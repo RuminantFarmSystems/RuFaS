@@ -14,6 +14,7 @@ import numpy
 from typing import Optional
 
 from RUFAS.routines.manure.manure_manager import simulate_daily_manure_manager
+from RUFAS.routines.manure.output_handler.manure_manager_output_handler import ManureManagerOutputHandler
 from RUFAS.util import Utility
 
 
@@ -38,6 +39,7 @@ class SimulationEngine:
 
         self._run_simulation_main_loop()
         self.output.finalize(self.state, self.weather, self.time)
+        ManureManagerOutputHandler.produce_csv(self.config.csv_dir, self.state.manure_manager)
         t_end_sim = timer.time()
 
         print("Simulation Successful")
@@ -50,6 +52,7 @@ class SimulationEngine:
             sys.stdout.write('Producing Graphics\n')
             t_start_graphics = timer.time()
             self.output.produce_graphics()
+            ManureManagerOutputHandler.produce_graphics(self.config.graphic_dir, self.state.manure_manager)
             t_end_graphics = timer.time()
             graphics_prod_time = t_end_graphics - t_start_graphics
         else:
@@ -79,16 +82,14 @@ class SimulationEngine:
 
     def _daily_simulation(self) -> None:
         """Executes the daily simulation routines."""
-
         routines.daily_animal_routine(
             self.state.animal_manager, self.state.feed, self.weather, self.time)
         routines.daily_manure_storage_routine(
             self.state.manure_storage, self.state.animal_manager)
         simulate_daily_manure_manager(
             self.state.manure_manager, self.state.animal_manager)
-        routines.daily_fields_routine(
-            self.state.fields, self.state.manure_storage, self.weather, self.time)
-        routines.daily_feed_routine(self.state.feed, self.state.fields, self.state.animal_manager,
+        self.state.field_manager.daily_update_routine(self.weather, self.time)
+        routines.daily_feed_routine(self.state.feed, self.state.field_manager, self.state.animal_manager,
                                     self.output.reports['feed_storage_report'])
 
         self.output.daily_update(self.state, self.weather, self.time)
@@ -112,7 +113,6 @@ class SimulationEngine:
 
     def _run_pre_annual_routines(self) -> None:
         """TODO GitHub issue #137"""
-        routines.annual_fields_routine(self.state.fields, self.time)
         routines.annual_feed_routine(self.state.feed)
 
     def _run_post_annual_routines(self) -> None:

@@ -1,8 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Tuple
-from typing import Union
+from typing import Dict, Union, Tuple
 
 from RUFAS.routines.manure.manure_treatments.manure_treatment_types import ManureTreatmentType
 
@@ -121,6 +120,8 @@ class DefaultManureTreatmentConfigFactory:
             freeboard_input=0.3048
     )
 
+    COMPOST_BEDDED_PACK_BARN_CONFIG = ManureTreatmentConfig()
+
     @classmethod
     def get_instance(cls, treatment_type: ManureTreatmentType) -> \
             Union[ManureTreatmentConfig, Tuple[ManureTreatmentConfig, ManureTreatmentConfig]]:
@@ -144,5 +145,6 @@ class DefaultManureTreatmentConfigFactory:
             ManureTreatmentType.ANAEROBIC_DIGESTION_AND_LAGOON_WITH_SPLIT: (
                 cls.ANAEROBIC_DIGESTION_CONFIG, cls.ANAEROBIC_LAGOON_CONFIG
             ),
+            ManureTreatmentType.COMPOST_BEDDED_PACK_BARN: cls.COMPOST_BEDDED_PACK_BARN_CONFIG,
         }
         return manure_treatment_config_by_type[treatment_type]

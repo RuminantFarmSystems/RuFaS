@@ -23,7 +23,6 @@ from RUFAS.routines.manure.manure_handlers.manure_handler_daily_output import Ma
 from RUFAS.routines.manure.manure_handlers.milking_parlor import MilkingParlor
 from RUFAS.routines.manure.pen.manure_manager_pen import ManureManagerPen
 
-
 om = OutputManager()
 
 
@@ -32,6 +31,7 @@ class ManureHandlerType(DefaultEnum):
     FLUSH_SYSTEM = 'flush system'
     MANUAL_SCRAPING = 'manual scraping'
     ALLEY_SCRAPER = 'alley scraper'
+    TILLAGE = 'tillage'
     DEFAULT = FLUSH_SYSTEM
 
 
@@ -109,10 +109,17 @@ class BaseManureHandler:
         """
         if pen.num_animals == 0:
             return ManureHandlerDailyOutput()
-        
+
+        bedding_data = {"bedding_mass_per_day": bedding.bedding_mass_per_day,
+                        "bedding_density": bedding.bedding_density,
+                        "bedding_dry_matter_content": bedding.bedding_dry_matter_content,
+                        "bedding_cleaned_fraction": bedding.bedding_cleaned_fraction,
+                        "bedding_type": bedding.bedding_type._name_,
+                        }
+
         info_map = {"class": self.__class__.__name__,
                     "function": self.daily_update.__name__,
-                    "bedding": vars(bedding),
+                    "bedding": bedding_data,
                     "sim_day": sim_day, }
 
         housing_methane_emission = GasEmissions.calc_housing_methane_emission(
@@ -179,12 +186,12 @@ class BaseManureHandler:
                     "function": self.calc_cleaning_water_volume_in_main_barn.__name__,
                     }
 
-        clean_water_volume = num_animals * self.config.cleaning_water_use_rate
+        cleaning_water_volume = num_animals * self.config.cleaning_water_use_rate
 
         om.add_variable(
-            "cleaning_water_volume_in_main_barn", clean_water_volume, info_map)
+            "cleaning_water_volume_in_main_barn", cleaning_water_volume, info_map)
 
-        return clean_water_volume
+        return cleaning_water_volume
 
 
 class FlushSystem(BaseManureHandler):
@@ -217,6 +224,16 @@ class AlleyScraper(BaseManureHandler):
     pass
 
 
+class Tillage(BaseManureHandler):
+    """A class that handles calculations related to tillage.
+
+    Attributes:
+        All inherited from BaseManureHandler.
+
+    """
+    pass
+
+
 @dataclass
 class ManureHandlerConfig:
     """Class for storing the configuration of a manure handler.
@@ -225,11 +242,13 @@ class ManureHandlerConfig:
         cleaning_water_use_rate: Amount of cleaning water used per animal per day, L.
         minutes_per_cleaning: Number of minutes needed per animal per cleaning, minutes.
         cleanings_per_day: Number of cleanings per day.
+        daily_tillage_frequency: Number of times per day that compost bedding is tilled.
 
     """
     cleaning_water_use_rate: float = 0.0
     minutes_per_cleaning: int = 8
     cleanings_per_day: int = 2
+    daily_tillage_frequency: int = 0
 
 
 class DefaultManureHandlerConfigFactory:
@@ -243,6 +262,9 @@ class DefaultManureHandlerConfigFactory:
     )
     ALLEY_SCRAPER_CONFIG = ManureHandlerConfig(
         cleaning_water_use_rate=10.0,
+    )
+    TILLAGE_CONFIG = ManureHandlerConfig(
+        daily_tillage_frequency=1,
     )
 
     @classmethod
@@ -263,7 +285,8 @@ class DefaultManureHandlerConfigFactory:
         manure_handler_config_by_type = {
             ManureHandlerType.FLUSH_SYSTEM: cls.FLUSH_SYSTEM_CONFIG,
             ManureHandlerType.MANUAL_SCRAPING: cls.MANUAL_SCRAPING_CONFIG,
-            ManureHandlerType.ALLEY_SCRAPER: cls.ALLEY_SCRAPER_CONFIG
+            ManureHandlerType.ALLEY_SCRAPER: cls.ALLEY_SCRAPER_CONFIG,
+            ManureHandlerType.TILLAGE: cls.TILLAGE_CONFIG,
         }
 
         manure_handler_config = manure_handler_config_by_type[manure_handler_type]
@@ -300,6 +323,7 @@ class ManureHandlerFactory:
             ManureHandlerType.FLUSH_SYSTEM: FlushSystem,
             ManureHandlerType.ALLEY_SCRAPER: AlleyScraper,
             ManureHandlerType.MANUAL_SCRAPING: ManualScraping,
+            ManureHandlerType.TILLAGE: Tillage
         }
 
         manure_handler_type = ManureHandlerType.get_type(

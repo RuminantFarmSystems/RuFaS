@@ -1,11 +1,12 @@
 # !/usr/bin/env python3
 
 from pathlib import Path
-import re
-from typing import Any, Dict, List, Optional, Union
+from typing import Any, Dict, List, Optional, Tuple, Union
+import datetime
 import json
 import os
-import datetime
+import pandas as pd
+import re
 
 from RUFAS.util import Utility
 
@@ -273,6 +274,7 @@ class OutputManager(object):
         ----------
         data_dict : Dict[str, Any]
             The dictionary to be saved
+
         path : str
             The path to the file to be saved
 
@@ -307,6 +309,74 @@ class OutputManager(object):
         except Exception as e:
             raise e
 
+    def _dict_to_csv_column_list(self, data_dict: Dict[str, List[Any]]) -> List[Tuple[str, pd.Series]]:
+        """Turns a dictionary to a list of csv columns.
+
+        Parameters
+        ----------
+        data_dict : Dict[str, List[Any]]
+            The dictionary to read from
+
+        Returns
+        -------
+        List[Tuple[str, pd.Series]]
+            A list of (column_name, column_data) tuples.
+
+        """
+        column_list = []
+        mandatory_fields = ["values", "info_maps"] if "info_maps" in data_dict else ["values"]
+        for field in mandatory_fields:
+            data_list = data_dict[field]
+            if data_list and isinstance(data_list[0], dict):
+                csv_column_lists: Dict[str, List[Any]] = {subkey: [] for item in data_list for subkey in item.keys()}
+                for nested_dictionary in data_list:
+                    for subkey, value in nested_dictionary.items():
+                        csv_column_lists[subkey].append(value)
+
+                for subkey in csv_column_lists.keys():
+                    column_title = f"{field}_{subkey}" if field == "info_maps" else subkey
+                    column_list.append((column_title, pd.Series(csv_column_lists[subkey], dtype=object)))
+            else:
+                column_list.append((field, pd.Series(data_list, dtype=object)))
+
+        return column_list
+
+    def _dict_to_file_csv(self, data_dict: Dict[str, Any], path: str) -> None:
+        """Saves a dictionary to a csv file.
+
+        Parameters
+        ----------
+        data_dict : Dict[str, Any]
+            The dictionary to be saved
+
+        path : str
+            The path to the file to be saved
+
+        Raises
+        ------
+        Exception
+            If an error occurs while writting to the file
+
+        """
+        info_map = {"class": self.__class__.__name__,
+                    "function": self._dict_to_file_csv.__name__,
+                    }
+        self.add_log("save_dict_file_try", f"Attempting to save to {path}.", info_map)
+
+        if len(data_dict) == 0:
+            self.add_log("save_dict_file_try", f"Nothing to save to {path}. Data dictionary is empty.", info_map)
+            return
+
+        (_, variable_data), = data_dict.items()
+        csv_column_data = self._dict_to_csv_column_list(variable_data)
+        df = pd.DataFrame(dict(csv_column_data))
+        try:
+            df.to_csv(path, index=False)
+        except Exception as e:
+            raise e
+
+        self.add_log("save_dict_file_try", f"Successfully saved to {path}.", info_map)
+
     def _list_to_file_txt(self, data_list: List[str], path: str) -> None:
         """Saves a list into a text file
 
@@ -321,7 +391,6 @@ class OutputManager(object):
         ------
         Exception
             If an error occurs while saving to the file
-
         """
         info_map = {"class": self.__class__.__name__,
                     "function": self._list_to_file_txt.__name__,
@@ -485,8 +554,37 @@ class OutputManager(object):
             filtered_pool = self._filter_variables_pool(filter_patterns, filter_file)
             if exclude_info_maps:
                 filtered_pool = self._exclude_info_maps(filtered_pool)
-            file_path = os.path.join(save_path, self._generate_file_name(f"saved_variables_{filter_file}", "json"))
-            self._dict_to_file_json(filtered_pool, file_path)
+
+            if filter_file.startswith("json_"):
+                file_path = os.path.join(save_path, self._generate_file_name(f"saved_variables_{filter_file}", "json"))
+                self._dict_to_file_json(filtered_pool, file_path)
+            elif filter_file.startswith("csv_"):
+                csv_directory = os.path.join(save_path, "CSVs", "om", "variables")
+                self._save_variables_to_csv_files(filtered_pool, csv_directory)
+            else:
+                self.add_warning("invalid filter file", f"{filter_file} must be prefixed with csv_ or json_", info_map)
+
+    def _save_variables_to_csv_files(self, data_dict: Dict[str, Any], path: str) -> None:
+        """
+        Saves the variables_pool into one csv file per variable in the given path to a directory.
+
+        Parameters
+        ----------
+        data_dict : Dict[str, Any]
+            The dictionary to be saved
+
+        path : str
+            Path to the output directory for the OutputManager.
+
+        """
+        try:
+            Path(path).mkdir(parents=True, exist_ok=True)
+        except Exception as e:
+            raise e
+
+        for key in data_dict.keys():
+            variable_csv_file_path = os.path.join(path, self._generate_file_name(key, "csv"))
+            self._dict_to_file_csv({key: data_dict[key]}, variable_csv_file_path)
 
     def dump_variables(self, path: str, exclude_info_maps: bool = False) -> None:
         """
@@ -505,8 +603,8 @@ class OutputManager(object):
         if exclude_info_maps:
             pool = self._exclude_info_maps(self.variables_pool)
 
-        file_path = os.path.join(path, self._generate_file_name("all_variables", "json"))
-        self._dict_to_file_json(pool, file_path)
+        json_file_path = os.path.join(path, self._generate_file_name("all_variables", "json"))
+        self._dict_to_file_json(pool, json_file_path)
 
     def dump_logs(self, path: str) -> None:
         """
@@ -567,10 +665,10 @@ class OutputManager(object):
         class_name.function_name.variable_name.info_maps: variable4_name
         """
 
-        var_list = [f"_{exclude_info_maps=}, expect info_maps accordingly.\n"]
+        var_list = [f"_{exclude_info_maps=}, expect info_maps accordingly.{os.linesep}"]
         for name, variable_data in self.variables_pool.items():
-            if not variable_data["values"]:
-                var_list.append(f"{name}: **NO VARIABLES**\n")
+            if "values" not in variable_data:
+                var_list.append(f"{name}: **NO VARIABLES**{os.linesep}")
                 continue
 
             parsable_dicts = []
@@ -582,10 +680,7 @@ class OutputManager(object):
             if is_variable_nested:
                 parsable_dicts.append("values")
             else:
-                var_list.append(f"{name}\n")
-
-            if format_option == "block":
-                var_list.append(f"{name}\n")
+                var_list.append(f"{name}{os.linesep}")
 
             prefix = name
             if format_option == "block":
@@ -594,10 +689,10 @@ class OutputManager(object):
             for parsable_dict in parsable_dicts:
                 keys = variable_data[parsable_dict][0].keys()
                 if format_option == "inline":
-                    var_list.append(f"{name}.{parsable_dict}: {list(keys)}\n")
+                    var_list.append(f"{name}.{parsable_dict}: {list(keys)}{os.linesep}")
                 else:
                     for key in keys:
-                        var_list.append(f"{prefix}.{parsable_dict}: {key}\n")
+                        var_list.append(f"{prefix}.{parsable_dict}: {key}{os.linesep}")
 
         file_path = os.path.join(
             path, self._generate_file_name("variable_names", "txt")

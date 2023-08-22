@@ -11,12 +11,12 @@ Author(s): Chris VanKerkhove, cjv47@cornell.edu,
 import math
 from RUFAS.routines.animal.animal_types import AnimalType
 from RUFAS.general_constants import GeneralConstants
+from RUFAS.routines.animal.animal_module_constants import AnimalModuleConstants
 from RUFAS.routines.animal.life_cycle.animal_base import AnimalBase
 from RUFAS.output_manager import OutputManager
 om = OutputManager()
 from typing import Optional
 from typing import Dict
-from RUFAS.routines.animal.ration import ration_constants
 
 
 def calc_rqmts(body_weight: float, mature_body_weight: float, day_of_pregnancy: int,
@@ -912,7 +912,7 @@ def calculate_NASEM_calcium_requirements(body_weight: float, mature_body_weight:
                      (day_of_pregnancy - 1)) * (body_weight/715)
     Ca_Lact = (0.295 + 0.239 * milk_true_protein) * milk_production
     calcium_requirement = Ca_Maint + Ca_Growth + Ca_Preg + Ca_Lact
-    return max(calcium_requirement, ration_constants.minimum_calcium)
+    return max(calcium_requirement, AnimalModuleConstants.MINIMUM_CALCIUM)
 
 
 def calculate_NRC_phosphorus_requirements(body_weight: float, mature_body_weight: float, 
@@ -1035,7 +1035,7 @@ def calculate_NASEM_phosphorus_requirements(body_weight: float, mature_body_weig
     else:
         P_Lact = milk_production * (0.49 + 0.13*milk_true_protein)
     phosphorus_requirement = P_Maint + P_Growth + P_Preg + P_Lact
-    return max(phosphorus_requirement, ration_constants.minimum_phosophorus)
+    return max(phosphorus_requirement, AnimalModuleConstants.MINIMUM_PHOSPHORUS)
 
 
 def calculate_NRC_DMI(animal_type: AnimalType, body_weight: float, day_of_pregnancy: int, days_in_milk: Optional[int],
@@ -1086,15 +1086,7 @@ def calculate_NRC_DMI(animal_type: AnimalType, body_weight: float, day_of_pregna
         dry_matter_intake_estimate = (
             (1.97 - 0.75 * math.exp(0.16 * (day_of_pregnancy - 280))) / 100) * body_weight
     else:
-        dry_matter_intake_estimate = body_weight**0.75 * (0.2435*net_energy_diet_concentration 
-                                                          - 0.0466*net_energy_diet_concentration**2 
-                                                          - 0.1128) / net_energy_diet_concentration
-        if day_of_pregnancy and day_of_pregnancy >= 210:
-            adjustment_factor = 1+((210-day_of_pregnancy) * 0.0025)
-            dry_matter_intake_estimate -= adjustment_factor
-    dry_matter_intake_estimate_minimum_flat = ration_constants.minimum_DMI
-    dry_matter_intake_estimate_minimum_percentage = ration_constants.minimum_DMI_percentage * body_weight
-    return max(dry_matter_intake_estimate, dry_matter_intake_estimate_minimum_percentage, 
+        return max(dry_matter_intake_estimate, dry_matter_intake_estimate_minimum_percentage, 
                dry_matter_intake_estimate_minimum_flat)
 
 
@@ -1147,13 +1139,7 @@ def calculate_NASEM_DMI(body_weight: float, mature_body_weight: float, days_in_m
                                       + 0.022*body_weight+(-0.689-1.87*parity_adjustment_factor)*body_condition_score_5) \
             * (1-(0.212+parity_adjustment_factor*0.136)*math.exp(-0.053*days_in_milk))
     else:
-        #dry_matter_intake_estimate = 0.022*mature_body_weight * \
-        #    (1-math.exp(-1.54*(body_weight/mature_body_weight)))
-        dry_matter_intake_estimate = (0.0226*mature_body_weight*(1-math.exp(-1.47*(body_weight/mature_body_weight))))\
-            -(0.082*(NDF_conc - (23.1+56*(body_weight/mature_body_weight)-30.6*(body_weight/mature_body_weight)**2.0)))
-    dry_matter_intake_estimate_minimum_flat = ration_constants.minimum_DMI
-    dry_matter_intake_estimate_minimum_percentage = ration_constants.minimum_DMI_percentage * body_weight
-    return max(dry_matter_intake_estimate, dry_matter_intake_estimate_minimum_percentage, 
+        return max(dry_matter_intake_estimate, dry_matter_intake_estimate_minimum_percentage, 
                dry_matter_intake_estimate_minimum_flat)
 
 
@@ -1209,7 +1195,7 @@ def energy_activity_rqmts(body_weight: float, housing: str, distance: Optional[f
             net_energy_activity = distance * 0.00035 * \
                 body_weight
         elif housing == 'Grazing':
-            # TODO This will be the DMI supplemented after grazing - requires grazing module implementation
+            # TODO This will be the DMI supplemented after grazing - requires grazing module implementation: See Issue #590
             nonpasturekgDMI = 1
             net_energy_activity = distance * body_weight * \
                 0.75 * ((600-12*nonpasturekgDMI))/600

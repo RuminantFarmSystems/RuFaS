@@ -42,10 +42,12 @@ def test_pen_manure_init() -> None:
         'non_degradable_volatile_solids': 9.0,
         'inorganic_phosphorus_fraction': 10.0,
         'organic_phosphorus_fraction': 11.0,
-        'phosphorus': 12.0,
-        'phosphorus_fraction': 13.0,
-        'potassium': 14.0,
-        'methane': 15.0
+        'non_water_inorganic_phosphorus_fraction': 12.0,
+        'non_water_organic_phosphorus_fraction': 13.0,
+        'phosphorus': 14.0,
+        'phosphorus_fraction': 15.0,
+        'potassium': 16.0,
+        'methane': 17.0
     }
 
     # Act
@@ -64,10 +66,11 @@ def test_pen_manure_init() -> None:
     assert manure.non_degradable_volatile_solids == approx(9.0)
     assert manure.inorganic_phosphorus_fraction == approx(10.0)
     assert manure.organic_phosphorus_fraction == approx(11.0)
-    assert manure.phosphorus == approx(12.0)
-    assert manure.phosphorus_fraction == approx(13.0)
-    assert manure.potassium == approx(14.0)
-    assert manure.methane == approx(15.0)
+    assert manure.non_water_inorganic_phosphorus_fraction == approx(12.0)
+    assert manure.non_water_organic_phosphorus_fraction == approx(13.0)
+    assert manure.phosphorus == approx(14.0)
+    assert manure.phosphorus_fraction == approx(15.0)
+    assert manure.potassium == approx(16.0)
 
     # --------------------------------------------------------------------------- #
 
@@ -86,10 +89,12 @@ def test_pen_manure_init() -> None:
     non_degradable_volatile_solids = 9.0
     inorganic_phosphorus_fraction = 10.0
     organic_phosphorus_fraction = 11.0
-    phosphorus = 12.0
-    phosphorus_fraction = 13.0
-    potassium = 14.0
-    methane = 15.0
+    non_water_inorganic_phosphorus_fraction = 12.0
+    non_water_organic_phosphorus_fraction = 13.0
+    phosphorus = 14.0
+    phosphorus_fraction = 15.0
+    potassium = 16.0
+    methane = 17.0
     animal_manure = AnimalManureExcretions(
         urea=urea,
         urine=urine,
@@ -102,6 +107,8 @@ def test_pen_manure_init() -> None:
         non_degradable_volatile_solids=non_degradable_volatile_solids,
         inorganic_phosphorus_fraction=inorganic_phosphorus_fraction,
         organic_phosphorus_fraction=organic_phosphorus_fraction,
+        non_water_inorganic_phosphorus_fraction=non_water_inorganic_phosphorus_fraction,
+        non_water_organic_phosphorus_fraction=non_water_organic_phosphorus_fraction,
         phosphorus=phosphorus,
         phosphorus_fraction=phosphorus_fraction,
         potassium=potassium,
@@ -131,6 +138,8 @@ def test_pen_manure_init() -> None:
     assert manure.non_degradable_volatile_solids == approx(animal_manure['non_degradable_volatile_solids'])
     assert manure.inorganic_phosphorus_fraction == approx(animal_manure['inorganic_phosphorus_fraction'] / num_animals)
     assert manure.organic_phosphorus_fraction == approx(animal_manure['organic_phosphorus_fraction'] / num_animals)
+    assert manure.non_water_inorganic_phosphorus_fraction == approx(animal_manure['non_water_inorganic_phosphorus_fraction'] / num_animals)
+    assert manure.non_water_organic_phosphorus_fraction == approx(animal_manure['non_water_organic_phosphorus_fraction'] / num_animals)
     assert manure.phosphorus == approx(animal_manure['phosphorus'] * GeneralConstants.GRAMS_TO_KG)
     assert manure.phosphorus_fraction == approx(animal_manure['phosphorus_fraction'] / num_animals)
     assert manure.potassium == approx(animal_manure['potassium'] * GeneralConstants.GRAMS_TO_KG)
