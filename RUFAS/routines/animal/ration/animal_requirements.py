@@ -90,7 +90,7 @@ def calc_rqmts(body_weight: float, mature_body_weight: float, day_of_pregnancy: 
         net_energy_lactation = calculate_NRC_energy_lactation_requirements(
             animal_type, milk_fat, milk_true_protein, milk_lactose, milk_production)
         dry_matter_intake_estimate = calculate_NRC_DMI(
-            animal_type, body_weight, day_of_pregnancy, days_in_milk, lactating, milk_production, milk_fat, net_energy_diet_concentration)
+            animal_type, body_weight, day_of_pregnancy, days_in_milk, milk_production, milk_fat, net_energy_diet_concentration)
         metabolizable_protein_requirement = calculate_NRC_protein_requirements(
             body_weight, conceptus_weight, day_of_pregnancy, animal_type, milk_production, milk_true_protein,
             calf_birth_weight, net_energy_growth, average_daily_gain, equivalent_shrunk_body_weight, dry_matter_intake_estimate, TDN_conc)
@@ -1053,8 +1053,6 @@ def calculate_NRC_DMI(animal_type: AnimalType, body_weight: float, day_of_pregna
         Day of pregnancy (days)
     days_in_milk : int
         Days in milk (days)
-    lactating : bool
-        Physiological condition (conditional)
     milk_production : float
         Milk yield (kg/d)
     milk_fat : float
