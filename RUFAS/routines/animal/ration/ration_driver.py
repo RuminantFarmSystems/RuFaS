@@ -254,6 +254,174 @@ def ration_report(ration, available_feeds):
     return nutrient_amount, nutrient_conc
 
 
+def ration_supply(ration, available_feeds, ration_report):
+    ration = ration.copy()
+    for non_numeric_key in ['status', 'objective']:
+        if non_numeric_key in ration:
+            del ration[non_numeric_key]
+    supply_report = {
+        'NE_maintenance_and_activity': 0.0,
+        'NE_lactation': 0.0,
+        'NE_growth': 0.0,
+        'Calcium': 0.0,
+        'Phosphorus': 0.0,
+        'Metabolizable_protein': 0.0,
+        'Forage_NDF': 0.0,
+        'Fat': 0.0
+    }
+    DMI = sum(ration.values())
+
+    # # OPTION 1
+    # for item in supply_report:
+    #     supply_report[item] = eval('get' + item + '(ration, available_feeds)')
+    # OPTION 2
+    for key, val in ration.items():
+        for item in supply_report:
+            # supply_report[item] += val * (available_feeds[key] / 100)
+            feed_item_info = available_feeds[key]
+            supply_report[item] += eval('get_' + item + '(val, feed_item_info)')
+    
+    supply_report['Metabolizable_protein'] = get_Metabolizable_protein(ration, available_feeds, ration_report, mean_body_weight = 500)
+
+
+def get_NE_maintenance_and_activity(val, feed_item_info):
+    """
+    
+    """
+    ME_item = get_ME(val, feed_item_info)
+    # turn ME into NEm
+    if feed_item_info['is_fat'] == 1:
+        NEm_item = (0.8 * ME_item)
+    else:
+        NEm_item = 1.37 * ME_item - 0.138 * ME_item ** 2 + 0.0105 * ME_item ** 3 - 1.12
+    return NEm_item
+
+def get_ME(val, feed_item_info):
+    """
+    
+    """
+    DE_item = feed_item_info['DE']
+    if feed_item_info['type'] == 'Mineral':
+        ME_item = 0.0
+    elif feed_item_info['is_fat'] == 1:
+        ME_item = DE_item
+    elif feed_item_info['EE'] >= 3:
+        ME_item = 1.01 * DE_item - 0.45 + 0.0046 * (feed_item_info['EE'] - 3)
+    else:
+        ME_item = 1.01 * DE_item - 0.45
+    return ME_item * val
+
+def get_NE_lactation(val, feed_item_info):
+    """
+    
+    """
+    ME_item = get_ME(val, feed_item_info)
+    if feed_item_info['type'] == 'Mineral':
+        NE_lactation_item = 0.0
+    elif feed_item_info['is_fat'] == 1:
+        NE_lactation_item = 0.8 * feed_item_info['DE']
+    elif feed_item_info['EE'] >= 3:
+        NE_lactation_item = 0.703 * ME_item - 0.19 + ((0.097 * ME_item + 0.19) / 97) * (feed_item_info['EE'] - 3)
+    else:
+        NE_lactation_item = 0.703 * ME_item - 0.19
+    return NE_lactation_item
+
+
+def get_NE_growth(val, feed_item_info):
+    """
+    
+    """
+    ME_item = get_ME(val, feed_item_info)
+    if feed_item_info['type'] == 'Mineral':
+        NE_growth = 0.0
+    elif feed_item_info['is_fat'] == 1:
+        NE_growth = 0.55 * ME_item
+    else:
+        NE_growth  = 1.42 * ME_item - 0.174 * ME_item ** 2 + 0.0122 * ME_item ** 3 - 1.65
+    return NE_growth
+
+
+def get_Calcium(val, feed_item_info):
+    """
+    
+    """
+    if feed_item_info['type'] == 'Forage':
+        dCa = 0.3
+    elif feed_item_info['type'] == 'Conc':
+        dCa = 0.6
+    elif feed_item_info['type'] == 'Mineral':
+        dCa = 0.95
+    else:
+        dCa = 0.0
+    calcium_item = val * 0.01 * dCa
+    return calcium_item
+
+
+def get_Phosphorus(val, feed_item_info):
+    """
+    
+    """
+    if feed_item_info['Type'] == 'Forage':
+        dP = 0.64
+    elif feed_item_info['Type'] == 'Conc':
+        dP = 0.70
+    elif feed_item_info['Type'] == 'Mineral':
+        dP = 0.80
+    else:
+        dP = 0.0
+    return dP * feed_item_info['phosphorus'] * 0.01
+
+
+def get_Metabolizable_protein(ration, available_feeds, ration_report, mean_body_weight):
+    """
+    
+    """
+    ############ SUPPLY RATION_REPORT AS DICT OF THESE TWO!
+    TDNconc = ration_report['nutrient_conc']['TDN']
+    TDNtotal = ration_report['nutrient_amount']['TDN']
+    SBW = mean_body_weight * 0.96
+    if TDNtotal < (0.035 * mean_body_weight ** 0.75):
+        DMI_to_maint = 1
+    else:
+        DMI_to_maint = (TDNtotal / (0.035 * SBW ** 0.75))
+
+    for key, val in ration.items():
+        # supply_report[item] += val * (available_feeds[key] / 100)
+        feed_item_info = available_feeds[key]
+        # KP calcs
+        # RDP calcs
+        # RUP calcs
+        # MP bact calcs
+        # MP supply calc
+    pass
+
+
+def get_TDN_discount():
+    """
+    Crucial step to take into account TDN digesitbility decreate from DMI and TDN
+
+    Initial step in NE/ME calcs
+    """
+    pass
+
+def get_Forage_NDF(val, feed_item_info):
+    """
+    
+    """
+    if feed_item_info['Type'] == 'Forage':
+        forage_NDF_item = val * feed_item_info['NDF']
+    else:
+        forage_NDF_item = 0.0
+    return forage_NDF_item
+
+def get_Fat(val, feed_item_info):
+    """
+    
+    """
+    fat_item = feed_item_info['EE'] * val
+    return fat_item
+
+
 class Requirements:
     """
     Stores the information for the calculated requirements of animals to
