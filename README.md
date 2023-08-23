@@ -50,9 +50,8 @@ Redesign and implement Feed storage module ||||Moved to MS 2.5
 Revisit the Animal Module design – Refactoring -- Animal Manager
 Revisit the Animal Module design – Refactoring -- Animal Ration formulation
 Revisit the Animal Module design – Refactoring -- Animal Life Cycle|||| Moved to MS 2.5
-Finalize IM and OM connections with the model
 Deprecate the output handler, add missing functionalities, and reports to OM
-Go through the entire codebase and ensure IM is the only way we are receiving input data
+Go through the entire codebase and ensure IM is the only way we are receiving input data||||[IM Integration tracking](https://docs.google.com/spreadsheets/d/1k8J6MelPrsrz6Tv4fQNAG-kLSN7oQTQOCEy3I6F0IqU/edit?usp=sharing)
 
 
 SMEs:
