@@ -473,7 +473,7 @@ class InputManager:
         """Validates an input data bool element."""
         return input_data_value in (True, False)
 
-    def _fix_data(self, variable_properties: Dict[str, Any], element_hierarchy: list,
+    def _fix_data(self, variable_properties: Dict[str, Any], element_hierarchy: List[Union[str, int]],
                   input_data: Dict[str, Any]) -> bool:
         """
         Attempt to fix the invalid data.
