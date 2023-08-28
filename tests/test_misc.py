@@ -84,7 +84,6 @@ def patch_simulation_engine(mocker: MockerFixture) -> SimulationEngine:
     sim_eng.weather = MagicMock()
     sim_eng.time = MagicMock()
     sim_eng.state = MagicMock()
-    sim_eng.output = MagicMock()
 
     return sim_eng
 
@@ -110,9 +109,6 @@ def test_simulate(patch_simulation_engine: SimulationEngine, mocker: MockerFixtu
     sim_eng = patch_simulation_engine
     sim_eng.simulate()
     patch_for_run_simulation_main_loop.assert_called_once()
-    sim_eng.output.finalize.assert_called_once_with(
-        sim_eng.state, sim_eng.weather, sim_eng.time
-    )
     patch_for_show_final_messages.assert_called_once()
     patch_for_manure_output_handler_produce_csv.assert_called_once_with(
         sim_eng.config.csv_dir, sim_eng.state.manure_manager
@@ -137,7 +133,6 @@ def test_daily_simulation(
     mocker.patch("RUFAS.routines.daily_feed_routine")
     mocker.patch("RUFAS.simulation_engine.SimulationEngine._advance_time")
     patch_simulation_engine._daily_simulation()
-    assert patch_simulation_engine.output.daily_update.call_count == 1
     for mocked in mocker._patches_and_mocks:
         assert mocked[1].call_count == 1
     patch_simulation_engine.state.field_manager.daily_update_routine.assert_called_once()

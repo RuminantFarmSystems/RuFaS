@@ -19,14 +19,13 @@ from . import nitrogen_loss, carbon_loss, protein_degradation
 from .feed_typed_dicts import PurchasedFeedTypedDict
 from ..animal.pen import Pen
 from ...database_reader import DatabaseReader
-from RUFAS.output_handler.reports.feed_storage_report import StorageReport
 from RUFAS.output_manager import OutputManager
 from typing import Dict, List, Union
 
 om = OutputManager()
 
 
-def daily_feed_routine(feed, fields, animal_manager, feed_report):
+def daily_feed_routine(feed, fields, animal_manager):
     """
     Description:
         Executes the functions that run the daily feed routines for both storage
@@ -42,7 +41,7 @@ def daily_feed_routine(feed, fields, animal_manager, feed_report):
     """
 
     # feed storage routines to be run daily
-    feed.daily_feed_storage(fields, feed_report)
+    feed.daily_feed_storage(fields)
 
     # feed management routines to be run daily
     feed.daily_feed_management(animal_manager)
@@ -667,7 +666,7 @@ class Feed:
                     storage.DMI_forage_max['lactating_cows'] = available_forage \
                                                                / storage.cow_days['lactating_cows']
 
-    def daily_feed_storage(self, fields, feed_report):
+    def daily_feed_storage(self, fields):
         """
         Description:
             Executes daily routines relating to crop and feed storage, which
@@ -729,11 +728,6 @@ class Feed:
                         standard_name = 'standard_storage_' + str(self.standard_storage_count)
                         self.available_storage[standard_name] = self.Storage(standard_data)
                         self.storage_options[standard_name] = self.available_storage[standard_name]
-                        report = feed_report.reports[standard_name] = StorageReport(feed_report.storage_report_data,
-                                                                                    standard_name)
-                        report.initialize_dir(feed_report.csv_dir, feed_report.graphic_dir)
-
-                        report.initialize()
 
                         self.standard_storage_count += 1
 
@@ -750,8 +744,6 @@ class Feed:
                 self.available_storage.pop(storage_name)
 
             self.summarize_feed_storage()
-            
-
 
     def daily_feed_management(self, animal_manager):
         """
