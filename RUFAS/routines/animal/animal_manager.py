@@ -1405,8 +1405,6 @@ class AnimalManager:
                     om.add_variable(f'ration_supply_report for {pen.id}', ration_supply_report, info_map)
                     print('ration_supply_report')
                     print(ration_supply_report)
-                    if pen.animal_combination == Pen.AnimalCombination.LAC_COW:
-                        assert 1==2
                     
 
                 pen.ration_nutrient_amount = nutrient_amount

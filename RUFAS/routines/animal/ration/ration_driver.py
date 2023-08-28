@@ -470,7 +470,7 @@ def get_Metabolizable_protein(ration, available_feeds, ration_report, body_weigh
     RDP_diet = []
     RUP_diet = []
     for i, val in enumerate(ration.values()):
-        RDP_diet.append(RDP_list[i] * val * 0.01) # TODO Use constants for g to KG and reverse
+        RDP_diet.append(RDP_list[i] * val * 0.01)
         RUP_diet.append(val * RUP_list[i] * dRUP_diet[i])
 
     # print(f'RDP_diet new = {RDP_diet}')
@@ -478,15 +478,12 @@ def get_Metabolizable_protein(ration, available_feeds, ration_report, body_weigh
     #print(f'TDN_total_actual = {TDN_total_actual}')
     
     # MP bact calcs
-    MP_bact = 0.64 * min(1000 * .13 * TDN_total_actual, 1000 * 0.85 * sum(RDP_diet))
+    MP_bact = 0.64 * min(1000 * 0.13 * TDN_total_actual, 1000 * 0.85 * sum(RDP_diet))
     # print(f'MP_bact = {MP_bact}')
     print(f'RUP_diet = {RUP_diet}')
     # MP supply calc
     MP_supply = MP_bact + sum(RUP_diet)*0.0001 + 0.4 * 11.8 * DMI_estimate
     return MP_supply
-
-
-
 
 
 def get_Forage_NDF(val, feed_item_info, ration_report, body_weight):
