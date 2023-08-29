@@ -153,7 +153,7 @@ class SimulationEngine:
             file_path (Path): Path to the input json file
 
         Raises:
-            InvalidJSONFile: If the json file at the given path does not conform 
+            InvalidJSONFile: If the json file at the given path does not conform
             with the format required
         """
         print(f"Initializing simulation environment from {file_path}")
