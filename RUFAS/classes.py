@@ -18,9 +18,7 @@ from RUFAS.routines import Feed
 from RUFAS.routines.field.manager.field_manager import FieldManager
 from RUFAS.routines.animal.animal_manager import AnimalManager
 from RUFAS.routines.manure.manure_manager import ManureManager
-from RUFAS.routines.manure_storage.manure_storage import ManureStorage
 from RUFAS.util import Utility
-from typing import Any, Dict
 
 
 om = OutputManager()
@@ -57,7 +55,6 @@ class State:
         animal_config = Utility.read_json_file(input_dir / 'animal' / data['animal'])
         animal_config['manure_management_scenarios'] = manure_manager_config['manure_management_scenarios']
         self.animal_manager = AnimalManager(animal_config, config, self.feed, weather, time)
-        self.manure_storage = ManureStorage(self.animal_manager)
         self.manure_manager = ManureManager(self.animal_manager, weather, time, manure_manager_config)
         self.field_manager = FieldManager(data['fields'], manure_manager=self.manure_manager)
 
@@ -68,10 +65,9 @@ class State:
         """
         self.field_manager.annual_update_routine()
         self.animal_manager.annual_reset()
-        self.manure_storage.annual_reset()
 
     def annual_mass_balance(self, time):
-        self.manure_storage.annual_mass_balance()
+        pass
 
 
 class Config:
