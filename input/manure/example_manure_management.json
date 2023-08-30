@@ -31,8 +31,7 @@
                 "holding_center_water_type": "Fresh",
                 "sprinkler_water_use_rate": 3,
                 "is_sprinkler_water_use_rate_animal_dependent": false,
-                "is_sprinkler_water_use_rate_calc_on_yearly_basis": false,
-
+                "is_sprinkler_water_use_rate_calc_on_yearly_basis": false
             },
             "compost_bedded_pack_barn": {
                 "bedding_type": "Straw",

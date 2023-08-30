@@ -97,6 +97,7 @@
 			},
 			"culling": {
 				"parity_death_prob": [0.039,0.056,0.085,0.117],
+				"parity_cull_prob": [0.169, 0.233, 0.301, 0.408],
  				"death_cull_prob": [0, 0.18, 0.32, 0.42, 0.48, 0.54, 0.60, 0.65, 0.70, 0.77, 0.83, 0.89, 0.95, 1]
 			},
 			"life_cycle": {
@@ -105,7 +106,7 @@
 		}
 	},
 	"methane_mitigation": {
-		"methane_mitigation_method": null,
+		"methane_mitigation_method": "None",
 		"3-NOP_additive_amount": 70,
 		"monensin_additive_amount": 24,
 		"essential_oils_additive_amount": 0,

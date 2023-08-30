@@ -282,6 +282,9 @@ class InputManager:
             invalid elements, valid elements, and fixed elements as well as a boolean
             which is True if the data is valid, False otherwise.
         """
+        info_map = {"class": self.__class__.__name__,
+                    "function": self._validate_csv_element.__name__,
+                    }
         element_counter_and_validity = {"fixed_elements": 0, "total_elements": 0, "valid_elements": 0,
                                         "invalid_elements": 0, "is_valid": True}
         property_data = input_data[var_name]
@@ -300,6 +303,8 @@ class InputManager:
                 else:
                     element_counter_and_validity["invalid_elements"] += 1
                     element_counter_and_validity["is_valid"] = False
+                    om.add_warning("Invalid unfixable element found",
+                                   f"{var_name} element {element_num} was invalid and could not be fixed", info_map)
                     if eager_termination:
                         return element_counter_and_validity
 
@@ -391,6 +396,8 @@ class InputManager:
                 if is_fixed:
                     element_counter_and_validity["fixed_elements"] += 1
                 else:
+                    om.add_warning("Invalid unfixable element found",
+                                   f"{var_name} was invalid and could not be fixed", info_map)
                     element_counter_and_validity["invalid_elements"] += 1
                     element_counter_and_validity["is_valid"] = False
                 return element_counter_and_validity
