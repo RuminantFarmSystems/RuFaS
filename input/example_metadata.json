@@ -1498,6 +1498,33 @@
         }
       }
     },
+    "user_feeds_properties": {
+      "rufas_id": {
+        "type": "number",
+        "description": "Unique integer identifier for feeds used within the RuFaS model.",
+        "minimum": 1
+      },
+      "feed_name": {
+        "type": "string",
+        "description": "A general common name for the feed as defined within RuFaS.",
+        "pattern": "(ALFALFA|ALMOND|Ammonium Chloride|Ammonium phosphate (monobasic)|Ammonium Phosphate, dibasic|Ammonium Sulfate|APPLE|BAKERY BYPRODUCT|BARLEY|BEET, SUGAR|BERMUDAGRASS|BLOOD|Bone Meal|BREWERS GRAINS|BREWERS YEAST|Calcium carbonate|Calcium Choride dihydrate|Calcium Choride,anhydrous|Calcium hydroxide|Calcium iodate|Calcium oxide|Calcium Phosphate monobasic|Calcium Sulfate, dihydrate|Calf grower 14CP (Fed to calves only)|Calf grower 16CP (Fed to calves only)|Calf starter 18CP high starch (Fed to calves only)|Calf starter 18CP low starch (Fed to calves only)|Calf starter 22CP high starch (Fed to calves only)|Calf starter 22CP med starch (Fed to calves only)|CANDY|CANOLA|Casein|CHOCOLATE|CITRUS|Cobalt carbonate|Cobalt carbonate (6H2O)|Cobalt chloride (6H2O)|Cobalt organic generic|Cobalt sulfate (7H2O)|Copper chloride (2H2O)|Copper organic, generic|Copper oxide|Copper sulfate (5H2O)|CORN, YELLOW|COTTON SEED|DESTILLERY BYPRODUCT|Dicalcium Phosphate, dibasic|EDDI|FATS AND OILS|FEATHERS|Ferrous carbonate|Ferrous sulfate (7H2O)|Ferrous sulfate (H2O)|FISH BYPRODUCTS|FRUIT AND VEGETABLE|GLYCEROL|GRAIN SCREENINGS|GRASSES, COOL SEASON|GRASS-Legume MIXTURES Pr. GR.   (17-22% Hcel.)|Grass-LEGUME MIXTURES Pr. LG. (10-13% HCEL.)|Iron oxide|Iron, organic generic|LEGUMES, FORAGE|Limestone, dolomite|Limestone, ground|LINSEED (FLAX)|LINSEED (FLAXSEED)|Magnesium carbonate|Magnesium Chloride, Hexahydrate|Magnesium hydroxide|Magnesium Oxide|Magnesium sulfate (7H2O)|Manganese carbonate|Manganese chloride|Manganese chloride (4H2O)|Manganese organic generic|Manganese oxide|Manganese sulfate (5H2O)|Manganese sulfate (H2O)|MEAT|MILK|Milk Replacer|Milk replacer 20 CP 20 fat|Milk replacer 26 CP 17 fat|MILLET|Mixed grass-legume (12-15% Hcel.)|MOLASSES|OATS|Oystershell|PEANUT|PEAS|Phosphate rock|Phosphate, Curacao|Phosphate, defluorinated|Phosphoric acid|PINEAPPLE|Potassium bicarbonate|Potassium carbonate|Potassium Chloride|Potassium iodide|Potassium Sulfate|POTATO|POULTRY|RICE|RUMEN PROTECTED AA|RYE, ANNUAL|SAFFLOWER|Selenate, sodium (10 H2O)|Selenite, sodium|Selenium yeast, generic|Skim milk, fresh|Sodium Bicarbonate|Sodium carbonate (H2O)|Sodium Choride|Sodium Phosphate, Monohydrate|Sodium sesquicarbonate (2H2O)|Sodium Sulfate decahydrate|Sodium tripolyphosphate|SORGHUM, GRAIN TYPE|SORGHUM, SUDAN TYPE|SOYBEAN|SPELT|SUDAN GRASS|SUGAR|SUGARCANE|SUNFLOWER|SWEET CORN|TAPIOCA|TOMATO|TRITICALE|UREA|Vit A premix|Vit D premix|Vit E premix|VitTM Premix, generic|WHEAT|WHEY|Whole Milk|Zinc carbonate|Zinc chloride|Zinc oxide|Zinc sulfate (H2O)|Zinc, organic generic)"
+      },
+      "feed_description": {
+        "type": "string",
+        "description": "A more specific description of the feed that uniquely distinguishes it from other feeds with a similar or same name.",
+        "pattern": "((NH4)2SO4|(NH4)H2PO4|Anchovy, meal, mech.|Arg|Bagasse, hay|Bagasse, silage|Barley hay|Beet sugar|Bran|Bran, deffated|Bread, waste|Byproduct|Byproduct meal|Byproduct, wet|Ca(H2PO4)2|Ca(OH)2|CaCl2|CaCl2.2H2O|CaCO3|CaHPO4|Calcium soaps|Cannery waste|CaO|Casein|CaSO4.2H2O|Cassava|Cereal byproduct|Cobs|Cookie byproduct|Corn grain dry, fine grind|Corn silage, immature|Corn silage, mature|Corn silage, mid maturity|Corn stalks, ensiled, high DM|Corn stalks, ensiled, low DM|Corn, ear w husk, stlk, hi fbr|Corn, ear, huks, stlk, low fbr|DDGS, high fat|DDGS, high protein|DDGS, low fat|Delactosed|DGS modified|DGS wet|Distillers solubles|Dried|Dry, cattle|Fat, canola oil|Fat, corn oil|Fat, cottonseed oil|Fat, flaxseed oil|Fat, lard|Fat, safflower oil|Fat, soybean oil|Fat, sunflower oil|forage silage, immature|Fresh, immature|Fresh, mid-maturity|Germ|Germ meal|Gin trash|Gluten feed, dried|Gluten feed, wet|Gluten meal, dried|Glycerol|Grain|Grain and cob, dry, ground|Grain and cob, high moisture, ground|Grain, cracked, dry|Grain, dry rolled|Grain, ground, dry|Grain, ground, high moisture|Grain, rolled|Grain, rolled, high moisture|Grain, steam-flaked|Grain, steam-rolled|Grower|Hay|Hay, all samples|Hay, headed|Hay, immature|Hay, mature|Hay, mid mature|Hay, mid maturity|Hay, mid-maturity|Hay, vegetative|High protein, byproduct|His|Hominy feed|Hulls|Hydrolyzed meal|Hydrolyzed meal with some viscera|Hydrolyzed tallow fatty acids|Ile|K2SO4|KCl|Leu|Lys|Malt sprouts|Meal|Meal, expellers|Meal, extruded|Meal, high dRUP|Meal, low dRUP|Meal, nonenzymatically browned|Meal, rendered|Meal, solvent|Meal, solvent, 44% CP|Meal, solvent, 48% CP|Meat and bone, rendered|Menhaden, meal, mech.|Met|MgCl2.6H2O|MgO|Middlings|Milk Replacer|Mineral|NA|Na2SO4.10H2O|NaCl|NaH2PO4.H2O|NaHCO3|Not chocolate, byproduct|Oil seeds, whole|Partially hydrogenated tallow|Pasture|Pasture, intensively managed|Peanuts|Peas|Permeate|Phe|Plus pea silage|Pomace|Pomace, wet|Protein concentrate|Pulp dried|Pulp dried, molasses added|Pulp wet|Replacer|Seed|Seeds, whole|Seeds, whole roasted|Silage|Silage, all samples|Silage, early head|Silage, early maturity|Silage, headed|Silage, headed (mature)|Silage, immature|Silage, mature|Silage, mid maturity|Silage, mid-maturity|Silage, vegetative|Silage, vegetative (mature)|Skim, dried powder|Skimmed|Skins|Sorghum soybean,silage|Source unknown|Starter|Steamed|Straw|Sugar|Sugarcane|Tallow|Thr|Tifton-85, hay, 3-4wk growth|Trp|Urea|Val|Vegetable oil|Vitamins|Wet|Wet, cattle|Whole|Whole Milk)"
+      },
+      "feed_type": {
+        "type": "string",
+        "description": "The general type or category of the feed (group).",
+        "pattern": "(Aminoacids|Forage|Conc|Milk|Mineral|Vitamins)"
+      },
+      "units": {
+        "type": "string",
+        "description": "The unit of measurement used for the feed.",
+        "pattern": "(kg)"
+      }
+    },
     "NRC_Comp_properties": {
       "rufas_id": {
         "type": "number",
