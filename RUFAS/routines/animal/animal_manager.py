@@ -39,7 +39,7 @@ from RUFAS.routines.animal.pen import Pen
 from RUFAS.routines.animal.ration import ration_driver as ration_driver
 from RUFAS.routines.feed.feed import Feed
 from RUFAS.routines.animal.ration.calf_ration import optimize as calf_optimize
-
+from RUFAS.routines.animal.ration.ration_driver import RationReporter
 
 import random
 from statistics import mean
@@ -1351,7 +1351,6 @@ class AnimalManager:
             instance of the Feed class
 
         """
-
         available_feeds = ration_driver.AvailableFeeds()
         available_feeds.feed_nutrients(feed)
         for pen in self.all_pens:
@@ -1377,7 +1376,7 @@ class AnimalManager:
                         raise Exception('Too many attempts at optimizing ration.')
 
                 # recording ration nutrition information in pen
-                nutrient_amount, nutrient_conc = ration_driver.ration_report(ration_per_animal, feed.available_feeds)
+                nutrient_amount, nutrient_conc = RationReporter.report_ration(ration_per_animal, feed.available_feeds)
                 pen.ration_nutrient_amount = nutrient_amount
                 pen.ration_nutrient_conc = nutrient_conc
                 pen.MEdiet = ration_vals['ME_tot']

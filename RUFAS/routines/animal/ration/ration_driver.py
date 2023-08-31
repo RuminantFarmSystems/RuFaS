@@ -99,60 +99,63 @@ def ration_formulation(pen, available_feeds, animal_grouping_scenario):
     else:
         return pen.ration, ration_vals
 
-class RationReport:
-    pass
+class RationReporter:
+    def __init__(cls):
+        cls.nutrient_amount = []
+        cls.nutrient_conc = []
+    
+    @classmethod
+    def report_ration(cls, ration, available_feeds):
+        """
+        Calculates information in the ration about nutrient information including
+        nutrient amounts and concentrations. Returns a dictionary of nutrient amounts
+        and nutrient calculations respectively. Psuedocode for these calculations
+        are located in Ration Class Variables in Animal Module Pseduocode
 
-def ration_report(ration, available_feeds):
-    """
-    Calculates information in the ration about nutrient information including
-    nutrient amounts and concentrations. Returns a dictionary of nutrient amounts
-    and nutrient calculations respectively. Psuedocode for these calculations
-    are located in Ration Class Variables in Animal Module Pseduocode
+        Args:
+            ration: a dictionary of the calculated ration
+            available_feeds: available feeds dictionary from the Feed class object
+        """
+        nutrient_amount = {'dm': 0, 'as_fed': 0, 'CP': 0, 'ADF': 0, 'NDF': 0,
+                        'lignin': 0, 'ash': 0, 'phosphorus': 0, 'potassium': 0,
+                        'N': 0, "EE": 0, "starch": 0}
+        nutrient_conc = {}
+        ration = ration.copy()
+        for non_numeric_key in ['status', 'objective']:
+            if non_numeric_key in ration:
+                del ration[non_numeric_key]
+        nutrients = ['DM', 'CP', 'ADF', 'NDF', 'lignin', 'ash', 'phosphorus',
+                    'potassium', 'N', 'EE', 'starch']
 
-    Args:
-        ration: a dictionary of the calculated ration
-        available_feeds: available feeds dictionary from the Feed class object
-    """
-    nutrient_amount = {'dm': 0, 'as_fed': 0, 'CP': 0, 'ADF': 0, 'NDF': 0,
-                       'lignin': 0, 'ash': 0, 'phosphorus': 0, 'potassium': 0,
-                       'N': 0, "EE": 0, "starch": 0}
-    nutrient_conc = {}
-    ration = ration.copy()
-    for non_numeric_key in ['status', 'objective']:
-        if non_numeric_key in ration:
-            del ration[non_numeric_key]
-    nutrients = ['DM', 'CP', 'ADF', 'NDF', 'lignin', 'ash', 'phosphorus',
-                 'potassium', 'N', 'EE', 'starch']
-
-    # feed nutrient amounts
-    for key, val in ration.items():
-        nutrient_amount['dm'] += val
-        for nutr in nutrients:
-            # all values on a 100% dry matter basis
-            if nutr == 'DM':
-                nutrient_amount['as_fed'] += val * (available_feeds[key][nutr] / 100)
-            elif nutr == 'N':
-                # [A.2.A.2]
-                if key[:3] in ['121', '122', '155', '157']:
-                    denom = 6.38
-                # [A.2.A.1]
+        # feed nutrient amounts
+        for key, val in ration.items():
+            nutrient_amount['dm'] += val
+            for nutr in nutrients:
+                # all values on a 100% dry matter basis
+                if nutr == 'DM':
+                    nutrient_amount['as_fed'] += val * (available_feeds[key][nutr] / 100)
+                elif nutr == 'N':
+                    # [A.2.A.2]
+                    if key[:3] in ['121', '122', '155', '157']:
+                        denom = 6.38
+                    # [A.2.A.1]
+                    else:
+                        denom = 6.25
+                    nutrient_amount[nutr] += (available_feeds[key]['CP'] / (denom * 100)) * val
                 else:
-                    denom = 6.25
-                nutrient_amount[nutr] += (available_feeds[key]['CP'] / (denom * 100)) * val
-            else:
-                nutrient_amount[nutr] += val * (available_feeds[key][nutr] / 100)
+                    nutrient_amount[nutr] += val * (available_feeds[key][nutr] / 100)
 
-    # feed nutrient concentrations
-    dm_amount = nutrient_amount['dm']
-    if dm_amount == 0:
-        dm_amount = 1
-    for nutr in nutrients:
-        if nutr == 'DM':
-            nutrient_conc['dm'] = (nutrient_amount['as_fed'] / dm_amount) * 100
-        else:
-            # all values on a 100% dry matter basis
-            nutrient_conc[nutr] = (nutrient_amount[nutr] / dm_amount) * 100
-    return nutrient_amount, nutrient_conc
+        # feed nutrient concentrations
+        dm_amount = nutrient_amount['dm']
+        if dm_amount == 0:
+            dm_amount = 1
+        for nutr in nutrients:
+            if nutr == 'DM':
+                nutrient_conc['dm'] = (nutrient_amount['as_fed'] / dm_amount) * 100
+            else:
+                # all values on a 100% dry matter basis
+                nutrient_conc[nutr] = (nutrient_amount[nutr] / dm_amount) * 100
+        return nutrient_amount, nutrient_conc
 
 
 class AvailableFeeds:

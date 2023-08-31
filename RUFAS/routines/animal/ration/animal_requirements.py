@@ -281,7 +281,6 @@ class AnimalRequirements:
         self.calc_pen_requirements(NEmaint, NEa, NEg, NEpreg, NEl, MP_req, Ca_req, P_req, DMIest, BW, milk, CP_milk,
                                milk_production_reduction)
         
-        # setting average nutrient requirements pen class variable
         avg_nutrient_rqmts = {'NEmaint': self.NEmaint, 'NEa': self.NEa,
                               'NEg': self.NEg, 'NEpreg': self.NEpreg, 'NEl': self.NEl,
                               'MP_req': self.MP_req, 'Ca_req': self.Ca_req, 'P_req': self.P_req,
@@ -1040,11 +1039,6 @@ class AnimalRequirements:
         NPEndUrin = 53 * GeneralConstants.NITROGEN_TO_PROTEIN * body_weight * 0.001
         NDF_conc = 0.3
         # TODO get the current NDF_conc See Issue #531
-        # hardcoded '0.3' is a general value that works for initial simulation purposes
-        # In pen.py, cow.py, heiferI, II, III, ration_driver. add the variable to the calc_rqmts call each time
-        # something like:
-        # NDF_conc = conc['NDF']
-        # amount, conc = ration_report(self.ration, feed.available_feeds)
         CPMFP = (11.62 + 0.134 * NDF_conc) * dry_matter_intake_estimate
         NPMFP = CPMFP * 0.73
         NPGrowth = frame_weight_gain * 0.11 * 0.86
