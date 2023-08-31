@@ -141,7 +141,6 @@ def total_energy(x):
     global MEact
     global TDNact
     global DEact
-    # DMI calculated by the NLP
     DMI = sum(x)
     # Dietary TDN content, kg
     TotalTDN = sum(np.multiply(x, TDN))
@@ -667,10 +666,6 @@ def optimize(animal_combination, available_feeds: Dict) -> None:
             usermod = minimize(objective, x0, method='SLSQP', bounds=bnds, constraints=cow_cons)
         else:
             usermod = minimize(objective, x0, method='SLSQP', bounds=bnds, constraints=heifer_cons)
-        # Uncomment to use
-        print(str(animal_combination))
-        if usermod.success:
-            print('No constraints violated')
         return usermod
     # TODO: Put AnimalCombination enum in a separate file and import it here to avoid circular import
     elif str(animal_combination) in ['AnimalCombination.LAC_COW']:

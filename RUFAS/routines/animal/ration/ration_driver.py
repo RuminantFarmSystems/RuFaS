@@ -244,18 +244,15 @@ def get_user_defined_ration(req: animal_requirements, pen, available_feeds, anim
         ration_vals = NLP.get_ration_vals(make_solution_from_fixed_ration(ration))
         return ration, ration_vals
 
-    # No method to reduce requirements for non-lactating animals, so fixed ration is used
     if str(pen.animal_combination) not in ['AnimalCombination.LAC_COW'] and not solution.success:
         fixed_ration = True
 
 
-    # Follow method to reduce requirements for lactating animals
     if str(pen.animal_combination) in ['AnimalCombination.LAC_COW'] and solution is not None:
         running_milk_reduction = 0.0
         while not solution.success:
             running_average_milk = calc_milk_average(pen)
             reduction = 0.25
-            # if lactation reduction "not allowed", or max or min milk production reached, use fixed ration
             if udrv.milk_reduction_maximum == 0.0 or \
                 running_milk_reduction + reduction > udrv.milk_reduction_maximum or\
                     running_average_milk - reduction < 1.0:
@@ -263,13 +260,11 @@ def get_user_defined_ration(req: animal_requirements, pen, available_feeds, anim
                 solution.success = True
                 break
             
-            # reattempt optimization
             num_reattempts += 1
             running_milk_reduction += reduction
             reduce_milk_production(pen, reduction)
             running_average_milk = calc_milk_average(pen)
 
-            # recalculating requirements after reduction
             req.set_requirements(pen, animal_grouping_scenario, True)
             solution, ration_vals = optimization(req, available_feeds, pen.animal_combination)
             failed_constraints = []
@@ -366,7 +361,6 @@ def ration_formulation(pen, available_feeds, animal_grouping_scenario):
     num_reattempts = 0
     
     # TODO: Put AnimalCombination enum in a separate file and use it here instead of hardcoding the names
-    # TODO: pick one! other option: if str(pen.animal_combination) in ['AnimalCombination.LAC_COW']:
     if pen.animal_combination.name in ['LAC_COW']:
         while not solution.success:
             num_reattempts += 1
@@ -375,18 +369,8 @@ def ration_formulation(pen, available_feeds, animal_grouping_scenario):
             if failed_constraints:
                 for constr in failed_constraints:
                     constraints_failed_list.append(constr["fun"].__name__)
-            # These values for reduction are not from pseudocode, but the values below
-            # are based on fastest case runtime testing
-
             # TODO: continue testing for more efficient reductions: see Issues #569, 577, 589
-            # NEl_con = NLP.NEl_constraint(solution.x)
-            # if NEl_con < -0.5:
-            #     reduction = 3 * (-NEl_con)
-            # else:
-            #     reduction = 1.5
-            # for animal in pen.animals_in_pen:
-            #     animal.estimated_daily_milk_produced -= reduction
-            #     animal.milk_production_reduction -= reduction
+
             reduction = 0.5
             reduce_milk_production(pen, reduction)
 

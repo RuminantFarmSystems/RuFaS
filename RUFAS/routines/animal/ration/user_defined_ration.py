@@ -14,9 +14,6 @@ class UserDefinedRationManager(object):
     Methods return rations and change keys in the dict as needed.
     """
 
-    # check the setup JSON
-    # if user-defined-ration is NOT selected, initialize as NULL
-    
     __instance = None
 
     def __new__(cls):
@@ -43,7 +40,7 @@ class UserDefinedRationManager(object):
         This checks the keys in the ration_percents dictionary and checks
          against the AvailableFeeds dictionary. If a given key is not found in the 
          latter, 2 is added to the key. This is because there is a 'quality' change
-         in the Feed module that changes keys that vary in quality. Said functionality may be deprecated, hence this quick solution. 
+         in the Feed module that changes keys that vary in quality. 
         
         Parameters
         ----------
@@ -68,7 +65,7 @@ class UserDefinedRationManager(object):
 
     def ration_to_use(pen_animal_combo, available_feeds: Dict) -> Dict:
         """
-        Function outputs the correct dictionary from the UserDefinedRationManager class
+        Function outputs the dictionary for a given animal combination from the UserDefinedRationManager class
         
         Parameters
         ----------
@@ -98,12 +95,13 @@ class UserDefinedRationManager(object):
 
     def make_ration_from_user_values(ration_percents: Dict, available_feeds, req) -> Dict:
         """
-        Generate ration dict from user ration percents input
+        Generate ration dict from user ration percents input, 
+        scaled to their estimated dry matter intake (DMI)
         
         Parameters
         ----------
         ration_percents : Dict
-            dictionary of feed ids and their associated percentage of DMI 
+            dictionary of feed ids and their desired percentages of estimated DMI
         
         available_feeds : Dict
             available feeds dictionary from the Feed class object
@@ -125,5 +123,5 @@ class UserDefinedRationManager(object):
             else:
                 ration[available_feeds['feed_key'][feed_id]] = 0.0
         ration['status'] = 'Optimal'
-        ration['objective'] = 0.0 # setting as optimal
+        ration['objective'] = 0.0
         return ration
