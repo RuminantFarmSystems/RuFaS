@@ -35,9 +35,6 @@ def daily_feed_routine(feed, fields, animal_manager):
         feed: an instance of the Feed object
         fields: an instance of the Field object (contains harvest information)
         animal_manager: an instance of the AnimalManager object
-        feed_report: an instance of the FeedStorageReport class defined in
-            RUFAS.output_handler.reports.feed_storage_report.py. Included here
-            in order to add generated storage receptacles to the feed storage report.
     """
 
     # feed storage routines to be run daily
@@ -678,9 +675,6 @@ class Feed:
 
         Args:
             fields : an instance of the Field object (contains harvest information)
-            feed_report: an instance of the BaseReport object defined in
-                output_hanler/base_report.py. Included here so that new storage
-                can be added to output.
         """
         # aggregate crop yield across fields
         return
