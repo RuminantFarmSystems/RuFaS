@@ -9,97 +9,96 @@ Description: Main file in the ration formulation process that connects all
 Author(s): Chris VanKerkhove, cjv47@cornell.edu
 """
 import collections
-import math
-from typing import Callable
-from typing import List
-import numpy as np
-import numpy.typing as npt
 from typing import Set
 from RUFAS.output_manager import OutputManager
-from RUFAS.routines.animal.animal_types import AnimalType
 from RUFAS.routines.animal.ration import animal_requirements
-from RUFAS.routines.animal.ration import ration_NLP
+from RUFAS.routines.animal.ration.ration_NLP import RationOptimizer
 
-NLP = ration_NLP.RationOptimizer()
+NLP = RationOptimizer()
 
 om = OutputManager()
 
 class RationManager:
-    pass
-
-
-def ration_formulation(pen, available_feeds, animal_grouping_scenario):
     """
-    Function that links the ration_driver file with the calc_ration function in
-    animal_manager.py. Returns a dictionary of the rations by feed and status of the NLP
-    optimization.
-
-    Args:
-        pen: an object of class Pen
-        available_feeds: an object of class AvailableFeeds
-        animal_grouping_scenario: A grouping scenario of animals used in the current simulation, specified in
-            AnimalGroupingScenario enum and AnimalManager class
 
     """
 
-    # creating instance of class requirements
-    req = animal_requirements.AnimalRequirements()
-    # Use grouping scenario to find the type of each animal in pen
-    req.set_requirements(pen, animal_grouping_scenario, False)
+    @classmethod
+    def formulate_ration(cls, pen, available_feeds, animal_grouping_scenario):
+        """
+        Function that links the ration_driver file with the calc_ration function in
+        animal_manager.py. Returns a dictionary of the rations by feed and status of the NLP
+        optimization.
 
-    solution, ration_vals = NLP.optimization(req, available_feeds, pen.animal_combination)
-    # Reduction of milk production estimate process to achieve feasible solution
-    num_reattempts = 0
-    failed_list = []
+        Args:
+            pen: an object of class Pen
+            available_feeds: an object of class AvailableFeeds
+            animal_grouping_scenario: A grouping scenario of animals used in the current simulation, specified in
+                AnimalGroupingScenario enum and AnimalManager class
 
-    # TODO: Put AnimalCombination enum in a separate file and use it here instead of hardcoding the names
-    if pen.animal_combination.name in ['LAC_COW']:
-        while not solution.success:
-            num_reattempts += 1
-            failed_constraints = NLP.find_failed_constraints(solution.x, NLP.cow_cons)
-            if failed_constraints:
-                for constr in failed_constraints:
-                    failed_list.append(constr["fun"].__name__)
-                    print(constr)
-            # These values for reduction are not from pseudocode, but the values below
-            # are based on fastest case runtime testing
-            # TODO: continue testing for more efficient reductions: see Issues #569, 577, 589
-            # NEl_con = NLP.NEl_constraint(solution.x)
-            # if NEl_con < -0.5:
-            #     reduction = 3 * (-NEl_con)
-            # else:
-            #     reduction = 1.5
-            reduction = 0.25
-            for animal in pen.animals_in_pen:
-                animal.estimated_daily_milk_produced -= reduction
-                animal.milk_production_reduction -= reduction
-            # recalculating requirements after reduction
-            req.set_requirements(pen, animal_grouping_scenario, True)
-            solution, ration_vals = NLP.optimization(req, available_feeds, pen.animal_combination)
-            info_map = {"class": "no_caller_class",
-                "function": pen.__init__.__name__,
-                }
+        """
 
-    if solution is not None:
-        if failed_list != []:
-            fail_summary = [num_reattempts, failed_list]
-            om.add_variable(f'failed_constraint_summary_for_pen_{pen.id}', fail_summary, info_map)
-        ration = {}
-        for feed_id in range(len(available_feeds['feed_id'])):
-            i = feed_id * 3
-            num = solution.x[i]
-            num += solution.x[i + 1]
-            num += solution.x[i + 2]
-            ration[available_feeds['feed_key'][feed_id]] = round(num, 6)
-        ration['status'] = 'Optimal'
-        ration['objective'] = NLP.objective(solution.x)
-        return ration, ration_vals
-    # safeguard if scipy SLSQP bounds error still occurs after many iterations
-    # using previous cycles ration for this pen
-    else:
-        return pen.ration, ration_vals
+        # creating instance of class requirements
+        req = animal_requirements.AnimalRequirements()
+        # Use grouping scenario to find the type of each animal in pen
+        req.set_requirements(pen, animal_grouping_scenario, False)
+
+        solution, ration_vals = NLP.optimization(req, available_feeds, pen.animal_combination)
+        # Reduction of milk production estimate process to achieve feasible solution
+        num_reattempts = 0
+        failed_list = []
+
+        # TODO: Put AnimalCombination enum in a separate file and use it here instead of hardcoding the names
+        if pen.animal_combination.name in ['LAC_COW']:
+            while not solution.success:
+                num_reattempts += 1
+                failed_constraints = NLP.find_failed_constraints(solution.x, NLP.cow_cons)
+                if failed_constraints:
+                    for constr in failed_constraints:
+                        failed_list.append(constr["fun"].__name__)
+                        print(constr)
+                # These values for reduction are not from pseudocode, but the values below
+                # are based on fastest case runtime testing
+                # TODO: continue testing for more efficient reductions: see Issues #569, 577, 589
+                # NEl_con = NLP.NEl_constraint(solution.x)
+                # if NEl_con < -0.5:
+                #     reduction = 3 * (-NEl_con)
+                # else:
+                #     reduction = 1.5
+                reduction = 0.25
+                for animal in pen.animals_in_pen:
+                    animal.estimated_daily_milk_produced -= reduction
+                    animal.milk_production_reduction -= reduction
+                # recalculating requirements after reduction
+                req.set_requirements(pen, animal_grouping_scenario, True)
+                solution, ration_vals = NLP.optimization(req, available_feeds, pen.animal_combination)
+                info_map = {"class": "no_caller_class",
+                    "function": pen.__init__.__name__,
+                    }
+
+        if solution is not None:
+            if failed_list != []:
+                fail_summary = [num_reattempts, failed_list]
+                om.add_variable(f'failed_constraint_summary_for_pen_{pen.id}', fail_summary, info_map)
+            ration = {}
+            for feed_id in range(len(available_feeds['feed_id'])):
+                i = feed_id * 3
+                num = solution.x[i]
+                num += solution.x[i + 1]
+                num += solution.x[i + 2]
+                ration[available_feeds['feed_key'][feed_id]] = round(num, 6)
+            ration['status'] = 'Optimal'
+            ration['objective'] = NLP.objective(solution.x)
+            return ration, ration_vals
+        # safeguard if scipy SLSQP bounds error still occurs after many iterations
+        # using previous cycles ration for this pen
+        else:
+            return pen.ration, ration_vals
 
 class RationReporter:
+    """
+
+    """
     def __init__(cls):
         cls.nutrient_amount = []
         cls.nutrient_conc = []
