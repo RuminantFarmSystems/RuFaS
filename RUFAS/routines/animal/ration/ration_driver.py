@@ -18,118 +18,14 @@ from typing import Set
 from RUFAS.output_manager import OutputManager
 from RUFAS.routines.animal.animal_types import AnimalType
 from RUFAS.routines.animal.ration import animal_requirements
-from RUFAS.routines.animal.ration import ration_NLP as NLP
+from RUFAS.routines.animal.ration import ration_NLP
+
+NLP = ration_NLP.RationOptimizer()
 
 om = OutputManager()
 
 class RationManager:
     pass
-
-def optimization(requirements, available_feeds, animal_combination):
-    """
-    Function that sets up the nutrients and requirements lists into structured
-    inputs for the non-linear program and calls the optimization function.
-
-    Args:
-        requirements: object of class Requirements
-        available_feeds: object of class AvailableFeeds
-        animal_combination: one of the animal combinations specified in the AnimalCombination enum
-    """
-    price = NLP.list_reconfig(available_feeds['price'])
-    TDN = NLP.list_reconfig(available_feeds['TDN'])
-    DE = NLP.list_reconfig(available_feeds['DE'])
-    EE = NLP.list_reconfig(available_feeds['EE'])
-    is_fat = NLP.list_reconfig(available_feeds['is_fat'])
-    calcium = NLP.list_reconfig(available_feeds['calcium'])
-    phosphorus = NLP.list_reconfig(available_feeds['phosphorus'])
-    NDF = NLP.list_reconfig(available_feeds['NDF'])
-    feed_type = NLP.list_reconfig(available_feeds['type'])
-    is_wetforage = NLP.list_reconfig(available_feeds['is_wetforage'])
-    Kd = NLP.list_reconfig(available_feeds['Kd'])
-    N_A = NLP.list_reconfig(available_feeds['N_A'])
-    N_B = NLP.list_reconfig(available_feeds['N_B'])
-    CP = NLP.list_reconfig(available_feeds['CP'])
-    dRUP = NLP.list_reconfig(available_feeds['dRUP'])
-    # TODO: Put AnimalCombination enum in a separate file and use it here instead of hardcoding the names
-    if str(animal_combination) in ['AnimalCombination.LAC_COW']:
-        limit = NLP.list_reconfig(available_feeds['lactating_cow_limit'])
-        cow_type = True
-    else:
-        limit = NLP.list_reconfig(available_feeds['dry_cow_limit'])
-        cow_type = False
-    NLP.set_globals(price, requirements.NEmaint, requirements.NEa, requirements.NEpreg,
-                    requirements.NEl, requirements.NEg, requirements.MP_req,
-                    requirements.Ca_req, requirements.P_req,
-                    TDN, DE, EE, is_fat, requirements.avg_BW, calcium, phosphorus, NDF,
-                    feed_type, is_wetforage, Kd, N_A, N_B, CP, dRUP, limit, cow_type,
-                    DMIest_=requirements.DMIest)
-    # try block for catching scipy SLSQP error
-    i = 0
-    count = 0
-    while i < 1:
-        try:
-            solution = NLP.optimize(animal_combination)
-        except:
-            i -= 1
-        finally:
-            i += 1
-            count += 1
-        # this case should not be called, but is in place to not crash the
-        # simulation if bounds error is not resolved
-        if count > 30:
-            solution = None
-            break
-
-    # retrieving MEact from diet
-    if solution is None:
-        ration_vals = None
-    else:
-        ration_vals = NLP.get_ration_vals(solution.x)
-    return solution, ration_vals
-
-
-def is_constraint_violated(solution_x: npt.NDArray, constraint: dict[str, Callable]) -> bool:
-        """
-        Helper function to check a solution dictionary to see if a given constraint 
-            in a list of constraints was met.
-        
-        Parameters
-        ----------
-        solution_x: numpy nd array, e.g. npt.NDArray
-            solution.x array from minimize function used in ration_NLP.py
-        constraint: dict[str, Any]
-            constraint function as defined in ration_NLP.py
-
-        """
-        result = constraint['fun'](solution_x)
-        if constraint['type'] == 'ineq' and result < 0:
-            return True
-        elif constraint['type'] == 'eq' and not np.isclose(result, 0):
-            return True
-        else:
-            return False
-
-
-def find_failed_constraints(solution_x: npt.NDArray, constraints: List[dict[str,Callable]]) -> List[dict[str,Callable]]:
-        """
-        Returns list of constraints that were not met during optmization step.
-        
-        Parameters
-        ----------
-        solution_x: numpy nd array, e.g. npt.NDArray
-            solution.x is from minimize function used in ration_NLP.py, 
-                solution obj itself is returned as  <dict class 'scipy.optimize._optimize.OptimizeResult'>
-
-        constraints: List[dict[str, Callable]]
-            list of constraint functions as defined in ration_NLP.py
-
-        Returns
-        -------
-        List[dict[str,Callable]]
-            the same type of list as the constraints themselves
-                just filtered such that the ones that failed are returned
-        """
-        return list(filter(lambda c: is_constraint_violated(solution_x, c), constraints))
 
 
 def ration_formulation(pen, available_feeds, animal_grouping_scenario):
@@ -151,7 +47,7 @@ def ration_formulation(pen, available_feeds, animal_grouping_scenario):
     # Use grouping scenario to find the type of each animal in pen
     req.set_requirements(pen, animal_grouping_scenario, False)
 
-    solution, ration_vals = optimization(req, available_feeds, pen.animal_combination)
+    solution, ration_vals = NLP.optimization(req, available_feeds, pen.animal_combination)
     # Reduction of milk production estimate process to achieve feasible solution
     num_reattempts = 0
     failed_list = []
@@ -160,10 +56,11 @@ def ration_formulation(pen, available_feeds, animal_grouping_scenario):
     if pen.animal_combination.name in ['LAC_COW']:
         while not solution.success:
             num_reattempts += 1
-            failed_constraints = find_failed_constraints(solution.x, NLP.cow_cons)
+            failed_constraints = NLP.find_failed_constraints(solution.x, NLP.cow_cons)
             if failed_constraints:
                 for constr in failed_constraints:
                     failed_list.append(constr["fun"].__name__)
+                    print(constr)
             # These values for reduction are not from pseudocode, but the values below
             # are based on fastest case runtime testing
             # TODO: continue testing for more efficient reductions: see Issues #569, 577, 589
@@ -178,7 +75,7 @@ def ration_formulation(pen, available_feeds, animal_grouping_scenario):
                 animal.milk_production_reduction -= reduction
             # recalculating requirements after reduction
             req.set_requirements(pen, animal_grouping_scenario, True)
-            solution, ration_vals = optimization(req, available_feeds, pen.animal_combination)
+            solution, ration_vals = NLP.optimization(req, available_feeds, pen.animal_combination)
             info_map = {"class": "no_caller_class",
                 "function": pen.__init__.__name__,
                 }
