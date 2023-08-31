@@ -53,12 +53,15 @@ class State:
                 initialize the state
         """
         input_dir = Utility.get_base_dir() / 'input'
-        feed_class_data = im.get_data("feed")
-        self.feed = Feed(feed_class_data)
+        feed_class_config = im.get_data("feed")
+        self.feed = Feed(feed_class_config)
+        manure_class_config = im.get_data("manure_management")
         manure_manager_config = Utility.read_json_file(input_dir / 'manure' / data['manure'])
+        animal_class_config = im.get_data("animal")
         animal_config = Utility.read_json_file(input_dir / 'animal' / data['animal'])
+        animal_class_config['manure_management_scenarios'] = manure_manager_config['manure_management_scenarios']
         animal_config['manure_management_scenarios'] = manure_manager_config['manure_management_scenarios']
-        self.animal_manager = AnimalManager(animal_config, config, self.feed, weather, time)
+        self.animal_manager = AnimalManager(animal_class_config, config, self.feed, weather, time)
         self.manure_storage = ManureStorage(self.animal_manager)
         self.manure_manager = ManureManager(self.animal_manager, weather, time, manure_manager_config)
         self.field_manager = FieldManager(data['fields'], manure_manager=self.manure_manager)

@@ -725,6 +725,68 @@
                 "minimum": 0,
                 "maximum": 1
               }
+            },
+            "mastitis_cull_prob": {
+              "type": "array",
+              "description": "Culling rate for mastitis",
+              "properties": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1
+              }
+            },
+            "udder_cull_prob": {
+              "type": "array",
+              "description": "Culling rate for udder reasons",
+              "properties": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1
+              }
+            },
+            "feet_leg_cull_prob": {
+              "type": "array",
+              "description": "Culling rate for feet and leg reasons",
+              "properties": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1
+              }
+            },
+            "unknown_cull_prob": {
+              "type": "array",
+              "description": "Culling rate for unknown reasons",
+              "properties": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1
+              }
+            },
+            "disease_cull_prob": {
+              "type": "array",
+              "description": "Culling rate for disease",
+              "properties": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1
+              }
+            },
+            "injury_cull_prob": {
+              "type": "array",
+              "description": "Culling rate for injury",
+              "properties": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1
+              }
+            },
+            "cull_day_count": {
+              "type": "array",
+              "description": "Culling day count",
+              "properties": {
+                "type": "number",
+                "minimum": 0
+              }
             }
           },
           "life_cycle": {
