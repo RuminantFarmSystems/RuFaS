@@ -22,6 +22,8 @@ from RUFAS.routines.animal.ration import ration_NLP as NLP
 
 om = OutputManager()
 
+class RationManager:
+    pass
 
 def optimization(requirements, available_feeds, animal_combination):
     """
@@ -145,7 +147,7 @@ def ration_formulation(pen, available_feeds, animal_grouping_scenario):
     """
 
     # creating instance of class requirements
-    req = Requirements()
+    req = animal_requirements.AnimalRequirements()
     # Use grouping scenario to find the type of each animal in pen
     req.set_requirements(pen, animal_grouping_scenario, False)
 
@@ -200,6 +202,8 @@ def ration_formulation(pen, available_feeds, animal_grouping_scenario):
     else:
         return pen.ration, ration_vals
 
+class RationReport:
+    pass
 
 def ration_report(ration, available_feeds):
     """
@@ -252,282 +256,6 @@ def ration_report(ration, available_feeds):
             # all values on a 100% dry matter basis
             nutrient_conc[nutr] = (nutrient_amount[nutr] / dm_amount) * 100
     return nutrient_amount, nutrient_conc
-
-
-class Requirements:
-    """
-    Stores the information for the calculated requirements of animals to
-    be used in the ration formulation.
-    """
-
-    def __init__(self):
-        """
-        Initializes a requirements object with default values of specific
-        requirements at 0.
-        
-        Notes
-        -----
-        NEmaint = Net energy for maintenance requirement (Mcal)
-        
-        NEa = Net energy for activity requirement (Mcal)
-        
-        NEg = Net energy for growth requirement (Mcal)
-        
-        NEpreg = Net energy requirement for pregnancy (Mcal)
-        
-        NEl = Net energy requirement for lactation (Mcal)
-
-        MP_req = Metabolizable protein requirement for growth (g)
-        
-        Ca_req = Calcium requirement (g)
-        
-        P_req = Phosphorus requirement (g)
-        
-        DMIest = dry matter intake estimation (kg)
-        
-        avg_BW = average body weight in pen (kg)
-        
-        avg_milk = average milk production per animal (kg/day)
-        
-        avg_CP_milk = average crude protein content of milk (%)
-        
-        """
-        
-        # Net energy for maintenance requirement (Mcal)
-        self.NEmaint = 0
-        # Net energy for activity requirement (Mcal)
-        self.NEa = 0
-        # Net energy for growth requirement (Mcal)
-        self.NEg = 0
-        # Net energy requirement for pregnancy (Mcal)
-        self.NEpreg = 0
-        # Net energy requirement for lactation (Mcal)
-        self.NEl = 0
-        # Metabolizable protein requirement for growth (g)
-        self.MP_req = 0
-        # Calcium requirement (g)
-        self.Ca_req = 0
-        # Phosphorus requirement (g)
-        self.P_req = 0
-        # dry matter intake estimation (kg)
-        self.DMIest = 0
-        # average body weight in pen
-        self.avg_BW = 0
-        # average milk production (kg/day)
-        self.avg_milk = 0
-        # average crude protein content of milk (%)
-        self.avg_CP_milk = 0
-    
-    def calc_pen_requirements(self, NEmaint: List[float], NEa: List[float], NEg: List[float], NEpreg: List[float],
-                               NEl: List[float], MP_req: List[float], Ca_req: List[float], P_req: List[float], 
-                               DMIest: List[float], BW: List[float], milk: List[float], CP_milk: List[float],
-                               milk_production_reduction: List[float]) -> None:
-        """
-        This functions sets the average (or #th percentile) pen requirements. Each input parameter is a list of floats generated in ration_driver.set_requirements
-        
-        Parameters
-        ----------
-        NEmaint: List[float]
-            List of net energy for maintenance requirement (Mcal) for all animals in pen
-        NEa: List[float]
-            List of Net energy for activity requirement (Mcal) for all animals in pen
-        NEg: List[float]
-            List of Net energy for growth requirement (Mcal) for all animals in pen
-        NEpreg: List[float]
-            List of Net energy requirement for pregnancy (Mcal) for all animals in pen
-        NEl: List[float]
-            List of Net energy requirement for lactation (Mcal) for all animals in pen
-        MP_req: List[float]
-            List of Metabolizable protein requirement for growth (g) for all animals in pen
-        Ca_req: List[float]
-            List of Calcium requirement (g) for all animals in pen
-        P_req: List[float]
-            List of Phosphorus requirement (g) for all animals in pen
-        DMIest: List[float] 
-            List of dry matter intake estimation (kg) for all animals in pen
-        BW: List[float]
-            List of body weight (kg) for all animals in the pen for all animals in pen
-        milk: List[float]
-            List of milk production of the animals in the pen (kg)
-        CP_milk: List[float] 
-            List of milk crude protein content of the animals in the pen (%)
-        milk_production_reduction: List[float]
-            list of milk_production_reduction values for all animals in the pen (kg)
-        """
-        # in future will be set in the argument, here hardcoded to show the rough logic and keep using the mean
-        calc_method = 'mean'
-        if calc_method == 'mean':
-            # populating the class variables as an average across cows for each requirement
-            self.NEmaint = np.mean(NEmaint)
-            self.NEa = np.mean(NEa)
-            self.NEg = np.mean(NEg)
-            self.NEpreg = np.mean(NEpreg)
-            self.NEl = np.mean(NEl)
-            self.MP_req = np.mean(MP_req)
-            self.Ca_req = np.mean(Ca_req)
-            self.P_req = np.mean(P_req)
-            self.DMIest = np.mean(DMIest)
-            self.avg_BW = np.mean(BW)
-            self.avg_milk = np.mean(milk)
-            self.avg_CP_milk = np.mean(CP_milk)
-            self.avg_milk_production_reduction = np.mean(milk_production_reduction)
-        else:
-            # here we'd implement another method, e.g. percentile, median, etc.
-            requirement_percentile = 90
-            self.NEmaint = np.percentile(NEmaint, requirement_percentile)
-            self.NEa = np.percentile(NEa, requirement_percentile)
-            self.NEg = np.percentile(NEg, requirement_percentile)
-            self.NEpreg = np.percentile(NEpreg, requirement_percentile)
-            self.NEl = np.percentile(NEl, requirement_percentile)
-            self.MP_req = np.percentile(MP_req, requirement_percentile)
-            self.Ca_req = np.percentile(Ca_req, requirement_percentile)
-            self.P_req = np.percentile(P_req, requirement_percentile)
-            self.DMIest = np.percentile(DMIest, requirement_percentile)
-            self.avg_BW = np.percentile(BW, requirement_percentile)
-            self.avg_milk = np.percentile(milk, requirement_percentile)
-            self.avg_CP_milk = np.percentile(CP_milk, requirement_percentile)
-            self.avg_milk_production_reduction = np.percentile(milk_production_reduction, requirement_percentile)
-        
-
-
-    def set_requirements(self, pen, animal_grouping_scenario, recalc):
-        """
-        Calculates the average requirements utilizing cow_requirements.py and an
-        input pen to generate the average requirements across a pen. It then
-        populates the corresponding class variables.
-
-        Args:
-            pen: an instance of an object of class Pen
-            animal_grouping_scenario: a grouping scenario fixed for current simulation, specified in AnimalManager
-            recalc: boolean to see if requirements need to be recalculated since grouping
-        """
-        NEmaint = []
-        NEa = []
-        NEg = []
-        NEpreg = []
-        NEl = []
-        MP_req = []
-        Ca_req = []
-        P_req = []
-        DMIest = []
-        BW = []
-        milk = [0]
-        milk_production_reduction = [0]
-        CP_milk = [0]
-
-        if recalc:
-            # iterating through each animal in the pen and calculating requirements
-            # temp parameter for heifer is hardcoded because heifer req should
-            # never have to be recalculated
-            for animal in pen.animals_in_pen:
-                # For now, assuming calves are handled separately
-                animal_type = animal_grouping_scenario.get_animal_type(animal)
-                if animal_type in [AnimalType.HEIFER_I]:
-                    req = animal_requirements.calc_rqmts(body_weight = animal.body_weight,
-                                                         mature_body_weight = animal.mature_body_weight,
-                                                         day_of_pregnancy = None, animal_type=animal_type,
-                                                         body_condition_score_5=3, previous_temperature=15,
-                                                         average_daily_gain_heifer=animal.daily_growth
-                                                         )
-                elif animal_type in [AnimalType.HEIFER_II, AnimalType.HEIFER_III, AnimalType.DRY_COW]:
-                    req = animal_requirements.calc_rqmts(body_weight = animal.body_weight,
-                                                         mature_body_weight = animal.mature_body_weight,
-                                                         day_of_pregnancy = animal.days_in_preg,
-                                                         animal_type=animal_type, body_condition_score_5=3,
-                                                         previous_temperature=15,
-                                                         average_daily_gain_heifer=animal.daily_growth)
-                elif animal_type in [AnimalType.LAC_COW]:
-                    req = animal_requirements.calc_rqmts(body_weight = animal.body_weight,
-                                                         mature_body_weight = animal.mature_body_weight,
-                                                         day_of_pregnancy = animal.days_in_preg,
-                                                         animal_type=animal_type, parity = animal.calves,
-                                                         calving_interval = animal.CI,
-                                                         milk_true_protein= animal.mPrt, milk_fat = animal.fat_percent,
-                                                         milk_lactose = animal.lactose_milk,
-                                                         milk_production = animal.estimated_daily_milk_produced,
-                                                         days_in_milk = animal.days_in_milk, lactating = animal.milking
-                                                         )
-
-                animal.NEmaint = req['NEmaint']
-                animal.NEg = req['NEg']
-                animal.NEpreg = req['NEpreg']
-                animal.NEl = req['NEl']
-                animal.MP_req = req['MP_req']
-                animal.Ca_req = req['Ca_req']
-                animal.P_req = req['P_req']
-                animal.DMIest = req['DMIest']
-                # these animal class variables are only used for grouping purposes
-                if animal_type in [AnimalType.LAC_COW]:
-                    animal.DNED_req = (req['NEmaint'] + req['NEl']) / animal.DMIest
-                    animal.DMDP_req = (req['MP_req']) / animal.DMIest
-
-                    # calculating the activity requirement for energy
-                    animal.calc_daily_walking_dist(pen.vertical_dist_to_parlor,
-                                                   pen.horizontal_dist_to_parlor)
-                    NEa_val = animal_requirements.energy_activity_rqmts(animal.body_weight,
-                                                                        pen.housing_type,
-                                                                        (math.sqrt(animal.DVD ** 2 + animal.DHD ** 2)))
-                    milk.append(animal.estimated_daily_milk_produced)
-                    milk_production_reduction.append(animal.milk_production_reduction)
-                    CP_milk.append(animal.CP_milk)
-                else:
-                    NEa_val = 0
-
-                NEmaint.append(req['NEmaint'])
-                NEa.append(NEa_val)
-                NEg.append(req['NEg'])
-                NEpreg.append(req['NEpreg'])
-                NEl.append(req['NEl'])
-                MP_req.append(req['MP_req'])
-                Ca_req.append(req['Ca_req'])
-                P_req.append(req['P_req'])
-                DMIest.append(req['DMIest'])
-                BW.append(animal.body_weight)
-        else:
-            # iterating through each animal in the pen and setting requirements
-            for animal in pen.animals_in_pen:
-                animal_type = animal_grouping_scenario.get_animal_type(animal)
-                if animal_type in [AnimalType.LAC_COW]:
-                    # calculating the activity requirement for energy
-                    animal.calc_daily_walking_dist(pen.vertical_dist_to_parlor,
-                                                   pen.horizontal_dist_to_parlor)
-                    NEa_val = animal_requirements.energy_activity_rqmts(animal.body_weight,
-                                                                        pen.housing_type,
-                                                                        (math.sqrt(animal.DVD ** 2 + animal.DHD ** 2)))
-                    milk.append(animal.estimated_daily_milk_produced)
-                    milk_production_reduction.append(animal.milk_production_reduction)
-                    CP_milk.append(animal.CP_milk)
-                else:
-                    NEa_val = 0
-
-                NEmaint.append(animal.NEmaint)
-                NEa.append(NEa_val)
-                NEg.append(animal.NEg)
-                NEpreg.append(animal.NEpreg)
-                NEl.append(animal.NEl)
-                MP_req.append(animal.MP_req)
-                Ca_req.append(animal.Ca_req)
-                P_req.append(animal.P_req)
-                DMIest.append(animal.DMIest)
-                BW.append(animal.body_weight)
-
-        
-        self.calc_pen_requirements(NEmaint, NEa, NEg, NEpreg, NEl, MP_req, Ca_req, P_req, DMIest, BW, milk, CP_milk,
-                               milk_production_reduction)
-        
-        # setting average nutrient requirements pen class variable
-        avg_nutrient_rqmts = {'NEmaint': self.NEmaint, 'NEa': self.NEa,
-                              'NEg': self.NEg, 'NEpreg': self.NEpreg, 'NEl': self.NEl,
-                              'MP_req': self.MP_req, 'Ca_req': self.Ca_req, 'P_req': self.P_req,
-                              'DMIest': self.DMIest, 'avg_BW': self.avg_BW,
-                              'avg_milk_production_reduction_pen': self.avg_milk_production_reduction,}
-        
-        pen.set_avg_nutrient_rqmts(avg_nutrient_rqmts)
-
-        pen.set_milk_avgs(self.avg_milk, self.avg_CP_milk, self.avg_milk_production_reduction)
-
-
-    
 
 
 class AvailableFeeds:

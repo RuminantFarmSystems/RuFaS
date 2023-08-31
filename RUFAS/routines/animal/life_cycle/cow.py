@@ -28,7 +28,7 @@ from RUFAS.routines.animal.manure.lactating_cow_manure_excretion import \
     manure_calculations as lactating_manure_calculations
 from RUFAS.routines.animal.manure.dry_cow_manure_excretion import \
     manure_calculations as dry_manure_calculations
-from RUFAS.routines.animal.ration.animal_requirements import calc_rqmts
+from RUFAS.routines.animal.ration.animal_requirements import AnimalRequirements
 from random import random
 from RUFAS.routines.animal.life_cycle import animal_constants as const
 
@@ -393,8 +393,8 @@ class Cow(HeiferIII):
         """
         Calculates this Cow's nutrient requirements.
         """
-
-        req = calc_rqmts(body_weight=self.body_weight,
+        req = AnimalRequirements()
+        animal_requirements = req.calc_rqmts(body_weight=self.body_weight,
                          mature_body_weight=self.mature_body_weight,
                          day_of_pregnancy=self.days_in_preg,
                          animal_type=animal_grouping_scenario.get_animal_type(
@@ -408,16 +408,16 @@ class Cow(HeiferIII):
                          days_in_milk=self.days_in_milk,
                          lactating=self.milking)
 
-        self.NEmaint = req['NEmaint']
-        self.NEg = req['NEg']
-        self.NEpreg = req['NEpreg']
-        self.NEl = req['NEl']
-        self.MP_req = req['MP_req']
-        self.Ca_req = req['Ca_req']
-        self.P_req = req['P_req']
-        self.DMIest = req['DMIest']
-        self.DNED_req = (req['NEmaint'] + req['NEl']) / self.DMIest
-        self.DMDP_req = (req['MP_req']) / self.DMIest
+        self.NEmaint = animal_requirements['NEmaint']
+        self.NEg = animal_requirements['NEg']
+        self.NEpreg = animal_requirements['NEpreg']
+        self.NEl = animal_requirements['NEl']
+        self.MP_req = animal_requirements['MP_req']
+        self.Ca_req = animal_requirements['Ca_req']
+        self.P_req = animal_requirements['P_req']
+        self.DMIest = animal_requirements['DMIest']
+        self.DNED_req = (animal_requirements['NEmaint'] + animal_requirements['NEl']) / self.DMIest
+        self.DMDP_req = (animal_requirements['MP_req']) / self.DMIest
 
     def phosphorus_rqmts(self, DMI):
         """
