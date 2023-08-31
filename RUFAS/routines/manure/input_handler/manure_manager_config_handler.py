@@ -26,7 +26,7 @@ class ManureManagerConfigHandler:
             The manure manager config dictionary that contains all the manure manager config information.
 
         """
-        self.custom_bedding_configs = self._process_bedding_configs(manure_manager_config['bedding_configs'])
+        self.custom_bedding_configs = self._process_bedding_configs(manure_manager_config['bedding'])
         self.custom_manure_handler_configs = \
             self._process_manure_handler_configs(manure_manager_config['manure_handler_configs'])
         self.custom_manure_separator_configs = \

@@ -239,10 +239,12 @@ class AnimalManager:
             manure_management_scenario = [scenario for scenario in manure_management_scenarios
                                           if scenario['scenario_id'] ==
                                           manure_management_scenario_id][0]
-            pen_data['bedding_type'] = manure_management_scenario['bedding_type']
-            pen_data['manure_handling'] = manure_management_scenario['manure_handler']
-            pen_data['manure_separator'] = manure_management_scenario['manure_separator']
-            pen_data['manure_storage'] = manure_management_scenario['manure_treatment']
+            pen_data['bedding_type'] = manure_management_scenario['bedding']['bedding_type']
+            pen_data['manure_handling'] = manure_management_scenario['manure_handling']['manure_handling_method']
+            pen_data['manure_separator'] = \
+                manure_management_scenario['manure_treatment_and_storage']['manure_separator_type']
+            pen_data['manure_storage'] = \
+                manure_management_scenario['manure_treatment_and_storage']['manure_treatment_methods']
 
             pen = Pen(**pen_data)
 

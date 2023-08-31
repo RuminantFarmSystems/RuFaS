@@ -1976,11 +1976,16 @@
       }
     },
     "manure_management_properties": {
-      "manure_management_scenario": {
+      "manure_management_scenarios": {
         "type": "array",
         "description": "Manure Management Scenarios -- Add as many different manure scenarios as needed",
         "properties": {
           "type": "object",
+          "scenario_id": {
+            "type": "number",
+            "description": "Scenario ID -- An identification number for livestock enclosures.",
+            "minimum": 0
+          },
           "manure_pen_id": {
             "type": "number",
             "description": "Manure Pen ID -- An identification number for livestock enclosures.",
