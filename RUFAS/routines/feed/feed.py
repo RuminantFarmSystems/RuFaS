@@ -67,10 +67,13 @@ class Feed:
         self.feed_quality_table = data['feed_quality_table']
         self.nutrient_table = data['nutrient_table']
         self.db_reader = DatabaseReader(self.feed_database)
+        purchased_feeds_list = [feed_item["purchased_feed"] for feed_item in data["purchased_feeds"]]
+        purchased_feed_costs = {str(feed_item["purchased_feed"]): feed_item["purchased_feed_cost"]
+                                for feed_item in data["purchased_feeds"]}
 
         self.entries_split_by_maturity = self.get_feeds_split_by_maturity()
         self.farm_grown_feeds = data['farm_grown_feeds']
-        self.purchased_feeds = self.get_quality_specific_purchased_feed_ids(data['purchased_feeds'])
+        self.purchased_feeds = self.get_quality_specific_purchased_feed_ids(purchased_feeds_list)
 
         self.input_feed_combinations = {
             Pen.AnimalCombination.CALF: set(self.get_quality_specific_purchased_feed_ids(data['calf_feeds'])),
@@ -82,7 +85,7 @@ class Feed:
             Pen.AnimalCombination.LAC_COW: set(self.get_quality_specific_purchased_feed_ids(data['lac_cow_feeds'])),
         }
 
-        self.all_feed_ids = self.get_all_feed_units(data['purchased_feeds'], data['farm_grown_feeds'])
+        self.all_feed_ids = self.get_all_feed_units(purchased_feeds_list, data['farm_grown_feeds'])
 
         # dictionary of nutrients needed for this run
         # initially, this only contains information for purchased feeds as none
@@ -91,8 +94,8 @@ class Feed:
             self.get_nutrient_vals(self.purchased_feeds, False)
         self.calf_feeds = self.get_calf_feeds()
         # setting up the feed costs based on the input
-        self.feed_costs = data['purchased_feeds_costs']
-        self.feed_costs = self.get_quality_specific_feed_costs(data['purchased_feeds'])
+        self.feed_costs = purchased_feed_costs
+        self.feed_costs = self.get_quality_specific_feed_costs(purchased_feeds_list)
 
         # The nutrient requirements used in the ration calculations.
         self.nutrient_rqmts = ['FU', 'RU', 'ME_DM', 'RDP_DM', 'RUP_DM']
@@ -100,8 +103,8 @@ class Feed:
         # Storage receptacles managed by the feed module
         self.storage_options = {}
 
-        for storage_name, storage_data in data['storage_options'].items():
-            self.storage_options[storage_name] = self.Storage(storage_data)
+        for count, storage_option in enumerate(data['storage_options']):
+            self.storage_options[f"storage_option_{count}"] = self.Storage(storage_option)
 
         self.available_storage = dict(self.storage_options)
         self.standard_storage_count = 0

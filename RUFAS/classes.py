@@ -13,6 +13,7 @@ Author(s): Kass Chupongstimun, kass_c@hotmail.com
 import csv
 
 from RUFAS import errors
+from RUFAS.input_manager import InputManager
 from RUFAS.output_manager import OutputManager
 from RUFAS.routines import Feed
 from RUFAS.routines.field.manager.field_manager import FieldManager
@@ -23,6 +24,7 @@ from RUFAS.util import Utility
 from typing import Any, Dict
 
 
+im = InputManager()
 om = OutputManager()
 
 
@@ -51,8 +53,8 @@ class State:
                 initialize the state
         """
         input_dir = Utility.get_base_dir() / 'input'
-        self.feed = Feed(Utility.read_json_file(
-            input_dir / 'feed' / data['feed']))
+        feed_class_data = im.get_data("feed")
+        self.feed = Feed(feed_class_data)
         manure_manager_config = Utility.read_json_file(input_dir / 'manure' / data['manure'])
         animal_config = Utility.read_json_file(input_dir / 'animal' / data['animal'])
         animal_config['manure_management_scenarios'] = manure_manager_config['manure_management_scenarios']
