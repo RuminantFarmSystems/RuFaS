@@ -52,11 +52,9 @@ class State:
             time: instance of the Time class containing information necessary to
                 initialize the state
         """
-        # input_dir = Utility.get_base_dir() / 'input'
         feed_class_config = im.get_data("feed")
         self.feed = Feed(feed_class_config)
         manure_class_config = im.get_data("manure_management")
-        # manure_manager_config = Utility.read_json_file(input_dir / 'manure' / data['manure'])
         animal_class_config = im.get_data("animal")
         animal_class_config['manure_management_scenarios'] = manure_class_config['manure_management_scenarios']
         self.animal_manager = AnimalManager(animal_class_config, config, self.feed, weather, time)
