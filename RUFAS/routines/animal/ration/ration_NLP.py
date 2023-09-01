@@ -168,10 +168,7 @@ def NEmact_constraint(x):
     # [A.Cow.E.5]-[A.Heifer.E.5]
     # Actual digestible energy of feed i, Mcal/kg
     DEact = np.multiply(DE, Discount)
-    print(f'DE = {DE}')
-    print(f'DEsum = {sum(DE)}')
-    print(f'Discount = {Discount}')
-    print(f'DEact = {sum(DEact)}')
+
     # [A.Cow.E.6]-[A.Heifer.E.6]
     # Actual metabolizable energy of feed i, Mcal/kg
     MEact = []
@@ -184,7 +181,7 @@ def NEmact_constraint(x):
             MEact.append(1.01 * DEact[i] - 0.45 + 0.0046 * (EE[i] - 3))
         else:
             MEact.append(1.01 * DEact[i] - 0.45)
-    print(f'MEact_constraint = {sum(MEact)}')
+
     # [A.Cow.E.8]-[A.Heifer.E.8]
     # Actual net energy for maintenance of feed i, Mcal/kg
     NEm_act = []
@@ -200,7 +197,7 @@ def NEmact_constraint(x):
         multiplier.append(1)
         multiplier.append(1)
     # returning the NEm_act constraint in the NLP
-    print(f'NEmaint = {sum(np.multiply(x, np.multiply(multiplier, NEm_act)))}')
+
     return (sum(np.multiply(x, np.multiply(multiplier, NEm_act))) - (NEmaint + NEa))
 
 
@@ -233,8 +230,7 @@ def NEl_constraint(x):
         multiplier.append(1)
         multiplier.append(1)
     # returning the NElact constraint in the NLP
-    print(f'NElact = {sum(np.multiply(x, np.multiply(multiplier, NElact)))}')
-    # print(f'x={x}')
+
     return sum(np.multiply(x, np.multiply(multiplier, NElact))) - (NEpreg + NEl)
 
 
@@ -265,8 +261,7 @@ def NEgact_constraint(x):
         multiplier.append(1)
         multiplier.append(1)
     # returning the NEgact constraint in the NLP
-    print('NEg')
-    print(sum(np.multiply(x, np.multiply(multiplier, NEgact))))
+
     return sum(np.multiply(x, np.multiply(multiplier, NEgact))) - NEg
 
 
@@ -292,8 +287,7 @@ def calcium_constraint(x):
         else:
             dCa.append(0)
     # [A.Cow.E.16]-[A.Heifer.E.16]
-    # print('C')
-    # print(sum(np.multiply(x, np.multiply(np.multiply(calcium, 0.01), dCa))))
+
     return (sum(np.multiply(x, np.multiply(np.multiply(calcium, 0.01), dCa))) - (C_req / 1000))
 
 
@@ -332,8 +326,7 @@ def phosphorus_constraint(x):
         #all other animals
         P_maint = 0.8 * DMI + 0.002 * BW
     # [A.Cow.E.16]-[A.Heifer.16]
-    # print('P')
-    # print(sum(np.multiply(x, np.multiply(np.multiply(phosphorus, 0.01), dP))))
+
     return sum(np.multiply(x, np.multiply(np.multiply(phosphorus, 0.01), dP))) - ((P_req + P_maint) / 1000)
 
 
@@ -386,8 +379,6 @@ def protein_constraint(x):
     for i in range(len(CP)):
         RUP.append(CP[i] - RDP[i])
     
-    # print(f'RDPconst = {RDP}')
-    # print(f'RUPconst = {RUP}')
     # Dietary actual TDN (kg)
     TDNact_diet = sum(np.multiply(x, np.multiply(TDNact, 0.01)))
     # Dietary RDP (kg)
@@ -401,18 +392,7 @@ def protein_constraint(x):
     # [A.Cow.E.15]
     # Total metabolizable protein supply
     MP_supply = MPbact + RUP_diet + 0.4 * 11.8 * DMI
-    
-    #print(f'Kp_const = {Kp}')
-    #print(f'TDNact -diet = {TDNact_diet}')
-    #print(f'PercentConc_constraint = {PercentConc}')
 
-    # print(f'dRUP = {dRUP}')
-
-    # print(f'MPbact const = {MPbact}')
-    # print(f'RDPdiet = {RDP_diet}')
-    print(f'RUPdiet = {RUP_diet}')
-
-    print(f'MP_supply = {MP_supply}')
     return (MP_supply - (MP_req / 1000))
 
 
@@ -440,8 +420,7 @@ def NDF_constraint_2(x):
     """
     # From E/D: OTHER REQUIREMENTS
     DMI = sum(x)
-    # print('NDF')
-    # print(sum(np.multiply(x, NDF)) / DMI)
+    
     if DMI != 0:
         return (-(sum(np.multiply(x, NDF)) / DMI) + 45)
 
@@ -463,8 +442,7 @@ def forage_NDF_constraint(x):
         else:
             is_forage.append(0)
     DMI = sum(x)
-    # print('forage NDF')
-    # print((sum(np.multiply(x, np.multiply(NDF, is_forage))) / DMI))
+    
     if DMI != 0:
         return (sum(np.multiply(x, np.multiply(NDF, is_forage))) / DMI) - 19
 
@@ -479,8 +457,7 @@ def fat_constraint(x):
     """
     # From E/D: OTHER REQUIREMENTS
     DMI = sum(x)
-    # print('fat')
-    # print((sum(np.multiply(x, EE)) / DMI) )
+    
     if DMI != 0:
         return -(sum(np.multiply(x, EE)) / DMI) + 7
 

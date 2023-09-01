@@ -276,15 +276,9 @@ def ration_supply(ration, available_feeds, ration_report, body_weight):
     
     DMI = sum(ration.values())
 
-    # # OPTION 1
-    # for item in supply_report:
-    #     supply_report[item] = eval('get' + item + '(ration, available_feeds)')
-    # OPTION 2
     for key, val in ration.items():
         for item in supply_report:
-            # supply_report[item] += val * (available_feeds[key] / 100)
             feed_item_info = available_feeds[key]
-            #print(feed_item_info['DE'])
             supply_report[item] += eval('get_' + item + '(val, feed_item_info, ration_report, body_weight)')
 
     supply_report['Forage_NDF_percent'] = supply_report['Forage_NDF'] / DMI
@@ -427,17 +421,13 @@ def get_Metabolizable_protein(ration, available_feeds, ration_report, body_weigh
     for item in ration:
         if available_feeds[item]['type'] == 'Conc':
             is_conc.append(ration[item])
-    # print(f'is_conc = {is_conc}')
-    # print(f'ration={ration}')
     DMI_conc_percentage = sum(is_conc) / DMI_estimate * 100
-    # print(f'DMI_conc_percentage={DMI_conc_percentage}')
     Kp = []
     RUP_list = []
     RDP_list = []
     dRUP_diet = []
     counter = 0
     for key, val in ration.items():
-        # supply_report[item] += val * (available_feeds[key] / 100)
         feed_item_info = available_feeds[key]
         
         # KP calcs
@@ -457,31 +447,22 @@ def get_Metabolizable_protein(ration, available_feeds, ration_report, body_weigh
             RDP_list.append(0)
         
         # RUP calcs
-        #print(f'RDP_diet = {RDP_list}')
         RUP_list.append((feed_item_info['CP'] - RDP_list[counter]))
         dRUP_diet.append(feed_item_info['dRUP'])
 
         counter+=1
 
-    # print(f'Kp = {Kp}')
-    # print(f'RUP_list = {RUP_list}')
-    # print(f'RDP_list = {RDP_list}')
-    # print(f'dRUP_diet = {dRUP_diet}')
     RDP_diet = []
     RUP_diet = []
     for i, val in enumerate(ration.values()):
         RDP_diet.append(RDP_list[i] * val * 0.01)
         RUP_diet.append(val * RUP_list[i] * dRUP_diet[i])
 
-    # print(f'RDP_diet new = {RDP_diet}')
     TDN_total_actual = TDNtotal * get_TDN_discount(ration_report, body_weight)
-    #print(f'TDN_total_actual = {TDN_total_actual}')
     
     # MP bact calcs
     MP_bact = 0.64 * min(1000 * 0.13 * TDN_total_actual, 1000 * 0.85 * sum(RDP_diet))
-    # print(f'MP_bact = {MP_bact}')
-    print(f'RUP_diet = {RUP_diet}')
-    # MP supply calc
+    
     MP_supply = MP_bact + sum(RUP_diet)*0.0001 + 0.4 * 11.8 * DMI_estimate
     return MP_supply
 
