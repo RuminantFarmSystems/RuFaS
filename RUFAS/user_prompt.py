@@ -161,4 +161,3 @@ def prompt_user_for_input() -> str:
 # convert_path_string_to_list("../input/")
 # convert_path_string_to_list(path=prompt_user_for_input())
 # input_prompt()
-# dummy
