@@ -62,7 +62,7 @@ def execute_simulations_from_files(
     """Execute simulations for each file"""
     output_manager = OutputManager()
     input_manager = InputManager()
-    is_data_valid = input_manager.start_data_processing("input/default_metadata.json", exclude_info_maps)
+    is_data_valid = input_manager.start_data_processing("input/example_metadata.json", exclude_info_maps)
     print(f"Result of data validation is: {is_data_valid}")  # TODO: remove before merging
     input_file_list = files
     for input_file_path in input_file_list:
