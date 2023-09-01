@@ -24,7 +24,7 @@ om = OutputManager()
 
 
 class State:
-    def __init__(self, data, config, weather, time):
+    def __init__(self, config, weather, time):
         """
         Description:
             Contains information about the current state of the farm.
@@ -47,6 +47,7 @@ class State:
             time: instance of the Time class containing information necessary to
                 initialize the state
         """
+        data = {}
         input_dir = Utility.get_base_dir() / 'input'
         self.feed = Feed(Utility.read_json_file(
             input_dir / 'feed' / data['feed']))
