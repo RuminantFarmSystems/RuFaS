@@ -502,7 +502,7 @@ def forage_NDF_constraint(x):
             is_forage.append(0)
     DMI = sum(x)
     if DMI != 0:
-        return (sum(np.multiply(x, np.multiply(NDF, is_forage))) / DMI) - 19
+        return (sum(np.multiply(x, np.multiply(NDF, is_forage))) / DMI) - 15
 
 
 def fat_constraint(x):
@@ -595,10 +595,11 @@ def make_user_bounds(ration_percents: Dict, DMIest: float) -> List[Tuple[float, 
     udr_tolerance = udrv.tolerance
     ration_key_list = sorted([int(key) for key in ration_percents.keys()])
     for key in ration_key_list:
-        targetlower = ration_percents[str(key)]/100*(1-udr_tolerance)*(DMIest*1.1+0.0001)
-        targetupper = ration_percents[str(key)]/100*(1+udr_tolerance)*(DMIest*1.1+0.0001)
-        targetbounds = (max(0.0, (targetlower)/3),
-                        (targetupper)/3)
+        target_lower = ration_percents[str(key)] / \
+            100 * (1 - udr_tolerance) * (DMIest * 1.1 + 0.0001)
+        target_upper = ration_percents[str(key)] / \
+            100 * (1 + udr_tolerance) * (DMIest * 1.1 + 0.0001)
+        targetbounds = (max(0.0, (target_lower)/3), (target_upper)/3)
         tribounds.append(targetbounds)
         tribounds.append(targetbounds)
         tribounds.append(targetbounds)
