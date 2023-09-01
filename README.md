@@ -1,6 +1,6 @@
 [![Testing](https://github.com/RuminantFarmSystems/MASM/actions/workflows/testing_pytest.yml/badge.svg)](https://github.com/RuminantFarmSystems/MASM/actions/workflows/testing_pytest.yml)
 [![Linting](https://github.com/RuminantFarmSystems/MASM/actions/workflows/lint_flake8.yml/badge.svg)](https://github.com/RuminantFarmSystems/MASM/actions/workflows/lint_flake8.yml)
-[![Coverage](https://img.shields.io/badge/coverage-85%25-yellowgreen)](https://github.com/RuminantFarmSystems/MASM/actions/workflows/coverage_pytest-cov.yml)
+[![Coverage](https://img.shields.io/badge/coverage-86%25-yellowgreen)](https://github.com/RuminantFarmSystems/MASM/actions/workflows/coverage_pytest-cov.yml)
 # Vision
 To support research and sustainable decision-making in ruminant animal production through a state-of-art, open-source modeling environment that is continuously adapting as technology and scientific knowledge advance.
 
@@ -44,23 +44,23 @@ Review, modify, and approve EEE design doc. Evaluate its implementation.
 Dev Team:
 |Title|Owner|Status|Priority|Remarks|
 |--|--|--|--|--|
-Design and implement EEE (Review progress on this)
-Finish Compost for Manure Module 
+Design and implement EEE (Review progress on this)|Pooya, Roohi, Kristan, Jenn||P1
+Finish Compost for Manure Module |Varma, Loi||P0
 Redesign and implement Feed storage module ||||Moved to MS 2.5
-Revisit the Animal Module design – Refactoring -- Animal Manager
-Revisit the Animal Module design – Refactoring -- Animal Ration formulation
-Revisit the Animal Module design – Refactoring -- Animal Life Cycle|||| Moved to MS 2.5
-Deprecate the output handler, add missing functionalities, and reports to OM
-Go through the entire codebase and ensure IM is the only way we are receiving input data||||[IM Integration tracking](https://docs.google.com/spreadsheets/d/1k8J6MelPrsrz6Tv4fQNAG-kLSN7oQTQOCEy3I6F0IqU/edit?usp=sharing)
+Revisit the Animal Module design – Refactoring -- Animal Manager|||P2| Moved to MS 2.5
+Revisit the Animal Module design – Refactoring -- Animal Ration formulation|Joe||P0
+Revisit the Animal Module design – Refactoring -- Animal Life Cycle|Yijing, Simon, Anchey|Design phase|P0
+Deprecate the output handler, add missing functionalities, and reports to OM|Niko||P0
+Go through the entire codebase and ensure IM is the only way we are receiving input data|||P0|[IM Integration tracking](https://docs.google.com/spreadsheets/d/1k8J6MelPrsrz6Tv4fQNAG-kLSN7oQTQOCEy3I6F0IqU/edit?usp=sharing)
 
 
 SMEs:
 |Title|Owner|Status|Priority|Remarks|
 |--|--|--|--|--|
-Complete model evaluation
-Complete Sensitivity Analysis
-Complete External/Scientific Documentation for Animal, Manure, & EEE modules and put on GitHub
-Complete Cohort 1 Pilot testing
+Complete model evaluation||||Moved to Milestone 3
+Complete Sensitivity Analysis||||Moved to Milestone 3
+Complete External/Scientific Documentation for Animal, Manure, & EEE modules and put on GitHub|Varma, Joe, Haowen, Kristan, Jenn, Emmanuel||P1
+Complete Cohort 1 Pilot testing|Kristan, Haowen, Kat||P0
 
 ## Milestone 2.5: Oct 31th
 [GitHub Milestone](https://github.com/RuminantFarmSystems/MASM/milestone/5)
@@ -68,8 +68,8 @@ Complete Cohort 1 Pilot testing
 Dev Team:
 |Title|Owner|Status|Priority|Remarks|
 |--|--|--|--|--|
-Redesign and implement the Feed storage module
-Refactor Animal Module -- Animal Life Cycle
+Redesign and implement the Feed storage module|Pooya, Kevin, Kristan||P1
+Refactor Animal Module -- Animal Manager|Joe||P0
 
 SMEs:
 |Title|Owner|Status|Priority|Remarks|
@@ -92,6 +92,10 @@ SMEs:
 |Title|Owner|Status|Priority|Remarks|
 |--|--|--|--|--|
 Complete External/Scientific Documentation for the Crop and Soil module
+Complete model evaluation using existing experimental data||||
+Complete Sensitivity Analysis of Animal Module
+Complete Sensitivity Analysis of Crop and Soil Module
+Initiate Sensitivity Analysis of Manure Module
 Complete Cohort 2 Pilot testing
 Develop standard reports recipe (at least one industry-facing and one scientist-facing)
 Develop a set of standard scenarios for end-to-end testing

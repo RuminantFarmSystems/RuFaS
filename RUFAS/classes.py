@@ -19,9 +19,7 @@ from RUFAS.routines import Feed
 from RUFAS.routines.field.manager.field_manager import FieldManager
 from RUFAS.routines.animal.animal_manager import AnimalManager
 from RUFAS.routines.manure.manure_manager import ManureManager
-from RUFAS.routines.manure_storage.manure_storage import ManureStorage
 from RUFAS.util import Utility
-from typing import Any, Dict
 
 
 im = InputManager()
@@ -52,6 +50,7 @@ class State:
             time: instance of the Time class containing information necessary to
                 initialize the state
         """
+
         feed_class_config = im.get_data("feed")
         self.feed = Feed(feed_class_config)
         manure_class_config = im.get_data("manure_management")
@@ -69,10 +68,9 @@ class State:
         """
         self.field_manager.annual_update_routine()
         self.animal_manager.annual_reset()
-        self.manure_storage.annual_reset()
 
     def annual_mass_balance(self, time):
-        self.manure_storage.annual_mass_balance()
+        pass
 
 
 class Config:
