@@ -84,8 +84,6 @@ class SimulationEngine:
         """Executes the daily simulation routines."""
         routines.daily_animal_routine(
             self.state.animal_manager, self.state.feed, self.weather, self.time)
-        routines.daily_manure_storage_routine(
-            self.state.manure_storage, self.state.animal_manager)
         simulate_daily_manure_manager(
             self.state.manure_manager, self.state.animal_manager)
         self.state.field_manager.daily_update_routine(self.weather, self.time)
