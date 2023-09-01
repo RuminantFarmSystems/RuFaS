@@ -170,7 +170,6 @@ class SimulationEngine:
             data_config = im.get_data('config')
             data_weather = im.get_data('weather')
             print(data_config)
-            data = Utility.read_json_file(file_path)
             self.config = Config(data_config, data_weather)
 
             random.seed(self.config.random_seed)
@@ -178,10 +177,10 @@ class SimulationEngine:
 
             self.weather = Weather(data_weather, self.config)
             self.time = Time(self.config)
-            self.state = State(data['farm'], self.config,
+            self.state = State(self.config,
                                self.weather, self.time)
             self.output = OutputHandler(Utility.read_json_file(
-                Utility.get_base_dir() / 'input/output' / data['output']), self.state)
+                Utility.get_base_dir() / 'input/output' / 'output'), self.state)
 
         except errors.JSONfileData as e:
             print(
