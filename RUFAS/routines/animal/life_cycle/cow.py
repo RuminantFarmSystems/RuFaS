@@ -132,7 +132,6 @@ class Cow(HeiferIII):
         self.wood_m = 0
         self.wood_n = 0
 
-        # self.lactation_curve = AnimalBase.config['lactation_curve']
         self.lactation_curve = 'wood'
         self.milk_production_history = []
         self.breed_index = 0
