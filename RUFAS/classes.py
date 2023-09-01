@@ -104,6 +104,10 @@ class Config:
         year_length = 365
         leap_year_length = 366
 
+        # Deleted weather data validation in commit 60bd9e3 (60bd9e3eb888d01da4db3f989c29e34ec8c28e09)
+        # TODO: Move the validation into IM
+        # TODO: Refactor the structure of weather data
+
         self.w_start_year = self.start_year
         self.w_start_day = self.start_day
         self.w_end_year = self.end_year
