@@ -24,7 +24,7 @@ class AnimalEvents:
     Attributes
     ----------
     events : dict[int, list[str]]
-        A dictionary containing the events, indexed by the animal's age in days. The values
+        A dictionary containing the events indexed by the animal's age in days. The values
         are lists of descriptions for the events on that day.
     """
 
