@@ -18,7 +18,7 @@ class AnimalEvents:
     """
     A class to represent animal events in a farm simulation.
 
-    This class tracks the events related to animals, including birth and other significant
+    This class tracks the events related to animals including birth and other significant
     occurrences.
 
     Attributes
