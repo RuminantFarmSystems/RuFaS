@@ -195,7 +195,6 @@ class LifeCycleManager:
         """
         self.animal_initializer = AnimalInitialization(self.animal_config['calving_interval'],
                                                        herd_data['breed'],
-                                                       config.set_seed,
                                                        herd_data['herd_init'])
         self.herd_num = herd_data['herd_num']
         self._set_avg_CI()

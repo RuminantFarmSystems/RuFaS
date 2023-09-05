@@ -208,6 +208,7 @@ class AnimalManager:
             self.allocate_animals_to_pens()
 
         self._print_animal_num_warnings(data['herd_information'])
+        print(data['herd_information'])
 
     @property
     def animals_by_type(self):
