@@ -165,18 +165,23 @@ class InputManager:
             file_path = file_details["path"]
 
             try:
+                file_type = file_details["type"]
                 data_loader = data_type_to_loader_map[file_details["type"]]
                 data = data_loader(file_path)
             except KeyError:
                 raise KeyError(f"Faulty data type in {file_blob_key},"
                                f"supported types are: {data_type_to_loader_map.keys()}")
 
-            # counter_dict = {"fixed_elements": 0, "total_elements": 0, "valid_elements": 0, "invalid_elements": 0}
             properties_blob_key = file_details["properties"]
             properties = self.__metadata["properties"][properties_blob_key]
             for property in properties.keys():
-                element_counter_and_validity = self._validate_element([property], properties_blob_key, data,
-                                                                      eager_termination)
+                if file_type == "json":
+                    element_counter_and_validity = self._validate_json_element([property], properties_blob_key, data,
+                                                                               eager_termination)
+                if file_type == "csv":
+                    element_counter_and_validity = self._validate_csv_element(property, properties_blob_key, data,
+                                                                              eager_termination)
+
                 fixed_elements_counter += element_counter_and_validity["fixed_elements"]
                 valid_elements_counter += element_counter_and_validity["valid_elements"]
                 total_elements_counter += element_counter_and_validity["total_elements"]
@@ -194,12 +199,118 @@ class InputManager:
         om.add_log("Total Invalid Items", f"{invalid_elements_counter=}", info_map)
         return invalid_elements_counter == 0
 
-    def _validate_element(self, element_hierarchy: List[str], properties_blob_key: str,
-                          input_data: Dict[str, Any], eager_termination: bool, ) -> dict:
+    def _validate_input_type_dynamic(self, variable_properties: Dict[str, Any], var_name: str, input_data_value: Any):
         """
-        Receives data loaded from input file, recursively finds and then validates nested elements,
-        attempts to fix any invalid elements, and tracks the number of how many valid, invalid, fixed,
-        and total elements from the input data are checked.
+        Validates the input data value based on its specified dynamic type.
+
+        Parameters
+        ----------
+        variable_properties : Dict[str, Any]
+            A dictionary containing properties relevant to the validation.
+        var_name : str
+            The name of the variable being validated.
+        input_data_value : Any
+            The input data value to be validated.
+
+        Returns
+        -------
+        bool
+            True if the input data value is valid for the specified type, False otherwise.
+
+        Raises
+        ------
+        KeyError
+            If an invalid type is provided in the variable_properties or if "type" key is missing.
+
+        Notes
+        ------
+        This function determines the type of validation needed based on the 'type' property in variable_properties.
+        It dynamically selects the appropriate validator based on the determined type and delegates the validation
+        process to that validator function. If the determined type is not recognized or if "type" key is missing,
+        a KeyError is raised.
+
+        Example
+        --------
+        variable_properties = {"type": "string", "min_length": 3, "max_length": 10}
+        var_name = "name"
+        input_data_value = "John Doe"
+        is_valid = validate_input_type_dynamic(variable_properties, var_name, input_data_value)
+        if is_valid:
+            print(f"{var_name} is a valid {variable_properties['type']}.")
+        else:
+            print(f"{var_name} is not a valid {variable_properties['type']}.")
+        """
+        if "type" not in variable_properties:
+            raise KeyError("Missing 'type' key in variable_properties")
+        var_type = variable_properties["type"]
+        data_type_to_validator_map = {
+            "string": self._string_type_validator,
+            "number": self._num_type_validator,
+            "array": self._array_type_validator,
+            "bool": self._bool_type_validator,
+        }
+        try:
+            validator = data_type_to_validator_map[var_type]
+        except KeyError:
+            raise KeyError(
+                f"Invalid type {var_type}: Element must be type {data_type_to_validator_map.keys()}"
+            )
+        return validator(variable_properties, var_name, input_data_value)
+
+    def _validate_csv_element(self, var_name: str, properties_blob_key: str, input_data: Dict[str, Any],
+                              eager_termination: bool) -> dict:
+        """
+        Receives data loaded from csv input file and the validates each row element in the csv column it's sent.
+        It attempts to fix any invalid elements and tracks the number of valid, invalid, fixed,
+        and total elements from the input file are checked.
+
+        Parameters
+        ----------
+        var_name : str
+            The name of the csv data element being validated.
+        properties_blob_key : str
+            The metadata properties section keyword for the data input file being checked.
+        input_data : Dict[str, Any]
+            A buffer dictionary that holds the input data for validation and fixing.
+        eager_termination : bool
+            If true, the process will be terminated upon finding invalid data.
+
+        Returns
+        -------
+        dict
+            A dictionary that collects the counts of total elements checked,
+            invalid elements, valid elements, and fixed elements as well as a boolean
+            which is True if the data is valid, False otherwise.
+        """
+        element_counter_and_validity = {"fixed_elements": 0, "total_elements": 0, "valid_elements": 0,
+                                        "invalid_elements": 0, "is_valid": True}
+        property_data = input_data[var_name]
+        variable_properties = reduce(lambda d, key: d[key], [var_name],
+                                     self.__metadata["properties"][properties_blob_key])
+
+        for element_num in range(len(property_data)):
+            element_counter_and_validity["total_elements"] += 1
+            is_valid = self._validate_input_type_dynamic(variable_properties, var_name, property_data[element_num])
+            if is_valid:
+                element_counter_and_validity["valid_elements"] += 1
+            else:
+                is_fixed = self._fix_data(variable_properties, [var_name, element_num], input_data)
+                if is_fixed:
+                    element_counter_and_validity["fixed_elements"] += 1
+                else:
+                    element_counter_and_validity["invalid_elements"] += 1
+                    element_counter_and_validity["is_valid"] = False
+                    if eager_termination:
+                        return element_counter_and_validity
+
+        return element_counter_and_validity
+
+    def _validate_json_element(self, element_hierarchy: List[str], properties_blob_key: str,
+                               input_data: Dict[str, Any], eager_termination: bool, ) -> dict:
+        """
+        Receives data loaded from json input file, recursively finds and then validates nested elements,
+        attempts to fix any invalid elements, and tracks the number of valid, invalid, fixed,
+        and total elements from the input file are checked.
 
         Parameters
         ----------
@@ -225,14 +336,19 @@ class InputManager:
 
         """
         info_map = {"class": self.__class__.__name__,
-                    "function": self._validate_element.__name__,
+                    "function": self._validate_json_element.__name__,
                     }
         element_counter_and_validity = {"fixed_elements": 0, "total_elements": 0, "valid_elements": 0,
                                         "invalid_elements": 0, "is_valid": True}
-        variable_properties = reduce(lambda d, key: d[key], element_hierarchy,
-                                     self.__metadata["properties"][properties_blob_key])
-        var_type = variable_properties["type"]
-        is_nested = var_type == "object"
+        try:
+            variable_properties = reduce(lambda d, key: d[key], element_hierarchy,
+                                         self.__metadata["properties"][properties_blob_key])
+        except KeyError as e:
+            raise KeyError(f"{str(e)} not found in input data")
+
+        if "type" not in variable_properties:
+            raise KeyError("Missing 'type' key in variable_properties")
+        is_nested = variable_properties["type"] == "object"
         if is_nested:
             children_status: Dict[str, bool] = {}
             false_counter = 0
@@ -240,8 +356,8 @@ class InputManager:
             for nested_key in variable_properties.keys():
                 if nested_key not in variable_properties_to_ignore:
                     element_hierarchy.append(nested_key)
-                    element_counter_and_validity = self._validate_element(element_hierarchy, properties_blob_key,
-                                                                          input_data, eager_termination)
+                    element_counter_and_validity = self._validate_json_element(element_hierarchy, properties_blob_key,
+                                                                               input_data, eager_termination)
                     is_child_valid = element_counter_and_validity["is_valid"]
                     if eager_termination and not is_child_valid:
                         return element_counter_and_validity
@@ -258,21 +374,13 @@ class InputManager:
             return element_counter_and_validity
         else:
             var_name = element_hierarchy[-1]
+
             try:
                 input_data_value = reduce(lambda d, key: d[key], element_hierarchy, input_data)
             except KeyError:
                 raise KeyError(f"Key {var_name} not found in input data")
 
-            data_type_to_validator_map = {"string": self._string_type_validator,
-                                          "number": self._num_type_validator,
-                                          "array": self._array_type_validator,
-                                          "bool": self._bool_type_validator, }
-            try:
-                validator = data_type_to_validator_map[var_type]
-            except KeyError:
-                raise KeyError(f"Invalid type {var_type}: Element must be type {data_type_to_validator_map.keys()}")
-
-            is_valid = validator(variable_properties, var_name, input_data_value)
+            is_valid = self._validate_input_type_dynamic(variable_properties, var_name, input_data_value)
 
             element_counter_and_validity["total_elements"] += 1
             if is_valid:
@@ -365,8 +473,8 @@ class InputManager:
         """Validates an input data bool element."""
         return input_data_value in (True, False)
 
-    def _fix_data(self, variable_properties: dict[str, Any], element_hierarchy: List[str],
-                  input_data: dict[str, Any]) -> bool:
+    def _fix_data(self, variable_properties: Dict[str, Any], element_hierarchy: List[Union[str, int]],
+                  input_data: Dict[str, Any]) -> bool:
         """
         Attempt to fix the invalid data.
 
@@ -375,8 +483,8 @@ class InputManager:
         variable_properties : dict[str, Any]
             The properties for the variable of interest.
 
-        element_hierarchy: List[str]
-            A list of strings indicating the path to reach the variable of interest in self.__metadata and self.__pool.
+        element_hierarchy: list
+            A list indicating the path to reach the variable of interest in self.__metadata and self.__pool.
 
         input_data: dict[str, Any]
             A buffer dictionary that holds the input data for validation and fixing.

@@ -6,6 +6,7 @@ from typing import Optional
 from typing import Tuple
 from typing import Union
 
+from RUFAS.general_constants import GeneralConstants
 from RUFAS.routines.manure.manure_handlers.manure_handler_daily_output import ManureHandlerDailyOutput
 from RUFAS.routines.manure.manure_separators.manure_separator_classes import BaseManureSeparator
 from RUFAS.routines.manure.manure_separators.manure_separator_daily_output import ManureSeparatorDailyOutput
@@ -231,13 +232,16 @@ class BaseManureTreatment(ABC):
         return self.weather.T_avg[self.time.year - 1][self.time.day - 1]
 
     def _get_current_day_rainfall(self) -> float:
-        """Returns the rainfall of the current day in mm.  # TODO: Check the unit.
+        """
+        Return the rainfall of the current day in meters (m).
 
-        Returns:
-            The rainfall of the current day in mm.
+        Returns
+        -------
+        float
+            The rainfall of the current day in meters (m).
 
         """
-        return self.weather.rainfall[self.time.year - 1][self.time.day - 1]
+        return self.weather.rainfall[self.time.year - 1][self.time.day - 1] * GeneralConstants.MM_TO_M
 
     def _accumulate_daily_output(self, manure_treatment_daily_output: ManureTreatmentDailyOutput) -> None:
         """Accumulates the daily output of the manure treatment.
