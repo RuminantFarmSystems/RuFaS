@@ -208,16 +208,14 @@ class Config:
             if self.start_day > year_length:
                 start_date_warning_3 = "Start date invalid. Starting simulation on " \
                     f"{self.start_year}:{year_length}"
-                om.add_warning("invalid_start_date_3",
-                             start_date_warning_3, info_map)
+                om.add_warning("invalid_start_date_3", start_date_warning_3, info_map)
                 self.start_day = year_length
                 om.add_variable("start_day", self.start_day, info_map)
         else:
             if self.start_day > leap_year_length:
                 start_date_warning_4 = "Start date invalid. Starting simulation on " \
                     f"{self.start_year}:{leap_year_length}"
-                om.add_warning("invalid_start_date_4",
-                             start_date_warning_4, info_map)
+                om.add_warning("invalid_start_date_4", start_date_warning_4, info_map)
                 self.start_day = leap_year_length
                 om.add_variable("start_day", self.start_day, info_map)
 
@@ -247,8 +245,8 @@ class Config:
         # checks that start date is not after end date
         if self.start_year > self.end_year \
                 or (self.start_year == self.end_year and self.start_day > self.end_day):
-            # TODO determine if this below raised error should be rewritten to reassign 
-            # either the the start or end year to then allow the simulation to continue 
+            # TODO determine if this below raised error should be rewritten to reassign
+            # either the the start or end year to then allow the simulation to continue
             # instead of crashing.
             raise errors.JSONfileData(
                 "CONFIG", "\tThe start date must be before the end date")
@@ -574,6 +572,7 @@ class Time:
             return self.day == len(self.years[self.year - 1])
 
         return False
+
 
 def is_leap_year(year):
     """
