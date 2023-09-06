@@ -358,15 +358,14 @@ class OutputManager(object):
         Parameters
         ----------
         data_dict : Dict[str, Any]
-            The dictionary to be saved
-
+            The dictionary to be saved.
         path : str
-            The path to the file to be saved
+            The path to the file to be saved.
 
         Raises
         ------
         Exception
-            If an error occurs while writting to the file
+            If an error occurs while writing to the file.
 
         """
         info_map = {"class": self.__class__.__name__,
@@ -378,9 +377,13 @@ class OutputManager(object):
             self.add_log("save_dict_file_try", f"Nothing to save to {path}. Data dictionary is empty.", info_map)
             return
 
-        (variable_name, variable_data), = data_dict.items()
-        csv_column_data = self._dict_to_csv_column_list(variable_name, variable_data)
-        df = pd.concat(csv_column_data, axis=1)
+        csv_columns = []
+        for variable_name in data_dict.keys():
+            variable_data = data_dict[variable_name]
+            csv_column_data = self._dict_to_csv_column_list(variable_name, variable_data)
+            csv_columns.extend(csv_column_data)
+
+        df = pd.concat(csv_columns, axis=1)
         try:
             df.to_csv(path, index=False)
         except Exception as e:
@@ -570,12 +573,12 @@ class OutputManager(object):
                 file_path = os.path.join(save_path, self._generate_file_name(f"saved_variables_{filter_file}", "json"))
                 self._dict_to_file_json(filtered_pool, file_path)
             elif filter_file.startswith("csv_"):
-                csv_directory = os.path.join(save_path, "CSVs", "om", "variables")
-                self._save_variables_to_csv_files(filtered_pool, csv_directory)
+                csv_directory = os.path.join(save_path, "CSVs", "om")
+                self._save_variables_to_csv_files(filtered_pool, filter_file, csv_directory)
             else:
                 self.add_warning("invalid filter file", f"{filter_file} must be prefixed with csv_ or json_", info_map)
 
-    def _save_variables_to_csv_files(self, data_dict: Dict[str, Any], path: str) -> None:
+    def _save_variables_to_csv_files(self, data_dict: Dict[str, Any], filter_name: str, path: str) -> None:
         """
         Saves the variables_pool into one csv file per variable in the given path to a directory.
 
@@ -583,7 +586,8 @@ class OutputManager(object):
         ----------
         data_dict : Dict[str, Any]
             The dictionary to be saved
-
+        filter_name : str
+            Name of the filter that is being used for selecting data for the CSV.
         path : str
             Path to the output directory for the OutputManager.
 
@@ -593,9 +597,9 @@ class OutputManager(object):
         except Exception as e:
             raise e
 
-        for key in data_dict.keys():
-            variable_csv_file_path = os.path.join(path, self._generate_file_name(key, "csv"))
-            self._dict_to_file_csv({key: data_dict[key]}, variable_csv_file_path)
+        # for key in data_dict.keys():
+        variable_csv_file_path = os.path.join(path, self._generate_file_name(filter_name, "csv"))
+        self._dict_to_file_csv(data_dict, variable_csv_file_path)
 
     def dump_variables(self, path: str, exclude_info_maps: bool = False) -> None:
         """
