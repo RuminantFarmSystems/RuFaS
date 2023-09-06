@@ -309,11 +309,13 @@ class OutputManager(object):
         except Exception as e:
             raise e
 
-    def _dict_to_csv_column_list(self, data_dict: Dict[str, List[Any]]) -> List[Tuple[str, pd.Series]]:
+    def _dict_to_csv_column_list(self, variable_name: str, data_dict: Dict[str, List[Any]]) -> List[pd.Series]:
         """Turns a dictionary to a list of csv columns.
 
         Parameters
         ----------
+        variable_name : str
+            The name of the variable having its values written into a CSV column.
         data_dict : Dict[str, List[Any]]
             The dictionary to read from
 
@@ -342,10 +344,11 @@ class OutputManager(object):
                         csv_column_lists[subkey].append(value)
 
                 for subkey in csv_column_lists.keys():
-                    column_title = f"{field}_{subkey}" if field == "info_maps" else subkey
-                    column_list.append((column_title, pd.Series(csv_column_lists[subkey], dtype=object)))
+                    column_title = f"{variable_name}.{field}_{subkey}" if field == "info_maps" else subkey
+                    column_list.append(pd.Series(csv_column_lists[subkey], dtype=object, name=column_title))
             else:
-                column_list.append((field, pd.Series(data_list, dtype=object)))
+                column_title = f"{variable_name}.{field}"
+                column_list.append(pd.Series(data_list, dtype=object, name=column_title))
 
         return column_list
 
@@ -375,9 +378,9 @@ class OutputManager(object):
             self.add_log("save_dict_file_try", f"Nothing to save to {path}. Data dictionary is empty.", info_map)
             return
 
-        (_, variable_data), = data_dict.items()
-        csv_column_data = self._dict_to_csv_column_list(variable_data)
-        df = pd.DataFrame(dict(csv_column_data))
+        (variable_name, variable_data), = data_dict.items()
+        csv_column_data = self._dict_to_csv_column_list(variable_name, variable_data)
+        df = pd.concat(csv_column_data, axis=1)
         try:
             df.to_csv(path, index=False)
         except Exception as e:
