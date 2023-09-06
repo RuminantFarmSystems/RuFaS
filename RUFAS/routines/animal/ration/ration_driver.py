@@ -12,9 +12,9 @@ import collections
 from typing import Set
 from RUFAS.output_manager import OutputManager
 from RUFAS.routines.animal.ration import animal_requirements
-from RUFAS.routines.animal.ration.ration_NLP import RationOptimizer
+from RUFAS.routines.animal.ration.ration_optimizer import RationOptimizer
 
-NLP = RationOptimizer()
+ration_optimizer = RationOptimizer()
 
 om = OutputManager()
 
@@ -27,7 +27,7 @@ class RationManager:
     def formulate_ration(cls, pen, available_feeds, animal_grouping_scenario):
         """
         Function that links the ration_driver file with the calc_ration function in
-        animal_manager.py. Returns a dictionary of the rations by feed and status of the NLP
+        animal_manager.py. Returns a dictionary of the rations by feed and status of the nonlinear programming attempt
         optimization.
 
         Args:
@@ -43,7 +43,7 @@ class RationManager:
         # Use grouping scenario to find the type of each animal in pen
         req.set_requirements(pen, animal_grouping_scenario, False)
 
-        solution, ration_vals = NLP.optimization(req, available_feeds, pen.animal_combination)
+        solution, ration_vals = ration_optimizer.attempt_optimization(req, available_feeds, pen.animal_combination)
         # Reduction of milk production estimate process to achieve feasible solution
         num_reattempts = 0
         failed_list = []
@@ -52,7 +52,7 @@ class RationManager:
         if pen.animal_combination.name in ['LAC_COW']:
             while not solution.success:
                 num_reattempts += 1
-                failed_constraints = NLP.find_failed_constraints(solution.x, NLP.cow_cons)
+                failed_constraints = ration_optimizer.find_failed_constraints(solution.x, ration_optimizer.cow_cons)
                 if failed_constraints:
                     for constr in failed_constraints:
                         failed_list.append(constr["fun"].__name__)
@@ -60,7 +60,7 @@ class RationManager:
                 # These values for reduction are not from pseudocode, but the values below
                 # are based on fastest case runtime testing
                 # TODO: continue testing for more efficient reductions: see Issues #569, 577, 589
-                # NEl_con = NLP.NEl_constraint(solution.x)
+                # NEl_con = ration_optimizer.NEl_constraint(solution.x)
                 # if NEl_con < -0.5:
                 #     reduction = 3 * (-NEl_con)
                 # else:
@@ -71,7 +71,7 @@ class RationManager:
                     animal.milk_production_reduction -= reduction
                 # recalculating requirements after reduction
                 req.set_requirements(pen, animal_grouping_scenario, True)
-                solution, ration_vals = NLP.optimization(req, available_feeds, pen.animal_combination)
+                solution, ration_vals = ration_optimizer.attempt_optimization(req, available_feeds, pen.animal_combination)
                 info_map = {"class": "no_caller_class",
                     "function": pen.__init__.__name__,
                     }
@@ -88,7 +88,7 @@ class RationManager:
                 num += solution.x[i + 2]
                 ration[available_feeds['feed_key'][feed_id]] = round(num, 6)
             ration['status'] = 'Optimal'
-            ration['objective'] = NLP.objective(solution.x)
+            ration['objective'] = ration_optimizer.objective(solution.x)
             return ration, ration_vals
         # safeguard if scipy SLSQP bounds error still occurs after many iterations
         # using previous cycles ration for this pen

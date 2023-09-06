@@ -26,7 +26,7 @@ from RUFAS.routines.animal.life_cycle.calf import Calf
 import RUFAS.routines.animal.clustering_pen_grouping
 from RUFAS.routines.animal.ration.ration_driver import AvailableFeeds
 
-from RUFAS.routines.animal.ration.ration_NLP import RationOptimizer
+from RUFAS.routines.animal.ration.ration_optimizer import RationOptimizer
 from RUFAS.routines.animal.life_cycle.animal_base import AnimalBase
 import RUFAS.routines.animal.ration.animal_requirements
 import RUFAS.routines.animal.ration.ration_driver
@@ -1294,7 +1294,7 @@ def test_calc_requirements():
 
 
 def test_set_globals():
-    """Unit test for function set_globals in file routines/animal/ration/ration_NLP.py"""
+    """Unit test for function set_globals in file routines/animal/ration/ration_optimizer.py"""
     pass
 
 
@@ -1305,78 +1305,78 @@ def test_set_globals():
         ]
 )
 def test_list_reconfig(input, expected)->None:
-    """Unit test for function list_reconfig in file routines/animal/ration/ration_NLP.py"""
+    """Unit test for function list_reconfig in file routines/animal/ration/ration_optimizer.py"""
     ration_optimizer = RationOptimizer()
     assert ration_optimizer.list_reconfig(input) == expected
 
 
 def test_objective():
-    """Unit test for function objective in file routines/animal/ration/ration_NLP.py"""
+    """Unit test for function objective in file routines/animal/ration/ration_optimizer.py"""
     pass
 
 
 def test_NEmact_constraint():
-    """Unit test for function NEmact_constraint in file routines/animal/ration/ration_NLP.py"""
+    """Unit test for function NEmact_constraint in file routines/animal/ration/ration_optimizer.py"""
     pass
 
 
 def test_NEl_constraint():
-    """Unit test for function NEl_constraint in file routines/animal/ration/ration_NLP.py"""
+    """Unit test for function NEl_constraint in file routines/animal/ration/ration_optimizer.py"""
     pass
 
 
 def test_NEgact_constraint():
-    """Unit test for function NEgact_constraint in file routines/animal/ration/ration_NLP.py"""
+    """Unit test for function NEgact_constraint in file routines/animal/ration/ration_optimizer.py"""
     pass
 
 
 def test_calcium_constraint():
-    """Unit test for function calcium_constraint in file routines/animal/ration/ration_NLP.py"""
+    """Unit test for function calcium_constraint in file routines/animal/ration/ration_optimizer.py"""
     pass
 
 
 def test_phosphorus_constraint():
-    """Unit test for function phosphorus_constraint in file routines/animal/ration/ration_NLP.py"""
+    """Unit test for function phosphorus_constraint in file routines/animal/ration/ration_optimizer.py"""
     pass
 
 
 def test_protein_constraint():
-    """Unit test for function protein_constraint in file routines/animal/ration/ration_NLP.py"""
+    """Unit test for function protein_constraint in file routines/animal/ration/ration_optimizer.py"""
     pass
 
 
 def test_NDF_constraint_1():
-    """Unit test for function NDF_constraint_1 in file routines/animal/ration/ration_NLP.py"""
+    """Unit test for function NDF_constraint_1 in file routines/animal/ration/ration_optimizer.py"""
     pass
 
 
 def test_NDF_constraint_2():
-    """Unit test for function NDF_constraint_2 in file routines/animal/ration/ration_NLP.py"""
+    """Unit test for function NDF_constraint_2 in file routines/animal/ration/ration_optimizer.py"""
     pass
 
 
 def test_forage_NDF_constraint():
-    """Unit test for function forage_NDF_constraint in file routines/animal/ration/ration_NLP.py"""
+    """Unit test for function forage_NDF_constraint in file routines/animal/ration/ration_optimizer.py"""
     pass
 
 
 def test_fat_constraint():
-    """Unit test for function fat_constraint in file routines/animal/ration/ration_NLP.py"""
+    """Unit test for function fat_constraint in file routines/animal/ration/ration_optimizer.py"""
     pass
 
 
 def test_DMI_constraint():
-    """Unit test for function DMI_constraint in file routines/animal/ration/ration_NLP.py"""
+    """Unit test for function DMI_constraint in file routines/animal/ration/ration_optimizer.py"""
     pass
 
 
 def test_energy_req_limit_constraint():
-    """Unit test for function energy_req_limit_constraint in file routines/animal/ration/ration_NLP.py"""
+    """Unit test for function energy_req_limit_constraint in file routines/animal/ration/ration_optimizer.py"""
     pass
 
 
-def test_ration_NLP_optimize():
-    """Unit test for function optimize in file routines/animal/ration/ration_NLP.py"""
+def test_ration_optimizer_optimize():
+    """Unit test for function optimize in file routines/animal/ration/ration_optimizer.py"""
     pass
 
 
@@ -1400,8 +1400,8 @@ def test_calculate_rqmts():
     pass
 
 
-def test_optimization():
-    """Unit test for function optimization in file routines/animal/ration/ration_driver.py"""
+def test_attempt_optimization():
+    """Unit test for function attempt_optimization in file routines/animal/ration/ration_optimizer.py"""
     pass
 
 
@@ -1450,7 +1450,7 @@ def test_find_failed_constraints(mocker: MockerFixture, mock_results, expected_r
     
     # The exact path depends on where is_constraint_violated() is 'used' (which may differ from where it is 'defined') - a common bug
     # The path below may need to be adjusted
-    mocker.patch('RUFAS.routines.animal.ration.ration_NLP.RationOptimizer.is_constraint_violated', side_effect=mock_results)
+    mocker.patch('RUFAS.routines.animal.ration.ration_optimizer.RationOptimizer.is_constraint_violated', side_effect=mock_results)
     
     # Act
     ration_optimizer = RationOptimizer()

@@ -1,12 +1,13 @@
 """
 RUFAS: Ruminant Farm Systems Model
-File name: ration_NLP.py
+File name: ration_optimizer.py
 Description: Calculates the ration for animals using a Non-Linear
-    programming method utilizing the scipy package. The NLP is formulated using
-    constraint functions. Note NLP (Non-linear Program) will be used throughout
+    programming method utilizing the scipy package. The Non-linear Program (NLP) is formulated using
+    constraint functions. Note NLP will be used throughout
     descriptions for functions in this file.
 Author(s):
     Chris VanKerkhove, cjv47@cornell.edu
+    Joseph Waddell, jw2574@cornell.edu
 """
 import numpy as np
 import random
@@ -25,7 +26,7 @@ class RationOptimizer:
         self.heifer_cons = []
         self.constraint_functions = []
 
-    def set_constraints(self):
+    def set_constraints(self, arguments):
         # establishing the constraints of the NLP
         self.constraint_functions = [
             self.NEmact_constraint,
@@ -42,7 +43,7 @@ class RationOptimizer:
             self.DMI_constraint_lower
         ]
         
-        self.cow_cons = [{'type': 'ineq', 'fun': func} for func in self.constraint_functions]
+        self.cow_cons = [{'type': 'ineq', 'fun': func, 'args': arguments} for func in self.constraint_functions]
 
         self.heifer_cons = [cons for cons in self.cow_cons if str(cons['fun']) not in [self.NEl_constraint, self.DMI_constraint_lower]]
 
@@ -140,7 +141,7 @@ class RationOptimizer:
         return list_reconfig
 
 
-    def objective(self, x):
+    def objective(self, x, *args):
         """
         Sets up the objective function in the optimize function for the non-linear
         program. Whenever the paramert x is used, it refers to the "decision vetor
@@ -156,7 +157,7 @@ class RationOptimizer:
         return sum(np.multiply(x, price))
 
 
-    def NEmact_constraint(self, x):
+    def NEmact_constraint(self, x, *args):
         """
         Sets up the RHS multipliers for the maintenance and activity requirements
         satisfied by the feed. Each equation has a reference to the respective
@@ -229,7 +230,7 @@ class RationOptimizer:
         return (sum(np.multiply(x, np.multiply(multiplier, NEm_act))) - (NEmaint + NEa))
 
 
-    def NEl_constraint(self, x):
+    def NEl_constraint(self, x, price2):
         """
         Sets up the RHS multipliers for the lactation and pregnancy requirements
         satisfied by each feed. Each calculation has a reference to the respective
@@ -261,7 +262,7 @@ class RationOptimizer:
         return sum(np.multiply(x, np.multiply(multiplier, NElact))) - (NEpreg + NEl)
 
 
-    def NEgact_constraint(self, x):
+    def NEgact_constraint(self, x, price2):
         """
         Sets up the RHS multipliers for the growth requirements satisfied by each
         feed. Each calculation has a reference to the respective calculation in the
@@ -291,7 +292,7 @@ class RationOptimizer:
         return sum(np.multiply(x, np.multiply(multiplier, NEgact))) - NEg
 
 
-    def calcium_constraint(self, x):
+    def calcium_constraint(self, x, price2):
         """
         Sets up the RHS multipliers for the calcium requirements satisfied by each
         feed. Each calculation has a reference to the respective calculation in the
@@ -316,7 +317,7 @@ class RationOptimizer:
         return (sum(np.multiply(x, np.multiply(np.multiply(calcium, 0.01), dCa))) - (C_req / 1000))
 
 
-    def phosphorus_constraint(self, x):
+    def phosphorus_constraint(self, x, price2):
         """
         Sets up the RHS multipliers for the phosphorus requirements satisfied by each
         feed. Each calculation has a reference to the respective calculation in the
@@ -354,15 +355,15 @@ class RationOptimizer:
         return sum(np.multiply(x, np.multiply(np.multiply(phosphorus, 0.01), dP))) - ((P_req + P_maint) / 1000)
 
 
-    def protein_constraint(self, x):
+    def protein_constraint(self, x, price2):
         """
-        Sets up the protein requirement constraint in the NLP. Because part of the
+        Sets up the protein requirement constraint in the nonlinear programming. Because part of the
         maintenance requirement for protein contains non-linearity properties, that
         requirement will be calculated in this function. Each calculation has a
         reference to the respective calculation in the pseudocode.
 
         Args:
-            x: The decision vector of the NLP.
+            x: The decision vector of the nonlinear programming objective.
         """
         DMI = sum(x)
         # Boolean values to identify if feed is a concentrate
@@ -419,7 +420,7 @@ class RationOptimizer:
         return (MP_supply - (MP_req / 1000))
 
 
-    def NDF_constraint_1(self, x):
+    def NDF_constraint_1(self, x, price2):
         """
         Sets up the RHS multipliers for each feed to instill an overall NDF percent
         constraint. This is a lower bound constraint on overall NDF percent.
@@ -433,7 +434,7 @@ class RationOptimizer:
             return (sum(np.multiply(x, NDF)) / DMI) - 25
 
 
-    def NDF_constraint_2(self, x):
+    def NDF_constraint_2(self, x, price2):
         """
         Sets up the RHS multipliers for each feed to instill an overall NDF percent
         constraint. This is an upper bound constraint on overall NDF percent.
@@ -447,7 +448,7 @@ class RationOptimizer:
             return (-(sum(np.multiply(x, NDF)) / DMI) + 45)
 
 
-    def forage_NDF_constraint(self, x):
+    def forage_NDF_constraint(self, x, price2):
         """
         Sets up the RHS multipliers for only FORAGES to instill a NDF percent across
         forages constraint. This is a lower bound constraint on NDF percent across
@@ -468,7 +469,7 @@ class RationOptimizer:
             return (sum(np.multiply(x, np.multiply(NDF, is_forage))) / DMI) - 19
 
 
-    def fat_constraint(self, x):
+    def fat_constraint(self, x, price2):
         """
         Sets up the RHS multipliers for each feed to instill an overall fat percent
         constraint. This is an upper bound constraint on over fat percent.
@@ -482,7 +483,7 @@ class RationOptimizer:
             return -(sum(np.multiply(x, EE)) / DMI) + 7
 
 
-    def DMI_constraint_lower(self, x):
+    def DMI_constraint_lower(self, x, price2):
         """
         Constraint in place to make sure the sum of all the feeds in the ration is
         greater than the DMI_est + 20% calculated in the requirements
@@ -493,7 +494,7 @@ class RationOptimizer:
         return (sum(x)) - DMIest-DMIest*AnimalModuleConstants.DMI_CONSTRAINT_PERCENT
 
 
-    def DMI_constraint_upper(self, x):
+    def DMI_constraint_upper(self, x, price2):
         """
         Constraint in place to make sure the sum of all the feeds in the ration is
         less than the DMI_est + 20% calculated in the requirements.
@@ -503,7 +504,7 @@ class RationOptimizer:
         """
         return -(sum(x)) + DMIest+DMIest*AnimalModuleConstants.DMI_CONSTRAINT_PERCENT
 
-    def energy_req_limit_constraint(self, x):
+    def energy_req_limit_constraint(self, x, price2):
         """
         Constraint that limits each feed to only satisfying a single energy constraint
         (NEmact, NEgact, or NEl).
@@ -533,7 +534,7 @@ class RationOptimizer:
         ration_vals = {'ME_tot': ME_tot}
         return ration_vals
 
-    def optimize(self, animal_combination):
+    def optimize(self, animal_combination, requirements, available_feeds):
         """
         Calls the objective function and constraint functions and formulates
         the inputs for the minimization function. Returns the optimized solution
@@ -545,7 +546,10 @@ class RationOptimizer:
             The animal combination to optimize the ration for.
 
         """
-        self.set_constraints()
+        price = self.list_reconfig(available_feeds['price'])
+
+        arguments = (price.copy(),)
+        self.set_constraints(arguments = arguments)
         n = len(price)
         x0 = [1]
         for i in range(n-1):
@@ -560,15 +564,15 @@ class RationOptimizer:
 
         # TODO: Put AnimalCombination enum in a separate file and import it here to avoid circular import
         if str(animal_combination) in ['AnimalCombination.LAC_COW']:
-            return minimize(self.objective, x0, method='SLSQP', bounds=bnds, constraints=self.cow_cons)
+            return minimize(self.objective, x0, method='SLSQP', bounds=bnds, constraints=self.cow_cons, args = arguments)
         elif str(animal_combination) in ['AnimalCombination.GROWING', 'AnimalCombination.CLOSE_UP',
                                         'AnimalCombination.GROWING_AND_CLOSE_UP']:
-            return minimize(self.objective, x0, method='SLSQP', bounds=bnds, constraints=self.heifer_cons)
+            return minimize(self.objective, x0, method='SLSQP', bounds=bnds, constraints=self.heifer_cons, args = arguments)
         else:
             raise ValueError("Invalid animal combination: " + str(animal_combination))
 
 
-    def optimization(self, requirements, available_feeds, animal_combination):
+    def attempt_optimization(self, requirements, available_feeds, animal_combination):
         """
         Function that sets up the nutrients and requirements lists into structured
         inputs for the non-linear program and calls the optimization function.
@@ -611,7 +615,7 @@ class RationOptimizer:
         count = 0
         while i < 1:
             try:
-                solution = self.optimize(animal_combination)
+                solution = self.optimize(animal_combination, requirements, available_feeds)
             except:
                 i -= 1
             finally:
@@ -639,9 +643,9 @@ class RationOptimizer:
             Parameters
             ----------
             solution_x: numpy nd array, e.g. npt.NDArray
-                solution.x array from minimize function used in ration_NLP.py
+                solution.x array from minimize function used in ration_optimizer.py
             constraint: dict[str, Any]
-                constraint function as defined in ration_NLP.py
+                constraint function as defined in ration_optimizer.py
 
             """
             result = constraint['fun'](solution_x)
@@ -660,11 +664,11 @@ class RationOptimizer:
             Parameters
             ----------
             solution_x: numpy nd array, e.g. npt.NDArray
-                solution.x is from minimize function used in ration_NLP.py, 
+                solution.x is from minimize function used in ration_optimizer.py, 
                     solution obj itself is returned as  <dict class 'scipy.optimize._optimize.OptimizeResult'>
 
             constraints: List[dict[str, Callable]]
-                list of constraint functions as defined in ration_NLP.py
+                list of constraint functions as defined in ration_optimizer.py
 
             Returns
             -------
