@@ -324,14 +324,6 @@ class OutputManager(object):
         List[Tuple[str, pd.Series]]
             A list of (column_name, column_data) tuples.
 
-        ED - plan for fixing this bug:
-            1. rewrite this method so that it only returns a list of pd.Series, with each Series getting its name set to
-                <name_of_the_variable>.value or <name_of_the_variable>.info_map.
-            2. rewrite _dict_to_file_csv() so that it takes a FULL dictionary of data, generates a Series of each
-                variable, combines all the Series into one DataFrame, and writes it to a CSV.
-            3. rewrite save_variables() to only call _dict_to_file_csv() for each CSV filter.
-            4. rewrite the tests.
-
         """
         column_list = []
         mandatory_fields = ["values", "info_maps"] if "info_maps" in data_dict else ["values"]

@@ -334,36 +334,36 @@ def test_dict_to_csv_column_list(mock_output_manager: OutputManager) -> None:
     data = {
         "values": [1.0, True, "test", {"key": 1}],
     }
-    result = mock_output_manager._dict_to_csv_column_list(data)
-    (_, v) = result[0]
+    result = mock_output_manager._dict_to_csv_column_list("dummy_variable_name", data)
+    v = result[0]
     assert v.to_list() == data['values']
 
     data["info_maps"] = [{"map1": "value1", "map2": 1}, {"map1": "value2", "map2": 2}]
-    result = mock_output_manager._dict_to_csv_column_list(data)
+    result = mock_output_manager._dict_to_csv_column_list("dummy_variable_name", data)
     assert len(result) == 3
-    (title1, data_series) = result[0]
-    (title2, map1_series) = result[1]
-    (title3, map2_series) = result[2]
-    assert title1 == 'values'
+    data_series = result[0]
+    map1_series = result[1]
+    map2_series = result[2]
+    assert data_series.name == "dummy_variable_name.values"
     assert data_series.to_list() == data['values']
-    assert title2 == "info_maps_map1"
+    assert map1_series.name == "dummy_variable_name.info_maps_map1"
     assert map1_series.to_list() == ['value1', 'value2']
-    assert title3 == "info_maps_map2"
+    assert map2_series.name == "dummy_variable_name.info_maps_map2"
     assert map2_series.to_list() == [1, 2]
 
 
 def test_dict_to_csv_column_list_empty_list(mock_output_manager: OutputManager) -> None:
     """Unit test for the function _dict_to_csv_column_list in the file output_manager.py"""
     data = {"values": [], "info_maps": []}
-    result = mock_output_manager._dict_to_csv_column_list(data)
+    result = mock_output_manager._dict_to_csv_column_list("dummy_variable_name", data)
 
     assert len(result) == 2
-    (title, data_series) = result[0]
-    assert title == "values"
-    assert data_series.to_list() == []
-    (title, data_series) = result[1]
-    assert title == "info_maps"
-    assert data_series.to_list() == []
+    series = result[0]
+    assert series.name == "dummy_variable_name.values"
+    assert series.to_list() == []
+    series = result[1]
+    assert series.name == "dummy_variable_name.info_maps"
+    assert series.to_list() == []
 
 
 @pytest.mark.parametrize("data, expected_result, should_write", [
