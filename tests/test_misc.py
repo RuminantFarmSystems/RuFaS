@@ -421,6 +421,44 @@ def test_dict_to_csv_column_list_empty_list(mock_output_manager: OutputManager) 
      f"2,\"[2, 2]\",2,Hi,\"[4, 5, 6]\",\"{{'nestedkey1': 'There', 'nestedkey2': [7, 8, 9]}}\"{os.linesep}"
      f"3,\"[3, 3]\",,,,{os.linesep}",
      True),
+    ({
+        "simple_key1": {
+            "values": [1, 2, 3]
+        },
+        "simple_key2": {
+            "values": [4, 5, 6]
+        }
+    },
+     f"simple_key1.values,simple_key2.values{os.linesep}"
+     f"1,4{os.linesep}2,5{os.linesep}3,6{os.linesep}",
+     True),
+    ({
+        "simple_key1": {
+            "values": [1, 2, 3],
+            "info_maps": [
+                {
+                    "subkey1": "Farm",
+                    "subkey2": "Field"
+                }
+            ]
+        },
+        "simple_key2": {
+            "values": [4, 5, 6, 8, 9],
+            "info_maps": [
+                {
+                    "subkey1": "Tractor",
+                }
+            ]
+        }
+    },
+     f"simple_key1.values,simple_key1.info_maps_subkey1,simple_key1.info_maps_subkey2,simple_key2.values,"
+     f"simple_key2.info_maps_subkey1{os.linesep}"
+     f"1,Farm,Field,4,Tractor{os.linesep}"
+     f"2,,,5,{os.linesep}"
+     f"3,,,6,{os.linesep}"
+     f",,,8,{os.linesep}"
+     f",,,9,{os.linesep}",
+     True),
     ({}, "",
      False),
 ])
