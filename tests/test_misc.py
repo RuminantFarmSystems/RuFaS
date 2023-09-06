@@ -870,10 +870,12 @@ def test_save_variables_to_csv_files(
 
     with patch('pathlib.Path.mkdir') as mock_mkdir:
         mock_mkdir.return_value = None
-        mock_output_manager._save_variables_to_csv_files(mock_variable_pool, "dummy_path")
+        mock_output_manager._save_variables_to_csv_files(mock_variable_pool, "csv_dummy_filter_filepath.txt",
+                                                         "dummy_path")
 
     mock_mkdir.assert_called_with(parents=True, exist_ok=True)
-    mock_output_manager._generate_file_name.assert_called_once_with("var1", "csv")
+    mock_output_manager._generate_file_name.assert_called_once_with("saved_variables_csv_dummy_filter_filepath.txt",
+                                                                    "csv")
     mock_output_manager._dict_to_file_csv.assert_called_once_with(
         mock_variable_pool, os.path.join("dummy_path", "dummy_name")
     )
@@ -1540,7 +1542,7 @@ def test_save_variables(
         mock_output_manager.variables_pool, os.path.join("dummy_path", "dummy_name")
     )
     mock_output_manager._save_variables_to_csv_files.assert_called_with(
-        mock_output_manager.variables_pool, os.path.join("dummy_path", "CSVs", "om", "variables")
+        mock_output_manager.variables_pool, 'csv_dummy_input_filepath.txt', os.path.join("dummy_path", "CSVs", "om")
     )
 
     # test case for when exclude_info_maps flag set to True
@@ -1554,7 +1556,7 @@ def test_save_variables(
         mock_output_manager.variables_pool, os.path.join("dummy_path", "dummy_name")
     )
     mock_output_manager._save_variables_to_csv_files.assert_called_with(
-        mock_output_manager.variables_pool, os.path.join("dummy_path", "CSVs", "om", "variables")
+        mock_output_manager.variables_pool, 'csv_dummy_input_filepath.txt', os.path.join("dummy_path", "CSVs", "om")
     )
 
     # test case for when the filter files to don start with csv_ or json_
