@@ -598,7 +598,7 @@ class OutputManager(object):
             raise e
 
         # for key in data_dict.keys():
-        variable_csv_file_path = os.path.join(path, self._generate_file_name(filter_name, "csv"))
+        variable_csv_file_path = os.path.join(path, self._generate_file_name(f"saved_variables_{filter_name}", "csv"))
         self._dict_to_file_csv(data_dict, variable_csv_file_path)
 
     def dump_variables(self, path: str, exclude_info_maps: bool = False) -> None:
