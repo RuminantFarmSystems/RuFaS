@@ -230,7 +230,7 @@ class RationOptimizer:
         return (sum(np.multiply(x, np.multiply(multiplier, NEm_act))) - (NEmaint + NEa))
 
 
-    def NEl_constraint(self, x, price2):
+    def NEl_constraint(self, x, *args):
         """
         Sets up the RHS multipliers for the lactation and pregnancy requirements
         satisfied by each feed. Each calculation has a reference to the respective
@@ -262,7 +262,7 @@ class RationOptimizer:
         return sum(np.multiply(x, np.multiply(multiplier, NElact))) - (NEpreg + NEl)
 
 
-    def NEgact_constraint(self, x, price2):
+    def NEgact_constraint(self, x, *args):
         """
         Sets up the RHS multipliers for the growth requirements satisfied by each
         feed. Each calculation has a reference to the respective calculation in the
@@ -292,7 +292,7 @@ class RationOptimizer:
         return sum(np.multiply(x, np.multiply(multiplier, NEgact))) - NEg
 
 
-    def calcium_constraint(self, x, price2):
+    def calcium_constraint(self, x, *args):
         """
         Sets up the RHS multipliers for the calcium requirements satisfied by each
         feed. Each calculation has a reference to the respective calculation in the
@@ -317,7 +317,7 @@ class RationOptimizer:
         return (sum(np.multiply(x, np.multiply(np.multiply(calcium, 0.01), dCa))) - (C_req / 1000))
 
 
-    def phosphorus_constraint(self, x, price2):
+    def phosphorus_constraint(self, x, *args):
         """
         Sets up the RHS multipliers for the phosphorus requirements satisfied by each
         feed. Each calculation has a reference to the respective calculation in the
@@ -355,7 +355,7 @@ class RationOptimizer:
         return sum(np.multiply(x, np.multiply(np.multiply(phosphorus, 0.01), dP))) - ((P_req + P_maint) / 1000)
 
 
-    def protein_constraint(self, x, price2):
+    def protein_constraint(self, x, *args):
         """
         Sets up the protein requirement constraint in the nonlinear programming. Because part of the
         maintenance requirement for protein contains non-linearity properties, that
@@ -420,7 +420,7 @@ class RationOptimizer:
         return (MP_supply - (MP_req / 1000))
 
 
-    def NDF_constraint_1(self, x, price2):
+    def NDF_constraint_1(self, x, *args):
         """
         Sets up the RHS multipliers for each feed to instill an overall NDF percent
         constraint. This is a lower bound constraint on overall NDF percent.
@@ -434,7 +434,7 @@ class RationOptimizer:
             return (sum(np.multiply(x, NDF)) / DMI) - 25
 
 
-    def NDF_constraint_2(self, x, price2):
+    def NDF_constraint_2(self, x, *args):
         """
         Sets up the RHS multipliers for each feed to instill an overall NDF percent
         constraint. This is an upper bound constraint on overall NDF percent.
@@ -448,7 +448,7 @@ class RationOptimizer:
             return (-(sum(np.multiply(x, NDF)) / DMI) + 45)
 
 
-    def forage_NDF_constraint(self, x, price2):
+    def forage_NDF_constraint(self, x, *args):
         """
         Sets up the RHS multipliers for only FORAGES to instill a NDF percent across
         forages constraint. This is a lower bound constraint on NDF percent across
@@ -469,7 +469,7 @@ class RationOptimizer:
             return (sum(np.multiply(x, np.multiply(NDF, is_forage))) / DMI) - 19
 
 
-    def fat_constraint(self, x, price2):
+    def fat_constraint(self, x, *args):
         """
         Sets up the RHS multipliers for each feed to instill an overall fat percent
         constraint. This is an upper bound constraint on over fat percent.
@@ -483,7 +483,7 @@ class RationOptimizer:
             return -(sum(np.multiply(x, EE)) / DMI) + 7
 
 
-    def DMI_constraint_lower(self, x, price2):
+    def DMI_constraint_lower(self, x, *args):
         """
         Constraint in place to make sure the sum of all the feeds in the ration is
         greater than the DMI_est + 20% calculated in the requirements
@@ -494,7 +494,7 @@ class RationOptimizer:
         return (sum(x)) - DMIest-DMIest*AnimalModuleConstants.DMI_CONSTRAINT_PERCENT
 
 
-    def DMI_constraint_upper(self, x, price2):
+    def DMI_constraint_upper(self, x, *args):
         """
         Constraint in place to make sure the sum of all the feeds in the ration is
         less than the DMI_est + 20% calculated in the requirements.
@@ -504,7 +504,7 @@ class RationOptimizer:
         """
         return -(sum(x)) + DMIest+DMIest*AnimalModuleConstants.DMI_CONSTRAINT_PERCENT
 
-    def energy_req_limit_constraint(self, x, price2):
+    def energy_req_limit_constraint(self, x, *args):
         """
         Constraint that limits each feed to only satisfying a single energy constraint
         (NEmact, NEgact, or NEl).
@@ -548,7 +548,7 @@ class RationOptimizer:
         """
         price = self.list_reconfig(available_feeds['price'])
 
-        arguments = (price.copy(),)
+        arguments = (price.copy(),[], 10)
         self.set_constraints(arguments = arguments)
         n = len(price)
         x0 = [1]
