@@ -368,19 +368,19 @@ def test_dict_to_csv_column_list_empty_list(mock_output_manager: OutputManager) 
 
 @pytest.mark.parametrize("data, expected_result, should_write", [
     ({"var1": {"values": [1.0, True, "test"], "info_maps": []}},
-     f"values,info_maps{os.linesep}1.0,{os.linesep}True,{os.linesep}test,{os.linesep}",
+     f"var1.values,var1.info_maps{os.linesep}1.0,{os.linesep}True,{os.linesep}test,{os.linesep}",
      True),
     ({"var1": {"values": [1.0, True, "test"]}},
-     f"values{os.linesep}1.0{os.linesep}True{os.linesep}test{os.linesep}",
+     f"var1.values{os.linesep}1.0{os.linesep}True{os.linesep}test{os.linesep}",
      True),
     ({"var1": {"values": [1, 2, 3], "info_maps": [{"v": 1}, {"v": 2}, {"v": 3}]}},
-     f"values,info_maps_v{os.linesep}1,1{os.linesep}2,2{os.linesep}3,3{os.linesep}",
+     f"var1.values,var1.info_maps_v{os.linesep}1,1{os.linesep}2,2{os.linesep}3,3{os.linesep}",
      True),
     ({"var1": {"values": [1, 2, 3]}},
-     f"values{os.linesep}1{os.linesep}2{os.linesep}3{os.linesep}",
+     f"var1.values{os.linesep}1{os.linesep}2{os.linesep}3{os.linesep}",
      True),
     ({"var1": {"values": [1], "info_maps": [{"map1": "value1"}, {"map1": "value2"}]}},
-     f"values,info_maps_map1{os.linesep}1,value1{os.linesep},value2{os.linesep}",
+     f"var1.values,var1.info_maps_map1{os.linesep}1,value1{os.linesep},value2{os.linesep}",
      True),
     ({"var1":
       {
@@ -388,7 +388,7 @@ def test_dict_to_csv_column_list_empty_list(mock_output_manager: OutputManager) 
         "info_maps": [{"map1": "value1"}, {"map1": "value2"}]
       }
       },
-     f"v1,v2,info_maps_map1{os.linesep}1,1,value1{os.linesep}2,2,value2{os.linesep}",
+     f"v1,v2,var1.info_maps_map1{os.linesep}1,1,value1{os.linesep}2,2,value2{os.linesep}",
      True),
     ({
         "simple_key": {
@@ -415,7 +415,8 @@ def test_dict_to_csv_column_list_empty_list(mock_output_manager: OutputManager) 
             ]
         }
     },
-     f"key1,key2,info_maps_subkey1,info_maps_subkey2,info_maps_subkey3,info_maps_subkey4{os.linesep}"
+     f"key1,key2,simple_key.info_maps_subkey1,simple_key.info_maps_subkey2,simple_key.info_maps_subkey3,"
+     f"simple_key.info_maps_subkey4{os.linesep}"
      f"1,\"[1, 1]\",1,Hello,\"[1, 2, 3]\",\"{{'nestedkey1': 'World', 'nestedkey2': [4, 5, 6]}}\"{os.linesep}"
      f"2,\"[2, 2]\",2,Hi,\"[4, 5, 6]\",\"{{'nestedkey1': 'There', 'nestedkey2': [7, 8, 9]}}\"{os.linesep}"
      f"3,\"[3, 3]\",,,,{os.linesep}",
