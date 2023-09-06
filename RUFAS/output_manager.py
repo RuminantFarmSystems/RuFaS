@@ -336,7 +336,8 @@ class OutputManager(object):
                         csv_column_lists[subkey].append(value)
 
                 for subkey in csv_column_lists.keys():
-                    column_title = f"{variable_name}.{field}_{subkey}" if field == "info_maps" else subkey
+                    column_title = f"{variable_name}.{field}_{subkey}" if field == "info_maps" else \
+                        f"{variable_name}.{subkey}"
                     column_list.append(pd.Series(csv_column_lists[subkey], dtype=object, name=column_title))
             else:
                 column_title = f"{variable_name}.{field}"
