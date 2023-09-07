@@ -179,7 +179,6 @@ def make_solution_from_fixed_ration(ration: Dict) -> List:
     return solution_from_ration
 
 
-#TODO how should we handle type hints for classes that aren't imported already? Import just for type hint?
 def get_user_defined_ration(req: animal_requirements, pen, available_feeds, animal_grouping_scenario) \
     -> tuple[Dict[str, float], Dict[str, float]]:
     """
@@ -247,7 +246,6 @@ def get_user_defined_ration(req: animal_requirements, pen, available_feeds, anim
     if str(pen.animal_combination) not in ['AnimalCombination.LAC_COW'] and not solution.success:
         fixed_ration = True
 
-
     if str(pen.animal_combination) in ['AnimalCombination.LAC_COW'] and solution is not None:
         running_milk_reduction = 0.0
         while not solution.success:
@@ -284,12 +282,9 @@ def get_user_defined_ration(req: animal_requirements, pen, available_feeds, anim
     if fixed_ration:
         ration = UserDefinedRationManager.make_ration_from_user_values(ration_percents, available_feeds, req)
         ration_vals = NLP.get_ration_vals(make_solution_from_fixed_ration(ration))
-    elif solution is not None:
-        #elif solution is not None and not fixed_ration and str(pen.animal_combination) in ['AnimalCombination.LAC_COW']:
+    else:
         ration = make_ration_from_solution(available_feeds, solution)
         ration_vals = NLP.get_ration_vals(solution.x)
-    else:
-        print('ERROR') #TODO output to error log? Or force a fixed ration?
     return ration, ration_vals
 
 def is_constraint_violated(solution_x: npt.NDArray, constraint: dict[str, Callable]) -> bool:
@@ -380,8 +375,7 @@ def ration_formulation(pen, available_feeds, animal_grouping_scenario):
             info_map = {"class": "no_caller_class",
                 "function": ration_formulation.__name__,
                 }
-            # save attempt to fail_summary
-            # TODO: find a better way to get the current day! import Time from classes.py?
+
             sim_day = pen.animals_in_pen[0].body_weight_history[-1].simulation_day
             fail_summary = {'simulation day' : sim_day,
                             'reattempt number' : num_reattempts,

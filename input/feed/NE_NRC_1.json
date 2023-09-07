@@ -103,7 +103,7 @@
           "34": 49,
           "65":21
          },
-  "tolerance": 0.1,
-  "milk_reduction_maximum": 21.0
+  "tolerance": 0.01,
+  "milk_reduction_maximum": 20.0
   }
 }
