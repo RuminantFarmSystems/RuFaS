@@ -79,17 +79,17 @@ class UserDefinedRationManager(object):
         ration_percents : Dict
             dictionary of feed ids and their associated percentage of DMI 
         """
-        udrv = UserDefinedRationManager()
+        udrm = UserDefinedRationManager()
         group = pen_animal_combo.name 
         if group == 'LAC_COW':
-            ration_percents = udrv.lactating_cow_ration
+            ration_percents = udrm.lactating_cow_ration
         # elif pen.classes
         elif group == 'GROWING':
-            ration_percents = udrv.growing_ration
+            ration_percents = udrm.growing_ration
         elif group == 'CLOSE_UP':
-            ration_percents = udrv.close_up_ration
+            ration_percents = udrm.close_up_ration
         else: 
-            ration_percents = udrv.calf_ration
+            ration_percents = udrm.calf_ration
         return UserDefinedRationManager.feed_quality_fix(ration_percents, available_feeds)
 
 

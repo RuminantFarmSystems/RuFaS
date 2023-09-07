@@ -24,7 +24,7 @@ from RUFAS.routines.animal.ration import ration_NLP as NLP
 from RUFAS.routines.animal.ration.user_defined_ration import \
     UserDefinedRationManager as UserDefinedRationManager
 
-udrv = UserDefinedRationManager()
+udrm = UserDefinedRationManager()
 om = OutputManager()
 
 def optimization(requirements, available_feeds, animal_combination):
@@ -238,7 +238,7 @@ def get_user_defined_ration(req: animal_requirements, pen, available_feeds, anim
                     'pen requirements' : pen.avg_nutrient_rqmts}
         om.add_variable(f'failed_constraint_summary_for_pen_{pen.id}', fail_summary, info_map)
     
-    if udrv.milk_reduction_maximum == 0.0 and udrv.tolerance == 0.0 and not solution.success:
+    if udrm.milk_reduction_maximum == 0.0 and udrm.tolerance == 0.0 and not solution.success:
         ration = UserDefinedRationManager.make_ration_from_user_values(ration_percents, available_feeds, req)
         ration_vals = NLP.get_ration_vals(make_solution_from_fixed_ration(ration))
         return ration, ration_vals
@@ -251,8 +251,8 @@ def get_user_defined_ration(req: animal_requirements, pen, available_feeds, anim
         while not solution.success:
             running_average_milk = calc_milk_average(pen)
             reduction = 0.25
-            if udrv.milk_reduction_maximum == 0.0 or \
-                running_milk_reduction + reduction > udrv.milk_reduction_maximum or\
+            if udrm.milk_reduction_maximum == 0.0 or \
+                running_milk_reduction + reduction > udrm.milk_reduction_maximum or\
                     running_average_milk - reduction < 1.0:
                 fixed_ration = True
                 solution.success = True
@@ -347,7 +347,7 @@ def ration_formulation(pen, available_feeds, animal_grouping_scenario):
     # creating instance of class requirements
     req = Requirements()
     req.set_requirements(pen, animal_grouping_scenario, False)
-    if udrv.udr_or_not:
+    if udrm.udr_or_not:
         ration, ration_vals = get_user_defined_ration(req, pen, available_feeds, animal_grouping_scenario)
         return ration, ration_vals
 

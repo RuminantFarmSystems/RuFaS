@@ -192,9 +192,9 @@ class AnimalManager:
         # concentrate supplementation when farming type is "pasture", kg
         self.pasture_concentrate = data['pasture_concentrate']
         
-        udrv = udr.UserDefinedRationManager()
+        udrm = udr.UserDefinedRationManager()
         self.ration_user_input = data['ration']['user_input']
-        udrv.udr_or_not = self.ration_user_input
+        udrm.udr_or_not = self.ration_user_input
 
         # how often a ration is calculated, days
         self.formulation_interval = data['ration']['formulation_interval']

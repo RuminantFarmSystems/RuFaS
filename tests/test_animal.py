@@ -1802,7 +1802,7 @@ def mock_user_defined_ration_manager(mocker) -> UserDefinedRationManager:
 def test_ration_to_use(mock_user_defined_ration_manager: UserDefinedRationManager):
     """Unit test for function ration_to_use in file routines/animal/ration/ration_driver.py"""
     
-    #udrv = MagicMock()
+    #udrm = MagicMock()
     mock_user_defined_ration_manager.lactating_cow_ration = {'1': 100, '2': 200, '3': 300}
     mock_user_defined_ration_manager.close_up_ration = {'1': 10, '2': 20, '3': 30}
     mock_user_defined_ration_manager.growing_ration = {'1': 1, '2': 2, '3': 3}

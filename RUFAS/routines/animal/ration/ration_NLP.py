@@ -16,7 +16,7 @@ from typing import Dict, List, Tuple
 from RUFAS.routines.animal.animal_module_constants import AnimalModuleConstants
 
 from RUFAS.routines.animal.ration.user_defined_ration import UserDefinedRationManager as UserDefinedRationManager
-udrv = UserDefinedRationManager()
+udrm = UserDefinedRationManager()
 
 def set_globals(price_, NEmaint_, NEa_, NEpreg_, NEl_, NEg_, MP_req_, C_req_, P_req_,
                  TDN_, DE_, EE_, is_fat_, BW_, calcium_, phosphorus_, NDF_, type_,
@@ -575,7 +575,7 @@ def make_user_bounds(ration_percents: Dict, DMIest: float) -> List[Tuple[float, 
     """
     Calculates user bounds for optimize function
 
-    Uses udrv object to get tolerance, e.g. the +/- percentage allowed around those.
+    Uses udrm object to get tolerance, e.g. the +/- percentage allowed around those.
     Returns a list of each key/value pair three times, but divided by three
         This return in triplicate is necessary for the scipy.minimize function,
          which requires the decision vector in this shape
@@ -592,7 +592,7 @@ def make_user_bounds(ration_percents: Dict, DMIest: float) -> List[Tuple[float, 
         List of each bound, divided by three and reported in triplicate for scipy.minimize function
     """
     tribounds = []
-    udr_tolerance = udrv.tolerance
+    udr_tolerance = udrm.tolerance
     ration_key_list = sorted([int(key) for key in ration_percents.keys()])
     for key in ration_key_list:
         target_lower = ration_percents[str(key)] / \
@@ -656,13 +656,13 @@ def optimize(animal_combination, available_feeds: Dict) -> None:
     # establishing the bounds of the NLP
 
     # Dividing limit by 3 for tri-decision variables for farm grown feeds
-    if udrv.udr_or_not:
+    if udrm.udr_or_not:
         bnds = make_user_bounds(UserDefinedRationManager.ration_to_use(animal_combination, available_feeds), DMIest)
         x0 = [np.mean(bnd) for bnd in bnds]
     else:    
         bnds = []
         bnds = [(0, (lim / 3) + 0.0001) for lim in limit]
-    if udrv.udr_or_not:
+    if udrm.udr_or_not:
         if str(animal_combination) in ['AnimalCombination.LAC_COW']:
             usermod = minimize(objective, x0, method='SLSQP', bounds=bnds, constraints=cow_cons)
         else:
