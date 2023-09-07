@@ -59,7 +59,7 @@
     "fertilizer_schedule": {
       "title": "Fertilizer schedule.",
       "description": "ARL fertilizer application schedule.",
-      "path": "fertilizer_schedule/ARL_fertilizer_management.json",
+      "path": "fertilizer_schedule/ARL_fertilizer_schedule.json",
       "type": "json",
       "properties": "fertilizer_schedule_properties"
     },
