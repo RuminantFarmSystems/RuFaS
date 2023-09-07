@@ -3,6 +3,8 @@
     "end_date": "2009:100",
     "graphic_dir": "output/graphics/",
     "output_dir": "output/",
+    "csv_dir": "output/CSVs",
     "random_seed": 42,
+    "set_seed": true,
     "simulate_animals": true
 }
