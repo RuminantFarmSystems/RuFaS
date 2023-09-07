@@ -25,6 +25,10 @@ from typing import Dict, List, Union
 
 om = OutputManager()
 
+from RUFAS.routines.animal.ration.user_defined_ration import \
+    UserDefinedRationManager as UserDefinedRationManager
+
+udrm = UserDefinedRationManager()
 
 def daily_feed_routine(feed, fields, animal_manager, feed_report):
     """
@@ -121,6 +125,16 @@ class Feed:
         # a list of storage objects with new crops
         self.new_forages = []
 
+        # Loading in user-defined ration values
+        self.user_defined_ration_percentages = data['user_defined_ration_percentages']
+
+        udrm.calf_ration = self.user_defined_ration_percentages['calf']
+        udrm.growing_ration = self.user_defined_ration_percentages['growing']
+        udrm.close_up_ration = self.user_defined_ration_percentages['close_up']
+        udrm.lactating_cow_ration = self.user_defined_ration_percentages['lac_cow']
+        udrm.tolerance = self.user_defined_ration_percentages['tolerance']
+        udrm.milk_reduction_maximum = self.user_defined_ration_percentages['milk_reduction_maximum']
+         
     def summarize_feed_storage(self):
         """
         Description:
