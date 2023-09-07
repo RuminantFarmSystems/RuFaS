@@ -169,11 +169,11 @@ class SimulationEngine:
         try:
             data_config = im.get_data('config')
             data_weather = im.get_data('weather')
-            print(data_config)
             self.config = Config(data_config, data_weather)
 
-            random.seed(self.config.random_seed)
-            numpy.random.seed(self.config.random_seed)
+            if self.config.set_seed:
+                random.seed(self.config.seed)
+                numpy.random.seed(self.config.seed)
 
             self.weather = Weather(data_weather, self.config)
             self.time = Time(self.config)

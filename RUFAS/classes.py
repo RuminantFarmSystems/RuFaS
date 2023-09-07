@@ -97,17 +97,14 @@ class Config:
         self.end_day = int(self.end_full_date[1])
 
         # set seed attributes
-        self.random_seed = data['random_seed']
+        self.set_seed = data['set_seed']
+        self.seed = data['random_seed']
 
         # TODO: remove conditional once all json files have simulate_animals field
         self.simulate_animals = data['simulate_animals'] if 'simulate_animals' in data else True
 
         year_length = 365
         leap_year_length = 366
-
-        # Deleted weather data validation in commit 60bd9e3 (60bd9e3eb888d01da4db3f989c29e34ec8c28e09)
-        # TODO: Move the validation into IM
-        # TODO: Refactor the structure of weather data
 
         self.w_start_year = self.start_year
         self.w_start_day = self.start_day
@@ -125,7 +122,7 @@ class Config:
                 days = [None for _ in range(1, self.start_day)]
                 if is_leap_year(year):
                     days += (_ for _ in range(self.start_day,
-                                              leap_year_length + 1))
+                             leap_year_length + 1))
                 else:
                     days += (_ for _ in range(self.start_day, year_length + 1))
             elif year == self.end_year:
@@ -261,10 +258,10 @@ class Weather:
 
         if len(years) > 2:
             T_avg = sum([self.T_avg_annual[j] for j in range(1, len(self.T_avg_annual) - 1)]) \
-                    / (len(self.T_avg_annual) - 2)
+                / (len(self.T_avg_annual) - 2)
         else:
             T_avg = sum([self.T_avg_annual[j] for j in range(len(self.T_avg_annual))]) \
-                    / len(self.T_avg_annual)
+                / len(self.T_avg_annual)
 
         self.T_avg_annual[0] = T_avg
         self.T_avg_annual[len(self.T_avg_annual) - 1] = T_avg
