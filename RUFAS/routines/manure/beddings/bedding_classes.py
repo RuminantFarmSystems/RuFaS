@@ -11,153 +11,255 @@ from RUFAS.routines.manure.default_enum.default_enum import DefaultEnum
 
 
 class BeddingType(DefaultEnum):
-    """Enumerates the different types of bedding."""
+    """
+    Enumerate the different types of bedding.
+
+    This class, derived from the `DefaultEnum` base class, provides a set of predefined constants
+    that represent different types of bedding such as sawdust, straw, and sand. The default type is sand.
+
+    Attributes
+    ----------
+    SAWDUST : str
+        Represent the 'sawdust' type of bedding.
+    CBPB_SAWDUST : str
+        Represent the 'CBPB sawdust' type of bedding.
+    MANURE_SOLIDS : str
+        Represent the 'manure solids' type of bedding.
+    STRAW : str
+        Represent the 'straw' type of bedding.
+    SAND : str
+        Represent the 'sand' type of bedding.
+    DEFAULT : str
+        The default type of bedding is 'sand' if none is specified.
+
+    """
     SAWDUST = 'sawdust'
+    CBPB_SAWDUST = 'CBPB sawdust'
     MANURE_SOLIDS = 'manure solids'
+    STRAW = 'straw'
     SAND = 'sand'
     DEFAULT = SAND
 
 
 class BaseBedding(ABC):
-    """Base class for all bedding types.
+    """
+    Abstract base class for all bedding types.
 
-    Attributes:
-        bedding_mass_per_day: Amount of bedding needed for each animal per day, kg/animal/day.
-        bedding_density: Density of the bedding, kg/m^3.
-        bedding_dry_matter_content: Dry matter content of the bedding, [0.7 - 1.0].
-        bedding_cleaned_fraction: Fraction of bedding removed from the barn [0.7 - 1.0].
-        bedding_type: Type of bedding.
+    This class provides a base for all bedding types. It initializes with a configuration of bedding
+    attributes and includes methods for calculating various bedding properties.
+
+    Attributes
+    ----------
+    bedding_mass_per_day : float
+        Quantity of bedding required per animal per day (kg/animal/day).
+    bedding_density : float
+        Density of the bedding (kg/:math:`m^3`).
+    bedding_dry_matter_content : float
+        Dry matter content in the bedding (unitless). Value should be in the range [0.7 - 1.0].
+    bedding_cleaned_fraction : float
+        Fraction of bedding that is removed from the barn (unitless). Value should be in the range [0.7 - 1.0].
+    bedding_carbon_fraction : float
+        Fraction of bedding that is composed of carbon (unitless). Value should be in the range [0.0 - 1.0].
+    bedding_phosphorus_content : float
+        Quantity of phosphorus in the bedding (kg).
+    bedding_type : str
+        Type of bedding as a string.
 
     """
 
     def __init__(self, bedding_config: BeddingConfig) -> None:
-        """Initialize the base bedding class.
+        """
+        Initialize the base bedding class with specific configuration data.
 
-        Args:
-            bedding_config: A BeddingConfig object that specifies config data specific to the choice
-                of bedding.
+        Parameters
+        ----------
+        bedding_config : BeddingConfig
+            A BeddingConfig object that specifies configuration data specific to the choice of bedding.
 
         """
         self.bedding_mass_per_day = bedding_config.bedding_mass_per_day
         self.bedding_density = bedding_config.bedding_density
         self.bedding_dry_matter_content = bedding_config.bedding_dry_matter_content
         self.bedding_cleaned_fraction = bedding_config.bedding_cleaned_fraction
+        self.bedding_carbon_fraction = bedding_config.bedding_carbon_fraction
+        self.bedding_phosphorus_content = bedding_config.bedding_phosphorus_content
         self.bedding_type = bedding_config.bedding_type
 
     def calc_total_bedding_washed(self, num_animals: int) -> float:
-        """Returns the total amount of bedding that is washed away.
+        """
+        Calculate the total amount of bedding that is washed away.
 
-        Args:
-            num_animals: Number of animals in the pen.
+        Parameters
+        ----------
+        num_animals : int
+            The number of animals in the pen.
 
-        Returns:
-            Total amount of bedding that is washed away, kg/animal/day.
+        Returns
+        -------
+        float
+            The total amount of bedding that is washed away (kg/animal/day).
 
         """
         return self.bedding_cleaned_fraction * self.calc_total_bedding_mass(num_animals)
 
     @abstractmethod
     def calc_total_bedding_mass(self, num_animals: int) -> float:
-        """Returns the total amount of bedding needed for all animals in the given pen.
+        """
+        Abstract method to calculate the total amount of bedding needed for all animals.
 
-        Args:
-            num_animals: Number of animals in the pen.
+        Parameters
+        ----------
+        num_animals : int
+            The number of animals in the pen.
 
-        Returns:
-            Total amount of bedding needed for all animals in the given pen, kg/day.
+        Returns
+        -------
+        float
+            The total amount of bedding needed for all animals (kg/day).
 
         """
         pass
 
     def calc_total_bedding_volume(self, num_animals: int) -> float:
-        """Return the total volume of bedding needed for all animals in the given pen.
+        """
+        Calculate the total volume of bedding needed for all animals.
 
-        Args:
-            num_animals: Number of animals in the pen.
+        Parameters
+        ----------
+        num_animals : int
+            The number of animals in the pen.
 
-        Returns:
-            Total volume of bedding needed for all animals in the given pen, m^3/day.
+        Returns
+        -------
+        float
+            The total volume of bedding needed for all animals (:math:`m^3`/day).
 
         """
         return self.calc_total_bedding_mass(num_animals) / self.bedding_density
 
     def calc_total_bedding_dry_solids(self, num_animals: int) -> float:
-        """Returns the total amount of dry solids in the bedding.
+        """
+        Calculate the total amount of dry solids in the bedding.
 
-        Args:
-            num_animals: Number of animals in the pen.
+        Parameters
+        ----------
+        num_animals : int
+            The number of animals in the pen.
 
-        Returns:
-            Total amount of dry solids in the bedding, kg/day.
+        Returns
+        -------
+        float
+            The total amount of dry solids in the bedding (kg/day).
 
         """
         return self.calc_total_bedding_mass(num_animals) / self.bedding_dry_matter_content
 
 
 class BaseOrganicBedding(BaseBedding):
-    """Base class for all organic bedding types."""
+    """
+    Abstract base class for all organic bedding types.
+
+    This class extends the BaseBedding class and provides a method to calculate the total
+    amount of bedding needed for all animals in a pen.
+
+    """
 
     def calc_total_bedding_mass(self, num_animals: int) -> float:
-        """Returns the total amount of bedding needed for all animals in the given pen.
+        """
+        Calculate the total amount of bedding needed for all animals in the given pen.
 
-        Args:
-            num_animals: Number of animals in the pen.
+        Parameters
+        ----------
+        num_animals : int
+            The number of animals in the pen.
 
-        Returns:
-            Total amount of bedding needed for all animals in the given pen, kg/day.
+        Returns
+        -------
+        float
+            Total amount of bedding needed for all animals in the given pen (kg/day).
 
         """
-        return num_animals * self.bedding_mass_per_day  # kg/day
+        return num_animals * self.bedding_mass_per_day
 
 
 class SawdustBedding(BaseOrganicBedding):
-    """Class for sawdust bedding.
+    """
+    A concrete class representing sawdust bedding.
 
-    Attributes:
-        Inherited from BaseOrganicBedding.
+    All attributes and methods are inherited from BaseOrganicBedding.
+    """
+    pass
 
+
+class CBPBSawdustBedding(BaseOrganicBedding):
+    """
+    A concrete class representing sawdust bedding type for compost bedded pack barns.
+
+    All attributes and methods are inherited from BaseOrganicBedding.
     """
     pass
 
 
 class ManureSolidsBedding(BaseOrganicBedding):
-    """Class for manure solids bedding.
+    """
+    A concrete class representing manure solids bedding.
 
-    Attributes:
-        Inherited from BaseOrganicBedding.
+    All attributes and methods are inherited from BaseOrganicBedding.
+    """
+    pass
 
+
+class StrawBedding(BaseOrganicBedding):
+    """
+    A concrete class representing straw bedding.
+
+    All attributes and methods are inherited from BaseOrganicBedding.
     """
     pass
 
 
 class SandBedding(BaseBedding):
-    """Class for sand bedding.
+    """
+    A concrete class representing sand bedding.
 
-    Attributes:
-        All inherited attributes from the parent classes.
-        In addition:
-        sand_removal_efficiency: Efficiency of removing sand from the bedding, [0.0, 1.0], unitless.
+    In addition to the attributes inherited from the parent classes, this class also includes
+    sand_removal_efficiency.
+
+    Attributes
+    ----------
+    sand_removal_efficiency : float
+        Efficiency of removing sand from the bedding (unitless). Range: [0.0, 1.0].
 
     """
 
     def __init__(self, bedding_config: BeddingConfig) -> None:
-        """Initialize the sand bedding class.
+        """
+        Initialize the sand bedding class with a specific configuration.
 
-        Args:
-            bedding_config: A BeddingConfig object that specifies config data for sand bedding.
+        Parameters
+        ----------
+        bedding_config : BeddingConfig
+            A BeddingConfig object that specifies config data for sand bedding.
 
         """
         super().__init__(bedding_config)
         self.sand_removal_efficiency = bedding_config.sand_removal_efficiency
 
     def calc_total_bedding_mass(self, num_animals: int) -> float:
-        """Returns the total amount of bedding needed for all animals in the given pen.
+        """
+        Calculate the total amount of bedding needed for all animals in the given pen.
 
-        Args:
-            num_animals: Number of animals in the pen.
+        The total mass is adjusted by the efficiency of sand removal.
 
-        Returns:
-            Total amount of bedding needed for all animals in the given pen, kg/day.
+        Parameters
+        ----------
+        num_animals : int
+            The number of animals in the pen.
+
+        Returns
+        -------
+        float
+            Total amount of bedding needed for all animals in the given pen (kg/day).
 
         """
         bedding_mass = num_animals * self.bedding_mass_per_day
@@ -166,95 +268,187 @@ class SandBedding(BaseBedding):
 
 @dataclass
 class BeddingConfig:
-    """Class for storing the configuration of a bedding.
-
-    Attributes:
-        bedding_mass_per_day: Amount of bedding needed for each animal per day, kg/animal/day.
-        bedding_density: Density of the bedding, kg/m^3.
-        bedding_dry_matter_content: Dry matter content of the bedding as a fraction of the total mass, [0.7, 1.0],
-        dimensionless.
-        bedding_cleaned_fraction: Percent of the bedding that is washed away, [0.7, 1.0], dimensionless.
-        sand_removal_efficiency: Efficiency of removing sand from the bedding, [0.7, 1.0], dimensionless.
-
-    """
     bedding_mass_per_day: float
+    """Quantity of bedding required per animal per day (:math:`kg/animal/day`)."""
+
     bedding_density: float
+    """Density of the bedding (:math:`kg/m^3`)."""
+
     bedding_dry_matter_content: float
+    """
+    Dry matter content in the bedding (unitless).
+    Value should be in the range :math:`[0.7 - 1.0]`.
+    """
+
     bedding_cleaned_fraction: float
+    """
+    Fraction of bedding that is removed from the barn (unitless).
+    Value should be in the range :math:`[0.7 - 1.0]`.
+    """
+
+    bedding_carbon_fraction: float
+    """
+    Fraction of bedding that is composed of carbon (unitless).
+    Value should be in the range :math:`[0.0 - 1.0]`.
+    """
+
+    bedding_phosphorus_content: float
+    """Quantity of phosphorus in the bedding (kg)."""
+
     bedding_type: BeddingType
-    sand_removal_efficiency: float = 0.0
+    """Type of bedding."""
+
+    sand_removal_efficiency: float
+    """
+    Efficiency of removing sand from the bedding (unitless).
+    Value should be in the range :math:`[0.7 - 1.0]`.
+    """
 
 
 class DefaultBeddingConfigFactory:
-    """Class for creating default bedding configurations."""
+    """
+    Factory class for creating default bedding configurations.
 
+    This class contains predefined configurations for different types of beddings. It offers a method to retrieve
+    these predefined configurations based on the bedding type.
+
+    """
+
+    # Predefined configuration for Sawdust Bedding
     SAWDUST_BEDDING_CONFIG = BeddingConfig(
-            bedding_mass_per_day=1.97,
-            bedding_density=250.0,
-            bedding_dry_matter_content=0.9,
-            bedding_cleaned_fraction=1.0,
-            bedding_type=BeddingType.SAWDUST,
+        bedding_mass_per_day=1.97,
+        bedding_density=250.0,
+        bedding_dry_matter_content=0.9,
+        bedding_cleaned_fraction=1.0,
+        bedding_carbon_fraction=0.0,
+        bedding_phosphorus_content=0.0,
+        bedding_type=BeddingType.SAWDUST,
+        sand_removal_efficiency=0.0,
     )
 
+    # Predefined configuration for CBPB Sawdust Bedding
+    CBPB_SAWDUST_BEDDING_CONFIG = BeddingConfig(
+        bedding_mass_per_day=12,
+        bedding_density=350.0,
+        bedding_dry_matter_content=0.9,
+        bedding_cleaned_fraction=1.0,
+        bedding_carbon_fraction=0.35,
+        bedding_phosphorus_content=0.0,
+        bedding_type=BeddingType.CBPB_SAWDUST,
+        sand_removal_efficiency=0.0,
+    )
+
+    # Predefined configuration for Manure Solids Bedding
     MANURE_SOLIDS_BEDDING_CONFIG = BeddingConfig(
-            bedding_mass_per_day=2.50,
-            bedding_density=400.0,
-            bedding_dry_matter_content=0.9,
-            bedding_cleaned_fraction=1.0,
-            bedding_type=BeddingType.MANURE_SOLIDS,
+        bedding_mass_per_day=2.50,
+        bedding_density=400.0,
+        bedding_dry_matter_content=0.9,
+        bedding_cleaned_fraction=1.0,
+        bedding_carbon_fraction=0.0,
+        bedding_phosphorus_content=0.0,
+        bedding_type=BeddingType.MANURE_SOLIDS,
+        sand_removal_efficiency=0.0,
     )
 
+    # TODO: Use correct values for straw bedding.
+    # Predefined configuration for Straw Bedding
+    STRAW_BEDDING_CONFIG = BeddingConfig(
+        bedding_mass_per_day=1.97,
+        bedding_density=100.0,
+        bedding_dry_matter_content=0.9,
+        bedding_cleaned_fraction=1.0,
+        bedding_carbon_fraction=0.35,
+        bedding_phosphorus_content=0.0,
+        bedding_type=BeddingType.STRAW,
+        sand_removal_efficiency=0.0,
+    )
+
+    # Predefined configuration for Sand Bedding
     SAND_BEDDING_CONFIG = BeddingConfig(
-            bedding_mass_per_day=25.0,
-            bedding_density=1500.0,
-            bedding_dry_matter_content=0.9,
-            bedding_cleaned_fraction=1.0,
-            bedding_type=BeddingType.SAND,
-            sand_removal_efficiency=1.0,
+        bedding_mass_per_day=25.0,
+        bedding_density=1500.0,
+        bedding_dry_matter_content=0.9,
+        bedding_cleaned_fraction=1.0,
+        bedding_carbon_fraction=0.0,
+        bedding_phosphorus_content=0.0,
+        bedding_type=BeddingType.SAND,
+        sand_removal_efficiency=1.0,
     )
 
     @classmethod
     def get_instance(cls, bedding_type: BeddingType) -> BeddingConfig:
-        """Return the default bedding configuration for the given bedding type.
+        """
+        Fetch the default bedding configuration for the given bedding type.
 
-        Args:
-            bedding_type: Type of bedding.
+        Parameters
+        ----------
+        bedding_type : BeddingType
+            Type of the bedding.
 
-        Returns:
+        Returns
+        -------
+        BeddingConfig
             Default bedding configuration for the given bedding type.
 
-        """
+        Raises
+        ------
+        ValueError
+            If the given bedding type is invalid.
 
+        """
         bedding_config_by_type = {
             BeddingType.SAWDUST: cls.SAWDUST_BEDDING_CONFIG,
+            BeddingType.CBPB_SAWDUST: cls.CBPB_SAWDUST_BEDDING_CONFIG,
             BeddingType.MANURE_SOLIDS: cls.MANURE_SOLIDS_BEDDING_CONFIG,
+            BeddingType.STRAW: cls.STRAW_BEDDING_CONFIG,
             BeddingType.SAND: cls.SAND_BEDDING_CONFIG
         }
+
+        if bedding_type not in bedding_config_by_type:
+            raise ValueError(f"Bedding type {bedding_type} is not recognized. "
+                             f"It may be a new bedding type that has not been added "
+                             f"to the 'get_instance' method.")
+
         return bedding_config_by_type[bedding_type]
 
 
 class BeddingFactory:
-    """Class for creating bedding objects."""
+    """
+    A factory class for creating bedding objects.
+
+    This class leverages the Factory design pattern to instantiate bedding objects of different types.
+    Based on the bedding type provided, it either uses the default configuration or a custom configuration,
+    if provided.
+
+    """
 
     @classmethod
-    def get_instance(cls,
-                     bedding_type_name: str,
-                     custom_bedding_config: Optional[BeddingConfig] = None) \
+    def get_instance(cls, bedding_type_name: str, custom_bedding_config: Optional[BeddingConfig] = None) \
             -> BaseBedding:
-        """Return the bedding object for the given bedding type name.
+        """
+        Create a bedding object of the specified type.
 
-        Args:
-            bedding_type_name: Name of the bedding type.
-            custom_bedding_config: Custom configuration of the bedding, if any.
+        If a custom bedding configuration is provided, it is used to create the bedding object. Otherwise,
+        the default configuration for the bedding type is used.
 
-        Returns:
-            Bedding object for the given bedding type name.
+        Parameters
+        ----------
+        bedding_type_name : str
+            Name of the bedding type.
+        custom_bedding_config : Optional[BeddingConfig], default is None
+            Custom configuration of the bedding, if any.
+
+        Returns
+        -------
+        BaseBedding
+            Bedding object of the specified type.
 
         """
-
         bedding_class_by_type: Dict[BeddingType, Type[BaseBedding]] = {
             BeddingType.SAWDUST: SawdustBedding,
+            BeddingType.CBPB_SAWDUST: CBPBSawdustBedding,
             BeddingType.MANURE_SOLIDS: ManureSolidsBedding,
+            BeddingType.STRAW: StrawBedding,
             BeddingType.SAND: SandBedding,
         }
 
