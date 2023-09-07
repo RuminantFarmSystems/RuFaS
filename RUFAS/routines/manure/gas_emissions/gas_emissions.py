@@ -1307,7 +1307,7 @@ class GasEmissions:
         return total_carbon_decomposition
 
     @staticmethod
-    def _calc_nitrogen_loss_from_ammonia_emission(
+    def _calc_nitrogen_loss_in_compost_bedded_pack_barn_due_to_ammonia_emission(
             daily_nitrogen_input: float,
             is_bedding_tilled: bool
     ) -> float:
@@ -1345,7 +1345,7 @@ class GasEmissions:
         return nitrogen_loss_tilled + nitrogen_loss_untilled
 
     @staticmethod
-    def _calc_nitrogen_loss_to_leaching(daily_nitrogen_input: float) -> float:
+    def _calc_nitrogen_loss_in_compost_bedded_pack_barn_due_to_leaching(daily_nitrogen_input: float) -> float:
         """
         Calculate the mass of nitrogen that leaches out of the compost bedded pack barn's manure-bedding mixture.
 
@@ -1371,7 +1371,7 @@ class GasEmissions:
         return GasEmissionConstants.LEACHING_COEFFICIENT * daily_nitrogen_input
 
     @staticmethod
-    def _calc_nitrogen_loss_from_nitrous_oxide_emission(
+    def _calc_nitrogen_loss_in_compost_bedded_pack_barn_due_to_nitrous_oxide_emission(
             daily_nitrogen_input: float,
             is_bedding_tilled: bool
     ) -> float:
@@ -1436,15 +1436,16 @@ class GasEmissions:
         if daily_nitrogen_input < 0.0:
             raise ValueError(f'Daily nitrogen input mass must be non-negative: {daily_nitrogen_input}')
 
-        ammonia_loss = GasEmissions._calc_nitrogen_loss_from_ammonia_emission(
+        ammonia_loss = GasEmissions._calc_nitrogen_loss_in_compost_bedded_pack_barn_due_to_ammonia_emission(
             daily_nitrogen_input, is_bedding_tilled
         )
 
-        nitrous_oxide_loss = GasEmissions._calc_nitrogen_loss_from_nitrous_oxide_emission(
+        nitrous_oxide_loss = GasEmissions._calc_nitrogen_loss_in_compost_bedded_pack_barn_due_to_nitrous_oxide_emission(
             daily_nitrogen_input, is_bedding_tilled
         )
 
-        leaching_loss = GasEmissions._calc_nitrogen_loss_to_leaching(daily_nitrogen_input)
+        leaching_loss = GasEmissions._calc_nitrogen_loss_in_compost_bedded_pack_barn_due_to_leaching(
+            daily_nitrogen_input)
 
         total_nitrogen_loss = ammonia_loss + nitrous_oxide_loss + leaching_loss
 
