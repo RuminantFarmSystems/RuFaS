@@ -219,11 +219,13 @@ def test_calc_total_nitrogen_loss_from_compost_bedded_pack_barn(daily_nitrogen_i
 
     # Arrange
     mocker.patch(
-        'RUFAS.routines.manure.gas_emissions.gas_emissions.GasEmissions._calc_nitrogen_loss_in_compost_bedded_pack_barn_due_to_ammonia_emission',
+        'RUFAS.routines.manure.gas_emissions.gas_emissions.GasEmissions'
+        '._calc_nitrogen_loss_in_compost_bedded_pack_barn_due_to_ammonia_emission',
         return_value=expected_ammonia
     )
     mocker.patch(
-        'RUFAS.routines.manure.gas_emissions.gas_emissions.GasEmissions._calc_nitrogen_loss_to_leaching',
+        'RUFAS.routines.manure.gas_emissions.gas_emissions.GasEmissions'
+        '._calc_nitrogen_loss_in_compost_bedded_pack_barn_due_to_leaching',
         return_value=expected_leaching
     )
     mocker.patch(
