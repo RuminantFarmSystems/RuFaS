@@ -321,7 +321,7 @@ class OutputManager(object):
 
         Returns
         -------
-        List[Tuple[str, pd.Series]]
+        List[pd.Series]
             A list of (column_name, column_data) tuples.
 
         """
@@ -355,11 +355,6 @@ class OutputManager(object):
         path : str
             The path to the file to be saved.
 
-        Raises
-        ------
-        Exception
-            If an error occurs while writing to the file.
-
         """
         info_map = {"class": self.__class__.__name__,
                     "function": self._dict_to_file_csv.__name__,
@@ -377,10 +372,8 @@ class OutputManager(object):
             csv_columns.extend(csv_column_data)
 
         df = pd.concat(csv_columns, axis=1)
-        try:
-            df.to_csv(path, index=False)
-        except Exception as e:
-            raise e
+
+        df.to_csv(path, index=False)
 
         self.add_log("save_dict_file_try", f"Successfully saved to {path}.", info_map)
 
