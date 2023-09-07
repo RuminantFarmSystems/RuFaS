@@ -21,7 +21,6 @@ from RUFAS.routines.animal.animal_manager import AnimalManager
 from RUFAS.routines.manure.manure_manager import ManureManager
 from RUFAS.util import Utility
 
-
 im = InputManager()
 om = OutputManager()
 
@@ -58,6 +57,7 @@ class State:
         animal_class_config['manure_management_scenarios'] = manure_class_config['manure_management_scenarios']
         self.animal_manager = AnimalManager(animal_class_config, config, self.feed, weather, time)
         self.manure_manager = ManureManager(self.animal_manager, weather, time, manure_class_config)
+
         self.field_manager = FieldManager(data['fields'], manure_manager=self.manure_manager)
 
     def annual_reset(self):
