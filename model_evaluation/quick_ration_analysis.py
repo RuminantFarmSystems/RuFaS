@@ -73,7 +73,7 @@ def quickprint(pen_report, pen_name):
     print(pen_report[0][3:])
     # 
     iterator = 0
-    for i in range(2,90,30):
+    for i in range(-91, len(pen_report), 30):
         num_animals, total_DMI, ration_fed, percent_DMI = dict_convert(pen_report, i)
         print('')
         print('-----ration interval ' + str(iterator) + '-----')

@@ -294,23 +294,23 @@ def test_calculate_NRC_phosphorus_requirements(cow_a:dict, cow_b:dict, heifer_a:
     """Unit test for function calculate_NRC_phosophorus_requirements in file routines/animal/ration/animal_requirements.py"""
     result_P_req = RUFAS.routines.animal.ration.animal_requirements.calculate_NRC_phosphorus_requirements(
         cow_a['body_weight'], cow_a['mature_body_weight'], cow_a['day_of_pregnancy'], cow_a['Milk'],
-        cow_a['animal_type'], 1)
-    assert (result_P_req) == pytest.approx((33), rel=1e-1)
+        cow_a['animal_type'], 1, 25)
+    assert (result_P_req) == pytest.approx((59), rel=1e-1)
 
     result_P_req = RUFAS.routines.animal.ration.animal_requirements.calculate_NRC_phosphorus_requirements(
         cow_b['body_weight'], cow_b['mature_body_weight'], cow_b['day_of_pregnancy'], cow_b['Milk'],
-        cow_b['animal_type'], 1)
-    assert (result_P_req) == pytest.approx((29), rel=1e-1)
+        cow_b['animal_type'], 1, 15)
+    assert (result_P_req) == pytest.approx((45), rel=1e-1)
 
     result_P_req = RUFAS.routines.animal.ration.animal_requirements.calculate_NRC_phosphorus_requirements(
         heifer_a['body_weight'], heifer_a['mature_body_weight'], heifer_a['day_of_pregnancy'], heifer_a['Milk'],
-        heifer_a['animal_type'], 1)
-    assert (result_P_req) == pytest.approx((7.5), rel=1e-1)
+        heifer_a['animal_type'], 1, 5.0)
+    assert (result_P_req) == pytest.approx((12.5), rel=1e-1)
 
     result_P_req = RUFAS.routines.animal.ration.animal_requirements.calculate_NRC_phosphorus_requirements(
         heifer_b['body_weight'], heifer_b['mature_body_weight'], heifer_b['day_of_pregnancy'], heifer_b['Milk'],
-        heifer_b['animal_type'], 1)
-    assert (result_P_req) == pytest.approx((6.9), rel=1e-1)
+        heifer_b['animal_type'], 1, 7.0)
+    assert (result_P_req) == pytest.approx((13), rel=1e-1)
 
 
 def test_calculate_NRC_DMI(cow_a:dict, cow_b:dict, heifer_a:dict, heifer_b:dict)->None:
@@ -1343,13 +1343,13 @@ def test_protein_constraint():
     pass
 
 
-def test_NDF_constraint_1():
-    """Unit test for function NDF_constraint_1 in file routines/animal/ration/ration_NLP.py"""
+def test_NDF_constraint_lower():
+    """Unit test for function test_NDF_constraint_lower in file routines/animal/ration/ration_NLP.py"""
     pass
 
 
-def test_NDF_constraint_2():
-    """Unit test for function NDF_constraint_2 in file routines/animal/ration/ration_NLP.py"""
+def test_NDF_constraint_upper():
+    """Unit test for function NDF_constraint_upper in file routines/animal/ration/ration_NLP.py"""
     pass
 
 
@@ -1403,8 +1403,8 @@ def test_optimization():
     pass
 
 
-def test_calc_starting_milk_average() -> None:
-    """Unit test for function calc_starting_milk_average in file routines/animal/ration/ration_driver.py"""
+def test_calc_milk_average() -> None:
+    """Unit test for function calc_milk_average in file routines/animal/ration/ration_driver.py"""
     mockpen = MagicMock()
     mockpen.animals_in_pen = [MagicMock(),
                               MagicMock(),
@@ -1414,7 +1414,7 @@ def test_calc_starting_milk_average() -> None:
     production = [1,2,3,4,5]
     for i in range(len(production)):
         mockpen.animals_in_pen[i].estimated_daily_milk_produced = production[i]
-    result = ration_driver.calc_starting_milk_average(mockpen)
+    result = ration_driver.calc_milk_average(mockpen)
     assert result == sum(production)/len(production)
 
 def test_reduce_milk_production() -> None:
@@ -1805,7 +1805,7 @@ def test_ration_to_use(mock_user_defined_ration_manager: UserDefinedRationManage
     #udrv = MagicMock()
     mock_user_defined_ration_manager.lactating_cow_ration = {'1': 100, '2': 200, '3': 300}
     mock_user_defined_ration_manager.close_up_ration = {'1': 10, '2': 20, '3': 30}
-    mock_user_defined_ration_manager.heifer_ration = {'1': 1, '2': 2, '3': 3}
+    mock_user_defined_ration_manager.growing_ration = {'1': 1, '2': 2, '3': 3}
     mock_user_defined_ration_manager.calf_ration = {'1': 0.1, '2': 0.2, '3': 0.3}
 
     pen_animal_combo = MagicMock()
@@ -1834,8 +1834,8 @@ def test_make_user_bounds(mock_user_defined_ration_manager: UserDefinedRationMan
     """Unit test for function make_user_bounds in file routines/animal/ration/ration_NLP.py"""
     mock_user_defined_ration_manager.tolerance = 0.1
     ration_percents = {'1': 10, '2': 20}
-    low_offset = 1-AnimalModuleConstants.DMI_CONSTRAINT_PERCENT
-    high_offset = 1+AnimalModuleConstants.DMI_CONSTRAINT_PERCENT
+    low_offset = 1 #1-AnimalModuleConstants.DMI_CONSTRAINT_PERCENT
+    high_offset = 1 #1+AnimalModuleConstants.DMI_CONSTRAINT_PERCENT
     predicted = [[9/3*low_offset,11/3*high_offset], [9/3*low_offset,11/3*high_offset], [9/3*low_offset,11/3*high_offset], \
                  [18/3*low_offset,22/3*high_offset], [18/3*low_offset,22/3*high_offset], [18/3*low_offset,22/3*high_offset]]
     result = RUFAS.routines.animal.ration.ration_NLP.make_user_bounds(ration_percents, 100)

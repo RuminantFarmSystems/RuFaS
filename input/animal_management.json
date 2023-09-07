@@ -14,7 +14,7 @@
   "farm": {
     "fields": {
     },
-    "animal": "animal_feed_management.json",
+    "animal": "animal_management_animal.json",
     "feed": "purchased_feed.json",
     "manure": "manure_management.json"
   }

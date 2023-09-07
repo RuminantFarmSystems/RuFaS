@@ -6,8 +6,7 @@ Description: Tools for accessing and providing user-defined ration  variables
 Author: Joseph C. Waddell, jw2574@cornell.edu
 """
 
-from typing import Any, Dict
-import json
+from typing import Dict
 
 class UserDefinedRationManager(object):
     """
@@ -15,9 +14,6 @@ class UserDefinedRationManager(object):
     Methods return rations and change keys in the dict as needed.
     """
 
-    # check the setup JSON
-    # if user-defined-ration is NOT selected, initialize as NULL
-    
     __instance = None
 
     def __new__(cls):
@@ -28,28 +24,23 @@ class UserDefinedRationManager(object):
     def __init__(self) -> None:
         if UserDefinedRationManager.__instance is None:
             UserDefinedRationManager.__instance = self
-            with open('input/userdefinedration/user_defined_ration_input_percentages.json', 'r') as f:
-                ration_all = json.load(f)
-            lactating_cow_ration = ration_all['cow_lactating']
-            heifer_ration = ration_all['growing_heifers']
-            calf_ration = ration_all['calf']
-            close_up_ration = ration_all['close_up']
-            self.calf_ration: Dict[str, Any] = calf_ration
-            self.heifer_ration: Dict[str, Any] = heifer_ration
-            self.lactating_cow_ration: Dict[str, Any] = lactating_cow_ration
-            self.ration_all: Dict[str, Any] = ration_all
-            self.close_up_ration: Dict[str, Any] = close_up_ration
-            self.tolerance = ration_all['tolerance']
-            self.milk_reduction_percent = ration_all['milk_reduction_percent']
+            
             self.udr_or_not = None
-    
+
+            self.calf_ration = []
+            self.growing_ration = []
+            self.close_up_ration = []
+            self.lactating_cow_ration = []
+
+            self.tolerance = []
+            self.milk_reduction_maximum = []
 
     def feed_quality_fix(ration_percents: Dict, available_feeds: Dict) -> Dict:
         """
         This checks the keys in the ration_percents dictionary and checks
          against the AvailableFeeds dictionary. If a given key is not found in the 
          latter, 2 is added to the key. This is because there is a 'quality' change
-         in the Feed module that changes keys that vary in quality. Said functionality may be deprecated, hence this quick solution. 
+         in the Feed module that changes keys that vary in quality. 
         
         Parameters
         ----------
@@ -74,7 +65,7 @@ class UserDefinedRationManager(object):
 
     def ration_to_use(pen_animal_combo, available_feeds: Dict) -> Dict:
         """
-        Function outputs the correct dictionary from the UserDefinedRationManager class
+        Function outputs the dictionary for a given animal combination from the UserDefinedRationManager class
         
         Parameters
         ----------
@@ -94,7 +85,7 @@ class UserDefinedRationManager(object):
             ration_percents = udrv.lactating_cow_ration
         # elif pen.classes
         elif group == 'GROWING':
-            ration_percents = udrv.heifer_ration
+            ration_percents = udrv.growing_ration
         elif group == 'CLOSE_UP':
             ration_percents = udrv.close_up_ration
         else: 
@@ -104,12 +95,13 @@ class UserDefinedRationManager(object):
 
     def make_ration_from_user_values(ration_percents: Dict, available_feeds, req) -> Dict:
         """
-        Generate ration dict from user ration percents input
+        Generate ration dict from user ration percents input, 
+        scaled to their estimated dry matter intake (DMI)
         
         Parameters
         ----------
         ration_percents : Dict
-            dictionary of feed ids and their associated percentage of DMI 
+            dictionary of feed ids and their desired percentages of estimated DMI
         
         available_feeds : Dict
             available feeds dictionary from the Feed class object
@@ -131,5 +123,5 @@ class UserDefinedRationManager(object):
             else:
                 ration[available_feeds['feed_key'][feed_id]] = 0.0
         ration['status'] = 'Optimal'
-        ration['objective'] = 0.0 # setting as optimal
+        ration['objective'] = 0.0
         return ration

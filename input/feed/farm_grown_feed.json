@@ -37,5 +37,13 @@
             "removal_rate": 6,
             "initial_dry_matter": 0
         }
-    }
+    },
+    "user_defined_ration_percentages": {
+        "calf": {},
+        "growing": {},
+        "close_up": {},
+        "lac_cow": {},
+    "tolerance": 0.0,
+    "milk_reduction_maximum": 0.0
+}
 }
