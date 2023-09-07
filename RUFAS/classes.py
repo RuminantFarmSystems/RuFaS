@@ -13,6 +13,7 @@ Author(s): Kass Chupongstimun, kass_c@hotmail.com
 import csv
 
 from RUFAS import errors
+from RUFAS.input_manager import InputManager
 from RUFAS.output_manager import OutputManager
 from RUFAS.routines import Feed
 from RUFAS.routines.field.manager.field_manager import FieldManager
@@ -20,12 +21,12 @@ from RUFAS.routines.animal.animal_manager import AnimalManager
 from RUFAS.routines.manure.manure_manager import ManureManager
 from RUFAS.util import Utility
 
-
+im = InputManager()
 om = OutputManager()
 
 
 class State:
-    def __init__(self, data, config, weather, time):
+    def __init__(self, config, weather, time):
         """
         Description:
             Contains information about the current state of the farm.
@@ -48,14 +49,15 @@ class State:
             time: instance of the Time class containing information necessary to
                 initialize the state
         """
-        input_dir = Utility.get_base_dir() / 'input'
-        self.feed = Feed(Utility.read_json_file(
-            input_dir / 'feed' / data['feed']))
-        manure_manager_config = Utility.read_json_file(input_dir / 'manure' / data['manure'])
-        animal_config = Utility.read_json_file(input_dir / 'animal' / data['animal'])
-        animal_config['manure_management_scenarios'] = manure_manager_config['manure_management_scenarios']
-        self.animal_manager = AnimalManager(animal_config, config, self.feed, weather, time)
-        self.manure_manager = ManureManager(self.animal_manager, weather, time, manure_manager_config)
+        data = {}
+        feed_class_config = im.get_data("feed")
+        self.feed = Feed(feed_class_config)
+        manure_class_config = im.get_data("manure_management")
+        animal_class_config = im.get_data("animal")
+        animal_class_config['manure_management_scenarios'] = manure_class_config['manure_management_scenarios']
+        self.animal_manager = AnimalManager(animal_class_config, config, self.feed, weather, time)
+        self.manure_manager = ManureManager(self.animal_manager, weather, time, manure_class_config)
+
         self.field_manager = FieldManager(data['fields'], manure_manager=self.manure_manager)
 
     def annual_reset(self):
@@ -98,7 +100,7 @@ class Config:
 
         # set seed attributes
         self.set_seed = data['set_seed']
-        self.seed = data['seed']
+        self.seed = data['random_seed']
 
         # TODO: remove conditional once all json files have simulate_animals field
         self.simulate_animals = data['simulate_animals'] if 'simulate_animals' in data else True
@@ -106,158 +108,10 @@ class Config:
         year_length = 365
         leap_year_length = 366
 
-        # read in the input csv file
-
-        weather_full_path = Utility.get_base_dir() / 'input/weather' / weather_file
-
-        if not weather_full_path.is_file():
-            raise errors.JSONfileData("WEATHER",
-                                      "\tWeather file specified does not exist")
-
-        with weather_full_path.open('r') as f:
-            readCSV = csv.reader(f, delimiter=',')
-
-            # keeps track of how many lines are in the weather file
-            file_line = 1
-            # sets the starting and ending weather dates
-            for row in readCSV:
-                if len(row) == 0:
-                    continue
-                if file_line == 2:
-                    w_start_year = int(row[0])
-                    w_start_day = int(row[1])
-                elif file_line > 2:
-                    w_end_year = int(row[0])
-                    w_end_day = int(row[1])
-                file_line += 1
-
-            # expected size of the csv file from start to end
-            # to determine if the weather file has any gaps
-            expected_w_file_size = 0
-            if is_leap_year(w_start_year):
-                expected_w_file_size += (leap_year_length - w_start_day + 1)
-            else:
-                expected_w_file_size += (year_length - w_start_day + 1)
-
-            # adds the length of each year
-            for i in range(w_start_year + 1, w_end_year):
-                if is_leap_year(i):
-                    expected_w_file_size += leap_year_length
-                else:
-                    expected_w_file_size += year_length
-
-            # adds the last year
-            expected_w_file_size += w_end_day
-
-            # compares actual size of the file to expected size
-            if file_line - 1 != expected_w_file_size + 1:
-                dates_not_matching_size = "Start and end dates of the Weather CSV file" \
-                    " do not match the size."
-                om.add_warning("dates_not_matching_size", dates_not_matching_size,
-                               info_map)
-                if file_line - 1 > expected_w_file_size + 1:
-                    info_map["weather_full_path.name"] = weather_full_path.name
-                    duplicate_days = f"There may be duplicate days in {weather_full_path.name}"
-                    om.add_warning("duplicate_days", duplicate_days, info_map)
-                else:
-                    missing_days = f"There may be missing days in: {weather_full_path.name}"
-                    om.add_warning("missing_days", missing_days, info_map)
-                expected_weather_file_size = f"Weather File Size: {file_line - 1}\n" \
-                                             f" Expected size: {expected_w_file_size + 1}"
-                om.add_log("expected_weather_file_size", expected_weather_file_size,
-                           info_map)
-
-        self.w_start_year = w_start_year
-        self.w_start_day = w_start_day
-        self.w_end_year = w_end_year
-        self.w_end_day = w_end_day
-
-        # error statements if the start date is not within the weather data
-        # special error statements for start and end years
-        if self.start_year == w_start_year and self.start_day < w_start_day \
-                or self.start_year < w_start_year:
-            start_date_warning = "Start date invalid. Starting simulation on " \
-                f"{w_start_year}:{w_start_day}"
-            om.add_warning("invalid_start_date", start_date_warning, info_map)
-            self.start_day = w_start_day
-            om.add_variable("start_day", self.start_day, info_map)
-            self.start_year = w_start_year
-            om.add_variable("start_year", self.start_year, info_map)
-
-        if self.end_year == w_end_year and self.end_day > w_end_day \
-                or self.end_year > w_end_year:
-            end_date_warning = "End date invalid. Ending simulation on " \
-                f"{w_end_year}:{w_end_day}"
-            om.add_warning("invalid_end_date", end_date_warning, info_map)
-            self.end_day = w_end_day
-            om.add_variable("end_day", self.end_day, info_map)
-            self.end_year = w_end_year
-            om.add_variable("end_year", self.end_year, info_map)
-
-        # start date errors if the simulation starts before day 1 or after
-        # the last possible day of the year
-        if self.start_day < 1:
-            start_date_warning_2 = "Start date invalid. Starting simulation on " \
-                f"{self.start_year}:1"
-            om.add_warning("invalid_start_date_2", start_date_warning_2, info_map)
-            self.start_day = 1
-            om.add_variable("start_day", self.start_day, info_map)
-        if not is_leap_year(self.start_year):
-            if self.start_day > year_length:
-                start_date_warning_3 = "Start date invalid. Starting simulation on " \
-                    f"{self.start_year}:{year_length}"
-                om.add_warning("invalid_start_date_3",
-                             start_date_warning_3, info_map)
-                self.start_day = year_length
-                om.add_variable("start_day", self.start_day, info_map)
-        else:
-            if self.start_day > leap_year_length:
-                start_date_warning_4 = "Start date invalid. Starting simulation on " \
-                    f"{self.start_year}:{leap_year_length}"
-                om.add_warning("invalid_start_date_4",
-                             start_date_warning_4, info_map)
-                self.start_day = leap_year_length
-                om.add_variable("start_day", self.start_day, info_map)
-
-        # end date errors if the simulation ends before day 1 or after
-        # the last possible day of the year
-        if self.end_day < 1:
-            end_date_warning_2 = "End date invalid. Ending simulation on " \
-                f"{self.end_year}:1"
-            om.add_warning("invalid_end_date_2", end_date_warning_2, info_map)
-            self.end_day = 1
-            om.add_variable("end_day", self.end_day, info_map)
-        if not is_leap_year(self.end_year):
-            if self.end_day > year_length:
-                end_date_warning_3 = "End date invalid. Ending simulation on " \
-                    f"{self.end_year}:{year_length}"
-                om.add_warning("invalid_end_date_3", end_date_warning_3, info_map)
-                self.end_day = year_length
-                om.add_variable("end_day", self.end_day, info_map)
-        else:
-            if self.end_day > leap_year_length:
-                end_date_warning_4 = "End date invalid. Ending simulation on " \
-                    f"{self.end_year}:{leap_year_length}"
-                om.add_warning("invalid_end_date_4", end_date_warning_4, info_map)
-                self.end_day = leap_year_length
-                om.add_variable("end_day", self.end_day, info_map)
-
-        # checks that start date is not after end date
-        if self.start_year > self.end_year \
-                or (self.start_year == self.end_year and self.start_day > self.end_day):
-            # TODO determine if this below raised error should be rewritten to reassign 
-            # either the the start or end year to then allow the simulation to continue 
-            # instead of crashing.
-            raise errors.JSONfileData(
-                "CONFIG", "\tThe start date must be before the end date")
-
-        # constructs a calendar (years[]) of julian days and years, accounting for leap
-        # years and mid-year start/end dates
-        # each year in years starts with the calendar date at index zero and then
-        # is filled with the days of the year that the program will run
-        # the start and end dates will be specified by the user
-        # years is used as a correctly size template for each of the weather arrays
-        # in Weather()
+        self.w_start_year = self.start_year
+        self.w_start_day = self.start_day
+        self.w_end_year = self.end_year
+        self.w_end_day = self.end_day
 
         self.years = []
 
@@ -270,7 +124,7 @@ class Config:
                 days = [None for _ in range(1, self.start_day)]
                 if is_leap_year(year):
                     days += (_ for _ in range(self.start_day,
-                             leap_year_length + 1))
+                                              leap_year_length + 1))
                 else:
                     days += (_ for _ in range(self.start_day, year_length + 1))
             elif year == self.end_year:
@@ -380,101 +234,39 @@ class Weather:
             self.radiation.append([0.0 for _ in range(len(year))])
             self.irrigation.append([0.0 for _ in range(len(year))])
 
-        # read in the input csv file
-        weather_full_path = Utility.get_base_dir() / 'input/weather' / weather_file
+        for i in range(len(weather_file['year'])):
+            current_year = weather_file['year'][i]
+            current_day = weather_file['jday'][i]
 
-        if not weather_full_path.is_file():
-            raise errors.JSONfileData("WEATHER",
-                                      "\tWeather file specified does not exist")
+            current_year_index = current_year - start_year
+            current_day_index = current_day - 1
 
-        with weather_full_path.open('r') as f:
-            readCSV = csv.reader(f, delimiter=',')
+            if not start_year <= current_year <= config.end_year:
+                continue
+            elif current_year == config.end_year and current_day > config.end_day:
+                break
 
-            # this for loop takes the weather data and parses it into multiple
-            # 2D arrays [year][day] for different weather variables used by the
-            # module
-            current_row = 0
-            year = 0
-            day = start_day
-            # used to offset pointer to the start of the simulation
-            # in the weather file
-            counter = 0
-            skips = 0
-            offset = 1
-            for row in readCSV:
-                # limits weather data read in to the length of the simulation
-                if year > len(years) - 1:
-                    break
+            self.rainfall[current_year_index][current_day_index] = weather_file['precip'][i]
+            self.T_max[current_year_index][current_day_index] = weather_file['high'][i]
+            self.T_min[current_year_index][current_day_index] = weather_file['low'][i]
+            self.T_avg[current_year_index][current_day_index] = weather_file['avg'][i]
+            self.radiation[current_year_index][current_day_index] = weather_file['Hday'][i]
+            self.irrigation[current_year_index][current_day_index] = weather_file['irrigation'][i]
 
-                # if a line is empty then skip it
-                if len(row) == 0:
-                    skips += 1
-                    continue
+        # calculates T_avg_annual for each year
+        for i in range(len(years)):
+            avg = sum(self.T_avg[i]) / (len(years[i]))
+            self.T_avg_annual.append(avg)
 
-                # sets a pointer to the start date of the simulation in the weather file
-                if counter < days_to_start:
-                    counter += 1
-                    continue
+        if len(years) > 2:
+            T_avg = sum([self.T_avg_annual[j] for j in range(1, len(self.T_avg_annual) - 1)]) \
+                / (len(self.T_avg_annual) - 2)
+        else:
+            T_avg = sum([self.T_avg_annual[j] for j in range(len(self.T_avg_annual))]) \
+                / len(self.T_avg_annual)
 
-                # row 0 contains variable names
-                if current_row != 0:
-                    # try/except statement to catch faulty weather data
-                    try:
-                        # fill data at appropriate location
-                        self.rainfall[year][day - offset] = float(row[2])
-                        self.T_max[year][day - offset] = float(row[3])
-                        self.T_min[year][day - offset] = float(row[4])
-                        self.T_avg[year][day - offset] = float(row[5])
-                        self.radiation[year][day - offset] = float(row[6])
-                        self.irrigation[year][day - offset] = float(row[7])
-                    except (IndexError, ValueError):
-                        # prints out each problematic row in the weather CSV file
-                        skips += 1
-                        if skips == 1:
-                            weather_csv_error = "Weather CSV file has invalid data in:" \
-                                f" {weather_full_path.name}. \nInvalid rows that are skipped:"
-                            om.add_error("weather_csv_error",
-                                         weather_csv_error,
-                                         info_map)
-                        if skips <= 5:
-                            weather_csv_error_pt2 = f"Row: {current_row}" \
-                                f" {skips} {days_to_start}"
-                            om.add_error("weather_csv_error_pt2",
-                                         weather_csv_error_pt2,
-                                         info_map)
-                        continue
-
-                    # iterate year counter accounting for leap years
-                    if day == len(years[year]):
-                        year += 1
-                        day = 0
-
-                    day += 1
-
-                current_row += 1
-
-            # prints if there are more than 5 skipped lines in order to
-            # prevent console clutter
-            if skips > 5:
-                weather_csv_error_pt3 = "Only printing first 5 invalid rows, there are" \
-                    f" {skips} total invalid rows."
-                om.add_error("weather_csv_error_pt3",
-                             weather_csv_error_pt3, info_map)
-
-            # calculates T_avg_annual for each year
-            for i in range(len(years)):
-                avg = sum(self.T_avg[i]) / (len(years[i]))
-                self.T_avg_annual.append(avg)
-
-            if len(years) > 2:
-                T_avg = sum([self.T_avg_annual[j] for j in range(1, len(self.T_avg_annual) - 1)]) \
-                    / (len(self.T_avg_annual) - 2)
-            else:
-                T_avg = sum([self.T_avg_annual[j] for j in range(len(self.T_avg_annual))]) \
-                    / len(self.T_avg_annual)
-
-            self.T_avg_annual[0] = T_avg
-            self.T_avg_annual[len(self.T_avg_annual) - 1] = T_avg
+        self.T_avg_annual[0] = T_avg
+        self.T_avg_annual[len(self.T_avg_annual) - 1] = T_avg
 
 
 class Time:
@@ -572,6 +364,7 @@ class Time:
             return self.day == len(self.years[self.year - 1])
 
         return False
+
 
 def is_leap_year(year):
     """

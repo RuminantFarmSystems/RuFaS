@@ -175,10 +175,10 @@ class Pen:
 
         GROWING_AND_CLOSE_UP = 4  # all heifers and dry cows
 
-    def __init__(self, pen_id: int, vertical_dist_to_milking_parlor: float, horizontal_dist_to_milking_parlor: float,
-                 number_of_stalls: int, housing_type: str, bedding_type: str, pen_type: str, manure_handling: str,
-                 manure_separator: str, manure_storage: str, animal_combination: AnimalCombination,
-                 max_stocking_density: float) -> None:
+    def __init__(self, pen_id: int, pen_name: str, vertical_dist_to_milking_parlor: float,
+                 horizontal_dist_to_milking_parlor: float, number_of_stalls: int, housing_type: str, bedding_type: str,
+                 pen_type: str, manure_handling: str, manure_separator: str, manure_storage: str,
+                 animal_combination: AnimalCombination, max_stocking_density: float) -> None:
         """
         Initializes a pen with the given arguments.
 
@@ -219,6 +219,7 @@ class Pen:
         self.housing_type = housing_type
         self.bedding_type = bedding_type
         self._pen_type = pen_type
+        self.pen_name = pen_name
 
         self.manure_handling = manure_handling
         self.manure_separator = manure_separator

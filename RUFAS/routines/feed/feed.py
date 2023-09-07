@@ -67,10 +67,13 @@ class Feed:
         self.feed_quality_table = data['feed_quality_table']
         self.nutrient_table = data['nutrient_table']
         self.db_reader = DatabaseReader(self.feed_database)
+        purchased_feeds_list = [feed_item["purchased_feed"] for feed_item in data["purchased_feeds"]]
+        purchased_feed_costs = {str(feed_item["purchased_feed"]): feed_item["purchased_feed_cost"]
+                                for feed_item in data["purchased_feeds"]}
 
         self.entries_split_by_maturity = self.get_feeds_split_by_maturity()
         self.farm_grown_feeds = data['farm_grown_feeds']
-        self.purchased_feeds = self.get_quality_specific_purchased_feed_ids(data['purchased_feeds'])
+        self.purchased_feeds = self.get_quality_specific_purchased_feed_ids(purchased_feeds_list)
 
         self.input_feed_combinations = {
             Pen.AnimalCombination.CALF: set(self.get_quality_specific_purchased_feed_ids(data['calf_feeds'])),
@@ -82,7 +85,7 @@ class Feed:
             Pen.AnimalCombination.LAC_COW: set(self.get_quality_specific_purchased_feed_ids(data['lac_cow_feeds'])),
         }
 
-        self.all_feed_ids = self.get_all_feed_units(data['purchased_feeds'], data['farm_grown_feeds'])
+        self.all_feed_ids = self.get_all_feed_units(purchased_feeds_list, data['farm_grown_feeds'])
 
         # dictionary of nutrients needed for this run
         # initially, this only contains information for purchased feeds as none
@@ -91,8 +94,8 @@ class Feed:
             self.get_nutrient_vals(self.purchased_feeds, False)
         self.calf_feeds = self.get_calf_feeds()
         # setting up the feed costs based on the input
-        self.feed_costs = data['purchased_feeds_costs']
-        self.feed_costs = self.get_quality_specific_feed_costs(data['purchased_feeds'])
+        self.feed_costs = purchased_feed_costs
+        self.feed_costs = self.get_quality_specific_feed_costs(purchased_feeds_list)
 
         # The nutrient requirements used in the ration calculations.
         self.nutrient_rqmts = ['FU', 'RU', 'ME_DM', 'RDP_DM', 'RUP_DM']
@@ -100,8 +103,8 @@ class Feed:
         # Storage receptacles managed by the feed module
         self.storage_options = {}
 
-        for storage_name, storage_data in data['storage_options'].items():
-            self.storage_options[storage_name] = self.Storage(storage_data)
+        for count, storage_option in enumerate(data['storage_options']):
+            self.storage_options[f"storage_option_{count}"] = self.Storage(storage_option)
 
         self.available_storage = dict(self.storage_options)
         self.standard_storage_count = 0
@@ -138,7 +141,7 @@ class Feed:
             self.CP_loss += storage.CP_loss
 
             self.NPN += storage.NPN
-            info_map = {"class": self.__class__.__name__, "function": self.summarize_feed_storage.__name__, 
+            info_map = {"class": self.__class__.__name__, "function": self.summarize_feed_storage.__name__,
                         "storage_type": storage}
             nutrients_dict = {}
             nutrients_dict["carbon"] = self.C
@@ -593,7 +596,7 @@ class Feed:
                         storage.inclusion_rate_est[animal] = \
                             (storage.inclusion_pct[animal] / 100) * storage.animal_avg_BW[animal]
                         storage.req_inv[animal] = storage.inclusion_rate_est[animal] \
-                                                  * storage.cow_days[animal]
+                            * storage.cow_days[animal]
                     tot_req_inv_non_lactating_cows = 0
 
                     for animal in storage.req_inv:
@@ -750,8 +753,6 @@ class Feed:
                 self.available_storage.pop(storage_name)
 
             self.summarize_feed_storage()
-            
-
 
     def daily_feed_management(self, animal_manager):
         """
@@ -787,8 +788,7 @@ class Feed:
         # inventory plan for new forages
         # if it is the day before the ration interval will be calculated
         ration_interval = ((animal_manager.simulation_day + 1) %
-                           animal_manager.formulation_interval) == 1 or \
-                          animal_manager.formulation_interval == 1
+                           animal_manager.formulation_interval) == 1 or animal_manager.formulation_interval == 1
         for silo in self.new_forages:
             if silo.days_since_feedout >= -1 and ration_interval and \
                     silo.feed_id != 'null':
@@ -894,7 +894,7 @@ class Feed:
 
         for entry in all_feeds_mapping:
             if not entry == all_feeds_mapping[entry]:
-                all_feed_info.update({all_feeds_mapping[entry]:all_feed_info[entry]})
+                all_feed_info.update({all_feeds_mapping[entry]: all_feed_info[entry]})
                 all_feed_info[all_feeds_mapping[entry]] = \
                     all_feed_info.pop(entry)
 
