@@ -52,7 +52,7 @@ def test_calc_E_CH4_slurry_storage(is_enclosed: bool, mocker: MockerFixture) -> 
 def test_calc_mcf() -> None:
     """Tests _calc_methane_conversion_factor() in gas_emissions.py."""
     assert GasEmissions._calc_methane_conversion_factor(1.0) == \
-        pytest.approx((GasEmissionConstants.MCF_CONSTANT_A * math.exp(GasEmissionConstants.MCF_CONSTANT_B)))
+           pytest.approx((GasEmissionConstants.MCF_CONSTANT_A * math.exp(GasEmissionConstants.MCF_CONSTANT_B)))
 
 
 def test_calc_ifsm_methane_emission(mocker: MockerFixture) -> None:
@@ -76,79 +76,179 @@ def test_calc_ifsm_methane_emission(mocker: MockerFixture) -> None:
     assert actual == pytest.approx(expected)
 
 
-def test_calc_nitrogen_loss_from_ammonia_emissions() -> None:
-    """Tests _calc_nitrogen_loss_from_ammonia_emissions() in gas_emissions.py"""
-    additional_n = 1.5
-    assert GasEmissions._calc_nitrogen_loss_from_ammonia_emissions(additional_n, False) \
-        == pytest.approx(0.375)
-    assert GasEmissions._calc_nitrogen_loss_from_ammonia_emissions(additional_n, True) \
-        == pytest.approx(0.75)
+@pytest.mark.parametrize(
+    'daily_nitrogen_input, is_bedding_tilled, expected, expected_error',
+    [
+        # Standard cases
+        (1.5, False, 0.375, None),
+        (1.5, True, 0.75, None),
+
+        # When daily_nitrogen_input is zero
+        (0.0, False, 0.0, None),
+        (0.0, True, 0.0, None),
+
+        # When daily_nitrogen_input is negative
+        (-1.5, False, None, ValueError),
+        (-1.5, True, None, ValueError),
+    ]
+)
+def test_calc_nitrogen_loss_in_compost_bedded_pack_barn_due_to_ammonia_emission(daily_nitrogen_input: float,
+                                                                                is_bedding_tilled: bool,
+                                                                                expected: float,
+                                                                                expected_error: type[
+                                                                                    Exception]) -> None:
+    """
+    Unit test for _calc_nitrogen_loss_in_compost_bedded_pack_barn_due_to_ammonia_emission() method in gas_emissions.py.
+
+    This test verifies that the method correctly calculates the nitrogen loss from ammonia emission in a
+    compost bedded pack barn given the daily nitrogen input and whether the bedding is tilled or not.
+    """
+
+    # Act and Assert
+    if expected_error:
+        with pytest.raises(expected_error):
+            GasEmissions._calc_nitrogen_loss_in_compost_bedded_pack_barn_due_to_ammonia_emission(daily_nitrogen_input,
+                                                                                                 is_bedding_tilled)
+    else:
+        actual = GasEmissions._calc_nitrogen_loss_in_compost_bedded_pack_barn_due_to_ammonia_emission(
+            daily_nitrogen_input, is_bedding_tilled)
+        assert actual == pytest.approx(expected)
 
 
-def test_calc_nitrogen_loss_to_leaching() -> None:
-    """Tests _calc_nitrogen_loss_to_leaching() in gas_emissions.py"""
-    additional_n = 1.5
-    assert GasEmissions._calc_nitrogen_loss_to_leaching(additional_n) \
-        == pytest.approx(0.0525)
+@pytest.mark.parametrize(
+    'daily_nitrogen_input, expected, expected_error',
+    [
+        # Standard cases
+        (1.5, 0.0525, None),
+
+        # When daily_nitrogen_input is zero
+        (0.0, 0.0, None),
+
+        # When daily_nitrogen_input is negative
+        (-1.5, None, ValueError),
+    ]
+)
+def test_calc_nitrogen_loss_in_compost_bedded_pack_barn_due_to_leaching(daily_nitrogen_input: float, expected: float,
+                                                                        expected_error: type[Exception]) -> None:
+    """
+    Unit test for _calc_nitrogen_loss_in_compost_bedded_pack_barn_due_to_leaching() method in gas_emissions.py.
+
+    This test verifies that the method correctly calculates the nitrogen loss due to leaching in a
+    compost bedded pack barn given the daily nitrogen input.
+    """
+
+    # Act and Assert
+    if expected_error:
+        with pytest.raises(expected_error):
+            GasEmissions._calc_nitrogen_loss_in_compost_bedded_pack_barn_due_to_leaching(daily_nitrogen_input)
+    else:
+        actual = GasEmissions._calc_nitrogen_loss_in_compost_bedded_pack_barn_due_to_leaching(daily_nitrogen_input)
+        assert actual == pytest.approx(expected)
 
 
-def test_calc_nitrogen_loss_from_nitrous_oxide_emissions() -> None:
-    """Tests _calc_nitrogen_loss_from_nitrous_oxide_emissions() in gas_emissions.py"""
-    additional_n = 1.5
-    assert GasEmissions._calc_nitrogen_loss_from_nitrous_oxide_emissions(additional_n, False) \
-        == pytest.approx(0.015)
-    assert GasEmissions._calc_nitrogen_loss_from_nitrous_oxide_emissions(additional_n, True) \
-        == pytest.approx(0.105)
+@pytest.mark.parametrize(
+    'daily_nitrogen_input, is_bedding_tilled, expected, expected_error',
+    [
+        # Standard cases with tilled and untilled bedding
+        (1.5, True, 0.105, None),
+        (1.5, False, 0.015, None),
+
+        # When daily_nitrogen_input is zero
+        (0.0, True, 0.0, None),
+        (0.0, False, 0.0, None),
+
+        # When daily_nitrogen_input is negative
+        (-1.5, True, None, ValueError),
+        (-1.5, False, None, ValueError),
+    ]
+)
+def test_calc_nitrogen_loss_in_compost_bedded_pack_barn_due_to_nitrous_oxide_emission(daily_nitrogen_input: float,
+                                                                                      is_bedding_tilled: bool,
+                                                                                      expected: float,
+                                                                                      expected_error: type[
+                                                                                          Exception]) -> None:
+    """
+    Unit test for _calc_nitrogen_loss_in_compost_bedded_pack_barn_due_to_nitrous_oxide_emission() method in gas_emissions.py.
+
+    This test verifies that the method correctly calculates the nitrogen loss due to nitrous oxide emission in a
+    compost bedded pack barn given the daily nitrogen input and whether the bedding is tilled or not.
+    """
+
+    # Act and Assert
+    if expected_error:
+        with pytest.raises(expected_error):
+            GasEmissions._calc_nitrogen_loss_in_compost_bedded_pack_barn_due_to_nitrous_oxide_emission(
+                daily_nitrogen_input, is_bedding_tilled)
+    else:
+        actual = GasEmissions._calc_nitrogen_loss_in_compost_bedded_pack_barn_due_to_nitrous_oxide_emission(
+            daily_nitrogen_input, is_bedding_tilled)
+        assert actual == pytest.approx(expected)
 
 
-def test_calc_nitrogen_losses(mocker: MockerFixture) -> None:
-    """Tests calc_nitrogen_losses() in gas_emissions.py"""
-    ammonia_loss = 1.0
-    leaching_loss = 2.0
-    nitrous_oxide_loss = 3.0
+@pytest.mark.parametrize(
+    'daily_nitrogen_input, is_bedding_tilled, expected_ammonia,'
+    'expected_nitrous_oxide, expected_leaching, expected_error',
+    [
+        # Standard cases
+        (1.5, True, 0.75, 0.105, 0.0525, None),
+        (1.5, False, 0.375, 0.015, 0.0525, None),
+
+        # When daily_nitrogen_input is zero
+        (0.0, True, 0.0, 0.0, 0.0, None),
+        (0.0, False, 0.0, 0.0, 0.0, None),
+
+        # When daily_nitrogen_input is negative
+        (-1.5, True, None, None, None, ValueError),
+        (-1.5, False, None, None, None, ValueError),
+    ]
+)
+def test_calc_total_nitrogen_loss_from_compost_bedded_pack_barn(daily_nitrogen_input: float,
+                                                                is_bedding_tilled: bool,
+                                                                expected_ammonia: float,
+                                                                expected_nitrous_oxide: float,
+                                                                expected_leaching: float,
+                                                                expected_error: type[Exception],
+                                                                mocker: MockerFixture) -> None:
+    """
+    Unit test for the `calc_total_nitrogen_loss_from_compost_bedded_pack_barn` method in gas_emissions.py.
+
+    This test verifies that the method correctly calculates the total nitrogen loss from a compost
+    bedded pack barn, given the daily nitrogen input and whether the bedding is tilled or not.
+    It checks for both valid inputs and invalid (negative) nitrogen input scenarios.
+    """
+
+    # Arrange
     mocker.patch(
-        'RUFAS.routines.manure.gas_emissions.gas_emissions.GasEmissions._calc_nitrogen_loss_from_ammonia_emissions',
-        return_value=ammonia_loss
+        'RUFAS.routines.manure.gas_emissions.gas_emissions.GasEmissions'
+        '._calc_nitrogen_loss_in_compost_bedded_pack_barn_due_to_ammonia_emission',
+        return_value=expected_ammonia
     )
     mocker.patch(
-        'RUFAS.routines.manure.gas_emissions.gas_emissions.GasEmissions._calc_nitrogen_loss_to_leaching',
-        return_value=leaching_loss
+        'RUFAS.routines.manure.gas_emissions.gas_emissions.GasEmissions'
+        '._calc_nitrogen_loss_in_compost_bedded_pack_barn_due_to_leaching',
+        return_value=expected_leaching
     )
     mocker.patch(
-        'RUFAS.routines.manure.gas_emissions.gas_emissions.'
-        'GasEmissions._calc_nitrogen_loss_from_nitrous_oxide_emissions',
-        return_value=nitrous_oxide_loss
+        'RUFAS.routines.manure.gas_emissions.gas_emissions.GasEmissions._calc_nitrogen_loss_in_compost_bedded_pack_barn_due_to_nitrous_oxide_emission',
+        return_value=expected_nitrous_oxide
     )
-    expected = ammonia_loss + leaching_loss + nitrous_oxide_loss
 
-    assert GasEmissions.calc_nitrogen_losses(1.0, True) == pytest.approx(expected)
-
-
-def test_calc_nitrogen_losses_invalid_mass(mocker: MockerFixture) -> None:
-    """Tests calc_nitrogen_losses() in gas_emissions.py"""
-    mocker.patch(
-        'RUFAS.routines.manure.gas_emissions.gas_emissions.GasEmissions._calc_nitrogen_loss_from_ammonia_emissions',
-        return_value=0.0
-    )
-    mocker.patch(
-        'RUFAS.routines.manure.gas_emissions.gas_emissions.GasEmissions._calc_nitrogen_loss_to_leaching',
-        return_value=0.0
-    )
-    mocker.patch(
-        'RUFAS.routines.manure.gas_emissions.gas_emissions.'
-        'GasEmissions._calc_nitrogen_loss_from_nitrous_oxide_emissions',
-        return_value=0.0
-    )
-    invalid_negative_mass = -1.0
-    with pytest.raises(ValueError):
-        GasEmissions.calc_nitrogen_losses(invalid_negative_mass, True)
+    # Act & Assert
+    if expected_error:
+        with pytest.raises(expected_error):
+            GasEmissions.calc_total_nitrogen_loss_from_compost_bedded_pack_barn(daily_nitrogen_input, is_bedding_tilled)
+    else:
+        total_nitrogen_loss = GasEmissions.calc_total_nitrogen_loss_from_compost_bedded_pack_barn(daily_nitrogen_input,
+                                                                                                  is_bedding_tilled)
+        expected = expected_ammonia + expected_leaching + expected_nitrous_oxide
+        assert total_nitrogen_loss == pytest.approx(expected)
 
 
 @pytest.mark.parametrize("temperature", [-10.0, 0.0, 10.0])
 def test_microbial_decomp_rate(temperature: float) -> None:
     """Tests _calc_microbial_decomp_rate() in gas_emissions.py."""
     assert GasEmissions._calc_microbial_decomp_rate(temperature) == \
-        pytest.approx(2.37e-3 * (math.pow(1.066, (temperature - 10)) - math.pow(1.21, (temperature - 50))))
+           pytest.approx(2.37e-3 * (math.pow(1.066, (temperature - 10)) - math.pow(1.21, (temperature - 50))))
 
 
 @pytest.mark.parametrize("days_since_last_tillage, lag", [(1, 1), (10, 2), (1, 3)])
@@ -165,7 +265,7 @@ def test_carbon_decomposition_rate(mocker: MockerFixture, days_since_last_tillag
     expected = math.exp(0.1 * (days_since_last_tillage - lag))
 
     assert GasEmissions._calc_carbon_decomposition_rate(days_since_last_tillage, lag) == \
-        pytest.approx(expected)
+           pytest.approx(expected)
 
 
 @pytest.mark.parametrize("oxygen_mole_fraction, oxygen_ambient_air_mole_fraction, should_throw", [
@@ -176,9 +276,9 @@ def test_carbon_decomposition_rate(mocker: MockerFixture, days_since_last_tillag
     (0.15, 0.21, False)
 ])
 def test_aneerobic_coefficient(
-    oxygen_mole_fraction: float,
-    oxygen_ambient_air_mole_fraction: float,
-    should_throw: bool
+        oxygen_mole_fraction: float,
+        oxygen_ambient_air_mole_fraction: float,
+        should_throw: bool
 ) -> None:
     """Tests _calc_aneerobic_coefficient() in gas_emissions.py."""
     if should_throw:
@@ -189,13 +289,13 @@ def test_aneerobic_coefficient(
             )
     else:
         expected = (
-            (oxygen_mole_fraction / (0.02 + oxygen_mole_fraction))
-            * ((0.02 + oxygen_ambient_air_mole_fraction) / oxygen_ambient_air_mole_fraction)
+                (oxygen_mole_fraction / (0.02 + oxygen_mole_fraction))
+                * ((0.02 + oxygen_ambient_air_mole_fraction) / oxygen_ambient_air_mole_fraction)
         )
         assert GasEmissions._calc_anaerobic_effect(
-                oxygen_mole_fraction=oxygen_mole_fraction,
-                oxygen_ambient_air_mole_fraction=oxygen_ambient_air_mole_fraction
-            ) == pytest.approx(expected)
+            oxygen_mole_fraction=oxygen_mole_fraction,
+            oxygen_ambient_air_mole_fraction=oxygen_ambient_air_mole_fraction
+        ) == pytest.approx(expected)
 
 
 def test_calc_total_carbon_decomposition(mocker: MockerFixture) -> None:
@@ -217,7 +317,7 @@ def test_calc_total_carbon_decomposition(mocker: MockerFixture) -> None:
     expected = (total_solids * 0.5 + bedding_mass * 0.35) * c_decomp_rate * 0.65 * anaerobic_effect
 
     assert GasEmissions.calc_total_carbon_decomposition(total_solids, bedding_mass, days_since_last_tillage, lag) \
-        == pytest.approx(expected)
+           == pytest.approx(expected)
 
 
 @pytest.mark.parametrize('hours', [hour for hour in range(0, 24)])
@@ -714,11 +814,15 @@ def test_calc_storage_ammonia_emission(num_animals: int, storage_area: float, ma
     # Act and assert
     if isinstance(expected, type) and issubclass(expected, Exception):
         with pytest.raises(expected, match=error_message):  # type: ignore
-            GasEmissions.calc_storage_ammonia_emission(num_animals, storage_area, manure_tan,
-                                                       manure_volume, manure_density, total_solids, temp, pH)
+            GasEmissions.calc_storage_ammonia_emission(num_animals, manure_tan,
+                                                       manure_volume, manure_density,
+                                                       total_solids, temp,
+                                                       storage_area, pH)
     else:
-        actual = GasEmissions.calc_storage_ammonia_emission(num_animals, storage_area, manure_tan,
-                                                            manure_volume, manure_density, total_solids, temp, pH)
+        actual = GasEmissions.calc_storage_ammonia_emission(num_animals, manure_tan,
+                                                            manure_volume, manure_density,
+                                                            total_solids, temp,
+                                                            storage_area, pH)
         assert actual == pytest.approx(expected)
 
 

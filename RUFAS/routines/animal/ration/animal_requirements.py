@@ -39,6 +39,7 @@ class AnimalRequirements:
         NEa = Net energy for activity requirement (Mcal)
         
         NEg = Net energy for growth requirement (Mcal)
+
         
         NEpreg = Net energy requirement for pregnancy (Mcal)
         
@@ -1087,6 +1088,7 @@ class AnimalRequirements:
         ----------
         .. [1] National Research Council, "Nutrient Requirements of Dairy Cattle, 7th edition." National Academic Press,
             Chapter 6 "Minerals",pp. 106-109. 2001.
+
 
         """
 

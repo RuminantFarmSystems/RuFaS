@@ -10,6 +10,7 @@ Author(s): Chris VanKerkhove, cjv47@cornell.edu
 """
 import collections
 from typing import Set, Dict, List
+
 from RUFAS.output_manager import OutputManager
 from RUFAS.routines.animal.ration import animal_requirements
 from RUFAS.routines.animal.ration.ration_NLP import RationOptimizer
@@ -155,6 +156,8 @@ class RationManager:
         ration['objective'] = NLP.objective(solution.x)
         return ration
 
+
+
     def make_solution_from_fixed_ration(ration: Dict) -> List:
         """
         makes solution object from returned fixed ration for use in get_ration_vals function in ration_NLP.py
@@ -163,6 +166,7 @@ class RationManager:
         Parameters
         ----------
         ration: Dict
+
 
         Returns
         -------
@@ -287,7 +291,6 @@ class RationManager:
             ration_vals = NLP.get_ration_vals(solution.x)
         return ration, ration_vals
 
-
 class RationReporter:
     """
 
@@ -298,6 +301,7 @@ class RationReporter:
     
     @classmethod
     def report_ration(cls, ration, available_feeds):
+
         """
         Calculates information in the ration about nutrient information including
         nutrient amounts and concentrations. Returns a dictionary of nutrient amounts
@@ -348,6 +352,7 @@ class RationReporter:
                 # all values on a 100% dry matter basis
                 nutrient_conc[nutr] = (nutrient_amount[nutr] / dm_amount) * 100
         return nutrient_amount, nutrient_conc
+
 
 
 class AvailableFeeds:

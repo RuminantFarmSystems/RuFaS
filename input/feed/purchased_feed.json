@@ -29,11 +29,11 @@
 
     },
     "user_defined_ration_percentages": {
-       "calf": {},
-       "growing": {},
-       "close_up": {},
-       "lac_cow": {},
-   "tolerance": 0.05,
-   "milk_reduction_maximum": 20.0
-   }
+        "calf": {},
+        "growing": {},
+        "close_up": {},
+        "lac_cow": {},
+    "tolerance": 0.0,
+    "milk_reduction_maximum": 0.0
+}
 }

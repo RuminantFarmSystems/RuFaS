@@ -288,6 +288,7 @@ class RationOptimizer:
         # TDN discount, TDN digestibility decrease caused by DMI and TDNconc
         if TDNconc < 60:
             Discount = 1
+
         else:
             Discount = (TDNconc - ((0.18 * TDNconc - 10.3) * (DMI_to_maint - 1))) / TDNconc
         # [A.Cow.E.4]-[A.Heifer.E.4]
@@ -802,3 +803,4 @@ class RationOptimizer:
                     just filtered such that the ones that failed are returned
             """
             return list(filter(lambda c: self.is_constraint_violated(solution_x, c), constraints))
+
