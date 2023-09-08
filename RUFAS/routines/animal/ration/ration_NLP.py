@@ -248,7 +248,7 @@ class RationOptimizer:
 
         NEl_constraint= sum(np.multiply(x, NElact)) 
         NEm_act_constraint = (sum(np.multiply(x, NEm_act)))
-        NEg_constraint =  sum(np.multiply(x, NEgact))
+        NEg_constraint = sum(np.multiply(x, NEgact))
         all_req = NEg + NEmaint + NEa + NEpreg + NEl
         return max(NEm_act_constraint, NEl_constraint, NEg_constraint) - all_req
     
@@ -613,8 +613,8 @@ class RationOptimizer:
         ration_vals = {'ME_tot': ME_tot}
         return ration_vals
 
-
-    def make_user_bounds(self, ration_percents: Dict, DMIest: float) -> List[Tuple[float, float]]:
+    @classmethod
+    def make_user_bounds(cls, ration_percents: Dict, DMIest: float) -> List[Tuple[float, float]]:
         """
         Calculates user bounds for optimize function
 

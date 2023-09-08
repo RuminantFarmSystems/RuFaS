@@ -26,13 +26,13 @@ from RUFAS.routines.animal.life_cycle.calf import Calf
 
 import RUFAS.routines.animal.clustering_pen_grouping
 from RUFAS.routines.animal.ration.ration_driver import AvailableFeeds
+from RUFAS.routines.animal.ration.ration_driver import RationManager
 
 
 from RUFAS.routines.animal.ration.ration_NLP import RationOptimizer
 
 import RUFAS.routines.animal.ration.animal_requirements
 import RUFAS.routines.animal.ration.ration_NLP
-from RUFAS.routines.animal.ration.ration_NLP import list_reconfig
 
 from RUFAS.routines.animal.life_cycle.animal_base import AnimalBase
 from RUFAS.routines.animal.life_cycle.animal_events import AnimalEvents
@@ -1434,7 +1434,7 @@ def test_calc_milk_average() -> None:
     production = [1,2,3,4,5]
     for i in range(len(production)):
         mockpen.animals_in_pen[i].estimated_daily_milk_produced = production[i]
-    result = ration_driver.calc_milk_average(mockpen)
+    result = RationManager.calc_milk_average(mockpen)
     assert result == sum(production)/len(production)
 
 def test_reduce_milk_production() -> None:
@@ -1451,7 +1451,7 @@ def test_reduce_milk_production() -> None:
     for i in range(len(production)):
         mockpen.animals_in_pen[i].estimated_daily_milk_produced = production[i]
     # assert all were reduced, but not reaching below 1.0 kg/day
-    ration_driver.reduce_milk_production(mockpen, 1.0)
+    RationManager.reduce_milk_production(mockpen, 1.0)
     for i, animal in enumerate(mockpen.animals_in_pen):
         assert reduced_predicted[i] == animal.estimated_daily_milk_produced
 
@@ -1477,7 +1477,7 @@ def test_make_ration_from_solution():
     mock_avail_feeds['feed_id'] = [100, 200, 300]
     mock_avail_feeds['feed_key'] = ['100', '200', '300']
     # with patch.object(RUFAS.routines.animal.ration.ration_NLP, 'price', price):
-    result = ration_driver.make_ration_from_solution(mock_avail_feeds, mock_solution)
+    result = RationManager.make_ration_from_solution(mock_avail_feeds, mock_solution)
     assert result == predicted
 
 @pytest.mark.parametrize("test_ration, expected", [
@@ -1491,7 +1491,7 @@ def test_make_solution_from_fixed_ration(test_ration: Dict, expected: list):
     """
     # test_ration = {'2' : 3, '4' : 6, 'status' : True, 'objective' : False}
     # expected = [1, 1, 1, 2, 2, 2]
-    result = ration_driver.make_solution_from_fixed_ration(test_ration)
+    result = RationManager.make_solution_from_fixed_ration(test_ration)
     assert result == expected
 
 
@@ -1859,7 +1859,7 @@ def test_make_user_bounds(mock_user_defined_ration_manager: UserDefinedRationMan
     high_offset = 1 #1+AnimalModuleConstants.DMI_CONSTRAINT_PERCENT
     predicted = [[9/3*low_offset,11/3*high_offset], [9/3*low_offset,11/3*high_offset], [9/3*low_offset,11/3*high_offset], \
                  [18/3*low_offset,22/3*high_offset], [18/3*low_offset,22/3*high_offset], [18/3*low_offset,22/3*high_offset]]
-    result = RUFAS.routines.animal.ration.ration_NLP.make_user_bounds(ration_percents, 100)
+    result = RationOptimizer.make_user_bounds(ration_percents, 100)
     # assert that list output is those modified and repeated 3X
     for i in range(len(predicted)):
         assert predicted[i][0] == pytest.approx(result[i][0], 0.1)

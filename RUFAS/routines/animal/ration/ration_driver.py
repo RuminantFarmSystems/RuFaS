@@ -129,7 +129,8 @@ class RationManager:
                 animal.milk_production_reduction -= reduction
             running_total_milk += animal.estimated_daily_milk_produced
 
-    def make_ration_from_solution(available_feeds: Dict, solution: scipy.optimize.OptimizeResult) -> dict:
+    @classmethod
+    def make_ration_from_solution(cls, available_feeds: Dict, solution: scipy.optimize.OptimizeResult) -> dict:
         """
         Generates ration dictionary from scipy result
         
@@ -156,9 +157,8 @@ class RationManager:
         ration['objective'] = NLP.objective(solution.x)
         return ration
 
-
-
-    def make_solution_from_fixed_ration(ration: Dict) -> List:
+    @classmethod
+    def make_solution_from_fixed_ration(cls, ration: Dict) -> List:
         """
         makes solution object from returned fixed ration for use in get_ration_vals function in ration_NLP.py
         Simply puts the value in triplicate, and multiplies by the MEact defined in the set_globals function
