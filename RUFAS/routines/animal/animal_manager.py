@@ -42,6 +42,8 @@ from RUFAS.routines.animal.ration.calf_ration import optimize as calf_optimize
 from RUFAS.routines.animal.ration.ration_driver import RationReporter
 from RUFAS.routines.animal.ration.ration_driver import RationManager
 
+from RUFAS.routines.animal.ration import user_defined_ration as udr
+
 import random
 from statistics import mean
 from typing import Any, Dict, Tuple, List
@@ -192,8 +194,10 @@ class AnimalManager:
         # concentrate supplementation when farming type is "pasture", kg
         self.pasture_concentrate = data['pasture_concentrate']
 
+        udrm = udr.UserDefinedRationManager()
         self.ration_user_input = data['ration']['user_input']
-
+        udrm.udr_or_not = self.ration_user_input
+        
         # how often a ration is calculated, days
         self.formulation_interval = data['ration']['formulation_interval']
 
