@@ -215,73 +215,56 @@ def test_setup_management(field_name: str, config: Dict) -> None:
     assert till_sched.tillage_depths == config.get("tillage").get("depth")
 
 
-@pytest.mark.parametrize("crop_input_file_name", [
-    "ARL_rotation.json",
-    "corn_rotation.json",
-    "double_cropping_1yr_rotation.json",
-    "double_cropping_2yr_rotation.json",
-    "LT_rotation.json",
-    "multi_crop_rotation.json",
-    "swat_rotation.json",
-    "testing_rotation.json"
-])
-def test_setup_crop_schedules(crop_input_file_name: str) -> None:
-    """Tests that the crop schedule setup method is able to correctly parse all the currently available crop
-        datasets."""
-    input_directory = Utility.get_base_dir() / 'input'
-    crops_config = Utility.read_json_file(input_directory / 'crop' / crop_input_file_name)
-    crop_specifications = crops_config.get("crops")
-    FieldManager._setup_crop_schedules(crop_specifications)
-    assert True
-
-
 @pytest.mark.parametrize("crop_schedule_config,expected", [
-    ({"corn": {
-        "crop_reference": "corn",
-        "plant_years": [2009],
-        "repeat": 1,
-        "planting_day": [121],
-        "harvest_years": [2009],
-        "harvest_day": [319],
-        "harvest_operations": ["default"],
-        "harvest_type": "scheduled"
-    }
-     }, [CropSchedule(name="corn", crop_reference="corn", planting_years=[2009], planting_days=[121],
+    ([
+         {"crop_species": "corn",
+          "planting_years": [2009],
+          "pattern_repeat": 1,
+          "pattern_skip": 0,
+          "planting_days": [121],
+          "harvest_years": [2009],
+          "harvest_days": [319],
+          "harvest_operations": ["default"],
+          "harvest_type": "scheduled"}
+     ], [CropSchedule(name="crop_schedule_0", crop_reference="corn", planting_years=[2009], planting_days=[121],
                       harvest_years=[2009], harvest_days=[319], harvest_operations=["default"],
                       use_heat_scheduling=False, pattern_repeat=1)]),
-    ({
-         "Corn10": {"crop_reference": "corn", "plant_years": [2010], "repeat": 0, "planting_day": [121],
-                    "harvest_years": [2010], "harvest_day": [319], "harvest_operations": ["default"],
-                    "harvest_type": "scheduled", "planting_order": "1st", "extracted": True},
-         "Corn11": {"crop_reference": "corn", "plant_years": [2011], "repeat": 0, "planting_day": [121],
-                    "harvest_years": [2011], "harvest_day": [319], "harvest_operations": ["default"],
-                    "harvest_type": "scheduled", "planting_order": "1st", "extracted": True},
-         "Corn12": {"crop_reference": "corn", "plant_years": [2012], "repeat": 0, "planting_day": [121],
-                    "harvest_years": [2012], "harvest_day": [319], "harvest_operations": ["default"],
-                    "harvest_type": "scheduled", "planting_order": "1st", "extracted": True},
-         "Corn13": {"crop_reference": "corn", "plant_years": [2013], "repeat": 0, "planting_day": [121],
-                    "harvest_years": [2013], "harvest_day": [319], "harvest_operations": ["default"],
-                    "harvest_type": "scheduled", "planting_order": "1st", "extracted": True}
-     }, [CropSchedule(name="Corn10", crop_reference="corn", planting_years=[2010], planting_days=[121],
+    ([
+         {"crop_species": "corn", "planting_years": [2010], "pattern_repeat": 0, "pattern_skip": 1,
+          "planting_days": [121], "harvest_years": [2010], "harvest_days": [319], "harvest_operations": ["default"],
+          "harvest_type": "scheduled", "planting_order": "1st", "extracted": True},
+         {"crop_species": "corn", "planting_years": [2011], "pattern_repeat": 0, "pattern_skip": 3,
+          "planting_days": [121], "harvest_years": [2011], "harvest_days": [319], "harvest_operations": ["default"],
+          "harvest_type": "scheduled", "planting_order": "1st", "extracted": True},
+         {"crop_species": "corn", "planting_years": [2012], "pattern_repeat": 0, "pattern_skip": 0,
+          "planting_days": [121], "harvest_years": [2012], "harvest_days": [319], "harvest_operations": ["default"],
+          "harvest_type": "scheduled", "planting_order": "1st", "extracted": True},
+         {"crop_species": "corn", "planting_years": [2013], "pattern_repeat": 0, "pattern_skip": 2,
+          "planting_days": [121], "harvest_years": [2013], "harvest_days": [319], "harvest_operations": ["default"],
+          "harvest_type": "scheduled", "planting_order": "1st", "extracted": True}
+     ], [CropSchedule(name="crop_schedule_0", crop_reference="corn", planting_years=[2010], planting_days=[121],
                       harvest_years=[2010], harvest_days=[319], harvest_operations=["default"],
                       use_heat_scheduling=False, pattern_repeat=0),
-         CropSchedule(name="Corn11", crop_reference="corn", planting_years=[2011], planting_days=[121],
+         CropSchedule(name="crop_schedule_1", crop_reference="corn", planting_years=[2011], planting_days=[121],
                       harvest_years=[2011], harvest_days=[319], harvest_operations=["default"],
                       use_heat_scheduling=False, pattern_repeat=0),
-         CropSchedule(name="Corn12", crop_reference="corn", planting_years=[2012], planting_days=[121],
+         CropSchedule(name="crop_schedule_2", crop_reference="corn", planting_years=[2012], planting_days=[121],
                       harvest_years=[2012], harvest_days=[319], harvest_operations=["default"],
                       use_heat_scheduling=False, pattern_repeat=0),
-         CropSchedule(name="Corn13", crop_reference="corn", planting_years=[2013], planting_days=[121],
+         CropSchedule(name="crop_schedule_3", crop_reference="corn", planting_years=[2013], planting_days=[121],
                       harvest_years=[2013], harvest_days=[319], harvest_operations=["default"],
                       use_heat_scheduling=False, pattern_repeat=0)
          ])
 ])
-def test_correct_crop_schedule_setup(crop_schedule_config: Dict, expected: List[CropSchedule]) -> None:
+def test_crop_schedule_setup(crop_schedule_config: Dict, expected: List[CropSchedule]) -> None:
     """Tests that crop schedules are created correctly from the crop schedule configuration passed to it."""
-    actual = FieldManager._setup_crop_schedules(crop_schedule_config)
-    for index in range(len(expected)):
-        assert actual[index].generate_planting_events() == expected[index].generate_planting_events()
-        assert actual[index].generate_harvest_events() == expected[index].generate_harvest_events()
+    field_manager = FieldManager(MagicMock(ManureManager))
+    with patch("RUFAS.input_manager.InputManager.get_data", return_value=crop_schedule_config) as patched_get_data:
+        actual = field_manager._setup_crop_schedules("test_crop_schedule")
+        for index in range(len(expected)):
+            assert actual[index].generate_planting_events() == expected[index].generate_planting_events()
+            assert actual[index].generate_harvest_events() == expected[index].generate_harvest_events()
+        patched_get_data.assert_called_once_with("test_crop_schedule.crop_schedules")
 
 
 @pytest.mark.parametrize("field_size,top,sand,silt,residue,nitrogen_mineralization,config,expected", [
