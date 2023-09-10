@@ -1,3 +1,4 @@
+from RUFAS.input_manager import InputManager
 from RUFAS.routines.field.manager.field_manager import FieldManager
 from RUFAS.routines.field.manager.crop_schedule import CropSchedule
 from RUFAS.routines.field.manager.current_weather import CurrentWeather
@@ -15,6 +16,8 @@ import pytest
 from typing import List, Dict
 from unittest.mock import MagicMock, patch
 
+
+# im = InputManager()
 
 @pytest.mark.parametrize("year,day,expected", [
     (1, 3, CurrentWeather(incoming_light=3, min_air_temperature=3, mean_air_temperature=3, max_air_temperature=3,
@@ -364,6 +367,59 @@ def test_setup_soil_subroutine_calls(soil_config: Dict, soil_layer_count: int) -
     FieldManager._setup_soil(soil_config)
 
     assert FieldManager._setup_soil_layer.call_count == soil_layer_count
+
+
+@pytest.mark.parametrize("blobs,expected", [
+    ({
+         "tillage_schedule": {
+             "properties": "tillage_schedule_properties"
+         },
+         "field": {
+             "properties": "field_properties"
+         },
+         "weather": {
+             "properties": "weather_properties"
+         }}, ["field"]),
+    ({
+         "tillage_schedule": {
+             "properties": "tillage_schedule_properties"
+         },
+         "field_1": {
+             "properties": "field_properties"
+         },
+         "field_2": {
+             "properties": "field_properties"
+         }}, ["field_1", "field_2"]),
+    ({
+         "tillage_schedule": {
+             "properties": "tillage_schedule_properties"
+         },
+         "weather": {
+             "properties": "weather_properties"
+         }}, []),
+    ({}, [])
+])
+def test_get_field_blob_names(blobs: Dict[str, Dict[str, str]], expected: List[str]) -> None:
+    """Tests that all field blob names are correctly pulled from the InputManager."""
+    field_manager = FieldManager({}, MagicMock(ManureManager))
+    with patch("RUFAS.input_manager.InputManager.get_metadata", return_value=blobs):
+        actual = field_manager._get_field_blob_names()
+        assert actual == expected
+
+
+def test_get_field_blob_names_error() -> None:
+    """Tests that exceptions are correctly raised when metadata does not contain expected values."""
+    field_manager = FieldManager({}, MagicMock(ManureManager))
+    with patch("RUFAS.input_manager.InputManager.get_metadata", side_effect=KeyError), \
+            pytest.raises(KeyError) as e:
+        field_manager._get_field_blob_names()
+    assert str(e.value) == '"Could not find \'files\' section of metadata."'
+
+    with patch("RUFAS.input_manager.InputManager.get_metadata",
+               return_value={"dummy_blob": {"title": "Title", "description": "Described"}}), \
+            pytest.raises(KeyError) as e:
+        field_manager._get_field_blob_names()
+    assert str(e.value) == '"dummy_blob in metadata did not contain \'properties\' value."'
 
 
 @pytest.mark.parametrize("field_name,field_config", [

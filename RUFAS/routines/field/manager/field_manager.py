@@ -1,3 +1,4 @@
+from RUFAS.input_manager import InputManager
 from RUFAS.routines.field.field.field import Field
 from RUFAS.routines.field.field.field_data import FieldData
 from RUFAS.util import Utility
@@ -18,6 +19,8 @@ from typing import Dict, List, Tuple, Any
 This module is responsible for initializing the `Field` instances that will be simulated and providing an interface to
 the `SimulationEngine` for executing daily and annual routines in the field module.
 """
+
+im = InputManager()
 
 
 class FieldManager:
@@ -143,6 +146,34 @@ class FieldManager:
                               rainfall=weather.rainfall[time.year - 1][time.day - 1],
                               irrigation=weather.irrigation[time.year - 1][time.day - 1],
                               daylength=daylength)
+
+    def _get_field_blob_names(self) -> List[str]:
+        """
+        Gets the names of each blob in the metadata that conforms to the field properties.
+
+        Returns
+        -------
+        List[str]
+            List of blob names that contain field configurations.
+
+        """
+        field_blob_names = []
+
+        try:
+            blobs = im.get_metadata("files")
+        except KeyError:
+            raise KeyError("Could not find 'files' section of metadata.")
+
+        for blob_name, blob_values in blobs.items():
+            try:
+                property = blob_values["properties"]
+            except KeyError:
+                raise KeyError(f"{blob_name} in metadata did not contain 'properties' value.")
+
+            if property == "field_properties":
+                field_blob_names.append(blob_name)
+
+        return field_blob_names
 
     @staticmethod
     def _setup_field(field_name: str, field_config: Dict[str, str], manure_manager: ManureManager) -> Field:
