@@ -24,10 +24,10 @@ im = InputManager()
 
 
 class FieldManager:
-    def __init__(self, fields_config: Dict[str, Dict[str, str]], manure_manager: ManureManager):
+    def __init__(self, manure_manager: ManureManager):
         self.fields: List[Field] = []
-        for field_name, field_config in fields_config.items():
-            self.fields.append(self._setup_field(field_name, field_config, manure_manager))
+        # for field_name, field_config in fields_config.items():
+        #     self.fields.append(self._setup_field(field_name, field_config, manure_manager))
         self.output_gatherer = OutputGatherer(fields=self.fields)
 
     def daily_update_routine(self, weather, time) -> None:
@@ -175,16 +175,13 @@ class FieldManager:
 
         return field_blob_names
 
-    @staticmethod
-    def _setup_field(field_name: str, field_config: Dict[str, str], manure_manager: ManureManager) -> Field:
+    def _setup_field(self, field_name: str, manure_manager: ManureManager) -> Field:
         """
 
         Parameters
         ----------
         field_name : str
-            The name of the field being initialized.
-        field_config : Dict[str, str]
-            Contains the paths to input data files for soil profile, crop management, and farm management.
+            The name of the blob in the metadata that contains the configuration for the field to be initialized.
         manure_manager: ManureManager
             Instance of the ManureManager class.
 
@@ -194,12 +191,14 @@ class FieldManager:
             A `Field` instance configured with the specified input data
 
         """
-        input_directory = Utility.get_base_dir() / 'input'
-
-        management_config = \
-            Utility.read_json_file(input_directory / 'field_management' / field_config['field_management'])
-        crops_config = Utility.read_json_file(input_directory / 'crop' / field_config['crop'])
-        soil_config = Utility.read_json_file(input_directory / 'soil' / field_config['soil'])
+        field_data_address = f"{field_name}."
+        field_size = im.get_data(field_data_address + "field_size")
+        absolute_latitude = im.get_data(field_data_address + "absolute_latitude")
+        longitude = im.get_data(field_data_address + "longitude")
+        minimum_daylength = im.get_data(field_data_address + "minimum_daylength")
+        seasonal_high_water_table = im.get_data(field_data_address + "seasonal_high_water_table")
+        watering_amount_in_liters = im.get_data(field_data_address + "watering_amount_in_liters")
+        watering_interval = im.get_data(field_data_address + "watering_interval")
 
         available_fertilizer_mixes, fertilizer_schedule, manure_schedule, tillage_schedule = \
             FieldManager._setup_management(field_name, management_config)
@@ -216,9 +215,10 @@ class FieldManager:
 
         soil_profile = FieldManager._setup_soil(soil_config)
 
-        field_data = FieldData(name=field_name, field_size=soil_config["field_size"],
-                               current_residue=soil_config["initial_residue"],
-                               absolute_latitude=abs(crops_config["latitude"]))
+        field_data = FieldData(name=field_name, field_size=field_size, absolute_latitude=absolute_latitude,
+                               longitude=longitude, minimum_daylength=minimum_daylength,
+                               seasonal_high_water_table=seasonal_high_water_table,
+                               watering_amount_in_liters=watering_amount_in_liters, watering_interval=watering_interval)
 
         return Field(field_data=field_data, soil=soil_profile, plantings=all_planting_events,
                      harvestings=all_harvest_events, tillage_events=tillage_events, fertilizer_events=fertilizer_events,
@@ -281,15 +281,14 @@ class FieldManager:
 
         return fertilizer_mixes, fertilizer_schedule, manure_schedule, tillage_schedule
 
-    @staticmethod
-    def _setup_crop_schedules(crop_config: Dict) -> List[CropSchedule]:
+    def _setup_crop_schedules(self, crop_rotation: str) -> List[CropSchedule]:
         """
         Creates CropSchedules as dictated by the input specifications.
 
         Parameters
         ----------
-        crop_config : Dict
-            Contains all specifications for when crops should be planted and harvested.
+        crop_rotation : str
+            Name of the metadata blob that contains the crop rotation information.
 
         Returns
         -------
@@ -298,20 +297,24 @@ class FieldManager:
 
         """
         schedules = []
-        for schedule_name, specifications in crop_config.items():
-            if specifications.get("harvest_type") == "scheduled":
+        crop_rotation_data = im.get_data(f"{crop_rotation}.crop_schedules")
+
+        for index, rotation in enumerate(crop_rotation_data):
+            print(rotation)
+            if rotation.get("harvest_type") == "scheduled":
                 heat_scheduled_harvest = False
             else:
                 heat_scheduled_harvest = True
-            new_schedule = CropSchedule(name=schedule_name,
-                                        crop_reference=specifications.get("crop_reference"),
-                                        planting_years=specifications.get("plant_years"),
-                                        planting_days=specifications.get("planting_day"),
-                                        harvest_years=specifications.get("harvest_years"),
-                                        harvest_days=specifications.get("harvest_day"),
-                                        harvest_operations=specifications.get("harvest_operations"),
+            new_schedule = CropSchedule(name=f"crop_schedule_{index}",
+                                        crop_reference=rotation.get("crop_species"),
+                                        planting_years=rotation.get("planting_years"),
+                                        planting_days=rotation.get("planting_days"),
+                                        harvest_years=rotation.get("harvest_years"),
+                                        harvest_days=rotation.get("harvest_days"),
+                                        harvest_operations=rotation.get("harvest_operations"),
                                         use_heat_scheduling=heat_scheduled_harvest,
-                                        pattern_repeat=specifications.get("repeat"))
+                                        pattern_repeat=rotation.get("pattern_repeat"),
+                                        pattern_skip=rotation.get("pattern_skip"))
             schedules.append(new_schedule)
         return schedules
 

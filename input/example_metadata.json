@@ -984,16 +984,10 @@
             }
           },
           "harvest_type": {
-            "type": "array",
+            "type": "string",
             "description": "Whether the crop uses scheduled harvests or optimal harvests",
-            "default": [
-              "scheduled"
-            ],
-            "properties": {
-              "type": "string",
-              "pattern": "^(scheduled|optimal)$",
-              "default": "scheduled"
-            }
+            "default": "scheduled",
+            "pattern": "^(scheduled|optimal)$",
           },
           "planting_days": {
             "type": "array",
