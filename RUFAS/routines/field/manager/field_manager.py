@@ -358,7 +358,6 @@ class FieldManager:
         crop_rotation_data = im.get_data(f"{crop_rotation}.crop_schedules")
 
         for index, rotation in enumerate(crop_rotation_data):
-            print(rotation)
             if rotation.get("harvest_type") == "scheduled":
                 heat_scheduled_harvest = False
             else:
