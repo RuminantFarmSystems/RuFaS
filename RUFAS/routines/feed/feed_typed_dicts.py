@@ -41,3 +41,5 @@ class PurchasedFeedTypedDict(TypedDict):
     farm_grown_feeds: List
 
     storage_options: Dict[str, StorageOption]
+
+    user_defined_ration_percentages: Dict[str,float]
