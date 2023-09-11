@@ -343,6 +343,56 @@ def test_setup_fertilizer_schedule(fertilizer_schedule_data: Dict, expected_avai
         patched_get_data.assert_called_once_with("test_fert_schedule")
 
 
+@pytest.mark.parametrize("manure_schedule_data,expected_manure_schedule", [
+    ({
+         "years": [1990, 1992, 1993, 1996, 1997, 2000, 2001, 2004, 2005, 2008, 2009, 2012, 2013, 2016, 2017],
+         "days": [113, 335, 311, 311, 310, 315, 316, 316, 314, 310, 327, 304, 324, 280, 318],
+         "nitrogen_masses": [266, 266, 201, 207, 230, 279, 214, 244, 320, 169, 355, 163, 245, 66, 275],
+         "phosphorus_masses": [70, 70, 45, 36, 37, 50, 31, 48, 53, 20, 60, 29, 43, 30, 54],
+         "potassium_masses": [188, 188, 211, 164, 183, 198, 112, 156, 227, 167, 270, 128, 192, 86, 178],
+         "coverage_fractions": [0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1],
+         "application_depths": [150.0, 150.0, 150.0, 150.0, 150.0, 150.0, 150.0, 150.0, 150.0, 150.0, 150.0, 150.0,
+                                150.0, 150.0, 150.0],
+         "surface_remainder_fractions": [0.80, 0.80, 0.80, 0.80, 0.80, 0.80, 0.80, 0.80, 0.80, 0.80, 0.80, 0.80, 0.80,
+                                         0.80, 0.80],
+         "pattern_repeat": 0,
+         "pattern_skip": 0
+     }, ManureSchedule(name="manure_schedule",
+                       years=[1990, 1992, 1993, 1996, 1997, 2000, 2001, 2004, 2005, 2008, 2009, 2012, 2013, 2016, 2017],
+                       days=[113, 335, 311, 311, 310, 315, 316, 316, 314, 310, 327, 304, 324, 280, 318],
+                       nitrogen_masses=[266, 266, 201, 207, 230, 279, 214, 244, 320, 169, 355, 163, 245, 66, 275],
+                       phosphorus_masses=[70, 70, 45, 36, 37, 50, 31, 48, 53, 20, 60, 29, 43, 30, 54],
+                       field_coverages=[0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1],
+                       application_depths=[150.0, 150.0, 150.0, 150.0, 150.0, 150.0, 150.0, 150.0, 150.0, 150.0, 150.0,
+                                           150.0, 150.0, 150.0, 150.0],
+                       surface_remainder_fractions=[0.80, 0.80, 0.80, 0.80, 0.80, 0.80, 0.80, 0.80, 0.80, 0.80, 0.80,
+                                                    0.80, 0.80, 0.80, 0.80],
+                       pattern_repeat=0,
+                       pattern_skip=0)),
+    ({
+         "years": [2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2016],
+         "days": [200, 200, 200, 200, 200, 200, 200, 200, 200],
+         "nitrogen_masses": [1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000],
+         "phosphorus_masses": [500, 500, 500, 500, 500, 500, 500, 500, 500],
+         "potassium_masses": [0.0],
+         "coverage_fractions": [0.95, 0.95, 0.95, 0.95, 0.95, 0.95, 0.95, 0.95, 0.95],
+         "application_depths": [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
+         "surface_remainder_fractions": [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0],
+         "pattern_repeat": 0,
+         "pattern_skip": 0
+     }, ManureSchedule(name="manure_schedule", years=[2008], days=[200], nitrogen_masses=[1000],
+                       phosphorus_masses=[500], field_coverages=[0.95], application_depths=[0.0],
+                       surface_remainder_fractions=[1.0], pattern_repeat=8, pattern_skip=0))
+])
+def test_setup_manure_schedule(manure_schedule_data: Dict, expected_manure_schedule: ManureSchedule) -> None:
+    """Tests that ManureSchedules are correctly initialized with data from the InputManager."""
+    field_manager = FieldManager(MagicMock(ManureManager))
+    with patch("RUFAS.input_manager.InputManager.get_data", return_value=manure_schedule_data) as patched_get_data:
+        actual_manure_schedule = field_manager._setup_manure_schedule("test_manure_schedule")
+        assert actual_manure_schedule.generate_manure_events() == expected_manure_schedule.generate_manure_events()
+        patched_get_data.assert_called_once_with("test_manure_schedule")
+
+
 @pytest.mark.parametrize("crop_schedule_config,expected", [
     ([
          {"crop_species": "corn",
