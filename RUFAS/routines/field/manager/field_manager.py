@@ -26,8 +26,10 @@ im = InputManager()
 class FieldManager:
     def __init__(self, manure_manager: ManureManager):
         self.fields: List[Field] = []
-        # for field_name, field_config in fields_config.items():
-        #     self.fields.append(self._setup_field(field_name, field_config, manure_manager))
+        fields = FieldManager._get_field_blob_names()
+        for field in fields:
+            new_field = self._setup_field(field, manure_manager)
+            self.fields.append(new_field)
         self.output_gatherer = OutputGatherer(fields=self.fields)
 
     def daily_update_routine(self, weather, time) -> None:
@@ -147,7 +149,8 @@ class FieldManager:
                               irrigation=weather.irrigation[time.year - 1][time.day - 1],
                               daylength=daylength)
 
-    def _get_field_blob_names(self) -> List[str]:
+    @staticmethod
+    def _get_field_blob_names() -> List[str]:
         """
         Gets the names of each blob in the metadata that conforms to the field properties.
 
@@ -175,7 +178,8 @@ class FieldManager:
 
         return field_blob_names
 
-    def _setup_field(self, field_name: str, manure_manager: ManureManager) -> Field:
+    @staticmethod
+    def _setup_field(field_name: str, manure_manager: ManureManager) -> Field:
         """
 
         Parameters
@@ -201,19 +205,20 @@ class FieldManager:
         watering_interval = field_configuration_data.get("watering_interval")
 
         fertilizer_configuration = field_configuration_data.get("fertilizer_management_specification")
-        available_fertilizer_mixes, fertilizer_schedule = self._setup_fertilizer_schedule(fertilizer_configuration)
+        available_fertilizer_mixes, fertilizer_schedule = FieldManager._setup_fertilizer_schedule(
+            fertilizer_configuration)
         fertilizer_events = fertilizer_schedule.generate_fertilizer_events()
 
         manure_configuration = field_configuration_data.get("manure_management_specification")
-        manure_application_schedule = self._setup_manure_schedule(manure_configuration)
+        manure_application_schedule = FieldManager._setup_manure_schedule(manure_configuration)
         manure_events = manure_application_schedule.generate_manure_events()
 
         tillage_configuration = field_configuration_data.get("tillage_management_specification")
-        tillage_schedule = self._setup_tillage_schedule(tillage_configuration)
+        tillage_schedule = FieldManager._setup_tillage_schedule(tillage_configuration)
         tillage_events = tillage_schedule.generate_tillage_events()
 
         crop_rotation_configuration = field_configuration_data.get("crop_specification")
-        crop_schedules = self._setup_crop_schedules(crop_rotation_configuration)
+        crop_schedules = FieldManager._setup_crop_schedules(crop_rotation_configuration)
         all_planting_events = []
         all_harvest_events = []
         for schedule in crop_schedules:
@@ -221,7 +226,7 @@ class FieldManager:
             all_harvest_events += schedule.generate_harvest_events()
 
         soil_configuration = field_configuration_data.get("soil_specification")
-        soil_profile = self._setup_soil(soil_configuration, field_size)
+        soil_profile = FieldManager._setup_soil(soil_configuration, field_size)
 
         field_data = FieldData(name=field_name, field_size=field_size, absolute_latitude=absolute_latitude,
                                longitude=longitude, minimum_daylength=minimum_daylength,
@@ -233,7 +238,8 @@ class FieldManager:
                      fertilizer_mixes=available_fertilizer_mixes, manure_events=manure_events,
                      manure_manager=manure_manager)
 
-    def _setup_fertilizer_schedule(self, fertilizer_schedule: str) -> Tuple[Dict, FertilizerSchedule]:
+    @staticmethod
+    def _setup_fertilizer_schedule(fertilizer_schedule: str) -> Tuple[Dict, FertilizerSchedule]:
         """
         Sets up the fertilizer schedule and the list of available fertilizer mixes.
 
@@ -273,7 +279,8 @@ class FieldManager:
 
         return available_fertilizer_mixes, fertilizer_application_schedule
 
-    def _setup_manure_schedule(self, manure_schedule: str) -> ManureSchedule:
+    @staticmethod
+    def _setup_manure_schedule(manure_schedule: str) -> ManureSchedule:
         """
         Sets up a ManureSchedule.
 
@@ -303,7 +310,8 @@ class FieldManager:
         )
         return manure_schedule_instance
 
-    def _setup_tillage_schedule(self, tillage_schedule: str) -> TillageSchedule:
+    @staticmethod
+    def _setup_tillage_schedule(tillage_schedule: str) -> TillageSchedule:
         """
         Sets up a TillageSchedule.
 
@@ -331,7 +339,8 @@ class FieldManager:
         )
         return tillage_schedule_instance
 
-    def _setup_crop_schedules(self, crop_rotation: str) -> List[CropSchedule]:
+    @staticmethod
+    def _setup_crop_schedules(crop_rotation: str) -> List[CropSchedule]:
         """
         Creates CropSchedules as dictated by the input specifications.
 
@@ -368,7 +377,8 @@ class FieldManager:
             schedules.append(new_schedule)
         return schedules
 
-    def _setup_soil(self, soil_configuration: str, field_size: float) -> Soil:
+    @staticmethod
+    def _setup_soil(soil_configuration: str, field_size: float) -> Soil:
         """
         Sets up a Soil instance that will be used by the Field class.
 
@@ -399,8 +409,8 @@ class FieldManager:
                 top_depth = 0.0
             else:
                 top_depth = soil_layers[-1].bottom_depth
-            new_layer = self._setup_soil_layer(field_size, top_depth, sand_content, silt_content, residue,
-                                               nitrogen_mineralization_rate, layer_config)
+            new_layer = FieldManager._setup_soil_layer(field_size, top_depth, sand_content, silt_content, residue,
+                                                       nitrogen_mineralization_rate, layer_config)
             soil_layers.append(new_layer)
 
         config_dictionary = {"second_moisture_condition_parameter": soil_configuration_data.get("CN2"),
@@ -414,7 +424,8 @@ class FieldManager:
         soil_data = SoilData(field_size=field_size, **config_dictionary)
         return Soil(soil_data=soil_data)
 
-    def _setup_soil_layer(self, field_size: float, top_depth: float, sand: float, silt: float, initial_residue: float,
+    @staticmethod
+    def _setup_soil_layer(field_size: float, top_depth: float, sand: float, silt: float, initial_residue: float,
                           fresh_nitrogen_mineralization_rate: float, layer_config: Dict) -> LayerData:
         """
         Initializes a LayerData instance to be added to a SoilData object.
