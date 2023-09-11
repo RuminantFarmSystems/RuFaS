@@ -39,6 +39,22 @@ class Field:
                  fertilizer_mixes: Optional[Dict[str, Dict[str, float]]] = None,
                  manure_events: Optional[List[ManureEvent]] = None,
                  manure_manager: Optional[ManureManager] = None):
+        """This method initializes the related data fields that this module will work with, or create one if none
+        provided.
+
+        Args:
+            field_data: FieldData
+
+            soil:
+            plantings:
+            harvestings:
+            custom_crop_specifications:
+            tillage_events:
+            fertilizer_events:
+            fertilizer_mixes:
+            manure_events:
+            manure_manager:
+        """
         # field-wide attributes
         self.field_data = field_data or FieldData()
         """field data component"""
