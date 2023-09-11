@@ -1,0 +1,5528 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>&lt;no title&gt; &mdash; Ruminant Farm Simulation (RuFaS)  documentation</title>
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/sphinx_highlight.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            Ruminant Farm Simulation (RuFaS)
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules.html">GitHub</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules.html#design-documentation">Design Documentation</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">Ruminant Farm Simulation (RuFaS)</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">&lt;no title&gt;</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../../_sources/Design/Manure_Design/Pseudocode_manure_storage_2022_R1/228d05d7fd8146bc96e1b4fdd5eb8c8a.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <p>Manure Module</p>
+<blockquote>
+<div><div class="line-block">
+<div class="line"><strong>1. Model Structure</strong></div>
+<div class="line">a. Manure collection from pens</div>
+<div class="line">b. Manure handlers</div>
+<div class="line">c. Storage/treatment</div>
+<div class="line">d. Output</div>
+</div>
+<div class="line-block">
+<div class="line"><strong>2. Calibration</strong></div>
+<div class="line">TBC</div>
+</div>
+<div class="line-block">
+<div class="line"><strong>3. Manure Generation and Handling</strong></div>
+<div class="line">Contains equations from:</div>
+</div>
+</div></blockquote>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><div class="line-block">
+<div class="line">●</div>
+<div class="line">●</div>
+<div class="line">●</div>
+</div>
+</th>
+<th class="head"><blockquote>
+<div><div class="line-block">
+<div class="line">Manure
+collection from
+pens</div>
+<div class="line">Manure handlers</div>
+</div>
+</div></blockquote>
+<div class="line-block">
+<div class="line">Storage/treatment</div>
+</div>
+</th>
+<th class="head"></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td></td>
+<td><p>○</p></td>
+<td><p>Slurry storage -
+Underfloor and
+Outside</p></td>
+</tr>
+<tr class="row-odd"><td></td>
+<td><p>○</p></td>
+<td><p>Anaerobic
+Digestion</p></td>
+</tr>
+<tr class="row-even"><td></td>
+<td><p>○</p></td>
+<td><p>Lagoon system</p></td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<div><div class="line-block">
+<div class="line"><strong>A. Pens</strong></div>
+<div class="line">𝑇𝐴 = 𝐴𝑁𝑀𝐴 + 𝐴𝑁𝑀𝐵 + 𝐴𝑁𝑀𝐶 <strong>[MS.3.A.1]</strong></div>
+</div>
+<div class="line-block">
+<div class="line">TA = Total Animals</div>
+<div class="line">ANMi = Animal of type i</div>
+</div>
+</div></blockquote>
+<p>𝐶</p>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>𝑅𝑀 =</p></th>
+<th class="head"><p>∑ 𝐴𝑁𝑀𝑖 * 𝑀𝑁𝑅𝑖 𝑖=𝐴</p></th>
+<th class="head"><p><strong>[MS.3.A.2]</strong></p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td></td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<div><div class="line-block">
+<div class="line">RM = Raw Manure</div>
+<div class="line">MNRi = Manure generated by each animal of type i</div>
+</div>
+</div></blockquote>
+<p>𝐶</p>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>𝑇𝑆𝑒𝑥𝑐𝑟𝑒𝑡𝑒𝑑 =</p></th>
+<th class="head"><p>∑ 𝐴𝑁𝑀𝑖 * 𝑆𝑖 𝑖=𝐴</p></th>
+<th class="head"><p><strong>[MS.3.A.3]</strong></p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td></td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<div><div class="line-block">
+<div class="line">TSexcreted = Total Solids Excreted</div>
+<div class="line">Si = Solids excreted by each animal of type i</div>
+</div>
+<p>1</p>
+</div></blockquote>
+<p>Manure Module</p>
+<p>𝐶</p>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>𝑉𝑆𝑒𝑥𝑐𝑟𝑒𝑡𝑒𝑑 =</p></th>
+<th class="head"><p>∑ 𝐴𝑁𝑀𝑖 * 𝑉𝑆𝑖 𝑖=𝐴</p></th>
+<th class="head"><p><strong>[MS.3.A.4]</strong></p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td></td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<div><div class="line-block">
+<div class="line">VSexcreted = Volatile Solids Excreted</div>
+<div class="line">VSi = Volatile Solids excreted by each animal of type i</div>
+</div>
+<div class="line-block">
+<div class="line">Nutrients : Nutrient = [N, TAN, P2O5, K2O]</div>
+<div class="line">𝐶</div>
+</div>
+</div></blockquote>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>𝑁𝑢𝑡𝑟𝑖𝑒𝑛𝑡𝑒𝑥𝑐𝑟𝑒𝑡𝑒𝑑 =</p></th>
+<th class="head"><p>∑ 𝐴𝑁𝑀𝑖 * 𝑁𝑢𝑡𝑟𝑖𝑒𝑛𝑡𝑖 𝑖=𝐴</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p><strong>[MS.3.A.5]</strong></p>
+<blockquote>
+<div><div class="line-block">
+<div class="line">Nutrientexcreted = Nutrient Excreted</div>
+<div class="line">Nutrienti = Nutrient excreted by each animal of type i</div>
+</div>
+</div></blockquote>
+<p>𝐶</p>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>𝑇𝐴𝑁</p></th>
+<th class="head"><p>𝑒𝑥𝑐𝑟𝑒𝑡𝑒𝑑 =</p></th>
+<th class="head"><p>∑ 𝐴𝑁𝑀𝑖
+* 𝑇𝐴𝑁
+𝑖=𝐴</p></th>
+<th class="head"><p>𝑖</p></th>
+<th class="head"><blockquote>
+<div><p><a href="#id1"><span class="problematic" id="id2">**</span></a>[</p>
+</div></blockquote>
+<p>MS.3.A.6]**</p>
+</th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<div><div class="line-block">
+<div class="line">TANexcreted = TAN Excreted</div>
+<div class="line">TANi = TAN excreted by each animal of type i</div>
+</div>
+</div></blockquote>
+<p>𝐶</p>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>𝑃2𝑂5</p></th>
+<th class="head"><p>𝑒𝑥𝑐𝑟𝑒𝑡𝑒𝑑 =</p></th>
+<th class="head"><p>∑ 𝐴𝑁𝑀𝑖
+* 𝑃2𝑂5
+𝑖=𝐴</p></th>
+<th class="head"><p>𝑖</p></th>
+<th class="head"><blockquote>
+<div><p><a href="#id3"><span class="problematic" id="id4">**</span></a>[</p>
+</div></blockquote>
+<p>MS.3.A.7]**</p>
+</th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<div><div class="line-block">
+<div class="line">P2O5 excreted = P2O5 Excreted</div>
+<div class="line">P2O5 i = P2O5 excreted by each animal of type i</div>
+</div>
+</div></blockquote>
+<p>𝐶</p>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>𝐾2𝑂</p></th>
+<th class="head"><p>𝑒𝑥𝑐𝑟𝑒𝑡𝑒𝑑 =</p></th>
+<th class="head"><p>∑ 𝐴𝑁𝑀𝑖
+* 𝐾2𝑂
+𝑖=𝐴</p></th>
+<th class="head"><p>𝑖</p></th>
+<th class="head"><blockquote>
+<div><p><a href="#id5"><span class="problematic" id="id6">**</span></a>[</p>
+</div></blockquote>
+<p>MS.3.A.8]**</p>
+</th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<div><div class="line-block">
+<div class="line">K2O excreted = K2O Excreted</div>
+<div class="line">VSi = Volatile Solids excreted by each animal of type i</div>
+</div>
+<p><strong>I.</strong> <strong>Milking Center &amp; Holding Pen</strong></p>
+</div></blockquote>
+<p>Cleaning Method is always flushing</p>
+<blockquote>
+<div><p>𝐹𝑊 = 𝑊𝑉𝑓𝑙𝑢𝑠ℎ𝑖𝑛𝑔 * 𝑇𝐴 <strong>[MS.3.A.I.1]</strong></p>
+</div></blockquote>
+<p>FW = Fresh water volume</p>
+<p>WVflushing = Volume of water used in flushing per animal</p>
+<p><em>Manure Generated</em></p>
+<blockquote>
+<div><p>2</p>
+</div></blockquote>
+<p>Manure Module</p>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>𝑇𝑊𝑉𝑚𝑙𝑘 =</p></th>
+<th class="head"><div class="line-block">
+<div class="line">𝑅𝑀</div>
+<div class="line">ρ𝑚𝑎𝑢𝑟𝑒* τ𝑚𝑙𝑘*
+𝐹𝑊</div>
+</div>
+</th>
+<th class="head"><p><strong>[MS.3.A.I.2]</strong></p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td></td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<div><div class="line-block">
+<div class="line">TWVmlk = Total waste volume received in milking &amp; holding center
+ϱ𝑚𝑎𝑛𝑢𝑟𝑒 = Density of manure</div>
+<div class="line">τ𝑚𝑙𝑘 = Percentage daily time spent and milking &amp; holding center FW
+is in m3</div>
+</div>
+<p>𝑇𝑆𝑚𝑙𝑘 = 𝑇𝑆𝑒𝑥𝑐𝑟𝑒𝑡𝑒𝑑 * τ𝑚𝑙𝑘 <strong>[MS.3.A.I.3]</strong> TSmlk = Total solids from
+milking and holding center</p>
+<p>𝑉𝑆𝑚𝑙𝑘 = 𝑉𝑆𝑒𝑥𝑐𝑟𝑒𝑡𝑒𝑑 * τ𝑚𝑙𝑘 <strong>[MS.3.A.I.4]</strong> VSmlk = Volatile solids
+from milking and holding center</p>
+</div></blockquote>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>𝑁𝑢𝑡𝑟𝑖𝑒𝑛𝑡</p></th>
+<th class="head"><p>𝑚𝑙𝑘 = 𝑁𝑢𝑡𝑟𝑖𝑒𝑛𝑡</p></th>
+<th class="head"><p>𝑒𝑥𝑐𝑟𝑒𝑡𝑒𝑑* τ𝑚𝑙𝑘</p></th>
+<th class="head"><blockquote>
+<div><ul class="simple">
+<li></li>
+</ul>
+</div></blockquote>
+<p><em>[MS.3.A.I.5]*</em></p>
+</th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p>Nutrientmlk = Nutrient from milking and holding center</p>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p><strong>II.</strong></p></th>
+<th class="head"><p><strong>Cleaning = Flushing Scrape -
+FreeStall/TieStall</strong></p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Flushing system</strong></p>
+<blockquote>
+<div><div class="line-block">
+<div class="line">𝐹𝑊𝑉 = 𝑊𝑉𝑓𝑙𝑢𝑠ℎ𝑖𝑛𝑔 * 𝑇𝐴 <strong>[MS.3.A.II.1]</strong> FWV = Flush water volume</div>
+<div class="line">WVflushing = Volume of water used in flushing per animal</div>
+</div>
+</div></blockquote>
+<p><strong>Scrape system</strong></p>
+<blockquote>
+<div><div class="line-block">
+<div class="line">𝑆𝑊𝑉 = 𝑊𝑉𝑆𝑐𝑟𝑎𝑝𝑒 * 𝑇𝐴 <strong>[MS.3.A.II.2]</strong> SWV = Scrape water volume</div>
+<div class="line">WVflushing = Volume of water used in scraping per animal</div>
+</div>
+<p>3</p>
+</div></blockquote>
+<p>Manure Module</p>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p><strong>III.</strong></p></th>
+<th class="head"><p>𝐵𝑒𝑑𝑑𝑖𝑛𝑔 = 𝑆𝐵 | 𝑂𝐵</p></th>
+<th class="head"><blockquote>
+<div><p><a href="#id7"><span class="problematic" id="id8">**</span></a>-</p>
+</div></blockquote>
+<p>FreeStall/TieStall**</p>
+</th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td></td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<div><div class="line-block">
+<div class="line">SB = Sand Bedding</div>
+<div class="line">SD = Sawdust</div>
+<div class="line">MS = Manure solids</div>
+<div class="line">Bedding can be any of the above, not combinations in</div>
+<div class="line">any of the given pens.</div>
+</div>
+<p>bedding_mass_per_day: Amount of bedding needed for each animal per
+day, kg/animal/day.</p>
+</div></blockquote>
+<p>bedding_density: Density of the bedding, kg/m^3.</p>
+<blockquote>
+<div><p>bedding_dry_matter_content: Dry matter content of the bedding, [0.7 -
+1.0].</p>
+<p>bedding_cleaned_fraction: Fraction of bedding removed from the barn
+[0.7 - 1.0].</p>
+</div></blockquote>
+<p>bedding_type: Type of bedding.</p>
+<blockquote>
+<div><p>𝐵𝐷𝑀𝑃𝐷 = 𝐵𝐷𝑀𝑃𝐷𝐴 * 𝑇𝐴 <strong>[MS.3.A.III.1]</strong></p>
+<div class="line-block">
+<div class="line">BDMPD = Bedding mass per day (depends on selected bedding), Kg</div>
+<div class="line">BDMPDA = Bedding mass per day per animal, kg</div>
+</div>
+</div></blockquote>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"></th>
+<th class="head"><p>𝐵𝐷𝑀𝑃𝐷</p></th>
+<th class="head"></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>𝐵𝐷𝑉𝑃𝐷 =</p></td>
+<td><p>ρ𝑏𝑒𝑑𝑑𝑖𝑛𝑔</p></td>
+<td><p><strong>[MS.3.A.III.2]</strong></p></td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<div><div class="line-block">
+<div class="line">BDVPD = Bedding Volume per day, m^3</div>
+<div class="line">ϱ𝑏𝑒𝑑𝑑𝑖𝑛𝑔 = Density of selected bedding</div>
+</div>
+</div></blockquote>
+<p>𝐶𝐿𝑀 = 𝐹𝐿𝑆𝐻 | 𝑆𝐶𝑅𝑃</p>
+<blockquote>
+<div><div class="line-block">
+<div class="line">CLM = Cleaning method</div>
+<div class="line">FLSH = Flushing</div>
+</div>
+<p>4</p>
+</div></blockquote>
+<p>Manure Module</p>
+<blockquote>
+<div><div class="line-block">
+<div class="line">SCRP = Scraping</div>
+<div class="line">Cleaning method can either be flushing or scraping</div>
+</div>
+<p>𝑅𝐹𝑊 = 𝐶𝐿𝑀𝑣𝑜𝑙𝑢𝑚𝑒 * 𝑇𝐴 <strong>[MS.3.A.III.3]</strong></p>
+<div class="line-block">
+<div class="line">RFW = Total Volume of water from cleaning</div>
+<div class="line">CLMvolume = Volume of water per animal used for selected cleaning
+method</div>
+</div>
+<div class="line-block">
+<div class="line"><strong>IV.</strong> <strong>Sand Separation</strong></div>
+<div class="line"><strong>Sand lane</strong> | <strong>Mechanical Separators (</strong>Used if and only if
+the bedding used is SB)</div>
+<div class="line"><strong>Sand lane</strong></div>
+<div class="line">𝑆𝐷𝑀𝑠𝑒𝑝 = 𝐵𝐷𝑀𝑃𝐷 * ϵ𝑠𝑎𝑛𝑑−𝑠𝑒𝑝 <strong>[MS.3.A.IV.1]</strong></div>
+</div>
+<div class="line-block">
+<div class="line">SDMsep = Mass of sand separated (per day)</div>
+<div class="line">ϵ𝑠𝑎𝑛𝑑−𝑠𝑒𝑝 = Sand separation efficiency</div>
+</div>
+</div></blockquote>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"></th>
+<th class="head"></th>
+<th class="head"><p>𝐵𝐷𝑀𝑃𝐷 − 𝑆𝐷𝑀𝑠𝑒𝑝</p></th>
+<th class="head"></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>𝑆𝐷𝑉</p></td>
+<td><p>𝑟𝑒𝑚 =</p></td>
+<td><p>ρ𝑏𝑒𝑑𝑑𝑖𝑛𝑔</p></td>
+<td><p>**
+[MS.3.A.IV.2]**</p></td>
+</tr>
+</tbody>
+</table>
+<p>SDVrem = Volume of sand remaining after separation (per day)</p>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p><strong>V.</strong></p></th>
+<th class="head"><dl class="simple">
+<dt><a href="#id9"><span class="problematic" id="id10">**</span></a>CONTRIBUTIONS</dt><dd><p>FROM
+CLEANING
+(RFW)**</p>
+</dd>
+</dl>
+</th>
+<th class="head"></th>
+<th class="head"></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td></td>
+<td><p>𝑇𝑆𝑟𝑓𝑤 =</p></td>
+<td><p>𝑅𝐹𝑊*ε𝑇𝑆−𝑟𝑓𝑤</p></td>
+<td><ul class="simple">
+<li></li>
+</ul>
+<p><em>[MS.3.A.V.1]*</em></p>
+</td>
+</tr>
+<tr class="row-odd"><td></td>
+<td></td>
+<td><p>1000</p></td>
+<td></td>
+</tr>
+<tr class="row-even"><td></td>
+<td><p>𝑇𝑆𝑟𝑓𝑤 =
+Total Solids
+contribution
+from
+cleaning</p></td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p>ε𝑇𝑆−𝑟𝑓𝑤 = Proportion of RFW corresponding to Total solids</p>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"></th>
+<th class="head"><p>𝑅𝐹𝑊*ε𝑉𝑆−𝑟𝑓𝑤</p></th>
+<th class="head"></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>𝑉𝑆 =</p></td>
+<td><p>1000</p></td>
+<td><p><strong>[MS.3.A.V.2]</strong></p></td>
+</tr>
+<tr class="row-odd"><td><p>𝑉𝑆 = Volatile
+Solids
+contribution from
+cleaning</p></td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p>ε𝑉𝑆−𝑟𝑓𝑤 = Proportion of RFW corresponding to Volatile solids</p>
+<blockquote>
+<div><p>5</p>
+</div></blockquote>
+<p>Manure Module</p>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"></th>
+<th class="head"></th>
+<th class="head"><p>𝑅𝐹𝑊*ε𝑁𝑢𝑡𝑟𝑖𝑒𝑛𝑡−𝑟𝑓𝑤</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>𝑁𝑢𝑡𝑟𝑖𝑒𝑛𝑡</p></td>
+<td><p>𝑟𝑓𝑤=</p></td>
+<td><p>1000</p></td>
+</tr>
+</tbody>
+</table>
+<p><strong>[MS.3.A.V.3]</strong></p>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>𝑁𝑢𝑡𝑟𝑖𝑒𝑛𝑡</p></th>
+<th class="head"><p>𝑟𝑓𝑤=𝑁𝑢𝑡𝑟𝑖𝑒𝑛𝑡</p></th>
+<th class="head"><p>contribution
+from
+cleaning</p></th>
+<th class="head"></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>ε𝑁𝑢𝑡𝑟𝑖𝑒𝑛𝑡−𝑟𝑓𝑤 =
+Proportion of
+RFW
+corresponding
+to</p></td>
+<td></td>
+<td></td>
+<td><p>𝑁𝑢𝑡𝑟𝑖𝑒𝑛𝑡</p></td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<div><p><strong>TOTAL MANURE GENERATED (FROM PENS)</strong></p>
+</div></blockquote>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>𝑇𝑊𝑉ℎ𝑠𝑒 = (</p></th>
+<th class="head"><div class="line-block">
+<div class="line">𝑅𝑀</div>
+<div class="line">ρ𝑚𝑎𝑛𝑢𝑟𝑒* τ𝑓𝑟𝑠𝑡𝑎𝑙𝑙) + 𝑅𝐹𝑊 +
+𝑇𝑊𝑉𝑚𝑙𝑘+ 𝑆𝐷𝑉𝑟𝑒𝑚</div>
+</div>
+</th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p><strong>[MS.3.A.9]</strong></p>
+<p>TWVhse = Total waste volume generated from housing (both</p>
+<p>freestall and milking/holding centres)</p>
+<p>τ𝑓𝑟𝑠𝑡𝑎𝑙𝑙 = Percent daily time spent in freestall/tiestall</p>
+<p>All volumes in m3.</p>
+<blockquote>
+<div><p>𝑇𝑆𝑔𝑒𝑛 = 𝑇𝑆𝑒𝑥𝑐𝑟𝑒𝑡𝑒𝑑 * τ𝑓𝑟𝑠𝑡𝑎𝑙𝑙 + 𝑇𝑆𝑚𝑙𝑘 + 𝑇𝑆𝑟𝑓𝑤 <strong>[MS.3.A.10]</strong></p>
+</div></blockquote>
+<p>TSgen = Total solids generated</p>
+<blockquote>
+<div><p>𝑉𝑆𝑔𝑒𝑛 = 𝑉𝑆𝑒𝑥𝑐𝑟𝑒𝑡𝑒𝑑 * τ𝑓𝑟𝑠𝑡𝑎𝑙𝑙 + 𝑇𝑉 + 𝑉𝑆𝑟𝑓𝑤 <strong>[MS.3.A.11]</strong></p>
+</div></blockquote>
+<p>𝑉𝑆𝑔𝑒𝑛 = Total Volatile Solids generated</p>
+<p>𝑁𝑢𝑡𝑟𝑖𝑒𝑛𝑡𝑔𝑒𝑛 = 𝑁𝑢𝑡𝑟𝑖𝑒𝑛𝑡𝑒𝑥𝑐𝑟𝑒𝑡𝑒𝑑 * τ𝑓𝑟𝑠𝑡𝑎𝑙𝑙 + 𝑁𝑢𝑡𝑟𝑖𝑒𝑛𝑡𝑚𝑙𝑘 + 𝑁𝑢𝑡𝑟𝑖𝑒𝑛𝑡𝑟𝑓</p>
+<p><strong>[MS.3.A.12]</strong></p>
+<p>𝑁𝑢𝑡𝑟𝑖𝑒𝑛𝑡𝑔𝑒𝑛 = Total Nutrients generated</p>
+<blockquote>
+<div><p><strong>4. Storage</strong></p>
+</div></blockquote>
+<p><strong>B. Slurry Storage (SS)</strong></p>
+<blockquote>
+<div><p>6</p>
+</div></blockquote>
+<p>Manure Module</p>
+<p><strong>SS - Underfloor</strong></p>
+<blockquote>
+<div><p>𝑊𝑉𝑠𝑙𝑢𝑟𝑟𝑦 = 𝑊𝑊𝑉𝑠𝑙𝑢𝑟𝑟𝑦 − 𝐹𝑅𝑠𝑡𝑟𝑔 <strong>[MS.4.B.1]</strong></p>
+</div></blockquote>
+<p>𝑊𝑉𝑠𝑙𝑢𝑟𝑟𝑦 𝑠𝑡𝑟𝑔 = Waste Volume of Slurry storage (includes manure</p>
+<p>and bedding)</p>
+<p>𝑊𝑊𝑉𝑠𝑙𝑢𝑟𝑟𝑦 𝑠𝑡𝑟𝑔 = Waste Water Volume loaded into Slurry storage</p>
+<p>used for cleaning</p>
+<p>𝐹𝑅𝑠𝑙𝑢𝑟𝑟𝑦 𝑠𝑡𝑟𝑔 = Flushing Volume Recycled to Slurry storage</p>
+<blockquote>
+<div><p>𝑇𝑉𝑠𝑡𝑟𝑔 = 𝑊𝑊𝑉𝑠𝑡𝑟𝑔 + 𝑊𝑉𝑠𝑡𝑟𝑔 * ℎ𝑟𝑡𝑠𝑡𝑟𝑔 <strong>[MS.4.B.2]</strong></p>
+</div></blockquote>
+<p>𝑇𝑉𝑠𝑡𝑟𝑔 = Total Volume of Slurry storage</p>
+<p>ℎ𝑟𝑡𝑠𝑡𝑟𝑔 = Hydraulic Retention Time of Slurry storage, days</p>
+<p><strong>SS - Outdoor</strong></p>
+<blockquote>
+<div><p>𝑊𝑉𝑠𝑙𝑢𝑟𝑟𝑦 = 𝑊𝑊𝑉𝑠𝑙𝑢𝑟𝑟𝑦 − 𝐹𝑅𝑠𝑡𝑟𝑔 <strong>[MS.4.B.3]</strong></p>
+</div></blockquote>
+<p>𝑊𝑉𝑠𝑙𝑢𝑟𝑟𝑦 𝑠𝑡𝑟𝑔 = Waste Volume of Slurry storage (includes manure</p>
+<p>and bedding)</p>
+<p>𝑊𝑊𝑉𝑠𝑙𝑢𝑟𝑟𝑦 𝑠𝑡𝑟𝑔 = Waste Water Volume loaded into Slurry storage</p>
+<p>used for cleaning</p>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>𝐹𝑅𝑠𝑙𝑢𝑟𝑟𝑦 𝑠𝑡𝑟𝑔 =</p></th>
+<th class="head"><p>Flushing Volume
+Recycled to Slurry
+storage</p></th>
+<th class="head"></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>𝑇𝑉𝑠𝑡𝑟𝑔 = 𝑊𝑊𝑉𝑠𝑡𝑟𝑔 +
+𝑊𝑉𝑠𝑡𝑟𝑔 * ℎ𝑟𝑡𝑠𝑡𝑟𝑔
++ 𝑅𝐹 + 𝐹𝐵</p></td>
+<td></td>
+<td><p><strong>[MS.4.B.4]</strong></p></td>
+</tr>
+<tr class="row-odd"><td><p>𝑇𝑉𝑠𝑡𝑟𝑔 = Total
+Volume of Slurry
+storage</p></td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p>ℎ𝑟𝑡𝑠𝑡𝑟𝑔 = Hydraulic Retention Time of Slurry storage, days</p>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><div class="line-block">
+<div class="line">𝑅𝐹 =</div>
+<div class="line">𝐹𝐵 =</div>
+</div>
+</th>
+<th class="head"><p>Total Rainfall Volume added,
+m^3 Free Board volume, m^3</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<div><p>7</p>
+</div></blockquote>
+<p>Manure Module</p>
+<p><strong>C. Anaerobic Digestion</strong></p>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"></th>
+<th class="head"><p>𝑉𝑆𝑎𝑛𝑑𝑖𝑔−𝑙𝑑</p></th>
+<th class="head"></th>
+<th class="head"></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>𝑆𝐴𝑉𝑎𝑛𝑑𝑖𝑔 =</p></td>
+<td><p>ρ𝑤𝑎𝑡𝑒𝑟</p></td>
+<td><p>* δ𝑠𝑙𝑑 *
+τ𝑠𝑙𝑑 * 𝐷𝑦𝑟</p></td>
+<td><p><strong>[MS.4.C.1]</strong></p></td>
+</tr>
+<tr class="row-odd"><td><p>𝑆𝐴𝑉𝑎𝑛𝑑𝑖𝑔 =
+Sludge
+accumulation
+volume of
+anaerobic
+digester</p></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p>𝑉𝑆𝑎𝑛𝑑𝑖𝑔−𝑙𝑑 = Volatile solids loaded (into Anaerobic Digester)</p>
+<p>δ𝑠𝑙𝑑 = Sludge accumulation rate (in anaerobic digester)</p>
+<p>τ𝑠𝑙𝑑 = Sludge accumulation period ( in anaerobic digester)</p>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>ρ𝑤𝑎𝑡𝑒𝑟 = Density of
+water (in kg/m3)</p></th>
+<th class="head"></th>
+<th class="head"><p><strong>[MS.4.C.2]</strong></p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>𝐷𝑦𝑟 = Days in a year</p></td>
+<td><p>≈ 365</p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>𝑀𝑉𝑇𝑎𝑛𝑑𝑖𝑔 = 𝑊𝑊𝑉𝑎𝑛𝑑𝑖𝑔
+* ℎ𝑟𝑡𝑎𝑛𝑑𝑖𝑔</p></td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p>𝑀𝑉𝑇𝑎𝑛𝑑𝑖𝑔 = Minimum Volume Treatment (in anaerobic digester)</p>
+<p>𝑊𝑊𝑉𝑎𝑛𝑑𝑖𝑔 = Waste water volume loaded into anaerobic digester</p>
+<p>ℎ𝑟𝑡𝑎𝑛𝑑𝑖𝑔 = Hydraulic Retention Time anaerobic digester</p>
+<blockquote>
+<div><p>𝑇𝐶𝑉𝑎𝑛𝑑𝑖𝑔 = ε𝑇𝐶𝑉 * 𝑀𝑉𝑇𝑎𝑛𝑑𝑖𝑔 <strong>[MS.4.C.3]</strong></p>
+</div></blockquote>
+<p>𝑇𝐶𝑉𝑎𝑛𝑑𝑖𝑔 = Top cover volume</p>
+<p>ε𝑇𝐶𝑉 = Percentage of MVT corresponding to TCV</p>
+<blockquote>
+<div><p>𝑉𝑎𝑛𝑑𝑖𝑔 = 𝑀𝑉𝑇𝑎𝑛𝑑𝑖𝑔 + 𝑇𝐶𝑉𝑎𝑛𝑑𝑖𝑔 + 𝑆𝐴𝑉𝑎𝑛𝑑𝑖𝑔 <strong>[MS.4.C.4]</strong></p>
+</div></blockquote>
+<p>𝑉𝑎𝑛𝑑𝑖𝑔 = Digester Volume of anaerobic lagoon</p>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"></th>
+<th class="head"><p>𝑉𝑆𝑎𝑛𝑑𝑖𝑔−𝑙𝑑</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>δ𝑣𝑠𝑙−𝑎𝑛𝑑𝑖𝑔 =</p></td>
+<td><p>𝑉𝑎𝑛𝑑𝑖𝑔</p></td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<div><p><strong>[MS.3.C.5]</strong></p>
+</div></blockquote>
+<p>δ𝑣𝑠𝑙−𝑎𝑛𝑑𝑖𝑔 = VS loading rate for andig</p>
+<blockquote>
+<div><p>8</p>
+</div></blockquote>
+<p>Manure Module</p>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>𝐵𝐺𝑔𝑒𝑛 = ε 𝑏𝑔𝑔𝑒𝑛</p></th>
+<th class="head"><p>* 𝑉𝑆𝑎𝑛𝑑𝑖𝑔−𝑙𝑑</p></th>
+<th class="head"><p><strong>[MS.4.C.6]</strong></p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td></td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p>𝐵𝐺𝑔𝑒𝑛 = Biogas generated in anaerobic lagoon</p>
+<p>ε𝑏𝑔𝑔𝑒𝑛 = Biogas generation rate (percentage)</p>
+<p>𝐶𝐻4𝑔𝑒𝑛 = ϵ𝐶𝐻4𝑔𝑒𝑛 * 𝐵𝐺𝑔𝑒𝑛</p>
+<blockquote>
+<div><p><strong>[MS.4.C.7]</strong></p>
+</div></blockquote>
+<p>𝐶𝐻4𝑔𝑒𝑛 = Methane generated in anaerobic digester</p>
+<p>ε𝐶𝐻4𝑔𝑒𝑛 = Methane generation rate (percentage)</p>
+<p><strong>EFFLUENT FROM ANAEROBIC DIGESTER</strong></p>
+<blockquote>
+<div><p>𝑊𝑊𝑉𝑒𝑓𝑓−𝑎𝑛𝑑𝑖𝑔 = 𝑊𝑊𝑉𝑎𝑛𝑑𝑖𝑔 <strong>[MS.4.C.8]</strong></p>
+</div></blockquote>
+<p>𝑊𝑊𝑉𝑒𝑓𝑓−𝑎𝑛𝑑𝑖𝑔 = Effluent Waste Volume</p>
+<p>𝑇𝑆𝑒𝑓𝑓−𝑎𝑛𝑑𝑖𝑔 = 𝑇𝑆𝑎𝑛𝑑𝑖𝑔 * (1 − ε𝑇𝑆𝑙𝑜𝑠𝑠−𝑎𝑛𝑑𝑖𝑔)</p>
+<blockquote>
+<div><p>𝑇𝑆𝑒𝑓𝑓−𝑎𝑛𝑑𝑖𝑔 = Effluent Total Solid <strong>[MS.4.C.9]</strong></p>
+</div></blockquote>
+<p>𝑇𝑆𝑎𝑛𝑑𝑖𝑔 = Total solids loaded into Anaerobic Digester</p>
+<p>ε𝑇𝑆𝑙𝑜𝑠𝑠−𝑎𝑛𝑑𝑖𝑔 = Percentage of loaded TS lost</p>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>𝑉𝑆</p></th>
+<th class="head"><p>𝑒𝑓𝑓−𝑎𝑛𝑑𝑖𝑔= 𝑉𝑆</p></th>
+<th class="head"><blockquote>
+<div><p>𝑎𝑛𝑑𝑖𝑔* (1 −</p>
+</div></blockquote>
+<p>ε𝑉𝑆𝑙𝑜𝑠𝑠−𝑎𝑛𝑑𝑖𝑔)</p>
+</th>
+<th class="head"><p><strong>[MS.4.C.10]</strong></p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p>𝑉𝑆𝑒𝑓𝑓−𝑎𝑛𝑑𝑖𝑔 = Effluent Volatile Solid</p>
+<p>𝑉𝑆𝑎𝑛𝑑𝑖𝑔 = Total volatile solids loaded into Anaerobic Digester</p>
+<p>ε𝑉𝑆𝑙𝑜𝑠𝑠−𝑎𝑛𝑑𝑖𝑔 = Percentage of loaded VS lost</p>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>𝑁𝑢𝑡𝑟𝑖𝑒𝑛𝑡</p></th>
+<th class="head"><p>𝑒𝑓𝑓−𝑎𝑛𝑑𝑖𝑔= 𝑁𝑢𝑡𝑟𝑖𝑒𝑛𝑡</p></th>
+<th class="head"><p>𝑎𝑛𝑑𝑖𝑔* (1 −
+ε𝑇𝑆𝑙𝑜𝑠𝑠−𝑎𝑛𝑑𝑖𝑔)</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td></td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p><strong>[MS.4.C.11]</strong></p>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>𝑁
+𝑢𝑡𝑟𝑖𝑒𝑛𝑡</p></th>
+<th class="head"><p>𝑒𝑓𝑓
+−𝑎𝑛𝑑𝑖𝑔=
+E
+ffluent</p></th>
+<th class="head"></th>
+<th class="head"><blockquote>
+<div><p>𝑁</p>
+</div></blockquote>
+<p>𝑢𝑡𝑟𝑖𝑒𝑛𝑡</p>
+</th>
+<th class="head"></th>
+<th class="head"></th>
+<th class="head"></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>𝑁
+𝑢𝑡𝑟𝑖𝑒𝑛𝑡</p></td>
+<td><p>𝑎𝑛𝑑𝑖𝑔=
+Total</p></td>
+<td><p>𝑁
+𝑢𝑡𝑟𝑖𝑒𝑛𝑡</p></td>
+<td></td>
+<td><blockquote>
+<div><dl class="simple">
+<dt>loaded</dt><dd><p>into
+An</p>
+</dd>
+</dl>
+</div></blockquote>
+<dl class="simple">
+<dt>aerobic</dt><dd><p>D</p>
+</dd>
+</dl>
+<p>igester</p>
+</td>
+<td></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>ε𝑁𝑢𝑡𝑟
+𝑖𝑒𝑛𝑡𝑙𝑜𝑠
+𝑠−𝑎𝑛𝑑𝑖𝑔
+=
+Per
+centage
+of
+loaded</p></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td><p>𝑁
+𝑢𝑡𝑟𝑖𝑒𝑛𝑡</p></td>
+<td><p>lost</p></td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<div><p>9</p>
+</div></blockquote>
+<p>Manure Module</p>
+<blockquote>
+<div><p>Contains equations from:</p>
+<p><strong>D. Anaerobic Lagoon</strong></p>
+<p>𝑅𝑉𝑙𝑎𝑔 = 𝑊𝑊𝑉𝑙𝑎𝑔 − 𝐹𝑅𝑙𝑎𝑔 <strong>[MS.4.D.1]</strong></p>
+</div></blockquote>
+<p>𝑅𝑉𝑙𝑎𝑔 = Reduced Volume of Anaerobic Lagoon</p>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>𝑊𝑊𝑉𝑙𝑎𝑔 = Waste
+Water Volume
+loaded into
+Anaerobic Lagoon</p></th>
+<th class="head"></th>
+<th class="head"></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>𝐹𝑅𝑙𝑎𝑔 =</p></td>
+<td><p>Flushing Volume
+Recycled to
+Anaerobic Lagoon</p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>𝑉𝐿𝑅 =</p></td>
+<td><p>𝑉𝑆𝑙𝑜𝑎𝑑𝑖𝑛𝑔−𝑙𝑎𝑔</p></td>
+<td><p><strong>[MS.4.D.2]</strong></p></td>
+</tr>
+<tr class="row-even"><td></td>
+<td><p>𝑊𝑊𝑉𝑙𝑎𝑔* ℎ𝑟𝑡𝑙𝑎𝑔</p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>𝑉𝐿𝑅 = Volumetric
+Loading Rate of
+Anaerobic Lagoon</p></td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p>𝑉𝑆𝑙𝑜𝑎𝑑𝑖𝑛𝑔−𝑙𝑎𝑔 = Volume Volatile Solids loaded into Anaerobic Lagoon</p>
+<p>ℎ𝑟𝑡𝑙𝑎𝑔 = Hydraulic Retention Time of Anaerobic Lagoon</p>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>𝑀𝑇𝑉𝑙𝑎𝑔 = 𝑊𝑊𝑉𝑙𝑎𝑔 + (𝑅𝑉𝑙𝑎𝑔 *
+ℎ𝑟𝑡𝑙𝑎𝑔)</p></th>
+<th class="head"><p><strong>[MS.4.D.4]</strong></p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>𝑀𝑇𝑉𝑙𝑎𝑔 = Minimum Treatment
+Volume of Anaerobic Lagoon</p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>𝑆𝐴𝑉𝑙𝑎𝑔 = 𝑇𝑆𝑙𝑎𝑔 * 𝑆𝑙𝑑𝑝𝑇𝑆 * τ𝑆𝑙𝑑
+* τ𝑦𝑟</p></td>
+<td><p><strong>[MS.4.D.5]</strong></p></td>
+</tr>
+</tbody>
+</table>
+<p>𝑆𝐴𝑉𝑙𝑎𝑔 = Sludge Accumulation Volume of Anaerobic Lagoon</p>
+<p>𝑇𝑆𝑙𝑎𝑔 = Total Solids loaded into Anaerobic Lagoon</p>
+<p>𝑆𝑙𝑑𝑝𝑇𝑆 = Sludge per Total Solids</p>
+<p>τ𝑆𝑙𝑑 = Sludge Accumulation Period in years</p>
+<p>τ𝑦𝑟 = Number of days in a year</p>
+<p>𝑇𝑉𝑙𝑎𝑔 = 𝑀𝑇𝑉𝑙𝑎𝑔 + 𝑆𝐴𝑉𝑙𝑎𝑔</p>
+<p><strong>[MS.4.D.6]</strong></p>
+<p>𝑇𝑉𝑙𝑎𝑔 = Total Lagoon Volume</p>
+<p><strong>GAS EMISSION</strong></p>
+<blockquote>
+<div><p>10</p>
+</div></blockquote>
+<p>Manure Module</p>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"></th>
+<th class="head"><p>𝑁𝑖𝑛𝑝−𝑙𝑎𝑔</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>∆𝑁−𝑒𝑥𝑐𝑟−𝑑𝑎𝑖𝑙𝑦 =</p></td>
+<td><p>𝑇𝐴</p></td>
+</tr>
+</tbody>
+</table>
+<p>∆𝑁−𝑒𝑥𝑐𝑟−𝑑𝑎𝑖𝑙𝑦 = Daily Nitrogen Excretion Rate</p>
+<p>𝑁𝑖𝑛𝑝−𝑙𝑎𝑔 = Total Nitrogen produced</p>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p><strong>I.</strong></p>
+<p><strong>II.</strong></p>
+</th>
+<th class="head"><div class="line-block">
+<div class="line"><strong>DIRECT</strong></div>
+<div class="line"><strong>INDIRECT</strong></div>
+</div>
+</th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p><strong>LAGOON EFFLUENT</strong></p>
+<p>𝑊𝑊𝑉𝑒𝑓𝑓−𝑙𝑎𝑔 = 𝑀𝑉𝑇𝑙𝑎𝑔</p>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>𝑇𝑆𝑒𝑓𝑓−𝑙𝑎𝑔 =</p></th>
+<th class="head"><div class="line-block">
+<div class="line">𝑇𝑆𝑙𝑎𝑔</div>
+<div class="line">𝑊𝑊𝑉(1 − ε𝑇𝑆−𝑒𝑓𝑓−𝑙𝑎𝑔)</div>
+</div>
+</th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p>𝑇𝑆𝑒𝑓𝑓−𝑙𝑎𝑔 = Total Solid Effluent from Anaerobic Lagoon, in g/L</p>
+<p>ε𝑇𝑆−𝑒𝑓𝑓−𝑙𝑎𝑔 = Total Solid effluent rate Anaerobic Lagoon</p>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"></th>
+<th class="head"><p>𝑉𝑆𝑙𝑜𝑎𝑑𝑖𝑛𝑔−𝑙𝑎𝑔</p></th>
+<th class="head"></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>𝑉𝑆𝑒𝑓𝑓−𝑙𝑎𝑔 =</p></td>
+<td><p>𝑊𝑊𝑉</p></td>
+<td><p>(1 − ε𝑉𝑆−𝑒𝑓𝑓−𝑙𝑎𝑔)</p></td>
+</tr>
+</tbody>
+</table>
+<p>𝑉𝑆𝑒𝑓𝑓−𝑙𝑎𝑔 = Total Volatile Solid Effluent from Anaerobic Lagoon, in g/L</p>
+<p>ε𝑉𝑆−𝑒𝑓𝑓−𝑙𝑎𝑔 = Volatile Solid effluent rate in Anaerobic Lagoon</p>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"></th>
+<th class="head"><p>𝑒𝑓𝑓−
+𝑙𝑎𝑔=</p></th>
+<th class="head"></th>
+<th class="head"><p>𝑁𝑢𝑡𝑟
+𝑖𝑒𝑛𝑡</p></th>
+<th class="head"></th>
+<th class="head"></th>
+<th class="head"><p>𝑙𝑎𝑔</p></th>
+<th class="head"><blockquote>
+<div><dl class="simple">
+<dt>(1</dt><dd><p>−</p>
+</dd>
+</dl>
+<p>ε𝑁</p>
+</div></blockquote>
+<p>𝑢𝑡𝑟𝑖
+𝑒𝑛𝑡−
+𝑒𝑓𝑓−
+𝑙𝑎𝑔)</p>
+</th>
+<th class="head"></th>
+<th class="head"></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>𝑁𝑢𝑡𝑟
+𝑖𝑒𝑛𝑡</p></td>
+<td></td>
+<td></td>
+<td><p>𝑊𝑊𝑉</p></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>𝑁𝑢𝑡𝑟
+𝑖𝑒𝑛𝑡</p></td>
+<td><p>𝑒𝑓𝑓−
+𝑙𝑎𝑔=
+T
+otal</p></td>
+<td></td>
+<td></td>
+<td></td>
+<td><p>𝑁𝑢𝑡𝑟
+𝑖𝑒𝑛𝑡</p></td>
+<td></td>
+<td></td>
+<td></td>
+<td><dl class="simple">
+<dt>from</dt><dd><p>A</p>
+</dd>
+</dl>
+<p>naer
+obic</p>
+<blockquote>
+<div><p>Lag</p>
+</div></blockquote>
+<p>oon,</p>
+<blockquote>
+<div><blockquote>
+<div><p>in</p>
+</div></blockquote>
+<p>g/L</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="row-even"><td><p>ε
+𝑁𝑢𝑡𝑟
+𝑖𝑒𝑛𝑡
+−𝑒𝑓𝑓
+−𝑙𝑎𝑔
+=
+T
+otal</p></td>
+<td></td>
+<td></td>
+<td></td>
+<td><p>𝑁𝑢𝑡𝑟
+𝑖𝑒𝑛𝑡</p></td>
+<td></td>
+<td></td>
+<td></td>
+<td><p>effl
+uent</p>
+<p>rate</p>
+</td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>𝑁𝑢𝑡
+𝑟𝑖𝑒𝑛
+𝑡𝑙𝑎𝑔
+=
+T
+otal</p></td>
+<td></td>
+<td><p>𝑁𝑢𝑡𝑟
+𝑖𝑒𝑛𝑡</p>
+<blockquote>
+<div><p>Lo</p>
+</div></blockquote>
+<p>aded</p>
+<p>into</p>
+<blockquote>
+<div><dl class="simple">
+<dt>the</dt><dd><p>A</p>
+</dd>
+</dl>
+</div></blockquote>
+<p>naer
+obic</p>
+<blockquote>
+<div><p>La</p>
+</div></blockquote>
+<p>goon</p>
+</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p><strong>LAGOON SLUDGE NUTRIENT VALUE</strong></p>
+<p>𝑇𝑆𝑙𝑎𝑔−𝑣𝑎𝑙 = δ𝑇𝑆−𝑙𝑎𝑔 * 𝑆𝐴𝑉𝑙𝑎𝑔</p>
+<p>𝑇𝑆𝑙𝑎𝑔−𝑣𝑎𝑙 <strong>=</strong> Nutrient Value of Total Solid</p>
+<p>δ𝑇𝑆−𝑙𝑎𝑔 = Value of Total Solids in grams, per liter of TS</p>
+<blockquote>
+<div><p>11</p>
+</div></blockquote>
+<p>Manure Module</p>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>𝑁𝑢𝑡𝑟𝑖𝑒𝑛𝑡</p></th>
+<th class="head"><blockquote>
+<div><dl class="simple">
+<dt>𝑙𝑎𝑔−𝑣𝑎𝑙</dt><dd><p>=
+δ𝑁𝑢𝑡𝑟𝑖</p>
+</dd>
+</dl>
+</div></blockquote>
+<dl class="simple">
+<dt>𝑒𝑛𝑡−𝑙𝑎𝑔*</dt><dd><p>𝑆𝐴𝑉𝑙𝑎𝑔</p>
+</dd>
+</dl>
+</th>
+<th class="head"></th>
+<th class="head"></th>
+<th class="head"></th>
+<th class="head"><p>𝑁𝑢𝑡𝑟𝑖𝑒𝑛𝑡</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>𝑁𝑢𝑡𝑟𝑖𝑒𝑛𝑡</p></td>
+<td><blockquote>
+<div><p><strong>=</strong></p>
+</div></blockquote>
+<dl>
+<dt>Nutrient</dt><dd><blockquote>
+<div><p>Value
+of</p>
+</div></blockquote>
+<p>𝑙𝑎𝑔−𝑣𝑎𝑙</p>
+</dd>
+</dl>
+</td>
+<td></td>
+<td></td>
+<td><p>𝑁𝑢𝑡𝑟𝑖𝑒𝑛𝑡</p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>δ𝑁𝑢𝑡
+𝑟𝑖𝑒𝑛𝑡−𝑙𝑎𝑔
+= Value
+of</p></td>
+<td></td>
+<td><p>𝑁𝑢𝑡𝑟𝑖𝑒𝑛𝑡</p></td>
+<td><p>in grams,
+per liter
+of</p></td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<div><p><strong>5. Separator (MECHANICAL SEPARATOR)</strong></p>
+<p>Contains equations from Solid Liquid Separation</p>
+</div></blockquote>
+<p><strong>A. REMOVAL</strong></p>
+<blockquote>
+<div><p>𝑇𝑆𝑟𝑒𝑚−𝑠𝑙𝑠 = 𝑇𝑆𝑠𝑙𝑠 * ε𝑇𝑆−𝑠𝑙𝑠 <strong>[MS.5.A.1]</strong></p>
+</div></blockquote>
+<p>𝑇𝑆𝑟𝑒𝑚−𝑠𝑙𝑠 = Total Solids removed in Solid Liquid Separator (SLS)</p>
+<p>𝑇𝑆𝑠𝑙𝑠 = Total solids put into Solid Liquid Separator</p>
+<p>ε𝑇𝑆−𝑠𝑙𝑠 = Total Solids separation efficiency</p>
+<blockquote>
+<div><p>𝑉𝑆 𝑟𝑒𝑚−𝑠𝑙𝑠= 𝑉𝑆 𝑠𝑙𝑠* ε𝑉𝑆−𝑠𝑙𝑠 <strong>[MS.5.A.2]</strong></p>
+<p>𝑉𝑆 𝑟𝑒𝑚−𝑠𝑙𝑠= Volatile Solids removed in Solid Liquid Separator (SLS)</p>
+</div></blockquote>
+<p>𝑉𝑆𝑠𝑙𝑠 = Volatile solids put into Solid Liquid Separator</p>
+<p>ε𝑉𝑆−𝑠𝑙𝑠 = Volatile Solids separation efficiency</p>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>𝑁𝑢𝑡𝑟𝑖𝑒𝑛𝑡</p></th>
+<th class="head"><p>𝑟𝑒𝑚−𝑠𝑙𝑠= 𝑁𝑢𝑡𝑟𝑖𝑒𝑛𝑡</p></th>
+<th class="head"><p>𝑠𝑙𝑠*
+ε𝑁𝑢𝑡𝑟𝑖𝑒𝑛𝑡−𝑠𝑙𝑠</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td></td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p><strong>[MS.5.A.3]</strong></p>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>𝑁𝑢𝑡𝑟𝑖𝑒𝑛𝑡</p></th>
+<th class="head"><p>𝑟𝑒𝑚−𝑠𝑙𝑠=𝑁𝑢𝑡𝑟𝑖𝑒𝑛𝑡</p></th>
+<th class="head"><p>removed in Solid
+Liquid Separator</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td></td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p>(SLS)</p>
+<blockquote>
+<div><p>𝑁𝑢𝑡𝑟𝑖𝑒𝑛𝑡 𝑠𝑙𝑠=𝑁𝑢𝑡𝑟𝑖𝑒𝑛𝑡 put into Solid Liquid Separator</p>
+</div></blockquote>
+<p>ε𝑁𝑢𝑡𝑟𝑖𝑒𝑛𝑡−𝑠𝑙𝑠 =𝑁𝑢𝑡𝑟𝑖𝑒𝑛𝑡 separation efficiency</p>
+<p><strong>B. EFFLUENT SOLID</strong></p>
+<blockquote>
+<div><p>𝑇𝑆𝑒𝑓𝑓−𝑠−𝑠𝑙𝑠 = 𝑇𝑆𝑟𝑒𝑚−𝑠𝑙𝑠 <strong>[MS.5.B.1]</strong></p>
+</div></blockquote>
+<p>𝑇𝑆𝑒𝑓𝑓−𝑠−𝑠𝑙𝑠 = Effluent Dry Total Solid from Solid Liquid Separator</p>
+<blockquote>
+<div><p>12</p>
+</div></blockquote>
+<p>Manure Module</p>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>𝑉𝑆</p></th>
+<th class="head"><p>𝑒𝑓𝑓−𝑠−𝑠𝑙𝑠=
+𝑉𝑆𝑟𝑒𝑚−𝑠𝑙𝑠</p></th>
+<th class="head"><p><strong>[MS.5.B.2]</strong></p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td></td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p>𝑉𝑆𝑒𝑓𝑓−𝑠−𝑠𝑙𝑠 = Effluent Dry Volatile Solid from Solid Liquid Separator</p>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>𝑁𝑢𝑡𝑟𝑖𝑒𝑛𝑡</p></th>
+<th class="head"><blockquote>
+<div><p>𝑒𝑓𝑓−𝑠−𝑠𝑙𝑠=</p>
+</div></blockquote>
+<p>𝑁𝑢𝑡𝑟𝑖𝑒𝑛𝑡𝑟𝑒𝑚−𝑠𝑙𝑠</p>
+</th>
+<th class="head"></th>
+<th class="head"><p><strong>[MS.5.B.3]</strong></p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>𝑁𝑢𝑡𝑟𝑖𝑒𝑛𝑡</p></td>
+<td><p>𝑒𝑓𝑓−𝑠−𝑠𝑙𝑠=
+Effluent Dry</p></td>
+<td><p>𝑁𝑢𝑡𝑟𝑖𝑒𝑛𝑡</p></td>
+<td><p>from Solid
+Liquid</p></td>
+</tr>
+</tbody>
+</table>
+<p>Separator</p>
+<p>𝑊𝑊𝑀𝑒𝑓𝑓−𝑠−𝑠𝑙𝑠 = =</p>
+<p><strong>C. EFFLUENT LIQUID</strong></p>
+<blockquote>
+<div><p>𝑉𝑜𝑙𝑒𝑓𝑓 = 𝐹𝑅 − 𝑊𝑊𝑀𝑒𝑓𝑓−𝑠−𝑠𝑙𝑠 <strong>[MS.5.C.1]</strong></p>
+</div></blockquote>
+<p>𝑉𝑜𝑙𝑒𝑓𝑓 = Effluent Volume</p>
+<p>𝐹𝑅 = Flow rate into SLS which is equal to the total volume fed into</p>
+<p>the SLS per day</p>
+<p>𝑊𝑊𝑀𝑒𝑓𝑓−𝑠−𝑠𝑙𝑠 : 1kg is equivalent to 1 liter</p>
+<p>𝑇𝑆𝑒𝑓𝑓−𝑙−𝑠𝑙𝑠 = 𝑇𝑆𝑠𝑙𝑠 − 𝑇𝑆𝑒𝑓𝑓−𝑠−𝑠𝑙𝑠</p>
+<p><strong>[MS.5.C.2]</strong></p>
+<p>𝑇𝑆𝑒𝑓𝑓−𝑙−𝑠𝑙𝑠 = Effluent Wet Total Solid from Solid Liquid Separator</p>
+<p>𝑉𝑆𝑒𝑓𝑓−𝑙−𝑠𝑙𝑠 = 𝑉𝑆𝑠𝑙𝑠 − 𝑉𝑆𝑒𝑓𝑓−𝑠−𝑠𝑙𝑠</p>
+<p><strong>[MS.5.C.3]</strong></p>
+<p>𝑉𝑆𝑒𝑓𝑓−𝑙−𝑠𝑙𝑠 = Effluent Wet Volatile Solid from Solid Liquid Separator</p>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>𝑁𝑢𝑡𝑟𝑖𝑒𝑛𝑡</p></th>
+<th class="head"><p>𝑒𝑓𝑓−𝑙−𝑠𝑙𝑠 =
+𝑁𝑢𝑡𝑟𝑖𝑒𝑛𝑡</p></th>
+<th class="head"><p>𝑠𝑙𝑠− 𝑁𝑢𝑡𝑟𝑖𝑒𝑛𝑡</p></th>
+<th class="head"><p>𝑒𝑓𝑓−𝑠−𝑠𝑙𝑠</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p><strong>[MS.5.C.4]</strong></p>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>𝑁𝑢𝑡𝑟𝑖𝑒𝑛𝑡</p></th>
+<th class="head"><p>𝑒𝑓𝑓−𝑙−𝑠𝑙𝑠=
+Effluent Wet</p></th>
+<th class="head"><p>𝑁𝑢𝑡𝑟𝑖𝑒𝑛𝑡</p></th>
+<th class="head"><p>from Solid
+Liquid</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p>Separator</p>
+<blockquote>
+<div><p>13</p>
+</div></blockquote>
+<p>Manure Module</p>
+<p><strong>GAS EMISSIONS</strong></p>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p><strong>I.</strong></p></th>
+<th class="head"><p><strong>METHANE</strong></p></th>
+<th class="head"><p>𝑉𝑆𝑠𝑡𝑟𝑔</p></th>
+<th class="head"></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td></td>
+<td><p>𝑉𝑆𝑠𝑡𝑟𝑔−𝑝𝑎 =</p></td>
+<td><p>𝑇𝐴</p></td>
+<td><ul class="simple">
+<li></li>
+</ul>
+<p><em>[MS.5.B.I.1]*</em></p>
+</td>
+</tr>
+</tbody>
+</table>
+<p>𝑉𝑆𝑠𝑡𝑟𝑔−𝑝𝑎 = Volatile Solids per Animal</p>
+<p>𝑉𝑆𝑠𝑡𝑟𝑔 = Total Volatile Solids loaded into Storage Pond</p>
+<p>𝐶𝐻4𝑠𝑡𝑟𝑔−𝑑𝑎𝑖𝑙𝑦 = 𝑉𝑆𝑠𝑡𝑟𝑔−𝑝𝑎 * 𝐵0 * 𝑀𝐶𝐹 * 𝑀𝑆 * 𝐶𝐻4𝑚3/𝑘𝑔</p>
+<p><strong>[MS.5.B.I.2]</strong></p>
+<p>𝐶𝐻4𝑠𝑡𝑟𝑔−𝑑𝑎𝑖𝑙𝑦 = Methane Emitted Daily from Storage Pond</p>
+<p>𝐵0 = Maximum Methane Producing Capacity</p>
+<p>𝑀𝐶𝐹 = Methane Conversion Factor= 0.79 Default</p>
+<p>𝑀𝑆 = Percentage manure handled in system=0.9 Default</p>
+<p>𝐶𝐻4𝑚3/𝑘𝑔 = kg Methane per m3 of Methane = 0.67 Default</p>
+<blockquote>
+<div><p>𝐶𝑂2𝑠𝑡𝑟𝑔−𝐶𝐻4−𝑑𝑎𝑖𝑙𝑦 = 𝐶𝐻4𝑠𝑡𝑟𝑔−𝑑𝑎𝑖𝑙𝑦 * ε𝐶𝐻4−𝐶𝑂2 <strong>[MS.5.B.I.3]</strong></p>
+</div></blockquote>
+<p>𝐶𝑂2𝑠𝑡𝑟𝑔−𝐶𝐻4−𝑑𝑎𝑖𝑙𝑦 = Carbon DiOxide generated in Storage</p>
+<p>Pond with Methane</p>
+<p>ε𝐶𝐻4−𝐶𝑂2 = Methane to Carbon DiOxide Conversion Factor = 30</p>
+<p>Default</p>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Obtain Yearly
+Values for</p></th>
+<th class="head"><p>𝐶𝐻4𝑠𝑡𝑟𝑔−𝑑𝑎𝑖𝑙𝑦</p></th>
+<th class="head"><p>and</p></th>
+<th class="head"><blockquote>
+<div><p>𝐶𝑂</p>
+</div></blockquote>
+<dl class="simple">
+<dt>2𝑠𝑡𝑟𝑔−𝐶𝐻4−𝑑𝑎𝑖𝑙𝑦</dt><dd><p>by</p>
+</dd>
+</dl>
+</th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p>multiplying each value by 365, the number of days in a year.</p>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p><strong>II.</strong></p></th>
+<th class="head"><blockquote>
+<div><ul class="simple">
+<li></li>
+</ul>
+</div></blockquote>
+<p><em>NITROGEN*</em></p>
+</th>
+<th class="head"><p>𝑁</p></th>
+<th class="head"><p>𝑠𝑡𝑟𝑔</p></th>
+<th class="head"></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td></td>
+<td><p>𝑁𝑠𝑡𝑟𝑔−𝑝𝑎
+=</p></td>
+<td><p>𝑇𝐴</p></td>
+<td></td>
+<td><p><strong>[MS.
+5.B.II.1]</strong></p></td>
+</tr>
+</tbody>
+</table>
+<p>𝑁𝑠𝑡𝑟𝑔−𝑝𝑎 = Nitrogen Per Animal</p>
+<p>𝑁𝑠𝑡𝑟𝑔 = 𝑇𝑜𝑡𝑎𝑙 𝑁𝑖𝑡𝑟𝑜𝑔𝑒𝑛 𝐿𝑜𝑎𝑑𝑒𝑑 𝑖𝑛𝑡𝑜 𝑆𝑡𝑜𝑟𝑎𝑔𝑒 𝑃𝑜𝑛𝑑</p>
+<p><strong>a. Direct Nitrous Oxide</strong></p>
+<blockquote>
+<div><p>14</p>
+</div></blockquote>
+<p>Manure Module</p>
+<p>𝑁2𝑂𝑠𝑡𝑟𝑔−𝑑𝑖𝑟−𝑑𝑎𝑖𝑙𝑦 = 𝑁𝑠𝑡𝑟𝑔−𝑝𝑎 * ε𝑀𝑀𝑆 * ϵ𝑁20−𝑑𝑖𝑟 * σ𝑁−𝑁2𝑂</p>
+<p><strong>[MS.5.B.II.a.1]</strong></p>
+<p>𝑁2𝑂𝑠𝑡𝑟𝑔−𝑑𝑖𝑟−𝑑𝑎𝑖𝑙𝑦 = Direct Nitrous produced Daily in</p>
+<p>Storage Pond</p>
+<p>ε𝑀𝑀𝑆 = fraction MMS</p>
+<p>ϵ𝑁20−𝑑𝑖𝑟 = Direct Nitrous Emission Factor</p>
+<p>σ𝑁−𝑁2𝑂 = kg Nitrous Oxide generated per kg Nitrogen</p>
+<p>𝐶𝑂2𝑠𝑡𝑟𝑔−𝑑𝑖𝑟𝑁2𝑂−𝑑𝑎𝑖𝑙𝑦 = 𝑁2𝑂𝑠𝑡𝑟𝑔−𝑑𝑖𝑟−𝑑𝑎𝑖𝑙𝑦 * ε𝑁2𝑂−𝐶𝑂2</p>
+<p><strong>[MS.5.B.II.a.2]</strong></p>
+<p>𝐶𝑂2𝑠𝑡𝑟𝑔−𝑑𝑖𝑟𝑁2𝑂−𝑑𝑎𝑖𝑙𝑦 = Carbon DiOxide generated in</p>
+<p>Storage Pond with Direct Nitrous Oxide</p>
+<p>ε𝐶𝐻4−𝐶𝑂2 = kg Carbon DiOxide generated per kg Nitrous</p>
+<p>Oxide Conversion Factor = 130 (default)</p>
+<p><strong>b. Indirect Nitrous Oxide</strong></p>
+<p>𝑁2𝑂𝑠𝑡𝑟𝑔−𝑖𝑛𝑑𝑖𝑟−𝑑𝑎𝑖𝑙𝑦 = 𝑁𝑠𝑡𝑟𝑔−𝑝𝑎 * ε𝑁−𝑁𝐻3/𝑁𝑂𝑥 * ϵ𝑁20−𝑖𝑛𝑑𝑖𝑟 * σ𝑁−𝑁2𝑂</p>
+<p><strong>[MS.5.B.II.b.1]</strong></p>
+<p>𝑁2𝑂𝑠𝑡𝑟𝑔−𝑖𝑛𝑑𝑖𝑟−𝑑𝑎𝑖𝑙𝑦 = Indirect Nitrous produced Daily</p>
+<p>in Storage Pond</p>
+<p>ε𝑁−𝑁𝐻3/𝑁𝑂𝑥 = Fraction of Nitrogen that Volatizes to</p>
+<p>NH3 or NOx</p>
+<p>ϵ𝑁20−𝑖𝑛𝑑𝑖𝑟 = Indirect Nitrous Emission Factor</p>
+<p>𝐶𝑂2𝑠𝑡𝑟𝑔−𝑖𝑛𝑑𝑁2𝑂−𝑑𝑎𝑖𝑙𝑦 = 𝑁2𝑂𝑠𝑡𝑟𝑔−𝑖𝑛𝑑𝑖𝑟−𝑑𝑎𝑖𝑙𝑦 * ε𝑁2𝑂−𝐶𝑂2</p>
+<p><strong>[MS.5.B.II.b.2]</strong></p>
+<p>𝐶𝑂2𝑠𝑡𝑟𝑔−𝑖𝑛𝑑𝑁2𝑂−𝑑𝑎𝑖𝑙𝑦 = Carbon DiOxide generated in</p>
+<p>Storage Pond with Indirect Nitrous Oxide</p>
+<p>NB: Yearly values of all daily measured quantities can be</p>
+<p>obtained by multiplying corresponding daily values by 365,</p>
+<p>the number of days in a year</p>
+<blockquote>
+<div><p>15</p>
+</div></blockquote>
+<p>Manure Module</p>
+<p><strong>STORAGE POND EFFLUENTS</strong></p>
+<blockquote>
+<div><p>𝑊𝑊𝑉𝑒𝑓𝑓−𝑠𝑡𝑟𝑔 = 𝑊𝑊𝑉𝑠𝑡𝑟𝑔 <strong>[MS.5.B.3]</strong></p>
+</div></blockquote>
+<p>𝑊𝑊𝑉𝑒𝑓𝑓−𝑠𝑡𝑟𝑔 = Effluent Waste Water Volume from Storage Pond</p>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>𝑇𝑆𝑒𝑓𝑓−𝑠𝑡𝑟𝑔 =</p></th>
+<th class="head"><div class="line-block">
+<div class="line">𝑇𝑆𝑠𝑡𝑟𝑔</div>
+<div class="line">𝑊𝑊𝑉(1 −
+ε𝑇𝑆−𝑒𝑓𝑓−𝑠𝑡𝑟𝑔)</div>
+</div>
+</th>
+<th class="head"><p><strong>[MS.5.B.4]</strong></p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td></td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p>𝑇𝑆𝑒𝑓𝑓−𝑠𝑡𝑟𝑔 = Total Solid Effluent from Storage Pond, in g/L</p>
+<p>ε𝑇𝑆−𝑒𝑓𝑓−𝑠𝑡𝑟𝑔 = Total Solid effluent rate in Storage Pond</p>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>𝑇𝑆</p></th>
+<th class="head"><p>𝑠𝑡𝑟𝑔= Total
+Solids
+Loaded into
+the Storage
+Pond</p></th>
+<th class="head"></th>
+<th class="head"></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>𝑉𝑆𝑒𝑓𝑓−𝑠𝑡𝑟𝑔 =</p></td>
+<td></td>
+<td><p>𝑉𝑆𝑙𝑜𝑎𝑑𝑖𝑛𝑔−𝑠𝑡𝑟𝑔</p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td></td>
+<td></td>
+<td><p>𝑊𝑊𝑉</p></td>
+<td><blockquote>
+<div><p>(1 −</p>
+</div></blockquote>
+<p>ε𝑉𝑆−𝑒𝑓𝑓−𝑠𝑡𝑟𝑔)</p>
+</td>
+</tr>
+</tbody>
+</table>
+<p><strong>[MS.5.B.5]</strong></p>
+<p>𝑉𝑆𝑒𝑓𝑓−𝑠𝑡𝑟𝑔 = Total Volatile Solid Effluent from Storage Pond, in g/L</p>
+<p>ε𝑉𝑆−𝑒𝑓𝑓−𝑠𝑡𝑟𝑔 = Volatile Solid effluent rate in Storage Pond</p>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"></th>
+<th class="head"></th>
+<th class="head"><p>𝑁𝑢𝑡𝑟𝑖𝑒𝑛𝑡</p></th>
+<th class="head"><p>𝑠𝑡𝑟𝑔</p></th>
+<th class="head"></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>𝑁𝑢𝑡𝑟𝑖𝑒𝑛𝑡</p></td>
+<td><p>𝑒𝑓𝑓−𝑠𝑡𝑟𝑔=</p></td>
+<td><p>𝑊𝑊𝑉</p></td>
+<td></td>
+<td><blockquote>
+<div><p>(1 −
+ε𝑁𝑢𝑡𝑟𝑖𝑒𝑛</p>
+</div></blockquote>
+<p>𝑡−𝑒𝑓𝑓−𝑠𝑡𝑟𝑔)</p>
+</td>
+</tr>
+</tbody>
+</table>
+<p><strong>[MS.5.B.6]</strong></p>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>𝑁
+𝑢𝑡𝑟𝑖𝑒𝑛𝑡</p></th>
+<th class="head"><p>𝑒𝑓
+𝑓−𝑠𝑡𝑟𝑔=
+Total</p></th>
+<th class="head"></th>
+<th class="head"></th>
+<th class="head"><p>𝑁
+𝑢𝑡𝑟𝑖𝑒𝑛𝑡</p></th>
+<th class="head"></th>
+<th class="head"><blockquote>
+<div><p>from</p>
+</div></blockquote>
+<p>Storage</p>
+<blockquote>
+<div><dl class="simple">
+<dt>Pond,</dt><dd><p>in
+g/L</p>
+</dd>
+</dl>
+</div></blockquote>
+</th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>ε𝑁𝑢𝑡
+𝑟𝑖𝑒𝑛𝑡−𝑒
+𝑓𝑓−𝑠𝑡𝑟𝑔
+= Total</p></td>
+<td></td>
+<td></td>
+<td><p>𝑁
+𝑢𝑡𝑟𝑖𝑒𝑛𝑡</p></td>
+<td></td>
+<td><blockquote>
+<div><p>e</p>
+</div></blockquote>
+<dl class="simple">
+<dt>ffluent</dt><dd><p>rate
+in</p>
+</dd>
+<dt>Storage</dt><dd><p>Pond</p>
+</dd>
+</dl>
+</td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>𝑁𝑢𝑡𝑟𝑖
+𝑒𝑛𝑡𝑠𝑡𝑟𝑔
+= Total</p></td>
+<td></td>
+<td><blockquote>
+<div><p>𝑁</p>
+</div></blockquote>
+<p>𝑢𝑡𝑟𝑖𝑒𝑛𝑡</p>
+<blockquote>
+<div><dl class="simple">
+<dt>Loaded</dt><dd><p>into
+the</p>
+</dd>
+</dl>
+</div></blockquote>
+<dl class="simple">
+<dt>Storage</dt><dd><p>Pond</p>
+</dd>
+</dl>
+</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<div><p>16</p>
+</div></blockquote>
+<p>Manure Module</p>
+<blockquote>
+<div><div class="line-block">
+<div class="line"><strong>1. Model Structure</strong></div>
+<div class="line">Implemented in <strong>manure_storage.py</strong></div>
+</div>
+<p>The following diagram conceptually demonstrates the existing link
+from animal (pens) to soil and crop (fields) through the manure
+module. At present, the manure module only simulates basic handling,
+separation, and storage. The path manure takes is specified by pen in
+the json file and includes a handling, separator, and storage
+mechanism. Multiple pens can be funnelled</p>
+<p>17</p>
+</div></blockquote>
+<p>Manure Module</p>
+<blockquote>
+<div><p>into the same path, but multiple paths cannot be specified for one
+pen at present. Storage is emptied sequentially as manure is applied
+to each field and no preference is made for storage or for
+application.</p>
+</div></blockquote>
+<p>Manure Module</p>
+<p><strong>[MS.1.2]</strong></p>
+<blockquote>
+<div><p>Once the model structure is established, the link between handling,
+separation, and storage is sequential. Handling is called for each
+pen, and within that method, the associated separator is updated,
+then separation is called for each separator and storage is updated
+from within that</p>
+<p>19</p>
+</div></blockquote>
+<p>Manure Module</p>
+<blockquote>
+<div><p>method, then storage is called for each storage receptacle. In this
+way, we can maintain the association between each pen and its
+specified processing path without creating duplicate separator and
+storage objects.</p>
+<div class="line-block">
+<div class="line"><strong>2. Calibration</strong></div>
+<div class="line">Implemented in <strong>manure_storage.py</strong></div>
+</div>
+<p>Manure storage is currently an empirical, daily reduction model
+broken that calculates losses, transformations, and emissions from
+handling, separation, and storage on a daily basis. Each section of
+the model (handling, separator, storage) is calibrated in accordance
+with provided by Greg Thoma of the University of Arkansas.</p>
+<div class="line-block">
+<div class="line"><strong>3. Handling</strong></div>
+<div class="line">Implemented in <strong>manure_handling.py</strong></div>
+<div class="line"><strong>A. Flush Water</strong></div>
+<div class="line">𝐹𝑊𝑉 = 𝐹𝑊𝑉 + 𝑟𝑎𝑤 𝑚𝑎𝑛𝑢𝑟𝑒 + 𝐹𝑊𝑑𝑎𝑖𝑙𝑦 + 𝑏𝑒𝑑𝑑𝑖𝑛𝑔 𝑤𝑎𝑠ℎ𝑒𝑑 <strong>[MS.3.A.1]</strong></div>
+</div>
+</div></blockquote>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>FWV</p></th>
+<th class="head"><p>=</p></th>
+<th class="head"><p>Total Flush Water
+Volume in the
+separator</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>raw manure</p></td>
+<td><p>=</p></td>
+<td><p>Daily excreted raw
+manure (kg)</p></td>
+</tr>
+<tr class="row-odd"><td><p>FWdaily</p></td>
+<td><p>=</p></td>
+<td><p>Daily Flush Water</p></td>
+</tr>
+<tr class="row-even"><td><p>bedding washed</p></td>
+<td><p>=</p></td>
+<td><p>Daily mass of
+washed bedding</p></td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<div><p><strong>B. N Loss</strong></p>
+</div></blockquote>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>𝑁 = 𝑁 +
+𝑁𝑒𝑥𝑐𝑟𝑒𝑡𝑒𝑑</p></th>
+<th class="head"></th>
+<th class="head"></th>
+<th class="head"><p><strong>[MS.3.B.1]</strong></p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>N</p></td>
+<td><p>=</p></td>
+<td><p>Total
+Nitrogen
+mass in the
+separator
+(kg)</p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>Nexcreted</p></td>
+<td><p>=</p></td>
+<td><p>Daily
+excreted
+Nitrogen
+from the pen
+(kg)</p></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<div><p><strong>C. P Loss</strong></p>
+</div></blockquote>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>𝑃 = 𝑃 +
+𝑃𝑒𝑥𝑐𝑟𝑒𝑡𝑒𝑑</p></th>
+<th class="head"></th>
+<th class="head"></th>
+<th class="head"><p><strong>[MS.3.C.1]</strong></p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>P</p></td>
+<td><p>=</p></td>
+<td><p>Total
+Phosphorus
+mass in the
+separator
+(kg)</p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>Pexcreted</p></td>
+<td><p>=</p></td>
+<td><p>Daily
+excreted
+Phosphorus
+from the pen
+(kg)</p></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<div><p>20</p>
+</div></blockquote>
+<p>Manure Module</p>
+<blockquote>
+<div><p><strong>D. K Loss</strong></p>
+</div></blockquote>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>𝐾 = 𝐾 +
+𝐾𝑒𝑥𝑐𝑟𝑒𝑡𝑒𝑑</p></th>
+<th class="head"></th>
+<th class="head"></th>
+<th class="head"><p><strong>[MS.3.D.1]</strong></p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>K</p></td>
+<td><p>=</p></td>
+<td><p>Total
+Potassium
+mass in the
+separator
+(kg)</p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>Kexcreted</p></td>
+<td><p>=</p></td>
+<td><p>Daily
+excreted
+Potassium
+from the pen
+(kg)</p></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<div><p><strong>E. Solids</strong></p>
+</div></blockquote>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>𝑇𝑆 = 𝑇𝑆
++ 𝐹𝑊𝑉 ×
+𝑇𝑆𝑙𝑜𝑠𝑠</p></th>
+<th class="head"></th>
+<th class="head"></th>
+<th class="head"></th>
+<th class="head"><p><strong>[
+MS.3.E.1]</strong></p>
+<p><strong>[
+MS.3.E.2]</strong></p>
+</th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>TS</p></td>
+<td><p>=</p></td>
+<td></td>
+<td><blockquote>
+<div><p>Total
+Solids
+in the</p>
+</div></blockquote>
+<dl class="simple">
+<dt>separator</dt><dd><p>(kg)</p>
+</dd>
+</dl>
+</td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>TSloss</p></td>
+<td><p>=</p></td>
+<td></td>
+<td><p>Empirically</p>
+<blockquote>
+<div><dl class="simple">
+<dt>calibrated</dt><dd><p>Total
+Solids
+loss (%)</p>
+</dd>
+</dl>
+</div></blockquote>
+</td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p>𝑉𝑆 = 𝑉𝑆
++ 𝑇𝑆 ×
+𝑉𝑆𝑙𝑜𝑠𝑠</p></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>VS</p></td>
+<td><p>=</p></td>
+<td></td>
+<td><blockquote>
+<div><p>Total
+Volatile
+Solids
+in the</p>
+</div></blockquote>
+<dl class="simple">
+<dt>separator</dt><dd><p>(kg)</p>
+</dd>
+</dl>
+</td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p>VSloss</p></td>
+<td></td>
+<td><p>=</p></td>
+<td><p>Empirically</p>
+<blockquote>
+<div><dl class="simple">
+<dt>calibrated</dt><dd><p>Volatile
+Solids
+loss (%)</p>
+</dd>
+</dl>
+</div></blockquote>
+</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<div><div class="line-block">
+<div class="line"><strong>4. Separator</strong></div>
+<div class="line">Implemented in <strong>manure_separator.py</strong></div>
+</div>
+<p><strong>A. Effluent Liquid</strong></p>
+<p>The liquid nutrient content of the separator for TS, VS, N, P, and K
+are updated:</p>
+<p>𝑁𝑢𝑡𝑟𝑖𝑒𝑛𝑡𝑙𝑖𝑞𝑢𝑖𝑑 = 𝑁𝑢𝑡𝑟𝑖𝑒𝑛𝑡 − 𝑁𝑢𝑡𝑟𝑖𝑒𝑛𝑡 × 𝑁𝑢𝑡𝑟𝑖𝑒𝑛𝑡𝑟𝑒𝑚𝑜𝑣𝑎𝑙 𝑒𝑓𝑓𝑖𝑐𝑖𝑒𝑛𝑐𝑦
+<strong>[MS.4.A.1]</strong></p>
+</div></blockquote>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Nutrientliquid</p></th>
+<th class="head"><p>=</p></th>
+<th class="head"><p>Liquid mass of a
+given nutrient in
+the separator (kg)</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td></td>
+<td><p>=</p></td>
+<td><p>Mass of a given
+nutrient in the
+separator (kg)</p></td>
+</tr>
+<tr class="row-odd"><td><p>Nutrient</p></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p>Nutrientremoval
+efficiency</p></td>
+<td><p>=</p></td>
+<td><p>Empirically
+calibrated removal
+efficiency of the
+separator</p></td>
+</tr>
+</tbody>
+</table>
+<p>for the given nutrient (kg)</p>
+<blockquote>
+<div><p><strong>B. Effluent Solid</strong></p>
+<p>The nutrient content of the separator is reduced by the separated
+liquid</p>
+<p>21</p>
+</div></blockquote>
+<p>Manure Module</p>
+<blockquote>
+<div><div class="line-block">
+<div class="line">𝑁𝑢𝑡𝑟𝑖𝑒𝑛𝑡 = 𝑁𝑢𝑡𝑟𝑖𝑒𝑛𝑡 − 𝑁𝑢𝑡𝑟𝑖𝑒𝑛𝑡𝑙𝑖𝑞𝑢𝑖𝑑</div>
+<div class="line"><strong>[MS.4.B.1]</strong></div>
+</div>
+<div class="line-block">
+<div class="line"><strong>C. Update Storage</strong></div>
+<div class="line">The nutrient content of the storage receptacle is updated</div>
+</div>
+<div class="line-block">
+<div class="line">𝑁𝑢𝑡𝑟𝑖𝑒𝑛𝑡𝑠𝑡𝑜𝑟𝑎𝑔𝑒 = 𝑁𝑢𝑡𝑟𝑖𝑒𝑛𝑡𝑠𝑡𝑜𝑟𝑎𝑔𝑒 + 𝑁𝑢𝑡𝑟𝑖𝑒𝑛𝑡</div>
+<div class="line"><strong>[MS.4.C.1]</strong></div>
+</div>
+</div></blockquote>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Nutrientstorage</p></th>
+<th class="head"><p>=</p></th>
+<th class="head"><p>Mass of a given
+nutrient in
+storage (kg)</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td></td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<div><p>𝑁𝑢𝑡𝑟𝑖𝑒𝑛𝑡𝑙𝑖𝑞𝑢𝑖𝑑 𝑠𝑡𝑜𝑟𝑎𝑔𝑒 = 𝑁𝑢𝑡𝑟𝑖𝑒𝑛𝑡𝑙𝑖𝑞𝑢𝑖𝑑 𝑠𝑡𝑜𝑟𝑎𝑔𝑒 + 𝑁𝑢𝑡𝑟𝑖𝑒𝑛𝑡𝑙𝑖𝑞𝑢𝑖𝑑</p>
+<p><strong>[MS.4.C.2]</strong></p>
+<p>Nutrientliquid storage = Liquid mass of a given nutrient in storage
+(kg)</p>
+<div class="line-block">
+<div class="line"><strong>5. Storage</strong></div>
+<div class="line">Implemented in <strong>manure_emissions.py</strong></div>
+</div>
+<div class="line-block">
+<div class="line"><strong>A. Methane</strong></div>
+<div class="line">𝐶𝐻4 = 𝐶𝐻4 + 𝑉𝑆 × 𝐵𝑜 × 𝑀𝐶𝐹 × 𝑀𝑆 × 𝑚3 × 𝐶𝐻4𝑐𝑜𝑙𝑙𝑒𝑐𝑡𝑖𝑜𝑛 𝑒𝑓𝑓𝑖𝑐𝑖𝑒𝑛𝑐𝑦
+<strong>[MS.5.A.1]</strong></div>
+</div>
+</div></blockquote>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>CH4</p></th>
+<th class="head"><p>=</p></th>
+<th class="head"><p>Total Methane
+emissions from
+storage (kg)</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>VS</p></td>
+<td><p>=</p></td>
+<td><p>Mass of Volatile
+Solids in storage
+(kg)</p></td>
+</tr>
+<tr class="row-odd"><td><p>Bo</p></td>
+<td><p>=</p></td>
+<td><p>Empirically
+calibrated
+parameter of
+manure storage</p></td>
+</tr>
+</tbody>
+</table>
+<p>(m3CH4 / kg of VS)</p>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>MCF</p></th>
+<th class="head"><p>=</p></th>
+<th class="head"><p>Empirically
+calibrated Methane
+Conversion Factor
+(%)</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>MS</p></td>
+<td><p>=</p></td>
+<td><p>Manure Handled in
+the system (%)</p></td>
+</tr>
+<tr class="row-odd"><td><p>m3</p></td>
+<td><p>=</p></td>
+<td><p>Empirically
+calibrated Factor
+CH4 to kg /
+m3(kg/m3)</p></td>
+</tr>
+<tr class="row-even"><td><p>CH4collection
+efficiency</p></td>
+<td><p>=</p></td>
+<td><p>Empirically
+calibrated Methane
+collection
+efficiency (%)</p></td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<div><p>22</p>
+</div></blockquote>
+<p>Manure Module</p>
+<blockquote>
+<div><p>***The following models were developed by Osama Ben Omran while he
+was a Computer Science PhD candidate at the University of Arkansas in
+collaboration with Greg Thoma. None of them are currently
+implemented***</p>
+<p>The Manure Module was developed by Osama Ben Omran, Computer Science
+PhD candidate from the University of Arkansas, as well as the Manure
+Management researcher Greg Thoma in collaboration with the RuFaS
+project. Osama developed models for manure emissions from a number of
+different papers. His work is broken up into the following categories
+which run separately in the existing code. The data in the weather
+file is taken hourly using Kelvin for temperature and kg/m2/s for
+precipitation.</p>
+<p>The model runs on a daily time scale, but some of the modules
+currently utilize a sub-daily time step. We may be interested in
+integrating them into a single model when they are transferred into
+RuFaS.</p>
+<div class="line-block">
+<div class="line"><strong>1. AMOCO</strong></div>
+<div class="line">This code was developed from an analysis of the AMOCO model in the
+paper “Anaerobic Digestion Models: a Comparative Study”. It
+calculates Methane (CH4) and Carbon Dioxide (CO2) emissions. AMOCO
+is run using differential equations. Osama’s</div>
+<div class="line">implementation involved 8 iterations per day, corresponding to a
+3hr time step.</div>
+</div>
+<div class="line-block">
+<div class="line"><strong>A. Organic Substrate</strong></div>
+<div class="line">Calculate difference in organic substrate over time:</div>
+</div>
+</div></blockquote>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>𝑑𝑡= 𝑞𝑖𝑛 𝑉𝐿×
+𝑆1𝑖𝑛− 𝑆1 (
+)− 𝑘1×
+𝑀1𝑚𝑎𝑥×𝑑𝑆1</p></th>
+<th class="head"></th>
+<th class="head"></th>
+<th class="head"><div class="line-block">
+<div class="line">𝑆1</div>
+<div class="line">𝑆1+𝐾𝑆1× 𝑋1</div>
+</div>
+</th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>dS1/dt</p></td>
+<td><p>=</p></td>
+<td><p>Difference
+in organic
+substrate
+over time</p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>qin</p></td>
+<td><p>=</p></td>
+<td><p>Volumetric
+flowrate</p></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p>VL</p></td>
+<td><p>=</p></td>
+<td><p>Liquid
+volume</p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>S1in</p></td>
+<td><p>=</p></td>
+<td><p>Initial
+organic
+substrate
+(initialized
+as S1) (g VS
+L-1)</p></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p>S1</p></td>
+<td><p>=</p></td>
+<td><p>Organic
+substrate (g
+VS L-1)</p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>k1</p></td>
+<td><p>=</p></td>
+<td><p>Yield for
+substrate
+degradation
+(g COD)</p></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p>M1max</p></td>
+<td><p>=</p></td>
+<td><p>Maximum
+acidogenic
+bacteria
+growth rate
+(d-1)</p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>KS1</p></td>
+<td><p>=</p></td>
+<td><p>Half
+saturation
+constant (4)
+(g VS L-1)</p></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p>X1</p></td>
+<td><p>=</p></td>
+<td><p>Acidogenic
+bacteria</p></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<div><p>Calculate organic substrate</p>
+</div></blockquote>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>𝑆1 = 𝑡𝑖𝑚𝑒𝑁 − 𝑀𝑡 ) ×𝑑𝑆1 𝑑𝑡+ 𝑆1</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td></td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<div><p>23</p>
+</div></blockquote>
+<p>Manure Module</p>
+<blockquote>
+<div><p>timeN and Mt are counters for time. All of the code in this module is
+contained in a loop that runs 8 times with values of timeN
+incrementing from 2-9. Mt is initialized at 0 and then set to timeN
+at the end of each loop such that timeN - Mt = 2 for the first
+iteration, and 1 every time after that. The purpose of this loop is
+unknown.</p>
+<div class="line-block">
+<div class="line"><strong>B. Volatile Fatty Acids</strong></div>
+<div class="line">Calculate Volatile Fatty Acids</div>
+</div>
+</div></blockquote>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><blockquote>
+<div><p>𝑑𝑡= 𝑞𝑖𝑛
+𝑉𝐿×
+𝑆2𝑖𝑛− 𝑆2
+( )+ 𝑘2×</p>
+</div></blockquote>
+<p>𝑀1𝑚𝑎𝑥×𝑑𝑆2</p>
+</th>
+<th class="head"></th>
+<th class="head"></th>
+<th class="head"><p>𝑆1</p></th>
+<th class="head"><p>𝑆2</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td></td>
+<td></td>
+<td></td>
+<td><p>𝑆1+𝐾𝑆1× 𝑋1−
+𝑘3× 𝑀2𝑚𝑎𝑥×</p></td>
+<td><p>𝑆2+𝐾𝑆2+</p></td>
+</tr>
+<tr class="row-odd"><td><p>dS2/dt</p></td>
+<td><p>=</p></td>
+<td><dl class="simple">
+<dt>Difference</dt><dd><p>in
+volatile
+fatty
+acids
+over
+time</p>
+</dd>
+</dl>
+</td>
+<td></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p>S2in</p></td>
+<td><p>=</p></td>
+<td><p>Initial
+volatile
+fatty
+acids
+(mmol
+L-1)</p></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>S2</p></td>
+<td><p>=</p></td>
+<td><p>Volatile
+fatty
+acids
+(mmol
+L-1)</p></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p>k2</p></td>
+<td><p>=</p></td>
+<td><blockquote>
+<div><p>Yield
+for VFA</p>
+</div></blockquote>
+<dl class="simple">
+<dt>production</dt><dd><p>(mmol/g)</p>
+</dd>
+</dl>
+</td>
+<td></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>k3</p></td>
+<td><p>=</p></td>
+<td><blockquote>
+<div><p>Yield
+for VFA</p>
+</div></blockquote>
+<dl class="simple">
+<dt>consumption</dt><dd><p>(mmol/g)</p>
+</dd>
+</dl>
+</td>
+<td></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p>M2max</p></td>
+<td><p>=</p></td>
+<td><blockquote>
+<div><p>Maximum
+m</p>
+</div></blockquote>
+<dl class="simple">
+<dt>ethanogenic</dt><dd><p>bacteria
+growth
+rate
+(d-1)</p>
+</dd>
+</dl>
+</td>
+<td></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>KS2</p></td>
+<td><p>=</p></td>
+<td><blockquote>
+<div><p>Half</p>
+</div></blockquote>
+<p>saturation</p>
+<blockquote>
+<div><dl class="simple">
+<dt>constants</dt><dd><p>(mmol
+L-1)</p>
+</dd>
+</dl>
+</div></blockquote>
+</td>
+<td></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p>KI2</p></td>
+<td><p>=</p></td>
+<td><dl class="simple">
+<dt>Inibition</dt><dd><p>constant
+(mmol
+L-1)</p>
+</dd>
+</dl>
+</td>
+<td></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>X2</p></td>
+<td><p>=</p></td>
+<td><blockquote>
+<div><p>M</p>
+</div></blockquote>
+<dl class="simple">
+<dt>ethanogenic</dt><dd><p>bacteria
+(g VS
+L-1)</p>
+</dd>
+</dl>
+</td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<div><p>Update volatile fatty acids</p>
+</div></blockquote>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>𝑆2 = 𝑡𝑖𝑚𝑒𝑁 − 𝑀𝑡 ) ×𝑑𝑆2 𝑑𝑡</p></th>
+<th class="head"><ul class="simple">
+<li><p>𝑆2</p></li>
+</ul>
+</th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<div><p>This structure is common to the AMOCO model section. A derivative is
+calculated and then applied to the running sum 8 times with the first
+rate being scaled by two.</p>
+<div class="line-block">
+<div class="line"><strong>C. Acidogenic Bacteria</strong></div>
+<div class="line">Calculate Acidogenic Bacteria</div>
+</div>
+</div></blockquote>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><blockquote>
+<div><div class="line-block">
+<div class="line">𝑑𝑡=−
+𝑞𝑖𝑛
+𝑉𝐿×
+𝑋1+</div>
+</div>
+</div></blockquote>
+<dl>
+<dt>𝑀1𝑚𝑎𝑥×(</dt><dd><div class="line-block">
+<div class="line">𝑑𝑋1</div>
+</div>
+</dd>
+</dl>
+</th>
+<th class="head"></th>
+<th class="head"></th>
+<th class="head"><p>(</p></th>
+<th class="head"><p>𝑆1</p></th>
+<th class="head"><p>)− 𝑘𝑑
+)× 𝑋1</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td></td>
+<td></td>
+<td></td>
+<td></td>
+<td><p>( 𝑆1+𝐾𝑆1
+)</p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>dX1/dt</p></td>
+<td><p>=</p></td>
+<td><blockquote>
+<div><p>D</p>
+</div></blockquote>
+<dl class="simple">
+<dt>ifference</dt><dd><p>in
+a</p>
+</dd>
+</dl>
+<p>cidogenic</p>
+<blockquote>
+<div><dl class="simple">
+<dt>bacteria</dt><dd><p>over
+time</p>
+</dd>
+</dl>
+</div></blockquote>
+</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<div><p>24</p>
+</div></blockquote>
+<p>Manure Module</p>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>kd</p></th>
+<th class="head"><p>=</p></th>
+<th class="head"><p>Decay constant</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td></td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<div><p>Update Acidogenic Bacteria</p>
+</div></blockquote>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>𝑋1 = 𝑡𝑖𝑚𝑒𝑁 − 𝑀𝑡 ) ×</p></th>
+<th class="head"><div class="line-block">
+<div class="line">𝑑𝑋1</div>
+<div class="line">𝑑𝑡+ 𝑋1</div>
+</div>
+</th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<div><div class="line-block">
+<div class="line"><strong>D. Methanogenic Bacteria</strong></div>
+<div class="line">Methanogenic Bacteria</div>
+</div>
+</div></blockquote>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><blockquote>
+<div><div class="line-block">
+<div class="line"><br /></div>
+</div>
+</div></blockquote>
+<p>𝑑𝑋2</p>
+<div class="line-block">
+<div class="line">𝑑</div>
+</div>
+<p>𝑡=−</p>
+<p>𝑞𝑖𝑛</p>
+<p>𝑉𝐿×</p>
+<p>𝑋2+</p>
+</th>
+<th class="head"></th>
+<th class="head"></th>
+<th class="head"><p>⎛𝑀2
+𝑚𝑎𝑥
+×</p></th>
+<th class="head"></th>
+<th class="head"><p>⎛</p></th>
+<th class="head"><p>𝑆2</p></th>
+<th class="head"></th>
+<th class="head"><p>⎞</p></th>
+<th class="head"><p>⎞</p></th>
+<th class="head"></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td><blockquote>
+<div><p>(</p>
+</div></blockquote>
+<p>𝑆2+
+𝐾𝑆2
++𝑆2</p>
+<p>𝐾𝐼2</p>
+<blockquote>
+<div><p>2</p>
+</div></blockquote>
+</td>
+<td><p>)</p></td>
+<td></td>
+<td><blockquote>
+<div><p>−</p>
+</div></blockquote>
+<p>𝑘𝑑</p>
+</td>
+<td><blockquote>
+<div><p>×</p>
+</div></blockquote>
+<p>𝑋2</p>
+</td>
+</tr>
+<tr class="row-odd"><td></td>
+<td></td>
+<td></td>
+<td><p>⎝</p></td>
+<td></td>
+<td><p>⎝</p></td>
+<td></td>
+<td></td>
+<td><p>⎠</p></td>
+<td><p>⎠</p></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p>dX2
+/dt</p></td>
+<td><p>=</p></td>
+<td><blockquote>
+<div><p>D</p>
+</div></blockquote>
+<p>iff
+ere
+nce</p>
+<blockquote>
+<div><p>in</p>
+<p>vo</p>
+</div></blockquote>
+<p>lat
+ile</p>
+<blockquote>
+<div><p>fa</p>
+</div></blockquote>
+<p>tty</p>
+<blockquote>
+<div><p>ac</p>
+</div></blockquote>
+<p>ids</p>
+<blockquote>
+<div><p>o</p>
+</div></blockquote>
+<p>ver</p>
+<blockquote>
+<div><p>t</p>
+</div></blockquote>
+<p>ime</p>
+</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>𝑋2
+=
+𝑡𝑖
+𝑚𝑒𝑁
+−
+𝑀𝑡
+) ×</p></td>
+<td></td>
+<td></td>
+<td></td>
+<td><blockquote>
+<div><div class="line-block">
+<div class="line"><br /></div>
+</div>
+</div></blockquote>
+<p>𝑑𝑋2</p>
+<blockquote>
+<div><div class="line-block">
+<div class="line"><br /></div>
+</div>
+</div></blockquote>
+<p>𝑑𝑡+</p>
+<blockquote>
+<div><p>𝑋2</p>
+</div></blockquote>
+</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<div><div class="line-block">
+<div class="line"><strong>E. Inorganic Nitrogen</strong></div>
+<div class="line">Inorganic Nitrogen</div>
+</div>
+<p>The equation for calculating the change in inorganic nitrogen over
+time is quite long</p>
+<p>and has been broken into parts to fit the page.</p>
+</div></blockquote>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>𝑝𝑎𝑟𝑡1
+=𝑞𝑖𝑛
+𝑉𝐿×
+𝑁𝑖𝑛− 𝑁
+( )+
+𝑘1×
+𝑁𝑆1−
+𝑁𝑏𝑎𝑐
+)×
+𝑀1𝑚𝑎𝑥×</p></th>
+<th class="head"></th>
+<th class="head"></th>
+<th class="head"></th>
+<th class="head"></th>
+<th class="head"><blockquote>
+<div><div class="line-block">
+<div class="line">𝑆1</div>
+</div>
+</div></blockquote>
+<div class="line-block">
+<div class="line">𝑆1+𝐾𝑆1×
+𝑋1</div>
+</div>
+</th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>𝑝𝑎𝑟𝑡2 =
+𝑁𝑏𝑎𝑐 ×
+𝑀2𝑚𝑎𝑥 ×</p></td>
+<td></td>
+<td></td>
+<td><p>𝑆2</p></td>
+<td><p>× 𝑋2 + 𝑘𝑑
+× 𝑁𝑏𝑎𝑐 ×
+𝑀1𝑚𝑎𝑥 ×
+𝑋1 + 𝑘𝑑 ×
+𝑁𝑏𝑎𝑐 ×
+𝑀2𝑚𝑎𝑥 × 𝑋</p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td></td>
+<td></td>
+<td></td>
+<td><p>𝑆2+𝐾𝑆2</p></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p>N</p></td>
+<td><p>=</p></td>
+<td><p>Inorganic</p>
+<blockquote>
+<div><dl class="simple">
+<dt>nitrogen</dt><dd><p>(k mol
+m-3)</p>
+</dd>
+</dl>
+</div></blockquote>
+</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>NS1</p></td>
+<td><p>=</p></td>
+<td><blockquote>
+<div><p>Nitrogen</p>
+<blockquote>
+<div><dl class="simple">
+<dt>content</dt><dd><p>of</p>
+</dd>
+</dl>
+</div></blockquote>
+</div></blockquote>
+<dl>
+<dt>substrate</dt><dd><p>S1</p>
+</dd>
+<dt>dependent</dt><dd><blockquote>
+<div><p>on its</p>
+</div></blockquote>
+<p>protein</p>
+<p>content</p>
+</dd>
+</dl>
+</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p>Nbac</p></td>
+<td><p>=</p></td>
+<td><p>Nitrogen</p>
+<blockquote>
+<div><dl class="simple">
+<dt>content</dt><dd><p>in the</p>
+</dd>
+</dl>
+<p>biomass</p>
+</div></blockquote>
+</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<div><p>𝑑𝑁</p>
+<p>𝑑𝑡= 𝑝𝑎𝑟𝑡1 − 𝑝𝑎𝑟𝑡2</p>
+</div></blockquote>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>𝑁 = 𝑡𝑖𝑚𝑒𝑁 − 𝑀𝑡 ) ×𝑑𝑁 𝑑𝑡+ 𝑁</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td></td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<div><p>25</p>
+</div></blockquote>
+<p>Manure Module</p>
+<blockquote>
+<div><p><strong>F. Alkalinity</strong></p>
+<p>Alkalinity</p>
+</div></blockquote>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>𝑑𝑡= 𝑞𝑖𝑛 𝑉𝐿× 𝑍𝑖𝑛− 𝑍
+( )</p></th>
+<th class="head"></th>
+<th class="head"></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Z</p></td>
+<td><p>=</p></td>
+<td><p>Total alkalinity
+(mmol L-1)</p></td>
+</tr>
+<tr class="row-odd"><td><p>𝑍 = 𝑡𝑖𝑚𝑒𝑁 − 𝑀𝑡 )
+×𝑑𝑍 𝑑𝑡+ 𝑍</p></td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<div><p><strong>G. Inorganic Carbon</strong></p>
+<p>Inorganic Carbon</p>
+</div></blockquote>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>𝑑𝑡= 𝑞𝑖𝑛
+𝑉𝐿× 𝐶𝑖𝑛−
+𝐶 ( )+
+𝑘4×
+𝑀1𝑚𝑎𝑥×</p></th>
+<th class="head"></th>
+<th class="head"></th>
+<th class="head"><p>𝑆1</p></th>
+<th class="head"><p>𝑆2</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td></td>
+<td></td>
+<td></td>
+<td><p>𝑆1+𝐾𝑆1× 𝑋1+
+𝑘5× 𝑀2𝑚𝑎𝑥×</p></td>
+<td><blockquote>
+<div><p>2</p>
+</div></blockquote>
+<dl class="simple">
+<dt>𝑆2+𝐾𝑆2+𝑆2</dt><dd><p>𝐾𝐼2</p>
+</dd>
+</dl>
+</td>
+</tr>
+<tr class="row-odd"><td><p>C</p></td>
+<td><p>=</p></td>
+<td><dl class="simple">
+<dt>Inorganic</dt><dd><p>carbon
+(mmol
+L-1)</p>
+</dd>
+</dl>
+</td>
+<td></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p>k4 =</p></td>
+<td></td>
+<td><blockquote>
+<div><p>Yield
+for CO2</p>
+</div></blockquote>
+<dl class="simple">
+<dt>production</dt><dd><p>(mmol/g)</p>
+</dd>
+</dl>
+</td>
+<td></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>k5 =</p></td>
+<td></td>
+<td><blockquote>
+<div><p>Yield
+for CO2</p>
+</div></blockquote>
+<dl class="simple">
+<dt>production</dt><dd><p>(mmol/g)</p>
+</dd>
+</dl>
+</td>
+<td></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p>rC =</p></td>
+<td></td>
+<td><blockquote>
+<div><p>The
+carbon
+dioxide</p>
+</div></blockquote>
+<dl class="simple">
+<dt>production</dt><dd><p>rate
+(mmol
+L-1d-1)</p>
+</dd>
+</dl>
+</td>
+<td></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>𝐶 =
+𝑡𝑖𝑚𝑒𝑁 −
+𝑀𝑡 ) ×𝑑𝐶
+𝑑𝑡+ 𝐶</p></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<div><p><strong>H. CO2 Production Rate</strong></p>
+<p>𝑍’ = 𝑁 + 𝑍</p>
+</div></blockquote>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Z’ =</p></th>
+<th class="head"></th>
+<th class="head"><p>???</p></th>
+<th class="head"><p>𝑘6</p></th>
+<th class="head"><p>𝑆2</p></th>
+<th class="head"></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>α = 𝐶
++ 𝑆2 −
+𝑍’ +
+𝐾𝐻 ×
+𝑃𝑇 +</p></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td></td>
+<td></td>
+<td></td>
+<td><p>𝑘𝐿𝑎×
+𝑀2𝑚𝑎𝑥×</p></td>
+<td><blockquote>
+<div><p>2</p>
+</div></blockquote>
+<dl class="simple">
+<dt>𝑆2+𝐾𝑆2+𝑆2</dt><dd><p>𝐾𝐼2</p>
+</dd>
+</dl>
+</td>
+<td><p>× 𝑋2</p></td>
+</tr>
+<tr class="row-even"><td><p>A</p></td>
+<td><p>=</p></td>
+<td><p>???</p></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>KH =</p></td>
+<td></td>
+<td><blockquote>
+<div><p>Henry’s</p>
+</div></blockquote>
+<dl class="simple">
+<dt>constant</dt><dd><p>for
+CO2
+(5)</p>
+</dd>
+</dl>
+</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<div><p>26</p>
+</div></blockquote>
+<a class="reference internal image-reference" href="../../../_images/image4.png"><img alt="../../../_images/image4.png" src="../../../_images/image4.png" style="width: 2in; height: 0.31944in;" /></a>
+<p>Manure Module</p>
+<blockquote>
+<div><div class="line-block">
+<div class="line">PT = Atmospheric pressure (1)</div>
+<div class="line">k6 = Yield for CH4 production (mmol/g)</div>
+<div class="line">kLa = Liquid gas transfer coefficient (d-1)</div>
+</div>
+<p>Carbon dioxide production rate</p>
+<p>α− α 2−4×𝐾𝐻×𝑃𝑇× 𝐶+𝑆2−𝑍’ ) 𝑟𝐶 = 𝑘𝐿𝑎 × 𝐶 + 𝑆2 − 𝑍’ ( )− 𝑘𝐿𝑎× 2</p>
+<p>rC = Carbon dioxide (CO2) production rate (mmol L-1d-1)</p>
+<div class="line-block">
+<div class="line"><strong>I. CH4 Production Rate</strong></div>
+<div class="line">Methane production rate</div>
+</div>
+</div></blockquote>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>𝑟𝐶𝐻4 =
+𝑘6 ×
+𝑀2𝑚𝑎𝑥 ×</p></th>
+<th class="head"></th>
+<th class="head"></th>
+<th class="head"><p>𝑆2</p></th>
+<th class="head"></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td></td>
+<td></td>
+<td></td>
+<td><blockquote>
+<div><p>2</p>
+</div></blockquote>
+<dl class="simple">
+<dt>𝑆2+𝐾𝑆2+𝑆2</dt><dd><p>𝐾𝐼2</p>
+</dd>
+</dl>
+</td>
+<td><p>× 𝑋2</p></td>
+</tr>
+<tr class="row-odd"><td><p>rCH4</p></td>
+<td><p>=</p></td>
+<td><blockquote>
+<div><p>Methane
+(CH4)</p>
+</div></blockquote>
+<dl class="simple">
+<dt>production</dt><dd><p>rate
+(mmol
+L-1d-1)</p>
+</dd>
+</dl>
+</td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<div><div class="line-block">
+<div class="line"><strong>2. IPCC Guidelines for National Greenhouse Gas Inventories</strong></div>
+<div class="line">This code was developed from chapter 10 of the Draft Report 2019
+Refinement to the 2006 IPCC Guidelines for National Greenhouse Gas
+Inventories. It calculates Methane and Nitrous Oxide Emissions from
+digesters. This paper analyzed country level emissions from Manure
+Management.</div>
+</div>
+<p>Some values are constants while others are varied across a range of
+factors indicated by subscript: type of animal (T), management system
+(S), and productivity system (P). The use in the code/pseudocode is
+inconsistent and the logic is not immediately obvious.</p>
+<p><strong>A. Methane (CH4)</strong></p>
+</div></blockquote>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"></th>
+<th class="head"><p>𝑉𝐶𝐻4, 𝑝𝑟𝑜𝑑 − 𝑉𝐶𝐻4,
+𝑢𝑠𝑒𝑑 − 𝑉𝐶𝐻4,
+𝑓𝑙𝑎𝑟𝑒𝑑 + 𝑀𝐶𝐹𝑟𝑒𝑠 ×
+𝐵0− 𝑉𝐶𝐻4, 𝑝𝑟𝑜𝑑 ( )</p></th>
+<th class="head"></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>𝑀𝐶𝐹 =</p>
+<blockquote>
+<div><div class="line-block">
+<div class="line">MCF</div>
+<div class="line">VCH4, prod VCH4,
+used VCH4,
+flared MCFres</div>
+</div>
+</div></blockquote>
+</td>
+<td><p>𝐵0, 𝑇</p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td></td>
+<td><p>=</p></td>
+<td><p>Methane Conversion
+Factor for
+combination
+digester and
+storage</p></td>
+</tr>
+<tr class="row-even"><td></td>
+<td><p>=</p></td>
+<td><p>Volume of methane
+produced in the
+digester (m3CH4
+kg-1VS)</p></td>
+</tr>
+<tr class="row-odd"><td></td>
+<td><p>=</p></td>
+<td><p>Volume of methane
+used for energy
+production (m3CH4
+kg-1VS)</p></td>
+</tr>
+<tr class="row-even"><td></td>
+<td><p>=</p></td>
+<td><p>Volume of methane
+flared (m3CH4
+kg-1VS)</p></td>
+</tr>
+<tr class="row-odd"><td></td>
+<td><p>=</p></td>
+<td><p>Methane Conversion
+Factor for the
+storage of
+digested manure %</p></td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<div><p>27</p>
+</div></blockquote>
+<p>Manure Module</p>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Bo</p></th>
+<th class="head"><p>=</p></th>
+<th class="head"><p>Maximum methane
+production
+capacity for
+manure produced by</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td></td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p>the current livestock category (m3CH4 kg-1VS)</p>
+<blockquote>
+<div><p>𝐸𝐹𝑇 = 𝑉𝑆𝑇 × 𝐵0, 𝑇 × 0. 67 × 𝑀𝐶𝐹 × 𝐴𝑊𝑀𝑆𝑇𝑆</p>
+</div></blockquote>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>EFT</p></th>
+<th class="head"><p>=</p></th>
+<th class="head"><p>Methane Emissions
+from manure
+management for
+species T</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>VST</p></td>
+<td><p>=</p></td>
+<td><p>Annual average VS
+excretion per head
+of species T</p></td>
+</tr>
+<tr class="row-odd"><td><p>AWMSTS</p></td>
+<td><p>=</p></td>
+<td><p>Fraction of total
+annual VS for
+livestock category
+T and manure</p></td>
+</tr>
+</tbody>
+</table>
+<p>system S</p>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>𝐶𝐻4 =</p></th>
+<th class="head"></th>
+<th class="head"><div class="line-block">
+<div class="line">𝐸𝐹𝑇𝑆</div>
+<div class="line">1000×</div>
+</div>
+</th>
+<th class="head"><div class="line-block">
+<div class="line">#𝑇</div>
+<div class="line">∑ 𝑁𝑇 × 𝑉𝑆𝑇
+× 𝐴𝑊𝑀𝑆𝑇𝑆 (
+)</div>
+<div class="line">𝑇=0</div>
+</div>
+</th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>EFTS</p></td>
+<td><p>=</p></td>
+<td><p>Emission
+Factor for
+direct CH4
+emissions
+from manure
+management</p></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p>system S</p>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>#T</p></th>
+<th class="head"><p>=</p></th>
+<th class="head"><p>Number of
+livestock types</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>NT</p></td>
+<td><p>=</p></td>
+<td><p>Number of
+livestock of type
+T</p></td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<div><p><strong>B. Nitrous Oxide (N2O)</strong></p>
+</div></blockquote>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"></th>
+<th class="head"><p>44×𝐸𝐹3𝑆</p></th>
+<th class="head"></th>
+<th class="head"><p>#𝑇</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>𝑁2𝑂𝐷 =</p></td>
+<td><p>28</p></td>
+<td><p>×</p></td>
+<td><p>∑ 𝑁𝑇𝑃 ×
+𝑁𝑒𝑥𝑇𝑃 ×
+𝐴𝑊𝑀𝑆𝑇𝑆𝑃 ( )</p>
+<p>𝑇=0</p>
+</td>
+</tr>
+<tr class="row-odd"><td><p>N2OD</p></td>
+<td><p>=</p></td>
+<td><p>Direct
+Nitrous
+Oxide N2O
+emissions
+from Manure
+Management</p></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<ol class="lowerroman simple" start="2000">
+<li></li>
+</ol>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>EF3S</p></th>
+<th class="head"><p>=</p></th>
+<th class="head"><p>Emissions factor
+for direct CH4
+emissions from
+manure</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td></td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p>management system S (kg N2O - N / kg N)</p>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>NTP</p></th>
+<th class="head"><p>=</p></th>
+<th class="head"><p>Number of
+livestock of type
+T in the country
+for productivity</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td></td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p>system P</p>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>NexTP</p></th>
+<th class="head"><p>=</p></th>
+<th class="head"><p>Annual average
+Nitrogen excretion
+per head of
+livestock T for
+the</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td></td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p>productivity system P (kg N / animal / year)</p>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>AWMSTSP</p></th>
+<th class="head"><p>=</p></th>
+<th class="head"><p>Fraction of total
+annual VS for
+species T managed
+in system S for</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td></td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p>productivity system P</p>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"></th>
+<th class="head"><p>%𝐺𝑎𝑠𝑇𝑆</p></th>
+<th class="head"></th>
+<th class="head"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>#
+𝑇</p></th>
+<th class="head"><p>(</p></th>
+<th class="head"><p>)</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td></td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+</th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>𝑁𝑣𝑜𝑙 =</p></td>
+<td><p>100</p></td>
+<td><p>×</p></td>
+<td><p>∑ 𝑁𝑇𝑃 ×
+𝑁𝑒𝑥𝑇𝑃 ×
+𝐴𝑊𝑀𝑆𝑇𝑆𝑃 𝑇=0</p></td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<div><p>28</p>
+</div></blockquote>
+<p>Manure Module</p>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Nvol</p></th>
+<th class="head"><p>=</p></th>
+<th class="head"><div class="line-block">
+<div class="line">Nitrogen lost
+due to
+volatilization
+of NH3 and NOx
+(mm)</div>
+<div class="line">Percent of
+manure for
+category T that
+volatilizes in
+the manure
+system S</div>
+</div>
+</th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>%GasTS =</p></td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<div><p>𝑁2𝑂𝐺 = 𝑁𝑣𝑜𝑙 × 𝐸𝐹4 ×44</p>
+</div></blockquote>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>N2OG</p></th>
+<th class="head"><p>=</p></th>
+<th class="head"><p>Indirect N2O
+emissions due to
+volatilization of
+N from manure</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td></td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p>management (mm)</p>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>EF4</p></th>
+<th class="head"><p>=</p></th>
+<th class="head"><p>Emissions factor
+for N2O emissions
+from atmospheric
+deposition</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td></td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p>(kg N2O - N / (kg NH3 - N + NOx - N volatilized) )</p>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"></th>
+<th class="head"><p>%𝑙𝑒𝑎𝑐ℎ𝑇𝑆</p></th>
+<th class="head"></th>
+<th class="head"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>#
+𝑇</p></th>
+<th class="head"><p>(</p></th>
+<th class="head"><p>)</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td></td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+</th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>𝑁𝑙𝑒𝑎𝑐ℎ =</p></td>
+<td><p>100</p></td>
+<td><p>×</p></td>
+<td><div class="line-block">
+<div class="line">∑ 𝑁𝑇 ×
+𝑁𝑒𝑥𝑇 ×
+𝐴𝑊𝑀𝑆𝑇𝑆</div>
+<div class="line">𝑇=0</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><p>Nleach</p></td>
+<td><p>=</p></td>
+<td><p>Manure
+nitrogen
+leached from
+manure
+management
+systems</p></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<ol class="lowerroman simple" start="2000">
+<li></li>
+</ol>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>%leachTS</p></th>
+<th class="head"><p>=</p></th>
+<th class="head"><p>% manure N lost
+for category T due
+to runoff and
+leaching during</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td></td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<div><p>solid and liquid storage. (Derived from country specific data, to be
+developed specifically for regions with high rainfall rates and
+outdoor, uncovered manure pens.)</p>
+<p>𝑁2𝑂𝐿 = 𝑁𝑙𝑒𝑎𝑐ℎ × 𝐸𝐹5 ×44</p>
+</div></blockquote>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>N2OL</p></th>
+<th class="head"><p>=</p></th>
+<th class="head"><p>Indirect N2O
+emissions from
+leaching and
+runoff</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td></td>
+<td><p>=</p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>EF5</p></td>
+<td></td>
+<td><p>Emissions factor
+for N2O emissions
+from nitrogen
+leaching and
+runoff</p></td>
+</tr>
+</tbody>
+</table>
+<p>(kg N2O - N / kg N)</p>
+<blockquote>
+<div><p><strong>3. Proposed Rule for Mandatory Reporting of Greenhouse Gases</strong> This
+code was developed from a Technical Support Document for Manure
+Management Systems. This module takes number of days as an input, but
+the weather data purports to be hourly. It looks like Osama attempted
+to deal with this by running the code for each hour in each day, but
+the way the weather file is being read has the function of reading
+the first 10 hours and reporting it as 10 days. Part of this is going
+to be switching the weather file from txt to csv and adjusting the
+way it is read, the other solution may simply be running the code
+with a daily interval weather file.</p>
+<p>29</p>
+</div></blockquote>
+<p>Manure Module</p>
+<blockquote>
+<div><div class="line-block">
+<div class="line"><strong>A. Methane (CH4)</strong></div>
+<div class="line">Total Methane (CH4) generated from the digester</div>
+</div>
+</div></blockquote>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>𝐶𝐻4 = 𝑉𝑛 ×</p></th>
+<th class="head"></th>
+<th class="head"><div class="line-block">
+<div class="line">𝐶𝑛</div>
+<div class="line">100× 0.
+0423 × 520
+𝑇𝑅× 𝑃𝑛×
+1440 ×</div>
+</div>
+</th>
+<th class="head"><div class="line-block">
+<div class="line">1</div>
+<div class="line">2.20462×
+𝐷𝑎𝑦𝑠</div>
+</div>
+</th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Vn</p></td>
+<td><p>=</p></td>
+<td><blockquote>
+<div><div class="line-block">
+<div class="line">Daily
+average
+volumetric
+flow rate
+for day n
+(acfm)</div>
+<div class="line">Daily
+average
+CH4</div>
+</div>
+</div></blockquote>
+<dl class="simple">
+<dt>concentration</dt><dd><p>for
+digester
+gas for
+day n (%,
+wet</p>
+</dd>
+</dl>
+</td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>Cn</p></td>
+<td><p>=</p></td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p>basis)</p>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>TR</p></th>
+<th class="head"><p>=</p></th>
+<th class="head"><p>Read temperature
+(ºK)</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Pn</p></td>
+<td><p>=</p></td>
+<td><p>Pressure at which
+flow is measured
+for day n (atm)</p></td>
+</tr>
+<tr class="row-odd"><td><p>Days</p></td>
+<td><p>=</p></td>
+<td><p>Number of days in
+the reporting year
+(days/yr)</p></td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<div><p>Methane destruction of Digesters</p>
+</div></blockquote>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>𝐶 =𝐶𝐻4×𝐷𝐸×𝑂𝐻 𝐻𝑜𝑢𝑟𝑠</p></th>
+<th class="head"></th>
+<th class="head"></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>C</p></td>
+<td><p>=</p></td>
+<td><p>Methane
+destruction of
+digesters (kg/day)</p></td>
+</tr>
+<tr class="row-odd"><td><p>DE</p></td>
+<td><p>=</p></td>
+<td><p>CH4 destruction
+efficiency from
+flaring or burning
+in engine</p></td>
+</tr>
+<tr class="row-even"><td><p>OH</p></td>
+<td><p>=</p></td>
+<td><p>Number of hours
+destruction device
+is functioning</p></td>
+</tr>
+<tr class="row-odd"><td><p>Hours</p></td>
+<td><p>=</p></td>
+<td><p>Total hours in
+reporting</p></td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<div><p>Methane leakage at digesters</p>
+</div></blockquote>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>𝐷 = 𝐶𝐻4 ×</p></th>
+<th class="head"></th>
+<th class="head"></th>
+<th class="head"><p>1</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td></td>
+<td></td>
+<td></td>
+<td><p>𝐶𝐸−1</p></td>
+</tr>
+<tr class="row-odd"><td><p>D</p></td>
+<td><p>=</p></td>
+<td><p>Methane
+leakage at
+digesters</p></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p>CE =</p></td>
+<td></td>
+<td><p>CH4
+collection
+efficiency
+of anaerobic
+digester</p></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<div><p><strong>B. Nitrous Oxide (N2O)</strong></p>
+<p>USCIS</p>
+</div></blockquote>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>𝐸 =44 28× 𝑁𝑒𝑥× 𝐸𝐹
+× 𝐷𝑎𝑦𝑠</p></th>
+<th class="head"></th>
+<th class="head"></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>E</p></td>
+<td><p>=</p></td>
+<td><p>Direct Nitrous
+Oxide emissions
+from MMS (kg/day)</p></td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<div><p>30</p>
+</div></blockquote>
+<p>Manure Module</p>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Nex</p></th>
+<th class="head"><p>=</p></th>
+<th class="head"><p>Total nitrogen
+excreted per
+animal type
+(kg/day)</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>EF</p></td>
+<td><p>=</p></td>
+<td><p>Emissions Factor
+for the given MMS
+(kg N2O-N/kg N)</p></td>
+</tr>
+<tr class="row-odd"><td><p>Days</p></td>
+<td><p>=</p></td>
+<td><p>Days in the
+reporting year</p></td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<div><p>Greenhouse gas generated by the MMS</p>
+<p>𝐺𝐺𝐺 = 𝐵 + 𝐸</p>
+</div></blockquote>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>GGG</p></th>
+<th class="head"><p>=</p></th>
+<th class="head"><p>Generated
+Greenhouse Gas
+(kg/day)</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td></td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<div><p>Total greenhouse gas emissions from the MMS</p>
+<p>𝐺𝐺𝐸 = 𝐵 − 𝐶 + 𝐷 + 𝐸 )</p>
+</div></blockquote>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>GGE</p></th>
+<th class="head"><p>=</p></th>
+<th class="head"><p>Greenhouse Gas
+Emissions (kg/day)</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td></td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<div><div class="line-block">
+<div class="line"><strong>4. Manure Production and Emissions from Pigs</strong></div>
+<div class="line">This module suffers the same timestep / weather file confusion
+detailed above. It is</div>
+</div>
+<p>developed from the paper “Modelling of manure production by pigs and
+NH3, N2O, Ch4</p>
+<p>emissions. Part II: effect of animal housing, manure storage, and
+treatment practices.”</p>
+<div class="line-block">
+<div class="line"><strong>A. Ammonia (NO3)</strong></div>
+<div class="line">Calculate NO3 from the outdoor slurry tank</div>
+</div>
+<div class="line-block">
+<div class="line">𝐸𝑓𝑓𝑙𝑢𝑒𝑛𝑡𝑇𝑒𝑚𝑝 = 0. 9614 × 𝑇𝑅 + 1. 6889</div>
+<div class="line">EffluentTemp= No description is given, I am hoping the name is
+sufficiently</div>
+</div>
+</div></blockquote>
+<p>descriptive</p>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>TR</p></th>
+<th class="head"><p>=</p></th>
+<th class="head"><p>Read temperature
+(currently in ºK
+taken hourly)</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><div class="line-block">
+<div class="line">0.08×𝐸𝑓𝑓𝑙𝑢𝑒𝑛𝑡𝑇𝑒𝑚𝑝
+| 𝑉𝐹𝑇𝑒𝑚𝑝 =𝑒 2.612</div>
+</div>
+</td>
+<td></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>VFTemp</p></td>
+<td><p>=</p></td>
+<td><p>Temperature
+variation factor</p></td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<div><p>𝑉𝐹𝑁𝐷𝑖𝑙𝑢𝑡𝑖𝑜𝑛 =𝑇𝐴𝑁</p>
+</div></blockquote>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>VFNDilution</p></th>
+<th class="head"><p>=</p></th>
+<th class="head"><p>“A correction
+factor”</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td></td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<div><p>31</p>
+</div></blockquote>
+<p>Manure Module</p>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>TAN</p></th>
+<th class="head"><p>=</p></th>
+<th class="head"><p>Ammoniacal N
+concentration
+(mg/kg)</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td></td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<div><p>𝑁𝐻3𝑜𝑢𝑡𝑑𝑜𝑜𝑟 = 1. 57 × 𝑉𝐹𝑇𝑒𝑚𝑝 × 𝑉𝐹𝑁𝐷𝑖𝑙𝑢𝑡𝑖𝑜𝑛 × 𝑉𝐹𝐶𝑜𝑣𝑒𝑟 × 𝑆𝐴 × 𝑆𝑇</p>
+</div></blockquote>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>NH3outdoor =</p></th>
+<th class="head"></th>
+<th class="head"><div class="line-block">
+<div class="line">Ammonia from the
+outdoor slurry
+tank (g NH3/m2)
+Cover variation
+factor (???)</div>
+<div class="line">Surface Area of
+the tank (m2)</div>
+<div class="line">Storage Time
+(days)</div>
+</div>
+</th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>VFCover</p></td>
+<td><p>=</p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>SA</p></td>
+<td><p>=</p></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p>ST</p></td>
+<td><p>=</p></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<div><p>Total N losses for the building</p>
+<p>𝑁𝐿𝑜𝑠𝑠 = 0. 64 × 𝑁𝑖𝑛𝑖𝑡𝑖𝑎𝑙 × 𝑉𝐹𝐵𝑀 × 𝑉𝐹𝐿𝑆 × 𝑉𝐹𝑀 × 𝑉𝐹𝐵𝐴 × 𝑉𝐹𝑀𝑖𝑥𝑖𝑛𝑔</p>
+</div></blockquote>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>NLoss</p></th>
+<th class="head"><p>=</p></th>
+<th class="head"><p>Total N lost from
+the building</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Ninitial</p></td>
+<td><p>=</p></td>
+<td><p>Initial Nitrogen
+(kg/kg)</p></td>
+</tr>
+<tr class="row-odd"><td><p>VFBM</p></td>
+<td><p>=</p></td>
+<td><p>Variation factor
+for the bedding
+material type
+(kg/pig)</p></td>
+</tr>
+<tr class="row-even"><td><p>VFLS</p></td>
+<td><p>=</p></td>
+<td><p>Variation factor
+for the Litter
+Surface (m2/pig)</p></td>
+</tr>
+<tr class="row-odd"><td><p>VFM</p></td>
+<td><p>=</p></td>
+<td><p>Variation factor
+for Maintenance</p></td>
+</tr>
+<tr class="row-even"><td><p>VFBA</p></td>
+<td><p>=</p></td>
+<td><p>Variation factor
+for bedding amount
+(kg/pig)</p></td>
+</tr>
+<tr class="row-odd"><td><p>VFMixing</p></td>
+<td><p>=</p></td>
+<td><p>Variation factor
+for mixing</p></td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<div><p>Calculate NH3 emissions</p>
+</div></blockquote>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>𝑁𝐻3𝐸 =17 14× 0. 2
+× 𝑁𝑖𝑛𝑖𝑡𝑖𝑎𝑙× 𝑉𝐹𝐿𝑆×
+𝑉𝐹𝑀× 𝑉𝐹𝐵𝐴</p></th>
+<th class="head"></th>
+<th class="head"></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>NH3E</p></td>
+<td><p>=</p></td>
+<td><p>Ammonia emissions
+from the building</p></td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<div><div class="line-block">
+<div class="line"><strong>B. Methane (CH4)</strong></div>
+<div class="line">Calculate Methane Emissions</div>
+</div>
+<p>𝐶𝐻4𝐸 = 𝑉𝑆 × 𝐵𝑜 × 𝑀𝐶𝐹</p>
+</div></blockquote>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>CH4E</p></th>
+<th class="head"><p>=</p></th>
+<th class="head"><p>Methane emissions
+from the building</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>VS</p></td>
+<td><p>=</p></td>
+<td><p>Total Volatile
+Solids (kg)</p></td>
+</tr>
+<tr class="row-odd"><td><p>Bo</p></td>
+<td><p>=</p></td>
+<td><p>Maximum Methane
+producing capacity
+(m3/kg)</p></td>
+</tr>
+<tr class="row-even"><td><p>MCF</p></td>
+<td><p>=</p></td>
+<td><p>Methane Conversion
+Factor</p></td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<div><p>32</p>
+</div></blockquote>
+<p>Manure Module</p>
+<blockquote>
+<div><p><strong>C. Nitrous Oxide (N2O)</strong></p>
+<p>Calculate Nitrous Oxide Emissions</p>
+</div></blockquote>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>𝑁2𝑂𝐸 =44 28× 0. 06
+× 𝑁𝑖𝑛𝑖𝑡𝑖𝑎𝑙× 𝑉𝐹𝐵𝑀×
+𝑉𝐹𝐿𝑆× 𝑉𝐹𝑀× 𝑉𝐹𝐵𝐴×
+𝑉𝐹𝑀𝑖𝑥𝑖𝑛𝑔</p></th>
+<th class="head"></th>
+<th class="head"></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>N2OE</p></td>
+<td><p>=</p></td>
+<td><p>Nitrous Oxide
+emissions from the
+building</p></td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<div><p><strong>D. Solid Manure Composting</strong></p>
+<p>𝑋𝐸𝑚𝑖𝑡𝑡𝑒𝑑𝐶𝑜𝑚𝑝𝑜𝑠𝑡𝑖𝑛𝑔 = 𝐸𝐹 × 𝑉𝐹𝑀𝑇 × 𝑉𝐹𝑇𝑁 × 𝑉𝐹𝑂𝑇 × 𝑉𝐹𝐶𝐷</p>
+</div></blockquote>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>XEmittedComposting</p></th>
+<th class="head"><p>=</p></th>
+<th class="head"><p>Emitted Composting
+(no idea where the
+X comes from??)</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>EF</p></td>
+<td><p>=</p></td>
+<td><p>Emission Factor</p></td>
+</tr>
+<tr class="row-odd"><td><p>VFMT</p></td>
+<td><p>=</p></td>
+<td><p>Variation Factor
+manure type (kg)</p></td>
+</tr>
+<tr class="row-even"><td><p>VFTN</p></td>
+<td><p>=</p></td>
+<td><p>Variation Factor
+Turning Number
+(kg)</p></td>
+</tr>
+<tr class="row-odd"><td><p>VFOT</p></td>
+<td><p>=</p></td>
+<td><p>Variation Factor
+Outside
+Temperature (ºC)</p></td>
+</tr>
+<tr class="row-even"><td><p>VFCD</p></td>
+<td><p>=</p></td>
+<td><p>Variation Factor
+Composting
+Duration (months)</p></td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<div><div class="line-block">
+<div class="line"><strong>5. System Management</strong></div>
+<div class="line"><strong>A. Methane (CH4)</strong></div>
+</div>
+<p>Methane emissions produced from unprocessed manure on the
+ground/floor are</p>
+<p>calculated</p>
+<p>𝑀𝑒𝑡ℎ𝑎𝑛𝑒𝑓𝑙𝑜𝑜𝑟 = 𝑚𝑎𝑥 0, 0. 13 × 𝑇𝑅 ) × 𝐴𝑓𝑙𝑜𝑜𝑟</p>
+</div></blockquote>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Methanefloor</p></th>
+<th class="head"><p>=</p></th>
+<th class="head"><p>Methane produced
+from unprocessed
+manure on the
+floor</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td></td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p>(g CH4/day)</p>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>TR</p></th>
+<th class="head"><p>=</p></th>
+<th class="head"><p>⎡</p></th>
+<th class="head"><p>Re
+ad</p>
+<blockquote>
+<div><p>t</p>
+</div></blockquote>
+<p>em
+pe
+ra
+tu
+re</p>
+<p>(º
+K)</p>
+</th>
+<th class="head"></th>
+<th class="head"></th>
+<th class="head"></th>
+<th class="head"></th>
+<th class="head"></th>
+<th class="head"></th>
+<th class="head"></th>
+<th class="head"></th>
+<th class="head"><p>⎤</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Af
+lo
+or</p></td>
+<td><p>=</p></td>
+<td></td>
+<td><p>Ar
+ea</p>
+<blockquote>
+<div><p>c</p>
+</div></blockquote>
+<p>ov
+er
+ed</p>
+<p>by</p>
+<p>ma
+nu
+re</p>
+<p>(m
+2)</p>
+</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td></td>
+<td></td>
+<td></td>
+<td><p>2
+4×
+𝑉𝑆
+𝑑×
+𝑏1</p></td>
+<td><p>𝑙𝑛
+𝐴
+(
+)−</p></td>
+<td><p>𝐸</p></td>
+<td><p>⎤</p></td>
+<td></td>
+<td><p>⎡</p></td>
+<td><p>24
+×𝑉
+𝑆𝑛
+𝑑×
+𝑏2</p></td>
+<td><p>𝑙𝑛
+𝐴
+(
+)−</p></td>
+<td><p>𝐸</p></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p>𝑀
+𝑒𝑡
+ℎ𝑎
+𝑛𝑒
+𝑙𝑖
+𝑞𝑢
+𝑖𝑑
+=</p></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td><p>𝑅×
+𝑇𝑅</p></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td><p>𝑅×
+𝑇𝑅</p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td></td>
+<td></td>
+<td><p>⎢⎣</p></td>
+<td><p>10
+00</p></td>
+<td><p>×</p>
+<p>𝑒</p>
+</td>
+<td></td>
+<td><p>⎥⎦</p></td>
+<td><ul class="simple">
+<li></li>
+</ul>
+</td>
+<td><p>⎢⎣</p></td>
+<td><p>10
+00</p></td>
+<td><p>×</p>
+<p>𝑒</p>
+</td>
+<td></td>
+<td><p>⎥⎦</p></td>
+</tr>
+<tr class="row-even"><td><p>M
+et
+ha
+ne
+li
+qu
+id</p></td>
+<td><p>=</p></td>
+<td></td>
+<td><p>M
+et
+ha
+ne
+pr
+od
+uc
+ed
+fr
+om
+st
+or
+ed
+li
+qu
+id
+ma
+nu
+re
+(g
+CH
+4/
+da
+y)</p></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<div><p>33</p>
+</div></blockquote>
+<p>Manure Module</p>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>VSd</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td></td>
+</tr>
+</tbody>
+</table>
+</th>
+<th class="head"><p>=</p></th>
+<th class="head"><p>Degradable
+volatile solids
+(g)</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td></td>
+<td><p>=</p></td>
+<td><p>Rate correcting
+factor 1</p></td>
+</tr>
+<tr class="row-odd"><td><p>b1</p></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p>A</p></td>
+<td><p>=</p></td>
+<td><p>Arrhenius
+parameter (g
+CH4/(kg VS)/h)</p></td>
+</tr>
+<tr class="row-odd"><td><p>E</p></td>
+<td><p>=</p></td>
+<td><p>Apparent
+activation energy
+(j/mol)</p></td>
+</tr>
+<tr class="row-even"><td><p>R</p></td>
+<td><p>=</p></td>
+<td><p>Constant (J/K/mol)</p></td>
+</tr>
+<tr class="row-odd"><td><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>VSnd</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td></td>
+</tr>
+</tbody>
+</table>
+</td>
+<td><p>=</p></td>
+<td><p>Nondegradable
+volatile solids
+(g)</p></td>
+</tr>
+<tr class="row-even"><td></td>
+<td><p>=</p></td>
+<td><p>Rate correcting
+factor 2</p></td>
+</tr>
+<tr class="row-odd"><td><p>b2</p></td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<div><p>The methane conversion factor</p>
+</div></blockquote>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>𝑀𝐶𝐹 = 0. 201 × 𝑇𝑅
+− 273 ) − 0. 29</p></th>
+<th class="head"></th>
+<th class="head"></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>MCF</p></td>
+<td><p>=</p></td>
+<td><p>Methane Conversion
+Factor (%)</p></td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<div><p>Methane produced from stored solid manure</p>
+</div></blockquote>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>𝑀𝑒𝑡ℎ𝑎𝑛𝑒𝑠𝑜𝑙𝑖𝑑 =</p></th>
+<th class="head"></th>
+<th class="head"><p>𝑉𝑆×𝐵𝑜×0.68×𝑀𝐶𝐹</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td></td>
+<td></td>
+<td><p>100</p></td>
+</tr>
+<tr class="row-odd"><td><p>VS =</p></td>
+<td><p>Total volatile
+solids (g)</p></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p>Bo =</p></td>
+<td><p>Maximum methane
+producing capacity
+(m3CH4/g VS)</p></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<div><p>Total methane emissions from the manure management system is just the
+sum of these different components</p>
+<p>𝑇𝑜𝑡𝐶𝐻4 = 𝑀𝑒𝑡ℎ𝑎𝑛𝑒𝑓𝑙𝑜𝑜𝑟 + 𝑀𝑒𝑡ℎ𝑎𝑛𝑒𝑙𝑖𝑞𝑢𝑖𝑑 + 𝑀𝑒𝑡ℎ𝑎𝑛𝑒𝑠𝑜𝑙𝑖𝑑</p>
+</div></blockquote>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>TotCH4</p></th>
+<th class="head"><p>=</p></th>
+<th class="head"><p>Total methane
+emissions from the
+manure management
+system</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td></td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p>(g CH4/day)</p>
+<blockquote>
+<div><div class="line-block">
+<div class="line"><strong>B. Nitrous Oxide (N2O)</strong></div>
+<div class="line">Nitrous Oxide emissions from the puddle</div>
+</div>
+</div></blockquote>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>(
+77.345+0.0057×𝑇𝑅−7235
+𝑇𝑅</p>
+<blockquote>
+<div><p>𝑃𝑠𝑎𝑡 =𝑒 𝑇𝑅 8.2</p>
+</div></blockquote>
+</th>
+<th class="head"></th>
+<th class="head"><p>)</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Psat =</p></td>
+<td><p>Saturation
+pressure of water
+(no units)</p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>TR =</p></td>
+<td><p>Temperature (ºK)</p></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<div><p>34</p>
+</div></blockquote>
+<p>Manure Module</p>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"></th>
+<th class="head"><p>𝑃𝑠𝑎𝑡×18</p></th>
+<th class="head"></th>
+<th class="head"></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>ρ𝑣 =</p></td>
+<td><blockquote>
+<div><p>10</p>
+</div></blockquote>
+<p>0000×𝑇𝑅×0.08315</p>
+</td>
+<td></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>Pv =</p></td>
+<td></td>
+<td><p>Density of
+vapor of the
+puddle (no
+units)</p></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><blockquote>
+<div><p>𝑘𝐻2𝑂 = 0.
+0821 × 𝑇𝑅
+0.7 × 𝑉𝑅 0.5
+× 𝐷𝑃−0.5 ×
+𝐷𝐻2𝑂,𝐴𝑖𝑟</p>
+</div></blockquote>
+<p>0.666</p>
+</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>kH2O</p></td>
+<td></td>
+<td><p>=</p></td>
+<td><p>Convective
+mass
+transfer
+coefficient
+for water
+(no units)</p></td>
+</tr>
+<tr class="row-even"><td><p>VR</p></td>
+<td></td>
+<td><p>=</p></td>
+<td><p>Air velocity
+(m/s)</p></td>
+</tr>
+<tr class="row-odd"><td><p>DP</p></td>
+<td></td>
+<td><p>=</p></td>
+<td><p>Diameter of
+the puddle
+(m)</p></td>
+</tr>
+<tr class="row-even"><td><p>DH2O,Air</p></td>
+<td></td>
+<td><p>=</p></td>
+<td><p>Not listed
+as an input
+or
+calculated
+in the
+pseudocode,
+calculated</p></td>
+</tr>
+</tbody>
+</table>
+<p>in the code as a constant as below.</p>
+<p>−4</p>
+<blockquote>
+<div><p>𝐷𝐻2𝑂,𝐴𝑖𝑟 = 0. 26 × 10</p>
+<p>Calculate change in the volume of the puddle</p>
+</div></blockquote>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"></th>
+<th class="head"><p>𝑘𝐻2𝑂×𝐴𝑃</p></th>
+<th class="head"></th>
+<th class="head"></th>
+<th class="head"><p>𝑅𝐻</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>𝑑𝑉𝑃 =</p>
+<p>dVP=</p>
+<blockquote>
+<div><div class="line-block">
+<div class="line">AP =</div>
+<div class="line">PP =</div>
+<div class="line">RH =</div>
+</div>
+</div></blockquote>
+</td>
+<td><p>ρ𝑃</p></td>
+<td><p>× 1000 × ρ𝑣
+×</p></td>
+<td></td>
+<td><p>100− 1 )</p></td>
+</tr>
+<tr class="row-odd"><td></td>
+<td><blockquote>
+<div><div class="line-block">
+<div class="line">Change
+in
+volume
+of the
+puddle
+(no
+units)
+Area
+of the
+puddle
+(m2)</div>
+</div>
+</div></blockquote>
+<div class="line-block">
+<div class="line">Density
+of the
+puddle</div>
+</div>
+<blockquote>
+<div><blockquote>
+<div><p>(kg/m3)</p>
+</div></blockquote>
+<p>Relative
+humidity
+(%)</p>
+</div></blockquote>
+</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<div><p>Calculate the change in Urea concentration, first by calculating
+Urease activity.</p>
+</div></blockquote>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"></th>
+<th class="head"><p>𝑆𝑚𝑙</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>𝑆𝑚 =</p>
+<blockquote>
+<div><div class="line-block">
+<div class="line">Sm =</div>
+<div class="line">Sml =</div>
+<div class="line">CF =</div>
+</div>
+</div></blockquote>
+<p>VP =</p>
+</td>
+<td><p>( )×𝐶𝐹</p>
+<div class="line-block">
+<div class="line">Urease activity (no units)</div>
+<div class="line">Urease activity (g NH3 / m2/
+h)</div>
+</div>
+<p>Correction Factor for unit
+conversion Volume of the
+puddle (m3)</p>
+</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<div><p>35</p>
+</div></blockquote>
+<p>Manure Module</p>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>𝑑𝑈 =−</p>
+<p>dU =</p>
+<p>Km =</p>
+</th>
+<th class="head"></th>
+<th class="head"><p>(</p></th>
+<th class="head"><p>𝑆𝑚×𝑈</p></th>
+<th class="head"></th>
+<th class="head"><p>𝑈</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td></td>
+<td></td>
+<td></td>
+<td><p>𝐾𝑚+𝑈</p></td>
+<td><p>−</p></td>
+<td><p>𝑉𝑃×
+𝑑𝑉𝑃</p></td>
+</tr>
+<tr class="row-odd"><td></td>
+<td></td>
+<td><blockquote>
+<div><p>Change
+in
+Urea
+conc</p>
+</div></blockquote>
+<dl class="simple">
+<dt>entration</dt><dd><p>(no
+units)</p>
+</dd>
+</dl>
+<p>Michaelis</p>
+<blockquote>
+<div><p>constant</p>
+<blockquote>
+<div><p>(mol/L)</p>
+</div></blockquote>
+</div></blockquote>
+</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p>U</p></td>
+<td><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>=</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td></td>
+</tr>
+</tbody>
+</table>
+</td>
+<td><blockquote>
+<div><p>Urea
+conc</p>
+</div></blockquote>
+<p>entration</p>
+<blockquote>
+<div><p>(mol/L)</p>
+</div></blockquote>
+</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<div><p>Calculate the convective mass transfer coefficient for ammonia</p>
+</div></blockquote>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><blockquote>
+<div><p>𝑘𝑁𝐻3 = 0. 0821 ×
+𝑇𝑅 0.7 × 𝑉𝑅 0.5 ×
+𝐷𝑃−0.5 × 𝐷𝑁𝐻3,𝐴𝑖𝑟</p>
+</div></blockquote>
+<p>0.666</p>
+</th>
+<th class="head"></th>
+<th class="head"></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>kNH3</p></td>
+<td><p>=</p></td>
+<td><p>Convective mass
+transfer
+coefficient of
+ammonia (no units)</p></td>
+</tr>
+<tr class="row-odd"><td><p>DNH3,Air</p></td>
+<td><p>=</p></td>
+<td><p>Similar to
+DH20,Air above
+this is neither
+listed as an input
+nor</p></td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<div><div class="line-block">
+<div class="line">calculated in the pseudocode. It is calculated in the code as a</div>
+<div class="line">constant as below.</div>
+</div>
+<div class="line-block">
+<div class="line">−4</div>
+<div class="line">𝐷𝑁𝐻3,𝐴𝑖𝑟 = 0. 28 × 10</div>
+</div>
+<p>The fraction of TAN (Total Ammonical Nitrogen in the puddle) in
+ammonia form is calculated as</p>
+</div></blockquote>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>𝑓𝑃 = 𝑚𝑎𝑥⎛</p></th>
+<th class="head"></th>
+<th class="head"></th>
+<th class="head"><div class="line-block">
+<div class="line">𝑝𝐻𝑃</div>
+<div class="line">10</div>
+</div>
+</th>
+<th class="head"><p>⎞</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td></td>
+<td></td>
+<td></td>
+<td><div class="line-block">
+<div class="line">𝑝𝐻</div>
+<div class="line">𝑃+5×10
+(</div>
+</div>
+<blockquote>
+<div><dl class="simple">
+<dt>0.0897+</dt><dd><p>2729
+𝑇𝑅 10</p>
+</dd>
+</dl>
+</div></blockquote>
+</td>
+<td><div class="line-block">
+<div class="line">), 0.
+05</div>
+<div class="line">⎠</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><p>⎝</p></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p>fP</p></td>
+<td><p>=</p></td>
+<td><p>Fraction
+of TAN
+in
+ammonia
+form in
+the
+puddle
+(no
+units)</p></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>pHP=</p></td>
+<td></td>
+<td><p>pH of
+the
+puddle</p></td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<div><p>The dimensionless Henry Constant for ammonia in the puddle is</p>
+<div class="line-block">
+<div class="line">( 293−𝑇𝑅 )</div>
+<div class="line">𝐻𝑃 = 1431 × 1. 053</div>
+</div>
+<p>HP = Dimensionless Henry Constant for ammonia in the puddle</p>
+<p>The change in total ammoniacal nitrogen concentration in the puddle
+is calculated</p>
+<p>36</p>
+</div></blockquote>
+<p>Manure Module</p>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>𝑑𝑇
+𝐴𝑁𝑃
+=−
+2 ×</p></th>
+<th class="head"></th>
+<th class="head"></th>
+<th class="head"></th>
+<th class="head"><p>−𝑆
+𝑚×𝑈</p></th>
+<th class="head"></th>
+<th class="head"><p>𝑘𝑁
+𝐻3×
+𝐴𝑃×
+100
+0×(</p></th>
+<th class="head"><p>𝑓
+𝑃×𝑇
+𝐴𝑁𝑃</p></th>
+<th class="head"><p>−𝐶𝑅
+)</p></th>
+<th class="head"></th>
+<th class="head"><p>𝑇
+𝐴𝑁𝑃</p></th>
+<th class="head"></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td><p>𝐻𝑃</p></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td></td>
+<td></td>
+<td></td>
+<td></td>
+<td><p>𝐾
+𝑚+𝑈</p></td>
+<td><p>−</p></td>
+<td><p>𝑉𝑃</p></td>
+<td></td>
+<td></td>
+<td><p>−</p></td>
+<td><p>𝑉𝑃</p></td>
+<td><blockquote>
+<div><p>×</p>
+</div></blockquote>
+<p>𝑑𝑉𝑃</p>
+</td>
+</tr>
+<tr class="row-even"><td><p>dT
+ANP</p></td>
+<td><p>=</p></td>
+<td><p>Cha
+nge</p>
+<blockquote>
+<div><p>in</p>
+<p>to</p>
+</div></blockquote>
+<p>tal</p>
+<blockquote>
+<div><p>a</p>
+</div></blockquote>
+<p>mmo
+nia
+cal</p>
+<blockquote>
+<div><p>ni</p>
+</div></blockquote>
+<p>tro
+gen</p>
+<blockquote>
+<div><p>c</p>
+</div></blockquote>
+<p>onc
+ent
+rat
+ion</p>
+<blockquote>
+<div><p>in</p>
+</div></blockquote>
+<p>the</p>
+<p>pud
+dle</p>
+</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p>(no units)</p>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>TANP</p></th>
+<th class="head"><p>=</p></th>
+<th class="head"><p>Total ammoniacal
+nitrogen
+concentration in
+the puddle (mol/L)</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td></td>
+<td><p>=</p></td>
+<td><p>Concentration of
+ammonia already
+present in the air
+(mol/L)</p></td>
+</tr>
+<tr class="row-odd"><td><p>CR</p></td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<div><p>The change in the concentration of the pH of the buddle is calculated</p>
+<div class="line-block">
+<div class="line">𝑑𝑝𝐻𝑃 =− 0. 75 × 𝑑𝑇𝐴𝑁𝑃, 𝑑𝑇𝐴𝑁𝑃 &gt; 0</div>
+<div class="line">𝑑𝑝𝐻𝑃 = 6 × 𝑑𝑇𝐴𝑁𝑃, 𝑑𝑇𝐴𝑁𝑃 &lt; 0</div>
+</div>
+<p>And finally, Nitrous Oxide emission from the puddle is calculated</p>
+</div></blockquote>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>𝐸𝑃 = 𝑘𝑁𝐻3 ×
+𝐴𝑃 × 1000 ×</p></th>
+<th class="head"></th>
+<th class="head"><p>(</p></th>
+<th class="head"><p>𝑓𝑃×𝑇𝐴𝑁𝑃</p></th>
+<th class="head"><p>)</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td></td>
+<td></td>
+<td></td>
+<td><p>𝐻𝑃</p></td>
+<td><p>− 𝐶𝑅</p></td>
+</tr>
+<tr class="row-odd"><td><p>EP =</p></td>
+<td><blockquote>
+<div><p>Nitrous
+Oxide</p>
+</div></blockquote>
+<dl class="simple">
+<dt>emissions</dt><dd><p>from the
+puddle
+(mol/s)</p>
+</dd>
+</dl>
+</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<div><p>The next 5 equations are used to calculate Nitrous Oxide (N2O)
+emissions from Feces</p>
+<p>(Slurry).</p>
+</div></blockquote>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"></th>
+<th class="head"><p>( 𝑇𝑅+𝑇𝑆 )</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>𝑇𝑓𝑖𝑙𝑚 =</p>
+<p>Tfilm=</p>
+<p>TR =</p>
+<p>TS =</p>
+</td>
+<td><p>2</p>
+<div class="line-block">
+<div class="line">No description or units
+given</div>
+<div class="line">Read temperature (ºK)</div>
+<div class="line">Temperature of the slurry
+(no units given)</div>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<div><p>The Convective mass transfer coefficient for ammonia is calculated</p>
+</div></blockquote>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>𝑘𝑁𝐻3,𝑆 = 0. 0821 ×
+𝑇𝑓𝑖𝑙𝑚 0.7 × 𝑉𝐻 0.5 ×
+𝐿𝑆𝑙𝑎𝑡−0.5 × 𝐷𝑁𝐻3,𝐴𝑖𝑟
+0.666</p></th>
+<th class="head"></th>
+<th class="head"></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>kNH3,S</p></td>
+<td><p>=</p></td>
+<td><p>Convective mass
+transfer
+coefficient for
+ammonia (no units)</p></td>
+</tr>
+<tr class="row-odd"><td><p>VH</p></td>
+<td><p>=</p></td>
+<td><p>Velocity over the
+slurry surface
+(m/s)</p></td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<div><p>37</p>
+</div></blockquote>
+<p>Manure Module</p>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>LSlat</p></th>
+<th class="head"><p>=</p></th>
+<th class="head"><p>Slatted floor
+length (m)</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>DNH3,Air</p></td>
+<td><p>=</p></td>
+<td><p>See previous note
+re: this parameter</p></td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<div><p>The dimensionless fraction of TAN in ammonia form from the slurry is
+calculated</p>
+</div></blockquote>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>𝑓𝑆 =</p></th>
+<th class="head"></th>
+<th class="head"><div class="line-block">
+<div class="line">𝑝𝐻𝑆</div>
+<div class="line">10</div>
+</div>
+</th>
+<th class="head"></th>
+<th class="head"></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td></td>
+<td></td>
+<td><p>10 𝑝𝐻𝑆+</p></td>
+<td><p>1</p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>fS</p></td>
+<td><p>=</p></td>
+<td><blockquote>
+<div><p>−
+0.0897+
+2729</p>
+</div></blockquote>
+<dl class="simple">
+<dt>9.245×10⎝</dt><dd><p>𝑇𝑓𝑖𝑙𝑚</p>
+</dd>
+</dl>
+</td>
+<td></td>
+<td><div class="line-block">
+<div class="line">⎞</div>
+<div class="line">⎠</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td></td>
+<td></td>
+<td><blockquote>
+<div><p>Fraction
+of TAN
+in
+ammonia
+form
+from the
+slurry
+(dim</p>
+</div></blockquote>
+<dl class="simple">
+<dt>ensionless)</dt><dd><p>pH level
+of the
+slurry</p>
+</dd>
+</dl>
+</td>
+<td></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>pHS=</p></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p>The dimensionless Henry Constant for ammonia in the slurry is calculated</p>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>( 293−𝑇𝑓𝑖𝑙𝑚 )</p>
+<blockquote>
+<div><p>𝐻𝑆 = 1431 × 1. 053</p>
+</div></blockquote>
+</th>
+<th class="head"></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>HS =</p></td>
+<td><p>Dimensionless Henry Constant
+for ammonia (slurry)</p></td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<div><p>Nitrous Oxide emissions from the Slurry are calculated</p>
+</div></blockquote>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>𝐸𝑆 = 𝑘𝑁𝐻3
+× 𝐴𝑆 ×
+1000 ×</p></th>
+<th class="head"></th>
+<th class="head"></th>
+<th class="head"><p>(</p></th>
+<th class="head"><p>𝑓𝑆×𝑇𝐴𝑁𝑆</p></th>
+<th class="head"><p>)</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td></td>
+<td></td>
+<td></td>
+<td></td>
+<td><p>𝐻𝑆</p></td>
+<td><p>− 𝐶𝑅</p></td>
+</tr>
+<tr class="row-odd"><td><p>ES</p></td>
+<td><p>=</p></td>
+<td><blockquote>
+<div><dl class="simple">
+<dt>Nitrous</dt><dd><p>Oxide</p>
+</dd>
+</dl>
+</div></blockquote>
+<dl>
+<dt>emissions</dt><dd><blockquote>
+<div><p>from
+the
+slurry</p>
+</div></blockquote>
+<p>(mol/s)</p>
+</dd>
+</dl>
+</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p>kNH3</p></td>
+<td><p>=</p></td>
+<td><blockquote>
+<div><blockquote>
+<div><p>I</p>
+</div></blockquote>
+<dl class="simple">
+<dt>believe</dt><dd><p>this
+should
+be</p>
+</dd>
+<dt>kNH3,S,</dt><dd><p>c</p>
+</dd>
+</dl>
+</div></blockquote>
+<dl class="simple">
+<dt>alculated</dt><dd><p>above</p>
+</dd>
+</dl>
+</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>AS</p></td>
+<td><p>=</p></td>
+<td><p>Area
+of the
+slurry</p></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p>TANS</p></td>
+<td><p>=</p></td>
+<td><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><blockquote>
+<div><p>T</p>
+</div></blockquote>
+<p>otal</p>
+<blockquote>
+<div><p>Am</p>
+</div></blockquote>
+<p>moni
+acal</p>
+<p>Nitr
+ogen</p>
+<blockquote>
+<div><p>c</p>
+</div></blockquote>
+<p>once
+ntra
+tion</p>
+<blockquote>
+<div><blockquote>
+<div><p>in</p>
+</div></blockquote>
+<p>the</p>
+<blockquote>
+<div><p>ma</p>
+</div></blockquote>
+</div></blockquote>
+<p>nure</p>
+<blockquote>
+<div><p>(mo</p>
+</div></blockquote>
+<p>l/L)</p>
+</th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td></td>
+</tr>
+</tbody>
+</table>
+</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>CR</p></td>
+<td><p>=</p></td>
+<td><p>Conc
+entration
+of
+ammonia
+already
+present
+in the
+air
+(mol/L)</p></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<div><p>Total Nitrous Oxide produced during the “time step” from the puddle
+and slurry is</p>
+<p>calculated</p>
+</div></blockquote>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>𝑇𝑜𝑡𝑁2𝑂 =
+3600 ×
+𝐸𝑆 +
+𝐸𝑃⎡⎢⎣ (
+)× 17</p></th>
+<th class="head"></th>
+<th class="head"><p>𝑚𝑜𝑙 𝑁𝐻3× 0.
+01 𝑔 𝑁2𝑂</p></th>
+<th class="head"><p>⎤⎥⎦ + 0.
+005</p></th>
+<th class="head"><div class="line-block">
+<div class="line">𝑔 𝑁2𝑂</div>
+<div class="line">𝑔
+𝑚𝑎𝑛𝑢𝑟𝑒
+𝑁×</div>
+</div>
+</th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><div class="line-block">
+<div class="line">−5</div>
+<div class="line">+ 5. 4
+×
+10⎡⎢⎣</div>
+</div>
+</td>
+<td><div class="line-block">
+<div class="line">𝑔 𝑁2𝑂</div>
+<div class="line">𝑘𝑔</div>
+</div>
+<blockquote>
+<div><dl class="simple">
+<dt>𝑚𝑎𝑛𝑢𝑟𝑒×</dt><dd><p>𝑀𝑘𝑔⎤⎥⎦</p>
+</dd>
+</dl>
+</div></blockquote>
+</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<div><p>38</p>
+</div></blockquote>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, RuFaS team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

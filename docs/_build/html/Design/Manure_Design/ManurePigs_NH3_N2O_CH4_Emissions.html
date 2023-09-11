@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ManurePigs NH3 N2O CH4 Emissions &mdash; Ruminant Farm Simulation (RuFaS)  documentation</title>
+      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/sphinx_highlight.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Animal Module" href="../../animal_design.html" />
+    <link rel="prev" title="Manure Models Sheet 1" href="Manure_Models%20_sheet1.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            Ruminant Farm Simulation (RuFaS)
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../modules.html">GitHub</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../../modules.html#design-documentation">Design Documentation</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="../../manure_design.html">Manure module</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="../../manure_design.html#submodules">Submodules</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="Anaerobic_digestion_discussion.html">Anaerobic Digestion Discussion</a></li>
+<li class="toctree-l4"><a class="reference internal" href="AD_variables.html">AD Variables</a></li>
+<li class="toctree-l4"><a class="reference internal" href="Compost_bedded_pack_barn_design_document.html">Compost Bedded Pack Barn</a></li>
+<li class="toctree-l4"><a class="reference internal" href="Compost_bedded_pack_barn/e4f80e0dc67749f689523bc44aca1003.html">Compost bedded pack barn (CBPB)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="Manure_Models%20_sheet1.html">Manure Models Sheet 1</a></li>
+<li class="toctree-l4 current"><a class="current reference internal" href="#">ManurePigs NH3 N2O CH4 Emissions</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../animal_design.html">Animal Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../feed_design.html">Feed Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../field_design.html">Field Design</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../manure_storage_design.html">Manure Storage</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">Ruminant Farm Simulation (RuFaS)</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../modules.html">GitHub</a></li>
+          <li class="breadcrumb-item"><a href="../../manure_design.html">Manure module</a></li>
+      <li class="breadcrumb-item active">ManurePigs NH3 N2O CH4 Emissions</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../_sources/Design/Manure_Design/ManurePigs_NH3_N2O_CH4_Emissions.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="manurepigs-nh3-n2o-ch4-emissions">
+<h1>ManurePigs NH3 N2O CH4 Emissions<a class="headerlink" href="#manurepigs-nh3-n2o-ch4-emissions" title="Permalink to this heading"></a></h1>
+<blockquote>
+<div><p>Manure Module: Calculate Ammonia (NH3), Nitrous Oxide (N2O) and
+Methane (CH4) Emissions by Animal Housing</p>
+<p>5.Calculate Ammonia (NH3), Nitrous Oxide (N2O) and Methane (CH4)
+Emissions by pigs.</p>
+<p>•Inputs (All inputs come from the weather file, the Animal Module).</p>
+</div></blockquote>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><ol class="lowerroman simple">
+<li></li>
+<li></li>
+<li></li>
+<li></li>
+<li></li>
+<li></li>
+<li></li>
+<li></li>
+<li></li>
+<li></li>
+<li></li>
+<li></li>
+<li></li>
+<li></li>
+<li></li>
+<li></li>
+<li></li>
+<li></li>
+</ol>
+</th>
+<th class="head"><div class="line-block">
+<div class="line">TAN = Ammoniacal N
+concentration (mg/kg)</div>
+<div class="line">SurfaceArea = m^2</div>
+<div class="line">StorageTime = days</div>
+<div class="line">N_Initial = kg/kg</div>
+<div class="line">VF_BeddingMaterialType =
+kg/pig</div>
+<div class="line">VF_LitterSurface = m^2/pig</div>
+<div class="line">VF_Maintenance =</div>
+<div class="line">VF_BeddingmaterialAmount =
+kg/pig</div>
+<div class="line">VF_Mixing =</div>
+<div class="line">B0 = Maximum methane
+producing capacity (m^3/kg )
+VS = Total volatile solids
+(kg)</div>
+<div class="line">MCF = methane conversion
+factor</div>
+<div class="line">EmissionFactor = (kg)</div>
+<div class="line">VF_ManureType = (kg)</div>
+<div class="line">VF_TurningNumber = (kg)</div>
+<div class="line">VF_OutsideTemperature = (o C
+)</div>
+<div class="line">VF_CompostingDuration =
+(months)</div>
+<div class="line">TR = Read Temperature
+(K-Kelvin)</div>
+</div>
+</th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<div><p>•Outputs</p>
+</div></blockquote>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><ol class="lowerroman simple">
+<li></li>
+<li></li>
+</ol>
+</th>
+<th class="head"><p>NH3_Outdoor = Ammonia from the
+outdoor slurry tank, g NH3/m2
+per day. N_LossesBuilding =
+total N losses</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<div><p>1</p>
+</div></blockquote>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><blockquote>
+<div><div class="line-block">
+<div class="line">iii.</div>
+<div class="line">iv.</div>
+<div class="line">v.</div>
+</div>
+</div></blockquote>
+<ol class="lowerroman simple" start="6">
+<li></li>
+</ol>
+</th>
+<th class="head"><div class="line-block">
+<div class="line">NH3_EmittedBuilding =
+Ammonia from the building
+N2O_EmittedBuilding =
+Nitrous Oxide from building
+CH4_Emitted = Methane CH4
+Emissions</div>
+<div class="line">X_EmittedComposting =
+Emitted Composting</div>
+</div>
+</th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<div><p>1.Calculate Ammonia from the outdoor slurry tank 1.VF_Temperature</p>
+</div></blockquote>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Temp_Effluent=0.9614*TR+1.6889</p></th>
+<th class="head"><p>[M.5.1.1.1]</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<div><p>VF_Temperature=𝑒(0.08∗Temp_Effluent) /2.612 [M.5.1.1.2]</p>
+<div class="line-block">
+<div class="line">2.VF_NDilution A Correction factor</div>
+<div class="line">VF_NDilution=TAN/1.03 [M.5.1.2]</div>
+</div>
+<p>3.Ammonia from the outdoor slurry tank</p>
+<div class="line-block">
+<div class="line">NH3_Outdoor=1.57*VF_Temperature*VF_NDilution*VF_Cover*SurfaceArea*StorageTime
+[M.5.1.3] 2. Calculate total N losses</div>
+<div class="line">N_LossesBuilding=0.64*N_Initial*VF_BeddingMaterialType*VF_LitterSurface*VF_M
+aintenance*VF_BeddingmaterialAmount*VF_Mixing [M.5.2.1]</div>
+</div>
+<div class="line-block">
+<div class="line">3. Calculate NH3</div>
+<div class="line">NH3_EmittedBuilding=17/14*0.20*N_Initial*VF_LitterSurface*VF_Maintenance*VF_
+BeddingmaterialAmount [M.5.3.1] 4. Calculate N2O</div>
+<div class="line">N2O_EmittedBuilding=44/28*0.06*N_Initial*VF_BeddingMaterialType*VF_LitterSurf
+ace*VF_Maintenance*VF_BeddingmaterialAmount*VF_Mixing [M.5.4.1]</div>
+</div>
+<p>2</p>
+<div class="line-block">
+<div class="line">5. Calculate CH4 emissions</div>
+<div class="line">CH4_Emitted=VS*B0*MCF [M.5.5.1] 6. Solid manure composting</div>
+<div class="line">X_EmittedComposting=EmissionFactor*VF_ManureType*VF_TurningNumber*VF_Outsid
+eTemperature*VF_CompostingDuration [M.5.6.1]</div>
+</div>
+<div class="line-block">
+<div class="line"><strong>References</strong></div>
+<div class="line">Rigolot, C., Espagnol, S., Robin, P., Hassouna, M., Béline, F.,
+Paillat, J. M., &amp; Dourmad, J. Y. (2010). Modelling of manure
+production by pigs and NH3, N2O and CH4 emissions. Part II: effect
+of animal housing, manure storage and treatment practices. Animal,
+4(8), 1413-1424.</div>
+</div>
+<p>3</p>
+</div></blockquote>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="Manure_Models%20_sheet1.html" class="btn btn-neutral float-left" title="Manure Models Sheet 1" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="../../animal_design.html" class="btn btn-neutral float-right" title="Animal Module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, RuFaS team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

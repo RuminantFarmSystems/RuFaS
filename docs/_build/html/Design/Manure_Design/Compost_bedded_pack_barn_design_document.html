@@ -1,0 +1,1208 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Compost Bedded Pack Barn &mdash; Ruminant Farm Simulation (RuFaS)  documentation</title>
+      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/sphinx_highlight.js"></script>
+        <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Compost bedded pack barn (CBPB)" href="Compost_bedded_pack_barn/e4f80e0dc67749f689523bc44aca1003.html" />
+    <link rel="prev" title="AD Variables" href="AD_variables.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            Ruminant Farm Simulation (RuFaS)
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../modules.html">GitHub</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../../modules.html#design-documentation">Design Documentation</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="../../manure_design.html">Manure module</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="../../manure_design.html#submodules">Submodules</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="Anaerobic_digestion_discussion.html">Anaerobic Digestion Discussion</a></li>
+<li class="toctree-l4"><a class="reference internal" href="AD_variables.html">AD Variables</a></li>
+<li class="toctree-l4 current"><a class="current reference internal" href="#">Compost Bedded Pack Barn</a></li>
+<li class="toctree-l4"><a class="reference internal" href="Compost_bedded_pack_barn/e4f80e0dc67749f689523bc44aca1003.html">Compost bedded pack barn (CBPB)</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../animal_design.html">Animal Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../feed_design.html">Feed Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../field_design.html">Field Design</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../manure_storage_design.html">Manure Storage</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">Ruminant Farm Simulation (RuFaS)</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../modules.html">GitHub</a></li>
+          <li class="breadcrumb-item"><a href="../../manure_design.html">Manure module</a></li>
+      <li class="breadcrumb-item active">Compost Bedded Pack Barn</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../_sources/Design/Manure_Design/Compost_bedded_pack_barn_design_document.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="compost-bedded-pack-barn">
+<h1>Compost Bedded Pack Barn<a class="headerlink" href="#compost-bedded-pack-barn" title="Permalink to this heading"></a></h1>
+<p>Module: Manure</p>
+<ol class="upperroman simple">
+<li><p><strong>Overview</strong></p></li>
+</ol>
+<p>Traditional dairy housing systems involve concrete flooring and limited
+bedding, which can lead to cow discomfort, suboptimal health, and
+laborious manure management. CBPB (Compost Bedded Pack Barn) aims to
+address these issues by providing a soft, comfortable, and dry bedding
+surface for cows, enhancing their comfort and overall well-being. In a
+nutshell, the CBPB practice starts by spreading a layer of organic
+bedding like sawdust or sand on the floor of animal pens in the barn. As
+cows produce manure, bedding is regularly added and tilted to keep the
+mix dry and clean and to facilitate its composting process.</p>
+<p>See video for an illustration of a compost bedded pack practice on a
+farm. <a class="reference external" href="https://www.youtube.com/watch?v=NBwXcdF1wxo">https://www.youtube.com/watch?v=NBwXcdF1wxo</a></p>
+<p>The primary objective of CBPB is to create a well-aerated and composting
+bedding pack within the barn. The composting process helps in the
+decomposition of organic matter, including the manure and bedding
+materials, which leads to the production of heat and microbial activity.
+This composting activity contributes to the breakdown of organic
+components and the reduction of moisture content, resulting in a drier
+and more stable bedding pack.</p>
+<p>The composted manure from the CBP in the pens is cleaned out
+infrequently; when it does get cleaned out it is further managed in two
+ways:  the composted manure can be moved to a composting facility for
+further storage and composting or it can be land applied. In this module
+we assume the final manure pack is either land applied or sent to the
+manure compost pile. (In the future once we have the composting
+treatment method implemented, we will have both functionality for now
+land applied only).</p>
+<p>The CBPB practice may also reduce manure storage costs and by saving
+space and manure handling labor. CBPB can have significant effects on
+nutrient dynamics and gas emissions, and various mitigation strategies
+can be implemented to minimize their environmental impacts.</p>
+<ol class="upperroman simple" start="2">
+<li><p><strong>Existing Solution</strong></p></li>
+</ol>
+<p>RuFaS does not currently model the CBPB manure management practice.</p>
+<p>CBPB can be modeled using approaches from the IFSM and the Daycent
+models. These models use process-based interactions to capture the
+dynamics of the system. While the IFSM and Daycent models are valuable
+tools for simulating CBPB and assessing their performance and
+environmental impacts, they do have certain limitations. These include
+limited user flexibility in understanding and changing their structure,
+inputs, and parameters.</p>
+<ol class="upperroman simple" start="3">
+<li><p><strong>Proposed Solution</strong></p></li>
+</ol>
+<blockquote>
+<div><p>The CBPB receives manure information from the animal module, bedding
+material and barn information from users. Given weather data, it then
+keeps track of 1) the composition of the bedding-material-manure-mix
+as manure and bedding material are added continuously as well as 2)
+methane, carbon dioxide, nitrous oxide, and ammonia emissions during
+the composting process of the bedding-material-manure-mix.</p>
+<p><a class="reference external" href="https://whimsical.com/cbpb-WT7Je8NzWUPu8FbRhdsh3E">https://whimsical.com/cbpb-WT7Je8NzWUPu8FbRhdsh3E</a></p>
+<p>Section 0 lays out all the input requirements, intermediary
+computations, and overall output variables. Section 1 focuses the
+methane (CH<sub>4</sub>) and carbon decomposition, which constitute a
+daily dry matter loss of the manure-bedding mix thus changing its
+mass. The steps to quantify methane emissions and carbon
+decomposition are detailed in subsection A and B respectively.
+Subsection C will compute the ensuing dry matter loss. Section 2 will
+track the mass of phosphorous (P) accumulated broken down into 4
+pools: water organic phosphorous, water inorganic phosphorous,
+non-water organic phosphorous, and non-water inorganic phosphorous.
+Section 3 will detail the Nitrogen (N) cycle by keeping track of the
+mass of organic and inorganic nitrogen.</p>
+<p><strong>Section 0. Input Requirements, Intermediary Steps, and Output
+variables.</strong></p>
+<p><strong>0.1 Input Requirement table</strong></p>
+</div></blockquote>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p><strong>Variable
+Name</strong></p></th>
+<th class="head"><p><strong>Ab
+breviation</strong></p></th>
+<th class="head"><p><strong>Unit</strong></p></th>
+<th class="head"><p><strong>Origin</strong></p></th>
+<th class="head"><ul class="simple">
+<li></li>
+</ul>
+<p><em>Notes*</em></p>
+</th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Pen id</p></td>
+<td></td>
+<td><p>Unitless</p></td>
+<td><p>Pen Class
+(?)</p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>Pen Size</p></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p>Housing type</p></td>
+<td></td>
+<td><p>Unitless</p></td>
+<td><p>Animal</p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>Number of
+Animal</p></td>
+<td></td>
+<td><p>Unitless</p></td>
+<td><p>Animal</p></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p>Animal types
+(calf,
+heifers,
+lactating,
+and dry
+cows)</p></td>
+<td></td>
+<td><p>Unitless</p></td>
+<td><p>Animal</p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>Manure Mass</p></td>
+<td><p>MM<sub>t</sub></p></td>
+<td><p>kg</p></td>
+<td><p>Animal</p></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p>Total Solids
+at time t
+from manure</p></td>
+<td><p>math:: {TS}_
+{manure}^{t}</p>
+</td>
+<td><p>kg</p></td>
+<td><p>Animal</p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>Volatile
+Solids</p></td>
+<td><p>VS</p></td>
+<td><p>kg</p></td>
+<td><p>Animal</p></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p>Urea
+c
+oncentration</p></td>
+<td></td>
+<td><p>gram/L</p></td>
+<td><p>Animal</p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>Urine</p></td>
+<td></td>
+<td><p>kg</p></td>
+<td><p>Animal</p></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p>Urine TAN</p></td>
+<td></td>
+<td><p>kg</p></td>
+<td><p>Animal</p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>Manure TAN</p></td>
+<td></td>
+<td><p>kg</p></td>
+<td><p>Animal</p></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p>Urine N</p></td>
+<td></td>
+<td><p>kg</p></td>
+<td><p>Animal</p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>Fecal
+Nitrogen</p></td>
+<td></td>
+<td><p>kg</p></td>
+<td><p>Animal</p></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p>Proportion
+of Carbon in
+manure</p></td>
+<td><p>C:
+sub:<cite>manure</cite>
+Set at 0.5
+as default</p></td>
+<td><p>unitless</p></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>Water
+Inorganic
+Phosphorus</p></td>
+<td><p>WIP(t)</p></td>
+<td><p>kg</p></td>
+<td><p>Animal</p></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p>Water
+Organic
+Phosphorus</p></td>
+<td><p>WOP(t)</p></td>
+<td><p>kg</p></td>
+<td><p>Animal</p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>Non-water
+Inorganic
+Phosphorus</p></td>
+<td><p>NWIP(t)</p></td>
+<td><p>kg</p></td>
+<td><p>Animal</p></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p>Non-water
+Organic
+Phosphorus</p></td>
+<td><p>NWOP(t)</p></td>
+<td><p>kg</p></td>
+<td><p>Animal</p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>Phosphorus</p></td>
+<td><p>P</p></td>
+<td><p>kg</p></td>
+<td><p>Animal</p></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p>Potassium</p></td>
+<td><p>K</p></td>
+<td><p>kg</p></td>
+<td><p>Animal</p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>Enteric
+Methane</p></td>
+<td></td>
+<td><p>kg</p></td>
+<td><p>Animal</p></td>
+<td></td>
+</tr>
+<tr class="row-even"><td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>Bedding type
+(sawdust,
+manure
+solids,
+straw)</p></td>
+<td></td>
+<td></td>
+<td><p>User</p></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p>Bedding
+quantity</p></td>
+<td></td>
+<td><p>kg/animal</p></td>
+<td><p>User</p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>Total
+bedding
+quantity</p></td>
+<td><div class="math notranslate nohighlight">
+\[Q_{bedding}\]</div>
+</td>
+<td><p>kg</p></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p>Date of Last
+ma
+nure-bedding
+mix complete
+removal</p></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>Proportion
+of C in
+Bedding</p></td>
+<td><p>C:s
+ub:<cite>bedding</cite>
+Set at 0.35
+as default</p></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p>Bedding P
+content</p></td>
+<td><p>Set at 0</p></td>
+<td><p>kg</p></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>Bedding N
+content</p></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p>Bedding K
+content</p></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>Daily
+Tillage
+frequency</p></td>
+<td><p>Default is
+once/day</p></td>
+<td><p>Nb/day</p></td>
+<td><p>User</p></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p>Temperature</p></td>
+<td><p>T</p></td>
+<td><p><sup>o</sup>C</p></td>
+<td><p>Weather</p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>Total Solids
+at time t
+from bedding
+material</p></td>
+<td><p>ath:: {TS}_{
+bedding}^{t}</p>
+</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p>Initial
+Bedding
+Material
+Water
+extractable
+inorganic P</p></td>
+<td><p>:: {WIP}^{bp
+}(t = 0) = 0</p>
+</td>
+<td><p>kg</p></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>Initial
+Bedding
+Material
+Water
+extractable
+organic P</p></td>
+<td><p>:: {WOP}^{bp
+}(t = 0) = 0</p>
+</td>
+<td><p>kg</p></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p>Initial
+Bedding
+Material
+NonWater
+extractable
+inorganic P</p></td>
+<td><p>: {NWIP}^{bp
+}(t = 0) = 0</p>
+</td>
+<td><p>kg</p></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>Initial
+Bedding
+Material
+NonWater
+extractable
+organic P</p></td>
+<td><p>: {NWOP}^{bp
+}(t = 0) = 0</p>
+</td>
+<td><p>kg</p></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="row-even"><td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p><strong>0.2. The above information is collected and used to calculate the
+manure-bedding mix composition and management each day</strong></p>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Total manure
+mass</p></th>
+<th class="head"></th>
+<th class="head"><p>kg</p></th>
+<th class="head"></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Density of the
+manure pack</p></td>
+<td></td>
+<td><p>kg/m<sup>3</sup></p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>Manure Bedded
+pack
+temperature</p></td>
+<td><p>T<sub>BP</sub></p></td>
+<td><p><sup>o</sup>C</p></td>
+<td></td>
+</tr>
+<tr class="row-even"><td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="row-even"><td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p><strong>0.3. Based on the compost bedding mass, composition, and temperature,
+the routines should calculate: (explained in proposed solution)</strong></p>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Loss of mass/
+dry matter
+through
+CH<sub>4</sub>
+and
+CO<sub>2</sub>
+emissions</p></th>
+<th class="head"></th>
+<th class="head"><p>kg/day</p></th>
+<th class="head"></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Loss of
+nitrogen
+through
+ammonia
+emissions</p></td>
+<td></td>
+<td><p>kg/day</p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>Loss of
+nitrogen
+through
+nitrous oxide
+emissions</p></td>
+<td></td>
+<td><p>kg/day</p></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p>T
+ransformation
+of manure
+phosphorus
+chemical
+forms</p></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>Tillage/no
+tillage of
+the
+m
+anure-bedding
+mix at time t</p></td>
+<td><div class="math notranslate nohighlight">
+\[\mathbf{I}_{\m\]</div>
+<p>athbf{t}}^{mathbf{CBPB}}
+left( mathbf{Till} rig
+ht)mathbf{= 1iftilla
+geoccurs0otherwise}</p>
+</td>
+<td></td>
+<td></td>
+</tr>
+<tr class="row-even"><td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p><strong>0.4. The following characteristics of the compost-bedding material
+need to be calculated and updated each day based on bedding and manure
+additions as well as composting losses in emissions.</strong></p>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"></th>
+<th class="head"></th>
+<th class="head"></th>
+<th class="head"><p>Comment</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Proportion of
+Dry matter to
+total Mass</p></td>
+<td></td>
+<td><p>%</p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>Proportion of
+Moisture to
+total mass</p></td>
+<td></td>
+<td><p>%</p></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p>Proportion of
+Nitrogen in
+dry Matter</p></td>
+<td></td>
+<td><p>%</p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>Proportion of
+Organic
+Nitrogen to
+Total Nitrogen</p></td>
+<td></td>
+<td><p>%</p></td>
+<td><p>Organic N
+originates from
+fecal nitrogen
+so the initial
+composition can
+be found from
+fecal N/total
+manure N</p></td>
+</tr>
+<tr class="row-even"><td><p>Proportion of
+Inorganic
+Nitrogen to
+Total Nitrogen</p></td>
+<td></td>
+<td><p>%</p></td>
+<td><p>Organic N +
+Inorganic N =
+total N</p>
+<p>Inorganic N
+originates from
+urinary N</p>
+</td>
+</tr>
+<tr class="row-odd"><td><p>Total
+Ammoniacal
+Nitrogen</p></td>
+<td><p>TAN</p></td>
+<td><p>kg</p></td>
+<td><p>this is a
+subset of
+Inorganic N</p></td>
+</tr>
+<tr class="row-even"><td><p>Proportion of
+Nitrate to
+Total Mass</p></td>
+<td></td>
+<td><p>%</p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>Water
+Inorganic
+Phosphorus</p></td>
+<td><p>WIP(t)</p></td>
+<td><p>kg</p></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p>Water Organic
+Phosphorus</p></td>
+<td><p>WOT(t)</p></td>
+<td><p>kg</p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>Non-water
+Inorganic
+Phosphorus</p></td>
+<td><p>NWIP(t)</p></td>
+<td><p>kg</p></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p>Non-water
+Organic
+Phosphorus</p></td>
+<td><p>NWoP(t)</p></td>
+<td><p>kg</p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>Phosphorus</p></td>
+<td><p>P</p></td>
+<td><p>kg</p></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p>Potassium</p></td>
+<td><p>K</p></td>
+<td><p>kg</p></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Section 1. Methane and Carbon Dioxide Emissions; Dry Matter Loss in
+Manure-Bedding Mix</strong></p>
+<p>The dry matter quantity in the manure-bedding mix changes daily because
+1) manure and bedding material are added daily and 2) methane emissions
+from volatile solids and 3) carbon decomposition. Here we simply keep
+track of what is added and what is lost.</p>
+<p>Before we can calculate the mass of dry matter loss from the
+manure-bedding mix and update its daily mass accordingly, we will
+calculate what is lost in methane emissions (section A) and what is lost
+from carbon decomposition (section B).</p>
+<ol class="upperalpha simple">
+<li><p><strong>Methane Emissions Calculations using IFSM (IPCC)</strong></p></li>
+</ol>
+<p>We use an adaptation of the tier 2 approach of the IPCC (2006) to
+calculate the emissions of methane on a given day, given the ambient
+barn temperature, and a methane conversion factor for the manure
+management.</p>
+<p>First let’s calculate the Methane Conversion Factor (MCF). The constant
+values 7.11 and 0.0884 in equation [M.1.A.1] below are parameter
+estimates of a regression using IPCC data (2006), where MCF is an
+exponential function of ambient barn temperature. As temperature rises
+so will methane emissions, which is determined by the <span class="math notranslate nohighlight">\(MCF(T)\)</span>:</p>
+<p>        **  <strong>:math:`MCF(T) = 7.11 times e^{0.0884 times T}`
+**[M.1.A.1]</strong></p>
+<p>where, <span class="math notranslate nohighlight">\(T\)</span> is the ambient barn temperature in <sup>o</sup>C from the
+weather data.</p>
+<p>Next, let <span class="math notranslate nohighlight">\({Emis}_{({CH}_{4})}\)</span>be the emissions of methane in
+kg/day from the compost-bedding-mix such that:</p>
+<p>        **
+ <strong>:math:`{Emis}_{CH_{4}}^{CBPB} = frac{VS times B_{0} times 0.67 times MCF(T)}{100}`
+**[M.1.A.2]</strong></p>
+<p>where,</p>
+<p><span class="math notranslate nohighlight">\(VS\)</span> is the volatile solids in manure in kg/day,</p>
+<p>T is the temperature in <sup>o</sup>C,</p>
+<p><span class="math notranslate nohighlight">\(MCF\)</span> is the methane (<span class="math notranslate nohighlight">\({CH}_{4})\)</span>conversion factor
+calculated in [M.1.A.1] given T in <sup>o</sup>C,</p>
+<p>B<sub>0</sub> is the maximum methane (<span class="math notranslate nohighlight">\({CH}_{4})\ \)</span>producing
+capacity for dairy manure, in m<sup>3</sup>/kg. Value is set at 0.24 as a
+default value and the constant at 0.67 in the equation is the conversion
+factor of methane (CH4) in m<sup>3</sup> to kg of methane.</p>
+<ol class="upperalpha simple" start="2">
+<li><p><strong>Carbon Decomposition and Carbon Dioxide Emissions</strong></p></li>
+</ol>
+<blockquote>
+<div><p>In this section, we quantify the carbon decomposition taking place in
+the composting process of the manure-bedding mix due to microbial
+activity (decomposition, consumption, respiration). Such
+decomposition is a function of the manure-bedding mix composition and
+properties (Carbon content, moisture content…), tillage activity, and
+ambient temperature.</p>
+</div></blockquote>
+<p>Before we proceed with the total carbon decomposition calculations in
+[M.1.B.5], we will calculate the maximum microbial decomposition rate,
+and the microbial decomposition rate of slowly decomposing components in
+[M.1.B.1] and [M.1.B.2] respectively; using those we will determine the
+carbon decomposition rate in [M.1.B.3], and the Anaerobic effect in
+[M.1.B.4].</p>
+<p>Let <span class="math notranslate nohighlight">\({Rate}_{decomp}^{Max}\)</span>be maximum microbial decomposition
+rate in <span class="math notranslate nohighlight">\(d^{- 1}\)</span>, and <span class="math notranslate nohighlight">\({Rate}_{decomp}^{Slow}\)</span>be the
+microbial decomposition rate of slowly decomposing components in
+<span class="math notranslate nohighlight">\(d^{- 1}\)</span>such that:</p>
+<p><span class="math notranslate nohighlight">\({Rate}_{decomp}^{Max} = {Rate}_{decomp}^{Effective} \times \left( {1.066}^{\left( T_{layer} - 10 \right)} - {1.21}^{\left( T_{layer} - 50 \right)} \right)\)</span>
+<strong>[M.1.B.1]</strong></p>
+<p><span class="math notranslate nohighlight">\({Rate}_{decomp}^{Slow} = {Rate}_{decomp}^{Effective} \times \left( {1.066}^{\left( T_{BP} - 10 \right)} - {1.21}^{\left( T_{BP} - 50 \right)} \right)\)</span>
+<strong>[M.1.B.2]</strong></p>
+<p>where,</p>
+<p><span class="math notranslate nohighlight">\({Rate}_{decomp}^{Effective}\ \)</span>is the effectiveness of microbial
+decomposition rate, unitless, set at <span class="math notranslate nohighlight">\(2.37 \times 10^{- 3},\)</span></p>
+<p><span class="math notranslate nohighlight">\(T_{layer}\ \)</span>is the decomposition temperature simulated in
+<sup>o</sup>C, set at <span class="math notranslate nohighlight">\(60℃\)</span>,</p>
+<p><span class="math notranslate nohighlight">\(T_{BP}\)</span>is the temperature of the compost-bedded pack in
+<sup>o</sup>C, set at <span class="math notranslate nohighlight">\(30℃\)</span>.</p>
+<p>Using results in [M.1.B.1] and [M.1.B.2], let
+<span class="math notranslate nohighlight">\({Rate}_{decomp}^{C}\)</span>be the carbon decomposition rate in
+<span class="math notranslate nohighlight">\(d^{- 1}\)</span>, such that:</p>
+<blockquote>
+<div><p><span class="math notranslate nohighlight">\({Rate}_{decomp}^{C} = \left( {Rate}_{decomp}^{Max} - {Rate}_{decomp}^{Slow} \right) \times e^{decay \times ({NbDays}^{last\ till} - lag)} \times {Rate}_{decomp}^{Slow}\)</span>
+<strong>[M.1.B.3]</strong></p>
+</div></blockquote>
+<p>where,</p>
+<p><span class="math notranslate nohighlight">\({Rate}_{decomp}^{Max}\)</span>is the maximum microbial decomposition
+rate in <span class="math notranslate nohighlight">\(d^{- 1}\)</span>calculated above,</p>
+<p><span class="math notranslate nohighlight">\({Rate}_{decomp}^{Slow}\)</span>is the microbial decomposition rate of
+slowly decomposing components in <span class="math notranslate nohighlight">\(d^{- 1}\)</span>,</p>
+<p><span class="math notranslate nohighlight">\(decay\)</span> is the first order decaying coefficient set at 0.1 per day
+in <span class="math notranslate nohighlight">\(d^{- 1}\)</span>,</p>
+<p><span class="math notranslate nohighlight">\({NbDays}^{last\ till}\)</span>is the number of days since the last
+tillage event in <span class="math notranslate nohighlight">\(d\)</span>,set at 1 as a default,</p>
+<p><span class="math notranslate nohighlight">\(lag\)</span> is the lag time in in <span class="math notranslate nohighlight">\(d\)</span>, set at 2 as a default
+value.</p>
+<p>The last sub calculation needed before we can determine total carbon
+decomposition is the Anaerobic coefficient. Let be
+<span class="math notranslate nohighlight">\({Effect}_{C}^{Anae}\)</span>be the anaerobic effect, unitless, such
+that:</p>
+<blockquote>
+<div><p><span class="math notranslate nohighlight">\({Effect}_{C}^{Anae} = \frac{O_{2}}{O_{2,hsat} + O_{2}} \times \frac{O_{2,hsat} + O_{2,amb}}{O_{2,amb}}\)</span>
+<strong>[M.1.B.4]</strong></p>
+</div></blockquote>
+<p>where,</p>
+<p><span class="math notranslate nohighlight">\(O_{2} \in \lbrack 0,1\rbrack,\ \)</span>is the mole fraction of oxygen
+in the air within the windrow, unitless set at 0.15,</p>
+<p><span class="math notranslate nohighlight">\(O_{2,hsat\ }\)</span>, is the half-saturation constant, unitless set at
+0.02,</p>
+<p><span class="math notranslate nohighlight">\(O_{2,amb} \in \lbrack 0,1\rbrack\)</span> is the mole fraction of oxygen
+in ambient air, unitless set at 0.21.</p>
+<p>Finally, using calculations above, let <span class="math notranslate nohighlight">\(C_{decomp}^{CBPB}\)</span> be the
+total carbon decomposition, in kg per day, such that:</p>
+<p><span class="math notranslate nohighlight">\(C_{decomp}^{CBPB} = ({TS \times \ C}_{manure} + {Q_{bedding}\  \times C}_{bedding}) \times {Rate}_{decomp}^{C} \times {Effect}_{Moist} \times {Effect}_{Anae}\)</span><strong>[M.1.B.5]</strong></p>
+<p>where,</p>
+<p><span class="math notranslate nohighlight">\(TS\)</span> is the total solids from the manure in kg,</p>
+<blockquote>
+<div><p><span class="math notranslate nohighlight">\(C_{manure}\)</span> is the proportion of carbon available in manure,
+unitless, set at 0.5 as a default,</p>
+<p><span class="math notranslate nohighlight">\(Q_{bedding}\)</span>is the total mass of bedding material in kg,</p>
+<p><span class="math notranslate nohighlight">\(C_{bedding}\)</span> is the carbon available in the bedding, unitless,
+set at 0.35 as a default,</p>
+<p><span class="math notranslate nohighlight">\({Rate}_{decomp}^{C}\)</span> is the effective microbial decomposition
+rate calculated in [M.1.B.3],</p>
+<p><span class="math notranslate nohighlight">\({Effect}_{Moist}\)</span> is the effect of moisture on microbial
+decomposition, with
+<span class="math notranslate nohighlight">\({Effect}_{Moist} \in \lbrack 0,0.1\rbrack\ ,\)</span> unitless, it is
+set at 0.65 <a class="footnote-reference brackets" href="#id2" id="id1" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a>.</p>
+<p><span class="math notranslate nohighlight">\({Effect}_{Anae}\ i\)</span>s the effect of anaerobic conditions on
+microbial decomposition, unitless.</p>
+</div></blockquote>
+<ol class="upperalpha simple" start="3">
+<li><p><strong>The Daily Dry Matter Available, Daily Dry Matter Loss, and
+Manure-Bedding mix update</strong></p></li>
+</ol>
+<p>The daily dry matter loss is simply what is lost from the dry matter in
+methane emission and carbon decomposition. Since we estimated the
+emissions of methane in kg/day from the compost-bedding mix in [M.1.A.2]
+and the total carbon decomposition in kg/day in [M.1.B.5], we can then
+derive the dry matter loss in kg/day is by simply adding those 2
+quantities in kg/day.</p>
+<p><span class="math notranslate nohighlight">\({DM}_{loss}^{CBPB} = {2 \times C}_{decomp}^{CBPB} + {Emis}_{{CH}_{4}}^{CBPB}\)</span>
+<strong>[M.1.C.1]</strong></p>
+<p><strong>Numerical Example of Accounting for Dry Matter loss via Methane
+Emissions and Carbon Decomposition within a time step.</strong></p>
+<p>To estimate the dry matter loss in kg from the manure-bedding mix
+through methane and carbon decomposition we first estimate methane loss
+from volatile solids (VS) in kg and carbon decomposition in kg. Let the
+initial volatile solid mass be VS = 10.2 kg and the initial total solid
+be TS =12 kg.</p>
+<p><strong>Step 1: Calculate the carbon lost as</strong>
+<span class="math notranslate nohighlight">\(\mathbf{Emis}_{\mathbf{C}\mathbf{H}_{\mathbf{4}}}^{\mathbf{CBPB}}\)</span>
+<strong>(methane) using [M.1.A.1] and [M.1.A.2]</strong></p>
+<p>the Initial VS = 10.2 kg, then the methane loss is 0.10 kg/day. Plugging
+[M.1.A.1] into [M.1.A.2],</p>
+<div class="math notranslate nohighlight">
+\[{Emis}_{CH_{4}}^{CBPB} = \frac{VS \times B_{0} \times 0.67 \times 7.11 \times e^{0.0884 \times T}}{100}\]</div>
+<p><span class="math notranslate nohighlight">\(= 10^{- 2} \times \left( 10.2 \times 0.24 \times 0.67 \times .11 \times e^{0.0884 \times T} \right) =\)</span>
+0.1</p>
+<p><strong>Step 2: Calculate the updated VS</strong></p>
+<p>The new VS remaining = Initial VS – Methane loss:</p>
+<div class="math notranslate nohighlight">
+\[{VS}_{t + 1}^{CBPB} = {VS}_{t}^{CBPB} - \left( {Emis}_{CH_{4}}^{CBPB} \right)_{t} = 10.2 - 0.1 = 10.1\ kg\]</div>
+<p><strong>Step 3: Calculate the updated TS</strong></p>
+<p>Assume <span class="math notranslate nohighlight">\(C_{decomp}^{CBPB}\)</span>= 0.2 kg. Considering the carbon
+content of the total solids is 50 %. To represent the loss at the scale
+of the total solids we need to double the mass of carbon decomposition;
+hence the total solid loss becomes 0.4 kg.</p>
+<p>The updated Total solids = Initial Total Solids– Methane loss – Carbon
+decomposition scaled up to the total solids. With a mass 12 kg of
+initial total solids, let <span class="math notranslate nohighlight">\({TS}_{t + 1}^{CBPB}\)</span> be the updated TS
+in kg in the next period such that:</p>
+<div class="math notranslate nohighlight">
+\[{TS}_{t + 1}^{CBPB} = {TS}_{t}^{CBPB} - \left( {Emis}_{CH_{4}}^{CBPB} \right)_{t} - {2 \times \left( C_{decomp}^{CBPB} \right)}_{t} = 12\ –\ 0.1\  - 0.4 = 11.5\ kg\]</div>
+<p><strong>Manure mass:</strong></p>
+<p>Everyday dry matter loss is substituted from the total manure-bedding
+mix.</p>
+<p>Assume the initial total manure-bedding mix is 100 kg with 12 kg total
+solids and a daily dry matter loss of 0.5 kg. We can update the total
+manure-bedding mix mass using the following equation:</p>
+<p>If we lose 0.5 kg of dry matter, which is part of the total solids, we
+can subtract this from the total solids mass to find the remaining total
+solids mass.</p>
+<p> Updated total solids mass = Total Solids - Dry Matter loss</p>
+<p> <span class="math notranslate nohighlight">\({TS}_{t + 1}^{CBPB} = {TS}_{t}^{CBPB} - \left( {DM}_{loss}^{CBPB} \right)_{t}\)</span></p>
+<p>Plugging the corresponding numerical values,
+<span class="math notranslate nohighlight">\({TS}_{t + 1}^{CBPB} = 12 - 0.5 = 11.5\ kg.\)</span></p>
+<p>Since the proportion of total solids in the original manure-bedding mix
+remains the same at 12 %, we can set up another equation to determine
+the updated manure mass <span class="math notranslate nohighlight">\(M_{t + 1}^{CBPB}\)</span>:</p>
+<div class="math notranslate nohighlight">
+\[M_{t + 1}^{CBPB} = \frac{{TS}_{t + 1}^{CBPB}}{0.12}\  = 95.83\ kg\]</div>
+<p>Therefore, the updated manure-bedding mix mass after losing 0.4 kg of
+total solids is approximately 95.83 kg.</p>
+<p><strong>Section 2. Accounting for Phosphorus (P) and Potassium (K) contents in
+the CBPB</strong></p>
+<p>Cows continuously produce manure containing phosphorus (P) and potassium
+(K). Hence, P and K get added daily to the manure-bedding mix. In
+subsection A and B, we account for those changes in P and K mass.</p>
+<ol class="upperalpha simple">
+<li><p><strong>Phosphorous Content in the CBPB</strong></p></li>
+</ol>
+<p>P gets added daily to the manure-bedding mix. P is further divided into
+4 pools, each corresponding to 4 distinct forms of P: 1) water
+extractable inorganic (WIP), 2) water extractable organic (WOP), 3)
+non-water extractable inorganic (NWIP), 4) non-water extractable organic
+(NWOP). We will then calculate daily changes in total P and in each of
+its sub-pools.</p>
+<p>Let <span class="math notranslate nohighlight">\(P_{t + 1}^{CBPB}\)</span>be the total mass of P in the
+manure-bedding mix at time <span class="math notranslate nohighlight">\(t + 1\)</span> , in kg. The general equation,
+for all forms of P is such that:</p>
+<div class="math notranslate nohighlight">
+\[P_{t + 1}^{CBPB} = P_{t}^{CBPB} + P_{t}^{bedding} + P_{t}^{animal} - P_{t}^{loss}\]</div>
+<p>Where,</p>
+<p><span class="math notranslate nohighlight">\(P_{t}^{CBPB}\)</span> is the total accumulated P in the previous period
+<span class="math notranslate nohighlight">\(t\)</span>, in kg.</p>
+<p><span class="math notranslate nohighlight">\(P_{t}^{bedding}\)</span> is the mass of P present in the bedding material
+added in the previous period <span class="math notranslate nohighlight">\(t\)</span>, in kg.</p>
+<p><span class="math notranslate nohighlight">\(P_{t}^{animal}\)</span> is the mass of P present in the manure execrated
+by the animal in the previous period <span class="math notranslate nohighlight">\(t\)</span>, in kg.</p>
+<p><span class="math notranslate nohighlight">\(P_{t}^{loss}\)</span>is the mass of P loss in the previous period
+<span class="math notranslate nohighlight">\(t\)</span>, in kg.</p>
+<p>In words, the updated mass of P in the CBPB at time <span class="math notranslate nohighlight">\(t + 1\)</span> sums
+what was already accumulated at time <span class="math notranslate nohighlight">\(t\)</span> with what was added in
+the previous period <span class="math notranslate nohighlight">\(t\)</span> (through P present in the added bedding
+material and from the manure execrated by the animal). It then subtracts
+the losses in P in the previous period <span class="math notranslate nohighlight">\(t\)</span>.</p>
+<p>For this version of the CBPB model, we make 3 simplifying assumptions:</p>
+<ol class="lowerroman simple">
+<li><p>The mass of P in the bedding material is negligeable and set at 0,
+<span class="math notranslate nohighlight">\(P_{t}^{bedding} = 0\ \forall t.\)</span></p></li>
+<li><p>The masses of different forms of P will be received from the animal
+module.</p></li>
+<li><p>There are no losses in P within the compost bedded pack practice
+<span class="math notranslate nohighlight">\(P_{t + 1}^{loss} = 0\ \forall t\)</span>.</p></li>
+</ol>
+<p>Under such assumptions, the equations for updating the mass all 4 forms
+of phosphorus (P) contained in the manure-bedding mix can be expressed
+as follows:</p>
+<blockquote>
+<div><p><span class="math notranslate nohighlight">\(P_{t + 1}^{CBPB,\ pool} = P_{t}^{CBPB,\ pool} + P_{t}^{animal,\ pool}\)</span>
+<strong>[M.2.A.1]</strong></p>
+</div></blockquote>
+<p><span class="math notranslate nohighlight">\(Wh\)</span>ere,</p>
+<p><span class="math notranslate nohighlight">\(pool \in \left\{ P,WIP,WOP,\ NWIP,NWOP \right\}\)</span></p>
+<p>and the corresponding relative proportion
+<span class="math notranslate nohighlight">\(\% P_{t + 1}^{CBPB,\ pool}\)</span> for each
+<span class="math notranslate nohighlight">\(pool \in \left\{ P,WIP,WOP,\ NWIP,NWOP \right\}\)</span> becomes:</p>
+<blockquote>
+<div><p><span class="math notranslate nohighlight">\(\% P_{t + 1}^{CBPB,\ pool} = \frac{P_{t + 1}^{CBPB,\ pool}}{\sum_{pool}^{}P_{t + 1}^{CBPB,\ pool}}\)</span>
+<strong>[M.2.A.2]</strong></p>
+</div></blockquote>
+<ol class="upperalpha simple" start="2">
+<li><p><strong>Potassium Content in the CBPB</strong></p></li>
+</ol>
+<p>Potassium K gets added continuously to the manure-bedding mix through
+cows ‘manure production.</p>
+<p>Let <span class="math notranslate nohighlight">\(K_{t + 1}^{CBPB}\)</span>be the total mass of K in the
+manure-bedding mix at time <span class="math notranslate nohighlight">\(t + 1\)</span> such that:</p>
+<div class="math notranslate nohighlight">
+\[K_{t + 1}^{CBPB} = K_{t}^{CBPB} + K_{t}^{bedding} + K_{t}^{animal} - K_{t}^{loss}\]</div>
+<p>Here, we make 2 simplifying assumptions:</p>
+<ol class="lowerroman simple">
+<li><p>The mass of K in the bedding material is negligeable and set at 0,
+<span class="math notranslate nohighlight">\(K_{t}^{bedding} = 0\ \forall t.\)</span></p></li>
+<li><p>There are no losses in K within the compost bedded pack practice
+<span class="math notranslate nohighlight">\(K_{t}^{loss} = 0\ \forall t\)</span></p></li>
+</ol>
+<p><span class="math notranslate nohighlight">\(K_{t + 1}^{CBPB} = K_{t}^{CBPB} + K_{t}^{bedding} + K_{t}^{animal} - K_{t}^{loss}\)</span>
+<strong>[M.2.B.1]</strong></p>
+<p><strong>Section 3. Ammonia Emissions, Leaching, and Nitrous Oxide Emission</strong></p>
+<p>The total nitrogen in the manure-bedding mix changes daily via tillage
+activity, ammonia emissions, nitrous oxide loss and N leaching. Here we
+simply keep track of what is added and what is lost.</p>
+<p>For this version of the CBPB model, we make 2 simplifying assumptions:</p>
+<ol class="lowerroman simple">
+<li><p>The mass of N in the bedding material is negligeable and set at 0,
+<span class="math notranslate nohighlight">\(N_{t}^{bedding} = 0\ \forall t.\)</span></p></li>
+<li><p>The mass of N will be received from the animal module.</p></li>
+</ol>
+<ol class="upperalpha simple">
+<li><p><strong>Nitrogen Loss to Ammonia Emissions</strong></p></li>
+</ol>
+<blockquote>
+<div><p>Let <span class="math notranslate nohighlight">\(\left( {Emis}_{NH_{3}}^{CBPB} \right)_{t}\)</span>be the
+emissions of ammonia in kg at time t:</p>
+</div></blockquote>
+<p><span class="math notranslate nohighlight">\(\left( {Emis}_{NH_{3}}^{CBPB} \right)_{t} = 0.5 \times \left( N_{t}^{animal} + N_{t}^{CBPB} \right)\mathbf{\times}\mathbf{I}_{\mathbf{t}}^{\mathbf{CBPB}}\left( \mathbf{Till} \right)\mathbf{+ 0.25 \times}\left( N_{t}^{animal} + N_{t}^{CBPB} \right)\mathbf{\  \times}\left( \mathbf{1 -}\mathbf{I}_{\mathbf{t}}^{\mathbf{CBPB}}\left( \mathbf{Till} \right) \right)\)</span>
+<strong>[M.3.A.1]</strong></p>
+<p>Where<strong>,</strong></p>
+<p><span class="math notranslate nohighlight">\(N_{t}^{animal}\)</span>is the mass of nitrogen present in the manure
+excreted by the animals at time t in kg.</p>
+<p><span class="math notranslate nohighlight">\(N_{t}^{CBPB}\)</span> is the mass of nitrogen already present in the
+manure-bedding mix at time t from previous manure excretions, in kg.</p>
+<p><span class="math notranslate nohighlight">\(\mathbf{I}_{\mathbf{t}}^{\mathbf{CBPB}}\left( \mathbf{Till} \right)\)</span>
+is an indicator function equal to 1 if there is tillage of the
+manure-bedding mix at time t and equal to 0 otherwise.</p>
+<ol class="upperalpha simple" start="2">
+<li><p><strong>Nitrogen Loss to Leaching</strong></p></li>
+</ol>
+<blockquote>
+<div><p>In this section, tillage activity does not influence the leaching
+level of N. Let <span class="math notranslate nohighlight">\(\left( {Leach}_{N}^{CBPB} \right)_{t}\)</span>be the
+mass in kg of Nitrogen leached out of the manure-bedding mix at time
+t:</p>
+<p><span class="math notranslate nohighlight">\(\left( {Leach}_{N}^{CBPB} \right)_{t} = 0.035 \times \left( N_{t}^{animal} + N_{t}^{CBPB} \right)\)</span>
+<strong>[M.3.B.1]</strong></p>
+</div></blockquote>
+<p>Where,</p>
+<p><span class="math notranslate nohighlight">\(N_{t}^{animal}\)</span>is the mass of nitrogen present in the manure
+excreted by the animals at time t in kg.</p>
+<p><span class="math notranslate nohighlight">\(N_{t}^{CBPB}\)</span> is the mass of nitrogen already present in the
+manure-bedding mix at time t from previous manure excretions, in kg.</p>
+<ol class="upperalpha simple" start="3">
+<li><p><strong>Nitrogen Loss to Nitrous Oxide Emissions</strong></p></li>
+</ol>
+<p>Let <span class="math notranslate nohighlight">\(\left( {Emis}_{NO_{2}}^{CBPB} \right)_{t}\)</span>be the emissions
+of Nitrous Oxide at time t, in kg, such that:</p>
+<blockquote>
+<div><p><span class="math notranslate nohighlight">\(\left( {Emis}_{NO_{2}}^{CBPB} \right)_{t} = 7.10^{- 2} \times \left( N_{t}^{animal} + N_{t}^{CBPB} \right)\mathbf{\times}\mathbf{I}_{\mathbf{t}}^{\mathbf{CBPB}}\left( \mathbf{Till} \right)\mathbf{+}\mathbf{10}^{\mathbf{- 2}}\mathbf{\times}\left( N_{t}^{animal} + N_{t}^{CBPB} \right)\mathbf{\times}\left( \mathbf{1 -}\mathbf{I}_{\mathbf{t}}^{\mathbf{CBPB}}\left( \mathbf{Till} \right) \right)\)</span>
+<strong>[M.3.C.1]</strong></p>
+</div></blockquote>
+<p>Where,</p>
+<p><span class="math notranslate nohighlight">\(N_{t}^{animal}\)</span> is the mass of nitrogen present in the manure
+excreted by the animals at time t in kg.</p>
+<blockquote>
+<div><p><span class="math notranslate nohighlight">\(N_{t}^{CBPB}\)</span> is the mass of nitrogen already present in the
+manure-bedding mix at time t from previous manure excretions, in kg.</p>
+<p><span class="math notranslate nohighlight">\(\mathbf{I}_{\mathbf{t}}^{\mathbf{CBPB}}\left( \mathbf{Till} \right)\)</span>
+is an indicator function equal to 1 if there is tillage of the
+manure-bedding mix at time t and equal to 0 otherwise.</p>
+</div></blockquote>
+<ol class="upperalpha simple" start="4">
+<li><p><strong>Total Mass of Nitrogen, Organic Nitrogen, Inorganic Nitrogen, and
+Ammonium</strong></p></li>
+</ol>
+<p>Let <span class="math notranslate nohighlight">\(N_{t + 1}^{CBPB}\)</span> be the total mass in kg of Nitrogen in the
+manure-bedding mix at <span class="math notranslate nohighlight">\(t + 1\)</span>, such that:</p>
+<p><span class="math notranslate nohighlight">\(N_{t + 1}^{CBPB} = \left( N_{t}^{CBPB} + N_{t}^{animal} \right) - \left( E_{NH_{3}}^{CBPB} \right)_{t} - \left( {Leach}_{N}^{CBPB} \right)_{t} - \left( E_{NO_{2}}^{CBPB} \right)_{t}\)</span>
+<strong>[M.3.D.1]</strong></p>
+<p>Let <span class="math notranslate nohighlight">\(\left( N_{organic}^{CBPB} \right)_{t + 1}\)</span>be the mass in kg
+of organic nitrogen in the manure-bedding mix at <span class="math notranslate nohighlight">\(t + 1\)</span>, such
+that:</p>
+<blockquote>
+<div><p><span class="math notranslate nohighlight">\(\left( N_{organic}^{CBPB} \right)_{t + 1} = 0.952 \times N_{t + 1}^{CBPB}\)</span>
+<strong>[M.3.D.2]</strong></p>
+</div></blockquote>
+<p>Let <span class="math notranslate nohighlight">\(\left( N_{inorganic}^{CBPB} \right)_{t + 1}\)</span>be the mass in
+kg of inorganic nitrogen in the manure-bedding mix at <span class="math notranslate nohighlight">\(t + 1\)</span>,
+such that:</p>
+<blockquote>
+<div><p><span class="math notranslate nohighlight">\(\left( N_{inorganic}^{CBPB} \right)_{t + 1} = (1 - 0.952) \times N_{t + 1}^{CBPB} = 0.048\  \times N_{t + 1}^{CBPB}\)</span>
+<strong>[M.3.D.3]</strong></p>
+</div></blockquote>
+<p>Finally, the mass of ammonium in kg is estimated to be half of the
+inorganic Nitrogen. Let <span class="math notranslate nohighlight">\(\left( {NH_{4}}^{CBPB} \right)_{t + 1}\)</span>
+be the mass of ammonium in kg at time t+1 such that:</p>
+<blockquote>
+<div><p><span class="math notranslate nohighlight">\(\left( {NH_{4}}^{CBPB} \right)_{t + 1} = 0.5 \times \left( N_{inorganic}^{CBPB} \right)_{t + 1}\)</span>
+<strong>[M.3.D.4]</strong></p>
+</div></blockquote>
+<p><strong>Numerical Example of Accounting for Nitrogen and its Composition
+within a time step.</strong></p>
+<p>For each time period, to calculate the total nitrogen remaining and its
+composition (different forms of N), we need to subtract the nitrogen
+lost as 1) ammonia emissions
+<span class="math notranslate nohighlight">\(\left( {Emis}_{NH_{3}}^{CBPB} \right)_{t}\)</span>, 2) leaching
+<span class="math notranslate nohighlight">\(\left( {Leach}_{N}^{CBPB} \right)_{t}\)</span>, and 3) Nitrous oxide
+emissions <span class="math notranslate nohighlight">\(\left( {Emis}_{NO_{2}}^{CBPB} \right)_{t}\)</span> .</p>
+<p>Let’s walk through a numerical example where the manure-bedding mix is
+tilled at time t and the sum of initial N mass and additional N mass
+from manure excretion at time t is 1.5 kg:</p>
+<p><span class="math notranslate nohighlight">\(N_{t}^{animal} + N_{t}^{CBPB} = 1.5\ kg\)</span>.</p>
+<p><strong>Step 1: Calculate the nitrogen lost as</strong>
+<span class="math notranslate nohighlight">\(\left( \mathbf{Emis}_{\mathbf{N}\mathbf{H}_{\mathbf{3}}}^{\mathbf{CBPB}} \right)_{\mathbf{t}}\)</span>
+<strong>(Ammonia) using [M.3.A.1]</strong></p>
+<p>Given that 50% of the excreted nitrogen is lost as NH<sub>3</sub>, the
+estimate of Nitrogen lost as NH<sub>3</sub> is
+<span class="math notranslate nohighlight">\(\left( {Emis}_{NH_{3}}^{CBPB} \right)_{t} = 0.5 \times 1.5 = 0.75\ kg\)</span></p>
+<p><strong>Step 2: Calculate the nitrogen lost through</strong>
+<span class="math notranslate nohighlight">\(\left( \mathbf{Leach}_{\mathbf{N}}^{\mathbf{CBPB}} \right)_{\mathbf{t}}\)</span><strong>(leaching)
+using [M.3.B.1]</strong></p>
+<p>Given that 3.5% of the excreted nitrogen is lost through leaching, the
+estimate of Nitrogen lost through leaching is
+<span class="math notranslate nohighlight">\(\left( {Leach}_{N}^{CBPB} \right)_{t} = 0.035 \times 1.5 = 0.0525\ kg\)</span></p>
+<p><strong>Step 3: Calculate the Nitrous Oxide Emissions</strong>
+<span class="math notranslate nohighlight">\(\left( \mathbf{Emis}_{\mathbf{N}\mathbf{O}_{\mathbf{2}}}^{\mathbf{CBPB}} \right)_{\mathbf{t}}\)</span><strong>using
+[M.3.C.1]</strong></p>
+<p>Given that 7% of the excreted nitrogen is lost through Nitrous Oxide
+emissions, the estimate of Nitrogen lost through Nitrous Oxide Emissions
+if
+<span class="math notranslate nohighlight">\(\left( {Emis}_{NO_{2}}^{CBPB} \right)_{t} = 7 \times 10^{- 2} \times 1.5 = 0.105\ kg.\)</span></p>
+<p><strong>Step 4: Calculate the total nitrogen lost using [M.3.A.1], [M.3.B.1],
+and [M.3.C.1]</strong></p>
+<p>Total nitrogen lost = Nitrogen lost as Ammonia Emission + Nitrogen lost
+through leaching + Nitrogen lost through N<sub>2</sub>O emissions</p>
+<p>Total nitrogen lost = 0.75 + 0.0525 + 0.105 = 0.9075 kg</p>
+<p><strong>Step 5: Calculate the total nitrogen remaining after losses using
+[M.3.D.1]</strong></p>
+<p>Total nitrogen remaining = Initial Nitrogen + N from additional Manure -
+Total nitrogen lost</p>
+<p>Total nitrogen remaining =
+<span class="math notranslate nohighlight">\(N_{t + 1}^{CBPB} = 1.5 - 0.9075 = 0.5925\ kg\)</span></p>
+<p>So, after accounting for the losses (ammonia emissions, leaching, and
+Nitrous Oxide emissions), the total nitrogen remaining is 0.5925 kg.</p>
+<p><strong>Step 6: Calculate the different pools of nitrogen based on the
+remaining total nitrogen - organic nitrogen, inorganic nitrogen, and the
+ammonium within the inorganic nitrogen.</strong></p>
+<p>To calculate the different components of nitrogen based on the remaining
+total nitrogen (0.5925 kg) and the given fractions:</p>
+<p><strong>Step 6a: Calculate the Mass of organic Nitrogen using [M.3.D.2]</strong></p>
+<p>Given that 95.2% of the total nitrogen is organic, the mass of organic
+nitrogen at time <em>t+1</em> is
+<span class="math notranslate nohighlight">\(\left( N_{organic}^{CBPB} \right)_{t + 1} = 0.952 \times 0.5925 = 0.5646\ kg\)</span></p>
+<p><strong>Step 6b: Calculate the amount of inorganic nitrogen using [M.3.D.3]</strong></p>
+<p>Given that 4.8% of the total nitrogen is inorganic, the mass of
+inorganic nitrogen at time <em>t+1</em> is
+<span class="math notranslate nohighlight">\(\left( N_{inorganic}^{CBPB} \right)_{t + 1} = 4.8 \times 10^{- 2} \times 0.5646 = 0.0284\ kg.\)</span></p>
+<p><strong>Step 6c: Calculate the ammonium (inorganic nitrogen) using [M.3.D.4]</strong></p>
+<p>Given that 50% of the inorganic nitrogen is ammonium, the mass of
+ammonium at time <em>t+1</em> is
+<span class="math notranslate nohighlight">\(\left( {NH_{4}}^{CBPB} \right)_{t + 1} = 0.5 \times 0.0284 = 0.0142\ kg.\)</span></p>
+<p><strong>References</strong></p>
+<p>Michel, Frederick C. Jr., John A. Pecchia, Jerome Rigot, Harold M.
+Keener, “Mass and Nutrient Losses during Composting of Dairy Manure with
+Sawdust versus Straw Amendment”, Manuscript Submitted to Compost Science
+and Utilization journal, 8/5/2003</p>
+<p><a class="reference external" href="https://citeseerx.ist.psu.edu/document?repid=rep1&amp;type=pdf&amp;doi=f1cad6a0a19f1a51d175b7c603f2f461ed173010">https://citeseerx.ist.psu.edu/document?repid=rep1&amp;type=pdf&amp;doi=f1cad6a0a19f1a51d175b7c603f2f461ed173010</a></p>
+<p>Rotz, C.A., Corson, M.S., Chianese, D.S., Montes, F., Hafner, S.D. and
+Coiner, C.U., 2012. The Integrated Farm System Model:. Washington, DC:
+USDA ARS.</p>
+<p><a class="reference external" href="https://www.ars.usda.gov/ARSUserFiles/80700500/reference%20manual.pdf">https://www.ars.usda.gov/ARSUserFiles/80700500/reference%20manual.pdf</a></p>
+<p>Bonifacio, Henry F., C. Alan Rotz, and Tom L. Richard. “A process-based
+model for cattle manure compost windrows: Part 1. Model description.”
+<em>Transactions of the ASABE</em> 60, no. 3 (2017): 877-892.</p>
+<p><a class="reference external" href="http://elibrary.asabe.org/azdez.asp?JID=3&amp;AID=47792&amp;CID=t2017&amp;v=60&amp;i=3&amp;T=1&amp;refer=7&amp;access=">http://elibrary.asabe.org/azdez.asp?JID=3&amp;AID=47792&amp;CID=t2017&amp;v=60&amp;i=3&amp;T=1&amp;refer=7&amp;access=</a></p>
+<p>Bonifacio, Henry F., C. Alan Rotz, and Tom L. Richard. “A process-based
+model for cattle manure compost windrows: Part 2. Model performance and
+application.” <em>Transactions of the ASABE</em> 60, no. 3 (2017): 893.</p>
+<p><a class="reference external" href="https://elibrary.asabe.org/azdez.asp?JID=3&amp;AID=47793&amp;CID=t2017&amp;v=60&amp;i=3&amp;T=1&amp;refer=7&amp;access=">https://elibrary.asabe.org/azdez.asp?JID=3&amp;AID=47793&amp;CID=t2017&amp;v=60&amp;i=3&amp;T=1&amp;refer=7&amp;access=</a></p>
+<aside class="footnote-list brackets">
+<aside class="footnote brackets" id="id2" role="note">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id1">1</a><span class="fn-bracket">]</span></span>
+<p>According to Michel et al. Adding bedding material like sawdust
+reduces the moisture content to an optimal range of [60%,65%] for
+composting (Rynk et al., 1991; Keener et al., 1999).</p>
+</aside>
+</aside>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="AD_variables.html" class="btn btn-neutral float-left" title="AD Variables" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="Compost_bedded_pack_barn/e4f80e0dc67749f689523bc44aca1003.html" class="btn btn-neutral float-right" title="Compost bedded pack barn (CBPB)" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, RuFaS team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
