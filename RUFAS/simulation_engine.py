@@ -7,7 +7,6 @@ from pathlib import Path
 import config.global_variables
 from RUFAS import routines, errors
 from RUFAS.classes import Config, State, Weather, Time
-from RUFAS.output_handler import OutputHandler
 from RUFAS.output_manager import OutputManager
 import random
 import numpy
@@ -38,7 +37,6 @@ class SimulationEngine:
         t_start_sim = timer.time()
 
         self._run_simulation_main_loop()
-        self.output.finalize(self.state, self.weather, self.time)
         ManureManagerOutputHandler.produce_csv(self.config.csv_dir, self.state.manure_manager)
         t_end_sim = timer.time()
 
@@ -51,7 +49,6 @@ class SimulationEngine:
         if config.global_variables.PRODUCE_GRAPHICS:
             sys.stdout.write('Producing Graphics\n')
             t_start_graphics = timer.time()
-            self.output.produce_graphics()
             ManureManagerOutputHandler.produce_graphics(self.config.graphic_dir, self.state.manure_manager)
             t_end_graphics = timer.time()
             graphics_prod_time = t_end_graphics - t_start_graphics
@@ -87,10 +84,8 @@ class SimulationEngine:
         simulate_daily_manure_manager(
             self.state.manure_manager, self.state.animal_manager)
         self.state.field_manager.daily_update_routine(self.weather, self.time)
-        routines.daily_feed_routine(self.state.feed, self.state.field_manager, self.state.animal_manager,
-                                    self.output.reports['feed_storage_report'])
+        routines.daily_feed_routine(self.state.feed, self.state.field_manager, self.state.animal_manager)
 
-        self.output.daily_update(self.state, self.weather, self.time)
         self._advance_time()
 
     def _advance_time(self, print_day: Optional[bool] = False) -> None:
@@ -119,9 +114,6 @@ class SimulationEngine:
         Flushes the data in the output object
         Resets the state for the following year"""
         self.state.annual_mass_balance(self.time)
-        self.output.annual_updates(self.state, self.weather, self.time)
-        self.output.write_annual_reports()
-        self.output.annual_flushes()
         self.state.annual_reset()
         self.time.advance()
 
@@ -159,7 +151,7 @@ class SimulationEngine:
             file_path (Path): Path to the input json file
 
         Raises:
-            InvalidJSONFile: If the json file at the given path does not conform 
+            InvalidJSONFile: If the json file at the given path does not conform
             with the format required
         """
         print(f"Initializing simulation environment from {file_path}")
@@ -176,14 +168,8 @@ class SimulationEngine:
             self.time = Time(self.config)
             self.state = State(data['farm'], self.config,
                                self.weather, self.time)
-            self.output = OutputHandler(Utility.read_json_file(
-                Utility.get_base_dir() / 'input/output' / data['output']), self.state)
 
         except errors.JSONfileData as e:
             print(
                 f"JSON FILE ERROR: {file_path.name}\n\t{e.section} Section\n{e.msg}\n")
             raise errors.InvalidJSONfile(file_path.name)
-
-        self.output.initialize_dir(
-            self.config.csv_dir, self.config.graphic_dir)
-        self.output.initialize_reports()
