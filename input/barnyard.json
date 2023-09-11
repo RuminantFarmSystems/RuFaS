@@ -17,21 +17,16 @@
     "farm":
     {
         "fields": {
-            "field_1": {
-                "soil": "barnyard_soil.json",
-                "crop": "no_crop.json",
-                "field_management": "barnyard_field_management.json"
-            },
-            "field_2": {
-                "soil": "barnyard_soil.json",
-                "crop": "no_crop.json",
+            "regular_soil_field": {
+                "soil": "barnyard_regular_soil.json",
+                "crop": "corn_rotation.json",
                 "field_management": "barnyard_scheduled_field_management.json"
             },
-            "field_3": {
-                "soil": "barnyard_soil.json",
-                "crop": "no_crop.json",
-                "field_management": "barnyard_field_management.json"
-            }
+            "sandy_field": {
+                "soil": "barnyard_sandy_soil.json",
+                "crop": "corn_rotation.json",
+                "field_management": "barnyard_scheduled_field_management.json"
+            },
         },
         "animal": "barnyard_animal.json",
         "feed": "purchased_feed.json",
