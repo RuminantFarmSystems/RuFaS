@@ -40,6 +40,7 @@ from RUFAS.routines.animal.ration import ration_driver as ration_driver
 from RUFAS.routines.feed.feed import Feed
 from RUFAS.routines.animal.ration.calf_ration import optimize as calf_optimize
 
+from RUFAS.routines.animal.ration import user_defined_ration as udr
 
 import random
 from statistics import mean
@@ -190,8 +191,10 @@ class AnimalManager:
 
         # concentrate supplementation when farming type is "pasture", kg
         self.pasture_concentrate = data['pasture_concentrate']
-
+        
+        udrm = udr.UserDefinedRationManager()
         self.ration_user_input = data['ration']['user_input']
+        udrm.udr_or_not = self.ration_user_input
 
         # how often a ration is calculated, days
         self.formulation_interval = data['ration']['formulation_interval']
@@ -1397,6 +1400,15 @@ class AnimalManager:
 
                 pen.ration = ration_per_pen
                 pen.ration_per_animal = ration_per_animal  # Important
+
+                info_map = {"class": self.__class__.__name__,
+                    "function": self._calc_ration_at_interval.__name__,
+                    "available_feeds": available_feeds.feed_id, }
+                om.add_variable(f'ration_nutrient_amount_pen_{pen.id}', nutrient_amount, info_map)
+                om.add_variable(f'ration_nutrient_conc_pen_{pen.id}', nutrient_conc, info_map)
+                om.add_variable(f'MEdiet_pen_{pen.id}', pen.MEdiet, info_map)
+                om.add_variable(f'dry_matter_intake_pen_{pen.id}', pen.dry_matter_intake, info_map)
+                om.add_variable(f'avg_rqmts_pen_{pen.id}', pen.avg_nutrient_rqmts, info_map)
 
     @classmethod
     def _get_animal_types_in_pen(cls, pen: Pen) -> Set[AnimalType]:
