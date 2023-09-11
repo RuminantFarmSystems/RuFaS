@@ -127,3 +127,33 @@ class GasEmissionConstants:
 
     SLURRY_MANURE_THRESHOLD = 5.0
     """Dry matter threshold for classifying slurry manure (unitless)."""
+
+    DEFAULT_STORAGE_AREA_PER_ANIMAL = 1.0
+    """Default storage area per animal (:math:`m^2`). Default is set to 1.0."""
+
+    AMMONIA_EMISSION_COEFFICIENT_WITH_TILLED_BEDDING = 0.5
+    """
+    Ammonia emission coefficient used for calculating nitrogen loss in a compost bedded pack barn
+    when the bedding is tilled (unitless).
+    """
+
+    AMMONIA_EMISSION_COEFFICIENT_WITH_UNTILLED_BEDDING = 0.25
+    """
+    Ammonia emission coefficient used for calculating nitrogen loss in a compost bedded pack barn
+    when the bedding is not tilled (unitless).
+    """
+
+    LEACHING_COEFFICIENT = 0.035
+    """Leaching coefficient used in the calculation of nitrogen loss in a compost bedded pack barn (unitless)."""
+
+    NITROUS_OXIDE_COEFFICIENT_WITH_TILLED_BEDDING = 0.07
+    """
+    Nitrous oxide coefficient used for calculating nitrogen loss in a compost bedded pack barn 
+    when the bedding is tilled (unitless).
+    """
+
+    NITROUS_OXIDE_COEFFICIENT_WITH_UNTILLED_BEDDING = 0.01
+    """
+    Nitrous oxide coefficient used for calculating nitrogen loss in a compost bedded pack barn
+    when the bedding is not tilled (unitless).
+    """
