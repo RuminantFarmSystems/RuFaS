@@ -987,7 +987,7 @@
             "type": "string",
             "description": "Whether the crop uses scheduled harvests or optimal harvests",
             "default": "scheduled",
-            "pattern": "^(scheduled|optimal)$",
+            "pattern": "^(scheduled|optimal)$"
           },
           "planting_days": {
             "type": "array",
