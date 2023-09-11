@@ -44,44 +44,46 @@ class Field:
 
         Args:
             field_data: FieldData
-
-            soil:
-            plantings:
-            harvestings:
-            custom_crop_specifications:
-            tillage_events:
-            fertilizer_events:
-            fertilizer_mixes:
-            manure_events:
-            manure_manager:
+                FieldData object that will be simulated
+            soil: Soil
+                The soil component of the field
+            plantings: List[PlantingEvent]
+                List of all planting events that will occur over the run of the simulation in this field.
+            harvestings: List[HarvestEvent]
+                List of all harvesting events that will occur over the run of the simulation in the field.
+            custom_crop_specifications: Dict[str, Dict]
+                Dictionary where keys are crop references and values are dictionaries containing crop specifications.
+            tillage_events: List[TillageEvent]
+                List of all tillage events that will occur over the run of the simulation in this field.
+            fertilizer_events: List[FertilizerEvent]
+                List of all fertilizer mixes available for application to this field.
+            fertilizer_mixes: Dict[str, Dict[str, float]]
+                List of all fertilizer mixes available for application to this field.
+            manure_events: List[ManureEvent]
+                Manure application interface.
+            manure_manager: ManureManager
+                ManureManager Object to be used during simulation
         """
         # field-wide attributes
         self.field_data = field_data or FieldData()
-        """field data component"""
 
         # soil attributes
         self.soil = soil or Soil(soil_data=None, field_size=self.field_data.field_size)  # default soil if not given.
-        """the soil component of the field"""
 
         # crop attributes
         self.crops: List[Crop] = list()  # empty crop list
-        """crops currently in the field"""
 
         self.planting_events: List[PlantingEvent] = plantings or []
-        """List of all planting events that will occur over the run of the simulation in this field."""
 
         self.harvest_events: List[HarvestEvent] = harvestings or []
-        """List of all harvesting events that will occur over the run of the simulation in the field."""
 
         self.custom_crop_specifications: Dict[str, Dict] = custom_crop_specifications or {}
-        """Dictionary where keys are crop references and values are dictionaries containing crop specifications."""
 
         # Soil amendment attributes
         self.fertilizer_applicator = FertilizerApplication(self.soil)
         """Provides interface for adding fertilizer to the field."""
 
         self.fertilizer_events = fertilizer_events or []
-        """List of all fertilizer application events that will be applied to this field."""
 
         self.available_fertilizer_mixes = fertilizer_mixes or {}
         self.available_fertilizer_mixes["100_0_0"] = {"N": 1.0, "P": 0.0, "K": 0.0}
@@ -99,7 +101,6 @@ class Field:
         """List of all tillage events that will occur over the run of the simulation in this field."""
 
         self.manure_applicator = ManureApplication(self.soil.data)
-        """Manure application interface."""
 
         self.manure_events: List[ManureEvent] = manure_events or []
         """List of all manure applications that will be applied to this field."""
