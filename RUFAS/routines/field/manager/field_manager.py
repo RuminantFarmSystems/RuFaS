@@ -360,15 +360,16 @@ class FieldManager:
             schedules.append(new_schedule)
         return schedules
 
-    @staticmethod
-    def _setup_soil(soil_config: Dict[str, Any]) -> Soil:
+    def _setup_soil(self, soil_configuration: str, field_size: float) -> Soil:
         """
         Sets up a Soil instance that will be used by the Field class.
 
         Parameters
         ----------
-        soil_config : Dict[str]
-            Contains all the data necessary to set up a SoilData object.
+        soil_configuration : str
+            Name of the metadata blob that contains the soil.
+        field_size : float
+            Size of the field that contains this soil profile (ha).
 
         Returns
         -------
@@ -376,13 +377,13 @@ class FieldManager:
             Soil instance that contains a SoilData instance configured to the provided specifications.
 
         """
-        field_size = soil_config["field_size"]
-        sand_content = soil_config["sand"]
-        silt_content = soil_config["silt"]
-        residue = soil_config["initial_residue"]
-        nitrogen_mineralization_rate = soil_config["fresh_N_mineral_rate"]
+        soil_configuration_data = im.get_data(soil_configuration)
+        sand_content = soil_configuration_data["sand"]
+        silt_content = soil_configuration_data["silt"]
+        residue = soil_configuration_data["initial_residue"]
+        nitrogen_mineralization_rate = soil_configuration_data["fresh_N_mineral_rate"]
 
-        soil_layers_config = list(soil_config.get("soil_layers").values())
+        soil_layers_config = list(soil_configuration_data.get("soil_layers").values())
         soil_layers_config.sort(key=lambda x: x.get("bottom_depth"))
         soil_layers = []
         for index, layer_config in enumerate(soil_layers_config):
@@ -390,15 +391,16 @@ class FieldManager:
                 top_depth = 0.0
             else:
                 top_depth = soil_layers[-1].bottom_depth
-            new_layer = FieldManager._setup_soil_layer(field_size, top_depth, sand_content,
-                                                       silt_content, residue, nitrogen_mineralization_rate,
-                                                       layer_config)
+            new_layer = self._setup_soil_layer(field_size, top_depth, sand_content, silt_content, residue,
+                                               nitrogen_mineralization_rate, layer_config)
             soil_layers.append(new_layer)
 
-        config_dictionary = {"second_moisture_condition_parameter": soil_config.get("CN2"),
-                             "average_subbasin_slope": soil_config.get("field_slope"),
-                             "slope_length": soil_config.get("slope_length"), "manning": soil_config.get("manning"),
-                             "albedo": soil_config.get("soil_albedo"), "cover_type": soil_config.get("soil_cover_type"),
+        config_dictionary = {"second_moisture_condition_parameter": soil_configuration_data.get("CN2"),
+                             "average_subbasin_slope": soil_configuration_data.get("field_slope"),
+                             "slope_length": soil_configuration_data.get("slope_length"),
+                             "manning": soil_configuration_data.get("manning"),
+                             "albedo": soil_configuration_data.get("soil_albedo"),
+                             "cover_type": soil_configuration_data.get("soil_cover_type"),
                              "soil_layers": soil_layers}
 
         soil_data = SoilData(field_size=field_size, **config_dictionary)
