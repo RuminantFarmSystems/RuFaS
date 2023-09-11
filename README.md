@@ -1,6 +1,6 @@
 [![Testing](https://github.com/RuminantFarmSystems/MASM/actions/workflows/testing_pytest.yml/badge.svg)](https://github.com/RuminantFarmSystems/MASM/actions/workflows/testing_pytest.yml)
 [![Linting](https://github.com/RuminantFarmSystems/MASM/actions/workflows/lint_flake8.yml/badge.svg)](https://github.com/RuminantFarmSystems/MASM/actions/workflows/lint_flake8.yml)
-[![Coverage](https://img.shields.io/badge/coverage-86%25-yellowgreen)](https://github.com/RuminantFarmSystems/MASM/actions/workflows/coverage_pytest-cov.yml)
+[![Coverage](https://img.shields.io/badge/coverage-88%25-yellowgreen)](https://github.com/RuminantFarmSystems/MASM/actions/workflows/coverage_pytest-cov.yml)
 # Vision
 To support research and sustainable decision-making in ruminant animal production through a state-of-art, open-source modeling environment that is continuously adapting as technology and scientific knowledge advance.
 
@@ -16,6 +16,15 @@ When decision-making is difficult and doubtful, we use these as our North Star t
 
 ## Past
 N/A
+
+# Definitions for Priority Levels
+- **P0 (Priority 0):** These are the 🔥 "fire-breathing dragon" tasks! They are critical and need immediate attention. Team members should don their hero capes 🦸‍♂️🦸‍♀️ and charge into action on P0 tasks. However, if someone finds themselves in a knightly standstill while battling these dragons 🐉, they can embark on a noble quest to tackle lower-priority tasks while working to rescue the damsel in distress (unblocking the higher priority task).
+
+- **P1 (Priority 1):** Think of these as the trusty steed tasks 🐎. They're important and require attention once the dragons (P0) are vanquished. Knights of the project realm should prioritize P0 tasks but, if they encounter a moat or a drawbridge on their way, they can hop on their trusty steed 🏇 and joust with P1 tasks, all while working on strategies to lower the drawbridge (resolve blockers).
+
+- **P2 (Priority 2):** These are the friendly village tasks 🏘️. They're less urgent but still vital to the kingdom. Team members can take a leisurely stroll through the village (work on P2 tasks) when the dragons and drawbridges are at bay. If they happen upon a blocked path, they can enjoy a cup of tea with the villagers ☕ (work on P2 tasks), all while devising clever plans to remove any obstacles in their way.
+
+Remember, in the grand adventure of project work, flexibility and creativity are your allies! 🚀
 
 # 2023 H2 Roadmap
 ## Milestone 1: Aug 11th
@@ -50,8 +59,8 @@ Redesign and implement Feed storage module ||||Moved to MS 2.5
 Revisit the Animal Module design – Refactoring -- Animal Manager|||P2| Moved to MS 2.5
 Revisit the Animal Module design – Refactoring -- Animal Ration formulation|Joe||P0
 Revisit the Animal Module design – Refactoring -- Animal Life Cycle|Yijing, Simon, Anchey|Design phase|P0
-Deprecate the output handler, add missing functionalities, and reports to OM|Niko||P0
-Go through the entire codebase and ensure IM is the only way we are receiving input data|||P0|[IM Integration tracking](https://docs.google.com/spreadsheets/d/1k8J6MelPrsrz6Tv4fQNAG-kLSN7oQTQOCEy3I6F0IqU/edit?usp=sharing)
+Deprecate the output handler, add missing functionalities, and reports to OM|Niko, Allister||P0
+Go through the entire codebase and ensure IM is the only way we are receiving input data|Allister, Niko||P0|[IM Integration tracking](https://docs.google.com/spreadsheets/d/1k8J6MelPrsrz6Tv4fQNAG-kLSN7oQTQOCEy3I6F0IqU/edit?usp=sharing)
 
 
 SMEs:
@@ -81,9 +90,9 @@ SMEs:
 Dev Team:
 |Title|Owner|Status|Priority|Remarks|
 |--|--|--|--|--|
-Revisit classes.py
-Deprecate DB(s)
-Deprecate output handler ||||moved to MS 2
+Revisit classes.py|Allister
+Deprecate DB(s)|Allister
+Deprecate output handler ||moved to MS 2||
 Develop post-processing and report generation
 Develop end-to-end testing
 Publish V1 Repo
