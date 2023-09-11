@@ -321,6 +321,37 @@ class FieldManager:
 
         return available_fertilizer_mixes, fertilizer_application_schedule
 
+    def _setup_manure_schedule(self, manure_schedule: str) -> ManureSchedule:
+        """
+        Sets up the Manure Schedule.
+
+        Parameters
+        ----------
+        manure_schedule : str
+            Name of the metadata blob that contains the manure schedule information.
+
+        Returns
+        -------
+        ManureSchedule
+            ManureSchedule instance created using data pulled from the Input Manager.
+
+        """
+        manure_schedule_data = im.get_data(manure_schedule)
+        manure_schedule_instance = ManureSchedule(
+            name="manure_schedule",
+            years=manure_schedule_data.get("years"),
+            days=manure_schedule_data.get("days"),
+            nitrogen_masses=manure_schedule_data.get("nitrogen_masses"),
+            phosphorus_masses=manure_schedule_data.get("phosphorus_masses"),
+            field_coverages=manure_schedule_data.get("coverage_fractions"),
+            application_depths=manure_schedule_data.get("application_depths"),
+            surface_remainder_fractions=manure_schedule_data.get("surface_remainder_fractions"),
+            pattern_skip=manure_schedule_data.get("pattern_skip"),
+            pattern_repeat=manure_schedule_data.get("pattern_repeat"),
+        )
+        return manure_schedule_instance
+
+
     def _setup_crop_schedules(self, crop_rotation: str) -> List[CropSchedule]:
         """
         Creates CropSchedules as dictated by the input specifications.
