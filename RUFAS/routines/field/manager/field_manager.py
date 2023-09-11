@@ -225,61 +225,101 @@ class FieldManager:
                      fertilizer_mixes=available_fertilizer_mixes, manure_events=manure_events,
                      manure_manager=manure_manager)
 
-    @staticmethod
-    def _setup_management(field_name: str,
-                          management_config: Dict) -> Tuple[Dict, FertilizerSchedule, ManureSchedule, TillageSchedule]:
+    # @staticmethod
+    # def _setup_management(field_name: str,
+    #                       management_config: Dict) -> Tuple[Dict, FertilizerSchedule, ManureSchedule, TillageSchedule]:
+    #     """
+    #     Creates all the Schedule instances needed to manage the farm.
+    #
+    #     Parameters
+    #     ----------
+    #     field_name : str
+    #         The name of the field managed with this fertilizer schedule.
+    #     management_config : Dict
+    #         Contains the specifications for how this field will be managed.
+    #
+    #     Returns
+    #     -------
+    #     Tuple
+    #         Dictionary containing the available fertilizer mixes for this field, a FertilizerSchedule instance, a
+    #         ManureSchedule instance, and a TillageSchedule instance.
+    #
+    #     """
+    #     fertilizer_config = management_config["fertilizer"]
+    #     fertilizer_mixes = fertilizer_config["mixes"]
+    #     fertilizer_schedule_name = field_name + "_fertilizer_schedule"
+    #     fertilizer_schedule = FertilizerSchedule(name=fertilizer_schedule_name,
+    #                                              mix_names=fertilizer_config["mix"],
+    #                                              years=fertilizer_config["year"], days=fertilizer_config["day"],
+    #                                              nitrogen_masses=fertilizer_config["N_mass"],
+    #                                              phosphorus_masses=fertilizer_config["P_mass"],
+    #                                              application_depths=fertilizer_config["depth"],
+    #                                              surface_remainder_fractions=fertilizer_config["surface_percent"],
+    #                                              pattern_repeat=fertilizer_config["repeat"])
+    #
+    #     manure_config = management_config["manure"]
+    #     manure_schedule_name = field_name + "_manure_schedule"
+    #     manure_schedule = ManureSchedule(name=manure_schedule_name,
+    #                                      years=manure_config["year"],
+    #                                      days=manure_config["day"],
+    #                                      nitrogen_masses=manure_config["N_mass"],
+    #                                      phosphorus_masses=manure_config["P_mass"],
+    #                                      field_coverages=manure_config["cover_percent"],
+    #                                      application_depths=manure_config["depth"],
+    #                                      surface_remainder_fractions=manure_config["surface_percent"],
+    #                                      pattern_repeat=manure_config["repeat"])
+    #
+    #     tillage_config = management_config["tillage"]
+    #     tillage_schedule_name = field_name + "_tillage_schedule"
+    #     tillage_schedule = TillageSchedule(name=tillage_schedule_name,
+    #                                        years=tillage_config["year"],
+    #                                        days=tillage_config["day"],
+    #                                        tillage_depths=tillage_config["depth"],
+    #                                        incorporation_fractions=tillage_config["percent_incorporated"],
+    #                                        mixing_fractions=tillage_config["percent_mixed"],
+    #                                        pattern_repeat=tillage_config["repeat"])
+    #
+    #     return fertilizer_mixes, fertilizer_schedule, manure_schedule, tillage_schedule
+
+    def _setup_fertilizer_schedule(self, fertilizer_schedule: str) -> Tuple[Dict, FertilizerSchedule]:
         """
-        Creates all the Schedule instances needed to manage the farm.
+        Sets up the fertilizer schedule and the list of available fertilizer mixes.
 
         Parameters
         ----------
-        field_name : str
-            The name of the field managed with this fertilizer schedule.
-        management_config : Dict
-            Contains the specifications for how this field will be managed.
+        fertilizer_schedule : str
+            Name of the metadata blob that contains the fertilizer schedule.
 
         Returns
         -------
-        Tuple
-            Dictionary containing the available fertilizer mixes for this field, a FertilizerSchedule instance, a
-            ManureSchedule instance, and a TillageSchedule instance.
+        Tuple[Dict, FertilizerSchedule]
+            Dictionary containing the specifications of the available fertilizer mixes, and a FertilizerSchedule.
 
         """
-        fertilizer_config = management_config["fertilizer"]
-        fertilizer_mixes = fertilizer_config["mixes"]
-        fertilizer_schedule_name = field_name + "_fertilizer_schedule"
-        fertilizer_schedule = FertilizerSchedule(name=fertilizer_schedule_name,
-                                                 mix_names=fertilizer_config["mix"],
-                                                 years=fertilizer_config["year"], days=fertilizer_config["day"],
-                                                 nitrogen_masses=fertilizer_config["N_mass"],
-                                                 phosphorus_masses=fertilizer_config["P_mass"],
-                                                 application_depths=fertilizer_config["depth"],
-                                                 surface_remainder_fractions=fertilizer_config["surface_percent"],
-                                                 pattern_repeat=fertilizer_config["repeat"])
+        fertilizer_data = im.get_data(fertilizer_schedule)
+        available_fertilizer_mixes = {}
+        fertilizer_mix_data = fertilizer_data.get("available_fertilizer_mixes")
+        for mix in fertilizer_mix_data:
+            available_fertilizer_mixes[mix.get("name")] = {
+                "N": mix.get("N"),
+                "P": mix.get("P"),
+                "K": mix.get("K")
+            }
 
-        manure_config = management_config["manure"]
-        manure_schedule_name = field_name + "_manure_schedule"
-        manure_schedule = ManureSchedule(name=manure_schedule_name,
-                                         years=manure_config["year"],
-                                         days=manure_config["day"],
-                                         nitrogen_masses=manure_config["N_mass"],
-                                         phosphorus_masses=manure_config["P_mass"],
-                                         field_coverages=manure_config["cover_percent"],
-                                         application_depths=manure_config["depth"],
-                                         surface_remainder_fractions=manure_config["surface_percent"],
-                                         pattern_repeat=manure_config["repeat"])
+        fertilizer_application_schedule = FertilizerSchedule(
+            name="fertilizer_schedule",
+            mix_names=fertilizer_data.get("mix_names"),
+            years=fertilizer_data.get("years"),
+            days=fertilizer_data.get("days"),
+            nitrogen_masses=fertilizer_data.get("nitrogen_masses"),
+            phosphorus_masses=fertilizer_data.get("phosphorus_masses"),
+            application_depths=fertilizer_data.get("application_depths"),
+            surface_remainder_fractions=fertilizer_data.get("surface_remainder_fractions"),
+            pattern_skip=fertilizer_data.get("pattern_skip"),
+            pattern_repeat=fertilizer_data.get("pattern_repeat")
+        )
 
-        tillage_config = management_config["tillage"]
-        tillage_schedule_name = field_name + "_tillage_schedule"
-        tillage_schedule = TillageSchedule(name=tillage_schedule_name,
-                                           years=tillage_config["year"],
-                                           days=tillage_config["day"],
-                                           tillage_depths=tillage_config["depth"],
-                                           incorporation_fractions=tillage_config["percent_incorporated"],
-                                           mixing_fractions=tillage_config["percent_mixed"],
-                                           pattern_repeat=tillage_config["repeat"])
-
-        return fertilizer_mixes, fertilizer_schedule, manure_schedule, tillage_schedule
+        return available_fertilizer_mixes, fertilizer_application_schedule
 
     def _setup_crop_schedules(self, crop_rotation: str) -> List[CropSchedule]:
         """
