@@ -8,6 +8,7 @@ from RUFAS.routines.field.field.field_data import FieldData
 from RUFAS.routines.field.field.field import Field
 from RUFAS.routines.field.soil.layer_data import LayerData
 from RUFAS.routines.field.soil.soil import Soil
+from RUFAS.routines.field.soil.soil_data import SoilData
 from RUFAS.classes import Time, Weather
 from RUFAS.util import Utility
 from RUFAS.routines.manure.manure_manager import ManureManager
@@ -468,41 +469,6 @@ def test_setup_soil_layer_error(config: Dict) -> None:
     assert str(e.value) == "Bottom depth is required for each soil layer."
 
 
-# @pytest.mark.parametrize("soil_input_file_name,expected_soil_layer_count", [
-#     ("ARL_soil.json", 5),
-#     ("ARL_soil_tillage.json", 5),
-#     ("barnyard_soil.json", 4),
-#     ("base_case_soil.json", 5),
-#     ("LT_soil.json", 3),
-#     ("multi_crop_soil.json", 5),
-#     ("swat_soil.json", 5),
-#     ("testing_soil.json", 5)
-# ])
-# def test_setup_soil_with_full_inputs(soil_input_file_name: str, expected_soil_layer_count: int) -> None:
-#     """Tests that current soil inputs can be handled by the soil setup routine."""
-#     input_directory = Utility.get_base_dir() / 'input'
-#     soil_config = Utility.read_json_file(input_directory / 'soil' / soil_input_file_name)
-#     actual = FieldManager._setup_soil(soil_config)
-#     assert len(actual.data.soil_layers) == expected_soil_layer_count
-#
-#
-# @pytest.mark.parametrize("soil_config,soil_layer_count", [
-#     ({"CN2": 85.00, "field_slope": 0.02, "slope_length": 3, "manning": 0.4, "field_size": 1.0, "sand": 15, "silt": 65,
-#       "soil_albedo": 0.16, "initial_residue": 0, "fresh_N_mineral_rate": 0.05, "soil_cover_type": "BARE", "soil_layers":
-#           {"layer_1": {"bottom_depth": 279.4},
-#            "layer_2": {"bottom_depth": 1041.4},
-#            "layer_3": {"bottom_depth": 1168.4},
-#            "layer_4": {"bottom_depth": 2006.6}}
-#       }, 4)
-# ])
-# def test_setup_soil_subroutine_calls(soil_config: Dict, soil_layer_count: int) -> None:
-#     """Tests that soil setup routine correctly parses input and calls subroutine."""
-#     FieldManager._setup_soil_layer = MagicMock(return_value=LayerData(top_depth=0.0, bottom_depth=1000.0,
-#                                                                       field_size=1.0))
-#     FieldManager._setup_soil(soil_config)
-#
-#     assert FieldManager._setup_soil_layer.call_count == soil_layer_count
-
 @pytest.mark.parametrize("soil_configuration", [
     {
         "CN2": 85.00,
@@ -753,32 +719,81 @@ def test_get_field_blob_names_error() -> None:
 
 
 @pytest.mark.parametrize("field_name,field_config", [
-    ("field_1", {"soil": "ARL_soil.json", "crop": "ARL_rotation.json",
-                 "field_management": "ARL_field_management.json"}),
-    ("field_2", {"soil": "barnyard_soil.json", "crop": "corn_scheduled_rotation.json",
-                 "field_management": "barnyard_scheduled_field_management.json"})
+    ("field_1", {
+        "soil_specification": "soil",
+        "crop_specification": "crop",
+        "fertilizer_management_specification": "fertilizer_schedule",
+        "manure_management_specification": "manure_schedule",
+        "tillage_management_specification": "tillage_schedule",
+        "field_size": 1.0,
+        "absolute_latitude": 43.304346,
+        "longitude": None,
+        "minimum_daylength": 9.0,
+        "seasonal_high_water_table": False,
+        "watering_amount_in_liters": 0.0,
+        "watering_interval": 0
+    }),
+    ("field_2", {
+        "soil_specification": "soil",
+        "crop_specification": "crop",
+        "fertilizer_management_specification": "fertilizer_schedule_1",
+        "manure_management_specification": "manure_schedule_1",
+        "tillage_management_specification": "tillage_schedule_1",
+        "field_size": 1.0,
+        "absolute_latitude": 43.5,
+        "longitude": -89.4,
+        "minimum_daylength": 9.0,
+        "seasonal_high_water_table": False,
+        "watering_amount_in_liters": 500.0,
+        "watering_interval": 3
+    })
 ])
-def test_setup_field(field_name: str, field_config: Dict[str, str]) -> None:
+def test_setup_field(field_name: str, field_config: Dict) -> None:
     """Tests that a Field instance is correctly initialized with a given input configuration."""
-    with patch("RUFAS.util.Utility.get_base_dir", new_callable=MagicMock) as mocked_base_dir:
-        with patch("RUFAS.util.Utility.read_json_file", new_callable=MagicMock,
-                   return_value={"field_size": 1.0, "initial_residue": 0.0, "latitude": 40.0}) as mocked_json_dir:
-            FieldManager._setup_management = MagicMock(return_value=({}, FertilizerSchedule("name", [], [], [], [], [],
-                                                                                            [], []),
-                                                                     ManureSchedule("name", [], [], [], [], []),
-                                                                     TillageSchedule("name", [], [], [], [], [])))
-            FieldManager._setup_crop_schedules = MagicMock(return_value=[CropSchedule("name", "crop", [1999], [100],
-                                                                                      [1999], [240], ["default"])])
-            FieldManager._setup_soil = MagicMock(return_value=Soil(field_size=1.0))
-            mocked_manure_manager = MagicMock(ManureManager)
+    mocked_manure_manager = MagicMock(ManureManager)
+    mocked_fertilizer_schedule = MagicMock(FertilizerSchedule)
+    mocked_manure_schedule = MagicMock(ManureSchedule)
+    mocked_tillage_schedule = MagicMock(TillageSchedule)
+    mocked_crop_schedules = [MagicMock(CropSchedule)]
 
-            actual = FieldManager._setup_field(field_name, field_config, mocked_manure_manager)
+    mocked_soil_profile = MagicMock(Soil)
+    mocked_soil_data = MagicMock(SoilData)
+    mocked_soil_profile.data = mocked_soil_data
 
-            mocked_base_dir.assert_called_once()
-            assert mocked_json_dir.call_count == 3
-            FieldManager._setup_management.assert_called_once()
-            FieldManager._setup_crop_schedules.assert_called_once()
-            FieldManager._setup_soil.assert_called_once()
-            assert actual.field_data.name == field_name
-            assert actual.field_data.current_residue == 0.0
-            assert actual.field_data.absolute_latitude == 40.0
+    field_manager = FieldManager(mocked_manure_manager)
+
+    with patch("RUFAS.input_manager.InputManager.get_data", return_value=field_config) as patched_get_data, \
+            patch("RUFAS.routines.field.manager.field_manager.FieldManager._setup_fertilizer_schedule",
+                  new_callable=MagicMock, return_value=({}, mocked_fertilizer_schedule)) as patched_fertilizer_setup, \
+            patch("RUFAS.routines.field.manager.field_manager.FieldManager._setup_manure_schedule",
+                  new_callable=MagicMock, return_value=mocked_manure_schedule) as patched_manure_setup, \
+            patch("RUFAS.routines.field.manager.field_manager.FieldManager._setup_tillage_schedule",
+                  new_callable=MagicMock, return_value=mocked_tillage_schedule) as patched_tillage_setup, \
+            patch("RUFAS.routines.field.manager.field_manager.FieldManager._setup_crop_schedules",
+                  new_callable=MagicMock, return_value=mocked_crop_schedules) as patched_crop_schedules, \
+            patch("RUFAS.routines.field.manager.field_manager.FieldManager._setup_soil", new_callable=MagicMock,
+                  return_value=mocked_soil_profile) as patched_soil_setup:
+        new_field = field_manager._setup_field(field_name, mocked_manure_manager)
+
+        assert new_field.field_data.name == field_name
+        assert new_field.field_data.field_size == field_config.get("field_size")
+        assert new_field.field_data.absolute_latitude == field_config.get("absolute_latitude")
+        assert new_field.field_data.longitude == field_config.get("longitude")
+        assert new_field.field_data.minimum_daylength == field_config.get("minimum_daylength")
+        assert new_field.field_data.watering_amount_in_liters == field_config.get("watering_amount_in_liters")
+        assert new_field.field_data.watering_interval == field_config.get("watering_interval")
+
+        assert new_field.soil == mocked_soil_profile
+        assert new_field.available_fertilizer_mixes == {
+            "100_0_0": {"N": 1.0, "P": 0.0, "K": 0.0},
+            "26_4_24": {"N": 0.26, "P": 0.04, "K": 0.24}
+        }
+        assert new_field.manure_manager == mocked_manure_manager
+
+        patched_get_data.assert_called_once_with(field_name)
+        patched_fertilizer_setup.assert_called_once_with(field_config.get("fertilizer_management_specification"))
+        patched_manure_setup.assert_called_once_with(field_config.get("manure_management_specification"))
+        patched_tillage_setup.assert_called_once_with(field_config.get("tillage_management_specification"))
+        patched_crop_schedules.assert_called_once_with(field_config.get("crop_specification"))
+        patched_soil_setup.assert_called_once_with(field_config.get("soil_specification"),
+                                                   field_config.get("field_size"))

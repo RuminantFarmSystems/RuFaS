@@ -191,29 +191,37 @@ class FieldManager:
             A `Field` instance configured with the specified input data
 
         """
-        field_data_address = f"{field_name}."
-        field_size = im.get_data(field_data_address + "field_size")
-        absolute_latitude = im.get_data(field_data_address + "absolute_latitude")
-        longitude = im.get_data(field_data_address + "longitude")
-        minimum_daylength = im.get_data(field_data_address + "minimum_daylength")
-        seasonal_high_water_table = im.get_data(field_data_address + "seasonal_high_water_table")
-        watering_amount_in_liters = im.get_data(field_data_address + "watering_amount_in_liters")
-        watering_interval = im.get_data(field_data_address + "watering_interval")
+        field_configuration_data = im.get_data(field_name)
+        field_size = field_configuration_data.get("field_size")
+        absolute_latitude = field_configuration_data.get("absolute_latitude")
+        longitude = field_configuration_data.get("longitude")
+        minimum_daylength = field_configuration_data.get("minimum_daylength")
+        seasonal_high_water_table = field_configuration_data.get("seasonal_high_water_table")
+        watering_amount_in_liters = field_configuration_data.get("watering_amount_in_liters")
+        watering_interval = field_configuration_data.get("watering_interval")
 
-        available_fertilizer_mixes, fertilizer_schedule, manure_schedule, tillage_schedule = \
-            FieldManager._setup_management(field_name, management_config)
+        fertilizer_configuration = field_configuration_data.get("fertilizer_management_specification")
+        available_fertilizer_mixes, fertilizer_schedule = self._setup_fertilizer_schedule(fertilizer_configuration)
         fertilizer_events = fertilizer_schedule.generate_fertilizer_events()
-        manure_events = manure_schedule.generate_manure_events()
+
+        manure_configuration = field_configuration_data.get("manure_management_specification")
+        manure_application_schedule = self._setup_manure_schedule(manure_configuration)
+        manure_events = manure_application_schedule.generate_manure_events()
+
+        tillage_configuration = field_configuration_data.get("tillage_management_specification")
+        tillage_schedule = self._setup_tillage_schedule(tillage_configuration)
         tillage_events = tillage_schedule.generate_tillage_events()
 
-        crop_schedules = FieldManager._setup_crop_schedules(crops_config.get("crops"))
+        crop_rotation_configuration = field_configuration_data.get("crop_specification")
+        crop_schedules = self._setup_crop_schedules(crop_rotation_configuration)
         all_planting_events = []
         all_harvest_events = []
         for schedule in crop_schedules:
             all_planting_events += schedule.generate_planting_events()
             all_harvest_events += schedule.generate_harvest_events()
 
-        soil_profile = FieldManager._setup_soil(soil_config)
+        soil_configuration = field_configuration_data.get("soil_specification")
+        soil_profile = self._setup_soil(soil_configuration, field_size)
 
         field_data = FieldData(name=field_name, field_size=field_size, absolute_latitude=absolute_latitude,
                                longitude=longitude, minimum_daylength=minimum_daylength,
