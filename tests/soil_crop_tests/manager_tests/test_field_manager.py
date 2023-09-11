@@ -393,6 +393,62 @@ def test_setup_manure_schedule(manure_schedule_data: Dict, expected_manure_sched
         patched_get_data.assert_called_once_with("test_manure_schedule")
 
 
+@pytest.mark.parametrize("tillage_schedule_data,expected_tillage_schedule", [
+    ({
+         "pattern_repeat": 0,
+         "pattern_skip": 0,
+         "years": [1989, 1989, 1992, 1993, 1993, 1993, 1994, 1997, 1997, 1997, 1998, 2000, 2001, 2001, 2001, 2001, 2002,
+                   2004, 2005, 2005, 2006, 2008, 2009, 2009, 2010, 2010, 2012, 2013, 2013, 2014, 2016, 2017, 2018,
+                   2018],
+         "days": [305, 306, 335, 120, 121, 313, 108, 100, 114, 324, 98, 316, 114, 136, 142, 317, 175, 321, 118, 318, 95,
+                  315, 121, 327, 83, 88, 321, 126, 339, 112, 280, 125, 117, 120],
+         "incorporation_fractions": [0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3,
+                                     0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3,
+                                     0.3, 0.3],
+         "mixing_fractions": [0.3, 0.55, 0.3, 0.85, 0.55, 0.3, 0.55, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.1, 0.25, 0.3, 0.3,
+                              0.3, 0.3, 0.3, 0.55, 0.55, 0.3, 0.3, 0.55, 0.3, 0.55, 0.3, 0.55, 0.3, 0.3, 0.3, 0.3, 0.3],
+         "tillage_depths": [150, 75, 150, 100, 75, 150, 75, 150, 100, 150, 100, 150, 100, 5, 25, 150, 100, 150, 100,
+                            150, 75, 150, 100, 100, 150, 100, 150, 100, 150, 100, 100, 100, 100, 100]
+     }, TillageSchedule(
+        name="tillage_schedule",
+        years=[1989, 1989, 1992, 1993, 1993, 1993, 1994, 1997, 1997, 1997, 1998, 2000, 2001, 2001, 2001, 2001, 2002,
+               2004, 2005, 2005, 2006, 2008, 2009, 2009, 2010, 2010, 2012, 2013, 2013, 2014, 2016, 2017, 2018, 2018],
+        days=[305, 306, 335, 120, 121, 313, 108, 100, 114, 324, 98, 316, 114, 136, 142, 317, 175, 321, 118, 318, 95,
+              315, 121, 327, 83, 88, 321, 126, 339, 112, 280, 125, 117, 120],
+        incorporation_fractions=[0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3,
+                                 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3,
+                                 0.3, 0.3],
+        mixing_fractions=[0.3, 0.55, 0.3, 0.85, 0.55, 0.3, 0.55, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.1, 0.25, 0.3, 0.3,
+                          0.3, 0.3, 0.3, 0.55, 0.55, 0.3, 0.3, 0.55, 0.3, 0.55, 0.3, 0.55, 0.3, 0.3, 0.3, 0.3, 0.3],
+        tillage_depths=[150, 75, 150, 100, 75, 150, 75, 150, 100, 150, 100, 150, 100, 5, 25, 150, 100, 150, 100, 150,
+                        75, 150, 100, 100, 150, 100, 150, 100, 150, 100, 100, 100, 100, 100])),
+    ({
+        "years": [2014],
+        "days": [322],
+        "incorporation_fractions": [0.95],
+        "mixing_fractions": [0.95],
+        "tillage_depths": [150],
+        "pattern_repeat": 0,
+        "pattern_skip": 0
+    }, TillageSchedule(
+        name="tillage_schedule",
+        years=[2014],
+        days=[322],
+        incorporation_fractions=[0.95],
+        mixing_fractions=[0.95],
+        tillage_depths=[150],
+        pattern_skip=0,
+        pattern_repeat=0))
+])
+def test_setup_tillage_schedule(tillage_schedule_data: Dict, expected_tillage_schedule: TillageSchedule) -> None:
+    """Tests that TillageSchedules are correctly initialized with data from the InputManager."""
+    field_manager = FieldManager(MagicMock(ManureManager))
+    with patch("RUFAS.input_manager.InputManager.get_data", return_value=tillage_schedule_data) as patched_get_data:
+        actual_tillage_schedule = field_manager._setup_tillage_schedule("test_tillage_schedule")
+        assert actual_tillage_schedule.generate_tillage_events() == expected_tillage_schedule.generate_tillage_events()
+        patched_get_data.assert_called_once_with("test_tillage_schedule")
+
+
 @pytest.mark.parametrize("crop_schedule_config,expected", [
     ([
          {"crop_species": "corn",
