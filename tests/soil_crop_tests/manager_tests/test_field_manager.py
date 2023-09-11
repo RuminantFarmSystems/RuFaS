@@ -97,18 +97,19 @@ def test_daily_update_routine(fields: List[Field]) -> None:
     setattr(mocked_weather, "irrigation", 3)
 
     mocked_manure_manager = MagicMock(ManureManager)
-    fm = FieldManager(mocked_manure_manager)
+    with patch("RUFAS.routines.field.manager.field_manager.FieldManager._get_field_blob_names", return_value=[]):
+        fm = FieldManager(mocked_manure_manager)
 
-    fm.fields = fields
-    for field in fields:
-        field.manage_field = MagicMock()
-    fm.output_gatherer.send_daily_variables = MagicMock()
-    FieldManager._create_current_weather = MagicMock()
-    fm.daily_update_routine(weather=mocked_weather, time=mocked_time)
-    for field in fields:
-        assert field.manage_field.call_count == 1
-    assert FieldManager._create_current_weather.call_count == len(fields)
-    assert fm.output_gatherer.send_daily_variables.call_count == 1
+        fm.fields = fields
+        for field in fields:
+            field.manage_field = MagicMock()
+        fm.output_gatherer.send_daily_variables = MagicMock()
+        FieldManager._create_current_weather = MagicMock()
+        fm.daily_update_routine(weather=mocked_weather, time=mocked_time)
+        for field in fields:
+            assert field.manage_field.call_count == 1
+        assert FieldManager._create_current_weather.call_count == len(fields)
+        assert fm.output_gatherer.send_daily_variables.call_count == 1
 
 
 @pytest.mark.parametrize("fields", [
@@ -122,13 +123,14 @@ def test_annual_update_routine(fields: List[Field]):
     for field in fields:
         field.perform_annual_reset = MagicMock()
     mocked_field_manager = MagicMock(ManureManager)
-    fm = FieldManager(mocked_field_manager)
-    fm.fields = fields
-    fm.output_gatherer.send_annual_variables = MagicMock()
-    fm.annual_update_routine()
-    for field in fields:
-        assert field.perform_annual_reset.call_count == 1
-    assert fm.output_gatherer.send_annual_variables.call_count == 1
+    with patch("RUFAS.routines.field.manager.field_manager.FieldManager._get_field_blob_names", return_value=[]):
+        fm = FieldManager(mocked_field_manager)
+        fm.fields = fields
+        fm.output_gatherer.send_annual_variables = MagicMock()
+        fm.annual_update_routine()
+        for field in fields:
+            assert field.perform_annual_reset.call_count == 1
+        assert fm.output_gatherer.send_annual_variables.call_count == 1
 
 
 @pytest.mark.parametrize("fertilizer_schedule_data,expected_available_mixes,expected_schedule", [
@@ -252,9 +254,8 @@ def test_annual_update_routine(fields: List[Field]):
 def test_setup_fertilizer_schedule(fertilizer_schedule_data: Dict, expected_available_mixes: Dict,
                                    expected_schedule: FertilizerSchedule) -> None:
     """Tests that fertilizer schedules and available fertilizer mixes are correctly setup."""
-    field_manager = FieldManager(MagicMock(ManureManager))
     with patch("RUFAS.input_manager.InputManager.get_data", return_value=fertilizer_schedule_data) as patched_get_data:
-        actual_available_mixes, actual_schedule = field_manager._setup_fertilizer_schedule("test_fert_schedule")
+        actual_available_mixes, actual_schedule = FieldManager._setup_fertilizer_schedule("test_fert_schedule")
         assert actual_available_mixes == expected_available_mixes
         assert actual_schedule.generate_fertilizer_events() == expected_schedule.generate_fertilizer_events()
         patched_get_data.assert_called_once_with("test_fert_schedule")
@@ -303,9 +304,8 @@ def test_setup_fertilizer_schedule(fertilizer_schedule_data: Dict, expected_avai
 ])
 def test_setup_manure_schedule(manure_schedule_data: Dict, expected_manure_schedule: ManureSchedule) -> None:
     """Tests that ManureSchedules are correctly initialized with data from the InputManager."""
-    field_manager = FieldManager(MagicMock(ManureManager))
     with patch("RUFAS.input_manager.InputManager.get_data", return_value=manure_schedule_data) as patched_get_data:
-        actual_manure_schedule = field_manager._setup_manure_schedule("test_manure_schedule")
+        actual_manure_schedule = FieldManager._setup_manure_schedule("test_manure_schedule")
         assert actual_manure_schedule.generate_manure_events() == expected_manure_schedule.generate_manure_events()
         patched_get_data.assert_called_once_with("test_manure_schedule")
 
@@ -359,9 +359,8 @@ def test_setup_manure_schedule(manure_schedule_data: Dict, expected_manure_sched
 ])
 def test_setup_tillage_schedule(tillage_schedule_data: Dict, expected_tillage_schedule: TillageSchedule) -> None:
     """Tests that TillageSchedules are correctly initialized with data from the InputManager."""
-    field_manager = FieldManager(MagicMock(ManureManager))
     with patch("RUFAS.input_manager.InputManager.get_data", return_value=tillage_schedule_data) as patched_get_data:
-        actual_tillage_schedule = field_manager._setup_tillage_schedule("test_tillage_schedule")
+        actual_tillage_schedule = FieldManager._setup_tillage_schedule("test_tillage_schedule")
         assert actual_tillage_schedule.generate_tillage_events() == expected_tillage_schedule.generate_tillage_events()
         patched_get_data.assert_called_once_with("test_tillage_schedule")
 
@@ -409,9 +408,8 @@ def test_setup_tillage_schedule(tillage_schedule_data: Dict, expected_tillage_sc
 ])
 def test_crop_schedule_setup(crop_schedule_config: Dict, expected: List[CropSchedule]) -> None:
     """Tests that crop schedules are created correctly from the crop schedule configuration passed to it."""
-    field_manager = FieldManager(MagicMock(ManureManager))
     with patch("RUFAS.input_manager.InputManager.get_data", return_value=crop_schedule_config) as patched_get_data:
-        actual = field_manager._setup_crop_schedules("test_crop_schedule")
+        actual = FieldManager._setup_crop_schedules("test_crop_schedule")
         for index in range(len(expected)):
             assert actual[index].generate_planting_events() == expected[index].generate_planting_events()
             assert actual[index].generate_harvest_events() == expected[index].generate_harvest_events()
@@ -449,8 +447,7 @@ def test_crop_schedule_setup(crop_schedule_config: Dict, expected: List[CropSche
 def test_setup_soil_layer(field_size: float, top: float, sand: float, silt: float, residue: float,
                           nitrogen_mineralization: float, config: Dict, expected: LayerData) -> None:
     """Tests that LayerData instances are configured correctly with a given specification."""
-    field_manager = FieldManager(MagicMock(ManureManager))
-    actual = field_manager._setup_soil_layer(field_size, top, sand, silt, residue, nitrogen_mineralization, config)
+    actual = FieldManager._setup_soil_layer(field_size, top, sand, silt, residue, nitrogen_mineralization, config)
     assert actual == expected
 
 
@@ -463,9 +460,8 @@ def test_setup_soil_layer(field_size: float, top: float, sand: float, silt: floa
 ])
 def test_setup_soil_layer_error(config: Dict) -> None:
     """Tests that errors are thrown correctly when not enough information is provided to create one."""
-    field_manager = FieldManager(MagicMock(ManureManager))
     with pytest.raises(ValueError) as e:
-        field_manager._setup_soil_layer(1.0, 0.0, 65.0, 15.0, 0.0, 0.05, config)
+        FieldManager._setup_soil_layer(1.0, 0.0, 65.0, 15.0, 0.0, 0.05, config)
     assert str(e.value) == "Bottom depth is required for each soil layer."
 
 
@@ -653,9 +649,8 @@ def test_setup_soil_layer_error(config: Dict) -> None:
 ])
 def test_setup_soil(soil_configuration: Dict) -> None:
     """Tests that Soil profiles are setup correctly with data from the InputManager."""
-    field_manager = FieldManager(MagicMock(ManureManager))
     with patch("RUFAS.input_manager.InputManager.get_data", return_value=soil_configuration) as patched_get_data:
-        actual_soil = field_manager._setup_soil("test_soil_setup", 1.0)
+        actual_soil = FieldManager._setup_soil("test_soil_setup", 1.0)
         assert actual_soil.data.second_moisture_condition_parameter == soil_configuration.get("CN2")
         assert actual_soil.data.average_subbasin_slope == soil_configuration.get("field_slope")
         assert actual_soil.data.slope_length == soil_configuration.get("slope_length")
@@ -697,24 +692,22 @@ def test_setup_soil(soil_configuration: Dict) -> None:
 ])
 def test_get_field_blob_names(blobs: Dict[str, Dict[str, str]], expected: List[str]) -> None:
     """Tests that all field blob names are correctly pulled from the InputManager."""
-    field_manager = FieldManager(MagicMock(ManureManager))
     with patch("RUFAS.input_manager.InputManager.get_metadata", return_value=blobs):
-        actual = field_manager._get_field_blob_names()
+        actual = FieldManager._get_field_blob_names()
         assert actual == expected
 
 
 def test_get_field_blob_names_error() -> None:
     """Tests that exceptions are correctly raised when metadata does not contain expected values."""
-    field_manager = FieldManager(MagicMock(ManureManager))
     with patch("RUFAS.input_manager.InputManager.get_metadata", side_effect=KeyError), \
             pytest.raises(KeyError) as e:
-        field_manager._get_field_blob_names()
+        FieldManager._get_field_blob_names()
     assert str(e.value) == '"Could not find \'files\' section of metadata."'
 
     with patch("RUFAS.input_manager.InputManager.get_metadata",
                return_value={"dummy_blob": {"title": "Title", "description": "Described"}}), \
             pytest.raises(KeyError) as e:
-        field_manager._get_field_blob_names()
+        FieldManager._get_field_blob_names()
     assert str(e.value) == '"dummy_blob in metadata did not contain \'properties\' value."'
 
 
@@ -760,8 +753,6 @@ def test_setup_field(field_name: str, field_config: Dict) -> None:
     mocked_soil_data = MagicMock(SoilData)
     mocked_soil_profile.data = mocked_soil_data
 
-    field_manager = FieldManager(mocked_manure_manager)
-
     with patch("RUFAS.input_manager.InputManager.get_data", return_value=field_config) as patched_get_data, \
             patch("RUFAS.routines.field.manager.field_manager.FieldManager._setup_fertilizer_schedule",
                   new_callable=MagicMock, return_value=({}, mocked_fertilizer_schedule)) as patched_fertilizer_setup, \
@@ -773,7 +764,7 @@ def test_setup_field(field_name: str, field_config: Dict) -> None:
                   new_callable=MagicMock, return_value=mocked_crop_schedules) as patched_crop_schedules, \
             patch("RUFAS.routines.field.manager.field_manager.FieldManager._setup_soil", new_callable=MagicMock,
                   return_value=mocked_soil_profile) as patched_soil_setup:
-        new_field = field_manager._setup_field(field_name, mocked_manure_manager)
+        new_field = FieldManager._setup_field(field_name, mocked_manure_manager)
 
         assert new_field.field_data.name == field_name
         assert new_field.field_data.field_size == field_config.get("field_size")
