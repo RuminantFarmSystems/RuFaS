@@ -128,11 +128,11 @@ class Feed:
         self.user_defined_ration_percentages = data['user_defined_ration_percentages']
 
         udrm.calf_ration = self.user_defined_ration_percentages['calf']
-        udrm.growing_ration = self.user_defined_ration_percentages['growing']
+        udrm.growing_ration = self.user_defined_ration_percentages['growing_heifers']
         udrm.close_up_ration = self.user_defined_ration_percentages['close_up']
-        udrm.lactating_cow_ration = self.user_defined_ration_percentages['lac_cow']
+        udrm.lactating_cow_ration = self.user_defined_ration_percentages['cow_lactating']
         udrm.tolerance = self.user_defined_ration_percentages['tolerance']
-        udrm.milk_reduction_maximum = self.user_defined_ration_percentages['milk_reduction_maximum']
+        udrm.milk_reduction_maximum = self.user_defined_ration_percentages['milk_reduction_percent']
          
     def summarize_feed_storage(self):
         """
