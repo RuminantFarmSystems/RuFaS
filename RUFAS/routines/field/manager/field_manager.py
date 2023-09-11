@@ -1,7 +1,6 @@
 from RUFAS.input_manager import InputManager
 from RUFAS.routines.field.field.field import Field
 from RUFAS.routines.field.field.field_data import FieldData
-from RUFAS.util import Utility
 from RUFAS.routines.field.soil.soil import Soil
 from RUFAS.routines.field.soil.soil_data import SoilData
 from RUFAS.routines.field.soil.layer_data import LayerData
@@ -13,7 +12,7 @@ from RUFAS.routines.field.manager.fertilizer_schedule import FertilizerSchedule
 from RUFAS.routines.field.manager.manure_schedule import ManureSchedule
 from RUFAS.routines.field.manager.tillage_schedule import TillageSchedule
 from RUFAS.routines.field.manager.schedule import Schedule
-from typing import Dict, List, Tuple, Any
+from typing import Dict, List, Tuple
 
 """
 This module is responsible for initializing the `Field` instances that will be simulated and providing an interface to

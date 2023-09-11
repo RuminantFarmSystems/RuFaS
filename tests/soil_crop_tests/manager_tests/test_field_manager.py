@@ -10,11 +10,33 @@ from RUFAS.routines.field.soil.layer_data import LayerData
 from RUFAS.routines.field.soil.soil import Soil
 from RUFAS.routines.field.soil.soil_data import SoilData
 from RUFAS.classes import Time, Weather
-from RUFAS.util import Utility
 from RUFAS.routines.manure.manure_manager import ManureManager
 import pytest
 from typing import List, Dict
 from unittest.mock import MagicMock, patch, call
+
+
+@pytest.mark.parametrize("field_blob_names", [
+    [],
+    ["field_1", "field_2", "field_3"]
+])
+def test_field_manager_init(field_blob_names) -> None:
+    """Tests that FieldManager init method runs correctly."""
+    mocked_manure_manager = MagicMock(ManureManager)
+    expected_field_setup_calls = [call(field_name, mocked_manure_manager) for field_name in field_blob_names]
+    with patch("RUFAS.routines.field.manager.field_manager.FieldManager._get_field_blob_names",
+               return_value=field_blob_names) as patched_field_blob_names, \
+        patch("RUFAS.routines.field.manager.field_manager.FieldManager._setup_field", return_value=MagicMock(Field)) \
+            as patched_field_setup:
+        field_manager = FieldManager(mocked_manure_manager)
+
+        assert len(field_manager.fields) == len(field_blob_names)
+        assert len(field_manager.output_gatherer.fields) == len(field_blob_names)
+        patched_field_blob_names.assert_called_once()
+        if len(field_blob_names) > 0:
+            patched_field_setup.assert_has_calls(expected_field_setup_calls)
+        else:
+            patched_field_setup.assert_not_called()
 
 
 @pytest.mark.parametrize("year,day,expected", [
@@ -214,7 +236,7 @@ def test_annual_update_routine(fields: List[Field]):
                            surface_remainder_fractions=[1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0],
                            pattern_repeat=0,
                            pattern_skip=0)
-    ), ({
+     ), ({
             "available_fertilizer_mixes": [
                 {
                     "name": "barnyard_fert",
@@ -382,25 +404,25 @@ def test_setup_tillage_schedule(tillage_schedule_data: Dict, expected_tillage_sc
     ([
          {"crop_species": "corn", "planting_years": [2010], "pattern_repeat": 0, "pattern_skip": 1,
           "planting_days": [121], "harvest_years": [2010], "harvest_days": [319], "harvest_operations": ["default"],
-          "harvest_type": "scheduled", "planting_order": "1st", "extracted": True},
+          "harvest_type": "optimal", "planting_order": "1st", "extracted": True},
          {"crop_species": "corn", "planting_years": [2011], "pattern_repeat": 0, "pattern_skip": 3,
           "planting_days": [121], "harvest_years": [2011], "harvest_days": [319], "harvest_operations": ["default"],
           "harvest_type": "scheduled", "planting_order": "1st", "extracted": True},
          {"crop_species": "corn", "planting_years": [2012], "pattern_repeat": 0, "pattern_skip": 0,
           "planting_days": [121], "harvest_years": [2012], "harvest_days": [319], "harvest_operations": ["default"],
-          "harvest_type": "scheduled", "planting_order": "1st", "extracted": True},
+          "harvest_type": "optimal", "planting_order": "1st", "extracted": True},
          {"crop_species": "corn", "planting_years": [2013], "pattern_repeat": 0, "pattern_skip": 2,
           "planting_days": [121], "harvest_years": [2013], "harvest_days": [319], "harvest_operations": ["default"],
           "harvest_type": "scheduled", "planting_order": "1st", "extracted": True}
      ], [CropSchedule(name="crop_schedule_0", crop_reference="corn", planting_years=[2010], planting_days=[121],
                       harvest_years=[2010], harvest_days=[319], harvest_operations=["default"],
-                      use_heat_scheduling=False, pattern_repeat=0),
+                      use_heat_scheduling=True, pattern_repeat=0),
          CropSchedule(name="crop_schedule_1", crop_reference="corn", planting_years=[2011], planting_days=[121],
                       harvest_years=[2011], harvest_days=[319], harvest_operations=["default"],
                       use_heat_scheduling=False, pattern_repeat=0),
          CropSchedule(name="crop_schedule_2", crop_reference="corn", planting_years=[2012], planting_days=[121],
                       harvest_years=[2012], harvest_days=[319], harvest_operations=["default"],
-                      use_heat_scheduling=False, pattern_repeat=0),
+                      use_heat_scheduling=True, pattern_repeat=0),
          CropSchedule(name="crop_schedule_3", crop_reference="corn", planting_years=[2013], planting_days=[121],
                       harvest_years=[2013], harvest_days=[319], harvest_operations=["default"],
                       use_heat_scheduling=False, pattern_repeat=0)
@@ -658,6 +680,7 @@ def test_setup_soil(soil_configuration: Dict) -> None:
         assert actual_soil.data.manning == soil_configuration.get("manning")
         assert actual_soil.data.albedo == soil_configuration.get("soil_albedo")
         assert len(actual_soil.data.soil_layers) == len(soil_configuration.get("soil_layers")) + 1
+        patched_get_data.assert_called_once_with("test_soil_setup")
 
 
 @pytest.mark.parametrize("blobs,expected", [
