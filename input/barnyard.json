@@ -26,7 +26,7 @@
                 "soil": "barnyard_sandy_soil.json",
                 "crop": "corn_rotation.json",
                 "field_management": "barnyard_scheduled_field_management.json"
-            },
+            }
         },
         "animal": "barnyard_animal.json",
         "feed": "purchased_feed.json",
