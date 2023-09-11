@@ -48,7 +48,7 @@ class RationConfig:
                  type_: list[str] | None = None, is_wetforage_: list[bool] | None = None,
                  Kd_: list[float] | None = None, N_A_: list[float] | None = None, N_B_: list[float] | None = None,
                  CP_: list[float] | None = None, dRUP_: list[float] | None = None,
-                 limit_: list[float] | None = None, cow_type_: bool = False, DMIest_: float | None = None):
+                 limit_: list[float] | None = None, cow_type_: bool = False, DMIest_: float | None = None) -> None:
         """
         Initialize the RationConfig class with the provided feed information. If the input
         is a list, it should have a length corresponding to the decision vector.
@@ -125,7 +125,6 @@ class RationConfig:
         self.MP_req = MP_req_
         self.C_req = C_req_
         self.P_req = P_req_
-        self.DMIest = DMIest_
         self.TDN = TDN_ if TDN_ is not None else []
         self.DE = DE_ if DE_ is not None else []
         self.EE = EE_ if EE_ is not None else []
@@ -143,3 +142,5 @@ class RationConfig:
         self.dRUP = dRUP_ if dRUP_ is not None else []
         self.limit = limit_ if limit_ is not None else []
         self.cow_type = cow_type_
+        self.DMIest = DMIest_
+
