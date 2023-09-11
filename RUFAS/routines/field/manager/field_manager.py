@@ -323,7 +323,7 @@ class FieldManager:
 
     def _setup_manure_schedule(self, manure_schedule: str) -> ManureSchedule:
         """
-        Sets up the Manure Schedule.
+        Sets up a ManureSchedule.
 
         Parameters
         ----------
@@ -351,6 +351,33 @@ class FieldManager:
         )
         return manure_schedule_instance
 
+    def _setup_tillage_schedule(self, tillage_schedule: str) -> TillageSchedule:
+        """
+        Sets up a TillageSchedule.
+
+        Parameters
+        ----------
+        tillage_schedule : str
+            Name of the metadata blob that contains the manure schedule information.
+
+        Returns
+        -------
+        TillageSchedule
+            TillageSchedule instance created using data pulled from the Input Manager.
+
+        """
+        tillage_schedule_data = im.get_data(tillage_schedule)
+        tillage_schedule_instance = TillageSchedule(
+            name="tillage_schedule",
+            years=tillage_schedule_data.get("years"),
+            days=tillage_schedule_data.get("days"),
+            incorporation_fractions=tillage_schedule_data.get("incorporation_fractions"),
+            mixing_fractions=tillage_schedule_data.get("mixing_fractions"),
+            tillage_depths=tillage_schedule_data.get("tillage_depths"),
+            pattern_skip=tillage_schedule_data.get("pattern_skip"),
+            pattern_repeat=tillage_schedule_data.get("pattern_repeat")
+        )
+        return tillage_schedule_instance
 
     def _setup_crop_schedules(self, crop_rotation: str) -> List[CropSchedule]:
         """
