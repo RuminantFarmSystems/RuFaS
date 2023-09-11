@@ -14,22 +14,31 @@ from RUFAS.routines.animal.life_cycle.cow import Cow
 from RUFAS.routines.animal.animal_types import AnimalType
 import pytest
 from unittest.mock import MagicMock
-from pytest_mock.plugin import MockerFixture
+
 import numpy as np
+import pytest
+
 
 from RUFAS.routines.animal.life_cycle import cow
 from RUFAS.routines.animal.pen import Pen
-from RUFAS.routines.animal.life_cycle.animal_events import AnimalEvents
 from RUFAS.routines.animal.life_cycle.calf import Calf
 
 
 import RUFAS.routines.animal.clustering_pen_grouping
 from RUFAS.routines.animal.ration.ration_driver import AvailableFeeds
 
-from RUFAS.routines.animal.ration.ration_NLP import list_reconfig
-from RUFAS.routines.animal.life_cycle.animal_base import AnimalBase
 import RUFAS.routines.animal.ration.animal_requirements
-import RUFAS.routines.animal.ration.ration_driver
+import RUFAS.routines.animal.ration.ration_NLP
+from RUFAS.routines.animal.ration.ration_NLP import list_reconfig
+
+from RUFAS.routines.animal.life_cycle.animal_base import AnimalBase
+from RUFAS.routines.animal.life_cycle.animal_events import AnimalEvents
+from RUFAS.routines.animal.ration import ration_driver
+
+import RUFAS.routines.animal.ration.user_defined_ration
+from RUFAS.routines.animal.ration.user_defined_ration import \
+    UserDefinedRationManager
+
 
 @pytest.fixture
 def cow_a() -> dict:
@@ -285,23 +294,23 @@ def test_calculate_NRC_phosphorus_requirements(cow_a:dict, cow_b:dict, heifer_a:
     """Unit test for function calculate_NRC_phosophorus_requirements in file routines/animal/ration/animal_requirements.py"""
     result_P_req = RUFAS.routines.animal.ration.animal_requirements.calculate_NRC_phosphorus_requirements(
         cow_a['body_weight'], cow_a['mature_body_weight'], cow_a['day_of_pregnancy'], cow_a['Milk'],
-        cow_a['animal_type'], 1)
-    assert (result_P_req) == pytest.approx((33), rel=1e-1)
+        cow_a['animal_type'], 1, 25)
+    assert (result_P_req) == pytest.approx((59), rel=1e-1)
 
     result_P_req = RUFAS.routines.animal.ration.animal_requirements.calculate_NRC_phosphorus_requirements(
         cow_b['body_weight'], cow_b['mature_body_weight'], cow_b['day_of_pregnancy'], cow_b['Milk'],
-        cow_b['animal_type'], 1)
-    assert (result_P_req) == pytest.approx((29), rel=1e-1)
+        cow_b['animal_type'], 1, 15)
+    assert (result_P_req) == pytest.approx((45), rel=1e-1)
 
     result_P_req = RUFAS.routines.animal.ration.animal_requirements.calculate_NRC_phosphorus_requirements(
         heifer_a['body_weight'], heifer_a['mature_body_weight'], heifer_a['day_of_pregnancy'], heifer_a['Milk'],
-        heifer_a['animal_type'], 1)
-    assert (result_P_req) == pytest.approx((7.5), rel=1e-1)
+        heifer_a['animal_type'], 1, 5.0)
+    assert (result_P_req) == pytest.approx((12.5), rel=1e-1)
 
     result_P_req = RUFAS.routines.animal.ration.animal_requirements.calculate_NRC_phosphorus_requirements(
         heifer_b['body_weight'], heifer_b['mature_body_weight'], heifer_b['day_of_pregnancy'], heifer_b['Milk'],
-        heifer_b['animal_type'], 1)
-    assert (result_P_req) == pytest.approx((6.9), rel=1e-1)
+        heifer_b['animal_type'], 1, 7.0)
+    assert (result_P_req) == pytest.approx((13), rel=1e-1)
 
 
 def test_calculate_NRC_DMI(cow_a:dict, cow_b:dict, heifer_a:dict, heifer_b:dict)->None:
@@ -761,20 +770,20 @@ def test___str__():
 
 
 @pytest.mark.parametrize(
-        "events_list, event_descriptions, expected_days",
-        [
-            (
-                    [],
-                    ['dummy'],
-                    [-1]
-            ),
-            (
-                    [(1, 2, 'event1'), (3, 4, 'event2'),
-                     (5, 6, 'event1'), (7, 8, 'event3')],
-                    ['event1', 'event2', 'event3', 'event0'],
-                    [5, 3, 7, -1]
-            )
-        ],
+    "events_list, event_descriptions, expected_days",
+    [
+        (
+            [],
+            ['dummy'],
+            [-1]
+        ),
+        (
+            [(1, 2, 'event1'), (3, 4, 'event2'),
+             (5, 6, 'event1'), (7, 8, 'event3')],
+            ['event1', 'event2', 'event3', 'event0'],
+            [5, 3, 7, -1]
+        )
+    ],
 )
 def test_get_most_recent_date(events_list, event_descriptions, expected_days):
     """Unit test for function get_most_recent_date in file routines/animal/life_cycle/animal_events.py"""
@@ -1257,6 +1266,11 @@ def test_cow_manure_calculations():
     pass
 
 
+def test_phosphorus_excreted():
+    """Unit test for function phosphorus_excreted in file routines/animal/manure/general_manure.py"""
+    pass
+
+
 def test_manure_calculations():
     """Unit test for function manure_calculations in file routines/animal/manure/growing_heifer_manure_excretion.py"""
     pass
@@ -1291,6 +1305,7 @@ def test_set_globals():
 def test_list_reconfig(input, expected)->None:
     """Unit test for function list_reconfig in file routines/animal/ration/ration_NLP.py"""
     assert list_reconfig(input) == expected
+
 
 
 def test_objective():
@@ -1328,13 +1343,13 @@ def test_protein_constraint():
     pass
 
 
-def test_NDF_constraint_1():
-    """Unit test for function NDF_constraint_1 in file routines/animal/ration/ration_NLP.py"""
+def test_NDF_constraint_lower():
+    """Unit test for function test_NDF_constraint_lower in file routines/animal/ration/ration_NLP.py"""
     pass
 
 
-def test_NDF_constraint_2():
-    """Unit test for function NDF_constraint_2 in file routines/animal/ration/ration_NLP.py"""
+def test_NDF_constraint_upper():
+    """Unit test for function NDF_constraint_upper in file routines/animal/ration/ration_NLP.py"""
     pass
 
 
@@ -1385,6 +1400,83 @@ def test_calculate_rqmts():
 
 def test_optimization():
     """Unit test for function optimization in file routines/animal/ration/ration_driver.py"""
+    pass
+
+
+def test_calc_milk_average() -> None:
+    """Unit test for function calc_milk_average in file routines/animal/ration/ration_driver.py"""
+    mockpen = MagicMock()
+    mockpen.animals_in_pen = [MagicMock(),
+                              MagicMock(),
+                              MagicMock(),
+                              MagicMock(),
+                              MagicMock()]
+    production = [1,2,3,4,5]
+    for i in range(len(production)):
+        mockpen.animals_in_pen[i].estimated_daily_milk_produced = production[i]
+    result = ration_driver.calc_milk_average(mockpen)
+    assert result == sum(production)/len(production)
+
+def test_reduce_milk_production() -> None:
+    """Unit test for function reduce_milk_production in file routines/animal/ration/ration_driver.py"""
+    mockpen = MagicMock()
+    mockpen.animals_in_pen = [MagicMock(),
+                              MagicMock(),
+                              MagicMock(),
+                              MagicMock(),
+                              MagicMock()]
+    production = [1,2,3,4,5]
+    reduced_predicted = [1,2,2,3,4]
+    # assign production to mocked animals
+    for i in range(len(production)):
+        mockpen.animals_in_pen[i].estimated_daily_milk_produced = production[i]
+    # assert all were reduced, but not reaching below 1.0 kg/day
+    ration_driver.reduce_milk_production(mockpen, 1.0)
+    for i, animal in enumerate(mockpen.animals_in_pen):
+        assert reduced_predicted[i] == animal.estimated_daily_milk_produced
+
+
+def test_make_ration_from_solution():
+    """Unit test for function make_ration_from_solution in file routines/animal/ration/ration_driver.py"""
+    
+    # make a mocked solution object - the critical component being the x
+    mock_solution = MagicMock()
+    mock_solution.x = [1, 1, 1, 2, 2, 2, 3, 3, 3]
+    predicted = {'100': 3, '200': 6, '300': 9}
+    predicted['status'] = 'Optimal'
+    predicted['objective'] = 0.0
+    price = []
+    for _ in range(len(mock_solution.x)):
+        price.append(0.0)
+    RUFAS.routines.animal.ration.ration_NLP.price = price
+    # TODO how to reset the above? Since it relies on a global, I tried patch
+        # however, this solution worked for now, and forthcoming PRs will remove usage of globals
+
+    # make a mocked available_feeds dict - the critical component being the 'feed_key' and 'feed_id'
+    mock_avail_feeds = {}
+    mock_avail_feeds['feed_id'] = [100, 200, 300]
+    mock_avail_feeds['feed_key'] = ['100', '200', '300']
+    # with patch.object(RUFAS.routines.animal.ration.ration_NLP, 'price', price):
+    result = ration_driver.make_ration_from_solution(mock_avail_feeds, mock_solution)
+    assert result == predicted
+
+@pytest.mark.parametrize("test_ration, expected", [
+    ({'2' : 3, '4' : 6, 'status' : True, 'objective' : False},[1, 1, 1, 2, 2, 2]),
+    ({'2' : 3, 'status' : True, 'objective' : False},[1, 1, 1, ]),
+    ({'2' : 3, '4' : 6, },[1, 1, 1, 2, 2, 2]),
+    ({'2' : 3, '4' : 12, },[1, 1, 1, 4, 4, 4])
+    ])
+def test_make_solution_from_fixed_ration(test_ration: Dict, expected: list):
+    """Unit test for function make_solution_from_fixed_ration in file routines/animal/ration/ration_driver.py
+    """
+    # test_ration = {'2' : 3, '4' : 6, 'status' : True, 'objective' : False}
+    # expected = [1, 1, 1, 2, 2, 2]
+    result = ration_driver.make_solution_from_fixed_ration(test_ration)
+    assert result == expected
+
+
+def test_get_user_defined_ration():
+    """Unit test for function get_user_defined_ration in file routines/animal/ration/ration_driver.py"""
     pass
 
 
@@ -1613,7 +1705,7 @@ def test_calculate_daily_milk_produced(lactation_curve, wood_l, wood_m, wood_n, 
 
     daily_milk_produced = mock_cow.calculate_daily_milk_produced()
 
-    assert math.isclose(daily_milk_produced, expected_milk, rel_tol=1e-3)
+    assert np.isclose(daily_milk_produced, expected_milk, rtol=1e-3)
 
 
 def test_get_feed_data_from_feed_ids() -> None:
@@ -1684,3 +1776,70 @@ def test_get_feed_data_from_feed_ids() -> None:
         'type': ['Milk', 'Starter']
     }
     assert pen_specific_feed_data == expected_pen_specific_feed_data
+
+
+def test_feed_quality_fix():
+    """Unit test for function feed_quality_fix in file routines/animal/ration/user_defined_ration.py"""
+    # make a fake available feeds dict
+    fakefeeds_available = {}
+    fakefeeds_available['feed_id']=[1,2,5] 
+    # make two fake ration percents dicts
+    fake_ration_OK = {'1': 2, '2': 3, '5': 4}
+    fake_ration_missing = {'1':2, '2': 3, '3':4}
+    # assert that keys are same as the available feeds afterward 
+    fake_ration_OK = RUFAS.routines.animal.ration.user_defined_ration.UserDefinedRationManager.feed_quality_fix(fake_ration_OK, fakefeeds_available)
+    assert list(fake_ration_OK.keys())==['1','2','5']
+    # second has missing values, needs to check that keys are equivalent to orig
+    fake_ration_missing = RUFAS.routines.animal.ration.user_defined_ration.UserDefinedRationManager.feed_quality_fix(fake_ration_missing, fakefeeds_available)
+    assert list(fake_ration_missing.keys())==['1','2','5']
+
+
+@pytest.fixture
+def mock_user_defined_ration_manager(mocker) -> UserDefinedRationManager:
+    user_defined_ration_manager = UserDefinedRationManager()
+    return user_defined_ration_manager
+
+def test_ration_to_use(mock_user_defined_ration_manager: UserDefinedRationManager):
+    """Unit test for function ration_to_use in file routines/animal/ration/ration_driver.py"""
+    
+    #udrm = MagicMock()
+    mock_user_defined_ration_manager.lactating_cow_ration = {'1': 100, '2': 200, '3': 300}
+    mock_user_defined_ration_manager.close_up_ration = {'1': 10, '2': 20, '3': 30}
+    mock_user_defined_ration_manager.growing_ration = {'1': 1, '2': 2, '3': 3}
+    mock_user_defined_ration_manager.calf_ration = {'1': 0.1, '2': 0.2, '3': 0.3}
+
+    pen_animal_combo = MagicMock()
+    pen_animal_combo.name = 'LAC_COW'
+    
+    fakefeeds_available = {}
+    fakefeeds_available['feed_id']=[1,2,3] 
+
+    result = RUFAS.routines.animal.ration.user_defined_ration.UserDefinedRationManager.ration_to_use(pen_animal_combo, fakefeeds_available)
+    assert result == {'1': 100, '2': 200, '3': 300}
+
+    pen_animal_combo.name = 'GROWING'
+    result = RUFAS.routines.animal.ration.user_defined_ration.UserDefinedRationManager.ration_to_use(pen_animal_combo, fakefeeds_available)
+    assert result == {'1': 1, '2': 2, '3': 3}
+
+    pen_animal_combo.name = 'CLOSE_UP'
+    result = RUFAS.routines.animal.ration.user_defined_ration.UserDefinedRationManager.ration_to_use(pen_animal_combo, fakefeeds_available)
+    assert result == {'1': 10, '2': 20, '3': 30}
+
+    pen_animal_combo.name = 'CALF'
+    result = RUFAS.routines.animal.ration.user_defined_ration.UserDefinedRationManager.ration_to_use(pen_animal_combo, fakefeeds_available)
+    assert result == {'1': 0.1, '2': 0.2, '3': 0.3}
+
+from RUFAS.routines.animal.animal_module_constants import AnimalModuleConstants
+def test_make_user_bounds(mock_user_defined_ration_manager: UserDefinedRationManager):
+    """Unit test for function make_user_bounds in file routines/animal/ration/ration_NLP.py"""
+    mock_user_defined_ration_manager.tolerance = 0.1
+    ration_percents = {'1': 10, '2': 20}
+    low_offset = 1 #1-AnimalModuleConstants.DMI_CONSTRAINT_PERCENT
+    high_offset = 1 #1+AnimalModuleConstants.DMI_CONSTRAINT_PERCENT
+    predicted = [[9/3*low_offset,11/3*high_offset], [9/3*low_offset,11/3*high_offset], [9/3*low_offset,11/3*high_offset], \
+                 [18/3*low_offset,22/3*high_offset], [18/3*low_offset,22/3*high_offset], [18/3*low_offset,22/3*high_offset]]
+    result = RUFAS.routines.animal.ration.ration_NLP.make_user_bounds(ration_percents, 100)
+    # assert that list output is those modified and repeated 3X
+    for i in range(len(predicted)):
+        assert predicted[i][0] == pytest.approx(result[i][0], 0.1)
+        assert predicted[i][1] == pytest.approx(result[i][1], 0.1)
