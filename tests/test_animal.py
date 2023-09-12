@@ -5,7 +5,6 @@ Description: Implements test cases
 Author(s): Pooya Hekmati, sh2235@cornell.edu, Carson Wolber, ctw54@cornell.edu
 """
 
-import math
 from typing import Any, Dict
 from unittest.mock import patch
 from mock import MagicMock
@@ -36,7 +35,6 @@ import RUFAS.routines.animal.ration.ration_NLP
 
 from RUFAS.routines.animal.life_cycle.animal_base import AnimalBase
 from RUFAS.routines.animal.life_cycle.animal_events import AnimalEvents
-from RUFAS.routines.animal.ration import ration_driver
 
 import RUFAS.routines.animal.ration.user_defined_ration
 from RUFAS.routines.animal.ration.user_defined_ration import \
@@ -1850,15 +1848,11 @@ def test_ration_to_use(mock_user_defined_ration_manager: UserDefinedRationManage
     result = RUFAS.routines.animal.ration.user_defined_ration.UserDefinedRationManager.ration_to_use(pen_animal_combo, fakefeeds_available)
     assert result == {'1': 0.1, '2': 0.2, '3': 0.3}
 
-from RUFAS.routines.animal.animal_module_constants import AnimalModuleConstants
 def test_make_user_bounds(mock_user_defined_ration_manager: UserDefinedRationManager):
     """Unit test for function make_user_bounds in file routines/animal/ration/ration_NLP.py"""
     mock_user_defined_ration_manager.tolerance = 0.1
     ration_percents = {'1': 10, '2': 20}
-    low_offset = 1 #1-AnimalModuleConstants.DMI_CONSTRAINT_PERCENT
-    high_offset = 1 #1+AnimalModuleConstants.DMI_CONSTRAINT_PERCENT
-    predicted = [[9/3*low_offset,11/3*high_offset], [9/3*low_offset,11/3*high_offset], [9/3*low_offset,11/3*high_offset], \
-                 [18/3*low_offset,22/3*high_offset], [18/3*low_offset,22/3*high_offset], [18/3*low_offset,22/3*high_offset]]
+    predicted = [[9/3, 11/3], [9/3, 11/3], [9/3, 11/3], [18/3, 22/3], [18/3, 22/3], [18/3, 22/3]]
     result = RationOptimizer.make_user_bounds(ration_percents, 100)
     # assert that list output is those modified and repeated 3X
     for i in range(len(predicted)):

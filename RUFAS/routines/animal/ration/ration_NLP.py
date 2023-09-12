@@ -742,8 +742,9 @@ class RationOptimizer:
         while i < 1:
             try:
                 solution = self.optimize(animal_combination, available_feeds)
-            except:
+            except Exception as e:
                 i -= 1
+                e.add_error('SLSQP error')
             finally:
                 i += 1
                 count += 1

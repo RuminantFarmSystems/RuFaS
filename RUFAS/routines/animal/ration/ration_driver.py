@@ -222,7 +222,6 @@ class RationManager:
         ration_percents = UserDefinedRationManager.ration_to_use(pen.animal_combination, available_feeds)
         fixed_ration = False
         num_reattempts = 0
-        failed_constraints = []
         constraints_failed_list = []
 
         solution, ration_vals = NLP.optimization(req, available_feeds, pen.animal_combination)
