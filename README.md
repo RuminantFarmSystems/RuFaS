@@ -102,7 +102,7 @@ SMEs:
 |Title|Owner|Status|Priority|Remarks|
 |--|--|--|--|--|
 Complete External/Scientific Documentation for the Crop and Soil module|||P0
-Complete model evaluation using existing experimental data||||
+Complete model evaluation using existing experimental data|||P2
 Complete Sensitivity Analysis of Animal Module|||P1
 Complete Sensitivity Analysis of Crop and Soil Module|||P1
 Initiate Sensitivity Analysis of Manure Module|||P1
