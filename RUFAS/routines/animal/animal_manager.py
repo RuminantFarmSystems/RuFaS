@@ -1410,6 +1410,8 @@ class AnimalManager:
                 om.add_variable(f'MEdiet_pen_{pen.id}', pen.MEdiet, info_map)
                 om.add_variable(f'dry_matter_intake_pen_{pen.id}', pen.dry_matter_intake, info_map)
                 om.add_variable(f'avg_rqmts_pen_{pen.id}', pen.avg_nutrient_rqmts, info_map)
+                om.add_variable(f'ration_for_pen_{pen.id}', pen.ration_per_animal, info_map)
+
 
     @classmethod
     def _get_animal_types_in_pen(cls, pen: Pen) -> Set[AnimalType]:
