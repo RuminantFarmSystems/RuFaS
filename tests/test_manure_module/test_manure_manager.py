@@ -705,6 +705,7 @@ def test_manure_manager_daily_update(mocker: MockFixture) -> None:
         (ManureTreatmentType.ANAEROBIC_DIGESTION_AND_LAGOON, ManureType.LIQUID),
         (ManureTreatmentType.ANAEROBIC_DIGESTION, ManureType.LIQUID),
         (ManureTreatmentType.ANAEROBIC_DIGESTION_AND_LAGOON_WITH_SPLIT, ManureType.LIQUID),
+        (ManureTreatmentType.COMPOST_BEDDED_PACK_BARN, ManureType.SOLID),
     ]
 )
 def test_get_manure_type(treatment_type: ManureTreatmentType, expected_manure_type: ManureType) -> None:
