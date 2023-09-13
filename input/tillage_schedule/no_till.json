@@ -3,5 +3,7 @@
     "days": [],
     "incorporation_fractions": [],
     "mixing_fractions": [],
-    "application_depths": []
+    "tillage_depths": [],
+    "pattern_repeat": 0,
+    "pattern_skip": 0
 }

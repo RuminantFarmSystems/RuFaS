@@ -7,7 +7,7 @@
             "K": 0.1
         }
     ],
-    "mix": ["barnyard_fert"],
+    "mix_names": ["barnyard_fert"],
     "years": [2010],
     "days": [200],
     "nitrogen_masses": [1000],
