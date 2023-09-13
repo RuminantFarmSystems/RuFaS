@@ -45,14 +45,14 @@
     "NRC_Comp": {
       "title": "NRC Comp data",
       "description": "Nutrients!",
-      "path": "input/feed/NRC_Comp.csv",
+      "path": "input/feed/NRC_comp.csv",
       "type": "csv",
       "properties": "NRC_Comp_properties"
     },
     "NASEM_Comp": {
       "title": "NASEM Comp data",
       "description": "Nutrients!",
-      "path": "input/feed/NASEM_Comp.csv",
+      "path": "input/feed/NASEM_comp.csv",
       "type": "csv",
       "properties": "NASEM_Comp_properties"
     },
@@ -71,8 +71,8 @@
       "properties": "soil_profile_properties"
     },
     "soil_2": {
-      "title": "Second soil data",
-      "description": "Soil is still being treated like dirt.",
+      "title": "Soil data",
+      "description": "Stop treating soil like dirt!",
       "path": "input/soil/example_soil_2.json",
       "type": "json",
       "properties": "soil_profile_properties"
@@ -101,7 +101,7 @@
     "field": {
       "title": "Field specification",
       "description": "Contains overall field properties and references to specification files.",
-      "path": "input/field_management/Barnyard_field_1.json",
+      "path": "input/field/example_field.json",
       "type": "json",
       "properties": "field_properties"
     },
@@ -2181,7 +2181,7 @@
         "maximum": 1.0,
         "default": 0.16
       },
-      "residue": {
+      "initial_residue": {
         "type": "number",
         "description": "Amount of residue present on the soil surface at the start of the simulation.\nUnits: kg / ha.",
         "minimum": 0.0,
@@ -2194,7 +2194,7 @@
         "maximum": 1.0,
         "default": 0.95
       },
-      "fresh_n_mineral_rate": {
+      "fresh_N_mineral_rate": {
             "type": "number",
             "description": "Fraction of residue that will decompose in a day given optimal conditions.\nUnitless.\nReference SWAT Input: .BSN - RSDCO.",
             "minimum": 0.0,
