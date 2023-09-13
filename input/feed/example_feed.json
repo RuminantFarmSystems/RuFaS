@@ -117,7 +117,7 @@
         "ration_percentage": 50
       }
     ],
-    "growing_heifers": [
+    "growing": [
       {
         "feed_type": 2,
         "ration_percentage": 50
@@ -161,7 +161,7 @@
         "ration_percentage": 2.9
       }
     ],
-    "cow_lactating": [
+    "lac_cow": [
       {
         "feed_type": 4,
         "ration_percentage": 26
@@ -204,6 +204,6 @@
       }
     ],
     "tolerance": 0.1,
-    "milk_reduction_percent": 0.50
+    "milk_reduction_maximum": 0.50
   }
 }
