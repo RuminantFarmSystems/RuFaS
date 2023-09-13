@@ -7,6 +7,8 @@
     "sand": 15,
     "silt": 65,
     "soil_albedo": 0.16,
+    "support_practice_factor": 0.8,
+    "soil_evaporation_compensation_coefficient": 0.95,
     "initial_residue": 0,
     "fresh_N_mineral_rate": 0.05,
     "soil_cover_type": "BARE",
