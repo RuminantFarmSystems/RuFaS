@@ -7,6 +7,7 @@ Description: Calculates the ration for animals using a Non-Linear
     descriptions for functions in this file.
 Author(s):
     Chris VanKerkhove, cjv47@cornell.edu
+    Joseph Waddell, jw2574@cornell.edu
 """
 import numpy as np
 import random
@@ -22,6 +23,17 @@ from typing import Callable, List
 
 
 class RationOptimizer:
+    """
+    Nonlinear programming methods to optimize a ration by comparing feed supply and animal requirements
+    
+    Constraints are defined here as the animal requirements subtracted from the feed supply (for a given 
+        attempted 'solution') 
+    The difference is then used in scipy.minimize to ensure that the attempted supply meets the requirements
+    If supply meets requirements, then the solution is a 'success'
+    
+    Unmet requirements are checked here to report to users
+    
+    """
     def __init__(self):
         """initializes RationOptimizer object"""
         self.cow_cons = []
@@ -47,8 +59,10 @@ class RationOptimizer:
         ]
         
         self.cow_cons = [{'type': 'ineq', 'fun': func} for func in self.constraint_functions]
+        """ constraints for lactating cows """
 
         self.heifer_cons = [cons for cons in self.cow_cons if cons['fun'] not in [self.total_energy, self.NEl_constraint, self.DMI_constraint_lower]]
+        """constraints for animals that are not lactating cows """
 
     def set_globals(self, price_, NEmaint_, NEa_, NEpreg_, NEl_, NEg_, MP_req_, C_req_, P_req_,
                     TDN_, DE_, EE_, is_fat_, BW_, calcium_, phosphorus_, NDF_, type_,
@@ -159,6 +173,7 @@ class RationOptimizer:
         """
         return sum(np.multiply(x, price))
 
+
     def total_energy(self, x):
         """
         Sets up the RHS multipliers for the maintenance and activity requirements
@@ -249,7 +264,7 @@ class RationOptimizer:
         NEl_constraint= sum(np.multiply(x, NElact)) 
         NEm_act_constraint = (sum(np.multiply(x, NEm_act)))
         NEg_constraint = sum(np.multiply(x, NEgact))
-        all_req = NEg + NEmaint + NEa + NEpreg + NEl
+        all_req = NEl + NEg + NEmaint + NEa + NEpreg
         return max(NEm_act_constraint, NEl_constraint, NEg_constraint) - all_req
     
 

@@ -4,7 +4,7 @@ File name: animal_requirements.py
 Description: Calculates the following energy, mineral, and dry matter intake
     estimation for a single animal using the function in this file.
 Author(s): Chris VanKerkhove, cjv47@cornell.edu, 
-            Joe Waddell jw2574@cornell.edu, 
+            Joseph Waddell jw2574@cornell.edu, 
             Edward Cabezas Garcia ec867@cornell.edu
 """
 

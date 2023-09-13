@@ -7,6 +7,7 @@ Description: Main file in the ration formulation process that connects all
     also connects with the Feed and Animal modules to bring in relevant values.
 
 Author(s): Chris VanKerkhove, cjv47@cornell.edu
+           Joseph Waddell, jw2574@cornell.edu
 """
 import collections
 from typing import Set, Dict, List
@@ -20,12 +21,18 @@ from RUFAS.routines.animal.ration.user_defined_ration import \
 import scipy
 
 udrm = UserDefinedRationManager()
-NLP = RationOptimizer()
+ration_optimizer = RationOptimizer()
 om = OutputManager()
 
 class RationManager:
     """
-
+    Ration formulation is performed via collection and comparison of feed supply and animal requirements
+    
+    Calls to AnimalRequirements and AvailableFeeds (in this file until Feed refactor)
+        collect the necessary information, which is then sent to RationOptimization
+        Finally, RationReporter is a suite of methods used to send information to output manager 
+        (and other submodules of RuFaS)
+    
     """
 
     @classmethod
@@ -51,7 +58,7 @@ class RationManager:
             ration, ration_vals = cls.get_user_defined_ration(req, pen, available_feeds, animal_grouping_scenario)
             return ration, ration_vals
 
-        solution, ration_vals = NLP.optimization(req, available_feeds, pen.animal_combination)
+        solution, ration_vals = ration_optimizer.optimization(req, available_feeds, pen.animal_combination)
         # Reduction of milk production estimate process to achieve feasible solution
         num_reattempts = 0
 
@@ -60,7 +67,7 @@ class RationManager:
             while not solution.success:
                 num_reattempts += 1
                 constraints_failed_list = []
-                failed_constraints = NLP.find_failed_constraints(solution.x, NLP.cow_cons)
+                failed_constraints = ration_optimizer.find_failed_constraints(solution.x, ration_optimizer.cow_cons)
                 if failed_constraints:
                     for constr in failed_constraints:
                         constraints_failed_list.append(constr["fun"].__name__)
@@ -69,7 +76,7 @@ class RationManager:
                 cls.reduce_milk_production(pen, reduction)
 
                 req.set_requirements(pen, animal_grouping_scenario, True)
-                solution, ration_vals = NLP.optimization(req, available_feeds, pen.animal_combination)
+                solution, ration_vals = ration_optimizer.optimization(req, available_feeds, pen.animal_combination)
                 info_map = {"class": "RationManager", 
                             "function": cls.formulate_ration.__name__,
                             }
@@ -154,7 +161,7 @@ class RationManager:
             num += solution.x[i + 2]
             ration[available_feeds['feed_key'][feed_id]] = round(num, 6)
         ration['status'] = 'Optimal'
-        ration['objective'] = NLP.objective(solution.x)
+        ration['objective'] = ration_optimizer.objective(solution.x)
         return ration
 
     @classmethod
@@ -224,11 +231,11 @@ class RationManager:
         num_reattempts = 0
         constraints_failed_list = []
 
-        solution, ration_vals = NLP.optimization(req, available_feeds, pen.animal_combination)
+        solution, ration_vals = ration_optimizer.optimization(req, available_feeds, pen.animal_combination)
         if str(pen.animal_combination) in ['AnimalCombination.LAC_COW']:
-            failed_constraints = NLP.find_failed_constraints(solution.x, NLP.cow_cons)
+            failed_constraints = ration_optimizer.find_failed_constraints(solution.x, ration_optimizer.cow_cons)
         else:
-            failed_constraints = NLP.find_failed_constraints(solution.x, NLP.heifer_cons)
+            failed_constraints = ration_optimizer.find_failed_constraints(solution.x, ration_optimizer.heifer_cons)
         
         if failed_constraints:
             for constr in failed_constraints:
@@ -243,7 +250,7 @@ class RationManager:
         
         if udrm.milk_reduction_maximum == 0.0 and udrm.tolerance == 0.0 and not solution.success:
             ration = UserDefinedRationManager.make_ration_from_user_values(ration_percents, available_feeds, req)
-            ration_vals = NLP.get_ration_vals(cls.make_solution_from_fixed_ration(ration))
+            ration_vals = ration_optimizer.get_ration_vals(cls.make_solution_from_fixed_ration(ration))
             return ration, ration_vals
 
         if str(pen.animal_combination) not in ['AnimalCombination.LAC_COW'] and not solution.success:
@@ -267,10 +274,10 @@ class RationManager:
                 running_average_milk = cls.calc_milk_average(pen)
 
                 req.set_requirements(pen, animal_grouping_scenario, True)
-                solution, ration_vals = NLP.optimization(req, available_feeds, pen.animal_combination)
+                solution, ration_vals = ration_optimizer.optimization(req, available_feeds, pen.animal_combination)
                 failed_constraints = []
                 constraints_failed_list = []
-                failed_constraints = NLP.find_failed_constraints(solution.x, NLP.cow_cons)
+                failed_constraints = ration_optimizer.find_failed_constraints(solution.x, ration_optimizer.cow_cons)
                 if failed_constraints:
                     for constr in failed_constraints:
                         constraints_failed_list.append(constr["fun"].__name__)
@@ -284,10 +291,10 @@ class RationManager:
         
         if fixed_ration:
             ration = UserDefinedRationManager.make_ration_from_user_values(ration_percents, available_feeds, req)
-            ration_vals = NLP.get_ration_vals(cls.make_solution_from_fixed_ration(ration))
+            ration_vals = ration_optimizer.get_ration_vals(cls.make_solution_from_fixed_ration(ration))
         else:
             ration = cls.make_ration_from_solution(available_feeds, solution)
-            ration_vals = NLP.get_ration_vals(solution.x)
+            ration_vals = ration_optimizer.get_ration_vals(solution.x)
         return ration, ration_vals
 
 class RationReporter:
