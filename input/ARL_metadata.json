@@ -3,91 +3,84 @@
     "config": {
       "title": "Config Data",
       "description": "Configuration Information",
-      "path": "config/ARL_config.json",
+      "path": "input/config/ARL_config.json",
       "type": "json",
       "properties": "config_properties"
     },
     "crop": {
       "title": "Crop data",
       "description": "ARL crop rotation schedule.",
-      "path": "crop/ARL_rotation.json",
+      "path": "input/crop/ARL_rotation.json",
       "type": "json",
       "properties": "crop_schedule_properties"
     },
     "economy": {
       "title": "Economy data",
       "description": "Time is money!",
-      "path": "EEE/example_costs.csv",
+      "path": "input/EEE/example_costs.csv",
       "type": "csv",
       "properties": "economic_properties"
-    },
-    "emission": {
-      "title": "Emissions data",
-      "description": "Let's think about global warming",
-      "path": "EEE/example_emissions.json",
-      "type": "json",
-      "properties": "emissions_properties"
     },
     "feed": {
       "title": "Feed data",
       "description": "Those cows need to eat!",
-      "path": "feed/example_feed.json",
+      "path": "input/feed/purchased_feed.json",
       "type": "json",
       "properties": "feed_properties"
     },
     "user_feeds": {
       "title": "User Feeds Data",
       "description": "Those cows need to eat!",
-      "path": "feed/example_user_feeds.csv",
+      "path": "input/feed/example_user_feeds.csv",
       "type": "csv",
       "properties": "user_feeds_properties"
     },
     "manure_management": {
       "title": "Manure data",
       "description": "You thought it's a waste, but those crops need to eat as well",
-      "path": "manure/example_manure_management.json",
+      "path": "input/manure/manure_management.json",
       "type": "json",
       "properties": "manure_management_properties"
     },
     "soil": {
       "title": "Soil data",
       "description": "ARL soil configuration.",
-      "path": "soil/ARL_soil.json",
+      "path": "input/soil/ARL_soil.json",
       "type": "json",
       "properties": "soil_profile_properties"
     },
     "fertilizer_schedule": {
       "title": "Fertilizer schedule.",
       "description": "ARL fertilizer application schedule.",
-      "path": "fertilizer_schedule/ARL_fertilizer_schedule.json",
+      "path": "input/fertilizer_schedule/ARL_fertilizer_schedule.json",
       "type": "json",
       "properties": "fertilizer_schedule_properties"
     },
     "manure_schedule": {
       "title": "Manure schedule.",
       "description": "ARL manure application schedule.",
-      "path": "manure_schedule/ARL_manure_schedule.json",
+      "path": "input/manure_schedule/ARL_manure_schedule.json",
       "type": "json",
       "properties": "manure_schedule_properties"
     },
     "tillage_schedule": {
       "title": "Tillage schedule.",
       "description": "ARL tillage application schedule.",
-      "path": "tillage_schedule/ARL_tillage_schedule.json",
+      "path": "input/tillage_schedule/ARL_tillage_schedule.json",
       "type": "json",
       "properties": "tillage_schedule_properties"
     },
     "field": {
       "title": "Field specification",
       "description": "Contains overall field properties and references to specification files.",
-      "path": "field/ARL_field.json",
+      "path": "input/field/ARL_field.json",
       "type": "json",
       "properties": "field_properties"
     },
     "weather": {
       "title": "Weather data",
       "description": "Let's turn on the AC",
-      "path": "weather/ARL_weather.csv",
+      "path": "input/weather/ARL_weather.csv",
       "type": "csv",
       "properties": "weather_properties"
     }
@@ -125,7 +118,7 @@
         "default": 42
       },
       "simulate_animals": {
-        "type": "boolean",
+        "type": "bool",
         "description": "Whether or not to simulate animals during the simulation",
         "default": true
       }
@@ -173,7 +166,7 @@
           "minimum": 0
         },
         "herd_init": {
-          "type": "boolean",
+          "type": "bool",
           "default": false,
           "description": "Initialize Herd? -- Whether to re-initialize the animal database, where the herd animals are selected from."
         },
