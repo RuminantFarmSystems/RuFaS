@@ -1499,7 +1499,7 @@
             }
           }
         },
-        "growing_heifers": {
+        "growing": {
           "type": "array",
           "description": "Growing Heifers Feeds.",
           "properties": {
@@ -1537,7 +1537,7 @@
             }
           }
         },
-        "cow_lactating": {
+        "lac_cow": {
           "type": "array",
           "description": "Lactating Cow Feeds.",
           "properties": {
@@ -1562,7 +1562,7 @@
           "minimum": 0,
           "maximum": 1
         },
-        "milk_reduction_percent": {
+        "milk_reduction_maximum": {
           "type": "number",
           "description": "Milk Reduction Percent -- Allowable amount of milk reduction (kg)",
           "minimum": 0,
