@@ -70,6 +70,7 @@ Complete model evaluation||||Moved to Milestone 3
 Complete Sensitivity Analysis||||Moved to Milestone 3
 Complete External/Scientific Documentation for Animal, Manure, & EEE modules and put on GitHub|Varma, Joe, Haowen, Kristan, Jenn, Emmanuel||P1
 Complete Cohort 1 Pilot testing|Kristan, Haowen, Kat||P0
+Complete evaluation of soil temperature|Ed, Jenn, Matthew|In progress|P0|
 
 ## Milestone 2.5: Oct 31th
 [GitHub Milestone](https://github.com/RuminantFarmSystems/MASM/milestone/5)
@@ -84,6 +85,7 @@ SMEs:
 |Title|Owner|Status|Priority|Remarks|
 |--|--|--|--|--|
 Complete Cohort 1 Pilot testing|Kristan, Haowen, Kat||P0
+Complete evaluation of soil hydrology|Ed, Jenn, Matthew|In progress|P0
 
 ## Milestone 3: Dec 31th
 [GitHub Milestone](https://github.com/RuminantFarmSystems/MASM/milestone/6)
@@ -104,7 +106,8 @@ SMEs:
 Complete External/Scientific Documentation for the Crop and Soil module|||P0
 Complete model evaluation using existing experimental data|||P2
 Complete Sensitivity Analysis of Animal Module|||P1
-Complete Sensitivity Analysis of Crop and Soil Module|||P1
+Complete Sensitivity Analysis of Crop and Soil Module|||P1|Should be moved to milestone after this.
+Complete full evaluation of Crop and Soil Module|Ed, Jenn, Matthew||P0|[#762](https://github.com/RuminantFarmSystems/MASM/issues/762)
 Initiate Sensitivity Analysis of Manure Module|||P1
 Complete Cohort 2 Pilot testing|||P0
 Develop standard reports recipe (at least one industry-facing and one scientist-facing)|||P1
