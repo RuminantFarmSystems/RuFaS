@@ -647,3 +647,13 @@ class InputManager:
 
             raise KeyError(f"Data not found: Cannot find \"{metadata_address}\", "
                            f"\"{parent_address}\" does not have attribute \"{invalid_key}\".")
+
+    def flush_pools(self) -> None:
+        """
+        Clear the variable pool.
+        """
+        info_map = {"class": self.__class__.__name__,
+                    "function": self.flush_pools.__name__,
+                    }
+        self.__pool = {}
+        om.add_log("Clear variable pool", f"The pool is emptied.", info_map)
