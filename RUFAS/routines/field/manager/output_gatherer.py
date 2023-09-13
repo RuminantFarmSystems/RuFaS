@@ -26,7 +26,7 @@ class OutputGatherer:
             # ----------------------------adding soil data
             om.add_variable("water_evaporated", field.soil.data.water_evaporated,
                             info_map)
-            om.add_variable("eroded_sediment", field.soil.data.eroded_sediment, info_map)
+            om.add_variable("eroded_sediment", field.soil.data.eroded_sediment * 1_000, info_map)
             om.add_variable("accumulated_runoff", field.soil.data.accumulated_runoff, info_map)
             om.add_variable("cover_type",
                             field.soil.data.cover_type,
@@ -121,7 +121,7 @@ class OutputGatherer:
             # ----------------------------adding layer data
             for index, layer in enumerate(field.soil.data.soil_layers):
                 info_map["prefix"] = "field='" + field.field_data.name + "',layer_index='" + str(index) + "'"
-
+                om.add_variable("water_content", layer.water_content, info_map)
                 om.add_variable("temperature", layer.temperature, info_map)
                 om.add_variable("percolated_water", layer.percolated_water, info_map)
                 om.add_variable("plant_metabolic_active_carbon_usage", layer.plant_metabolic_active_carbon_usage,

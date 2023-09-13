@@ -12,12 +12,15 @@ from RUFAS.routines.field.manager.fertilizer_schedule import FertilizerSchedule
 from RUFAS.routines.field.manager.manure_schedule import ManureSchedule
 from RUFAS.routines.field.manager.tillage_schedule import TillageSchedule
 from RUFAS.routines.field.manager.schedule import Schedule
+from RUFAS.output_manager import OutputManager
 from typing import Dict, List, Tuple, Any
 
 """
 This module is responsible for initializing the `Field` instances that will be simulated and providing an interface to
 the `SimulationEngine` for executing daily and annual routines in the field module.
 """
+
+om = OutputManager()
 
 
 class FieldManager:
@@ -44,6 +47,20 @@ class FieldManager:
         Because different fields can have different latitudes, the day length has to be recalculated for each field.
 
         """
+        info_map = {"class": self.__class__.__name__, "function": self.daily_update_routine.__name__,
+                    "prefix": "Time"}
+        om.add_variable("day", time.day, info_map)
+        om.add_variable("year", time.calendar_year, info_map)
+
+        current_weather = FieldManager._create_current_weather(weather=weather, time=time,
+                                                               month=FieldManager._date_conversion_month(time))
+        info_map["prefix"] = "Weather"
+        om.add_variable("average_temperature", current_weather.mean_air_temperature, info_map)
+        om.add_variable("minimum_temperature", current_weather.min_air_temperature, info_map)
+        om.add_variable("maximum_temperature", current_weather.max_air_temperature, info_map)
+        om.add_variable("annual_average_temperature", current_weather.annual_mean_air_temperature, info_map)
+        om.add_variable("rainfall", current_weather.rainfall, info_map)
+
         for field in self.fields:
             month = FieldManager._date_conversion_month(time)
             current_weather = FieldManager._create_current_weather(weather=weather, time=time, month=month)

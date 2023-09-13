@@ -128,7 +128,8 @@ class Infiltration:
         """
         top = 20 * (100 - second_moisture_condition)
         bottom = (100 - second_moisture_condition + exp(2.533 - 0.0636 * (100 - second_moisture_condition)))
-        return second_moisture_condition - (top / bottom)
+        first_moisture_condition_parameter = second_moisture_condition - (top / bottom)
+        return max(1.0, first_moisture_condition_parameter)
 
     @staticmethod
     def _determine_third_moisture_condition_parameter(second_moisture_condition: float):
@@ -180,8 +181,7 @@ class Infiltration:
         SWAT Reference: 2:1.1.8
         """
         first_top_term = log((field_capacity / (1 - (third_moisture_condition_retention_parameter /
-                                                     max_retention_parameter))) -
-                             field_capacity)
+                                                     max_retention_parameter))) - field_capacity)
         second_top_term = log((saturation / (1 - (2.54 / max_retention_parameter))) - saturation)
         return (first_top_term - second_top_term) / (saturation - field_capacity)
 
