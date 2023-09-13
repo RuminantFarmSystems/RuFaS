@@ -10,7 +10,7 @@
     "animal": {
       "title": "Animal data",
       "description": "Moo Moo!",
-      "path": "input/animal/barnyard_animal.json",
+      "path": "input/animal/no_animal.json",
       "type": "json",
       "properties": "animal_properties"
   },
