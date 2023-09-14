@@ -34,7 +34,7 @@ from RUFAS.routines.manure.manure_treatments.manure_treatment_daily_output impor
 from RUFAS.routines.manure.manure_treatments.manure_treatment_factory import ManureTreatmentFactory
 from RUFAS.routines.manure.manure_treatments.manure_treatment_types import ManureTreatmentType
 from RUFAS.routines.manure.manure_treatments.manure_types import ManureType
-from RUFAS.routines.manure.output_handler.util import ManureModuleOutputHandler
+from RUFAS.routines.manure.output_handler.manure_module_output_handler import ManureModuleOutputHandler
 from RUFAS.routines.manure.pen.manure_manager_pen import ManureManagerPen
 from RUFAS.routines.manure.reception_pits.reception_pit import ReceptionPit
 from RUFAS.routines.manure.reception_pits.reception_pit_daily_output import ReceptionPitDailyOutput
@@ -304,7 +304,8 @@ class ManureManager:
         return self._manure_nutrient_manager.request_nutrients(request)
 
     def _pen_daily_update(self, simulation_day: int, pen) -> None:
-        """Calculates and stores daily output for each manure manager component for a given animal pen.
+        """
+        Calculate daily output data for each manure manager component for a given animal pen.
 
         Parameters
         ----------
@@ -313,7 +314,12 @@ class ManureManager:
         pen
             The animal pen for which the daily output data will be calculated.
 
+        Returns
+        -------
+        None
+
         """
+
         mm_pen = ManureManagerPen(pen)
         class_and_function_info_maps = {
             'class': self.__class__.__name__,

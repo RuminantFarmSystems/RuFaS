@@ -6,7 +6,7 @@ from RUFAS.routines.manure.manure_manager import ManureManager
 from RUFAS.routines.manure.manure_manager import simulate_daily_manure_manager
 from RUFAS.routines.manure.manure_treatments.manure_treatment_types import ManureTreatmentType
 from RUFAS.routines.manure.manure_treatments.manure_types import ManureType
-from RUFAS.routines.manure.output_handler.util import ManureModuleOutputHandler
+from RUFAS.routines.manure.output_handler.manure_module_output_handler import ManureModuleOutputHandler
 
 
 def test_simulate_daily_manure_manager(mocker: MockFixture) -> None:
