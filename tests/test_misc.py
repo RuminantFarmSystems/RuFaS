@@ -84,7 +84,6 @@ def patch_simulation_engine(mocker: MockerFixture) -> SimulationEngine:
     sim_eng.weather = MagicMock()
     sim_eng.time = MagicMock()
     sim_eng.state = MagicMock()
-    sim_eng.output = MagicMock()
 
     return sim_eng
 
@@ -110,9 +109,6 @@ def test_simulate(patch_simulation_engine: SimulationEngine, mocker: MockerFixtu
     sim_eng = patch_simulation_engine
     sim_eng.simulate()
     patch_for_run_simulation_main_loop.assert_called_once()
-    sim_eng.output.finalize.assert_called_once_with(
-        sim_eng.state, sim_eng.weather, sim_eng.time
-    )
     patch_for_show_final_messages.assert_called_once()
     patch_for_manure_output_handler_produce_csv.assert_called_once_with(
         sim_eng.config.csv_dir, sim_eng.state.manure_manager
@@ -136,7 +132,6 @@ def test_daily_simulation(
     mocker.patch("RUFAS.routines.daily_feed_routine")
     mocker.patch("RUFAS.simulation_engine.SimulationEngine._advance_time")
     patch_simulation_engine._daily_simulation()
-    assert patch_simulation_engine.output.daily_update.call_count == 1
     for mocked in mocker._patches_and_mocks:
         assert mocked[1].call_count == 1
     patch_simulation_engine.state.field_manager.daily_update_routine.assert_called_once()
@@ -334,53 +329,53 @@ def test_dict_to_csv_column_list(mock_output_manager: OutputManager) -> None:
     data = {
         "values": [1.0, True, "test", {"key": 1}],
     }
-    result = mock_output_manager._dict_to_csv_column_list(data)
-    (_, v) = result[0]
+    result = mock_output_manager._dict_to_csv_column_list("dummy_variable_name", data)
+    v = result[0]
     assert v.to_list() == data['values']
 
     data["info_maps"] = [{"map1": "value1", "map2": 1}, {"map1": "value2", "map2": 2}]
-    result = mock_output_manager._dict_to_csv_column_list(data)
+    result = mock_output_manager._dict_to_csv_column_list("dummy_variable_name", data)
     assert len(result) == 3
-    (title1, data_series) = result[0]
-    (title2, map1_series) = result[1]
-    (title3, map2_series) = result[2]
-    assert title1 == 'values'
+    data_series = result[0]
+    map1_series = result[1]
+    map2_series = result[2]
+    assert data_series.name == "dummy_variable_name.values"
     assert data_series.to_list() == data['values']
-    assert title2 == "info_maps_map1"
+    assert map1_series.name == "dummy_variable_name.info_maps_map1"
     assert map1_series.to_list() == ['value1', 'value2']
-    assert title3 == "info_maps_map2"
+    assert map2_series.name == "dummy_variable_name.info_maps_map2"
     assert map2_series.to_list() == [1, 2]
 
 
 def test_dict_to_csv_column_list_empty_list(mock_output_manager: OutputManager) -> None:
     """Unit test for the function _dict_to_csv_column_list in the file output_manager.py"""
     data = {"values": [], "info_maps": []}
-    result = mock_output_manager._dict_to_csv_column_list(data)
+    result = mock_output_manager._dict_to_csv_column_list("dummy_variable_name", data)
 
     assert len(result) == 2
-    (title, data_series) = result[0]
-    assert title == "values"
-    assert data_series.to_list() == []
-    (title, data_series) = result[1]
-    assert title == "info_maps"
-    assert data_series.to_list() == []
+    series = result[0]
+    assert series.name == "dummy_variable_name.values"
+    assert series.to_list() == []
+    series = result[1]
+    assert series.name == "dummy_variable_name.info_maps"
+    assert series.to_list() == []
 
 
 @pytest.mark.parametrize("data, expected_result, should_write", [
     ({"var1": {"values": [1.0, True, "test"], "info_maps": []}},
-     f"values,info_maps{os.linesep}1.0,{os.linesep}True,{os.linesep}test,{os.linesep}",
+     f"var1.values,var1.info_maps{os.linesep}1.0,{os.linesep}True,{os.linesep}test,{os.linesep}",
      True),
     ({"var1": {"values": [1.0, True, "test"]}},
-     f"values{os.linesep}1.0{os.linesep}True{os.linesep}test{os.linesep}",
+     f"var1.values{os.linesep}1.0{os.linesep}True{os.linesep}test{os.linesep}",
      True),
     ({"var1": {"values": [1, 2, 3], "info_maps": [{"v": 1}, {"v": 2}, {"v": 3}]}},
-     f"values,info_maps_v{os.linesep}1,1{os.linesep}2,2{os.linesep}3,3{os.linesep}",
+     f"var1.values,var1.info_maps_v{os.linesep}1,1{os.linesep}2,2{os.linesep}3,3{os.linesep}",
      True),
     ({"var1": {"values": [1, 2, 3]}},
-     f"values{os.linesep}1{os.linesep}2{os.linesep}3{os.linesep}",
+     f"var1.values{os.linesep}1{os.linesep}2{os.linesep}3{os.linesep}",
      True),
     ({"var1": {"values": [1], "info_maps": [{"map1": "value1"}, {"map1": "value2"}]}},
-     f"values,info_maps_map1{os.linesep}1,value1{os.linesep},value2{os.linesep}",
+     f"var1.values,var1.info_maps_map1{os.linesep}1,value1{os.linesep},value2{os.linesep}",
      True),
     ({"var1":
       {
@@ -388,7 +383,7 @@ def test_dict_to_csv_column_list_empty_list(mock_output_manager: OutputManager) 
         "info_maps": [{"map1": "value1"}, {"map1": "value2"}]
       }
       },
-     f"v1,v2,info_maps_map1{os.linesep}1,1,value1{os.linesep}2,2,value2{os.linesep}",
+     f"var1.v1,var1.v2,var1.info_maps_map1{os.linesep}1,1,value1{os.linesep}2,2,value2{os.linesep}",
      True),
     ({
         "simple_key": {
@@ -415,10 +410,49 @@ def test_dict_to_csv_column_list_empty_list(mock_output_manager: OutputManager) 
             ]
         }
     },
-     f"key1,key2,info_maps_subkey1,info_maps_subkey2,info_maps_subkey3,info_maps_subkey4{os.linesep}"
+     f"simple_key.key1,simple_key.key2,simple_key.info_maps_subkey1,simple_key.info_maps_subkey2,"
+     f"simple_key.info_maps_subkey3,simple_key.info_maps_subkey4{os.linesep}"
      f"1,\"[1, 1]\",1,Hello,\"[1, 2, 3]\",\"{{'nestedkey1': 'World', 'nestedkey2': [4, 5, 6]}}\"{os.linesep}"
      f"2,\"[2, 2]\",2,Hi,\"[4, 5, 6]\",\"{{'nestedkey1': 'There', 'nestedkey2': [7, 8, 9]}}\"{os.linesep}"
      f"3,\"[3, 3]\",,,,{os.linesep}",
+     True),
+    ({
+        "simple_key1": {
+            "values": [1, 2, 3]
+        },
+        "simple_key2": {
+            "values": [4, 5, 6]
+        }
+    },
+     f"simple_key1.values,simple_key2.values{os.linesep}"
+     f"1,4{os.linesep}2,5{os.linesep}3,6{os.linesep}",
+     True),
+    ({
+        "simple_key1": {
+            "values": [1, 2, 3],
+            "info_maps": [
+                {
+                    "subkey1": "Farm",
+                    "subkey2": "Field"
+                }
+            ]
+        },
+        "simple_key2": {
+            "values": [4, 5, 6, 8, 9],
+            "info_maps": [
+                {
+                    "subkey1": "Tractor",
+                }
+            ]
+        }
+    },
+     f"simple_key1.values,simple_key1.info_maps_subkey1,simple_key1.info_maps_subkey2,simple_key2.values,"
+     f"simple_key2.info_maps_subkey1{os.linesep}"
+     f"1,Farm,Field,4,Tractor{os.linesep}"
+     f"2,,,5,{os.linesep}"
+     f"3,,,6,{os.linesep}"
+     f",,,8,{os.linesep}"
+     f",,,9,{os.linesep}",
      True),
     ({}, "",
      False),
@@ -870,10 +904,12 @@ def test_save_variables_to_csv_files(
 
     with patch('pathlib.Path.mkdir') as mock_mkdir:
         mock_mkdir.return_value = None
-        mock_output_manager._save_variables_to_csv_files(mock_variable_pool, "dummy_path")
+        mock_output_manager._save_variables_to_csv_files(mock_variable_pool, "csv_dummy_filter_filepath.txt",
+                                                         "dummy_path")
 
     mock_mkdir.assert_called_with(parents=True, exist_ok=True)
-    mock_output_manager._generate_file_name.assert_called_once_with("var1", "csv")
+    mock_output_manager._generate_file_name.assert_called_once_with("saved_variables_csv_dummy_filter_filepath.txt",
+                                                                    "csv")
     mock_output_manager._dict_to_file_csv.assert_called_once_with(
         mock_variable_pool, os.path.join("dummy_path", "dummy_name")
     )
@@ -1540,7 +1576,7 @@ def test_save_variables(
         mock_output_manager.variables_pool, os.path.join("dummy_path", "dummy_name")
     )
     mock_output_manager._save_variables_to_csv_files.assert_called_with(
-        mock_output_manager.variables_pool, os.path.join("dummy_path", "CSVs", "om", "variables")
+        mock_output_manager.variables_pool, 'csv_dummy_input_filepath.txt', os.path.join("dummy_path", "CSVs", "om")
     )
 
     # test case for when exclude_info_maps flag set to True
@@ -1554,7 +1590,7 @@ def test_save_variables(
         mock_output_manager.variables_pool, os.path.join("dummy_path", "dummy_name")
     )
     mock_output_manager._save_variables_to_csv_files.assert_called_with(
-        mock_output_manager.variables_pool, os.path.join("dummy_path", "CSVs", "om", "variables")
+        mock_output_manager.variables_pool, 'csv_dummy_input_filepath.txt', os.path.join("dummy_path", "CSVs", "om")
     )
 
     # test case for when the filter files to don start with csv_ or json_

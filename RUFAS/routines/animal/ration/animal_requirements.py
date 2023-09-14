@@ -4,7 +4,7 @@ File name: animal_requirements.py
 Description: Calculates the following energy, mineral, and dry matter intake
     estimation for a single animal using the function in this file.
 Author(s): Chris VanKerkhove, cjv47@cornell.edu, 
-            Joe Waddell jw2574@cornell.edu, 
+            Joseph Waddell jw2574@cornell.edu, 
             Edward Cabezas Garcia ec867@cornell.edu
 """
 
@@ -39,6 +39,7 @@ class AnimalRequirements:
         NEa = Net energy for activity requirement (Mcal)
         
         NEg = Net energy for growth requirement (Mcal)
+
         
         NEpreg = Net energy requirement for pregnancy (Mcal)
         
@@ -368,7 +369,7 @@ class AnimalRequirements:
                 body_weight, mature_body_weight, day_of_pregnancy, animal_type, lactating, average_daily_gain,
                 milk_production)
             phosphorus_requirement = self.calculate_NRC_phosphorus_requirements(
-                body_weight, mature_body_weight, day_of_pregnancy, milk_production, animal_type, average_daily_gain)
+                body_weight, mature_body_weight, day_of_pregnancy, milk_production, animal_type, average_daily_gain, dry_matter_intake_estimate)
             
         elif AnimalBase.config['energy_and_nutrient_calculation_method'] == 'NASEM':
             net_energy_lactation = self.calculate_NASEM_energy_lactation_requirements(
@@ -1088,6 +1089,7 @@ class AnimalRequirements:
         .. [1] National Research Council, "Nutrient Requirements of Dairy Cattle, 7th edition." National Academic Press,
             Chapter 6 "Minerals",pp. 106-109. 2001.
 
+
         """
 
         # C: MINERAL REQUIREMENTS
@@ -1192,7 +1194,7 @@ class AnimalRequirements:
 
     def calculate_NRC_phosphorus_requirements(self, body_weight: float, mature_body_weight: float, 
                                             day_of_pregnancy: Optional[int], milk_production: float,
-                                            animal_type: AnimalType, average_daily_gain: float) -> float:
+                                            animal_type: AnimalType, average_daily_gain: float, dry_matter_intake_estimate: float, ) -> float:
         """ Calculates total Phosphorus requirement according to NRC (2001).
 
         Calculates the estimated the total phosphorus requirement (P) in grams per day
@@ -1211,17 +1213,14 @@ class AnimalRequirements:
             A type or subtype of animal specified in the AnimalType enum
         average_daily_gain : float
             Average daily gain (grams per day)
+        dry_matter_intake_estimate : float
+            Estimated dry matter intake (kg/d)
 
         Returns
         -------
         phosphorus_requirement : float
             Phosphorus requirement (grams per day)
-
-        Notes
-        -----
-        This total phosphorus requirement (g) sum does not include the maintenance requirement which will
-        be calculated within the NLP and added to this sum
-
+            
         References
         ----------
         .. [1] National Research Council, "Nutrient Requirements of Dairy Cattle, 7th edition." National Academic Press,
@@ -1238,11 +1237,15 @@ class AnimalRequirements:
         else:
             P_preg = 0.0
         if animal_type in [AnimalType.LAC_COW]:
+            P_maint = 1 * dry_matter_intake_estimate + 0.002 * body_weight
+        else:
+            P_maint = 0.8 * dry_matter_intake_estimate + 0.002 * body_weight
+        if animal_type in [AnimalType.LAC_COW]:
             P_lact = 0.9 * milk_production
         if animal_type in [AnimalType.LAC_COW]:
-            phosphorus_requirement = P_growth + P_preg + P_lact
+            phosphorus_requirement = P_growth + P_preg + P_lact + P_maint
         elif animal_type in [AnimalType.HEIFER_I, AnimalType.HEIFER_II, AnimalType.HEIFER_III, AnimalType.DRY_COW]:
-            phosphorus_requirement = P_growth + P_preg
+            phosphorus_requirement = P_growth + P_preg + P_maint
         return phosphorus_requirement
 
 

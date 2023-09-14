@@ -10,7 +10,6 @@
     "simulate_animals": true
   },
   "weather": "barnyard_weather.csv",
-  "output": "life_cycle_report.json",
   "farm": {
     "fields": {
     },
