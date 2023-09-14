@@ -50,8 +50,8 @@ class RationOptimizer:
             self.calcium_constraint,
             self.phosphorus_constraint,
             self.protein_constraint,
-            self.NDF_constraint_1,
-            self.NDF_constraint_2,
+            self.NDF_constraint_lower,
+            self.NDF_constraint_upper,
             self.forage_NDF_constraint,
             self.fat_constraint,
             self.DMI_constraint_upper,
@@ -514,7 +514,7 @@ class RationOptimizer:
         return (MP_supply - (MP_req / 1000))
 
 
-    def NDF_constraint_1(self, x):
+    def NDF_constraint_lower(self, x):
         """
         Sets up the RHS multipliers for each feed to instill an overall NDF percent
         constraint. This is a lower bound constraint on overall NDF percent.
@@ -528,7 +528,7 @@ class RationOptimizer:
             return (sum(np.multiply(x, NDF)) / DMI) - 25
 
 
-    def NDF_constraint_2(self, x):
+    def NDF_constraint_upper(self, x):
         """
         Sets up the RHS multipliers for each feed to instill an overall NDF percent
         constraint. This is an upper bound constraint on overall NDF percent.
