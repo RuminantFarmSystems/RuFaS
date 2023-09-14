@@ -933,11 +933,6 @@ def test_calc_avg_nutrient_rqmts():
     pass
 
 
-def test_calc_ration():
-    """Unit test for function calc_ration in file routines/animal/animal_manager.py"""
-    pass
-
-
 def test_calc_manure_excretion():
     """Unit test for function calc_manure_excretion in file routines/animal/animal_manager.py"""
     pass
@@ -959,21 +954,16 @@ def test_record_pen_history():
     pass
 
 
-def test_calc_p_conc(mock_animals_small: List[MagicMock]) -> None:
-    """Unit test for function _calc_p_conc in file routines/animal/animal_manager.py"""
+def test_calc_phosphorus_concentration(mock_animals_small: List[MagicMock]) -> None:
+    """Unit test for function _calc_phosphorus_concentration in file routines/animal/animal_manager.py"""
     expected = 0
-    actual = AnimalManager._calc_p_conc([])
+    actual = AnimalManager._calc_phosphorus_concentration([])
     assert actual == expected
 
-    actual = AnimalManager._calc_p_conc(mock_animals_small)
+    actual = AnimalManager._calc_phosphorus_concentration(mock_animals_small)
     expected = (16.0 / 8.0) / 1000.0
 
     assert actual == pytest.approx(expected)
-
-
-def test_calc_all_p_conc():
-    """Unit test for function calc_all_p_conc in file routines/animal/animal_manager.py"""
-    pass
 
 
 def test_calc_p_rqmts():
