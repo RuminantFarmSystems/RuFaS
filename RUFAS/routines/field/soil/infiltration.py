@@ -128,7 +128,8 @@ class Infiltration:
         """
         top = 20 * (100 - second_moisture_condition)
         bottom = (100 - second_moisture_condition + exp(2.533 - 0.0636 * (100 - second_moisture_condition)))
-        return second_moisture_condition - (top / bottom)
+        first_moisture_condition_parameter = second_moisture_condition - (top / bottom)
+        return max(1.0, first_moisture_condition_parameter)
 
     @staticmethod
     def _determine_third_moisture_condition_parameter(second_moisture_condition: float):

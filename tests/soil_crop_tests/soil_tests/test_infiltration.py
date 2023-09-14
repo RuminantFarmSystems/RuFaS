@@ -21,6 +21,7 @@ def test_determine_curve_number_1(curve_num_2):
     observe = Infiltration._determine_first_moisture_condition_parameter(curve_num_2)
     expect = curve_num_2 - ((20 * (100 - curve_num_2)) /
                             (100 - curve_num_2 + exp(2.533 - (0.0636 * (100 - curve_num_2)))))
+    expect = max(1.0, expect)
     assert expect == observe
 
 
