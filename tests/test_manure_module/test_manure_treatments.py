@@ -9,6 +9,7 @@ from pytest_mock import MockFixture
 
 from RUFAS.general_constants import GeneralConstants
 from RUFAS.routines.manure.constants.manure_constants import ManureConstants
+from RUFAS.routines.manure.gas_emissions.gas_emissions import GasEmissions
 from RUFAS.routines.manure.manure_treatments.anaerobic_digestion import AnaerobicDigestion
 from RUFAS.routines.manure.manure_treatments.anaerobic_digestion_and_lagoon import AnaerobicDigestionAndLagoon
 from RUFAS.routines.manure.manure_treatments.anaerobic_lagoon import AnaerobicLagoon
@@ -2707,3 +2708,90 @@ def test_compost_bedded_pack_barn_calc_bedding_potassium_content(mocker: MockFix
     )
 
     assert cbpb._calc_bedding_potassium_content(1.0, 2.0, 4.0, 1.0) == pytest.approx(6.0)
+
+
+@pytest.mark.parametrize(
+    'manure_total_solids, bedding_total_solids, manure_volatile_solids,'
+    'moisture_effect, days_since_last_tillage, lag,'
+    'carbon_fraction_available_in_manure, carbon_fraction_available_in_bedding,'
+    'mock_temp, mock_methane_emission, mock_carbon_decomposition,'
+    'expected_outputs',
+    [
+        # Normal case
+        (10.0, 5.0, 7.0,
+         0.5, 7, 3,
+         0.4, 0.6,
+         25.0, 1.0, 0.5,
+         (6.0, 13.0, 2.0)),
+
+        # Zero values
+        (0.0, 0.0, 0.0,
+         0.0, 0, 0,
+         0.0, 0.0,
+         0.0, 0.0, 0.0,
+         (0.0, 0.0, 0.0)),
+
+        # Larger values and lower temperature
+        (100.0, 50.0, 70.0,
+         0.8, 10, 5,
+         0.5, 0.7,
+         10.0, 5.0, 3.0,
+         (65.0, 139.0, 11.0)),
+
+        # Values at upper limits or where multipliers are maxed
+        (10.0, 5.0, 7.0,
+         1.0, 7, 3,
+         1.0, 1.0,
+         35.0, 2.0, 1.0,
+         (5.0, 11.0, 4.0))
+    ]
+)
+def test_calc_dry_matter_changes(
+        mocker: MockFixture,
+        manure_total_solids: float,
+        bedding_total_solids: float,
+        manure_volatile_solids: float,
+        moisture_effect: float,
+        days_since_last_tillage: int,
+        lag: int,
+        carbon_fraction_available_in_manure: float,
+        carbon_fraction_available_in_bedding: float,
+        mock_temp: float,
+        mock_methane_emission: float,
+        mock_carbon_decomposition: float,
+        expected_outputs: tuple[float, float, float]
+) -> None:
+    """
+    Unit test for _calc_dry_matter_changes() in CompostBeddedPackBarn in manure_treatment_cbpb.py
+
+    This test verifies that the method correctly calculates changes in dry matter based on various parameters.
+    """
+
+    # Arrange
+    mocker.patch(
+        'RUFAS.routines.manure.manure_treatments.manure_treatment_cbpb.CompostBeddedPackBarn.__init__',
+        return_value=None
+    )
+    cbpb = CompostBeddedPackBarn(weather=mocker.MagicMock(), time=mocker.MagicMock(),
+                                 manure_treatment_config=mocker.MagicMock())
+
+    mocker.patch.object(cbpb, '_get_current_day_average_temperature_celsius', return_value=mock_temp)
+
+    mocker.patch.object(GasEmissions, 'calc_ifsm_methane_emission', return_value=mock_methane_emission)
+
+    mocker.patch.object(GasEmissions, 'calc_total_carbon_decomposition', return_value=mock_carbon_decomposition)
+
+    # Act
+    result = cbpb._calc_dry_matter_changes(
+        manure_total_solids,
+        bedding_total_solids,
+        manure_volatile_solids,
+        moisture_effect,
+        days_since_last_tillage,
+        lag,
+        carbon_fraction_available_in_manure,
+        carbon_fraction_available_in_bedding
+    )
+
+    # Assert
+    assert result == approx(expected_outputs)

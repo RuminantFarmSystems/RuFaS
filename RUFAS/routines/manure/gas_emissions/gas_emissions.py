@@ -1115,7 +1115,7 @@ class GasEmissions:
         return GasEmissionConstants.MCF_CONSTANT_A * math.exp(GasEmissionConstants.MCF_CONSTANT_B * ambient_barn_temp)
 
     @classmethod
-    def _calc_ifsm_methane_emission(cls, manure_volatile_solids: float, ambient_barn_temp: float) -> float:
+    def calc_ifsm_methane_emission(cls, manure_volatile_solids: float, ambient_barn_temp: float) -> float:
         """Calculates emission of methane for a day using an adaptation of the tier 2 approach
         of the IPCC(2006), given ambient barn temperature and a methane conversion factor for the manure
         management.
@@ -1257,7 +1257,7 @@ class GasEmissions:
             days_since_last_tillage: int,
             lag: int,
             moisture_effect: float = ManureConstants.DEFAULT_MOISTURE_EFFECT_MICROBIAL_DECOMP,
-            carbon_available_in_manure: float = ManureConstants.DEFAULT_CARBON_AVAILABLE_IN_MANURE,
+            carbon_available_in_manure: float = ManureConstants.DEFAULT_CARBON_FRACTION_AVAILABLE_IN_MANURE,
             carbon_available_in_bedding: float = GasEmissionConstants.DEFAULT_CARBON_AVAILABLE_IN_BEDDING
     ) -> float:
         """Calculates the carbon decomposition from the composting process of the manure-bed mixture

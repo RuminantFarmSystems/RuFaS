@@ -92,21 +92,27 @@ class BaseManureHandler:
 
     def daily_update(self,
                      pen: ManureManagerPen,
-                     bedding: BaseBedding,
+                     bedding: BaseBedding | None,
                      sim_day: int) -> ManureHandlerDailyOutput:
-        """Calculates and stores the daily output of the manure handler.
-
-        Notes:
-            "pseudocode_manure_management" MS.3
-
-        Args:
-            pen: A ManureManagerPen object.
-            bedding: A BaseBedding object that specifies the type of bedding used.
-            sim_day: The current simulation day.
-
-        Returns:
-            A ManureHandlerDailyOutput object.
         """
+        Calculate the daily manure handler output based on input passed from the animal module.
+
+        Parameters
+        ----------
+        pen : ManureManagerPen
+            A ManureManagerPen object that stores relevant information about the pen that
+            can helpful in the manure module.
+        bedding : BaseBedding | None
+            A BaseBedding object that specifies the type of bedding use or None if no bedding is used.
+        sim_day : int
+            The current simulation day.
+        Returns
+        -------
+        ManureHandlerDailyOutput
+            A ManureHandlerDailyOutput object that stores the daily manure handler output.
+            See details in the class definition (:class:`ManureHandlerDailyOutput`).
+        """
+
         if pen.num_animals == 0:
             return ManureHandlerDailyOutput()
 
@@ -161,6 +167,8 @@ class BaseManureHandler:
             cleaning_water_volume=self.calc_cleaning_water_volume_in_main_barn(
                 pen.num_animals),
             total_bedding_volume=bedding.calc_total_bedding_volume(
+                pen.num_animals),
+            total_bedding_mass=bedding.calc_total_bedding_mass(
                 pen.num_animals),
             total_water_volume_in_milking_parlor=(
                 self.milking_parlor.calc_total_water_volume_used_in_milking_parlor(pen.num_lactating_cows)),
