@@ -28,6 +28,8 @@ class CropData:
       CropData(light_extinction=0.7) will initialize with the vallue set to 0.7, but CropData(0.65) will not work.
       The upside is that this facilitates dataclass inheritance. For example, the CornData class inherits from CropData
       but will have its values set to different defaults.
+
+      This "Generic" crop uses the values for Grain Sorghum.
     """
     # ID variables (SWAT Table A-1 ish)
     species: Optional[str] = "generic"
@@ -285,7 +287,7 @@ class CropData:
     """actual phosphorus to be taken up by the plant from each soil layer (kg/ha)"""
 
     # ---- root development
-    max_root_depth: float = 2000
+    max_root_depth: float = 2_000
     """maximum depth of roots in the soil (mm)"""
 
     # ---- water dynamics
@@ -480,7 +482,7 @@ class Corn(CropData):
     half_mature_phosphorus_fraction: float = 0.0018
     mature_phosphorus_fraction: float = 0.0014
 
-    maximum_root_depth: float = 2_000
+    max_root_depth: float = 2_000
 
     optimal_harvest_index: float = 0.50
     min_harvest_index: float = 0.30
@@ -517,7 +519,7 @@ class CornSilage(CropData):
     half_mature_phosphorus_fraction: float = 0.0018
     mature_phosphorus_fraction: float = 0.0014
 
-    maximum_root_depth: float = 2_000
+    max_root_depth: float = 2_000
 
     optimal_harvest_index: float = 0.90
     min_harvest_index: float = 0.90
@@ -554,7 +556,7 @@ class SpringWheat(CropData):
     half_mature_phosphorus_fraction: float = 0.0032
     mature_phosphorus_fraction: float = 0.0019
 
-    maximum_root_depth: float = 2_000
+    max_root_depth: float = 2_000
 
     optimal_harvest_index: float = 0.42
     min_harvest_index: float = 0.20
@@ -591,7 +593,7 @@ class WinterWheat(CropData):
     half_mature_phosphorus_fraction: float = 0.0020
     mature_phosphorus_fraction: float = 0.0012
 
-    maximum_root_depth: float = 1_300
+    max_root_depth: float = 1_300
 
     optimal_harvest_index: float = 0.40
     min_harvest_index: float = 0.20
@@ -628,7 +630,7 @@ class CerealRye(CropData):
     half_mature_phosphorus_fraction: float = 0.0032
     mature_phosphorus_fraction: float = 0.0019
 
-    maximum_root_depth: float = 1_800
+    max_root_depth: float = 1_800
 
     optimal_harvest_index: float = 0.40
     min_harvest_index: float = 0.20
@@ -665,7 +667,7 @@ class SpringBarley(CropData):
     half_mature_phosphorus_fraction: float = 0.0022
     mature_phosphorus_fraction: float = 0.0013
 
-    maximum_root_depth: float = 1_300
+    max_root_depth: float = 1_300
 
     optimal_harvest_index: float = 0.54
     min_harvest_index: float = 0.20
@@ -702,7 +704,7 @@ class FallOats(CropData):
     half_mature_phosphorus_fraction: float = 0.0032
     mature_phosphorus_fraction: float = 0.0019
 
-    maximum_root_depth: float = 2_000
+    max_root_depth: float = 2_000
 
     optimal_harvest_index: float = 0.42
     min_harvest_index: float = 0.175
@@ -739,7 +741,7 @@ class TallFescue(CropData):
     half_mature_phosphorus_fraction: float = 0.0022
     mature_phosphorus_fraction: float = 0.0019
 
-    maximum_root_depth: float = 2_000
+    max_root_depth: float = 2_000
 
     optimal_harvest_index: float = 0.90
     min_harvest_index: float = 0.90
@@ -776,7 +778,7 @@ class Alfalfa(CropData):
     half_mature_phosphorus_fraction: float = 0.0028
     mature_phosphorus_fraction: float = 0.0020
 
-    maximum_root_depth: float = 3_000
+    max_root_depth: float = 3_000
 
     optimal_harvest_index: float = 0.90
     min_harvest_index: float = 0.90
@@ -813,7 +815,7 @@ class Soybean(CropData):
     half_mature_phosphorus_fraction: float = 0.0037
     mature_phosphorus_fraction: float = 0.0035
 
-    maximum_root_depth: float = 1_700
+    max_root_depth: float = 1_700
 
     optimal_harvest_index: float = 0.31
     min_harvest_index: float = 0.01
@@ -850,7 +852,7 @@ class SugarBeet(CropData):
     half_mature_phosphorus_fraction: float = 0.0025
     mature_phosphorus_fraction: float = 0.0019
 
-    maximum_root_depth: float = 2_000
+    max_root_depth: float = 2_000
 
     optimal_harvest_index: float = 2.00
     min_harvest_index: float = 1.10
@@ -887,7 +889,7 @@ class Potato(CropData):
     half_mature_phosphorus_fraction: float = 0.0025
     mature_phosphorus_fraction: float = 0.0019
 
-    maximum_root_depth: float = 600
+    max_root_depth: float = 600
 
     optimal_harvest_index: float = 0.95
     min_harvest_index: float = 0.95
@@ -928,7 +930,7 @@ class Triticale(CropData):
     half_mature_phosphorus_fraction: float = 0.0032
     mature_phosphorus_fraction: float = 0.0019
 
-    maximum_root_depth: float = 2_000
+    max_root_depth: float = 2_000
 
     optimal_harvest_index: float = 0.40
     min_harvest_index: float = 0.20
