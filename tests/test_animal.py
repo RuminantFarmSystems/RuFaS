@@ -5,6 +5,7 @@ Description: Implements test cases
 Author(s): Pooya Hekmati, sh2235@cornell.edu, Carson Wolber, ctw54@cornell.edu
 """
 
+import math
 from typing import Any, Dict
 from unittest.mock import patch
 from mock import MagicMock
@@ -27,12 +28,15 @@ import RUFAS.routines.animal.clustering_pen_grouping
 from RUFAS.routines.animal.ration.ration_driver import AvailableFeeds
 from RUFAS.routines.animal.ration.ration_driver import RationManager
 
+
 from RUFAS.routines.animal.ration.ration_optimizer import RationOptimizer
-from RUFAS.routines.animal.life_cycle.animal_base import AnimalBase
 
 import RUFAS.routines.animal.ration.animal_requirements
+import RUFAS.routines.animal.ration.ration_optimizer
 
+from RUFAS.routines.animal.life_cycle.animal_base import AnimalBase
 from RUFAS.routines.animal.life_cycle.animal_events import AnimalEvents
+from RUFAS.routines.animal.ration import ration_driver
 
 import RUFAS.routines.animal.ration.user_defined_ration
 from RUFAS.routines.animal.ration.user_defined_ration import \
@@ -1360,12 +1364,12 @@ def test_protein_constraint():
 
 
 def test_NDF_constraint_lower():
-    """Unit test for function test_NDF_constraint_lower in file routines/animal/ration/ration_NLP.py"""
+    """Unit test for function test_NDF_constraint_lower in file routines/animal/ration/ration_optimizer.py"""
     pass
 
 
 def test_NDF_constraint_upper():
-    """Unit test for function NDF_constraint_upper in file routines/animal/ration/ration_NLP.py"""
+    """Unit test for function NDF_constraint_upper in file routines/animal/ration/ration_optimizer.py"""
     pass
 
 
@@ -1414,8 +1418,8 @@ def test_calculate_rqmts():
     pass
 
 
-def test_attempt_optimization():
-    """Unit test for function attempt_optimization in file routines/animal/ration/ration_optimizer.py"""
+def test_optimization():
+    """Unit test for function optimization in file routines/animal/ration/ration_driver.py"""
     pass
 
 
@@ -1464,7 +1468,7 @@ def test_make_ration_from_solution():
     price = []
     for _ in range(len(mock_solution.x)):
         price.append(0.0)
-    RUFAS.routines.animal.ration.ration_NLP.price = price
+    RUFAS.routines.animal.ration.ration_optimizer.price = price
     # TODO how to reset the above? Since it relies on a global, I tried patch
         # however, this solution worked for now, and forthcoming PRs will remove usage of globals
 
@@ -1472,84 +1476,7 @@ def test_make_ration_from_solution():
     mock_avail_feeds = {}
     mock_avail_feeds['feed_id'] = [100, 200, 300]
     mock_avail_feeds['feed_key'] = ['100', '200', '300']
-    # with patch.object(RUFAS.routines.animal.ration.ration_NLP, 'price', price):
-    result = RationManager.make_ration_from_solution(mock_avail_feeds, mock_solution)
-    assert result == predicted
-
-@pytest.mark.parametrize("test_ration, expected", [
-    ({'2' : 3, '4' : 6, 'status' : True, 'objective' : False},[1, 1, 1, 2, 2, 2]),
-    ({'2' : 3, 'status' : True, 'objective' : False},[1, 1, 1, ]),
-    ({'2' : 3, '4' : 6, },[1, 1, 1, 2, 2, 2]),
-    ({'2' : 3, '4' : 12, },[1, 1, 1, 4, 4, 4])
-    ])
-def test_make_solution_from_fixed_ration(test_ration: Dict, expected: list):
-    """Unit test for function make_solution_from_fixed_ration in file routines/animal/ration/ration_driver.py
-    """
-    # test_ration = {'2' : 3, '4' : 6, 'status' : True, 'objective' : False}
-    # expected = [1, 1, 1, 2, 2, 2]
-    result = RationManager.make_solution_from_fixed_ration(test_ration)
-    assert result == expected
-
-
-def test_get_user_defined_ration():
-    """Unit test for function get_user_defined_ration in file routines/animal/ration/ration_driver.py"""
-    pass
-
-
-def test_calc_milk_average() -> None:
-    """Unit test for function calc_milk_average in file routines/animal/ration/ration_driver.py"""
-    mockpen = MagicMock()
-    mockpen.animals_in_pen = [MagicMock(),
-                              MagicMock(),
-                              MagicMock(),
-                              MagicMock(),
-                              MagicMock()]
-    production = [1,2,3,4,5]
-    for i in range(len(production)):
-        mockpen.animals_in_pen[i].estimated_daily_milk_produced = production[i]
-    result = RationManager.calc_milk_average(mockpen)
-    assert result == sum(production)/len(production)
-
-def test_reduce_milk_production() -> None:
-    """Unit test for function reduce_milk_production in file routines/animal/ration/ration_driver.py"""
-    mockpen = MagicMock()
-    mockpen.animals_in_pen = [MagicMock(),
-                              MagicMock(),
-                              MagicMock(),
-                              MagicMock(),
-                              MagicMock()]
-    production = [1,2,3,4,5]
-    reduced_predicted = [1,2,2,3,4]
-    # assign production to mocked animals
-    for i in range(len(production)):
-        mockpen.animals_in_pen[i].estimated_daily_milk_produced = production[i]
-    # assert all were reduced, but not reaching below 1.0 kg/day
-    RationManager.reduce_milk_production(mockpen, 1.0)
-    for i, animal in enumerate(mockpen.animals_in_pen):
-        assert reduced_predicted[i] == animal.estimated_daily_milk_produced
-
-
-def test_make_ration_from_solution():
-    """Unit test for function make_ration_from_solution in file routines/animal/ration/ration_driver.py"""
-    
-    # make a mocked solution object - the critical component being the x
-    mock_solution = MagicMock()
-    mock_solution.x = [1, 1, 1, 2, 2, 2, 3, 3, 3]
-    predicted = {'100': 3, '200': 6, '300': 9}
-    predicted['status'] = 'Optimal'
-    predicted['objective'] = 0.0
-    price = []
-    for _ in range(len(mock_solution.x)):
-        price.append(0.0)
-    RUFAS.routines.animal.ration.ration_NLP.price = price
-    # TODO how to reset the above? Since it relies on a global, I tried patch
-        # however, this solution worked for now, and forthcoming PRs will remove usage of globals
-
-    # make a mocked available_feeds dict - the critical component being the 'feed_key' and 'feed_id'
-    mock_avail_feeds = {}
-    mock_avail_feeds['feed_id'] = [100, 200, 300]
-    mock_avail_feeds['feed_key'] = ['100', '200', '300']
-    # with patch.object(RUFAS.routines.animal.ration.ration_NLP, 'price', price):
+    # with patch.object(RUFAS.routines.animal.ration.ration_optimizer, 'price', price):
     result = RationManager.make_ration_from_solution(mock_avail_feeds, mock_solution)
     assert result == predicted
 
@@ -1924,7 +1851,7 @@ def test_ration_to_use(mock_user_defined_ration_manager: UserDefinedRationManage
     assert result == {'1': 0.1, '2': 0.2, '3': 0.3}
 
 def test_make_user_bounds(mock_user_defined_ration_manager: UserDefinedRationManager):
-    """Unit test for function make_user_bounds in file routines/animal/ration/ration_NLP.py"""
+    """Unit test for function make_user_bounds in file routines/animal/ration/ration_optimizer.py"""
     mock_user_defined_ration_manager.tolerance = 0.1
     ration_percents = {'1': 10, '2': 20}
     predicted = [[9/3, 11/3], [9/3, 11/3], [9/3, 11/3], [18/3, 22/3], [18/3, 22/3], [18/3, 22/3]]
