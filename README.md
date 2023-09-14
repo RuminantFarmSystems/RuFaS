@@ -61,7 +61,7 @@ Revisit the Animal Module design – Refactoring -- Animal Ration formulation|Jo
 Revisit the Animal Module design – Refactoring -- Animal Life Cycle|Yijing, Simon, Anchey|Design phase|P0
 Deprecate the output handler, add missing functionalities, and reports to OM|Niko, Allister||P0
 Go through the entire codebase and ensure IM is the only way we are receiving input data|Allister, Niko||P0|[IM Integration tracking](https://docs.google.com/spreadsheets/d/1k8J6MelPrsrz6Tv4fQNAG-kLSN7oQTQOCEy3I6F0IqU/edit?usp=sharing)
-
+Revert soil profile properties and rewrite soil profile inputs|Ed||P1|[#773](https://github.com/RuminantFarmSystems/MASM/issues/773)
 
 SMEs:
 |Title|Owner|Status|Priority|Remarks|
