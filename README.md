@@ -55,9 +55,9 @@ Dev Team:
 |--|--|--|--|--|
 Design and implement EEE (Review progress on this)|Pooya, Roohi, Kristan, Jenn||P1
 Finish Compost for Manure Module |Varma, Loi||P0
-Redesign and implement Feed storage module ||||Moved to MS 2.5
-Revisit the Animal Module design – Refactoring -- Animal Manager|||P2| Moved to MS 2.5
-Revisit the Animal Module design – Refactoring -- Animal Ration formulation|Joe||P0
+Redesign and implement Feed storage module |Kevin, Pooya, Kristan|||Moved to MS 2.5
+Revisit the Animal Module design – Refactoring -- Animal Manager||Design Phase|P2| Moved to MS 2.5
+Revisit the Animal Module design – Refactoring -- Animal Ration formulation|Joe|In Progress|P0
 Revisit the Animal Module design – Refactoring -- Animal Life Cycle|Yijing, Simon, Anchey|Design phase|P0
 Deprecate the output handler, add missing functionalities, and reports to OM|Niko, Allister||P0
 Go through the entire codebase and ensure IM is the only way we are receiving input data|Allister, Niko||P0|[IM Integration tracking](https://docs.google.com/spreadsheets/d/1k8J6MelPrsrz6Tv4fQNAG-kLSN7oQTQOCEy3I6F0IqU/edit?usp=sharing)
@@ -83,6 +83,7 @@ Refactor Animal Module -- Animal Manager|Joe||P0
 SMEs:
 |Title|Owner|Status|Priority|Remarks|
 |--|--|--|--|--|
+Complete Cohort 1 Pilot testing|Kristan, Haowen, Kat||P0
 
 ## Milestone 3: Dec 31th
 [GitHub Milestone](https://github.com/RuminantFarmSystems/MASM/milestone/6)
@@ -93,21 +94,21 @@ Dev Team:
 Revisit classes.py|Allister
 Deprecate DB(s)|Allister
 Deprecate output handler ||moved to MS 2||
-Develop post-processing and report generation
-Develop end-to-end testing
-Publish V1 Repo
+Develop post-processing and report generation|||P1
+Develop end-to-end testing|||P1
+Publish V1 Repo|||P2
 
 SMEs:
 |Title|Owner|Status|Priority|Remarks|
 |--|--|--|--|--|
-Complete External/Scientific Documentation for the Crop and Soil module
-Complete model evaluation using existing experimental data||||
-Complete Sensitivity Analysis of Animal Module
-Complete Sensitivity Analysis of Crop and Soil Module
-Initiate Sensitivity Analysis of Manure Module
-Complete Cohort 2 Pilot testing
-Develop standard reports recipe (at least one industry-facing and one scientist-facing)
-Develop a set of standard scenarios for end-to-end testing
+Complete External/Scientific Documentation for the Crop and Soil module|||P0
+Complete model evaluation using existing experimental data|||P2
+Complete Sensitivity Analysis of Animal Module|||P1
+Complete Sensitivity Analysis of Crop and Soil Module|||P1
+Initiate Sensitivity Analysis of Manure Module|||P1
+Complete Cohort 2 Pilot testing|||P0
+Develop standard reports recipe (at least one industry-facing and one scientist-facing)|||P1
+Develop a set of standard scenarios for end-to-end testing|||P1
 
 
 # Resources
