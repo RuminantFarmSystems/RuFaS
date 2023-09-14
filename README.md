@@ -80,6 +80,7 @@ Dev Team:
 |--|--|--|--|--|
 Redesign and implement the Feed storage module|Pooya, Kevin, Kristan||P1
 Refactor Animal Module -- Animal Manager|Joe||P0
+Rewrite and clean field input files in the `input/` directory|Ed, Matthew||P1|[#769](https://github.com/RuminantFarmSystems/MASM/issues/769) 
 
 SMEs:
 |Title|Owner|Status|Priority|Remarks|
