@@ -717,3 +717,26 @@ class OutputManager(object):
         self.warnings_pool: Dict[str, OutputManager.pool_element_type] = {}
         self.errors_pool: Dict[str, OutputManager.pool_element_type] = {}
         self.logs_pool: Dict[str, OutputManager.pool_element_type] = {}
+
+    def remove_zero_valued_variables(self) -> None:
+        """
+        Remove variables with zero values from the variables pool.
+
+        Returns
+        -------
+        None
+        """
+
+        info_map = {"class": self.__class__.__name__,
+                    "function": self.remove_zero_valued_variables.__name__,
+                    }
+        self.add_log("remove_zero_valued_variables_try", "Attempting to remove zero valued variables.", info_map)
+        keys_to_remove = []
+        for key, value in self.variables_pool.items():
+            if isinstance(value, dict) and "values" in value:
+                if all(v == 0 for v in value["values"]):
+                    keys_to_remove.append(key)
+        for key in keys_to_remove:
+            self.variables_pool.pop(key)
+            self.add_log("remove_zero_valued_variables_log", f"Removed {key} from variables pool.", info_map)
+        self.add_log("remove_zero_valued_variables_success", "Successfully removed zero valued variables.", info_map)

@@ -38,6 +38,7 @@ class SimulationEngine:
 
         self._run_simulation_main_loop()
         ManureManagerOutputHandler.produce_csv(self.config.csv_dir, self.state.manure_manager)
+        om.remove_zero_valued_variables()
         t_end_sim = timer.time()
 
         print("Simulation Successful")

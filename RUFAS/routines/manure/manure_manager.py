@@ -34,6 +34,7 @@ from RUFAS.routines.manure.manure_treatments.manure_treatment_daily_output impor
 from RUFAS.routines.manure.manure_treatments.manure_treatment_factory import ManureTreatmentFactory
 from RUFAS.routines.manure.manure_treatments.manure_treatment_types import ManureTreatmentType
 from RUFAS.routines.manure.manure_treatments.manure_types import ManureType
+from RUFAS.routines.manure.output_handler.util import ManureModuleOutputHandler
 from RUFAS.routines.manure.pen.manure_manager_pen import ManureManagerPen
 from RUFAS.routines.manure.reception_pits.reception_pit import ReceptionPit
 from RUFAS.routines.manure.reception_pits.reception_pit_daily_output import ReceptionPitDailyOutput
@@ -314,6 +315,19 @@ class ManureManager:
 
         """
         mm_pen = ManureManagerPen(pen)
+        class_and_function_info_maps = {
+            'class': self.__class__.__name__,
+            'function': self._pen_daily_update.__name__,
+        }
+        excluded_fields = ['pen_id', 'simulation_day']
+
+        ManureModuleOutputHandler.add_dataclass_object(mm_pen.manure,
+                                                       class_and_function_info_maps |
+                                                       {
+                                                           'prefix': ('AnimalModuleInputToManureModule_Pen_' + str(
+                                                               mm_pen.id)),
+                                                       },
+                                                       excluded_fields)
 
         manure_handler_daily_output = self.manure_handlers[mm_pen.id].daily_update(
             pen=mm_pen,
@@ -321,11 +335,27 @@ class ManureManager:
             sim_day=simulation_day
         )
 
+        ManureModuleOutputHandler.add_dataclass_object(manure_handler_daily_output,
+                                                       class_and_function_info_maps |
+                                                       {
+                                                           'prefix': (manure_handler_daily_output.__class__.__name__
+                                                                      + '_Pen_' + str(mm_pen.id)),
+                                                       },
+                                                       excluded_fields)
+
         reception_pit_daily_output = self.reception_pits[mm_pen.id].daily_update(
             manure_handler_daily_output=manure_handler_daily_output,
             pen=mm_pen,
             bedding=self.beddings[mm_pen.id]
         )
+
+        ManureModuleOutputHandler.add_dataclass_object(reception_pit_daily_output,
+                                                       class_and_function_info_maps |
+                                                       {
+                                                           'prefix': (reception_pit_daily_output.__class__.__name__
+                                                                      + '_Pen_' + str(mm_pen.id)),
+                                                       },
+                                                       excluded_fields)
 
         results = self._pen_daily_update_for_separator_and_treatment(
             simulation_day=simulation_day,
@@ -338,6 +368,41 @@ class ManureManager:
         manure_separator_daily_output = results[1]
         manure_treatment_daily_output = results[2]
         manure_treatment_accumulated_output = results[3]
+
+        if anaerobic_digestion_daily_output:
+            ManureModuleOutputHandler.add_dataclass_object(anaerobic_digestion_daily_output,
+                                                           class_and_function_info_maps |
+                                                           {
+                                                               'prefix': ('AnaerobicDigestion_' +
+                                                                          anaerobic_digestion_daily_output.__class__.__name__
+                                                                          + '_Pen_' + str(mm_pen.id)),
+                                                           },
+                                                           excluded_fields)
+        if manure_separator_daily_output:
+            ManureModuleOutputHandler.add_dataclass_object(manure_separator_daily_output,
+                                                           class_and_function_info_maps |
+                                                           {
+                                                               'prefix': (
+                                                                       manure_separator_daily_output.__class__.__name__
+                                                                       + '_Pen_' + str(mm_pen.id)),
+                                                           },
+                                                           excluded_fields)
+        ManureModuleOutputHandler.add_dataclass_object(manure_treatment_daily_output,
+                                                       class_and_function_info_maps |
+                                                       {
+                                                           'prefix': (manure_treatment_daily_output.__class__.__name__
+                                                                      + '_Pen_' + str(mm_pen.id)),
+                                                       },
+                                                       excluded_fields)
+
+        ManureModuleOutputHandler.add_dataclass_object(manure_treatment_accumulated_output,
+                                                       class_and_function_info_maps |
+                                                       {
+                                                           'prefix': ('Accumulated_' +
+                                                                      manure_treatment_accumulated_output.__class__.__name__
+                                                                      + '_Pen_' + str(mm_pen.id)),
+                                                       },
+                                                       excluded_fields)
 
         daily_output_data = {
             'simulation_day': simulation_day,
