@@ -144,3 +144,11 @@ class RationConfig:
         self.cow_type = cow_type_
         self.DMIest = DMIest_
 
+        self.MEact = []
+        self.NEgact = []
+        self.NEm_act = []
+        self.is_forage = []
+        self.MPbact = []
+        self.RUP_diet = []
+        self.dP = []
+        self.TDNact = []

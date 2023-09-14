@@ -17,6 +17,7 @@ from RUFAS.routines.animal.ration import animal_requirements
 from RUFAS.routines.animal.ration.ration_optimizer import RationOptimizer
 from RUFAS.routines.animal.ration.user_defined_ration import \
     UserDefinedRationManager as UserDefinedRationManager
+from RUFAS.routines.animal.ration.ration_config import RationConfig
 
 import scipy
 
@@ -58,7 +59,7 @@ class RationManager:
             ration, ration_vals = cls.get_user_defined_ration(req, pen, available_feeds, animal_grouping_scenario)
             return ration, ration_vals
 
-        solution, ration_vals = ration_optimizer.optimization(req, available_feeds, pen.animal_combination)
+        solution, ration_vals = ration_optimizer.attempt_optimization(req, available_feeds, pen.animal_combination)
         # Reduction of milk production estimate process to achieve feasible solution
         num_reattempts = 0
 
@@ -76,7 +77,7 @@ class RationManager:
                 cls.reduce_milk_production(pen, reduction)
 
                 req.set_requirements(pen, animal_grouping_scenario, True)
-                solution, ration_vals = ration_optimizer.optimization(req, available_feeds, pen.animal_combination)
+                solution, ration_vals = ration_optimizer.attempt_optimization(req, available_feeds, pen.animal_combination)
                 info_map = {"class": "RationManager", 
                             "function": cls.formulate_ration.__name__,
                             }
@@ -161,7 +162,9 @@ class RationManager:
             num += solution.x[i + 2]
             ration[available_feeds['feed_key'][feed_id]] = round(num, 6)
         ration['status'] = 'Optimal'
-        ration['objective'] = ration_optimizer.objective(solution.x)
+        ration_config = RationConfig()
+        ration_config.price = RationOptimizer.list_reconfig(available_feeds['price'])
+        ration['objective'] = ration_optimizer.objective(solution.x, ration_config)
         return ration
 
     @classmethod
@@ -231,7 +234,7 @@ class RationManager:
         num_reattempts = 0
         constraints_failed_list = []
 
-        solution, ration_vals = ration_optimizer.optimization(req, available_feeds, pen.animal_combination)
+        solution, ration_vals = ration_optimizer.attempt_optimization(req, available_feeds, pen.animal_combination)
         if str(pen.animal_combination) in ['AnimalCombination.LAC_COW']:
             failed_constraints = ration_optimizer.find_failed_constraints(solution.x, ration_optimizer.cow_cons)
         else:
@@ -274,7 +277,7 @@ class RationManager:
                 running_average_milk = cls.calc_milk_average(pen)
 
                 req.set_requirements(pen, animal_grouping_scenario, True)
-                solution, ration_vals = ration_optimizer.optimization(req, available_feeds, pen.animal_combination)
+                solution, ration_vals = ration_optimizer.attempt_optimization(req, available_feeds, pen.animal_combination)
                 failed_constraints = []
                 constraints_failed_list = []
                 failed_constraints = ration_optimizer.find_failed_constraints(solution.x, ration_optimizer.cow_cons)
