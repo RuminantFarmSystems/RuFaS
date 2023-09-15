@@ -22,7 +22,8 @@ from RUFAS.routines.animal.ration.ration_config import RationConfig
 
 import numpy.typing as npt
 from typing import Callable, List
-
+from RUFAS.output_manager import OutputManager
+om = OutputManager()
 
 class RationOptimizer:
     """
@@ -429,7 +430,6 @@ class RationOptimizer:
         Args:
             x: The decision vector of the NLP
         """
-        DMI = sum(x)
         # P digestibility of feed i (proportion of P)
         ration_config.dP = []
         for i in range(len(type)):
@@ -441,18 +441,7 @@ class RationOptimizer:
                 ration_config.dP.append(0.80)
             else:
                 ration_config.dP.append(0)
-        # Phosphorus Requirements
-        # ----------------------
-        # [A.Cow.C.6]-[A.Heifer.C.5]
-        # Phosphorus maintenance requirement (g)
-        if cow_type:
-            #lactating cows
-            P_maint = 1 * DMI + 0.002 * ration_config.BW
-        else:
-            #all other animals
-            P_maint = 0.8 * DMI + 0.002 * ration_config.BW
-        # [A.Cow.E.16]-[A.Heifer.16]
-        return sum(np.multiply(x, np.multiply(np.multiply(ration_config.phosphorus, 0.01), ration_config.dP))) - ((P_req + P_maint) / 1000)
+        return sum(np.multiply(x, np.multiply(np.multiply(ration_config.phosphorus, 0.01), ration_config.dP))) - ((P_req) / 1000)
 
 
     def protein_constraint(self, x, ration_config):
@@ -776,7 +765,10 @@ class RationOptimizer:
                 solution = self.optimize(animal_combination, available_feeds, ration_config)
             except Exception as e:
                 i -= 1
-                # e.add_error('SLSQP error')
+                info_map = {"class": "RationOptimizer", 
+                            "function": self.optimization.__name__,
+                            }
+                om.add_error('SLSQP error', e.message, info_map)
             finally:
                 i += 1
                 count += 1
