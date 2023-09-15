@@ -506,7 +506,7 @@ class NitrogenIncorporation:
         if total_accessible_nitrates <= 100:
             return 1
         elif total_accessible_nitrates <= 300:
-            return 1.5 - (0.0005 * total_accessible_nitrates)
+            return 1.5 - (0.005 * total_accessible_nitrates)
         else:
             return 0
 
