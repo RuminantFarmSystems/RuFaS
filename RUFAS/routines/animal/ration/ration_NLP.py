@@ -435,18 +435,7 @@ class RationOptimizer:
                 dP.append(0.80)
             else:
                 dP.append(0)
-        # Phosphorus Requirements
-        # ----------------------
-        # [A.Cow.C.6]-[A.Heifer.C.5]
-        # Phosphorus maintenance requirement (g)
-        if cow_type:
-            #lactating cows
-            P_maint = 1 * DMI + 0.002 * BW
-        else:
-            #all other animals
-            P_maint = 0.8 * DMI + 0.002 * BW
-        # [A.Cow.E.16]-[A.Heifer.16]
-        return sum(np.multiply(x, np.multiply(np.multiply(phosphorus, 0.01), dP))) - ((P_req + P_maint) / 1000)
+        return sum(np.multiply(x, np.multiply(np.multiply(phosphorus, 0.01), dP))) - ((P_req) / 1000)
 
 
     def protein_constraint(self, x):
