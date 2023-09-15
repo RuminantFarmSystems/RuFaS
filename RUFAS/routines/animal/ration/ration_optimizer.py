@@ -710,9 +710,9 @@ class RationOptimizer:
             bnds = [(0, (lim / 3) + 0.0001) for lim in limit]
         if udrm.udr_or_not:
             if str(animal_combination) in ['AnimalCombination.LAC_COW']:
-                usermod = minimize(self.objective, x0, method='SLSQP', bounds=bnds, constraints=self.cow_cons)
+                usermod = minimize(self.objective, x0, method='SLSQP', bounds=bnds, constraints=self.cow_cons, args = arguments)
             else:
-                usermod = minimize(self.objective, x0, method='SLSQP', bounds=bnds, constraints=self.heifer_cons)
+                usermod = minimize(self.objective, x0, method='SLSQP', bounds=bnds, constraints=self.heifer_cons, args = arguments)
             return usermod
         # TODO: Put AnimalCombination enum in a separate file and import it here to avoid circular import
         elif str(animal_combination) in ['AnimalCombination.LAC_COW']:
@@ -776,7 +776,7 @@ class RationOptimizer:
                 solution = self.optimize(animal_combination, available_feeds, ration_config)
             except Exception as e:
                 i -= 1
-                e.add_error('SLSQP error')
+                # e.add_error('SLSQP error')
             finally:
                 i += 1
                 count += 1
@@ -789,12 +789,13 @@ class RationOptimizer:
         # retrieving MEact from diet
         if solution is None:
             ration_vals = None
+            ration_config = None
         else:
             ration_vals = self.get_ration_vals(solution.x, ration_config)
-        return solution, ration_vals
+        return solution, ration_vals, ration_config
 
 
-    def is_constraint_violated(self, solution_x: npt.NDArray, constraint: dict[str, Callable]) -> bool:
+    def is_constraint_violated(self, solution_x: npt.NDArray, constraint: dict[str, Callable], ration_config) -> bool:
             """
             Helper function to check a solution dictionary to see if a given constraint 
                 in a list of constraints was met.
@@ -807,7 +808,7 @@ class RationOptimizer:
                 constraint function as defined in ration_NLP.py
 
             """
-            result = constraint['fun'](solution_x)
+            result = constraint['fun'](solution_x, ration_config)
             if constraint['type'] == 'ineq' and result < 0:
                 return True
             elif constraint['type'] == 'eq' and not np.isclose(result, 0):
@@ -816,7 +817,7 @@ class RationOptimizer:
                 return False
 
 
-    def find_failed_constraints(self, solution_x: npt.NDArray, constraints: List[dict[str,Callable]]) -> List[dict[str,Callable]]:
+    def find_failed_constraints(self, solution_x: npt.NDArray, constraints: List[dict[str,Callable]], ration_config) -> List[dict[str,Callable]]:
             """
             Returns list of constraints that were not met during optmization step.
             
@@ -835,5 +836,5 @@ class RationOptimizer:
                 the same type of list as the constraints themselves
                     just filtered such that the ones that failed are returned
             """
-            return list(filter(lambda c: self.is_constraint_violated(solution_x, c), constraints))
+            return list(filter(lambda c: self.is_constraint_violated(solution_x, c, ration_config), constraints))
 

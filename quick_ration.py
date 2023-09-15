@@ -12,9 +12,12 @@ actual_key = [key for key in list(data.keys()) if key.endswith(keyselect)][0]
 ration_raw = data[actual_key]
 ration_list = list(ration_raw.values())[0]
 
-for line in ration_list:
-    del line['status']
-    del line['objective']
+try:
+    for line in ration_list:
+        del line['status']
+        del line['objective']
+except:
+    pass
 
 percent_dicts = []
 DMI_list = []

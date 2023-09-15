@@ -59,7 +59,7 @@ class RationManager:
             ration, ration_vals = cls.get_user_defined_ration(req, pen, available_feeds, animal_grouping_scenario)
             return ration, ration_vals
 
-        solution, ration_vals = ration_optimizer.attempt_optimization(req, available_feeds, pen.animal_combination)
+        solution, ration_vals, ration_config = ration_optimizer.attempt_optimization(req, available_feeds, pen.animal_combination)
         # Reduction of milk production estimate process to achieve feasible solution
         num_reattempts = 0
 
@@ -68,7 +68,7 @@ class RationManager:
             while not solution.success:
                 num_reattempts += 1
                 constraints_failed_list = []
-                failed_constraints = ration_optimizer.find_failed_constraints(solution.x, ration_optimizer.cow_cons)
+                failed_constraints = ration_optimizer.find_failed_constraints(solution.x, ration_optimizer.cow_cons, ration_config)
                 if failed_constraints:
                     for constr in failed_constraints:
                         constraints_failed_list.append(constr["fun"].__name__)
@@ -77,7 +77,7 @@ class RationManager:
                 cls.reduce_milk_production(pen, reduction)
 
                 req.set_requirements(pen, animal_grouping_scenario, True)
-                solution, ration_vals = ration_optimizer.attempt_optimization(req, available_feeds, pen.animal_combination)
+                solution, ration_vals, ration_config = ration_optimizer.attempt_optimization(req, available_feeds, pen.animal_combination)
                 info_map = {"class": "RationManager", 
                             "function": cls.formulate_ration.__name__,
                             }
@@ -234,13 +234,13 @@ class RationManager:
         num_reattempts = 0
         constraints_failed_list = []
 
-        solution, ration_vals = ration_optimizer.attempt_optimization(req, available_feeds, pen.animal_combination)
+        solution, ration_vals, ration_config = ration_optimizer.attempt_optimization(req, available_feeds, pen.animal_combination)
         if str(pen.animal_combination) in ['AnimalCombination.LAC_COW']:
-            failed_constraints = ration_optimizer.find_failed_constraints(solution.x, ration_optimizer.cow_cons)
+            failed_constraints = ration_optimizer.find_failed_constraints(solution.x, ration_optimizer.cow_cons, ration_config)
         else:
-            failed_constraints = ration_optimizer.find_failed_constraints(solution.x, ration_optimizer.heifer_cons)
+            failed_constraints = ration_optimizer.find_failed_constraints(solution.x, ration_optimizer.heifer_cons, ration_config)
         
-        if failed_constraints:
+        if failed_constraints is not None:
             for constr in failed_constraints:
                 constraints_failed_list.append(constr["fun"].__name__)
             # TODO: is there a better way to get the simulation day?
@@ -277,10 +277,10 @@ class RationManager:
                 running_average_milk = cls.calc_milk_average(pen)
 
                 req.set_requirements(pen, animal_grouping_scenario, True)
-                solution, ration_vals = ration_optimizer.attempt_optimization(req, available_feeds, pen.animal_combination)
+                solution, ration_vals, ration_config = ration_optimizer.attempt_optimization(req, available_feeds, pen.animal_combination)
                 failed_constraints = []
                 constraints_failed_list = []
-                failed_constraints = ration_optimizer.find_failed_constraints(solution.x, ration_optimizer.cow_cons)
+                failed_constraints = ration_optimizer.find_failed_constraints(solution.x, ration_optimizer.cow_cons, ration_config)
                 if failed_constraints:
                     for constr in failed_constraints:
                         constraints_failed_list.append(constr["fun"].__name__)
@@ -297,7 +297,7 @@ class RationManager:
             ration_vals = ration_optimizer.get_ration_vals(cls.make_solution_from_fixed_ration(ration))
         else:
             ration = cls.make_ration_from_solution(available_feeds, solution)
-            ration_vals = ration_optimizer.get_ration_vals(solution.x)
+            ration_vals = ration_optimizer.get_ration_vals(solution.x, ration_config)
         return ration, ration_vals
 
 class RationReporter:
