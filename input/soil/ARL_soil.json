@@ -7,7 +7,6 @@
     "albedo": 0.16,
     "soil_evaporation_compensation_coefficient": 0.95,
     "initial_residue": 0,
-    "fresh_N_mineral_rate": 0.05,
     "soil_layers":
     [
         {
