@@ -24,17 +24,17 @@ dry_cow_manure_excretion.py
 
 -  bw: body weight (kg, animal life cycle)
 
--  dm_intake: dry matter intake (kg, pen ration)
+-  dry_matter_intake: dry matter intake (kg, pen ration)
 
--  cp_conc: diet CP concentration (%, from ration_driver.py)
+-  CP_concentration: diet CP concentration (%, from ration_driver.py)
 
--  K_conc: diet K concentration (%, from ration_driver.py)
+-  potassium_concentration: diet K concentration (%, from ration_driver.py)
 
--  adf_conc: diet ADF concentration (%, from ration_driver.py)
+-  ADF_concentration : diet ADF concentration (%, from ration_driver.py)
 
--  NDF conc: diet NDF concentration (%, from ration_driver.py)
+-  NDF_concentration : diet NDF concentration (%, from ration_driver.py)
 
--  ash conc: diet ash intake (kg, from ration_driver.py)
+-  ASH_conc: diet ash intake (kg, from ration_driver.py)
 
 -  milk_protein: milk protein (%, from cow.py)
 
@@ -53,17 +53,17 @@ dry_cow_manure_excretion.py
 
 -  degradable_volatile_solids: degradable volatile solids (kg)
 
--  N_manure: manure nitrogen (kg)
+-  manure_nitrogen : manure nitrogen (kg)
 
--  K_manure: manure potassium (g)
+-  potassium : manure potassium (g)
 
 -  fecal_water: fecal water (kg)
 
 -  urine: urine (kg)
 
--  methane emis: methane emissions (g/d)
+-  methane_emission : methane emissions (g/d)
 
--  urine_urea_conc: urinary urea N concentration (g N/L)
+-  urine_urea_nitrogen_concentration : urinary urea N concentration (g N/L)
 
 -  total_ammonical_n_conc: total ammoniacal N concentration in slurry (g N/L)
 
@@ -73,13 +73,13 @@ dry_cow_manure_excretion.py
 
       **Manure excretion (kg/d):** Amount of feces and urine excreted daily by a calf (kg/d)
 
-         :math:`manure\  = \ 3.45\  \times \ dm\_ intake\ (Nennich\ et\ al.,\ 2005)`
+         :math:`manure\  = \ 3.45\  \times \ dry\_ matter\_ intake\ (Nennich\ et\ al.,\ 2005)`
 
             [A.3A.A.1]
 
             manure = amount of manure excreted (kg)
 
-            dm_intake = dry matter intake (kg)
+            dry_matter_intake = dry matter intake (kg)
 
       **Urine excretion (kg/d):** Amount of urine excreted in kg. This is an assumption.
 
@@ -91,13 +91,13 @@ dry_cow_manure_excretion.py
 
       **Total solids excretion (kg/d):** Amount of dry material excreted by the calf (kg/d).
 
-         :math:`total\_ solids\  = \ 0.393\  \times dm\_ intake` (Nennich et al., 2005)
+         :math:`total\_ solids\  = \ 0.393\  \times dry\_ matter\_ intake` (Nennich et al., 2005)
 
             [A.3A.A.3]
 
             manure = amount of manure excreted (kg)
 
-            dm_intake = dry matter intake (kg)
+            dry_matter_intake = dry matter intake (kg)
 
       **Total volatile solids excretion (kg/d):**
 
@@ -123,13 +123,13 @@ dry_cow_manure_excretion.py
 
       **Manure N excretion (kg/d):** Amount of nitrogen excreted by a calf (kg/d).
 
-         :math:`N\_ manure = (112.55 \times dm\_ intake \times \ \frac{cp\_ conc}{100})\ /\ 1000` (Nennich et al., 2005)
+         :math:`manure\_ nitrogen\ = (112.55 \times dry\_ matter\_ intake \times \ \frac{cp\_ conc}{100})\ /\ 1000` (Nennich et al., 2005)
 
             [A.3A.B.1]
 
-            N manure = amount of nitrogen excreted in manure (kg)
+            manure_nitrogen = amount of nitrogen excreted in manure (kg)
 
-            dm intake = dry matter intake (kg)
+            dry_matter_intake = dry matter intake (kg)
 
             cp conc = concentration of crude protein in ration (%)
 
@@ -141,7 +141,7 @@ dry_cow_manure_excretion.py
 
             N urine = amount of nitrogen excreted in urine (kg)
 
-            N manure = amount of nitrogen excreted in manure (kg)
+            manure_nitrogen = amount of nitrogen excreted in manure (kg)
 
    c. **Methane Emissions**
 
@@ -152,11 +152,11 @@ dry_cow_manure_excretion.py
       production in crossbred calves. Methane emissions by calves are
       estimated from mean values observed in that study.
 
-      :math:`methane\ emis\  = \ \frac{0.013\  \times {{{\ bw}^{0.75}\  \times \ 4.184\ MJ/Mcal}^{}}^{}}{0.05565}`
+      :math:`methane\_ emission\  = \ \frac{0.013\  \times {{{\ bw}^{0.75}\  \times \ 4.184\ MJ/Mcal}^{}}^{}}{0.05565}`
 
          [A.3A.C.1]
 
-         methane emis = methane production (g/d)
+         methane_emission = methane production (g/d)
 
          bw = animal weight (kg)
 
@@ -177,25 +177,25 @@ dry_cow_manure_excretion.py
 
       **Manure excretion (kg/d):** Amount of feces and urine excreted daily by heifers (kg/d).
 
-         :math:`manure = 4.158\  \times dm\_ intake - 0.0246\  \times bw` (Nennich et al., 2005; NASEM, 2021)
+         :math:`manure = 4.158\  \times dry\_ matter\_ intake - 0.0246\  \times bw` (Nennich et al., 2005; NASEM, 2021)
 
             [A.3B.A.2]
 
             manure = amount of manure excreted (kg)
 
-            dm intake = dry matter intake (kg)
-
+            dry_matter_intake = dry matter intake (kg)
+            
             bw = animal weight (kg)
 
       **Total solids excretion (kg/d):** Amount of dry material excreted by heifers (kg/d). This is the same equation used for dry cows.
 
-         :math:`total\_ solids = 0.178 \times dm\_ intake + 2.733` (ASABE, 2005)
+         :math:`total\_ solids = 0.178 \times dry\_ matter\_ intake + 2.733` (ASABE, 2005)
 
             [A.3F.A.3]
 
             total solids = amount of total solids excreted (kg)
 
-            dm intake = dry matter intake (kg)
+            dry_matter_intake = dry matter intake (kg)
 
       **Total volatile solids excretion (kg/d):** Amount of volatile solids excreted by heifers (kg/d).
 
@@ -228,48 +228,48 @@ dry_cow_manure_excretion.py
 
       **Manure N excretion (kg/d):** Amount of nitrogen excreted by a heifer (kg/d).
 
-         :math:`N\_ manure = (15.1 + 0.83\  \times \ \ (dm\_ intake\  \times \ 1000) \times \ \frac{cp\_ conc/6.25}{100})\ /\ 1000`
+         :math:`manure\_ nitrogen\ = (15.1 + 0.83\  \times \ \ (dry\_ mattter\_ intake\  \times \ 1000) \times \ \frac{CP\_ concentration/6.25}{100})\ /\ 1000`
          (Reed et al., 2015; Johnson et al., 2016; NASEM, 2021)
 
             [A.3B.B.1]
 
-            N manure = amount of nitrogen excreted in manure (kg)
+            manure_nitrogen = amount of nitrogen excreted in manure (kg)
 
-            dm intake = dry matter intake (kg)
+   `        dry_matter_intake = dry matter intake (kg)
 
-            cp conc = concentration of crude protein in ration (%)
+            CP_concentration = concentration of crude protein in ration (%)
 
       **Urine N excretion (kg/d):** Amount of urine nitrogen excreted by a heifer (kg/d).
 
-         :math:`N\_ urine = (14.3 + 0.510 \times \ (dm\_ intake\  \times \ 1000) \times \ \frac{cp\_ conc/6.25}{100})\ /\ 1000`
+         :math:`N\_ urine = (14.3 + 0.510 \times \ (dry\_ matter\_ intake\  \times \ 1000) \times \ \frac{CP\_ concentration/6.25}{100})\ /\ 1000`
          (Reed et al., 2015)
 
             [A.3B.B.2]
 
             N urine = amount of nitrogen excreted in urine (kg)
 
-            dm intake = dry matter intake (kg)
+            dry_matter_intake = dry matter intake (kg)
 
-            cp conc = concentration of crude protein in ration (%)
+            CP_concentration = concentration of crude protein in ration (%)
 
       **Fecal N excretion (kg/d):** Amount of fecal nitrogen excreted by a heifer (kg/d)
 
-         :math:`N\_ fecal = N\_ manure - \ N\_ urine`
+         :math:`N\_ fecal = manure\_ nitogen\ - \ N\_ urine`
 
             [A.3B.B.3]
 
       **Manure K excretion (g/d):** Amount of potassium excreted by a heifer (g/d) .
 
-         :math:`K\_ manure = 1000\  \times \ dm\_ intake \times \ \frac{K\_ conc}{100}`
+         :math:`potassium = 1000\  \times \ dry\_ matter\_ intake \times \ \frac{potassium\_ concentration}{100}`
          (ASABE, 2005)
 
             [A.3B.B.4]
 
-            K manure = amount of potassium excreted in manure (g)
+            potassium = amount of potassium excreted in manure (g)
 
-            dm intake = dry matter intake (kg)
+            dry_matter_intake = dry matter intake (kg)
 
-            K conc = concentration of potassium in ration (%)
+            potassium_concentration = concentration of potassium in ration (%)
 
    c. **Methane Emissions**
 
@@ -279,13 +279,13 @@ dry_cow_manure_excretion.py
       An empirical equation relates methane emissions to dry matter intake
       (Boadi and Wittenberg, 2002).
 
-         :math:`methane\ emis\  = \ (38.62\  + \ 26.44\  \times \ dm\ intake\ )\  \times 0.554`
+         :math:`methane\_ emission\  = \ (38.62\  + \ 26.44\  \times \ dry\_ matter\ intake\ )\  \times 0.554`
 
             [A.3B.C.1]
 
-            methane emis = methane production (g/d)
+            methane_emission = methane production (g/d)
 
-            dm intake = dry matter intake (kg)
+            dry_matter_intake = dry matter intake (kg)
 
       IPCC Tier 2 (2006)
 
@@ -295,31 +295,31 @@ dry_cow_manure_excretion.py
       Gross energy in the diet is calculated from diet nutrient composition
       (Moraes et al. 2014).
 
-         :math:`gross\ energy\ conc\  = \ 0.263\  \times CP\ conc\  + \ 0.522\  \times EE\ conc`
+         :math:`gross\ energy\ conc\  = \ 0.263\  \times CP\_ concentration\  + \ 0.522\  \times EE\ conc`
                   
-            | :math:`+ \ 0.198\  \times NDF\ conc\  + \ 0.160\  \times soluble\ residue`
+            | :math:`+ \ 0.198\  \times NDF\_ concentration\  + \ 0.160\  \times soluble\ residue`
 
             [A.3B.C.2]
 
             gross energy conc = dietary gross energy concentration (MJ/kg DM)
 
-            cp conc = crude protein concentration (% DM)
+            CP_concentration = crude protein concentration (% DM)
 
             ee con = ether extract concentration (or crude fat, % DM)
 
-            ndf conc = neutral detergent fiber concentration (% DM)
+            NDF_concentration = neutral detergent fiber concentration (% DM)
 
-            soluble residue = dietary percentage of soluble residues [% DM, = (100 - ash conc) - NDF conc - cp conc - ee conc]
+            soluble residue = dietary percentage of soluble residues [% DM, = (100 - ASH_concentration) - NDF_concentration - CP_concentration - ee conc]
 
-         :math:`methane\ emis\  = \ (0.065\  \times gross\ energy\ conc\  \times DMI)/0.05565`
+         :math:`methane\_ emission\  = \ (0.065\  \times gross\ energy\ conc\  \times dry\_ matter\_ intake)/0.05565`
 
             [A.3B.C.3]
 
-            methane emis = methane production (g/cow per day)
+            methane_emission = methane production (g/cow per day)
 
             gross energy conc = dietary gross energy concentration (MJ/kg DM)
 
-            DMI = dry matter intake (kg)
+            dry_matter_intake = dry matter intake (kg)
 
 (3)  **Lactating Cow Manure Excretion:** Equations for manure production specific 
      to cows (adapted from Li’s pseudocode).
@@ -328,19 +328,19 @@ dry_cow_manure_excretion.py
 
       **Fecal water (kg/d):** Calculate the amount of fecal water excreted (kg/d)
 
-         :math:`fecal\_ water = 1.987 \times dm\_ intake + 0.348 \times adf\_ conc - 0.412` 
+         :math:`fecal\_ water = 1.987 \times dry\_ matter\_ intake + 0.348 \times ADF\_ concentration - 0.412` 
                
-               | :math:`\times cp\_ conc - 0.074 \times dm\_ conc - 0.0057 \times days\_ milk` (Appuhamy et al., 2014)
+               | :math:`\times CP\_ concentration - 0.074 \times dm\_ conc - 0.0057 \times days\_ milk` (Appuhamy et al., 2014)
 
             [A.3E.A.1]
 
             fecal water = amount of water excreted in feces (kg)
 
-            dm intake = dry matter intake of the ration (kg)
+            dry_matter_intake = dry matter intake of the ration (kg)
 
-            adf conc = acid detergent fiber concentration of the diet (%)
+            ADF_concentration = acid detergent fiber concentration of the diet (%)
 
-            cp conc = crude protein concentration of the diet (%)
+            CP_concentration = crude protein concentration of the diet (%)
 
             dm conc = dry matter concentration of the diet (%)
 
@@ -350,31 +350,33 @@ dry_cow_manure_excretion.py
       dry matter excreted (kg/d). Fecal dry matter is assumed to be equivalent 
       to total solids.
 
-         :math:`fecal\ solids = - 0.576 + 0.370 \times dm\_ intake + 0.059 \times adf\_ conc`
+         :math:`fecal\ solids = - 0.576 + 0.370 \times dry\_ matter\_ intake + 0.059 \times ADF\_ concentration`
 
-            :math:`- 0.075 \times cp\_ conc` (Appuhamy et al., 2014)
+            :math:`- 0.075 \times CP\_ concentration` (Appuhamy et al., 2014)
 
             [A.3E.A.2]
 
             fecal solids = amount of dry matter excreted in feces (kg)
 
-            dm intake = dry matter intake of the ration (kg)
+            dry_matter_intake = dry matter intake of the ration (kg)
 
-            adf conc = acid detergent fiber concentration of the diet (%)
+            ADF_concentration = acid detergent fiber concentration of the diet (%)
 
-            cp conc = crude protein concentration of the diet (%)
+            CP_concentration = crude protein concentration of the diet (%)
 
       **Urine (kg/d):** Calculate the amount of urine excreted (kg/d)
 
-         :math:`urine = - 7.742 + 0.388 \times dm\_ intake + 0.726 \times cp\_ conc + 2.066 \times milk\_ protein` (Appuhamy et al., 2014)
+         :math:`urine = - 7.742 + 0.388 \times dry\_ matter\_ intake + 0.726 \times CP\_ concentration + 2.066 \times milk\_ protein` 
+         
+         (Appuhamy et al., 2014)
 
             [A.3E.A.3]
 
             urine = amount of urine excreted (kg)
 
-            dm intake = dry matter intake of the ration (kg)
+            dry_matter_intake = dry matter intake of the ration (kg)
 
-            cp conc = crude protein concentration of the diet (%)
+            CP_concentration = crude protein concentration of the diet (%)
 
             milk protein = true milk protein concentration (%)
 
@@ -395,13 +397,13 @@ dry_cow_manure_excretion.py
       **Total and degradable volatile solids (kg/d):** Total and degradable volatile solids excreted by a lactating cow (kg/d).
       **Organic matter intake (kg/d):** Estimate Organic matter intake (kg/d) as a required input:
 
-         :math:`om\ intake\  = \ dm\ amount\  - \ ash\ amount`
+         :math:`om\ intake\  = \ dry\_ matter\_ intake\  - \ ash\ amount`
 
             [A.2.A.3]
 
             om intake = organic matter intake (kg)
 
-            dm amount = dry matter intake (kg)
+            dry_matter_intake = dry matter intake (kg)
 
             ash amount = ash intake (kg)
 
@@ -409,7 +411,7 @@ dry_cow_manure_excretion.py
 
          :math:`degradable\_ volatile\_ solids = - 1.017 + 0.364 \times om\ intake + 0.029`
          
-            | :math:`\times ndf\_ conc - 0.023 \times cp\_ conc` (Appuhamy et al., 2018)
+            | :math:`\times NDF\_ concentration - 0.023 \times CP\_ concentration` (Appuhamy et al., 2018)
 
             [A.3E.A.5]
 
@@ -417,15 +419,15 @@ dry_cow_manure_excretion.py
 
             om intake = organic matter matter intake (kg)
 
-            ndf conc = neutral detergent fiber concentration (%)
+            NDF concentration = neutral detergent fiber concentration (%)
 
-            cp conc = crude protein concentration (%)
+            CP_concentration = crude protein concentration (%)
 
       **Total volatile solids excreted by a lactating cow (kg/d)**
 
-         :math:`total\_ volatile\_ solids = \  - 1.201 + 0.402 \times om\_ intake + 0.036 \times ndf\_ conc`
+         :math:`total\_ volatile\_ solids = \  - 1.201 + 0.402 \times om\_ intake + 0.036 \times NDF\_ concentration`
          
-            | :math:`- 0.024 \times cp\_ conc` (Appuhamy et al., 2018)
+            | :math:`- 0.024 \times CP\_ concentration` (Appuhamy et al., 2018)
 
             [A.3E.A.6]
 
@@ -433,9 +435,9 @@ dry_cow_manure_excretion.py
 
             om intake = organic matter intake (kg)
 
-            ndf conc = neutral detergent fiber concentration (%)
+            NDF_concentration = neutral detergent fiber concentration (%)
 
-            cp conc = crude protein concentration (%)
+            CP_concentration = crude protein concentration (%)
 
       **Non-degradable volatile solids excretion (kg/d)**
 
@@ -449,41 +451,41 @@ dry_cow_manure_excretion.py
 
       **Total manure nitrogen (kg/d)**
 
-         :math:`N\_ manure\  = \ (20.3\  + \ 0.654\  \times \ (dm\_ intake\  \times \ 1000)`
+         :math:`manure\_ nitrogen\  = \ (20.3\  + \ 0.654\  \times \ (dry\_ matter\_ intake\  \times \ 1000)`
          
-            | :math:`\times \ \frac{cp\_ conc/6.25}{100}) / 1000` (Reed et al., 2015)
+            | :math:`\times \ \frac{CP\_ concentration/6.25}{100}) / 1000` (Reed et al., 2015)
 
             [A.3E.B.1]
 
-            N_manure = amount of nitrogen excreted in manure (kg)
+            manure_nitrogen = amount of nitrogen excreted in manure (kg)
 
-            dm intake = dry matter intake (kg)
+            dry_matter_intake = dry matter intake (kg)
 
-            cp conc = concentration of crude protein in ration (%)
+            CP_concentration = concentration of crude protein in ration (%)
 
             Urinary nitrogen (kg/d)
 
-         :math:`N\_ urine = (12.0\  + \ 0.333\  \times \ (dm\_ intake\  \times \ 1000)`
+         :math:`N\_ urine = (12.0\  + \ 0.333\  \times \ (dry\_ matter\_ intake\  \times \ 1000)`
          
-            | :math:`\times \ \frac{cp\_ conc/6.25}{100}) / 1000` (Reed et al., 2015)
+            | :math:`\times \ \frac{CP\_ concentration/6.25}{100}) / 1000` (Reed et al., 2015)
 
             [A.3E.B.2]
 
             N urine = amount of nitrogen excreted in urine (kg)
 
-            dm intake = dry matter intake (kg)
+            dry_matter_intake = dry matter intake (kg)
 
-            cp conc = concentration of crude protein in ration (%)
+            CP_concentration = concentration of crude protein in ration (%)
 
             bw = animal weight (kg)
 
       **Fecal nitrogen (kg/d)**
 
-         :math:`N\_ feces = N\_ manure - N\_ urine`
+         :math:`N\_ feces = manure\_ nitrogen\ - N\_ urine`
 
             [A.3B.B.3]
 
-            N manure = amount of nitrogen excreted in manure (kg)
+            manure_nitrogen = amount of nitrogen excreted in manure (kg)
 
             N feces = amount of nitrogen excreted in feces (kg)
 
@@ -491,33 +493,34 @@ dry_cow_manure_excretion.py
 
       **Manure K excretion (g/d)**
 
-         :math:`K\_ manure\  = \ 7.21\  \times \ DMI\ `\ + 15944
-         :math:`\times \ K\_ conc\ /\ 100` - 164.5 (Nennich et al., 2005)
+         :math:`potassium\  = \ 7.21\  \times \ dry\_ matter\_ intake + 15944`
+         
+            | :math:`\times \ potassium\_ concentration\ /\ 100 - 164.5` (Nennich et al., 2005)
 
             [A.3E.B.3]
 
-            K manure = amount of potassium excreted in manure (g)
+            potassium = amount of potassium excreted in manure (g)
 
-            dm intake = dry matter intake (kg)
+            dry_matter_intake = dry matter intake (kg)
 
-            K conc = Dietary potassium concentration (%)
+            potassium_concentration = Dietary potassium concentration (%)
 
    c. **Enteric Methane Emissions**
       Methane emissions are calculated for all animals except calves. The
       user has an input option to select which methane model they want to
       use for methane emissions calculations. Mutian (Dairy cows, US Animal Model)
 
-      :math:`methane\_ emis\  = \  - 126\  + \ 11.3\  \times \ dm\_ intake\  + 2.30\  \times \ ndf\_ conc\  + 28.8`
+      :math:`methane\_ emission\  = \  - 126\  + \ 11.3\  \times \ dry\_ matter\_ intake\  + 2.30\  \times \ NDF\_ concentration\  + 28.8`
       
          | :math:`\times \ milk\_ fat\  + \ 0.148\  \times \ bw`
 
       [A.3E.C.1]
 
-      methane emis = methane production (g/day)
+      methane_emission = methane production (g/day)
 
-      dm intake = dry matter intake (kg)
+      dry_matter_intake = dry matter intake (kg)
 
-      NDF conc = dietary neutral detergent fiber concentration (% of DM)
+      NDF_concentration = dietary neutral detergent fiber concentration (% of DM)
 
       milk fat = milk fat concentration (%)
 
@@ -529,17 +532,17 @@ dry_cow_manure_excretion.py
       nonlinear model of methane emissions. The CNCPS and IFSM models use
       the Mitscherlich 3 equation.
 
-      :math:`methane\ emis\  = (45.98\  - \ 45.98\  \times exp( - \lbrack( - 0.0011 \times \frac{starch\_ conc}{adf\_ conc})\  + \ 0.0045\rbrack`
+      :math:`methane\_ emission\  = (45.98\  - \ 45.98\  \times exp( - \lbrack( - 0.0011 \times \frac{starch\_ conc}{ADF\_ concentration})\  + \ 0.0045\rbrack`
       
          | :math:`\times \ me\_ intake\  \times 4.184)) / 0.05565`
 
          [A.3E.C.2]
 
-         methane emis = methane production (g/d)
+         methane_emission = methane production (g/d)
 
          starch conc = starch concentration (% DM)
 
-         ADF conc = acid detergent fiber concentration (% DM)
+         ADF_concentration = acid detergent fiber concentration (% DM)
 
          ME intake = metabolizable energy intake (Mcal/kg DM)
 
@@ -550,31 +553,31 @@ dry_cow_manure_excretion.py
       the diet is calculated from diet nutrient composition (Moraes et al.
       2014).
 
-      :math:`gross\ energy\ conc\  = \ 0.263\  \times cp\ conc\  + \ 0.522\  \times ee\ conc\  + \ 0.198`
+      :math:`gross\ energy\ conc\  = \ 0.263\  \times CP\_ concentration\  + \ 0.522\  \times ee\ conc\  + \ 0.198`
       
-         | :math:`\times ndf\ conc\  + \ 0.160\  \times soluble\ residue`
+         | :math:`\times NDF\_ concentration\  + \ 0.160\  \times soluble\ residue`
 
          [A.3B.C.2]
 
          gross energy conc = dietary gross energy concentration (MJ/kg DM)
 
-         cp conc = crude protein concentration (% DM)
+         CP_concentration = crude protein concentration (% DM)
 
          ee con = ether extract concentration (or crude fat, % DM)
 
-         ndf conc = neutral detergent fiber concentration (% DM)
+         NDF_concentration = neutral detergent fiber concentration (% DM)
 
-         soluble residue = dietary percentage of soluble residues [% DM, = (100 - ash conc) - NDF conc - cp conc - ee conc]
+         soluble residue = dietary percentage of soluble residues [% DM, = (100 - ash conc) - NDF_concentration - cp conc - ee conc]
 
-      :math:`methane\ emis\  = \ (0.065\  \times gross\ energy\ conc\  \times DMI)/0.05565`
+      :math:`methane\_ emission\  = \ (0.065\  \times gross\ energy\ conc\  \times dry\_ matter\_ intake)/0.05565`
 
          [A.3B.C.3]
 
-         methane emis = methane production (g/cow per day)
+         methane_emission = methane production (g/cow per day)
 
          gross energy conc = dietary gross energy concentration (MJ/kg DM)
 
-         DMI = dry matter intake (kg)
+         dry_matter_intake = dry matter intake (kg)
 
 (4) **Dry Cow Manure Excretion:** Equations for manure production specific to dry cows.
    
@@ -592,27 +595,31 @@ dry_cow_manure_excretion.py
 
       **Manure excretion (kg/d):** Amount of feces and urine excreted daily by dry cows (kg/d).
 
-         :math:`manure = 0.00711\  \times \ bw + 0.324\  \times \ CP\  + \ 0.259\  \times \ NDF\  + \ 8.05` (Wilkerson et al., 1997; Nennich et al., 2005; NASEM, 2021)
+         :math:`total_manure_excreted = 0.00711\  \times \ body\_ weight + 0.324\  \times \ CP\_ concentration`  
+         
+               | :math:`+ \ 0.259\  \times \ NDF\_ concentration\  + \ 8.05` 
+         
+         (Wilkerson et al., 1997; Nennich et al., 2005; NASEM, 2021) 
+          
+           [A.3F.A.2]
 
-            [A.3F.A.2]
+            total_manure_excreted = amount of manure excreted (kg)
 
-            manure = amount of manure excreted (kg)
+            body_weight = animal weight (kg)
 
-            bw = animal weight (kg)
+            CP_concentration = crude protein (% DM)
 
-            CP = crude protein (% DM)
-
-            NDF = neutral detergent fiber (% DM)
+            NDF_concentration = neutral detergent fiber (% DM)
 
       **Total solids excretion (kg/d):** Amount of dry material excreted by dry cows (kg/d). The same equation is applied for heifers.
 
-         :math:`total\_ solids = 0.178 \times dm\_ intake + 2.733` (ASABE, 2005)
+         :math:`total\_ solids = 0.178 \times dry\_ matter\_ intake + 2.733` (ASABE, 2005)
 
             [A.3F.A.3]
 
             total solids = amount of total solids excreted (kg)
 
-            dm intake = dry matter intake (kg)
+            dry_matter_intake = dry matter intake (kg)
 
       **Total and degradable volatile solids (kg/d)**
 
@@ -622,13 +629,13 @@ dry_cow_manure_excretion.py
 
       **Organic matter intake (kg/d):** Estimate Organic matter intake (kg/d) as a required input:
 
-         :math:`om\ intake\  = \ dm\ amount\  - \ ash\ amount`
+         :math:`om\ intake\  = \ dry\_ matter\_ intake\  - \ ash\ amount`
 
             [A.2.A.3]
 
             om intake = organic matter intake (kg)
 
-            dm amount = dry matter intake (kg)
+            dry_matter_intake = dry matter intake (kg)
 
             ash amount = ash intake (kg)
 
@@ -636,7 +643,7 @@ dry_cow_manure_excretion.py
 
          :math:`degradable\_ volatile\_ solids = - 1.017 + 0.364 \times om\ intake + 0.029`
          
-            | :math:`\times ndf\_ conc - 0.023 \times cp\_ conc` (Appuhamy et al., 2018)
+            | :math:`\times NDF\_ concentration - 0.023 \times CP\_ concentration` (Appuhamy et al., 2018)
 
             [A.3E.A.5]
 
@@ -644,15 +651,15 @@ dry_cow_manure_excretion.py
 
             om intake = organic matter matter intake (kg)
 
-            ndf conc = neutral detergent fiber concentration (%)
+            NDF_concentration = neutral detergent fiber concentration (%)
 
-            cp conc = crude protein concentration (%)
+            CP_concentration = crude protein concentration (%)
 
       **Total volatile solids (kg/d)**
 
          :math:`total\_ volatile\_ solids = \  - 1.201 + 0.402 \times om\_ intake + 0.036`
          
-            | :math:`\times ndf\_ conc - 0.024 \times cp\_ conc` (Appuhamy et al., 2018)
+            | :math:`\times NDF\_ concentration - 0.024 \times CP\_ concentration` (Appuhamy et al., 2018)
 
             [A.3E.A.6]
 
@@ -660,9 +667,9 @@ dry_cow_manure_excretion.py
 
             om intake = organic matter intake (kg)
 
-            ndf conc = neutral detergent fiber concentration (%)
+            NDF_concentration = neutral detergent fiber concentration (%)
 
-            cp conc = crude protein concentration (%)
+            CP_concentration = crude protein concentration (%)
 
       **Non-degradable volatile solids excretion (kg/d)**
 
@@ -675,21 +682,21 @@ dry_cow_manure_excretion.py
       **Manure N excretion (kg/d):** Amount of nitrogen excreted by a dry cow (kg/d). This is the same
       equation used for heifers.
 
-         :math:`N\_ manure = (15.1 + 0.83\  \times \ \ (dm\_ intake\  \times \ 1000) \times \ \frac{cp\_ conc/6.25}{100})\ /\ 1000` 
+         :math:`manure\_ nitrogen\ = (15.1 + 0.83\  \times \ \ (dry\_ matter\_ intake\  \times \ 1000) \times \ \frac{CP\_ concentration/6.25}{100})\ /\ 1000` 
          
          (Reed et al., 2015; Johnson et al., 2016; NASEM, 2021)
 
             [A.3B.B.1]
 
-            N manure = amount of nitrogen excreted in manure (kg)
+            manure_nitrogen = amount of nitrogen excreted in manure (kg)
 
-            dm intake = dry matter intake (kg)
+            dry_matter_intake = dry matter intake (kg)
 
-            cp conc = concentration of crude protein in ration (%)
+            CP_concentration = concentration of crude protein in ration (%)
 
       **Urine N excretion (kg/d):** Amount of urine nitrogen excreted by a dry cow (kg/d).
 
-         :math:`N\_ urine = (14.3 + 0.510 \times \ (dm\_ intake\  \times \ 1000) \times \ \frac{cp\_ conc/6.25}{100})\ /\ 1000` 
+         :math:`N\_ urine = (14.3 + 0.510 \times \ (dry\_ matter\_ intake\  \times \ 1000) \times \ \frac{CP\_ concentration/6.25}{100})\ /\ 1000` 
          
          (Reed et al., 2015)
 
@@ -697,13 +704,13 @@ dry_cow_manure_excretion.py
 
             N urine = amount of nitrogen excreted in manure (kg)
 
-            dm intake = dry matter intake (kg)
+            dry_matter_intake = dry matter intake (kg)
 
-            cp conc = concentration of crude protein in ration (%)
+            CP_concentration = concentration of crude protein in ration (%)
 
       **Fecal N excretion (kg/d):** Amount of fecal nitrogen excreted by a dry cow (kg/d)
 
-         :math:`N\_ feces\  = \ N\_ manure\  - \ N\_ urine`
+         :math:`N\_ feces\  = \ manure\_ nitrogen\  - \ N\_ urine`
 
             [A.3B.B.3]
 
@@ -713,15 +720,15 @@ dry_cow_manure_excretion.py
 
       **Amount of potassium excreted by a dry cow (g/d).**
 
-         :math:`K\_ manure = 1000\  \times \ dm\_ intake \times \ \frac{K\_ conc}{100}` (ASABE, 2005)
+         :math:`potassium = 1000\  \times \ dry\_ matter\_ intake \times \ \frac{potassium\_ concentration}{100}` (ASABE, 2005)
 
             [A.3B.B.4]
 
-            K manure = amount of potassium excreted in manure (g)
+            potassium = amount of potassium excreted in manure (g)
 
-            dm intake = dry matter intake (kg)
+            dry_matter_intake = dry matter intake (kg)
 
-            K conc = concentration of potassium in ration (%)
+            potassium_concentration = concentration of potassium in ration (%)
 
    c. **Enteric Methane Emissions**
 
@@ -736,18 +743,18 @@ dry_cow_manure_excretion.py
       the Mitscherlich 3 equation.
 
 
-      :math:`methane\ emis\  = (45.98\  - \ 45.98\  \times exp( - \lbrack( - 0.0011 \times \frac{starch\_ conc}{adf\_ conc})\  + \ 0.0045\rbrack`
+      :math:`methane\_ emission\  = (45.98\  - \ 45.98\  \times exp( - \lbrack( - 0.0011 \times \frac{starch\_ conc}{ADF\_ concentration})\  + \ 0.0045\rbrack`
 
          | :math:`\times \ me\_ intake\  \times 4.184))/0.05565`
 
 
       [A.3E.C.2]
 
-         methane emis = methane production (g/d)
+         methane_emission = methane production (g/d)
 
          starch_conc = starch concentration (% DM)
 
-         ADF conc = acid detergent fiber concentration (% DM)
+         ADF_concentration = acid detergent fiber concentration (% DM)
 
          ME intake = metabolizable energy intake (Mcal/kg DM)
 
@@ -758,7 +765,7 @@ dry_cow_manure_excretion.py
 
       Gross energy in the diet is calculated from diet nutrient composition (Moraes et al. 2014).
 
-      :math:`gross\ energy\ conc\  = \ 0.263\  \times CP\ conc\  + \ 0.522 \times EE\ conc\  + \ 0.198\  \times NDF\ conc` 
+      :math:`gross\ energy\ conc\  = \ 0.263\  \times CP\_ concentration\  + \ 0.522 \times EE\ conc\  + \ 0.198\  \times NDF\_ concentration` 
          
          | :math:`+ \ 0.160 \times soluble\ residue`   
 
@@ -766,23 +773,23 @@ dry_cow_manure_excretion.py
 
          gross energy conc = dietary gross energy concentration (MJ/kg DM)
 
-         cp conc = crude protein concentration (% DM)
+         CP_concentration = crude protein concentration (% DM)
 
          ee con = ether extract concentration (or crude fat, % DM)
 
-         ndf conc = neutral detergent fiber concentration (% DM)
+         NDF_concentration = neutral detergent fiber concentration (% DM)
 
-         soluble residue = dietary percentage of soluble residues [% DM, = (100 - ash conc) - NDF conc - cp conc - ee conc]
+         soluble residue = dietary percentage of soluble residues [% DM, = (100 - ash conc) - NDF_concentration - CP_concentration - ee conc]
 
-      :math:`methane\ emis\  = \ (0.065\  \times gross\ energy\ conc\  \times DMI)/0.05565`
+      :math:`methane\_ emission\  = \ (0.065\  \times gross\ energy\ conc\  \times dry\_ matter\_ intake)/0.05565`
 
          [A.3B.C.3]
 
-         methane emis = methane production (g/cow per day)
+         methane_emission = methane production (g/cow per day)
 
          gross energy conc = dietary gross energy concentration (MJ/kg DM)
 
-         DMI = dry matter intake (kg)
+         dry_matter_intake = dry matter intake (kg)
 
 (5) **General Manure Excretion**
 
@@ -825,7 +832,7 @@ dry_cow_manure_excretion.py
 
       **Urinary urea concentration (g N/L)**
 
-         :math:`urine\_ urea\_ N\_ conc\  = \  - 1.16\  + \ 0.86*urinary\_ N\_ conc`
+         :math:`urine\_ urea\_ nitrogen\_ concentration\  = \  - 1.16\  + \ 0.86*urinary\_ N\_ conc`
 
             [A.3G.B.2]
       **Total ammoniacal N (:math:`{NH}_{3}`-N) in the slurry top layer as a
