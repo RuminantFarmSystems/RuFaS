@@ -9,6 +9,7 @@ import pandas as pd
 import re
 
 from RUFAS.util import Utility
+from RUFAS.graph_generator import GraphGenerator
 
 
 class OutputManager(object):
@@ -425,26 +426,26 @@ class OutputManager(object):
                 value.pop("info_maps")
         return pool_copy
 
-    def _list_txt_file_names_in_dir(self, dir_path: str) -> List[str]:
-        """ Returns the list of files in the given path"""
+    def _list_txt_and_json_files_in_dir(self, dir_path: str) -> List[str]:
+        """ Returns the list of txt and json files in the given path"""
         info_map = {"class": self.__class__.__name__,
-                    "function": self._list_txt_file_names_in_dir.__name__,
+                    "function": self._list_txt_and_json_files_in_dir.__name__,
                     }
         self.add_log("search_path_for_filenames_try", f"Attempting to search in {dir_path}.", info_map)
         dir_path_check = Path(dir_path)
         if dir_path_check.is_dir():
-            txt_files = []
+            filter_files = []
             all_files = os.listdir(dir_path)
             for filename in all_files:
-                if filename.endswith(".txt"):
-                    txt_files.append(filename)
+                if filename.endswith(".txt") or filename.endswith(".json"):
+                    filter_files.append(filename)
             self.add_log("search_path_for_filenames_success", f"Successfully searched in {dir_path}"
-                         f" and found {len(txt_files)} text files.", info_map)
-            return txt_files
+                         f" and found {len(filter_files)} txt and json files.", info_map)
+            return filter_files
         else:
             raise NotADirectoryError("The specified path must be a directory")
 
-    def _load_txt_file_to_list(self, path: str) -> List[str]:
+    def _load_filter_file_to_list(self, path: str):
         """ Reads a text file into a list.
 
         Parameters
@@ -464,15 +465,25 @@ class OutputManager(object):
 
         """
         info_map = {"class": self.__class__.__name__,
-                    "function": self._load_txt_file_to_list.__name__,
+                    "function": self._load_filter_file_to_list.__name__,
                     }
-        self.add_log("open_text_file", f"Attempting to open {path}.", info_map)
+        self.add_log("open_filter_file", f"Attempting to open {path}.", info_map)
+        list_of_elements = []
+        graph_metadata = {}
         try:
-            with open(path) as text_file:
-                list_of_elements = text_file.read().splitlines()
-                load_message = f"Successfully opened {path} and read {len(list_of_elements)} lines."
-                self.add_log("filter_pattern_file_load_log", load_message, info_map)
-                return list_of_elements
+            with open(path) as filter_file:
+                if path.endswith(".txt"):
+                    list_of_elements = filter_file.read().splitlines()
+                    load_message = f"Successfully opened {path} and read {len(list_of_elements)} lines."
+                    self.add_log("filter_pattern_file_load_log", load_message, info_map)
+
+                elif path.endswith(".json"):
+                    graph_metadata = json.load(filter_file)
+                    list_of_elements = graph_metadata['filter']
+                    load_message = f"Successfully opened {path} and read {len(list_of_elements)} lines."
+                    self.add_log("filter_pattern_file_load_log", load_message, info_map)
+
+                return list_of_elements, graph_metadata
         except Exception as e:
             raise e
 
@@ -547,10 +558,11 @@ class OutputManager(object):
                     "function": self.save_variables.__name__,
                     }
         self.add_log("exclude_info_maps", f"exclude_info_maps flag set to {exclude_info_maps}", info_map)
-        list_of_filter_files = self._list_txt_file_names_in_dir(dir_path)
+        gg = GraphGenerator()
+        list_of_filter_files = self._list_txt_and_json_files_in_dir(dir_path)
         for filter_file in list_of_filter_files:
             input_path = os.path.join(dir_path, filter_file)
-            filter_patterns = self._load_txt_file_to_list(input_path)
+            filter_patterns, graph_info = self._load_filter_file_to_list(input_path)
             filtered_pool = self._filter_variables_pool(filter_patterns, filter_file)
             if exclude_info_maps:
                 filtered_pool = self._exclude_info_maps(filtered_pool)
@@ -561,6 +573,9 @@ class OutputManager(object):
             elif filter_file.startswith("csv_"):
                 csv_directory = os.path.join(save_path, "CSVs", "om")
                 self._save_variables_to_csv_files(filtered_pool, filter_file, csv_directory)
+            elif filter_file.startswith("png_"):
+                print(type(filtered_pool))
+                gg.generate_graph(filtered_pool, graph_info)
             else:
                 self.add_warning("invalid filter file", f"{filter_file} must be prefixed with csv_ or json_", info_map)
 
