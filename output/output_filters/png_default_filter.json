@@ -1,0 +1,5 @@
+{
+  "graph_type": "Line graph",
+  "filter": [".*passive_carbon_decomposition_amount"],
+  "title": "Passive Carbon Decomposition Amount"
+}
