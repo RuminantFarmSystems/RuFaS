@@ -394,12 +394,8 @@ class FieldManager:
 
         """
         soil_configuration_data = im.get_data(soil_configuration)
-        sand_content = soil_configuration_data["sand"]
-        silt_content = soil_configuration_data["silt"]
         residue = soil_configuration_data["initial_residue"]
-        nitrogen_mineralization_rate = soil_configuration_data["fresh_N_mineral_rate"]
-
-        soil_layers_config = list(soil_configuration_data.get("soil_layers").values())
+        soil_layers_config = soil_configuration_data.get("soil_layers")
         soil_layers_config.sort(key=lambda x: x.get("bottom_depth"))
         soil_layers = []
         for index, layer_config in enumerate(soil_layers_config):
@@ -407,24 +403,22 @@ class FieldManager:
                 top_depth = 0.0
             else:
                 top_depth = soil_layers[-1].bottom_depth
-            new_layer = FieldManager._setup_soil_layer(field_size, top_depth, sand_content, silt_content, residue,
-                                                       nitrogen_mineralization_rate, layer_config)
+            new_layer = FieldManager._setup_soil_layer(field_size, top_depth, residue, layer_config)
             soil_layers.append(new_layer)
 
-        config_dictionary = {"second_moisture_condition_parameter": soil_configuration_data.get("CN2"),
-                             "average_subbasin_slope": soil_configuration_data.get("field_slope"),
-                             "slope_length": soil_configuration_data.get("slope_length"),
-                             "manning": soil_configuration_data.get("manning"),
-                             "albedo": soil_configuration_data.get("soil_albedo"),
-                             "cover_type": soil_configuration_data.get("soil_cover_type"),
-                             "soil_layers": soil_layers}
+        config_dictionary = {
+            "second_moisture_condition_parameter": soil_configuration_data.get("second_moisture_condition_parameter"),
+            "average_subbasin_slope": soil_configuration_data.get("average_subbasin_slope"),
+            "slope_length": soil_configuration_data.get("slope_length"),
+            "manning": soil_configuration_data.get("manning_roughness_coefficient"),
+            "albedo": soil_configuration_data.get("albedo"),
+            "soil_layers": soil_layers}
 
         soil_data = SoilData(field_size=field_size, **config_dictionary)
         return Soil(soil_data=soil_data)
 
     @staticmethod
-    def _setup_soil_layer(field_size: float, top_depth: float, sand: float, silt: float, initial_residue: float,
-                          fresh_nitrogen_mineralization_rate: float, layer_config: Dict) -> LayerData:
+    def _setup_soil_layer(field_size: float, top_depth: float, initial_residue: float, layer_config: Dict) -> LayerData:
         """
         Initializes a LayerData instance to be added to a SoilData object.
 
@@ -434,14 +428,8 @@ class FieldManager:
             Size of the field that contains the soil layer being created (ha)
         top_depth : float
             Depth of top of the soil layer beneath the surface (mm)
-        sand : float
-            Sand content expressed as percent of soil in this layer (unitless)
-        silt : float
-            Silt content expressed as percent of soil in this layer (unitless)
         initial_residue : float
             Amount of residue on the soil surface when this soil layer is initialized (kg / ha)
-        fresh_nitrogen_mineralization_rate : float
-            Rate at which fresh organic nitrogen mineralizes (unitless)
         layer_config : Dict
             Contains all the specifications for a layer of soil.
 
@@ -463,29 +451,36 @@ class FieldManager:
         except KeyError:
             raise ValueError("Bottom depth is required for each soil layer.")
 
-        config_dictionary["wilting_point_water_concentration"] = layer_config.get("wilting_point")
-        config_dictionary["field_capacity_water_concentration"] = layer_config.get("field_capacity")
-        config_dictionary["saturation_point_water_concentration"] = layer_config.get("saturation")
-        config_dictionary["saturated_hydraulic_conductivity"] = layer_config.get("K_sat")
-        config_dictionary["percent_clay_content"] = layer_config.get("clay")
+        config_dictionary["soil_water_concentration"] = layer_config.get("soil_water_concentration")
+        config_dictionary["wilting_point_water_concentration"] = layer_config.get("wilting_point_water_concentration")
+        config_dictionary["field_capacity_water_concentration"] = layer_config.get("field_capacity_water_concentration")
+        config_dictionary["saturation_point_water_concentration"] = \
+            layer_config.get("saturation_point_water_concentration")
+        config_dictionary["saturated_hydraulic_conductivity"] = layer_config.get("saturated_hydraulic_conductivity")
         config_dictionary["temperature"] = layer_config.get("initial_temperature")
         config_dictionary["bulk_density"] = layer_config["bulk_density"]
-        config_dictionary["percent_organic_carbon_content"] = layer_config.get("org_C_percent")
-        config_dictionary["initial_soil_ammonium_concentration"] = layer_config.get("NH4")
-        config_dictionary["initial_soil_nitrate_concentration"] = layer_config.get("N03")
-        config_dictionary["initial_labile_inorganic_phosphorus_concentration"] = layer_config.get("labile_P")
-        config_dictionary["humus_mineralization_rate_factor"] = layer_config.get("active_mineral_rate")
+        config_dictionary["percent_organic_carbon_content"] = layer_config.get("percent_organic_carbon_content")
+        config_dictionary["percent_clay_content"] = layer_config.get("percent_clay_content")
+        config_dictionary["percent_silt_content"] = layer_config.get("percent_silt_content")
+        config_dictionary["percent_sand_content"] = layer_config.get("percent_sand_content")
+        config_dictionary["percent_rock_content"] = layer_config.get("percent_rock_content")
+        config_dictionary["initial_labile_inorganic_phosphorus_concentration"] = \
+            layer_config.get("initial_labile_inorganic_phosphorus_concentration")
+        config_dictionary["initial_soil_nitrate_concentration"] = layer_config.get("initial_soil_nitrate_concentration")
+        config_dictionary["initial_soil_ammonium_concentration"] = \
+            layer_config.get("initial_soil_ammonium_concentration")
+        config_dictionary["humus_mineralization_rate_factor"] = layer_config.get("humus_mineralization_rate_factor")
         config_dictionary["ammonium_volatilization_cation_exchange_factor"] = \
-            layer_config.get("volatile_exchange_factor")
-        config_dictionary["denitrification_rate_coefficient"] = layer_config.get("denitrification_rate")
-        config_dictionary["soil_water_concentration"] = layer_config.get("soil_water_percent")
+            layer_config.get("ammonium_volatilization_cation_exchange_factor")
+        config_dictionary["denitrification_rate_coefficient"] = layer_config.get("denitrification_rate_coefficient")
+        config_dictionary["denitrification_threshold_water_content"] = \
+            layer_config.get("denitrification_threshold_water_content")
+        config_dictionary["residue_fresh_organic_mineralization_rate"] = \
+            layer_config.get("residue_fresh_organic_mineralization_rate")
 
         config_dictionary["field_size"] = field_size
         config_dictionary["top_depth"] = top_depth
-        config_dictionary["percent_sand_content"] = sand
-        config_dictionary["percent_silt_content"] = silt
         config_dictionary["residue"] = initial_residue
-        config_dictionary["residue_fresh_organic_mineralization_rate"] = fresh_nitrogen_mineralization_rate
 
         layer = LayerData(**config_dictionary)
         return layer
