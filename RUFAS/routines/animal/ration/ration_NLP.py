@@ -20,7 +20,8 @@ udrm = UserDefinedRationManager()
 
 import numpy.typing as npt
 from typing import Callable, List
-
+from RUFAS.output_manager import OutputManager
+om = OutputManager()
 
 class RationOptimizer:
     """
@@ -748,7 +749,10 @@ class RationOptimizer:
                 solution = self.optimize(animal_combination, available_feeds)
             except Exception as e:
                 i -= 1
-                e.add_error('SLSQP error')
+                info_map = {"class": "RationOptimizer", 
+                            "function": self.optimization.__name__,
+                            }
+                om.add_error('SLSQP error', e.message, info_map)
             finally:
                 i += 1
                 count += 1
