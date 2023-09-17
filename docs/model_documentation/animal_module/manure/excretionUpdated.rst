@@ -34,13 +34,13 @@ dry_cow_manure_excretion.py
 
 -  NDF_concentration : diet NDF concentration (%, from ration_driver.py)
 
--  ASH_conc: diet ash intake (kg, from ration_driver.py)
+-  ASH_concentration: diet ash intake (kg, from ration_driver.py)
 
 -  milk_protein: milk protein (%, from cow.py)
 
 -  milk_fat: milk fat (%, from cow.py)
 
--  days_milk: days in milk (days, from cow.py)
+-  days_in_milk: days in milk (days, from cow.py)
 
 
 **Outputs**
@@ -65,7 +65,7 @@ dry_cow_manure_excretion.py
 
 -  urine_urea_nitrogen_concentration : urinary urea N concentration (g N/L)
 
--  total_ammonical_n_conc: total ammoniacal N concentration in slurry (g N/L)
+-  total_ammonical_nitrogen_concentration: total ammoniacal N concentration in slurry (g N/L)
 
 (1) **Calf Manure Excretion:** Equations for manure production specific to calves.
 
@@ -228,7 +228,10 @@ dry_cow_manure_excretion.py
 
       **Manure N excretion (kg/d):** Amount of nitrogen excreted by a heifer (kg/d).
 
-         :math:`manure\_ nitrogen\ = (15.1 + 0.83\  \times \ \ (dry\_ mattter\_ intake\  \times \ 1000) \times \ \frac{CP\_ concentration/6.25}{100})\ /\ 1000`
+         :math:`manure\_ nitrogen\ = (15.1 + 0.83\  \times \ \ (dry\_ mattter\_ intake\  \times \ 1000)`
+         
+            :math:`\times \frac{CP\_ concentration/6.25}{100})\ /\ 1000`
+         
          (Reed et al., 2015; Johnson et al., 2016; NASEM, 2021)
 
             [A.3B.B.1]
@@ -366,7 +369,8 @@ dry_cow_manure_excretion.py
 
       **Urine (kg/d):** Calculate the amount of urine excreted (kg/d)
 
-         :math:`urine = - 7.742 + 0.388 \times dry\_ matter\_ intake + 0.726 \times CP\_ concentration + 2.066 \times milk\_ protein` 
+         :math:`urine = - 7.742 + 0.388 \times dry\_ matter\_ intake + 0.726 \times CP\_ concentration` 
+            :math:`+ 2.066 \times milk\_ protein` 
          
          (Appuhamy et al., 2014)
 
@@ -510,9 +514,9 @@ dry_cow_manure_excretion.py
       user has an input option to select which methane model they want to
       use for methane emissions calculations. Mutian (Dairy cows, US Animal Model)
 
-      :math:`methane\_ emission\  = \  - 126\  + \ 11.3\  \times \ dry\_ matter\_ intake\  + 2.30\  \times \ NDF\_ concentration\  + 28.8`
+      :math:`methane\_ emission\  = \  - 126\  + \ 11.3\  \times \ dry\_ matter\_ intake\  + 2.30`
       
-         | :math:`\times \ milk\_ fat\  + \ 0.148\  \times \ bw`
+         | :math:`\times \ NDF\_ concentration\ + 28.8\times \ milk\_ fat\  + \ 0.148\  \times \ bw`
 
       [A.3E.C.1]
 
@@ -567,7 +571,7 @@ dry_cow_manure_excretion.py
 
          NDF_concentration = neutral detergent fiber concentration (% DM)
 
-         soluble residue = dietary percentage of soluble residues [% DM, = (100 - ash conc) - NDF_concentration - cp conc - ee conc]
+         soluble residue = dietary percentage of soluble residues [% DM, = (100 - ASH_concentration) - NDF_concentration - cp conc - ee conc]
 
       :math:`methane\_ emission\  = \ (0.065\  \times gross\ energy\ conc\  \times dry\_ matter\_ intake)/0.05565`
 
@@ -682,7 +686,8 @@ dry_cow_manure_excretion.py
       **Manure N excretion (kg/d):** Amount of nitrogen excreted by a dry cow (kg/d). This is the same
       equation used for heifers.
 
-         :math:`manure\_ nitrogen\ = (15.1 + 0.83\  \times \ \ (dry\_ matter\_ intake\  \times \ 1000) \times \ \frac{CP\_ concentration/6.25}{100})\ /\ 1000` 
+         :math:`manure\_ nitrogen\ = (15.1 + 0.83\  \times \ \ (dry\_ matter\_ intake\  \times \ 1000)`
+            :math:`\times \ \frac{CP\_ concentration/6.25}{100})\ /\ 1000` 
          
          (Reed et al., 2015; Johnson et al., 2016; NASEM, 2021)
 
@@ -696,7 +701,8 @@ dry_cow_manure_excretion.py
 
       **Urine N excretion (kg/d):** Amount of urine nitrogen excreted by a dry cow (kg/d).
 
-         :math:`N\_ urine = (14.3 + 0.510 \times \ (dry\_ matter\_ intake\  \times \ 1000) \times \ \frac{CP\_ concentration/6.25}{100})\ /\ 1000` 
+         :math:`N\_ urine = (14.3 + 0.510 \times \ (dry\_ matter\_ intake\  \times \ 1000)`
+            :math:`\times \ \frac{CP\_ concentration/6.25}{100})\ /\ 1000` 
          
          (Reed et al., 2015)
 
@@ -765,9 +771,9 @@ dry_cow_manure_excretion.py
 
       Gross energy in the diet is calculated from diet nutrient composition (Moraes et al. 2014).
 
-      :math:`gross\ energy\ conc\  = \ 0.263\  \times CP\_ concentration\  + \ 0.522 \times EE\ conc\  + \ 0.198\  \times NDF\_ concentration` 
+      :math:`gross\ energy\ conc\  = \ 0.263\  \times CP\_ concentration\  + \ 0.522 \times EE\ conc\  + \ 0.198` 
          
-         | :math:`+ \ 0.160 \times soluble\ residue`   
+         | :math:`\times NDF\_ concentration + \ 0.160 \times soluble\ residue`   
 
       [A.3B.C.2]
 
@@ -779,7 +785,7 @@ dry_cow_manure_excretion.py
 
          NDF_concentration = neutral detergent fiber concentration (% DM)
 
-         soluble residue = dietary percentage of soluble residues [% DM, = (100 - ash conc) - NDF_concentration - CP_concentration - ee conc]
+         soluble residue = dietary percentage of soluble residues [% DM, = (100 - ASH_concentration) - NDF_concentration - CP_concentration - ee conc]
 
       :math:`methane\_ emission\  = \ (0.065\  \times gross\ energy\ conc\  \times dry\_ matter\_ intake)/0.05565`
 
@@ -806,7 +812,7 @@ dry_cow_manure_excretion.py
 
             total solids = amount of total solids excreted (kg)
 
-   b. **Urinary Urea N and total ammoniacal N (:math:`{NH}_{3}`-N)**
+   b. **Urinary Urea N and total ammoniacal N**
 
       The concentration of urinary urea N and total ammoniacal N are
       derived from a pair of JDS papers by de Boer (2002) and Monteny
