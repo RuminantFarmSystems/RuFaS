@@ -6,7 +6,7 @@ from RUFAS.routines.manure.manure_manager import ManureManager
 from RUFAS.routines.manure.manure_manager import simulate_daily_manure_manager
 from RUFAS.routines.manure.manure_treatments.manure_treatment_types import ManureTreatmentType
 from RUFAS.routines.manure.manure_treatments.manure_types import ManureType
-from RUFAS.routines.manure.output_handler.manure_module_output_handler import ManureModuleOutputHandler
+from RUFAS.routines.manure.output_manager_helper.manure_module_output_manager_helper import ManureModuleOutputManagerHelper
 
 
 def test_simulate_daily_manure_manager(mocker: MockFixture) -> None:
@@ -624,7 +624,7 @@ def test_pen_daily_update(mocker: MockFixture) -> None:
         manure_manager, '_add_manure_nutrients', return_value=None
     )
 
-    mocker.patch.object(ManureModuleOutputHandler, 'add_dataclass_object', return_value=None)
+    mocker.patch.object(ManureModuleOutputManagerHelper, 'add_dataclass_object', return_value=None)
 
     # Act
     manure_manager._pen_daily_update(

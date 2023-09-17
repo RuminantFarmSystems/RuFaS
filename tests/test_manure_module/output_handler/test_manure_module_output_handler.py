@@ -5,13 +5,13 @@ from dataclasses import dataclass
 import pytest
 from pytest_mock import MockFixture
 
-from RUFAS.routines.manure.output_handler.manure_module_output_handler import ManureModuleOutputHandler
+from RUFAS.routines.manure.output_manager_helper.manure_module_output_manager_helper import ManureModuleOutputManagerHelper
 
 
 @dataclass
 class MockDataclass:
     """
-    Mock data class for testing ManureModuleOutputHandler.
+    Mock data class for testing ManureModuleOutputManagerHelper.
 
     Attributes
     ----------
@@ -40,7 +40,7 @@ def test_add_dataclass_object(mocker: MockFixture,
                               exclude_fields: list[str] | None,
                               expected_calls: list[tuple[str, int | str]]) -> None:
     """
-    Unit test for add_dataclass_object() method in ManureModuleOutputHandler.
+    Unit test for add_dataclass_object() method in ManureModuleOutputManagerHelper.
 
     This test verifies that the method correctly adds the fields of a dataclass object to the output manager.
     It checks for the correct handling of the `exclude_fields` parameter.
@@ -54,7 +54,7 @@ def test_add_dataclass_object(mocker: MockFixture,
     info_maps = {'info_map1': 'value1', 'info_map2': 'value2', 'info_map3': 'value3'}
 
     # Act
-    ManureModuleOutputHandler.add_dataclass_object(obj, info_maps, exclude_fields)
+    ManureModuleOutputManagerHelper.add_dataclass_object(obj, info_maps, exclude_fields)
 
     # Assert
     for field_name, value in expected_calls:

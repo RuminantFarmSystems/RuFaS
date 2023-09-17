@@ -4,9 +4,9 @@ from dataclasses import fields, dataclass
 from RUFAS.output_manager import OutputManager
 
 
-class ManureModuleOutputHandler:
+class ManureModuleOutputManagerHelper:
     """
-    A handler for managing the output of the Manure Module.
+    A helper class that builds on the more general OutputManger for managing the output of the Manure Module.
 
     Attributes
     ----------
