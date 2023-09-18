@@ -40,8 +40,8 @@ class SoilErosion:
         rainfall : float
             Amount of rain that fell on the field on the current day (mm).
 
-        Details
-        -------
+        Notes
+        -----
         This method calculates the mass of soil that gets eroded from the soil profile based on the content of the soil,
         how the soil is being farmed, how much rainfall there is and how much of that rain gets absorbed into the soil,
         and the geometry of the field.
@@ -89,7 +89,7 @@ class SoilErosion:
         percent_silt_content : float
             Percent of soil content that is silt.
 
-        Details
+        Notes
         -------
         The coarseness of a soil affects the overall erodibility of the soil. Specifically, soils with high levels of
         coarse-sand content will have relatively low erodibility compared to soils with less sand.
@@ -99,9 +99,9 @@ class SoilErosion:
         float
             Coarseness factor of erodibility, based on sand content (unitless).
 
-        Reference
-        --------------
-        SWAT 4:1.1.6
+        References
+        ----------
+        SWAT Theoretical documentation eqn. 4:1.1.6
         """
         return 0.2 + 0.3 * exp((-0.256) * percent_sand_content * (1 - (percent_silt_content / 100)))
 
@@ -117,7 +117,7 @@ class SoilErosion:
         percent_clay_content : float
             Percent of clay in the given layer of soil.
 
-        Details
+        Notes
         -------
         The clay-silt ratio affects the erodibility of the soil, specifically soils with a high ratio of clay to
         silt are less susceptible to erosion than soils with lower ratios of clay to silt.
@@ -127,9 +127,9 @@ class SoilErosion:
         float
             The clay-silt ratio factor, based on clay and silt content (unitless).
 
-        Reference
-        --------------
-        SWAT 4:1.1.7
+        References
+        ----------
+        SWAT Theoretical documentation eqn. 4:1.1.7
         """
         if percent_silt_content == 0 and percent_clay_content == 0:
             raise ValueError("Cannot have percent silt content and percent clay content both be 0")
@@ -146,7 +146,7 @@ class SoilErosion:
         percent_organic_carbon : float
             The percent of organic carbon content in the given layer of soil.
 
-        Details
+        Notes
         -------
         The amount of organic carbon content in the soil affects the erodibility of the soil. Soils with higher amounts
         of organic carbon content will have less erosion compared to soils with lower organic carbon content.
@@ -156,9 +156,9 @@ class SoilErosion:
         float
             The carbon factor of erodibility based on the organic carbon content of the soil (unitless).
 
-        Reference
-        --------------
-        SWAT 4:1.1.8
+        References
+        ----------
+        SWAT Theoretical documentation eqn. 4:1.1.8
         """
         return 1 - ((0.25 * percent_organic_carbon) / (percent_organic_carbon +
                                                        exp(3.72 - (2.95 * percent_organic_carbon))))
@@ -173,7 +173,7 @@ class SoilErosion:
         percent_sand_content : float
             The percent of sand in the given layer of soil.
 
-        Details
+        Notes
         -------
         When a soil has an extremely high sand content, it reduces the erodibility of that soil.
 
@@ -182,9 +182,9 @@ class SoilErosion:
         float
             The high sand content factor of erodibility, based on the amount of sand in the soil (unitless).
 
-        Reference
-        --------------
-        SWAT 4:1.1.9
+        References
+        ----------
+        SWAT Theoretical documentation eqn. 4:1.1.9
         """
         not_sand_fraction = 1 - (percent_sand_content / 100)
         return 1 - ((0.7 * not_sand_fraction) / (not_sand_fraction + exp(-5.51 + 22.9 *
@@ -193,6 +193,35 @@ class SoilErosion:
     @staticmethod
     def _determine_soil_erodibility_factor(percent_sand_content: float, percent_silt_content: float,
                                            percent_clay_content: float, percent_organic_carbon_content: float) -> float:
+        """
+        Calculate the soil erodibility factor for use in calculating the sediment yield on a given day.
+
+        Parameters
+        ----------
+        percent_sand_content : float
+            Percent of sand in the given layer of soil.
+        percent_silt_content : float
+            Percent of silt in the given layer of soil.
+        percent_clay_content : float
+            Percent of clay in the given layer of soil.
+        percent_organic_carbon_content : float
+            Percent of organic carbon content in the given layer of soil.
+
+        Notes
+        -----
+        Some soils are more prone to erosion than others, based on how much sand, silt, clay, and organic carbon
+        they contain.
+
+        Returns
+        -------
+        float
+            The soil erodibility factor based on its coarse sand content, clay-silt ratio, clay content, and organic
+            carbon content (compound unit, irrelevant).
+
+        Reference
+        ---------
+        SWAT Theoretical documentation eqn. 4:1.1.5
+        """
 
         coarse_sand_factor = SoilErosion._determine_coarse_sand_factor(percent_sand_content, percent_silt_content)
         clay_silt_factor = SoilErosion._determine_clay_silt_ratio_factor(percent_silt_content, percent_clay_content)
@@ -212,8 +241,8 @@ class SoilErosion:
         surface_residue : float
             Amount of residue on the soil surface (kg per hectare).
 
-        Details
-        -------
+        Notes
+        -----
         This factor accounts for what is planted in and/or physically covering the field. Erodibility is affected by
         this because rainfall energy is either reduced or entirely eliminated when it hits the plant canopy or
         residue on the soil surface, which means less energy is transferred to soil when the water reaches it.
@@ -223,9 +252,9 @@ class SoilErosion:
         float
             The cover and management factor (unitless).
 
-        Reference
-        --------------
-        SWAT 4:1.1.10
+        References
+        ----------
+        SWAT Theoretical documentation eqn. 4:1.1.10
         """
         if minimum_cover_management_factor <= 0:
             raise ValueError("Minimum cover and management cannot be less than or equal to 0")
@@ -245,19 +274,19 @@ class SoilErosion:
         """
         Calculate the exponential term used to determine the topographic factor.
 
-        Parameters:
+        Parameters
         -----------
         average_subbasin_slope : float
             Average slope fraction of the subbasin (unitless).
 
-        Returns:
-        --------
+        Returns
+        -------
         float
             The exponential term (unitless).
 
-        Reference:
-        ---------------
-        SWAT 4:1.1.13
+        References
+        ----------
+        SWAT Theoretical documentation eqn. 4:1.1.13
         """
         return 0.6 * (1 - exp(-35.835 * average_subbasin_slope))
 
@@ -267,21 +296,21 @@ class SoilErosion:
         Calculate the topographic factor, which represents the expected ratio of soil loss per unit area from a field
         slope to that from a 22.1 m length of uniform 9% slope under otherwise identical conditions.
 
-        Parameters:
+        Parameters
         -----------
         slope_length : float
             Length of the slope (m).
         average_subbasin_slope : float
             Average slope fraction of the subbasin (m rise over m run).
 
-        Returns:
-        --------
+        Returns
+        -------
         float
             The topographic factor (unitless).
 
-        Reference:
-        ---------------
-        SWAT 4:1.1.12
+        References
+        ----------
+        SWAT Theoretical documentation eqn. 4:1.1.12
         """
         # Note: arctan(tan(x)) == x does not always hold, it is only true from -90 to 90 degrees, inclusive. It is safe
         # to use here because there will never be a field at an angle < -90 or > 90 degrees
@@ -296,24 +325,24 @@ class SoilErosion:
         """
         Calculate the coarse fragment factor for use in calculating sediment yield.
 
-        Parameters:
+        Parameters
         -----------
         percent_rock_content : float
             Percent rock in the first soil layer.
 
-        Details:
-        --------
+        Notes
+        -----
         The mass of rocks is much greater than particles of sand, silt, clay, etc., requiring significantly more force
         to move them off a field, resulting in slower erosion in soils with higher rock content.
 
-        Returns:
+        Returns
         --------
         float
             Coarse fragment factor based on the rock content of the soil (unitless).
 
-        Reference:
-        ---------------
-        SWAT 4:1.1.15
+        References
+        ----------
+        SWAT Theoretical documentation eqn. 4:1.1.15
         """
         return exp(-0.053 * percent_rock_content)
 
@@ -524,8 +553,8 @@ class SoilErosion:
         """
         Calculate the sediment yield for a given day.
 
-        Parameters:
-        -----------
+        Parameters
+        ----------
         surface_area_runoff : float
             Surface runoff volume (mm per hectare).
         peak_runoff_rate : float
@@ -545,8 +574,8 @@ class SoilErosion:
         coarse_fragment_factor : float
             Factor that adjusts for the percent rock in the first soil layer (unitless).
 
-        Returns:
-        --------
+        Returns
+        -------
         float
             Sediment yield on a given day (metric tons).
         """
@@ -559,20 +588,20 @@ class SoilErosion:
         """
         Adjust the sediment yield based on the amount of snow cover.
 
-        Parameters:
-        -----------
+        Parameters
+        ----------
         sediment_yield : float
             Sediment yield on a given day (metric tons).
         snow_water_content : float
             Water content of the snow cover (mm).
 
-        Returns:
-        --------
+        Returns
+        -------
         float
             The sediment yield on a given day adjusted for the water content of the snow cover.
 
-        Reference:
-        ---------------
-        SWAT 4:1.3.1
+        Reference
+        ---------
+        SWAT Theoretical documentation eqn. 4:1.3.1
         """
         return sediment_yield / exp((3 * snow_water_content) / 25.4)
