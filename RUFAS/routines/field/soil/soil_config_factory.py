@@ -19,6 +19,8 @@ class SoilConfigFactory:
     def create_soil_data(field_size: float, config: SoilConfiguration = SoilConfiguration("generic"),
                          **kwargs) -> SoilData:
         """
+        Creates a soil data object from a SoilConfiguration enum, with the defaults from that configurations and the
+            optional ability to modify attributes
 
         Parameters
         ----------

@@ -129,9 +129,9 @@ class Infiltration:
         float
             Curve number 1 (dry/wilting point conditions) (unitless).
 
-        SWAT Reference
-        --------------
-        2:1.1.4
+        References
+        ----------
+        SWAT Theoretical documentation eqn. 2:1.1.4
         """
         top = 20 * (100 - second_moisture_condition)
         bottom = (100 - second_moisture_condition + exp(2.533 - 0.0636 * (100 - second_moisture_condition)))
@@ -152,9 +152,9 @@ class Infiltration:
         float
             Curve number 3 (wet/field capacity conditions) (unitless).
 
-        SWAT Reference
+        Reference
         --------------
-        2:1.1.5
+        SWAT Theoretical documentation eqn. 2:1.1.5
         """
         return second_moisture_condition * exp(0.00673 * (100 - second_moisture_condition))
 
@@ -175,7 +175,7 @@ class Infiltration:
 
         References
         ----------
-        SWAT Reference: 2:1.1.2
+        SWAT Theoretical documentation eqn. 2:1.1.2
         """
         return 25.4 * ((1000 / moisture_condition_parameter) - 10)
 
@@ -206,7 +206,7 @@ class Infiltration:
 
         References
         ----------
-        SWAT Reference: 2:1.1.8
+        SWAT Theoretical documentation eqn. 2:1.1.8
         """
         first_top_term = log((field_capacity / (1 - (third_moisture_condition_retention_parameter /
                                                      max_retention_parameter))) -
@@ -240,7 +240,7 @@ class Infiltration:
 
         References
         ----------
-        SWAT Reference: 2:1.1.7
+        SWAT Theoretical documentation eqn. 2:1.1.7
         """
         first_term = log((field_capacity / (1 - (third_moisture_condition_retention_parameter /
                                                  max_retention_parameter))) - field_capacity)
@@ -275,7 +275,7 @@ class Infiltration:
 
         References
         ----------
-        SWAT Reference: 2:1.1.6
+        SWAT Theoretical documentation eqn. 2:1.1.6
         """
         return max_retention_parameter * (1 - (soil_water_content / (soil_water_content + exp(first_shape_coefficient -
                                                                                               (second_shape_coefficient
@@ -301,7 +301,7 @@ class Infiltration:
 
         References
         ----------
-        SWAT Reference: 2:1.1.10
+        SWAT Theoretical documentation eqn. 2:1.1.10
         """
         return max_retention_parameter * (1 - exp(-0.000862 * retention_parameter))
 
@@ -328,7 +328,7 @@ class Infiltration:
 
         References
         ----------
-        SWAT Reference: 2:1.1.12
+        SWAT Theoretical documentation eqn. 2:1.1.12
         """
         first_factor = (third_moisture_condition - second_moisture_condition) / 3
         second_factor = 1 - (2 * exp(-13.86 * average_fraction_slope))
@@ -358,7 +358,7 @@ class Infiltration:
 
         References
         -------
-        SWAT Reference: 2:1.1.1, 3
+        SWAT Theoretical documentation eqn. 2:1.1.1, 3
         """
         if rainfall > (0.2 * retention_parameter):
             return ((rainfall - (0.2 * retention_parameter)) ** 2) / (rainfall + (0.8 * retention_parameter))
@@ -398,7 +398,7 @@ class Infiltration:
 
         References
         -------
-        SWAT 2:1.1.9
+        SWAT Theoretical documentation eqn. 2:1.1.9
         """
         retention_parameter = previous_retention_parameter - rainfall + runoff
         retention_parameter += potential_evapotranspiration * exp((((-1) * weighting_coefficient) *
@@ -423,6 +423,6 @@ class Infiltration:
 
         References
         -------
-        SWAT 2:1.1.11
+        SWAT Theoretical documentation eqn. 2:1.1.11
         """
         return 25400 / (retention_parameter + 254)

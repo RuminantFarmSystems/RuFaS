@@ -347,8 +347,8 @@ class SoilData:
         float
             The total soil water content in millimeters (mm).
 
-        Details
-        -------
+        Notes
+        -----
         This method calculates the total soil water content in the entire soil profile. It assumes that the lower bound
         of water is 0. The calculation is done per layer, meaning that if one layer has water content greater than its
         wilting water point and another layer has water content less than its wilting point, the first layer will not
@@ -400,9 +400,9 @@ class SoilData:
         -------
         float
             The soil water factor (unitless)
-        Reference
-        --------------
-        SWAT 5:2.3.18
+        References
+        ----------
+        SWAT Theoretical documentation eqn. 5:2.3.18
         """
         return self.profile_soil_water_content / (0.85 * self.profile_field_capacity)
 

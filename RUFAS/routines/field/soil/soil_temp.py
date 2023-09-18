@@ -30,8 +30,8 @@ class SoilTemp:
         """
         Update the soil temperature.
 
-        Parameters:
-        -----------
+        Parameters
+        ----------
         solar_radiation : float
             Solar radiation reaching the ground on the current day (MJ per square meter per day).
         avg_temp : float
@@ -61,9 +61,9 @@ class SoilTemp:
         to be the same temperature every day. For every day of the simulation besides potentially the first, the
         top two layers of soil will have the same temperature.
 
-        Reference:
-        ---------------
-        SWAT section 1:1.3.3
+        References
+        ----------
+        SWAT Theoretical documentation eqn. 1:1.3.3
         """
         max_damping_depth = self._determine_maximum_damping_depth(self.data.profile_bulk_density)
         scaling_factor = self._determine_scaling_factor(self.data.profile_soil_water_content,
@@ -113,19 +113,19 @@ class SoilTemp:
         """
         Calculate the maximum damping depth of a soil profile based on bulk density.
 
-        Parameters:
-        -----------
+        Parameters
+        ----------
         bulk_density : float
             The soil profile bulk density (Mg per cubic meter).
 
-        Returns:
-        --------
+        Returns
+        -------
         float
             The maximum damping depth (mm).
 
-        Reference:
-        ---------------
-        SWAT 1:1.3.6
+        References
+        ----------
+        SWAT Theoretical documentation eqn. 1:1.3.6
         """
         top_term = 2500 * bulk_density
         bottom_term = bulk_density + (686 * exp(-5.63 * bulk_density))
@@ -136,8 +136,8 @@ class SoilTemp:
         """
         Calculate the scaling factor for use in calculating the damping depth.
 
-        Parameters:
-        -----------
+        Parameters
+        ----------
         soil_water_content : float
             Amount of water in the soil profile expressed as depth of water in profile (mm).
         bulk_density : float
@@ -145,14 +145,14 @@ class SoilTemp:
         bottom_depth : float
             Depth from the soil surface of the bottom of the soil profile (mm).
 
-        Returns:
-        --------
+        Returns
+        -------
         float
             The scaling factor for calculating damping depth (unitless).
 
-        Reference:
-        ---------------
-        SWAT 1:1.3.7
+        References
+        ----------
+        SWAT Theoretical documentation eqn. 1:1.3.7
         """
         return soil_water_content / ((0.356 - (0.144 * bulk_density)) * bottom_depth)
 
@@ -161,21 +161,21 @@ class SoilTemp:
         """
         Calculate the daily value for the damping depth.
 
-        Parameters:
-        -----------
+        Parameters
+        ----------
         max_damping_depth : float
             Maximum damping depth (mm).
         scaling_factor : float
             Scaling factor for soil water (unitless).
 
-        Returns:
-        --------
+        Returns
+        -------
         float
             Damping depth for the day (mm).
 
-        Reference:
-        ---------------
-        SWAT 1:1.3.8
+        References
+        ----------
+        SWAT Theoretical documentation eqn. 1:1.3.8
         """
         first_term = log(500 / max_damping_depth)
         second_term = ((1 - scaling_factor) / (1 + scaling_factor)) ** 2
@@ -186,21 +186,21 @@ class SoilTemp:
         """
         Calculate the depth factor for a given layer of soil.
 
-        Parameters:
-        -----------
+        Parameters
+        ----------
         center_depth : float
             Depth of the center of a given soil layer (mm).
         damping_depth : float
             Damping depth of the soil profile (mm).
 
-        Returns:
-        --------
+        Returns
+        -------
         float
             The depth factor for this layer of soil (unitless).
 
-        Reference:
-        ---------------
-        SWAT 1:1.3.4, 5
+        References
+        ----------
+        SWAT Theoretical documentation eqn. 1:1.3.4, 5
         """
         # calculate ratio of center depth to damping depth (SWAT 1:1.3.5)
         ratio = center_depth / damping_depth
@@ -212,21 +212,21 @@ class SoilTemp:
         """
         Calculate the radiation term for use in calculating the bare soil surface temperature.
 
-        Parameters:
-        -----------
+        Parameters
+        ----------
         solar_radiation : float
             Solar radiation reaching the ground on the current day (MJ per square meter per day).
         albedo : float
             Proportion of solar radiation that is reflected by the soil surface (unitless).
 
-        Returns:
-        --------
+        Returns
+        -------
         float
             The radiation factor for the day (unitless).
 
-        SWAT Reference:
-        ---------------
-        1:1.3.10
+        References
+        ----------
+        SWAT Theoretical documentation eqn. 1:1.3.10
         """
         return ((solar_radiation * (1 - albedo)) - 14) / 20
 
@@ -236,8 +236,8 @@ class SoilTemp:
         """
         Calculate the temperature at the surface of bare soil.
 
-        Parameters:
-        -----------
+        Parameters
+        ----------
         radiation_factor : float
             Radiation factor for a given day (unitless).
         avg_temp : float
@@ -247,14 +247,14 @@ class SoilTemp:
         max_temp : float
             Maximum temperature of the current day (degrees C).
 
-        Returns:
-        --------
+        Returns
+        -------
         float
             Bare soil surface temperature (degrees C).
 
-        Reference:
+        References
         ---------------
-        SWAT 1:1.3.9
+        SWAT Theoretical documentation eqn. 1:1.3.9
         """
         return avg_temp + (radiation_factor * ((max_temp - min_temp) / 2))
 
@@ -263,21 +263,21 @@ class SoilTemp:
         """
         Calculate the weighting factor for use in calculating the soil surface temperature.
 
-        Parameters:
-        -----------
+        Parameters
+        ----------
         plant_cover : float
             Total aboveground plant biomass and residue on the current day (kg per hectare).
         snow_cover : float
             Water content of the snow cover on the current day (mm).
 
-        Returns:
-        --------
+        Returns
+        -------
         float
             Weighting factor based on either snow or plant matter soil cover (unitless).
 
-        SWAT Reference:
-        ---------------
-        1:1.3.11
+        References
+        ----------
+        SWAT Theoretical documentation eqn. 1:1.3.11
         """
         plant_factor = plant_cover / (plant_cover + exp(7.563 - ((1.297 * 10 ** (-4)) * plant_cover)))
         snow_factor = snow_cover / (snow_cover + exp(6.055 - (0.3002 * snow_cover)))
@@ -329,9 +329,9 @@ class SoilTemp:
         float
             Soil surface temperature for the current day (degrees C).
 
-        Reference
-        --------------
-        SWAT 1:1.3.12
+        References
+        ----------
+        SWAT Theoretical documentation eqn. 1:1.3.12
         """
         return cover_weighting_factor * previous_top_soil_layer_temp + \
             (1 - cover_weighting_factor) * bare_soil_surface_temp
@@ -361,9 +361,9 @@ class SoilTemp:
         float
             Soil temperature at the given depth on the current day (degrees C).
 
-        Reference
-        --------------
-        SWAT 1:1.3.3
+        References
+        ----------
+        SWAT Theoretical documentation eqn. 1:1.3.3
         """
         first_term = prev_temperature_effect * previous_day_soil_temp
         second_term = (1 - prev_temperature_effect) * (depth_factor * (avg_annual_air_temp - soil_surface_temp)
