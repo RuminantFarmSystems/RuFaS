@@ -253,7 +253,7 @@ class RationManager:
         
         if udrm.milk_reduction_maximum == 0.0 and udrm.tolerance == 0.0 and not solution.success:
             ration = UserDefinedRationManager.make_ration_from_user_values(ration_percents, available_feeds, req)
-            ration_vals = ration_optimizer.get_ration_vals(cls.make_solution_from_fixed_ration(ration))
+            ration_vals = ration_optimizer.get_ration_vals(cls.make_solution_from_fixed_ration(ration), ration_config)
             return ration, ration_vals
 
         if str(pen.animal_combination) not in ['AnimalCombination.LAC_COW'] and not solution.success:
@@ -294,7 +294,7 @@ class RationManager:
         
         if fixed_ration:
             ration = UserDefinedRationManager.make_ration_from_user_values(ration_percents, available_feeds, req)
-            ration_vals = ration_optimizer.get_ration_vals(cls.make_solution_from_fixed_ration(ration))
+            ration_vals = ration_optimizer.get_ration_vals(cls.make_solution_from_fixed_ration(ration), ration_config)
         else:
             ration = cls.make_ration_from_solution(available_feeds, solution)
             ration_vals = ration_optimizer.get_ration_vals(solution.x, ration_config)

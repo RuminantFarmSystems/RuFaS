@@ -110,9 +110,9 @@ class RationOptimizer:
             limit_: A list of the limiting upper bounds for each feed (kg)
             cow_type_: A boolean which is True if cow is lactating, False else
         """
-        global price, n, NEmaint, NEa, NEpreg, NEl, NEg, MP_req, C_req, P_req, \
-            DMIest, TDN, DE, EE, is_fat, BW, calcium, phosphorus, NDF, type, \
-            is_wetforage, Kd, N_A, N_B, CP, dRUP, limit, cow_type
+        # global price, n, NEmaint, NEa, NEpreg, NEl, NEg, MP_req, C_req, P_req, \
+            # DMIest, TDN, DE, EE, is_fat, BW, calcium, phosphorus, NDF, type, \
+            # is_wetforage, Kd, N_A, N_B, CP, dRUP, limit, cow_type
 
         price = price_
         n = len(price)
@@ -189,87 +189,94 @@ class RationOptimizer:
         Args:
             x: The decision vector of the NLP
         """
-        global MEact
-        global TDNact
-        global DEact
-        DMI = sum(x)
+        # global MEact
+        # global TDNact
+        # global DEact
+        dry_matter_intake = sum(x)
         # Dietary TDN content, kg
         TotalTDN = sum(np.multiply(x, ration_config.TDN))
         TotalTDN = np.multiply(TotalTDN, 0.01)
         # [A.Cow.E.1]-[A.Heifer.E.1]
         # TDN concentration, %
-        if DMI != 0:
-            TDNconc = (TotalTDN / DMI) * 100
+        if dry_matter_intake != 0:
+            TDNconc = (TotalTDN / dry_matter_intake) * 100
         else:
             TDNconc = 0
-        SBW = BW * 0.96
+        somatic_BW = ration_config.BW * 0.96
         # [A.Cow.E.2]-[A.Heifer.E.2]
         # The amount of intake needed to meet the maintenance requirement, dimensionless
-        if TotalTDN < (0.035 * BW ** 0.75):
+        if TotalTDN < (0.035 * ration_config.BW ** 0.75):
             DMI_to_maint = 1
         else:
-            DMI_to_maint = (TotalTDN / (0.035 * SBW ** 0.75))
+            DMI_to_maint = (TotalTDN / (0.035 * somatic_BW ** 0.75))
         # [A.Cow.E.3]-[A.Heifer.E.3]
         # TDN discount, TDN digestibility decrease caused by DMI and TDNconc
         if TDNconc < 60:
             Discount = 1
         else:
             Discount = (TDNconc - ((0.18 * TDNconc - 10.3) * (DMI_to_maint - 1))) / TDNconc
+        ration_config.Discount = Discount
         # [A.Cow.E.4]-[A.Heifer.E.4]
         # Actual TDN content of feed i, %
-        TDNact = np.multiply(TDN, Discount)
+        ration_config.TDNact = np.multiply(ration_config.TDN, Discount)
         # [A.Cow.E.5]-[A.Heifer.E.5]
         # Actual digestible energy of feed i, Mcal/kg
-        DEact = np.multiply(DE, Discount)
+        DEact = np.multiply(ration_config.DE, Discount)
+        ration_config.DEact = DEact
         # [A.Cow.E.6]-[A.Heifer.E.6]
         # Actual metabolizable energy of feed i, Mcal/kg
         MEact = []
         for i in range(len(DEact)):
-            if type[i] == 'Mineral':
+            if ration_config.type[i] == 'Mineral':
                 MEact.append(0)
-            elif is_fat[i] == 1:
-                MEact.append(DE[i])
-            elif EE[i] >= 3:
-                MEact.append(1.01 * DEact[i] - 0.45 + 0.0046 * (EE[i] - 3))
+            elif ration_config.is_fat[i] == 1:
+                MEact.append(ration_config.DE[i])
+            elif ration_config.EE[i] >= 3:
+                MEact.append(1.01 * DEact[i] - 0.45 + 0.0046 * (ration_config.EE[i] - 3))
             else:
                 MEact.append(1.01 * DEact[i] - 0.45)
+        ration_config.MEact = MEact
         # [A.Cow.E.8]-[A.Heifer.E.8]
         # Actual net energy for maintenance of feed i, Mcal/kg
         NEm_act = []
         for i in range(len(MEact)):
-            if is_fat[i] == 1:
+            if ration_config.is_fat[i] == 1:
                 NEm_act.append(0.8 * MEact[i])
             else:
                 NEm_act.append(1.37 * MEact[i] - 0.138 * MEact[i] ** 2 + 0.0105 * MEact[i] ** 3 - 1.12)
+        ration_config.NEm_act = NEm_act
 
         # Actual net energy for lactation of feed i, Mcal/kg
         NElact = []
         # [A.Cow.E.7]-[A.Heifer.E.7]
         for i in range(len(MEact)):
-            if type[i] == 'Mineral':
+            if ration_config.type[i] == 'Mineral':
                 NElact.append(0)
-            elif is_fat[i] == 1:
+            elif ration_config.is_fat[i] == 1:
                 NElact.append(0.8 * DEact[i])
-            elif EE[i] >= 3:
-                NElact.append(0.703 * MEact[i] - 0.19 + ((0.097 * MEact[i] + 0.19) / 97) * (EE[i] - 3))
+            elif ration_config.EE[i] >= 3:
+                NElact.append(0.703 * MEact[i] - 0.19 + ((0.097 * MEact[i] + 0.19) / 97) * (ration_config.EE[i] - 3))
             else:
                 NElact.append(0.703 * MEact[i] - 0.19)
+        ration_config.NElact = NElact
 
         # Actual net energy for growth of feed i, Mcal/kg
         NEgact = []
         # [A.Cow.E.9]-[A.Heifer.E.9]
         for i in range(len(MEact)):
-            if type[i] == 'Mineral':
+            if ration_config.type[i] == 'Mineral':
                 NEgact.append(0)
-            elif is_fat[i] == 1:
+            elif ration_config.is_fat[i] == 1:
                 NEgact.append(0.55 * MEact[i])
             else:
                 NEgact.append(1.42 * MEact[i] - 0.174 * MEact[i] ** 2 + 0.0122 * MEact[i] ** 3 - 1.65)
+        ration_config.NEgact = NEgact
 
-        NEl_constraint= sum(np.multiply(x, NElact)) 
-        NEm_act_constraint = (sum(np.multiply(x, NEm_act)))
-        NEg_constraint = sum(np.multiply(x, NEgact))
-        all_req = NEl + NEg + NEmaint + NEa + NEpreg
+        NEl_constraint= sum(np.multiply(x, ration_config.NElact)) 
+        NEm_act_constraint = (sum(np.multiply(x, ration_config.NEm_act)))
+        NEg_constraint = sum(np.multiply(x, ration_config.NEgact))
+
+        all_req = ration_config.NEl + ration_config.NEg + ration_config.NEmaint + ration_config.NEa + ration_config.NEpreg
         return max(NEm_act_constraint, NEl_constraint, NEg_constraint) - all_req
     
 
@@ -283,24 +290,24 @@ class RationOptimizer:
         Args:
             x: The decision vector of the NLP
         """
-        global MEact
-        global TDNact
-        global DEact
+        # global MEact
+        # global TDNact
+        # global DEact
         # DMI calculated by the NLP
-        DMI = sum(x)
+        dry_matter_intake = sum(x)
         # Dietary TDN content, kg
-        TotalTDN = sum(np.multiply(x, TDN))
+        TotalTDN = sum(np.multiply(x, ration_config.TDN))
         TotalTDN = np.multiply(TotalTDN, 0.01)
         # [A.Cow.E.1]-[A.Heifer.E.1]
         # TDN concentration, %
-        if DMI != 0:
-            TDNconc = (TotalTDN / DMI) * 100
+        if dry_matter_intake != 0:
+            TDNconc = (TotalTDN / dry_matter_intake) * 100
         else:
             TDNconc = 0
-        SBW = BW * 0.96
+        SBW = ration_config.BW * 0.96
         # [A.Cow.E.2]-[A.Heifer.E.2]
         # The amount of intake needed to meet the maintenance requirement, dimensionless
-        if TotalTDN < (0.035 * BW ** 0.75):
+        if TotalTDN < (0.035 * ration_config.BW ** 0.75):
             DMI_to_maint = 1
         else:
             DMI_to_maint = (TotalTDN / (0.035 * SBW ** 0.75))
@@ -316,30 +323,33 @@ class RationOptimizer:
         # [A.Cow.E.5]-[A.Heifer.E.5]
         # Actual digestible energy of feed i, Mcal/kg
         DEact = np.multiply(ration_config.DE, ration_config.Discount)
+        ration_config.DEact = DEact 
         # [A.Cow.E.6]-[A.Heifer.E.6]
         # Actual metabolizable energy of feed i, Mcal/kg
-        MEact = []
-        for i in range(len(DEact)):
-            if type[i] == 'Mineral':
-                MEact.append(0)
-            elif is_fat[i] == 1:
-                MEact.append(DE[i])
-            elif EE[i] >= 3:
-                MEact.append(1.01 * DEact[i] - 0.45 + 0.0046 * (EE[i] - 3))
-            else:
-                MEact.append(1.01 * DEact[i] - 0.45)
-        ration_config.MEact = MEact
+        if not ration_config.MEact:
+            MEact = []
+            for i in range(len(DEact)):
+                if ration_config.type[i] == 'Mineral':
+                    MEact.append(0)
+                elif ration_config.is_fat[i] == 1:
+                    MEact.append(ration_config.DE[i])
+                elif ration_config.EE[i] >= 3:
+                    MEact.append(1.01 * DEact[i] - 0.45 + 0.0046 * (ration_config.EE[i] - 3))
+                else:
+                    MEact.append(1.01 * DEact[i] - 0.45)
+            ration_config.MEact = MEact
         # [A.Cow.E.8]-[A.Heifer.E.8]
         # Actual net energy for maintenance of feed i, Mcal/kg
-        NEm_act = []
-        for i in range(len(MEact)):
-            if is_fat[i] == 1:
-                NEm_act.append(0.8 * MEact[i])
-            else:
-                NEm_act.append(1.37 * MEact[i] - 0.138 * MEact[i] ** 2 + 0.0105 * MEact[i] ** 3 - 1.12)
-        ration_config.NEm_act = NEm_act
+        if not ration_config.NEm_act:
+            NEm_act = []
+            for i in range(len(MEact)):
+                if ration_config.is_fat[i] == 1:
+                    NEm_act.append(0.8 * MEact[i])
+                else:
+                    NEm_act.append(1.37 * MEact[i] - 0.138 * MEact[i] ** 2 + 0.0105 * MEact[i] ** 3 - 1.12)
+            ration_config.NEm_act = NEm_act
         # returning the NEm_act constraint in the NLP
-        return (sum(np.multiply(x, ration_config.NEm_act)) - (NEmaint + NEa))
+        return (sum(np.multiply(x, ration_config.NEm_act)) - (ration_config.NEmaint + ration_config.NEa))
 
 
     def NEl_constraint(self, x, ration_config):
@@ -353,19 +363,21 @@ class RationOptimizer:
             x: The decision vector of the NLP
         """
         # Actual net energy for lactation of feed i, Mcal/kg
-        ration_config.NElact = []
-        # [A.Cow.E.7]-[A.Heifer.E.7]
-        for i in range(len(ration_config.MEact)):
-            if type[i] == 'Mineral':
-                ration_config.NElact.append(0)
-            elif is_fat[i] == 1:
-                ration_config.NElact.append(0.8 * ration_config.DEact[i])
-            elif ration_config.EE[i] >= 3:
-                ration_config.NElact.append(0.703 * ration_config.MEact[i] - 0.19 + ((0.097 * ration_config.MEact[i] + 0.19) / 97) * (ration_config.EE[i] - 3))
-            else:
-                ration_config.NElact.append(0.703 * ration_config.MEact[i] - 0.19)
-        # returning the NElact constraint in the NLP
-        return sum(np.multiply(x, ration_config.NElact)) - (NEpreg + NEl)
+        if not ration_config.NElact:
+            NElact = []
+            # [A.Cow.E.7]-[A.Heifer.E.7]
+            for i in range(len(ration_config.MEact)):
+                if ration_config.type[i] == 'Mineral':
+                    NElact.append(0)
+                elif ration_config.is_fat[i] == 1:
+                    NElact.append(0.8 * ration_config.DEact[i])
+                elif ration_config.EE[i] >= 3:
+                    NElact.append(0.703 * ration_config.MEact[i] - 0.19 + ((0.097 * ration_config.MEact[i] + 0.19) / 97) * (ration_config.EE[i] - 3))
+                else:
+                    NElact.append(0.703 * ration_config.MEact[i] - 0.19)
+            ration_config.NElact = NElact
+            # returning the NElact constraint in the NLP
+        return sum(np.multiply(x, ration_config.NElact)) - (ration_config.NEpreg + ration_config.NEl)
 
 
     def NEgact_constraint(self, x, ration_config):
@@ -379,18 +391,19 @@ class RationOptimizer:
             x: The decision vector of the NLP
         """
         # Actual net energy for growth of feed i, Mcal/kg
-        NEgact = []
-        # [A.Cow.E.9]-[A.Heifer.E.9]
-        for i in range(len(ration_config.MEact)):
-            if type[i] == 'Mineral':
-                NEgact.append(0)
-            elif is_fat[i] == 1:
-                NEgact.append(0.55 * ration_config.MEact[i])
-            else:
-                NEgact.append(1.42 * ration_config.MEact[i] - 0.174 * ration_config.MEact[i] ** 2 + 0.0122 * ration_config.MEact[i] ** 3 - 1.65)
-        ration_config.NEgact = NEgact
+        if not ration_config.NEgact:
+            NEgact = []
+            # [A.Cow.E.9]-[A.Heifer.E.9]
+            for i in range(len(ration_config.MEact)):
+                if ration_config.type[i] == 'Mineral':
+                    NEgact.append(0)
+                elif ration_config.is_fat[i] == 1:
+                    NEgact.append(0.55 * ration_config.MEact[i])
+                else:
+                    NEgact.append(1.42 * ration_config.MEact[i] - 0.174 * ration_config.MEact[i] ** 2 + 0.0122 * ration_config.MEact[i] ** 3 - 1.65)
+            ration_config.NEgact = NEgact
         # returning the NEgact constraint in the NLP
-        return sum(np.multiply(x, ration_config.NEgact)) - NEg
+        return sum(np.multiply(x, ration_config.NEgact)) - ration_config.NEg
 
 
     def calcium_constraint(self, x, ration_config):
@@ -405,17 +418,17 @@ class RationOptimizer:
         """
         # Ca digestibility of feed i (proportion of Ca)
         ration_config.dCa = []
-        for i in range(len(type)):
-            if type[i] == 'Forage':
+        for i in range(len(ration_config.type)):
+            if ration_config.type[i] == 'Forage':
                 ration_config.dCa.append(.3)
-            elif type[i] == 'Conc':
+            elif ration_config.type[i] == 'Conc':
                 ration_config.dCa.append(.6)
-            elif type[i] == 'Mineral':
+            elif ration_config.type[i] == 'Mineral':
                 ration_config.dCa.append(.95)
             else:
                 ration_config.dCa.append(0)
         # [A.Cow.E.16]-[A.Heifer.E.16]
-        return (sum(np.multiply(x, np.multiply(np.multiply(ration_config.calcium, 0.01), ration_config.dCa))) - (C_req / 1000))
+        return (sum(np.multiply(x, np.multiply(np.multiply(ration_config.calcium, 0.01), ration_config.dCa))) - (ration_config.C_req / 1000))
 
 
     def phosphorus_constraint(self, x, ration_config):
@@ -432,16 +445,16 @@ class RationOptimizer:
         """
         # P digestibility of feed i (proportion of P)
         ration_config.dP = []
-        for i in range(len(type)):
-            if type[i] == 'Forage':
+        for i in range(len(ration_config.type)):
+            if ration_config.type[i] == 'Forage':
                 ration_config.dP.append(.64)
-            elif type[i] == 'Conc':
+            elif ration_config.type[i] == 'Conc':
                 ration_config.dP.append(.70)
-            elif type[i] == 'Mineral':
+            elif ration_config.type[i] == 'Mineral':
                 ration_config.dP.append(0.80)
             else:
                 ration_config.dP.append(0)
-        return sum(np.multiply(x, np.multiply(np.multiply(ration_config.phosphorus, 0.01), ration_config.dP))) - ((P_req) / 1000)
+        return sum(np.multiply(x, np.multiply(np.multiply(ration_config.phosphorus, 0.01), ration_config.dP))) - ((ration_config.P_req) / 1000)
 
 
     def protein_constraint(self, x, ration_config):
@@ -458,7 +471,7 @@ class RationOptimizer:
         # Boolean values to identify if feed is a concentrate
         ration_config.is_conc = []
         for i in range(len(ration_config.type)):
-            if type[i] == 'Conc':
+            if ration_config.type[i] == 'Conc':
                 ration_config.is_conc.append(1)
             else:
                 ration_config.is_conc.append(0)
@@ -470,10 +483,10 @@ class RationOptimizer:
         # [A.Cow.E.10]-[A.Heifer.E.10]
         # Protein passage rate of feed i (%/h)
         Kp = []
-        for i in range(len(type)):
-            if type[i] == 'Conc':
+        for i in range(len(ration_config.type)):
+            if ration_config.type[i] == 'Conc':
                 Kp.append(2.904 + 1.375 * (DMI / ration_config.BW) * 100 - 0.02 * PercentConc)
-            elif type[i] == 'Forage' and ration_config.is_wetforage[i] == 0:
+            elif ration_config.type[i] == 'Forage' and ration_config.is_wetforage[i] == 0:
                 Kp.append(3.362 + 0.479 * (DMI / ration_config.BW) * 100 - 0.017 * ration_config.NDF[i] - 0.007 * PercentConc)
             elif ration_config.is_wetforage[i] == 1:
                 Kp.append(3.054 + 0.614 * (DMI / ration_config.BW) * 100)
@@ -506,9 +519,9 @@ class RationOptimizer:
         ration_config.RUP_diet = sum(np.multiply(x, np.multiply(np.multiply(ration_config.RUP, 0.01), np.multiply(ration_config.dRUP, 0.01))))
         # [A.Cow.E.15]
         # Total metabolizable protein supply
-        MP_supply = ration_config.MPbact + ration_config.RUP_diet + 0.4 * 11.8 * DMI
+        ration_config.MP_supply = ration_config.MPbact + ration_config.RUP_diet + 0.4 * 11.8 * DMI
 
-        return (MP_supply - (MP_req / 1000))
+        return (ration_config.MP_supply - (ration_config.MP_req / 1000))
 
 
     def NDF_constraint_lower(self, x, ration_config):
@@ -551,7 +564,7 @@ class RationOptimizer:
         # From E/D: OTHER REQUIREMENTS
         is_forage = []
         for i in range(len(ration_config.type)):
-            if type[i] == 'Forage':
+            if ration_config.type[i] == 'Forage':
                 is_forage.append(1)
             else:
                 is_forage.append(0)
@@ -683,7 +696,7 @@ class RationOptimizer:
         """
         arguments = (ration_config,)
         self.set_constraints(arguments = arguments)
-        n = len(price)
+        n = len(ration_config.price)
         x0 = [1]
         for i in range(n-1):
             x0.append(random.random() * 10)
@@ -692,11 +705,11 @@ class RationOptimizer:
 
         # Dividing limit by 3 for tri-decision variables for farm grown feeds
         if udrm.udr_or_not:
-            bnds = self.make_user_bounds(UserDefinedRationManager.ration_to_use(animal_combination, available_feeds), DMIest)
+            bnds = self.make_user_bounds(UserDefinedRationManager.ration_to_use(animal_combination, available_feeds), ration_config.DMIest)
             x0 = [np.mean(bnd) for bnd in bnds]
         else:    
             bnds = []
-            bnds = [(0, (lim / 3) + 0.0001) for lim in limit]
+            bnds = [(0, (lim / 3) + 0.0001) for lim in ration_config.limit]
         if udrm.udr_or_not:
             if str(animal_combination) in ['AnimalCombination.LAC_COW']:
                 usermod = minimize(self.objective, x0, method='SLSQP', bounds=bnds, constraints=self.cow_cons, args = arguments)
@@ -745,12 +758,12 @@ class RationOptimizer:
         else:
             limit = self.list_reconfig(available_feeds['dry_cow_limit'])
             cow_type = False
-        self.set_globals(price, requirements.NEmaint, requirements.NEa, requirements.NEpreg,
-                        requirements.NEl, requirements.NEg, requirements.MP_req,
-                        requirements.Ca_req, requirements.P_req,
-                        TDN, DE, EE, is_fat, requirements.avg_BW, calcium, phosphorus, NDF,
-                        feed_type, is_wetforage, Kd, N_A, N_B, CP, dRUP, limit, cow_type,
-                        DMIest_=requirements.DMIest)
+        # self.set_globals(price, requirements.NEmaint, requirements.NEa, requirements.NEpreg,
+        #                 requirements.NEl, requirements.NEg, requirements.MP_req,
+        #                 requirements.Ca_req, requirements.P_req,
+        #                 TDN, DE, EE, is_fat, requirements.avg_BW, calcium, phosphorus, NDF,
+        #                 feed_type, is_wetforage, Kd, N_A, N_B, CP, dRUP, limit, cow_type,
+        #                 DMIest_=requirements.DMIest)
         ration_config = RationConfig(price, requirements.NEmaint, requirements.NEa, requirements.NEpreg,
                         requirements.NEl, requirements.NEg, requirements.MP_req,
                         requirements.Ca_req, requirements.P_req,
@@ -766,9 +779,9 @@ class RationOptimizer:
             except Exception as e:
                 i -= 1
                 info_map = {"class": "RationOptimizer", 
-                            "function": self.optimization.__name__,
+                            "function": self.attempt_optimization.__name__,
                             }
-                om.add_error('SLSQP error', e.message, info_map)
+                om.add_error('SLSQP error', 'whoops', info_map)
             finally:
                 i += 1
                 count += 1
