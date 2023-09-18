@@ -49,25 +49,13 @@ class Infiltration:
         third_moisture_condition_parameter = self._determine_third_moisture_condition_parameter(
                                                                         self.data.second_moisture_condition_parameter)
 
-        # --- adjust moisture condition parameters for slope of soil, if necessary -------------------------------------
-        if abs(self.data.average_subbasin_slope - 0.05) != 0:
-            adjusted_second_moisture_condition_parameter = self._determine_second_moisture_condition_adjusted(
-                                                                        self.data.average_subbasin_slope,
-                                                                        self.data.second_moisture_condition_parameter,
-                                                                        third_moisture_condition_parameter)
-            adjusted_third_moisture_condition_parameter = self._determine_third_moisture_condition_parameter(
-                                                                        adjusted_second_moisture_condition_parameter)
-        else:
-            adjusted_second_moisture_condition_parameter = self.data.second_moisture_condition_parameter
-            adjusted_third_moisture_condition_parameter = third_moisture_condition_parameter
-        # --------------------------------------------------------------------------------------------------------------
-        adjusted_first_moisture_condition_parameter = self._determine_first_moisture_condition_parameter(
-                                                                        adjusted_second_moisture_condition_parameter)
+        first_moisture_condition_parameter = self._determine_first_moisture_condition_parameter(
+                                                                        self.data.second_moisture_condition_parameter)
 
         first_moisture_condition_retention_parameter = self._determine_retention_parameter_for_moisture_condition(
-                                                                            adjusted_first_moisture_condition_parameter)
+                                                                            first_moisture_condition_parameter)
         third_moisture_condition_retention_parameter = self._determine_retention_parameter_for_moisture_condition(
-                                                                            adjusted_third_moisture_condition_parameter)
+                                                                            third_moisture_condition_parameter)
 
         profile_saturation = self.data.profile_saturation
         profile_field_capacity = self.data.profile_field_capacity
@@ -128,8 +116,7 @@ class Infiltration:
         """
         top = 20 * (100 - second_moisture_condition)
         bottom = (100 - second_moisture_condition + exp(2.533 - 0.0636 * (100 - second_moisture_condition)))
-        first_moisture_condition_parameter = second_moisture_condition - (top / bottom)
-        return max(1.0, first_moisture_condition_parameter)
+        return second_moisture_condition - (top / bottom)
 
     @staticmethod
     def _determine_third_moisture_condition_parameter(second_moisture_condition: float):

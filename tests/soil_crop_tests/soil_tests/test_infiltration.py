@@ -21,7 +21,6 @@ def test_determine_curve_number_1(curve_num_2):
     observe = Infiltration._determine_first_moisture_condition_parameter(curve_num_2)
     expect = curve_num_2 - ((20 * (100 - curve_num_2)) /
                             (100 - curve_num_2 + exp(2.533 - (0.0636 * (100 - curve_num_2)))))
-    expect = max(1.0, expect)
     assert expect == observe
 
 
@@ -234,12 +233,8 @@ def test_infiltrate(average_subbasin_slope: float, rainfall: float, is_top_froze
     incorp.infiltrate(rainfall, coefficient, potential_evapotranspiration)
     expected_infiltrated_water = max(0.0, rainfall - 0.95)
     # assertions
-    if average_subbasin_slope == 0.05:
-        assert incorp._determine_third_moisture_condition_parameter.call_count == 1
-        assert incorp._determine_second_moisture_condition_adjusted.call_count == 0
-    else:
-        assert incorp._determine_third_moisture_condition_parameter.call_count == 2
-        assert incorp._determine_second_moisture_condition_adjusted.call_count == 1
+    assert incorp._determine_third_moisture_condition_parameter.call_count == 1
+    assert incorp._determine_second_moisture_condition_adjusted.call_count == 0
     assert incorp._determine_first_moisture_condition_parameter.call_count == 1
     assert incorp._determine_retention_parameter_for_moisture_condition.call_count == 2
     assert incorp._determine_second_shape_coefficient.call_count == 1
