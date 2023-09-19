@@ -438,38 +438,85 @@ def test_crop_schedule_setup(crop_schedule_config: Dict, expected: List[CropSche
         patched_get_data.assert_called_once_with("test_crop_schedule.crop_schedules")
 
 
-@pytest.mark.parametrize("field_size,top,sand,silt,residue,nitrogen_mineralization,config,expected", [
-    (1.3, 0.0, 15, 65, 0.0, 0.05,
-     {"bottom_depth": 279.4, "wilting_point": 0.1, "field_capacity": 0.29, "saturation": 0.58, "K_sat": 20.0,
-      "clay": 22.5, "initial_temperature": 0.0, "bulk_density": 1.34, "org_C_percent": 0.012, "NH4": 1,
-      "active_N_percent": 0.02, "labile_P": 23.7, "active_mineral_rate": 0.0003, "volatile_exchange_factor": 0.15,
-      "denitrification_rate": 0.1, "soil_water_percent": 0.3, "OM_percent": 0.019},
-     LayerData(field_size=1.3, top_depth=0.0, bottom_depth=279.4, wilting_point_water_concentration=0.1,
+@pytest.mark.parametrize("field_size,top,residue,config,expected", [
+    (1.3, 0.0, 0.0,
+     {
+         "bottom_depth": 279.4,
+         "soil_water_concentration": 0.3,
+         "wilting_point_water_concentration": 0.23,
+         "field_capacity_water_concentration": 0.29,
+         "saturation_point_water_concentration": 0.58,
+         "saturated_hydraulic_conductivity": 9.17,
+         "initial_temperature": 15.77575,
+         "bulk_density": 1.34,
+         "percent_organic_carbon_content": 0.012,
+         "percent_clay_content": 21.95,
+         "percent_silt_content": 63.42,
+         "percent_sand_content": 14.63,
+         "percent_rock_content": 0.0,
+         "initial_labile_inorganic_phosphorus_concentration": 2.7,
+         "initial_fresh_organic_phosphorus_concentration": 0.0,
+         "initial_soil_nitrate_concentration": 1,
+         "initial_soil_ammonium_concentration": 1,
+         "humus_mineralization_rate_factor": 0.0003,
+         "ammonium_volatilization_cation_exchange_factor": 0.15,
+         "denitrification_rate_coefficient": 1.4,
+         "denitrification_threshold_water_content": 1.1,
+         "residue_fresh_organic_mineralization_rate": 0.05,
+         "denitrification_rate": 0.1,
+         "active_N_percent": 0.02,
+         "OM_percent": 0.04
+     },
+     LayerData(field_size=1.3, top_depth=0.0, bottom_depth=279.4, wilting_point_water_concentration=0.23,
                field_capacity_water_concentration=0.29, saturation_point_water_concentration=0.58,
-               saturated_hydraulic_conductivity=20.0, percent_clay_content=22.5, temperature=0.0, bulk_density=1.34,
-               percent_organic_carbon_content=0.012, initial_soil_ammonium_concentration=1.0,
-               initial_soil_nitrate_concentration=None, initial_labile_inorganic_phosphorus_concentration=23.7,
+               saturated_hydraulic_conductivity=9.17, percent_clay_content=21.95, temperature=15.77575,
+               bulk_density=1.34, percent_organic_carbon_content=0.012, initial_soil_ammonium_concentration=1.0,
+               initial_soil_nitrate_concentration=1.0, initial_labile_inorganic_phosphorus_concentration=2.7,
                humus_mineralization_rate_factor=0.0003, ammonium_volatilization_cation_exchange_factor=0.15,
-               denitrification_rate_coefficient=0.1, soil_water_concentration=0.3, percent_sand_content=15.0,
-               percent_silt_content=65.0, residue=0.0, residue_fresh_organic_mineralization_rate=0.05)),
-    (2.2, 279.4, 15, 65, 0.0, 0.05,
-     {"bottom_depth": 1041.4, "wilting_point": 0.163, "field_capacity": 0.306, "saturation": 0.5, "K_sat": 9.17,
-      "clay": 30, "initial_temperature": 14.50797297, "bulk_density": 1.42, "org_C_percent": 0.012, "NH4": 1, "N03": 1,
-      "active_N_percent": 0.02, "labile_P": 2.7, "active_mineral_rate": 0.0003, "volatile_exchange_factor": 0.15,
-      "denitrification_rate": 0.1, "soil_water_percent": 0.3, "OM_percent": 0.006},
+               denitrification_rate_coefficient=1.4, soil_water_concentration=0.3, percent_sand_content=14.63,
+               percent_silt_content=63.42, percent_rock_content=0.0, residue=0.0,
+               residue_fresh_organic_mineralization_rate=0.05)),
+    (2.2, 279.4, 0.0,
+     {
+         "bottom_depth": 1041.4,
+         "soil_water_concentration": 0.3,
+         "wilting_point_water_concentration": 0.163,
+         "field_capacity_water_concentration": 0.306,
+         "saturation_point_water_concentration": 0.5,
+         "saturated_hydraulic_conductivity": 9.17,
+         "initial_temperature": 14.50797297,
+         "bulk_density": 1.42,
+         "percent_organic_carbon_content": 0.012,
+         "percent_clay_content": 27.27,
+         "percent_silt_content": 59.09,
+         "percent_sand_content": 13.64,
+         "percent_rock_content": 0.0,
+         "initial_labile_inorganic_phosphorus_concentration": 2.7,
+         "initial_fresh_organic_phosphorus_concentration": 0.0,
+         "initial_soil_nitrate_concentration": 1,
+         "initial_soil_ammonium_concentration": 1,
+         "humus_mineralization_rate_factor": 0.0003,
+         "ammonium_volatilization_cation_exchange_factor": 0.15,
+         "denitrification_rate_coefficient": 1.4,
+         "denitrification_threshold_water_content": 1.1,
+         "residue_fresh_organic_mineralization_rate": 0.05,
+         "denitrification_rate": 0.1,
+         "active_N_percent": 0.02,
+         "OM_percent": 0.006
+     },
      LayerData(field_size=2.2, top_depth=279.4, bottom_depth=1041.4, wilting_point_water_concentration=0.163,
                field_capacity_water_concentration=0.306, saturation_point_water_concentration=0.5,
-               saturated_hydraulic_conductivity=9.17, percent_clay_content=30, temperature=14.50797297,
+               saturated_hydraulic_conductivity=9.17, percent_clay_content=27.27, temperature=14.50797297,
                bulk_density=1.42, percent_organic_carbon_content=0.012, initial_soil_ammonium_concentration=1,
                initial_soil_nitrate_concentration=1, initial_labile_inorganic_phosphorus_concentration=2.7,
                humus_mineralization_rate_factor=0.0003, ammonium_volatilization_cation_exchange_factor=0.15,
-               denitrification_rate_coefficient=0.1, soil_water_concentration=0.3, percent_sand_content=15.0,
-               percent_silt_content=65.0, residue=0.0, residue_fresh_organic_mineralization_rate=0.05))
+               denitrification_rate_coefficient=1.4, soil_water_concentration=0.3, percent_sand_content=13.64,
+               percent_silt_content=59.09, percent_rock_content=0.0, residue=0.0,
+               residue_fresh_organic_mineralization_rate=0.05))
 ])
-def test_setup_soil_layer(field_size: float, top: float, sand: float, silt: float, residue: float,
-                          nitrogen_mineralization: float, config: Dict, expected: LayerData) -> None:
+def test_setup_soil_layer(field_size: float, top: float, residue: float, config: Dict, expected: LayerData) -> None:
     """Tests that LayerData instances are configured correctly with a given specification."""
-    actual = FieldManager._setup_soil_layer(field_size, top, sand, silt, residue, nitrogen_mineralization, config)
+    actual = FieldManager._setup_soil_layer(field_size, top, residue, config)
     assert actual == expected
 
 
@@ -483,202 +530,234 @@ def test_setup_soil_layer(field_size: float, top: float, sand: float, silt: floa
 def test_setup_soil_layer_error(config: Dict) -> None:
     """Tests that errors are thrown correctly when not enough information is provided to create one."""
     with pytest.raises(ValueError) as e:
-        FieldManager._setup_soil_layer(1.0, 0.0, 65.0, 15.0, 0.0, 0.05, config)
+        FieldManager._setup_soil_layer(1.0, 0.0, 0.0, config)
     assert str(e.value) == "Bottom depth is required for each soil layer."
 
 
 @pytest.mark.parametrize("soil_configuration", [
     {
-        "CN2": 85.00,
-        "field_slope": 0.02,
+        "second_moisture_condition_parameter": 85.00,
+        "average_subbasin_slope": 0.02,
         "slope_length": 3,
-        "manning": 0.4,
-        "field_size": 1.0,
-        "sand": 15,
-        "silt": 65,
-        "soil_albedo": 0.16,
+        "manning_roughness_coefficient": 0.4,
+        "support_practice_factor": 0.8,
+        "albedo": 0.16,
+        "soil_evaporation_compensation_coefficient": 0.95,
         "initial_residue": 0,
-        "fresh_N_mineral_rate": 0.05,
-        "soil_cover_type": "BARE",
         "soil_layers":
-            {
-                "layer_1":
-                    {
-                        "bottom_depth": 279.4,
-                        "wilting_point": 0.23,
-                        "field_capacity": 0.29,
-                        "saturation": 0.58,
-                        "K_sat": 9.17,
-                        "clay": 22.5,
-                        "initial_temperature": 15.77575,
-                        "bulk_density": 1.34,
-                        "org_C_percent": 0.012,
-                        "NH4": 1,
-                        "N03": 1,
-                        "active_N_percent": 0.02,
-                        "labile_P": 2.7,
-                        "active_mineral_rate": 0.0003,
-                        "volatile_exchange_factor": 0.15,
-                        "denitrification_rate": 0.1,
-                        "soil_water_percent": 0.3,
-                        "OM_percent": 0.04
-                    },
-                "layer_2":
-                    {
-                        "bottom_depth": 1041.4,
-                        "wilting_point": 0.163,
-                        "field_capacity": 0.306,
-                        "saturation": 0.5,
-                        "K_sat": 9.17,
-                        "clay": 30,
-                        "initial_temperature": 14.50797297,
-                        "bulk_density": 1.42,
-                        "org_C_percent": 0.012,
-                        "NH4": 1,
-                        "N03": 1,
-                        "active_N_percent": 0.02,
-                        "labile_P": 2.7,
-                        "active_mineral_rate": 0.0003,
-                        "volatile_exchange_factor": 0.15,
-                        "denitrification_rate": 0.1,
-                        "soil_water_percent": 0.3,
-                        "OM_percent": 0.006
-                    },
-                "layer_3":
-                    {
-                        "bottom_depth": 1168.4,
-                        "wilting_point": 0.151,
-                        "field_capacity": 0.298,
-                        "saturation": 0.5,
-                        "K_sat": 23.29,
-                        "clay": 23,
-                        "initial_temperature": 13.38623,
-                        "bulk_density": 1.6,
-                        "org_C_percent": 0.012,
-                        "NH4": 1,
-                        "N03": 1,
-                        "active_N_percent": 0.02,
-                        "labile_P": 2.7,
-                        "active_mineral_rate": 0.0003,
-                        "volatile_exchange_factor": 0.15,
-                        "denitrification_rate": 0.1,
-                        "soil_water_percent": 0.3,
-                        "OM_percent": 0.0025
-                    },
-                "layer_4":
-                    {
-                        "bottom_depth": 2006.6,
-                        "wilting_point": 0.132,
-                        "field_capacity": 0.211,
-                        "saturation": 0.5,
-                        "K_sat": 23.29,
-                        "clay": 12,
-                        "initial_temperature": 13.38623,
-                        "bulk_density": 1.5,
-                        "org_C_percent": 0.012,
-                        "NH4": 1,
-                        "N03": 1,
-                        "active_N_percent": 0.02,
-                        "labile_P": 2.7,
-                        "active_mineral_rate": 0.0003,
-                        "volatile_exchange_factor": 0.15,
-                        "denitrification_rate": 0.1,
-                        "soil_water_percent": 0.3,
-                        "OM_percent": 0.0025
-                    }
-            }
+            [
+                {
+                    "bottom_depth": 279.4,
+                    "soil_water_concentration": 0.3,
+                    "wilting_point_water_concentration": 0.23,
+                    "field_capacity_water_concentration": 0.29,
+                    "saturation_point_water_concentration": 0.58,
+                    "saturated_hydraulic_conductivity": 9.17,
+                    "initial_temperature": 15.77575,
+                    "bulk_density": 1.34,
+                    "percent_organic_carbon_content": 0.012,
+                    "percent_clay_content": 21.95,
+                    "percent_silt_content": 63.42,
+                    "percent_sand_content": 14.63,
+                    "percent_rock_content": 0.0,
+                    "initial_labile_inorganic_phosphorus_concentration": 2.7,
+                    "initial_fresh_organic_phosphorus_concentration": 0.0,
+                    "initial_soil_nitrate_concentration": 1,
+                    "initial_soil_ammonium_concentration": 1,
+                    "humus_mineralization_rate_factor": 0.0003,
+                    "ammonium_volatilization_cation_exchange_factor": 0.15,
+                    "denitrification_rate_coefficient": 1.4,
+                    "denitrification_threshold_water_content": 1.1,
+                    "residue_fresh_organic_mineralization_rate": 0.05,
+                    "denitrification_rate": 0.1,
+                    "active_N_percent": 0.02,
+                    "OM_percent": 0.04
+                },
+                {
+                    "bottom_depth": 1041.4,
+                    "soil_water_concentration": 0.3,
+                    "wilting_point_water_concentration": 0.163,
+                    "field_capacity_water_concentration": 0.306,
+                    "saturation_point_water_concentration": 0.5,
+                    "saturated_hydraulic_conductivity": 9.17,
+                    "initial_temperature": 14.50797297,
+                    "bulk_density": 1.42,
+                    "percent_organic_carbon_content": 0.012,
+                    "percent_clay_content": 27.27,
+                    "percent_silt_content": 59.09,
+                    "percent_sand_content": 13.64,
+                    "percent_rock_content": 0.0,
+                    "initial_labile_inorganic_phosphorus_concentration": 2.7,
+                    "initial_fresh_organic_phosphorus_concentration": 0.0,
+                    "initial_soil_nitrate_concentration": 1,
+                    "initial_soil_ammonium_concentration": 1,
+                    "humus_mineralization_rate_factor": 0.0003,
+                    "ammonium_volatilization_cation_exchange_factor": 0.15,
+                    "denitrification_rate_coefficient": 1.4,
+                    "denitrification_threshold_water_content": 1.1,
+                    "residue_fresh_organic_mineralization_rate": 0.05,
+                    "denitrification_rate": 0.1,
+                    "active_N_percent": 0.02,
+                    "OM_percent": 0.006
+                },
+                {
+                    "bottom_depth": 1168.4,
+                    "soil_water_concentration": 0.3,
+                    "wilting_point_water_concentration": 0.151,
+                    "field_capacity_water_concentration": 0.298,
+                    "saturation_point_water_concentration": 0.5,
+                    "saturated_hydraulic_conductivity": 23.29,
+                    "initial_temperature": 13.38623,
+                    "bulk_density": 1.6,
+                    "percent_organic_carbon_content": 0.012,
+                    "percent_clay_content": 22.33,
+                    "percent_silt_content": 63.11,
+                    "percent_sand_content": 14.56,
+                    "percent_rock_content": 0.0,
+                    "initial_labile_inorganic_phosphorus_concentration": 2.7,
+                    "initial_fresh_organic_phosphorus_concentration": 0.0,
+                    "initial_soil_nitrate_concentration": 1,
+                    "initial_soil_ammonium_concentration": 1,
+                    "humus_mineralization_rate_factor": 0.0003,
+                    "ammonium_volatilization_cation_exchange_factor": 0.15,
+                    "denitrification_rate_coefficient": 1.4,
+                    "denitrification_threshold_water_content": 1.1,
+                    "residue_fresh_organic_mineralization_rate": 0.05,
+                    "denitrification_rate": 0.1,
+                    "active_N_percent": 0.02,
+                    "OM_percent": 0.0025
+                },
+                {
+                    "bottom_depth": 2006.6,
+                    "soil_water_concentration": 0.3,
+                    "wilting_point_water_concentration": 0.132,
+                    "field_capacity_water_concentration": 0.211,
+                    "saturation_point_water_concentration": 0.5,
+                    "saturated_hydraulic_conductivity": 23.29,
+                    "initial_temperature": 13.38623,
+                    "bulk_density": 1.5,
+                    "percent_organic_carbon_content": 0.012,
+                    "percent_clay_content": 13.04,
+                    "percent_silt_content": 70.66,
+                    "percent_sand_content": 16.30,
+                    "percent_rock_content": 0.0,
+                    "initial_labile_inorganic_phosphorus_concentration": 2.7,
+                    "initial_fresh_organic_phosphorus_concentration": 0.0,
+                    "initial_soil_nitrate_concentration": 1,
+                    "initial_soil_ammonium_concentration": 1,
+                    "humus_mineralization_rate_factor": 0.0003,
+                    "ammonium_volatilization_cation_exchange_factor": 0.15,
+                    "denitrification_rate_coefficient": 1.4,
+                    "denitrification_threshold_water_content": 1.1,
+                    "residue_fresh_organic_mineralization_rate": 0.05,
+                    "denitrification_rate": 0.1,
+                    "active_N_percent": 0.02,
+                    "OM_percent": 0.0025
+                }
+            ]
     },
     {
-        "CN2": 85.00,
-        "field_slope": 0.02,
+        "second_moisture_condition_parameter": 85.00,
+        "average_subbasin_slope": 0.02,
         "slope_length": 3,
-        "manning": 0.4,
-        "field_size": 1.0,
-        "practice_factor": 0.08,
-        "sand": 15,
-        "silt": 65,
-        "soil_albedo": 0.16,
+        "manning_roughness_coefficient": 0.4,
+        "support_practice_factor": 0.08,
+        "albedo": 0.16,
+        "soil_evaporation_compensation_coefficient": 0.95,
         "initial_residue": 0,
-        "fresh_N_mineral_rate": 0.05,
-        "soil_cover_type": "BARE",
         "soil_layers":
-            {
-                "layer_1":
-                    {
-                        "bottom_depth": 150,
-                        "wilting_point": 0.1,
-                        "field_capacity": 0.30,
-                        "saturation": 0.5,
-                        "K_sat": 20,
-
-                        "clay": 20,
-                        "initial_temperature": 15.77575,
-                        "bulk_density": 1.3,
-                        "org_C_percent": 0.012,
-                        "NH4": 1,
-                        "active_N_percent": 0.02,
-                        "labile_P": 23.7,
-                        "active_mineral_rate": 0.0003,
-                        "volatile_exchange_factor": 0.15,
-                        "denitrification_rate": 0.1,
-                        "soil_water_percent": 0.3,
-                        "OM_percent": 0.019
-                    },
-                "layer_2":
-                    {
-                        "bottom_depth": 300,
-                        "wilting_point": 0.1,
-                        "field_capacity": 0.3,
-                        "saturation": 0.5,
-                        "K_sat": 20,
-
-                        "clay": 20,
-                        "initial_temperature": 14.50797297,
-                        "bulk_density": 1.3,
-                        "org_C_percent": 0.012,
-                        "NH4": 1,
-                        "active_N_percent": 0.02,
-                        "labile_P": 10,
-                        "active_mineral_rate": 0.0003,
-                        "volatile_exchange_factor": 0.15,
-                        "denitrification_rate": 0.1,
-                        "soil_water_percent": 0.3,
-                        "OM_percent": 0.019
-                    },
-                "layer_3":
-                    {
-                        "bottom_depth": 450,
-                        "wilting_point": 0.1,
-                        "field_capacity": 0.30,
-                        "saturation": 0.5,
-                        "K_sat": 20,
-
-                        "clay": 20,
-                        "initial_temperature": 13.38623,
-                        "bulk_density": 1.3,
-                        "org_C_percent": 0.012,
-                        "NH4": 1,
-                        "active_N_percent": 0.02,
-                        "labile_P": 10,
-                        "active_mineral_rate": 0.0003,
-                        "volatile_exchange_factor": 0.15,
-                        "denitrification_rate": 0.1,
-                        "soil_water_percent": 0.3,
-                        "OM_percent": 0.019
-                    }
-            }
+            [
+                {
+                    "bottom_depth": 150,
+                    "soil_water_concentration": 0.3,
+                    "wilting_point_water_concentration": 0.1,
+                    "field_capacity_water_concentration": 0.30,
+                    "saturation_point_water_concentration": 0.5,
+                    "saturated_hydraulic_conductivity": 20,
+                    "initial_temperature": 15.77575,
+                    "bulk_density": 1.3,
+                    "percent_organic_carbon_content": 0.012,
+                    "percent_clay_content": 20,
+                    "percent_silt_content": 65,
+                    "percent_sand_content": 15,
+                    "percent_rock_content": 0.0,
+                    "initial_labile_inorganic_phosphorus_concentration": 23.7,
+                    "initial_soil_nitrate_concentration": 0.0,
+                    "initial_soil_ammonium_concentration": 1,
+                    "humus_mineralization_rate_factor": 0.0003,
+                    "ammonium_volatilization_cation_exchange_factor": 0.15,
+                    "denitrification_rate_coefficient": 1.4,
+                    "denitrification_threshold_water_content": 1.1,
+                    "residue_fresh_organic_mineralization_rate": 0.05,
+                    "active_N_percent": 0.02,
+                    "denitrification_rate": 0.1,
+                    "OM_percent": 0.019
+                },
+                {
+                    "bottom_depth": 300,
+                    "soil_water_concentration": 0.3,
+                    "wilting_point_water_concentration": 0.1,
+                    "field_capacity_water_concentration": 0.3,
+                    "saturation_point_water_concentration": 0.5,
+                    "saturated_hydraulic_conductivity": 20,
+                    "initial_temperature": 14.50797297,
+                    "bulk_density": 1.3,
+                    "percent_organic_carbon_content": 0.012,
+                    "percent_clay_content": 20,
+                    "percent_silt_content": 65,
+                    "percent_sand_content": 15,
+                    "percent_rock_content": 0.0,
+                    "initial_labile_inorganic_phosphorus_concentration": 10,
+                    "initial_soil_nitrate_concentration": 0.0,
+                    "initial_soil_ammonium_concentration": 1,
+                    "humus_mineralization_rate_factor": 0.0003,
+                    "ammonium_volatilization_cation_exchange_factor": 0.15,
+                    "denitrification_rate_coefficient": 1.4,
+                    "denitrification_threshold_water_content": 1.1,
+                    "residue_fresh_organic_mineralization_rate": 0.05,
+                    "active_N_percent": 0.02,
+                    "denitrification_rate": 0.1,
+                    "OM_percent": 0.019
+                },
+                {
+                    "bottom_depth": 450,
+                    "soil_water_concentration": 0.3,
+                    "wilting_point_water_concentration": 0.1,
+                    "field_capacity_water_concentration": 0.30,
+                    "saturation_point_water_concentration": 0.5,
+                    "saturated_hydraulic_conductivity": 20,
+                    "initial_temperature": 13.38623,
+                    "bulk_density": 1.3,
+                    "percent_organic_carbon_content": 0.012,
+                    "percent_clay_content": 20,
+                    "percent_silt_content": 65,
+                    "percent_sand_content": 15,
+                    "percent_rock_content": 0.0,
+                    "initial_labile_inorganic_phosphorus_concentration": 10,
+                    "initial_soil_nitrate_concentration": 0.0,
+                    "initial_soil_ammonium_concentration": 1,
+                    "humus_mineralization_rate_factor": 0.0003,
+                    "ammonium_volatilization_cation_exchange_factor": 0.15,
+                    "denitrification_rate_coefficient": 1.4,
+                    "denitrification_threshold_water_content": 1.1,
+                    "residue_fresh_organic_mineralization_rate": 0.05,
+                    "active_N_percent": 0.02,
+                    "denitrification_rate": 0.1,
+                    "OM_percent": 0.019
+                }
+            ]
     }
 ])
 def test_setup_soil(soil_configuration: Dict) -> None:
     """Tests that Soil profiles are setup correctly with data from the InputManager."""
     with patch("RUFAS.input_manager.InputManager.get_data", return_value=soil_configuration) as patched_get_data:
         actual_soil = FieldManager._setup_soil("test_soil_setup", 1.0)
-        assert actual_soil.data.second_moisture_condition_parameter == soil_configuration.get("CN2")
-        assert actual_soil.data.average_subbasin_slope == soil_configuration.get("field_slope")
+        assert actual_soil.data.second_moisture_condition_parameter == \
+               soil_configuration.get("second_moisture_condition_parameter")
+        assert actual_soil.data.average_subbasin_slope == soil_configuration.get("average_subbasin_slope")
         assert actual_soil.data.slope_length == soil_configuration.get("slope_length")
-        assert actual_soil.data.average_subbasin_slope == soil_configuration.get("field_slope")
-        assert actual_soil.data.manning == soil_configuration.get("manning")
-        assert actual_soil.data.albedo == soil_configuration.get("soil_albedo")
+        assert actual_soil.data.manning == soil_configuration.get("manning_roughness_coefficient")
+        assert actual_soil.data.albedo == soil_configuration.get("albedo")
         assert len(actual_soil.data.soil_layers) == len(soil_configuration.get("soil_layers")) + 1
         patched_get_data.assert_called_once_with("test_soil_setup")
 
