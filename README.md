@@ -61,7 +61,7 @@ Revisit the Animal Module design – Refactoring -- Animal Ration formulation|Jo
 Revisit the Animal Module design – Refactoring -- Animal Life Cycle|Yijing, Simon, Anchey|Design phase|P0
 Deprecate the output handler, add missing functionalities, and reports to OM|Niko, Allister||P0
 Go through the entire codebase and ensure IM is the only way we are receiving input data|Allister, Niko||P0|[IM Integration tracking](https://docs.google.com/spreadsheets/d/1k8J6MelPrsrz6Tv4fQNAG-kLSN7oQTQOCEy3I6F0IqU/edit?usp=sharing)
-
+Revert soil profile properties and rewrite soil profile inputs|Ed||P1|[#773](https://github.com/RuminantFarmSystems/MASM/issues/773)
 
 SMEs:
 |Title|Owner|Status|Priority|Remarks|
@@ -70,6 +70,7 @@ Complete model evaluation||||Moved to Milestone 3
 Complete Sensitivity Analysis||||Moved to Milestone 3
 Complete External/Scientific Documentation for Animal, Manure, & EEE modules and put on GitHub|Varma, Joe, Haowen, Kristan, Jenn, Emmanuel||P1
 Complete Cohort 1 Pilot testing|Kristan, Haowen, Kat||P0
+Complete evaluation of soil temperature|Ed, Jenn, Matthew|In progress|P0|[#764](https://github.com/RuminantFarmSystems/MASM/issues/764)
 
 ## Milestone 2.5: Oct 31th
 [GitHub Milestone](https://github.com/RuminantFarmSystems/MASM/milestone/5)
@@ -79,11 +80,13 @@ Dev Team:
 |--|--|--|--|--|
 Redesign and implement the Feed storage module|Pooya, Kevin, Kristan||P1
 Refactor Animal Module -- Animal Manager|Joe||P0
+Rewrite and clean field input files in the `input/` directory|Ed, Matthew||P1|[#769](https://github.com/RuminantFarmSystems/MASM/issues/769) 
 
 SMEs:
 |Title|Owner|Status|Priority|Remarks|
 |--|--|--|--|--|
 Complete Cohort 1 Pilot testing|Kristan, Haowen, Kat||P0
+Complete evaluation of soil hydrology|Ed, Jenn, Matthew|In progress|P0|[#766](https://github.com/RuminantFarmSystems/MASM/issues/766)
 
 ## Milestone 3: Dec 31th
 [GitHub Milestone](https://github.com/RuminantFarmSystems/MASM/milestone/6)
@@ -104,7 +107,8 @@ SMEs:
 Complete External/Scientific Documentation for the Crop and Soil module|||P0
 Complete model evaluation using existing experimental data|||P2
 Complete Sensitivity Analysis of Animal Module|||P1
-Complete Sensitivity Analysis of Crop and Soil Module|||P1
+Complete Sensitivity Analysis of Crop and Soil Module|||P1|Should be moved to milestone after this.
+Complete full evaluation of Crop and Soil Module|Ed, Jenn, Matthew||P0|[#762](https://github.com/RuminantFarmSystems/MASM/issues/762)
 Initiate Sensitivity Analysis of Manure Module|||P1
 Complete Cohort 2 Pilot testing|||P0
 Develop standard reports recipe (at least one industry-facing and one scientist-facing)|||P1
