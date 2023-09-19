@@ -2319,8 +2319,8 @@
       "second_moisture_condition_parameter": {
         "type": "number",
         "description": "Curve number parameter for average moisture condition equation.\nUnitless.\nReference: SWAT Input .MGT - CN2.",
-        "minimum": 30,
-        "maximum": 100,
+        "minimum": 20,
+        "maximum": 99,
         "default": 85
       },
       "average_subbasin_slope": {
