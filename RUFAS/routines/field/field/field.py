@@ -893,8 +893,8 @@ class Field:
                                                           current_weather.max_air_temperature,
                                                           total_plant_cover,
                                                           snow_cover,
-                                                          current_weather.annual_mean_air_temperature)
-
+                                                          current_weather.annual_mean_air_temperature,
+                                                          time.day)
         self._cycle_water(current_weather, time)
 
         for crop in self.crops:

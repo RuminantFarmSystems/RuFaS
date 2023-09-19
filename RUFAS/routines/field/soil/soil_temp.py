@@ -26,7 +26,8 @@ class SoilTemp:
         self.data = soil_data or SoilData(field_size=field_size)
 
     def daily_soil_temperature_update(self, solar_radiation: float, avg_temp: float, min_temp: float, max_temp: float,
-                                      plant_cover: float, snow_cover: float, avg_annual_air_temp: float) -> None:
+                                      plant_cover: float, snow_cover: float, avg_annual_air_temp: float,
+                                      day: int) -> None:
         """this is the main routine that updates the soil temperature
 
         Args:
@@ -60,7 +61,10 @@ class SoilTemp:
         damping_depth = self._determine_damping_depth(max_damping_depth, scaling_factor)
         radiation_factor = self._determine_radiation_factor(solar_radiation, self.data.albedo)
         bare_soil_surface_temp = self._determine_bare_soil_surface_temp(radiation_factor, avg_temp, min_temp, max_temp)
-        cover_factor = self._determine_cover_weighting_factor(plant_cover, snow_cover)
+        if 59 < day < 334:
+            cover_factor = self._determine_cover_weighting_factor(plant_cover, snow_cover)
+        else:
+            cover_factor = 0.172
         if self.data.soil_layers[0].previous_day_temperature is None:
             self.data.soil_layers[0].previous_day_temperature = self.data.soil_layers[0].temperature
             self.data.soil_layers[1].previous_day_temperature = self.data.soil_layers[1].temperature
