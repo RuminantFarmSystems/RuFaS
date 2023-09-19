@@ -55,11 +55,11 @@ class FieldManager:
         current_weather = FieldManager._create_current_weather(weather=weather, time=time,
                                                                month=FieldManager._date_conversion_month(time))
         info_map["prefix"] = "Weather"
-        om.add_variable("average_temperature", current_weather.mean_air_temperature, info_map)
-        om.add_variable("minimum_temperature", current_weather.min_air_temperature, info_map)
-        om.add_variable("maximum_temperature", current_weather.max_air_temperature, info_map)
-        om.add_variable("annual_average_temperature", current_weather.annual_mean_air_temperature, info_map)
-        om.add_variable("rainfall", current_weather.rainfall, info_map)
+        om.add_variable("average_temperature(Celsius)", current_weather.mean_air_temperature, info_map)
+        om.add_variable("minimum_temperature(Celsius)", current_weather.min_air_temperature, info_map)
+        om.add_variable("maximum_temperature(Celsius)", current_weather.max_air_temperature, info_map)
+        om.add_variable("annual_average_temperature(Celsius)", current_weather.annual_mean_air_temperature, info_map)
+        om.add_variable("rainfall(mm)", current_weather.rainfall, info_map)
 
         for field in self.fields:
             month = FieldManager._date_conversion_month(time)
