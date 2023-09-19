@@ -168,11 +168,11 @@ class FieldManager:
 
         for blob_name, blob_values in blobs.items():
             try:
-                property = blob_values["properties"]
+                blob_property = blob_values["properties"]
             except KeyError:
                 raise KeyError(f"{blob_name} in metadata did not contain 'properties' value.")
 
-            if property == "field_properties":
+            if blob_property == "field_properties":
                 field_blob_names.append(blob_name)
 
         return field_blob_names
