@@ -367,16 +367,30 @@ class AnimalManager:
             calf.calc_nutrient_rqmts(feed, temp)
 
         for heiferI in self.heiferIs:
-            heiferI.set_nutrient_rqmts(temp, self.ANIMAL_GROUPING_SCENARIO)
+            pen = heiferI.pen_history[-1].pen
+            heiferI.set_nutrient_rqmts(temp, self.ANIMAL_GROUPING_SCENARIO,
+                                       nutrient_conc = self.all_pens[pen].ration_nutrient_conc,
+                                       metabolizable_energy = self.all_pens[pen].MEdiet,
+                                       previous_DMI = self.all_pens[pen].dry_matter_intake)
 
         for heiferII in self.heiferIIs:
-            heiferII.set_nutrient_rqmts(temp, self.ANIMAL_GROUPING_SCENARIO)
-
+            pen = heiferII.pen_history[-1].pen
+            heiferII.set_nutrient_rqmts(temp, self.ANIMAL_GROUPING_SCENARIO,
+                                       nutrient_conc = self.all_pens[pen].ration_nutrient_conc,
+                                       metabolizable_energy = self.all_pens[pen].MEdiet,
+                                       previous_DMI = self.all_pens[pen].dry_matter_intake)
+            
         for heiferIII in self.heiferIIIs:
-            heiferIII.set_nutrient_rqmts(temp, self.ANIMAL_GROUPING_SCENARIO)
-
+            pen = heiferIII.pen_history[-1].pen
+            heiferIII.set_nutrient_rqmts(temp, self.ANIMAL_GROUPING_SCENARIO,
+                                       nutrient_conc = self.all_pens[pen].ration_nutrient_conc,
+                                       metabolizable_energy = self.all_pens[pen].MEdiet,
+                                       previous_DMI = self.all_pens[pen].dry_matter_intake)
+            
         for cow in self.cows:
-            cow.set_nutrient_rqmts(self.ANIMAL_GROUPING_SCENARIO)
+            pen = cow.pen_history[-1].pen
+            cow.set_nutrient_rqmts(self.ANIMAL_GROUPING_SCENARIO,
+                                       nutrient_conc = self.all_pens[pen].ration_nutrient_conc)
 
     def reset_milk_production_reduction(self) -> None:
         """
@@ -1336,7 +1350,17 @@ class AnimalManager:
                 pen.ration_nutrient_conc = nutrient_conc
                 pen.MEdiet = ration_vals['ME_tot']
                 pen.dry_matter_intake = nutrient_amount['dm']
+                
+                ration_report={}
+                ration_report['nutrient_amount'] = nutrient_amount
+                ration_report['nutrient_conc'] = nutrient_conc
 
+                # if pen.animal_combination != Pen.AnimalCombination.CALF:
+                #     ration_supply_report = ration_driver.ration_supply(ration_per_animal, feed.available_feeds, ration_report, pen.avg_nutrient_rqmts['avg_BW'])
+                #     info_map = {"class": self.__class__.__name__,
+                #     "function": self._calc_ration_at_interval.__name__}
+                #     om.add_variable(f'ration_supply_report for {pen.id}', ration_supply_report, info_map)
+                    
                 for animal in pen.animals_in_pen:
                     animal.set_ration(ration_per_animal, nutrient_amount['dm'])
                     animal.set_p_intake(nutrient_amount['phosphorus'], nutrient_conc['phosphorus'])

@@ -299,8 +299,9 @@ class AnimalRequirements:
                 milk_fat: Optional[float] = 0.0, milk_lactose: Optional[float] = 0.0,
                 milk_production: Optional[float] = 0.0, days_in_milk: Optional[int] = None,
                 lactating: Optional[bool] = False, body_condition_score_5: Optional[int] = 3,
-                previous_temperature: Optional[float] = None, average_daily_gain_heifer: Optional[float] = None)\
-                    -> Dict[str, float]:
+                previous_temperature: Optional[float] = None, average_daily_gain_heifer: Optional[float] = None,
+                NDF_conc: Optional[float] = 0.3, TDN_conc: Optional[float] = 0.7,
+                net_energy_diet_concentration: Optional[float] = 1.0) -> Dict[str, float]:
         """
         Calculates the dietary requirements of a single animal.
 
@@ -361,10 +362,10 @@ class AnimalRequirements:
             net_energy_lactation = self.calculate_NRC_energy_lactation_requirements(
                 animal_type, milk_fat, milk_true_protein, milk_lactose, milk_production)
             dry_matter_intake_estimate = self.calculate_NRC_DMI(
-                animal_type, body_weight, day_of_pregnancy, days_in_milk, lactating, milk_production, milk_fat)
+                animal_type, body_weight, day_of_pregnancy, days_in_milk, lactating, milk_production, milk_fat, net_energy_diet_concentration)
             metabolizable_protein_requirement = self.calculate_NRC_protein_requirements(
                 body_weight, conceptus_weight, day_of_pregnancy, animal_type, milk_production, milk_true_protein,
-                calf_birth_weight, net_energy_growth, average_daily_gain, equivalent_shrunk_body_weight, dry_matter_intake_estimate)
+                calf_birth_weight, net_energy_growth, average_daily_gain, equivalent_shrunk_body_weight, dry_matter_intake_estimate, TDN_conc)
             calcium_requirement = self.calculate_NRC_calcium_requirements(
                 body_weight, mature_body_weight, day_of_pregnancy, animal_type, lactating, average_daily_gain,
                 milk_production)
@@ -376,7 +377,7 @@ class AnimalRequirements:
                 animal_type, milk_fat, milk_true_protein, milk_lactose, milk_production)
             dry_matter_intake_estimate = self.calculate_NASEM_DMI(
                 body_weight, mature_body_weight, days_in_milk, lactating, net_energy_lactation, parity,
-                body_condition_score_5)
+                body_condition_score_5, NDF_conc)
             net_energy_maintenance, gravid_uterine_weight, uterine_weight = \
                 self.calculate_NASEM_energy_maintenance_requirements(body_weight, mature_body_weight, day_of_pregnancy,
                                                                 days_in_milk)
@@ -386,7 +387,7 @@ class AnimalRequirements:
                 lactating, day_of_pregnancy, days_in_milk, gravid_uterine_weight, uterine_weight)
             metabolizable_protein_requirement = self.calculate_NASEM_protein_requirements(
                 lactating, body_weight, frame_weight_gain, gravid_uterine_weight_gain, dry_matter_intake_estimate,
-                milk_true_protein, milk_production)
+                milk_true_protein, milk_production, NDF_conc)
             calcium_requirement = self.calculate_NASEM_calcium_requirements(
                 body_weight, mature_body_weight, day_of_pregnancy, average_daily_gain, dry_matter_intake_estimate,
                 milk_true_protein, milk_production, parity)
@@ -865,7 +866,8 @@ class AnimalRequirements:
     def calculate_NRC_protein_requirements(self, body_weight: float, conceptus_weight: float, day_of_pregnancy: Optional[int],
                                         animal_type: AnimalType, milk_production: float, milk_true_protein: float,
                                         calf_birth_weight: float, net_energy_growth: float, average_daily_gain: float,
-                                        equivalent_shrunk_body_weight: float, dry_matter_intake_estimate: float) -> float:
+                                        equivalent_shrunk_body_weight: float, dry_matter_intake_estimate: float,
+                                        TDN_conc: Optional[float] = 0.7) -> float:
         """ Protein requirement for maintenance according to NRC (2001).
 
         Calculates the estimated total metabolizable protein requirement (MP) in kilograms per day
@@ -926,11 +928,8 @@ class AnimalRequirements:
         # [A.Cow.B.1]-[A.Heifer.B.1]
         # Metabolizable protein requirement for maintenance (g)
 
-        TDN_estimate = 0.7  
-        # communication with Dr. Edward Garcia
-        # TODO: Calculate TDN from the previous rations, when formulated. Using this constant as a placeholder value for the first formulation. See Issue #531
         MP_bactria_estimate = dry_matter_intake_estimate * \
-            GeneralConstants.KG_TO_GRAMS * TDN_estimate * 0.13
+            GeneralConstants.KG_TO_GRAMS * TDN_conc * 0.13
         # communication with Dr. Edward Garcia, to calculate a placeholder MP bacteria value for the first formulation.
 
         MPm = 0.3 * (body_weight - conceptus_weight) ** 0.6 + \
@@ -985,7 +984,7 @@ class AnimalRequirements:
 
     def calculate_NASEM_protein_requirements(self, lactating: bool, body_weight: float, frame_weight_gain: float, 
                                             gravid_uterine_weight_gain: float, dry_matter_intake_estimate: float,
-                                            milk_true_protein: float, milk_production: float) -> float:
+                                            milk_true_protein: float, milk_production: float, NDF_conc: float) -> float:
         """ Calculates Protein requirement for maintenance according to NASEM (2021).
 
         Calculates the estimated total metabolizable protein requirement (MP) in kilograms per day
@@ -1038,8 +1037,6 @@ class AnimalRequirements:
         """
         NPscurf = 0.20 * body_weight**(0.60) * 0.85
         NPEndUrin = 53 * GeneralConstants.NITROGEN_TO_PROTEIN * body_weight * 0.001
-        NDF_conc = 0.3
-        # TODO get the current NDF_conc See Issue #531
         CPMFP = (11.62 + 0.134 * NDF_conc) * dry_matter_intake_estimate
         NPMFP = CPMFP * 0.73
         NPGrowth = frame_weight_gain * 0.11 * 0.86
@@ -1317,7 +1314,7 @@ class AnimalRequirements:
 
 
     def calculate_NRC_DMI(self, animal_type: AnimalType, body_weight: float, day_of_pregnancy: int, days_in_milk: Optional[int],
-                        lactating: bool, milk_production: float, milk_fat: float) -> float:
+                        lactating: bool, milk_production: float, milk_fat: float, net_energy_diet_concentration: float) -> float:
         """ Calculates dry matter intake according to NRC (2001).
 
         Calculates the estimated total dry matter intake in kilograms per day
@@ -1338,6 +1335,8 @@ class AnimalRequirements:
             Milk yield (kg/d)
         milk_fat : float
             Fat contents in milk (%)
+        net_energy_diet_concentration : float
+            TODO GET DESCRIPTION AND ADD OTHERS
 
         Returns
         -------
@@ -1355,36 +1354,28 @@ class AnimalRequirements:
             pp. 4; and pp. 325, 2001 (Equations 1 and 2).
 
         """
-        if animal_type in [AnimalType.LAC_COW, AnimalType.DRY_COW]:
-            # TODO: Refactor this so lactating is not needed
-            if lactating:
-                fat_corrected_milk_kg = (
-                    0.4 * milk_production) + (15 * milk_fat * (milk_production / 100))
-                dry_matter_intake_estimate = (0.372 * fat_corrected_milk_kg + 0.0968 * body_weight ** 0.75) \
-                    * (1 - math.exp(-0.192 * ((days_in_milk / 7) + 3.67)))
-            else:
-                dry_matter_intake_estimate = (
-                    (1.97 - 0.75 * math.exp(0.16 * (day_of_pregnancy - 280))) / 100) * body_weight
+        if animal_type in [AnimalType.LAC_COW]:
+            fat_corrected_milk_kg = (
+                0.4 * milk_production) + (15 * milk_fat * (milk_production / 100))
+            dry_matter_intake_estimate = (0.372 * fat_corrected_milk_kg + 0.0968 * body_weight ** 0.75) \
+                * (1 - math.exp(-0.192 * ((days_in_milk / 7) + 3.67)))
+        elif animal_type in [AnimalType.DRY_COW]:
+            dry_matter_intake_estimate = (
+                (1.97 - 0.75 * math.exp(0.16 * (day_of_pregnancy - 280))) / 100) * body_weight
         else:
-            net_energy_maintenance_diet = 1 # TODO update this method to retrieve values from nutrient composition of 
-                                            # ration from previous formulation.
-                                            # Currently using magic value set by Edward and Haowen
-                                            # see Issue #531
-            dry_matter_intake_estimate = body_weight**0.75 * (0.2435*net_energy_maintenance_diet 
-                                                            - 0.0466*net_energy_maintenance_diet**2 
-                                                            - 0.1128) / net_energy_maintenance_diet
+            dry_matter_intake_estimate = body_weight**0.75 * (0.2435 * net_energy_diet_concentration
+                                                            - 0.0466 * net_energy_diet_concentration**2 
+                                                            - 0.1128) / net_energy_diet_concentration
             if day_of_pregnancy and day_of_pregnancy >= 210:
                 adjustment_factor = 1+((210-day_of_pregnancy) * 0.0025)
                 dry_matter_intake_estimate -= adjustment_factor
-        dry_matter_intake_estimate_minimum_flat = AnimalModuleConstants.MINIMUM_DMI
-        dry_matter_intake_estimate_minimum_percentage = AnimalModuleConstants.MINIMUM_DMI_PERCENTAGE * body_weight
-        return max(dry_matter_intake_estimate, dry_matter_intake_estimate_minimum_percentage, 
-                dry_matter_intake_estimate_minimum_flat)
+        return max(dry_matter_intake_estimate, AnimalModuleConstants.MINIMUM_DMI_PERCENTAGE * body_weight, 
+                AnimalModuleConstants.MINIMUM_DMI)
 
 
     def calculate_NASEM_DMI(self, body_weight: float, mature_body_weight: float, days_in_milk: Optional[int],
                             lactating: bool, net_energy_lactation: float,
-                            parity: int, body_condition_score_5: int) -> float:
+                            parity: int, body_condition_score_5: int, NDF_conc: float) -> float:
         """ Calculates dry matter intake according to NASEM (2021).
 
         Calculates the estimated total dry matter intake in kilograms per day
@@ -1431,19 +1422,10 @@ class AnimalRequirements:
                                         + 0.022*body_weight+(-0.689-1.87*parity_adjustment_factor)*body_condition_score_5) \
                 * (1-(0.212+parity_adjustment_factor*0.136)*math.exp(-0.053*days_in_milk))
         else:
-            dry_matter_intake_estimate = 0.022*mature_body_weight * \
-                (1-math.exp(-1.54*(body_weight/mature_body_weight)))
-            """
-            # TODO: implement this by getting NDF_concentration_percentage See Issue #531
-                (neutral detergent fiber) from the feeds
             dry_matter_intake_estimate = (0.0226*mature_body_weight*(1-math.exp(-1.47*(body_weight/mature_body_weight))))\
-                -(0.082*(NDF_concentration_percentage\
-                -(23.1+56*(body_weight/mature_body_weight)-30.6(body_weight/mature_body_weight)^2)))
-            """
-        dry_matter_intake_estimate_minimum_flat = AnimalModuleConstants.MINIMUM_DMI
-        dry_matter_intake_estimate_minimum_percentage = AnimalModuleConstants.MINIMUM_DMI_PERCENTAGE * body_weight
-        return max(dry_matter_intake_estimate, dry_matter_intake_estimate_minimum_percentage, 
-                dry_matter_intake_estimate_minimum_flat)
+                -(0.082*(NDF_conc - (23.1+56*(body_weight/mature_body_weight)-30.6*(body_weight/mature_body_weight)**2.0)))
+        return max(dry_matter_intake_estimate, AnimalModuleConstants.MINIMUM_DMI_PERCENTAGE * body_weight, 
+                AnimalModuleConstants.MINIMUM_DMI)
 
 
     def energy_activity_rqmts(self, body_weight: float, housing: str, distance: Optional[float]) -> float:
