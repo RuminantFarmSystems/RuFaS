@@ -1,5 +1,5 @@
 {
   "graph_type": "Line graph",
-  "filter": [".*passive_carbon_decomposition_amount"],
-  "title": "Passive Carbon Decomposition Amount"
+  "filter": ["Pen.calc_total_manure.daily_aggregate_calf_degradable_volatile_solids"],
+  "title": "Daily Aggregate Calf Degradable Volatile Solids"
 }

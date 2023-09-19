@@ -411,6 +411,19 @@ class OutputManager(object):
         timestamp: str = self._get_timestamp(include_millis=False)
         return f"{base_name}_{timestamp}.{extension}"
 
+    def _generate_graph_path(self, save_path: str, graph_info: dict, filter_file: str) -> str:
+        graph_directory = os.path.join(save_path, "graphics", "om")
+        try:
+            Path(graph_directory).mkdir(parents=True, exist_ok=True)
+        except Exception as e:
+            raise e
+
+        if 'title' in graph_info.keys():
+            title = '-'.join(graph_info['title'].split()).lower()
+            return os.path.join(graph_directory, self._generate_file_name(title, 'png'))
+        else:
+            return os.path.join(graph_directory, self._generate_file_name(f"saved_graph_{filter_file}", 'png'))
+
     def _exclude_info_maps(self, pool: Dict[str, pool_element_type]) -> Dict[str, pool_element_type]:
         """ Makes a copy of the given pool and removes info_maps from it.
 
@@ -482,7 +495,6 @@ class OutputManager(object):
                     list_of_elements = graph_metadata['filter']
                     load_message = f"Successfully opened {path} and read {len(list_of_elements)} lines."
                     self.add_log("filter_pattern_file_load_log", load_message, info_map)
-
                 return list_of_elements, graph_metadata
         except Exception as e:
             raise e
@@ -574,8 +586,8 @@ class OutputManager(object):
                 csv_directory = os.path.join(save_path, "CSVs", "om")
                 self._save_variables_to_csv_files(filtered_pool, filter_file, csv_directory)
             elif filter_file.startswith("png_"):
-                print(type(filtered_pool))
-                gg.generate_graph(filtered_pool, graph_info)
+                graph_path = self._generate_graph_path(save_path, graph_info, filter_file)
+                gg.generate_graph(filtered_pool, graph_info, graph_path)
             else:
                 self.add_warning("invalid filter file", f"{filter_file} must be prefixed with csv_ or json_", info_map)
 
