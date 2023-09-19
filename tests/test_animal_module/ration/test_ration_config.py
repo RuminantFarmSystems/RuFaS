@@ -43,7 +43,7 @@ def test_default_initialization():
     assert ration_config.CP == []
     assert ration_config.dRUP == []
     assert ration_config.limit == []
-    assert not ration_config.cow_type
+    assert not ration_config.lactating
     assert ration_config.DMIest is None
 
 
@@ -52,7 +52,7 @@ def test_default_initialization():
     'MP_req, C_req, P_req, TDN, DE, EE,'
     'is_fat, BW, calcium, phosphorus, NDF, type_input,'
     'is_wetforage, Kd, N_A, N_B, CP, dRUP,'
-    'limit, cow_type, DMIest',
+    'limit, lactating, DMIest',
     [
         # Default values
         ([], 0, 0, 0, 0, 0,
@@ -74,7 +74,7 @@ def test_custom_initialization(price: list[float], NEmaint: float, NEa: float, N
                                EE: list[float], is_fat: list[bool], BW: float, calcium: list[float],
                                phosphorus: list[float], NDF: list[float], type_input: list[str],
                                is_wetforage: list[bool], Kd: list[float], N_A: list[float], N_B: list[float],
-                               CP: list[float], dRUP: list[float], limit: list[float], cow_type: bool, DMIest: float) \
+                               CP: list[float], dRUP: list[float], limit: list[float], lactating: bool, DMIest: float) \
         -> None:
     """
     Test the initialization of the RationConfig class with custom values.
@@ -109,7 +109,7 @@ def test_custom_initialization(price: list[float], NEmaint: float, NEa: float, N
         CP_=CP,
         dRUP_=dRUP,
         limit_=limit,
-        cow_type_=cow_type,
+        lactating_=lactating,
         DMIest_=DMIest,
     )
 
@@ -140,5 +140,5 @@ def test_custom_initialization(price: list[float], NEmaint: float, NEa: float, N
     assert ration_config.CP == CP
     assert ration_config.dRUP == dRUP
     assert ration_config.limit == limit
-    assert ration_config.cow_type == cow_type
+    assert ration_config.lactating == lactating
     assert ration_config.DMIest == DMIest

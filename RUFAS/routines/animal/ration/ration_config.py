@@ -5,38 +5,81 @@ class RationConfig:
     """
     RationConfig provides a structured way to represent the configuration for rations.
 
-    Attributes:
-
-    - price: The price of each feed.
-    - n: The length of the price list.
-    - NEmaint: Net energy for maintenance requirement (Mcal).
-    - NEa: Net energy for activity requirement (Mcal).
-    - NEpreg: Net energy requirement for pregnancy (Mcal).
-    - NEl: Net energy requirement for lactation (Mcal).
-    - NEg: Net energy for growth requirement (Mcal).
-    - MP_req: Metabolizable protein requirement for growth (g).
-    - C_req: Calcium requirement (g).
-    - P_req: Phosphorus requirement (g).
-    - TDN: Total digestible nutrient in each feed (% of DM).
-    - DE: Digestible energy in each feed (Mcal/kg).
-    - EE: Ether extract, crude fat in each feed (% of DM).
-    - is_fat: Indicates if the feed is a fat supplement.
-    - BW: The average body weight of the pen.
-    - calcium: Calcium content of each feed (% of DM).
-    - phosphorus: Phosphorus content of each feed (% of DM).
-    - NDF: Neutral detergent fiber in each feed (% of DM).
-    - type: Feed types (Forage, Concentrate, or Mineral).
-    - is_wetforage: Indicates if the feed is wet forage.
-    - Kd: Rumen protein degradation rate in each feed (%/h).
-    - N_A: Fraction A of protein, degraded immediately in rumen for each feed (% of CP).
-    - N_B: Fraction B of protein, potentially degradable protein in rumen for each feed (% of CP).
-    - CP: Crude protein in each feed (% of DM).
-    - dRUP: RUP degradability in each feed (% of RUP).
-    - limit: Limiting upper bounds for each feed (kg).
-    - cow_type: Indicates if the cow is lactating.
-    - DMIest: Dry matter intake estimation (kg).
-
-    Methods:
+    Attributes
+    ----------
+    price : list
+        The price of each feed.
+    NEmaint : float
+        Net energy for maintenance requirement (Mcal).
+    NEa : float
+        Net energy for activity requirement (Mcal).
+    NEpreg : float
+        Net energy requirement for pregnancy (Mcal).
+    NEl : float
+        Net energy requirement for lactation (Mcal).
+    NEg : float
+        Net energy for growth requirement (Mcal).
+    MP_req : float
+        Metabolizable protein requirement for growth (g).
+    C_req : float
+        Calcium requirement (g).
+    P_req : float
+        Phosphorus requirement (g).
+    TDN : list
+        Total digestible nutrient in each feed (% of DM).
+    DE : list
+        Digestible energy in each feed (Mcal/kg).
+    EE : list
+        Ether extract, crude fat in each feed (% of DM).
+    is_fat : list of bool
+        Indicates if the feed is a fat supplement (yes = True; no = False).
+    BW : float
+        The average body weight of the pen.
+    calcium : list
+        Calcium content of each feed (% of DM).
+    phosphorus : list
+        Phosphorus content of each feed (% of DM).
+    NDF : list
+        Neutral detergent fiber in each feed (% of DM).
+    type : list
+        Feed types (Forage, Concentrate, or Mineral).
+    is_wetforage : list of bool
+        Indicates if the feed is wet forage (yes = True; no = False).
+    Kd : list
+        Rumen protein degradation rate in each feed (%/h).
+    N_A : list
+        Fraction A of protein, degraded immediately in rumen for each feed (% of CP).
+    N_B : list
+        Fraction B of protein, potentially degradable protein, requires time to degrade in rumen for each feed (% of CP).
+    CP : list
+        Crude protein in each feed (% of DM).
+    dRUP : list
+        RUP degradability in each feed (% of RUP).
+    limit : list
+        Limiting upper bounds for each feed (kg).
+    lactating : bool
+        True if the cow is lactating, False otherwise.
+    DMIest : float
+        Dry matter intake estimation (kg).
+    MEact : list
+        Actual metabolizable energy for each feed (Mcal/kg)
+    NEgact : list
+        Actual net energy for growth for each feed (Mcal/kg)
+    NEm_act : list
+        Actual net energy for maintenance for each feed (Mcal/kg)
+    is_forage : list
+        Boolean if feed item is forage or not 
+    MPbact : list
+        Metabolizable bacterial protein production for each feed (g)
+    RUP_diet : list
+        Rumen undegradable protein for each feed (% of DM)
+    dP : list
+        P digestibility for each feed (proportion of P)
+    TDNact : list
+        Actual dietary total digestible nutrient for each feed (kg)
+    Methods
+    -------
+    None.
 
     """
 
@@ -48,7 +91,7 @@ class RationConfig:
                  type_: list[str] | None = None, is_wetforage_: list[bool] | None = None,
                  Kd_: list[float] | None = None, N_A_: list[float] | None = None, N_B_: list[float] | None = None,
                  CP_: list[float] | None = None, dRUP_: list[float] | None = None,
-                 limit_: list[float] | None = None, cow_type_: bool = False, DMIest_: float | None = None) -> None:
+                 limit_: list[float] | None = None, lactating_: bool = False, DMIest_: float | None = None) -> None:
         """
         Initialize the RationConfig class with the provided feed information. If the input
         is a list, it should have a length corresponding to the decision vector.
@@ -105,7 +148,7 @@ class RationConfig:
             RUP degradability in each feed (% of RUP).
         limit_ : list, optional
             Limiting upper bounds for each feed (kg).
-        cow_type_ : bool, optional
+        lactating_ : bool, optional
             True if the cow is lactating, False otherwise.
         DMIest_ : float, optional
             Dry matter intake estimation (kg).
@@ -141,7 +184,7 @@ class RationConfig:
         self.CP = CP_ if CP_ is not None else []
         self.dRUP = dRUP_ if dRUP_ is not None else []
         self.limit = limit_ if limit_ is not None else []
-        self.cow_type = cow_type_
+        self.lactating = lactating_
         self.DMIest = DMIest_
 
         self.MEact = []

@@ -1310,11 +1310,6 @@ def test_calc_requirements():
     pass
 
 
-def test_set_globals():
-    """Unit test for function set_globals in file routines/animal/ration/ration_optimizer.py"""
-    pass
-
-
 @pytest.mark.parametrize(
         "input,expected",
         [([1, 2, 3, 4],[1, 1, 1, 2, 2, 2, 3, 3, 3, 4, 4, 4]),
@@ -1465,17 +1460,11 @@ def test_make_ration_from_solution():
     predicted = {'100': 3, '200': 6, '300': 9}
     predicted['status'] = 'Optimal'
     predicted['objective'] = 0.0
-    price = []
-    for _ in range(len(mock_solution.x)):
-        price.append(0.0)
-    RUFAS.routines.animal.ration.ration_optimizer.price = price
-    # TODO how to reset the above? Since it relies on a global, I tried patch
-        # however, this solution worked for now, and forthcoming PRs will remove usage of globals
 
-    # make a mocked available_feeds dict - the critical component being the 'feed_key' and 'feed_id'
     mock_avail_feeds = {}
     mock_avail_feeds['feed_id'] = [100, 200, 300]
     mock_avail_feeds['feed_key'] = ['100', '200', '300']
+    mock_avail_feeds['price'] = [0, 0, 0]
     # with patch.object(RUFAS.routines.animal.ration.ration_optimizer, 'price', price):
     result = RationManager.make_ration_from_solution(mock_avail_feeds, mock_solution)
     assert result == predicted
@@ -1515,10 +1504,10 @@ def test_set_requirements():
     pass
 
     
-def eq_constraint(x):
+def eq_constraint(x, ration_config):
     return np.sum(x) - 10  # This 'eq' constraint checks if the sum of x is equal to 10
 
-def ineq_constraint(x):
+def ineq_constraint(x, ration_config):
     return np.sum(x) - 10  # This 'ineq' constraint checks if the sum of x is greater than 10
 
 @pytest.mark.parametrize("solution_x,constraint,expected", [
@@ -1529,8 +1518,9 @@ def ineq_constraint(x):
 ])
 def test_is_constraint_violated(solution_x, constraint, expected):
     """Unit test for function is_constraint_violated in file routines/animal/ration/ration_driver.py"""
+    ration_config = MagicMock()
     ration_optimizer = RationOptimizer()
-    assert ration_optimizer.is_constraint_violated(solution_x, constraint) == expected
+    assert ration_optimizer.is_constraint_violated(solution_x, constraint, ration_config) == expected
 
 @pytest.mark.parametrize('mock_results, expected_result', [
     ([False, True, False], [1]),  
@@ -1548,8 +1538,9 @@ def test_find_failed_constraints(mocker: MockerFixture, mock_results, expected_r
     mocker.patch('RUFAS.routines.animal.ration.ration_optimizer.RationOptimizer.is_constraint_violated', side_effect=mock_results)
     
     # Act
+    ration_config = MagicMock()
     ration_optimizer = RationOptimizer()
-    failed_constraints = ration_optimizer.find_failed_constraints(solution_x, constraints)
+    failed_constraints = ration_optimizer.find_failed_constraints(solution_x, constraints, ration_config)
     failed_constraints_indices = []
 
     for i, constraint in enumerate(constraints): 

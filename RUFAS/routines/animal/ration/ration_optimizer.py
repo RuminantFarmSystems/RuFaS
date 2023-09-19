@@ -68,80 +68,6 @@ class RationOptimizer:
         self.heifer_cons = [cons for cons in self.cow_cons if cons['fun'] not in [self.total_energy, self.NEl_constraint, self.DMI_constraint_lower]]
         """constraints for animals that are not lactating cows """
 
-    def set_globals(self, price_, NEmaint_, NEa_, NEpreg_, NEl_, NEg_, MP_req_, C_req_, P_req_,
-                    TDN_, DE_, EE_, is_fat_, BW_, calcium_, phosphorus_, NDF_, type_,
-                    is_wetforage_, Kd_, N_A_, N_B_, CP_, dRUP_, limit_, cow_type_,
-                    DMIest_= None):
-        """
-        Sets the global variables with the feed information to be used in the
-        constraint functions below. If the input described below is a list, it is a
-        list with a length of the decision vector.
-
-        Args:
-            price_: A list of the price of each feed
-            NEmaint_: Net energy for maintenance requirement (Mcal)
-            NEa_: Net energy for activity requirement (Mcal)
-            NEpreg_: Net energy requirement for pregnancy (Mcal)
-            NEl_: Net energy requirement for lactation (Mcal)
-            NEg_: Net energy for growth requirement (Mcal)
-            MP_req_: Metabolizable protein requirement for growth (g)
-            C_req_: Calcium requirement (g)
-            P_req_: Phosphorus requirement (g)
-            DMIest_: dry matter intake estimation (kg)
-            TDN_: A list of otal digestible nutrient in each feed (% of DM)
-            DE_: A list of digestible energy in each feed (Mcal/kg)
-            EE_: A list of ether extract, crude fat in each feed (% of DM)
-            is_fat_: A list of booleans, if the feed is fat supplement or not
-                    (yes = 1; no = 0)
-            BW_: the average body weight of the pen
-            calcium_: A list of the calcium content of each feed (% of DM)
-            phosphorus_: A list of phosphorus content of each feed (% of DM)
-            NDF_: A list of neutral detergent fiber in each feed (% of DM)
-            type_: A list of feed types (Forage, Concentrate, or Mineral)
-            is_wetforage_: A list of booleans, if the feed is wet forage or not
-                        (yes = 1; no = 0)
-            Kd_: A list of the rumen protein degradation rate in each feed (%/h)
-            N_A_: A list of fraction A of protein, degraded immediately in rumen for
-                each feed (% of CP)
-            N_B_: A list of fraction B of protein, potentially degradable protein,
-                require time to generally degrade in rumen in each feed (% of CP)
-            CP_: A list of crude protein in each feed (% of DM)
-            dRUP_: A list of RUP degradability in each feed (% of RUP)
-            limit_: A list of the limiting upper bounds for each feed (kg)
-            cow_type_: A boolean which is True if cow is lactating, False else
-        """
-        # global price, n, NEmaint, NEa, NEpreg, NEl, NEg, MP_req, C_req, P_req, \
-            # DMIest, TDN, DE, EE, is_fat, BW, calcium, phosphorus, NDF, type, \
-            # is_wetforage, Kd, N_A, N_B, CP, dRUP, limit, cow_type
-
-        price = price_
-        n = len(price)
-        NEmaint = NEmaint_
-        NEa = NEa_
-        NEpreg = NEpreg_
-        NEl = NEl_
-        NEg = NEg_
-        MP_req = MP_req_
-        C_req = C_req_
-        P_req = P_req_
-        DMIest = DMIest_
-        TDN = TDN_
-        DE = DE_
-        EE = EE_
-        is_fat = is_fat_
-        BW = BW_
-        calcium = calcium_
-        phosphorus = phosphorus_
-        NDF = NDF_
-        type = type_
-        is_wetforage = is_wetforage_
-        Kd = Kd_
-        N_A = N_A_
-        N_B = N_B_
-        CP = CP_
-        dRUP = dRUP_
-        limit = limit_
-        cow_type = cow_type_
 
     @staticmethod
     def list_reconfig(list):
@@ -754,21 +680,15 @@ class RationOptimizer:
         # TODO: Put AnimalCombination enum in a separate file and use it here instead of hardcoding the names
         if str(animal_combination) in ['AnimalCombination.LAC_COW']:
             limit = self.list_reconfig(available_feeds['lactating_cow_limit'])
-            cow_type = True
+            lactating = True
         else:
             limit = self.list_reconfig(available_feeds['dry_cow_limit'])
-            cow_type = False
-        # self.set_globals(price, requirements.NEmaint, requirements.NEa, requirements.NEpreg,
-        #                 requirements.NEl, requirements.NEg, requirements.MP_req,
-        #                 requirements.Ca_req, requirements.P_req,
-        #                 TDN, DE, EE, is_fat, requirements.avg_BW, calcium, phosphorus, NDF,
-        #                 feed_type, is_wetforage, Kd, N_A, N_B, CP, dRUP, limit, cow_type,
-        #                 DMIest_=requirements.DMIest)
+            lactating = False
         ration_config = RationConfig(price, requirements.NEmaint, requirements.NEa, requirements.NEpreg,
                         requirements.NEl, requirements.NEg, requirements.MP_req,
                         requirements.Ca_req, requirements.P_req,
                         TDN, DE, EE, is_fat, requirements.avg_BW, calcium, phosphorus, NDF,
-                        feed_type, is_wetforage, Kd, N_A, N_B, CP, dRUP, limit, cow_type,
+                        feed_type, is_wetforage, Kd, N_A, N_B, CP, dRUP, limit, lactating,
                         DMIest_=requirements.DMIest)
         # try block for catching scipy SLSQP error
         i = 0

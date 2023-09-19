@@ -171,7 +171,7 @@ class RationManager:
     def make_solution_from_fixed_ration(cls, ration: Dict) -> List:
         """
         makes solution object from returned fixed ration for use in get_ration_vals function in ration_optimizer.py
-        Simply puts the value in triplicate, and multiplies by the MEact defined in the set_globals function
+        Simply puts the value in triplicate, and multiplies by the MEact defined in  ration_config
 
         Parameters
         ----------
