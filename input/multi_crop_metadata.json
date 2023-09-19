@@ -66,7 +66,7 @@
     "soil": {
       "title": "Soil data",
       "description": "Soil configuration.",
-      "path": "input/soil/multi_crop_soil.json",
+      "path": "input/soil/ARL_soil.json",
       "type": "json",
       "properties": "soil_profile_properties"
     },
