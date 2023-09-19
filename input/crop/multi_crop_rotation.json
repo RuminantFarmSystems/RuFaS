@@ -1,11 +1,10 @@
 {
-    "latitude": 43.304346,
-
-    "crops": {
-        "Corn90": {
-            "crop_reference": "corn",
-            "plant_years": [1990],
-            "repeat": 0,
+    "crop_schedules": [
+        {
+            "crop_species": "corn",
+            "planting_years": [1990],
+            "pattern_repeat": 0,
+            "pattern_skip": 0,
             "planting_day": [113],
             "harvest_years": [1990],
             "harvest_day": [305],
@@ -15,10 +14,11 @@
             "extracted": true
 
         },
-        "Alfalfa91": {
-            "crop_reference": "alfalfa",
-            "plant_years": [1991],
-            "repeat": 0,
+        {
+            "crop_species": "alfalfa",
+            "planting_years": [1991],
+            "pattern_repeat": 0,
+            "pattern_skip": 0,
             "planting_day": [113],
             "harvest_years": [1991],
             "harvest_day": [296],
@@ -27,10 +27,11 @@
             "planting_order": "1st",
             "extracted": true
         },
-        "Corn92": {
-            "crop_reference": "corn",
-            "plant_years": [1992],
-            "repeat": 0,
+        {
+            "crop_species": "corn",
+            "planting_years": [1992],
+            "pattern_repeat": 0,
+            "pattern_skip": 0,
             "planting_day": [133],
             "harvest_years": [1992],
             "harvest_day": [323],
@@ -40,10 +41,11 @@
             "extracted": true
 
         },
-        "Alfalfa93": {
-            "crop_reference": "alfalfa",
-            "plant_years": [1993,1994],
-            "repeat": 0,
+        {
+            "crop_species": "alfalfa",
+            "planting_years": [1993,1994],
+            "pattern_repeat": 0,
+            "pattern_skip": 0,
             "planting_day": [121],
             "harvest_years": [1993, 1994],
             "harvest_day": [273],
@@ -52,10 +54,11 @@
             "planting_order": "1st",
             "extracted": true
         },
-        "FallOats93": {
-            "crop_reference": "fall_oats",
-            "plant_years": [1993],
-            "repeat": 0,
+        {
+            "crop_species": "fall_oats",
+            "planting_years": [1993],
+            "pattern_repeat": 0,
+            "pattern_skip": 0,
             "planting_day": [121],
             "harvest_years": [1993],
             "harvest_day": [225],
@@ -65,10 +68,11 @@
             "extracted": true
 
         },
-        "Corn95": {
-            "crop_reference": "corn",
-            "plant_years": [1995],
-            "repeat": 0,
+        {
+            "crop_species": "corn",
+            "planting_years": [1995],
+            "pattern_repeat": 0,
+            "pattern_skip": 0,
             "planting_day": [132],
             "harvest_years": [1995],
             "harvest_day": [286],
@@ -78,10 +82,11 @@
             "extracted": true
 
         },
-        "FallOats96": {
-            "crop_reference": "fall_oats",
-            "plant_years": [1996],
-            "repeat": 0,
+        {
+            "crop_species": "fall_oats",
+            "planting_years": [1996],
+            "pattern_repeat": 0,
+            "pattern_skip": 0,
             "planting_day": [99],
             "harvest_years": [1996],
             "harvest_day": [237],
@@ -91,10 +96,11 @@
             "extracted": true
 
         },
-        "Alfalfa96": {
-            "crop_reference": "alfalfa",
-            "plant_years": [1996,1997],
-            "repeat": 0,
+        {
+            "crop_species": "alfalfa",
+            "planting_years": [1996,1997],
+            "pattern_repeat": 0,
+            "pattern_skip": 0,
             "planting_day": [99],
             "harvest_years": [1996,1997],
             "harvest_day": [274],
@@ -104,10 +110,11 @@
             "extracted": true
 
         },
-        "Corn98": {
-            "crop_reference": "corn",
-            "plant_years": [1998],
-            "repeat": 0,
+        {
+            "crop_species": "corn",
+            "planting_years": [1998],
+            "pattern_repeat": 0,
+            "pattern_skip": 0,
             "planting_day": [99],
             "harvest_years": [1998],
             "harvest_day": [293],
@@ -117,10 +124,11 @@
             "extracted": true
 
         },
-        "FallOats99": {
-            "crop_reference": "fall_oats",
-            "plant_years": [1999],
-            "repeat": 0,
+        {
+            "crop_species": "fall_oats",
+            "planting_years": [1999],
+            "pattern_repeat": 0,
+            "pattern_skip": 0,
             "planting_day": [83],
             "harvest_years": [1999],
             "harvest_day": [231],
@@ -130,10 +138,11 @@
             "extracted": true
 
         },
-        "Alfalfa99": {
-            "crop_reference": "alfalfa",
-            "plant_years": [1999,2000],
-            "repeat": 0,
+        {
+            "crop_species": "alfalfa",
+            "planting_years": [1999,2000],
+            "pattern_repeat": 0,
+            "pattern_skip": 0,
             "planting_day": [83],
             "harvest_years": [1999,2000],
             "harvest_day": [250],
@@ -143,10 +152,11 @@
             "extracted": true
 
         },
-        "Corn01": {
-            "crop_reference": "corn",
-            "plant_years": [2001],
-            "repeat": 0,
+        {
+            "crop_species": "corn",
+            "planting_years": [2001],
+            "pattern_repeat": 0,
+            "pattern_skip": 0,
             "planting_day": [121],
             "harvest_years": [2001],
             "harvest_day": [288],
@@ -155,10 +165,11 @@
             "planting_order": "1st",
             "extracted": true
         },
-        "FallOats02": {
-            "crop_reference": "fall_oats",
-            "plant_years": [2002],
-            "repeat": 0,
+        {
+            "crop_species": "fall_oats",
+            "planting_years": [2002],
+            "pattern_repeat": 0,
+            "pattern_skip": 0,
             "planting_day": [83],
             "harvest_years": [2002],
             "harvest_day": [231],
@@ -168,10 +179,11 @@
             "extracted": true
 
         },
-        "Alfalfa02": {
-            "crop_reference": "alfalfa",
-            "plant_years": [2002,2003],
-            "repeat": 0,
+        {
+            "crop_species": "alfalfa",
+            "planting_years": [2002,2003],
+            "pattern_repeat": 0,
+            "pattern_skip": 0,
             "planting_day": [83],
             "harvest_years": [2002, 2003],
             "harvest_day": [250],
@@ -180,10 +192,11 @@
             "planting_order": "1st",
             "extracted": true
         },
-        "Corn04": {
-            "crop_reference": "corn",
-            "plant_years": [2004],
-            "repeat": 0,
+        {
+            "crop_species": "corn",
+            "planting_years": [2004],
+            "pattern_repeat": 0,
+            "pattern_skip": 0,
             "planting_day": [138],
             "harvest_years": [2004],
             "harvest_day": [300],
@@ -192,10 +205,11 @@
             "planting_order": "1st",
             "extracted": true
         },
-        "FallOats05": {
-            "crop_reference": "fall_oats",
-            "plant_years": [2005],
-            "repeat": 0,
+        {
+            "crop_species": "fall_oats",
+            "planting_years": [2005],
+            "pattern_repeat": 0,
+            "pattern_skip": 0,
             "planting_day": [104],
             "harvest_years": [2005],
             "harvest_day": [193],
@@ -205,10 +219,11 @@
             "extracted": true
 
         },
-        "Alfalfa05": {
-            "crop_reference": "alfalfa",
-            "plant_years": [2005,2006],
-            "repeat": 0,
+        {
+            "crop_species": "alfalfa",
+            "planting_years": [2005,2006],
+            "pattern_repeat": 0,
+            "pattern_skip": 0,
             "planting_day": [104],
             "harvest_years": [2005,2006],
             "harvest_day": [251],
@@ -217,10 +232,11 @@
             "planting_order": "1st",
             "extracted": true
         },
-        "Corn07": {
-            "crop_reference": "corn",
-            "plant_years": [2007],
-            "repeat": 0,
+        {
+            "crop_species": "corn",
+            "planting_years": [2007],
+            "pattern_repeat": 0,
+            "pattern_skip": 0,
             "planting_day": [110],
             "harvest_years": [2007],
             "harvest_day": [290],
@@ -229,10 +245,11 @@
             "planting_order": "1st",
             "extracted": true
         },
-        "FallOats08": {
-            "crop_reference": "fall_oats",
-            "plant_years": [2008],
-            "repeat": 0,
+        {
+            "crop_species": "fall_oats",
+            "planting_years": [2008],
+            "pattern_repeat": 0,
+            "pattern_skip": 0,
             "planting_day": [104],
             "harvest_years": [2008],
             "harvest_day": [193],
@@ -242,10 +259,11 @@
             "extracted": true
 
         },
-        "Alfalfa08": {
-            "crop_reference": "alfalfa",
-            "plant_years": [2008,2009],
-            "repeat": 0,
+        {
+            "crop_species": "alfalfa",
+            "planting_years": [2008,2009],
+            "pattern_repeat": 0,
+            "pattern_skip": 0,
             "planting_day": [104],
             "harvest_years": [2008, 2009],
             "harvest_day": [292],
@@ -254,10 +272,10 @@
             "planting_order": "1st",
             "extracted": true
         },
-        "Corn10": {
-            "crop_reference": "corn",
-            "plant_years": [2010],
-            "repeat": 0,
+        {
+            "crop_species": "corn",
+            "planting_years": [2010],
+            "pattern_repeat": 0,
             "planting_day": [139],
             "harvest_years": [2010],
             "harvest_day": [286],
@@ -266,10 +284,11 @@
             "planting_order": "1st",
             "extracted": true
         },
-        "FallOats11": {
-            "crop_reference": "fall_oats",
-            "plant_years": [2011],
-            "repeat": 0,
+        {
+            "crop_species": "fall_oats",
+            "planting_years": [2011],
+            "pattern_repeat": 0,
+            "pattern_skip": 0,
             "planting_day": [103],
             "harvest_years": [2011],
             "harvest_day": [193],
@@ -279,10 +298,11 @@
             "extracted": true
 
         },
-        "Alfalfa11": {
-            "crop_reference": "alfalfa",
-            "plant_years": [2011,2012],
-            "repeat": 0,
+        {
+            "crop_species": "alfalfa",
+            "planting_years": [2011,2012],
+            "pattern_repeat": 0,
+            "pattern_skip": 0,
             "planting_day": [103],
             "harvest_years": [2011,2012],
             "harvest_day": [236],
@@ -291,10 +311,11 @@
             "planting_order": "1st",
             "extracted": true
         },
-        "Corn13": {
-            "crop_reference": "corn",
-            "plant_years": [2013],
-            "repeat": 0,
+        {
+            "crop_species": "corn",
+            "planting_years": [2013],
+            "pattern_repeat": 0,
+            "pattern_skip": 0,
             "planting_day": [139],
             "harvest_years": [2013],
             "harvest_day": [286],
@@ -303,10 +324,11 @@
             "planting_order": "1st",
             "extracted": true
         },
-        "FallOats14": {
-            "crop_reference": "fall_oats",
-            "plant_years": [2014],
-            "repeat": 0,
+        {
+            "crop_species": "fall_oats",
+            "planting_years": [2014],
+            "pattern_repeat": 0,
+            "pattern_skip": 0,
             "planting_day": [113],
             "harvest_years": [2014],
             "harvest_day": [246],
@@ -316,10 +338,11 @@
             "extracted": true
 
         },
-        "Alfalfa14": {
-            "crop_reference": "alfalfa",
-            "plant_years": [2014,2015],
-            "repeat": 0,
+        {
+            "crop_species": "alfalfa",
+            "planting_years": [2014,2015],
+            "pattern_repeat": 0,
+            "pattern_skip": 0,
             "planting_day": [113],
             "harvest_years": [2014,2015],
             "harvest_day": [245],
@@ -328,10 +351,11 @@
             "planting_order": "1st",
             "extracted": true
         },
-        "Corn16": {
-            "crop_reference": "corn",
-            "plant_years": [2016],
-            "repeat": 0,
+        {
+            "crop_species": "corn",
+            "planting_years": [2016],
+            "pattern_repeat": 0,
+            "pattern_skip": 0,
             "planting_day": [131],
             "harvest_years": [2016],
             "harvest_day": [294],
@@ -340,10 +364,11 @@
             "planting_order": "1st",
             "extracted": true
         },
-        "FallOats17": {
-            "crop_reference": "fall_oats",
-            "plant_years": [2017],
-            "repeat": 0,
+        {
+            "crop_species": "fall_oats",
+            "planting_years": [2017],
+            "pattern_repeat": 0,
+            "pattern_skip": 0,
             "planting_day": [115],
             "harvest_years": [2017],
             "harvest_day": [240],
@@ -353,10 +378,11 @@
             "extracted": true
 
         },
-        "Alfalfa17": {
-            "crop_reference": "alfalfa",
-            "plant_years": [2017,2018],
-            "repeat": 0,
+        {
+            "crop_species": "alfalfa",
+            "planting_years": [2017,2018],
+            "pattern_repeat": 0,
+            "pattern_skip": 0,
             "planting_day": [115],
             "harvest_years": [2017,2018],
             "harvest_day": [251],
@@ -365,10 +391,11 @@
             "planting_order": "1st",
             "extracted": true
         },
-        "Corn19": {
-            "crop_reference": "corn",
-            "plant_years": [2019],
-            "repeat": 0,
+        {
+            "crop_species": "corn",
+            "planting_years": [2019],
+            "pattern_repeat": 0,
+            "pattern_skip": 0,
             "planting_day": [116],
             "harvest_years": [2019],
             "harvest_day": [303],
@@ -377,5 +404,5 @@
             "planting_order": "1st",
             "extracted": true
         }
-    }
+    ]
 }
