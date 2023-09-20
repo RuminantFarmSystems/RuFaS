@@ -47,8 +47,8 @@ class SoilTemp:
         avg_annual_air_temp : float
             Average annual air temperature (degrees C).
 
-        Notes:
-        ------
+        Notes
+        -----
         SWAT does not specify how to start the simulation i.e. it does not specify what to do on day 0, when
         there is no previous day's temperature. Currently, the implementation just uses the temperature that the
         soil starts (it sets the previous day's temperature equal to the current day's temperature). This assumption
@@ -253,7 +253,7 @@ class SoilTemp:
             Bare soil surface temperature (degrees C).
 
         References
-        ---------------
+        ----------
         SWAT Theoretical documentation eqn. 1:1.3.9
         """
         return avg_temp + (radiation_factor * ((max_temp - min_temp) / 2))

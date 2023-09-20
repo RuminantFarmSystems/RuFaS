@@ -118,7 +118,7 @@ class SoilErosion:
             Percent of clay in the given layer of soil.
 
         Notes
-        -------
+        -----
         The clay-silt ratio affects the erodibility of the soil, specifically soils with a high ratio of clay to
         silt are less susceptible to erosion than soils with lower ratios of clay to silt.
 
@@ -174,7 +174,7 @@ class SoilErosion:
             The percent of sand in the given layer of soil.
 
         Notes
-        -------
+        -----
         When a soil has an extremely high sand content, it reduces the erodibility of that soil.
 
         Returns
@@ -311,6 +311,14 @@ class SoilErosion:
         References
         ----------
         SWAT Theoretical documentation eqn. 4:1.1.12
+
+        Notes
+        -----
+        The length and slope of a soil have an effect on erodibility, with shorter lengths and steeper slopes
+        resulting in more soil erosion. A shorter length means more erosion because sediment does not have to travel
+        as far to reach channels and be removed from the soil. A steeper slope means that there is less
+        resistance against the gravitational forces acting on a piece of sediment as it moves down the slope,
+        resulting in the soil eroding more easily.
         """
         # Note: arctan(tan(x)) == x does not always hold, it is only true from -90 to 90 degrees, inclusive. It is safe
         # to use here because there will never be a field at an angle < -90 or > 90 degrees
@@ -336,7 +344,7 @@ class SoilErosion:
         to move them off a field, resulting in slower erosion in soils with higher rock content.
 
         Returns
-        --------
+        -------
         float
             Coarse fragment factor based on the rock content of the soil (unitless).
 

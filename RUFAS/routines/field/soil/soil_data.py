@@ -376,16 +376,15 @@ class SoilData:
 
     @property
     def profile_field_capacity(self) -> float:
-        def get_field_capacity_soil_water_content():
-            """
-            Calculate the total amount of water contained in the entire soil profile at field capacity
-            (but not saturated) (mm).
+        """
+        Calculate the total amount of water contained in the entire soil profile at field capacity
+        (but not saturated) (mm).
 
-            Returns
-            -------
-            float
-                The soil water content at field capacity in millimeters (mm).
-            """
+        Returns
+        -------
+        float
+            The soil water content at field capacity in millimeters (mm).
+        """
         field_capacity_sum = 0
         for layer in self.soil_layers:
             field_capacity_sum += layer.field_capacity_content
@@ -400,6 +399,7 @@ class SoilData:
         -------
         float
             The soil water factor (unitless)
+
         References
         ----------
         SWAT Theoretical documentation eqn. 5:2.3.18

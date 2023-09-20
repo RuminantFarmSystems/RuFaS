@@ -140,8 +140,8 @@ class Infiltration:
         float
             Curve number 3 (wet/field capacity conditions) (unitless).
 
-        Reference
-        --------------
+        References
+        ----------
         SWAT Theoretical documentation eqn. 2:1.1.5
         """
         return second_moisture_condition * exp(0.00673 * (100 - second_moisture_condition))
@@ -340,12 +340,12 @@ class Infiltration:
             Accumulated runoff or rainfall excess (mm).
 
         Notes
-        -------
+        -----
         Runoff only occurs when rainfall is greater than initial abstractions (about surface storage, interception, etc.)
         which are approximated as 0.2 times the retention parameter in SWAT 2:1.1 and here.
 
         References
-        -------
+        ----------
         SWAT Theoretical documentation eqn. 2:1.1.1, 3
         """
         if rainfall > (0.2 * retention_parameter):
@@ -385,7 +385,7 @@ class Infiltration:
             Retention parameter for the current day (mm).
 
         References
-        -------
+        ----------
         SWAT Theoretical documentation eqn. 2:1.1.9
         """
         retention_parameter = previous_retention_parameter - rainfall + runoff
@@ -410,7 +410,7 @@ class Infiltration:
             The curve number for a given day adjusted for moisture content (unitless).
 
         References
-        -------
+        ----------
         SWAT Theoretical documentation eqn. 2:1.1.11
         """
         return 25400 / (retention_parameter + 254)
