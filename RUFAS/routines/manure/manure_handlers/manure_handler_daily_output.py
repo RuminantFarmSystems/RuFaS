@@ -1,9 +1,10 @@
-from RUFAS.routines.manure.protocols.liquid_manure_portion_protocol import LiquidManurePortionProtocol
+from RUFAS.routines.manure.protocols.liquid_manure_portion_protocol import (
+    LiquidManurePortionProtocol,
+)
 from dataclasses import dataclass
 from dataclasses import field
 
 from RUFAS.general_constants import GeneralConstants
-from RUFAS.output_manager import OutputManager
 
 
 @dataclass
@@ -36,6 +37,7 @@ class ManureHandlerDailyOutput(LiquidManurePortionProtocol):
         tempC: Temperature of the current day, C.
 
     """
+
     pen_id: int = -1
     simulation_day: int = -1
     manure_urea: float = 0.0
@@ -65,15 +67,21 @@ class ManureHandlerDailyOutput(LiquidManurePortionProtocol):
     def __post_init__(self) -> None:
         """Calculates total volatile solids and total daily manure volume after initialization."""
 
-        self.liquid_manure_total_volatile_solids = (self.manure_degradable_volatile_solids +
-                                                    self.manure_non_degradable_volatile_solids)
+        self.liquid_manure_total_volatile_solids = (
+            self.manure_degradable_volatile_solids
+            + self.manure_non_degradable_volatile_solids
+        )
         self.cleaning_water_volume *= GeneralConstants.LITERS_TO_CUBIC_METERS
-        self.total_water_volume_in_milking_parlor *= GeneralConstants.LITERS_TO_CUBIC_METERS
+        self.total_water_volume_in_milking_parlor *= (
+            GeneralConstants.LITERS_TO_CUBIC_METERS
+        )
 
-        self.total_daily_manure_volume = sum([
-            self.manure_volume,
-            self.cleaning_water_volume,
-            self.total_bedding_volume,
-            self.total_water_volume_in_milking_parlor,
-        ])
+        self.total_daily_manure_volume = sum(
+            [
+                self.manure_volume,
+                self.cleaning_water_volume,
+                self.total_bedding_volume,
+                self.total_water_volume_in_milking_parlor,
+            ]
+        )
         self.liquid_manure_daily_volume = self.total_daily_manure_volume

@@ -1,22 +1,25 @@
 from __future__ import annotations
 
 from RUFAS.routines.manure.beddings.bedding_classes import BaseBedding
-from RUFAS.routines.manure.manure_handlers.manure_handler_daily_output import ManureHandlerDailyOutput
-from RUFAS.routines.manure.pen.manure_manager_pen import ManureManagerPen
-from RUFAS.routines.manure.reception_pits.reception_pit_daily_output import ReceptionPitDailyOutput
+from RUFAS.routines.manure.manure_handlers.manure_handler_daily_output import (
+    ManureHandlerDailyOutput,
+)
+from RUFAS.routines.manure.pen_manure.manure_manager_pen import ManureManagerPen
+from RUFAS.routines.manure.reception_pits.reception_pit_daily_output import (
+    ReceptionPitDailyOutput,
+)
 
 
 class ReceptionPit:
-    """Class for a reception pit.
-
-    """
+    """Class for a reception pit."""
 
     @classmethod
-    def daily_update(cls,
-                     manure_handler_daily_output: ManureHandlerDailyOutput,
-                     pen: ManureManagerPen,
-                     bedding: BaseBedding
-                     ) -> ReceptionPitDailyOutput:
+    def daily_update(
+        cls,
+        manure_handler_daily_output: ManureHandlerDailyOutput,
+        pen: ManureManagerPen,
+        bedding: BaseBedding,
+    ) -> ReceptionPitDailyOutput:
         """Calculates and stores the daily output of the reception pit.
 
         Args:
@@ -36,14 +39,14 @@ class ReceptionPit:
             manure_urea=mh.manure_urea,
             liquid_manure_total_ammoniacal_nitrogen=mh.liquid_manure_total_ammoniacal_nitrogen,
             liquid_manure_nitrogen=mh.liquid_manure_nitrogen,
-            liquid_manure_total_solids=mh.liquid_manure_total_solids +
-                                       bedding.calc_total_bedding_dry_solids(pen.num_animals),
+            liquid_manure_total_solids=mh.liquid_manure_total_solids
+            + bedding.calc_total_bedding_dry_solids(pen.num_animals),
             manure_degradable_volatile_solids=mh.manure_degradable_volatile_solids,
             manure_non_degradable_volatile_solids=mh.manure_non_degradable_volatile_solids,
             liquid_manure_total_volatile_solids=mh.liquid_manure_total_volatile_solids,
             liquid_manure_phosphorus=mh.liquid_manure_phosphorus,
             liquid_manure_potassium=mh.liquid_manure_potassium,
-            total_daily_manure_volume=mh.total_daily_manure_volume
+            total_daily_manure_volume=mh.total_daily_manure_volume,
         )
 
         return daily_output
