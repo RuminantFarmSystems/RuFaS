@@ -86,6 +86,8 @@ class SoilData:
     """curve number value adjusted for moisture content (unitless) (SWAT 2:1.1.11)"""
     accumulated_runoff: Optional[float] = None
     """the amount of rainfall discharged as runoff during the day (mm)"""
+    infiltrated_water: float = 0.0
+    """Amount of water that infiltrated the top soil layer on the current day(mm)."""
 
     # ---- percolation
     vadose_zone_layer: Optional[LayerData] = None

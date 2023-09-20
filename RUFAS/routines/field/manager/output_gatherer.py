@@ -17,15 +17,14 @@ class OutputGatherer:
             info_map["prefix"] = "field='" + field.field_data.name + "'"
             # --------------------------adding field data
             om.add_variable("current_residue", field.field_data.current_residue, info_map)
-            om.add_variable("evaporation", field.field_data.evaporation, info_map)
-            om.add_variable("transpiration", field.field_data.transpiration, info_map)
             om.add_variable("max_transpiration", field.field_data.max_transpiration, info_map)
             om.add_variable("max_evapotranspiration", field.field_data.max_evapotranspiration, info_map)
             om.add_variable("days_into_watering_interval", field.field_data.days_into_watering_interval, info_map)
 
             # ----------------------------adding soil data
-            om.add_variable("water_evaporated", field.soil.data.water_evaporated,
+            om.add_variable("water_evaporated(mm)", field.soil.data.water_evaporated,
                             info_map)
+            om.add_variable("infiltrated_water(mm)", field.soil.data.infiltrated_water, info_map)
             om.add_variable("eroded_sediment(kg)", field.soil.data.eroded_sediment * 1_000, info_map)
             om.add_variable("accumulated_runoff(mm)", field.soil.data.accumulated_runoff, info_map)
             om.add_variable("cover_type",
@@ -123,7 +122,8 @@ class OutputGatherer:
                 info_map["prefix"] = "field='" + field.field_data.name + "',layer_index='" + str(index) + "'"
                 om.add_variable("water_content(mm)", layer.water_content, info_map)
                 om.add_variable("temperature(Celsius)", layer.temperature, info_map)
-                om.add_variable("percolated_water", layer.percolated_water, info_map)
+                om.add_variable("percolated_water(mm)", layer.percolated_water, info_map)
+                om.add_variable("evaporated_water_content(mm)", layer.evaporated_water_content, info_map)
                 om.add_variable("plant_metabolic_active_carbon_usage", layer.plant_metabolic_active_carbon_usage,
                                 info_map)
                 om.add_variable("plant_metabolic_active_carbon_loss", layer.plant_metabolic_active_carbon_loss,
@@ -229,6 +229,8 @@ class OutputGatherer:
                 om.add_variable("cumulative_evapotranspiration", crop.data.cumulative_evapotranspiration, info_map)
                 om.add_variable("max_transpiration", crop.data.max_transpiration, info_map)
                 om.add_variable("canopy_water", crop.data.canopy_water, info_map)
+                om.add_variable("total_water_uptake(mm)", crop.data.total_water_uptake, info_map)
+                crop.data.total_water_uptake = 0.0
                 om.add_variable("cut_biomass", crop.data.cut_biomass, info_map)
                 om.add_variable("yield_collected", crop.data.yield_collected, info_map)
                 om.add_variable("yield_residue", crop.data.yield_residue, info_map)

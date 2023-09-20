@@ -39,6 +39,7 @@ class Evaporation:
         exactly and the loop is exited after evaporating the reduced amount from the current layer.
 
         """
+        self.data.set_vectorized_layer_attribute("evaporated_water_content", [0.0] * len(self.data.soil_layers))
         amount_available_for_evaporation = maximum_soil_water_evaporation
         for layer in self.data.soil_layers:
             evaporative_demand = self._determine_layer_evaporative_demand(
@@ -51,6 +52,7 @@ class Evaporation:
 
             amount_water_removed = min(amount_water_removed, amount_available_for_evaporation)
             layer.water_content -= amount_water_removed
+            layer.evaporated_water_content = amount_water_removed
             amount_available_for_evaporation -= amount_water_removed
             if amount_available_for_evaporation == 0:
                 break

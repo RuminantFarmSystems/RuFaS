@@ -40,6 +40,10 @@ class LayerData:
     """coefficient that allows user to modify depth distribution used to meet the soil evaporative demand (unitless)
         (SWAT 2:2.3.17)"""
 
+    # --- Evaporation
+    evaporated_water_content: float = 0.0
+    """Amount of water evaporated out of the layer on the current day (mm)."""
+
     # --- Percolation
     temperature: float = 15.05
     """current temperature of this soil layer (degrees Celsius)"""

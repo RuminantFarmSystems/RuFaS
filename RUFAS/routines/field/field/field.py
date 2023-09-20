@@ -934,6 +934,7 @@ class Field:
             of processes. This is necessary because there is not necessarily one correct order for processes to run in.
 
         """
+        self.field_data.transpiration = 0.0
         watering_amount = self._determine_watering_amount(rainfall=current_weather.rainfall, year=time.year,
                                                           day=time.day, irrigation=current_weather.irrigation)
         total_precipitation = current_weather.rainfall + watering_amount
