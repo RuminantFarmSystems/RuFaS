@@ -5,8 +5,6 @@ from dataclasses import field
 from RUFAS.general_constants import GeneralConstants
 from RUFAS.output_manager import OutputManager
 
-om = OutputManager()
-
 
 @dataclass
 class ManureHandlerDailyOutput(LiquidManurePortionProtocol):
@@ -66,9 +64,6 @@ class ManureHandlerDailyOutput(LiquidManurePortionProtocol):
 
     def __post_init__(self) -> None:
         """Calculates total volatile solids and total daily manure volume after initialization."""
-        info_map = {"class": self.__class__.__name__,
-                    "function": self.__post_init__.__name__,
-                    }
 
         self.liquid_manure_total_volatile_solids = (self.manure_degradable_volatile_solids +
                                                     self.manure_non_degradable_volatile_solids)
@@ -82,14 +77,3 @@ class ManureHandlerDailyOutput(LiquidManurePortionProtocol):
             self.total_water_volume_in_milking_parlor,
         ])
         self.liquid_manure_daily_volume = self.total_daily_manure_volume
-
-        om.add_variable("liquid_manure_total_volatile_solids",
-                        self.liquid_manure_total_volatile_solids, info_map)
-        om.add_variable("cleaning_water_volume",
-                        self.cleaning_water_volume, info_map)
-        om.add_variable("total_water_volume_in_milking_parlor",
-                        self.total_water_volume_in_milking_parlor, info_map)
-        om.add_variable("total_daily_manure_volume",
-                        self.total_daily_manure_volume, info_map)
-        om.add_variable("liquid_manure_daily_volume",
-                        self.liquid_manure_daily_volume, info_map)
