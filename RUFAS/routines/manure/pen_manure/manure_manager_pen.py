@@ -57,10 +57,14 @@ class ManureManagerPen:
         self.manure_treatment: str = pen.manure_storage
 
         self.manure = PenManure.get_instance(pen.manure, self.num_animals)
-        self.num_lactating_cows = self.count_lactating_cows(pen.animal_combination, pen.animals_in_pen)
+        self.num_lactating_cows = self.count_lactating_cows(
+            pen.animal_combination, pen.animals_in_pen
+        )
 
     @classmethod
-    def count_lactating_cows(cls, animal_combination: Pen.AnimalCombination, animals_in_pen: [AnimalBase]) -> int:
+    def count_lactating_cows(
+        cls, animal_combination: Pen.AnimalCombination, animals_in_pen: [AnimalBase]
+    ) -> int:
         """Counts the number of lactating cows in the pen.
 
         Args:
@@ -87,21 +91,21 @@ class ManureManagerPen:
             Barn area, m^2/animal.
 
         """
-        BarnArea = NamedTuple('BarnArea', [('has_cows', float), ('no_cows', float)])
+        BarnArea = NamedTuple("BarnArea", [("has_cows", float), ("no_cows", float)])
         tiestall = BarnArea(has_cows=1.2, no_cows=1.0)
         bedded_pack = BarnArea(has_cows=5.0, no_cows=3.0)
         freestall = BarnArea(has_cows=3.5, no_cows=2.5)
         default = freestall
 
         barn_area_by_pen_type = {
-            'tiestall': tiestall,
-            'bedded pack': bedded_pack,
-            'freestall': freestall
+            "tiestall": tiestall,
+            "bedded pack": bedded_pack,
+            "freestall": freestall,
         }
 
         barn_area = barn_area_by_pen_type.get(self.pen_type, default)
 
-        if 'Cow' in self.classes_in_pen:
+        if "Cow" in self.classes_in_pen:
             return barn_area.has_cows
         else:
             return barn_area.no_cows
