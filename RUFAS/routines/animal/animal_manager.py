@@ -108,8 +108,6 @@ class AnimalManager:
         config = {}
         config.update(data['management_decisions'])
         config.update(data['farm_level']['calf'])
-        config.update(data['farm_level']['repro']['ED_related'])
-        config.update(data['farm_level']['repro']['TAI_related'])
         config.update(data['farm_level']['repro'])
         config.update(data['farm_level']['bodyweight'])
         config.update(data['from_literature']['repro'])
@@ -200,8 +198,8 @@ class AnimalManager:
         self.formulation_interval = data['ration']['formulation_interval']
 
         self.methane_model = data['methane_model']
-        self.methane_mitigation_method = data['methane_mitigation_method']
-        self.methane_mitigation_additive_amount = data['methane_mitigation_additive_amount']
+        self.methane_mitigation_method = data['methane_mitigation']['methane_mitigation_method']
+        self.methane_mitigation_additive_amount = data['methane_mitigation']['methane_mitigation_additive_amount']
 
         self.init_pens(data['pen_information'], data['herd_information'], data['manure_management_scenarios'])
 
@@ -244,8 +242,10 @@ class AnimalManager:
                                           manure_management_scenario_id][0]
             pen_data['bedding_type'] = manure_management_scenario['bedding_type']
             pen_data['manure_handling'] = manure_management_scenario['manure_handler']
-            pen_data['manure_separator'] = manure_management_scenario['manure_separator']
-            pen_data['manure_storage'] = manure_management_scenario['manure_treatment']
+            pen_data['manure_separator'] = \
+                manure_management_scenario['manure_separator']
+            pen_data['manure_storage'] = \
+                manure_management_scenario['manure_treatment']
 
             pen = Pen(**pen_data)
 
@@ -279,7 +279,7 @@ class AnimalManager:
             herd_data: dictionary containing information about the herd
         """
 
-        animal_keys = {"calf_num", "heiferI_num", "heiferII_num", "heiferIII_num", "cow_num"}
+        animal_keys = {"calf_num", "heiferI_num", "heiferII_num", "heiferIII_num_springers", "cow_num"}
 
         info_map = {
             "class": self.__class__.__name__,

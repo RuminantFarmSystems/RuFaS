@@ -102,6 +102,7 @@ def mock_pen_data() -> Dict[str, Dict[str, Union[str, float, int]]]:
     return {
         "pen0": {
             "id": 0,
+            "pen_name": "",
             "animal_combination": "CALF",
             "vertical_dist_to_milking_parlor": 0.1,
             "horizontal_dist_to_milking_parlor": 1.6,
@@ -113,6 +114,7 @@ def mock_pen_data() -> Dict[str, Dict[str, Union[str, float, int]]]:
         },
         "pen1": {
             "id": 1,
+            "pen_name": "",
             "animal_combination": "GROWING",
             "vertical_dist_to_milking_parlor": 0.1,
             "horizontal_dist_to_milking_parlor": 1.6,
@@ -124,6 +126,7 @@ def mock_pen_data() -> Dict[str, Dict[str, Union[str, float, int]]]:
         },
         "pen2": {
             "id": 2,
+            "pen_name": "",
             "animal_combination": "CLOSE_UP",
             "vertical_dist_to_milking_parlor": 0.1,
             "horizontal_dist_to_milking_parlor": 1.6,
@@ -135,6 +138,7 @@ def mock_pen_data() -> Dict[str, Dict[str, Union[str, float, int]]]:
         },
         "pen3": {
             "id": 3,
+            "pen_name": "",
             "animal_combination": "LAC_COW",
             "vertical_dist_to_milking_parlor": 0.1,
             "horizontal_dist_to_milking_parlor": 1.6,
@@ -329,12 +333,12 @@ def test_print_animal_num_warnings(animal_manager: AnimalManager):
     with patch("RUFAS.output_manager.OutputManager.add_log") as add_log, \
             patch("RUFAS.output_manager.OutputManager.add_warning") as add_warning:
 
-        animal_keys = {"calf_num", "heiferI_num", "heiferII_num", "heiferIII_num", "cow_num"}
+        animal_keys = {"calf_num", "heiferI_num", "heiferII_num", "heiferIII_num_springers", "cow_num"}
         herd_data = {
             "calf_num": 0,
             "heiferI_num": 0,
             "heiferII_num": 0,
-            "heiferIII_num": 0,
+            "heiferIII_num_springers": 0,
             "cow_num": 0
         }
 
@@ -345,7 +349,7 @@ def test_print_animal_num_warnings(animal_manager: AnimalManager):
                 "calf_num": 0,
                 "heiferI_num": 0,
                 "heiferII_num": 0,
-                "heiferIII_num": 0,
+                "heiferIII_num_springers": 0,
                 "cow_num": 0
             },
             "simulate_animals": True
@@ -425,17 +429,17 @@ def pens_test_data_dict() -> List[dict[Any]]:
         {
             "pen_data":
                 {"pen0":
-                     {"pen_id": 0,
-                      "cow_type_to_id_map": {
+                    {"pen_id": 0,
+                     "cow_type_to_id_map": {
                           'Calf': [100283, 102779, 112701, 115078, 127686, 131248, 137254, 148550, 150007, 150905,
                                    151340, 154391, 154438, 156048, 157528, 165411, 169062, 170598, 182656,
                                    186570, 189951, 194172], 'HeiferI': [], 'HeiferII': [], 'HeiferIII': [],
                           'Dry_Cow': [], 'Lac_Cow': []},
-                      "pen_animal_combination": Pen.AnimalCombination.CALF,
-                      "post_removal_stocking_density": 0.50, "num_stalls": 40,
-                      "ration": {"dummy_feed1": 205.0, "dummy_feed2": 0.0, "dummy_feed3": 18.25,
-                                 "dummy_feed4": 72.0, "dummy_feed5": 45.0, "dummy_feed6": 146.0, "dummy_feed7": 170.0,
-                                 "dummy_feed8": 5.0, "dummy_feed9": 0.0, "dummy_feed10": 200.0}},
+                     "pen_animal_combination": Pen.AnimalCombination.CALF,
+                     "post_removal_stocking_density": 0.50, "num_stalls": 40,
+                     "ration": {"dummy_feed1": 205.0, "dummy_feed2": 0.0, "dummy_feed3": 18.25,
+                                "dummy_feed4": 72.0, "dummy_feed5": 45.0, "dummy_feed6": 146.0, "dummy_feed7": 170.0,
+                                "dummy_feed8": 5.0, "dummy_feed9": 0.0, "dummy_feed10": 200.0}},
                  "pen1":
                      {"pen_id": 1,
                       "cow_type_to_id_map": {'Calf': [], 'HeiferI': [100439, 106977, 111123, 111262, 111527, 112516],
@@ -443,8 +447,7 @@ def pens_test_data_dict() -> List[dict[Any]]:
                                              'HeiferIII': [], 'Dry_Cow': [], 'Lac_Cow': []},
                       "pen_animal_combination": Pen.AnimalCombination.GROWING,
                       "post_removal_stocking_density": 0.25, "num_stalls": 36,
-                      "ration": {"dummy_feed1": 0.0, "dummy_feed2": 56.0}}
-                    ,
+                      "ration": {"dummy_feed1": 0.0, "dummy_feed2": 56.0}},
                  "pen2":
                      {"pen_id": 2,
                       "cow_type_to_id_map": {'Calf': [], 'HeiferI': [],
@@ -505,18 +508,18 @@ def pens_test_data_dict() -> List[dict[Any]]:
         {
             "pen_data":
                 {"pen0":
-                     {"pen_id": 0,
-                      "cow_type_to_id_map": {'Calf': [120297, 122798, 123120, 124011, 125663, 139048, 141097, 151564,
-                                                      152876, 162678, 100919, 101115, 112752, 119921, 172095, 178379,
-                                                      181144, 185339, 186287, 192840, 194279, 195286, 196169, 199241,
-                                                      199441],
-                                             'HeiferI': [], 'HeiferII': [], 'HeiferIII': [], 'Dry_Cow': [],
-                                             'Lac_Cow': []},
-                      "pen_animal_combination": Pen.AnimalCombination.CALF,
-                      "post_removal_stocking_density": 0.50, "num_stalls": 48,
-                      "ration": {"status": "dummy_val", "dummy_feed2": 34.0, "dummy_feed3": 3.4,
-                                 "dummy_feed4": 77.0, "dummy_feed5": 3.2, "dummy_feed6": 9.50, "dummy_feed7": 0.0,
-                                 "dummy_feed8": 12.2, "dummy_feed9": 9.9, "dummy_feed10": 400.0}},
+                 {"pen_id": 0,
+                  "cow_type_to_id_map": {'Calf': [120297, 122798, 123120, 124011, 125663, 139048, 141097, 151564,
+                                                  152876, 162678, 100919, 101115, 112752, 119921, 172095, 178379,
+                                                  181144, 185339, 186287, 192840, 194279, 195286, 196169, 199241,
+                                                  199441],
+                                         'HeiferI': [], 'HeiferII': [], 'HeiferIII': [], 'Dry_Cow': [],
+                                         'Lac_Cow': []},
+                  "pen_animal_combination": Pen.AnimalCombination.CALF,
+                  "post_removal_stocking_density": 0.50, "num_stalls": 48,
+                  "ration": {"status": "dummy_val", "dummy_feed2": 34.0, "dummy_feed3": 3.4,
+                             "dummy_feed4": 77.0, "dummy_feed5": 3.2, "dummy_feed6": 9.50, "dummy_feed7": 0.0,
+                             "dummy_feed8": 12.2, "dummy_feed9": 9.9, "dummy_feed10": 400.0}},
                  "pen1":
                      {"pen_id": 1,
                       "cow_type_to_id_map": {'Calf': [], 'HeiferI': [105602, 106140, 111756, 111796, 113310, 116100],
@@ -616,14 +619,14 @@ def pens_test_data_dict() -> List[dict[Any]]:
         {
             "pen_data":
                 {"pen0":
-                     {"pen_id": 0,
-                      "cow_type_to_id_map": {
+                    {"pen_id": 0,
+                     "cow_type_to_id_map": {
                           'Calf': [115259, 138228, 142905, 144752, 156434, 157064, 164638, 167179, 168371, 192382],
                           'HeiferI': [], 'HeiferII': [], 'HeiferIII': [], 'Dry_Cow': [], 'Lac_Cow': []},
-                      "pen_animal_combination": Pen.AnimalCombination.CALF,
-                      "post_removal_stocking_density": 0.20, "num_stalls": 50,
-                      "ration": {"dummy_feed1": 200.0, "dummy_feed2": 0.0, "dummy_feed3": 8.5,
-                                 "dummy_feed4": 98.0, "dummy_feed5": 3.5}},
+                     "pen_animal_combination": Pen.AnimalCombination.CALF,
+                     "post_removal_stocking_density": 0.20, "num_stalls": 50,
+                     "ration": {"dummy_feed1": 200.0, "dummy_feed2": 0.0, "dummy_feed3": 8.5,
+                                "dummy_feed4": 98.0, "dummy_feed5": 3.5}},
                  "pen1":
                      {"pen_id": 1,
                       "cow_type_to_id_map": {'Calf': [], 'HeiferI': [112121, 117953, 138864, 144952],
@@ -632,8 +635,7 @@ def pens_test_data_dict() -> List[dict[Any]]:
                       "pen_animal_combination": Pen.AnimalCombination.GROWING,
                       "post_removal_stocking_density": 0.10, "num_stalls": 100,
                       "ration": {"dummy_feed1": 1.0, "dummy_feed2": 100.0, "dummy_feed3": 77.23,
-                                 "dummy_feed4": 60.5, "dummy_feed5": 42.0}}
-                    ,
+                                 "dummy_feed4": 60.5, "dummy_feed5": 42.0}},
                  "pen2":
                      {"pen_id": 2,
                       "cow_type_to_id_map": {'Calf': [], 'HeiferI': [114067, 119819, 166593, 168618, 183594],
@@ -765,6 +767,7 @@ def setup_dummy_pen(pen_id: int, num_stalls: int, animal_list: List[AnimalBase])
     """
 
     dummy_pen_info_dict = {'vertical_dist_to_milking_parlor': 'dummy_vertical_dist_to_milking_parlor',
+                           'pen_name': 'dummy_pen_name',
                            'horizontal_dist_to_milking_parlor': 'dummy_horizontal_dist_to_milking_parlor',
                            'housing_type': 'dummy_housing_type', 'bedding_type': 'dummy_bedding_type',
                            'pen_type': 'dummy_pen_type', 'manure_handling': 'dummy_manure_handling',
@@ -773,7 +776,8 @@ def setup_dummy_pen(pen_id: int, num_stalls: int, animal_list: List[AnimalBase])
                            'max_stocking_density': 'dummy_max_stocking_density', 'id': pen_id,
                            'number_of_stalls': num_stalls}
 
-    dummy_pen = Pen(dummy_pen_info_dict['id'], dummy_pen_info_dict['vertical_dist_to_milking_parlor'],
+    dummy_pen = Pen(dummy_pen_info_dict['id'], dummy_pen_info_dict['pen_name'],
+                    dummy_pen_info_dict['vertical_dist_to_milking_parlor'],
                     dummy_pen_info_dict['horizontal_dist_to_milking_parlor'],
                     dummy_pen_info_dict['number_of_stalls'],
                     dummy_pen_info_dict['housing_type'], dummy_pen_info_dict['bedding_type'],
@@ -1009,11 +1013,6 @@ def test_reset_milk_production_reduction(pens_with_mock_animals) -> None:
             assert animal.milk_production_reduction == 0.0
 
 
-def test_daily_updates():
-    """Unit test for function daily_updates in file routines/animal/animal_manager.py"""
-    pass
-
-
 def test_end_ration_interval():
     """Unit test for function end_ration_interval in file routines/animal/animal_manager.py"""
     pass
@@ -1211,8 +1210,10 @@ def test_handle_animals_with_unchanged_class_and_changed_combination(mocker: Moc
     """
     Unit test for the function _handle_animals_with_unchanged_class_and_changed_combination() in file animal_manager.py
 
-    This test checks that the function correctly identifies the animals that didn't change their classes but changed their animal combination.
-    It also verifies that the functions '_remove_animal_from_pen_and_id_map' and '_add_animal_to_pen_and_id_map' are called for these animals.
+    This test checks that the function correctly identifies the animals
+    that didn't change their classes but changed their animal combination.
+    It also verifies that the functions '_remove_animal_from_pen_and_id_map'
+    and '_add_animal_to_pen_and_id_map' are called for these animals.
 
     """
     # Arrange
@@ -1502,7 +1503,8 @@ def test_daily_updates(is_end_ration_interval: bool, mocker: MockerFixture) -> N
     mock_animal_manager.cows = mock_cows = mocker.MagicMock()
     mock_animal_manager.methane_model = mock_methane_model = mocker.MagicMock()
     mock_animal_manager.methane_mitigation_method = mock_methane_mitigation_method = mocker.MagicMock()
-    mock_animal_manager.methane_mitigation_additive_amount = mock_methane_mitigation_additive_amount = mocker.MagicMock()
+    mock_animal_manager.methane_mitigation_additive_amount = \
+        mock_methane_mitigation_additive_amount = mocker.MagicMock()
     patch_for_end_ration_interval = mocker.patch.object(
         AnimalManager, 'end_ration_interval', return_value=is_end_ration_interval)
     patch_for_reset_milk_production_reduction = mocker.patch.object(

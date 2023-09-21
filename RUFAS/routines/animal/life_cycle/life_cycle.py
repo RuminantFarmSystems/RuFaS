@@ -203,7 +203,7 @@ class LifeCycleManager:
         calves = self._get_animals(Calf, herd_data['calf_num'], herd_data['breed'])
         heiferIs = self._get_animals(HeiferI, herd_data['heiferI_num'], herd_data['breed'])
         heiferIIs = self._get_animals(HeiferII, herd_data['heiferII_num'], herd_data['breed'])
-        heiferIIIs = self._get_animals(HeiferIII, herd_data['heiferIII_num'], herd_data['breed'])
+        heiferIIIs = self._get_animals(HeiferIII, herd_data['heiferIII_num_springers'], herd_data['breed'])
         cows = self._get_animals(Cow, herd_data['cow_num'], herd_data['breed'])
         self.replacement_market = self.animal_initializer.get_replacement_cows(herd_data['replace_num'],
                                                                                herd_data['breed'])
@@ -498,8 +498,8 @@ class LifeCycleManager:
             'pen_history': heiferI.pen_history
         })
         heiferI_vals.update(repro_program=AnimalBase.config['heifer_repro_method'])
-        heiferI_vals.update(tai_method_h=AnimalBase.config['heifer_TAI_protocol'])
-        heiferI_vals.update(synch_ed_method_h=AnimalBase.config['heifer_synchED_protocol'])
+        heiferI_vals.update(tai_method_h=AnimalBase.config['heifer_repro_programs']['heifer_TAI_protocol'])
+        heiferI_vals.update(synch_ed_method_h=AnimalBase.config['heifer_repro_programs']['heifer_synchED_protocol'])
         new_heiferII = HeiferII(heiferI_vals)
         heiferIIs.append(new_heiferII)
 
@@ -647,9 +647,9 @@ class LifeCycleManager:
             'calf_birth_weight': heiferIII.calf_birth_weight
         })
         args.update(repro_program=AnimalBase.config['cow_repro_method'])
-        args.update(presynch_method=AnimalBase.config['cow_presynch_protocol'])
-        args.update(tai_method_c=AnimalBase.config['cow_TAI_protocol'])
-        args.update(resynch_method=AnimalBase.config['cow_resynch_protocol'])
+        args.update(presynch_method=AnimalBase.config["cow_repro_programs"]['cow_presynch_protocol'])
+        args.update(tai_method_c=AnimalBase.config["cow_repro_programs"]['cow_TAI_protocol'])
+        args.update(resynch_method=AnimalBase.config["cow_repro_programs"]['cow_resynch_protocol'])
         new_cow = Cow(args)
         if len(cows)>0:
             new_cow.milk_production_reduction = cows[0].milk_production_reduction
