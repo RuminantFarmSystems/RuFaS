@@ -4,13 +4,14 @@
     "slope_length": 3,
     "manning": 0.4,
     "field_size": 1.0,
-    "practice_factor": 0.08,
+    "support_practice_factor": 0.08,
     "sand": 15,
     "silt": 65,
     "soil_albedo": 0.16,
     "initial_residue": 0,
     "fresh_N_mineral_rate": 0.05,
     "soil_cover_type": "BARE",
+    "soil_evaporation_compensation_coefficient": 0.95,
     "soil_layers":
     {
         "layer_1":

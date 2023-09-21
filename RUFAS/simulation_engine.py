@@ -8,6 +8,7 @@ import config.global_variables
 from RUFAS import routines, errors
 from RUFAS.classes import Config, State, Weather, Time
 from RUFAS.output_manager import OutputManager
+from RUFAS.input_manager import InputManager
 import random
 import numpy
 from typing import Optional
@@ -17,6 +18,7 @@ from RUFAS.util import Utility
 
 
 om = OutputManager()
+im = InputManager()
 
 
 class SimulationEngine:
@@ -154,16 +156,17 @@ class SimulationEngine:
         print(f"Initializing simulation environment from {file_path}")
 
         try:
-            data = Utility.read_json_file(file_path)
-            self.config = Config(data['config'], data['weather'])
+            data_config = im.get_data('config')
+            data_weather = im.get_data('weather')
+            self.config = Config(data_config, data_weather)
 
             if self.config.set_seed:
                 random.seed(self.config.seed)
                 numpy.random.seed(self.config.seed)
 
-            self.weather = Weather(data['weather'], self.config)
+            self.weather = Weather(data_weather, self.config)
             self.time = Time(self.config)
-            self.state = State(data['farm'], self.config,
+            self.state = State(self.config,
                                self.weather, self.time)
 
         except errors.JSONfileData as e:

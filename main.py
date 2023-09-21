@@ -62,10 +62,11 @@ def execute_simulations_from_files(
     """Execute simulations for each file"""
     output_manager = OutputManager()
     input_manager = InputManager()
-    is_data_valid = input_manager.start_data_processing("input/example_metadata.json", True)
     input_file_list = files
     for input_file_path in input_file_list:
+        input_manager.flush_pools()
         output_manager.flush_pools()
+        is_data_valid = input_manager.start_data_processing(str(input_file_path), True)
         simulator = SimulationEngine(input_file_path)
         simulator.simulate()
         output_manager.save_variables(r"output", r"output/output_filters/", exclude_info_maps)
