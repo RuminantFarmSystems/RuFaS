@@ -187,6 +187,7 @@ class RationConfig:
         self.lactating = lactating_
         self.DMIest = DMIest_
 
+        self.NElact = []
         self.MEact = []
         self.NEgact = []
         self.NEm_act = []

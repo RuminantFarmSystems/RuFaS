@@ -218,7 +218,8 @@ class RationOptimizer:
         NEm_act_constraint = (sum(np.multiply(x, ration_config.NEm_act)))
         NEg_constraint = sum(np.multiply(x, ration_config.NEgact))
 
-        all_req = ration_config.NEl + ration_config.NEg + ration_config.NEmaint + ration_config.NEa + ration_config.NEpreg
+        all_req = ration_config.NEl + ration_config.NEg + ration_config.NEmaint + \
+            ration_config.NEa + ration_config.NEpreg
         return max(NEm_act_constraint, NEl_constraint, NEg_constraint) - all_req
     
 
@@ -703,10 +704,10 @@ class RationOptimizer:
         Parameters
         ----------
         animal_combination : Pen.AnimalCombination
-            The animal combination to optimize the ration for.
-        available_feeds: Dict 
+            enum of 'AnimalCombination', e.g. The animal combination to optimize the ration for.
+        available_feeds : Dict 
             a DefaultDict of the AvailableFeeds class attributes defined in ration_driver.py
-        ration_config: RationConfig object
+        ration_config : RationConfig object
             Attributes are animal requirement and feed supply information required for optimization
         
         Returns
@@ -754,8 +755,8 @@ class RationOptimizer:
 
         available_feeds : Dict
             a DefaultDict of the AvailableFeeds class attributes defined in ration_driver.py
-        animal_combination: 
-            one of the animal combinations specified in the AnimalCombination enum
+        animal_combination : Pen.AnimalCombination
+            enum of 'AnimalCombination', e.g. The animal combination to optimize the ration for.
 
         """
         price = self.list_reconfig(available_feeds['price'])

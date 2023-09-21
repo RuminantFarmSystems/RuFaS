@@ -5,7 +5,6 @@ Description: Implements test cases
 Author(s): Pooya Hekmati, sh2235@cornell.edu, Carson Wolber, ctw54@cornell.edu
 """
 
-import math
 from typing import Any, Dict
 from unittest.mock import patch
 from mock import MagicMock
@@ -19,7 +18,6 @@ import numpy as np
 import pytest
 
 
-from RUFAS.routines.animal.life_cycle import cow
 from RUFAS.routines.animal.pen import Pen
 from RUFAS.routines.animal.life_cycle.calf import Calf
 
@@ -36,7 +34,6 @@ import RUFAS.routines.animal.ration.ration_optimizer
 
 from RUFAS.routines.animal.life_cycle.animal_base import AnimalBase
 from RUFAS.routines.animal.life_cycle.animal_events import AnimalEvents
-from RUFAS.routines.animal.ration import ration_driver
 
 import RUFAS.routines.animal.ration.user_defined_ration
 from RUFAS.routines.animal.ration.user_defined_ration import \
