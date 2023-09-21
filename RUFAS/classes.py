@@ -253,24 +253,7 @@ class Weather:
             self.radiation[current_year_index][current_day_index] = weather_file['Hday'][i]
             self.irrigation[current_year_index][current_day_index] = weather_file['irrigation'][i]
 
-        avg_annual_temp = np.mean(np.array(weather_file['avg']))
-        print(avg_annual_temp)
-
-        # calculates T_avg_annual for each year
-        for i in range(len(years)):
-            avg = sum(self.T_avg[i]) / (len(years[i]))
-            self.T_avg_annual.append(avg)
-
-        if len(years) > 2:
-            T_avg = sum([self.T_avg_annual[j] for j in range(1, len(self.T_avg_annual) - 1)]) \
-                / (len(self.T_avg_annual) - 2)
-        else:
-            T_avg = sum([self.T_avg_annual[j] for j in range(len(self.T_avg_annual))]) \
-                / len(self.T_avg_annual)
-
-        self.T_avg_annual[0] = T_avg
-        self.T_avg_annual[len(self.T_avg_annual) - 1] = T_avg
-        print(self.T_avg_annual)
+        self.T_avg_annual = self._calculate_average_annual_temperature(weather_file['avg'])
 
     @staticmethod
     def _calculate_average_annual_temperature(daily_average_temperatures: list(float)) -> float:
@@ -289,10 +272,17 @@ class Weather:
 
         Notes
         -----
-        This method is a
+        This method calculates the average annual air temperature by taking the average of all daily average air
+        temperatures provided in the weather input file.
+
+        This method is intended to approximate SWAT's method for calculating the average annual temperature. SWAT
+        calculates average high and low temperatures for each month over every simulated year, then averages those
+        values to get a single annual average air temperature for the entire simulation. The exact implementation for
+        this can be found at in the SWAT source code file `readwgn.f
+        <https://bitbucket.org/blacklandgrasslandmodels/swat_development/src/master/readwgn.f>`_
 
         """
-        pass
+        return np.mean(np.array(daily_average_temperatures))
 
 
 class Time:
