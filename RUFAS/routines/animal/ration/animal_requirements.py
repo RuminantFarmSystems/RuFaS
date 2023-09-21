@@ -74,7 +74,7 @@ def calc_rqmts(body_weight: float, mature_body_weight: float, day_of_pregnancy: 
     Dict[str, float]
         dictionary of requirement values, see individual functions for each key value pair
     """
-    if AnimalBase.config['energy_and_nutrient_calculation_method'] == 'NRC':
+    if AnimalBase.config['nutrient_standard'] == 'NRC':
         net_energy_maintenance, conceptus_weight, calf_birth_weight = calculate_NRC_energy_maintenance_requirements(
             body_weight, mature_body_weight, day_of_pregnancy, body_condition_score_5, previous_temperature,
             animal_type)
@@ -96,7 +96,7 @@ def calc_rqmts(body_weight: float, mature_body_weight: float, day_of_pregnancy: 
         phosphorus_requirement = calculate_NRC_phosphorus_requirements(
             body_weight, mature_body_weight, day_of_pregnancy, milk_production, animal_type, average_daily_gain, dry_matter_intake_estimate)
         
-    elif AnimalBase.config['energy_and_nutrient_calculation_method'] == 'NASEM':
+    elif AnimalBase.config['nutrient_standard'] == 'NASEM':
         net_energy_lactation = calculate_NASEM_energy_lactation_requirements(
             animal_type, milk_fat, milk_true_protein, milk_lactose, milk_production)
         dry_matter_intake_estimate = calculate_NASEM_DMI(
@@ -1216,7 +1216,7 @@ def energy_activity_rqmts(body_weight: float, housing: str, distance: Optional[f
         National Academic Press, Chapter 3 "Energy", pp. 30-31, 2021.
         
     """
-    if AnimalBase.config['energy_and_nutrient_calculation_method'] == 'NRC':
+    if AnimalBase.config['nutrient_standard'] == 'NRC':
         # Activity requirements
         # ---------------------
         # [A.Cow.A.4]-[A.Heifer.A.5]
@@ -1229,7 +1229,7 @@ def energy_activity_rqmts(body_weight: float, housing: str, distance: Optional[f
         # Total net energy for activity requirement (Mcal)
         net_energy_activity = distance * 0.00045 * body_weight + net_energy_activity1
         return net_energy_activity
-    elif AnimalBase.config['energy_and_nutrient_calculation_method'] == 'NASEM':
+    elif AnimalBase.config['nutrient_standard'] == 'NASEM':
         if housing == 'Barn':
             net_energy_activity = distance * 0.00035 * \
                 body_weight
