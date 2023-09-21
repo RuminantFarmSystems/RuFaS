@@ -11,6 +11,7 @@ Author(s): Kass Chupongstimun, kass_c@hotmail.com
 """
 
 import csv
+import numpy as np
 
 from RUFAS import errors
 from RUFAS.input_manager import InputManager
@@ -252,6 +253,9 @@ class Weather:
             self.radiation[current_year_index][current_day_index] = weather_file['Hday'][i]
             self.irrigation[current_year_index][current_day_index] = weather_file['irrigation'][i]
 
+        avg_annual_temp = np.mean(np.array(weather_file['avg']))
+        print(avg_annual_temp)
+
         # calculates T_avg_annual for each year
         for i in range(len(years)):
             avg = sum(self.T_avg[i]) / (len(years[i]))
@@ -266,6 +270,8 @@ class Weather:
 
         self.T_avg_annual[0] = T_avg
         self.T_avg_annual[len(self.T_avg_annual) - 1] = T_avg
+        print(self.T_avg_annual)
+        print(sum(self.T_avg_annual) / len(self.T_avg_annual))
 
 
 class Time:
