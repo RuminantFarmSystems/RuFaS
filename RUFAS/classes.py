@@ -50,7 +50,7 @@ class State:
                 initialize the state
         """
         feed_class_config = im.get_data("feed")
-        self.feed = Feed(feed_class_config)
+        self.feed = Feed(feed_class_config, nutrient_standard=im.get_data("config.nutrient_standard"))
         manure_class_config = im.get_data("manure_management")
         animal_class_config = im.get_data("animal")
         animal_class_config['manure_management_scenarios'] = manure_class_config['manure_management_scenarios']

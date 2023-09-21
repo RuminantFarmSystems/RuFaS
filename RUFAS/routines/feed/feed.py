@@ -29,6 +29,7 @@ from RUFAS.routines.animal.ration.user_defined_ration import \
 
 udrm = UserDefinedRationManager()
 
+
 def daily_feed_routine(feed, fields, animal_manager):
     """
     Description:
@@ -53,7 +54,7 @@ def annual_feed_routine(feed):
 
 
 class Feed:
-    def __init__(self, data: PurchasedFeedTypedDict):
+    def __init__(self, data: PurchasedFeedTypedDict, nutrient_standard: str):
         """
         Description:
             Stores the information for the feeds managed by the farm, and the methods
@@ -67,6 +68,9 @@ class Feed:
         self.feed_quality_table = data['feed_quality_table']
         self.nutrient_table = data['nutrient_table']
         self.db_reader = DatabaseReader(self.feed_database)
+        self.nutrient_standard = nutrient_standard
+        print(nutrient_standard)
+
         purchased_feeds_list = [feed_item["purchased_feed"] for feed_item in data["purchased_feeds"]]
         purchased_feed_costs = {str(feed_item["purchased_feed"]): feed_item["purchased_feed_cost"]
                                 for feed_item in data["purchased_feeds"]}
@@ -133,7 +137,7 @@ class Feed:
         udrm.lactating_cow_ration = self.user_defined_ration_percentages['lac_cow']
         udrm.tolerance = self.user_defined_ration_percentages['tolerance']
         udrm.milk_reduction_maximum = self.user_defined_ration_percentages['milk_reduction_maximum']
-         
+
     def summarize_feed_storage(self):
         """
         Description:
@@ -606,7 +610,7 @@ class Feed:
                         storage.inclusion_rate_est[animal] = \
                             (storage.inclusion_pct[animal] / 100) * storage.animal_avg_BW[animal]
                         storage.req_inv[animal] = storage.inclusion_rate_est[animal] \
-                            * storage.cow_days[animal]
+                                                  * storage.cow_days[animal]
                     tot_req_inv_non_lactating_cows = 0
 
                     for animal in storage.req_inv:

@@ -273,7 +273,7 @@
             "description": "Number of Times Cows Milked (per day) -- The average or most common number of times the cows are milked, whole numbers 1-3",
             "default": 3,
             "minimum": 0
-          },
+          }
         },
         "farm_level": {
           "type": "object",

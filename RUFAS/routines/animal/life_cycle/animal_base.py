@@ -18,6 +18,9 @@ from RUFAS.routines.animal.animal_typed_dicts import AnimalBaseInitArgsTypedDict
 from RUFAS.routines.animal.life_cycle.animal_events import AnimalEvents
 from RUFAS.routines.animal.life_cycle.body_weight_history import BodyWeightHistory
 from RUFAS.routines.animal.life_cycle.pen_history import PenHistory
+from RUFAS.input_manager import InputManager
+
+im = InputManager()
 
 
 class AnimalBase:
@@ -31,6 +34,7 @@ class AnimalBase:
     @staticmethod
     def set_config(config):
         AnimalBase.config = config
+        AnimalBase.config['nutrient_standard'] = im.get_data("config.nutrient_standard")
 
     def __init__(self, args: AnimalBaseInitArgsTypedDict):
         """
