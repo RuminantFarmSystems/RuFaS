@@ -17,7 +17,7 @@
 *.pyc
 
 # folders
-build
+_build
 others
 
 # Ignore contents of output directories, except for .keep files
