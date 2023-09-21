@@ -339,12 +339,20 @@ class SoilData:
     @property
     def profile_soil_water_content(self) -> float:
         """
-        Returns: amount of water in the entire soil profile (excluding the amount of water held in the profile at the
-            wilting point) (mm)
-        Details: this method for calculating total soil water content assumes the lower bound of water to be 0. It also
-            calculates the soil water content per layer, meaning that if one layer has water content greater than its
-            wilting water point and another layer has water content less than its wilting point, the first layer will
-            not have to compensate for the deficit in the second layer.
+        Calculate the amount of water in the entire soil profile (excluding the amount of water held in the profile at
+        the wilting point) (mm).
+
+        Returns
+        -------
+        float
+            The total soil water content in millimeters (mm).
+
+        Notes
+        -----
+        This method calculates the total soil water content in the entire soil profile. It assumes that the lower bound
+        of water is 0. The calculation is done per layer, meaning that if one layer has water content greater than its
+        wilting water point and another layer has water content less than its wilting point, the first layer will not
+        have to compensate for the deficit in the second layer.
         """
         water_sum = 0
         for layer in self.soil_layers:
@@ -354,7 +362,12 @@ class SoilData:
     @property
     def profile_saturation(self) -> float:
         """
-        Returns: amount of water in the soil profile when completely saturated (mm)
+        Calculate the amount of water in the soil profile when completely saturated (mm).
+
+        Returns
+        -------
+        float
+            The saturated soil water content in millimeters (mm).
         """
         saturation_sum = 0
         for layer in self.soil_layers:
@@ -364,7 +377,13 @@ class SoilData:
     @property
     def profile_field_capacity(self) -> float:
         """
-         Returns: total amount of water contained in the entire soil profile at field capacity (but not saturated) (mm)
+        Calculate the total amount of water contained in the entire soil profile at field capacity
+        (but not saturated) (mm).
+
+        Returns
+        -------
+        float
+            The soil water content at field capacity in millimeters (mm).
         """
         field_capacity_sum = 0
         for layer in self.soil_layers:
@@ -373,8 +392,17 @@ class SoilData:
 
     @property
     def soil_water_factor(self) -> float:
-        """Returns: the soil water factor (unitless)
-        SWAT Reference: 5:2.3.18
+        """
+        Get the soil water factor (unitless).
+
+        Returns
+        -------
+        float
+            The soil water factor (unitless)
+
+        References
+        ----------
+        SWAT Theoretical documentation eqn. 5:2.3.18
         """
         return self.profile_soil_water_content / (0.85 * self.profile_field_capacity)
 
@@ -387,8 +415,15 @@ class SoilData:
 
     @property
     def profile_bulk_density(self) -> float:
-        """Average bulk density of the soil profile based on the bulk density of each soil layer, weighted by the
-            thickness (Mg per cubic meter)"""
+        """
+        Calculate the average bulk density of the soil profile based on the bulk density of each soil layer,
+        weighted by the thickness.
+
+        Returns
+        -------
+        float
+            The average bulk density of the soil profile (Mg per cubic meter)
+        """
         weighted_densities_sum = 0
         weights_sum = 0
         for layer in self.soil_layers:
@@ -398,7 +433,14 @@ class SoilData:
 
     @property
     def profile_nitrates_total(self) -> float:
-        """Calculates and returns the total amount of nitrates in the soil (kg per hectare)"""
+        """
+        Calculate and return the total amount of nitrates in the soil.
+
+        Returns
+        -------
+        float
+            The total amount of nitrates in the soil (kg per hectare).
+        """
         nitrates_sum = 0
         for layer in self.soil_layers:
             nitrates_sum += layer.nitrate_content
@@ -406,13 +448,24 @@ class SoilData:
 
     @property
     def cover_factor(self) -> float:
-        """Returns the cover factor based on the cover type, for use in determining how much phosphorus is absorbed by
-            the soil from surface applied fertilizer before the first rainfall event after application (unitless).
-        Raises:
-            ValueError: If cover type is not one of the three acceptable types ("BARE", "RESIDUE_COVER", or "GRASSED")
-        References:
-            pseudocode_soil [S.5.C.I.1], SurPhos [14] (Note: constants differ between these documents, defer to
-            pseudocode_soil and old code)
+        """
+        Returns the cover factor based on the cover type for determining phosphorus absorption by soil
+        from surface-applied fertilizer before the first rainfall event after application.
+
+        Returns
+        -------
+        float
+            The cover factor (unitless).
+
+        Raises
+        ------
+        ValueError
+            If the cover type is not one of the acceptable types ("BARE", "RESIDUE_COVER", or "GRASSED").
+
+        References
+        ----------
+        pseudocode_soil [S.5.C.I.1], SurPhos [14] (Note: constants may differ between documents; defer to
+        pseudocode_soil and old code).
         """
         if self.cover_type == "BARE":
             return 0.5333
@@ -425,11 +478,23 @@ class SoilData:
 
     @property
     def solubilizing_factor(self) -> float:
-        """Returns the fraction of fertilizer phosphorus that is removed from the available fertilizer phosphorus pool
-            (when number of rain events is less than or equal to 1) or the recalcitrant fertilizer phosphorus pool
-            (when number of rain events is greater than or equal to 2) (unitless).
-            References:
-                SurPhos paragraph just below [16]
+        """
+        Returns the fraction of fertilizer phosphorus removed from the available or recalcitrant pool based on the
+        number of rain events.
+
+        Parameters
+        ----------
+        rain_events : int
+            The number of rain events.
+
+        Returns
+        -------
+        float
+            The fraction of fertilizer phosphorus removed (unitless).
+
+        References
+        ----------
+        SurPhos paragraph just below [16].
         """
         if self.rain_events_after_fertilizer_application <= 1:
             return 1
