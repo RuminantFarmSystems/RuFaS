@@ -25,13 +25,16 @@ class Decomposition:
 
     def decompose(self, temp_average: float) -> None:
         """
-        Determines decomposition effect for each layers and temperature effect
+        Determines decomposition effect for each layer and temperature effect.
 
-        Args:
-            temp_average: Average temperature (Celsius)
+        Parameters
+        ----------
+        temp_average : float
+            Average temperature (Celsius).
 
-        Returns: None
-
+        Returns
+        -------
+        None
         """
         self.data.decomposition_temperature_effect = self._calc_temp_factor(temp_average)
 
@@ -43,16 +46,24 @@ class Decomposition:
                           point_distance: float = 29.7, inflection_slope=0.03,
                           normalizer=20.80546) -> float:
         """
-        Description: calculates the Temperature factor for carbon decomposition
-            "pseudocode_soil" S.6.A.1
-            defaults drawn from defac: course soil
-        Args:
-            temp_average: Average temperature (celsius)
+        Calculate the temperature factor for carbon decomposition.
 
-        Returns: temperature effect (unitless)
+        This function implements the "pseudocode_soil" S.6.A.1 and uses defaults drawn from defac: course soil.
 
-        Notes: this temperature factor is lower-bounded at 0.0, because if negative it may result in a negative amount
-            of decomposition, which in this context would be considered a bug.
+        Parameters
+        ----------
+        temp_average : float
+            Average temperature (Celsius).
+
+        Returns
+        -------
+        float
+            Temperature effect (unitless).
+
+        Notes
+        -----
+        This temperature factor is lower-bounded at 0.0 because if negative, it may result in a negative amount
+        of decomposition, which in this context would be considered a bug.
         """
         # S.6.A.4
         temp_factor = (y_inflection + (point_distance / math.pi) * math.atan(math.pi * inflection_slope * (
@@ -64,21 +75,28 @@ class Decomposition:
                               c_term: float = -0.007, first_exponent=6.648115,
                               second_exponent=3.22) -> float:
         """
-        Description: calculates the moisture factor for carbon decomposition for the layer
-            "pseudocode_soil" S.6.A.2
-            defaults drawn from defac: course soil
+        Calculate the moisture factor for carbon decomposition for the layer.
 
-        Args:
-            water_factor: relative water saturation (%)
+        This function implements the "pseudocode_soil" S.6.A.2 and uses defaults drawn from defac: course soil.
 
-        Returns: moisture effect (unitless)
+        Parameters
+        ----------
+        water_factor : float
+            Relative water saturation (%).
 
-        Notes: If negative bases are raised to a exponents, they sometimes result in complex numbers instead of negative
-            floats. This behavior causes the program to eventually crash and is avoided by computing a sign correction
-            factor, which allows the absolute value of the bases to be used.
+        Returns
+        -------
+        float
+            Moisture effect (unitless).
 
-            This value is lower-bounded at 0, because if negative it will lead to a negative decomposition factor, which
-            does not make any sense.
+        Notes
+        -----
+        If negative bases are raised to exponents, they sometimes result in complex numbers instead of negative
+        floats. This behavior can cause the program to crash. To avoid this, a sign correction factor is computed,
+        allowing the absolute value of the bases to be used.
+
+        The moisture effect is lower-bounded at 0 because if negative, it will lead to a negative decomposition factor,
+        which is not meaningful.
         """
         # S.6.A.5
         base_1 = (water_factor - b_term) / (a_term - b_term)

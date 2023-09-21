@@ -14,7 +14,6 @@ import numpy
 from typing import Optional
 
 from RUFAS.routines.manure.manure_manager import simulate_daily_manure_manager
-from RUFAS.routines.manure.output_handler.manure_manager_output_handler import ManureManagerOutputHandler
 from RUFAS.util import Utility
 
 
@@ -39,7 +38,6 @@ class SimulationEngine:
         t_start_sim = timer.time()
 
         self._run_simulation_main_loop()
-        ManureManagerOutputHandler.produce_csv(self.config.csv_dir, self.state.manure_manager)
         t_end_sim = timer.time()
 
         print("Simulation Successful")
@@ -51,7 +49,6 @@ class SimulationEngine:
         if config.global_variables.PRODUCE_GRAPHICS:
             sys.stdout.write('Producing Graphics\n')
             t_start_graphics = timer.time()
-            ManureManagerOutputHandler.produce_graphics(self.config.graphic_dir, self.state.manure_manager)
             t_end_graphics = timer.time()
             graphics_prod_time = t_end_graphics - t_start_graphics
         else:
