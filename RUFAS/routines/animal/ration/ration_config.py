@@ -3,7 +3,7 @@ from __future__ import annotations
 
 class RationConfig:
     """
-    RationConfig provides a structured way to represent the configuration for rations.
+    RationConfig provides a structured way to represent the collection of animal requirements and feed supply information for the ration formulation process.
 
     Attributes
     ----------

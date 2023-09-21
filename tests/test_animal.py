@@ -1322,6 +1322,10 @@ def test_list_reconfig(input, expected)->None:
     assert ration_optimizer.list_reconfig(input) == expected
 
 
+def test_attempt_optimization():
+    """Unit test for function attempt_optimization in file routines/animal/ration/ration_optimizer.py"""
+    pass
+
 
 def test_objective():
     """Unit test for function objective in file routines/animal/ration/ration_optimizer.py"""
@@ -1383,11 +1387,6 @@ def test_DMI_constraint():
     pass
 
 
-def test_energy_req_limit_constraint():
-    """Unit test for function energy_req_limit_constraint in file routines/animal/ration/ration_optimizer.py"""
-    pass
-
-
 def test_ration_optimizer_optimize():
     """Unit test for function optimize in file routines/animal/ration/ration_optimizer.py"""
     pass
@@ -1410,11 +1409,6 @@ def test_growing_heifer_ration_optimize():
 
 def test_calculate_rqmts():
     """Unit test for function calculate_rqmts in file routines/animal/ration/growing_heifer_ration.py"""
-    pass
-
-
-def test_optimization():
-    """Unit test for function optimization in file routines/animal/ration/ration_driver.py"""
     pass
 
 

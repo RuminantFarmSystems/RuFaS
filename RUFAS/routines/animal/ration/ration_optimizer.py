@@ -19,6 +19,7 @@ from RUFAS.routines.animal.ration.user_defined_ration import UserDefinedRationMa
 udrm = UserDefinedRationManager()
 
 from RUFAS.routines.animal.ration.ration_config import RationConfig
+from RUFAS.routines.animal.ration.animal_requirements import AnimalRequirements
 
 import numpy.typing as npt
 from typing import Callable, List
@@ -61,9 +62,8 @@ class RationOptimizer:
             self.DMI_constraint_lower
         ]
         
-        self.cow_cons = [{'type': 'ineq', 'fun': func} for func in self.constraint_functions]
-        """ constraints for lactating cows """
         self.cow_cons=[{'type': 'ineq', 'fun': func, 'args': arguments} for func in self.constraint_functions]
+        """ constraints for lactating cows """
 
         self.heifer_cons = [cons for cons in self.cow_cons if cons['fun'] not in [self.total_energy, self.NEl_constraint, self.DMI_constraint_lower]]
         """constraints for animals that are not lactating cows """
@@ -77,8 +77,10 @@ class RationOptimizer:
         required for matching the decision variables to one of the three energy
         constraint.
 
-        Args:
-            list: A list of values
+        Parameters
+        ----------
+        list : list
+            A list of values
         """
         list_reconfig = []
         for i in list:
@@ -88,7 +90,7 @@ class RationOptimizer:
         return list_reconfig
 
 
-    def objective(self, x, ration_config):
+    def objective(self, x: np.ndarray, ration_config: RationConfig) -> None:
         """
         Sets up the objective function in the optimize function for the non-linear
         program. Whenever the paramert x is used, it refers to the "decision vetor
@@ -98,26 +100,40 @@ class RationOptimizer:
         all "constraints", which just means the diet fulfills the average nutrient
         requirements in the pen.
 
-        Args:
-            x: The decision vector of the NLP
+        Parameters
+        ----------
+        x : numpy.ndarray
+            The decision vector of the NLP
+        ration_config: RationConfig object
+            Attributes are animal requirement and feed supply information required for optimization
+        
+        Returns
+        -------
+        None
+
         """
-        # return sum(np.multiply(x, ration_config['price']))
         return sum(np.multiply(x, ration_config.price))
 
 
-    def total_energy(self, x, ration_config):
+    def total_energy(self, x: np.ndarray, ration_config: RationConfig) -> None:
         """
         Sets up the RHS multipliers for the maintenance and activity requirements
         satisfied by the feed. Each equation has a reference to the respective
         calculation in the pseudo code. 
         The global variables are a temporary measure until the completion of the ration refactor
 
-        Args:
-            x: The decision vector of the NLP
+        Parameters
+        ----------
+        x : numpy.ndarray
+            The decision vector of the NLP
+        ration_config: RationConfig object
+            Attributes are animal requirement and feed supply information required for optimization
+        
+        Returns
+        -------
+        None
+
         """
-        # global MEact
-        # global TDNact
-        # global DEact
         dry_matter_intake = sum(x)
         # Dietary TDN content, kg
         TotalTDN = sum(np.multiply(x, ration_config.TDN))
@@ -206,19 +222,25 @@ class RationOptimizer:
         return max(NEm_act_constraint, NEl_constraint, NEg_constraint) - all_req
     
 
-    def NEmact_constraint(self, x, ration_config):
+    def NEmact_constraint(self, x: np.ndarray, ration_config: RationConfig) -> None:
         """
         Sets up the RHS multipliers for the maintenance and activity requirements
         satisfied by the feed. Each equation has a reference to the respective
         calculation in the pseudo code. The global variables defined in the begining
         of this function are used in future functions.
 
-        Args:
-            x: The decision vector of the NLP
+        Parameters
+        ----------
+        x : numpy.ndarray
+            The decision vector of the NLP
+        ration_config: RationConfig object
+            Attributes are animal requirement and feed supply information required for optimization
+        
+        Returns
+        -------
+        None
+
         """
-        # global MEact
-        # global TDNact
-        # global DEact
         # DMI calculated by the NLP
         dry_matter_intake = sum(x)
         # Dietary TDN content, kg
@@ -278,15 +300,24 @@ class RationOptimizer:
         return (sum(np.multiply(x, ration_config.NEm_act)) - (ration_config.NEmaint + ration_config.NEa))
 
 
-    def NEl_constraint(self, x, ration_config):
+    def NEl_constraint(self, x: np.ndarray, ration_config: RationConfig) -> None:
         """
         Sets up the RHS multipliers for the lactation and pregnancy requirements
         satisfied by each feed. Each calculation has a reference to the respective
         calculation in the pseudocode. Note to eliminate code repetition the global
         variable MEact is used (calculated in NEmact_constraint).
 
-        Args:
-            x: The decision vector of the NLP
+        Parameters
+        ----------
+        x : numpy.ndarray
+            The decision vector of the NLP
+        ration_config: RationConfig object
+            Attributes are animal requirement and feed supply information required for optimization
+        
+        Returns
+        -------
+        None
+
         """
         # Actual net energy for lactation of feed i, Mcal/kg
         if not ration_config.NElact:
@@ -306,7 +337,7 @@ class RationOptimizer:
         return sum(np.multiply(x, ration_config.NElact)) - (ration_config.NEpreg + ration_config.NEl)
 
 
-    def NEgact_constraint(self, x, ration_config):
+    def NEgact_constraint(self, x: np.ndarray, ration_config: RationConfig) -> None:
         """
         Sets up the RHS multipliers for the growth requirements satisfied by each
         feed. Each calculation has a reference to the respective calculation in the
@@ -332,15 +363,24 @@ class RationOptimizer:
         return sum(np.multiply(x, ration_config.NEgact)) - ration_config.NEg
 
 
-    def calcium_constraint(self, x, ration_config):
+    def calcium_constraint(self, x: np.ndarray, ration_config: RationConfig) -> None:
         """
         Sets up the RHS multipliers for the calcium requirements satisfied by each
         feed. Each calculation has a reference to the respective calculation in the
         pseudocode. Note the calculated calcium requirement 'C_req' is in grams and
         x is in kg thus the divide by 1000.
 
-        Args:
-            x: The decision vector of the NLP
+        Parameters
+        ----------
+        x : numpy.ndarray
+            The decision vector of the NLP
+        ration_config: RationConfig object
+            Attributes are animal requirement and feed supply information required for optimization
+        
+        Returns
+        -------
+        None
+
         """
         # Ca digestibility of feed i (proportion of Ca)
         ration_config.dCa = []
@@ -357,7 +397,7 @@ class RationOptimizer:
         return (sum(np.multiply(x, np.multiply(np.multiply(ration_config.calcium, 0.01), ration_config.dCa))) - (ration_config.C_req / 1000))
 
 
-    def phosphorus_constraint(self, x, ration_config):
+    def phosphorus_constraint(self, x: np.ndarray, ration_config: RationConfig) -> None:
         """
         Sets up the RHS multipliers for the phosphorus requirements satisfied by each
         feed. Each calculation has a reference to the respective calculation in the
@@ -366,8 +406,17 @@ class RationOptimizer:
         calculated phosphorus requirement 'P_req' is in grams and x is in kg thus
         the divide by 1000.
 
-        Args:
-            x: The decision vector of the NLP
+        Parameters
+        ----------
+        x : numpy.ndarray
+            The decision vector of the NLP
+        ration_config: RationConfig object
+            Attributes are animal requirement and feed supply information required for optimization
+        
+        Returns
+        -------
+        None
+
         """
         # P digestibility of feed i (proportion of P)
         ration_config.dP = []
@@ -383,15 +432,24 @@ class RationOptimizer:
         return sum(np.multiply(x, np.multiply(np.multiply(ration_config.phosphorus, 0.01), ration_config.dP))) - ((ration_config.P_req) / 1000)
 
 
-    def protein_constraint(self, x, ration_config):
+    def protein_constraint(self, x: np.ndarray, ration_config: RationConfig) -> None:
         """
         Sets up the protein requirement constraint in the NLP. Because part of the
         maintenance requirement for protein contains non-linearity properties, that
         requirement will be calculated in this function. Each calculation has a
         reference to the respective calculation in the pseudocode.
 
-        Args:
-            x: The decision vector of the NLP.
+        Parameters
+        ----------
+        x : numpy.ndarray
+            The decision vector of the NLP
+        ration_config: RationConfig object
+            Attributes are animal requirement and feed supply information required for optimization
+        
+        Returns
+        -------
+        None
+
         """
         DMI = sum(x)
         # Boolean values to identify if feed is a concentrate
@@ -450,13 +508,22 @@ class RationOptimizer:
         return (ration_config.MP_supply - (ration_config.MP_req / 1000))
 
 
-    def NDF_constraint_lower(self, x, ration_config):
+    def NDF_constraint_lower(self, x: np.ndarray, ration_config: RationConfig) -> None:
         """
         Sets up the RHS multipliers for each feed to instill an overall NDF percent
         constraint. This is a lower bound constraint on overall NDF percent.
 
-        Args:
-            x: The decision vector of the NLP
+        Parameters
+        ----------
+        x : numpy.ndarray
+            The decision vector of the NLP
+        ration_config: RationConfig object
+            Attributes are animal requirement and feed supply information required for optimization
+        
+        Returns
+        -------
+        None
+
         """
         # From E/D: OTHER REQUIREMENTS
         DMI = sum(x)
@@ -464,13 +531,22 @@ class RationOptimizer:
             return (sum(np.multiply(x, ration_config.NDF)) / DMI) - 25
 
 
-    def NDF_constraint_upper(self, x, ration_config):
+    def NDF_constraint_upper(self, x: np.ndarray, ration_config: RationConfig) -> None:
         """
         Sets up the RHS multipliers for each feed to instill an overall NDF percent
         constraint. This is an upper bound constraint on overall NDF percent.
 
-        Args:
-            x: The decision vector of the NLP
+        Parameters
+        ----------
+        x : numpy.ndarray
+            The decision vector of the NLP
+        ration_config: RationConfig object
+            Attributes are animal requirement and feed supply information required for optimization
+        
+        Returns
+        -------
+        None
+
         """
         # From E/D: OTHER REQUIREMENTS
         DMI = sum(x)
@@ -478,7 +554,7 @@ class RationOptimizer:
             return (-(sum(np.multiply(x, ration_config.NDF)) / DMI) + 45)
 
 
-    def forage_NDF_constraint(self, x, ration_config):
+    def forage_NDF_constraint(self, x: np.ndarray, ration_config: RationConfig) -> None:
         """
         Sets up the RHS multipliers for only FORAGES to instill a NDF percent across
         forages constraint. This is a lower bound constraint on NDF percent across
@@ -500,13 +576,22 @@ class RationOptimizer:
             return (sum(np.multiply(x, np.multiply(ration_config.NDF, ration_config.is_forage))) / DMI) - 15
 
 
-    def fat_constraint(self, x, ration_config):
+    def fat_constraint(self, x: np.ndarray, ration_config: RationConfig) -> None:
         """
         Sets up the RHS multipliers for each feed to instill an overall fat percent
         constraint. This is an upper bound constraint on over fat percent.
 
-        Args:
-            x: The decision vector of the NLP
+        Parameters
+        ----------
+        x : numpy.ndarray
+            The decision vector of the NLP
+        ration_config: RationConfig object
+            Attributes are animal requirement and feed supply information required for optimization
+        
+        Returns
+        -------
+        None
+
         """
         # From E/D: OTHER REQUIREMENTS
         DMI = sum(x)
@@ -514,51 +599,58 @@ class RationOptimizer:
             return -(sum(np.multiply(x, ration_config.EE)) / DMI) + 7
 
 
-    def DMI_constraint_lower(self, x, ration_config):
+    def DMI_constraint_lower(self, x: np.ndarray, ration_config: RationConfig) -> None:
         """
         Constraint in place to make sure the sum of all the feeds in the ration is
         greater than the DMI_est + 20% calculated in the requirements
 
-        Args:
-            x: The decision vector of the NLP
+        Parameters
+        ----------
+        x : numpy.ndarray
+            The decision vector of the NLP
+        ration_config: RationConfig object
+            Attributes are animal requirement and feed supply information required for optimization
+        
+        Returns
+        -------
+        None
+
         """
         return (sum(x)) - (ration_config.DMIest*(1-AnimalModuleConstants.DMI_CONSTRAINT_PERCENT))
 
 
-    def DMI_constraint_upper(self, x, ration_config):
+    def DMI_constraint_upper(self, x: np.ndarray, ration_config: RationConfig) -> None:
         """
         Constraint in place to make sure the sum of all the feeds in the ration is
         less than the DMI_est + 20% calculated in the requirements.
 
-        Args:
-            x: The decision vector of the NLP
+        Parameters
+        ----------
+        x : numpy.ndarray
+            The decision vector of the NLP
+        ration_config: RationConfig object
+            Attributes are animal requirement and feed supply information required for optimization
+        
+        Returns
+        -------
+        None
+
         """
         return -(sum(x)) + (ration_config.DMIest*(1+AnimalModuleConstants.DMI_CONSTRAINT_PERCENT))
 
-    def energy_req_limit_constraint(self, x, ration_config):
-        """
-        Constraint that limits each feed to only satisfying a single energy constraint
-        (NEmact, NEgact, or NEl).
 
-        Args:
-            x: The decision vector of the NLP
-        """
-        n = len(ration_config.price) / 3
-        list = []
-        for i in range(int(n)):
-            a = i * 3
-            list.append(x[a] * x[a + 1])
-            list.append(x[a] * x[a + 2])
-            list.append(x[a + 1] * x[a + 2])
-        return -sum(list)
-
-    def get_ration_vals(self, x, ration_config):
+    def get_ration_vals(self, x: np.ndarray, ration_config: RationConfig) -> None:
         """
         Function that calculates and retrieves ration values used throughout the
         ration.
 
-        Args:
-            x: the decision vector of the NLP (should be a completed ration)
+        Parameters
+        ----------
+        
+        x: the decision vector of the NLP (should be a completed ration)
+        ration_config: RationConfig object
+            Attributes are animal requirement and feed supply information required for optimization
+        
         """
         #ration vals (subject to adding other ration vals)
         ME_tot = sum(np.multiply(x, ration_config.MEact))
@@ -581,6 +673,7 @@ class RationOptimizer:
             keys are feed IDs, values are percent of DMI
         DMIest: float
             average estimated DMI for pen
+
         Returns
         -------
         List
@@ -601,7 +694,7 @@ class RationOptimizer:
         return tribounds
 
 
-    def optimize(self, animal_combination, available_feeds: Dict, ration_config) -> None:
+    def optimize(self, animal_combination, available_feeds: Dict, ration_config: RationConfig) -> None:
         """
         Calls the objective function and constraint functions and formulates
         the inputs for the minimization function. Returns the optimized solution
@@ -613,7 +706,8 @@ class RationOptimizer:
             The animal combination to optimize the ration for.
         available_feeds: Dict 
             a DefaultDict of the AvailableFeeds class attributes defined in ration_driver.py
-        ration_config: 
+        ration_config: RationConfig object
+            Attributes are animal requirement and feed supply information required for optimization
         
         Returns
         -------
@@ -626,9 +720,6 @@ class RationOptimizer:
         x0 = [1]
         for i in range(n-1):
             x0.append(random.random() * 10)
-        # OPTIMIZE:
-        # establishing the bounds of the NLP
-
         # Dividing limit by 3 for tri-decision variables for farm grown feeds
         if udrm.udr_or_not:
             bnds = self.make_user_bounds(UserDefinedRationManager.ration_to_use(animal_combination, available_feeds), ration_config.DMIest)
@@ -652,15 +743,20 @@ class RationOptimizer:
             raise ValueError("Invalid animal combination: " + str(animal_combination))
 
 
-    def attempt_optimization(self, requirements, available_feeds, animal_combination):
+    def attempt_optimization(self, requirements: AnimalRequirements, available_feeds: Dict, animal_combination):
         """
         Function that sets up the nutrients and requirements lists into structured
         inputs for the non-linear program and calls the optimization function.
 
-        Args:
-            requirements: object of class Requirements
-            available_feeds: object of class AvailableFeeds
-            animal_combination: one of the animal combinations specified in the AnimalCombination enum
+        Parameters
+        ----------
+        requirements: AnimalRequirements
+
+        available_feeds : Dict
+            a DefaultDict of the AvailableFeeds class attributes defined in ration_driver.py
+        animal_combination: 
+            one of the animal combinations specified in the AnimalCombination enum
+
         """
         price = self.list_reconfig(available_feeds['price'])
         TDN = self.list_reconfig(available_feeds['TDN'])
