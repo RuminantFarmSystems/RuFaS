@@ -145,10 +145,21 @@
         "minimum": 0,
         "default": 42
       },
+      "set_seed": {
+        "type": "bool",
+        "description": "Whether or not to set random seed",
+        "default": true
+      },
       "simulate_animals": {
         "type": "bool",
         "description": "Whether or not to simulate animals during the simulation",
         "default": true
+      },
+      "nutrient_standard": {
+        "type": "string",
+        "default": "NASEM",
+        "pattern": "(NASEM|NRC)",
+        "description": "The nutrient standard to use for feed."
       }
     },
     "animal_properties": {
@@ -263,12 +274,6 @@
             "default": 3,
             "minimum": 0
           },
-          "energy_and_nutrient_calculation_method": {
-            "type": "string",
-            "default": "NASEM",
-            "pattern": "^(NASEM|NRC)$",
-            "description": "Energy and Nutrient Calculation Method -- The method used to calculate the animal nutrient requirements."
-          }
         },
         "farm_level": {
           "type": "object",
