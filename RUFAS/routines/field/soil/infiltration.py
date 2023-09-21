@@ -104,15 +104,22 @@ class Infiltration:
     # --- static methods ---
     @staticmethod
     def _determine_first_moisture_condition_parameter(second_moisture_condition: float):
-        """determine curve number for dry (wilting point) conditions
+        """
+        Determine the curve number for dry (wilting point) conditions.
 
-        Args:
-            second_moisture_condition: curve number for average moisture conditions (unitless)
+        Parameters
+        ----------
+        second_moisture_condition : float
+            Curve number for average moisture conditions (unitless).
 
-        Returns:
-            curve number 1 (dry/wilting point conditions) (unitless)
+        Returns
+        -------
+        float
+            Curve number 1 (dry/wilting point conditions) (unitless).
 
-        SWAT Reference: 2:1.1.4
+        References
+        ----------
+        SWAT Theoretical documentation eqn. 2:1.1.4
         """
         top = 20 * (100 - second_moisture_condition)
         bottom = (100 - second_moisture_condition + exp(2.533 - 0.0636 * (100 - second_moisture_condition)))
@@ -120,29 +127,43 @@ class Infiltration:
 
     @staticmethod
     def _determine_third_moisture_condition_parameter(second_moisture_condition: float):
-        """determine curve number for wet (field capacity) conditions
+        """
+        Determine the curve number for wet (field capacity) conditions.
 
-        Args:
-            second_moisture_condition: curve number for average moisture conditions (unitless)
+        Parameters
+        ----------
+        second_moisture_condition : float
+            Curve number for average moisture conditions (unitless).
 
-        Returns:
-            curve number 3 (wet/field capacity conditions) (unitless)
+        Returns
+        -------
+        float
+            Curve number 3 (wet/field capacity conditions) (unitless).
 
-        SWAT Reference: 2:1.1.5
+        References
+        ----------
+        SWAT Theoretical documentation eqn. 2:1.1.5
         """
         return second_moisture_condition * exp(0.00673 * (100 - second_moisture_condition))
 
     @staticmethod
     def _determine_retention_parameter_for_moisture_condition(moisture_condition_parameter: float) -> float:
-        """calculates the retention parameter used to determine runoff
+        """
+        Calculate the retention parameter used to determine runoff.
 
-        Args:
-            moisture_condition_parameter: curve number for the day (from SCS runoff equations (SWAT 2:1.1)) (unitless)
+        Parameters
+        ----------
+        moisture_condition_parameter : float
+            Curve number for the day (from SCS runoff equations (SWAT 2:1.1)) (unitless).
 
-        Returns:
-            retention parameter (mm)
+        Returns
+        -------
+        float
+            Retention parameter (mm).
 
-        SWAT Reference: 2:1.1.2
+        References
+        ----------
+        SWAT Theoretical documentation eqn. 2:1.1.2
         """
         return 25.4 * ((1000 / moisture_condition_parameter) - 10)
 
@@ -151,21 +172,29 @@ class Infiltration:
                                             saturation: float,
                                             max_retention_parameter: float,
                                             third_moisture_condition_retention_parameter: float) -> float:
-        """determines the second shape coefficient for use in calculating the first shape coefficient and retention
-        parameter for a given day
+        """
+        Determine the second shape coefficient for use in calculating the first shape coefficient and retention
+        parameter for a given day.
 
-        Args:
-            field_capacity: amount of water in soil profile at field capacity (mm)
-            saturation: amount of water in soil profile when saturated (mm)
-            max_retention_parameter: retention parameter calculated from curve number 1
-                (the driest conditions) (unitless)
-            third_moisture_condition_retention_parameter: retention parameter calculated from curve number 3 (the
-                wettest conditions) (unitless)
+        Parameters
+        ----------
+        field_capacity : float
+            Amount of water in soil profile at field capacity (mm).
+        saturation : float
+            Amount of water in soil profile when saturated (mm).
+        max_retention_parameter : float
+            Retention parameter calculated from curve number 1 (the driest conditions) (unitless).
+        third_moisture_condition_retention_parameter : float
+            Retention parameter calculated from curve number 3 (the wettest conditions) (unitless).
 
-        Returns:
-            the second shape coefficient (unitless)
+        Returns
+        -------
+        float
+            The second shape coefficient (unitless).
 
-        SWAT Reference: 2:1.1.8
+        References
+        ----------
+        SWAT Theoretical documentation eqn. 2:1.1.8
         """
         first_top_term = log((field_capacity / (1 - (third_moisture_condition_retention_parameter /
                                                      max_retention_parameter))) -
@@ -178,20 +207,28 @@ class Infiltration:
                                            max_retention_parameter: float,
                                            third_moisture_condition_retention_parameter: float,
                                            second_shape_coefficient: float) -> float:
-        """calculates the first shape coefficient for use in calculating the retention parameter
+        """
+        Calculate the first shape coefficient for use in calculating the retention parameter.
 
-        Args:
-            field_capacity: amount of water in soil profile at field capacity (mm)
-            max_retention_parameter: retention parameter calculated from curve number 1
-                (the driest conditions) (unitless)
-            third_moisture_condition_retention_parameter: retention parameter calculated from curve number 3 (the
-                wettest conditions) (unitless)
-            second_shape_coefficient: the second shape coefficient (unitless)
+        Parameters
+        ----------
+        field_capacity : float
+            Amount of water in soil profile at field capacity (mm).
+        max_retention_parameter : float
+            Retention parameter calculated from curve number 1 (the driest conditions) (unitless).
+        third_moisture_condition_retention_parameter : float
+            Retention parameter calculated from curve number 3 (the wettest conditions) (unitless).
+        second_shape_coefficient : float
+            The second shape coefficient (unitless).
 
-        Returns:
-            the first shape coefficient (unitless)
+        Returns
+        -------
+        float
+            The first shape coefficient (unitless).
 
-        SWAT Reference: 2:1.1.7
+        References
+        ----------
+        SWAT Theoretical documentation eqn. 2:1.1.7
         """
         first_term = log((field_capacity / (1 - (third_moisture_condition_retention_parameter /
                                                  max_retention_parameter))) - field_capacity)
@@ -203,20 +240,30 @@ class Infiltration:
                                        max_retention_parameter: float,
                                        first_shape_coefficient: float,
                                        second_shape_coefficient: float) -> float:
-        """returns the retention parameter for a given day
+        """
+        Return the retention parameter for a given day.
 
-        Args:
-            soil_water_content: amount of water held in the soil profile excluding amount of water held in profile at
-                the wilting point (mm)
-            max_retention_parameter: maximum retention parameter, calculated from curve number 1
-                (the driest conditions) (mm)
-            first_shape_coefficient: first shape coefficient (unitless)
-            second_shape_coefficient: second shape coefficient (unitless)
+        Parameters
+        ----------
+        soil_water_content : float
+            Amount of water held in the soil profile excluding the amount of water held in
+            the profile at the wilting point (mm).
+        max_retention_parameter : float
+            Maximum retention parameter, calculated from curve number 1
+            (the driest conditions) (mm).
+        first_shape_coefficient : float
+            First shape coefficient (unitless).
+        second_shape_coefficient : float
+            Second shape coefficient (unitless).
 
-        Returns:
-            retention parameter for a given day (mm)
+        Returns
+        -------
+        float
+            Retention parameter for a given day (mm).
 
-        SWAT Reference: 2:1.1.6
+        References
+        ----------
+        SWAT Theoretical documentation eqn. 2:1.1.6
         """
         return max_retention_parameter * (1 - (soil_water_content / (soil_water_content + exp(first_shape_coefficient -
                                                                                               (second_shape_coefficient
@@ -224,17 +271,25 @@ class Infiltration:
 
     @staticmethod
     def _determine_frozen_retention_parameter(max_retention_parameter: float, retention_parameter: float) -> float:
-        """determines the adjusted retention parameter if the top layer of soil is frozen
+        """
+        Determine the adjusted retention parameter if the top layer of soil is frozen.
 
-        Args:
-            max_retention_parameter: maximum retention parameter, calculated from curve number 1
-                (the driest conditions) (mm)
-            retention_parameter: retention parameter for a given day (mm)
+        Parameters
+        ----------
+        max_retention_parameter : float
+            Maximum retention parameter, calculated from curve number 1
+            (the driest conditions) (mm).
+        retention_parameter : float
+            Retention parameter for a given day (mm).
 
-        Returns:
-            retention parameter for a given day adjusted for frozen soil (mm)
+        Returns
+        -------
+        float
+            Retention parameter for a given day adjusted for frozen soil (mm).
 
-        SWAT Reference: 2:1.1.10
+        References
+        ----------
+        SWAT Theoretical documentation eqn. 2:1.1.10
         """
         return max_retention_parameter * (1 - exp(-0.000862 * retention_parameter))
 
@@ -242,17 +297,26 @@ class Infiltration:
     def _determine_second_moisture_condition_adjusted(average_fraction_slope: float,
                                                       second_moisture_condition: float,
                                                       third_moisture_condition: float) -> float:
-        """determines curve for moisture condition 2 (average moisture conditions) adjusted for slope
+        """
+        Determine the curve for moisture condition 2 (average moisture conditions) adjusted for slope.
 
-        Args:
-            average_fraction_slope: average slope fraction of subbasin (unitless)
-            second_moisture_condition: moisture condition 2 curve for (default) 5% slope (unitless)
-            third_moisture_condition: moisture condition 3 curve for (default) 5% slope (unitless)
+        Parameters
+        ----------
+        average_fraction_slope : float
+            Average slope fraction of the subbasin (unitless).
+        second_moisture_condition : float
+            Moisture condition 2 curve for (default) 5% slope (unitless).
+        third_moisture_condition : float
+            Moisture condition 3 curve for (default) 5% slope (unitless).
 
-        Returns:
-            moisture condition 2 curve adjusted for actual slop of the soil (unitless)
+        Returns
+        -------
+        float
+            Moisture condition 2 curve adjusted for the actual slope of the soil (unitless).
 
-        SWAT Reference: 2:1.1.12
+        References
+        ----------
+        SWAT Theoretical documentation eqn. 2:1.1.12
         """
         first_factor = (third_moisture_condition - second_moisture_condition) / 3
         second_factor = 1 - (2 * exp(-13.86 * average_fraction_slope))
@@ -260,20 +324,29 @@ class Infiltration:
 
     @staticmethod
     def _determine_accumulated_runoff(rainfall: float, retention_parameter: float) -> float:
-        """calculates accumulated runoff or rainfall excess
+        """
+        Calculate accumulated runoff or rainfall excess.
 
-        Args:
-            rainfall: rainfall depth of given day (mm)
-            retention_parameter: retention parameter based on curve number (mm)
+        Parameters
+        ----------
+        rainfall : float
+            Rainfall depth of the given day (mm).
+        retention_parameter : float
+            Retention parameter based on curve number (mm).
 
-        Returns:
-            accumulated runoff or rainfall excess (mm)
+        Returns
+        -------
+        float
+            Accumulated runoff or rainfall excess (mm).
 
-        Details:
-            Runoff only occurs when rainfall is greater than initial abstractions (about surface storage, interception,
-            etc.) which are approximated as 0.2 * retention parameter in SWAT 2:1.1 and here
+        Notes
+        -----
+        Runoff only occurs when rainfall is greater than initial abstractions (about surface storage, interception, etc.)
+        which are approximated as 0.2 times the retention parameter in SWAT 2:1.1 and here.
 
-        SWAT Reference: 2:1.1.1, 3
+        References
+        ----------
+        SWAT Theoretical documentation eqn. 2:1.1.1, 3
         """
         if rainfall > (0.2 * retention_parameter):
             return ((rainfall - (0.2 * retention_parameter)) ** 2) / (rainfall + (0.8 * retention_parameter))
@@ -287,22 +360,33 @@ class Infiltration:
                                                rainfall: float,
                                                runoff: float,
                                                weighting_coefficient: float) -> float:
-        """updates the retention parameter based on the previous day's retention parameter and the current day's
-            conditions
+        """
+        Update the retention parameter based on the previous day's retention parameter and the current day's conditions.
 
-        Args:
-            previous_retention_parameter: retention parameter from previous day (mm)
-            potential_evapotranspiration: potential evapotranspiration for current day (mm per day)
-            max_retention_parameter: maximum retention parameter for the current day (mm)
-            rainfall: rainfall depth of current day (mm)
-            runoff: surface runoff of current day (mm)
-            weighting_coefficient: weighting coefficient used to calculate retention coefficient for daily curve number
-                calculations dependent on plant evapotranspiration (unitless)
+        Parameters
+        ----------
+        previous_retention_parameter : float
+            Retention parameter from the previous day (mm).
+        potential_evapotranspiration : float
+            Potential evapotranspiration for the current day (mm per day).
+        max_retention_parameter : float
+            Maximum retention parameter for the current day (mm).
+        rainfall : float
+            Rainfall depth of the current day (mm).
+        runoff : float
+            Surface runoff of the current day (mm).
+        weighting_coefficient : float
+            Weighting coefficient used to calculate the retention coefficient for daily curve number calculations
+            dependent on plant evapotranspiration (unitless).
 
-        Returns:
-            retention parameter for the current day (mm)
+        Returns
+        -------
+        float
+            Retention parameter for the current day (mm).
 
-        SWAT Reference: 2:1.1.9
+        References
+        ----------
+        SWAT Theoretical documentation eqn. 2:1.1.9
         """
         retention_parameter = previous_retention_parameter - rainfall + runoff
         retention_parameter += potential_evapotranspiration * exp((((-1) * weighting_coefficient) *
@@ -312,14 +396,21 @@ class Infiltration:
 
     @staticmethod
     def _determine_moisture_condition_parameter(retention_parameter: float) -> float:
-        """determines the curve number on a given day adjusted for moisture content
+        """
+        Determine the curve number on a given day adjusted for moisture content.
 
-        Args:
-            retention_parameter: retention parameter calculated for moisture content on a given day (unitless)
+        Parameters
+        ----------
+        retention_parameter : float
+            Retention parameter calculated for moisture content on a given day (unitless).
 
-        Returns:
-            the curve number for a given day adjusted for moisture content (unitless)
+        Returns
+        -------
+        float
+            The curve number for a given day adjusted for moisture content (unitless).
 
-        SWAT Reference: 2:1.1.11
+        References
+        ----------
+        SWAT Theoretical documentation eqn. 2:1.1.11
         """
         return 25400 / (retention_parameter + 254)
