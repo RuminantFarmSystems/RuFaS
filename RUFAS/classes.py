@@ -13,6 +13,7 @@ Author(s): Kass Chupongstimun, kass_c@hotmail.com
 import csv
 
 from RUFAS import errors
+from RUFAS.input_manager import InputManager
 from RUFAS.output_manager import OutputManager
 from RUFAS.routines import Feed
 from RUFAS.routines.field.manager.field_manager import FieldManager
@@ -20,6 +21,7 @@ from RUFAS.routines.animal.animal_manager import AnimalManager
 from RUFAS.routines.manure.manure_manager import ManureManager
 from RUFAS.util import Utility
 
+im = InputManager()
 om = OutputManager()
 
 
@@ -47,16 +49,15 @@ class State:
             time: instance of the Time class containing information necessary to
                 initialize the state
         """
-        data = {}
-        input_dir = Utility.get_base_dir() / 'input'
-        self.feed = Feed(Utility.read_json_file(
-            input_dir / 'feed' / data['feed']))
-        manure_manager_config = Utility.read_json_file(input_dir / 'manure' / data['manure'])
-        animal_config = Utility.read_json_file(input_dir / 'animal' / data['animal'])
-        animal_config['manure_management_scenarios'] = manure_manager_config['manure_management_scenarios']
-        self.animal_manager = AnimalManager(animal_config, config, self.feed, weather, time)
-        self.manure_manager = ManureManager(self.animal_manager, weather, time, manure_manager_config)
-        self.field_manager = FieldManager(data['fields'], manure_manager=self.manure_manager)
+        feed_class_config = im.get_data("feed")
+        self.feed = Feed(feed_class_config)
+        manure_class_config = im.get_data("manure_management")
+        animal_class_config = im.get_data("animal")
+        animal_class_config['manure_management_scenarios'] = manure_class_config['manure_management_scenarios']
+        self.animal_manager = AnimalManager(animal_class_config, config, self.feed, weather, time)
+        self.manure_manager = ManureManager(self.animal_manager, weather, time, manure_class_config)
+
+        self.field_manager = FieldManager(manure_manager=self.manure_manager)
 
     def annual_reset(self):
         """
@@ -122,7 +123,7 @@ class Config:
                 days = [None for _ in range(1, self.start_day)]
                 if is_leap_year(year):
                     days += (_ for _ in range(self.start_day,
-                             leap_year_length + 1))
+                                              leap_year_length + 1))
                 else:
                     days += (_ for _ in range(self.start_day, year_length + 1))
             elif year == self.end_year:

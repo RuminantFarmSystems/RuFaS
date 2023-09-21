@@ -132,7 +132,7 @@ class Cow(HeiferIII):
         self.wood_m = 0
         self.wood_n = 0
 
-        self.lactation_curve = AnimalBase.config['lactation_curve']
+        self.lactation_curve = 'wood'
         self.milk_production_history = []
         self.breed_index = 0
         self.parity_index = 0
@@ -781,7 +781,7 @@ class Cow(HeiferIII):
                 self.GnRH_injections = self.GnRH_injections + 1
             elif self.days_born == self.tai_program_start_day_c + 10:
                 self.ai_day = self.days_born
-                self.conception_rate = AnimalBase.config['ovsynch56_conception_rate']
+                self.conception_rate = AnimalBase.config['cow_repro_programs']['ovsynch56_conception_rate']
 
     def OvSynch48_update(self, sim_day):
         """
