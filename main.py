@@ -67,7 +67,6 @@ def execute_simulations_from_files(
         input_manager.flush_pools()
         output_manager.flush_pools()
         is_data_valid = input_manager.start_data_processing(str(input_file_path), True)
-        print(is_data_valid)  # TODO: remove before merging
         simulator = SimulationEngine(input_file_path)
         simulator.simulate()
         output_manager.save_variables(r"output", r"output/output_filters/", exclude_info_maps)
