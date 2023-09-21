@@ -1,4 +1,4 @@
-from RUFAS.routines.manure.constants.manure_constants import ManureConstants
+from RUFAS.routines.manure.constants_and_units.manure_constants import ManureConstants
 
 
 class MilkingParlor:
@@ -15,12 +15,14 @@ class MilkingParlor:
 
     """
 
-    def __init__(self,
-                 num_milkings=3,
-                 minutes_spent_in_holding_area=30.0,
-                 minutes_spent_per_milking=7.0,
-                 wash_water_use_rate=20.0,
-                 fresh_water_use_rate=10.0):
+    def __init__(
+        self,
+        num_milkings=3,
+        minutes_spent_in_holding_area=30.0,
+        minutes_spent_per_milking=7.0,
+        wash_water_use_rate=20.0,
+        fresh_water_use_rate=10.0,
+    ):
         """Initialize the milking parlor.
 
         Parameters
@@ -47,8 +49,9 @@ class MilkingParlor:
             Total number of minutes spent in holding area per animal per day.
         """
 
-        total_minutes_spent_in_holding_area = self.num_milkings * \
-                                              self.minutes_spent_in_holding_area
+        total_minutes_spent_in_holding_area = (
+            self.num_milkings * self.minutes_spent_in_holding_area
+        )
 
         return total_minutes_spent_in_holding_area
 
@@ -61,7 +64,8 @@ class MilkingParlor:
 
         """
         fraction_of_day_spent_in_holding_area = self._calc_fraction_of_day_from_minutes(
-            self.total_minutes_spent_in_holding_area)
+            self.total_minutes_spent_in_holding_area
+        )
 
         return fraction_of_day_spent_in_holding_area
 
@@ -103,7 +107,8 @@ class MilkingParlor:
         """
 
         fraction_of_day_spent_milking = self._calc_fraction_of_day_from_minutes(
-            self.total_minutes_spent_milking)
+            self.total_minutes_spent_milking
+        )
 
         return fraction_of_day_spent_milking
 
@@ -135,8 +140,9 @@ class MilkingParlor:
 
         """
 
-        total_minutes_spent_in_milking_parlor = self.total_minutes_spent_in_holding_area + \
-                                                self.total_minutes_spent_milking
+        total_minutes_spent_in_milking_parlor = (
+            self.total_minutes_spent_in_holding_area + self.total_minutes_spent_milking
+        )
 
         return total_minutes_spent_in_milking_parlor
 
@@ -148,8 +154,10 @@ class MilkingParlor:
             Total fraction of day spent in the milking parlor per animal.
         """
 
-        total_fraction_of_day_spent_in_milking_parlor = self.fraction_of_day_spent_in_holding_area + \
-                                                        self.fraction_of_day_spent_milking
+        total_fraction_of_day_spent_in_milking_parlor = (
+            self.fraction_of_day_spent_in_holding_area
+            + self.fraction_of_day_spent_milking
+        )
 
         return total_fraction_of_day_spent_in_milking_parlor
 
@@ -163,12 +171,16 @@ class MilkingParlor:
             Total volume of water used in the milking parlor, L.
         """
 
-        total_water_volume_used_in_milking_parlor = (self.calc_wash_water_volume_used_in_holding_area(num_cows) +
-                                                     self.calc_fresh_water_volume_used_for_milking(num_cows))
+        total_water_volume_used_in_milking_parlor = (
+            self.calc_wash_water_volume_used_in_holding_area(num_cows)
+            + self.calc_fresh_water_volume_used_for_milking(num_cows)
+        )
 
         return total_water_volume_used_in_milking_parlor
 
-    def calc_manure_mass_deposited_in_milking_parlor(self, num_cows: int, manure_mass: float) -> float:
+    def calc_manure_mass_deposited_in_milking_parlor(
+        self, num_cows: int, manure_mass: float
+    ) -> float:
         """Calculates total mass of manure deposited in the milking parlor by all cows in pen.
 
         Args:
@@ -180,12 +192,17 @@ class MilkingParlor:
 
         """
 
-        manure_mass_deposited_in_milking_parlor = (manure_mass *
-                                                   self.total_fraction_of_day_spent_in_milking_parlor) if num_cows > 0 else 0.0
+        manure_mass_deposited_in_milking_parlor = (
+            (manure_mass * self.total_fraction_of_day_spent_in_milking_parlor)
+            if num_cows > 0
+            else 0.0
+        )
 
         return manure_mass_deposited_in_milking_parlor
 
-    def calc_manure_volume_deposited_in_milking_parlor(self, num_cows: int, manure_mass: float) -> float:
+    def calc_manure_volume_deposited_in_milking_parlor(
+        self, num_cows: int, manure_mass: float
+    ) -> float:
         """Calculates total volume of manure deposited in the milking parlor.
 
         Args:
@@ -197,8 +214,10 @@ class MilkingParlor:
 
         """
 
-        manure_volume_deposited_in_milking_parlor = self.calc_manure_mass_deposited_in_milking_parlor(
-            num_cows, manure_mass) / ManureConstants.MANURE_DENSITY
+        manure_volume_deposited_in_milking_parlor = (
+            self.calc_manure_mass_deposited_in_milking_parlor(num_cows, manure_mass)
+            / ManureConstants.MANURE_DENSITY
+        )
 
         return manure_volume_deposited_in_milking_parlor
 

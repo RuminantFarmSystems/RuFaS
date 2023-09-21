@@ -3,8 +3,10 @@ from __future__ import annotations
 from dataclasses import dataclass
 from dataclasses import field
 
-from RUFAS.output_manager import OutputManager
-from RUFAS.routines.manure.protocols.liquid_manure_portion_protocol import LiquidManurePortionProtocol
+from RUFAS.routines.manure.protocols.liquid_manure_portion_protocol import (
+    LiquidManurePortionProtocol,
+)
+
 
 @dataclass
 class ReceptionPitDailyOutput(LiquidManurePortionProtocol):
@@ -27,6 +29,7 @@ class ReceptionPitDailyOutput(LiquidManurePortionProtocol):
         Used for satisfying the LiquidManurePortionProtocol.
 
     """
+
     pen_id: int = -1
     simulation_day: int = -1
     manure_urea: float = 0.0
