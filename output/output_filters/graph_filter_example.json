@@ -1,0 +1,5 @@
+{
+  "graph_type": "Line Graph",
+  "filter": ["Pen.calc_total_manure.daily_aggregate_calf_degradable_volatile_solids", "Pen.calc_total_manure.daily_aggregate_calf_non_degradable_volatile_solids"],
+  "title": "Daily Aggregate Calf Degradable Volatile Solids"
+}
