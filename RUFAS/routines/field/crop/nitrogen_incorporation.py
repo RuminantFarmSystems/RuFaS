@@ -494,19 +494,34 @@ class NitrogenIncorporation:
     @staticmethod
     def _determine_nitrate_factor(total_accessible_nitrates: float) -> float:
         """
-        Description: calculates soil nitrate factor
+        Calculates soil nitrate factor.
 
-        Args:
-            total_accessible_nitrates: total nitrates available in the soil layers accessible to roots
+        Parameters
+        ----------
+        total_accessible_nitrates : float
+            Total nitrates available in the soil layers accessible to roots (kg nitrate / ha).
 
-        SWAT Reference: Equations 5:2.3.15, 5:2.3.16, 5:2.3.17
+        Returns
+        -------
+        float
+            The soil nitrate factor, in the range [0.0, 1.0].
 
-        Returns: the nitrate factor
+        References
+        ----------
+        SWAT Theoretical documentation equations 5:2.3.15, 5:2.3.16, 5:2.3.17
+
+        Notes
+        -----
+        Equation 5:2.3.16 in the SWAT Theoretical documentation (and associated SWAT code in the file nfix.f) is
+        seemingly wrong. This equation originates from the EPIC model (see line 31 of NFIX.f90). Also note that in EPIC,
+        the total accessible nitrates in the soil profile are divided by the amount of residue (`RD(JKK)`), which RuFaS
+        does not do.
+
         """
         if total_accessible_nitrates <= 100:
             return 1
         elif total_accessible_nitrates <= 300:
-            return 1.5 - (0.0005 * total_accessible_nitrates)
+            return 1.5 - (0.005 * total_accessible_nitrates)
         else:
             return 0
 

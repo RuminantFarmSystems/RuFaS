@@ -98,21 +98,10 @@ def test_simulate(patch_simulation_engine: SimulationEngine, mocker: MockerFixtu
     patch_for_run_simulation_main_loop = \
         mocker.patch("RUFAS.simulation_engine.SimulationEngine._run_simulation_main_loop")
     patch_for_show_final_messages = mocker.patch("RUFAS.simulation_engine.SimulationEngine._show_final_messages")
-    patch_for_manure_output_handler_produce_csv = mocker.patch(
-        "RUFAS.simulation_engine.ManureManagerOutputHandler.produce_csv",
-        return_value=None
-    )
-    mocker.patch(
-        "RUFAS.simulation_engine.ManureManagerOutputHandler.produce_graphics",
-        return_value=None
-    )
     sim_eng = patch_simulation_engine
     sim_eng.simulate()
     patch_for_run_simulation_main_loop.assert_called_once()
     patch_for_show_final_messages.assert_called_once()
-    patch_for_manure_output_handler_produce_csv.assert_called_once_with(
-        sim_eng.config.csv_dir, sim_eng.state.manure_manager
-    )
 
 
 def test_show_final_messages(
