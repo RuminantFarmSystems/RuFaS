@@ -570,7 +570,7 @@ class OutputManager(object):
                     "function": self.save_variables.__name__,
                     }
         self.add_log("exclude_info_maps", f"exclude_info_maps flag set to {exclude_info_maps}", info_map)
-        gg = GraphGenerator()
+        graph_generator = GraphGenerator()
         list_of_filter_files = self._list_txt_and_json_files_in_dir(dir_path)
         for filter_file in list_of_filter_files:
             input_path = os.path.join(dir_path, filter_file)
