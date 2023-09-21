@@ -1334,7 +1334,6 @@ def test_list_reconfig(input, expected)->None:
     assert ration_optimizer.list_reconfig(input) == expected
 
 
-
 def test_objective():
     """Unit test for function objective in file routines/animal/ration/ration_optimizer.py"""
     pass

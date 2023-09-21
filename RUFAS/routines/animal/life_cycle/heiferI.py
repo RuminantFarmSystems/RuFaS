@@ -45,10 +45,13 @@ class HeiferI(Calf):
         """
         return self.get_calf_values()
 
-    def set_nutrient_rqmts(self, temp, animal_grouping_scenario, nutrient_conc: dict = {}, metabolizable_energy: float = 15.625, previous_DMI: float = 10.0):
+    def set_nutrient_rqmts(self, temp, animal_grouping_scenario, nutrient_conc: dict = {}, 
+                           metabolizable_energy: float = 15.625, previous_DMI: float = 10.0):
         """
         Calculates this heiferI's nutrient requirements.
         """
+        if metabolizable_energy == 0.0: metabolizable_energy = 15.625
+        if previous_DMI == 0.0: previous_DMI = 10.0
         if nutrient_conc and nutrient_conc['dm'] != 0.0:
             NDF_conc = nutrient_conc['NDF']
             TDN_conc = nutrient_conc['TDN']
