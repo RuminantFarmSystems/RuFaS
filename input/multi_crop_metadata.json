@@ -3,112 +3,91 @@
     "config": {
       "title": "Config Data",
       "description": "Configuration Information",
-      "path": "input/config/example_config.json",
+      "path": "config/multi_crop_config.json",
       "type": "json",
       "properties": "config_properties"
     },
-    "animal": {
-      "title": "Animal data",
-      "description": "Moo Moo!",
-      "path": "input/animal/example_animal.json",
-      "type": "json",
-      "properties": "animal_properties"
-    },
     "crop": {
       "title": "Crop data",
-      "description": "Alfafa is fun!",
-      "path": "input/crop/example_rotation.json",
+      "description": "Crop rotation schedule.",
+      "path": "crop/multi_crop_rotation.json",
       "type": "json",
       "properties": "crop_schedule_properties"
     },
     "economy": {
       "title": "Economy data",
       "description": "Time is money!",
-      "path": "input/EEE/example_costs.csv",
+      "path": "EEE/example_costs.csv",
       "type": "csv",
       "properties": "economic_properties"
     },
     "emission": {
       "title": "Emissions data",
       "description": "Let's think about global warming",
-      "path": "input/EEE/example_emissions.csv",
-      "type": "csv",
+      "path": "EEE/example_emissions.json",
+      "type": "json",
       "properties": "emissions_properties"
     },
     "feed": {
       "title": "Feed data",
       "description": "Those cows need to eat!",
-      "path": "input/feed/example_feed.json",
+      "path": "feed/example_feed.json",
       "type": "json",
       "properties": "feed_properties"
     },
-    "NRC_Comp": {
-      "title": "NRC Comp data",
-      "description": "Nutrients!",
-      "path": "input/feed/NRC_comp.csv",
+    "user_feeds": {
+      "title": "User Feeds Data",
+      "description": "Those cows need to eat!",
+      "path": "feed/example_user_feeds.csv",
       "type": "csv",
-      "properties": "NRC_Comp_properties"
-    },
-    "NASEM_Comp": {
-      "title": "NASEM Comp data",
-      "description": "Nutrients!",
-      "path": "input/feed/NASEM_comp.csv",
-      "type": "csv",
-      "properties": "NASEM_Comp_properties"
+      "properties": "user_feeds_properties"
     },
     "manure_management": {
       "title": "Manure data",
       "description": "You thought it's a waste, but those crops need to eat as well",
-      "path": "input/manure/manure_management.json",
+      "path": "manure/example_manure_management.json",
       "type": "json",
       "properties": "manure_management_properties"
     },
-    "soil_1": {
+    "soil": {
       "title": "Soil data",
-      "description": "Stop treating soil like dirt!",
-      "path": "input/soil/example_soil.json",
-      "type": "json",
-      "properties": "soil_profile_properties"
-    },
-    "soil_2": {
-      "title": "Soil data",
-      "description": "Stop treating soil like dirt!",
-      "path": "input/soil/example_soil_2.json",
+      "description": "Soil configuration.",
+      "path": "soil/multi_crop_soil.json",
       "type": "json",
       "properties": "soil_profile_properties"
     },
     "fertilizer_schedule": {
       "title": "Fertilizer schedule.",
-      "description": "Fertilizer is like butter, you can never have too much.",
-      "path": "input/fertilizer_schedule/example_fertilizer_schedule.json",
+      "description": "Fertilizer application schedule.",
+      "path": "fertilizer_schedule/multi_crop_fertilizer_schedule.json",
       "type": "json",
       "properties": "fertilizer_schedule_properties"
     },
     "manure_schedule": {
       "title": "Manure schedule.",
-      "description": "Crappier than having 7:45 am classes Monday - Friday.",
-      "path": "input/manure_schedule/example_manure_schedule.json",
+      "description": "Manure application schedule.",
+      "path": "manure_schedule/multi_crop_manure_schedule.json",
       "type": "json",
       "properties": "manure_schedule_properties"
     },
     "tillage_schedule": {
       "title": "Tillage schedule.",
-      "description": "Requires the will to till.",
-      "path": "input/tillage_schedule/example_tillage_schedule.json",
+      "description": "Tillage application schedule.",
+      "path": "tillage_schedule/multi_crop_tillage_schedule.json",
       "type": "json",
       "properties": "tillage_schedule_properties"
     },
     "field": {
       "title": "Field specification",
       "description": "Contains overall field properties and references to specification files.",
-      "path": "input/field/example_field.json",
+      "path": "field/multi_crop_field.json",
       "type": "json",
       "properties": "field_properties"
     },
     "weather": {
       "title": "Weather data",
       "description": "Let's turn on the AC",
-      "path": "input/weather/barnyard_weather.csv",
+      "path": "weather/multi_crop_weather.csv",
       "type": "csv",
       "properties": "weather_properties"
     }
@@ -146,12 +125,14 @@
         "default": 42
       },
       "simulate_animals": {
-        "type": "bool",
+        "type": "boolean",
         "description": "Whether or not to simulate animals during the simulation",
         "default": true
       }
     },
     "animal_properties": {
+      "type": "object",
+      "description": "Animal data",
       "herd_information": {
         "type": "object",
         "description": "Herd Demographics",
@@ -169,13 +150,13 @@
         },
         "heiferII_num": {
           "type": "number",
-          "description": "Number of HeiferIIs (head) -- HeiferII is the number of heifers eligible for breeding and in early pregnancy",
+          "description": "Number of HeiferIIs (head) -- HeiferII is the number of heifers eligible for breeding and in early pregnancy (default is ~20% of herd number)",
           "default": 38,
           "minimum": 0
         },
         "heiferIII_num_springers": {
           "type": "number",
-          "description": "Number of HeiferIIIs (head) -- HeiferIII is the number of close-up heifers",
+          "description": "Number of HeiferIIIs (head) -- HeiferIII is the number of close-up heifers (default is ~3% of herd number)",
           "default": 5,
           "minimum": 0
         },
@@ -192,14 +173,14 @@
           "minimum": 0
         },
         "herd_init": {
-          "type": "bool",
+          "type": "boolean",
           "default": false,
           "description": "Initialize Herd? -- Whether to re-initialize the animal database, where the herd animals are selected from."
         },
         "breed": {
           "type": "string",
           "default": "HO",
-          "pattern": "(HO|JE)",
+          "pattern": "{HO|JE}",
           "description": "Breed (select one Holstein/Jersey) -- The predominant breed of the herd (Holstein or Jersey)"
         }
       },
@@ -219,18 +200,18 @@
             "type": "string",
             "description": "Heifer Reproductive Program (select one) -- TAI - Timed Artificial Insemination; ED - Estrus Detection; Synch-ED - Combination of ED and TAI",
             "default": "TAI",
-            "pattern": "^(TAI|ED|Synch-ED)$"
+            "pattern": "^{TAI|ED|Synch-ED}$"
           },
           "cow_repro_method": {
             "type": "string",
             "description": "Cow Reproductive Program (select one) -- TAI - Timed Artificial Insemination; ED - Estrus Detection; ED-TAI -Combination of ED and TAI",
             "default": "TAI",
-            "pattern": "^(TAI|ED|ED-TAI)$"
+            "pattern": "^{TAI|ED|ED-TAI}$"
           },
           "semen_type": {
             "type": "string",
             "default": "conventional",
-            "pattern": "^(sexed|conventional)$",
+            "pattern": "^{sexed|conventional}$",
             "description": "The semen type that makes up a majority of the farm's breedings"
           },
           "days_in_preg_when_dry": {
@@ -266,7 +247,7 @@
           "energy_and_nutrient_calculation_method": {
             "type": "string",
             "default": "NASEM",
-            "pattern": "^(NASEM|NRC)$",
+            "pattern": "^{NASEM|NRC}$",
             "description": "Energy and Nutrient Calculation Method -- The method used to calculate the animal nutrient requirements."
           }
         },
@@ -312,7 +293,7 @@
             "milk_type": {
               "type": "string",
               "default": "whole",
-              "pattern": "^(whole|replacer)$",
+              "pattern": "^{whole|replacer}$",
               "description": "Milk Type (select one) -- The type of milk that is used to feed calves (Whole or Replacer)"
             }
           },
@@ -383,7 +364,7 @@
               "heifer_TAI_protocol": {
                 "type": "string",
                 "default": "md5CG2P",
-                "pattern": "^(md5CG2P|md5CGP)$",
+                "pattern": "^{md5CG2P|md5CGP}$",
                 "description": "Heifer TAI (Timed Artificial Insemination) Protocol (select one) -- The breeding protocol for heifers (md5CG2P or md5CGP)"
               },
               "md5CG2P_conception_rate": {
@@ -403,7 +384,7 @@
               "heifer_synchED_protocol": {
                 "type": "string",
                 "default": "2P",
-                "pattern": "^(2P|CP)$",
+                "pattern": "^{2P|CP}$",
                 "description": "Heifer SynchED Protocol (select one) -- 2P: two injections of PGF (prostaglandin), watch for estrus after each injection with insemination upon heat detection; CP: 7 days CIDR implements, inject PGF upon removal, insemination upon heat detection"
               },
               "estrus_detection_rate_h_synch": {
@@ -448,7 +429,7 @@
                 "type": "string",
                 "description": "Cow TAI (Timed Artificial Insemination) Protocol -- The timed AI protocol for cows in the TAI (Timed Artificial Insemination) program",
                 "default": "OvSynch 56",
-                "pattern": "^(OvSynch 56|OvSynch 48|CoSynch 72|5d CoSynch)$"
+                "pattern": "^{OvSynch 56|OvSynch 48|CoSynch 72|5d CoSynch}$"
               },
               "ovsynch56_conception_rate": {
                 "type": "number",
@@ -482,7 +463,7 @@
                 "type": "string",
                 "description": "Cow Resynch Protocol -- Resynch protocol for cow before/at/after pregnancy check day in the TAI (Timed Artificial Insemination) program",
                 "default": "TAIafterPD",
-                "pattern": "^(TAIafterPD|TAIbeforePD|PGFatPD)$"
+                "pattern": "^{TAIafterPD|TAIbeforePD|PGFatPD}$"
               },
               "tai_program_start_day": {
                 "type": "number",
@@ -586,37 +567,37 @@
             },
             "avg_estrus_cycle_return": {
               "type": "number",
-              "description": "Average days between calving and first estrus after calving (default is 23).",
+              "description": "Average days between calving and first estrus after calving.",
               "minimum": 1,
               "default": 23
             },
             "std_estrus_cycle_return": {
               "type": "number",
-              "description": "Standard deviation of days between calving and first estrus after calving (default is 6).",
+              "description": "Standard deviation of days between calving and first estrus after calving.",
               "minimum": 1,
               "default": 6
             },
             "avg_estrus_cycle_cow": {
               "type": "number",
-              "description": "Average length of estrus cycle for cows (default is 21).",
+              "description": "Average length of estrus cycle for cows.",
               "minimum": 1,
               "default": 21
             },
             "std_estrus_cycle_cow": {
               "type": "number",
-              "description": "Standard deviation of the length of estrus cycle for cows (default is 4).",
+              "description": "Standard deviation of the length of estrus cycle for cows.",
               "minimum": 1,
               "default": 4
             },
             "avg_estrus_cycle_after_pgf": {
               "type": "number",
-              "description": "Average days between the injection of PGF and the occurrence of estrus in the ‘PGFatPD’ resynch protocol (default is 5).",
+              "description": "Average days between the injection of PGF and the occurrence of estrus in the ‘PGFatPD’ resynch protocol.",
               "minimum": 1,
               "default": 5
             },
             "std_estrus_cycle_after_pgf": {
               "type": "number",
-              "description": "Standard deviation of days between the injection of PGF and the occurrence of estrus in the ‘PGFatPD’ resynch protocol (default is 2).",
+              "description": "Standard deviation of days between the injection of PGF and the occurrence of estrus in the ‘PGFatPD’ resynch protocol.",
               "minimum": 1,
               "default": 2
             }
@@ -726,77 +707,15 @@
                 "maximum": 1
               }
             },
-            "mastitis_cull_prob": {
-              "type": "array",
-              "description": "Culling rate for mastitis",
-              "properties": {
+            "life_cycle": {
+              "type": "object",
+              "description": "",
+              "still_birth_rate": {
                 "type": "number",
+                "description": "Stillbirth rate",
                 "minimum": 0,
                 "maximum": 1
               }
-            },
-            "udder_cull_prob": {
-              "type": "array",
-              "description": "Culling rate for udder reasons",
-              "properties": {
-                "type": "number",
-                "minimum": 0,
-                "maximum": 1
-              }
-            },
-            "feet_leg_cull_prob": {
-              "type": "array",
-              "description": "Culling rate for feet and leg reasons",
-              "properties": {
-                "type": "number",
-                "minimum": 0,
-                "maximum": 1
-              }
-            },
-            "unknown_cull_prob": {
-              "type": "array",
-              "description": "Culling rate for unknown reasons",
-              "properties": {
-                "type": "number",
-                "minimum": 0,
-                "maximum": 1
-              }
-            },
-            "disease_cull_prob": {
-              "type": "array",
-              "description": "Culling rate for disease",
-              "properties": {
-                "type": "number",
-                "minimum": 0,
-                "maximum": 1
-              }
-            },
-            "injury_cull_prob": {
-              "type": "array",
-              "description": "Culling rate for injury",
-              "properties": {
-                "type": "number",
-                "minimum": 0,
-                "maximum": 1
-              }
-            },
-            "cull_day_count": {
-              "type": "array",
-              "description": "Culling day count",
-              "properties": {
-                "type": "number",
-                "minimum": 0
-              }
-            }
-          },
-          "life_cycle": {
-            "type": "object",
-            "description": "",
-            "still_birth_rate": {
-              "type": "number",
-              "description": "Stillbirth rate",
-              "minimum": 0,
-              "maximum": 1
             }
           }
         }
@@ -808,7 +727,7 @@
           "type": "string",
           "description": "Methane Mitigation Method -- The type of enteric methane mitigation supplement that is fed to the lactating dairy cattle",
           "default": "None",
-          "pattern": "^(None|3-NOP|monensin|essential_oils|seaweed)$"
+          "pattern": "^{None|3-NOP|monensin|essential_oils|seaweed}$"
         },
         "3-NOP_additive_amount": {
           "type": "number",
@@ -843,7 +762,7 @@
         "type": "string",
         "description": "Housing -- The type of housing management for the herd.",
         "default": "barn",
-        "pattern": "^(barn|3-pasture|drylot)$"
+        "pattern": "^{barn|3-pasture|drylot}$"
       },
       "pasture_concentrate": {
         "description": "Pasture Concentration -- Amount of concentrate supplementation provided if animals are housed on pasture. (kg)",
@@ -855,14 +774,14 @@
         "description": "Methane Model -- The method used to estimate enteric methane emissions.",
         "type": "string",
         "default": "IPCC",
-        "pattern": "^(Mills|3-Mutian|IPCC)$"
+        "pattern": "^{Mills|3-Mutian|IPCC}$"
       },
       "ration": {
         "type": "object",
         "description": "Ration",
         "user_input": {
-          "description": "User Input -- A bool value indicating if the user will provide the ration or diet formulation they would like to feed to the cattle (true) or not (false).",
-          "type": "bool",
+          "description": "User Input -- A boolean value indicating if the user will provide the ration or diet formulation they would like to feed to the cattle (true) or not (false).",
+          "type": "boolean",
           "default": false
         },
         "formulation_interval": {
@@ -888,7 +807,7 @@
           "animal_combination": {
             "description": "Animal Combination -- The valid combinations of animal types that can be in a pen.",
             "type": "string",
-            "pattern": "^(CALF|GROWING|CLOSE_UP|LAC_COW)$"
+            "pattern": "^{CALF|GROWING|CLOSE_UP|LAC_COW}$"
           },
           "vertical_dist_to_milking_parlor": {
             "description": "Vertical Distance to Milking Parlor (m) -- The elevation gain (in meters) between the pen and the milking parlor.",
@@ -911,13 +830,13 @@
           "housing_type": {
             "description": "Housing Type -- The type of barn the pen is in.",
             "type": "string",
-            "pattern": "^(open air barn)$",
+            "pattern": "^{open air barn}$",
             "default": "open air barn"
           },
           "pen_type": {
             "description": "Pen Type -- The type of stalls the pen has.",
             "type": "string",
-            "pattern": "^(freestall|tilestall|drylot)$",
+            "pattern": "^{freestall|tilestall|drylot}$",
             "default": "freestall"
           },
           "max_stocking_density": {
@@ -947,7 +866,7 @@
           "crop_species": {
             "type": "string",
             "description": "Name of the crop being grown.",
-            "pattern": "^(generic|corn|silage_corn|spring_wheat|winter_wheat|cereal_rye|spring_barley|fall_oats|tall_fescue|alfalfa|soybean|sugar_beet|potato|triticale)$"
+            "pattern": "^{generic|corn|silage_corn|spring_wheat|winter_wheat|cereal_rye|spring_barley|fall_oats|tall_fescue|alfalfa|soybean|sugar_beet|potato|triticale}$"
           },
           "harvest_days": {
             "type": "array",
@@ -979,15 +898,21 @@
             ],
             "properties": {
               "type": "string",
-              "pattern": "^(default|no_kill)$",
+              "pattern": "^{default|no_kill}$",
               "default": "default"
             }
           },
           "harvest_type": {
-            "type": "string",
+            "type": "array",
             "description": "Whether the crop uses scheduled harvests or optimal harvests",
-            "default": "scheduled",
-            "pattern": "^(scheduled|optimal)$"
+            "default": [
+              "scheduled"
+            ],
+            "properties": {
+              "type": "string",
+              "pattern": "^{scheduled|optimal}$",
+              "default": "scheduled"
+            }
           },
           "planting_days": {
             "type": "array",
@@ -1404,22 +1329,6 @@
           "maximum": 300
         }
       },
-      "feed_database": {
-        "type": "string",
-        "description": "The location of the feed database"
-      },
-      "feeds_table": {
-        "type": "string",
-        "description": "The name of the feeds table in the feed database"
-      },
-      "feed_quality_table": {
-        "type": "string",
-        "description": "The name of the feed quality table in the feed database"
-      },
-      "nutrient_table": {
-        "type": "string",
-        "description": "The name of the nutrient table in the feed database"
-      },
       "storage_options": {
         "type": "array",
         "description": "Storage Options.",
@@ -1429,18 +1338,18 @@
             "type": "string",
             "description": "Storage Type -- The type of storage unit used. This only applies to farm grown forage feeds",
             "default": "Bunker Silo",
-            "pattern": "^(8' Diameter Bag|10' Diameter Bag|12' Diameter Bag|14' Diameter Bag|Upright Silo - Traditional|Upright Silo - Oxygen-Excluding|Bunker Silo|Pile|Wrapped Bale|Bale - Covered|Bale - Uncovered|Bin)$"
+            "pattern": "^{8' Diameter Bag|10' Diameter Bag|12' Diameter Bag|14' Diameter Bag|Upright Silo - Traditional|Upright Silo - Oxygen-Excluding|Bunker Silo|Pile|Wrapped Bale|Bale - Covered|Bale - Uncovered|Bin}$"
           },
           "moisture": {
             "type": "string",
             "description": "Moisture -- The management practices used that determine the dry matter content of the preserved feed.",
             "default": "Wilted",
-            "pattern": "^(Direct Cut|Wilted|Baleage|Haylage|Moist Hay|Dry Hay)$"
+            "pattern": "^{Direct Cut|Wilted|Baleage|Haylage|Moist Hay|Dry Hay}$"
           },
           "additive": {
             "type": "string",
             "description": "Additive -- Type of additive added to the forage material before ensiling.",
-            "pattern": "^(preservative|nutrient additive|absorbant)$",
+            "pattern": "^{preservative|nutrient additive|absorbant}$",
             "default": "preservative"
           },
           "package_density": {
@@ -1453,11 +1362,11 @@
           "inoculation": {
             "type": "string",
             "description": "Inoculation",
-            "pattern": "^(None|heterofermentative|homofermentative)$",
+            "pattern": "^{None|heterofermentative|homofermentative}$",
             "default": "None"
           },
           "ventilation": {
-            "type": "bool",
+            "type": "boolean",
             "description": "Ventilation -- True if the storage unit has appropriate ventilation.",
             "default": true
           },
@@ -1499,7 +1408,7 @@
             }
           }
         },
-        "growing": {
+        "growing_heifers": {
           "type": "array",
           "description": "Growing Heifers Feeds.",
           "properties": {
@@ -1537,7 +1446,7 @@
             }
           }
         },
-        "lac_cow": {
+        "cow_lactating": {
           "type": "array",
           "description": "Lactating Cow Feeds.",
           "properties": {
@@ -1562,7 +1471,7 @@
           "minimum": 0,
           "maximum": 1
         },
-        "milk_reduction_maximum": {
+        "milk_reduction_percent": {
           "type": "number",
           "description": "Milk Reduction Percent -- Allowable amount of milk reduction (kg)",
           "minimum": 0,
@@ -1579,22 +1488,22 @@
       "feed_name": {
         "type": "string",
         "description": "A general common name for the feed as defined within RuFaS.",
-        "pattern": "(ALFALFA|ALMOND|Ammonium Chloride|Ammonium phosphate (monobasic)|Ammonium Phosphate, dibasic|Ammonium Sulfate|APPLE|BAKERY BYPRODUCT|BARLEY|BEET, SUGAR|BERMUDAGRASS|BLOOD|Bone Meal|BREWERS GRAINS|BREWERS YEAST|Calcium carbonate|Calcium Choride dihydrate|Calcium Choride,anhydrous|Calcium hydroxide|Calcium iodate|Calcium oxide|Calcium Phosphate monobasic|Calcium Sulfate, dihydrate|Calf grower 14CP (Fed to calves only)|Calf grower 16CP (Fed to calves only)|Calf starter 18CP high starch (Fed to calves only)|Calf starter 18CP low starch (Fed to calves only)|Calf starter 22CP high starch (Fed to calves only)|Calf starter 22CP med starch (Fed to calves only)|CANDY|CANOLA|Casein|CHOCOLATE|CITRUS|Cobalt carbonate|Cobalt carbonate (6H2O)|Cobalt chloride (6H2O)|Cobalt organic generic|Cobalt sulfate (7H2O)|Copper chloride (2H2O)|Copper organic, generic|Copper oxide|Copper sulfate (5H2O)|CORN, YELLOW|COTTON SEED|DESTILLERY BYPRODUCT|Dicalcium Phosphate, dibasic|EDDI|FATS AND OILS|FEATHERS|Ferrous carbonate|Ferrous sulfate (7H2O)|Ferrous sulfate (H2O)|FISH BYPRODUCTS|FRUIT AND VEGETABLE|GLYCEROL|GRAIN SCREENINGS|GRASSES, COOL SEASON|GRASS-Legume MIXTURES Pr. GR.   (17-22% Hcel.)|Grass-LEGUME MIXTURES Pr. LG. (10-13% HCEL.)|Iron oxide|Iron, organic generic|LEGUMES, FORAGE|Limestone, dolomite|Limestone, ground|LINSEED (FLAX)|LINSEED (FLAXSEED)|Magnesium carbonate|Magnesium Chloride, Hexahydrate|Magnesium hydroxide|Magnesium Oxide|Magnesium sulfate (7H2O)|Manganese carbonate|Manganese chloride|Manganese chloride (4H2O)|Manganese organic generic|Manganese oxide|Manganese sulfate (5H2O)|Manganese sulfate (H2O)|MEAT|MILK|Milk Replacer|Milk replacer 20 CP 20 fat|Milk replacer 26 CP 17 fat|MILLET|Mixed grass-legume (12-15% Hcel.)|MOLASSES|OATS|Oystershell|PEANUT|PEAS|Phosphate rock|Phosphate, Curacao|Phosphate, defluorinated|Phosphoric acid|PINEAPPLE|Potassium bicarbonate|Potassium carbonate|Potassium Chloride|Potassium iodide|Potassium Sulfate|POTATO|POULTRY|RICE|RUMEN PROTECTED AA|RYE, ANNUAL|SAFFLOWER|Selenate, sodium (10 H2O)|Selenite, sodium|Selenium yeast, generic|Skim milk, fresh|Sodium Bicarbonate|Sodium carbonate (H2O)|Sodium Choride|Sodium Phosphate, Monohydrate|Sodium sesquicarbonate (2H2O)|Sodium Sulfate decahydrate|Sodium tripolyphosphate|SORGHUM, GRAIN TYPE|SORGHUM, SUDAN TYPE|SOYBEAN|SPELT|SUDAN GRASS|SUGAR|SUGARCANE|SUNFLOWER|SWEET CORN|TAPIOCA|TOMATO|TRITICALE|UREA|Vit A premix|Vit D premix|Vit E premix|VitTM Premix, generic|WHEAT|WHEY|Whole Milk|Zinc carbonate|Zinc chloride|Zinc oxide|Zinc sulfate (H2O)|Zinc, organic generic)"
+        "pattern": "{ALFALFA|ALMOND|Ammonium Chloride|Ammonium phosphate (monobasic)|Ammonium Phosphate, dibasic|Ammonium Sulfate|APPLE|BAKERY BYPRODUCT|BARLEY|BEET, SUGAR|BERMUDAGRASS|BLOOD|Bone Meal|BREWERS GRAINS|BREWERS YEAST|Calcium carbonate|Calcium Choride dihydrate|Calcium Choride,anhydrous|Calcium hydroxide|Calcium iodate|Calcium oxide|Calcium Phosphate monobasic|Calcium Sulfate, dihydrate|Calf grower 14CP (Fed to calves only)|Calf grower 16CP (Fed to calves only)|Calf starter 18CP high starch (Fed to calves only)|Calf starter 18CP low starch (Fed to calves only)|Calf starter 22CP high starch (Fed to calves only)|Calf starter 22CP med starch (Fed to calves only)|CANDY|CANOLA|Casein|CHOCOLATE|CITRUS|Cobalt carbonate|Cobalt carbonate (6H2O)|Cobalt chloride (6H2O)|Cobalt organic generic|Cobalt sulfate (7H2O)|Copper chloride (2H2O)|Copper organic, generic|Copper oxide|Copper sulfate (5H2O)|CORN, YELLOW|COTTON SEED|DESTILLERY BYPRODUCT|Dicalcium Phosphate, dibasic|EDDI|FATS AND OILS|FEATHERS|Ferrous carbonate|Ferrous sulfate (7H2O)|Ferrous sulfate (H2O)|FISH BYPRODUCTS|FRUIT AND VEGETABLE|GLYCEROL|GRAIN SCREENINGS|GRASSES, COOL SEASON|GRASS-Legume MIXTURES Pr. GR.   (17-22% Hcel.)|Grass-LEGUME MIXTURES Pr. LG. (10-13% HCEL.)|Iron oxide|Iron, organic generic|LEGUMES, FORAGE|Limestone, dolomite|Limestone, ground|LINSEED (FLAX)|LINSEED (FLAXSEED)|Magnesium carbonate|Magnesium Chloride, Hexahydrate|Magnesium hydroxide|Magnesium Oxide|Magnesium sulfate (7H2O)|Manganese carbonate|Manganese chloride|Manganese chloride (4H2O)|Manganese organic generic|Manganese oxide|Manganese sulfate (5H2O)|Manganese sulfate (H2O)|MEAT|MILK|Milk Replacer|Milk replacer 20 CP 20 fat|Milk replacer 26 CP 17 fat|MILLET|Mixed grass-legume (12-15% Hcel.)|MOLASSES|OATS|Oystershell|PEANUT|PEAS|Phosphate rock|Phosphate, Curacao|Phosphate, defluorinated|Phosphoric acid|PINEAPPLE|Potassium bicarbonate|Potassium carbonate|Potassium Chloride|Potassium iodide|Potassium Sulfate|POTATO|POULTRY|RICE|RUMEN PROTECTED AA|RYE, ANNUAL|SAFFLOWER|Selenate, sodium (10 H2O)|Selenite, sodium|Selenium yeast, generic|Skim milk, fresh|Sodium Bicarbonate|Sodium carbonate (H2O)|Sodium Choride|Sodium Phosphate, Monohydrate|Sodium sesquicarbonate (2H2O)|Sodium Sulfate decahydrate|Sodium tripolyphosphate|SORGHUM, GRAIN TYPE|SORGHUM, SUDAN TYPE|SOYBEAN|SPELT|SUDAN GRASS|SUGAR|SUGARCANE|SUNFLOWER|SWEET CORN|TAPIOCA|TOMATO|TRITICALE|UREA|Vit A premix|Vit D premix|Vit E premix|VitTM Premix, generic|WHEAT|WHEY|Whole Milk|Zinc carbonate|Zinc chloride|Zinc oxide|Zinc sulfate (H2O)|Zinc, organic generic}"
       },
       "feed_description": {
         "type": "string",
         "description": "A more specific description of the feed that uniquely distinguishes it from other feeds with a similar or same name.",
-        "pattern": "((NH4)2SO4|(NH4)H2PO4|Anchovy, meal, mech.|Arg|Bagasse, hay|Bagasse, silage|Barley hay|Beet sugar|Bran|Bran, deffated|Bread, waste|Byproduct|Byproduct meal|Byproduct, wet|Ca(H2PO4)2|Ca(OH)2|CaCl2|CaCl2.2H2O|CaCO3|CaHPO4|Calcium soaps|Cannery waste|CaO|Casein|CaSO4.2H2O|Cassava|Cereal byproduct|Cobs|Cookie byproduct|Corn grain dry, fine grind|Corn silage, immature|Corn silage, mature|Corn silage, mid maturity|Corn stalks, ensiled, high DM|Corn stalks, ensiled, low DM|Corn, ear w husk, stlk, hi fbr|Corn, ear, huks, stlk, low fbr|DDGS, high fat|DDGS, high protein|DDGS, low fat|Delactosed|DGS modified|DGS wet|Distillers solubles|Dried|Dry, cattle|Fat, canola oil|Fat, corn oil|Fat, cottonseed oil|Fat, flaxseed oil|Fat, lard|Fat, safflower oil|Fat, soybean oil|Fat, sunflower oil|forage silage, immature|Fresh, immature|Fresh, mid-maturity|Germ|Germ meal|Gin trash|Gluten feed, dried|Gluten feed, wet|Gluten meal, dried|Glycerol|Grain|Grain and cob, dry, ground|Grain and cob, high moisture, ground|Grain, cracked, dry|Grain, dry rolled|Grain, ground, dry|Grain, ground, high moisture|Grain, rolled|Grain, rolled, high moisture|Grain, steam-flaked|Grain, steam-rolled|Grower|Hay|Hay, all samples|Hay, headed|Hay, immature|Hay, mature|Hay, mid mature|Hay, mid maturity|Hay, mid-maturity|Hay, vegetative|High protein, byproduct|His|Hominy feed|Hulls|Hydrolyzed meal|Hydrolyzed meal with some viscera|Hydrolyzed tallow fatty acids|Ile|K2SO4|KCl|Leu|Lys|Malt sprouts|Meal|Meal, expellers|Meal, extruded|Meal, high dRUP|Meal, low dRUP|Meal, nonenzymatically browned|Meal, rendered|Meal, solvent|Meal, solvent, 44% CP|Meal, solvent, 48% CP|Meat and bone, rendered|Menhaden, meal, mech.|Met|MgCl2.6H2O|MgO|Middlings|Milk Replacer|Mineral|NA|Na2SO4.10H2O|NaCl|NaH2PO4.H2O|NaHCO3|Not chocolate, byproduct|Oil seeds, whole|Partially hydrogenated tallow|Pasture|Pasture, intensively managed|Peanuts|Peas|Permeate|Phe|Plus pea silage|Pomace|Pomace, wet|Protein concentrate|Pulp dried|Pulp dried, molasses added|Pulp wet|Replacer|Seed|Seeds, whole|Seeds, whole roasted|Silage|Silage, all samples|Silage, early head|Silage, early maturity|Silage, headed|Silage, headed (mature)|Silage, immature|Silage, mature|Silage, mid maturity|Silage, mid-maturity|Silage, vegetative|Silage, vegetative (mature)|Skim, dried powder|Skimmed|Skins|Sorghum soybean,silage|Source unknown|Starter|Steamed|Straw|Sugar|Sugarcane|Tallow|Thr|Tifton-85, hay, 3-4wk growth|Trp|Urea|Val|Vegetable oil|Vitamins|Wet|Wet, cattle|Whole|Whole Milk)"
+        "pattern": "{(NH4)2SO4|(NH4)H2PO4|Anchovy, meal, mech.|Arg|Bagasse, hay|Bagasse, silage|Barley hay|Beet sugar|Bran|Bran, deffated|Bread, waste|Byproduct|Byproduct meal|Byproduct, wet|Ca(H2PO4)2|Ca(OH)2|CaCl2|CaCl2.2H2O|CaCO3|CaHPO4|Calcium soaps|Cannery waste|CaO|Casein|CaSO4.2H2O|Cassava|Cereal byproduct|Cobs|Cookie byproduct|Corn grain dry, fine grind|Corn silage, immature|Corn silage, mature|Corn silage, mid maturity|Corn stalks, ensiled, high DM|Corn stalks, ensiled, low DM|Corn, ear w husk, stlk, hi fbr|Corn, ear, huks, stlk, low fbr|DDGS, high fat|DDGS, high protein|DDGS, low fat|Delactosed|DGS modified|DGS wet|Distillers solubles|Dried|Dry, cattle|Fat, canola oil|Fat, corn oil|Fat, cottonseed oil|Fat, flaxseed oil|Fat, lard|Fat, safflower oil|Fat, soybean oil|Fat, sunflower oil|forage silage, immature|Fresh, immature|Fresh, mid-maturity|Germ|Germ meal|Gin trash|Gluten feed, dried|Gluten feed, wet|Gluten meal, dried|Glycerol|Grain|Grain and cob, dry, ground|Grain and cob, high moisture, ground|Grain, cracked, dry|Grain, dry rolled|Grain, ground, dry|Grain, ground, high moisture|Grain, rolled|Grain, rolled, high moisture|Grain, steam-flaked|Grain, steam-rolled|Grower|Hay|Hay, all samples|Hay, headed|Hay, immature|Hay, mature|Hay, mid mature|Hay, mid maturity|Hay, mid-maturity|Hay, vegetative|High protein, byproduct|His|Hominy feed|Hulls|Hydrolyzed meal|Hydrolyzed meal with some viscera|Hydrolyzed tallow fatty acids|Ile|K2SO4|KCl|Leu|Lys|Malt sprouts|Meal|Meal, expellers|Meal, extruded|Meal, high dRUP|Meal, low dRUP|Meal, nonenzymatically browned|Meal, rendered|Meal, solvent|Meal, solvent, 44% CP|Meal, solvent, 48% CP|Meat and bone, rendered|Menhaden, meal, mech.|Met|MgCl2.6H2O|MgO|Middlings|Milk Replacer|Mineral|NA|Na2SO4.10H2O|NaCl|NaH2PO4.H2O|NaHCO3|Not chocolate, byproduct|Oil seeds, whole|Partially hydrogenated tallow|Pasture|Pasture, intensively managed|Peanuts|Peas|Permeate|Phe|Plus pea silage|Pomace|Pomace, wet|Protein concentrate|Pulp dried|Pulp dried, molasses added|Pulp wet|Replacer|Seed|Seeds, whole|Seeds, whole roasted|Silage|Silage, all samples|Silage, early head|Silage, early maturity|Silage, headed|Silage, headed (mature)|Silage, immature|Silage, mature|Silage, mid maturity|Silage, mid-maturity|Silage, vegetative|Silage, vegetative (mature)|Skim, dried powder|Skimmed|Skins|Sorghum soybean,silage|Source unknown|Starter|Steamed|Straw|Sugar|Sugarcane|Tallow|Thr|Tifton-85, hay, 3-4wk growth|Trp|Urea|Val|Vegetable oil|Vitamins|Wet|Wet, cattle|Whole|Whole Milk}"
       },
       "feed_type": {
         "type": "string",
         "description": "The general type or category of the feed (group).",
-        "pattern": "(Aminoacids|Forage|Conc|Milk|Mineral|Vitamins)"
+        "pattern": "{Aminoacids|Forage|Conc|Milk|Mineral|Vitamins}"
       },
       "units": {
         "type": "string",
         "description": "The unit of measurement used for the feed.",
-        "pattern": "(kg)"
+        "pattern": "{kg}"
       }
     },
     "NRC_Comp_properties": {
@@ -1606,7 +1515,7 @@
       "feed_type": {
         "type": "string",
         "description": "The general type or category of the feed.",
-        "pattern": "^(Aminoacids|Forage|Conc|Milk|Mineral|Vitamins)$"
+        "pattern": "{Aminoacids|Forage|Conc|Milk|Mineral|Vitamins}"
       },
       "DM": {
         "type": "number",
@@ -1786,7 +1695,7 @@
       "feed_type": {
         "type": "string",
         "description": "The general type or category of the feed.",
-        "pattern": "^(Aminoacids|Forage|Conc|Milk|Mineral|Vitamins)$"
+        "pattern": "{Aminoacids|Forage|Conc|Milk|Mineral|Vitamins}"
       },
       "DM": {
         "type": "number",
@@ -1970,186 +1879,456 @@
       }
     },
     "manure_management_properties": {
-      "manure_management_scenarios": {
+      "type": "object",
+      "description": "Manure Storage and Handling Data",
+      "manure_management_scenario": {
         "type": "array",
         "description": "Manure Management Scenarios -- Add as many different manure scenarios as needed",
         "properties": {
           "type": "object",
-          "scenario_id": {
+          "manure_pen_id": {
             "type": "number",
-            "description": "Scenario ID -- An identification number for livestock enclosures.",
+            "description": "Manure Pen ID -- An identification number for livestock enclosures.",
             "minimum": 0
           },
-          "bedding_type": {
-            "type": "string",
-            "description": "Bedding Type -- The material used for bedding pack.",
-            "pattern": "^(Sand|Straw|Sawdust|Manure_solids|Other)$"
+          "manure_handling": {
+            "type": "object",
+            "description": "Manure Handling",
+            "manure_handling_method": {
+              "type": "string",
+              "description": "Manure Handling Method -- Method for cleaning barn alleyways.",
+              "pattern": "^{Flush System|Alley Scraper|Manual Scraping|Tillage|Manual Skid Steer Scraping}$"
+            },
+            "water_type": {
+              "type": "string",
+              "description": "Water Type -- The type of water used for cleaning barn alleyways.",
+              "pattern": "^{Fresh|Recycled}$"
+            },
+            "flushing_water_use_rate": {
+              "type": "number",
+              "description": "Water Use Rate for Flushing (gal/animal/day). -- Water Use Rate for Flushing (gal/animal/day).",
+              "minimum": 50,
+              "maximum": 200,
+              "default": 150
+            },
+            "auto_scraping_water_use_rate": {
+              "type": "number",
+              "description": "Water Use Rate for Auto Alley Scraping (gal/animal/day). -- Water Use Rate for Auto Alley Scraping (gal/animal/day).",
+              "minimum": 0,
+              "maximum": 50,
+              "default": 1
+            },
+            "manual_scraping_water_use_rate": {
+              "type": "number",
+              "description": "Water Use Rate for Manual Skid Steer Scraping (gal/animal/day). -- Water Use Rate for Manual Skid Steer Scraping (gal/animal/day).",
+              "minimum": 0,
+              "maximum": 50,
+              "default": 1
+            },
+            "flushing_cleaning_frequency": {
+              "type": "number",
+              "description": "Cleaning Frequency for Flushing (times/day). -- Cleaning Frequency for Flushing (times/day).",
+              "minimum": 1,
+              "maximum": 3,
+              "default": 3
+            },
+            "auto_scraping_cleaning_frequency": {
+              "type": "number",
+              "description": "Cleaning Frequency for Auto Alley Scraping (times/day). -- Cleaning Frequency for Auto Alley Scraping (times/day).",
+              "minimum": 1,
+              "maximum": 12,
+              "default": 5
+            },
+            "manual_scraping_cleaning_frequency": {
+              "type": "number",
+              "description": "Cleaning Frequency for Manual Skid Steer Scraping (times/day). -- Cleaning Frequency for Manual Skid Steer Scraping (times/day).",
+              "minimum": 1,
+              "maximum": 12,
+              "default": 6
+            }
           },
-          "manure_handler": {
-            "type": "string",
-            "description": "Manure Handling Method -- Method for cleaning barn alleyways.",
-            "pattern": "^(flush system|alley scraper|manual scraping|tillage|manual skid steer scraping)$"
-          },
-          "manure_separator": {
-            "type": "string",
-            "description": "Manure Separator Type -- The type of solid-liquid separator equipment to separate coarse fibrous solids/sand",
-            "pattern": "^(screw press|sand lane|rotary screen|none|other)$"
-          },
-          "manure_treatment_methods": {
-            "type": "string",
-            "description": "Manure Treatment Methods -- Select the Manure Treatment Methods.",
-            "pattern": "^(slurry storage underfloor|slurry storage outdoor|open lots|compost bedded pack barn|anaerobic lagoon|anaerobic digestion|other)$"
-          }
-        }
-      },
-      "bedding_configs": {
-        "type": "array",
-        "properties": {
-          "type": "object",
-          "properties": {
+          "bedding": {
+            "type": "object",
+            "description": "Bedding",
             "bedding_type": {
               "type": "string",
               "description": "Bedding Type -- The material used for bedding pack.",
-              "pattern": "^(Sand|Straw|Sawdust|Manure_solids|Other)$"
+              "pattern": "^{Sand|Straw|Sawdust|Manure_solids|Other}$"
             },
-            "bedding_mass_per_day": {
-              "type": "number"
+            "amount_of_sand_used": {
+              "type": "number",
+              "description": "Amount of Sand Used (kg/animal/day) -- Average amount of Sand added.",
+              "minimum": 18,
+              "maximum": 25,
+              "default": 25
             },
-            "bedding_density": {
-              "type": "number"
+            "amount_of_straw_used": {
+              "type": "number",
+              "description": "Amount of Straw Used (kg/animal/day) -- Average amount of Straw added.",
+              "minimum": 1.5,
+              "maximum": 3,
+              "default": 2.1
             },
-            "bedding_dry_matter_content": {
-              "type": "number"
+            "amount_of_sawdust_used": {
+              "type": "number",
+              "description": "Amount of Sawdust Used (kg/animal/day) -- Average amount of Sawdust added.",
+              "minimum": 1.5,
+              "maximum": 3,
+              "default": 1.97
             },
-            "bedding_cleaned_fraction": {
-              "type": "number"
+            "amount_of_manure_solids_used": {
+              "type": "number",
+              "description": "Amount of Manure Solids Used (kg/animal/day) -- Average amount of Bedding added.",
+              "minimum": 2,
+              "maximum": 5,
+              "default": 2.5
             },
-            "bedding_carbon_fraction": {
-              "type": "number"
-            },
-            "bedding_phosphorus_content": {
-              "type": "number"
-            },
-            "sand_removal_efficiency": {
-              "type": "number"
-            }
-          }
-        }
-      },
-      "manure_handler_configs": {
-        "type": "array",
-        "properties": {
-          "type": "object",
-          "properties": {
-            "manure_handler_type": {
+            "other_bedding_type": {
               "type": "string",
-              "description": "Manure Handling Method -- Method for cleaning barn alleyways.",
-              "pattern": "^(flush system|alley scraper|manual scraping|tillage|manual skid steer scraping)$"
+              "description": "Other Bedding Type -- If selected 'other' in \"Bedding Type\", write bedding type here."
             },
-            "cleaning_water_use_rate": {
-              "type": "number"
+            "amount_of_other_bedding_used": {
+              "type": "number",
+              "description": "Amount of Other Bedding Used (kg/animal/day) -- Average amount of Manure Solids added."
             },
-            "minutes_per_cleaning": {
-              "type": "number"
+            "bedding_addition_frequency": {
+              "type": "string",
+              "description": "Bedding Addition Frequency -- ",
+              "pattern": "^{Weekly|Bi-weekly|Other}$"
             },
-            "cleanings_per_day": {
-              "type": "number"
+            "other_bedding_addition_frequency": {
+              "type": "string",
+              "description": "Other Bedding Addition Frequency -- If selected 'other' in \"Bedding Addition Frequency\", write bedding addition frequency here."
+            },
+            "tillage_frequency": {
+              "type": "number",
+              "description": "Tillage Frequency (times/day). -- Turning activity of compost bedded pack (times/day).",
+              "minimum": 1,
+              "maximum": 3,
+              "default": 1
             }
-          }
-        }
-      },
-      "manure_separator_configs": {
-        "type": "array",
-        "properties": {
-          "type": "object",
-          "properties": {
+          },
+          "water_use_rate": {
+            "type": "object",
+            "description": "Water Use Rate",
+            "milking_parlor_water_use_rate": {
+              "type": "number",
+              "description": "Milking Parlor Water Use Rate (gal/animal/day) -- The water use rate for cleaning in the milking parlor (gal/animal/day).",
+              "minimum": 0,
+              "maximum": 50,
+              "default": 25
+            },
+            "milking_parlor_water_type": {
+              "type": "string",
+              "description": "Milking Parlor Water Type -- The type of water used for cleaning in the milking parlor.",
+              "default": "fresh",
+              "pattern": "^{Fresh|Recycled}$"
+            },
+            "holding_center_water_use_rate": {
+              "type": "number",
+              "description": "Holding Center Water Use Rate (gal/animal/day) -- The water use rate for cleaning in the holding area (gal/animal/day).",
+              "minimum": 0,
+              "maximum": 50,
+              "default": 10
+            },
+            "holding_center_water_type": {
+              "type": "string",
+              "description": "Holding Center Water Type -- The type of water used for cleaning in the holding area.",
+              "default": "fresh",
+              "pattern": "^{Fresh|Recycled}$"
+            },
+            "sprinkler_water_use_rate": {
+              "type": "number",
+              "description": "Sprinkler Water Use Rate (gal/animal/day) -- The water use rate for the sprinklers (gal/animal/day).",
+              "minimum": 0,
+              "maximum": 10,
+              "default": 3
+            },
+            "is_sprinkler_water_use_rate_animal_dependent": {
+              "type": "boolean",
+              "description": "Is Sprinkler Water Use Rate animal dependent? -- Whether the sprinkler water use rate varies according to the animal type."
+            },
+            "is_sprinkler_water_use_rate_calc_on_yearly_basis": {
+              "type": "boolean",
+              "description": "Is Sprinkler Water Use Rate calculated on a yearly basis? -- Whether the sprinkler water use rate is calculated on a yearly basis."
+            }
+          },
+          "compost_bedded_pack_barn": {
+            "type": "object",
+            "description": "Compost Bedding Pack Barn",
+            "bedding_type": {
+              "type": "string",
+              "description": "Bedding Type -- The material used for bedding pack.",
+              "pattern": "^{Straw|Sawdust|Compost}$"
+            },
+            "amount_of_straw_used": {
+              "type": "number",
+              "description": "Amount of Straw Used (kg/animal/day) -- Average amount of Straw added.",
+              "minimum": 4.5,
+              "maximum": 12,
+              "default": 12
+            },
+            "amount_of_sawdust_used": {
+              "type": "number",
+              "description": "Amount of Sawdust Used (kg/animal/day) -- Average amount of Sawdust added.",
+              "minimum": 4.5,
+              "maximum": 12,
+              "default": 11.3
+            },
+            "amount_of_compost_used": {
+              "type": "number",
+              "description": "Amount of Compost Used (kg/animal/day) -- Average amount of Sand added.",
+              "minimum": 4.5,
+              "maximum": 12,
+              "default": 11.3
+            },
+            "tillage_frequency": {
+              "type": "number",
+              "description": "Tillage Frequency (times/day). -- Turning activity of compost bedded pack (times/day).",
+              "minimum": 1,
+              "maximum": 3,
+              "default": 1
+            }
+          },
+          "manure_treatment_and_storage": {
+            "type": "object",
+            "description": "Manure Treatment and Storage Process",
+            "manure_treatment_methods": {
+              "type": "array",
+              "description": "Manure Treatment Methods -- Select the Manure Treatment Methods.",
+              "uniqueItems": "True",
+              "properties": {
+                "type": "string",
+                "pattern": "^{Slurry Storage Underfloor|Slurry Storage Outdoor|Open Lots|Compost Bedded Pack Barn|Anaerobic Lagoon|Anaerobic Digestion|Other}$"
+              }
+            },
+            "other_manure_treatment_method": {
+              "type": "string",
+              "description": "Other Manure Treatment Methods -- If 'other' is selected in \"Manure Treatment Methods\", write manure treatment method here."
+            },
+            "manure_removal_frequency_for_storage_underfloor": {
+              "type": "number",
+              "description": "Manure Removal Frequency for \"slurry_storage_underfloor\" (months) -- The frequency to remove manure when storing in slurry pit under floor (months).",
+              "minimum": 0,
+              "maximum": 10,
+              "default": 3
+            },
+            "manure_removal_frequency_for_storage_outdoor": {
+              "type": "number",
+              "description": "Manure Removal Frequency for \"slurry_storage_outdoor\" (months) -- The frequency to remove manure when storing in slurry pit outdoor (months).",
+              "minimum": 0,
+              "maximum": 12,
+              "default": 6
+            },
+            "manure_removal_frequency_for_compost_bedded_pack_barn": {
+              "type": "number",
+              "description": "Manure Removal Frequency for \"Compost Bedded Pack Barn\" (months) -- The frequency to remove manure when composting bedded pack (months).",
+              "minimum": 0,
+              "maximum": 12,
+              "default": 6
+            },
+            "manure_removal_frequency_for_open_lots": {
+              "type": "number",
+              "description": "Manure Removal Frequency for \"open_lots\" (months) -- The frequency to remove manure when storing in open lots (months).",
+              "minimum": 0,
+              "maximum": 12,
+              "default": 6
+            },
+            "effluent_removal_frequency": {
+              "type": "number",
+              "description": "Effluent Removal Frequency (months) -- The frequency to remove effluent for \"anaerobic_lagoon\" (months).",
+              "minimum": 0,
+              "maximum": 12,
+              "default": 12
+            },
+            "sludge_removal_frequency": {
+              "type": "number",
+              "description": "Sludge Removal Frequency (years) -- The frequency to remove sludge for \"anaerobic_lagoon\" (years).",
+              "minimum": 0,
+              "maximum": 15,
+              "default": 10
+            },
             "manure_separator_type": {
               "type": "string",
               "description": "Manure Separator Type -- The type of solid-liquid separator equipment to separate coarse fibrous solids/sand",
-              "pattern": "^(screw press|sand lane|rotary screen|none|other)$"
+              "pattern": "^{Screw Press|Sand Lane|Rotary Screen|None|Other}$"
             },
-            "percent_dry_solids": {
-              "type": "number"
-            },
-            "total_solids_removal_efficiency_for_separator": {
-              "type": "number"
-            },
-            "volatile_solids_removal_efficiency_for_separator": {
-              "type": "number"
-            },
-            "nitrogen_removal_efficiency_for_separator": {
-              "type": "number"
-            },
-            "total_ammoniacal_nitrogen_removal_efficiency_for_separator": {
-              "type": "number"
-            },
-            "phosphorus_removal_efficiency_for_separator": {
-              "type": "number"
-            },
-            "potassium_removal_efficiency_for_separator": {
-              "type": "number"
-            }
-          }
-        }
-      },
-      "manure_treatment_configs": {
-        "type": "array",
-        "properties": {
-          "type": "object",
-          "properties": {
-            "manure_treatment_type": {
+            "other_manure_separator": {
               "type": "string",
-              "description": "Manure Treatment Methods -- Select the Manure Treatment Methods.",
-              "pattern": "^(slurry storage underfloor|slurry storage outdoor|open lots|compost bedded pack barn|anaerobic lagoon|anaerobic digestion|other)$"
+              "description": "Other Manure Separator -- If selected 'other' in \"Manure Separator Type\", write manure separator type here"
             },
-            "total_solids_removal_efficiency_for_treatment": {
-              "type": "number"
+            "sand_removal_efficiency": {
+              "type": "number",
+              "description": "Sand Removal Efficiency for \"sand_lane\" -- Fraction of Sand Removed for \"sand_lane\".",
+              "minimum": 0.7,
+              "maximum": 0.95,
+              "default": 0.9
             },
-            "volatile_solids_removal_efficiency_for_treatment": {
-              "type": "number"
+            "dry_solids_percentage_for_screw_press": {
+              "type": "number",
+              "description": "Dry Solids Percentage for \"screw_press\" -- Final dry solids percentage for \"screw_press\".",
+              "minimum": 0,
+              "maximum": 1,
+              "default": 0.35
             },
-            "nitrogen_removal_efficiency_for_treatment": {
-              "type": "number"
+            "dry_solids_percentage_for_rotary_screen": {
+              "type": "number",
+              "description": "Dry Solids Percentage for \"rotary_screen\" -- Final dry solids percentage for \"rotary_screen\".",
+              "minimum": 0,
+              "maximum": 1,
+              "default": 0.2
             },
-            "total_ammoniacal_nitrogen_removal_efficiency_for_treatment": {
-              "type": "number"
+            "dry_solids_percentage_for_sand_lane": {
+              "type": "number",
+              "description": " Dry  Solids  Percentage  for  \"sand_lane\" -- Final dry solids percentage for \"sand_lane\".",
+              "minimum": 0,
+              "maximum": 1,
+              "default": 0
             },
-            "phosphorus_removal_efficiency_for_treatment": {
-              "type": "number"
+            "total_solids_removal_efficiency_for_screw_press": {
+              "type": "number",
+              "description": "Total Solids Removal Efficiency for \"screw_press\" -- Total Solids Removal Efficiency for \"screw_press\".",
+              "minimum": 0,
+              "maximum": 1,
+              "default": 0.25
             },
-            "potassium_removal_efficiency_for_treatment": {
-              "type": "number"
+            "total_solids_removal_efficiency_for_rotary_screen": {
+              "type": "number",
+              "description": "Total Solids Removal Efficiency for \"rotary_screen\" -- Total Solids Removal Efficiency for \"screw_press\".",
+              "minimum": 0,
+              "maximum": 1,
+              "default": 0.35
             },
-            "storage_time_period": {
-              "type": "number"
+            "total_solids_removal_efficiency_for_sand_lane": {
+              "type": "number",
+              "description": "Total Solids Removal Efficiency for \"sand_lane\" -- Total Solids Removal Efficiency for \"screw_press\".",
+              "minimum": 0,
+              "maximum": 1,
+              "default": 0
             },
-            "freeboard_input": {
-              "type": "number"
+            "volatile_solids_removal_efficiency_for_screw_press": {
+              "type": "number",
+              "description": "Volatile Solids Removal Efficiency for \"screw_press\" -- Volatile Solids Removal Efficiency for \"screw_press\".",
+              "minimum": 0,
+              "maximum": 1,
+              "default": 0.3
+            },
+            "volatile_solids_removal_efficiency_for_rotary_screen": {
+              "type": "number",
+              "description": "Volatile Solids Removal Efficiency for \"rotary_screen\" -- Volatile Solids Removal Efficiency for \"screw_press\".",
+              "minimum": 0,
+              "maximum": 1,
+              "default": 0.4
+            },
+            "volatile_solids_removal_efficiency_for_sand_lane": {
+              "type": "number",
+              "description": "Volatile Solids Removal Efficiency for \"sand_lane\" -- Volatile Solids Removal Efficiency for \"screw_press\".",
+              "minimum": 0,
+              "maximum": 1,
+              "default": 0
+            },
+            "nitrogen_removal_efficiency_for_screw_press": {
+              "type": "number",
+              "description": "Nitrogen Removal Efficiency for \"screw_press\" -- Nitrogen Removal Efficiency for \"screw_press\".",
+              "minimum": 0,
+              "maximum": 1,
+              "default": 0.3
+            },
+            "nitrogen_removal_efficiency_for_rotary_screen": {
+              "type": "number",
+              "description": "Nitrogen Removal Efficiency for \"rotary_screen\" -- Nitrogen Removal Efficiency for \"screw_press\".",
+              "minimum": 0,
+              "maximum": 1,
+              "default": 0.3
+            },
+            "nitrogen_removal_efficiency_for_sand_lane": {
+              "type": "number",
+              "description": "Nitrogen Removal Efficiency for \"sand_lane\" -- Nitrogen Removal Efficiency for \"screw_press\".",
+              "minimum": 0,
+              "maximum": 1,
+              "default": 0
+            },
+            "total_ammoniacal_nitrogen_removal_efficiency_for_screw_press": {
+              "type": "number",
+              "description": "Total Ammoniacal Nitrogen Removal Efficiency for \"screw_press\" -- Total Ammoniacal Nitrogen Removal Efficiency for \"screw_press\".",
+              "minimum": 0,
+              "maximum": 1,
+              "default": 0.1
+            },
+            "total_ammoniacal_nitrogen_removal_efficiency_for_rotary_screen": {
+              "type": "number",
+              "description": "Total Ammoniacal Nitrogen Removal Efficiency for \"rotary_screen\" -- Total Ammoniacal Nitrogen Removal Efficiency for \"screw_press\".",
+              "minimum": 0,
+              "maximum": 1,
+              "default": 0.15
+            },
+            "total_ammoniacal_nitrogen_removal_efficiency_for_sand_lane": {
+              "type": "number",
+              "description": "Total Ammoniacal Nitrogen Removal Efficiency for \"sand_lane\" -- Total Ammoniacal Nitrogen Removal Efficiency for \"screw_press\".",
+              "minimum": 0,
+              "maximum": 1,
+              "default": 0
+            },
+            "phosphorus_removal_efficiency_for_screw_press": {
+              "type": "number",
+              "description": "Phosphorus Removal Efficiency for \"screw_press\" -- Phosphorus Removal Efficiency for \"screw_press\".",
+              "minimum": 0,
+              "maximum": 1,
+              "default": 0.2
+            },
+            "phosphorus_removal_efficiency_for_rotary_screen": {
+              "type": "number",
+              "description": "Phosphorus Removal Efficiency for \"rotary_screen\" -- Phosphorus Removal Efficiency for \"screw_press\".",
+              "minimum": 0,
+              "maximum": 1,
+              "default": 0.4
+            },
+            "phosphorus_removal_efficiency_for_sand_lane": {
+              "type": "number",
+              "description": "Phosphorus Removal Efficiency for \"sand_lane\" -- Phosphorus Removal Efficiency for \"screw_press\".",
+              "minimum": 0,
+              "maximum": 1,
+              "default": 0
+            },
+            "potassium_removal_efficiency_for_screw_press": {
+              "type": "number",
+              "description": "Potassium Removal Efficiency for \"screw_press\" -- Potassium Removal Efficiency for \"screw_press\".",
+              "minimum": 0,
+              "maximum": 1,
+              "default": 0.23
+            },
+            "potassium_removal_efficiency_for_rotary_screen": {
+              "type": "number",
+              "description": "Potassium Removal Efficiency for \"rotary_screen\" -- Nitrogen Removal Efficiency for \"screw_press\".",
+              "minimum": 0,
+              "maximum": 1,
+              "default": 0.15
+            },
+            "potassium_removal_efficiency_for_sand_lane": {
+              "type": "number",
+              "description": "Potassium Removal Efficiency for \"sand_lane\" -- Potassium Removal Efficiency for \"screw_press\".",
+              "minimum": 0,
+              "maximum": 1,
+              "default": 0
             }
           }
         }
       }
     },
     "soil_profile_properties": {
-      "CN2": {
+      "second_moisture_condition_parameter": {
         "type": "number",
         "description": "Curve number parameter for average moisture condition equation.\nUnitless.\nReference: SWAT Input .MGT - CN2.",
         "minimum": 30,
         "maximum": 100,
         "default": 85
       },
-      "field_slope": {
+      "average_subbasin_slope": {
         "type": "number",
         "description": "Slope of the field, measured as rise over run.\nUnits: meters / meters or unitless.\nReference: SWAT Input .HRU - HRU_SLP.",
         "default": 0.05
       },
-      "slope_length": {
-        "type": "number",
-        "description": "Length of the slope of the field.\nUnits: meters.\nReference: SWAT Input .HRU - SLSUBBSN",
-        "minimum": 0.0,
-        "default": 10.0
-      },
-      "manning": {
+      "manning_roughness_coefficient": {
         "type": "number",
         "description": "Manning's \"n\" value for overland flow.\nUnitless.\nReference: SWAT Input .HRU - OV_N.",
         "minimum": 0.001,
@@ -2160,21 +2339,7 @@
         "description": "Ratio of soil loss with a specific support practice based on slope characteristics.This value adjusts for terracing, contouring, and stripcropping, and these features are not present in V1, so this value IS NOT used.\nUnitless.\nReference: SWAT Input .MGT - USLE_P.",
         "default": 0.08
       },
-      "silt": {
-        "type": "number",
-        "description": "Average percentage of silt in each layer of the soil profile.",
-        "minimum": 0.0,
-        "maximum": 100.0,
-        "default": 65.0
-      },
-      "sand": {
-        "type": "number",
-        "description": "Average percentage of sand in each layer of the soil profile.",
-        "minimum": 0.0,
-        "maximum": 100.0,
-        "default": 15.0
-      },
-      "soil_albedo": {
+      "albedo": {
         "type": "number",
         "description": "Ratio of solar radiation reflected by soil to amount of incident upon it.\nUnitless.\nReference: SWAT Input .SOL - SOL_ALB",
         "minimum": 0.0,
@@ -2194,12 +2359,6 @@
         "maximum": 1.0,
         "default": 0.95
       },
-      "fresh_N_mineral_rate": {
-            "type": "number",
-            "description": "Fraction of residue that will decompose in a day given optimal conditions.\nUnitless.\nReference SWAT Input: .BSN - RSDCO.",
-            "minimum": 0.0,
-            "default": 0.05
-      },
       "soil_layers": {
         "type": "array",
         "description": "The soil layers that this profile contains. Each element of the array should be a `soil_layer` object.",
@@ -2212,40 +2371,40 @@
             "description": "Bottom depth of this soil layer.\nUnits: mm.",
             "minimum": 20
           },
-          "soil_water_percent": {
+          "soil_water_concentration": {
             "type": "number",
             "description": "Concentration of water in this layer at the beginning of the simulation.\nUnits: mm water / mm soil.",
             "minimum": 0.0,
             "maximum": 0.95,
             "default": 0.25
           },
-          "field_capacity": {
+          "field_capacity_water_concentration": {
             "type": "number",
             "description": "Concentration of water in this layer when at field capacity.\nUnits: mm water / mm soil.",
             "minimum": 0.0,
             "maximum": 0.95,
             "default": 0.3
           },
-          "wilting_point": {
+          "wilting_point_water_concentration": {
             "type": "number",
             "description": "Concentration of water in this layer when at field capacity.\nUnits: mm water / mm soil.",
             "minimum": 0.0,
             "maximum": 0.95,
             "default": 0.2
           },
-          "saturation": {
+          "saturation_point_water_concentration": {
             "type": "number",
             "description": "Concentration of water in a layer when it has become saturated.\nUnits: mm water / mm soil.",
             "minimum": 0.0,
             "maximum": 0.95,
             "default": 0.5
           },
-          "initial_temperature": {
+          "temperature": {
             "type": "number",
             "description": "Temperature of the layer at the beginning of the simulation.\nUnits: degrees Celsius.",
             "default": 15.05
           },
-          "K_sat": {
+          "saturated_hydraulic_conductivity": {
             "type": "number",
             "description": "Measure of ease of water movement through the soil.\nUnits: mm / hour.\nReference: SWAT Input .SOL - SOL_K.",
             "minimum": 0.01,
@@ -2258,14 +2417,14 @@
             "maximum": 1.9,
             "default": 1.4
           },
-          "org_C_percent": {
+          "percent_organic_carbon_content": {
             "type": "number",
             "description": "Percent of soil weight that is organic carbon.\nUnitless.\nReference: SWAT Input .SOL - SOL_CBN.",
             "minimum": 0.0,
-            "maximum": 1.0,
-            "default": 0.012
+            "maximum": 100.0,
+            "default": 1.2
           },
-          "clay": {
+          "percent_clay_content": {
             "type": "number",
             "description": "Percent of soil weight that is clay.\nUnitless.\nReference: SWAT Input .SOL - SOL_CLAY.",
             "minimum": 0.0,
@@ -2293,7 +2452,7 @@
             "maximum": 100.0,
             "default": 1.3
           },
-          "labile_P": {
+          "initial_labile_inorganic_phosphorus_concentration": {
             "type": "number",
             "description": "Concentration of labile inorganic phosphorus at the beginning of the simulation.\nUnits: milligrams / kilogram soil.",
             "minimum": 0.0,
@@ -2317,13 +2476,13 @@
             "minimum": 0.0,
             "default": null
           },
-          "active_mineral_rate": {
+          "humus_mineralization_rate_factor": {
             "type": "number",
             "description": "Rate factor for humus mineralization of active organic nutrients (N and P).\nUnitless.\nReference: SWAT Input .BSN - CMN.",
             "minimum": 0.0,
             "default": 0.0003
           },
-          "denitrification_rate": {
+          "denitrification_rate_coefficient": {
             "type": "number",
             "description": "Controls the rate of denitrification.\nUnitless.\nReference: SWAT Input .BSN - CDN.",
             "minimum": 0.0,
