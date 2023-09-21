@@ -1,15 +1,19 @@
 import math
 
 from RUFAS.general_constants import GeneralConstants
-from RUFAS.routines.manure.constants.gas_emission_constants import GasEmissionConstants
-from RUFAS.routines.manure.constants.manure_constants import ManureConstants
+from RUFAS.routines.manure.constants_and_units.gas_emission_constants import (
+    GasEmissionConstants,
+)
+from RUFAS.routines.manure.constants_and_units.manure_constants import ManureConstants
 
 
-class GasEmissions:
+class GasEmissionsCalculator:
     @classmethod
-    def calc_methane_emission_from_slurry_storage(cls, total_volatile_solids: float,
-                                                  temp=GasEmissionConstants.DEFAULT_SLURRY_STORAGE_TEMPERATURE,
-                                                  ) -> float:
+    def methane_emission_from_slurry_storage(
+        cls,
+        total_volatile_solids: float,
+        temp=GasEmissionConstants.DEFAULT_SLURRY_STORAGE_TEMPERATURE,
+    ) -> float:
         """
         Calculate the methane emission from manure storage using total volatile solids.
 
@@ -77,28 +81,38 @@ class GasEmissions:
         """
         if total_volatile_solids < 0:
             raise ValueError(
-                f'Total volatile solids must be greater than 0. Total volatile solids provided: {total_volatile_solids}')
+                f"Total volatile solids must be greater than 0. Total volatile solids provided: {total_volatile_solids}"
+            )
 
-        arrhenius_exponent = cls._calc_arrhenius_exponent(temp)
+        arrhenius_exponent = cls._arrhenius_exponent(temp)
 
-        degradable_volatile_solids, non_degradable_volatile_solids = cls._calc_volatile_solid_components(
-            total_volatile_solids)
+        (
+            degradable_volatile_solids,
+            non_degradable_volatile_solids,
+        ) = cls._volatile_solid_components(total_volatile_solids)
 
-        methane_emission_from_degradable_volatile_solids = (GasEmissionConstants.METHANE_EMISSION_COEFFICIENT
-                                                            * degradable_volatile_solids
-                                                            * GasEmissionConstants.DEGRADABLE_VOLATILE_SOLIDS_RATE_CORRECTING_FACTOR
-                                                            * arrhenius_exponent)
-        methane_emission_from_non_degradable_volatile_solids = (GasEmissionConstants.METHANE_EMISSION_COEFFICIENT
-                                                                * non_degradable_volatile_solids
-                                                                * GasEmissionConstants.NON_DEGRADABLE_VOLATILE_SOLIDS_RATE_CORRECTING_FACTOR
-                                                                * arrhenius_exponent)
+        methane_emission_from_degradable_volatile_solids = (
+            GasEmissionConstants.METHANE_EMISSION_COEFFICIENT
+            * degradable_volatile_solids
+            * GasEmissionConstants.DEGRADABLE_VOLATILE_SOLIDS_RATE_CORRECTING_FACTOR
+            * arrhenius_exponent
+        )
+        methane_emission_from_non_degradable_volatile_solids = (
+            GasEmissionConstants.METHANE_EMISSION_COEFFICIENT
+            * non_degradable_volatile_solids
+            * GasEmissionConstants.NON_DEGRADABLE_VOLATILE_SOLIDS_RATE_CORRECTING_FACTOR
+            * arrhenius_exponent
+        )
 
-        methane_emission = methane_emission_from_degradable_volatile_solids + methane_emission_from_non_degradable_volatile_solids
+        methane_emission = (
+            methane_emission_from_degradable_volatile_solids
+            + methane_emission_from_non_degradable_volatile_solids
+        )
 
         return methane_emission
 
     @classmethod
-    def _calc_arrhenius_exponent(cls, temp: float) -> float:
+    def _arrhenius_exponent(cls, temp: float) -> float:
         """
         Calculate the Arrhenius exponent.
 
@@ -136,15 +150,28 @@ class GasEmissions:
             If the temperature is not between -40 and 50 degrees Celsius.
 
         """
-        if not GasEmissionConstants.GENERAL_LOWER_BOUND_TEMPERATURE <= temp <= GasEmissionConstants.GENERAL_UPPER_BOUND_TEMPERATURE:
-            raise ValueError(f'Temperature must be between -40 and 60 degrees Celsius. Temperature provided: {temp}')
+        if (
+            not GasEmissionConstants.GENERAL_LOWER_BOUND_TEMPERATURE
+            <= temp
+            <= GasEmissionConstants.GENERAL_UPPER_BOUND_TEMPERATURE
+        ):
+            raise ValueError(
+                f"Temperature must be between -40 and 60 degrees Celsius. Temperature provided: {temp}"
+            )
 
         temp_kelvin = cls._convert_temperature_celsius_to_kelvin(temp)
-        return math.exp(GasEmissionConstants.NATURAL_LOG_ARRHENIUS_CONSTANT -
-                        (GasEmissionConstants.ACTIVATION_ENERGY / (GasEmissionConstants.GAS_CONSTANT * temp_kelvin)))
+        return math.exp(
+            GasEmissionConstants.NATURAL_LOG_ARRHENIUS_CONSTANT
+            - (
+                GasEmissionConstants.ACTIVATION_ENERGY
+                / (GasEmissionConstants.GAS_CONSTANT * temp_kelvin)
+            )
+        )
 
     @classmethod
-    def _calc_volatile_solid_components(cls, total_volatile_solids: float) -> tuple[float, float]:
+    def _volatile_solid_components(
+        cls, total_volatile_solids: float
+    ) -> tuple[float, float]:
         """
         Calculate the degradable and non-degradable volatile solids.
 
@@ -188,23 +215,31 @@ class GasEmissions:
         """
         if total_volatile_solids < 0:
             raise ValueError(
-                f'Total volatile solids must be non-negative. Total volatile solids provided: {total_volatile_solids}')
+                f"Total volatile solids must be non-negative. Total volatile solids provided: {total_volatile_solids}"
+            )
 
-        degradable_volatile_solids = (total_volatile_solids
-                                      * GasEmissionConstants.ACHIEVABLE_METHANE_EMISSION
-                                      / GasEmissionConstants.POTENTIAL_METHANE_YIELD_OF_MANURE)
-        non_degradable_volatile_solids = total_volatile_solids - degradable_volatile_solids
+        degradable_volatile_solids = (
+            total_volatile_solids
+            * GasEmissionConstants.ACHIEVABLE_METHANE_EMISSION
+            / GasEmissionConstants.POTENTIAL_METHANE_YIELD_OF_MANURE
+        )
+        non_degradable_volatile_solids = (
+            total_volatile_solids - degradable_volatile_solids
+        )
         return degradable_volatile_solids, non_degradable_volatile_solids
 
     # TODO: to be removed in the next PR while refactoring slurry storage treatments
     @classmethod
-    def calc_methane_emission_for_slurry_storage(cls,
-                                                 manure_total_solids: float,
-                                                 is_enclosed=False,
-                                                 temperature_celsius=GasEmissionConstants.DEFAULT_SLURRY_STORAGE_TEMPERATURE,
-                                                 manure_volatile_solids_fraction=(
-                                                         GasEmissionConstants.DEFAULT_VOLATILE_SOLIDS_FRACTION),
-                                                 efficiency_fraction=0.99) -> float:
+    def methane_emission_for_slurry_storage(
+        cls,
+        manure_total_solids: float,
+        is_enclosed=False,
+        temperature_celsius=GasEmissionConstants.DEFAULT_SLURRY_STORAGE_TEMPERATURE,
+        manure_volatile_solids_fraction=(
+            GasEmissionConstants.DEFAULT_VOLATILE_SOLIDS_FRACTION
+        ),
+        efficiency_fraction=0.99,
+    ) -> float:
         """Calculates methane emissions from manure storage using total solids.
 
         Args:
@@ -233,7 +268,7 @@ class GasEmissions:
         tempK = cls._convert_temperature_celsius_to_kelvin(temperature_celsius)
         ex = math.exp(lnA - (E / (R * tempK)))
 
-        VSd = (Bo / E_CH4_pot)
+        VSd = Bo / E_CH4_pot
         VSnd = 1 - VSd
         E_CH4_open_air = c * VS_tot * (VSd * b1 + VSnd * b2) * ex
 
@@ -243,7 +278,7 @@ class GasEmissions:
             return E_CH4_open_air * (1 - efficiency_fraction)
 
     @classmethod
-    def _calc_modified_hours(cls, hours: float) -> float:
+    def _modified_hours(cls, hours: float) -> float:
         """
         Calculate modified hours based on the specific conditions.
 
@@ -280,17 +315,21 @@ class GasEmissions:
 
         """
         if not 0 <= hours <= 24:
-            raise ValueError(f'Hours must be in the range of [0, 24]. Hours provided: {hours}')
+            raise ValueError(
+                f"Hours must be in the range of [0, 24]. Hours provided: {hours}"
+            )
 
         if hours > 14:
-            return - math.tanh(hours - 21.5) / 3.5
+            return -math.tanh(hours - 21.5) / 3.5
         elif hours > 4:
             return math.tanh(hours - 9.5) / 2.5
         else:
-            return - math.tanh(hours + 3.5) / 3.5
+            return -math.tanh(hours + 3.5) / 3.5
 
     @classmethod
-    def _calc_ambient_temperature(cls, hours: float, min_temp: float, max_temp: float) -> float:
+    def _ambient_temperature(
+        cls, hours: float, min_temp: float, max_temp: float
+    ) -> float:
         """
         Calculate the ambient temperature based on the time of the day and the minimum and maximum barn temperatures.
 
@@ -308,7 +347,7 @@ class GasEmissions:
 
             :math:`T_{min}` and :math:`T_{max}` are the minimum and maximum barn temperatures, respectively,
 
-            :math:`modified_{hours}` is the result of the :func:`_calc_modified_hours` function.
+            :math:`modified_{hours}` is the result of the :func:`_modified_hours` function.
 
         Parameters
         ----------
@@ -332,16 +371,21 @@ class GasEmissions:
 
         """
         if not 0 <= hours <= 24:
-            raise ValueError(f'Hours should be between 0 and 24. Hours provided: {hours}')
+            raise ValueError(
+                f"Hours should be between 0 and 24. Hours provided: {hours}"
+            )
         if min_temp > max_temp:
             raise ValueError(
-                f'Minimum temperature cannot be greater than maximum temperature: min_temp = {min_temp}, max_temp = {max_temp}')
+                f"Minimum temperature cannot be greater than maximum temperature: {min_temp=}, {max_temp=}"
+            )
 
-        modified_hours = cls._calc_modified_hours(hours)
+        modified_hours = cls._modified_hours(hours)
         return modified_hours * (max_temp - min_temp) / 2 + (max_temp + min_temp) / 2
 
     @classmethod
-    def calc_housing_methane_emission(cls, num_animals: int, barn_area: float, barn_temp: float) -> float:
+    def housing_methane_emission(
+        cls, num_animals: int, barn_area: float, barn_temp: float
+    ) -> float:
         """
         Calculate housing methane emissions from manure handlers.
 
@@ -384,15 +428,17 @@ class GasEmissions:
 
         """
         if num_animals < 0:
-            raise ValueError('Number of animals must be greater than or equal to 0.')
+            raise ValueError("Number of animals must be greater than or equal to 0.")
 
         if barn_area < 0:
-            raise ValueError('Barn area must be greater than or equal to 0.')
+            raise ValueError("Barn area must be greater than or equal to 0.")
 
         return num_animals * max(0.0, 0.13 * barn_temp) * barn_area / 1000
 
     @classmethod
-    def calc_housing_carbon_dioxide_emission(cls, num_animals: int, barn_area: float, barn_temp: float) -> float:
+    def housing_carbon_dioxide_emission(
+        cls, num_animals: int, barn_area: float, barn_temp: float
+    ) -> float:
         """
         Calculate carbon dioxide housing emission.
 
@@ -435,19 +481,24 @@ class GasEmissions:
 
         """
         if num_animals < 0:
-            raise ValueError('Number of animals must be greater than or equal to 0.')
+            raise ValueError("Number of animals must be greater than or equal to 0.")
 
         if barn_area < 0:
-            raise ValueError('Barn area must be greater than or equal to 0.')
+            raise ValueError("Barn area must be greater than or equal to 0.")
 
         return num_animals * max(0.0, 0.0065 + 0.0192 * barn_temp) * barn_area / 1000
 
     @classmethod
-    def calc_housing_ammonia_emission(cls, num_animals: int, barn_area_per_animal: float,
-                                      urine_total_ammoniacal_nitrogen: float,
-                                      urine: float, temp: float,
-                                      pH=GasEmissionConstants.DEFAULT_PH_FOR_HOUSING_AMMONIA,
-                                      hsc=GasEmissionConstants.DEFAULT_HOUSING_SPECIFIC_CONSTANT) -> float:
+    def housing_ammonia_emission(
+        cls,
+        num_animals: int,
+        barn_area_per_animal: float,
+        urine_total_ammoniacal_nitrogen: float,
+        urine: float,
+        temp: float,
+        pH=GasEmissionConstants.DEFAULT_PH_FOR_HOUSING_AMMONIA,
+        hsc=GasEmissionConstants.DEFAULT_HOUSING_SPECIFIC_CONSTANT,
+    ) -> float:
         """
         Calculate housing ammonia emission.
 
@@ -562,19 +613,26 @@ class GasEmissions:
 
         """
         if num_animals < 0:
-            raise ValueError('Number of animals must be greater than or equal to 0.')
+            raise ValueError("Number of animals must be greater than or equal to 0.")
 
         if barn_area_per_animal < 0:
-            raise ValueError('Barn area must be greater than or equal to 0.')
+            raise ValueError("Barn area must be greater than or equal to 0.")
 
         if urine_total_ammoniacal_nitrogen < 0:
-            raise ValueError('Urine total ammoniacal nitrogen must be greater than or equal to 0.')
+            raise ValueError(
+                "Urine total ammoniacal nitrogen must be greater than or equal to 0."
+            )
 
         if urine < 0:
-            raise ValueError('Urine must be greater than or equal to 0.')
+            raise ValueError("Urine must be greater than or equal to 0.")
 
         # If any of the aforementioned values is 0, then the result will be 0.
-        if num_animals == 0 or barn_area_per_animal == 0 or urine_total_ammoniacal_nitrogen == 0 or urine == 0:
+        if (
+            num_animals == 0
+            or barn_area_per_animal == 0
+            or urine_total_ammoniacal_nitrogen == 0
+            or urine == 0
+        ):
             return 0.0
 
         total_barn_area = num_animals * barn_area_per_animal
@@ -582,21 +640,27 @@ class GasEmissions:
         manure_density = ManureConstants.MANURE_DENSITY  # kg/m^3
         seconds_per_day = GeneralConstants.SECONDS_PER_DAY
         temperature_kelvin = cls._convert_temperature_celsius_to_kelvin(temp)
-        ammonia_barn_resistance = cls._calc_ammonia_barn_resistance(temp, hsc)
+        ammonia_barn_resistance = cls._ammonia_barn_resistance(temp, hsc)
         manure_urine_per_area = urine / total_barn_area  # kg/m^2
-        equilibrium_coefficient = cls._calc_equilibrium_coefficient(temperature_kelvin, pH)
-        ammonia_loss = (total_ammoniacal_nitrogen * seconds_per_day * manure_density) / \
-                       (ammonia_barn_resistance * manure_urine_per_area * equilibrium_coefficient)
+        equilibrium_coefficient = cls._equilibrium_coefficient(temperature_kelvin, pH)
+        ammonia_loss = (
+            total_ammoniacal_nitrogen * seconds_per_day * manure_density
+        ) / (ammonia_barn_resistance * manure_urine_per_area * equilibrium_coefficient)
         total_ammonia_loss = ammonia_loss * total_barn_area
         return max(0.0, total_ammonia_loss)
 
     @classmethod
-    def calc_storage_ammonia_emission(cls, num_animals: int,
-                                      manure_total_ammoniacal_nitrogen: float,
-                                      manure_volume: float, manure_density: float,
-                                      total_solids: float, temp: float,
-                                      storage_area_per_animal=GasEmissionConstants.DEFAULT_STORAGE_AREA_PER_ANIMAL,
-                                      pH=GasEmissionConstants.DEFAULT_PH_FOR_STORAGE_AMMONIA) -> float:
+    def storage_ammonia_emission(
+        cls,
+        num_animals: int,
+        manure_total_ammoniacal_nitrogen: float,
+        manure_volume: float,
+        manure_density: float,
+        total_solids: float,
+        temp: float,
+        storage_area_per_animal=GasEmissionConstants.DEFAULT_STORAGE_AREA_PER_ANIMAL,
+        pH=GasEmissionConstants.DEFAULT_PH_FOR_STORAGE_AMMONIA,
+    ) -> float:
         """
         Calculate storage ammonia emissions for manure treatments.
 
@@ -715,37 +779,63 @@ class GasEmissions:
 
         """
         if num_animals < 0:
-            raise ValueError('Number of animals must be greater than or equal to 0.')
+            raise ValueError("Number of animals must be greater than or equal to 0.")
         if storage_area_per_animal < 0:
-            raise ValueError('Storage area per animal must be greater than or equal to 0.')
+            raise ValueError(
+                "Storage area per animal must be greater than or equal to 0."
+            )
         if manure_total_ammoniacal_nitrogen < 0:
-            raise ValueError('Manure total ammoniacal nitrogen must be greater than or equal to 0.')
+            raise ValueError(
+                "Manure total ammoniacal nitrogen must be greater than or equal to 0."
+            )
         if manure_volume < 0:
-            raise ValueError('Manure volume must be greater than or equal to 0.')
+            raise ValueError("Manure volume must be greater than or equal to 0.")
         if manure_density < 0:
-            raise ValueError('Manure density must be greater than or equal to 0.')
+            raise ValueError("Manure density must be greater than or equal to 0.")
         if total_solids < 0:
-            raise ValueError('Total solids must be greater than or equal to 0.')
+            raise ValueError("Total solids must be greater than or equal to 0.")
 
         # If any of the input parameters is 0, then the result will be 0.
-        if any(param == 0 for param in [num_animals, storage_area_per_animal, manure_total_ammoniacal_nitrogen,
-                                        manure_volume, manure_density, total_solids]):
+        if any(
+            param == 0
+            for param in [
+                num_animals,
+                storage_area_per_animal,
+                manure_total_ammoniacal_nitrogen,
+                manure_volume,
+                manure_density,
+                total_solids,
+            ]
+        ):
             return 0.0
 
         total_storage_area = num_animals * storage_area_per_animal
         temp_kelvin = cls._convert_temperature_celsius_to_kelvin(temp)
         total_manure_mass = manure_volume * manure_density
-        housing_specific_constant = cls._calc_housing_specific_constant(total_manure_mass, total_solids)
-        storage_area_resistance = cls._calc_ammonia_barn_resistance(temp, housing_specific_constant)
+        housing_specific_constant = cls._housing_specific_constant(
+            total_manure_mass, total_solids
+        )
+        storage_area_resistance = cls._ammonia_barn_resistance(
+            temp, housing_specific_constant
+        )
         manure_mass_excluding_solids = total_manure_mass - total_solids
-        equilibrium_coefficient = cls._calc_equilibrium_coefficient(temp_kelvin, pH)
-        ammonia_loss = (manure_total_ammoniacal_nitrogen * GeneralConstants.SECONDS_PER_DAY * manure_density) / \
-                       (storage_area_resistance * manure_mass_excluding_solids * equilibrium_coefficient)
+        equilibrium_coefficient = cls._equilibrium_coefficient(temp_kelvin, pH)
+        ammonia_loss = (
+            manure_total_ammoniacal_nitrogen
+            * GeneralConstants.SECONDS_PER_DAY
+            * manure_density
+        ) / (
+            storage_area_resistance
+            * manure_mass_excluding_solids
+            * equilibrium_coefficient
+        )
         total_ammonia_loss = ammonia_loss * total_storage_area
         return max(0.0, total_ammonia_loss)
 
     @classmethod
-    def _calc_housing_specific_constant(cls, manure_mass: float, total_solids: float) -> float:
+    def _housing_specific_constant(
+        cls, manure_mass: float, total_solids: float
+    ) -> float:
         """
         Calculate housing specific constant.
 
@@ -772,9 +862,9 @@ class GasEmissions:
 
         """
         if manure_mass < 0.0:
-            raise ValueError('Manure mass must be greater than or equal to 0.')
+            raise ValueError("Manure mass must be greater than or equal to 0.")
         elif total_solids < 0.0:
-            raise ValueError('Total solids must be greater than or equal to 0.')
+            raise ValueError("Total solids must be greater than or equal to 0.")
         elif manure_mass == 0.0 or total_solids == 0.0:
             return GasEmissionConstants.SOLID_AND_SEMI_SOLID_MANURE_HSC
 
@@ -788,14 +878,15 @@ class GasEmissions:
             return GasEmissionConstants.LIQUID_MANURE_HSC
 
     @classmethod
-    def calc_ammonia_emission(cls,
-                              num_animals: int,
-                              barn_area: float,
-                              total_ammoniacal_nitrogen: float,
-                              mass: float,
-                              temperature_celsius: float,
-                              housing_specific_constant=GasEmissionConstants.DEFAULT_HOUSING_SPECIFIC_CONSTANT,
-                              ) -> float:
+    def ammonia_emission(
+        cls,
+        num_animals: int,
+        barn_area: float,
+        total_ammoniacal_nitrogen: float,
+        mass: float,
+        temperature_celsius: float,
+        housing_specific_constant=GasEmissionConstants.DEFAULT_HOUSING_SPECIFIC_CONSTANT,
+    ) -> float:
         """Calculates NH3 storage emissions.
 
         Args:
@@ -814,24 +905,29 @@ class GasEmissions:
         pH = 7.5
         c = GeneralConstants.SECONDS_PER_DAY  # s/day
         tempK = cls._convert_temperature_celsius_to_kelvin(temperature_celsius)  # K
-        r = cls._calc_ammonia_barn_resistance(temperature_celsius, housing_specific_constant)
+        r = cls._ammonia_barn_resistance(temperature_celsius, housing_specific_constant)
         M = mass / barn_area  # manure per area of exposed surface, kg/m^2
-        Q = cls._calc_equilibrium_coefficient(tempK, pH)
+        Q = cls._equilibrium_coefficient(tempK, pH)
         if r * M * Q > 0:
-            return num_animals * barn_area * ((total_ammoniacal_nitrogen / barn_area) * c * p) / (
-                    r * M * Q)
+            return (
+                num_animals
+                * barn_area
+                * ((total_ammoniacal_nitrogen / barn_area) * c * p)
+                / (r * M * Q)
+            )
         else:
             return 0.0
 
     @classmethod
-    def calc_ammonia_storage_emission(cls,
-                                      num_animals: int,
-                                      barn_area: float,
-                                      manure_total_ammoniacal_nitrogen: float,
-                                      manure_mass: float,  # TODO: Decide to use volume or mass
-                                      temperature_celsius: float,
-                                      housing_specific_constant=GasEmissionConstants.DEFAULT_HOUSING_SPECIFIC_CONSTANT,
-                                      ) -> float:
+    def ammonia_storage_emission(
+        cls,
+        num_animals: int,
+        barn_area: float,
+        manure_total_ammoniacal_nitrogen: float,
+        manure_mass: float,  # TODO: Decide to use volume or mass
+        temperature_celsius: float,
+        housing_specific_constant=GasEmissionConstants.DEFAULT_HOUSING_SPECIFIC_CONSTANT,
+    ) -> float:
         """Calculates ammonia storage emissions for manure treatments.
 
         Parameters
@@ -851,18 +947,19 @@ class GasEmissions:
             The default is GasEmissionConstants.DEFAULT_HOUSING_SPECIFIC_CONSTANT.
 
         """
-        return cls.calc_ammonia_emission(
+        return cls.ammonia_emission(
             num_animals=num_animals,
             barn_area=barn_area,
             total_ammoniacal_nitrogen=manure_total_ammoniacal_nitrogen,
             mass=manure_mass,
             temperature_celsius=temperature_celsius,
-            housing_specific_constant=housing_specific_constant
+            housing_specific_constant=housing_specific_constant,
         )
 
     @classmethod
-    def _calc_ammonia_barn_resistance(cls, temp: float,
-                                      hsc=GasEmissionConstants.DEFAULT_HOUSING_SPECIFIC_CONSTANT) -> float:
+    def _ammonia_barn_resistance(
+        cls, temp: float, hsc=GasEmissionConstants.DEFAULT_HOUSING_SPECIFIC_CONSTANT
+    ) -> float:
         """
         Calculate resistance of :math:`NH_3` transport to the atmosphere in a barn.
 
@@ -899,7 +996,7 @@ class GasEmissions:
         return hsc * (1 - 0.027 * (20.0 - temp))
 
     @classmethod
-    def _calc_henry_law_coefficient_of_ammonia(cls, temp: float) -> float:
+    def _henry_law_coefficient_of_ammonia(cls, temp: float) -> float:
         """
         Calculate Henry's law coefficient of ammonia.
 
@@ -931,7 +1028,7 @@ class GasEmissions:
         return 10 ** (1478 / temp - 1.69)
 
     @classmethod
-    def _calc_dissociation_coefficient_of_ammonium(cls, temp: float, pH: float) -> float:
+    def _dissociation_coefficient_of_ammonium(cls, temp: float, pH: float) -> float:
         """
         Calculate dissociation coefficient of ammonium.
 
@@ -967,7 +1064,7 @@ class GasEmissions:
         return 1 + 10 ** (0.09018 + 2729.9 / temp - pH)
 
     @classmethod
-    def _calc_equilibrium_coefficient(cls, temp: float, pH: float) -> float:
+    def _equilibrium_coefficient(cls, temp: float, pH: float) -> float:
         """
         Calculate Q, the equilibrium coefficient for the :math:`NH_3` gas in the air for a given
         concentration of total ammoniacal nitrogen in the solution.
@@ -1001,12 +1098,14 @@ class GasEmissions:
             Equilibrium coefficient for the :math:`NH_3` gas in the air (unitless).
 
         """
-        Kh = cls._calc_henry_law_coefficient_of_ammonia(temp)
-        Ka = cls._calc_dissociation_coefficient_of_ammonium(temp, pH)
+        Kh = cls._henry_law_coefficient_of_ammonia(temp)
+        Ka = cls._dissociation_coefficient_of_ammonium(temp, pH)
         return Kh * Ka
 
     @classmethod
-    def _convert_temperature_celsius_to_kelvin(cls, temperature_celsius: float) -> float:
+    def _convert_temperature_celsius_to_kelvin(
+        cls, temperature_celsius: float
+    ) -> float:
         """Converts a temperature from Celsius to Kelvin.
 
         Args:
@@ -1019,8 +1118,9 @@ class GasEmissions:
         return temperature_celsius + 273.15
 
     @classmethod
-    def calc_methane_volume_via_Chen_equation(cls, manure_total_volatile_solids: float,
-                                              hydraulic_retention_time: int) -> float:
+    def methane_volume_via_Chen_equation(
+        cls, manure_total_volatile_solids: float, hydraulic_retention_time: int
+    ) -> float:
         """Calculates CH4 generation volume using the Chen-Hashimoto equation.
 
         Args:
@@ -1031,14 +1131,23 @@ class GasEmissions:
             CH4 generation volume, m^3.
 
         """
-        return (GasEmissionConstants.METHANE_POTENTIAL_Go *
-                (1 - GasEmissionConstants.CHEN_HASHIMOTO_KINETIC_CONSTANT_KCH /
-                 (hydraulic_retention_time * GasEmissionConstants.SPECIFIC_GROWTH_RATE +
-                  GasEmissionConstants.CHEN_HASHIMOTO_KINETIC_CONSTANT_KCH - 1)) *
-                manure_total_volatile_solids * GeneralConstants.GRAMS_TO_KG)
+        return (
+            GasEmissionConstants.METHANE_POTENTIAL_Go
+            * (
+                1
+                - GasEmissionConstants.CHEN_HASHIMOTO_KINETIC_CONSTANT_KCH
+                / (
+                    hydraulic_retention_time * GasEmissionConstants.SPECIFIC_GROWTH_RATE
+                    + GasEmissionConstants.CHEN_HASHIMOTO_KINETIC_CONSTANT_KCH
+                    - 1
+                )
+            )
+            * manure_total_volatile_solids
+            * GeneralConstants.GRAMS_TO_KG
+        )
 
     @classmethod
-    def calc_biogas_energy_content(cls, methane_volume: float) -> float:
+    def biogas_energy_content(cls, methane_volume: float) -> float:
         """Calculates biogas energy content.
 
         Args:
@@ -1048,10 +1157,16 @@ class GasEmissions:
             Biogas energy content, MJ.
 
         """
-        return methane_volume * GasEmissionConstants.METHANE_DENSITY * GasEmissionConstants.METHANE_ENERGY_DENSITY
+        return (
+            methane_volume
+            * GasEmissionConstants.METHANE_DENSITY
+            * GasEmissionConstants.METHANE_ENERGY_DENSITY
+        )
 
     @classmethod
-    def calc_methane_emission_from_anaerobic_lagoon(cls, manure_volatile_solids: float) -> float:
+    def methane_emission_from_anaerobic_lagoon(
+        cls, manure_volatile_solids: float
+    ) -> float:
         """
         Calculate methane emission from anaerobic lagoon.
 
@@ -1095,7 +1210,7 @@ class GasEmissions:
         return Bo * MCF * MS * MF * manure_volatile_solids
 
     @classmethod
-    def _calc_methane_conversion_factor(cls, ambient_barn_temp: float) -> float:
+    def _methane_conversion_factor(cls, ambient_barn_temp: float) -> float:
         """
         Calculate the Methane Conversion Factor (MCF) using the exponential function:
 
@@ -1112,10 +1227,14 @@ class GasEmissions:
             The calculated Methane Conversion Factor (MCF) for the given ambient barn temperature.
 
         """
-        return GasEmissionConstants.MCF_CONSTANT_A * math.exp(GasEmissionConstants.MCF_CONSTANT_B * ambient_barn_temp)
+        return GasEmissionConstants.MCF_CONSTANT_A * math.exp(
+            GasEmissionConstants.MCF_CONSTANT_B * ambient_barn_temp
+        )
 
     @classmethod
-    def _calc_ifsm_methane_emission(cls, manure_volatile_solids: float, ambient_barn_temp: float) -> float:
+    def _ifsm_methane_emission(
+        cls, manure_volatile_solids: float, ambient_barn_temp: float
+    ) -> float:
         """Calculates emission of methane for a day using an adaptation of the tier 2 approach
         of the IPCC(2006), given ambient barn temperature and a methane conversion factor for the manure
         management.
@@ -1139,13 +1258,19 @@ class GasEmissions:
         if manure_volatile_solids < 0:
             raise ValueError(f"{manure_volatile_solids=} mass must be positive.")
         Bo = GasEmissionConstants.ACHIEVABLE_METHANE_EMISSION
-        methane_conversion_factor = GasEmissions._calc_methane_conversion_factor(ambient_barn_temp)
-        methane_emissions_in_kg = (manure_volatile_solids * Bo *
-                                   GasEmissionConstants.METHANE_FACTOR * methane_conversion_factor) / 100
+        methane_conversion_factor = GasEmissionsCalculator._methane_conversion_factor(
+            ambient_barn_temp
+        )
+        methane_emissions_in_kg = (
+            manure_volatile_solids
+            * Bo
+            * GasEmissionConstants.METHANE_FACTOR
+            * methane_conversion_factor
+        ) / 100
         return methane_emissions_in_kg
 
     @classmethod
-    def _calc_microbial_decomp_rate(cls, temperature: float) -> float:
+    def _microbial_decomp_rate(cls, temperature: float) -> float:
         """
         Calculates the microbial decomposition (unitless) rate per day:
 
@@ -1162,11 +1287,14 @@ class GasEmissions:
             The microbial decomposition rate per day (unitless)
 
         """
-        return ManureConstants.EFFECTIVE_MICROBIAL_DECOMP_RATE * \
-            (math.pow(1.066, (temperature - 10)) - math.pow(1.21, (temperature - 50)))
+        return ManureConstants.EFFECTIVE_MICROBIAL_DECOMP_RATE * (
+            math.pow(1.066, (temperature - 10)) - math.pow(1.21, (temperature - 50))
+        )
 
     @classmethod
-    def _calc_carbon_decomposition_rate(cls, days_since_last_tillage: int = 1, lag: int = 2) -> float:
+    def _carbon_decomposition_rate(
+        cls, days_since_last_tillage: int = 1, lag: int = 2
+    ) -> float:
         """
         Calculates the carbon decomposition taking place in the composting process of
         the manure-bedding mix due to microbial activity.
@@ -1192,23 +1320,23 @@ class GasEmissions:
         compost_bed_pack_temp = 30
         decay = 0.1
 
-        max_microbial_decom_rate = cls._calc_microbial_decomp_rate(decomposition_temp)
-        slow_decomp_rate = cls._calc_microbial_decomp_rate(compost_bed_pack_temp)
+        max_microbial_decom_rate = cls._microbial_decomp_rate(decomposition_temp)
+        slow_decomp_rate = cls._microbial_decomp_rate(compost_bed_pack_temp)
         exponent_coeff = decay * (days_since_last_tillage - lag)
 
         c_decomp_rate = (
-                (max_microbial_decom_rate - slow_decomp_rate)
-                * math.exp(exponent_coeff)
-                * slow_decomp_rate
+            (max_microbial_decom_rate - slow_decomp_rate)
+            * math.exp(exponent_coeff)
+            * slow_decomp_rate
         )
         return c_decomp_rate
 
     @classmethod
-    def _calc_anaerobic_effect(
-            cls,
-            oxygen_mole_fraction: float = 0.15,
-            oxygen_half_saturation_constant: float = GasEmissionConstants.OXYGEN_HALF_SATURATION_CONSTANT,
-            oxygen_ambient_air_mole_fraction: float = 0.21
+    def _anaerobic_effect(
+        cls,
+        oxygen_mole_fraction: float = 0.15,
+        oxygen_half_saturation_constant: float = GasEmissionConstants.OXYGEN_HALF_SATURATION_CONSTANT,
+        oxygen_ambient_air_mole_fraction: float = 0.21,
     ) -> float:
         """
         Calculates the anaerobic effect.
@@ -1241,24 +1369,28 @@ class GasEmissions:
         if not (0.0 < oxygen_mole_fraction < 1.0):
             raise ValueError(f"{oxygen_mole_fraction=} must be in the range [0, 1]")
         if not (0.0 < oxygen_ambient_air_mole_fraction < 1.0):
-            raise ValueError(f"{oxygen_ambient_air_mole_fraction=} must be in the range [0, 1]")
+            raise ValueError(
+                f"{oxygen_ambient_air_mole_fraction=} must be in the range [0, 1]"
+            )
         anaerobic_effect = (
-                (oxygen_mole_fraction / (oxygen_half_saturation_constant + oxygen_mole_fraction))
-                * ((
-                           oxygen_half_saturation_constant + oxygen_ambient_air_mole_fraction) / oxygen_ambient_air_mole_fraction)
+            oxygen_mole_fraction
+            / (oxygen_half_saturation_constant + oxygen_mole_fraction)
+        ) * (
+            (oxygen_half_saturation_constant + oxygen_ambient_air_mole_fraction)
+            / oxygen_ambient_air_mole_fraction
         )
         return anaerobic_effect
 
     @classmethod
-    def calc_total_carbon_decomposition(
-            cls,
-            manure_total_solids: float,
-            bedding_total_mass: float,
-            days_since_last_tillage: int,
-            lag: int,
-            moisture_effect: float = ManureConstants.DEFAULT_MOISTURE_EFFECT_MICROBIAL_DECOMP,
-            carbon_available_in_manure: float = ManureConstants.DEFAULT_CARBON_AVAILABLE_IN_MANURE,
-            carbon_available_in_bedding: float = GasEmissionConstants.DEFAULT_CARBON_AVAILABLE_IN_BEDDING
+    def total_carbon_decomposition(
+        cls,
+        manure_total_solids: float,
+        bedding_total_mass: float,
+        days_since_last_tillage: int,
+        lag: int,
+        moisture_effect: float = ManureConstants.DEFAULT_MOISTURE_EFFECT_MICROBIAL_DECOMP,
+        carbon_available_in_manure: float = ManureConstants.DEFAULT_CARBON_AVAILABLE_IN_MANURE,
+        carbon_available_in_bedding: float = GasEmissionConstants.DEFAULT_CARBON_AVAILABLE_IN_BEDDING,
     ) -> float:
         """Calculates the carbon decomposition from the composting process of the manure-bed mixture
         due to microbial activity (decomposition, consumption, respiration).
@@ -1296,20 +1428,21 @@ class GasEmissions:
         carbon_from_bedding = bedding_total_mass * carbon_available_in_bedding
         total_carbon = carbon_from_manure + carbon_from_bedding
 
-        microbial_decomp_rate = cls._calc_carbon_decomposition_rate(days_since_last_tillage, lag)
-        microbial_decomp_anaerobic_conditions_effect = cls._calc_anaerobic_effect()
+        microbial_decomp_rate = cls._carbon_decomposition_rate(
+            days_since_last_tillage, lag
+        )
+        microbial_decomp_anaerobic_conditions_effect = cls._anaerobic_effect()
         total_carbon_decomposition = (
-                total_carbon
-                * microbial_decomp_rate
-                * moisture_effect
-                * microbial_decomp_anaerobic_conditions_effect
+            total_carbon
+            * microbial_decomp_rate
+            * moisture_effect
+            * microbial_decomp_anaerobic_conditions_effect
         )
         return total_carbon_decomposition
 
     @staticmethod
-    def _calc_nitrogen_loss_in_compost_bedded_pack_barn_due_to_ammonia_emission(
-            daily_nitrogen_input: float,
-            is_bedding_tilled: bool
+    def _nitrogen_loss_in_compost_bedded_pack_barn_due_to_ammonia_emission(
+        daily_nitrogen_input: float, is_bedding_tilled: bool
     ) -> float:
         """
         Calculate the nitrogen loss from ammonia emission in the compost bedded pack barn.
@@ -1333,19 +1466,31 @@ class GasEmissions:
         """
 
         if daily_nitrogen_input < 0.0:
-            raise ValueError(f'Daily nitrogen input mass must be non-negative: {daily_nitrogen_input}')
+            raise ValueError(
+                f"Daily nitrogen input mass must be non-negative: {daily_nitrogen_input}"
+            )
 
-        coefficient_tilled = GasEmissionConstants.AMMONIA_EMISSION_COEFFICIENT_WITH_TILLED_BEDDING
-        coefficient_untilled = GasEmissionConstants.AMMONIA_EMISSION_COEFFICIENT_WITH_UNTILLED_BEDDING
+        coefficient_tilled = (
+            GasEmissionConstants.AMMONIA_EMISSION_COEFFICIENT_WITH_TILLED_BEDDING
+        )
+        coefficient_untilled = (
+            GasEmissionConstants.AMMONIA_EMISSION_COEFFICIENT_WITH_UNTILLED_BEDDING
+        )
 
-        nitrogen_loss_tilled = coefficient_tilled * daily_nitrogen_input * is_bedding_tilled
+        nitrogen_loss_tilled = (
+            coefficient_tilled * daily_nitrogen_input * is_bedding_tilled
+        )
 
-        nitrogen_loss_untilled = coefficient_untilled * daily_nitrogen_input * (not is_bedding_tilled)
+        nitrogen_loss_untilled = (
+            coefficient_untilled * daily_nitrogen_input * (not is_bedding_tilled)
+        )
 
         return nitrogen_loss_tilled + nitrogen_loss_untilled
 
     @staticmethod
-    def _calc_nitrogen_loss_in_compost_bedded_pack_barn_due_to_leaching(daily_nitrogen_input: float) -> float:
+    def _nitrogen_loss_in_compost_bedded_pack_barn_due_to_leaching(
+        daily_nitrogen_input: float,
+    ) -> float:
         """
         Calculate the mass of nitrogen that leaches out of the compost bedded pack barn's manure-bedding mixture.
 
@@ -1366,14 +1511,15 @@ class GasEmissions:
         """
 
         if daily_nitrogen_input < 0.0:
-            raise ValueError(f'Daily nitrogen input mass must be non-negative: {daily_nitrogen_input}')
+            raise ValueError(
+                f"Daily nitrogen input mass must be non-negative: {daily_nitrogen_input}"
+            )
 
         return GasEmissionConstants.LEACHING_COEFFICIENT * daily_nitrogen_input
 
     @staticmethod
-    def _calc_nitrogen_loss_in_compost_bedded_pack_barn_due_to_nitrous_oxide_emission(
-            daily_nitrogen_input: float,
-            is_bedding_tilled: bool
+    def _nitrogen_loss_in_compost_bedded_pack_barn_due_to_nitrous_oxide_emission(
+        daily_nitrogen_input: float, is_bedding_tilled: bool
     ) -> float:
         """
         Calculate the nitrogen loss from nitrous oxide emission in a compost bedded pack barn.
@@ -1397,20 +1543,29 @@ class GasEmissions:
         """
 
         if daily_nitrogen_input < 0.0:
-            raise ValueError(f'Daily nitrogen input mass must be non-negative: {daily_nitrogen_input}')
+            raise ValueError(
+                f"Daily nitrogen input mass must be non-negative: {daily_nitrogen_input}"
+            )
 
-        coefficient_tilled = GasEmissionConstants.NITROUS_OXIDE_COEFFICIENT_WITH_TILLED_BEDDING
-        coefficient_untilled = GasEmissionConstants.NITROUS_OXIDE_COEFFICIENT_WITH_UNTILLED_BEDDING
+        coefficient_tilled = (
+            GasEmissionConstants.NITROUS_OXIDE_COEFFICIENT_WITH_TILLED_BEDDING
+        )
+        coefficient_untilled = (
+            GasEmissionConstants.NITROUS_OXIDE_COEFFICIENT_WITH_UNTILLED_BEDDING
+        )
 
-        nitrogen_loss_tilled = coefficient_tilled * daily_nitrogen_input * is_bedding_tilled
-        nitrogen_loss_untilled = coefficient_untilled * daily_nitrogen_input * (not is_bedding_tilled)
+        nitrogen_loss_tilled = (
+            coefficient_tilled * daily_nitrogen_input * is_bedding_tilled
+        )
+        nitrogen_loss_untilled = (
+            coefficient_untilled * daily_nitrogen_input * (not is_bedding_tilled)
+        )
 
         return nitrogen_loss_tilled + nitrogen_loss_untilled
 
     @staticmethod
-    def calc_total_nitrogen_loss_from_compost_bedded_pack_barn(
-            daily_nitrogen_input: float,
-            is_bedding_tilled: bool
+    def total_nitrogen_loss_from_compost_bedded_pack_barn(
+        daily_nitrogen_input: float, is_bedding_tilled: bool
     ) -> float:
         """
         Calculate the total nitrogen loss from a compost bedded pack barn.
@@ -1434,18 +1589,21 @@ class GasEmissions:
         """
 
         if daily_nitrogen_input < 0.0:
-            raise ValueError(f'Daily nitrogen input mass must be non-negative: {daily_nitrogen_input}')
+            raise ValueError(
+                f"Daily nitrogen input mass must be non-negative: {daily_nitrogen_input}"
+            )
 
-        ammonia_loss = GasEmissions._calc_nitrogen_loss_in_compost_bedded_pack_barn_due_to_ammonia_emission(
+        ammonia_loss = GasEmissionsCalculator._nitrogen_loss_in_compost_bedded_pack_barn_due_to_ammonia_emission(
             daily_nitrogen_input, is_bedding_tilled
         )
 
-        nitrous_oxide_loss = GasEmissions._calc_nitrogen_loss_in_compost_bedded_pack_barn_due_to_nitrous_oxide_emission(
+        nitrous_oxide_loss = GasEmissionsCalculator._nitrogen_loss_in_compost_bedded_pack_barn_due_to_nitrous_oxide_emission(
             daily_nitrogen_input, is_bedding_tilled
         )
 
-        leaching_loss = GasEmissions._calc_nitrogen_loss_in_compost_bedded_pack_barn_due_to_leaching(
-            daily_nitrogen_input)
+        leaching_loss = GasEmissionsCalculator._nitrogen_loss_in_compost_bedded_pack_barn_due_to_leaching(
+            daily_nitrogen_input
+        )
 
         total_nitrogen_loss = ammonia_loss + nitrous_oxide_loss + leaching_loss
 
