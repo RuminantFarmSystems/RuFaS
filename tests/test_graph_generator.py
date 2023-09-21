@@ -137,12 +137,12 @@ def test_bar_graph(mock_graph_generator: GraphGenerator,
     with patch.object(matplotlib.pyplot, "subplots", return_value=(mock_fig, mock_ax)) as mock_subplots:
         with patch.object(mock_ax, "bar", mock_bar):
             with patch.object(matplotlib.pyplot, "savefig", mock_savefig):
-                mock_graph_generator._line_graph(filtered_pool, graph_info, graph_path)
+                mock_graph_generator._bar_graph(filtered_pool, graph_info, graph_path)
 
     mock_graph_generator._customize_graph.assert_called_once_with(mock_fig, graph_info)
 
     mock_subplots.assert_called_once()
-    # mock_ax.bar.assert_called()
+    mock_bar.assert_called_once_with(["a", "b", "c"], [1, 2, 3])
     mock_savefig.assert_called_once_with(graph_path)
 
     mock_graph_generator._customize_graph = graph_generator_original_states["_customize_graph"]
