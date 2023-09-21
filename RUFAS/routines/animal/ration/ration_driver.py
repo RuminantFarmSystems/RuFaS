@@ -363,6 +363,266 @@ class RationReporter:
         return nutrient_amount, nutrient_conc
 
 
+    @classmethod
+    def ration_supply(cls, ration, available_feeds, ration_report, body_weight):
+        ration = ration.copy()
+        for non_numeric_key in ['status', 'objective']:
+            if non_numeric_key in ration:
+                del ration[non_numeric_key]
+
+        supply_report = {
+            'ME': 0.0,
+            'DE': 0.0,
+            'NE_maintenance_and_activity': 0.0,
+            'NE_lactation': 0.0,
+            'NE_growth': 0.0,
+            'Calcium': 0.0,
+            'Phosphorus': 0.0,
+            'Forage_NDF': 0.0,
+            'Forage_NDF_percent': 0.0,
+            'Fat': 0.0,
+            'Fat_percentage': 0.0
+        }
+
+        DMI = sum(ration.values())
+
+        for key, val in ration.items():
+            for item in supply_report:
+                feed_item_info = available_feeds[key]
+                supply_report[item] += eval('cls.get_' + item + '(val, feed_item_info, ration_report, body_weight)')
+
+        supply_report['Forage_NDF_percent'] = supply_report['Forage_NDF'] / DMI
+
+        supply_report['Metabolizable_protein'] = \
+            cls.get_Metabolizable_protein(ration, available_feeds, ration_report, body_weight)
+
+        return supply_report
+
+
+    @classmethod
+    def get_TDN_discount(cls, ration_report, body_weight):
+        """
+        Crucial step to take into account TDN digesitbility decreate from DMI and TDN
+        Initial step in NE/ME calcs
+        """
+        TDNtotal = ration_report['nutrient_amount']['TDN']
+        TDNconc = ration_report['nutrient_conc']['TDN']
+        somatic_body_weight = body_weight * 0.96
+        if body_weight == 0.0 or TDNtotal == 0.0:
+            return 0.0
+        if TDNtotal < (0.035 * body_weight ** 0.75):
+            DMI_to_maint = 1
+        else:
+            DMI_to_maint = (TDNtotal / (0.035 * somatic_body_weight ** 0.75))
+        # [A.Cow.E.3]-[A.Heifer.E.3]
+        # TDN discount, TDN digestibility decrease caused by DMI and TDNconc
+        if TDNconc < 60:
+            Discount = 1
+        else:
+            Discount = (TDNconc - ((0.18 * TDNconc - 10.3) * (DMI_to_maint - 1))) / TDNconc
+        return Discount
+
+    @classmethod
+    def get_DE(cls, val, feed_item_info, ration_report, body_weight):
+        """
+        
+        """
+        DE_act = feed_item_info['DE'] * cls.get_TDN_discount(ration_report, body_weight)
+        return DE_act
+
+    @classmethod
+    def get_ME(cls, val, feed_item_info, ration_report, body_weight):
+        """
+        
+        """
+        DE_act =cls.get_DE(val, feed_item_info, ration_report, body_weight)
+
+        if feed_item_info['type'] == 'Mineral':
+            ME_item = 0.0
+        elif feed_item_info['is_fat'] == 1:
+            ME_item = feed_item_info['DE']
+        elif feed_item_info['EE'] >= 3:
+            ME_item = 1.01 * DE_act - 0.45 + 0.0046 * (feed_item_info['EE'] - 3)
+        else:
+            ME_item = 1.01 * DE_act - 0.45
+        return ME_item
+        
+    @classmethod
+    def get_NE_maintenance_and_activity(cls, val, feed_item_info, ration_report, body_weight):
+        """
+        
+        """
+        ME_item = cls.get_ME(val, feed_item_info, ration_report, body_weight)
+        # turn ME into NEm
+        if feed_item_info['is_fat'] == 1:
+            NEm_item = (0.8 * ME_item)
+        else:
+            NEm_item = 1.37 * ME_item - 0.138 * ME_item ** 2 + 0.0105 * ME_item ** 3 - 1.12
+        return NEm_item * val
+
+    @classmethod
+    def get_NE_lactation(cls, val, feed_item_info, ration_report, body_weight):
+        """
+        
+        """
+        DE_act = cls.get_DE(val, feed_item_info, ration_report, body_weight)
+        ME_item = cls.get_ME(val, feed_item_info, ration_report, body_weight)
+        if feed_item_info['type'] == 'Mineral':
+            NE_lactation_item = 0.0
+        elif feed_item_info['is_fat'] == 1:
+            NE_lactation_item = 0.8 * DE_act
+        elif feed_item_info['EE'] >= 3:
+            NE_lactation_item = 0.703 * ME_item - 0.19 + ((0.097 * ME_item + 0.19) / 97) * (feed_item_info['EE'] - 3)
+        else:
+            NE_lactation_item = 0.703 * ME_item - 0.19
+        return NE_lactation_item * val
+
+    @classmethod
+    def get_NE_growth(cls, val, feed_item_info, ration_report, body_weight):
+        """
+        
+        """
+        ME_item = cls.get_ME(val, feed_item_info, ration_report, body_weight)
+        if feed_item_info['type'] == 'Mineral':
+            NE_growth = 0.0
+        elif feed_item_info['is_fat'] == 1:
+            NE_growth = 0.55 * ME_item
+        else:
+            NE_growth = 1.42 * ME_item - 0.174 * ME_item ** 2 + 0.0122 * ME_item ** 3 - 1.65
+        return NE_growth * val
+
+    @classmethod
+    def get_Calcium(cls, val, feed_item_info, ration_report, body_weight):
+        """
+        
+        """
+        if feed_item_info['type'] == 'Forage':
+            dCa = 0.3
+        elif feed_item_info['type'] == 'Conc':
+            dCa = 0.6
+        elif feed_item_info['type'] == 'Mineral':
+            dCa = 0.95
+        else:
+            dCa = 0.0
+        calcium_item = val * feed_item_info['calcium'] * 0.01 * dCa
+        return calcium_item
+
+
+    @classmethod
+    def get_Phosphorus(cls, val, feed_item_info, ration_report, body_weight):
+        """
+        
+        """
+        if feed_item_info['type'] == 'Forage':
+            dP = 0.64
+        elif feed_item_info['type'] == 'Conc':
+            dP = 0.70
+        elif feed_item_info['type'] == 'Mineral':
+            dP = 0.80
+        else:
+            dP = 0.0
+        return dP * feed_item_info['phosphorus'] * 0.01 * val
+
+    @classmethod
+    def get_Metabolizable_protein(cls, ration, available_feeds, ration_report, body_weight):
+        """
+        
+        """
+        TDNconc = ration_report['nutrient_conc']['TDN']
+        TDNtotal = ration_report['nutrient_amount']['TDN']
+
+        DMI_estimate = sum(ration.values())
+        is_conc = []
+        for item in ration:
+            if available_feeds[item]['type'] == 'Conc':
+                is_conc.append(ration[item])
+        DMI_conc_percentage = sum(is_conc) / DMI_estimate * 100
+        Kp = []
+        RUP_list = []
+        RDP_list = []
+        dRUP_diet = []
+        counter = 0
+        for key, val in ration.items():
+            feed_item_info = available_feeds[key]
+
+            # KP calcs
+            if feed_item_info['type'] == 'Conc':
+                Kp.append(2.904 + 1.375 * (DMI_estimate / body_weight) * 100 - 0.02 * DMI_conc_percentage)
+            elif feed_item_info['type'] == 'Forage' and feed_item_info['is_wetforage'] == 0:
+                Kp.append(3.362 + 0.479 * (DMI_estimate / body_weight) * 100 - 0.017 * feed_item_info['NDF'] - 0.007 * DMI_conc_percentage)
+            elif feed_item_info['is_wetforage'] == 1:
+                Kp.append(3.054 + 0.614 * (DMI_estimate / body_weight) * 100)
+            else:
+                Kp.append(0)
+
+            # RDP calcs
+            if Kp[counter] > -feed_item_info['Kd']:
+                RDP_list.append( (feed_item_info['Kd'] / (feed_item_info['Kd'] + Kp[counter]) * (feed_item_info['N_B'] / 100) * feed_item_info['CP'] + (feed_item_info['N_A'] / 100) * feed_item_info['CP']) ) 
+            else:
+                RDP_list.append(0)
+
+            # RUP calcs
+            RUP_list.append((feed_item_info['CP'] - RDP_list[counter]))
+            dRUP_diet.append(feed_item_info['dRUP'])
+
+            counter+=1
+
+        RDP_diet = []
+        RUP_diet = []
+        for i, val in enumerate(ration.values()):
+            RDP_diet.append(RDP_list[i] * val * 0.01)
+            RUP_diet.append(val * RUP_list[i] * dRUP_diet[i])
+
+        TDN_total_actual = TDNtotal * cls.get_TDN_discount(ration_report, body_weight)
+
+        # MP bact calcs
+        MP_bact = 0.64 * min(1000 * 0.13 * TDN_total_actual, 1000 * 0.85 * sum(RDP_diet))
+
+        MP_supply = MP_bact + sum(RUP_diet)*0.0001 + 0.4 * 11.8 * DMI_estimate
+        return MP_supply
+
+    @classmethod
+    def get_Forage_NDF(cls, val, feed_item_info, ration_report, body_weight):
+        """
+        
+        """
+        if feed_item_info['type'] == 'Forage':
+            forage_NDF_item = feed_item_info['NDF'] * val
+        else:
+            forage_NDF_item = 0.0
+        return forage_NDF_item
+
+    @classmethod
+    def get_Forage_NDF_percent(cls, val, feed_item_info, ration_report, body_weight):
+        """
+        
+        """
+        if feed_item_info['type'] == 'Forage':
+            forage_NDF_percent_item = val / ration_report['nutrient_amount']['dm']
+        else:
+            forage_NDF_percent_item = 0.0
+        return forage_NDF_percent_item
+
+
+    @classmethod
+    def get_Fat(cls, val, feed_item_info, ration_report, body_weight):
+        """
+        
+        """
+        fat_item = feed_item_info['EE'] * val
+        return fat_item
+
+    @classmethod
+    def get_Fat_percentage(cls, val, feed_item_info, ration_report, body_weight):
+        """
+        
+        """
+        fat_item_percentage = (feed_item_info['EE'] * val) / ration_report['nutrient_amount']['dm']
+        return fat_item_percentage
+
+
+
+
 
 class AvailableFeeds:
     """
