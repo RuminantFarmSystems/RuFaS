@@ -39,33 +39,53 @@ class Field:
                  fertilizer_mixes: Optional[Dict[str, Dict[str, float]]] = None,
                  manure_events: Optional[List[ManureEvent]] = None,
                  manure_manager: Optional[ManureManager] = None):
+        """
+        Initialize the related data fields that this module will work with, or create one if none provided.
+
+        Parameters
+        ----------
+        field_data : FieldData
+            FieldData object that will be simulated.
+        soil : Soil
+            The soil component of the field.
+        plantings : List[PlantingEvent]
+            List of all planting events that will occur over the run of the simulation in this field.
+        harvestings : List[HarvestEvent]
+            List of all harvesting events that will occur over the run of the simulation in the field.
+        custom_crop_specifications : Dict[str, Dict]
+            Dictionary where keys are crop references and values are dictionaries containing crop specifications.
+        tillage_events : List[TillageEvent]
+            List of all tillage events that will occur over the run of the simulation in this field.
+        fertilizer_events : List[FertilizerEvent]
+            List of all fertilizer mixes available for application to this field.
+        fertilizer_mixes : Dict[str, Dict[str, float]]
+            List of all fertilizer mixes available for application to this field.
+        manure_events : List[ManureEvent]
+            Manure application interface.
+        manure_manager : ManureManager
+            ManureManager Object to be used during simulation
+
+        """
         # field-wide attributes
         self.field_data = field_data or FieldData()
-        """field data component"""
 
         # soil attributes
         self.soil = soil or Soil(soil_data=None, field_size=self.field_data.field_size)  # default soil if not given.
-        """the soil component of the field"""
 
         # crop attributes
         self.crops: List[Crop] = list()  # empty crop list
-        """crops currently in the field"""
 
         self.planting_events: List[PlantingEvent] = plantings or []
-        """List of all planting events that will occur over the run of the simulation in this field."""
 
         self.harvest_events: List[HarvestEvent] = harvestings or []
-        """List of all harvesting events that will occur over the run of the simulation in the field."""
 
         self.custom_crop_specifications: Dict[str, Dict] = custom_crop_specifications or {}
-        """Dictionary where keys are crop references and values are dictionaries containing crop specifications."""
 
         # Soil amendment attributes
         self.fertilizer_applicator = FertilizerApplication(self.soil)
         """Provides interface for adding fertilizer to the field."""
 
         self.fertilizer_events = fertilizer_events or []
-        """List of all fertilizer application events that will be applied to this field."""
 
         self.available_fertilizer_mixes = fertilizer_mixes or {}
         self.available_fertilizer_mixes["100_0_0"] = {"N": 1.0, "P": 0.0, "K": 0.0}
@@ -83,7 +103,6 @@ class Field:
         """List of all tillage events that will occur over the run of the simulation in this field."""
 
         self.manure_applicator = ManureApplication(self.soil.data)
-        """Manure application interface."""
 
         self.manure_events: List[ManureEvent] = manure_events or []
         """List of all manure applications that will be applied to this field."""
@@ -791,16 +810,24 @@ class Field:
 
     @staticmethod
     def _make_crop_from_config_dict(config: Dict) -> Crop:
-        """Initializes a new crop from a configuration dictionary
+        """
+        Initialize a new crop from a configuration dictionary.
 
-        Args:
-            config: a dictionary containing specifications for the crop to be initialized.
+        Parameters
+        ----------
+        config : dict
+            A dictionary containing specifications for the crop to be initialized.
 
-        Details: if the "species" key is present in the dictionary, that value is checked against the supported
-            crop species. If it is supported, that supported crop is initialized. Otherwise, a custom crop is
-            created (with 'custom' prepended to species name, if given).
+        Details
+        -------
+        If the "species" key is present in the dictionary, that value is checked against the supported
+        crop species. If it is supported, that supported crop is initialized. Otherwise, a custom crop is
+        created (with 'custom' prepended to the species name, if given).
 
-        Returns: a Crop object, initialized with the desired attribute values.
+        Returns
+        -------
+        Crop
+            A Crop object initialized with the desired attribute values.
         """
         if "species" in config.keys():
             accepted_species = set(item.value for item in CropSpecies)
@@ -815,19 +842,28 @@ class Field:
 
     @staticmethod
     def _make_supported_crop(species: str, **specs) -> Crop:
-        """creates a crop instance with attributes determined by the species of the crop.
-
-        Args:
-            species: one of the supported species
-            **specs: an optional set of arguments, passed to CropSpeciesDataFactory that customize the
-              crop species
-
-        Details: species attributes are read from species configuration files/classes. This method of creating
-            a crop does not allow for customizing crop values. It is limited to creating the default crops
-            supported by the CropSpecies Enum.
-
-        Returns: a Crop object, initialized with the desired attribute values.
         """
+        Create a crop instance with attributes determined by the species of the crop.
+
+        Parameters
+        ----------
+        species : str
+            One of the supported species.
+        **specs : optional
+            An optional set of keyword arguments passed to CropSpeciesDataFactory to customize the crop species.
+
+        Details
+        -------
+        Species attributes are read from species configuration files/classes. This method of creating a crop
+        does not allow for customizing crop values. It is limited to creating the default crops supported by the
+        CropSpecies Enum.
+
+        Returns
+        -------
+        Crop
+            A Crop object initialized with the desired attribute values.
+        """
+
         crop_species = CropSpecies(species)
         crop_data = CropSpeciesDataFactory.create_species_data(crop_species, **specs)
         return Crop(crop_data)
@@ -846,17 +882,21 @@ class Field:
         return Crop(crop_data)
 
     def _assess_dormancy(self, daylength: float) -> None:
-        """Transitions all crops to dormancy, that are capable of going dormant
-
-        Args:
-            daylength: length of time from sunup to sundown on the current day (hours)
-
-        Details:
-            If the length of the current day is at or below the dormancy threshold length, all crops that can go dormant
-            should be put into dormancy. If the length is greater than the threshold length, all crops
-            should be brought out of dormancy.
-
         """
+        Transition all crops to dormancy if they are capable of going dormant.
+
+        Parameters
+        ----------
+        daylength : float
+            Length of time from sunup to sundown on the current day (hours).
+
+        Details
+        -------
+        If the length of the current day is at or below the dormancy threshold length, all crops that can go dormant
+        should be put into dormancy. If the length is greater than the threshold length, all crops
+        should be brought out of dormancy.
+        """
+
         if daylength <= self.field_data.dormancy_threshold_daylength:
 
             for crop in self.crops:
@@ -911,29 +951,34 @@ class Field:
             crop.biomass_allocation.allocate_biomass(current_weather.incoming_light)
 
     def _cycle_water(self, current_weather: CurrentWeather, time):
-        """allow the water to cycle through the field.
-
-        Args:
-            current_weather: a CurrentWeather object, containing a collection of today's weather variables needed
-                for field processes.
-        time : Time
-            Object containing the current year and day of the simulation.
-
-        Details: This method executes all water-related processes that occur within Crop and Soil objects. Having a
-            separate method to handle water processes altogether is necessary because processes that effect water in the
-            soil are dependent on processes that effect water in crops and vice versa. The most complex process that is
-            executed in this method is evapotranspiration, which is executed in the following order
-                - Evaporation of water in canopies of crops.
-                - Sublimation of water in snow pack (not implemented in V1)
-                - Evaporation from the soil profile.
-                - Transpiration from crops (amount of water taken up by plants is equal to the amount they transpirate,
-                    and this amount depends on the evapotranspirative demand after water has been removed from canopies)
-
-            It should also be noted that while this method is more messy and complex than it could be, this is a
-            conscious design choice that will allow for SME's to more easily and freely experiment with different orders
-            of processes. This is necessary because there is not necessarily one correct order for processes to run in.
-
         """
+        Allow water to cycle through the field.
+
+        Parameters
+        ----------
+        current_weather : CurrentWeather
+            A CurrentWeather object containing a collection of today's weather variables needed for field processes.
+        time : Time
+            An object containing the current year and day of the simulation.
+
+        Details
+        -------
+        This method executes all water-related processes that occur within Crop and Soil objects. Having a
+        separate method to handle water processes altogether is necessary because processes that affect water in the
+        soil are dependent on processes that affect water in crops and vice versa. The most complex process that is
+        executed in this method is evapotranspiration, which is executed in the following order:
+
+            - Evaporation of water in canopies of crops.
+            - Sublimation of water in the snowpack (not implemented in V1).
+            - Evaporation from the soil profile.
+            - Transpiration from crops (the amount of water taken up by plants is equal to the amount they transpirate,
+              and this amount depends on the evapotranspirative demand after water has been removed from canopies).
+
+        It should also be noted that while this method is more messy and complex than it could be, this is a
+        conscious design choice that will allow for SMEs to more easily and freely experiment with different orders
+        of processes. This is necessary because there is not necessarily one correct order for processes to run in.
+        """
+
         watering_amount = self._determine_watering_amount(rainfall=current_weather.rainfall, year=time.year,
                                                           day=time.day, irrigation=current_weather.irrigation)
         total_precipitation = current_weather.rainfall + watering_amount
@@ -954,9 +999,9 @@ class Field:
                                      total_precipitation)
         self.soil.phosphorus_cycling.cycle_phosphorus(precipitation_reaching_soil, self.soil.data.accumulated_runoff,
                                                       self.field_data.field_size, current_weather.mean_air_temperature)
-        self.soil.nitrogen_cycling.cycle_nitrogen(self.field_data.field_size)
         self.soil.carbon_cycling.cycle_carbon(precipitation_reaching_soil, current_weather.mean_air_temperature,
                                               self.field_data.field_size)
+        self.soil.nitrogen_cycling.cycle_nitrogen(self.field_data.field_size)
 
         weighted_transpiration_total = 0.0
         weights_sum = 0.0
