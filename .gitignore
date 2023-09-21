@@ -12,6 +12,8 @@
 !requirements.txt
 *.doc
 *.docx
+!json*.txt
+!csv*.txt
 
 # ignore log files
 *.log
@@ -35,8 +37,6 @@ others
 output/*
 !output/.keep
 !output/output_filters/
-RUFAS/routines/manure/output/*
-!RUFAS/routines/manure/output/.keep
 
 # ignore project files
 *.sublime-project
