@@ -3,21 +3,21 @@
     "config": {
       "title": "Config Data",
       "description": "Configuration Information",
-      "path": "input/config/example_config.json",
+      "path": "input/config/ARL_config.json",
       "type": "json",
       "properties": "config_properties"
     },
     "animal": {
       "title": "Animal data",
       "description": "Moo Moo!",
-      "path": "input/animal/example_animal.json",
+      "path": "input/animal/no_animal.json",
       "type": "json",
       "properties": "animal_properties"
     },
     "crop": {
       "title": "Crop data",
       "description": "Alfafa is fun!",
-      "path": "input/crop/example_rotation.json",
+      "path": "input/crop/ARL_rotation.json",
       "type": "json",
       "properties": "crop_schedule_properties"
     },
@@ -63,52 +63,45 @@
       "type": "json",
       "properties": "manure_management_properties"
     },
-    "soil_1": {
+    "soil": {
       "title": "Soil data",
       "description": "Stop treating soil like dirt!",
-      "path": "input/soil/example_soil.json",
-      "type": "json",
-      "properties": "soil_profile_properties"
-    },
-    "soil_2": {
-      "title": "Soil data",
-      "description": "Stop treating soil like dirt!",
-      "path": "input/soil/example_soil_2.json",
+      "path": "input/soil/ARL_soil.json",
       "type": "json",
       "properties": "soil_profile_properties"
     },
     "fertilizer_schedule": {
       "title": "Fertilizer schedule.",
       "description": "Fertilizer is like butter, you can never have too much.",
-      "path": "input/fertilizer_schedule/example_fertilizer_schedule.json",
+      "path": "input/fertilizer_schedule/ARL_fertilizer_schedule.json",
       "type": "json",
       "properties": "fertilizer_schedule_properties"
     },
     "manure_schedule": {
       "title": "Manure schedule.",
       "description": "Crappier than having 7:45 am classes Monday - Friday.",
-      "path": "input/manure_schedule/example_manure_schedule.json",
+      "path": "input/manure_schedule/ARL_manure_schedule.json",
       "type": "json",
       "properties": "manure_schedule_properties"
     },
     "tillage_schedule": {
       "title": "Tillage schedule.",
       "description": "Requires the will to till.",
-      "path": "input/tillage_schedule/example_tillage_schedule.json",
+      "path": "input/tillage_schedule/ARL_tillage_schedule.json",
       "type": "json",
       "properties": "tillage_schedule_properties"
     },
     "field": {
       "title": "Field specification",
       "description": "Contains overall field properties and references to specification files.",
-      "path": "input/field/example_field.json",
+      "path": "input/field/ARL_field.json",
       "type": "json",
       "properties": "field_properties"
     },
     "weather": {
       "title": "Weather data",
       "description": "Let's turn on the AC",
-      "path": "input/weather/barnyard_weather.csv",
+      "path": "input/weather/ARL_weather.csv",
       "type": "csv",
       "properties": "weather_properties"
     }

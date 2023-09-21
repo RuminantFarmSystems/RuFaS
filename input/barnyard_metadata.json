@@ -3,21 +3,21 @@
     "config": {
       "title": "Config Data",
       "description": "Configuration Information",
-      "path": "input/config/example_config.json",
+      "path": "input/config/barnyard_config.json",
       "type": "json",
       "properties": "config_properties"
     },
     "animal": {
       "title": "Animal data",
       "description": "Moo Moo!",
-      "path": "input/animal/example_animal.json",
+      "path": "input/animal/no_animal.json",
       "type": "json",
       "properties": "animal_properties"
-    },
+  },
     "crop": {
       "title": "Crop data",
-      "description": "Alfafa is fun!",
-      "path": "input/crop/example_rotation.json",
+      "description": "Barnyard crop rotation schedule.",
+      "path": "input/crop/no_crop.json",
       "type": "json",
       "properties": "crop_schedule_properties"
     },
@@ -38,7 +38,7 @@
     "feed": {
       "title": "Feed data",
       "description": "Those cows need to eat!",
-      "path": "input/feed/example_feed.json",
+      "path": "input/feed/purchased_feed.json",
       "type": "json",
       "properties": "feed_properties"
     },
@@ -63,45 +63,66 @@
       "type": "json",
       "properties": "manure_management_properties"
     },
-    "soil_1": {
+    "soil": {
       "title": "Soil data",
-      "description": "Stop treating soil like dirt!",
-      "path": "input/soil/example_soil.json",
+      "description": "Barnyard soil configuration.",
+      "path": "input/soil/barnyard_soil.json",
       "type": "json",
       "properties": "soil_profile_properties"
     },
-    "soil_2": {
-      "title": "Soil data",
-      "description": "Stop treating soil like dirt!",
-      "path": "input/soil/example_soil_2.json",
-      "type": "json",
-      "properties": "soil_profile_properties"
-    },
-    "fertilizer_schedule": {
+    "fertilizer_schedule_1": {
       "title": "Fertilizer schedule.",
-      "description": "Fertilizer is like butter, you can never have too much.",
-      "path": "input/fertilizer_schedule/example_fertilizer_schedule.json",
+      "description": "Barnyard fertilizer application schedule.",
+      "path": "input/fertilizer_schedule/no_fertilizer.json",
       "type": "json",
       "properties": "fertilizer_schedule_properties"
     },
-    "manure_schedule": {
+    "fertilizer_schedule_2": {
+      "title": "Fertilizer schedule.",
+      "description": "Barnyard fertilizer application schedule.",
+      "path": "input/fertilizer_schedule/barnyard_scheduled_fertilizer_schedule.json",
+      "type": "json",
+      "properties": "fertilizer_schedule_properties"
+    },
+    "manure_schedule_1": {
       "title": "Manure schedule.",
-      "description": "Crappier than having 7:45 am classes Monday - Friday.",
-      "path": "input/manure_schedule/example_manure_schedule.json",
+      "description": "Barnyard manure application schedule.",
+      "path": "input/manure_schedule/no_manure.json",
       "type": "json",
       "properties": "manure_schedule_properties"
     },
-    "tillage_schedule": {
+    "manure_schedule_2": {
+      "title": "Manure schedule.",
+      "description": "Barnyard manure application schedule.",
+      "path": "input/manure_schedule/barnyard_scheduled_manure_schedule.json",
+      "type": "json",
+      "properties": "manure_schedule_properties"
+    },
+    "tillage_schedule_1": {
       "title": "Tillage schedule.",
-      "description": "Requires the will to till.",
-      "path": "input/tillage_schedule/example_tillage_schedule.json",
+      "description": "Barnyard tillage application schedule.",
+      "path": "input/tillage_schedule/no_till.json",
       "type": "json",
       "properties": "tillage_schedule_properties"
     },
-    "field": {
+    "tillage_schedule_2": {
+      "title": "Tillage schedule.",
+      "description": "Barnyard tillage application schedule.",
+      "path": "input/tillage_schedule/barnyard_scheduled_tillage_schedule.json",
+      "type": "json",
+      "properties": "tillage_schedule_properties"
+    },
+    "field_1": {
       "title": "Field specification",
       "description": "Contains overall field properties and references to specification files.",
-      "path": "input/field/example_field.json",
+      "path": "input/field/barnyard_field_1.json",
+      "type": "json",
+      "properties": "field_properties"
+    },
+    "field_2": {
+      "title": "Field specification",
+      "description": "Contains overall field properties and references to specification files.",
+      "path": "input/field/barnyard_field_2.json",
       "type": "json",
       "properties": "field_properties"
     },
