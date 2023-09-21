@@ -272,6 +272,28 @@ class Weather:
         self.T_avg_annual[len(self.T_avg_annual) - 1] = T_avg
         print(self.T_avg_annual)
 
+    @staticmethod
+    def _calculate_average_annual_temperature(daily_average_temperatures: list(float)) -> float:
+        """
+        Calculates the average annual air temperature based on the daily average air temperatures.
+
+        Parameters
+        ----------
+        daily_average_temperatures : list(float)
+            List of daily average air temperatures in the passed to be run by the simulation (degrees C).
+
+        Returns
+        -------
+        float
+            The average annual air temperature (degrees C).
+
+        Notes
+        -----
+        This method is a
+
+        """
+        pass
+
 
 class Time:
     def __init__(self, config):
