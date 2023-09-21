@@ -1,2 +1,0 @@
-Manure Storage
-==============
