@@ -271,7 +271,6 @@ class Weather:
         self.T_avg_annual[0] = T_avg
         self.T_avg_annual[len(self.T_avg_annual) - 1] = T_avg
         print(self.T_avg_annual)
-        print(sum(self.T_avg_annual) / len(self.T_avg_annual))
 
 
 class Time:
