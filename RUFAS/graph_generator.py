@@ -6,11 +6,11 @@ import matplotlib.pyplot as plt
 
 class GraphGenerator:
     def generate_graph(self, filtered_pool: dict, graph_info: dict, graph_path: str, **kwargs):
-        graph_type = graph_info["graph_type"]
-        if graph_type == 'Line graph':
-            self._line_graph(filtered_pool, graph_info, graph_path)
-        elif graph_type == 'Bar graph':
-            self._bar_graph(filtered_pool, graph_info, graph_path)
+        graph_type_funcs={
+        "Line Graph": self._line_graph,
+        "Bar Graph": self._bar_graph,
+        }
+        graph_type_funcs[graph_info["graph_type"]](filtered_pool, graph_info, graph_path)
 
     def _customize_graph(self, fig, graph_info: dict, **kwargs):
         if 'title' in graph_info.keys():
