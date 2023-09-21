@@ -256,7 +256,7 @@ class Weather:
         self.T_avg_annual = self._calculate_average_annual_temperature(weather_file['avg'])
 
     @staticmethod
-    def _calculate_average_annual_temperature(daily_average_temperatures: list(float)) -> float:
+    def _calculate_average_annual_temperature(daily_average_temperatures: list[float]) -> float:
         """
         Calculates the average annual air temperature based on the daily average air temperatures.
 
