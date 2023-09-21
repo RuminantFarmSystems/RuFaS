@@ -19,7 +19,6 @@ class GraphGenerator:
             fig.axes[0].set_xlabel(graph_info['x_label'])
         if 'y_label' in graph_info.keys():
             fig.axes[0].set_xlabel(graph_info['y_label'])
-        # TODO: add more functionalities
         return fig
 
     def _line_graph(self, filtered_pool: dict, graph_info: dict, graph_path: str, **kwargs):
