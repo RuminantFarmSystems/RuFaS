@@ -299,7 +299,7 @@ class RationManager:
 
 class RationReporter:
     """
-
+    Calculates and collects information about a formulated ration.
     """
     def __init__(cls):
         cls.nutrient_amount = []
