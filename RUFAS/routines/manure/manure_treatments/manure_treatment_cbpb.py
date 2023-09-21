@@ -4,6 +4,7 @@ from typing import Tuple
 
 import math
 
+from RUFAS.routines.manure.gas_emissions.gas_emissions import GasEmissions
 from RUFAS.routines.manure.manure_treatments.base_manure_treatment import BaseManureTreatment
 from RUFAS.routines.manure.manure_treatments.manure_treatment_configs import ManureTreatmentConfig
 from RUFAS.routines.manure.manure_treatments.manure_treatment_daily_output import ManureTreatmentDailyOutput
@@ -66,14 +67,26 @@ class CompostBeddedPackBarn(BaseManureTreatment):
         )
 
     def _daily_update_helper(self) -> ManureTreatmentDailyOutput:
-        """Returns the daily output of the outdoor slurry storage treatment system.
+        """
+        Calculate the daily output of the compost bedded pack barn manure treatment system.
 
-        Returns:
+        Returns
+        -------
+        ManureTreatmentDailyOutput
             A ManureTreatmentDailyOutput object containing the daily output of the
-            slurry storage outdoor treatment system.
+            compost bedded pack barn manure treatment system.
 
         """
-        daily_output = self._initialize_daily_output_during_update(self._current_manure_treatment_daily_input)
+        daily_input = self._current_manure_treatment_daily_input
+        total_nitrogen_loss = GasEmissions.calc_total_nitrogen_loss_from_compost_bedded_pack_barn(
+            daily_nitrogen_input=daily_input.liquid_manure_nitrogen,
+            is_bedding_tilled=True
+        )
+        manure_nitrogen = daily_input.liquid_manure_nitrogen - total_nitrogen_loss
+        # TODO: To be implemented further later.
+        daily_output = ManureTreatmentDailyOutput(
+            simulation_day=daily_input.simulation_day,
+            pen_id=daily_input.pen_id,
+        )
         self._accumulate_daily_output(daily_output)
-
         return daily_output

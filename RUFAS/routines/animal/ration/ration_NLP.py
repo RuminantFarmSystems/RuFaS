@@ -11,9 +11,12 @@ Author(s):
 import numpy as np
 import random
 from scipy.optimize import minimize
+from typing import Dict, List, Tuple
 
 from RUFAS.routines.animal.animal_module_constants import AnimalModuleConstants
 
+from RUFAS.routines.animal.ration.user_defined_ration import UserDefinedRationManager as UserDefinedRationManager
+udrm = UserDefinedRationManager()
 
 def set_globals(price_, NEmaint_, NEa_, NEpreg_, NEl_, NEg_, MP_req_, C_req_, P_req_,
                  TDN_, DE_, EE_, is_fat_, BW_, calcium_, phosphorus_, NDF_, type_,
@@ -125,6 +128,100 @@ def objective(x):
     return sum(np.multiply(x, price))
 
 
+def total_energy(x):
+    """
+    Sets up the RHS multipliers for the maintenance and activity requirements
+    satisfied by the feed. Each equation has a reference to the respective
+    calculation in the pseudo code. 
+    The global variables are a temporary measure until the completion of the ration refactor
+
+    Args:
+        x: The decision vector of the NLP
+    """
+    global MEact
+    global TDNact
+    global DEact
+    DMI = sum(x)
+    # Dietary TDN content, kg
+    TotalTDN = sum(np.multiply(x, TDN))
+    TotalTDN = np.multiply(TotalTDN, 0.01)
+    # [A.Cow.E.1]-[A.Heifer.E.1]
+    # TDN concentration, %
+    if DMI != 0:
+        TDNconc = (TotalTDN / DMI) * 100
+    else:
+        TDNconc = 0
+    SBW = BW * 0.96
+    # [A.Cow.E.2]-[A.Heifer.E.2]
+    # The amount of intake needed to meet the maintenance requirement, dimensionless
+    if TotalTDN < (0.035 * BW ** 0.75):
+        DMI_to_maint = 1
+    else:
+        DMI_to_maint = (TotalTDN / (0.035 * SBW ** 0.75))
+    # [A.Cow.E.3]-[A.Heifer.E.3]
+    # TDN discount, TDN digestibility decrease caused by DMI and TDNconc
+    if TDNconc < 60:
+        Discount = 1
+    else:
+        Discount = (TDNconc - ((0.18 * TDNconc - 10.3) * (DMI_to_maint - 1))) / TDNconc
+    # [A.Cow.E.4]-[A.Heifer.E.4]
+    # Actual TDN content of feed i, %
+    TDNact = np.multiply(TDN, Discount)
+    # [A.Cow.E.5]-[A.Heifer.E.5]
+    # Actual digestible energy of feed i, Mcal/kg
+    DEact = np.multiply(DE, Discount)
+    # [A.Cow.E.6]-[A.Heifer.E.6]
+    # Actual metabolizable energy of feed i, Mcal/kg
+    MEact = []
+    for i in range(len(DEact)):
+        if type[i] == 'Mineral':
+            MEact.append(0)
+        elif is_fat[i] == 1:
+            MEact.append(DE[i])
+        elif EE[i] >= 3:
+            MEact.append(1.01 * DEact[i] - 0.45 + 0.0046 * (EE[i] - 3))
+        else:
+            MEact.append(1.01 * DEact[i] - 0.45)
+    # [A.Cow.E.8]-[A.Heifer.E.8]
+    # Actual net energy for maintenance of feed i, Mcal/kg
+    NEm_act = []
+    for i in range(len(MEact)):
+        if is_fat[i] == 1:
+            NEm_act.append(0.8 * MEact[i])
+        else:
+            NEm_act.append(1.37 * MEact[i] - 0.138 * MEact[i] ** 2 + 0.0105 * MEact[i] ** 3 - 1.12)
+
+    # Actual net energy for lactation of feed i, Mcal/kg
+    NElact = []
+    # [A.Cow.E.7]-[A.Heifer.E.7]
+    for i in range(len(MEact)):
+        if type[i] == 'Mineral':
+            NElact.append(0)
+        elif is_fat[i] == 1:
+            NElact.append(0.8 * DEact[i])
+        elif EE[i] >= 3:
+            NElact.append(0.703 * MEact[i] - 0.19 + ((0.097 * MEact[i] + 0.19) / 97) * (EE[i] - 3))
+        else:
+            NElact.append(0.703 * MEact[i] - 0.19)
+
+    # Actual net energy for growth of feed i, Mcal/kg
+    NEgact = []
+    # [A.Cow.E.9]-[A.Heifer.E.9]
+    for i in range(len(MEact)):
+        if type[i] == 'Mineral':
+            NEgact.append(0)
+        elif is_fat[i] == 1:
+            NEgact.append(0.55 * MEact[i])
+        else:
+            NEgact.append(1.42 * MEact[i] - 0.174 * MEact[i] ** 2 + 0.0122 * MEact[i] ** 3 - 1.65)
+
+    NEl_constraint= sum(np.multiply(x, NElact)) 
+    NEm_act_constraint = (sum(np.multiply(x, NEm_act)))
+    NEg_constraint =  sum(np.multiply(x, NEgact))
+    all_req = NEg + NEmaint + NEa + NEpreg + NEl
+    return max(NEm_act_constraint, NEl_constraint, NEg_constraint) - all_req
+
+
 def NEmact_constraint(x):
     """
     Sets up the RHS multipliers for the maintenance and activity requirements
@@ -188,14 +285,8 @@ def NEmact_constraint(x):
             NEm_act.append(0.8 * MEact[i])
         else:
             NEm_act.append(1.37 * MEact[i] - 0.138 * MEact[i] ** 2 + 0.0105 * MEact[i] ** 3 - 1.12)
-    # Constraining to only allow each feed to only satisfy a single energy constraint
-    multiplier = []
-    for i in range(int(n / 3)):
-        multiplier.append(1)
-        multiplier.append(0)
-        multiplier.append(0)
     # returning the NEm_act constraint in the NLP
-    return (sum(np.multiply(x, np.multiply(multiplier, NEm_act))) - (NEmaint + NEa))
+    return (sum(np.multiply(x, NEm_act)) - (NEmaint + NEa))
 
 
 def NEl_constraint(x):
@@ -220,14 +311,8 @@ def NEl_constraint(x):
             NElact.append(0.703 * MEact[i] - 0.19 + ((0.097 * MEact[i] + 0.19) / 97) * (EE[i] - 3))
         else:
             NElact.append(0.703 * MEact[i] - 0.19)
-    # Constraining to only allow each feed to only satisfy a single energy constraint
-    multiplier = []
-    for i in range(int(n / 3)):
-        multiplier.append(0)
-        multiplier.append(1)
-        multiplier.append(0)
     # returning the NElact constraint in the NLP
-    return sum(np.multiply(x, np.multiply(multiplier, NElact))) - (NEpreg + NEl)
+    return sum(np.multiply(x, NElact)) - (NEpreg + NEl)
 
 
 def NEgact_constraint(x):
@@ -250,14 +335,8 @@ def NEgact_constraint(x):
             NEgact.append(0.55 * MEact[i])
         else:
             NEgact.append(1.42 * MEact[i] - 0.174 * MEact[i] ** 2 + 0.0122 * MEact[i] ** 3 - 1.65)
-    # Constraining to only allow each feed to only satisfy a single energy constraint
-    multiplier = []
-    for i in range(int(n / 3)):
-        multiplier.append(0)
-        multiplier.append(0)
-        multiplier.append(1)
     # returning the NEgact constraint in the NLP
-    return sum(np.multiply(x, np.multiply(multiplier, NEgact))) - NEg
+    return sum(np.multiply(x, NEgact)) - NEg
 
 
 def calcium_constraint(x):
@@ -309,18 +388,7 @@ def phosphorus_constraint(x):
             dP.append(0.80)
         else:
             dP.append(0)
-    # Phosphorus Requirements
-    # ----------------------
-    # [A.Cow.C.6]-[A.Heifer.C.5]
-    # Phosphorus maintenance requirement (g)
-    if cow_type:
-        #lactating cows
-        P_maint = 1 * DMI + 0.002 * BW
-    else:
-        #all other animals
-        P_maint = 0.8 * DMI + 0.002 * BW
-    # [A.Cow.E.16]-[A.Heifer.16]
-    return sum(np.multiply(x, np.multiply(np.multiply(phosphorus, 0.01), dP))) - ((P_req + P_maint) / 1000)
+    return sum(np.multiply(x, np.multiply(np.multiply(phosphorus, 0.01), dP))) - (P_req / 1000)
 
 
 def protein_constraint(x):
@@ -388,7 +456,7 @@ def protein_constraint(x):
     return (MP_supply - (MP_req / 1000))
 
 
-def NDF_constraint_1(x):
+def NDF_constraint_lower(x):
     """
     Sets up the RHS multipliers for each feed to instill an overall NDF percent
     constraint. This is a lower bound constraint on overall NDF percent.
@@ -402,7 +470,7 @@ def NDF_constraint_1(x):
         return (sum(np.multiply(x, NDF)) / DMI) - 25
 
 
-def NDF_constraint_2(x):
+def NDF_constraint_upper(x):
     """
     Sets up the RHS multipliers for each feed to instill an overall NDF percent
     constraint. This is an upper bound constraint on overall NDF percent.
@@ -434,7 +502,7 @@ def forage_NDF_constraint(x):
             is_forage.append(0)
     DMI = sum(x)
     if DMI != 0:
-        return (sum(np.multiply(x, np.multiply(NDF, is_forage))) / DMI) - 19
+        return (sum(np.multiply(x, np.multiply(NDF, is_forage))) / DMI) - 15
 
 
 def fat_constraint(x):
@@ -454,12 +522,12 @@ def fat_constraint(x):
 def DMI_constraint_lower(x):
     """
     Constraint in place to make sure the sum of all the feeds in the ration is
-    greater than the DMI_est + 20% calculated in the requirements
+    greater than the DMI_est - 20% calculated in the requirements
 
     Args:
         x: The decision vector of the NLP
     """
-    return (sum(x)) - DMIest-DMIest*AnimalModuleConstants.DMI_CONSTRAINT_PERCENT
+    return (sum(x)) - (DMIest*(1-AnimalModuleConstants.DMI_CONSTRAINT_PERCENT))
 
 
 def DMI_constraint_upper(x):
@@ -470,7 +538,8 @@ def DMI_constraint_upper(x):
     Args:
         x: The decision vector of the NLP
     """
-    return -(sum(x)) + DMIest+DMIest*AnimalModuleConstants.DMI_CONSTRAINT_PERCENT
+    return -(sum(x)) + (DMIest*(1+AnimalModuleConstants.DMI_CONSTRAINT_PERCENT))
+
 
 def energy_req_limit_constraint(x):
     """
@@ -480,7 +549,7 @@ def energy_req_limit_constraint(x):
     Args:
         x: The decision vector of the NLP
     """
-    n = len(price) / 3
+    n = len(price) /    3
     list = []
     for i in range(int(n)):
         a = i * 3
@@ -497,21 +566,57 @@ def get_ration_vals(x):
     Args:
         x: the decision vector of the NLP (should be a completed ration)
     """
-    #ration vals (subject to adding other ration vals)
     ME_tot = sum(np.multiply(x, MEact))
     ration_vals = {'ME_tot': ME_tot}
     return ration_vals
 
+
+def make_user_bounds(ration_percents: Dict, DMIest: float) -> List[Tuple[float, float]]:
+    """
+    Calculates user bounds for optimize function
+
+    Uses udrm object to get tolerance, e.g. the +/- percentage allowed around those.
+    Returns a list of each key/value pair three times, but divided by three
+        This return in triplicate is necessary for the scipy.minimize function,
+         which requires the decision vector in this shape
+    
+    Parameters
+    ----------
+    ration_percents: Dict
+        keys are feed IDs, values are percent of DMI
+    DMIest: float
+        average estimated DMI for pen
+    Returns
+    -------
+    List
+        List of each bound, divided by three and reported in triplicate for scipy.minimize function
+    """
+    tribounds = []
+    udr_tolerance = udrm.tolerance
+    ration_key_list = sorted([int(key) for key in ration_percents.keys()])
+    for key in ration_key_list:
+        target_lower = ration_percents[str(key)] / \
+            100 * (1 - udr_tolerance) * (DMIest * 1.1 + 0.0001)
+        target_upper = ration_percents[str(key)] / \
+            100 * (1 + udr_tolerance) * (DMIest * 1.1 + 0.0001)
+        targetbounds = (max(0.0, (target_lower)/3), (target_upper)/3)
+        tribounds.append(targetbounds)
+        tribounds.append(targetbounds)
+        tribounds.append(targetbounds)
+    return tribounds
+
+
 # establishing the constraints of the NLP
 constraint_functions = [
+    total_energy,
     NEmact_constraint,
     NEl_constraint,
     NEgact_constraint,
     calcium_constraint,
     phosphorus_constraint,
     protein_constraint,
-    NDF_constraint_1,
-    NDF_constraint_2,
+    NDF_constraint_lower,
+    NDF_constraint_upper,
     forage_NDF_constraint,
     fat_constraint,
     DMI_constraint_upper,
@@ -520,9 +625,10 @@ constraint_functions = [
 
 cow_cons = [{'type': 'ineq', 'fun': func} for func in constraint_functions]
 
-heifer_cons = [cons for cons in cow_cons if cons['fun'] not in [NEl_constraint, DMI_constraint_lower]]
+heifer_cons = [cons for cons in cow_cons if cons['fun'] not in [total_energy, NEl_constraint, DMI_constraint_lower]]
 
-def optimize(animal_combination):
+def optimize(animal_combination, available_feeds: Dict) -> None:
+
     """
     Calls the objective function and constraint functions and formulates
     the inputs for the minimization function. Returns the optimized solution
@@ -532,6 +638,13 @@ def optimize(animal_combination):
     ----------
     animal_combination : Pen.AnimalCombination
         The animal combination to optimize the ration for.
+    
+    available_feeds: Dict 
+        a DefaultDict of the AvailableFeeds class attributes defined in ration_driver.py
+    
+    Returns
+    -------
+    OptimizeResult object from scipy package
 
     """
 
@@ -541,14 +654,22 @@ def optimize(animal_combination):
         x0.append(random.random() * 10)
     # OPTIMIZE:
     # establishing the bounds of the NLP
-    bnds = []
-    # Dividing limit by 3 for tri-decision variables for farm grown feeds
-    for i in range(len(limit)):
-        bnds.append((0, (limit[i] / 3) + 0.0001))
-    bnds = tuple(bnds)
 
+    # Dividing limit by 3 for tri-decision variables for farm grown feeds
+    if udrm.udr_or_not:
+        bnds = make_user_bounds(UserDefinedRationManager.ration_to_use(animal_combination, available_feeds), DMIest)
+        x0 = [np.mean(bnd) for bnd in bnds]
+    else:    
+        bnds = []
+        bnds = [(0, (lim / 3) + 0.0001) for lim in limit]
+    if udrm.udr_or_not:
+        if str(animal_combination) in ['AnimalCombination.LAC_COW']:
+            usermod = minimize(objective, x0, method='SLSQP', bounds=bnds, constraints=cow_cons)
+        else:
+            usermod = minimize(objective, x0, method='SLSQP', bounds=bnds, constraints=heifer_cons)
+        return usermod
     # TODO: Put AnimalCombination enum in a separate file and import it here to avoid circular import
-    if str(animal_combination) in ['AnimalCombination.LAC_COW']:
+    elif str(animal_combination) in ['AnimalCombination.LAC_COW']:
         return minimize(objective, x0, method='SLSQP', bounds=bnds, constraints=cow_cons)
     elif str(animal_combination) in ['AnimalCombination.GROWING', 'AnimalCombination.CLOSE_UP',
                                      'AnimalCombination.GROWING_AND_CLOSE_UP']:

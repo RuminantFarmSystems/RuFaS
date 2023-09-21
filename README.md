@@ -1,6 +1,6 @@
 [![Testing](https://github.com/RuminantFarmSystems/MASM/actions/workflows/testing_pytest.yml/badge.svg)](https://github.com/RuminantFarmSystems/MASM/actions/workflows/testing_pytest.yml)
 [![Linting](https://github.com/RuminantFarmSystems/MASM/actions/workflows/lint_flake8.yml/badge.svg)](https://github.com/RuminantFarmSystems/MASM/actions/workflows/lint_flake8.yml)
-[![Coverage](https://img.shields.io/badge/coverage-85%25-yellowgreen)](https://github.com/RuminantFarmSystems/MASM/actions/workflows/coverage_pytest-cov.yml)
+[![Coverage](https://img.shields.io/badge/coverage-88%25-yellowgreen)](https://github.com/RuminantFarmSystems/MASM/actions/workflows/coverage_pytest-cov.yml)
 # Vision
 To support research and sustainable decision-making in ruminant animal production through a state-of-art, open-source modeling environment that is continuously adapting as technology and scientific knowledge advance.
 
@@ -16,6 +16,15 @@ When decision-making is difficult and doubtful, we use these as our North Star t
 
 ## Past
 N/A
+
+# Definitions for Priority Levels
+- **P0 (Priority 0):** These are the 🔥 "fire-breathing dragon" tasks! They are critical and need immediate attention. Team members should don their hero capes 🦸‍♂️🦸‍♀️ and charge into action on P0 tasks. However, if someone finds themselves in a knightly standstill while battling these dragons 🐉, they can embark on a noble quest to tackle lower-priority tasks while working to rescue the damsel in distress (unblocking the higher priority task).
+
+- **P1 (Priority 1):** Think of these as the trusty steed tasks 🐎. They're important and require attention once the dragons (P0) are vanquished. Knights of the project realm should prioritize P0 tasks but, if they encounter a moat or a drawbridge on their way, they can hop on their trusty steed 🏇 and joust with P1 tasks, all while working on strategies to lower the drawbridge (resolve blockers).
+
+- **P2 (Priority 2):** These are the friendly village tasks 🏘️. They're less urgent but still vital to the kingdom. Team members can take a leisurely stroll through the village (work on P2 tasks) when the dragons and drawbridges are at bay. If they happen upon a blocked path, they can enjoy a cup of tea with the villagers ☕ (work on P2 tasks), all while devising clever plans to remove any obstacles in their way.
+
+Remember, in the grand adventure of project work, flexibility and creativity are your allies! 🚀
 
 # 2023 H2 Roadmap
 ## Milestone 1: Aug 11th
@@ -44,23 +53,24 @@ Review, modify, and approve EEE design doc. Evaluate its implementation.
 Dev Team:
 |Title|Owner|Status|Priority|Remarks|
 |--|--|--|--|--|
-Design and implement EEE (Review progress on this)
-Finish Compost for Manure Module 
-Redesign and implement Feed storage module ||||Moved to MS 2.5
-Revisit the Animal Module design – Refactoring -- Animal Manager
-Revisit the Animal Module design – Refactoring -- Animal Ration formulation
-Revisit the Animal Module design – Refactoring -- Animal Life Cycle|||| Moved to MS 2.5
-Deprecate the output handler, add missing functionalities, and reports to OM
-Go through the entire codebase and ensure IM is the only way we are receiving input data||||[IM Integration tracking](https://docs.google.com/spreadsheets/d/1k8J6MelPrsrz6Tv4fQNAG-kLSN7oQTQOCEy3I6F0IqU/edit?usp=sharing)
-
+Design and implement EEE (Review progress on this)|Pooya, Roohi, Kristan, Jenn||P1
+Finish Compost for Manure Module |Varma, Loi||P0
+Redesign and implement Feed storage module |Kevin, Pooya, Kristan|||Moved to MS 2.5
+Revisit the Animal Module design – Refactoring -- Animal Manager||Design Phase|P2| Moved to MS 2.5
+Revisit the Animal Module design – Refactoring -- Animal Ration formulation|Joe|In Progress|P0
+Revisit the Animal Module design – Refactoring -- Animal Life Cycle|Yijing, Simon, Anchey|Design phase|P0
+Deprecate the output handler, add missing functionalities, and reports to OM|Niko, Allister||P0
+Go through the entire codebase and ensure IM is the only way we are receiving input data|Allister, Niko||P0|[IM Integration tracking](https://docs.google.com/spreadsheets/d/1k8J6MelPrsrz6Tv4fQNAG-kLSN7oQTQOCEy3I6F0IqU/edit?usp=sharing)
+Revert soil profile properties and rewrite soil profile inputs|Ed||P1|[#773](https://github.com/RuminantFarmSystems/MASM/issues/773)
 
 SMEs:
 |Title|Owner|Status|Priority|Remarks|
 |--|--|--|--|--|
-Complete model evaluation
-Complete Sensitivity Analysis
-Complete External/Scientific Documentation for Animal, Manure, & EEE modules and put on GitHub
-Complete Cohort 1 Pilot testing
+Complete model evaluation||||Moved to Milestone 3
+Complete Sensitivity Analysis||||Moved to Milestone 3
+Complete External/Scientific Documentation for Animal, Manure, & EEE modules and put on GitHub|Varma, Joe, Haowen, Kristan, Jenn, Emmanuel||P1
+Complete Cohort 1 Pilot testing|Kristan, Haowen, Kat||P0
+Complete evaluation of soil temperature|Ed, Jenn, Matthew|In progress|P0|[#764](https://github.com/RuminantFarmSystems/MASM/issues/764)
 
 ## Milestone 2.5: Oct 31th
 [GitHub Milestone](https://github.com/RuminantFarmSystems/MASM/milestone/5)
@@ -68,12 +78,15 @@ Complete Cohort 1 Pilot testing
 Dev Team:
 |Title|Owner|Status|Priority|Remarks|
 |--|--|--|--|--|
-Redesign and implement the Feed storage module
-Refactor Animal Module -- Animal Life Cycle
+Redesign and implement the Feed storage module|Pooya, Kevin, Kristan||P1
+Refactor Animal Module -- Animal Manager|Joe||P0
+Rewrite and clean field input files in the `input/` directory|Ed, Matthew||P1|[#769](https://github.com/RuminantFarmSystems/MASM/issues/769) 
 
 SMEs:
 |Title|Owner|Status|Priority|Remarks|
 |--|--|--|--|--|
+Complete Cohort 1 Pilot testing|Kristan, Haowen, Kat||P0
+Complete evaluation of soil hydrology|Ed, Jenn, Matthew|In progress|P0|[#766](https://github.com/RuminantFarmSystems/MASM/issues/766)
 
 ## Milestone 3: Dec 31th
 [GitHub Milestone](https://github.com/RuminantFarmSystems/MASM/milestone/6)
@@ -81,20 +94,25 @@ SMEs:
 Dev Team:
 |Title|Owner|Status|Priority|Remarks|
 |--|--|--|--|--|
-Revisit classes.py
-Deprecate DB(s)
-Deprecate output handler ||||moved to MS 2
-Develop post-processing and report generation
-Develop end-to-end testing
-Publish V1 Repo
+Revisit classes.py|Allister
+Deprecate DB(s)|Allister
+Deprecate output handler ||moved to MS 2||
+Develop post-processing and report generation|||P1
+Develop end-to-end testing|||P1
+Publish V1 Repo|||P2
 
 SMEs:
 |Title|Owner|Status|Priority|Remarks|
 |--|--|--|--|--|
-Complete External/Scientific Documentation for the Crop and Soil module
-Complete Cohort 2 Pilot testing
-Develop standard reports recipe (at least one industry-facing and one scientist-facing)
-Develop a set of standard scenarios for end-to-end testing
+Complete External/Scientific Documentation for the Crop and Soil module|||P0
+Complete model evaluation using existing experimental data|||P2
+Complete Sensitivity Analysis of Animal Module|||P1
+Complete Sensitivity Analysis of Crop and Soil Module|||P1|Should be moved to milestone after this.
+Complete full evaluation of Crop and Soil Module|Ed, Jenn, Matthew||P0|[#762](https://github.com/RuminantFarmSystems/MASM/issues/762)
+Initiate Sensitivity Analysis of Manure Module|||P1
+Complete Cohort 2 Pilot testing|||P0
+Develop standard reports recipe (at least one industry-facing and one scientist-facing)|||P1
+Develop a set of standard scenarios for end-to-end testing|||P1
 
 
 # Resources

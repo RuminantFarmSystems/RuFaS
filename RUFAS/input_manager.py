@@ -1,5 +1,6 @@
 # !/usr/bin/env python3
 
+from copy import deepcopy
 from functools import reduce
 import json
 import re
@@ -594,7 +595,7 @@ class InputManager:
         try:
             data_value = reduce(self._get_array_data, element_hierarchy,
                                 self.__pool)
-            return data_value
+            return deepcopy(data_value)
 
         except KeyError as key_error:
             invalid_key = str(key_error).strip("\'")
@@ -660,7 +661,7 @@ class InputManager:
         try:
             metadata_value = reduce(lambda d, key: d[key], element_hierarchy,
                                     self.__metadata)
-            return metadata_value
+            return deepcopy(metadata_value)
 
         except KeyError:
             invalid_key = element_hierarchy[-1]
