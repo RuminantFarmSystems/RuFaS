@@ -1,5 +1,6 @@
 # !/usr/bin/env python3
 
+from copy import deepcopy
 from functools import reduce
 import json
 import re
@@ -282,6 +283,9 @@ class InputManager:
             invalid elements, valid elements, and fixed elements as well as a boolean
             which is True if the data is valid, False otherwise.
         """
+        info_map = {"class": self.__class__.__name__,
+                    "function": self._validate_csv_element.__name__,
+                    }
         element_counter_and_validity = {"fixed_elements": 0, "total_elements": 0, "valid_elements": 0,
                                         "invalid_elements": 0, "is_valid": True}
         property_data = input_data[var_name]
@@ -300,6 +304,8 @@ class InputManager:
                 else:
                     element_counter_and_validity["invalid_elements"] += 1
                     element_counter_and_validity["is_valid"] = False
+                    om.add_warning("Invalid unfixable element found",
+                                   f"{var_name} element {element_num} was invalid and could not be fixed", info_map)
                     if eager_termination:
                         return element_counter_and_validity
 
@@ -391,6 +397,8 @@ class InputManager:
                 if is_fixed:
                     element_counter_and_validity["fixed_elements"] += 1
                 else:
+                    om.add_warning("Invalid unfixable element found",
+                                   f"{var_name} was invalid and could not be fixed", info_map)
                     element_counter_and_validity["invalid_elements"] += 1
                     element_counter_and_validity["is_valid"] = False
                 return element_counter_and_validity
@@ -562,7 +570,7 @@ class InputManager:
         try:
             data_value = reduce(lambda d, key: d[key], element_hierarchy,
                                 self.__pool)
-            return data_value
+            return deepcopy(data_value)
 
         except KeyError as key_error:
             invalid_key = str(key_error).strip("\'")
@@ -628,7 +636,7 @@ class InputManager:
         try:
             metadata_value = reduce(lambda d, key: d[key], element_hierarchy,
                                     self.__metadata)
-            return metadata_value
+            return deepcopy(metadata_value)
 
         except KeyError:
             invalid_key = element_hierarchy[-1]
@@ -640,3 +648,13 @@ class InputManager:
 
             raise KeyError(f"Data not found: Cannot find \"{metadata_address}\", "
                            f"\"{parent_address}\" does not have attribute \"{invalid_key}\".")
+
+    def flush_pools(self) -> None:
+        """
+        Clear the variable pool.
+        """
+        info_map = {"class": self.__class__.__name__,
+                    "function": self.flush_pools.__name__,
+                    }
+        self.__pool = {}
+        om.add_log("Clear variable pool", "The pool is emptied.", info_map)
