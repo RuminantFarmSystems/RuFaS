@@ -3,17 +3,17 @@
 # ignore text files
 *.txt
 *.txt#
-!example_list_of_filter_patterns.txt
-!example_list_of_regex_patterns.txt
-!example_list_of_exclude_regex_patterns.txt
-!example_list_of_exclude_filter_patterns.txt
-!csv_default_filter.txt
-!json_default_filter.txt
+example_list_of_filter_patterns.txt
+example_list_of_regex_patterns.txt
+example_list_of_exclude_regex_patterns.txt
+example_list_of_exclude_filter_patterns.txt
+csv_all_variables.txt
+_csv_all_variables.txt
+json_all_variables.txt
+_json_all_variables.txt
 !requirements.txt
 *.doc
 *.docx
-!json*.txt
-!csv*.txt
 
 # ignore log files
 *.log
