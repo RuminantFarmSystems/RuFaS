@@ -45,7 +45,7 @@ class GraphGenerator:
         try:
             pyplt.savefig(graph_path)
         except Exception as e:
-            print(e)
+            raise e
 
     def _customize_graph(self, fig: Figure, graph_info: dict, **kwargs):
         """

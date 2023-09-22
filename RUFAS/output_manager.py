@@ -573,7 +573,10 @@ class OutputManager(object):
                 csv_directory = os.path.join(save_path, "CSVs", "om")
                 self._save_variables_to_csv_files(filtered_pool, filter_file, csv_directory)
             elif filter_file.startswith("graph_"):
-                graph_generator.generate_graph(filtered_pool, graph_info, save_path, filter_file)
+                try:
+                    graph_generator.generate_graph(filtered_pool, graph_info, save_path, filter_file)
+                except Exception as e:
+                    self.add_error("graph generation exception", str(e), info_map)
             else:
                 self.add_warning("invalid filter file", f"{filter_file} must be prefixed with csv_ or json_", info_map)
 
