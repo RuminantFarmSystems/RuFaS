@@ -81,14 +81,17 @@ def test_generate_graph(mock_graph_generator: GraphGenerator,
     mock_graph_generator._line_graph = MagicMock()
     mock_graph_generator._bar_graph = MagicMock()
     mock_graph_generator._generate_graph_path = MagicMock()
+    mock_savefig = MagicMock()
 
-    mock_graph_generator.generate_graph(filtered_pool, graph_info, save_path, filter_file_name)
+    with patch.object(matplotlib.pyplot, "savefig", mock_savefig):
+        mock_graph_generator.generate_graph(filtered_pool, graph_info, save_path, filter_file_name)
 
     if graph_info["graph_type"] == "Line graph":
         mock_graph_generator._line_graph.assert_called_once_with(filtered_pool, graph_info, save_path, filter_file_name)
     elif graph_info["graph_type"] == "Bar graph":
         mock_graph_generator._bar_graph.assert_called_once_with(filtered_pool, graph_info, save_path, filter_file_name)
     mock_graph_generator._generate_graph_path.assert_called_once_with(save_path, graph_info, filter_file_name)
+    mock_savefig.assert_called_once()
 
     mock_graph_generator._line_graph = graph_generator_original_states["_line_graph"]
     mock_graph_generator._bar_graph = graph_generator_original_states["_bar_graph"]
