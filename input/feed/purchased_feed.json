@@ -9,13 +9,24 @@
     "close_up_feeds": [2, 26, 57,  118, 136, 139],
     "lac_cow_feeds": [26, 34, 81, 103, 118, 136, 139],
 
-    "purchased_feeds": [2, 26, 34, 52, 57, 81, 103, 118, 136, 139, 155, 157],
-    "purchased_feeds_costs": {"2": 0.17, "26": 0.1, "34": 0.01, "52":0.05, "57" : 0.01, "81": 0.01, "103" : 0.05,
-                          "118": 0.39, "136": 0.1, "139": 0.05, "155" : 0.82, "157": 0.44},
+    "purchased_feeds": [
+        {"purchased_feed": 2, "purchased_feed_cost": 0.17},
+        {"purchased_feed": 26, "purchased_feed_cost": 0.1},
+        {"purchased_feed": 34, "purchased_feed_cost": 0.01},
+        {"purchased_feed": 52, "purchased_feed_cost": 0.05 },
+        {"purchased_feed": 57, "purchased_feed_cost": 0.01},
+        {"purchased_feed": 81, "purchased_feed_cost": 0.01},
+        {"purchased_feed": 103, "purchased_feed_cost": 0.05},
+        {"purchased_feed": 118, "purchased_feed_cost": 0.39},
+        {"purchased_feed": 136, "purchased_feed_cost": 0.1},
+        {"purchased_feed": 139, "purchased_feed_cost": 0.05},
+        {"purchased_feed": 155, "purchased_feed_cost": 0.82},
+        {"purchased_feed": 157, "purchased_feed_cost": 0.44}
+    ],
     "farm_grown_feeds": [],
 
-    "storage_options": {
-        "storage_1": {
+    "storage_options": [
+        {
             "storage_type": "bunker",
             "moisture": "direct_cut",
             "additive": "preservative",
@@ -26,8 +37,7 @@
             "removal_rate": 6,
             "initial_dry_matter": 0
         }
-
-    },
+    ],
     "user_defined_ration_percentages": {
         "calf": {},
         "growing": {},

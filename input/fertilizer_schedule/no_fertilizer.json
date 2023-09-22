@@ -1,0 +1,13 @@
+{
+    "available_fertilizer_mixes": [],
+    "mix_names": [],
+    "years": [],
+    "days": [],
+    "nitrogen_masses": [],
+    "phosphorus_masses": [],
+    "potassium_masses": [],
+    "application_depths": [],
+    "surface_remainder_fractions": [],
+    "pattern_repeat": 0,
+    "pattern_skip": 0
+}

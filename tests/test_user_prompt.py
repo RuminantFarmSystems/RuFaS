@@ -13,6 +13,7 @@ from main import run_rufas
 from main import set_global_variables
 from RUFAS import errors
 from RUFAS.simulation_engine import SimulationEngine
+from RUFAS.input_manager import InputManager
 from RUFAS.output_manager import OutputManager
 from RUFAS.user_prompt import convert_json_path_to_list
 from RUFAS.user_prompt import convert_path_string_to_list
@@ -344,10 +345,12 @@ def test_execute_simulations_from_files(mocker: MockerFixture) -> None:
     """Checks that execute_simulations_from_files() calls the correct functions in the correct order"""
     # Arrange
     mock_output_manager = mocker.MagicMock(auto_spec=OutputManager)
+    mock_input_manager = mocker.MagicMock(auto_spec=InputManager)
     mock_output_manager.flush_pools.return_value = None
     mock_output_manager.dump_all_pools.return_value = None
     mock_output_manager.save_variables.return_value = None
     mocker.patch("main.OutputManager", return_value=mock_output_manager)
+    mocker.patch("main.InputManager", return_value=mock_input_manager)
     file_path1 = Path("file1.json")
     file_path2 = Path("file2.json")
     file_list = [file_path1, file_path2]
