@@ -519,7 +519,7 @@ def test_validate_json_element_string_type(mock_input_manager: InputManager,
     with patch("RUFAS.output_manager.OutputManager.add_warning") as add_warning:
         result = mock_input_manager._validate_json_element(["element8"], "property_map_key1", input_data, False)
 
-        assert add_warning.call_count == 2
+        assert add_warning.call_count == 3
         assert result["is_valid"] is False
         assert result["invalid_elements"] == 1
 

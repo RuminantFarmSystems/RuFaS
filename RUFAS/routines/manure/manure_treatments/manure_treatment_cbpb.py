@@ -1,13 +1,17 @@
 from __future__ import annotations
 
-from typing import Tuple
-
-import math
-
-from RUFAS.routines.manure.gas_emissions.gas_emissions import GasEmissions
-from RUFAS.routines.manure.manure_treatments.base_manure_treatment import BaseManureTreatment
-from RUFAS.routines.manure.manure_treatments.manure_treatment_configs import ManureTreatmentConfig
-from RUFAS.routines.manure.manure_treatments.manure_treatment_daily_output import ManureTreatmentDailyOutput
+from RUFAS.routines.manure.gas_emissions.calculator import (
+    GasEmissionsCalculator,
+)
+from RUFAS.routines.manure.manure_treatments.base_manure_treatment import (
+    BaseManureTreatment,
+)
+from RUFAS.routines.manure.manure_treatments.manure_treatment_configs import (
+    ManureTreatmentConfig,
+)
+from RUFAS.routines.manure.manure_treatments.manure_treatment_daily_output import (
+    ManureTreatmentDailyOutput,
+)
 
 
 class CompostBeddedPackBarn(BaseManureTreatment):
@@ -18,7 +22,9 @@ class CompostBeddedPackBarn(BaseManureTreatment):
 
     """
 
-    def __init__(self, weather, time, manure_treatment_config: ManureTreatmentConfig) -> None:
+    def __init__(
+        self, weather, time, manure_treatment_config: ManureTreatmentConfig
+    ) -> None:
         """Initializes the compost bedded pack barn manure treatment.
 
         Args:
@@ -29,13 +35,13 @@ class CompostBeddedPackBarn(BaseManureTreatment):
         """
 
         super().__init__(weather, time, manure_treatment_config)
-      
+
     def _calc_bedding_potassium_content(
         self,
         current_manure_bedding_mix_potassium: float,
         additional_potassium_in_manure: float,
         additional_potassium_in_bedding: float = 0,
-        potassium_loss: float = 0
+        potassium_loss: float = 0,
     ) -> float:
         """Calculates the potassium content of the manure-bedding mixture.
 
@@ -57,10 +63,10 @@ class CompostBeddedPackBarn(BaseManureTreatment):
         -------
         float
             The total potassium within the compost bedded pack barn's manure-bedding mixture (in kg).
-        
+
         """
         return (
-            current_manure_bedding_mix_potassium 
+            current_manure_bedding_mix_potassium
             + additional_potassium_in_manure
             + additional_potassium_in_bedding
             - potassium_loss
@@ -78,9 +84,11 @@ class CompostBeddedPackBarn(BaseManureTreatment):
 
         """
         daily_input = self._current_manure_treatment_daily_input
-        total_nitrogen_loss = GasEmissions.calc_total_nitrogen_loss_from_compost_bedded_pack_barn(
-            daily_nitrogen_input=daily_input.liquid_manure_nitrogen,
-            is_bedding_tilled=True
+        total_nitrogen_loss = (
+            GasEmissionsCalculator.total_nitrogen_loss_from_compost_bedded_pack_barn(
+                daily_nitrogen_input=daily_input.liquid_manure_nitrogen,
+                is_bedding_tilled=True,
+            )
         )
         manure_nitrogen = daily_input.liquid_manure_nitrogen - total_nitrogen_loss
         # TODO: To be implemented further later.
