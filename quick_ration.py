@@ -1,20 +1,30 @@
 import os
 import json
+import sys
+
+if len(sys.argv)>1:
+    pen_select = sys.argv[1]
+else:
+    pen_select = 3
+    
 
 filelist = os.listdir('output')
-file = [file for file in filelist if file.startswith('all_variables')][-1]
+file = [file for file in filelist if file.startswith('saved_variables_json_all_variables')][-1]
 
-keyselect = 'ration_for_pen_3'
+keyselect = f'ration_per_animal_for_pen_{pen_select}'
 
 with open(str('output/' + file)) as f:
     data = json.load(f)
 actual_key = [key for key in list(data.keys()) if key.endswith(keyselect)][0]
 ration_raw = data[actual_key]
-ration_list = list(ration_raw.values())[0]
+ration_list = list(ration_raw.values())[-1]
 
-for line in ration_list:
-    del line['status']
-    del line['objective']
+try:
+    for line in ration_list:
+        del line['status']
+        del line['objective']
+except:
+    pass
 
 percent_dicts = []
 DMI_list = []
@@ -32,7 +42,7 @@ for line in ration_list:
 for pos in range(len(percent_dict) - 3, len(percent_dict)):
     DMItotal = round(DMI_list[pos],2)
     print('\n')
-    print(f'ration for interval {pos}')
+    print(f'ration for pen {pen_select} interval {pos}')
     print(f'raw kgs, total = {DMItotal}kg')
     print(ration_list[pos])
     print('percent of DMI')
