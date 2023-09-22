@@ -5,6 +5,7 @@
     "manning_roughness_coefficient": 0.4,
     "support_practice_factor": 0.08,
     "albedo": 0.16,
+    "soil_evaporation_compensation_coefficient": 0.95,
     "initial_residue": 0,
     "soil_layers":
     [
