@@ -7,13 +7,25 @@ from typing import Tuple
 from typing import Union
 
 from RUFAS.general_constants import GeneralConstants
-from RUFAS.routines.manure.manure_handlers.manure_handler_daily_output import ManureHandlerDailyOutput
-from RUFAS.routines.manure.manure_separators.manure_separator_classes import BaseManureSeparator
-from RUFAS.routines.manure.manure_separators.manure_separator_daily_output import ManureSeparatorDailyOutput
-from RUFAS.routines.manure.manure_treatments.manure_treatment_configs import ManureTreatmentConfig
-from RUFAS.routines.manure.manure_treatments.manure_treatment_daily_output import ManureTreatmentDailyOutput
-from RUFAS.routines.manure.pen.manure_manager_pen import ManureManagerPen
-from RUFAS.routines.manure.protocols.liquid_manure_portion_protocol import LiquidManurePortionProtocol
+from RUFAS.routines.manure.manure_handlers.manure_handler_daily_output import (
+    ManureHandlerDailyOutput,
+)
+from RUFAS.routines.manure.manure_separators.manure_separator_classes import (
+    BaseManureSeparator,
+)
+from RUFAS.routines.manure.manure_separators.manure_separator_daily_output import (
+    ManureSeparatorDailyOutput,
+)
+from RUFAS.routines.manure.manure_treatments.manure_treatment_configs import (
+    ManureTreatmentConfig,
+)
+from RUFAS.routines.manure.manure_treatments.manure_treatment_daily_output import (
+    ManureTreatmentDailyOutput,
+)
+from RUFAS.routines.manure.pen_manure.manure_manager_pen import ManureManagerPen
+from RUFAS.routines.manure.protocols.liquid_manure_portion_protocol import (
+    LiquidManurePortionProtocol,
+)
 
 
 class BaseManureTreatment(ABC):
@@ -26,10 +38,14 @@ class BaseManureTreatment(ABC):
 
     """
 
-    def __init__(self, weather, time,
-                 manure_treatment_config: Union[ManureTreatmentConfig,
-                 Tuple[ManureTreatmentConfig, ManureTreatmentConfig]]
-                 ) -> None:
+    def __init__(
+        self,
+        weather,
+        time,
+        manure_treatment_config: Union[
+            ManureTreatmentConfig, Tuple[ManureTreatmentConfig, ManureTreatmentConfig]
+        ],
+    ) -> None:
         """Initializes the BaseManureTreatment class.
 
         Args:
@@ -56,7 +72,9 @@ class BaseManureTreatment(ABC):
         self._sim_day = -1
         self._current_pen: Optional[ManureManagerPen] = None
         self._manure_handler_daily_output = None
-        self._current_manure_treatment_daily_input: Optional[LiquidManurePortionProtocol] = None
+        self._current_manure_treatment_daily_input: Optional[
+            LiquidManurePortionProtocol
+        ] = None
         self._manure_separator: Optional[BaseManureSeparator] = None
         self._manure_separator_daily_output: Optional[ManureSeparatorDailyOutput] = None
         self._accumulated_output = ManureTreatmentDailyOutput()
@@ -82,11 +100,14 @@ class BaseManureTreatment(ABC):
         """
         return self._manure_separator_daily_output
 
-    def _initialize_private_attributes_during_update(self, sim_day: int,
-                                                     current_pen: ManureManagerPen,
-                                                     manure_handler_daily_output: ManureHandlerDailyOutput,
-                                                     manure_treatment_daily_input: LiquidManurePortionProtocol,
-                                                     manure_separator: BaseManureSeparator) -> None:
+    def _initialize_private_attributes_during_update(
+        self,
+        sim_day: int,
+        current_pen: ManureManagerPen,
+        manure_handler_daily_output: ManureHandlerDailyOutput,
+        manure_treatment_daily_input: LiquidManurePortionProtocol,
+        manure_separator: BaseManureSeparator,
+    ) -> None:
         """Initializes the private attributes of the class.
 
         Args:
@@ -103,8 +124,9 @@ class BaseManureTreatment(ABC):
         self._current_manure_treatment_daily_input = manure_treatment_daily_input
         self._manure_separator = manure_separator
 
-    def _initialize_daily_output_during_update(self, manure_treatment_daily_input: LiquidManurePortionProtocol) \
-            -> ManureTreatmentDailyOutput:
+    def _initialize_daily_output_during_update(
+        self, manure_treatment_daily_input: LiquidManurePortionProtocol
+    ) -> ManureTreatmentDailyOutput:
         """Initializes the daily output of the manure treatment, which will be subsequently modified.
 
         Typically, this method should be called at the beginning of the _daily_update_helper() method.
@@ -122,27 +144,46 @@ class BaseManureTreatment(ABC):
         simulation_day = manure_treatment_daily_input.simulation_day
         pen_id = manure_treatment_daily_input.pen_id
 
-        liquid_manure_total_ammoniacal_nitrogen = manure_treatment_daily_input.liquid_manure_total_ammoniacal_nitrogen * (
-                    1 - self.config.total_ammoniacal_nitrogen_removal_efficiency_for_treatment)
+        liquid_manure_total_ammoniacal_nitrogen = (
+            manure_treatment_daily_input.liquid_manure_total_ammoniacal_nitrogen
+            * (
+                1
+                - self.config.total_ammoniacal_nitrogen_removal_efficiency_for_treatment
+            )
+        )
 
         liquid_manure_nitrogen = manure_treatment_daily_input.liquid_manure_nitrogen * (
-                    1 - self.config.nitrogen_removal_efficiency_for_treatment)
+            1 - self.config.nitrogen_removal_efficiency_for_treatment
+        )
 
-        liquid_manure_total_solids = manure_treatment_daily_input.liquid_manure_total_solids * (
-                    1 - self.config.total_solids_removal_efficiency_for_treatment)
+        liquid_manure_total_solids = (
+            manure_treatment_daily_input.liquid_manure_total_solids
+            * (1 - self.config.total_solids_removal_efficiency_for_treatment)
+        )
 
-        liquid_manure_total_volatile_solids = manure_treatment_daily_input.liquid_manure_total_volatile_solids * (
-                    1 - self.config.volatile_solids_removal_efficiency_for_treatment)
+        liquid_manure_total_volatile_solids = (
+            manure_treatment_daily_input.liquid_manure_total_volatile_solids
+            * (1 - self.config.volatile_solids_removal_efficiency_for_treatment)
+        )
 
-        liquid_manure_phosphorus = manure_treatment_daily_input.liquid_manure_phosphorus * (
-                    1 - self.config.phosphorus_removal_efficiency_for_treatment)
+        liquid_manure_phosphorus = (
+            manure_treatment_daily_input.liquid_manure_phosphorus
+            * (1 - self.config.phosphorus_removal_efficiency_for_treatment)
+        )
 
-        liquid_manure_potassium = manure_treatment_daily_input.liquid_manure_potassium * (
-                    1 - self.config.potassium_removal_efficiency_for_treatment)
+        liquid_manure_potassium = (
+            manure_treatment_daily_input.liquid_manure_potassium
+            * (1 - self.config.potassium_removal_efficiency_for_treatment)
+        )
 
-        final_manure_volume = (manure_treatment_daily_input.liquid_manure_daily_volume -
-                               (manure_treatment_daily_input.liquid_manure_total_solids *
-                                self.config.total_solids_removal_efficiency_for_treatment) / 1000.0)  # TODO: Make 1000.0 a constant
+        final_manure_volume = (
+            manure_treatment_daily_input.liquid_manure_daily_volume
+            - (
+                manure_treatment_daily_input.liquid_manure_total_solids
+                * self.config.total_solids_removal_efficiency_for_treatment
+            )
+            / 1000.0
+        )  # TODO: Make 1000.0 a constant
 
         return ManureTreatmentDailyOutput(
             simulation_day=simulation_day,
@@ -156,13 +197,14 @@ class BaseManureTreatment(ABC):
             daily_final_manure_volume=final_manure_volume,
         )
 
-    def daily_update(self,
-                     manure_handler_daily_output: ManureHandlerDailyOutput,
-                     manure_treatment_daily_input: LiquidManurePortionProtocol,
-                     pen: ManureManagerPen,
-                     sim_day: int,
-                     manure_separator: Optional[BaseManureSeparator] = None
-                     ) -> ManureTreatmentDailyOutput:
+    def daily_update(
+        self,
+        manure_handler_daily_output: ManureHandlerDailyOutput,
+        manure_treatment_daily_input: LiquidManurePortionProtocol,
+        pen: ManureManagerPen,
+        sim_day: int,
+        manure_separator: Optional[BaseManureSeparator] = None,
+    ) -> ManureTreatmentDailyOutput:
         """Calculates the daily output of the manure treatment.
 
         Args:
@@ -180,8 +222,13 @@ class BaseManureTreatment(ABC):
                 treatment for the current simulation day.
 
         """
-        self._initialize_private_attributes_during_update(sim_day, pen, manure_handler_daily_output,
-                                                          manure_treatment_daily_input, manure_separator)
+        self._initialize_private_attributes_during_update(
+            sim_day,
+            pen,
+            manure_handler_daily_output,
+            manure_treatment_daily_input,
+            manure_separator,
+        )
         if pen.num_animals == 0:
             daily_output = ManureTreatmentDailyOutput()
         else:
@@ -241,9 +288,14 @@ class BaseManureTreatment(ABC):
             The rainfall of the current day in meters (m).
 
         """
-        return self.weather.rainfall[self.time.year - 1][self.time.day - 1] * GeneralConstants.MM_TO_M
+        return (
+            self.weather.rainfall[self.time.year - 1][self.time.day - 1]
+            * GeneralConstants.MM_TO_M
+        )
 
-    def _accumulate_daily_output(self, manure_treatment_daily_output: ManureTreatmentDailyOutput) -> None:
+    def _accumulate_daily_output(
+        self, manure_treatment_daily_output: ManureTreatmentDailyOutput
+    ) -> None:
         """Accumulates the daily output of the manure treatment.
 
         Args:
