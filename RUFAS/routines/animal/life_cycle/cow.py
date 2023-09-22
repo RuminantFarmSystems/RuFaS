@@ -394,8 +394,8 @@ class Cow(HeiferIII):
         Calculates this Cow's nutrient requirements.
         """
         if nutrient_conc and nutrient_conc['dm'] != 0.0:
-            NDF_conc = nutrient_conc['NDF']
-            TDN_conc = nutrient_conc['TDN']
+            NDF_conc = nutrient_conc['NDF'] / 100
+            TDN_conc = nutrient_conc['TDN'] / 100
         else:
             NDF_conc = 0.3
             TDN_conc = 0.7
