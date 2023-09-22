@@ -5,7 +5,6 @@ Description: Implements test cases
 Author(s): Pooya Hekmati, sh2235@cornell.edu, Carson Wolber, ctw54@cornell.edu
 """
 
-import math
 from typing import Any, Dict
 from unittest.mock import patch
 from mock import MagicMock
@@ -19,7 +18,6 @@ import numpy as np
 import pytest
 
 
-from RUFAS.routines.animal.life_cycle import cow
 from RUFAS.routines.animal.pen import Pen
 from RUFAS.routines.animal.life_cycle.calf import Calf
 
@@ -36,7 +34,6 @@ import RUFAS.routines.animal.ration.ration_optimizer
 
 from RUFAS.routines.animal.life_cycle.animal_base import AnimalBase
 from RUFAS.routines.animal.life_cycle.animal_events import AnimalEvents
-from RUFAS.routines.animal.ration import ration_driver
 
 import RUFAS.routines.animal.ration.user_defined_ration
 from RUFAS.routines.animal.ration.user_defined_ration import \
@@ -1334,6 +1331,11 @@ def test_list_reconfig(input, expected)->None:
     assert ration_optimizer.list_reconfig(input) == expected
 
 
+def test_attempt_optimization():
+    """Unit test for function attempt_optimization in file routines/animal/ration/ration_optimizer.py"""
+    pass
+
+
 def test_objective():
     """Unit test for function objective in file routines/animal/ration/ration_optimizer.py"""
     pass
@@ -1394,11 +1396,6 @@ def test_DMI_constraint():
     pass
 
 
-def test_energy_req_limit_constraint():
-    """Unit test for function energy_req_limit_constraint in file routines/animal/ration/ration_optimizer.py"""
-    pass
-
-
 def test_ration_optimizer_optimize():
     """Unit test for function optimize in file routines/animal/ration/ration_optimizer.py"""
     pass
@@ -1421,11 +1418,6 @@ def test_growing_heifer_ration_optimize():
 
 def test_calculate_rqmts():
     """Unit test for function calculate_rqmts in file routines/animal/ration/growing_heifer_ration.py"""
-    pass
-
-
-def test_optimization():
-    """Unit test for function optimization in file routines/animal/ration/ration_driver.py"""
     pass
 
 

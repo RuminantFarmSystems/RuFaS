@@ -24,6 +24,8 @@ class FieldData:
     """The absolute latitude value (degrees above or below equator) where field is located (degrees)"""
     minimum_daylength: float = 6.33  # TODO: set default to somewhere other than Wisconsin, or no default?
     """Shortest day of the year for this watershed (hours)"""
+    longitude: float = -88.6  # TODO: set default to somewhere other than Wisconsin, or no default?
+    """The longitude value of where the field is located (degrees)."""
     dormancy_threshold_daylength: Optional[float] = None
     """Threshold daylength to initiate dormancy in a plant (hours)"""
     current_residue: float = 0

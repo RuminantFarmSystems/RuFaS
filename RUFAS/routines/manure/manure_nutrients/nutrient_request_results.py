@@ -54,19 +54,31 @@ class NutrientRequestResults:
             For nitrogen and phosphorus, if the sum of organic and inorganic fractions doesn't equal 1.
 
         """
-        fractional_fields = [f for f in fields(self) if 'fraction' in f.name]
+        fractional_fields = [f for f in fields(self) if "fraction" in f.name]
         non_fractional_fields = list(set(fields(self)) - set(fractional_fields))
 
         for field in fractional_fields:
             if not 0.0 <= getattr(self, field.name) <= 1.0:
-                raise ValueError(f'{field.name} must be between 0 and 1.')
+                raise ValueError(f"{field.name} must be between 0 and 1.")
 
         for field in non_fractional_fields:
             if getattr(self, field.name) < 0.0:
-                raise ValueError(f'{field.name} must be non-negative.')
+                raise ValueError(f"{field.name} must be non-negative.")
 
-        if not math.isclose(self.organic_nitrogen_fraction + self.inorganic_nitrogen_fraction, 1.0, abs_tol=1e-6):
-            raise ValueError('Sum of organic and inorganic nitrogen fractions must be 1.')
+        if not math.isclose(
+            self.organic_nitrogen_fraction + self.inorganic_nitrogen_fraction,
+            1.0,
+            abs_tol=1e-6,
+        ):
+            raise ValueError(
+                "Sum of organic and inorganic nitrogen fractions must be 1."
+            )
 
-        if not math.isclose(self.organic_phosphorus_fraction + self.inorganic_phosphorus_fraction, 1.0, abs_tol=1e-6):
-            raise ValueError('Sum of organic and inorganic phosphorus fractions must be 1.')
+        if not math.isclose(
+            self.organic_phosphorus_fraction + self.inorganic_phosphorus_fraction,
+            1.0,
+            abs_tol=1e-6,
+        ):
+            raise ValueError(
+                "Sum of organic and inorganic phosphorus fractions must be 1."
+            )

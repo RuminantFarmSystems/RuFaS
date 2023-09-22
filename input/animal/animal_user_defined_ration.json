@@ -3,7 +3,7 @@
 		"calf_num": 80,
 		"heiferI_num": 440,
 		"heiferII_num": 380,
-		"heiferIII_num": 50,
+		"heiferIII_num_springers": 50,
 		"cow_num": 1000,
 		"replace_num": 5000,
 		"herd_num": 1000,

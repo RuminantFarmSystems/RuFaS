@@ -26,6 +26,7 @@ from RUFAS.routines.animal.pen import Pen
 @pytest.fixture
 def pen() -> Pen:
     id_number = 0
+    pen_name = ""
     vert_dist = 0.1
     horiz_dist = 1.6
     num_stalls = 100
@@ -38,8 +39,8 @@ def pen() -> Pen:
     animal_combination = Pen.AnimalCombination.CALF
     max_stocking_density = 1.2
 
-    pen = Pen(id_number, vert_dist, horiz_dist, num_stalls, housing_type, bedding_type, pen_type, manure_handling,
-              manure_separator, manure_storage, animal_combination, max_stocking_density)
+    pen = Pen(id_number, pen_name, vert_dist, horiz_dist, num_stalls, housing_type, bedding_type, pen_type,
+              manure_handling, manure_separator, manure_storage, animal_combination, max_stocking_density)
 
     return pen
 
