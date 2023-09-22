@@ -752,7 +752,7 @@ class RationOptimizer:
                 info_map = {"class": "RationOptimizer", 
                             "function": self.optimization.__name__,
                             }
-                om.add_error('SLSQP error', e.message, info_map)
+                om.add_error('SLSQP error', 'whoops', info_map)
             finally:
                 i += 1
                 count += 1
