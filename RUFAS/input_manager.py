@@ -657,4 +657,4 @@ class InputManager:
                     "function": self.flush_pools.__name__,
                     }
         self.__pool = {}
-        om.add_log("Clear variable pool", f"The pool is emptied.", info_map)
+        om.add_log("Clear variable pool", "The pool is emptied.", info_map)
