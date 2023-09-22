@@ -781,38 +781,31 @@ def output_manager_original_method_states(
     }
 
 
-def test_dump_all_pools(
+def test_dump_all_nondata_pools(
     mock_output_manager: OutputManager,
     output_manager_original_method_states: Dict[str, Callable],
 ) -> None:
-    """Test case for function dump_all_pools in output_manager.py"""
+    """Test case for function dump_all_nondata_pools in output_manager.py"""
     path = "dummy_path"
     mock_output_manager.dump_errors = MagicMock()
     mock_output_manager.dump_warnings = MagicMock()
     mock_output_manager.dump_logs = MagicMock()
-    mock_output_manager.dump_variables = MagicMock()
     mock_output_manager.dump_variable_names_and_contexts = MagicMock()
 
-    mock_output_manager.dump_all_pools(path, exclude_info_maps=False)
+    mock_output_manager.dump_all_nondata_pools(path, exclude_info_maps=False)
 
     mock_output_manager.dump_errors.assert_called_once_with(path)
     mock_output_manager.dump_warnings.assert_called_once_with(path)
     mock_output_manager.dump_logs.assert_called_once_with(path)
-    mock_output_manager.dump_variables.assert_called_once_with(path, False)
     mock_output_manager.dump_variable_names_and_contexts.assert_called_once_with(path, False)
 
-    mock_output_manager.dump_all_pools(path, exclude_info_maps=True)
-    mock_output_manager.dump_variables.assert_called_with(path, True)
+    mock_output_manager.dump_all_nondata_pools(path, exclude_info_maps=True)
     mock_output_manager.dump_variable_names_and_contexts.assert_called_with(path, True)
     assert mock_output_manager.dump_logs.call_count == 2
     assert mock_output_manager.dump_warnings.call_count == 2
     assert mock_output_manager.dump_errors.call_count == 2
-    assert mock_output_manager.dump_variables.call_count == 2
 
     # Restore original methods
-    mock_output_manager.dump_variables = output_manager_original_method_states[
-        "dump_variables"
-    ]
     mock_output_manager.dump_logs = output_manager_original_method_states["dump_logs"]
     mock_output_manager.dump_warnings = output_manager_original_method_states[
         "dump_warnings"
