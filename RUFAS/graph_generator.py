@@ -6,7 +6,7 @@ from typing import Dict, List, Any
 import matplotlib
 
 matplotlib.use('TkAgg')
-import matplotlib.pyplot as plt
+import matplotlib.pyplot as pyplt
 from matplotlib.figure import Figure
 
 om_pool_element_type = Dict[str, List[Dict[str, Any]]]
@@ -15,6 +15,7 @@ om_pool_element_type = Dict[str, List[Dict[str, Any]]]
 class GraphGenerator:
     """
     Graph Generator is used to generate graphs from the simulation results.
+    NOTE: This class is not multi-thread safe!!!
     """
 
     def generate_graph(self, filtered_pool: Dict[str, om_pool_element_type], graph_info: Dict[str, str], save_path: str, filter_file_name: str, **kwargs):
@@ -42,7 +43,7 @@ class GraphGenerator:
 
         graph_path = self._generate_graph_path(save_path, graph_info, filter_file_name)
         try:
-            plt.savefig(graph_path)
+            pyplt.savefig(graph_path)
         except Exception as e:
             print(e)
 
@@ -56,6 +57,8 @@ class GraphGenerator:
             fig.axes[0].set_xlabel(graph_info['x_label'])
         if 'y_label' in graph_info.keys():
             fig.axes[0].set_xlabel(graph_info['y_label'])
+        if 'legend' in graph_info.keys():
+            fig.axes[0].legend(graph_info['legend'])
 
     def _generate_graph_path(self, save_path: str, graph_info: dict, filter_file_name: str) -> str:
         """
@@ -82,7 +85,7 @@ class GraphGenerator:
         """
         Function to generate a line graph.
         """
-        fig, ax = plt.subplots()
+        fig, ax = pyplt.subplots()
         for key in filtered_pool.keys():
             ax.plot(filtered_pool[key]['values'])
         self._customize_graph(fig, graph_info)
@@ -92,7 +95,7 @@ class GraphGenerator:
         """
         Function to generate a bar graph.
         """
-        fig, ax = plt.subplots()
+        fig, ax = pyplt.subplots()
         category, count = [], []
 
         for key in filtered_pool.keys():
