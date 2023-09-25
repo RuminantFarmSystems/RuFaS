@@ -38,7 +38,7 @@
     "feed": {
       "title": "Feed data",
       "description": "Those cows need to eat!",
-      "path": "input/feed/feed_NE_Diet_3.json",
+      "path": "input/feed/example_feed.json",
       "type": "json",
       "properties": "feed_properties"
     },
