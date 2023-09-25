@@ -1,0 +1,238 @@
+{
+  "calf_feeds": [
+    155,
+    157
+  ],
+  "growing_feeds": [
+    2,
+    51,
+    86,
+    136,
+    139
+  ],
+  "close_up_feeds": [
+    2,
+    51,
+    86,
+    136,
+    139
+  ],
+  "lac_cow_feeds": [
+    11,
+    19,
+    23,
+    24,
+    26,
+    34,
+    81,
+    118,
+    129,
+    132,
+    139
+  ],
+  "purchased_feeds": [
+    {
+      "purchased_feed": 2,
+      "purchased_feed_cost": 0.17
+    },
+    {
+      "purchased_feed": 11,
+      "purchased_feed_cost": 0.1
+    },
+    {
+      "purchased_feed": 19,
+      "purchased_feed_cost": 0.01
+    },
+    {
+      "purchased_feed": 23,
+      "purchased_feed_cost": 0.1
+    },
+    {
+      "purchased_feed": 24,
+      "purchased_feed_cost": 0.1
+    },
+    {
+      "purchased_feed": 26,
+      "purchased_feed_cost": 0.1
+    },
+    {
+      "purchased_feed": 34,
+      "purchased_feed_cost": 0.001
+    },
+    {
+      "purchased_feed": 51,
+      "purchased_feed_cost": 0.001
+    },
+    {
+      "purchased_feed": 81,
+      "purchased_feed_cost": 0.001
+    },
+    {
+      "purchased_feed": 86,
+      "purchased_feed_cost": 0.001
+    },
+    {
+      "purchased_feed": 118,
+      "purchased_feed_cost": 0.39
+    },
+    {
+      "purchased_feed": 129,
+      "purchased_feed_cost": 0.1
+    },
+    {
+      "purchased_feed": 132,
+      "purchased_feed_cost": 0.1
+    },
+    {
+      "purchased_feed": 136,
+      "purchased_feed_cost": 0.1
+    },
+    {
+      "purchased_feed": 139,
+      "purchased_feed_cost": 0.1
+    },
+    {
+      "purchased_feed": 155,
+      "purchased_feed_cost": 0.1
+    },
+    {
+      "purchased_feed": 157,
+      "purchased_feed_cost": 0.1
+    }
+  ],
+  "farm_grown_feeds": [
+    1
+  ],
+  "feed_database": "input/databases/feeds.sqlite",
+  "feeds_table": "user_feeds",
+  "feed_quality_table": "feed_quality",
+  "nutrient_table": "nutrients",
+  "storage_options": [
+    {
+      "storage_type": "bunker",
+      "moisture": "direct_cut",
+      "additive": "preservative",
+      "packing_density": 14,
+      "inoculation": "heterofermentative",
+      "bunk_type": "open_floor",
+      "ventilation": true,
+      "removal_rate": 6,
+      "initial_dry_matter": 0
+    },
+    {
+      "storage_type": "bunker",
+      "moisture": "direct_cut",
+      "additive": "preservative",
+      "packing_density": 14,
+      "inoculation": "heterofermentative",
+      "bunk_type": "open_floor",
+      "ventilation": true,
+      "removal_rate": 6,
+      "initial_dry_matter": 0
+    }
+  ],
+  "user_defined_ration_percentages": {
+    "calf": [
+      {
+        "feed_type": 155,
+        "ration_percentage": 50
+      },
+      {
+        "feed_type": 157,
+        "ration_percentage": 50
+      }
+    ],
+    "growing": [
+      {
+        "feed_type": 2,
+        "ration_percentage": 50
+      },
+      {
+        "feed_type": 51,
+        "ration_percentage": 20
+      },
+      {
+        "feed_type": 86,
+        "ration_percentage": 25
+      },
+      {
+        "feed_type": 136,
+        "ration_percentage": 2.10
+      },
+      {
+        "feed_type": 139,
+        "ration_percentage": 2.9
+      }
+    ],
+    "close_up": [
+      {
+        "feed_type": 2,
+        "ration_percentage": 30.8
+      },
+      {
+        "feed_type": 51,
+        "ration_percentage": 29.6
+      },
+      {
+        "feed_type": 86,
+        "ration_percentage": 33.6
+      },
+      {
+        "feed_type": 136,
+        "ration_percentage": 3.10
+      },
+      {
+        "feed_type": 139,
+        "ration_percentage": 2.9
+      }
+    ],
+    "lac_cow": [
+      {
+        "feed_type": 11,
+        "ration_percentage": 0.4
+      },
+      {
+        "feed_type": 19,
+        "ration_percentage": 6.6
+      },
+      {
+        "feed_type": 23,
+        "ration_percentage": 6.6
+      },
+      {
+        "feed_type": 24,
+        "ration_percentage": 3.3
+      },
+      {
+        "feed_type": 26,
+        "ration_percentage": 4.5
+      },
+      {
+        "feed_type": 34,
+        "ration_percentage": 49.0
+      },
+      {
+        "feed_type": 81,
+        "ration_percentage": 21.0
+      },
+      {
+        "feed_type": 118,
+        "ration_percentage": 2.82
+      },
+      {
+        "feed_type": 129,
+        "ration_percentage": 1.98
+      },
+      {
+        "feed_type": 132,
+        "ration_percentage": 0.33
+      },
+      {
+        "feed_type": 139,
+        "ration_percentage": 3.5
+      }
+    ],
+    "tolerance": 0.1,
+    "milk_reduction_maximum": 0.50
+  }
+}
