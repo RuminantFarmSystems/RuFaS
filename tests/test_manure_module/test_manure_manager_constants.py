@@ -1,7 +1,7 @@
 from pytest import approx
 
-from RUFAS.routines.manure.constants.gas_emission_constants import GasEmissionConstants
-from RUFAS.routines.manure.constants.manure_constants import ManureConstants
+from RUFAS.routines.manure.constants_and_units.gas_emission_constants import GasEmissionConstants
+from RUFAS.routines.manure.constants_and_units.manure_constants import ManureConstants
 
 
 def test_manure_constants() -> None:

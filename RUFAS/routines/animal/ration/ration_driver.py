@@ -72,8 +72,7 @@ class RationManager:
                 if failed_constraints:
                     for constr in failed_constraints:
                         constraints_failed_list.append(constr["fun"].__name__)
-                # TODO: continue testing for more efficient reductions: see Issues #569, 577, 589
-                reduction = 0.5
+                reduction = 0.25
                 cls.reduce_milk_production(pen, reduction)
 
                 req.set_requirements(pen, animal_grouping_scenario, True)
@@ -235,7 +234,7 @@ class RationManager:
         constraints_failed_list = []
 
         solution, ration_vals, ration_config = ration_optimizer.attempt_optimization(req, available_feeds, pen.animal_combination)
-        if str(pen.animal_combination) in ['AnimalCombination.LAC_COW']:
+        if pen.animal_combination.name in ['LAC_COW']:
             failed_constraints = ration_optimizer.find_failed_constraints(solution.x, ration_optimizer.cow_cons, ration_config)
         else:
             failed_constraints = ration_optimizer.find_failed_constraints(solution.x, ration_optimizer.heifer_cons, ration_config)
@@ -243,7 +242,6 @@ class RationManager:
         if failed_constraints is not None:
             for constr in failed_constraints:
                 constraints_failed_list.append(constr["fun"].__name__)
-            # TODO: is there a better way to get the simulation day?
             fail_summary = {'simulation day' : pen.animals_in_pen[0].body_weight_history[-1].simulation_day,
                         'reattempt number' : num_reattempts,
                         'constraints_failed_dict': constraints_failed_list, 
@@ -256,10 +254,10 @@ class RationManager:
             ration_vals = ration_optimizer.get_ration_vals(cls.make_solution_from_fixed_ration(ration), ration_config)
             return ration, ration_vals
 
-        if str(pen.animal_combination) not in ['AnimalCombination.LAC_COW'] and not solution.success:
+        if pen.animal_combination.name not in ['LAC_COW'] and not solution.success:
             fixed_ration = True
 
-        if str(pen.animal_combination) in ['AnimalCombination.LAC_COW'] and solution is not None:
+        if pen.animal_combination.name in ['LAC_COW'] and solution is not None:
             running_milk_reduction = 0.0
             while not solution.success:
                 running_average_milk = cls.calc_milk_average(pen)
@@ -284,7 +282,6 @@ class RationManager:
                 if failed_constraints:
                     for constr in failed_constraints:
                         constraints_failed_list.append(constr["fun"].__name__)
-                    # TODO: is there a better way to get the simulation day?
                     fail_summary = {'simulation day' : pen.animals_in_pen[0].body_weight_history[-1].simulation_day,
                         'reattempt number' : num_reattempts,
                         'constraints_failed_dict': constraints_failed_list, 
@@ -302,7 +299,7 @@ class RationManager:
 
 class RationReporter:
     """
-
+    Calculates and collects information about a formulated ration.
     """
     def __init__(cls):
         cls.nutrient_amount = []

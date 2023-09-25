@@ -63,7 +63,7 @@ class UserDefinedRationManager(object):
         return ration_percents
     
 
-    def ration_to_use(pen_animal_combo, available_feeds: Dict) -> Dict:
+    def ration_to_use(animal_combination, available_feeds: Dict) -> Dict:
         """
         Function outputs the dictionary for a given animal combination from the UserDefinedRationManager class
         
@@ -80,13 +80,13 @@ class UserDefinedRationManager(object):
             dictionary of feed ids and their associated percentage of DMI 
         """
         udrm = UserDefinedRationManager()
-        group = pen_animal_combo.name 
-        if group == 'LAC_COW':
+        animal_type = animal_combination.name 
+        if animal_type == 'LAC_COW':
             ration_percents = udrm.lactating_cow_ration
         # elif pen.classes
-        elif group == 'GROWING':
+        elif animal_type == 'GROWING':
             ration_percents = udrm.growing_ration
-        elif group == 'CLOSE_UP':
+        elif animal_type == 'CLOSE_UP':
             ration_percents = udrm.close_up_ration
         else: 
             ration_percents = udrm.calf_ration
