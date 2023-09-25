@@ -101,22 +101,22 @@ class RationManager:
             return pen.ration, ration_vals
 
 
-def calc_milk_average(pen) -> float:
-    """
-    Calculates average milk produced in a pen.
-    
-    Parameters
-    ----------
-    pen: an object of class Pen
+    def calc_milk_average(pen) -> float:
+        """
+        Calculates average milk produced in a pen.
+        
+        Parameters
+        ----------
+        pen: an object of class Pen
 
-    Returns
-    -------
-    float
-        Average running milk
-    """
-    total_milk_in_pen = sum(animal.estimated_daily_milk_produced for animal in pen.animals_in_pen)
-    starting_milk_average = total_milk_in_pen / len(pen.animals_in_pen)
-    return starting_milk_average
+        Returns
+        -------
+        float
+            Average running milk
+        """
+        total_milk_in_pen = sum(animal.estimated_daily_milk_produced for animal in pen.animals_in_pen)
+        starting_milk_average = total_milk_in_pen / len(pen.animals_in_pen)
+        return starting_milk_average
 
     @classmethod
     def reduce_milk_production(cls, pen, reduction: float) -> None:
@@ -176,23 +176,23 @@ def calc_milk_average(pen) -> float:
         makes solution object from returned fixed ration for use in get_ration_vals function in ration_optimizer.py
         Simply puts the value in triplicate, and multiplies by the MEact defined in  ration_config
 
-    Parameters
-    ----------
-    ration: Dict
+        Parameters
+        ----------
+        ration: Dict
 
-    Returns
-    -------
-    List
+        Returns
+        -------
+        List
 
-    """
-    excluded_keys = {'status', 'objective'}
-    solution_from_ration = []
-    for key in ration.keys():
-        if key not in excluded_keys:
-            solution_from_ration.append(ration[key]/3)
-            solution_from_ration.append(ration[key]/3)
-            solution_from_ration.append(ration[key]/3)
-    return solution_from_ration
+        """
+        excluded_keys = {'status', 'objective'}
+        solution_from_ration = []
+        for key in ration.keys():
+            if key not in excluded_keys:
+                solution_from_ration.append(ration[key]/3)
+                solution_from_ration.append(ration[key]/3)
+                solution_from_ration.append(ration[key]/3)
+        return solution_from_ration
 
     @classmethod
     def get_user_defined_ration(cls, req: animal_requirements, pen, available_feeds, animal_grouping_scenario) \
