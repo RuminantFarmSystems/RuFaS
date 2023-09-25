@@ -1854,3 +1854,7 @@ def test_make_user_bounds(mock_user_defined_ration_manager: UserDefinedRationMan
     for i in range(len(predicted)):
         assert predicted[i][0] == pytest.approx(result[i][0], 0.1)
         assert predicted[i][1] == pytest.approx(result[i][1], 0.1)
+
+def test_get_TDN_discount():
+    """ Unit test for function get_TDN_discount in file routines/animal/ration/ration_driver.py"""
+    pass
