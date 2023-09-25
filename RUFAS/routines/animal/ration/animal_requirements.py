@@ -362,7 +362,7 @@ class AnimalRequirements:
             net_energy_lactation = self.calculate_NRC_energy_lactation_requirements(
                 animal_type, milk_fat, milk_true_protein, milk_lactose, milk_production)
             dry_matter_intake_estimate = self.calculate_NRC_DMI(
-                animal_type, body_weight, day_of_pregnancy, days_in_milk, lactating, milk_production, milk_fat, net_energy_diet_concentration)
+                animal_type, body_weight, day_of_pregnancy, days_in_milk, milk_production, milk_fat, net_energy_diet_concentration)
             metabolizable_protein_requirement = self.calculate_NRC_protein_requirements(
                 body_weight, conceptus_weight, day_of_pregnancy, animal_type, milk_production, milk_true_protein,
                 calf_birth_weight, net_energy_growth, average_daily_gain, equivalent_shrunk_body_weight, dry_matter_intake_estimate, TDN_conc)
@@ -1313,8 +1313,7 @@ class AnimalRequirements:
         return max(phosphorus_requirement, AnimalModuleConstants.MINIMUM_PHOSPHORUS)
 
 
-    def calculate_NRC_DMI(self, animal_type: AnimalType, body_weight: float, day_of_pregnancy: int, days_in_milk: Optional[int],
-                        lactating: bool, milk_production: float, milk_fat: float, net_energy_diet_concentration: float) -> float:
+    def calculate_NRC_DMI(self, animal_type: AnimalType, body_weight: float, day_of_pregnancy: int, days_in_milk: Optional[int], milk_production: float, milk_fat: float, net_energy_diet_concentration: float) -> float:
         """ Calculates dry matter intake according to NRC (2001).
 
         Calculates the estimated total dry matter intake in kilograms per day
@@ -1336,7 +1335,7 @@ class AnimalRequirements:
         milk_fat : float
             Fat contents in milk (%)
         net_energy_diet_concentration : float
-            TODO GET DESCRIPTION AND ADD OTHERS
+            Metabolizable energy density of formulated ration
 
         Returns
         -------
