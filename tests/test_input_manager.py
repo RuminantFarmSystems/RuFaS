@@ -745,6 +745,7 @@ def test_validate_json_element_missing_type_raises_keyerror(mock_input_manager: 
         ([1, 2, 3, 4, 5, 6, 7, 8, 9, 10], {"maximum_length": 10}, True, 0),
         ([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11], {"minimum_length": 5, "maximum_length": 10}, False, 1),
         ([], {"minimum_length": 5}, False, 1),
+        (None, {"minimum_length": 3, "maximum_length": 6}, False, 1)
     ]
 )
 def test_array_type_validator(dummy_value: list, dummy_variable_to_check: Dict[str, int], expected_result: bool,
@@ -768,6 +769,7 @@ def test_array_type_validator(dummy_value: list, dummy_variable_to_check: Dict[s
         (7, {"minimum": 3, "maximum": 7}, True, 0),
         (9, {"maximum": 7}, False, 1),
         (-1, {"minimum": 3, "maximum": 7}, False, 1),
+        (None, {"maximum": 1, "minimum": 0}, False, 1)
     ]
 )
 def test_num_type_validator(dummy_value: int,
@@ -794,6 +796,7 @@ def test_num_type_validator(dummy_value: int,
         ("cow", {"minimum_length": 1, "maximum_length": 5}, True, 0),
         ("cow", {"minimum_length": 5}, False, 1),
         ("cow", {"maximum_length": 1}, False, 1),
+        (None, {"pattern": r"cow", "minimum_length": 1}, False, 1)
     ]
 )
 def test_string_type_validator(dummy_value: int,
