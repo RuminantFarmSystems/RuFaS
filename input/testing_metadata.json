@@ -17,7 +17,7 @@
     "crop": {
       "title": "Crop data",
       "description": "Alfafa is fun!",
-      "path": "input/crop/ARL_rotation.json",
+      "path": "input/crop/testing_rotation.json",
       "type": "json",
       "properties": "crop_schedule_properties"
     },
