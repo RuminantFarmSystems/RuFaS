@@ -408,6 +408,11 @@ class InputManager:
         info_map = {"class": self.__class__.__name__,
                     "function": self._array_type_validator.__name__,
                     }
+        if input_data_value is None:
+            warning_string = f"Array is NoneType."
+            om.add_warning(warning_string, f"{var_name=}", info_map)
+            return False
+
         maximum_length = variable_properties.get("maximum_length")
         minimum_length = variable_properties.get("minimum_length")
         if minimum_length is not None:
@@ -432,6 +437,10 @@ class InputManager:
                     }
         minimum_value = variable_properties.get("minimum")
         maximum_value = variable_properties.get("maximum")
+        if input_data_value is None:
+            warning_string = f"Value is NoneType."
+            om.add_warning(warning_string, f"{var_name=}", info_map)
+            return False
         if minimum_value is not None:
             is_in_range = minimum_value <= input_data_value
             if not is_in_range:
@@ -452,6 +461,11 @@ class InputManager:
         info_map = {"class": self.__class__.__name__,
                     "function": self._string_type_validator.__name__,
                     }
+        if input_data_value is None:
+            warning_string = f"String variable is NoneType."
+            om.add_warning(warning_string, f"{var_name=}", info_map)
+            return False
+
         pattern_check = variable_properties.get("pattern")
         if pattern_check is not None:
             is_valid_string = bool(re.match(pattern_check, input_data_value))
