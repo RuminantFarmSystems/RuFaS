@@ -21,7 +21,7 @@ from RUFAS.routines.animal.life_cycle.heiferII import HeiferII
 from RUFAS.routines.animal.life_cycle.heiferIII import HeiferIII
 from RUFAS.routines.animal.pen import Pen
 from RUFAS.routines.feed.feed import Feed
-
+from RUFAS.input_manager import InputManager
 
 def create_mock_object_list(attribute_dicts: List[Dict[str, Any]]) -> List[MagicMock]:
     mock_object_list = []
@@ -248,6 +248,13 @@ def mock_herd_data() -> Dict[str, Union[str, int, bool]]:
     }
 
 
+def input_manager() -> None:
+    im = InputManager()
+    im.flush_pools()
+    im.__pool = {'config': {
+        'nutrient_standard': 'NASEM'
+    }}
+
 @pytest.fixture
 def animal_manager() -> AnimalManager:
     init_pens_patch = patch('RUFAS.routines.animal.animal_manager.AnimalManager.init_pens')
@@ -269,6 +276,9 @@ def animal_manager() -> AnimalManager:
     feed = MagicMock()
     weather = MagicMock()
     time = MagicMock()
+
+    input_manager()
+    im = InputManager()
 
     animal_manager = AnimalManager(data, config, feed, weather, time)
 

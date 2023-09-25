@@ -20,8 +20,10 @@ from .feed_typed_dicts import PurchasedFeedTypedDict
 from ..animal.pen import Pen
 from ...database_reader import DatabaseReader
 from RUFAS.output_manager import OutputManager
-from typing import Dict, List, Union
+from typing import Dict, List, Union, Any
+from RUFAS.input_manager import InputManager
 
+im = InputManager()
 om = OutputManager()
 
 from RUFAS.routines.animal.ration.user_defined_ration import \
@@ -53,6 +55,37 @@ def annual_feed_routine(feed):
     feed.reset_feed_data()
 
 
+def pack_into_dict(var_names: List[str], var_values: List[Any]) -> Dict[str, Any]:
+    result_dict = {}
+    for id_var, var_name in enumerate(var_names):
+        result_dict[var_name] = var_values[id_var]
+    return result_dict
+
+
+def retrieve_data(data_source: str, var_names: List[str], unique_value: bool,
+                  identifier: str = None, desired_rows: List[Any] = None) -> List[Dict[str, Any]]:
+    result_list = []
+    data = {}
+    values = []
+    for var in var_names:
+        data[var] = im.get_data(data_source + '.' + var)
+
+    for i in range(len(data[var_names[0]])):
+        if desired_rows and identifier:
+            if data[identifier][i] not in desired_rows:
+                continue
+
+        var_values = [data[key][i] for key in data.keys()]
+        if unique_value:
+            if var_values in values:
+                continue
+        values.append(var_values)
+
+        result_list.append(pack_into_dict(var_names, var_values))
+
+    return result_list
+
+
 class Feed:
     def __init__(self, data: PurchasedFeedTypedDict, nutrient_standard: str):
         """
@@ -69,7 +102,9 @@ class Feed:
         self.nutrient_table = data['nutrient_table']
         self.db_reader = DatabaseReader(self.feed_database)
         self.nutrient_standard = nutrient_standard
-        print(nutrient_standard)
+
+        self.feeds_split_by_maturity = retrieve_data('feed_quality', ['rufas_id'], True)
+        self.all_feed_units = retrieve_data('user_feeds', ['rufas_id', 'feed_name', 'units'], False)
 
         purchased_feeds_list = [feed_item["purchased_feed"] for feed_item in data["purchased_feeds"]]
         purchased_feed_costs = {str(feed_item["purchased_feed"]): feed_item["purchased_feed_cost"]
@@ -846,9 +881,8 @@ class Feed:
         Returns: a set-like list (no duplicates) of the entries listed in the
             table which splits feeds by quality
         """
-        column = 'entry'
-        dict_list = self.db_reader.query(self.feed_quality_table,
-                                         distinct=True, cols=[column])
+        column = 'rufas_id'
+        dict_list = self.feeds_split_by_maturity
         return [result[column] for result in dict_list]
 
     def get_all_feed_units(self, purchased_feeds, grown_feeds):
@@ -874,13 +908,9 @@ class Feed:
             - units is the string representing the units for the feed
             (e.g. 'kg')
         """
-        columns = ['entry', 'feed_name', 'units']
-        all_feeds = purchased_feeds + grown_feeds
-        dict_list = self.db_reader.query(self.feeds_table, cols=columns,
-                                         identifier='entry',
-                                         desired_rows=tuple(all_feeds))
+        dict_list = self.all_feed_units
 
-        all_feed_info = {str(result['entry']): {
+        all_feed_info = {str(result['rufas_id']): {
             'feed_name': result['feed_name'],
             'units': result['units']
         }
@@ -982,6 +1012,8 @@ class Feed:
                                          distinct=True, cols=[column],
                                          identifier='entry',
                                          desired_rows=(grown_feed_entry,))
+        print(grown_feed_entry)
+        print(dict_list)
         nutrient = dict_list[0][column]
 
         column = 'quality_id'
@@ -1011,6 +1043,7 @@ class Feed:
         status_dict = self.db_reader.query(self.feed_quality_table,
                                            cols=[column], identifier='quality_id',
                                            desired_rows=(str(quality_id),))
+        print(status_dict)
 
         return status_dict[0][column]
 
@@ -1082,6 +1115,8 @@ class Feed:
         dict_list = self.db_reader.query(self.nutrient_table,
                                          identifier='feed_id',
                                          desired_rows=tuple(feed_ids))
+        print(feed_ids)
+        print(dict_list)
         nutrient_vals = {}
         for dictionary in dict_list:
             feed_id = dictionary['feed_id']
