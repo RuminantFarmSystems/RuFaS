@@ -347,7 +347,7 @@ def test_execute_simulations_from_files(mocker: MockerFixture) -> None:
     mock_output_manager = mocker.MagicMock(auto_spec=OutputManager)
     mock_input_manager = mocker.MagicMock(auto_spec=InputManager)
     mock_output_manager.flush_pools.return_value = None
-    mock_output_manager.dump_all_pools.return_value = None
+    mock_output_manager.dump_all_nondata_pools.return_value = None
     mock_output_manager.save_variables.return_value = None
     mocker.patch("main.OutputManager", return_value=mock_output_manager)
     mocker.patch("main.InputManager", return_value=mock_input_manager)
@@ -371,8 +371,8 @@ def test_execute_simulations_from_files(mocker: MockerFixture) -> None:
     ]
     assert mock_simulator.simulate.call_count == len(file_list)
     assert mock_output_manager.flush_pools.call_count == len(file_list)
-    assert mock_output_manager.dump_all_pools.call_count == len(file_list)
-    assert mock_output_manager.dump_all_pools.call_args_list == [
+    assert mock_output_manager.dump_all_nondata_pools.call_count == len(file_list)
+    assert mock_output_manager.dump_all_nondata_pools.call_args_list == [
         mocker.call("output", True)
     ] * len(file_list)
     assert mock_output_manager.save_variables.call_count == len(file_list)
