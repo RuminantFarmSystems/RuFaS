@@ -586,8 +586,6 @@ class InputManager:
         element_hierarchy = data_address.split('.')
 
         try:
-            # if data_address == "weather":
-            #     print("here")
             data_value = reduce(lambda d, key: d[key], element_hierarchy,
                                 self.__pool)
             return deepcopy(data_value)
