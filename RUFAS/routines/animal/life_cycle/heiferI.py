@@ -53,8 +53,8 @@ class HeiferI(Calf):
         if metabolizable_energy == 0.0: metabolizable_energy = 15.625
         if previous_DMI == 0.0: previous_DMI = 10.0
         if nutrient_conc and nutrient_conc['dm'] != 0.0:
-            NDF_conc = nutrient_conc['NDF']
-            TDN_conc = nutrient_conc['TDN']
+            NDF_conc = nutrient_conc['NDF'] / 100
+            TDN_conc = nutrient_conc['TDN'] / 100
             net_energy_diet_concentration = (metabolizable_energy * 0.64)/previous_DMI
         else:
             NDF_conc = 0.3
