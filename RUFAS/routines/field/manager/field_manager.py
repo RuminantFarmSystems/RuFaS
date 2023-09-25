@@ -26,6 +26,7 @@ class FieldManager:
     def __init__(self, manure_manager: ManureManager):
         self.fields: List[Field] = []
         fields = FieldManager._get_field_blob_names()
+        print(im.get_data("soil.CN2"))
         for field in fields:
             new_field = self._setup_field(field, manure_manager)
             self.fields.append(new_field)

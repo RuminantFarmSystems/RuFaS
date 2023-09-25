@@ -1667,3 +1667,15 @@ def test_get_metadata_raises_exception(dummy_metadata_path: str,
                                 f"\"{expected_error_parent_address}\" does not have attribute " \
                                 f"\"{expected_error_invalid_key}\"."
         assert add_error.call_count == expected_warning_call_count
+
+
+def test_flush_pools(mock_input_manager: InputManager) -> None:
+    """Tests that the InputManager pool is flushed correctly."""
+
+    mock_input_manager._InputManager__pool = {"values in": "pool"}
+
+    with patch("RUFAS.output_manager.OutputManager.add_log") as add_log:
+        mock_input_manager.flush_pools()
+
+        assert mock_input_manager._InputManager__pool == {}
+        assert add_log.call_count == 1
