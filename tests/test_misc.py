@@ -505,13 +505,13 @@ def test_dict_to_file_csv_exception(mock_output_manager: OutputManager) -> None:
 
 
 def test_save_variables_to_csv_files_exceptions(
-    mock_output_manager: OutputManager,
-    mocker: MockerFixture
+    mock_output_manager: OutputManager
 ) -> None:
     """Unit test for the function _save_variables_to_csv_files() in the file output_manager.py"""
-    mocker.patch("pathlib.Path.mkdir", side_effect=IOError)
-    with raises(Exception):
-        mock_output_manager._save_variables_to_csv_files({}, "test_dir")
+    invalid_path = '/invalid/directory'
+
+    with pytest.raises((PermissionError, OSError)):
+        mock_output_manager._save_variables_to_csv_files({}, 'filter', invalid_path)
 
 
 def test_generate_key(mocker: MockerFixture) -> None:
