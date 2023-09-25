@@ -1007,7 +1007,7 @@ def test_cycle_water(field_size: float, rainfall: float, runoff: float, high_wat
                                cumulative_transpiration=219.2, cumulative_potential_evapotranspiration=480.1,
                                total_water_uptake=3.25)
         crop_2 = Crop(crop_data_2)
-        current_weather = CurrentWeather(incoming_light=light, min_air_temperature=min_temp, rainfall=rainfall,
+        current_weather = CurrentWeather(incoming_light=light, min_air_temperature=min_temp, precipitation=rainfall,
                                          max_air_temperature=max_temp, mean_air_temperature=mean_temp)
         field_data = FieldData(field_size=field_size, current_residue=residue,
                                seasonal_high_water_table=high_water_table)
