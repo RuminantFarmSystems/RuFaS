@@ -1354,12 +1354,6 @@ class AnimalManager:
                 ration_report={}
                 ration_report['nutrient_amount'] = nutrient_amount
                 ration_report['nutrient_conc'] = nutrient_conc
-
-                # if pen.animal_combination != Pen.AnimalCombination.CALF:
-                #     ration_supply_report = ration_driver.ration_supply(ration_per_animal, feed.available_feeds, ration_report, pen.avg_nutrient_rqmts['avg_BW'])
-                #     info_map = {"class": self.__class__.__name__,
-                #     "function": self._calc_ration_at_interval.__name__}
-                #     om.add_variable(f'ration_supply_report for {pen.id}', ration_supply_report, info_map)
                     
                 for animal in pen.animals_in_pen:
                     animal.set_ration(ration_per_animal, nutrient_amount['dm'])
