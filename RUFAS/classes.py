@@ -172,6 +172,7 @@ class Weather:
             config: instance of the Config class containing information necessary
                 to initialize the Weather object
         """
+
         years = config.years
         w_start_year = config.w_start_year
         w_start_day = config.w_start_day

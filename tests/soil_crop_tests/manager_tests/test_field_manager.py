@@ -41,13 +41,13 @@ def test_field_manager_init(field_blob_names) -> None:
 
 @pytest.mark.parametrize("year,day,expected", [
     (1, 3, CurrentWeather(incoming_light=3, min_air_temperature=3, mean_air_temperature=3, max_air_temperature=3,
-                          annual_mean_air_temperature=2.1, rainfall=3, irrigation=3, daylength=15.5)),
+                          annual_mean_air_temperature=2.1, precipitation=3, irrigation=3, daylength=15.5)),
     (2, 1, CurrentWeather(incoming_light=4, min_air_temperature=4, mean_air_temperature=4, max_air_temperature=4,
-                          annual_mean_air_temperature=2.1, rainfall=4, irrigation=4, daylength=15.5)),
+                          annual_mean_air_temperature=2.1, precipitation=4, irrigation=4, daylength=15.5)),
     (3, 2, CurrentWeather(incoming_light=8, min_air_temperature=8, mean_air_temperature=8, max_air_temperature=8,
-                          annual_mean_air_temperature=2.1, rainfall=8, irrigation=8, daylength=15.5))
+                          annual_mean_air_temperature=2.1, precipitation=8, irrigation=8, daylength=15.5))
 ])
-def test_create_current_weather(year: int, day: int, expected) -> None:
+def test_create_current_weather(year: int, day: int, expected: CurrentWeather) -> None:
     """Tests that current weather objects are correctly created from a time and weather object."""
     weather = MagicMock()
     setattr(weather, "radiation", [[1, 2, 3], [4, 5, 6], [7, 8, 9]])
@@ -66,6 +66,34 @@ def test_create_current_weather(year: int, day: int, expected) -> None:
 
     assert actual == expected
     CurrentWeather.determine_daylength.assert_called_once()
+
+
+@pytest.mark.parametrize("year, day, snow_fall, rainfall, expected", [
+    (1, 1, 0, 1, CurrentWeather(incoming_light=1, min_air_temperature=1, mean_air_temperature=1, max_air_temperature=1,
+                                annual_mean_air_temperature=1, precipitation=1, irrigation=1,
+                                daylength=8.5)),
+    (1, 2, 0, 2, CurrentWeather(incoming_light=1, min_air_temperature=1, mean_air_temperature=0, max_air_temperature=1,
+                                annual_mean_air_temperature=1, precipitation=2, irrigation=1,
+                                daylength=8.5)),
+    (1, 3, 3, 0, CurrentWeather(incoming_light=1, min_air_temperature=1, mean_air_temperature=-1, max_air_temperature=1,
+                                annual_mean_air_temperature=1, precipitation=3, irrigation=1,
+                                daylength=8.5))
+])
+def test_current_weather_snowfall(year: int, day: int, snow_fall: int, rainfall: int, expected: CurrentWeather) -> None:
+    weather = MagicMock()
+    setattr(weather, "radiation", [[1, 2, 3]])
+    setattr(weather, "T_min", [[1, 2, 3]])
+    setattr(weather, "T_avg", [[1, 0, -1]])
+    setattr(weather, "T_max", [[1, 2, 3]])
+    setattr(weather, "T_avg_annual", [1])
+    setattr(weather, "rainfall", [[1, 2, 3]])
+    setattr(weather, "irrigation", [[1, 2, 3]])
+    CurrentWeather.determine_daylength = MagicMock(return_value=8.5)
+    time = MagicMock()
+    setattr(time, "year", year)
+    setattr(time, "day", day)
+    assert expected.snow_fall == snow_fall
+    assert expected.rainfall == rainfall
 
 
 @pytest.mark.parametrize("year, day, expected_month", [

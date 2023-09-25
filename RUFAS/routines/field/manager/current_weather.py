@@ -30,6 +30,16 @@ class CurrentWeather:
     rainfall: float = 0.0
     """amount of rainfall that occurs on the day (mm)"""
     irrigation: float = 0.0
+    """amount of irrigation that is applied to the field on that day (mm)"""
+    precipitation: float = 0.0
+    """amount of precipitation that occurs on the day (mm)"""
+
+    def __post_init__(self):
+        """Sets precipitation as snow_fall or rainfall depending on mean air temperature"""
+        if self.mean_air_temperature >= 0:
+            self.rainfall = self.precipitation
+        else:
+            self.snow_fall = self.precipitation
 
     @staticmethod
     def determine_daylength(month: int) -> int:
