@@ -5,9 +5,9 @@ from typing import Dict, List, Any
 
 import matplotlib
 
-matplotlib.use('TkAgg')
 import matplotlib.pyplot as pyplt
 from matplotlib.figure import Figure
+matplotlib.use('TkAgg')
 
 om_pool_element_type = Dict[str, List[Dict[str, Any]]]
 
@@ -18,7 +18,8 @@ class GraphGenerator:
     NOTE: This class is not multi-thread safe!!!
     """
 
-    def generate_graph(self, filtered_pool: Dict[str, om_pool_element_type], graph_info: Dict[str, str], save_path: str, filter_file_name: str, **kwargs):
+    def generate_graph(self, filtered_pool: Dict[str, om_pool_element_type], graph_info: Dict[str, str], save_path: str,
+                       filter_file_name: str, **kwargs):
         """
         Function to generate graph. This function will route the input to the correct function according to the type
         of graph.

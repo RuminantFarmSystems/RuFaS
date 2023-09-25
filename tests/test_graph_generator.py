@@ -4,23 +4,21 @@ File name: test_graph_generator.py
 Description: Implements test cases for the GraphGenerator class
 Author(s): Allister Liu, al2562@cornell.edu
 """
-import datetime
 import os
 from pathlib import Path
 
-from freezegun import freeze_time
-
-import pytest
-from mock.mock import MagicMock, patch, call
 import matplotlib
+import matplotlib.axes
+import matplotlib.figure
+import matplotlib.pyplot as plt
+import pytest
+from freezegun import freeze_time
+from mock.mock import MagicMock, patch, call
 
 import RUFAS
+from RUFAS.graph_generator import GraphGenerator
 
 matplotlib.use('TkAgg')
-import matplotlib.pyplot as plt
-import matplotlib.figure, matplotlib.axes
-
-from RUFAS.graph_generator import GraphGenerator
 
 
 @pytest.fixture
@@ -203,8 +201,7 @@ def test_bar_graph(mock_graph_generator: GraphGenerator,
                 "dummy\\path",
                 {
                     "graph_type": "Line Graph",
-                    "filter": ["dummy.variable"],
-                    "title": "Dummy Variable"
+                    "filter": ["dummy.variable"]
                 },
                 "dummy_filter"
         )
@@ -235,3 +232,50 @@ def test_generate_graph_path(mock_graph_generator: GraphGenerator,
 
     mock_graph_generator._generate_graph_path = graph_generator_original_states["_generate_graph_path"]
 
+
+# @pytest.mark.parametrize(
+#     "fig_ax, graph_info",
+#     [
+#         (
+#                 plt.subplots(),
+#                 {
+#                     "graph_type": "Line Graph",
+#                     "filter": ["dummy.variable"],
+#                     "title": "Dummy Variable",
+#                     "x_label": "Dummy x",
+#                     "y_label": "Dummy y",
+#                     "legend": "Dummy legend",
+#                 }
+#         ),
+#         # (
+#         #         matplotlib.figure.Figure(),
+#         #         {
+#         #             "graph_type": "Line Graph",
+#         #             "filter": ["dummy.variable"],
+#         #             "title": "Dummy Variable"
+#         #         }
+#         # )
+#     ]
+# )
+# def test_customize_graph(mock_graph_generator: GraphGenerator,
+#                          fig_ax: matplotlib.figure.Figure,
+#                          graph_info: dict) -> None:
+#     mock_graph_generator._customize_graph = MagicMock()
+#
+#     mock_fig = MagicMock(spec=matplotlib.figure.Figure)
+#     mock_ax = MagicMock(spec=matplotlib.axes.Axes)
+#     mock_set_title = MagicMock(spec=matplotlib.axes.Axes.set_title)
+#     mock_set_xlabel = MagicMock()
+#     mock_set_ylabel = MagicMock()
+#     mock_legend = MagicMock()
+#
+#     # (fig, ax) = fig_ax
+#     # ax.plot([1, 2, 3])
+#     # print(fig.axes)
+#
+#     with patch.object(matplotlib.axes.Axes, "set_title", mock_set_title):
+#         # print(fig.axes[0].set_title)
+#         mock_graph_generator._customize_graph(mock_fig, graph_info)
+#
+#     # mock_set_title.assert_called_with(graph_info['title'])
+#     mock_set_title.assert_called()
