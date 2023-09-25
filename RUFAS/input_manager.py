@@ -408,8 +408,12 @@ class InputManager:
         info_map = {"class": self.__class__.__name__,
                     "function": self._array_type_validator.__name__,
                     }
-        if input_data_value is None:
-            warning_string = "Array is NoneType."
+        # TODO: This conditional should only pass if the input data is a list, not if it is a dict. Currently this is
+        #   prevented by two inputs that are specified as arrays in their respective properties sections but are still
+        #   in the form of dictionaries in the input files: pen_information in the animal input and soil_layers in the
+        #   soil profile input. soil_layers is fixed in #774, pen_information does not have a fix plan right now.
+        if type(input_data_value) is not list and type(input_data_value) is not dict:
+            warning_string = "Array is not a list."
             om.add_warning(warning_string, f"{var_name=}", info_map)
             return False
 
@@ -437,8 +441,8 @@ class InputManager:
                     }
         minimum_value = variable_properties.get("minimum")
         maximum_value = variable_properties.get("maximum")
-        if input_data_value is None:
-            warning_string = "Value is NoneType."
+        if type(input_data_value) is not float and type(input_data_value) is not int:
+            warning_string = "Value is not a number."
             om.add_warning(warning_string, f"{var_name=}", info_map)
             return False
         if minimum_value is not None:
@@ -461,8 +465,8 @@ class InputManager:
         info_map = {"class": self.__class__.__name__,
                     "function": self._string_type_validator.__name__,
                     }
-        if input_data_value is None:
-            warning_string = "String variable is NoneType."
+        if type(input_data_value) is not str:
+            warning_string = "String variable is not a string."
             om.add_warning(warning_string, f"{var_name=}", info_map)
             return False
 
@@ -582,6 +586,8 @@ class InputManager:
         element_hierarchy = data_address.split('.')
 
         try:
+            # if data_address == "weather":
+            #     print("here")
             data_value = reduce(lambda d, key: d[key], element_hierarchy,
                                 self.__pool)
             return deepcopy(data_value)
