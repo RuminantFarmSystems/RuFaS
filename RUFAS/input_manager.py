@@ -409,7 +409,7 @@ class InputManager:
                     "function": self._array_type_validator.__name__,
                     }
         if input_data_value is None:
-            warning_string = f"Array is NoneType."
+            warning_string = "Array is NoneType."
             om.add_warning(warning_string, f"{var_name=}", info_map)
             return False
 
@@ -438,7 +438,7 @@ class InputManager:
         minimum_value = variable_properties.get("minimum")
         maximum_value = variable_properties.get("maximum")
         if input_data_value is None:
-            warning_string = f"Value is NoneType."
+            warning_string = "Value is NoneType."
             om.add_warning(warning_string, f"{var_name=}", info_map)
             return False
         if minimum_value is not None:
@@ -462,7 +462,7 @@ class InputManager:
                     "function": self._string_type_validator.__name__,
                     }
         if input_data_value is None:
-            warning_string = f"String variable is NoneType."
+            warning_string = "String variable is NoneType."
             om.add_warning(warning_string, f"{var_name=}", info_map)
             return False
 
