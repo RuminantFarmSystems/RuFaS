@@ -13,7 +13,7 @@ from typing import Tuple
 from RUFAS.general_constants import GeneralConstants
 from RUFAS.routines.animal.manure.general_manure import AnimalManureExcretions
 from RUFAS.routines.animal.manure.general_manure import calculate_phosphorus_excretion_values
-from RUFAS.routines.animal.ration.ration_driver import ration_report
+from RUFAS.routines.animal.ration.ration_driver import RationReporter
 from RUFAS.routines.animal.animal_module_constants import AnimalModuleConstants
 
 def methane_mitigation(NDF_concentration: float,
@@ -116,7 +116,7 @@ def manure_calculations(ration_formulation,
             in the AnimalManureExcretions class definition.
 
     """
-    nutrient_amounts, nutrient_concentrations = ration_report(
+    nutrient_amounts, nutrient_concentrations = RationReporter.report_ration(
         ration_formulation, feed.available_feeds)
     dry_matter_intake = nutrient_amounts['dm']
     ASH_diet_content = nutrient_amounts['ash']

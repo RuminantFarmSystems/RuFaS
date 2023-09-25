@@ -40,7 +40,7 @@ def test_growing_heifer_manure_calculations(methane_model: str,
         'EE': EE_concentration
     }
     patch_for_ration_report = mocker.patch(
-        'RUFAS.routines.animal.manure.growing_heifer_manure_excretion.ration_report',
+        'RUFAS.routines.animal.manure.growing_heifer_manure_excretion.RationReporter.report_ration',
         return_value=(mock_nutrient_amounts, mock_nutrient_concentrations)
     )
 
