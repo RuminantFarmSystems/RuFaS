@@ -32,6 +32,7 @@ jobs:
       run: |
         echo "FILES=$( echo ${{ steps.files.outputs.added_modified }} | tr " " "\n" | grep -E "\.py$" )" >> "$GITHUB_ENV"
     - name: Lint with flake8
+      if: ${{ env.FILES != '' }}
       run: |
         # stop the build if there are Python syntax errors or undefined names
         flake8 ${{ env.FILES }}
