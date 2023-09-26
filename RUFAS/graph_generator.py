@@ -71,7 +71,7 @@ class GraphGenerator:
         except Exception as e:
             raise e
 
-        timestamp: str = datetime.datetime.now().strftime(f"%d-%b-%Y_%a_%H-%M-%S")
+        timestamp: str = datetime.datetime.now().strftime("%d-%b-%Y_%a_%H-%M-%S")
 
         if 'title' in graph_info.keys():
             title = '-'.join(graph_info['title'].split()).lower()
