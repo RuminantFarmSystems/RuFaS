@@ -1,33 +1,26 @@
 """
 RUFAS: Ruminant Farm Systems Model
-File name: animal_base.py
-Author(s): Manfei Li, mli497@wisc.edu
-           Militsa Sotirova, militsasotrirova@gmail.com
-           Tayler Hansen, tlhansen@cornell.edu
-Description: This file initialize common parameters including ID, breed,
-birth date, and age for all animals to be identified.
+----------------------------------
+
+File Name: animal_base.py
+
+Authors:
+    - Manfei Li: mli497@wisc.edu
+    - Militsa Sotirova: militsasotrirova@gmail.com
+    - Tayler Hansen: tlhansen@cornell.edu
+
+Description:
+    This file initializes common parameters including ID, breed, birth date,
+    and age for all animals to be identified.
 """
-###############################################################################
 
+from RUFAS.routines.animal.animal_typed_dicts import AnimalBaseInitArgsTypedDict
 from RUFAS.routines.animal.life_cycle.animal_events import AnimalEvents
+from RUFAS.routines.animal.life_cycle.body_weight_history import BodyWeightHistory
+from RUFAS.routines.animal.life_cycle.pen_history import PenHistory
 
 
-class PenHistory:
-    def __init__(self, start, end, pen, classes_in_pen):
-        self.start_date = start
-        self.end_date = end
-        self.pen = pen
-        self.classes_in_pen = classes_in_pen
-
-
-class BodyWeightHistory:
-    def __init__(self, sim_day, days_born, body_weight):
-        self.simulation_day = sim_day
-        self.days_born = days_born
-        self.body_weight = body_weight
-
-
-class AnimalBase(object):
+class AnimalBase:
     config = {}
     nutrients = None
 
@@ -39,7 +32,7 @@ class AnimalBase(object):
     def set_config(config):
         AnimalBase.config = config
 
-    def __init__(self, args):
+    def __init__(self, args: AnimalBaseInitArgsTypedDict):
         """
         Initializes common parameters for all animals
         Args:
@@ -59,7 +52,6 @@ class AnimalBase(object):
         self.birth_date = args['birth_date']
         self.days_born = args['days_born']
         self.semen_used = self.config['semen_type']
-
         self.culled = False
         self.do_not_breed = False
         self.body_weight_history = []
@@ -72,7 +64,7 @@ class AnimalBase(object):
         self.manure_excretion = {}
         self.ration_formulation = {'objective': 0.00}
         self.DMIest = 0
-        #self.DBW = 0
+        self.DBW = 0
         self.p_animal = 0
         self.p_intake = 0
         self.p_conc_ration = 0
@@ -89,7 +81,6 @@ class AnimalBase(object):
         self.conceptus_weight = 0
         self.calf_birth_weight = 0
         self.tissue_changed = 0
-
         if 'body_weight_history' in args:
             self.body_weight_history = args['body_weight_history']
             self.pen_history = args['pen_history']
@@ -146,7 +137,7 @@ class AnimalBase(object):
 
         # amount of P in the animal (A.1G.A.3)
         self.p_animal = self.p_animal + self.p_gest + self.p_growth + \
-            (self.dP_reserves - dP_reserves_prev)
+                        (self.dP_reserves - dP_reserves_prev)
 
     def calc_base_manure(self):
         """
@@ -163,17 +154,15 @@ class AnimalBase(object):
         # excess P in the diet (g) (A.1G.A.1)
         self.p_excess = max(self.p_intake - self.p_req, 0)
 
-
         # amount of P excreted by an animal (g) (A.1G.B.2)
         if self.dP_reserves == 0 and self.p_intake >= self.p_req:
             p_feces_excrt = self.p_intake - self.p_req + self.p_maint_feces
         elif self.dP_reserves < 0 and self.p_intake >= self.p_req and \
                 self.p_excess >= (-1) * self.dP_reserves / 0.7:
             p_feces_excrt = self.p_intake - self.p_req + self.p_maint_feces + \
-                self.dP_reserves / 0.7
+                            self.dP_reserves / 0.7
         else:
             p_feces_excrt = self.p_maint_feces
-
 
         return p_urine, p_feces_excrt
 
@@ -183,7 +172,6 @@ class AnimalBase(object):
         """
         # (A.1G.C.1) from P tracking
         self.p_animal = 0.0072 * self.body_weight * 1000
-        
 
     def update_pen_history(self, curr_pen, curr_day, classes_in_pen):
         """

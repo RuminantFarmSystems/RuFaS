@@ -5,53 +5,123 @@ from RUFAS.general_constants import GeneralConstants
 
 
 class AnimalManureExcretions(TypedDict):
-    """A TypedDict class that specifies the structure of the dictionary of animal manure excretion values.
+    """A TypedDict class that specifies the structure of the dictionary of animal manure excretion values."""
 
-    """
     urea: float
-    """Concentration of urea in manure, g/L."""
+    """Concentration of urea in manure (g/L)."""
 
     urine: float
-    """Amount of urine excreted, kg."""
+    """Amount of urine excreted (kg)."""
 
     total_ammoniacal_nitrogen_concentration: float
-    """Concentration of total ammoniacal manure_nitrogen in the manure slurry, g/L."""
+    """Concentration of total ammoniacal manure_nitrogen in the manure slurry (g/L)."""
 
     urine_nitrogen: float
-    """Amount of nitrogen in urine, kg."""
+    """Amount of nitrogen in urine (kg)."""
 
     manure_nitrogen: float
-    """Amount of nitrogen in manure, kg."""
+    """Amount of nitrogen in manure (kg)."""
 
     manure_mass: float
-    """Amount of manure, kg."""
+    """Amount of manure (kg)."""
 
     total_solids: float
-    """Amount of total solids, kg."""
+    """Amount of total solids (kg)."""
 
     degradable_volatile_solids: float
-    """Amount of degradable volatile solids, kg."""
+    """Amount of degradable volatile solids (kg)."""
 
     non_degradable_volatile_solids: float
-    """Amount of non-degradable volatile solids, kg."""
+    """Amount of non-degradable volatile solids (kg)."""
 
     inorganic_phosphorus_fraction: float
-    """Fraction of water extractable inorganic phosphorus, unitless."""
+    """Fraction of water extractable inorganic phosphorus (unitless)."""
 
     organic_phosphorus_fraction: float
-    """Fraction of water extractable organic phosphorus, unitless."""
+    """Fraction of water extractable organic phosphorus (unitless)."""
+
+    non_water_inorganic_phosphorus_fraction: float
+    """Fraction of non-water extractable inorganic phosphorus (unitless)."""
+
+    non_water_organic_phosphorus_fraction: float
+    """Fraction of non-water extractable organic phosphorus (unitless)."""
 
     phosphorus: float
-    """Amount of phosphorus excreted in manure, g."""
+    """Amount of phosphorus excreted in manure (g)."""
 
     phosphorus_fraction: float
-    """Fraction of phosphorus in manure, unitless."""
+    """Fraction of phosphorus in manure (unitless)."""
 
     potassium: float
-    """Amount of potassium in manure, g."""
+    """Amount of potassium in manure (g)."""
 
     methane: float
-    """Amount of methane emissions, g/day."""
+    """Amount of methane emissions (g/day)."""
+
+
+def get_default_animal_manure_excretions() -> AnimalManureExcretions:
+    """
+    Get a default AnimalManureExcretions object.
+
+    Returns
+    -------
+    AnimalManureExcretions
+        Default AnimalManureExcretions object.
+
+    """
+
+    return AnimalManureExcretions(
+        urea=0.0,
+        urine=0.0,
+        total_ammoniacal_nitrogen_concentration=0.0,
+        urine_nitrogen=0.0,
+        manure_nitrogen=0.0,
+        manure_mass=0.0,
+        total_solids=0.0,
+        degradable_volatile_solids=0.0,
+        non_degradable_volatile_solids=0.0,
+        inorganic_phosphorus_fraction=0.0,
+        organic_phosphorus_fraction=0.0,
+        non_water_inorganic_phosphorus_fraction=0.0,
+        non_water_organic_phosphorus_fraction=0.0,
+        phosphorus=0.0,
+        phosphorus_fraction=0.0,
+        potassium=0.0,
+        methane=0.0
+    )
+
+
+def add_animal_manure_excretions(first: AnimalManureExcretions, second: AnimalManureExcretions) \
+        -> AnimalManureExcretions:
+    """
+    Add two AnimalManureExcretions objects together.
+
+    Parameters
+    ----------
+    first : AnimalManureExcretions
+        First AnimalManureExcretions object.
+    second : AnimalManureExcretions
+        Second AnimalManureExcretions object.
+
+    Returns
+    -------
+    AnimalManureExcretions
+        Sum of the two AnimalManureExcretions objects.
+
+    """
+
+    data = {}
+    for key in first:
+        data[key] = first[key] + second[key]
+    return AnimalManureExcretions(**data)
+
+
+def scalar_mult_animal_manure_excretions(manure: AnimalManureExcretions, scalar: float) \
+        -> AnimalManureExcretions:
+    data = {}
+    for key in manure:
+        data[key] = manure[key] * scalar
+    return AnimalManureExcretions(**data)
 
 
 def calculate_phosphorus_excretion_values(daily_milk_production: float,
@@ -88,8 +158,11 @@ def calculate_phosphorus_excretion_values(daily_milk_production: float,
 
     """
     # P fraction of manure (A.3.A.1)
-    manure_phosphorus_fraction = (fecal_phosphorus + urine_phosphorus_required) / (
-            total_manure_excreted * GeneralConstants.KG_TO_GRAMS)
+    if total_manure_excreted > 0:
+        manure_phosphorus_fraction = (fecal_phosphorus + urine_phosphorus_required) / (
+                total_manure_excreted * GeneralConstants.KG_TO_GRAMS)
+    else:
+        manure_phosphorus_fraction = 0.0
 
     # Water extractable Inorganic P (WIP) fraction - fraction of manure
     # compromised of inorganic water extractable P [A.3.A.2]

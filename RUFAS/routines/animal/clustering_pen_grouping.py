@@ -5,7 +5,7 @@ File name: clustering_pen_grouping.py
 Description: This file's main function is grouping(list, pens) (line 44) which
     returns a Dictionary of lists of cows, with the key being the pen those cows
     are assigned to based on nutritional requirements. This function is called
-    in animal_management.py for each ration cycle if there are more than 7 pens
+    in animal_manager.py for each ration cycle if there are more than 7 pens
     in the input (>=2 pens for lactating cows). Based on algorithm developed by
     Jorge Barrientos (jab924@cornell.edu).
 Author(s): Chris VanKerkhove, cjv47@cornell.edu
@@ -20,7 +20,7 @@ from scipy.stats import percentileofscore
 
 def norm(x):
     """
-        Helper function to normalize a list of values and returnthat normalized
+        Helper function to normalize a list of values and return that normalized
         list.
 
         Args:
@@ -59,7 +59,7 @@ def grouping(cow_list, pens, stocking_density):
 
         Args:
             cow_list: a list of lactating cows
-            pens: the number of pens allocated for lactating cows
+            pens: a list of pens allocated for lactating
             stocking_density: The required stocking density to group all cows
     """
 
@@ -129,13 +129,13 @@ def grouping(cow_list, pens, stocking_density):
     # Create a list of percentile partitions for grouping
     key = 0
     for pen in pens:
-        #filling pens based on input stocking density
-        index[key] = (round(pen.num_stalls*stocking_density +0.5) / num_cows) + index[(key - 1)]
+        # filling pens based on input stocking density
+        index[key] = (round(pen.num_stalls * stocking_density + 0.5) / num_cows) + index[(key - 1)]
         if index[key] > 1:
             index[key] = 1
         key += 1
 
-     # list of pen assignments to be added to the data frame
+    # list of pen assignments to be added to the data frame
     pen_assignment = []
     percentile = rank_data['percentile'].to_list()
 

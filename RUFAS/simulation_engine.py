@@ -7,17 +7,18 @@ from pathlib import Path
 import config.global_variables
 from RUFAS import routines, errors
 from RUFAS.classes import Config, State, Weather, Time
-from RUFAS.output_handler import OutputHandler
 from RUFAS.output_manager import OutputManager
+from RUFAS.input_manager import InputManager
 import random
 import numpy
 from typing import Optional
 
-from RUFAS.routines.manure.manure_management import simulate_daily_manure_management
+from RUFAS.routines.manure.manure_manager import simulate_daily_manure_manager
 from RUFAS.util import Utility
 
 
 om = OutputManager()
+im = InputManager()
 
 
 class SimulationEngine:
@@ -37,7 +38,6 @@ class SimulationEngine:
         t_start_sim = timer.time()
 
         self._run_simulation_main_loop()
-        self.output.finalize(self.state, self.weather, self.time)
         t_end_sim = timer.time()
 
         print("Simulation Successful")
@@ -49,7 +49,6 @@ class SimulationEngine:
         if config.global_variables.PRODUCE_GRAPHICS:
             sys.stdout.write('Producing Graphics\n')
             t_start_graphics = timer.time()
-            self.output.produce_graphics()
             t_end_graphics = timer.time()
             graphics_prod_time = t_end_graphics - t_start_graphics
         else:
@@ -79,19 +78,13 @@ class SimulationEngine:
 
     def _daily_simulation(self) -> None:
         """Executes the daily simulation routines."""
-
         routines.daily_animal_routine(
-            self.state.animal_management, self.state.feed, self.weather, self.time)
-        routines.daily_manure_storage_routine(
-            self.state.manure_storage, self.state.animal_management)
-        simulate_daily_manure_management(
-            self.state.manure_management, self.state.animal_management)
-        routines.daily_fields_routine(
-            self.state.fields, self.state.manure_storage, self.weather, self.time)
-        routines.daily_feed_routine(self.state.feed, self.state.fields, self.state.animal_management,
-                                    self.output.reports['feed_storage_report'])
+            self.state.animal_manager, self.state.feed, self.weather, self.time)
+        simulate_daily_manure_manager(
+            self.state.manure_manager, self.state.animal_manager)
+        self.state.field_manager.daily_update_routine(self.weather, self.time)
+        routines.daily_feed_routine(self.state.feed, self.state.field_manager, self.state.animal_manager)
 
-        self.output.daily_update(self.state, self.weather, self.time)
         self._advance_time()
 
     def _advance_time(self, print_day: Optional[bool] = False) -> None:
@@ -108,11 +101,10 @@ class SimulationEngine:
                        simulating_day_log,
                        info_map)
         self.time.advance()
-        self.state.animal_management.simulation_day += 1
+        self.state.animal_manager.simulation_day += 1
 
     def _run_pre_annual_routines(self) -> None:
         """TODO GitHub issue #137"""
-        routines.annual_fields_routine(self.state.fields, self.time)
         routines.annual_feed_routine(self.state.feed)
 
     def _run_post_annual_routines(self) -> None:
@@ -121,9 +113,6 @@ class SimulationEngine:
         Flushes the data in the output object
         Resets the state for the following year"""
         self.state.annual_mass_balance(self.time)
-        self.output.annual_updates(self.state, self.weather, self.time)
-        self.output.write_annual_reports()
-        self.output.annual_flushes()
         self.state.annual_reset()
         self.time.advance()
 
@@ -161,31 +150,26 @@ class SimulationEngine:
             file_path (Path): Path to the input json file
 
         Raises:
-            InvalidJSONFile: If the json file at the given path does not conform 
+            InvalidJSONFile: If the json file at the given path does not conform
             with the format required
         """
         print(f"Initializing simulation environment from {file_path}")
 
         try:
-            data = Utility.read_json_file(file_path)
-            self.config = Config(data['config'], data['weather'])
+            data_config = im.get_data('config')
+            data_weather = im.get_data('weather')
+            self.config = Config(data_config, data_weather)
 
             if self.config.set_seed:
                 random.seed(self.config.seed)
                 numpy.random.seed(self.config.seed)
 
-            self.weather = Weather(data['weather'], self.config)
+            self.weather = Weather(data_weather, self.config)
             self.time = Time(self.config)
-            self.state = State(data['farm'], self.config,
+            self.state = State(self.config,
                                self.weather, self.time)
-            self.output = OutputHandler(Utility.read_json_file(
-                Utility.get_base_dir() / 'input/output' / data['output']), self.state)
 
         except errors.JSONfileData as e:
             print(
                 f"JSON FILE ERROR: {file_path.name}\n\t{e.section} Section\n{e.msg}\n")
             raise errors.InvalidJSONfile(file_path.name)
-
-        self.output.initialize_dir(
-            self.config.csv_dir, self.config.graphic_dir)
-        self.output.initialize_reports()

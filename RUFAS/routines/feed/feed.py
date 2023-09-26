@@ -19,14 +19,17 @@ from . import nitrogen_loss, carbon_loss, protein_degradation
 from .feed_typed_dicts import PurchasedFeedTypedDict
 from ..animal.pen import Pen
 from ...database_reader import DatabaseReader
-from RUFAS.output_handler.reports.feed_storage_report import StorageReport
 from RUFAS.output_manager import OutputManager
 from typing import Dict, List, Union
 
 om = OutputManager()
 
+from RUFAS.routines.animal.ration.user_defined_ration import \
+    UserDefinedRationManager as UserDefinedRationManager
 
-def daily_feed_routine(feed, fields, animal_management, feed_report):
+udrm = UserDefinedRationManager()
+
+def daily_feed_routine(feed, fields, animal_manager):
     """
     Description:
         Executes the functions that run the daily feed routines for both storage
@@ -35,17 +38,14 @@ def daily_feed_routine(feed, fields, animal_management, feed_report):
     Args:
         feed: an instance of the Feed object
         fields: an instance of the Field object (contains harvest information)
-        animal_management: an instance of the AnimalManagement object
-        feed_report: an instance of the FeedStorageReport class defined in
-            RUFAS.output_handler.reports.feed_storage_report.py. Included here
-            in order to add generated storage receptacles to the feed storage report.
+        animal_manager: an instance of the AnimalManager object
     """
 
     # feed storage routines to be run daily
-    feed.daily_feed_storage(fields, feed_report)
+    feed.daily_feed_storage(fields)
 
     # feed management routines to be run daily
-    feed.daily_feed_management(animal_management)
+    feed.daily_feed_management(animal_manager)
 
 
 def annual_feed_routine(feed):
@@ -67,10 +67,13 @@ class Feed:
         self.feed_quality_table = data['feed_quality_table']
         self.nutrient_table = data['nutrient_table']
         self.db_reader = DatabaseReader(self.feed_database)
+        purchased_feeds_list = [feed_item["purchased_feed"] for feed_item in data["purchased_feeds"]]
+        purchased_feed_costs = {str(feed_item["purchased_feed"]): feed_item["purchased_feed_cost"]
+                                for feed_item in data["purchased_feeds"]}
 
         self.entries_split_by_maturity = self.get_feeds_split_by_maturity()
         self.farm_grown_feeds = data['farm_grown_feeds']
-        self.purchased_feeds = self.get_quality_specific_purchased_feed_ids(data['purchased_feeds'])
+        self.purchased_feeds = self.get_quality_specific_purchased_feed_ids(purchased_feeds_list)
 
         self.input_feed_combinations = {
             Pen.AnimalCombination.CALF: set(self.get_quality_specific_purchased_feed_ids(data['calf_feeds'])),
@@ -82,7 +85,7 @@ class Feed:
             Pen.AnimalCombination.LAC_COW: set(self.get_quality_specific_purchased_feed_ids(data['lac_cow_feeds'])),
         }
 
-        self.all_feed_ids = self.get_all_feed_units(data['purchased_feeds'], data['farm_grown_feeds'])
+        self.all_feed_ids = self.get_all_feed_units(purchased_feeds_list, data['farm_grown_feeds'])
 
         # dictionary of nutrients needed for this run
         # initially, this only contains information for purchased feeds as none
@@ -91,8 +94,8 @@ class Feed:
             self.get_nutrient_vals(self.purchased_feeds, False)
         self.calf_feeds = self.get_calf_feeds()
         # setting up the feed costs based on the input
-        self.feed_costs = data['purchased_feeds_costs']
-        self.feed_costs = self.get_quality_specific_feed_costs(data['purchased_feeds'])
+        self.feed_costs = purchased_feed_costs
+        self.feed_costs = self.get_quality_specific_feed_costs(purchased_feeds_list)
 
         # The nutrient requirements used in the ration calculations.
         self.nutrient_rqmts = ['FU', 'RU', 'ME_DM', 'RDP_DM', 'RUP_DM']
@@ -100,8 +103,8 @@ class Feed:
         # Storage receptacles managed by the feed module
         self.storage_options = {}
 
-        for storage_name, storage_data in data['storage_options'].items():
-            self.storage_options[storage_name] = self.Storage(storage_data)
+        for count, storage_option in enumerate(data['storage_options']):
+            self.storage_options[f"storage_option_{count}"] = self.Storage(storage_option)
 
         self.available_storage = dict(self.storage_options)
         self.standard_storage_count = 0
@@ -121,6 +124,25 @@ class Feed:
         # a list of storage objects with new crops
         self.new_forages = []
 
+        # Loading in user-defined ration values
+        self.user_defined_ration_percentages = data['user_defined_ration_percentages']
+
+        udrm.calf_ration = {str(dict['feed_type']):dict['ration_percentage'] for 
+                            dict in self.user_defined_ration_percentages['calf']}
+
+        udrm.growing_ration = {str(dict['feed_type']):dict['ration_percentage'] for 
+                            dict in self.user_defined_ration_percentages['growing']}
+        
+        udrm.close_up_ration = {str(dict['feed_type']):dict['ration_percentage'] for 
+                            dict in self.user_defined_ration_percentages['close_up']}
+
+        udrm.lactating_cow_ration = {str(dict['feed_type']):dict['ration_percentage'] for 
+                            dict in self.user_defined_ration_percentages['lac_cow']}
+
+        udrm.tolerance = self.user_defined_ration_percentages['tolerance']
+
+        udrm.milk_reduction_maximum = self.user_defined_ration_percentages['milk_reduction_maximum']
+         
     def summarize_feed_storage(self):
         """
         Description:
@@ -437,7 +459,7 @@ class Feed:
             self.__init__(reset_data)
 
     @staticmethod
-    def required_inventory(storage, animal_management):
+    def required_inventory(storage, animal_manager):
         """
         Description:
             Computes the required inventory necessary across all animals for a
@@ -449,18 +471,18 @@ class Feed:
 
         Args:
             storage: a storage object that contains forage being assessed
-            animal_management: the class object Animal Management which tracks
+            animal_manager: the class object Animal Manager which tracks
             the state of the animals
         """
         # animals = dictionary with animals as keys and animal objects as values
-        animals = {'calves': animal_management.calves,
-                   'heiferIs': animal_management.heiferIs,
-                   'heiferIIs': animal_management.heiferIIs,
-                   'heiferIIIs': animal_management.heiferIIIs
+        animals = {'calves': animal_manager.calves,
+                   'heiferIs': animal_manager.heiferIs,
+                   'heiferIIs': animal_manager.heiferIIs,
+                   'heiferIIIs': animal_manager.heiferIIIs
                    }
         lactating_cows = []
         dry_cows = []
-        for cow in animal_management.cows:
+        for cow in animal_manager.cows:
             if cow.milking:
                 lactating_cows.append(cow)
             else:
@@ -669,7 +691,7 @@ class Feed:
                     storage.DMI_forage_max['lactating_cows'] = available_forage \
                                                                / storage.cow_days['lactating_cows']
 
-    def daily_feed_storage(self, fields, feed_report):
+    def daily_feed_storage(self, fields):
         """
         Description:
             Executes daily routines relating to crop and feed storage, which
@@ -681,13 +703,13 @@ class Feed:
 
         Args:
             fields : an instance of the Field object (contains harvest information)
-            feed_report: an instance of the BaseReport object defined in
-                output_hanler/base_report.py. Included here so that new storage
-                can be added to output.
         """
         # aggregate crop yield across fields
+        return
+
         for field in fields.fields.values():
-            crop = field.crop.current_crop
+            name = list(field.crop.current_crop.keys())[0]
+            crop = field.crop.current_crop[name]
             # there is forage to be stored
             if crop.yield_actual != 0:
                 stored = False
@@ -728,11 +750,6 @@ class Feed:
                         standard_name = 'standard_storage_' + str(self.standard_storage_count)
                         self.available_storage[standard_name] = self.Storage(standard_data)
                         self.storage_options[standard_name] = self.available_storage[standard_name]
-                        report = feed_report.reports[standard_name] = StorageReport(feed_report.storage_report_data,
-                                                                                    standard_name)
-                        report.initialize_dir(feed_report.csv_dir, feed_report.graphic_dir)
-
-                        report.initialize()
 
                         self.standard_storage_count += 1
 
@@ -750,7 +767,7 @@ class Feed:
 
             self.summarize_feed_storage()
 
-    def daily_feed_management(self, animal_management):
+    def daily_feed_management(self, animal_manager):
         """
         Description:
             Executes daily routines relating to feed management, specifically a
@@ -760,14 +777,14 @@ class Feed:
             called.
 
         Args:
-            animal_management: The state of the AnimalManagement class object
+            animal_manager: The state of the AnimalManager class object
         """
         # Daily feedout for silos with farm grown forages in them per pen based
         # on ration formulated
         feeds_fed = []
         for key, silo in self.storage_options.items():
             if silo.days_since_feedout >= 0 and silo.DM > 0:
-                for pen in animal_management.all_pens:
+                for pen in animal_manager.all_pens:
                     if silo.feed_key in pen.ration and silo.feed_key not in \
                             feeds_fed:
                         if (silo.DM - pen.ration[silo.feed_key]) > 0:
@@ -783,13 +800,13 @@ class Feed:
                 silo.days_since_feedout += 1
         # inventory plan for new forages
         # if it is the day before the ration interval will be calculated
-        ration_interval = ((animal_management.simulation_day + 1) %
-                           animal_management.formulation_interval) == 1 or animal_management.formulation_interval == 1
+        ration_interval = ((animal_manager.simulation_day + 1) %
+                           animal_manager.formulation_interval) == 1 or animal_manager.formulation_interval == 1
         for silo in self.new_forages:
             if silo.days_since_feedout >= -1 and ration_interval and \
                     silo.feed_id != 'null':
                 silo.forage_quality_assessment(self)
-                self.required_inventory(silo, animal_management)
+                self.required_inventory(silo, animal_manager)
                 self.forage_inventory_plan(silo)
                 self.add_to_available_feeds([silo.feed_id], [silo.DM_percent],
                                             [silo.NDF_percent])
