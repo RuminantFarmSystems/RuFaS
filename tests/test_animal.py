@@ -1882,27 +1882,65 @@ def test_get_NE_lactation():
 
 def test_get_NE_growth():
     """ Unit test for function get_NE_growth in file routines/animal/ration/ration_driver.py"""
+    
+    # patch in get_ME return
     pass
 
-def test_get_Calcium():
+from RUFAS.routines.animal.ration.ration_driver import RationReporter
+@pytest.mark.parametrize("kg_fed,feed_item_info,ration_report,body_weight,expected", [
+    (1,{'type': 'Forage', 'calcium': 1},'dummy_variable','dummy_variable', 0.003),
+    (1,{'type': 'Conc', 'calcium': 1},'dummy_variable','dummy_variable', 0.006),
+    (1,{'type': 'Mineral', 'calcium': 1},'dummy_variable','dummy_variable', 0.0095),
+    (1,{'type': 'Forage', 'calcium': 0},'dummy_variable','dummy_variable', 0.000),
+])
+def test_get_calcium(kg_fed, feed_item_info, ration_report, body_weight, expected):
     """ Unit test for function get_Calcium in file routines/animal/ration/ration_driver.py"""
-    pass
+    actual = RationReporter.get_calcium(kg_fed, feed_item_info, ration_report, body_weight)
+    assert np.isclose(actual, expected, rtol=1e-3)
 
-def test_get_phosphorus():
+@pytest.mark.parametrize("kg_fed,feed_item_info,ration_report,body_weight,expected", [
+    (1,{'type': 'Forage', 'phosphorus': 1},'dummy_variable','dummy_variable', 0.0064),
+    (1,{'type': 'Conc', 'phosphorus': 1},'dummy_variable','dummy_variable', 0.007),
+    (1,{'type': 'Mineral', 'phosphorus': 1},'dummy_variable','dummy_variable', 0.008),
+    (1,{'type': 'Forage', 'phosphorus': 0},'dummy_variable','dummy_variable', 0.000),
+])
+def test_get_phosphorus(kg_fed, feed_item_info, ration_report, body_weight, expected):
     """ Unit test for function get_phosphorus in file routines/animal/ration/ration_driver.py"""
-    pass
+    actual = RationReporter.get_phosphorus(kg_fed, feed_item_info, ration_report, body_weight)
+    assert np.isclose(actual, expected, rtol=1e-3)
 
-def test_get_fat():
+@pytest.mark.parametrize("kg_fed,feed_item_info,ration_report,body_weight,expected", [
+    (1,{'EE': 1},'dummy_variable','dummy_variable', 1),
+    (1,{'EE': 2},'dummy_variable','dummy_variable', 2),
+    (2,{'EE': 2},'dummy_variable','dummy_variable', 4),
+    (1,{'EE': 0},'dummy_variable','dummy_variable', 0.0),
+])
+def test_get_fat(kg_fed, feed_item_info, ration_report, body_weight, expected):
     """ Unit test for function get_fat in file routines/animal/ration/ration_driver.py"""
-    pass
-
-def test_get_fat_percentage():
+    actual = RationReporter.get_fat(kg_fed, feed_item_info, ration_report, body_weight)
+    assert np.isclose(actual, expected, rtol=1e-3)
+    
+@pytest.mark.parametrize("kg_fed,feed_item_info,ration_report,body_weight,expected", [
+    (1,{'EE': 1},{'nutrient_amount':{'dm': 100}},'dummy_variable', 0.01),
+    (1,{'EE': 2},{'nutrient_amount':{'dm': 1}},'dummy_variable', 2),
+    (2,{'EE': 2},{'nutrient_amount':{'dm': 100}},'dummy_variable', 0.04),
+    (1,{'EE': 0},{'nutrient_amount':{'dm': 100}},'dummy_variable', 0.0),
+])
+def test_get_fat_percentage(kg_fed, feed_item_info, ration_report, body_weight, expected):
     """ Unit test for function get_fat_percentage in file routines/animal/ration/ration_driver.py"""
-    pass
+    actual = RationReporter.get_fat_percentage(kg_fed, feed_item_info, ration_report, body_weight)
+    assert np.isclose(actual, expected, rtol=1e-3)
 
-def test_get_forage_NDF():
+@pytest.mark.parametrize("kg_fed,feed_item_info,ration_report,body_weight,expected", [
+    (1,{'type': 'Forage', 'NDF': 1},'dummy_variable','dummy_variable', 1),
+    (1,{'type': 'Conc', 'NDF': 2},'dummy_variable','dummy_variable', 0.0),
+    (1,{'type': 'Forage', 'NDF': 0},'dummy_variable','dummy_variable', 0.0),
+    (1,{'type': 'Mineral', 'NDF': 0},'dummy_variable','dummy_variable', 0.0),
+])
+def test_get_forage_NDF(kg_fed, feed_item_info, ration_report, body_weight, expected):
     """ Unit test for function get_forage_NDF in file routines/animal/ration/ration_driver.py"""
-    pass
+    actual = RationReporter.get_forage_NDF(kg_fed, feed_item_info, ration_report, body_weight)
+    assert np.isclose(actual, expected, rtol=1e-3)
 
 def test_get_metabolizable_protein():
     """ Unit test for function get_metabolizable_protein in file routines/animal/ration/ration_driver.py"""
