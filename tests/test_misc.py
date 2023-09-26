@@ -79,7 +79,7 @@ def patch_simulation_engine(mocker: MockerFixture) -> SimulationEngine:
     """Returns a mocked SimulationEngine"""
     mocker.patch("RUFAS.simulation_engine.SimulationEngine._initialize_simulation")
 
-    sim_eng = SimulationEngine("dummy_path")
+    sim_eng = SimulationEngine()
     sim_eng.config = MagicMock()
     sim_eng.weather = MagicMock()
     sim_eng.time = MagicMock()
@@ -90,7 +90,7 @@ def patch_simulation_engine(mocker: MockerFixture) -> SimulationEngine:
 
 def test_init_simulation_engine(patch_simulation_engine: SimulationEngine) -> None:
     """Unit test for function __init__ in file RUFAS/simulation_engine.py"""
-    patch_simulation_engine._initialize_simulation.assert_called_once_with("dummy_path")
+    patch_simulation_engine._initialize_simulation.assert_called_once()
 
 
 def test_simulate(patch_simulation_engine: SimulationEngine, mocker: MockerFixture) -> None:

@@ -2,19 +2,16 @@
 
 import sys
 import time as timer
-from pathlib import Path
 
 import config.global_variables
-from RUFAS import routines, errors
+from RUFAS import routines
 from RUFAS.classes import Config, State, Weather, Time
 from RUFAS.output_manager import OutputManager
 from RUFAS.input_manager import InputManager
+from RUFAS.routines.manure.manure_manager import simulate_daily_manure_manager
 import random
 import numpy
 from typing import Optional
-
-from RUFAS.routines.manure.manure_manager import simulate_daily_manure_manager
-from RUFAS.util import Utility
 
 
 om = OutputManager()
@@ -23,13 +20,8 @@ im = InputManager()
 
 class SimulationEngine:
 
-    def __init__(self, input_file_path: Path) -> None:
-        """
-        Args:
-            input_file_path (Path): Path to the json file that contains all the input
-                parameters to the simulation. Passed to read_json_file().
-        """
-        self._initialize_simulation(input_file_path)
+    def __init__(self) -> None:
+        self._initialize_simulation()
 
     def simulate(self) -> None:
         """Executes the simulation"""
@@ -139,37 +131,19 @@ class SimulationEngine:
 
         self._run_post_annual_routines()
 
-    def _initialize_simulation(self, file_path: Path) -> None:
-        """Reads the json file, writes information to the simulation variables.
-
-        Reads and interprets the (json) file at the given path. Compiles the
-        information into dictionaries and instantiates the simulation objects with
+    def _initialize_simulation(self) -> None:
+        """Requests data from the Input Manager pool to compile the
+        information into dictionaries and instantiate the simulation objects with
         them. Assigns the objects to the global simulation variables.
-
-        Args:
-            file_path (Path): Path to the input json file
-
-        Raises:
-            InvalidJSONFile: If the json file at the given path does not conform
-            with the format required
         """
-        print(f"Initializing simulation environment from {file_path}")
+        data_config = im.get_data('config')
+        data_weather = im.get_data('weather')
+        self.config = Config(data_config, data_weather)
 
-        try:
-            data_config = im.get_data('config')
-            data_weather = im.get_data('weather')
-            self.config = Config(data_config, data_weather)
+        if self.config.set_seed:
+            random.seed(self.config.seed)
+            numpy.random.seed(self.config.seed)
 
-            if self.config.set_seed:
-                random.seed(self.config.seed)
-                numpy.random.seed(self.config.seed)
-
-            self.weather = Weather(data_weather, self.config)
-            self.time = Time(self.config)
-            self.state = State(self.config,
-                               self.weather, self.time)
-
-        except errors.JSONfileData as e:
-            print(
-                f"JSON FILE ERROR: {file_path.name}\n\t{e.section} Section\n{e.msg}\n")
-            raise errors.InvalidJSONfile(file_path.name)
+        self.weather = Weather(data_weather, self.config)
+        self.time = Time(self.config)
+        self.state = State(self.config, self.weather, self.time)
