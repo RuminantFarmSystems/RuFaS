@@ -49,6 +49,7 @@ class Percolation:
             else:
                 layer_below = self.data.vadose_zone_layer
 
+
             # check for percolation conditions
             can_percolate = self._determine_if_percolation_allowed(layer_below.water_content,
                                                                    layer_below.field_capacity_content,
