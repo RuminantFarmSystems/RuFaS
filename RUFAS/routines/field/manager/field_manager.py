@@ -392,10 +392,17 @@ class FieldManager:
         Soil
             Soil instance that contains a SoilData instance configured to the provided specifications.
 
+        Raises
+        ------
+        ValueError
+            If no specification is provided for soil layers.
+
         """
         soil_configuration_data = im.get_data(soil_configuration)
         residue = soil_configuration_data["initial_residue"]
         soil_layers_config = soil_configuration_data.get("soil_layers")
+        if soil_layers_config is None:
+            raise ValueError("Configuration for soil layers must be provided.")
         soil_layers_config.sort(key=lambda x: x.get("bottom_depth"))
         soil_layers = []
         for index, layer_config in enumerate(soil_layers_config):

@@ -26,8 +26,8 @@ def test_field_manager_init(field_blob_names) -> None:
     expected_field_setup_calls = [call(field_name, mocked_manure_manager) for field_name in field_blob_names]
     with patch("RUFAS.routines.field.manager.field_manager.FieldManager._get_field_blob_names",
                return_value=field_blob_names) as patched_field_blob_names, \
-        patch("RUFAS.routines.field.manager.field_manager.FieldManager._setup_field", return_value=MagicMock(Field)) \
-            as patched_field_setup:
+            patch("RUFAS.routines.field.manager.field_manager.FieldManager._setup_field",
+                  return_value=MagicMock(Field)) as patched_field_setup:
         field_manager = FieldManager(mocked_manure_manager)
 
         assert len(field_manager.fields) == len(field_blob_names)
@@ -236,42 +236,43 @@ def test_annual_update_routine(fields: List[Field]):
                            surface_remainder_fractions=[1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0],
                            pattern_repeat=0,
                            pattern_skip=0)
-     ), ({
-            "available_fertilizer_mixes": [
-                {
-                    "name": "barnyard_fert",
-                    "N": 0.4,
-                    "P": 0.2,
-                    "K": 0.1
-                }
-            ],
-            "mix_names": ["barnyard_fert"],
-            "years": [2010],
-            "days": [200],
-            "nitrogen_masses": [1000],
-            "phosphorus_masses": [5],
-            "potassium_masses": [400],
-            "application_depths": [0.0],
-            "surface_remainder_fractions": [1.0],
-            "pattern_repeat": 0,
-            "pattern_skip": 0
-        }, {
-            "barnyard_fert": {
-                "N": 0.4,
-                "P": 0.2,
-                "K": 0.1
-            }
-        }, FertilizerSchedule(name="fertilizer_schedule",
-                              mix_names=["barnyard_fert"],
-                              years=[2010],
-                              days=[200],
-                              nitrogen_masses=[1000],
-                              phosphorus_masses=[5],
-                              application_depths=[0.0],
-                              surface_remainder_fractions=[1.0],
-                              pattern_repeat=0,
-                              pattern_skip=0)
-    )
+     ),
+    ({
+         "available_fertilizer_mixes": [
+             {
+                 "name": "barnyard_fert",
+                 "N": 0.4,
+                 "P": 0.2,
+                 "K": 0.1
+             }
+         ],
+         "mix_names": ["barnyard_fert"],
+         "years": [2010],
+         "days": [200],
+         "nitrogen_masses": [1000],
+         "phosphorus_masses": [5],
+         "potassium_masses": [400],
+         "application_depths": [0.0],
+         "surface_remainder_fractions": [1.0],
+         "pattern_repeat": 0,
+         "pattern_skip": 0
+     }, {
+         "barnyard_fert": {
+             "N": 0.4,
+             "P": 0.2,
+             "K": 0.1
+         }
+     }, FertilizerSchedule(name="fertilizer_schedule",
+                           mix_names=["barnyard_fert"],
+                           years=[2010],
+                           days=[200],
+                           nitrogen_masses=[1000],
+                           phosphorus_masses=[5],
+                           application_depths=[0.0],
+                           surface_remainder_fractions=[1.0],
+                           pattern_repeat=0,
+                           pattern_skip=0)
+     )
 ])
 def test_setup_fertilizer_schedule(fertilizer_schedule_data: Dict, expected_available_mixes: Dict,
                                    expected_schedule: FertilizerSchedule) -> None:
@@ -760,6 +761,37 @@ def test_setup_soil(soil_configuration: Dict) -> None:
         assert actual_soil.data.albedo == soil_configuration.get("albedo")
         assert len(actual_soil.data.soil_layers) == len(soil_configuration.get("soil_layers")) + 1
         patched_get_data.assert_called_once_with("test_soil_setup")
+
+
+@pytest.mark.parametrize("soil_configuration,error_message", [
+    ({
+         "second_moisture_condition_parameter": 85.00,
+         "average_subbasin_slope": 0.02,
+         "slope_length": 3,
+         "manning_roughness_coefficient": 0.4,
+         "support_practice_factor": 0.08,
+         "albedo": 0.16,
+         "soil_evaporation_compensation_coefficient": 0.95,
+         "initial_residue": 0,
+     }, "Configuration for soil layers must be provided."),
+    ({
+         "second_moisture_condition_parameter": 85.00,
+         "average_subbasin_slope": 0.02,
+         "slope_length": 3,
+         "manning_roughness_coefficient": 0.4,
+         "support_practice_factor": 0.08,
+         "albedo": 0.16,
+         "soil_evaporation_compensation_coefficient": 0.95,
+         "initial_residue": 0,
+         "soil_layers": None
+     }, "Configuration for soil layers must be provided.")
+])
+def test_setup_soil_error(soil_configuration: dict, error_message: str) -> None:
+    """Tests that errors are raised correctly when invalid soil configurations are passed."""
+    with pytest.raises(ValueError) as e, \
+            patch("RUFAS.input_manager.InputManager.get_data", return_value=soil_configuration):
+        FieldManager._setup_soil("soil_config", 1.3)
+    assert str(e.value) == error_message
 
 
 @pytest.mark.parametrize("blobs,expected", [
