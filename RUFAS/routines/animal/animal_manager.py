@@ -224,17 +224,23 @@ class AnimalManager:
             Cow: self.cows
         }
 
-    def init_pens(self, all_pen_data, herd_data: Dict[str, Any], manure_management_scenarios):
+    def init_pens(self, all_pen_data: list, herd_data: Dict[str, Any], manure_management_scenarios) -> None:
         """
         Populates the list of pens with the information from the input json file.
-        Args:
-            all_pen_data: dictionary containing information about the pens
-            herd_data: dictionary containing information about the herd
-            manure_management_scenarios: dictionary containing information about the manure management scenarios
+
+        Parameters
+        ----------
+            all_pen_data: list[dict[str, Any]]
+                List containing information about the pens.
+            herd_data: Dict[str, Any]
+                Dictionary containing information about the herd.
+            manure_management_scenarios:
+                Dictionary containing information about the manure management scenarios.
+
         """
 
         # Initialize pens from all_pen_data
-        for pen_data in all_pen_data.values():
+        for pen_data in all_pen_data:
             pen_data['pen_id'] = pen_data.pop('id')
             pen_data['animal_combination'] = Pen.AnimalCombination[pen_data.pop('animal_combination')]
 
