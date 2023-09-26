@@ -7,6 +7,7 @@ import json
 import os
 import pandas as pd
 import re
+from deprecated.sphinx import deprecated
 
 from RUFAS.util import Utility
 from RUFAS.graph_generator import GraphGenerator
@@ -217,7 +218,9 @@ class OutputManager(object):
         28-Jun-2023_Wed_15-48-21
         """
         base_timestamp_str: str = "%d-%b-%Y_%a_%H-%M-%S"
-        timestamp_format_string: str = f"{base_timestamp_str}.%f" if include_millis else base_timestamp_str
+        timestamp_format_string: str = (
+            f"{base_timestamp_str}.%f" if include_millis else base_timestamp_str
+        )
         return datetime.datetime.now().strftime(timestamp_format_string)
 
     def _generate_key(self, name: str, info_map: Dict[str, Union[str, bool]]) -> str:
@@ -295,9 +298,10 @@ class OutputManager(object):
         serialized dictionary using the max_depth parameter.
 
         """
-        info_map = {"class": self.__class__.__name__,
-                    "function": self._dict_to_file_json.__name__,
-                    }
+        info_map = {
+            "class": self.__class__.__name__,
+            "function": self._dict_to_file_json.__name__,
+        }
         self.add_log("save_dict_file_try", f"Attempting to save to {path}.", info_map)
         try:
             with open(path, "w") as json_file:
@@ -306,11 +310,15 @@ class OutputManager(object):
                     json_file,
                     indent=0,
                 )
-                self.add_log("save_dict_file_success", f"Successfully saved to {path}.", info_map)
+                self.add_log(
+                    "save_dict_file_success", f"Successfully saved to {path}.", info_map
+                )
         except Exception as e:
             raise e
 
-    def _dict_to_csv_column_list(self, variable_name: str, data_dict: Dict[str, List[Any]]) -> List[pd.Series]:
+    def _dict_to_csv_column_list(
+        self, variable_name: str, data_dict: Dict[str, List[Any]]
+    ) -> List[pd.Series]:
         """Turns a dictionary to a list of csv columns.
 
         Parameters
@@ -327,22 +335,35 @@ class OutputManager(object):
 
         """
         column_list = []
-        mandatory_fields = ["values", "info_maps"] if "info_maps" in data_dict else ["values"]
+        mandatory_fields = (
+            ["values", "info_maps"] if "info_maps" in data_dict else ["values"]
+        )
         for field in mandatory_fields:
             data_list = data_dict[field]
             if data_list and isinstance(data_list[0], dict):
-                csv_column_lists: Dict[str, List[Any]] = {subkey: [] for item in data_list for subkey in item.keys()}
+                csv_column_lists: Dict[str, List[Any]] = {
+                    subkey: [] for item in data_list for subkey in item.keys()
+                }
                 for nested_dictionary in data_list:
                     for subkey, value in nested_dictionary.items():
                         csv_column_lists[subkey].append(value)
 
                 for subkey in csv_column_lists.keys():
-                    column_title = f"{variable_name}.{field}_{subkey}" if field == "info_maps" else \
-                        f"{variable_name}.{subkey}"
-                    column_list.append(pd.Series(csv_column_lists[subkey], dtype=object, name=column_title))
+                    column_title = (
+                        f"{variable_name}.{field}_{subkey}"
+                        if field == "info_maps"
+                        else f"{variable_name}.{subkey}"
+                    )
+                    column_list.append(
+                        pd.Series(
+                            csv_column_lists[subkey], dtype=object, name=column_title
+                        )
+                    )
             else:
                 column_title = f"{variable_name}.{field}"
-                column_list.append(pd.Series(data_list, dtype=object, name=column_title))
+                column_list.append(
+                    pd.Series(data_list, dtype=object, name=column_title)
+                )
 
         return column_list
 
@@ -357,19 +378,26 @@ class OutputManager(object):
             The path to the file to be saved.
 
         """
-        info_map = {"class": self.__class__.__name__,
-                    "function": self._dict_to_file_csv.__name__,
-                    }
+        info_map = {
+            "class": self.__class__.__name__,
+            "function": self._dict_to_file_csv.__name__,
+        }
         self.add_log("save_dict_file_try", f"Attempting to save to {path}.", info_map)
 
         if len(data_dict) == 0:
-            self.add_log("save_dict_file_try", f"Nothing to save to {path}. Data dictionary is empty.", info_map)
+            self.add_log(
+                "save_dict_file_try",
+                f"Nothing to save to {path}. Data dictionary is empty.",
+                info_map,
+            )
             return
 
         csv_columns = []
         for variable_name in data_dict.keys():
             variable_data = data_dict[variable_name]
-            csv_column_data = self._dict_to_csv_column_list(variable_name, variable_data)
+            csv_column_data = self._dict_to_csv_column_list(
+                variable_name, variable_data
+            )
             csv_columns.extend(csv_column_data)
 
         df = pd.concat(csv_columns, axis=1)
@@ -393,14 +421,17 @@ class OutputManager(object):
         Exception
             If an error occurs while saving to the file
         """
-        info_map = {"class": self.__class__.__name__,
-                    "function": self._list_to_file_txt.__name__,
-                    }
+        info_map = {
+            "class": self.__class__.__name__,
+            "function": self._list_to_file_txt.__name__,
+        }
         self.add_log("save_txt_file_try", f"Attempting to save to {path}.", info_map)
         try:
             with open(path, "w") as var_names_file:
                 var_names_file.writelines(data_list)
-                self.add_log("save_txt_file_success", f"Successfully saved to {path}.", info_map)
+                self.add_log(
+                    "save_txt_file_success", f"Successfully saved to {path}.", info_map
+                )
         except Exception as e:
             raise e
 
@@ -411,8 +442,10 @@ class OutputManager(object):
         timestamp: str = self._get_timestamp(include_millis=False)
         return f"{base_name}_{timestamp}.{extension}"
 
-    def _exclude_info_maps(self, pool: Dict[str, pool_element_type]) -> Dict[str, pool_element_type]:
-        """ Makes a copy of the given pool and removes info_maps from it.
+    def _exclude_info_maps(
+        self, pool: Dict[str, pool_element_type]
+    ) -> Dict[str, pool_element_type]:
+        """Makes a copy of the given pool and removes info_maps from it.
 
         Returns
         -------
@@ -431,7 +464,11 @@ class OutputManager(object):
         info_map = {"class": self.__class__.__name__,
                     "function": self._list_txt_and_json_files_in_dir.__name__,
                     }
-        self.add_log("search_path_for_filenames_try", f"Attempting to search in {dir_path}.", info_map)
+        self.add_log(
+            "search_path_for_filenames_try",
+            f"Attempting to search in {dir_path}.",
+            info_map,
+        )
         dir_path_check = Path(dir_path)
         if dir_path_check.is_dir():
             filter_files = []
@@ -439,8 +476,12 @@ class OutputManager(object):
             for filename in all_files:
                 if filename.endswith(".txt") or filename.endswith(".json"):
                     filter_files.append(filename)
-            self.add_log("search_path_for_filenames_success", f"Successfully searched in {dir_path}"
-                         f" and found {len(filter_files)} txt and json files.", info_map)
+            self.add_log(
+                "search_path_for_filenames_success",
+                f"Successfully searched in {dir_path}"
+                f" and found {len(filter_files)} text files.",
+                info_map,
+            )
             return filter_files
         else:
             raise NotADirectoryError("The specified path must be a directory")
@@ -486,8 +527,9 @@ class OutputManager(object):
         except Exception as e:
             raise e
 
-    def _filter_variables_pool(self, filter_patterns: List[str], input_file_name: Optional[str]
-                               ) -> Dict[str, pool_element_type]:
+    def _filter_variables_pool(
+        self, filter_patterns: List[str], input_file_name: Optional[str]
+    ) -> Dict[str, pool_element_type]:
         """
         Returns a filtered variables pool based on either inclusion or exclusion.
 
@@ -513,30 +555,47 @@ class OutputManager(object):
         as inclusionary.
 
         """
-        info_map = {"class": self.__class__.__name__,
-                    "function": self._filter_variables_pool.__name__,
-                    }
+        info_map = {
+            "class": self.__class__.__name__,
+            "function": self._filter_variables_pool.__name__,
+        }
         exclude_keyword_location = 0
         exclude_keyword = "exclude"
-        filter_by_exclusion = filter_patterns and filter_patterns[exclude_keyword_location] == exclude_keyword
+        filter_by_exclusion = (
+            filter_patterns
+            and filter_patterns[exclude_keyword_location] == exclude_keyword
+        )
         if filter_by_exclusion:
-            filter_vars_msg = f"{input_file_name} has exclude-keyword '{exclude_keyword}' at"\
+            filter_vars_msg = (
+                f"{input_file_name} has exclude-keyword '{exclude_keyword}' at"
                 f" position {exclude_keyword_location}. Performing filtering by exclusion."
-            filter_pattern_matches = {key: self.variables_pool[key] for key in self.variables_pool.keys() if not
-                                      any(re.match(pattern, key) for pattern in filter_patterns)}
+            )
+            filter_pattern_matches = {
+                key: self.variables_pool[key]
+                for key in self.variables_pool.keys()
+                if not any(re.match(pattern, key) for pattern in filter_patterns)
+            }
         else:
-            filter_vars_msg = f"{input_file_name} does NOT contain exclude-keyword '{exclude_keyword}'"\
+            filter_vars_msg = (
+                f"{input_file_name} does NOT contain exclude-keyword '{exclude_keyword}'"
                 f" at position {exclude_keyword_location}. Performing filtering by inclusion."
-            filter_pattern_matches = {key: self.variables_pool[key] for key in self.variables_pool.keys() if
-                                      any(re.match(pattern, key) for pattern in filter_patterns)}
+            )
+            filter_pattern_matches = {
+                key: self.variables_pool[key]
+                for key in self.variables_pool.keys()
+                if any(re.match(pattern, key) for pattern in filter_patterns)
+            }
         self.add_log("filtering_log", filter_vars_msg, info_map)
-        filter_log_count_msg = f"There were {len(filter_pattern_matches)} matches for the {len(filter_patterns)}"\
+        filter_log_count_msg = (
+            f"There were {len(filter_pattern_matches)} matches for the {len(filter_patterns)}"
             f" filter patterns in the {input_file_name} file."
+        )
         self.add_log("num_filter_pattern_matches", filter_log_count_msg, info_map)
         return filter_pattern_matches
 
-    def save_variables(self, save_path: str, dir_path: str,
-                       exclude_info_maps: bool = False) -> None:
+    def save_variables(
+        self, save_path: str, dir_path: str, exclude_info_maps: bool = False
+    ) -> None:
         """
         Reads a text file containing a list of keys and filters the variables pool by those keys.
         Saves resulting data pool to a json file in the given path to a directory.
@@ -556,7 +615,11 @@ class OutputManager(object):
         info_map = {"class": self.__class__.__name__,
                     "function": self.save_variables.__name__,
                     }
-        self.add_log("exclude_info_maps", f"exclude_info_maps flag set to {exclude_info_maps}", info_map)
+        self.add_log(
+            "exclude_info_maps",
+            f"exclude_info_maps flag set to {exclude_info_maps}",
+            info_map,
+        )
         graph_generator = GraphGenerator()
         list_of_filter_files = self._list_txt_and_json_files_in_dir(dir_path)
         for filter_file in list_of_filter_files:
@@ -567,20 +630,31 @@ class OutputManager(object):
                 filtered_pool = self._exclude_info_maps(filtered_pool)
 
             if filter_file.startswith("json_"):
-                file_path = os.path.join(save_path, self._generate_file_name(f"saved_variables_{filter_file}", "json"))
+                file_path = os.path.join(
+                    save_path,
+                    self._generate_file_name(f"saved_variables_{filter_file}", "json"),
+                )
                 self._dict_to_file_json(filtered_pool, file_path)
             elif filter_file.startswith("csv_"):
                 csv_directory = os.path.join(save_path, "CSVs", "om")
-                self._save_variables_to_csv_files(filtered_pool, filter_file, csv_directory)
+                self._save_variables_to_csv_files(
+                    filtered_pool, filter_file, csv_directory
+                )
             elif filter_file.startswith("graph_"):
                 try:
                     graph_generator.generate_graph(filtered_pool, graph_info, save_path, filter_file)
                 except Exception as e:
                     self.add_error("graph generation exception", str(e), info_map)
             else:
-                self.add_warning("invalid filter file", f"{filter_file} must be prefixed with csv_ or json_", info_map)
+                self.add_warning(
+                    "invalid filter file",
+                    f"{filter_file} must be prefixed with csv_ or json_",
+                    info_map,
+                )
 
-    def _save_variables_to_csv_files(self, data_dict: Dict[str, Any], filter_name: str, path: str) -> None:
+    def _save_variables_to_csv_files(
+        self, data_dict: Dict[str, Any], filter_name: str, path: str
+    ) -> None:
         """
         Saves the variables_pool into one csv file per variable in the given path to a directory.
 
@@ -599,9 +673,16 @@ class OutputManager(object):
         except Exception as e:
             raise e
 
-        variable_csv_file_path = os.path.join(path, self._generate_file_name(f"saved_variables_{filter_name}", "csv"))
+        variable_csv_file_path = os.path.join(
+            path, self._generate_file_name(f"saved_variables_{filter_name}", "csv")
+        )
         self._dict_to_file_csv(data_dict, variable_csv_file_path)
 
+    @deprecated(
+        reason="""This function is still in the code base but it is not used. We want to keep it for debugging purposes
+        when save_variables() is not working.""",
+        version="MVP",
+    )
     def dump_variables(self, path: str, exclude_info_maps: bool = False) -> None:
         """
         Dumps variables_pool into a json file in the given path to a directory.
@@ -619,7 +700,9 @@ class OutputManager(object):
         if exclude_info_maps:
             pool = self._exclude_info_maps(self.variables_pool)
 
-        json_file_path = os.path.join(path, self._generate_file_name("all_variables", "json"))
+        json_file_path = os.path.join(
+            path, self._generate_file_name("all_variables", "json")
+        )
         self._dict_to_file_json(pool, json_file_path)
 
     def dump_logs(self, path: str) -> None:
@@ -715,15 +798,16 @@ class OutputManager(object):
         )
         self._list_to_file_txt(var_list, file_path)
 
-    def dump_all_pools(self, path: str, exclude_info_maps: bool = False) -> None:
+    def dump_all_nondata_pools(
+        self, path: str, exclude_info_maps: bool = False
+    ) -> None:
         """
-        dumps all pool into the given path to a directory.
+        Dumps all non-data pools into the given path to a directory.
         """
-        self.dump_variables(path, exclude_info_maps)
         self.dump_variable_names_and_contexts(path, exclude_info_maps)
-        self.dump_errors(path)
         self.dump_logs(path)
         self.dump_warnings(path)
+        self.dump_errors(path)
 
     def flush_pools(self) -> None:
         """

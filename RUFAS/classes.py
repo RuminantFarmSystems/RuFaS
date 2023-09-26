@@ -10,16 +10,12 @@ Author(s): Kass Chupongstimun, kass_c@hotmail.com
            Jacob Johnson, jacob8399@gmail.com
 """
 
-import csv
-
-from RUFAS import errors
 from RUFAS.input_manager import InputManager
 from RUFAS.output_manager import OutputManager
 from RUFAS.routines import Feed
 from RUFAS.routines.field.manager.field_manager import FieldManager
 from RUFAS.routines.animal.animal_manager import AnimalManager
 from RUFAS.routines.manure.manure_manager import ManureManager
-from RUFAS.util import Utility
 
 im = InputManager()
 om = OutputManager()
@@ -83,10 +79,6 @@ class Config:
                 under "config"
             weather_file: path to the weather file specified in the json file
         """
-
-        info_map = {"class": self.__class__.__name__,
-                    "function": self.__init__.__name__,
-                    "config_data": data, }
 
         # gets a start/end date in the format year:julian-day. That way the program
         # can start in the middle of the year
@@ -178,10 +170,6 @@ class Weather:
             config: instance of the Config class containing information necessary
                 to initialize the Weather object
         """
-
-        info_map = {"class": self.__class__.__name__,
-                    "function": self.__init__.__name__,
-                    "weather_config": vars(config), }
 
         years = config.years
         w_start_year = config.w_start_year

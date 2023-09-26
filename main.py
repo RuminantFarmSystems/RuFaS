@@ -70,7 +70,7 @@ def execute_simulations_from_files(
         simulator = SimulationEngine(input_file_path)
         simulator.simulate()
         output_manager.save_variables(r"output", r"output/output_filters/", exclude_info_maps)
-        output_manager.dump_all_pools(r"output", exclude_info_maps)
+        output_manager.dump_all_nondata_pools(r"output", exclude_info_maps)
 
 
 def parse_gnu_args():
