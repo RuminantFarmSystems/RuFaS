@@ -1860,16 +1860,10 @@ def test_report_ration_supplyy():
     """ Unit test for function report_ration_supply in file routines/animal/ration/ration_driver.py"""
     pass
 
-@pytest.mark.parametrize("dP_reserves,p_intake,p_req,expected",
-                          [(0,1,0,0),(-10,10,1, -3.7),(10,10,1,0)]
-                          )
 def test_get_TDN_discount():
     """ Unit test for function get_TDN_discount in file routines/animal/ration/ration_driver.py"""
     pass
 
-@pytest.mark.parametrize("kg_fed, feed_item_info, ration_report, body_weight, expected", [(1,{'DE': 1},0,0, 0),
-                                                                                          (-10,10,1, -3.7, 0),
-                                                                                          (10,10,1,0, 0)] )
 def test_get_DE():
     """ Unit test for function get_DE in file routines/animal/ration/ration_driver.py"""
     pass
