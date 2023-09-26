@@ -796,7 +796,7 @@ class AvailableFeeds:
 
         for key, feed in available_feeds.items():
             self.feed_key.append(key)
-            self.feed_id.append(feed['feed_id'])
+            self.feed_id.append(feed['rufas_id'])
             self.price.append(feed_costs[str(key)])
             self.TDN.append(feed['TDN'])
             self.DE.append(feed['DE'])
