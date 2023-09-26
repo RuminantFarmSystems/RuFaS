@@ -62,15 +62,20 @@ def pack_into_dict(var_names: List[str], var_values: List[Any]) -> Dict[str, Any
     return result_dict
 
 
-def retrieve_data(data_source: str, var_names: List[str], unique_value: bool,
+def retrieve_data(data_source: str, var_names: List[str] | str, unique_value: bool,
                   identifier: str = None, desired_rows: List[Any] = None) -> List[Dict[str, Any]]:
     result_list = []
     data = {}
     values = []
-    for var in var_names:
-        data[var] = im.get_data(data_source + '.' + var)
+    if var_names == 'all':
+        data = im.get_data(data_source)
+    else:
+        for var in var_names:
+            data[var] = im.get_data(data_source + '.' + var)
 
-    for i in range(len(data[var_names[0]])):
+    variables = list(data.keys())
+
+    for i in range(len(data[variables[0]])):
         if desired_rows and identifier:
             if data[identifier][i] not in desired_rows:
                 continue
@@ -81,7 +86,7 @@ def retrieve_data(data_source: str, var_names: List[str], unique_value: bool,
                 continue
         values.append(var_values)
 
-        result_list.append(pack_into_dict(var_names, var_values))
+        result_list.append(pack_into_dict(variables, var_values))
 
     return result_list
 
@@ -99,13 +104,14 @@ class Feed:
         self.feed_database = data['feed_database']
         self.feeds_table = data['feeds_table']
         self.feed_quality_table = data['feed_quality_table']
-        self.nutrient_table = data['nutrient_table']
         self.db_reader = DatabaseReader(self.feed_database)
         self.nutrient_standard = nutrient_standard
+        # self.nutrient_table = 'NASEM_Comp' if self.nutrient_standard == 'NASEM' else 'NRC_Comp'
+        # self.nutrient_table = 'NRC_Comp'
+        self.nutrient_table = data['nutrient_table']
 
         self.feeds_split_by_maturity = retrieve_data('feed_quality', ['rufas_id'], True)
         self.all_feed_units = retrieve_data('user_feeds', ['rufas_id', 'feed_name', 'units'], False)
-
         purchased_feeds_list = [feed_item["purchased_feed"] for feed_item in data["purchased_feeds"]]
         purchased_feed_costs = {str(feed_item["purchased_feed"]): feed_item["purchased_feed_cost"]
                                 for feed_item in data["purchased_feeds"]}
@@ -1008,12 +1014,9 @@ class Feed:
         rounded_DM = round(DM)
         rounded_NDF = round(NDF)
         column = 'differentiating_nutrient'
-        dict_list = self.db_reader.query(self.feed_quality_table,
-                                         distinct=True, cols=[column],
-                                         identifier='entry',
-                                         desired_rows=(grown_feed_entry,))
-        print(grown_feed_entry)
-        print(dict_list)
+        dict_list = retrieve_data('feed_quality', ['column'], True,
+                                  identifier='rufas_id',
+                                  desired_rows=grown_feed_entry)
         nutrient = dict_list[0][column]
 
         column = 'quality_id'
@@ -1117,9 +1120,12 @@ class Feed:
                                          desired_rows=tuple(feed_ids))
         print(feed_ids)
         print(dict_list)
+        dict_list = retrieve_data('NRC_Comp', 'all', False,
+                                  identifier='rufas_id', desired_rows=feed_ids)
+        print(dict_list)
         nutrient_vals = {}
         for dictionary in dict_list:
-            feed_id = dictionary['feed_id']
+            feed_id = dictionary['rufas_id']
             # the key in the available_feeds dictionary has a 'g' as the
             # suffix if it is a grown feed
             feed_key = str(feed_id)
