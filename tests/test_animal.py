@@ -1468,7 +1468,7 @@ def test_make_ration_from_solution():
     mock_avail_feeds['feed_id'] = [100, 200, 300]
     mock_avail_feeds['feed_key'] = ['100', '200', '300']
     mock_avail_feeds['price'] = [0, 0, 0]
-    # with patch.object(RUFAS.routines.animal.ration.ration_optimizer, 'price', price):
+
     result = RationManager.make_ration_from_solution(mock_avail_feeds, mock_solution)
     assert result == predicted
 
@@ -1855,6 +1855,61 @@ def test_make_user_bounds(mock_user_defined_ration_manager: UserDefinedRationMan
         assert predicted[i][0] == pytest.approx(result[i][0], 0.1)
         assert predicted[i][1] == pytest.approx(result[i][1], 0.1)
 
+
+def test_report_ration_supplyy():
+    """ Unit test for function report_ration_supply in file routines/animal/ration/ration_driver.py"""
+    pass
+
+@pytest.mark.parametrize("dP_reserves,p_intake,p_req,expected",
+                          [(0,1,0,0),(-10,10,1, -3.7),(10,10,1,0)]
+                          )
 def test_get_TDN_discount():
     """ Unit test for function get_TDN_discount in file routines/animal/ration/ration_driver.py"""
+    pass
+
+@pytest.mark.parametrize("kg_fed, feed_item_info, ration_report, body_weight, expected", [(1,{'DE': 1},0,0, 0),
+                                                                                          (-10,10,1, -3.7, 0),
+                                                                                          (10,10,1,0, 0)] )
+def test_get_DE():
+    """ Unit test for function get_DE in file routines/animal/ration/ration_driver.py"""
+    pass
+
+def test_get_ME():
+    """ Unit test for function get_ME in file routines/animal/ration/ration_driver.py"""
+    pass
+
+def test_get_NE_maintenance_and_activity():
+    """ Unit test for function get_NE_maintenance_and_activity in file routines/animal/ration/ration_driver.py"""
+    pass
+
+def test_get_NE_lactation():
+    """ Unit test for function get_NE_lactation in file routines/animal/ration/ration_driver.py"""
+    pass
+
+def test_get_NE_growth():
+    """ Unit test for function get_NE_growth in file routines/animal/ration/ration_driver.py"""
+    pass
+
+def test_get_Calcium():
+    """ Unit test for function get_Calcium in file routines/animal/ration/ration_driver.py"""
+    pass
+
+def test_get_phosphorus():
+    """ Unit test for function get_phosphorus in file routines/animal/ration/ration_driver.py"""
+    pass
+
+def test_get_fat():
+    """ Unit test for function get_fat in file routines/animal/ration/ration_driver.py"""
+    pass
+
+def test_get_fat_percentage():
+    """ Unit test for function get_fat_percentage in file routines/animal/ration/ration_driver.py"""
+    pass
+
+def test_get_forage_NDF():
+    """ Unit test for function get_forage_NDF in file routines/animal/ration/ration_driver.py"""
+    pass
+
+def test_get_metabolizable_protein():
+    """ Unit test for function get_metabolizable_protein in file routines/animal/ration/ration_driver.py"""
     pass
