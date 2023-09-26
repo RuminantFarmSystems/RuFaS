@@ -7,7 +7,7 @@ from pytest_mock import MockerFixture
 
 import config.global_variables
 from config import global_variables
-from main import execute_simulations_from_files
+from main import execute_simulations
 from main import parse_gnu_args
 from main import run_rufas
 from main import set_global_variables
@@ -300,8 +300,8 @@ def test_run_rufas(
     patch_obtain_file_list = mocker.patch(
         "main.obtain_file_list", return_value=file_list
     )
-    patch_execute_simulations_from_files = mocker.patch(
-        "main.execute_simulations_from_files"
+    patch_execute_simulations = mocker.patch(
+        "main.execute_simulations"
     )
     patch_empty_dir = mocker.patch("RUFAS.util.Utility.empty_dir")
 
@@ -311,7 +311,7 @@ def test_run_rufas(
     # Assert
     patch_set_global_variables.assert_called_once_with(make_graphs, verbose)
     patch_obtain_file_list.assert_called_once_with(input_path, verbose)
-    patch_execute_simulations_from_files.assert_called_once_with(
+    patch_execute_simulations.assert_called_once_with(
         file_list, exclude_info_maps
     )
     if clear_output:
@@ -341,8 +341,8 @@ def test_set_global_variables(make_graphs: bool, verbose: bool) -> None:
     config.global_variables.PRINT_STATUS_MESSAGES = old_verbose
 
 
-def test_execute_simulations_from_files(mocker: MockerFixture) -> None:
-    """Checks that execute_simulations_from_files() calls the correct functions in the correct order"""
+def test_execute_simulations(mocker: MockerFixture) -> None:
+    """Checks that execute_simulations() calls the correct functions in the correct order"""
     # Arrange
     mock_output_manager = mocker.MagicMock(auto_spec=OutputManager)
     mock_input_manager = mocker.MagicMock(auto_spec=InputManager)
@@ -354,6 +354,7 @@ def test_execute_simulations_from_files(mocker: MockerFixture) -> None:
     file_path1 = Path("file1.json")
     file_path2 = Path("file2.json")
     file_list = [file_path1, file_path2]
+    mocker.patch("main.InputManager.start_data_processing", return_value=True)
     mock_simulator = mocker.MagicMock(auto_spec=SimulationEngine)
     mock_simulator.simulate.return_value = None
     patch_for_simulation_engine_init = mocker.patch(
@@ -361,14 +362,9 @@ def test_execute_simulations_from_files(mocker: MockerFixture) -> None:
     )
 
     # Act
-    execute_simulations_from_files(file_list, True)
+    execute_simulations(file_list, True)
 
     # Assert
-    assert patch_for_simulation_engine_init.call_count == len(file_list)
-    assert patch_for_simulation_engine_init.call_args_list == [
-        mocker.call(file_path1),
-        mocker.call(file_path2),
-    ]
     assert mock_simulator.simulate.call_count == len(file_list)
     assert mock_output_manager.flush_pools.call_count == len(file_list)
     assert mock_output_manager.dump_all_nondata_pools.call_count == len(file_list)

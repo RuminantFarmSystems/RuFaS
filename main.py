@@ -44,8 +44,8 @@ def run_rufas(
     if verbose:
         print("RuFaS: Ruminant Farm Systems Model 2023")
     print(input_path)
-    file_list = obtain_file_list(input_path, verbose)
-    execute_simulations_from_files(file_list, exclude_info_maps)
+    metadata_file_list = obtain_file_list(input_path, verbose)
+    execute_simulations(metadata_file_list, exclude_info_maps)
 
 
 def set_global_variables(make_graphs: bool, verbose: bool) -> None:
@@ -56,19 +56,26 @@ def set_global_variables(make_graphs: bool, verbose: bool) -> None:
     )
 
 
-def execute_simulations_from_files(
-    files: List[Path], exclude_info_maps: bool = True
+def execute_simulations(
+    metadata_files: List[Path], exclude_info_maps: bool = True
 ) -> None:
-    """Execute simulations for each file"""
+    """Instantiates I/O Managers and processes the metadata files provided by the user."""
+    info_map = {"class": "No caller class",
+                "function": execute_simulations.__name__,
+                }
     output_manager = OutputManager()
     input_manager = InputManager()
-    input_file_list = files
-    for input_file_path in input_file_list:
+    metadata_file_list = metadata_files
+    for metadata_file_path in metadata_file_list:
         input_manager.flush_pools()
         output_manager.flush_pools()
-        is_data_valid = input_manager.start_data_processing(str(input_file_path), True)
-        simulator = SimulationEngine(input_file_path)
-        simulator.simulate()
+        is_data_valid = input_manager.start_data_processing(str(metadata_file_path), True)
+        if is_data_valid:
+            simulator = SimulationEngine()
+            simulator.simulate()
+        else:
+            output_manager.add_error("No simulation run",
+                                     f"Data not valid for {metadata_file_path}, simulation not run", info_map)
         output_manager.save_variables(r"output", r"output/output_filters/", exclude_info_maps)
         output_manager.dump_all_nondata_pools(r"output", exclude_info_maps)
 
