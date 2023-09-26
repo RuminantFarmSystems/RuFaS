@@ -24,10 +24,11 @@ from RUFAS.routines.animal.life_cycle.heiferII import HeiferII
 from RUFAS.routines.animal.life_cycle.heiferIII import HeiferIII
 from RUFAS.routines.animal.manure.general_manure import AnimalManureExcretions, add_animal_manure_excretions, \
     get_default_animal_manure_excretions
-from RUFAS.routines.animal.ration import animal_requirements as req
+from RUFAS.routines.animal.ration.animal_requirements import AnimalRequirements
 
 om = OutputManager()
 
+req = AnimalRequirements()
 
 class Pen:
     """
@@ -864,6 +865,7 @@ class Pen:
         """
         animal_type = animal_grouping_scenario.get_animal_type(animal)
         if animal_type in [AnimalType.LAC_COW, AnimalType.DRY_COW]:
+            req = AnimalRequirements()
             requirements = req.calc_rqmts(body_weight=animal.body_weight, mature_body_weight=animal.mature_body_weight,
                                           day_of_pregnancy=animal.days_in_preg, animal_type=animal_type,
                                           parity=animal.calves, calving_interval=animal.CI,
