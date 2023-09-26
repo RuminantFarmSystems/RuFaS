@@ -414,9 +414,9 @@ class RationReporter:
             for item in supply_report:
                 feed_item_info = available_feeds[key]
                 supply_report[item] += eval('cls.get_' + item + '(kg_fed, feed_item_info, ration_report, body_weight)')
-        supply_report['forage_NDF_percent'] = supply_report['Forage_NDF'] / sum(ration_.values())
+        supply_report['forage_NDF_percent'] = supply_report['forage_NDF'] / sum(ration_.values())
         supply_report['metabolizable_protein'] = \
-            cls.get_Metabolizable_protein(ration_, available_feeds, ration_report, body_weight)
+            cls.get_metabolizable_protein(ration_, available_feeds, ration_report, body_weight)
 
         return supply_report
 
