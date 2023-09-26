@@ -62,31 +62,30 @@ def pack_into_dict(var_names: List[str], var_values: List[Any]) -> Dict[str, Any
     return result_dict
 
 
-def retrieve_data(data_source: str, var_names: List[str] | str, unique_value: bool,
-                  identifier: str = None, desired_rows: List[Any] = None) -> List[Dict[str, Any]]:
+def retrieve_data(data_source: str, var_names: List[str] = None, unique_value: bool = None,
+                  identifier: str = None, desired_rows: List[Any] = None,
+                  compare_val: int = None, low_col: str = None, high_col: str = None) -> List[Dict[str, Any]]:
     result_list = []
-    data = {}
     values = []
-    if var_names == 'all':
-        data = im.get_data(data_source)
-    else:
-        for var in var_names:
-            data[var] = im.get_data(data_source + '.' + var)
+    data = im.get_data(data_source)
+    if not var_names:
+        var_names = list(data.keys())
 
-    variables = list(data.keys())
-
-    for i in range(len(data[variables[0]])):
+    for i in range(len(data[var_names[0]])):
         if desired_rows and identifier:
             if data[identifier][i] not in desired_rows:
                 continue
-
+        if compare_val and low_col and high_col:
+            low_val, high_val = data[low_col][i], data[high_col][i]
+            if not (low_val <= compare_val <= high_val):
+                continue
         var_values = [data[key][i] for key in data.keys()]
         if unique_value:
             if var_values in values:
                 continue
         values.append(var_values)
 
-        result_list.append(pack_into_dict(variables, var_values))
+        result_list.append(pack_into_dict(var_names, var_values))
 
     return result_list
 
@@ -110,8 +109,10 @@ class Feed:
         # self.nutrient_table = 'NRC_Comp'
         self.nutrient_table = data['nutrient_table']
 
-        self.feeds_split_by_maturity = retrieve_data('feed_quality', ['rufas_id'], True)
-        self.all_feed_units = retrieve_data('user_feeds', ['rufas_id', 'feed_name', 'units'], False)
+        self.feeds_split_by_maturity = retrieve_data(data_source='feed_quality', var_names=['rufas_id'],
+                                                     unique_value=True)
+        self.all_feed_units = retrieve_data(data_source='user_feeds', var_names=['rufas_id', 'feed_name', 'units'])
+
         purchased_feeds_list = [feed_item["purchased_feed"] for feed_item in data["purchased_feeds"]]
         purchased_feed_costs = {str(feed_item["purchased_feed"]): feed_item["purchased_feed_cost"]
                                 for feed_item in data["purchased_feeds"]}
@@ -1023,9 +1024,8 @@ class Feed:
         rounded_DM = round(DM)
         rounded_NDF = round(NDF)
         column = 'differentiating_nutrient'
-        dict_list = retrieve_data('feed_quality', ['column'], True,
-                                  identifier='rufas_id',
-                                  desired_rows=grown_feed_entry)
+        dict_list = retrieve_data(data_source='feed_quality', var_names=[column], unique_value=True,
+                                  identifier='rufas_id', desired_rows=grown_feed_entry)
         nutrient = dict_list[0][column]
 
         column = 'quality_id'
@@ -1036,6 +1036,9 @@ class Feed:
                                          compare_val=str(rounded_nutrient),
                                          low_col='low_percent',
                                          high_col='high_percent', )
+        dict_list = retrieve_data(data_source='feed_quality', var_names=[column],
+                                  identifier='rufas_id', desired_rows=grown_feed_entry,
+                                  compare_val=rounded_nutrient, low_col='low_percent', high_col='high_percent')
 
         return dict_list[0][column]
 
@@ -1052,9 +1055,9 @@ class Feed:
         Returns: a string representation of the quality status
         """
         column = 'status'
-        status_dict = self.db_reader.query(self.feed_quality_table,
-                                           cols=[column], identifier='quality_id',
-                                           desired_rows=(str(quality_id),))
+        status_dict = retrieve_data(data_source='feed_quality',
+                                    var_names=[column], unique_value=False,
+                                    identifier='quality_id', desired_rows=quality_id)
         print(status_dict)
 
         return status_dict[0][column]
@@ -1129,8 +1132,7 @@ class Feed:
                                          desired_rows=tuple(feed_ids))
         print(feed_ids)
         print(dict_list)
-        dict_list = retrieve_data('NRC_Comp', 'all', False,
-                                  identifier='rufas_id', desired_rows=feed_ids)
+        dict_list = retrieve_data(data_source='NRC_Comp', identifier='rufas_id', desired_rows=feed_ids)
         print(dict_list)
         nutrient_vals = {}
         for dictionary in dict_list:
@@ -1153,5 +1155,9 @@ class Feed:
             cols=columns,
             identifier='feed_id',
             desired_rows=tuple(feed_ids))
+        print(nutrients)
+        nutrients = retrieve_data(data_source='NRC_Comp', var_names=columns,
+                                  identifier='rufas_id', desired_rows=feed_ids)
+        print(nutrients)
         calf_feeds = {155: nutrients[0], 156: nutrients[1], 157: nutrients[2]}
         return calf_feeds

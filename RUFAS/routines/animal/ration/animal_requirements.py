@@ -349,7 +349,7 @@ class AnimalRequirements:
         Dict[str, float]
             dictionary of requirement values, see individual functions for each key value pair
         """
-        if AnimalBase.config['energy_and_nutrient_calculation_method'] == 'NRC':
+        if AnimalBase.config['nutrient_standard'] == 'NRC':
             net_energy_maintenance, conceptus_weight, calf_birth_weight = self.calculate_NRC_energy_maintenance_requirements(
                 body_weight, mature_body_weight, day_of_pregnancy, body_condition_score_5, previous_temperature,
                 animal_type)
@@ -371,7 +371,7 @@ class AnimalRequirements:
             phosphorus_requirement = self.calculate_NRC_phosphorus_requirements(
                 body_weight, mature_body_weight, day_of_pregnancy, milk_production, animal_type, average_daily_gain, dry_matter_intake_estimate)
 
-        elif AnimalBase.config['energy_and_nutrient_calculation_method'] == 'NASEM':
+        elif AnimalBase.config['nutrient_standard'] == 'NASEM':
             net_energy_lactation = self.calculate_NASEM_energy_lactation_requirements(
                 animal_type, milk_fat, milk_true_protein, milk_lactose, milk_production)
             dry_matter_intake_estimate = self.calculate_NASEM_DMI(
@@ -394,12 +394,12 @@ class AnimalRequirements:
                 body_weight, mature_body_weight, animal_type, day_of_pregnancy, average_daily_gain,
                 dry_matter_intake_estimate, milk_true_protein, milk_production, parity)
         else:
-            energy_and_nutrient_calculation_method_error = f"energy and nutrient calculation method \
-                {AnimalBase.config['energy_and_nutrient_calculation_method']}\
+            nutrient_standard_error = f"nutrient_standard method \
+                {AnimalBase.config['nutrient_standard']}\
                 not supported"
             info_map = {"function": self.calc_rqmts}
-            om.add_error("energy_and_nutrient_calculation_method_error",
-                        energy_and_nutrient_calculation_method_error, info_map)
+            om.add_error("nutrient_standard_error",
+                        nutrient_standard_error, info_map)
         # Requirements summary dictionary
         return {'NEmaint': net_energy_maintenance, 'NEg': net_energy_growth, 'NEpreg': net_energy_pregnancy,
                 'NEl': net_energy_lactation, 'MP_req': metabolizable_protein_requirement, 'Ca_req': calcium_requirement,
@@ -1480,7 +1480,7 @@ class AnimalRequirements:
             National Academic Press, Chapter 3 "Energy", pp. 30-31, 2021.
 
         """
-        if AnimalBase.config['energy_and_nutrient_calculation_method'] == 'NRC':
+        if AnimalBase.config['nutrient_standard'] == 'NRC':
             # Activity requirements
             # ---------------------
             # [A.Cow.A.4]-[A.Heifer.A.5]
@@ -1493,7 +1493,7 @@ class AnimalRequirements:
             # Total net energy for activity requirement (Mcal)
             net_energy_activity = distance * 0.00045 * body_weight + net_energy_activity1
             return net_energy_activity
-        elif AnimalBase.config['energy_and_nutrient_calculation_method'] == 'NASEM':
+        elif AnimalBase.config['nutrient_standard'] == 'NASEM':
             if housing == 'Barn':
                 net_energy_activity = distance * 0.00035 * \
                     body_weight
