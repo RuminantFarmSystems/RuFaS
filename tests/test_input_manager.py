@@ -1672,13 +1672,13 @@ def test_get_metadata_raises_exception(dummy_metadata_path: str,
         assert add_error.call_count == expected_warning_call_count
 
 
-def test_flush_pools(mock_input_manager: InputManager) -> None:
+def test_flush_pool(mock_input_manager: InputManager) -> None:
     """Tests that the InputManager pool is flushed correctly."""
 
     mock_input_manager._InputManager__pool = {"Key": "I never metadata I didn't like!"}
 
     with patch("RUFAS.output_manager.OutputManager.add_log") as add_log:
-        mock_input_manager.flush_pools()
+        mock_input_manager.flush_pool()
 
         assert mock_input_manager._InputManager__pool == {}
         assert add_log.call_count == 1
