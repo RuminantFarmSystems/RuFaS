@@ -690,9 +690,11 @@ def test_validate_json_element_invalid_var_name_raises_input_data_keyerror(mock_
     input_data = {"valid_key": {"another_valid_key": "value"}}
     eager_termination = False
 
-    with pytest.raises(KeyError):
+    with patch("RUFAS.output_manager.OutputManager.add_error") as add_error:
         mock_input_manager._validate_json_element(element_hierarchy, properties_blob_key, input_data,
                                                   eager_termination)
+
+        assert add_error.call_count == 1
 
     mock_input_manager._validate_json_element = input_manager_original_method_states["_validate_json_element"]
 

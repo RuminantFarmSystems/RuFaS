@@ -384,7 +384,8 @@ class InputManager:
             try:
                 input_data_value = reduce(lambda d, key: d[key], element_hierarchy, input_data)
             except KeyError:
-                raise KeyError(f"Key {var_name} not found in input data")
+                om.add_error("Key not found in input data", f"Key {var_name} not found in input data.", info_map)
+                input_data_value = None
 
             is_valid = self._validate_input_type_dynamic(variable_properties, var_name, input_data_value)
 
