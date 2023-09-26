@@ -35,7 +35,7 @@ def test_calf_manure_excretions(methane_model: str,
         'CP': CP_concentration
     }
     patch_for_ration_report = mocker.patch(
-        'RUFAS.routines.animal.manure.calf_manure_excretion.ration_report',
+        'RUFAS.routines.animal.manure.calf_manure_excretion.RationReporter.report_ration',
         return_value=(mock_nutrient_amounts, mock_nutrient_concentrations)
     )
 
