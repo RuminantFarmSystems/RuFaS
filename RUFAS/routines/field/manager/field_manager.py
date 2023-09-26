@@ -417,7 +417,7 @@ class FieldManager:
             "second_moisture_condition_parameter",
             "average_subbasin_slope",
             "slope_length",
-            "albedo",
+            "albedo"
         ]
 
         for value in expected_values:
