@@ -347,34 +347,69 @@ def test_execute_simulations(mocker: MockerFixture) -> None:
     mock_output_manager = mocker.MagicMock(auto_spec=OutputManager)
     mock_input_manager = mocker.MagicMock(auto_spec=InputManager)
     mock_output_manager.flush_pools.return_value = None
+    mock_input_manager.flush_pools.return_value = None
     mock_output_manager.dump_all_nondata_pools.return_value = None
     mock_output_manager.save_variables.return_value = None
     mocker.patch("main.OutputManager", return_value=mock_output_manager)
     mocker.patch("main.InputManager", return_value=mock_input_manager)
-    file_path1 = Path("file1.json")
-    file_path2 = Path("file2.json")
-    file_list = [file_path1, file_path2]
-    mocker.patch("main.InputManager.start_data_processing", return_value=True)
+    metadata_file_path1 = Path("metadata_file1.json")
+    metadata_file_path2 = Path("metadata_file2.json")
+    metadata_file_list = [metadata_file_path1, metadata_file_path2]
+    mock_input_manager.start_data_processing.return_value = True
     mock_simulator = mocker.MagicMock(auto_spec=SimulationEngine)
     mock_simulator.simulate.return_value = None
-    patch_for_simulation_engine_init = mocker.patch(
-        "main.SimulationEngine", return_value=mock_simulator
-    )
+    mocker.patch("main.SimulationEngine", return_value=mock_simulator)
 
     # Act
-    execute_simulations(file_list, True)
+    execute_simulations(metadata_file_list, True)
 
     # Assert
-    assert mock_simulator.simulate.call_count == len(file_list)
-    assert mock_output_manager.flush_pools.call_count == len(file_list)
-    assert mock_output_manager.dump_all_nondata_pools.call_count == len(file_list)
+    assert mock_simulator.simulate.call_count == len(metadata_file_list)
+    assert mock_output_manager.flush_pools.call_count == len(metadata_file_list)
+    assert mock_input_manager.flush_pools.call_count == len(metadata_file_list)
+    assert mock_output_manager.dump_all_nondata_pools.call_count == len(metadata_file_list)
     assert mock_output_manager.dump_all_nondata_pools.call_args_list == [
         mocker.call("output", True)
-    ] * len(file_list)
-    assert mock_output_manager.save_variables.call_count == len(file_list)
+    ] * len(metadata_file_list)
+    assert mock_output_manager.save_variables.call_count == len(metadata_file_list)
     assert mock_output_manager.save_variables.call_args_list == [
         mocker.call("output", "output/output_filters/", True)
-    ] * len(file_list)
+    ] * len(metadata_file_list)
+
+
+def test_execute_simulations_adds_error_if_invalid_data(mocker: MockerFixture) -> None:
+    """Checks that execute_simulations() adds an error to OM if IM returns invalid data"""
+    mock_output_manager = mocker.MagicMock(auto_spec=OutputManager)
+    mock_input_manager = mocker.MagicMock(auto_spec=InputManager)
+    mock_output_manager.flush_pools.return_value = None
+    mock_output_manager.dump_all_nondata_pools.return_value = None
+    mock_output_manager.save_variables.return_value = None
+    mocker.patch("main.OutputManager", return_value=mock_output_manager)
+    mocker.patch("main.InputManager", return_value=mock_input_manager)
+    metadata_file_path1 = Path("metadata_file1.json")
+    metadata_file_path2 = Path("metadata_file2.json")
+    metadata_file_list = [metadata_file_path1, metadata_file_path2]
+    mock_input_manager.start_data_processing.return_value = False
+    mock_simulator = mocker.MagicMock(auto_spec=SimulationEngine)
+    mock_simulator.simulate.return_value = None
+    mocker.patch("main.SimulationEngine", return_value=mock_simulator)
+
+    # Act
+    execute_simulations(metadata_file_list, True)
+
+    # Assert
+    assert mock_simulator.simulate.call_count == 0
+    assert mock_output_manager.add_error.call_count == 2
+    assert mock_output_manager.flush_pools.call_count == len(metadata_file_list)
+    assert mock_input_manager.flush_pools.call_count == len(metadata_file_list)
+    assert mock_output_manager.dump_all_nondata_pools.call_count == len(metadata_file_list)
+    assert mock_output_manager.dump_all_nondata_pools.call_args_list == [
+        mocker.call("output", True)
+    ] * len(metadata_file_list)
+    assert mock_output_manager.save_variables.call_count == len(metadata_file_list)
+    assert mock_output_manager.save_variables.call_args_list == [
+        mocker.call("output", "output/output_filters/", True)
+    ] * len(metadata_file_list)
 
 
 def test_parse_gnu_args(mocker: MockerFixture) -> None:
