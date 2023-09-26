@@ -100,14 +100,9 @@ class Feed:
         Args:
             data: the feed information from the input JSON file
         """
-        self.feed_database = data['feed_database']
-        self.feeds_table = data['feeds_table']
-        self.feed_quality_table = data['feed_quality_table']
-        self.db_reader = DatabaseReader(self.feed_database)
         self.nutrient_standard = nutrient_standard
-        # self.nutrient_table = 'NASEM_Comp' if self.nutrient_standard == 'NASEM' else 'NRC_Comp'
-        # self.nutrient_table = 'NRC_Comp'
-        self.nutrient_table = data['nutrient_table']
+        self.nutrient_table = 'NASEM_Comp' if self.nutrient_standard == 'NASEM' else 'NRC_Comp'
+        self.nutrient_table = 'NRC_Comp'
 
         self.feeds_split_by_maturity = retrieve_data(data_source='feed_quality', var_names=['rufas_id'],
                                                      unique_value=True)
@@ -1030,12 +1025,6 @@ class Feed:
 
         column = 'quality_id'
         rounded_nutrient = rounded_DM if nutrient == 'DM' else rounded_NDF
-        dict_list = self.db_reader.query(self.feed_quality_table,
-                                         cols=[column], identifier='entry',
-                                         desired_rows=(str(grown_feed_entry),),
-                                         compare_val=str(rounded_nutrient),
-                                         low_col='low_percent',
-                                         high_col='high_percent', )
         dict_list = retrieve_data(data_source='feed_quality', var_names=[column],
                                   identifier='rufas_id', desired_rows=grown_feed_entry,
                                   compare_val=rounded_nutrient, low_col='low_percent', high_col='high_percent')
@@ -1127,13 +1116,8 @@ class Feed:
         Returns: a dictionary where the keys are the the feed identifiers and
         the values are nutrient dictionaries
         """
-        dict_list = self.db_reader.query(self.nutrient_table,
-                                         identifier='feed_id',
-                                         desired_rows=tuple(feed_ids))
-        print(feed_ids)
-        print(dict_list)
-        dict_list = retrieve_data(data_source='NRC_Comp', identifier='rufas_id', desired_rows=feed_ids)
-        print(dict_list)
+        dict_list = retrieve_data(data_source=self.nutrient_table, identifier='rufas_id', desired_rows=feed_ids)
+        # missing: (26, 54, 136, 139, 157)
         nutrient_vals = {}
         for dictionary in dict_list:
             feed_id = dictionary['rufas_id']
@@ -1150,14 +1134,8 @@ class Feed:
     def get_calf_feeds(self):
         feed_ids = [155, 156, 157]
         columns = ['DM', 'CP', 'EE', 'DE']
-        nutrients = self.db_reader.query(
-            self.nutrient_table,
-            cols=columns,
-            identifier='feed_id',
-            desired_rows=tuple(feed_ids))
-        print(nutrients)
-        nutrients = retrieve_data(data_source='NRC_Comp', var_names=columns,
+        nutrients = retrieve_data(data_source=self.nutrient_table, var_names=columns,
                                   identifier='rufas_id', desired_rows=feed_ids)
-        print(nutrients)
+        # missing 157
         calf_feeds = {155: nutrients[0], 156: nutrients[1], 157: nutrients[2]}
         return calf_feeds
