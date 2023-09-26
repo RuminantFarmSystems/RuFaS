@@ -97,6 +97,48 @@ def test_generate_graph(mock_graph_generator: GraphGenerator,
 
 
 @pytest.mark.parametrize(
+    "filtered_pool, graph_info, save_path, filter_file_name",
+    [
+        (
+                {"dummy.variable": {"values": [1, 2, 3]}},
+                {"graph_type": "Line Graph",
+                 "filter": ["dummy.variable"],
+                 "title": "Dummy Variable"},
+                "dummy\\path",
+                "dummy_filter"
+        )
+    ]
+)
+def test_invalid_generate_graph(mock_graph_generator: GraphGenerator,
+                                graph_generator_original_states: dict[str, callable],
+                                filtered_pool: dict,
+                                graph_info: dict,
+                                save_path: str,
+                                filter_file_name: str) -> None:
+    mock_graph_generator._line_graph = MagicMock()
+    mock_graph_generator._bar_graph = MagicMock()
+    mock_graph_generator._generate_graph_path = MagicMock()
+    mock_savefig = MagicMock(side_effect=Exception('Save Figure Failed'))
+
+    with patch.object(matplotlib.pyplot, "savefig", mock_savefig):
+        try:
+            mock_graph_generator.generate_graph(filtered_pool, graph_info, save_path, filter_file_name)
+            assert False
+        except Exception as e:
+            assert True
+
+    if graph_info["graph_type"] == "Line graph":
+        mock_graph_generator._line_graph.assert_called_once_with(filtered_pool, graph_info, save_path, filter_file_name)
+    elif graph_info["graph_type"] == "Bar graph":
+        mock_graph_generator._bar_graph.assert_called_once_with(filtered_pool, graph_info, save_path, filter_file_name)
+    mock_graph_generator._generate_graph_path.assert_called_once_with(save_path, graph_info, filter_file_name)
+
+    mock_graph_generator._line_graph = graph_generator_original_states["_line_graph"]
+    mock_graph_generator._bar_graph = graph_generator_original_states["_bar_graph"]
+    mock_graph_generator._generate_graph_path = graph_generator_original_states["_generate_graph_path"]
+
+
+@pytest.mark.parametrize(
     "filtered_pool, graph_info",
     [
         (
@@ -232,6 +274,38 @@ def test_generate_graph_path(mock_graph_generator: GraphGenerator,
 
     mock_graph_generator._generate_graph_path = graph_generator_original_states["_generate_graph_path"]
 
+
+@pytest.mark.parametrize(
+    "save_path, graph_info, filter_file_name",
+    [
+        (
+                "dummy\\path",
+                {
+                    "graph_type": "Line Graph",
+                    "filter": ["dummy.variable"],
+                    "title": "Dummy Variable"
+                },
+                "dummy_filter"
+        )
+    ]
+)
+def test_invalid_generate_graph_path(mock_graph_generator: GraphGenerator,
+                                     graph_generator_original_states: dict[str, callable],
+                                     save_path: str,
+                                     graph_info: dict,
+                                     filter_file_name: str) -> None:
+    mock_graph_generator._generate_graph_path = MagicMock()
+    mock_mkdir = MagicMock(side_effect=Exception('Make Directory Failed'))
+    with freeze_time("2023-09-21"):
+        with patch.object(Path, "mkdir", mock_mkdir):
+            try:
+                graph_path = RUFAS.graph_generator.GraphGenerator._generate_graph_path(mock_graph_generator, save_path,
+                                                                                       graph_info, filter_file_name)
+                assert False
+            except Exception as e:
+                assert True
+
+    mock_graph_generator._generate_graph_path = graph_generator_original_states["_generate_graph_path"]
 
 # @pytest.mark.parametrize(
 #     "fig_ax, graph_info",
