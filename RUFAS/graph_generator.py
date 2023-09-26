@@ -4,10 +4,10 @@ from pathlib import Path
 from typing import Dict, List, Any
 
 import matplotlib
-
+matplotlib.use('TkAgg')
 import matplotlib.pyplot as pyplt
 from matplotlib.figure import Figure
-matplotlib.use('TkAgg')
+
 
 om_pool_element_type = Dict[str, List[Dict[str, Any]]]
 
