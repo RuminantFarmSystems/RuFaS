@@ -300,6 +300,8 @@ class LifeCycleManager:
         self._calculate_cull_reason_stats_percent()
         self._calculate_percent_cow_per_parity()
 
+        self.daily_milk_production = sum(cow.estimated_daily_milk_produced for cow in cows)
+
         info_map = {"class": self.__class__.__name__,
                     "function": self.daily_update.__name__,
                     "sim_day": sim_day, }

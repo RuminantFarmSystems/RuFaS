@@ -174,7 +174,7 @@ def test_lactating_cow_manure_calculations(methane_model: str, methane_mitigatio
 
     # Patching
     patch_for_ration_report = mocker.patch(
-        'RUFAS.routines.animal.manure.lactating_cow_manure_excretion.ration_report'
+        'RUFAS.routines.animal.manure.lactating_cow_manure_excretion.RationReporter.report_ration'
     )
     patch_for_ration_report.return_value = (
         {
