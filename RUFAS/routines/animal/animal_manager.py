@@ -230,12 +230,12 @@ class AnimalManager:
 
         Parameters
         ----------
-            all_pen_data: list[dict[str, Any]]
-                List containing information about the pens.
-            herd_data: Dict[str, Any]
-                Dictionary containing information about the herd.
-            manure_management_scenarios:
-                Dictionary containing information about the manure management scenarios.
+        all_pen_data: list[dict[str, Any]]
+            List containing information about the pens.
+        herd_data: Dict[str, Any]
+            Dictionary containing information about the herd.
+        manure_management_scenarios:
+            Dictionary containing information about the manure management scenarios.
 
         """
 
