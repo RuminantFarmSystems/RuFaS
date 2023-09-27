@@ -224,6 +224,7 @@ class AnimalManager:
             Cow: self.cows
         }
 
+
     def init_pens(self, all_pen_data, herd_data: Dict[str, Any], manure_management_scenarios):
         """
         Populates the list of pens with the information from the input json file.
