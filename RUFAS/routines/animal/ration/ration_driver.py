@@ -786,7 +786,6 @@ class RationReporter:
         float
             Metabolizable protein supply of feed item, TODO: check units
         """
-        TDNconc = ration_report['nutrient_conc']['TDN']
         TDNtotal = ration_report['nutrient_amount']['TDN']
 
         DMI_estimate = sum(ration.values())
