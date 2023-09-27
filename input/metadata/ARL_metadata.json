@@ -3,112 +3,105 @@
     "config": {
       "title": "Config Data",
       "description": "Configuration Information",
-      "path": "input/config/example_config.json",
+      "path": "input/data/config/ARL_config.json",
       "type": "json",
       "properties": "config_properties"
     },
     "animal": {
       "title": "Animal data",
       "description": "Moo Moo!",
-      "path": "input/animal/example_animal.json",
+      "path": "input/data/animal/no_animal.json",
       "type": "json",
       "properties": "animal_properties"
     },
     "crop": {
       "title": "Crop data",
       "description": "Alfafa is fun!",
-      "path": "input/crop/example_rotation.json",
+      "path": "input/data/crop/ARL_rotation.json",
       "type": "json",
       "properties": "crop_schedule_properties"
     },
     "economy": {
       "title": "Economy data",
       "description": "Time is money!",
-      "path": "input/EEE/example_costs.csv",
+      "path": "input/data/EEE/example_costs.csv",
       "type": "csv",
       "properties": "economic_properties"
     },
     "emission": {
       "title": "Emissions data",
       "description": "Let's think about global warming",
-      "path": "input/EEE/example_emissions.csv",
+      "path": "input/data/EEE/example_emissions.csv",
       "type": "csv",
       "properties": "emissions_properties"
     },
     "feed": {
       "title": "Feed data",
       "description": "Those cows need to eat!",
-      "path": "input/feed/example_feed.json",
+      "path": "input/data/feed/example_feed.json",
       "type": "json",
       "properties": "feed_properties"
     },
     "NRC_Comp": {
       "title": "NRC Comp data",
       "description": "Nutrients!",
-      "path": "input/feed/NRC_comp.csv",
+      "path": "input/data/feed/NRC_comp.csv",
       "type": "csv",
       "properties": "NRC_Comp_properties"
     },
     "NASEM_Comp": {
       "title": "NASEM Comp data",
       "description": "Nutrients!",
-      "path": "input/feed/NASEM_comp.csv",
+      "path": "input/data/feed/NASEM_comp.csv",
       "type": "csv",
       "properties": "NASEM_Comp_properties"
     },
     "manure_management": {
       "title": "Manure data",
       "description": "You thought it's a waste, but those crops need to eat as well",
-      "path": "input/manure/manure_management.json",
+      "path": "input/data/manure/manure_management.json",
       "type": "json",
       "properties": "manure_management_properties"
     },
-    "soil_1": {
+    "soil": {
       "title": "Soil data",
       "description": "Stop treating soil like dirt!",
-      "path": "input/soil/example_soil.json",
-      "type": "json",
-      "properties": "soil_profile_properties"
-    },
-    "soil_2": {
-      "title": "Soil data",
-      "description": "Stop treating soil like dirt!",
-      "path": "input/soil/example_soil_2.json",
+      "path": "input/data/soil/ARL_soil.json",
       "type": "json",
       "properties": "soil_profile_properties"
     },
     "fertilizer_schedule": {
       "title": "Fertilizer schedule.",
       "description": "Fertilizer is like butter, you can never have too much.",
-      "path": "input/fertilizer_schedule/example_fertilizer_schedule.json",
+      "path": "input/data/fertilizer_schedule/ARL_fertilizer_schedule.json",
       "type": "json",
       "properties": "fertilizer_schedule_properties"
     },
     "manure_schedule": {
       "title": "Manure schedule.",
       "description": "Crappier than having 7:45 am classes Monday - Friday.",
-      "path": "input/manure_schedule/example_manure_schedule.json",
+      "path": "input/data/manure_schedule/ARL_manure_schedule.json",
       "type": "json",
       "properties": "manure_schedule_properties"
     },
     "tillage_schedule": {
       "title": "Tillage schedule.",
       "description": "Requires the will to till.",
-      "path": "input/tillage_schedule/example_tillage_schedule.json",
+      "path": "input/data/tillage_schedule/ARL_tillage_schedule.json",
       "type": "json",
       "properties": "tillage_schedule_properties"
     },
     "field": {
       "title": "Field specification",
       "description": "Contains overall field properties and references to specification files.",
-      "path": "input/field/example_field.json",
+      "path": "input/data/field/ARL_field.json",
       "type": "json",
       "properties": "field_properties"
     },
     "weather": {
       "title": "Weather data",
       "description": "Let's turn on the AC",
-      "path": "input/weather/barnyard_weather.csv",
+      "path": "input/data/weather/ARL_weather.csv",
       "type": "csv",
       "properties": "weather_properties"
     }

@@ -3,133 +3,105 @@
     "config": {
       "title": "Config Data",
       "description": "Configuration Information",
-      "path": "input/config/barnyard_config.json",
+      "path": "input/data/config/multi_crop_config.json",
       "type": "json",
       "properties": "config_properties"
     },
     "animal": {
       "title": "Animal data",
-      "description": "Moo Moo!",
-      "path": "input/animal/no_animal.json",
+      "description": "Animal module specification.",
+      "path": "input/data/animal/no_animal.json",
       "type": "json",
       "properties": "animal_properties"
-  },
+    },
     "crop": {
       "title": "Crop data",
-      "description": "Barnyard crop rotation schedule.",
-      "path": "input/crop/no_crop.json",
+      "description": "Crop rotation schedule.",
+      "path": "input/data/crop/multi_crop_rotation.json",
       "type": "json",
       "properties": "crop_schedule_properties"
     },
     "economy": {
       "title": "Economy data",
       "description": "Time is money!",
-      "path": "input/EEE/example_costs.csv",
+      "path": "input/data/EEE/example_costs.csv",
       "type": "csv",
       "properties": "economic_properties"
     },
     "emission": {
       "title": "Emissions data",
       "description": "Let's think about global warming",
-      "path": "input/EEE/example_emissions.csv",
+      "path": "input/data/EEE/example_emissions.csv",
       "type": "csv",
       "properties": "emissions_properties"
     },
     "feed": {
       "title": "Feed data",
       "description": "Those cows need to eat!",
-      "path": "input/feed/purchased_feed.json",
+      "path": "input/data/feed/example_feed.json",
       "type": "json",
       "properties": "feed_properties"
     },
     "NRC_Comp": {
       "title": "NRC Comp data",
       "description": "Nutrients!",
-      "path": "input/feed/NRC_comp.csv",
+      "path": "input/data/feed/NRC_comp.csv",
       "type": "csv",
       "properties": "NRC_Comp_properties"
     },
     "NASEM_Comp": {
       "title": "NASEM Comp data",
       "description": "Nutrients!",
-      "path": "input/feed/NASEM_comp.csv",
+      "path": "input/data/feed/NASEM_comp.csv",
       "type": "csv",
       "properties": "NASEM_Comp_properties"
     },
     "manure_management": {
       "title": "Manure data",
       "description": "You thought it's a waste, but those crops need to eat as well",
-      "path": "input/manure/manure_management.json",
+      "path": "input/data/manure/manure_management.json",
       "type": "json",
       "properties": "manure_management_properties"
     },
     "soil": {
       "title": "Soil data",
-      "description": "Barnyard soil configuration.",
-      "path": "input/soil/barnyard_soil.json",
+      "description": "Soil configuration.",
+      "path": "input/data/soil/ARL_soil.json",
       "type": "json",
       "properties": "soil_profile_properties"
     },
-    "fertilizer_schedule_1": {
+    "fertilizer_schedule": {
       "title": "Fertilizer schedule.",
-      "description": "Barnyard fertilizer application schedule.",
-      "path": "input/fertilizer_schedule/no_fertilizer.json",
+      "description": "Fertilizer application schedule.",
+      "path": "input/data/fertilizer_schedule/multi_crop_fertilizer_schedule.json",
       "type": "json",
       "properties": "fertilizer_schedule_properties"
     },
-    "fertilizer_schedule_2": {
-      "title": "Fertilizer schedule.",
-      "description": "Barnyard fertilizer application schedule.",
-      "path": "input/fertilizer_schedule/barnyard_scheduled_fertilizer_schedule.json",
-      "type": "json",
-      "properties": "fertilizer_schedule_properties"
-    },
-    "manure_schedule_1": {
+    "manure_schedule": {
       "title": "Manure schedule.",
-      "description": "Barnyard manure application schedule.",
-      "path": "input/manure_schedule/no_manure.json",
+      "description": "Manure application schedule.",
+      "path": "input/data/manure_schedule/multi_crop_manure_schedule.json",
       "type": "json",
       "properties": "manure_schedule_properties"
     },
-    "manure_schedule_2": {
-      "title": "Manure schedule.",
-      "description": "Barnyard manure application schedule.",
-      "path": "input/manure_schedule/barnyard_scheduled_manure_schedule.json",
-      "type": "json",
-      "properties": "manure_schedule_properties"
-    },
-    "tillage_schedule_1": {
+    "tillage_schedule": {
       "title": "Tillage schedule.",
-      "description": "Barnyard tillage application schedule.",
-      "path": "input/tillage_schedule/no_till.json",
+      "description": "Tillage application schedule.",
+      "path": "input/data/tillage_schedule/multi_crop_tillage_schedule.json",
       "type": "json",
       "properties": "tillage_schedule_properties"
     },
-    "tillage_schedule_2": {
-      "title": "Tillage schedule.",
-      "description": "Barnyard tillage application schedule.",
-      "path": "input/tillage_schedule/barnyard_scheduled_tillage_schedule.json",
-      "type": "json",
-      "properties": "tillage_schedule_properties"
-    },
-    "field_1": {
+    "field": {
       "title": "Field specification",
       "description": "Contains overall field properties and references to specification files.",
-      "path": "input/field/barnyard_field_1.json",
-      "type": "json",
-      "properties": "field_properties"
-    },
-    "field_2": {
-      "title": "Field specification",
-      "description": "Contains overall field properties and references to specification files.",
-      "path": "input/field/barnyard_field_2.json",
+      "path": "input/data/field/multi_crop_field.json",
       "type": "json",
       "properties": "field_properties"
     },
     "weather": {
       "title": "Weather data",
       "description": "Let's turn on the AC",
-      "path": "input/weather/barnyard_weather.csv",
+      "path": "input/data/weather/ARL_weather.csv",
       "type": "csv",
       "properties": "weather_properties"
     }

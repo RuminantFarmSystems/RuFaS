@@ -17,7 +17,7 @@ from RUFAS.output_manager import OutputManager
 from RUFAS.util import Utility
 
 
-METADATA_PATHS = ['input/example_metadata.json']
+METADATA_PATHS = ['input/metadata/default_metadata.json']
 
 
 def run_rufas(
