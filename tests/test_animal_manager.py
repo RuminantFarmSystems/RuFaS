@@ -7,10 +7,10 @@ Author(s): Pooya Hekmati, sh2235@cornell.edu, Anchey Peng, ap724@cornell.edu
 
 from typing import Any
 from typing import List, Dict, Union
-from unittest.mock import MagicMock, patch
+from mock import MagicMock, patch
 
 import pytest
-from pytest_mock.plugin import MockerFixture
+from pytest_mock import MockerFixture
 
 from RUFAS.routines.animal.animal_manager import AnimalManager
 from RUFAS.routines.animal.life_cycle.animal_base import AnimalBase
@@ -248,15 +248,23 @@ def mock_herd_data() -> Dict[str, Union[str, int, bool]]:
     }
 
 
-def input_manager() -> None:
+@pytest.fixture
+def input_manager(mocker: MockerFixture) -> InputManager:
     im = InputManager()
-    im.flush_pools()
-    im.__pool = {'config': {
-        'nutrient_standard': 'NASEM'
-    }}
+    return im
+
 
 @pytest.fixture
-def animal_manager() -> AnimalManager:
+def mock_im_pool(mocker: MockerFixture) -> Dict[str, Dict[str, Any]]:
+    return {
+        "config": {
+            "nutrient_standard": "NASEM"
+        }
+    }
+
+
+@pytest.fixture
+def animal_manager(input_manager: InputManager, mock_im_pool) -> AnimalManager:
     init_pens_patch = patch('RUFAS.routines.animal.animal_manager.AnimalManager.init_pens')
     init_animals_patch = patch('RUFAS.routines.animal.animal_manager.AnimalManager.init_animals')
     init_nutrient_rqmts_patch = patch('RUFAS.routines.animal.animal_manager.AnimalManager.init_nutrient_rqmts')
@@ -277,9 +285,7 @@ def animal_manager() -> AnimalManager:
     weather = MagicMock()
     time = MagicMock()
 
-    input_manager()
-    im = InputManager()
-
+    input_manager._InputManager__pool = mock_im_pool
     animal_manager = AnimalManager(data, config, feed, weather, time)
 
     init_pens_patch.stop()
@@ -308,7 +314,7 @@ def test_get_animal_config():
     pass
 
 
-def test_init_pens(animal_manager: AnimalManager, mock_pen_data: Dict[str, Dict[str, Union[str, float, int]]],
+def test_init_pens(input_manager: InputManager, animal_manager: AnimalManager, mock_pen_data: Dict[str, Dict[str, Union[str, float, int]]],
                    mock_herd_data: Dict[str, Union[str, int, bool]],
                    mock_manure_management_scenarios: Dict[str, List[Dict[str, Union[str, int]]]],
                    ) -> None:
