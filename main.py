@@ -59,7 +59,15 @@ def set_global_variables(make_graphs: bool, verbose: bool) -> None:
 def execute_simulations(
     metadata_files: List[Path], exclude_info_maps: bool = True
 ) -> None:
-    """Instantiates I/O Managers and processes the metadata files provided by the user."""
+    """Instantiates I/O Managers and processes the metadata files provided by the user to run the simulation.
+
+    Parameters
+    ----------
+    metadata_files : List[Path]
+        The list of Paths to the metadata files the user entered with which to run the simulation.
+    exclude_info_maps : bool, optional
+        Flag for whether or not the user wants to inlcude info_maps data in their results files.
+    """
     info_map = {"class": "No caller class",
                 "function": execute_simulations.__name__,
                 }
