@@ -341,7 +341,14 @@ def test_set_global_variables(make_graphs: bool, verbose: bool) -> None:
     config.global_variables.PRINT_STATUS_MESSAGES = old_verbose
 
 
-def test_execute_simulations(mocker: MockerFixture) -> None:
+@pytest.mark.parametrize(
+        "is_data_valid, simulate_call_count, add_error_call_count",
+        [(True, 2, 0),
+         (False, 0, 2)
+         ]
+)
+def test_execute_simulations(mocker: MockerFixture, is_data_valid: bool,
+                             simulate_call_count: int, add_error_call_count: int) -> None:
     """Checks that execute_simulations() calls the correct functions in the correct order"""
     # Arrange
     mock_output_manager = mocker.MagicMock(auto_spec=OutputManager)
@@ -355,7 +362,7 @@ def test_execute_simulations(mocker: MockerFixture) -> None:
     metadata_file_path1 = Path("metadata_file1.json")
     metadata_file_path2 = Path("metadata_file2.json")
     metadata_file_list = [metadata_file_path1, metadata_file_path2]
-    mock_input_manager.start_data_processing.return_value = True
+    mock_input_manager.start_data_processing.return_value = is_data_valid
     mock_simulator = mocker.MagicMock(auto_spec=SimulationEngine)
     mock_simulator.simulate.return_value = None
     mocker.patch("main.SimulationEngine", return_value=mock_simulator)
@@ -364,42 +371,8 @@ def test_execute_simulations(mocker: MockerFixture) -> None:
     execute_simulations(metadata_file_list, True)
 
     # Assert
-    assert mock_simulator.simulate.call_count == len(metadata_file_list)
-    assert mock_output_manager.flush_pools.call_count == len(metadata_file_list)
-    assert mock_input_manager.flush_pools.call_count == len(metadata_file_list)
-    assert mock_output_manager.dump_all_nondata_pools.call_count == len(metadata_file_list)
-    assert mock_output_manager.dump_all_nondata_pools.call_args_list == [
-        mocker.call("output", True)
-    ] * len(metadata_file_list)
-    assert mock_output_manager.save_variables.call_count == len(metadata_file_list)
-    assert mock_output_manager.save_variables.call_args_list == [
-        mocker.call("output", "output/output_filters/", True)
-    ] * len(metadata_file_list)
-
-
-def test_execute_simulations_adds_error_if_invalid_data(mocker: MockerFixture) -> None:
-    """Checks that execute_simulations() adds an error to OM if IM returns invalid data"""
-    mock_output_manager = mocker.MagicMock(auto_spec=OutputManager)
-    mock_input_manager = mocker.MagicMock(auto_spec=InputManager)
-    mock_output_manager.flush_pools.return_value = None
-    mock_output_manager.dump_all_nondata_pools.return_value = None
-    mock_output_manager.save_variables.return_value = None
-    mocker.patch("main.OutputManager", return_value=mock_output_manager)
-    mocker.patch("main.InputManager", return_value=mock_input_manager)
-    metadata_file_path1 = Path("metadata_file1.json")
-    metadata_file_path2 = Path("metadata_file2.json")
-    metadata_file_list = [metadata_file_path1, metadata_file_path2]
-    mock_input_manager.start_data_processing.return_value = False
-    mock_simulator = mocker.MagicMock(auto_spec=SimulationEngine)
-    mock_simulator.simulate.return_value = None
-    mocker.patch("main.SimulationEngine", return_value=mock_simulator)
-
-    # Act
-    execute_simulations(metadata_file_list, True)
-
-    # Assert
-    assert mock_simulator.simulate.call_count == 0
-    assert mock_output_manager.add_error.call_count == 2
+    assert mock_simulator.simulate.call_count == simulate_call_count
+    assert mock_output_manager.add_error.call_count == add_error_call_count
     assert mock_output_manager.flush_pools.call_count == len(metadata_file_list)
     assert mock_input_manager.flush_pools.call_count == len(metadata_file_list)
     assert mock_output_manager.dump_all_nondata_pools.call_count == len(metadata_file_list)
