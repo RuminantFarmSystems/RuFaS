@@ -40,11 +40,9 @@ class SimulationEngine:
 
         if config.global_variables.PRODUCE_GRAPHICS:
             sys.stdout.write('Producing Graphics\n')
-            t_start_graphics = timer.time()
-            t_end_graphics = timer.time()
-            graphics_prod_time = t_end_graphics - t_start_graphics
-        else:
-            graphics_prod_time = 0
+        t_start_graphics = timer.time()
+        t_end_graphics = timer.time()
+        graphics_prod_time = t_end_graphics - t_start_graphics
 
         om.add_log("graphics_prod_time", f"Graphics production time is: {graphics_prod_time}", info_map)
         total_runtime = (t_end_sim-t_start_sim) + graphics_prod_time
