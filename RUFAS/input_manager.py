@@ -424,6 +424,7 @@ class InputManager:
                 return False
         return True
 
+
     def _num_type_validator(self, variable_properties: Dict[str, Any], var_name: str,
                             input_data_value: Union[int, float]) -> bool:
         """Validates an input data number element."""
