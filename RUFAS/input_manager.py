@@ -410,10 +410,9 @@ class InputManager:
                     "function": self._array_type_validator.__name__,
                     }
         # TODO: This conditional should only pass if the input data is a list, not if it is a dict. Currently this is
-        #   prevented by two inputs that are specified as arrays in their respective properties sections but are still
-        #   in the form of dictionaries in the input files: pen_information in the animal input and calf, growing,
-        #   close_up, and lac_cow in user_defined_ration_percentages in the feed input. The ration percentages are fixed
-        #   in #774, pen_information does not have a fix plan right now - needs to be coordinated with Joe and Kristan.
+        #   prevented by inputs that are specified as arrays in their respective properties sections but are still
+        #   in the form of dictionaries in the input files: pen_information in the animal input. The pen_information
+        #   is fixed in #809, but this fix needs to be coordinated with and approved by Joe and Kristan.
         if type(input_data_value) is not list and type(input_data_value) is not dict:
             warning_string = "Array is not a list."
             om.add_warning(warning_string, f"{var_name=}", info_map)
