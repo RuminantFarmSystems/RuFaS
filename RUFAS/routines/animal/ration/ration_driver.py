@@ -439,13 +439,13 @@ class AvailableFeeds:
             self.feed_id.append(feed['rufas_id'])
             self.price.append(feed_costs[str(key)])
             self.TDN.append(feed['TDN'])
-            self.DE.append(feed['DE'])
+            self.DE.append(feed['DE_Base'])
             self.EE.append(feed['EE'])
             self.is_fat.append(feed['is_fat'])
             self.calcium.append(feed['calcium'])
             self.phosphorus.append(feed['phosphorus'])
             self.NDF.append(feed['NDF'])
-            self.type.append(feed['type'])
+            self.type.append(feed['feed_type'])
             self.is_wetforage.append(feed['is_wetforage'])
             self.Kd.append(feed['Kd'])
             self.N_A.append(feed['N_A'])
@@ -490,6 +490,6 @@ class AvailableFeeds:
                 continue
             for feed_id in sorted(list(feed_ids)):
                 # Get the list index of the feed_id in self.feed_id list.
-                idx = self._feed_id_to_list_idx_dict[int(feed_id)]
+                idx = self._feed_id_to_list_idx_dict[int(feed_id)]      # missing 54, 136, 26, 118, 139
                 result[key].append(vals[idx])
         return result

@@ -187,7 +187,7 @@ def feed(mocker: MockerFixture) -> Feed:
 
     mocker.patch('RUFAS.routines.feed.Feed.__init__',
                  return_value=None)
-    return Feed(data=mocker.MagicMock())
+    return Feed(data=mocker.MagicMock(), nutrient_standard='NASEM')
 
 
 def test_get_quality_specific_feed_costs(mocker: MockerFixture, feed: Feed) -> None:

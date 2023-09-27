@@ -18,7 +18,6 @@ Author(s): Kass Chupongstimun, kass_c@hotmail.com,
 from . import nitrogen_loss, carbon_loss, protein_degradation
 from .feed_typed_dicts import PurchasedFeedTypedDict
 from ..animal.pen import Pen
-from ...database_reader import DatabaseReader
 from RUFAS.output_manager import OutputManager
 from typing import Dict, List, Union, Any
 from RUFAS.input_manager import InputManager
@@ -79,7 +78,7 @@ def retrieve_data(data_source: str, var_names: List[str] = None, unique_value: b
             low_val, high_val = data[low_col][i], data[high_col][i]
             if not (low_val <= compare_val <= high_val):
                 continue
-        var_values = [data[key][i] for key in data.keys()]
+        var_values = [data[key][i] for key in var_names]
         if unique_value:
             if var_values in values:
                 continue
@@ -102,7 +101,6 @@ class Feed:
         """
         self.nutrient_standard = nutrient_standard
         self.nutrient_table = 'NASEM_Comp' if self.nutrient_standard == 'NASEM' else 'NRC_Comp'
-        self.nutrient_table = 'NRC_Comp'
 
         self.feeds_split_by_maturity = retrieve_data(data_source='feed_quality', var_names=['rufas_id'],
                                                      unique_value=True)
@@ -168,17 +166,17 @@ class Feed:
         # Loading in user-defined ration values
         self.user_defined_ration_percentages = data['user_defined_ration_percentages']
 
-        udrm.calf_ration = {str(dict['feed_type']):dict['ration_percentage'] for 
+        udrm.calf_ration = {str(dict['feed_type']): dict['ration_percentage'] for
                             dict in self.user_defined_ration_percentages['calf']}
 
-        udrm.growing_ration = {str(dict['feed_type']):dict['ration_percentage'] for 
-                            dict in self.user_defined_ration_percentages['growing']}
-        
-        udrm.close_up_ration = {str(dict['feed_type']):dict['ration_percentage'] for 
-                            dict in self.user_defined_ration_percentages['close_up']}
+        udrm.growing_ration = {str(dict['feed_type']): dict['ration_percentage'] for
+                               dict in self.user_defined_ration_percentages['growing']}
 
-        udrm.lactating_cow_ration = {str(dict['feed_type']):dict['ration_percentage'] for 
-                            dict in self.user_defined_ration_percentages['lac_cow']}
+        udrm.close_up_ration = {str(dict['feed_type']): dict['ration_percentage'] for
+                                dict in self.user_defined_ration_percentages['close_up']}
+
+        udrm.lactating_cow_ration = {str(dict['feed_type']): dict['ration_percentage'] for
+                                     dict in self.user_defined_ration_percentages['lac_cow']}
 
         udrm.tolerance = self.user_defined_ration_percentages['tolerance']
 
@@ -1133,9 +1131,14 @@ class Feed:
 
     def get_calf_feeds(self):
         feed_ids = [155, 156, 157]
-        columns = ['DM', 'CP', 'EE', 'DE']
+        columns = ['rufas_id', 'DM', 'CP', 'EE', 'DE_Base']
         nutrients = retrieve_data(data_source=self.nutrient_table, var_names=columns,
                                   identifier='rufas_id', desired_rows=feed_ids)
-        # missing 157
-        calf_feeds = {155: nutrients[0], 156: nutrients[1], 157: nutrients[2]}
+
+        calf_feeds = {}     # missing 157
+        for feed_id in feed_ids:
+            feed_id_nutrient = next(nutrient for nutrient in nutrients if nutrient['rufas_id'] == feed_id)
+            calf_feeds[feed_id] = {key: feed_id_nutrient[key]
+                                   for key in list(feed_id_nutrient.keys())
+                                   if key != 'rufas_id'}
         return calf_feeds
