@@ -404,7 +404,7 @@ def test_parse_gnu_args(mocker: MockerFixture) -> None:
             type=str,
             metavar="path",
             nargs="?",
-            help="path to input .json file or directory of .json files",
+            help="path to metadata .json file or directory of metadata .json files",
         ),
         mocker.call(
             "-ng",
