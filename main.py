@@ -21,17 +21,14 @@ METADATA_PATHS = ['input/example_metadata.json']
 
 
 def run_rufas(
-    input_path: str = None,
     make_graphs: bool = True,
     verbose: bool = True,
     clear_output: bool = False,
     exclude_info_maps: bool = True,
 ) -> None:
-    """Main function to run RuFaS, with options. If input_path is not provided,
-    the interactive user prompt is triggered.
+    """Main function to run RuFaS, with options.
 
     Args:
-        input_path: path to input .json file or directory of .json files
         make_graphs: prevent graphics from generating
         verbose: print progress messages while simulation is running
         clear_output: lear output directory before running the simulation
@@ -93,17 +90,6 @@ def parse_gnu_args():
     """Parse command line options, if applicable"""
     parser = argparse.ArgumentParser()
     parser.add_argument(
-        "input_path",
-        type=str,
-        metavar="path",
-        nargs="?",
-        help="path to metadata .json file or directory of metadata .json files",
-    )
-    # TODO: rather than a string, this should probably be a file handle as in the link below, but that would affect
-    #   the current input handler, file reader, etc.
-    #   https://stackoverflow.com/questions/11540854/file-as-command-line-argument-for-argparse-error-message-if-argument-is-not-va
-
-    parser.add_argument(
         "-ng",
         "--no-graphics",
         help="Prevent graphics from generating",
@@ -115,7 +101,6 @@ def parse_gnu_args():
         help="Print progress messages while simulation is running",
         action="store_true",
     )
-    # parser.add_argument("-i", "--interactive", help="run in interactive mode", action="store_true")
     parser.add_argument(
         "-co",
         "--clear-output",
@@ -134,7 +119,6 @@ def parse_gnu_args():
 if __name__ == "__main__":
     cmd_arguments = parse_gnu_args()
     run_rufas(
-        input_path=cmd_arguments.input_path,
         make_graphs=not cmd_arguments.no_graphics,
         verbose=cmd_arguments.verbose,
         clear_output=cmd_arguments.clear_output,
