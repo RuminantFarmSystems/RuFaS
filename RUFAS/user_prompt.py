@@ -129,9 +129,9 @@ def prompt_user_for_input() -> str:
 
     Returns: the user input, as a string"""
     print("\nSingle Simulation:\n\t" +
-          "Enter a json file name\n" +
+          "Enter a metadata file name\n" +
           "Batch Simulation:\n\t" +
-          "Enter a directory containing json files\n" +
+          "Enter a directory containing metadata files\n" +
           "Print Base Directory:\n\t" +  # TODO: neither "dir" nor "Q/q" work at all - GitHub Issue #208
           "Enter \'dir\'\n" +
           "Exit RUFAS:\n\t" +

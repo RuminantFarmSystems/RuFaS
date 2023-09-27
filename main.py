@@ -96,7 +96,7 @@ def parse_gnu_args():
         type=str,
         metavar="path",
         nargs="?",
-        help="path to input .json file or directory of .json files",
+        help="path to metadata .json file or directory of metadata .json files",
     )
     # TODO: rather than a string, this should probably be a file handle as in the link below, but that would affect
     #   the current input handler, file reader, etc.
