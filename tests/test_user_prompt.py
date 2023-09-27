@@ -343,9 +343,7 @@ def test_set_global_variables(make_graphs: bool, verbose: bool) -> None:
 
 @pytest.mark.parametrize(
         "is_data_valid, simulate_call_count, add_error_call_count",
-        [(True, 2, 0),
-         (False, 0, 2)
-         ]
+        [(True, 2, 0), (False, 0, 2)]
 )
 def test_execute_simulations(mocker: MockerFixture, is_data_valid: bool,
                              simulate_call_count: int, add_error_call_count: int) -> None:

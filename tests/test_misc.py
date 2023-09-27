@@ -11,7 +11,6 @@ import json
 from typing import Any, Callable, Dict, List
 from mock import Mock, mock_open, patch
 
-import config.global_variables
 import pytest
 from mock.mock import MagicMock, call
 from pytest import approx, raises
@@ -108,11 +107,11 @@ def test_simulate(patch_simulation_engine: SimulationEngine, mocker: MockerFixtu
 def test_run_simulation_main_loop(patch_simulation_engine: SimulationEngine) -> None:
     """Unit test for function simulate in file RUFAS/simulation_engine.py"""
     sim_eng = patch_simulation_engine
-    sim_eng.time.end_simulation = MagicMock(return_value=True)
+    sim_eng.time.end_simulation = MagicMock(side_effect=[False, True])
     sim_eng._annual_simulation = MagicMock()
     sim_eng._run_simulation_main_loop()
-    sim_eng.time.end_simulation.assert_called_once()
-    sim_eng._annual_simulation.assert_not_called()
+    sim_eng.time.end_simulation.assert_has_calls([call(), call()])
+    sim_eng._annual_simulation.assert_called_once()
 
 
 def test_show_final_messages(
