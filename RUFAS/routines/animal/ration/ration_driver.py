@@ -8,8 +8,11 @@ Description: Main file in the ration formulation process that connects all
 
 Author(s): Chris VanKerkhove, cjv47@cornell.edu
            Joseph Waddell, jw2574@cornell.edu
+           Joseph Waddell, jw2574@cornell.edu
 """
 import collections
+from typing import Set, Dict, List
+
 from typing import Set, Dict, List
 
 from RUFAS.output_manager import OutputManager
@@ -22,6 +25,7 @@ from RUFAS.routines.animal.ration.ration_config import RationConfig
 import scipy
 
 udrm = UserDefinedRationManager()
+ration_optimizer = RationOptimizer()
 ration_optimizer = RationOptimizer()
 om = OutputManager()
 
@@ -96,8 +100,8 @@ class RationManager:
         else:
             return pen.ration, ration_vals
 
-    @classmethod
-    def calc_milk_average(cls, pen) -> float:
+
+    def calc_milk_average(pen) -> float:
         """
         Calculates average milk produced in a pen.
         
@@ -175,7 +179,6 @@ class RationManager:
         Parameters
         ----------
         ration: Dict
-
 
         Returns
         -------
