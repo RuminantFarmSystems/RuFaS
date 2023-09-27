@@ -11,6 +11,7 @@ from main import execute_simulations
 from main import parse_gnu_args
 from main import run_rufas
 from main import set_global_variables
+from main import METADATA_PATHS
 from RUFAS import errors
 from RUFAS.simulation_engine import SimulationEngine
 from RUFAS.input_manager import InputManager
@@ -296,10 +297,7 @@ def test_run_rufas(
     """Checks that run_rufas() calls the correct functions in the correct order"""
     # Arrange
     patch_set_global_variables = mocker.patch("main.set_global_variables")
-    file_list = ["file1.json", "file2.json"]
-    patch_obtain_file_list = mocker.patch(
-        "main.obtain_file_list", return_value=file_list
-    )
+    metadata_file_list = METADATA_PATHS
     patch_execute_simulations = mocker.patch(
         "main.execute_simulations"
     )
@@ -310,9 +308,8 @@ def test_run_rufas(
 
     # Assert
     patch_set_global_variables.assert_called_once_with(make_graphs, verbose)
-    patch_obtain_file_list.assert_called_once_with(input_path, verbose)
     patch_execute_simulations.assert_called_once_with(
-        file_list, exclude_info_maps
+        metadata_file_list, exclude_info_maps
     )
     if clear_output:
         patch_empty_dir.assert_called_once()

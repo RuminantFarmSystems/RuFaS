@@ -12,10 +12,12 @@ from typing import List
 
 import config.global_variables
 from RUFAS.simulation_engine import SimulationEngine
-from RUFAS.user_prompt import obtain_file_list
 from RUFAS.input_manager import InputManager
 from RUFAS.output_manager import OutputManager
 from RUFAS.util import Utility
+
+
+METADATA_PATHS = ['input/example_metadata.json']
 
 
 def run_rufas(
@@ -43,8 +45,7 @@ def run_rufas(
     set_global_variables(make_graphs, verbose)
     if verbose:
         print("RuFaS: Ruminant Farm Systems Model 2023")
-    print(input_path)
-    metadata_file_list = obtain_file_list(input_path, verbose)
+    metadata_file_list = METADATA_PATHS
     execute_simulations(metadata_file_list, exclude_info_maps)
 
 
