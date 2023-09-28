@@ -153,6 +153,11 @@ def heifer_b() -> dict:
     return heifer_b_dict
 
 
+def test_set_requirements():
+    """Unit test for function set_requirements in file routines/animal/ration/animal_requirements.py"""
+    pass
+
+
 def test_calculate_NRC_energy_maintenance_requirements(cow_a:dict, cow_b:dict, heifer_a:dict, heifer_b:dict)->None:
     """Unit test for function calculate_NRC_energy_maintenance_requirements in file routines/animal/ration/animal_requirements.py"""
     req = RUFAS.routines.animal.ration.animal_requirements.AnimalRequirements()
@@ -1421,6 +1426,31 @@ def test_calculate_rqmts():
     """Unit test for function calculate_rqmts in file routines/animal/ration/growing_heifer_ration.py"""
     pass
 
+# @pytest.mark.parameterize("udrm, om, expected", [MagicMock(), MagicMock(), True])
+def test_formulate_ration() -> None:
+    """Unit test for function formulate_ration in file routines/animal/ration/ration_driver.py"""
+    # test 1
+    pass
+    # udrm = MagicMock()
+    # udrm.udr_or_not = True
+    # expected = True
+    # result = udrm.udr_or_not
+    # assert result == expected
+    # patch get_user_defined_ration()
+    # assert that the return == ration, ration_vals
+    
+    # test 2
+    # udrm.udr_or_not = True
+    # patch attempt_optimization
+    # pen.animal_combination.name in ['LAC_COW']
+    
+    # test 2b: success = False
+    
+    
+    # test 3 pen.animal_combination.name NOT in ['LAC_COW']
+    
+    # test 4 - solution == None
+        
 
 def test_calc_milk_average() -> None:
     """Unit test for function calc_milk_average in file routines/animal/ration/ration_driver.py"""
@@ -1493,20 +1523,40 @@ def test_get_user_defined_ration():
     pass
 
 
-def test_ration_formulation():
-    """Unit test for function ration_formulation in file routines/animal/ration/ration_driver.py"""
-    pass
+def test_init_ration_reporter():
+    rationreporter_object = RationReporter()
+    assert rationreporter_object.nutrient_amount == []
+    assert rationreporter_object.nutrient_conc == []
 
 
-def test_ration_report():
-    """Unit test for function ration_report in file routines/animal/ration/ration_driver.py"""
-    pass
-
-
-def test_set_requirements():
-    """Unit test for function set_requirements in file routines/animal/ration/ration_driver.py"""
-    pass
-
+def test_report_ration():
+    """Unit test for function report_ration in file routines/animal/ration/ration_driver.py"""
+    ration = {'1':1, '2':2, '3':3,
+            '121':1, '122':2, '155':3, '157':4}
+    available_feeds = {'1':{'DM': 1, 'as_fed': 1, 'CP': 1, 'ADF': 1, 'NDF': 1,
+                            'lignin': 1, 'ash': 1, 'phosphorus': 1, 'potassium': 1,
+                            'N': 1, "EE": 1, "starch": 1, "TDN": 1, "DE" : 1, "calcium":1},
+    '2':{'DM': 1, 'as_fed': 1, 'CP': 1, 'ADF': 1, 'NDF': 1,
+                            'lignin': 1, 'ash': 1, 'phosphorus': 1, 'potassium': 1,
+                            'N': 1, "EE": 1, "starch": 1, "TDN": 1, "DE" : 1, "calcium":1}, 
+    '3': {'DM': 1, 'as_fed': 1, 'CP': 1, 'ADF': 1, 'NDF': 1,
+                            'lignin': 1, 'ash': 1, 'phosphorus': 1, 'potassium': 1,
+                            'N': 1, "EE": 1, "starch": 1, "TDN": 1, "DE" : 1, "calcium":1},
+    '121': {'DM': 1, 'as_fed': 1, 'CP': 1, 'ADF': 1, 'NDF': 1,
+                            'lignin': 1, 'ash': 1, 'phosphorus': 1, 'potassium': 1,
+                            'N': 1, "EE": 1, "starch": 1, "TDN": 1, "DE" : 1, "calcium":1},
+    '122':{'DM': 1, 'as_fed': 1, 'CP': 1, 'ADF': 1, 'NDF': 1,
+                            'lignin': 1, 'ash': 1, 'phosphorus': 1, 'potassium': 1,
+                            'N': 1, "EE": 1, "starch": 1, "TDN": 1, "DE" : 1, "calcium":1},
+    '155':{'DM': 1, 'as_fed': 1, 'CP': 1, 'ADF': 1, 'NDF': 1,
+                            'lignin': 1, 'ash': 1, 'phosphorus': 1, 'potassium': 1,
+                            'N': 1, "EE": 1, "starch": 1, "TDN": 1, "DE" : 1, "calcium":1},
+    '157':{'DM': 1, 'as_fed': 1, 'CP': 1, 'ADF': 1, 'NDF': 1,
+                            'lignin': 1, 'ash': 1, 'phosphorus': 1, 'potassium': 1,
+                            'N': 1, "EE": 1, "starch": 1, "TDN": 1, "DE" : 1, "calcium":1}}
+    result = RationReporter.report_ration(ration, available_feeds)
+    expected = ({'dm': 16, 'as_fed': 0.16, 'CP': 0.16, 'ADF': 0.16, 'NDF': 0.16, 'lignin': 0.16, 'ash': 0.16, 'phosphorus': 0.16, 'potassium': 0.16, 'N': 0.025273981191222573, 'EE': 0.16, 'starch': 0.16, 'TDN': 0.16, 'DE': 0.16, 'calcium': 0.16}, {'dm': 1.0, 'CP': 1.0, 'ADF': 1.0, 'NDF': 1.0, 'lignin': 1.0, 'ash': 1.0, 'phosphorus': 1.0, 'potassium': 1.0, 'N': 0.15796238244514108, 'EE': 1.0, 'starch': 1.0, 'TDN': 1.0, 'DE': 1.0, 'calcium': 1.0})
+    assert result == expected
     
 def eq_constraint(x, ration_config):
     return np.sum(x) - 10  # This 'eq' constraint checks if the sum of x is equal to 10
