@@ -83,21 +83,6 @@ class Infiltration:
         infiltrated_water = max(0.0, rainfall - self.data.accumulated_runoff)
         self.data.soil_layers[0].water_content += infiltrated_water
 
-        # --- Update previous retention parameter ----------------------------------------------------------------------
-        if self.data.previous_retention_parameter is None:
-            self.data.previous_retention_parameter = 0.9 * first_moisture_condition_retention_parameter
-        else:
-            self.data.previous_retention_parameter = self._determine_updated_retention_parameter(
-                                                                        self.data.previous_retention_parameter,
-                                                                        potential_evapotranspiration,
-                                                                        first_moisture_condition_retention_parameter,
-                                                                        rainfall,
-                                                                        self.data.accumulated_runoff,
-                                                                        weighting_coefficient)
-        # --------------------------------------------------------------------------------------------------------------
-
-        self.data.moisture_condition_parameter = self._determine_moisture_condition_parameter(retention_parameter)
-
         # Update annual totals
         self.data.annual_runoff_total += self.data.accumulated_runoff
 

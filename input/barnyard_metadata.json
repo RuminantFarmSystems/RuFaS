@@ -119,13 +119,6 @@
       "type": "json",
       "properties": "field_properties"
     },
-    "field_2": {
-      "title": "Field specification",
-      "description": "Contains overall field properties and references to specification files.",
-      "path": "input/field/barnyard_field_2.json",
-      "type": "json",
-      "properties": "field_properties"
-    },
     "weather": {
       "title": "Weather data",
       "description": "Let's turn on the AC",
