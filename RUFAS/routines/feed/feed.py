@@ -55,15 +55,77 @@ def annual_feed_routine(feed):
 
 
 def pack_into_dict(var_names: List[str], var_values: List[Any]) -> Dict[str, Any]:
+    """
+        Pack the provided variable names and values into a dictionary.
+
+        Parameters
+        ----------
+        var_names : List[str]
+            List of keys for the resulting dictionary.
+        var_values : List[Any]
+            Corresponding values for the keys specified in `var_names`.
+
+        Returns
+        -------
+        Dict[str, Any]
+            Dictionary constructed from the provided variable names and values.
+
+        Raises
+        ------
+        ValueError
+            If the lengths of `var_names` and `var_values` are not the same.
+
+        Notes
+        -----
+        Ensure that both `var_names` and `var_values` have the same length.
+        Each name in `var_names` will be paired with its corresponding value from `var_values`.
+
+        Example
+        -------
+        >>> pack_into_dict(['a', 'b'], [1, 2])
+        {'a': 1, 'b': 2}
+
+        """
     result_dict = {}
     for id_var, var_name in enumerate(var_names):
         result_dict[var_name] = var_values[id_var]
     return result_dict
 
 
-def retrieve_data(data_source: str, var_names: List[str] = None, unique_value: bool = None,
+def retrieve_data(data_source: str, var_names: List[str] = None, unique_value: bool = False,
                   identifier: str = None, desired_rows: List[Any] = None,
                   compare_val: int = None, low_col: str = None, high_col: str = None) -> List[Dict[str, Any]]:
+    """
+    This function retrieves and filters the desired data, pack each "row" into a dictionary object, and returns a list
+    of desired rows
+
+    Parameters
+        ----------
+        data_source : str
+            Path to retrieve the desired data from IM.
+        var_names : List[str] = None
+            A list of desired variables (columns) to retrieve.
+            If omitted, all existing columns are returned.
+        unique_value: bool = False
+            If True, returns only unique values. Default is False.
+        identifier: str = None
+            Column name used for filtering based on `desired_rows`.
+            Both `identifier` and `desired_rows` must be provided for filtering.
+        desired_rows: List[Any] = None
+            Desired row values for filtering. Rows with these values in the `identifier` column are returned.
+        compare_val: int = None
+            Baseline value for comparison. Used with `low_col` and `high_col` to filter rows. The "compare_val" should
+            fall in the range of [low_col_value, high_col_value], otherwise the current row will be ignored.
+        low_col: str = None
+            Column indicating the lower bound for comparison with `compare_val`.
+        high_col: str = None
+            Column indicating the upper bound for comparison with `compare_val`.
+
+    Returns
+    -------
+        List[Dict[str, Any]]
+            Returns a list of dictionaries, each dictionary corresponds to a row in the csv file.
+    """
     result_list = []
     values = []
     data = im.get_data(data_source)
