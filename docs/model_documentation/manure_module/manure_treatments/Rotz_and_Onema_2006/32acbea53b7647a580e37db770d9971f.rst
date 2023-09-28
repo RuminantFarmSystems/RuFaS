@@ -1,0 +1,1546 @@
+Rotz and Onema 2006
+===================
+
+.. image:: vertopal_32acbea53b7647a580e37db770d9971f/media/image1.png
+   :width: 1.01389in
+   :height: 0.13889in
+
+See discussions, stats, and author profiles for this publication at:
+
+**Article**\ *in*\ Transactions of the ASABE (American Society of
+Agricultural and Biological Engineers) · July 2006
+
+DOI: 10.13031/2013.21731 · Source: OAI
+
++-----------------------------------+-----------------------------------+
+| CITATIONS                         |    | READS                        |
+| 60                                |    | 191                          |
++===================================+===================================+
++-----------------------------------+-----------------------------------+
+
+**2 authors:**
+
++-----------------+-----------------+-----------------+-----------------+
+| |image1|        |                 | |image2|        |                 |
++=================+=================+=================+=================+
+|                 |                 |                 |                 |
++-----------------+-----------------+-----------------+-----------------+
+|                 |                 |                 |                 |
+|                 |   **319**\ PUBL |                 |   **110**\ PUBL |
+|                 | ICATIONS\ **9,1 |                 | ICATIONS\ **1,0 |
+|                 | 45**\ CITATIONS |                 | 47**\ CITATIONS |
++-----------------+-----------------+-----------------+-----------------+
+|                 | +------------+  |                 | +------------+  |
+|                 | | SEE        |  |                 | | SEE        |  |
+|                 | | PROFILE    |  |                 | | PROFILE    |  |
+|                 | +============+  |                 | +============+  |
+|                 | +------------+  |                 | +------------+  |
++-----------------+-----------------+-----------------+-----------------+
+
+**Some of the authors of this publication are also working on these
+related projects:**
+
+|image3|\ Autograssmilk
+
+|image4|\ Climate variability
+
+   All content following this page was uploaded by on 20 May 2014.
+
+   The user has requested enhancement of the downloaded file.
+
+   PREDICTING MANAGEMENT EFFECTSON AMMONIA EMISSIONSFROM DAIRYAND BEEF
+   FARMS
+
+C. A. Rotz, J. Oenema
+
+   **ABSTRACT.** *Relationships were developed to predict ammonia (NH3)
+   nitrogen losses from cattle manure in animal housing, during manure
+   storage, following field application, and during grazing. Ammonia
+   loss in each phase was predicted using a mechanistic model for NH3
+   volatilized from the surface of an aqueous solution of ammonium where
+   the NH3 is transported to the free atmosphere through a pathway with
+   finite resistance. Ammonia emission rate was a function of the
+   ammoniacal N content in the manure, ambient temperature, manure pH,
+   manure moisture content, and the exposed manure surface area. Model
+   relationships were calibrated by selecting values for the resistance
+   to NH3 transport for the various loss pathways, which predicted daily
+   and annual emissions similar to those reported in published studies.
+   In further evaluation, these calibrated relationships predicted
+   average annual losses similar to those documented in previous work
+   over a range in climate locations. These relationships were
+   integrated into a whole-farm simulation model to provide a tool for
+   evaluating and comparing long-term nitrogen losses along with other
+   performance, environmental, and economic aspects of farm production.
+   Whole-farm simulations illustrated that the use of a free stall barn,
+   bottom-loaded slurry storage, and direct injection of manure into the
+   soil reduced NH3 emissions by 33% to 50% compared to other commonly
+   used dairy housing and manure handling systems in the northeastern
+   U.S. The improvement in nitrogen utilization more than offset the
+   increased cost in manure handling, providing a small increase in farm
+   profit. The farm model provides a research and teaching tool for
+   evaluating and comparing the economic and environmental
+   sustainability of dairy and beef production systems.*
+
+   **Keywords.** *Ammonia emission, Cattle production, Farm model,
+   Nitrogen loss, Simulation.*
+
++-----------------------------------------------------------------------+
+|    producing farms today, more nutrients are being brought onto T a   |
+|    major social concern in many developed coun-tries, particularly in |
+|    regions with high concentra-tions of animal production. On many of |
+|    our animal he effect of farms on the environment has become        |
+|                                                                       |
+|    the farm through feed, fertilizer, legume fixed N, and deposi-tion |
+|    than are leaving the farm in animal products or crops sold. This   |
+|    leads to the accumulation of nutrients in the soil and loss to the |
+|    environment.                                                       |
+|                                                                       |
+|    Environmental concerns include nutrient losses to the atmosphere,  |
+|    surface water bodies, and groundwater. Nutri-ents of greatest      |
+|    concern are nitrogen (N) and phosphorus (P). Nitrogen loss in the  |
+|    form of nitrate leaching to groundwater has been a major concern   |
+|    for agriculture. In recent years, P loss in runoff following storm |
+|    events has also become an important issue. A growing concern,      |
+|    though, is the volatiliza-tion of gases from animal facilities. An |
+|    important gaseous emission is N in the form of ammonia (NH3).      |
+|    Depending on farm management, NH3−N losses can be up to two or     |
+|    more times the N loss occurring through other pathways (Rotz,      |
+|    2004). Ammonia emissions are of concern because NH3 in             |
++=======================================================================+
++-----------------------------------------------------------------------+
+
+..
+
+   Submitted for review in October 2005 as manuscript number SE 6108;
+   approved for publication by the Structures & Environment Division of
+   ASABE in July 2006.
+
+   The authors are **C. Alan Rotz, ASABE Fellow,** Agricultural
+   Engineer, USDA-ARS, University Park, Pennsylvania; and **Jouke
+   Oenema,** Senior Research Assistant, Farming Systems, Plant Research
+   International, Wageningen University and Research Center, Wageningen,
+   The Netherlands. **Corresponding author:** C. Alan Rotz, USDA-ARS,
+   Building 3702, Curtin Rd., University Park, PA; phone: 814-865-2049;
+   fax: 814-863-0935; e-mail: al.rotz@ars.usda.gov.
+
+   the atmosphere contributes to the formation of fine particu-late
+   matter with potential adverse effects on human health, including
+   premature mortality, chronic bronchitis, and asthma attacks (McCubbin
+   et al., 2002). Atmospheric NH3 also contributes to
+   over-fertilization, acidification, and eutrophication of ecosystems,
+   which may occur near or at a considerable distance from the NH3
+   source (NRC, 2003).
+
+   Changes in technology and management such as low-pro-tein diets,
+   low-emission barns, covered manure storages, and manure application
+   through injection into the soil can be used to reduce ammonia
+   emissions (Rotz, 2004). However, such changes should not be made
+   without considering interactions with other aspects of farm
+   performance, environmental impact, and profitability. Focusing on the
+   reduction of loss from one part of the farm is of little value if
+   that change just leads to additional loss from another part of the
+   farm. For example, reducing NH3 emission in the barn can simply lead
+   to greater emissions during manure storage and field application if
+   all components of the farm are not managed in an integrated way to
+   reduce loss. Reducing gaseous N loss can also lead to
+   over-application of N on cropland, with excessive loss through
+   nitrate leaching. Environmental benefits also must be weighed against
+   production costs and farm profit to determine the economic impact on
+   the producer.
+
+   Thus, a comprehensive whole-farm approach is needed to develop and
+   evaluate animal production systems that reduce environmental concerns
+   while maintaining profitable opera-tions. The Integrated Farm System
+   Model (IFSM) was developed as a research and educational tool to
+   assist this type of evaluation (Rotz and Coiner, 2005). This farm
+   simulation model is used to evaluate and compare the
+
+Transactions of the ASABE
+
++-----------------------+-----------------------+-----------------------+
+|    Vol. 49(4):        |    2006 American      | 1139                  |
+|    1139−1149          |    Society of         |                       |
+|                       |    Agricultural and   |                       |
+|                       |    Biological         |                       |
+|                       |    Engineers ISSN     |                       |
+|                       |    0001−2351          |                       |
++=======================+=======================+=======================+
++-----------------------+-----------------------+-----------------------+
+
+long-term performance, economics, and environmental im-pact of farm
+production systems. To broaden the application of this model, a more
+robust component was needed for predicting NH3 emissions from manure in
+housing facilities, during storage, following field application, and
+during grazing. Addition of this component model enabled a more
+comprehensive assessment of the effects of changes made to reduce NH3
+emissions and their interactions with other parts of the farm.
+
+Both empirical and mechanistic approaches have been used to model NH3
+emissions from manure. Sogaard et al. (2002) developed an empirical
+model of NH3 volatilization from field-applied slurry using an
+experimental database collected throughout Europe. Empirical information
+also has been used to model NH3 emissions from animal agriculture in the
+U.S. (EPA, 2004) and the impacts of farming practices on N fluxes for
+all of agriculture in the Netherlands (de Vries et al., 2001).
+Mechanistic models predict emissions by describing the physical,
+biological, and chemical processes involved (Ni, 1999). Monteny et al.
+(1998) developed a detailed mechanistic model to simulate NH3 emissions
+from Dutch dairy cow houses that use slatted floors with slurry storage
+under the slats. Hutchings et al. (1996) used less detail in a dynamic
+model of NH3 volatilization to predict all sources of emission from
+grazing livestock farms. This model has been adapted by others to
+predict NH3 emissions from field-applied slurry (McGechan and Wu, 1998),
+to simulate losses in the dynamic farm model FASSET (Berntsen et al.,
+2003), and to map temporal and spatial variation in NH3 emissions from
+dairy farms across the U.S. (Pinder et al., 2004).
+
+Our goal was to develop and evaluate a process-based model of NH3
+emissions in cattle production for use in IFSM. Specific objectives
+were: (1) to adapt and expand the mechanistic model of Hutchings et al.
+(1996) to simulate NH3 emissions from manure in housing facilities,
+during storage, following field application, and during grazing; (2) to
+verify emission predictions for common manure handling practic-es; and
+(3) to use the farm model to illustrate the environmen-tal impact and
+economics of manure management options commonly used on U.S. dairy
+farms.
+
+| **MODEL DESCRIPTION**
+| Ammonia loss from manure can be predicted using a relationship for NH3
+  volatilized from the surface of an aqueous solution containing
+  ammonium where the NH3 is transported to the free atmosphere through a
+  pathway with a finite resistance (Hutchings et al., 1996). Assuming a
+  very low (zero) concentration of NH3 in the free atmosphere, volatile
+  loss can be determined as:
+
+   Loss = TAN \* *c* \* � / (*r* \* *M* \* *Q*) (1)
+
+| where
+| Loss = NH3−N loss (kg N/m2/d)
+| TAN = total ammoniacal N in the manure solution (kg N/m2)
+| *r* = resistance of NH3 transport from the manure surface to the free
+  atmosphere (s/m)
+| *M*
+| = manure solution mass per unit area of exposed surface (kg/m2)
+
+   | � = manure specific density (assumed to be
+   | 1000 kg/m3)
+   | *Q* = dimensionless equilibrium coefficient for the NH3 gas in the
+     air for a given concentration of TAN in the solution.
+
+   | = time conversion (86400 s/d). *c*
+   | By Henry’s law of distribution, the equilibrium coefficient can be
+     defined as:
+
+   *Q* = *Kh* \* *Ka* (2)
+
+   | where
+   | *Kh* = Henry’s law coefficient
+   | *Ka* = disassociation coefficient of ammonium.
+
+   These two coefficients are a function of temperature and pH (Sherlock
+   and Goh, 1985):
+
+   *Kh* = 10(1478/(*T*\ +273)−1.69) (3)
+
+   *Ka* = 1 + 10(0.09018+2729.9/(*T*\ +273)−pH) (4)
+
+   where *T* = manure solution temperature (°C) pH = manure solution
+   acidity.
+
+   By integrating these relationships over the time of manure exposure,
+   NH3 loss is predicted. As described in the following sections, this
+   general relationship was adapted to predict losses in animal housing,
+   during manure storage, following field application, and from grazing
+   animals. Relationships developed for each of these specific emission
+   sources were then calibrated to predict reported emission rates. This
+   was done by selecting values for the resistance to NH3 transport
+   (*r*) for the various emission pathways that provided daily emission
+   rates similar to those reported from experimental studies. Given the
+   limited data available for developing model parameters, this
+   calibration procedure was used to ensure that predicted daily and
+   annual emissions adequately represented reported emissions.
+
+   Two assumptions were made that simplified this model for whole-farm
+   simulation. First, *r* was set at constant values for emissions other
+   than those in a barn. Although meteorologi-cal conditions such as
+   temperature and wind velocity affect this resistance, these effects
+   were not considered. Second, manure pH may vary through time due to
+   biological and chemical processes in the manure. Because these
+   changes would normally be small and difficult to predict, we assumed
+   a constant pH during each of the four pathways of loss. These
+   simplifications were justified because these variations would tend to
+   average out over time, with little impact on whole-farm simulations
+   over many years of weather.
+
+   | **ANIMAL HOUSING LOSS**
+   | Ammonia loss was modeled for cattle housing facilities typically
+     found on U.S. farms. These included tie stall, free stall, and open
+     feedlot facilities. Manure was collected from gutters in a tie
+     stall barn, from smooth floors in a free stall barn, and from an
+     open soil surface on a feedlot. Manure was removed from tie stall
+     and free stall barns through periodic scraping in intervals of two
+     days or less. Scraping of feedlots was assumed to occur at
+     relatively long intervals of several weeks or more. Another common
+     practice in free stall housing is manure removal through flushing
+     with recycled liquid separated from manure solids. Since data were
+     not available to compare scraped floors to those flushed with this
+     TAN-containing solution, they were assumed to have the
+
+   1140 TRANSACTIONSOFTHE ASABE
+
+same emission rate. The option of using a slatted floor with a storage
+tank below the floor was not modeled. Limited data indicate that the
+loss with this option is greater than that from a scraped floor but
+likely similar to the total loss from a scraped floor and an open manure
+storage tank (Rotz, 2004).
+
+Daily NH3−N emission was determined assuming that the characteristics of
+the exposed manure remained relatively constant throughout each day.
+Although manure is typically removed at intervals within a day, scraping
+also tends to mix urine and feces and spread a thin surface layer that
+remains on the floor surface. Scraping frequency has been found to have
+little effect on NH3 emission (Braam et al., 1997; Rotz, 2004).
+
+The exposed manure surface area was set considering typical barn designs
+(PSU, 2006). For free stall barns, the area was defined as 80% of the
+alley area available to animal traffic divided by the number of stalls.
+This provided an area of 3.5 m2 per cow (or finishing beef animal). For
+growing animals, surface areas were 2.0, 2.5, and 2.4 m2 for dairy
+heifers under one year of age, heifers over one year of age, and stocker
+beef cattle, respectively. For tie stall barns, an area of 1.5 m2 per
+cow was assumed, which was twice the open gutter surface area behind
+each animal. This area included the open gutter surface, gutter walls,
+and the surrounding floor typically fouled by each animal. The manure
+solution mass on the floor (*M*) was determined as the daily urine
+excreted by the housed animals divided by the exposed surface area.
+Urine production was obtained from the animal component of IFSM where
+urine excretion was a function of animal size, feed intake, protein
+intake, and milk production (Fox et al., 2004; Rotz and Coiner, 2005).
+
+For NH3 loss during enclosed animal housing, the resistance of NH3
+transport (*r*) was a function of the ventilation air temperature
+(Hutchings et al., 1996; Manne-beck and Oldenburg, 1991):
+
+   *r* = HSC (1 − 0.027 (20 − *T*)) (5)
+
+where HSC is a housing-specific constant (s/m).
+
+A value for *r* was determined for each simulated day using the average
+ambient temperature. Manure temperature was assumed to be equal to this
+average daily temperature in determining the equilibrium coefficient
+with equations 2, 3, and 4. Manure solution pH was set at 7.7 to
+represent a typical value for urine excreted by lactating dairy cattle
+buffered in a mixture with feces (Pinder et al., 2004; Burgos et al.,
+2005).
+
+A suitable housing-specific constant was established by calibrating the
+model to predict reported NH3−N losses from free stall barns. Most
+measurements have been made in northern Europe, where typical emission
+rates range from 20 to 45 g N/cow/d (Monteny and Erisman, 1998; Groot
+Koerkamp et al., 1998). For a 25-year simulation of dairy cows in a free
+stall barn using Wageningen weather and a selected housing-specific
+constant of 260 s/m, the model 1% to 6% for each °C increase in ambient
+temperature, which was similar to that found by Groot Koerkamp et al.
+(1998).
+
+The same housing model was used for open feedlots except that a constant
+value was assigned for *r*. Since ventilation was not a factor, the
+influence of temperature on *r* was not included. Surface areas covered
+by urine were set at 5.0 and 3.2 m2 for mature and growing animals,
+respectively. These areas were estimated considering the
+
+   average area covered by urine deposits per animal over 2 d (Oenema et
+   al., 2001). The pH of feedlot manure was set at 7.7 (Eghball et al.,
+   1997). A constant *r* value of 80 s/m was used. This, along with the
+   simulated storage of manure on the lot, caused loss of nearly all
+   available TAN.
+
+   The TAN in manure deposited on the barn floor or earthen lot was
+   obtained from the animal component of IFSM. The daily TAN was the
+   non-organic portion of the total N excreted, which was determined as
+   the sum of the urine N from all animals in the housing facility.
+   Urinary N production was a function of the age, size, and milk
+   production level of the animals in each housing facility and the
+   amount and type of protein in their diet (Rotz and Coiner, 2005).
+
+   With the use of equation 1, NH3 loss was determined for each day
+   based on the amount of manure TAN excreted and the ambient
+   temperature for the day. By integrating over each simulated year,
+   annual losses were determined. The propor-tion of N lost during
+   animal housing each year was the annual NH3−N loss divided by the
+   total N excreted in the housing facility during the year.
+
+   | **MANURE STORAGE LOSS**
+   | On farms where manure is stored outdoors for an extended time in a
+     pile, tank, or pond, NH3 emission continues during this storage
+     period. This loss was modeled considering the TAN content and pH of
+     the stored manure, the ambient temperature, and the exposed surface
+     area for the storage facility. Manure was stored in either liquid
+     (5% dry matter, DM), slurry (8% DM), semisolid (13% DM), or solid
+     (20% DM) form. Manure DM content affected the volume of manure
+     stored and the resistance to NH3 transfer at the manure surface.
+     For a feedlot, manure was assumed to be stored in solid form.
+
+   The TAN in storage on a given day was the accumulated TAN removed
+   from the housing facility plus a portion of the organic N entering
+   storage. The TAN entering storage each day was the urinary N excreted
+   minus the TAN lost in the housing facility. Slurry and liquid manures
+   were assumed to spread across the exposed surface of the storage
+   facility, where the surface area was determined by the storage
+   dimensions set by the model user. Thus, in the early stages of
+   loading, manure was in a relatively thin layer, with a large surface
+   area per unit volume stored. As the storage facility filled, this
+   surface area to volume ratio decreased, so less NH3 was lost per unit
+   of manure TAN in storage.
+
+   The organic N entering storage was that excreted in feces, assuming
+   that no loss or transformation would occur prior to storage. The
+   portion of the organic N mineralized to form TAN during long-term
+   storage was set based on the work of Patni and Jui (1991). They found
+   that 25% to 35% of the organic N in slurry was mineralized during
+   long-term storage, with greater mineralization in the summer months,
+   and most of this change occurring during the first 4 to 6 months of
+   storage. Since average manure storage time was half of the full
+   storage period, the amount of organic N mineralized was set at 12%
+   for a 6-month winter storage period, 21% for a 6-month summer storage
+   period, and 25% for a full-year storage period.
+
+   Daily NH3 loss from storage was determined using equation 1, where
+   TAN was the ammoniacal N and *M* was the mass of manure solution in
+   storage on that day. On a given day, the amount of TAN was that
+   coming into storage minus that lost from storage between the date
+   loading began and the
+
+   Vol. 49(4): 1139−1149 1141
+
+given date. The mass of manure solution was the total manure mass minus
+the manure DM loaded into storage. Daily changes due to precipitation
+and evaporation were ignored, but *M* included the long-term moisture
+added from wash water and rain. A daily value for the equilibrium
+coefficient was determined using equations 2, 3, and 4 and the average
+daily ambient temperature. Reported values for manure pH during storage
+vary between 6.5 and 8.5, with a typical value being 7.5 (Pinder et al.,
+2004; Sommer et al., 1993). A constant value of 7.5 was assumed
+throughout the storage period.
+
+Major options modeled for manure storage included solid manure in a
+stack, semi-solid manure in a stack, slurry in a tank loaded from the
+top, slurry in a tank loaded from the bottom, and liquid manure in a
+lined earthen storage pond. Values for NH3 transport resistance were
+assigned to predict appropriate losses from each storage type. The total
+resist-ance of the storage was the sum of the resistances within the
+manure to the surface and from the surface to the free atmosphere. The
+resistance within the manure solution was set as a function of the
+manure DM content, with the greatest resistance for solid manure and
+little resistance for liquid manure. For manure slurry with a DM content
+of 8% to 12%, a crust can form on the surface when manure is pumped into
+the bottom of the storage tank. Thus, a greater resistance value was set
+for bottom-loading tanks with manure of this consistency.
+
+The first step in calibrating the manure storage component was to
+determine a transport resistance for liquid or slurry manure stored in
+an open tank. Several studies have measured NH3 emission rates from
+storages in various locations, where daily emission rates were 0 to 18 g
+NH3−N/m2 of surface area with losses directly related to ambient
+temperature (Olesen and Sommer, 1993; De Bode, 1991; Williams and Nigro,
+1997). Sommer et al. (1993) measured NH3−N loss from slurry tanks in
+Denmark over several months during summer and winter periods, finding an
+average annual loss of 1.6 kg NH3−N/m2, or 12% of the total N stored.
+The resistance from the surface to the atmosphere was set low at 4.1
+s/m, which allowed nearly all of the NH3−N reaching the surface of the
+manure storage to be lost. A 25-year simulation was performed using
+Denmark weather data and manure and storage characteristics similar to
+those of the Danish study (Sommer et al., 1993). A transport resistance
+to the manure surface of 19 s/m was found to provide daily (2 to 14 g
+NH3−N/m2) and annual (1.6 kg NH3−N/m2) emissions similar to those
+measured. For solid and semi-solid manure stored in stacks, detailed
+loss data were not available. Resistance values of 10 s/m were selected
+for both solid and semi-solid manure stacks to provide average long-term
+NH3 loss predictions similar to reported values of about 20% of the
+total N stored (Rotz, 2004).
+
+When a natural crust forms on the surface of slurry manure, the
+resistance to NH3 transfer is increased. A surface crust was reported to
+reduce the loss of NH3−N by 40% to 80% compared to surfaces without a
+crust (Olesen and Sommer, 1993; Sommer et al., 1993; De Bode, 1991;
+Williams and Nigro, 1997). A resistance of 75 s/m was selected to
+represent a slurry surface with a crust, which provided a typical
+reduction in annual loss of about 60%. Although this assumption may
+appear conservative, it seemed reasonable considering the irregularity
+found in
+
+   crusts and that some time is required to establish a crust in farm
+   manure storages.
+
+   Daily loss of NH3−N was determined such that the cumulative loss up
+   to a given date could not exceed the accumulated TAN in storage. This
+   was particularly important in the early stages of loading, when a
+   thin layer of manure on the bottom of the storage facility created
+   maximum exposure for the loss of TAN. By integrating equation 1 with
+   these assumptions over the full year, an annual storage loss was
+   determined. For storages with a 6-month capacity, the storage was
+   emptied in early April and again in early October for use as organic
+   fertilizer on cropland. With a 12-month capacity, the storage was
+   emptied only in April.
+
+   On a feedlot, manure was assumed to be stored in a solid form
+   following the initial housing phase. Loss of the TAN remaining after
+   the housing phase continued during a user-assigned 6 or 12 month
+   storage period. Periodic scraping of manure could occur, or the
+   manure could remain spread across the lot. Scraped manure was stored
+   in piles with general dimensions assigned by the model user. The same
+   parameters were used to predict the daily rate of TAN loss as used
+   for solid manure storage.
+
+   | **FIELD APPLICATION LOSS**
+   | Manure is normally applied to crop or grassland so the nutrients
+     can be taken up and recycled through growing plants. Manure can be
+     applied either through daily hauling or from long-term storage.
+     With a daily strategy, smaller amounts of manure are applied each
+     day. When storage is used, large amounts of manure are applied over
+     a period of several days, normally in the spring and fall. The same
+     model was used to simulate each of these approaches. With daily
+     hauling, the manure produced each day was applied the same day.
+     With 6-month storage, half of the annual manure produced and stored
+     on the farm was field applied over 10 d periods in early to
+     mid-April and early to mid-October. For 12-month storage systems,
+     all manure for the year was applied in a 10 d period in April.
+
+   Three manure application methods were modeled: broad-cast spreading,
+   irrigation, and direct injection into the soil. Some TAN is lost as
+   the manure moves through the air in the actual application process.
+   Based on a summary of relevant research (Rotz, 2004), this loss was
+   set at 1% of the applied TAN for broadcast spreading and 10% for
+   irrigation, with no loss during injection. Thus, the manure TAN
+   reaching the field surface was that hauled from the barn or manure
+   storage on a given day minus this loss. The TAN hauled to the field
+   was either that excreted minus that lost in the barn that day for
+   daily haul systems or that removed from storage for stored manure
+   systems.
+
+   Loss from manure applied on a given day was determined by integrating
+   equation 1 over the days until the manure was incorporated by a
+   tillage operation. A maximum of 15 d was set for this period since
+   all TAN would normally be lost after this much time on a field
+   surface (Meisinger and Jokela, 2000). Because the emission rate is
+   very rapid when manure is first applied, this integration was done on
+   a 0.08 d (290 s) time step. Loss during each time step was determined
+   using an equilibrium coefficient (eqs. 2, 3, and 4) calculated using
+   the average ambient temperature of each day. Manure pH was set at 8.0
+   to account for a 0.5 increase that may occur for the first few days
+   after manure is spread on a field surface (Sommer et al., 1991;
+   Kirchmann and Lundvall, 1998).
+
+   1142 TRANSACTIONSOFTHE ASABE
+
+The mass of manure solution on the surface (*M*) varied through time.
+The initial value following application was set assuming a manure
+application rate of 0.3 kg DM/m2. The solution mass was this application
+rate divided by the manure DM content minus the manure DM. This solution
+mass was adjusted during each time step to account for infiltration,
+evaporation, and rain.
+
+A simple relationship was used to predict evaporation in proportion to
+the incident solar radiation of the day. Daily evaporation (EV) varied
+from 0% to 60% of the available solution mass as daily solar radiation
+varied from 0 to a maximum level of 30 MJ/m2. When rain occurred, the
+manure solution was increased assuming a uniform rate of rainfall over
+the daily period.
+
+Solution infiltration was determined as a function of the manure DM
+content (Hutchings et al., 1996):
+
+   IR = e(6.95−31.9*DMC) (6)
+
+| where
+| IR = infiltration rate (kg/m2/d or mm/d) DMC= manure DM content
+  (fraction).
+
+Daily infiltration was limited to a maximum of 70% of the available
+manure solution mass. This solution mass at each time step was *M* minus
+EV. During each time step, the manure solution mass was reduced by the
+infiltration and evaporation rates times the length of the time step and
+increased by the rainfall rate times the time step length.
+
+Manure TAN on the soil surface also varied through time. The initial TAN
+was that reaching the soil following the application process. During
+each time step, NH3 loss occurred to the atmosphere and TAN moved into
+the soil with the infiltration of moisture. The TAN moving into the soil
+was set in proportion to the manure solution that infiltrated into the
+soil, i.e., if IR was 10% of *M*, then 10% of the available TAN was
+removed from the surface pool and was thus unavailable to move into the
+atmosphere. Ammonia emission was determined for each time step using
+equation 1. This loss was a function of the TAN and *M* on the field
+surface at the given time, the value of *Q*, and an assumed resistance
+for NH3 transport from the manure to the free atmosphere. At the
+completion of each time step, TAN and *M* were adjusted to provide
+initial values for the next time step.
+
+To calibrate the model, a value for the transport resistance was
+selected that provided losses in TAN for different application
+procedures similar to those reported. In a review of volatile losses
+during field application, Meisinger and Jokela (2000) summarized that
+35% to 70% of the TAN applied in the broadcast application of cattle
+slurry was lost. Between 30% and 70% of this loss occurred within the
+first 4 to 6 h following application, with 50% to 90% lost in the first
+day. With solid dairy manure, they reported greater losses of 61% to 99%
+of the applied TAN. Within liquid and slurry manure types (less than 12%
+DM), reported NH3−N loss increased by about 5% of applied TAN for each
+1% increase in DM content.
+
+A transport resistance within the applied manure layer to the free
+atmosphere of 180 s/m was selected to provide TAN losses similar to
+those reported by Meisinger and Jokela (2000). For a 25-year simulation
+in southern Pennsylvania, average annual loss of TAN from slurry (8% DM)
+applied in the spring and fall ranged from 53% to 76% with a 25-year
+average of 65%. For liquid slurry (5% DM), simulated annual losses were
+41% to 69% of applied TAN for an average of
+
+   56%. Between 21% and 39% of this loss occurred within 8 h of
+   application, with 75% to 86% occurring in the first 24 h. The loss of
+   TAN increased by 3.5% to 5.4% of TAN for each 1% increase in the
+   manure DM content at the time of application. For semi-solid manure
+   (13% DM), the range in annual loss was 56% to 83% of applied TAN with
+   an average of 71%, and for solid manure (20% DM), the loss ranged
+   from 62% to 89% with a long-term average of 79%. These predicted
+   losses generally fell within the ranges of reported values (Meisinger
+   and Jokela, 2000; Rotz, 2004), indicating that the model could
+   adequately predict field application losses over a wide range of
+   manure DM contents.
+
+   To predict loss from manure directly injected into the soil, a
+   simpler approach was used. Ammonia N loss was set at 4% of the TAN in
+   manure applied through deep injection into cropland and 7% of the TAN
+   in manure applied through shallow injection to grassland. This
+   provided relatively small losses, similar to those measured in field
+   experiments (Rotz, 2004).
+
+   Ammonia loss was determined by integrating these relationships over
+   the period from application until incorpo-ration into the soil. This
+   provided an exponential decline in the emission rate through time as
+   influenced by changes in manure TAN content, infiltration rate, and
+   DM content along with the effects of rainfall and ambient air
+   temperature. When manure was incorporated the same day as applied, an
+   average exposure time of 8 h was assumed. Losses occurring from daily
+   applications were summed to determine an annual loss. The total loss
+   included NH3 volatilized during the application process plus that
+   volatilized from the field surface. The proportion of N lost was the
+   total annual NH3−N loss divided by the total manure N transported to
+   the field.
+
+   | **GRAZING LOSS**
+   | To model NH3 loss from pastures, an approach similar to field
+     application was used, but some simplifying assumptions were made.
+     Grazing animals deposit urine and feces in separate spots. The N in
+     feces is primarily organic, so NH3 loss mostly occurs from the TAN
+     in urine. When urine contacts plant and soil material, urease
+     enzyme activity quickly transforms the urea to ammoniacal N that
+     can volatilize (Sherlock and Goh, 1985). Because of the relative-ly
+     low DM content, urine quickly infiltrates into the soil.
+     Considering these relatively rapid processes, NH3 loss was
+     considered to be uniform throughout a daily time step. Therefore,
+     daily losses were determined using equation 1 with daily values for
+     available TAN, *M*, and *Q* and an assumed constant value for the
+     resistance to NH3 transport.
+
+   The TAN available for volatilization was the daily urine N excreted
+   by grazing animals plus 9% of the fecal N (Rotz, 2004). The solution
+   mass (*M*) was varied from 3 to 8 kg/m2 (Oenema et al., 2001) as a
+   function of the moisture-absorbing ability of the soil:
+
+   *M* = 16.5 − 0.146 \* CN (7)
+
+   where CN is a user-specified runoff curve number for the soil
+   (dimensionless). Typical values for CN varied from 90 for a clay soil
+   to 65 for a sandy soil (Rotz and Coiner, 2005).
+
+   Of the urine deposited, 30% was assumed to infiltrate immediately.
+   This carried 30% of the available TAN into the soil as well. If
+   rainfall occurred on the given day, the solution mass was diluted by
+   the rain, i.e., *M* was increased by the daily rainfall amount. A
+   value for *Q* was determined for each
+
+   Vol. 49(4): 1139−1149 1143
+
+   day using equations 2, 3, and 4, assuming the temperature of the
+   deposited manure was equal to the average daily ambient temperature.
+   The pH was set at 8.5 to reflect an increase that normally occurs in
+   urine patches over the first few days following deposition (Sherlock
+   and Goh, 1985).
+
+   Ammonia N loss during grazing was modeled for full-year and seasonal
+   grazing strategies. A greater portion of the N applied during grazing
+   should be lost with a seasonal strategy where animals are only on the
+   pasture during warmer weather. Reported N losses from pasture
+   normally do not specify a difference due to grazing strategy. With
+   full-year grazing in New Zealand, Ball and Ryden (1984) reported
+   NH3−N losses of 66% of applied urine N under warm dry conditions, 6%
+   under cool moist conditions, and 16% under warm moist conditions,
+   with an average loss over the year of 28%. Our model was calibrated
+   to their data, assuming that their loss of urine N was equivalent to
+   the loss of TAN. A grazing dairy herd was simulated for 25 years of
+   New Zealand weather on a silt loam soil. Using an NH3 transport
+   resistance of 1950 s/m, minimum and maximum daily losses throughout
+   the year fell between 2% and 68% with average annual losses between
+   22% and 29% of the TAN deposited on pasture.
+
+   Daily NH3 loss from grazing animals was determined for each day
+   animals were on pasture. When animals were maintained on pastures
+   throughout the winter, a daily loss was determined for each day of
+   the year. Otherwise, losses were integrated over the grazing season
+   set by the model user (typically mid-April through October).
+   Calculated losses were summed over the time on pasture to obtain an
+   annual loss. The proportion of N lost each simulated year was the
+   NH3−N lost from pasture divided by the total N excreted by the
+   animals on pasture.
+
+   | **MODEL EVALUATION**
+   | Model-predicted NH3 emissions were evaluated to ensure reasonable
+     predictions across weather years and across locations. Farms were
+     simulated over 25 years of weather for southern Pennsylvania, the
+     Netherlands, and central Texas to provide a wide range in weather
+     conditions. A series of animal housing and manure management
+     strategies were simulated that represented the major strategies
+     used in dairy and beef production. Farm management and animal
+     nutrition were kept as similar as possible across locations so that
+     differences were primarily due to weather. Simulated differences in
+     crop yield and quality, though, had a small effect on the nutrient
+     intake and excretion of animals.
+
+   | **ANIMAL HOUSING**
+   | Simulated and reported losses were first compared for different
+     housing types. In a review of N loss studies, typical annual losses
+     were 8%, 16%, and 50% of the excreted N in tie stall, free stall,
+     and feedlot facilities, respectively (Rotz, 2004). Reported values
+     for each housing type varied considerably around these values,
+     which were selected as typical (table 1). Feedlot loss would
+     include other volatile forms of N, but 90% of this loss was assumed
+     to be NH3−N. For a tie stall barn in Pennsylvania, simulated annual
+     losses varied from 6% to 8% of the total N excreted, with a 25-year
+     mean loss of 7.5%. A mean loss of 5.6% was determined for the
+     cooler conditions of the Netherlands, and a loss of 12.1% was
+     predicted for the hot conditions of Texas. For a free stall barn,
+     these loss values were nearly twice those of the tie stall barn
+     (table 1). On an open feedlot, annual emissions predicted for
+     Pennsylvania were 38% to 44% of the N excreted. Ammonia N losses
+     were similar across locations, with average annual losses of 40% to
+     47%. This loss was predicted to be a little less in Pennsylvania,
+     where cold winter temperatures reduced emissions compared to the
+     milder climate locations.
+
+**Table 1. Evaluation of predicted average annual ammonia emissions
+(percent of available N) for various components of manure handling.**
+
++---------+---------+---------+---------+---------+---------+---------+
+| R       |         | Pr      |         |         |         |         |
+| eported |         | edicted |         |         |         |         |
+| Losses  |         | Annual  |         |         |         |         |
+| (%)     |         | Losses  |         |         |         |         |
+|         |         | (%)     |         |         |         |         |
++=========+=========+=========+=========+=========+=========+=========+
+| (Rotz,  |         |    S    |         | Neth    |         | Central |
+| 2004)   |         | outhern |         | erlands |         | Texas   |
+|         |         |         |         |         |         |         |
+|         |         |   Penns |         |         |         |         |
+|         |         | ylvania |         |         |         |         |
++---------+---------+---------+---------+---------+---------+---------+
+| Typical |         | Mean    |         |         | Mean    | Mean    |
+|         |   Range |         |   Range |         |         |         |
++---------+---------+---------+---------+---------+---------+---------+
+
+..
+
+   Animal housing
+
++---------+---------+---------+---------+---------+---------+---------+
+|    Tie  | 8       | 2−35    | 7.5     | 6−8     | 5.6     | 12.1    |
+|         |         |         |         |         |         |         |
+|   stall |         |         |         |         |         |         |
+|    barn |         |         |         |         |         |         |
++=========+=========+=========+=========+=========+=========+=========+
+|    Free | 16      | 10−20   | 15.8    | 14−17   | 11.9    | 24.6    |
+|         |         |         |         |         |         |         |
+|   stall |         |         |         |         |         |         |
+|    barn |         |         |         |         |         |         |
++---------+---------+---------+---------+---------+---------+---------+
+|    Fee  | 45[b]   |    3    | 40.6    | 38−44   | 43.8    | 47.1    |
+| dlot[a] |         | 5−80[b] |         |         |         |         |
++---------+---------+---------+---------+---------+---------+---------+
+
+..
+
+   Manure storage (with free stall barn)
+
++---------+---------+---------+---------+---------+---------+---------+
+|         | 20      | 10−40   | 20.2    | 17−22   | 23.5    | 20.3    |
+|   Solid |         |         |         |         |         |         |
+|         |         |         |         |         |         |         |
+|  manure |         |         |         |         |         |         |
++=========+=========+=========+=========+=========+=========+=========+
+|    Sem  | −−      | −−      | 19.6    | 17−22   | 22.6    | 20.0    |
+| i−solid |         |         |         |         |         |         |
+|         |         |         |         |         |         |         |
+|  manure |         |         |         |         |         |         |
++---------+---------+---------+---------+---------+---------+---------+
+|         | 15[c]   | 5−30[c] | 13.4    | 12−15   | 15.6    | 15.2    |
+| Slurry, |         |         |         |         |         |         |
+|    top  |         |         |         |         |         |         |
+|         |         |         |         |         |         |         |
+|  loaded |         |         |         |         |         |         |
++---------+---------+---------+---------+---------+---------+---------+
+|         | 5[c]    | 3−8[c]  | 5.2     | 4−6     | 5.3     | 6.9     |
+| Slurry, |         |         |         |         |         |         |
+|         |         |         |         |         |         |         |
+|  bottom |         |         |         |         |         |         |
+|         |         |         |         |         |         |         |
+|  loaded |         |         |         |         |         |         |
++---------+---------+---------+---------+---------+---------+---------+
+|         | 25[d]   |    2    | 24.2    | 22−27   | 29.1    | 22.8    |
+|  Liquid |         | 0−50[d] |         |         |         |         |
+|         |         |         |         |         |         |         |
+|  manure |         |         |         |         |         |         |
++---------+---------+---------+---------+---------+---------+---------+
+
+..
+
+   Field application (with free stall barn and bottom−loaded slurry
+   tank)
+
++---------+---------+---------+---------+---------+---------+---------+
+|    Ir   | 30      | 25−50   | 28.6    | 24−35   | 29.4    | 27.6    |
+| rigated |         |         |         |         |         |         |
++=========+=========+=========+=========+=========+=========+=========+
+|    Br   | 25      | 15−40   | 25.1    | 21−31   | 25.5    | 24.9    |
+| oadcast |         |         |         |         |         |         |
++---------+---------+---------+---------+---------+---------+---------+
+|    B    | 10      | 6−13    | 9.6     | 7−14    | 9.0     | 14.5    |
+| roadcas |         |         |         |         |         |         |
+| t/incor |         |         |         |         |         |         |
+| porated |         |         |         |         |         |         |
++---------+---------+---------+---------+---------+---------+---------+
+|    Deep | 2       | 1−5     | 2.2     | 2.0−2.3 | 2.4     | 1.7     |
+|    in   |         |         |         |         |         |         |
+| jection |         |         |         |         |         |         |
++---------+---------+---------+---------+---------+---------+---------+
+
+..
+
+   Grazing
+
++---------+---------+---------+---------+---------+---------+---------+
+|    Year | 10      | 4−20    | 12.7    | 11−14   | 7.3     | 23.0    |
+| −around |         |         |         |         |         |         |
++=========+=========+=========+=========+=========+=========+=========+
+|    S    | 10      | 4−20    | 20.2    | 18−23   | 10.8    | 31.7    |
+| easonal |         |         |         |         |         |         |
++---------+---------+---------+---------+---------+---------+---------+
+
+..
+
+   [a] Feedlot includes loss from solid manure stored on the lot.
+
+   [b] Assumes 90% of total N emission is NH3−N.
+
+   [c] From Muck and Steenhuis, 1982; Muck et al., 1984; and Sommer et
+   al., 1993. [d] Estimated from single-stage lagoon assuming 50% of
+   total N emission is NH3−N.
+
+   1144 TRANSACTIONSOFTHE ASABE
+
+Each of these predicted losses fell within the range of measured values
+except for a free stall barn in Texas. This predicted loss was a little
+greater than reported values, but no measured values were found for this
+type of facility in a warm climate. In another modeling study, Pinder et
+al. (2004) predicted ammonia emission factors in Texas that were about
+double those predicted for southern Pennsylvania. Overall, predicted
+annual NH3−N losses during animal housing over this wide range in
+climates appeared very reasonable compared to reported values.
+
+| **MANURE STORAGE**
+| Simulations were done for the same farm using solid, semi-solid,
+  slurry, and liquid manure storage facilities, which were emptied every
+  6 months. Solid and semi-solid storage represented manure stacked on a
+  pad, slurry was stored in an open tank, and liquid manure was stored
+  in a lined earthen pond. Slurry storage was either loaded from the
+  top, where a crust would not form, or from the bottom with crust
+  formation.
+
+Long-term simulations in southern Pennsylvania pro-vided reasonable
+annual and 25-year mean losses for each storage type (table 1). Loss
+predictions for the Netherlands were sometimes greater than those for
+the other locations. This was due to less annual temperature variation
+and the resulting effect on loss during animal housing as well as
+storage. Since less TAN was lost in the barn under the cooler summer
+conditions of the Netherlands, more TAN was loaded into storage. This
+allowed greater loss from those storage facilities that were less
+efficient in conserving NH3−N (table 1). In Texas, greater barn loss
+provided less TAN entering storage, which offset an increased loss from
+storage due to higher ambient temperatures.
+
+| **FIELD APPLICATION**
+| Manure application methods simulated were irrigation with delayed soil
+  incorporation, broadcast spreading with delayed incorporation,
+  broadcast spreading with same-day incorporation, and injection into
+  the soil. With delayed incorporation, manure remained on the soil
+  surface at least a week before being incorporated by tillage.
+
+Losses predicted for the Netherlands were similar to those for southern
+Pennsylvania (table 1). With irrigation or broadcast spreading with
+delayed incorporation, essentially all TAN that did not infiltrate below
+the soil surface was lost to the atmosphere. Use of rapid incorporation
+or deep injection greatly reduced this loss. Irrigation, broadcast
+application, and injection gave slightly lower field losses in Texas
+because more TAN was lost prior to field application, and thus less was
+available for loss following application. With rapid incorporation in
+Texas, losses were greater than those in the cooler locations. This
+occurred because the hot and dry climate caused more rapid loss during
+or immediate-ly after application.
+
+| **GRAZING**
+| Year-around and seasonal grazing systems were simulated for dairy
+  herds at the three locations (table 1). Simulated losses from grazing
+  systems in Texas were higher than those generally reported. Since the
+  reported data come from northern Europe and New Zealand, these higher
+  losses in a warm climate are reasonable (Pinder et al., 2004). Without
+
+   actual data for this climate, these predicted losses cannot be
+   verified. With a sandy soil and the cooler climate of the
+   Netherlands, predicted annual losses during seasonal grazing were 9%
+   to 13% of the total N excreted on the pasture, with a 25-year average
+   of 10.8%. These losses fall within the range of reported seasonal
+   losses in this region of 3% to 14% of the excreted N deposited on
+   pasture (Bussink, 1992, 1994). Overall, the model appeared to predict
+   reasonable losses from grazing animals over a wide range of soil and
+   climate conditions.
+
+   | **A COMPARISONOF MANAGEMENT**
+   | **SYSTEMS**
+   | To further evaluate the NH3-loss relationships and their use in a
+     whole-farm simulation, four common options for animal housing and
+     manure handling in the northeastern U.S. were simulated with the
+     Integrated Farm Systems Model. The same representative dairy farm
+     was used with each option. The farm included 100 Holstein cows and
+     85 replace-ment heifers on 90 ha of medium depth, clay loam soil.
+     Crops produced included alfalfa and grass, primarily harvested as
+     silage, corn harvested as silage and high-moisture grain, and oats
+     harvested as high-moisture grain and straw bedding. Lactating cows
+     were fed total mixed rations in confinement housing, while older
+     heifers and dry cows were on pasture during the grazing season.
+     This simulation analysis was included to demonstrate the use of the
+     model, not to provide a comprehensive comparison of production
+     systems. Thus, documentation of model parameters is limited to the
+     major differences among the four options simulated.
+
+   | **SIMULATED MANAGEMENT SYSTEMS**
+   | The first management option was a tie stall barn where manure was
+     removed with a gutter scraper and surface applied on a daily basis
+     using a box spreader. Bedding material was used to provide manure
+     in a semi-solid form. Manure storage was limited to a concrete pad
+     for short-term storage. Field-applied manure remained on the soil
+     surface for at least a few weeks prior to incorporation, which led
+     to greater field loss of NH3−N.
+
+   For the remaining three strategies, animals were housed in a free
+   stall barn and milked in a double-six parlor. Manure slurry was
+   stored up to 6 months in a concrete tank and applied to fields in
+   April and October. The three strategies used surface spreading,
+   injection, or irrigation application. For the first two strategies,
+   manure was scraped daily using a skid-steer loader. With surface
+   application, a tank spreader with a splash plate applicator was used,
+   and manure remained on the surface for about 3 d prior to
+   incorporation. With injection, the spreader included tines to insert
+   the manure under the soil surface. The use of injection was assumed
+   to increase implement draft and reduce field capacity of the
+   application operation by 25%. For the irrigation strategy, manure was
+   handled as a liquid (lower DM content). A flush system was used to
+   remove manure from the barn, and a liquid-solid separator was used to
+   remove some of the manure solids. This material was recycled as
+   bedding, which reduced the need for straw by 50%. Manure was stored
+   in a lined earthen pond and applied with irrigation equipment.
+   Tillage operations incorporated the manure within 5 d of application.
+
+   Vol. 49(4): 1139−1149 1145
+
+   | **Table 2. Economic parameters, prices, and initial costs assumed\|
+     for various system inputs and outputs for the analyses of**
+   | **nutrient conservation technologies on representative**
+   | **dairy farms in Pennsylvania.**
+
++-----------------------------------+-----------------------------------+
+|    Economic parameter             | Price[a] ($)                      |
++===================================+===================================+
+|    | Labor wage rate              |    | 12.00/h                      |
+|    | Diesel fuel price            |    | 0.60/L                       |
+|    | Electricity price            |    | 0.10/kW-h                    |
+|    | Mailbox milk price           |    | 31.50/hL                     |
+|    | Nitrogen fertilizer price    |    | 0.95/kg N                    |
+|    | Corn grain price             |    | 125/t DM                     |
+|    | Soybean meal price           |    | 350/t DM                     |
+|    | Protein mix price            |    | 380/t DM                     |
+|    | Real interest rate           |    | 6.0% per year 2.3% per year  |
+|    | Property tax rate            |                                   |
++-----------------------------------+-----------------------------------+
+|    Structure or equipment         | Initial Cost ($)                  |
++-----------------------------------+-----------------------------------+
+|    | Tie stall barn and milking   |    | 360,000                      |
+|      equipment Standard free      |    | 313,000                      |
+|      stall barn                   |    | 25,000                       |
+|    | Gutter cleaner               |    | 23,000                       |
+|    | Skid-steer loader            |    | 25,000                       |
+|    | Flush system                 |    | 15,000                       |
+|    | Liquid-solid separator       |    | 3,000                        |
+|    | Manure collection pad        |    | 58,500                       |
+|    | Concrete tank storage        |    | 41,000                       |
+|    | Lined earthen pond storage   |    | 12,800                       |
+|    | Broadcast box spreader       |    | 18,300                       |
+|    | Broadcast tank spreader      |    | 25,200                       |
+|    | Injection manure spreader    |    | 25,000                       |
+|    | Irrigation equipment         |                                   |
++-----------------------------------+-----------------------------------+
+
+..
+
+   [a] Prices were set to represent long-term relative prices in current
+   value, which were not necessarily current prices.
+
+   All prices were consistent across systems and across simulated years
+   of weather. Important prices in the compari-son of these systems are
+   listed in table 2. Initial costs include the facilities and equipment
+   that varied across the simulated systems. Initial costs of structures
+   were amortized over 20 years and equipment was amortized over 10
+   years using a real interest or discount rate of 6% per year.
+
+   | **SIMULATION RESULTS**
+   | A comparison of N losses, manure handling costs, and farm profit
+     for the four management scenarios is shown in table 3. In the tie
+     stall housing system, NH3−N loss in the barn was 37% less than that
+     in a free stall barn. There was no loss in storage with daily
+     hauling of manure, but surface spreading of semi-solid manure
+     caused high field loss of NH3−N.
+
+   Compared to the tie stall system, a free stall barn, 6-month slurry
+   storage, and surface spreading of manure provided a 17% increase in
+   total NH3−N loss from the farm (table 3, column 2 vs. column 1).
+   Greater losses in the barn and during storage more than offset a
+   decrease in the loss following field application. Greater volatile
+   loss of N led to less N incorporated into the soil and thus lower
+   leaching and denitrification losses. Less available soil N also
+   caused a small decrease in protein levels in forage, which required a
+   small increase in purchased supplemental feed to meet the needs of
+   the herd. Annual manure handling costs were essentially the same with
+   reductions in equipment, labor, and bedding costs offsetting
+   increases in storage and fuel costs.
+
+   Direct injection of the manure greatly reduced NH3−N loss following
+   application, providing a 43% reduction in
+
+   NH3−N loss from the farm compared to the broadcast application system
+   (table 3, column 3 vs. column 2). With less volatile loss, more N was
+   available in the soil. This increased crop yields and forage protein
+   contents, which reduced the annual purchased feed cost by $26/cow.
+   Higher soil N levels also increased leaching and denitrification
+   losses by about 50%. Annual manure handling costs increased by
+   $17/cow compared to surface spreading due to small increases in
+   equipment, fuel, and labor costs.
+
+   The largest loss of NH3−N occurred using the liquid manure and
+   irrigation strategy (table 3, column 4). Loss following field
+   application was relatively low because most of the manure TAN was
+   lost prior to application and because the liquid manure infiltrated
+   into the soil more readily. The remaining organic N was relatively
+   stable, with little loss prior to incorporation. With less N
+   incorporated into the soil, crop yields and protein contents were a
+   little lower, which again affected purchased feed requirements. Lower
+   soil N levels also reduced nitrate leaching and denitrification
+   losses compared to the other three systems.
+
+   Differences in manure handling costs across systems were not large
+   (table 3). The highest cost occurred with manure injection, and the
+   irrigation system had the lowest cost. Large differences in the costs
+   of storage, fuel, labor and bedding material occurred across systems,
+   but these differences tended to offset each other, giving annual
+   manure handling costs of $192 to $231/cow.
+
+   Farm profit using the tie stall barn was $100/cow less than that
+   using free stall housing (table 3). Most of this difference was due
+   to added costs in animal facilities and milking labor. Although this
+   type of barn is still commonly used throughout the northeastern U.S.,
+   a new barn of this type and size would not normally be built today.
+   Among the remaining three strategies, differences in farm profit were
+   small. Differences of up to $10/cow per year were primarily due to
+   differences in manure handling and purchased feed costs.
+
+   These simulation results illustrate that changes can be made to
+   reduce NH3−N loss while maintaining and perhaps improving farm
+   profit. Of the four production systems simulated, the most profitable
+   was that using the injection of manure, and this strategy reduced
+   NH3−N emissions by 33% to 50% relative to the other options. Although
+   the reduction in NH3 emissions led to greater leaching and
+   denitrification losses of N, this may also be corrected through
+   improved management. By redistributing manure among farm crops or
+   using cover crops, the increased available N may be better utilized
+   to offset this increase in N loss of other forms. This type of
+   refinement was not done in this series of simulations in order to
+   maintain consistent farm characteristics across manure handling
+   strategies.
+
+   | **DISCUSSION**
+   | This model of ammonia emissions was developed specifi-cally for use
+     in whole-farm simulation. With this goal in mind, simplifying
+     assumptions were made in model develop-ment. For example, the pH of
+     urine and manure slurry is known to vary through time as influenced
+     by management and the environment (Sommer and Sherlock, 1996; Patni
+     and Jui, 1991; Sherlock and Goh, 1985). Because of limited
+     available data on these changes and because these effects would not
+     be expected to have much effect at the whole-farm
+
+   1146 TRANSACTIONSOFTHE ASABE
+
+   **Table 3. Effect of animal housing and manure handling practices on
+   nitrogen losses, manure handling costs, and farm net return for a
+   simulated dairy farm in southern Pennsylvania.[a]**
+
++-----------------+-----------------+-----------------+-----------------+
+| Tie Stall       |                 | Free Stall Barn |                 |
+| Barn[b]         |                 |                 |                 |
++=================+=================+=================+=================+
+| Daily Haul      | Slurry Tank[c]  | Slurry Tank[d]  | Earthen Pond[e] |
++-----------------+-----------------+-----------------+-----------------+
+| Surface         | Surface         | Injected        | Irrigated       |
++-----------------+-----------------+-----------------+-----------------+
+
+..
+
+   Nitrogen losses
+
++-------------+-------------+-------------+-------------+-------------+
+|    Ammonia  | 62.1        | 72.7        | 41.3        | 82.0        |
+|    nitrogen |             |             |             |             |
+|    loss (kg |             |             |             |             |
+|    N/cow)   |             |             |             |             |
++=============+=============+=============+=============+=============+
+|    Barn     | 16.5        | 26.1        | 26.5        | 25.9        |
++-------------+-------------+-------------+-------------+-------------+
+|    Manure   | 0.0         | 7.0         | 7.1         | 35.1        |
+|    storage  |             |             |             |             |
++-------------+-------------+-------------+-------------+-------------+
+|    Field    | 40.9        | 35.0        | 3.0         | 16.5        |
+|             |             |             |             |             |
+| application |             |             |             |             |
++-------------+-------------+-------------+-------------+-------------+
+|    Grazing  | 4.7         | 4.6         | 4.7         | 4.5         |
++-------------+-------------+-------------+-------------+-------------+
+| Nitrogen    | 30.3        | 25.2        | 37.7        | 21.6        |
+| leaching    |             |             |             |             |
+| loss from   |             |             |             |             |
+| fields (kg  |             |             |             |             |
+| N/ha)       |             |             |             |             |
++-------------+-------------+-------------+-------------+-------------+
+|    Deni     | 21.6        | 18.2        | 26.2        | 15.6        |
+| trification |             |             |             |             |
+|    loss     |             |             |             |             |
+|    from     |             |             |             |             |
+|    fields   |             |             |             |             |
+|    (kg      |             |             |             |             |
+|    N/ha)    |             |             |             |             |
++-------------+-------------+-------------+-------------+-------------+
+
+..
+
+   Manure handling costs
+
++-------------+-------------+-------------+-------------+-------------+
+|    Manure   | 215         | 214         | 231         | 192         |
+|    handling |             |             |             |             |
+|    cost     |             |             |             |             |
+|    ($/cow)  |             |             |             |             |
++=============+=============+=============+=============+=============+
+|             | 105         | 97          | 109         | 125         |
+|   Equipment |             |             |             |             |
++-------------+-------------+-------------+-------------+-------------+
+|    Holding  | 3           | 51          | 51          | 36          |
+|    or       |             |             |             |             |
+|    storage  |             |             |             |             |
+|    facility |             |             |             |             |
++-------------+-------------+-------------+-------------+-------------+
+|    Fuel and | 9           | 17          | 20          | 14          |
+|    electric |             |             |             |             |
++-------------+-------------+-------------+-------------+-------------+
+|    Labor    | 38          | 28          | 30          | 15          |
++-------------+-------------+-------------+-------------+-------------+
+|             | 60          | 21          | 21          | 2           |
+|   Purchased |             |             |             |             |
+|    bedding  |             |             |             |             |
++-------------+-------------+-------------+-------------+-------------+
+
+..
+
+   Farm net return
+
++-------------+-------------+-------------+-------------+-------------+
+|    Feed     | 848         | 853         | 852         | 857         |
+|             |             |             |             |             |
+|  production |             |             |             |             |
+|    cost     |             |             |             |             |
+|    ($/cow)  |             |             |             |             |
++=============+=============+=============+=============+=============+
+|             | 364         | 377         | 351         | 389         |
+|   Purchased |             |             |             |             |
+|    feed     |             |             |             |             |
+|    cost     |             |             |             |             |
+|    ($/cow)  |             |             |             |             |
++-------------+-------------+-------------+-------------+-------------+
+|    Animal   | 487         | 441         | 441         | 441         |
+|             |             |             |             |             |
+|  facilities |             |             |             |             |
+|    cost     |             |             |             |             |
+|    ($/cow)  |             |             |             |             |
++-------------+-------------+-------------+-------------+-------------+
+|    All      | 666         | 594         | 594         | 593         |
+|    other    |             |             |             |             |
+|    costs[f] |             |             |             |             |
+|    ($/cow)  |             |             |             |             |
++-------------+-------------+-------------+-------------+-------------+
+|    Total    | 2580        | 2479        | 2469        | 2472        |
+|             |             |             |             |             |
+|  production |             |             |             |             |
+|    cost     |             |             |             |             |
+|    ($/cow)  |             |             |             |             |
++-------------+-------------+-------------+-------------+-------------+
+|    Milk and | 3101        | 3101        | 3101        | 3101        |
+|    animal   |             |             |             |             |
+|    sale     |             |             |             |             |
+|    income   |             |             |             |             |
+|    ($/cow)  |             |             |             |             |
++-------------+-------------+-------------+-------------+-------------+
+|    Net      | 521         | 622         | 632         | 629         |
+|    return   |             |             |             |             |
+|    to       |             |             |             |             |
+|             |             |             |             |             |
+|  management |             |             |             |             |
+|    ($/cow)  |             |             |             |             |
++-------------+-------------+-------------+-------------+-------------+
+
+..
+
+   [a] 100 cows and 85 heifers on 90 ha in alfalfa, grass, corn, and
+   oats with a moderate milk production simulated over 25 years of
+   weather for Chambersburg, Pennsylvania.
+
+   [b] Animals housed and milked in a tie stall barn ($360,000). Manure
+   collected with a gutter cleaner ($25,000), hauled and surface applied
+   daily using a box spreader ($12,800) with delayed soil incorporation.
+   Numbers in parentheses are assumed initial costs of equipment and
+   structures.
+
+   [c] Animals housed in a free stall barn and milked in a parlor
+   ($313,000). Manure scraped with a skid-steer loader ($23,000), pumped
+   into the bottom of a storage tank ($58,500), and surface applied
+   using a tank spreader ($18,300) with delayed soil incorporation.
+
+   [d] Animals housed in a free stall barn and milked in a parlor.
+   Manure scraped, pumped into the bottom of a storage tank, and applied
+   using a tank spreader with subsurface injection ($25,200).
+
+   [e] Animals housed in a free stall barn and milked in a parlor.
+   Manure flushed into a lined earthen pond ($41,000) using a flush
+   system ($25,000) and a solids separator ($15,000), and applied using
+   irrigation ($25,000) with delayed soil incorporation.
+
+   [f] Includes annual costs for milking labor, livestock expenses, and
+   property tax.
+
+   level, a constant pH was assumed in our model for manure at each
+   stage of handling.
+
+   Considering our goal for whole-farm simulation, the model was
+   evaluated against the limited farm-level data available. The model
+   was shown to provide acceptable prediction of emissions over a broad
+   range of manure management and climatic conditions. Thus, the model
+   should provide reasonable emission predictions under the goal for
+   which it was developed, i.e., predicting manure management effects on
+   farms at various climate locations.
+
+   Care is needed in extrapolating the use of the model beyond the
+   conditions for which the model parameters were developed. For
+   example, the model is very sensitive to the manure or urine pH for
+   each of the sources of ammonia emission. By assigning constant values
+   for typical or average pH and then deriving values for transport
+   resistance that provided appropriate emissions, this sensitivity was
+   removed from our model. No attempt was made to verify the model’s
+   response to changes in manure pH, so use of the model for evaluating
+   this effect is not recommended without further verification. Other
+   changes, such as exposed surface area during animal housing and field
+   application rates of manure, also should not be made without
+   verification since the current relationships were calibrated or tuned
+   to the specific assumptions of our model.
+
+   To further develop and evaluate this model, more basic research is
+   needed on the physical, biological, and chemical processes involved
+   in the formation and release of NH3 from manure under the wide range
+   of conditions found on farms. For example, many different
+   relationships have been used to model the coefficients for Henry’s
+   law and the disassociation of ammonium used in equation 2 (Ni, 1999).
+   More informa-tion is needed to determine the best of these
+   relationships for simulating the various conditions of manure storage
+   and handling. This includes better definition of the effects of
+   manure characteristics and meteorological conditions on these
+   processes. Better information is also needed to define the transport
+   resistance of NH3 from various manure types and surfaces and the
+   environmental effects on this resistance.
+
+   More farm-level data on emissions are also needed for model
+   evaluation or validation. Emissions from housing facilities, manure
+   storage facilities, and land applications of manure need to be
+   monitored over many months and even years, along with management and
+   meteorological informa-tion, to develop a comprehensive data base of
+   farm-level emissions. This type of database would be very useful, and
+   in fact necessary, for validating emission models at the farm scale.
+   By validating models on even a few select farms, model users would be
+   more confident in applying these models to the wide range in farm
+   management practices found in dairy and beef production.
+
+   Vol. 49(4): 1139−1149 1147
+
+For those interested in further evaluation of farming systems, the
+Integrated Farm System Model is available from the Pasture Systems and
+Watershed Management Research Unit website
+(http://ars.usda.gov/naa/pswmru). The program operates on computers that
+use any Microsoft Windows operating system. A copy of the program,
+including an integrated help system and reference manual, can be
+obtained at this website, and instructions for downloading and setting
+up the program are provided.
+
+| **CONCLUSION**
+| A process-based model was developed to predict daily NH3−N losses in
+  cattle production as a function of manage-ment and climatic
+  conditions. Mathematical relationships were developed to describe NH3
+  emission processes in animal housing, during manure storage, following
+  field application, and during grazing. These loss relationships were
+  added to the Integrated Farm System Model to form a tool for
+  evaluating management effects on annual and long-term average NH3−N
+  losses and their interaction with other aspects of farm performance,
+  environmental impact, and profit. Whole-farm simulations illustrated
+  that the use of a free stall barn, bottom-loaded slurry storage, and
+  direct injection of manure into the soil reduced farm-level NH3
+  emissions by 33% to 50% compared to other commonly used animal housing
+  and manure handling systems in the north-eastern U.S. while at least
+  maintaining farm profit.
+
+| **ACKNOWLEDGEMENTS**
+| The authors acknowledge the assistance of Nick Hutch-ings, Danish
+  Institute of Agricultural Sciences, Research Centre Foulum, Tjele,
+  Denmark, in the development of this model.
+
+| **REFERENCES**
+| Ball, P. R., and J. C. Ryden. 1984. Nitrogen relationships in
+| intensively managed temperate grasslands. *Plant Soil* 76: 23-33.
+  Berntsen, J., B. M. Peterson, B. H. Jacobsen, J. E. Olesen, and N. J.
+
+   Hutchings. 2003. Evaluating nitrogen taxation scenarios using the
+   dynamic whole-farm simulation model FASSET. *Agric.*
+
+   *Systems* 76(3): 817-839.
+
+Braam, C. R., J. J. M. H. Detelaars, and M. C. J. Smits. 1997.
+
+   Effects of floor design and floor cleaning on ammonia emission from
+   cubicle houses for dairy cows. *Netherlands J. Agric. Sci.* 45(1):
+   49-64.
+
+Burgos, S. A., P. H. Robinson, J. G. Fadel, and E. J. DePeters. 2005.
+
+   Ammonia volatilization potential: Prediction of urinary urea nitrogen
+   output in lactating dairy cows. *Agric. Ecosys. Environ.* 111:
+   261-269.
+
+Bussink, D. W. 1992. Ammonia volatilization from grassland receiving
+nitrogen fertilizer and rotationally grazed by dairy cattle. *Fertilizer
+Res.* 33(3): 257-265.
+
+Bussink, D. W. 1994. Relationships between ammonia volatilization and
+nitrogen fertilizer application rate, intake and excretion of herbage
+nitrogen by cattle on grazed swards. *Fertilizer Res.*
+
+   38(2): 111-121.
+
+Eghball, B., J. F. Power, J. E. Gilley, and J. W. Doran. 1997.
+
+   Nutrient, carbon, and mass loss during composting of beef cattle
+   feedlot manure. *J. Environ. Qual.* 26(1): 189-193.
+
+EPA. 2004. National emissions inventory: Ammonia emissions from animal
+husbandry operations. Washington, D.C.: U.S.
+
+   Environmental Protection Agency. Available at:
+
+   www.epa.gov/ttn/chief/ap42/ch09/related/nh3inventorydraft_jan
+   2004.pdf. Accessed 21 June 2005.
+
+   | De Bode, M. J. C. 1991. Odour and ammonia emissions from manure
+     storage. In *Odour and Ammonia Emissions from*
+   | *Livestock Farming*, 59-66. V. C. Nielsen, J. H. Voorburg, and P.
+     L’Hermite, eds. London, U.K.: Elsevier Applied Science.
+
+   de Vries, W., H. Kros, and O. Oenema. 2001. Modeled impacts of
+   farming practices and structural agricultural changes on nitrogen
+   fluxes in the Netherlands. In *Proc. 2nd Intl. Nitrogen Conf. on
+   Science and Policy, TheScientificWorld* 1(S2): 664-672.
+
+   Available at: www.thescientificworld.com. Accessed 21 June 2005.
+
+   | Fox, D. G, L. O. Tedeschi, T. P. Tylutki, J. B. Russell, M. E. Van
+     Amburgh, L. E. Chase, A. N. Pell, and T. R. Overton. 2004. The
+     Cornell net carbohydrate and protein system model for
+   | evaluating herd nutrition and nutrient excretion. *Animal Feed Sci.
+     Tech.* 112: 29-78.
+
+   Groot Koerkamp, P. W. G., J. H. M. Metz, G. H. Uenk, V. R.
+
+   Phillips, M. R. Holden, R. W. Sneath, J. L. Short, R. P. White, J.
+
+   Hartung, J. Seedorf, M. Schroder, K. H. Linkert, S. Pedersen, H.
+
+   Takai, J. O. Johnsen, and C. M. Wathes. 1998. Concentrations and
+   emissions of ammonia in livestock buildings in northern Europe. *J.
+   Agric. Eng. Res.* 70(1): 79-95.
+
+   Hutchings, N. J., S. G. Sommer, and S. C. Jarvis. 1996. A model of
+   ammonia volatilization from a grazing livestock farm. *Atmos.
+   Environ.* 30(4): 589-599.
+
+   Kirchmann, H., and A. Lundvall. 1998. Treatment of solid animal
+   manures: Identification of low NH3 emission practices. *Nutrient
+   Cycling in Agroecosys*. 51(1): 65-71.
+
+   Mannebeck, H., and J. Oldenburg. 1991. Comparison of the effect of
+   different systems on ammonia emissions. In *Odour and Ammonia
+   Emissions from Livestock Farming*, 42-49. V. C.
+
+   Nielsen, J. H. Voorburg, and P. L’Hermite, eds. London, U.K.:
+   Elsevier Applied Science.
+
+   McCubbin, D. R., B. J. Apelberg, S. Roe, and F. Divita Jr. 2002.
+
+   Livestock ammonia management and particulate-related health benefits.
+   *Environ. Sci. Tech.* 36(6): 1141-1146.
+
+   McGechan, W. B., and L. Wu. 1998. Environmental and economic
+   implications of some slurry management options. *J. Agric. Eng. Res.*
+   71(3): 273-283.
+
+   Meisinger, J. J., and W. E. Jokela. 2000. Ammonia volatilization from
+   dairy and poultry manure. In *Managing, Nutrients and Pathogens from
+   Animal Agriculture*, 334-354. NRAES-130.
+
+   Ithaca, N.Y.: Natural Resource, Agriculture, and Engineering Service.
+
+   Monteny, G. J., and J. W. Erisman. 1998. Ammonia emission from dairy
+   cow buildings: A review of measurement techniques, influencing
+   factors, and possibilities for reduction. *Netherlands J. Agric.
+   Sci.* 46(3-4): 225-247.
+
+   Monteny, G. J., D. D. Schulte, A. Elzing, and E. J. J. Lamaker.
+
+   | 1998. A conceptual mechanistic model for the ammonia
+   | emissions from free stall cubicle dairy cow houses. *Trans. ASAE*
+     41(1): 193-201.
+
+   Muck, R. E., and T. S. Steenhuis. 1982. Nitrogen losses from manure
+   storages. *Agric. Wastes* 4(1): 41-54.
+
+   Muck, R. E., R. W. Guest, and B. K. Richards. 1984. Effects of manure
+   storage design on nitrogen conservation. *Agric. Wastes* 10(3):
+   205-220.
+
+   Ni, J. 1999. Mechanistic models of ammonia release from liquid
+   manure: A review. *J. Agric. Eng. Res.* 72(1): 1-17.
+
+   NRC. 2003. *Air Emissions from Animal Feeding Operations: Current
+   Knowledge, Future Needs.* Washington, D.C.: National Research
+   Council.
+
+   Oenema, O., A. Bannink, S. G. Sommer, and G. L. Velthof. 2001.
+
+   | Gaseous nitrogen emissions from livestock farming systems. In
+     *Nitrogen in the Environment: Sources, Problems, and*
+   | *Management*, 255-289. R. F. Follett and J. L. Hatfield, eds.
+
+   Amsterdam, The Netherlands: Elsevier Science.
+
+   1148 TRANSACTIONSOFTHE ASABE
+
+Olesen, J. E., and S. G. Sommer. 1993. Modelling effects of wind speed
+and surface cover on ammonia volatilization from stored pig slurry.
+*Atmos. Environ.* 27(16): 2567-2574.
+
+Patni, N. K., and P. Y. Jui. 1991. Nitrogen concentration variability in
+dairy-cattle slurry stored in farm tanks. *Trans. ASAE* 34(2): 609-615.
+
+Pinder, R. W., R. Strader, C. I. Davidson, and P. J. Adams. 2004. A
+temporally and spatially resolved ammonia emission inventory for dairy
+cows in the United States. *Atmos. Environ.* 38(23): 3747-3756.
+
+| PSU. 2006. Dairy idea plans. University Park, Pa.: Pennsylvania State
+  University, Agricultural and Biological Engineering
+| Extension. Available at:
+| www.abe.psu.edu/extension/ip/dairyideaplans.html. Accessed 20 February
+  2006.
+
+Rotz, C. A. 2004. Management to reduce nitrogen losses in animal
+production. *J. Animal Sci.* 82(13, elec. supp.): E119-E137.
+
+| Rotz, C. A., and C. U. Coiner. 2005. Integrated Farm System Model,
+  Reference Manual. Available at:
+| http://ars.usda.gov/naa/pswmru. Accessed 21 August 2005.
+
+Sherlock, R. R., and K. M. Goh. 1985. Dynamics of ammonia volatilization
+from simulated urine patches and aqueous urea applied to pasture: II.
+Theoretical derivation of a simplified model. *Fertilizer Res.* 6(1):
+3-22.
+
+   | Sommer, S. G., J. E. Olesen, and B. T. Christensen. 1991. Effects
+     of temperature, wind speed, and air humidity on ammonia
+   | volatilization from surface-applied cattle slurry. *J. Agric. Sci.,
+     Cambridge* 117(1): 91-100.
+
+   Sommer, S. G., B. T. Christensen, N. E. Nielsen, and J. K.
+
+   Schjørring. 1993. Ammonia volatilization during storage of cattle and
+   pig slurry: Effect of surface cover. *J. Agric. Sci., Cambridge*
+   121(1): 63-71.
+
+   | Sommer, S. G., and R. R. Sherlock. 1996. pH and buffer
+   | component dynamics in the surface layers of animal slurries. *J.
+     Agric. Sci., Cambridge* 127(1): 109-116.
+
+   Sogaard, H. T., S. G. Sommer, N. J. Hutchings, J. F. M. Huijsmans, D.
+   W. Bussink, and F. Nicholson. 2002. Ammonia volatilization from
+   field-applied animal slurry: The ALFAM model. *Atmos. Environ.*
+   36(20): 3309-3319.
+
+   Williams, A. G., and E. Nigro. 1997. Covering slurry stores and
+   effects on emissions of ammonia and methane. In *Proc. Intl.*
+
+   *Symposium on Ammonia and Odour Control from Animal Production
+   Facilities*, 421-428. J. A. M. Voermans and G. J.
+
+   Monteny, eds. Wageningen, The Netherlands: Dutch Society of
+   Agricultural Engineering.
+
+   Vol. 49(4): 1139−1149 1149
+
+   1150 TRANSACTIONSOFTHE ASABE
+
+.. |image1| image:: vertopal_32acbea53b7647a580e37db770d9971f/media/image2.png
+   :width: 0.27639in
+   :height: 0.27639in
+.. |image2| image:: vertopal_32acbea53b7647a580e37db770d9971f/media/image3.png
+   :width: 0.27778in
+   :height: 0.27639in
+.. |image3| image:: vertopal_32acbea53b7647a580e37db770d9971f/media/image4.png
+   :width: 0.36806in
+   :height: 0.36944in
+.. |image4| image:: vertopal_32acbea53b7647a580e37db770d9971f/media/image4.png
+   :width: 0.36806in
+   :height: 0.36944in
