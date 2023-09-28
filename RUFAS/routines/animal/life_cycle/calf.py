@@ -15,7 +15,8 @@ from random import random
 from scipy.stats import truncnorm
 from RUFAS.output_manager import OutputManager
 from RUFAS.routines.animal.life_cycle.animal_base import AnimalBase
-from RUFAS.routines.animal.ration.calf_ration import calc_requirements
+# from RUFAS.routines.animal.ration.calf_ration import calc_requirements
+from RUFAS.routines.animal.ration.calf_ration import CalfRationManager
 from RUFAS.routines.animal.manure.calf_manure_excretion import \
     manure_calculations
 from RUFAS.routines.animal.life_cycle import animal_constants as const
@@ -134,7 +135,7 @@ class Calf(AnimalBase):
         wean_day = AnimalBase.config['wean_day']
         wean_length = AnimalBase.config['wean_length']
         milk_type = AnimalBase.config['milk_type']
-        self.animal_intake, self.nutrient_rqmts = calc_requirements(
+        self.animal_intake, self.nutrient_rqmts = CalfRationManager.calc_requirements(
             self, feed, temp, wean_day, wean_length, milk_type)
         self.DBW = self.nutrient_rqmts['live_weight_change']['val']
 
