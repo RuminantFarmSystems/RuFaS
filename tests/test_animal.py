@@ -1348,7 +1348,16 @@ def test_attempt_optimization():
 
 def test_objective():
     """Unit test for function objective in file routines/animal/ration/ration_optimizer.py"""
-    pass
+    ration_optimizer = RationOptimizer()
+    x = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0]
+    ration_config = MagicMock()
+    ration_config.price = [7.0, 8.0, 9.0, 10.0, 11.0, 12.0]
+
+    expected = 217.0
+
+    actual = ration_optimizer.objective(x, ration_config)
+
+    assert actual == expected
 
 
 def test_NEmact_constraint():
