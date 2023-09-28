@@ -262,7 +262,8 @@ class Weather:
         Notes
         -----
         This method calculates the average annual air temperature by taking the average of all daily average air
-        temperatures provided in the weather input file.
+        temperatures provided in the weather input file. Previous implementations calculated the average annual
+        temperature for individual years, which led to the value fluctuating more than desired.
 
         This method is intended to approximate SWAT's method for calculating the average annual temperature. SWAT
         calculates average high and low temperatures for each month over every simulated year, then averages those
