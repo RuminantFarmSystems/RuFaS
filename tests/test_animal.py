@@ -1358,22 +1358,91 @@ def test_NEmact_constraint():
 
 def test_NEl_constraint():
     """Unit test for function NEl_constraint in file routines/animal/ration/ration_optimizer.py"""
-    pass
+    ration_optimizer = RationOptimizer()
+    x = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0]
+    ration_config = MagicMock()
+    ration_config.type = ['Forage', 'Conc', 'Mineral', 'Forage', 'Conc', 'Mineral']
+    ration_config.is_fat = [1, 1, 1, 0, 0, 0]
+    ration_config.EE = [0, 1, 2, 3, 4, 5]
+    ration_config.MEact = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0]
+    ration_config.DEact = [7.0, 8.0, 9.0, 10.0, 11.0, 12.0]
+    ration_config.NEpreg = 7.0
+    ration_config.NEl = 8.0
+
+    ration_config.NElact = False
+
+    expected = 30.547793814432993
+
+    actual = ration_optimizer.NEl_constraint(x, ration_config)
+
+    assert actual == expected
+
+    ration_config.NElact = True
+
+    expected = 6.0
+
+    actual = ration_optimizer.NEl_constraint(x, ration_config)
+
+    assert actual == expected
 
 
 def test_NEgact_constraint():
     """Unit test for function NEgact_constraint in file routines/animal/ration/ration_optimizer.py"""
-    pass
+    ration_optimizer = RationOptimizer()
+    x = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0]
+    ration_config = MagicMock()
+    ration_config.type = ['Forage', 'Conc', 'Mineral', 'Forage', 'Conc', 'Mineral']
+    ration_config.is_fat = [1, 1, 1, 0, 0, 0]
+    ration_config.MEact = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0]
+    ration_config.NEg = 7.0
+
+    ration_config.NEgact = False
+
+    expected = 16.982200000000002
+
+    actual = ration_optimizer.NEgact_constraint(x, ration_config)
+
+    assert actual == expected
+
+    ration_config.NEgact = True
+
+    expected = 14.0
+
+    actual = ration_optimizer.NEgact_constraint(x, ration_config)
+
+    assert actual == expected
 
 
 def test_calcium_constraint():
     """Unit test for function calcium_constraint in file routines/animal/ration/ration_optimizer.py"""
-    pass
+    ration_optimizer = RationOptimizer()
+    x = [1.0, 2.0, 3.0, 4.0, 5.0]
+    ration_config = MagicMock()
+    ration_config.type = ['Forage', 'Conc', 'Mineral', 'Forage', 'Conc']
+    ration_config.calcium = 6.0
+    ration_config.C_req = 7.0
+
+    expected = 0.506
+
+    actual = ration_optimizer.calcium_constraint(x, ration_config)
+
+    assert actual == expected
 
 
 def test_phosphorus_constraint():
     """Unit test for function phosphorus_constraint in file routines/animal/ration/ration_optimizer.py"""
-    pass
+    ration_optimizer = RationOptimizer()
+    x = [1.0, 2.0, 3.0, 4.0, 5.0]
+    ration_config = MagicMock()
+    ration_config.type = ['Forage', 'Conc', 'Mineral', 'Forage', 'Conc']
+    ration_config.phosphorus = 6.0
+    ration_config.P_req = 7.0
+
+    expected = 0.6229999999999999
+
+    actual = ration_optimizer.phosphorus_constraint(x, ration_config)
+
+    assert actual == expected
 
 
 def test_protein_constraint():
@@ -1382,8 +1451,8 @@ def test_protein_constraint():
     x = [1.0, 2.0, 3.0, 4.0, 5.0]
     ration_config = MagicMock()
     ration_config.NDF = [1.0, 2.0, 3.0, 4.0, 5.0]
-    ration_config.type = ['Forage', 'Conc', 'Forage', 'Conc', 'Forage']
-    ration_config.is_wetforage = [1, 1, 0, 0, 1]
+    ration_config.type = ['Forage', 'Conc', 'Mineral', 'Forage', 'Conc']
+    ration_config.is_wetforage = [1, 1, 1, 0, 0]
     ration_config.BW = 6.0
     ration_config.Kd = [1.0, 2.0, 3.0, 4.0, 5.0]
     ration_config.N_B = [1.0, 2.0, 3.0, 4.0, 5.0]
@@ -1393,7 +1462,7 @@ def test_protein_constraint():
     ration_config.dRUP = [1.0, 2.0, 3.0, 4.0, 5.0]
     ration_config.MP_req = 7.0
 
-    expected = 83.34263876096367
+    expected = 83.29181235589395
 
     actual = ration_optimizer.protein_constraint(x, ration_config)
 
@@ -1413,6 +1482,14 @@ def test_NDF_constraint_lower():
 
     assert actual == pytest.approx(expected)
 
+    x = [-1, 1]
+
+    expected = None
+
+    actual = ration_optimizer.NDF_constraint_lower(x, ration_config)
+
+    assert actual == pytest.approx(expected)
+
 
 def test_NDF_constraint_upper():
     """Unit test for function NDF_constraint_upper in file routines/animal/ration/ration_optimizer.py"""
@@ -1422,6 +1499,14 @@ def test_NDF_constraint_upper():
     ration_config.NDF = [1.0, 2.0, 3.0, 4.0, 5.0]
 
     expected = 41.333333333333336
+
+    actual = ration_optimizer.NDF_constraint_upper(x, ration_config)
+
+    assert actual == pytest.approx(expected)
+
+    x = [-1, 1]
+
+    expected = None
 
     actual = ration_optimizer.NDF_constraint_upper(x, ration_config)
 
@@ -1442,6 +1527,14 @@ def test_forage_NDF_constraint():
 
     assert actual == pytest.approx(expected)
 
+    x = [-1, 1]
+
+    expected = None
+
+    actual = ration_optimizer.forage_NDF_constraint(x, ration_config)
+
+    assert actual == pytest.approx(expected)
+
 
 def test_fat_constraint():
     """Unit test for function fat_constraint in file routines/animal/ration/ration_optimizer.py"""
@@ -1452,6 +1545,14 @@ def test_fat_constraint():
     ration_config.EE = [1.0, 2.0, 3.0, 4.0, 5.0]
 
     expected = 3.3333333333333335
+
+    actual = ration_optimizer.fat_constraint(x, ration_config)
+
+    assert actual == pytest.approx(expected)
+
+    x = [-1, 1]
+
+    expected = None
 
     actual = ration_optimizer.fat_constraint(x, ration_config)
 
