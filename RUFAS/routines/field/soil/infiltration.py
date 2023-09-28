@@ -1,10 +1,13 @@
 from math import exp, log
 from typing import Optional
 from RUFAS.routines.field.soil.soil_data import SoilData
+from RUFAS.output_manager import OutputManager
 
 """
 This module is based on the 'Runoff Volume: SCS Curve Number Procedure' (2:1.1) section of the SWAT model documentation
 """
+
+om = OutputManager()
 
 
 class Infiltration:
@@ -81,7 +84,11 @@ class Infiltration:
         # TODO: bound runoff by the amount of rainfall that occurred before storing it - Issue #468
         self.data.accumulated_runoff = self._determine_accumulated_runoff(rainfall, retention_parameter)
         infiltrated_water = max(0.0, rainfall - self.data.accumulated_runoff)
+        info_map = {"class": self.__class__.__name__, "function": self.infiltrate.__name__, "prefix": "Field"}
+        om.add_variable("top_water_content_pre_infiltration(mm)", self.data.soil_layers[0].water_content, info_map)
+        om.add_variable("infiltrated_water(mm)", infiltrated_water, info_map)
         self.data.soil_layers[0].water_content += infiltrated_water
+        om.add_variable("top_water_content_post_infiltration(mm)", self.data.soil_layers[0].water_content, info_map)
 
         # Update annual totals
         self.data.annual_runoff_total += self.data.accumulated_runoff

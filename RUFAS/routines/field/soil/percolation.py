@@ -3,10 +3,13 @@ from math import exp
 
 from RUFAS.routines.field.soil.layer_data import LayerData
 from RUFAS.routines.field.soil.soil_data import SoilData
+from RUFAS.output_manager import OutputManager
 
 """
 This module is based on the section 'Percolation' (2:3.2) in SWAT
 """
+
+om = OutputManager()
 
 
 class Percolation:
@@ -39,6 +42,9 @@ class Percolation:
         """
         layer_count = len(self.data.soil_layers)
         deepest_layer = layer_count - 1
+
+        info_map = {"class": self.__class__.__name__, "function": self.percolate.__name__, "prefix": "Field"}
+        om.add_variable("top_water_content_pre_percolation(mm)", self.data.soil_layers[0].water_content, info_map)
 
         percolation_ops = []
         for layer_number in range(layer_count):  # loop through each layer
