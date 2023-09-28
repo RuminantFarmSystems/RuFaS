@@ -1,4 +1,5 @@
 from RUFAS.input_manager import InputManager
+from RUFAS.output_manager import OutputManager
 from RUFAS.routines.field.field.field import Field
 from RUFAS.routines.field.field.field_data import FieldData
 from RUFAS.routines.field.soil.soil import Soil
@@ -20,7 +21,7 @@ the `SimulationEngine` for executing daily and annual routines in the field modu
 """
 
 im = InputManager()
-
+om = OutputManager()
 
 class FieldManager:
     def __init__(self, manure_manager: ManureManager):
@@ -48,6 +49,10 @@ class FieldManager:
         Because different fields can have different latitudes, the day length has to be recalculated for each field.
 
         """
+        info_map = {"class": self.__class__.__name__, "function": self.daily_update_routine.__name__, "prefix": "Time"}
+        om.add_variable("day", time.day, info_map)
+        om.add_variable("year", time.calendar_year, info_map)
+
         for field in self.fields:
             month = FieldManager._date_conversion_month(time)
             current_weather = FieldManager._create_current_weather(weather=weather, time=time, month=month)
