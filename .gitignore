@@ -22,7 +22,8 @@
 # folders
 build
 others
-
+input/metadata/
+input/scenario_manager.py
 
 # Ignore contents of output directories, except for .keep files
 # This is because we want to keep the output directories, and git
