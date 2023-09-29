@@ -1298,13 +1298,29 @@ def test_lactating_cow_manure_calculations():
     pass
 
 
-def test_optimize():
+def test__get_ration():
+    """Unit test for function _get_ration in file routines/animal/ration/calf_ration.py"""
+    actual = RUFAS.routines.animal.ration.calf_ration.CalfRationManager._get_ration()
+    expected = {'155': 1, '157': 2, 'status': 'Optimal', 'objective': 4.5}
+    assert actual == expected
+    
+
+def test_optimize(mocker: MockerFixture):
     """Unit test for function optimize in file routines/animal/ration/calf_ration.py"""
-    pass
+    mocker.patch('RUFAS.routines.animal.ration.calf_ration.CalfRationManager._get_ration',
+                 return_value='formulated_ration')
+    actual = RUFAS.routines.animal.ration.calf_ration.CalfRationManager.optimize()
+    expected = 'formulated_ration'
+    assert actual == expected
 
 
 def test_calc_requirements():
     """Unit test for function calc_requirements in file routines/animal/ration/calf_ration.py"""
+    pass
+
+
+def test_calc_intake():
+    """Unit test for function calc_intake in file routines/animal/ration/calf_ration.py"""
     pass
 
 

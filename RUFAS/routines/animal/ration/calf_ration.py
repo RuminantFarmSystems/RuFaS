@@ -94,7 +94,6 @@ class CalfRationManager:
         # [A.1B.C.1]
         whole_milk_me = 0.96 * whole_milk_de
 
-        milk_replacer_dm = calf_feeds[milk_replacer_id]['DM']
         milk_replacer_cp = calf_feeds[milk_replacer_id]['CP']
         milk_replacer_de = calf_feeds[milk_replacer_id]['DE']
         # [A.1B.C.1]
