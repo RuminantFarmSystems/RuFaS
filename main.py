@@ -10,6 +10,7 @@ import argparse
 from pathlib import Path
 import sys
 from typing import List
+from input.metadata.metadata_paths import METADATA_PATHS
 
 import config.global_variables
 from RUFAS.simulation_engine import SimulationEngine
@@ -18,7 +19,7 @@ from RUFAS.output_manager import OutputManager
 from RUFAS.util import Utility
 
 
-METADATA_PATHS = ['input/metadata/default_metadata.json']
+# METADATA_PATHS = ['input/metadata/barnyard_metadata.json']
 
 
 def run_rufas(
