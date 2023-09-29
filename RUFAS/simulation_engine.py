@@ -32,7 +32,7 @@ class SimulationEngine:
         self._run_simulation_main_loop()
         t_end_sim = timer.time()
 
-        print("Simulation Successful")
+        sys.stdout.write("\nSimulation Successful\n")
         total_simulation_time = t_end_sim - t_start_sim
         total_simulation_time_log = f"Total simulation time is: {total_simulation_time}"
         om.add_log("total_simulation_time",
@@ -53,7 +53,6 @@ class SimulationEngine:
         """
         The main loop for simulation
         """
-        sys.stdout.write("Simulating  ")
         while not self.time.end_simulation():
             self._annual_simulation()
 

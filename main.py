@@ -8,6 +8,7 @@ file(s) or, if this input is not given, it will run in interactive mode and acce
 """
 import argparse
 from pathlib import Path
+import sys
 from typing import List
 
 import config.global_variables
@@ -69,6 +70,7 @@ def execute_simulations(
     info_map = {"class": "No caller class",
                 "function": execute_simulations.__name__,
                 }
+    sys.stdout.write("Simulating...\n")
     output_manager = OutputManager()
     input_manager = InputManager()
     metadata_file_list = metadata_files

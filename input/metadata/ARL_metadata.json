@@ -24,21 +24,21 @@
     "economy": {
       "title": "Economy data",
       "description": "Time is money!",
-      "path": "input/data/EEE/example_costs.csv",
+      "path": "input/data/EEE/default_costs.csv",
       "type": "csv",
       "properties": "economic_properties"
     },
     "emission": {
       "title": "Emissions data",
       "description": "Let's think about global warming",
-      "path": "input/data/EEE/example_emissions.csv",
+      "path": "input/data/EEE/default_emissions.csv",
       "type": "csv",
       "properties": "emissions_properties"
     },
     "feed": {
       "title": "Feed data",
       "description": "Those cows need to eat!",
-      "path": "input/data/feed/example_feed.json",
+      "path": "input/data/feed/default_feed.json",
       "type": "json",
       "properties": "feed_properties"
     },
