@@ -22,7 +22,7 @@
 # folders
 build
 others
-input/metadata/
+
 input/scenario_manager.py
 
 # Ignore contents of output directories, except for .keep files
