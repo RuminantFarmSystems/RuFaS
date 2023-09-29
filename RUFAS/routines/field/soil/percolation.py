@@ -49,7 +49,7 @@ class Percolation:
                         info_map)
 
         percolation_ops = []
-        for layer_number in range(layer_count):  # loop through each layer
+        for layer_number in reversed(range(layer_count)):  # loop through each layer
             current_layer = self.data.soil_layers[layer_number]
 
             # get the appropriate underlying layer
