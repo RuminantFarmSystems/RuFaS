@@ -45,6 +45,8 @@ class Percolation:
 
         info_map = {"class": self.__class__.__name__, "function": self.percolate.__name__, "prefix": "Field"}
         om.add_variable("top_water_content_pre_percolation(mm)", self.data.soil_layers[0].water_content, info_map)
+        om.add_variable("second_layer_water_content_pre_percolation(mm)", self.data.soil_layers[1].water_content,
+                        info_map)
 
         percolation_ops = []
         for layer_number in range(layer_count):  # loop through each layer
