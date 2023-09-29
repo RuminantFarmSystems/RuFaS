@@ -30,8 +30,6 @@ class LayerData:
     """soil water concentration of the layer (mm)"""
     water_content: float = field(init=False)
     """water present in the layer (mm)"""
-    incoming_water: float = 0.0
-    """water coming into the layer from percolation (mm)"""
     field_capacity_water_concentration: float = 0.3  # arbitrary
     """water concentration of soil layer at field capacity (mm water / mm soil)"""
     wilting_point_water_concentration: float = 0.2  # arbitrary

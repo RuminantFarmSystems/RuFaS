@@ -56,10 +56,11 @@ class Percolation:
                                                                    has_seasonal_high_water_table)
             if current_layer.temperature > 0 and can_percolate:
                 percolated_water = self._percolate_between_layers(self.data.time_step, current_layer, layer_below)
-                current_layer.water_content -= percolated_water
-                current_layer.percolated_water = percolated_water
-                layer_below.water_content += current_layer.incoming_water
-                layer_below.incoming_water = percolated_water
+                current_layer.water_content -= percolated_water  # subtract current day percolated water from current layer
+                current_layer.percolated_water = percolated_water  # track percolated water amount in the current layer percolated water attribute
+                if layer_number > 0:  # if it's not the first loop through (i.e. we're not on the top layer)
+                    layer_above = self.data.soil_layers[layer_number - 1]  # get the layer above
+                    current_layer.water_content += layer_above.percolated_water  # add the previous day's percolated water to the water content
             else:
                 current_layer.percolated_water = 0
 
