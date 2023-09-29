@@ -1,34 +1,218 @@
+"""
+RUFAS: Ruminant Farm Systems Model
+File name: calf_ration.py
+
+Description: The class which handles calf nutrient requirement calculations and ration formulation methods
+
+Author(s): Katrina Wang, kw433@cornell.edu
+           Militsa Sotirova, militsasotirova@gmail.com
+           Joseph Waddell, jw2574@cornell.edu
+"""
 # from .hardcoded_ration import get_ration
 import math
+from typing import Dict, Any
+from RUFAS.routines.animal.life_cycle.calf import Calf
 
 class CalfRationManager:
     """
     Calf ration formulation is distinct from other animal types, and managed separately.
-    Note that the ration formulated is a fixed ration, and the animal requirements are scarcely used
-    
-    
+    Note that the ration formulated is a fixed ration; requirements used only for reporting
     
     """
     @classmethod
-    def _get_ration(cls):
+    def _get_ration(cls) -> Dict[str, float | str]:
+        """
+        Harcoded calf ration
+
+        Returns
+        -------
+        Dict[str, float | str]
+            Dictionary of formulated ration
+
+        """
         return {'155': 1, '157': 2, 'status': 'Optimal', 'objective': 4.5}
 
     @classmethod
     def optimize(cls):
+        """"
+        Returns "optimized" calf ration
+        
+        Notes
+        -----
+        Use of calf nutrient requirements not implemented, hardcoded ration is returned
+
+        Returns
+        -------
+        Dictionary of formulated ration
+
+        """
         return cls._get_ration()
 
     @classmethod
-    def calc_requirements(cls, calf, feed, temp, wean_day, wean_length, milk_type):
+    def calc_requirements(cls, calf: Calf, feed: Dict[str, float], temp: float, animal_intake: Dict) -> \
+        Dict[str, Dict[str, Any]]:
         """
         Calculate dietary intake and nutrient requirements for the calf.
 
-        Args:
-            feed: instance of Feed class defined in feed.py
-            calf: the calf to calculate the nutrient requirement for
-            temp: the average temperature of the simulation day
-            wean_day: the wean day of the calf
-            wean_length: the wean length of the calf
-            milk_type: either "whole" or "replacer"
+        Parameters
+        ----------
+        calf : Calf
+            Calf object
+        feed : Dict[str, float]
+            Instance of Feed class defined in feed.py
+        temp : float
+            Average temperature of the simulation day
+        animal_intake : Dict
+            Dictionary of calculated intake values
+
+        Returns
+        -------
+        Dict[str,  Dict[str, Any]]
+            Dictionary of requirement values and methods
+
+        """
+
+        whole_milk_intake = animal_intake['whole_milk_intake']
+        milk_replacer_intake = animal_intake['milk_replacer_intake']
+        starter_intake = animal_intake['starter_intake']
+        dm_intake = animal_intake['dm_intake']
+        me_intake = animal_intake['me_intake']
+        cp_intake = animal_intake['cp_intake']
+        adp_intake = animal_intake['adp_intake']
+        milk_me_proportion = animal_intake['milk_me_proportion']
+        starter_me_proportion = animal_intake['starter_me_proportion']
+        milk_proportion = animal_intake['milk_proportion']
+        starter_proportion = animal_intake['starter_proportion']
+
+        # nutrient composition of feeds from the feed library
+        whole_milk_id = 155
+        milk_replacer_id = 156
+        starter_id = 157
+        calf_feeds = feed.calf_feeds
+
+        whole_milk_cp = calf_feeds[whole_milk_id]['CP']
+        whole_milk_de = calf_feeds[whole_milk_id]['DE']
+        # [A.1B.C.1]
+        whole_milk_me = 0.96 * whole_milk_de
+
+        milk_replacer_dm = calf_feeds[milk_replacer_id]['DM']
+        milk_replacer_cp = calf_feeds[milk_replacer_id]['CP']
+        milk_replacer_de = calf_feeds[milk_replacer_id]['DE']
+        # [A.1B.C.1]
+        milk_replacer_me = 0.96 * milk_replacer_de
+
+        starter_cp = calf_feeds[starter_id]['CP']
+        starter_de = calf_feeds[starter_id]['DE']
+        starter_ee = calf_feeds[starter_id]['EE']
+        # [A.1B.C.2]
+        starter_me = (1.01 * starter_de - 0.45) + 0.0046 * (starter_ee - 3)
+
+        # [A.1B.C.5]
+        milk_me_proportion = (whole_milk_intake * whole_milk_me + milk_replacer_intake * milk_replacer_me) / me_intake
+        # [A.1B.C.6]
+        starter_me_proportion = starter_intake * starter_me / me_intake
+
+        # [A.1B.E.2]
+        milk_cp_intake = 0.01 * (whole_milk_cp * whole_milk_intake + milk_replacer_cp * milk_replacer_intake)
+        starter_cp_intake = 0.01 * starter_cp * starter_intake
+
+        # [A.1B.D.2]
+        milk_proportion = (whole_milk_intake + milk_replacer_intake) / dm_intake
+        # [A.1B.D.3]
+        starter_proportion = starter_intake / dm_intake
+
+        # maintainance requirements
+        # [A.1B.F.1]
+        if calf.days_born <= 60:
+            if temp < -30:
+                t_factor = 1.34
+            elif temp < 15:
+                t_factor = -0.0272 * temp + 0.4751
+            else:
+                t_factor = 0
+        else:
+            if temp < -30:
+                t_factor = 1.07
+            elif temp <= 5:
+                t_factor = -0.0271 * temp + 0.2002
+            else:
+                t_factor = 0
+
+        # [A.1B.F.2]
+        ne_maint = 0.086 * calf.body_weight ** 0.75 * (1 + t_factor)
+        # [A.1B.F.3]
+        me_maint = ne_maint / (0.86 * milk_proportion + 0.75 * starter_proportion)
+
+        # [A.1B.G.1]
+        bio_val = 0.8 * milk_cp_intake / cp_intake + 0.7 * starter_cp_intake / cp_intake
+
+        # [A.1B.G.2]
+        endo_urine_N = 0.0002 * calf.body_weight ** 0.75 * 1000
+        # [A.1B.G.3]
+        meta_fecal_N = (0.0019 * (whole_milk_intake + milk_replacer_intake) + 0.0033 * starter_intake) * 1000
+
+        # [A.1B.G.4]
+        adp_maint = 6.25 * (1 / bio_val * (endo_urine_N + meta_fecal_N) - meta_fecal_N)
+
+        # growth requirements
+        # [A.1B.H.1]
+        me_gain = me_intake - me_maint
+        # [A.1B.H.2]
+        ne_gain = me_gain * (0.69 * milk_me_proportion + 0.57 * starter_me_proportion)
+
+        # [A.1B.H.3]
+        if ne_gain >= 0:
+            energy_allow_gain = math.exp(0.833 * math.log((1.19 * ne_gain)/(0.69 * calf.body_weight ** 0.355)))
+        else:
+            energy_allow_gain = 0
+
+        # [A.1B.H.4]
+        adp_allow_gain = (adp_intake - adp_maint) * bio_val / 0.188 * 0.001
+        # [A.1B.H.5]
+        live_weight_change = min(energy_allow_gain, adp_allow_gain)
+
+        nutrient_requirements = {
+            'ne_maint': {'op': '=', 'val': ne_maint},
+            'me_maint': {'op': '=', 'val': me_maint},
+            'bio_val': {'op': '=', 'val': bio_val},
+            'endo_urine_N': {'op': '=', 'val': endo_urine_N},
+            'meta_fecal_N': {'op': '=', 'val': meta_fecal_N},
+            'adp_maint': {'op': '=', 'val': adp_maint},
+            'me_gain': {'op': '=', 'val': me_gain},
+            'ne_gain': {'op': '=', 'val': ne_gain},
+            'energy_allow_gain': {'op': '=', 'val': energy_allow_gain},
+            'adp_allow_gain': {'op': '=', 'val': adp_allow_gain},
+            'live_weight_change': {'op': '=', 'val': live_weight_change}
+        }
+
+        return nutrient_requirements
+
+
+    @ classmethod
+    def calc_intake(cls, calf: Calf, feed: Dict[str, float], wean_day: int, wean_length: int,
+                          milk_type: str) -> Dict:
+        """
+        Calculating calf intake values
+
+
+        Parameters
+        ----------
+        calf : Calf
+            Calf object
+        feed : Dict[str, float]
+            Instance of Feed class defined in feed.py
+        wean_day : int
+            Wean day of the calf
+        wean_length : int
+            Wean length of the calf
+        milk_type : string
+            Either "whole" or "replacer"
+
+        Returns
+        -------
+        Dict[str, float]
+            Dictionary of intake values
+
         """
         # nutrient composition of feeds from the feed library
         whole_milk_id = 155
@@ -108,56 +292,6 @@ class CalfRationManager:
         # [A.1B.D.3]
         starter_proportion = starter_intake / dm_intake
 
-        # maintainance requirements
-        # [A.1B.F.1]
-        if calf.days_born <= 60:
-            if temp < -30:
-                t_factor = 1.34
-            elif temp < 15:
-                t_factor = -0.0272 * temp + 0.4751
-            else:
-                t_factor = 0
-        else:
-            if temp < -30:
-                t_factor = 1.07
-            elif temp <= 5:
-                t_factor = -0.0271 * temp + 0.2002
-            else:
-                t_factor = 0
-
-        # [A.1B.F.2]
-        ne_maint = 0.086 * calf.body_weight ** 0.75 * (1 + t_factor)
-        # [A.1B.F.3]
-        me_maint = ne_maint / (0.86 * milk_proportion + 0.75 * starter_proportion)
-
-        # [A.1B.G.1]
-        bio_val = 0.8 * milk_cp_intake / cp_intake + 0.7 * starter_cp_intake / cp_intake
-
-        # [A.1B.G.2]
-        endo_urine_N = 0.0002 * calf.body_weight ** 0.75 * 1000
-        # [A.1B.G.3]
-        meta_fecal_N = (0.0019 * (whole_milk_intake + milk_replacer_intake) + 0.0033 * starter_intake) * 1000
-
-        # [A.1B.G.4]
-        adp_maint = 6.25 * (1 / bio_val * (endo_urine_N + meta_fecal_N) - meta_fecal_N)
-
-        # growth requirements
-        # [A.1B.H.1]
-        me_gain = me_intake - me_maint
-        # [A.1B.H.2]
-        ne_gain = me_gain * (0.69 * milk_me_proportion + 0.57 * starter_me_proportion)
-
-        # [A.1B.H.3]
-        if ne_gain >= 0:
-            energy_allow_gain = math.exp(0.833 * math.log((1.19 * ne_gain)/(0.69 * calf.body_weight ** 0.355)))
-        else:
-            energy_allow_gain = 0
-
-        # [A.1B.H.4]
-        adp_allow_gain = (adp_intake - adp_maint) * bio_val / 0.188 * 0.001
-        # [A.1B.H.5]
-        live_weight_change = min(energy_allow_gain, adp_allow_gain)
-
         animal_intake = {
             'whole_milk_intake': whole_milk_intake,
             'milk_replacer_intake': milk_replacer_intake,
@@ -175,18 +309,4 @@ class CalfRationManager:
             'starter_proportion': starter_proportion
         }
 
-        nutrient_requirements = {
-            'ne_maint': {'op': '=', 'val': ne_maint},
-            'me_maint': {'op': '=', 'val': me_maint},
-            'bio_val': {'op': '=', 'val': bio_val},
-            'endo_urine_N': {'op': '=', 'val': endo_urine_N},
-            'meta_fecal_N': {'op': '=', 'val': meta_fecal_N},
-            'adp_maint': {'op': '=', 'val': adp_maint},
-            'me_gain': {'op': '=', 'val': me_gain},
-            'ne_gain': {'op': '=', 'val': ne_gain},
-            'energy_allow_gain': {'op': '=', 'val': energy_allow_gain},
-            'adp_allow_gain': {'op': '=', 'val': adp_allow_gain},
-            'live_weight_change': {'op': '=', 'val': live_weight_change}
-        }
-
-        return animal_intake, nutrient_requirements
+        return animal_intake

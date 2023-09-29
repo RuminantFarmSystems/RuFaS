@@ -131,12 +131,11 @@ class Calf(AnimalBase):
         """
         Calculates this calf's nutrient requirements.
         """
-        # self.nutrient_rqmts, self.DMIest, self.DBW = calculate_rqmts()
         wean_day = AnimalBase.config['wean_day']
         wean_length = AnimalBase.config['wean_length']
         milk_type = AnimalBase.config['milk_type']
-        self.animal_intake, self.nutrient_rqmts = CalfRationManager.calc_requirements(
-            self, feed, temp, wean_day, wean_length, milk_type)
+        self.animal_intake = CalfRationManager.calc_intake(self, feed, wean_day, wean_length, milk_type)
+        self.nutrient_rqmts = CalfRationManager.calc_requirements(self, feed, temp, self.animal_intake)
         self.DBW = self.nutrient_rqmts['live_weight_change']['val']
 
     def calc_manure_excretion(self, feed, methane_model):
