@@ -11,7 +11,6 @@ Author(s): Katrina Wang, kw433@cornell.edu
 # from .hardcoded_ration import get_ration
 import math
 from typing import Dict, Any
-from RUFAS.routines.animal.life_cycle.calf import Calf
 
 class CalfRationManager:
     """
@@ -49,7 +48,7 @@ class CalfRationManager:
         return cls._get_ration()
 
     @classmethod
-    def calc_requirements(cls, calf: Calf, feed: Dict[str, float], temp: float, animal_intake: Dict) -> \
+    def calc_requirements(cls, calf, feed: Dict[str, float], temp: float, animal_intake: Dict) -> \
         Dict[str, Dict[str, Any]]:
         """
         Calculate dietary intake and nutrient requirements for the calf.
@@ -189,7 +188,7 @@ class CalfRationManager:
 
 
     @ classmethod
-    def calc_intake(cls, calf: Calf, feed: Dict[str, float], wean_day: int, wean_length: int,
+    def calc_intake(cls, calf, feed: Dict[str, float], wean_day: int, wean_length: int,
                           milk_type: str) -> Dict:
         """
         Calculating calf intake values
