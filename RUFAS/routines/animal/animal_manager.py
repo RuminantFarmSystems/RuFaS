@@ -39,6 +39,8 @@ from RUFAS.routines.animal.pen import Pen
 from RUFAS.routines.animal.ration import ration_driver as ration_driver
 from RUFAS.routines.feed.feed import Feed
 from RUFAS.routines.animal.ration.calf_ration import optimize as calf_optimize
+from RUFAS.routines.animal.ration.ration_driver import RationReporter
+from RUFAS.routines.animal.ration.ration_driver import RationManager
 
 from RUFAS.routines.animal.ration import user_defined_ration as udr
 
@@ -108,8 +110,6 @@ class AnimalManager:
         config = {}
         config.update(data['management_decisions'])
         config.update(data['farm_level']['calf'])
-        config.update(data['farm_level']['repro']['ED_related'])
-        config.update(data['farm_level']['repro']['TAI_related'])
         config.update(data['farm_level']['repro'])
         config.update(data['farm_level']['bodyweight'])
         config.update(data['from_literature']['repro'])
@@ -191,7 +191,7 @@ class AnimalManager:
 
         # concentrate supplementation when farming type is "pasture", kg
         self.pasture_concentrate = data['pasture_concentrate']
-        
+
         udrm = udr.UserDefinedRationManager()
         self.ration_user_input = data['ration']['user_input']
         udrm.udr_or_not = self.ration_user_input
@@ -200,8 +200,8 @@ class AnimalManager:
         self.formulation_interval = data['ration']['formulation_interval']
 
         self.methane_model = data['methane_model']
-        self.methane_mitigation_method = data['methane_mitigation_method']
-        self.methane_mitigation_additive_amount = data['methane_mitigation_additive_amount']
+        self.methane_mitigation_method = data['methane_mitigation']['methane_mitigation_method']
+        self.methane_mitigation_additive_amount = data['methane_mitigation']['methane_mitigation_additive_amount']
 
         self.init_pens(data['pen_information'], data['herd_information'], data['manure_management_scenarios'])
 
@@ -244,8 +244,10 @@ class AnimalManager:
                                           manure_management_scenario_id][0]
             pen_data['bedding_type'] = manure_management_scenario['bedding_type']
             pen_data['manure_handling'] = manure_management_scenario['manure_handler']
-            pen_data['manure_separator'] = manure_management_scenario['manure_separator']
-            pen_data['manure_storage'] = manure_management_scenario['manure_treatment']
+            pen_data['manure_separator'] = \
+                manure_management_scenario['manure_separator']
+            pen_data['manure_storage'] = \
+                manure_management_scenario['manure_treatment']
 
             pen = Pen(**pen_data)
 
@@ -279,7 +281,7 @@ class AnimalManager:
             herd_data: dictionary containing information about the herd
         """
 
-        animal_keys = {"calf_num", "heiferI_num", "heiferII_num", "heiferIII_num", "cow_num"}
+        animal_keys = {"calf_num", "heiferI_num", "heiferII_num", "heiferIII_num_springers", "cow_num"}
 
         info_map = {
             "class": self.__class__.__name__,
@@ -1304,7 +1306,6 @@ class AnimalManager:
             instance of the Feed class
 
         """
-
         available_feeds = ration_driver.AvailableFeeds()
         available_feeds.feed_nutrients(feed)
         for pen in self.all_pens:
@@ -1322,7 +1323,7 @@ class AnimalManager:
                         ration_vals = {'ME_tot': 0}
                     else:
                         ration_per_animal, ration_vals = \
-                            ration_driver.ration_formulation(pen, pen_specific_feed_data, self.ANIMAL_GROUPING_SCENARIO)
+                            RationManager.formulate_ration(pen, pen_specific_feed_data, self.ANIMAL_GROUPING_SCENARIO)
 
                     # TODO: Remove this check before merging to master
                     counter += 1
@@ -1330,7 +1331,7 @@ class AnimalManager:
                         raise Exception('Too many attempts at optimizing ration.')
 
                 # recording ration nutrition information in pen
-                nutrient_amount, nutrient_conc = ration_driver.ration_report(ration_per_animal, feed.available_feeds)
+                nutrient_amount, nutrient_conc = RationReporter.report_ration(ration_per_animal, feed.available_feeds)
                 pen.ration_nutrient_amount = nutrient_amount
                 pen.ration_nutrient_conc = nutrient_conc
                 pen.MEdiet = ration_vals['ME_tot']
@@ -1353,13 +1354,13 @@ class AnimalManager:
 
                 info_map = {"class": self.__class__.__name__,
                     "function": self._calc_ration_at_interval.__name__,
-                    "available_feeds": available_feeds.feed_id, }
+                    "available_feeds": available_feeds.feed_id, 
+                    f'number_animals_in_pen_{pen.id}': len(pen.animals_in_pen)}
                 om.add_variable(f'ration_nutrient_amount_pen_{pen.id}', nutrient_amount, info_map)
-                om.add_variable(f'ration_nutrient_conc_pen_{pen.id}', nutrient_conc, info_map)
                 om.add_variable(f'MEdiet_pen_{pen.id}', pen.MEdiet, info_map)
-                om.add_variable(f'dry_matter_intake_pen_{pen.id}', pen.dry_matter_intake, info_map)
                 om.add_variable(f'avg_rqmts_pen_{pen.id}', pen.avg_nutrient_rqmts, info_map)
-
+                om.add_variable(f'ration_per_animal_for_pen_{pen.id}', pen.ration_per_animal, info_map)
+                
     @classmethod
     def _get_animal_types_in_pen(cls, pen: Pen) -> Set[AnimalType]:
         """

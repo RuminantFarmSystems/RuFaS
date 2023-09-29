@@ -3,12 +3,6 @@
 # ignore text files
 *.txt
 *.txt#
-!example_list_of_filter_patterns.txt
-!example_list_of_regex_patterns.txt
-!example_list_of_exclude_regex_patterns.txt
-!example_list_of_exclude_filter_patterns.txt
-!csv_default_filter.txt
-!json_default_filter.txt
 !requirements.txt
 *.doc
 *.docx
@@ -34,9 +28,7 @@ others
 # only stores non-empty directories
 output/*
 !output/.keep
-!output/output_filters/
-RUFAS/routines/manure/output/*
-!RUFAS/routines/manure/output/.keep
+output/output_filters/
 
 # ignore project files
 *.sublime-project

@@ -5,7 +5,7 @@ from pytest import approx
 from pytest import fixture
 from pytest_mock import MockFixture
 
-from RUFAS.routines.manure.constants.manure_constants import ManureConstants
+from RUFAS.routines.manure.constants_and_units.manure_constants import ManureConstants
 from RUFAS.routines.manure.manure_separators.manure_separator_classes import BaseManureSeparator
 from RUFAS.routines.manure.manure_separators.manure_separator_classes import BeltPress
 from RUFAS.routines.manure.manure_separators.manure_separator_classes import DecantingCentrifuge

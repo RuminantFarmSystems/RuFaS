@@ -98,21 +98,10 @@ def test_simulate(patch_simulation_engine: SimulationEngine, mocker: MockerFixtu
     patch_for_run_simulation_main_loop = \
         mocker.patch("RUFAS.simulation_engine.SimulationEngine._run_simulation_main_loop")
     patch_for_show_final_messages = mocker.patch("RUFAS.simulation_engine.SimulationEngine._show_final_messages")
-    patch_for_manure_output_handler_produce_csv = mocker.patch(
-        "RUFAS.simulation_engine.ManureManagerOutputHandler.produce_csv",
-        return_value=None
-    )
-    mocker.patch(
-        "RUFAS.simulation_engine.ManureManagerOutputHandler.produce_graphics",
-        return_value=None
-    )
     sim_eng = patch_simulation_engine
     sim_eng.simulate()
     patch_for_run_simulation_main_loop.assert_called_once()
     patch_for_show_final_messages.assert_called_once()
-    patch_for_manure_output_handler_produce_csv.assert_called_once_with(
-        sim_eng.config.csv_dir, sim_eng.state.manure_manager
-    )
 
 
 def test_show_final_messages(
@@ -516,13 +505,13 @@ def test_dict_to_file_csv_exception(mock_output_manager: OutputManager) -> None:
 
 
 def test_save_variables_to_csv_files_exceptions(
-    mock_output_manager: OutputManager,
-    mocker: MockerFixture
+    mock_output_manager: OutputManager
 ) -> None:
     """Unit test for the function _save_variables_to_csv_files() in the file output_manager.py"""
-    mocker.patch("pathlib.Path.mkdir", side_effect=IOError)
-    with raises(Exception):
-        mock_output_manager._save_variables_to_csv_files({}, "test_dir")
+    invalid_path = '/invalid/directory'
+
+    with pytest.raises((PermissionError, OSError)):
+        mock_output_manager._save_variables_to_csv_files({}, 'filter', invalid_path)
 
 
 def test_generate_key(mocker: MockerFixture) -> None:
@@ -792,38 +781,31 @@ def output_manager_original_method_states(
     }
 
 
-def test_dump_all_pools(
+def test_dump_all_nondata_pools(
     mock_output_manager: OutputManager,
     output_manager_original_method_states: Dict[str, Callable],
 ) -> None:
-    """Test case for function dump_all_pools in output_manager.py"""
+    """Test case for function dump_all_nondata_pools in output_manager.py"""
     path = "dummy_path"
     mock_output_manager.dump_errors = MagicMock()
     mock_output_manager.dump_warnings = MagicMock()
     mock_output_manager.dump_logs = MagicMock()
-    mock_output_manager.dump_variables = MagicMock()
     mock_output_manager.dump_variable_names_and_contexts = MagicMock()
 
-    mock_output_manager.dump_all_pools(path, exclude_info_maps=False)
+    mock_output_manager.dump_all_nondata_pools(path, exclude_info_maps=False)
 
     mock_output_manager.dump_errors.assert_called_once_with(path)
     mock_output_manager.dump_warnings.assert_called_once_with(path)
     mock_output_manager.dump_logs.assert_called_once_with(path)
-    mock_output_manager.dump_variables.assert_called_once_with(path, False)
     mock_output_manager.dump_variable_names_and_contexts.assert_called_once_with(path, False)
 
-    mock_output_manager.dump_all_pools(path, exclude_info_maps=True)
-    mock_output_manager.dump_variables.assert_called_with(path, True)
+    mock_output_manager.dump_all_nondata_pools(path, exclude_info_maps=True)
     mock_output_manager.dump_variable_names_and_contexts.assert_called_with(path, True)
     assert mock_output_manager.dump_logs.call_count == 2
     assert mock_output_manager.dump_warnings.call_count == 2
     assert mock_output_manager.dump_errors.call_count == 2
-    assert mock_output_manager.dump_variables.call_count == 2
 
     # Restore original methods
-    mock_output_manager.dump_variables = output_manager_original_method_states[
-        "dump_variables"
-    ]
     mock_output_manager.dump_logs = output_manager_original_method_states["dump_logs"]
     mock_output_manager.dump_warnings = output_manager_original_method_states[
         "dump_warnings"
