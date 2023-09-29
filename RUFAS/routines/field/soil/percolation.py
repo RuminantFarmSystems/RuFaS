@@ -58,7 +58,8 @@ class Percolation:
                 percolated_water = self._percolate_between_layers(self.data.time_step, current_layer, layer_below)
                 current_layer.water_content -= percolated_water
                 current_layer.percolated_water = percolated_water
-                layer_below.water_content += percolated_water
+                layer_below.water_content += current_layer.incoming_water
+                layer_below.incoming_water = percolated_water
             else:
                 current_layer.percolated_water = 0
 

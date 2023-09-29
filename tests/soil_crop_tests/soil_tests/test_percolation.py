@@ -99,7 +99,7 @@ def test_percolate_between_layers(time_step: float, excess_water_available: floa
 
 # --- Integration tests ----
 @pytest.mark.parametrize("can_percolate, expected", [
-    (True, [4.7, 4.75, 21, 0.3]),
+    (True, [4.7, 4.45, 21, 0.3]),
     (False, [5.0, 4.75, 21, 0])
 ])
 def test_percolate(can_percolate: bool, expected: List[float]):
