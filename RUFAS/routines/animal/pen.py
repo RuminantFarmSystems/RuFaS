@@ -24,10 +24,11 @@ from RUFAS.routines.animal.life_cycle.heiferII import HeiferII
 from RUFAS.routines.animal.life_cycle.heiferIII import HeiferIII
 from RUFAS.routines.animal.manure.general_manure import AnimalManureExcretions, add_animal_manure_excretions, \
     get_default_animal_manure_excretions
-from RUFAS.routines.animal.ration import animal_requirements as req
+from RUFAS.routines.animal.ration.animal_requirements import AnimalRequirements
 
 om = OutputManager()
 
+req = AnimalRequirements()
 
 class Pen:
     """
@@ -175,10 +176,10 @@ class Pen:
 
         GROWING_AND_CLOSE_UP = 4  # all heifers and dry cows
 
-    def __init__(self, pen_id: int, vertical_dist_to_milking_parlor: float, horizontal_dist_to_milking_parlor: float,
-                 number_of_stalls: int, housing_type: str, bedding_type: str, pen_type: str, manure_handling: str,
-                 manure_separator: str, manure_storage: str, animal_combination: AnimalCombination,
-                 max_stocking_density: float) -> None:
+    def __init__(self, pen_id: int, pen_name: str, vertical_dist_to_milking_parlor: float,
+                 horizontal_dist_to_milking_parlor: float, number_of_stalls: int, housing_type: str, bedding_type: str,
+                 pen_type: str, manure_handling: str, manure_separator: str, manure_storage: str,
+                 animal_combination: AnimalCombination, max_stocking_density: float) -> None:
         """
         Initializes a pen with the given arguments.
 
@@ -219,6 +220,7 @@ class Pen:
         self.housing_type = housing_type
         self.bedding_type = bedding_type
         self._pen_type = pen_type
+        self.pen_name = pen_name
 
         self.manure_handling = manure_handling
         self.manure_separator = manure_separator
@@ -863,6 +865,7 @@ class Pen:
         """
         animal_type = animal_grouping_scenario.get_animal_type(animal)
         if animal_type in [AnimalType.LAC_COW, AnimalType.DRY_COW]:
+            req = AnimalRequirements()
             requirements = req.calc_rqmts(body_weight=animal.body_weight, mature_body_weight=animal.mature_body_weight,
                                           day_of_pregnancy=animal.days_in_preg, animal_type=animal_type,
                                           parity=animal.calves, calving_interval=animal.CI,

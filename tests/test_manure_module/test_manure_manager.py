@@ -1,11 +1,12 @@
 import pytest
 from pytest_mock import MockFixture
 
-from RUFAS.routines.manure.constants.manure_constants import ManureConstants
+from RUFAS.routines.manure.constants_and_units.manure_constants import ManureConstants
 from RUFAS.routines.manure.manure_manager import ManureManager
 from RUFAS.routines.manure.manure_manager import simulate_daily_manure_manager
 from RUFAS.routines.manure.manure_treatments.manure_treatment_types import ManureTreatmentType
 from RUFAS.routines.manure.manure_treatments.manure_types import ManureType
+from RUFAS.routines.manure.IO_helpers.manure_module_output_manager_helper import ManureModuleOutputManagerHelper
 
 
 def test_simulate_daily_manure_manager(mocker: MockFixture) -> None:
@@ -622,6 +623,8 @@ def test_pen_daily_update(mocker: MockFixture) -> None:
     patch_for_add_manure_nutrients = mocker.patch.object(
         manure_manager, '_add_manure_nutrients', return_value=None
     )
+
+    mocker.patch.object(ManureModuleOutputManagerHelper, 'add_dataclass_object', return_value=None)
 
     # Act
     manure_manager._pen_daily_update(

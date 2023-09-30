@@ -1,13 +1,19 @@
 from __future__ import annotations
 
-from typing import Tuple
-
-from RUFAS.routines.manure.constants.gas_emission_constants import GasEmissionConstants
-from RUFAS.routines.manure.constants.manure_constants import ManureConstants
-from RUFAS.routines.manure.gas_emissions.gas_emissions import GasEmissions
-from RUFAS.routines.manure.manure_treatments.base_manure_treatment import BaseManureTreatment
-from RUFAS.routines.manure.manure_treatments.manure_treatment_configs import ManureTreatmentConfig
-from RUFAS.routines.manure.manure_treatments.manure_treatment_daily_output import ManureTreatmentDailyOutput
+from RUFAS.routines.manure.constants_and_units.gas_emission_constants import GasEmissionConstants
+from RUFAS.routines.manure.constants_and_units.manure_constants import ManureConstants
+from RUFAS.routines.manure.gas_emissions.calculator import (
+    GasEmissionsCalculator,
+)
+from RUFAS.routines.manure.manure_treatments.base_manure_treatment import (
+    BaseManureTreatment,
+)
+from RUFAS.routines.manure.manure_treatments.manure_treatment_configs import (
+    ManureTreatmentConfig,
+)
+from RUFAS.routines.manure.manure_treatments.manure_treatment_daily_output import (
+    ManureTreatmentDailyOutput,
+)
 
 
 class CompostBeddedPackBarn(BaseManureTreatment):
@@ -18,7 +24,9 @@ class CompostBeddedPackBarn(BaseManureTreatment):
 
     """
 
-    def __init__(self, weather, time, manure_treatment_config: ManureTreatmentConfig) -> None:
+    def __init__(
+            self, weather, time, manure_treatment_config: ManureTreatmentConfig
+    ) -> None:
         """Initializes the compost bedded pack barn manure treatment.
 
         Args:
@@ -57,7 +65,7 @@ class CompostBeddedPackBarn(BaseManureTreatment):
         -------
         float
             The total potassium within the compost bedded pack barn's manure-bedding mixture (in kg).
-        
+
         """
         return (
                 current_manure_bedding_mix_potassium
@@ -111,9 +119,9 @@ class CompostBeddedPackBarn(BaseManureTreatment):
 
         total_solids = bedding_total_solids + manure_total_solids
         temperature_celsius = self._get_current_day_average_temperature_celsius()
-        methane_emission = GasEmissions.calc_ifsm_methane_emission(
+        methane_emission = GasEmissionsCalculator.calc_ifsm_methane_emission(
             manure_volatile_solids, temperature_celsius)
-        carbon_decomposition = GasEmissions.calc_total_carbon_decomposition(
+        carbon_decomposition = GasEmissionsCalculator.calc_total_carbon_decomposition(
             manure_total_solids=manure_total_solids,
             bedding_total_mass=bedding_total_solids,
             days_since_last_tillage=days_since_last_tillage,
@@ -141,9 +149,11 @@ class CompostBeddedPackBarn(BaseManureTreatment):
 
         """
         daily_input = self._current_manure_treatment_daily_input
-        total_nitrogen_loss = GasEmissions.calc_total_nitrogen_loss_from_compost_bedded_pack_barn(
-            daily_nitrogen_input=daily_input.liquid_manure_nitrogen,
-            is_bedding_tilled=True
+        total_nitrogen_loss = (
+            GasEmissionsCalculator.total_nitrogen_loss_from_compost_bedded_pack_barn(
+                daily_nitrogen_input=daily_input.liquid_manure_nitrogen,
+                is_bedding_tilled=True,
+            )
         )
         manure_nitrogen = daily_input.liquid_manure_nitrogen - total_nitrogen_loss
         manure_organic_nitrogen = ManureConstants.COMPOST_BEDDING_ORGANIC_NITROGEN_FRACTION * manure_nitrogen
