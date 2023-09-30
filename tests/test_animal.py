@@ -1362,7 +1362,27 @@ def test_objective():
 
 def test_NEmact_constraint():
     """Unit test for function NEmact_constraint in file routines/animal/ration/ration_optimizer.py"""
-    pass
+    ration_optimizer = RationOptimizer()
+    x = [1.0, 2.0, 3.0, 4.0, 5.0]
+    ration_config = MagicMock()
+    ration_config.TDN = [6.0, 7.0, 8.0, 9.0, 10.0]
+    ration_config.BW = 6.0
+    ration_config.DE = [1.0, 2.0, 3.0, 4.0, 5.0]
+    ration_config.MEact = [6.0, 7.0, 8.0, 9.0, 10.0]
+
+    ration_config.type = ['Forage', 'Conc', 'Mineral', 'Forage', 'Conc', 'Mineral']
+    ration_config.is_fat = [1, 1, 1, 0, 0, 0]
+    ration_config.EE = [0, 1, 2, 3, 4, 5]
+
+    ration_config.NEm_act = [1.0, 2.0, 3.0, 4.0, 5.0]
+    ration_config.NEa = 6.0
+    ration_config.NEmaint = 7.0
+
+    expected = 42.0
+
+    actual = ration_optimizer.NEmact_constraint(x, ration_config)
+
+    assert actual == expected
 
 
 def test_NEl_constraint():
