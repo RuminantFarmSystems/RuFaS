@@ -122,6 +122,7 @@ def test_percolate_between_layers_correct(can_percolate: bool, expected_water_co
     assert mock_percolation.data.soil_layers[0].water_content == expected_water_content[0]
     assert mock_percolation.data.soil_layers[1].water_content == expected_water_content[1]
     assert mock_percolation.data.soil_layers[2].water_content == expected_water_content[2]
+    assert mock_percolation.data.vadose_zone_layer.water_content == 3.0
 
 
 # --- Integration tests ----
