@@ -171,7 +171,7 @@ def test_set_requirements(mocker: MockerFixture):
          mock_foo.return_value = {'NEmaint':1, 'NEg': 2, 'NEpreg': 3, 'NEl': 4, 'MP_req': 5,
                                   'Ca_req': 6, 'P_req': 7, 'DMIest': 8}
          
-         
+
     # RUFAS.routines.animal.life_cycle.heiferI.calc_rqmts()
     # patch heiferI.calc_rqmts() 
     # patch heiferII.calc_rqmts() 
@@ -1650,7 +1650,31 @@ def test_calc_pen_requirements():
 
 def test_feed_nutrients():
     """Unit test for function feed_nutrients in file routines/animal/ration/ration_driver.py"""
-    pass
+    feed_obj = MagicMock()
+    feed_obj.available_feeds = {'1':{'feed_id': 1, 'TDN': 1, 'DE': 1, 'EE': 1, 
+                                     'is_fat': 1, 'calcium': 1, 'phosphorus': 1, 
+                                     'NDF': 1, 'type': 1, 'is_wetforage': 1, 'Kd': 1,
+                                     'N_A': 1,'N_B': 1, 'CP': 1, 'dRUP': 1, 'limit': 
+                                     {'lactating_cows': 1, 'dry_cows': 2}}, 
+                                '2':{'feed_id': 2, 'TDN': 2, 'DE': 2, 'EE': 2, 
+                                     'is_fat': 2, 'calcium': 2, 'phosphorus': 2, 
+                                     'NDF': 2, 'type': 2, 'is_wetforage': 2, 'Kd': 2,
+                                     'N_A': 2,'N_B': 2, 'CP': 2, 'dRUP': 2, 'limit': 3},}
+    feed_obj.feed_costs = {'1': 1, '2': 2}
+
+    available_feeds = AvailableFeeds()
+    actual = available_feeds.feed_nutrients(feed_obj)
+
+    assert available_feeds.lactating_cow_limit == [1, 3]
+    assert available_feeds.dry_cow_limit == [2, 3]
+    assert available_feeds.CP == [1,2]
+    keylist = ['feed_id', 'TDN', 'DE', 'EE', 'is_fat', 'calcium', 'phosphorus', 'NDF', 'type', 'is_wetforage', 'Kd', 
+               'N_A', 'N_B', 'CP', 'dRUP']
+    for key in keylist:
+        assert getattr(available_feeds, key) == [1,2]
+        assert len(getattr(available_feeds, key)) == 2
+
+
 
 
 @pytest.fixture
