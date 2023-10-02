@@ -152,10 +152,41 @@ def heifer_b() -> dict:
     }
     return heifer_b_dict
 
+from unittest.mock import PropertyMock
 
-def test_set_requirements():
+from RUFAS.routines.animal.ration.animal_requirements import AnimalRequirements
+def test_set_requirements(mocker: MockerFixture):
     """Unit test for function set_requirements in file routines/animal/ration/animal_requirements.py"""
-    pass
+
+    pen = MagicMock()
+    pen.animals_in_pen = [MagicMock(), MagicMock(), MagicMock()]
+    animal_grouping_scenario = MagicMock()
+    
+    test_obj = AnimalRequirements()
+    
+    with patch('RUFAS.routines.animal.animal_grouping_scenarios.AnimalGroupingScenario.get_animal_type') as mock_foo:
+        mock_foo.return_value = AnimalType.HEIFER_I
+
+    with patch('RUFAS.routines.animal.ration.animal_requirements.AnimalRequirements.calc_rqmts', new_callable=PropertyMock) as mock_foo:
+         mock_foo.return_value = {'NEmaint':1, 'NEg': 2, 'NEpreg': 3, 'NEl': 4, 'MP_req': 5,
+                                  'Ca_req': 6, 'P_req': 7, 'DMIest': 8}
+         
+         
+    # RUFAS.routines.animal.life_cycle.heiferI.calc_rqmts()
+    # patch heiferI.calc_rqmts() 
+    # patch heiferII.calc_rqmts() 
+    # patch heiferIII.calc_rqmts() 
+    # patch cow.calc_rqmts() 
+    # patch AnimalRequirements.calc_pen_requirements
+    # mocker.patch(
+    #     'RUFAS.routines.animal.ration.ration_driver.RationReporter.get_TDN_discount',
+    #     return_value = 1)
+
+    recalc = True
+    test_obj.set_requirements(pen, animal_grouping_scenario, recalc)
+    
+    assert len(test_obj.NEmaint)==3
+
 
 
 def test_calculate_NRC_energy_maintenance_requirements(cow_a:dict, cow_b:dict, heifer_a:dict, heifer_b:dict)->None:
