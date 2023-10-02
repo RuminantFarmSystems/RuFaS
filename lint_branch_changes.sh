@@ -20,6 +20,7 @@ changed_files=$(git diff --name-only $(git merge-base ${base_branch} HEAD) | gre
 
 if [ -z "$changed_files" ]; then
     # Exit if there are no Python files to lint
+    echo "No Python files modified on this branch yet."
     exit 0
 fi
 
