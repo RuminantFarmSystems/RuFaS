@@ -10,7 +10,7 @@ IF "%~1"=="" (
     exit /b 1
 )
 
-REM Get the commit hash of HEAD of the bash branch.
+REM Get the commit hash of HEAD on the bash branch.
 FOR /F "tokens=*" %%n IN ('git merge-base %base_branch% HEAD') DO @(set BASEBRANCHHEAD=%%n)
 
 REM Remove any old files that use names needed in this script.
