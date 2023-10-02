@@ -11,34 +11,32 @@ IF "%~1"=="" (
     call :display_usage
     exit /b 1
 )
+REM Get the commit hash of HEAD of the bash branch.
+FOR /F "tokens=*" %%n IN ('git merge-base %base_branch% HEAD') DO @(set BASEBRANCHHEAD=%%n)
 
-REM Get the list of changed Python files
-REM cmd /k "git merge-base master HEAD"
-@REM set HELLO=hello
-@REM call echo %%HELLO%%
-FOR /F "tokens=*" %%n IN ('git merge-base master HEAD') DO @(set BASEBRANCHHEAD=%%n)
-call echo %%BASEBRANCHHEAD%%
+REM Remove any old files that use names needed in this script.
+IF EXIST ".\.changed_files.txt" (del .\.changed_files.txt)
+IF EXIST ".\.changed_python_files.txt" (del .\.changed_python_files.txt)
 
-del .\.changed_files.txt
-
+REM Get the list of files changed in this branch.
 FOR /F "tokens=*" %%G IN ('git diff --name-only %BASEBRANCHHEAD%') DO (
-    echo %%G >> .\.changed_files.txt
+    echo %%G>> .\.changed_files.txt
 )
-call type .\.changed_files.txt
 
+REM Filter the list of changed files to get all the changed Python files from it.
 FOR /F "tokens=*" %%G IN ('findstr /r "\.py$" .\.changed_files.txt') DO (
-    call echo here
-    echo %%G >> .\.changed_python_files.txt
+    echo %%G>> .\.changed_python_files.txt
 )
-call type .\.changed_python_files.txt
 
-REM Exit if there are no Python files to lint
-@REM IF "%changed_files%"=="" (
-@REM     exit /b 0
-@REM )
-@REM
-@REM REM Run Flake8 on the changed Python files
-@REM flake8 %changed_files%
+REM Run Flake8 on the Python files modified in this branch.
+IF EXIST ".\.changed_python_files.txt" (
+    REM Run Flake8 on the changed Python files
+    FOR /F "tokens=*" %%G IN ('type .\.changed_python_files.txt') DO (
+        flake8 %%G
+    )
+) ELSE (
+    call echo No Python files modified on this branch yet.
+)
 
 exit /b 0
 
