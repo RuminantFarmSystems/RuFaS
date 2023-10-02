@@ -1450,7 +1450,8 @@ class AnimalRequirements:
         """
         Calculates the net energy for activity requirement portion of the energy
         requirements for animals. This is separate because it must be calculated after
-        grouping due to pen input args and cannot be used individually on an animal. The estimated energy requirements requirements for activity in megacalories per day are calculated following either NRC or NASEM guidelines
+        grouping due to pen input args and cannot be used individually on an animal. The estimated energy requirements
+         for activity in megacalories per day are calculated following either NRC or NASEM guidelines
         
         Parameters
         ----------
@@ -1469,10 +1470,9 @@ class AnimalRequirements:
 
         Notes
         -----
-        # Activity requirement (net_energy_activity) is proportional to body weight and daily walking distance.
-        # Grazing system and hilly topography will cost additional energy. 
-        # This is not implemented yet in the current version of code.
-        # The latter requires implementation with the grazing module.
+        Activity requirement (net_energy_activity) is proportional to body weight and daily walking distance.
+        Grazing system and hilly topography will cost additional energy. 
+            Grazing is not implemented yet in the current version of code.
 
         References
         ----------
@@ -1498,7 +1498,6 @@ class AnimalRequirements:
                 net_energy_activity = distance * 0.00035 * \
                     body_weight
             elif housing == 'Grazing':
-                # TODO This will be the DMI supplemented after grazing - requires grazing module implementation: See Issue #590
                 nonpasturekgDMI = 1
                 net_energy_activity = distance * body_weight * \
                     0.75 * ((600-12*nonpasturekgDMI))/600
