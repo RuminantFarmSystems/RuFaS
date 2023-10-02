@@ -38,6 +38,10 @@ IF EXIST ".\.changed_python_files.txt" (
     call echo No Python files modified on this branch yet.
 )
 
+REM Remove files used to run this script.
+IF EXIST ".\.changed_files.txt" (del .\.changed_files.txt)
+IF EXIST ".\.changed_python_files.txt" (del .\.changed_python_files.txt)
+
 exit /b 0
 
 REM Function to display usage
