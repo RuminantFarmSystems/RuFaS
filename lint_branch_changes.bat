@@ -1,16 +1,15 @@
 @echo off
 
-REM Check the number of command line arguments
+REM Check the number of command line arguments.
 IF "%~1"=="" (
     set "base_branch=master"
 ) ELSE IF "%~2"=="" (
     set "base_branch=%~1"
 ) ELSE (
-    Set "SubStr=%here%"
-    echo %SubStr%
     call :display_usage
     exit /b 1
 )
+
 REM Get the commit hash of HEAD of the bash branch.
 FOR /F "tokens=*" %%n IN ('git merge-base %base_branch% HEAD') DO @(set BASEBRANCHHEAD=%%n)
 
@@ -25,15 +24,16 @@ FOR /F "tokens=*" %%G IN ('git diff --name-only %BASEBRANCHHEAD%') DO (
 
 REM Filter the list of changed files to get all the changed Python files from it.
 FOR /F "tokens=*" %%G IN ('findstr /r "\.py$" .\.changed_files.txt') DO (
-    echo %%G>> .\.changed_python_files.txt
+    echo|set /p="%%G " >> .\.changed_python_files.txt
 )
+
+REM Write the changed Python files in to a variable that can be accessed by Flake8.
+FOR /F "tokens=*" %%G IN (.\.changed_python_files.txt) DO (set changed_python_files=%%G)
 
 REM Run Flake8 on the Python files modified in this branch.
 IF EXIST ".\.changed_python_files.txt" (
     REM Run Flake8 on the changed Python files
-    FOR /F "tokens=*" %%G IN ('type .\.changed_python_files.txt') DO (
-        flake8 %%G
-    )
+    flake8 %changed_python_files%
 ) ELSE (
     call echo No Python files modified on this branch yet.
 )
@@ -44,7 +44,7 @@ IF EXIST ".\.changed_python_files.txt" (del .\.changed_python_files.txt)
 
 exit /b 0
 
-REM Function to display usage
+REM Function to display usage.
 :display_usage
 echo Usage: cleanup.bat [BASEBRANCH]
 echo Lint all files different between current branch and BASEBRANCH with Flake8.
