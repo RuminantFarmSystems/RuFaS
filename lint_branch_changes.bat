@@ -27,11 +27,11 @@ FOR /F "tokens=*" %%G IN ('findstr /r "\.py$" .\.changed_files.txt') DO (
     echo|set /p="%%G " >> .\.changed_python_files.txt
 )
 
-REM Write the changed Python files in to a variable that can be accessed by Flake8.
-FOR /F "tokens=*" %%G IN (.\.changed_python_files.txt) DO (set changed_python_files=%%G)
-
 REM Run Flake8 on the Python files modified in this branch.
 IF EXIST ".\.changed_python_files.txt" (
+    REM Write the changed Python files in to a variable that can be accessed by Flake8.
+    FOR /F "tokens=*" %%G IN (.\.changed_python_files.txt) DO (set changed_python_files=%%G)
+    
     REM Run Flake8 on the changed Python files
     flake8 %changed_python_files%
 ) ELSE (
