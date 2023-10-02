@@ -97,11 +97,9 @@ def test_simulate(patch_simulation_engine: SimulationEngine, mocker: MockerFixtu
     """Unit test for function simulate in file RUFAS/simulation_engine.py"""
     patch_for_run_simulation_main_loop = \
         mocker.patch("RUFAS.simulation_engine.SimulationEngine._run_simulation_main_loop")
-    patch_for_show_final_messages = mocker.patch("RUFAS.simulation_engine.SimulationEngine._show_final_messages")
     sim_eng = patch_simulation_engine
     sim_eng.simulate()
     patch_for_run_simulation_main_loop.assert_called_once()
-    patch_for_show_final_messages.assert_called_once()
 
 
 def test_run_simulation_main_loop(patch_simulation_engine: SimulationEngine) -> None:
@@ -112,15 +110,6 @@ def test_run_simulation_main_loop(patch_simulation_engine: SimulationEngine) -> 
     sim_eng._run_simulation_main_loop()
     sim_eng.time.end_simulation.assert_has_calls([call(), call()])
     sim_eng._annual_simulation.assert_called_once()
-
-
-def test_show_final_messages(
-    patch_simulation_engine: SimulationEngine, mocker: MockerFixture
-) -> None:
-    """Unit test for function _show_final_messages in file RUFAS/simulation_engine.py"""
-    mocker.patch("sys.stdout.write")
-    patch_simulation_engine._show_final_messages(1, 1)
-    assert mocker._patches_and_mocks[1][1].call_count == 3
 
 
 def test_daily_simulation(

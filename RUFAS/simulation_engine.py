@@ -3,7 +3,6 @@
 import sys
 import time as timer
 
-import config.global_variables
 from RUFAS import routines
 from RUFAS.classes import Config, State, Weather, Time
 from RUFAS.output_manager import OutputManager
@@ -46,15 +45,6 @@ class SimulationEngine:
         """
         while not self.time.end_simulation():
             self._annual_simulation()
-
-    def _show_final_messages(self, graphics_prod_time: float, total_runtime: float) -> None:
-        """
-        Shows the messages of the end of the simulation.
-        """
-        sys.stdout.write(
-            f"Graphics stored in: {self.config.graphic_dir}\n")
-        sys.stdout.write(f"Time to produce graphics: {graphics_prod_time}\n")
-        sys.stdout.write(f"Total Run Time: {total_runtime} seconds\n")
 
     def _daily_simulation(self) -> None:
         """Executes the daily simulation routines."""
