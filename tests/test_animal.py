@@ -1329,6 +1329,64 @@ def test_calc_requirements():
     pass
 
 
+def test_init_ration_optimizer():
+    """Unit test for function __init__ in file routines/animal/ration/ration_optimizer.py"""
+    ration_optimizer = RationOptimizer()
+
+    assert ration_optimizer.cow_cons == []
+    assert ration_optimizer.heifer_cons == []
+    assert ration_optimizer.constraint_functions == []
+
+
+def test_set_constraints():
+    """Unit test for function set_constraints in file routines/animal/ration/ration_optimizer.py"""
+    ration_optimizer = RationOptimizer()
+    arguments = MagicMock()
+    ration_optimizer.set_constraints(arguments)
+
+    assert ration_optimizer.constraint_functions == [
+        ration_optimizer.total_energy,
+        ration_optimizer.NEmact_constraint,
+        ration_optimizer.NEl_constraint,
+        ration_optimizer.NEgact_constraint,
+        ration_optimizer.calcium_constraint,
+        ration_optimizer.phosphorus_constraint,
+        ration_optimizer.protein_constraint,
+        ration_optimizer.NDF_constraint_lower,
+        ration_optimizer.NDF_constraint_upper,
+        ration_optimizer.forage_NDF_constraint,
+        ration_optimizer.fat_constraint,
+        ration_optimizer.DMI_constraint_upper,
+        ration_optimizer.DMI_constraint_lower
+    ]
+
+    assert ration_optimizer.cow_cons == [{'type': 'ineq', 'fun': func, 'args': arguments} for func in
+                                         ration_optimizer.constraint_functions]
+
+    assert ration_optimizer.heifer_cons == [cons for cons in ration_optimizer.cow_cons if
+                                            cons['fun'] not in [ration_optimizer.total_energy,
+                                                                ration_optimizer.NEl_constraint,
+                                                                ration_optimizer.DMI_constraint_lower]]
+
+
+def test_get_ration_vals():
+    """Unit test for function get_ration_vals in file routines/animal/ration/ration_optimizer.py"""
+    ration_optimizer = RationOptimizer()
+    x = [1.0, 2.0, 3.0, 4.0, 5.0]
+    ration_config = MagicMock()
+    ration_config.MEact = [6.0, 7.0, 8.0, 9.0, 10.0]
+
+    actual = ration_optimizer.get_ration_vals(x, ration_config)
+
+    expected = {'ME_tot': 130.0}
+
+    assert actual == expected
+
+
+def test_total_energy():
+    """Unit test for function total_energy in file routines/animal/ration/ration_optimizer.py"""
+
+
 @pytest.mark.parametrize(
     "input,expected",
     [([1, 2, 3, 4], [1, 1, 1, 2, 2, 2, 3, 3, 3, 4, 4, 4]),
