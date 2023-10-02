@@ -25,7 +25,7 @@ def run_rufas(
     clear_output: bool = False,
     exclude_info_maps: bool = True,
 ) -> None:
-    """Main function to run RuFaS, with options. If input_path is not provided,
+    """Main function to run RuFaS, with options. If input_path is not provided
     the interactive user prompt is triggered.
 
     Args:
