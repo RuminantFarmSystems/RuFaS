@@ -122,7 +122,7 @@ class OutputGatherer:
                 info_map["prefix"] = "field='" + field.field_data.name + "',layer_index='" + str(index) + "'"
                 om.add_variable("water_content(mm)", layer.water_content, info_map)
                 om.add_variable("temperature(Celsius)", layer.temperature, info_map)
-                om.add_variable("percolated_water(mm)", layer.percolated_water, info_map)
+                om.add_variable("percolated_water", layer.percolated_water, info_map)
                 om.add_variable("evaporated_water_content(mm)", layer.evaporated_water_content, info_map)
                 om.add_variable("plant_metabolic_active_carbon_usage", layer.plant_metabolic_active_carbon_usage,
                                 info_map)
