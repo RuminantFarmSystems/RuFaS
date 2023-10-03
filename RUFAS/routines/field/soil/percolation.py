@@ -35,7 +35,8 @@ class Percolation:
         layer_count = len(self.data.soil_layers)
         deepest_layer = layer_count - 1
 
-        for layer_number in range(layer_count):  # loop through each layer
+        percolation_ops = []
+        for layer_number in reversed(range(layer_count)):  # loop through each layer
             current_layer = self.data.soil_layers[layer_number]
 
             # get the appropriate underlying layer
@@ -49,13 +50,17 @@ class Percolation:
                                                                    layer_below.field_capacity_content,
                                                                    layer_below.saturation_content,
                                                                    has_seasonal_high_water_table)
-            if current_layer.temperature > 0 and can_percolate:
+            if can_percolate:
                 percolated_water = self._percolate_between_layers(self.data.time_step, current_layer, layer_below)
                 current_layer.water_content -= percolated_water
                 current_layer.percolated_water = percolated_water
                 layer_below.water_content += percolated_water
             else:
                 current_layer.percolated_water = 0
+            percolation_ops.append((layer_below, current_layer.percolated_water))
+
+        for op in percolation_ops:
+            op[0].water_content += op[1]
 
     # --- Static methods ---
     @staticmethod

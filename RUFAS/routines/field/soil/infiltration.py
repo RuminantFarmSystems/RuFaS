@@ -82,9 +82,6 @@ class Infiltration:
         self.data.accumulated_runoff = self._determine_accumulated_runoff(rainfall, retention_parameter)
         infiltrated_water = max(0.0, rainfall - self.data.accumulated_runoff)
         self.data.infiltrated_water = infiltrated_water
-        print(f"\nwater content: {self.data.soil_layers[0].water_content}")
-        print(f"infiltrated water: {infiltrated_water}")
-        print(f"retention parameter: {retention_parameter}")
         self.data.soil_layers[0].water_content += infiltrated_water
 
         # --- Update previous retention parameter ----------------------------------------------------------------------

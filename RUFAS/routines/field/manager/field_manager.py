@@ -51,7 +51,6 @@ class FieldManager:
                     "prefix": "Time"}
         om.add_variable("day", time.day, info_map)
         om.add_variable("year", time.calendar_year, info_map)
-        print(f"\n{time.day} {time.year}")
 
         current_weather = FieldManager._create_current_weather(weather=weather, time=time,
                                                                month=FieldManager._date_conversion_month(time))
