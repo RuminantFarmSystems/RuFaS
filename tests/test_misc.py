@@ -15,11 +15,9 @@ import pytest
 from mock.mock import MagicMock, call
 from pytest import approx, raises
 from pytest_mock.plugin import MockerFixture
-from RUFAS.classes import Config, Weather, Time, State
 
 from RUFAS.general_constants import GeneralConstants
 from RUFAS.output_manager import OutputManager
-from RUFAS.input_manager import InputManager
 from RUFAS.simulation_engine import SimulationEngine
 from RUFAS.util import Utility
 
