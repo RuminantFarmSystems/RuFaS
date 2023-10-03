@@ -95,7 +95,7 @@ def test_execute_simulations(mocker: MockerFixture, is_data_valid: bool,
     mock_output_manager = mocker.MagicMock(auto_spec=OutputManager)
     mock_input_manager = mocker.MagicMock(auto_spec=InputManager)
     mock_output_manager.flush_pools.return_value = None
-    mock_input_manager.flush_pools.return_value = None
+    mock_input_manager.flush_pool.return_value = None
     mock_output_manager.dump_all_nondata_pools.return_value = None
     mock_output_manager.save_variables.return_value = None
     mocker.patch("main.OutputManager", return_value=mock_output_manager)
@@ -115,7 +115,7 @@ def test_execute_simulations(mocker: MockerFixture, is_data_valid: bool,
     assert mock_simulator.simulate.call_count == simulate_call_count
     assert mock_output_manager.add_error.call_count == add_error_call_count
     assert mock_output_manager.flush_pools.call_count == len(metadata_file_list)
-    assert mock_input_manager.flush_pools.call_count == len(metadata_file_list)
+    assert mock_input_manager.flush_pool.call_count == len(metadata_file_list)
     assert mock_output_manager.dump_all_nondata_pools.call_count == len(metadata_file_list)
     assert mock_output_manager.dump_all_nondata_pools.call_args_list == [
         mocker.call("output", True)

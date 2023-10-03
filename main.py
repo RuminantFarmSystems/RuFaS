@@ -73,7 +73,7 @@ def execute_simulations(
     input_manager = InputManager()
     metadata_file_list = metadata_files
     for metadata_file_path in metadata_file_list:
-        input_manager.flush_pools()
+        input_manager.flush_pool()
         output_manager.flush_pools()
         is_data_valid = input_manager.start_data_processing(str(metadata_file_path), True)
         if is_data_valid:
