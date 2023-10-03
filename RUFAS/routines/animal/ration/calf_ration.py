@@ -12,11 +12,12 @@ Author(s): Katrina Wang, kw433@cornell.edu
 import math
 from typing import Dict, Any
 
+
 class CalfRationManager:
     """
     Calf ration formulation is distinct from other animal types, and managed separately.
     Note that the ration formulated is a fixed ration; requirements used only for reporting
-    
+
     """
     @classmethod
     def _get_ration(cls) -> Dict[str, float | str]:
@@ -35,7 +36,7 @@ class CalfRationManager:
     def optimize(cls):
         """"
         Returns "optimized" calf ration
-        
+
         Notes
         -----
         Use of calf nutrient requirements not implemented, hardcoded ration is returned
@@ -49,7 +50,7 @@ class CalfRationManager:
 
     @classmethod
     def calc_requirements(cls, calf, feed: Dict[str, float], temp: float, animal_intake: Dict) -> \
-        Dict[str, Dict[str, Any]]:
+            Dict[str, Dict[str, Any]]:
         """
         Calculate dietary intake and nutrient requirements for the calf.
 
@@ -185,10 +186,9 @@ class CalfRationManager:
 
         return nutrient_requirements
 
-
     @ classmethod
     def calc_intake(cls, calf, feed: Dict[str, float], wean_day: int, wean_length: int,
-                          milk_type: str) -> Dict:
+                    milk_type: str) -> Dict:
         """
         Calculating calf intake values
 
@@ -270,7 +270,7 @@ class CalfRationManager:
         dm_intake = whole_milk_intake + milk_replacer_intake + starter_intake
         # [A.1B.C.4]
         me_intake = whole_milk_me * whole_milk_intake + milk_replacer_me * \
-                    milk_replacer_intake + starter_me * starter_intake
+            milk_replacer_intake + starter_me * starter_intake
         # [A.1B.E.1]
         cp_intake = 0.01 * (whole_milk_cp * whole_milk_intake + milk_replacer_cp *
                             milk_replacer_intake + starter_cp * starter_intake)
