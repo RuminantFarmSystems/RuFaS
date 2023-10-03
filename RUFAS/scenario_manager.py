@@ -3,7 +3,7 @@
 """
 This file contains the path(s) to the metadata file(s) that will run when a user runs a simulation.
 
-main.py will import the METADATA_PATHS variable and use it to provide the execute_simulations() with
+main.py will import the METADATA_PATHS variable and use it to provide execute_simulations() with
 the list of metadata files that they want to be used to run simulations.
 
 Examples
