@@ -34,24 +34,23 @@ class AnimalRequirements:
         
         Notes
         -----
-        NEmaint = Net energy for maintenance requirement (Mcal)
+        NEmaint_requirement = Net energy for maintenance requirement (Mcal)
         
-        NEa = Net energy for activity requirement (Mcal)
+        NEa_requirement = Net energy for activity requirement (Mcal)
         
-        NEg = Net energy for growth requirement (Mcal)
+        NEg_requirement = Net energy for growth requirement (Mcal)
 
+        NEpreg_requirement = Net energy requirement for pregnancy (Mcal)
         
-        NEpreg = Net energy requirement for pregnancy (Mcal)
-        
-        NEl = Net energy requirement for lactation (Mcal)
+        NEl_requirement = Net energy requirement for lactation (Mcal)
 
-        MP_req = Metabolizable protein requirement for growth (g)
+        MP_requirement = Metabolizable protein requirement for growth (g)
         
-        Ca_req = Calcium requirement (g)
+        Ca_requirement = Calcium requirement (g)
         
-        P_req = Phosphorus requirement (g)
+        P_requirement = Phosphorus requirement (g)
         
-        DMIest = dry matter intake estimation (kg)
+        DMIest_requirement = dry matter intake estimation (kg)
         
         avg_BW = average body weight in pen (kg)
         
@@ -62,23 +61,23 @@ class AnimalRequirements:
         """
         
         # Net energy for maintenance requirement (Mcal)
-        self.NEmaint = 0
+        self.NEmaint_requirement = 0
         # Net energy for activity requirement (Mcal)
-        self.NEa = 0
+        self.NEa_requirement = 0
         # Net energy for growth requirement (Mcal)
-        self.NEg = 0
+        self.NEg_requirement = 0
         # Net energy requirement for pregnancy (Mcal)
-        self.NEpreg = 0
+        self.NEpreg_requirement = 0
         # Net energy requirement for lactation (Mcal)
-        self.NEl = 0
+        self.NEl_requirement = 0
         # Metabolizable protein requirement for growth (g)
-        self.MP_req = 0
+        self.MP_requirement = 0
         # Calcium requirement (g)
-        self.Ca_req = 0
+        self.Ca_requirement = 0
         # Phosphorus requirement (g)
-        self.P_req = 0
+        self.P_requirement = 0
         # dry matter intake estimation (kg)
-        self.DMIest = 0
+        self.DMIest_requirement = 0
         # average body weight in pen
         self.avg_BW = 0
         # average milk production (kg/day)
@@ -86,32 +85,32 @@ class AnimalRequirements:
         # average crude protein content of milk (%)
         self.avg_CP_milk = 0
     
-    def calc_pen_requirements(self, NEmaint: List[float], NEa: List[float], NEg: List[float], NEpreg: List[float],
-                               NEl: List[float], MP_req: List[float], Ca_req: List[float], P_req: List[float], 
-                               DMIest: List[float], BW: List[float], milk: List[float], CP_milk: List[float],
+    def calc_pen_requirements(self, NEmaint_requirement_list: List[float], NEa_requirement_list: List[float], NEg_requirement_list: List[float], NEpreg_requirement_list: List[float],
+                               NEl_requirement_list: List[float], MP_requirement_list: List[float], Ca_requirement_list: List[float], P_requirement_list: List[float], 
+                               DMIest_requirement_list: List[float], BW: List[float], milk: List[float], CP_milk: List[float],
                                milk_production_reduction: List[float]) -> None:
         """
         This functions sets the average (or #th percentile) pen requirements. Each input parameter is a list of floats generated in ration_driver.set_requirements
         
         Parameters
         ----------
-        NEmaint: List[float]
+        NEmaint_requirement_list: List[float]
             List of net energy for maintenance requirement (Mcal) for all animals in pen
-        NEa: List[float]
+        NEa_requirement_list: List[float]
             List of Net energy for activity requirement (Mcal) for all animals in pen
-        NEg: List[float]
+        NEg_requirement_list: List[float]
             List of Net energy for growth requirement (Mcal) for all animals in pen
-        NEpreg: List[float]
+        NEpreg_requirement_list: List[float]
             List of Net energy requirement for pregnancy (Mcal) for all animals in pen
-        NEl: List[float]
+        NEl_requirement_list: List[float]
             List of Net energy requirement for lactation (Mcal) for all animals in pen
-        MP_req: List[float]
+        MP_requirement_list: List[float]
             List of Metabolizable protein requirement for growth (g) for all animals in pen
-        Ca_req: List[float]
+        Ca_requirement_list: List[float]
             List of Calcium requirement (g) for all animals in pen
-        P_req: List[float]
+        P_requirement_list: List[float]
             List of Phosphorus requirement (g) for all animals in pen
-        DMIest: List[float] 
+        DMIest_requirement_list: List[float] 
             List of dry matter intake estimation (kg) for all animals in pen
         BW: List[float]
             List of body weight (kg) for all animals in the pen for all animals in pen
@@ -126,15 +125,15 @@ class AnimalRequirements:
         calc_method = 'mean'
         if calc_method == 'mean':
             # populating the class variables as an average across cows for each requirement
-            self.NEmaint = np.mean(NEmaint)
-            self.NEa = np.mean(NEa)
-            self.NEg = np.mean(NEg)
-            self.NEpreg = np.mean(NEpreg)
-            self.NEl = np.mean(NEl)
-            self.MP_req = np.mean(MP_req)
-            self.Ca_req = np.mean(Ca_req)
-            self.P_req = np.mean(P_req)
-            self.DMIest = np.mean(DMIest)
+            self.NEmaint_requirement = np.mean(NEmaint_requirement_list)
+            self.NEa_requirement = np.mean(NEa_requirement_list)
+            self.NEg_requirement = np.mean(NEg_requirement_list)
+            self.NEpreg_requirement = np.mean(NEpreg_requirement_list)
+            self.NEl_requirement = np.mean(NEl_requirement_list)
+            self.MP_requirement = np.mean(MP_requirement_list)
+            self.Ca_requirement = np.mean(Ca_requirement_list)
+            self.P_requirement = np.mean(P_requirement_list)
+            self.DMIest_requirement = np.mean(DMIest_requirement_list)
             self.avg_BW = np.mean(BW)
             self.avg_milk = np.mean(milk)
             self.avg_CP_milk = np.mean(CP_milk)
@@ -142,15 +141,15 @@ class AnimalRequirements:
         else:
             # here we'd implement another method, e.g. percentile, median, etc.
             requirement_percentile = 90
-            self.NEmaint = np.percentile(NEmaint, requirement_percentile)
-            self.NEa = np.percentile(NEa, requirement_percentile)
-            self.NEg = np.percentile(NEg, requirement_percentile)
-            self.NEpreg = np.percentile(NEpreg, requirement_percentile)
-            self.NEl = np.percentile(NEl, requirement_percentile)
-            self.MP_req = np.percentile(MP_req, requirement_percentile)
-            self.Ca_req = np.percentile(Ca_req, requirement_percentile)
-            self.P_req = np.percentile(P_req, requirement_percentile)
-            self.DMIest = np.percentile(DMIest, requirement_percentile)
+            self.NEmaint_requirement = np.percentile(NEmaint_requirement_list, requirement_percentile)
+            self.NEa_requirement = np.percentile(NEa_requirement_list, requirement_percentile)
+            self.NEg_requirement = np.percentile(NEg_requirement_list, requirement_percentile)
+            self.NEpreg_requirement = np.percentile(NEpreg_requirement_list, requirement_percentile)
+            self.NEl_requirement = np.percentile(NEl_requirement_list, requirement_percentile)
+            self.MP_requirement = np.percentile(MP_requirement_list, requirement_percentile)
+            self.Ca_requirement = np.percentile(Ca_requirement_list, requirement_percentile)
+            self.P_requirement = np.percentile(P_requirement_list, requirement_percentile)
+            self.DMIest_requirement = np.percentile(DMIest_requirement_list, requirement_percentile)
             self.avg_BW = np.percentile(BW, requirement_percentile)
             self.avg_milk = np.percentile(milk, requirement_percentile)
             self.avg_CP_milk = np.percentile(CP_milk, requirement_percentile)
@@ -168,15 +167,15 @@ class AnimalRequirements:
             animal_grouping_scenario: a grouping scenario fixed for current simulation, specified in AnimalManager
             recalc: boolean to see if requirements need to be recalculated since grouping
         """
-        NEmaint = []
-        NEa = []
-        NEg = []
-        NEpreg = []
-        NEl = []
-        MP_req = []
-        Ca_req = []
-        P_req = []
-        DMIest = []
+        NEmaint_requirement = []
+        NEa_requirement = []
+        NEg_requirement = []
+        NEpreg_requirement = []
+        NEl_requirement = []
+        MP_requirement = []
+        Ca_requirement = []
+        P_requirement = []
+        DMIest_requirement = []
         BW = []
         milk = [0]
         milk_production_reduction = [0]
@@ -215,18 +214,18 @@ class AnimalRequirements:
                                                          days_in_milk = animal.days_in_milk, lactating = animal.milking
                                                          )
 
-                animal.NEmaint = req['NEmaint']
-                animal.NEg = req['NEg']
-                animal.NEpreg = req['NEpreg']
-                animal.NEl = req['NEl']
-                animal.MP_req = req['MP_req']
-                animal.Ca_req = req['Ca_req']
-                animal.P_req = req['P_req']
-                animal.DMIest = req['DMIest']
+                animal.NEmaint_requirement = req['NEmaint_requirement']
+                animal.NEg_requirement = req['NEg_requirement']
+                animal.NEpreg_requirement = req['NEpreg_requirement']
+                animal.NEl_requirement = req['NEl_requirement']
+                animal.MP_requirement = req['MP_requirement']
+                animal.Ca_requirement = req['Ca_requirement']
+                animal.P_requirement = req['P_requirement']
+                animal.DMIest_requirement = req['DMIest_requirement']
                 # these animal class variables are only used for grouping purposes
                 if animal_type in [AnimalType.LAC_COW]:
-                    animal.DNED_req = (req['NEmaint'] + req['NEl']) / animal.DMIest
-                    animal.DMDP_req = (req['MP_req']) / animal.DMIest
+                    animal.DNED_requirement = (req['NEmaint_requirement'] + req['NEl_requirement']) / animal.DMIest_requirement
+                    animal.DMDP_requirement = (req['MP_requirement']) / animal.DMIest_requirement
 
                     # calculating the activity requirement for energy
                     animal.calc_daily_walking_dist(pen.vertical_dist_to_parlor,
@@ -240,15 +239,15 @@ class AnimalRequirements:
                 else:
                     NEa_val = 0
 
-                NEmaint.append(req['NEmaint'])
-                NEa.append(NEa_val)
-                NEg.append(req['NEg'])
-                NEpreg.append(req['NEpreg'])
-                NEl.append(req['NEl'])
-                MP_req.append(req['MP_req'])
-                Ca_req.append(req['Ca_req'])
-                P_req.append(req['P_req'])
-                DMIest.append(req['DMIest'])
+                NEmaint_requirement.append(req['NEmaint_requirement'])
+                NEa_requirement.append(NEa_val)
+                NEg_requirement.append(req['NEg_requirement'])
+                NEpreg_requirement.append(req['NEpreg_requirement'])
+                NEl_requirement.append(req['NEl_requirement'])
+                MP_requirement.append(req['MP_requirement'])
+                Ca_requirement.append(req['Ca_requirement'])
+                P_requirement.append(req['P_requirement'])
+                DMIest_requirement.append(req['DMIest_requirement'])
                 BW.append(animal.body_weight)
         else:
             # iterating through each animal in the pen and setting requirements
@@ -267,25 +266,25 @@ class AnimalRequirements:
                 else:
                     NEa_val = 0
 
-                NEmaint.append(animal.NEmaint)
-                NEa.append(NEa_val)
-                NEg.append(animal.NEg)
-                NEpreg.append(animal.NEpreg)
-                NEl.append(animal.NEl)
-                MP_req.append(animal.MP_req)
-                Ca_req.append(animal.Ca_req)
-                P_req.append(animal.P_req)
-                DMIest.append(animal.DMIest)
+                NEmaint_requirement.append(animal.NEmaint_requirement)
+                NEa_requirement.append(NEa_val)
+                NEg_requirement.append(animal.NEg_requirement)
+                NEpreg_requirement.append(animal.NEpreg_requirement)
+                NEl_requirement.append(animal.NEl_requirement)
+                MP_requirement.append(animal.MP_requirement)
+                Ca_requirement.append(animal.Ca_requirement)
+                P_requirement.append(animal.P_requirement)
+                DMIest_requirement.append(animal.DMIest_requirement)
                 BW.append(animal.body_weight)
 
         
-        self.calc_pen_requirements(NEmaint, NEa, NEg, NEpreg, NEl, MP_req, Ca_req, P_req, DMIest, BW, milk, CP_milk,
+        self.calc_pen_requirements(NEmaint_requirement, NEa_requirement, NEg_requirement, NEpreg_requirement, NEl_requirement, MP_requirement, Ca_requirement, P_requirement, DMIest_requirement, BW, milk, CP_milk,
                                milk_production_reduction)
         
-        avg_nutrient_rqmts = {'NEmaint': self.NEmaint, 'NEa': self.NEa,
-                              'NEg': self.NEg, 'NEpreg': self.NEpreg, 'NEl': self.NEl,
-                              'MP_req': self.MP_req, 'Ca_req': self.Ca_req, 'P_req': self.P_req,
-                              'DMIest': self.DMIest, 'avg_BW': self.avg_BW,
+        avg_nutrient_rqmts = {'NEmaint_requirement': self.NEmaint_requirement, 'NEa_requirement': self.NEa_requirement,
+                              'NEg_requirement': self.NEg_requirement, 'NEpreg_requirement': self.NEpreg_requirement, 'NEl_requirement': self.NEl_requirement,
+                              'MP_requirement': self.MP_requirement, 'Ca_requirement': self.Ca_requirement, 'P_req': self.P_requirement,
+                              'DMIest_requirement': self.DMIest_requirement, 'avg_BW': self.avg_BW,
                               'avg_milk_production_reduction_pen': self.avg_milk_production_reduction,}
         
         pen.set_avg_nutrient_rqmts(avg_nutrient_rqmts)
@@ -401,9 +400,9 @@ class AnimalRequirements:
             om.add_error("energy_and_nutrient_calculation_method_error",
                         energy_and_nutrient_calculation_method_error, info_map)
         # Requirements summary dictionary
-        return {'NEmaint': net_energy_maintenance, 'NEg': net_energy_growth, 'NEpreg': net_energy_pregnancy,
-                'NEl': net_energy_lactation, 'MP_req': metabolizable_protein_requirement, 'Ca_req': calcium_requirement,
-                'P_req': phosphorus_requirement,'DMIest': dry_matter_intake_estimate}
+        return {'NEmaint_requirement': net_energy_maintenance, 'NEg_requirement': net_energy_growth, 'NEpreg_requirement': net_energy_pregnancy,
+                'NEl_requirement': net_energy_lactation, 'MP_requirement': metabolizable_protein_requirement, 'Ca_requirement': calcium_requirement,
+                'P_requirement': phosphorus_requirement,'DMIest_requirement': dry_matter_intake_estimate}
 
 
     def calculate_NRC_energy_maintenance_requirements(self, body_weight: float, mature_body_weight: float,

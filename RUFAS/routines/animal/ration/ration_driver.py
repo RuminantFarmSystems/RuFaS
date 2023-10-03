@@ -8,11 +8,8 @@ Description: Main file in the ration formulation process that connects all
 
 Author(s): Chris VanKerkhove, cjv47@cornell.edu
            Joseph Waddell, jw2574@cornell.edu
-           Joseph Waddell, jw2574@cornell.edu
 """
 import collections
-from typing import Set, Dict, List
-
 from typing import Set, Dict, List
 
 from RUFAS.output_manager import OutputManager
@@ -21,11 +18,11 @@ from RUFAS.routines.animal.ration.ration_optimizer import RationOptimizer
 from RUFAS.routines.animal.ration.user_defined_ration import \
     UserDefinedRationManager as UserDefinedRationManager
 from RUFAS.routines.animal.ration.ration_config import RationConfig
+from RUFAS.routines.animal.animal_module_constants import AnimalModuleConstants
 
 import scipy
 
 udrm = UserDefinedRationManager()
-ration_optimizer = RationOptimizer()
 ration_optimizer = RationOptimizer()
 om = OutputManager()
 
@@ -76,7 +73,7 @@ class RationManager:
                 if failed_constraints:
                     for constr in failed_constraints:
                         constraints_failed_list.append(constr["fun"].__name__)
-                reduction = 0.25
+                reduction = AnimalModuleConstants.MILK_REDUCTION_KG
                 cls.reduce_milk_production(pen, reduction)
 
                 req.set_requirements(pen, animal_grouping_scenario, True)
@@ -166,7 +163,7 @@ class RationManager:
             ration[available_feeds['feed_key'][feed_id]] = round(num, 6)
         ration['status'] = 'Optimal'
         ration_config = RationConfig()
-        ration_config.price = RationOptimizer.list_reconfig(available_feeds['price'])
+        ration_config.price_list = RationOptimizer.triple_values_in_list(available_feeds['price'])
         ration['objective'] = ration_optimizer.objective(solution.x, ration_config)
         return ration
 
@@ -264,7 +261,7 @@ class RationManager:
             running_milk_reduction = 0.0
             while not solution.success:
                 running_average_milk = cls.calc_milk_average(pen)
-                reduction = 0.25
+                reduction = AnimalModuleConstants.MILK_REDUCTION_KG
                 if udrm.milk_reduction_maximum == 0.0 or \
                     running_milk_reduction + reduction > udrm.milk_reduction_maximum or\
                         running_average_milk - reduction < 1.0:

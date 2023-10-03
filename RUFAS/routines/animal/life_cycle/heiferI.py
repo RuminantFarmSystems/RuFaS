@@ -58,14 +58,14 @@ class HeiferI(Calf):
                          previous_temperature=temp,
                          average_daily_gain_heifer=self.daily_growth)
 
-        self.NEmaint = animal_requirements['NEmaint']
-        self.NEg = animal_requirements['NEg']
-        self.NEpreg = animal_requirements['NEpreg']
-        self.NEl = animal_requirements['NEl']
-        self.MP_req = animal_requirements['MP_req']
-        self.Ca_req = animal_requirements['Ca_req']
-        self.P_req = animal_requirements['P_req']
-        self.DMIest = animal_requirements['DMIest']
+        self.NEmaint_requirement = animal_requirements['NEmaint_requirement']
+        self.NEg_requirement = animal_requirements['NEg_requirement']
+        self.NEpreg_requirement = animal_requirements['NEpreg_requirement']
+        self.NEl_requirement = animal_requirements['NEl_requirement']
+        self.MP_requirement = animal_requirements['MP_requirement']
+        self.Ca_requirement = animal_requirements['Ca_requirement']
+        self.P_requirement = animal_requirements['P_requirement']
+        self.DMIest_requirement = animal_requirements['DMIest_requirement']
 
     def calc_manure_excretion(self, feed, methane_model):
         """

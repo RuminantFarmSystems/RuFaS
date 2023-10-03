@@ -1313,10 +1313,10 @@ def test_calc_requirements():
     (['1', '2', '3', '4'], ['1', '1', '1', '2', '2', '2', '3', '3', '3', '4', '4', '4'])
         ]
 )
-def test_list_reconfig(input, expected)->None:
-    """Unit test for function list_reconfig in file routines/animal/ration/ration_optimizer.py"""
+def test_triple_values_in_list(input, expected)->None:
+    """Unit test for function triple_values_in_list in file routines/animal/ration/ration_optimizer.py"""
     ration_optimizer = RationOptimizer()
-    assert ration_optimizer.list_reconfig(input) == expected
+    assert ration_optimizer.triple_values_in_list(input) == expected
 
 
 def test_attempt_optimization():
@@ -1548,8 +1548,8 @@ def test_calc_pen_requirements():
     req.calc_pen_requirements(
         [1,2,3], [1,2,3], [1,2,3], [1,2,3], [1,2,3], [1,2,3], [1,2,3], 
         [1,2,3], [1,2,3], [1,2,3], [1,2,3], [1,2,3], [1,2,3])
-    attributelist = ['NEmaint','NEa','NEg','NEpreg', 'NEl', 'MP_req', 'Ca_req', 'P_req', 
-        'DMIest', 'avg_BW', 'avg_milk', 'avg_CP_milk', 'avg_milk_production_reduction']
+    attributelist = ['NEmaint_requirement','NEa_requirement','NEg_requirement','NEpreg_requirement', 'NEl_requirement', 'MP_requirement', 'Ca_requirement', 'P_requirement', 
+        'DMIest_requirement', 'avg_BW', 'avg_milk', 'avg_CP_milk', 'avg_milk_production_reduction']
     for attribute in attributelist:
         assert getattr(req, attribute) == 2
 

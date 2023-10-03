@@ -62,6 +62,7 @@ class AnimalModuleConstants:
 
     DAILY_MILK_VARIATION_MEAN = 0
     """Mean of the daily milk production variation from the estimated milk production, kg/day"""
+
     DAILY_MILK_VARIATION_STD_DEV = 1.0
     """Standard deviation of the daily milk production variation from the estimated milk production, kg/day"""
 
@@ -79,3 +80,6 @@ class AnimalModuleConstants:
 
     MINIMUM_CALCIUM = 0.0
     """Minimum calcium estimate, g/day"""
+
+    MILK_REDUCTION_KG = 0.25
+    """Milk reduction amount for each failed ration optimization attempt, kg"""

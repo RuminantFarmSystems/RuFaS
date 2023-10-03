@@ -584,17 +584,17 @@ class Pen:
                                           milk_lactose=animal.lactose_milk,
                                           milk_production=animal.estimated_daily_milk_produced,
                                           days_in_milk=animal.days_in_milk, lactating=animal.milking)
-            animal.NEmaint = requirements['NEmaint']
-            animal.NEg = requirements['NEg']
-            animal.NEpreg = requirements['NEpreg']
-            animal.NEl = requirements['NEl']
-            animal.MP_req = requirements['MP_req']
-            animal.Ca_req = requirements['Ca_req']
-            animal.P_req = requirements['P_req']
-            animal.DMIest = requirements['DMIest']
-            animal.DNED_req = (requirements['NEmaint'] + requirements[
-                'NEl']) / animal.DMIest
-            animal.DMPD_req = (requirements['MP_req']) / animal.DMIest
+            animal.NEmaint_requirement = requirements['NEmaint_requirement']
+            animal.NEg_requirement = requirements['NEg_requirement']
+            animal.NEpreg_requirement = requirements['NEpreg_requirement']
+            animal.NEl_requirement = requirements['NEl_requirement']
+            animal.MP_requirement = requirements['MP_requirement']
+            animal.Ca_requirement = requirements['Ca_requirement']
+            animal.P_requirement = requirements['P_requirement']
+            animal.DMIest_requirement = requirements['DMIest_requirement']
+            animal.DNED_requirement = (requirements['NEmaint_requirement'] + requirements[
+                'NEl_requirement']) / animal.DMIest_requirement
+            animal.DMPD_requirement = (requirements['MP_requirement']) / animal.DMIest_requirement
 
         animal.dry_matter_intake = self.dry_matter_intake
 
@@ -874,17 +874,17 @@ class Pen:
                                           milk_production=animal.estimated_daily_milk_produced,
                                           days_in_milk=animal.days_in_milk, lactating=animal.milking,
                                           previous_temperature=temp)
-            animal.NEmaint = requirements['NEmaint']
-            animal.NEg = requirements['NEg']
-            animal.NEpreg = requirements['NEpreg']
-            animal.NEl = requirements['NEl']
-            animal.MP_req = requirements['MP_req']
-            animal.Ca_req = requirements['Ca_req']
-            animal.P_req = requirements['P_req']
-            animal.DMIest = requirements['DMIest']
-            animal.DNED_req = (requirements['NEmaint'] + requirements[
-                'NEl']) / animal.DMIest
-            animal.DMPD_req = (requirements['MP_req']) / animal.DMIest
+            animal.NEmaint_requirement = requirements['NEmaint_requirement']
+            animal.NEg_requirement = requirements['NEg_requirement']
+            animal.NEpreg_requirement = requirements['NEpreg_requirement']
+            animal.NEl_requirement = requirements['NEl_requirement']
+            animal.MP_requirement = requirements['MP_requirement']
+            animal.Ca_requirement = requirements['Ca_requirement']
+            animal.P_requirement = requirements['P_requirement']
+            animal.DMIest_requirement = requirements['DMIest_requirement']
+            animal.DNED_requirement = (requirements['NEmaint_requirement'] + requirements[
+                'NEl_requirement']) / animal.DMIest_requirement
+            animal.DMPD_requirement = (requirements['MP_requirement']) / animal.DMIest_requirement
 
             animal.calc_daily_walking_dist(
                 self.vertical_dist_to_parlor, self.horizontal_dist_to_parlor)

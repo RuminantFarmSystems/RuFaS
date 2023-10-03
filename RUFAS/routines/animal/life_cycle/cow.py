@@ -408,16 +408,16 @@ class Cow(HeiferIII):
                          days_in_milk=self.days_in_milk,
                          lactating=self.milking)
 
-        self.NEmaint = animal_requirements['NEmaint']
-        self.NEg = animal_requirements['NEg']
-        self.NEpreg = animal_requirements['NEpreg']
-        self.NEl = animal_requirements['NEl']
-        self.MP_req = animal_requirements['MP_req']
-        self.Ca_req = animal_requirements['Ca_req']
-        self.P_req = animal_requirements['P_req']
-        self.DMIest = animal_requirements['DMIest']
-        self.DNED_req = (animal_requirements['NEmaint'] + animal_requirements['NEl']) / self.DMIest
-        self.DMDP_req = (animal_requirements['MP_req']) / self.DMIest
+        self.NEmaint_requirement = animal_requirements['NEmaint_requirement']
+        self.NEg_requirement = animal_requirements['NEg_requirement']
+        self.NEpreg_requirement = animal_requirements['NEpreg_requirement']
+        self.NEl_requirement = animal_requirements['NEl_requirement']
+        self.MP_requirement = animal_requirements['MP_requirement']
+        self.Ca_requirement = animal_requirements['Ca_requirement']
+        self.P_requirement = animal_requirements['P_requirement']
+        self.DMIest_requirement = animal_requirements['DMIest_requirement']
+        self.DNED_requirement = (animal_requirements['NEmaint_requirement'] + animal_requirements['NEl_requirement']) / self.DMIest_requirement
+        self.DMDP_requirement = (animal_requirements['MP_requirement']) / self.DMIest_requirement
 
     def phosphorus_rqmts(self, DMI):
         """
