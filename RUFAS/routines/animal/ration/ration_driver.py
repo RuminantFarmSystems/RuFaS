@@ -8,7 +8,6 @@ Description: Main file in the ration formulation process that connects all
 
 Author(s): Chris VanKerkhove, cjv47@cornell.edu
            Joseph Waddell, jw2574@cornell.edu
-           Joseph Waddell, jw2574@cornell.edu
 """
 import collections
 from typing import Set, Dict, List
@@ -24,7 +23,6 @@ from RUFAS.routines.animal.animal_module_constants import AnimalModuleConstants
 import scipy
 
 udrm = UserDefinedRationManager()
-ration_optimizer = RationOptimizer()
 ration_optimizer = RationOptimizer()
 om = OutputManager()
 

@@ -368,30 +368,30 @@ class AnimalManager:
             calf.calc_nutrient_rqmts(feed, temp)
 
         for heiferI in self.heiferIs:
-            pen = heiferI.pen_history[-1].pen
+            latest_pen = heiferI.pen_history[-1].pen
             heiferI.set_nutrient_rqmts(temp, self.ANIMAL_GROUPING_SCENARIO,
-                                       nutrient_conc=self.all_pens[pen].ration_nutrient_conc,
-                                       metabolizable_energy=self.all_pens[pen].MEdiet,
-                                       previous_DMI=self.all_pens[pen].dry_matter_intake)
+                                       nutrient_conc=self.all_pens[latest_pen].ration_nutrient_conc,
+                                       metabolizable_energy=self.all_pens[latest_pen].MEdiet,
+                                       previous_DMI=self.all_pens[latest_pen].dry_matter_intake)
 
         for heiferII in self.heiferIIs:
-            pen = heiferII.pen_history[-1].pen
+            latest_pen = heiferII.pen_history[-1].pen
             heiferII.set_nutrient_rqmts(temp, self.ANIMAL_GROUPING_SCENARIO,
-                                        nutrient_conc=self.all_pens[pen].ration_nutrient_conc,
-                                        metabolizable_energy=self.all_pens[pen].MEdiet,
-                                        previous_DMI=self.all_pens[pen].dry_matter_intake)
+                                        nutrient_conc=self.all_pens[latest_pen].ration_nutrient_conc,
+                                        metabolizable_energy=self.all_pens[latest_pen].MEdiet,
+                                        previous_DMI=self.all_pens[latest_pen].dry_matter_intake)
 
         for heiferIII in self.heiferIIIs:
-            pen = heiferIII.pen_history[-1].pen
+            latest_pen = heiferIII.pen_history[-1].pen
             heiferIII.set_nutrient_rqmts(temp, self.ANIMAL_GROUPING_SCENARIO,
-                                         nutrient_conc=self.all_pens[pen].ration_nutrient_conc,
-                                         metabolizable_energy=self.all_pens[pen].MEdiet,
-                                         previous_DMI=self.all_pens[pen].dry_matter_intake)
+                                         nutrient_conc=self.all_pens[latest_pen].ration_nutrient_conc,
+                                         metabolizable_energy=self.all_pens[latest_pen].MEdiet,
+                                         previous_DMI=self.all_pens[latest_pen].dry_matter_intake)
 
         for cow in self.cows:
-            pen = cow.pen_history[-1].pen
+            latest_pen = cow.pen_history[-1].pen
             cow.set_nutrient_rqmts(self.ANIMAL_GROUPING_SCENARIO,
-                                   nutrient_conc=self.all_pens[pen].ration_nutrient_conc)
+                                   nutrient_conc=self.all_pens[latest_pen].ration_nutrient_conc)
 
     def reset_milk_production_reduction(self) -> None:
         """
