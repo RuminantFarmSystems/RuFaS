@@ -66,7 +66,6 @@ class Percolation:
             else:
                 current_layer.percolated_water = 0
 
-        self.data.vadose_zone_layer.water_content += self.data.soil_layers[-1].percolated_water
 
     # --- Static methods ---
     @staticmethod
