@@ -1385,6 +1385,30 @@ def test_get_ration_vals():
 
 def test_total_energy():
     """Unit test for function total_energy in file routines/animal/ration/ration_optimizer.py"""
+    ration_optimizer = RationOptimizer()
+    x = [1.0, 2.0, 3.0, 4.0, 5.0]
+    ration_config = MagicMock()
+    ration_config.TDN = [6.0, 7.0, 8.0, 9.0, 10.0]
+    ration_config.BW = 6.0
+    ration_config.DE = [1.0, 2.0, 3.0, 4.0, 5.0]
+    ration_config.MEact = [6.0, 7.0, 8.0, 9.0, 10.0]
+
+    ration_config.type = ['Forage', 'Conc', 'Mineral', 'Forage', 'Conc', 'Mineral']
+    ration_config.is_fat = [1, 1, 1, 0, 0, 0]
+    ration_config.EE = [0, 1, 2, 3, 4, 5]
+
+    ration_config.NEm_act = [1.0, 2.0, 3.0, 4.0, 5.0]
+    ration_config.NEa = 1.0
+    ration_config.NEmaint = 2.0
+    ration_config.NEl = 3.0
+    ration_config.NEg = 4.0
+    ration_config.NEpreg = 5.0
+
+    expected = 15.459616873130141
+
+    actual = ration_optimizer.total_energy(x, ration_config)
+
+    assert actual == pytest.approx(expected)
 
 
 @pytest.mark.parametrize(
