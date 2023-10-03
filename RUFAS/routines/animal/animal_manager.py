@@ -1320,7 +1320,7 @@ class AnimalManager:
                 counter = 1
                 while 'status' not in ration_per_animal or ration_per_animal['status'].lower() != 'optimal':
                     if pen.animal_combination == Pen.AnimalCombination.CALF:
-                        ration_per_animal = CalfRationManager.calf_optimize()
+                        ration_per_animal = CalfRationManager.optimize()
                         ration_vals = {'ME_total': 0}
 
                     else:
