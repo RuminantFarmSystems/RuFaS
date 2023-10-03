@@ -311,7 +311,7 @@ class InputManager:
 
         return element_counter_and_validity
 
-    def _validate_json_element(self, element_hierarchy: List[str], properties_blob_key: str,
+    def _validate_json_element(self, element_hierarchy: List[str], properties_blob_key: str,   # noqa
                                input_data: Dict[str, Any], eager_termination: bool, ) -> dict:
         """
         Receives data loaded from json input file, recursively finds and then validates nested elements,
