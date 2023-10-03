@@ -66,7 +66,6 @@ class Percolation:
             else:
                 current_layer.percolated_water = 0
 
-
     # --- Static methods ---
     @staticmethod
     def _determine_percolation_travel_time(saturation: float, field_capacity_content: float,
