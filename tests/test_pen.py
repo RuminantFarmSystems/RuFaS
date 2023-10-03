@@ -77,15 +77,15 @@ def pen_with_animals(pen: Pen, mock_animal_list: List[MagicMock]) -> Pen:
 
 def test_set_avg_nutrient_rqmts(pen: Pen):
     """Unit test for function set_avg_nutrient_rqmts in file routines/animal/pen.py"""
-    avg_nutrient_rqmts = {'NEmaint': 22.739694446587276,
-                          'NEa': 0,
-                          'NEg': 0.0,
-                          'NEpreg': 0.8809032714863911,
-                          'NEl': 0,
-                          'MP_req': 169.60219829211576,
-                          'Ca_req': 8.551061771355254,
-                          'P_req': 0.8978663353409345,
-                          'DMIest': 0,
+    avg_nutrient_rqmts = {'NEmaint_requirement': 22.739694446587276,
+                          'NEa_requirement': 0,
+                          'NEg_requirement': 0.0,
+                          'NEpreg_requirement': 0.8809032714863911,
+                          'NEl_requirement': 0,
+                          'MP_requirement': 169.60219829211576,
+                          'Ca_requirement': 8.551061771355254,
+                          'P_requirement': 0.8978663353409345,
+                          'DMIest_requirement': 0,
                           'avg_BW': 445.74074026264447}
 
     pen.set_avg_nutrient_rqmts(avg_nutrient_rqmts)

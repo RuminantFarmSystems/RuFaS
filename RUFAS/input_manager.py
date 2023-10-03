@@ -409,11 +409,7 @@ class InputManager:
         info_map = {"class": self.__class__.__name__,
                     "function": self._array_type_validator.__name__,
                     }
-        # TODO: This conditional should only pass if the input data is a list, not if it is a dict. Currently this is
-        #   prevented by inputs that are specified as arrays in their respective properties sections but are still
-        #   in the form of dictionaries in the input files: pen_information in the animal input. The pen_information
-        #   is fixed in #809, but this fix needs to be coordinated with and approved by Joe and Kristan.
-        if type(input_data_value) is not list and type(input_data_value) is not dict:
+        if type(input_data_value) is not list:
             warning_string = "Array is not a list."
             om.add_warning(warning_string, f"{var_name=}", info_map)
             return False
