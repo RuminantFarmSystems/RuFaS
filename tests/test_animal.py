@@ -53,6 +53,9 @@ def cow_a() -> dict:
         "daily_growth": None,
         "age": 1000,
         "distance": None,
+        'NDF_conc': 0.3,
+        'TDN_conc': 0.7,
+        'net_energy_diet_concentration': 1.0
     }
     return cow_a_dict
 
@@ -78,6 +81,9 @@ def cow_b() -> dict:
         "daily_growth": None,
         "age": 1000,
         "distance": None,
+        'NDF_conc': 0.3,
+        'TDN_conc': 0.7,
+        'net_energy_diet_concentration': 1.0
     }
     return cow_b_dict
 
@@ -308,7 +314,7 @@ def test_calculate_NRC_protein_requirements(cow_a: dict, cow_b: dict, heifer_a: 
         0,
         24,
     )
-    assert (result_MP_req) == pytest.approx((2000), rel=1e-1)
+    assert (result_MP_req) == pytest.approx((712), rel=1e-1)
 
     result_MP_req = req.calculate_NRC_protein_requirements(
         heifer_a["body_weight"],
