@@ -15,9 +15,11 @@ import pytest
 from mock.mock import MagicMock, call
 from pytest import approx, raises
 from pytest_mock.plugin import MockerFixture
+from RUFAS.classes import Config, Weather, Time, State
 
 from RUFAS.general_constants import GeneralConstants
 from RUFAS.output_manager import OutputManager
+from RUFAS.input_manager import InputManager
 from RUFAS.simulation_engine import SimulationEngine
 from RUFAS.util import Utility
 
@@ -84,13 +86,33 @@ def patch_simulation_engine(mocker: MockerFixture) -> SimulationEngine:
     sim_eng.weather = MagicMock()
     sim_eng.time = MagicMock()
     sim_eng.state = MagicMock()
+    sim_eng.im = MagicMock()
 
     return sim_eng
 
 
-def test_init_simulation_engine(patch_simulation_engine: SimulationEngine) -> None:
+def test_init_simulation_engine(patch_simulation_engine: SimulationEngine, mocker: MockerFixture) -> None:
     """Unit test for function __init__ in file RUFAS/simulation_engine.py"""
     patch_simulation_engine._initialize_simulation.assert_called_once()
+    mock_data_config = MagicMock(return_value={'config': {'set_seed': True, 'seed': 123, 'w_start_year': 2000}})
+    mock_data_weather = MagicMock(return_value={'weather': {'temperature': 25}})
+    patch_get_data = mocker.patch("RUFAS.input_manager.InputManager.get_data",
+                                  side_effect=[mock_data_config, mock_data_weather])
+    patch_config = MagicMock(return_value=Config(mock_data_config, mock_data_weather))
+    patch_simulation_engine.config = patch_config
+    patch_weather = MagicMock(return_value=Weather(mock_data_weather, patch_config))
+    patch_simulation_engine.weather = patch_weather
+    patch_time = MagicMock(return_value=Time(patch_config))
+    patch_simulation_engine.time = patch_time
+    patch_state = MagicMock(return_value=State(patch_config, patch_weather, patch_time))
+    patch_simulation_engine.state = patch_state
+
+    patch_simulation_engine._initialize_simulation()
+    assert patch_simulation_engine.config is not None
+    assert patch_simulation_engine.weather is not None
+    assert patch_simulation_engine.time is not None
+    assert patch_simulation_engine.state is not None
+    assert patch_simulation_engine.im is not None
 
 
 def test_simulate(patch_simulation_engine: SimulationEngine, mocker: MockerFixture) -> None:
