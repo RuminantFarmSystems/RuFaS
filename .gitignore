@@ -30,7 +30,7 @@ input/scenario_manager.py
 # only stores non-empty directories
 output/*
 !output/.keep
-output/output_filters/
+output/output_filters/*
 
 # ignore project files
 *.sublime-project
