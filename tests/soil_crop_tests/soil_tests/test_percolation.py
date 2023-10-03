@@ -98,8 +98,8 @@ def test_percolate_between_layers(time_step: float, excess_water_available: floa
 
 
 @pytest.mark.parametrize("can_percolate, expected_water_content", [
-    (True, [7.0, 20.0, 40.0]),
-    (False, [10.0, 20.0, 40.0])
+    (True, [7.0, 20.0, 40.0, 6.0]),
+    (False, [10.0, 20.0, 40.0, 0])
 ])
 def test_percolate_between_layers_correct(can_percolate: bool, expected_water_content: float) -> None:
     layers = [LayerData(top_depth=0, bottom_depth=25, field_size=1.33),
@@ -122,7 +122,7 @@ def test_percolate_between_layers_correct(can_percolate: bool, expected_water_co
     assert mock_percolation.data.soil_layers[0].water_content == expected_water_content[0]
     assert mock_percolation.data.soil_layers[1].water_content == expected_water_content[1]
     assert mock_percolation.data.soil_layers[2].water_content == expected_water_content[2]
-    assert mock_percolation.data.vadose_zone_layer.water_content == 3.0
+    assert mock_percolation.data.vadose_zone_layer.water_content == expected_water_content[3]
 
 
 # --- Integration tests ----
