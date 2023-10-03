@@ -37,6 +37,7 @@ from RUFAS.routines.animal.life_cycle.calf import Calf
 from RUFAS.output_manager import OutputManager
 from RUFAS.routines.animal.pen import Pen
 from RUFAS.routines.animal.ration import ration_driver as ration_driver
+from RUFAS.routines.animal.ration.ration_optimizer import RationOptimizer
 from RUFAS.routines.feed.feed import Feed
 from RUFAS.routines.animal.ration.calf_ration import optimize as calf_optimize
 from RUFAS.routines.animal.ration.ration_driver import RationReporter
@@ -1337,7 +1338,7 @@ class AnimalManager:
                         ration_vals = {'ME_tot': 0}
                     else:
                         ration_per_animal, ration_vals = \
-                            RationManager.formulate_ration(pen, pen_specific_feed_data, self.ANIMAL_GROUPING_SCENARIO)
+                            RationManager.formulate_ration(RationOptimizer(), pen, pen_specific_feed_data, self.ANIMAL_GROUPING_SCENARIO)
 
                     # TODO: Remove this check before merging to master
                     counter += 1
