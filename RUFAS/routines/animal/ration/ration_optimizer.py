@@ -518,7 +518,8 @@ class RationOptimizer:
         ration_config.MPbact = 0.64 * min(1000 * .13 * ration_config.TDNact_diet, 1000 * 0.85 * ration_config.RDP_diet)
         # [A.Cow.E.14]-[A.Heifer.E.14]
         # Dietary RUP (kg)
-        ration_config.RUP_diet = sum(np.multiply(x, np.multiply(np.multiply(ration_config.RUP_list, 0.01), np.multiply(ration_config.dRUP_list, 0.01))))
+        ration_config.RUP_diet = sum(np.multiply(x, np.multiply(np.multiply(ration_config.RUP_list, 0.01),
+                                                                np.multiply(ration_config.dRUP_list, 0.01))))
         # [A.Cow.E.15]
         # Total metabolizable protein supply
         ration_config.MP_supply = ration_config.MPbact + ration_config.RUP_diet + 0.4 * 11.8 * DMI
@@ -821,7 +822,7 @@ class RationOptimizer:
                 solution = self.optimize(animal_combination, available_feeds, ration_config)
             except Exception as e:
                 i -= 1
-                info_map = {"class": "RationOptimizer", "function": self.attempt_optimization.__name__,}
+                info_map = {"class": "RationOptimizer", "function": self.attempt_optimization.__name__, }
                 om.add_error('SLSQP error', 'whoops', info_map)
             finally:
                 i += 1
