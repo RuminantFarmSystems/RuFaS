@@ -4,7 +4,8 @@ class AnimalModuleConstants:
     """
 
     DEFAULT_MAX_STOCKING_DENSITY = 1.2
-    """The default maximum stocking density for a pen. This value is used when a pen is created dynamically during the simulation."""
+    """The default maximum stocking density for a pen. This value is used when a pen is created dynamically during the
+    simulation."""
 
     DEFAULT_NUM_STALLS = 100
     """The default number of stalls to be created in a new pen if no specific value is provided."""
@@ -49,10 +50,12 @@ class AnimalModuleConstants:
     """The default type of manure storage system used in those pens created dynamically during the simulation."""
 
     MONENSIN_CP_LOWER_BOUND = 15
-    """The lower bound of the dietary Crude Protein (CP) level (% Dry Matter) that should be considered when calculating the mitigation effects of monensin."""
+    """The lower bound of the dietary Crude Protein (CP) level (% Dry Matter) that should be considered when
+    calculating the mitigation effects of monensin."""
 
     MONENSIN_CP_UPPER_BOUND = 19
-    """The upper bound of the dietary Crude Protein (CP) level (% Dry Matter) that should be considered when calculating the mitigation effects of monensin."""
+    """The upper bound of the dietary Crude Protein (CP) level (% Dry Matter) that should be considered when
+    calculating the mitigation effects of monensin."""
 
     URINE_UREA_NITROGEN_CONCENTRATION_LOWER_BOUND = 2
     """The lower bound of the urine urea nitrogen concentration."""

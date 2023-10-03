@@ -30,6 +30,7 @@ om = OutputManager()
 
 req = AnimalRequirements()
 
+
 class Pen:
     """
     Manages a pen's operation. Stores the characteristics of the pen and the

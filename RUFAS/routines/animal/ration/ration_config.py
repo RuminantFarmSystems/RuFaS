@@ -3,7 +3,8 @@ from __future__ import annotations
 
 class RationConfig:
     """
-    RationConfig provides a structured way to represent the collection of animal requirements and feed supply information for the ration formulation process.
+    RationConfig provides a structured way to represent the collection of animal requirements and feed supply
+    information for the ration formulation process.
 
     Attributes
     ----------
@@ -50,7 +51,8 @@ class RationConfig:
     N_A_list : list
         Fraction A of protein, degraded immediately in rumen for each feed (% of CP).
     N_B_list : list
-        Fraction B of protein, potentially degradable protein, requires time to degrade in rumen for each feed (% of CP).
+        Fraction B of protein, potentially degradable protein, requires time to degrade
+        in rumen for each feed (% of CP).
     CP_list : list
         Crude protein in each feed (% of DM).
     dRUP_list : list
@@ -68,7 +70,7 @@ class RationConfig:
     NEm_act_list : list
         Actual net energy for maintenance for each feed (Mcal/kg)
     is_forage_list : list
-        Boolean if feed item is forage or not 
+        Boolean if feed item is forage or not
     MPbact_list : list
         Metabolizable bacterial protein production for each feed (g)
     RUP_diet_list : list
@@ -85,15 +87,19 @@ class RationConfig:
 
     """
 
-    def __init__(self, price__list: list[float] | None = None, NEmaint__requirement: float = 0, NEa__requirement: float = 0, NEpreg__requirement: float = 0,
-                 NEl__requirement: float = 0, NEg__requirement: float = 0, MP__requirement: float = 0, C__requirement: float = 0, P__requirement: float = 0,
-                 TDN__list: list[float] | None = None, DE__list: list[float] | None = None, EE__list: list[float] | None = None,
-                 is_fat__list: list[bool] | None = None, BW_: float = 0, calcium__list: list[float] | None = None,
-                 phosphorus__list: list[float] | None = None, NDF__list: list[float] | None = None,
-                 feed_type__list: list[str] | None = None, is_wetforage__list: list[bool] | None = None,
-                 Kd__list: list[float] | None = None, N_A__list: list[float] | None = None, N_B__list: list[float] | None = None,
+    def __init__(self, price__list: list[float] | None = None, NEmaint__requirement: float = 0,
+                 NEa__requirement: float = 0, NEpreg__requirement: float = 0,
+                 NEl__requirement: float = 0, NEg__requirement: float = 0, MP__requirement: float = 0,
+                 C__requirement: float = 0, P__requirement: float = 0,
+                 TDN__list: list[float] | None = None, DE__list: list[float] | None = None,
+                 EE__list: list[float] | None = None, is_fat__list: list[bool] | None = None,
+                 BW_: float = 0, calcium__list: list[float] | None = None, phosphorus__list: list[float] | None = None,
+                 NDF__list: list[float] | None = None, feed_type__list: list[str] | None = None,
+                 is_wetforage__list: list[bool] | None = None, Kd__list: list[float] | None = None,
+                 N_A__list: list[float] | None = None, N_B__list: list[float] | None = None,
                  CP__list: list[float] | None = None, dRUP__list: list[float] | None = None,
-                 feed_limit__list: list[float] | None = None, lactating_: bool = False, DMIest__requirement: float | None = None) -> None:
+                 feed_limit__list: list[float] | None = None, lactating_: bool = False,
+                 DMIest__requirement: float | None = None) -> None:
         """
         Initialize the RationConfig class with the provided feed information. If the input
         is a list, it should have a length corresponding to the decision vector.
@@ -143,7 +149,8 @@ class RationConfig:
         N_A__list : list, optional
             Fraction A of protein, degraded immediately in rumen for each feed (% of CP).
         N_B__list : list, optional
-            Fraction B of protein, potentially degradable protein, requires time to degrade in rumen for each feed (% of CP).
+            Fraction B of protein, potentially degradable protein, requires time to degrade
+            in rumen for each feed (% of CP).
         CP__list : list, optional
             Crude protein in each feed (% of DM).
         dRUP__list : list, optional
