@@ -66,7 +66,7 @@ def execute_simulations_from_files(
     for input_file_path in input_file_list:
         input_manager.flush_pool()
         output_manager.flush_pools()
-        is_data_valid = input_manager.start_data_processing(str(input_file_path), True)
+        input_manager.start_data_processing(str(input_file_path), True)
         simulator = SimulationEngine(input_file_path)
         simulator.simulate()
         output_manager.save_variables(r"output", r"output/output_filters/", exclude_info_maps)
