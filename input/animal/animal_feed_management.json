@@ -129,8 +129,8 @@
 		"formulation_interval": 30
 	},
 
-	"pen_information": {
-		"pen0": {
+	"pen_information": [
+		{
 			"id": 0,
 			"animal_combination": "CALF",
 			"vertical_dist_to_milking_parlor": 0.1,
@@ -144,7 +144,7 @@
 			"manure_storage": "storage_pit",
 			"max_stocking_density": 1.2
 		},
-		"pen1": {
+		{
 			"id": 1,
 			"animal_combination": "GROWING",
 			"vertical_dist_to_milking_parlor": 0.1,
@@ -158,7 +158,7 @@
 			"manure_storage": "storage_pit",
 			"max_stocking_density": 1.2
 		},
-		"pen2": {
+		{
 			"id": 2,
 			"animal_combination": "CLOSE_UP",
 			"vertical_dist_to_milking_parlor": 0.1,
@@ -172,7 +172,7 @@
 			"manure_storage": "storage_pit",
 			"max_stocking_density": 1.2
 		},
-		"pen3": {
+		{
 			"id": 3,
 			"animal_combination": "LAC_COW",
 			"vertical_dist_to_milking_parlor": 0.1,
@@ -186,5 +186,5 @@
 			"manure_storage": "anaerobic_lagoon",
 			"max_stocking_density": 1.2
 		}
-	}
+	]
 }
