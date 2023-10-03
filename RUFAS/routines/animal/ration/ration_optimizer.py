@@ -120,7 +120,7 @@ class RationOptimizer:
         """
         return sum(np.multiply(x, ration_config.price_list))
 
-    def total_energy(self, x: np.ndarray, ration_config: RationConfig) -> float:
+    def total_energy(self, x: np.ndarray, ration_config: RationConfig) -> float: # noqa
         """
         Sets up the RHS multipliers for the sum of the lactation, pregnancy, maintenance, and activity requirements
         satisfied by the feed. Each equation has a reference to the respective
@@ -229,7 +229,7 @@ class RationOptimizer:
             ration_config.NEa_requirement + ration_config.NEpreg_requirement
         return max(NEm_act_constraint, NEl_constraint, NEg_constraint) - all_req
 
-    def NEmact_constraint(self, x: np.ndarray, ration_config: RationConfig) -> float:
+    def NEmact_constraint(self, x: np.ndarray, ration_config: RationConfig) -> float: # noqa
         """
         Sets up the RHS multipliers for the maintenance and activity requirements
         satisfied by the feed. Each equation has a reference to the respective
@@ -449,7 +449,7 @@ class RationOptimizer:
         return sum(np.multiply(x, np.multiply(np.multiply(ration_config.phosphorus_list, 0.01),
                                               ration_config.dP_list))) - ((ration_config.P_requirement) / 1000)
 
-    def protein_constraint(self, x: np.ndarray, ration_config: RationConfig) -> float:
+    def protein_constraint(self, x: np.ndarray, ration_config: RationConfig) -> float: # noqa
         """
         Sets up the protein requirement constraint in the NLP. Because part of the
         maintenance requirement for protein contains non-linearity properties, that
@@ -820,7 +820,7 @@ class RationOptimizer:
         while i < 1:
             try:
                 solution = self.optimize(animal_combination, available_feeds, ration_config)
-            except Exception as e:
+            except Exception as e: # noqa
                 i -= 1
                 info_map = {"class": "RationOptimizer", "function": self.attempt_optimization.__name__, }
                 om.add_error('SLSQP error', 'whoops', info_map)

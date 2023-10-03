@@ -486,7 +486,7 @@ class Cow(HeiferIII):
         self.DVD = 2 * vertical_dist_to_parlor * AnimalBase.config['cow_times_milked_per_day']
         self.DHD = 2 * horizontal_dist_to_parlor * AnimalBase.config['cow_times_milked_per_day']
 
-    def get_bw_change(self, CI):
+    def get_bw_change(self, CI): # noqa
         """
         life cycle psedocode @[A.1A.C.56/57/58]
         Calculates the body weight change for a cow.
@@ -556,7 +556,7 @@ class Cow(HeiferIII):
 
         return target_adg_cow + conceptus_growth + bodyweight_tissue
 
-    def update(self, sim_day, calving_interval):
+    def update(self, sim_day, calving_interval): # noqa
         """
         Update cow status from the moment of calving, parity+1,
         milking start, pregnancy stop, and estrus restart.
@@ -942,7 +942,7 @@ class Cow(HeiferIII):
                 self.days_born + \
                 AnimalBase.config['user_defined_presynch_length']
 
-    def tai_update(self, sim_day):
+    def tai_update(self, sim_day): # noqa
         """
         Assign tai and presynch method, update time AI method status, TAI can
         be performed with or without presynch.
@@ -977,7 +977,7 @@ class Cow(HeiferIII):
             self.user_defined_update()
 
     # ED-TAI methods
-    def ed_tai_update(self, sim_day):
+    def ed_tai_update(self, sim_day): # noqa
         """
         Update ED-TAI method, perform estrus detection before the TAI program
         Args:
@@ -1085,7 +1085,7 @@ class Cow(HeiferIII):
         else:
             return self.conception_rate - 0.1
 
-    def preg_update(self, sim_day):
+    def preg_update(self, sim_day): # noqa
         """
         Update AI for cows reach ai day, inseminate the cow with specific semen
         type. By comparing with conception rate, if conception success,

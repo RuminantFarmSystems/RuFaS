@@ -422,7 +422,7 @@ class Pen:
         self.update_animal_combination(animal_combination)
         self.update_classes_in_pen()
 
-    def calc_manure(self, feed, methane_model):
+    def calc_manure(self, feed, methane_model): # noqa
         """
         Calculates the total manure excretion of the animals in the pen,
          and updates the manure attributes to contain the new amounts.
@@ -458,19 +458,19 @@ class Pen:
         # TODO: Write an accumulator function
         for animal in self.animals_in_pen:
             curr_manure = animal.manure_excretion
-            if type(animal) == Calf:
+            if type(animal) == Calf: # noqa
                 for key in manure.keys():
                     manure[key] += curr_manure[key]
                     calf_total[key] += curr_manure[key]
-            elif type(animal) in [HeiferI, HeiferII, HeiferIII]:
+            elif type(animal) in [HeiferI, HeiferII, HeiferIII]: # noqa
                 for key in manure.keys():
                     manure[key] += curr_manure[key]
                     heifer_total[key] += curr_manure[key]
-            elif type(animal) == Cow and not animal.milking:
+            elif type(animal) == Cow and not animal.milking: # noqa
                 for key in manure.keys():
                     manure[key] += curr_manure[key]
                     dry_total[key] += curr_manure[key]
-            elif type(animal) == Cow and animal.milking:
+            elif type(animal) == Cow and animal.milking: # noqa
                 for key in manure.keys():
                     manure[key] += curr_manure[key]
                     lactating_total[key] += curr_manure[key]
@@ -550,7 +550,7 @@ class Pen:
             total_p_animal = max(total_p_animal, 0)
             self.avg_p_animal = total_p_animal / len(self.animals_in_pen)
 
-    def set_up_new_animal(self, animal, p_conc, feed, temp, num_animals_before_additions):
+    def set_up_new_animal(self, animal, p_conc, feed, temp, num_animals_before_additions): # noqa
         """
         Sets the necessary attributes for @animal to be a replacement in this
         pen.

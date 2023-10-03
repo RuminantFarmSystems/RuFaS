@@ -195,7 +195,7 @@ class RationManager:
 
     @classmethod
     def get_user_defined_ration(cls, req: animal_requirements, pen, available_feeds, animal_grouping_scenario) \
-            -> tuple[Dict[str, float], Dict[str, float]]:
+            -> tuple[Dict[str, float], Dict[str, float]]: # noqa
         """
         Function that links the ration_driver file with the calc_ration function in
         pen.py. Returns a dictionary of the rations by feed and status of the NLP
@@ -314,7 +314,7 @@ class RationReporter:
         cls.nutrient_conc = []
 
     @classmethod
-    def report_ration(cls, ration, available_feeds):
+    def report_ration(cls, ration, available_feeds): # noqa
 
         """
         Calculates information in the ration about nutrient information including

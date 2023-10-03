@@ -601,7 +601,7 @@ class HeiferII(HeiferI):
             self.synch_ed_program_day_after_abortion()
 
     # artificial inseminated and go through 3 preg checks
-    def preg_update(self, sim_day):
+    def preg_update(self, sim_day): # noqa
         """
         update AI for heifers reach ai day, inseminate the heifer with specific
             semen type
