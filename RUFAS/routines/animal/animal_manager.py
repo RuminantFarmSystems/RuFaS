@@ -75,7 +75,7 @@ class AnimalManager:
         Pen.AnimalCombination.CLOSE_UP: AnimalModuleConstants.DEFAULT_NUM_STALLS_FOR_CLOSE_UP_PEN,
         Pen.AnimalCombination.LAC_COW: AnimalModuleConstants.DEFAULT_NUM_STALLS_FOR_LAC_COW_PEN,
         Pen.AnimalCombination.GROWING_AND_CLOSE_UP:
-            AnimalModuleConstants.DEFAULT_NUM_STALLS_FOR_GROWING_AND_CLOSE_UP_PEN,
+        AnimalModuleConstants.DEFAULT_NUM_STALLS_FOR_GROWING_AND_CLOSE_UP_PEN,
     }
 
     ANIMAL_GROUPING_SCENARIO = AnimalGroupingScenario.CALF__GROWING__CLOSE_UP__LACCOW
@@ -1321,7 +1321,7 @@ class AnimalManager:
                 while 'status' not in ration_per_animal or ration_per_animal['status'].lower() != 'optimal':
                     if pen.animal_combination == Pen.AnimalCombination.CALF:
                         ration_per_animal = calf_optimize()
-                        ration_vals = {'ME_tot': 0}
+                        ration_vals = {'ME_total': 0}
                     else:
                         ration_per_animal, ration_vals = \
                             RationManager.formulate_ration(pen, pen_specific_feed_data, self.ANIMAL_GROUPING_SCENARIO)
@@ -1335,7 +1335,7 @@ class AnimalManager:
                 nutrient_amount, nutrient_conc = RationReporter.report_ration(ration_per_animal, feed.available_feeds)
                 pen.ration_nutrient_amount = nutrient_amount
                 pen.ration_nutrient_conc = nutrient_conc
-                pen.MEdiet = ration_vals['ME_tot']
+                pen.MEdiet = ration_vals['ME_total']
                 pen.dry_matter_intake = nutrient_amount['dm']
 
                 for animal in pen.animals_in_pen:
