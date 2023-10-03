@@ -1684,8 +1684,8 @@ def test_DMI_constraint():
     assert actual == pytest.approx(expected)
 
 
-def test_ration_optimizer_optimize():
-    """Unit test for function optimize in file routines/animal/ration/ration_optimizer.py"""
+def test_DMI_constraint_upper():
+    """Unit test for function DMI_constraint_upper in file routines/animal/ration/ration_optimizer.py"""
     ration_optimizer = RationOptimizer()
     x = [1.0, 2.0, 3.0, 4.0, 5.0]
     ration_config = MagicMock()
@@ -2122,8 +2122,6 @@ def mock_user_defined_ration_manager(mocker: MockerFixture) -> UserDefinedRation
 
 def test_ration_to_use(mock_user_defined_ration_manager: UserDefinedRationManager):
     """Unit test for function ration_to_use in file routines/animal/ration/ration_driver.py"""
-
-    # udrm = MagicMock()
     mock_user_defined_ration_manager.lactating_cow_ration = {'1': 100, '2': 200, '3': 300}
     mock_user_defined_ration_manager.close_up_ration = {'1': 10, '2': 20, '3': 30}
     mock_user_defined_ration_manager.growing_ration = {'1': 1, '2': 2, '3': 3}
