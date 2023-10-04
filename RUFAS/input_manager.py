@@ -311,7 +311,7 @@ class InputManager:
 
         return element_counter_and_validity
 
-    def _validate_json_element(self, element_hierarchy: List[str], properties_blob_key: str,
+    def _validate_json_element(self, element_hierarchy: List[str], properties_blob_key: str,   # noqa
                                input_data: Dict[str, Any], eager_termination: bool, ) -> dict:
         """
         Receives data loaded from json input file, recursively finds and then validates nested elements,
@@ -384,7 +384,8 @@ class InputManager:
             try:
                 input_data_value = reduce(lambda d, key: d[key], element_hierarchy, input_data)
             except KeyError:
-                raise KeyError(f"Key {var_name} not found in input data")
+                om.add_error("Key not found in input data", f"Key {var_name} not found in input data.", info_map)
+                input_data_value = None
 
             is_valid = self._validate_input_type_dynamic(variable_properties, var_name, input_data_value)
 
@@ -408,6 +409,11 @@ class InputManager:
         info_map = {"class": self.__class__.__name__,
                     "function": self._array_type_validator.__name__,
                     }
+        if type(input_data_value) is not list:
+            warning_string = "Array is not a list."
+            om.add_warning(warning_string, f"{var_name=}", info_map)
+            return False
+
         maximum_length = variable_properties.get("maximum_length")
         minimum_length = variable_properties.get("minimum_length")
         if minimum_length is not None:
@@ -432,6 +438,10 @@ class InputManager:
                     }
         minimum_value = variable_properties.get("minimum")
         maximum_value = variable_properties.get("maximum")
+        if type(input_data_value) is not float and type(input_data_value) is not int:
+            warning_string = "Value is not a number."
+            om.add_warning(warning_string, f"{var_name=}", info_map)
+            return False
         if minimum_value is not None:
             is_in_range = minimum_value <= input_data_value
             if not is_in_range:
@@ -452,6 +462,11 @@ class InputManager:
         info_map = {"class": self.__class__.__name__,
                     "function": self._string_type_validator.__name__,
                     }
+        if type(input_data_value) is not str:
+            warning_string = "String variable is not a string."
+            om.add_warning(warning_string, f"{var_name=}", info_map)
+            return False
+
         pattern_check = variable_properties.get("pattern")
         if pattern_check is not None:
             is_valid_string = bool(re.match(pattern_check, input_data_value))
@@ -649,12 +664,12 @@ class InputManager:
             raise KeyError(f"Data not found: Cannot find \"{metadata_address}\", "
                            f"\"{parent_address}\" does not have attribute \"{invalid_key}\".")
 
-    def flush_pools(self) -> None:
+    def flush_pool(self) -> None:
         """
         Clear the variable pool.
         """
         info_map = {"class": self.__class__.__name__,
-                    "function": self.flush_pools.__name__,
+                    "function": self.flush_pool.__name__,
                     }
         self.__pool = {}
         om.add_log("Clear variable pool", "The pool is emptied.", info_map)

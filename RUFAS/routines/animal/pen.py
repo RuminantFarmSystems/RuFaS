@@ -30,6 +30,7 @@ om = OutputManager()
 
 req = AnimalRequirements()
 
+
 class Pen:
     """
     Manages a pen's operation. Stores the characteristics of the pen and the
@@ -421,7 +422,7 @@ class Pen:
         self.update_animal_combination(animal_combination)
         self.update_classes_in_pen()
 
-    def calc_manure(self, feed, methane_model):
+    def calc_manure(self, feed, methane_model): # noqa
         """
         Calculates the total manure excretion of the animals in the pen,
          and updates the manure attributes to contain the new amounts.
@@ -457,19 +458,19 @@ class Pen:
         # TODO: Write an accumulator function
         for animal in self.animals_in_pen:
             curr_manure = animal.manure_excretion
-            if type(animal) == Calf:
+            if type(animal) == Calf: # noqa
                 for key in manure.keys():
                     manure[key] += curr_manure[key]
                     calf_total[key] += curr_manure[key]
-            elif type(animal) in [HeiferI, HeiferII, HeiferIII]:
+            elif type(animal) in [HeiferI, HeiferII, HeiferIII]: # noqa
                 for key in manure.keys():
                     manure[key] += curr_manure[key]
                     heifer_total[key] += curr_manure[key]
-            elif type(animal) == Cow and not animal.milking:
+            elif type(animal) == Cow and not animal.milking: # noqa
                 for key in manure.keys():
                     manure[key] += curr_manure[key]
                     dry_total[key] += curr_manure[key]
-            elif type(animal) == Cow and animal.milking:
+            elif type(animal) == Cow and animal.milking: # noqa
                 for key in manure.keys():
                     manure[key] += curr_manure[key]
                     lactating_total[key] += curr_manure[key]
@@ -549,7 +550,7 @@ class Pen:
             total_p_animal = max(total_p_animal, 0)
             self.avg_p_animal = total_p_animal / len(self.animals_in_pen)
 
-    def set_up_new_animal(self, animal, p_conc, feed, temp, num_animals_before_additions):
+    def set_up_new_animal(self, animal, p_conc, feed, temp, num_animals_before_additions): # noqa
         """
         Sets the necessary attributes for @animal to be a replacement in this
         pen.
@@ -584,17 +585,17 @@ class Pen:
                                           milk_lactose=animal.lactose_milk,
                                           milk_production=animal.estimated_daily_milk_produced,
                                           days_in_milk=animal.days_in_milk, lactating=animal.milking)
-            animal.NEmaint = requirements['NEmaint']
-            animal.NEg = requirements['NEg']
-            animal.NEpreg = requirements['NEpreg']
-            animal.NEl = requirements['NEl']
-            animal.MP_req = requirements['MP_req']
-            animal.Ca_req = requirements['Ca_req']
-            animal.P_req = requirements['P_req']
-            animal.DMIest = requirements['DMIest']
-            animal.DNED_req = (requirements['NEmaint'] + requirements[
-                'NEl']) / animal.DMIest
-            animal.DMPD_req = (requirements['MP_req']) / animal.DMIest
+            animal.NEmaint_requirement = requirements['NEmaint_requirement']
+            animal.NEg_requirement = requirements['NEg_requirement']
+            animal.NEpreg_requirement = requirements['NEpreg_requirement']
+            animal.NEl_requirement = requirements['NEl_requirement']
+            animal.MP_requirement = requirements['MP_requirement']
+            animal.Ca_requirement = requirements['Ca_requirement']
+            animal.P_requirement = requirements['P_requirement']
+            animal.DMIest_requirement = requirements['DMIest_requirement']
+            animal.DNED_requirement = (requirements['NEmaint_requirement'] + requirements[
+                'NEl_requirement']) / animal.DMIest_requirement
+            animal.DMPD_requirement = (requirements['MP_requirement']) / animal.DMIest_requirement
 
         animal.dry_matter_intake = self.dry_matter_intake
 
@@ -874,17 +875,17 @@ class Pen:
                                           milk_production=animal.estimated_daily_milk_produced,
                                           days_in_milk=animal.days_in_milk, lactating=animal.milking,
                                           previous_temperature=temp)
-            animal.NEmaint = requirements['NEmaint']
-            animal.NEg = requirements['NEg']
-            animal.NEpreg = requirements['NEpreg']
-            animal.NEl = requirements['NEl']
-            animal.MP_req = requirements['MP_req']
-            animal.Ca_req = requirements['Ca_req']
-            animal.P_req = requirements['P_req']
-            animal.DMIest = requirements['DMIest']
-            animal.DNED_req = (requirements['NEmaint'] + requirements[
-                'NEl']) / animal.DMIest
-            animal.DMPD_req = (requirements['MP_req']) / animal.DMIest
+            animal.NEmaint_requirement = requirements['NEmaint_requirement']
+            animal.NEg_requirement = requirements['NEg_requirement']
+            animal.NEpreg_requirement = requirements['NEpreg_requirement']
+            animal.NEl_requirement = requirements['NEl_requirement']
+            animal.MP_requirement = requirements['MP_requirement']
+            animal.Ca_requirement = requirements['Ca_requirement']
+            animal.P_requirement = requirements['P_requirement']
+            animal.DMIest_requirement = requirements['DMIest_requirement']
+            animal.DNED_requirement = (requirements['NEmaint_requirement'] + requirements[
+                'NEl_requirement']) / animal.DMIest_requirement
+            animal.DMPD_requirement = (requirements['MP_requirement']) / animal.DMIest_requirement
 
             animal.calc_daily_walking_dist(
                 self.vertical_dist_to_parlor, self.horizontal_dist_to_parlor)

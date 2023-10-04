@@ -31,9 +31,9 @@ jobs:
     - name: Get all added or modified files
       run: |
         echo "FILES=$( echo ${{ steps.files.outputs.added_modified }} |
-          tr " " "\n" |
-          grep -E "\.py$" |
-          tr "\n" " ")" >> "$GITHUB_ENV"
+                        tr " " "\n" |
+                        grep -E "\.py$" |
+                        tr "\n" " ")" >> "$GITHUB_ENV"
     - name: Lint with flake8
       if: ${{ env.FILES != '' }}
       run: |
