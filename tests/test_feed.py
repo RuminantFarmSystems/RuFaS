@@ -151,11 +151,6 @@ def test_get_calf_feeds():
     pass
 
 
-def test_update_all():
-    """Unit test for function update_all in file routines/feed/nitrogen_loss.py"""
-    pass
-
-
 def test_CP_loss():
     """Unit test for function CP_loss in file routines/feed/nitrogen_loss.py"""
     pass

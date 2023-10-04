@@ -446,49 +446,52 @@ def pens_test_data_dict() -> List[dict[Any]]:
     return [
         {
             "pen_data":
-                {"pen0":
-                     {"pen_id": 0,
-                      "cow_type_to_id_map": {
-                          'Calf': [100283, 102779, 112701, 115078, 127686, 131248, 137254, 148550, 150007, 150905,
-                                   151340, 154391, 154438, 156048, 157528, 165411, 169062, 170598, 182656,
-                                   186570, 189951, 194172], 'HeiferI': [], 'HeiferII': [], 'HeiferIII': [],
-                          'Dry_Cow': [], 'Lac_Cow': []},
-                      "pen_animal_combination": Pen.AnimalCombination.CALF,
-                      "post_removal_stocking_density": 0.50, "num_stalls": 40,
-                      "ration": {"dummy_feed1": 205.0, "dummy_feed2": 0.0, "dummy_feed3": 18.25,
-                                 "dummy_feed4": 72.0, "dummy_feed5": 45.0, "dummy_feed6": 146.0, "dummy_feed7": 170.0,
-                                 "dummy_feed8": 5.0, "dummy_feed9": 0.0, "dummy_feed10": 200.0}},
-                 "pen1":
-                     {"pen_id": 1,
-                      "cow_type_to_id_map": {'Calf': [], 'HeiferI': [100439, 106977, 111123, 111262, 111527, 112516],
-                                             'HeiferII': [120348, 153413, 156414, 193126],
-                                             'HeiferIII': [], 'Dry_Cow': [], 'Lac_Cow': []},
-                      "pen_animal_combination": Pen.AnimalCombination.GROWING,
-                      "post_removal_stocking_density": 0.25, "num_stalls": 36,
-                      "ration": {"dummy_feed1": 0.0, "dummy_feed2": 56.0}},
-                 "pen2":
-                     {"pen_id": 2,
-                      "cow_type_to_id_map": {'Calf': [], 'HeiferI': [],
-                                             'HeiferII': [],
-                                             'HeiferIII': [115748, 118413, 129345, 139533, 148813, 156669, 158006,
-                                                           161608,
-                                                           162583, 163942,
-                                                           176371],
-                                             'Dry_Cow': [187817, 189760, 189801, 198331, 199999], 'Lac_Cow': []},
-                      "pen_animal_combination": Pen.AnimalCombination.CLOSE_UP,
-                      "post_removal_stocking_density": 0.10, "num_stalls": 150,
-                      "ration": {"dummy_feed1": 10.0, "dummy_feed2": 35.0, "dummy_feed3": 0.0,
-                                 "dummy_feed4": 84.0}},
-                 "pen3":
-                     {"pen_id": 3,
-                      "cow_type_to_id_map": {'Calf': [],
-                                             'HeiferI': [], 'HeiferII': [], 'HeiferIII': [], 'Dry_Cow': [],
-                                             'Lac_Cow': [126963, 133132, 156958, 158639, 160697, 162375, 164238,
-                                                         198542]},
-                      "pen_animal_combination": Pen.AnimalCombination.LAC_COW,
-                      "post_removal_stocking_density": 0.20, "num_stalls": 35,
-                      "ration": {"dummy_feed1": 100.0, "status": "dummy_val"}}
-                 },
+                {
+                    "pen0":
+                        {
+                            "pen_id": 0,
+                            "cow_type_to_id_map": {
+                                'Calf': [100283, 102779, 112701, 115078, 127686, 131248, 137254, 148550, 150007, 150905,
+                                         151340, 154391, 154438, 156048, 157528, 165411, 169062, 170598, 182656,
+                                         186570, 189951, 194172], 'HeiferI': [], 'HeiferII': [], 'HeiferIII': [],
+                                'Dry_Cow': [], 'Lac_Cow': []},
+                            "pen_animal_combination": Pen.AnimalCombination.CALF,
+                            "post_removal_stocking_density": 0.50, "num_stalls": 40,
+                            "ration": {"dummy_feed1": 205.0, "dummy_feed2": 0.0, "dummy_feed3": 18.25,
+                                       "dummy_feed4": 72.0, "dummy_feed5": 45.0, "dummy_feed6": 146.0,
+                                       "dummy_feed7": 170.0,
+                                       "dummy_feed8": 5.0, "dummy_feed9": 0.0, "dummy_feed10": 200.0}},
+                    "pen1":
+                        {"pen_id": 1,
+                         "cow_type_to_id_map": {'Calf': [], 'HeiferI': [100439, 106977, 111123, 111262, 111527, 112516],
+                                                'HeiferII': [120348, 153413, 156414, 193126],
+                                                'HeiferIII': [], 'Dry_Cow': [], 'Lac_Cow': []},
+                         "pen_animal_combination": Pen.AnimalCombination.GROWING,
+                         "post_removal_stocking_density": 0.25, "num_stalls": 36,
+                         "ration": {"dummy_feed1": 0.0, "dummy_feed2": 56.0}},
+                    "pen2":
+                        {"pen_id": 2,
+                         "cow_type_to_id_map": {'Calf': [], 'HeiferI': [],
+                                                'HeiferII': [],
+                                                'HeiferIII': [115748, 118413, 129345, 139533, 148813, 156669, 158006,
+                                                              161608,
+                                                              162583, 163942,
+                                                              176371],
+                                                'Dry_Cow': [187817, 189760, 189801, 198331, 199999], 'Lac_Cow': []},
+                         "pen_animal_combination": Pen.AnimalCombination.CLOSE_UP,
+                         "post_removal_stocking_density": 0.10, "num_stalls": 150,
+                         "ration": {"dummy_feed1": 10.0, "dummy_feed2": 35.0, "dummy_feed3": 0.0,
+                                    "dummy_feed4": 84.0}},
+                    "pen3":
+                        {"pen_id": 3,
+                         "cow_type_to_id_map": {'Calf': [],
+                                                'HeiferI': [], 'HeiferII': [], 'HeiferIII': [], 'Dry_Cow': [],
+                                                'Lac_Cow': [126963, 133132, 156958, 158639, 160697, 162375, 164238,
+                                                            198542]},
+                         "pen_animal_combination": Pen.AnimalCombination.LAC_COW,
+                         "post_removal_stocking_density": 0.20, "num_stalls": 35,
+                         "ration": {"dummy_feed1": 100.0, "status": "dummy_val"}}
+                },
             "animals_to_be_removed":
                 {115078, 169062, 112516, 189801, 198542},
             "animal_to_pen_id_map_after_removals":
