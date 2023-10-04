@@ -1582,7 +1582,7 @@ class AnimalRequirements:
         ----------
         .. [1] National Research Council, "Nutrient Requirements of Dairy Cattle, 7th edition." National Academic Press,
             Chapter 1 "Dry Matter Intake",
-            pp. 4; and pp. 325, 2001 (Equations 1 and 2).
+            pp. 4; and pp. 325, 2001 (Equations 1 and 2), and pp. 326 for heifers
 
         """
         if animal_type in [AnimalType.LAC_COW]:
