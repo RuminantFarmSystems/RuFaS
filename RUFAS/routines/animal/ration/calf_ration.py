@@ -122,20 +122,17 @@ class CalfRationManager:
 
         # maintainance requirements
         # [A.1B.F.1]
+        t_factor = 0
         if calf.days_born <= 60:
             if temp < -30:
                 t_factor = 1.34
             elif temp < 15:
                 t_factor = -0.0272 * temp + 0.4751
-            else:
-                t_factor = 0
         else:
             if temp < -30:
                 t_factor = 1.07
             elif temp <= 5:
                 t_factor = -0.0271 * temp + 0.2002
-            else:
-                t_factor = 0
 
         # [A.1B.F.2]
         ne_maint = 0.086 * calf.body_weight ** 0.75 * (1 + t_factor)
