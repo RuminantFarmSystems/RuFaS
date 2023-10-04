@@ -1590,6 +1590,11 @@ class AnimalRequirements:
             pp. 4; and pp. 325, 2001 (Equations 1 and 2), and pp. 326 for heifers
 
         """
+        if net_energy_diet_concentration < 1.0:
+            DivFact = 0.95
+        else:
+            DivFact = net_energy_diet_concentration
+
         if animal_type in [AnimalType.LAC_COW]:
             fat_corrected_milk_kg = (0.4 * milk_production) + (15 * milk_fat * (milk_production / 100))
             dry_matter_intake_estimate = (0.372 * fat_corrected_milk_kg + 0.0968 * body_weight**0.75) * (
@@ -1604,8 +1609,8 @@ class AnimalRequirements:
                 value_to_use = 0.0869
             dry_matter_intake_estimate = (
                 body_weight**0.75
-                * (0.2435 * net_energy_diet_concentration - 0.0466 * net_energy_diet_concentration**2 - value_to_use)
-                / net_energy_diet_concentration
+                * (0.2435 * DivFact - 0.0466 * DivFact**2 - value_to_use)
+                / DivFact
             )
             if day_of_pregnancy and day_of_pregnancy >= 210:
                 adjustment_factor = 1 + ((210 - day_of_pregnancy) * 0.0025)
