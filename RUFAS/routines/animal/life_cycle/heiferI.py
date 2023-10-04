@@ -72,7 +72,8 @@ class HeiferI(Calf):
                                              average_daily_gain_heifer=self.daily_growth,
                                              NDF_conc=NDF_conc,
                                              TDN_conc=TDN_conc,
-                                             net_energy_diet_concentration=net_energy_diet_concentration)
+                                             net_energy_diet_concentration=net_energy_diet_concentration,
+                                             days_born=self.daysBorn)
 
         self.NEmaint_requirement = animal_requirements["NEmaint_requirement"]
         self.NEg_requirement = animal_requirements["NEg_requirement"]

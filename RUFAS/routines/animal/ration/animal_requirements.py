@@ -354,6 +354,7 @@ class AnimalRequirements:
         NDF_conc: Optional[float] = 0.3,
         TDN_conc: Optional[float] = 0.7,
         net_energy_diet_concentration: Optional[float] = 1.0,
+        days_born: Optional[float] = None
     ) -> Dict[str, float]:
         """
         Calculates the dietary requirements of a single animal.
@@ -441,6 +442,7 @@ class AnimalRequirements:
                 milk_production,
                 milk_fat,
                 net_energy_diet_concentration,
+                days_born
             )
             metabolizable_protein_requirement = self.calculate_NRC_protein_requirements(
                 body_weight,
@@ -1544,6 +1546,7 @@ class AnimalRequirements:
         milk_production: float,
         milk_fat: float,
         net_energy_diet_concentration: float,
+        days_born: float
     ) -> float:
         """Calculates dry matter intake according to NRC (2001).
 
@@ -1567,6 +1570,8 @@ class AnimalRequirements:
             Fat contents in milk (%)
         net_energy_diet_concentration : float
             Metabolizable energy density of formulated ration
+        days_born : float
+            number of days since birth
 
         Returns
         -------
@@ -1593,9 +1598,13 @@ class AnimalRequirements:
         elif animal_type in [AnimalType.DRY_COW]:
             dry_matter_intake_estimate = ((1.97 - 0.75 * math.exp(0.16 * (day_of_pregnancy - 280))) / 100) * body_weight
         else:
+            if days_born and days_born > 365:
+                value_to_use = 0.1128
+            else:
+                value_to_use = 0.08  # TODO get real value
             dry_matter_intake_estimate = (
                 body_weight**0.75
-                * (0.2435 * net_energy_diet_concentration - 0.0466 * net_energy_diet_concentration**2 - 0.1128)
+                * (0.2435 * net_energy_diet_concentration - 0.0466 * net_energy_diet_concentration**2 - value_to_use)
                 / net_energy_diet_concentration
             )
             if day_of_pregnancy and day_of_pregnancy >= 210:

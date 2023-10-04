@@ -112,6 +112,7 @@ def heifer_a() -> dict:
         "NDF_conc": 0.3,
         "TDN_conc": 0.7,
         "net_energy_diet_concentration": 1.0,
+        "days_born": 100
     }
     return heifer_a_dict
 
@@ -140,6 +141,7 @@ def heifer_b() -> dict:
         "NDF_conc": 0.3,
         "TDN_conc": 0.7,
         "net_energy_diet_concentration": 1.0,
+        "days_born": 400
     }
     return heifer_b_dict
 
@@ -464,6 +466,7 @@ def test_calculate_NRC_DMI(cow_a: dict, cow_b: dict, heifer_a: dict, heifer_b: d
         cow_a["Milk"],
         cow_a["Fat_Milk"],
         cow_a["net_energy_diet_concentration"],
+        None
     )
     assert (result_DMIest) == pytest.approx((22.5), rel=1e-1)
 
@@ -475,6 +478,7 @@ def test_calculate_NRC_DMI(cow_a: dict, cow_b: dict, heifer_a: dict, heifer_b: d
         cow_b["Milk"],
         cow_b["Fat_Milk"],
         cow_b["net_energy_diet_concentration"],
+        None
     )
     assert (result_DMIest) == pytest.approx((13.4), rel=1e-1)
 
@@ -486,8 +490,10 @@ def test_calculate_NRC_DMI(cow_a: dict, cow_b: dict, heifer_a: dict, heifer_b: d
         heifer_a["Milk"],
         heifer_a["Fat_Milk"],
         heifer_a["net_energy_diet_concentration"],
+        heifer_a["days_born"],
+
     )
-    assert (result_DMIest) == pytest.approx((4.9), rel=1e-1)
+    assert (result_DMIest) == pytest.approx((6.9041), rel=1e-1)
 
     result_DMIest = req.calculate_NRC_DMI(
         heifer_b["animal_type"],
@@ -497,6 +503,7 @@ def test_calculate_NRC_DMI(cow_a: dict, cow_b: dict, heifer_a: dict, heifer_b: d
         heifer_b["Milk"],
         heifer_b["Fat_Milk"],
         heifer_b["net_energy_diet_concentration"],
+        heifer_b["days_born"]
     )
     assert (result_DMIest) == pytest.approx((6.7), rel=1e-1)
 
