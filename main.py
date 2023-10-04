@@ -8,28 +8,26 @@ file(s) or, if this input is not given, it will run in interactive mode and acce
 """
 import argparse
 from pathlib import Path
+import sys
 from typing import List
+from RUFAS.scenario_manager import METADATA_PATHS
 
 import config.global_variables
 from RUFAS.simulation_engine import SimulationEngine
-from RUFAS.user_prompt import obtain_file_list
 from RUFAS.input_manager import InputManager
 from RUFAS.output_manager import OutputManager
 from RUFAS.util import Utility
 
 
 def run_rufas(
-    input_path: str = None,
     make_graphs: bool = True,
     verbose: bool = True,
     clear_output: bool = False,
     exclude_info_maps: bool = True,
 ) -> None:
-    """Main function to run RuFaS, with options. If input_path is not provided,
-    the interactive user prompt is triggered.
+    """Main function to run RuFaS, with options.
 
     Args:
-        input_path: path to input .json file or directory of .json files
         make_graphs: prevent graphics from generating
         verbose: print progress messages while simulation is running
         clear_output: lear output directory before running the simulation
@@ -43,9 +41,8 @@ def run_rufas(
     set_global_variables(make_graphs, verbose)
     if verbose:
         print("RuFaS: Ruminant Farm Systems Model 2023")
-    print(input_path)
-    file_list = obtain_file_list(input_path, verbose)
-    execute_simulations_from_files(file_list, exclude_info_maps)
+    metadata_file_list = METADATA_PATHS
+    execute_simulations(metadata_file_list, exclude_info_maps)
 
 
 def set_global_variables(make_graphs: bool, verbose: bool) -> None:
@@ -56,19 +53,35 @@ def set_global_variables(make_graphs: bool, verbose: bool) -> None:
     )
 
 
-def execute_simulations_from_files(
-    files: List[Path], exclude_info_maps: bool = True
+def execute_simulations(
+    metadata_files: List[Path], exclude_info_maps: bool = True
 ) -> None:
-    """Execute simulations for each file"""
+    """Instantiates I/O Managers and processes the metadata files provided by the user to run the simulation.
+
+    Parameters
+    ----------
+    metadata_files : List[Path]
+        The list of Paths to the metadata files the user entered with which to run the simulation.
+    exclude_info_maps : bool, optional
+        Flag for whether or not the user wants to inlcude info_maps data in their results files.
+    """
+    info_map = {"class": "No caller class",
+                "function": execute_simulations.__name__,
+                }
+    sys.stdout.write("Simulating...\n")
     output_manager = OutputManager()
     input_manager = InputManager()
-    input_file_list = files
-    for input_file_path in input_file_list:
-        input_manager.flush_pools()
+    metadata_file_list = metadata_files
+    for metadata_file_path in metadata_file_list:
+        input_manager.flush_pool()
         output_manager.flush_pools()
-        is_data_valid = input_manager.start_data_processing(str(input_file_path), True)
-        simulator = SimulationEngine(input_file_path)
-        simulator.simulate()
+        is_data_valid = input_manager.start_data_processing(str(metadata_file_path), True)
+        if is_data_valid:
+            simulator = SimulationEngine()
+            simulator.simulate()
+        else:
+            output_manager.add_error("No simulation run",
+                                     f"Data not valid for {metadata_file_path}, simulation not run", info_map)
         output_manager.save_variables(r"output", r"output/output_filters/", exclude_info_maps)
         output_manager.dump_all_nondata_pools(r"output", exclude_info_maps)
 
@@ -76,17 +89,6 @@ def execute_simulations_from_files(
 def parse_gnu_args():
     """Parse command line options, if applicable"""
     parser = argparse.ArgumentParser()
-    parser.add_argument(
-        "input_path",
-        type=str,
-        metavar="path",
-        nargs="?",
-        help="path to input .json file or directory of .json files",
-    )
-    # TODO: rather than a string, this should probably be a file handle as in the link below, but that would affect
-    #   the current input handler, file reader, etc.
-    #   https://stackoverflow.com/questions/11540854/file-as-command-line-argument-for-argparse-error-message-if-argument-is-not-va
-
     parser.add_argument(
         "-ng",
         "--no-graphics",
@@ -99,7 +101,6 @@ def parse_gnu_args():
         help="Print progress messages while simulation is running",
         action="store_true",
     )
-    # parser.add_argument("-i", "--interactive", help="run in interactive mode", action="store_true")
     parser.add_argument(
         "-co",
         "--clear-output",
@@ -118,7 +119,6 @@ def parse_gnu_args():
 if __name__ == "__main__":
     cmd_arguments = parse_gnu_args()
     run_rufas(
-        input_path=cmd_arguments.input_path,
         make_graphs=not cmd_arguments.no_graphics,
         verbose=cmd_arguments.verbose,
         clear_output=cmd_arguments.clear_output,

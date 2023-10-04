@@ -11,10 +11,8 @@ Description: This file updates the heifer form close to calving to calving,
 """
 from RUFAS.output_manager import OutputManager
 from RUFAS.routines.animal.life_cycle.heiferII import HeiferII
-from RUFAS.routines.animal.life_cycle.animal_base import AnimalBase
 
-from RUFAS.routines.animal.manure.growing_heifer_manure_excretion import \
-    manure_calculations
+from RUFAS.routines.animal.manure.growing_heifer_manure_excretion import manure_calculations
 from RUFAS.routines.animal.ration.animal_requirements import AnimalRequirements
 from RUFAS.routines.animal.life_cycle import animal_constants as const
 
@@ -60,10 +58,10 @@ class HeiferIII(HeiferII):
             args.p_gest_for_calf
         """
         super().__init__(args)
-        if 'conceptus_weight' in args:
-            self.conceptus_weight = args['conceptus_weight']
-        if 'calf_birth_weight' in args:
-            self.calf_birth_weight = args['calf_birth_weight']
+        if "conceptus_weight" in args:
+            self.conceptus_weight = args["conceptus_weight"]
+        if "calf_birth_weight" in args:
+            self.calf_birth_weight = args["calf_birth_weight"]
 
     def get_heiferIII_values(self):
         """
@@ -76,21 +74,23 @@ class HeiferIII(HeiferII):
         Calculates this heiferIII's nutrient requirements.
         """
         req = AnimalRequirements()
-        animal_requirements = req.calc_rqmts(body_weight=self.body_weight,
-                         mature_body_weight=self.mature_body_weight,
-                         day_of_pregnancy=self.days_in_preg,
-                         animal_type=animal_grouping_scenario.get_animal_type(self),
-                         body_condition_score_5=3,
-                         previous_temperature=temp,
-                         average_daily_gain_heifer=self.daily_growth)
-        self.NEmaint = animal_requirements['NEmaint']
-        self.NEg = animal_requirements['NEg']
-        self.NEpreg = animal_requirements['NEpreg']
-        self.NEl = animal_requirements['NEl']
-        self.MP_req = animal_requirements['MP_req']
-        self.Ca_req = animal_requirements['Ca_req']
-        self.P_req = animal_requirements['P_req']
-        self.DMIest = animal_requirements['DMIest']
+        animal_requirements = req.calc_rqmts(
+            body_weight=self.body_weight,
+            mature_body_weight=self.mature_body_weight,
+            day_of_pregnancy=self.days_in_preg,
+            animal_type=animal_grouping_scenario.get_animal_type(self),
+            body_condition_score_5=3,
+            previous_temperature=temp,
+            average_daily_gain_heifer=self.daily_growth,
+        )
+        self.NEmaint_requirement = animal_requirements["NEmaint_requirement"]
+        self.NEg_requirement = animal_requirements["NEg_requirement"]
+        self.NEpreg_requirement = animal_requirements["NEpreg_requirement"]
+        self.NEl_requirement = animal_requirements["NEl_requirement"]
+        self.MP_requirement = animal_requirements["MP_requirement"]
+        self.Ca_requirement = animal_requirements["Ca_requirement"]
+        self.P_requirement = animal_requirements["P_requirement"]
+        self.DMIest_requirement = animal_requirements["DMIest_requirement"]
 
     def calc_manure_excretion(self, feed, methane_model):
         """
@@ -102,9 +102,9 @@ class HeiferIII(HeiferII):
         """
         p_urine, p_feces_excrt = self.calc_base_manure()
 
-        self.p_excrt, self.manure_excretion = \
-            manure_calculations(self.ration_formulation, feed,
-                                self.body_weight, p_feces_excrt, p_urine, methane_model)
+        self.p_excrt, self.manure_excretion = manure_calculations(
+            self.ration_formulation, feed, self.body_weight, p_feces_excrt, p_urine, methane_model
+        )
 
     def update(self, sim_day):
         """
@@ -132,8 +132,7 @@ class HeiferIII(HeiferII):
 
         else:
             self.body_weight = self.mature_body_weight
-            self.events.add_event(self.days_born, sim_day,
-                                  const.MATURE_BODY_WEIGHT_REGULAR)
+            self.events.add_event(self.days_born, sim_day, const.MATURE_BODY_WEIGHT_REGULAR)
 
         if self.days_in_preg == self.gestation_length:
             self.days_born -= 1  # will be incremented again in next stage

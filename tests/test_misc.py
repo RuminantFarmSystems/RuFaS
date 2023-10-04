@@ -79,7 +79,7 @@ def patch_simulation_engine(mocker: MockerFixture) -> SimulationEngine:
     """Returns a mocked SimulationEngine"""
     mocker.patch("RUFAS.simulation_engine.SimulationEngine._initialize_simulation")
 
-    sim_eng = SimulationEngine("dummy_path")
+    sim_eng = SimulationEngine()
     sim_eng.config = MagicMock()
     sim_eng.weather = MagicMock()
     sim_eng.time = MagicMock()
@@ -88,29 +88,32 @@ def patch_simulation_engine(mocker: MockerFixture) -> SimulationEngine:
     return sim_eng
 
 
-def test_init_simulation_engine(patch_simulation_engine: SimulationEngine) -> None:
+def test_init_simulation_engine(patch_simulation_engine: SimulationEngine, mocker: MockerFixture) -> None:
     """Unit test for function __init__ in file RUFAS/simulation_engine.py"""
-    patch_simulation_engine._initialize_simulation.assert_called_once_with("dummy_path")
+    assert patch_simulation_engine.config is not None
+    assert patch_simulation_engine.weather is not None
+    assert patch_simulation_engine.time is not None
+    assert patch_simulation_engine.state is not None
+    patch_simulation_engine._initialize_simulation.assert_called_once()
 
 
 def test_simulate(patch_simulation_engine: SimulationEngine, mocker: MockerFixture) -> None:
     """Unit test for function simulate in file RUFAS/simulation_engine.py"""
     patch_for_run_simulation_main_loop = \
         mocker.patch("RUFAS.simulation_engine.SimulationEngine._run_simulation_main_loop")
-    patch_for_show_final_messages = mocker.patch("RUFAS.simulation_engine.SimulationEngine._show_final_messages")
     sim_eng = patch_simulation_engine
     sim_eng.simulate()
     patch_for_run_simulation_main_loop.assert_called_once()
-    patch_for_show_final_messages.assert_called_once()
 
 
-def test_show_final_messages(
-    patch_simulation_engine: SimulationEngine, mocker: MockerFixture
-) -> None:
-    """Unit test for function _show_final_messages in file RUFAS/simulation_engine.py"""
-    mocker.patch("sys.stdout.write")
-    patch_simulation_engine._show_final_messages(1, 1)
-    assert mocker._patches_and_mocks[1][1].call_count == 3
+def test_run_simulation_main_loop(patch_simulation_engine: SimulationEngine) -> None:
+    """Unit test for function simulate in file RUFAS/simulation_engine.py"""
+    sim_eng = patch_simulation_engine
+    sim_eng.time.end_simulation = MagicMock(side_effect=[False, True])
+    sim_eng._annual_simulation = MagicMock()
+    sim_eng._run_simulation_main_loop()
+    sim_eng.time.end_simulation.assert_has_calls([call(), call()])
+    sim_eng._annual_simulation.assert_called_once()
 
 
 def test_daily_simulation(
