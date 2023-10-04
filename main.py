@@ -83,7 +83,6 @@ def execute_simulations(
             output_manager.add_log("Terminate after validation data validity check",
                                    f"{str(metadata_file_path)} data validity is: {is_data_valid}",
                                    info_map)
-            output_manager.save_variables(r"output", r"output/output_filters/", exclude_info_maps)
             output_manager.dump_all_nondata_pools(r"output", exclude_info_maps)
             continue
         if is_data_valid:

@@ -101,14 +101,14 @@ def test_set_global_variables(make_graphs: bool, verbose: bool) -> None:
 
 
 @pytest.mark.parametrize(
-        "is_data_valid, terminate_after_validation, simulate_call_count, add_error_call_count",
-        [(True, True, 0, 0),
-         (False, True, 0, 0),
-         (True, False, 2, 0),
-         (False, False, 0, 2)]
+        "is_data_valid, terminate_after_validation, simulate_call_count, add_error_call_count, save_vars_call_count",
+        [(True, True, 0, 0, 0),
+         (False, True, 0, 0, 0),
+         (True, False, 2, 0, 2),
+         (False, False, 0, 2, 2)]
 )
 def test_execute_simulations(mocker: MockerFixture, is_data_valid: bool, terminate_after_validation: bool,
-                             simulate_call_count: int, add_error_call_count: int) -> None:
+                             simulate_call_count: int, add_error_call_count: int, save_vars_call_count: int) -> None:
     """Checks that execute_simulations() calls the correct functions in the correct order"""
     # Arrange
     mock_output_manager = mocker.MagicMock(auto_spec=OutputManager)
@@ -139,10 +139,10 @@ def test_execute_simulations(mocker: MockerFixture, is_data_valid: bool, termina
     assert mock_output_manager.dump_all_nondata_pools.call_args_list == [
         mocker.call("output", True)
     ] * len(metadata_file_list)
-    assert mock_output_manager.save_variables.call_count == len(metadata_file_list)
+    assert mock_output_manager.save_variables.call_count == save_vars_call_count
     assert mock_output_manager.save_variables.call_args_list == [
         mocker.call("output", "output/output_filters/", True)
-    ] * len(metadata_file_list)
+    ] * save_vars_call_count
 
 
 def test_parse_gnu_args(mocker: MockerFixture) -> None:
