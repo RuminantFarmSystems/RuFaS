@@ -23,6 +23,7 @@ from RUFAS.routines.animal.pen import Pen
 from RUFAS.routines.feed.feed import Feed
 from RUFAS.input_manager import InputManager
 
+
 def create_mock_object_list(attribute_dicts: List[Dict[str, Any]]) -> List[MagicMock]:
     mock_object_list = []
 
@@ -314,7 +315,8 @@ def test_get_animal_config():
     pass
 
 
-def test_init_pens(input_manager: InputManager, animal_manager: AnimalManager, mock_pen_data: Dict[str, Dict[str, Union[str, float, int]]],
+def test_init_pens(input_manager: InputManager, animal_manager: AnimalManager,
+                   mock_pen_data: Dict[str, Dict[str, Union[str, float, int]]],
                    mock_herd_data: Dict[str, Union[str, int, bool]],
                    mock_manure_management_scenarios: Dict[str, List[Dict[str, Union[str, int]]]],
                    ) -> None:
@@ -445,17 +447,17 @@ def pens_test_data_dict() -> List[dict[Any]]:
         {
             "pen_data":
                 {"pen0":
-                    {"pen_id": 0,
-                     "cow_type_to_id_map": {
+                     {"pen_id": 0,
+                      "cow_type_to_id_map": {
                           'Calf': [100283, 102779, 112701, 115078, 127686, 131248, 137254, 148550, 150007, 150905,
                                    151340, 154391, 154438, 156048, 157528, 165411, 169062, 170598, 182656,
                                    186570, 189951, 194172], 'HeiferI': [], 'HeiferII': [], 'HeiferIII': [],
                           'Dry_Cow': [], 'Lac_Cow': []},
-                     "pen_animal_combination": Pen.AnimalCombination.CALF,
-                     "post_removal_stocking_density": 0.50, "num_stalls": 40,
-                     "ration": {"dummy_feed1": 205.0, "dummy_feed2": 0.0, "dummy_feed3": 18.25,
-                                "dummy_feed4": 72.0, "dummy_feed5": 45.0, "dummy_feed6": 146.0, "dummy_feed7": 170.0,
-                                "dummy_feed8": 5.0, "dummy_feed9": 0.0, "dummy_feed10": 200.0}},
+                      "pen_animal_combination": Pen.AnimalCombination.CALF,
+                      "post_removal_stocking_density": 0.50, "num_stalls": 40,
+                      "ration": {"dummy_feed1": 205.0, "dummy_feed2": 0.0, "dummy_feed3": 18.25,
+                                 "dummy_feed4": 72.0, "dummy_feed5": 45.0, "dummy_feed6": 146.0, "dummy_feed7": 170.0,
+                                 "dummy_feed8": 5.0, "dummy_feed9": 0.0, "dummy_feed10": 200.0}},
                  "pen1":
                      {"pen_id": 1,
                       "cow_type_to_id_map": {'Calf': [], 'HeiferI': [100439, 106977, 111123, 111262, 111527, 112516],
@@ -524,18 +526,18 @@ def pens_test_data_dict() -> List[dict[Any]]:
         {
             "pen_data":
                 {"pen0":
-                 {"pen_id": 0,
-                  "cow_type_to_id_map": {'Calf': [120297, 122798, 123120, 124011, 125663, 139048, 141097, 151564,
-                                                  152876, 162678, 100919, 101115, 112752, 119921, 172095, 178379,
-                                                  181144, 185339, 186287, 192840, 194279, 195286, 196169, 199241,
-                                                  199441],
-                                         'HeiferI': [], 'HeiferII': [], 'HeiferIII': [], 'Dry_Cow': [],
-                                         'Lac_Cow': []},
-                  "pen_animal_combination": Pen.AnimalCombination.CALF,
-                  "post_removal_stocking_density": 0.50, "num_stalls": 48,
-                  "ration": {"status": "dummy_val", "dummy_feed2": 34.0, "dummy_feed3": 3.4,
-                             "dummy_feed4": 77.0, "dummy_feed5": 3.2, "dummy_feed6": 9.50, "dummy_feed7": 0.0,
-                             "dummy_feed8": 12.2, "dummy_feed9": 9.9, "dummy_feed10": 400.0}},
+                     {"pen_id": 0,
+                      "cow_type_to_id_map": {'Calf': [120297, 122798, 123120, 124011, 125663, 139048, 141097, 151564,
+                                                      152876, 162678, 100919, 101115, 112752, 119921, 172095, 178379,
+                                                      181144, 185339, 186287, 192840, 194279, 195286, 196169, 199241,
+                                                      199441],
+                                             'HeiferI': [], 'HeiferII': [], 'HeiferIII': [], 'Dry_Cow': [],
+                                             'Lac_Cow': []},
+                      "pen_animal_combination": Pen.AnimalCombination.CALF,
+                      "post_removal_stocking_density": 0.50, "num_stalls": 48,
+                      "ration": {"status": "dummy_val", "dummy_feed2": 34.0, "dummy_feed3": 3.4,
+                                 "dummy_feed4": 77.0, "dummy_feed5": 3.2, "dummy_feed6": 9.50, "dummy_feed7": 0.0,
+                                 "dummy_feed8": 12.2, "dummy_feed9": 9.9, "dummy_feed10": 400.0}},
                  "pen1":
                      {"pen_id": 1,
                       "cow_type_to_id_map": {'Calf': [], 'HeiferI': [105602, 106140, 111756, 111796, 113310, 116100],
@@ -635,14 +637,14 @@ def pens_test_data_dict() -> List[dict[Any]]:
         {
             "pen_data":
                 {"pen0":
-                    {"pen_id": 0,
-                     "cow_type_to_id_map": {
+                     {"pen_id": 0,
+                      "cow_type_to_id_map": {
                           'Calf': [115259, 138228, 142905, 144752, 156434, 157064, 164638, 167179, 168371, 192382],
                           'HeiferI': [], 'HeiferII': [], 'HeiferIII': [], 'Dry_Cow': [], 'Lac_Cow': []},
-                     "pen_animal_combination": Pen.AnimalCombination.CALF,
-                     "post_removal_stocking_density": 0.20, "num_stalls": 50,
-                     "ration": {"dummy_feed1": 200.0, "dummy_feed2": 0.0, "dummy_feed3": 8.5,
-                                "dummy_feed4": 98.0, "dummy_feed5": 3.5}},
+                      "pen_animal_combination": Pen.AnimalCombination.CALF,
+                      "post_removal_stocking_density": 0.20, "num_stalls": 50,
+                      "ration": {"dummy_feed1": 200.0, "dummy_feed2": 0.0, "dummy_feed3": 8.5,
+                                 "dummy_feed4": 98.0, "dummy_feed5": 3.5}},
                  "pen1":
                      {"pen_id": 1,
                       "cow_type_to_id_map": {'Calf': [], 'HeiferI': [112121, 117953, 138864, 144952],

@@ -79,8 +79,7 @@ def calc_requirements(calf, feed, temp, wean_day, wean_length, milk_type):
     # [A.1B.D.1]
     dm_intake = whole_milk_intake + milk_replacer_intake + starter_intake
     # [A.1B.C.4]
-    me_intake = whole_milk_me * whole_milk_intake + milk_replacer_me * \
-                milk_replacer_intake + starter_me * starter_intake
+    me_intake = whole_milk_me * whole_milk_intake + milk_replacer_me * milk_replacer_intake + starter_me * starter_intake
     # [A.1B.E.1]
     cp_intake = 0.01 * (whole_milk_cp * whole_milk_intake + milk_replacer_cp *
                         milk_replacer_intake + starter_cp * starter_intake)
@@ -141,7 +140,7 @@ def calc_requirements(calf, feed, temp, wean_day, wean_length, milk_type):
 
     # [A.1B.H.3]
     if ne_gain >= 0:
-        energy_allow_gain = math.exp(0.833 * math.log((1.19 * ne_gain)/(0.69 * calf.body_weight ** 0.355)))
+        energy_allow_gain = math.exp(0.833 * math.log((1.19 * ne_gain) / (0.69 * calf.body_weight ** 0.355)))
     else:
         energy_allow_gain = 0
 

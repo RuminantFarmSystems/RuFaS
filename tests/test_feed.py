@@ -171,11 +171,6 @@ def test_update_CP():
     pass
 
 
-def test_update_all():
-    """Unit test for function update_all in file routines/feed/protein_degradation.py"""
-    pass
-
-
 def test_degrade_protein():
     """Unit test for function degrade_protein in file routines/feed/protein_degradation.py"""
     pass

@@ -21,12 +21,11 @@ from ..animal.pen import Pen
 from RUFAS.output_manager import OutputManager
 from typing import Dict, List, Union, Any
 from RUFAS.input_manager import InputManager
+from RUFAS.routines.animal.ration.user_defined_ration import \
+    UserDefinedRationManager as UserDefinedRationManager
 
 im = InputManager()
 om = OutputManager()
-
-from RUFAS.routines.animal.ration.user_defined_ration import \
-    UserDefinedRationManager as UserDefinedRationManager
 
 udrm = UserDefinedRationManager()
 
@@ -715,8 +714,7 @@ class Feed:
                         ) * 100
                         storage.inclusion_rate_est[animal] = \
                             (storage.inclusion_pct[animal] / 100) * storage.animal_avg_BW[animal]
-                        storage.req_inv[animal] = storage.inclusion_rate_est[animal] \
-                                                  * storage.cow_days[animal]
+                        storage.req_inv[animal] = storage.inclusion_rate_est[animal] * storage.cow_days[animal]
                     tot_req_inv_non_lactating_cows = 0
 
                     for animal in storage.req_inv:

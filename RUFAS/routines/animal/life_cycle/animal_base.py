@@ -140,8 +140,7 @@ class AnimalBase:
             self.dP_reserves = 0
 
         # amount of P in the animal (A.1G.A.3)
-        self.p_animal = self.p_animal + self.p_gest + self.p_growth + \
-                        (self.dP_reserves - dP_reserves_prev)
+        self.p_animal = self.p_animal + self.p_gest + self.p_growth + (self.dP_reserves - dP_reserves_prev)
 
     def calc_base_manure(self):
         """
