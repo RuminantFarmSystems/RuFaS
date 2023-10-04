@@ -1601,7 +1601,7 @@ class AnimalRequirements:
             if days_born and days_born > 365:
                 value_to_use = 0.1128
             else:
-                value_to_use = 0.08  # TODO get real value
+                value_to_use = 0.0869
             dry_matter_intake_estimate = (
                 body_weight**0.75
                 * (0.2435 * net_energy_diet_concentration - 0.0466 * net_energy_diet_concentration**2 - value_to_use)
