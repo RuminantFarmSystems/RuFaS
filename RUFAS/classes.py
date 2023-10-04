@@ -205,7 +205,7 @@ class Weather:
         else:
             days_to_start = w_day_offset + start_day
             temp_year = w_start_year + 1
-            while temp_year < start_year:
+            while temp_year != start_year:
                 if is_leap_year(temp_year):
                     days_to_start += leap_year_length
                 else:

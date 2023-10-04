@@ -99,8 +99,8 @@ def mock_pens() -> List[MagicMock]:
 
 @pytest.fixture
 def mock_pen_data() -> Dict[str, Dict[str, Union[str, float, int]]]:
-    return {
-        "pen0": {
+    return [
+        {
             "id": 0,
             "pen_name": "",
             "animal_combination": "CALF",
@@ -112,7 +112,7 @@ def mock_pen_data() -> Dict[str, Dict[str, Union[str, float, int]]]:
             "max_stocking_density": 1.2,
             "manure_management_scenario_id": 0
         },
-        "pen1": {
+        {
             "id": 1,
             "pen_name": "",
             "animal_combination": "GROWING",
@@ -124,7 +124,7 @@ def mock_pen_data() -> Dict[str, Dict[str, Union[str, float, int]]]:
             "max_stocking_density": 1.2,
             "manure_management_scenario_id": 1
         },
-        "pen2": {
+        {
             "id": 2,
             "pen_name": "",
             "animal_combination": "CLOSE_UP",
@@ -136,7 +136,7 @@ def mock_pen_data() -> Dict[str, Dict[str, Union[str, float, int]]]:
             "max_stocking_density": 1.2,
             "manure_management_scenario_id": 2
         },
-        "pen3": {
+        {
             "id": 3,
             "pen_name": "",
             "animal_combination": "LAC_COW",
@@ -148,7 +148,7 @@ def mock_pen_data() -> Dict[str, Dict[str, Union[str, float, int]]]:
             "max_stocking_density": 1.2,
             "manure_management_scenario_id": 3
         }
-    }
+    ]
 
 
 @pytest.fixture()
