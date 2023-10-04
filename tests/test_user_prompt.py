@@ -21,16 +21,30 @@ file_path = os.path.join(dir_path, "input/ARL.json")
 
 
 @pytest.mark.parametrize(
-    "make_graphs, verbose, clear_output, exclude_info_maps",
+    "make_graphs, verbose, clear_output, exclude_info_maps, early_termination, terminate_after_validation",
     [
-        (True, True, True, True),
-        (False, True, True, True),
-        (True, False, True, True),
-        (False, False, True, True),
-        (False, False, False, True),
-        (False, False, True, False),
-        (False, False, False, False),
-        (True, True, False, False),
+        (True, True, True, True, True, True),
+        (False, True, True, True, True, True),
+        (True, False, True, True, True, True),
+        (True, True, False, True, True, True),
+        (True, True, True, False, True, True),
+        (True, True, True, True, False, True),
+        (True, True, True, True, True, False),
+        (False, False, True, True, True, True),
+        (False, True, False, True, True, True),
+        (False, True, True, False, True, True),
+        (False, True, True, True, False, True),
+        (False, True, True, True, True, False),
+        (False, False, False, True, True, True),
+        (False, False, True, False, True, True),
+        (False, False, True, True, False, True),
+        (False, False, True, True, True, False),
+        (False, False, False, False, True, True),
+        (False, False, False, True, False, True),
+        (False, False, False, True, True, False),
+        (False, False, False, False, False, True),
+        (False, False, False, False, True, False),
+        (False, False, False, False, False, False)
     ],
 )
 def test_run_rufas(
@@ -38,6 +52,8 @@ def test_run_rufas(
     verbose: bool,
     clear_output: bool,
     exclude_info_maps: bool,
+    early_termination: bool,
+    terminate_after_validation: bool,
     mocker: MockerFixture,
 ) -> None:
     """Checks that run_rufas() calls the correct functions in the correct order"""
@@ -50,12 +66,12 @@ def test_run_rufas(
     patch_empty_dir = mocker.patch("RUFAS.util.Utility.empty_dir")
 
     # Act
-    run_rufas(make_graphs, verbose, clear_output, exclude_info_maps)
+    run_rufas(make_graphs, verbose, clear_output, exclude_info_maps, early_termination, terminate_after_validation)
 
     # Assert
     patch_set_global_variables.assert_called_once_with(make_graphs, verbose)
     patch_execute_simulations.assert_called_once_with(
-        metadata_file_list, exclude_info_maps
+        metadata_file_list, exclude_info_maps, early_termination, terminate_after_validation
     )
     if clear_output:
         patch_empty_dir.assert_called_once()
@@ -85,10 +101,13 @@ def test_set_global_variables(make_graphs: bool, verbose: bool) -> None:
 
 
 @pytest.mark.parametrize(
-        "is_data_valid, simulate_call_count, add_error_call_count",
-        [(True, 2, 0), (False, 0, 2)]
+        "is_data_valid, terminate_after_validation, simulate_call_count, add_error_call_count",
+        [(True, True, 0, 0),
+         (False, True, 0, 0),
+         (True, False, 2, 0),
+         (False, False, 0, 2)]
 )
-def test_execute_simulations(mocker: MockerFixture, is_data_valid: bool,
+def test_execute_simulations(mocker: MockerFixture, is_data_valid: bool, terminate_after_validation: bool,
                              simulate_call_count: int, add_error_call_count: int) -> None:
     """Checks that execute_simulations() calls the correct functions in the correct order"""
     # Arrange
@@ -109,7 +128,7 @@ def test_execute_simulations(mocker: MockerFixture, is_data_valid: bool,
     mocker.patch("main.SimulationEngine", return_value=mock_simulator)
 
     # Act
-    execute_simulations(metadata_file_list, True)
+    execute_simulations(metadata_file_list, True, True, terminate_after_validation)
 
     # Assert
     assert mock_simulator.simulate.call_count == simulate_call_count
@@ -140,7 +159,7 @@ def test_parse_gnu_args(mocker: MockerFixture) -> None:
     actual_args = parse_gnu_args()
 
     # Assert
-    assert mock_add_argument.call_count == 4
+    assert mock_add_argument.call_count == 6
     assert mock_add_argument.call_args_list == [
         mocker.call(
             "-ng",
@@ -166,6 +185,18 @@ def test_parse_gnu_args(mocker: MockerFixture) -> None:
             help="Exclude info_maps from the output",
             action="store_true",
         ),
+        mocker.call(
+            "-et",
+            "--early_termination",
+            help="Terminate data validation if invalid critical data found",
+            action="store_false",
+        ),
+        mocker.call(
+            "-tav",
+            "--terminate-after-validation",
+            help="Terminate simulation after data validation",
+            action="store_true",
+        )
     ]
     mock_parse_args.assert_called_once()
     assert actual_args == "test_args"

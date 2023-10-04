@@ -23,7 +23,9 @@ def run_rufas(
     make_graphs: bool = True,
     verbose: bool = True,
     clear_output: bool = False,
-    exclude_info_maps: bool = True,
+    exclude_info_maps: bool = False,
+    early_termination: bool = True,
+    terminate_after_validation: bool = False,
 ) -> None:
     """Main function to run RuFaS, with options.
 
@@ -42,7 +44,7 @@ def run_rufas(
     if verbose:
         print("RuFaS: Ruminant Farm Systems Model 2023")
     metadata_file_list = METADATA_PATHS
-    execute_simulations(metadata_file_list, exclude_info_maps)
+    execute_simulations(metadata_file_list, exclude_info_maps, early_termination, terminate_after_validation)
 
 
 def set_global_variables(make_graphs: bool, verbose: bool) -> None:
@@ -54,7 +56,8 @@ def set_global_variables(make_graphs: bool, verbose: bool) -> None:
 
 
 def execute_simulations(
-    metadata_files: List[Path], exclude_info_maps: bool = True
+    metadata_files: List[Path], exclude_info_maps: bool = False, early_termination: bool = True,
+    terminate_after_validation: bool = False,
 ) -> None:
     """Instantiates I/O Managers and processes the metadata files provided by the user to run the simulation.
 
@@ -75,7 +78,14 @@ def execute_simulations(
     for metadata_file_path in metadata_file_list:
         input_manager.flush_pool()
         output_manager.flush_pools()
-        is_data_valid = input_manager.start_data_processing(str(metadata_file_path), True)
+        is_data_valid = input_manager.start_data_processing(str(metadata_file_path), early_termination)
+        if terminate_after_validation:
+            output_manager.add_log("Terminate after validation data validity check",
+                                   f"{str(metadata_file_path)} data validity is: {is_data_valid}",
+                                   info_map)
+            output_manager.save_variables(r"output", r"output/output_filters/", exclude_info_maps)
+            output_manager.dump_all_nondata_pools(r"output", exclude_info_maps)
+            continue
         if is_data_valid:
             simulator = SimulationEngine()
             simulator.simulate()
@@ -113,6 +123,18 @@ def parse_gnu_args():
         help="Exclude info_maps from the output",
         action="store_true",
     )
+    parser.add_argument(
+        "-et",
+        "--early_termination",
+        help="Terminate data validation if invalid critical data found",
+        action="store_false",
+    )
+    parser.add_argument(
+        "-tav",
+        "--terminate-after-validation",
+        help="Terminate simulation after data validation",
+        action="store_true",
+    )
     return parser.parse_args()
 
 
@@ -123,4 +145,6 @@ if __name__ == "__main__":
         verbose=cmd_arguments.verbose,
         clear_output=cmd_arguments.clear_output,
         exclude_info_maps=cmd_arguments.exclude_info_maps,
+        early_termination=cmd_arguments.early_termination,
+        terminate_after_validation=cmd_arguments.terminate_after_validation,
     )
