@@ -398,13 +398,15 @@ class SoilData:
         Returns
         -------
         float
-            The soil water factor (unitless)
+            The soil water factor, in the range [0.0, 1.0] (unitless).
 
         References
         ----------
         SWAT Theoretical documentation eqn. 5:2.3.18
         """
-        return self.profile_soil_water_content / (0.85 * self.profile_field_capacity)
+        unclamped_water_factor = self.profile_soil_water_content / (0.85 * self.profile_field_capacity)
+        clamped_water_factor = min(1.0, max(0.0, unclamped_water_factor))
+        return clamped_water_factor
 
     # TODO: implement method that validates all the values inside the SoilData object, including
     #   - soil layers all have top depths above bottom depths, top depth of top layer is 0, none of the layers are
