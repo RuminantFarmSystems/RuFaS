@@ -4,7 +4,7 @@
     216
   ],
   "growing_feeds": [
-    87,
+    89,
     104,
     231
   ],
@@ -39,7 +39,7 @@
       "purchased_feed_cost": 0.01
     },
     {
-      "purchased_feed": 87,
+      "purchased_feed": 89,
       "purchased_feed_cost": 0.001
     },
     {
@@ -119,7 +119,7 @@
     ],
     "growing": [
       {
-        "feed_type": 87,
+        "feed_type": 89,
         "ration_percentage": 47
       },
       {
