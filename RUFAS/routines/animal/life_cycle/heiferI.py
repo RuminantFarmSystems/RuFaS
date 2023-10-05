@@ -2,9 +2,9 @@
 RUFAS: Ruminant Farm Systems Model
 File name: heiferI.py
 Author(s): Manfei Li, mli497@wisc.edu
-			Militsa Sotirova, militsasotirova@gmail.com
+    Militsa Sotirova, militsasotirova@gmail.com
 Description: This file updates the heifer form wean to start breeding.
-			Body weight gain with user input heifer average daily gain.
+    Body weight gain with user input heifer average daily gain.
 
 """
 ###############################################################################
@@ -12,8 +12,7 @@ Description: This file updates the heifer form wean to start breeding.
 from RUFAS.output_manager import OutputManager
 from RUFAS.routines.animal.life_cycle.calf import Calf
 from RUFAS.routines.animal.life_cycle.animal_base import AnimalBase
-from RUFAS.routines.animal.manure.growing_heifer_manure_excretion import \
-    manure_calculations
+from RUFAS.routines.animal.manure.growing_heifer_manure_excretion import manure_calculations
 from RUFAS.routines.animal.ration.animal_requirements import AnimalRequirements
 from RUFAS.routines.animal.life_cycle import animal_constants as const
 
@@ -23,19 +22,20 @@ om = OutputManager()
 class HeiferI(Calf):
     def __init__(self, args):
         """
-        Description:
-                initialize the 1st heifer group from calf information
-        Input:
-                args.id: id of the animal
-                args.breed: breed of the animal
-                args.birth_date: the date of the simulation when the calf was born
-                args.daysBorn: age of the animal
-                (optional: include the following to assign animal information)
-                args.birth_weight: the birth weight of the animal
-                args.body_weight: current body weight of the animal
-                args.wean_weight: the wean weight of the animal
-                args.mature_body_weight: the mature body weight of the animal
-                args.events: events of the animal
+        initialize the 1st heifer group from calf information
+
+        Parameters
+        ----------
+        args.id: id of the animal
+        args.breed: breed of the animal
+        args.birth_date: the date of the simulation when the calf was born
+        args.daysBorn: age of the animal
+        (optional: include the following to assign animal information)
+        args.birth_weight: the birth weight of the animal
+        args.body_weight: current body weight of the animal
+        args.wean_weight: the wean weight of the animal
+        args.mature_body_weight: the mature body weight of the animal
+        args.events: events of the animal
         """
         super().__init__(args)
 
@@ -50,22 +50,24 @@ class HeiferI(Calf):
         Calculates this heiferI's nutrient requirements.
         """
         req = AnimalRequirements()
-        animal_requirements = req.calc_rqmts(body_weight=self.body_weight,
-                         mature_body_weight=self.mature_body_weight,
-                         day_of_pregnancy=None,
-                         animal_type=animal_grouping_scenario.get_animal_type(self),
-                         body_condition_score_5=3,
-                         previous_temperature=temp,
-                         average_daily_gain_heifer=self.daily_growth)
+        animal_requirements = req.calc_rqmts(
+            body_weight=self.body_weight,
+            mature_body_weight=self.mature_body_weight,
+            day_of_pregnancy=None,
+            animal_type=animal_grouping_scenario.get_animal_type(self),
+            body_condition_score_5=3,
+            previous_temperature=temp,
+            average_daily_gain_heifer=self.daily_growth,
+        )
 
-        self.NEmaint = animal_requirements['NEmaint']
-        self.NEg = animal_requirements['NEg']
-        self.NEpreg = animal_requirements['NEpreg']
-        self.NEl = animal_requirements['NEl']
-        self.MP_req = animal_requirements['MP_req']
-        self.Ca_req = animal_requirements['Ca_req']
-        self.P_req = animal_requirements['P_req']
-        self.DMIest = animal_requirements['DMIest']
+        self.NEmaint_requirement = animal_requirements["NEmaint_requirement"]
+        self.NEg_requirement = animal_requirements["NEg_requirement"]
+        self.NEpreg_requirement = animal_requirements["NEpreg_requirement"]
+        self.NEl_requirement = animal_requirements["NEl_requirement"]
+        self.MP_requirement = animal_requirements["MP_requirement"]
+        self.Ca_requirement = animal_requirements["Ca_requirement"]
+        self.P_requirement = animal_requirements["P_requirement"]
+        self.DMIest_requirement = animal_requirements["DMIest_requirement"]
 
     def calc_manure_excretion(self, feed, methane_model):
         """
@@ -76,16 +78,16 @@ class HeiferI(Calf):
                 methane_model: methane model used for methane emission calculations
         """
         p_urine, p_feces_excrt = self.calc_base_manure()
-        self.p_excrt, self.manure_excretion = \
-            manure_calculations(self.ration_formulation, feed,
-                                self.body_weight, p_feces_excrt, p_urine, methane_model)
+        self.p_excrt, self.manure_excretion = manure_calculations(
+            self.ration_formulation, feed, self.body_weight, p_feces_excrt, p_urine, methane_model
+        )
 
     def phosphorus_rqmts(self, DMI):
         """
         Calculates and sets the animal's phosphorus requirement.
 
         Args:
-                DMI: the Dry Matter Intake (kg)
+            DMI: the Dry Matter Intake (kg)
         """
         # amount of P required for endogenous losses (g) (A.1A-D.E.1)
         self.p_maint_feces = 0.0008 * DMI * 1000
@@ -94,10 +96,12 @@ class HeiferI(Calf):
         p_urine = 0.000002 * self.body_weight * 1000
 
         # absorbed P retained for growth (g) (A.1A-F.E.3)
-        self.p_growth = \
-            (0.0012 + 0.004635 * (self.mature_body_weight ** 0.22) *
-             (self.body_weight ** (-0.22))) * \
-            self.daily_growth / 0.96 * 1000
+        self.p_growth = (
+            (0.0012 + 0.004635 * (self.mature_body_weight**0.22) * (self.body_weight ** (-0.22)))
+            * self.daily_growth
+            / 0.96
+            * 1000
+        )
 
         # absorbed P required by the animal (g) (A.1A-F.E.6)
         p_absorb = p_urine + self.p_maint_feces + self.p_growth
@@ -113,12 +117,10 @@ class HeiferI(Calf):
 
         Returns: the daily body weight change for a heifer that is not pregnant
         """
-        divisor = abs(
-            AnimalBase.config['target_heifer_preg_day'] - self.days_born)
+        divisor = abs(AnimalBase.config["target_heifer_preg_day"] - self.days_born)
         if divisor == 0:
             divisor = 1
-        return (0.55 * 0.96 * self.mature_body_weight -
-                0.96 * self.body_weight) / divisor
+        return (0.55 * 0.96 * self.mature_body_weight - 0.96 * self.body_weight) / divisor
 
     def update(self, sim_day):
         """
@@ -128,7 +130,10 @@ class HeiferI(Calf):
         Once reach the breeding start day,
         this heifer would be move to next stage, the heiferII stage
 
-        Returns: the second stage of heifer -- breeding stage starts
+        Returns
+        -------
+
+        the second stage of heifer -- breeding stage starts
         """
 
         self.update_body_weight_history(sim_day)
@@ -139,10 +144,9 @@ class HeiferI(Calf):
         self.body_weight += self.daily_growth
 
         self.days_born += 1
-        if self.days_born == AnimalBase.config['breeding_start_day_h']:
+        if self.days_born == AnimalBase.config["breeding_start_day_h"]:
             second_stage = True
-            self.events.add_event(self.days_born, sim_day,
-                                  const.BREEDING_START)
+            self.events.add_event(self.days_born, sim_day, const.BREEDING_START)
             self.days_born -= 1  # will increment in next stage again
 
         return second_stage
