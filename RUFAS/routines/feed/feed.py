@@ -365,7 +365,7 @@ class Feed:
             self.CP_leachate_percent = 0.0
             self.NPN_min_percent = 0.0
 
-        def calibrate_storage(self, crop):
+        def calibrate_storage(self, crop):  # noqa
             """
             Description:
                 Calibrates the feed storage loss model to the crop being stored in the receptacle.
@@ -649,7 +649,7 @@ class Feed:
         storage.animal_avg_BW = avg_BW
 
     @staticmethod
-    def forage_inventory_plan(storage):
+    def forage_inventory_plan(storage):  # noqa
         """
         Description:
             Assess farm grown forage stocks and plan maximum intake of each
@@ -788,7 +788,7 @@ class Feed:
                     storage.DMI_forage_max['lactating_cows'] = available_forage \
                                                                / storage.cow_days['lactating_cows']
 
-    def daily_feed_storage(self, fields):
+    def daily_feed_storage(self, fields):  # noqa
         """
         Description:
             Executes daily routines relating to crop and feed storage, which
@@ -864,7 +864,7 @@ class Feed:
 
             self.summarize_feed_storage()
 
-    def daily_feed_management(self, animal_manager):
+    def daily_feed_management(self, animal_manager):  # noqa
         """
         Description:
             Executes daily routines relating to feed management, specifically a
@@ -1190,12 +1190,12 @@ class Feed:
         return nutrient_vals
 
     def get_calf_feeds(self):
-        feed_ids = [155, 156, 157]
+        feed_ids = [202, 203, 216]
         columns = ['rufas_id', 'DM', 'CP', 'EE', 'DE_Base']
         nutrients = retrieve_data(data_source=self.nutrient_table, var_names=columns,
                                   identifier='rufas_id', desired_rows=feed_ids)
 
-        calf_feeds = {}     # missing 157
+        calf_feeds = {}
         for feed_id in feed_ids:
             feed_id_nutrient = next(nutrient for nutrient in nutrients if nutrient['rufas_id'] == feed_id)
             calf_feeds[feed_id] = {key: feed_id_nutrient[key]

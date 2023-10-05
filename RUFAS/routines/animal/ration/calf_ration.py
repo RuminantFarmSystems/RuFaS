@@ -3,7 +3,7 @@ import math
 
 
 def get_ration():
-    return {'155': 1, '157': 2, 'status': 'Optimal', 'objective': 4.5}
+    return {'202': 1, '216': 2, 'status': 'Optimal', 'objective': 4.5}
 
 
 def optimize():
@@ -23,9 +23,9 @@ def calc_requirements(calf, feed, temp, wean_day, wean_length, milk_type):
         milk_type: either "whole" or "replacer"
     """
     # nutrient composition of feeds from the feed library
-    whole_milk_id = 155
-    milk_replacer_id = 156
-    starter_id = 157
+    whole_milk_id = 202
+    milk_replacer_id = 203
+    starter_id = 216
     calf_feeds = feed.calf_feeds
 
     whole_milk_dm = calf_feeds[whole_milk_id]['DM']
@@ -79,7 +79,8 @@ def calc_requirements(calf, feed, temp, wean_day, wean_length, milk_type):
     # [A.1B.D.1]
     dm_intake = whole_milk_intake + milk_replacer_intake + starter_intake
     # [A.1B.C.4]
-    me_intake = whole_milk_me * whole_milk_intake + milk_replacer_me * milk_replacer_intake + starter_me * starter_intake
+    me_intake = whole_milk_me * whole_milk_intake + milk_replacer_me * milk_replacer_intake + starter_me\
+        * starter_intake
     # [A.1B.E.1]
     cp_intake = 0.01 * (whole_milk_cp * whole_milk_intake + milk_replacer_cp *
                         milk_replacer_intake + starter_cp * starter_intake)

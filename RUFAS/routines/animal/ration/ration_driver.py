@@ -346,7 +346,7 @@ class RationReporter:
                     nutrient_amount['as_fed'] += val * (available_feeds[key][nutr] / 100)
                 elif nutr == 'N':
                     # [A.2.A.2]
-                    if key[:3] in ['121', '122', '155', '157']:
+                    if key[:3] in ['172', '181', '202', '216']:
                         denom = 6.38
                     # [A.2.A.1]
                     else:
