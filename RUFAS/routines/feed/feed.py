@@ -1026,11 +1026,7 @@ class Feed:
 
         purchased_feed_ids: List[int] = []
         for entry in entry_list:
-            if entry in self.entries_split_by_maturity:
-                # making the assumption that purchased feeds are at mid-maturity
-                purchased_feed_ids.append(entry + 2)
-            else:
-                purchased_feed_ids.append(entry)
+            purchased_feed_ids.append(entry)
         return purchased_feed_ids
 
     def get_quality_specific_feed_costs(self, input_feed_ids: List[int]) -> Dict[str, float]:
