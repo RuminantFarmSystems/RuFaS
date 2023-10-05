@@ -119,8 +119,6 @@
       "type": "json",
       "properties": "field_properties"
     },
-<<<<<<< HEAD:input/barnyard_metadata.json
-=======
     "field_2": {
       "title": "Field specification",
       "description": "Contains overall field properties and references to specification files.",
@@ -128,7 +126,6 @@
       "type": "json",
       "properties": "field_properties"
     },
->>>>>>> master:input/metadata/barnyard_metadata.json
     "weather": {
       "title": "Weather data",
       "description": "Let's turn on the AC",
