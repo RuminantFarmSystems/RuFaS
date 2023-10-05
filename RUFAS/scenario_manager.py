@@ -19,11 +19,10 @@ Multiple simulations:
     extra input from the user and will use the ARL_metadata.json file
 """
 
-METADATA_PATHS = ['input/metadata/swat_metadata.json',
-                  'input/metadata/multi_crop_metadata.json',
-                  'input/metadata/testing_metadata.json']
+METADATA_PATHS = ['input/metadata/swat_metadata.json']
 
 # default_metadata
+# swat_metadata
 # barnyard_metadata
 # ARL_metadata
 # user_defined_ration_md
