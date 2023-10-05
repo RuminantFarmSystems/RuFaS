@@ -6,8 +6,8 @@
 
     "calf_feeds": [202, 216],
     "growing_feeds": [89, 104, 231],
-    "close_up_feeds": [2, 43, 91,  167, 231, 234],
-    "lac_cow_feeds": [43, 51, 81, 121, 167, 231, 234],
+    "close_up_feeds": [2, 43, 91, 167, 231, 234],
+    "lac_cow_feeds": [43, 51, 104, 121, 167, 231, 234],
 
     "purchased_feeds": [
         {"purchased_feed": 2, "purchased_feed_cost": 0.17},
