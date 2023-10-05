@@ -9,10 +9,12 @@ from typing import Any, Dict
 from unittest.mock import patch
 from mock import MagicMock
 from pytest_mock import MockerFixture
+from pytest_lazyfixture import lazy_fixture
 from RUFAS.routines.animal.life_cycle.cow import Cow
 from RUFAS.routines.animal.animal_types import AnimalType
 import pytest
 from unittest.mock import MagicMock
+from copy import deepcopy
 
 import numpy as np
 import pytest
@@ -148,6 +150,113 @@ def heifer_b() -> dict:
         'net_energy_diet_concentration': 1.0
     }
     return heifer_b_dict
+
+
+@pytest.fixture
+def mock_ration_config() -> MagicMock:
+    ration_config = MagicMock()
+    ration_config.price = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0]
+    ration_config.n = 6
+    ration_config.NEmaint = 1.0
+    ration_config.NEa = 2.0
+    ration_config.NEpreg = 3.0
+    ration_config.NEl = 4.0
+    ration_config.NEg = 5.0
+    ration_config.MP_req = 6.0
+    ration_config.C_req = 7.0
+    ration_config.P_req = 8.0
+    ration_config.TDN = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0]
+    ration_config.DE = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0]
+    ration_config.EE = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0]
+    ration_config.is_fat = [1, 1, 1, 0, 0, 0]
+    ration_config.BW = 9.0
+    ration_config.calcium = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0]
+    ration_config.phosphorus = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0]
+    ration_config.NDF = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0]
+    ration_config.type = ['Forage', 'Conc', 'Mineral', 'Forage', 'Conc', 'Mineral']
+    ration_config.is_wetforage = [1, 1, 1, 0, 0, 0]
+    ration_config.Kd = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0]
+    ration_config.N_A = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0]
+    ration_config.N_B = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0]
+    ration_config.CP = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0]
+    ration_config.dRUP = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0]
+    ration_config.limit = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0]
+    ration_config.lactating = True
+    ration_config.DMIest = 10.0
+
+    ration_config.NElact = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0]
+    ration_config.MEact = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0]
+    ration_config.NEgact = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0]
+    ration_config.NEm_act = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0]
+    ration_config.is_forage = [1, 1, 1, 0, 0, 0]
+    ration_config.MPbact = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0]
+    ration_config.RUP_diet = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0]
+    ration_config.dP = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0]
+    ration_config.TDNact = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0]
+
+    return ration_config
+
+
+@pytest.fixture
+def mock_random_ration_config() -> MagicMock:
+    ration_config = MagicMock()
+    ration_config.price = [2.615, 0.544, 3.847, 3.585, 2.881, 1.342]
+    ration_config.n = 6
+    ration_config.NEmaint = 1.423
+    ration_config.NEa = 3.849
+    ration_config.NEpreg = 2.223
+    ration_config.NEl = 0.505
+    ration_config.NEg = 3.375
+    ration_config.MP_req = 2.207
+    ration_config.C_req = 3.205
+    ration_config.P_req = 1.17
+    ration_config.TDN = [2.976, 0.19, 3.855, 4.415, 3.181, 4.065]
+    ration_config.DE = [1.374, 4.783, 2.642, 4.42, 2.522, 2.397]
+    ration_config.EE = [4.314, 4.227, 3.704, 4.897, 0.49, 1.59]
+    ration_config.is_fat = [0, 1, 1, 1, 1, 0]
+    ration_config.BW = 2.227
+    ration_config.calcium = [3.79, 4.242, 4.276, 0.676, 2.767, 0.907]
+    ration_config.phosphorus = [3.275, 4.759, 0.653, 1.942, 0.914, 3.964]
+    ration_config.NDF = [2.548, 2.382, 3.086, 4.709, 0.145, 3.554]
+    ration_config.type = ['Forage', 'Conc', 'Conc', 'Conc', 'Forage', 'Mineral']
+    ration_config.is_wetforage = [0, 1, 0, 0, 1, 1]
+    ration_config.Kd = [2.548, 2.382, 3.086, 4.709, 0.145, 3.554]
+    ration_config.N_A = [3.262, 2.552, 3.456, 2.377, 3.992, 4.561]
+    ration_config.N_B = [3.453, 0.098, 2.109, 1.191, 4.602, 1.85]
+    ration_config.CP = [3.489, 0.408, 4.415, 3.394, 2.497, 4.231]
+    ration_config.dRUP = [2.281, 2.537, 2.186, 3.58, 1.436, 1.876]
+    ration_config.limit = [1.211, 0.908, 2.13, 3.851, 0.277, 4.266]
+    ration_config.lactating = True
+    ration_config.DMIest = 1.17
+
+    ration_config.NElact = [4.433, 1.648, 3.986, 1.527, 4.815, 1.883]
+    ration_config.MEact = [0.709, 1.781, 0.724, 3.533, 3.033, 4.017]
+    ration_config.NEgact = [4.827, 0.161, 2.234, 2.955, 4.31, 3.584]
+    ration_config.NEm_act = [3.757, 0.391, 0.259, 1.066, 0.782, 2.24]
+    ration_config.is_forage = [3.053, 4.154, 2.636, 2.901, 2.095, 1.296]
+    ration_config.MPbact = [2.47, 0.411, 1.933, 4.501, 2.679, 4.123]
+    ration_config.RUP_diet = [1.124, 4.395, 4.673, 1.696, 1.469, 1.478]
+    ration_config.dP = [4.678, 2.127, 4.902, 2.609, 3.125, 0.662]
+    ration_config.TDNact = [3.249, 4.541, 0.663, 0.392, 1.745, 4.876]
+
+    return ration_config
+
+
+@pytest.fixture
+def mock_ration_config_with_empty_NElact(mock_ration_config) -> MagicMock:
+    mock_ration_config.NElact = np.empty(1)
+    return mock_ration_config
+
+
+@pytest.fixture
+def mock_ration_config_with_empty_NEgact(mock_ration_config) -> MagicMock:
+    mock_ration_config.NEgact = np.empty(1)
+    return mock_ration_config
+
+
+@pytest.fixture
+def decision_vector() -> list[float]:
+    return [1.0, 2.0, 3.0, 4.0, 5.0, 6.0]
 
 
 def test_calculate_NRC_energy_maintenance_requirements(cow_a: dict, cow_b: dict, heifer_a: dict,
@@ -1383,30 +1492,14 @@ def test_get_ration_vals():
     assert actual == expected
 
 
-def test_total_energy():
+@pytest.mark.parametrize("ration_config, expected", [(pytest.lazy_fixture('mock_ration_config'), 13.687246),
+                                                     (pytest.lazy_fixture('mock_random_ration_config'),
+                                                      27.327894)])
+def test_total_energy(ration_config, expected, decision_vector) -> None:
     """Unit test for function total_energy in file routines/animal/ration/ration_optimizer.py"""
     ration_optimizer = RationOptimizer()
-    x = [1.0, 2.0, 3.0, 4.0, 5.0]
-    ration_config = MagicMock()
-    ration_config.TDN = [6.0, 7.0, 8.0, 9.0, 10.0]
-    ration_config.BW = 6.0
-    ration_config.DE = [1.0, 2.0, 3.0, 4.0, 5.0]
-    ration_config.MEact = [6.0, 7.0, 8.0, 9.0, 10.0]
 
-    ration_config.type = ['Forage', 'Conc', 'Mineral', 'Forage', 'Conc', 'Mineral']
-    ration_config.is_fat = [1, 1, 1, 0, 0, 0]
-    ration_config.EE = [0, 1, 2, 3, 4, 5]
-
-    ration_config.NEm_act = [1.0, 2.0, 3.0, 4.0, 5.0]
-    ration_config.NEa = 1.0
-    ration_config.NEmaint = 2.0
-    ration_config.NEl = 3.0
-    ration_config.NEg = 4.0
-    ration_config.NEpreg = 5.0
-
-    expected = 15.459616873130141
-
-    actual = ration_optimizer.total_energy(x, ration_config)
+    actual = ration_optimizer.total_energy(decision_vector, ration_config)
 
     assert actual == pytest.approx(expected)
 
@@ -1428,156 +1521,94 @@ def test_attempt_optimization():
     pass
 
 
-def test_objective():
+@pytest.mark.parametrize("ration_config, expected", [(pytest.lazy_fixture('mock_ration_config'), 91.0),
+                                                     (pytest.lazy_fixture('mock_random_ration_config'),
+                                                      52.041)])
+def test_objective(ration_config, expected, decision_vector) -> None:
     """Unit test for function objective in file routines/animal/ration/ration_optimizer.py"""
     ration_optimizer = RationOptimizer()
-    x = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0]
-    ration_config = MagicMock()
-    ration_config.price = [7.0, 8.0, 9.0, 10.0, 11.0, 12.0]
 
-    expected = 217.0
+    actual = ration_optimizer.objective(decision_vector, ration_config)
 
-    actual = ration_optimizer.objective(x, ration_config)
-
-    assert actual == expected
+    assert actual == pytest.approx(expected)
 
 
-def test_NEmact_constraint():
+@pytest.mark.parametrize("ration_config, expected", [(pytest.lazy_fixture('mock_ration_config'), 88.0),
+                                                     (pytest.lazy_fixture('mock_random_ration_config'),
+                                                      21.658)])
+def test_NEmact_constraint(ration_config, expected, decision_vector) -> None:
     """Unit test for function NEmact_constraint in file routines/animal/ration/ration_optimizer.py"""
     ration_optimizer = RationOptimizer()
-    x = [1.0, 2.0, 3.0, 4.0, 5.0]
-    ration_config = MagicMock()
-    ration_config.TDN = [6.0, 7.0, 8.0, 9.0, 10.0]
-    ration_config.BW = 6.0
-    ration_config.DE = [1.0, 2.0, 3.0, 4.0, 5.0]
-    ration_config.MEact = [6.0, 7.0, 8.0, 9.0, 10.0]
 
-    ration_config.type = ['Forage', 'Conc', 'Mineral', 'Forage', 'Conc', 'Mineral']
-    ration_config.is_fat = [1, 1, 1, 0, 0, 0]
-    ration_config.EE = [0, 1, 2, 3, 4, 5]
+    actual = ration_optimizer.NEmact_constraint(decision_vector, ration_config)
 
-    ration_config.NEm_act = [1.0, 2.0, 3.0, 4.0, 5.0]
-    ration_config.NEa = 6.0
-    ration_config.NEmaint = 7.0
-
-    expected = 42.0
-
-    actual = ration_optimizer.NEmact_constraint(x, ration_config)
-
-    assert actual == expected
+    assert actual == pytest.approx(expected)
 
 
-def test_NEl_constraint():
+@pytest.mark.parametrize("ration_config, expected", [(pytest.lazy_fixture('mock_ration_config'), 84.0),
+                                                     (
+                                                             pytest.lazy_fixture(
+                                                                 'mock_ration_config_with_empty_NElact'), 14.0),
+                                                     (pytest.lazy_fixture('mock_random_ration_config'),
+                                                      58.44)])
+def test_NEl_constraint(ration_config, expected, decision_vector) -> None:
     """Unit test for function NEl_constraint in file routines/animal/ration/ration_optimizer.py"""
     ration_optimizer = RationOptimizer()
-    x = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0]
-    ration_config = MagicMock()
-    ration_config.type = ['Forage', 'Conc', 'Mineral', 'Forage', 'Conc', 'Mineral']
-    ration_config.is_fat = [1, 1, 1, 0, 0, 0]
-    ration_config.EE = [0, 1, 2, 3, 4, 5]
-    ration_config.MEact = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0]
-    ration_config.DEact = [7.0, 8.0, 9.0, 10.0, 11.0, 12.0]
-    ration_config.NEpreg = 7.0
-    ration_config.NEl = 8.0
 
-    ration_config.NElact = False
+    actual = ration_optimizer.NEl_constraint(decision_vector, ration_config)
 
-    expected = 30.547793814432993
-
-    actual = ration_optimizer.NEl_constraint(x, ration_config)
-
-    assert actual == expected
-
-    ration_config.NElact = True
-
-    expected = 6.0
-
-    actual = ration_optimizer.NEl_constraint(x, ration_config)
-
-    assert actual == expected
+    assert actual == pytest.approx(expected)
 
 
-def test_NEgact_constraint():
+@pytest.mark.parametrize("ration_config, expected", [(pytest.lazy_fixture('mock_ration_config'), 86.0),
+                                                     (
+                                                             pytest.lazy_fixture(
+                                                                 'mock_ration_config_with_empty_NEgact'), 16.0),
+                                                     (pytest.lazy_fixture('mock_random_ration_config'),
+                                                      63.349999999999994)])
+def test_NEgact_constraint(ration_config, expected, decision_vector) -> None:
     """Unit test for function NEgact_constraint in file routines/animal/ration/ration_optimizer.py"""
     ration_optimizer = RationOptimizer()
-    x = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0]
-    ration_config = MagicMock()
-    ration_config.type = ['Forage', 'Conc', 'Mineral', 'Forage', 'Conc', 'Mineral']
-    ration_config.is_fat = [1, 1, 1, 0, 0, 0]
-    ration_config.MEact = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0]
-    ration_config.NEg = 7.0
 
-    ration_config.NEgact = False
+    actual = ration_optimizer.NEgact_constraint(decision_vector, ration_config)
 
-    expected = 16.982200000000002
-
-    actual = ration_optimizer.NEgact_constraint(x, ration_config)
-
-    assert actual == expected
-
-    ration_config.NEgact = True
-
-    expected = 14.0
-
-    actual = ration_optimizer.NEgact_constraint(x, ration_config)
-
-    assert actual == expected
+    assert actual == pytest.approx(expected)
 
 
-def test_calcium_constraint():
+@pytest.mark.parametrize("ration_config, expected", [(pytest.lazy_fixture('mock_ration_config'), 0.6455),
+                                                     (pytest.lazy_fixture('mock_random_ration_config'),
+                                                      0.245464)])
+def test_calcium_constraint(ration_config, expected, decision_vector) -> None:
     """Unit test for function calcium_constraint in file routines/animal/ration/ration_optimizer.py"""
     ration_optimizer = RationOptimizer()
-    x = [1.0, 2.0, 3.0, 4.0, 5.0]
-    ration_config = MagicMock()
-    ration_config.type = ['Forage', 'Conc', 'Mineral', 'Forage', 'Conc']
-    ration_config.calcium = 6.0
-    ration_config.C_req = 7.0
 
-    expected = 0.506
-
-    actual = ration_optimizer.calcium_constraint(x, ration_config)
+    actual = ration_optimizer.calcium_constraint(decision_vector, ration_config)
 
     assert actual == expected
 
 
-def test_phosphorus_constraint():
+@pytest.mark.parametrize("ration_config, expected", [(pytest.lazy_fixture('mock_ration_config'), 0.6638),
+                                                     (pytest.lazy_fixture('mock_random_ration_config'),
+                                                      0.374025)])
+def test_phosphorus_constraint(ration_config, expected, decision_vector) -> None:
     """Unit test for function phosphorus_constraint in file routines/animal/ration/ration_optimizer.py"""
     ration_optimizer = RationOptimizer()
-    x = [1.0, 2.0, 3.0, 4.0, 5.0]
-    ration_config = MagicMock()
-    ration_config.type = ['Forage', 'Conc', 'Mineral', 'Forage', 'Conc']
-    ration_config.phosphorus = 6.0
-    ration_config.P_req = 7.0
 
-    expected = 0.6229999999999999
+    actual = ration_optimizer.phosphorus_constraint(decision_vector, ration_config)
 
-    actual = ration_optimizer.phosphorus_constraint(x, ration_config)
-
-    assert actual == expected
+    assert actual == pytest.approx(expected)
 
 
-def test_protein_constraint():
+@pytest.mark.parametrize("ration_config, expected", [(pytest.lazy_fixture('mock_ration_config'), 135.148700),
+                                                     (pytest.lazy_fixture('mock_random_ration_config'),
+                                                      113.147389)])
+def test_protein_constraint(ration_config, expected, decision_vector) -> None:
     """Unit test for function protein_constraint in file routines/animal/ration/ration_optimizer.py"""
     ration_optimizer = RationOptimizer()
-    x = [1.0, 2.0, 3.0, 4.0, 5.0]
-    ration_config = MagicMock()
-    ration_config.NDF = [1.0, 2.0, 3.0, 4.0, 5.0]
-    ration_config.type = ['Forage', 'Conc', 'Mineral', 'Forage', 'Conc']
-    ration_config.is_wetforage = [1, 1, 1, 0, 0]
-    ration_config.BW = 6.0
-    ration_config.Kd = [1.0, 2.0, 3.0, 4.0, 5.0]
-    ration_config.N_B = [1.0, 2.0, 3.0, 4.0, 5.0]
-    ration_config.CP = [1.0, 2.0, 3.0, 4.0, 5.0]
-    ration_config.N_A = [1.0, 2.0, 3.0, 4.0, 5.0]
-    ration_config.TDNact = [1.0, 2.0, 3.0, 4.0, 5.0]
-    ration_config.dRUP = [1.0, 2.0, 3.0, 4.0, 5.0]
-    ration_config.MP_req = 7.0
 
-    expected = 83.29181235589395
+    actual = ration_optimizer.protein_constraint(decision_vector, ration_config)
 
-    actual = ration_optimizer.protein_constraint(x, ration_config)
-
-    assert actual == expected
+    assert actual == pytest.approx(expected)
 
 
 def test_NDF_constraint_lower():
