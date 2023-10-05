@@ -68,18 +68,20 @@ def execute_simulations(
     info_map = {"class": "No caller class",
                 "function": execute_simulations.__name__,
                 }
-    sys.stdout.write("Simulating...\n")
     output_manager = OutputManager()
     input_manager = InputManager()
     metadata_file_list = metadata_files
     for metadata_file_path in metadata_file_list:
         input_manager.flush_pool()
         output_manager.flush_pools()
+        sys.stdout.write(f"Validating data for {str(metadata_file_path)}...\n")
         is_data_valid = input_manager.start_data_processing(str(metadata_file_path), True)
         if is_data_valid:
+            sys.stdout.write("Data is valid. \nSimulating...\n")
             simulator = SimulationEngine()
             simulator.simulate()
         else:
+            sys.stdout.write(f"Data not valid for {metadata_file_path}, simulation not run\n\n")
             output_manager.add_error("No simulation run",
                                      f"Data not valid for {metadata_file_path}, simulation not run", info_map)
         output_manager.save_variables(r"output", r"output/output_filters/", exclude_info_maps)
