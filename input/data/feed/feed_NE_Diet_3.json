@@ -85,14 +85,6 @@
     {
       "purchased_feed": 234,
       "purchased_feed_cost": 0.1
-    },
-    {
-      "purchased_feed": 155,
-      "purchased_feed_cost": 0.1
-    },
-    {
-      "purchased_feed": 157,
-      "purchased_feed_cost": 0.1
     }
   ],
   "farm_grown_feeds": [
