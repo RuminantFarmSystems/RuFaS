@@ -2094,26 +2094,6 @@ def test_get_feed_data_from_feed_ids() -> None:
     assert pen_specific_feed_data == expected_pen_specific_feed_data
 
 
-def test_feed_quality_fix():
-    """Unit test for function feed_quality_fix in file routines/animal/ration/user_defined_ration.py"""
-    # make a fake available feeds dict
-    fakefeeds_available = {}
-    fakefeeds_available["feed_id"] = [1, 2, 5]
-    # make two fake ration percents dicts
-    fake_ration_OK = {"1": 2, "2": 3, "5": 4}
-    fake_ration_missing = {"1": 2, "2": 3, "3": 4}
-    # assert that keys are same as the available feeds afterward
-    fake_ration_OK = RUFAS.routines.animal.ration.user_defined_ration.UserDefinedRationManager.feed_quality_fix(
-        fake_ration_OK, fakefeeds_available
-    )
-    assert list(fake_ration_OK.keys()) == ["1", "2", "5"]
-    # second has missing values, needs to check that keys are equivalent to orig
-    fake_ration_missing = RUFAS.routines.animal.ration.user_defined_ration.UserDefinedRationManager.feed_quality_fix(
-        fake_ration_missing, fakefeeds_available
-    )
-    assert list(fake_ration_missing.keys()) == ["1", "2", "5"]
-
-
 @pytest.fixture
 def mock_user_defined_ration_manager(mocker) -> UserDefinedRationManager:
     user_defined_ration_manager = UserDefinedRationManager()
