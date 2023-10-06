@@ -680,7 +680,8 @@ class GasEmissionsCalculator:
 
             :math:`E_{NH_3}` is the storage ammonia emission in kg :math:`NH_3`/day,
 
-            :math:`total\\_storage\\_area` is the total storage area in :math:`m^2`, calculated as :math:`num\\_animals \\times storage\\_area\\_per\\_animal`,
+            :math:`total\\_storage\\_area` is the total storage area in :math:`m^2`, calculated as
+            :math:`num\\_animals \\times storage\\_area\\_per\\_animal`,
 
             :math:`TAN` is the total ammoniacal nitrogen in manure in kg,
 
@@ -690,7 +691,8 @@ class GasEmissionsCalculator:
 
             :math:`r` is the resistance of :math:`NH_3` transport to the atmosphere in s/m,
 
-            :math:`M` is the manure mass excluding solids per area of exposed surface in kg/:math:`m^2`, calculated as :math:`(total\\_manure\\_mass - total\\_solids) / total\\_storage\\_area`,
+            :math:`M` is the manure mass excluding solids per area of exposed surface in kg/:math:`m^2`,
+            calculated as :math:`(total\\_manure\\_mass - total\\_solids) / total\\_storage\\_area`,
 
             :math:`Q` is the equilibrium coefficient for the :math:`NH_3` gas in the air (unitless).
 
