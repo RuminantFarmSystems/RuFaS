@@ -58,7 +58,11 @@ class Percolation:
                 percolated_water = self._percolate_between_layers(self.data.time_step, current_layer, layer_below)
                 current_layer.water_content -= percolated_water
                 current_layer.percolated_water = percolated_water
-                layer_below.water_content += percolated_water
+                if layer_number > 0:
+                    layer_above = self.data.soil_layers[layer_number - 1]
+                    current_layer.water_content += layer_above.percolated_water
+                if layer_number == deepest_layer:
+                    self.data.vadose_zone_layer.water_content += self.data.soil_layers[-1].percolated_water
             else:
                 current_layer.percolated_water = 0
 
