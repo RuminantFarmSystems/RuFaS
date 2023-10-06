@@ -1232,7 +1232,7 @@ class GasEmissionsCalculator:
         )
 
     @classmethod
-    def calc_ifsm_methane_emission(cls, manure_volatile_solids: float, ambient_barn_temp: float) -> float:
+    def ifsm_methane_emission(cls, manure_volatile_solids: float, ambient_barn_temp: float) -> float:
         """Calculates emission of methane for a day using an adaptation of the tier 2 approach
         of the IPCC(2006), given ambient barn temperature and a methane conversion factor for the manure
         management.
@@ -1380,7 +1380,7 @@ class GasEmissionsCalculator:
         return anaerobic_effect
 
     @classmethod
-    def calc_total_carbon_decomposition(
+    def total_carbon_decomposition(
             cls,
             manure_total_solids: float,
             bedding_total_mass: float,

@@ -119,9 +119,9 @@ class CompostBeddedPackBarn(BaseManureTreatment):
 
         total_solids = bedding_total_solids + manure_total_solids
         temperature_celsius = self._get_current_day_average_temperature_celsius()
-        methane_emission = GasEmissionsCalculator.calc_ifsm_methane_emission(
+        methane_emission = GasEmissionsCalculator.ifsm_methane_emission(
             manure_volatile_solids, temperature_celsius)
-        carbon_decomposition = GasEmissionsCalculator.calc_total_carbon_decomposition(
+        carbon_decomposition = GasEmissionsCalculator.total_carbon_decomposition(
             manure_total_solids=manure_total_solids,
             bedding_total_mass=bedding_total_solids,
             days_since_last_tillage=days_since_last_tillage,

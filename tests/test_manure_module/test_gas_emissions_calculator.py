@@ -92,7 +92,7 @@ def test_ifsm_methane_emission(mocker: MockerFixture) -> None:
     expected = (manure_volatile_solids * 0.24 * 0.67 * 1.0) / 100
 
     # Actual
-    actual = GasEmissionsCalculator._ifsm_methane_emission(
+    actual = GasEmissionsCalculator.ifsm_methane_emission(
         manure_volatile_solids, ambient_barn_temp
     )
 
