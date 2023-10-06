@@ -17,34 +17,34 @@ def test_default_initialization():
     ration_config = RationConfig()
 
     # Assert
-    assert ration_config.price == []
+    assert ration_config.price_list == []
     assert ration_config.n == 0
-    assert ration_config.NEmaint == 0
-    assert ration_config.NEa == 0
-    assert ration_config.NEpreg == 0
-    assert ration_config.NEl == 0
-    assert ration_config.NEg == 0
-    assert ration_config.MP_req == 0
-    assert ration_config.C_req == 0
-    assert ration_config.P_req == 0
-    assert ration_config.TDN == []
-    assert ration_config.DE == []
-    assert ration_config.EE == []
-    assert ration_config.is_fat == []
+    assert ration_config.NEmaint_requirement == 0
+    assert ration_config.NEa_requirement == 0
+    assert ration_config.NEpreg_requirement == 0
+    assert ration_config.NEl_requirement == 0
+    assert ration_config.NEg_requirement == 0
+    assert ration_config.MP_requirement == 0
+    assert ration_config.C_requirement == 0
+    assert ration_config.P_requirement == 0
+    assert ration_config.TDN_list == []
+    assert ration_config.DE_list == []
+    assert ration_config.EE_list == []
+    assert ration_config.is_fat_list == []
     assert ration_config.BW == approx(0)
-    assert ration_config.calcium == []
-    assert ration_config.phosphorus == []
-    assert ration_config.NDF == []
-    assert ration_config.type == []
-    assert ration_config.is_wetforage == []
-    assert ration_config.Kd == []
-    assert ration_config.N_A == []
-    assert ration_config.N_B == []
-    assert ration_config.CP == []
-    assert ration_config.dRUP == []
-    assert ration_config.limit == []
+    assert ration_config.calcium_list == []
+    assert ration_config.phosphorus_list == []
+    assert ration_config.NDF_list == []
+    assert ration_config.feed_type_list == []
+    assert ration_config.is_wetforage_list == []
+    assert ration_config.Kd_list == []
+    assert ration_config.N_A_list == []
+    assert ration_config.N_B_list == []
+    assert ration_config.CP_list == []
+    assert ration_config.dRUP_list == []
+    assert ration_config.feed_limit_list == []
     assert not ration_config.lactating
-    assert ration_config.DMIest is None
+    assert ration_config.DMIest_requirement is None
 
 
 @pytest.mark.parametrize(
@@ -84,61 +84,61 @@ def test_custom_initialization(price: list[float], NEmaint: float, NEa: float, N
 
     # Act
     ration_config = RationConfig(
-        price_=price,
-        NEmaint_=NEmaint,
-        NEa_=NEa,
-        NEpreg_=NEpreg,
-        NEl_=NEl,
-        NEg_=NEg,
-        MP_req_=MP_req,
-        C_req_=C_req,
-        P_req_=P_req,
-        TDN_=TDN,
-        DE_=DE,
-        EE_=EE,
-        is_fat_=is_fat,
+        price__list=price,
+        NEmaint__requirement=NEmaint,
+        NEa__requirement=NEa,
+        NEpreg__requirement=NEpreg,
+        NEl__requirement=NEl,
+        NEg__requirement=NEg,
+        MP__requirement=MP_req,
+        C__requirement=C_req,
+        P__requirement=P_req,
+        TDN__list=TDN,
+        DE__list=DE,
+        EE__list=EE,
+        is_fat__list=is_fat,
         BW_=BW,
-        calcium_=calcium,
-        phosphorus_=phosphorus,
-        NDF_=NDF,
-        type_=type_input,
-        is_wetforage_=is_wetforage,
-        Kd_=Kd,
-        N_A_=N_A,
-        N_B_=N_B,
-        CP_=CP,
-        dRUP_=dRUP,
-        limit_=limit,
+        calcium__list=calcium,
+        phosphorus__list=phosphorus,
+        NDF__list=NDF,
+        feed_type__list=type_input,
+        is_wetforage__list=is_wetforage,
+        Kd__list=Kd,
+        N_A__list=N_A,
+        N_B__list=N_B,
+        CP__list=CP,
+        dRUP__list=dRUP,
+        feed_limit__list=limit,
         lactating_=lactating,
-        DMIest_=DMIest,
+        DMIest__requirement=DMIest,
     )
 
     # Assert
-    assert ration_config.price == price
+    assert ration_config.price_list == price
     assert ration_config.n == len(price)
-    assert ration_config.NEmaint == NEmaint
-    assert ration_config.NEa == NEa
-    assert ration_config.NEpreg == NEpreg
-    assert ration_config.NEl == NEl
-    assert ration_config.NEg == NEg
-    assert ration_config.MP_req == MP_req
-    assert ration_config.C_req == C_req
-    assert ration_config.P_req == P_req
-    assert ration_config.TDN == TDN
-    assert ration_config.DE == DE
-    assert ration_config.EE == EE
-    assert ration_config.is_fat == is_fat
+    assert ration_config.NEmaint_requirement == NEmaint
+    assert ration_config.NEa_requirement == NEa
+    assert ration_config.NEpreg_requirement == NEpreg
+    assert ration_config.NEl_requirement == NEl
+    assert ration_config.NEg_requirement == NEg
+    assert ration_config.MP_requirement == MP_req
+    assert ration_config.C_requirement == C_req
+    assert ration_config.P_requirement == P_req
+    assert ration_config.TDN_list == TDN
+    assert ration_config.DE_list == DE
+    assert ration_config.EE_list == EE
+    assert ration_config.is_fat_list == is_fat
     assert ration_config.BW == approx(BW)
-    assert ration_config.calcium == calcium
-    assert ration_config.phosphorus == phosphorus
-    assert ration_config.NDF == NDF
-    assert ration_config.type == type_input
-    assert ration_config.is_wetforage == is_wetforage
-    assert ration_config.Kd == Kd
-    assert ration_config.N_A == N_A
-    assert ration_config.N_B == N_B
-    assert ration_config.CP == CP
-    assert ration_config.dRUP == dRUP
-    assert ration_config.limit == limit
+    assert ration_config.calcium_list == calcium
+    assert ration_config.phosphorus_list == phosphorus
+    assert ration_config.NDF_list == NDF
+    assert ration_config.feed_type_list == type_input
+    assert ration_config.is_wetforage_list == is_wetforage
+    assert ration_config.Kd_list == Kd
+    assert ration_config.N_A_list == N_A
+    assert ration_config.N_B_list == N_B
+    assert ration_config.CP_list == CP
+    assert ration_config.dRUP_list == dRUP
+    assert ration_config.feed_limit_list == limit
     assert ration_config.lactating == lactating
-    assert ration_config.DMIest == DMIest
+    assert ration_config.DMIest_requirement == DMIest

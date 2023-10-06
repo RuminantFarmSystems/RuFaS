@@ -97,6 +97,34 @@ def test_percolate_between_layers(time_step: float, excess_water_available: floa
             assert result == expected
 
 
+@pytest.mark.parametrize("can_percolate, expected_water_content", [
+    (True, [7.0, 20.0, 40.0, 3.0]),
+    (False, [10.0, 20.0, 40.0, 0])
+])
+def test_percolate_between_layers_correct(can_percolate: bool, expected_water_content: float) -> None:
+    layers = [LayerData(top_depth=0, bottom_depth=25, field_size=1.33),
+              LayerData(top_depth=25, bottom_depth=75, field_size=1.33),
+              LayerData(top_depth=75, bottom_depth=200, field_size=1.33)]
+
+    data = SoilData(field_size=1.33, soil_layers=layers)
+
+    mock_percolation = Percolation(soil_data=data)
+
+    has_seasonal_high_water_table = True
+    layers[0].water_content = 10
+    layers[1].water_content = 20
+    layers[2].water_content = 40
+
+    mock_percolation._determine_if_percolation_allowed = MagicMock(return_value=can_percolate)
+    mock_percolation._percolate_between_layers = MagicMock(return_value=3.0)
+    mock_percolation.percolate(has_seasonal_high_water_table)
+
+    assert mock_percolation.data.soil_layers[0].water_content == expected_water_content[0]
+    assert mock_percolation.data.soil_layers[1].water_content == expected_water_content[1]
+    assert mock_percolation.data.soil_layers[2].water_content == expected_water_content[2]
+    assert mock_percolation.data.vadose_zone_layer.water_content == expected_water_content[3]
+
+
 # --- Integration tests ----
 @pytest.mark.parametrize("can_percolate, expected", [
     (True, [4.7, 4.75, 21, 0.3]),
