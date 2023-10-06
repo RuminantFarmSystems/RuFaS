@@ -361,7 +361,8 @@ def test_manure_handler_daily_update(mocker: MockerFixture) -> None:
     )
     housing_carbon_dioxide_emission = 3.0
     patch_for_calc_housing_carbon_dioxide_emission = mocker.patch(
-        'RUFAS.routines.manure.manure_handlers.manure_handler_classes.GasEmissionsCalculator.housing_carbon_dioxide_emission',
+        'RUFAS.routines.manure.manure_handlers.manure_handler_classes.'
+        'GasEmissionsCalculator.housing_carbon_dioxide_emission',
         return_value=housing_carbon_dioxide_emission
     )
 
