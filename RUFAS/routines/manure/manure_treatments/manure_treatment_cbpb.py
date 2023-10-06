@@ -83,7 +83,8 @@ class CompostBeddedPackBarn(BaseManureTreatment):
             days_since_last_tillage: int = ManureConstants.DEFAULT_DAYS_SINCE_LAST_TILLAGE,
             lag: int = ManureConstants.DEFAULT_LAG_TIME,
             carbon_fraction_available_in_manure: float = ManureConstants.DEFAULT_CARBON_FRACTION_AVAILABLE_IN_MANURE,
-            carbon_fraction_available_in_bedding: float = GasEmissionConstants.DEFAULT_CARBON_FRACTION_AVAILABLE_IN_BEDDING
+            carbon_fraction_available_in_bedding: float = (
+                    GasEmissionConstants.DEFAULT_CARBON_FRACTION_AVAILABLE_IN_BEDDING)
     ) -> tuple[float, float, float]:
         """
         Calculate  the changes in dry-matter for the manure-bedding mixture.
@@ -158,16 +159,17 @@ class CompostBeddedPackBarn(BaseManureTreatment):
         manure_nitrogen = daily_input.liquid_manure_nitrogen - total_nitrogen_loss
         manure_organic_nitrogen = ManureConstants.COMPOST_BEDDING_ORGANIC_NITROGEN_FRACTION * manure_nitrogen
         manure_inorganic_nitrogen = manure_nitrogen - manure_organic_nitrogen
-        manure_inorganic_nitrogen_ammonium = ManureConstants.COMPOST_BEDDING_INORGANIC_NITROGEN_AMMONIUM_FRACTION * manure_inorganic_nitrogen
+        manure_inorganic_nitrogen_ammonium = (ManureConstants.COMPOST_BEDDING_INORGANIC_NITROGEN_AMMONIUM_FRACTION
+                                              * manure_inorganic_nitrogen)
 
         remaining_volatile_solids, remaining_total_solids, dry_matter_loss = self._calc_dry_matter_changes(
             manure_total_solids=daily_input.liquid_manure_total_solids,
             bedding_total_solids=self._manure_handler_daily_output.total_bedding_mass,
             manure_volatile_solids=daily_input.liquid_manure_total_volatile_solids,
         )
-        initial_total_solids_fraction = (daily_input.liquid_manure_total_solids /
-                                         (
-                                                 daily_input.liquid_manure_daily_volume * ManureConstants.SOLID_MANURE_DENSITY))
+        initial_total_solids_fraction = (daily_input.liquid_manure_total_solids
+                                         / (daily_input.liquid_manure_daily_volume
+                                            * ManureConstants.SOLID_MANURE_DENSITY))
         solid_manure_mass = remaining_total_solids / initial_total_solids_fraction
         daily_output = ManureTreatmentDailyOutput(
             simulation_day=daily_input.simulation_day,
