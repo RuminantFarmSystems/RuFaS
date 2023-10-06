@@ -151,11 +151,8 @@ class GasEmissionsCalculator:
             If the temperature is not between -40 and 50 degrees Celsius.
 
         """
-        if (
-                not GasEmissionConstants.GENERAL_LOWER_BOUND_TEMPERATURE
-                    <= temp
-                    <= GasEmissionConstants.GENERAL_UPPER_BOUND_TEMPERATURE
-        ):
+        if not (GasEmissionConstants.GENERAL_LOWER_BOUND_TEMPERATURE <= temp
+                <= GasEmissionConstants.GENERAL_UPPER_BOUND_TEMPERATURE):
             raise ValueError(
                 f"Temperature must be between -40 and 60 degrees Celsius. Temperature provided: {temp}"
             )
