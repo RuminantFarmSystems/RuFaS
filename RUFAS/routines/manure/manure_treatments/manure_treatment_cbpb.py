@@ -160,14 +160,8 @@ class CompostBeddedPackBarn(BaseManureTreatment):
         manure_nitrogen = daily_input.liquid_manure_nitrogen - total_nitrogen_loss
         manure_organic_nitrogen = ManureConstants.COMPOST_BEDDING_ORGANIC_NITROGEN_FRACTION * manure_nitrogen
         manure_inorganic_nitrogen = manure_nitrogen - manure_organic_nitrogen
-        manure_inorganic_nitrogen_ammonium = (ManureConstants.COMPOST_BEDDING_INORGANIC_NITROGEN_AMMONIUM_FRACTION
-                                              * manure_inorganic_nitrogen)
-        info_map = {
-            'class': self.__class__.__name__,
-            'function': self._daily_update_helper.__name__,
-        }
-        # Temporarily log this out to bypass the flake8 warning for unused variables
-        OutputManager().add_log('manure_inorganic_nitrogen_ammonium', manure_inorganic_nitrogen_ammonium, info_map)
+        # manure_inorganic_nitrogen_ammonium
+        ManureConstants.COMPOST_BEDDING_INORGANIC_NITROGEN_AMMONIUM_FRACTION * manure_inorganic_nitrogen
 
         remaining_volatile_solids, remaining_total_solids, dry_matter_loss = self._calc_dry_matter_changes(
             manure_total_solids=daily_input.liquid_manure_total_solids,
@@ -177,9 +171,8 @@ class CompostBeddedPackBarn(BaseManureTreatment):
         initial_total_solids_fraction = (daily_input.liquid_manure_total_solids
                                          / (daily_input.liquid_manure_daily_volume
                                             * ManureConstants.SOLID_MANURE_DENSITY))
-        solid_manure_mass = remaining_total_solids / initial_total_solids_fraction
-        # Temporarily log this out to bypass the flake8 warning for unused variables
-        OutputManager().add_log('solid_manure_mass', solid_manure_mass, info_map)
+        # solid_manure_mass
+        remaining_total_solids / initial_total_solids_fraction
         daily_output = ManureTreatmentDailyOutput(
             simulation_day=daily_input.simulation_day,
             pen_id=daily_input.pen_id,
