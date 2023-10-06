@@ -76,7 +76,7 @@ class AnimalInitialization:
         self.order_by_random = not set_seed
 
         if init:
-            conn = sqlite3.connect('input/animal/animals.sqlite')
+            conn = sqlite3.connect('input/data/animal/animals.sqlite')
             cur = conn.cursor()
             cur.execute('DROP TABLE IF EXISTS calves')
             cur.execute('DROP TABLE IF EXISTS heiferIs')
@@ -122,9 +122,11 @@ class AnimalInitialization:
                                     synch_ed_program_start_day_h VARCHAR, synch_ed_estrus_day VARCHAR, \
                                         synch_ed_stop_day VARCHAR, conception_rate VARCHAR, ai_day VARCHAR, \
                                             abortion_day VARCHAR, days_in_preg VARCHAR, gestation_length VARCHAR, \
-                                                p_gest_for_calf VARCHAR, calf_birth_weight VARCHAR, presynch_method VARCHAR, \
-                                                    tai_method_c VARCHAR, resynch_method VARCHAR, days_in_milk VARCHAR, parity VARCHAR, \
-                                                        calving_interval VARCHAR)')
+                                                p_gest_for_calf VARCHAR, \
+                                                    calf_birth_weight VARCHAR, presynch_method VARCHAR, \
+                                                        tai_method_c VARCHAR, resynch_method VARCHAR, \
+                                                            days_in_milk VARCHAR, parity VARCHAR, \
+                                                                calving_interval VARCHAR)')
             cur.execute('CREATE TABLE IF NOT EXISTS replacement \
                 (id VARCHAR, breed VARCHAR, birth_date VARCHAR, days_born VARCHAR, \
                     birth_weight VARCHAR, body_weight VARCHAR, wean_weight VARCHAR, \
@@ -144,7 +146,7 @@ class AnimalInitialization:
             self.init_animals(breed)
 
         else:
-            conn = sqlite3.connect('input/animal/animals.sqlite')
+            conn = sqlite3.connect('input/data/animal/animals.sqlite')
             cur = conn.cursor()
             cur.execute('SELECT * FROM animal_id')
             row = cur.fetchone()
@@ -158,7 +160,7 @@ class AnimalInitialization:
             animal_num: number of animals to simulate
             sim_days: number of days to simulate
     '''
-    def init_animals(self, breed, animal_num = 20000, sim_days=5000):
+    def init_animals(self, breed, animal_num=20000, sim_days=5000):
         calves = []
         heiferIs = []
         heiferIIs = []
@@ -166,7 +168,7 @@ class AnimalInitialization:
         cows = []
         replacement = []
 
-        conn = sqlite3.connect('input/animal/animals.sqlite')
+        conn = sqlite3.connect('input/data/animal/animals.sqlite')
         cur = conn.cursor()
 
         for _ in range(animal_num):
@@ -253,8 +255,7 @@ class AnimalInitialization:
                         'p_init': cow.p_gest_for_calf,
                         'birth_weight': cow.calf_birth_weight
                     }
-                    cow.p_animal = cow.p_animal - cow.p_gest_for_calf + \
-                                   cow.p_growth + cow.dP_reserves
+                    cow.p_animal = cow.p_animal - cow.p_gest_for_calf + cow.p_growth + cow.dP_reserves
                     cow.p_gest_for_calf = 0
                     cow.calf_birth_weight = 0
 
@@ -354,7 +355,7 @@ class AnimalInitialization:
     '''
     def get_calves(self, num, breed):
         calves = []
-        conn = sqlite3.connect('input/animal/animals.sqlite')
+        conn = sqlite3.connect('input/data/animal/animals.sqlite')
         cur = conn.cursor()
         while cur.execute('SELECT COUNT() FROM calves').fetchone()[0] < num:
             self.init_animals(breed)
@@ -391,7 +392,7 @@ class AnimalInitialization:
     '''
     def get_heiferIs(self, num, breed):
         heiferIs = []
-        conn = sqlite3.connect('input/animal/animals.sqlite')
+        conn = sqlite3.connect('input/data/animal/animals.sqlite')
         cur = conn.cursor()
         while cur.execute('SELECT COUNT() FROM heiferIs').fetchone()[0] < num:
             self.init_animals(breed)
@@ -427,7 +428,7 @@ class AnimalInitialization:
     '''
     def get_heiferIIs(self, num, breed):
         heiferIIs = []
-        conn = sqlite3.connect('input/animal/animals.sqlite')
+        conn = sqlite3.connect('input/data/animal/animals.sqlite')
         cur = conn.cursor()
         while cur.execute('SELECT COUNT() FROM heiferIIs').fetchone()[0] < num:
             self.init_animals(breed)
@@ -479,7 +480,7 @@ class AnimalInitialization:
     '''
     def get_heiferIIIs(self, num, breed):
         heiferIIIs = []
-        conn = sqlite3.connect('input/animal/animals.sqlite')
+        conn = sqlite3.connect('input/data/animal/animals.sqlite')
         cur = conn.cursor()
         while cur.execute('SELECT COUNT() FROM heiferIIIs').fetchone()[0] < num:
             self.init_animals(breed)
@@ -531,7 +532,7 @@ class AnimalInitialization:
     '''
     def get_cows(self, num, breed):
         cows = []
-        conn = sqlite3.connect('input/animal/animals.sqlite')
+        conn = sqlite3.connect('input/data/animal/animals.sqlite')
         cur = conn.cursor()
         while cur.execute('SELECT COUNT() FROM cows').fetchone()[0] < num:
             self.init_animals(breed)
@@ -589,7 +590,7 @@ class AnimalInitialization:
     '''
     def get_replacement_cows(self, num, breed):
         cows = []
-        conn = sqlite3.connect('input/animal/animals.sqlite')
+        conn = sqlite3.connect('input/data/animal/animals.sqlite')
         cur = conn.cursor()
         while cur.execute('SELECT COUNT() FROM replacement').fetchone()[0] < num:
             self.init_animals(breed)
@@ -642,7 +643,7 @@ class AnimalInitialization:
         database
         """
         try:
-            conn = sqlite3.connect('input/animal/animals.sqlite')
+            conn = sqlite3.connect('input/data/animal/animals.sqlite')
             conn.row_factory = sqlite3.Row
             c = conn.cursor()
 

@@ -23,12 +23,14 @@
 build
 others
 
+RUFAS/scenario_manager.py
+
 # Ignore contents of output directories, except for .keep files
 # This is because we want to keep the output directories, and git
 # only stores non-empty directories
 output/*
 !output/.keep
-output/output_filters/
+output/output_filters/*
 
 # ignore project files
 *.sublime-project
