@@ -3393,9 +3393,9 @@ def test_calc_dry_matter_changes(
 
     mocker.patch.object(cbpb, '_get_current_day_average_temperature_celsius', return_value=mock_temp)
 
-    mocker.patch.object(GasEmissionsCalculator, 'calc_ifsm_methane_emission', return_value=mock_methane_emission)
+    mocker.patch.object(GasEmissionsCalculator, 'ifsm_methane_emission', return_value=mock_methane_emission)
 
-    mocker.patch.object(GasEmissionsCalculator, 'calc_total_carbon_decomposition',
+    mocker.patch.object(GasEmissionsCalculator, 'total_carbon_decomposition',
                         return_value=mock_carbon_decomposition)
 
     # Act

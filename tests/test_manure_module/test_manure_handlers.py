@@ -16,7 +16,7 @@ from RUFAS.routines.manure.manure_handlers.manure_handler_classes import ManureH
 from RUFAS.routines.manure.manure_handlers.manure_handler_classes import ManureHandlerType
 from RUFAS.routines.manure.manure_handlers.manure_handler_daily_output import ManureHandlerDailyOutput
 from RUFAS.routines.manure.manure_handlers.milking_parlor import MilkingParlor
-from RUFAS.routines.manure.pen.manure_manager_pen import ManureManagerPen
+from RUFAS.routines.manure.pen_manure.manure_manager_pen import ManureManagerPen
 from RUFAS.routines.manure.pen_manure.pen_manure import PenManure
 
 
@@ -351,17 +351,17 @@ def test_manure_handler_daily_update(mocker: MockerFixture) -> None:
     sim_day = 10
     housing_ammonia_emission = 1.0
     patch_for_calc_housing_ammonia_emission = mocker.patch(
-        'RUFAS.routines.manure.manure_handlers.manure_handler_classes.GasEmissions.calc_housing_ammonia_emission',
+        'RUFAS.routines.manure.manure_handlers.manure_handler_classes.GasEmissionsCalculator.housing_ammonia_emission',
         return_value=housing_ammonia_emission
     )
     housing_methane_emission = 2.0
     patch_for_calc_housing_methane_emission = mocker.patch(
-        'RUFAS.routines.manure.manure_handlers.manure_handler_classes.GasEmissions.calc_housing_methane_emission',
+        'RUFAS.routines.manure.manure_handlers.manure_handler_classes.GasEmissionsCalculator.housing_methane_emission',
         return_value=housing_methane_emission
     )
     housing_carbon_dioxide_emission = 3.0
     patch_for_calc_housing_carbon_dioxide_emission = mocker.patch(
-        'RUFAS.routines.manure.manure_handlers.manure_handler_classes.GasEmissions.calc_housing_carbon_dioxide_emission',
+        'RUFAS.routines.manure.manure_handlers.manure_handler_classes.GasEmissionsCalculator.housing_carbon_dioxide_emission',
         return_value=housing_carbon_dioxide_emission
     )
 
