@@ -1279,8 +1279,7 @@ def test_slurry_storage_calc_ammonia_emission(
     patch_for_calc_ammonia_emission_for_slurry_storage.assert_called_once_with(
         num_animals=num_animals,
         barn_area=barn_area,
-        total_ammoniacal_nitrogen=accumulated_manure_total_ammoniacal_nitrogen
-                                  / num_animals,
+        total_ammoniacal_nitrogen=accumulated_manure_total_ammoniacal_nitrogen / num_animals,
         mass=accumulated_manure_volume * ManureConstants.MANURE_DENSITY / num_animals,
         temperature_celsius=temperature_celsius,
     )
