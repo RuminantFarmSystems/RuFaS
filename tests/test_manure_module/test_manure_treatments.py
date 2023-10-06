@@ -744,7 +744,7 @@ def test_manure_treatment_factory_get_instance(
     )
 
     # Assert
-    assert type(manure_treatment) == expected_manure_treatment_class
+    assert isinstance(manure_treatment, expected_manure_treatment_class)
     assert manure_treatment.weather == mock_weather
     assert manure_treatment.time == mock_time
     assert manure_treatment.config == expected_manure_treatment_config
