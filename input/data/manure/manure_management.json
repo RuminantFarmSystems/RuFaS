@@ -25,7 +25,7 @@
       "scenario_id": 3,
       "bedding_type": "sawdust",
       "manure_handler": "flush system",
-      "manure_separator": "none",
+      "manure_separator": "rotary screen",
       "manure_treatment": "anaerobic lagoon"
     },
     {
