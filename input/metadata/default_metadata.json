@@ -1598,7 +1598,7 @@
       "feed_name": {
         "type": "string",
         "description": "A general common name for the feed as defined within RuFaS."
-        },
+      },
       "feed_description": {
         "type": "string",
         "description": "A more specific description of the feed that uniquely distinguishes it from other feeds with a similar or same name."
