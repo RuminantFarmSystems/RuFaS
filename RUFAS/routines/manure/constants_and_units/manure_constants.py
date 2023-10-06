@@ -52,4 +52,7 @@ class ManureConstants:
     """The fraction of organic nitrogen in compost bedding (unitless, [0, 1]). Default is set to 0.952."""
 
     COMPOST_BEDDING_INORGANIC_NITROGEN_AMMONIUM_FRACTION = 0.5
-    """The fraction of inorganic nitrogen in compost bedding that is ammonium (unitless, [0, 1]). Default is set to 0.5."""
+    """
+    The fraction of inorganic nitrogen in compost bedding that is ammonium (unitless, [0, 1]).
+    Default is set to 0.5.
+    """

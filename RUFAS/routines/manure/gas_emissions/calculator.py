@@ -23,7 +23,8 @@ class GasEmissionsCalculator:
 
         .. math::
 
-            E_{CH_4} = 24 \\cdot VS_{d} \\cdot b_{1} \\cdot e^{lnA - \\frac{E}{RT}} + 24 \\cdot VS_{nd} \\cdot b_{2} \\cdot e^{lnA - \\frac{E}{RT}}
+            E_{CH_4} = 24 \\cdot VS_{d} \\cdot b_{1} \\cdot e^{lnA - \\frac{E}{RT}}
+            + 24 \\cdot VS_{nd} \\cdot b_{2} \\cdot e^{lnA - \\frac{E}{RT}}
 
         where:
 
@@ -70,7 +71,7 @@ class GasEmissionsCalculator:
         total_volatile_solids : float
             Total volatile solids in manure (kg).
         temp : float
-            Temperature in Celsius (:math:`^\circ C`). Default is set to 20 degrees Celsius. This value is
+            Temperature in Celsius (:math:`^\\circ C`). Default is set to 20 degrees Celsius. This value is
             listed as :attr:`DEFAULT_SLURRY_STORAGE_TEMPERATURE` in :class:`GasEmissionConstants`.
 
         Returns
@@ -137,7 +138,7 @@ class GasEmissionsCalculator:
         Parameters
         ----------
         temp : float
-            Temperature in Celsius (:math:`^\circ C`).
+            Temperature in Celsius (:math:`^\\circ C`).
 
         Returns
         -------
@@ -354,14 +355,14 @@ class GasEmissionsCalculator:
         hours : float
             The hour(s) of the day, must be in the range of [0, 24].
         min_temp : float
-            The minimum barn temperature (:math:`^{\circ}C`).
+            The minimum barn temperature (:math:`^{\\circ}C`).
         max_temp : float
-            The maximum barn temperature (:math:`^{\circ}C`). Must be greater than or equal to `min_temp`.
+            The maximum barn temperature (:math:`^{\\circ}C`). Must be greater than or equal to `min_temp`.
 
         Returns
         -------
         float
-            The ambient temperature (:math:`^{\circ}C`).
+            The ambient temperature (:math:`^{\\circ}C`).
 
         Raises
         ------
@@ -401,7 +402,7 @@ class GasEmissionsCalculator:
 
             :math:`E_{CH_4}` is the methane housing emission in kg :math:`CH_4/day`,
 
-            :math:`T_{barn}` is the barn temperature in :math:`^{\circ}C`,
+            :math:`T_{barn}` is the barn temperature in :math:`^{\\circ}C`,
 
             :math:`barn\\_area` is the barn area per animal based on housing type in :math:`m^2`, and
 
@@ -414,7 +415,7 @@ class GasEmissionsCalculator:
         barn_area : float
             Barn area per animal based on housing type (:math:`m^2`).
         barn_temp : float
-            Current barn temperature (:math:`^{\circ}C`).
+            Current barn temperature (:math:`^{\\circ}C`).
 
         Returns
         -------
@@ -454,7 +455,7 @@ class GasEmissionsCalculator:
 
             :math:`E_{CO_2}` is the carbon dioxide housing emission in kg :math:`CO_2/day`,
 
-            :math:`T_{barn}` is the barn temperature in :math:`^{\circ}C`,
+            :math:`T_{barn}` is the barn temperature in :math:`^{\\circ}C`,
 
             :math:`barn\\_area` is the barn area per animal based on housing type in :math:`m^2`, and
 
@@ -467,7 +468,7 @@ class GasEmissionsCalculator:
         barn_area : float
             Barn area per animal based on housing type (:math:`m^2`).
         barn_temp : float
-            Current barn temperature (:math:`^{\circ}C`).
+            Current barn temperature (:math:`^{\\circ}C`).
 
         Returns
         -------
@@ -540,7 +541,7 @@ class GasEmissionsCalculator:
 
             :math:`HSC` is the housing-specific constant (s/m, default is 260 s/m),
 
-            :math:`T` is the barn temperature (:math:`^{\circ}C`).
+            :math:`T` is the barn temperature (:math:`^{\\circ}C`).
 
         The value of :math:`Q` is calculated as:
 
@@ -566,7 +567,7 @@ class GasEmissionsCalculator:
 
             :math:`K_h` is the Henry's law coefficient of :math:`NH_3` (unitless),
 
-            :math:`T` is the barn temperature (:math:`^{\circ}C`).
+            :math:`T` is the barn temperature (:math:`^{\\circ}C`).
 
         The value of :math:`K_a` is calculated as:
 
@@ -578,7 +579,7 @@ class GasEmissionsCalculator:
 
             :math:`K_a` is the dissociation coefficient of ammonium ion (unitless),
 
-            :math:`T` is the barn temperature (:math:`^{\circ}C`),
+            :math:`T` is the barn temperature (:math:`^{\\circ}C`),
 
             :math:`pH` is the manure solution acidity (unitless).
 
@@ -593,7 +594,7 @@ class GasEmissionsCalculator:
         urine : float
             Amount of urine produced by animals in the barn (kg).
         temp : float
-            Current barn temperature (:math:`^{\circ}C`).
+            Current barn temperature (:math:`^{\\circ}C`).
         pH : float, optional
             pH value for housing ammonia emission (unitless). Default is set to 7.7. This value is listed as
                 :attr:`DEFAULT_PH_FOR_HOUSING_AMMONIA` in :class:`GasEmissionConstants`.
@@ -702,7 +703,7 @@ class GasEmissionsCalculator:
 
             :math:`HSC` is the housing-specific constant (s/m, default is 260 s/m),
 
-            :math:`T` is the storage area temperature (:math:`^{\circ}C`).
+            :math:`T` is the storage area temperature (:math:`^{\\circ}C`).
 
         The value of :math:`Q` is calculated as:
 
@@ -757,7 +758,7 @@ class GasEmissionsCalculator:
         total_solids : float
             Total solids present in the manure (kg).
         temp : float
-            Current storage area temperature (:math:`^{\circ}C`).
+            Current storage area temperature (:math:`^{\\circ}C`).
         storage_area_per_animal : float, optional
             Storage area per animal based on manure treatment type (:math:`m^2`).
             Default is set to a value listed as :attr:`DEFAULT_STORAGE_AREA_PER_ANIMAL
@@ -977,12 +978,12 @@ class GasEmissionsCalculator:
 
             :math:`HSC` is housing specific constant (s/m, default is 260 s/m),
 
-            :math:`T` is barn temperature (:math:`^{\circ}C`).
+            :math:`T` is barn temperature (:math:`^{\\circ}C`).
 
         Parameters
         ----------
         temp : float
-            Temperature in Celsius (:math:`^{\circ}C`).
+            Temperature in Celsius (:math:`^{\\circ}C`).
         hsc : float, optional
             Housing specific constant, s/m. Default is set to 260 s/m. This value is listed as
                 :attr:`DEFAULT_HOUSING_SPECIFIC_CONSTANT` in :class:`GasEmissionConstants`.
@@ -1176,7 +1177,7 @@ class GasEmissionsCalculator:
 
         .. math::
 
-            E_{CH_4} = Bo \cdot MCF \cdot MS \cdot MF \cdot VS
+            E_{CH_4} = Bo \\cdot MCF \\cdot MS \\cdot MF \\cdot VS
 
         where:
 

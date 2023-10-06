@@ -5,10 +5,15 @@ class GasEmissionConstants:
     """Methane emission coefficient, used in calculation of slurry storage methane emission (unitless)."""
 
     DEGRADABLE_VOLATILE_SOLIDS_RATE_CORRECTING_FACTOR = 1.0
-    """Rate correcting factor for degradable volatile solids, used in calculation of slurry storage methane emission (unitless)."""
+    """
+    Rate correcting factor for degradable volatile solids, used in calculation of slurry storage
+    methane emission (unitless).
+    """
 
     NON_DEGRADABLE_VOLATILE_SOLIDS_RATE_CORRECTING_FACTOR = 0.01
-    """Rate correcting factor for non-degradable volatile solids, used in calculation of slurry storage methane emission (unitless)."""
+    """
+    Rate correcting factor for non-degradable volatile solids, used in calculation of slurry storage
+    methane emission (unitless)."""
 
     NATURAL_LOG_ARRHENIUS_CONSTANT = 43.33
     """Natural log of the Arrhenius constant (unitless)."""
@@ -20,7 +25,7 @@ class GasEmissionConstants:
     """
 
     GAS_CONSTANT = 8.314
-    """The ideal gas constant (J/mol :math:`\cdot` K)."""
+    """The ideal gas constant (J/mol :math:`\\cdot` K)."""
 
     ACHIEVABLE_METHANE_EMISSION = 0.24
     """Achievable emission of methane (:math:`CH_4`) during anaerobic digestion (kg :math:`CH_4`/kg VS)."""
@@ -68,7 +73,7 @@ class GasEmissionConstants:
     """
 
     DEFAULT_SLURRY_STORAGE_TEMPERATURE = 15.0
-    """Default slurry storage temperature (:math:`^{\circ}C`). Default is set to 15.0."""
+    """Default slurry storage temperature (:math:`^{\\circ}C`). Default is set to 15.0."""
 
     DEFAULT_VOLATILE_SOLIDS_FRACTION = 0.68
     """
@@ -84,7 +89,7 @@ class GasEmissionConstants:
 
     SPECIFIC_GROWTH_RATE = 0.637
     """
-    Specific growth rate (:math:`\mu`m). This represents the rate at which the microbial population
+    Specific growth rate (:math:`\\mu`m). This represents the rate at which the microbial population
     in the anaerobic digestion process increases.
     """
 
@@ -108,10 +113,10 @@ class GasEmissionConstants:
     Default proportion of carbon available in bedding, (unitless, [0, 1]). Default is set to 0.35.
     """
     GENERAL_LOWER_BOUND_TEMPERATURE = -40.0
-    """General temperature lower bound (:math:`^{\circ}C`). Default is set to -40.0."""
+    """General temperature lower bound (:math:`^{\\circ}C`). Default is set to -40.0."""
 
     GENERAL_UPPER_BOUND_TEMPERATURE = 60.0
-    """General temperature upper bound (:math:`^{\circ}C`). Default is set to 60.0."""
+    """General temperature upper bound (:math:`^{\\circ}C`). Default is set to 60.0."""
 
     SOLID_AND_SEMI_SOLID_MANURE_HSC = 10.0
     """Housing specific constant for solid and semi-solid manure (s/m)."""
