@@ -340,7 +340,7 @@ def test_manure_handler_daily_update(mocker: MockerFixture) -> None:
     mock_pen = mocker.MagicMock(autospec=ManureManagerPen)
     mock_pen.id = pen_id = 1
     mock_pen.num_animals = num_animals = 100
-    mock_pen.num_lactating_cows = num_lactating_cows = 100
+    mock_pen.num_lactating_cows = 100
     mock_pen.barn_area_from_pen_type = barn_area_from_pen_type = 101.0
     mock_pen.manure = mock_manure
 
