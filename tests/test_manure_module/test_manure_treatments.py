@@ -132,7 +132,7 @@ def test_manure_treatment_daily_output_add() -> None:
 
     # Act and Assert
     with pytest.raises(TypeError) as e:
-        sum_object = manure_treatment_daily_output + 1
+        manure_treatment_daily_output + 1
         # Check error message
         assert "Other must be of type ManureTreatmentDailyOutput" in str(e.value)
 
