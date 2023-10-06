@@ -259,7 +259,8 @@ def test_total_nitrogen_loss_from_compost_bedded_pack_barn(
         return_value=expected_leaching,
     )
     mocker.patch(
-        "RUFAS.routines.manure.gas_emissions.calculator.GasEmissionsCalculator._nitrogen_loss_in_compost_bedded_pack_barn_due_to_nitrous_oxide_emission",
+        "RUFAS.routines.manure.gas_emissions.calculator.GasEmissionsCalculator."
+        "_nitrogen_loss_in_compost_bedded_pack_barn_due_to_nitrous_oxide_emission",
         return_value=expected_nitrous_oxide,
     )
 
@@ -988,18 +989,21 @@ def test_methane_emission_from_slurry_storage(
 
 
 @pytest.mark.parametrize(
-    "num_animals, storage_area, manure_tan, manure_volume, manure_density, total_solids, temp, pH, expected, error_message",
+    "num_animals, storage_area, manure_tan, manure_volume, manure_density,"
+    "total_solids, temp, pH, expected, error_message",
     [
         # Standard case
         (10, 100.0, 25.0, 30.0, 1200.0, 5.0, 20.0, 7.7, 62.315518096348924, None),
-        # Edge cases: Zero input values for num_animals, storage_area, manure_tan, manure_volume, manure_density, total_solids
+        # Edge cases: Zero input values for num_animals, storage_area,
+        # manure_tan, manure_volume, manure_density, total_solids
         (0, 100.0, 25.0, 30.0, 1200.0, 5.0, 20.0, 7.7, 0.0, None),
         (10, 0.0, 25.0, 30.0, 1200.0, 5.0, 20.0, 7.7, 0.0, None),
         (10, 100.0, 0.0, 30.0, 1200.0, 5.0, 20.0, 7.7, 0.0, None),
         (10, 100.0, 25.0, 0.0, 1200.0, 5.0, 20.0, 7.7, 0.0, None),
         (10, 100.0, 25.0, 30.0, 0.0, 5.0, 20.0, 7.7, 0.0, None),
         (10, 100.0, 25.0, 30.0, 1200.0, 0.0, 20.0, 7.7, 0.0, None),
-        # Exception cases: Negative input values for num_animals, storage_area, manure_tan, manure_volume, manure_density, total_solids
+        # Exception cases: Negative input values for num_animals, storage_area,
+        # manure_tan, manure_volume, manure_density, total_solids
         (
             -1,
             100.0,
