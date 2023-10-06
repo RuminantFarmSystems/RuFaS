@@ -509,7 +509,7 @@ class GasEmissionsCalculator:
 
         .. math::
 
-            E_{NH_3} = total\\_barn\\_area \\times \\frac{TAN \\times c \\times \gamma}{r \\times M \\times Q}
+            E_{NH_3} = total\\_barn\\_area \\times \\frac{TAN \\times c \\times \\gamma}{r \\times M \\times Q}
 
         where:
 
@@ -521,7 +521,7 @@ class GasEmissionsCalculator:
 
             :math:`c` is the number of seconds in a day (86400 s),
 
-            :math:`\gamma` is the manure density in kg/:math:`m^3`,
+            :math:`\\gamma` is the manure density in kg/:math:`m^3`,
 
             :math:`r` is the resistance of :math:`NH_3` transport to the atmosphere in s/m,
 
@@ -671,7 +671,7 @@ class GasEmissionsCalculator:
 
         .. math::
 
-            E_{NH_3} = total\\_storage\\_area \\cdot \\frac{TAN \\cdot c \\cdot \gamma}{r \\cdot M \\cdot Q}
+            E_{NH_3} = total\\_storage\\_area \\cdot \\frac{TAN \\cdot c \\cdot \\gamma}{r \\cdot M \\cdot Q}
 
         where:
 
@@ -683,7 +683,7 @@ class GasEmissionsCalculator:
 
             :math:`c` is the number of seconds in a day (86400 s),
 
-            :math:`\gamma` is the manure density in kg/:math:`m^3`,
+            :math:`\\gamma` is the manure density in kg/:math:`m^3`,
 
             :math:`r` is the resistance of :math:`NH_3` transport to the atmosphere in s/m,
 
