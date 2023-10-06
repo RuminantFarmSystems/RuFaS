@@ -153,7 +153,7 @@ class GasEmissionConstants:
 
     NITROUS_OXIDE_COEFFICIENT_WITH_TILLED_BEDDING = 0.07
     """
-    Nitrous oxide coefficient used for calculating nitrogen loss in a compost bedded pack barn 
+    Nitrous oxide coefficient used for calculating nitrogen loss in a compost bedded pack barn
     when the bedding is tilled (unitless).
     """
 
