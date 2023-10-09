@@ -5,7 +5,14 @@ from RUFAS.routines.manure.constants_and_units.manure_constants import ManureCon
 
 
 def test_manure_constants() -> None:
-    """Tests the manure constants in file manure_constants.py."""
+    """
+    Unit test for the manure constants in file manure_constants.py.
+
+    This function checks the accuracy of the constants based on predefined expected values.
+    Assertions are arranged in the order the constants appear in the class definition.
+    """
+
+    # Assert
     assert ManureConstants.MANURE_DENSITY == approx(990.0)
     assert ManureConstants.UREA_MOLAR_MASS == approx(60.06)
     assert ManureConstants.UREA_DENSITY == approx(1.32)
@@ -13,8 +20,15 @@ def test_manure_constants() -> None:
     assert ManureConstants.URINE_TAN_FACTOR == approx(0.45)
     assert ManureConstants.MANURE_SOLIDS_BEDDING_DENSITY == approx(400.0)
     assert ManureConstants.LIQUID_MANURE_DENSITY == approx(990.0)
-    assert ManureConstants.SLURRY_MANURE_DENSITY == approx(1400.0)
-    assert ManureConstants.SOLID_MANURE_DENSITY == approx(1250.0)
+    assert ManureConstants.SLURRY_MANURE_DENSITY == approx(1400)
+    assert ManureConstants.SOLID_MANURE_DENSITY == approx(1250)
+    assert ManureConstants.DEFAULT_CARBON_FRACTION_AVAILABLE_IN_MANURE == approx(0.5)
+    assert ManureConstants.EFFECTIVE_MICROBIAL_DECOMP_RATE == approx(2.37e-3)
+    assert ManureConstants.DEFAULT_MOISTURE_EFFECT_MICROBIAL_DECOMP == approx(0.65)
+    assert ManureConstants.DEFAULT_DAYS_SINCE_LAST_TILLAGE == approx(1)
+    assert ManureConstants.DEFAULT_LAG_TIME == approx(2)
+    assert ManureConstants.COMPOST_BEDDING_ORGANIC_NITROGEN_FRACTION == approx(0.952)
+    assert ManureConstants.COMPOST_BEDDING_INORGANIC_NITROGEN_AMMONIUM_FRACTION == approx(0.5)
 
 
 def test_gas_emission_constants() -> None:
@@ -64,3 +78,4 @@ def test_gas_emission_constants() -> None:
     assert GasEmissionConstants.LEACHING_COEFFICIENT == approx(0.035)
     assert GasEmissionConstants.NITROUS_OXIDE_COEFFICIENT_WITH_TILLED_BEDDING == approx(0.07)
     assert GasEmissionConstants.NITROUS_OXIDE_COEFFICIENT_WITH_UNTILLED_BEDDING == approx(0.01)
+    assert GasEmissionConstants.DEFAULT_CARBON_FRACTION_AVAILABLE_IN_BEDDING == approx(0.35)
