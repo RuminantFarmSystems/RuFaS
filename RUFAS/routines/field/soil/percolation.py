@@ -43,12 +43,6 @@ class Percolation:
         layer_count = len(self.data.soil_layers)
         deepest_layer = layer_count - 1
 
-        info_map = {"class": self.__class__.__name__, "function": self.percolate.__name__, "prefix": "Field"}
-        om.add_variable("top_water_content_pre_percolation(mm)", self.data.soil_layers[0].water_content, info_map)
-        om.add_variable("second_layer_water_content_pre_percolation(mm)", self.data.soil_layers[1].water_content,
-                        info_map)
-
-        percolation_operations = []
         for layer_number in reversed(range(layer_count)):  # loop through each layer
             current_layer = self.data.soil_layers[layer_number]
 
@@ -63,23 +57,20 @@ class Percolation:
                                                                    layer_below.field_capacity_content,
                                                                    layer_below.saturation_content,
                                                                    has_seasonal_high_water_table)
-            percolated_water = 0.0
             if can_percolate:
                 percolated_water = self._percolate_between_layers(self.data.time_step, current_layer, layer_below)
                 current_layer.water_content -= percolated_water
                 current_layer.percolated_water = percolated_water
-
-                # if layer_number > 0:
-                #     layer_above = self.data.soil_layers[layer_number - 1]
-                #     # current_layer.water_content += layer_above.percolated_water
-                # if layer_number == deepest_layer:
-                #     self.data.vadose_zone_layer.water_content += self.data.soil_layers[-1].percolated_water
             else:
                 current_layer.percolated_water = 0
-            percolation_operations.append((layer_below, percolated_water))
 
-        for op in percolation_operations:
-            op[0].water_content += op[1]
+        for layer_number in range(1, layer_count + 1):
+            layer_above = self.data.soil_layers[layer_number - 1]
+            percolated_water = layer_above.percolated_water
+            if layer_number == deepest_layer + 1:
+                self.data.vadose_zone_layer.water_content += percolated_water
+            else:
+                self.data.soil_layers[layer_number].water_content += percolated_water
 
     # --- Static methods ---
     @staticmethod
