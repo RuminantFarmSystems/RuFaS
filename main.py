@@ -61,7 +61,7 @@ def execute_simulations(
     Parameters
     ----------
     metadata_files : MetadataPaths
-        A lsit of custom TypedDict objects including the specified prefix for the save_variables output file
+        A list of custom TypedDict objects including the specified prefix for the save_variables output file
         and the path to the metadata file.
     exclude_info_maps : bool, optional
         Flag for whether or not the user wants to inlcude info_maps data in their results files.
