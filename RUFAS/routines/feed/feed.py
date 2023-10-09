@@ -1187,7 +1187,11 @@ class Feed:
 
     def get_calf_feeds(self):
         feed_ids = [202, 203, 216]
-        columns = ['rufas_id', 'DM', 'CP', 'EE', 'DE_Base']
+        if 'DE_Base' in list(self.available_feeds.items())[0][1].keys():
+            columns = ['rufas_id', 'DM', 'CP', 'EE', 'DE_Base']
+        else:
+            columns = ['rufas_id', 'DM', 'CP', 'EE', 'DE']
+
         nutrients = retrieve_data(data_source=self.nutrient_table, var_names=columns,
                                   identifier='rufas_id', desired_rows=feed_ids)
 

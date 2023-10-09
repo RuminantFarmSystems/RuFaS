@@ -446,7 +446,10 @@ class AvailableFeeds:
             self.feed_id.append(feed['rufas_id'])
             self.price.append(feed_costs[str(key)])
             self.TDN.append(feed['TDN'])
-            self.DE.append(feed['DE_Base'])
+            if 'DE_Base' in feed.keys():
+                self.DE.append(feed['DE_Base'])
+            else:
+                self.DE.append(feed['DE'])
             self.EE.append(feed['EE'])
             self.is_fat.append(feed['is_fat'])
             self.calcium.append(feed['calcium'])

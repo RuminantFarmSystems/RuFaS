@@ -30,18 +30,24 @@ def calc_requirements(calf, feed, temp, wean_day, wean_length, milk_type):
 
     whole_milk_dm = calf_feeds[whole_milk_id]['DM']
     whole_milk_cp = calf_feeds[whole_milk_id]['CP']
-    whole_milk_de = calf_feeds[whole_milk_id]['DE_Base']
+    if 'DE_Base' in calf_feeds[whole_milk_id].keys():
+        whole_milk_de = calf_feeds[whole_milk_id]['DE_Base']
+        milk_replacer_de = calf_feeds[milk_replacer_id]['DE_Base']
+        starter_de = calf_feeds[starter_id]['DE_Base']
+    else:
+        whole_milk_de = calf_feeds[whole_milk_id]['DE']
+        milk_replacer_de = calf_feeds[milk_replacer_id]['DE']
+        starter_de = calf_feeds[starter_id]['DE']
+
     # [A.1B.C.1]
     whole_milk_me = 0.96 * whole_milk_de
 
     milk_replacer_dm = calf_feeds[milk_replacer_id]['DM']
     milk_replacer_cp = calf_feeds[milk_replacer_id]['CP']
-    milk_replacer_de = calf_feeds[milk_replacer_id]['DE_Base']
     # [A.1B.C.1]
     milk_replacer_me = 0.96 * milk_replacer_de
 
     starter_cp = calf_feeds[starter_id]['CP']
-    starter_de = calf_feeds[starter_id]['DE_Base']
     starter_ee = calf_feeds[starter_id]['EE']
     # [A.1B.C.2]
     starter_me = (1.01 * starter_de - 0.45) + 0.0046 * (starter_ee - 3)
