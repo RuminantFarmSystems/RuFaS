@@ -586,7 +586,7 @@ class OutputManager(object):
         return filter_pattern_matches
 
     def save_variables(
-        self, save_path: str, dir_path: str, exclude_info_maps: bool = False
+        self, prefix: str, save_path: str, dir_path: str, exclude_info_maps: bool = False
     ) -> None:
         """
         Reads a text file containing a list of keys and filters the variables pool by those keys.
@@ -594,6 +594,9 @@ class OutputManager(object):
 
         Parameters
         ----------
+        prefix : str
+            The custom prefix specified in the MetadataPaths object by the user in Scenario Manager.
+
         save_path : str
             Path to the directory where the file will be saved.
 
@@ -624,7 +627,7 @@ class OutputManager(object):
             if filter_file.startswith("json_"):
                 file_path = os.path.join(
                     save_path,
-                    self._generate_file_name(f"saved_variables_{filter_file}", "json"),
+                    self._generate_file_name(f"{prefix}_saved_variables_{filter_file}", "json"),
                 )
                 self._dict_to_file_json(filtered_pool, file_path)
             elif filter_file.startswith("csv_"):
@@ -640,13 +643,15 @@ class OutputManager(object):
                 )
 
     def _save_variables_to_csv_files(
-        self, data_dict: Dict[str, Any], filter_name: str, path: str
+        self, prefix: str, data_dict: Dict[str, Any], filter_name: str, path: str
     ) -> None:
         """
         Saves the variables_pool into one csv file per variable in the given path to a directory.
 
         Parameters
         ----------
+        prefix : str
+            The custom prefix specified in the MetadataPaths object by the user in Scenario Manager.
         data_dict : Dict[str, Any]
             The dictionary to be saved
         filter_name : str
@@ -661,7 +666,7 @@ class OutputManager(object):
             raise e
 
         variable_csv_file_path = os.path.join(
-            path, self._generate_file_name(f"saved_variables_{filter_name}", "csv")
+            path, self._generate_file_name(f"{prefix}_saved_variables_{filter_name}", "csv")
         )
         self._dict_to_file_csv(data_dict, variable_csv_file_path)
 
@@ -692,29 +697,29 @@ class OutputManager(object):
         )
         self._dict_to_file_json(pool, json_file_path)
 
-    def dump_logs(self, path: str) -> None:
+    def dump_logs(self, prefix: str, path: str) -> None:
         """
         Dumps logs_pool into a json file in the given path to a directory.
         """
-        file_path = os.path.join(path, self._generate_file_name("logs", "json"))
+        file_path = os.path.join(path, self._generate_file_name(f"{prefix}_logs", "json"))
         self._dict_to_file_json(self.logs_pool, file_path)
 
-    def dump_warnings(self, path: str) -> None:
+    def dump_warnings(self, prefix: str, path: str) -> None:
         """
         Dumps warnings_pool into a json file in the given path to a directory.
         """
-        file_path = os.path.join(path, self._generate_file_name("warnings", "json"))
+        file_path = os.path.join(path, self._generate_file_name(f"{prefix}_warnings", "json"))
         self._dict_to_file_json(self.warnings_pool, file_path)
 
-    def dump_errors(self, path: str) -> None:
+    def dump_errors(self, prefix: str, path: str) -> None:
         """
         Dumps errors_pool into a json file in the given path to a directory.
         """
-        file_path = os.path.join(path, self._generate_file_name("errors", "json"))
+        file_path = os.path.join(path, self._generate_file_name(f"{prefix}_errors", "json"))
         self._dict_to_file_json(self.errors_pool, file_path)
 
     def dump_variable_names_and_contexts(
-        self, path: str, exclude_info_maps: bool, format_option: str = "verbose"
+        self, metadata_prefix: str, path: str, exclude_info_maps: bool, format_option: str = "verbose"
     ) -> None:
         """
         Dumps names of all variables added to variables_pool along with the caller class
@@ -722,6 +727,9 @@ class OutputManager(object):
 
         Parameters
         ----------
+        metadata_prefix: str
+            The prefix specifying the metadata file used to run the scenario.
+
         path : str
             The path to the file to be dumped to.
 
@@ -781,20 +789,20 @@ class OutputManager(object):
                         var_list.append(f"{prefix}.{parsable_dict}: {key}{os.linesep}")
 
         file_path = os.path.join(
-            path, self._generate_file_name("variable_names", "txt")
+            path, self._generate_file_name(f"{metadata_prefix}_variable_names", "txt")
         )
         self._list_to_file_txt(var_list, file_path)
 
     def dump_all_nondata_pools(
-        self, path: str, exclude_info_maps: bool = False
+        self, prefix: str, path: str, exclude_info_maps: bool = False
     ) -> None:
         """
         Dumps all non-data pools into the given path to a directory.
         """
-        self.dump_variable_names_and_contexts(path, exclude_info_maps)
-        self.dump_logs(path)
-        self.dump_warnings(path)
-        self.dump_errors(path)
+        self.dump_variable_names_and_contexts(prefix, path, exclude_info_maps)
+        self.dump_logs(prefix, path)
+        self.dump_warnings(prefix, path)
+        self.dump_errors(prefix, path)
 
     def flush_pools(self) -> None:
         """

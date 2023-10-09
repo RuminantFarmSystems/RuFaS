@@ -19,4 +19,17 @@ Multiple simulations:
     extra input from the user and will use the ARL_metadata.json file
 """
 
-METADATA_PATHS = ['input/metadata/default_metadata.json']
+from pathlib import Path
+from typing import List, TypedDict
+
+
+class MetadataPaths(TypedDict):
+    prefix: str
+    path: Path
+
+
+METADATA_PATHS: List[MetadataPaths] = [{"prefix": "default_scenario",
+                                        "path": Path('input/metadata/default_metadata.json')},
+                                       {"prefix": "ARL_scenario",
+                                        "path": Path('input/metadata/ARL_metadata.json')},
+                                       ]
