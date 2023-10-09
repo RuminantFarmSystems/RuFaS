@@ -26,27 +26,20 @@ class Infiltration:
         """
         self.data = soil_data or SoilData(field_size=field_size)
 
-    def infiltrate(self, rainfall: float, weighting_coefficient: float, potential_evapotranspiration: float) -> None:
+    def infiltrate(self, rainfall: float) -> None:
         """Main routine for determining runoff and infiltration of soil for a given day.
 
         Parameters
         ----------
         rainfall : float
-            Rainfall depth of current day (mm)
-        weighting_coefficient : float
-            Weighting coefficient used to calculate retention coefficient for daily curve number calculations dependent
-            on plant evapotranspiration (unitless)
-        potential_evapotranspiration : float
-            Total potential evaporation and transpiration that can occur on the current day (mm)
+            Rainfall depth of current day (mm).
 
         Notes
         -----
-        This module, in part, relies on the temperature of the top soil layer to determine infiltration. Because RuFaS
-        overrides the user-defined soil profile to maintain a top soil layer that is 20 mm thick for the purpose of
-        tracking phosphorus more accurately, this module distributes the water infiltrated between the two top layers of
-        proportionately by thickness. It also assumes that the top two layers of soil will have the same temperature
-        every day, which will be true for every day of the simulation as long as daily routine in `soil_temp.py` is run
-        prior to this routine.
+        The amount of water that is allowed to infiltrate the soil profile on any given day is limited by the available
+        capacity of the total soil profile. This means that on some days more water will infiltrate the surface soil
+        layer than there is capacity in said layer. This works fine as long as water is allowed to percolate out of the
+        surface layer after this.
 
         """
         third_moisture_condition_parameter = self._determine_third_moisture_condition_parameter(
@@ -81,14 +74,10 @@ class Infiltration:
                                                                         first_moisture_condition_retention_parameter,
                                                                         retention_parameter)
         # --------------------------------------------------------------------------------------------------------------
-        # TODO: bound runoff by the amount of rainfall that occurred before storing it - Issue #468
-        self.data.accumulated_runoff = self._determine_accumulated_runoff(rainfall, retention_parameter)
+        self.data.accumulated_runoff = min(rainfall, self._determine_accumulated_runoff(rainfall, retention_parameter))
         infiltrated_water = max(0.0, rainfall - self.data.accumulated_runoff)
-        info_map = {"class": self.__class__.__name__, "function": self.infiltrate.__name__, "prefix": "Field"}
-        om.add_variable("top_water_content_pre_infiltration(mm)", self.data.soil_layers[0].water_content, info_map)
-        om.add_variable("infiltrated_water(mm)", infiltrated_water, info_map)
+        self.data.infiltrated_water = infiltrated_water
         self.data.soil_layers[0].water_content += infiltrated_water
-        om.add_variable("top_water_content_post_infiltration(mm)", self.data.soil_layers[0].water_content, info_map)
 
         # Update annual totals
         self.data.annual_runoff_total += self.data.accumulated_runoff
@@ -333,8 +322,8 @@ class Infiltration:
 
         Notes
         -----
-        Runoff only occurs when rainfall is greater than initial abstractions (about surface storage, interception, etc.)
-        which are approximated as 0.2 times the retention parameter in SWAT 2:1.1 and here.
+        Runoff only occurs when rainfall is greater than initial abstractions (about surface storage, interception,
+        etc.) which are approximated as 0.2 times the retention parameter in SWAT 2:1.1 and here.
 
         References
         ----------
