@@ -33,6 +33,10 @@ class Percolation:
         has_seasonal_high_water_table : bool
             A flag indicating whether the HRU has a seasonal high water table (True/False).
 
+        Notes
+        -----
+        RuFaS allows percolation even when the temperature of the soil layer is below zero degrees Celsius.
+
         References
         ----------
         SWAT sections 2:3.1 and 2
