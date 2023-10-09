@@ -224,7 +224,7 @@ class LayerData:
     """the rate at which above ground structural carbon decomposes into slow or active carbon (unitless)"""
     weighted_residue_dry_matter_lignin_fraction: float = 0.0
     """the weighted fractional of lignin amount in residue dry matter (unitless)"""
-    soil_residue_lignin_fraction: float = 0.0
+    soil_residue_lignin_fraction: float = 0.17
     """the fraction of soil residue that's comprised of lignin (unitless)"""
     soil_lignin_to_nitrogen_fraction: float = 0.0
     """soil lignin to nitrogen fraction(unitless)"""
