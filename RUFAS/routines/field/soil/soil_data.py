@@ -182,7 +182,7 @@ class SoilData:
     """plant residue on the surface of the soil (kg/ha)"""
     plant_root_residue = 0
     """plant residue below the surface of the soil (kg/ha)"""
-    plant_residue_lignin_composition: float = 0
+    plant_residue_lignin_composition: float = 0.17
     """lignin fraction of plant residue (unitless)"""
     plant_lignin_nitrogen_ratio: float = 0
     """plant lignin to nitrogen ratio (unitless)"""
