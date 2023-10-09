@@ -633,7 +633,7 @@ class OutputManager(object):
             elif filter_file.startswith("csv_"):
                 csv_directory = os.path.join(save_path, "CSVs", "om")
                 self._save_variables_to_csv_files(
-                    filtered_pool, filter_file, csv_directory
+                    prefix, filtered_pool, filter_file, csv_directory
                 )
             else:
                 self.add_warning(
