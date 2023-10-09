@@ -3,13 +3,10 @@ from math import exp
 
 from RUFAS.routines.field.soil.layer_data import LayerData
 from RUFAS.routines.field.soil.soil_data import SoilData
-from RUFAS.output_manager import OutputManager
 
 """
 This module is based on the section 'Percolation' (2:3.2) in SWAT
 """
-
-om = OutputManager()
 
 
 class Percolation:

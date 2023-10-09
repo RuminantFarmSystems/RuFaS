@@ -1,13 +1,10 @@
 from math import exp, log
 from typing import Optional
 from RUFAS.routines.field.soil.soil_data import SoilData
-from RUFAS.output_manager import OutputManager
 
 """
 This module is based on the 'Runoff Volume: SCS Curve Number Procedure' (2:1.1) section of the SWAT model documentation
 """
-
-om = OutputManager()
 
 
 class Infiltration:
