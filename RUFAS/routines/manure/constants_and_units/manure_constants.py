@@ -30,7 +30,7 @@ class ManureConstants:
     SOLID_MANURE_DENSITY = 1250
     """The density of solid manure (kg/:math:`m^3`)."""
 
-    DEFAULT_CARBON_AVAILABLE_IN_MANURE = 0.5
+    DEFAULT_CARBON_FRACTION_AVAILABLE_IN_MANURE = 0.5
     """Default proportion of carbon available in manure, (unitless, [0, 1]). Default is set to 0.5."""
 
     EFFECTIVE_MICROBIAL_DECOMP_RATE = 2.37e-3
@@ -38,3 +38,21 @@ class ManureConstants:
 
     DEFAULT_MOISTURE_EFFECT_MICROBIAL_DECOMP = 0.65
     """The effect of moisture on microbial decomposition."""
+
+    DEFAULT_DAYS_SINCE_LAST_TILLAGE = 1
+    """
+    Default number of days since last tillage used in the calculation of the carbon decomposition rate
+    (days). Default is set to 1.
+    """
+
+    DEFAULT_LAG_TIME = 2
+    """Default lag time used in the calculation of the carbon decomposition rate (days). Default is set to 2."""
+
+    COMPOST_BEDDING_ORGANIC_NITROGEN_FRACTION = 0.952
+    """The fraction of organic nitrogen in compost bedding (unitless, [0, 1]). Default is set to 0.952."""
+
+    COMPOST_BEDDING_INORGANIC_NITROGEN_AMMONIUM_FRACTION = 0.5
+    """
+    The fraction of inorganic nitrogen in compost bedding that is ammonium (unitless, [0, 1]).
+    Default is set to 0.5.
+    """
