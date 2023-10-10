@@ -12,10 +12,10 @@ Body weight gain with user input calf average daily gain.
 
 from random import random
 from scipy.stats import truncnorm
+from typing import Dict
 from RUFAS.output_manager import OutputManager
 from RUFAS.routines.animal.life_cycle.animal_base import AnimalBase
 
-# from RUFAS.routines.animal.ration.calf_ration import calc_requirements
 from RUFAS.routines.animal.ration.calf_ration import CalfRationManager
 from RUFAS.routines.animal.manure.calf_manure_excretion import manure_calculations
 from RUFAS.routines.animal.life_cycle import animal_constants as const
@@ -127,9 +127,21 @@ class Calf(AnimalBase):
         }
         return values
 
-    def calc_nutrient_rqmts(self, feed, temp):
+    def calc_nutrient_rqmts(self, feed: Dict[str, float], temp: float) -> None:
         """
         Calculates this calf's nutrient requirements.
+
+        Parameters
+        ----------
+        feed: Dict[str, float]
+            instance of the Feed class
+        temp : float
+            methane model used for methane emission calculations
+
+        Returns
+        -------
+        None
+
         """
         wean_day = AnimalBase.config["wean_day"]
         wean_length = AnimalBase.config["wean_length"]
@@ -138,13 +150,21 @@ class Calf(AnimalBase):
         self.nutrient_rqmts = CalfRationManager.calc_requirements(self, feed, temp, self.animal_intake)
         self.DBW = self.nutrient_rqmts["live_weight_change"]["val"]
 
-    def calc_manure_excretion(self, feed, methane_model):
+    def calc_manure_excretion(self, feed: Dict[str, float], methane_model: str) -> None:
         """
         Calculates and sets the manure excretion components.
 
-        Args:
-            feed: instance of the Feed class
-            methane_model: methane model used for methane emission calculations
+        Parameters
+        ----------
+        feed: Dict[str, float]
+            instance of the Feed class
+        methane_model : str
+            methane model used for methane emission calculations
+
+        Returns
+        -------
+        None
+
         """
         p_urine, p_feces_excrt = self.calc_base_manure()
 

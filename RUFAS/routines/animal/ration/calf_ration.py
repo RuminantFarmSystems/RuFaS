@@ -22,12 +22,12 @@ class CalfRationManager:
     @classmethod
     def _get_ration(cls) -> Dict[str, float | str]:
         """
-        Harcoded calf ration
+        Harcoded calf ration.
 
         Returns
         -------
         Dict[str, float | str]
-            Dictionary of formulated ration
+            Dictionary of formulated ration.
 
         """
         return {'155': 1, '157': 2, 'status': 'Optimal', 'objective': 4.5}
@@ -35,15 +35,15 @@ class CalfRationManager:
     @classmethod
     def optimize(cls):
         """"
-        Returns "optimized" calf ration
+        Returns "optimized" calf ration.
 
         Notes
         -----
-        Use of calf nutrient requirements not implemented, hardcoded ration is returned
+        Use of calf nutrient requirements not implemented, hardcoded ration is returned.
 
         Returns
         -------
-        Dictionary of formulated ration
+        Dictionary of formulated ration.
 
         """
         return cls._get_ration()
@@ -59,16 +59,16 @@ class CalfRationManager:
         calf : Calf
             Calf object
         feed : Dict[str, float]
-            Instance of Feed class defined in feed.py
+            Instance of Feed class defined in feed.py.
         temp : float
-            Average temperature of the simulation day
+            Average temperature of the simulation day, C.
         animal_intake : Dict
-            Dictionary of calculated intake values
+            Dictionary of calculated intake values.
 
         Returns
         -------
         Dict[str,  Dict[str, Any]]
-            Dictionary of requirement values and methods
+            Dictionary of requirement values and methods.
 
         """
 
@@ -157,10 +157,9 @@ class CalfRationManager:
         ne_gain = me_gain * (0.69 * milk_me_proportion + 0.57 * starter_me_proportion)
 
         # [A.1B.H.3]
+        energy_allow_gain = 0
         if ne_gain >= 0:
             energy_allow_gain = math.exp(0.833 * math.log((1.19 * ne_gain)/(0.69 * calf.body_weight ** 0.355)))
-        else:
-            energy_allow_gain = 0
 
         # [A.1B.H.4]
         adp_allow_gain = (adp_intake - adp_maint) * bio_val / 0.188 * 0.001
@@ -183,11 +182,11 @@ class CalfRationManager:
 
         return nutrient_requirements
 
-    @ classmethod
+    @classmethod
     def calc_intake(cls, calf, feed: Dict[str, float], wean_day: int, wean_length: int,
                     milk_type: str) -> Dict:
         """
-        Calculating calf intake values
+        Calculating calf intake values.
 
 
         Parameters
@@ -195,18 +194,18 @@ class CalfRationManager:
         calf : Calf
             Calf object
         feed : Dict[str, float]
-            Instance of Feed class defined in feed.py
+            Instance of Feed class defined in feed.py.
         wean_day : int
-            Wean day of the calf
+            Wean day of the calf.
         wean_length : int
-            Wean length of the calf
+            Wean length of the calf.
         milk_type : string
-            Either "whole" or "replacer"
+            Either "whole" or "replacer".
 
         Returns
         -------
         Dict[str, float]
-            Dictionary of intake values
+            Dictionary of intake values.
 
         """
         # nutrient composition of feeds from the feed library
