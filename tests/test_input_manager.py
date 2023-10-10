@@ -690,9 +690,11 @@ def test_validate_json_element_invalid_var_name_raises_input_data_keyerror(mock_
     input_data = {"valid_key": {"another_valid_key": "value"}}
     eager_termination = False
 
-    with pytest.raises(KeyError):
+    with patch("RUFAS.output_manager.OutputManager.add_error") as add_error:
         mock_input_manager._validate_json_element(element_hierarchy, properties_blob_key, input_data,
                                                   eager_termination)
+
+        assert add_error.call_count == 1
 
     mock_input_manager._validate_json_element = input_manager_original_method_states["_validate_json_element"]
 
@@ -745,6 +747,8 @@ def test_validate_json_element_missing_type_raises_keyerror(mock_input_manager: 
         ([1, 2, 3, 4, 5, 6, 7, 8, 9, 10], {"maximum_length": 10}, True, 0),
         ([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11], {"minimum_length": 5, "maximum_length": 10}, False, 1),
         ([], {"minimum_length": 5}, False, 1),
+        (None, {"minimum_length": 3, "maximum_length": 6}, False, 1),
+        ("[1, 2, 3]", {"minimum_length": 1}, False, 1)
     ]
 )
 def test_array_type_validator(dummy_value: list, dummy_variable_to_check: Dict[str, int], expected_result: bool,
@@ -768,6 +772,8 @@ def test_array_type_validator(dummy_value: list, dummy_variable_to_check: Dict[s
         (7, {"minimum": 3, "maximum": 7}, True, 0),
         (9, {"maximum": 7}, False, 1),
         (-1, {"minimum": 3, "maximum": 7}, False, 1),
+        (None, {"maximum": 1, "minimum": 0}, False, 1),
+        ("42", {"minimum": 4, "maximum": 32}, False, 1)
     ]
 )
 def test_num_type_validator(dummy_value: int,
@@ -794,6 +800,8 @@ def test_num_type_validator(dummy_value: int,
         ("cow", {"minimum_length": 1, "maximum_length": 5}, True, 0),
         ("cow", {"minimum_length": 5}, False, 1),
         ("cow", {"maximum_length": 1}, False, 1),
+        (None, {"pattern": r"cow", "minimum_length": 1}, False, 1),
+        (42.0, {"pattern": r"cow", "maximum_length": 3}, False, 1)
     ]
 )
 def test_string_type_validator(dummy_value: int,
@@ -1664,3 +1672,15 @@ def test_get_metadata_raises_exception(dummy_metadata_path: str,
                                 f"\"{expected_error_parent_address}\" does not have attribute " \
                                 f"\"{expected_error_invalid_key}\"."
         assert add_error.call_count == expected_warning_call_count
+
+
+def test_flush_pool(mock_input_manager: InputManager) -> None:
+    """Tests that the InputManager pool is flushed correctly."""
+
+    mock_input_manager._InputManager__pool = {"Key": "I never metadata I didn't like!"}
+
+    with patch("RUFAS.output_manager.OutputManager.add_log") as add_log:
+        mock_input_manager.flush_pool()
+
+        assert mock_input_manager._InputManager__pool == {}
+        assert add_log.call_count == 1
