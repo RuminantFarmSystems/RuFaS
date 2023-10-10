@@ -196,9 +196,9 @@ class CalfRationManager:
         feed : Dict[str, float]
             Instance of Feed class defined in feed.py.
         wean_day : int
-            Wean day of the calf.
+            Number of days after birth that calf is fully weaned from milk (or replacer).
         wean_length : int
-            Wean length of the calf.
+            Wean length of the calf, in days.
         milk_type : string
             Either "whole" or "replacer".
 
