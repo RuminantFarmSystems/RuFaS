@@ -57,6 +57,7 @@ class ManureHandlerDailyOutput(LiquidManurePortionProtocol):
     manure_volume: float = 0.0
     cleaning_water_volume: float = 0.0
     total_bedding_volume: float = 0.0
+    total_bedding_mass: float = 0.0
     total_water_volume_in_milking_parlor: float = 0.0
     total_daily_manure_volume: float = field(init=False)
     # To satisfy the LiquidManurePortionProtocol
