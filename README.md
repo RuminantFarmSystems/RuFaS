@@ -57,7 +57,7 @@ Design and implement EEE (Review progress on this)|Pooya, Roohi, Kristan, Jenn||
 Finish Compost for Manure Module |Varma, Loi||P0
 Redesign and implement Feed storage module |Kevin, Pooya, Kristan|||Moved to MS 2.5
 Revisit the Animal Module design – Refactoring -- Animal Manager||Design Phase|P2| Moved to MS 2.5
-Revisit the Animal Module design – Refactoring -- Animal Ration formulation|Joe|In Progress|P0
+Revisit the Animal Module design – Refactoring -- Animal Ration formulation|Joe|In Review|P0
 Revisit the Animal Module design – Refactoring -- Animal Life Cycle|Yijing, Simon, Anchey|Design phase|P0
 Deprecate the output handler, add missing functionalities, and reports to OM|Niko, Allister||P0
 Go through the entire codebase and ensure IM is the only way we are receiving input data|Allister, Niko||P0|[IM Integration tracking](https://docs.google.com/spreadsheets/d/1k8J6MelPrsrz6Tv4fQNAG-kLSN7oQTQOCEy3I6F0IqU/edit?usp=sharing)
