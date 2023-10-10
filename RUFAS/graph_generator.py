@@ -4,10 +4,14 @@ from pathlib import Path
 from typing import Dict, List, Any
 
 import matplotlib
-matplotlib.use('TkAgg')
 import matplotlib.pyplot as pyplt
 from matplotlib.figure import Figure
 
+"""
+Agg rendering to a Tk canvas (requires TkInter). This backend can be activated in IPython with %matplotlib tk.
+Ref: https://matplotlib.org/stable/users/explain/figure/backends.html
+"""
+matplotlib.use("TkAgg")
 
 om_pool_element_type = Dict[str, List[Dict[str, Any]]]
 
@@ -18,8 +22,14 @@ class GraphGenerator:
     NOTE: This class is not multi-thread safe!!!
     """
 
-    def generate_graph(self, filtered_pool: Dict[str, om_pool_element_type], graph_info: Dict[str, str], save_path: str,
-                       filter_file_name: str, **kwargs):
+    def generate_graph(
+        self,
+        filtered_pool: Dict[str, om_pool_element_type],
+        graph_info: Dict[str, str],
+        save_path: str,
+        filter_file_name: str,
+        **kwargs,
+    ):
         """
         Function to generate graph. This function will route the input to the correct function according to the type
         of graph.
@@ -52,16 +62,18 @@ class GraphGenerator:
         """
         Function to apply customizations to the graph.
         """
-        if 'title' in graph_info.keys():
-            fig.axes[0].set_title(graph_info['title'])
-        if 'x_label' in graph_info.keys():
-            fig.axes[0].set_xlabel(graph_info['x_label'])
-        if 'y_label' in graph_info.keys():
-            fig.axes[0].set_xlabel(graph_info['y_label'])
-        if 'legend' in graph_info.keys():
-            fig.axes[0].legend(graph_info['legend'])
+        if "title" in graph_info.keys():
+            fig.axes[0].set_title(graph_info["title"])
+        if "x_label" in graph_info.keys():
+            fig.axes[0].set_xlabel(graph_info["x_label"])
+        if "y_label" in graph_info.keys():
+            fig.axes[0].set_xlabel(graph_info["y_label"])
+        if "legend" in graph_info.keys():
+            fig.axes[0].legend(graph_info["legend"])
 
-    def _generate_graph_path(self, save_path: str, graph_info: dict, filter_file_name: str) -> str:
+    def _generate_graph_path(
+        self, save_path: str, graph_info: dict, filter_file_name: str
+    ) -> str:
         """
         Function to generate the full path for the output graph, and create all the parenting folders.
         """
@@ -73,9 +85,9 @@ class GraphGenerator:
 
         timestamp: str = datetime.datetime.now().strftime("%d-%b-%Y_%a_%H-%M-%S")
 
-        if 'title' in graph_info.keys():
-            title = '-'.join(graph_info['title'].split()).lower()
-            filename = title + '-' + timestamp + ".png"
+        if "title" in graph_info.keys():
+            title = "-".join(graph_info["title"].split()).lower()
+            filename = title + "-" + timestamp + ".png"
         else:
             filename = f"saved_graph_{filter_file_name}-" + timestamp + ".png"
 
@@ -88,7 +100,7 @@ class GraphGenerator:
         """
         fig, ax = pyplt.subplots()
         for key in filtered_pool.keys():
-            ax.plot(filtered_pool[key]['values'])
+            ax.plot(filtered_pool[key]["values"])
         self._customize_graph(fig, graph_info)
         return fig
 
@@ -101,7 +113,7 @@ class GraphGenerator:
 
         for key in filtered_pool.keys():
             category.append(key)
-            count.append(filtered_pool[key]['values'])
+            count.append(filtered_pool[key]["values"])
 
         ax.bar(category, count)
         self._customize_graph(fig, graph_info)
