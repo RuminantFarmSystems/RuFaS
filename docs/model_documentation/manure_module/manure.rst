@@ -1,17 +1,14 @@
-Manure module
-====================
+Manure Module
+=============
 
 .. toctree::
    :maxdepth: 1
 
-   background
-   beddings/beddings
-   default_enum/default_enum
-   gas_emissions/gas_emissions
+   background 
+   manure_characteristics/manure_characteristics
+   manure_field_connector/manure_field_connector
    manure_handlers/manure_handlers
-   manure_separators/manure_separators
-   manure_treatments/manure_treatments
-   pen/pen
-   pen_manure/pen_manure
-   protocols
-   reception_pits/reception_pits
+   manure_treatment/manure_treatment
+   milking_parlor/milking_parlor
+   solid_liquid_separator/solid_liquid_separator
+   Manure_module_data_evaluation_documentation 
