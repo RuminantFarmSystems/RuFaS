@@ -520,7 +520,7 @@ class OutputManager(object):
 
                 elif path.endswith(".json"):
                     graph_metadata = json.load(filter_file)
-                    list_of_elements = graph_metadata['filter']
+                    list_of_elements = graph_metadata['filters']
                     load_message = f"Successfully opened {path} and read {len(list_of_elements)} lines."
                     self.add_log("filter_pattern_file_load_log", load_message, info_map)
                 return list_of_elements, graph_metadata
