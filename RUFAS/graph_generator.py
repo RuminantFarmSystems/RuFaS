@@ -115,29 +115,35 @@ class GraphGenerator:
         ----------
         filtered_pool : Dict[str, Dict[str, List[Dict[str, Any]]]]
             The result pool after filtering with the provided RegEx filters
-        graph_info: Dict[str, str]
+        graph_details: Dict[str, str]
             A dictionary containing details/metadata about the graph
         save_path: str
             The base folder path to save the output
         filter_file_name: str
             The name of the filter file
-        """
-        fig, _ = pyplt.subplots()
-        self._draw_graph(fig, graph_details["type"])
-        self._customize_graph(fig, graph_details)
 
-        graph_path = self._generate_graph_path(
-            save_path, graph_details, filter_file_name
-        )
+
+        Raises
+        ------
+            Generic Exception raised by utility functions
+
+        Returns
+        -------
+        str
+            The path to the saved graph
+
+        """
         try:
-            pyplt.savefig(graph_path)
+            fig, _ = pyplt.subplots()
+            self._draw_graph(graph_details["type"], filtered_pool)
+            self._customize_graph(fig, graph_details)
+            return self._save_graph(graph_details, filter_file_name, save_path)
         except Exception as e:
             raise e
 
     def _draw_graph(
         self,
         graph_type: str,
-        fig: Figure,
         data: Dict[str, Dict[str, List[Dict[str, Any]]]],
     ):
         for key in data.keys():
@@ -154,8 +160,23 @@ class GraphGenerator:
             elif attrib in AXES_SETTERS.keys():
                 AXES_SETTERS[attrib](fig.axes[0], value)
 
+    def _save_graph(
+        self,
+        graph_details: Dict[str, str],
+        filter_file_name: str,
+        save_path: str,
+    ) -> str:
+        graph_path = self._generate_graph_path(
+            save_path, graph_details, filter_file_name
+        )
+        try:
+            pyplt.savefig(graph_path)
+            return graph_path
+        except Exception as e:
+            raise e
+
     def _generate_graph_path(
-        self, save_path: str, graph_info: dict, filter_file_name: str
+        self, save_path: str, graph_details: Dict[str, str], filter_file_name: str
     ) -> str:
         """
         Function to generate the full path for the output graph, and create all the parenting folders.
@@ -168,11 +189,11 @@ class GraphGenerator:
 
         timestamp: str = datetime.datetime.now().strftime("%d-%b-%Y_%a_%H-%M-%S")
 
-        if "title" in graph_info.keys():
-            title = "-".join(graph_info["title"].split()).lower()
-            filename = title + "-" + timestamp + ".png"
+        if "title" in graph_details.keys():
+            title = "-".join(graph_details["title"].split()).lower()
+            filename = f"{title}-{timestamp}.png"
         else:
-            filename = f"saved_graph_{filter_file_name}-" + timestamp + ".png"
+            filename = f"saved_graph_{filter_file_name}-{timestamp}.png"
 
         graph_path = os.path.join(graph_directory, filename)
         return graph_path
