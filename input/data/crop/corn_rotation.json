@@ -1,0 +1,15 @@
+{
+    "crop_schedules": [
+        {
+            "crop_species": "corn",
+            "planting_years": [2009],
+            "planting_days": [121],
+            "harvest_years": [2009],
+            "harvest_days": [319],
+            "harvest_operations": ["default"],
+            "harvest_type": "scheduled",
+            "pattern_repeat": 7,
+            "pattern_skip": 0
+        }
+    ]
+}

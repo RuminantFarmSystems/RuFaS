@@ -10,16 +10,14 @@ Author(s): Kass Chupongstimun, kass_c@hotmail.com
            Jacob Johnson, jacob8399@gmail.com
 """
 
-import csv
+import numpy as np
 
-from RUFAS import errors
 from RUFAS.input_manager import InputManager
 from RUFAS.output_manager import OutputManager
 from RUFAS.routines import Feed
 from RUFAS.routines.field.manager.field_manager import FieldManager
 from RUFAS.routines.animal.animal_manager import AnimalManager
 from RUFAS.routines.manure.manure_manager import ManureManager
-from RUFAS.util import Utility
 
 im = InputManager()
 om = OutputManager()
@@ -83,10 +81,6 @@ class Config:
                 under "config"
             weather_file: path to the weather file specified in the json file
         """
-
-        info_map = {"class": self.__class__.__name__,
-                    "function": self.__init__.__name__,
-                    "config_data": data, }
 
         # gets a start/end date in the format year:julian-day. That way the program
         # can start in the middle of the year
@@ -179,10 +173,6 @@ class Weather:
                 to initialize the Weather object
         """
 
-        info_map = {"class": self.__class__.__name__,
-                    "function": self.__init__.__name__,
-                    "weather_config": vars(config), }
-
         years = config.years
         w_start_year = config.w_start_year
         w_start_day = config.w_start_day
@@ -217,7 +207,7 @@ class Weather:
         else:
             days_to_start = w_day_offset + start_day
             temp_year = w_start_year + 1
-            while temp_year < start_year:
+            while temp_year != start_year:
                 if is_leap_year(temp_year):
                     days_to_start += leap_year_length
                 else:
@@ -252,20 +242,37 @@ class Weather:
             self.radiation[current_year_index][current_day_index] = weather_file['Hday'][i]
             self.irrigation[current_year_index][current_day_index] = weather_file['irrigation'][i]
 
-        # calculates T_avg_annual for each year
-        for i in range(len(years)):
-            avg = sum(self.T_avg[i]) / (len(years[i]))
-            self.T_avg_annual.append(avg)
+        self.T_avg_annual = self._calculate_average_annual_temperature(weather_file['avg'])
 
-        if len(years) > 2:
-            T_avg = sum([self.T_avg_annual[j] for j in range(1, len(self.T_avg_annual) - 1)]) \
-                / (len(self.T_avg_annual) - 2)
-        else:
-            T_avg = sum([self.T_avg_annual[j] for j in range(len(self.T_avg_annual))]) \
-                / len(self.T_avg_annual)
+    @staticmethod
+    def _calculate_average_annual_temperature(daily_average_temperatures: list[float]) -> float:
+        """
+        Calculates the average annual air temperature based on the daily average air temperatures.
 
-        self.T_avg_annual[0] = T_avg
-        self.T_avg_annual[len(self.T_avg_annual) - 1] = T_avg
+        Parameters
+        ----------
+        daily_average_temperatures : list(float)
+            List of daily average air temperatures in the passed to be run by the simulation (degrees C).
+
+        Returns
+        -------
+        float
+            The average annual air temperature (degrees C).
+
+        Notes
+        -----
+        This method calculates the average annual air temperature by taking the average of all daily average air
+        temperatures provided in the weather input file. Previous implementations calculated the average annual
+        temperature for individual years, which led to the value fluctuating more than desired.
+
+        This method is intended to approximate SWAT's method for calculating the average annual temperature. SWAT
+        calculates average high and low temperatures for each month over every simulated year, then averages those
+        values to get a single annual average air temperature for the entire simulation. The exact implementation for
+        this can be found at in the SWAT source code file `readwgn.f
+        <https://bitbucket.org/blacklandgrasslandmodels/swat_development/src/master/readwgn.f>`_
+
+        """
+        return np.mean(np.array(daily_average_temperatures))
 
 
 class Time:
