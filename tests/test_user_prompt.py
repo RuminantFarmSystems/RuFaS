@@ -121,14 +121,12 @@ def test_execute_simulations(mocker: MockerFixture, is_data_valid: bool,
     assert mock_input_manager.flush_pool.call_count == len(metadata_file_list)
     assert mock_output_manager.dump_all_nondata_pools.call_count == len(metadata_file_list)
     assert mock_output_manager.dump_all_nondata_pools.call_args_list == [
-        mocker.call(f"{metadata_file_list[0]['prefix']}", "output", True),
-        mocker.call(f"{metadata_file_list[1]['prefix']}", "output", True),
-    ]
+        mocker.call("output", True),
+    ] * len(metadata_file_list)
     assert mock_output_manager.save_variables.call_count == len(metadata_file_list)
     assert mock_output_manager.save_variables.call_args_list == [
-        mocker.call(f"{metadata_file_list[0]['prefix']}", "output", "output/output_filters/", True),
-        mocker.call(f"{metadata_file_list[1]['prefix']}", "output", "output/output_filters/", True)
-    ]
+        mocker.call("output", "output/output_filters/", True),
+    ] * len(metadata_file_list)
 
 
 def test_parse_gnu_args(mocker: MockerFixture) -> None:
