@@ -65,6 +65,8 @@ def run_validation(metadata_files: List[Path], exclude_info_maps: bool = False) 
     input_manager = InputManager()
     metadata_file_list = metadata_files
     for metadata_file_path in metadata_file_list:
+        input_manager.flush_pool()
+        output_manager.flush_pools()
         is_data_valid = input_manager.start_data_processing(str(metadata_file_path), False)
         output_manager.add_log("Only run validation data validity check",
                                f"{str(metadata_file_path)} data validity is: {is_data_valid}",
@@ -73,7 +75,7 @@ def run_validation(metadata_files: List[Path], exclude_info_maps: bool = False) 
 
 
 def execute_simulations(
-    metadata_files: List[Path], exclude_info_maps: bool = False, eager_termination: bool = True,
+    metadata_files: List[Path], exclude_info_maps: bool = False,
 ) -> None:
     """Instantiates I/O Managers and processes the metadata files provided by the user to run the simulation.
 
@@ -94,7 +96,7 @@ def execute_simulations(
     for metadata_file_path in metadata_file_list:
         input_manager.flush_pool()
         output_manager.flush_pools()
-        is_data_valid = input_manager.start_data_processing(str(metadata_file_path), eager_termination)
+        is_data_valid = input_manager.start_data_processing(str(metadata_file_path), True)
         if is_data_valid:
             simulator = SimulationEngine()
             simulator.simulate()
@@ -134,7 +136,7 @@ def parse_gnu_args():
     )
     parser.add_argument(
         "-orv",
-        "--only_run_validation",
+        "--only-run-validation",
         help="Only validate the data, don't run a simulation",
         action="store_true",
     )
