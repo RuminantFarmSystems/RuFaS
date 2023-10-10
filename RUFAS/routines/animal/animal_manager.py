@@ -1373,7 +1373,6 @@ class AnimalManager:
 
                 info_map = {"class": self.__class__.__name__,
                             "function": self._calc_ration_at_interval.__name__,
-                            "available_feeds": available_feeds.feed_id,
                             f'number_animals_in_pen_{pen.id}': len(pen.animals_in_pen)}
                 om.add_variable(f'ration_nutrient_amount_pen_{pen.id}', nutrient_amount, info_map)
                 om.add_variable(f'MEdiet_pen_{pen.id}', pen.MEdiet, info_map)
