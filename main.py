@@ -58,6 +58,15 @@ def set_global_variables(make_graphs: bool, verbose: bool) -> None:
 
 
 def run_validation(metadata_files: List[Path], exclude_info_maps: bool = False) -> None:
+    """Instantiates I/O Managers and triggers validation of input data.
+
+    Parameters
+    ----------
+    metadata_files : List[Path]
+        The list of Paths to the metadata files the user entered with which to run the simulation.
+    exclude_info_maps : bool, optional
+        Flag for whether or not the user wants to inlcude info_maps data in their results files.
+    """
     info_map = {"class": "No caller class",
                 "function": run_validation.__name__,
                 }
