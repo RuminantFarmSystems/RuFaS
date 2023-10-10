@@ -75,6 +75,7 @@ def execute_simulations(
     for metadata_file in metadata_files:
         input_manager.flush_pool()
         output_manager.flush_pools()
+        output_manager.set_metadata_prefix(metadata_file['prefix'])
         is_data_valid = input_manager.start_data_processing(str(metadata_file["path"]), True)
         if is_data_valid:
             simulator = SimulationEngine()
@@ -82,8 +83,8 @@ def execute_simulations(
         else:
             output_manager.add_error("No simulation run",
                                      f"Data not valid for {str(metadata_file['path'])}, simulation not run", info_map)
-        output_manager.save_variables(metadata_file["prefix"], r"output", r"output/output_filters/", exclude_info_maps)
-        output_manager.dump_all_nondata_pools(metadata_file["prefix"], r"output", exclude_info_maps)
+        output_manager.save_variables(r"output", r"output/output_filters/", exclude_info_maps)
+        output_manager.dump_all_nondata_pools(r"output", exclude_info_maps)
 
 
 def parse_gnu_args():
