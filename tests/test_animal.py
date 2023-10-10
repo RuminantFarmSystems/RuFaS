@@ -2218,40 +2218,40 @@ def test_report_ration_supply(mocker):
     """ Unit test for function report_ration_supply in file routines/animal/ration/ration_driver.py"""
     mocker.patch(
         'RUFAS.routines.animal.ration.ration_driver.RationReporter.get_ME',
-        return_value = 1.0)
+        return_value=1.0)
     mocker.patch(
         'RUFAS.routines.animal.ration.ration_driver.RationReporter.get_DE',
-        return_value = 1.0)
+        return_value=1.0)
     mocker.patch(
         'RUFAS.routines.animal.ration.ration_driver.RationReporter.get_NE_maintenance_and_activity',
-        return_value = 1.0)
+        return_value=1.0)
     mocker.patch(
         'RUFAS.routines.animal.ration.ration_driver.RationReporter.get_NE_lactation',
-        return_value = 1.0)
+        return_value=1.0)
     mocker.patch(
         'RUFAS.routines.animal.ration.ration_driver.RationReporter.get_NE_growth',
-        return_value = 1.0)
+        return_value=1.0)
     mocker.patch(
         'RUFAS.routines.animal.ration.ration_driver.RationReporter.get_calcium',
-        return_value = 1.0)
+        return_value=1.0)
     mocker.patch(
         'RUFAS.routines.animal.ration.ration_driver.RationReporter.get_phosphorus',
-        return_value = 1.0)
+        return_value=1.0)
     mocker.patch(
         'RUFAS.routines.animal.ration.ration_driver.RationReporter.get_fat',
-        return_value = 1.0)
+        return_value=1.0)
     mocker.patch(
         'RUFAS.routines.animal.ration.ration_driver.RationReporter.get_fat_percentage',
-        return_value = 1.0)
+        return_value=1.0)
     mocker.patch(
         'RUFAS.routines.animal.ration.ration_driver.RationReporter.get_forage_NDF',
-        return_value = 1.0)
+        return_value=1.0)
     mocker.patch(
         'RUFAS.routines.animal.ration.ration_driver.RationReporter.get_metabolizable_protein',
-        return_value = 1.0)
+        return_value=1.0)
 
-    ration = {'1':1, '2':2, '3': 3}
-    available_feeds = {'1':{}, '2':{}, '3':{}}
+    ration = {'1': 1, '2': 2, '3': 3}
+    available_feeds = {'1': {}, '2': {}, '3': {}}
     ration_report = {}
     body_weight = 1
 
@@ -2288,91 +2288,85 @@ def test_get_TDN_discount(ration_report, body_weight, expected):
 
 
 @pytest.mark.parametrize("kg_fed,feed_item_info,ration_report,body_weight,expected", [
-    ('dummy_variable',{'DE': 2},'dummy_variable','dummy_variable', 1.0),
-    ('dummy_variable',{'DE': 1},'dummy_variable','dummy_variable', 0.5),
-    ('dummy_variable',{'DE': 0},'dummy_variable','dummy_variable', 0.0),
+    ('dummy_variable', {'DE': 2}, 'dummy_variable', 'dummy_variable', 1.0),
+    ('dummy_variable', {'DE': 1}, 'dummy_variable', 'dummy_variable', 0.5),
+    ('dummy_variable', {'DE': 0}, 'dummy_variable', 'dummy_variable', 0.0),
     ])
 def test_get_DE(kg_fed, feed_item_info, ration_report, body_weight, expected, mocker: MockerFixture):
     """ Unit test for function get_DE in file routines/animal/ration/ration_driver.py"""
     mocker.patch(
         'RUFAS.routines.animal.ration.ration_driver.RationReporter.get_TDN_discount',
-        return_value = 0.5)
+        return_value=0.5)
     actual = RationReporter.get_DE(kg_fed, feed_item_info, ration_report, body_weight)
     assert np.isclose(actual, expected, rtol=1e-3)
 
 
 @pytest.mark.parametrize("kg_fed,feed_item_info,ration_report,body_weight,expected", [
-    (0,{'type': 'Mineral'},'dummy_variable','dummy_variable', 0.0),
-    (1,{'type': 'Mineral', 'is_fat': 1, 'DE':1},'dummy_variable','dummy_variable', 0.0),
-    (1,{'type': 'not_mineral', 'is_fat': 1, 'DE':1},'dummy_variable','dummy_variable', 1.0),
-    (1,{'type': 'not_mineral', 'is_fat': 'dummy', 'EE':4},'dummy_variable','dummy_variable', 1.5746),
-    (1,{'type': 'not_mineral', 'is_fat': 'dummy', 'EE':1},'dummy_variable','dummy_variable', 1.57),
+    (0, {'type': 'Mineral'}, 'dummy_variable', 'dummy_variable', 0.0),
+    (1, {'type': 'Mineral', 'is_fat': 1, 'DE': 1}, 'dummy_variable', 'dummy_variable', 0.0),
+    (1, {'type': 'not_mineral', 'is_fat': 1, 'DE': 1}, 'dummy_variable', 'dummy_variable', 1.0),
+    (1, {'type': 'not_mineral', 'is_fat': 'dummy', 'EE': 4}, 'dummy_variable', 'dummy_variable', 1.5746),
+    (1, {'type': 'not_mineral', 'is_fat': 'dummy', 'EE': 1}, 'dummy_variable', 'dummy_variable', 1.57),
     ])
 def test_get_ME(kg_fed, feed_item_info, ration_report, body_weight, expected, mocker):
     """ Unit test for function get_ME in file routines/animal/ration/ration_driver.py"""
     mocker.patch(
         'RUFAS.routines.animal.ration.ration_driver.RationReporter.get_DE',
-        return_value = 2)
+        return_value=2)
     actual = RationReporter.get_ME(kg_fed, feed_item_info, ration_report, body_weight)
     assert np.isclose(actual, expected, rtol=1e-3)
 
+
 @pytest.mark.parametrize("kg_fed,feed_item_info,ration_report,body_weight,expected", [
-    (0,{'is_fat': 'dummy'},'dummy_variable','dummy_variable', 0.0),
-    (1,{'is_fat': 1},'dummy_variable','dummy_variable', 1.6),
-    (1,{'is_fat': 0},'dummy_variable','dummy_variable', 1.152),
+    (0, {'is_fat': 'dummy'}, 'dummy_variable', 'dummy_variable', 0.0),
+    (1, {'is_fat': 1}, 'dummy_variable', 'dummy_variable', 1.6),
+    (1, {'is_fat': 0}, 'dummy_variable', 'dummy_variable', 1.152),
     ])
-def test_get_NE_maintenance_and_activity(kg_fed, feed_item_info, ration_report, body_weight, expected, mocker: MockerFixture):
+def test_get_NE_maintenance_and_activity(kg_fed, feed_item_info, ration_report, body_weight, expected,
+                                         mocker: MockerFixture):
     """ Unit test for function get_NE_maintenance_and_activity in file routines/animal/ration/ration_driver.py"""
     mocker.patch(
         'RUFAS.routines.animal.ration.ration_driver.RationReporter.get_ME',
-        return_value = 2)
+        return_value=2)
     actual = RationReporter.get_NE_maintenance_and_activity(kg_fed, feed_item_info, ration_report, body_weight)
     assert np.isclose(actual, expected, rtol=1e-3)
 
 
 @pytest.mark.parametrize("kg_fed,feed_item_info,ration_report,body_weight,expected", [
-    (1,{'type': 'Mineral', 'is_fat': 'dummy'},'dummy_variable','dummy_variable', 0.0),
-    (0,{'type': 'Mineral', 'is_fat': 'dummy'},'dummy_variable','dummy_variable', 0.0),
-    (1,{'type': 'dummy', 'is_fat': 1},'dummy_variable','dummy_variable', 1.6),
-    (1,{'type': 'dummy', 'is_fat': 0, 'EE': 4},'dummy_variable','dummy_variable', 1.21996),
-    (1,{'type': 'dummy', 'is_fat': 0, 'EE': 1},'dummy_variable','dummy_variable', 1.216),
-    (0,{'type': 'dummy', 'is_fat': 0, 'EE': 1},'dummy_variable','dummy_variable', 0.0),
+    (1, {'type': 'Mineral', 'is_fat': 'dummy'}, 'dummy_variable', 'dummy_variable', 0.0),
+    (0, {'type': 'Mineral', 'is_fat': 'dummy'}, 'dummy_variable', 'dummy_variable', 0.0),
+    (1, {'type': 'dummy', 'is_fat': 1}, 'dummy_variable', 'dummy_variable', 1.6),
+    (1, {'type': 'dummy', 'is_fat': 0, 'EE': 4}, 'dummy_variable', 'dummy_variable', 1.21996),
+    (1, {'type': 'dummy', 'is_fat': 0, 'EE': 1}, 'dummy_variable', 'dummy_variable', 1.216),
+    (0, {'type': 'dummy', 'is_fat': 0, 'EE': 1}, 'dummy_variable', 'dummy_variable', 0.0),
 ])
 def test_get_NE_lactation(kg_fed, feed_item_info, ration_report, body_weight, expected, mocker: MockerFixture):
     """ Unit test for function get_NE_lactation in file routines/animal/ration/ration_driver.py"""
-    mocker.patch(
-    'RUFAS.routines.animal.ration.ration_driver.RationReporter.get_DE',
-    return_value = 2)
-    mocker.patch(
-    'RUFAS.routines.animal.ration.ration_driver.RationReporter.get_ME',
-    return_value = 2)
+    mocker.patch('RUFAS.routines.animal.ration.ration_driver.RationReporter.get_DE', return_value=2)
+    mocker.patch('RUFAS.routines.animal.ration.ration_driver.RationReporter.get_ME', return_value=2)
     actual = RationReporter.get_NE_lactation(kg_fed, feed_item_info, ration_report, body_weight)
     assert np.isclose(actual, expected, rtol=1e-3)
 
 
 @pytest.mark.parametrize("kg_fed,feed_item_info,ration_report,body_weight,expected", [
-    (0,{'type': 'Mineral', 'is_fat': 'dummy'},'dummy_variable','dummy_variable', 0.000),
-    (0,{'type': 'dummy', 'is_fat': 1},'dummy_variable','dummy_variable', 0.0),
-    (1,{'type': 'Mineral', 'is_fat': 1},'dummy_variable','dummy_variable', 0.0),
-    (1,{'type': 'dummy', 'is_fat': 1},'dummy_variable','dummy_variable', 1.1),
-    (1,{'type': 'dummy', 'is_fat': 0},'dummy_variable','dummy_variable', 0.5916),
+    (0, {'type': 'Mineral', 'is_fat': 'dummy'}, 'dummy_variable', 'dummy_variable', 0.000),
+    (0, {'type': 'dummy', 'is_fat': 1}, 'dummy_variable', 'dummy_variable', 0.0),
+    (1, {'type': 'Mineral', 'is_fat': 1}, 'dummy_variable', 'dummy_variable', 0.0),
+    (1, {'type': 'dummy', 'is_fat': 1}, 'dummy_variable', 'dummy_variable', 1.1),
+    (1, {'type': 'dummy', 'is_fat': 0}, 'dummy_variable', 'dummy_variable', 0.5916),
 ])
 def test_get_NE_growth(kg_fed, feed_item_info, ration_report, body_weight, expected, mocker: MockerFixture):
     """ Unit test for function get_NE_growth in file routines/animal/ration/ration_driver.py"""
-    
-    # patch in get_ME return
-    mocker.patch(
-        'RUFAS.routines.animal.ration.ration_driver.RationReporter.get_ME',
-        return_value = 2)
+    mocker.patch('RUFAS.routines.animal.ration.ration_driver.RationReporter.get_ME', return_value=2)
     actual = RationReporter.get_NE_growth(kg_fed, feed_item_info, ration_report, body_weight)
     assert np.isclose(actual, expected, rtol=1e-3)
 
 
 @pytest.mark.parametrize("kg_fed,feed_item_info,ration_report,body_weight,expected", [
-    (1,{'type': 'Forage', 'calcium': 1},'dummy_variable','dummy_variable', 0.003),
-    (1,{'type': 'Conc', 'calcium': 1},'dummy_variable','dummy_variable', 0.006),
-    (1,{'type': 'Mineral', 'calcium': 1},'dummy_variable','dummy_variable', 0.0095),
-    (1,{'type': 'Forage', 'calcium': 0},'dummy_variable','dummy_variable', 0.000),
+    (1, {'type': 'Forage', 'calcium': 1}, 'dummy_variable', 'dummy_variable', 0.003),
+    (1, {'type': 'Conc', 'calcium': 1}, 'dummy_variable', 'dummy_variable', 0.006),
+    (1, {'type': 'Mineral', 'calcium': 1}, 'dummy_variable', 'dummy_variable', 0.0095),
+    (1, {'type': 'Forage', 'calcium': 0}, 'dummy_variable', 'dummy_variable', 0.000),
 ])
 def test_get_calcium(kg_fed, feed_item_info, ration_report, body_weight, expected):
     """ Unit test for function get_Calcium in file routines/animal/ration/ration_driver.py"""
@@ -2381,10 +2375,10 @@ def test_get_calcium(kg_fed, feed_item_info, ration_report, body_weight, expecte
 
 
 @pytest.mark.parametrize("kg_fed,feed_item_info,ration_report,body_weight,expected", [
-    (1,{'type': 'Forage', 'phosphorus': 1},'dummy_variable','dummy_variable', 0.0064),
-    (1,{'type': 'Conc', 'phosphorus': 1},'dummy_variable','dummy_variable', 0.007),
-    (1,{'type': 'Mineral', 'phosphorus': 1},'dummy_variable','dummy_variable', 0.008),
-    (1,{'type': 'Forage', 'phosphorus': 0},'dummy_variable','dummy_variable', 0.000),
+    (1, {'type': 'Forage', 'phosphorus': 1}, 'dummy_variable', 'dummy_variable', 0.0064),
+    (1, {'type': 'Conc', 'phosphorus': 1}, 'dummy_variable', 'dummy_variable', 0.007),
+    (1, {'type': 'Mineral', 'phosphorus': 1}, 'dummy_variable', 'dummy_variable', 0.008),
+    (1, {'type': 'Forage', 'phosphorus': 0}, 'dummy_variable', 'dummy_variable', 0.000),
 ])
 def test_get_phosphorus(kg_fed, feed_item_info, ration_report, body_weight, expected):
     """ Unit test for function get_phosphorus in file routines/animal/ration/ration_driver.py"""
@@ -2393,22 +2387,22 @@ def test_get_phosphorus(kg_fed, feed_item_info, ration_report, body_weight, expe
 
 
 @pytest.mark.parametrize("kg_fed,feed_item_info,ration_report,body_weight,expected", [
-    (1,{'EE': 1},'dummy_variable','dummy_variable', 1),
-    (1,{'EE': 2},'dummy_variable','dummy_variable', 2),
-    (2,{'EE': 2},'dummy_variable','dummy_variable', 4),
-    (1,{'EE': 0},'dummy_variable','dummy_variable', 0.0),
+    (1, {'EE': 1}, 'dummy_variable', 'dummy_variable', 1),
+    (1, {'EE': 2}, 'dummy_variable', 'dummy_variable', 2),
+    (2, {'EE': 2}, 'dummy_variable', 'dummy_variable', 4),
+    (1, {'EE': 0}, 'dummy_variable', 'dummy_variable', 0.0),
 ])
 def test_get_fat(kg_fed, feed_item_info, ration_report, body_weight, expected):
     """ Unit test for function get_fat in file routines/animal/ration/ration_driver.py"""
     actual = RationReporter.get_fat(kg_fed, feed_item_info, ration_report, body_weight)
     assert np.isclose(actual, expected, rtol=1e-3)
-    
+
 
 @pytest.mark.parametrize("kg_fed,feed_item_info,ration_report,body_weight,expected", [
-    (1,{'EE': 1},{'nutrient_amount':{'dm': 100}},'dummy_variable', 0.01),
-    (1,{'EE': 2},{'nutrient_amount':{'dm': 1}},'dummy_variable', 2),
-    (2,{'EE': 2},{'nutrient_amount':{'dm': 100}},'dummy_variable', 0.04),
-    (1,{'EE': 0},{'nutrient_amount':{'dm': 100}},'dummy_variable', 0.0),
+    (1, {'EE': 1}, {'nutrient_amount': {'dm': 100}}, 'dummy_variable', 0.01),
+    (1, {'EE': 2}, {'nutrient_amount': {'dm': 1}}, 'dummy_variable', 2),
+    (2, {'EE': 2}, {'nutrient_amount': {'dm': 100}}, 'dummy_variable', 0.04),
+    (1, {'EE': 0}, {'nutrient_amount': {'dm': 100}}, 'dummy_variable', 0.0),
 ])
 def test_get_fat_percentage(kg_fed, feed_item_info, ration_report, body_weight, expected):
     """ Unit test for function get_fat_percentage in file routines/animal/ration/ration_driver.py"""
@@ -2417,10 +2411,10 @@ def test_get_fat_percentage(kg_fed, feed_item_info, ration_report, body_weight, 
 
 
 @pytest.mark.parametrize("kg_fed,feed_item_info,ration_report,body_weight,expected", [
-    (1,{'type': 'Forage', 'NDF': 1},'dummy_variable','dummy_variable', 1),
-    (1,{'type': 'Conc', 'NDF': 2},'dummy_variable','dummy_variable', 0.0),
-    (1,{'type': 'Forage', 'NDF': 0},'dummy_variable','dummy_variable', 0.0),
-    (1,{'type': 'Mineral', 'NDF': 0},'dummy_variable','dummy_variable', 0.0),
+    (1, {'type': 'Forage', 'NDF': 1}, 'dummy_variable', 'dummy_variable', 1),
+    (1, {'type': 'Conc', 'NDF': 2}, 'dummy_variable', 'dummy_variable', 0.0),
+    (1, {'type': 'Forage', 'NDF': 0}, 'dummy_variable', 'dummy_variable', 0.0),
+    (1, {'type': 'Mineral', 'NDF': 0}, 'dummy_variable', 'dummy_variable', 0.0),
 ])
 def test_get_forage_NDF(kg_fed, feed_item_info, ration_report, body_weight, expected):
     """ Unit test for function get_forage_NDF in file routines/animal/ration/ration_driver.py"""
@@ -2430,23 +2424,21 @@ def test_get_forage_NDF(kg_fed, feed_item_info, ration_report, body_weight, expe
 
 def test_get_metabolizable_protein(mocker):
     """ Unit test for function get_metabolizable_protein in file routines/animal/ration/ration_driver.py"""
-    feed_path_a1 = {'1':{'type': 'Conc', 'Kd': 1, 'N_A': 1, 'N_B': 1, 'CP': 1, 'dRUP': 1}}
-    feed_path_a2 = {'2':{'type': 'Conc', 'Kd': -100, 'N_A': 1, 'N_B': 1, 'CP': 1, 'dRUP': 1}}
-    feed_path_b1 = {'3':{'type': 'Forage', 'Kd': 1, 'N_A': 1, 'N_B': 1, 'CP': 1, 'dRUP': 1, 'is_wetforage': 0, 'NDF': 1}}
-    feed_path_b2 = {'4':{'type': 'Forage', 'Kd': -100, 'N_A': 1, 'N_B': 1, 'CP': 1, 'dRUP': 1, 'is_wetforage': 0, 'NDF': 1}}
-    feed_path_c1 = {'5':{'type': 'Forage', 'Kd': 1, 'N_A': 1, 'N_B': 1, 'CP': 1, 'dRUP': 1, 'is_wetforage': 1, 'NDF': 1}}
-    feed_path_c2 = {'6':{'type': 'Forage', 'Kd': -100, 'N_A': 1, 'N_B': 1, 'CP': 1, 'dRUP': 1, 'is_wetforage': 1, 'NDF': 1}}
-    feed_path_d1 = {'7':{'type': 'Dummy', 'Kd': 1, 'N_A': 1, 'N_B': 1, 'CP': 1, 'dRUP': 1, 'is_wetforage': 0, 'NDF': 1}}
-    feed_path_d2 = {'8':{'type': 'Dummy', 'Kd': -100, 'N_A': 1, 'N_B': 1, 'CP': 1, 'dRUP': 1, 'is_wetforage': 0, 'NDF': 1}}
+    feed_path_a1 = {'1': {'type': 'Conc', 'Kd': 1, 'N_A': 1, 'N_B': 1, 'CP': 1, 'dRUP': 1}}
+    feed_path_a2 = {'2': {'type': 'Conc', 'Kd': -100, 'N_A': 1, 'N_B': 1, 'CP': 1, 'dRUP': 1}}
+    feed_path_b1 = {'3': {'type': 'Forage', 'Kd': 1, 'N_A': 1, 'N_B': 1, 'CP': 1, 'dRUP': 1, 'is_wetforage': 0, 'NDF': 1}}
+    feed_path_b2 = {'4': {'type': 'Forage', 'Kd': -100, 'N_A': 1, 'N_B': 1, 'CP': 1, 'dRUP': 1, 'is_wetforage': 0, 'NDF': 1}}
+    feed_path_c1 = {'5': {'type': 'Forage', 'Kd': 1, 'N_A': 1, 'N_B': 1, 'CP': 1, 'dRUP': 1, 'is_wetforage': 1, 'NDF': 1}}
+    feed_path_c2 = {'6': {'type': 'Forage', 'Kd': -100, 'N_A': 1, 'N_B': 1, 'CP': 1, 'dRUP': 1, 'is_wetforage': 1, 'NDF': 1}}
+    feed_path_d1 = {'7': {'type': 'Dummy', 'Kd': 1, 'N_A': 1, 'N_B': 1, 'CP': 1, 'dRUP': 1, 'is_wetforage': 0, 'NDF': 1}}
+    feed_path_d2 = {'8': {'type': 'Dummy', 'Kd': -100, 'N_A': 1, 'N_B': 1, 'CP': 1, 'dRUP': 1, 'is_wetforage': 0, 'NDF': 1}}
     available_feeds = feed_path_a1 | feed_path_b1 | feed_path_c1 | feed_path_d1 | \
-                    feed_path_a2 | feed_path_b2 | feed_path_c2 | feed_path_d2 
-    ration = {'1':1, '2':2, '3': 3, '4': 4, '5': 5, '6': 6, '7': 7, '8': 8}
+        feed_path_a2 | feed_path_b2 | feed_path_c2 | feed_path_d2
+    ration = {'1': 1, '2': 2, '3': 3, '4': 4, '5': 5, '6': 6, '7': 7, '8': 8}
     ration_report = {'nutrient_amount': {'TDN': 1}}
     body_weight = 100
 
-    mocker.patch(
-        'RUFAS.routines.animal.ration.ration_driver.RationReporter.get_TDN_discount',
-        return_value = 1)
+    mocker.patch('RUFAS.routines.animal.ration.ration_driver.RationReporter.get_TDN_discount', return_value=1)
     expected = 171.1937767245963
     actual = RationReporter.get_metabolizable_protein(ration, available_feeds, ration_report, body_weight)
     assert np.isclose(actual, expected, rtol=1e-3)
