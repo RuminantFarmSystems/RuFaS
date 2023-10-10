@@ -94,6 +94,7 @@ Complete evaluation of soil hydrology|Ed, Jenn, Matthew|In progress|P0|[#766](ht
 Dev Team:
 |Title|Owner|Status|Priority|Remarks|
 |--|--|--|--|--|
+Refactor manure excretion and methane emission in the animal module|Dev team, Joe, Haowen||P2
 Revisit classes.py|Allister
 Deprecate DB(s)|Allister
 Deprecate output handler ||moved to MS 2||
