@@ -257,20 +257,20 @@ def test_profile_field_capacity() -> None:
         assert observe == expect
 
 
-@pytest.mark.parametrize("profile_water,profile_field_capacity", [
-    (3.4857, 4.3948569),
-    (5.29485, 5.0918482),
-    (3.495839, 3.948591),
+@pytest.mark.parametrize("profile_water,profile_field_capacity,expected", [
+    (3.5, 4.5, 0.91503268),
+    (5.0, 5.5, 1.0),
+    (0.0, 3.0, 0.0),
+    (-1.0, 3.0, 0.0)
 ])
-def test_soil_water_factor(profile_water: float, profile_field_capacity: float) -> None:
-    """Test that SoilData correctly calculates the soil water factor for a soil profile"""
+def test_soil_water_factor(profile_water: float, profile_field_capacity: float, expected: float) -> None:
+    """Test that SoilData correctly calculates the soil water factor for a soil profile."""
     with patch.multiple("RUFAS.routines.field.soil.soil_data.SoilData",
                         profile_soil_water_content=PropertyMock(return_value=profile_water),
                         profile_field_capacity=PropertyMock(return_value=profile_field_capacity)):
         soil_data = SoilData(field_size=1.88)
-        observe = soil_data.soil_water_factor
-        expect = profile_water / (0.85 * profile_field_capacity)
-        assert observe == expect
+        actual = soil_data.soil_water_factor
+        assert pytest.approx(actual) == expected
 
 
 @pytest.mark.parametrize("layers", [
