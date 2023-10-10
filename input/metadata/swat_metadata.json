@@ -3,7 +3,7 @@
     "config": {
       "title": "Config Data",
       "description": "Configuration Information",
-      "path": "input/data/config/barnyard_config.json",
+      "path": "input/data/config/swat_config.json",
       "type": "json",
       "properties": "config_properties"
     },
@@ -13,11 +13,11 @@
       "path": "input/data/animal/no_animal.json",
       "type": "json",
       "properties": "animal_properties"
-  },
+    },
     "crop": {
       "title": "Crop data",
-      "description": "Barnyard crop rotation schedule.",
-      "path": "input/data/crop/corn_rotation.json",
+      "description": "Alfafa is fun!",
+      "path": "input/data/crop/swat_rotation.json",
       "type": "json",
       "properties": "crop_schedule_properties"
     },
@@ -63,59 +63,45 @@
       "type": "json",
       "properties": "manure_management_properties"
     },
-    "regular_soil": {
+    "soil": {
       "title": "Soil data",
-      "description": "Barnyard soil configuration.",
-      "path": "input/data/soil/regular_barnyard_soil.json",
-      "type": "json",
-      "properties": "soil_profile_properties"
-    },
-    "sandy_soil": {
-      "title": "Soil data",
-      "description": "Barnyard soil configuration.",
-      "path": "input/data/soil/sandy_barnyard_soil.json",
+      "description": "Stop treating soil like dirt!",
+      "path": "input/data/soil/testing_soil.json",
       "type": "json",
       "properties": "soil_profile_properties"
     },
     "fertilizer_schedule": {
       "title": "Fertilizer schedule.",
-      "description": "Barnyard fertilizer application schedule.",
-      "path": "input/data/fertilizer_schedule/barnyard_scheduled_fertilizer_schedule.json",
+      "description": "Fertilizer is like butter, you can never have too much.",
+      "path": "input/data/fertilizer_schedule/swat_fertilizer_schedule.json",
       "type": "json",
       "properties": "fertilizer_schedule_properties"
     },
     "manure_schedule": {
       "title": "Manure schedule.",
-      "description": "Barnyard manure application schedule.",
-      "path": "input/data/manure_schedule/barnyard_scheduled_manure_schedule.json",
+      "description": "Crappier than having 7:45 am classes Monday - Friday.",
+      "path": "input/data/manure_schedule/no_manure.json",
       "type": "json",
       "properties": "manure_schedule_properties"
     },
     "tillage_schedule": {
       "title": "Tillage schedule.",
-      "description": "Barnyard tillage application schedule.",
-      "path": "input/data/tillage_schedule/barnyard_scheduled_tillage_schedule.json",
+      "description": "Requires the will to till.",
+      "path": "input/data/tillage_schedule/no_till.json",
       "type": "json",
       "properties": "tillage_schedule_properties"
     },
-    "regular": {
+    "field": {
       "title": "Field specification",
       "description": "Contains overall field properties and references to specification files.",
-      "path": "input/data/field/regular_barnyard_field.json",
-      "type": "json",
-      "properties": "field_properties"
-    },
-    "sandy": {
-      "title": "Field specification",
-      "description": "Contains overall field properties and references to specification files.",
-      "path": "input/data/field/sandy_barnyard_field.json",
+      "path": "input/data/field/swat_field.json",
       "type": "json",
       "properties": "field_properties"
     },
     "weather": {
       "title": "Weather data",
       "description": "Let's turn on the AC",
-      "path": "input/data/weather/barnyard_weather.csv",
+      "path": "input/data/weather/swat_weather.csv",
       "type": "csv",
       "properties": "weather_properties"
     }
