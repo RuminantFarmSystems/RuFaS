@@ -136,6 +136,7 @@ def parse_gnu_args():
 
 
 def determine_format_option(cmd_arguments):
+    """Helper function to determine the output formatting option selected by the user."""
     if cmd_arguments.format_option_block:
         return "block"
     elif cmd_arguments.format_option_inline:
