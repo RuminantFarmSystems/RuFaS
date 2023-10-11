@@ -7,7 +7,7 @@ from pytest_mock import MockerFixture
 
 import config.global_variables
 from config import global_variables
-from main import execute_simulations
+from main import determine_format_option, execute_simulations
 from main import parse_gnu_args
 from main import run_rufas
 from main import set_global_variables
@@ -21,19 +21,20 @@ file_path = os.path.join(dir_path, "input/ARL.json")
 
 
 @pytest.mark.parametrize(
-    "make_graphs, verbose, clear_output, exclude_info_maps",
+    "format_option, make_graphs, verbose, clear_output, exclude_info_maps",
     [
-        (True, True, True, True),
-        (False, True, True, True),
-        (True, False, True, True),
-        (False, False, True, True),
-        (False, False, False, True),
-        (False, False, True, False),
-        (False, False, False, False),
-        (True, True, False, False),
+        ("verbose", True, True, True, True),
+        ("block", False, True, True, True),
+        ("inline", True, False, True, True),
+        ("verbose", False, False, True, True),
+        ("block", False, False, False, True),
+        ("inline", False, False, True, False),
+        ("verbose", False, False, False, False),
+        ("block", True, True, False, False),
     ],
 )
 def test_run_rufas(
+    format_option: str,
     make_graphs: bool,
     verbose: bool,
     clear_output: bool,
@@ -50,12 +51,12 @@ def test_run_rufas(
     patch_empty_dir = mocker.patch("RUFAS.util.Utility.empty_dir")
 
     # Act
-    run_rufas(make_graphs, verbose, clear_output, exclude_info_maps)
+    run_rufas(format_option, make_graphs, verbose, clear_output, exclude_info_maps)
 
     # Assert
     patch_set_global_variables.assert_called_once_with(make_graphs, verbose)
     patch_execute_simulations.assert_called_once_with(
-        metadata_file_list, exclude_info_maps
+        metadata_file_list, exclude_info_maps, format_option,
     )
     if clear_output:
         patch_empty_dir.assert_called_once()
@@ -85,11 +86,12 @@ def test_set_global_variables(make_graphs: bool, verbose: bool) -> None:
 
 
 @pytest.mark.parametrize(
-        "is_data_valid, simulate_call_count, add_error_call_count",
-        [(True, 2, 0), (False, 0, 2)]
+        "is_data_valid, simulate_call_count, add_error_call_count, format_option",
+        [(True, 2, 0, "verbose"), (False, 0, 2, "block")]
 )
 def test_execute_simulations(mocker: MockerFixture, is_data_valid: bool,
-                             simulate_call_count: int, add_error_call_count: int) -> None:
+                             simulate_call_count: int, add_error_call_count: int,
+                             format_option) -> None:
     """Checks that execute_simulations() calls the correct functions in the correct order"""
     # Arrange
     mock_output_manager = mocker.MagicMock(auto_spec=OutputManager)
@@ -109,7 +111,7 @@ def test_execute_simulations(mocker: MockerFixture, is_data_valid: bool,
     mocker.patch("main.SimulationEngine", return_value=mock_simulator)
 
     # Act
-    execute_simulations(metadata_file_list, True)
+    execute_simulations(metadata_file_list, True, format_option)
 
     # Assert
     assert mock_simulator.simulate.call_count == simulate_call_count
@@ -118,12 +120,31 @@ def test_execute_simulations(mocker: MockerFixture, is_data_valid: bool,
     assert mock_input_manager.flush_pool.call_count == len(metadata_file_list)
     assert mock_output_manager.dump_all_nondata_pools.call_count == len(metadata_file_list)
     assert mock_output_manager.dump_all_nondata_pools.call_args_list == [
-        mocker.call("output", True)
+        mocker.call("output", True, format_option)
     ] * len(metadata_file_list)
     assert mock_output_manager.save_variables.call_count == len(metadata_file_list)
     assert mock_output_manager.save_variables.call_args_list == [
         mocker.call("output", "output/output_filters/", True)
     ] * len(metadata_file_list)
+
+
+def test_determine_format_option() -> None:
+    cmd_arguments = parse_gnu_args()
+    cmd_arguments.format_option_block = True
+    assert determine_format_option(cmd_arguments) == "block"
+
+    cmd_arguments = parse_gnu_args()
+    cmd_arguments.format_option_inline = True
+    assert determine_format_option(cmd_arguments) == "inline"
+
+    cmd_arguments = parse_gnu_args()
+    cmd_arguments.format_option_block = False
+    cmd_arguments.format_option_inline = False
+    assert determine_format_option(cmd_arguments) == "verbose"
+
+    cmd_arguments = parse_gnu_args()
+    cmd_arguments.format_option_verbose = True
+    assert determine_format_option(cmd_arguments) == "verbose"
 
 
 def test_parse_gnu_args(mocker: MockerFixture) -> None:
@@ -140,8 +161,26 @@ def test_parse_gnu_args(mocker: MockerFixture) -> None:
     actual_args = parse_gnu_args()
 
     # Assert
-    assert mock_add_argument.call_count == 4
+    assert mock_add_argument.call_count == 7
     assert mock_add_argument.call_args_list == [
+        mocker.call(
+            '-fob',
+            "--format-option-block",
+            help="Use block formatting option for variable_names.txt file",
+            action="store_true",
+        ),
+        mocker.call(
+            "-foi",
+            "--format-option-inline",
+            help="Use inline formatting option for variable_names.txt file",
+            action="store_true",
+        ),
+        mocker.call(
+            "-fov",
+            "--format-option-verbose",
+            help="Use verbose formatting option for variable_names.txt file",
+            action="store_true",
+        ),
         mocker.call(
             "-ng",
             "--no-graphics",

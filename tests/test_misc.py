@@ -795,15 +795,15 @@ def test_dump_all_nondata_pools(
     mock_output_manager.dump_logs = MagicMock()
     mock_output_manager.dump_variable_names_and_contexts = MagicMock()
 
-    mock_output_manager.dump_all_nondata_pools(path, exclude_info_maps=False)
+    mock_output_manager.dump_all_nondata_pools(path, False, "verbose")
 
     mock_output_manager.dump_errors.assert_called_once_with(path)
     mock_output_manager.dump_warnings.assert_called_once_with(path)
     mock_output_manager.dump_logs.assert_called_once_with(path)
-    mock_output_manager.dump_variable_names_and_contexts.assert_called_once_with(path, False)
+    mock_output_manager.dump_variable_names_and_contexts.assert_called_once_with(path, False, "verbose")
 
-    mock_output_manager.dump_all_nondata_pools(path, exclude_info_maps=True)
-    mock_output_manager.dump_variable_names_and_contexts.assert_called_with(path, True)
+    mock_output_manager.dump_all_nondata_pools(path, True, "verbose")
+    mock_output_manager.dump_variable_names_and_contexts.assert_called_with(path, True, "verbose")
     assert mock_output_manager.dump_logs.call_count == 2
     assert mock_output_manager.dump_warnings.call_count == 2
     assert mock_output_manager.dump_errors.call_count == 2
