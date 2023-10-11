@@ -197,6 +197,7 @@ class OutputManager(object):
         self._add_to_pool(self.errors_pool, key, msg, info_map)
 
     def set_metadata_prefix(self, metadata_prefix: str) -> None:
+        """Sets the metadata_prefix attribute."""
         self.__metadata_prefix = metadata_prefix
 
     def _get_timestamp(self, include_millis: bool = False) -> str:
