@@ -984,9 +984,10 @@ class Field:
         total_precipitation = current_weather.rainfall + watering_amount
         precipitation_reaching_soil = self._handle_water_in_crop_canopies(total_precipitation)
 
-        full_evapotranspirative_demand = self._determine_potential_evapotranspiration(
-            current_weather.incoming_light, current_weather.max_air_temperature, current_weather.min_air_temperature,
-            current_weather.mean_air_temperature)
+        full_evapotranspirative_demand = self._determine_potential_evapotranspiration(current_weather.incoming_light,
+                                                                                      current_weather.max_air_temperature,
+                                                                                      current_weather.min_air_temperature,
+                                                                                      current_weather.mean_air_temperature)
         self.field_data.max_evapotranspiration = full_evapotranspirative_demand
 
         remaining_evapotranspirative_demand = self._evaporate_from_crop_canopies(full_evapotranspirative_demand)
@@ -1171,26 +1172,26 @@ class Field:
         return total_above_ground_biomass
 
     @staticmethod
-    def _determine_potential_evapotranspiration(extra_terrestrial_radiation: float, max_air_temp: float,
+    def _determine_potential_evapotranspiration(extraterrestrial_radiation: float, max_air_temp: float,
                                                 min_air_temp: float,
                                                 avg_air_temp: float) -> float:
         """Calculates the potential evapotranspiration for a given day.
 
         Parameters
         ----------
-        extra_terrestrial_radiation : float
-            Radiation from the aliens (MJ per square meter per day)
+        extraterrestrial_radiation : float
+            Radiation from the aliens (MJ per square meter per day).
         max_air_temp : float
-            Maximum air temperature (degrees C)
+            Maximum air temperature (degrees C).
         min_air_temp : float
-            Minimum air temperature (degrees C)
+            Minimum air temperature (degrees C).
         avg_air_temp : float
-            Average air temperature (degrees C)
+            Average air temperature (degrees C).
 
         Returns
         -------
         float
-            potential evapotranspiration (mm)
+            Potential evapotranspiration (mm).
 
         References
         ----------
@@ -1201,20 +1202,15 @@ class Field:
         This method calculates the evapotranspirative demand for the entire field on any given day using the Hargreaves
         method. This method lower-bounds the potential evapotranspiration at 0.0 mm.
 
+        If the average temperature for the day is not specified, then the average temperature for the day is calculated
+        as the average of the maximum and minimum temperatures of the day.
+
         """
-        if avg_air_temp is None:
-            calculated_avg_air_temp = (max_air_temp + min_air_temp) / 2
-            latent_heat_vaporization = Field._determine_latent_heat_vaporization(calculated_avg_air_temp)
-            potential_evapotranspiration = (0.0023 *
-                                            extra_terrestrial_radiation * ((max_air_temp - min_air_temp) ** (-0.5))
-                                            * (calculated_avg_air_temp + 17.8)) / latent_heat_vaporization
-            return max(0.0, potential_evapotranspiration)
-        else:
-            latent_heat_vaporization = Field._determine_latent_heat_vaporization(avg_air_temp)
-            potential_evapotranspiration = (0.0023 *
-                                            extra_terrestrial_radiation * ((max_air_temp - min_air_temp) ** (-0.5))
-                                            * (avg_air_temp + 17.8)) / latent_heat_vaporization
-            return max(0.0, potential_evapotranspiration)
+        avg_air_temp = avg_air_temp if avg_air_temp else (max_air_temp + min_air_temp) / 2
+        latent_heat_vaporization = Field._determine_latent_heat_vaporization(avg_air_temp)
+        potential_evapotranspiration = (0.0023 * extraterrestrial_radiation * ((max_air_temp - min_air_temp) ** 0.5)
+                                        * (avg_air_temp + 17.8)) / latent_heat_vaporization
+        return max(0.0, potential_evapotranspiration)
 
     @staticmethod
     def _determine_latent_heat_vaporization(avg_air_temp: float) -> float:
