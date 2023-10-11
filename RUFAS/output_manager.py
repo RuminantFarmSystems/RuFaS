@@ -444,7 +444,7 @@ class OutputManager(object):
         Returns a file name using the given base_name and timestamp.
         """
         timestamp: str = self._get_timestamp(include_millis=False)
-        return f"{base_name}_{timestamp}.{extension}"
+        return f"{self.__metadata_prefix}_{base_name}_{timestamp}.{extension}"
 
     def _exclude_info_maps(
         self, pool: Dict[str, pool_element_type]
@@ -629,7 +629,7 @@ class OutputManager(object):
             if filter_file.startswith("json_"):
                 file_path = os.path.join(
                     save_path,
-                    self._generate_file_name(f"{self.__metadata_prefix}_saved_variables_{filter_file}", "json"),
+                    self._generate_file_name(f"saved_variables_{filter_file}", "json"),
                 )
                 self._dict_to_file_json(filtered_pool, file_path)
             elif filter_file.startswith("csv_"):
@@ -664,7 +664,7 @@ class OutputManager(object):
             raise e
 
         variable_csv_file_path = os.path.join(
-            path, self._generate_file_name(f"{self.__metadata_prefix}_saved_variables_{filter_name}", "csv")
+            path, self._generate_file_name(f"saved_variables_{filter_name}", "csv")
         )
         self._dict_to_file_csv(data_dict, variable_csv_file_path)
 
@@ -699,21 +699,21 @@ class OutputManager(object):
         """
         Dumps logs_pool into a json file in the given path to a directory.
         """
-        file_path = os.path.join(path, self._generate_file_name(f"{self.__metadata_prefix}_logs", "json"))
+        file_path = os.path.join(path, self._generate_file_name("logs", "json"))
         self._dict_to_file_json(self.logs_pool, file_path)
 
     def dump_warnings(self, path: str) -> None:
         """
         Dumps warnings_pool into a json file in the given path to a directory.
         """
-        file_path = os.path.join(path, self._generate_file_name(f"{self.__metadata_prefix}_warnings", "json"))
+        file_path = os.path.join(path, self._generate_file_name("warnings", "json"))
         self._dict_to_file_json(self.warnings_pool, file_path)
 
     def dump_errors(self, path: str) -> None:
         """
         Dumps errors_pool into a json file in the given path to a directory.
         """
-        file_path = os.path.join(path, self._generate_file_name(f"{self.__metadata_prefix}_errors", "json"))
+        file_path = os.path.join(path, self._generate_file_name("errors", "json"))
         self._dict_to_file_json(self.errors_pool, file_path)
 
     def dump_variable_names_and_contexts(
@@ -784,7 +784,7 @@ class OutputManager(object):
                         var_list.append(f"{prefix}.{parsable_dict}: {key}{os.linesep}")
 
         file_path = os.path.join(
-            path, self._generate_file_name(f"{self.__metadata_prefix}_variable_names", "txt")
+            path, self._generate_file_name("variable_names", "txt")
         )
         self._list_to_file_txt(var_list, file_path)
 

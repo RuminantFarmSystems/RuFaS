@@ -832,13 +832,15 @@ def test_generate_file_name(mocker: MockerFixture) -> None:
     timestamp = "18-Jan-2023_Wed_22-38-14"
     base_name = "dummy_name"
     extension = "ext"
+    metadata_prefix = "dummy_prefix"
     om = OutputManager()
+    om._OutputManager__metadata_prefix = metadata_prefix
 
     with patch.object(om, "_get_timestamp") as mock_method:
         mock_method.return_value = timestamp
         assert (
             om._generate_file_name(base_name, extension)
-            == f"{base_name}_{timestamp}.{extension}"
+            == f"{metadata_prefix}_{base_name}_{timestamp}.{extension}"
         )
 
 
@@ -891,7 +893,7 @@ def test_save_variables_to_csv_files(
     """Test case for function _save_variables_to_csv_files in output_manager.py"""
     mock_output_manager._generate_file_name = MagicMock(return_value="dummy_name")
     mock_output_manager._dict_to_file_csv = MagicMock()
-    mock_output_manager._OutputManager__metadata_prefix = "dummy_prefix"
+
     mock_variable_pool = {"var1": {"values": [1], "info_maps": []}}
 
     with patch('pathlib.Path.mkdir') as mock_mkdir:
@@ -901,7 +903,7 @@ def test_save_variables_to_csv_files(
                                                          "dummy_path")
 
     mock_mkdir.assert_called_with(parents=True, exist_ok=True)
-    dummy_file_name = "dummy_prefix_saved_variables_csv_dummy_filter_filepath.txt"
+    dummy_file_name = "saved_variables_csv_dummy_filter_filepath.txt"
     mock_output_manager._generate_file_name.assert_called_once_with(dummy_file_name, "csv")
     mock_output_manager._dict_to_file_csv.assert_called_once_with(
         mock_variable_pool, os.path.join("dummy_path", "dummy_name")
@@ -923,11 +925,10 @@ def test_dump_logs(
     """Test case for function dump_logs in output_manager.py"""
     mock_output_manager._generate_file_name = MagicMock(return_value="dummy_name")
     mock_output_manager._dict_to_file_json = MagicMock()
-    mock_output_manager._OutputManager__metadata_prefix = "dummy_prefix"
 
     mock_output_manager.dump_logs("dummy_path")
 
-    mock_output_manager._generate_file_name.assert_called_once_with("dummy_prefix_logs", "json")
+    mock_output_manager._generate_file_name.assert_called_once_with("logs", "json")
     mock_output_manager._dict_to_file_json.assert_called_once_with(
         mock_output_manager.logs_pool, os.path.join("dummy_path", "dummy_name")
     )
@@ -948,11 +949,10 @@ def test_dump_warnings(
     """Test case for function dump_warnings in output_manager.py"""
     mock_output_manager._generate_file_name = MagicMock(return_value="dummy_name")
     mock_output_manager._dict_to_file_json = MagicMock()
-    mock_output_manager._OutputManager__metadata_prefix = "dummy_prefix"
 
     mock_output_manager.dump_warnings("dummy_path")
 
-    mock_output_manager._generate_file_name.assert_called_once_with("dummy_prefix_warnings", "json")
+    mock_output_manager._generate_file_name.assert_called_once_with("warnings", "json")
     mock_output_manager._dict_to_file_json.assert_called_once_with(
         mock_output_manager.warnings_pool, os.path.join("dummy_path", "dummy_name")
     )
@@ -973,11 +973,10 @@ def test_dump_errors(
     """Test case for function dump_errors in output_manager.py"""
     mock_output_manager._generate_file_name = MagicMock(return_value="dummy_name")
     mock_output_manager._dict_to_file_json = MagicMock()
-    mock_output_manager._OutputManager__metadata_prefix = "dummy_prefix"
 
     mock_output_manager.dump_errors("dummy_path")
 
-    mock_output_manager._generate_file_name.assert_called_once_with("dummy_prefix_errors", "json")
+    mock_output_manager._generate_file_name.assert_called_once_with("errors", "json")
     mock_output_manager._dict_to_file_json.assert_called_once_with(
         mock_output_manager.errors_pool, os.path.join("dummy_path", "dummy_name")
     )
@@ -1032,11 +1031,10 @@ def test_dump_variable_names_and_contexts(
     mock_output_manager.variables_pool = mock_variable_pool
     mock_output_manager._generate_file_name = MagicMock(return_value="dummy_name")
     mock_output_manager._list_to_file_txt = MagicMock()
-    mock_output_manager._OutputManager__metadata_prefix = "dummy_prefix"
 
     mock_output_manager.dump_variable_names_and_contexts("dummy_path", exclude_info_maps, format_option)
 
-    mock_output_manager._generate_file_name.assert_called_once_with("dummy_prefix_variable_names", "txt")
+    mock_output_manager._generate_file_name.assert_called_once_with("variable_names", "txt")
     mock_output_manager._list_to_file_txt.assert_called_once_with(
         expected_result, os.path.join("dummy_path", "dummy_name")
     )
@@ -1065,11 +1063,10 @@ def test_dump_variable_names_and_contexts_no_values(
     mock_output_manager.variables_pool = mock_variable_pool
     mock_output_manager._generate_file_name = MagicMock(return_value="dummy_name")
     mock_output_manager._list_to_file_txt = MagicMock()
-    mock_output_manager._OutputManager__metadata_prefix = "dummy_prefix"
 
     mock_output_manager.dump_variable_names_and_contexts("dummy_path", False, format_option="verbose")
 
-    mock_output_manager._generate_file_name.assert_called_once_with("dummy_prefix_variable_names", "txt")
+    mock_output_manager._generate_file_name.assert_called_once_with("variable_names", "txt")
     mock_output_manager._list_to_file_txt.assert_called_once_with(
         expected_output, os.path.join("dummy_path", "dummy_name")
     )
@@ -1543,7 +1540,6 @@ def test_save_variables(
     """Test case for function save_variables in output_manager.py"""
     mock_output_manager.variables_pool = {}
     mock_output_manager._generate_file_name = MagicMock(return_value="dummy_name")
-    mock_output_manager._OutputManager__metadata_prefix = "dummy_prefix"
     mock_output_manager._dict_to_file_json = MagicMock()
     mock_output_manager._load_txt_file_to_list = MagicMock()
     mock_output_manager._exclude_info_maps = MagicMock()
@@ -1569,7 +1565,7 @@ def test_save_variables(
     mock_output_manager._list_txt_file_names_in_dir.assert_called_with("dummy_dir_path/")
     mock_output_manager._load_txt_file_to_list.assert_called_with("dummy_dir_path/csv_dummy_input_filepath.txt")
     mock_output_manager._generate_file_name.assert_called_once_with(
-        "dummy_prefix_saved_variables_json_dummy_input_filepath.txt", "json")
+        "saved_variables_json_dummy_input_filepath.txt", "json")
     mock_output_manager._exclude_info_maps.assert_not_called()
     mock_output_manager._dict_to_file_json.assert_called_with(
         mock_output_manager.variables_pool, os.path.join("dummy_path", "dummy_name")
@@ -1583,7 +1579,7 @@ def test_save_variables(
     mock_output_manager.save_variables("dummy_path", "dummy_dir_path/", True)
     mock_output_manager._list_txt_file_names_in_dir.assert_called_with("dummy_dir_path/")
     mock_output_manager._load_txt_file_to_list.assert_called_with("dummy_dir_path/csv_dummy_input_filepath.txt")
-    dummy_file_name = "dummy_prefix_saved_variables_json_dummy_input_filepath.txt"
+    dummy_file_name = "saved_variables_json_dummy_input_filepath.txt"
     mock_output_manager._generate_file_name.assert_called_with(dummy_file_name, "json")
     mock_output_manager._exclude_info_maps.assert_has_calls([call({}), call({})])
     mock_output_manager._dict_to_file_json.assert_called_with(
