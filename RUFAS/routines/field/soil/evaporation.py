@@ -1,10 +1,13 @@
 from math import exp
 from typing import Optional
 from RUFAS.routines.field.soil.soil_data import SoilData
+from RUFAS.output_manager import OutputManager
 
 """
 This module is based off of the 'Soil Water Evaporation' (2:2.3.3.2) section of the SWAT Theoretical documentation.
 """
+
+om = OutputManager()
 
 
 class Evaporation:
@@ -40,6 +43,7 @@ class Evaporation:
 
         """
         amount_available_for_evaporation = maximum_soil_water_evaporation
+        self.data.set_vectorized_layer_attribute("evaporated_water_content", [0.0] * len(self.data.soil_layers))
         for layer in self.data.soil_layers:
             evaporative_demand = self._determine_layer_evaporative_demand(
                 maximum_soil_water_evaporation, layer.top_depth, layer.bottom_depth,
@@ -51,6 +55,7 @@ class Evaporation:
 
             amount_water_removed = min(amount_water_removed, amount_available_for_evaporation)
             layer.water_content -= amount_water_removed
+            layer.evaporated_water_content = amount_water_removed
             amount_available_for_evaporation -= amount_water_removed
             if amount_available_for_evaporation == 0:
                 break

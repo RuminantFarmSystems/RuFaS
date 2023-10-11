@@ -987,6 +987,7 @@ class Field:
         full_evapotranspirative_demand = self._determine_potential_evapotranspiration(
             current_weather.incoming_light, current_weather.max_air_temperature, current_weather.min_air_temperature,
             current_weather.mean_air_temperature)
+        self.field_data.max_evapotranspiration = full_evapotranspirative_demand
 
         remaining_evapotranspirative_demand = self._evaporate_from_crop_canopies(full_evapotranspirative_demand)
 

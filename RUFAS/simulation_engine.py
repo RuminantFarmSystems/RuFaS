@@ -48,6 +48,10 @@ class SimulationEngine:
 
     def _daily_simulation(self) -> None:
         """Executes the daily simulation routines."""
+        info_map = {"class": self.__class__.__name__, "function": self._daily_simulation.__name__, "prefix": "Time"}
+        om.add_variable("day", self.time.day, info_map)
+        om.add_variable("year", self.time.year, info_map)
+        om.add_variable("calendar_year", self.time.calendar_year, info_map)
         routines.daily_animal_routine(
             self.state.animal_manager, self.state.feed, self.weather, self.time)
         simulate_daily_manure_manager(
