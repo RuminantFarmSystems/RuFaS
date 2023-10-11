@@ -89,7 +89,7 @@ def test_set_global_variables(make_graphs: bool, verbose: bool) -> None:
         [(True, 2, 0), (False, 0, 2)]
 )
 def test_execute_simulations(mocker: MockerFixture, is_data_valid: bool,
-                             simulate_call_count: int, add_error_call_count: int) -> None:
+                             simulate_call_count: int, add_error_call_count: int, ) -> None:
     """Checks that execute_simulations() calls the correct functions in the correct order"""
     # Arrange
     mock_output_manager = mocker.MagicMock(auto_spec=OutputManager)
@@ -102,7 +102,10 @@ def test_execute_simulations(mocker: MockerFixture, is_data_valid: bool,
     mocker.patch("main.InputManager", return_value=mock_input_manager)
     metadata_file_path1 = Path("metadata_file1.json")
     metadata_file_path2 = Path("metadata_file2.json")
-    metadata_file_list = [metadata_file_path1, metadata_file_path2]
+    metadata_prefix1 = "dummy_prefix1"
+    metadata_prefix2 = "dummy_prefix2"
+    metadata_file_list = [{"prefix": metadata_prefix1, "path": metadata_file_path1},
+                          {"prefix": metadata_prefix2, "path": metadata_file_path2}, ]
     mock_input_manager.start_data_processing.return_value = is_data_valid
     mock_simulator = mocker.MagicMock(auto_spec=SimulationEngine)
     mock_simulator.simulate.return_value = None
@@ -118,11 +121,11 @@ def test_execute_simulations(mocker: MockerFixture, is_data_valid: bool,
     assert mock_input_manager.flush_pool.call_count == len(metadata_file_list)
     assert mock_output_manager.dump_all_nondata_pools.call_count == len(metadata_file_list)
     assert mock_output_manager.dump_all_nondata_pools.call_args_list == [
-        mocker.call("output", True)
+        mocker.call("output", True),
     ] * len(metadata_file_list)
     assert mock_output_manager.save_variables.call_count == len(metadata_file_list)
     assert mock_output_manager.save_variables.call_args_list == [
-        mocker.call("output", "output/output_filters/", True)
+        mocker.call("output", "output/output_filters/", True),
     ] * len(metadata_file_list)
 
 
