@@ -90,6 +90,24 @@ def parse_gnu_args():
     """Parse command line options, if applicable"""
     parser = argparse.ArgumentParser()
     parser.add_argument(
+        '-fob',
+        "--format-option-block",
+        help="Use block formatting option for variable_names.txt file",
+        action="store_true",
+    )
+    parser.add_argument(
+        "-foi",
+        "--format-option-inline",
+        help="Use inline formatting option for variable_names.txt file",
+        action="store_true",
+    )
+    parser.add_argument(
+        "-fov",
+        "--format-option-verbose",
+        help="Use verbose formatting option for variable_names.txt file",
+        action="store_true",
+    )
+    parser.add_argument(
         "-ng",
         "--no-graphics",
         help="Prevent graphics from generating",
@@ -118,6 +136,7 @@ def parse_gnu_args():
 
 if __name__ == "__main__":
     cmd_arguments = parse_gnu_args()
+    
     run_rufas(
         make_graphs=not cmd_arguments.no_graphics,
         verbose=cmd_arguments.verbose,
