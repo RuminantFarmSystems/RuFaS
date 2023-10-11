@@ -20,6 +20,7 @@ from RUFAS.util import Utility
 
 
 def run_rufas(
+    format_option: str = "verbose",
     make_graphs: bool = True,
     verbose: bool = True,
     clear_output: bool = False,
@@ -42,7 +43,7 @@ def run_rufas(
     if verbose:
         print("RuFaS: Ruminant Farm Systems Model 2023")
     metadata_file_list = METADATA_PATHS
-    execute_simulations(metadata_file_list, exclude_info_maps)
+    execute_simulations(metadata_file_list, exclude_info_maps, format_option)
 
 
 def set_global_variables(make_graphs: bool, verbose: bool) -> None:
@@ -54,7 +55,7 @@ def set_global_variables(make_graphs: bool, verbose: bool) -> None:
 
 
 def execute_simulations(
-    metadata_files: List[Path], exclude_info_maps: bool = True
+    metadata_files: List[Path], exclude_info_maps: bool = True, format_option: str = "verbose",
 ) -> None:
     """Instantiates I/O Managers and processes the metadata files provided by the user to run the simulation.
 
@@ -83,7 +84,7 @@ def execute_simulations(
             output_manager.add_error("No simulation run",
                                      f"Data not valid for {metadata_file_path}, simulation not run", info_map)
         output_manager.save_variables(r"output", r"output/output_filters/", exclude_info_maps)
-        output_manager.dump_all_nondata_pools(r"output", exclude_info_maps)
+        output_manager.dump_all_nondata_pools(r"output", exclude_info_maps, format_option)
 
 
 def parse_gnu_args():
@@ -134,10 +135,20 @@ def parse_gnu_args():
     return parser.parse_args()
 
 
+def determine_format_option(cmd_arguments):
+    if cmd_arguments.format_option_block:
+        return "block"
+    elif cmd_arguments.format_option_inline:
+        return "inline"
+    else:
+        return "verbose"
+
+
 if __name__ == "__main__":
     cmd_arguments = parse_gnu_args()
-    
+    format_option = determine_format_option(cmd_arguments)
     run_rufas(
+        format_option,
         make_graphs=not cmd_arguments.no_graphics,
         verbose=cmd_arguments.verbose,
         clear_output=cmd_arguments.clear_output,

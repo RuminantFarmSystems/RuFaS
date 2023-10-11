@@ -786,12 +786,12 @@ class OutputManager(object):
         self._list_to_file_txt(var_list, file_path)
 
     def dump_all_nondata_pools(
-        self, path: str, exclude_info_maps: bool = False
+        self, path: str, exclude_info_maps: bool = False, format_option: str = "verbose",
     ) -> None:
         """
         Dumps all non-data pools into the given path to a directory.
         """
-        self.dump_variable_names_and_contexts(path, exclude_info_maps)
+        self.dump_variable_names_and_contexts(path, exclude_info_maps, format_option)
         self.dump_logs(path)
         self.dump_warnings(path)
         self.dump_errors(path)
