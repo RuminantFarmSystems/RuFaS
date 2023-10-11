@@ -52,10 +52,10 @@ class ResiduePartition:
             layer.plant_metabolic_active_carbon_usage = self._determine_plant_metabolic_active_carbon_usage(
                 layer.decomposition_moisture_effect,
                 self.data.decomposition_temperature_effect,
-                layer.plant_metabolic_carbon_amount)
+                layer.metabolic_litter_amount)
 
             layer.plant_metabolic_to_soil_carbon_amount = self._determine_plant_metabolic_to_soil_carbon_amount(
-                layer.plant_metabolic_carbon_amount,
+                layer.metabolic_litter_amount,
                 layer.tillage_fraction
             )
 
@@ -64,7 +64,7 @@ class ResiduePartition:
                 #  tillage
                 #     depth and mix the residue into all soil down to that depth. This is not a priority, though.
                 layer.structural_carbon_transfer_amount = self._determine_structural_carbon_transfer_amount(
-                    layer.plant_structural_carbon_amount,
+                    layer.structural_litter_amount,
                     layer.tillage_fraction
                 )
 
@@ -75,8 +75,8 @@ class ResiduePartition:
                 layer.soil_dry_matter_residue_amount = 0
                 self.data.plant_surface_residue = 0  # TODO: why is this not also done for root residue?
 
-            layer.plant_metabolic_carbon_amount = self._determine_plant_metabolic_carbon_amount(
-                layer.plant_metabolic_carbon_amount,
+            layer.metabolic_litter_amount = self._determine_plant_metabolic_carbon_amount(
+                layer.metabolic_litter_amount,
                 layer.plant_residue_metabolic_fraction,
                 layer.plant_dry_matter_residue_amount,
                 layer.plant_metabolic_active_carbon_usage,
@@ -85,27 +85,27 @@ class ResiduePartition:
             layer.plant_structural_to_slow_or_active_rate = self._determine_plant_structural_to_slow_or_active_rate(
                 self.data.plant_residue_metabolic_fraction)
 
-            layer.plant_structural_carbon_amount = self._determine_plant_structural_carbon_amount(
+            layer.structural_litter_amount = self._determine_plant_structural_carbon_amount(
                 layer.plant_dry_matter_residue_amount,
                 layer.plant_residue_metabolic_fraction,
                 layer.structural_carbon_transfer_amount,
                 layer.plant_structural_active_carbon_usage,
                 layer.plant_structural_slow_carbon_usage,
-                layer.plant_structural_carbon_amount)
+                layer.structural_litter_amount)
 
             layer.plant_structural_active_carbon_usage = \
                 self._determine_plant_structural_to_slow_active_carbon_amount(
                     layer.plant_structural_to_slow_or_active_rate,
                     layer.decomposition_moisture_effect,
                     self.data.decomposition_temperature_effect,
-                    layer.plant_structural_carbon_amount)
+                    layer.structural_litter_amount)
 
             layer.plant_structural_slow_carbon_usage = \
                 self._determine_plant_structural_to_slow_active_carbon_amount(
                     layer.plant_structural_to_slow_or_active_rate,
                     layer.decomposition_moisture_effect,
                     self.data.decomposition_temperature_effect,
-                    layer.plant_structural_carbon_amount)
+                    layer.structural_litter_amount)
 
             layer.weighted_residue_dry_matter_lignin_fraction = \
                 self._determine_weighted_residue_dry_matter_lignin_fraction(layer.soil_dry_matter_residue_amount,
