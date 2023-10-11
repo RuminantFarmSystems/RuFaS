@@ -992,7 +992,7 @@ class Field:
 
         # TODO: figure out how to determine weighting coefficient when there are multiple crops in the field - issue
         #  #519
-        self.soil.infiltration.infiltrate(precipitation_reaching_soil, 1.0, full_evapotranspirative_demand)
+        self.soil.infiltration.infiltrate(precipitation_reaching_soil)
         self.soil.percolation.percolate(self.field_data.seasonal_high_water_table)
         # TODO: find reasonable values/way to set minimum cover management factor - issue #520
         self.soil.soil_erosion.erode(self.field_data.field_size, 0.02, self.field_data.current_residue,
