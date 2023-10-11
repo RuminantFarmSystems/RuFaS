@@ -1101,7 +1101,6 @@ class Feed:
         status_dict = retrieve_data(data_source='feed_quality',
                                     var_names=[column], unique_value=False,
                                     identifier='quality_id', desired_rows=quality_id)
-        print(status_dict)
 
         return status_dict[0][column]
 
