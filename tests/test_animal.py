@@ -1528,12 +1528,13 @@ def test_attempt_optimization(mocker: MockerFixture, mock_ration_config: MagicMo
     def mock_list_reconfig(x):
         return x
 
+    mock_RationConfig = mocker.patch("RUFAS.routines.animal.ration.ration_optimizer.RationConfig")
     mocker.patch("RUFAS.routines.animal.ration.ration_optimizer.RationOptimizer.optimize")
     mocker.patch("RUFAS.routines.animal.ration.ration_optimizer.RationOptimizer.get_ration_vals")
     mocker.patch("RUFAS.routines.animal.ration.ration_optimizer.RationOptimizer.list_reconfig",
                  side_effect=mock_list_reconfig)
 
-    mock_RationConfig = mocker.patch("RUFAS.routines.animal.ration.ration_config.RationConfig")
+    # mocker.patch("RUFAS.routines.animal.ration.ration_config.RationConfig.__init__", return_value=None)
 
     ration_optimizer = RationOptimizer()
     requirements = MagicMock()
@@ -1585,8 +1586,8 @@ def test_attempt_optimization(mocker: MockerFixture, mock_ration_config: MagicMo
         DMIest_=requirements.DMIest
     )
 
-    # ration_optimizer.optimize.assert_called_once_with(animal_combination, available_feeds,
-    #                                                   mock_RationConfig.return_value)
+    ration_optimizer.optimize.assert_called_once_with(animal_combination, available_feeds,
+                                                      mock_RationConfig.return_value)
 
 
 @pytest.mark.parametrize("ration_config, expected", [(lazy_fixture('mock_ration_config'), 91.0),
