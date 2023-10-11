@@ -495,8 +495,8 @@ class Field:
         info_map = {"class": self.__class__.__name__, "function": self._record_manure_application.__name__,
                     "prefix": f"field='{self.field_data.name}'", "date": {"year": year, "day": day},
                     "field_size": self.field_data.field_size}
-        value = {"dry_matter_mass": dry_matter_mass, "dry_matter_fraction": dry_matter_fraction, "field_coverage":
-                 field_coverage, "application_depth": application_depth,
+        value = {"dry_matter_mass": dry_matter_mass, "dry_matter_fraction": dry_matter_fraction,
+                 "field_coverage": field_coverage, "application_depth": application_depth,
                  "surface_remainder_fraction": surface_remainder_fraction, "nitrogen": nitrogen,
                  "phosphorus": phosphorus, "potassium": potassium}
         om.add_variable("manure_application", value, info_map)
@@ -534,6 +534,7 @@ class Field:
                             f"the soil profile, setting the application depth to be at the bottom of the soil " \
                             f"profile."
         om.add_error(error_name, error_message, info_map)
+
     # </editor-fold>
 
     # <editor-fold desc="--- Scheduling Methods ---">
@@ -984,10 +985,9 @@ class Field:
         total_precipitation = current_weather.rainfall + watering_amount
         precipitation_reaching_soil = self._handle_water_in_crop_canopies(total_precipitation)
 
-        full_evapotranspirative_demand = self._determine_potential_evapotranspiration(current_weather.incoming_light,
-                                                                                      current_weather.max_air_temperature,
-                                                                                      current_weather.min_air_temperature,
-                                                                                      current_weather.mean_air_temperature)
+        full_evapotranspirative_demand = self._determine_potential_evapotranspiration(
+            current_weather.incoming_light, current_weather.max_air_temperature, current_weather.min_air_temperature,
+            current_weather.mean_air_temperature)
         self.field_data.max_evapotranspiration = full_evapotranspirative_demand
 
         remaining_evapotranspirative_demand = self._evaporate_from_crop_canopies(full_evapotranspirative_demand)
