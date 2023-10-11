@@ -5,9 +5,9 @@ name: Coverage
 
 on:
   push:
-    branches: [ master ]
+    branches: [ main ]
   pull_request:
-    branches: [ master ]
+    branches: [ main ]
 
 jobs:
   build:
@@ -52,7 +52,7 @@ jobs:
     # Update repository
     # https://github.com/marketplace/actions/github-commit-push
     - name: Commit & Push changes to Readme
-      uses: actions-js/push@master
+      uses: actions-js/push@main
       with:
         message: Update coverage on Readme
         github_token: ${{ secrets.GITHUB_TOKEN }}
