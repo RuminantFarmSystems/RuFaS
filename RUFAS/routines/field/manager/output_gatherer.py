@@ -28,6 +28,7 @@ class OutputGatherer:
                             info_map)
             om.add_variable("eroded_sediment", field.soil.data.eroded_sediment, info_map)
             om.add_variable("accumulated_runoff", field.soil.data.accumulated_runoff, info_map)
+            om.add_variable("infiltrated_water", field.soil.data.infiltrated_water, info_map)
             om.add_variable("cover_type",
                             field.soil.data.cover_type,
                             info_map)
@@ -124,6 +125,7 @@ class OutputGatherer:
 
                 om.add_variable("temperature", layer.temperature, info_map)
                 om.add_variable("percolated_water", layer.percolated_water, info_map)
+                om.add_variable("water_content", layer.water_content, info_map)
                 om.add_variable("plant_metabolic_active_carbon_usage", layer.plant_metabolic_active_carbon_usage,
                                 info_map)
                 om.add_variable("plant_metabolic_active_carbon_loss", layer.plant_metabolic_active_carbon_loss,

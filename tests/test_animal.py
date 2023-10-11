@@ -1552,14 +1552,114 @@ def test_lactating_cow_manure_calculations():
     pass
 
 
-def test_optimize():
-    """Unit test for function optimize in file routines/animal/ration/calf_ration.py"""
-    pass
+def test_get_ration():
+    """Unit test for function _get_ration in file routines/animal/ration/calf_ration.py"""
+    actual = RUFAS.routines.animal.ration.calf_ration.CalfRationManager._get_ration()
+    expected = {'155': 1, '157': 2, 'status': 'Optimal', 'objective': 4.5}
+    assert actual == expected
+
+
+def test_optimize(mocker: MockerFixture):
+    """Unit test for function optimize in file routines/animal/ration/calf_ration.
+    Tests the optimize function to verify it returns a correctly optimized calf ration.py"""
+    mocker.patch('RUFAS.routines.animal.ration.calf_ration.CalfRationManager._get_ration',
+                 return_value='formulated_ration')
+    actual = RUFAS.routines.animal.ration.calf_ration.CalfRationManager.optimize()
+    expected = 'formulated_ration'
+    assert actual == expected
 
 
 def test_calc_requirements():
     """Unit test for function calc_requirements in file routines/animal/ration/calf_ration.py"""
-    pass
+    animal_intake = {
+                    'whole_milk_intake': 1,
+                    'milk_replacer_intake': 1,
+                    'starter_intake': 1,
+                    'wean_start': 1,
+                    'milk_reduction': 1,
+                    'milk_intake_wean': 1,
+                    'dm_intake': 1,
+                    'me_intake': 1,
+                    'cp_intake': 1,
+                    'adp_intake': 1,
+                    'milk_me_proportion': 1,
+                    'starter_me_proportion': 1,
+                    'milk_proportion': 1,
+                    'starter_proportion': 1
+                    }
+    feed = MagicMock()
+    feed.calf_feeds = {155: {'DM': 1, 'CP': 1, 'DE': 1},
+                       156: {'DM': 1, 'CP': 1, 'DE': 1},
+                       157: {'DM': 1, 'CP': 1, 'DE': 1, 'EE': 1}}
+
+    calf = MagicMock()
+    calf.days_born = 10
+    calf.body_weight = 100
+    temp = 25
+
+    actual = RUFAS.routines.animal.ration.calf_ration.CalfRationManager.calc_requirements(calf, feed, temp,
+                                                                                          animal_intake)
+    expected = {'ne_maint': {'op': '=', 'val': 2.719558787744806}, 'me_maint': {'op': '=', 'val': 1.1010359464553872},
+                'bio_val': {'op': '=', 'val': 0.023}, 'endo_urine_N': {'op': '=', 'val': 6.324555320336759},
+                'meta_fecal_N': {'op': '=', 'val': 7.1000000000000005},
+                'adp_maint': {'op': '=', 'val': 3603.6019892219456},
+                'me_gain': {'op': '=', 'val': -0.10103594645538716},
+                'ne_gain': {'op': '=', 'val': -0.16557326346944443},
+                'energy_allow_gain': {'op': '=', 'val': 0}, 'adp_allow_gain': {'op': '=', 'val': -0.4407438603835359},
+                'live_weight_change': {'op': '=', 'val': -0.4407438603835359}}
+    assert actual == expected
+
+    calf.days_born = 100
+    actual = RUFAS.routines.animal.ration.calf_ration.CalfRationManager.calc_requirements(calf, feed, temp,
+                                                                                          animal_intake)
+    expected = {'ne_maint': {'op': '=', 'val': 2.719558787744806}, 'me_maint': {'op': '=', 'val': 1.1010359464553872},
+                'bio_val': {'op': '=', 'val': 0.023}, 'endo_urine_N': {'op': '=', 'val': 6.324555320336759},
+                'meta_fecal_N': {'op': '=', 'val': 7.1000000000000005},
+                'adp_maint': {'op': '=', 'val': 3603.6019892219456},
+                'me_gain': {'op': '=', 'val': -0.10103594645538716},
+                'ne_gain': {'op': '=', 'val': -0.16557326346944443}, 'energy_allow_gain': {'op': '=', 'val': 0},
+                'adp_allow_gain': {'op': '=', 'val': -0.4407438603835359},
+                'live_weight_change': {'op': '=', 'val': -0.4407438603835359}}
+    assert actual == expected
+
+
+def test_calc_intake():
+    """Unit test for function calc_intake in file routines/animal/ration/calf_ration.py"""
+
+    calf = MagicMock()
+    calf.birth_weight = 1
+    calf.body_weight = 2
+
+    feed = MagicMock()
+    feed.calf_feeds = {155: {'DM': 1, 'CP': 1, 'DE': 1},
+                       156: {'DM': 1, 'CP': 1, 'DE': 1},
+                       157: {'DM': 1, 'CP': 1, 'DE': 1, 'EE': 1}}
+
+    milk_type = 'whole'
+    wean_day = 100
+    wean_length = 10
+
+    actual = RUFAS.routines.animal.ration.calf_ration.CalfRationManager.calc_intake(calf, feed, wean_day, wean_length,
+                                                                                    milk_type)
+    expected = {'whole_milk_intake': 0.001, 'milk_replacer_intake': 0.0, 'starter_intake': -0.2379166, 'wean_start': 89,
+                'milk_reduction': 5, 'milk_intake_wean': 0.0005454545454545455, 'dm_intake': -0.2369166,
+                'me_intake': -0.13008446328000003, 'cp_intake': -0.0023691660000000002, 'adp_intake': 749.2402389701692,
+                'milk_me_proportion': -0.007379820585750122, 'starter_me_proportion': 1.00737982058575,
+                'milk_proportion': -0.004220894610170837, 'starter_proportion': 1.004220894610171}
+
+    assert actual == expected
+
+    milk_type = 'not_whole'
+    actual = RUFAS.routines.animal.ration.calf_ration.CalfRationManager.calc_intake(calf, feed, wean_day, wean_length,
+                                                                                    milk_type)
+    expected = {'whole_milk_intake': 0.0, 'milk_replacer_intake': 0.00015, 'starter_intake': -0.2379166,
+                'wean_start': 89, 'milk_reduction': 5, 'milk_intake_wean': 8.18181818181818e-05,
+                'dm_intake': -0.2377666, 'me_intake': -0.13090046328000002, 'cp_intake': -0.002377666,
+                'adp_intake': 749.8864432599029, 'milk_me_proportion': -0.001100072500828203,
+                'starter_me_proportion': 1.0011000725008283,
+                'milk_proportion': -0.0006308707783178966, 'starter_proportion': 1.000630870778318}
+
+    assert actual == expected
 
 
 @pytest.mark.parametrize(
