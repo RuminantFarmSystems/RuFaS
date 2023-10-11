@@ -99,31 +99,31 @@ def retrieve_data(data_source: str, var_names: List[str] = None, unique_value: b
     of desired rows
 
     Parameters
-        ----------
-        data_source : str
-            Path to retrieve the desired data from IM.
-        var_names : List[str] = None
-            A list of desired variables (columns) to retrieve.
-            If omitted, all existing columns are returned.
-        unique_value: bool = False
-            If True, returns only unique values. Default is False.
-        identifier: str = None
-            Column name used for filtering based on `desired_rows`.
-            Both `identifier` and `desired_rows` must be provided for filtering.
-        desired_rows: List[Any] = None
-            Desired row values for filtering. Rows with these values in the `identifier` column are returned.
-        compare_val: int = None
-            Baseline value for comparison. Used with `low_col` and `high_col` to filter rows. The "compare_val" should
-            fall in the range of [low_col_value, high_col_value], otherwise the current row will be ignored.
-        low_col: str = None
-            Column indicating the lower bound for comparison with `compare_val`.
-        high_col: str = None
-            Column indicating the upper bound for comparison with `compare_val`.
+    ----------
+    data_source : str
+        Path to retrieve the desired data from IM.
+    var_names : List[str] = None
+        A list of desired variables (columns) to retrieve.
+        If omitted, all existing columns are returned.
+    unique_value: bool = False
+        If True, returns only unique values. Default is False.
+    identifier: str = None
+        Column name used for filtering based on `desired_rows`.
+        Both `identifier` and `desired_rows` must be provided for filtering.
+    desired_rows: List[Any] = None
+        Desired row values for filtering. Rows with these values in the `identifier` column are returned.
+    compare_val: int = None
+        Baseline value for comparison. Used with `low_col` and `high_col` to filter rows. The "compare_val" should
+        fall in the range of [low_col_value, high_col_value], otherwise the current row will be ignored.
+    low_col: str = None
+        Column indicating the lower bound for comparison with `compare_val`.
+    high_col: str = None
+        Column indicating the upper bound for comparison with `compare_val`.
 
     Returns
     -------
-        List[Dict[str, Any]]
-            Returns a list of dictionaries, each dictionary corresponds to a row in the csv file.
+    List[Dict[str, Any]]
+        Returns a list of dictionaries, each dictionary corresponds to a row in the csv file.
     """
     result_list = []
     values = []
