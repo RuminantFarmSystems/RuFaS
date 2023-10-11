@@ -44,16 +44,14 @@ class Percolation:
         layer_count = len(self.data.soil_layers)
         deepest_layer = layer_count - 1
 
-        for layer_number in reversed(range(layer_count)):  # loop through each layer
+        for layer_number in reversed(range(layer_count)):
             current_layer = self.data.soil_layers[layer_number]
 
-            # get the appropriate underlying layer
             if layer_number < deepest_layer:
                 layer_below = self.data.soil_layers[layer_number + 1]
             else:
                 layer_below = self.data.vadose_zone_layer
 
-            # check for percolation conditions
             can_percolate = self._determine_if_percolation_allowed(layer_below.water_content,
                                                                    layer_below.field_capacity_content,
                                                                    layer_below.saturation_content,
