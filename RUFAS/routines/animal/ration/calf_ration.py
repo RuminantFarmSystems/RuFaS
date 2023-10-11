@@ -80,7 +80,7 @@ def calc_requirements(calf, feed, temp, wean_day, wean_length, milk_type):
     # [A.1B.D.1]
     dm_intake = whole_milk_intake + milk_replacer_intake + starter_intake
     # [A.1B.C.4]
-    me_intake = whole_milk_me * whole_milk_intake + milk_replacer_me * milk_replacer_intake + starter_me\
+    me_intake = whole_milk_me * whole_milk_intake + milk_replacer_me * milk_replacer_intake + starter_me \
         * starter_intake
     # [A.1B.E.1]
     cp_intake = 0.01 * (whole_milk_cp * whole_milk_intake + milk_replacer_cp *
