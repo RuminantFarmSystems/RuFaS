@@ -471,9 +471,9 @@ def test_partition_residue(layers: list, crop: CropData, rainfall=10):
             assert layer.soil_dry_matter_residue_amount == 0
             assert data.plant_surface_residue == 0
 
-        assert layer.plant_metabolic_carbon_amount == 2.4
+        assert layer.metabolic_litter_amount == 2.4
         assert layer.plant_structural_to_slow_or_active_rate == 0.58
-        assert layer.plant_structural_carbon_amount == 2.5
+        assert layer.structural_litter_amount == 2.5
         assert layer.plant_structural_active_carbon_usage == 2.6
         assert layer.plant_structural_slow_carbon_usage == 2.6
         assert layer.weighted_residue_dry_matter_lignin_fraction == 0.59
