@@ -1,355 +1,113 @@
-"""
-RUFAS: Ruminant Farm Systems Model
-File name: test_graph_generator.py
-Description: Implements test cases for the GraphGenerator class
-Author(s): Allister Liu, al2562@cornell.edu
-"""
 import os
-from pathlib import Path
-
-import matplotlib
-import matplotlib.axes
-import matplotlib.figure
+from matplotlib.figure import Figure
+import datetime
 import matplotlib.pyplot as plt
+from mock import patch
 import pytest
-from freezegun import freeze_time
-from mock.mock import MagicMock, patch, call
-
-import RUFAS
+from unittest.mock import MagicMock
 from RUFAS.graph_generator import GraphGenerator
 
-matplotlib.use('TkAgg')
 
+class TestGraphGenerator:
+    @pytest.fixture
+    def graph_generator(self):
+        return GraphGenerator()
 
-@pytest.fixture
-def mock_graph_generator(mocker) -> GraphGenerator:
-    graph_generator = GraphGenerator()
-    return graph_generator
+    @pytest.fixture
+    def mock_plt(self, monkeypatch):
+        mock = MagicMock()
+        monkeypatch.setattr(plt, "subplots", mock)
+        return mock
 
+    @pytest.fixture
+    def mock_plt_savefig(self, monkeypatch):
+        mock = MagicMock()
+        monkeypatch.setattr(plt, "savefig", mock)
+        return mock
 
-@pytest.fixture
-def graph_generator_original_states(
-        mock_graph_generator: GraphGenerator
-) -> dict[str, callable]:
-    """Fixture to store original methods of GraphGenerator"""
-    return {
-        "generate_graph": mock_graph_generator.generate_graph,
-        "_line_graph": mock_graph_generator._line_graph,
-        "_bar_graph": mock_graph_generator._bar_graph,
-        "_customize_graph": mock_graph_generator._customize_graph,
-        "_generate_graph_path": mock_graph_generator._generate_graph_path,
-    }
+    def test_draw_graph(self, graph_generator, mock_plt):
+        graph_type = "plot"
+        data = {
+            "key1": {"values": [1, 2, 3]},
+            "key2": {"values": [4, 5, 6]},
+        }
+        graph_generator._draw_graph(graph_type, data)
+        mock_plt.plot.assert_called_once_with(data["key1"]["values"])
+        mock_plt.plot.assert_called_once_with(data["key2"]["values"])
 
+    def test_customize_graph_figure_setters(self, graph_generator):
+        fig = MagicMock(name="Figure")
+        fig.set_dpi = MagicMock()
+        fig.set_size_inches = MagicMock()
+        fig.set_facecolor = MagicMock()
 
-@pytest.mark.parametrize(
-    "filtered_pool, graph_info, save_path, filter_file_name",
-    [
-        (
-                {"dummy.variable": {"values": [1, 2, 3]}},
-                {"graph_type": "Line Graph",
-                 "filter": ["dummy.variable"],
-                 "title": "Dummy Variable"},
-                "dummy\\path",
-                "dummy_filter"
-        ),
-        (
-                {"a": {"values": 1}, "b": {"values": 2}, "c": {"values": 3}},
-                {"graph_type": "Bar Graph",
-                 "filter": ["dummy.variable"],
-                 "title": "Dummy Variable"},
-                "dummy\\path",
-                "dummy_filter"
-        ),
-        (
-                {"dummy.variable": {"values": [1, 2, 3]}},
-                {"graph_type": "Line Graph",
-                 "filter": ["dummy.variable"]},
-                "dummy\\path",
-                "dummy_filter"
-        ),
+        customization_details = {
+            "dpi": 150,
+            "figsize": (6, 4),
+            "facecolor": "white",
+        }
 
-    ]
-)
-def test_generate_graph(mock_graph_generator: GraphGenerator,
-                        graph_generator_original_states: dict[str, callable],
-                        filtered_pool: dict,
-                        graph_info: dict,
-                        save_path: str,
-                        filter_file_name: str) -> None:
-    mock_graph_generator._line_graph = MagicMock()
-    mock_graph_generator._bar_graph = MagicMock()
-    mock_graph_generator._generate_graph_path = MagicMock()
-    mock_savefig = MagicMock()
+        with patch("matplotlib.figure.Figure", return_value=fig):
+            graph_generator._customize_graph(fig, customization_details)
 
-    with patch.object(matplotlib.pyplot, "savefig", mock_savefig):
-        mock_graph_generator.generate_graph(filtered_pool, graph_info, save_path, filter_file_name)
+        fig.set_dpi.assert_called_once_with(150)
+        fig.set_size_inches.assert_called_once_with(6, 4)
+        fig.set_facecolor.assert_called_once_with("white")
 
-    if graph_info["graph_type"] == "Line graph":
-        mock_graph_generator._line_graph.assert_called_once_with(filtered_pool, graph_info, save_path, filter_file_name)
-    elif graph_info["graph_type"] == "Bar graph":
-        mock_graph_generator._bar_graph.assert_called_once_with(filtered_pool, graph_info, save_path, filter_file_name)
-    mock_graph_generator._generate_graph_path.assert_called_once_with(save_path, graph_info, filter_file_name)
-    mock_savefig.assert_called_once()
+    def test_customize_graph_axes_setters(self, graph_generator, mock_plt):
+        fig = Figure()
+        fig.add_subplot(111)
+        customization_details = {
+            "xlabel": "X Label",
+            "ylabel": "Y Label",
+            "title": "Graph Title",
+        }
+        graph_generator._customize_graph(fig, customization_details)
+        mock_plt.set_xlabel.assert_called_once_with("X Label")
+        mock_plt.set_ylabel.assert_called_once_with("Y Label")
+        mock_plt.set_title.assert_called_once_with("Graph Title")
 
-    mock_graph_generator._line_graph = graph_generator_original_states["_line_graph"]
-    mock_graph_generator._bar_graph = graph_generator_original_states["_bar_graph"]
-    mock_graph_generator._generate_graph_path = graph_generator_original_states["_generate_graph_path"]
-
-
-@pytest.mark.parametrize(
-    "filtered_pool, graph_info, save_path, filter_file_name",
-    [
-        (
-                {"dummy.variable": {"values": [1, 2, 3]}},
-                {"graph_type": "Line Graph",
-                 "filter": ["dummy.variable"],
-                 "title": "Dummy Variable"},
-                "dummy\\path",
-                "dummy_filter"
+    def test_save_graph(self, graph_generator, mock_plt_savefig):
+        graph_details = {
+            "title": "My Graph",
+        }
+        filter_file_name = "filter_file"
+        save_path = "path/to/save"
+        graphics_dir = "graphs"
+        result = graph_generator._save_graph(
+            graph_details, filter_file_name, save_path, graphics_dir
         )
-    ]
-)
-def test_invalid_generate_graph(mock_graph_generator: GraphGenerator,
-                                graph_generator_original_states: dict[str, callable],
-                                filtered_pool: dict,
-                                graph_info: dict,
-                                save_path: str,
-                                filter_file_name: str) -> None:
-    mock_graph_generator._line_graph = MagicMock()
-    mock_graph_generator._bar_graph = MagicMock()
-    mock_graph_generator._generate_graph_path = MagicMock()
-    mock_savefig = MagicMock(side_effect=Exception('Save Figure Failed'))
-
-    with patch.object(matplotlib.pyplot, "savefig", mock_savefig):
-        try:
-            mock_graph_generator.generate_graph(filtered_pool, graph_info, save_path, filter_file_name)
-            assert False
-        except Exception as e:
-            assert True
-
-    if graph_info["graph_type"] == "Line graph":
-        mock_graph_generator._line_graph.assert_called_once_with(filtered_pool, graph_info, save_path, filter_file_name)
-    elif graph_info["graph_type"] == "Bar graph":
-        mock_graph_generator._bar_graph.assert_called_once_with(filtered_pool, graph_info, save_path, filter_file_name)
-    mock_graph_generator._generate_graph_path.assert_called_once_with(save_path, graph_info, filter_file_name)
-
-    mock_graph_generator._line_graph = graph_generator_original_states["_line_graph"]
-    mock_graph_generator._bar_graph = graph_generator_original_states["_bar_graph"]
-    mock_graph_generator._generate_graph_path = graph_generator_original_states["_generate_graph_path"]
-
-
-@pytest.mark.parametrize(
-    "filtered_pool, graph_info",
-    [
-        (
-                {
-                    "dummy.variable": {
-                        "values": [1, 2, 3]
-                    }
-                },
-                {
-                    "graph_type": "Line Graph",
-                    "filter": ["dummy.variable"],
-                    "title": "Dummy Variable"
-                }
-        ),
-        (
-                {
-                    "dummy.variable_1":
-                        {
-                            "values": [1, 2, 3]
-                        },
-                    "dummy.variable_2":
-                        {
-                            "values": [4, 5, 6]
-                        }
-                },
-                {
-                    "graph_type": "Line Graph",
-                    "filter": ["dummy.variable*"],
-                    "title": "Dummy Variable"
-                }
-        ),
-    ]
-)
-def test_line_graph(mock_graph_generator: GraphGenerator,
-                    graph_generator_original_states: dict[str, callable],
-                    filtered_pool: dict,
-                    graph_info: dict) -> None:
-    mock_graph_generator._customize_graph = MagicMock()
-    mock_fig = MagicMock(spec=matplotlib.figure.Figure)
-    mock_ax = MagicMock(spec=matplotlib.axes.Axes)
-    mock_plot = MagicMock()
-
-    with patch.object(matplotlib.pyplot, "subplots", return_value=(mock_fig, mock_ax)) as mock_subplots:
-        with patch.object(mock_ax, "plot", mock_plot):
-            mock_graph_generator._line_graph(filtered_pool, graph_info)
-
-    expected_plot_calls = []
-    mock_subplots.assert_called_once()
-    for key in filtered_pool.keys():
-        expected_plot_calls.append(call(filtered_pool[key]['values']))
-    assert (mock_plot.call_args_list == expected_plot_calls)
-
-    mock_graph_generator._customize_graph.assert_called_once_with(mock_fig, graph_info)
-
-    mock_graph_generator._customize_graph = graph_generator_original_states["_customize_graph"]
-
-
-@pytest.mark.parametrize(
-    "filtered_pool, graph_info",
-    [
-        (
-                {"a": {"values": 1}, "b": {"values": 2}, "c": {"values": 3}},
-                {"graph_type": "Bar Graph",
-                 "filter": ["dummy.variable"],
-                 "title": "Dummy Variable"}),
-    ]
-)
-def test_bar_graph(mock_graph_generator: GraphGenerator,
-                   graph_generator_original_states: dict[str, callable],
-                   filtered_pool: dict,
-                   graph_info: dict) -> None:
-    mock_graph_generator._customize_graph = MagicMock()
-    mock_fig = MagicMock(spec=matplotlib.figure.Figure)
-    mock_ax = MagicMock(spec=matplotlib.axes.Axes)
-    mock_bar = MagicMock()
-
-    with patch.object(matplotlib.pyplot, "subplots", return_value=(mock_fig, mock_ax)) as mock_subplots:
-        with patch.object(mock_ax, "bar", mock_bar):
-            mock_graph_generator._bar_graph(filtered_pool, graph_info)
-
-    mock_graph_generator._customize_graph.assert_called_once_with(mock_fig, graph_info)
-
-    mock_subplots.assert_called_once()
-    mock_bar.assert_called_once_with(["a", "b", "c"], [1, 2, 3])
-
-    mock_graph_generator._customize_graph = graph_generator_original_states["_customize_graph"]
-
-
-@pytest.mark.parametrize(
-    "save_path, graph_info, filter_file_name",
-    [
-        (
-                "dummy\\path",
-                {
-                    "graph_type": "Line Graph",
-                    "filter": ["dummy.variable"],
-                    "title": "Dummy Variable"
-                },
-                "dummy_filter"
-        ),
-        (
-                "dummy\\path",
-                {
-                    "graph_type": "Line Graph",
-                    "filter": ["dummy.variable"]
-                },
-                "dummy_filter"
+        timestamp = datetime.datetime.now().strftime("%d-%b-%Y_%a_%H-%M-%S")
+        expected_filename = (
+            f"{graph_details['title'].replace(' ', '-').lower()}-{timestamp}.png"
         )
-    ]
-)
-def test_generate_graph_path(mock_graph_generator: GraphGenerator,
-                             graph_generator_original_states: dict[str, callable],
-                             save_path: str,
-                             graph_info: dict,
-                             filter_file_name: str) -> None:
-    mock_graph_generator._generate_graph_path = MagicMock()
-    mock_mkdir = MagicMock()
-    with freeze_time("2023-09-21"):
-        with patch.object(Path, "mkdir", mock_mkdir):
-            graph_path = RUFAS.graph_generator.GraphGenerator._generate_graph_path(mock_graph_generator, save_path,
-                                                                                   graph_info, filter_file_name)
+        expected_path = os.path.join(save_path, graphics_dir, expected_filename)
+        mock_plt_savefig.assert_called_once_with(expected_path)
+        assert result == expected_path
 
-    graph_directory = os.path.join(save_path, "graphics", "om")
-    timestamp = "21-Sep-2023_Thu_00-00-00"
-    if 'title' in graph_info.keys():
-        title = '-'.join(graph_info['title'].split()).lower()
-        filename = title + '-' + timestamp + ".png"
-    else:
-        filename = f"saved_graph_{filter_file_name}-" + timestamp + ".png"
-    expected_graph_path = os.path.join(graph_directory, filename)
-
-    assert expected_graph_path == graph_path
-
-    mock_graph_generator._generate_graph_path = graph_generator_original_states["_generate_graph_path"]
-
-
-@pytest.mark.parametrize(
-    "save_path, graph_info, filter_file_name",
-    [
-        (
-                "dummy\\path",
-                {
-                    "graph_type": "Line Graph",
-                    "filter": ["dummy.variable"],
-                    "title": "Dummy Variable"
-                },
-                "dummy_filter"
+    def test_generate_graph(self, graph_generator, mock_plt_savefig, mock_plt):
+        filtered_pool = {
+            "key1": {"values": [1, 2, 3]},
+            "key2": {"values": [4, 5, 6]},
+        }
+        graph_details = {
+            "type": "line",
+            "title": "My Graph",
+            "dpi": 150,
+            "figsize": (6, 4),
+        }
+        filter_file_name = "filter_file"
+        save_path = "path/to/save"
+        graphics_dir = "graphs"
+        result = graph_generator.generate_graph(
+            filtered_pool, graph_details, save_path, filter_file_name, graphics_dir
         )
-    ]
-)
-def test_invalid_generate_graph_path(mock_graph_generator: GraphGenerator,
-                                     graph_generator_original_states: dict[str, callable],
-                                     save_path: str,
-                                     graph_info: dict,
-                                     filter_file_name: str) -> None:
-    mock_graph_generator._generate_graph_path = MagicMock()
-    mock_mkdir = MagicMock(side_effect=Exception('Make Directory Failed'))
-    with freeze_time("2023-09-21"):
-        with patch.object(Path, "mkdir", mock_mkdir):
-            try:
-                graph_path = RUFAS.graph_generator.GraphGenerator._generate_graph_path(mock_graph_generator, save_path,
-                                                                                       graph_info, filter_file_name)
-                assert False
-            except Exception as e:
-                assert True
-
-    mock_graph_generator._generate_graph_path = graph_generator_original_states["_generate_graph_path"]
-
-# @pytest.mark.parametrize(
-#     "fig_ax, graph_info",
-#     [
-#         (
-#                 plt.subplots(),
-#                 {
-#                     "graph_type": "Line Graph",
-#                     "filter": ["dummy.variable"],
-#                     "title": "Dummy Variable",
-#                     "x_label": "Dummy x",
-#                     "y_label": "Dummy y",
-#                     "legend": "Dummy legend",
-#                 }
-#         ),
-#         # (
-#         #         matplotlib.figure.Figure(),
-#         #         {
-#         #             "graph_type": "Line Graph",
-#         #             "filter": ["dummy.variable"],
-#         #             "title": "Dummy Variable"
-#         #         }
-#         # )
-#     ]
-# )
-# def test_customize_graph(mock_graph_generator: GraphGenerator,
-#                          fig_ax: matplotlib.figure.Figure,
-#                          graph_info: dict) -> None:
-#     mock_graph_generator._customize_graph = MagicMock()
-#
-#     mock_fig = MagicMock(spec=matplotlib.figure.Figure)
-#     mock_ax = MagicMock(spec=matplotlib.axes.Axes)
-#     mock_set_title = MagicMock(spec=matplotlib.axes.Axes.set_title)
-#     mock_set_xlabel = MagicMock()
-#     mock_set_ylabel = MagicMock()
-#     mock_legend = MagicMock()
-#
-#     # (fig, ax) = fig_ax
-#     # ax.plot([1, 2, 3])
-#     # print(fig.axes)
-#
-#     with patch.object(matplotlib.axes.Axes, "set_title", mock_set_title):
-#         # print(fig.axes[0].set_title)
-#         mock_graph_generator._customize_graph(mock_fig, graph_info)
-#
-#     # mock_set_title.assert_called_with(graph_info['title'])
-#     mock_set_title.assert_called()
+        timestamp = datetime.datetime.now().strftime("%d-%b-%Y_%a_%H-M-%S")
+        expected_filename = (
+            f"{graph_details['title'].replace(' ', '-').lower()}-{timestamp}.png"
+        )
+        expected_path = os.path.join(save_path, graphics_dir, expected_filename)
+        mock_plt.set_dpi.assert_called_once_with(150)
+        mock_plt.set_size_inches.assert_called_once_with(6, 4)
+        mock_plt_savefig.assert_called_once_with(expected_path)
+        assert result == expected_path
