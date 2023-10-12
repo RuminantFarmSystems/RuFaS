@@ -523,7 +523,7 @@ class AnimalRequirements:
             )
         else:
             nutrient_standard_error = f"Nutrient Standard \
-                {AnimalBase.config['nutrient_standard']}\
+                {AnimalBase.config['nutrient_standard']} \
                 not supported"
             info_map = {"function": self.calc_rqmts}
             om.add_error(
