@@ -1379,6 +1379,12 @@ class AnimalManager:
                 om.add_variable(f'MEdiet_pen_{pen.id}', pen.MEdiet, info_map)
                 om.add_variable(f'avg_rqmts_pen_{pen.id}', pen.avg_nutrient_rqmts, info_map)
                 om.add_variable(f'ration_per_animal_for_pen_{pen.id}', pen.ration_per_animal, info_map)
+                if pen.animal_combination != Pen.AnimalCombination.CALF:
+                    ration_supply_report = RationReporter.report_ration_supply(ration_per_animal,
+                                                                               feed.available_feeds,
+                                                                               ration_report,
+                                                                               pen.avg_nutrient_rqmts['avg_BW'])
+                    om.add_variable(f'ration_supply_report_for_pen_{pen.id}', ration_supply_report, info_map)
 
     @classmethod
     def _get_animal_types_in_pen(cls, pen: Pen) -> Set[AnimalType]:
