@@ -369,27 +369,14 @@ class RationReporter:
             "DE": 0,
             "calcium": 0,
         }
+
         nutrient_conc = {}
         ration = ration.copy()
         for non_numeric_key in ["status", "objective"]:
             if non_numeric_key in ration:
                 del ration[non_numeric_key]
-        nutrients = [
-            "DM",
-            "CP",
-            "ADF",
-            "NDF",
-            "lignin",
-            "ash",
-            "phosphorus",
-            "potassium",
-            "N",
-            "EE",
-            "starch",
-            "TDN",
-            "DE",
-            "calcium",
-        ]
+        nutrients = ['DM', 'CP', 'ADF', 'NDF', 'lignin', 'ash', 'phosphorus',
+                     'potassium', 'N', 'EE', 'starch', 'TDN', 'DE', 'calcium']
 
         # feed nutrient amounts
         for key, val in ration.items():
