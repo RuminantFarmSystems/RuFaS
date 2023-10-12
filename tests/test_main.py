@@ -1,6 +1,7 @@
 import argparse
 import os.path
 from pathlib import Path
+from mock import MagicMock
 
 import pytest
 from pytest_mock import MockerFixture
@@ -8,6 +9,7 @@ from pytest_mock import MockerFixture
 import config.global_variables
 from config import global_variables
 from main import execute_simulations
+from main import main
 from main import parse_gnu_args
 from main import run_rufas
 from main import set_global_variables
@@ -18,6 +20,28 @@ from RUFAS.output_manager import OutputManager
 
 dir_path = os.path.join(global_variables.ROOT_DIR, "input")
 file_path = os.path.join(dir_path, "input/ARL.json")
+
+
+def test_main(mocker: MockerFixture):
+    """Unit test for main() function in main.py"""
+    mock_cmd_arguments = MagicMock()
+    patch_run_rufas = mocker.patch(
+        "main.run_rufas"
+    )
+    patch_parse_gnu_args = mocker.patch(
+        "main.parse_gnu_args", return_value=mock_cmd_arguments
+    )
+
+    main()
+
+    patch_run_rufas.assert_called_once_with(
+        format_option=mock_cmd_arguments.format_option,
+        make_graphs=not mock_cmd_arguments.no_graphics,
+        verbose=mock_cmd_arguments.verbose,
+        clear_output=mock_cmd_arguments.clear_output,
+        exclude_info_maps=mock_cmd_arguments.exclude_info_maps
+    )
+    patch_parse_gnu_args.assert_called_once()
 
 
 @pytest.mark.parametrize(
