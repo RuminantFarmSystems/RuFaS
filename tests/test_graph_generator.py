@@ -34,7 +34,7 @@ class TestGraphGenerator:
         graph_generator._draw_graph(graph_type, data)
         mock_plt.plot.assert_called_once_with(data["key1"]["values"])
         mock_plt.plot.assert_called_once_with(data["key2"]["values"])
-
+    
     def test_customize_graph_figure_setters(self, graph_generator):
         fig = MagicMock(name="Figure")
         fig.set_dpi = MagicMock()
