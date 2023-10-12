@@ -20,7 +20,7 @@ from RUFAS.util import Utility
 
 
 def run_rufas(
-    make_graphs: bool = True,
+    produce_graphics: bool = True,
     verbose: bool = True,
     clear_output: bool = False,
     exclude_info_maps: bool = True,
@@ -28,7 +28,7 @@ def run_rufas(
     """Main function to run RuFaS, with options.
 
     Args:
-        make_graphs: prevent graphics from generating
+        produce_graphics: produce graphics after simulation
         verbose: print progress messages while simulation is running
         clear_output: lear output directory before running the simulation
         exclude_info_map: exclude info_maps from the output
@@ -38,23 +38,24 @@ def run_rufas(
         keep_list = [".keep", "output_filters"]
         Utility.empty_dir(output_dir, keep=keep_list)
 
-    set_global_variables(make_graphs, verbose)
+    set_global_variables(verbose)
     if verbose:
         print("RuFaS: Ruminant Farm Systems Model 2023")
     metadata_file_list = METADATA_PATHS
-    execute_simulations(metadata_file_list, exclude_info_maps)
+    execute_simulations(metadata_file_list, exclude_info_maps, produce_graphics)
 
 
-def set_global_variables(make_graphs: bool, verbose: bool) -> None:
+def set_global_variables(verbose: bool) -> None:
     """Sets values of global variables in config/global_variables.py"""
-    config.global_variables.PRODUCE_GRAPHICS = make_graphs
     config.global_variables.PRINT_STATUS_MESSAGES = (
         verbose  # TODO: this is currently unimplemented - GitHub Issue #211
     )
 
 
 def execute_simulations(
-    metadata_files: List[Path], exclude_info_maps: bool = True
+    metadata_files: List[Path],
+    exclude_info_maps: bool = True,
+    produce_graphics: bool = True,
 ) -> None:
     """Instantiates I/O Managers and processes the metadata files provided by the user to run the simulation.
 
@@ -62,12 +63,17 @@ def execute_simulations(
     ----------
     metadata_files : List[Path]
         The list of Paths to the metadata files the user entered with which to run the simulation.
+
     exclude_info_maps : bool, optional
         Flag for whether or not the user wants to inlcude info_maps data in their results files.
+
+    produce_graphics: bool, optional
+        Flag for whether or not the user wants to produce graphs at after the simulation.
     """
-    info_map = {"class": "No caller class",
-                "function": execute_simulations.__name__,
-                }
+    info_map = {
+        "class": "No caller class",
+        "function": execute_simulations.__name__,
+    }
     sys.stdout.write("Simulating...\n")
     output_manager = OutputManager()
     input_manager = InputManager()
@@ -75,25 +81,45 @@ def execute_simulations(
     for metadata_file_path in metadata_file_list:
         input_manager.flush_pool()
         output_manager.flush_pools()
-        is_data_valid = input_manager.start_data_processing(str(metadata_file_path), True)
+        is_data_valid = input_manager.start_data_processing(
+            str(metadata_file_path), True
+        )
         if is_data_valid:
             simulator = SimulationEngine()
             simulator.simulate()
         else:
-            output_manager.add_error("No simulation run",
-                                     f"Data not valid for {metadata_file_path}, simulation not run", info_map)
-        output_manager.save_variables(r"output", r"output/output_filters/", exclude_info_maps)
+            output_manager.add_error(
+                "No simulation run",
+                f"Data not valid for {metadata_file_path}, simulation not run",
+                info_map,
+            )
+        output_manager.save_variables(
+            r"output", r"output/output_filters/", exclude_info_maps, produce_graphics
+        )
         output_manager.dump_all_nondata_pools(r"output", exclude_info_maps)
 
 
-def parse_gnu_args():
+class CaseInsensitiveArgumentAction(argparse.Action):
+    def __call__(self, parser, namespace, values, option_string=None):
+        for action in self.option_strings:
+            setattr(namespace, action, values)
+
+
+def parse_gnu_args() -> argparse.Namespace:
     """Parse command line options, if applicable"""
-    parser = argparse.ArgumentParser()
+    parser = argparse.ArgumentParser(description="RuFaS: Whole dairy farm simulation")
+    parser.register("action", "ci_action", CaseInsensitiveArgumentAction)
     parser.add_argument(
-        "-ng",
-        "--no-graphics",
+        "-g",
+        "--no_graphics",
         help="Prevent graphics from generating",
         action="store_true",
+    )
+    parser.add_argument(
+        "-G",
+        "--graphics_dir",
+        help="The saving directory for graphics",
+        default="graphics",
     )
     parser.add_argument(
         "-v",
@@ -102,17 +128,18 @@ def parse_gnu_args():
         action="store_true",
     )
     parser.add_argument(
-        "-co",
+        "-c",
         "--clear-output",
         help="Clear output directory before running the simulation",
         action="store_true",
     )
     parser.add_argument(
-        "-ei",
+        "-i",
         "--exclude_info_maps",
         help="Exclude info_maps from the output",
         action="store_true",
     )
+
     return parser.parse_args()
 
 

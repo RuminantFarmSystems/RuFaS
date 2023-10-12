@@ -14,32 +14,24 @@ Ref: https://matplotlib.org/stable/users/explain/figure/backends.html
 matplotlib.use("TkAgg")
 
 MATPLOTLIB_PLOT_FUNCTIONS = {
-    "3d_contour": pyplt.contour,
-    "3d_heatmap": pyplt.imshow,
-    "3d_line": pyplt.plot,
-    "3d_scatter": pyplt.scatter,
-    "3dhistogram": pyplt.hist,
     "area": pyplt.fill_between,
     "bar": pyplt.bar,
     "barbs": pyplt.barbs,
     "boxplot": pyplt.boxplot,
     "broken_barh": pyplt.broken_barh,
     "contour": pyplt.contour,
-    "filled_barh": pyplt.broken_barh,
     "filled_contour": pyplt.contourf,
     "hexbin": pyplt.hexbin,
-    "hexbin_plot": pyplt.hexbin,
     "hist2d": pyplt.hist2d,
     "histogram": pyplt.hist,
     "horizontal_bar": pyplt.barh,
     "horizontal_line": pyplt.axhline,
     "horizontal_lines": pyplt.hlines,
-    "image": pyplt.imshow,
     "imshow": pyplt.imshow,
-    "line": pyplt.plot,
     "pcolor": pyplt.pcolor,
     "pcolormesh": pyplt.pcolormesh,
     "pie": pyplt.pie,
+    "plot": pyplt.plot,
     "polar": pyplt.polar,
     "quiver": pyplt.quiver,
     "quiver_key": pyplt.quiverkey,
@@ -47,9 +39,7 @@ MATPLOTLIB_PLOT_FUNCTIONS = {
     "spy": pyplt.spy,
     "stacked_area": pyplt.stackplot,
     "step": pyplt.step,
-    "stepfilled": pyplt.step,
     "stem": pyplt.stem,
-    "stream_plot": pyplt.streamplot,
     "streamplot": pyplt.streamplot,
     "tripcolor": pyplt.tripcolor,
     "vertical_line": pyplt.axvline,
@@ -106,38 +96,41 @@ class GraphGenerator:
         graph_details: Dict[str, str],
         save_path: str,
         filter_file_name: str,
+        graphics_dir: str = "",
     ):
         """
-        Function to generate graph. This function will route the input to the correct function according to the type
-        of graph.
+        Generate a graph based on filtered data and graph details.
 
         Parameters
         ----------
         filtered_pool : Dict[str, Dict[str, List[Dict[str, Any]]]]
-            The result pool after filtering with the provided RegEx filters
+            The result pool after filtering with the provided RegEx filters.
         graph_details: Dict[str, str]
-            A dictionary containing details/metadata about the graph
+            A dictionary containing details/metadata about the graph.
         save_path: str
-            The base folder path to save the output
+            The base folder path to save the output.
         filter_file_name: str
-            The name of the filter file
-
-
-        Raises
-        ------
-            Generic Exception raised by utility functions
+            The name of the filter file.
+        graphics_dir : str, optional
+            The directory for saving graphics, by default an empty string.
 
         Returns
         -------
         str
-            The path to the saved graph
+            The path to the saved graph.
 
+        Raises
+        ------
+        Exception
+            Generic exception raised by utility functions.
         """
         try:
             fig, _ = pyplt.subplots()
             self._draw_graph(graph_details["type"], filtered_pool)
             self._customize_graph(fig, graph_details)
-            return self._save_graph(graph_details, filter_file_name, save_path)
+            return self._save_graph(
+                graph_details, filter_file_name, save_path, graphics_dir
+            )
         except Exception as e:
             raise e
 
@@ -145,14 +138,35 @@ class GraphGenerator:
         self,
         graph_type: str,
         data: Dict[str, Dict[str, List[Dict[str, Any]]]],
-    ):
+    ) -> None:
+        """
+        Draw the graph based on the provided graph type and data.
+
+        Parameters
+        ----------
+        graph_type : str
+            The type of graph to draw.
+        data : Dict[str, Dict[str, List[Dict[str, Any]]]]
+            The data to use for plotting.
+
+        """
         for key in data.keys():
             plot_function = MATPLOTLIB_PLOT_FUNCTIONS[graph_type]
             plot_function(data[key]["values"])
 
-    def _customize_graph(self, fig: Figure, customization_details: Dict[str, Any]):
+    def _customize_graph(
+        self, fig: Figure, customization_details: Dict[str, Any]
+    ) -> None:
         """
-        Function to apply customizations to the graph.
+        Apply customizations to the graph.
+
+        Parameters
+        ----------
+        fig : Figure
+            The matplotlib Figure object to customize.
+        customization_details : Dict[str, Any]
+            A dictionary of customization details.
+
         """
         for attrib, value in customization_details.items():
             if attrib in FIGURE_SETTERS.keys():
@@ -165,9 +179,35 @@ class GraphGenerator:
         graph_details: Dict[str, str],
         filter_file_name: str,
         save_path: str,
+        graphics_dir: str = "",
     ) -> str:
+        """
+        Save the generated graph to a file.
+
+        Parameters
+        ----------
+        graph_details : Dict[str, str]
+            A dictionary containing details/metadata about the graph.
+        filter_file_name : str
+            The name of the filter file.
+        save_path : str
+            The base folder path to save the output.
+        graphics_dir : str, optional
+            The directory for saving graphics, by default an empty string.
+
+        Returns
+        -------
+        str
+            The path to the saved graph.
+
+        Raises
+        ------
+        Exception
+            Generic exception raised if saving the graph fails.
+
+        """
         graph_path = self._generate_graph_path(
-            save_path, graph_details, filter_file_name
+            save_path, graph_details, filter_file_name, graphics_dir
         )
         try:
             pyplt.savefig(graph_path)
@@ -176,12 +216,38 @@ class GraphGenerator:
             raise e
 
     def _generate_graph_path(
-        self, save_path: str, graph_details: Dict[str, str], filter_file_name: str
+        self,
+        save_path: str,
+        graph_details: Dict[str, str],
+        filter_file_name: str,
+        graphics_dir: str = "",
     ) -> str:
         """
-        Function to generate the full path for the output graph, and create all the parenting folders.
+        Generate the full path for the output graph and create parent folders if necessary.
+
+        Parameters
+        ----------
+        save_path : str
+            The base folder path to save the output.
+        graph_details : Dict[str, str]
+            A dictionary containing details/metadata about the graph.
+        filter_file_name : str
+            The name of the filter file.
+        graphics_dir : str, optional
+            The directory for saving graphics, by default an empty string.
+
+        Returns
+        -------
+        str
+            The full path to the output graph file.
+
+        Raises
+        ------
+        Exception
+            Generic exception raised if directory creation fails.
+
         """
-        graph_directory = os.path.join(save_path, "graphics", "om")
+        graph_directory = os.path.join(save_path, graphics_dir)
         try:
             Path(graph_directory).mkdir(parents=True, exist_ok=True)
         except Exception as e:

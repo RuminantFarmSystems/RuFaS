@@ -460,10 +460,11 @@ class OutputManager(object):
         return pool_copy
 
     def _list_txt_and_json_files_in_dir(self, dir_path: str) -> List[str]:
-        """ Returns the list of txt and json files in the given path"""
-        info_map = {"class": self.__class__.__name__,
-                    "function": self._list_txt_and_json_files_in_dir.__name__,
-                    }
+        """Returns the list of txt and json files in the given path"""
+        info_map = {
+            "class": self.__class__.__name__,
+            "function": self._list_txt_and_json_files_in_dir.__name__,
+        }
         self.add_log(
             "search_path_for_filenames_try",
             f"Attempting to search in {dir_path}.",
@@ -487,7 +488,7 @@ class OutputManager(object):
             raise NotADirectoryError("The specified path must be a directory")
 
     def _load_filter_file_to_list(self, path: str) -> (List[str], Dict[str, str]):
-        """ Reads a text file into a list.
+        """Reads a text file into a list.
 
         Parameters
         ----------
@@ -505,9 +506,10 @@ class OutputManager(object):
             If an error occurs while opening or reading the file.
 
         """
-        info_map = {"class": self.__class__.__name__,
-                    "function": self._load_filter_file_to_list.__name__,
-                    }
+        info_map = {
+            "class": self.__class__.__name__,
+            "function": self._load_filter_file_to_list.__name__,
+        }
         self.add_log("open_filter_file", f"Attempting to open {path}.", info_map)
         list_of_elements = []
         graph_metadata = {}
@@ -520,7 +522,7 @@ class OutputManager(object):
 
                 elif path.endswith(".json"):
                     graph_metadata = json.load(filter_file)
-                    list_of_elements = graph_metadata['filters']
+                    list_of_elements = graph_metadata["filters"]
                     load_message = f"Successfully opened {path} and read {len(list_of_elements)} lines."
                     self.add_log("filter_pattern_file_load_log", load_message, info_map)
                 return list_of_elements, graph_metadata
@@ -594,7 +596,12 @@ class OutputManager(object):
         return filter_pattern_matches
 
     def save_variables(
-        self, save_path: str, dir_path: str, exclude_info_maps: bool = False
+        self,
+        save_path: str,
+        dir_path: str,
+        exclude_info_maps: bool = False,
+        produce_graphics: bool = True,
+        graphics_dir: str = "",
     ) -> None:
         """
         Reads a text file containing a list of keys and filters the variables pool by those keys.
@@ -611,10 +618,13 @@ class OutputManager(object):
         exclude_info_maps : bool
             Flag for whether or not the user wants to include info_maps data in their results files.
 
+        produce_graphics: bool, optional
+            Flag for whether or not the user wants to produce graphs at after the simulation.
         """
-        info_map = {"class": self.__class__.__name__,
-                    "function": self.save_variables.__name__,
-                    }
+        info_map = {
+            "class": self.__class__.__name__,
+            "function": self.save_variables.__name__,
+        }
         self.add_log(
             "exclude_info_maps",
             f"exclude_info_maps flag set to {exclude_info_maps}",
@@ -641,10 +651,23 @@ class OutputManager(object):
                     filtered_pool, filter_file, csv_directory
                 )
             elif filter_file.startswith("graph_"):
-                try:
-                    graph_generator.generate_graph(filtered_pool, graph_info, save_path, filter_file)
-                except Exception as e:
-                    self.add_error("graph generation exception", str(e), info_map)
+                if produce_graphics:
+                    try:
+                        graph_generator.generate_graph(
+                            filtered_pool,
+                            graph_info,
+                            save_path,
+                            filter_file,
+                            graphics_dir,
+                        )
+                    except Exception as e:
+                        self.add_error("graph generation exception", str(e), info_map)
+                else:
+                    self.add_warning(
+                        "No Graphics",
+                        f"Graphic generation is disabled, skipping {filter_file=}",
+                        info_map,
+                    )
             else:
                 self.add_warning(
                     "invalid filter file",
