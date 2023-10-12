@@ -91,22 +91,10 @@ def parse_gnu_args():
     """Parse command line options, if applicable"""
     parser = argparse.ArgumentParser()
     parser.add_argument(
-        '-fob',
-        "--format-option-block",
-        help="Use block formatting option for variable_names.txt file",
-        action="store_true",
-    )
-    parser.add_argument(
-        "-foi",
-        "--format-option-inline",
-        help="Use inline formatting option for variable_names.txt file",
-        action="store_true",
-    )
-    parser.add_argument(
-        "-fov",
-        "--format-option-verbose",
-        help="Use verbose formatting option for variable_names.txt file",
-        action="store_true",
+        "-f",
+        "--format-option",
+        choices=['block', 'inline', 'verbose'],
+        help="Select formatting option for variable_names.txt file",
     )
     parser.add_argument(
         "-ng",
@@ -135,21 +123,10 @@ def parse_gnu_args():
     return parser.parse_args()
 
 
-def determine_format_option(cmd_arguments):
-    """Helper function to determine the output formatting option selected by the user."""
-    if cmd_arguments.format_option_block:
-        return "block"
-    elif cmd_arguments.format_option_inline:
-        return "inline"
-    else:
-        return "verbose"
-
-
 if __name__ == "__main__":
     cmd_arguments = parse_gnu_args()
-    format_option = determine_format_option(cmd_arguments)
     run_rufas(
-        format_option,
+        format_option=cmd_arguments.format_option,
         make_graphs=not cmd_arguments.no_graphics,
         verbose=cmd_arguments.verbose,
         clear_output=cmd_arguments.clear_output,

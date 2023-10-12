@@ -7,7 +7,7 @@ from pytest_mock import MockerFixture
 
 import config.global_variables
 from config import global_variables
-from main import determine_format_option, execute_simulations
+from main import execute_simulations
 from main import parse_gnu_args
 from main import run_rufas
 from main import set_global_variables
@@ -128,25 +128,6 @@ def test_execute_simulations(mocker: MockerFixture, is_data_valid: bool,
     ] * len(metadata_file_list)
 
 
-def test_determine_format_option() -> None:
-    cmd_arguments = parse_gnu_args()
-    cmd_arguments.format_option_block = True
-    assert determine_format_option(cmd_arguments) == "block"
-
-    cmd_arguments = parse_gnu_args()
-    cmd_arguments.format_option_inline = True
-    assert determine_format_option(cmd_arguments) == "inline"
-
-    cmd_arguments = parse_gnu_args()
-    cmd_arguments.format_option_block = False
-    cmd_arguments.format_option_inline = False
-    assert determine_format_option(cmd_arguments) == "verbose"
-
-    cmd_arguments = parse_gnu_args()
-    cmd_arguments.format_option_verbose = True
-    assert determine_format_option(cmd_arguments) == "verbose"
-
-
 def test_parse_gnu_args(mocker: MockerFixture) -> None:
     """Checks that parse_gnu_args() correctly parses the user's input."""
     # Arrange
@@ -161,25 +142,13 @@ def test_parse_gnu_args(mocker: MockerFixture) -> None:
     actual_args = parse_gnu_args()
 
     # Assert
-    assert mock_add_argument.call_count == 7
+    assert mock_add_argument.call_count == 5
     assert mock_add_argument.call_args_list == [
         mocker.call(
-            '-fob',
-            "--format-option-block",
-            help="Use block formatting option for variable_names.txt file",
-            action="store_true",
-        ),
-        mocker.call(
-            "-foi",
-            "--format-option-inline",
-            help="Use inline formatting option for variable_names.txt file",
-            action="store_true",
-        ),
-        mocker.call(
-            "-fov",
-            "--format-option-verbose",
-            help="Use verbose formatting option for variable_names.txt file",
-            action="store_true",
+            '-f',
+            "--format-option",
+            choices=['block', 'inline', 'verbose'],
+            help="Select formatting option for variable_names.txt file",
         ),
         mocker.call(
             "-ng",
