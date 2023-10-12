@@ -19,6 +19,17 @@ from RUFAS.output_manager import OutputManager
 from RUFAS.util import Utility
 
 
+def main():
+    cmd_arguments = parse_gnu_args()
+    run_rufas(
+        format_option=cmd_arguments.format_option,
+        make_graphs=not cmd_arguments.no_graphics,
+        verbose=cmd_arguments.verbose,
+        clear_output=cmd_arguments.clear_output,
+        exclude_info_maps=cmd_arguments.exclude_info_maps,
+    )
+
+
 def run_rufas(
     format_option: str = "verbose",
     make_graphs: bool = True,
@@ -124,11 +135,4 @@ def parse_gnu_args():
 
 
 if __name__ == "__main__":
-    cmd_arguments = parse_gnu_args()
-    run_rufas(
-        format_option=cmd_arguments.format_option,
-        make_graphs=not cmd_arguments.no_graphics,
-        verbose=cmd_arguments.verbose,
-        clear_output=cmd_arguments.clear_output,
-        exclude_info_maps=cmd_arguments.exclude_info_maps,
-    )
+    main()
