@@ -4,7 +4,7 @@ from pathlib import Path
 from typing import Dict, List, Any
 
 import matplotlib
-import matplotlib.pyplot as pyplt
+import matplotlib.pyplot as plt
 from matplotlib.figure import Axes, Figure
 
 """
@@ -19,37 +19,37 @@ else:
     matplotlib.use("TkAgg")
 
 MATPLOTLIB_PLOT_FUNCTIONS = {
-    "area": pyplt.fill_between,
-    "bar": pyplt.bar,
-    "barbs": pyplt.barbs,
-    "boxplot": pyplt.boxplot,
-    "broken_barh": pyplt.broken_barh,
-    "contour": pyplt.contour,
-    "filled_contour": pyplt.contourf,
-    "hexbin": pyplt.hexbin,
-    "hist2d": pyplt.hist2d,
-    "histogram": pyplt.hist,
-    "horizontal_bar": pyplt.barh,
-    "horizontal_line": pyplt.axhline,
-    "horizontal_lines": pyplt.hlines,
-    "imshow": pyplt.imshow,
-    "pcolor": pyplt.pcolor,
-    "pcolormesh": pyplt.pcolormesh,
-    "pie": pyplt.pie,
-    "plot": pyplt.plot,
-    "polar": pyplt.polar,
-    "quiver": pyplt.quiver,
-    "quiver_key": pyplt.quiverkey,
-    "scatter": pyplt.scatter,
-    "spy": pyplt.spy,
-    "stacked_area": pyplt.stackplot,
-    "step": pyplt.step,
-    "stem": pyplt.stem,
-    "streamplot": pyplt.streamplot,
-    "tripcolor": pyplt.tripcolor,
-    "vertical_line": pyplt.axvline,
-    "vertical_lines": pyplt.vlines,
-    "violin": pyplt.violinplot,
+    "area": plt.fill_between,
+    "bar": plt.bar,
+    "barbs": plt.barbs,
+    "boxplot": plt.boxplot,
+    "broken_barh": plt.broken_barh,
+    "contour": plt.contour,
+    "filled_contour": plt.contourf,
+    "hexbin": plt.hexbin,
+    "hist2d": plt.hist2d,
+    "histogram": plt.hist,
+    "horizontal_bar": plt.barh,
+    "horizontal_line": plt.axhline,
+    "horizontal_lines": plt.hlines,
+    "imshow": plt.imshow,
+    "pcolor": plt.pcolor,
+    "pcolormesh": plt.pcolormesh,
+    "pie": plt.pie,
+    "plot": plt.plot,
+    "polar": plt.polar,
+    "quiver": plt.quiver,
+    "quiver_key": plt.quiverkey,
+    "scatter": plt.scatter,
+    "spy": plt.spy,
+    "stacked_area": plt.stackplot,
+    "step": plt.step,
+    "stem": plt.stem,
+    "streamplot": plt.streamplot,
+    "tripcolor": plt.tripcolor,
+    "vertical_line": plt.axvline,
+    "vertical_lines": plt.vlines,
+    "violin": plt.violinplot,
 }
 
 FIGURE_SETTERS = {
@@ -130,7 +130,7 @@ class GraphGenerator:
             Generic exception raised by utility functions.
         """
         try:
-            fig, _ = pyplt.subplots()
+            fig, _ = plt.subplots()
             self._draw_graph(graph_details["type"], filtered_pool)
             self._customize_graph(fig, graph_details)
             return self._save_graph(
@@ -215,7 +215,7 @@ class GraphGenerator:
             save_path, graph_details, filter_file_name, graphics_dir
         )
         try:
-            pyplt.savefig(graph_path)
+            plt.savefig(graph_path)
             return graph_path
         except Exception as e:
             raise e
