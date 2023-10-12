@@ -2,7 +2,7 @@
 
 REM Check the number of command line arguments.
 IF "%~1"=="" (
-    set "base_branch=master"
+    set "base_branch=main"
 ) ELSE IF "%~2"=="" (
     set "base_branch=%~1"
 ) ELSE (
@@ -49,5 +49,5 @@ REM Function to display usage.
 echo Usage: cleanup.bat [BASEBRANCH]
 echo Lint all files different between current branch and BASEBRANCH with Flake8.
 echo.
-echo With no BASEBRANCH, compare the current branch to master.
+echo With no BASEBRANCH, compare the current branch to main.
 goto :eof

@@ -36,7 +36,7 @@ def run_rufas(
     make_graphs: bool = True,
     verbose: bool = True,
     clear_output: bool = False,
-    exclude_info_maps: bool = True,
+    exclude_info_maps: bool = False,
     only_run_validation: bool = False,
 ) -> None:
     """Main function to run RuFaS, with options.
@@ -105,8 +105,9 @@ def execute_simulations(
 
     Parameters
     ----------
-    metadata_files : List[Path]
-        The list of Paths to the metadata files the user entered with which to run the simulation.
+    metadata_files : MetadataPaths
+        A list of custom TypedDict objects including the specified prefix for the save_variables output file
+        and the path to the metadata file.
     exclude_info_maps : bool, optional
         Flag for whether or not the user wants to inlcude info_maps data in their results files.
     format_option : str
@@ -121,13 +122,14 @@ def execute_simulations(
     for metadata_file in metadata_files:
         input_manager.flush_pool()
         output_manager.flush_pools()
+        output_manager.set_metadata_prefix(metadata_file['prefix'])
         is_data_valid = input_manager.start_data_processing(str(metadata_file["path"]), True)
         if is_data_valid:
             simulator = SimulationEngine()
             simulator.simulate()
         else:
             output_manager.add_error("No simulation run",
-                                     f"Data not valid for {metadata_file['path']}, simulation not run", info_map)
+                                     f"Data not valid for {str(metadata_file['path'])}, simulation not run", info_map)
         output_manager.save_variables(r"output", r"output/output_filters/", exclude_info_maps)
         output_manager.dump_all_nondata_pools(r"output", exclude_info_maps, format_option)
 
