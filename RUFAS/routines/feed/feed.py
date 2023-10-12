@@ -53,103 +53,6 @@ def annual_feed_routine(feed):
     feed.reset_feed_data()
 
 
-def pack_into_dict(var_names: List[str], var_values: List[Any]) -> Dict[str, Any]:
-    """
-    Pack the provided variable names and values into a dictionary.
-
-    Parameters
-    ----------
-    var_names : List[str]
-        List of keys for the resulting dictionary.
-    var_values : List[Any]
-        Corresponding values for the keys specified in `var_names`.
-
-    Returns
-    -------
-    Dict[str, Any]
-        Dictionary constructed from the provided variable names and values.
-
-    Raises
-    ------
-    ValueError
-        If the lengths of `var_names` and `var_values` are not the same.
-
-    Notes
-    -----
-    Ensure that both `var_names` and `var_values` have the same length.
-    Each name in `var_names` will be paired with its corresponding value from `var_values`.
-
-    Example
-    -------
-    >>> pack_into_dict(['a', 'b'], [1, 2])
-    {'a': 1, 'b': 2}
-
-    """
-    result_dict = {}
-    for id_var, var_name in enumerate(var_names):
-        result_dict[var_name] = var_values[id_var]
-    return result_dict
-
-
-def retrieve_data(data_source: str, var_names: List[str] = None, unique_value: bool = False,
-                  identifier: str = None, desired_rows: List[Any] = None,
-                  compare_val: int = None, low_col: str = None, high_col: str = None) -> List[Dict[str, Any]]:
-    """
-    This function retrieves and filters the desired data, pack each "row" into a dictionary object, and returns a list
-    of desired rows
-
-    Parameters
-    ----------
-    data_source : str
-        Path to retrieve the desired data from IM.
-    var_names : List[str] = None
-        A list of desired variables (columns) to retrieve.
-        If omitted, all existing columns are returned.
-    unique_value: bool = False
-        If True, returns only unique values. Default is False.
-    identifier: str = None
-        Column name used for filtering based on `desired_rows`.
-        Both `identifier` and `desired_rows` must be provided for filtering.
-    desired_rows: List[Any] = None
-        Desired row values for filtering. Rows with these values in the `identifier` column are returned.
-    compare_val: int = None
-        Baseline value for comparison. Used with `low_col` and `high_col` to filter rows. The "compare_val" should
-        fall in the range of [low_col_value, high_col_value], otherwise the current row will be ignored.
-    low_col: str = None
-        Column indicating the lower bound for comparison with `compare_val`.
-    high_col: str = None
-        Column indicating the upper bound for comparison with `compare_val`.
-
-    Returns
-    -------
-    List[Dict[str, Any]]
-        Returns a list of dictionaries, each dictionary corresponds to a row in the csv file.
-    """
-    result_list = []
-    values = []
-    data = im.get_data(data_source)
-    if not var_names:
-        var_names = list(data.keys())
-
-    for i in range(len(data[var_names[0]])):
-        if desired_rows and identifier:
-            if data[identifier][i] not in desired_rows:
-                continue
-        if compare_val and low_col and high_col:
-            low_val, high_val = data[low_col][i], data[high_col][i]
-            if not (low_val <= compare_val <= high_val):
-                continue
-        var_values = [data[key][i] for key in var_names]
-        if unique_value:
-            if var_values in values:
-                continue
-        values.append(var_values)
-
-        result_list.append(pack_into_dict(var_names, var_values))
-
-    return result_list
-
-
 class Feed:
     def __init__(self, data: PurchasedFeedTypedDict, nutrient_standard: str):
         """
@@ -163,9 +66,10 @@ class Feed:
         self.nutrient_standard = nutrient_standard
         self.nutrient_table = 'NASEM_Comp' if self.nutrient_standard == 'NASEM' else 'NRC_Comp'
 
-        self.feeds_split_by_maturity = retrieve_data(data_source='feed_quality', var_names=['rufas_id'],
-                                                     unique_value=True)
-        self.all_feed_units = retrieve_data(data_source='user_feeds', var_names=['rufas_id', 'feed_name', 'units'])
+        self.feeds_split_by_maturity = self._retrieve_data(data_source='feed_quality', var_names=['rufas_id'],
+                                                           unique_value=True)
+        self.all_feed_units = self._retrieve_data(data_source='user_feeds',
+                                                  var_names=['rufas_id', 'feed_name', 'units'])
 
         purchased_feeds_list = [feed_item["purchased_feed"] for feed_item in data["purchased_feeds"]]
         purchased_feed_costs = {str(feed_item["purchased_feed"]): feed_item["purchased_feed_cost"]
@@ -1073,15 +977,15 @@ class Feed:
         rounded_DM = round(DM)
         rounded_NDF = round(NDF)
         column = 'differentiating_nutrient'
-        dict_list = retrieve_data(data_source='feed_quality', var_names=[column], unique_value=True,
-                                  identifier='rufas_id', desired_rows=grown_feed_entry)
+        dict_list = self._retrieve_data(data_source='feed_quality', var_names=[column], unique_value=True,
+                                        identifier='rufas_id', desired_rows=grown_feed_entry)
         nutrient = dict_list[0][column]
 
         column = 'quality_id'
         rounded_nutrient = rounded_DM if nutrient == 'DM' else rounded_NDF
-        dict_list = retrieve_data(data_source='feed_quality', var_names=[column],
-                                  identifier='rufas_id', desired_rows=grown_feed_entry,
-                                  compare_val=rounded_nutrient, low_col='low_percent', high_col='high_percent')
+        dict_list = self._retrieve_data(data_source='feed_quality', var_names=[column],
+                                        identifier='rufas_id', desired_rows=grown_feed_entry,
+                                        compare_val=rounded_nutrient, low_col='low_percent', high_col='high_percent')
 
         return dict_list[0][column]
 
@@ -1098,9 +1002,9 @@ class Feed:
         Returns: a string representation of the quality status
         """
         column = 'status'
-        status_dict = retrieve_data(data_source='feed_quality',
-                                    var_names=[column], unique_value=False,
-                                    identifier='quality_id', desired_rows=quality_id)
+        status_dict = self._retrieve_data(data_source='feed_quality',
+                                          var_names=[column], unique_value=False,
+                                          identifier='quality_id', desired_rows=quality_id)
 
         return status_dict[0][column]
 
@@ -1169,7 +1073,7 @@ class Feed:
         Returns: a dictionary where the keys are the the feed identifiers and
         the values are nutrient dictionaries
         """
-        dict_list = retrieve_data(data_source=self.nutrient_table, identifier='rufas_id', desired_rows=feed_ids)
+        dict_list = self._retrieve_data(data_source=self.nutrient_table, identifier='rufas_id', desired_rows=feed_ids)
         # missing: (26, 54, 136, 139, 157)
         nutrient_vals = {}
         for dictionary in dict_list:
@@ -1191,8 +1095,8 @@ class Feed:
         else:
             columns = ['rufas_id', 'DM', 'CP', 'EE', 'DE']
 
-        nutrients = retrieve_data(data_source=self.nutrient_table, var_names=columns,
-                                  identifier='rufas_id', desired_rows=feed_ids)
+        nutrients = self._retrieve_data(data_source=self.nutrient_table, var_names=columns,
+                                        identifier='rufas_id', desired_rows=feed_ids)
 
         calf_feeds = {}
         for feed_id in feed_ids:
@@ -1201,3 +1105,133 @@ class Feed:
                                    for key in list(feed_id_nutrient.keys())
                                    if key != 'rufas_id'}
         return calf_feeds
+
+    def _pack_into_dict(self, var_names: List[str], var_values: List[Any]) -> Dict[str, Any]:
+        """
+        Pack the provided variable names and values into a dictionary.
+
+        Parameters
+        ----------
+        var_names : List[str]
+            List of keys for the resulting dictionary.
+        var_values : List[Any]
+            Corresponding values for the keys specified in `var_names`.
+
+        Returns
+        -------
+        Dict[str, Any]
+            Dictionary constructed from the provided variable names and values.
+
+        Raises
+        ------
+        ValueError
+            If the lengths of `var_names` and `var_values` are not the same.
+
+        Notes
+        -----
+        Ensure that both `var_names` and `var_values` have the same length.
+        Each name in `var_names` will be paired with its corresponding value from `var_values`.
+
+        Example
+        -------
+        >>> self._pack_into_dict(['a', 'b'], [1, 2])
+        {'a': 1, 'b': 2}
+
+        """
+        result_dict = {}
+        for id_var, var_name in enumerate(var_names):
+            result_dict[var_name] = var_values[id_var]
+        return result_dict
+
+    def _retrieve_data(self, data_source: str, var_names: List[str] = None, unique_value: bool = False,
+                       identifier: str = None, desired_rows: List[Any] = None,
+                       compare_val: int = None, low_col: str = None, high_col: str = None) -> List[Dict[str, Any]]:
+        """
+        This function retrieves and filters the desired data, pack each "row" into a dictionary object, and returns a list
+        of desired rows
+
+        Parameters
+        ----------
+        data_source : str
+            Path to retrieve the desired data from IM.
+        var_names : List[str] = None
+            A list of desired variables (columns) to retrieve.
+            If omitted, all existing columns are returned.
+        unique_value: bool = False
+            If True, returns only unique values. Default is False.
+        identifier: str = None
+            Column name used for filtering based on `desired_rows`.
+            Both `identifier` and `desired_rows` must be provided for filtering.
+        desired_rows: List[Any] = None
+            Desired row values for filtering. Rows with these values in the `identifier` column are returned.
+        compare_val: int = None
+            Baseline value for comparison. Used with `low_col` and `high_col` to filter rows. The "compare_val" should
+            fall in the range of [low_col_value, high_col_value], otherwise the current row will be ignored.
+        low_col: str = None
+            Column indicating the lower bound for comparison with `compare_val`.
+        high_col: str = None
+            Column indicating the upper bound for comparison with `compare_val`.
+
+        Returns
+        -------
+        List[Dict[str, Any]]
+            Returns a list of dictionaries, each dictionary corresponds to a row in the csv file.
+
+        Example
+        -------
+       1. Retrieve specific columns:
+        >>> self._retrieve_data(data_source="NASEM_Comp", var_names=["rufas_id", "Name", "feed_type"])
+        Returns rows from the data source "NASEM_Comp" with columns "rufas_id", "Name", and "feed_type" packed into
+        dictionaries.
+
+        2. Filter by specific rows based on an identifier:
+        >>> self._retrieve_data(data_source="NASEM_Comp", identifier="rufas_id", desired_rows=[1, 2, 157])
+        Returns rows where the "rufas_id" column has values 1, 2 or 157.
+
+        3. Use a value for range comparison:
+        >>> self._retrieve_data(data_source="NASEM_Comp", compare_val=5, low_col="lower_limit", high_col="limit")
+        Returns rows where the "compare_val" of 5 lies between the values in columns "lower_limit" and "limit".
+
+        4. Retrieve unique values from specified columns:
+        >>> self._retrieve_data(data_source="NASEM_Comp", var_names=["rufas_id", "Name"], unique_value=True)
+        Returns unique rows (based on "rufas_id" and "Name" columns) from the data source "NASEM_Comp".
+
+        5. No filters or specific columns, retrieve all data:
+        >>> self._retrieve_data(data_source="NASEM_Comp")
+        Returns all rows from the data source "NASEM_Comp" with all columns packed into dictionaries.
+
+        6. Filtering with range comparison and specific desired rows:
+        >>> self._retrieve_data(data_source="NASEM_Comp", identifier="feed_type", desired_rows=["Conc"], compare_val=10,
+                          low_col="lower_limit", high_col="limit")
+        Returns rows where the "feed_type" column has values "Conc" and where the value 10 lies between the values in
+        columns "lower_limit" and "limit".
+        """
+        info_map = {"class": self.__class__.__name__,
+                    "function": self._retrieve_data.__name__,
+                    }
+
+        result_list = []
+        values = []
+        data = im.get_data(data_source)
+        if not var_names:
+            var_names = list(data.keys())
+
+        for i in range(len(data[var_names[0]])):
+            try:
+                if desired_rows and identifier:
+                    if data[identifier][i] not in desired_rows:
+                        continue
+                if compare_val and low_col and high_col:
+                    low_val, high_val = data[low_col][i], data[high_col][i]
+                    if not (low_val <= compare_val <= high_val):
+                        continue
+                var_values = [data[key][i] for key in var_names]
+                if unique_value:
+                    if var_values in values:
+                        continue
+                values.append(var_values)
+                result_list.append(self._pack_into_dict(var_names, var_values))
+            except IndexError as e:
+                om.add_error("Length mismatch", str(e), info_map=info_map)
+
+        return result_list
