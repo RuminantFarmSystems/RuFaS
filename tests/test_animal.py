@@ -109,9 +109,9 @@ def heifer_a() -> dict:
         "daily_growth": None,
         "age": 210,
         "distance": None,
-        "NDF_conc": 0.3,
-        "TDN_conc": 0.7,
-        "net_energy_diet_concentration": 1.0,
+        "NDF_conc": 0.0,
+        "TDN_conc": 0.0,
+        "net_energy_diet_concentration": 0.0,
         "days_born": 100
     }
     return heifer_a_dict
@@ -144,6 +144,32 @@ def heifer_b() -> dict:
         "days_born": 400
     }
     return heifer_b_dict
+
+
+@pytest.fixture
+def heifer_c() -> dict:
+    heifer_c_dict = {
+        "body_weight": 340,
+        "mature_body_weight": 700,
+        "day_of_pregnancy": 1,
+        "animal_type": AnimalType.HEIFER_I,
+        "parity": 0,
+        "calving_interval": None,
+        "milk_protein": 0.0,
+        "Fat_Milk": 0.0,
+        "Lactose_Milk": 0.0,
+        "Milk": 0.0,
+        "DIM": None,
+        "lactating": False,
+        "BCS5": 3,
+        "PrevTemp": 15,
+        "ADG_heifer": 0.9,
+        "daily_growth": None,
+        "age": 365,
+        "distance": None,
+        "days_born": 400
+    }
+    return heifer_c_dict
 
 
 def test_calculate_NRC_energy_maintenance_requirements(
@@ -323,8 +349,9 @@ def test_calculate_NRC_protein_requirements(cow_a: dict, cow_b: dict, heifer_a: 
         1,
         0,
         24,
+        0.6
     )
-    assert (result_MP_req) == pytest.approx((712), rel=1e-1)
+    assert (result_MP_req) == pytest.approx((786.12), rel=1e-1)
 
     result_MP_req = req.calculate_NRC_protein_requirements(
         heifer_a["body_weight"],
@@ -353,8 +380,25 @@ def test_calculate_NRC_protein_requirements(cow_a: dict, cow_b: dict, heifer_a: 
         1,
         0,
         12,
+        0.7
     )
     assert (result_MP_req) == pytest.approx((489), rel=1e-1)
+
+    result_MP_req = req.calculate_NRC_protein_requirements(
+        heifer_b["body_weight"],
+        0,
+        heifer_b["day_of_pregnancy"],
+        heifer_b["animal_type"],
+        heifer_b["Milk"],
+        heifer_b["milk_protein"],
+        0,
+        3,
+        1,
+        0,
+        12,
+        0.5
+    )
+    assert (result_MP_req) == pytest.approx((562.1), rel=1e-1)
 
 
 def test_calculate_NRC_calcium_requirements(cow_a: dict, cow_b: dict, heifer_a: dict, heifer_b: dict) -> None:
