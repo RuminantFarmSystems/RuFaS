@@ -276,13 +276,13 @@ def mock_ration_config_with_empty_NEgact(mock_ration_config) -> MagicMock:
 
 
 @pytest.fixture
-def decision_vector() -> list[float]:
-    return [1.0, 2.0, 3.0, 4.0, 5.0, 6.0]
+def decision_vector() -> np.ndarray:
+    return np.array([1.0, 2.0, 3.0, 4.0, 5.0, 6.0])
 
 
 @pytest.fixture
-def decision_vector_sum_zero() -> list[float]:
-    return [1.0, 2.0, 3.0, -3.0, -2.0 - 1.0]
+def decision_vector_sum_zero() -> np.ndarray:
+    return np.array([1.0, 2.0, 3.0, -3.0, -2.0 - 1.0])
 
 
 def test_calculate_NRC_energy_maintenance_requirements(
