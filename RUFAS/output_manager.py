@@ -50,6 +50,7 @@ class OutputManager(object):
             self.warnings_pool: Dict[str, OutputManager.pool_element_type] = {}
             self.errors_pool: Dict[str, OutputManager.pool_element_type] = {}
             self.logs_pool: Dict[str, OutputManager.pool_element_type] = {}
+            self.__metadata_prefix: str = ""
             self.add_log(
                 "init_log",
                 "Output Manager instantiated.",
@@ -195,6 +196,10 @@ class OutputManager(object):
         info_map["timestamp"] = self._get_timestamp(include_millis=True)
         key = self._generate_key(name, info_map)
         self._add_to_pool(self.errors_pool, key, msg, info_map)
+
+    def set_metadata_prefix(self, metadata_prefix: str) -> None:
+        """Sets the metadata_prefix attribute."""
+        self.__metadata_prefix = metadata_prefix
 
     def _get_timestamp(self, include_millis: bool = False) -> str:
         """
@@ -440,7 +445,7 @@ class OutputManager(object):
         Returns a file name using the given base_name and timestamp.
         """
         timestamp: str = self._get_timestamp(include_millis=False)
-        return f"{base_name}_{timestamp}.{extension}"
+        return f"{self.__metadata_prefix}_{base_name}_{timestamp}.{extension}"
 
     def _exclude_info_maps(
         self, pool: Dict[str, pool_element_type]
