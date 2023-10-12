@@ -1046,7 +1046,7 @@ def test_cycle_water(field_size: float, rainfall: float, runoff: float, high_wat
         incorp._determine_potential_evapotranspiration.assert_called_once_with(light, max_temp, min_temp,
                                                                                mean_temp)
         incorp._evaporate_from_crop_canopies.assert_called_once_with(33.5)
-        incorp.soil.infiltration.infiltrate.assert_called_once_with(2.0, 1, 33.5)
+        incorp.soil.infiltration.infiltrate.assert_called_once_with(2.0)
         incorp.soil.percolation.percolate.assert_called_once_with(high_water_table)
         incorp.soil.soil_erosion.erode.assert_called_once_with(field_size, 0.02, residue, rainfall)
         incorp.soil.phosphorus_cycling.cycle_phosphorus.assert_called_once_with(2.0, runoff, field_size, mean_temp)
@@ -1203,10 +1203,10 @@ def test_potential_evapotranspiration(extraterrestrial_radiation, max_temp, min_
         actual = Field._determine_potential_evapotranspiration(extraterrestrial_radiation, max_temp, min_temp, avg_temp)
         if avg_temp is not None:
             expect = max(0.0, (0.0023 * extraterrestrial_radiation * ((max_temp - min_temp) ** (-0.5)) *
-                             (avg_temp + 17.8)) / 1.3)
+                               (avg_temp + 17.8)) / 1.3)
         else:
             expect = max(0.0, (0.0023 * extraterrestrial_radiation * ((max_temp - min_temp) ** (-0.5)) *
-                             (((max_temp + min_temp) / 2) + 17.8)) / 1.3)
+                               (((max_temp + min_temp) / 2) + 17.8)) / 1.3)
 
         if avg_temp is not None:
             mocked_latent_heat.assert_called_once_with(avg_temp)
