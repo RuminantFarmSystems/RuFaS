@@ -72,13 +72,12 @@ def run_validation(metadata_files: List[Path], exclude_info_maps: bool = False) 
                 }
     output_manager = OutputManager()
     input_manager = InputManager()
-    metadata_file_list = metadata_files
-    for metadata_file_path in metadata_file_list:
+    for metadata_file in metadata_files:
         input_manager.flush_pool()
         output_manager.flush_pools()
-        is_data_valid = input_manager.start_data_processing(str(metadata_file_path), False)
+        is_data_valid = input_manager.start_data_processing(str(metadata_file["path"]), False)
         output_manager.add_log("Only run validation data validity check",
-                               f"{str(metadata_file_path)} data validity is: {is_data_valid}",
+                               f"{str(metadata_file['path'])} data validity is: {is_data_valid}",
                                info_map)
         output_manager.dump_all_nondata_pools(r"output", exclude_info_maps)
 

@@ -109,9 +109,12 @@ def test_run_validation(mocker: MockerFixture, is_data_valid: bool) -> None:
     mock_output_manager.save_variables.return_value = None
     mocker.patch("main.OutputManager", return_value=mock_output_manager)
     mocker.patch("main.InputManager", return_value=mock_input_manager)
+    metadata_prefix1 = "dummy_prefix1"
+    metadata_prefix2 = "dummy_prefix2"
     metadata_file_path1 = Path("metadata_file1.json")
     metadata_file_path2 = Path("metadata_file2.json")
-    metadata_file_list = [metadata_file_path1, metadata_file_path2]
+    metadata_file_list = [{"prefix": metadata_prefix1, "path": metadata_file_path1},
+                          {"prefix": metadata_prefix2, "path": metadata_file_path2}, ]
     mock_input_manager.start_data_processing.return_value = is_data_valid
 
     run_validation(metadata_file_list, True)
