@@ -86,6 +86,8 @@ class AnimalRequirements:
         # average crude protein content of milk (%)
         self.avg_CP_milk = 0
 
+        self.avg_milk_production_reduction = None
+
     def calc_pen_requirements(
         self,
         NEmaint_requirement_list: List[float],
