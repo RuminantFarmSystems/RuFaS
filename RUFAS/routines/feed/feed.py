@@ -1220,17 +1220,15 @@ class Feed:
 
         for i in range(len(data[var_names[0]])):
             try:
-                if desired_rows and identifier:
-                    if data[identifier][i] not in desired_rows:
-                        continue
+                if desired_rows and identifier and data[identifier][i] not in desired_rows:
+                    continue
                 if compare_val and low_col and high_col:
                     low_val, high_val = data[low_col][i], data[high_col][i]
                     if not (low_val <= compare_val <= high_val):
                         continue
                 var_values = [data[key][i] for key in var_names]
-                if unique_value:
-                    if var_values in values:
-                        continue
+                if unique_value and var_values in values:
+                    continue
                 values.append(var_values)
                 result_list.append(self._pack_into_dict(var_names, var_values))
             except IndexError as e:
