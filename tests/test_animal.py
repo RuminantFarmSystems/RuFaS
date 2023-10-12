@@ -2042,7 +2042,8 @@ def test_NEl_constraint(ration_config, expected, decision_vector) -> None:
 
 
 @pytest.mark.parametrize("ration_config, expected", [(lazy_fixture('mock_ration_config'), 86.0),
-                                                     # (lazy_fixture('mock_ration_config_with_empty_NEgact_list'), 16.0),
+                                                     # (lazy_fixture('mock_ration_config_with_empty_NEgact_list'),
+                                                     # 16.0),
                                                      (lazy_fixture('mock_random_ration_config'),
                                                       63.349999999999994)])
 def test_NEgact_constraint(ration_config, expected, decision_vector) -> None:
