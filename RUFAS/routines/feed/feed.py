@@ -1233,5 +1233,6 @@ class Feed:
                 result_list.append(self._pack_into_dict(var_names, var_values))
             except IndexError as e:
                 om.add_error("Length mismatch", str(e), info_map=info_map)
+                raise e
 
         return result_list
