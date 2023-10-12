@@ -2,8 +2,8 @@ import pytest
 from pytest import approx
 from pytest_mock import MockerFixture
 
-from RUFAS.classes import Time
-from RUFAS.classes import Weather
+from RUFAS.classes.time import Time
+from RUFAS.classes.weather import Weather
 from RUFAS.general_constants import GeneralConstants
 from RUFAS.routines.manure.beddings.bedding_classes import BaseBedding
 from RUFAS.routines.manure.manure_handlers.manure_handler_classes import AlleyScraper, Tillage
