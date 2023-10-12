@@ -133,8 +133,8 @@ def test_advance_time(
     patch_simulation_engine: SimulationEngine, mocker: MockerFixture
 ) -> None:
     """Unit test for function _advance_time in file RUFAS/simulation_engine.py"""
-    mocker.patch("RUFAS.classes.Time.to_str")
-    mocker.patch("RUFAS.classes.Time.advance")
+    mocker.patch("RUFAS.classes.time.Time.to_str")
+    mocker.patch("RUFAS.classes.time.Time.advance")
     patch_simulation_engine.state.animal_manager.simulation_day = 1
     patch_simulation_engine._advance_time(False)
     patch_simulation_engine._advance_time(True)
