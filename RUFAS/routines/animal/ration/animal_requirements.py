@@ -203,7 +203,7 @@ class AnimalRequirements:
         if recalc:
             requirements_lists = self.recalculate_requirements(pen, animal_grouping_scenario, requirements_lists)
         else:
-            requirements_lists = self.recalculate_requirements(pen, animal_grouping_scenario, requirements_lists)
+            requirements_lists = self.use_existing_requirements(pen, animal_grouping_scenario, requirements_lists)
 
         self.calc_pen_requirements(requirements_lists['NEmaint_requirement'],
                                    requirements_lists['NEa_requirement'],

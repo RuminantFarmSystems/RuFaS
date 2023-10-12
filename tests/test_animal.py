@@ -151,50 +151,87 @@ def test_set_requirements(mocker: MockerFixture):
     """Unit test for function set_requirements in file routines/animal/ration/animal_requirements.py"""
 
     pen = MagicMock()
+    pen.set_milk_avgs = MagicMock()
+    pen.set_avg_nutrient_rqmts = MagicMock()
 
     animal_grouping_scenario = MagicMock()
-
+    # test_obj = AnimalRequirements()
+    # test_obj = MagicMock(wraps=AnimalRequirements())
     test_obj = AnimalRequirements()
-    assert test_obj.NEmaint_requirement == 0
-    with patch("RUFAS.routines.animal.ration.animal_requirements.AnimalRequirements.recalculate_requirements")\
-            as mock_foo:
-        mock_foo.return_value = {'NEmaint_requirement': [1, 2],
-                                 'NEa_requirement': [2, 3],
-                                 'NEg_requirement': [3, 4],
-                                 'NEpreg_requirement': [4,],
-                                 'NEl_requirement': [5,],
-                                 'MP_requirement': [6,],
-                                 'Ca_requirement': [7,],
-                                 'P_requirement': [8,],
-                                 'DMIest_requirement': [9,],
-                                 'BW': [10,],
-                                 'milk': [11,],
-                                 'milk_production_reduction': [12,],
-                                 'CP_milk': [13,]
-                                 }
-
+    test_obj.set_requirements = MagicMock()
+    test_obj.recalculate_requirements = MagicMock(
+        return_value={'NEmaint_requirement': [1, 2],
+                        'NEa_requirement': [2, 3],
+                        'NEg_requirement': [3, 4],
+                        'NEpreg_requirement': [4,],
+                        'NEl_requirement': [5,],
+                        'MP_requirement': [6,],
+                        'Ca_requirement': [7,],
+                        'P_requirement': [8,],
+                        'DMIest_requirement': [9,],
+                        'BW': [10,],
+                        'milk': [11,],
+                        'milk_production_reduction': [12,],
+                        'CP_milk': [13,]
+                        })
+    test_obj.use_existing_requirements = MagicMock(
+        return_value={'NEmaint_requirement': [2, 2],
+                        'NEa_requirement': [3, 3],
+                        'NEg_requirement': [4, 4],
+                        'NEpreg_requirement': [5, 5],
+                        'NEl_requirement': [6, 6],
+                        'MP_requirement': [7, 7],
+                        'Ca_requirement': [8, 8],
+                        'P_requirement': [9, 9],
+                        'DMIest_requirement': [10, 10],
+                        'BW': [11, 11],
+                        'milk': [12, 12],
+                        'milk_production_reduction': [13, 13],
+                        'CP_milk': [14, 14]
+                        })
+    test_obj.calc_pen_requirements = MagicMock()
+    # with patch("RUFAS.routines.animal.ration.animal_requirements.AnimalRequirements.recalculate_requirements")\
+    #         as mock_foo:
+    #     mock_foo.return_value = {'NEmaint_requirement': [1, 2],
+    #                              'NEa_requirement': [2, 3],
+    #                              'NEg_requirement': [3, 4],
+    #                              'NEpreg_requirement': [4,],
+    #                              'NEl_requirement': [5,],
+    #                              'MP_requirement': [6,],
+    #                              'Ca_requirement': [7,],
+    #                              'P_requirement': [8,],
+    #                              'DMIest_requirement': [9,],
+    #                              'BW': [10,],
+    #                              'milk': [11,],
+    #                              'milk_production_reduction': [12,],
+    #                              'CP_milk': [13,]
+    #                              }
+    
+    # with patch("RUFAS.routines.animal.ration.animal_requirements.AnimalRequirements.use_existing_requirements")\
+    #         as mock_foo:
+    #     mock_foo.return_value = {'NEmaint_requirement': [2, 2],
+    #                              'NEa_requirement': [3, 3],
+    #                              'NEg_requirement': [4, 4],
+    #                              'NEpreg_requirement': [5, 5],
+    #                              'NEl_requirement': [6, 6],
+    #                              'MP_requirement': [7, 7],
+    #                              'Ca_requirement': [8, 8],
+    #                              'P_requirement': [9, 9],
+    #                              'DMIest_requirement': [10, 10],
+    #                              'BW': [11, 11],
+    #                              'milk': [12, 12],
+    #                              'milk_production_reduction': [13, 13],
+    #                              'CP_milk': [14, 14]
+    #                              }
     recalc = True
     test_obj.set_requirements(pen, animal_grouping_scenario, recalc)
-    # test_obj.NEmaint_requirement == 1
-    pen.set_avg_nutrient_rqmts.assert_called_once()
-    # pen.set_avg_nutrient_rqmts.assert_called_once_with({'NEmaint_requirement': 1.5,
-    #                                                     'NEa_requirement': 2.5,
-    #                                                     'NEg_requirement': 3.5,
-    #                                                     'NEpreg_requirement': 4,
-    #                                                     'NEl_requirement': 5,
-    #                                                     'MP_requirement': 6,
-    #                                                     'Ca_requirement': 7,
-    #                                                     'P_requirement': 8,
-    #                                                     'DMIest_requirement': 9,
-    #                                                     'avg_BW': 10,
-    #                                                     'avg_milk_production_reduction_pen': 12,
-    #                                                     })
+    # test_obj.recalculate_requirements.assert_called_once()
+    test_obj.calc_pen_requirements.assert_called_once()
     pen.set_milk_avgs.assert_called_once()
-
+    pen.set_avg_nutrient_rqmts.assert_called_once()
     recalc = False
     test_obj.set_requirements(pen, animal_grouping_scenario, recalc)
-    # test_obj.recalculate_requirements.assert_called_once()
-    # test_obj.recalculate_requirements.assert_called_once()
+    test_obj.use_existing_requirements.assert_called_once()
 
 
 def test_recalculate_requirements():
