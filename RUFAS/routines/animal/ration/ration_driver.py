@@ -182,7 +182,8 @@ class RationManager:
 
         Parameters
         ----------
-        ration: Dict
+        ration : Dict
+            Dictionary of formulated ration, with keys as feed IDs, values as kg fed.
 
         Returns
         -------
@@ -674,7 +675,7 @@ class RationReporter:
         Returns
         -------
         float
-            Calcium supply of feed item, kg. TODO: check units
+            Calcium supply of feed item, g.
 
         """
         if feed_item_info["type"] == "Forage":
@@ -707,7 +708,7 @@ class RationReporter:
         Returns
         -------
         float
-            Phosphorus supply, kg. TODO: check units
+            Phosphorus supply, g.
 
         """
         if feed_item_info["type"] == "Forage":
@@ -739,7 +740,7 @@ class RationReporter:
         Returns
         -------
         float
-            Fat supply of feed item, g. TODO: check units
+            Fat supply of feed item, g.
 
         """
         fat_item = feed_item_info["EE"] * kg_fed
@@ -773,7 +774,7 @@ class RationReporter:
     @classmethod
     def get_forage_NDF(cls, kg_fed: float, feed_item_info: Dict, ration_report: Dict, body_weight: float) -> float:
         """
-        Returns forage neutral detergent fiber content of feed item, kg.
+        Returns forage neutral detergent fiber content of feed item, g.
 
         Parameters
         ----------
@@ -789,7 +790,7 @@ class RationReporter:
         Returns
         -------
         float
-            Forage neutral detergent fiber content of feed item. TODO: check units
+            Forage neutral detergent fiber content of feed item, g.
 
         """
         if feed_item_info["type"] == "Forage":
@@ -802,7 +803,7 @@ class RationReporter:
     def get_metabolizable_protein(cls, ration: Dict, available_feeds: Dict, ration_report: Dict, body_weight: float)\
             -> float:
         """
-        Returns metabolizable protein supply  of feed item, TODO: check units
+        Returns metabolizable protein supply  of feed item, g.
 
         Parameters
         ----------
@@ -811,16 +812,16 @@ class RationReporter:
         available_feeds : Dict
             available feeds dictionary from the Feed class object.
         feed_item_info : Dict
-            Dictionary of nutrient and energy information of feed item
+            Dictionary of nutrient and energy information of feed item.
         ration_report : Dict
-            Dictionary of nutrient amount and concentrations
+            Dictionary of nutrient amount and concentrations.
         body_weight : float
-            Animal body weight in kg
+            Animal body weight in kg.
 
         Returns
         -------
         float
-            Metabolizable protein supply of feed item, TODO: check units
+            Metabolizable protein supply of feed item, g.
         """
         TDNtotal = ration_report["nutrient_amount"]["TDN"]
 
