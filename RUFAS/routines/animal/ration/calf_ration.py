@@ -19,7 +19,6 @@ class CalfRationManager:
     Note that the ration formulated is a fixed ration; requirements used only for reporting
 
     """
-
     @classmethod
     def _get_ration(cls) -> Dict[str, float | str]:
         """
@@ -101,10 +100,12 @@ class CalfRationManager:
         whole_milk_me = 0.96 * whole_milk_de
 
         milk_replacer_cp = calf_feeds[milk_replacer_id]['CP']
+
         # [A.1B.C.1]
         milk_replacer_me = 0.96 * milk_replacer_de
 
         starter_cp = calf_feeds[starter_id]['CP']
+
         starter_ee = calf_feeds[starter_id]['EE']
         # [A.1B.C.2]
         starter_me = (1.01 * starter_de - 0.45) + 0.0046 * (starter_ee - 3)
@@ -268,8 +269,8 @@ class CalfRationManager:
         # [A.1B.D.1]
         dm_intake = whole_milk_intake + milk_replacer_intake + starter_intake
         # [A.1B.C.4]
-        me_intake = whole_milk_me * whole_milk_intake + milk_replacer_me * milk_replacer_intake + \
-                    starter_me * starter_intake
+        me_intake = whole_milk_me * whole_milk_intake + milk_replacer_me * \
+            milk_replacer_intake + starter_me * starter_intake
         # [A.1B.E.1]
         cp_intake = 0.01 * (whole_milk_cp * whole_milk_intake + milk_replacer_cp *
                             milk_replacer_intake + starter_cp * starter_intake)
