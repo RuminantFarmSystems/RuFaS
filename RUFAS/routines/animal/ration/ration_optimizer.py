@@ -689,7 +689,6 @@ class RationOptimizer:
         Returns a list of each key/value pair three times, but divided by three
             This return in triplicate is necessary for the scipy.minimize function,
             which requires the decision vector in this shape
-
         Parameters
         ----------
         ration_percents: Dict

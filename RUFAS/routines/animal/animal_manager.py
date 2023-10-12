@@ -35,7 +35,7 @@ from RUFAS.routines.animal.life_cycle.calf import Calf
 from RUFAS.routines.animal.pen import Pen
 from RUFAS.routines.animal.ration import ration_driver as ration_driver
 from RUFAS.routines.feed.feed import Feed
-from RUFAS.routines.animal.ration.calf_ration import optimize as calf_optimize
+from RUFAS.routines.animal.ration.calf_ration import CalfRationManager
 from RUFAS.routines.animal.ration.ration_driver import RationReporter
 from RUFAS.routines.animal.ration.ration_driver import RationManager
 
@@ -368,16 +368,30 @@ class AnimalManager:
             calf.calc_nutrient_rqmts(feed, temp)
 
         for heiferI in self.heiferIs:
-            heiferI.set_nutrient_rqmts(temp, self.ANIMAL_GROUPING_SCENARIO)
+            latest_pen = heiferI.pen_history[-1].pen
+            heiferI.set_nutrient_rqmts(temp, self.ANIMAL_GROUPING_SCENARIO,
+                                       nutrient_conc=self.all_pens[latest_pen].ration_nutrient_conc,
+                                       metabolizable_energy=self.all_pens[latest_pen].MEdiet,
+                                       previous_DMI=self.all_pens[latest_pen].dry_matter_intake)
 
         for heiferII in self.heiferIIs:
-            heiferII.set_nutrient_rqmts(temp, self.ANIMAL_GROUPING_SCENARIO)
+            latest_pen = heiferII.pen_history[-1].pen
+            heiferII.set_nutrient_rqmts(temp, self.ANIMAL_GROUPING_SCENARIO,
+                                        nutrient_conc=self.all_pens[latest_pen].ration_nutrient_conc,
+                                        metabolizable_energy=self.all_pens[latest_pen].MEdiet,
+                                        previous_DMI=self.all_pens[latest_pen].dry_matter_intake)
 
         for heiferIII in self.heiferIIIs:
-            heiferIII.set_nutrient_rqmts(temp, self.ANIMAL_GROUPING_SCENARIO)
+            latest_pen = heiferIII.pen_history[-1].pen
+            heiferIII.set_nutrient_rqmts(temp, self.ANIMAL_GROUPING_SCENARIO,
+                                         nutrient_conc=self.all_pens[latest_pen].ration_nutrient_conc,
+                                         metabolizable_energy=self.all_pens[latest_pen].MEdiet,
+                                         previous_DMI=self.all_pens[latest_pen].dry_matter_intake)
 
         for cow in self.cows:
-            cow.set_nutrient_rqmts(self.ANIMAL_GROUPING_SCENARIO)
+            latest_pen = cow.pen_history[-1].pen
+            cow.set_nutrient_rqmts(self.ANIMAL_GROUPING_SCENARIO,
+                                   nutrient_conc=self.all_pens[latest_pen].ration_nutrient_conc)
 
     def reset_milk_production_reduction(self) -> None:
         """
@@ -1320,8 +1334,9 @@ class AnimalManager:
                 counter = 1
                 while 'status' not in ration_per_animal or ration_per_animal['status'].lower() != 'optimal':
                     if pen.animal_combination == Pen.AnimalCombination.CALF:
-                        ration_per_animal = calf_optimize()
+                        ration_per_animal = CalfRationManager.optimize()
                         ration_vals = {'ME_total': 0}
+
                     else:
                         ration_per_animal, ration_vals = \
                             RationManager.formulate_ration(pen, pen_specific_feed_data, self.ANIMAL_GROUPING_SCENARIO)
@@ -1337,6 +1352,10 @@ class AnimalManager:
                 pen.ration_nutrient_conc = nutrient_conc
                 pen.MEdiet = ration_vals['ME_total']
                 pen.dry_matter_intake = nutrient_amount['dm']
+
+                ration_report = {}
+                ration_report['nutrient_amount'] = nutrient_amount
+                ration_report['nutrient_conc'] = nutrient_conc
 
                 for animal in pen.animals_in_pen:
                     animal.set_ration(ration_per_animal, nutrient_amount['dm'])
@@ -1355,7 +1374,6 @@ class AnimalManager:
 
                 info_map = {"class": self.__class__.__name__,
                             "function": self._calc_ration_at_interval.__name__,
-                            "available_feeds": available_feeds.feed_id,
                             f'number_animals_in_pen_{pen.id}': len(pen.animals_in_pen)}
                 om.add_variable(f'ration_nutrient_amount_pen_{pen.id}', nutrient_amount, info_map)
                 om.add_variable(f'MEdiet_pen_{pen.id}', pen.MEdiet, info_map)
