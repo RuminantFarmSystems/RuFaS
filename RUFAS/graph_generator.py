@@ -11,7 +11,12 @@ from matplotlib.figure import Axes, Figure
 Agg rendering to a Tk canvas (requires TkInter). This backend can be activated in IPython with %matplotlib tk.
 Ref: https://matplotlib.org/stable/users/explain/figure/backends.html
 """
-matplotlib.use("TkAgg")
+if "DISPLAY" not in os.environ:
+    # If running in a headless environment, use the 'Agg' backend
+    matplotlib.use("Agg")
+else:
+    # Use the 'TkAgg' backend when a display is available
+    matplotlib.use("TkAgg")
 
 MATPLOTLIB_PLOT_FUNCTIONS = {
     "area": pyplt.fill_between,
