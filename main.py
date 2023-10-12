@@ -81,9 +81,9 @@ def execute_simulations(
     for metadata_file in metadata_files:
         input_manager.flush_pool()
         output_manager.flush_pools()
-        output_manager.set_metadata_prefix(metadata_file['prefix'])
+        output_manager.set_metadata_prefix(metadata_file["prefix"])
         is_data_valid = input_manager.start_data_processing(
-            str(metadata_file_path), True
+            str(metadata_file["path"]), True
         )
         if is_data_valid:
             simulator = SimulationEngine()
