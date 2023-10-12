@@ -176,44 +176,44 @@ def heifer_c() -> dict:
 @pytest.fixture
 def mock_ration_config() -> MagicMock:
     ration_config = MagicMock()
-    ration_config.price = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0]
+    ration_config.price_list = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0]
     ration_config.n = 6
-    ration_config.NEmaint = 1.0
-    ration_config.NEa = 2.0
-    ration_config.NEpreg = 3.0
-    ration_config.NEl = 4.0
-    ration_config.NEg = 5.0
-    ration_config.MP_req = 6.0
-    ration_config.C_req = 7.0
-    ration_config.P_req = 8.0
-    ration_config.TDN = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0]
-    ration_config.DE = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0]
-    ration_config.EE = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0]
-    ration_config.is_fat = [1, 1, 1, 0, 0, 0]
+    ration_config.NEmaint_requirement = 1.0
+    ration_config.NEa_requirement = 2.0
+    ration_config.NEpreg_requirement = 3.0
+    ration_config.NEl_requirement = 4.0
+    ration_config.NEg_requirement = 5.0
+    ration_config.MP_requirement = 6.0
+    ration_config.C_requirement = 7.0
+    ration_config.P_requirement = 8.0
+    ration_config.TDN_list = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0]
+    ration_config.DE_list = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0]
+    ration_config.EE_list = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0]
+    ration_config.is_fat_list = [1, 1, 1, 0, 0, 0]
     ration_config.BW = 9.0
-    ration_config.calcium = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0]
-    ration_config.phosphorus = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0]
-    ration_config.NDF = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0]
-    ration_config.type = ['Forage', 'Conc', 'Mineral', 'Forage', 'Conc', 'Mineral']
-    ration_config.is_wetforage = [1, 1, 1, 0, 0, 0]
-    ration_config.Kd = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0]
-    ration_config.N_A = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0]
-    ration_config.N_B = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0]
-    ration_config.CP = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0]
-    ration_config.dRUP = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0]
-    ration_config.limit = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0]
+    ration_config.calcium_list = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0]
+    ration_config.phosphorus_list = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0]
+    ration_config.NDF_list = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0]
+    ration_config.feed_type_list = ['Forage', 'Conc', 'Mineral', 'Forage', 'Conc', 'Mineral']
+    ration_config.is_wetforage_list = [1, 1, 1, 0, 0, 0]
+    ration_config.Kd_list = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0]
+    ration_config.N_A_list = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0]
+    ration_config.N_B_list = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0]
+    ration_config.CP_list = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0]
+    ration_config.dRUP_list = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0]
+    ration_config.feed_limit_list = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0]
     ration_config.lactating = True
-    ration_config.DMIest = 10.0
+    ration_config.DMIest_requirement = 10.0
 
-    ration_config.NElact = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0]
-    ration_config.MEact = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0]
-    ration_config.NEgact = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0]
-    ration_config.NEm_act = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0]
-    ration_config.is_forage = [1, 1, 1, 0, 0, 0]
+    ration_config.NElact_list = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0]
+    ration_config.MEact_list = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0]
+    ration_config.NEgact_list = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0]
+    ration_config.NEm_act_list = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0]
+    ration_config.is_forage_list = [1, 1, 1, 0, 0, 0]
     ration_config.MPbact = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0]
     ration_config.RUP_diet = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0]
-    ration_config.dP = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0]
-    ration_config.TDNact = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0]
+    ration_config.dP_list = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0]
+    ration_config.TDNact_list = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0]
 
     return ration_config
 
@@ -221,57 +221,57 @@ def mock_ration_config() -> MagicMock:
 @pytest.fixture
 def mock_random_ration_config() -> MagicMock:
     ration_config = MagicMock()
-    ration_config.price = [2.615, 0.544, 3.847, 3.585, 2.881, 1.342]
+    ration_config.price_list = [2.615, 0.544, 3.847, 3.585, 2.881, 1.342]
     ration_config.n = 6
-    ration_config.NEmaint = 1.423
-    ration_config.NEa = 3.849
-    ration_config.NEpreg = 2.223
-    ration_config.NEl = 0.505
-    ration_config.NEg = 3.375
-    ration_config.MP_req = 2.207
-    ration_config.C_req = 3.205
-    ration_config.P_req = 1.17
-    ration_config.TDN = [2.976, 0.19, 3.855, 4.415, 3.181, 4.065]
-    ration_config.DE = [1.374, 4.783, 2.642, 4.42, 2.522, 2.397]
-    ration_config.EE = [4.314, 4.227, 3.704, 4.897, 0.49, 1.59]
-    ration_config.is_fat = [0, 1, 1, 1, 1, 0]
+    ration_config.NEmaint_requirement = 1.423
+    ration_config.NEa_requirement = 3.849
+    ration_config.NEpreg_requirement = 2.223
+    ration_config.NEl_requirement = 0.505
+    ration_config.NEg_requirement = 3.375
+    ration_config.MP_requirement = 2.207
+    ration_config.C_requirement = 3.205
+    ration_config.P_requirement = 1.17
+    ration_config.TDN_list = [2.976, 0.19, 3.855, 4.415, 3.181, 4.065]
+    ration_config.DE_list = [1.374, 4.783, 2.642, 4.42, 2.522, 2.397]
+    ration_config.EE_list = [4.314, 4.227, 3.704, 4.897, 0.49, 1.59]
+    ration_config.is_fat_list = [0, 1, 1, 1, 1, 0]
     ration_config.BW = 2.227
-    ration_config.calcium = [3.79, 4.242, 4.276, 0.676, 2.767, 0.907]
-    ration_config.phosphorus = [3.275, 4.759, 0.653, 1.942, 0.914, 3.964]
-    ration_config.NDF = [2.548, 2.382, 3.086, 4.709, 0.145, 3.554]
-    ration_config.type = ['Forage', 'Conc', 'Conc', 'Conc', 'Forage', 'Mineral']
-    ration_config.is_wetforage = [0, 1, 0, 0, 1, 1]
-    ration_config.Kd = [2.548, 2.382, 3.086, 4.709, 0.145, 3.554]
-    ration_config.N_A = [3.262, 2.552, 3.456, 2.377, 3.992, 4.561]
-    ration_config.N_B = [3.453, 0.098, 2.109, 1.191, 4.602, 1.85]
-    ration_config.CP = [3.489, 0.408, 4.415, 3.394, 2.497, 4.231]
-    ration_config.dRUP = [2.281, 2.537, 2.186, 3.58, 1.436, 1.876]
-    ration_config.limit = [1.211, 0.908, 2.13, 3.851, 0.277, 4.266]
+    ration_config.calcium_list = [3.79, 4.242, 4.276, 0.676, 2.767, 0.907]
+    ration_config.phosphorus_list = [3.275, 4.759, 0.653, 1.942, 0.914, 3.964]
+    ration_config.NDF_list = [2.548, 2.382, 3.086, 4.709, 0.145, 3.554]
+    ration_config.feed_type_list = ['Forage', 'Conc', 'Conc', 'Conc', 'Forage', 'Mineral']
+    ration_config.is_wetforage_list = [0, 1, 0, 0, 1, 1]
+    ration_config.Kd_list = [2.548, 2.382, 3.086, 4.709, 0.145, 3.554]
+    ration_config.N_A_list = [3.262, 2.552, 3.456, 2.377, 3.992, 4.561]
+    ration_config.N_B_list = [3.453, 0.098, 2.109, 1.191, 4.602, 1.85]
+    ration_config.CP_list = [3.489, 0.408, 4.415, 3.394, 2.497, 4.231]
+    ration_config.dRUP_list = [2.281, 2.537, 2.186, 3.58, 1.436, 1.876]
+    ration_config.feed_limit_list = [1.211, 0.908, 2.13, 3.851, 0.277, 4.266]
     ration_config.lactating = True
-    ration_config.DMIest = 1.17
+    ration_config.DMIest_requirement = 1.17
 
-    ration_config.NElact = [4.433, 1.648, 3.986, 1.527, 4.815, 1.883]
-    ration_config.MEact = [0.709, 1.781, 0.724, 3.533, 3.033, 4.017]
-    ration_config.NEgact = [4.827, 0.161, 2.234, 2.955, 4.31, 3.584]
-    ration_config.NEm_act = [3.757, 0.391, 0.259, 1.066, 0.782, 2.24]
-    ration_config.is_forage = [3.053, 4.154, 2.636, 2.901, 2.095, 1.296]
+    ration_config.NElact_list = [4.433, 1.648, 3.986, 1.527, 4.815, 1.883]
+    ration_config.MEact_list = [0.709, 1.781, 0.724, 3.533, 3.033, 4.017]
+    ration_config.NEgact_list = [4.827, 0.161, 2.234, 2.955, 4.31, 3.584]
+    ration_config.NEm_act_list = [3.757, 0.391, 0.259, 1.066, 0.782, 2.24]
+    ration_config.is_forage_list = [3.053, 4.154, 2.636, 2.901, 2.095, 1.296]
     ration_config.MPbact = [2.47, 0.411, 1.933, 4.501, 2.679, 4.123]
     ration_config.RUP_diet = [1.124, 4.395, 4.673, 1.696, 1.469, 1.478]
-    ration_config.dP = [4.678, 2.127, 4.902, 2.609, 3.125, 0.662]
-    ration_config.TDNact = [3.249, 4.541, 0.663, 0.392, 1.745, 4.876]
+    ration_config.dP_list = [4.678, 2.127, 4.902, 2.609, 3.125, 0.662]
+    ration_config.TDNact_list = [3.249, 4.541, 0.663, 0.392, 1.745, 4.876]
 
     return ration_config
 
 
 @pytest.fixture
 def mock_ration_config_with_empty_NElact(mock_ration_config) -> MagicMock:
-    mock_ration_config.NElact = np.empty(1)
+    mock_ration_config.NElact_list = np.empty(1)
     return mock_ration_config
 
 
 @pytest.fixture
 def mock_ration_config_with_empty_NEgact(mock_ration_config) -> MagicMock:
-    mock_ration_config.NEgact = np.empty(1)
+    mock_ration_config.NEgact_list = np.empty(1)
     return mock_ration_config
 
 
@@ -1911,13 +1911,13 @@ def test_set_constraints():
 def test_get_ration_vals():
     """Unit test for function get_ration_vals in file routines/animal/ration/ration_optimizer.py"""
     ration_optimizer = RationOptimizer()
-    x = [1.0, 2.0, 3.0, 4.0, 5.0]
+    decision_vector = [1.0, 2.0, 3.0, 4.0, 5.0]
     ration_config = MagicMock()
-    ration_config.MEact = [6.0, 7.0, 8.0, 9.0, 10.0]
+    ration_config.MEact_list = [6.0, 7.0, 8.0, 9.0, 10.0]
 
-    actual = ration_optimizer.get_ration_vals(x, ration_config)
+    actual = ration_optimizer.get_ration_vals(decision_vector, ration_config)
 
-    expected = {'ME_tot': 130.0}
+    expected = {'ME_total': 130.0}
 
     assert actual == expected
 
@@ -1935,30 +1935,28 @@ def test_total_energy(ration_config, expected, decision_vector) -> None:
 
 
 @pytest.mark.parametrize(
-    "input,expected",
+    "input_,expected",
     [([1, 2, 3, 4], [1, 1, 1, 2, 2, 2, 3, 3, 3, 4, 4, 4]),
      (['1', '2', '3', '4'], ['1', '1', '1', '2', '2', '2', '3', '3', '3', '4', '4', '4'])
      ]
 )
-def test_list_reconfig(input, expected) -> None:
-    """Unit test for function list_reconfig in file routines/animal/ration/ration_optimizer.py"""
+def test_triple_values_in_list(input_, expected) -> None:
+    """Unit test for function triple_values_in_list in file routines/animal/ration/ration_optimizer.py"""
     ration_optimizer = RationOptimizer()
-    assert ration_optimizer.list_reconfig(input) == expected
+    assert ration_optimizer.triple_values_in_list(input_) == expected
 
 
 def test_attempt_optimization(mocker: MockerFixture, mock_ration_config: MagicMock) -> None:
     """Unit test for function attempt_optimization in file routines/animal/ration/ration_optimizer.py"""
 
-    def mock_list_reconfig(x):
+    def mock_triple_values_in_list(x):
         return x
 
     mock_RationConfig = mocker.patch("RUFAS.routines.animal.ration.ration_optimizer.RationConfig")
     mocker.patch("RUFAS.routines.animal.ration.ration_optimizer.RationOptimizer.optimize")
     mocker.patch("RUFAS.routines.animal.ration.ration_optimizer.RationOptimizer.get_ration_vals")
-    mocker.patch("RUFAS.routines.animal.ration.ration_optimizer.RationOptimizer.list_reconfig",
-                 side_effect=mock_list_reconfig)
-
-    # mocker.patch("RUFAS.routines.animal.ration.ration_config.RationConfig.__init__", return_value=None)
+    mocker.patch("RUFAS.routines.animal.ration.ration_optimizer.RationOptimizer.triple_values_in_list",
+                 side_effect=mock_triple_values_in_list)
 
     ration_optimizer = RationOptimizer()
     requirements = MagicMock()
@@ -1981,25 +1979,26 @@ def test_attempt_optimization(mocker: MockerFixture, mock_ration_config: MagicMo
     available_feeds['dRUP'] = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0]
     available_feeds['lactating_cow_limit'] = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0]
 
-    requirements.NEmaint = 1.0
-    requirements.NEa = 2.0
-    requirements.NEpreg = 3.0
-    requirements.NEl = 4.0
-    requirements.NEg = 5.0
-    requirements.MP_req = 6.0
-    requirements.C_req = 7.0
-    requirements.P_req = 8.0
+    requirements.NEmaint_requirement = 1.0
+    requirements.NEa_requirement = 2.0
+    requirements.NEpreg_requirement = 3.0
+    requirements.NEl_requirement = 4.0
+    requirements.NEg_requirement = 5.0
+    requirements.MP_requirement = 6.0
+    requirements.C_requirement = 7.0
+    requirements.P_requirement = 8.0
     requirements.avg_BW = 9.0
-    requirements.DMIest = 10.0
+    requirements.DMIest_requirement = 10.0
 
     animal_combination = 'AnimalCombination.LAC_COW'
 
     ration_optimizer.attempt_optimization(requirements, available_feeds, animal_combination)
 
     mock_RationConfig.assert_called_once_with(
-        available_feeds['price'], requirements.NEmaint, requirements.NEa, requirements.NEpreg,
-        requirements.NEl, requirements.NEg, requirements.MP_req,
-        requirements.Ca_req, requirements.P_req,
+        available_feeds['price'], requirements.NEmaint_requirement, requirements.NEa_requirement,
+        requirements.NEpreg_requirement,
+        requirements.NEl_requirement, requirements.NEg_requirement, requirements.MP_requirement,
+        requirements.Ca_requirement, requirements.P_requirement,
         available_feeds['TDN'], available_feeds['DE'], available_feeds['EE'], available_feeds['is_fat'],
         requirements.avg_BW,
         available_feeds['calcium'], available_feeds['phosphorus'], available_feeds['NDF'],
@@ -2007,7 +2006,7 @@ def test_attempt_optimization(mocker: MockerFixture, mock_ration_config: MagicMo
         available_feeds['N_B'], available_feeds['CP'], available_feeds['dRUP'],
         available_feeds['lactating_cow_limit'],
         True,
-        DMIest_=requirements.DMIest
+        DMIest__requirement=requirements.DMIest_requirement
     )
 
     ration_optimizer.optimize.assert_called_once_with(animal_combination, available_feeds,
@@ -2070,14 +2069,14 @@ def test_NEgact_constraint(ration_config, expected, decision_vector) -> None:
 
 @pytest.mark.parametrize("ration_config, expected", [(lazy_fixture('mock_ration_config'), 0.6455),
                                                      (lazy_fixture('mock_random_ration_config'),
-                                                      0.245464)])
+                                                      0.245465)])
 def test_calcium_constraint(ration_config, expected, decision_vector) -> None:
     """Unit test for function calcium_constraint in file routines/animal/ration/ration_optimizer.py"""
     ration_optimizer = RationOptimizer()
 
     actual = ration_optimizer.calcium_constraint(decision_vector, ration_config)
 
-    assert actual == expected
+    assert actual == pytest.approx(expected)
 
 
 @pytest.mark.parametrize("ration_config, expected", [(lazy_fixture('mock_ration_config'), 0.6638),
