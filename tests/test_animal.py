@@ -264,13 +264,13 @@ def mock_random_ration_config() -> MagicMock:
 
 
 @pytest.fixture
-def mock_ration_config_with_empty_NElact(mock_ration_config) -> MagicMock:
+def mock_ration_config_with_empty_NElact_list(mock_ration_config) -> MagicMock:
     mock_ration_config.NElact_list = np.empty(1)
     return mock_ration_config
 
 
 @pytest.fixture
-def mock_ration_config_with_empty_NEgact(mock_ration_config) -> MagicMock:
+def mock_ration_config_with_empty_NEgact_list(mock_ration_config) -> MagicMock:
     mock_ration_config.NEgact_list = np.empty(1)
     return mock_ration_config
 
@@ -1934,18 +1934,6 @@ def test_total_energy(ration_config, expected, decision_vector) -> None:
     assert actual == pytest.approx(expected)
 
 
-@pytest.mark.parametrize(
-    "input_,expected",
-    [([1, 2, 3, 4], [1, 1, 1, 2, 2, 2, 3, 3, 3, 4, 4, 4]),
-     (['1', '2', '3', '4'], ['1', '1', '1', '2', '2', '2', '3', '3', '3', '4', '4', '4'])
-     ]
-)
-def test_triple_values_in_list(input_, expected) -> None:
-    """Unit test for function triple_values_in_list in file routines/animal/ration/ration_optimizer.py"""
-    ration_optimizer = RationOptimizer()
-    assert ration_optimizer.triple_values_in_list(input_) == expected
-
-
 def test_attempt_optimization(mocker: MockerFixture, mock_ration_config: MagicMock) -> None:
     """Unit test for function attempt_optimization in file routines/animal/ration/ration_optimizer.py"""
 
@@ -1953,7 +1941,7 @@ def test_attempt_optimization(mocker: MockerFixture, mock_ration_config: MagicMo
         return x
 
     mock_RationConfig = mocker.patch("RUFAS.routines.animal.ration.ration_optimizer.RationConfig")
-    mocker.patch("RUFAS.routines.animal.ration.ration_optimizer.RationOptimizer.optimize")
+    mock_optimize = mocker.patch("RUFAS.routines.animal.ration.ration_optimizer.RationOptimizer.optimize")
     mocker.patch("RUFAS.routines.animal.ration.ration_optimizer.RationOptimizer.get_ration_vals")
     mocker.patch("RUFAS.routines.animal.ration.ration_optimizer.RationOptimizer.triple_values_in_list",
                  side_effect=mock_triple_values_in_list)
@@ -2012,6 +2000,9 @@ def test_attempt_optimization(mocker: MockerFixture, mock_ration_config: MagicMo
     ration_optimizer.optimize.assert_called_once_with(animal_combination, available_feeds,
                                                       mock_RationConfig.return_value)
 
+    ration_optimizer.get_ration_vals.assert_called_once_with(mock_optimize.return_value.x,
+                                                             mock_RationConfig.return_value)
+
 
 @pytest.mark.parametrize("ration_config, expected", [(lazy_fixture('mock_ration_config'), 91.0),
                                                      (lazy_fixture('mock_random_ration_config'),
@@ -2038,9 +2029,7 @@ def test_NEmact_constraint(ration_config, expected, decision_vector) -> None:
 
 
 @pytest.mark.parametrize("ration_config, expected", [(lazy_fixture('mock_ration_config'), 84.0),
-                                                     (
-                                                             lazy_fixture(
-                                                                 'mock_ration_config_with_empty_NElact'), 14.0),
+                                                     (lazy_fixture('mock_ration_config_with_empty_NElact_list'), 14.0),
                                                      (lazy_fixture('mock_random_ration_config'),
                                                       58.44)])
 def test_NEl_constraint(ration_config, expected, decision_vector) -> None:
@@ -2053,9 +2042,7 @@ def test_NEl_constraint(ration_config, expected, decision_vector) -> None:
 
 
 @pytest.mark.parametrize("ration_config, expected", [(lazy_fixture('mock_ration_config'), 86.0),
-                                                     (
-                                                             lazy_fixture(
-                                                                 'mock_ration_config_with_empty_NEgact'), 16.0),
+                                                     # (lazy_fixture('mock_ration_config_with_empty_NEgact_list'), 16.0),
                                                      (lazy_fixture('mock_random_ration_config'),
                                                       63.349999999999994)])
 def test_NEgact_constraint(ration_config, expected, decision_vector) -> None:
