@@ -37,7 +37,7 @@ class FieldData:
     # --- Field-level Variables ---
     name: Optional[str] = None
     """Name of this field for identification purposes."""
-    transpiration: Optional[float] = 0.0
+    transpiration: float = 0.0
     """total amount of water lost to transpiration in the field on the current day (mm)"""
     max_transpiration: float = 0.0
     """maximum possible amount of water that could be lost to transpiration in the field for the current day (mm)"""
