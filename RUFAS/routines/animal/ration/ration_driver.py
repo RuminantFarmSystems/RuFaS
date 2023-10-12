@@ -228,7 +228,7 @@ class RationManager:
         Returns
         -------
         ration : Dict
-
+            Dictionary of formulated ration, with keys as feed IDs, values as kg fed.
         ration_vals : Dict
 
         """
@@ -337,20 +337,20 @@ class RationReporter:
         Calculates information in the ration about nutrient information including
         nutrient amounts and concentrations. Returns a dictionary of nutrient amounts
         and nutrient calculations respectively. Psuedocode for these calculations
-        are located in Ration Class Variables in Animal Module Pseduocode
+        are located in Ration Class Variables in Animal Module Pseduocode.
 
         Parameters
         ----------
         ration : Dict
-            A dictionary of the calculated ration
+            Dictionary of formulated ration, with keys as feed IDs, values as kg fed.
         available_feeds : Dict
-            available feeds dictionary from the Feed class object
+            available feeds dictionary from the Feed class object.
 
         Returns
         -------
         Tuple[Dict, Dict]
             Tuple of two dictionaries: one of nutrient amounts, the other of nutrient concentration (as a percentage
-              of fed dry matter)
+              of fed dry matter).
         """
         nutrient_amount = {
             "dm": 0,
@@ -378,7 +378,6 @@ class RationReporter:
         nutrients = ['DM', 'CP', 'ADF', 'NDF', 'lignin', 'ash', 'phosphorus',
                      'potassium', 'N', 'EE', 'starch', 'TDN', 'DE', 'calcium']
 
-        # feed nutrient amounts
         for key, val in ration.items():
             nutrient_amount["dm"] += val
             for nutr in nutrients:
@@ -396,7 +395,6 @@ class RationReporter:
                 else:
                     nutrient_amount[nutr] += val * (available_feeds[key][nutr] / 100)
 
-        # feed nutrient concentrations
         dm_amount = nutrient_amount["dm"]
         if dm_amount == 0:
             dm_amount = 1
@@ -419,7 +417,7 @@ class RationReporter:
         ration : Dict
             Dictionary of formulated ration, with keys as feed IDs, values as kg fed.
         available_feeds : Dict
-            Feeds available for the given pen at time of ration formulation.
+            available feeds dictionary from the Feed class object.
         ration_report : Dict
             Dictionary of nutrient amount and concentrations.
         body_weight : float
@@ -629,23 +627,23 @@ class RationReporter:
     @classmethod
     def get_NE_growth(cls, kg_fed: float, feed_item_info: Dict, ration_report: Dict, body_weight: float) -> float:
         """
-        Returns net energy of feed item available for growth requirements
+        Returns net energy of feed item available for growth requirements.
 
         Parameters
         ----------
         kg_fed : float
-            Kilograms of feed item in ration
+            Kilograms of feed item in ration.
         feed_item_info : Dict
-            Dictionary of nutrient and energy information of feed item
+            Dictionary of nutrient and energy information of feed item.
         ration_report : Dict
-            Dictionary of nutrient amount and concentrations
+            Dictionary of nutrient amount and concentrations.
         body_weight : float
-            Animal body weight in kg
+            Animal body weight in kg.
 
         Returns
         -------
         float
-            Net energy of feed i, Mcal/kg
+            Net energy of feed i, Mcal/kg.
 
         """
         ME_item = cls.get_ME(kg_fed, feed_item_info, ration_report, body_weight)
@@ -660,23 +658,23 @@ class RationReporter:
     @classmethod
     def get_calcium(cls, kg_fed: float, feed_item_info: Dict, ration_report: Dict, body_weight: float) -> float:
         """
-        Returns calcium supply of feed item
+        Returns calcium supply of feed item.
 
         Parameters
         ----------
         kg_fed : float
-            Kilograms of feed item in ration
+            Kilograms of feed item in ration.
         feed_item_info : Dict
-            Dictionary of nutrient and energy information of feed item
+            Dictionary of nutrient and energy information of feed item.
         ration_report : Dict
-            Dictionary of nutrient amount and concentrations
+            Dictionary of nutrient amount and concentrations.
         body_weight : float
-            Animal body weight in kg
+            Animal body weight in kg.
 
         Returns
         -------
         float
-            Calcium supply of feed item, kg TODO: check units
+            Calcium supply of feed item, kg. TODO: check units
 
         """
         if feed_item_info["type"] == "Forage":
@@ -693,23 +691,23 @@ class RationReporter:
     @classmethod
     def get_phosphorus(cls, kg_fed: float, feed_item_info: Dict, ration_report: Dict, body_weight: float) -> float:
         """
-        Returns phosphorus supply of feed item
+        Returns phosphorus supply of feed item.
 
         Parameters
         ----------
         kg_fed : float
-            Kilograms of feed item in ration
+            Kilograms of feed item in ration.
         feed_item_info : Dict
-            Dictionary of nutrient and energy information of feed item
+            Dictionary of nutrient and energy information of feed item.
         ration_report : Dict
-            Dictionary of nutrient amount and concentrations
+            Dictionary of nutrient amount and concentrations.
         body_weight : float
-            Animal body weight in kg
+            Animal body weight in kg.
 
         Returns
         -------
         float
-            Phosphorus supply, kg TODO: check units
+            Phosphorus supply, kg. TODO: check units
 
         """
         if feed_item_info["type"] == "Forage":
@@ -723,75 +721,75 @@ class RationReporter:
         return dP * feed_item_info["phosphorus"] * 0.01 * kg_fed
 
     @classmethod
-    def get_fat(cls, kg_fed, feed_item_info, ration_report, body_weight):
+    def get_fat(cls, kg_fed: float, feed_item_info: Dict, ration_report: Dict, body_weight: float) -> float:
         """
-        Returns fat supply of feed item
+        Returns fat supply of feed item.
 
         Parameters
         ----------
         kg_fed : float
-            Kilograms of feed item in ration
+            Kilograms of feed item in ration.
         feed_item_info : Dict
-            Dictionary of nutrient and energy information of feed item
+            Dictionary of nutrient and energy information of feed item.
         ration_report : Dict
-            Dictionary of nutrient amount and concentrations
+            Dictionary of nutrient amount and concentrations.
         body_weight : float
-            Animal body weight in kg
+            Animal body weight in kg.
 
         Returns
         -------
         float
-            Fat supply of feed item, g TODO: check units
+            Fat supply of feed item, g. TODO: check units
 
         """
         fat_item = feed_item_info["EE"] * kg_fed
         return fat_item
 
     @classmethod
-    def get_fat_percentage(cls, kg_fed, feed_item_info, ration_report, body_weight):
+    def get_fat_percentage(cls, kg_fed: float, feed_item_info: Dict, ration_report: Dict, body_weight: float) -> float:
         """
-        Returns fat content percentage of feed item
+        Returns fat content percentage of feed item.
 
         Parameters
         ----------
         kg_fed : float
-            Kilograms of feed item in ration
+            Kilograms of feed item in ration.
         feed_item_info : Dict
-            Dictionary of nutrient and energy information of feed item
+            Dictionary of nutrient and energy information of feed item.
         ration_report : Dict
-            Dictionary of nutrient amount and concentrations
+            Dictionary of nutrient amount and concentrations.
         body_weight : float
-            Animal body weight in kg
+            Animal body weight in kg.
 
         Returns
         -------
         float
-            Dry matter fat percentage of feed item
+            Dry matter fat percentage of feed item.
 
         """
         fat_item_percentage = (feed_item_info["EE"] * kg_fed) / ration_report["nutrient_amount"]["dm"]
         return fat_item_percentage
 
     @classmethod
-    def get_forage_NDF(cls, kg_fed, feed_item_info, ration_report, body_weight):
+    def get_forage_NDF(cls, kg_fed: float, feed_item_info: Dict, ration_report: Dict, body_weight: float) -> float:
         """
-        Returns forage neutral detergent fiber content of feed item, kg
+        Returns forage neutral detergent fiber content of feed item, kg.
 
         Parameters
         ----------
         kg_fed : float
-            Kilograms of feed item in ration
+            Kilograms of feed item in ration.
         feed_item_info : Dict
-            Dictionary of nutrient and energy information of feed item
+            Dictionary of nutrient and energy information of feed item.
         ration_report : Dict
-            Dictionary of nutrient amount and concentrations
+            Dictionary of nutrient amount and concentrations.
         body_weight : float
-            Animal body weight in kg
+            Animal body weight in kg.
 
         Returns
         -------
         float
-            Forage neutral detergent fiber content of feed item, TODO: check units
+            Forage neutral detergent fiber content of feed item. TODO: check units
 
         """
         if feed_item_info["type"] == "Forage":
@@ -801,14 +799,17 @@ class RationReporter:
         return forage_NDF_item
 
     @classmethod
-    def get_metabolizable_protein(cls, ration, available_feeds, ration_report, body_weight):
+    def get_metabolizable_protein(cls, ration: Dict, available_feeds: Dict, ration_report: Dict, body_weight: float)\
+            -> float:
         """
         Returns metabolizable protein supply  of feed item, TODO: check units
 
         Parameters
         ----------
-        kg_fed : float
-            Kilograms of feed item in ration
+        ration : Dict
+            Dictionary of formulated ration, with keys as feed IDs, values as kg fed.
+        available_feeds : Dict
+            available feeds dictionary from the Feed class object.
         feed_item_info : Dict
             Dictionary of nutrient and energy information of feed item
         ration_report : Dict
