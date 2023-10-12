@@ -125,9 +125,9 @@ def test_run_validation(mocker: MockerFixture, is_data_valid: bool) -> None:
 
 
 @pytest.mark.parametrize(
-        "is_data_valid, simulate_call_count, add_error_call_count, save_vars_call_count",
-        [(True, 2, 0, 2),
-         (False, 0, 2, 2),
+        "is_data_valid, simulate_call_count, add_error_call_count",
+        [(True, 2, 0),
+         (False, 0, 2),
          ]
 )
 def test_execute_simulations(mocker: MockerFixture, is_data_valid: bool,
@@ -166,11 +166,10 @@ def test_execute_simulations(mocker: MockerFixture, is_data_valid: bool,
     assert mock_output_manager.dump_all_nondata_pools.call_args_list == [
         mocker.call("output", True),
     ] * len(metadata_file_list)
-    assert mock_output_manager.save_variables.call_count == save_vars_call_count
+    assert mock_output_manager.save_variables.call_count == len(metadata_file_list)
     assert mock_output_manager.save_variables.call_args_list == [
         mocker.call("output", "output/output_filters/", True),
     ] * len(metadata_file_list)
-
 
 
 def test_parse_gnu_args(mocker: MockerFixture) -> None:
@@ -214,7 +213,7 @@ def test_parse_gnu_args(mocker: MockerFixture) -> None:
             action="store_true",
         ),
         mocker.call(
-            "-orv",
+            "-ov",
             "--only-run-validation",
             help="Only validate the data, don't run a simulation",
             action="store_true",

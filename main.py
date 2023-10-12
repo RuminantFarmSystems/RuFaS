@@ -145,7 +145,7 @@ def parse_gnu_args():
         action="store_true",
     )
     parser.add_argument(
-        "-orv",
+        "-ov",
         "--only-run-validation",
         help="Only validate the data, don't run a simulation",
         action="store_true",
