@@ -417,18 +417,18 @@ class RationReporter:
         Parameters
         ----------
         ration : Dict
-            Dictionary of formulated ration, with keys as feed IDs, values as kg fed
+            Dictionary of formulated ration, with keys as feed IDs, values as kg fed.
         available_feeds : Dict
-            feed.available_feeds
+            Feeds available for the given pen at time of ration formulation.
         ration_report : Dict
-            Dictionary of nutrient amount and concentrations
+            Dictionary of nutrient amount and concentrations.
         body_weight : float
-            Animal body weight in kg
+            Animal body weight in kg.
 
         Returns
         -------
         Dict
-            Dictionary of nutrients and energy supplied by a formulated ration
+            Dictionary of nutrients and energy supplied by a formulated ration.
 
         """
         ration_ = ration.copy()
@@ -451,8 +451,8 @@ class RationReporter:
 
         for key, kg_fed in ration_.items():
             for item in supply_report:
-                feed_item_info = available_feeds[key]  # noqa
-                supply_report[item] += eval("cls.get_" + item + "(kg_fed, feed_item_info, ration_report, body_weight)")
+                supply_report[item] += eval("cls.get_" + item +
+                                            "(kg_fed, available_feeds[key], ration_report, body_weight)")
         supply_report["forage_NDF_percent"] = supply_report["forage_NDF"] / sum(ration_.values())
         supply_report["metabolizable_protein"] = cls.get_metabolizable_protein(
             ration_, available_feeds, ration_report, body_weight
@@ -464,21 +464,21 @@ class RationReporter:
     def get_TDN_discount(cls, ration_report: Dict, body_weight: float) -> float:
         """
         Crucial step to take into account Total digestible nutrient (TDN)
-         digesitbility (% of DM)
-        Initial step in net energy (NE) and metabolizable energy (ME) calculations
+         digesitbility (% of DM).
+        Initial step in net energy (NE) and metabolizable energy (ME) calculations.
 
         Parameters
         ----------
         ration_report : Dict
-            Dictionary of nutrient amount and concentrations
+            Dictionary of nutrient amount and concentrations.
         body_weight : float
-            Animal body weight in kg
+            Animal body weight in kg.
 
         Returns
         -------
         float
             Total digestible nutrient (% of DM) discount, which is TDN digestibility decrease that is a result of
-             TDN amount relative to TDN concentration
+             TDN amount relative to TDN concentration.
 
         Notes
         -----
@@ -510,18 +510,18 @@ class RationReporter:
         Parameters
         ----------
         kg_fed : float
-            Kilograms of feed item in ration
+            Kilograms of feed item in ration.
         feed_item_info : Dict
-            Dictionary of nutrient and energy information of feed item
+            Dictionary of nutrient and energy information of feed item.
         ration_report : Dict
-            Dictionary of nutrient amount and concentrations
+            Dictionary of nutrient amount and concentrations.
         body_weight : float
-            Animal body weight in kg
+            Animal body weight in kg.
 
         Returns
         -------
         float
-            actual digestible energy of feed item, Mcal/kg
+            actual digestible energy of feed item, Mcal/kg.
 
         """
         DE_act = feed_item_info["DE"] * cls.get_TDN_discount(ration_report, body_weight)
@@ -530,23 +530,23 @@ class RationReporter:
     @classmethod
     def get_ME(cls, kg_fed: float, feed_item_info: Dict, ration_report: Dict, body_weight: float) -> float:
         """
-        Returns metabolizable energy of feed item
+        Returns metabolizable energy of feed item.
 
         Parameters
         ----------
         kg_fed : float
-            Kilograms of feed item in ration
+            Kilograms of feed item in ration.
         feed_item_info : Dict
-            Dictionary of nutrient and energy information of feed item
+            Dictionary of nutrient and energy information of feed item.
         ration_report : Dict
-            Dictionary of nutrient amount and concentrations
+            Dictionary of nutrient amount and concentrations.
         body_weight : float
-            Animal body weight in kg
+            Animal body weight in kg.
 
         Returns
         -------
         float
-            metabolizable energy of feed i, Mcal/kg
+            metabolizable energy of feed i, Mcal/kg.
 
         """
         DE_act = cls.get_DE(kg_fed, feed_item_info, ration_report, body_weight)
@@ -566,27 +566,26 @@ class RationReporter:
         cls, kg_fed: float, feed_item_info: Dict, ration_report: Dict, body_weight: float
     ) -> float:
         """
-        Returns net energy of feed item available for maintenance requirements
+        Returns net energy of feed item available for maintenance requirements.
 
         Parameters
         ----------
         kg_fed : float
-            Kilograms of feed item in ration
+            Kilograms of feed item in ration.
         feed_item_info : Dict
-            Dictionary of nutrient and energy information of feed item
+            Dictionary of nutrient and energy information of feed item.
         ration_report : Dict
-            Dictionary of nutrient amount and concentrations
+            Dictionary of nutrient amount and concentrations.
         body_weight : float
-            Animal body weight in kg
+            Animal body weight in kg.
 
         Returns
         -------
         float
-            Net energy of feed i, Mcal/kg
+            Net energy of feed i, Mcal/kg.
 
         """
         ME_item = cls.get_ME(kg_fed, feed_item_info, ration_report, body_weight)
-        # turn ME into NEm
         if feed_item_info["is_fat"] == 1:
             NEm_item = 0.8 * ME_item
         else:
@@ -596,23 +595,23 @@ class RationReporter:
     @classmethod
     def get_NE_lactation(cls, kg_fed: float, feed_item_info: Dict, ration_report: Dict, body_weight: float) -> float:
         """
-        Returns net energy of feed item available for lactation requirements
+        Returns net energy of feed item available for lactation requirements.
 
         Parameters
         ----------
         kg_fed : float
-            Kilograms of feed item in ration
+            Kilograms of feed item in ration.
         feed_item_info : Dict
-            Dictionary of nutrient and energy information of feed item
+            Dictionary of nutrient and energy information of feed item.
         ration_report : Dict
-            Dictionary of nutrient amount and concentrations
+            Dictionary of nutrient amount and concentrations.
         body_weight : float
-            Animal body weight in kg
+            Animal body weight in kg.
 
         Returns
         -------
         float
-            Net energy of feed i, Mcal/kg
+            Net energy of feed i, Mcal/kg.
 
         """
         DE_act = cls.get_DE(kg_fed, feed_item_info, ration_report, body_weight)
