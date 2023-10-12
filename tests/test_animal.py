@@ -1588,9 +1588,9 @@ def test_calc_requirements():
                     'starter_proportion': 1
                     }
     feed = MagicMock()
-    feed.calf_feeds = {155: {'DM': 1, 'CP': 1, 'DE': 1},
-                       156: {'DM': 1, 'CP': 1, 'DE': 1},
-                       157: {'DM': 1, 'CP': 1, 'DE': 1, 'EE': 1}}
+    feed.calf_feeds = {202: {'DM': 1, 'CP': 1, 'DE': 1},
+                       203: {'DM': 1, 'CP': 1, 'DE': 1},
+                       216: {'DM': 1, 'CP': 1, 'DE': 1, 'EE': 1}}
 
     calf = MagicMock()
     calf.days_born = 10
