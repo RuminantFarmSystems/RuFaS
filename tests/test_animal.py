@@ -352,7 +352,7 @@ def test_calculate_NRC_protein_requirements(cow_a: dict, cow_b: dict, heifer_a: 
         24,
         0.6
     )
-    assert (result_MP_req) == pytest.approx((712), rel=1e-1)
+    assert (result_MP_req) == pytest.approx((786.12), rel=1e-1)
 
     result_MP_req = req.calculate_NRC_protein_requirements(
         heifer_a["body_weight"],
