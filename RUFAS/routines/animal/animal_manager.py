@@ -35,7 +35,7 @@ from RUFAS.routines.animal.life_cycle.calf import Calf
 from RUFAS.routines.animal.pen import Pen
 from RUFAS.routines.animal.ration import ration_driver as ration_driver
 from RUFAS.routines.feed.feed import Feed
-from RUFAS.routines.animal.ration.calf_ration import optimize as calf_optimize
+from RUFAS.routines.animal.ration.calf_ration import CalfRationManager
 from RUFAS.routines.animal.ration.ration_driver import RationReporter
 from RUFAS.routines.animal.ration.ration_driver import RationManager
 
@@ -1320,8 +1320,9 @@ class AnimalManager:
                 counter = 1
                 while 'status' not in ration_per_animal or ration_per_animal['status'].lower() != 'optimal':
                     if pen.animal_combination == Pen.AnimalCombination.CALF:
-                        ration_per_animal = calf_optimize()
+                        ration_per_animal = CalfRationManager.optimize()
                         ration_vals = {'ME_total': 0}
+
                     else:
                         ration_per_animal, ration_vals = \
                             RationManager.formulate_ration(pen, pen_specific_feed_data, self.ANIMAL_GROUPING_SCENARIO)

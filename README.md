@@ -1,6 +1,6 @@
 [![Testing](https://github.com/RuminantFarmSystems/MASM/actions/workflows/testing_pytest.yml/badge.svg)](https://github.com/RuminantFarmSystems/MASM/actions/workflows/testing_pytest.yml)
 [![Linting](https://github.com/RuminantFarmSystems/MASM/actions/workflows/lint_flake8.yml/badge.svg)](https://github.com/RuminantFarmSystems/MASM/actions/workflows/lint_flake8.yml)
-[![Coverage](https://img.shields.io/badge/coverage-88%25-yellowgreen)](https://github.com/RuminantFarmSystems/MASM/actions/workflows/coverage_pytest-cov.yml)
+[![Coverage](https://img.shields.io/badge/coverage-89%25-yellowgreen)](https://github.com/RuminantFarmSystems/MASM/actions/workflows/coverage_pytest-cov.yml)
 # Vision
 To support research and sustainable decision-making in ruminant animal production through a state-of-art, open-source modeling environment that is continuously adapting as technology and scientific knowledge advance.
 
@@ -57,7 +57,7 @@ Design and implement EEE (Review progress on this)|Pooya, Roohi, Kristan, Jenn||
 Finish Compost for Manure Module |Varma, Loi||P0
 Redesign and implement Feed storage module |Kevin, Pooya, Kristan|||Moved to MS 2.5
 Revisit the Animal Module design – Refactoring -- Animal Manager||Design Phase|P2| Moved to MS 2.5
-Revisit the Animal Module design – Refactoring -- Animal Ration formulation|Joe|In Progress|P0
+Revisit the Animal Module design – Refactoring -- Animal Ration formulation|Joe|In Review|P0
 Revisit the Animal Module design – Refactoring -- Animal Life Cycle|Yijing, Simon, Anchey|Design phase|P0
 Deprecate the output handler, add missing functionalities, and reports to OM|Niko, Allister||P0
 Go through the entire codebase and ensure IM is the only way we are receiving input data|Allister, Niko||P0|[IM Integration tracking](https://docs.google.com/spreadsheets/d/1k8J6MelPrsrz6Tv4fQNAG-kLSN7oQTQOCEy3I6F0IqU/edit?usp=sharing)
@@ -94,6 +94,7 @@ Complete evaluation of soil hydrology|Ed, Jenn, Matthew|In progress|P0|[#766](ht
 Dev Team:
 |Title|Owner|Status|Priority|Remarks|
 |--|--|--|--|--|
+Refactor manure excretion and methane emission in the animal module|Dev team, Joe, Haowen||P2
 Revisit classes.py|Allister
 Deprecate DB(s)|Allister
 Deprecate output handler ||moved to MS 2||
@@ -119,7 +120,7 @@ Develop a set of standard scenarios for end-to-end testing|||P1
 
 [RuFaS Version 1 High Level Functional Requirements](https://docs.google.com/document/d/1fJ3lIOtUJjHKWdaDx2M0c2ZVwCTE-Qy4mK2Vvjt012g/edit?usp=sharing)
 
-[Onboarding Document](https://docs.google.com/document/d/1zN92KK2OkTDkutVmT96u7eEu3B2UDWgP/edit?usp=sharing&ouid=111321898904316595397&rtpof=true&sd=true)
+[Onboarding Wiki](https://github.com/RuminantFarmSystems/MASM/wiki/Onboarding-New-Team-Members)
 
 [Uncle Bob Clean Code Lessons](https://youtube.com/playlist?list=PLs4sTjbm8kLhbJy-rT4DILg-kKw3ZCwDx)
 

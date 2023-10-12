@@ -17,7 +17,7 @@
     "crop": {
       "title": "Crop data",
       "description": "Barnyard crop rotation schedule.",
-      "path": "input/data/crop/no_crop.json",
+      "path": "input/data/crop/corn_rotation.json",
       "type": "json",
       "properties": "crop_schedule_properties"
     },
@@ -63,66 +63,52 @@
       "type": "json",
       "properties": "manure_management_properties"
     },
-    "soil": {
+    "regular_soil": {
       "title": "Soil data",
       "description": "Barnyard soil configuration.",
-      "path": "input/data/soil/barnyard_soil.json",
+      "path": "input/data/soil/regular_barnyard_soil.json",
       "type": "json",
       "properties": "soil_profile_properties"
     },
-    "fertilizer_schedule_1": {
-      "title": "Fertilizer schedule.",
-      "description": "Barnyard fertilizer application schedule.",
-      "path": "input/data/fertilizer_schedule/no_fertilizer.json",
+    "sandy_soil": {
+      "title": "Soil data",
+      "description": "Barnyard soil configuration.",
+      "path": "input/data/soil/sandy_barnyard_soil.json",
       "type": "json",
-      "properties": "fertilizer_schedule_properties"
+      "properties": "soil_profile_properties"
     },
-    "fertilizer_schedule_2": {
+    "fertilizer_schedule": {
       "title": "Fertilizer schedule.",
       "description": "Barnyard fertilizer application schedule.",
       "path": "input/data/fertilizer_schedule/barnyard_scheduled_fertilizer_schedule.json",
       "type": "json",
       "properties": "fertilizer_schedule_properties"
     },
-    "manure_schedule_1": {
-      "title": "Manure schedule.",
-      "description": "Barnyard manure application schedule.",
-      "path": "input/data/manure_schedule/no_manure.json",
-      "type": "json",
-      "properties": "manure_schedule_properties"
-    },
-    "manure_schedule_2": {
+    "manure_schedule": {
       "title": "Manure schedule.",
       "description": "Barnyard manure application schedule.",
       "path": "input/data/manure_schedule/barnyard_scheduled_manure_schedule.json",
       "type": "json",
       "properties": "manure_schedule_properties"
     },
-    "tillage_schedule_1": {
-      "title": "Tillage schedule.",
-      "description": "Barnyard tillage application schedule.",
-      "path": "input/data/tillage_schedule/no_till.json",
-      "type": "json",
-      "properties": "tillage_schedule_properties"
-    },
-    "tillage_schedule_2": {
+    "tillage_schedule": {
       "title": "Tillage schedule.",
       "description": "Barnyard tillage application schedule.",
       "path": "input/data/tillage_schedule/barnyard_scheduled_tillage_schedule.json",
       "type": "json",
       "properties": "tillage_schedule_properties"
     },
-    "field_1": {
+    "regular": {
       "title": "Field specification",
       "description": "Contains overall field properties and references to specification files.",
-      "path": "input/data/field/barnyard_field_1.json",
+      "path": "input/data/field/regular_barnyard_field.json",
       "type": "json",
       "properties": "field_properties"
     },
-    "field_2": {
+    "sandy": {
       "title": "Field specification",
       "description": "Contains overall field properties and references to specification files.",
-      "path": "input/data/field/barnyard_field_2.json",
+      "path": "input/data/field/sandy_barnyard_field.json",
       "type": "json",
       "properties": "field_properties"
     },
