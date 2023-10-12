@@ -2959,8 +2959,15 @@ def test_get_metabolizable_protein(mocker: MockerFixture) -> None:
                           'is_wetforage': 0, 'NDF': 1}}
     feed_path_d2 = {'8': {'type': 'Dummy', 'Kd': -100, 'N_A': 1, 'N_B': 1, 'CP': 1, 'dRUP': 1,
                           'is_wetforage': 0, 'NDF': 1}}
-    available_feeds = feed_path_a1 | feed_path_b1 | feed_path_c1 | feed_path_d1 | \
-                      feed_path_a2 | feed_path_b2 | feed_path_c2 | feed_path_d2
+    available_feeds = (feed_path_a1 |
+                       feed_path_b1 |
+                       feed_path_c1 |
+                       feed_path_d1 |
+                       feed_path_a2 |
+                       feed_path_b2 |
+                       feed_path_c2 |
+                       feed_path_d2
+                       )
     ration = {'1': 1, '2': 2, '3': 3, '4': 4, '5': 5, '6': 6, '7': 7, '8': 8}
     ration_report = {'nutrient_amount': {'TDN': 1}}
     body_weight = 100
