@@ -19,7 +19,7 @@ Multiple simulations:
     extra input from the user and will use the ARL_metadata.json file
 """
 
-METADATA_PATHS = ['input/metadata/swat_metadata.json']
+METADATA_PATHS = ['input/metadata/default_metadata.json']
 
 # default_metadata
 # swat_metadata
