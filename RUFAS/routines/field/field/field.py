@@ -1173,14 +1173,13 @@ class Field:
 
     @staticmethod
     def _determine_potential_evapotranspiration(extraterrestrial_radiation: float, max_air_temp: float,
-                                                min_air_temp: float,
-                                                avg_air_temp: float) -> float:
+                                                min_air_temp: float, avg_air_temp: float) -> float:
         """Calculates the potential evapotranspiration for a given day.
 
         Parameters
         ----------
         extraterrestrial_radiation : float
-            Radiation from the aliens (MJ per square meter per day).
+            Radiation from sunlight (MJ per square meter per day).
         max_air_temp : float
             Maximum air temperature (degrees C).
         min_air_temp : float
