@@ -528,22 +528,23 @@ def pens_test_data_dict() -> List[dict[Any]]:
         },
         {
             "pen_data":
-                {"pen0":
-                    {
-                        "pen_id": 0,
-                        "cow_type_to_id_map": {
-                            'Calf': [120297, 122798, 123120, 124011, 125663, 139048, 141097, 151564,
-                                     152876, 162678, 100919, 101115, 112752, 119921, 172095, 178379,
-                                     181144, 185339, 186287, 192840, 194279, 195286, 196169, 199241,
-                                     199441],
-                            'HeiferI': [], 'HeiferII': [], 'HeiferIII': [], 'Dry_Cow': [],
-                            'Lac_Cow': []},
-                        "pen_animal_combination": Pen.AnimalCombination.CALF,
-                        "post_removal_stocking_density": 0.50, "num_stalls": 48,
-                        "ration": {
-                            "status": "dummy_val", "dummy_feed2": 34.0, "dummy_feed3": 3.4,
-                            "dummy_feed4": 77.0, "dummy_feed5": 3.2, "dummy_feed6": 9.50, "dummy_feed7": 0.0,
-                            "dummy_feed8": 12.2, "dummy_feed9": 9.9, "dummy_feed10": 400.0}},
+                {
+                    "pen0":
+                        {
+                            "pen_id": 0,
+                            "cow_type_to_id_map": {
+                                'Calf': [120297, 122798, 123120, 124011, 125663, 139048, 141097, 151564,
+                                         152876, 162678, 100919, 101115, 112752, 119921, 172095, 178379,
+                                         181144, 185339, 186287, 192840, 194279, 195286, 196169, 199241,
+                                         199441],
+                                'HeiferI': [], 'HeiferII': [], 'HeiferIII': [], 'Dry_Cow': [],
+                                'Lac_Cow': []},
+                            "pen_animal_combination": Pen.AnimalCombination.CALF,
+                            "post_removal_stocking_density": 0.50, "num_stalls": 48,
+                            "ration": {
+                                "status": "dummy_val", "dummy_feed2": 34.0, "dummy_feed3": 3.4,
+                                "dummy_feed4": 77.0, "dummy_feed5": 3.2, "dummy_feed6": 9.50, "dummy_feed7": 0.0,
+                                "dummy_feed8": 12.2, "dummy_feed9": 9.9, "dummy_feed10": 400.0}},
                     "pen1":
                         {
                             "pen_id": 1,

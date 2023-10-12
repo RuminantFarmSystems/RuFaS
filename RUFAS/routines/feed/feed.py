@@ -1149,8 +1149,8 @@ class Feed:
                        identifier: str = None, desired_rows: List[Any] = None,
                        compare_val: int = None, low_col: str = None, high_col: str = None) -> List[Dict[str, Any]]:
         """
-        This function retrieves and filters the desired data, pack each "row" into a dictionary object, and returns a list
-        of desired rows
+        This function retrieves and filters the desired data, pack each "row" into a dictionary object, and returns a
+        list of desired rows
 
         Parameters
         ----------
