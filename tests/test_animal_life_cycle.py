@@ -8,7 +8,7 @@ from pytest import approx
 from pytest import fixture
 from pytest_mock import MockerFixture
 
-from RUFAS.classes import Config
+from RUFAS.classes.config import Config
 from RUFAS.routines.animal.animal_typed_dicts import AnimalConfigTypedDict
 from RUFAS.routines.animal.life_cycle import animal_constants
 from RUFAS.routines.animal.life_cycle.animal_constants import ENTER_HERD

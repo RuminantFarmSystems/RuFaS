@@ -1,6 +1,6 @@
 import pytest
 
-from RUFAS.classes import Weather
+from RUFAS.classes.weather import Weather
 
 
 @pytest.mark.parametrize("avg_daily_temperatures,expected", [
