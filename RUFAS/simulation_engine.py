@@ -4,7 +4,10 @@ import sys
 import time as timer
 
 from RUFAS import routines
-from RUFAS.classes import Config, State, Weather, Time
+from RUFAS.classes.config import Config
+from RUFAS.classes.state import State
+from RUFAS.classes.weather import Weather
+from RUFAS.classes.time import Time
 from RUFAS.output_manager import OutputManager
 from RUFAS.input_manager import InputManager
 from RUFAS.routines.manure.manure_manager import simulate_daily_manure_manager
@@ -115,7 +118,7 @@ class SimulationEngine:
         """
         data_config = im.get_data('config')
         data_weather = im.get_data('weather')
-        self.config = Config(data_config, data_weather)
+        self.config = Config(data_config)
 
         if self.config.set_seed:
             random.seed(self.config.seed)

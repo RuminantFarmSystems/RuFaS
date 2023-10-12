@@ -3,7 +3,10 @@ import json
 from pathlib import Path
 from typing import Dict, Tuple, Any
 
-from RUFAS.classes import Config, Feed, Weather, Time
+from RUFAS.classes.config import Config
+from RUFAS.routines.feed import Feed
+from RUFAS.classes.weather import Weather
+from RUFAS.classes.time import Time
 from RUFAS.routines.animal.animal_manager import AnimalManager
 
 """
