@@ -46,7 +46,7 @@ def test_annual_average_temperature_recording(mock_output_manager: OutputManager
     """Tests that the annual average temperature is recorded correctly to the OutputManager when Weather is created."""
     with patch("RUFAS.classes.Weather._calculate_average_annual_temperature") as avg, \
             patch("RUFAS.output_manager.OutputManager.add_variable") as record:
-        _weather = Weather(mock_weather_input, mock_config)
+        Weather(mock_weather_input, mock_config)
         avg.assert_called_once()
         record.assert_called_once()
 
