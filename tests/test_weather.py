@@ -2,13 +2,6 @@ import pytest
 from unittest.mock import patch, MagicMock
 
 from RUFAS.classes import Weather, Config
-from RUFAS.output_manager import OutputManager
-
-#
-# @pytest.fixture
-# def mock_output_manager() -> OutputManager:
-#     output_manager = OutputManager()
-#     return output_manager
 
 
 @pytest.fixture
@@ -24,18 +17,6 @@ def mock_weather_input() -> dict:
         "irrigation": [0.0] * 5,
     }
     return weather_data
-
-#
-# @pytest.fixture
-# def mock_weather() -> Weather:
-#     mock_weather = MagicMock(Weather)
-#     setattr(mock_weather, "rainfall", [[1, 2, 3], [4, 5, 6], [7, 8, 9]])
-#     setattr(mock_weather, "T_max", [[1, 2, 3], [4, 5, 6], [7, 8, 9]])
-#     setattr(mock_weather, "T_min", [[1, 2, 3], [4, 5, 6], [7, 8, 9]])
-#     setattr(mock_weather, "T_avg", [[1, 2, 3], [4, 5, 6], [7, 8, 9]])
-#     setattr(mock_weather, "radiation", [[1, 2, 3], [4, 5, 6], [7, 8, 9]])
-#     setattr(mock_weather, "irrigation", [[1, 2, 3], [4, 5, 6], [7, 8, 9]])
-#     return mock_weather
 
 
 @pytest.fixture

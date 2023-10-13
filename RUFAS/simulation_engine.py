@@ -57,15 +57,6 @@ class SimulationEngine:
 
         self._advance_time()
 
-    def _record_time(self) -> None:
-        """
-        Records the current day and year of the simulation in the OutputManager.
-        """
-        info_map = {"class": self.__class__.__name__, "function": self._record_time.__name__, "prefix": "Time"}
-        om.add_variable("day", self.time.day, info_map)
-        om.add_variable("year", self.time.year, info_map)
-        om.add_variable("calendar_year", self.time.calendar_year, info_map)
-
     def _advance_time(self, print_day: Optional[bool] = False) -> None:
         """
         Advances time and increments simulation_day.
