@@ -9,7 +9,7 @@ def graph_generator() -> GraphGenerator:
     return GraphGenerator()
 
 
-def test_save_graph_successful(graph_generator):
+def test_save_graph_successful(graph_generator: GraphGenerator) -> None:
     graph_details: Dict[str, str] = {
         "title": "Test Graph",
         "x_label": "X Axis",
@@ -38,7 +38,7 @@ def test_save_graph_successful(graph_generator):
             assert result == mock_generate_graph_path.return_value
 
 
-def test_save_graph_exception(graph_generator):
+def test_save_graph_exception(graph_generator: GraphGenerator) -> None:
     graph_details: Dict[str, str] = {
         "title": "Test Graph",
         "x_label": "X Axis",
