@@ -10,6 +10,8 @@ import argparse
 from pathlib import Path
 import sys
 from typing import List
+
+from RUFAS.graph_herd_composition import HerdCompositionGraphGenerator
 from RUFAS.scenario_manager import METADATA_PATHS, MetadataPaths
 
 import config.global_variables
@@ -114,6 +116,12 @@ def execute_simulations(
                                      f"Data not valid for {str(metadata_file['path'])}, simulation not run", info_map)
         output_manager.save_variables(r"output", r"output/output_filters/", exclude_info_maps)
         output_manager.dump_all_nondata_pools(r"output", exclude_info_maps)
+
+        HerdCompositionGraphGenerator.generate_graph(
+            Path(__file__).parent / 'output/CSVs/om/',
+            Path(__file__).parent / 'output/graphics/',
+            'life_cycle_daily_updates'
+        )
 
 
 def parse_gnu_args():

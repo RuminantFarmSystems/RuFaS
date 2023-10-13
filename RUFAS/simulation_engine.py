@@ -1,17 +1,17 @@
 # !/usr/bin/env python3
 
+import random
 import sys
 import time as timer
+from typing import Optional
+
+import numpy
 
 from RUFAS import routines
 from RUFAS.classes import Config, State, Weather, Time
-from RUFAS.output_manager import OutputManager
 from RUFAS.input_manager import InputManager
+from RUFAS.output_manager import OutputManager
 from RUFAS.routines.manure.manure_manager import simulate_daily_manure_manager
-import random
-import numpy
-from typing import Optional
-
 
 om = OutputManager()
 im = InputManager()
