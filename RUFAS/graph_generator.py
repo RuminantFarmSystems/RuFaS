@@ -1,7 +1,7 @@
 import os
 import datetime
 from pathlib import Path
-from typing import Dict, List, Any
+from typing import Dict, List, Any, Callable
 
 import matplotlib
 import matplotlib.pyplot as plt
@@ -19,7 +19,9 @@ else:
     # Use the 'TkAgg' backend when a display is available
     matplotlib.use("TkAgg")
 
-MATPLOTLIB_PLOT_FUNCTIONS = {
+function_type = Callable[..., None]
+
+MATPLOTLIB_PLOT_FUNCTIONS: Dict[str, function_type] = {
     "area": plt.fill_between,
     "bar": plt.bar,
     "barbs": plt.barbs,
@@ -53,7 +55,7 @@ MATPLOTLIB_PLOT_FUNCTIONS = {
     "violin": plt.violinplot,
 }
 
-FIGURE_SETTERS = {
+FIGURE_SETTERS: Dict[str, function_type] = {
     "align_labels": Figure.align_labels,
     "canvas": Figure.set_canvas,
     "constrained_layout": Figure.set_constrained_layout,
@@ -70,7 +72,7 @@ FIGURE_SETTERS = {
     "zorder": Figure.set_zorder,
 }
 
-AXES_SETTERS = {
+AXES_SETTERS: Dict[str, function_type] = {
     "aspect": Axes.set_aspect,
     "grid": Axes.grid,
     "legend": Axes.legend,
