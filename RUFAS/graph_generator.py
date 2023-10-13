@@ -58,7 +58,6 @@ FIGURE_SETTERS = {
     "constrained_layout": Figure.set_constrained_layout,
     "dpi": Figure.set_dpi,
     "edgecolor": Figure.set_edgecolor,
-    "figdpi": Figure.set_dpi,
     "figheight": Figure.set_figheight,
     "figsize": Figure.set_size_inches,
     "figwidth": Figure.set_figwidth,
