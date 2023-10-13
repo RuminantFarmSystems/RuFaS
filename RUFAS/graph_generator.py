@@ -6,6 +6,7 @@ from typing import Dict, List, Any
 import matplotlib
 import matplotlib.pyplot as plt
 from matplotlib.figure import Axes, Figure
+from RUFAS.util import Utility
 
 """
 Agg rendering to a Tk canvas (requires TkInter). This backend can be activated in IPython with %matplotlib tk.
@@ -96,7 +97,7 @@ class GraphGenerator:
 
     def generate_graph(
         self,
-        filtered_pool: Dict[str, Dict[str, List[Dict[str, Any]]]],
+        filtered_pool: Dict[str, Dict[str, List[Any]]],
         graph_details: Dict[str, str | List[str]],
         save_path: str,
         filter_file_name: str,
@@ -107,7 +108,7 @@ class GraphGenerator:
 
         Parameters
         ----------
-        filtered_pool : Dict[str, Dict[str, List[Dict[str, Any]]]]
+        filtered_pool : Dict[str, Dict[str, List[Any]]]
             The result pool after filtering with the provided RegEx filters.
         graph_details: Dict[str, str]
             A dictionary containing details/metadata about the graph.
@@ -130,7 +131,9 @@ class GraphGenerator:
         """
         try:
             fig, _ = plt.subplots()
-            self._draw_graph(graph_details["type"], filtered_pool)
+            self._draw_graph(
+                graph_details["type"], filtered_pool, graph_details.get("variables")
+            )
             self._customize_graph(fig, graph_details)
             return self._save_graph(
                 graph_details, filter_file_name, save_path, graphics_dir
@@ -141,7 +144,8 @@ class GraphGenerator:
     def _draw_graph(
         self,
         graph_type: str,
-        data: Dict[str, Dict[str, List[Dict[str, Any]]]],
+        data: Dict[str, Dict[str, List[Any]]],
+        variables: List[str] | None,
     ) -> None:
         """
         Draw the graph based on the provided graph type and data.
@@ -150,13 +154,26 @@ class GraphGenerator:
         ----------
         graph_type : str
             The type of graph to draw.
-        data : Dict[str, Dict[str, List[Dict[str, Any]]]]
+        data : Dict[str, Dict[str, List[Any]]]
             The data to use for plotting.
-
+        variables : List[str] | None
+            If it is present and the data is a list of dicts,
+            it selects the variables to be plotted.
         """
+        plot_function = MATPLOTLIB_PLOT_FUNCTIONS[graph_type]
         for key in data.keys():
-            plot_function = MATPLOTLIB_PLOT_FUNCTIONS[graph_type]
-            plot_function(data[key]["values"])
+            values: List[Any] = data[key]["values"]
+            if isinstance(values[0], dict):
+                if isinstance(variables, list):
+                    data_dict = Utility.convert_list_of_dicts_to_dict_of_lists(values)
+                    for variable in variables:
+                        plot_function(data_dict[variable])
+                else:
+                    raise TypeError(
+                        "Can't plot dictionary, use 'variables' arg to select items from data"
+                    )
+            else:
+                plot_function(values)
 
     def _customize_graph(
         self, fig: Figure, customization_details: Dict[str, Any]
