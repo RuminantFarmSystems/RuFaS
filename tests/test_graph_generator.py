@@ -50,7 +50,7 @@ def test_save_graph_exception(graph_generator):
 
     with patch("RUFAS.graph_generator.matplotlib.pyplot.savefig") as mock_savefig:
         mock_savefig.side_effect = Exception("test")
-        with pytest.raises(Exception):
+        with pytest.raises(Exception, match="test"):
             graph_generator._save_graph(
                 graph_details, filter_file_name, save_path, graphics_dir
             )
