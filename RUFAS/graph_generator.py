@@ -97,7 +97,7 @@ class GraphGenerator:
     def generate_graph(
         self,
         filtered_pool: Dict[str, Dict[str, List[Dict[str, Any]]]],
-        graph_details: Dict[str, str],
+        graph_details: Dict[str, str | List[str]],
         save_path: str,
         filter_file_name: str,
         graphics_dir: str = "",
