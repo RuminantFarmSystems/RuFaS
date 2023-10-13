@@ -244,6 +244,9 @@ class Weather:
 
         self.T_avg_annual = self._calculate_average_annual_temperature(weather_file['avg'])
 
+        info_map = {"class": self.__class__.__name__, "function": self.__init__.__name__, "prefix": "Weather"}
+        om.add_variable("average_annual_temperature(C)", self.T_avg_annual, info_map)
+
     @staticmethod
     def _calculate_average_annual_temperature(daily_average_temperatures: list[float]) -> float:
         """
