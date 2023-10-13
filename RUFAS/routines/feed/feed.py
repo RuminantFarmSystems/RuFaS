@@ -1106,7 +1106,6 @@ class Feed:
                                    if key != 'rufas_id'}
         return calf_feeds
 
-    @staticmethod
     def _pack_into_dict(self, var_names: List[str], var_values: List[Any]) -> Dict[str, Any]:
         """
         Pack the provided variable names and values into a dictionary.
@@ -1144,7 +1143,6 @@ class Feed:
             result_dict[var_name] = var_values[id_var]
         return result_dict
 
-    @staticmethod
     def _retrieve_data(self, data_source: str, var_names: List[str] = None, unique_value: bool = False,
                        identifier: str = None, desired_rows: List[Any] = None,
                        compare_val: int = None, low_col: str = None, high_col: str = None) -> List[Dict[str, Any]]:
