@@ -54,3 +54,20 @@ def test_save_graph_exception(graph_generator: GraphGenerator) -> None:
             graph_generator._save_graph(
                 graph_details, filter_file_name, save_path, graphics_dir
             )
+
+
+def test_generate_graph_path_exception(graph_generator: GraphGenerator) -> None:
+    graph_details: Dict[str, str] = {
+        "title": "Test Graph",
+        "x_label": "X Axis",
+        "y_label": "Y Axis",
+    }
+    filter_file_name: str = "test_filter.png"
+    save_path: str = "/path/to/save"
+    graphics_dir: str = "graphics"
+    with patch("pathlib.Path.mkdir") as mock_mkdir:
+        mock_mkdir.side_effect = Exception("test")
+        with pytest.raises(Exception, match="test"):
+            graph_generator._generate_graph_path(
+                save_path, graph_details, filter_file_name, graphics_dir
+            )
