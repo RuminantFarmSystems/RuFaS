@@ -1990,7 +1990,76 @@ def test_ration_optimizer_optimize():
 
 def test_calc_rqmts():
     """Unit test for function calc_rqmts in file routines/animal/ration/animal_requirements.py"""
-    pass
+    test_requirements = AnimalRequirements()
+    test_requirements.calculate_NRC_energy_maintenance_requirements = MagicMock(return_value=(1, 2, 3))
+    test_requirements.calculate_NRC_energy_growth_requirements = MagicMock(return_value=(1, 2, 3))
+    test_requirements.calculate_NRC_energy_pregnancy_requirements = MagicMock(return_value=1)
+    test_requirements.calculate_NRC_energy_lactation_requirements = MagicMock(return_value=1)
+    test_requirements.calculate_NRC_DMI = MagicMock(return_value=1)
+    test_requirements.calculate_NRC_protein_requirements = MagicMock(return_value=1)
+    test_requirements.calculate_NRC_calcium_requirements = MagicMock(return_value=1)
+    test_requirements.calculate_NRC_phosphorus_requirements = MagicMock(return_value=1)
+    test_requirements.calculate_NASEM_energy_maintenance_requirements = MagicMock(return_value=(4, 5, 6))
+    test_requirements.calculate_NASEM_energy_growth_requirements = MagicMock(return_value=(4, 5, 6))
+    test_requirements.calculate_NASEM_energy_pregnancy_requirements = MagicMock(return_value=(4, 5))
+    test_requirements.calculate_NASEM_energy_lactation_requirements = MagicMock(return_value=2)
+    test_requirements.calculate_NASEM_DMI = MagicMock(return_value=2)
+    test_requirements.calculate_NASEM_protein_requirements = MagicMock(return_value=2)
+    test_requirements.calculate_NASEM_calcium_requirements = MagicMock(return_value=2)
+    test_requirements.calculate_NASEM_phosphorus_requirements = MagicMock(return_value=2)
+    AnimalBase.config["energy_and_nutrient_calculation_method"] = 'NRC'
+    test_requirements.AnimalBase = AnimalBase
+    # with patch.object('') as mocked:
+    #     mocked.side
+    actual = test_requirements.calc_rqmts(MagicMock(), MagicMock(), MagicMock(), MagicMock())
+    expected = {
+            "NEmaint_requirement": 1,
+            "NEg_requirement": 1,
+            "NEpreg_requirement": 1,
+            "NEl_requirement": 1,
+            "MP_requirement": 1,
+            "Ca_requirement": 1,
+            "P_requirement": 1,
+            "DMIest_requirement": 1,
+        }
+    actual == expected
+    test_requirements.calculate_NRC_energy_maintenance_requirements.assert_called_once()
+    test_requirements.calculate_NRC_energy_growth_requirements.assert_called_once()
+    test_requirements.calculate_NRC_energy_pregnancy_requirements.assert_called_once()
+    test_requirements.calculate_NRC_energy_lactation_requirements.assert_called_once()
+    test_requirements.calculate_NRC_DMI.assert_called_once()
+    test_requirements.calculate_NRC_protein_requirements.assert_called_once()
+    test_requirements.calculate_NRC_calcium_requirements.assert_called_once()
+    test_requirements.calculate_NRC_phosphorus_requirements.assert_called_once()
+
+    expected = {
+            "NEmaint_requirement": 2,
+            "NEg_requirement": 2,
+            "NEpreg_requirement": 2,
+            "NEl_requirement": 2,
+            "MP_requirement": 2,
+            "Ca_requirement": 2,
+            "P_requirement": 2,
+            "DMIest_requirement": 2,
+        }
+    AnimalBase.config["energy_and_nutrient_calculation_method"] = 'NASEM'
+    actual = test_requirements.calc_rqmts(MagicMock(), MagicMock(), MagicMock(), MagicMock())
+    test_requirements.calculate_NASEM_energy_maintenance_requirements.assert_called_once()
+    test_requirements.calculate_NASEM_energy_growth_requirements.assert_called_once()
+    test_requirements.calculate_NASEM_energy_pregnancy_requirements.assert_called_once()
+    test_requirements.calculate_NASEM_energy_lactation_requirements.assert_called_once()
+    test_requirements.calculate_NASEM_DMI.assert_called_once()
+    test_requirements.calculate_NASEM_protein_requirements.assert_called_once()
+    test_requirements.calculate_NASEM_calcium_requirements.assert_called_once()
+    test_requirements.calculate_NASEM_phosphorus_requirements.assert_called_once()
+
+    # AnimalBase.config["energy_and_nutrient_calculation_method"] = 'DUMMY'
+    # test_requirements.calc_rqmts(MagicMock(), MagicMock(), MagicMock(), MagicMock())
+
+    # test_requirements.om = MagicMock()
+    # om = MagicMock()
+    # test_requirements.om.add_error = MagicMock(return_value='error')
+    # test_requirements.om.add_error.assert_called_once()
 
 
 def test_energy_activity_rqmts():
