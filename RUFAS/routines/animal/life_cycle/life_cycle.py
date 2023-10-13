@@ -306,6 +306,21 @@ class LifeCycleManager:
                     "function": self.daily_update.__name__,
                     "sim_day": sim_day, }
 
+        om.add_variable("calf_num", self.calf_num, info_map)
+        om.add_variable("heiferI_num", self.heiferI_num, info_map)
+        om.add_variable("heiferII_num", self.heiferII_num, info_map)
+        om.add_variable("heiferIII_num", self.heiferII_num, info_map)
+        om.add_variable("cow_num", self.cow_num, info_map)
+        om.add_variable("sim_day", sim_day, info_map)
+        parity_1 = self.num_cow_for_parity['1']
+        parity_2 = self.num_cow_for_parity['2']
+        parity_3 = self.num_cow_for_parity['3']
+        parity_greater_than_3 = self.num_cow_for_parity['greater_than_3']
+        om.add_variable("num_cow_for_parity_1", parity_1, info_map)
+        om.add_variable("num_cow_for_parity_2", parity_2, info_map)
+        om.add_variable("num_cow_for_parity_3", parity_3, info_map)
+        om.add_variable("num_cow_for_parity_greater_than_3", parity_greater_than_3, info_map)
+
         life_cycle_daily_herd_update_keys = ["calf_num", "heiferI_num", "heiferII_num", "heiferIII_num", "cow_num",
                                              "sold_heifer_num", "bought_heifer_num", "culled_heifer_num",
                                              "culled_cow_num", "GnRH_injection_num_h", "GnRH_injection_num",
@@ -324,6 +339,7 @@ class LifeCycleManager:
         life_cycle_daily_herd_update["avg_age_for_calving"] = self.avg_age_for_calving
         life_cycle_daily_herd_update["cull_reason_stats"] = self.cull_reason_stats
         life_cycle_daily_herd_update["avg_calving_to_preg_time"] = self.avg_calving_to_preg_time
+        life_cycle_daily_herd_update["sim_day"] = sim_day
 
         om.add_variable("life_cycle_daily_herd_update", life_cycle_daily_herd_update, info_map)
 
