@@ -45,7 +45,7 @@ MATPLOTLIB_PLOT_FUNCTIONS: Dict[str, function_type] = {
     "quiver_key": plt.quiverkey,
     "scatter": plt.scatter,
     "spy": plt.spy,
-    "stacked_area": plt.stackplot,
+    "stackplot": plt.stackplot,
     "step": plt.step,
     "stem": plt.stem,
     "streamplot": plt.streamplot,
@@ -166,10 +166,16 @@ class GraphGenerator:
         for key in data.keys():
             values: List[Any] = data[key]["values"]
             if isinstance(values[0], dict):
-                if isinstance(variables, list):
+                if variables is not None:
                     data_dict = Utility.convert_list_of_dicts_to_dict_of_lists(values)
-                    for variable in variables:
-                        plot_function(data_dict[variable])
+                    if graph_type == "stackplot":
+                        values_tuple = tuple(
+                            data_dict[variable] for variable in variables
+                        )
+                        plot_function(list(range(len(values_tuple[0]))), values_tuple)
+                    else:
+                        for variable in variables:
+                            plot_function(data_dict[variable])
                 else:
                     raise TypeError(
                         "Can't plot dictionary, use 'variables' arg to select items from data"
