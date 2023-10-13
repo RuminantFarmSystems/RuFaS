@@ -779,6 +779,9 @@ class OutputManager(object):
                 keys = variable_data[parsable_dict][0].keys()
                 if format_option == "inline":
                     var_list.append(f"{name}.{parsable_dict}: {list(keys)}{os.linesep}")
+                if format_option == "match":
+                    for key in keys:
+                        var_list.append(f"{name}.{key}{os.linesep}")
                 else:
                     for key in keys:
                         var_list.append(f"{prefix}.{parsable_dict}: {key}{os.linesep}")

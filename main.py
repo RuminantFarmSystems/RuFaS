@@ -140,7 +140,7 @@ def parse_gnu_args():
     parser.add_argument(
         "-f",
         "--format-option",
-        choices=['block', 'inline', 'verbose'],
+        choices=['block', 'inline', 'verbose', 'match'],
         help="Select formatting option for variable_names.txt file",
     )
     parser.add_argument(
