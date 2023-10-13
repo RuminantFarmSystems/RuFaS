@@ -11,7 +11,6 @@ from typing import Any, Dict
 from unittest.mock import patch
 from mock import MagicMock
 from pytest_mock import MockerFixture
-from unittest.mock import PropertyMock
 
 from RUFAS.routines.animal.life_cycle.cow import Cow
 # from RUFAS.routines.animal.life_cycle.heiferI import HeiferI
