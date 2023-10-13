@@ -1,3 +1,4 @@
+from freezegun import freeze_time
 from typing import Dict
 from unittest.mock import patch
 import pytest
@@ -70,4 +71,47 @@ def test_generate_graph_path_exception(graph_generator: GraphGenerator) -> None:
         with pytest.raises(Exception, match="test"):
             graph_generator._generate_graph_path(
                 save_path, graph_details, filter_file_name, graphics_dir
+            )
+
+
+def test_generate_graph_path_with_title(graph_generator: GraphGenerator) -> None:
+    graph_details: Dict[str, str] = {
+        "title": "Test Graph",
+        "x_label": "X Axis",
+        "y_label": "Y Axis",
+    }
+    filter_file_name: str = "test_filter.png"
+    save_path: str = "/path/to/save"
+    graphics_dir: str = "graphics"
+
+    with freeze_time("2023-10-13 11:41:23"):
+        with patch("pathlib.Path.mkdir") as mock_mkdir:
+            result = graph_generator._generate_graph_path(
+                save_path, graph_details, filter_file_name, graphics_dir
+            )
+            mock_mkdir.assert_called_once()
+            assert (
+                result
+                == "/path/to/save\\graphics\\test-graph-13-Oct-2023_Fri_11-41-23.png"
+            )
+
+
+def test_generate_graph_path_no_title(graph_generator: GraphGenerator) -> None:
+    graph_details: Dict[str, str] = {
+        "x_label": "X Axis",
+        "y_label": "Y Axis",
+    }
+    filter_file_name: str = "test_filter.png"
+    save_path: str = "/path/to/save"
+    graphics_dir: str = "graphics"
+
+    with freeze_time("2023-10-13 11:41:23"):
+        with patch("pathlib.Path.mkdir") as mock_mkdir:
+            result = graph_generator._generate_graph_path(
+                save_path, graph_details, filter_file_name, graphics_dir
+            )
+            mock_mkdir.assert_called_once()
+            assert (
+                result
+                == "/path/to/save\\graphics\\saved_graph_test_filter.png-13-Oct-2023_Fri_11-41-23.png"
             )
