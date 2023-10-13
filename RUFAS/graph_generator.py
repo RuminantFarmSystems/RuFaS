@@ -128,6 +128,7 @@ class GraphGenerator:
         Exception
             Generic exception raised by utility functions.
         """
+        print(f"{graphics_dir=}")
         try:
             fig, _ = plt.subplots()
             self._draw_graph(graph_details["type"], filtered_pool)

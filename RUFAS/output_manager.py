@@ -625,6 +625,9 @@ class OutputManager(object):
 
         produce_graphics: bool, optional
             Flag for whether or not the user wants to produce graphs at after the simulation.
+
+        graphics_dir : str, optional
+            The directory for saving graphics, by default an empty string.
         """
         info_map = {
             "class": self.__class__.__name__,
