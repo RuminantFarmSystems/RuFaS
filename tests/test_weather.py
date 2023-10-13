@@ -4,11 +4,11 @@ from unittest.mock import patch, MagicMock
 from RUFAS.classes import Weather, Config
 from RUFAS.output_manager import OutputManager
 
-
-@pytest.fixture
-def mock_output_manager() -> OutputManager:
-    output_manager = OutputManager()
-    return output_manager
+#
+# @pytest.fixture
+# def mock_output_manager() -> OutputManager:
+#     output_manager = OutputManager()
+#     return output_manager
 
 
 @pytest.fixture
@@ -24,6 +24,18 @@ def mock_weather_input() -> dict:
         "irrigation": [0.0] * 5,
     }
     return weather_data
+
+#
+# @pytest.fixture
+# def mock_weather() -> Weather:
+#     mock_weather = MagicMock(Weather)
+#     setattr(mock_weather, "rainfall", [[1, 2, 3], [4, 5, 6], [7, 8, 9]])
+#     setattr(mock_weather, "T_max", [[1, 2, 3], [4, 5, 6], [7, 8, 9]])
+#     setattr(mock_weather, "T_min", [[1, 2, 3], [4, 5, 6], [7, 8, 9]])
+#     setattr(mock_weather, "T_avg", [[1, 2, 3], [4, 5, 6], [7, 8, 9]])
+#     setattr(mock_weather, "radiation", [[1, 2, 3], [4, 5, 6], [7, 8, 9]])
+#     setattr(mock_weather, "irrigation", [[1, 2, 3], [4, 5, 6], [7, 8, 9]])
+#     return mock_weather
 
 
 @pytest.fixture
@@ -41,14 +53,22 @@ def mock_config() -> Config:
     return mock_config
 
 
-def test_annual_average_temperature_recording(mock_output_manager: OutputManager, mock_weather_input: dict,
+def test_annual_average_temperature_recording(mock_weather_input: dict,
                                               mock_config: Config) -> None:
     """Tests that the annual average temperature is recorded correctly to the OutputManager when Weather is created."""
     with patch("RUFAS.classes.Weather._calculate_average_annual_temperature") as avg, \
-            patch("RUFAS.output_manager.OutputManager.add_variable") as record:
+            patch("RUFAS.output_manager.OutputManager.add_variable") as add:
         Weather(mock_weather_input, mock_config)
         avg.assert_called_once()
-        record.assert_called_once()
+        add.assert_called_once()
+
+
+def test_record_weather(mock_weather_input: dict, mock_config: Config) -> None:
+    """Tests that weather conditions are correctly recorded to the OutputManager."""
+    weather = Weather(mock_weather_input, mock_config)
+    with patch("RUFAS.output_manager.OutputManager.add_variable") as add_var:
+        weather.record_weather(1, 1)
+        assert add_var.call_count == 6
 
 
 @pytest.mark.parametrize("avg_daily_temperatures,expected", [
