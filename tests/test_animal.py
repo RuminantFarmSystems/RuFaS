@@ -198,25 +198,143 @@ def test_set_requirements(mocker: MockerFixture):
     test_obj.use_existing_requirements.assert_called_once()
 
 
-def test_recalculate_requirements():
-    with patch(
-        "RUFAS.routines.animal.ration.animal_requirements.AnimalRequirements.calc_rqmts", new_callable=PropertyMock
-    ) as mock_foo:
-        mock_foo.return_value = {
-            "NEmaint_requirement": 1,
-            "NEg_requirement": 2,
-            "NEpreg_requirement": 3,
-            "NEl_requirement": 4,
-            "MP_requirement": 5,
-            "Ca_requirement": 6,
-            "P_requirement": 7,
-            "DMIest_requirement": 8,
-        }
-    pass
+def test_recalculate_requirements() -> None:
+    pen_mock = MagicMock()
+    pen_mock.animals_in_pen = [MagicMock(), MagicMock(), MagicMock(), MagicMock(), MagicMock()]
+    for i in range(0, 5):
+        pen_mock.animals_in_pen[i].NEmaint_requirement = i
+        pen_mock.animals_in_pen[i].NEg_requirement = i
+        pen_mock.animals_in_pen[i].NEpreg_requirement = i
+        pen_mock.animals_in_pen[i].NEl_requirement = i
+        pen_mock.animals_in_pen[i].MP_requirement = i
+        pen_mock.animals_in_pen[i].Ca_requirement = i
+        pen_mock.animals_in_pen[i].P_requirement = i
+        pen_mock.animals_in_pen[i].DMIest_requirement = i
+        pen_mock.animals_in_pen[i].body_weight = i
+        pen_mock.animals_in_pen[i].estimated_daily_milk_produced = i
+        pen_mock.animals_in_pen[i].milk_production_reduction = i
+        pen_mock.animals_in_pen[i].CP_milk = i
+        pen_mock.animals_in_list[i].calc_daily_walking_dist = MagicMock()
+
+    animal_grouping_scenario_mock = MagicMock()
+    animal_grouping_scenario_mock.get_animal_type = MagicMock(side_effect=[AnimalType.HEIFER_I,
+                                                                           AnimalType.HEIFER_II,
+                                                                           AnimalType.HEIFER_III,
+                                                                           AnimalType.DRY_COW,
+                                                                           AnimalType.LAC_COW])
+
+    requirements_lists_empty = {'NEmaint_requirement': [],
+                                'NEa_requirement': [],
+                                'NEg_requirement': [],
+                                'NEpreg_requirement': [],
+                                'NEl_requirement': [],
+                                'MP_requirement': [],
+                                'Ca_requirement': [],
+                                'P_requirement': [],
+                                'DMIest_requirement': [],
+                                'BW': [],
+                                'milk': [],
+                                'milk_production_reduction': [],
+                                'CP_milk': []
+                                }
+    requirements_list_expected = {'NEmaint_requirement': [1, 1, 1, 1, 1],
+                                  'NEa_requirement': [0, 0, 0, 0, 100],
+                                  'NEg_requirement': [1, 1, 1, 1, 1],
+                                  'NEpreg_requirement': [1, 1, 1, 1, 1],
+                                  'NEl_requirement': [1, 1, 1, 1, 1],
+                                  'MP_requirement': [1, 1, 1, 1, 1],
+                                  'Ca_requirement': [1, 1, 1, 1, 1],
+                                  'P_requirement': [1, 1, 1, 1, 1],
+                                  'DMIest_requirement': [1, 1, 1, 1, 1],
+                                  'BW': [0, 1, 2, 3, 4],
+                                  'milk': [4],
+                                  'milk_production_reduction': [4],
+                                  'CP_milk': [4]
+                                  }
+
+    requirements_mock = AnimalRequirements()
+    requirements_mock.energy_activity_rqmts = MagicMock(return_value=100)
+    requirements_mock.calc_rqmts = MagicMock(return_value={'NEmaint_requirement': 1,
+                                                           'NEa_requirement': 1,
+                                                           'NEg_requirement': 1,
+                                                           'NEpreg_requirement': 1,
+                                                           'NEl_requirement': 1,
+                                                           'MP_requirement': 1,
+                                                           'Ca_requirement': 1,
+                                                           'P_requirement': 1,
+                                                           'DMIest_requirement': 1, })
+
+    requirements_lists_actual = requirements_mock.recalculate_requirements(pen_mock,
+                                                                           animal_grouping_scenario_mock,
+                                                                           requirements_lists_empty)
+
+    # Assertions
+    requirements_mock.energy_activity_rqmts.assert_called_once()
+    assert requirements_list_expected == requirements_lists_actual
+    assert pen_mock.animals_in_pen[-1].DNED_requirement == 2
+    assert pen_mock.animals_in_pen[-1].DMDP_requirement == 1
 
 
-def test_use_existing_requirements():
-    pass
+def test_use_existing_requirements() -> None:
+    pen_mock = MagicMock()
+    pen_mock.animals_in_pen = [MagicMock(), MagicMock()]
+    for i in range(0, 2):
+        pen_mock.animals_in_pen[i].NEmaint_requirement = i
+        pen_mock.animals_in_pen[i].NEg_requirement = i
+        pen_mock.animals_in_pen[i].NEpreg_requirement = i
+        pen_mock.animals_in_pen[i].NEl_requirement = i
+        pen_mock.animals_in_pen[i].MP_requirement = i
+        pen_mock.animals_in_pen[i].Ca_requirement = i
+        pen_mock.animals_in_pen[i].P_requirement = i
+        pen_mock.animals_in_pen[i].DMIest_requirement = i
+        pen_mock.animals_in_pen[i].body_weight = i
+        pen_mock.animals_in_pen[i].estimated_daily_milk_produced = i
+        pen_mock.animals_in_pen[i].milk_production_reduction = i
+        pen_mock.animals_in_pen[i].CP_milk = i
+        pen_mock.animals_in_list[i].calc_daily_walking_dist = MagicMock()
+
+    animal_grouping_scenario_mock = MagicMock()
+    animal_grouping_scenario_mock.get_animal_type = MagicMock(side_effect=[AnimalType.HEIFER_I, AnimalType.LAC_COW])
+
+    requirements_lists_empty = {'NEmaint_requirement': [],
+                                'NEa_requirement': [],
+                                'NEg_requirement': [],
+                                'NEpreg_requirement': [],
+                                'NEl_requirement': [],
+                                'MP_requirement': [],
+                                'Ca_requirement': [],
+                                'P_requirement': [],
+                                'DMIest_requirement': [],
+                                'BW': [],
+                                'milk': [],
+                                'milk_production_reduction': [],
+                                'CP_milk': []
+                                }
+    requirements_list_expected = {'NEmaint_requirement': [0, 1],
+                                  'NEa_requirement': [0, 1],
+                                  'NEg_requirement': [0, 1],
+                                  'NEpreg_requirement': [0, 1],
+                                  'NEl_requirement': [0, 1],
+                                  'MP_requirement': [0, 1],
+                                  'Ca_requirement': [0, 1],
+                                  'P_requirement': [0, 1],
+                                  'DMIest_requirement': [0, 1],
+                                  'BW': [0, 1],
+                                  'milk': [1],
+                                  'milk_production_reduction': [1],
+                                  'CP_milk': [1]
+                                  }
+
+    requirements_mock = AnimalRequirements()
+    requirements_mock.energy_activity_rqmts = MagicMock(return_value=i)
+
+    requirements_lists_actual = requirements_mock.use_existing_requirements(pen_mock, animal_grouping_scenario_mock,
+                                                                            requirements_lists_empty)
+
+    # Assertions
+    requirements_mock.energy_activity_rqmts.assert_called_once()
+    assert requirements_list_expected == requirements_lists_actual
+    # pen_mock.animals_in_list[1].calc_daily_walking_dist.assert_called_once()
 
 
 def test_calculate_NRC_energy_maintenance_requirements(
