@@ -181,7 +181,7 @@ def parse_gnu_args() -> argparse.Namespace:
 if __name__ == "__main__":
     cmd_arguments = parse_gnu_args()
     run_rufas(
-        make_graphs=not cmd_arguments.no_graphics,
+        produce_graphics=not cmd_arguments.no_graphics,
         verbose=cmd_arguments.verbose,
         clear_output=cmd_arguments.clear_output,
         exclude_info_maps=cmd_arguments.exclude_info_maps,
