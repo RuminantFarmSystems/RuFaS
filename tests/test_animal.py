@@ -285,6 +285,29 @@ def decision_vector_sum_zero() -> np.ndarray:
     return np.array([1.0, 2.0, 3.0, -3.0, -2.0 - 1.0])
 
 
+@pytest.fixture
+def mock_available_feeds() -> dict:
+    available_feeds = dict()
+    available_feeds['price'] = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0]
+    available_feeds['TDN'] = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0]
+    available_feeds['DE'] = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0]
+    available_feeds['EE'] = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0]
+    available_feeds['is_fat'] = [1, 1, 1, 0, 0, 0]
+    available_feeds['calcium'] = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0]
+    available_feeds['phosphorus'] = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0]
+    available_feeds['NDF'] = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0]
+    available_feeds['type'] = ['Forage', 'Conc', 'Mineral', 'Forage', 'Conc', 'Mineral']
+    available_feeds['is_wetforage'] = [1, 1, 1, 0, 0, 0]
+    available_feeds['Kd'] = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0]
+    available_feeds['N_A'] = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0]
+    available_feeds['N_B'] = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0]
+    available_feeds['CP'] = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0]
+    available_feeds['dRUP'] = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0]
+    available_feeds['lactating_cow_limit'] = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0]
+
+    return available_feeds
+
+
 def test_calculate_NRC_energy_maintenance_requirements(
         cow_a: dict, cow_b: dict, heifer_a: dict, heifer_b: dict
 ) -> None:
@@ -1934,11 +1957,10 @@ def test_total_energy(ration_config, expected, decision_vector) -> None:
     assert actual == pytest.approx(expected)
 
 
-def test_attempt_optimization(mocker: MockerFixture, mock_ration_config: MagicMock) -> None:
+def test_attempt_optimization(mocker: MockerFixture, mock_ration_config: MagicMock, mock_available_feeds: dict) -> None:
     """Unit test for function attempt_optimization in file routines/animal/ration/ration_optimizer.py"""
 
-    def mock_triple_values_in_list(x):
-        return x
+    def mock_triple_values_in_list(x): return x
 
     mock_RationConfig = mocker.patch("RUFAS.routines.animal.ration.ration_optimizer.RationConfig")
     mock_optimize = mocker.patch("RUFAS.routines.animal.ration.ration_optimizer.RationOptimizer.optimize")
@@ -1948,24 +1970,6 @@ def test_attempt_optimization(mocker: MockerFixture, mock_ration_config: MagicMo
 
     ration_optimizer = RationOptimizer()
     requirements = MagicMock()
-    available_feeds = dict()
-
-    available_feeds['price'] = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0]
-    available_feeds['TDN'] = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0]
-    available_feeds['DE'] = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0]
-    available_feeds['EE'] = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0]
-    available_feeds['is_fat'] = [1, 1, 1, 0, 0, 0]
-    available_feeds['calcium'] = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0]
-    available_feeds['phosphorus'] = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0]
-    available_feeds['NDF'] = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0]
-    available_feeds['type'] = ['Forage', 'Conc', 'Mineral', 'Forage', 'Conc', 'Mineral']
-    available_feeds['is_wetforage'] = [1, 1, 1, 0, 0, 0]
-    available_feeds['Kd'] = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0]
-    available_feeds['N_A'] = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0]
-    available_feeds['N_B'] = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0]
-    available_feeds['CP'] = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0]
-    available_feeds['dRUP'] = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0]
-    available_feeds['lactating_cow_limit'] = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0]
 
     requirements.NEmaint_requirement = 1.0
     requirements.NEa_requirement = 2.0
@@ -1980,24 +1984,26 @@ def test_attempt_optimization(mocker: MockerFixture, mock_ration_config: MagicMo
 
     animal_combination = 'AnimalCombination.LAC_COW'
 
-    ration_optimizer.attempt_optimization(requirements, available_feeds, animal_combination)
+    ration_optimizer.attempt_optimization(requirements, mock_available_feeds, animal_combination)
 
     mock_RationConfig.assert_called_once_with(
-        available_feeds['price'], requirements.NEmaint_requirement, requirements.NEa_requirement,
+        mock_available_feeds['price'], requirements.NEmaint_requirement, requirements.NEa_requirement,
         requirements.NEpreg_requirement,
         requirements.NEl_requirement, requirements.NEg_requirement, requirements.MP_requirement,
         requirements.Ca_requirement, requirements.P_requirement,
-        available_feeds['TDN'], available_feeds['DE'], available_feeds['EE'], available_feeds['is_fat'],
+        mock_available_feeds['TDN'], mock_available_feeds['DE'], mock_available_feeds['EE'],
+        mock_available_feeds['is_fat'],
         requirements.avg_BW,
-        available_feeds['calcium'], available_feeds['phosphorus'], available_feeds['NDF'],
-        available_feeds['type'], available_feeds['is_wetforage'], available_feeds['Kd'], available_feeds['N_A'],
-        available_feeds['N_B'], available_feeds['CP'], available_feeds['dRUP'],
-        available_feeds['lactating_cow_limit'],
+        mock_available_feeds['calcium'], mock_available_feeds['phosphorus'], mock_available_feeds['NDF'],
+        mock_available_feeds['type'], mock_available_feeds['is_wetforage'], mock_available_feeds['Kd'],
+        mock_available_feeds['N_A'],
+        mock_available_feeds['N_B'], mock_available_feeds['CP'], mock_available_feeds['dRUP'],
+        mock_available_feeds['lactating_cow_limit'],
         True,
         DMIest__requirement=requirements.DMIest_requirement
     )
 
-    ration_optimizer.optimize.assert_called_once_with(animal_combination, available_feeds,
+    ration_optimizer.optimize.assert_called_once_with(animal_combination, mock_available_feeds,
                                                       mock_RationConfig.return_value)
 
     ration_optimizer.get_ration_vals.assert_called_once_with(mock_optimize.return_value.x,
@@ -2184,46 +2190,30 @@ def test_DMI_constraint_upper(ration_config, expected, decision_vector) -> None:
     assert actual == pytest.approx(expected)
 
 
-def test_ration_optimizer_optimize(mocker: MockerFixture, mock_ration_config: MagicMock) -> None:
+def test_ration_optimizer_optimize(mocker: MockerFixture, mock_ration_config: MagicMock,
+                                   mock_available_feeds: dict) -> None:
     """Unit test for function optimize in file routines/animal/ration/ration_optimizer.py"""
 
-    # set seed for scipy optimize
-    numpy_randomGen = np.Generator(PCG64(seed))
-    scipy_randomGen.random_state = numpy_randomGen
+    bounds = [(0, 1), (0, 2), (0, 3), (0, 4), (0, 5), (0, 6)]
 
     mocker.patch("RUFAS.routines.animal.ration.ration_optimizer.RationOptimizer.set_constraints")
     mocker.patch("RUFAS.routines.animal.ration.ration_optimizer.RationOptimizer.make_user_bounds",
-                 return_value=[(0, 1), (0, 2), (0, 3), (0, 4), (0, 5), (0, 6)])
+                 return_value=bounds)
     mock_ration_to_use = mocker.patch(
         "RUFAS.routines.animal.ration.user_defined_ration.UserDefinedRationManager.ration_to_use")
-    # mock_minimize = mocker.patch("RUFAS.routines.animal.ration.ration_optimizer.minimize")
-    # mocker.patch("RUFAS.routines.animal.ration.ration_optimizer.RationOptimizer.get_ration_vals")
-    # mocker.patch("RUFAS.routines.animal.ration.ration_optimizer.RationOptimizer.triple_values_in_list",
-    #              side_effect=mock_triple_values_in_list)
+    mock_minimize = mocker.patch("RUFAS.routines.animal.ration.ration_optimizer.minimize")
+    mocker.patch("RUFAS.routines.animal.ration.ration_optimizer.random.random", return_value=0.1)
 
     ration_optimizer = RationOptimizer()
 
-    ration_optimizer.objective = lambda x, ration_config: sum(x) / 100000
-    ration_optimizer.cow_cons = []
-    ration_optimizer.heifer_cons = []
+    def objective(x, _): sum(x)
 
-    available_feeds = dict()
-    available_feeds['price'] = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0]
-    available_feeds['TDN'] = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0]
-    available_feeds['DE'] = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0]
-    available_feeds['EE'] = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0]
-    available_feeds['is_fat'] = [1, 1, 1, 0, 0, 0]
-    available_feeds['calcium'] = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0]
-    available_feeds['phosphorus'] = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0]
-    available_feeds['NDF'] = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0]
-    available_feeds['type'] = ['Forage', 'Conc', 'Mineral', 'Forage', 'Conc', 'Mineral']
-    available_feeds['is_wetforage'] = [1, 1, 1, 0, 0, 0]
-    available_feeds['Kd'] = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0]
-    available_feeds['N_A'] = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0]
-    available_feeds['N_B'] = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0]
-    available_feeds['CP'] = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0]
-    available_feeds['dRUP'] = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0]
-    available_feeds['lactating_cow_limit'] = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0]
+    cow_cons = MagicMock(name="cow_cons")
+    heifer_cons = MagicMock(name="heifer_cons")
+
+    ration_optimizer.objective = objective
+    ration_optimizer.cow_cons = cow_cons
+    ration_optimizer.heifer_cons = heifer_cons
 
     # test when udr_or_not is True
 
@@ -2231,36 +2221,41 @@ def test_ration_optimizer_optimize(mocker: MockerFixture, mock_ration_config: Ma
                  MagicMock(udr_or_not=True))
     animal_combination = 'AnimalCombination.LAC_COW'
 
-    actual = ration_optimizer.optimize(animal_combination, available_feeds, mock_ration_config).x
-
-    expected = np.array([0.5, 1, 1.5, 2.0, 2.5, 3.0])
-
-    assert (actual == expected).all()
+    assert ration_optimizer.optimize(animal_combination, mock_available_feeds,
+                                     mock_ration_config) == mock_minimize.return_value
 
     ration_optimizer.set_constraints.assert_called_once_with(arguments=(mock_ration_config,))
 
-    mock_ration_to_use.assert_called_once_with(animal_combination, available_feeds)
+    mock_ration_to_use.assert_called_once_with(animal_combination, mock_available_feeds)
 
     ration_optimizer.make_user_bounds.assert_called_once_with(mock_ration_to_use.return_value,
                                                               mock_ration_config.DMIest_requirement)
 
+    mock_minimize.assert_called_once_with(objective, [0.5, 1.0, 1.5, 2.0, 2.5, 3.0], method='SLSQP',
+                                          bounds=[(0, 1), (0, 2), (0, 3), (0, 4), (0, 5), (0, 6)],
+                                          constraints=cow_cons, args=(mock_ration_config,))
+
     # test when udr_or_not is False
+
+    ration_optimizer.set_constraints.reset_mock()
+    mock_minimize.reset_mock()
 
     mocker.patch("RUFAS.routines.animal.ration.ration_optimizer.udrm",
                  MagicMock(udr_or_not=False))
 
-    actual = ration_optimizer.optimize(animal_combination, available_feeds, mock_ration_config).x.tolist()
+    assert ration_optimizer.optimize(animal_combination, mock_available_feeds,
+                                     mock_ration_config) == mock_minimize.return_value
 
-    expected = pytest.approx([0.33343333, 0.66676667, 1.0001, 1.33343333, 1.66676667, 2.0001])
+    ration_optimizer.set_constraints.assert_called_once_with(arguments=(mock_ration_config,))
 
-    assert actual == expected
-
-    # ration_optimizer.set_constraints.assert_called_once_with(arguments=(mock_ration_config,))
-    # 
-    # mock_ration_to_use.assert_called_once_with(animal_combination, available_feeds)
-    # 
-    # ration_optimizer.make_user_bounds.assert_called_once_with(mock_ration_to_use.return_value,
-    #                                                           mock_ration_config.DMIest_requirement)
+    mock_minimize.assert_called_once_with(objective, [1, 1, 1, 1, 1, 1], method='SLSQP',
+                                          bounds=[(0, 0.3334333333333333),
+                                                  (0, 0.6667666666666666),
+                                                  (0, 1.0001),
+                                                  (0, 1.3334333333333332),
+                                                  (0, 1.6667666666666667),
+                                                  (0, 2.0001)],
+                                          constraints=cow_cons, args=(mock_ration_config,))
 
 
 def test_calc_rqmts():

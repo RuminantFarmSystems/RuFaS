@@ -39,7 +39,6 @@ class RationOptimizer:
     Unmet requirements are checked here to report to users
 
     """
-
     def __init__(self):
         """initializes RationOptimizer object"""
         self.cow_cons = []
@@ -121,7 +120,7 @@ class RationOptimizer:
         """
         return sum(np.multiply(x, ration_config.price_list))
 
-    def total_energy(self, x: np.ndarray, ration_config: RationConfig) -> float:  # noqa
+    def total_energy(self, x: np.ndarray, ration_config: RationConfig) -> float: # noqa
         """
         Sets up the RHS multipliers for the sum of the lactation, pregnancy, maintenance, and activity requirements
         satisfied by the feed. Each equation has a reference to the respective
@@ -227,10 +226,10 @@ class RationOptimizer:
         NEg_constraint = sum(np.multiply(x, ration_config.NEgact_list))
 
         all_req = ration_config.NEl_requirement + ration_config.NEg_requirement + ration_config.NEmaint_requirement + \
-                  ration_config.NEa_requirement + ration_config.NEpreg_requirement
+            ration_config.NEa_requirement + ration_config.NEpreg_requirement
         return max(NEm_act_constraint, NEl_constraint, NEg_constraint) - all_req
 
-    def NEmact_constraint(self, x: np.ndarray, ration_config: RationConfig) -> float:  # noqa
+    def NEmact_constraint(self, x: np.ndarray, ration_config: RationConfig) -> float: # noqa
         """
         Sets up the RHS multipliers for the maintenance and activity requirements
         satisfied by the feed. Each equation has a reference to the respective
@@ -338,8 +337,7 @@ class RationOptimizer:
                     ration_config.NElact_list.append(0.8 * ration_config.DEact_list[i])
                 elif ration_config.EE_list[i] >= 3:
                     ration_config.NElact_list.append(0.703 * ration_config.MEact_list[i] - 0.19 + ((0.097 *
-                                                                                                    ration_config.MEact_list[
-                                                                                                        i] + 0.19) / 97) *
+                                                     ration_config.MEact_list[i] + 0.19) / 97) *
                                                      (ration_config.EE_list[i] - 3))
                 else:
                     ration_config.NElact_list.append(0.703 * ration_config.MEact_list[i] - 0.19)
@@ -451,7 +449,7 @@ class RationOptimizer:
         return sum(np.multiply(x, np.multiply(np.multiply(ration_config.phosphorus_list, 0.01),
                                               ration_config.dP_list))) - ((ration_config.P_requirement) / 1000)
 
-    def protein_constraint(self, x: np.ndarray, ration_config: RationConfig) -> float:  # noqa
+    def protein_constraint(self, x: np.ndarray, ration_config: RationConfig) -> float: # noqa
         """
         Sets up the protein requirement constraint in the NLP. Because part of the
         maintenance requirement for protein contains non-linearity properties, that
@@ -640,7 +638,7 @@ class RationOptimizer:
         float
 
         """
-        return (sum(x)) - (ration_config.DMIest_requirement * (1 - AnimalModuleConstants.DMI_CONSTRAINT_PERCENT))
+        return (sum(x)) - (ration_config.DMIest_requirement*(1-AnimalModuleConstants.DMI_CONSTRAINT_PERCENT))
 
     def DMI_constraint_upper(self, x: np.ndarray, ration_config: RationConfig) -> float:
         """
@@ -659,7 +657,7 @@ class RationOptimizer:
         float
 
         """
-        return -(sum(x)) + (ration_config.DMIest_requirement * (1 + AnimalModuleConstants.DMI_CONSTRAINT_PERCENT))
+        return -(sum(x)) + (ration_config.DMIest_requirement*(1+AnimalModuleConstants.DMI_CONSTRAINT_PERCENT))
 
     def get_ration_vals(self, x: np.ndarray, ration_config: RationConfig) -> Dict:
         """
@@ -708,10 +706,10 @@ class RationOptimizer:
         ration_key_list = sorted([int(key) for key in ration_percents.keys()])
         for key in ration_key_list:
             target_lower = ration_percents[str(key)] / \
-                           100 * (1 - udr_tolerance) * (DMIest * 1.1 + 0.0001)
+                100 * (1 - udr_tolerance) * (DMIest * 1.1 + 0.0001)
             target_upper = ration_percents[str(key)] / \
-                           100 * (1 + udr_tolerance) * (DMIest * 1.1 + 0.0001)
-            targetbounds = (max(0.0, (target_lower) / 3), (target_upper) / 3)
+                100 * (1 + udr_tolerance) * (DMIest * 1.1 + 0.0001)
+            targetbounds = (max(0.0, (target_lower)/3), (target_upper)/3)
             tribounds.append(targetbounds)
             tribounds.append(targetbounds)
             tribounds.append(targetbounds)
@@ -741,14 +739,13 @@ class RationOptimizer:
         self.set_constraints(arguments=arguments)
         n = len(ration_config.price_list)
         x0 = [1]
-        for i in range(n - 1):
+        for i in range(n-1):
             x0.append(random.random() * 10)
         # Dividing limit by 3 for tri-decision variables for farm grown feeds
         if udrm.udr_or_not:
             bnds = self.make_user_bounds(UserDefinedRationManager.ration_to_use(animal_combination, available_feeds),
                                          ration_config.DMIest_requirement)
             x0 = [np.mean(bnd) for bnd in bnds]
-            # return x0
         else:
             bnds = []
             bnds = [(0, (lim / 3) + 0.0001) for lim in ration_config.feed_limit_list]
@@ -762,16 +759,6 @@ class RationOptimizer:
             return usermod
         # TODO: Put AnimalCombination enum in a separate file and import it here to avoid circular import
         elif str(animal_combination) in ['AnimalCombination.LAC_COW']:
-            # print("______________________")
-            # print("X0", x0)
-            # print()
-            # print("BNDS", bnds)
-            # print()
-            # print("COW CONS", self.cow_cons)
-            # print()
-            # print("ARGS", arguments)
-            # print("_______________________")
-
             return minimize(self.objective, x0, method='SLSQP', bounds=bnds,
                             constraints=self.cow_cons, args=arguments)
         elif str(animal_combination) in ['AnimalCombination.GROWING', 'AnimalCombination.CLOSE_UP',
@@ -832,7 +819,7 @@ class RationOptimizer:
         while i < 1:
             try:
                 solution = self.optimize(animal_combination, available_feeds, ration_config)
-            except Exception as e:  # noqa
+            except Exception as e: # noqa
                 i -= 1
                 info_map = {"class": "RationOptimizer", "function": self.attempt_optimization.__name__, }
                 om.add_error('SLSQP error', 'whoops', info_map)
