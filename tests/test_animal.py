@@ -2429,6 +2429,7 @@ def test_calc_pen_requirements():
         [1, 2, 3],
         [1, 2, 3],
         [1, 2, 3],
+        "mean"
     )
     attributelist = [
         "NEmaint_requirement",
@@ -2447,6 +2448,24 @@ def test_calc_pen_requirements():
     ]
     for attribute in attributelist:
         assert getattr(req, attribute) == 2
+    req.calc_pen_requirements(
+        [1, 2, 3],
+        [1, 2, 3],
+        [1, 2, 3],
+        [1, 2, 3],
+        [1, 2, 3],
+        [1, 2, 3],
+        [1, 2, 3],
+        [1, 2, 3],
+        [1, 2, 3],
+        [1, 2, 3],
+        [1, 2, 3],
+        [1, 2, 3],
+        [1, 2, 3],
+        "percentile"
+    )
+    for attribute in attributelist:
+        assert getattr(req, attribute) == 2.8
 
 
 def test_feed_nutrients():

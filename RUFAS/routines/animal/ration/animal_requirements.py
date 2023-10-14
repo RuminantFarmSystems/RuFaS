@@ -103,6 +103,7 @@ class AnimalRequirements:
         milk: List[float],
         CP_milk: List[float],
         milk_production_reduction: List[float],
+        calc_method: str = "mean"
     ) -> None:
         """
         This functions sets the average (or #th percentile) pen requirements. Each input parameter is a list of floats
@@ -137,8 +138,6 @@ class AnimalRequirements:
         milk_production_reduction: List[float]
             list of milk_production_reduction values for all animals in the pen (kg)
         """
-        # in future will be set in the argument, here hardcoded to show the rough logic and keep using the mean
-        calc_method = "mean"
         if calc_method == "mean":
             # populating the class variables as an average across cows for each requirement
             self.NEmaint_requirement = np.mean(NEmaint_requirement_list)
@@ -219,7 +218,8 @@ class AnimalRequirements:
                                    requirements_lists['BW'],
                                    requirements_lists['milk'],
                                    requirements_lists['CP_milk'],
-                                   requirements_lists['milk_production_reduction']
+                                   requirements_lists['milk_production_reduction'],
+                                   "mean"
                                    )
 
         avg_nutrient_rqmts = {
@@ -551,14 +551,7 @@ class AnimalRequirements:
                 parity,
             )
         else:
-            energy_and_nutrient_calculation_method_error = f"energy and nutrient calculation method \
-                {AnimalBase.config['energy_and_nutrient_calculation_method']}\
-                not supported"
-            info_map = {"function": self.calc_rqmts}
-            om.add_error(
-                "energy_and_nutrient_calculation_method_error", energy_and_nutrient_calculation_method_error, info_map
-            )
-        # Requirements summary dictionary
+            pass
         return {
             "NEmaint_requirement": net_energy_maintenance,
             "NEg_requirement": net_energy_growth,
