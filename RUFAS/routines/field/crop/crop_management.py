@@ -60,6 +60,8 @@ class CropManagement:
 
         self._record_yield(field_name, field_size, year, day)
         self._transfer_residue(soil_data)
+        soil_data.plant_root_residue = self.data.root_biomass
+        soil_data.crop_root_depth = self.data.root_depth
 
     # TODO: implement grazing feature - issue #590
 
@@ -162,7 +164,7 @@ class CropManagement:
         if self.data.do_harvest_index_override:
             self.data.yield_nitrogen = self.data.optimal_nitrogen_fraction * self.data.yield_collected  # SWAT 5:2.4.7
             self.data.yield_phosphorus = self.data.optimal_phosphorus_fraction * \
-                self.data.yield_collected  # SWAT 5:2.4.8
+                                         self.data.yield_collected  # SWAT 5:2.4.8
         else:
             self.data.yield_nitrogen = self.data.yield_nitrogen_fraction * self.data.yield_collected  # SWAT 5:2.4.5
             self.data.yield_phosphorus = self.data.yield_phosphorus_fraction * self.data.yield_collected  # SWAT 5:2.4.6
@@ -219,6 +221,8 @@ class CropManagement:
 
         """
         soil_data.plant_surface_residue += self.data.yield_residue
+        # set soil.ratio = biomass*ligning compose/ self.data.yield_nitrogen
+        # root residue
         soil_data.soil_layers[0].fresh_organic_nitrogen_content += self.data.yield_nitrogen
         # TODO: Add organic phosphorus to correct pool in soil - GitHub issue #444
 
