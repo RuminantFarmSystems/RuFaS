@@ -4,11 +4,11 @@ display_usage() {
     echo "Usage: ./cleanup.sh [BASEBRANCH]"
     echo "Lint all files different between current branch and BASEBRANCH with Flake8."
     echo ""
-    echo "With no BASEBRANCH, compare current branch to master."
+    echo "With no BASEBRANCH, compare current branch to main."
 }
 
 if [ $# -eq 0 ]; then
-    base_branch="master"
+    base_branch="main"
 elif [ $# -gt 1 ]; then
     display_usage
     exit 1
