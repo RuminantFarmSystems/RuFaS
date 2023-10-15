@@ -68,12 +68,31 @@ class ResiduePartition:
                     layer.tillage_fraction
                 )
 
-                layer.soil_dry_matter_residue_amount = self.data.plant_surface_residue * layer.tillage_fraction
+                layer.plant_dry_matter_residue_amount = self.data.plant_surface_residue
+                # set to 0
+                # set to zero after partition
+
+                # use plant root residue amount according to depth
+                # move to outside of the condition statement, needs to be calculated even not surface layer
+                # layer.soil_dry_matter_residue_amount = self._determine_soil_dry_matter_residue_amount(
+                #     self.data.crop_root_depth,
+                #     layer.layer_thickness,
+                #     self.data.plant_root_residue
+                # )
+                # deduct
+
                 self.data.total_residue += self.data.plant_surface_residue
             else:
                 layer.structural_carbon_transfer_amount = 0
-                layer.soil_dry_matter_residue_amount = 0
+                #layer.soil_dry_matter_residue_amount = 0
                 self.data.plant_surface_residue = 0  # TODO: why is this not also done for root residue?
+
+            layer.soil_dry_matter_residue_amount = self._determine_soil_dry_matter_residue_amount(
+                self.data.crop_root_depth,
+                layer.depth_of_layer_center,
+                layer.layer_thickness,
+                self.data.plant_root_residue
+            )
 
             layer.metabolic_litter_amount = self._determine_plant_metabolic_carbon_amount(
                 layer.metabolic_litter_amount,
@@ -160,6 +179,26 @@ class ResiduePartition:
                 self.data.plant_root_residue,
                 layer.soil_structural_carbon_amount
             )
+
+    @staticmethod
+    def _determine_soil_dry_matter_residue_amount(root_depth: float, layer_center: float, layer_thickness: float,
+                                                  plant_root_residue: float):
+        """Determine the amount of dry matter residue in each layer according to the portion of root in such layer
+
+        Parameters
+        ----------
+        root_depth : float
+        layer_center
+        layer_thickness
+        plant_root_residue
+
+        Returns
+        -------
+
+        """
+
+        return 0
+
 
     @staticmethod
     def _determine_plant_residue_lignin_composition(plant_residue_lignin_composition: float,
