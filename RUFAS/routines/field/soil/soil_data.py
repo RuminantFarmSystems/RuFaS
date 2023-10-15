@@ -72,7 +72,7 @@ class SoilData:
     """Cumulative total of active organic nitrogen that was removed from the top soil layer by erosion (kg)"""
 
     # ---- evaporation
-    water_evaporated: float = 0
+    water_evaporated: float = 0.0
     """Amount of water evaporated from the soil profile on the current day (mm)"""
 
     # ---- infiltration
@@ -85,7 +85,9 @@ class SoilData:
     moisture_condition_parameter: Optional[float] = None
     """curve number value adjusted for moisture content (unitless) (SWAT 2:1.1.11)"""
     accumulated_runoff: Optional[float] = None
-    """the amount of rainfall discharged as runoff during the day (mm)"""
+    """Amount of rainfall discharged as runoff on the current day (mm)."""
+    infiltrated_water: float = 0.0
+    """Amount of water that infiltrated the soil profile on the day (mm)."""
 
     # ---- percolation
     vadose_zone_layer: Optional[LayerData] = None
