@@ -161,7 +161,15 @@ class GraphGenerator:
         selected_variables : Optional[List[str]]
             If it is present and the data is a list of dicts,
             it selects the variables to be plotted.
+
+        Raises
+        ------
+        ValueError
+            if graph_type is not found in MATPLOTLIB_PLOT_FUNCTIONS
         """
+        if graph_type not in MATPLOTLIB_PLOT_FUNCTIONS:
+            raise ValueError(f"Unsupported graph type: {graph_type}")
+
         plot_function = MATPLOTLIB_PLOT_FUNCTIONS[graph_type]
         for key in data.keys():
             values: List[Any] = data[key]["values"]
