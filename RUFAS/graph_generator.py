@@ -174,6 +174,7 @@ class GraphGenerator:
         for key in data.keys():
             values: List[Any] = data[key]["values"]
             is_data_in_dict = isinstance(values[0], dict)
+
             if is_data_in_dict:
                 if selected_variables is None:
                     raise TypeError(
