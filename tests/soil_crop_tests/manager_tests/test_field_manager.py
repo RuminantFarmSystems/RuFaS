@@ -11,9 +11,11 @@ from RUFAS.routines.field.soil.soil import Soil
 from RUFAS.routines.field.soil.soil_data import SoilData
 from RUFAS.classes.time import Time
 from RUFAS.classes.weather import Weather
+from RUFAS.classes.config import Config
 from RUFAS.routines.manure.manure_manager import ManureManager
 import pytest
-from typing import List, Dict
+from pytest_mock.plugin import MockerFixture
+from typing import List, Dict, Callable
 from unittest.mock import MagicMock, patch, call
 
 
@@ -40,29 +42,42 @@ def test_field_manager_init(field_blob_names) -> None:
             patched_field_setup.assert_not_called()
 
 
+@pytest.fixture
+def mock_weather(mocker: MockerFixture) -> Weather:
+    """Fixture for Weather object."""
+    mocker.patch("RUFAS.classes.weather.Weather.__init__", return_value=None)
+
+    mock_config = MagicMock(Config)
+
+    mock_weather = Weather({}, mock_config)
+    return mock_weather
+
+
+@pytest.fixture
+def weather_original_method_states(mock_weather: Weather) -> Dict[str, Callable]:
+    """Fixture to store unmocked methods of Weather."""
+    return {
+        "get_current_weather": mock_weather.get_current_weather
+    }
+
+
 @pytest.mark.parametrize("fields", [
     [Field(field_data=FieldData(name="field1"), manure_manager=MagicMock(ManureManager)),
      Field(field_data=FieldData(name="field2"), manure_manager=MagicMock(ManureManager)),
      Field(field_data=FieldData(name="field3"), manure_manager=MagicMock(ManureManager))],
     []
 ])
-def test_daily_update_routine(fields: List[Field]) -> None:
+def test_daily_update_routine(fields: List[Field], mock_weather: Weather,
+                              weather_original_method_states: Dict[str, Callable]) -> None:
     """Tests that the daily routines and it's methods were called and updated correctly"""
     mocked_time = MagicMock(Time)
-    mocked_weather = MagicMock(Weather)
     setattr(mocked_time, "year", 1)
     setattr(mocked_time, "calendar_year", 1998)
     setattr(mocked_time, "year", 1998)
     setattr(mocked_time, "day", 5)
-    setattr(mocked_weather, "radiation", 3)
-    setattr(mocked_weather, "T_min", 3)
-    setattr(mocked_weather, "T_avg", 3)
-    setattr(mocked_weather, "T_max", 3)
-    setattr(mocked_weather, "T_avg_annual", 3)
-    setattr(mocked_weather, "rainfall", 3)
-    setattr(mocked_weather, "irrigation", 3)
 
     mocked_manure_manager = MagicMock(ManureManager)
+    mock_weather.get_current_weather = MagicMock(return_value=MagicMock(CurrentWeather))
     with patch("RUFAS.routines.field.manager.field_manager.FieldManager._get_field_blob_names", return_value=[]):
         fm = FieldManager(mocked_manure_manager)
 
@@ -70,12 +85,12 @@ def test_daily_update_routine(fields: List[Field]) -> None:
         for field in fields:
             field.manage_field = MagicMock()
         fm.output_gatherer.send_daily_variables = MagicMock()
-        FieldManager._create_current_weather = MagicMock()
-        fm.daily_update_routine(weather=mocked_weather, time=mocked_time)
+        fm.daily_update_routine(weather=mock_weather, time=mocked_time)
         for field in fields:
             assert field.manage_field.call_count == 1
-        assert FieldManager._create_current_weather.call_count == len(fields)
+        assert mock_weather.get_current_weather.call_count == 1
         assert fm.output_gatherer.send_daily_variables.call_count == 1
+    mock_weather.get_current_weather = weather_original_method_states["get_current_weather"]
 
 
 @pytest.mark.parametrize("fields", [
