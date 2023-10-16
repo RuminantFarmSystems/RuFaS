@@ -104,6 +104,12 @@ class SoilData:
     to 1, inclusive. SWAT sets the lag coefficient to 0.8 (paragraph between equations 1:1.3.3, 4) (unitless)
     """
 
+    # ---- Snow
+    snow_content: float = 0.0
+    previous_day_snow_temperature: Optional[float] = None
+    current_day_snow_temperature: Optional[float] = None
+    snow_lag_factor: float = 1.0
+
     # ---- Erosion
     slope_length: float = 3
     """length of the slope (meters)"""
