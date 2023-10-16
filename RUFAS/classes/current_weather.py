@@ -103,8 +103,8 @@ class CurrentWeather:
 
         Parameters
         ----------
-        time:
-            Object containing the current year and day of the simulation.
+        time: Time
+            Time object containing the current time of the simulation.
 
         Returns
         -------
