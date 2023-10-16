@@ -146,7 +146,7 @@ class GraphGenerator:
     def _draw_graph(
         self,
         graph_type: str,
-        data: Dict[str, Dict[str, List[Any]]],
+        data: Dict[str, Dict[str, List[Any]] | Dict[str, List[Dict[str, List[Any]]]]],
         selected_variables: Optional[List[str]] = None,
     ) -> None:
         """
@@ -156,7 +156,7 @@ class GraphGenerator:
         ----------
         graph_type : str
             The type of graph to draw.
-        data : Dict[str, Dict[str, List[Any]]]
+        data : Dict[str, Dict[str, List[Any]] | Dict[str, List[Dict[str, List[Any]]]]]
             The data to use for plotting.
         selected_variables : Optional[List[str]]
             If it is present and the data is a list of dicts,
