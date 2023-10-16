@@ -247,7 +247,7 @@ class LifeCycleManager:
                      heiferIIIs: List[HeiferIII],
                      cows: List[Cow]) \
             -> Tuple[List[Cow], List[Cow], List[Calf], List[Calf],
-            List[HeiferI], List[HeiferII], List[HeiferIII], List[Cow]]:
+                     List[HeiferI], List[HeiferII], List[HeiferIII], List[Cow]]:
         """
         Updates the status of the animals.
 
@@ -304,7 +304,7 @@ class LifeCycleManager:
 
         info_map = {"class": self.__class__.__name__,
                     "function": self.daily_update.__name__,
-                    "sim_day": sim_day, }
+                    }
 
         om.add_variable("calf_num", self.calf_num, info_map)
         om.add_variable("heiferI_num", self.heiferI_num, info_map)
@@ -347,14 +347,23 @@ class LifeCycleManager:
         om.add_variable("num_cow_for_parity_2", parity_2, info_map)
         om.add_variable("num_cow_for_parity_3", parity_3, info_map)
         om.add_variable("num_cow_for_parity_greater_than_3", parity_greater_than_3, info_map)
-
-        life_cycle_daily_herd_update["avg_age_for_parity"] = self.avg_age_for_parity
-        life_cycle_daily_herd_update["avg_age_for_calving"] = self.avg_age_for_calving
-        life_cycle_daily_herd_update["cull_reason_stats"] = self.cull_reason_stats
-        life_cycle_daily_herd_update["avg_calving_to_preg_time"] = self.avg_calving_to_preg_time
-        life_cycle_daily_herd_update["sim_day"] = sim_day
-
-        om.add_variable("life_cycle_daily_herd_update", life_cycle_daily_herd_update, info_map)
+        calving_to_preg_time_1 = self.avg_calving_to_preg_time['1']
+        calving_to_preg_time_2 = self.avg_calving_to_preg_time['2']
+        calving_to_preg_time_3 = self.avg_calving_to_preg_time['3']
+        calving_to_preg_time_greater_than_3 = self.avg_calving_to_preg_time['greater_than_3']
+        om.add_variable("calving_to_preg_time_1", calving_to_preg_time_1, info_map)
+        om.add_variable("calving_to_preg_time_2", calving_to_preg_time_2, info_map)
+        om.add_variable("calving_to_preg_time_3", calving_to_preg_time_3, info_map)
+        om.add_variable("calving_to_preg_time_greater_than_3", calving_to_preg_time_greater_than_3, info_map)
+        avg_age_for_calving_1 = self.avg_age_for_calving['1']
+        avg_age_for_calving_2 = self.avg_age_for_calving['2']
+        avg_age_for_calving_3 = self.avg_age_for_calving['3']
+        avg_age_for_calving_greater_than_3 = self.avg_age_for_calving['greater_than_3']
+        om.add_variable("avg_age_for_calving_1", avg_age_for_calving_1, info_map)
+        om.add_variable("avg_age_for_calving_2", avg_age_for_calving_2, info_map)
+        om.add_variable("avg_age_for_calving_3", avg_age_for_calving_3, info_map)
+        om.add_variable("avg_age_for_calving_greater_than_3", avg_age_for_calving_greater_than_3, info_map)
+        om.add_variable("cull_reason_stats", self.cull_reason_stats, info_map)
 
         return (animals_added, animals_removed, calves_born, calves, heiferIs,
                 heiferIIs, heiferIIIs, cows)
@@ -682,7 +691,7 @@ class LifeCycleManager:
         args.update(tai_method_c=AnimalBase.config["cow_repro_programs"]['cow_TAI_protocol'])
         args.update(resynch_method=AnimalBase.config["cow_repro_programs"]['cow_resynch_protocol'])
         new_cow = Cow(args)
-        if len(cows)>0:
+        if len(cows) > 0:
             new_cow.milk_production_reduction = cows[0].milk_production_reduction
         cows.append(new_cow)
 
