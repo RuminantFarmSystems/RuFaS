@@ -1,7 +1,7 @@
 from typing import List
 import pytest
 
-from RUFAS.routines.field.manager.current_weather import CurrentWeather
+from RUFAS.classes.current_weather import CurrentWeather
 
 
 @pytest.mark.parametrize("months, expected", [
