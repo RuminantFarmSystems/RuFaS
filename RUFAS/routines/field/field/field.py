@@ -992,6 +992,7 @@ class Field:
 
         # TODO: figure out how to determine weighting coefficient when there are multiple crops in the field - issue
         #  #519
+        # update_snow()
         self.soil.infiltration.infiltrate(precipitation_reaching_soil)
         self.soil.percolation.percolate(self.field_data.seasonal_high_water_table)
         # TODO: find reasonable values/way to set minimum cover management factor - issue #520
