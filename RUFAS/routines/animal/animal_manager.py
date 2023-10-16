@@ -1347,7 +1347,6 @@ class AnimalManager:
                         raise Exception('Too many attempts at optimizing ration.')
 
                 # recording ration nutrition information in pen
-                print(ration_per_animal)
                 nutrient_amount, nutrient_conc = RationReporter.report_ration(ration_per_animal, feed.available_feeds)
                 pen.ration_nutrient_amount = nutrient_amount
                 pen.ration_nutrient_conc = nutrient_conc
