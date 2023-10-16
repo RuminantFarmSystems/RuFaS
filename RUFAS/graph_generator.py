@@ -1,7 +1,7 @@
 import os
 import datetime
 from pathlib import Path
-from typing import Dict, List, Any, Callable
+from typing import Dict, List, Any, Callable, Optional
 
 import matplotlib
 import matplotlib.pyplot as plt
@@ -147,7 +147,7 @@ class GraphGenerator:
         self,
         graph_type: str,
         data: Dict[str, Dict[str, List[Any]]],
-        selected_variables: List[str] | None,
+        selected_variables: Optional[List[str]] = None,
     ) -> None:
         """
         Draw the graph based on the provided graph type and data.
@@ -158,7 +158,7 @@ class GraphGenerator:
             The type of graph to draw.
         data : Dict[str, Dict[str, List[Any]]]
             The data to use for plotting.
-        selected_variables : List[str] | None
+        selected_variables : Optional[List[str]]
             If it is present and the data is a list of dicts,
             it selects the variables to be plotted.
         """
