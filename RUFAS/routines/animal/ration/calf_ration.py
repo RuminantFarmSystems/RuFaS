@@ -30,7 +30,7 @@ class CalfRationManager:
             Dictionary of formulated ration.
 
         """
-        return {'155': 1, '157': 2, 'status': 'Optimal', 'objective': 4.5}
+        return {'202': 1, '216': 2, 'status': 'Optimal', 'objective': 4.5}
 
     @classmethod
     def optimize(cls):
