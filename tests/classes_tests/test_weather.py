@@ -58,7 +58,7 @@ def test_get_current_weather(mock_weather: Weather, day: int, year: int, expecte
     mocked_time = MagicMock(Time)
     setattr(mocked_time, "day", day)
     setattr(mocked_time, "year", year)
-    with patch("RUFAS.classes.current_weather.CurrentWeather.date_conversion_day", new_callable=MagicMock,
+    with patch("RUFAS.classes.current_weather.CurrentWeather.date_conversion_month", new_callable=MagicMock,
                return_value=3) as day, \
             patch("RUFAS.classes.current_weather.CurrentWeather.determine_daylength", new_callable=MagicMock,
                   return_value=10.0) as daylength:
@@ -78,7 +78,7 @@ def test_get_current_weather_error(mock_weather: Weather, day: int, year: int, e
     mocked_time = MagicMock(Time)
     setattr(mocked_time, "day", day)
     setattr(mocked_time, "year", year)
-    with patch("RUFAS.classes.current_weather.CurrentWeather.date_conversion_day", new_callable=MagicMock,
+    with patch("RUFAS.classes.current_weather.CurrentWeather.date_conversion_month", new_callable=MagicMock,
                return_value=3), \
             patch("RUFAS.classes.current_weather.CurrentWeather.determine_daylength", new_callable=MagicMock,
                   return_value=10.0), \

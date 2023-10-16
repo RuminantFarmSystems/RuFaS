@@ -43,17 +43,3 @@ def test_date_conversion_month(year: int, day: int, expected_month: int):
     setattr(mocked_time, "calendar_year", year)
     setattr(mocked_time, "day", day)
     assert CurrentWeather.date_conversion_month(mocked_time) == expected_month
-
-
-@pytest.mark.parametrize("year, day, expected_day", [
-    (2000, 366, 31),  # leap year
-    (2001, 365, 31),  # normal year
-    (2000, 60, 29),
-    (2001, 60, 1)
-])
-def test_date_conversion_day(year: int, day: int, expected_day: int):
-    """Tests that number of days were converted into day of the month correctly"""
-    mocked_time = MagicMock(Time)
-    setattr(mocked_time, "calendar_year", year)
-    setattr(mocked_time, "day", day)
-    assert CurrentWeather.date_conversion_day(mocked_time) == expected_day
