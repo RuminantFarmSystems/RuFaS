@@ -1,6 +1,6 @@
 from RUFAS.routines.field.manager.field_manager import FieldManager
 from RUFAS.routines.field.manager.crop_schedule import CropSchedule
-from RUFAS.routines.field.manager.current_weather import CurrentWeather
+from RUFAS.classes.current_weather import CurrentWeather
 from RUFAS.routines.field.manager.fertilizer_schedule import FertilizerSchedule
 from RUFAS.routines.field.manager.manure_schedule import ManureSchedule
 from RUFAS.routines.field.manager.tillage_schedule import TillageSchedule

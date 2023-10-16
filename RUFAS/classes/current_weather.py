@@ -2,7 +2,7 @@ from dataclasses import dataclass
 from typing import Optional
 
 from RUFAS.classes.time import Time
-from RUFAS.classes.weather import is_leap_year
+from RUFAS.classes.config import is_leap_year
 
 
 @dataclass
