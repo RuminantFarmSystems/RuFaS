@@ -65,7 +65,7 @@ class CurrentWeather:
         return daylength[month-1]
 
     @staticmethod
-    def _date_conversion_month(time: Time) -> int:
+    def date_conversion_month(time: Time) -> int:
         """
         Converts the day number into the corresponding month of the year.
 
@@ -116,6 +116,6 @@ class CurrentWeather:
         leap_days = [31, 60, 91, 121, 152, 182, 213, 244, 274, 305, 335, 366]
 
         if is_leap_year(time.calendar_year):
-            return time.day - leap_days[CurrentWeather._date_conversion_month(time) - 2]
+            return time.day - leap_days[CurrentWeather.date_conversion_month(time) - 2]
         else:
-            return time.day - days[CurrentWeather._date_conversion_month(time) - 2]
+            return time.day - days[CurrentWeather.date_conversion_month(time) - 2]
