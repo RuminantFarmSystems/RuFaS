@@ -374,7 +374,6 @@ class RationReporter:
                 del ration[non_numeric_key]
         nutrients = ['DM', 'CP', 'ADF', 'NDF', 'lignin', 'ash', 'phosphorus',
                      'potassium', 'N', 'EE', 'starch', 'TDN', 'DE', 'calcium']
-        # print(ration)
 
         for key, val in ration.items():
             nutrient_amount["dm"] += val
