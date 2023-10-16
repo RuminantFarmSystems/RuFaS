@@ -167,20 +167,19 @@ class GraphGenerator:
             values: List[Any] = data[key]["values"]
             is_data_in_dict = isinstance(values[0], dict)
             if is_data_in_dict:
-                if selected_variables is not None:
-                    data_dict = Utility.convert_list_of_dicts_to_dict_of_lists(values)
-                    if graph_type == "stackplot":
-                        values_tuple = tuple(
-                            data_dict[variable] for variable in selected_variables
-                        )
-                        plot_function(list(range(len(values_tuple[0]))), values_tuple)
-                    else:
-                        for variable in selected_variables:
-                            plot_function(data_dict[variable])
-                else:
+                if selected_variables is None:
                     raise TypeError(
                         "Can't plot dictionary, use 'variables' arg to select items from data"
                     )
+                data_dict = Utility.convert_list_of_dicts_to_dict_of_lists(values)
+                if graph_type == "stackplot":
+                    values_tuple = tuple(
+                        data_dict[variable] for variable in selected_variables
+                    )
+                    plot_function(list(range(len(values_tuple[0]))), values_tuple)
+                else:
+                    for variable in selected_variables:
+                        plot_function(data_dict[variable])
             else:
                 plot_function(values)
 
