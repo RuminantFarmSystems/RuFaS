@@ -200,7 +200,7 @@ class GraphGenerator:
         self,
         data_dict: Dict[str, List[float | int]],
         selected_variables: List[str],
-        plot_function: Callable[[List[int], List[List[Any]], None]],
+        plot_function: FUNCTION_TYPE,
     ) -> None:
         """Draw a plot using the provided data and selected variables where the data is tuple"""
         values_tuple = tuple(data_dict[variable] for variable in selected_variables)
