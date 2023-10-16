@@ -1,5 +1,8 @@
 import numpy as np
 
+from RUFAS.classes.current_weather import CurrentWeather
+from RUFAS.classes.time import Time
+
 
 def is_leap_year(year):
     """
@@ -107,6 +110,44 @@ class Weather:
             self.irrigation[current_year_index][current_day_index] = weather_file['irrigation'][i]
 
         self.T_avg_annual = self._calculate_average_annual_temperature(weather_file['avg'])
+
+    def get_current_weather(self, time: Time) -> CurrentWeather:
+        """
+        Creates a CurrentWeather object containing all the weather conditions on the current day.
+
+        Parameters
+        ----------
+        time: Time
+            Time object containing the current time of the simulation.
+
+        Returns
+        -------
+        CurrentWeather
+            CurrentWeather instance including all the weather conditions of the specified date.
+
+        Raises
+        ------
+        IndexError
+            While attempting to collect weather conditions that are not contained in the Weather object.
+
+        """
+        year = time.year
+        day = time.day
+        month = CurrentWeather._date_conversion_day(time)
+        daylength = CurrentWeather.determine_daylength(month)
+        try:
+            current_weather = CurrentWeather(incoming_light=self.radiation[year - 1][day - 1],
+                                             min_air_temperature=self.T_min[year - 1][day - 1],
+                                             mean_air_temperature=self.T_avg[year - 1][day - 1],
+                                             max_air_temperature=self.T_max[year - 1][day - 1],
+                                             annual_mean_air_temperature=self.T_avg_annual,
+                                             precipitation=self.rainfall[year - 1][day - 1],
+                                             irrigation=self.irrigation[year - 1][day - 1],
+                                             daylength=daylength)
+        except IndexError:
+            raise IndexError(f"Attempted to get weather conditions for day: {time.day}, year: {time.year}.")
+
+        return current_weather
 
     @staticmethod
     def _calculate_average_annual_temperature(daily_average_temperatures: list[float]) -> float:

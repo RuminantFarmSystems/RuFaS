@@ -1,6 +1,9 @@
 from dataclasses import dataclass
 from typing import Optional
 
+from RUFAS.classes.time import Time
+from RUFAS.classes.weather import is_leap_year
+
 
 @dataclass
 class CurrentWeather:
@@ -60,3 +63,59 @@ class CurrentWeather:
         """
         daylength = [9, 10, 11, 13, 14, 15, 15, 15, 13, 12, 10, 9]
         return daylength[month-1]
+
+    @staticmethod
+    def _date_conversion_month(time: Time) -> int:
+        """
+        Converts the day number into the corresponding month of the year.
+
+        Parameters
+        ----------
+        time: Time
+            Time object containing the current time of the simulation.
+
+        Returns
+        -------
+        int
+            The corresponding month of the year.
+
+        """
+        days = [31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334, 365]
+        leap_days = [31, 60, 91, 121, 152, 182, 213, 244, 274, 305, 335, 366]
+        prev_month = 0
+        if is_leap_year(time.calendar_year):
+            for day in leap_days:
+                if prev_month < time.day <= day:
+                    return leap_days.index(day) + 1
+                else:
+                    prev_month = day
+        else:
+            for day in days:
+                if prev_month < time.day <= day:
+                    return days.index(day) + 1
+                else:
+                    prev_month = day
+
+    @staticmethod
+    def date_conversion_day(time: Time) -> int:
+        """
+        Converts the day number into the corresponding day of the month.
+
+        Parameters
+        ----------
+        time:
+            Object containing the current year and day of the simulation.
+
+        Returns
+        -------
+        int
+            Corresponding day of the month.
+
+        """
+        days = [31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334, 365]
+        leap_days = [31, 60, 91, 121, 152, 182, 213, 244, 274, 305, 335, 366]
+
+        if is_leap_year(time.calendar_year):
+            return time.day - leap_days[CurrentWeather._date_conversion_month(time) - 2]
+        else:
+            return time.day - days[CurrentWeather._date_conversion_month(time) - 2]
