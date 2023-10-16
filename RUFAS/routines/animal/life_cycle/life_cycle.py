@@ -311,6 +311,33 @@ class LifeCycleManager:
         om.add_variable("heiferII_num", self.heiferII_num, info_map)
         om.add_variable("heiferIII_num", self.heiferII_num, info_map)
         om.add_variable("cow_num", self.cow_num, info_map)
+        om.add_variable("sold_heifer_num", self.sold_heifer_num, info_map)
+        om.add_variable("bought_heifer_num", self.bought_heifer_num, info_map)
+        om.add_variable("culled_heifer_num", self.culled_heifer_num, info_map)
+        om.add_variable("culled_cow_num", self.culled_cow_num, info_map)
+        om.add_variable("GnRH_injection_num_h", self.GnRH_injection_num_h, info_map)
+        om.add_variable("GnRH_injection_num", self.GnRH_injection_num, info_map)
+        om.add_variable("PGF_injection_num", self.PGF_injection_num, info_map)
+        om.add_variable("PGF_injection_num_h", self.PGF_injection_num_h, info_map)
+        om.add_variable("ai_num", self.ai_num, info_map)
+        om.add_variable("preg_check_num", self.preg_check_num, info_map)
+        om.add_variable("preg_check_num_h", self.preg_check_num_h, info_map)
+        om.add_variable("sold_calf_num", self.sold_calf_num, info_map)
+        om.add_variable("daily_milk_production", self.daily_milk_production, info_map)
+        om.add_variable("open_cow_num", self.open_cow_num, info_map)
+        om.add_variable("vwp_cow_num", self.vwp_cow_num, info_map)
+        om.add_variable("preg_cow_num", self.preg_cow_num, info_map)
+        om.add_variable("milking_cow_num", self.milking_cow_num, info_map)
+        om.add_variable("dry_cow_num", self.dry_cow_num, info_map)
+        om.add_variable("avg_days_in_milk", self.avg_days_in_milk, info_map)
+        om.add_variable("avg_days_in_preg", self.avg_days_in_preg, info_map)
+        om.add_variable("avg_cow_body_weight", self.avg_cow_body_weight, info_map)
+        om.add_variable("avg_parity_num", self.avg_parity_num, info_map)
+        om.add_variable("avg_calving_interval", self.avg_calving_interval, info_map)
+        om.add_variable("avg_breeding_to_preg_time", self.avg_breeding_to_preg_time, info_map)
+        om.add_variable("avg_heifer_culling_age", self.avg_heifer_culling_age, info_map)
+        om.add_variable("avg_cow_culling_age", self.avg_cow_culling_age, info_map)
+        om.add_variable("avg_mature_body_weight", self.avg_mature_body_weight, info_map)
         om.add_variable("sim_day", sim_day, info_map)
         parity_1 = self.num_cow_for_parity['1']
         parity_2 = self.num_cow_for_parity['2']
@@ -321,20 +348,6 @@ class LifeCycleManager:
         om.add_variable("num_cow_for_parity_3", parity_3, info_map)
         om.add_variable("num_cow_for_parity_greater_than_3", parity_greater_than_3, info_map)
 
-        life_cycle_daily_herd_update_keys = ["calf_num", "heiferI_num", "heiferII_num", "heiferIII_num", "cow_num",
-                                             "sold_heifer_num", "bought_heifer_num", "culled_heifer_num",
-                                             "culled_cow_num", "GnRH_injection_num_h", "GnRH_injection_num",
-                                             "PGF_injection_num", "PGF_injection_num_h", "ai_num", "preg_check_num",
-                                             "preg_check_num_h", "sold_calf_num", "daily_milk_production",
-                                             "open_cow_num", "vwp_cow_num", "preg_cow_num", "milking_cow_num",
-                                             "dry_cow_num", "avg_days_in_milk", "avg_days_in_preg",
-                                             "avg_cow_body_weight", "avg_parity_num", "avg_calving_interval",
-                                             "avg_breeding_to_preg_time", "avg_heifer_culling_age",
-                                             "avg_cow_culling_age", "avg_mature_body_weight"]
-
-        life_cycle_daily_herd_update = {key: vars(self)[key] for key in life_cycle_daily_herd_update_keys}
-
-        life_cycle_daily_herd_update["num_cow_for_parity"] = self.num_cow_for_parity
         life_cycle_daily_herd_update["avg_age_for_parity"] = self.avg_age_for_parity
         life_cycle_daily_herd_update["avg_age_for_calving"] = self.avg_age_for_calving
         life_cycle_daily_herd_update["cull_reason_stats"] = self.cull_reason_stats
