@@ -801,15 +801,15 @@ def test_dump_all_nondata_pools(
     mock_output_manager.dump_logs = MagicMock()
     mock_output_manager.dump_variable_names_and_contexts = MagicMock()
 
-    mock_output_manager.dump_all_nondata_pools(path, False, "verbose")
+    mock_output_manager.dump_all_nondata_pools(path, False)
 
     mock_output_manager.dump_errors.assert_called_once_with(path)
     mock_output_manager.dump_warnings.assert_called_once_with(path)
     mock_output_manager.dump_logs.assert_called_once_with(path)
-    mock_output_manager.dump_variable_names_and_contexts.assert_called_once_with(path, False, "verbose")
+    mock_output_manager.dump_variable_names_and_contexts.assert_called_once_with(path, False)
 
-    mock_output_manager.dump_all_nondata_pools(path, True, "verbose")
-    mock_output_manager.dump_variable_names_and_contexts.assert_called_with(path, True, "verbose")
+    mock_output_manager.dump_all_nondata_pools(path, True)
+    mock_output_manager.dump_variable_names_and_contexts.assert_called_with(path, True)
     assert mock_output_manager.dump_logs.call_count == 2
     assert mock_output_manager.dump_warnings.call_count == 2
     assert mock_output_manager.dump_errors.call_count == 2
@@ -1029,10 +1029,11 @@ def test_dump_variable_names_and_contexts(
      }
     original_variables_pool = mock_output_manager.variables_pool
     mock_output_manager.variables_pool = mock_variable_pool
+    mock_output_manager.set_format_option(format_option)
     mock_output_manager._generate_file_name = MagicMock(return_value="dummy_name")
     mock_output_manager._list_to_file_txt = MagicMock()
 
-    mock_output_manager.dump_variable_names_and_contexts("dummy_path", exclude_info_maps, format_option)
+    mock_output_manager.dump_variable_names_and_contexts("dummy_path", exclude_info_maps)
 
     mock_output_manager._generate_file_name.assert_called_once_with("variable_names", "txt")
     mock_output_manager._list_to_file_txt.assert_called_once_with(
@@ -1061,10 +1062,11 @@ def test_dump_variable_names_and_contexts_no_values(
                        'var1: **NO VARIABLES**' + os.linesep]
     original_variables_pool = mock_output_manager.variables_pool
     mock_output_manager.variables_pool = mock_variable_pool
+    mock_output_manager.set_format_option("verbose")
     mock_output_manager._generate_file_name = MagicMock(return_value="dummy_name")
     mock_output_manager._list_to_file_txt = MagicMock()
 
-    mock_output_manager.dump_variable_names_and_contexts("dummy_path", False, format_option="verbose")
+    mock_output_manager.dump_variable_names_and_contexts("dummy_path", False)
 
     mock_output_manager._generate_file_name.assert_called_once_with("variable_names", "txt")
     mock_output_manager._list_to_file_txt.assert_called_once_with(
