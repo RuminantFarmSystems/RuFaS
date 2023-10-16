@@ -19,9 +19,9 @@ else:
     # Use the 'TkAgg' backend when a display is available
     matplotlib.use("TkAgg")
 
-function_type = Callable[..., None]
+FUNCTION_TYPE = Callable[..., None]
 
-MATPLOTLIB_PLOT_FUNCTIONS: Dict[str, function_type] = {
+MATPLOTLIB_PLOT_FUNCTIONS: Dict[str, FUNCTION_TYPE] = {
     "area": plt.fill_between,
     "bar": plt.bar,
     "barbs": plt.barbs,
@@ -55,7 +55,7 @@ MATPLOTLIB_PLOT_FUNCTIONS: Dict[str, function_type] = {
     "violin": plt.violinplot,
 }
 
-FIGURE_SETTERS: Dict[str, function_type] = {
+FIGURE_SETTERS: Dict[str, FUNCTION_TYPE] = {
     "align_labels": Figure.align_labels,
     "canvas": Figure.set_canvas,
     "constrained_layout": Figure.set_constrained_layout,
@@ -72,7 +72,7 @@ FIGURE_SETTERS: Dict[str, function_type] = {
     "zorder": Figure.set_zorder,
 }
 
-AXES_SETTERS: Dict[str, function_type] = {
+AXES_SETTERS: Dict[str, FUNCTION_TYPE] = {
     "aspect": Axes.set_aspect,
     "grid": Axes.grid,
     "legend": Axes.legend,
