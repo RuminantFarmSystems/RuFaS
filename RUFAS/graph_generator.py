@@ -186,21 +186,23 @@ class GraphGenerator:
                         "Can't plot dictionary, use 'variables' arg to select items from data"
                     )
                 data_dict = Utility.convert_list_of_dicts_to_dict_of_lists(values)
-                if graph_type == "stackplot":
-                    self._draw_stackplot(data_dict, selected_variables, plot_function)
+                if graph_type in TUPLE_BASED_FUNCTIONS:
+                    self._handle_tuple_based_plot(
+                        data_dict, selected_variables, plot_function
+                    )
                 else:
                     for variable in selected_variables:
                         plot_function(data_dict[variable])
             else:
                 plot_function(values)
 
-    def _draw_stackplot(
+    def _handle_tuple_based_plot(
         self,
         data_dict: Dict[str, List[float | int]],
         selected_variables: List[str],
         plot_function: Callable[[List[int], List[List[Any]], None]],
     ) -> None:
-        """Draw a stackplot using the provided data and selected variables."""
+        """Draw a plot using the provided data and selected variables where the data is tuple"""
         values_tuple = tuple(data_dict[variable] for variable in selected_variables)
         plot_function(list(range(len(values_tuple[0]))), values_tuple)
 
