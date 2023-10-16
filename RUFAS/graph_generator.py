@@ -188,7 +188,13 @@ class GraphGenerator:
             else:
                 plot_function(values)
 
-    def _draw_stackplot(self, data_dict, selected_variables, plot_function) -> None:
+    def _draw_stackplot(
+        self,
+        data_dict: Dict[str, List[float | int]],
+        selected_variables: List[str],
+        plot_function: Callable[[List[int], List[List[Any]], None]],
+    ) -> None:
+        """Draw a stackplot using the provided data and selected variables."""
         values_tuple = tuple(data_dict[variable] for variable in selected_variables)
         plot_function(list(range(len(values_tuple[0]))), values_tuple)
 
