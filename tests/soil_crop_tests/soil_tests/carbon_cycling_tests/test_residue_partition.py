@@ -369,8 +369,8 @@ def test_determine_soil_structural_carbon_amount(soil_residue_metabolic_fraction
                                                  soil_structural_carbon_amount: float) -> None:
     """Tests that the updated soil structural carbon amount is calculated correctly"""
     expected = soil_structural_carbon_amount + structural_carbon_transfer_amount + root_biomass * \
-        (1 - soil_residue_metabolic_fraction) - soil_structural_to_active_carbon_amount - \
-        soil_structural_to_slow_carbon_amount
+               (1 - soil_residue_metabolic_fraction) - soil_structural_to_active_carbon_amount - \
+               soil_structural_to_slow_carbon_amount
 
     assert expected == ResiduePartition._determine_soil_structural_carbon_amount(
         soil_residue_metabolic_fraction,
@@ -424,6 +424,7 @@ def test_partition_residue(layers: list, crop: CropData, rainfall=10):
     data.plant_root_residue = crop.root_biomass or 0
     partition = ResiduePartition(data)
 
+    ResiduePartition._determine_soil_dry_matter_residue_amount = MagicMock(return_value=15.3)
     ResiduePartition._determine_plant_residue_lignin_composition = MagicMock(return_value=0.55)
     ResiduePartition._determine_plant_lignin_nitrogen_fraction = MagicMock(return_value=0.56)
     ResiduePartition._determine_plant_residue_metabolic_fraction = MagicMock(return_value=0.57)
@@ -448,6 +449,7 @@ def test_partition_residue(layers: list, crop: CropData, rainfall=10):
     partition.partition_residue(rainfall)
 
     # Checking if methods are called correct number of times
+    assert ResiduePartition._determine_soil_dry_matter_residue_amount.call_count == len(layers)
     assert ResiduePartition._determine_plant_residue_lignin_composition.call_count == 1
     assert ResiduePartition._determine_plant_lignin_nitrogen_fraction.call_count == 1
     assert ResiduePartition._determine_plant_residue_metabolic_fraction.call_count == 1
@@ -478,12 +480,10 @@ def test_partition_residue(layers: list, crop: CropData, rainfall=10):
 
         if layers.index(layer) == 0:
             assert layer.structural_carbon_transfer_amount == 2.3
-            assert layer.soil_dry_matter_residue_amount == first_layer_yield_residue_value * layer.tillage_fraction
         else:
             assert layer.structural_carbon_transfer_amount == 0
-            assert layer.soil_dry_matter_residue_amount == 0
             assert data.plant_surface_residue == 0
-
+        assert layer.soil_dry_matter_residue_amount == 15.3
         assert layer.metabolic_litter_amount == 2.4
         assert layer.plant_structural_to_slow_or_active_rate == 0.58
         assert layer.structural_litter_amount == 2.5
