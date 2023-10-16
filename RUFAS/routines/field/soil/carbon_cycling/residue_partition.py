@@ -209,7 +209,7 @@ class ResiduePartition:
         elif layer_bottom <= root_depth:
             return plant_root_residue * layer_thickness/root_depth
         else:
-            return plant_root_residue * (layer_bottom - root_depth) / root_depth
+            return plant_root_residue * (root_depth - layer_top) / root_depth
 
     @staticmethod
     def _determine_plant_residue_lignin_composition(plant_residue_lignin_composition: float,
