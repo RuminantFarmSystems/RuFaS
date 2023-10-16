@@ -147,7 +147,7 @@ class GraphGenerator:
         self,
         graph_type: str,
         data: Dict[str, Dict[str, List[Any]]],
-        variables: List[str] | None,
+        selected_variables: List[str] | None,
     ) -> None:
         """
         Draw the graph based on the provided graph type and data.
@@ -158,23 +158,24 @@ class GraphGenerator:
             The type of graph to draw.
         data : Dict[str, Dict[str, List[Any]]]
             The data to use for plotting.
-        variables : List[str] | None
+        selected_variables : List[str] | None
             If it is present and the data is a list of dicts,
             it selects the variables to be plotted.
         """
         plot_function = MATPLOTLIB_PLOT_FUNCTIONS[graph_type]
         for key in data.keys():
             values: List[Any] = data[key]["values"]
-            if isinstance(values[0], dict):
-                if variables is not None:
+            is_data_in_dict = isinstance(values[0], dict)
+            if is_data_in_dict:
+                if selected_variables is not None:
                     data_dict = Utility.convert_list_of_dicts_to_dict_of_lists(values)
                     if graph_type == "stackplot":
                         values_tuple = tuple(
-                            data_dict[variable] for variable in variables
+                            data_dict[variable] for variable in selected_variables
                         )
                         plot_function(list(range(len(values_tuple[0]))), values_tuple)
                     else:
-                        for variable in variables:
+                        for variable in selected_variables:
                             plot_function(data_dict[variable])
                 else:
                     raise TypeError(
