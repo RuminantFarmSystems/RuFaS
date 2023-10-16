@@ -795,14 +795,16 @@ class OutputManager(object):
 
             for parsable_dict in parsable_dicts:
                 keys = variable_data[parsable_dict][0].keys()
+                formatted_output = []
+
                 if self.__format_option == "inline":
-                    var_list.append(f"{name}.{parsable_dict}: {list(keys)}{os.linesep}")
+                    formatted_output.append(f"{name}.{parsable_dict}: {list(keys)}")
                 elif self.__format_option == "match":
-                    for key in keys:
-                        var_list.append(f"{name}.{key}{os.linesep}")
+                    formatted_output.extend([f"{name}.{key}" for key in keys])
                 else:
-                    for key in keys:
-                        var_list.append(f"{prefix}.{parsable_dict}: {key}{os.linesep}")
+                    formatted_output.extend([f"{prefix}.{parsable_dict}: {key}" for key in keys])
+
+                var_list.extend([f"{line}{os.linesep}" for line in formatted_output])
 
         file_path = os.path.join(
             path, self._generate_file_name("variable_names", "txt")
