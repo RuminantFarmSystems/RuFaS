@@ -6,14 +6,12 @@ from RUFAS.routines.field.soil.soil_data import SoilData
 from RUFAS.routines.field.soil.layer_data import LayerData
 from RUFAS.routines.field.manager.crop_schedule import CropSchedule
 from RUFAS.routines.manure.manure_manager import ManureManager
-from RUFAS.classes.current_weather import CurrentWeather
 from RUFAS.classes.weather import Weather
 from RUFAS.classes.time import Time
 from RUFAS.routines.field.manager.output_gatherer import OutputGatherer
 from RUFAS.routines.field.manager.fertilizer_schedule import FertilizerSchedule
 from RUFAS.routines.field.manager.manure_schedule import ManureSchedule
 from RUFAS.routines.field.manager.tillage_schedule import TillageSchedule
-from RUFAS.routines.field.manager.schedule import Schedule
 from typing import Dict, List, Tuple
 
 """
