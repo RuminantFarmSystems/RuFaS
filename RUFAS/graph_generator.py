@@ -173,15 +173,16 @@ class GraphGenerator:
                     )
                 data_dict = Utility.convert_list_of_dicts_to_dict_of_lists(values)
                 if graph_type == "stackplot":
-                    values_tuple = tuple(
-                        data_dict[variable] for variable in selected_variables
-                    )
-                    plot_function(list(range(len(values_tuple[0]))), values_tuple)
+                    self._draw_stackplot(data_dict, selected_variables, plot_function)
                 else:
                     for variable in selected_variables:
                         plot_function(data_dict[variable])
             else:
                 plot_function(values)
+
+    def _draw_stackplot(self, data_dict, selected_variables, plot_function) -> None:
+        values_tuple = tuple(data_dict[variable] for variable in selected_variables)
+        plot_function(list(range(len(values_tuple[0]))), values_tuple)
 
     def _customize_graph(
         self, fig: Figure, customization_details: Dict[str, Any]
