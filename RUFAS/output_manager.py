@@ -50,6 +50,7 @@ class OutputManager(object):
             self.errors_pool: Dict[str, OutputManager.pool_element_type] = {}
             self.logs_pool: Dict[str, OutputManager.pool_element_type] = {}
             self.__metadata_prefix: str = ""
+            self.__format_option: str = ""
             self.add_log(
                 "init_log",
                 "Output Manager instantiated.",
@@ -199,6 +200,10 @@ class OutputManager(object):
     def set_metadata_prefix(self, metadata_prefix: str) -> None:
         """Sets the metadata_prefix attribute."""
         self.__metadata_prefix = metadata_prefix
+
+    def set_format_option(self, format_option: str = "verbose") -> None:
+        """Sets the metadata_prefix attribute."""
+        self.__format_option = format_option
 
     def _get_timestamp(self, include_millis: bool = False) -> str:
         """
@@ -353,18 +358,26 @@ class OutputManager(object):
                         csv_column_lists[subkey].append(value)
 
                 for subkey in csv_column_lists.keys():
-                    column_title = (
-                        f"{variable_name}.{field}_{subkey}"
-                        if field == "info_maps"
-                        else f"{variable_name}.{subkey}"
-                    )
+                    if self.__format_option == "match":
+                        column_title = (
+                            f"{variable_name}.{subkey}"
+                        )
+                    else:
+                        column_title = (
+                            f"{variable_name}.{field}_{subkey}"
+                            if field == "info_maps"
+                            else f"{variable_name}.{subkey}"
+                        )
                     column_list.append(
                         pd.Series(
                             csv_column_lists[subkey], dtype=object, name=column_title
                         )
                     )
             else:
-                column_title = f"{variable_name}.{field}"
+                if self.__format_option == "match":
+                    column_title = f"{variable_name}"
+                else:
+                    column_title = f"{variable_name}.{field}"
                 column_list.append(
                     pd.Series(data_list, dtype=object, name=column_title)
                 )
@@ -717,7 +730,7 @@ class OutputManager(object):
         self._dict_to_file_json(self.errors_pool, file_path)
 
     def dump_variable_names_and_contexts(
-        self, path: str, exclude_info_maps: bool, format_option: str = "verbose"
+        self, path: str, exclude_info_maps: bool
     ) -> None:
         """
         Dumps names of all variables added to variables_pool along with the caller class
@@ -731,23 +744,28 @@ class OutputManager(object):
         exclude_info_maps : bool
             Flag to denote whether info_map data should be dumped with variable names.
 
-        format_option : {"block", "inline", "verbose"}
-            The selection for the formatting option of the text written to the variables names text file.
-
         Examples
         --------
-        format_option: str = "block"
+        For the different format options available:
+
+        self.__format_option: str = "match" - "matches" format for output CSV column headers.
+        class_name.function_name.variable_name.sub_variable1_name
+        class_name.function_name.variable_name.sub_variable2_name
+        class_name.function_name.variable_name.sub_variable3_name
+        class_name.function_name.variable_name.sub_variable4_name
+
+        self.__format_option: str = "block"
         class_name.function_name.variable_name
                                             .values: variable1_name
                                             .values: variable2_name
                                             .info_maps: variable3_name
                                             .info_maps: variable4_name
 
-        format_option: str = "inline"
+        self.__format_option: str = "inline"
         class_name.function_name.variable_name.values: [variable1_name, variable2_name]
         class_name.function_name.variable_name.info_maps: [variable3_name, variable4_name]
 
-        format_option: str = "verbose"
+        self.__format_option: str = "verbose"
         class_name.function_name.variable_name.values: variable1_name
         class_name.function_name.variable_name.values: variable2_name
         class_name.function_name.variable_name.info_maps: variable3_name
@@ -772,14 +790,14 @@ class OutputManager(object):
                 var_list.append(f"{name}{os.linesep}")
 
             prefix = name
-            if format_option == "block":
+            if self.__format_option == "block":
                 prefix = " " * len(name)
 
             for parsable_dict in parsable_dicts:
                 keys = variable_data[parsable_dict][0].keys()
-                if format_option == "inline":
+                if self.__format_option == "inline":
                     var_list.append(f"{name}.{parsable_dict}: {list(keys)}{os.linesep}")
-                if format_option == "match":
+                elif self.__format_option == "match":
                     for key in keys:
                         var_list.append(f"{name}.{key}{os.linesep}")
                 else:
@@ -792,12 +810,12 @@ class OutputManager(object):
         self._list_to_file_txt(var_list, file_path)
 
     def dump_all_nondata_pools(
-        self, path: str, exclude_info_maps: bool = False, format_option: str = "verbose",
+        self, path: str, exclude_info_maps: bool = False,
     ) -> None:
         """
         Dumps all non-data pools into the given path to a directory.
         """
-        self.dump_variable_names_and_contexts(path, exclude_info_maps, format_option)
+        self.dump_variable_names_and_contexts(path, exclude_info_maps)
         self.dump_logs(path)
         self.dump_warnings(path)
         self.dump_errors(path)

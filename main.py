@@ -88,6 +88,7 @@ def run_validation(metadata_files: List[Path], exclude_info_maps: bool = False,
                 }
     output_manager = OutputManager()
     input_manager = InputManager()
+    output_manager.set_format_option(format_option)
     for metadata_file in metadata_files:
         input_manager.flush_pool()
         output_manager.flush_pools()
@@ -95,7 +96,7 @@ def run_validation(metadata_files: List[Path], exclude_info_maps: bool = False,
         output_manager.add_log("Only run validation data validity check",
                                f"{str(metadata_file['path'])} data validity is: {is_data_valid}",
                                info_map)
-        output_manager.dump_all_nondata_pools(r"output", exclude_info_maps, format_option)
+        output_manager.dump_all_nondata_pools(r"output", exclude_info_maps)
 
 
 def execute_simulations(
@@ -119,6 +120,7 @@ def execute_simulations(
     sys.stdout.write("Simulating...\n")
     output_manager = OutputManager()
     input_manager = InputManager()
+    output_manager.set_format_option(format_option)
     for metadata_file in metadata_files:
         input_manager.flush_pool()
         output_manager.flush_pools()
@@ -131,7 +133,7 @@ def execute_simulations(
             output_manager.add_error("No simulation run",
                                      f"Data not valid for {str(metadata_file['path'])}, simulation not run", info_map)
         output_manager.save_variables(r"output", r"output/output_filters/", exclude_info_maps)
-        output_manager.dump_all_nondata_pools(r"output", exclude_info_maps, format_option)
+        output_manager.dump_all_nondata_pools(r"output", exclude_info_maps)
 
 
 def parse_gnu_args():
