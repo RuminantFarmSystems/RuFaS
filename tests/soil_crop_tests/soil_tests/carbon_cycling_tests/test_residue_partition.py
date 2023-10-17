@@ -22,33 +22,35 @@ def test_determine_plant_residue_lignin_composition(plant_residue_lignin_composi
                                                                                     rainfall)
 
 
-@pytest.mark.parametrize("plant_residue_lignin_composition, total_residue, crop_yield_nitrogen, expected", [
-    (3, 0.4),  # default
-    (50, 0.5),  # higher plant_residue_lignin_composition
-    (1.8, 55),  # higher nitrogen_fraction_plant_residue
-    (0, 0),  # neither
-    (3, 0),  # no plant_residue_lignin_composition
-    (0, 3),  # no nitrogen_fraction_plant_residue
-])
-def test_determine_plant_lignin_nitrogen_ratio(plant_residue_lignin_composition: float,
-                                               total_residue: float,
-                                               crop_yield_nitrogen: float,
-                                               expected: float) -> None:
+@pytest.mark.parametrize("plant_residue_lignin_composition, total_residue, crop_yield_nitrogen,"
+                         "expected_result", [
+                             (0.5, 50, 20, 0.0125),  # default
+                             (0.5, 50, 0, 0),  # no nitrogen
+                             (0.5, 50, -50, 0)  # negative case
+                         ])
+def test_determine_plant_lignin_nitrogen_fraction(plant_residue_lignin_composition: float,
+                                                  total_residue: float,
+                                                  crop_yield_nitrogen: float,
+                                                  expected_result: float) -> None:
     """Test that metabolic plant residue ration is correctly determined under current nitrogen_fraction_plant_residue
     """
+    nitrogen_fraction_plant_residue = crop_yield_nitrogen / total_residue
     if 0 < nitrogen_fraction_plant_residue <= 1.0:
-        expected = (plant_residue_lignin_composition / 100) / nitrogen_fraction_plant_residue
-        assert expected == ResiduePartition._determine_plant_lignin_nitrogen_fraction(plant_residue_lignin_composition,
-                                                                                      nitrogen_fraction_plant_residue)
+        assert expected_result == pytest.approx(ResiduePartition._determine_plant_lignin_nitrogen_fraction(
+            plant_residue_lignin_composition,
+            total_residue,
+            crop_yield_nitrogen))
     elif nitrogen_fraction_plant_residue == 0:
-        expected = 0
-        assert expected == ResiduePartition._determine_plant_lignin_nitrogen_fraction(plant_residue_lignin_composition,
-                                                                                      nitrogen_fraction_plant_residue)
+        assert expected_result == ResiduePartition._determine_plant_lignin_nitrogen_fraction(
+            plant_residue_lignin_composition,
+            total_residue,
+            crop_yield_nitrogen)
     else:
         # case of invalid input
         with pytest.raises(ValueError) as e:
             ResiduePartition._determine_plant_lignin_nitrogen_fraction(plant_residue_lignin_composition,
-                                                                       nitrogen_fraction_plant_residue)
+                                                                       total_residue,
+                                                                       crop_yield_nitrogen)
         expected = "Expected nitrogen_fraction_plant_residue be between 0.0-1.0, received " + \
                    str(nitrogen_fraction_plant_residue)
         assert expected == str(e.value)

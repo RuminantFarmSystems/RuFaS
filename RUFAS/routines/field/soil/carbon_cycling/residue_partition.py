@@ -44,7 +44,7 @@ class ResiduePartition:
         self.data.plant_residue_lignin_composition = self._determine_plant_residue_lignin_composition(
             self.data.plant_residue_lignin_composition, rainfall)
         self.data.plant_lignin_nitrogen_ratio = self._determine_plant_lignin_nitrogen_fraction(
-            self.data.plant_residue_lignin_composition, self.data.total_residue, self.data.crop_yield_nitrogen)
+            self.data.plant_residue_lignin_composition, self.data.all_residue, self.data.crop_yield_nitrogen)
         self.data.plant_residue_metabolic_fraction = self._determine_plant_residue_metabolic_fraction(
             self.data.plant_lignin_nitrogen_ratio)
 
@@ -207,7 +207,7 @@ class ResiduePartition:
         if layer_top >= root_depth:
             return 0
         elif layer_bottom <= root_depth:
-            return plant_root_residue * layer_thickness/root_depth
+            return plant_root_residue * layer_thickness / root_depth
         else:
             return plant_root_residue * (root_depth - layer_top) / root_depth
 
@@ -249,8 +249,10 @@ class ResiduePartition:
         ----------
         plant_residue_lignin_composition : float
             lignin fraction of plant residue (unitless)
-        nitrogen_fraction_plant_residue : float, default = 0.4
-            Nitrogen fraction in plant residue at harvest (unitless)
+        total_residue : float
+            total amount of soil residue ever added to the field (kg/ha)
+        crop_yield_nitrogen : float
+            nitrogen contained in the harvested yield (kg/ha)
 
         Returns
         -------
@@ -324,8 +326,8 @@ class ResiduePartition:
 
         """
         plant_metabolic_carbon_amount += plant_dry_matter_residue_amount \
-                                         * plant_residue_metabolic_fraction - \
-                                         (plant_metabolic_active_carbon_usage + plant_metabolic_to_soil_carbon_amount)
+            * plant_residue_metabolic_fraction - \
+            (plant_metabolic_active_carbon_usage + plant_metabolic_to_soil_carbon_amount)
         return plant_metabolic_carbon_amount
 
     @staticmethod
@@ -492,9 +494,9 @@ class ResiduePartition:
         pseudocode_soil S.6.B.I.8, S.6.B.I.12
         """
         updated_amount = plant_structural_carbon_amount + plant_dry_matter_residue_amount \
-                         * (1 - plant_residue_metabolic_fraction) - structural_carbon_transfer_amount \
-                         - plant_structural_to_active_carbon_amount \
-                         - plant_structural_to_slow_carbon_amount
+            * (1 - plant_residue_metabolic_fraction) - structural_carbon_transfer_amount \
+            - plant_structural_to_active_carbon_amount \
+            - plant_structural_to_slow_carbon_amount
 
         return updated_amount
 
@@ -641,7 +643,7 @@ class ResiduePartition:
         pseudocode_soil S.6.B.II.6, S.6.B.II.8
         """
         result = soil_metabolic_carbon_amount + plant_metabolic_to_soil_carbon_amount + \
-                 (root_biomass * soil_residue_metabolic_fraction) - soil_metabolic_active_carbon_usage
+            (root_biomass * soil_residue_metabolic_fraction) - soil_metabolic_active_carbon_usage
         return result
 
     @staticmethod
@@ -743,7 +745,7 @@ class ResiduePartition:
         pseudocode_soil S.6.B.II.9, S.6.B.II.11
         """
         updated_amount = soil_structural_carbon_amount + structural_carbon_transfer_amount + root_biomass * \
-                         (1 - soil_residue_metabolic_fraction) - soil_structural_to_active_carbon_amount - \
-                         soil_structural_to_slow_carbon_amount
+            (1 - soil_residue_metabolic_fraction) - soil_structural_to_active_carbon_amount - \
+            soil_structural_to_slow_carbon_amount
 
         return updated_amount
