@@ -175,13 +175,14 @@ class InputManager:
 
             properties_blob_key = file_details["properties"]
             properties = self.__metadata["properties"][properties_blob_key]
+            self.clean_input_data(data, properties)
             for property in properties.keys():
                 if file_type == "json":
-                    element_counter_and_validity = self._validate_json_element([property], properties_blob_key, data,
-                                                                               eager_termination)
+                    element_counter_and_validity = self._validate_json_element([property], properties_blob_key,
+                                                                               data, eager_termination)
                 if file_type == "csv":
-                    element_counter_and_validity = self._validate_csv_element(property, properties_blob_key, data,
-                                                                              eager_termination)
+                    element_counter_and_validity = self._validate_csv_element(property, properties_blob_key,
+                                                                              data, eager_termination)
 
                 fixed_elements_counter += element_counter_and_validity["fixed_elements"]
                 valid_elements_counter += element_counter_and_validity["valid_elements"]
@@ -199,6 +200,23 @@ class InputManager:
         om.add_log("Total Fixed Items", f"{fixed_elements_counter=}", info_map)
         om.add_log("Total Invalid Items", f"{invalid_elements_counter=}", info_map)
         return invalid_elements_counter == 0
+
+    def clean_input_data(self, input_data: dict, properties: Dict[str, Any]) -> None:
+        """Function to remove any key-value pairs present in an input file for which
+        the metadata doesn't have a corresponding key.
+
+        Parameters
+        ----------
+        input_data : dict
+            The input data value to be validated.
+        properties : Dict[str, Any]
+            The properties of the metadata blob corresponding to the input_data.
+        """
+        for key in list(input_data.keys()):
+            if key not in properties:
+                del input_data[key]
+            elif isinstance(input_data[key], dict) and isinstance(properties[key], dict):
+                self.clean_input_data(input_data[key], properties[key])
 
     def _validate_input_type_dynamic(self, variable_properties: Dict[str, Any], var_name: str, input_data_value: Any):
         """
