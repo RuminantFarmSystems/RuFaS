@@ -123,16 +123,16 @@ class SoilData:
     Fraction of snow volume represented by SNOCOVMX that corresponds to 50% snow cover, SNO50, (mm H2O).
     """
     snow_melt_factor_maximum = 4.5
-    """ 
-    Melt factor for snow on June 21, mlt6, (mm H2O/°C-day) 
-    If the watershed is in the Northern Hemisphere, SMFMX will be the maximum melt factor. 
-    If the watershed is in the Southern Hemisphere, SMFMX will be the minimum melt factor. 
+    """
+    Melt factor for snow on June 21, mlt6, (mm H2O/°C-day)
+    If the watershed is in the Northern Hemisphere, SMFMX will be the maximum melt factor.
+    If the watershed is in the Southern Hemisphere, SMFMX will be the minimum melt factor.
     """
     snow_melt_factor_minimum = 4.5
-    """ 
-    Melt factor for snow on December 21, mlt12, (mm H2O/°C-day) 
-    If the watershed is in the Northern Hemisphere, SMFMN will be the minimum melt factor. 
-    If the watershed is in the Southern Hemisphere, SMFMN will be the maximum melt factor. 
+    """
+    Melt factor for snow on December 21, mlt12, (mm H2O/°C-day)
+    If the watershed is in the Northern Hemisphere, SMFMN will be the minimum melt factor.
+    If the watershed is in the Southern Hemisphere, SMFMN will be the maximum melt factor.
     """
 
     # ---- Erosion

@@ -72,7 +72,7 @@ class Field:
 
         # soil attributes
         self.soil = soil or Soil(soil_data=None, field_size=self.field_data.field_size)  # default soil if not given.
-        self.snow = Snow(soil_data=soil.data, field_size=self.field_data.field_size)
+        self.snow = Snow(soil_data=self.soil.data, field_size=self.field_data.field_size)
 
         # crop attributes
         self.crops: List[Crop] = list()  # empty crop list

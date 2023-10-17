@@ -142,7 +142,7 @@ class Snow:
         Calculate the snow melt factor for the current day.
 
         This function calculates the snow melt factor based on Equation 1:2.5.3 in SWAT
-        2009 Theoretical Documentation.
+        2009 Theoretical Documentation. According to the equation:
 
         The snow melt factor represents the rate at which snow melts and is influenced by
         factors such as the day of the year (day), maximum snow melt factor (mlt6), and
