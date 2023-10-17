@@ -365,8 +365,8 @@ class HeiferII(HeiferI):
         estrus_cycle = truncnorm.rvs(
             -const.STDI,
             const.STDI,
-            AnimalBase.config["avg_estrus_cycle_cow"],
-            AnimalBase.config["std_estrus_cycle_cow"],
+            AnimalBase.config["avg_estrus_cycle_heifer"],
+            AnimalBase.config["std_estrus_cycle_heifer"],
         )
         estrus_day = int(start_date + abs(estrus_cycle))
         self.events.add_event(self.days_born, sim_day, estrus_note)

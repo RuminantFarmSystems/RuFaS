@@ -83,6 +83,8 @@
 				"preg_loss_rate_3": 0.017,
 				"avg_estrus_cycle_return": 23,
 				"std_estrus_cycle_return": 6,
+				"avg_estrus_cycle_heifer": 21,
+				"std_estrus_cycle_heifer": 2.5,
 				"avg_estrus_cycle_cow": 21,
 				"std_estrus_cycle_cow": 4,
 				"avg_estrus_cycle_after_pgf": 5,
