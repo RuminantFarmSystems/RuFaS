@@ -107,6 +107,8 @@ class SoilData:
     # ---- Snow
     snow_content: float = 0.0
     """The water content of the snow pack, SNO, (mm H2O)."""
+    snow_melt_amount: float = 0.0
+    """The water content of the snow that melted on the current day, SNO, (mm H2O)."""
     previous_day_snow_temperature: Optional[float] = None
     """Snow pack temperature on the previous day, T_snow_day_(n-1), (ºC)"""
     current_day_snow_temperature: Optional[float] = None

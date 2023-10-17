@@ -13,7 +13,7 @@ class Snow:
     """
         Class representing snow-related calculations and data management.
 
-        This class provides methods for calculating snow pack temperature, snow melting, snow coverage fraction, and
+        This class provides methods for calculating snow pack temperature, snow melting, and
         updating snow-related data based on the Soil and Water Assessment Tool (SWAT) documentation.
 
         Methods
@@ -23,9 +23,6 @@ class Snow:
 
         _melt_snow(current_day_weather: CurrentWeather, day: int):
             Calculate the snow melt for the current day.
-
-        _snow_coverage_fraction():
-            Calculate the snow coverage fraction, sno_cov.
 
         _melt_factor(day: int) -> float:
             Calculate the snow melt factor for a given day, b_mlt.
@@ -41,6 +38,7 @@ class Snow:
         self.soil_data = soil_data or SoilData(field_size=field_size)
         """object that tracks all soil variable throughout the simulation"""
 
+    @staticmethod
     def _calc_snow_temp(self, current_day_weather: CurrentWeather) -> float:
         """
         Calculate the snow pack temperature for the current day.
@@ -73,6 +71,7 @@ class Snow:
         else:
             return current_day_weather.mean_air_temperature
 
+    @staticmethod
     def _melt_snow(self, current_day_weather: CurrentWeather, day: int):
         """
         Calculate snow melting for the current day.
@@ -84,7 +83,8 @@ class Snow:
 
         Where:
         - b_mlt is the melt factor of the current day.
-        - sno_cov is the snow coverage fraction
+        - sno_cov is the snow coverage fraction. It can be assumed that it is equal to 1.0 whenever there is snow on the
+          ground.
         - T_snow is the snow pack temperature of the current day.
         - T_mx is the maximum air temperature of the current day.
         - T_mlt is the base temperature above which snow melt is allowed.
@@ -102,7 +102,7 @@ class Snow:
             The amount of snow melting for the current day.
         """
         melt_factor = self._melt_factor(day=day)
-        snow_coverage_fraction = self._snow_coverage_fraction()
+        snow_coverage_fraction = 1.0 if self.soil_data.snow_content > 0.0 else 0.0
         snow_temperature = self.soil_data.current_day_snow_temperature
         max_air_temperature = current_day_weather.max_air_temperature
         snow_melt_base_temperature = self.soil_data.snow_melt_base_temperature
@@ -110,40 +110,7 @@ class Snow:
         return melt_factor * snow_coverage_fraction * ((snow_temperature + max_air_temperature) / 2 -
                                                        snow_melt_base_temperature)
 
-    def _snow_coverage_fraction(self):
-        """
-        Calculate the snow coverage fraction for the current day.
-
-        This function calculates the snow coverage fraction based on Equation 1:2.4.2
-        in SWAT 2009 Theoretical Documentation.  According to the equation:
-
-            sno_cov = (SNO / SNO_100) * (SNO / SNO_100 + exp(cov_1 - cov_2 * SNO / SNO_100)) ** -1
-
-        Where:
-        - SNO is the water content of the snow pack of the current day (mm H2O).
-        - SNO_100 is the threshold depth of snow at 100% coverage (mm H2O).
-        - cov_1 and cov_2 are coefficients that define the shape of the curve, the values of 'cov_1' and 'cov_2' are
-          determined by solving the above equation using two know points: 95% coverage at 95% SNO_100; and 50% coverage
-          at SNO_50(a user specified fraction of SNO_100). This function solves for 'cov_1' and 'cov_2' in terms of
-          SNO_50 and uses these values to calculate the snow coverage fraction.
-
-        Returns
-        -------
-        float
-            The snow coverage fraction for the current day.
-        """
-        sno = self.soil_data.snow_content
-        sno50 = self.soil_data.snow_50_coverage
-        sno100 = self.soil_data.snow_coverage_maximum
-
-        # solving for cov1 and cov2 in terms of sno50
-        cov2 = (math.log((10 * 1 - sno50), math.e)) / 0.45
-        cov1 = math.log(0.05, math.e) + (0.95 * math.log(cov2, math.e))
-
-        sno_ratio = sno / sno100
-
-        return sno_ratio * (sno_ratio + math.exp(cov1 - cov2 * sno_ratio)) ** -1
-
+    @staticmethod
     def _melt_factor(self, day: int) -> float:
         """
         Calculate the snow melt factor for the current day.
@@ -201,5 +168,6 @@ class Snow:
         """Update previous day snow temperature"""
         self.soil_data.current_day_snow_temperature = self._calc_snow_temp(current_day_weather)
         """Update current day snow temperature"""
-        self.soil_data.snow_content -= self._melt_snow(current_day_weather, day)
+        self.soil_data.snow_melt_amount = self._melt_snow(current_day_weather, day)
+        self.soil_data.snow_content -= self.soil_data.snow_melt_amount
         """Update snow content with melted snow"""
