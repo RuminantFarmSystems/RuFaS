@@ -2409,15 +2409,13 @@
       "year": {
         "description": "Year.",
         "type": "number",
-        "minimum": 1900,
-        "default": 0
+        "minimum": 1900
       },
       "jday": {
         "description": "Julian day of the year.",
         "type": "number",
         "minimum": 0,
-        "maximum": 366,
-        "default": 0
+        "maximum": 366
       },
       "precip": {
         "description": "Amount of precipitation (mm H2O).",
@@ -2428,7 +2426,7 @@
       "high": {
         "description": "The maximum air temperature of the day (°C).",
         "type": "number",
-        "default": 0
+        "default": 21
       },
       "low": {
         "description": "The minimum air temperature of the day (°C).",
@@ -2446,7 +2444,7 @@
         "default": 0
       },
       "irrigation": {
-        "description": "Irrigation.",
+        "description": "Irrigation (mm H2O).",
         "type": "number",
         "default": 0
       }
