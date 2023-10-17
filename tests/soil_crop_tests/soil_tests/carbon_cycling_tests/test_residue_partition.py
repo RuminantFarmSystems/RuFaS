@@ -81,8 +81,8 @@ def test_determine_plant_metabolic_carbon_amount(plant_metabolic_carbon_amount: 
                                                  plant_metabolic_to_soil_carbon_amount: float) -> None:
     """Tests that the updated plant metabolic carbon amount is calculated correctly"""
     expected = plant_metabolic_carbon_amount + plant_dry_matter_residue_amount \
-               * plant_residue_metabolic_fraction - \
-               (plant_metabolic_active_carbon_usage + plant_metabolic_to_soil_carbon_amount)
+        * plant_residue_metabolic_fraction - \
+        (plant_metabolic_active_carbon_usage + plant_metabolic_to_soil_carbon_amount)
     assert expected == ResiduePartition._determine_plant_metabolic_carbon_amount(plant_metabolic_carbon_amount,
                                                                                  plant_residue_metabolic_fraction,
                                                                                  plant_dry_matter_residue_amount,
@@ -102,7 +102,7 @@ def test_determine_plant_metabolic_active_carbon_usage(decomposition_moisture_ef
     """Tests that plant metabolic active carbon usage amount was calculated correctly"""
     metabolic_active_carbon_rate = 0.28
     expected = decomposition_moisture_effect * decomposition_temperature_effect * \
-               plant_metabolic_carbon_amount * metabolic_active_carbon_rate
+        plant_metabolic_carbon_amount * metabolic_active_carbon_rate
     assert expected == ResiduePartition._determine_plant_metabolic_active_carbon_usage(decomposition_moisture_effect,
                                                                                        decomposition_temperature_effect,
                                                                                        plant_metabolic_carbon_amount)
@@ -152,8 +152,8 @@ def test_determine_plant_structural_to_slow_active_carbon_amount(plant_structura
     """Tests that the amount of plant structural carbon decomposed into slow or active carbon was calculated
     correctly"""
     expected = plant_structural_to_slow_or_active_rate * decomposition_moisture_effect \
-               * decomposition_temperature_effect \
-               * plant_structural_carbon_amount
+        * decomposition_temperature_effect \
+        * plant_structural_carbon_amount
     assert expected == ResiduePartition._determine_plant_structural_to_slow_active_carbon_amount(
         plant_structural_to_slow_or_active_rate,
         decomposition_moisture_effect,
@@ -193,9 +193,9 @@ def test_determine_plant_structural_carbon_amount(plant_dry_matter_residue_amoun
                                                   plant_structural_carbon_amount: float) -> None:
     """Tests that plant_structural_carbon_amount was updated correctly"""
     expected = plant_structural_carbon_amount + plant_dry_matter_residue_amount \
-               * (1 - plant_residue_metabolic_fraction) - structural_carbon_transfer_amount \
-               - plant_structural_to_active_carbon_amount \
-               - plant_structural_to_slow_carbon_amount
+        * (1 - plant_residue_metabolic_fraction) - structural_carbon_transfer_amount \
+        - plant_structural_to_active_carbon_amount \
+        - plant_structural_to_slow_carbon_amount
     assert expected == ResiduePartition._determine_plant_structural_carbon_amount(
         plant_dry_matter_residue_amount,
         plant_residue_metabolic_fraction,
@@ -311,7 +311,7 @@ def test_determine_soil_metabolic_carbon_amount(soil_metabolic_carbon_amount: fl
                                                 soil_metabolic_to_active_carbon_amount: float) -> None:
     """Test that the amount of soil metabolic carbon was updated correctly"""
     expected = soil_metabolic_carbon_amount + plant_metabolic_to_soil_carbon_amount + \
-               (root_biomass * soil_residue_metabolic_fraction) - soil_metabolic_to_active_carbon_amount
+        (root_biomass * soil_residue_metabolic_fraction) - soil_metabolic_to_active_carbon_amount
 
     assert expected == ResiduePartition._determine_soil_metabolic_carbon_amount(soil_metabolic_carbon_amount,
                                                                                 plant_metabolic_to_soil_carbon_amount,
@@ -332,7 +332,7 @@ def test_determine_soil_metabolic_to_active_carbon_amount(decomposition_moisture
     """Tests that the amount of soil metabolic carbon decomposed into active carbon was calculated correctly"""
     soil_metabolic_active_carbon_rate = 0.35
     expected = decomposition_temperature_effect * decomposition_moisture_effect * soil_metabolic_carbon_amount * \
-               soil_metabolic_active_carbon_rate
+        soil_metabolic_active_carbon_rate
     assert expected == ResiduePartition._determine_soil_metabolic_to_active_carbon_amount(
         decomposition_moisture_effect,
         decomposition_temperature_effect,
@@ -347,11 +347,11 @@ def test_determine_soil_metabolic_to_active_carbon_amount(decomposition_moisture
                          ])
 def test_determine_soil_structural_to_slow_active_carbon_amount(decomposition_moisture_effect: float,
                                                                 decomposition_temperature_effect: float,
-                                                                soil_structural_carbon_amount: float) -> float:
+                                                                soil_structural_carbon_amount: float) -> None:
     """Tests that the amount of soil structural carbon decomposed into slow or active carbon was calculated correctly"""
     soil_structural_to_slow_or_active_rate = 0.094
     expected = decomposition_moisture_effect * decomposition_temperature_effect * soil_structural_carbon_amount * \
-               soil_structural_to_slow_or_active_rate
+        soil_structural_to_slow_or_active_rate
     assert expected == ResiduePartition._determine_soil_structural_to_slow_active_carbon_amount(
         decomposition_moisture_effect,
         decomposition_temperature_effect,
@@ -373,8 +373,8 @@ def test_determine_soil_structural_carbon_amount(soil_residue_metabolic_fraction
                                                  soil_structural_carbon_amount: float) -> None:
     """Tests that the updated soil structural carbon amount is calculated correctly"""
     expected = soil_structural_carbon_amount + structural_carbon_transfer_amount + root_biomass * \
-               (1 - soil_residue_metabolic_fraction) - soil_structural_to_active_carbon_amount - \
-               soil_structural_to_slow_carbon_amount
+        (1 - soil_residue_metabolic_fraction) - soil_structural_to_active_carbon_amount - \
+        soil_structural_to_slow_carbon_amount
 
     assert expected == ResiduePartition._determine_soil_structural_carbon_amount(
         soil_residue_metabolic_fraction,
@@ -449,7 +449,7 @@ def test_partition_residue(layers: list, crop: CropData, rainfall=10):
     ResiduePartition._determine_soil_structural_to_slow_active_carbon_amount = MagicMock(return_value=2.9)
     ResiduePartition._determine_soil_structural_carbon_amount = MagicMock(return_value=3)
 
-    first_layer_yield_residue_value = crop.yield_residue
+    # first_layer_yield_residue_value = crop.yield_residue
     partition.partition_residue(rainfall)
 
     # Checking if methods are called correct number of times

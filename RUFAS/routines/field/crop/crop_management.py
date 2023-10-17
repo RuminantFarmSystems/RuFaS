@@ -165,7 +165,7 @@ class CropManagement:
         if self.data.do_harvest_index_override:
             self.data.yield_nitrogen = self.data.optimal_nitrogen_fraction * self.data.yield_collected  # SWAT 5:2.4.7
             self.data.yield_phosphorus = self.data.optimal_phosphorus_fraction * \
-                                         self.data.yield_collected  # SWAT 5:2.4.8
+                self.data.yield_collected  # SWAT 5:2.4.8
         else:
             self.data.yield_nitrogen = self.data.yield_nitrogen_fraction * self.data.yield_collected  # SWAT 5:2.4.5
             self.data.yield_phosphorus = self.data.yield_phosphorus_fraction * self.data.yield_collected  # SWAT 5:2.4.6
