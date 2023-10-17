@@ -115,3 +115,21 @@ def test_generate_graph_path_no_title(graph_generator: GraphGenerator) -> None:
                 result
                 == "/path/to/save\\graphics\\saved_graph_test_filter.png-13-Oct-2023_Fri_11-41-23.png"
             )
+
+
+def test_handle_tuple_based_plot(graph_generator: GraphGenerator) -> None:
+    data_dict = {
+        "var1": [1, 2, 3],
+        "var2": [4, 5, 6],
+        "var3": [7, 8, 9],
+        "var4": [10, 11, 12],
+    }
+    selected_variables = ["var1", "var2"]
+
+    def mock_plot_function(x, y):
+        assert x == [0, 1, 2]
+        assert y == (data_dict["var1"], data_dict["var2"])
+
+    graph_generator._handle_tuple_based_plot(
+        data_dict, selected_variables, mock_plot_function
+    )
