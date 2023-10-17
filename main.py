@@ -42,10 +42,12 @@ def run_rufas(
     """Main function to run RuFaS, with options.
 
     Args:
+        format_option: format for variable_names.txt output file
         make_graphs: prevent graphics from generating
         verbose: print progress messages while simulation is running
         clear_output: lear output directory before running the simulation
         exclude_info_map: exclude info_maps from the output
+        only_run_validation: validate input data and don't run a simulation
     """
     if clear_output:
         output_dir = Path(config.global_variables.OUT_DIR)
