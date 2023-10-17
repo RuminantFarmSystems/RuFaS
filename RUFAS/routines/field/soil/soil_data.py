@@ -72,7 +72,7 @@ class SoilData:
     """Cumulative total of active organic nitrogen that was removed from the top soil layer by erosion (kg)"""
 
     # ---- evaporation
-    water_evaporated: float = 0
+    water_evaporated: float = 0.0
     """Amount of water evaporated from the soil profile on the current day (mm)"""
 
     # ---- infiltration
