@@ -1,6 +1,7 @@
 from freezegun import freeze_time
 from typing import Dict
 from unittest.mock import patch
+from matplotlib import pyplot as plt
 import pytest
 from RUFAS.graph_generator import GraphGenerator
 
@@ -133,3 +134,30 @@ def test_handle_tuple_based_plot(graph_generator: GraphGenerator) -> None:
     graph_generator._handle_tuple_based_plot(
         data_dict, selected_variables, mock_plot_function
     )
+
+
+def test_customize_graph_figure_setters(graph_generator: GraphGenerator) -> None:
+    customization_details = {
+        "figsize": (6, 4),
+        "facecolor": "red",
+        "dpi": 100,
+    }
+    fig = plt.figure()
+    graph_generator._customize_graph(fig, customization_details)
+    assert (fig.get_size_inches() == (6, 4)).all()
+    assert fig.get_facecolor() == (1.0, 0.0, 0.0, 1.0)  # RGBA
+    assert fig.get_dpi() == 100
+
+
+def test_customize_graph_axes_setters(graph_generator: GraphGenerator) -> None:
+    fig = plt.figure()
+    ax = fig.add_subplot(111)
+    customization_details = {
+        "title": "Test Plot",
+        "xlabel": "X-axis Label",
+        "ylabel": "Y-axis Label",
+    }
+    graph_generator._customize_graph(fig, customization_details)
+    assert ax.get_title() == "Test Plot"
+    assert ax.get_xlabel() == "X-axis Label"
+    assert ax.get_ylabel() == "Y-axis Label"
