@@ -135,7 +135,6 @@ def test_run_validation(mocker: MockerFixture, is_data_valid: bool) -> None:
     mock_input_manager.flush_pool.return_value = None
     mock_output_manager.dump_all_nondata_pools.return_value = None
     mock_output_manager.save_variables.return_value = None
-    mock_input_manager.set_format_option.return_value = None
     mocker.patch("main.OutputManager", return_value=mock_output_manager)
     mocker.patch("main.InputManager", return_value=mock_input_manager)
     metadata_prefix1 = "dummy_prefix1"
@@ -148,12 +147,11 @@ def test_run_validation(mocker: MockerFixture, is_data_valid: bool) -> None:
 
     run_validation(metadata_file_list, True, "verbose")
 
-    assert mock_output_manager.set_format_option.call_count == 1
     assert mock_output_manager.flush_pools.call_count == len(metadata_file_list)
     assert mock_input_manager.flush_pool.call_count == len(metadata_file_list)
     assert mock_output_manager.dump_all_nondata_pools.call_count == len(metadata_file_list)
     assert mock_output_manager.dump_all_nondata_pools.call_args_list == [
-        mocker.call("output", True)
+        mocker.call("output", True, "verbose")
     ] * len(metadata_file_list)
 
 
@@ -172,7 +170,6 @@ def test_execute_simulations(mocker: MockerFixture, is_data_valid: bool,
     mock_input_manager.flush_pool.return_value = None
     mock_output_manager.dump_all_nondata_pools.return_value = None
     mock_output_manager.save_variables.return_value = None
-    mock_input_manager.set_format_option.return_value = None
     mocker.patch("main.OutputManager", return_value=mock_output_manager)
     mocker.patch("main.InputManager", return_value=mock_input_manager)
     metadata_file_path1 = Path("metadata_file1.json")
@@ -191,13 +188,12 @@ def test_execute_simulations(mocker: MockerFixture, is_data_valid: bool,
 
     # Assert
     assert mock_simulator.simulate.call_count == simulate_call_count
-    assert mock_output_manager.set_format_option.call_count == 1
     assert mock_output_manager.add_error.call_count == add_error_call_count
     assert mock_output_manager.flush_pools.call_count == len(metadata_file_list)
     assert mock_input_manager.flush_pool.call_count == len(metadata_file_list)
     assert mock_output_manager.dump_all_nondata_pools.call_count == len(metadata_file_list)
     assert mock_output_manager.dump_all_nondata_pools.call_args_list == [
-        mocker.call("output", True)
+        mocker.call("output", True, format_option)
     ] * len(metadata_file_list)
     assert mock_output_manager.save_variables.call_count == len(metadata_file_list)
     assert mock_output_manager.save_variables.call_args_list == [
@@ -224,7 +220,7 @@ def test_parse_gnu_args(mocker: MockerFixture) -> None:
         mocker.call(
             '-f',
             "--format-option",
-            choices=['block', 'inline', 'verbose', 'match'],
+            choices=['block', 'inline', 'verbose', 'basic'],
             help="Select formatting option for variable_names.txt file",
         ),
         mocker.call(

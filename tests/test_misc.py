@@ -337,11 +337,11 @@ def test_dict_to_csv_column_list(mock_output_manager: OutputManager) -> None:
     data_series = result[0]
     map1_series = result[1]
     map2_series = result[2]
-    assert data_series.name == "dummy_variable_name.values"
+    assert data_series.name == "dummy_variable_name"
     assert data_series.to_list() == data['values']
-    assert map1_series.name == "dummy_variable_name.info_maps_map1"
+    assert map1_series.name == "dummy_variable_name.map1"
     assert map1_series.to_list() == ['value1', 'value2']
-    assert map2_series.name == "dummy_variable_name.info_maps_map2"
+    assert map2_series.name == "dummy_variable_name.map2"
     assert map2_series.to_list() == [1, 2]
 
 
@@ -352,28 +352,28 @@ def test_dict_to_csv_column_list_empty_list(mock_output_manager: OutputManager) 
 
     assert len(result) == 2
     series = result[0]
-    assert series.name == "dummy_variable_name.values"
+    assert series.name == "dummy_variable_name"
     assert series.to_list() == []
     series = result[1]
-    assert series.name == "dummy_variable_name.info_maps"
+    assert series.name == "dummy_variable_name"
     assert series.to_list() == []
 
 
 @pytest.mark.parametrize("data, expected_result, should_write", [
     ({"var1": {"values": [1.0, True, "test"], "info_maps": []}},
-     f"var1.values,var1.info_maps{os.linesep}1.0,{os.linesep}True,{os.linesep}test,{os.linesep}",
+     f"var1,var1{os.linesep}1.0,{os.linesep}True,{os.linesep}test,{os.linesep}",
      True),
     ({"var1": {"values": [1.0, True, "test"]}},
-     f"var1.values{os.linesep}1.0{os.linesep}True{os.linesep}test{os.linesep}",
+     f"var1{os.linesep}1.0{os.linesep}True{os.linesep}test{os.linesep}",
      True),
     ({"var1": {"values": [1, 2, 3], "info_maps": [{"v": 1}, {"v": 2}, {"v": 3}]}},
-     f"var1.values,var1.info_maps_v{os.linesep}1,1{os.linesep}2,2{os.linesep}3,3{os.linesep}",
+     f"var1,var1.v{os.linesep}1,1{os.linesep}2,2{os.linesep}3,3{os.linesep}",
      True),
     ({"var1": {"values": [1, 2, 3]}},
-     f"var1.values{os.linesep}1{os.linesep}2{os.linesep}3{os.linesep}",
+     f"var1{os.linesep}1{os.linesep}2{os.linesep}3{os.linesep}",
      True),
     ({"var1": {"values": [1], "info_maps": [{"map1": "value1"}, {"map1": "value2"}]}},
-     f"var1.values,var1.info_maps_map1{os.linesep}1,value1{os.linesep},value2{os.linesep}",
+     f"var1,var1.map1{os.linesep}1,value1{os.linesep},value2{os.linesep}",
      True),
     ({"var1":
       {
@@ -381,7 +381,7 @@ def test_dict_to_csv_column_list_empty_list(mock_output_manager: OutputManager) 
         "info_maps": [{"map1": "value1"}, {"map1": "value2"}]
       }
       },
-     f"var1.v1,var1.v2,var1.info_maps_map1{os.linesep}1,1,value1{os.linesep}2,2,value2{os.linesep}",
+     f"var1.v1,var1.v2,var1.map1{os.linesep}1,1,value1{os.linesep}2,2,value2{os.linesep}",
      True),
     ({
         "simple_key": {
@@ -408,8 +408,8 @@ def test_dict_to_csv_column_list_empty_list(mock_output_manager: OutputManager) 
             ]
         }
     },
-     f"simple_key.key1,simple_key.key2,simple_key.info_maps_subkey1,simple_key.info_maps_subkey2,"
-     f"simple_key.info_maps_subkey3,simple_key.info_maps_subkey4{os.linesep}"
+     f"simple_key.key1,simple_key.key2,simple_key.subkey1,simple_key.subkey2,"
+     f"simple_key.subkey3,simple_key.subkey4{os.linesep}"
      f"1,\"[1, 1]\",1,Hello,\"[1, 2, 3]\",\"{{'nestedkey1': 'World', 'nestedkey2': [4, 5, 6]}}\"{os.linesep}"
      f"2,\"[2, 2]\",2,Hi,\"[4, 5, 6]\",\"{{'nestedkey1': 'There', 'nestedkey2': [7, 8, 9]}}\"{os.linesep}"
      f"3,\"[3, 3]\",,,,{os.linesep}",
@@ -422,7 +422,7 @@ def test_dict_to_csv_column_list_empty_list(mock_output_manager: OutputManager) 
             "values": [4, 5, 6]
         }
     },
-     f"simple_key1.values,simple_key2.values{os.linesep}"
+     f"simple_key1,simple_key2{os.linesep}"
      f"1,4{os.linesep}2,5{os.linesep}3,6{os.linesep}",
      True),
     ({
@@ -444,8 +444,8 @@ def test_dict_to_csv_column_list_empty_list(mock_output_manager: OutputManager) 
             ]
         }
     },
-     f"simple_key1.values,simple_key1.info_maps_subkey1,simple_key1.info_maps_subkey2,simple_key2.values,"
-     f"simple_key2.info_maps_subkey1{os.linesep}"
+     f"simple_key1,simple_key1.subkey1,simple_key1.subkey2,simple_key2,"
+     f"simple_key2.subkey1{os.linesep}"
      f"1,Farm,Field,4,Tractor{os.linesep}"
      f"2,,,5,{os.linesep}"
      f"3,,,6,{os.linesep}"
@@ -801,15 +801,15 @@ def test_dump_all_nondata_pools(
     mock_output_manager.dump_logs = MagicMock()
     mock_output_manager.dump_variable_names_and_contexts = MagicMock()
 
-    mock_output_manager.dump_all_nondata_pools(path, False)
+    mock_output_manager.dump_all_nondata_pools(path, False, "verbose")
 
     mock_output_manager.dump_errors.assert_called_once_with(path)
     mock_output_manager.dump_warnings.assert_called_once_with(path)
     mock_output_manager.dump_logs.assert_called_once_with(path)
-    mock_output_manager.dump_variable_names_and_contexts.assert_called_once_with(path, False)
+    mock_output_manager.dump_variable_names_and_contexts.assert_called_once_with(path, False, "verbose")
 
     mock_output_manager.dump_all_nondata_pools(path, True)
-    mock_output_manager.dump_variable_names_and_contexts.assert_called_with(path, True)
+    mock_output_manager.dump_variable_names_and_contexts.assert_called_with(path, True, "verbose")
     assert mock_output_manager.dump_logs.call_count == 2
     assert mock_output_manager.dump_warnings.call_count == 2
     assert mock_output_manager.dump_errors.call_count == 2
@@ -1029,11 +1029,10 @@ def test_dump_variable_names_and_contexts(
      }
     original_variables_pool = mock_output_manager.variables_pool
     mock_output_manager.variables_pool = mock_variable_pool
-    mock_output_manager.set_format_option(format_option)
     mock_output_manager._generate_file_name = MagicMock(return_value="dummy_name")
     mock_output_manager._list_to_file_txt = MagicMock()
 
-    mock_output_manager.dump_variable_names_and_contexts("dummy_path", exclude_info_maps)
+    mock_output_manager.dump_variable_names_and_contexts("dummy_path", exclude_info_maps, format_option)
 
     mock_output_manager._generate_file_name.assert_called_once_with("variable_names", "txt")
     mock_output_manager._list_to_file_txt.assert_called_once_with(
@@ -1062,11 +1061,10 @@ def test_dump_variable_names_and_contexts_no_values(
                        'var1: **NO VARIABLES**' + os.linesep]
     original_variables_pool = mock_output_manager.variables_pool
     mock_output_manager.variables_pool = mock_variable_pool
-    mock_output_manager.set_format_option("verbose")
     mock_output_manager._generate_file_name = MagicMock(return_value="dummy_name")
     mock_output_manager._list_to_file_txt = MagicMock()
 
-    mock_output_manager.dump_variable_names_and_contexts("dummy_path", False)
+    mock_output_manager.dump_variable_names_and_contexts("dummy_path", False, format_option="verbose")
 
     mock_output_manager._generate_file_name.assert_called_once_with("variable_names", "txt")
     mock_output_manager._list_to_file_txt.assert_called_once_with(
