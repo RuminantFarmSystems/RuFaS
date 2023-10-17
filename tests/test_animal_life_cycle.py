@@ -1136,15 +1136,14 @@ def test_calc_cow_percentages(mocker: MockerFixture, life_cycle_manager: LifeCyc
                               cow_num: int) -> None:
     """Unit test for function _calculate_cow_percentages() in file life_cycle.py."""
     # Arrange
-    dry_cow_num = milking_cow_num = preg_cow_num = open_cow_num = vwp_cow_num = 0
+    dry_cow_num = milking_cow_num = preg_cow_num = open_cow_num = 0
     life_cycle_manager.cow_num = cow_num
     if cow_num > 0:
         life_cycle_manager.dry_cow_num = dry_cow_num = int(0.2 * cow_num)
         life_cycle_manager.milking_cow_num = milking_cow_num = int(0.2 * cow_num)
         life_cycle_manager.preg_cow_num = preg_cow_num = int(0.2 * cow_num)
         life_cycle_manager.open_cow_num = open_cow_num = int(0.2 * cow_num)
-        life_cycle_manager.vwp_cow_num = vwp_cow_num = (cow_num - dry_cow_num - milking_cow_num
-                                                        - preg_cow_num - open_cow_num)
+        life_cycle_manager.vwp_cow_num = (cow_num - dry_cow_num - milking_cow_num - preg_cow_num - open_cow_num)
     spy_calc_cow_percentages = mocker.spy(life_cycle_manager, '_calculate_cow_percentages')
 
     # Act
