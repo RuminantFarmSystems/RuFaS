@@ -6,6 +6,7 @@ from RUFAS.routines.field.crop.species_data_factory import CropSpecies, CropSpec
 from RUFAS.routines.field.manager.events import Event, PlantingEvent, HarvestEvent, FertilizerEvent, ManureEvent
 from RUFAS.routines.field.manager.current_weather import CurrentWeather
 from RUFAS.routines.field.soil.soil import Soil
+from RUFAS.routines.field.soil.snow import Snow
 from RUFAS.routines.field.field.field_data import FieldData
 from RUFAS.routines.field.field.fertilizer_application import FertilizerApplication
 from RUFAS.routines.field.field.tillage_application import TillageApplication
@@ -71,6 +72,7 @@ class Field:
 
         # soil attributes
         self.soil = soil or Soil(soil_data=None, field_size=self.field_data.field_size)  # default soil if not given.
+        self.snow = Snow(soil_data=soil.data, field_size=self.field_data.field_size)
 
         # crop attributes
         self.crops: List[Crop] = list()  # empty crop list
@@ -992,7 +994,7 @@ class Field:
 
         # TODO: figure out how to determine weighting coefficient when there are multiple crops in the field - issue
         #  #519
-        # update_snow()
+        self.snow.update_snow(current_day_weather=current_weather, day=time.day)
         self.soil.infiltration.infiltrate(precipitation_reaching_soil)
         self.soil.percolation.percolate(self.field_data.seasonal_high_water_table)
         # TODO: find reasonable values/way to set minimum cover management factor - issue #520

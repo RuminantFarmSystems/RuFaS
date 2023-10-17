@@ -109,6 +109,31 @@ class SoilData:
     previous_day_snow_temperature: Optional[float] = None
     current_day_snow_temperature: Optional[float] = None
     snow_lag_factor: float = 1.0
+    snow_melt_base_temperature = 0.5
+    """
+    Snow melt base temperature, Tmlt, (ºC).
+    The snow pack will not melt until the snow pack temperature exceeds a threshold value, Tmlt.
+    """
+    snow_coverage_maximum = 1.0
+    """
+    Minimum snow water content that corresponds to 100% snow cover, SNO100, (mm H2O).
+    """
+    snow_50_coverage = 0.5
+    """
+    Fraction of snow volume represented by SNOCOVMX that corresponds to 50% snow cover, SNO50, (mm H2O).
+    """
+    snow_melt_factor_maximum = 4.5
+    """ 
+    Melt factor for snow on June 21, mlt6, (mm H2O/°C-day) 
+    If the watershed is in the Northern Hemisphere, SMFMX will be the maximum melt factor. 
+    If the watershed is in the Southern Hemisphere, SMFMX will be the minimum melt factor. 
+    """
+    snow_melt_factor_minimum = 4.5
+    """ 
+    Melt factor for snow on December 21, mlt12, (mm H2O/°C-day) 
+    If the watershed is in the Northern Hemisphere, SMFMN will be the minimum melt factor. 
+    If the watershed is in the Southern Hemisphere, SMFMN will be the maximum melt factor. 
+    """
 
     # ---- Erosion
     slope_length: float = 3
