@@ -1012,6 +1012,13 @@ def test_dump_errors(
     (['_exclude_info_maps=True, expect info_maps accordingly.' + os.linesep, 'var1' + os.linesep,
       "var2.values: ['v1', 'v2']" + os.linesep],
      True, "inline"),
+    (['_exclude_info_maps=True, expect info_maps accordingly.' + os.linesep, 'var1' + os.linesep,
+      "var2.v1" + os.linesep, "var2.v2" + os.linesep],
+     True, "basic"),
+    (['_exclude_info_maps=False, expect info_maps accordingly.' + os.linesep, 'var1' + os.linesep,
+      "var1.test" + os.linesep, "var2.map1" + os.linesep,
+      "var2.v1" + os.linesep, "var2.v2" + os.linesep],
+     False, "basic"),
 ])
 def test_dump_variable_names_and_contexts(
     mock_output_manager: OutputManager,
