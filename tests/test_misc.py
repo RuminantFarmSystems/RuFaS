@@ -546,8 +546,12 @@ def test_save_variables_to_csv_files_exceptions(
     """Unit test for the function _save_variables_to_csv_files() in the file output_manager.py"""
 
     with patch("pathlib.Path.mkdir") as mock_mkdir:
-        mock_mkdir.side_effect = OSError("test error")
-        with pytest.raises(OSError, match="test error"):
+        mock_mkdir.side_effect = OSError("test OS Error")
+        with pytest.raises(OSError, match="test OS Error"):
+            mock_output_manager._save_variables_to_csv_files({}, "filter", "path")
+
+        mock_mkdir.side_effect = FileNotFoundError("test File not Found Error")
+        with pytest.raises(OSError, match="test File not Found Error"):
             mock_output_manager._save_variables_to_csv_files({}, "filter", "path")
 
 
