@@ -342,9 +342,6 @@ class LifeCycleManager:
         om.add_variable("num_cow_for_parity_2", parity_2, info_map)
         om.add_variable("num_cow_for_parity_3", parity_3, info_map)
         om.add_variable("num_cow_for_parity_greater_than_3", parity_greater_than_3, info_map)
-        om.add_variable("num_cow_summary", self.num_cow_for_parity, info_map)
-        print(self.num_cow_for_parity)
-        print(self.num_cow_for_parity['1'])
         calving_to_preg_time_1 = self.avg_calving_to_preg_time['1']
         calving_to_preg_time_2 = self.avg_calving_to_preg_time['2']
         calving_to_preg_time_3 = self.avg_calving_to_preg_time['3']
