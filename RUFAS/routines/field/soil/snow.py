@@ -16,30 +16,25 @@ class Snow:
         This class provides methods for calculating snow pack temperature, snow melting, snow coverage fraction, and
         updating snow-related data based on the Soil and Water Assessment Tool (SWAT) documentation.
 
-        Args:
-            soil_data : Optional[SoilData]
-                An optional SoilData object that tracks soil variables.
-            field_size : Optional[float]
-                An optional field size parameter used for initializing SoilData if not provided.
+        Methods
+        -------
+        _calc_snow_temp(current_day_weather: CurrentWeather) -> float:
+            Calculate the snow pack temperature for the current day.
 
-        Methods:
-            _calc_snow_temp(current_day_weather: CurrentWeather) -> float:
-                Calculate the snow pack temperature for the current day.
+        _melt_snow(current_day_weather: CurrentWeather, day: int):
+            Calculate the snow melt for the current day.
 
-            _melt_snow(current_day_weather: CurrentWeather, day: int):
-                Calculate the snow melt for the current day.
+        _snow_coverage_fraction():
+            Calculate the snow coverage fraction, sno_cov.
 
-            _snow_coverage_fraction():
-                Calculate the snow coverage fraction, sno_cov.
+        _melt_factor(day: int) -> float:
+            Calculate the snow melt factor for a given day, b_mlt.
 
-            _melt_factor(day: int) -> float:
-                Calculate the snow melt factor for a given day, b_mlt.
+        sublimation():
+            Placeholder function for sublimation calculations.
 
-            sublimation():
-                Placeholder function for sublimation calculations.
-
-            update_snow(current_day_weather: CurrentWeather, day: int) -> None:
-                Update snow-related data including snow content and temperatures.
+        update_snow(current_day_weather: CurrentWeather, day: int) -> None:
+            Update snow-related data including snow content and temperatures.
         """
 
     def __init__(self, soil_data: Optional[SoilData] = None, field_size: Optional[float] = None):
@@ -62,12 +57,15 @@ class Snow:
         - l_sno is a lagging factor that accounts for snow pack density, snow pack
           depth, exposure, and other factors affecting snow pack temperature.
 
-        Parameters:
-            current_day_weather :CurrentWeather
-                The current day weather data.
+        Parameters
+        ----------
+        current_day_weather :CurrentWeather
+            The current day weather data.
 
-        Returns:
-            float: The calculated snow pack temperature for the current day in Celsius.
+        Returns
+        -------
+        float
+            The calculated snow pack temperature for the current day in Celsius.
         """
         if self.soil_data.snow_content is not None and self.soil_data.snow_content > 0.0:
             return (self.soil_data.previous_day_snow_temperature * (1 - self.soil_data.snow_lag_factor)) + \
@@ -91,14 +89,17 @@ class Snow:
         - T_mx is the maximum air temperature of the current day.
         - T_mlt is the base temperature above which snow melt is allowed.
 
-        Parameters:
-            current_day_weather : CurrentWeather
-                The current day weather data
-            day :int
-                The day number of the year.
+        Parameters
+        ----------
+        current_day_weather : CurrentWeather
+            The current day weather data
+        day :int
+            The day number of the year.
 
-        Returns:
-            float: The amount of snow melting for the current day.
+        Returns
+        -------
+        float
+            The amount of snow melting for the current day.
         """
         melt_factor = self._melt_factor(day=day)
         snow_coverage_fraction = self._snow_coverage_fraction()
@@ -116,14 +117,20 @@ class Snow:
         This function calculates the snow coverage fraction based on Equation 1:2.4.2
         in SWAT 2009 Theoretical Documentation.  According to the equation:
 
-        The snow coverage fraction represents the fraction of the ground covered by snow
-        and is influenced by various factors, including snow content (sno), snow coverage
-        at 50% (sno50), and maximum snow coverage (sno100). The function solves for
-        'cov1' and 'cov2' in terms of sno50 and uses these values to calculate the
-        snow coverage fraction.
+            sno_cov = (SNO / SNO_100) * (SNO / SNO_100 + exp(cov_1 - cov_2 * SNO / SNO_100)) ** -1
 
-        Returns:
-            float: The snow coverage fraction for the current day.
+        Where:
+        - SNO is the water content of the snow pack of the current day (mm H2O).
+        - SNO_100 is the threshold depth of snow at 100% coverage (mm H2O).
+        - cov_1 and cov_2 are coefficients that define the shape of the curve, the values of 'cov_1' and 'cov_2' are
+          determined by solving the above equation using two know points: 95% coverage at 95% SNO_100; and 50% coverage
+          at SNO_50(a user specified fraction of SNO_100). This function solves for 'cov_1' and 'cov_2' in terms of
+          SNO_50 and uses these values to calculate the snow coverage fraction.
+
+        Returns
+        -------
+        float
+            The snow coverage fraction for the current day.
         """
         sno = self.soil_data.snow_content
         sno50 = self.soil_data.snow_50_coverage
@@ -144,16 +151,22 @@ class Snow:
         This function calculates the snow melt factor based on Equation 1:2.5.3 in SWAT
         2009 Theoretical Documentation. According to the equation:
 
-        The snow melt factor represents the rate at which snow melts and is influenced by
-        factors such as the day of the year (day), maximum snow melt factor (mlt6), and
-        minimum snow melt factor (mlt12). The function computes the snow melt factor
-        based on these factors and a sinusoidal function.
+            b_mlt = (b_mlt6 + b_mlt12) / 2 + (b_mlt6 - b_mlt12) / 2 * sin((2*pi/365) * (d_n - 81))
 
-        Parameters:
-            day (int): The day number of the year.
+        Where:
+        - b_mlt6 is the melt factor for June 21 (mm H2O/°C-day)
+        - b_mlt12 is the melt factor for December 21 (mm H2O/°C-day)
+        - d_n is the day number of the year
 
-        Returns:
-            float: The calculated snow melt factor for the current day.
+        Parameters
+        ----------
+        day : int
+            The day number of the year.
+
+        Returns
+        -------
+        float
+            The calculated snow melt factor for the current day.
         """
         mlt6 = self.soil_data.snow_melt_factor_maximum
         mlt12 = self.soil_data.snow_melt_factor_minimum
@@ -163,8 +176,26 @@ class Snow:
         pass
 
     def update_snow(self, current_day_weather: CurrentWeather, day: int) -> None:
+        """
+        Update snow-related data for the current day.
+
+        This function updates various snow-related data, including snow content, snow
+        temperatures, and snow melting, based on the provided current day weather data
+        and day of the simulation.
+
+        Parameters
+        ----------
+        current_day_weather : CurrentWeather
+            The current day weather data.
+        day : int
+            The day number of the year.
+
+        Returns
+        -------
+        None
+        """
         self.soil_data.snow_content += current_day_weather.snow_fall
-        """Update snow content"""
+        """Update snow content with precipitation"""
         self.soil_data.previous_day_snow_temperature = self.soil_data.current_day_snow_temperature if \
             self.soil_data.snow_content > 0.0 else None
         """Update previous day snow temperature"""
