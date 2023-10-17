@@ -788,7 +788,7 @@ class OutputManager(object):
 
                 if format_option == "inline":
                     formatted_output.append(f"{name}.{parsable_dict}: {list(keys)}")
-                elif format_option == "match":
+                elif format_option == "basic":
                     formatted_output.extend([f"{name}.{key}" for key in keys])
                 else:
                     formatted_output.extend([f"{prefix}.{parsable_dict}: {key}" for key in keys])
