@@ -49,20 +49,20 @@ class CropManagement:
             The object tracking the attributes of the soil profile.
 
         """
+        killed = False
         self.determine_harvest_index()
 
         if harvest_op == HarvestOperation.HARVEST:
             self.cut_crop(collected_fraction=self.data.harvest_efficiency)
             self.kill()
+            killed = True
 
         if harvest_op == HarvestOperation.HARVEST_NOKILL:
             self.cut_crop(collected_fraction=self.data.harvest_efficiency)
+            # non of the roots gets killed, soil litter not used
 
         self._record_yield(field_name, field_size, year, day)
-        self._transfer_residue(soil_data)
-        soil_data.plant_root_residue = self.data.root_biomass
-        soil_data.crop_root_depth = self.data.root_depth
-        soil_data.crop_yield_nitrogen = self.data.yield_nitrogen
+        self._transfer_residue(soil_data, killed)
 
     # TODO: implement grazing feature - issue #590
 
@@ -210,7 +210,7 @@ class CropManagement:
                  "harvest_date": {"year": year, "day": day}}
         om.add_variable("harvest_yield", value, info_map)
 
-    def _transfer_residue(self, soil_data: SoilData) -> None:
+    def _transfer_residue(self, soil_data: SoilData, killed: bool) -> None:
         """
         Transfers residue from harvest to SoilData that tracks how that residue is degraded and assimilated into the
         soil.
@@ -222,7 +222,12 @@ class CropManagement:
 
         """
         soil_data.plant_surface_residue += self.data.yield_residue
-        # set soil.ratio = biomass*ligning compose/ self.data.yield_nitrogen
+        if killed:
+            soil_data.plant_root_residue = self.data.root_biomass
+            soil_data.crop_root_depth = self.data.root_depth
+            soil_data.crop_yield_nitrogen = self.data.residue_nitrogen
+        else:
+            soil_data.crop_yield_nitrogen = self.data.residue_nitrogen
         # root residue
         soil_data.soil_layers[0].fresh_organic_nitrogen_content += self.data.yield_nitrogen
         # TODO: Add organic phosphorus to correct pool in soil - GitHub issue #444
