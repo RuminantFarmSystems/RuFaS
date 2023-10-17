@@ -22,7 +22,7 @@ def test_determine_plant_residue_lignin_composition(plant_residue_lignin_composi
                                                                                     rainfall)
 
 
-@pytest.mark.parametrize("plant_residue_lignin_composition, nitrogen_fraction_plant_residue", [
+@pytest.mark.parametrize("plant_residue_lignin_composition, total_residue, crop_yield_nitrogen, expected", [
     (3, 0.4),  # default
     (50, 0.5),  # higher plant_residue_lignin_composition
     (1.8, 55),  # higher nitrogen_fraction_plant_residue
@@ -31,7 +31,9 @@ def test_determine_plant_residue_lignin_composition(plant_residue_lignin_composi
     (0, 3),  # no nitrogen_fraction_plant_residue
 ])
 def test_determine_plant_lignin_nitrogen_ratio(plant_residue_lignin_composition: float,
-                                               nitrogen_fraction_plant_residue) -> None:
+                                               total_residue: float,
+                                               crop_yield_nitrogen: float,
+                                               expected: float) -> None:
     """Test that metabolic plant residue ration is correctly determined under current nitrogen_fraction_plant_residue
     """
     if 0 < nitrogen_fraction_plant_residue <= 1.0:

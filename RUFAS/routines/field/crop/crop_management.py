@@ -62,6 +62,7 @@ class CropManagement:
         self._transfer_residue(soil_data)
         soil_data.plant_root_residue = self.data.root_biomass
         soil_data.crop_root_depth = self.data.root_depth
+        soil_data.crop_yield_nitrogen = self.data.yield_nitrogen
 
     # TODO: implement grazing feature - issue #590
 

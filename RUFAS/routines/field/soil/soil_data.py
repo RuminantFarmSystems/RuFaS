@@ -194,6 +194,8 @@ class SoilData:
     """total amount of soil residue ever added to the field"""  # TODO: needed?
     crop_root_depth: float = 0
     """Root depth of the crop harvested (mm)"""
+    crop_yield_nitrogen: float = 0
+    """nitrogen contained in the harvested yield (kg/ha)"""
     @property
     def all_residue(self) -> float:  # TODO: not currently used.
         """amount of total plant residue, above and below-ground, on the field (kg/ha)"""

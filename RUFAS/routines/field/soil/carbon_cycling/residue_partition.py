@@ -44,7 +44,7 @@ class ResiduePartition:
         self.data.plant_residue_lignin_composition = self._determine_plant_residue_lignin_composition(
             self.data.plant_residue_lignin_composition, rainfall)
         self.data.plant_lignin_nitrogen_ratio = self._determine_plant_lignin_nitrogen_fraction(
-            self.data.plant_residue_lignin_composition)
+            self.data.plant_residue_lignin_composition, self.data.total_residue, self.data.crop_yield_nitrogen)
         self.data.plant_residue_metabolic_fraction = self._determine_plant_residue_metabolic_fraction(
             self.data.plant_lignin_nitrogen_ratio)
 
@@ -238,7 +238,8 @@ class ResiduePartition:
 
     @staticmethod
     def _determine_plant_lignin_nitrogen_fraction(plant_residue_lignin_composition: float,
-                                                  nitrogen_fraction_plant_residue=0.4) -> float:
+                                                  total_residue: float,
+                                                  crop_yield_nitrogen: float) -> float:
         # TODO nitrogen_fraction_plant_residue calculate in RuFaS [C.5.B.1] but not "accurate" for carbon use -
         #  GitHub Issue #163
         """This method calculates the plant lignin to nitrogen ratio when nitrogen in plant residue at harvest
@@ -260,6 +261,7 @@ class ResiduePartition:
         -------
         pseudocode_soil S.6.B.I.2
         """
+        nitrogen_fraction_plant_residue = crop_yield_nitrogen / total_residue
         if 0 < nitrogen_fraction_plant_residue <= 1.0:
             return (plant_residue_lignin_composition / 100) / nitrogen_fraction_plant_residue
         elif nitrogen_fraction_plant_residue == 0:
