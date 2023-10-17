@@ -39,6 +39,7 @@ def input_manager_original_method_states(
         "_load_metadata": mock_input_manager._load_metadata,
         "_load_data_from_json": mock_input_manager._load_data_from_json,
         "_load_data_from_csv": mock_input_manager._load_data_from_csv,
+        "_clean_input_data": mock_input_manager._clean_input_data,
         "_populate_pool": mock_input_manager._populate_pool,
         "_validate_json_element": mock_input_manager._validate_json_element,
         "_array_type_validator": mock_input_manager._array_type_validator,
@@ -158,6 +159,28 @@ def test_start_data_processing(mock_input_manager: InputManager,
     mock_input_manager._load_metadata = input_manager_original_method_states["_load_metadata"]
     mock_input_manager._populate_pool = \
         input_manager_original_method_states["_populate_pool"]
+
+
+@pytest.mark.parametrize("input_data, properties, expected_result", [
+        (
+            {'key1': 'value1', 'key2': 'value2'},
+            {'key1': 'some_value'},
+            {'key1': 'value1'}
+        ),
+        (
+            {'key1': {'nested_key1': 'value1', 'nested_key2': 'value2'}},
+            {'key1': {'nested_key1': 'some_value'}},
+            {'key1': {'nested_key1': 'value1'}}
+        )
+    ])
+def test_clean_input_data(mock_input_manager: InputManager, input_data: dict, properties: dict,
+                          expected_result: dict,
+                          input_manager_original_method_states: Dict[str, Callable], ) -> None:
+    """Unit test for function clean_input_data() in file input_manager.py"""
+    mock_input_manager._clean_input_data(input_data, properties)
+    assert input_data == expected_result
+
+    mock_input_manager._clean_input_data = input_manager_original_method_states["_clean_input_data"]
 
 
 @pytest.fixture
