@@ -21,6 +21,8 @@ from statistics import mean
 from typing import Any, Dict, Tuple, List, Set
 
 from RUFAS.general_constants import GeneralConstants
+from RUFAS.classes.time import Time
+from RUFAS.classes.weather import Weather
 from RUFAS.output_manager import OutputManager
 from RUFAS.routines.animal.animal_grouping_scenarios import AnimalGroupingScenario
 from RUFAS.routines.animal.animal_types import AnimalType
@@ -44,7 +46,7 @@ from RUFAS.routines.animal.ration import user_defined_ration as udr
 om = OutputManager()
 
 
-def daily_animal_routine(animal_manager, feed, weather, time):
+def daily_animal_routine(animal_manager, feed, weather: Weather, time: Time):
     """
     Executes daily routines relating to Animals. This method is called every day
     in the simulation and calls @animal_manager's daily_updates() method
@@ -113,7 +115,7 @@ class AnimalManager:
         config.update(data['from_literature']['life_cycle'])
         return config
 
-    def __init__(self, data, config, feed, weather, time):
+    def __init__(self, data, config, feed, weather: Weather, time: Time):
         """
         Initializes the pens and animals in the simulation with data from the
         JSON file by calling init_pens() and init_animals(). Creates instance
@@ -308,7 +310,7 @@ class AnimalManager:
                        "simulate_animals is true",
                        info_map)
 
-    def init_nutrient_rqmts(self, weather, time, feed):
+    def init_nutrient_rqmts(self, weather: Weather, time: Time, feed):
         """
         Calculates initial nutrient requirements at the beginning of the
         simulation for initial pen allocation. For the nutrient requirements
@@ -324,8 +326,9 @@ class AnimalManager:
         # average vertical & horizontal distance (VD, HD) of pens to the
         # milking parlor
         # avg_VD_parlor, avg_HD_parlor = self.avg_pen_dist()
+        current_weather = weather.get_current_weather(time)
+        temp = current_weather.mean_air_temperature
         for calf in self.calves:
-            temp = weather.T_avg[time.year - 1][time.day - 1]
             calf.calc_nutrient_rqmts(feed, temp)
             calf.p_animal = 0.0072 * calf.body_weight * 1000
 
@@ -1567,7 +1570,7 @@ class AnimalManager:
                                                  self.phosphorus_concentration_by_animal_class[type(animal)])
         self.animal_to_pen_id_map[animal.id] = pen_with_min_stocking_density.id
 
-    def daily_updates(self, feed, weather, time):
+    def daily_updates(self, feed, weather: Weather, time: Time):
         """
         Execute the daily routines relating to Animals. All animals are
         updated through the life_cycle_manager's daily_update() method. The
@@ -1591,7 +1594,8 @@ class AnimalManager:
         if self.simulate_animals:
             if self.end_ration_interval():
                 self.reset_milk_production_reduction()
-            temp = weather.T_avg[time.year - 1][time.day - 1]
+            current_weather = weather.get_current_weather(time)
+            temp = current_weather.mean_air_temperature
             animals_snapshot_before_update = self._get_animals_snapshot()
 
             animals_added, animals_removed, calves_born, *rest = \

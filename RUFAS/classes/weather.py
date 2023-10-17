@@ -47,13 +47,13 @@ class Weather:
         start_day = config.start_day
 
         # initialize data sets
-        self.rainfall = []
-        self.T_max = []
-        self.T_min = []
-        self.T_avg = []
-        self.radiation = []
-        self.irrigation = []
-        self.T_avg_annual = []
+        self._rainfall = []
+        self._T_max = []
+        self._T_min = []
+        self._T_avg = []
+        self._radiation = []
+        self._irrigation = []
+        self._T_avg_annual = []
 
         year_length = config.year_length
         leap_year_length = config.leap_year_length
@@ -83,12 +83,12 @@ class Weather:
 
         # fill the weather arrays with zeros for the size of each year in years[]
         for year in years:
-            self.rainfall.append([0.0 for _ in range(len(year))])
-            self.T_max.append([0.0 for _ in range(len(year))])
-            self.T_min.append([0.0 for _ in range(len(year))])
-            self.T_avg.append([0.0 for _ in range(len(year))])
-            self.radiation.append([0.0 for _ in range(len(year))])
-            self.irrigation.append([0.0 for _ in range(len(year))])
+            self._rainfall.append([0.0 for _ in range(len(year))])
+            self._T_max.append([0.0 for _ in range(len(year))])
+            self._T_min.append([0.0 for _ in range(len(year))])
+            self._T_avg.append([0.0 for _ in range(len(year))])
+            self._radiation.append([0.0 for _ in range(len(year))])
+            self._irrigation.append([0.0 for _ in range(len(year))])
 
         for i in range(len(weather_file['year'])):
             current_year = weather_file['year'][i]
@@ -102,14 +102,14 @@ class Weather:
             elif current_year == config.end_year and current_day > config.end_day:
                 break
 
-            self.rainfall[current_year_index][current_day_index] = weather_file['precip'][i]
-            self.T_max[current_year_index][current_day_index] = weather_file['high'][i]
-            self.T_min[current_year_index][current_day_index] = weather_file['low'][i]
-            self.T_avg[current_year_index][current_day_index] = weather_file['avg'][i]
-            self.radiation[current_year_index][current_day_index] = weather_file['Hday'][i]
-            self.irrigation[current_year_index][current_day_index] = weather_file['irrigation'][i]
+            self._rainfall[current_year_index][current_day_index] = weather_file['precip'][i]
+            self._T_max[current_year_index][current_day_index] = weather_file['high'][i]
+            self._T_min[current_year_index][current_day_index] = weather_file['low'][i]
+            self._T_avg[current_year_index][current_day_index] = weather_file['avg'][i]
+            self._radiation[current_year_index][current_day_index] = weather_file['Hday'][i]
+            self._irrigation[current_year_index][current_day_index] = weather_file['irrigation'][i]
 
-        self.T_avg_annual = self._calculate_average_annual_temperature(weather_file['avg'])
+        self._T_avg_annual = self._calculate_average_annual_temperature(weather_file['avg'])
 
     def get_current_weather(self, time: Time) -> CurrentWeather:
         """
@@ -136,13 +136,13 @@ class Weather:
         month = CurrentWeather.date_conversion_month(time)
         daylength = CurrentWeather.determine_daylength(month)
         try:
-            current_weather = CurrentWeather(incoming_light=self.radiation[year - 1][day - 1],
-                                             min_air_temperature=self.T_min[year - 1][day - 1],
-                                             mean_air_temperature=self.T_avg[year - 1][day - 1],
-                                             max_air_temperature=self.T_max[year - 1][day - 1],
-                                             annual_mean_air_temperature=self.T_avg_annual,
-                                             precipitation=self.rainfall[year - 1][day - 1],
-                                             irrigation=self.irrigation[year - 1][day - 1],
+            current_weather = CurrentWeather(incoming_light=self._radiation[year - 1][day - 1],
+                                             min_air_temperature=self._T_min[year - 1][day - 1],
+                                             mean_air_temperature=self._T_avg[year - 1][day - 1],
+                                             max_air_temperature=self._T_max[year - 1][day - 1],
+                                             annual_mean_air_temperature=self._T_avg_annual,
+                                             precipitation=self._rainfall[year - 1][day - 1],
+                                             irrigation=self._irrigation[year - 1][day - 1],
                                              daylength=daylength)
         except IndexError:
             raise IndexError(f"Attempted to get weather conditions for day: {time.day}, year: {time.year}.")
