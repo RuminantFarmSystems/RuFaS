@@ -80,7 +80,7 @@ class OutputManager(object):
         # the function key; as they are already stored in element key and
         # having them increases the final file size.
         reduced_info_map = {
-            k: info_map[k] for k in info_map.keys() - {"class", "function"}
+            k: info_map[k] for k in info_map.keys() - {"class", "function", "prefix", "suffix"}
         }
         pool[key]["info_maps"].append(reduced_info_map)
         pool[key]["values"].append(value)
@@ -714,9 +714,9 @@ class OutputManager(object):
         file_path = os.path.join(path, self._generate_file_name("errors", "json"))
         self._dict_to_file_json(self.errors_pool, file_path)
 
-    def dump_variable_names_and_contexts(
-        self, path: str, exclude_info_maps: bool, format_option: str = "verbose",
-    ) -> None:
+    def dump_variable_names_and_contexts(self, path: str, exclude_info_maps: bool, # noqa
+                                         format_option: str = "verbose",
+                                         ) -> None:
         """
         Dumps names of all variables added to variables_pool along with the caller class
         and function contextual information into a txt file in the given path to a directory.
@@ -780,20 +780,20 @@ class OutputManager(object):
 
             prefix = name
             if format_option == "block":
+                if f"{name}{os.linesep}" not in var_list:
+                    var_list.append(f"{name}{os.linesep}")
                 prefix = " " * len(name)
 
             for parsable_dict in parsable_dicts:
                 keys = variable_data[parsable_dict][0].keys()
-                formatted_output = []
-
                 if format_option == "inline":
-                    formatted_output.append(f"{name}.{parsable_dict}: {list(keys)}")
+                    var_list.append(f"{name}.{parsable_dict}: {list(keys)}{os.linesep}")
                 elif format_option == "basic":
-                    formatted_output.extend([f"{name}.{key}" for key in keys])
+                    for key in keys:
+                        var_list.append(f"{name}.{key}{os.linesep}")
                 else:
-                    formatted_output.extend([f"{prefix}.{parsable_dict}: {key}" for key in keys])
-
-                var_list.extend([f"{line}{os.linesep}" for line in formatted_output])
+                    for key in keys:
+                        var_list.append(f"{prefix}.{parsable_dict}: {key}{os.linesep}")
 
         file_path = os.path.join(
             path, self._generate_file_name("variable_names", "txt")
