@@ -45,7 +45,7 @@ def test_field_manager_init(field_blob_names) -> None:
 @pytest.fixture
 def mock_weather(mocker: MockerFixture) -> Weather:
     """Fixture for Weather object."""
-    mocker.patch("RUFAS.classes.weather.Weather.__init__", return_value=None)
+    mocker.patch("RUFAS.weather.Weather.__init__", return_value=None)
 
     mock_config = MagicMock(Config)
 
