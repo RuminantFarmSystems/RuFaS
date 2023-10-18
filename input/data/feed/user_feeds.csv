@@ -1,4 +1,4 @@
-rufas_id, feed_name, description, type, units
+rufas_id,Name,feed_description,feed_type,units
 1,ALFALFA,Meal,Forage,kg
 2,ALMOND,Hulls,Conc,kg
 3,APPLE,"Pomace, wet",Conc,kg
@@ -169,7 +169,7 @@ rufas_id, feed_name, description, type, units
 168,SOYBEAN,"Meal, extruded",Conc,kg
 169,SOYBEAN,"Seeds, whole",Conc,kg
 170,SOYBEAN,"Seeds, whole roasted",Conc,kg
-171,SOYBEAN,Silage,Forage,Kg
+171,SOYBEAN,Silage,Forage,kg
 172,SOYBEAN,"Silage, early maturity",Forage,kg
 173,SPELT ,Grain,Conc,kg
 174,SUDAN GRASS,"Hay, mature",Forage,kg
@@ -232,11 +232,11 @@ rufas_id, feed_name, description, type, units
 231,"Dicalcium Phosphate, dibasic",CaHPO4,Mineral,kg
 232,Calcium Phosphate monobasic,Ca(H2PO4)2,Mineral,kg
 233,"Calcium Sulfate, dihydrate",CaSO4.2H2O,Mineral,kg
-234,"Limestone, ground",NA,Mineral,kg
-235,"Limestone, dolomite",NA,Mineral,kg
+234,"Limestone, ground",No,Mineral,kg
+235,"Limestone, dolomite",No,Mineral,kg
 236,Magnesium Oxide,MgO,Mineral,kg
 237,Potassium Chloride,KCl,Mineral,kg
-238,Phosphate rock,NA,Mineral,kg
+238,Phosphate rock,No,Mineral,kg
 239,Sodium Choride,NaCl,Mineral,kg
 240,Sodium Bicarbonate,NaHCO3,Mineral,kg
 241,"Sodium Phosphate, Monohydrate",NaH2PO4.H2O,Mineral,kg
@@ -244,7 +244,7 @@ rufas_id, feed_name, description, type, units
 243,Potassium Sulfate,K2SO4,Mineral,kg
 244,Ammonium Sulfate,(NH4)2SO4,Mineral,kg
 245,"Ammonium Phosphate, dibasic",(NH4)H2PO4,Mineral,kg
-246,Ammonium Chloride,NA,Mineral,kg
+246,Ammonium Chloride,No,Mineral,kg
 247,Calcium Choride dihydrate,CaCl2.2H2O,Mineral,kg
 248,"Calcium Choride,anhydrous",CaCl2,Mineral,kg
 249,Calcium hydroxide,Ca(OH)2,Mineral,kg

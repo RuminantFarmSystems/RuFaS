@@ -1,9 +1,4 @@
 {
-    "feed_database": "input/databases/feeds.sqlite",
-    "feeds_table": "user_feeds",
-    "feed_quality_table": "feed_quality",
-    "nutrient_table": "nutrients",
-
     "calf_feeds": [202, 216],
     "growing_feeds": [89, 104, 231],
     "close_up_feeds": [2, 43, 91, 167, 231, 234],

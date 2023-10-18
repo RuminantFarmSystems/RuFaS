@@ -1,4 +1,4 @@
-rufas_id,feed_name,feed_description,feed_type,units
+rufas_id,Name,feed_description,feed_type,units
 1,ALFALFA,"Meal, 17% CP",Forage,kg
 2,ALMOND,Hulls,Conc,kg
 3,APPLE,"Pomace, wet",Conc,kg

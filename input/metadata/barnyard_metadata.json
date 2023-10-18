@@ -1430,22 +1430,6 @@
           "maximum": 300
         }
       },
-      "feed_database": {
-        "type": "string",
-        "description": "The location of the feed database"
-      },
-      "feeds_table": {
-        "type": "string",
-        "description": "The name of the feeds table in the feed database"
-      },
-      "feed_quality_table": {
-        "type": "string",
-        "description": "The name of the feed quality table in the feed database"
-      },
-      "nutrient_table": {
-        "type": "string",
-        "description": "The name of the nutrient table in the feed database"
-      },
       "storage_options": {
         "type": "array",
         "description": "Storage Options.",
@@ -1602,7 +1586,7 @@
         "description": "Unique integer identifier for feeds used within the RuFaS model.",
         "minimum": 1
       },
-      "feed_name": {
+      "Name": {
         "type": "string",
         "description": "A general common name for the feed as defined within RuFaS."
       },
