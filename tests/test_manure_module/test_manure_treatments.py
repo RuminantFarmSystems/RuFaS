@@ -939,7 +939,11 @@ def test_get_current_day_temperature_and_rainfall(
     mock_time = mocker.MagicMock()
     mock_time.year = 10
     mock_time.day = 1
+    mock_current_weather = mocker.MagicMock()
+    setattr(mock_current_weather, "mean_air_temperature", 10)
+    setattr(mock_current_weather, "rainfall", 20)
     mock_weather = mocker.MagicMock()
+    mock_weather.get_current_weather.return_value = mock_current_weather
     mock_weather.T_avg = [[0.0] * 10 for _ in range(mock_time.year + 1)]
     mock_weather.T_avg[mock_time.year - 1][
         mock_time.day - 1
