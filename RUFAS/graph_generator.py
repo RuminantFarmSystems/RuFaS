@@ -109,7 +109,7 @@ class GraphGenerator:
         save_path: str,
         filter_file_name: str,
         graphics_dir: str = "",
-    ):
+    ) -> str:
         """
         Generate a graph based on filtered data and graph details.
 
