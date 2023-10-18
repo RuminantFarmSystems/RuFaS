@@ -2676,10 +2676,46 @@
       }
     },
     "weather_properties": {
-      "precip": {
-        "description": "amount of precipitation",
+      "year": {
+        "description": "Year.",
+        "type": "number",
+        "minimum": 1900
+      },
+      "jday": {
+        "description": "Julian day of the year.",
         "type": "number",
         "minimum": 0,
+        "maximum": 366
+      },
+      "precip": {
+        "description": "Amount of precipitation (mm H2O).",
+        "type": "number",
+        "minimum": 0,
+        "default": 0
+      },
+      "high": {
+        "description": "The maximum air temperature of the day (°C).",
+        "type": "number",
+        "default": 21
+      },
+      "low": {
+        "description": "The minimum air temperature of the day (°C).",
+        "type": "number",
+        "default": 0
+      },
+      "avg": {
+        "description": "The average air temperature of the day (°C).",
+        "type": "number",
+        "default": 0
+      },
+      "Hday": {
+        "description": "The solar radiation of the day (MJ m^-2).",
+        "type": "number",
+        "default": 0
+      },
+      "irrigation": {
+        "description": "Irrigation (mm H2O).",
+        "type": "number",
         "default": 0
       }
     },
