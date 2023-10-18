@@ -551,7 +551,7 @@ class AnimalRequirements:
                 parity,
             )
         else:
-            pass
+            pass  # TODO
         return {
             "NEmaint_requirement": net_energy_maintenance,
             "NEg_requirement": net_energy_growth,
@@ -614,7 +614,7 @@ class AnimalRequirements:
         calf_birth_weight = mature_body_weight * 0.06275 if day_of_pregnancy else 0.0
         conceptus_weight = 0.0
         if day_of_pregnancy and day_of_pregnancy > 190:
-            conceptus_weight = (18 + (day_of_pregnancy - 190) * 0.665) * (calf_birth_weight / 45)
+            conceptus_weight = (18 + (day_of_pregnancy - 190) * 0.665) * (calf_birth_weight / 45)  # TODO
         if animal_type in [AnimalType.LAC_COW, AnimalType.DRY_COW]:
             net_energy_maintenance = 0.08 * (body_weight - conceptus_weight) ** 0.75
         elif animal_type in [AnimalType.HEIFER_I, AnimalType.HEIFER_II, AnimalType.HEIFER_III]:
@@ -758,7 +758,7 @@ class AnimalRequirements:
             if parity == 1 and calving_interval != 0:
                 average_daily_gain = ((0.92 - 0.82) * MSBW) / calving_interval
             elif parity == 2 and calving_interval != 0:
-                average_daily_gain = ((1 - 0.92) * MSBW) / calving_interval
+                average_daily_gain = ((1 - 0.92) * MSBW) / calving_interval  # TODO
             else:
                 average_daily_gain = 0.0
         # [A.Heifer.A.12]
@@ -832,13 +832,13 @@ class AnimalRequirements:
             if parity == 1 and calving_interval != 0:
                 average_daily_gain = ((0.92 - 0.82) * MSBW) / calving_interval
             elif parity == 2 and calving_interval != 0:
-                average_daily_gain = ((1 - 0.92) * MSBW) / calving_interval
+                average_daily_gain = ((1 - 0.92) * MSBW) / calving_interval  # TODO
             else:
                 average_daily_gain = 0.0
         elif animal_type in [AnimalType.HEIFER_I, AnimalType.HEIFER_II, AnimalType.HEIFER_III]:
             average_daily_gain = max(average_daily_gain_heifer, 0.0)
         else:
-            average_daily_gain = 0.0
+            average_daily_gain = 0.0  # TODO
         EBG = 0.85 * average_daily_gain
         if average_daily_gain == 0:
             average_daily_gain = 0.00001  # fix to avoid divide by 0 error
@@ -887,7 +887,7 @@ class AnimalRequirements:
         if day_of_pregnancy is None:
             MEpreg = 0.0
         elif day_of_pregnancy > 190:
-            MEpreg = (2 * 0.00159 * day_of_pregnancy - 0.0352) * (calf_birth_weight / (45 * 0.14))
+            MEpreg = (2 * 0.00159 * day_of_pregnancy - 0.0352) * (calf_birth_weight / (45 * 0.14))  # TODO
         else:
             MEpreg = 0.0
         # [A.Cow.A.16]-[A.Heifer.A.17]
@@ -1142,7 +1142,7 @@ class AnimalRequirements:
         # [A.Cow.B.2]-[A.Heifer.B.2]
         # Net protein requirement for growth (g)
         if average_daily_gain == 0:
-            NPg = 0.0
+            NPg = 0.0  # TODO
         else:
             NPg = average_daily_gain * (268 - 29.4 * (net_energy_growth / average_daily_gain))
         # [A.Cow.B.3]-[A.Heifer.B.3]
@@ -1150,7 +1150,7 @@ class AnimalRequirements:
         if equivalent_shrunk_body_weight <= 478:
             EffMP_NPg = (83.4 - 0.114 * equivalent_shrunk_body_weight) / 100
         else:
-            EffMP_NPg = 0.28908
+            EffMP_NPg = 0.28908  # TODO
         # [A.Cow.B.4]-[A.Heifer.B.4]
         # Metabolizable protein requirement for growth (g)
         MPg = NPg / EffMP_NPg
@@ -1161,7 +1161,7 @@ class AnimalRequirements:
         if day_of_pregnancy is None:
             MPpreg = 0.0
         elif day_of_pregnancy > 190:
-            MPpreg = (0.69 * day_of_pregnancy - 69.2) * (calf_birth_weight / (45 * 0.33))
+            MPpreg = (0.69 * day_of_pregnancy - 69.2) * (calf_birth_weight / (45 * 0.33))  # TODO
         else:
             MPpreg = 0.0
         # Lactation Requirement
@@ -1314,7 +1314,7 @@ class AnimalRequirements:
             if lactating:
                 Ca_maint = 0.031 * body_weight + 0.08 * (body_weight / 100)
             else:
-                Ca_maint = 0.0154 * body_weight + 0.08 * (body_weight / 100)
+                Ca_maint = 0.0154 * body_weight + 0.08 * (body_weight / 100)  # TODO
         elif animal_type in [AnimalType.HEIFER_I, AnimalType.HEIFER_II, AnimalType.HEIFER_III, AnimalType.DRY_COW]:
             # [A.Heifer.C.1]
             # Calcium maintenance requirement (g)
@@ -1328,7 +1328,7 @@ class AnimalRequirements:
             Ca_preg = 0.0
         elif day_of_pregnancy > 190:
             Ca_preg = 0.02456 * math.exp(
-                (0.05581 - 0.00007 * day_of_pregnancy) * day_of_pregnancy
+                (0.05581 - 0.00007 * day_of_pregnancy) * day_of_pregnancy  # TODO
             ) - 0.02456 * math.exp((0.05581 - 0.00007 * (day_of_pregnancy - 1)) * (day_of_pregnancy - 1))
         else:
             Ca_preg = 0.0
@@ -1455,7 +1455,7 @@ class AnimalRequirements:
             P_preg = 0.0
         elif day_of_pregnancy > 190:
             P_preg = 0.02743 * math.exp(
-                (0.05527 - 0.000075 * day_of_pregnancy) * day_of_pregnancy
+                (0.05527 - 0.000075 * day_of_pregnancy) * day_of_pregnancy  # TODO
             ) - 0.02743 * math.exp((0.05527 - 0.000075 * (day_of_pregnancy - 1)) * (day_of_pregnancy - 1))
         else:
             P_preg = 0.0
@@ -1527,7 +1527,7 @@ class AnimalRequirements:
         elif animal_type in [AnimalType.HEIFER_I, AnimalType.HEIFER_II, AnimalType.HEIFER_III, AnimalType.DRY_COW]:
             P_Maint = 0.8 * dry_matter_intake_estimate + 0.0006 * body_weight
         else:
-            P_Maint = 0.0
+            P_Maint = 0.0  # TODO
         if parity <= 2:
             P_Growth = (1.2 + 4.635 * mature_body_weight**0.22 * body_weight**-0.22) * average_daily_gain
         else:
@@ -1539,7 +1539,7 @@ class AnimalRequirements:
                 (0.05527 - 0.000075 * (day_of_pregnancy - 1)) * (day_of_pregnancy - 1) * (body_weight / 715)
             )
         if milk_true_protein is None or milk_production is None:
-            P_Lact = 0.0
+            P_Lact = 0.0  # TODO
         else:
             P_Lact = milk_production * (0.49 + 0.13 * milk_true_protein)
         phosphorus_requirement = P_Maint + P_Growth + P_Preg + P_Lact
@@ -1621,7 +1621,7 @@ class AnimalRequirements:
                 / DivFact
             )
             if day_of_pregnancy and day_of_pregnancy >= 210:
-                adjustment_factor = 1 + ((210 - day_of_pregnancy) * 0.0025)
+                adjustment_factor = 1 + ((210 - day_of_pregnancy) * 0.0025)  # TODO
                 dry_matter_intake_estimate -= adjustment_factor
         return max(
             dry_matter_intake_estimate,
@@ -1682,7 +1682,7 @@ class AnimalRequirements:
         if lactating:
             parity_adjustment_factor = 0
             if parity > 1:
-                parity_adjustment_factor = 1
+                parity_adjustment_factor = 1  # TODO
             dry_matter_intake_estimate = (
                 (3.7 + parity_adjustment_factor * 5.7)
                 + 0.305 * net_energy_lactation
@@ -1744,7 +1744,7 @@ class AnimalRequirements:
             National Academic Press, Chapter 3 "Energy", pp. 30-31, 2021.
 
         """
-        if AnimalBase.config["energy_and_nutrient_calculation_method"] == "NRC":
+        if AnimalBase.config["energy_and_nutrient_calculation_method"] == "NRC":  # TODO
             # Activity requirements
             # ---------------------
             # [A.Cow.A.4]-[A.Heifer.A.5]
