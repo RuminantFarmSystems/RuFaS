@@ -69,7 +69,7 @@ class Feed:
         self.feeds_split_by_maturity = self._retrieve_data(data_source='feed_quality', var_names=['rufas_id'],
                                                            unique_value=True)
         self.all_feed_units = self._retrieve_data(data_source='user_feeds',
-                                                  var_names=['rufas_id', 'feed_name', 'units'])
+                                                  var_names=['rufas_id', 'Name', 'units'])
 
         purchased_feeds_list = [feed_item["purchased_feed"] for feed_item in data["purchased_feeds"]]
         purchased_feed_costs = {str(feed_item["purchased_feed"]): feed_item["purchased_feed_cost"]
@@ -884,7 +884,7 @@ class Feed:
         dict_list = self.all_feed_units
 
         all_feed_info = {str(result['rufas_id']): {
-            'feed_name': result['feed_name'],
+            'Name': result['Name'],
             'units': result['units']
         }
             for result in dict_list}
