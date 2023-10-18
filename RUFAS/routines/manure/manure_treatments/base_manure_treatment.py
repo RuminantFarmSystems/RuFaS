@@ -7,8 +7,8 @@ from typing import Tuple
 from typing import Union
 
 from RUFAS.general_constants import GeneralConstants
-from RUFAS.classes.time import Time
-from RUFAS.classes.weather import Weather
+from RUFAS.time import Time
+from RUFAS.weather import Weather
 from RUFAS.routines.manure.manure_handlers.manure_handler_daily_output import (
     ManureHandlerDailyOutput,
 )

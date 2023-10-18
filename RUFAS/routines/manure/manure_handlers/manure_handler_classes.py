@@ -15,8 +15,8 @@ from typing import Dict
 from typing import Optional
 from typing import Type
 
-from RUFAS.classes.time import Time
-from RUFAS.classes.weather import Weather
+from RUFAS.time import Time
+from RUFAS.weather import Weather
 from RUFAS.routines.manure.beddings.bedding_classes import BaseBedding
 from RUFAS.routines.manure.default_enum.default_enum import DefaultEnum
 from RUFAS.routines.manure.gas_emissions.calculator import (

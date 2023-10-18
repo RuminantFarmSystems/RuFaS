@@ -21,8 +21,8 @@ from statistics import mean
 from typing import Any, Dict, Tuple, List, Set
 
 from RUFAS.general_constants import GeneralConstants
-from RUFAS.classes.time import Time
-from RUFAS.classes.weather import Weather
+from RUFAS.time import Time
+from RUFAS.weather import Weather
 from RUFAS.output_manager import OutputManager
 from RUFAS.routines.animal.animal_grouping_scenarios import AnimalGroupingScenario
 from RUFAS.routines.animal.animal_types import AnimalType
