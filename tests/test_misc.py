@@ -23,37 +23,37 @@ from RUFAS.util import Utility
 
 
 def test_annual_reset():
-    """Unit test for function annual_reset in file classes.py"""
+    """Unit test for function annual_reset in classes"""
     pass
 
 
 def test_annual_mass_balance():
-    """Unit test for function annual_mass_balance in file classes.py"""
+    """Unit test for function annual_mass_balance in classes"""
     pass
 
 
 def test_calc_sim_length():
-    """Unit test for function calc_sim_length in file classes.py"""
+    """Unit test for function calc_sim_length in classes"""
     pass
 
 
 def test_to_str():
-    """Unit test for function to_str in file classes.py"""
+    """Unit test for function to_str in classes"""
     pass
 
 
 def test_advance():
-    """Unit test for function advance in file classes.py"""
+    """Unit test for function advance in classes"""
     pass
 
 
 def test_end_year():
-    """Unit test for function end_year in file classes.py"""
+    """Unit test for function end_year in classes"""
     pass
 
 
 def test_end_simulation():
-    """Unit test for function end_simulation in file classes.py"""
+    """Unit test for function end_simulation in classes"""
     pass
 
 
@@ -70,7 +70,7 @@ def test_general_constants() -> None:
 
 
 def test_is_leap_year():
-    """Unit test for function is_leap_year in file classes.py"""
+    """Unit test for function is_leap_year in classes"""
     pass
 
 
@@ -138,8 +138,8 @@ def test_advance_time(
     patch_simulation_engine: SimulationEngine, mocker: MockerFixture
 ) -> None:
     """Unit test for function _advance_time in file RUFAS/simulation_engine.py"""
-    mocker.patch("RUFAS.classes.Time.to_str")
-    mocker.patch("RUFAS.classes.Time.advance")
+    mocker.patch("RUFAS.time.Time.to_str")
+    mocker.patch("RUFAS.time.Time.advance")
     patch_simulation_engine.state.animal_manager.simulation_day = 1
     patch_simulation_engine._advance_time(False)
     patch_simulation_engine._advance_time(True)
