@@ -1189,30 +1189,22 @@ def test_determine_total_above_ground_biomass(biomasses: List[float], expected: 
     assert actual == expected
 
 
-@pytest.mark.parametrize("extraterrestrial_radiation,max_temp,min_temp,avg_temp", [
-    (100, 28, 10, 14),
-    (568, 20, 14, 18),
-    (568, 20, 14, None),
-    (80, 14, 0, 8),
-    (678.0098, 26.8896, 10.3339, 18.3345),
-    (678.0098, 26.8896, 10.3339, -100000)
+@pytest.mark.parametrize("extraterrestrial_radiation,max_temp,min_temp,avg_temp,expected_avg,expected_result", [
+    (100, 28, 10, 14, 14, 23.869749),
+    (568, 20, 14, 18, 18, 88.123445),
+    (568, 20, 14, None, 17, 85.661897),
+    (80, 14, 0, 8, 8, 13.663381),
+    (678.0098, 26.8896, 10.3339, 18.3345, 18.3345, 176.36657),
+    (678.0098, 26.8896, 10.3339, -100000, -100000, 0.0)
 ])
-def test_potential_evapotranspiration(extraterrestrial_radiation, max_temp, min_temp, avg_temp):
+def test_potential_evapotranspiration(extraterrestrial_radiation: float, max_temp: float, min_temp: float,
+                                      avg_temp: float, expected_avg: float, expected_result) -> None:
     with patch("RUFAS.routines.field.field.field.Field._determine_latent_heat_vaporization",
                new_callable=MagicMock, return_value=1.3) as mocked_latent_heat:
         actual = Field._determine_potential_evapotranspiration(extraterrestrial_radiation, max_temp, min_temp, avg_temp)
-        if avg_temp is not None:
-            expect = max(0.0, (0.0023 * extraterrestrial_radiation * ((max_temp - min_temp) ** (-0.5)) *
-                               (avg_temp + 17.8)) / 1.3)
-        else:
-            expect = max(0.0, (0.0023 * extraterrestrial_radiation * ((max_temp - min_temp) ** (-0.5)) *
-                               (((max_temp + min_temp) / 2) + 17.8)) / 1.3)
 
-        if avg_temp is not None:
-            mocked_latent_heat.assert_called_once_with(avg_temp)
-        else:
-            mocked_latent_heat.assert_called_once_with((max_temp + min_temp) / 2)
-        assert actual == expect
+        mocked_latent_heat.assert_called_once_with(expected_avg)
+        assert pytest.approx(actual) == expected_result
 
 
 @pytest.mark.parametrize("avg_temp", [
