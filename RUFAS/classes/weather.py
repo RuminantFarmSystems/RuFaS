@@ -136,13 +136,13 @@ class Weather:
         month = CurrentWeather.date_conversion_month(time)
         daylength = CurrentWeather.determine_daylength(month)
         try:
-            current_weather = CurrentWeather(incoming_light=self.radiation[year - 1][day - 1],
-                                             min_air_temperature=self.T_min[year - 1][day - 1],
-                                             mean_air_temperature=self.T_avg[year - 1][day - 1],
-                                             max_air_temperature=self.T_max[year - 1][day - 1],
-                                             annual_mean_air_temperature=self.T_avg_annual,
-                                             precipitation=self.rainfall[year - 1][day - 1],
-                                             irrigation=self.irrigation[year - 1][day - 1],
+            current_weather = CurrentWeather(incoming_light=self.__radiation[year - 1][day - 1],
+                                             min_air_temperature=self.__T_min[year - 1][day - 1],
+                                             mean_air_temperature=self.__T_avg[year - 1][day - 1],
+                                             max_air_temperature=self.__T_max[year - 1][day - 1],
+                                             annual_mean_air_temperature=self.__T_avg_annual,
+                                             precipitation=self.__rainfall[year - 1][day - 1],
+                                             irrigation=self.__irrigation[year - 1][day - 1],
                                              daylength=daylength)
         except IndexError:
             raise IndexError(f"Attempted to get weather conditions for day: {time.day}, year: {time.year}.")
