@@ -1,6 +1,6 @@
 from RUFAS.routines.field.manager.field_manager import FieldManager
 from RUFAS.routines.field.manager.crop_schedule import CropSchedule
-from RUFAS.classes.current_weather import CurrentWeather
+from RUFAS.current_weather import CurrentWeather
 from RUFAS.routines.field.manager.fertilizer_schedule import FertilizerSchedule
 from RUFAS.routines.field.manager.manure_schedule import ManureSchedule
 from RUFAS.routines.field.manager.tillage_schedule import TillageSchedule
@@ -9,14 +9,9 @@ from RUFAS.routines.field.field.field import Field
 from RUFAS.routines.field.soil.layer_data import LayerData
 from RUFAS.routines.field.soil.soil import Soil
 from RUFAS.routines.field.soil.soil_data import SoilData
-<<<<<<< HEAD
-from RUFAS.classes.time import Time
-from RUFAS.classes.weather import Weather
-from RUFAS.classes.config import Config
-=======
+from RUFAS.config import Config
 from RUFAS.time import Time
 from RUFAS.weather import Weather
->>>>>>> main
 from RUFAS.routines.manure.manure_manager import ManureManager
 import pytest
 from pytest_mock.plugin import MockerFixture
