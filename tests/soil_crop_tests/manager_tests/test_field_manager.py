@@ -9,9 +9,14 @@ from RUFAS.routines.field.field.field import Field
 from RUFAS.routines.field.soil.layer_data import LayerData
 from RUFAS.routines.field.soil.soil import Soil
 from RUFAS.routines.field.soil.soil_data import SoilData
+<<<<<<< HEAD
 from RUFAS.classes.time import Time
 from RUFAS.classes.weather import Weather
 from RUFAS.classes.config import Config
+=======
+from RUFAS.time import Time
+from RUFAS.weather import Weather
+>>>>>>> main
 from RUFAS.routines.manure.manure_manager import ManureManager
 import pytest
 from pytest_mock.plugin import MockerFixture

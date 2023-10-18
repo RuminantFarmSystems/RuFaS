@@ -3,10 +3,10 @@ from pytest_mock.plugin import MockerFixture
 from unittest.mock import MagicMock, patch
 from typing import Callable
 
-from RUFAS.classes.config import Config
-from RUFAS.classes.current_weather import CurrentWeather
-from RUFAS.classes.time import Time
-from RUFAS.classes.weather import Weather
+from RUFAS.config import Config
+from RUFAS.current_weather import CurrentWeather
+from RUFAS.time import Time
+from RUFAS.weather import Weather
 
 
 @pytest.fixture
