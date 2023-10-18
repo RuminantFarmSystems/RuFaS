@@ -187,7 +187,7 @@ def test_execute_simulations(
     ] * len(metadata_file_list)
     assert mock_output_manager.save_variables.call_count == len(metadata_file_list)
     assert mock_output_manager.save_variables.call_args_list == [
-        mocker.call("output", "output/output_filters/", True, True, ""),
+        mocker.call("output", "output/output_filters/", True, True, Path("")),
     ] * len(metadata_file_list)
 
 

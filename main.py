@@ -25,7 +25,7 @@ def run_rufas(
     clear_output: bool = False,
     exclude_info_maps: bool = False,
     only_run_validation: bool = False,
-    graphics_dir: str = "",
+    graphics_dir: Path = Path(""),
 ) -> None:
     """Main function to run RuFaS, with options.
 
@@ -34,8 +34,8 @@ def run_rufas(
         verbose: print progress messages while simulation is running
         clear_output: lear output directory before running the simulation
         exclude_info_map: exclude info_maps from the output
-        graphics_dir : str, optional
-            The directory for saving graphics, by default an empty string.
+        graphics_dir : Path, optional
+            The directory for saving graphics.
     """
     if clear_output:
         output_dir = Path(config.global_variables.OUT_DIR)
@@ -95,7 +95,7 @@ def execute_simulations(
     metadata_files: List[MetadataPaths],
     exclude_info_maps: bool = False,
     produce_graphics: bool = True,
-    graphics_dir: str = "",
+    graphics_dir: Path = Path(""),
 ) -> None:
     """Instantiates I/O Managers and processes the metadata files provided by the user to run the simulation.
 
@@ -111,8 +111,8 @@ def execute_simulations(
     produce_graphics: bool, optional
         Flag for whether or not the user wants to produce graphs at after the simulation.
 
-        graphics_dir : str, optional
-            The directory for saving graphics, by default an empty string.
+        graphics_dir : Path, optional
+            The directory for saving graphics.
     """
     info_map = {
         "class": "No caller class",
@@ -204,5 +204,5 @@ if __name__ == "__main__":
         clear_output=cmd_arguments.clear_output,
         exclude_info_maps=cmd_arguments.exclude_info_maps,
         only_run_validation=cmd_arguments.only_run_validation,
-        graphics_dir=cmd_arguments.graphics_dir,
+        graphics_dir=Path(cmd_arguments.graphics_dir),
     )

@@ -606,7 +606,7 @@ class OutputManager(object):
         dir_path: str,
         exclude_info_maps: bool = False,
         produce_graphics: bool = True,
-        graphics_dir: str = "",
+        graphics_dir: Path = Path(""),
     ) -> None:
         """
         Reads a text file containing a list of keys and filters the variables pool by those keys.
@@ -626,8 +626,8 @@ class OutputManager(object):
         produce_graphics: bool, optional
             Flag for whether or not the user wants to produce graphs at after the simulation.
 
-        graphics_dir : str, optional
-            The directory for saving graphics, by default an empty string.
+        graphics_dir : Path, optional
+            The directory for saving graphics.
         """
         info_map = {
             "class": self.__class__.__name__,

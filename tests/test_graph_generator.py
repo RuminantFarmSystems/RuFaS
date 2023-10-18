@@ -1,3 +1,4 @@
+from pathlib import Path
 from freezegun import freeze_time
 from typing import Dict
 from unittest.mock import patch
@@ -91,9 +92,8 @@ def test_generate_graph_path_with_title(graph_generator: GraphGenerator) -> None
                 save_path, graph_details, filter_file_name, graphics_dir
             )
             mock_mkdir.assert_called_once()
-            assert (
-                result
-                == r"/path/to/save\graphics\test-graph-13-Oct-2023_Fri_11-41-23.png"
+            assert result == Path(
+                r"/path/to/save/graphics/test-graph-13-Oct-2023_Fri_11-41-23.png"
             )
 
 
@@ -112,9 +112,8 @@ def test_generate_graph_path_no_title(graph_generator: GraphGenerator) -> None:
                 save_path, graph_details, filter_file_name, graphics_dir
             )
             mock_mkdir.assert_called_once()
-            assert (
-                result
-                == "/path/to/save\\graphics\\saved_graph_test_filter.png-13-Oct-2023_Fri_11-41-23.png"
+            assert result == Path(
+                r"/path/to/save/graphics/saved_graph_test_filter.png-13-Oct-2023_Fri_11-41-23.png"
             )
 
 

@@ -108,7 +108,7 @@ class GraphGenerator:
         graph_details: Dict[str, str | List[str]],
         save_path: str,
         filter_file_name: str,
-        graphics_dir: str = "",
+        graphics_dir: Path = Path(""),
     ) -> str:
         """
         Generate a graph based on filtered data and graph details.
@@ -123,8 +123,8 @@ class GraphGenerator:
             The base folder path to save the output.
         filter_file_name: str
             The name of the filter file.
-        graphics_dir : str, optional
-            The directory for saving graphics, by default an empty string.
+        graphics_dir : Path, optional
+            The directory for saving graphics.
 
         Returns
         -------
@@ -231,7 +231,7 @@ class GraphGenerator:
         graph_details: Dict[str, str],
         filter_file_name: str,
         save_path: str,
-        graphics_dir: str = "",
+        graphics_dir: Path = Path(""),
     ) -> str:
         """
         Save the generated graph to a file.
@@ -244,8 +244,8 @@ class GraphGenerator:
             The name of the filter file.
         save_path : str
             The base folder path to save the output.
-        graphics_dir : str, optional
-            The directory for saving graphics, by default an empty string.
+        graphics_dir : Path, optional
+            The directory for saving graphics.
 
         Returns
         -------
@@ -272,8 +272,8 @@ class GraphGenerator:
         save_path: str,
         graph_details: Dict[str, str],
         filter_file_name: str,
-        graphics_dir: str = "",
-    ) -> str:
+        graphics_dir: Path = Path(""),
+    ) -> Path:
         """
         Generate the full path for the output graph and create parent folders if necessary.
 
@@ -285,12 +285,12 @@ class GraphGenerator:
             A dictionary containing details/metadata about the graph.
         filter_file_name : str
             The name of the filter file.
-        graphics_dir : str, optional
-            The directory for saving graphics, by default an empty string.
+        graphics_dir : Path, optional
+            The directory for saving graphics.
 
         Returns
         -------
-        str
+        Path
             The full path to the output graph file.
 
         Raises
@@ -314,4 +314,4 @@ class GraphGenerator:
             filename = f"saved_graph_{filter_file_name}-{timestamp}.png"
 
         graph_path = os.path.join(graph_directory, filename)
-        return graph_path
+        return Path(graph_path)
