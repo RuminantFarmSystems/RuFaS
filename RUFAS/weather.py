@@ -1,7 +1,7 @@
 import numpy as np
 
-from RUFAS.classes.current_weather import CurrentWeather
-from RUFAS.classes.time import Time
+from RUFAS.current_weather import CurrentWeather
+from RUFAS.time import Time
 
 
 def is_leap_year(year):

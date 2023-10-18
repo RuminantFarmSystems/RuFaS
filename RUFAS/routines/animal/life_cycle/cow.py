@@ -391,16 +391,21 @@ class Cow(HeiferIII):
                 self.ration_formulation, feed, self.body_weight,
                 self.estimated_daily_milk_produced, p_feces_excrt, p_urine, methane_model, ME_intake)
 
-    def set_nutrient_rqmts(self, animal_grouping_scenario):
+    def set_nutrient_rqmts(self, animal_grouping_scenario, nutrient_conc: dict = {}):
         """
         Calculates this Cow's nutrient requirements.
         """
+        if nutrient_conc and nutrient_conc['dm'] != 0.0:
+            NDF_conc = nutrient_conc['NDF'] / 100
+            TDN_conc = nutrient_conc['TDN'] / 100
+        else:
+            NDF_conc = 0.3
+            TDN_conc = 0.7
         req = AnimalRequirements()
         animal_requirements = req.calc_rqmts(body_weight=self.body_weight,
                                              mature_body_weight=self.mature_body_weight,
                                              day_of_pregnancy=self.days_in_preg,
-                                             animal_type=animal_grouping_scenario.get_animal_type(
-                                                self),
+                                             animal_type=animal_grouping_scenario.get_animal_type(self),
                                              parity=self.calves,
                                              calving_interval=self.CI,
                                              milk_true_protein=self.mPrt,
@@ -408,7 +413,9 @@ class Cow(HeiferIII):
                                              milk_lactose=self.lactose_milk,
                                              milk_production=self.estimated_daily_milk_produced,
                                              days_in_milk=self.days_in_milk,
-                                             lactating=self.milking)
+                                             lactating=self.milking,
+                                             NDF_conc=NDF_conc,
+                                             TDN_conc=TDN_conc)
 
         self.NEmaint_requirement = animal_requirements['NEmaint_requirement']
         self.NEg_requirement = animal_requirements['NEg_requirement']

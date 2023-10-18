@@ -1,8 +1,8 @@
 from dataclasses import dataclass
 from typing import Optional
 
-from RUFAS.classes.time import Time
-from RUFAS.classes.config import is_leap_year
+from RUFAS.time import Time
+from RUFAS.config import is_leap_year
 
 
 @dataclass
