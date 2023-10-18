@@ -7,7 +7,7 @@ from pytest_mock import MockerFixture
 
 import config.global_variables
 from config import global_variables
-from main import execute_simulations, run_validation
+from main import CaseInsensitiveArgumentAction, execute_simulations, run_validation
 from main import parse_gnu_args
 from main import run_rufas
 from main import set_global_variables
@@ -246,3 +246,21 @@ def test_parse_gnu_args(mocker: MockerFixture) -> None:
     ]
     mock_parse_args.assert_called_once()
     assert actual_args == "test_args"
+
+
+def test_case_insensitive_argument_action():
+    parser = argparse.ArgumentParser()
+    parser.register("action", "ci_action", CaseInsensitiveArgumentAction)
+
+    namespace = argparse.Namespace()
+
+    arguments = ["-f", "-F"]
+    value = "test_value"
+
+    for argument in arguments:
+        action = parser.add_argument(argument, action="ci_action")
+        action(parser, namespace, value, option_string=argument)
+
+    for argument in arguments:
+        assert hasattr(namespace, argument)
+        assert getattr(namespace, argument) == value
