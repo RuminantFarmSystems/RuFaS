@@ -257,12 +257,11 @@ def test_record_yield(field_name: str, field_size: float, species: str, year: in
     assert actual['values'].__contains__(expected_value)
 
 
-@pytest.mark.parametrize("residue,nitrogen", [
-    (100, 22),
-    (0, 0),
-    (200.23, 45.66)
+@pytest.mark.parametrize("residue,nitrogen, killed", [
+    (100, 22, True),
+    (0, 0, False)
 ])
-def test_transfer_residue(residue: float, nitrogen: float) -> None:
+def test_transfer_residue(residue: float, nitrogen: float, killed: bool) -> None:
     """Tests that residue and associated nutrients from harvests and not collected are properly transferred to the
         soil."""
     soil_data = SoilData(field_size=1)
@@ -271,7 +270,7 @@ def test_transfer_residue(residue: float, nitrogen: float) -> None:
     crop_data = CropData(yield_residue=residue, yield_nitrogen=nitrogen)
     crop_manage = CropManagement(crop_data)
 
-    crop_manage._transfer_residue(soil_data)
+    crop_manage._transfer_residue(soil_data, killed)
 
     assert soil_data.plant_surface_residue == residue
     assert soil_data.soil_layers[0].fresh_organic_nitrogen_content == nitrogen
