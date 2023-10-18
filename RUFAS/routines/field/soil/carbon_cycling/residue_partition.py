@@ -134,6 +134,8 @@ class ResiduePartition:
                 self._determine_weighted_residue_dry_matter_lignin_fraction(layer.soil_dry_matter_residue_amount,
                                                                             self.data.plant_root_residue)
 
+            layer.soil_dry_matter_residue_amount = 0
+
             layer.soil_residue_lignin_fraction = self._determine_soil_residue_lignin_fraction(
                 layer.weighted_residue_dry_matter_lignin_fraction,
                 rainfall

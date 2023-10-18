@@ -164,6 +164,7 @@ class OutputGatherer:
                                 info_map)
                 om.add_variable("active_carbon_amount", layer.active_carbon_amount, info_map)
                 om.add_variable("slow_carbon_amount", layer.slow_carbon_amount, info_map)
+                om.add_variable("passive_carbon_amount", layer.passive_carbon_amount, info_map)
                 om.add_variable("slow_carbon_decomposition_amount", layer.slow_carbon_decomposition_amount,
                                 info_map)
                 om.add_variable("passive_carbon_decomposition_amount", layer.passive_carbon_decomposition_amount,
