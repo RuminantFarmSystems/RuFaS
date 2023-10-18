@@ -1,8 +1,8 @@
 from dataclasses import dataclass
 from typing import Optional
 
-from RUFAS.classes.time import Time
-from RUFAS.classes.config import is_leap_year
+from RUFAS.time import Time
+from RUFAS.config import is_leap_year
 
 
 @dataclass
@@ -11,31 +11,45 @@ class CurrentWeather:
     The purpose of this class is to combine and covert infos from weather data and field data and creates a
     current weather class that have all the needed attributes to allow field and field manager to work properly.
 
+    Attributes
+    ----------
+    incoming_light: float, optional, default=None
+        Incoming light radiation energy (MJ/m^2).
+    min_air_temperature: float, optional, default=None
+        Minimum air temperature for the day (C).
+    mean_air_temperature: float, optional, default=None
+        Average air temperature for the day (C).
+    max_air_temperature: float, optional, default=None
+        Maximum air temperature for the day (C).
+    daylength: float, optional, default=None
+        Length of time from sunup to sundown on the day (hours).
+    annual_mean_air_temperature: float, optional, default=None
+        Average annual air temperature for the year (C).
+    snow_fall: float, default=0.0
+        Amount of snow that falls on the day (mm).
+    rainfall: float, default=0.0
+        Amount of rainfall that occurs on the day (mm).
+    irrigation: float, default=0.0
+        Amount of irrigation that is applied to the field on that day (mm).
+    precipitation: float, default=0.0
+        Amount of precipitation that occurs on the day (mm).
+
     Notes
     -------
     _deg_trig and _determine_daylength are more of temporary methods that approximately estimates the day length, this
     will be revisited for a more accurate implementation post v1
+
     """
     incoming_light: Optional[float] = None
-    """incoming light radiation energy (MJ/m)"""
     min_air_temperature: Optional[float] = None
-    """minimum air temperature for the day (C)"""
     mean_air_temperature: Optional[float] = None
-    """average air temperature for the day (C)"""
     max_air_temperature: Optional[float] = None
-    """maximum air temperature for the day (C)"""
     daylength: Optional[float] = None
-    """Length of time from sunup to sundown on the day (hours)"""
     annual_mean_air_temperature: Optional[float] = None
-    """average annual air temperature for the year (C)"""
-    snow_fall: float = 0.0    # TODO: make this better integrated with Soil module
-    """amount of snow that falls on the day (mm)"""
+    snow_fall: float = 0.0
     rainfall: float = 0.0
-    """amount of rainfall that occurs on the day (mm)"""
     irrigation: float = 0.0
-    """amount of irrigation that is applied to the field on that day (mm)"""
     precipitation: float = 0.0
-    """amount of precipitation that occurs on the day (mm)"""
 
     def __post_init__(self):
         """Sets precipitation as snow_fall or rainfall depending on mean air temperature"""
