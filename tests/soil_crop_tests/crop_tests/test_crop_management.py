@@ -139,12 +139,12 @@ def test_determine_harvest_index(harvest, heat_frac, water_def):
         assert data.harvest_index == CropManagement._adjust_harvest_index(potential, 0.5, water_def)
 
 
-@pytest.mark.parametrize("harvest_op,field_name,field_size,year,day,soil_data", [
-    (HarvestOperation.HARVEST, "test_1", 1.8, 1995, 200, SoilData(field_size=1.3)),
-    (HarvestOperation.HARVEST_NOKILL, "test_2", 4.5, 2010, 150, SoilData(field_size=2.4))
+@pytest.mark.parametrize("harvest_op,field_name,field_size,year,day,soil_data, killed", [
+    (HarvestOperation.HARVEST, "test_1", 1.8, 1995, 200, SoilData(field_size=1.3), True),
+    (HarvestOperation.HARVEST_NOKILL, "test_2", 4.5, 2010, 150, SoilData(field_size=2.4), False)
 ])
 def test_manage_harvest(harvest_op: HarvestOperation, field_name: str, field_size: float, year: int, day: int,
-                        soil_data: SoilData) -> None:
+                        soil_data: SoilData, killed: bool) -> None:
     """ensure that crops are harvested properly, dependent on their operation specs"""
     # Setup
     crop = CropManagement()
@@ -169,7 +169,7 @@ def test_manage_harvest(harvest_op: HarvestOperation, field_name: str, field_siz
         crop.kill.assert_not_called()
 
     crop._record_yield.assert_called_once_with(field_name, field_size, year, day)
-    crop._transfer_residue.assert_called_once_with(soil_data)
+    crop._transfer_residue.assert_called_once_with(soil_data, killed)
 
 
 @pytest.mark.parametrize("efficiency,harvest,override,should_fail", [
