@@ -716,13 +716,13 @@ def test_add_to_pool(mock_output_manager: OutputManager) -> None:
         "values": ["dummy_value1"],
     }
     info_map["more_context"] = 1234567890
-    mock_output_manager._add_to_pool(pool, key, "dummy_value2", info_map)
+    mock_output_manager._add_to_pool(pool, key, {"dummy_value2"}, info_map)
     assert pool[key] == {
         "info_maps": [
             {"context": "dummy_context"},
             {"context": "dummy_context", "more_context": 1234567890},
         ],
-        "values": ["dummy_value1", "dummy_value2"],
+        "values": ["dummy_value1", {"dummy_value2"}],
     }
 
 
