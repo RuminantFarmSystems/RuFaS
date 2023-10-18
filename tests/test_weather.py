@@ -1,7 +1,8 @@
 import pytest
 from unittest.mock import patch, MagicMock
 
-from RUFAS.classes import Weather, Config
+from RUFAS.config import Config
+from RUFAS.weather import Weather
 
 
 @pytest.fixture
@@ -37,7 +38,7 @@ def mock_config() -> Config:
 def test_annual_average_temperature_recording(mock_weather_input: dict,
                                               mock_config: Config) -> None:
     """Tests that the annual average temperature is recorded correctly to the OutputManager when Weather is created."""
-    with patch("RUFAS.classes.Weather._calculate_average_annual_temperature") as avg, \
+    with patch("RUFAS.weather.Weather._calculate_average_annual_temperature") as avg, \
             patch("RUFAS.output_manager.OutputManager.add_variable") as add:
         Weather(mock_weather_input, mock_config)
         avg.assert_called_once()
