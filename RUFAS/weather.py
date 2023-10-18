@@ -114,6 +114,9 @@ class Weather:
 
         self.__T_avg_annual = self._calculate_average_annual_temperature(weather_file['avg'])
 
+        info_map = {"class": self.__class__.__name__, "function": self.__init__.__name__, "prefix": "Weather"}
+        om.add_variable("average_annual_temperature(C)", self.T_avg_annual, info_map)
+
     def get_current_weather(self, time: Time) -> CurrentWeather:
         """
         Creates a CurrentWeather object containing all the weather conditions on the current day.
@@ -152,19 +155,14 @@ class Weather:
 
         return current_weather
 
-        info_map = {"class": self.__class__.__name__, "function": self.__init__.__name__, "prefix": "Weather"}
-        om.add_variable("average_annual_temperature(C)", self.T_avg_annual, info_map)
-
-    def record_weather(self, year: int, day: int) -> None:
+    def record_weather(self, time: Time) -> None:
         """
         Records the current weather conditions in the OutputManager.
 
         Parameters
         ----------
-        year: int
-            Current simulated year.
-        day: int
-            Current simulated julian day.
+        time: Time
+            Time object containing the current time of the simulation.
 
         """
         info_map = {"class": self.__class__.__name__, "function": self.record_weather.__name__, "prefix": "Weather"}

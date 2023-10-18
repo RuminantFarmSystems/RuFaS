@@ -1,8 +1,11 @@
-<<<<<<< HEAD
 import pytest
-from unittest.mock import patch, MagicMock
+from pytest_mock.plugin import MockerFixture
+from unittest.mock import MagicMock, patch
+from typing import Callable
 
 from RUFAS.config import Config
+from RUFAS.current_weather import CurrentWeather
+from RUFAS.time import Time
 from RUFAS.weather import Weather
 
 
@@ -36,44 +39,6 @@ def mock_config() -> Config:
     return mock_config
 
 
-def test_annual_average_temperature_recording(mock_weather_input: dict,
-                                              mock_config: Config) -> None:
-    """Tests that the annual average temperature is recorded correctly to the OutputManager when Weather is created."""
-    with patch("RUFAS.weather.Weather._calculate_average_annual_temperature") as avg, \
-            patch("RUFAS.output_manager.OutputManager.add_variable") as add:
-        Weather(mock_weather_input, mock_config)
-        avg.assert_called_once()
-        add.assert_called_once()
-
-
-def test_record_weather(mock_weather_input: dict, mock_config: Config) -> None:
-    """Tests that weather conditions are correctly recorded to the OutputManager."""
-    weather = Weather(mock_weather_input, mock_config)
-    with patch("RUFAS.output_manager.OutputManager.add_variable") as add_var:
-        weather.record_weather(1, 1)
-        assert add_var.call_count == 6
-
-
-@pytest.mark.parametrize("avg_daily_temperatures,expected", [
-    ([12.3, 20.4, 15.6, 20.5, 17.8], 17.32),
-    ([-4.55, -3.22, -1.05, -0.3, 1.44, 3.99, 8.6], 0.7014285714285712)
-])
-def test_calculate_average_annual_temperature(avg_daily_temperatures: list[float], expected: float) -> None:
-    """Tests that the annual average air temperature is correctly calculated based on average daily temperatures."""
-    actual = Weather._calculate_average_annual_temperature(avg_daily_temperatures)
-    assert actual == expected
-=======
-import pytest
-from pytest_mock.plugin import MockerFixture
-from unittest.mock import MagicMock, patch
-from typing import Callable
-
-from RUFAS.config import Config
-from RUFAS.current_weather import CurrentWeather
-from RUFAS.time import Time
-from RUFAS.weather import Weather
-
-
 @pytest.fixture
 def mock_weather(mocker: MockerFixture) -> Weather:
     """Fixture for Weather object."""
@@ -98,6 +63,16 @@ def weather_original_method_states(mock_weather: Weather) -> dict[str, Callable]
         "_calculate_average_annual_temperature": mock_weather._calculate_average_annual_temperature,
         "get_current_weather": mock_weather.get_current_weather
     }
+
+
+def test_annual_average_temperature_recording(mock_weather_input: dict,
+                                              mock_config: Config) -> None:
+    """Tests that the annual average temperature is recorded correctly to the OutputManager when Weather is created."""
+    with patch("RUFAS.weather.Weather._calculate_average_annual_temperature") as avg, \
+            patch("RUFAS.output_manager.OutputManager.add_variable") as add:
+        Weather(mock_weather_input, mock_config)
+        avg.assert_called_once()
+        add.assert_called_once()
 
 
 @pytest.mark.parametrize("avg_daily_temperatures,expected", [
@@ -150,4 +125,11 @@ def test_get_current_weather_error(mock_weather: Weather, day: int, year: int, e
             pytest.raises(IndexError) as e:
         mock_weather.get_current_weather(mocked_time)
     assert str(e.value) == expected
->>>>>>> access_weather_two
+
+
+def test_record_weather(mock_weather_input: dict, mock_config: Config) -> None:
+    """Tests that weather conditions are correctly recorded to the OutputManager."""
+    weather = Weather(mock_weather_input, mock_config)
+    with patch("RUFAS.output_manager.OutputManager.add_variable") as add_var:
+        weather.record_weather(1, 1)
+        assert add_var.call_count == 6
