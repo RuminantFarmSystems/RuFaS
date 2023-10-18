@@ -12,7 +12,6 @@ from unittest.mock import MagicMock, patch
 import pytest
 from pytest_mock.plugin import MockerFixture
 
-from RUFAS.classes.current_weather import CurrentWeather
 from RUFAS.routines.animal.animal_manager import AnimalManager
 from RUFAS.routines.animal.life_cycle.animal_base import AnimalBase
 from RUFAS.routines.animal.life_cycle.calf import Calf
@@ -1485,7 +1484,7 @@ def test_daily_updates(is_end_ration_interval: bool, mocker: MockerFixture) -> N
     mock_feed = mocker.MagicMock()
     mock_weather = mocker.MagicMock()
     temp = 25
-    mock_current_weather = mocker.MagicMock(CurrentWeather)
+    mock_current_weather = mocker.MagicMock()
     setattr(mock_current_weather, "mean_air_temperature", temp)
     mock_weather.get_current_weather.return_value = mock_current_weather
     mock_time = mocker.MagicMock()
