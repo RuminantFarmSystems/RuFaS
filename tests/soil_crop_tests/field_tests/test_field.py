@@ -14,7 +14,7 @@ from RUFAS.routines.field.field.field import Field
 from RUFAS.routines.field.field.field_data import FieldData
 from RUFAS.routines.field.crop.dormancy import Dormancy
 from RUFAS.routines.field.crop_and_soil_constants import LITERS_TO_CUBIC_MILLIMETERS, HECTARES_TO_SQUARE_MILLIMETERS
-from RUFAS.classes.time import Time
+from RUFAS.time import Time
 from RUFAS.routines.field.manager.events import TillageEvent
 from RUFAS.output_manager import OutputManager
 from RUFAS.routines.manure.manure_manager import ManureManager
