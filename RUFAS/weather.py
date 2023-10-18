@@ -1,5 +1,9 @@
 import numpy as np
 
+from RUFAS.output_manager import OutputManager
+
+om = OutputManager()
+
 
 def is_leap_year(year):
     """
@@ -107,6 +111,31 @@ class Weather:
             self.irrigation[current_year_index][current_day_index] = weather_file['irrigation'][i]
 
         self.T_avg_annual = self._calculate_average_annual_temperature(weather_file['avg'])
+
+        info_map = {"class": self.__class__.__name__, "function": self.__init__.__name__, "prefix": "Weather"}
+        om.add_variable("average_annual_temperature(C)", self.T_avg_annual, info_map)
+
+    def record_weather(self, year: int, day: int) -> None:
+        """
+        Records the current weather conditions in the OutputManager.
+
+        Parameters
+        ----------
+        year: int
+            Current simulated year.
+        day: int
+            Current simulated julian day.
+
+        """
+        info_map = {"class": self.__class__.__name__, "function": self.record_weather.__name__, "prefix": "Weather"}
+        year_index = year - 1
+        day_index = day - 1
+        om.add_variable("precipitation(mm)", self.rainfall[year_index][day_index], info_map)
+        om.add_variable("maximum_temperature(C)", self.T_max[year_index][day_index], info_map)
+        om.add_variable("minimum_temperature(C)", self.T_min[year_index][day_index], info_map)
+        om.add_variable("average_temperature(C)", self.T_avg[year_index][day_index], info_map)
+        om.add_variable("radiation(MJ/square_meter/day)", self.radiation[year_index][day_index], info_map)
+        om.add_variable("irrigation(mm)", self.irrigation[year_index][day_index], info_map)
 
     @staticmethod
     def _calculate_average_annual_temperature(daily_average_temperatures: list[float]) -> float:

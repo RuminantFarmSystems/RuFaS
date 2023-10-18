@@ -1,7 +1,8 @@
 import pytest
 from unittest.mock import patch, MagicMock
 
-from RUFAS.classes import Time, Config
+from RUFAS.config import Config
+from RUFAS.time import Time
 
 
 @pytest.fixture
