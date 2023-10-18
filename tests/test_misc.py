@@ -5,6 +5,7 @@ Description: Implements test cases
 Author(s): Pooya Hekmati, sh2235@cornell.edu
 """
 
+from copy import deepcopy
 import os
 import re
 import json
@@ -715,6 +716,9 @@ def test_add_to_pool(mock_output_manager: OutputManager) -> None:
         "info_maps": [{"context": "dummy_context"}],
         "values": ["dummy_value1"],
     }
+    assert pool[key]["values"][0] == "dummy_value1"
+    assert pool[key]["values"][0] is "dummy_value1"
+
     info_map["more_context"] = 1234567890
     mock_output_manager._add_to_pool(pool, key, {"dummy_value2"}, info_map)
     assert pool[key] == {
@@ -724,6 +728,8 @@ def test_add_to_pool(mock_output_manager: OutputManager) -> None:
         ],
         "values": ["dummy_value1", {"dummy_value2"}],
     }
+    assert pool[key]["values"][1] == deepcopy({"dummy_value2"})
+    assert pool[key]["values"][1] is not {"dummy_value2"}
 
 
 def test_output_manager_singleton(mocker: MockerFixture) -> None:
