@@ -21,32 +21,34 @@ file_path = os.path.join(dir_path, "input/ARL.json")
 
 
 @pytest.mark.parametrize(
-    "make_graphs, verbose, clear_output, exclude_info_maps, only_run_validation",
+    "produce_graphics, verbose, clear_output, exclude_info_maps, only_run_validation, graphics_dir",
     [
-        (True, True, True, True, True),
-        (False, True, True, True, True),
-        (True, False, True, True, True),
-        (True, True, False, True, True),
-        (True, True, True, False, True),
-        (True, True, True, True, False),
-        (False, False, True, True, True),
-        (False, True, False, True, True),
-        (False, True, True, False, True),
-        (False, True, True, True, False),
-        (False, False, False, True, True),
-        (False, False, True, False, True),
-        (False, False, True, True, False),
-        (False, False, False, False, True),
-        (False, False, False, True, False),
-        (False, False, False, False, False),
+        (True, True, True, True, True, ""),
+        (False, True, True, True, True, ""),
+        (True, False, True, True, True, ""),
+        (True, True, False, True, True, ""),
+        (True, True, True, False, True, ""),
+        (True, True, True, True, False, ""),
+        (False, False, True, True, True, ""),
+        (False, True, False, True, True, ""),
+        (False, True, True, False, True, ""),
+        (False, True, True, True, False, ""),
+        (False, False, False, True, True, ""),
+        (False, False, True, False, True, ""),
+        (False, False, True, True, False, ""),
+        (False, False, False, False, True, ""),
+        (False, False, False, True, False, ""),
+        (False, False, False, False, False, ""),
+        (False, False, False, False, False, "graphics"),
     ],
 )
 def test_run_rufas(
-    make_graphs: bool,
+    produce_graphics: bool,
     verbose: bool,
     clear_output: bool,
     exclude_info_maps: bool,
     only_run_validation: bool,
+    graphics_dir: str,
     mocker: MockerFixture,
 ) -> None:
     """Checks that run_rufas() calls the correct functions in the correct order"""
@@ -59,18 +61,23 @@ def test_run_rufas(
 
     # Act
     run_rufas(
-        make_graphs, verbose, clear_output, exclude_info_maps, only_run_validation
+        produce_graphics,
+        verbose,
+        clear_output,
+        exclude_info_maps,
+        only_run_validation,
+        graphics_dir,
     )
 
     # Assert
-    patch_set_global_variables.assert_called_once_with(make_graphs, verbose)
+    patch_set_global_variables.assert_called_once_with(verbose)
     if only_run_validation:
         patch_run_validation.assert_called_once_with(
             metadata_file_list, exclude_info_maps
         )
     else:
         patch_execute_simulations.assert_called_once_with(
-            metadata_file_list, exclude_info_maps
+            metadata_file_list, exclude_info_maps, produce_graphics, graphics_dir
         )
 
     if clear_output:
@@ -79,9 +86,7 @@ def test_run_rufas(
         patch_empty_dir.assert_not_called()
 
 
-@pytest.mark.parametrize(
-    "verbose", [True, False]
-)
+@pytest.mark.parametrize("verbose", [True, False])
 def test_set_global_variables(verbose: bool) -> None:
     """Checks that set_global_variables() sets the global variables correctly"""
     # Arrange
