@@ -168,27 +168,27 @@ class InputManager:
             try:
                 file_type = file_details["type"]
                 data_loader = data_type_to_loader_map[file_details["type"]]
-                data = data_loader(file_path)
+                input_data = data_loader(file_path)
             except KeyError:
                 raise KeyError(f"Faulty data type in {file_blob_key},"
                                f"supported types are: {data_type_to_loader_map.keys()}")
 
             properties_blob_key = file_details["properties"]
             properties = self.__metadata["properties"][properties_blob_key]
-            self._clean_input_data(data, properties)
+            self._clean_input_data(input_data, properties)
             for property in properties.keys():
                 if file_type == "json":
                     element_counter_and_validity = self._validate_json_element([property], properties_blob_key,
-                                                                               data, eager_termination)
+                                                                               input_data, eager_termination)
                 if file_type == "csv":
                     element_counter_and_validity = self._validate_csv_element(property, properties_blob_key,
-                                                                              data, eager_termination)
+                                                                              input_data, eager_termination)
 
                 fixed_elements_counter += element_counter_and_validity["fixed_elements"]
                 valid_elements_counter += element_counter_and_validity["valid_elements"]
                 total_elements_counter += element_counter_and_validity["total_elements"]
                 if element_counter_and_validity["is_valid"]:
-                    self.__pool[file_blob_key] = data
+                    self.__pool[file_blob_key] = input_data
                 else:
                     if not eager_termination:
                         invalid_elements_counter += element_counter_and_validity["invalid_elements"]
