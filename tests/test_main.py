@@ -80,23 +80,20 @@ def test_run_rufas(
 
 
 @pytest.mark.parametrize(
-    "make_graphs, verbose", [(True, True), (False, True), (True, False), (False, False)]
+    "verbose", [True, False]
 )
-def test_set_global_variables(make_graphs: bool, verbose: bool) -> None:
+def test_set_global_variables(verbose: bool) -> None:
     """Checks that set_global_variables() sets the global variables correctly"""
     # Arrange
-    old_make_graphs = config.global_variables.PRODUCE_GRAPHICS
     old_verbose = config.global_variables.PRINT_STATUS_MESSAGES
 
     # Act
-    set_global_variables(make_graphs, verbose)
+    set_global_variables(verbose)
 
     # Assert
-    assert config.global_variables.PRODUCE_GRAPHICS == make_graphs
     assert config.global_variables.PRINT_STATUS_MESSAGES == verbose
 
     # Cleanup
-    config.global_variables.PRODUCE_GRAPHICS = old_make_graphs
     config.global_variables.PRINT_STATUS_MESSAGES = old_verbose
 
 
