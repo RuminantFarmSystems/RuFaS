@@ -138,8 +138,8 @@ def execute_simulations(
                 info_map,
             )
         output_manager.save_variables(
-            r"output",
-            r"output/output_filters/",
+            Path(r"output"),
+            Path(r"output/output_filters/"),
             exclude_info_maps,
             produce_graphics,
             graphics_dir,

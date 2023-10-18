@@ -602,8 +602,8 @@ class OutputManager(object):
 
     def save_variables(
         self,
-        save_path: str,
-        dir_path: str,
+        save_path: Path,
+        dir_path: Path,
         exclude_info_maps: bool = False,
         produce_graphics: bool = True,
         graphics_dir: Path = Path(""),
@@ -614,10 +614,10 @@ class OutputManager(object):
 
         Parameters
         ----------
-        save_path : str
+        save_path : Path
             Path to the directory where the file will be saved.
 
-        dir_path : str
+        dir_path : Path
             Path of the directory containing the files containing the keys for filtering.
 
         exclude_info_maps : bool

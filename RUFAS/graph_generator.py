@@ -106,9 +106,9 @@ class GraphGenerator:
         self,
         filtered_pool: Dict[str, Dict[str, List[Any]]],
         graph_details: Dict[str, str | List[str]],
-        save_path: str,
+        save_path: Path,
         filter_file_name: str,
-        graphics_dir: Path = Path(""),
+        graphics_dir: Path,
     ) -> str:
         """
         Generate a graph based on filtered data and graph details.
@@ -119,11 +119,11 @@ class GraphGenerator:
             The result pool after filtering with the provided RegEx filters.
         graph_details: Dict[str, str]
             A dictionary containing details/metadata about the graph.
-        save_path: str
+        save_path: Path
             The base folder path to save the output.
         filter_file_name: str
             The name of the filter file.
-        graphics_dir : Path, optional
+        graphics_dir : Path
             The directory for saving graphics.
 
         Returns
@@ -230,8 +230,8 @@ class GraphGenerator:
         self,
         graph_details: Dict[str, str],
         filter_file_name: str,
-        save_path: str,
-        graphics_dir: Path = Path(""),
+        save_path: Path,
+        graphics_dir: Path,
     ) -> str:
         """
         Save the generated graph to a file.
@@ -242,9 +242,9 @@ class GraphGenerator:
             A dictionary containing details/metadata about the graph.
         filter_file_name : str
             The name of the filter file.
-        save_path : str
+        save_path : Path
             The base folder path to save the output.
-        graphics_dir : Path, optional
+        graphics_dir : Path
             The directory for saving graphics.
 
         Returns
@@ -269,23 +269,23 @@ class GraphGenerator:
 
     def _generate_graph_path(
         self,
-        save_path: str,
+        save_path: Path,
         graph_details: Dict[str, str],
         filter_file_name: str,
-        graphics_dir: Path = Path(""),
+        graphics_dir: Path,
     ) -> Path:
         """
         Generate the full path for the output graph and create parent folders if necessary.
 
         Parameters
         ----------
-        save_path : str
+        save_path : Path
             The base folder path to save the output.
         graph_details : Dict[str, str]
             A dictionary containing details/metadata about the graph.
         filter_file_name : str
             The name of the filter file.
-        graphics_dir : Path, optional
+        graphics_dir : Path
             The directory for saving graphics.
 
         Returns

@@ -49,7 +49,7 @@ def test_save_graph_exception(graph_generator: GraphGenerator) -> None:
     }
     filter_file_name: str = "test_filter.png"
     save_path: str = "/path/to/save"
-    graphics_dir: str = "graphics"
+    graphics_dir: Path = Path("graphics")
 
     with patch("RUFAS.graph_generator.matplotlib.pyplot.savefig") as mock_savefig:
         mock_savefig.side_effect = Exception("test")
