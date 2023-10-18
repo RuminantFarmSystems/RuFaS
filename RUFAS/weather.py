@@ -1,6 +1,8 @@
 import numpy as np
 
+from RUFAS.current_weather import CurrentWeather
 from RUFAS.output_manager import OutputManager
+from RUFAS.time import Time
 
 om = OutputManager()
 
@@ -48,13 +50,13 @@ class Weather:
         start_day = config.start_day
 
         # initialize data sets
-        self.rainfall = []
-        self.T_max = []
-        self.T_min = []
-        self.T_avg = []
-        self.radiation = []
-        self.irrigation = []
-        self.T_avg_annual = []
+        self.__rainfall = []
+        self.__T_max = []
+        self.__T_min = []
+        self.__T_avg = []
+        self.__radiation = []
+        self.__irrigation = []
+        self.__T_avg_annual = []
 
         year_length = config.year_length
         leap_year_length = config.leap_year_length
@@ -84,12 +86,12 @@ class Weather:
 
         # fill the weather arrays with zeros for the size of each year in years[]
         for year in years:
-            self.rainfall.append([0.0 for _ in range(len(year))])
-            self.T_max.append([0.0 for _ in range(len(year))])
-            self.T_min.append([0.0 for _ in range(len(year))])
-            self.T_avg.append([0.0 for _ in range(len(year))])
-            self.radiation.append([0.0 for _ in range(len(year))])
-            self.irrigation.append([0.0 for _ in range(len(year))])
+            self.__rainfall.append([0.0 for _ in range(len(year))])
+            self.__T_max.append([0.0 for _ in range(len(year))])
+            self.__T_min.append([0.0 for _ in range(len(year))])
+            self.__T_avg.append([0.0 for _ in range(len(year))])
+            self.__radiation.append([0.0 for _ in range(len(year))])
+            self.__irrigation.append([0.0 for _ in range(len(year))])
 
         for i in range(len(weather_file['year'])):
             current_year = weather_file['year'][i]
@@ -103,14 +105,52 @@ class Weather:
             elif current_year == config.end_year and current_day > config.end_day:
                 break
 
-            self.rainfall[current_year_index][current_day_index] = weather_file['precip'][i]
-            self.T_max[current_year_index][current_day_index] = weather_file['high'][i]
-            self.T_min[current_year_index][current_day_index] = weather_file['low'][i]
-            self.T_avg[current_year_index][current_day_index] = weather_file['avg'][i]
-            self.radiation[current_year_index][current_day_index] = weather_file['Hday'][i]
-            self.irrigation[current_year_index][current_day_index] = weather_file['irrigation'][i]
+            self.__rainfall[current_year_index][current_day_index] = weather_file['precip'][i]
+            self.__T_max[current_year_index][current_day_index] = weather_file['high'][i]
+            self.__T_min[current_year_index][current_day_index] = weather_file['low'][i]
+            self.__T_avg[current_year_index][current_day_index] = weather_file['avg'][i]
+            self.__radiation[current_year_index][current_day_index] = weather_file['Hday'][i]
+            self.__irrigation[current_year_index][current_day_index] = weather_file['irrigation'][i]
 
-        self.T_avg_annual = self._calculate_average_annual_temperature(weather_file['avg'])
+        self.__T_avg_annual = self._calculate_average_annual_temperature(weather_file['avg'])
+
+    def get_current_weather(self, time: Time) -> CurrentWeather:
+        """
+        Creates a CurrentWeather object containing all the weather conditions on the current day.
+
+        Parameters
+        ----------
+        time: Time
+            Time object containing the current time of the simulation.
+
+        Returns
+        -------
+        CurrentWeather
+            CurrentWeather instance including all the weather conditions of the specified date.
+
+        Raises
+        ------
+        IndexError
+            While attempting to collect weather conditions that are not contained in the Weather object.
+
+        """
+        year = time.year
+        day = time.day
+        month = CurrentWeather.date_conversion_month(time)
+        daylength = CurrentWeather.determine_daylength(month)
+        try:
+            current_weather = CurrentWeather(incoming_light=self.__radiation[year - 1][day - 1],
+                                             min_air_temperature=self.__T_min[year - 1][day - 1],
+                                             mean_air_temperature=self.__T_avg[year - 1][day - 1],
+                                             max_air_temperature=self.__T_max[year - 1][day - 1],
+                                             annual_mean_air_temperature=self.__T_avg_annual,
+                                             precipitation=self.__rainfall[year - 1][day - 1],
+                                             irrigation=self.__irrigation[year - 1][day - 1],
+                                             daylength=daylength)
+        except IndexError:
+            raise IndexError(f"Attempted to get weather conditions for day: {time.day}, year: {time.year}.")
+
+        return current_weather
 
         info_map = {"class": self.__class__.__name__, "function": self.__init__.__name__, "prefix": "Weather"}
         om.add_variable("average_annual_temperature(C)", self.T_avg_annual, info_map)
