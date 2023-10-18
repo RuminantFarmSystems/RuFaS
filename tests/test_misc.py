@@ -540,18 +540,27 @@ def test_dict_to_file_csv_exception(mock_output_manager: OutputManager) -> None:
             mock_output_manager._dict_to_file_csv(data, "test")
 
 
+@pytest.mark.parametrize(
+    "exception, error_message",
+    [
+        (
+            OSError,
+            "test OS Error",
+        ),
+        (
+            FileNotFoundError,
+            "test File not Found Error",
+        ),
+    ],
+)
 def test_save_variables_to_csv_files_exceptions(
-    mock_output_manager: OutputManager,
+    mock_output_manager: OutputManager, exception: Exception, error_message: str
 ) -> None:
     """Unit test for the function _save_variables_to_csv_files() in the file output_manager.py"""
 
     with patch("pathlib.Path.mkdir") as mock_mkdir:
-        mock_mkdir.side_effect = OSError("test OS Error")
-        with pytest.raises(OSError, match="test OS Error"):
-            mock_output_manager._save_variables_to_csv_files({}, "filter", "path")
-
-        mock_mkdir.side_effect = FileNotFoundError("test File not Found Error")
-        with pytest.raises(OSError, match="test File not Found Error"):
+        mock_mkdir.side_effect = exception(error_message)
+        with pytest.raises(exception, match=error_message):
             mock_output_manager._save_variables_to_csv_files({}, "filter", "path")
 
 
