@@ -1,5 +1,6 @@
 # !/usr/bin/env python3
 
+from copy import deepcopy
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Union
 import datetime
@@ -84,7 +85,11 @@ class OutputManager(object):
             k: info_map[k] for k in info_map.keys() - {"class", "function"}
         }
         pool[key]["info_maps"].append(reduced_info_map)
-        pool[key]["values"].append(value)
+
+        if isinstance(value, (int, bool, float, str)):
+            pool[key]["values"].append(value)
+        else:
+            pool[key]["values"].append(deepcopy(value))
 
     def add_variable(self, name: str, value: Any, info_map: Dict[str, Any]) -> None:
         """
