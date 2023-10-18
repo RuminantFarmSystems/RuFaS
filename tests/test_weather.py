@@ -3,16 +3,16 @@ from pytest_mock.plugin import MockerFixture
 from unittest.mock import MagicMock, patch
 from typing import Callable
 
-from RUFAS.classes.config import Config
-from RUFAS.classes.current_weather import CurrentWeather
-from RUFAS.classes.time import Time
-from RUFAS.classes.weather import Weather
+from RUFAS.config import Config
+from RUFAS.current_weather import CurrentWeather
+from RUFAS.time import Time
+from RUFAS.weather import Weather
 
 
 @pytest.fixture
 def mock_weather(mocker: MockerFixture) -> Weather:
     """Fixture for Weather object."""
-    mocker.patch("RUFAS.classes.weather.Weather.__init__", return_value=None)
+    mocker.patch("RUFAS.weather.Weather.__init__", return_value=None)
     mock_config = MagicMock(Config)
     mock_weather = Weather({}, mock_config)
     mock_weather._Weather__radiation = [[1.0, 2.0, 3.0]]
@@ -58,9 +58,9 @@ def test_get_current_weather(mock_weather: Weather, day: int, year: int, expecte
     mocked_time = MagicMock(Time)
     setattr(mocked_time, "day", day)
     setattr(mocked_time, "year", year)
-    with patch("RUFAS.classes.current_weather.CurrentWeather.date_conversion_month", new_callable=MagicMock,
+    with patch("RUFAS.current_weather.CurrentWeather.date_conversion_month", new_callable=MagicMock,
                return_value=3) as day, \
-            patch("RUFAS.classes.current_weather.CurrentWeather.determine_daylength", new_callable=MagicMock,
+            patch("RUFAS.current_weather.CurrentWeather.determine_daylength", new_callable=MagicMock,
                   return_value=10.0) as daylength:
         actual = mock_weather.get_current_weather(mocked_time)
 
@@ -78,9 +78,9 @@ def test_get_current_weather_error(mock_weather: Weather, day: int, year: int, e
     mocked_time = MagicMock(Time)
     setattr(mocked_time, "day", day)
     setattr(mocked_time, "year", year)
-    with patch("RUFAS.classes.current_weather.CurrentWeather.date_conversion_month", new_callable=MagicMock,
+    with patch("RUFAS.current_weather.CurrentWeather.date_conversion_month", new_callable=MagicMock,
                return_value=3), \
-            patch("RUFAS.classes.current_weather.CurrentWeather.determine_daylength", new_callable=MagicMock,
+            patch("RUFAS.current_weather.CurrentWeather.determine_daylength", new_callable=MagicMock,
                   return_value=10.0), \
             pytest.raises(IndexError) as e:
         mock_weather.get_current_weather(mocked_time)

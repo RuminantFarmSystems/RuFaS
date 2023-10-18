@@ -2,8 +2,8 @@ from typing import List
 import pytest
 from unittest.mock import MagicMock
 
-from RUFAS.classes.current_weather import CurrentWeather
-from RUFAS.classes.time import Time
+from RUFAS.current_weather import CurrentWeather
+from RUFAS.time import Time
 
 
 @pytest.mark.parametrize("snow_fall, rainfall, actual", [
