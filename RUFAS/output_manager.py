@@ -497,7 +497,7 @@ class OutputManager(object):
         else:
             raise NotADirectoryError("The specified path must be a directory")
 
-    def _load_filter_file_to_list(self, path: str) -> (List[str], Dict[str, str]):
+    def _load_txt_file_to_list(self, path: str) -> List[str]:
         """Reads a text file into a list.
 
         Parameters
@@ -518,26 +518,102 @@ class OutputManager(object):
         """
         info_map = {
             "class": self.__class__.__name__,
-            "function": self._load_filter_file_to_list.__name__,
+            "function": self._load_txt_file_to_list.__name__,
+        }
+        self.add_log("open_text_file", f"Attempting to open {path}.", info_map)
+        try:
+            with open(path) as text_file:
+                list_of_elements = text_file.read().splitlines()
+                load_message = f"Successfully opened {path} and read {len(list_of_elements)} lines."
+                self.add_log("filter_pattern_file_load_log", load_message, info_map)
+                return list_of_elements
+        except Exception as e:
+            self.add_error("error reading file", str(e), info_map)
+            raise e
+
+    def _load_json_file_to_tuple(self, path: str) -> (List[str], Dict[str, str]):
+        """
+        Load data from a JSON file located at the specified path and return it as a tuple.
+
+        Parameters
+        -----------
+        path (str):
+            The path to the JSON file to be loaded.
+
+        Returns
+        --------
+        Tuple[List[str], Dict[str, str]]:
+            A tuple containing two elements:
+            1. A list of strings, representing the 'filters' key from the JSON file.
+            2. A dictionary of string key-value pairs, representing the parsed JSON content.
+
+        Raises
+        -------
+        Any exceptions raised during file reading or JSON parsing are propagated.
+
+        This method attempts to open and read a JSON file, extracting the 'filters' key as a list of strings
+        and the rest of the JSON content as a dictionary. If successful, it returns these values in a tuple.
+        If any exceptions occur during the process, an error is logged and the exception is raised.
+        """
+        info_map = {
+            "class": self.__class__.__name__,
+            "function": self._load_json_file_to_tuple.__name__,
         }
         self.add_log("open_filter_file", f"Attempting to open {path}.", info_map)
         list_of_elements = []
         graph_metadata = {}
         try:
             with open(path) as filter_file:
-                if path.endswith(".txt"):
-                    list_of_elements = filter_file.read().splitlines()
-                    load_message = f"Successfully opened {path} and read {len(list_of_elements)} lines."
-                    self.add_log("filter_pattern_file_load_log", load_message, info_map)
-
-                elif path.endswith(".json"):
-                    graph_metadata = json.load(filter_file)
-                    list_of_elements = graph_metadata["filters"]
-                    load_message = f"Successfully opened {path} and read {len(list_of_elements)} lines."
-                    self.add_log("filter_pattern_file_load_log", load_message, info_map)
+                graph_metadata = json.load(filter_file)
+                list_of_elements = graph_metadata["filters"]
+                load_message = f"Successfully opened {path} and read {len(list_of_elements)} lines."
+                self.add_log("filter_pattern_file_load_log", load_message, info_map)
                 return list_of_elements, graph_metadata
         except Exception as e:
+            self.add_error("error reading file", str(e), info_map)
             raise e
+
+    # def _load_filter_file_to_list(self, path: str) -> (List[str], Dict[str, str]):
+    #     """Reads a text file into a list.
+
+    #     Parameters
+    #     ----------
+    #     path : str
+    #         Path of the input file to be read.
+
+    #     Returns
+    #     -------
+    #     List[str]
+    #         A list of strings from a text file where each line of the file becomes a list element.
+
+    #     Raises
+    #     -------
+    #     Exception
+    #         If an error occurs while opening or reading the file.
+
+    #     """
+    #     info_map = {
+    #         "class": self.__class__.__name__,
+    #         "function": self._load_filter_file_to_list.__name__,
+    #     }
+    #     self.add_log("open_filter_file", f"Attempting to open {path}.", info_map)
+    #     list_of_elements = []
+    #     graph_metadata = {}
+    #     try:
+    #         with open(path) as filter_file:
+    #             if path.endswith(".txt"):
+    #                 list_of_elements = filter_file.read().splitlines()
+    #                 load_message = f"Successfully opened {path} and read {len(list_of_elements)} lines."
+    #                 self.add_log("filter_pattern_file_load_log", load_message, info_map)
+
+    #             elif path.endswith(".json"):
+    #                 graph_metadata = json.load(filter_file)
+    #                 list_of_elements = graph_metadata["filters"]
+    #                 load_message = f"Successfully opened {path} and read {len(list_of_elements)} lines."
+    #                 self.add_log("filter_pattern_file_load_log", load_message, info_map)
+    #             return list_of_elements, graph_metadata
+    #     except Exception as e:
+    #         raise e
 
     def _filter_variables_pool(
         self, filter_patterns: List[str], input_file_name: Optional[str]
