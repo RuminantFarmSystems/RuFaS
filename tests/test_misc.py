@@ -1320,6 +1320,9 @@ def test_load_json_file_to_tuple(
     with pytest.raises(FileNotFoundError):
         mock_output_manager._load_json_file_to_tuple("non_existent_file.json")
 
+    mock_file.side_effect = Exception("Unexpected error")
+    with pytest.raises(Exception):
+        mock_output_manager._load_json_file_to_tuple("some_file.json")
 
     # Restore original method
     mock_output_manager._load_json_file_to_tuple = (
