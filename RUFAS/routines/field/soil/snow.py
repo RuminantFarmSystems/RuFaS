@@ -35,7 +35,7 @@ class Snow:
         """object that tracks all soil variable throughout the simulation"""
 
     @staticmethod
-    def _calc_snow_temp(soil_data: SoilData, current_day_weather: CurrentWeather) -> float | None:
+    def _calc_snow_temp(soil_data: SoilData, current_day_weather: CurrentWeather) -> float:
         """
         Calculate the snow pack temperature for the current day.
 
@@ -157,16 +157,14 @@ class Snow:
         None
         """
         self.soil_data.snow_content += current_day_weather.snow_fall
-        """Update snow content with precipitation"""
+
         if self.soil_data.snow_content <= 0.0:
             self.soil_data.current_day_snow_temperature, self.soil_data.previous_day_snow_temperature = None, None
             self.soil_data.snow_content, self.soil_data.snow_melt_amount = 0.0, 0.0
         else:
             self.soil_data.previous_day_snow_temperature = self.soil_data.current_day_snow_temperature if \
                 self.soil_data.current_day_snow_temperature is not None else current_day_weather.mean_air_temperature
-            """Update previous day snow temperature"""
             self.soil_data.current_day_snow_temperature = self._calc_snow_temp(self.soil_data, current_day_weather)
-            """Update current day snow temperature"""
+
             self.soil_data.snow_melt_amount = self._melt_snow(self.soil_data, current_day_weather, day)
             self.soil_data.snow_content -= self.soil_data.snow_melt_amount
-            """Update snow content with melted snow"""
