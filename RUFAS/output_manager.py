@@ -719,7 +719,7 @@ class OutputManager(object):
         file_path = os.path.join(path, self._generate_file_name("errors", "json"))
         self._dict_to_file_json(self.errors_pool, file_path)
 
-    def dump_variable_names_and_contexts(self, path: str, exclude_info_maps: bool, # noqa
+    def dump_variable_names_and_contexts(self, path: str, exclude_info_maps: bool,  # noqa: C901
                                          format_option: str = "verbose",
                                          ) -> None:
         """
