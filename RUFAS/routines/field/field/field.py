@@ -5,6 +5,7 @@ from RUFAS.routines.field.crop.crop_data import CropData
 from RUFAS.routines.field.crop.species_data_factory import CropSpecies, CropSpeciesDataFactory
 from RUFAS.routines.field.manager.events import Event, PlantingEvent, HarvestEvent, FertilizerEvent, ManureEvent
 from RUFAS.routines.field.manager.current_weather import CurrentWeather
+from RUFAS.routines.field.soil.carbon_cycling.residue_partition import ResiduePartition
 from RUFAS.routines.field.soil.soil import Soil
 from RUFAS.routines.field.field.field_data import FieldData
 from RUFAS.routines.field.field.fertilizer_application import FertilizerApplication
@@ -71,6 +72,7 @@ class Field:
 
         # soil attributes
         self.soil = soil or Soil(soil_data=None, field_size=self.field_data.field_size)  # default soil if not given.
+        self.residue_partition = ResiduePartition(self.soil.data)
 
         # crop attributes
         self.crops: List[Crop] = list()  # empty crop list
@@ -790,6 +792,7 @@ class Field:
             crop.crop_management.manage_harvest(harvest_operation_enum, self.field_data.name,
                                                 self.field_data.field_size, time.calendar_year, time.day,
                                                 self.soil.data)
+            self.residue_partition.partition_residue(self.soil.data.accumulated_runoff)
 
     def _remove_dead_crops(self) -> None:
         """

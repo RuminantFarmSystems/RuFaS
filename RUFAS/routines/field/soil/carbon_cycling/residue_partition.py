@@ -69,18 +69,7 @@ class ResiduePartition:
                 )
 
                 layer.plant_dry_matter_residue_amount = self.data.plant_surface_residue
-
-                # set to 0
-                # set to zero after partition
-
-                # use plant root residue amount according to depth
-                # move to outside of the condition statement, needs to be calculated even not surface layer
-                # layer.soil_dry_matter_residue_amount = self._determine_soil_dry_matter_residue_amount(
-                #     self.data.crop_root_depth,
-                #     layer.layer_thickness,
-                #     self.data.plant_root_residue
-                # )
-                # deduct
+                #layer.soil_dry_matter_residue_amount = self.data.plant_surface_residue * layer.tillage_fraction
 
                 self.data.total_residue += self.data.plant_surface_residue
             else:

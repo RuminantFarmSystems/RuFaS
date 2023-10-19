@@ -134,6 +134,8 @@ class OutputGatherer:
                                 layer.plant_metabolic_active_carbon_remaining, info_map)
                 om.add_variable("plant_structural_active_carbon_usage", layer.plant_structural_active_carbon_usage,
                                 info_map)
+                om.add_variable("metabolic_litter_amount", layer.metabolic_litter_amount, info_map)
+                om.add_variable("structural_litter_amount", layer.structural_litter_amount, info_map)
                 om.add_variable("plant_structural_active_carbon_remaining",
                                 layer.plant_structural_active_carbon_remaining, info_map)
                 om.add_variable("plant_structural_slow_carbon_usage", layer.plant_structural_slow_carbon_usage,
