@@ -1856,3 +1856,9 @@ def test_convert_list_of_dicts_to_dict_of_lists_multiple_dicts():
     result = Utility.convert_list_of_dicts_to_dict_of_lists(input_data)
     assert result == expected_result
 
+
+def test_convert_list_of_dicts_to_dict_of_lists_empty_values():
+    input_data = [{"a": 1, "b": 2}, {"a": None, "b": 3}]
+    expected_result = {"a": [1, None], "b": [2, 3]}
+    result = Utility.convert_list_of_dicts_to_dict_of_lists(input_data)
+    assert result == expected_result
