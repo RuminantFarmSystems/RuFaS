@@ -9,7 +9,7 @@ from copy import deepcopy
 import os
 import re
 import json
-from typing import Any, Callable, Dict, List
+from typing import Any, Callable, Dict, List, Tuple
 from mock import Mock, mock_open, patch
 
 import pytest
@@ -835,6 +835,7 @@ def output_manager_original_method_states(
         "_list_to_file_txt": mock_output_manager._list_to_file_txt,
         "_list_txt_and_json_files_in_dir": mock_output_manager._list_txt_and_json_files_in_dir,
         "_load_txt_file_to_list": mock_output_manager._load_txt_file_to_list,
+        "_load_json_file_to_tuple": mock_output_manager._load_json_file_to_tuple,
         "_save_variables_to_csv_files ": mock_output_manager._save_variables_to_csv_files,
         "save_variables": mock_output_manager.save_variables,
         "add_variable": mock_output_manager.add_variable,
@@ -1290,6 +1291,31 @@ def test_load_txt_file_to_list(
     mock_output_manager._load_txt_file_to_list = output_manager_original_method_states[
         "_load_txt_file_to_list"
     ]
+
+
+@patch("builtins.open", new_callable=mock_open)
+def test_load_json_file_to_tuple(
+    mock_file: MagicMock,
+    mock_output_manager: OutputManager,
+    output_manager_original_method_states: Dict[str, Callable],
+) -> None:
+    """Test case for function _load_json_file_to_tuple in output_manager.py"""
+    data: Dict[str, Any] = {
+        "filters": ["filter1", "filter2"],
+        "other_key": "value",
+    }
+    mock_file.return_value.read.return_value = json.dumps(data)
+
+    result: Tuple[
+        List[str], Dict[str, str]
+    ] = mock_output_manager._load_json_file_to_tuple("some_file.json")
+    expected_result: Tuple[List[str], Dict[str, str]] = (data["filters"], data)
+    assert result == expected_result
+
+    # Restore original method
+    mock_output_manager._load_json_file_to_tuple = (
+        output_manager_original_method_states["_load_json_file_to_tuple"]
+    )
 
 
 def test_list_txt_and_json_files_in_dir(
