@@ -753,12 +753,7 @@ def test_add_variable(
 
 @pytest.mark.parametrize(
     "dummy_value",
-    [
-        "dummy_value",
-        2,
-        3.45,
-        True
-    ],
+    ["dummy_value", 2, 3.45, True],
 )
 def test_add_to_pool(mock_output_manager: OutputManager, dummy_value: Any) -> None:
     """Unit test for function _add_to_pool in file output_manager.py"""
@@ -1841,3 +1836,9 @@ def test_make_serializable_recursive(
 
     # Assert
     assert result == expected_output
+
+
+def test_convert_list_of_dicts_to_dict_of_lists_empty_list():
+    result = Utility.convert_list_of_dicts_to_dict_of_lists([])
+    assert result == {}
+
