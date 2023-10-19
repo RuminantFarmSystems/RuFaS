@@ -5,6 +5,7 @@ Description: Implements test cases
 Author(s): Pooya Hekmati, sh2235@cornell.edu
 """
 
+from copy import deepcopy
 import os
 import re
 import json
@@ -23,37 +24,37 @@ from RUFAS.util import Utility
 
 
 def test_annual_reset():
-    """Unit test for function annual_reset in file classes.py"""
+    """Unit test for function annual_reset in classes"""
     pass
 
 
 def test_annual_mass_balance():
-    """Unit test for function annual_mass_balance in file classes.py"""
+    """Unit test for function annual_mass_balance in classes"""
     pass
 
 
 def test_calc_sim_length():
-    """Unit test for function calc_sim_length in file classes.py"""
+    """Unit test for function calc_sim_length in classes"""
     pass
 
 
 def test_to_str():
-    """Unit test for function to_str in file classes.py"""
+    """Unit test for function to_str in classes"""
     pass
 
 
 def test_advance():
-    """Unit test for function advance in file classes.py"""
+    """Unit test for function advance in classes"""
     pass
 
 
 def test_end_year():
-    """Unit test for function end_year in file classes.py"""
+    """Unit test for function end_year in classes"""
     pass
 
 
 def test_end_simulation():
-    """Unit test for function end_simulation in file classes.py"""
+    """Unit test for function end_simulation in classes"""
     pass
 
 
@@ -70,7 +71,7 @@ def test_general_constants() -> None:
 
 
 def test_is_leap_year():
-    """Unit test for function is_leap_year in file classes.py"""
+    """Unit test for function is_leap_year in classes"""
     pass
 
 
@@ -138,8 +139,8 @@ def test_advance_time(
     patch_simulation_engine: SimulationEngine, mocker: MockerFixture
 ) -> None:
     """Unit test for function _advance_time in file RUFAS/simulation_engine.py"""
-    mocker.patch("RUFAS.classes.Time.to_str")
-    mocker.patch("RUFAS.classes.Time.advance")
+    mocker.patch("RUFAS.time.Time.to_str")
+    mocker.patch("RUFAS.time.Time.advance")
     patch_simulation_engine.state.animal_manager.simulation_day = 1
     patch_simulation_engine._advance_time(False)
     patch_simulation_engine._advance_time(True)
@@ -750,7 +751,16 @@ def test_add_variable(
     ]
 
 
-def test_add_to_pool(mock_output_manager: OutputManager) -> None:
+@pytest.mark.parametrize(
+    "dummy_value",
+    [
+        "dummy_value",
+        2,
+        3.45,
+        True
+    ],
+)
+def test_add_to_pool(mock_output_manager: OutputManager, dummy_value: Any) -> None:
     """Unit test for function _add_to_pool in file output_manager.py"""
     info_map = {
         "class": "dummy_class",
@@ -759,20 +769,25 @@ def test_add_to_pool(mock_output_manager: OutputManager) -> None:
     }
     key = "dummy_key"
     pool = {}
-    mock_output_manager._add_to_pool(pool, key, "dummy_value1", info_map)
+    mock_output_manager._add_to_pool(pool, key, dummy_value, info_map)
     assert pool[key] == {
         "info_maps": [{"context": "dummy_context"}],
-        "values": ["dummy_value1"],
+        "values": [dummy_value],
     }
+    assert pool[key]["values"][0] == dummy_value
+    assert pool[key]["values"][0] is dummy_value
+
     info_map["more_context"] = 1234567890
-    mock_output_manager._add_to_pool(pool, key, "dummy_value2", info_map)
+    mock_output_manager._add_to_pool(pool, key, {dummy_value}, info_map)
     assert pool[key] == {
         "info_maps": [
             {"context": "dummy_context"},
             {"context": "dummy_context", "more_context": 1234567890},
         ],
-        "values": ["dummy_value1", "dummy_value2"],
+        "values": [dummy_value, {dummy_value}],
     }
+    assert pool[key]["values"][1] == deepcopy({dummy_value})
+    assert pool[key]["values"][1] is not {dummy_value}
 
 
 def test_output_manager_singleton(mocker: MockerFixture) -> None:
