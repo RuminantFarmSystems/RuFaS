@@ -1345,11 +1345,23 @@ def test_load_filter_file_to_list_load_txt_file(
     mock_txt_loader: MagicMock,
     mock_json_loader: MagicMock,
     mock_output_manager: OutputManager,
+    output_manager_original_method_states: Dict[str, Callable],
 ) -> None:
     result: List[str] = mock_output_manager._load_filter_file_to_list("some_file.txt")
     mock_txt_loader.assert_called_with("some_file.txt")
     mock_json_loader.assert_not_called()
     assert result == []
+
+    # Restore original method
+    mock_output_manager._load_filter_file_to_list = (
+        output_manager_original_method_states["_load_filter_file_to_list"]
+    )
+    mock_output_manager._load_json_file_to_tuple = (
+        output_manager_original_method_states["_load_json_file_to_tuple"]
+    )
+    mock_output_manager._load_txt_file_to_list = (
+        output_manager_original_method_states["_load_txt_file_to_list"]
+    )
 
 
 @patch.object(OutputManager, "_load_json_file_to_tuple", return_value=([], {}))
@@ -1358,6 +1370,7 @@ def test_load_filter_file_to_list_load_json_file(
     mock_txt_loader: MagicMock,
     mock_json_loader: MagicMock,
     mock_output_manager: OutputManager,
+    output_manager_original_method_states: Dict[str, Callable],
 ) -> None:
     result: Tuple[
         List[str], Dict[str, str]
@@ -1365,6 +1378,17 @@ def test_load_filter_file_to_list_load_json_file(
     mock_json_loader.assert_called_with("some_file.json")
     mock_txt_loader.assert_not_called()
     assert result == ([], {})
+
+    # Restore original method
+    mock_output_manager._load_filter_file_to_list = (
+        output_manager_original_method_states["_load_filter_file_to_list"]
+    )
+    mock_output_manager._load_json_file_to_tuple = (
+        output_manager_original_method_states["_load_json_file_to_tuple"]
+    )
+    mock_output_manager._load_txt_file_to_list = (
+        output_manager_original_method_states["_load_txt_file_to_list"]
+    )
 
 
 def test_list_txt_and_json_files_in_dir(
