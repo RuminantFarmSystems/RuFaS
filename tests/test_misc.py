@@ -1312,9 +1312,14 @@ def test_load_json_file_to_tuple(
     expected_result: Tuple[List[str], Dict[str, str]] = (data["filters"], data)
     assert result == expected_result
 
+    mock_file.return_value.read.return_value = "this is not valid JSON"
+    with pytest.raises(json.JSONDecodeError):
+        mock_output_manager._load_json_file_to_tuple("some_file.json")
+
     mock_file.side_effect = FileNotFoundError
     with pytest.raises(FileNotFoundError):
         mock_output_manager._load_json_file_to_tuple("non_existent_file.json")
+
 
     # Restore original method
     mock_output_manager._load_json_file_to_tuple = (
