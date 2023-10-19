@@ -365,82 +365,42 @@ def test_dict_to_csv_column_list_empty_list(mock_output_manager: OutputManager) 
     assert series.to_list() == []
 
 
-@pytest.mark.parametrize("data, expected_result, should_write", [
-    ({"var1": {"values": [1.0, True, "test"], "info_maps": []}},
-     f"var1,var1{os.linesep}1.0,{os.linesep}True,{os.linesep}test,{os.linesep}",
-     True),
-    ({"var1": {"values": [1.0, True, "test"]}},
-     f"var1{os.linesep}1.0{os.linesep}True{os.linesep}test{os.linesep}",
-     True),
-    ({"var1": {"values": [1, 2, 3], "info_maps": [{"v": 1}, {"v": 2}, {"v": 3}]}},
-     f"var1,var1.v{os.linesep}1,1{os.linesep}2,2{os.linesep}3,3{os.linesep}",
-     True),
-    ({"var1": {"values": [1, 2, 3]}},
-     f"var1{os.linesep}1{os.linesep}2{os.linesep}3{os.linesep}",
-     True),
-    ({"var1": {"values": [1], "info_maps": [{"map1": "value1"}, {"map1": "value2"}]}},
-     f"var1,var1.map1{os.linesep}1,value1{os.linesep},value2{os.linesep}",
-     True),
-    ({"var1":
-      {
-        "values": [{'v1': 1, 'v2': 1}, {'v1': 2, 'v2': 2}],
-        "info_maps": [{"map1": "value1"}, {"map1": "value2"}]
-      }
-      },
-     f"var1.v1,var1.v2,var1.map1{os.linesep}1,1,value1{os.linesep}2,2,value2{os.linesep}",
-     True),
-    ({
-        "simple_key": {
-            "values": [{"key1": 1, "key2": [1, 1]}, {"key1": 2, "key2": [2, 2]}, {"key1": 3, "key2": [3, 3]}],
-            "info_maps": [
-                {
-                    "subkey1": 1,
-                    "subkey2": "Hello",
-                    "subkey3": [1, 2, 3],
-                    "subkey4": {
-                        "nestedkey1": "World",
-                        "nestedkey2": [4, 5, 6]
-                    }
-                },
-                {
-                    "subkey1": 2,
-                    "subkey2": "Hi",
-                    "subkey3": [4, 5, 6],
-                    "subkey4": {
-                        "nestedkey1": "There",
-                        "nestedkey2": [7, 8, 9]
-                    }
-                }
-            ]
-        }
-    },
-     f"simple_key.key1,simple_key.key2,simple_key.subkey1,simple_key.subkey2,"
-     f"simple_key.subkey3,simple_key.subkey4{os.linesep}"
-     f"1,\"[1, 1]\",1,Hello,\"[1, 2, 3]\",\"{{'nestedkey1': 'World', 'nestedkey2': [4, 5, 6]}}\"{os.linesep}"
-     f"2,\"[2, 2]\",2,Hi,\"[4, 5, 6]\",\"{{'nestedkey1': 'There', 'nestedkey2': [7, 8, 9]}}\"{os.linesep}"
-     f"3,\"[3, 3]\",,,,{os.linesep}",
-     True),
-    ({
-        "simple_key1": {
-            "values": [1, 2, 3]
-        },
-        "simple_key2": {
-            "values": [4, 5, 6]
-        }
-    },
-     f"simple_key1,simple_key2{os.linesep}"
-     f"1,4{os.linesep}2,5{os.linesep}3,6{os.linesep}",
-     True),
-    ({
-        "simple_key1": {
-            "values": [1, 2, 3],
-            "info_maps": [
-                {
-                    "subkey1": "Farm",
-                    "subkey2": "Field"
+@pytest.mark.parametrize(
+    "data, expected_result, should_write",
+    [
+        (
+            {"var1": {"values": [1.0, True, "test"], "info_maps": []}},
+            f"var1,var1{os.linesep}1.0,{os.linesep}True,{os.linesep}test,{os.linesep}",
+            True,
+        ),
+        (
+            {"var1": {"values": [1.0, True, "test"]}},
+            f"var1{os.linesep}1.0{os.linesep}True{os.linesep}test{os.linesep}",
+            True,
+        ),
+        (
+            {
+                "var1": {
+                    "values": [1, 2, 3],
+                    "info_maps": [{"v": 1}, {"v": 2}, {"v": 3}],
                 }
             },
-            f"var1.values,var1.info_maps_map1{os.linesep}1,value1{os.linesep},value2{os.linesep}",
+            f"var1,var1.v{os.linesep}1,1{os.linesep}2,2{os.linesep}3,3{os.linesep}",
+            True,
+        ),
+        (
+            {"var1": {"values": [1, 2, 3]}},
+            f"var1{os.linesep}1{os.linesep}2{os.linesep}3{os.linesep}",
+            True,
+        ),
+        (
+            {
+                "var1": {
+                    "values": [1],
+                    "info_maps": [{"map1": "value1"}, {"map1": "value2"}],
+                }
+            },
+            f"var1,var1.map1{os.linesep}1,value1{os.linesep},value2{os.linesep}",
             True,
         ),
         (
@@ -449,22 +409,77 @@ def test_dict_to_csv_column_list_empty_list(mock_output_manager: OutputManager) 
                     "values": [{"v1": 1, "v2": 1}, {"v1": 2, "v2": 2}],
                     "info_maps": [{"map1": "value1"}, {"map1": "value2"}],
                 }
-            ]
-        }
-    },
-     f"simple_key1,simple_key1.subkey1,simple_key1.subkey2,simple_key2,"
-     f"simple_key2.subkey1{os.linesep}"
-     f"1,Farm,Field,4,Tractor{os.linesep}"
-     f"2,,,5,{os.linesep}"
-     f"3,,,6,{os.linesep}"
-     f",,,8,{os.linesep}"
-     f",,,9,{os.linesep}",
-     True),
-    ({}, "",
-     False),
-])
-
-          
+            },
+            f"var1.v1,var1.v2,var1.map1{os.linesep}1,1,value1{os.linesep}2,2,value2{os.linesep}",
+            True,
+        ),
+        (
+            {
+                "simple_key": {
+                    "values": [
+                        {"key1": 1, "key2": [1, 1]},
+                        {"key1": 2, "key2": [2, 2]},
+                        {"key1": 3, "key2": [3, 3]},
+                    ],
+                    "info_maps": [
+                        {
+                            "subkey1": 1,
+                            "subkey2": "Hello",
+                            "subkey3": [1, 2, 3],
+                            "subkey4": {"nestedkey1": "World", "nestedkey2": [4, 5, 6]},
+                        },
+                        {
+                            "subkey1": 2,
+                            "subkey2": "Hi",
+                            "subkey3": [4, 5, 6],
+                            "subkey4": {"nestedkey1": "There", "nestedkey2": [7, 8, 9]},
+                        },
+                    ],
+                }
+            },
+            f"simple_key.key1,simple_key.key2,simple_key.subkey1,simple_key.subkey2,"
+            f"simple_key.subkey3,simple_key.subkey4{os.linesep}"
+            f"1,\"[1, 1]\",1,Hello,\"[1, 2, 3]\",\"{{'nestedkey1': 'World', 'nestedkey2': [4, 5, 6]}}\"{os.linesep}"
+            f"2,\"[2, 2]\",2,Hi,\"[4, 5, 6]\",\"{{'nestedkey1': 'There', 'nestedkey2': [7, 8, 9]}}\"{os.linesep}"
+            f'3,"[3, 3]",,,,{os.linesep}',
+            True,
+        ),
+        (
+            {
+                "simple_key1": {"values": [1, 2, 3]},
+                "simple_key2": {"values": [4, 5, 6]},
+            },
+            f"simple_key1,simple_key2{os.linesep}"
+            f"1,4{os.linesep}2,5{os.linesep}3,6{os.linesep}",
+            True,
+        ),
+        (
+            {
+                "simple_key1": {
+                    "values": [1, 2, 3],
+                    "info_maps": [{"subkey1": "Farm", "subkey2": "Field"}],
+                },
+                "simple_key2": {
+                    "values": [4, 5, 6, 8, 9],
+                    "info_maps": [
+                        {
+                            "subkey1": "Tractor",
+                        }
+                    ],
+                },
+            },
+            f"simple_key1,simple_key1.subkey1,simple_key1.subkey2,simple_key2,"
+            f"simple_key2.subkey1{os.linesep}"
+            f"1,Farm,Field,4,Tractor{os.linesep}"
+            f"2,,,5,{os.linesep}"
+            f"3,,,6,{os.linesep}"
+            f",,,8,{os.linesep}"
+            f",,,9,{os.linesep}",
+            True,
+        ),
+        ({}, "", False),
+    ],
+)
 def test_dict_to_file_csv(
     mock_output_manager: OutputManager,
     data: Dict[str, Any],
@@ -1049,7 +1064,6 @@ def test_dump_errors(
     ]
 
 
-
 @pytest.mark.parametrize("expected_result, exclude_info_maps, format_option", [
     (['_exclude_info_maps=False, expect info_maps accordingly.' + os.linesep, 'var1' + os.linesep,
       'var1.info_maps: test' + os.linesep, 'var2.info_maps: map1' + os.linesep,
@@ -1080,8 +1094,6 @@ def test_dump_errors(
       "var2.v1" + os.linesep, "var2.v2" + os.linesep],
      False, "basic"),
 ])
-
-
 def test_dump_variable_names_and_contexts(
     mock_output_manager: OutputManager,
     output_manager_original_method_states: Dict[str, Callable],
