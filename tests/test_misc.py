@@ -836,6 +836,7 @@ def output_manager_original_method_states(
         "_list_txt_and_json_files_in_dir": mock_output_manager._list_txt_and_json_files_in_dir,
         "_load_txt_file_to_list": mock_output_manager._load_txt_file_to_list,
         "_load_json_file_to_tuple": mock_output_manager._load_json_file_to_tuple,
+        "_load_filter_file_to_list": mock_output_manager._load_filter_file_to_list,
         "_save_variables_to_csv_files ": mock_output_manager._save_variables_to_csv_files,
         "save_variables": mock_output_manager.save_variables,
         "add_variable": mock_output_manager.add_variable,
