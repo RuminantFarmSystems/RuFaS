@@ -2,7 +2,7 @@
 
 from copy import deepcopy
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Union
+from typing import Any, Dict, List, Optional, Tuple, Union
 import datetime
 import json
 import os
@@ -545,7 +545,7 @@ class OutputManager(object):
             self.add_error("Unexpected error", str(e), info_map)
             raise
 
-    def _load_json_file_to_tuple(self, path: str) -> (List[str], Dict[str, str]):
+    def _load_json_file_to_tuple(self, path: str) -> Tuple[List[str], Dict[str, str]]:
         """
         Load data from a JSON file located at the specified path and return it as a tuple.
 
