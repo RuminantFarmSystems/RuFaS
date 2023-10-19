@@ -565,11 +565,12 @@ class OutputManager(object):
         ------
         FileNotFoundError: If the specified file does not exist.
         json.JSONDecodeError: If there is an issue parsing the JSON content.
+        Exception: For other unexpected errors.
 
         This method loads a JSON file, extracting the 'filters' key as a list of strings and the rest of
         the JSON content as a dictionary. If successful, it returns these values in a tuple. If the file
         does not exist, a FileNotFoundError is raised. If there is an issue with JSON parsing, a
-        json.JSONDecodeError is raised.
+        json.JSONDecodeError is raised. For any other unexpected errors, a generic Exception is raised.
         """
         info_map = {
             "class": self.__class__.__name__,
@@ -592,6 +593,9 @@ class OutputManager(object):
             raise
         except json.JSONDecodeError as e:
             self.add_error("JSON parsing error", str(e), info_map)
+            raise
+        except Exception as e:
+            self.add_error("Unexpected error", str(e), info_map)
             raise
 
     # def _load_filter_file_to_list(self, path: str) -> (List[str], Dict[str, str]):
