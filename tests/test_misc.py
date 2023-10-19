@@ -9,8 +9,8 @@ from copy import deepcopy
 import os
 import re
 import json
-from typing import Any, Callable, Dict, List
-from mock import Mock, mock_open, patch
+from typing import Any, Callable, Dict, List, Tuple
+from mock import mock_open, patch
 
 import pytest
 from mock.mock import MagicMock, call
@@ -753,12 +753,7 @@ def test_add_variable(
 
 @pytest.mark.parametrize(
     "dummy_value",
-    [
-        "dummy_value",
-        2,
-        3.45,
-        True
-    ],
+    ["dummy_value", 2, 3.45, True],
 )
 def test_add_to_pool(mock_output_manager: OutputManager, dummy_value: Any) -> None:
     """Unit test for function _add_to_pool in file output_manager.py"""
@@ -838,8 +833,10 @@ def output_manager_original_method_states(
         "_generate_key": mock_output_manager._generate_key,
         "_get_timestamp": mock_output_manager._get_timestamp,
         "_list_to_file_txt": mock_output_manager._list_to_file_txt,
-        "_list_txt_file_names_in_dir": mock_output_manager._list_txt_file_names_in_dir,
+        "_list_txt_and_json_files_in_dir": mock_output_manager._list_txt_and_json_files_in_dir,
         "_load_txt_file_to_list": mock_output_manager._load_txt_file_to_list,
+        "_load_json_file_to_tuple": mock_output_manager._load_json_file_to_tuple,
+        "_load_filter_file_to_list": mock_output_manager._load_filter_file_to_list,
         "_save_variables_to_csv_files ": mock_output_manager._save_variables_to_csv_files,
         "save_variables": mock_output_manager.save_variables,
         "add_variable": mock_output_manager.add_variable,
@@ -1274,23 +1271,30 @@ def test_exclude_info_maps(
     ]
 
 
+@patch("builtins.open", new_callable=mock_open)
 def test_load_txt_file_to_list(
+    mock_file: MagicMock,
     mock_output_manager: OutputManager,
     output_manager_original_method_states: Dict[str, Callable],
-    tmpdir,
 ) -> None:
     """Test case for function _load_txt_file_to_list in output_manager.py"""
-    with patch("builtins.open", mock_open(read_data="apples\nbananas\ncherries")):
-        result = mock_output_manager._load_txt_file_to_list("path/to/file.txt")
-
+    mock_file.return_value.read.return_value = "apples\nbananas\ncherries"
+    result = mock_output_manager._load_txt_file_to_list("path/to/file.txt")
     assert result == ["apples", "bananas", "cherries"]
 
-    mock_open_func = Mock()
-    mock_open_func.side_effect = Exception("Error opening file")
+    mock_file.side_effect = FileNotFoundError
+    with pytest.raises(FileNotFoundError):
+        mock_output_manager._load_json_file_to_tuple("non_existent_file.txt")
 
-    with patch("builtins.open", mock_open_func):
-        with pytest.raises(Exception):
-            mock_output_manager._load_txt_file_to_list("path/to/file.txt")
+    mock_file.side_effect = UnicodeDecodeError(
+        "encoding", b"", 1, 2, "Fake decode error"
+    )
+    with pytest.raises(UnicodeDecodeError):
+        mock_output_manager._load_txt_file_to_list("corrupted_file.txt")
+
+    mock_file.side_effect = Exception("Unexpected error")
+    with pytest.raises(Exception):
+        mock_output_manager._load_json_file_to_tuple("some_file.txt")
 
     # Restore original method
     mock_output_manager._load_txt_file_to_list = output_manager_original_method_states[
@@ -1298,7 +1302,70 @@ def test_load_txt_file_to_list(
     ]
 
 
-def test_list_txt_file_names_in_dir(
+@patch("builtins.open", new_callable=mock_open)
+def test_load_json_file_to_tuple(
+    mock_file: MagicMock,
+    mock_output_manager: OutputManager,
+    output_manager_original_method_states: Dict[str, Callable],
+) -> None:
+    """Test case for function _load_json_file_to_tuple in output_manager.py"""
+    data: Dict[str, Any] = {
+        "filters": ["filter1", "filter2"],
+        "other_key": "value",
+    }
+    mock_file.return_value.read.return_value = json.dumps(data)
+
+    result: Tuple[
+        List[str], Dict[str, str]
+    ] = mock_output_manager._load_json_file_to_tuple("some_file.json")
+    expected_result: Tuple[List[str], Dict[str, str]] = (data["filters"], data)
+    assert result == expected_result
+
+    mock_file.return_value.read.return_value = "this is not valid JSON"
+    with pytest.raises(json.JSONDecodeError):
+        mock_output_manager._load_json_file_to_tuple("some_file.json")
+
+    mock_file.side_effect = FileNotFoundError
+    with pytest.raises(FileNotFoundError):
+        mock_output_manager._load_json_file_to_tuple("non_existent_file.json")
+
+    mock_file.side_effect = Exception("Unexpected error")
+    with pytest.raises(Exception):
+        mock_output_manager._load_json_file_to_tuple("some_file.json")
+
+    # Restore original method
+    mock_output_manager._load_json_file_to_tuple = (
+        output_manager_original_method_states["_load_json_file_to_tuple"]
+    )
+
+
+def test_load_filter_file_to_list_load_txt_file(mocker: MockerFixture,
+                                                mock_output_manager: OutputManager
+                                                ) -> None:
+    mock_txt_loader = mocker.patch.object(mock_output_manager, "_load_txt_file_to_list", return_value=[])
+    mock_json_loader = mocker.patch.object(mock_output_manager, "_load_json_file_to_tuple", return_value=([], {}))
+
+    result: List[str] = mock_output_manager._load_filter_file_to_list("some_file.txt")
+
+    mock_txt_loader.assert_called_with("some_file.txt")
+    mock_json_loader.assert_not_called()
+    assert result == []
+
+
+def test_load_filter_file_to_list_load_json_file(mocker: MockerFixture,
+                                                 mock_output_manager: OutputManager
+                                                 ) -> None:
+    mock_txt_loader = mocker.patch.object(mock_output_manager, "_load_txt_file_to_list", return_value=[])
+    mock_json_loader = mocker.patch.object(mock_output_manager, "_load_json_file_to_tuple", return_value=([], {}))
+
+    result: Tuple[List[str], Dict[str, str]] = mock_output_manager._load_filter_file_to_list("some_file.json")
+
+    mock_json_loader.assert_called_with("some_file.json")
+    mock_txt_loader.assert_not_called()
+    assert result == ([], {})
+
+
+def test_list_txt_and_json_files_in_dir(
     mock_output_manager: OutputManager,
     output_manager_original_method_states: Dict[str, Callable],
     tmpdir,
@@ -1308,7 +1375,7 @@ def test_list_txt_file_names_in_dir(
     tmpdir.join("file2.txt").write("File 2 content")
     tmpdir.join("file3.csv").write("File 3 content")
 
-    txt_files = mock_output_manager._list_txt_file_names_in_dir(tmpdir)
+    txt_files = mock_output_manager._list_txt_and_json_files_in_dir(tmpdir)
 
     assert len(txt_files) == 2
     assert "file1.txt" in txt_files
@@ -1316,11 +1383,11 @@ def test_list_txt_file_names_in_dir(
     assert "file3.csv" not in txt_files
 
     with pytest.raises(NotADirectoryError):
-        mock_output_manager._list_txt_file_names_in_dir("nonexistent_directory")
+        mock_output_manager._list_txt_and_json_files_in_dir("nonexistent_directory")
 
     # Restore original method
-    mock_output_manager._list_txt_file_names_in_dir = (
-        output_manager_original_method_states["_list_txt_file_names_in_dir"]
+    mock_output_manager._list_txt_and_json_files_in_dir = (
+        output_manager_original_method_states["_list_txt_and_json_files_in_dir"]
     )
 
 
@@ -1701,9 +1768,9 @@ def test_save_variables(
     mock_output_manager._save_variables_to_csv_files = MagicMock()
 
     # test case for when there are no filter keys txt files in output_inclusion_filters directory:
-    mock_output_manager._list_txt_file_names_in_dir = MagicMock(return_value=[])
+    mock_output_manager._list_txt_and_json_files_in_dir = MagicMock(return_value=[])
     mock_output_manager.save_variables("dummy_path", "dummy_dir_path/", True)
-    mock_output_manager._list_txt_file_names_in_dir.assert_called_once_with(
+    mock_output_manager._list_txt_and_json_files_in_dir.assert_called_once_with(
         "dummy_dir_path/"
     )
     mock_output_manager._load_txt_file_to_list.assert_not_called()
@@ -1713,15 +1780,17 @@ def test_save_variables(
     mock_output_manager._save_variables_to_csv_files.assert_not_called()
 
     # test case for when exclude_info_maps flag set to False
-    mock_output_manager._list_txt_file_names_in_dir = MagicMock(
+    mock_output_manager._list_txt_and_json_files_in_dir = MagicMock(
         return_value=[
             "json_dummy_input_filepath.txt",
             "csv_dummy_input_filepath.txt",
         ]
     )
-    mock_output_manager._load_txt_file_to_list = MagicMock()
+    mock_output_manager._load_txt_file_to_list = MagicMock(
+        return_value=([".*"], {"title": "dummy_title"})
+    )
     mock_output_manager.save_variables("dummy_path", "dummy_dir_path/", False)
-    mock_output_manager._list_txt_file_names_in_dir.assert_called_with(
+    mock_output_manager._list_txt_and_json_files_in_dir.assert_called_with(
         "dummy_dir_path/"
     )
     mock_output_manager._load_txt_file_to_list.assert_called_with(
@@ -1743,7 +1812,7 @@ def test_save_variables(
     # test case for when exclude_info_maps flag set to True
     mock_output_manager._exclude_info_maps = MagicMock(return_value={})
     mock_output_manager.save_variables("dummy_path", "dummy_dir_path/", True)
-    mock_output_manager._list_txt_file_names_in_dir.assert_called_with(
+    mock_output_manager._list_txt_and_json_files_in_dir.assert_called_with(
         "dummy_dir_path/"
     )
     mock_output_manager._load_txt_file_to_list.assert_called_with(
@@ -1762,7 +1831,7 @@ def test_save_variables(
     )
 
     # test case for when the filter files to don start with csv_ or json_
-    mock_output_manager._list_txt_file_names_in_dir = MagicMock(
+    mock_output_manager._list_txt_and_json_files_in_dir = MagicMock(
         return_value=[
             "dummy_input_filepath.txt",
             "csvdummy_input_filepath.txt",
@@ -1839,3 +1908,36 @@ def test_make_serializable_recursive(
 
     # Assert
     assert result == expected_output
+
+
+def test_convert_list_of_dicts_to_dict_of_lists_empty_list():
+    result = Utility.convert_list_of_dicts_to_dict_of_lists([])
+    assert result == {}
+
+
+def test_convert_list_of_dicts_to_dict_of_lists_single_dict():
+    input_data = [{"a": 1, "b": 2}]
+    expected_result = {"a": [1], "b": [2]}
+    result = Utility.convert_list_of_dicts_to_dict_of_lists(input_data)
+    assert result == expected_result
+
+
+def test_convert_list_of_dicts_to_dict_of_lists_multiple_dicts():
+    input_data = [{"a": 1, "b": 2}, {"a": 3, "c": 4}]
+    expected_result = {"a": [1, 3], "b": [2], "c": [4]}
+    result = Utility.convert_list_of_dicts_to_dict_of_lists(input_data)
+    assert result == expected_result
+
+
+def test_convert_list_of_dicts_to_dict_of_lists_empty_values():
+    input_data = [{"a": 1, "b": 2}, {"a": None, "b": 3}]
+    expected_result = {"a": [1, None], "b": [2, 3]}
+    result = Utility.convert_list_of_dicts_to_dict_of_lists(input_data)
+    assert result == expected_result
+
+
+def test_convert_list_of_dicts_to_dict_of_lists_empty_keys():
+    input_data = [{"a": 1, "b": 2}, {"": 3, "b": 4}]
+    expected_result = {"a": [1], "b": [2, 4], "": [3]}
+    result = Utility.convert_list_of_dicts_to_dict_of_lists(input_data)
+    assert result == expected_result
