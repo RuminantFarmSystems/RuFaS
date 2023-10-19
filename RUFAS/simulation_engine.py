@@ -59,7 +59,7 @@ class SimulationEngine:
         routines.daily_feed_routine(self.state.feed, self.state.field_manager, self.state.animal_manager)
 
         self.time.record_time()
-        self.weather.record_weather(self.time.year, self.time.day)
+        self.weather.record_weather(self.time)
 
         self._advance_time()
 
