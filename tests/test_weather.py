@@ -65,6 +65,31 @@ def weather_original_method_states(mock_weather: Weather) -> dict[str, Callable]
     }
 
 
+@pytest.fixture
+def mock_current_weather() -> CurrentWeather:
+    """Fixture for CurrentWeather object."""
+    mock_current_weather = MagicMock(CurrentWeather)
+    mock_current_weather.precipitation = 5.0
+    mock_current_weather.rainfall = 5.0
+    mock_current_weather.snow_fall = 0.0
+    mock_current_weather.min_air_temperature = 15.0
+    mock_current_weather.mean_air_temperature = 17.0
+    mock_current_weather.max_air_temperature = 19.0
+    mock_current_weather.annual_mean_air_temperature = 14.5
+    mock_current_weather.daylength = 15.0
+    mock_current_weather.irrigation = 0.0
+    return mock_current_weather
+
+
+@pytest.fixture
+def mock_time() -> Time:
+    """Fixture for Time object."""
+    mock_time = MagicMock(Time)
+    mock_time.year = 1
+    mock_time.day = 1
+    return mock_time
+
+
 def test_annual_average_temperature_recording(mock_weather_input: dict,
                                               mock_config: Config) -> None:
     """Tests that the annual average temperature is recorded correctly to the OutputManager when Weather is created."""
@@ -127,9 +152,10 @@ def test_get_current_weather_error(mock_weather: Weather, day: int, year: int, e
     assert str(e.value) == expected
 
 
-def test_record_weather(mock_weather_input: dict, mock_config: Config) -> None:
+def test_record_weather(mock_weather: Weather, mock_current_weather: CurrentWeather, mock_time: Time) -> None:
     """Tests that weather conditions are correctly recorded to the OutputManager."""
-    weather = Weather(mock_weather_input, mock_config)
-    with patch("RUFAS.output_manager.OutputManager.add_variable") as add_var:
-        weather.record_weather(1, 1)
-        assert add_var.call_count == 6
+    with patch("RUFAS.output_manager.OutputManager.add_variable") as add_var, \
+            patch.object(mock_weather, "get_current_weather", return_value=mock_current_weather) as current_weather:
+        mock_weather.record_weather(mock_time)
+        assert current_weather.call_count == 1
+        assert add_var.call_count == 9

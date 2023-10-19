@@ -115,7 +115,7 @@ class Weather:
         self.__T_avg_annual = self._calculate_average_annual_temperature(weather_file['avg'])
 
         info_map = {"class": self.__class__.__name__, "function": self.__init__.__name__, "prefix": "Weather"}
-        om.add_variable("average_annual_temperature(C)", self.T_avg_annual, info_map)
+        om.add_variable("average_annual_temperature(C)", self.__T_avg_annual, info_map)
 
     def get_current_weather(self, time: Time) -> CurrentWeather:
         """
@@ -169,7 +169,7 @@ class Weather:
         current_weather = self.get_current_weather(time)
         om.add_variable("precipitation(mm)", current_weather.rainfall, info_map)
         om.add_variable("rainfall(mm)", current_weather.rainfall, info_map)
-        om.add_variable("")
+        om.add_variable("snowfall(mm)", current_weather.snow_fall, info_map)
         om.add_variable("daylength(hours)", current_weather.daylength, info_map)
         om.add_variable("maximum_temperature(C)", current_weather.max_air_temperature, info_map)
         om.add_variable("minimum_temperature(C)", current_weather.min_air_temperature, info_map)
