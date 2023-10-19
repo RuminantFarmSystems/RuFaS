@@ -598,47 +598,18 @@ class OutputManager(object):
             self.add_error("Unexpected error", str(e), info_map)
             raise
 
-    # def _load_filter_file_to_list(self, path: str) -> (List[str], Dict[str, str]):
-    #     """Reads a text file into a list.
-
-    #     Parameters
-    #     ----------
-    #     path : str
-    #         Path of the input file to be read.
-
-    #     Returns
-    #     -------
-    #     List[str]
-    #         A list of strings from a text file where each line of the file becomes a list element.
-
-    #     Raises
-    #     -------
-    #     Exception
-    #         If an error occurs while opening or reading the file.
-
-    #     """
-    #     info_map = {
-    #         "class": self.__class__.__name__,
-    #         "function": self._load_filter_file_to_list.__name__,
-    #     }
-    #     self.add_log("open_filter_file", f"Attempting to open {path}.", info_map)
-    #     list_of_elements = []
-    #     graph_metadata = {}
-    #     try:
-    #         with open(path) as filter_file:
-    #             if path.endswith(".txt"):
-    #                 list_of_elements = filter_file.read().splitlines()
-    #                 load_message = f"Successfully opened {path} and read {len(list_of_elements)} lines."
-    #                 self.add_log("filter_pattern_file_load_log", load_message, info_map)
-
-    #             elif path.endswith(".json"):
-    #                 graph_metadata = json.load(filter_file)
-    #                 list_of_elements = graph_metadata["filters"]
-    #                 load_message = f"Successfully opened {path} and read {len(list_of_elements)} lines."
-    #                 self.add_log("filter_pattern_file_load_log", load_message, info_map)
-    #             return list_of_elements, graph_metadata
-    #     except Exception as e:
-    #         raise e
+    def _load_filter_file_to_list(
+        self, path: str
+    ) -> List[str] | Tuple(List[str], Dict[str, str]):
+        try:
+            if path.endswith(".txt"):
+                return self._load_txt_file_to_list(path)
+            elif path.endswith(".json"):
+                return self._load_json_file_to_tuple(path)
+            else:
+                raise Exception("Unsupported file format; only json and txt are supported.")
+        except Exception as e:
+            raise e
 
     def _filter_variables_pool(
         self, filter_patterns: List[str], input_file_name: Optional[str]
