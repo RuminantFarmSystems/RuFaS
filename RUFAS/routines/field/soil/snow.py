@@ -39,18 +39,6 @@ class Snow:
         """
         Calculate the snow pack temperature for the current day.
 
-        This function calculates the snow pack temperature based on Equation 1:2.5.1
-        in SWAT 2009 Theoretical Documentation. According to the equation:
-
-            T_snow_day_n = T_snow_day_(n-1) * (1 - l_sno) + T_av * l_sno
-
-        Where:
-        - T_snow_day_n is the snow pack temperature of the current day.
-        - T_snow_day_(n-1) is the snow pack temperature of the previous day.
-        - T_av is the mean air temperature on the current day in Celsius.
-        - l_sno is a lagging factor that accounts for snow pack density, snow pack
-          depth, exposure, and other factors affecting snow pack temperature.
-
         Parameters
         ----------
         current_day_weather :CurrentWeather
@@ -60,6 +48,11 @@ class Snow:
         -------
         float
             The calculated snow pack temperature for the current day in Celsius.
+            
+        References
+        ----------
+        SWAT Theoretical Documentation eqn. 1:2.5.1
+        
         """
         return (soil_data.previous_day_snow_temperature * (1 - soil_data.snow_lag_factor)) + \
                (current_day_weather.mean_air_temperature * soil_data.snow_lag_factor)
