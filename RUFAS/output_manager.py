@@ -577,8 +577,6 @@ class OutputManager(object):
             "function": self._load_json_file_to_tuple.__name__,
         }
         self.add_log("open_filter_file", f"Attempting to open {path}.", info_map)
-        list_of_elements = []
-        graph_metadata = {}
         try:
             with open(path) as filter_file:
                 graph_metadata = json.load(filter_file)
@@ -600,7 +598,7 @@ class OutputManager(object):
 
     def _load_filter_file_to_list(
         self, path: str
-    ) -> List[str] | Tuple(List[str], Dict[str, str]):
+    ) -> List[str] | Tuple[List[str], Dict[str, str]]:
         """
         Load data from a file and return it as a list of strings or a tuple.
 
