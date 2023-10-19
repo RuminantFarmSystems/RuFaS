@@ -10,7 +10,7 @@ import os
 import re
 import json
 from typing import Any, Callable, Dict, List, Tuple
-from mock import Mock, mock_open, patch
+from mock import mock_open, patch
 
 import pytest
 from mock.mock import MagicMock, call
@@ -1336,6 +1336,19 @@ def test_load_json_file_to_tuple(
     mock_output_manager._load_json_file_to_tuple = (
         output_manager_original_method_states["_load_json_file_to_tuple"]
     )
+
+
+@patch.object(OutputManager, "_load_json_file_to_tuple", return_value=([], {}))
+@patch.object(OutputManager, "_load_txt_file_to_list", return_value=[])
+def test_load_filter_file_to_list_load_txt_file(
+    mock_txt_loader: MagicMock,
+    mock_json_loader: MagicMock,
+    mock_output_manager: OutputManager,
+) -> None:
+    result: List[str] = mock_output_manager._load_filter_file_to_list("some_file.txt")
+    mock_txt_loader.assert_called_with("some_file.txt")
+    mock_json_loader.assert_not_called()
+    assert result == []
 
 
 def test_list_txt_and_json_files_in_dir(
