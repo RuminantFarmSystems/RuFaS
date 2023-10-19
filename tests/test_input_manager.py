@@ -180,7 +180,9 @@ def test_filter_input_data_by_metadata(mock_input_manager: InputManager, input_d
     filtered_input_data = mock_input_manager._filter_input_data_by_metadata(input_data, metadata_properties)
     assert filtered_input_data == expected_result
 
-    mock_input_manager._filter_input_data_by_metadata = input_manager_original_method_states["_filter_input_data_by_metadata"]
+    mock_input_manager._filter_input_data_by_metadata = input_manager_original_method_states[
+        "_filter_input_data_by_metadata"
+        ]
 
 
 @pytest.fixture
