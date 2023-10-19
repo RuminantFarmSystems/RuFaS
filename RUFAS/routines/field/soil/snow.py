@@ -3,6 +3,9 @@ from typing import Optional
 
 from RUFAS.routines.field.soil.soil_data import SoilData
 from RUFAS.routines.field.manager.current_weather import CurrentWeather
+from RUFAS.output_manager import OutputManager
+
+om = OutputManager()
 
 
 class Snow:
@@ -11,6 +14,13 @@ class Snow:
 
     This class provides methods for calculating snow pack temperature, snow melting, and
     updating snow-related data based on the Soil and Water Assessment Tool (SWAT) documentation.
+
+    Attributes
+    ----------
+    soil_data : Optional[SoilData]
+        The object that tracks all soil variable throughout the simulation.
+    field_size : Optional[float]
+        The field size in ha.
 
     Methods
     -------
@@ -41,7 +51,9 @@ class Snow:
 
         Parameters
         ----------
-        current_day_weather :CurrentWeather
+        soil_data : SoilData
+            The object that tracks all soil variable throughout the simulation
+        current_day_weather : CurrentWeather
             The current day weather data.
 
         Returns
@@ -51,32 +63,21 @@ class Snow:
             
         References
         ----------
-        SWAT Theoretical Documentation eqn. 1:2.5.1
+        Equation 1:2.5.1 in SWAT 2009 Theoretical Documentation.
         
         """
         return (soil_data.previous_day_snow_temperature * (1 - soil_data.snow_lag_factor)) + \
                (current_day_weather.mean_air_temperature * soil_data.snow_lag_factor)
 
     @staticmethod
-    def _melt_snow(soil_data: SoilData, current_day_weather: CurrentWeather, day: int):
+    def _melt_snow(soil_data: SoilData, current_day_weather: CurrentWeather, day: int) -> float:
         """
-        Calculate snow melting for the current day.
-
-        This function calculates the amount of snow melting for the current day based
-        on Equation 1:2.5.2 in SWAT 2009 Theoretical Documentation. According to the equation:
-
-            SNO_mlt = b_mlt * sno_cov * ((T_snow + T_mx) / 2 - T_mlt)
-
-        Where:
-        - b_mlt is the melt factor of the current day.
-        - sno_cov is the snow coverage fraction. It can be assumed that it is equal to 1.0 whenever there is snow on the
-          ground.
-        - T_snow is the snow pack temperature of the current day.
-        - T_mx is the maximum air temperature of the current day.
-        - T_mlt is the base temperature above which snow melt is allowed.
+        This function calculates the amount of snow melting for the current day
 
         Parameters
         ----------
+        soil_data : SoilData
+            The object that tracks all soil variable throughout the simulation
         current_day_weather : CurrentWeather
             The current day weather data
         day :int
@@ -86,15 +87,29 @@ class Snow:
         -------
         float
             The amount of snow melting for the current day.
+
+        References
+        ----------
+        Equation 1:2.5.2 in SWAT 2009 Theoretical Documentation.
         """
+        info_map = {"class": Snow.__class__.__name__,
+                    "function": Snow._melt_snow.__name__,
+                    }
+
         melt_factor = Snow._melt_factor(soil_data=soil_data, day=day)
         snow_coverage_fraction = soil_data.snow_coverage_fraction
         snow_temperature = soil_data.current_day_snow_temperature
         max_air_temperature = current_day_weather.max_air_temperature
         snow_melt_base_temperature = soil_data.snow_melt_base_temperature
 
-        return melt_factor * snow_coverage_fraction * ((snow_temperature + max_air_temperature) / 2 -
-                                                       snow_melt_base_temperature)
+        snow_melt_amount = melt_factor * snow_coverage_fraction * ((snow_temperature + max_air_temperature) / 2 -
+                                                                   snow_melt_base_temperature)
+
+        if snow_melt_amount > soil_data.snow_content:
+            om.add_warning("", "", info_map)
+            return soil_data.snow_content
+        else:
+            return snow_melt_amount
 
     @staticmethod
     def _melt_factor(soil_data: SoilData, day: int) -> float:
@@ -149,9 +164,12 @@ class Snow:
         -------
         None
         """
+        if self.soil_data.snow_content < 0.0:
+            raise ValueError("Snow Content should not be a negative number.")
+
         self.soil_data.snow_content += current_day_weather.snow_fall
 
-        if self.soil_data.snow_content <= 0.0:
+        if self.soil_data.snow_content == 0.0:
             self.soil_data.current_day_snow_temperature, self.soil_data.previous_day_snow_temperature = None, None
             self.soil_data.snow_content, self.soil_data.snow_melt_amount = 0.0, 0.0
         else:
