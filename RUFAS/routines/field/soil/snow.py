@@ -4,10 +4,6 @@ from typing import Optional
 from RUFAS.routines.field.soil.soil_data import SoilData
 from RUFAS.routines.field.manager.current_weather import CurrentWeather
 
-from RUFAS.output_manager import OutputManager
-
-om = OutputManager()
-
 
 class Snow:
     """
@@ -39,7 +35,7 @@ class Snow:
         """object that tracks all soil variable throughout the simulation"""
 
     @staticmethod
-    def _calc_snow_temp(soil_data: SoilData, current_day_weather: CurrentWeather) -> float:
+    def _calc_snow_temp(soil_data: SoilData, current_day_weather: CurrentWeather) -> float | None:
         """
         Calculate the snow pack temperature for the current day.
 
@@ -65,11 +61,8 @@ class Snow:
         float
             The calculated snow pack temperature for the current day in Celsius.
         """
-        if soil_data.snow_content is not None and soil_data.snow_content > 0.0:
-            return (soil_data.previous_day_snow_temperature * (1 - soil_data.snow_lag_factor)) + \
-                   (current_day_weather.mean_air_temperature * soil_data.snow_lag_factor)
-        else:
-            return current_day_weather.mean_air_temperature
+        return (soil_data.previous_day_snow_temperature * (1 - soil_data.snow_lag_factor)) + \
+               (current_day_weather.mean_air_temperature * soil_data.snow_lag_factor)
 
     @staticmethod
     def _melt_snow(soil_data: SoilData, current_day_weather: CurrentWeather, day: int):
@@ -101,8 +94,8 @@ class Snow:
         float
             The amount of snow melting for the current day.
         """
-        melt_factor = Snow._melt_factor(soil_data, day=day)
-        snow_coverage_fraction = 1.0 if soil_data.snow_content > 0.0 else 0.0
+        melt_factor = Snow._melt_factor(soil_data=soil_data, day=day)
+        snow_coverage_fraction = soil_data.snow_coverage_fraction
         snow_temperature = soil_data.current_day_snow_temperature
         max_air_temperature = current_day_weather.max_air_temperature
         snow_melt_base_temperature = soil_data.snow_melt_base_temperature
@@ -150,6 +143,8 @@ class Snow:
         temperatures, and snow melting, based on the provided current day weather data
         and day of the simulation.
 
+        MAKE A NOTE ABOUT SOIL TEMP
+
         Parameters
         ----------
         current_day_weather : CurrentWeather
@@ -163,11 +158,15 @@ class Snow:
         """
         self.soil_data.snow_content += current_day_weather.snow_fall
         """Update snow content with precipitation"""
-        self.soil_data.previous_day_snow_temperature = self.soil_data.current_day_snow_temperature if \
-            self.soil_data.snow_content > 0.0 else None
-        """Update previous day snow temperature"""
-        self.soil_data.current_day_snow_temperature = self._calc_snow_temp(self.soil_data, current_day_weather)
-        """Update current day snow temperature"""
-        self.soil_data.snow_melt_amount = self._melt_snow(self.soil_data, current_day_weather, day)
-        self.soil_data.snow_content -= self.soil_data.snow_melt_amount
-        """Update snow content with melted snow"""
+        if self.soil_data.snow_content <= 0.0:
+            self.soil_data.current_day_snow_temperature, self.soil_data.previous_day_snow_temperature = None, None
+            self.soil_data.snow_content, self.soil_data.snow_melt_amount = 0.0, 0.0
+        else:
+            self.soil_data.previous_day_snow_temperature = self.soil_data.current_day_snow_temperature if \
+                self.soil_data.current_day_snow_temperature is not None else current_day_weather.mean_air_temperature
+            """Update previous day snow temperature"""
+            self.soil_data.current_day_snow_temperature = self._calc_snow_temp(self.soil_data, current_day_weather)
+            """Update current day snow temperature"""
+            self.soil_data.snow_melt_amount = self._melt_snow(self.soil_data, current_day_weather, day)
+            self.soil_data.snow_content -= self.soil_data.snow_melt_amount
+            """Update snow content with melted snow"""
