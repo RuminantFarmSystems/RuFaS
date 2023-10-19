@@ -898,11 +898,11 @@ def test_record_manure_application(field_name: str, field_size: float, dry_mass:
 
 @pytest.mark.parametrize("depth,remainder,name,year,day,expected_info_map,expected_error_message", [
     (100.0, 1.0, "manure_application_error", 1998, 200,
-     {"date": {"year": 1998, "day": 200}, "timestamp": "00-Jan-1970_Thu_00-00-00"},
+     {"prefix": "field='test'", "date": {"year": 1998, "day": 200}, "timestamp": "00-Jan-1970_Thu_00-00-00"},
      "Invalid application depth (100.0) and surface remainder fraction (1.0). Defaulting to application depth of 0.0 "
      "mm and a surface remainder fraction of 1.0."),
     (800.0, None, "fertilizer_application_error", 2005, 100,
-     {"date": {"year": 2005, "day": 100}, "timestamp": "00-Jan-1970_Thu_00-00-00"},
+     {"prefix": "field='test'", "date": {"year": 2005, "day": 100}, "timestamp": "00-Jan-1970_Thu_00-00-00"},
      "Invalid application depth (800.0) is lower than the bottom depth of the soil profile, setting the application "
      "depth to be at the bottom of the soil profile.")
 ])
@@ -917,6 +917,7 @@ def test_record_nutrient_application_error(depth: float, remainder: float, name:
 
         expected_error_name = expected_info_map["prefix"] + "." + name
         actual = om.errors_pool[expected_error_name]
+        del expected_info_map["prefix"]
         assert actual["info_maps"].__contains__(expected_info_map)
         assert actual["values"].__contains__(expected_error_message)
 
@@ -1398,6 +1399,7 @@ def test_record_field_watering(field_name: str, field_size: float, day: int, yea
     field._record_field_watering(year=year, day=day, watering_amount=watering_amount)
 
     actual = om.variables_pool[f"field='{field_name}'.field_watering"]
+    del expected_info_map["prefix"]
     assert actual["info_maps"].__contains__(expected_info_map)
     assert actual["values"].__contains__(expected_value)
 
