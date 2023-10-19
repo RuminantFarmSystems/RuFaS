@@ -1285,6 +1285,12 @@ def test_load_txt_file_to_list(
     with pytest.raises(FileNotFoundError):
         mock_output_manager._load_json_file_to_tuple("non_existent_file.txt")
 
+    mock_file.side_effect = UnicodeDecodeError(
+        "encoding", b"", 1, 2, "Fake decode error"
+    )
+    with pytest.raises(UnicodeDecodeError):
+        mock_output_manager._load_txt_file_to_list("corrupted_file.txt")
+
     mock_file.side_effect = Exception("Unexpected error")
     with pytest.raises(Exception):
         mock_output_manager._load_json_file_to_tuple("some_file.txt")
