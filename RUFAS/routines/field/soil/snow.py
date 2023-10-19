@@ -7,28 +7,28 @@ from RUFAS.routines.field.manager.current_weather import CurrentWeather
 
 class Snow:
     """
-        Class representing snow-related calculations and data management.
+    Class representing snow-related calculations and data management.
 
-        This class provides methods for calculating snow pack temperature, snow melting, and
-        updating snow-related data based on the Soil and Water Assessment Tool (SWAT) documentation.
+    This class provides methods for calculating snow pack temperature, snow melting, and
+    updating snow-related data based on the Soil and Water Assessment Tool (SWAT) documentation.
 
-        Methods
-        -------
-        _calc_snow_temp(current_day_weather: CurrentWeather) -> float:
-            Calculate the snow pack temperature for the current day.
+    Methods
+    -------
+    _calc_snow_temp(current_day_weather: CurrentWeather) -> float:
+        Calculate the snow pack temperature for the current day.
 
-        _melt_snow(current_day_weather: CurrentWeather, day: int):
-            Calculate the snow melt for the current day.
+    _melt_snow(current_day_weather: CurrentWeather, day: int):
+        Calculate the snow melt for the current day.
 
-        _melt_factor(day: int) -> float:
-            Calculate the snow melt factor for a given day, b_mlt.
+    _melt_factor(day: int) -> float:
+        Calculate the snow melt factor for a given day, b_mlt.
 
-        sublimation():
-            Placeholder function for sublimation calculations.
+    sublimation():
+        Placeholder function for sublimation calculations.
 
-        update_snow(current_day_weather: CurrentWeather, day: int) -> None:
-            Update snow-related data including snow content and temperatures.
-        """
+    update_snow(current_day_weather: CurrentWeather, day: int) -> None:
+        Update snow-related data including snow content and temperatures.
+    """
 
     def __init__(self, soil_data: Optional[SoilData] = None, field_size: Optional[float] = None):
         self.soil_data = soil_data or SoilData(field_size=field_size)
@@ -39,18 +39,6 @@ class Snow:
         """
         Calculate the snow pack temperature for the current day.
 
-        This function calculates the snow pack temperature based on Equation 1:2.5.1
-        in SWAT 2009 Theoretical Documentation. According to the equation:
-
-            T_snow_day_n = T_snow_day_(n-1) * (1 - l_sno) + T_av * l_sno
-
-        Where:
-        - T_snow_day_n is the snow pack temperature of the current day.
-        - T_snow_day_(n-1) is the snow pack temperature of the previous day.
-        - T_av is the mean air temperature on the current day in Celsius.
-        - l_sno is a lagging factor that accounts for snow pack density, snow pack
-          depth, exposure, and other factors affecting snow pack temperature.
-
         Parameters
         ----------
         current_day_weather :CurrentWeather
@@ -60,6 +48,11 @@ class Snow:
         -------
         float
             The calculated snow pack temperature for the current day in Celsius.
+            
+        References
+        ----------
+        SWAT Theoretical Documentation eqn. 1:2.5.1
+        
         """
         return (soil_data.previous_day_snow_temperature * (1 - soil_data.snow_lag_factor)) + \
                (current_day_weather.mean_air_temperature * soil_data.snow_lag_factor)
