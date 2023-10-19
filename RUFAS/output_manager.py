@@ -536,24 +536,26 @@ class OutputManager(object):
         Load data from a JSON file located at the specified path and return it as a tuple.
 
         Parameters
-        -----------
+        ----------
         path (str):
             The path to the JSON file to be loaded.
 
         Returns
-        --------
+        -------
         Tuple[List[str], Dict[str, str]]:
             A tuple containing two elements:
             1. A list of strings, representing the 'filters' key from the JSON file.
             2. A dictionary of string key-value pairs, representing the parsed JSON content.
 
         Raises
-        -------
-        Any exceptions raised during file reading or JSON parsing are propagated.
+        ------
+        FileNotFoundError: If the specified file does not exist.
+        json.JSONDecodeError: If there is an issue parsing the JSON content.
 
-        This method attempts to open and read a JSON file, extracting the 'filters' key as a list of strings
-        and the rest of the JSON content as a dictionary. If successful, it returns these values in a tuple.
-        If any exceptions occur during the process, an error is logged and the exception is raised.
+        This method loads a JSON file, extracting the 'filters' key as a list of strings and the rest of
+        the JSON content as a dictionary. If successful, it returns these values in a tuple. If the file
+        does not exist, a FileNotFoundError is raised. If there is an issue with JSON parsing, a
+        json.JSONDecodeError is raised.
         """
         info_map = {
             "class": self.__class__.__name__,
@@ -569,9 +571,14 @@ class OutputManager(object):
                 load_message = f"Successfully opened {path} and read {len(list_of_elements)} lines."
                 self.add_log("filter_pattern_file_load_log", load_message, info_map)
                 return list_of_elements, graph_metadata
-        except Exception as e:
-            self.add_error("error reading file", str(e), info_map)
-            raise e
+        except FileNotFoundError:
+            self.add_error(
+                "File not found", f"The file '{path}' does not exist.", info_map
+            )
+            raise
+        except json.JSONDecodeError as e:
+            self.add_error("JSON parsing error", str(e), info_map)
+            raise
 
     # def _load_filter_file_to_list(self, path: str) -> (List[str], Dict[str, str]):
     #     """Reads a text file into a list.
