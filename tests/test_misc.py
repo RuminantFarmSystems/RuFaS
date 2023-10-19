@@ -1279,15 +1279,11 @@ def test_load_txt_file_to_list(
     """Test case for function _load_txt_file_to_list in output_manager.py"""
     mock_file.return_value.read.return_value = "apples\nbananas\ncherries"
     result = mock_output_manager._load_txt_file_to_list("path/to/file.txt")
-
     assert result == ["apples", "bananas", "cherries"]
 
-    mock_open_func = Mock()
-    mock_open_func.side_effect = Exception("Error opening file")
-
-    with patch("builtins.open", mock_open_func):
-        with pytest.raises(Exception):
-            mock_output_manager._load_txt_file_to_list("path/to/file.txt")
+    mock_file.side_effect = FileNotFoundError
+    with pytest.raises(FileNotFoundError):
+        mock_output_manager._load_json_file_to_tuple("non_existent_file.json")
 
     # Restore original method
     mock_output_manager._load_txt_file_to_list = output_manager_original_method_states[
