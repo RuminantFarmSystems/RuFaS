@@ -1312,6 +1312,10 @@ def test_load_json_file_to_tuple(
     expected_result: Tuple[List[str], Dict[str, str]] = (data["filters"], data)
     assert result == expected_result
 
+    mock_file.side_effect = FileNotFoundError
+    with pytest.raises(FileNotFoundError):
+        mock_output_manager._load_json_file_to_tuple("non_existent_file.json")
+
     # Restore original method
     mock_output_manager._load_json_file_to_tuple = (
         output_manager_original_method_states["_load_json_file_to_tuple"]
