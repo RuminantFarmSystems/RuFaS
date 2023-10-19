@@ -67,9 +67,9 @@ class ResiduePartition:
                     layer.structural_litter_amount,
                     layer.tillage_fraction
                 )
-
+                # print(self.data.plant_surface_residue)
                 layer.plant_dry_matter_residue_amount = self.data.plant_surface_residue
-                #layer.soil_dry_matter_residue_amount = self.data.plant_surface_residue * layer.tillage_fraction
+                # layer.soil_dry_matter_residue_amount = self.data.plant_surface_residue * layer.tillage_fraction
 
                 self.data.total_residue += self.data.plant_surface_residue
             else:
