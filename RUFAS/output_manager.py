@@ -2,7 +2,7 @@
 
 from copy import deepcopy
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Union
+from typing import Any, Dict, List, Optional, Tuple, Union
 import datetime
 import json
 import os
@@ -11,6 +11,7 @@ import re
 from deprecated.sphinx import deprecated
 
 from RUFAS.util import Utility
+from RUFAS.graph_generator import GraphGenerator
 
 
 class OutputManager(object):
@@ -468,11 +469,11 @@ class OutputManager(object):
                 value.pop("info_maps")
         return pool_copy
 
-    def _list_txt_file_names_in_dir(self, dir_path: str) -> List[str]:
-        """Returns the list of files in the given path"""
+    def _list_txt_and_json_files_in_dir(self, dir_path: str) -> List[str]:
+        """Returns the list of txt and json files in the given path"""
         info_map = {
             "class": self.__class__.__name__,
-            "function": self._list_txt_file_names_in_dir.__name__,
+            "function": self._list_txt_and_json_files_in_dir.__name__,
         }
         self.add_log(
             "search_path_for_filenames_try",
@@ -481,51 +482,149 @@ class OutputManager(object):
         )
         dir_path_check = Path(dir_path)
         if dir_path_check.is_dir():
-            txt_files = []
+            filter_files = []
             all_files = os.listdir(dir_path)
             for filename in all_files:
-                if filename.endswith(".txt"):
-                    txt_files.append(filename)
+                if filename.endswith(".txt") or filename.endswith(".json"):
+                    filter_files.append(filename)
             self.add_log(
                 "search_path_for_filenames_success",
                 f"Successfully searched in {dir_path}"
-                f" and found {len(txt_files)} text files.",
+                f" and found {len(filter_files)} text files.",
                 info_map,
             )
-            return txt_files
+            return filter_files
         else:
             raise NotADirectoryError("The specified path must be a directory")
 
     def _load_txt_file_to_list(self, path: str) -> List[str]:
-        """Reads a text file into a list.
+        """
+        Load text data from a text file located at the specified path and return it as a list of strings.
 
-        Parameters
-        ----------
-        path : str
-            Path of the input file to be read.
+        Parameters:
+        -----------
+        path (str):
+            The path to the text file to be loaded.
 
-        Returns
+        Returns:
+        --------
+        List[str]:
+            A list of strings representing the lines of text from the file.
+
+        Raises:
         -------
-        List[str]
-            A list of strings from a text file where each line of the file becomes a list element.
+        FileNotFoundError: If the specified file does not exist.
+        UnicodeDecodeError: If there is an issue decoding the file (e.g., due to an encoding error).
+        Exception: For other unexpected errors.
 
-        Raises
-        -------
-        Exception
-            If an error occurs while opening or reading the file.
-
+        This method attempts to open and read a text file, splitting the content into lines and returning
+        them as a list of strings. If successful, it returns the list of lines. If the file does not exist,
+        a FileNotFoundError is raised. If there is an issue with decoding the text, a UnicodeDecodeError
+        is raised. For any other unexpected errors, a generic Exception is raised.
         """
         info_map = {
             "class": self.__class__.__name__,
             "function": self._load_txt_file_to_list.__name__,
         }
-        self.add_log("open_text_file", f"Attempting to open {path}.", info_map)
+
         try:
             with open(path) as text_file:
                 list_of_elements = text_file.read().splitlines()
                 load_message = f"Successfully opened {path} and read {len(list_of_elements)} lines."
-                self.add_log("filter_pattern_file_load_log", load_message, info_map)
+                self.add_log("text_file_load_log", load_message, info_map)
                 return list_of_elements
+        except FileNotFoundError:
+            self.add_error(
+                "File not found", f"The file '{path}' does not exist.", info_map
+            )
+            raise
+        except UnicodeDecodeError as e:
+            self.add_error("Text decoding error", str(e), info_map)
+            raise
+        except Exception as e:
+            self.add_error("Unexpected error", str(e), info_map)
+            raise
+
+    def _load_json_file_to_tuple(self, path: str) -> Tuple[List[str], Dict[str, str]]:
+        """
+        Load data from a JSON file located at the specified path and return it as a tuple.
+
+        Parameters
+        ----------
+        path (str):
+            The path to the JSON file to be loaded.
+
+        Returns
+        -------
+        Tuple[List[str], Dict[str, str]]:
+            A tuple containing two elements:
+            1. A list of strings, representing the 'filters' key from the JSON file.
+            2. A dictionary of string key-value pairs, representing the parsed JSON content.
+
+        Raises
+        ------
+        FileNotFoundError: If the specified file does not exist.
+        json.JSONDecodeError: If there is an issue parsing the JSON content.
+        Exception: For other unexpected errors.
+
+        This method loads a JSON file, extracting the 'filters' key as a list of strings and the rest of
+        the JSON content as a dictionary. If successful, it returns these values in a tuple. If the file
+        does not exist, a FileNotFoundError is raised. If there is an issue with JSON parsing, a
+        json.JSONDecodeError is raised. For any other unexpected errors, a generic Exception is raised.
+        """
+        info_map = {
+            "class": self.__class__.__name__,
+            "function": self._load_json_file_to_tuple.__name__,
+        }
+        self.add_log("open_filter_file", f"Attempting to open {path}.", info_map)
+        try:
+            with open(path) as filter_file:
+                graph_metadata = json.load(filter_file)
+                list_of_elements = graph_metadata["filters"]
+                load_message = f"Successfully opened {path} and read {len(list_of_elements)} lines."
+                self.add_log("filter_pattern_file_load_log", load_message, info_map)
+                return list_of_elements, graph_metadata
+        except FileNotFoundError:
+            self.add_error(
+                "File not found", f"The file '{path}' does not exist.", info_map
+            )
+            raise
+        except json.JSONDecodeError as e:
+            self.add_error("JSON parsing error", str(e), info_map)
+            raise
+        except Exception as e:
+            self.add_error("Unexpected error", str(e), info_map)
+            raise
+
+    def _load_filter_file_to_list(
+        self, path: str
+    ) -> List[str] | Tuple[List[str], Dict[str, str]]:
+        """
+        Load data from a file and return it as a list of strings or a tuple.
+
+        Parameters:
+        path (str): The path to the file to be loaded.
+
+        Returns:
+        - If the file is a .txt, return a list of strings (lines of text).
+        - If the file is a .json, return a tuple of a list (filters) and a dictionary (parsed content).
+
+        Raises:
+        - FileNotFoundError: If the file does not exist.
+        - json.JSONDecodeError: If there is an issue parsing the JSON content (for .json files).
+        - UnicodeDecodeError: If there is an issue decoding the file (e.g., encoding error) (for .txt files).
+        - Exception: If the file format is unsupported (only .txt and .json are supported).
+        - Exception: For other unexpected errors.
+        """
+        try:
+            if path.endswith(".txt"):
+                return self._load_txt_file_to_list(path)
+            elif path.endswith(".json"):
+                return self._load_json_file_to_tuple(path)
+            else:
+                raise Exception(
+                    "Unsupported file format; only json and txt are supported."
+                )
         except Exception as e:
             raise e
 
@@ -596,7 +695,12 @@ class OutputManager(object):
         return filter_pattern_matches
 
     def save_variables(
-        self, save_path: str, dir_path: str, exclude_info_maps: bool = False
+        self,
+        save_path: Path,
+        dir_path: Path,
+        exclude_info_maps: bool = False,
+        produce_graphics: bool = True,
+        graphics_dir: Path = Path(""),
     ) -> None:
         """
         Reads a text file containing a list of keys and filters the variables pool by those keys.
@@ -604,15 +708,20 @@ class OutputManager(object):
 
         Parameters
         ----------
-        save_path : str
+        save_path : Path
             Path to the directory where the file will be saved.
 
-        dir_path : str
+        dir_path : Path
             Path of the directory containing the files containing the keys for filtering.
 
         exclude_info_maps : bool
             Flag for whether or not the user wants to include info_maps data in their results files.
 
+        produce_graphics: bool, optional
+            Flag for whether or not the user wants to produce graphs at after the simulation.
+
+        graphics_dir : Path, optional
+            The directory for saving graphics.
         """
         info_map = {
             "class": self.__class__.__name__,
@@ -623,10 +732,11 @@ class OutputManager(object):
             f"exclude_info_maps flag set to {exclude_info_maps}",
             info_map,
         )
-        list_of_filter_files = self._list_txt_file_names_in_dir(dir_path)
+        graph_generator = GraphGenerator()
+        list_of_filter_files = self._list_txt_and_json_files_in_dir(dir_path)
         for filter_file in list_of_filter_files:
             input_path = os.path.join(dir_path, filter_file)
-            filter_patterns = self._load_txt_file_to_list(input_path)
+            filter_patterns, graph_info = self._load_filter_file_to_list(input_path)
             filtered_pool = self._filter_variables_pool(filter_patterns, filter_file)
             if exclude_info_maps:
                 filtered_pool = self._exclude_info_maps(filtered_pool)
@@ -639,7 +749,27 @@ class OutputManager(object):
                 self._dict_to_file_json(filtered_pool, file_path)
             elif filter_file.startswith("csv_"):
                 csv_directory = os.path.join(save_path, "CSVs", "om")
-                self._save_variables_to_csv_files(filtered_pool, filter_file, csv_directory)
+                self._save_variables_to_csv_files(
+                    filtered_pool, filter_file, csv_directory
+                )
+            elif filter_file.startswith("graph_"):
+                if produce_graphics:
+                    try:
+                        graph_generator.generate_graph(
+                            filtered_pool,
+                            graph_info,
+                            save_path,
+                            filter_file,
+                            graphics_dir,
+                        )
+                    except Exception as e:
+                        self.add_error("graph generation exception", str(e), info_map)
+                else:
+                    self.add_warning(
+                        "No Graphics",
+                        f"Graphic generation is disabled, skipping {filter_file=}",
+                        info_map,
+                    )
             else:
                 self.add_warning(
                     "invalid filter file",
