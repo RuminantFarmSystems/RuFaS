@@ -601,13 +601,32 @@ class OutputManager(object):
     def _load_filter_file_to_list(
         self, path: str
     ) -> List[str] | Tuple(List[str], Dict[str, str]):
+        """
+        Load data from a file and return it as a list of strings or a tuple.
+
+        Parameters:
+        path (str): The path to the file to be loaded.
+
+        Returns:
+        - If the file is a .txt, return a list of strings (lines of text).
+        - If the file is a .json, return a tuple of a list (filters) and a dictionary (parsed content).
+
+        Raises:
+        - FileNotFoundError: If the file does not exist.
+        - json.JSONDecodeError: If there is an issue parsing the JSON content (for .json files).
+        - UnicodeDecodeError: If there is an issue decoding the file (e.g., encoding error) (for .txt files).
+        - Exception: If the file format is unsupported (only .txt and .json are supported).
+        - Exception: For other unexpected errors.
+        """
         try:
             if path.endswith(".txt"):
                 return self._load_txt_file_to_list(path)
             elif path.endswith(".json"):
                 return self._load_json_file_to_tuple(path)
             else:
-                raise Exception("Unsupported file format; only json and txt are supported.")
+                raise Exception(
+                    "Unsupported file format; only json and txt are supported."
+                )
         except Exception as e:
             raise e
 
