@@ -498,38 +498,52 @@ class OutputManager(object):
             raise NotADirectoryError("The specified path must be a directory")
 
     def _load_txt_file_to_list(self, path: str) -> List[str]:
-        """Reads a text file into a list.
+        """
+        Load text data from a text file located at the specified path and return it as a list of strings.
 
-        Parameters
-        ----------
-        path : str
-            Path of the input file to be read.
+        Parameters:
+        -----------
+        path (str):
+            The path to the text file to be loaded.
 
-        Returns
+        Returns:
+        --------
+        List[str]:
+            A list of strings representing the lines of text from the file.
+
+        Raises:
         -------
-        List[str]
-            A list of strings from a text file where each line of the file becomes a list element.
+        FileNotFoundError: If the specified file does not exist.
+        UnicodeDecodeError: If there is an issue decoding the file (e.g., due to an encoding error).
+        Exception: For other unexpected errors.
 
-        Raises
-        -------
-        Exception
-            If an error occurs while opening or reading the file.
-
+        This method attempts to open and read a text file, splitting the content into lines and returning
+        them as a list of strings. If successful, it returns the list of lines. If the file does not exist,
+        a FileNotFoundError is raised. If there is an issue with decoding the text, a UnicodeDecodeError
+        is raised. For any other unexpected errors, a generic Exception is raised.
         """
         info_map = {
             "class": self.__class__.__name__,
             "function": self._load_txt_file_to_list.__name__,
         }
-        self.add_log("open_text_file", f"Attempting to open {path}.", info_map)
+
         try:
             with open(path) as text_file:
                 list_of_elements = text_file.read().splitlines()
                 load_message = f"Successfully opened {path} and read {len(list_of_elements)} lines."
-                self.add_log("filter_pattern_file_load_log", load_message, info_map)
+                self.add_log("text_file_load_log", load_message, info_map)
                 return list_of_elements
+        except FileNotFoundError:
+            self.add_error(
+                "File not found", f"The file '{path}' does not exist.", info_map
+            )
+            raise
+        except UnicodeDecodeError as e:
+            self.add_error("Text decoding error", str(e), info_map)
+            raise
         except Exception as e:
-            self.add_error("error reading file", str(e), info_map)
-            raise e
+            self.add_error("Unexpected error", str(e), info_map)
+            raise
 
     def _load_json_file_to_tuple(self, path: str) -> (List[str], Dict[str, str]):
         """
