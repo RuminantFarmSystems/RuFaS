@@ -1283,7 +1283,11 @@ def test_load_txt_file_to_list(
 
     mock_file.side_effect = FileNotFoundError
     with pytest.raises(FileNotFoundError):
-        mock_output_manager._load_json_file_to_tuple("non_existent_file.json")
+        mock_output_manager._load_json_file_to_tuple("non_existent_file.txt")
+
+    mock_file.side_effect = Exception("Unexpected error")
+    with pytest.raises(Exception):
+        mock_output_manager._load_json_file_to_tuple("some_file.txt")
 
     # Restore original method
     mock_output_manager._load_txt_file_to_list = output_manager_original_method_states[
