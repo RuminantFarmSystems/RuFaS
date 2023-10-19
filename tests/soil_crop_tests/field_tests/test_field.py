@@ -14,7 +14,7 @@ from RUFAS.routines.field.field.field import Field
 from RUFAS.routines.field.field.field_data import FieldData
 from RUFAS.routines.field.crop.dormancy import Dormancy
 from RUFAS.routines.field.crop_and_soil_constants import LITERS_TO_CUBIC_MILLIMETERS, HECTARES_TO_SQUARE_MILLIMETERS
-from RUFAS.classes import Time
+from RUFAS.time import Time
 from RUFAS.routines.field.manager.events import TillageEvent
 from RUFAS.output_manager import OutputManager
 from RUFAS.routines.manure.manure_manager import ManureManager
@@ -1046,7 +1046,7 @@ def test_cycle_water(field_size: float, rainfall: float, runoff: float, high_wat
         incorp._determine_potential_evapotranspiration.assert_called_once_with(light, max_temp, min_temp,
                                                                                mean_temp)
         incorp._evaporate_from_crop_canopies.assert_called_once_with(33.5)
-        incorp.soil.infiltration.infiltrate.assert_called_once_with(2.0, 1, 33.5)
+        incorp.soil.infiltration.infiltrate.assert_called_once_with(2.0)
         incorp.soil.percolation.percolate.assert_called_once_with(high_water_table)
         incorp.soil.soil_erosion.erode.assert_called_once_with(field_size, 0.02, residue, rainfall)
         incorp.soil.phosphorus_cycling.cycle_phosphorus.assert_called_once_with(2.0, runoff, field_size, mean_temp)
@@ -1189,30 +1189,22 @@ def test_determine_total_above_ground_biomass(biomasses: List[float], expected: 
     assert actual == expected
 
 
-@pytest.mark.parametrize("extraterrestrial_radiation,max_temp,min_temp,avg_temp", [
-    (100, 28, 10, 14),
-    (568, 20, 14, 18),
-    (568, 20, 14, None),
-    (80, 14, 0, 8),
-    (678.0098, 26.8896, 10.3339, 18.3345),
-    (678.0098, 26.8896, 10.3339, -100000)
+@pytest.mark.parametrize("extraterrestrial_radiation,max_temp,min_temp,avg_temp,expected_avg,expected_result", [
+    (100, 28, 10, 14, 14, 23.869749),
+    (568, 20, 14, 18, 18, 88.123445),
+    (568, 20, 14, None, 17, 85.661897),
+    (80, 14, 0, 8, 8, 13.663381),
+    (678.0098, 26.8896, 10.3339, 18.3345, 18.3345, 176.36657),
+    (678.0098, 26.8896, 10.3339, -100000, -100000, 0.0)
 ])
-def test_potential_evapotranspiration(extraterrestrial_radiation, max_temp, min_temp, avg_temp):
+def test_potential_evapotranspiration(extraterrestrial_radiation: float, max_temp: float, min_temp: float,
+                                      avg_temp: float, expected_avg: float, expected_result) -> None:
     with patch("RUFAS.routines.field.field.field.Field._determine_latent_heat_vaporization",
                new_callable=MagicMock, return_value=1.3) as mocked_latent_heat:
         actual = Field._determine_potential_evapotranspiration(extraterrestrial_radiation, max_temp, min_temp, avg_temp)
-        if avg_temp is not None:
-            expect = max(0.0, (0.0023 * extraterrestrial_radiation * ((max_temp - min_temp) ** (-0.5)) *
-                             (avg_temp + 17.8)) / 1.3)
-        else:
-            expect = max(0.0, (0.0023 * extraterrestrial_radiation * ((max_temp - min_temp) ** (-0.5)) *
-                             (((max_temp + min_temp) / 2) + 17.8)) / 1.3)
 
-        if avg_temp is not None:
-            mocked_latent_heat.assert_called_once_with(avg_temp)
-        else:
-            mocked_latent_heat.assert_called_once_with((max_temp + min_temp) / 2)
-        assert actual == expect
+        mocked_latent_heat.assert_called_once_with(expected_avg)
+        assert pytest.approx(actual) == expected_result
 
 
 @pytest.mark.parametrize("avg_temp", [

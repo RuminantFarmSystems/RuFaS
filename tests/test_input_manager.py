@@ -39,6 +39,7 @@ def input_manager_original_method_states(
         "_load_metadata": mock_input_manager._load_metadata,
         "_load_data_from_json": mock_input_manager._load_data_from_json,
         "_load_data_from_csv": mock_input_manager._load_data_from_csv,
+        "_filter_input_data_by_metadata": mock_input_manager._filter_input_data_by_metadata,
         "_populate_pool": mock_input_manager._populate_pool,
         "_validate_json_element": mock_input_manager._validate_json_element,
         "_array_type_validator": mock_input_manager._array_type_validator,
@@ -158,6 +159,30 @@ def test_start_data_processing(mock_input_manager: InputManager,
     mock_input_manager._load_metadata = input_manager_original_method_states["_load_metadata"]
     mock_input_manager._populate_pool = \
         input_manager_original_method_states["_populate_pool"]
+
+
+@pytest.mark.parametrize("input_data, metadata_properties, expected_result", [
+        (
+            {'key1': 'value1', 'key2': 'value2'},
+            {'key1': {'default': 'value3'}},
+            {'key1': 'value1'}
+        ),
+        (
+            {'key1': {'nested_key1': 'value1', 'nested_key2': 'value2'}},
+            {'key1': {'nested_key1': {'default': 'value2'}}},
+            {'key1': {'nested_key1': 'value1'}}
+        )
+    ])
+def test_filter_input_data_by_metadata(mock_input_manager: InputManager, input_data: Dict[str, Any],
+                                       metadata_properties: Dict[str, Any], expected_result: Dict[str, Any],
+                                       input_manager_original_method_states: Dict[str, Callable], ) -> None:
+    """Unit test for function _filter_input_data_by_metadata() in file input_manager.py"""
+    filtered_input_data = mock_input_manager._filter_input_data_by_metadata(input_data, metadata_properties)
+    assert filtered_input_data == expected_result
+
+    mock_input_manager._filter_input_data_by_metadata = input_manager_original_method_states[
+        "_filter_input_data_by_metadata"
+        ]
 
 
 @pytest.fixture

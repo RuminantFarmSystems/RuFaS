@@ -10,7 +10,7 @@ import argparse
 from pathlib import Path
 import sys
 from typing import List
-from RUFAS.scenario_manager import METADATA_PATHS
+from RUFAS.scenario_manager import METADATA_PATHS, MetadataPaths
 
 import config.global_variables
 from RUFAS.simulation_engine import SimulationEngine
@@ -23,7 +23,8 @@ def run_rufas(
     make_graphs: bool = True,
     verbose: bool = True,
     clear_output: bool = False,
-    exclude_info_maps: bool = True,
+    exclude_info_maps: bool = False,
+    only_run_validation: bool = False,
 ) -> None:
     """Main function to run RuFaS, with options.
 
@@ -41,8 +42,11 @@ def run_rufas(
     set_global_variables(make_graphs, verbose)
     if verbose:
         print("RuFaS: Ruminant Farm Systems Model 2023")
-    metadata_file_list = METADATA_PATHS
-    execute_simulations(metadata_file_list, exclude_info_maps)
+    metadata_file_list: List[MetadataPaths] = METADATA_PATHS
+    if only_run_validation:
+        run_validation(metadata_file_list, exclude_info_maps)
+    else:
+        execute_simulations(metadata_file_list, exclude_info_maps)
 
 
 def set_global_variables(make_graphs: bool, verbose: bool) -> None:
@@ -53,10 +57,8 @@ def set_global_variables(make_graphs: bool, verbose: bool) -> None:
     )
 
 
-def execute_simulations(
-    metadata_files: List[Path], exclude_info_maps: bool = True
-) -> None:
-    """Instantiates I/O Managers and processes the metadata files provided by the user to run the simulation.
+def run_validation(metadata_files: List[Path], exclude_info_maps: bool = False) -> None:
+    """Instantiates I/O Managers and triggers validation of input data.
 
     Parameters
     ----------
@@ -66,16 +68,44 @@ def execute_simulations(
         Flag for whether or not the user wants to inlcude info_maps data in their results files.
     """
     info_map = {"class": "No caller class",
+                "function": run_validation.__name__,
+                }
+    output_manager = OutputManager()
+    input_manager = InputManager()
+    for metadata_file in metadata_files:
+        input_manager.flush_pool()
+        output_manager.flush_pools()
+        is_data_valid = input_manager.start_data_processing(str(metadata_file["path"]), False)
+        output_manager.add_log("Only run validation data validity check",
+                               f"{str(metadata_file['path'])} data validity is: {is_data_valid}",
+                               info_map)
+        output_manager.dump_all_nondata_pools(r"output", exclude_info_maps)
+
+
+def execute_simulations(
+    metadata_files: List[MetadataPaths], exclude_info_maps: bool = False,
+) -> None:
+    """Instantiates I/O Managers and processes the metadata files provided by the user to run the simulation.
+
+    Parameters
+    ----------
+    metadata_files : MetadataPaths
+        A list of custom TypedDict objects including the specified prefix for the save_variables output file
+        and the path to the metadata file.
+    exclude_info_maps : bool, optional
+        Flag for whether or not the user wants to inlcude info_maps data in their results files.
+    """
+    info_map = {"class": "No caller class",
                 "function": execute_simulations.__name__,
                 }
     output_manager = OutputManager()
     input_manager = InputManager()
-    metadata_file_list = metadata_files
-    for metadata_file_path in metadata_file_list:
+    for metadata_file in metadata_files:
         input_manager.flush_pool()
         output_manager.flush_pools()
         sys.stdout.write(f"Validating data for {str(metadata_file_path)}...\n")
-        is_data_valid = input_manager.start_data_processing(str(metadata_file_path), True)
+        output_manager.set_metadata_prefix(metadata_file['prefix'])
+        is_data_valid = input_manager.start_data_processing(str(metadata_file["path"]), True)
         if is_data_valid:
             sys.stdout.write("Data is valid. \nSimulating...\n")
             simulator = SimulationEngine()
@@ -83,7 +113,7 @@ def execute_simulations(
         else:
             sys.stdout.write(f"Data not valid for {metadata_file_path}, simulation not run\n\n")
             output_manager.add_error("No simulation run",
-                                     f"Data not valid for {metadata_file_path}, simulation not run", info_map)
+                                     f"Data not valid for {str(metadata_file['path'])}, simulation not run", info_map)
         output_manager.save_variables(r"output", r"output/output_filters/", exclude_info_maps)
         output_manager.dump_all_nondata_pools(r"output", exclude_info_maps)
 
@@ -115,6 +145,12 @@ def parse_gnu_args():
         help="Exclude info_maps from the output",
         action="store_true",
     )
+    parser.add_argument(
+        "-ov",
+        "--only-run-validation",
+        help="Only validate the data, don't run a simulation",
+        action="store_true",
+    )
     return parser.parse_args()
 
 
@@ -125,4 +161,5 @@ if __name__ == "__main__":
         verbose=cmd_arguments.verbose,
         clear_output=cmd_arguments.clear_output,
         exclude_info_maps=cmd_arguments.exclude_info_maps,
+        only_run_validation=cmd_arguments.only_run_validation,
     )

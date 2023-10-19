@@ -9,7 +9,8 @@ from RUFAS.routines.field.field.field import Field
 from RUFAS.routines.field.soil.layer_data import LayerData
 from RUFAS.routines.field.soil.soil import Soil
 from RUFAS.routines.field.soil.soil_data import SoilData
-from RUFAS.classes import Time, Weather
+from RUFAS.time import Time
+from RUFAS.weather import Weather
 from RUFAS.routines.manure.manure_manager import ManureManager
 import pytest
 from typing import List, Dict
@@ -41,11 +42,11 @@ def test_field_manager_init(field_blob_names) -> None:
 
 @pytest.mark.parametrize("year,day,expected", [
     (1, 3, CurrentWeather(incoming_light=3, min_air_temperature=3, mean_air_temperature=3, max_air_temperature=3,
-                          annual_mean_air_temperature=1, precipitation=3, irrigation=3, daylength=15.5)),
+                          annual_mean_air_temperature=2.1, precipitation=3, irrigation=3, daylength=15.5)),
     (2, 1, CurrentWeather(incoming_light=4, min_air_temperature=4, mean_air_temperature=4, max_air_temperature=4,
-                          annual_mean_air_temperature=2, precipitation=4, irrigation=4, daylength=15.5)),
+                          annual_mean_air_temperature=2.1, precipitation=4, irrigation=4, daylength=15.5)),
     (3, 2, CurrentWeather(incoming_light=8, min_air_temperature=8, mean_air_temperature=8, max_air_temperature=8,
-                          annual_mean_air_temperature=3, precipitation=8, irrigation=8, daylength=15.5))
+                          annual_mean_air_temperature=2.1, precipitation=8, irrigation=8, daylength=15.5))
 ])
 def test_create_current_weather(year: int, day: int, expected: CurrentWeather) -> None:
     """Tests that current weather objects are correctly created from a time and weather object."""
@@ -54,7 +55,7 @@ def test_create_current_weather(year: int, day: int, expected: CurrentWeather) -
     setattr(weather, "T_min", [[1, 2, 3], [4, 5, 6], [7, 8, 9]])
     setattr(weather, "T_avg", [[1, 2, 3], [4, 5, 6], [7, 8, 9]])
     setattr(weather, "T_max", [[1, 2, 3], [4, 5, 6], [7, 8, 9]])
-    setattr(weather, "T_avg_annual", [1, 2, 3])
+    setattr(weather, "T_avg_annual", 2.1)
     setattr(weather, "rainfall", [[1, 2, 3], [4, 5, 6], [7, 8, 9]])
     setattr(weather, "irrigation", [[1, 2, 3], [4, 5, 6], [7, 8, 9]])
     CurrentWeather.determine_daylength = MagicMock(return_value=15.5)

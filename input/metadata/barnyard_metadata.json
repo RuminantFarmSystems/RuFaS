@@ -17,7 +17,7 @@
     "crop": {
       "title": "Crop data",
       "description": "Barnyard crop rotation schedule.",
-      "path": "input/data/crop/no_crop.json",
+      "path": "input/data/crop/corn_rotation.json",
       "type": "json",
       "properties": "crop_schedule_properties"
     },
@@ -63,66 +63,52 @@
       "type": "json",
       "properties": "manure_management_properties"
     },
-    "soil": {
+    "regular_soil": {
       "title": "Soil data",
       "description": "Barnyard soil configuration.",
-      "path": "input/data/soil/barnyard_soil.json",
+      "path": "input/data/soil/regular_barnyard_soil.json",
       "type": "json",
       "properties": "soil_profile_properties"
     },
-    "fertilizer_schedule_1": {
-      "title": "Fertilizer schedule.",
-      "description": "Barnyard fertilizer application schedule.",
-      "path": "input/data/fertilizer_schedule/no_fertilizer.json",
+    "sandy_soil": {
+      "title": "Soil data",
+      "description": "Barnyard soil configuration.",
+      "path": "input/data/soil/sandy_barnyard_soil.json",
       "type": "json",
-      "properties": "fertilizer_schedule_properties"
+      "properties": "soil_profile_properties"
     },
-    "fertilizer_schedule_2": {
+    "fertilizer_schedule": {
       "title": "Fertilizer schedule.",
       "description": "Barnyard fertilizer application schedule.",
       "path": "input/data/fertilizer_schedule/barnyard_scheduled_fertilizer_schedule.json",
       "type": "json",
       "properties": "fertilizer_schedule_properties"
     },
-    "manure_schedule_1": {
-      "title": "Manure schedule.",
-      "description": "Barnyard manure application schedule.",
-      "path": "input/data/manure_schedule/no_manure.json",
-      "type": "json",
-      "properties": "manure_schedule_properties"
-    },
-    "manure_schedule_2": {
+    "manure_schedule": {
       "title": "Manure schedule.",
       "description": "Barnyard manure application schedule.",
       "path": "input/data/manure_schedule/barnyard_scheduled_manure_schedule.json",
       "type": "json",
       "properties": "manure_schedule_properties"
     },
-    "tillage_schedule_1": {
-      "title": "Tillage schedule.",
-      "description": "Barnyard tillage application schedule.",
-      "path": "input/data/tillage_schedule/no_till.json",
-      "type": "json",
-      "properties": "tillage_schedule_properties"
-    },
-    "tillage_schedule_2": {
+    "tillage_schedule": {
       "title": "Tillage schedule.",
       "description": "Barnyard tillage application schedule.",
       "path": "input/data/tillage_schedule/barnyard_scheduled_tillage_schedule.json",
       "type": "json",
       "properties": "tillage_schedule_properties"
     },
-    "field_1": {
+    "regular": {
       "title": "Field specification",
       "description": "Contains overall field properties and references to specification files.",
-      "path": "input/data/field/barnyard_field_1.json",
+      "path": "input/data/field/regular_barnyard_field.json",
       "type": "json",
       "properties": "field_properties"
     },
-    "field_2": {
+    "sandy": {
       "title": "Field specification",
       "description": "Contains overall field properties and references to specification files.",
-      "path": "input/data/field/barnyard_field_2.json",
+      "path": "input/data/field/sandy_barnyard_field.json",
       "type": "json",
       "properties": "field_properties"
     },
@@ -165,6 +151,16 @@
         "description": "The random seed",
         "minimum": 0,
         "default": 42
+      },
+      "set_seed": {
+        "type": "bool",
+        "description": "Whether to set the seed",
+        "default": true
+      },
+      "csv_dir": {
+        "type": "string",
+        "description": "The path to where the CSV output files will be saved",
+        "default": "output/CSVs"
       },
       "simulate_animals": {
         "type": "bool",
@@ -216,6 +212,11 @@
           "type": "bool",
           "default": false,
           "description": "Initialize Herd? -- Whether to re-initialize the animal database, where the herd animals are selected from."
+        },
+        "replace_num": {
+          "type": "number",
+          "default": 5000,
+          "minimum": 0
         },
         "breed": {
           "type": "string",
@@ -801,6 +802,15 @@
                 "maximum": 1
               }
             },
+            "death_cull_prob": {
+              "type": "array",
+              "description": "Culling rate for death",
+              "properties": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1
+              }
+            },
             "cull_day_count": {
               "type": "array",
               "description": "Culling day count",
@@ -830,6 +840,10 @@
           "description": "Methane Mitigation Method -- The type of enteric methane mitigation supplement that is fed to the lactating dairy cattle",
           "default": "None",
           "pattern": "^(None|3-NOP|monensin|essential_oils|seaweed)$"
+        },
+        "methane_mitigation_additive_amount": {
+          "type": "number",
+          "default": 0
         },
         "3-NOP_additive_amount": {
           "type": "number",
@@ -2420,10 +2434,46 @@
       }
     },
     "weather_properties": {
-      "precip": {
-        "description": "amount of precipitation",
+      "year": {
+        "description": "Year.",
+        "type": "number",
+        "minimum": 1900
+      },
+      "jday": {
+        "description": "Julian day of the year.",
         "type": "number",
         "minimum": 0,
+        "maximum": 366
+      },
+      "precip": {
+        "description": "Amount of precipitation (mm H2O).",
+        "type": "number",
+        "minimum": 0,
+        "default": 0
+      },
+      "high": {
+        "description": "The maximum air temperature of the day (°C).",
+        "type": "number",
+        "default": 21
+      },
+      "low": {
+        "description": "The minimum air temperature of the day (°C).",
+        "type": "number",
+        "default": 0
+      },
+      "avg": {
+        "description": "The average air temperature of the day (°C).",
+        "type": "number",
+        "default": 0
+      },
+      "Hday": {
+        "description": "The solar radiation of the day (MJ m^-2).",
+        "type": "number",
+        "default": 0
+      },
+      "irrigation": {
+        "description": "Irrigation (mm H2O).",
+        "type": "number",
         "default": 0
       }
     }

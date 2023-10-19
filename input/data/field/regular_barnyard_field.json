@@ -1,9 +1,9 @@
 {
-    "soil_specification": "soil",
+    "soil_specification": "regular_soil",
     "crop_specification": "crop",
-    "fertilizer_management_specification": "fertilizer_schedule_1",
-    "manure_management_specification": "manure_schedule_1",
-    "tillage_management_specification": "tillage_schedule_1",
+    "fertilizer_management_specification": "fertilizer_schedule",
+    "manure_management_specification": "manure_schedule",
+    "tillage_management_specification": "tillage_schedule",
     "field_size": 1.0,
     "absolute_latitude": 43.5,
     "longitude": -89.4,

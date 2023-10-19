@@ -143,7 +143,7 @@ class FieldManager:
                               min_air_temperature=weather.T_min[time.year - 1][time.day - 1],
                               mean_air_temperature=weather.T_avg[time.year - 1][time.day - 1],
                               max_air_temperature=weather.T_max[time.year - 1][time.day - 1],
-                              annual_mean_air_temperature=weather.T_avg_annual[time.year - 1],
+                              annual_mean_air_temperature=weather.T_avg_annual,
                               precipitation=weather.rainfall[time.year - 1][time.day - 1],
                               irrigation=weather.irrigation[time.year - 1][time.day - 1],
                               daylength=daylength)
