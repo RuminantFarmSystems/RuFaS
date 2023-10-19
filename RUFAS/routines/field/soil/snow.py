@@ -7,28 +7,28 @@ from RUFAS.routines.field.manager.current_weather import CurrentWeather
 
 class Snow:
     """
-        Class representing snow-related calculations and data management.
+    Class representing snow-related calculations and data management.
 
-        This class provides methods for calculating snow pack temperature, snow melting, and
-        updating snow-related data based on the Soil and Water Assessment Tool (SWAT) documentation.
+    This class provides methods for calculating snow pack temperature, snow melting, and
+    updating snow-related data based on the Soil and Water Assessment Tool (SWAT) documentation.
 
-        Methods
-        -------
-        _calc_snow_temp(current_day_weather: CurrentWeather) -> float:
-            Calculate the snow pack temperature for the current day.
+    Methods
+    -------
+    _calc_snow_temp(current_day_weather: CurrentWeather) -> float:
+        Calculate the snow pack temperature for the current day.
 
-        _melt_snow(current_day_weather: CurrentWeather, day: int):
-            Calculate the snow melt for the current day.
+    _melt_snow(current_day_weather: CurrentWeather, day: int):
+        Calculate the snow melt for the current day.
 
-        _melt_factor(day: int) -> float:
-            Calculate the snow melt factor for a given day, b_mlt.
+    _melt_factor(day: int) -> float:
+        Calculate the snow melt factor for a given day, b_mlt.
 
-        sublimation():
-            Placeholder function for sublimation calculations.
+    sublimation():
+        Placeholder function for sublimation calculations.
 
-        update_snow(current_day_weather: CurrentWeather, day: int) -> None:
-            Update snow-related data including snow content and temperatures.
-        """
+    update_snow(current_day_weather: CurrentWeather, day: int) -> None:
+        Update snow-related data including snow content and temperatures.
+    """
 
     def __init__(self, soil_data: Optional[SoilData] = None, field_size: Optional[float] = None):
         self.soil_data = soil_data or SoilData(field_size=field_size)
