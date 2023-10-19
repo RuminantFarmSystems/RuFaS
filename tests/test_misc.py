@@ -1270,13 +1270,15 @@ def test_exclude_info_maps(
     ]
 
 
+@patch("builtins.open", new_callable=mock_open)
 def test_load_txt_file_to_list(
+    mock_file: MagicMock,
     mock_output_manager: OutputManager,
     output_manager_original_method_states: Dict[str, Callable],
 ) -> None:
     """Test case for function _load_txt_file_to_list in output_manager.py"""
-    with patch("builtins.open", mock_open(read_data="apples\nbananas\ncherries")):
-        result = mock_output_manager._load_txt_file_to_list("path/to/file.txt")
+    mock_file.return_value.read.return_value = "apples\nbananas\ncherries"
+    result = mock_output_manager._load_txt_file_to_list("path/to/file.txt")
 
     assert result == ["apples", "bananas", "cherries"]
 
