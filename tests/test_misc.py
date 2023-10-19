@@ -1064,36 +1064,97 @@ def test_dump_errors(
     ]
 
 
-@pytest.mark.parametrize("expected_result, exclude_info_maps, format_option", [
-    (['_exclude_info_maps=False, expect info_maps accordingly.' + os.linesep, 'var1' + os.linesep,
-      'var1.info_maps: test' + os.linesep, 'var2.info_maps: map1' + os.linesep,
-      'var2.values: v1' + os.linesep, 'var2.values: v2' + os.linesep],
-     False, "verbose"),
-    (['_exclude_info_maps=True, expect info_maps accordingly.' + os.linesep, 'var1' + os.linesep,
-      'var2.values: v1' + os.linesep, 'var2.values: v2' + os.linesep],
-     True, "verbose"),
-    (['_exclude_info_maps=False, expect info_maps accordingly.' + os.linesep, 'var1' + os.linesep,
-      '    .info_maps: test' + os.linesep, 'var2' + os.linesep, '    .info_maps: map1' + os.linesep,
-      '    .values: v1' + os.linesep, '    .values: v2' + os.linesep],
-     False, "block"),
-    (['_exclude_info_maps=True, expect info_maps accordingly.' + os.linesep,
-      'var1' + os.linesep, 'var2' + os.linesep, '    .values: v1' + os.linesep, '    .values: v2' + os.linesep],
-     True, "block"),
-    (['_exclude_info_maps=False, expect info_maps accordingly.' + os.linesep, 'var1' + os.linesep,
-      "var1.info_maps: ['test']" + os.linesep, "var2.info_maps: ['map1']" + os.linesep,
-      "var2.values: ['v1', 'v2']" + os.linesep],
-     False, "inline"),
-    (['_exclude_info_maps=True, expect info_maps accordingly.' + os.linesep, 'var1' + os.linesep,
-      "var2.values: ['v1', 'v2']" + os.linesep],
-     True, "inline"),
-    (['_exclude_info_maps=True, expect info_maps accordingly.' + os.linesep, 'var1' + os.linesep,
-      "var2.v1" + os.linesep, "var2.v2" + os.linesep],
-     True, "basic"),
-    (['_exclude_info_maps=False, expect info_maps accordingly.' + os.linesep, 'var1' + os.linesep,
-      "var1.test" + os.linesep, "var2.map1" + os.linesep,
-      "var2.v1" + os.linesep, "var2.v2" + os.linesep],
-     False, "basic"),
-])
+@pytest.mark.parametrize(
+    "expected_result, exclude_info_maps, format_option",
+    [
+        (
+            [
+                '_exclude_info_maps=False, expect info_maps accordingly.' + os.linesep, 'var1' + os.linesep,
+                'var1.info_maps: test' + os.linesep,
+                'var2.info_maps: map1' + os.linesep,
+                'var2.values: v1' + os.linesep,
+                'var2.values: v2' + os.linesep
+            ],
+            False,
+            "verbose",
+        ),
+        (
+            [
+                '_exclude_info_maps=True, expect info_maps accordingly.' + os.linesep,
+                'var1' + os.linesep,
+                'var2.values: v1' + os.linesep,
+                'var2.values: v2' + os.linesep
+            ],
+            True,
+            "verbose",
+        ),
+        (
+            [
+                '_exclude_info_maps=False, expect info_maps accordingly.' + os.linesep, 'var1' + os.linesep,
+                '    .info_maps: test' + os.linesep,
+                'var2' + os.linesep,
+                '    .info_maps: map1' + os.linesep,
+                '    .values: v1' + os.linesep,
+                '    .values: v2' + os.linesep
+            ],
+            False,
+            "block",
+        ),
+        (
+            [
+                '_exclude_info_maps=True, expect info_maps accordingly.' + os.linesep,
+                'var1' + os.linesep,
+                'var2' + os.linesep,
+                '    .values: v1' + os.linesep,
+                '    .values: v2' + os.linesep
+            ],
+            True,
+            "block",
+        ),
+        (
+            [
+                '_exclude_info_maps=False, expect info_maps accordingly.' + os.linesep,
+                'var1' + os.linesep,
+                "var1.info_maps: ['test']" + os.linesep,
+                "var2.info_maps: ['map1']" + os.linesep,
+                "var2.values: ['v1', 'v2']" + os.linesep
+            ],
+            False,
+            "inline",
+        ),
+        (
+            [
+                '_exclude_info_maps=True, expect info_maps accordingly.' + os.linesep,
+                'var1' + os.linesep,
+                "var2.values: ['v1', 'v2']" + os.linesep
+            ],
+            True,
+            "inline",
+        ),
+        (
+            [
+                '_exclude_info_maps=True, expect info_maps accordingly.' + os.linesep,
+                'var1' + os.linesep,
+                "var2.v1" + os.linesep,
+                "var2.v2" + os.linesep
+            ],
+            True,
+            "basic",
+        ),
+        (
+            [
+                '_exclude_info_maps=False, expect info_maps accordingly.' + os.linesep,
+                'var1' + os.linesep,
+                "var1.test" + os.linesep,
+                "var2.map1" + os.linesep,
+                "var2.v1" + os.linesep,
+                "var2.v2" + os.linesep
+            ],
+            False,
+            "basic",
+        ),
+    ],
+)
 def test_dump_variable_names_and_contexts(
     mock_output_manager: OutputManager,
     output_manager_original_method_states: Dict[str, Callable],
