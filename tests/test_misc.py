@@ -834,7 +834,7 @@ def output_manager_original_method_states(
         "_get_timestamp": mock_output_manager._get_timestamp,
         "_list_to_file_txt": mock_output_manager._list_to_file_txt,
         "_list_txt_and_json_files_in_dir": mock_output_manager._list_txt_and_json_files_in_dir,
-        "_load_filter_file_to_list": mock_output_manager._load_filter_file_to_list,
+        "_load_txt_file_to_list": mock_output_manager._load_txt_file_to_list,
         "_save_variables_to_csv_files ": mock_output_manager._save_variables_to_csv_files,
         "save_variables": mock_output_manager.save_variables,
         "add_variable": mock_output_manager.add_variable,
@@ -1269,28 +1269,27 @@ def test_exclude_info_maps(
     ]
 
 
-def test_load_filter_file_to_list(
+def test_load_txt_file_to_list(
     mock_output_manager: OutputManager,
     output_manager_original_method_states: Dict[str, Callable],
-    tmpdir,
 ) -> None:
     """Test case for function _load_txt_file_to_list in output_manager.py"""
     with patch("builtins.open", mock_open(read_data="apples\nbananas\ncherries")):
-        result = mock_output_manager._load_filter_file_to_list("path/to/file.txt")
+        result = mock_output_manager._load_txt_file_to_list("path/to/file.txt")
 
-    assert result == (["apples", "bananas", "cherries"], {})
+    assert result == ["apples", "bananas", "cherries"]
 
     mock_open_func = Mock()
     mock_open_func.side_effect = Exception("Error opening file")
 
     with patch("builtins.open", mock_open_func):
         with pytest.raises(Exception):
-            mock_output_manager._load_filter_file_to_list("path/to/file.txt")
+            mock_output_manager._load_txt_file_to_list("path/to/file.txt")
 
     # Restore original method
-    mock_output_manager._load_filter_file_to_list = (
-        output_manager_original_method_states["_load_filter_file_to_list"]
-    )
+    mock_output_manager._load_txt_file_to_list = output_manager_original_method_states[
+        "_load_txt_file_to_list"
+    ]
 
 
 def test_list_txt_and_json_files_in_dir(
@@ -1691,7 +1690,7 @@ def test_save_variables(
     mock_output_manager.variables_pool = {}
     mock_output_manager._generate_file_name = MagicMock(return_value="dummy_name")
     mock_output_manager._dict_to_file_json = MagicMock()
-    mock_output_manager._load_filter_file_to_list = MagicMock()
+    mock_output_manager._load_txt_file_to_list = MagicMock()
     mock_output_manager._exclude_info_maps = MagicMock()
     mock_output_manager._save_variables_to_csv_files = MagicMock()
 
@@ -1701,7 +1700,7 @@ def test_save_variables(
     mock_output_manager._list_txt_and_json_files_in_dir.assert_called_once_with(
         "dummy_dir_path/"
     )
-    mock_output_manager._load_filter_file_to_list.assert_not_called()
+    mock_output_manager._load_txt_file_to_list.assert_not_called()
     mock_output_manager._generate_file_name.assert_not_called()
     mock_output_manager._exclude_info_maps.assert_not_called()
     mock_output_manager._dict_to_file_json.assert_not_called()
@@ -1714,14 +1713,14 @@ def test_save_variables(
             "csv_dummy_input_filepath.txt",
         ]
     )
-    mock_output_manager._load_filter_file_to_list = MagicMock(
+    mock_output_manager._load_txt_file_to_list = MagicMock(
         return_value=([".*"], {"title": "dummy_title"})
     )
     mock_output_manager.save_variables("dummy_path", "dummy_dir_path/", False)
     mock_output_manager._list_txt_and_json_files_in_dir.assert_called_with(
         "dummy_dir_path/"
     )
-    mock_output_manager._load_filter_file_to_list.assert_called_with(
+    mock_output_manager._load_txt_file_to_list.assert_called_with(
         "dummy_dir_path/csv_dummy_input_filepath.txt"
     )
     mock_output_manager._generate_file_name.assert_called_once_with(
@@ -1743,7 +1742,7 @@ def test_save_variables(
     mock_output_manager._list_txt_and_json_files_in_dir.assert_called_with(
         "dummy_dir_path/"
     )
-    mock_output_manager._load_filter_file_to_list.assert_called_with(
+    mock_output_manager._load_txt_file_to_list.assert_called_with(
         "dummy_dir_path/csv_dummy_input_filepath.txt"
     )
     dummy_file_name = "saved_variables_json_dummy_input_filepath.txt"
