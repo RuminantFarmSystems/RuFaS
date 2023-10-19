@@ -125,13 +125,13 @@ class SoilData:
     """Minimum snow water content that corresponds to 100% snow cover, SNO100, (mm H2O)."""
     snow_melt_factor_maximum: float = 4.5
     """
-    Melt factor for snow on June 21, mlt6, (mm H2O/°C-day)
+    Melt factor for snow on June 21, SMFMX, (mm H2O/°C-day)
     If the watershed is in the Northern Hemisphere, SMFMX will be the maximum melt factor.
     If the watershed is in the Southern Hemisphere, SMFMX will be the minimum melt factor.
     """
     snow_melt_factor_minimum: float = 4.5
     """
-    Melt factor for snow on December 21, mlt12, (mm H2O/°C-day)
+    Melt factor for snow on December 21, SMFMN, (mm H2O/°C-day)
     If the watershed is in the Northern Hemisphere, SMFMN will be the minimum melt factor.
     If the watershed is in the Southern Hemisphere, SMFMN will be the maximum melt factor.
     """
