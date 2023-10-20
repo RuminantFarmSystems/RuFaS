@@ -2,6 +2,8 @@
 
 from copy import deepcopy
 from functools import reduce
+import sys
+import config.global_variables
 import json
 import re
 
@@ -495,6 +497,7 @@ class InputManager:
         if type(input_data_value) is not str:
             warning_string = "String variable is not a string."
             om.add_warning(warning_string, f"{var_name=}", info_map)
+            print('line 500 is where')
             return False
 
         pattern_check = variable_properties.get("pattern")
@@ -503,6 +506,7 @@ class InputManager:
             if not is_valid_string:
                 warning_string = f"String variable must match pattern {variable_properties['pattern']}."
                 om.add_warning(warning_string, f"{var_name=}", info_map)
+                print('line 509 is where')
                 return False
 
         minimum_length = variable_properties.get("minimum_length")
@@ -512,12 +516,14 @@ class InputManager:
             if not is_valid_string:
                 warning_string = f"String length less than {minimum_length}."
                 om.add_warning(warning_string, f"{var_name=}", info_map)
+                print('line 519 is where')
                 return False
         if maximum_length is not None:
             is_valid_string = len(input_data_value) <= variable_properties["maximum_length"]
             if not is_valid_string:
                 warning_string = f"String length more than {maximum_length}."
                 om.add_warning(warning_string, f"{var_name=}", info_map)
+                print('line 526 is where')
                 return False
 
         return True
@@ -552,9 +558,14 @@ class InputManager:
                     }
 
         if 'default' not in variable_properties.keys():
+            if config.global_variables.PRINT_STATUS_MESSAGES:
+                sys.stdout.write(f"Invalid data not able to be fixed: {element_hierarchy[-1]}")
             return False
         variable_parent = reduce(lambda d, key: d[key], element_hierarchy[:-1],
                                  input_data)
+        if config.global_variables.PRINT_STATUS_MESSAGES:
+            sys.stdout.write(f"Invalid data found: {element_hierarchy[-1]}: {variable_parent[element_hierarchy[-1]]}\n")
+            sys.stdout.write(f"Set to default: {element_hierarchy[-1]} => {variable_properties['default']}\n")
         variable_parent[element_hierarchy[-1]] = variable_properties['default']
         om.add_warning("Data fixed",
                        f"Invalid data fixed: {element_hierarchy[-1]} => {variable_properties['default']}",

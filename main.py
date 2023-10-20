@@ -21,7 +21,7 @@ from RUFAS.util import Utility
 
 def run_rufas(
     make_graphs: bool = True,
-    verbose: bool = True,
+    verbose: bool = False,
     clear_output: bool = False,
     exclude_info_maps: bool = False,
     only_run_validation: bool = False,
@@ -52,9 +52,7 @@ def run_rufas(
 def set_global_variables(make_graphs: bool, verbose: bool) -> None:
     """Sets values of global variables in config/global_variables.py"""
     config.global_variables.PRODUCE_GRAPHICS = make_graphs
-    config.global_variables.PRINT_STATUS_MESSAGES = (
-        verbose  # TODO: this is currently unimplemented - GitHub Issue #211
-    )
+    config.global_variables.PRINT_STATUS_MESSAGES = verbose  # TODO: this is currently unimplemented - GitHub Issue #211
 
 
 def run_validation(metadata_files: List[Path], exclude_info_maps: bool = False) -> None:
@@ -103,7 +101,7 @@ def execute_simulations(
     for metadata_file in metadata_files:
         input_manager.flush_pool()
         output_manager.flush_pools()
-        sys.stdout.write(f"Validating data for {str(metadata_file_path)}...\n")
+        sys.stdout.write(f"Validating data for {str(metadata_file['path'])}...\n")
         output_manager.set_metadata_prefix(metadata_file['prefix'])
         is_data_valid = input_manager.start_data_processing(str(metadata_file["path"]), True)
         if is_data_valid:
@@ -111,7 +109,7 @@ def execute_simulations(
             simulator = SimulationEngine()
             simulator.simulate()
         else:
-            sys.stdout.write(f"Data not valid for {metadata_file_path}, simulation not run\n\n")
+            sys.stdout.write(f"Data not valid for {metadata_file['path']}, simulation not run\n\n")
             output_manager.add_error("No simulation run",
                                      f"Data not valid for {str(metadata_file['path'])}, simulation not run", info_map)
         output_manager.save_variables(r"output", r"output/output_filters/", exclude_info_maps)
