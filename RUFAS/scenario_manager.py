@@ -48,4 +48,16 @@ class MetadataPaths(TypedDict):
 
 METADATA_PATHS: List[MetadataPaths] = [{"prefix": "default_scenario",
                                         "path": Path('input/metadata/default_metadata.json')},
+                                       {"prefix": "ARL_scenario",
+                                        "path": Path('input/metadata/ARL_metadata.json')},
+                                       {"prefix": "barnyard_scenario",
+                                        "path": Path('input/metadata/barnyard_metadata.json')},
+                                       {"prefix": "multi_crop_scenario",
+                                        "path": Path('input/metadata/multi_crop_metadata.json')},
+                                       {"prefix": "swat_scenario",
+                                        "path": Path('input/metadata/swat_metadata.json')},
+                                       {"prefix": "testing_scenario",
+                                        "path": Path('input/metadata/testing_metadata.json')},
+                                       {"prefix": "user_def_scenario",
+                                        "path": Path('input/metadata/user_defined_ration_md.json')},
                                        ]
