@@ -559,7 +559,7 @@ class InputManager:
 
         if 'default' not in variable_properties.keys():
             if config.global_variables.PRINT_STATUS_MESSAGES:
-                sys.stdout.write(f"Invalid data not able to be fixed: {element_hierarchy[-1]}")
+                sys.stdout.write(f"Invalid data not able to be fixed: {element_hierarchy[-1]}\n")
             return False
         variable_parent = reduce(lambda d, key: d[key], element_hierarchy[:-1],
                                  input_data)

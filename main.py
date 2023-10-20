@@ -70,10 +70,19 @@ def run_validation(metadata_files: List[Path], exclude_info_maps: bool = False) 
                 }
     output_manager = OutputManager()
     input_manager = InputManager()
+    sys.stdout.write("Only validating data, no simulation will follow.\n")
     for metadata_file in metadata_files:
         input_manager.flush_pool()
         output_manager.flush_pools()
+        if config.global_variables.PRINT_STATUS_MESSAGES:
+            sys.stdout.write(f"Validating data for {str(metadata_file['path'])}...\n")
         is_data_valid = input_manager.start_data_processing(str(metadata_file["path"]), False)
+        if config.global_variables.PRINT_STATUS_MESSAGES:
+            if is_data_valid:
+                sys.stdout.write("Data is valid.\n")
+            else:
+                sys.stdout.write(f"Data not valid for {metadata_file['path']}.\n")
+                sys.stdout.write("Check logs for more detailed data validation info.\n")
         output_manager.add_log("Only run validation data validity check",
                                f"{str(metadata_file['path'])} data validity is: {is_data_valid}",
                                info_map)
@@ -101,15 +110,18 @@ def execute_simulations(
     for metadata_file in metadata_files:
         input_manager.flush_pool()
         output_manager.flush_pools()
-        sys.stdout.write(f"Validating data for {str(metadata_file['path'])}...\n")
+        if config.global_variables.PRINT_STATUS_MESSAGES:
+            sys.stdout.write(f"Validating data for {str(metadata_file['path'])}...\n")
         output_manager.set_metadata_prefix(metadata_file['prefix'])
         is_data_valid = input_manager.start_data_processing(str(metadata_file["path"]), True)
         if is_data_valid:
-            sys.stdout.write("Data is valid. \nSimulating...\n")
+            if config.global_variables.PRINT_STATUS_MESSAGES:
+                sys.stdout.write("Data is valid. \nSimulating...\n")
             simulator = SimulationEngine()
             simulator.simulate()
         else:
-            sys.stdout.write(f"Data not valid for {metadata_file['path']}, simulation not run\n\n")
+            if config.global_variables.PRINT_STATUS_MESSAGES:
+                sys.stdout.write(f"Data not valid for {metadata_file['path']}, simulation not run\n\n")
             output_manager.add_error("No simulation run",
                                      f"Data not valid for {str(metadata_file['path'])}, simulation not run", info_map)
         output_manager.save_variables(r"output", r"output/output_filters/", exclude_info_maps)
