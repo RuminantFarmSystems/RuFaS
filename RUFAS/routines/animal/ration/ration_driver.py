@@ -39,7 +39,7 @@ class RationManager:
 
     """
     REDUCTION_FACTOR = 0.25
-    MAX_REATTEMPTS = 5
+    MAX_OPT_REATTEMPTS = 5
 
     @staticmethod
     def formulate_ration(ration_optimizer: RationOptimizer, pen, available_feeds, animal_grouping_scenario) -> tuple:
@@ -216,7 +216,7 @@ class RationManager:
 
         num_reattempts = 0
         ration_vals = None
-        while not solution.success and num_reattempts < RationManager.MAX_REATTEMPTS:
+        while not solution.success and num_reattempts < RationManager.MAX_OPT_REATTEMPTS:
             num_reattempts += 1
             failed_constraint_names = RationManager._find_failed_constraint_names(ration_optimizer, solution,
                                                                                   ration_config)
@@ -299,7 +299,7 @@ class RationManager:
         failed_constraints = ration_optimizer.find_failed_constraints(solution.x,
                                                                       ration_optimizer.cow_cons,
                                                                       ration_config)
-        return [constr["fun"].__name__ for constr in failed_constraints if failed_constraints]
+        return [constraint["fun"].__name__ for constraint in failed_constraints if failed_constraints]
 
     @staticmethod
     def _log_failed_ration_optimization_attempt(ration_optimizer: RationOptimizer,
