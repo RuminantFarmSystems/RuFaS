@@ -26,7 +26,7 @@ class UserDefinedRationManager(object):
         if UserDefinedRationManager.__instance is None:
             UserDefinedRationManager.__instance = self
 
-            self.udr_or_not = None
+            self.is_udr = None
 
             self.calf_ration = []
             self.growing_ration = []

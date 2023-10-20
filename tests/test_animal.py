@@ -2213,7 +2213,7 @@ def ration_optimizer(mock_cow_cons: MagicMock, mock_heifer_cons: MagicMock) -> R
     return ration_optimizer
 
 
-@pytest.mark.parametrize("udr_or_not, animal_combination, expected_x0, expected_bounds, expected_constraints", [
+@pytest.mark.parametrize("is_udr, animal_combination, expected_x0, expected_bounds, expected_constraints", [
     (
             True, 'AnimalCombination.LAC_COW', [0.5, 1.0, 1.5, 2.0, 2.5, 3.0],
             [(0, 1), (0, 2), (0, 3), (0, 4), (0, 5), (0, 6)],
@@ -2243,7 +2243,7 @@ def ration_optimizer(mock_cow_cons: MagicMock, mock_heifer_cons: MagicMock) -> R
 
 ])
 def test_ration_optimizer_optimize(mocker: MockerFixture, mock_ration_config: MagicMock,
-                                   mock_available_feeds: dict, ration_optimizer: RationOptimizer, udr_or_not: bool,
+                                   mock_available_feeds: dict, ration_optimizer: RationOptimizer, is_udr: bool,
                                    animal_combination: str,
                                    expected_x0: list[float],
                                    expected_bounds: list[float],
@@ -2251,7 +2251,7 @@ def test_ration_optimizer_optimize(mocker: MockerFixture, mock_ration_config: Ma
     """Unit test for function optimize in file routines/animal/ration/ration_optimizer.py"""
 
     mocker.patch("RUFAS.routines.animal.ration.ration_optimizer.udrm",
-                 MagicMock(udr_or_not=udr_or_not))
+                 MagicMock(is_udr=is_udr))
     mocker.patch("RUFAS.routines.animal.ration.ration_optimizer.RationOptimizer.set_constraints")
     mocker.patch("RUFAS.routines.animal.ration.ration_optimizer.RationOptimizer.make_user_bounds",
                  return_value=[(0, 1), (0, 2), (0, 3), (0, 4), (0, 5), (0, 6)])
@@ -2265,7 +2265,7 @@ def test_ration_optimizer_optimize(mocker: MockerFixture, mock_ration_config: Ma
 
     ration_optimizer.set_constraints.assert_called_once_with(arguments=(mock_ration_config,))
 
-    if udr_or_not:
+    if is_udr:
         mock_ration_to_use.assert_called_once_with(animal_combination, mock_available_feeds)
 
         ration_optimizer.make_user_bounds.assert_called_once_with(mock_ration_to_use.return_value,
@@ -2280,7 +2280,7 @@ def test_ration_optimizer_optimize_value_error(mocker: MockerFixture, mock_ratio
                                                mock_available_feeds: dict, ration_optimizer: RationOptimizer) -> None:
     """Unit test for value error in function optimize in file routines/animal/ration/ration_optimizer.py"""
     mocker.patch("RUFAS.routines.animal.ration.ration_optimizer.udrm",
-                 MagicMock(udr_or_not=False))
+                 MagicMock(is_udr=False))
     mocker.patch("RUFAS.routines.animal.ration.ration_optimizer.RationOptimizer.set_constraints")
 
     animal_combination = 'AnimalCombination.CALF'
