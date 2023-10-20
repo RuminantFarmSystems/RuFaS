@@ -12,7 +12,6 @@ from unittest.mock import patch
 from mock import MagicMock
 from pytest_mock import MockerFixture
 
-=======
 from pytest_lazyfixture import lazy_fixture
 from RUFAS.routines.animal.life_cycle.cow import Cow
 # from RUFAS.routines.animal.life_cycle.heiferI import HeiferI
