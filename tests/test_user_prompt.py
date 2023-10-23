@@ -137,20 +137,20 @@ def test_run_validation(mocker: MockerFixture, is_data_valid: bool, verbose: boo
     if config.global_variables.PRINT_STATUS_MESSAGES:
         if is_data_valid:
             expected_messages = ['***Only validating data, no simulation will follow.***\n\n',
-                                'Check logs for more detailed data validation info.\n',
-                                'Validating data for metadata_file1.json...\n',
-                                'Data is valid.\n\n',
-                                'Validating data for metadata_file2.json...\n',
-                                'Data is valid.\n\n',
-                                ]
+                                 'Check logs for more detailed data validation info.\n',
+                                 'Validating data for metadata_file1.json...\n',
+                                 'Data is valid.\n\n',
+                                 'Validating data for metadata_file2.json...\n',
+                                 'Data is valid.\n\n',
+                                 ]
         else:
             expected_messages = ['***Only validating data, no simulation will follow.***\n\n',
-                                'Check logs for more detailed data validation info.\n',
-                                'Validating data for metadata_file1.json...\n',
-                                "Data not valid for metadata_file1.json.\n\n",
-                                'Validating data for metadata_file2.json...\n',
-                                "Data not valid for metadata_file2.json.\n\n"
-                                ]
+                                 'Check logs for more detailed data validation info.\n',
+                                 'Validating data for metadata_file1.json...\n',
+                                 "Data not valid for metadata_file1.json.\n\n",
+                                 'Validating data for metadata_file2.json...\n',
+                                 "Data not valid for metadata_file2.json.\n\n"
+                                 ]
     else:
         expected_messages = ["***Only validating data, no simulation will follow.***\n\n"]
 
