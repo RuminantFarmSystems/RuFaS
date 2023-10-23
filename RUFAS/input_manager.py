@@ -31,6 +31,10 @@ class InputManager:
             InputManager.__instance = self
         self.__metadata: Dict[str, Any] = {}
         self.__pool: Dict[str, Any] = {}
+        self.valid_elements_counter = 0
+        self.invalid_elements_counter = 0
+        self.total_elements_counter = 0
+        self.fixed_elements_counter = 0
 
     def start_data_processing(self, metadata_path: str,
                               eager_termination: bool = True) -> bool:
@@ -202,8 +206,8 @@ class InputManager:
         om.add_log("Total Fixed Items", f"{fixed_elements_counter=}", info_map)
         om.add_log("Total Invalid Items", f"{invalid_elements_counter=}", info_map)
         if config.global_variables.PRINT_STATUS_MESSAGES:
-            sys.stdout.write(f"{fixed_elements_counter} element(s) fixed during the validation process.\n")
-            sys.stdout.write(f"{invalid_elements_counter} element(s) found invalid and unfixable.\n")
+            sys.stdout.write(f"{self.fixed_elements_counter} element(s) fixed during the validation process.\n")
+            sys.stdout.write(f"{self.invalid_elements_counter} element(s) found invalid and unfixable.\n")
         return invalid_elements_counter == 0
 
     def _filter_input_data_by_metadata(self, input_data: Dict[str, Any],
@@ -329,16 +333,20 @@ class InputManager:
 
         for element_num in range(len(variable)):
             element_counter_and_validity["total_elements"] += 1
+            self.total_elements_counter += 1
             is_valid = self._validate_input_type_dynamic(variable_properties, var_name, variable[element_num])
             if is_valid:
                 element_counter_and_validity["valid_elements"] += 1
+                self.valid_elements_counter += 1
             else:
                 is_fixed = self._fix_data(variable_properties, [var_name, element_num], input_data)
                 if is_fixed:
                     element_counter_and_validity["fixed_elements"] += 1
+                    self.fixed_elements_counter += 1
                 else:
                     element_counter_and_validity["invalid_elements"] += 1
                     element_counter_and_validity["is_valid"] = False
+                    self.invalid_elements_counter += 1
                     om.add_warning("Invalid unfixable element found",
                                    f"{var_name} element {element_num} was invalid and could not be fixed", info_map)
                     if eager_termination:
@@ -425,17 +433,21 @@ class InputManager:
             is_valid = self._validate_input_type_dynamic(variable_properties, var_name, input_data_value)
 
             element_counter_and_validity["total_elements"] += 1
+            self.total_elements_counter += 1
             if is_valid:
                 element_counter_and_validity["valid_elements"] += 1
+                self.valid_elements_counter += 1
                 return element_counter_and_validity
             else:
                 is_fixed = self._fix_data(variable_properties, element_hierarchy, input_data)
                 if is_fixed:
                     element_counter_and_validity["fixed_elements"] += 1
+                    self.fixed_elements_counter += 1
                 else:
                     om.add_warning("Invalid unfixable element found",
                                    f"{var_name} was invalid and could not be fixed", info_map)
                     element_counter_and_validity["invalid_elements"] += 1
+                    self.invalid_elements_counter += 1
                     element_counter_and_validity["is_valid"] = False
                 return element_counter_and_validity
 
@@ -712,4 +724,8 @@ class InputManager:
                     "function": self.flush_pool.__name__,
                     }
         self.__pool = {}
+        self.total_elements_counter = 0
+        self.fixed_elements_counter = 0
+        self.valid_elements_counter = 0
+        self.invalid_elements_counter = 0
         om.add_log("Clear variable pool", "The pool is emptied.", info_map)
