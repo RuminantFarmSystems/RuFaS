@@ -1,6 +1,7 @@
 import argparse
 import os.path
 from pathlib import Path
+from mock import call
 
 import pytest
 from pytest_mock import MockerFixture
@@ -56,6 +57,7 @@ def test_run_rufas(
     patch_execute_simulations = mocker.patch("main.execute_simulations")
     patch_run_validation = mocker.patch("main.run_validation")
     patch_empty_dir = mocker.patch("RUFAS.util.Utility.empty_dir")
+    patch_sys_stdout = mocker.patch("sys.stdout.write")
 
     # Act
     run_rufas(make_graphs, verbose, clear_output, exclude_info_maps, only_run_validation)
@@ -71,6 +73,9 @@ def test_run_rufas(
         patch_empty_dir.assert_called_once()
     else:
         patch_empty_dir.assert_not_called()
+
+    if verbose:
+        patch_sys_stdout.assert_called_once_with("RuFaS: Ruminant Farm Systems Model 2023")
 
 
 @pytest.mark.parametrize(
@@ -95,11 +100,11 @@ def test_set_global_variables(make_graphs: bool, verbose: bool) -> None:
 
 
 @pytest.mark.parametrize(
-        "is_data_valid",
-        [(True), (False)
+        "is_data_valid, verbose",
+        [(True, True), (True, False), (False, True), (False, False)
          ]
 )
-def test_run_validation(mocker: MockerFixture, is_data_valid: bool) -> None:
+def test_run_validation(mocker: MockerFixture, is_data_valid: bool, verbose: bool) -> None:
     """Checks that run_validation() calls the correct functions in the correct order"""
     mock_output_manager = mocker.MagicMock(auto_spec=OutputManager)
     mock_input_manager = mocker.MagicMock(auto_spec=InputManager)
@@ -107,8 +112,11 @@ def test_run_validation(mocker: MockerFixture, is_data_valid: bool) -> None:
     mock_input_manager.flush_pool.return_value = None
     mock_output_manager.dump_all_nondata_pools.return_value = None
     mock_output_manager.save_variables.return_value = None
+    old_verbose = config.global_variables.PRINT_STATUS_MESSAGES
+    config.global_variables.PRINT_STATUS_MESSAGES = verbose
     mocker.patch("main.OutputManager", return_value=mock_output_manager)
     mocker.patch("main.InputManager", return_value=mock_input_manager)
+    patch_sys_stdout = mocker.patch("sys.stdout.write")
     metadata_prefix1 = "dummy_prefix1"
     metadata_prefix2 = "dummy_prefix2"
     metadata_file_path1 = Path("metadata_file1.json")
@@ -125,6 +133,26 @@ def test_run_validation(mocker: MockerFixture, is_data_valid: bool) -> None:
     assert mock_output_manager.dump_all_nondata_pools.call_args_list == [
         mocker.call("output", True)
     ] * len(metadata_file_list)
+
+    if config.global_variables.PRINT_STATUS_MESSAGES and is_data_valid:
+        valid_data_calls = ['***Only validating data, no simulation will follow.***\n\n',
+                            'Check logs for more detailed data validation info.\n',
+                            'Validating data for metadata_file1.json...\n',
+                            'Data is valid.\n\n',
+                            'Validating data for metadata_file2.json...\n',
+                            'Data is valid.\n\n',
+                            ]
+        # patch_sys_stdout.assert_called_with("Check logs for more detailed data validation info.\n")
+        # patch_sys_stdout.assert_called_with(valid_data_calls)
+        for valid_data_call in valid_data_calls:
+            patch_sys_stdout.assert_called_with(valid_data_call)
+        # patch_sys_stdout.assert_called_once_with("***Only validating data, no simulation will follow.***\n\n")
+    #     if is_data_valid:
+    #         patch_sys_stdout.assert_called_with("Data is valid.\n\n")
+    #     else:
+    #         patch_sys_stdout.assert_called_with(f"Data not valid for {metadata_file_list['path']}.\n\n")
+    #     patch_sys_stdout.assert_called_with("Check logs for more detailed data validation info.\n")
+    config.global_variables.PRINT_STATUS_MESSAGES = old_verbose
 
 
 @pytest.mark.parametrize(
