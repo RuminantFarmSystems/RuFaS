@@ -12,7 +12,6 @@ from RUFAS.config import Config
 from RUFAS.state import State
 from RUFAS.weather import Weather
 from RUFAS.time import Time
-from RUFAS.output_manager import OutputManager
 from RUFAS.input_manager import InputManager
 from RUFAS.output_manager import OutputManager
 from RUFAS.routines.manure.manure_manager import simulate_daily_manure_manager
