@@ -74,7 +74,7 @@ def test_run_rufas(
         patch_empty_dir.assert_not_called()
 
     if verbose:
-        patch_sys_stdout.assert_called_once_with("RuFaS: Ruminant Farm Systems Model 2023")
+        patch_sys_stdout.assert_called_once_with("RuFaS: Ruminant Farm Systems Model 2023\n")
 
 
 @pytest.mark.parametrize(
