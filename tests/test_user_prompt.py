@@ -103,7 +103,7 @@ def test_set_global_variables(make_graphs: bool, verbose: bool) -> None:
         [(True, True), (True, False), (False, True), (False, False)
          ]
 )
-def test_run_validation(mocker: MockerFixture, is_data_valid: bool, verbose: bool) -> None:
+def test_run_validation(mocker: MockerFixture, is_data_valid: bool, verbose: bool, capsys) -> None:
     """Checks that run_validation() calls the correct functions in the correct order"""
     mock_output_manager = mocker.MagicMock(auto_spec=OutputManager)
     mock_input_manager = mocker.MagicMock(auto_spec=InputManager)
@@ -115,7 +115,6 @@ def test_run_validation(mocker: MockerFixture, is_data_valid: bool, verbose: boo
     config.global_variables.PRINT_STATUS_MESSAGES = verbose
     mocker.patch("main.OutputManager", return_value=mock_output_manager)
     mocker.patch("main.InputManager", return_value=mock_input_manager)
-    patch_sys_stdout = mocker.patch("sys.stdout.write")
     metadata_prefix1 = "dummy_prefix1"
     metadata_prefix2 = "dummy_prefix2"
     metadata_file_path1 = Path("metadata_file1.json")
@@ -133,24 +132,31 @@ def test_run_validation(mocker: MockerFixture, is_data_valid: bool, verbose: boo
         mocker.call("output", True)
     ] * len(metadata_file_list)
 
-    if config.global_variables.PRINT_STATUS_MESSAGES and is_data_valid:
-        valid_data_calls = ['***Only validating data, no simulation will follow.***\n\n',
-                            'Check logs for more detailed data validation info.\n',
-                            'Validating data for metadata_file1.json...\n',
-                            'Data is valid.\n\n',
-                            'Validating data for metadata_file2.json...\n',
-                            'Data is valid.\n\n',
-                            ]
-        # patch_sys_stdout.assert_called_with("Check logs for more detailed data validation info.\n")
-        # patch_sys_stdout.assert_called_with(valid_data_calls)
-        for valid_data_call in valid_data_calls:
-            patch_sys_stdout.assert_called_with(valid_data_call)
-        # patch_sys_stdout.assert_called_once_with("***Only validating data, no simulation will follow.***\n\n")
-    #     if is_data_valid:
-    #         patch_sys_stdout.assert_called_with("Data is valid.\n\n")
-    #     else:
-    #         patch_sys_stdout.assert_called_with(f"Data not valid for {metadata_file_list['path']}.\n\n")
-    #     patch_sys_stdout.assert_called_with("Check logs for more detailed data validation info.\n")
+    captured = capsys.readouterr()
+
+    if config.global_variables.PRINT_STATUS_MESSAGES:
+        if is_data_valid:
+            expected_messages = ['***Only validating data, no simulation will follow.***\n\n',
+                                'Check logs for more detailed data validation info.\n',
+                                'Validating data for metadata_file1.json...\n',
+                                'Data is valid.\n\n',
+                                'Validating data for metadata_file2.json...\n',
+                                'Data is valid.\n\n',
+                                ]
+        else:
+            expected_messages = ['***Only validating data, no simulation will follow.***\n\n',
+                                'Check logs for more detailed data validation info.\n',
+                                'Validating data for metadata_file1.json...\n',
+                                "Data not valid for metadata_file1.json.\n\n",
+                                'Validating data for metadata_file2.json...\n',
+                                "Data not valid for metadata_file2.json.\n\n"
+                                ]
+    else:
+        expected_messages = ["***Only validating data, no simulation will follow.***\n\n"]
+
+    for message in expected_messages:
+        assert message in captured.out
+
     config.global_variables.PRINT_STATUS_MESSAGES = old_verbose
 
 
