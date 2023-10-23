@@ -41,7 +41,7 @@ def run_rufas(
 
     set_global_variables(make_graphs, verbose)
     if verbose:
-        sys.stdout.write("RuFaS: Ruminant Farm Systems Model 2023")
+        sys.stdout.write("RuFaS: Ruminant Farm Systems Model 2023\n")
     metadata_file_list: List[MetadataPaths] = METADATA_PATHS
     if only_run_validation:
         run_validation(metadata_file_list, exclude_info_maps)

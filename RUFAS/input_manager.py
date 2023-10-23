@@ -31,10 +31,6 @@ class InputManager:
             InputManager.__instance = self
         self.__metadata: Dict[str, Any] = {}
         self.__pool: Dict[str, Any] = {}
-        self.valid_elements_counter = 0
-        self.invalid_elements_counter = 0
-        self.total_elements_counter = 0
-        self.fixed_elements_counter = 0
 
     def start_data_processing(self, metadata_path: str,
                               eager_termination: bool = True) -> bool:
@@ -183,12 +179,16 @@ class InputManager:
             metadata_properties = self.__metadata["properties"][properties_blob_key]
             filtered_input_data = self._filter_input_data_by_metadata(input_data, metadata_properties)
             for metadata_property in metadata_properties.keys():
+                element_counter_and_validity = {"fixed_elements": 0, "total_elements": 0, "valid_elements": 0,
+                                                "invalid_elements": 0, "is_valid": True}
                 if file_type == "json":
                     element_counter_and_validity = self._validate_json_element([metadata_property], properties_blob_key,
-                                                                               filtered_input_data, eager_termination)
+                                                                               filtered_input_data, eager_termination,
+                                                                               element_counter_and_validity)
                 if file_type == "csv":
                     element_counter_and_validity = self._validate_csv_element(metadata_property, properties_blob_key,
-                                                                              filtered_input_data, eager_termination)
+                                                                              filtered_input_data, eager_termination,
+                                                                              element_counter_and_validity)
 
                 fixed_elements_counter += element_counter_and_validity["fixed_elements"]
                 valid_elements_counter += element_counter_and_validity["valid_elements"]
@@ -206,8 +206,8 @@ class InputManager:
         om.add_log("Total Fixed Items", f"{fixed_elements_counter=}", info_map)
         om.add_log("Total Invalid Items", f"{invalid_elements_counter=}", info_map)
         if config.global_variables.PRINT_STATUS_MESSAGES:
-            sys.stdout.write(f"{self.fixed_elements_counter} element(s) fixed during the validation process.\n")
-            sys.stdout.write(f"{self.invalid_elements_counter} element(s) found invalid and unfixable.\n")
+            sys.stdout.write(f"{fixed_elements_counter} element(s) fixed during the validation process.\n")
+            sys.stdout.write(f"{invalid_elements_counter} element(s) found invalid and unfixable.\n")
         return invalid_elements_counter == 0
 
     def _filter_input_data_by_metadata(self, input_data: Dict[str, Any],
@@ -247,8 +247,10 @@ class InputManager:
         ----------
         variable_properties : Dict[str, Any]
             A dictionary containing properties relevant to the validation.
+
         var_name : str
             The name of the variable being validated.
+
         input_data_value : Any
             The input data value to be validated.
 
@@ -298,7 +300,7 @@ class InputManager:
         return validator(variable_properties, var_name, input_data_value)
 
     def _validate_csv_element(self, var_name: str, properties_blob_key: str, input_data: Dict[str, Any],
-                              eager_termination: bool) -> dict:
+                              eager_termination: bool, element_counter_and_validity: Dict[str, Any]) -> dict:
         """
         Receives data loaded from csv input file and the validates each row element in the csv column it's sent.
         It attempts to fix any invalid elements and tracks the number of valid, invalid, fixed,
@@ -308,12 +310,20 @@ class InputManager:
         ----------
         var_name : str
             The name of the csv data element being validated.
+
         properties_blob_key : str
             The metadata properties section keyword for the data input file being checked.
+
         input_data : Dict[str, Any]
             A buffer dictionary that holds the input data for validation and fixing.
+
         eager_termination : bool
             If true, the process will be terminated upon finding invalid data.
+
+        element_counter_and_validity : Dict[str, Any]
+            A dictionary that collects the counts of total elements checked,
+            invalid elements, valid elements, and fixed elements as well as a boolean
+            which is True if the data is valid, False otherwise.
 
         Returns
         -------
@@ -325,28 +335,22 @@ class InputManager:
         info_map = {"class": self.__class__.__name__,
                     "function": self._validate_csv_element.__name__,
                     }
-        element_counter_and_validity = {"fixed_elements": 0, "total_elements": 0, "valid_elements": 0,
-                                        "invalid_elements": 0, "is_valid": True}
         variable = input_data[var_name]
         variable_properties = reduce(lambda d, key: d[key], [var_name],
                                      self.__metadata["properties"][properties_blob_key])
 
         for element_num in range(len(variable)):
             element_counter_and_validity["total_elements"] += 1
-            self.total_elements_counter += 1
             is_valid = self._validate_input_type_dynamic(variable_properties, var_name, variable[element_num])
             if is_valid:
                 element_counter_and_validity["valid_elements"] += 1
-                self.valid_elements_counter += 1
             else:
                 is_fixed = self._fix_data(variable_properties, [var_name, element_num], input_data)
                 if is_fixed:
                     element_counter_and_validity["fixed_elements"] += 1
-                    self.fixed_elements_counter += 1
                 else:
                     element_counter_and_validity["invalid_elements"] += 1
                     element_counter_and_validity["is_valid"] = False
-                    self.invalid_elements_counter += 1
                     om.add_warning("Invalid unfixable element found",
                                    f"{var_name} element {element_num} was invalid and could not be fixed", info_map)
                     if eager_termination:
@@ -355,7 +359,8 @@ class InputManager:
         return element_counter_and_validity
 
     def _validate_json_element(self, element_hierarchy: List[str], properties_blob_key: str,   # noqa
-                               input_data: Dict[str, Any], eager_termination: bool, ) -> dict:
+                               input_data: Dict[str, Any], eager_termination: bool,
+                               element_counter_and_validity: Dict[str, Any], ) -> dict:
         """
         Receives data loaded from json input file, recursively finds and then validates nested elements,
         attempts to fix any invalid elements, and tracks the number of valid, invalid, fixed,
@@ -375,6 +380,11 @@ class InputManager:
         eager_termination : bool
             If true, the process will be terminated upon finding invalid data.
 
+        element_counter_and_validity : Dict[str, Any]
+            A dictionary that collects the counts of total elements checked,
+            invalid elements, valid elements, and fixed elements as well as a boolean
+            which is True if the data is valid, False otherwise.
+
         Returns
         -------
         dict
@@ -387,8 +397,6 @@ class InputManager:
         info_map = {"class": self.__class__.__name__,
                     "function": self._validate_json_element.__name__,
                     }
-        element_counter_and_validity = {"fixed_elements": 0, "total_elements": 0, "valid_elements": 0,
-                                        "invalid_elements": 0, "is_valid": True}
         try:
             variable_properties = reduce(lambda d, key: d[key], element_hierarchy,
                                          self.__metadata["properties"][properties_blob_key])
@@ -406,7 +414,8 @@ class InputManager:
                 if nested_key not in variable_properties_to_ignore:
                     element_hierarchy.append(nested_key)
                     element_counter_and_validity = self._validate_json_element(element_hierarchy, properties_blob_key,
-                                                                               input_data, eager_termination)
+                                                                               input_data, eager_termination,
+                                                                               element_counter_and_validity)
                     is_child_valid = element_counter_and_validity["is_valid"]
                     if eager_termination and not is_child_valid:
                         return element_counter_and_validity
@@ -433,21 +442,17 @@ class InputManager:
             is_valid = self._validate_input_type_dynamic(variable_properties, var_name, input_data_value)
 
             element_counter_and_validity["total_elements"] += 1
-            self.total_elements_counter += 1
             if is_valid:
                 element_counter_and_validity["valid_elements"] += 1
-                self.valid_elements_counter += 1
                 return element_counter_and_validity
             else:
                 is_fixed = self._fix_data(variable_properties, element_hierarchy, input_data)
                 if is_fixed:
                     element_counter_and_validity["fixed_elements"] += 1
-                    self.fixed_elements_counter += 1
                 else:
                     om.add_warning("Invalid unfixable element found",
                                    f"{var_name} was invalid and could not be fixed", info_map)
                     element_counter_and_validity["invalid_elements"] += 1
-                    self.invalid_elements_counter += 1
                     element_counter_and_validity["is_valid"] = False
                 return element_counter_and_validity
 
@@ -724,8 +729,4 @@ class InputManager:
                     "function": self.flush_pool.__name__,
                     }
         self.__pool = {}
-        self.total_elements_counter = 0
-        self.fixed_elements_counter = 0
-        self.valid_elements_counter = 0
-        self.invalid_elements_counter = 0
         om.add_log("Clear variable pool", "The pool is emptied.", info_map)
