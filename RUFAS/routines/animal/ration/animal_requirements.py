@@ -240,12 +240,29 @@ class AnimalRequirements:
 
         pen.set_milk_avgs(self.avg_milk, self.avg_CP_milk, self.avg_milk_production_reduction)
 
-    def recalculate_requirements(self, pen, animal_grouping_scenario, requirements_lists):
-        # iterating through each animal in the pen and calculating requirements
-        # temp parameter for heifer is hardcoded because heifer req should
-        # never have to be recalculated
+    def recalculate_requirements(self, pen, animal_grouping_scenario, requirements_lists: Dict):
+        """
+        Calculates requirements for every animal in a pen and appends each value to a list in a dictionary
+         of requirements.
+
+        Parameters
+        ----------
+        pen : Pen
+            Instance of an object of class Pen
+
+        animal_grouping_scenario : AnimalGroupingScenario
+            the valid animal combinations inside the pen, an instance of the AnimalCombination Enum
+
+        requirements_lists : dict
+            Dictionary of requirements for each animal
+
+        Returns
+        -------
+        requirements_list : dict
+            Dictionary of lists of animal requirements for all animals
+
+        """
         for animal in pen.animals_in_pen:
-            # For now, assuming calves are handled separately
             animal_type = animal_grouping_scenario.get_animal_type(animal)
             if animal_type in [AnimalType.HEIFER_I]:
                 req = self.calc_rqmts(
@@ -322,11 +339,31 @@ class AnimalRequirements:
         return requirements_lists
 
     def use_existing_requirements(self, pen, animal_grouping_scenario, requirements_lists: Dict):
-        # iterating through each animal in the pen and setting requirements
+        """
+        Finds previous set of requirements for every animal in a pen and appends each value to a list in a dictionary
+         of requirements.
+        In the case of net energy for activity, this must be recalculated for lactating animals.
+
+        Parameters
+        ----------
+        pen : Pen
+            Instance of an object of class Pen
+
+        animal_grouping_scenario : AnimalGroupingScenario
+            the valid animal combinations inside the pen, an instance of the AnimalCombination Enum
+
+        requirements_lists : dict
+            Dictionary of requirements for each animal
+
+        Returns
+        -------
+        requirements_list : dict
+            Dictionary of lists of animal requirements for all animals in pen
+
+        """
         for animal in pen.animals_in_pen:
             animal_type = animal_grouping_scenario.get_animal_type(animal)
             if animal_type in [AnimalType.LAC_COW]:
-                # calculating the activity requirement for energy
                 animal.calc_daily_walking_dist(pen.vertical_dist_to_parlor, pen.horizontal_dist_to_parlor)
                 NEa_val = self.energy_activity_rqmts(
                     animal.body_weight, pen.housing_type, (math.sqrt(animal.DVD**2 + animal.DHD**2))
@@ -478,7 +515,6 @@ class AnimalRequirements:
                 mature_body_weight,
                 day_of_pregnancy,
                 animal_type,
-                lactating,
                 average_daily_gain,
                 milk_production,
             )
@@ -1263,7 +1299,6 @@ class AnimalRequirements:
         mature_body_weight: float,
         day_of_pregnancy: Optional[int],
         animal_type: AnimalType,
-        lactating: bool,
         average_daily_gain: float,
         milk_production,
     ) -> float:
@@ -1281,8 +1316,6 @@ class AnimalRequirements:
             Day of pregnancy (days)
         animal_type : AnimalType
             A type or subtype of animal specified in the AnimalType enum
-        lactating : bool
-            To emphasyze this physiological condition?
         average_daily_gain : float
             Average daily gain (grams per day)
         milk_production: float
