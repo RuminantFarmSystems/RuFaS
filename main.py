@@ -52,7 +52,7 @@ def run_rufas(
 def set_global_variables(make_graphs: bool, verbose: bool) -> None:
     """Sets values of global variables in config/global_variables.py"""
     config.global_variables.PRODUCE_GRAPHICS = make_graphs
-    config.global_variables.PRINT_STATUS_MESSAGES = verbose  # TODO: this is currently unimplemented - GitHub Issue #211
+    config.global_variables.PRINT_STATUS_MESSAGES = verbose
 
 
 def run_validation(metadata_files: List[Path], exclude_info_maps: bool = False) -> None:
