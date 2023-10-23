@@ -819,7 +819,8 @@ def test_calculate_NASEM_energy_maintenance_requirements(
     routines/animal/ration/animal_requirements.py"""
     req = RUFAS.routines.animal.ration.animal_requirements.AnimalRequirements()
     result_NEmaint, result_GrUterW, result_UterW = req.calculate_NASEM_energy_maintenance_requirements(
-        animal_dict["body_weight"], animal_dict["mature_body_weight"], animal_dict["day_of_pregnancy"], animal_dict["DIM"]
+        animal_dict["body_weight"], animal_dict["mature_body_weight"], animal_dict["day_of_pregnancy"],
+        animal_dict["DIM"]
     )
     assert (result_NEmaint, result_GrUterW, result_UterW) == pytest.approx(expected, rel=1e-2)
 
@@ -885,7 +886,8 @@ def test_calculate_NASEM_protein_requirements(animal_dict: dict,
     req = AnimalRequirements()
     result_MP_req = req.calculate_NASEM_protein_requirements(
         animal_dict["lactating"], animal_dict["body_weight"], frame_w_gain, gruter_w_gain,
-        animal_dict["dry_matter_intake_estimate"], animal_dict["milk_protein"], animal_dict["Milk"], animal_dict["NDF_conc"]
+        animal_dict["dry_matter_intake_estimate"], animal_dict["milk_protein"], animal_dict["Milk"],
+        animal_dict["NDF_conc"]
     )
     assert (result_MP_req) == pytest.approx(expected, rel=1e-2)
 
