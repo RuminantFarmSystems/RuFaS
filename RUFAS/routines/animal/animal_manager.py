@@ -54,8 +54,8 @@ def daily_animal_routine(animal_manager, feed, weather, time):
     Args:
         animal_manager: instance of the AnimalManager class
         feed: instance of the Feed class
-        weather: instance of the Weather class as defined in classes.py
-        time: instance of the Time class as defined in classes.py
+        weather: instance of the Weather class
+        time: instance of the Time class
     """
 
     animal_manager.daily_updates(feed, weather, time)
@@ -264,8 +264,7 @@ class AnimalManager:
         are calculated and the animals are allocated to pens.
 
         Args:
-            config: an instance of the Config class defined in classes.py
-                contains model configuration information
+            config: an instance of the Config class contains model configuration information
             herd_data: dictionary containing information about the herd
         """
 
@@ -318,8 +317,8 @@ class AnimalManager:
 
         Args:
             feed: an instance of the Feed class defined in feed.py
-            weather: instance of the Weather class defined in classes.py
-            time: instance of the Time class defined in classes.py
+            weather: instance of the Weather class
+            time: instance of the Time class
         """
 
         # average vertical & horizontal distance (VD, HD) of pens to the
@@ -1607,9 +1606,9 @@ class AnimalManager:
         feed
             instance of the Feed class defined in feed.py
         weather
-            instance of the Weather class defined in classes.py
+            instance of the Weather class
         time
-            instance of the Time class defined in classes.py
+            instance of the Time class
 
         """
         if self.simulate_animals:

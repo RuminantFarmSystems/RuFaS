@@ -8,7 +8,11 @@ from typing import Optional
 import numpy
 
 from RUFAS import routines
-from RUFAS.classes import Config, State, Weather, Time
+from RUFAS.config import Config
+from RUFAS.state import State
+from RUFAS.weather import Weather
+from RUFAS.time import Time
+from RUFAS.output_manager import OutputManager
 from RUFAS.input_manager import InputManager
 from RUFAS.output_manager import OutputManager
 from RUFAS.routines.manure.manure_manager import simulate_daily_manure_manager
@@ -115,7 +119,7 @@ class SimulationEngine:
         """
         data_config = im.get_data('config')
         data_weather = im.get_data('weather')
-        self.config = Config(data_config, data_weather)
+        self.config = Config(data_config)
 
         if self.config.set_seed:
             random.seed(self.config.seed)
