@@ -9,6 +9,7 @@ from typing import Any, Dict
 from unittest.mock import patch
 from mock import MagicMock
 from pytest_mock import MockerFixture
+from pytest_lazyfixture import lazy_fixture
 from RUFAS.routines.animal.life_cycle.cow import Cow
 from RUFAS.routines.animal.animal_types import AnimalType
 import pytest
@@ -19,7 +20,6 @@ import RUFAS.routines.animal.clustering_pen_grouping
 from RUFAS.routines.animal.ration.ration_driver import AvailableFeeds
 from RUFAS.routines.animal.ration.ration_driver import RationManager
 from RUFAS.routines.animal.ration.ration_driver import RationReporter
-
 
 from RUFAS.routines.animal.ration.ration_optimizer import RationOptimizer
 
@@ -173,8 +173,143 @@ def heifer_c() -> dict:
     return heifer_c_dict
 
 
+@pytest.fixture
+def mock_ration_config() -> MagicMock:
+    ration_config = MagicMock()
+    ration_config.price_list = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0]
+    ration_config.n = 6
+    ration_config.NEmaint_requirement = 1.0
+    ration_config.NEa_requirement = 2.0
+    ration_config.NEpreg_requirement = 3.0
+    ration_config.NEl_requirement = 4.0
+    ration_config.NEg_requirement = 5.0
+    ration_config.MP_requirement = 6.0
+    ration_config.C_requirement = 7.0
+    ration_config.P_requirement = 8.0
+    ration_config.TDN_list = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0]
+    ration_config.DE_list = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0]
+    ration_config.EE_list = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0]
+    ration_config.is_fat_list = [1, 1, 1, 0, 0, 0]
+    ration_config.BW = 9.0
+    ration_config.calcium_list = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0]
+    ration_config.phosphorus_list = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0]
+    ration_config.NDF_list = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0]
+    ration_config.feed_type_list = ['Forage', 'Conc', 'Mineral', 'Forage', 'Conc', 'Mineral']
+    ration_config.is_wetforage_list = [1, 1, 1, 0, 0, 0]
+    ration_config.Kd_list = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0]
+    ration_config.N_A_list = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0]
+    ration_config.N_B_list = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0]
+    ration_config.CP_list = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0]
+    ration_config.dRUP_list = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0]
+    ration_config.feed_limit_list = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0]
+    ration_config.lactating = True
+    ration_config.DMIest_requirement = 10.0
+
+    ration_config.NElact_list = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0]
+    ration_config.MEact_list = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0]
+    ration_config.NEgact_list = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0]
+    ration_config.NEm_act_list = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0]
+    ration_config.is_forage_list = [1, 1, 1, 0, 0, 0]
+    ration_config.MPbact = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0]
+    ration_config.RUP_diet = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0]
+    ration_config.dP_list = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0]
+    ration_config.TDNact_list = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0]
+
+    return ration_config
+
+
+@pytest.fixture
+def mock_random_ration_config() -> MagicMock:
+    ration_config = MagicMock()
+    ration_config.price_list = [2.615, 0.544, 3.847, 3.585, 2.881, 1.342]
+    ration_config.n = 6
+    ration_config.NEmaint_requirement = 1.423
+    ration_config.NEa_requirement = 3.849
+    ration_config.NEpreg_requirement = 2.223
+    ration_config.NEl_requirement = 0.505
+    ration_config.NEg_requirement = 3.375
+    ration_config.MP_requirement = 2.207
+    ration_config.C_requirement = 3.205
+    ration_config.P_requirement = 1.17
+    ration_config.TDN_list = [2.976, 0.19, 3.855, 4.415, 3.181, 4.065]
+    ration_config.DE_list = [1.374, 4.783, 2.642, 4.42, 2.522, 2.397]
+    ration_config.EE_list = [4.314, 4.227, 3.704, 4.897, 0.49, 1.59]
+    ration_config.is_fat_list = [0, 1, 1, 1, 1, 0]
+    ration_config.BW = 2.227
+    ration_config.calcium_list = [3.79, 4.242, 4.276, 0.676, 2.767, 0.907]
+    ration_config.phosphorus_list = [3.275, 4.759, 0.653, 1.942, 0.914, 3.964]
+    ration_config.NDF_list = [2.548, 2.382, 3.086, 4.709, 0.145, 3.554]
+    ration_config.feed_type_list = ['Forage', 'Conc', 'Conc', 'Conc', 'Forage', 'Mineral']
+    ration_config.is_wetforage_list = [0, 1, 0, 0, 1, 1]
+    ration_config.Kd_list = [2.548, 2.382, 3.086, 4.709, 0.145, 3.554]
+    ration_config.N_A_list = [3.262, 2.552, 3.456, 2.377, 3.992, 4.561]
+    ration_config.N_B_list = [3.453, 0.098, 2.109, 1.191, 4.602, 1.85]
+    ration_config.CP_list = [3.489, 0.408, 4.415, 3.394, 2.497, 4.231]
+    ration_config.dRUP_list = [2.281, 2.537, 2.186, 3.58, 1.436, 1.876]
+    ration_config.feed_limit_list = [1.211, 0.908, 2.13, 3.851, 0.277, 4.266]
+    ration_config.lactating = True
+    ration_config.DMIest_requirement = 1.17
+
+    ration_config.NElact_list = [4.433, 1.648, 3.986, 1.527, 4.815, 1.883]
+    ration_config.MEact_list = [0.709, 1.781, 0.724, 3.533, 3.033, 4.017]
+    ration_config.NEgact_list = [4.827, 0.161, 2.234, 2.955, 4.31, 3.584]
+    ration_config.NEm_act_list = [3.757, 0.391, 0.259, 1.066, 0.782, 2.24]
+    ration_config.is_forage_list = [3.053, 4.154, 2.636, 2.901, 2.095, 1.296]
+    ration_config.MPbact = [2.47, 0.411, 1.933, 4.501, 2.679, 4.123]
+    ration_config.RUP_diet = [1.124, 4.395, 4.673, 1.696, 1.469, 1.478]
+    ration_config.dP_list = [4.678, 2.127, 4.902, 2.609, 3.125, 0.662]
+    ration_config.TDNact_list = [3.249, 4.541, 0.663, 0.392, 1.745, 4.876]
+
+    return ration_config
+
+
+@pytest.fixture
+def mock_ration_config_with_empty_NElact_list(mock_ration_config) -> MagicMock:
+    mock_ration_config.NElact_list = np.empty(1)
+    return mock_ration_config
+
+
+@pytest.fixture
+def mock_ration_config_with_empty_NEgact_list(mock_ration_config) -> MagicMock:
+    mock_ration_config.NEgact_list = np.empty(1)
+    return mock_ration_config
+
+
+@pytest.fixture
+def decision_vector() -> np.ndarray:
+    return np.array([1.0, 2.0, 3.0, 4.0, 5.0, 6.0])
+
+
+@pytest.fixture
+def decision_vector_sum_zero() -> np.ndarray:
+    return np.array([1.0, 2.0, 3.0, -3.0, -2.0 - 1.0])
+
+
+@pytest.fixture
+def mock_available_feeds() -> dict:
+    available_feeds = dict()
+    available_feeds['price'] = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0]
+    available_feeds['TDN'] = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0]
+    available_feeds['DE'] = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0]
+    available_feeds['EE'] = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0]
+    available_feeds['is_fat'] = [1, 1, 1, 0, 0, 0]
+    available_feeds['calcium'] = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0]
+    available_feeds['phosphorus'] = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0]
+    available_feeds['NDF'] = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0]
+    available_feeds['type'] = ['Forage', 'Conc', 'Mineral', 'Forage', 'Conc', 'Mineral']
+    available_feeds['is_wetforage'] = [1, 1, 1, 0, 0, 0]
+    available_feeds['Kd'] = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0]
+    available_feeds['N_A'] = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0]
+    available_feeds['N_B'] = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0]
+    available_feeds['CP'] = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0]
+    available_feeds['dRUP'] = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0]
+    available_feeds['lactating_cow_limit'] = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0]
+
+    return available_feeds
+
+
 def test_calculate_NRC_energy_maintenance_requirements(
-    cow_a: dict, cow_b: dict, heifer_a: dict, heifer_b: dict
+        cow_a: dict, cow_b: dict, heifer_a: dict, heifer_b: dict
 ) -> None:
     """Unit test for function calculate_NRC_energy_maintenance_requirements in file
     routines/animal/ration/animal_requirements.py"""
@@ -554,7 +689,7 @@ def test_calculate_NRC_DMI(cow_a: dict, cow_b: dict, heifer_a: dict, heifer_b: d
 
 
 def test_calculate_NASEM_energy_lactation_requirements(
-    cow_a: dict, cow_b: dict, heifer_a: dict, heifer_b: dict
+        cow_a: dict, cow_b: dict, heifer_a: dict, heifer_b: dict
 ) -> None:
     """Unit test for function calculate_NASEM_energy_lactation_requirements in file
     routines/animal/ration/animal_requirements.py"""
@@ -641,7 +776,7 @@ def test_calculate_NASEM_DMI(cow_a: dict, cow_b: dict, heifer_a: dict, heifer_b:
 
 
 def test_calculate_NASEM_energy_maintenance_requirements(
-    cow_a: dict, cow_b: dict, heifer_a: dict, heifer_b: dict
+        cow_a: dict, cow_b: dict, heifer_a: dict, heifer_b: dict
 ) -> None:
     """Unit test for function calculate_NASEM_energy_maintenance_requirements in file
     routines/animal/ration/animal_requirements.py"""
@@ -713,7 +848,7 @@ def test_calculate_NASEM_energy_growth_requirements(cow_a: dict, cow_b: dict, he
 
 
 def test_calculate_NASEM_energy_pregnancy_requirements(
-    cow_a: dict, cow_b: dict, heifer_a: dict, heifer_b: dict
+        cow_a: dict, cow_b: dict, heifer_a: dict, heifer_b: dict
 ) -> None:
     """Unit test for function calculate_NASEM_energy_pregnancy_requirements in file
     routines/animal/ration/animal_requirements.py"""
@@ -1131,9 +1266,9 @@ def test___str__():
     [
         ([], ["dummy"], [-1]),
         (
-            [(1, 2, "event1"), (3, 4, "event2"), (5, 6, "event1"), (7, 8, "event3")],
-            ["event1", "event2", "event3", "event0"],
-            [5, 3, 7, -1],
+                [(1, 2, "event1"), (3, 4, "event2"), (5, 6, "event1"), (7, 8, "event3")],
+                ["event1", "event2", "event3", "event0"],
+                [5, 3, 7, -1],
         ),
     ],
 )
@@ -1653,21 +1788,21 @@ def test_optimize(mocker: MockerFixture):
 def test_calc_requirements():
     """Unit test for function calc_requirements in file routines/animal/ration/calf_ration.py"""
     animal_intake = {
-                    'whole_milk_intake': 1,
-                    'milk_replacer_intake': 1,
-                    'starter_intake': 1,
-                    'wean_start': 1,
-                    'milk_reduction': 1,
-                    'milk_intake_wean': 1,
-                    'dm_intake': 1,
-                    'me_intake': 1,
-                    'cp_intake': 1,
-                    'adp_intake': 1,
-                    'milk_me_proportion': 1,
-                    'starter_me_proportion': 1,
-                    'milk_proportion': 1,
-                    'starter_proportion': 1
-                    }
+        'whole_milk_intake': 1,
+        'milk_replacer_intake': 1,
+        'starter_intake': 1,
+        'wean_start': 1,
+        'milk_reduction': 1,
+        'milk_intake_wean': 1,
+        'dm_intake': 1,
+        'me_intake': 1,
+        'cp_intake': 1,
+        'adp_intake': 1,
+        'milk_me_proportion': 1,
+        'starter_me_proportion': 1,
+        'milk_proportion': 1,
+        'starter_proportion': 1
+    }
     feed = MagicMock()
     feed.calf_feeds = {155: {'DM': 1, 'CP': 1, 'DE': 1},
                        156: {'DM': 1, 'CP': 1, 'DE': 1},
@@ -1756,74 +1891,403 @@ def test_triple_values_in_list(input, expected) -> None:
     assert ration_optimizer.triple_values_in_list(input) == expected
 
 
-def test_attempt_optimization():
+def test_init_ration_optimizer():
+    """Unit test for function __init__ in file routines/animal/ration/ration_optimizer.py"""
+    ration_optimizer = RationOptimizer()
+
+    assert ration_optimizer.cow_cons == []
+    assert ration_optimizer.heifer_cons == []
+    assert ration_optimizer.constraint_functions == []
+
+
+def test_set_constraints():
+    """Unit test for function set_constraints in file routines/animal/ration/ration_optimizer.py"""
+    ration_optimizer = RationOptimizer()
+    arguments = MagicMock()
+    ration_optimizer.set_constraints(arguments)
+
+    assert ration_optimizer.constraint_functions == [
+        ration_optimizer.total_energy,
+        ration_optimizer.NEmact_constraint,
+        ration_optimizer.NEl_constraint,
+        ration_optimizer.NEgact_constraint,
+        ration_optimizer.calcium_constraint,
+        ration_optimizer.phosphorus_constraint,
+        ration_optimizer.protein_constraint,
+        ration_optimizer.NDF_constraint_lower,
+        ration_optimizer.NDF_constraint_upper,
+        ration_optimizer.forage_NDF_constraint,
+        ration_optimizer.fat_constraint,
+        ration_optimizer.DMI_constraint_upper,
+        ration_optimizer.DMI_constraint_lower
+    ]
+
+    assert ration_optimizer.cow_cons == [{'type': 'ineq', 'fun': func, 'args': arguments} for func in
+                                         ration_optimizer.constraint_functions]
+
+    assert ration_optimizer.heifer_cons == [cons for cons in ration_optimizer.cow_cons if
+                                            cons['fun'] not in [ration_optimizer.total_energy,
+                                                                ration_optimizer.NEl_constraint,
+                                                                ration_optimizer.DMI_constraint_lower]]
+
+
+def test_get_ration_vals():
+    """Unit test for function get_ration_vals in file routines/animal/ration/ration_optimizer.py"""
+    ration_optimizer = RationOptimizer()
+    decision_vector = [1.0, 2.0, 3.0, 4.0, 5.0]
+    ration_config = MagicMock()
+    ration_config.MEact_list = [6.0, 7.0, 8.0, 9.0, 10.0]
+
+    actual = ration_optimizer.get_ration_vals(decision_vector, ration_config)
+
+    expected = {'ME_total': 130.0}
+
+    assert actual == expected
+
+
+@pytest.mark.parametrize("ration_config, expected", [(lazy_fixture('mock_ration_config'), 13.687246),
+                                                     (lazy_fixture('mock_random_ration_config'),
+                                                      27.327894)])
+def test_total_energy(ration_config, expected, decision_vector) -> None:
+    """Unit test for function total_energy in file routines/animal/ration/ration_optimizer.py"""
+    ration_optimizer = RationOptimizer()
+
+    actual = ration_optimizer.total_energy(decision_vector, ration_config)
+
+    assert actual == pytest.approx(expected)
+
+
+def test_attempt_optimization(mocker: MockerFixture, mock_ration_config: MagicMock, mock_available_feeds: dict) -> None:
     """Unit test for function attempt_optimization in file routines/animal/ration/ration_optimizer.py"""
-    pass
+
+    def mock_triple_values_in_list(x): return x
+
+    mock_RationConfig = mocker.patch("RUFAS.routines.animal.ration.ration_optimizer.RationConfig")
+    mock_optimize = mocker.patch("RUFAS.routines.animal.ration.ration_optimizer.RationOptimizer.optimize")
+    mocker.patch("RUFAS.routines.animal.ration.ration_optimizer.RationOptimizer.get_ration_vals")
+    mocker.patch("RUFAS.routines.animal.ration.ration_optimizer.RationOptimizer.triple_values_in_list",
+                 side_effect=mock_triple_values_in_list)
+
+    ration_optimizer = RationOptimizer()
+    requirements = MagicMock()
+
+    requirements.NEmaint_requirement = 1.0
+    requirements.NEa_requirement = 2.0
+    requirements.NEpreg_requirement = 3.0
+    requirements.NEl_requirement = 4.0
+    requirements.NEg_requirement = 5.0
+    requirements.MP_requirement = 6.0
+    requirements.C_requirement = 7.0
+    requirements.P_requirement = 8.0
+    requirements.avg_BW = 9.0
+    requirements.DMIest_requirement = 10.0
+
+    animal_combination = 'AnimalCombination.LAC_COW'
+
+    ration_optimizer.attempt_optimization(requirements, mock_available_feeds, animal_combination)
+
+    mock_RationConfig.assert_called_once_with(
+        mock_available_feeds['price'], requirements.NEmaint_requirement, requirements.NEa_requirement,
+        requirements.NEpreg_requirement,
+        requirements.NEl_requirement, requirements.NEg_requirement, requirements.MP_requirement,
+        requirements.Ca_requirement, requirements.P_requirement,
+        mock_available_feeds['TDN'], mock_available_feeds['DE'], mock_available_feeds['EE'],
+        mock_available_feeds['is_fat'],
+        requirements.avg_BW,
+        mock_available_feeds['calcium'], mock_available_feeds['phosphorus'], mock_available_feeds['NDF'],
+        mock_available_feeds['type'], mock_available_feeds['is_wetforage'], mock_available_feeds['Kd'],
+        mock_available_feeds['N_A'],
+        mock_available_feeds['N_B'], mock_available_feeds['CP'], mock_available_feeds['dRUP'],
+        mock_available_feeds['lactating_cow_limit'],
+        True,
+        DMIest__requirement=requirements.DMIest_requirement
+    )
+
+    ration_optimizer.optimize.assert_called_once_with(animal_combination, mock_available_feeds,
+                                                      mock_RationConfig.return_value)
+
+    ration_optimizer.get_ration_vals.assert_called_once_with(mock_optimize.return_value.x,
+                                                             mock_RationConfig.return_value)
 
 
-def test_objective():
+@pytest.mark.parametrize("ration_config, expected", [(lazy_fixture('mock_ration_config'), 91.0),
+                                                     (lazy_fixture('mock_random_ration_config'),
+                                                      52.041)])
+def test_objective(ration_config, expected, decision_vector) -> None:
     """Unit test for function objective in file routines/animal/ration/ration_optimizer.py"""
-    pass
+    ration_optimizer = RationOptimizer()
+
+    actual = ration_optimizer.objective(decision_vector, ration_config)
+
+    assert actual == pytest.approx(expected)
 
 
-def test_NEmact_constraint():
+@pytest.mark.parametrize("ration_config, expected", [(lazy_fixture('mock_ration_config'), 88.0),
+                                                     (lazy_fixture('mock_random_ration_config'),
+                                                      21.658)])
+def test_NEmact_constraint(ration_config, expected, decision_vector) -> None:
     """Unit test for function NEmact_constraint in file routines/animal/ration/ration_optimizer.py"""
-    pass
+    ration_optimizer = RationOptimizer()
+
+    actual = ration_optimizer.NEmact_constraint(decision_vector, ration_config)
+
+    assert actual == pytest.approx(expected)
 
 
-def test_NEl_constraint():
+@pytest.mark.parametrize("ration_config, expected", [(lazy_fixture('mock_ration_config'), 84.0),
+                                                     (lazy_fixture('mock_ration_config_with_empty_NElact_list'), 14.0),
+                                                     (lazy_fixture('mock_random_ration_config'),
+                                                      58.44)])
+def test_NEl_constraint(ration_config, expected, decision_vector) -> None:
     """Unit test for function NEl_constraint in file routines/animal/ration/ration_optimizer.py"""
-    pass
+    ration_optimizer = RationOptimizer()
+
+    actual = ration_optimizer.NEl_constraint(decision_vector, ration_config)
+
+    assert actual == pytest.approx(expected)
 
 
-def test_NEgact_constraint():
+@pytest.mark.parametrize("ration_config, expected", [(lazy_fixture('mock_ration_config'), 86.0),
+                                                     # (lazy_fixture('mock_ration_config_with_empty_NEgact_list'),
+                                                     # 16.0),
+                                                     (lazy_fixture('mock_random_ration_config'),
+                                                      63.349999999999994)])
+def test_NEgact_constraint(ration_config, expected, decision_vector) -> None:
     """Unit test for function NEgact_constraint in file routines/animal/ration/ration_optimizer.py"""
-    pass
+    ration_optimizer = RationOptimizer()
+
+    actual = ration_optimizer.NEgact_constraint(decision_vector, ration_config)
+
+    assert actual == pytest.approx(expected)
 
 
-def test_calcium_constraint():
+@pytest.mark.parametrize("ration_config, expected", [(lazy_fixture('mock_ration_config'), 0.6455),
+                                                     (lazy_fixture('mock_random_ration_config'),
+                                                      0.245465)])
+def test_calcium_constraint(ration_config, expected, decision_vector) -> None:
     """Unit test for function calcium_constraint in file routines/animal/ration/ration_optimizer.py"""
-    pass
+    ration_optimizer = RationOptimizer()
+
+    actual = ration_optimizer.calcium_constraint(decision_vector, ration_config)
+
+    assert actual == pytest.approx(expected)
 
 
-def test_phosphorus_constraint():
+@pytest.mark.parametrize("ration_config, expected", [(lazy_fixture('mock_ration_config'), 0.6638),
+                                                     (lazy_fixture('mock_random_ration_config'),
+                                                      0.374025)])
+def test_phosphorus_constraint(ration_config, expected, decision_vector) -> None:
     """Unit test for function phosphorus_constraint in file routines/animal/ration/ration_optimizer.py"""
-    pass
+    ration_optimizer = RationOptimizer()
+
+    actual = ration_optimizer.phosphorus_constraint(decision_vector, ration_config)
+
+    assert actual == pytest.approx(expected)
 
 
-def test_protein_constraint():
+@pytest.mark.parametrize("ration_config, expected", [(lazy_fixture('mock_ration_config'), 135.148700),
+                                                     (lazy_fixture('mock_random_ration_config'),
+                                                      113.147389)])
+def test_protein_constraint(ration_config, expected, decision_vector) -> None:
     """Unit test for function protein_constraint in file routines/animal/ration/ration_optimizer.py"""
-    pass
+    ration_optimizer = RationOptimizer()
+
+    actual = ration_optimizer.protein_constraint(decision_vector, ration_config)
+
+    assert actual == pytest.approx(expected)
 
 
-def test_NDF_constraint_lower():
+@pytest.mark.parametrize("ration_config, decision_vec, expected",
+                         [(lazy_fixture('mock_ration_config'),
+                           lazy_fixture('decision_vector'), -20.666667),
+                          (lazy_fixture('mock_random_ration_config'),
+                           lazy_fixture('decision_vector'), -22.264048),
+                          (lazy_fixture('mock_ration_config'),
+                           lazy_fixture('decision_vector_sum_zero'), None)
+                          ])
+def test_NDF_constraint_lower(ration_config, decision_vec, expected) -> None:
     """Unit test for function test_NDF_constraint_lower in file routines/animal/ration/ration_optimizer.py"""
-    pass
+    ration_optimizer = RationOptimizer()
+
+    actual = ration_optimizer.NDF_constraint_lower(decision_vec, ration_config)
+
+    assert actual == pytest.approx(expected)
 
 
-def test_NDF_constraint_upper():
+@pytest.mark.parametrize("ration_config, decision_vec, expected",
+                         [(lazy_fixture('mock_ration_config'),
+                           lazy_fixture('decision_vector'), 40.666666),
+                          (lazy_fixture('mock_random_ration_config'),
+                           lazy_fixture('decision_vector'), 42.264047),
+                          (lazy_fixture('mock_ration_config'),
+                           lazy_fixture('decision_vector_sum_zero'), None)
+                          ])
+def test_NDF_constraint_upper(ration_config, decision_vec, expected) -> None:
     """Unit test for function NDF_constraint_upper in file routines/animal/ration/ration_optimizer.py"""
-    pass
+    ration_optimizer = RationOptimizer()
+
+    actual = ration_optimizer.NDF_constraint_upper(decision_vec, ration_config)
+
+    assert actual == pytest.approx(expected)
 
 
-def test_forage_NDF_constraint():
+@pytest.mark.parametrize("ration_config, decision_vec, expected",
+                         [(lazy_fixture('mock_ration_config'),
+                           lazy_fixture('decision_vector'), -14.190476),
+                          (lazy_fixture('mock_random_ration_config'),
+                           lazy_fixture('decision_vector'), -14.844142),
+                          (lazy_fixture('mock_ration_config'),
+                           lazy_fixture('decision_vector_sum_zero'), None)
+                          ])
+def test_forage_NDF_constraint(ration_config, decision_vec, expected) -> None:
     """Unit test for function forage_NDF_constraint in file routines/animal/ration/ration_optimizer.py"""
-    pass
+    ration_optimizer = RationOptimizer()
+
+    actual = ration_optimizer.forage_NDF_constraint(decision_vec, ration_config)
+
+    assert actual == pytest.approx(expected)
 
 
-def test_fat_constraint():
+@pytest.mark.parametrize("ration_config, decision_vec, expected",
+                         [(lazy_fixture('mock_ration_config'),
+                           lazy_fixture('decision_vector'), 2.666666),
+                          (lazy_fixture('mock_random_ration_config'),
+                           lazy_fixture('decision_vector'), 4.359142),
+                          (lazy_fixture('mock_ration_config'),
+                           lazy_fixture('decision_vector_sum_zero'), None)
+                          ])
+def test_fat_constraint(ration_config, decision_vec, expected) -> None:
     """Unit test for function fat_constraint in file routines/animal/ration/ration_optimizer.py"""
-    pass
+
+    ration_optimizer = RationOptimizer()
+
+    actual = ration_optimizer.fat_constraint(decision_vec, ration_config)
+
+    assert actual == pytest.approx(expected)
 
 
-def test_DMI_constraint():
+@pytest.mark.parametrize("ration_config, expected", [(lazy_fixture('mock_ration_config'), 13.0),
+                                                     (lazy_fixture('mock_random_ration_config'),
+                                                      20.064)])
+def test_DMI_constraint(ration_config, expected, decision_vector) -> None:
     """Unit test for function DMI_constraint in file routines/animal/ration/ration_optimizer.py"""
-    pass
+    ration_optimizer = RationOptimizer()
+
+    actual = ration_optimizer.DMI_constraint_lower(decision_vector, ration_config)
+
+    assert actual == pytest.approx(expected)
 
 
-def test_ration_optimizer_optimize():
+@pytest.mark.parametrize("ration_config, expected", [(lazy_fixture('mock_ration_config'), -9.0),
+                                                     (lazy_fixture('mock_random_ration_config'),
+                                                      -19.596)])
+def test_DMI_constraint_upper(ration_config, expected, decision_vector) -> None:
+    """Unit test for function DMI_constraint_upper in file routines/animal/ration/ration_optimizer.py"""
+    ration_optimizer = RationOptimizer()
+
+    actual = ration_optimizer.DMI_constraint_upper(decision_vector, ration_config)
+
+    assert actual == pytest.approx(expected)
+
+
+@pytest.fixture
+def mock_cow_cons() -> MagicMock():
+    return MagicMock(name="cow_cons")
+
+
+@pytest.fixture
+def mock_heifer_cons() -> MagicMock():
+    return MagicMock(name="heifer_cons")
+
+
+@pytest.fixture
+def ration_optimizer(mock_cow_cons: MagicMock, mock_heifer_cons: MagicMock) -> RationOptimizer:
+    ration_optimizer = RationOptimizer()
+
+    def objective(x, _): sum(x)
+
+    ration_optimizer.objective = objective
+    ration_optimizer.cow_cons = mock_cow_cons
+    ration_optimizer.heifer_cons = mock_heifer_cons
+
+    return ration_optimizer
+
+
+@pytest.mark.parametrize("udr_or_not, animal_combination, expected_x0, expected_bounds, expected_constraints", [
+    (
+            True, 'AnimalCombination.LAC_COW', [0.5, 1.0, 1.5, 2.0, 2.5, 3.0],
+            [(0, 1), (0, 2), (0, 3), (0, 4), (0, 5), (0, 6)],
+            lazy_fixture('mock_cow_cons')),
+    (
+            True, 'AnimalCombination.GROWING', [0.5, 1.0, 1.5, 2.0, 2.5, 3.0],
+            [(0, 1), (0, 2), (0, 3), (0, 4), (0, 5), (0, 6)],
+            lazy_fixture('mock_heifer_cons')),
+    (
+            False, 'AnimalCombination.LAC_COW', [1, 1, 1, 1, 1, 1],
+            [(0, 0.3334333333333333),
+             (0, 0.6667666666666666),
+             (0, 1.0001),
+             (0, 1.3334333333333332),
+             (0, 1.6667666666666667),
+             (0, 2.0001)],
+            lazy_fixture('mock_cow_cons')),
+    (
+            False, 'AnimalCombination.GROWING', [1, 1, 1, 1, 1, 1],
+            [(0, 0.3334333333333333),
+             (0, 0.6667666666666666),
+             (0, 1.0001),
+             (0, 1.3334333333333332),
+             (0, 1.6667666666666667),
+             (0, 2.0001)],
+            lazy_fixture('mock_heifer_cons')),
+
+])
+def test_ration_optimizer_optimize(mocker: MockerFixture, mock_ration_config: MagicMock,
+                                   mock_available_feeds: dict, ration_optimizer: RationOptimizer, udr_or_not: bool,
+                                   animal_combination: str,
+                                   expected_x0: list[float],
+                                   expected_bounds: list[float],
+                                   expected_constraints: MagicMock) -> None:
     """Unit test for function optimize in file routines/animal/ration/ration_optimizer.py"""
-    pass
+
+    mocker.patch("RUFAS.routines.animal.ration.ration_optimizer.udrm",
+                 MagicMock(udr_or_not=udr_or_not))
+    mocker.patch("RUFAS.routines.animal.ration.ration_optimizer.RationOptimizer.set_constraints")
+    mocker.patch("RUFAS.routines.animal.ration.ration_optimizer.RationOptimizer.make_user_bounds",
+                 return_value=[(0, 1), (0, 2), (0, 3), (0, 4), (0, 5), (0, 6)])
+    mock_ration_to_use = mocker.patch(
+        "RUFAS.routines.animal.ration.user_defined_ration.UserDefinedRationManager.ration_to_use")
+    mock_minimize = mocker.patch("RUFAS.routines.animal.ration.ration_optimizer.minimize")
+    mocker.patch("RUFAS.routines.animal.ration.ration_optimizer.random.random", return_value=0.1)
+
+    assert ration_optimizer.optimize(animal_combination, mock_available_feeds,
+                                     mock_ration_config) == mock_minimize.return_value
+
+    ration_optimizer.set_constraints.assert_called_once_with(arguments=(mock_ration_config,))
+
+    if udr_or_not:
+        mock_ration_to_use.assert_called_once_with(animal_combination, mock_available_feeds)
+
+        ration_optimizer.make_user_bounds.assert_called_once_with(mock_ration_to_use.return_value,
+                                                                  mock_ration_config.DMIest_requirement)
+
+    mock_minimize.assert_called_once_with(ration_optimizer.objective, expected_x0, method='SLSQP',
+                                          bounds=expected_bounds,
+                                          constraints=expected_constraints, args=(mock_ration_config,))
+
+
+def test_ration_optimizer_optimize_value_error(mocker: MockerFixture, mock_ration_config: MagicMock,
+                                               mock_available_feeds: dict, ration_optimizer: RationOptimizer) -> None:
+    """Unit test for value error in function optimize in file routines/animal/ration/ration_optimizer.py"""
+    mocker.patch("RUFAS.routines.animal.ration.ration_optimizer.udrm",
+                 MagicMock(udr_or_not=False))
+    mocker.patch("RUFAS.routines.animal.ration.ration_optimizer.RationOptimizer.set_constraints")
+
+    animal_combination = 'AnimalCombination.CALF'
+
+    with pytest.raises(ValueError, match="Invalid animal combination: AnimalCombination.CALF"):
+        ration_optimizer.optimize(animal_combination, mock_available_feeds,
+                                  mock_ration_config)
 
 
 def test_calc_rqmts():
@@ -1895,26 +2359,26 @@ def test_make_ration_from_solution():
     [
         ({"2": 3, "4": 6, "status": True, "objective": False}, [1, 1, 1, 2, 2, 2]),
         (
-            {"2": 3, "status": True, "objective": False},
-            [
-                1,
-                1,
-                1,
-            ],
+                {"2": 3, "status": True, "objective": False},
+                [
+                    1,
+                    1,
+                    1,
+                ],
         ),
         (
-            {
-                "2": 3,
-                "4": 6,
-            },
-            [1, 1, 1, 2, 2, 2],
+                {
+                    "2": 3,
+                    "4": 6,
+                },
+                [1, 1, 1, 2, 2, 2],
         ),
         (
-            {
-                "2": 3,
-                "4": 12,
-            },
-            [1, 1, 1, 4, 4, 4],
+                {
+                    "2": 3,
+                    "4": 12,
+                },
+                [1, 1, 1, 4, 4, 4],
         ),
     ],
 )
@@ -1958,9 +2422,9 @@ def ineq_constraint(x, ration_config):
     "solution_x,constraint,expected",
     [
         (
-            np.array([2, 3, 5]),
-            {"type": "eq", "fun": eq_constraint},
-            False,
+                np.array([2, 3, 5]),
+                {"type": "eq", "fun": eq_constraint},
+                False,
         ),  # Constraint not violated, hence expecting False
         (np.array([2, 3, 4]), {"type": "eq", "fun": eq_constraint}, True),
         (np.array([1, 3, 5]), {"type": "ineq", "fun": ineq_constraint}, True),
@@ -2192,7 +2656,7 @@ def test_set_lactation_curve_params(wood_l, wood_m, wood_n, mock_cow_args) -> No
     ],
 )
 def test_calculate_daily_milk_produced(
-    lactation_curve, wood_l, wood_m, wood_n, days_in_milk, expected_milk, mock_cow_args
+        lactation_curve, wood_l, wood_m, wood_n, days_in_milk, expected_milk, mock_cow_args
 ) -> None:
     """Unit test for function set_lactation_curve_params in file routines/animal/life_cycle/cow.py"""
     AnimalBase.config = MagicMock()
@@ -2401,19 +2865,19 @@ def test_report_ration_supply(mocker: MockerFixture) -> None:
 
     actual = RationReporter.report_ration_supply(ration, available_feeds, ration_report, body_weight)
     expected = {
-            'ME': 3.0,
-            'DE': 3.0,
-            'NE_maintenance_and_activity': 3.0,
-            'NE_lactation': 3.0,
-            'NE_growth': 3.0,
-            'calcium': 3.0,
-            'phosphorus': 3.0,
-            'fat': 3.0,
-            'fat_percentage': 3.0,
-            'forage_NDF': 3.0,
-            'forage_NDF_percent': 0.5,
-            'metabolizable_protein': 1.0
-        }
+        'ME': 3.0,
+        'DE': 3.0,
+        'NE_maintenance_and_activity': 3.0,
+        'NE_lactation': 3.0,
+        'NE_growth': 3.0,
+        'calcium': 3.0,
+        'phosphorus': 3.0,
+        'fat': 3.0,
+        'fat_percentage': 3.0,
+        'forage_NDF': 3.0,
+        'forage_NDF_percent': 0.5,
+        'metabolizable_protein': 1.0
+    }
     assert actual == expected
 
 
@@ -2424,7 +2888,7 @@ def test_report_ration_supply(mocker: MockerFixture) -> None:
     ({'nutrient_amount': {'TDN': 2}, 'nutrient_conc': {'TDN': 61}}, 100, 0.9903),
     ({'nutrient_amount': {'TDN': 1}, 'nutrient_conc': {'TDN': 59}}, 100, 1.0),
 
-    ])
+])
 def test_get_TDN_discount(ration_report: dict, body_weight: float, expected: float) -> None:
     """ Unit test for function get_TDN_discount in file routines/animal/ration/ration_driver.py"""
     actual = RationReporter.get_TDN_discount(ration_report, body_weight)
@@ -2435,7 +2899,7 @@ def test_get_TDN_discount(ration_report: dict, body_weight: float, expected: flo
     ('dummy_variable', {'DE': 2}, 'dummy_variable', 'dummy_variable', 1.0),
     ('dummy_variable', {'DE': 1}, 'dummy_variable', 'dummy_variable', 0.5),
     ('dummy_variable', {'DE': 0}, 'dummy_variable', 'dummy_variable', 0.0),
-    ])
+])
 def test_get_DE(kg_fed: float, feed_item_info: dict, ration_report: dict, body_weight: float, expected: float,
                 mocker: MockerFixture) -> None:
     """ Unit test for function get_DE in file routines/animal/ration/ration_driver.py"""
@@ -2452,7 +2916,7 @@ def test_get_DE(kg_fed: float, feed_item_info: dict, ration_report: dict, body_w
     (1, {'type': 'not_mineral', 'is_fat': 1, 'DE': 1}, 'dummy_variable', 'dummy_variable', 1.0),
     (1, {'type': 'not_mineral', 'is_fat': 'dummy', 'EE': 4}, 'dummy_variable', 'dummy_variable', 1.5746),
     (1, {'type': 'not_mineral', 'is_fat': 'dummy', 'EE': 1}, 'dummy_variable', 'dummy_variable', 1.57),
-    ])
+])
 def test_get_ME(kg_fed: float, feed_item_info: dict, ration_report: dict, body_weight: float, expected: float,
                 mocker: MockerFixture) -> None:
     """ Unit test for function get_ME in file routines/animal/ration/ration_driver.py"""
@@ -2467,7 +2931,7 @@ def test_get_ME(kg_fed: float, feed_item_info: dict, ration_report: dict, body_w
     (0, {'is_fat': 'dummy'}, 'dummy_variable', 'dummy_variable', 0.0),
     (1, {'is_fat': 1}, 'dummy_variable', 'dummy_variable', 1.6),
     (1, {'is_fat': 0}, 'dummy_variable', 'dummy_variable', 1.152),
-    ])
+])
 def test_get_NE_maintenance_and_activity(kg_fed: float, feed_item_info: dict,
                                          ration_report: dict, body_weight: float,
                                          expected: float, mocker: MockerFixture) -> None:
@@ -2597,8 +3061,16 @@ def test_get_metabolizable_protein(mocker: MockerFixture) -> None:
                           'is_wetforage': 0, 'NDF': 1}}
     feed_path_d2 = {'8': {'type': 'Dummy', 'Kd': -100, 'N_A': 1, 'N_B': 1, 'CP': 1, 'dRUP': 1,
                           'is_wetforage': 0, 'NDF': 1}}
-    available_feeds = feed_path_a1 | feed_path_b1 | feed_path_c1 | feed_path_d1 | \
-        feed_path_a2 | feed_path_b2 | feed_path_c2 | feed_path_d2
+    available_feeds = (
+            feed_path_a1 |
+            feed_path_b1 |
+            feed_path_c1 |
+            feed_path_d1 |
+            feed_path_a2 |
+            feed_path_b2 |
+            feed_path_c2 |
+            feed_path_d2
+    )
     ration = {'1': 1, '2': 2, '3': 3, '4': 4, '5': 5, '6': 6, '7': 7, '8': 8}
     ration_report = {'nutrient_amount': {'TDN': 1}}
     body_weight = 100
