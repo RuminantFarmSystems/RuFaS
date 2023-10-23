@@ -47,6 +47,7 @@ class SolublePhosphorus:
         phosphorus is carried downward by percolating water and moving that phosphorus between the layers.
 
         """
+        self.data.phosphorus_runoff = 0.0
         if runoff > 0:
             phosphorus_runoff = self._determine_phosphorus_runoff_from_top_soil(
                 runoff, field_size, self.data.soil_layers[0].labile_inorganic_phosphorus_content,
@@ -67,6 +68,7 @@ class SolublePhosphorus:
                 current_layer.layer_thickness, current_layer.percent_clay_content, current_layer.percolated_water,
                 field_size)
 
+            current_layer.percolated_phosphorus = phosphorus_percolated
             current_layer.labile_inorganic_phosphorus_content -= phosphorus_percolated
             next_layer.labile_inorganic_phosphorus_content += phosphorus_percolated
 
