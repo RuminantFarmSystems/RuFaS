@@ -21,7 +21,7 @@ class Snow:
     soil_data : Optional[SoilData]
         The object that tracks all soil variable throughout the simulation.
     field_size : Optional[float]
-        The field size in ha.
+        The field size (ha).
 
     Methods
     -------
