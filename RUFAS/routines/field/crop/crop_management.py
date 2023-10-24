@@ -64,8 +64,6 @@ class CropManagement:
         self._record_yield(field_name, field_size, year, day)
         self._transfer_residue(soil_data, killed)
 
-    # TODO: implement grazing feature - issue #590
-
     # ---- Sub Methods ----
     # TODO: implement management practice for dry-down and collecting cut yields that have been left in the field - #353
 
@@ -179,9 +177,6 @@ class CropManagement:
             self.data.residue_nitrogen = self.data.yield_nitrogen_fraction * self.data.yield_residue
             self.data.residue_phosphorus = self.data.yield_phosphorus_fraction * self.data.yield_residue
 
-        # TODO: are above- and below-ground lignin residue (percent) needed?
-        #   in the old version, they were both hard-coded to 17 - GitHub Issue #163
-
     def _record_yield(self, field_name: str, field_size: float, year: int, day: int) -> None:
         """
         Records the mass and nutrients collected in an individual harvest and sends them to the OutputManager.
@@ -219,18 +214,26 @@ class CropManagement:
         ----------
         soil_data : SoilData
             Object that tracks the attributes of the soil profile that contains this crop.
+        killed : bool
+            Indicates whether the crop was killed by the harvest.
+
+        Notes
+        -----
+        If a crop is harvested but not killed, then there is only residue added to the surface. If it is harvested and
+        killed, then both surface and root residue is added to the soil profile.
 
         """
-        soil_data.plant_surface_residue += self.data.yield_residue
+        soil_data.crop_yield_nitrogen = self.data.residue_nitrogen
         if killed:
+            soil_data.plant_surface_residue = self.data.yield_residue - self.data.root_biomass
             soil_data.plant_root_residue = self.data.root_biomass
             soil_data.crop_root_depth = self.data.root_depth
-            soil_data.crop_yield_nitrogen = self.data.residue_nitrogen
         else:
-            soil_data.crop_yield_nitrogen = self.data.residue_nitrogen
-        # root residue
-        soil_data.soil_layers[0].fresh_organic_nitrogen_content += self.data.yield_nitrogen
-        # TODO: Add organic phosphorus to correct pool in soil - GitHub issue #444
+            soil_data.plant_surface_residue = self.data.yield_residue
+            soil_data.plant_root_residue = self.data.root_biomass = None
+            soil_data.crop_root_depth = None
+
+        soil_data.soil_layers[0].fresh_organic_nitrogen_content += self.data.residue_nitrogen
 
     # ---- Harvest Scheduling ----
 
