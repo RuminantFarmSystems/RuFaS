@@ -21,14 +21,14 @@ class Snow:
     soil_data : Optional[SoilData]
         The object that tracks all soil variable throughout the simulation.
     field_size : Optional[float]
-        The field size in ha.
+        The field size (ha).
 
     Methods
     -------
     _calc_snow_temp(current_day_weather: CurrentWeather) -> float:
         Calculate the snow pack temperature for the current day.
 
-    _melt_snow(current_day_weather: CurrentWeather, day: int):
+    _melt_snow(current_day_weather: CurrentWeather, day: int) -> float:
         Calculate the snow melt for the current day.
 
     _melt_factor(day: int) -> float:
@@ -60,7 +60,7 @@ class Snow:
         Returns
         -------
         float
-            The calculated snow pack temperature for the current day in Celsius.
+            The calculated snow pack temperature for the current day (Celsius).
             
         References
         ----------
@@ -148,7 +148,8 @@ class Snow:
         temperatures, and snow melting, based on the provided current day weather data
         and day of the simulation.
 
-        Note:
+        Notes
+        -----
         - If the current snow content is negative, a ValueError is raised.
         - If the snow content is 0.0, 'previous_day_snow_temperature' and 'current_day_snow_temperature' are set to None
           and 'snow_content' and 'snow_melt_amount' is set to 0.0.
