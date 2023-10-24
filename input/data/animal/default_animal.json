@@ -13,7 +13,7 @@
 	"animal_config": {
 		"management_decisions": {
 			"breeding_start_day_h": 380,
-			"heifer_repro_method": "TAI",
+			"heifer_repro_method": "ED",
 			"cow_repro_method": "TAI",
 			"semen_type": "conventional",
 			"days_in_preg_when_dry": 218,
@@ -39,6 +39,56 @@
 				"std_gestation_len": 6,
 				"prefresh_day": 30,
                 "calving_interval": 400,
+				"heifers": {
+					"estrus_detection_rate": 0.6,
+					"estrus_insemination_rate": 1,
+					"estrus_conception_rate": 0.6,
+					"repro_protocols": {
+						"ED": {
+							"sub_protocol": null,
+							"properties": {}
+						},
+						"TAI": {
+							"sub_protocol": "md5CG2P",
+							"properties": {}
+						},
+						"SynchED": {
+							"sub_protocol": "2P",
+							"properties": {}
+						}
+					}
+				},
+				"cows": {
+					"estrus_detection_rate": 0.6,
+					"estrus_insemination_rate": 1,
+					"estrus_conception_rate": 0.5,
+					"repro_protocols": {
+						"Presynch": {
+							"sub_protocol": "Double OvSynch",
+							"properties": {}
+						},
+						"TAI": {
+							"sub_protocol": "OvSynch 56",
+							"properties": {
+								"tai_program_start_day": 40
+							}
+						},
+						"Resynch": {
+							"sub_protocol": "TAIafterPD",
+							"properties": {}
+						},
+						"ED": {
+							"sub_protocol": null,
+							"properties": {}
+						},
+						"ED-TAI": {
+							"sub_protocol": "OvSynch 56",
+							"properties": {
+								"tai_program_start_day": 70
+							}
+						}
+					}
+				},
                 "heifer_repro_programs": {
                     "estrus_detection_rate": 0.6,
                     "estrus_service_rate": 1,
@@ -83,6 +133,8 @@
 				"preg_loss_rate_3": 0.017,
 				"avg_estrus_cycle_return": 23,
 				"std_estrus_cycle_return": 6,
+				"avg_estrus_cycle_heifer": 21,
+				"std_estrus_cycle_heifer": 2.5,
 				"avg_estrus_cycle_cow": 21,
 				"std_estrus_cycle_cow": 4,
 				"avg_estrus_cycle_after_pgf": 5,
