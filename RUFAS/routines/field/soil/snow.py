@@ -148,7 +148,8 @@ class Snow:
         temperatures, and snow melting, based on the provided current day weather data
         and day of the simulation.
 
-        Note:
+        Notes
+        -----
         - If the current snow content is negative, a ValueError is raised.
         - If the snow content is 0.0, 'previous_day_snow_temperature' and 'current_day_snow_temperature' are set to None
           and 'snow_content' and 'snow_melt_amount' is set to 0.0.
