@@ -247,7 +247,7 @@ def test_record_yield(field_name: str, field_size: float, species: str, year: in
 
     crop_manager._record_yield(field_name, field_size, year, day)
 
-    expected_info_map = {"field_size": field_size,
+    expected_info_map = {"prefix": f"field='{field_name}'", "field_size": field_size,
                          "species": f"'{species}'"}
     expected_value = {"crop": crop_manager.data.name, "yield": mass, "nitrogen": nitrogen, "phosphorus": phosphorus,
                       "planting_date": {"year": 1995, "day": 100}, "harvest_date": {"year": year, "day": day}}

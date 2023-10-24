@@ -83,6 +83,7 @@ def test_record_tillage(till_depth: float, incorp_frac: float, mix_frac: float, 
     pool = om.variables_pool
     assert len(pool["field='field1'.tillage_record"]['info_maps']) == 1
     assert pool["field='field1'.tillage_record"]['info_maps'][0]["field_size"] == {1.5}
+    assert pool["field='field1'.tillage_record"]['info_maps'][0]['prefix'] == "field='field1'"
     assert pool["field='field1'.tillage_record"]['info_maps'][0]['date']['year'] == year
     assert pool["field='field1'.tillage_record"]['info_maps'][0]['date']['day'] == day
     if till_depth > till_app.soil_data.soil_layers[-1].bottom_depth:
