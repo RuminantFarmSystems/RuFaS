@@ -257,20 +257,27 @@ def test_record_yield(field_name: str, field_size: float, species: str, year: in
     assert actual['values'].__contains__(expected_value)
 
 
-@pytest.mark.parametrize("residue,nitrogen, killed", [
-    (100, 22, True),
-    (0, 0, False)
+@pytest.mark.parametrize(
+    "root_biomass,residue,nitrogen,killed,expected_root_depth,expected_surface_residue,expected_root_residue", [
+        (150, 150, 22, True, 100, 0.0, 150.0),
+        (100, 150, 22, True, 100, 50, 100),
+        (100, 150, 22, False, 0, 150, 0)
 ])
-def test_transfer_residue(residue: float, nitrogen: float, killed: bool) -> None:
+def test_transfer_residue(root_biomass: float, residue: float, nitrogen: float, killed: bool,
+                          expected_root_depth: float, expected_surface_residue: float,
+                          expected_root_residue: float) -> None:
     """Tests that residue and associated nutrients from harvests and not collected are properly transferred to the
         soil."""
     soil_data = SoilData(field_size=1)
-    soil_data.plant_surface_residue = 0
     soil_data.soil_layers[0].fresh_organic_nitrogen_content = 0
-    crop_data = CropData(yield_residue=residue, yield_nitrogen=nitrogen)
+    crop_data = CropData(yield_residue=residue, residue_nitrogen=nitrogen)
+    crop_data.root_depth = 100.0
+    crop_data.root_biomass = root_biomass
     crop_manage = CropManagement(crop_data)
 
     crop_manage._transfer_residue(soil_data, killed)
 
-    assert soil_data.plant_surface_residue == residue
+    assert soil_data.plant_surface_residue == expected_surface_residue
+    assert soil_data.plant_root_residue == expected_root_residue
+    assert soil_data.crop_root_depth == expected_root_depth
     assert soil_data.soil_layers[0].fresh_organic_nitrogen_content == nitrogen

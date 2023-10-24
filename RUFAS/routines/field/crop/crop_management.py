@@ -224,14 +224,15 @@ class CropManagement:
 
         """
         soil_data.crop_yield_nitrogen = self.data.residue_nitrogen
+        soil_data.plant_residue_lignin_composition = 0.17
         if killed:
             soil_data.plant_surface_residue = self.data.yield_residue - self.data.root_biomass
             soil_data.plant_root_residue = self.data.root_biomass
             soil_data.crop_root_depth = self.data.root_depth
         else:
             soil_data.plant_surface_residue = self.data.yield_residue
-            soil_data.plant_root_residue = self.data.root_biomass = None
-            soil_data.crop_root_depth = None
+            soil_data.plant_root_residue = 0
+            soil_data.crop_root_depth = 0
 
         soil_data.soil_layers[0].fresh_organic_nitrogen_content += self.data.residue_nitrogen
 
