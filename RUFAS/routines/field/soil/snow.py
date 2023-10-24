@@ -106,7 +106,10 @@ class Snow:
                                                                    snow_melt_base_temperature)
 
         if snow_melt_amount > soil_data.snow_content:
-            om.add_warning("", "", info_map)
+            om.add_warning("Snow melt amount is more than snow cover content", f"Current Snow Cover Content: "
+                                                                               f"{soil_data.snow_content}, Calculated "
+                                                                               f"Snow Melt Amount: {snow_melt_amount}",
+                           info_map)
             return soil_data.snow_content
         else:
             return snow_melt_amount
