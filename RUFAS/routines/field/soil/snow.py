@@ -47,7 +47,7 @@ class Snow:
     @staticmethod
     def _calc_snow_temp(soil_data: SoilData, current_day_weather: CurrentWeather) -> float:
         """
-        Calculate the snow pack temperature for the current day.
+        This function calculates the snow pack temperature for the current day.
 
         Parameters
         ----------
@@ -64,7 +64,6 @@ class Snow:
         References
         ----------
         Equation 1:2.5.1 in SWAT 2009 Theoretical Documentation.
-        
         """
         return (soil_data.previous_day_snow_temperature * (1 - soil_data.snow_lag_factor)) + \
                (current_day_weather.mean_air_temperature * soil_data.snow_lag_factor)
@@ -72,7 +71,7 @@ class Snow:
     @staticmethod
     def _melt_snow(soil_data: SoilData, current_day_weather: CurrentWeather, day: int) -> float:
         """
-        This function calculates the amount of snow melting for the current day
+        This function calculates the amount of snow melting for the current day.
 
         Parameters
         ----------
@@ -117,17 +116,7 @@ class Snow:
     @staticmethod
     def _melt_factor(soil_data: SoilData, day: int) -> float:
         """
-        Calculate the snow melt factor for the current day.
-
-        This function calculates the snow melt factor based on Equation 1:2.5.3 in SWAT
-        2009 Theoretical Documentation. According to the equation:
-
-            b_mlt = (b_mlt6 + b_mlt12) / 2 + (b_mlt6 - b_mlt12) / 2 * sin((2*pi/365) * (d_n - 81))
-
-        Where:
-        - b_mlt6 is the melt factor for June 21 (mm H2O/°C-day)
-        - b_mlt12 is the melt factor for December 21 (mm H2O/°C-day)
-        - d_n is the day number of the year
+        This function calculates the snow melt factor for the current day.
 
         Parameters
         ----------
@@ -138,6 +127,10 @@ class Snow:
         -------
         float
             The calculated snow melt factor for the current day.
+
+        References
+        ----------
+        Equation 1:2.5.3 in SWAT 2009 Theoretical Documentation.
         """
         mlt6 = soil_data.snow_melt_factor_maximum
         mlt12 = soil_data.snow_melt_factor_minimum
@@ -154,7 +147,14 @@ class Snow:
         temperatures, and snow melting, based on the provided current day weather data
         and day of the simulation.
 
-        MAKE A NOTE ABOUT SOIL TEMP
+        Note:
+        - If the current snow content is negative, a ValueError is raised.
+        - If the snow content is 0.0, 'previous_day_snow_temperature' and 'current_day_snow_temperature' are set to None
+          and 'snow_content' and 'snow_melt_amount' is set to 0.0.
+        - Before calculating the current day snow temperature, 'previous_day_snow_temperature' is set to the value of
+          'current_day_snow_temperature' from the last iteration. If 'current_day_snow_temperature' is None,
+          'previous_day_snow_temperature' is set to the average air temperature of the current day.
+
 
         Parameters
         ----------
@@ -166,6 +166,10 @@ class Snow:
         Returns
         -------
         None
+
+        Raises
+        ------
+        ValueError
         """
         if self.soil_data.snow_content < 0.0:
             raise ValueError("Snow Content should not be a negative number.")
@@ -173,7 +177,7 @@ class Snow:
         self.soil_data.snow_content += current_day_weather.snow_fall
 
         if self.soil_data.snow_content == 0.0:
-            self.soil_data.current_day_snow_temperature, self.soil_data.previous_day_snow_temperature = None, None
+            self.soil_data.previous_day_snow_temperature, self.soil_data.current_day_snow_temperature = None, None
             self.soil_data.snow_content, self.soil_data.snow_melt_amount = 0.0, 0.0
         else:
             self.soil_data.previous_day_snow_temperature = self.soil_data.current_day_snow_temperature if \

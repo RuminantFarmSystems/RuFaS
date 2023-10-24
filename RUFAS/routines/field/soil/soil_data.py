@@ -106,23 +106,23 @@ class SoilData:
 
     # ---- Snow
     snow_content: float = 0.0
-    """The water content of the snow pack, SNO, (mm H2O)."""
+    """The water content of the snow pack, (mm H2O)."""
     snow_melt_amount: float = 0.0
-    """The water content of the snow that melted on the current day, SNO, (mm H2O)."""
+    """The water content of the snow that melted on the current day, (mm H2O)."""
     previous_day_snow_temperature: Optional[float] = None
-    """Snow pack temperature on the previous day, T_snow_day_(n-1), (ºC)"""
+    """Snow pack temperature on the previous day, (ºC)"""
     current_day_snow_temperature: Optional[float] = None
-    """Snow pack temperature of the current day, T_snow_day_n, (ºC)"""
+    """Snow pack temperature of the current day, (ºC)"""
     snow_lag_factor: float = 1.0
-    """Snow pack temperature lag factor, l_sno, unitless."""
+    """Snow pack temperature lag factor, unitless."""
     snow_coverage_fraction: float = 1.0
     snow_melt_base_temperature: float = 0.5
     """
-    Snow melt base temperature, T_mlt, (ºC).
-    The snow pack will not melt until the snow pack temperature exceeds a threshold value, T_mlt.
+    Snow melt base temperature, (ºC).
+    The snow pack will not melt until the snow pack temperature exceeds a threshold value.
     """
     snow_coverage_maximum: float = 1.0
-    """Minimum snow water content that corresponds to 100% snow cover, SNO100, (mm H2O)."""
+    """Minimum snow water content that corresponds to 100% snow cover, (mm H2O)."""
     snow_melt_factor_maximum: float = 4.5
     """
     Melt factor for snow on June 21, SMFMX, (mm H2O/°C-day)
