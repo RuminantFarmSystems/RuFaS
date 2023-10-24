@@ -53,6 +53,7 @@ class SolublePhosphorus:
                 runoff, field_size, self.data.soil_layers[0].labile_inorganic_phosphorus_content,
                 self.data.soil_layers[0].bulk_density, self.data.soil_layers[0].layer_thickness)
             self.data.soil_layers[0].labile_inorganic_phosphorus_content -= phosphorus_runoff
+            self.data.phosphorus_runoff = phosphorus_runoff
             self.data.annual_soil_phosphorus_runoff += phosphorus_runoff * field_size
 
         for layer_index in range(len(self.data.soil_layers)):
