@@ -457,6 +457,10 @@ def test_validate_element_fixable_data(mock_input_manager: InputManager,
                                                        mock_element_counter_and_validity)
 
     assert result["is_valid"] is True
+    assert result["fixed_elements"] == 1
+    assert result["total_elements"] == 1
+    assert result["invalid_elements"] == 0
+    assert result["valid_elements"] == 0
 
     mock_input_manager._validate_json_element = input_manager_original_method_states["_validate_json_element"]
     mock_input_manager._num_type_validator = input_manager_original_method_states["_num_type_validator"]
@@ -535,7 +539,8 @@ def test_validate_csv_element_invalid_data(mock_input_manager: InputManager,
 
 def test_validate_json_element_string_type(mock_input_manager: InputManager,
                                            mock_metadata_for_validate_element: Dict[str, Dict[str, Any]],
-                                           input_manager_original_method_states: Dict[str, Callable], ) -> None:
+                                           input_manager_original_method_states: Dict[str, Callable],
+                                           ) -> None:
     """Unit test for string type input_data for _validate_json_element in file input_manager.py"""
     mock_input_manager._InputManager__metadata = mock_metadata_for_validate_element
     mock_element_counter_and_validity = {"fixed_elements": 0, "total_elements": 0, "valid_elements": 0,
@@ -546,6 +551,10 @@ def test_validate_json_element_string_type(mock_input_manager: InputManager,
                                                        mock_element_counter_and_validity)
 
     assert result["is_valid"] is True
+    assert result["fixed_elements"] == 0
+    assert result["total_elements"] == 1
+    assert result["invalid_elements"] == 0
+    assert result["valid_elements"] == 1
 
     input_data = {"element1": "invalid_value"}
     mock_element_counter_and_validity = {"fixed_elements": 0, "total_elements": 0, "valid_elements": 0,
@@ -554,6 +563,10 @@ def test_validate_json_element_string_type(mock_input_manager: InputManager,
                                                        mock_element_counter_and_validity)
 
     assert result["is_valid"] is False
+    assert result["fixed_elements"] == 0
+    assert result["total_elements"] == 1
+    assert result["invalid_elements"] == 1
+    assert result["valid_elements"] == 0
 
     input_data = {"element8": {"nested_element": 750}}
     mock_element_counter_and_validity = {"fixed_elements": 0, "total_elements": 0, "valid_elements": 0,
@@ -565,6 +578,9 @@ def test_validate_json_element_string_type(mock_input_manager: InputManager,
         assert add_warning.call_count == 3
         assert result["is_valid"] is False
         assert result["invalid_elements"] == 1
+        assert result["fixed_elements"] == 0
+        assert result["total_elements"] == 1
+        assert result["valid_elements"] == 0
 
     mock_input_manager._validate_json_element = input_manager_original_method_states["_validate_json_element"]
 
@@ -582,6 +598,10 @@ def test_validate_json_element_number_type(mock_input_manager: InputManager,
                                                        mock_element_counter_and_validity)
 
     assert result["is_valid"] is True
+    assert result["invalid_elements"] == 0
+    assert result["fixed_elements"] == 0
+    assert result["total_elements"] == 1
+    assert result["valid_elements"] == 1
 
     mock_element_counter_and_validity = {"fixed_elements": 0, "total_elements": 0, "valid_elements": 0,
                                          "invalid_elements": 0, "is_valid": True}
@@ -590,6 +610,10 @@ def test_validate_json_element_number_type(mock_input_manager: InputManager,
                                                        mock_element_counter_and_validity)
 
     assert result["is_valid"] is False
+    assert result["invalid_elements"] == 1
+    assert result["fixed_elements"] == 0
+    assert result["total_elements"] == 1
+    assert result["valid_elements"] == 0
 
     mock_input_manager._validate_json_element = input_manager_original_method_states["_validate_json_element"]
 
@@ -607,6 +631,10 @@ def test_validate_json_element_array_type(mock_input_manager: InputManager,
                                                        mock_element_counter_and_validity)
 
     assert result["is_valid"] is True
+    assert result["invalid_elements"] == 0
+    assert result["fixed_elements"] == 0
+    assert result["total_elements"] == 1
+    assert result["valid_elements"] == 1
 
     mock_element_counter_and_validity = {"fixed_elements": 0, "total_elements": 0, "valid_elements": 0,
                                          "invalid_elements": 0, "is_valid": True}
@@ -615,6 +643,10 @@ def test_validate_json_element_array_type(mock_input_manager: InputManager,
                                                        mock_element_counter_and_validity)
 
     assert result["is_valid"] is False
+    assert result["invalid_elements"] == 1
+    assert result["fixed_elements"] == 0
+    assert result["total_elements"] == 1
+    assert result["valid_elements"] == 0
 
     mock_input_manager._validate_json_element = input_manager_original_method_states["_validate_json_element"]
 
@@ -632,6 +664,10 @@ def test_validate_json_element_valid_object_type(mock_input_manager: InputManage
                                                        mock_element_counter_and_validity)
 
     assert result["is_valid"] is True
+    assert result["invalid_elements"] == 0
+    assert result["fixed_elements"] == 0
+    assert result["total_elements"] == 2
+    assert result["valid_elements"] == 2
 
     mock_input_manager._validate_json_element = input_manager_original_method_states["_validate_json_element"]
 
@@ -649,6 +685,10 @@ def test_validate_json_element_invalid_object_type(mock_input_manager: InputMana
                                                        mock_element_counter_and_validity)
 
     assert result["is_valid"] is False
+    assert result["invalid_elements"] == 1
+    assert result["fixed_elements"] == 0
+    assert result["total_elements"] == 2
+    assert result["valid_elements"] == 1
 
     mock_element_counter_and_validity = {"fixed_elements": 0, "total_elements": 0, "valid_elements": 0,
                                          "invalid_elements": 0, "is_valid": True}
@@ -657,6 +697,10 @@ def test_validate_json_element_invalid_object_type(mock_input_manager: InputMana
                                                        mock_element_counter_and_validity)
 
     assert result["is_valid"] is False
+    assert result["invalid_elements"] == 1
+    assert result["fixed_elements"] == 0
+    assert result["total_elements"] == 1
+    assert result["valid_elements"] == 0
 
     mock_input_manager._validate_json_element = input_manager_original_method_states["_validate_json_element"]
 
@@ -676,6 +720,10 @@ def test_validate_element_valid_nested_object_type(mock_input_manager: InputMana
                                                        mock_element_counter_and_validity)
 
     assert result["is_valid"] is True
+    assert result["invalid_elements"] == 0
+    assert result["fixed_elements"] == 0
+    assert result["total_elements"] == 4
+    assert result["valid_elements"] == 4
 
     mock_input_manager._validate_json_element = input_manager_original_method_states["_validate_json_element"]
 
@@ -696,6 +744,10 @@ def test_validate_element_invalid_nested_object_type(mock_input_manager: InputMa
                                                        mock_element_counter_and_validity)
 
     assert result["is_valid"] is False
+    assert result["invalid_elements"] == 1
+    assert result["fixed_elements"] == 0
+    assert result["total_elements"] == 4
+    assert result["valid_elements"] == 3
 
     mock_element_counter_and_validity = {"fixed_elements": 0, "total_elements": 0, "valid_elements": 0,
                                          "invalid_elements": 0, "is_valid": True}
@@ -706,6 +758,10 @@ def test_validate_element_invalid_nested_object_type(mock_input_manager: InputMa
                                                        mock_element_counter_and_validity)
 
     assert result["is_valid"] is False
+    assert result["invalid_elements"] == 1
+    assert result["fixed_elements"] == 0
+    assert result["total_elements"] == 3
+    assert result["valid_elements"] == 2
 
     mock_input_manager._validate_json_element = input_manager_original_method_states["_validate_json_element"]
 
