@@ -743,10 +743,10 @@ class OutputManager(object):
 
         format_option: str = "basic" - Excludes information about whether data is from info_maps but has the same
                                        format as output CSV column headers.
-        class_name.function_name.variable_name.sub_variable1_name
-        class_name.function_name.variable_name.sub_variable2_name
-        class_name.function_name.variable_name.sub_variable3_name
-        class_name.function_name.variable_name.sub_variable4_name
+        class_name.function_name.variable_name1.sub_variable1_name
+        class_name.function_name.variable_name1.sub_variable2_name
+        class_name.function_name.variable_name2.sub_variable1_name
+        class_name.function_name.variable_name3
 
         format_option: str = "block"
         class_name.function_name.variable_name
