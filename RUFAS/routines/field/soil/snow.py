@@ -61,7 +61,7 @@ class Snow:
         -------
         float
             The calculated snow pack temperature for the current day (Celsius).
-            
+
         References
         ----------
         Equation 1:2.5.1 in SWAT 2009 Theoretical Documentation.
