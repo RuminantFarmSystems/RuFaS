@@ -39,8 +39,6 @@ class ResiduePartition:
         rainfall: float
             amount of rain (mm)
         """
-
-        # TODO: Change these computations with SWAT_C methods
         self.data.plant_residue_lignin_composition = self._determine_plant_residue_lignin_composition(
             self.data.plant_residue_lignin_composition, rainfall)
         self.data.plant_lignin_nitrogen_ratio = self._determine_plant_lignin_nitrogen_fraction(
@@ -60,9 +58,6 @@ class ResiduePartition:
             )
 
             if self.data.soil_layers.index(layer) == 0:
-                # TODO: rather than simply mixing the crop residue into the top layer, this module should consider
-                #  tillage
-                #     depth and mix the residue into all soil down to that depth. This is not a priority, though.
                 layer.structural_carbon_transfer_amount = self._determine_structural_carbon_transfer_amount(
                     layer.structural_litter_amount,
                     layer.tillage_fraction
