@@ -60,7 +60,7 @@ class Snow:
         Returns
         -------
         float
-            The calculated snow pack temperature for the current day in Celsius.
+            The calculated snow pack temperature for the current day (Celsius).
             
         References
         ----------
