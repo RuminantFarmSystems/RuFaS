@@ -48,6 +48,7 @@ def test_run_rufas(
     exclude_info_maps: bool,
     only_run_validation: bool,
     mocker: MockerFixture,
+    capsys
 ) -> None:
     """Checks that run_rufas() calls the correct functions in the correct order"""
     # Arrange
@@ -56,7 +57,6 @@ def test_run_rufas(
     patch_execute_simulations = mocker.patch("main.execute_simulations")
     patch_run_validation = mocker.patch("main.run_validation")
     patch_empty_dir = mocker.patch("RUFAS.util.Utility.empty_dir")
-    patch_sys_stdout = mocker.patch("sys.stdout.write")
 
     # Act
     run_rufas(make_graphs, verbose, clear_output, exclude_info_maps, only_run_validation)
@@ -74,7 +74,9 @@ def test_run_rufas(
         patch_empty_dir.assert_not_called()
 
     if verbose:
-        patch_sys_stdout.assert_called_once_with("RuFaS: Ruminant Farm Systems Model 2023\n")
+        captured = capsys.readouterr()
+        expected_message = "RuFaS: Ruminant Farm Systems Model 2023\n"
+        assert expected_message in captured.out
 
 
 @pytest.mark.parametrize(
