@@ -283,7 +283,8 @@ def test_update_snow(soil_data: SoilData, current_day_weather: CurrentWeather, d
         dummy_snow_temperature = current_day_weather.mean_air_temperature
         dummy_melt_factor = 4.5
         snow_melt_amount = dummy_melt_factor * soil_data.snow_coverage_fraction * ((dummy_snow_temperature +
-                                                                                    current_day_weather.max_air_temperature)
+                                                                                    current_day_weather.
+                                                                                    max_air_temperature)
                                                                                    / 2 -
                                                                                    soil_data.snow_melt_base_temperature)
 
