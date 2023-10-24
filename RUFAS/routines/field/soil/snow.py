@@ -28,7 +28,7 @@ class Snow:
     _calc_snow_temp(current_day_weather: CurrentWeather) -> float:
         Calculate the snow pack temperature for the current day.
 
-    _melt_snow(current_day_weather: CurrentWeather, day: int):
+    _melt_snow(current_day_weather: CurrentWeather, day: int) -> float:
         Calculate the snow melt for the current day.
 
     _melt_factor(day: int) -> float:
