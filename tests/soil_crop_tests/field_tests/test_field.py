@@ -369,8 +369,9 @@ def test_harvest_crop(crop_reference: str, harvest_op: str, field_name: str, fie
     mocked_time = MagicMock(Time)
     setattr(mocked_time, "day", 100)
     setattr(mocked_time, "calendar_year", 1995)
-
-    field._harvest_crop(crop_reference, harvest_op, mocked_time)
+    with patch.object(field.soil.carbon_cycling.residue_partition, "partition_residue", new_callable=MagicMock) \
+            as partition:
+        field._harvest_crop(crop_reference, harvest_op, mocked_time)
 
     for crop in field.crops:
         if crop.data.id == "not this crop":
@@ -378,6 +379,7 @@ def test_harvest_crop(crop_reference: str, harvest_op: str, field_name: str, fie
         else:
             crop.crop_management.manage_harvest.assert_called_once_with(expected_operation, field_name, field_size,
                                                                         1995, 100, field.soil.data)
+    partition.assert_called_once()
 
 
 @pytest.mark.parametrize("crops,expected_info_map,expected_message", [
@@ -401,11 +403,14 @@ def test_harvest_crop_warnings(crops: List[Crop], expected_info_map: Dict, expec
         setattr(mocked_time, "calendar_year", 2000)
         mocked_timestamp.return_value = "00-Jan-1970_Thu_00-00-00"
 
-        field._harvest_crop("test", "default", mocked_time)
+        with patch.object(field.soil.carbon_cycling.residue_partition, "partition_residue", new_callable=MagicMock) \
+                as partition:
+            field._harvest_crop("test", "default", mocked_time)
 
         for crop in crops:
             crop.crop_management.manage_harvest.assert_called_once_with(HarvestOperation.HARVEST, "test", 1.0, 2000,
                                                                         200, field.soil.data)
+        assert partition.call_count == len(crops)
         actual = om.warnings_pool["field_name:'test'.harvest_warning"]
         assert actual['info_maps'].__contains__(expected_info_map)
         assert actual['values'].__contains__(expected_message)
