@@ -3,6 +3,7 @@ from typing import Optional
 
 from RUFAS.routines.field.soil.soil_data import SoilData
 from RUFAS.routines.field.manager.current_weather import CurrentWeather
+
 from RUFAS.output_manager import OutputManager
 
 om = OutputManager()
@@ -111,7 +112,7 @@ class Snow:
                            info_map)
             return soil_data.snow_content
         else:
-            return snow_melt_amount
+            return max(snow_melt_amount, 0.0)
 
     @staticmethod
     def _melt_factor(soil_data: SoilData, day: int) -> float:
