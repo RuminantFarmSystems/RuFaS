@@ -205,17 +205,12 @@ class ResiduePartition:
         contained in the soil layer.
 
         """
-        print(f"metabolic fraction: {self.data.plant_residue_metabolic_fraction}")
-        for layer in self.data.soil_layers[1:]:
+        for layer in self.data.soil_layers:
             litter_amount = self._determine_soil_dry_matter_residue_amount(root_depth, root_residue,
                                                                            layer.bottom_depth, layer.top_depth,
                                                                            layer.layer_thickness)
             layer.metabolic_litter_amount += self.data.plant_residue_metabolic_fraction * litter_amount
             layer.structural_litter_amount += (1 - self.data.plant_residue_metabolic_fraction) * litter_amount
-        print(sum(self.data.get_vectorized_layer_attribute('metabolic_litter_amount')[1:]) +
-              sum(self.data.get_vectorized_layer_attribute('structural_litter_amount')[1:]))
-        print(f"metabolic: {sum(self.data.get_vectorized_layer_attribute('metabolic_litter_amount')[1:])}")
-        print(f"structural: {sum(self.data.get_vectorized_layer_attribute('structural_litter_amount')[1:])}")
 
     @staticmethod
     def _determine_soil_dry_matter_residue_amount(root_depth: float, plant_root_residue: float, layer_bottom: float,
