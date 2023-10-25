@@ -77,7 +77,7 @@ class Snow:
         Parameters
         ----------
         soil_data : SoilData
-            The object that tracks all soil variable throughout the simulation
+            The object that tracks all soil variables throughout the simulation.
         current_day_weather : CurrentWeather
             The current day weather data.
         day :int
