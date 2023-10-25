@@ -146,7 +146,7 @@ class Weather:
         self.__mean_annual_temperature = self._calculate_average_annual_temperature(weather_file['avg'])
 
         info_map = {"class": self.__class__.__name__, "function": self.__init__.__name__, "prefix": "Weather"}
-        om.add_variable("average_annual_temperature(C)", self.__mean_annual_temperature, info_map)
+        om.add_variable("average_annual_temperature", self.__mean_annual_temperature, info_map)
 
     def get_current_weather(self, time: Time) -> CurrentWeather:
         """
@@ -198,15 +198,15 @@ class Weather:
         """
         info_map = {"class": self.__class__.__name__, "function": self.record_weather.__name__, "prefix": "Weather"}
         current_weather = self.get_current_weather(time)
-        om.add_variable("precipitation(mm)", current_weather.rainfall, info_map)
-        om.add_variable("rainfall(mm)", current_weather.rainfall, info_map)
-        om.add_variable("snowfall(mm)", current_weather.snow_fall, info_map)
-        om.add_variable("daylength(hours)", current_weather.daylength, info_map)
-        om.add_variable("maximum_temperature(C)", current_weather.max_air_temperature, info_map)
-        om.add_variable("minimum_temperature(C)", current_weather.min_air_temperature, info_map)
-        om.add_variable("average_temperature(C)", current_weather.mean_air_temperature, info_map)
-        om.add_variable("radiation(MJ/square_meter/day)", current_weather.incoming_light, info_map)
-        om.add_variable("irrigation(mm)", current_weather.irrigation, info_map)
+        om.add_variable("precipitation", current_weather.rainfall, info_map)
+        om.add_variable("rainfall", current_weather.rainfall, info_map)
+        om.add_variable("snowfall", current_weather.snow_fall, info_map)
+        om.add_variable("daylength", current_weather.daylength, info_map)
+        om.add_variable("maximum_temperature", current_weather.max_air_temperature, info_map)
+        om.add_variable("minimum_temperature", current_weather.min_air_temperature, info_map)
+        om.add_variable("average_temperature", current_weather.mean_air_temperature, info_map)
+        om.add_variable("radiation", current_weather.incoming_light, info_map)
+        om.add_variable("irrigation", current_weather.irrigation, info_map)
 
     @staticmethod
     def _calculate_average_annual_temperature(daily_average_temperatures: list[float]) -> float:
