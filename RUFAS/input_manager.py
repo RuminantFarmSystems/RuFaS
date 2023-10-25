@@ -1,14 +1,14 @@
 # !/usr/bin/env python3
 
-from copy import deepcopy
-from functools import reduce
 import json
 import re
-
-import pandas as pd
-from RUFAS.output_manager import OutputManager
+from copy import deepcopy
+from functools import reduce
 from typing import Any, Dict, List, Union
 
+import pandas as pd
+
+from RUFAS.output_manager import OutputManager
 
 om = OutputManager()
 
@@ -154,10 +154,12 @@ class InputManager:
         info_map = {"class": self.__class__.__name__,
                     "function": self._populate_pool.__name__,
                     }
-        valid_elements_counter = 0
-        invalid_elements_counter = 0
-        total_elements_counter = 0
-        fixed_elements_counter = 0
+        counters = {
+            "valid_elements": 0,
+            "invalid_elements": 0,
+            "total_elements": 0,
+            "fixed_elements": 0,
+        }
 
         data_type_to_loader_map = {"json": self._load_data_from_json,
                                    "csv": self._load_data_from_csv}
@@ -175,30 +177,31 @@ class InputManager:
 
             properties_blob_key = file_details["properties"]
             properties = self.__metadata["properties"][properties_blob_key]
-            for property in properties.keys():
+            for prop in properties:
                 if file_type == "json":
-                    element_counter_and_validity = self._validate_json_element([property], properties_blob_key, data,
-                                                                               eager_termination)
-                if file_type == "csv":
-                    element_counter_and_validity = self._validate_csv_element(property, properties_blob_key, data,
-                                                                              eager_termination)
+                    sub_counters, is_prop_valid = self._validate_json_element2([prop], properties_blob_key, data,
+                                                                                   )
+                    validation_result = {**sub_counters, "is_valid": is_prop_valid}
+                elif file_type == "csv":
+                    validation_result = self._validate_csv_element(prop, properties_blob_key, data,
+                                                                   eager_termination)
 
-                fixed_elements_counter += element_counter_and_validity["fixed_elements"]
-                valid_elements_counter += element_counter_and_validity["valid_elements"]
-                total_elements_counter += element_counter_and_validity["total_elements"]
-                if element_counter_and_validity["is_valid"]:
+                for key, value in validation_result.items():
+                    if key != "is_valid":
+                        counters[key] += value
+
+                if validation_result["is_valid"]:
                     self.__pool[file_blob_key] = data
-                else:
-                    if not eager_termination:
-                        invalid_elements_counter += element_counter_and_validity["invalid_elements"]
-                    else:
-                        return False
+                elif eager_termination:
+                    # return False
+                    raise Exception(f"Cannot fix the following data: {prop} in {file_blob_key}.")
 
-        om.add_log("Total Valid Items", f"{valid_elements_counter=}", info_map)
-        om.add_log("Total Checked Items", f"{total_elements_counter=}", info_map)
-        om.add_log("Total Fixed Items", f"{fixed_elements_counter=}", info_map)
-        om.add_log("Total Invalid Items", f"{invalid_elements_counter=}", info_map)
-        return invalid_elements_counter == 0
+        om.add_log("Total Valid Items", f"{counters['valid_elements']}", info_map)
+        om.add_log("Total Checked Items", f"{counters['total_elements']}", info_map)
+        om.add_log("Total Fixed Items", f"{counters['fixed_elements']}", info_map)
+        om.add_log("Total Invalid Items", f"{counters['invalid_elements']}", info_map)
+
+        return counters['invalid_elements'] == 0
 
     def _validate_input_type_dynamic(self, variable_properties: Dict[str, Any], var_name: str, input_data_value: Any):
         """
@@ -242,13 +245,14 @@ class InputManager:
             print(f"{var_name} is not a valid {variable_properties['type']}.")
         """
         if "type" not in variable_properties:
-            raise KeyError("Missing 'type' key in variable_properties")
+            raise KeyError(f"Missing 'type' key in variable_properties: {variable_properties}")
         var_type = variable_properties["type"]
         data_type_to_validator_map = {
             "string": self._string_type_validator,
             "number": self._num_type_validator,
             "array": self._array_type_validator,
             "bool": self._bool_type_validator,
+            "object": self._object_type_validator,
         }
         try:
             validator = data_type_to_validator_map[var_type]
@@ -256,7 +260,28 @@ class InputManager:
             raise KeyError(
                 f"Invalid type {var_type}: Element must be type {data_type_to_validator_map.keys()}"
             )
+
+        is_valid = validator(variable_properties, var_name, input_data_value)
+        if not is_valid:
+            print("here")
         return validator(variable_properties, var_name, input_data_value)
+
+    def _object_type_validator(self, variable_properties: Dict[str, Any], var_name: str,
+                               input_data_value: Dict[str, Any]) -> bool:
+        """Validates an input data object element."""
+        if type(input_data_value) is not dict:
+            return False
+
+        for key, value in input_data_value.items():
+            if key not in variable_properties:
+                # return False
+                raise Exception(f"Missing key: {var_name}.{key}: {value}")
+            is_valid = self._validate_input_type_dynamic(variable_properties[key], key, value)
+            if not is_valid:
+                # return False
+                raise Exception(f"Cannot fix the following data: {var_name}.{key}: {value}")
+
+        return True
 
     def _validate_csv_element(self, var_name: str, properties_blob_key: str, input_data: Dict[str, Any],
                               eager_termination: bool) -> dict:
@@ -311,7 +336,7 @@ class InputManager:
 
         return element_counter_and_validity
 
-    def _validate_json_element(self, element_hierarchy: List[str], properties_blob_key: str,   # noqa
+    def _validate_json_element(self, element_hierarchy: List[str], properties_blob_key: str,  # noqa
                                input_data: Dict[str, Any], eager_termination: bool, ) -> dict:
         """
         Receives data loaded from json input file, recursively finds and then validates nested elements,
@@ -404,15 +429,66 @@ class InputManager:
                     element_counter_and_validity["is_valid"] = False
                 return element_counter_and_validity
 
+    def _validate_json_element2(self,
+                                prop_breadcrumbs: list[str],
+                                properties_blob_key: str,
+                                input_data: dict[str, Any],
+                                ):
+        counters = {
+            "fixed_elements": 0,
+            "total_elements": 0,
+            "valid_elements": 0,
+            "invalid_elements": 0,
+        }
+
+        variable_properties = self._get_nested_dict_value(
+            self.__metadata["properties"][properties_blob_key], prop_breadcrumbs
+        )
+        element_to_validate = self._get_nested_dict_value(input_data, prop_breadcrumbs)
+
+        is_valid, is_fixed = self._validate_and_fix_element(variable_properties,
+                                                            prop_breadcrumbs,
+                                                            element_to_validate)
+        self._update_element_counters(counters, is_valid, is_fixed)
+        return counters, is_valid
+
+    @staticmethod
+    def _get_nested_dict_value(data, keys):
+        for key in keys:
+            if not isinstance(data, dict):
+                return data
+            data = data[key]
+        return data
+
+    @staticmethod
+    def _update_element_counters(counters: dict[str, int], is_valid: bool,
+                                 is_fixed: bool) -> None:
+        counters["total_elements"] += 1
+        if is_valid:
+            counters["valid_elements"] += 1
+        else:
+            if is_fixed:
+                counters["fixed_elements"] += 1
+            else:
+                counters["invalid_elements"] += 1
+
+    def _validate_and_fix_element(self, variable_properties, path, input_data):
+        is_valid = self._validate_input_type_dynamic(variable_properties, path[-1], input_data)
+        is_fixed = False
+        if not is_valid:
+            is_fixed = self._fix_data(variable_properties, path, input_data)
+        return is_valid, is_fixed
+
     def _array_type_validator(self, variable_properties: Dict[str, Any], var_name: str, input_data_value: list) -> bool:
         """Validates an input data element of type array."""
         info_map = {"class": self.__class__.__name__,
                     "function": self._array_type_validator.__name__,
                     }
         if type(input_data_value) is not list:
-            warning_string = "Array is not a list."
-            om.add_warning(warning_string, f"{var_name=}", info_map)
-            return False
+            # warning_string = "Array is not a list."
+            # om.add_warning(warning_string, f"{var_name=}", info_map)
+            # return False
+            raise Exception(f"The following is not an array: {var_name}")
 
         maximum_length = variable_properties.get("maximum_length")
         minimum_length = variable_properties.get("minimum_length")
@@ -428,6 +504,13 @@ class InputManager:
                 warning_string = f"Array length more than {maximum_length}."
                 om.add_warning(warning_string, f"{var_name=}", info_map)
                 return False
+
+        for idx, item in enumerate(input_data_value):
+            is_valid = self._validate_input_type_dynamic(variable_properties["properties"], f"{var_name}[{idx}]", item)
+            if not is_valid:
+                # return False
+                raise Exception(f"Cannot fix the following data: {var_name}[{idx}].")
+
         return True
 
     def _num_type_validator(self, variable_properties: Dict[str, Any], var_name: str,
@@ -593,7 +676,7 @@ class InputManager:
 
             om.add_error("Data not found:", f"Cannot find \"{data_address}\", "
                                             f"\"{parent_address}\" does not have attribute \"{invalid_key}\".",
-                                            info_map)
+                         info_map)
 
             raise KeyError(f"Data not found: Cannot find \"{data_address}\", "
                            f"\"{parent_address}\" does not have attribute \"{invalid_key}\".")
@@ -659,7 +742,7 @@ class InputManager:
 
             om.add_error("Data not found:", f"Cannot find \"{metadata_address}\", "
                                             f"\"{parent_address}\" does not have attribute \"{invalid_key}\".",
-                                            info_map)
+                         info_map)
 
             raise KeyError(f"Data not found: Cannot find \"{metadata_address}\", "
                            f"\"{parent_address}\" does not have attribute \"{invalid_key}\".")
