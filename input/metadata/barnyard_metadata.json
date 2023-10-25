@@ -152,6 +152,16 @@
         "minimum": 0,
         "default": 42
       },
+      "set_seed": {
+        "type": "bool",
+        "description": "Whether to set the seed",
+        "default": true
+      },
+      "csv_dir": {
+        "type": "string",
+        "description": "The path to where the CSV output files will be saved",
+        "default": "output/CSVs"
+      },
       "simulate_animals": {
         "type": "bool",
         "description": "Whether or not to simulate animals during the simulation",
@@ -202,6 +212,11 @@
           "type": "bool",
           "default": false,
           "description": "Initialize Herd? -- Whether to re-initialize the animal database, where the herd animals are selected from."
+        },
+        "replace_num": {
+          "type": "number",
+          "default": 5000,
+          "minimum": 0
         },
         "breed": {
           "type": "string",
@@ -787,6 +802,15 @@
                 "maximum": 1
               }
             },
+            "death_cull_prob": {
+              "type": "array",
+              "description": "Culling rate for death",
+              "properties": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1
+              }
+            },
             "cull_day_count": {
               "type": "array",
               "description": "Culling day count",
@@ -816,6 +840,10 @@
           "description": "Methane Mitigation Method -- The type of enteric methane mitigation supplement that is fed to the lactating dairy cattle",
           "default": "None",
           "pattern": "^(None|3-NOP|monensin|essential_oils|seaweed)$"
+        },
+        "methane_mitigation_additive_amount": {
+          "type": "number",
+          "default": 0
         },
         "3-NOP_additive_amount": {
           "type": "number",
@@ -2406,10 +2434,46 @@
       }
     },
     "weather_properties": {
-      "precip": {
-        "description": "amount of precipitation",
+      "year": {
+        "description": "Year.",
+        "type": "number",
+        "minimum": 1900
+      },
+      "jday": {
+        "description": "Julian day of the year.",
         "type": "number",
         "minimum": 0,
+        "maximum": 366
+      },
+      "precip": {
+        "description": "Amount of precipitation (mm H2O).",
+        "type": "number",
+        "minimum": 0,
+        "default": 0
+      },
+      "high": {
+        "description": "The maximum air temperature of the day (°C).",
+        "type": "number",
+        "default": 21
+      },
+      "low": {
+        "description": "The minimum air temperature of the day (°C).",
+        "type": "number",
+        "default": 0
+      },
+      "avg": {
+        "description": "The average air temperature of the day (°C).",
+        "type": "number",
+        "default": 0
+      },
+      "Hday": {
+        "description": "The solar radiation of the day (MJ m^-2).",
+        "type": "number",
+        "default": 0
+      },
+      "irrigation": {
+        "description": "Irrigation (mm H2O).",
+        "type": "number",
         "default": 0
       }
     }
