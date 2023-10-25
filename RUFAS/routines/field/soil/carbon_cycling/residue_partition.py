@@ -183,7 +183,7 @@ class ResiduePartition:
                 self.data.plant_surface_residue * (1 - self.data.plant_residue_metabolic_fraction)
             self.data.plant_surface_residue = 0.0
 
-        if self.data.plant_root_residue != 0.0 and self.data.plant_root_depth != 0.0:
+        if self.data.plant_root_residue != 0.0 and self.data.crop_root_depth != 0.0:
             self._add_subsurface_residue(self.data.plant_root_residue, self.data.crop_root_depth)
             self.data.plant_residue_metabolic_fraction = 0.0
             self.data.plant_root_depth = 0.0
@@ -205,6 +205,7 @@ class ResiduePartition:
         contained in the soil layer.
 
         """
+        print(f"")
         for layer in self.data.soil_layers[1:]:
             litter_fraction = self._determine_soil_dry_matter_residue_amount(root_depth, root_residue,
                                                                              layer.bottom_depth, layer.top_depth,
@@ -212,6 +213,7 @@ class ResiduePartition:
             layer.metabolic_litter_amount += self.data.plant_residue_metabolic_fraction * litter_fraction * root_residue
             layer.structural_litter_amount += \
                 (1 - self.data.plant_residue_metabolic_fraction) * litter_fraction * root_residue
+            print()
 
     @staticmethod
     def _determine_soil_dry_matter_residue_amount(root_depth: float, plant_root_residue: float, layer_bottom: float,
