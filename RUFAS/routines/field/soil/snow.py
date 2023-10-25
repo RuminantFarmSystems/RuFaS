@@ -79,7 +79,7 @@ class Snow:
         soil_data : SoilData
             The object that tracks all soil variable throughout the simulation
         current_day_weather : CurrentWeather
-            The current day weather data
+            The current day weather data.
         day :int
             The day number of the year.
 
