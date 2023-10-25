@@ -1,0 +1,17 @@
+{
+  "crop_schedules": [
+    {
+    "crop_species": "corn",
+    "planting_years": [2000],
+    "pattern_repeat": 0,
+    "pattern_skip": 0,
+    "planting_days": [110],
+    "harvest_years": [2000],
+    "harvest_days": [300],
+    "harvest_operations": ["default"],
+    "harvest_type": "scheduled",
+    "planting_order": "1st",
+    "extracted": true
+    }
+  ]
+}

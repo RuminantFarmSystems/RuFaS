@@ -484,8 +484,8 @@ class Corn(CropData):
 
     max_root_depth: float = 2_000
 
-    optimal_harvest_index: float = 0.50
-    min_harvest_index: float = 0.30
+    optimal_harvest_index: float = 0.0
+    min_harvest_index: float = 0.0
     yield_nitrogen_fraction: float = 0.0140
     yield_phosphorus_fraction: float = 0.0016
 
