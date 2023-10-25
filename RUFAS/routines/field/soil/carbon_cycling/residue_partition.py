@@ -29,6 +29,19 @@ class ResiduePartition:
         """
         self.data = soil_data or SoilData(field_size=field_size)
 
+    def add_residue_to_pools(self, rainfall: float) -> None:
+        """
+        Adds residue to pools.
+        """
+        self.data.plant_residue_lignin_composition = self._determine_plant_residue_lignin_composition(
+            self.data.plant_residue_lignin_composition, rainfall)
+        self.data.plant_lignin_nitrogen_ratio = self._determine_plant_lignin_nitrogen_fraction(
+            self.data.plant_residue_lignin_composition, self.data.all_residue, self.data.crop_yield_nitrogen)
+        self.data.plant_residue_metabolic_fraction = self._determine_plant_residue_metabolic_fraction(
+            self.data.plant_lignin_nitrogen_ratio)
+
+        self._add_residue_to_pools()
+
     def partition_residue(self, rainfall: float) -> None:
         """Main routine to updates attributes by using static methods, this method should only be called (by the field/
         field manager) on the day that a cut, harvest, or kill operation occurs and should be called after that
@@ -39,14 +52,14 @@ class ResiduePartition:
         rainfall: float
             amount of rain (mm)
         """
-        self.data.plant_residue_lignin_composition = self._determine_plant_residue_lignin_composition(
-            self.data.plant_residue_lignin_composition, rainfall)
-        self.data.plant_lignin_nitrogen_ratio = self._determine_plant_lignin_nitrogen_fraction(
-            self.data.plant_residue_lignin_composition, self.data.all_residue, self.data.crop_yield_nitrogen)
-        self.data.plant_residue_metabolic_fraction = self._determine_plant_residue_metabolic_fraction(
-            self.data.plant_lignin_nitrogen_ratio)
+        # self.data.plant_residue_lignin_composition = self._determine_plant_residue_lignin_composition(
+        #     self.data.plant_residue_lignin_composition, rainfall)
+        # self.data.plant_lignin_nitrogen_ratio = self._determine_plant_lignin_nitrogen_fraction(
+        #     self.data.plant_residue_lignin_composition, self.data.all_residue, self.data.crop_yield_nitrogen)
+        # self.data.plant_residue_metabolic_fraction = self._determine_plant_residue_metabolic_fraction(
+        #     self.data.plant_lignin_nitrogen_ratio)
 
-        self._add_residue_to_pools()
+        # self._add_residue_to_pools()
 
         for layer in self.data.soil_layers:
             layer.plant_metabolic_active_carbon_usage = self._determine_plant_metabolic_active_carbon_usage(

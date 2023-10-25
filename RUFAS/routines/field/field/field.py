@@ -790,7 +790,7 @@ class Field:
             crop.crop_management.manage_harvest(harvest_operation_enum, self.field_data.name,
                                                 self.field_data.field_size, time.calendar_year, time.day,
                                                 self.soil.data)
-            self.soil.carbon_cycling.residue_partition.partition_residue(self.soil.data.accumulated_runoff)
+            self.soil.carbon_cycling.residue_partition.add_residue_to_pools(self.soil.data.accumulated_runoff)
 
     def _remove_dead_crops(self) -> None:
         """
