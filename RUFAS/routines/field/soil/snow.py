@@ -2,8 +2,7 @@ import math
 from typing import Optional
 
 from RUFAS.routines.field.soil.soil_data import SoilData
-from RUFAS.routines.field.manager.current_weather import CurrentWeather
-
+from RUFAS.current_weather import CurrentWeather
 from RUFAS.output_manager import OutputManager
 
 om = OutputManager()
