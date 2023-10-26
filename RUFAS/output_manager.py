@@ -82,7 +82,7 @@ class OutputManager(object):
         # the function key; as they are already stored in element key and
         # having them increases the final file size.
         reduced_info_map = {
-            k: info_map[k] for k in info_map.keys() - {"class", "function"}
+            k: info_map[k] for k in info_map.keys() - {"class", "function", }
         }
         pool[key]["info_maps"].append(reduced_info_map)
 
@@ -360,9 +360,7 @@ class OutputManager(object):
 
                 for subkey in csv_column_lists.keys():
                     column_title = (
-                        f"{variable_name}.{field}_{subkey}"
-                        if field == "info_maps"
-                        else f"{variable_name}.{subkey}"
+                        f"{variable_name}.{subkey}"
                     )
                     column_list.append(
                         pd.Series(
@@ -370,7 +368,7 @@ class OutputManager(object):
                         )
                     )
             else:
-                column_title = f"{variable_name}.{field}"
+                column_title = f"{variable_name}"
                 column_list.append(
                     pd.Series(data_list, dtype=object, name=column_title)
                 )
@@ -851,9 +849,9 @@ class OutputManager(object):
         file_path = os.path.join(path, self._generate_file_name("errors", "json"))
         self._dict_to_file_json(self.errors_pool, file_path)
 
-    def dump_variable_names_and_contexts(
-        self, path: str, exclude_info_maps: bool, format_option: str = "verbose"
-    ) -> None:
+    def dump_variable_names_and_contexts(self, path: str, exclude_info_maps: bool,  # noqa: C901
+                                         format_option: str = "verbose",
+                                         ) -> None:
         """
         Dumps names of all variables added to variables_pool along with the caller class
         and function contextual information into a txt file in the given path to a directory.
@@ -866,11 +864,20 @@ class OutputManager(object):
         exclude_info_maps : bool
             Flag to denote whether info_map data should be dumped with variable names.
 
-        format_option : {"block", "inline", "verbose"}
+        format_option : {"block", "inline", "verbose", "basic"}
             The selection for the formatting option of the text written to the variables names text file.
 
         Examples
         --------
+        For the different format options available:
+
+        format_option: str = "basic" - Excludes information about whether data is from info_maps but has the same
+                                       format as output CSV column headers.
+        class_name.function_name.variable_name1.sub_variable1_name
+        class_name.function_name.variable_name1.sub_variable2_name
+        class_name.function_name.variable_name2.sub_variable1_name
+        class_name.function_name.variable_name3
+
         format_option: str = "block"
         class_name.function_name.variable_name
                                             .values: variable1_name
@@ -908,12 +915,17 @@ class OutputManager(object):
 
             prefix = name
             if format_option == "block":
+                if f"{name}{os.linesep}" not in var_list:
+                    var_list.append(f"{name}{os.linesep}")
                 prefix = " " * len(name)
 
             for parsable_dict in parsable_dicts:
                 keys = variable_data[parsable_dict][0].keys()
                 if format_option == "inline":
                     var_list.append(f"{name}.{parsable_dict}: {list(keys)}{os.linesep}")
+                elif format_option == "basic":
+                    for key in keys:
+                        var_list.append(f"{name}.{key}{os.linesep}")
                 else:
                     for key in keys:
                         var_list.append(f"{prefix}.{parsable_dict}: {key}{os.linesep}")
@@ -924,12 +936,12 @@ class OutputManager(object):
         self._list_to_file_txt(var_list, file_path)
 
     def dump_all_nondata_pools(
-        self, path: str, exclude_info_maps: bool = False
+        self, path: str, exclude_info_maps: bool = False, format_option: str = "verbose",
     ) -> None:
         """
         Dumps all non-data pools into the given path to a directory.
         """
-        self.dump_variable_names_and_contexts(path, exclude_info_maps)
+        self.dump_variable_names_and_contexts(path, exclude_info_maps, format_option)
         self.dump_logs(path)
         self.dump_warnings(path)
         self.dump_errors(path)
