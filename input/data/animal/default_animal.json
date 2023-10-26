@@ -40,9 +40,9 @@
 				"prefresh_day": 30,
                 "calving_interval": 400,
 				"heifers": {
-					"estrus_detection_rate": 0.8,
+					"estrus_detection_rate": 0.6,
 					"estrus_insemination_rate": 1,
-					"estrus_conception_rate": 0.8,
+					"estrus_conception_rate": 0.6,
 					"repro_protocols": {
 						"ED": {
 							"sub_protocol": null,
