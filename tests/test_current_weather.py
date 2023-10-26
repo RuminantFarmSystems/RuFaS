@@ -16,7 +16,7 @@ from RUFAS.time import Time
 ])
 def test_current_weather_snowfall(snow_fall: int, rainfall: int, actual: CurrentWeather) -> None:
     """Tests that precipitation falls either as snow or rain correctly."""
-    assert actual.snow_fall == snow_fall
+    assert actual.snowfall == snow_fall
     assert actual.rainfall == rainfall
 
 

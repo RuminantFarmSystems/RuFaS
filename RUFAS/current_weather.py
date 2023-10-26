@@ -25,7 +25,7 @@ class CurrentWeather:
         Length of time from sunup to sundown on the day (hours).
     annual_mean_air_temperature: float, optional, default=None
         Average annual air temperature for the year (C).
-    snow_fall: float, default=0.0
+    snowfall: float, default=0.0
         Amount of snow that falls on the day (mm).
     rainfall: float, default=0.0
         Amount of rainfall that occurs on the day (mm).
@@ -46,7 +46,7 @@ class CurrentWeather:
     max_air_temperature: Optional[float] = None
     daylength: Optional[float] = None
     annual_mean_air_temperature: Optional[float] = None
-    snow_fall: float = 0.0
+    snowfall: float = 0.0
     rainfall: float = 0.0
     irrigation: float = 0.0
     precipitation: float = 0.0
@@ -56,7 +56,7 @@ class CurrentWeather:
         if self.mean_air_temperature >= 0:
             self.rainfall = self.precipitation
         else:
-            self.snow_fall = self.precipitation
+            self.snowfall = self.precipitation
 
     @staticmethod
     def determine_daylength(month: int) -> int:
