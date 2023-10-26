@@ -22,8 +22,8 @@ from RUFAS.util import Utility
 def main():
     cmd_arguments = parse_gnu_args()
     run_rufas(
-        format_option=cmd_arguments.format_option,
         produce_graphics=not cmd_arguments.no_graphics,
+        format_option=cmd_arguments.format_option,
         verbose=cmd_arguments.verbose,
         clear_output=cmd_arguments.clear_output,
         exclude_info_maps=cmd_arguments.exclude_info_maps,
