@@ -33,6 +33,10 @@ class Percolation:
         has_seasonal_high_water_table : bool
             A flag indicating whether the HRU has a seasonal high water table (True/False).
 
+        Notes
+        -----
+        RuFaS allows percolation even when the temperature of the soil layer is below zero degrees Celsius.
+
         References
         ----------
         SWAT sections 2:3.1 and 2
@@ -40,31 +44,32 @@ class Percolation:
         layer_count = len(self.data.soil_layers)
         deepest_layer = layer_count - 1
 
-        for layer_number in range(layer_count):  # loop through each layer
+        for layer_number in reversed(range(layer_count)):
             current_layer = self.data.soil_layers[layer_number]
 
-            # get the appropriate underlying layer
             if layer_number < deepest_layer:
                 layer_below = self.data.soil_layers[layer_number + 1]
             else:
                 layer_below = self.data.vadose_zone_layer
 
-            # check for percolation conditions
             can_percolate = self._determine_if_percolation_allowed(layer_below.water_content,
                                                                    layer_below.field_capacity_content,
                                                                    layer_below.saturation_content,
                                                                    has_seasonal_high_water_table)
-            if current_layer.temperature > 0 and can_percolate:
+            if can_percolate:
                 percolated_water = self._percolate_between_layers(self.data.time_step, current_layer, layer_below)
                 current_layer.water_content -= percolated_water
                 current_layer.percolated_water = percolated_water
-                if layer_number > 0:
-                    layer_above = self.data.soil_layers[layer_number - 1]
-                    current_layer.water_content += layer_above.percolated_water
-                if layer_number == deepest_layer:
-                    self.data.vadose_zone_layer.water_content += self.data.soil_layers[-1].percolated_water
             else:
                 current_layer.percolated_water = 0
+
+        for layer_number in range(1, layer_count + 1):
+            layer_above = self.data.soil_layers[layer_number - 1]
+            percolated_water = layer_above.percolated_water
+            if layer_number == deepest_layer + 1:
+                self.data.vadose_zone_layer.water_content += percolated_water
+            else:
+                self.data.soil_layers[layer_number].water_content += percolated_water
 
     # --- Static methods ---
     @staticmethod
