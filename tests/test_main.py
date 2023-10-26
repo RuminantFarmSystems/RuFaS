@@ -1,7 +1,7 @@
 import argparse
 import os.path
 from pathlib import Path
-from mock import MagicMock, patch
+from mock import patch
 
 import pytest
 from pytest_mock import MockerFixture
