@@ -67,10 +67,7 @@ class SoilErosion:
         sediment_yield = self._determine_sediment_yield(self.data.surface_runoff_volume, peak_runoff_rate, field_size,
                                                         erodibility_factor, cover_factor, support_practice_factor,
                                                         topographic_factor, fragment_factor)
-        self.data.eroded_sediment = self._determine_adjusted_sediment_yield(sediment_yield,
-                                                                            self.data.snow_cover_water_content)
-
-        # TODO: does the soil profile needs to have mass removed from it as it gets eroded? - Issue #351
+        self.data.eroded_sediment = self._determine_adjusted_sediment_yield(sediment_yield, self.data.snow_content)
 
         # Update annual totals
         self.data.annual_eroded_sediment_total += self.data.eroded_sediment

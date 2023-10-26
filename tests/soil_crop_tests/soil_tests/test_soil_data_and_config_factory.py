@@ -58,7 +58,7 @@ def test_config_factory_defaults():
     assert generic.previous_temperature_effect == 0.8
     assert generic.slope_length == 3
     assert generic.manning == 0.4
-    assert generic.snow_cover_water_content == 0
+    assert generic.snow_content == 0
     assert generic.eroded_sediment == 0
 
     # Note: this kind of test (overall equality between objects) should be done IN ADDITION TO all the individual tests
