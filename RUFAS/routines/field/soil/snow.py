@@ -175,7 +175,7 @@ class Snow:
         if self.soil_data.snow_content < 0.0:
             raise ValueError("Snow Content should not be a negative number.")
 
-        self.soil_data.snow_content += current_day_weather.snow_fall
+        self.soil_data.snow_content += current_day_weather.snowfall
 
         if self.soil_data.snow_content == 0.0:
             self.soil_data.previous_day_snow_temperature, self.soil_data.current_day_snow_temperature = None, None

@@ -150,7 +150,7 @@ def test_melt_factor(soil_data: SoilData, day: int):
                          field_size=10),
                 CurrentWeather(mean_air_temperature=-5,
                                max_air_temperature=-1,
-                               snow_fall=0.0),
+                               snowfall=0.0),
                 15
         ),
         (
@@ -165,7 +165,7 @@ def test_melt_factor(soil_data: SoilData, day: int):
                          field_size=10),
                 CurrentWeather(mean_air_temperature=-5,
                                max_air_temperature=-1,
-                               snow_fall=1.0),
+                               snowfall=1.0),
                 25
         ),
         (
@@ -180,7 +180,7 @@ def test_melt_factor(soil_data: SoilData, day: int):
                          field_size=10),
                 CurrentWeather(mean_air_temperature=-5,
                                max_air_temperature=-1,
-                               snow_fall=0.0),
+                               snowfall=0.0),
                 15
         ),
         (
@@ -195,7 +195,7 @@ def test_melt_factor(soil_data: SoilData, day: int):
                          field_size=10),
                 CurrentWeather(mean_air_temperature=-5,
                                max_air_temperature=-1,
-                               snow_fall=0.0),
+                               snowfall=0.0),
                 15
         ),
         (
@@ -210,7 +210,7 @@ def test_melt_factor(soil_data: SoilData, day: int):
                          field_size=10),
                 CurrentWeather(mean_air_temperature=-5,
                                max_air_temperature=-1,
-                               snow_fall=1.0),
+                               snowfall=1.0),
                 15
         ),
         (
@@ -225,7 +225,7 @@ def test_melt_factor(soil_data: SoilData, day: int):
                          field_size=10),
                 CurrentWeather(mean_air_temperature=-5,
                                max_air_temperature=-1,
-                               snow_fall=1.0),
+                               snowfall=1.0),
                 15
         ),
         (
@@ -240,7 +240,7 @@ def test_melt_factor(soil_data: SoilData, day: int):
                          field_size=10),
                 CurrentWeather(mean_air_temperature=-5,
                                max_air_temperature=-1,
-                               snow_fall=0.0),
+                               snowfall=0.0),
                 15
         ),
         (
@@ -255,7 +255,7 @@ def test_melt_factor(soil_data: SoilData, day: int):
                          field_size=10),
                 CurrentWeather(mean_air_temperature=-5,
                                max_air_temperature=-1,
-                               snow_fall=1.0),
+                               snowfall=1.0),
                 15
         )
     ]
@@ -268,7 +268,7 @@ def test_update_snow(soil_data: SoilData, current_day_weather: CurrentWeather, d
             snow.update_snow(current_day_weather=current_day_weather, day=day)
         assert str(value_error.value) == "Snow Content should not be a negative number."
 
-    elif soil_data.snow_content + current_day_weather.snow_fall == 0.0:
+    elif soil_data.snow_content + current_day_weather.snowfall == 0.0:
         print("!!!!!")
         snow.update_snow(current_day_weather=current_day_weather, day=day)
         assert soil_data.previous_day_snow_temperature is None
@@ -300,4 +300,4 @@ def test_update_snow(soil_data: SoilData, current_day_weather: CurrentWeather, d
         assert soil_data.current_day_snow_temperature == dummy_snow_temperature
         mock_melt_snow.assert_called_once_with(soil_data, current_day_weather, day)
         assert soil_data.snow_melt_amount == snow_melt_amount
-        assert soil_data.snow_content == snow_content_before + current_day_weather.snow_fall - snow_melt_amount
+        assert soil_data.snow_content == snow_content_before + current_day_weather.snowfall - snow_melt_amount
