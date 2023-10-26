@@ -160,7 +160,7 @@ class AnimalInitialization:
             animal_num: number of animals to simulate
             sim_days: number of days to simulate
     '''
-    def init_animals(self, breed, animal_num=20000, sim_days=5000):
+    def init_animals(self, breed, animal_num=20000, sim_days=5000):  # noqa: C901
         calves = []
         heiferIs = []
         heiferIIs = []
