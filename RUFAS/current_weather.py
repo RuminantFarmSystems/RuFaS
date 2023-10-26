@@ -53,10 +53,11 @@ class CurrentWeather:
 
     def __post_init__(self):
         """Sets precipitation as snow_fall or rainfall depending on mean air temperature"""
-        if self.mean_air_temperature >= 0:
-            self.rainfall = self.precipitation
-        else:
+        is_freezing = self.mean_air_temperature < 0:
+        if is_freezing:
             self.snow_fall = self.precipitation
+        else:
+            self.rainfall= self.precipitation
 
     @staticmethod
     def determine_daylength(month: int) -> int:
