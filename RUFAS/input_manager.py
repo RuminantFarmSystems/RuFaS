@@ -300,7 +300,8 @@ class InputManager:
         return validator(variable_properties, var_name, input_data_value)
 
     def _validate_csv_element(self, var_name: str, properties_blob_key: str, input_data: Dict[str, Any],
-                              eager_termination: bool, element_counter_and_validity: Dict[str, int|bool]) -> Dict[str, int|bool]:
+                              eager_termination: bool, element_counter_and_validity: Dict[str, int | bool]
+                              ) -> Dict[str, int | bool]:
         """
         Receives data loaded from csv input file and the validates each row element in the csv column it's sent.
         It attempts to fix any invalid elements and tracks the number of valid, invalid, fixed,
@@ -320,7 +321,7 @@ class InputManager:
         eager_termination : bool
             If true, the process will be terminated upon finding invalid data.
 
-        element_counter_and_validity : Dict[str, Any]
+        element_counter_and_validity : Dict[str, int | bool]
             A dictionary that collects the counts of total elements checked,
             invalid elements, valid elements, and fixed elements as well as a boolean
             which is True if the data is valid, False otherwise.
@@ -360,7 +361,7 @@ class InputManager:
 
     def _validate_json_element(self, element_hierarchy: List[str], properties_blob_key: str,   # noqa
                                input_data: Dict[str, Any], eager_termination: bool,
-                               element_counter_and_validity: Dict[str, Any], ) -> dict:
+                               element_counter_and_validity: Dict[str, int | bool], ) -> dict:
         """
         Receives data loaded from json input file, recursively finds and then validates nested elements,
         attempts to fix any invalid elements, and tracks the number of valid, invalid, fixed,
@@ -380,7 +381,7 @@ class InputManager:
         eager_termination : bool
             If true, the process will be terminated upon finding invalid data.
 
-        element_counter_and_validity : Dict[str, Any]
+        element_counter_and_validity : Dict[str, int | bool]
             A dictionary that collects the counts of total elements checked,
             invalid elements, valid elements, and fixed elements as well as a boolean
             which is True if the data is valid, False otherwise.
