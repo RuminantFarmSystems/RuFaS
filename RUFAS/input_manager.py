@@ -207,7 +207,7 @@ class InputManager:
         om.add_log("Total Invalid Items", f"{invalid_elements_counter=}", info_map)
         if config.global_variables.PRINT_STATUS_MESSAGES:
             sys.stdout.write(f"{fixed_elements_counter} element(s) fixed during the validation process.\n")
-            sys.stdout.write(f"{invalid_elements_counter} element(s) found invalid and unfixable.\n")
+            sys.stdout.write(f"{invalid_elements_counter} invalid and unfixable element(s) were found.\n")
         return invalid_elements_counter == 0
 
     def _filter_input_data_by_metadata(self, input_data: Dict[str, Any],
