@@ -1,7 +1,7 @@
 import argparse
 import os.path
 from pathlib import Path
-from mock import MagicMock
+from mock import MagicMock, patch
 
 import pytest
 from pytest_mock import MockerFixture
@@ -26,26 +26,46 @@ dir_path = os.path.join(global_variables.ROOT_DIR, "input")
 file_path = os.path.join(dir_path, "input/ARL.json")
 
 
-def test_main(mocker: MockerFixture):
-    """Unit test for main() function in main.py"""
-    mock_cmd_arguments = MagicMock()
-    patch_run_rufas = mocker.patch("main.run_rufas")
-    patch_parse_gnu_args = mocker.patch(
-        "main.parse_gnu_args", return_value=mock_cmd_arguments
-    )
+@pytest.mark.parametrize(
+    "format_option, no_graphics, graphics_dir, verbose, clear_output, exclude_info_maps, only_run_validation",
+    [
+        ("verbose", False, "graphics", True, True, True, True),
+        ("basic", True, "custom_graphics", False, False, False, False),
+        ("block", True, "graphics", False, True, False, False),
+    ],
+)
+def test_main(
+    format_option: str,
+    no_graphics: bool,
+    graphics_dir: str,
+    verbose: bool,
+    clear_output: bool,
+    exclude_info_maps: bool,
+    only_run_validation: bool,
+) -> None:
+    with patch("main.parse_gnu_args") as mock_parse_gnu_args:
+        mock_parse_gnu_args.return_value = argparse.Namespace(
+            format_option=format_option,
+            no_graphics=no_graphics,
+            graphics_dir=graphics_dir,
+            verbose=verbose,
+            clear_output=clear_output,
+            exclude_info_maps=exclude_info_maps,
+            only_run_validation=only_run_validation,
+        )
 
-    main()
-
-    patch_run_rufas.assert_called_once_with(
-        produce_graphics=not mock_cmd_arguments.no_graphics,
-        format_option=mock_cmd_arguments.format_option,
-        verbose=mock_cmd_arguments.verbose,
-        clear_output=mock_cmd_arguments.clear_output,
-        exclude_info_maps=mock_cmd_arguments.exclude_info_maps,
-        only_run_validation=mock_cmd_arguments.only_run_validation,
-        graphics_dir=mock_cmd_arguments.graphics_dir,
-    )
-    patch_parse_gnu_args.assert_called_once()
+        with patch("main.run_rufas") as mock_run_rufas:
+            main()
+            mock_parse_gnu_args.assert_called_once()
+            mock_run_rufas.assert_called_once_with(
+                produce_graphics=not no_graphics,
+                format_option=format_option,
+                verbose=verbose,
+                clear_output=clear_output,
+                exclude_info_maps=exclude_info_maps,
+                only_run_validation=only_run_validation,
+                graphics_dir=Path(graphics_dir),
+            )
 
 
 @pytest.mark.parametrize(
