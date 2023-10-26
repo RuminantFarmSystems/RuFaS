@@ -13,7 +13,7 @@
 	"animal_config": {
 		"management_decisions": {
 			"breeding_start_day_h": 380,
-			"heifer_repro_method": "ED",
+			"heifer_repro_method": "TAI",
 			"cow_repro_method": "TAI",
 			"semen_type": "conventional",
 			"days_in_preg_when_dry": 218,
@@ -40,9 +40,9 @@
 				"prefresh_day": 30,
                 "calving_interval": 400,
 				"heifers": {
-					"estrus_detection_rate": 0.6,
+					"estrus_detection_rate": 0.8,
 					"estrus_insemination_rate": 1,
-					"estrus_conception_rate": 0.6,
+					"estrus_conception_rate": 0.8,
 					"repro_protocols": {
 						"ED": {
 							"sub_protocol": null,
@@ -61,7 +61,7 @@
 				"cows": {
 					"estrus_detection_rate": 0.6,
 					"estrus_insemination_rate": 1,
-					"estrus_conception_rate": 0.5,
+					"estrus_conception_rate": 0.6,
 					"repro_protocols": {
 						"Presynch": {
 							"sub_protocol": "Double OvSynch",

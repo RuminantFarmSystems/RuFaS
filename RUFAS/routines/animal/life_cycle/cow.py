@@ -15,6 +15,7 @@ Description: This file updates the cow form first calving to leaving the herd.
                 health culling for 6 reasons: Lameness, Injury, Mastitis,
                 Disease, Udder, and Unknown
 """
+from __future__ import annotations
 
 import math
 import numpy as np
@@ -151,20 +152,6 @@ class Cow(HeiferIII):
             self.CI = args['calving_interval']
             self.set_parity_index()
             self.set_lactation_curve_params()
-
-    @property
-    def is_pregnant(self):
-        """
-        Check if the cow is pregnant.
-
-        Returns
-        -------
-        bool
-            True if the cow is pregnant, False otherwise.
-
-        """
-
-        return self.days_in_preg > 0
 
     @property
     def is_lactating(self):
@@ -985,7 +972,7 @@ class Cow(HeiferIII):
         """
         # if on estrus day, start detecting estrus
         if self.days_born == self.estrus_day and \
-                self.days_in_milk < AnimalBase.config['tai_program_start_day']:
+                self.days_in_milk < AnimalBase.config['cow_repro_programs']['tai_program_start_day']:
             self.estrus_count += 1
 
             if 1 <= self.days_in_milk <= AnimalBase.config['voluntary_waiting_period']:
@@ -993,17 +980,17 @@ class Cow(HeiferIII):
             else:
                 estrus_detection_rand = random()
                 if estrus_detection_rand < \
-                        AnimalBase.config['estrus_detection_rate']:
+                        AnimalBase.config['cow_repro_programs']['estrus_detection_rate']:
                     # Estrus detected
                     self.events.add_event(
                         self.days_born, sim_day, const.ESTRUS_DETECTED)
                     estrus_service_rand = random()
                     if estrus_service_rand < \
-                            AnimalBase.config['estrus_service_rate']:
+                            AnimalBase.config['cow_repro_programs']['estrus_service_rate']:
                         # serviced
                         self.ai_day = self.estrus_day + 1
                         self.conception_rate = \
-                            AnimalBase.config['estrus_conception_rate']
+                            AnimalBase.config['cow_repro_programs']['estrus_conception_rate']
                     else:
                         self.return_estrus(sim_day)
                 else:
@@ -1012,7 +999,7 @@ class Cow(HeiferIII):
         if self.milking:
             self.ED_days += 1
 
-        if self.days_in_milk == AnimalBase.config['tai_program_start_day'] and \
+        if self.days_in_milk == AnimalBase.config['cow_repro_programs']['tai_program_start_day'] and \
                 self.ai_day == 0:
             self.estrus_day = 0
             self.determine_tai_program_day(self.days_born)
@@ -1198,6 +1185,37 @@ class Cow(HeiferIII):
                     self.days_born, sim_day, const.DO_NOT_BREED)
                 self.do_not_breed = True
             return True
+
+    @property
+    def avg_estrus_cycle(self):
+        return AnimalBase.config['avg_estrus_cycle_cow']
+
+    @property
+    def std_estrus_cycle(self):
+        return AnimalBase.config['std_estrus_cycle_cow']
+
+    @staticmethod
+    def _get_repro_data(attribute: str):
+        return AnimalBase.config['cows'][attribute]
+
+    # Note: Not used yet. Will revisit next.
+    def _handle_successful_conception(self, sim_day: int):
+        self.log_event(self.days_born, sim_day, const.COW_PREG)
+        self._initialize_pregnancy_parameters()
+        if self.calves > 0:
+            last_time_given_birth = self.events.get_most_recent_date(const.NEW_BIRTH)
+            self.calving_to_preg_time = self.days_born - last_time_given_birth
+
+    # Note: Not used yet. Will revisit next.
+    def _handle_failed_conception(self, sim_day: int):
+        self.log_event(self.days_born, sim_day, const.COW_NOT_PREG)
+        self.open_stage = True
+        if self.repro_program in ['ED'] or self.resynch_method in ['TAIafterPD', 'PGFatPD']:
+            self._simulate_estrus(self.estrus_day, sim_day, const.ESTRUS_AFTER_AI_NOTE)
+
+    # Note: Not implemented yet. Will revisit next.
+    def _handle_preg_check(self, preg_check_config: dict[str, int | str], sim_day: int):
+        pass
 
     # Cull methods
     def cull_update(self, sim_day):
