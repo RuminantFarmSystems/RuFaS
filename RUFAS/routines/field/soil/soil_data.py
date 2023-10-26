@@ -135,9 +135,8 @@ class SoilData:
     If the watershed is in the Northern Hemisphere, SMFMN will be the minimum melt factor.
     If the watershed is in the Southern Hemisphere, SMFMN will be the maximum melt factor.
     """
-    sublimation: float = 0.0
+    water_sublimated: float = 0.0
     """Amount of snow water content lost through sublimation on the current day (mm)."""
-
 
     # ---- Erosion
     slope_length: float = 3

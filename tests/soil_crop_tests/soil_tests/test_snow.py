@@ -314,12 +314,11 @@ def test_sublimate(max_sublimation: float, snow_content: float, expected_sublima
                    expected_snow_content) -> None:
     """Tests that water is correctly sublimated from the snow pack of a field."""
     mock_soil_data = MagicMock(SoilData)
-    mock_soil_data.sublimation = 42.0
+    mock_soil_data.water_sublimated = 42.0
     mock_soil_data.snow_content = snow_content
     snow = Snow(mock_soil_data)
 
-    actual_sublimation = snow.sublimate(max_sublimation)
+    snow.sublimate(max_sublimation)
 
-    assert actual_sublimation == expected_sublimation
-    assert mock_soil_data.sublimation == expected_sublimation
+    assert mock_soil_data.water_sublimated == expected_sublimation
     assert mock_soil_data.snow_content == expected_snow_content
