@@ -238,7 +238,7 @@ def test_parse_gnu_args(mocker: MockerFixture) -> None:
     actual_args = parse_gnu_args()
 
     # Assert
-    assert mock_add_argument.call_count == 6
+    assert mock_add_argument.call_count == 7
     assert mock_add_argument.call_args_list == [
         mocker.call(
             "-f",
