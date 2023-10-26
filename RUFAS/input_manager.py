@@ -170,7 +170,7 @@ class InputManager:
             try:
                 file_type = file_details["type"]
                 data_loader = data_type_to_loader_map[file_details["type"]]
-                data = data_loader(file_path)
+                input_data = data_loader(file_path)
             except KeyError:
                 raise KeyError(f"Faulty data type in {file_blob_key},"
                                f"supported types are: {data_type_to_loader_map.keys()}")
@@ -179,11 +179,11 @@ class InputManager:
             properties = self.__metadata["properties"][properties_blob_key]
             for prop in properties:
                 if file_type == "json":
-                    sub_counters, is_prop_valid = self._validate_json_element2([prop], properties_blob_key, data,
+                    sub_counters, is_prop_valid = self._validate_json_element2([prop], properties_blob_key, input_data,
                                                                                    )
                     validation_result = {**sub_counters, "is_valid": is_prop_valid}
                 elif file_type == "csv":
-                    validation_result = self._validate_csv_element(prop, properties_blob_key, data,
+                    validation_result = self._validate_csv_element(prop, properties_blob_key, input_data,
                                                                    eager_termination)
 
                 for key, value in validation_result.items():
@@ -191,7 +191,7 @@ class InputManager:
                         counters[key] += value
 
                 if validation_result["is_valid"]:
-                    self.__pool[file_blob_key] = data
+                    self.__pool[file_blob_key] = input_data
                 elif eager_termination:
                     # return False
                     raise Exception(f"Cannot fix the following data: {prop} in {file_blob_key}.")
@@ -202,6 +202,35 @@ class InputManager:
         om.add_log("Total Invalid Items", f"{counters['invalid_elements']}", info_map)
 
         return counters['invalid_elements'] == 0
+
+    def _filter_input_data_by_metadata(self, input_data: Dict[str, Any],
+                                       metadata_properties: Dict[str, Any]) -> Dict[str, Any]:
+        """
+        Filter input data dictionary based on provided metadata properties.
+
+        This function removes key-value pairs from the input data dictionary (input_data) if
+        the corresponding keys are not present in the metadata properties dictionary
+        (metadata_properties). Nested dictionaries are processed recursively.
+
+        Parameters:
+        -----------
+        input_data : dict
+            The input data dictionary to be filtered.
+
+        metadata_properties : Dict[str, Any]
+            The dictionary containing metadata properties used as a filter for input_data.
+        """
+        filtered_input_data = {}
+        for key, value in input_data.items():
+            if key in metadata_properties:
+                if isinstance(metadata_properties[key], dict) and isinstance(value, dict):
+                    nested_input_data = self._filter_input_data_by_metadata(value, metadata_properties[key])
+                    if nested_input_data:
+                        filtered_input_data[key] = nested_input_data
+                else:
+                    filtered_input_data[key] = value
+
+        return filtered_input_data
 
     def _validate_input_type_dynamic(self, variable_properties: Dict[str, Any], var_name: str, input_data_value: Any):
         """
@@ -313,13 +342,13 @@ class InputManager:
                     }
         element_counter_and_validity = {"fixed_elements": 0, "total_elements": 0, "valid_elements": 0,
                                         "invalid_elements": 0, "is_valid": True}
-        property_data = input_data[var_name]
+        variable = input_data[var_name]
         variable_properties = reduce(lambda d, key: d[key], [var_name],
                                      self.__metadata["properties"][properties_blob_key])
 
-        for element_num in range(len(property_data)):
+        for element_num in range(len(variable)):
             element_counter_and_validity["total_elements"] += 1
-            is_valid = self._validate_input_type_dynamic(variable_properties, var_name, property_data[element_num])
+            is_valid = self._validate_input_type_dynamic(variable_properties, var_name, variable[element_num])
             if is_valid:
                 element_counter_and_validity["valid_elements"] += 1
             else:
