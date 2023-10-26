@@ -133,7 +133,7 @@ class Weather:
         """
         year = time.year
         day = time.day
-        month = CurrentWeather.date_conversion_month(time)
+        month = CurrentWeather.day_to_month_conversion(time)
         daylength = CurrentWeather.determine_daylength(month)
         try:
             current_weather = CurrentWeather(incoming_light=self.radiation[year - 1][day - 1],

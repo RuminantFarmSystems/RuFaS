@@ -37,9 +37,9 @@ def test_determine_daylength(months: List[int], expected: List[int]):
     (2000, 60, 2),
     (2001, 60, 3)
 ])
-def test_date_conversion_month(year: int, day: int, expected_month: int):
+def test_day_to_month_conversion(year: int, day: int, expected_month: int):
     """Tests that number of days were converted into months correctly"""
     mocked_time = MagicMock(Time)
     setattr(mocked_time, "calendar_year", year)
     setattr(mocked_time, "day", day)
-    assert CurrentWeather.date_conversion_month(mocked_time) == expected_month
+    assert CurrentWeather.day_to_month_conversion(mocked_time) == expected_month
