@@ -945,6 +945,7 @@ def test_execute_daily_processes(field_size: float, crops_growing: bool, residue
                                          min_air_temperature=min_temp, max_air_temperature=max_temp,
                                          annual_mean_air_temperature=annual_mean_temp)
 
+        incorp.soil.snow.update_snow = MagicMock()
         incorp._determine_total_above_ground_biomass = MagicMock(return_value=89)
         incorp.soil.soil_temp.daily_soil_temperature_update = MagicMock()
         incorp._cycle_water = MagicMock()
@@ -961,6 +962,7 @@ def test_execute_daily_processes(field_size: float, crops_growing: bool, residue
         setattr(mocked_time, "day", 178)
         incorp._execute_daily_processes(current_weather, mocked_time)
 
+        incorp.soil.snow.update_snow.assert_called_once_with(current_day_weather=current_weather, day=mocked_time.day)
         incorp._determine_total_above_ground_biomass.assert_called_once()
         incorp.soil.soil_temp.daily_soil_temperature_update.assert_called_once_with(light, mean_temp, min_temp,
                                                                                     max_temp, 89 + residue, 0,
