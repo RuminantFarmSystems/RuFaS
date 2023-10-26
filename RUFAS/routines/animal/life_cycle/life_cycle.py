@@ -23,7 +23,6 @@ from RUFAS.routines.animal.animal_typed_dicts import AnimalConfigTypedDict, Herd
 from RUFAS.routines.animal.animal_typed_dicts import InitializationDBSummaryTypedDict
 from RUFAS.routines.animal.life_cycle import animal_constants
 from RUFAS.routines.animal.life_cycle.animal_base import AnimalBase
-from RUFAS.routines.animal.life_cycle.animal_initialization import AnimalInitialization
 from RUFAS.routines.animal.life_cycle.animal_data import AnimalData
 
 from RUFAS.routines.animal.life_cycle.calf import Calf

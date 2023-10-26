@@ -31,7 +31,7 @@ class AnimalData:
         self.animal_id += 1
         return self.animal_id
 
-    def __init__(self, CI, breed, set_seed, init=True):
+    def __init__(self, CI, breed, set_seed):
         self.calves = []
         self.heiferIs = []
         self.heiferIIs = []
@@ -49,102 +49,6 @@ class AnimalData:
         # If set_seed is True, then we do not want the results to be ordered
         # randomly. If set_seed is False, then we do want this.
         self.order_by_random = not set_seed
-
-        if init:
-            self.init_animals(breed)
-
-    def init_animals(self, breed, animal_num=20000, sim_days=5000):
-        print("called")
-        for _ in range(animal_num):
-            args = {
-                'id': self.next_id(),
-                'breed': breed,
-                'birth_date': 0,
-                'days_born': 0,
-                'p_init': 0,
-                'birth_weight': 0
-            }
-            calf = Calf(args)
-            if not (calf.culled or calf.sold):
-                self.calves.append(calf)
-
-        for day in range(sim_days):
-            for calf in self.calves:
-                wean_day = calf.update(0)
-                if wean_day:
-                    args = calf.get_calf_values()
-                    args.update(id=self.next_id())
-
-                    heiferI = HeiferI(args)
-                    self.heiferIs.append(heiferI)
-                    self.calves.remove(calf)
-
-            for heiferI in self.heiferIs:
-                second_stage = heiferI.update(0)
-                if second_stage:
-                    args = heiferI.get_heiferI_values()
-                    args.update(id=self.next_id())
-                    args.update(repro_program=AnimalBase.config['heifer_repro_method'])
-                    args.update(tai_method_h=AnimalBase.config['heifer_repro_programs']['heifer_TAI_protocol'])
-                    args.update(synch_ed_method_h=AnimalBase.config['heifer_repro_programs']['heifer_synchED_protocol'])
-
-                    heiferII = HeiferII(args)
-                    self.heiferIIs.append(heiferII)
-                    self.heiferIs.remove(heiferI)
-
-            for heiferII in self.heiferIIs:
-                cull_stage, third_stage = heiferII.update(0)
-                if cull_stage:
-                    self.heiferIIs.remove(heiferII)
-                if third_stage:
-                    args = heiferII.get_heiferII_values()
-                    args.update(id=self.next_id())
-
-                    heiferIII = HeiferIII(args)
-                    self.heiferIIIs.append(heiferIII)
-                    self.heiferIIs.remove(heiferII)
-
-            for heiferIII in self.heiferIIIs:
-                cow_stage = heiferIII.update(0)
-                if cow_stage:
-                    args = heiferIII.get_heiferIII_values()
-
-                    args.update(id=self.next_id())
-                    args.update(repro_program='TAI')
-                    args.update(presynch_method='PreSynch')
-                    args.update(tai_method_c='OvSynch 56')
-                    args.update(resynch_method='TAIafterPD')
-
-                    cow = Cow(args)
-
-                    self.cows.append(cow)
-                    if day >= 3000:
-                        args.update(id=self.next_id())
-                        replacement_cow = Cow(args)
-                        self.replacement.append(replacement_cow)
-
-                    self.heiferIIIs.remove(heiferIII)
-
-            for cow in self.cows:
-                _, _, _, culled, new_born = cow.update(0, self.CI)
-                if culled or cow.calves > 4:
-                    self.cows.remove(cow)
-                if new_born:
-                    args = {
-                        'id': self.next_id(),
-                        'breed': breed,
-                        'birth_date': 0,
-                        'days_born': 0,
-                        'p_init': cow.p_gest_for_calf,
-                        'birth_weight': cow.calf_birth_weight
-                    }
-                    cow.p_animal = cow.p_animal - cow.p_gest_for_calf + cow.p_growth + cow.dP_reserves
-                    cow.p_gest_for_calf = 0
-                    cow.calf_birth_weight = 0
-
-                    calf = Calf(args)
-                    if not (calf.culled or calf.sold):
-                        self.calves.append(calf)
 
     def _init_calves(self, num: int, breed: str) -> List[Calf]:
         calves: List[Calf] = []
