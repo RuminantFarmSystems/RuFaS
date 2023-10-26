@@ -2,7 +2,7 @@ import math
 from typing import Optional
 
 from RUFAS.routines.field.soil.soil_data import SoilData
-from RUFAS.current_weather import CurrentWeather
+from RUFAS.current_day_weather import CurrentDayWeather
 from RUFAS.output_manager import OutputManager
 
 om = OutputManager()
@@ -24,10 +24,10 @@ class Snow:
 
     Methods
     -------
-    _calc_snow_temp(current_day_weather: CurrentWeather) -> float:
+    _calc_snow_temp(current_day_weather: CurrentDayWeather) -> float:
         Calculate the snow pack temperature for the current day.
 
-    _melt_snow(current_day_weather: CurrentWeather, day: int) -> float:
+    _melt_snow(current_day_weather: CurrentDayWeather, day: int) -> float:
         Calculate the snow melt for the current day.
 
     _melt_factor(day: int) -> float:
@@ -36,7 +36,7 @@ class Snow:
     sublimation():
         Placeholder function for sublimation calculations.
 
-    update_snow(current_day_weather: CurrentWeather, day: int) -> None:
+    update_snow(current_day_weather: CurrentDayWeather, day: int) -> None:
         Update snow-related data including snow content and temperatures.
     """
 
@@ -45,7 +45,7 @@ class Snow:
         self.soil_data = soil_data or SoilData(field_size=field_size)
 
     @staticmethod
-    def _calc_snow_temp(soil_data: SoilData, current_day_weather: CurrentWeather) -> float:
+    def _calc_snow_temp(soil_data: SoilData, current_day_weather: CurrentDayWeather) -> float:
         """
         This function calculates the snow pack temperature for the current day.
 
@@ -53,7 +53,7 @@ class Snow:
         ----------
         soil_data : SoilData
             The object that tracks all soil variables throughout the simulation.
-        current_day_weather : CurrentWeather
+        current_day_weather : CurrentDayWeather
             The current day weather data.
 
         Returns
@@ -69,7 +69,7 @@ class Snow:
                (current_day_weather.mean_air_temperature * soil_data.snow_lag_factor)
 
     @staticmethod
-    def _melt_snow(soil_data: SoilData, current_day_weather: CurrentWeather, day: int) -> float:
+    def _melt_snow(soil_data: SoilData, current_day_weather: CurrentDayWeather, day: int) -> float:
         """
         This function calculates the amount of snow melting for the current day.
 
@@ -77,7 +77,7 @@ class Snow:
         ----------
         soil_data : SoilData
             The object that tracks all soil variables throughout the simulation.
-        current_day_weather : CurrentWeather
+        current_day_weather : CurrentDayWeather
             The current day weather data.
         day :int
             The day number of the year.
@@ -139,7 +139,7 @@ class Snow:
     def sublimation(self):
         pass
 
-    def update_snow(self, current_day_weather: CurrentWeather, day: int) -> None:
+    def update_snow(self, current_day_weather: CurrentDayWeather, day: int) -> None:
         """
         Update snow-related data for the current day.
 
@@ -159,7 +159,7 @@ class Snow:
 
         Parameters
         ----------
-        current_day_weather : CurrentWeather
+        current_day_weather : CurrentDayWeather
             The current day weather data.
         day : int
             The day number of the year.

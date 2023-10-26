@@ -4,7 +4,7 @@ from unittest.mock import MagicMock, patch
 from typing import Callable
 
 from RUFAS.config import Config
-from RUFAS.current_weather import CurrentWeather
+from RUFAS.current_day_weather import CurrentDayWeather
 from RUFAS.time import Time
 from RUFAS.weather import Weather
 
@@ -31,7 +31,7 @@ def weather_original_method_states(mock_weather: Weather) -> dict[str, Callable]
     """Fixture to store unmocked methods of Weather."""
     return {
         "_calculate_average_annual_temperature": mock_weather._calculate_average_annual_temperature,
-        "get_current_weather": mock_weather.get_current_weather
+        "get_current_day_weather": mock_weather.get_current_day_weather
     }
 
 
@@ -46,23 +46,25 @@ def test_calculate_average_annual_temperature(avg_daily_temperatures: list[float
 
 
 @pytest.mark.parametrize("day,year,expected", [
-    (1, 1, CurrentWeather(incoming_light=1.0, min_air_temperature=1.1, mean_air_temperature=1.2,
-                          max_air_temperature=1.3, annual_mean_air_temperature=15.0, precipitation=1.4, irrigation=1.5,
-                          daylength=10.0)),
-    (3, 1, CurrentWeather(incoming_light=3.0, min_air_temperature=3.1, mean_air_temperature=3.2,
-                          max_air_temperature=3.3, annual_mean_air_temperature=15.0, precipitation=3.4, irrigation=3.5,
-                          daylength=10.0))
+    (1, 1, CurrentDayWeather(incoming_light=1.0, min_air_temperature=1.1, mean_air_temperature=1.2,
+                             max_air_temperature=1.3, annual_mean_air_temperature=15.0, precipitation=1.4,
+                             irrigation=1.5,
+                             daylength=10.0)),
+    (3, 1, CurrentDayWeather(incoming_light=3.0, min_air_temperature=3.1, mean_air_temperature=3.2,
+                             max_air_temperature=3.3, annual_mean_air_temperature=15.0, precipitation=3.4,
+                             irrigation=3.5,
+                             daylength=10.0))
 ])
-def test_get_current_weather(mock_weather: Weather, day: int, year: int, expected: CurrentWeather) -> None:
-    """Tests that CurrentWeather instances are correctly created by Weather."""
+def test_get_current_day_weather(mock_weather: Weather, day: int, year: int, expected: CurrentDayWeather) -> None:
+    """Tests that CurrentDayWeather instances are correctly created by Weather."""
     mocked_time = MagicMock(Time)
     setattr(mocked_time, "day", day)
     setattr(mocked_time, "year", year)
     with patch("RUFAS.util.Utility.day_to_month_conversion", new_callable=MagicMock,
                return_value=3) as day, \
-            patch("RUFAS.current_weather.CurrentWeather.determine_daylength", new_callable=MagicMock,
+            patch("RUFAS.current_day_weather.CurrentDayWeather.determine_daylength", new_callable=MagicMock,
                   return_value=10.0) as daylength:
-        actual = mock_weather.get_current_weather(mocked_time)
+        actual = mock_weather.get_current_day_weather(mocked_time)
 
         assert actual == expected
         assert day.call_count == 1
@@ -73,15 +75,15 @@ def test_get_current_weather(mock_weather: Weather, day: int, year: int, expecte
     (4, 1, "Attempted to get weather conditions for day: 4, year: 1."),
     (2, 8, "Attempted to get weather conditions for day: 2, year: 8.")
 ])
-def test_get_current_weather_error(mock_weather: Weather, day: int, year: int, expected: CurrentWeather) -> None:
+def test_get_current_day_weather_error(mock_weather: Weather, day: int, year: int, expected: CurrentDayWeather) -> None:
     """Tests that error is raised properly when weather does not have data for specified time."""
     mocked_time = MagicMock(Time)
     setattr(mocked_time, "day", day)
     setattr(mocked_time, "year", year)
     with patch("RUFAS.util.Utility.day_to_month_conversion", new_callable=MagicMock,
                return_value=3), \
-            patch("RUFAS.current_weather.CurrentWeather.determine_daylength", new_callable=MagicMock,
+            patch("RUFAS.current_day_weather.CurrentDayWeather.determine_daylength", new_callable=MagicMock,
                   return_value=10.0), \
             pytest.raises(IndexError) as e:
-        mock_weather.get_current_weather(mocked_time)
+        mock_weather.get_current_day_weather(mocked_time)
     assert str(e.value) == expected

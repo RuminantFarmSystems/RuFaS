@@ -1,6 +1,6 @@
 import numpy as np
 
-from RUFAS.current_weather import CurrentWeather
+from RUFAS.current_day_weather import CurrentDayWeather
 from RUFAS.time import Time
 from RUFAS.util import Utility
 
@@ -112,9 +112,9 @@ class Weather:
 
         self.T_avg_annual = self._calculate_average_annual_temperature(weather_file['avg'])
 
-    def get_current_weather(self, time: Time) -> CurrentWeather:
+    def get_current_day_weather(self, time: Time) -> CurrentDayWeather:
         """
-        Creates a CurrentWeather object containing all the weather conditions on the current day.
+        Creates a CurrentDayWeather object containing all the weather conditions on the current day.
 
         Parameters
         ----------
@@ -123,8 +123,8 @@ class Weather:
 
         Returns
         -------
-        CurrentWeather
-            CurrentWeather instance including all the weather conditions of the specified date.
+        CurrentDayWeather
+            CurrentDayWeather instance including all the weather conditions of the specified date.
 
         Raises
         ------
@@ -135,16 +135,16 @@ class Weather:
         year = time.year
         day = time.day
         month = Utility.day_to_month_conversion(time)
-        daylength = CurrentWeather.determine_daylength(month)
+        daylength = CurrentDayWeather.determine_daylength(month)
         try:
-            current_weather = CurrentWeather(incoming_light=self.radiation[year - 1][day - 1],
-                                             min_air_temperature=self.T_min[year - 1][day - 1],
-                                             mean_air_temperature=self.T_avg[year - 1][day - 1],
-                                             max_air_temperature=self.T_max[year - 1][day - 1],
-                                             annual_mean_air_temperature=self.T_avg_annual,
-                                             precipitation=self.rainfall[year - 1][day - 1],
-                                             irrigation=self.irrigation[year - 1][day - 1],
-                                             daylength=daylength)
+            current_weather = CurrentDayWeather(incoming_light=self.radiation[year - 1][day - 1],
+                                                min_air_temperature=self.T_min[year - 1][day - 1],
+                                                mean_air_temperature=self.T_avg[year - 1][day - 1],
+                                                max_air_temperature=self.T_max[year - 1][day - 1],
+                                                annual_mean_air_temperature=self.T_avg_annual,
+                                                precipitation=self.rainfall[year - 1][day - 1],
+                                                irrigation=self.irrigation[year - 1][day - 1],
+                                                daylength=daylength)
         except IndexError:
             raise IndexError(f"Attempted to get weather conditions for day: {time.day}, year: {time.year}.")
 

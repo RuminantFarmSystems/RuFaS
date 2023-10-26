@@ -1,6 +1,6 @@
 from RUFAS.routines.field.manager.field_manager import FieldManager
 from RUFAS.routines.field.manager.crop_schedule import CropSchedule
-from RUFAS.current_weather import CurrentWeather
+from RUFAS.current_day_weather import CurrentDayWeather
 from RUFAS.routines.field.manager.fertilizer_schedule import FertilizerSchedule
 from RUFAS.routines.field.manager.manure_schedule import ManureSchedule
 from RUFAS.routines.field.manager.tillage_schedule import TillageSchedule
@@ -57,7 +57,7 @@ def mock_weather(mocker: MockerFixture) -> Weather:
 def weather_original_method_states(mock_weather: Weather) -> Dict[str, Callable]:
     """Fixture to store unmocked methods of Weather."""
     return {
-        "get_current_weather": mock_weather.get_current_weather
+        "get_current_weather": mock_weather.get_current_day_weather
     }
 
 
@@ -77,7 +77,7 @@ def test_daily_update_routine(fields: List[Field], mock_weather: Weather,
     setattr(mocked_time, "day", 5)
 
     mocked_manure_manager = MagicMock(ManureManager)
-    mock_weather.get_current_weather = MagicMock(return_value=MagicMock(CurrentWeather))
+    mock_weather.get_current_day_weather = MagicMock(return_value=MagicMock(CurrentDayWeather))
     with patch("RUFAS.routines.field.manager.field_manager.FieldManager._get_field_blob_names", return_value=[]):
         fm = FieldManager(mocked_manure_manager)
 
@@ -88,9 +88,9 @@ def test_daily_update_routine(fields: List[Field], mock_weather: Weather,
         fm.daily_update_routine(weather=mock_weather, time=mocked_time)
         for field in fields:
             assert field.manage_field.call_count == 1
-        assert mock_weather.get_current_weather.call_count == 1
+        assert mock_weather.get_current_day_weather.call_count == 1
         assert fm.output_gatherer.send_daily_variables.call_count == 1
-    mock_weather.get_current_weather = weather_original_method_states["get_current_weather"]
+    mock_weather.get_current_day_weather = weather_original_method_states["get_current_weather"]
 
 
 @pytest.mark.parametrize("fields", [

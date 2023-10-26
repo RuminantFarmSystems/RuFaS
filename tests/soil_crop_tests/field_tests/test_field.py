@@ -6,7 +6,7 @@ from RUFAS.routines.field.crop.crop import Crop
 from RUFAS.routines.field.crop.crop_data import CropData
 from RUFAS.routines.field.crop.harvest_operations import HarvestOperation
 from RUFAS.routines.field.crop.species_data_factory import CropSpecies
-from RUFAS.current_weather import CurrentWeather
+from RUFAS.current_day_weather import CurrentDayWeather
 from RUFAS.routines.field.manager.events import Event, PlantingEvent, HarvestEvent, FertilizerEvent, ManureEvent
 from RUFAS.routines.field.soil.soil import Soil
 from RUFAS.routines.field.soil.soil_data import SoilData
@@ -51,7 +51,7 @@ def test_manage_field() -> None:
     field._remove_dead_crops = MagicMock()
     field._reset_crop_field_coverage_fractions = MagicMock()
     mocked_time = MagicMock(Time)
-    mocked_weather = MagicMock(CurrentWeather)
+    mocked_weather = MagicMock(CurrentDayWeather)
     setattr(mocked_weather, "daylength", 12)
 
     field.manage_field(mocked_time, mocked_weather)
@@ -941,9 +941,9 @@ def test_execute_daily_processes(field_size: float, crops_growing: bool, residue
         crop_2 = Crop()
         crop_2.data.max_transpiration = transpiration
         incorp.crops = [crop_1, crop_2]
-        current_weather = CurrentWeather(incoming_light=light, mean_air_temperature=mean_temp,
-                                         min_air_temperature=min_temp, max_air_temperature=max_temp,
-                                         annual_mean_air_temperature=annual_mean_temp)
+        current_weather = CurrentDayWeather(incoming_light=light, mean_air_temperature=mean_temp,
+                                            min_air_temperature=min_temp, max_air_temperature=max_temp,
+                                            annual_mean_air_temperature=annual_mean_temp)
 
         incorp.soil.snow.update_snow = MagicMock()
         incorp._determine_total_above_ground_biomass = MagicMock(return_value=89)
@@ -1009,8 +1009,8 @@ def test_cycle_water(field_size: float, rainfall: float, runoff: float, high_wat
                                cumulative_transpiration=219.2, cumulative_potential_evapotranspiration=480.1,
                                total_water_uptake=3.25)
         crop_2 = Crop(crop_data_2)
-        current_weather = CurrentWeather(incoming_light=light, min_air_temperature=min_temp, precipitation=rainfall,
-                                         max_air_temperature=max_temp, mean_air_temperature=mean_temp)
+        current_weather = CurrentDayWeather(incoming_light=light, min_air_temperature=min_temp, precipitation=rainfall,
+                                            max_air_temperature=max_temp, mean_air_temperature=mean_temp)
         field_data = FieldData(field_size=field_size, current_residue=residue,
                                seasonal_high_water_table=high_water_table)
         incorp = Field(field_data=field_data, soil=soil, manure_manager=MagicMock(ManureManager))
