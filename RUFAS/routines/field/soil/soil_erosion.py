@@ -261,7 +261,7 @@ class SoilErosion:
         return exp(first_multiplicative_term * second_multiplicative_term + second_additive_term)
 
     @staticmethod
-    def _determine_support_practice_factor() -> float:  # TODO: implement this for version 2 (GitHub issue #348)
+    def _determine_support_practice_factor() -> float:
         """SWAT Reference: section 4:1.1.3 (only applies to fields that are doing contour tillage/planting,
             stripcropping, and/or terracing)"""
         return 1
@@ -385,7 +385,6 @@ class SoilErosion:
         -----
         This equation actually demands the area of the subbasin, not the field, as a parameter. But the field area was
         used in the old code, and is used here until the data for subbasin areas can be found.
-        TODO: find subbasin areas database and/or make it a parameter - issue #601
 
         """
         if rainfall == 0.0:
@@ -572,7 +571,8 @@ class SoilErosion:
             Ratio of soil loss from land cropped under given conditions to corresponding loss from clean-tilled,
             continuous fallow (unitless).
         support_practice_factor : float
-            Ratio of soil loss with specific support practice to corresponding loss with up-and-down slope culture (unitless).
+            Ratio of soil loss with specific support practice to corresponding loss with up-and-down slope culture
+            (unitless).
         topographic_factor : float
             Expected ratio of soil loss per unit area from a field slope to that from a 22.1 m length of uniform 9%
             slope under identical conditions (unitless).
@@ -583,6 +583,7 @@ class SoilErosion:
         -------
         float
             Sediment yield on a given day (metric tons).
+
         """
         term_with_exponent = (surface_area_runoff * peak_runoff_rate * field_area) ** 0.56
         return (11.8 * term_with_exponent * soil_erodibility_factor * cover_management_factor * support_practice_factor
