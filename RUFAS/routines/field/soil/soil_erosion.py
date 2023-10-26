@@ -316,9 +316,11 @@ class SoilErosion:
         as far to reach channels and be removed from the soil. A steeper slope means that there is less
         resistance against the gravitational forces acting on a piece of sediment as it moves down the slope,
         resulting in the soil eroding more easily.
+
+        arctan(tan(x)) == x does not always hold, it is only true from -90 to 90 degrees, inclusive. It is safe to use
+        here because there will never be a field at an angle < -90 or > 90 degrees.
+
         """
-        # Note: arctan(tan(x)) == x does not always hold, it is only true from -90 to 90 degrees, inclusive. It is safe
-        # to use here because there will never be a field at an angle < -90 or > 90 degrees
         slope_angle_in_rad = atan(average_subbasin_slope)
         exponential_term = SoilErosion._determine_exponential_term(average_subbasin_slope)
         first_term = (slope_length / 22.1) ** exponential_term
