@@ -60,6 +60,8 @@ class LayerData:
         calculating this field as well)"""
     previous_day_temperature: Optional[float] = None
     """temperature of soil layer on the previous day (degrees C)"""
+    decomposition_temperature_effect: Optional[float] = None
+    """temperature effect on decomposition factor (unitless) (pseudocode_soil S.6.A.1)"""
 
     # --- Erosion
     percent_organic_carbon_content: float = 1.2
