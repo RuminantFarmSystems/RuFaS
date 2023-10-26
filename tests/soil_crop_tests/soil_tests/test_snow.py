@@ -1,5 +1,5 @@
 import math
-from unittest.mock import patch
+from unittest.mock import patch, MagicMock
 
 import pytest
 
@@ -301,3 +301,25 @@ def test_update_snow(soil_data: SoilData, current_day_weather: CurrentWeather, d
         mock_melt_snow.assert_called_once_with(soil_data, current_day_weather, day)
         assert soil_data.snow_melt_amount == snow_melt_amount
         assert soil_data.snow_content == snow_content_before + current_day_weather.snow_fall - snow_melt_amount
+
+
+@pytest.mark.parametrize("max_sublimation,snow_content,expected_sublimation,expected_snow_content", [
+    (10.0, 10.0, 10.0, 0.0),
+    (14.0, 8.0, 8.0, 0.0),
+    (5.0, 9.0, 5.0, 4.0),
+    (11.0, 0.0, 0.0, 0.0),
+    (0.0, 0.0, 0.0, 0.0)
+])
+def test_sublimate(max_sublimation: float, snow_content: float, expected_sublimation: float,
+                   expected_snow_content) -> None:
+    """Tests that water is correctly sublimated from the snow pack of a field."""
+    mock_soil_data = MagicMock(SoilData)
+    mock_soil_data.sublimation = 42.0
+    mock_soil_data.snow_content = snow_content
+    snow = Snow(mock_soil_data)
+
+    actual_sublimation = snow.sublimate(max_sublimation)
+
+    assert actual_sublimation == expected_sublimation
+    assert mock_soil_data.sublimation == expected_sublimation
+    assert mock_soil_data.snow_content == expected_snow_content
