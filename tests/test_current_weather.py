@@ -1,9 +1,7 @@
 from typing import List
 import pytest
-from unittest.mock import MagicMock
 
 from RUFAS.current_weather import CurrentWeather
-from RUFAS.time import Time
 
 
 @pytest.mark.parametrize("snow_fall, rainfall, actual", [
@@ -29,17 +27,3 @@ def test_determine_daylength(months: List[int], expected: List[int]):
     for month in months:
         day_length.append(CurrentWeather.determine_daylength(month))
     assert day_length == expected
-
-
-@pytest.mark.parametrize("year, day, expected_month", [
-    (2000, 366, 12),  # leap year
-    (2001, 365, 12),  # normal year
-    (2000, 60, 2),
-    (2001, 60, 3)
-])
-def test_day_to_month_conversion(year: int, day: int, expected_month: int):
-    """Tests that number of days were converted into months correctly"""
-    mocked_time = MagicMock(Time)
-    setattr(mocked_time, "calendar_year", year)
-    setattr(mocked_time, "day", day)
-    assert CurrentWeather.day_to_month_conversion(mocked_time) == expected_month

@@ -2,6 +2,7 @@ import numpy as np
 
 from RUFAS.current_weather import CurrentWeather
 from RUFAS.time import Time
+from RUFAS.util import Utility
 
 
 def is_leap_year(year):
@@ -133,7 +134,7 @@ class Weather:
         """
         year = time.year
         day = time.day
-        month = CurrentWeather.day_to_month_conversion(time)
+        month = Utility.day_to_month_conversion(time)
         daylength = CurrentWeather.determine_daylength(month)
         try:
             current_weather = CurrentWeather(incoming_light=self.radiation[year - 1][day - 1],
