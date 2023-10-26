@@ -37,12 +37,13 @@ def test_main(mocker: MockerFixture):
     main()
 
     patch_run_rufas.assert_called_once_with(
+        produce_graphics=not mock_cmd_arguments.no_graphics,
         format_option=mock_cmd_arguments.format_option,
-        make_graphs=not mock_cmd_arguments.no_graphics,
         verbose=mock_cmd_arguments.verbose,
         clear_output=mock_cmd_arguments.clear_output,
         exclude_info_maps=mock_cmd_arguments.exclude_info_maps,
         only_run_validation=mock_cmd_arguments.only_run_validation,
+        graphics_dir=mock_cmd_arguments.graphics_dir,
     )
     patch_parse_gnu_args.assert_called_once()
 
@@ -169,11 +170,22 @@ def test_run_validation(mocker: MockerFixture, is_data_valid: bool) -> None:
 
 
 @pytest.mark.parametrize(
-    "is_data_valid, simulate_call_count, add_error_call_count, format_option",
-    [(True, 2, 0, "verbose"), (False, 0, 2, "block")],
+    "produce_graphics, exlclude_info_maps, is_data_valid, simulate_call_count, add_error_call_count, format_option",
+    [
+        (False, False, True, 2, 0, "verbose"),
+        (False, False, False, 0, 2, "block"),
+        (False, True, True, 2, 0, "verbose"),
+        (False, True, False, 0, 2, "block"),
+        (True, False, True, 2, 0, "verbose"),
+        (True, False, False, 0, 2, "block"),
+        (True, True, True, 2, 0, "verbose"),
+        (True, True, False, 0, 2, "block"),
+    ],
 )
 def test_execute_simulations(
     mocker: MockerFixture,
+    produce_graphics: bool,
+    exlclude_info_maps: bool,
     is_data_valid: bool,
     simulate_call_count: int,
     add_error_call_count: int,
@@ -203,7 +215,13 @@ def test_execute_simulations(
     mocker.patch("main.SimulationEngine", return_value=mock_simulator)
 
     # Act
-    execute_simulations(metadata_file_list, True, format_option)
+    execute_simulations(
+        metadata_files=metadata_file_list,
+        exclude_info_maps=exlclude_info_maps,
+        produce_graphics=produce_graphics,
+        graphics_dir=Path(""),
+        format_option=format_option,
+    )
 
     # Assert
     assert mock_simulator.simulate.call_count == simulate_call_count
@@ -214,12 +232,16 @@ def test_execute_simulations(
         metadata_file_list
     )
     assert mock_output_manager.dump_all_nondata_pools.call_args_list == [
-        mocker.call("output", True, format_option)
+        mocker.call("output", exlclude_info_maps, format_option)
     ] * len(metadata_file_list)
     assert mock_output_manager.save_variables.call_count == len(metadata_file_list)
     assert mock_output_manager.save_variables.call_args_list == [
         mocker.call(
-            Path("output"), Path("output/output_filters/"), True, True, Path("")
+            Path("output"),
+            Path("output/output_filters/"),
+            exlclude_info_maps,
+            produce_graphics,
+            Path(""),
         ),
     ] * len(metadata_file_list)
 
