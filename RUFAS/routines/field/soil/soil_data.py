@@ -72,7 +72,7 @@ class SoilData:
     """Cumulative total of active organic nitrogen that was removed from the top soil layer by erosion (kg)"""
 
     # ---- evaporation
-    water_evaporated: float = 0
+    water_evaporated: float = 0.0
     """Amount of water evaporated from the soil profile on the current day (mm)"""
 
     # ---- infiltration
@@ -85,7 +85,9 @@ class SoilData:
     moisture_condition_parameter: Optional[float] = None
     """curve number value adjusted for moisture content (unitless) (SWAT 2:1.1.11)"""
     accumulated_runoff: Optional[float] = None
-    """the amount of rainfall discharged as runoff during the day (mm)"""
+    """Amount of rainfall discharged as runoff on the current day (mm)."""
+    infiltrated_water: float = 0.0
+    """Amount of water that infiltrated the soil profile on the day (mm)."""
 
     # ---- percolation
     vadose_zone_layer: Optional[LayerData] = None
@@ -100,6 +102,38 @@ class SoilData:
     previous_temperature_effect: float = 0.8
     """variable that controls the influence of previous day's temperature on current day's temperature, range is from 0
     to 1, inclusive. SWAT sets the lag coefficient to 0.8 (paragraph between equations 1:1.3.3, 4) (unitless)
+    """
+
+    # ---- Snow
+    snow_content: float = 0.0
+    """The water content of the snow pack, (mm H2O)."""
+    snow_melt_amount: float = 0.0
+    """The water content of the snow that melted on the current day, (mm H2O)."""
+    previous_day_snow_temperature: Optional[float] = None
+    """Snow pack temperature on the previous day, (ºC)"""
+    current_day_snow_temperature: Optional[float] = None
+    """Snow pack temperature of the current day, (ºC)"""
+    snow_lag_factor: float = 1.0
+    """Snow pack temperature lag factor, unitless."""
+    snow_coverage_fraction: float = 1.0
+    snow_melt_base_temperature: float = 0.5
+    """
+    Snow melt base temperature, (ºC).
+    The snow pack will not melt until the snow pack temperature exceeds a threshold value.
+    """
+    snow_coverage_maximum: float = 1.0
+    """Minimum snow water content that corresponds to 100% snow cover, (mm H2O)."""
+    snow_melt_factor_maximum: float = 4.5
+    """
+    Melt factor for snow on June 21, SMFMX, (mm H2O/°C-day)
+    If the watershed is in the Northern Hemisphere, SMFMX will be the maximum melt factor.
+    If the watershed is in the Southern Hemisphere, SMFMX will be the minimum melt factor.
+    """
+    snow_melt_factor_minimum: float = 4.5
+    """
+    Melt factor for snow on December 21, SMFMN, (mm H2O/°C-day)
+    If the watershed is in the Northern Hemisphere, SMFMN will be the minimum melt factor.
+    If the watershed is in the Southern Hemisphere, SMFMN will be the maximum melt factor.
     """
 
     # ---- Erosion

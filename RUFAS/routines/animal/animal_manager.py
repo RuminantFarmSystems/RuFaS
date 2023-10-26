@@ -35,7 +35,7 @@ from RUFAS.routines.animal.life_cycle.calf import Calf
 from RUFAS.routines.animal.pen import Pen
 from RUFAS.routines.animal.ration import ration_driver as ration_driver
 from RUFAS.routines.feed.feed import Feed
-from RUFAS.routines.animal.ration.calf_ration import optimize as calf_optimize
+from RUFAS.routines.animal.ration.calf_ration import CalfRationManager
 from RUFAS.routines.animal.ration.ration_driver import RationReporter
 from RUFAS.routines.animal.ration.ration_driver import RationManager
 
@@ -54,8 +54,8 @@ def daily_animal_routine(animal_manager, feed, weather, time):
     Args:
         animal_manager: instance of the AnimalManager class
         feed: instance of the Feed class
-        weather: instance of the Weather class as defined in classes.py
-        time: instance of the Time class as defined in classes.py
+        weather: instance of the Weather class
+        time: instance of the Time class
     """
 
     animal_manager.daily_updates(feed, weather, time)
@@ -264,8 +264,7 @@ class AnimalManager:
         are calculated and the animals are allocated to pens.
 
         Args:
-            config: an instance of the Config class defined in classes.py
-                contains model configuration information
+            config: an instance of the Config class contains model configuration information
             herd_data: dictionary containing information about the herd
         """
 
@@ -318,8 +317,8 @@ class AnimalManager:
 
         Args:
             feed: an instance of the Feed class defined in feed.py
-            weather: instance of the Weather class defined in classes.py
-            time: instance of the Time class defined in classes.py
+            weather: instance of the Weather class
+            time: instance of the Time class
         """
 
         # average vertical & horizontal distance (VD, HD) of pens to the
@@ -368,16 +367,30 @@ class AnimalManager:
             calf.calc_nutrient_rqmts(feed, temp)
 
         for heiferI in self.heiferIs:
-            heiferI.set_nutrient_rqmts(temp, self.ANIMAL_GROUPING_SCENARIO)
+            latest_pen = heiferI.pen_history[-1].pen
+            heiferI.set_nutrient_rqmts(temp, self.ANIMAL_GROUPING_SCENARIO,
+                                       nutrient_conc=self.all_pens[latest_pen].ration_nutrient_conc,
+                                       metabolizable_energy=self.all_pens[latest_pen].MEdiet,
+                                       previous_DMI=self.all_pens[latest_pen].dry_matter_intake)
 
         for heiferII in self.heiferIIs:
-            heiferII.set_nutrient_rqmts(temp, self.ANIMAL_GROUPING_SCENARIO)
+            latest_pen = heiferII.pen_history[-1].pen
+            heiferII.set_nutrient_rqmts(temp, self.ANIMAL_GROUPING_SCENARIO,
+                                        nutrient_conc=self.all_pens[latest_pen].ration_nutrient_conc,
+                                        metabolizable_energy=self.all_pens[latest_pen].MEdiet,
+                                        previous_DMI=self.all_pens[latest_pen].dry_matter_intake)
 
         for heiferIII in self.heiferIIIs:
-            heiferIII.set_nutrient_rqmts(temp, self.ANIMAL_GROUPING_SCENARIO)
+            latest_pen = heiferIII.pen_history[-1].pen
+            heiferIII.set_nutrient_rqmts(temp, self.ANIMAL_GROUPING_SCENARIO,
+                                         nutrient_conc=self.all_pens[latest_pen].ration_nutrient_conc,
+                                         metabolizable_energy=self.all_pens[latest_pen].MEdiet,
+                                         previous_DMI=self.all_pens[latest_pen].dry_matter_intake)
 
         for cow in self.cows:
-            cow.set_nutrient_rqmts(self.ANIMAL_GROUPING_SCENARIO)
+            latest_pen = cow.pen_history[-1].pen
+            cow.set_nutrient_rqmts(self.ANIMAL_GROUPING_SCENARIO,
+                                   nutrient_conc=self.all_pens[latest_pen].ration_nutrient_conc)
 
     def reset_milk_production_reduction(self) -> None:
         """
@@ -1320,8 +1333,9 @@ class AnimalManager:
                 counter = 1
                 while 'status' not in ration_per_animal or ration_per_animal['status'].lower() != 'optimal':
                     if pen.animal_combination == Pen.AnimalCombination.CALF:
-                        ration_per_animal = calf_optimize()
+                        ration_per_animal = CalfRationManager.optimize()
                         ration_vals = {'ME_total': 0}
+
                     else:
                         ration_per_animal, ration_vals = \
                             RationManager.formulate_ration(pen, pen_specific_feed_data, self.ANIMAL_GROUPING_SCENARIO)
@@ -1337,6 +1351,10 @@ class AnimalManager:
                 pen.ration_nutrient_conc = nutrient_conc
                 pen.MEdiet = ration_vals['ME_total']
                 pen.dry_matter_intake = nutrient_amount['dm']
+
+                ration_report = {}
+                ration_report['nutrient_amount'] = nutrient_amount
+                ration_report['nutrient_conc'] = nutrient_conc
 
                 for animal in pen.animals_in_pen:
                     animal.set_ration(ration_per_animal, nutrient_amount['dm'])
@@ -1355,12 +1373,17 @@ class AnimalManager:
 
                 info_map = {"class": self.__class__.__name__,
                             "function": self._calc_ration_at_interval.__name__,
-                            "available_feeds": available_feeds.feed_id,
                             f'number_animals_in_pen_{pen.id}': len(pen.animals_in_pen)}
                 om.add_variable(f'ration_nutrient_amount_pen_{pen.id}', nutrient_amount, info_map)
                 om.add_variable(f'MEdiet_pen_{pen.id}', pen.MEdiet, info_map)
                 om.add_variable(f'avg_rqmts_pen_{pen.id}', pen.avg_nutrient_rqmts, info_map)
                 om.add_variable(f'ration_per_animal_for_pen_{pen.id}', pen.ration_per_animal, info_map)
+                if pen.animal_combination != Pen.AnimalCombination.CALF:
+                    ration_supply_report = RationReporter.report_ration_supply(ration_per_animal,
+                                                                               feed.available_feeds,
+                                                                               ration_report,
+                                                                               pen.avg_nutrient_rqmts['avg_BW'])
+                    om.add_variable(f'ration_supply_report_for_pen_{pen.id}', ration_supply_report, info_map)
 
     @classmethod
     def _get_animal_types_in_pen(cls, pen: Pen) -> Set[AnimalType]:
@@ -1583,9 +1606,9 @@ class AnimalManager:
         feed
             instance of the Feed class defined in feed.py
         weather
-            instance of the Weather class defined in classes.py
+            instance of the Weather class
         time
-            instance of the Time class defined in classes.py
+            instance of the Time class
 
         """
         if self.simulate_animals:
