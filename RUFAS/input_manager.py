@@ -300,7 +300,7 @@ class InputManager:
         return validator(variable_properties, var_name, input_data_value)
 
     def _validate_csv_element(self, var_name: str, properties_blob_key: str, input_data: Dict[str, Any],
-                              eager_termination: bool, element_counter_and_validity: Dict[str, Any]) -> dict:
+                              eager_termination: bool, element_counter_and_validity: Dict[str, int|bool]) -> Dict[str, int|bool]:
         """
         Receives data loaded from csv input file and the validates each row element in the csv column it's sent.
         It attempts to fix any invalid elements and tracks the number of valid, invalid, fixed,
