@@ -186,7 +186,7 @@ class Snow:
             self.soil_data.snow_melt_amount = self._melt_snow(self.soil_data, current_day_weather, day)
             self.soil_data.snow_content -= self.soil_data.snow_melt_amount
 
-    def sublimate(self, maximum_sublimation: float) -> float:
+    def sublimate(self, maximum_sublimation: float):
         """
         Performs sublimation on the snowpack.
 
@@ -195,17 +195,11 @@ class Snow:
         maximum_sublimation : float
             The maximum amount of sublimation possible on the current day (mm).
 
-        Returns
-        -------
-        float
-            The amount of sublimation that actually occurred on the current day (mm).
-
         References
         ----------
         SWAT Theoretical documentation section 2:2.3.3.1
 
         """
         sublimation = min(maximum_sublimation, self.soil_data.snow_content)
-        self.soil_data.sublimation = sublimation
+        self.soil_data.water_sublimated = sublimation
         self.soil_data.snow_content -= sublimation
-        return sublimation

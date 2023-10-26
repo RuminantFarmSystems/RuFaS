@@ -962,8 +962,8 @@ class Field:
         time : Time
             An object containing the current year and day of the simulation.
 
-        Details
-        -------
+        Notes
+        -----
         This method executes all water-related processes that occur within Crop and Soil objects. Having a
         separate method to handle water processes altogether is necessary because processes that affect water in the
         soil are dependent on processes that affect water in crops and vice versa. The most complex process that is
@@ -978,12 +978,13 @@ class Field:
         It should also be noted that while this method is more messy and complex than it could be, this is a
         conscious design choice that will allow for SMEs to more easily and freely experiment with different orders
         of processes. This is necessary because there is not necessarily one correct order for processes to run in.
-        """
 
+        """
         watering_amount = self._determine_watering_amount(rainfall=current_weather.rainfall, year=time.year,
                                                           day=time.day, irrigation=current_weather.irrigation)
         total_precipitation = current_weather.rainfall + watering_amount
         precipitation_reaching_soil = self._handle_water_in_crop_canopies(total_precipitation)
+        precipitation_reaching_soil += self.soil.data.snow_melt_amount
 
         full_evapotranspirative_demand = self._determine_potential_evapotranspiration(
             current_weather.incoming_light, current_weather.max_air_temperature, current_weather.min_air_temperature,
@@ -992,11 +993,8 @@ class Field:
 
         remaining_evapotranspirative_demand = self._evaporate_from_crop_canopies(full_evapotranspirative_demand)
 
-        # TODO: figure out how to determine weighting coefficient when there are multiple crops in the field - issue
-        #  #519
         self.soil.infiltration.infiltrate(precipitation_reaching_soil)
         self.soil.percolation.percolate(self.field_data.seasonal_high_water_table)
-        # TODO: find reasonable values/way to set minimum cover management factor - issue #520
         self.soil.soil_erosion.erode(self.field_data.field_size, 0.02, self.field_data.current_residue,
                                      total_precipitation)
         self.soil.phosphorus_cycling.cycle_phosphorus(precipitation_reaching_soil, self.soil.data.accumulated_runoff,
@@ -1017,16 +1015,15 @@ class Field:
         else:
             weighted_average_transpiration = weighted_transpiration_total / weights_sum
 
-        # TODO: Implement snow (melting and sublimation) - issue #317
-        snow_water_content = 0.0
         above_ground_biomass = self._determine_total_above_ground_biomass()
 
         soil_evaporation_and_sublimation_amount = self._determine_soil_evaporation_and_sublimation_adjusted(
-            above_ground_biomass, self.soil.data.plant_surface_residue, snow_water_content,
+            above_ground_biomass, self.soil.data.plant_surface_residue, self.soil.data.snow_content,
             remaining_evapotranspirative_demand, weighted_average_transpiration)
 
-        # TODO: sublimate and adjust soil_evaporation_and_sublimation_amount here - issue #317
-
+        self.soil.snow.sublimate(soil_evaporation_and_sublimation_amount)
+        soil_evaporation_and_sublimation_amount -= self.soil.data.water_sublimated
+        remaining_evapotranspirative_demand -= self.soil.data.water_sublimated
         self.soil.evaporation.evaporate(soil_evaporation_and_sublimation_amount)
         remaining_evapotranspirative_demand -= self.soil.data.water_evaporated
 
@@ -1113,7 +1110,7 @@ class Field:
         the canopy went down overnight, so water is lost from the canopy to the ground before any evapotranspiration can
         happen. A caveat is that if there is excess water in the canopy of one crop, it cannot be transferred to the
         canopy of another.
-        TODO: distribute water evenly/proportionally/fairly between crop canopies - issue #513
+
         """
         precipitation_reaching_soil = precipitation_total
         excess_canopy_water = 0
@@ -1154,7 +1151,7 @@ class Field:
         This method iterates through the crops in the field, for each determines how much water was evaporated from its
         canopy, then reduces the evapotranspirative demand by that amount. If the remaining evapotranspirative demand
         reaches 0, then no more water should be evaporated so the method stops running.
-        TODO: evaporate water evenly/proportionally/fairly from crop canopies - issue #513
+
         """
         remaining_evapotranspirative_demand = evapotranspirative_demand
         for crop in self.crops:
@@ -1283,52 +1280,30 @@ class Field:
     @staticmethod
     def _determine_soil_cover_index(above_ground_biomass: float, residue: float, snow_water_content: float) -> float:
         """Calculate the soil cover index.
+
         Parameters
         ----------
         above_ground_biomass : float
-            Mass of plant above ground (kg per hectare)
+            Mass of plant above ground (kg per hectare).
         residue : float
-            Biomass separated from plant on the ground (kg per hectare)
+            Biomass separated from plant on the ground (kg per hectare).
         snow_water_content : float
-            Amount of water from snow (mm)
+            Amount of water from snow (mm).
+
         Returns
         -------
         Float
-            Soil cover index (unitless)
+            Soil cover index (unitless).
+
         References
         ----------
         SWAT Theoretical documentation eqn. 2:2.3.8
+
         """
         if snow_water_content > 0.5:
             return 0.5
         else:
             return exp((-5.0 * (10 ** (-5))) * (above_ground_biomass + residue))
-
-    # TODO: this method will not be used until sublimation is implemented - issue #317
-    @staticmethod
-    def _determine_maximum_soil_evaporation(soil_evaporation_adj: float, snow_water_content: float) -> float:
-        """Calculates the maximum amount of evaporation from soil in a given day
-        Parameters
-        ----------
-        soil_evaporation_adj : float
-            Maximum soil evaporation adjusted for plant water use on a given day (mm)
-        snow_water_content : float
-            Amount of water in the snow pack on a given day prior to accounting for sublimation (mm)
-        TODO: verify that "amount of water in the snow pack on a given day" (2:2.3.3.1) and "snow water content"
-            (2:2.3.3) mean the same thing - address this with #317
-        Returns
-        -------
-        float
-            Maximum soil water evaporation on a given day (mm)
-        References
-        ----------
-        SWAT Theoretical documentation section 2:2.3.3.1
-        """
-        if soil_evaporation_adj < snow_water_content:
-            return 0.0
-        else:
-            return soil_evaporation_adj - snow_water_content
-
     # </editor-fold>
 
     # <editor-fold desc="--- Annual Reset Methods ---">
