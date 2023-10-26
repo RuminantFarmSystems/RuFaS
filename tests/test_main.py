@@ -89,8 +89,8 @@ def test_run_rufas(
 
     # Act
     run_rufas(
-        format_option,
         produce_graphics,
+        format_option,
         verbose,
         clear_output,
         exclude_info_maps,
