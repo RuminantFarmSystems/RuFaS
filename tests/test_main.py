@@ -32,6 +32,8 @@ file_path = os.path.join(dir_path, "input/ARL.json")
         ("verbose", False, "graphics", True, True, True, True),
         ("basic", True, "custom_graphics", False, False, False, False),
         ("block", True, "graphics", False, True, False, False),
+        ("inline", False, "custom_graphics", True, False, False, False),
+        ("verbose", True, "graphics", False, False, True, False),
     ],
 )
 def test_main(
