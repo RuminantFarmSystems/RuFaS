@@ -106,4 +106,3 @@ class CurrentWeather:
         for month, day_count in enumerate(cumulative_days_in_months):
             if time.day <= day_count:
                 return month + 1
-
