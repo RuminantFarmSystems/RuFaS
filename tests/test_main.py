@@ -182,7 +182,6 @@ def test_execute_simulations(mocker: MockerFixture, is_data_valid: bool,
     mock_simulator = mocker.MagicMock(auto_spec=SimulationEngine)
     mock_simulator.simulate.return_value = None
     mocker.patch("main.SimulationEngine", return_value=mock_simulator)
-    mocker.patch("main.HerdCompositionGraphGenerator.generate_graph", return_value=None)
 
     # Act
     execute_simulations(metadata_file_list, True, format_option)
