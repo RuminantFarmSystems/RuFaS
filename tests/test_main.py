@@ -6,19 +6,18 @@ from mock import MagicMock
 import pytest
 from pytest_mock import MockerFixture
 
-import config.global_variables
 from config import global_variables
 from main import (
     CaseInsensitiveArgumentAction,
     execute_simulations,
-    run_validation,
     main,
+    parse_gnu_args,
+    run_rufas,
+    run_validation,
+    set_global_variables,
+    METADATA_PATHS,
 )
-from main import parse_gnu_args
-from main import run_rufas
-from main import run_validation
-from main import set_global_variables
-from main import METADATA_PATHS
+
 from RUFAS.simulation_engine import SimulationEngine
 from RUFAS.input_manager import InputManager
 from RUFAS.output_manager import OutputManager
@@ -49,7 +48,7 @@ def test_main(mocker: MockerFixture):
 
 
 @pytest.mark.parametrize(
-    "format_option, produce_graphics, verbose, clear_output, exclude_info_maps, only_run_validation",
+    "format_option, produce_graphics, verbose, clear_output, exclude_info_maps, only_run_validation, graphics_dir",
     [
         ("verbose", True, True, True, True, True, ""),
         ("block", False, True, True, True, True, ""),
@@ -67,7 +66,7 @@ def test_main(mocker: MockerFixture):
         ("block", False, False, False, False, True, ""),
         ("inline", False, False, False, True, False, ""),
         ("basic", False, False, False, False, False, ""),
-        (False, False, False, False, False, "graphics"),
+        ("basic", False, False, False, False, False, "graphics"),
     ],
 )
 def test_run_rufas(
@@ -124,16 +123,16 @@ def test_run_rufas(
 def test_set_global_variables(verbose: bool) -> None:
     """Checks that set_global_variables() sets the global variables correctly"""
     # Arrange
-    old_verbose = config.global_variables.PRINT_STATUS_MESSAGES
+    old_verbose = global_variables.PRINT_STATUS_MESSAGES
 
     # Act
     set_global_variables(verbose)
 
     # Assert
-    assert config.global_variables.PRINT_STATUS_MESSAGES == verbose
+    assert global_variables.PRINT_STATUS_MESSAGES == verbose
 
     # Cleanup
-    config.global_variables.PRINT_STATUS_MESSAGES = old_verbose
+    global_variables.PRINT_STATUS_MESSAGES = old_verbose
 
 
 @pytest.mark.parametrize("is_data_valid", [(True), (False)])
