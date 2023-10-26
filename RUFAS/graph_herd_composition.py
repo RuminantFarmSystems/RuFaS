@@ -25,13 +25,13 @@ class HerdCompositionGraphGenerator:
         # Plot
         colors = sns.color_palette('hls', 7)
         plt.figure(figsize=(10, 6))
-        plt.plot(df['sim_day.values'], df['num_animals.values'], label='Total Animals', color=colors[0])
-        plt.plot(df['sim_day.values'], df['num_calves.values'], label='Calves', color=colors[1], linestyle='--')
-        plt.plot(df['sim_day.values'], df['num_heiferIs.values'], label='HeiferIs', color=colors[2], linestyle='--')
-        plt.plot(df['sim_day.values'], df['num_heiferIIs.values'], label='HeiferIIs', color=colors[3])
-        plt.plot(df['sim_day.values'], df['num_heiferIIIs.values'], label='HeiferIIIs', color=colors[4], linestyle='--')
-        plt.plot(df['sim_day.values'], df['num_lactating_cows.values'], label='Lactating Cows', color=colors[5])
-        plt.plot(df['sim_day.values'], df['num_dry_cows.values'], label='Dry Cows', color=colors[6], linestyle='--')
+        plt.plot(df['sim_day'], df['num_animals'], label='Total Animals', color=colors[0])
+        plt.plot(df['sim_day'], df['num_calves'], label='Calves', color=colors[1], linestyle='--')
+        plt.plot(df['sim_day'], df['num_heiferIs'], label='HeiferIs', color=colors[2], linestyle='--')
+        plt.plot(df['sim_day'], df['num_heiferIIs'], label='HeiferIIs', color=colors[3])
+        plt.plot(df['sim_day'], df['num_heiferIIIs'], label='HeiferIIIs', color=colors[4], linestyle='--')
+        plt.plot(df['sim_day'], df['num_lactating_cows'], label='Lactating Cows', color=colors[5])
+        plt.plot(df['sim_day'], df['num_dry_cows'], label='Dry Cows', color=colors[6], linestyle='--')
 
         # Labels and Legend
         plt.xlabel('Simulation Day')
@@ -62,11 +62,11 @@ class HerdCompositionGraphGenerator:
         # Plot
         colors = sns.color_palette('hls', 7)
         plt.figure(figsize=(10, 6))
-        plt.plot(df['sim_day.values'], df['num_cows.values'], label='Total Cows', color=colors[0])
-        plt.plot(df['sim_day.values'], df['num_cow_parity_1.values'], label='Parity-1 Cows', color=colors[1])
-        plt.plot(df['sim_day.values'], df['num_cow_parity_2.values'], label='Parity-2 Cows', color=colors[2])
-        plt.plot(df['sim_day.values'], df['num_cow_parity_3.values'], label='Parity-3 Cows', color=colors[3])
-        plt.plot(df['sim_day.values'], df['num_cow_parity_3+.values'], label='Parity-3+ Cows', color=colors[4])
+        plt.plot(df['sim_day'], df['num_cows'], label='Total Cows', color=colors[0])
+        plt.plot(df['sim_day'], df['num_cow_parity_1'], label='Parity-1 Cows', color=colors[1])
+        plt.plot(df['sim_day'], df['num_cow_parity_2'], label='Parity-2 Cows', color=colors[2])
+        plt.plot(df['sim_day'], df['num_cow_parity_3'], label='Parity-3 Cows', color=colors[3])
+        plt.plot(df['sim_day'], df['num_cow_parity_3+'], label='Parity-3+ Cows', color=colors[4])
 
         # Labels and Legend
         plt.xlabel('Simulation Day')
