@@ -619,7 +619,7 @@
             },
             "std_estrus_cycle_heifer": {
               "type": "number",
-              "description": "Standard deviation of the length of estrus cycle for cows (default is 2.5).",
+              "description": "Standard deviation of the length of estrus cycle for heifers (default is 2.5).",
               "minimum": 1,
               "default": 2.5
             },
