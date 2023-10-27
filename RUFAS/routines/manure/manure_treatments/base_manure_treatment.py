@@ -278,8 +278,8 @@ class BaseManureTreatment(ABC):
             The average temperature of the current day in Celsius.
 
         """
-        current_weather = self.weather.get_current_weather(self.time)
-        return current_weather.mean_air_temperature
+        current_conditions = self.weather.get_current_day_conditions(self.time)
+        return current_conditions.mean_air_temperature
 
     def _get_current_day_rainfall(self) -> float:
         """
@@ -291,8 +291,8 @@ class BaseManureTreatment(ABC):
             The rainfall of the current day in meters (m).
 
         """
-        current_weather = self.weather.get_current_weather(self.time)
-        rainfall = current_weather.rainfall
+        current_conditions = self.weather.get_current_day_conditions(self.time)
+        rainfall = current_conditions.rainfall
         return rainfall * GeneralConstants.MM_TO_M
 
     def _accumulate_daily_output(
