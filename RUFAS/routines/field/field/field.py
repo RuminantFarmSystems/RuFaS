@@ -113,7 +113,7 @@ class Field:
         self.manure_manager: ManureManager = manure_manager
         """:class:`ManureManager` instance from which manure is requested for application to the field."""
 
-    def manage_field(self, time, current_weather: CurrentDayConditions) -> None:
+    def manage_field(self, time, current_conditions: CurrentDayConditions) -> None:
         """
         Main Field routine, runs all subroutines routines based on current attribute configuration.
 
@@ -121,8 +121,8 @@ class Field:
         ----------
         time : Time
             Contains the current year and day that the simulation is on.
-        current_weather : CurrentDayConditions
-            Contains a collection of today's weather variables needed for field processes.
+        current_conditions : CurrentDayConditions
+            Contains a collection of today's conditions variables needed for field processes.
 
         Notes
         -----
@@ -141,11 +141,11 @@ class Field:
 
         # --- Whole-Field Methods ---
         # Allow non-management field processes (water/nutrient cycling) to occur
-        self._execute_daily_processes(current_weather, time)
+        self._execute_daily_processes(current_conditions, time)
         # ... Other ...
 
         # --- Crop Management ---
-        self._assess_dormancy(current_weather.daylength)
+        self._assess_dormancy(current_conditions.daylength)
 
         self._check_crop_planting_schedule(time)
 
