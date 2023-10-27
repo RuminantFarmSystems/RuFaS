@@ -3,7 +3,7 @@ from typing import Optional
 
 
 @dataclass
-class CurrentDayWeather:
+class CurrentDayConditions:
     """
     The purpose of this class is to combine and covert infos from weather data and field data and creates a
     current weather class that have all the needed attributes to allow field and field manager to work properly.

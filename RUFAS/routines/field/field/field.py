@@ -4,7 +4,7 @@ from RUFAS.routines.field.crop.crop import Crop
 from RUFAS.routines.field.crop.crop_data import CropData
 from RUFAS.routines.field.crop.species_data_factory import CropSpecies, CropSpeciesDataFactory
 from RUFAS.routines.field.manager.events import Event, PlantingEvent, HarvestEvent, FertilizerEvent, ManureEvent
-from RUFAS.current_day_weather import CurrentDayWeather
+from RUFAS.current_day_conditions import CurrentDayConditions
 from RUFAS.routines.field.soil.soil import Soil
 from RUFAS.routines.field.field.field_data import FieldData
 from RUFAS.routines.field.field.fertilizer_application import FertilizerApplication
@@ -113,7 +113,7 @@ class Field:
         self.manure_manager: ManureManager = manure_manager
         """:class:`ManureManager` instance from which manure is requested for application to the field."""
 
-    def manage_field(self, time, current_weather: CurrentDayWeather) -> None:
+    def manage_field(self, time, current_weather: CurrentDayConditions) -> None:
         """
         Main Field routine, runs all subroutines routines based on current attribute configuration.
 
@@ -121,7 +121,7 @@ class Field:
         ----------
         time : Time
             Contains the current year and day that the simulation is on.
-        current_weather : CurrentDayWeather
+        current_weather : CurrentDayConditions
             Contains a collection of today's weather variables needed for field processes.
 
         Notes
@@ -909,12 +909,12 @@ class Field:
     # </editor-fold>
 
     # <editor-fold desc="--- Field-level Methods ---">
-    def _execute_daily_processes(self, current_weather: CurrentDayWeather, time) -> None:
+    def _execute_daily_processes(self, current_weather: CurrentDayConditions, time) -> None:
         """Executes all daily updates on this field's soil and crop objects.
 
         Parameters
         ----------
-        current_weather : CurrentDayWeather
+        current_weather : CurrentDayConditions
             Object containing the environment conditions on this day.
         time : Time
             Object containing the current year and day of the simulation.
@@ -925,7 +925,7 @@ class Field:
         it will allow subject-matter experts to more easily experiment with different orders.
 
         """
-        self.soil.snow.update_snow(current_day_weather=current_weather, day=time.day)
+        self.soil.snow.update_snow(current_day_conditions=current_weather, day=time.day)
 
         total_plant_cover = self.field_data.current_residue + self._determine_total_above_ground_biomass()
         self.soil.soil_temp.daily_soil_temperature_update(current_weather.incoming_light,
@@ -951,14 +951,15 @@ class Field:
             crop.leaf_area_index.grow_canopy()
             crop.biomass_allocation.allocate_biomass(current_weather.incoming_light)
 
-    def _cycle_water(self, current_weather: CurrentDayWeather, time):
+    def _cycle_water(self, current_weather: CurrentDayConditions, time):
         """
         Allow water to cycle through the field.
 
         Parameters
         ----------
-        current_weather : CurrentDayWeather
-            A CurrentDayWeather object containing a collection of today's weather variables needed for field processes.
+        current_weather : CurrentDayConditions
+            A CurrentDayConditions object containing a collection of today's weather variables needed for field
+            processes.
         time : Time
             An object containing the current year and day of the simulation.
 
