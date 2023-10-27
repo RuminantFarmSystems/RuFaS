@@ -1,8 +1,9 @@
 import numpy as np
 
 from RUFAS.config import Config
-from RUFAS.current_weather import CurrentWeather
+from RUFAS.current_day_conditions import CurrentDayConditions
 from RUFAS.time import Time
+from RUFAS.util import Utility
 
 
 def is_leap_year(year):
@@ -142,9 +143,9 @@ class Weather:
 
         self.__mean_annual_temperature = self._calculate_average_annual_temperature(weather_file['avg'])
 
-    def get_current_weather(self, time: Time) -> CurrentWeather:
+    def get_current_day_conditions(self, time: Time) -> CurrentDayConditions:
         """
-        Creates a CurrentWeather object containing all the weather conditions on the current day.
+        Creates a CurrentDayConditions object containing all the weather conditions on the current day.
 
         Parameters
         ----------
@@ -153,8 +154,8 @@ class Weather:
 
         Returns
         -------
-        CurrentWeather
-            CurrentWeather instance including all the weather conditions of the specified date.
+        CurrentDayConditions
+            CurrentDayConditions instance including all the weather conditions of the specified date.
 
         Raises
         ------
@@ -164,21 +165,23 @@ class Weather:
         """
         year = time.year
         day = time.day
-        month = CurrentWeather.date_conversion_month(time)
-        daylength = CurrentWeather.determine_daylength(month)
+        month = Utility.day_to_month_conversion(time)
+        daylength = CurrentDayConditions.determine_daylength(month)
         try:
-            current_weather = CurrentWeather(incoming_light=self.__radiation[year - 1][day - 1],
-                                             min_air_temperature=self.__min_daily_temperature[year - 1][day - 1],
-                                             mean_air_temperature=self.__mean_daily_temperature[year - 1][day - 1],
-                                             max_air_temperature=self.__max_daily_temperature[year - 1][day - 1],
-                                             annual_mean_air_temperature=self.__mean_annual_temperature,
-                                             precipitation=self.__precipitation[year - 1][day - 1],
-                                             irrigation=self.__irrigation[year - 1][day - 1],
-                                             daylength=daylength)
+            current_conditions = CurrentDayConditions(
+                incoming_light=self.__radiation[year - 1][day - 1],
+                min_air_temperature=self.__min_daily_temperature[year - 1][day - 1],
+                mean_air_temperature=self.__mean_daily_temperature[year - 1][day - 1],
+                max_air_temperature=self.__max_daily_temperature[year - 1][day - 1],
+                annual_mean_air_temperature=self.__mean_annual_temperature,
+                precipitation=self.__precipitation[year - 1][day - 1],
+                irrigation=self.__irrigation[year - 1][day - 1],
+                daylength=daylength
+            )
         except IndexError:
             raise IndexError(f"Attempted to get weather conditions for day: {time.day}, year: {time.year}.")
 
-        return current_weather
+        return current_conditions
 
     @staticmethod
     def _calculate_average_annual_temperature(daily_average_temperatures: list[float]) -> float:
