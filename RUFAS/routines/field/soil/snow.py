@@ -186,7 +186,7 @@ class Snow:
             self.soil_data.snow_melt_amount = self._melt_snow(self.soil_data, current_day_weather, day)
             self.soil_data.snow_content -= self.soil_data.snow_melt_amount
 
-    def sublimate(self, maximum_sublimation: float):
+    def sublimate(self, maximum_sublimation: float) -> None:
         """
         Performs sublimation on the snowpack.
 
