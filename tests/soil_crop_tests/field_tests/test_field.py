@@ -998,7 +998,8 @@ def test_cycle_water(field_size: float, rainfall: float, runoff: float, high_wat
     """Tests that cycle_water() correctly executes all water processes on its soil profile and the crops it contains."""
     with patch("RUFAS.routines.field.crop.crop_data.CropData.in_growing_season", new_callable=PropertyMock,
                return_value=crops_growing):
-        soil_data = SoilData(field_size=field_size, accumulated_runoff=runoff, water_evaporated=3.5)
+        soil_data = SoilData(field_size=field_size, accumulated_runoff=runoff, water_evaporated=3.5,
+                             water_sublimated=1.0)
         soil_data.plant_surface_residue = surface_residue
         soil = Soil(soil_data)
         crop_data_1 = CropData(field_proportion=crop_1_proportion, max_transpiration=44.1, cumulative_evaporation=105.5,
@@ -1022,6 +1023,7 @@ def test_cycle_water(field_size: float, rainfall: float, runoff: float, high_wat
         incorp.soil.phosphorus_cycling.cycle_phosphorus = MagicMock()
         incorp.soil.nitrogen_cycling.cycle_nitrogen = MagicMock()
         incorp.soil.carbon_cycling.cycle_carbon = MagicMock()
+        incorp.soil.snow.sublimate = MagicMock()
         incorp.soil.evaporation.evaporate = MagicMock()
 
         incorp._determine_watering_amount = MagicMock(return_value=0)
@@ -1060,8 +1062,10 @@ def test_cycle_water(field_size: float, rainfall: float, runoff: float, high_wat
         expected_average_transpiration = 44.1 * crop_1_proportion + 39.5 * crop_2_proportion
         incorp._determine_soil_evaporation_and_sublimation_adjusted.assert_called_once_with(
             40.0, surface_residue, 0, expected_remaining_demand, expected_average_transpiration)
-        incorp.soil.evaporation.evaporate.assert_called_once_with(10.5)
-        expected_actual_evaporation = 33.5 - (expected_remaining_demand - 3.5)
+        incorp.soil.snow.sublimate.assert_called_once_with(10.5)
+        expected_soil_evaporation_after_sublimation = 10.5 - 1.0
+        incorp.soil.evaporation.evaporate.assert_called_once_with(expected_soil_evaporation_after_sublimation)
+        expected_actual_evaporation = 33.5 - (expected_remaining_demand - 4.5)
         if crops_growing:
             crop_1.water_uptake.uptake_water.assert_called_once_with(incorp.soil.data)
             crop_1.water_dynamics.cycle_water.assert_called_once_with(expected_actual_evaporation, 3.5, 33.5)
@@ -1268,20 +1272,6 @@ def test_determine_soil_cover_index(above_ground_biomass: float, residue: float,
         expect = exp((-0.00005) * (above_ground_biomass + residue))
     observe = Field._determine_soil_cover_index(above_ground_biomass, residue, snow_water)
     assert expect == observe
-
-
-@pytest.mark.parametrize("soil_evaporation_adj,snow_water_content", [
-    (1.3, 3.2),
-    (0, 0),
-    (1.3, 0.4),
-    (1.8954, 0)
-])
-def test_determine_maximum_soil_evaporation(soil_evaporation_adj, snow_water_content):
-    observe = Field._determine_maximum_soil_evaporation(soil_evaporation_adj, snow_water_content)
-    if snow_water_content > soil_evaporation_adj:
-        assert 0 == observe
-    else:
-        assert (soil_evaporation_adj - snow_water_content) == observe
 
 
 def test_annual_reset() -> None:
