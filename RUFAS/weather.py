@@ -137,18 +137,18 @@ class Weather:
         month = Utility.day_to_month_conversion(time)
         daylength = CurrentDayConditions.determine_daylength(month)
         try:
-            current_weather = CurrentDayConditions(incoming_light=self.radiation[year - 1][day - 1],
-                                                   min_air_temperature=self.T_min[year - 1][day - 1],
-                                                   mean_air_temperature=self.T_avg[year - 1][day - 1],
-                                                   max_air_temperature=self.T_max[year - 1][day - 1],
-                                                   annual_mean_air_temperature=self.T_avg_annual,
-                                                   precipitation=self.rainfall[year - 1][day - 1],
-                                                   irrigation=self.irrigation[year - 1][day - 1],
-                                                   daylength=daylength)
+            current_conditions = CurrentDayConditions(incoming_light=self.radiation[year - 1][day - 1],
+                                                      min_air_temperature=self.T_min[year - 1][day - 1],
+                                                      mean_air_temperature=self.T_avg[year - 1][day - 1],
+                                                      max_air_temperature=self.T_max[year - 1][day - 1],
+                                                      annual_mean_air_temperature=self.T_avg_annual,
+                                                      precipitation=self.rainfall[year - 1][day - 1],
+                                                      irrigation=self.irrigation[year - 1][day - 1],
+                                                      daylength=daylength)
         except IndexError:
             raise IndexError(f"Attempted to get weather conditions for day: {time.day}, year: {time.year}.")
 
-        return current_weather
+        return current_conditions
 
     @staticmethod
     def _calculate_average_annual_temperature(daily_average_temperatures: list[float]) -> float:

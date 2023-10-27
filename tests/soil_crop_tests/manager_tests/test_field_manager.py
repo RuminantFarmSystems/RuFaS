@@ -57,7 +57,7 @@ def mock_weather(mocker: MockerFixture) -> Weather:
 def weather_original_method_states(mock_weather: Weather) -> Dict[str, Callable]:
     """Fixture to store unmocked methods of Weather."""
     return {
-        "get_current_weather": mock_weather.get_current_day_conditions
+        "get_current_day_conditions": mock_weather.get_current_day_conditions
     }
 
 
@@ -90,7 +90,7 @@ def test_daily_update_routine(fields: List[Field], mock_weather: Weather,
             assert field.manage_field.call_count == 1
         assert mock_weather.get_current_day_conditions.call_count == 1
         assert fm.output_gatherer.send_daily_variables.call_count == 1
-    mock_weather.get_current_day_conditions = weather_original_method_states["get_current_weather"]
+    mock_weather.get_current_day_conditions = weather_original_method_states["get_current_day_conditions"]
 
 
 @pytest.mark.parametrize("fields", [
