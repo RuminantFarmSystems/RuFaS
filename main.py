@@ -7,6 +7,7 @@ The main function run_rufas() will execute the model simulation(s). It accepts a
 file(s) or, if this input is not given, it will run in interactive mode and accept input from the user.
 """
 import argparse
+from enum import Enum
 from pathlib import Path
 import sys
 from typing import List
@@ -17,6 +18,23 @@ from RUFAS.simulation_engine import SimulationEngine
 from RUFAS.input_manager import InputManager
 from RUFAS.output_manager import OutputManager
 from RUFAS.util import Utility
+
+
+class LogType(Enum):
+    """
+    The different types of logs collected by Output Manager.
+
+    Notes
+    -----
+    Selecting NONE will tell OutputManager not to print out anything during a simulation.
+    Selecting ERRORS will tell OutputManager to print out all errors added during a simulation.
+    Selecting WARNINGS will tell OutputManager to print out all warnings and errors added during a simulation.
+    Selecting LOGS will tell OutputManager to print out all logs, warnings, and errors added during a simulation. 
+    """
+    NONE = "none"
+    ERRORS = "errors"
+    WARNINGS = "warnings"
+    LOGS = "logs"
 
 
 def main():
@@ -34,7 +52,7 @@ def main():
 def run_rufas(
     format_option: str = "verbose",
     make_graphs: bool = True,
-    verbose: bool = False,
+    verbose: LogType = LogType("none"),
     clear_output: bool = False,
     exclude_info_maps: bool = False,
     only_run_validation: bool = False,
@@ -55,7 +73,7 @@ def run_rufas(
         Utility.empty_dir(output_dir, keep=keep_list)
 
     set_global_variables(make_graphs, verbose)
-    if verbose:
+    if verbose in LogType.LOGS:
         sys.stdout.write("RuFaS: Ruminant Farm Systems Model 2023\n")
     metadata_file_list: List[MetadataPaths] = METADATA_PATHS
     if only_run_validation:
@@ -64,10 +82,9 @@ def run_rufas(
         execute_simulations(metadata_file_list, exclude_info_maps, format_option)
 
 
-def set_global_variables(make_graphs: bool, verbose: bool) -> None:
+def set_global_variables(make_graphs: bool) -> None:
     """Sets values of global variables in config/global_variables.py"""
     config.global_variables.PRODUCE_GRAPHICS = make_graphs
-    config.global_variables.PRINT_STATUS_MESSAGES = verbose
 
 
 def run_validation(metadata_files: List[Path], exclude_info_maps: bool = False,
@@ -92,20 +109,13 @@ def run_validation(metadata_files: List[Path], exclude_info_maps: bool = False,
     for metadata_file in metadata_files:
         input_manager.flush_pool()
         output_manager.flush_pools()
-        if config.global_variables.PRINT_STATUS_MESSAGES:
-            sys.stdout.write(f"Validating data for {str(metadata_file['path'])}...\n")
+        output_manager.add_log("Validation start.", f"Validating data for {str(metadata_file['path'])}...\n", info_map)
         is_data_valid = input_manager.start_data_processing(str(metadata_file["path"]), False)
-        if config.global_variables.PRINT_STATUS_MESSAGES:
-            if is_data_valid:
-                sys.stdout.write("Data is valid.\n\n")
-            else:
-                sys.stdout.write(f"Data not valid for {metadata_file['path']}.\n\n")
-        output_manager.add_log("Only run validation data validity check",
-                               f"{str(metadata_file['path'])} data validity is: {is_data_valid}",
-                               info_map)
+        if is_data_valid:
+            output_manager.add_log("Data valid", "Data is valid.\n\n", info_map)
+        else:
+            output_manager.add_warning("Data not valid", f"Data not valid for {metadata_file['path']}.\n\n", info_map)
         output_manager.dump_all_nondata_pools(r"output", exclude_info_maps, format_option)
-    if config.global_variables.PRINT_STATUS_MESSAGES:
-        sys.stdout.write("Check logs for more detailed data validation info.\n")
 
 
 def execute_simulations(
@@ -167,8 +177,8 @@ def parse_gnu_args():
     parser.add_argument(
         "-v",
         "--verbose",
-        help="Print progress messages while simulation is running",
-        action="store_true",
+        choices=list(LogType),
+        help="Specify the log type: ERRORS, WARNINGS, LOGS, NONE",
     )
     parser.add_argument(
         "-co",
