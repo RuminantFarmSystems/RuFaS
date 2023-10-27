@@ -984,7 +984,6 @@ class Field:
                                                           day=time.day, irrigation=current_weather.irrigation)
         total_precipitation = current_weather.rainfall + watering_amount
         precipitation_reaching_soil = self._handle_water_in_crop_canopies(total_precipitation)
-        precipitation_reaching_soil += self.soil.data.snow_melt_amount
 
         full_evapotranspirative_demand = self._determine_potential_evapotranspiration(
             current_weather.incoming_light, current_weather.max_air_temperature, current_weather.min_air_temperature,
@@ -993,7 +992,7 @@ class Field:
 
         remaining_evapotranspirative_demand = self._evaporate_from_crop_canopies(full_evapotranspirative_demand)
 
-        self.soil.infiltration.infiltrate(precipitation_reaching_soil)
+        self.soil.infiltration.infiltrate(precipitation_reaching_soil + self.soil.data.snow_melt_amount)
         self.soil.percolation.percolate(self.field_data.seasonal_high_water_table)
         self.soil.soil_erosion.erode(self.field_data.field_size, 0.02, self.field_data.current_residue,
                                      total_precipitation)
