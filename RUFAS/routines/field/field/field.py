@@ -984,6 +984,7 @@ class Field:
                                                           day=time.day, irrigation=current_weather.irrigation)
         total_precipitation = current_weather.rainfall + watering_amount
         precipitation_reaching_soil = self._handle_water_in_crop_canopies(total_precipitation)
+        water_reaching_soil = precipitation_reaching_soil + self.soil.data.snow_melt_amount
 
         full_evapotranspirative_demand = self._determine_potential_evapotranspiration(
             current_weather.incoming_light, current_weather.max_air_temperature, current_weather.min_air_temperature,
@@ -992,13 +993,13 @@ class Field:
 
         remaining_evapotranspirative_demand = self._evaporate_from_crop_canopies(full_evapotranspirative_demand)
 
-        self.soil.infiltration.infiltrate(precipitation_reaching_soil + self.soil.data.snow_melt_amount)
+        self.soil.infiltration.infiltrate(water_reaching_soil)
         self.soil.percolation.percolate(self.field_data.seasonal_high_water_table)
         self.soil.soil_erosion.erode(self.field_data.field_size, 0.02, self.field_data.current_residue,
                                      total_precipitation)
-        self.soil.phosphorus_cycling.cycle_phosphorus(precipitation_reaching_soil, self.soil.data.accumulated_runoff,
+        self.soil.phosphorus_cycling.cycle_phosphorus(water_reaching_soil, self.soil.data.accumulated_runoff,
                                                       self.field_data.field_size, current_weather.mean_air_temperature)
-        self.soil.carbon_cycling.cycle_carbon(precipitation_reaching_soil, current_weather.mean_air_temperature,
+        self.soil.carbon_cycling.cycle_carbon(water_reaching_soil, current_weather.mean_air_temperature,
                                               self.field_data.field_size)
         self.soil.nitrogen_cycling.cycle_nitrogen(self.field_data.field_size)
 
