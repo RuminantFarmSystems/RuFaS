@@ -9,6 +9,7 @@ import os
 import pandas as pd
 import re
 from deprecated.sphinx import deprecated
+from main import LogType
 
 from RUFAS.util import Utility
 
@@ -51,6 +52,7 @@ class OutputManager(object):
             self.errors_pool: Dict[str, OutputManager.pool_element_type] = {}
             self.logs_pool: Dict[str, OutputManager.pool_element_type] = {}
             self.__metadata_prefix: str = ""
+            self.__log_type: LogType = LogType("none")
             self.add_log(
                 "init_log",
                 "Output Manager instantiated.",
@@ -204,6 +206,10 @@ class OutputManager(object):
     def set_metadata_prefix(self, metadata_prefix: str) -> None:
         """Sets the metadata_prefix attribute."""
         self.__metadata_prefix = metadata_prefix
+
+    def set_log_type(self, log_type: LogType = LogType("none")) -> None:
+        """Sets the log_type attribute"""
+        self.__log_type = log_type
 
     def _get_timestamp(self, include_millis: bool = False) -> str:
         """

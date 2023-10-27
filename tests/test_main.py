@@ -114,18 +114,15 @@ def test_set_global_variables(make_graphs: bool, verbose: bool) -> None:
     """Checks that set_global_variables() sets the global variables correctly"""
     # Arrange
     old_make_graphs = config.global_variables.PRODUCE_GRAPHICS
-    old_verbose = config.global_variables.PRINT_STATUS_MESSAGES
 
     # Act
     set_global_variables(make_graphs, verbose)
 
     # Assert
     assert config.global_variables.PRODUCE_GRAPHICS == make_graphs
-    assert config.global_variables.PRINT_STATUS_MESSAGES == verbose
 
     # Cleanup
     config.global_variables.PRODUCE_GRAPHICS = old_make_graphs
-    config.global_variables.PRINT_STATUS_MESSAGES = old_verbose
 
 
 @pytest.mark.parametrize(
@@ -133,7 +130,7 @@ def test_set_global_variables(make_graphs: bool, verbose: bool) -> None:
         [(True, True), (True, False), (False, True), (False, False)
          ]
 )
-def test_run_validation(mocker: MockerFixture, is_data_valid: bool, verbose: bool, capsys) -> None:
+def test_run_validation(mocker: MockerFixture, is_data_valid: bool) -> None:
     """Checks that run_validation() calls the correct functions in the correct order"""
     mock_output_manager = mocker.MagicMock(auto_spec=OutputManager)
     mock_input_manager = mocker.MagicMock(auto_spec=InputManager)
@@ -141,8 +138,6 @@ def test_run_validation(mocker: MockerFixture, is_data_valid: bool, verbose: boo
     mock_input_manager.flush_pool.return_value = None
     mock_output_manager.dump_all_nondata_pools.return_value = None
     mock_output_manager.save_variables.return_value = None
-    old_verbose = config.global_variables.PRINT_STATUS_MESSAGES
-    config.global_variables.PRINT_STATUS_MESSAGES = verbose
     mocker.patch("main.OutputManager", return_value=mock_output_manager)
     mocker.patch("main.InputManager", return_value=mock_input_manager)
     metadata_prefix1 = "dummy_prefix1"
@@ -161,33 +156,6 @@ def test_run_validation(mocker: MockerFixture, is_data_valid: bool, verbose: boo
     assert mock_output_manager.dump_all_nondata_pools.call_args_list == [
         mocker.call("output", True, "verbose")
     ] * len(metadata_file_list)
-
-    captured = capsys.readouterr()
-
-    if config.global_variables.PRINT_STATUS_MESSAGES:
-        if is_data_valid:
-            expected_messages = ['***Only validating data, no simulation will follow.***\n\n',
-                                 'Check logs for more detailed data validation info.\n',
-                                 'Validating data for metadata_file1.json...\n',
-                                 'Data is valid.\n\n',
-                                 'Validating data for metadata_file2.json...\n',
-                                 'Data is valid.\n\n',
-                                 ]
-        else:
-            expected_messages = ['***Only validating data, no simulation will follow.***\n\n',
-                                 'Check logs for more detailed data validation info.\n',
-                                 'Validating data for metadata_file1.json...\n',
-                                 "Data not valid for metadata_file1.json.\n\n",
-                                 'Validating data for metadata_file2.json...\n',
-                                 "Data not valid for metadata_file2.json.\n\n"
-                                 ]
-    else:
-        expected_messages = ["***Only validating data, no simulation will follow.***\n\n"]
-
-    for message in expected_messages:
-        assert message in captured.out
-
-    config.global_variables.PRINT_STATUS_MESSAGES = old_verbose
 
 
 @pytest.mark.parametrize(

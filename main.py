@@ -29,7 +29,7 @@ class LogType(Enum):
     Selecting NONE will tell OutputManager not to print out anything during a simulation.
     Selecting ERRORS will tell OutputManager to print out all errors added during a simulation.
     Selecting WARNINGS will tell OutputManager to print out all warnings and errors added during a simulation.
-    Selecting LOGS will tell OutputManager to print out all logs, warnings, and errors added during a simulation. 
+    Selecting LOGS will tell OutputManager to print out all logs, warnings, and errors added during a simulation.
     """
     NONE = "none"
     ERRORS = "errors"
@@ -42,7 +42,7 @@ def main():
     run_rufas(
         format_option=cmd_arguments.format_option,
         make_graphs=not cmd_arguments.no_graphics,
-        verbose=cmd_arguments.verbose,
+        verbose_log_type=LogType(cmd_arguments.verbose_log_type),
         clear_output=cmd_arguments.clear_output,
         exclude_info_maps=cmd_arguments.exclude_info_maps,
         only_run_validation=cmd_arguments.only_run_validation,
@@ -52,7 +52,7 @@ def main():
 def run_rufas(
     format_option: str = "verbose",
     make_graphs: bool = True,
-    verbose: LogType = LogType("none"),
+    verbose_log_type: LogType = LogType("none"),
     clear_output: bool = False,
     exclude_info_maps: bool = False,
     only_run_validation: bool = False,
@@ -72,14 +72,14 @@ def run_rufas(
         keep_list = [".keep", "output_filters"]
         Utility.empty_dir(output_dir, keep=keep_list)
 
-    set_global_variables(make_graphs, verbose)
-    if verbose in LogType.LOGS:
+    set_global_variables(make_graphs)
+    if verbose_log_type != LogType.NONE:
         sys.stdout.write("RuFaS: Ruminant Farm Systems Model 2023\n")
     metadata_file_list: List[MetadataPaths] = METADATA_PATHS
     if only_run_validation:
-        run_validation(metadata_file_list, exclude_info_maps, format_option)
+        run_validation(metadata_file_list, exclude_info_maps, format_option, verbose_log_type)
     else:
-        execute_simulations(metadata_file_list, exclude_info_maps, format_option)
+        execute_simulations(metadata_file_list, exclude_info_maps, format_option, verbose_log_type)
 
 
 def set_global_variables(make_graphs: bool) -> None:
@@ -88,7 +88,7 @@ def set_global_variables(make_graphs: bool) -> None:
 
 
 def run_validation(metadata_files: List[Path], exclude_info_maps: bool = False,
-                   format_option: str = "verbose",) -> None:
+                   format_option: str = "verbose", verbose_log_type: LogType = LogType("none")) -> None:
     """Instantiates I/O Managers and triggers validation of input data.
 
     Parameters
@@ -110,6 +110,7 @@ def run_validation(metadata_files: List[Path], exclude_info_maps: bool = False,
         input_manager.flush_pool()
         output_manager.flush_pools()
         output_manager.add_log("Validation start.", f"Validating data for {str(metadata_file['path'])}...\n", info_map)
+        output_manager.set_log_type(verbose_log_type)
         is_data_valid = input_manager.start_data_processing(str(metadata_file["path"]), False)
         if is_data_valid:
             output_manager.add_log("Data valid", "Data is valid.\n\n", info_map)
@@ -120,6 +121,7 @@ def run_validation(metadata_files: List[Path], exclude_info_maps: bool = False,
 
 def execute_simulations(
     metadata_files: List[Path], exclude_info_maps: bool = False, format_option: str = "verbose",
+    verbose_log_type: LogType = LogType("none")
 ) -> None:
     """Instantiates I/O Managers and processes the metadata files provided by the user to run the simulation.
 
@@ -141,22 +143,19 @@ def execute_simulations(
     for metadata_file in metadata_files:
         input_manager.flush_pool()
         output_manager.flush_pools()
-        if config.global_variables.PRINT_STATUS_MESSAGES:
-            sys.stdout.write(f"Validating data for {str(metadata_file['path'])}...\n")
+        output_manager.add_log("Validation start.", f"Validating data for {str(metadata_file['path'])}...\n", info_map)
         output_manager.set_metadata_prefix(metadata_file['prefix'])
+        output_manager.set_log_type(verbose_log_type)
         is_data_valid = input_manager.start_data_processing(str(metadata_file["path"]), True)
         if is_data_valid:
-            if config.global_variables.PRINT_STATUS_MESSAGES:
-                sys.stdout.write("Data is valid. \nSimulating...\n")
+            output_manager.add_log("Data valid", "Data is valid. \nSimulating...\n", info_map)
             simulator = SimulationEngine()
             simulator.simulate()
         else:
-            if config.global_variables.PRINT_STATUS_MESSAGES:
-                sys.stdout.write(f"Data not valid for {metadata_file['path']}, simulation not run\n\n")
             output_manager.add_error("No simulation run",
                                      f"Data not valid for {str(metadata_file['path'])}, simulation not run", info_map)
         output_manager.save_variables(r"output", r"output/output_filters/", exclude_info_maps)
-        output_manager.dump_all_nondata_pools(r"output", exclude_info_maps)
+        output_manager.dump_all_nondata_pools(r"output", exclude_info_maps, format_option)
 
 
 def parse_gnu_args():
@@ -165,7 +164,7 @@ def parse_gnu_args():
     parser.add_argument(
         "-f",
         "--format-option",
-        choices=['block', 'inline', 'verbose', 'basic'],
+        choices=["block", "inline", "verbose", "basic"],
         help="Select formatting option for variable_names.txt file",
     )
     parser.add_argument(
@@ -176,9 +175,9 @@ def parse_gnu_args():
     )
     parser.add_argument(
         "-v",
-        "--verbose",
-        choices=list(LogType),
-        help="Specify the log type: ERRORS, WARNINGS, LOGS, NONE",
+        "--verbose-log-type",
+        choices=["errors", "warnings", "logs", "none"],
+        help="Specify the log type",
     )
     parser.add_argument(
         "-co",

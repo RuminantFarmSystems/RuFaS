@@ -2,8 +2,6 @@
 
 from copy import deepcopy
 from functools import reduce
-import sys
-import config.global_variables
 import json
 import re
 
@@ -205,9 +203,6 @@ class InputManager:
         om.add_log("Total Checked Items", f"{total_elements_counter=}", info_map)
         om.add_log("Total Fixed Items", f"{fixed_elements_counter=}", info_map)
         om.add_log("Total Invalid Items", f"{invalid_elements_counter=}", info_map)
-        if config.global_variables.PRINT_STATUS_MESSAGES:
-            sys.stdout.write(f"{fixed_elements_counter} element(s) fixed during the validation process.\n")
-            sys.stdout.write(f"{invalid_elements_counter} invalid and unfixable element(s) were found.\n")
         return invalid_elements_counter == 0
 
     def _filter_input_data_by_metadata(self, input_data: Dict[str, Any],
@@ -575,14 +570,12 @@ class InputManager:
                     }
 
         if 'default' not in variable_properties.keys():
-            if config.global_variables.PRINT_STATUS_MESSAGES:
-                sys.stdout.write(f"Invalid data not able to be fixed: {element_hierarchy[-1]}\n")
+            om.add_error("Invalid data not able to be fixed: ", f"{element_hierarchy[-1]}\n", info_map)
             return False
         variable_parent = reduce(lambda d, key: d[key], element_hierarchy[:-1],
                                  input_data)
-        if config.global_variables.PRINT_STATUS_MESSAGES:
-            sys.stdout.write(f"Invalid data found: {element_hierarchy[-1]}: {variable_parent[element_hierarchy[-1]]}\n")
-            sys.stdout.write(f"Set to default: {element_hierarchy[-1]} => {variable_properties['default']}\n")
+        om.add_warning("Invalid data found", f"{element_hierarchy[-1]}: {variable_parent[element_hierarchy[-1]]}\n",
+                       info_map)
         variable_parent[element_hierarchy[-1]] = variable_properties['default']
         om.add_warning("Data fixed",
                        f"Invalid data fixed: {element_hierarchy[-1]} => {variable_properties['default']}",
