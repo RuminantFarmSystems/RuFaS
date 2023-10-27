@@ -48,9 +48,9 @@ class FieldManager:
         Because different fields can have different latitudes, the day length has to be recalculated for each field.
 
         """
-        current_weather = weather.get_current_weather(time)
+        current_conditions = weather.get_current_day_conditions(time)
         for field in self.fields:
-            field.manage_field(time, current_weather=current_weather)
+            field.manage_field(time, current_conditions=current_conditions)
         self.output_gatherer.send_daily_variables()
 
     def annual_update_routine(self) -> None:
