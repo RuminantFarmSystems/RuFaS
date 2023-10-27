@@ -326,8 +326,8 @@ class AnimalManager:
         # average vertical & horizontal distance (VD, HD) of pens to the
         # milking parlor
         # avg_VD_parlor, avg_HD_parlor = self.avg_pen_dist()
-        current_weather = weather.get_current_weather(time)
-        temp = current_weather.mean_air_temperature
+        current_conditions = weather.get_current_day_conditions(time)
+        temp = current_conditions.mean_air_temperature
         for calf in self.calves:
             calf.calc_nutrient_rqmts(feed, temp)
             calf.p_animal = 0.0072 * calf.body_weight * 1000
@@ -1617,8 +1617,8 @@ class AnimalManager:
         if self.simulate_animals:
             if self.end_ration_interval():
                 self.reset_milk_production_reduction()
-            current_weather = weather.get_current_weather(time)
-            temp = current_weather.mean_air_temperature
+            current_conditions = weather.get_current_day_conditions(time)
+            temp = current_conditions.mean_air_temperature
             animals_snapshot_before_update = self._get_animals_snapshot()
 
             animals_added, animals_removed, calves_born, *rest = \
