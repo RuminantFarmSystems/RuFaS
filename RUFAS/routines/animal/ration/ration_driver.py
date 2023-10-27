@@ -328,7 +328,8 @@ class RationReporter:
     Reports information about a formulated ration.
     """
 
-    def report_ration(ration: Dict, available_feeds: Dict) -> Tuple[Dict, Dict]:  # noqa
+    @classmethod
+    def report_ration(cls, ration: Dict, available_feeds: Dict) -> Tuple[Dict, Dict]:  # noqa
         """
         Calculates information in the ration about nutrient information including
         nutrient amounts and concentrations. Returns a dictionary of nutrient amounts
@@ -403,8 +404,8 @@ class RationReporter:
                 nutrient_conc[nutr] = (nutrient_amount[nutr] / dm_amount) * 100
         return nutrient_amount, nutrient_conc
 
-    @staticmethod
-    def report_ration_supply(ration: Dict, available_feeds: Dict, ration_report: Dict, body_weight: float) -> Dict:
+    @classmethod
+    def report_ration_supply(cls, ration: Dict, available_feeds: Dict, ration_report: Dict, body_weight: float) -> Dict:
 
         """
         Nutrient and energy supply of a formulated ration
