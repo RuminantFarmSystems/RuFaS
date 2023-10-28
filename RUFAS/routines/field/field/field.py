@@ -4,7 +4,7 @@ from RUFAS.routines.field.crop.crop import Crop
 from RUFAS.routines.field.crop.crop_data import CropData
 from RUFAS.routines.field.crop.species_data_factory import CropSpecies, CropSpeciesDataFactory
 from RUFAS.routines.field.manager.events import Event, PlantingEvent, HarvestEvent, FertilizerEvent, ManureEvent
-from RUFAS.routines.field.manager.current_weather import CurrentWeather
+from RUFAS.current_day_conditions import CurrentDayConditions
 from RUFAS.routines.field.soil.soil import Soil
 from RUFAS.routines.field.field.field_data import FieldData
 from RUFAS.routines.field.field.fertilizer_application import FertilizerApplication
@@ -113,7 +113,7 @@ class Field:
         self.manure_manager: ManureManager = manure_manager
         """:class:`ManureManager` instance from which manure is requested for application to the field."""
 
-    def manage_field(self, time, current_weather: CurrentWeather) -> None:
+    def manage_field(self, time, current_conditions: CurrentDayConditions) -> None:
         """
         Main Field routine, runs all subroutines routines based on current attribute configuration.
 
@@ -121,8 +121,8 @@ class Field:
         ----------
         time : Time
             Contains the current year and day that the simulation is on.
-        current_weather : CurrentWeather
-            Contains a collection of today's weather variables needed for field processes.
+        current_conditions : CurrentDayConditions
+            Contains a collection of today's conditions variables needed for field processes.
 
         Notes
         -----
@@ -141,11 +141,11 @@ class Field:
 
         # --- Whole-Field Methods ---
         # Allow non-management field processes (water/nutrient cycling) to occur
-        self._execute_daily_processes(current_weather, time)
+        self._execute_daily_processes(current_conditions, time)
         # ... Other ...
 
         # --- Crop Management ---
-        self._assess_dormancy(current_weather.daylength)
+        self._assess_dormancy(current_conditions.daylength)
 
         self._check_crop_planting_schedule(time)
 
@@ -909,12 +909,12 @@ class Field:
     # </editor-fold>
 
     # <editor-fold desc="--- Field-level Methods ---">
-    def _execute_daily_processes(self, current_weather: CurrentWeather, time) -> None:
+    def _execute_daily_processes(self, current_conditions: CurrentDayConditions, time) -> None:
         """Executes all daily updates on this field's soil and crop objects.
 
         Parameters
         ----------
-        current_weather : CurrentWeather
+        current_conditions : CurrentDayConditions
             Object containing the environment conditions on this day.
         time : Time
             Object containing the current year and day of the simulation.
@@ -925,40 +925,43 @@ class Field:
         it will allow subject-matter experts to more easily experiment with different orders.
 
         """
-        self.soil.snow.update_snow(current_day_weather=current_weather, day=time.day)
+        self.soil.snow.update_snow(current_day_conditions=current_conditions, day=time.day)
 
         total_plant_cover = self.field_data.current_residue + self._determine_total_above_ground_biomass()
-        self.soil.soil_temp.daily_soil_temperature_update(current_weather.incoming_light,
-                                                          current_weather.mean_air_temperature,
-                                                          current_weather.min_air_temperature,
-                                                          current_weather.max_air_temperature,
+        self.soil.soil_temp.daily_soil_temperature_update(current_conditions.incoming_light,
+                                                          current_conditions.mean_air_temperature,
+                                                          current_conditions.min_air_temperature,
+                                                          current_conditions.max_air_temperature,
                                                           total_plant_cover,
                                                           self.soil.data.snow_content,
-                                                          current_weather.annual_mean_air_temperature)
+                                                          current_conditions.annual_mean_air_temperature)
 
-        self._cycle_water(current_weather, time)
+        self._cycle_water(current_conditions, time)
 
         for crop in self.crops:
             if crop.data.is_mature or crop.data.is_dormant:
                 continue
 
-            crop.heat_units.absorb_heat_units(current_weather.mean_air_temperature, current_weather.min_air_temperature,
-                                              current_weather.max_air_temperature)
+            crop.heat_units.absorb_heat_units(current_conditions.mean_air_temperature,
+                                              current_conditions.min_air_temperature,
+                                              current_conditions.max_air_temperature)
             crop.root_development.develop_roots()
             crop.nitrogen_incorporation.incorporate_nitrogen(self.soil.data)
             crop.phosphorus_incorporation.incorporate_phosphorus(self.soil.data)
-            crop.growth_constraints.constrain_growth(crop.data.max_transpiration, current_weather.mean_air_temperature)
+            crop.growth_constraints.constrain_growth(crop.data.max_transpiration,
+                                                     current_conditions.mean_air_temperature)
             crop.leaf_area_index.grow_canopy()
-            crop.biomass_allocation.allocate_biomass(current_weather.incoming_light)
+            crop.biomass_allocation.allocate_biomass(current_conditions.incoming_light)
 
-    def _cycle_water(self, current_weather: CurrentWeather, time):
+    def _cycle_water(self, current_conditions: CurrentDayConditions, time):
         """
         Allow water to cycle through the field.
 
         Parameters
         ----------
-        current_weather : CurrentWeather
-            A CurrentWeather object containing a collection of today's weather variables needed for field processes.
+        current_conditions : CurrentDayConditions
+            A CurrentDayConditions object containing a collection of today's weather variables needed for field
+            processes.
         time : Time
             An object containing the current year and day of the simulation.
 
@@ -980,15 +983,15 @@ class Field:
         of processes. This is necessary because there is not necessarily one correct order for processes to run in.
 
         """
-        watering_amount = self._determine_watering_amount(rainfall=current_weather.rainfall, year=time.year,
-                                                          day=time.day, irrigation=current_weather.irrigation)
-        total_precipitation = current_weather.rainfall + watering_amount
+        watering_amount = self._determine_watering_amount(rainfall=current_conditions.rainfall, year=time.year,
+                                                          day=time.day, irrigation=current_conditions.irrigation)
+        total_precipitation = current_conditions.rainfall + watering_amount
         precipitation_reaching_soil = self._handle_water_in_crop_canopies(total_precipitation)
         water_reaching_soil = precipitation_reaching_soil + self.soil.data.snow_melt_amount
 
         full_evapotranspirative_demand = self._determine_potential_evapotranspiration(
-            current_weather.incoming_light, current_weather.max_air_temperature, current_weather.min_air_temperature,
-            current_weather.mean_air_temperature)
+            current_conditions.incoming_light, current_conditions.max_air_temperature,
+            current_conditions.min_air_temperature, current_conditions.mean_air_temperature)
         self.field_data.max_evapotranspiration = full_evapotranspirative_demand
 
         remaining_evapotranspirative_demand = self._evaporate_from_crop_canopies(full_evapotranspirative_demand)
@@ -998,8 +1001,9 @@ class Field:
         self.soil.soil_erosion.erode(self.field_data.field_size, 0.02, self.field_data.current_residue,
                                      total_precipitation)
         self.soil.phosphorus_cycling.cycle_phosphorus(water_reaching_soil, self.soil.data.accumulated_runoff,
-                                                      self.field_data.field_size, current_weather.mean_air_temperature)
-        self.soil.carbon_cycling.cycle_carbon(water_reaching_soil, current_weather.mean_air_temperature,
+                                                      self.field_data.field_size,
+                                                      current_conditions.mean_air_temperature)
+        self.soil.carbon_cycling.cycle_carbon(water_reaching_soil, current_conditions.mean_air_temperature,
                                               self.field_data.field_size)
         self.soil.nitrogen_cycling.cycle_nitrogen(self.field_data.field_size)
 
