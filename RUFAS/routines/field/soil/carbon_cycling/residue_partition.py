@@ -148,7 +148,7 @@ class ResiduePartition:
                 layer.structural_litter_amount
             )
 
-            layer.soil_structural_carbon_amount = self._determine_soil_structural_carbon_amount(
+            layer.structural_litter_amount = self._determine_soil_structural_carbon_amount(
                 layer.soil_residue_metabolic_fraction,
                 layer.structural_carbon_transfer_amount,
                 layer.soil_structural_active_carbon_usage,
