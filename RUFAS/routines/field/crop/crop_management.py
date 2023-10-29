@@ -234,9 +234,6 @@ class CropManagement:
             soil_data.plant_root_residue = 0
             soil_data.crop_root_depth = 0
 
-        print(f"surface_residue {soil_data.plant_surface_residue}")
-        print(f"root_residue {soil_data.plant_root_residue}")
-
         soil_data.soil_layers[0].fresh_organic_nitrogen_content += self.data.residue_nitrogen
 
     # ---- Harvest Scheduling ----

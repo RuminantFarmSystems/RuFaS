@@ -129,7 +129,7 @@ class ResiduePartition:
             )
 
             layer.metabolic_litter_amount = self._determine_soil_metabolic_carbon_amount(
-                layer.soil_metabolic_carbon_amount,
+                layer.metabolic_litter_amount,
                 layer.plant_metabolic_to_soil_carbon_amount,
                 self.data.plant_root_residue,
                 layer.soil_residue_metabolic_fraction,
@@ -171,7 +171,8 @@ class ResiduePartition:
         if self.data.plant_root_residue != 0.0 and self.data.crop_root_depth != 0.0:
             self._add_subsurface_residue(self.data.plant_root_residue, self.data.crop_root_depth)
             self.data.plant_residue_metabolic_fraction = 0.0
-            self.data.plant_root_depth = 0.0
+            self.data.plant_root_residue = 0.0
+            self.data.crop_root_depth = 0.0
 
     def _add_subsurface_residue(self, root_residue: float, root_depth: float) -> None:
         """
