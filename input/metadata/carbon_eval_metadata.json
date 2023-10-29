@@ -66,7 +66,7 @@
     "soil": {
       "title": "Soil data",
       "description": "Stop treating soil like dirt!",
-      "path": "input/data/soil/ARL_soil.json",
+      "path": "input/data/soil/carbon_eval_soil.json",
       "type": "json",
       "properties": "soil_profile_properties"
     },
