@@ -190,7 +190,7 @@ class CropManagement:
 
     def _recalculate_biomass_distribution(self, roots_harvested: bool) -> None:
         """
-        Recalculates how much biomass is above ground and how much is stored in the roots.
+        Recalculates how much biomass is stored above ground and how much is stored in the roots.
 
         Parameters
         ----------
@@ -209,7 +209,7 @@ class CropManagement:
         """
         if not roots_harvested:
             self.data.above_ground_biomass -= self.data.cut_biomass
-            self.data.root_fraction = self.data.biomass / self.data.root_biomass
+            self.data.root_fraction = self.data.root_biomass / self.data.biomass
         else:
             root_biomass_removed = self.data.cut_biomass - self.data.above_ground_biomass
             self.data.root_biomass -= root_biomass_removed
