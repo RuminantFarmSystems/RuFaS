@@ -73,8 +73,8 @@ class BaseManureHandler:
         Returns:
             The average temperature of the day, in Celsius.
         """
-        current_weather = self.weather.get_current_weather(self.time)
-        avg_temp = current_weather.mean_air_temperature
+        current_conditions = self.weather.get_current_day_conditions(self.time)
+        avg_temp = current_conditions.mean_air_temperature
 
         return avg_temp
 
