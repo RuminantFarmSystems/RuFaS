@@ -171,7 +171,7 @@ class Weather:
         """
         year = time.year
         day = time.day
-        month = Utility.day_to_month_conversion(time)
+        month = Utility.day_to_month_conversion(day, time.calendar_year)
         daylength = CurrentDayConditions.determine_daylength(month)
         try:
             current_conditions = CurrentDayConditions(
@@ -185,7 +185,7 @@ class Weather:
                 daylength=daylength
             )
         except IndexError:
-            raise IndexError(f"Attempted to get weather conditions for day: {time.day}, year: {time.year}.")
+            raise IndexError(f"Attempted to get weather conditions for day: {day}, year: {year}.")
 
         return current_conditions
 
@@ -200,10 +200,10 @@ class Weather:
 
         """
         info_map = {"class": self.__class__.__name__, "function": self.record_weather.__name__, "prefix": "Weather"}
-        current_weather = self.get_current_weather(time)
+        current_weather = self.get_current_day_conditions(time)
         om.add_variable("precipitation", current_weather.rainfall, info_map)
         om.add_variable("rainfall", current_weather.rainfall, info_map)
-        om.add_variable("snowfall", current_weather.snow_fall, info_map)
+        om.add_variable("snowfall", current_weather.snowfall, info_map)
         om.add_variable("daylength", current_weather.daylength, info_map)
         om.add_variable("maximum_temperature", current_weather.max_air_temperature, info_map)
         om.add_variable("minimum_temperature", current_weather.min_air_temperature, info_map)
