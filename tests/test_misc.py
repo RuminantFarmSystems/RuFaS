@@ -681,7 +681,7 @@ def output_manager_original_method_states(
         "_list_txt_and_json_files_in_dir": mock_output_manager._list_txt_and_json_files_in_dir,
         "_load_txt_file_to_list": mock_output_manager._load_txt_file_to_list,
         "_load_json_file_to_tuple": mock_output_manager._load_json_file_to_tuple,
-        "_load_filter_file_to_list": mock_output_manager._load_filter_file_to_list,
+        "_load_filter_file": mock_output_manager._load_filter_file,
         "_save_variables_to_csv_files ": mock_output_manager._save_variables_to_csv_files,
         "save_variables": mock_output_manager.save_variables,
         "_save_variables_to_csv_files": mock_output_manager._save_variables_to_csv_files,
@@ -1211,7 +1211,7 @@ def test_load_json_file_to_tuple(
     )
 
 
-def test_load_filter_file_to_list_load_txt_file(
+def test_load_filter_file_load_txt_file(
     mocker: MockerFixture, mock_output_manager: OutputManager
 ) -> None:
     mock_txt_loader = mocker.patch.object(
@@ -1221,14 +1221,14 @@ def test_load_filter_file_to_list_load_txt_file(
         mock_output_manager, "_load_json_file_to_tuple", return_value=([], {})
     )
 
-    result: List[str] = mock_output_manager._load_filter_file_to_list("some_file.txt")
+    result: List[str] = mock_output_manager._load_filter_file("some_file.txt")
 
     mock_txt_loader.assert_called_with("some_file.txt")
     mock_json_loader.assert_not_called()
     assert result == []
 
 
-def test_load_filter_file_to_list_load_json_file(
+def test_load_filter_file_load_json_file(
     mocker: MockerFixture, mock_output_manager: OutputManager
 ) -> None:
     mock_txt_loader = mocker.patch.object(
@@ -1240,14 +1240,14 @@ def test_load_filter_file_to_list_load_json_file(
 
     result: Tuple[
         List[str], Dict[str, str]
-    ] = mock_output_manager._load_filter_file_to_list("some_file.json")
+    ] = mock_output_manager._load_filter_file("some_file.json")
 
     mock_json_loader.assert_called_with("some_file.json")
     mock_txt_loader.assert_not_called()
     assert result == ([], {})
 
 
-def test_load_filter_file_to_list_unsupported_file(
+def test_load_filter_file_unsupported_file(
     mocker: MockerFixture, mock_output_manager: OutputManager
 ) -> None:
     mock_txt_loader = mocker.patch.object(
@@ -1259,7 +1259,7 @@ def test_load_filter_file_to_list_unsupported_file(
 
     result: List[str] = []
     with pytest.raises(Exception):
-        mock_output_manager._load_filter_file_to_list("some_file.abc")
+        mock_output_manager._load_filter_file("some_file.abc")
 
     mock_txt_loader.assert_not_called()
     mock_json_loader.assert_not_called()
@@ -1749,6 +1749,7 @@ def test_save_variables(
     # mock_output_manager._list_txt_and_json_files_in_dir = MagicMock(
     #     return_value=["graph_input_filepath.json"]
     # )
+    # mock_output_manager._load_filter_file = MagicMock(return_value=)
     # with patch(
     #     "RUFAS.graph_generator.GraphGenerator.generate_graph"
     # ) as mock_generate_graph:
@@ -1774,6 +1775,9 @@ def test_save_variables(
     ]
     mock_output_manager._load_txt_file_to_list = output_manager_original_method_states[
         "_load_txt_file_to_list"
+    ]
+    mock_output_manager._load_filter_file = output_manager_original_method_states[
+        "_load_filter_file"
     ]
     mock_output_manager._exclude_info_maps = output_manager_original_method_states[
         "_exclude_info_maps"
