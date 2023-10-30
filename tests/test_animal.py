@@ -5,32 +5,33 @@ Description: Implements test cases
 Author(s): Pooya Hekmati, sh2235@cornell.edu, Carson Wolber, ctw54@cornell.edu
 """
 
+import pytest
+import numpy as np
 from typing import Any, Dict
 from unittest.mock import patch
 from mock import MagicMock
 from pytest_mock import MockerFixture
+
 from pytest_lazyfixture import lazy_fixture
 from RUFAS.routines.animal.life_cycle.cow import Cow
+# from RUFAS.routines.animal.life_cycle.heiferI import HeiferI
+# from RUFAS.routines.animal.life_cycle.heiferII import HeiferII
+# from RUFAS.routines.animal.life_cycle.heiferIII import HeiferIII
+from RUFAS.routines.animal.life_cycle.animal_base import AnimalBase
+from RUFAS.routines.animal.life_cycle.animal_events import AnimalEvents
+# from RUFAS.routines.animal.animal_grouping_scenarios import AnimalGroupingScenario
+
 from RUFAS.routines.animal.animal_types import AnimalType
-import pytest
 
-import numpy as np
-
-import RUFAS.routines.animal.clustering_pen_grouping
+from RUFAS.routines.animal.ration.animal_requirements import AnimalRequirements
 from RUFAS.routines.animal.ration.ration_driver import AvailableFeeds
 from RUFAS.routines.animal.ration.ration_driver import RationManager
 from RUFAS.routines.animal.ration.ration_driver import RationReporter
 
 from RUFAS.routines.animal.ration.ration_optimizer import RationOptimizer
-
-import RUFAS.routines.animal.ration.animal_requirements
-import RUFAS.routines.animal.ration.ration_optimizer
-
-from RUFAS.routines.animal.life_cycle.animal_base import AnimalBase
-from RUFAS.routines.animal.life_cycle.animal_events import AnimalEvents
-
-import RUFAS.routines.animal.ration.user_defined_ration
 from RUFAS.routines.animal.ration.user_defined_ration import UserDefinedRationManager
+
+import RUFAS.routines.animal.clustering_pen_grouping
 
 
 @pytest.fixture
@@ -57,6 +58,13 @@ def cow_a() -> dict:
         "NDF_conc": 0.3,
         "TDN_conc": 0.7,
         "net_energy_diet_concentration": 1.0,
+        "days_born": 1000,
+        "conceptus_weight": 22,
+        "calf_birth_weight": 40,
+        "net_energy_growth": 3,
+        "average_daily_gain": 1,
+        "equivalent_shrunk_body_weight": 220,
+        "dry_matter_intake_estimate": 24
     }
     return cow_a_dict
 
@@ -85,8 +93,85 @@ def cow_b() -> dict:
         "NDF_conc": 0.3,
         "TDN_conc": 0.7,
         "net_energy_diet_concentration": 1.0,
+        "days_born": 1000,
+        "conceptus_weight": 0,
+        "calf_birth_weight": 0,
+        "net_energy_growth": 3,
+        "average_daily_gain": 1,
+        "equivalent_shrunk_body_weight": 0,
+        "dry_matter_intake_estimate": 24,
     }
     return cow_b_dict
+
+
+@pytest.fixture
+def cow_c() -> dict:
+    cow_c_dict = {
+        "body_weight": 680,
+        "mature_body_weight": 700,
+        "day_of_pregnancy": 191,
+        "animal_type": AnimalType.DRY_COW,
+        "parity": 2,
+        "calving_interval": 365,
+        "milk_protein": 3.45,
+        "Fat_Milk": 4,
+        "Lactose_Milk": 4.9,
+        "Milk": 25,
+        "DIM": 240,
+        "lactating": False,
+        "BCS5": 3,
+        "PrevTemp": None,
+        "ADG_heifer": None,
+        "daily_growth": None,
+        "age": 1000,
+        "distance": None,
+        "NDF_conc": 0.3,
+        "TDN_conc": 0.7,
+        "net_energy_diet_concentration": 1.0,
+        "days_born": 1000,
+        "conceptus_weight": 0,
+        "calf_birth_weight": 0,
+        "net_energy_growth": 3,
+        "average_daily_gain": 0,
+        "equivalent_shrunk_body_weight": 479,
+        "dry_matter_intake_estimate": 24,
+    }
+    return cow_c_dict
+
+
+@pytest.fixture
+def cow_d() -> dict:
+    cow_d_dict = {
+        "body_weight": 680,
+        "mature_body_weight": 700,
+        "day_of_pregnancy": 191,
+        "animal_type": "dummy",
+        "parity": 2,
+        "calving_interval": 365,
+        "milk_protein": 3.45,
+        "Fat_Milk": 4,
+        "Lactose_Milk": 4.9,
+        "Milk": 25,
+        "DIM": 240,
+        "lactating": False,
+        "BCS5": 3,
+        "PrevTemp": None,
+        "ADG_heifer": None,
+        "daily_growth": None,
+        "age": 1000,
+        "distance": None,
+        "NDF_conc": 0.3,
+        "TDN_conc": 0.7,
+        "net_energy_diet_concentration": 1.0,
+        "days_born": 1000,
+        "conceptus_weight": 0,
+        "calf_birth_weight": 0,
+        "net_energy_growth": 3,
+        "average_daily_gain": 0,
+        "equivalent_shrunk_body_weight": 479,
+        "dry_matter_intake_estimate": 24,
+    }
+    return cow_d_dict
 
 
 @pytest.fixture
@@ -113,7 +198,13 @@ def heifer_a() -> dict:
         "NDF_conc": 0.0,
         "TDN_conc": 0.0,
         "net_energy_diet_concentration": 0.0,
-        "days_born": 100
+        "days_born": 100,
+        "conceptus_weight": 22,
+        "calf_birth_weight": 40,
+        "net_energy_growth": 3,
+        "average_daily_gain": 1,
+        "equivalent_shrunk_body_weight": 220,
+        "dry_matter_intake_estimate": 12,
     }
     return heifer_a_dict
 
@@ -142,35 +233,204 @@ def heifer_b() -> dict:
         "NDF_conc": 0.3,
         "TDN_conc": 0.7,
         "net_energy_diet_concentration": 1.0,
-        "days_born": 400
+        "days_born": 400,
+        "conceptus_weight": 0,
+        "calf_birth_weight": 0,
+        "net_energy_growth": 3,
+        "average_daily_gain": 1,
+        "equivalent_shrunk_body_weight": 0,
+        "dry_matter_intake_estimate": 12,
     }
     return heifer_b_dict
 
 
-@pytest.fixture
-def heifer_c() -> dict:
-    heifer_c_dict = {
-        "body_weight": 340,
-        "mature_body_weight": 700,
-        "day_of_pregnancy": 1,
-        "animal_type": AnimalType.HEIFER_I,
-        "parity": 0,
-        "calving_interval": None,
-        "milk_protein": 0.0,
-        "Fat_Milk": 0.0,
-        "Lactose_Milk": 0.0,
-        "Milk": 0.0,
-        "DIM": None,
-        "lactating": False,
-        "BCS5": 3,
-        "PrevTemp": 15,
-        "ADG_heifer": 0.9,
-        "daily_growth": None,
-        "age": 365,
-        "distance": None,
-        "days_born": 400
-    }
-    return heifer_c_dict
+def test_set_requirements(mocker: MockerFixture):
+    """Unit test for function set_requirements in file routines/animal/ration/animal_requirements.py"""
+
+    pen = MagicMock()
+    animal_grouping_scenario = MagicMock()
+    test_obj = AnimalRequirements()
+    test_obj.recalculate_requirements = MagicMock(
+        return_value={'NEmaint_requirement': [1, 2],
+                      'NEa_requirement': [2, 3],
+                      'NEg_requirement': [3, 4],
+                      'NEpreg_requirement': [4,],
+                      'NEl_requirement': [5,],
+                      'MP_requirement': [6,],
+                      'Ca_requirement': [7,],
+                      'P_requirement': [8,],
+                      'DMIest_requirement': [9,],
+                      'BW': [10,],
+                      'milk': [11,],
+                      'milk_production_reduction': [12,],
+                      'CP_milk': [13,]
+                      })
+    test_obj.use_existing_requirements = MagicMock(
+        return_value={'NEmaint_requirement': [2, 2],
+                      'NEa_requirement': [3, 3],
+                      'NEg_requirement': [4, 4],
+                      'NEpreg_requirement': [5, 5],
+                      'NEl_requirement': [6, 6],
+                      'MP_requirement': [7, 7],
+                      'Ca_requirement': [8, 8],
+                      'P_requirement': [9, 9],
+                      'DMIest_requirement': [10, 10],
+                      'BW': [11, 11],
+                      'milk': [12, 12],
+                      'milk_production_reduction': [13, 13],
+                      'CP_milk': [14, 14]
+                      })
+    test_obj.calc_pen_requirements = MagicMock()
+
+    recalc = True
+    test_obj.set_requirements(pen, animal_grouping_scenario, recalc)
+    test_obj.recalculate_requirements.assert_called_once()
+    test_obj.calc_pen_requirements.assert_called_once()
+    pen.set_milk_avgs.assert_called_once()
+    pen.set_avg_nutrient_rqmts.assert_called_once()
+
+    recalc = False
+    test_obj.set_requirements(pen, animal_grouping_scenario, recalc)
+    test_obj.use_existing_requirements.assert_called_once()
+
+
+def test_recalculate_requirements() -> None:
+    pen_mock = MagicMock()
+    pen_mock.animals_in_pen = [MagicMock(), MagicMock(), MagicMock(), MagicMock(), MagicMock()]
+    for i in range(0, 5):
+        pen_mock.animals_in_pen[i].NEmaint_requirement = i
+        pen_mock.animals_in_pen[i].NEg_requirement = i
+        pen_mock.animals_in_pen[i].NEpreg_requirement = i
+        pen_mock.animals_in_pen[i].NEl_requirement = i
+        pen_mock.animals_in_pen[i].MP_requirement = i
+        pen_mock.animals_in_pen[i].Ca_requirement = i
+        pen_mock.animals_in_pen[i].P_requirement = i
+        pen_mock.animals_in_pen[i].DMIest_requirement = i
+        pen_mock.animals_in_pen[i].body_weight = i
+        pen_mock.animals_in_pen[i].estimated_daily_milk_produced = i
+        pen_mock.animals_in_pen[i].milk_production_reduction = i
+        pen_mock.animals_in_pen[i].CP_milk = i
+        pen_mock.animals_in_list[i].calc_daily_walking_dist = MagicMock()
+
+    animal_grouping_scenario_mock = MagicMock()
+    animal_grouping_scenario_mock.get_animal_type = MagicMock(side_effect=[AnimalType.HEIFER_I,
+                                                                           AnimalType.HEIFER_II,
+                                                                           AnimalType.HEIFER_III,
+                                                                           AnimalType.DRY_COW,
+                                                                           AnimalType.LAC_COW])
+
+    requirements_lists_empty = {'NEmaint_requirement': [],
+                                'NEa_requirement': [],
+                                'NEg_requirement': [],
+                                'NEpreg_requirement': [],
+                                'NEl_requirement': [],
+                                'MP_requirement': [],
+                                'Ca_requirement': [],
+                                'P_requirement': [],
+                                'DMIest_requirement': [],
+                                'BW': [],
+                                'milk': [],
+                                'milk_production_reduction': [],
+                                'CP_milk': []
+                                }
+    requirements_list_expected = {'NEmaint_requirement': [1, 1, 1, 1, 1],
+                                  'NEa_requirement': [0, 0, 0, 0, 100],
+                                  'NEg_requirement': [1, 1, 1, 1, 1],
+                                  'NEpreg_requirement': [1, 1, 1, 1, 1],
+                                  'NEl_requirement': [1, 1, 1, 1, 1],
+                                  'MP_requirement': [1, 1, 1, 1, 1],
+                                  'Ca_requirement': [1, 1, 1, 1, 1],
+                                  'P_requirement': [1, 1, 1, 1, 1],
+                                  'DMIest_requirement': [1, 1, 1, 1, 1],
+                                  'BW': [0, 1, 2, 3, 4],
+                                  'milk': [4],
+                                  'milk_production_reduction': [4],
+                                  'CP_milk': [4]
+                                  }
+
+    requirements_mock = AnimalRequirements()
+    requirements_mock.energy_activity_rqmts = MagicMock(return_value=100)
+    requirements_mock.calc_rqmts = MagicMock(return_value={'NEmaint_requirement': 1,
+                                                           'NEa_requirement': 1,
+                                                           'NEg_requirement': 1,
+                                                           'NEpreg_requirement': 1,
+                                                           'NEl_requirement': 1,
+                                                           'MP_requirement': 1,
+                                                           'Ca_requirement': 1,
+                                                           'P_requirement': 1,
+                                                           'DMIest_requirement': 1, })
+
+    requirements_lists_actual = requirements_mock.recalculate_requirements(pen_mock,
+                                                                           animal_grouping_scenario_mock,
+                                                                           requirements_lists_empty)
+
+    # Assertions
+    requirements_mock.energy_activity_rqmts.assert_called_once()
+    assert requirements_list_expected == requirements_lists_actual
+    assert pen_mock.animals_in_pen[-1].DNED_requirement == 2
+    assert pen_mock.animals_in_pen[-1].DMDP_requirement == 1
+
+
+def test_use_existing_requirements() -> None:
+    pen_mock = MagicMock()
+    pen_mock.animals_in_pen = [MagicMock(), MagicMock()]
+    for i in range(0, 2):
+        pen_mock.animals_in_pen[i].NEmaint_requirement = i
+        pen_mock.animals_in_pen[i].NEg_requirement = i
+        pen_mock.animals_in_pen[i].NEpreg_requirement = i
+        pen_mock.animals_in_pen[i].NEl_requirement = i
+        pen_mock.animals_in_pen[i].MP_requirement = i
+        pen_mock.animals_in_pen[i].Ca_requirement = i
+        pen_mock.animals_in_pen[i].P_requirement = i
+        pen_mock.animals_in_pen[i].DMIest_requirement = i
+        pen_mock.animals_in_pen[i].body_weight = i
+        pen_mock.animals_in_pen[i].estimated_daily_milk_produced = i
+        pen_mock.animals_in_pen[i].milk_production_reduction = i
+        pen_mock.animals_in_pen[i].CP_milk = i
+        pen_mock.animals_in_list[i].calc_daily_walking_dist = MagicMock()
+
+    animal_grouping_scenario_mock = MagicMock()
+    animal_grouping_scenario_mock.get_animal_type = MagicMock(side_effect=[AnimalType.HEIFER_I, AnimalType.LAC_COW])
+
+    requirements_lists_empty = {'NEmaint_requirement': [],
+                                'NEa_requirement': [],
+                                'NEg_requirement': [],
+                                'NEpreg_requirement': [],
+                                'NEl_requirement': [],
+                                'MP_requirement': [],
+                                'Ca_requirement': [],
+                                'P_requirement': [],
+                                'DMIest_requirement': [],
+                                'BW': [],
+                                'milk': [],
+                                'milk_production_reduction': [],
+                                'CP_milk': []
+                                }
+    requirements_list_expected = {'NEmaint_requirement': [0, 1],
+                                  'NEa_requirement': [0, 1],
+                                  'NEg_requirement': [0, 1],
+                                  'NEpreg_requirement': [0, 1],
+                                  'NEl_requirement': [0, 1],
+                                  'MP_requirement': [0, 1],
+                                  'Ca_requirement': [0, 1],
+                                  'P_requirement': [0, 1],
+                                  'DMIest_requirement': [0, 1],
+                                  'BW': [0, 1],
+                                  'milk': [1],
+                                  'milk_production_reduction': [1],
+                                  'CP_milk': [1]
+                                  }
+
+    requirements_mock = AnimalRequirements()
+    requirements_mock.energy_activity_rqmts = MagicMock(return_value=i)
+
+    requirements_lists_actual = requirements_mock.use_existing_requirements(pen_mock, animal_grouping_scenario_mock,
+                                                                            requirements_lists_empty)
+
+    # Assertions
+    requirements_mock.energy_activity_rqmts.assert_called_once()
+    assert requirements_list_expected == requirements_lists_actual
+    # pen_mock.animals_in_list[1].calc_daily_walking_dist.assert_called_once()
 
 
 @pytest.fixture
@@ -308,719 +568,380 @@ def mock_available_feeds() -> dict:
     return available_feeds
 
 
+@pytest.mark.parametrize(
+    "animal_dict, expected",
+    [(lazy_fixture('cow_a'), (9.7, 0, 43.92)),
+     (lazy_fixture('cow_b'), (10.65, 0, 43.92)),
+     (lazy_fixture('cow_c'), (10.65, 18.22, 43.92)),
+     (lazy_fixture('heifer_a'), (5.08, 0, 0)),
+     (lazy_fixture('heifer_b'), (6.81, 0, 43.92)),
+     ]
+)
 def test_calculate_NRC_energy_maintenance_requirements(
-        cow_a: dict, cow_b: dict, heifer_a: dict, heifer_b: dict
-) -> None:
+     animal_dict: dict, expected: tuple) -> None:
     """Unit test for function calculate_NRC_energy_maintenance_requirements in file
     routines/animal/ration/animal_requirements.py"""
     req = RUFAS.routines.animal.ration.animal_requirements.AnimalRequirements()
     result_NEmaint, result_CW, result_CBW = req.calculate_NRC_energy_maintenance_requirements(
-        cow_a["body_weight"],
-        cow_a["mature_body_weight"],
-        cow_a["day_of_pregnancy"],
-        cow_a["BCS5"],
-        cow_a["PrevTemp"],
-        cow_a["animal_type"],
+        animal_dict["body_weight"],
+        animal_dict["mature_body_weight"],
+        animal_dict["day_of_pregnancy"],
+        animal_dict["BCS5"],
+        animal_dict["PrevTemp"],
+        animal_dict["animal_type"],
     )
-    assert (result_NEmaint, result_CW, result_CBW) == pytest.approx((9.7, 0, 43.92), rel=5e-1)
-
-    result_NEmaint, result_CW, result_CBW = req.calculate_NRC_energy_maintenance_requirements(
-        cow_b["body_weight"],
-        cow_b["mature_body_weight"],
-        cow_b["day_of_pregnancy"],
-        cow_b["BCS5"],
-        cow_b["PrevTemp"],
-        cow_b["animal_type"],
-    )
-    assert (result_NEmaint, result_CW, result_CBW) == pytest.approx((10.65, 0, 43.92), rel=5e-1)
-
-    result_NEmaint, result_CW, result_CBW = req.calculate_NRC_energy_maintenance_requirements(
-        heifer_a["body_weight"],
-        heifer_a["mature_body_weight"],
-        heifer_a["day_of_pregnancy"],
-        heifer_a["BCS5"],
-        heifer_a["PrevTemp"],
-        heifer_a["animal_type"],
-    )
-    assert (result_NEmaint, result_CW, result_CBW) == pytest.approx((5.08, 0, 0), rel=5e-1)
-
-    result_NEmaint, result_CW, result_CBW = req.calculate_NRC_energy_maintenance_requirements(
-        heifer_b["body_weight"],
-        heifer_b["mature_body_weight"],
-        heifer_b["day_of_pregnancy"],
-        heifer_b["BCS5"],
-        heifer_b["PrevTemp"],
-        heifer_b["animal_type"],
-    )
-    assert (result_NEmaint, result_CW, result_CBW) == pytest.approx((6.81, 0, 43.92), rel=5e-1)
+    assert (result_NEmaint, result_CW, result_CBW) == pytest.approx(expected, rel=5e-1)
 
 
-def test_calculate_NRC_energy_growth_requirements(cow_a: dict, cow_b: dict, heifer_a: dict, heifer_b: dict) -> None:
+@pytest.mark.parametrize(
+    "animal_dict, conceptus_weight, expectedvalues",
+    [(lazy_fixture('cow_a'), 22, (0.77, 0.1841, 394.065)),
+     (lazy_fixture('cow_b'), 0, (0.0, 0, 464.343)),
+     (lazy_fixture('cow_c'), 0, (0.68, 0.147, 464.343)),
+     (lazy_fixture('heifer_a'), 0, (1.533, 0.65, 157.057)),
+     (lazy_fixture('heifer_b'), 0, (2.937, 0.9, 232.171)),
+     ]
+)
+def test_calculate_NRC_energy_growth_requirements(animal_dict: dict, conceptus_weight: float,
+                                                  expectedvalues: tuple) -> None:
     """Unit test for function calculate_NRC_energy_growth_requirements in file
     routines/animal/ration/animal_requirements.py"""
     req = RUFAS.routines.animal.ration.animal_requirements.AnimalRequirements()
     result_NEg, result_ADG, result_EQSBW = req.calculate_NRC_energy_growth_requirements(
-        cow_a["body_weight"],
-        cow_a["mature_body_weight"],
-        22,
-        cow_a["animal_type"],
-        cow_a["parity"],
-        cow_a["calving_interval"],
-        cow_a["ADG_heifer"],
+        animal_dict["body_weight"],
+        animal_dict["mature_body_weight"],
+        conceptus_weight,
+        animal_dict["animal_type"],
+        animal_dict["parity"],
+        animal_dict["calving_interval"],
+        animal_dict["ADG_heifer"],
     )
-    assert (result_NEg, result_ADG, result_EQSBW) == pytest.approx((0.77, 0.18, 394.065), rel=1e-1)
-
-    result_NEg, result_ADG, result_EQSBW = req.calculate_NRC_energy_growth_requirements(
-        cow_b["body_weight"],
-        cow_b["mature_body_weight"],
-        0,
-        cow_b["animal_type"],
-        cow_b["parity"],
-        cow_b["calving_interval"],
-        cow_b["ADG_heifer"],
-    )
-    assert (result_NEg, result_ADG, result_EQSBW) == pytest.approx((0.0, 0, 464.343), rel=1e-1)
-
-    result_NEg, result_ADG, result_EQSBW = req.calculate_NRC_energy_growth_requirements(
-        heifer_a["body_weight"],
-        heifer_a["mature_body_weight"],
-        0,
-        heifer_a["animal_type"],
-        heifer_a["parity"],
-        heifer_a["calving_interval"],
-        heifer_a["ADG_heifer"],
-    )
-    assert (result_NEg, result_ADG, result_EQSBW) == pytest.approx((1.5, 0.65, 157.057), rel=1e-1)
-
-    result_NEg, result_ADG, result_EQSBW = req.calculate_NRC_energy_growth_requirements(
-        heifer_b["body_weight"],
-        heifer_b["mature_body_weight"],
-        0,
-        heifer_b["animal_type"],
-        heifer_b["parity"],
-        heifer_b["calving_interval"],
-        heifer_b["ADG_heifer"],
-    )
-    assert (result_NEg, result_ADG, result_EQSBW) == pytest.approx((2.9, 0.9, 232.171), rel=1e-1)
+    assert (result_NEg, result_ADG, result_EQSBW) == pytest.approx(expectedvalues, rel=1e-2)
 
 
-def test_calculate_NRC_energy_pregnancy_requirements(cow_a: dict, cow_b: dict, heifer_a: dict, heifer_b: dict) -> None:
-    """Unit test for function calculate_NRC_energy_pregnancy_requirements in file
-    routines/animal/ration/animal_requirements.py"""
+@pytest.mark.parametrize(
+    'animal_dict, calf_birth_weight, expected',
+    [
+        (lazy_fixture('cow_a'), 40, 0),
+        (lazy_fixture('cow_b'), 40, 0),
+        (lazy_fixture('cow_c'), 40, 2.33),
+        (lazy_fixture('heifer_a'), 0, 0),
+        (lazy_fixture('heifer_b'), 40, 0),
+    ]
+)
+def test_calculate_NRC_energy_pregnancy_requirements(animal_dict: dict, calf_birth_weight: float, expected: float):
     req = RUFAS.routines.animal.ration.animal_requirements.AnimalRequirements()
-    result_NEpreg = req.calculate_NRC_energy_pregnancy_requirements(cow_a["day_of_pregnancy"], 40)
-    assert (result_NEpreg) == pytest.approx((0), rel=1e-1)
-
-    result_NEpreg = req.calculate_NRC_energy_pregnancy_requirements(cow_b["day_of_pregnancy"], 40)
-    assert (result_NEpreg) == pytest.approx((0), rel=1e-1)
-
-    result_NEpreg = req.calculate_NRC_energy_pregnancy_requirements(heifer_a["day_of_pregnancy"], 0)
-    assert (result_NEpreg) == pytest.approx((0), rel=1e-1)
-
-    result_NEpreg = req.calculate_NRC_energy_pregnancy_requirements(heifer_b["day_of_pregnancy"], 40)
-    assert (result_NEpreg) == pytest.approx((0), rel=1e-1)
+    result_NEpreg = req.calculate_NRC_energy_pregnancy_requirements(animal_dict["day_of_pregnancy"], calf_birth_weight)
+    assert (result_NEpreg) == pytest.approx((expected), rel=1e-2)
 
 
-def test_calculate_NRC_energy_lactation_requirements(cow_a: dict, cow_b: dict, heifer_a: dict, heifer_b: dict) -> None:
+@pytest.mark.parametrize(
+    "animal_dict, expected",
+    [(lazy_fixture('cow_a'), 23),
+     (lazy_fixture('cow_b'), 0.0),
+     (lazy_fixture('heifer_a'), 0.0),
+     (lazy_fixture('heifer_b'), 0.0),
+     ]
+)
+def test_calculate_NRC_energy_lactation_requirements(animal_dict: dict, expected: float) -> None:
     """Unit test for function calculate_NRC_energy_lactation_requirements in file
     routines/animal/ration/animal_requirements.py"""
     req = RUFAS.routines.animal.ration.animal_requirements.AnimalRequirements()
     result_NEl = req.calculate_NRC_energy_lactation_requirements(
-        cow_a["animal_type"], cow_a["Fat_Milk"], cow_a["milk_protein"], cow_a["Lactose_Milk"], cow_a["Milk"]
+        animal_dict["animal_type"], animal_dict["Fat_Milk"], animal_dict["milk_protein"],
+        animal_dict["Lactose_Milk"], animal_dict["Milk"]
     )
-    assert (result_NEl) == pytest.approx((23), rel=1e-1)
-
-    result_NEl = req.calculate_NRC_energy_lactation_requirements(
-        cow_b["animal_type"], cow_b["Fat_Milk"], cow_b["milk_protein"], cow_b["Lactose_Milk"], cow_b["Milk"]
-    )
-    assert (result_NEl) == pytest.approx((0.0), rel=1e-1)
-
-    result_NEl = req.calculate_NRC_energy_lactation_requirements(
-        heifer_a["animal_type"],
-        heifer_a["Fat_Milk"],
-        heifer_a["milk_protein"],
-        heifer_a["Lactose_Milk"],
-        heifer_a["Milk"],
-    )
-    assert (result_NEl) == pytest.approx((0.0), rel=1e-1)
-
-    result_NEl = req.calculate_NRC_energy_lactation_requirements(
-        heifer_b["animal_type"],
-        heifer_b["Fat_Milk"],
-        heifer_b["milk_protein"],
-        heifer_b["Lactose_Milk"],
-        heifer_b["Milk"],
-    )
-    assert (result_NEl) == pytest.approx((0.0), rel=1e-1)
+    assert (result_NEl) == pytest.approx((expected), rel=1e-2)
 
 
-def test_calculate_NRC_protein_requirements(cow_a: dict, cow_b: dict, heifer_a: dict, heifer_b: dict) -> None:
+@pytest.mark.parametrize(
+    "animal_dict, TDNconc, expected",
+    [(lazy_fixture('cow_a'), 0.7, 2340),
+     (lazy_fixture('cow_b'), 0.6, 786.12),
+     (lazy_fixture('cow_c'), 0.6, 570.5),
+     (lazy_fixture('heifer_a'), 0.7, 562),
+     (lazy_fixture('heifer_b'), 0.7, 489),
+     (lazy_fixture('heifer_b'), 0.5, 562.1),
+     ]
+)
+def test_calculate_NRC_protein_requirements(animal_dict: dict, TDNconc: float, expected: float) -> None:
     """Unit test for function calculate_NRC_protein_requirements in file
     routines/animal/ration/animal_requirements.py"""
     req = RUFAS.routines.animal.ration.animal_requirements.AnimalRequirements()
     result_MP_req = req.calculate_NRC_protein_requirements(
-        cow_a["body_weight"],
-        22,
-        cow_a["day_of_pregnancy"],
-        cow_a["animal_type"],
-        cow_a["Milk"],
-        cow_a["milk_protein"],
-        40,
-        3,
-        1,
-        220,
-        24,
+        animal_dict["body_weight"],
+        animal_dict["conceptus_weight"],
+        animal_dict["day_of_pregnancy"],
+        animal_dict["animal_type"],
+        animal_dict["Milk"],
+        animal_dict["milk_protein"],
+        animal_dict["calf_birth_weight"],
+        animal_dict["net_energy_growth"],
+        animal_dict["average_daily_gain"],
+        animal_dict["equivalent_shrunk_body_weight"],
+        animal_dict["dry_matter_intake_estimate"],
+        TDNconc
     )
-    assert (result_MP_req) == pytest.approx((2340), rel=1e-1)
-
-    result_MP_req = req.calculate_NRC_protein_requirements(
-        cow_b["body_weight"],
-        0,
-        cow_b["day_of_pregnancy"],
-        cow_b["animal_type"],
-        cow_b["Milk"],
-        cow_b["milk_protein"],
-        0,
-        3,
-        1,
-        0,
-        24,
-        0.6
-    )
-    assert (result_MP_req) == pytest.approx((786.12), rel=1e-1)
-
-    result_MP_req = req.calculate_NRC_protein_requirements(
-        heifer_a["body_weight"],
-        22,
-        heifer_a["day_of_pregnancy"],
-        heifer_a["animal_type"],
-        heifer_a["Milk"],
-        heifer_a["milk_protein"],
-        40,
-        3,
-        1,
-        220,
-        12,
-    )
-    assert (result_MP_req) == pytest.approx((562), rel=1e-1)
-
-    result_MP_req = req.calculate_NRC_protein_requirements(
-        heifer_b["body_weight"],
-        0,
-        heifer_b["day_of_pregnancy"],
-        heifer_b["animal_type"],
-        heifer_b["Milk"],
-        heifer_b["milk_protein"],
-        0,
-        3,
-        1,
-        0,
-        12,
-        0.7
-    )
-    assert (result_MP_req) == pytest.approx((489), rel=1e-1)
-
-    result_MP_req = req.calculate_NRC_protein_requirements(
-        heifer_b["body_weight"],
-        0,
-        heifer_b["day_of_pregnancy"],
-        heifer_b["animal_type"],
-        heifer_b["Milk"],
-        heifer_b["milk_protein"],
-        0,
-        3,
-        1,
-        0,
-        12,
-        0.5
-    )
-    assert (result_MP_req) == pytest.approx((562.1), rel=1e-1)
+    assert (result_MP_req) == pytest.approx((expected), rel=1e-2)
 
 
-def test_calculate_NRC_calcium_requirements(cow_a: dict, cow_b: dict, heifer_a: dict, heifer_b: dict) -> None:
+@pytest.mark.parametrize(
+    "animal_dict, expected",
+    [(lazy_fixture('cow_a'), 66),
+     (lazy_fixture('cow_b'), 21.32),
+     (lazy_fixture('cow_c'), 23.7),
+     (lazy_fixture('heifer_a'), 16.806),
+     (lazy_fixture('heifer_b'), 17.5),
+     ]
+)
+def test_calculate_NRC_calcium_requirements(animal_dict: dict, expected: float) -> None:
     """Unit test for function calculate_NRC_calcium_requirements in file
     routines/animal/ration/animal_requirements.py"""
     req = RUFAS.routines.animal.ration.animal_requirements.AnimalRequirements()
     result_Ca_req = req.calculate_NRC_calcium_requirements(
-        cow_a["body_weight"],
-        cow_a["mature_body_weight"],
-        cow_a["day_of_pregnancy"],
-        cow_a["animal_type"],
-        cow_a["lactating"],
+        animal_dict["body_weight"],
+        animal_dict["mature_body_weight"],
+        animal_dict["day_of_pregnancy"],
+        animal_dict["animal_type"],
         1,
-        cow_a["Milk"],
+        animal_dict["Milk"],
     )
-    assert (result_Ca_req) == pytest.approx((66), rel=1e-1)
-
-    result_Ca_req = req.calculate_NRC_calcium_requirements(
-        cow_b["body_weight"],
-        cow_b["mature_body_weight"],
-        cow_b["day_of_pregnancy"],
-        cow_b["animal_type"],
-        cow_b["lactating"],
-        1,
-        cow_b["Milk"],
-    )
-    assert (result_Ca_req) == pytest.approx((21), rel=1e-1)
-
-    result_Ca_req = req.calculate_NRC_calcium_requirements(
-        heifer_a["body_weight"],
-        heifer_a["mature_body_weight"],
-        heifer_a["day_of_pregnancy"],
-        heifer_a["animal_type"],
-        heifer_a["lactating"],
-        1,
-        heifer_a["Milk"],
-    )
-    assert (result_Ca_req) == pytest.approx((17), rel=1e-1)
-
-    result_Ca_req = req.calculate_NRC_calcium_requirements(
-        heifer_b["body_weight"],
-        heifer_b["mature_body_weight"],
-        heifer_b["day_of_pregnancy"],
-        heifer_b["animal_type"],
-        heifer_b["lactating"],
-        1,
-        heifer_b["Milk"],
-    )
-    assert (result_Ca_req) == pytest.approx((17.5), rel=1e-1)
+    assert (result_Ca_req) == pytest.approx((expected), rel=1e-2)
 
 
-def test_calculate_NRC_phosphorus_requirements(cow_a: dict, cow_b: dict, heifer_a: dict, heifer_b: dict) -> None:
+@pytest.mark.parametrize(
+    "animal_dict, expected",
+    [(lazy_fixture('cow_a'), 59),
+     (lazy_fixture('cow_b'), 26.67),
+     (lazy_fixture('cow_c'), 22.36),
+     (lazy_fixture('heifer_a'), 17.47),
+     (lazy_fixture('heifer_b'), 17.18),
+     ]
+)
+def test_calculate_NRC_phosphorus_requirements(animal_dict: dict, expected: float) -> None:
     """Unit test for function calculate_NRC_phosophorus_requirements in file
     routines/animal/ration/animal_requirements.py"""
     req = RUFAS.routines.animal.ration.animal_requirements.AnimalRequirements()
     result_P_req = req.calculate_NRC_phosphorus_requirements(
-        cow_a["body_weight"],
-        cow_a["mature_body_weight"],
-        cow_a["day_of_pregnancy"],
-        cow_a["Milk"],
-        cow_a["animal_type"],
-        1,
-        25,
+        animal_dict["body_weight"],
+        animal_dict["mature_body_weight"],
+        animal_dict["day_of_pregnancy"],
+        animal_dict["Milk"],
+        animal_dict["animal_type"],
+        animal_dict["average_daily_gain"],
+        animal_dict["dry_matter_intake_estimate"],
     )
-    assert (result_P_req) == pytest.approx((59), rel=1e-1)
-
-    result_P_req = req.calculate_NRC_phosphorus_requirements(
-        cow_b["body_weight"],
-        cow_b["mature_body_weight"],
-        cow_b["day_of_pregnancy"],
-        cow_b["Milk"],
-        cow_b["animal_type"],
-        1,
-        15,
-    )
-    assert (result_P_req) == pytest.approx((19), rel=1e-1)
-
-    result_P_req = req.calculate_NRC_phosphorus_requirements(
-        heifer_a["body_weight"],
-        heifer_a["mature_body_weight"],
-        heifer_a["day_of_pregnancy"],
-        heifer_a["Milk"],
-        heifer_a["animal_type"],
-        1,
-        5.0,
-    )
-    assert (result_P_req) == pytest.approx((12.5), rel=1e-1)
-
-    result_P_req = req.calculate_NRC_phosphorus_requirements(
-        heifer_b["body_weight"],
-        heifer_b["mature_body_weight"],
-        heifer_b["day_of_pregnancy"],
-        heifer_b["Milk"],
-        heifer_b["animal_type"],
-        1,
-        7.0,
-    )
-    assert (result_P_req) == pytest.approx((13), rel=1e-1)
+    assert (result_P_req) == pytest.approx((expected), rel=1e-2)
 
 
-def test_calculate_NRC_DMI(cow_a: dict, cow_b: dict, heifer_a: dict, heifer_b: dict) -> None:
+@pytest.mark.parametrize(
+    "animal_dict, expected",
+    [(lazy_fixture('cow_a'), 22.5),
+     (lazy_fixture('cow_b'), 13.4),
+     (lazy_fixture('cow_c'), 13.4),
+     (lazy_fixture('heifer_a'), 6.36),
+     (lazy_fixture('heifer_b'), 6.7),
+     ]
+)
+def test_calculate_NRC_DMI(animal_dict: dict, expected: float) -> None:
     """Unit test for function calculate_NRC_DMI in file routines/animal/ration/animal_requirements.py"""
     req = RUFAS.routines.animal.ration.animal_requirements.AnimalRequirements()
     result_DMIest = req.calculate_NRC_DMI(
-        cow_a["animal_type"],
-        cow_a["body_weight"],
-        cow_a["day_of_pregnancy"],
-        cow_a["DIM"],
-        cow_a["Milk"],
-        cow_a["Fat_Milk"],
-        cow_a["net_energy_diet_concentration"],
-        None
+        animal_dict["animal_type"],
+        animal_dict["body_weight"],
+        animal_dict["day_of_pregnancy"],
+        animal_dict["DIM"],
+        animal_dict["Milk"],
+        animal_dict["Fat_Milk"],
+        animal_dict["net_energy_diet_concentration"],
+        animal_dict["days_born"],
     )
-    assert (result_DMIest) == pytest.approx((22.5), rel=1e-1)
-
-    result_DMIest = req.calculate_NRC_DMI(
-        cow_b["animal_type"],
-        cow_b["body_weight"],
-        cow_b["day_of_pregnancy"],
-        cow_b["DIM"],
-        cow_b["Milk"],
-        cow_b["Fat_Milk"],
-        cow_b["net_energy_diet_concentration"],
-        None
-    )
-    assert (result_DMIest) == pytest.approx((13.4), rel=1e-1)
-
-    result_DMIest = req.calculate_NRC_DMI(
-        heifer_a["animal_type"],
-        heifer_a["body_weight"],
-        heifer_a["day_of_pregnancy"],
-        heifer_a["DIM"],
-        heifer_a["Milk"],
-        heifer_a["Fat_Milk"],
-        heifer_a["net_energy_diet_concentration"],
-        heifer_a["days_born"],
-
-    )
-    assert (result_DMIest) == pytest.approx((6.9041), rel=1e-1)
-
-    result_DMIest = req.calculate_NRC_DMI(
-        heifer_b["animal_type"],
-        heifer_b["body_weight"],
-        heifer_b["day_of_pregnancy"],
-        heifer_b["DIM"],
-        heifer_b["Milk"],
-        heifer_b["Fat_Milk"],
-        heifer_b["net_energy_diet_concentration"],
-        heifer_b["days_born"]
-    )
-    assert (result_DMIest) == pytest.approx((6.7), rel=1e-1)
+    assert (result_DMIest) == pytest.approx((expected), rel=1e-2)
 
 
+@pytest.mark.parametrize(
+    "animal_dict, expected",
+    [(lazy_fixture('cow_a'), 23),
+     (lazy_fixture('cow_b'), 0.0),
+     (lazy_fixture('heifer_a'), 0.0),
+     (lazy_fixture('heifer_b'), 0.0),
+     ]
+)
 def test_calculate_NASEM_energy_lactation_requirements(
-        cow_a: dict, cow_b: dict, heifer_a: dict, heifer_b: dict
+        animal_dict: dict, expected: float
 ) -> None:
     """Unit test for function calculate_NASEM_energy_lactation_requirements in file
     routines/animal/ration/animal_requirements.py"""
     req = RUFAS.routines.animal.ration.animal_requirements.AnimalRequirements()
     result_NEl = req.calculate_NASEM_energy_lactation_requirements(
-        cow_a["animal_type"], cow_a["Fat_Milk"], cow_a["milk_protein"], cow_a["Lactose_Milk"], cow_a["Milk"]
+        animal_dict["animal_type"], animal_dict["Fat_Milk"], animal_dict["milk_protein"],
+        animal_dict["Lactose_Milk"], animal_dict["Milk"]
     )
-    assert (result_NEl) == pytest.approx((23), rel=1e-1)
-
-    result_NEl = req.calculate_NASEM_energy_lactation_requirements(
-        cow_b["animal_type"], cow_b["Fat_Milk"], cow_b["milk_protein"], cow_b["Lactose_Milk"], cow_b["Milk"]
-    )
-    assert (result_NEl) == pytest.approx((0.0), rel=1e-1)
-
-    result_NEl = req.calculate_NASEM_energy_lactation_requirements(
-        heifer_a["animal_type"],
-        heifer_a["Fat_Milk"],
-        heifer_a["milk_protein"],
-        heifer_a["Lactose_Milk"],
-        heifer_a["Milk"],
-    )
-    assert (result_NEl) == pytest.approx((0.0), rel=1e-1)
-
-    result_NEl = req.calculate_NASEM_energy_lactation_requirements(
-        heifer_b["animal_type"],
-        heifer_b["Fat_Milk"],
-        heifer_b["milk_protein"],
-        heifer_b["Lactose_Milk"],
-        heifer_b["Milk"],
-    )
-    assert (result_NEl) == pytest.approx((0.0), rel=1e-1)
+    assert (result_NEl) == pytest.approx((expected), rel=1e-2)
 
 
-def test_calculate_NASEM_DMI(cow_a: dict, cow_b: dict, heifer_a: dict, heifer_b: dict) -> None:
+@pytest.mark.parametrize(
+    "animal_dict, lactating, net_energy_lactation, expected",
+    [(lazy_fixture('cow_a'), True, 15, 19.4),
+     (lazy_fixture('cow_b'), False, 15, 16),
+     (lazy_fixture('cow_b'), True, 15, 21.26),
+     (lazy_fixture('heifer_a'), False, 15, 9.19),
+     (lazy_fixture('heifer_b'), False, 15, 11.5),
+     ]
+)
+def test_calculate_NASEM_DMI(animal_dict: dict, lactating: bool, net_energy_lactation: float, expected: float) -> None:
     """Unit test for function calculate_NASEM_DMI in file routines/animal/ration/animal_requirements.py"""
     req = RUFAS.routines.animal.ration.animal_requirements.AnimalRequirements()
     result_DMIest = req.calculate_NASEM_DMI(
-        cow_a["body_weight"],
-        cow_a["mature_body_weight"],
-        cow_a["DIM"],
-        cow_a["lactating"],
-        15,
-        cow_a["parity"],
-        cow_a["BCS5"],
-        cow_a["NDF_conc"],
+        animal_dict["body_weight"],
+        animal_dict["mature_body_weight"],
+        animal_dict["DIM"],
+        lactating,
+        net_energy_lactation,
+        animal_dict["parity"],
+        animal_dict["BCS5"],
+        animal_dict["NDF_conc"],
     )
-    assert (result_DMIest) == pytest.approx((19), rel=1e-1)
-
-    result_DMIest = req.calculate_NASEM_DMI(
-        cow_b["body_weight"],
-        cow_b["mature_body_weight"],
-        cow_b["DIM"],
-        cow_b["lactating"],
-        15,
-        cow_b["parity"],
-        cow_b["BCS5"],
-        cow_b["NDF_conc"],
-    )
-    assert (result_DMIest) == pytest.approx((16), rel=1e-1)
-
-    result_DMIest = req.calculate_NASEM_DMI(
-        heifer_a["body_weight"],
-        heifer_a["mature_body_weight"],
-        heifer_a["DIM"],
-        heifer_a["lactating"],
-        15,
-        heifer_a["parity"],
-        heifer_a["BCS5"],
-        heifer_a["NDF_conc"],
-    )
-    assert (result_DMIest) == pytest.approx((9), rel=1e-1)
-
-    result_DMIest = req.calculate_NASEM_DMI(
-        heifer_b["body_weight"],
-        heifer_b["mature_body_weight"],
-        heifer_b["DIM"],
-        heifer_b["lactating"],
-        15,
-        heifer_b["parity"],
-        heifer_b["BCS5"],
-        heifer_b["NDF_conc"],
-    )
-    assert (result_DMIest) == pytest.approx((11.5), rel=1e-1)
+    assert (result_DMIest) == pytest.approx((expected), rel=1e-2)
 
 
+@pytest.mark.parametrize(
+    "animal_dict, expected",
+    [(lazy_fixture('cow_a'), (11.12, 65.11, 0.204)),
+     (lazy_fixture('cow_b'), (12.59, 48.52, 0.204)),
+     (lazy_fixture('heifer_a'), (5.9, 0, 0)),
+     (lazy_fixture('heifer_b'), (6.3, 77.71, 10.25)),
+     ]
+)
 def test_calculate_NASEM_energy_maintenance_requirements(
-        cow_a: dict, cow_b: dict, heifer_a: dict, heifer_b: dict
-) -> None:
+        animal_dict: dict, expected: tuple) -> None:
     """Unit test for function calculate_NASEM_energy_maintenance_requirements in file
     routines/animal/ration/animal_requirements.py"""
     req = RUFAS.routines.animal.ration.animal_requirements.AnimalRequirements()
     result_NEmaint, result_GrUterW, result_UterW = req.calculate_NASEM_energy_maintenance_requirements(
-        cow_a["body_weight"], cow_a["mature_body_weight"], cow_a["day_of_pregnancy"], cow_a["DIM"]
+        animal_dict["body_weight"], animal_dict["mature_body_weight"], animal_dict["day_of_pregnancy"],
+        animal_dict["DIM"]
     )
-    assert (result_NEmaint, result_GrUterW, result_UterW) == pytest.approx((11.12, 65.11, 0.2), rel=1e-1)
-
-    result_NEmaint, result_GrUterW, result_UterW = req.calculate_NASEM_energy_maintenance_requirements(
-        cow_b["body_weight"], cow_b["mature_body_weight"], cow_b["day_of_pregnancy"], cow_b["DIM"]
-    )
-    assert (result_NEmaint, result_GrUterW, result_UterW) == pytest.approx((12.59, 48.52, 0.2), rel=1e-1)
-
-    result_NEmaint, result_GrUterW, result_UterW = req.calculate_NASEM_energy_maintenance_requirements(
-        heifer_a["body_weight"], heifer_a["mature_body_weight"], heifer_a["day_of_pregnancy"], heifer_a["DIM"]
-    )
-    assert (result_NEmaint, result_GrUterW, result_UterW) == pytest.approx((5.9, 0, 0), rel=1e-1)
-
-    result_NEmaint, result_GrUterW, result_UterW = req.calculate_NASEM_energy_maintenance_requirements(
-        heifer_b["body_weight"], heifer_b["mature_body_weight"], heifer_b["day_of_pregnancy"], heifer_b["DIM"]
-    )
-    assert (result_NEmaint, result_GrUterW, result_UterW) == pytest.approx((6.3, 77.71, 10.25), rel=1e-1)
+    assert (result_NEmaint, result_GrUterW, result_UterW) == pytest.approx(expected, rel=1e-2)
 
 
-def test_calculate_NASEM_energy_growth_requirements(cow_a: dict, cow_b: dict, heifer_a: dict, heifer_b: dict) -> None:
+@pytest.mark.parametrize(
+    "animal_dict, expected",
+    [(lazy_fixture('cow_a'),  (1.12, 0.1841, 0.44)),
+     (lazy_fixture('cow_b'), (0.0, 0.00001, 0.0)),
+     (lazy_fixture('cow_c'), (0.97, 0.1472, 0.4705)),
+     (lazy_fixture('cow_d'), (0.0, 0.00001, 0.0)),
+     (lazy_fixture('heifer_a'), (2.5, 0.65, 0.31)),
+     (lazy_fixture('heifer_b'), (4.1, 0.9, 0.35)),
+     ]
+)
+def test_calculate_NASEM_energy_growth_requirements(animal_dict: dict, expected: tuple) -> None:
     """Unit test for function calculate_NASEM_energy_growth_requirements in file
     routines/animal/ration/animal_requirements.py"""
-    req = RUFAS.routines.animal.ration.animal_requirements.AnimalRequirements()
+    req = AnimalRequirements()
     result_NEg, result_ADG, result_frame_weight_gain = req.calculate_NASEM_energy_growth_requirements(
-        cow_a["body_weight"],
-        cow_a["mature_body_weight"],
-        cow_a["ADG_heifer"],
-        cow_a["animal_type"],
-        cow_a["parity"],
-        cow_a["calving_interval"],
+        animal_dict["body_weight"],
+        animal_dict["mature_body_weight"],
+        animal_dict["ADG_heifer"],
+        animal_dict["animal_type"],
+        animal_dict["parity"],
+        animal_dict["calving_interval"],
     )
-    assert (result_NEg, result_ADG, result_frame_weight_gain) == pytest.approx((1.1, 0.18, 0.44), rel=1e-1)
-
-    result_NEg, result_ADG, result_frame_weight_gain = req.calculate_NASEM_energy_growth_requirements(
-        cow_b["body_weight"],
-        cow_b["mature_body_weight"],
-        cow_b["ADG_heifer"],
-        cow_b["animal_type"],
-        cow_b["parity"],
-        cow_b["calving_interval"],
-    )
-    assert (result_NEg, result_ADG, result_frame_weight_gain) == pytest.approx((0.0, 0.00001, 0.0), rel=1e-1)
-
-    result_NEg, result_ADG, result_frame_weight_gain = req.calculate_NASEM_energy_growth_requirements(
-        heifer_a["body_weight"],
-        heifer_a["mature_body_weight"],
-        heifer_a["ADG_heifer"],
-        heifer_a["animal_type"],
-        heifer_a["parity"],
-        heifer_a["calving_interval"],
-    )
-    assert (result_NEg, result_ADG, result_frame_weight_gain) == pytest.approx((2.5, 0.65, 0.31), rel=1e-1)
-
-    result_NEg, result_ADG, result_frame_weight_gain = req.calculate_NASEM_energy_growth_requirements(
-        heifer_b["body_weight"],
-        heifer_b["mature_body_weight"],
-        heifer_b["ADG_heifer"],
-        heifer_b["animal_type"],
-        heifer_b["parity"],
-        heifer_b["calving_interval"],
-    )
-    assert (result_NEg, result_ADG, result_frame_weight_gain) == pytest.approx((4.1, 0.9, 0.35), rel=1e-1)
+    assert (result_NEg, result_ADG, result_frame_weight_gain) == pytest.approx(expected, rel=1e-2)
 
 
+@pytest.mark.parametrize(
+    "animal_dict, expected",
+    [(lazy_fixture('cow_a'), (0.4, 0.096)),
+     (lazy_fixture('cow_b'), (4.2, 1.01)),
+     (lazy_fixture('heifer_a'), (0, 0)),
+     (lazy_fixture('heifer_b'), (4.9, 1.2)),
+     ]
+)
 def test_calculate_NASEM_energy_pregnancy_requirements(
-        cow_a: dict, cow_b: dict, heifer_a: dict, heifer_b: dict
+        animal_dict: dict, expected: tuple
 ) -> None:
     """Unit test for function calculate_NASEM_energy_pregnancy_requirements in file
     routines/animal/ration/animal_requirements.py"""
-    req = RUFAS.routines.animal.ration.animal_requirements.AnimalRequirements()
+    req = AnimalRequirements()
     result_NEpreg, result_GrUterWGain = req.calculate_NASEM_energy_pregnancy_requirements(
-        cow_a["lactating"], cow_a["day_of_pregnancy"], cow_a["DIM"], 49, 0.2
+        animal_dict["lactating"], animal_dict["day_of_pregnancy"], animal_dict["DIM"], 49, 0.2
     )
-    assert (result_NEpreg, result_GrUterWGain) == pytest.approx((0.4, 0.096), rel=1e-1)
-
-    result_NEpreg, result_GrUterWGain = req.calculate_NASEM_energy_pregnancy_requirements(
-        cow_b["lactating"], cow_b["day_of_pregnancy"], cow_b["DIM"], 49, 0.2
-    )
-    assert (result_NEpreg, result_GrUterWGain) == pytest.approx((4.2, 1.0), rel=1e-1)
-
-    result_NEpreg, result_GrUterWGain = req.calculate_NASEM_energy_pregnancy_requirements(
-        heifer_a["lactating"], heifer_a["day_of_pregnancy"], heifer_a["DIM"], 49, 0.2
-    )
-    assert (result_NEpreg, result_GrUterWGain) == pytest.approx((0, 0), rel=1e-1)
-
-    result_NEpreg, result_GrUterWGain = req.calculate_NASEM_energy_pregnancy_requirements(
-        heifer_b["lactating"], heifer_b["day_of_pregnancy"], heifer_b["DIM"], 49, 0.2
-    )
-    assert (result_NEpreg, result_GrUterWGain) == pytest.approx((4.9, 1.2), rel=1e-1)
+    assert (result_NEpreg, result_GrUterWGain) == pytest.approx(expected, rel=1e-2)
 
 
-def test_calculate_NASEM_protein_requirements(cow_a: dict, cow_b: dict, heifer_a: dict, heifer_b: dict) -> None:
+@pytest.mark.parametrize(
+    "animal_dict, frame_w_gain, gruter_w_gain, expected",
+    [(lazy_fixture('cow_a'), 1, 0.1, 2044.23),
+     (lazy_fixture('cow_b'), 1, 1, 912.7),
+     (lazy_fixture('heifer_a'), 1, 1, 609.2),
+     (lazy_fixture('heifer_b'), 1, 1, 647.8),
+     ]
+)
+def test_calculate_NASEM_protein_requirements(animal_dict: dict,
+                                              frame_w_gain: float, gruter_w_gain: float,
+                                              expected: float) -> None:
     """Unit test for function calculate_NASEM_protein_requirements in file
     routines/animal/ration/animal_requirements.py"""
-    req = RUFAS.routines.animal.ration.animal_requirements.AnimalRequirements()
+    req = AnimalRequirements()
     result_MP_req = req.calculate_NASEM_protein_requirements(
-        cow_a["lactating"], cow_a["body_weight"], 1, 0.1, 22, cow_a["milk_protein"], cow_a["Milk"], cow_a["NDF_conc"]
+        animal_dict["lactating"], animal_dict["body_weight"], frame_w_gain, gruter_w_gain,
+        animal_dict["dry_matter_intake_estimate"], animal_dict["milk_protein"], animal_dict["Milk"],
+        animal_dict["NDF_conc"]
     )
-    assert (result_MP_req) == pytest.approx((2020), rel=1e-1)
-
-    result_MP_req = req.calculate_NASEM_protein_requirements(
-        cow_b["lactating"], cow_b["body_weight"], 1, 1, 8, cow_b["milk_protein"], cow_b["Milk"], cow_b["NDF_conc"]
-    )
-    assert (result_MP_req) == pytest.approx((715), rel=1e-1)
-
-    result_MP_req = req.calculate_NASEM_protein_requirements(
-        heifer_a["lactating"],
-        heifer_a["body_weight"],
-        1,
-        1,
-        7,
-        heifer_a["milk_protein"],
-        heifer_a["Milk"],
-        heifer_a["NDF_conc"],
-    )
-    assert (result_MP_req) == pytest.approx((548), rel=1e-1)
-
-    result_MP_req = req.calculate_NASEM_protein_requirements(
-        heifer_b["lactating"],
-        heifer_b["body_weight"],
-        1,
-        1,
-        7,
-        heifer_b["milk_protein"],
-        heifer_b["Milk"],
-        heifer_b["NDF_conc"],
-    )
-    assert (result_MP_req) == pytest.approx((586), rel=1e-1)
+    assert (result_MP_req) == pytest.approx(expected, rel=1e-2)
 
 
-def test_calculate_NASEM_calcium_requirements(cow_a: dict, cow_b: dict, heifer_a: dict, heifer_b: dict) -> None:
+@pytest.mark.parametrize(
+    "animal_dict, expected",
+    [(lazy_fixture('cow_a'), 55.78),
+     (lazy_fixture('cow_b'), 51.38),
+     (lazy_fixture('heifer_a'), 11.5),
+     (lazy_fixture('heifer_b'), 11.45),
+     ]
+)
+def test_calculate_NASEM_calcium_requirements(animal_dict: dict, expected: float) -> None:
     """Unit test for function calculate_NASEM_calcium_requirements in file
     routines/animal/ration/animal_requirements.py"""
-    req = RUFAS.routines.animal.ration.animal_requirements.AnimalRequirements()
+    req = AnimalRequirements()
     result_Ca_req = req.calculate_NASEM_calcium_requirements(
-        cow_a["body_weight"],
-        cow_a["mature_body_weight"],
-        cow_a["day_of_pregnancy"],
-        1,
-        22,
-        cow_a["milk_protein"],
-        cow_a["Milk"],
-        cow_a["parity"],
+        animal_dict["body_weight"],
+        animal_dict["mature_body_weight"],
+        animal_dict["day_of_pregnancy"],
+        animal_dict["average_daily_gain"],
+        animal_dict["dry_matter_intake_estimate"],
+        animal_dict["milk_protein"],
+        animal_dict["Milk"],
+        animal_dict["parity"],
     )
-    assert (result_Ca_req) == pytest.approx((54), rel=1e-1)
-
-    result_Ca_req = req.calculate_NASEM_calcium_requirements(
-        cow_b["body_weight"],
-        cow_b["mature_body_weight"],
-        cow_b["day_of_pregnancy"],
-        1,
-        8,
-        cow_b["milk_protein"],
-        cow_b["Milk"],
-        cow_b["parity"],
-    )
-    assert (result_Ca_req) == pytest.approx((38), rel=1e-1)
-
-    result_Ca_req = req.calculate_NASEM_calcium_requirements(
-        heifer_a["body_weight"],
-        heifer_a["mature_body_weight"],
-        heifer_a["day_of_pregnancy"],
-        1,
-        7,
-        heifer_a["milk_protein"],
-        heifer_a["Milk"],
-        heifer_a["parity"],
-    )
-    assert (result_Ca_req) == pytest.approx((7), rel=1e-1)
-
-    result_Ca_req = req.calculate_NASEM_calcium_requirements(
-        heifer_b["body_weight"],
-        heifer_b["mature_body_weight"],
-        heifer_b["day_of_pregnancy"],
-        1,
-        7,
-        heifer_b["milk_protein"],
-        heifer_b["Milk"],
-        heifer_b["parity"],
-    )
-    assert (result_Ca_req) == pytest.approx((7), rel=1e-1)
+    assert (result_Ca_req) == pytest.approx((expected), rel=1e-2)
 
 
-def test_calculate_NASEM_phosphorus_requirements(cow_a: dict, cow_b: dict, heifer_a: dict, heifer_b: dict) -> None:
+@pytest.mark.parametrize(
+    "animal_dict, expected",
+    [(lazy_fixture('cow_a'), 59.28),
+     (lazy_fixture('cow_b'), 33.18),
+     (lazy_fixture('cow_d'), 0.0),
+     (lazy_fixture('heifer_a'), 16.85),
+     (lazy_fixture('heifer_b'), 16.44),
+     ]
+)
+def test_calculate_NASEM_phosphorus_requirements(animal_dict: dict, expected: float) -> None:
     """Unit test for function calculate_NASEM_phosphorus_requirements in file
     routines/animal/ration/animal_requirements.py"""
-    req = RUFAS.routines.animal.ration.animal_requirements.AnimalRequirements()
+    req = AnimalRequirements()
     result_P_req = req.calculate_NASEM_phosphorus_requirements(
-        cow_a["body_weight"],
-        cow_a["mature_body_weight"],
-        cow_a["animal_type"],
-        cow_a["day_of_pregnancy"],
-        1,
-        20,
-        cow_a["milk_protein"],
-        cow_a["Milk"],
-        cow_a["parity"],
+        animal_dict["body_weight"],
+        animal_dict["mature_body_weight"],
+        animal_dict["animal_type"],
+        animal_dict["day_of_pregnancy"],
+        animal_dict["average_daily_gain"],
+        animal_dict["dry_matter_intake_estimate"],
+        animal_dict["milk_protein"],
+        animal_dict["Milk"],
+        animal_dict["parity"],
     )
-    assert (result_P_req) == pytest.approx((55), rel=1e-1)
-
-    result_P_req = req.calculate_NASEM_phosphorus_requirements(
-        cow_b["body_weight"],
-        cow_b["mature_body_weight"],
-        cow_b["animal_type"],
-        cow_b["day_of_pregnancy"],
-        1,
-        8,
-        cow_b["milk_protein"],
-        cow_b["Milk"],
-        cow_b["parity"],
-    )
-    assert (result_P_req) == pytest.approx((22), rel=1e-1)
-
-    result_P_req = req.calculate_NASEM_phosphorus_requirements(
-        heifer_a["body_weight"],
-        heifer_a["mature_body_weight"],
-        heifer_a["animal_type"],
-        heifer_a["day_of_pregnancy"],
-        1,
-        7,
-        heifer_a["milk_protein"],
-        heifer_a["Milk"],
-        heifer_a["parity"],
-    )
-    assert (result_P_req) == pytest.approx((13), rel=1e-1)
-
-    result_P_req = req.calculate_NASEM_phosphorus_requirements(
-        heifer_b["body_weight"],
-        heifer_b["mature_body_weight"],
-        heifer_b["animal_type"],
-        heifer_b["day_of_pregnancy"],
-        1,
-        7,
-        heifer_b["milk_protein"],
-        heifer_b["Milk"],
-        heifer_b["parity"],
-    )
-    assert (result_P_req) == pytest.approx((12.4), rel=1e-1)
+    assert (result_P_req) == pytest.approx((expected), rel=1e-2)
 
 
 def test_norm():
@@ -2292,12 +2213,110 @@ def test_ration_optimizer_optimize_value_error(mocker: MockerFixture, mock_ratio
 
 def test_calc_rqmts():
     """Unit test for function calc_rqmts in file routines/animal/ration/animal_requirements.py"""
-    pass
+    test_requirements = AnimalRequirements()
+    test_requirements.calculate_NRC_energy_maintenance_requirements = MagicMock(return_value=(1, 2, 3))
+    test_requirements.calculate_NRC_energy_growth_requirements = MagicMock(return_value=(1, 2, 3))
+    test_requirements.calculate_NRC_energy_pregnancy_requirements = MagicMock(return_value=1)
+    test_requirements.calculate_NRC_energy_lactation_requirements = MagicMock(return_value=1)
+    test_requirements.calculate_NRC_DMI = MagicMock(return_value=1)
+    test_requirements.calculate_NRC_protein_requirements = MagicMock(return_value=1)
+    test_requirements.calculate_NRC_calcium_requirements = MagicMock(return_value=1)
+    test_requirements.calculate_NRC_phosphorus_requirements = MagicMock(return_value=1)
+    test_requirements.calculate_NASEM_energy_maintenance_requirements = MagicMock(return_value=(4, 5, 6))
+    test_requirements.calculate_NASEM_energy_growth_requirements = MagicMock(return_value=(4, 5, 6))
+    test_requirements.calculate_NASEM_energy_pregnancy_requirements = MagicMock(return_value=(4, 5))
+    test_requirements.calculate_NASEM_energy_lactation_requirements = MagicMock(return_value=2)
+    test_requirements.calculate_NASEM_DMI = MagicMock(return_value=2)
+    test_requirements.calculate_NASEM_protein_requirements = MagicMock(return_value=2)
+    test_requirements.calculate_NASEM_calcium_requirements = MagicMock(return_value=2)
+    test_requirements.calculate_NASEM_phosphorus_requirements = MagicMock(return_value=2)
+    AnimalBase.config["energy_and_nutrient_calculation_method"] = 'NRC'
+    test_requirements.AnimalBase = AnimalBase
+    # with patch.object('') as mocked:
+    #     mocked.side
+    actual = test_requirements.calc_rqmts(MagicMock(), MagicMock(), MagicMock(), MagicMock())
+    expected = {
+            "NEmaint_requirement": 1,
+            "NEg_requirement": 1,
+            "NEpreg_requirement": 1,
+            "NEl_requirement": 1,
+            "MP_requirement": 1,
+            "Ca_requirement": 1,
+            "P_requirement": 1,
+            "DMIest_requirement": 1,
+        }
+    actual == expected
+    test_requirements.calculate_NRC_energy_maintenance_requirements.assert_called_once()
+    test_requirements.calculate_NRC_energy_growth_requirements.assert_called_once()
+    test_requirements.calculate_NRC_energy_pregnancy_requirements.assert_called_once()
+    test_requirements.calculate_NRC_energy_lactation_requirements.assert_called_once()
+    test_requirements.calculate_NRC_DMI.assert_called_once()
+    test_requirements.calculate_NRC_protein_requirements.assert_called_once()
+    test_requirements.calculate_NRC_calcium_requirements.assert_called_once()
+    test_requirements.calculate_NRC_phosphorus_requirements.assert_called_once()
+
+    expected = {
+            "NEmaint_requirement": 2,
+            "NEg_requirement": 2,
+            "NEpreg_requirement": 2,
+            "NEl_requirement": 2,
+            "MP_requirement": 2,
+            "Ca_requirement": 2,
+            "P_requirement": 2,
+            "DMIest_requirement": 2,
+        }
+    AnimalBase.config["energy_and_nutrient_calculation_method"] = 'NASEM'
+    actual = test_requirements.calc_rqmts(MagicMock(), MagicMock(), MagicMock(), MagicMock())
+    test_requirements.calculate_NASEM_energy_maintenance_requirements.assert_called_once()
+    test_requirements.calculate_NASEM_energy_growth_requirements.assert_called_once()
+    test_requirements.calculate_NASEM_energy_pregnancy_requirements.assert_called_once()
+    test_requirements.calculate_NASEM_energy_lactation_requirements.assert_called_once()
+    test_requirements.calculate_NASEM_DMI.assert_called_once()
+    test_requirements.calculate_NASEM_protein_requirements.assert_called_once()
+    test_requirements.calculate_NASEM_calcium_requirements.assert_called_once()
+    test_requirements.calculate_NASEM_phosphorus_requirements.assert_called_once()
 
 
 def test_energy_activity_rqmts():
     """Unit test for function energy_activity_rqmts in file routines/animal/ration/animal_requirements.py"""
-    pass
+    AnimalBase.config["energy_and_nutrient_calculation_method"] = 'NASEM'
+    req = AnimalRequirements()
+    result_energy_activity = req.energy_activity_rqmts(
+        body_weight=400,
+        housing="Grazing",
+        distance=1
+    )
+    assert (result_energy_activity) == pytest.approx((294), rel=1e-2)
+
+    result_energy_activity = req.energy_activity_rqmts(
+        body_weight=400,
+        housing="Not_Grazing",
+        distance=1
+    )
+    assert (result_energy_activity) == pytest.approx((0), rel=1e-2)
+
+    AnimalBase.config["energy_and_nutrient_calculation_method"] = 'NRC'
+
+    result_energy_activity = req.energy_activity_rqmts(
+        body_weight=400,
+        housing="Barn",
+        distance=1
+    )
+    assert (result_energy_activity) == pytest.approx((0.18), rel=1e-2)
+
+    result_energy_activity = req.energy_activity_rqmts(
+        body_weight=400,
+        housing="Grazing",
+        distance=1
+    )
+    assert (result_energy_activity) == pytest.approx((0.66), rel=1e-2)
+
+    result_energy_activity = req.energy_activity_rqmts(
+        body_weight=400,
+        housing="n e i t h e r",
+        distance=1
+    )
+    assert (result_energy_activity) == pytest.approx((0.18), rel=1e-2)
 
 
 def test_growing_heifer_ration_optimize():
@@ -2308,6 +2327,31 @@ def test_growing_heifer_ration_optimize():
 def test_calculate_rqmts():
     """Unit test for function calculate_rqmts in file routines/animal/ration/growing_heifer_ration.py"""
     pass
+
+
+# @pytest.mark.parameterize("udrm, om, expected", [MagicMock(), MagicMock(), True])
+def test_formulate_ration() -> None:
+    """Unit test for function formulate_ration in file routines/animal/ration/ration_driver.py"""
+    # test 1
+    pass
+    # udrm = MagicMock()
+    # udrm.udr_or_not = True
+    # expected = True
+    # result = udrm.udr_or_not
+    # assert result == expected
+    # patch get_user_defined_ration()
+    # assert that the return == ration, ration_vals
+
+    # test 2
+    # udrm.udr_or_not = True
+    # patch attempt_optimization
+    # pen.animal_combination.name in ['LAC_COW']
+
+    # test 2b: success = False
+
+    # test 3 pen.animal_combination.name NOT in ['LAC_COW']
+
+    # test 4 - solution == None
 
 
 def test_calc_milk_average() -> None:
@@ -2395,19 +2439,167 @@ def test_get_user_defined_ration():
     pass
 
 
-def test_ration_formulation():
-    """Unit test for function ration_formulation in file routines/animal/ration/ration_driver.py"""
-    pass
-
-
-def test_ration_report():
-    """Unit test for function ration_report in file routines/animal/ration/ration_driver.py"""
-    pass
-
-
-def test_set_requirements():
-    """Unit test for function set_requirements in file routines/animal/ration/ration_driver.py"""
-    pass
+def test_report_ration():
+    """Unit test for function report_ration in file routines/animal/ration/ration_driver.py"""
+    ration = {"1": 1, "2": 2, "3": 3, "121": 1, "122": 2, "155": 3, "157": 4}
+    available_feeds = {
+        "1": {
+            "DM": 1,
+            "as_fed": 1,
+            "CP": 1,
+            "ADF": 1,
+            "NDF": 1,
+            "lignin": 1,
+            "ash": 1,
+            "phosphorus": 1,
+            "potassium": 1,
+            "N": 1,
+            "EE": 1,
+            "starch": 1,
+            "TDN": 1,
+            "DE": 1,
+            "calcium": 1,
+        },
+        "2": {
+            "DM": 1,
+            "as_fed": 1,
+            "CP": 1,
+            "ADF": 1,
+            "NDF": 1,
+            "lignin": 1,
+            "ash": 1,
+            "phosphorus": 1,
+            "potassium": 1,
+            "N": 1,
+            "EE": 1,
+            "starch": 1,
+            "TDN": 1,
+            "DE": 1,
+            "calcium": 1,
+        },
+        "3": {
+            "DM": 1,
+            "as_fed": 1,
+            "CP": 1,
+            "ADF": 1,
+            "NDF": 1,
+            "lignin": 1,
+            "ash": 1,
+            "phosphorus": 1,
+            "potassium": 1,
+            "N": 1,
+            "EE": 1,
+            "starch": 1,
+            "TDN": 1,
+            "DE": 1,
+            "calcium": 1,
+        },
+        "121": {
+            "DM": 1,
+            "as_fed": 1,
+            "CP": 1,
+            "ADF": 1,
+            "NDF": 1,
+            "lignin": 1,
+            "ash": 1,
+            "phosphorus": 1,
+            "potassium": 1,
+            "N": 1,
+            "EE": 1,
+            "starch": 1,
+            "TDN": 1,
+            "DE": 1,
+            "calcium": 1,
+        },
+        "122": {
+            "DM": 1,
+            "as_fed": 1,
+            "CP": 1,
+            "ADF": 1,
+            "NDF": 1,
+            "lignin": 1,
+            "ash": 1,
+            "phosphorus": 1,
+            "potassium": 1,
+            "N": 1,
+            "EE": 1,
+            "starch": 1,
+            "TDN": 1,
+            "DE": 1,
+            "calcium": 1,
+        },
+        "155": {
+            "DM": 1,
+            "as_fed": 1,
+            "CP": 1,
+            "ADF": 1,
+            "NDF": 1,
+            "lignin": 1,
+            "ash": 1,
+            "phosphorus": 1,
+            "potassium": 1,
+            "N": 1,
+            "EE": 1,
+            "starch": 1,
+            "TDN": 1,
+            "DE": 1,
+            "calcium": 1,
+        },
+        "157": {
+            "DM": 1,
+            "as_fed": 1,
+            "CP": 1,
+            "ADF": 1,
+            "NDF": 1,
+            "lignin": 1,
+            "ash": 1,
+            "phosphorus": 1,
+            "potassium": 1,
+            "N": 1,
+            "EE": 1,
+            "starch": 1,
+            "TDN": 1,
+            "DE": 1,
+            "calcium": 1,
+        },
+    }
+    result = RationReporter.report_ration(ration, available_feeds)
+    expected = (
+        {
+            "dm": 16,
+            "as_fed": 0.16,
+            "CP": 0.16,
+            "ADF": 0.16,
+            "NDF": 0.16,
+            "lignin": 0.16,
+            "ash": 0.16,
+            "phosphorus": 0.16,
+            "potassium": 0.16,
+            "N": 0.025273981191222573,
+            "EE": 0.16,
+            "starch": 0.16,
+            "TDN": 0.16,
+            "DE": 0.16,
+            "calcium": 0.16,
+        },
+        {
+            "dm": 1.0,
+            "CP": 1.0,
+            "ADF": 1.0,
+            "NDF": 1.0,
+            "lignin": 1.0,
+            "ash": 1.0,
+            "phosphorus": 1.0,
+            "potassium": 1.0,
+            "N": 0.15796238244514108,
+            "EE": 1.0,
+            "starch": 1.0,
+            "TDN": 1.0,
+            "DE": 1.0,
+            "calcium": 1.0,
+        },
+    )
+    assert result == expected
 
 
 def eq_constraint(x, ration_config):
@@ -2489,6 +2681,7 @@ def test_calc_pen_requirements():
         [1, 2, 3],
         [1, 2, 3],
         [1, 2, 3],
+        "mean"
     )
     attributelist = [
         "NEmaint_requirement",
@@ -2507,11 +2700,95 @@ def test_calc_pen_requirements():
     ]
     for attribute in attributelist:
         assert getattr(req, attribute) == 2
+    req.calc_pen_requirements(
+        [1, 2, 3],
+        [1, 2, 3],
+        [1, 2, 3],
+        [1, 2, 3],
+        [1, 2, 3],
+        [1, 2, 3],
+        [1, 2, 3],
+        [1, 2, 3],
+        [1, 2, 3],
+        [1, 2, 3],
+        [1, 2, 3],
+        [1, 2, 3],
+        [1, 2, 3],
+        "percentile"
+    )
+    for attribute in attributelist:
+        assert getattr(req, attribute) == 2.8
 
 
 def test_feed_nutrients():
     """Unit test for function feed_nutrients in file routines/animal/ration/ration_driver.py"""
-    pass
+    feed_obj = MagicMock()
+    feed_obj.available_feeds = {
+        "1": {
+            "feed_id": 1,
+            "TDN": 1,
+            "DE": 1,
+            "EE": 1,
+            "is_fat": 1,
+            "calcium": 1,
+            "phosphorus": 1,
+            "NDF": 1,
+            "type": 1,
+            "is_wetforage": 1,
+            "Kd": 1,
+            "N_A": 1,
+            "N_B": 1,
+            "CP": 1,
+            "dRUP": 1,
+            "limit": {"lactating_cows": 1, "dry_cows": 2},
+        },
+        "2": {
+            "feed_id": 2,
+            "TDN": 2,
+            "DE": 2,
+            "EE": 2,
+            "is_fat": 2,
+            "calcium": 2,
+            "phosphorus": 2,
+            "NDF": 2,
+            "type": 2,
+            "is_wetforage": 2,
+            "Kd": 2,
+            "N_A": 2,
+            "N_B": 2,
+            "CP": 2,
+            "dRUP": 2,
+            "limit": 3,
+        },
+    }
+    feed_obj.feed_costs = {"1": 1, "2": 2}
+
+    available_feeds = AvailableFeeds()
+    available_feeds.feed_nutrients(feed_obj)
+
+    assert available_feeds.lactating_cow_limit == [1, 3]
+    assert available_feeds.dry_cow_limit == [2, 3]
+    assert available_feeds.CP == [1, 2]
+    keylist = [
+        "feed_id",
+        "TDN",
+        "DE",
+        "EE",
+        "is_fat",
+        "calcium",
+        "phosphorus",
+        "NDF",
+        "type",
+        "is_wetforage",
+        "Kd",
+        "N_A",
+        "N_B",
+        "CP",
+        "dRUP",
+    ]
+    for key in keylist:
+        assert getattr(available_feeds, key) == [1, 2]
+        assert len(getattr(available_feeds, key)) == 2
 
 
 @pytest.fixture
@@ -2747,12 +3024,12 @@ def test_feed_quality_fix():
     fake_ration_OK = {"1": 2, "2": 3, "5": 4}
     fake_ration_missing = {"1": 2, "2": 3, "3": 4}
     # assert that keys are same as the available feeds afterward
-    fake_ration_OK = RUFAS.routines.animal.ration.user_defined_ration.UserDefinedRationManager.feed_quality_fix(
+    fake_ration_OK = UserDefinedRationManager.feed_quality_fix(
         fake_ration_OK, fakefeeds_available
     )
     assert list(fake_ration_OK.keys()) == ["1", "2", "5"]
     # second has missing values, needs to check that keys are equivalent to orig
-    fake_ration_missing = RUFAS.routines.animal.ration.user_defined_ration.UserDefinedRationManager.feed_quality_fix(
+    fake_ration_missing = UserDefinedRationManager.feed_quality_fix(
         fake_ration_missing, fakefeeds_available
     )
     assert list(fake_ration_missing.keys()) == ["1", "2", "5"]
@@ -2779,25 +3056,25 @@ def test_ration_to_use(mock_user_defined_ration_manager: UserDefinedRationManage
     fakefeeds_available = {}
     fakefeeds_available["feed_id"] = [1, 2, 3]
 
-    result = RUFAS.routines.animal.ration.user_defined_ration.UserDefinedRationManager.ration_to_use(
+    result = UserDefinedRationManager.ration_to_use(
         pen_animal_combo, fakefeeds_available
     )
     assert result == {"1": 100, "2": 200, "3": 300}
 
     pen_animal_combo.name = "GROWING"
-    result = RUFAS.routines.animal.ration.user_defined_ration.UserDefinedRationManager.ration_to_use(
+    result = UserDefinedRationManager.ration_to_use(
         pen_animal_combo, fakefeeds_available
     )
     assert result == {"1": 1, "2": 2, "3": 3}
 
     pen_animal_combo.name = "CLOSE_UP"
-    result = RUFAS.routines.animal.ration.user_defined_ration.UserDefinedRationManager.ration_to_use(
+    result = UserDefinedRationManager.ration_to_use(
         pen_animal_combo, fakefeeds_available
     )
     assert result == {"1": 10, "2": 20, "3": 30}
 
     pen_animal_combo.name = "CALF"
-    result = RUFAS.routines.animal.ration.user_defined_ration.UserDefinedRationManager.ration_to_use(
+    result = UserDefinedRationManager.ration_to_use(
         pen_animal_combo, fakefeeds_available
     )
     assert result == {"1": 0.1, "2": 0.2, "3": 0.3}
