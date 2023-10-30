@@ -44,18 +44,23 @@ from RUFAS.routines.animal.ration import user_defined_ration as udr
 om = OutputManager()
 
 
-def daily_animal_routine(animal_manager, feed, weather, time):
+def daily_animal_routine(animal_manager, feed, weather, time) -> None:
     """
     Executes daily routines relating to Animals. This method is called every day
     in the simulation and calls @animal_manager's daily_updates() method
     with @feed and @time as arguments. [Note that currently, @weather and
     @ time are not used in animal updates.]
 
-    Args:
-        animal_manager: instance of the AnimalManager class
-        feed: instance of the Feed class
-        weather: instance of the Weather class
-        time: instance of the Time class
+    Parameters
+    ----------
+    animal_manager : AnimalManager
+        instance of the AnimalManager class
+    feed : Feed
+        instance of the Feed class
+    weather : Weather
+        instance of the Weather class
+    time : Time
+        instance of the Time class
     """
 
     animal_manager.daily_updates(feed, weather, time)
@@ -68,7 +73,7 @@ class AnimalManager:
     well as an instance of the LifeCycleManager class in order to update the
     animals' life cycles.
     """
-
+    # TODO: make this a method?
     DEFAULT_NUM_STALLS_BY_COMBINATION = {
         Pen.AnimalCombination.CALF: AnimalModuleConstants.DEFAULT_NUM_STALLS_FOR_CALF_PEN,
         Pen.AnimalCombination.GROWING: AnimalModuleConstants.DEFAULT_NUM_STALLS_FOR_GROWING_PEN,
@@ -82,6 +87,7 @@ class AnimalManager:
 
     # ANIMAL_GROUPING_SCENARIO = AnimalGroupingScenario.CALF__GROWING_AND_CLOSE_UP__LACCOW
 
+    # TODO use this method! Determine if we want to add another user input
     @classmethod
     def set_animal_grouping_scenario(cls, scenario: AnimalGroupingScenario) -> None:
         """
@@ -113,16 +119,25 @@ class AnimalManager:
         config.update(data['from_literature']['life_cycle'])
         return config
 
-    def __init__(self, data, config, feed, weather, time):
+    def __init__(self, data: Dict, config, feed: Feed, weather, time):
         """
         Initializes the pens and animals in the simulation with data from the
         JSON file by calling init_pens() and init_animals(). Creates instance
         of LifeCycleManager class and sets up the animal environment.
 
-        Args:
-            data: dictionary with animal information from the input JSON file
-            config: instance of the Config class
-            feed: instance of the Feed class
+        Parameters
+        ----------
+        data : Dict
+            dictionary with animal information from the input JSON file
+        config : Config
+            instance of the Config class
+        feed : Feed
+            instance of the Feed class
+        weather : Weather
+            instance of the Weather class
+        time : Time
+            instance of the Time class
+
         """
 
         # simulation length, days
@@ -229,7 +244,7 @@ class AnimalManager:
             List containing information about the pens.
         herd_data: Dict[str, Any]
             Dictionary containing information about the herd.
-        manure_management_scenarios:
+        manure_management_scenarios : Dict TODO: [str, Any]?
             Dictionary containing information about the manure management scenarios.
 
         """
@@ -254,31 +269,37 @@ class AnimalManager:
 
             self.all_pens.append(pen)
 
-    def init_animals(self, config, herd_data: Dict[str, Any]):
+    def init_animals(self, config, herd_data: Dict[str, Any]) -> None:
         """
         Populates the list of animals with the information from the
-        input JSON file: constructs the calves, heiferI’s, heiferII’s,
-        heiferIII’s, and cows (the desired amounts of each is specified by
+        input JSON file: constructs the calves, heiferI's, heiferII's,
+        heiferIII's, and cows (the desired amounts of each is specified by
         @data), then calls life_cycle_manager's initialize_herd() with those
         numbers to create instances of the animals. The nutrient requirements
         are calculated and the animals are allocated to pens.
 
-        Args:
-            config: an instance of the Config class contains model configuration information
-            herd_data: dictionary containing information about the herd
+        Parameters
+        ----------
+        config : Config
+            an instance of the Config class contains model configuration information
+        herd_data : Dict[str, Any]
+            dictionary containing information about the herd
         """
 
         self.calves, self.heiferIs, self.heiferIIs, self.heiferIIIs, self.cows \
             = self.life_cycle_manager.initialize_herd(config, herd_data)
 
-    def _print_animal_num_warnings(self, herd_data: Dict[str, Any]):
+    def _print_animal_num_warnings(self, herd_data: Dict[str, Any]) -> None:
         """
         If simulate_animals is false, creates warnings if there are more than 0 animals for any of the animal types,
             and logs how many warnings were generated
         Otherwise, if simulate_animals is true, logs that it is true
 
-        Args:
-            herd_data: dictionary containing information about the herd
+        Parameters
+        ----------
+        herd_data : Dict[str, Any]
+            dictionary containing information about the herd
+
         """
 
         animal_keys = {"calf_num", "heiferI_num", "heiferII_num", "heiferIII_num_springers", "cow_num"}
@@ -293,7 +314,6 @@ class AnimalManager:
         counter = 0
 
         if not self.simulate_animals:
-
             for key in animal_keys:
                 if herd_data[key] != 0:
                     om.add_warning(f"invalid_{key}_warning",
@@ -315,17 +335,23 @@ class AnimalManager:
         of cows, the average walking distance of all the pens initialized
         is used.
 
-        Args:
-            feed: an instance of the Feed class defined in feed.py
-            weather: instance of the Weather class
-            time: instance of the Time class
+        Parameters
+        ----------
+        feed : Feed
+            an instance of the Feed class defined in feed.py
+        weather : Weather
+            instance of the Weather class
+        time : Time
+            instance of the Time class
+
         """
 
+        # TODO reevaluate the below: walking distance was removed because it is calculated at a later step.
         # average vertical & horizontal distance (VD, HD) of pens to the
         # milking parlor
         # avg_VD_parlor, avg_HD_parlor = self.avg_pen_dist()
+        temp = weather.T_avg[time.year - 1][time.day - 1]
         for calf in self.calves:
-            temp = weather.T_avg[time.year - 1][time.day - 1]
             calf.calc_nutrient_rqmts(feed, temp)
             calf.p_animal = 0.0072 * calf.body_weight * 1000
 
@@ -348,20 +374,27 @@ class AnimalManager:
     def avg_pen_dist(self) -> Tuple[float, float]:
         """
         Calculates the average distance from a pen to the milking parlor.
-        Returns: a tuple of (average vertical distance from milking parlor,
-            average horizontal distance from milking parlor)
+
+        Returns
+        -------
+        Tuple : (average vertical distance from milking parlor, average horizontal distance from milking parlor)
+
         """
 
         return mean(pen.vertical_dist_to_parlor for pen in self.all_pens), \
             mean(pen.horizontal_dist_to_parlor for pen in self.all_pens)
 
-    def calc_nutrient_rqmts(self, feed, temp):
+    def calc_nutrient_rqmts(self, feed, temp: float) -> None:
         """
         Calls each animal's method to calculate its nutrient requirements.
 
-        Args:
-            feed: instance of the feed class
-            temp: the temperature on the current day
+        Parameters
+        ----------
+        feed : Feed
+            instance of the feed class
+        temp : float
+            the temperature on the current day
+
         """
         for calf in self.calves:
             calf.calc_nutrient_rqmts(feed, temp)
@@ -437,8 +470,10 @@ class AnimalManager:
         farm before any updates are made to pens. The original pens' information
         would get lost as animals get added.
 
-        Returns: a list of the populations of each pen on the farm prior to
-                 any additions due to daily pen updates
+        Returns
+        -------
+        a list of the populations of each pen on the farm prior to
+            any additions due to daily pen updates
         """
 
         pen_population_before_additions = [0] * len(self.all_pens)
@@ -453,9 +488,11 @@ class AnimalManager:
         Adjusts the amount of each feed within a ration that is delivered to a pen
             when the number of animals in the pen is changed
 
-        Args:
-            prior_pen_populations: list of the number of animals in each pen, since
-                pens are zero-indexed
+        Parameters
+        ----------
+        prior_pen_populations : List[int]
+            list of the number of animals in each pen, since
+             pens are zero-indexed
         """
 
         for index, pen in enumerate(self.all_pens):
@@ -464,17 +501,24 @@ class AnimalManager:
                     pen.ration[key] = (pen.ration[key] / prior_pen_populations[index]) * len(pen.animals_in_pen)
 
     def daily_update_id_map(self, animals_added: List[AnimalBase], animals_removed: List[AnimalBase],
-                            calves_born: List[Calf], feed: Feed, temp: float):
+                            calves_born: List[Calf], feed: Feed, temp: float) -> None:
         """
         Updates the dictionary that maps animal IDs to the ID of the pen they are housed in when
         new animals are born or purchased and when animals leave the herd due to death or culling
 
-        Args:
-            animals_added: list of animal objects that have been added to the herd
-            animals_removed: list of animal objects that have been removed from the herd
-            calves_born: list of Calf objects that have been added to the herd
-            feed: an instance of the Feed class defined in feed.py
-            temp: the temperature on the current day
+        Parameters
+        ----------
+        animals_added : List[AnimalBase]
+            list of animal objects that have been added to the herd
+        animals_removed : List[AnimalBase]
+            list of animal objects that have been removed from the herd
+        calves_born : List[Calf]
+            list of Calf objects that have been added to the herd
+        feed : Feed
+            an instance of the Feed class defined in feed.py
+        temp : float
+            the temperature on the current day
+
         """
 
         all_animals_added = animals_added + calves_born
@@ -1422,7 +1466,7 @@ class AnimalManager:
         """
         Get the classes of animals in the pen.
 
-        Eventually, we want to get rid of this method and use _get_animal_types_in_pen() instead.
+        TODO: Eventually, we want to get rid of this method and use _get_animal_types_in_pen() instead.
 
         Parameters
         ----------
