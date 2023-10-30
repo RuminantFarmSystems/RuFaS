@@ -300,10 +300,10 @@ def test_get_current_day_avg_temperature_celsius(mocker: MockerFixture) -> None:
     mock_time = mocker.MagicMock(auto_spec=Time)
     mock_time.year = 10
     mock_time.day = 1
-    mock_current_weather = mocker.MagicMock()
-    setattr(mock_current_weather, "mean_air_temperature", expected_current_day_avg_tempC)
+    mock_current_day_conditions = mocker.MagicMock()
+    setattr(mock_current_day_conditions, "mean_air_temperature", expected_current_day_avg_tempC)
     mock_weather = mocker.MagicMock(auto_spec=Weather)
-    mock_weather.get_current_weather.return_value = mock_current_weather
+    mock_weather.get_current_day_conditions.return_value = mock_current_day_conditions
 
     mock_manure_handler = BaseManureHandler(weather=mock_weather,
                                             time=mock_time,
