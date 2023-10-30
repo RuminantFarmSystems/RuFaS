@@ -166,7 +166,7 @@ class OutputManager(object):
         key = self._generate_key(name, info_map)
         self._add_to_pool(self.logs_pool, key, msg, info_map)
         if self.__log_type == LogType.LOGS:
-            sys.stdout.write(f"{self.__metadata_prefix}[LOG]: {name}: <{msg}>\n")
+            sys.stdout.write(f"{self.__metadata_prefix}[LOG]: {name}: {msg}\n")
 
     def add_warning(self, name: str, msg: str, info_map: Dict[str, Any]) -> None:
         """
@@ -196,7 +196,7 @@ class OutputManager(object):
         key = self._generate_key(name, info_map)
         self._add_to_pool(self.warnings_pool, key, msg, info_map)
         if self.__log_type in [LogType.LOGS, LogType.WARNINGS]:
-            sys.stdout.write(f"{self.__metadata_prefix}[WARNING]: {name}: <{msg}>\n")
+            sys.stdout.write(f"{self.__metadata_prefix}[WARNING]: {name}: {msg}\n")
 
     def add_error(self, name: str, msg: str, info_map: Dict[str, Any]) -> None:
         """
@@ -226,7 +226,7 @@ class OutputManager(object):
         key = self._generate_key(name, info_map)
         self._add_to_pool(self.errors_pool, key, msg, info_map)
         if self.__log_type in [LogType.LOGS, LogType.WARNINGS, LogType.ERRORS]:
-            sys.stdout.write(f"{self.__metadata_prefix}[ERROR]: {name}: <{msg}>\n")
+            sys.stdout.write(f"{self.__metadata_prefix}[ERROR]: {name}: {msg}\n")
 
     def set_metadata_prefix(self, metadata_prefix: str) -> None:
         """Sets the metadata_prefix attribute."""

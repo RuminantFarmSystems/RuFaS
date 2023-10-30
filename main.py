@@ -95,9 +95,9 @@ def run_validation(metadata_files: List[Path], exclude_info_maps: bool = False,
         output_manager.set_log_type(verbose_log_type)
         is_data_valid = input_manager.start_data_processing(str(metadata_file["path"]), False)
         if is_data_valid:
-            output_manager.add_log("Data valid", "Data is valid.\n\n", info_map)
+            output_manager.add_log("Validation", "Data is valid.\n\n", info_map)
         else:
-            output_manager.add_warning("Data not valid", f"Data not valid for {metadata_file['path']}.\n\n", info_map)
+            output_manager.add_warning("Validation", f"Data not valid for {metadata_file['path']}.\n\n", info_map)
         output_manager.dump_all_nondata_pools(r"output", exclude_info_maps, format_option)
 
 
