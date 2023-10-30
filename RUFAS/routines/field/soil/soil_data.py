@@ -510,3 +510,19 @@ class SoilData:
             return 0.40
         else:
             return 0.075
+
+    @property
+    def profile_carbon_emissions(self) -> float:
+        """
+        Calculates the total amount of CO2 respirated from the soil profile.
+
+        Returns
+        -------
+        float
+            Total amount of CO2 emitted from carbon decomposition in the soil profile (kg/ha).
+
+        """
+        emissions_from_active = sum(self.get_vectorized_layer_attribute('active_carbon_to_slow_loss'))
+        emissions_from_slow = sum(self.get_vectorized_layer_attribute('slow_carbon_co2_lost_amount'))
+        emissions_from_passive = sum(self.get_vectorized_layer_attribute('passive_carbon_co2_lost_amount'))
+        return emissions_from_active + emissions_from_slow + emissions_from_passive

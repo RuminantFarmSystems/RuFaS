@@ -97,6 +97,7 @@ class OutputGatherer:
             om.add_variable("grazing_stable_organic_phosphorus",
                             field.soil.data.grazing_stable_organic_phosphorus,
                             info_map)
+            om.add_variable("profile_carbon_emissions", field.soil.data.profile_carbon_emissions, info_map)
             # Adding vadose zone layer data
             info_map["prefix"] = "field='" + field.field_data.name + "',vadose_zone_layer"
             om.add_variable("active_organic_nitrogen_content",
