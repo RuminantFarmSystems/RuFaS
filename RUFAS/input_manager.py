@@ -494,13 +494,13 @@ class InputManager:
         if minimum_value is not None:
             is_in_range = minimum_value <= input_data_value
             if not is_in_range:
-                warning_string = f"Validation: value less than {minimum_value}."
+                warning_string = f"Validation: value less than {minimum_value: .2f}."
                 om.add_warning(warning_string, f"{var_name=}", info_map)
                 return False
         if maximum_value is not None:
             is_in_range = input_data_value <= maximum_value
             if not is_in_range:
-                warning_string = f"Validation: value greater than {maximum_value}."
+                warning_string = f"Validation: value greater than {maximum_value: .2f}."
                 om.add_warning(warning_string, f"{var_name=}", info_map)
                 return False
 
@@ -579,8 +579,8 @@ class InputManager:
                        f"{element_hierarchy[-1]}: {variable_parent[element_hierarchy[-1]]}\n",
                        info_map)
         variable_parent[element_hierarchy[-1]] = variable_properties['default']
-        om.add_warning("Data fixed",
-                       f"Validation: invalid data fixed: {element_hierarchy[-1]} => {variable_properties['default']}",
+        om.add_warning("Validation: data fixed",
+                       f"Invalid data fixed: {element_hierarchy[-1]} => {variable_properties['default']}",
                        info_map)
         return True
 
