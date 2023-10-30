@@ -199,10 +199,10 @@ class InputManager:
                     else:
                         return False
 
-        om.add_log("Total Valid Items", f"{valid_elements_counter=}", info_map)
-        om.add_log("Total Checked Items", f"{total_elements_counter=}", info_map)
-        om.add_log("Total Fixed Items", f"{fixed_elements_counter=}", info_map)
-        om.add_log("Total Invalid Items", f"{invalid_elements_counter=}", info_map)
+        om.add_log("Validation count: total valid", f"{valid_elements_counter=}", info_map)
+        om.add_log("Validation count: total items", f"{total_elements_counter=}", info_map)
+        om.add_log("Validation count: total fixed", f"{fixed_elements_counter=}", info_map)
+        om.add_log("Validation count: total invalid", f"{invalid_elements_counter=}", info_map)
         return invalid_elements_counter == 0
 
     def _filter_input_data_by_metadata(self, input_data: Dict[str, Any],
@@ -347,7 +347,7 @@ class InputManager:
                 else:
                     element_counter_and_validity["invalid_elements"] += 1
                     element_counter_and_validity["is_valid"] = False
-                    om.add_warning("Invalid unfixable element found",
+                    om.add_warning("Validation: invalid unfixable element found",
                                    f"{var_name} element {element_num} was invalid and could not be fixed", info_map)
                     if eager_termination:
                         return element_counter_and_validity
@@ -418,7 +418,7 @@ class InputManager:
                     element_path = ".".join(element_hierarchy)
                     children_status[element_path] = is_child_valid
                     if not is_child_valid:
-                        om.add_warning("Invalid nested element found", f"{element_path}", info_map)
+                        om.add_warning("Validation: invalid nested element found", f"{element_path}", info_map)
                         false_counter += 1
                     element_hierarchy.remove(nested_key)
 
@@ -432,7 +432,8 @@ class InputManager:
             try:
                 input_data_value = reduce(lambda d, key: d[key], element_hierarchy, input_data)
             except KeyError:
-                om.add_error("Key not found in input data", f"Key {var_name} not found in input data.", info_map)
+                om.add_error("Validation: key not found in input data", f"Key {var_name} not found in input data.",
+                             info_map)
                 input_data_value = None
 
             is_valid = self._validate_input_type_dynamic(variable_properties, var_name, input_data_value)
@@ -446,7 +447,7 @@ class InputManager:
                 if is_fixed:
                     element_counter_and_validity["fixed_elements"] += 1
                 else:
-                    om.add_warning("Invalid unfixable element found",
+                    om.add_warning("Validation: invalid unfixable element found",
                                    f"{var_name} was invalid and could not be fixed", info_map)
                     element_counter_and_validity["invalid_elements"] += 1
                     element_counter_and_validity["is_valid"] = False
@@ -458,7 +459,7 @@ class InputManager:
                     "function": self._array_type_validator.__name__,
                     }
         if type(input_data_value) is not list:
-            warning_string = "Array is not a list."
+            warning_string = "Validation: array is not a list."
             om.add_warning(warning_string, f"{var_name=}", info_map)
             return False
 
@@ -467,13 +468,13 @@ class InputManager:
         if minimum_length is not None:
             is_in_range = variable_properties["minimum_length"] <= len(input_data_value)
             if not is_in_range:
-                warning_string = f"Array length less than {minimum_length}."
+                warning_string = f"Validation: array length less than {minimum_length}."
                 om.add_warning(warning_string, f"{var_name=}", info_map)
                 return False
         if maximum_length is not None:
             is_in_range = len(input_data_value) <= variable_properties["maximum_length"]
             if not is_in_range:
-                warning_string = f"Array length more than {maximum_length}."
+                warning_string = f"Validation: array length more than {maximum_length}."
                 om.add_warning(warning_string, f"{var_name=}", info_map)
                 return False
         return True
@@ -487,19 +488,19 @@ class InputManager:
         minimum_value = variable_properties.get("minimum")
         maximum_value = variable_properties.get("maximum")
         if type(input_data_value) is not float and type(input_data_value) is not int:
-            warning_string = "Value is not a number."
+            warning_string = "Validation: value is not a number."
             om.add_warning(warning_string, f"{var_name=}", info_map)
             return False
         if minimum_value is not None:
             is_in_range = minimum_value <= input_data_value
             if not is_in_range:
-                warning_string = f"Value less than {minimum_value}."
+                warning_string = f"Validation: value less than {minimum_value}."
                 om.add_warning(warning_string, f"{var_name=}", info_map)
                 return False
         if maximum_value is not None:
             is_in_range = input_data_value <= maximum_value
             if not is_in_range:
-                warning_string = f"Value greater than {maximum_value}."
+                warning_string = f"Validation: value greater than {maximum_value}."
                 om.add_warning(warning_string, f"{var_name=}", info_map)
                 return False
 
@@ -511,7 +512,7 @@ class InputManager:
                     "function": self._string_type_validator.__name__,
                     }
         if type(input_data_value) is not str:
-            warning_string = "String variable is not a string."
+            warning_string = "Validation: string variable is not a string."
             om.add_warning(warning_string, f"{var_name=}", info_map)
             return False
 
@@ -519,7 +520,7 @@ class InputManager:
         if pattern_check is not None:
             is_valid_string = bool(re.match(pattern_check, input_data_value))
             if not is_valid_string:
-                warning_string = f"String variable must match pattern {variable_properties['pattern']}."
+                warning_string = f"Validation: string variable must match pattern {variable_properties['pattern']}."
                 om.add_warning(warning_string, f"{var_name=}", info_map)
                 return False
 
@@ -528,13 +529,13 @@ class InputManager:
         if minimum_length is not None:
             is_valid_string = variable_properties["minimum_length"] <= len(input_data_value)
             if not is_valid_string:
-                warning_string = f"String length less than {minimum_length}."
+                warning_string = f"Validation: string length less than {minimum_length}."
                 om.add_warning(warning_string, f"{var_name=}", info_map)
                 return False
         if maximum_length is not None:
             is_valid_string = len(input_data_value) <= variable_properties["maximum_length"]
             if not is_valid_string:
-                warning_string = f"String length more than {maximum_length}."
+                warning_string = f"Validation: string length more than {maximum_length}."
                 om.add_warning(warning_string, f"{var_name=}", info_map)
                 return False
 
@@ -570,15 +571,16 @@ class InputManager:
                     }
 
         if 'default' not in variable_properties.keys():
-            om.add_error("Invalid data not able to be fixed: ", f"{element_hierarchy[-1]}\n", info_map)
+            om.add_error("Validation: invalid data not able to be fixed: ", f"{element_hierarchy[-1]}\n", info_map)
             return False
         variable_parent = reduce(lambda d, key: d[key], element_hierarchy[:-1],
                                  input_data)
-        om.add_warning("Invalid data found", f"{element_hierarchy[-1]}: {variable_parent[element_hierarchy[-1]]}\n",
+        om.add_warning("Validation: invalid data found",
+                       f"{element_hierarchy[-1]}: {variable_parent[element_hierarchy[-1]]}\n",
                        info_map)
         variable_parent[element_hierarchy[-1]] = variable_properties['default']
         om.add_warning("Data fixed",
-                       f"Invalid data fixed: {element_hierarchy[-1]} => {variable_properties['default']}",
+                       f"Validation: invalid data fixed: {element_hierarchy[-1]} => {variable_properties['default']}",
                        info_map)
         return True
 
@@ -642,9 +644,9 @@ class InputManager:
             invalid_key = str(key_error).strip("\'")
             parent_address = str(data_address.split("." + invalid_key)[0])
 
-            om.add_error("Data not found:", f"Cannot find \"{data_address}\", "
-                                            f"\"{parent_address}\" does not have attribute \"{invalid_key}\".",
-                                            info_map)
+            om.add_error("Validation: data not found:", f"Cannot find \"{data_address}\", "
+                         f"\"{parent_address}\" does not have attribute \"{invalid_key}\".",
+                         info_map)
 
             raise KeyError(f"Data not found: Cannot find \"{data_address}\", "
                            f"\"{parent_address}\" does not have attribute \"{invalid_key}\".")
@@ -708,9 +710,9 @@ class InputManager:
             invalid_key = element_hierarchy[-1]
             parent_address = ".".join(element_hierarchy[:-1])
 
-            om.add_error("Data not found:", f"Cannot find \"{metadata_address}\", "
-                                            f"\"{parent_address}\" does not have attribute \"{invalid_key}\".",
-                                            info_map)
+            om.add_error("Validation: data not found:", f"Cannot find \"{metadata_address}\", "
+                         f"\"{parent_address}\" does not have attribute \"{invalid_key}\".",
+                         info_map)
 
             raise KeyError(f"Data not found: Cannot find \"{metadata_address}\", "
                            f"\"{parent_address}\" does not have attribute \"{invalid_key}\".")

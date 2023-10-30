@@ -131,11 +131,11 @@ def execute_simulations(
         output_manager.set_log_type(verbose_log_type)
         is_data_valid = input_manager.start_data_processing(str(metadata_file["path"]), True)
         if is_data_valid:
-            output_manager.add_log("Data valid", "Data is valid. \nSimulating...\n", info_map)
+            output_manager.add_log("Validation complete", "Data is valid. \nSimulating...\n", info_map)
             simulator = SimulationEngine()
             simulator.simulate()
         else:
-            output_manager.add_error("No simulation run",
+            output_manager.add_error("Validation complete",
                                      f"Data not valid for {str(metadata_file['path'])}, simulation not run", info_map)
         output_manager.save_variables(r"output", r"output/output_filters/", exclude_info_maps)
         output_manager.dump_all_nondata_pools(r"output", exclude_info_maps, format_option)
