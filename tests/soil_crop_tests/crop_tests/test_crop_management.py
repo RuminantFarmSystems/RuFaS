@@ -1,5 +1,5 @@
 import pytest
-from mock.mock import MagicMock
+from mock.mock import MagicMock, patch, PropertyMock
 from RUFAS.routines.field.crop.crop_management import CropManagement
 from RUFAS.routines.field.crop.crop_data import CropData
 from math import exp
@@ -98,10 +98,11 @@ def test_dry_down():
 def test_check_harvest_schedule(heat_sched: bool, heat_frac: float, harv_day: int, harv_yr: int,
                                 this_day: int, this_yr: int):
     """ensure that is_harvest_day is correctly set"""
-    data = CropData(use_heat_scheduling=heat_sched, heat_fraction=heat_frac, next_harvest_day=harv_day,
-                    next_harvest_year=harv_yr, harvest_heat_fraction=1.10)
+    data = CropData(use_heat_scheduling=heat_sched, next_harvest_day=harv_day, next_harvest_year=harv_yr,
+                    harvest_heat_fraction=1.10)
     cm = CropManagement(data)
-    cm.check_harvest_schedule(this_day, this_yr)
+    with patch.object(CropData, "heat_fraction", new_callable=PropertyMock, return_value=heat_frac):
+        cm.check_harvest_schedule(this_day, this_yr)
     scheduled_and_correct = (this_day == harv_day) & (this_yr == harv_yr) & (heat_sched is False)
     heat_scheduled_and_correct = (heat_sched is True) & (heat_frac >= 1.10)
     if scheduled_and_correct or heat_scheduled_and_correct:
@@ -126,10 +127,11 @@ def test_check_harvest_schedule(heat_sched: bool, heat_frac: float, harv_day: in
 ])
 def test_determine_harvest_index(harvest, heat_frac, water_def):
     """ensure that the harvest index is properly evaluated"""
-    data = CropData(user_harvest_index=harvest, heat_fraction=heat_frac, optimal_harvest_index=0.95,
-                    min_harvest_index=0.5, water_deficiency=water_def)
+    data = CropData(user_harvest_index=harvest, optimal_harvest_index=0.95, min_harvest_index=0.5,
+                    water_deficiency=water_def)
     crop = CropManagement(data)
-    crop.determine_harvest_index()
+    with patch.object(CropData, "heat_fraction", new_callable=PropertyMock, return_value=heat_frac):
+        crop.determine_harvest_index()
 
     if harvest is not None:
         assert data.harvest_index == harvest
@@ -191,6 +193,7 @@ def test_cut_crop(efficiency: float, harvest: float, override: bool, should_fail
     if override:
         data.user_harvest_index = harvest
     crop = CropManagement(data)
+    crop._recalculate_biomass_distribution = MagicMock()
 
     # act
     if should_fail:
@@ -198,6 +201,7 @@ def test_cut_crop(efficiency: float, harvest: float, override: bool, should_fail
             crop.cut_crop(efficiency)
         except ValueError as e:
             assert str(e) == f"Expected collected_fraction to be between 0 and 1 (inclusive), received '{efficiency}'."
+        crop._recalculate_biomass_distribution.assert_not_called()
     else:
         crop.cut_crop(efficiency)
         if harvest > 1:
@@ -211,6 +215,7 @@ def test_cut_crop(efficiency: float, harvest: float, override: bool, should_fail
         assert data.accumulated_heat_units == 1.1 * (1 - (cut_biomass / 100))
         collected = cut_biomass * efficiency
         residue = cut_biomass * (1 - efficiency)
+        crop._recalculate_biomass_distribution.assert_called_once()
         assert data.yield_collected == collected
         assert data.yield_residue == residue
 
