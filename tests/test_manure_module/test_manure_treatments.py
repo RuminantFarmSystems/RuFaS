@@ -939,11 +939,11 @@ def test_get_current_day_temperature_and_rainfall(
     mock_time = mocker.MagicMock()
     mock_time.year = 10
     mock_time.day = 1
-    mock_current_weather = mocker.MagicMock()
-    setattr(mock_current_weather, "mean_air_temperature", expected_current_day_average_temperature_celsius)
-    setattr(mock_current_weather, "rainfall", rainfall_mm)
+    mock_current_day_conditions = mocker.MagicMock()
+    setattr(mock_current_day_conditions, "mean_air_temperature", expected_current_day_average_temperature_celsius)
+    setattr(mock_current_day_conditions, "rainfall", rainfall_mm)
     mock_weather = mocker.MagicMock()
-    mock_weather.get_current_weather.return_value = mock_current_weather
+    mock_weather.get_current_day_conditions.return_value = mock_current_day_conditions
 
     manure_treatment = ManureTreatmentFactory.get_instance(
         manure_treatment_type_name=manure_treatment_type_name,
