@@ -188,9 +188,9 @@ def test_dict_to_csv_column_list(mock_output_manager: OutputManager) -> None:
     map1_series = result[1]
     map2_series = result[2]
     assert data_series.name == "dummy_variable_name"
-    assert data_series.to_list() == data['values']
+    assert data_series.to_list() == data["values"]
     assert map1_series.name == "dummy_variable_name.map1"
-    assert map1_series.to_list() == ['value1', 'value2']
+    assert map1_series.to_list() == ["value1", "value2"]
     assert map2_series.name == "dummy_variable_name.map2"
     assert map2_series.to_list() == [1, 2]
 
@@ -711,10 +711,14 @@ def test_dump_all_nondata_pools(
     mock_output_manager.dump_errors.assert_called_once_with(path)
     mock_output_manager.dump_warnings.assert_called_once_with(path)
     mock_output_manager.dump_logs.assert_called_once_with(path)
-    mock_output_manager.dump_variable_names_and_contexts.assert_called_once_with(path, False, "verbose")
+    mock_output_manager.dump_variable_names_and_contexts.assert_called_once_with(
+        path, False, "verbose"
+    )
 
     mock_output_manager.dump_all_nondata_pools(path, True)
-    mock_output_manager.dump_variable_names_and_contexts.assert_called_with(path, True, "verbose")
+    mock_output_manager.dump_variable_names_and_contexts.assert_called_with(
+        path, True, "verbose"
+    )
     assert mock_output_manager.dump_logs.call_count == 2
     assert mock_output_manager.dump_warnings.call_count == 2
     assert mock_output_manager.dump_errors.call_count == 2
@@ -910,86 +914,88 @@ def test_dump_errors(
     [
         (
             [
-                '_exclude_info_maps=False, expect info_maps accordingly.' + os.linesep, 'var1' + os.linesep,
-                'var1.info_maps: test' + os.linesep,
-                'var2.info_maps: map1' + os.linesep,
-                'var2.values: v1' + os.linesep,
-                'var2.values: v2' + os.linesep
+                "_exclude_info_maps=False, expect info_maps accordingly." + os.linesep,
+                "var1" + os.linesep,
+                "var1.info_maps: test" + os.linesep,
+                "var2.info_maps: map1" + os.linesep,
+                "var2.values: v1" + os.linesep,
+                "var2.values: v2" + os.linesep,
             ],
             False,
             "verbose",
         ),
         (
             [
-                '_exclude_info_maps=True, expect info_maps accordingly.' + os.linesep,
-                'var1' + os.linesep,
-                'var2.values: v1' + os.linesep,
-                'var2.values: v2' + os.linesep
+                "_exclude_info_maps=True, expect info_maps accordingly." + os.linesep,
+                "var1" + os.linesep,
+                "var2.values: v1" + os.linesep,
+                "var2.values: v2" + os.linesep,
             ],
             True,
             "verbose",
         ),
         (
             [
-                '_exclude_info_maps=False, expect info_maps accordingly.' + os.linesep, 'var1' + os.linesep,
-                '    .info_maps: test' + os.linesep,
-                'var2' + os.linesep,
-                '    .info_maps: map1' + os.linesep,
-                '    .values: v1' + os.linesep,
-                '    .values: v2' + os.linesep
+                "_exclude_info_maps=False, expect info_maps accordingly." + os.linesep,
+                "var1" + os.linesep,
+                "    .info_maps: test" + os.linesep,
+                "var2" + os.linesep,
+                "    .info_maps: map1" + os.linesep,
+                "    .values: v1" + os.linesep,
+                "    .values: v2" + os.linesep,
             ],
             False,
             "block",
         ),
         (
             [
-                '_exclude_info_maps=True, expect info_maps accordingly.' + os.linesep,
-                'var1' + os.linesep,
-                'var2' + os.linesep,
-                '    .values: v1' + os.linesep,
-                '    .values: v2' + os.linesep
+                "_exclude_info_maps=True, expect info_maps accordingly." + os.linesep,
+                "var1" + os.linesep,
+                "var2" + os.linesep,
+                "    .values: v1" + os.linesep,
+                "    .values: v2" + os.linesep,
             ],
             True,
             "block",
         ),
         (
             [
-                '_exclude_info_maps=False, expect info_maps accordingly.' + os.linesep,
-                'var1' + os.linesep,
+                "_exclude_info_maps=False, expect info_maps accordingly." + os.linesep,
+                "var1" + os.linesep,
                 "var1.info_maps: ['test']" + os.linesep,
                 "var2.info_maps: ['map1']" + os.linesep,
-                "var2.values: ['v1', 'v2']" + os.linesep
+                "var2.values: ['v1', 'v2']" + os.linesep,
             ],
             False,
             "inline",
         ),
         (
             [
-                '_exclude_info_maps=True, expect info_maps accordingly.' + os.linesep,
-                'var1' + os.linesep,
-                "var2.values: ['v1', 'v2']" + os.linesep
+                "_exclude_info_maps=True, expect info_maps accordingly." + os.linesep,
+                "var1" + os.linesep,
+                "var2.values: ['v1', 'v2']" + os.linesep,
             ],
             True,
             "inline",
         ),
         (
             [
-                '_exclude_info_maps=True, expect info_maps accordingly.' + os.linesep,
-                'var1' + os.linesep,
+                "_exclude_info_maps=True, expect info_maps accordingly." + os.linesep,
+                "var1" + os.linesep,
                 "var2.v1" + os.linesep,
-                "var2.v2" + os.linesep
+                "var2.v2" + os.linesep,
             ],
             True,
             "basic",
         ),
         (
             [
-                '_exclude_info_maps=False, expect info_maps accordingly.' + os.linesep,
-                'var1' + os.linesep,
+                "_exclude_info_maps=False, expect info_maps accordingly." + os.linesep,
+                "var1" + os.linesep,
                 "var1.test" + os.linesep,
                 "var2.map1" + os.linesep,
                 "var2.v1" + os.linesep,
-                "var2.v2" + os.linesep
+                "var2.v2" + os.linesep,
             ],
             False,
             "basic",
@@ -1203,11 +1209,15 @@ def test_load_json_file_to_tuple(
     )
 
 
-def test_load_filter_file_to_list_load_txt_file(mocker: MockerFixture,
-                                                mock_output_manager: OutputManager
-                                                ) -> None:
-    mock_txt_loader = mocker.patch.object(mock_output_manager, "_load_txt_file_to_list", return_value=[])
-    mock_json_loader = mocker.patch.object(mock_output_manager, "_load_json_file_to_tuple", return_value=([], {}))
+def test_load_filter_file_to_list_load_txt_file(
+    mocker: MockerFixture, mock_output_manager: OutputManager
+) -> None:
+    mock_txt_loader = mocker.patch.object(
+        mock_output_manager, "_load_txt_file_to_list", return_value=[]
+    )
+    mock_json_loader = mocker.patch.object(
+        mock_output_manager, "_load_json_file_to_tuple", return_value=([], {})
+    )
 
     result: List[str] = mock_output_manager._load_filter_file_to_list("some_file.txt")
 
@@ -1216,17 +1226,42 @@ def test_load_filter_file_to_list_load_txt_file(mocker: MockerFixture,
     assert result == []
 
 
-def test_load_filter_file_to_list_load_json_file(mocker: MockerFixture,
-                                                 mock_output_manager: OutputManager
-                                                 ) -> None:
-    mock_txt_loader = mocker.patch.object(mock_output_manager, "_load_txt_file_to_list", return_value=[])
-    mock_json_loader = mocker.patch.object(mock_output_manager, "_load_json_file_to_tuple", return_value=([], {}))
+def test_load_filter_file_to_list_load_json_file(
+    mocker: MockerFixture, mock_output_manager: OutputManager
+) -> None:
+    mock_txt_loader = mocker.patch.object(
+        mock_output_manager, "_load_txt_file_to_list", return_value=[]
+    )
+    mock_json_loader = mocker.patch.object(
+        mock_output_manager, "_load_json_file_to_tuple", return_value=([], {})
+    )
 
-    result: Tuple[List[str], Dict[str, str]] = mock_output_manager._load_filter_file_to_list("some_file.json")
+    result: Tuple[
+        List[str], Dict[str, str]
+    ] = mock_output_manager._load_filter_file_to_list("some_file.json")
 
     mock_json_loader.assert_called_with("some_file.json")
     mock_txt_loader.assert_not_called()
     assert result == ([], {})
+
+
+def test_load_filter_file_to_list_unsupported_file(
+    mocker: MockerFixture, mock_output_manager: OutputManager
+) -> None:
+    mock_txt_loader = mocker.patch.object(
+        mock_output_manager, "_load_txt_file_to_list", return_value=[]
+    )
+    mock_json_loader = mocker.patch.object(
+        mock_output_manager, "_load_json_file_to_tuple", return_value=([], {})
+    )
+
+    result: List[str] = []
+    with pytest.raises(Exception):
+        mock_output_manager._load_filter_file_to_list("some_file.abc")
+
+    mock_txt_loader.assert_not_called()
+    mock_json_loader.assert_not_called()
+    assert result == []
 
 
 def test_list_txt_and_json_files_in_dir(

@@ -623,8 +623,8 @@ class OutputManager(object):
                 raise Exception(
                     "Unsupported file format; only json and txt are supported."
                 )
-        except Exception as e:
-            raise e
+        except Exception:
+            raise
 
     def _filter_variables_pool(
         self, filter_patterns: List[str], input_file_name: Optional[str]
