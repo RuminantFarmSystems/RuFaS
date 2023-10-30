@@ -7,7 +7,6 @@ The main function run_rufas() will execute the model simulation(s). It accepts a
 file(s) or, if this input is not given, it will run in interactive mode and accept input from the user.
 """
 import argparse
-from enum import Enum
 from pathlib import Path
 import sys
 from typing import List
@@ -20,29 +19,12 @@ from RUFAS.output_manager import OutputManager
 from RUFAS.util import Utility
 
 
-class LogType(Enum):
-    """
-    The different types of logs collected by Output Manager.
-
-    Notes
-    -----
-    Selecting NONE will tell OutputManager not to print out anything during a simulation.
-    Selecting ERRORS will tell OutputManager to print out all errors added during a simulation.
-    Selecting WARNINGS will tell OutputManager to print out all warnings and errors added during a simulation.
-    Selecting LOGS will tell OutputManager to print out all logs, warnings, and errors added during a simulation.
-    """
-    NONE = "none"
-    ERRORS = "errors"
-    WARNINGS = "warnings"
-    LOGS = "logs"
-
-
 def main():
     cmd_arguments = parse_gnu_args()
     run_rufas(
         format_option=cmd_arguments.format_option,
         make_graphs=not cmd_arguments.no_graphics,
-        verbose_log_type=LogType(cmd_arguments.verbose_log_type),
+        verbose_log_type=cmd_arguments.verbose_log_type,
         clear_output=cmd_arguments.clear_output,
         exclude_info_maps=cmd_arguments.exclude_info_maps,
         only_run_validation=cmd_arguments.only_run_validation,
@@ -52,7 +34,7 @@ def main():
 def run_rufas(
     format_option: str = "verbose",
     make_graphs: bool = True,
-    verbose_log_type: LogType = LogType("none"),
+    verbose_log_type: str = "none",
     clear_output: bool = False,
     exclude_info_maps: bool = False,
     only_run_validation: bool = False,
@@ -62,7 +44,7 @@ def run_rufas(
     Args:
         format_option: format for variable_names.txt output file
         make_graphs: prevent graphics from generating
-        verbose: print progress messages while simulation is running
+        verbose: print errors, warnings, and/or logs during the simulation
         clear_output: lear output directory before running the simulation
         exclude_info_map: exclude info_maps from the output
         only_run_validation: validate input data and don't run a simulation
@@ -73,7 +55,7 @@ def run_rufas(
         Utility.empty_dir(output_dir, keep=keep_list)
 
     set_global_variables(make_graphs)
-    if verbose_log_type != LogType.NONE:
+    if verbose_log_type != "none":
         sys.stdout.write("RuFaS: Ruminant Farm Systems Model 2023\n")
     metadata_file_list: List[MetadataPaths] = METADATA_PATHS
     if only_run_validation:
@@ -88,7 +70,7 @@ def set_global_variables(make_graphs: bool) -> None:
 
 
 def run_validation(metadata_files: List[Path], exclude_info_maps: bool = False,
-                   format_option: str = "verbose", verbose_log_type: LogType = LogType("none")) -> None:
+                   format_option: str = "verbose", verbose_log_type: str = "none") -> None:
     """Instantiates I/O Managers and triggers validation of input data.
 
     Parameters
@@ -121,7 +103,7 @@ def run_validation(metadata_files: List[Path], exclude_info_maps: bool = False,
 
 def execute_simulations(
     metadata_files: List[Path], exclude_info_maps: bool = False, format_option: str = "verbose",
-    verbose_log_type: LogType = LogType("none")
+    verbose_log_type: str = "none"
 ) -> None:
     """Instantiates I/O Managers and processes the metadata files provided by the user to run the simulation.
 
@@ -138,6 +120,7 @@ def execute_simulations(
     info_map = {"class": "No caller class",
                 "function": execute_simulations.__name__,
                 }
+    sys.stdout.write("Simulating...\n")
     output_manager = OutputManager()
     input_manager = InputManager()
     for metadata_file in metadata_files:
@@ -177,7 +160,8 @@ def parse_gnu_args():
         "-v",
         "--verbose-log-type",
         choices=["errors", "warnings", "logs", "none"],
-        help="Specify the log type",
+        default="none",
+        help="Specify the log type to be printed",
     )
     parser.add_argument(
         "-co",

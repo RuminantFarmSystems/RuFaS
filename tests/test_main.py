@@ -38,7 +38,7 @@ def test_main(mocker: MockerFixture):
     patch_run_rufas.assert_called_once_with(
         format_option=mock_cmd_arguments.format_option,
         make_graphs=not mock_cmd_arguments.no_graphics,
-        verbose=mock_cmd_arguments.verbose,
+        verbose_log_type=mock_cmd_arguments.verbose_log_type,
         clear_output=mock_cmd_arguments.clear_output,
         exclude_info_maps=mock_cmd_arguments.exclude_info_maps,
         only_run_validation=mock_cmd_arguments.only_run_validation,
@@ -47,30 +47,30 @@ def test_main(mocker: MockerFixture):
 
 
 @pytest.mark.parametrize(
-    "format_option, make_graphs, verbose, clear_output, exclude_info_maps, only_run_validation",
+    "format_option, make_graphs, verbose_log_type, clear_output, exclude_info_maps, only_run_validation",
     [
-        ("verbose", True, True, True, True, True),
-        ("block", False, True, True, True, True),
-        ("inline", True, False, True, True, True),
-        ("basic", True, True, False, True, True),
-        ("verbose", True, True, True, False, True),
-        ("block", True, True, True, True, False),
-        ("inline", False, False, True, True, True),
-        ("basic", False, True, False, True, True),
-        ("verbose", False, True, True, False, True),
-        ("block", False, True, True, True, False),
-        ("inline", False, False, False, True, True),
-        ("basic", False, False, True, False, True),
-        ("verbose", False, False, True, True, False),
-        ("block", False, False, False, False, True),
-        ("inline", False, False, False, True, False),
-        ("basic", False, False, False, False, False)
+        ("verbose", True, "none", True, True, True),
+        ("block", False, "logs", True, True, True),
+        ("inline", True, "errors", True, True, True),
+        ("basic", True, "warnings", False, True, True),
+        ("verbose", True, "none", True, False, True),
+        ("block", True, "logs", True, True, False),
+        ("inline", False, "errors", True, True, True),
+        ("basic", False, "warnings", False, True, True),
+        ("verbose", False, "none", True, False, True),
+        ("block", False, "logs", True, True, False),
+        ("inline", False, "errors", False, True, True),
+        ("basic", False, "warnings", True, False, True),
+        ("verbose", False, "none", True, True, False),
+        ("block", False, "warnings", False, False, True),
+        ("inline", False, "logs", False, True, False),
+        ("basic", False, "errors", False, False, False)
     ],
 )
 def test_run_rufas(
     format_option: str,
     make_graphs: bool,
-    verbose: bool,
+    verbose_log_type: str,
     clear_output: bool,
     exclude_info_maps: bool,
     only_run_validation: bool,
@@ -86,37 +86,39 @@ def test_run_rufas(
     patch_empty_dir = mocker.patch("RUFAS.util.Utility.empty_dir")
 
     # Act
-    run_rufas(format_option, make_graphs, verbose, clear_output, exclude_info_maps, only_run_validation)
+    run_rufas(format_option, make_graphs, verbose_log_type, clear_output, exclude_info_maps, only_run_validation)
 
     # Assert
-    patch_set_global_variables.assert_called_once_with(make_graphs, verbose)
+    patch_set_global_variables.assert_called_once_with(make_graphs)
 
     if only_run_validation:
-        patch_run_validation.assert_called_once_with(metadata_file_list, exclude_info_maps, format_option)
+        patch_run_validation.assert_called_once_with(metadata_file_list, exclude_info_maps,
+                                                     format_option, verbose_log_type)
     else:
-        patch_execute_simulations.assert_called_once_with(metadata_file_list, exclude_info_maps, format_option)
+        patch_execute_simulations.assert_called_once_with(metadata_file_list, exclude_info_maps,
+                                                          format_option, verbose_log_type)
 
     if clear_output:
         patch_empty_dir.assert_called_once()
     else:
         patch_empty_dir.assert_not_called()
 
-    if verbose:
+    if verbose_log_type != "none":
         captured = capsys.readouterr()
         expected_message = "RuFaS: Ruminant Farm Systems Model 2023\n"
         assert expected_message in captured.out
 
 
 @pytest.mark.parametrize(
-    "make_graphs, verbose", [(True, True), (False, True), (True, False), (False, False)]
+    "make_graphs", [(True), (False)]
 )
-def test_set_global_variables(make_graphs: bool, verbose: bool) -> None:
+def test_set_global_variables(make_graphs: bool) -> None:
     """Checks that set_global_variables() sets the global variables correctly"""
     # Arrange
     old_make_graphs = config.global_variables.PRODUCE_GRAPHICS
 
     # Act
-    set_global_variables(make_graphs, verbose)
+    set_global_variables(make_graphs)
 
     # Assert
     assert config.global_variables.PRODUCE_GRAPHICS == make_graphs
@@ -126,9 +128,8 @@ def test_set_global_variables(make_graphs: bool, verbose: bool) -> None:
 
 
 @pytest.mark.parametrize(
-        "is_data_valid, verbose",
-        [(True, True), (True, False), (False, True), (False, False)
-         ]
+        "is_data_valid",
+        [True, False]
 )
 def test_run_validation(mocker: MockerFixture, is_data_valid: bool) -> None:
     """Checks that run_validation() calls the correct functions in the correct order"""
@@ -148,7 +149,7 @@ def test_run_validation(mocker: MockerFixture, is_data_valid: bool) -> None:
                           {"prefix": metadata_prefix2, "path": metadata_file_path2}, ]
     mock_input_manager.start_data_processing.return_value = is_data_valid
 
-    run_validation(metadata_file_list, True, "verbose")
+    run_validation(metadata_file_list, True, "verbose", "none")
 
     assert mock_output_manager.flush_pools.call_count == len(metadata_file_list)
     assert mock_input_manager.flush_pool.call_count == len(metadata_file_list)
@@ -196,7 +197,7 @@ def test_execute_simulations(mocker: MockerFixture, is_data_valid: bool,
     assert mock_input_manager.flush_pool.call_count == len(metadata_file_list)
     assert mock_output_manager.dump_all_nondata_pools.call_count == len(metadata_file_list)
     assert mock_output_manager.dump_all_nondata_pools.call_args_list == [
-        mocker.call("output", True)
+        mocker.call("output", True, format_option)
     ] * len(metadata_file_list)
     assert mock_output_manager.save_variables.call_count == len(metadata_file_list)
     assert mock_output_manager.save_variables.call_args_list == [
@@ -234,9 +235,10 @@ def test_parse_gnu_args(mocker: MockerFixture) -> None:
         ),
         mocker.call(
             "-v",
-            "--verbose",
-            help="Print progress messages while simulation is running",
-            action="store_true",
+            "--verbose-log-type",
+            choices=["errors", "warnings", "logs", "none"],
+            default="none",
+            help="Specify the log type to be printed",
         ),
         mocker.call(
             "-co",
