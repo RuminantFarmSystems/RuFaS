@@ -199,8 +199,8 @@ class InputManager:
                     else:
                         return False
 
-        om.add_log("Validation count: total valid", f"{valid_elements_counter=}", info_map)
         om.add_log("Validation count: total items", f"{total_elements_counter=}", info_map)
+        om.add_log("Validation count: total valid", f"{valid_elements_counter=}", info_map)
         om.add_log("Validation count: total fixed", f"{fixed_elements_counter=}", info_map)
         om.add_log("Validation count: total invalid", f"{invalid_elements_counter=}", info_map)
         return invalid_elements_counter == 0
