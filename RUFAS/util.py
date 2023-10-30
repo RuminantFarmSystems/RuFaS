@@ -12,6 +12,8 @@ from pathlib import Path
 from typing import Any, Callable, Dict, List, Tuple, Optional
 
 from RUFAS import errors
+from RUFAS.config import is_leap_year
+from RUFAS.time import Time
 
 
 class Utility:
@@ -322,3 +324,28 @@ class Utility:
                     file.unlink()
                 elif file.is_dir():
                     shutil.rmtree(file)
+
+    @staticmethod
+    def day_to_month_conversion(time: Time) -> int:
+        """
+        Converts the day number into the corresponding month of the year.
+
+        Parameters
+        ----------
+        time: Time
+            Time object containing the current time of the simulation.
+
+        Returns
+        -------
+        int
+            The corresponding month of the year (1 for January, 2 for February, etc.).
+        """
+        non_leap_cumulative_days_in_months = [31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334, 365]
+        leap_cumulative_days_in_months = [31, 60, 91, 121, 152, 182, 213, 244, 274, 305, 335, 366]
+
+        cumulative_days_in_months = \
+            leap_cumulative_days_in_months if is_leap_year(time.calendar_year) else non_leap_cumulative_days_in_months
+
+        for month, day_count in enumerate(cumulative_days_in_months):
+            if time.day <= day_count:
+                return month + 1
