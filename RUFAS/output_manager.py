@@ -1,7 +1,9 @@
 # !/usr/bin/env python3
 
 from copy import deepcopy
+from enum import Enum
 from pathlib import Path
+import sys
 from typing import Any, Dict, List, Optional, Union
 import datetime
 import json
@@ -9,9 +11,26 @@ import os
 import pandas as pd
 import re
 from deprecated.sphinx import deprecated
-from main import LogType
 
 from RUFAS.util import Utility
+
+
+class LogType(Enum):
+    """
+    The different types of logs printed by Output Manager. Set by the `verbose` gnu arg in main.py.
+
+    Notes
+    -----
+    NONE is the default setting.
+    Selecting NONE will tell OutputManager not to print out anything during a simulation.
+    Selecting ERRORS will tell OutputManager to print out all errors added during a simulation.
+    Selecting WARNINGS will tell OutputManager to print out all warnings and errors added during a simulation.
+    Selecting LOGS will tell OutputManager to print out all logs, warnings, and errors added during a simulation.
+    """
+    NONE = "none"
+    ERRORS = "errors"
+    WARNINGS = "warnings"
+    LOGS = "logs"
 
 
 class OutputManager(object):
@@ -146,6 +165,8 @@ class OutputManager(object):
         info_map["timestamp"] = self._get_timestamp(include_millis=True)
         key = self._generate_key(name, info_map)
         self._add_to_pool(self.logs_pool, key, msg, info_map)
+        if self.__log_type == LogType.LOGS:
+            sys.stdout.write(f"{self.__metadata_prefix}[LOG]: {name}: <{msg}>\n")
 
     def add_warning(self, name: str, msg: str, info_map: Dict[str, Any]) -> None:
         """
@@ -174,6 +195,8 @@ class OutputManager(object):
         info_map["timestamp"] = self._get_timestamp(include_millis=True)
         key = self._generate_key(name, info_map)
         self._add_to_pool(self.warnings_pool, key, msg, info_map)
+        if self.__log_type in [LogType.LOGS, LogType.WARNINGS]:
+            sys.stdout.write(f"{self.__metadata_prefix}[WARNING]: {name}: <{msg}>\n")
 
     def add_error(self, name: str, msg: str, info_map: Dict[str, Any]) -> None:
         """
@@ -202,14 +225,16 @@ class OutputManager(object):
         info_map["timestamp"] = self._get_timestamp(include_millis=True)
         key = self._generate_key(name, info_map)
         self._add_to_pool(self.errors_pool, key, msg, info_map)
+        if self.__log_type in [LogType.LOGS, LogType.WARNINGS, LogType.ERRORS]:
+            sys.stdout.write(f"{self.__metadata_prefix}[ERROR]: {name}: <{msg}>\n")
 
     def set_metadata_prefix(self, metadata_prefix: str) -> None:
         """Sets the metadata_prefix attribute."""
         self.__metadata_prefix = metadata_prefix
 
-    def set_log_type(self, log_type: LogType = LogType("none")) -> None:
+    def set_log_type(self, log_type: str = "none") -> None:
         """Sets the log_type attribute"""
-        self.__log_type = log_type
+        self.__log_type = LogType(log_type)
 
     def _get_timestamp(self, include_millis: bool = False) -> str:
         """

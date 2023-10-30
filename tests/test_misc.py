@@ -18,7 +18,7 @@ from pytest import approx, raises
 from pytest_mock.plugin import MockerFixture
 
 from RUFAS.general_constants import GeneralConstants
-from RUFAS.output_manager import OutputManager
+from RUFAS.output_manager import LogType, OutputManager
 from RUFAS.simulation_engine import SimulationEngine
 from RUFAS.util import Utility
 
@@ -328,6 +328,16 @@ def test_set_metadata_prefix(mock_output_manager: OutputManager) -> None:
     assert mock_output_manager._OutputManager__metadata_prefix == "dummy_prefix"
 
 
+@pytest.mark.parametrize(
+        "log_type",
+        ["none", "errors", "warnings", "logs"]
+        )
+def test_set_log_type(mock_output_manager: OutputManager, log_type: str) -> None:
+    """Unit test for the function set_log_type in the file output_manager.py"""
+    mock_output_manager.set_log_type(log_type)
+    assert mock_output_manager._OutputManager__log_type == LogType(log_type)
+
+
 def test_dict_to_csv_column_list(mock_output_manager: OutputManager) -> None:
     """Unit test for the function _dict_to_csv_column_list in the file output_manager.py"""
     data = {
@@ -622,27 +632,40 @@ def test_get_timestamp(mocker: MockerFixture) -> None:
     )
 
 
+@pytest.mark.parametrize(
+        "log_type",
+        ["none", "errors", "warnings", "logs"]
+        )
 def test_add_error(
     mock_output_manager: OutputManager,
     output_manager_original_method_states: Dict[str, Callable],
+    log_type: str,
+    capsys,
 ) -> None:
     """Unit test for function add_error in file output_manager.py"""
     key = "dummy_key"
     name = "dummy_name"
-    value = "dummy_value"
+    message = "dummy_value"
     timestamp = "18-Jan-2023_Wed_22-38-14.123456"
     info_map = {}
+    metadata_prefix = "dummy_prefix"
     mock_output_manager._generate_key = MagicMock(return_value=key)
     mock_output_manager._add_to_pool = MagicMock()
     mock_output_manager._get_timestamp = MagicMock(return_value=timestamp)
+    mock_output_manager.set_log_type(log_type)
+    mock_output_manager.set_metadata_prefix(metadata_prefix)
 
-    mock_output_manager.add_error(name, value, info_map)
+    mock_output_manager.add_error(name, message, info_map)
 
     mock_output_manager._generate_key.assert_called_once_with(name, info_map)
 
     assert info_map.get("timestamp") == timestamp
+    if log_type in ["logs", "warnings", "errors"]:
+        captured = capsys.readouterr()
+        expected_message = f"{metadata_prefix}[ERROR]: {name}: <{message}>\n"
+        assert expected_message in captured.out
     mock_output_manager._add_to_pool(
-        mock_output_manager.errors_pool, key, value, info_map
+        mock_output_manager.errors_pool, key, message, info_map
     )
 
     mock_output_manager._generate_key = output_manager_original_method_states[
@@ -656,27 +679,42 @@ def test_add_error(
     ]
 
 
+@pytest.mark.parametrize(
+        "log_type",
+        ["none", "errors", "warnings", "logs"]
+        )
 def test_add_warning(
     mock_output_manager: OutputManager,
     output_manager_original_method_states: Dict[str, Callable],
+    log_type: str,
+    capsys
 ) -> None:
     """Unit test for function add_warning in file output_manager.py"""
     key = "dummy_key"
     name = "dummy_name"
-    value = "dummy_value"
+    message = "dummy_value"
     timestamp = "18-Jan-2023_Wed_22-38-14.123456"
     info_map = {}
+    metadata_prefix = "dummy_prefix"
     mock_output_manager._generate_key = MagicMock(return_value=key)
     mock_output_manager._add_to_pool = MagicMock()
     mock_output_manager._get_timestamp = MagicMock(return_value=timestamp)
+    mock_output_manager.set_log_type(log_type)
+    mock_output_manager.set_metadata_prefix(metadata_prefix)
 
-    mock_output_manager.add_warning(name, value, info_map)
+    mock_output_manager.add_warning(name, message, info_map)
 
     mock_output_manager._generate_key.assert_called_once_with(name, info_map)
 
     assert info_map.get("timestamp") == timestamp
+
+    if log_type in ["logs", "warnings"]:
+        captured = capsys.readouterr()
+        expected_message = f"{metadata_prefix}[WARNING]: {name}: <{message}>\n"
+        assert expected_message in captured.out
+
     mock_output_manager._add_to_pool(
-        mock_output_manager.warnings_pool, key, value, info_map
+        mock_output_manager.warnings_pool, key, message, info_map
     )
 
     mock_output_manager._generate_key = output_manager_original_method_states[
@@ -690,27 +728,42 @@ def test_add_warning(
     ]
 
 
+@pytest.mark.parametrize(
+        "log_type",
+        ["none", "errors", "warnings", "logs"]
+        )
 def test_add_log(
     mock_output_manager: OutputManager,
     output_manager_original_method_states: Dict[str, Callable],
+    log_type: str,
+    capsys,
 ) -> None:
     """Unit test for function add_log in file output_manager.py"""
     key = "dummy_key"
     name = "dummy_name"
-    value = "dummy_value"
+    message = "dummy_value"
     timestamp = "18-Jan-2023_Wed_22-38-14.123456"
     info_map = {}
+    metadata_prefix = "dummy_prefix"
     mock_output_manager._generate_key = MagicMock(return_value=key)
     mock_output_manager._add_to_pool = MagicMock()
     mock_output_manager._get_timestamp = MagicMock(return_value=timestamp)
+    mock_output_manager.set_log_type(log_type)
+    mock_output_manager.set_metadata_prefix(metadata_prefix)
 
-    mock_output_manager.add_log(name, value, info_map)
+    mock_output_manager.add_log(name, message, info_map)
 
     mock_output_manager._generate_key.assert_called_once_with(name, info_map)
 
     assert info_map.get("timestamp") == timestamp
+
+    if log_type == "logs":
+        captured = capsys.readouterr()
+        expected_message = f"{metadata_prefix}[LOG]: {name}: <{message}>\n"
+        assert expected_message in captured.out
+
     mock_output_manager._add_to_pool(
-        mock_output_manager.logs_pool, key, value, info_map
+        mock_output_manager.logs_pool, key, message, info_map
     )
 
     mock_output_manager._generate_key = output_manager_original_method_states[
@@ -837,6 +890,8 @@ def output_manager_original_method_states(
         "_generate_file_name": mock_output_manager._generate_file_name,
         "_generate_key": mock_output_manager._generate_key,
         "_get_timestamp": mock_output_manager._get_timestamp,
+        "set_metadata_prefix": mock_output_manager.set_metadata_prefix,
+        "set_log_type": mock_output_manager.set_log_type,
         "_list_to_file_txt": mock_output_manager._list_to_file_txt,
         "_list_txt_file_names_in_dir": mock_output_manager._list_txt_file_names_in_dir,
         "_load_txt_file_to_list": mock_output_manager._load_txt_file_to_list,

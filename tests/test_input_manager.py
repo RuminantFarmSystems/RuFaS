@@ -827,7 +827,7 @@ def test_validate_json_element_invalid_var_name_raises_input_data_keyerror(mock_
         mock_input_manager._validate_json_element(element_hierarchy, properties_blob_key, input_data,
                                                   eager_termination, mock_element_counter_and_validity)
 
-        assert add_error.call_count == 1
+        assert add_error.call_count == 2
 
     mock_input_manager._validate_json_element = input_manager_original_method_states["_validate_json_element"]
 
@@ -1199,27 +1199,27 @@ def mock_input_array_data_for_fix_data() -> dict[str, dict[str, Any]]:
              "default": [1, 2, 3, 4, 5],
              "minimum_length": 5,
              "maximum_length": 10,
-         }, ["element1"], [1, 2, 3, 4, 5], True, 1),
+         }, ["element1"], [1, 2, 3, 4, 5], True, 2),
 
         ({
              "type": "array",
              "default": [],
              "minimum_length": 0,
              "maximum_length": 5,
-         }, ["element2"], [], True, 1),
+         }, ["element2"], [], True, 2),
 
         ({
              "type": "array",
              "default": [1, 2, 3, 4, 5],
              "minimum_length": 5,
              "maximum_length": 10,
-         }, ["element3"], [1, 2, 3, 4, 5], True, 1),
+         }, ["element3"], [1, 2, 3, 4, 5], True, 2),
         ({
              "type": "array",
              "default": [1, 2, 3],
              "minimum_length": 2,
              "maximum_length": 5,
-         }, ["element4", "element5"], [1, 2, 3], True, 1),
+         }, ["element4", "element5"], [1, 2, 3], True, 2),
     ]
 )
 def test_fix_array_type_fixable_data(dummy_variable_properties: dict[str, Any],
@@ -1305,27 +1305,27 @@ def mock_input_string_data_for_fix_data() -> dict[str, dict[str, Any]]:
              "pattern": r"cow",
              "minimum_length": 1,
              "maximum_length": 5,
-         }, ["element1"], "cow", True, 1),
+         }, ["element1"], "cow", True, 2),
         ({
              "type": "str",
              "default": "",
              "minimum_length": 0,
              "maximum_length": 5,
-         }, ["element2"], "", True, 1),
+         }, ["element2"], "", True, 2),
         ({
              "type": "str",
              "default": "cow",
              "pattern": r"cow",
              "minimum_length": 2,
              "maximum_length": 5,
-         }, ["element3"], "cow", True, 1),
+         }, ["element3"], "cow", True, 2),
         ({
              "type": "str",
              "default": "cow",
              "pattern": r"cow",
              "minimum_length": 2,
              "maximum_length": 5,
-         }, ["element4", "element5"], "cow", True, 1),
+         }, ["element4", "element5"], "cow", True, 2),
     ]
 )
 def test_fix_string_type_fixable_data(dummy_variable_properties: dict[str, Any],
@@ -1360,7 +1360,7 @@ def test_fix_string_type_csv_data(mock_input_manager: InputManager) -> None:
 
     assert fixed_variable == 3
     assert result is True
-    assert add_warning.call_count == 1
+    assert add_warning.call_count == 2
 
 
 @pytest.mark.parametrize(
@@ -1432,25 +1432,25 @@ def mock_input_number_data_for_fix_data() -> dict[str, dict[str, Any]]:
              "default": 5,
              "minimum": 0,
              "maximum": 10,
-         }, ["element1"], 5, True, 1),
+         }, ["element1"], 5, True, 2),
         ({
              "type": "number",
              "default": 0,
              "minimum": 0,
              "maximum": 10,
-         }, ["element2"], 0, True, 1),
+         }, ["element2"], 0, True, 2),
         ({
              "type": "number",
              "default": 5,
              "minimum": 1,
              "maximum": 10,
-         }, ["element3"], 5, True, 1),
+         }, ["element3"], 5, True, 2),
         ({
              "type": "number",
              "default": 5,
              "minimum": 0,
              "maximum": 10,
-         }, ["element4", "element5"], 5, True, 1),
+         }, ["element4", "element5"], 5, True, 2),
     ]
 )
 def test_fix_number_type_fixable_data(dummy_variable_properties: dict[str, Any],
