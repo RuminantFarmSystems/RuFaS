@@ -58,6 +58,9 @@ class SimulationEngine:
         self.state.field_manager.daily_update_routine(self.weather, self.time)
         routines.daily_feed_routine(self.state.feed, self.state.field_manager, self.state.animal_manager)
 
+        self.time.record_time()
+        self.weather.record_weather(self.time)
+
         self._advance_time()
 
     def _advance_time(self, print_day: Optional[bool] = False) -> None:
