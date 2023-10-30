@@ -7,6 +7,7 @@ Author(s): Pooya Hekmati, sh2235@cornell.edu
 
 from copy import deepcopy
 import os
+from pathlib import Path
 import re
 import json
 from typing import Any, Callable, Dict, List, Tuple
@@ -683,6 +684,7 @@ def output_manager_original_method_states(
         "_load_filter_file_to_list": mock_output_manager._load_filter_file_to_list,
         "_save_variables_to_csv_files ": mock_output_manager._save_variables_to_csv_files,
         "save_variables": mock_output_manager.save_variables,
+        "_save_variables_to_csv_files": mock_output_manager._save_variables_to_csv_files,
         "add_variable": mock_output_manager.add_variable,
         "add_error": mock_output_manager.add_error,
         "add_log": mock_output_manager.add_log,
@@ -1743,9 +1745,38 @@ def test_save_variables(
     mock_output_manager._save_variables_to_csv_files.assert_not_called()
     mock_output_manager._dict_to_file_json.assert_not_called()
 
+    # test case for when the filter files to don start with graph_
+    # mock_output_manager._list_txt_and_json_files_in_dir = MagicMock(
+    #     return_value=["graph_input_filepath.json"]
+    # )
+    # with patch(
+    #     "RUFAS.graph_generator.GraphGenerator.generate_graph"
+    # ) as mock_generate_graph:
+    #     mock_output_manager.save_variables(
+    #         "dummy_path",
+    #         "dummy_dir_path/",
+    #         produce_graphics=True,
+    #         graphics_dir=Path("graphics"),
+    #     )
+    #     mock_generate_graph.assert_called_once_with("a")
     # Restore original method
     mock_output_manager.save_variables = output_manager_original_method_states[
         "save_variables"
+    ]
+    mock_output_manager._save_variables_to_csv_files = (
+        output_manager_original_method_states["_save_variables_to_csv_files"]
+    )
+    mock_output_manager._generate_file_name = output_manager_original_method_states[
+        "_generate_file_name"
+    ]
+    mock_output_manager._dict_to_file_json = output_manager_original_method_states[
+        "_dict_to_file_json"
+    ]
+    mock_output_manager._load_txt_file_to_list = output_manager_original_method_states[
+        "_load_txt_file_to_list"
+    ]
+    mock_output_manager._exclude_info_maps = output_manager_original_method_states[
+        "_exclude_info_maps"
     ]
 
 
