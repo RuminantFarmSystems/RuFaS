@@ -1218,7 +1218,8 @@ class AnimalManager:
         }
 
 # TODO check the new type hints here are correct
-    def get_life_cycle_output(self, num_animals: int) -> Tuple(List[AnimalBase, str, bool], Dict[Dict, str]):
+    def get_life_cycle_output(self, num_animals: int) -> Tuple[List[Tuple[AnimalBase, str, bool]],
+                                                               Dict[str, Dict | int]]:
         """
         Returns the life cycle output on an individual level, which is the
         information of some of each type of animal as well as some animal
@@ -1506,7 +1507,7 @@ class AnimalManager:
         animal_types_in_pen = cls._get_animal_types_in_pen(pen)
         return {animal_type.value for animal_type in animal_types_in_pen}
 
-    def _get_animals_snapshot(self) -> Dict[set]:
+    def _get_animals_snapshot(self) -> Dict[str, set]:
         """
         Create a snapshot of the current state of all the animals in the system.
 
