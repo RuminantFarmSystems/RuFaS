@@ -10,6 +10,8 @@ import argparse
 from pathlib import Path
 import sys
 from typing import List
+
+import pandas as pd
 from RUFAS.scenario_manager import METADATA_PATHS, MetadataPaths
 
 import config.global_variables
@@ -136,6 +138,14 @@ def execute_simulations(
         output_manager.dump_all_nondata_pools(r"output", exclude_info_maps, format_option)
 
 
+def reload_pool(file_path: str = ""):
+    """Loads the pool from OM variables output csv"""
+    if not file_path:
+        file_path = "output/CSVs/om/default_scenario_saved_variables_csv_all_variables.txt_31-Oct-2023_Tue_15-00-07.csv"
+    variables_pool = pd.read_csv(file_path)
+    variables_pool = variables_pool.convert_dtypes()
+
+
 def parse_gnu_args():
     """Parse command line options, if applicable"""
     parser = argparse.ArgumentParser()
@@ -179,4 +189,4 @@ def parse_gnu_args():
 
 
 if __name__ == "__main__":
-    main()
+    reload_pool()
