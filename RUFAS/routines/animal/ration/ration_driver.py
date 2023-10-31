@@ -328,8 +328,8 @@ class RationReporter:
     Reports information about a formulated ration.
     """
 
-    @staticmethod
-    def report_ration(ration: Dict, available_feeds: Dict) -> Tuple[Dict, Dict]:  # noqa
+    @classmethod
+    def report_ration(cls, ration: Dict, available_feeds: Dict) -> Tuple[Dict, Dict]:  # noqa
         """
         Calculates information in the ration about nutrient information including
         nutrient amounts and concentrations. Returns a dictionary of nutrient amounts
@@ -342,6 +342,7 @@ class RationReporter:
             Dictionary of formulated ration, with keys as feed IDs, values as kg fed.
         available_feeds : Dict
             available feeds dictionary from the Feed class object.
+
 
         Returns
         -------
@@ -412,8 +413,9 @@ class RationReporter:
                     nutrient_conc[nutr] = (nutrient_amount[nutr] / dm_amount) * 100
         return nutrient_amount, nutrient_conc
 
-    @staticmethod
-    def report_ration_supply(ration: Dict, available_feeds: Dict, ration_report: Dict, body_weight: float) -> Dict:
+    @classmethod
+    def report_ration_supply(cls, ration: Dict, available_feeds: Dict, ration_report: Dict, body_weight: float) -> Dict:
+
         """
         Nutrient and energy supply of a formulated ration
         Different from the report_ration method, since this takes into account digestibility and other factors
@@ -428,6 +430,7 @@ class RationReporter:
             Dictionary of nutrient amount and concentrations.
         body_weight : float
             Animal body weight in kg.
+
 
         Returns
         -------
@@ -470,6 +473,7 @@ class RationReporter:
         Crucial step to take into account Total digestible nutrient (TDN)
          digesitbility (% of DM).
         Initial step in net energy (NE) and metabolizable energy (ME) calculations.
+
 
         Parameters
         ----------

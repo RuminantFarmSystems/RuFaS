@@ -54,7 +54,7 @@ def annual_feed_routine(feed):
 
 
 class Feed:
-    def __init__(self, data: PurchasedFeedTypedDict, nutrient_standard: str):
+    def __init__(self, data: PurchasedFeedTypedDict):
         """
         Description:
             Stores the information for the feeds managed by the farm, and the methods
@@ -63,7 +63,7 @@ class Feed:
         Args:
             data: the feed information from the input JSON file
         """
-        self.nutrient_standard = nutrient_standard
+        self.nutrient_standard = im.get_data("config.nutrient_standard")
         self.nutrient_table = 'NASEM_Comp' if self.nutrient_standard == 'NASEM' else 'NRC_Comp'
 
         self.feeds_split_by_maturity = self._retrieve_data(data_source='feed_quality', var_names=['rufas_id'],
