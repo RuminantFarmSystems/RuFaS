@@ -559,7 +559,7 @@ class RationReporter:
         if feed_item_info["feed_type"] == "Mineral":
             ME_item = 0.0
         elif feed_item_info["is_fat"] == 1:
-            ME_item = feed_item_info["DE"]
+            ME_item = feed_item_info["DE"] if 'DE' in feed_item_info.keys() else feed_item_info["DE_Base"]
         elif feed_item_info["EE"] >= 3:
             ME_item = 1.01 * DE_act - 0.45 + 0.0046 * (feed_item_info["EE"] - 3)
         else:
