@@ -473,22 +473,23 @@ def test_reset_crop_field_coverage_fractions(crop_list: List[Crop], expected_fie
     (7.293485893, 8.234850920),
 ])
 def test_start_dormancy(daylength: float, threshold_daylength: float) -> None:
-    """Tests that each crop's dormancy method is called"""
-    # Initialize objects
+    """Tests that each crop's dormancy method is called."""
     crop = Crop()
     field = Field(manure_manager=MagicMock(ManureManager))
     field.field_data.dormancy_threshold_daylength = threshold_daylength
     field.crops = [crop]
 
-    # Mock functions used
-    crop.dormancy.enter_dormancy = MagicMock()
+    with patch("RUFAS.routines.field.crop.dormancy.Dormancy.enter_dormancy", new_callable=MagicMock) as dormancy, \
+            patch("RUFAS.routines.field.crop.biomass_allocation.BiomassAllocation.partition_biomass",
+                  new_callable=MagicMock) as biomass:
+        field._assess_dormancy(daylength)
 
-    # Run method being tested
-    field._assess_dormancy(daylength)
-
-    # Check that subroutines were called correct number of times
     if daylength <= threshold_daylength:
-        assert crop.dormancy.enter_dormancy.call_count == 1
+        assert dormancy.call_count == 1
+        assert biomass.call_count == 1
+    else:
+        dormancy.assert_not_called()
+        biomass.assert_not_called()
 
 
 @pytest.mark.parametrize("species,specs", [

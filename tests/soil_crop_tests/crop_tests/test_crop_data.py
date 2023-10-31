@@ -115,4 +115,3 @@ def test_manual_custom_crop_data():
     assert aspen.plant_category == PlantCategory("tree")
     assert aspen.is_nitrogen_fixer is False
     assert aspen.max_leaf_area_index == 5.0
-
