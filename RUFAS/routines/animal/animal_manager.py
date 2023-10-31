@@ -23,6 +23,7 @@ from typing import Any, Dict, Tuple, List, Set
 from RUFAS.general_constants import GeneralConstants
 from RUFAS.output_manager import OutputManager
 from RUFAS.routines.animal.animal_grouping_scenarios import AnimalGroupingScenario
+from RUFAS.routines.animal.animal_typed_dicts import InitializationDBSummaryTypedDict
 from RUFAS.routines.animal.animal_types import AnimalType
 from RUFAS.routines.animal.animal_module_constants import AnimalModuleConstants
 from RUFAS.routines.animal.life_cycle.animal_base import AnimalBase
@@ -453,8 +454,11 @@ class AnimalManager:
         Deletes the IDs of animals from animal_to_pen_id_map dictionary when the animal
         was removed from the herd; updates the relevant pen's stocking density.
 
-        Args:
-            animals_removed: list of animal objects that are to be removed from the herd
+        Parameters
+        ----------
+        animals_removed : List[AnimalBase]
+            list of animal objects that are to be removed from the herd
+
         """
 
         for animal in animals_removed:
@@ -1024,12 +1028,12 @@ class AnimalManager:
 
         self.fully_update_animal_to_pen_id_map()
 
-    def _sort_animals_before_allocation(self):
+    def _sort_animals_before_allocation(self) -> None:
         # Sort lactating cows by days in milk in increasing order
         self.cows = self._get_dry_cows(self.cows) + \
                     sorted(self._get_lactating_cows(self.cows), key=lambda cow: cow.days_in_milk)
 
-    def clear_pens(self):
+    def clear_pens(self) -> None:
         """
         Removes animals from pens for re-allocation. This is part of the
         routines that happen every ration interval.
@@ -1038,15 +1042,19 @@ class AnimalManager:
         for pen in self.all_pens:
             pen.clear()
 
-    def calc_manure_excretion(self, feed, methane_model):
+    def calc_manure_excretion(self, feed, methane_model: str) -> None:
         """
         Calls each animal's method to calculate manure excretion to find the
         total for each pen. This is part of the routines that happen every
         ration interval.
 
-        Args:
-            feed: instance of the feed class
-            methane_model: methane model used for methane emission calculations
+        Parameters
+        ----------
+        feed : Feed
+            instance of the feed class
+        methane_model : str
+            Methane model used for methane emission calculations
+
         """
         for pen in self.all_pens:
             if pen.populated:
@@ -1054,7 +1062,7 @@ class AnimalManager:
             else:
                 pen.reset_manure()
 
-    def calc_avg_growth(self):
+    def calc_avg_growth(self) -> None:
         """
         Calls each pen's method to calculate the average growth of animals in
         the pen. This is part of the routines that happen every
@@ -1079,21 +1087,23 @@ class AnimalManager:
         """
         return sum(cow.estimated_daily_milk_produced for cow in cows)
 
-    def gather_cow_class_history(self, cow_class):
+    def gather_cow_class_history(self, cow_class) -> None:
         """
         Gathers all the pen history data for a given cow class type. Checks the current pen
         and pen composition of all animals of a given cow class, before then updating the
         pen history for that class using the update_pen_history() method
 
-        Args:
-            cow_class: list of instances of whatever cow type's pen history is being gathered
+        Parameters
+        ----------
+        cow_class : List
+            list of instances of whatever cow type's pen history is being gathered
         """
         for cow in cow_class:
             current_pen_id = self.animal_to_pen_id_map[cow.id]
             classes_in_pen = self.all_pens[current_pen_id].classes_in_pen
             cow.update_pen_history(current_pen_id, self.simulation_day, classes_in_pen)
 
-    def record_pen_history(self):
+    def record_pen_history(self) -> None:
         """
         Records the pen history of all of the animals.
         """
@@ -1103,57 +1113,64 @@ class AnimalManager:
         self.gather_cow_class_history(self.heiferIIIs)
         self.gather_cow_class_history(self.cows)
 
-    def calc_p_rqmts(self):
+    def calc_p_rqmts(self) -> None:
         """
         Calls each pen's method to calculate each animal's phosphorus
         requirements. This method is called daily.
 
-        Args:
         """
-
         for pen in self.all_pens:
             if pen.populated:
                 pen.call_p_rqmts()
 
-    def daily_p_update(self):
+    def daily_p_update(self) -> None:
         """
         Calls each pen's method to calculate each animal's daily phosphorus
         update. This method is called daily.
         """
-
         for pen in self.all_pens:
             if pen.populated:
                 pen.daily_p_update()
 
-    def end_ration_interval(self):
+    def end_ration_interval(self) -> int:
         """
-        Returns: True if today is the day a new ration has to be formulated,
-                false otherwise.
+        Checks if a new ration should be formulated for the current simulation_day.
+
+        Returns: 1 (True) if today is the day a new ration has to be formulated,
+                0 (False) otherwise.
         """
         return self.simulation_day % self.formulation_interval == 1 or self.formulation_interval == 1 or \
             self.simulation_day == 0
 
-    def annual_reset(self):
+# TODO revisit this method
+    def annual_reset(self) -> None:
         pass
 
-    def generate_animal_output(self, animal_type, index):
+    def generate_animal_output(self, animal_type: str, index: int):
         """
         Returns the information (ID, breed, birthday, breeding method,
         semen used, pen history, bodyweight history, milk production history,
         event history) of the animal at the index of the respective
         animal_type list.
 
-        Args:
-            animal_type: a string. One of 'calf', 'heiferI', 'heiferII',
-                'heiferIII', 'cow', 'sold_heifer', or 'culled cow'
-            index: the index of the animal in the respective animal_type list
-                whose information will be returned
+        Parameters
+        ----------
+        animal_type : str
+            One of 'calf', 'heiferI', 'heiferII',
+            'heiferIII', 'cow', 'sold_heifer', or 'culled cow'
+        index : int
+            the index of the animal in the respective animal_type list
+            whose information will be returned
 
-        Returns: a dictionary with an animal of animal_type's information. Not
+        Returns
+        -------
+        Dict with an animal of animal_type's information. Not
             all information is available for each animal_type.
+
         """
         is_cow = False
         is_heifer_repr = False  # True if animal is heiferII or heiferIII
+        # TODO reevaluate the above, as Life Cycle refactor may have better method for assignment
 
         if animal_type == 'calf':
             animal = self.calves[index]
@@ -1200,18 +1217,20 @@ class AnimalManager:
             'CI_avg': CI_avg
         }
 
-    def get_life_cycle_output(self, num_animals):
+# TODO check the new type hints here are correct
+    def get_life_cycle_output(self, num_animals: int) -> Tuple(List[AnimalBase, str, bool], Dict[Dict, str]):
         """
         Returns the life cycle output on an individual level, which is the
         information of some of each type of animal as well as some animal
         statistics.
 
-        Args:
-            num_animals: the number of each type of animal (calves, heiferIs,
-            heiferIIs, heiferIIIs, cows, sold_heifers, and culled_cows) for
-            which information will be collected and returned. If num_animals is
-            larger than the minimum length of the animal lists, then num_animals
-            will be set to the minimum length of the animal lists
+        Parameters
+        ----------
+        num_animals: the number of each type of animal (calves, heiferIs,
+        heiferIIs, heiferIIIs, cows, sold_heifers, and culled_cows) for
+        which information will be collected and returned. If num_animals is
+        larger than the minimum length of the animal lists, then num_animals
+        will be set to the minimum length of the animal lists
 
         Returns: a dictionary which contains the individual life cycle output
         """
@@ -1298,10 +1317,14 @@ class AnimalManager:
 
         return animals, output
 
-    def get_initialize_db_summary(self):
+    def get_initialize_db_summary(self) -> InitializationDBSummaryTypedDict:
         """
-        Returns: a dictionary which is the summary of the animal initialization
-        database
+
+        Returns
+        -------
+        InitializationDBSummaryTypedDict
+            a dictionary which is the summary of the animal initialization database
+
         """
         return self.life_cycle_manager.initialize_db_summary
 
@@ -1361,7 +1384,7 @@ class AnimalManager:
         Parameters
         ----------
         feed
-            instance of the Feed class
+            Instance of the Feed class
 
         """
         available_feeds = ration_driver.AvailableFeeds()
@@ -1483,7 +1506,7 @@ class AnimalManager:
         animal_types_in_pen = cls._get_animal_types_in_pen(pen)
         return {animal_type.value for animal_type in animal_types_in_pen}
 
-    def _get_animals_snapshot(self):
+    def _get_animals_snapshot(self) -> Dict[set]:
         """
         Create a snapshot of the current state of all the animals in the system.
 
@@ -1520,8 +1543,8 @@ class AnimalManager:
                 self.ANIMAL_GROUPING_SCENARIO.find_animal_combination(animal)
         return snapshot
 
-    def _handle_removed_animals_after_update(self, animals_snapshot_before_update,
-                                             animals_snapshot_after_update):
+    def _handle_removed_animals_after_update(self, animals_snapshot_before_update: Dict,
+                                             animals_snapshot_after_update: Dict) -> None:
         """
         Identifies and handles animals that were present prior to the update, but not afterwards.
 
@@ -1558,9 +1581,9 @@ class AnimalManager:
         for animal in removed_animals:
             self._remove_animal_from_pen_and_id_map(animal)
 
-    def _handle_animals_with_unchanged_class_and_changed_combination(self, animals_snapshot_before_update,
-                                                                     animals_snapshot_after_update,
-                                                                     feed, temp):
+    def _handle_animals_with_unchanged_class_and_changed_combination(self, animals_snapshot_before_update: Dict,
+                                                                     animals_snapshot_after_update: Dict,
+                                                                     feed, temp: float):
         """
         Handle animals that didn't change their classes but changed their animal combination.
 
@@ -1580,8 +1603,10 @@ class AnimalManager:
         animals_snapshot_after_update : dict
             Snapshot of the animals after the update. This should be a dictionary with the same
             structure as animals_snapshot_before_update.
-        feed
-        temp
+        feed : Feed
+            Instance of the Feed class.
+        temp : float
+            Current temperature.
 
         Returns
         -------
@@ -1607,7 +1632,10 @@ class AnimalManager:
 
     def _handle_graduated_animals(self, animals_snapshot_before_update,
                                   animals_snapshot_after_update,
-                                  feed, temp):
+                                  feed, temp) -> None:
+        """
+        # TODO
+        """
         graduated_animals = set()
         for animal_class_name in ['heiferIs', 'heiferIIs', 'heiferIIIs', 'cows']:
             graduated_animals.update(animals_snapshot_after_update[animal_class_name]
@@ -1615,17 +1643,26 @@ class AnimalManager:
         for animal in graduated_animals:
             self._add_animal_to_pen_and_id_map(animal, feed, temp)
 
-    def _handle_newly_added_animals(self, new_animals, feed, temp):
+    def _handle_newly_added_animals(self, new_animals, feed, temp) -> None:
+        """
+        # TODO
+        """
         for animal in new_animals:
             self._add_animal_to_pen_and_id_map(animal, feed, temp)
             self.animals_by_type[type(animal)].append(animal)
 
-    def _remove_animal_from_pen_and_id_map(self, animal):
+    def _remove_animal_from_pen_and_id_map(self, animal) -> None:
+        """
+        # TODO
+        """
         pen_id = self.animal_to_pen_id_map[animal.id]
         self.all_pens[pen_id].remove_animal(animal.id)
         del self.animal_to_pen_id_map[animal.id]
 
-    def _add_animal_to_pen_and_id_map(self, animal, feed, temp):
+    def _add_animal_to_pen_and_id_map(self, animal, feed, temp) -> None:
+        """
+        # TODO
+        """
         animal_combination = self.ANIMAL_GROUPING_SCENARIO.find_animal_combination(animal)
         pen_with_min_stocking_density = min(self.pens_by_animal_combination[animal_combination],
                                             key=lambda p: p.current_stocking_density)
@@ -1634,7 +1671,7 @@ class AnimalManager:
                                                  self.phosphorus_concentration_by_animal_class[type(animal)])
         self.animal_to_pen_id_map[animal.id] = pen_with_min_stocking_density.id
 
-    def daily_updates(self, feed, weather, time):
+    def daily_updates(self, feed, weather, time) -> None:
         """
         Execute the daily routines relating to Animals. All animals are
         updated through the life_cycle_manager's daily_update() method. The
@@ -1647,11 +1684,11 @@ class AnimalManager:
 
         Parameters
         ----------
-        feed
+        feed : Feed
             instance of the Feed class defined in feed.py
-        weather
+        weather : Weather
             instance of the Weather class
-        time
+        time : Time
             instance of the Time class
 
         """
