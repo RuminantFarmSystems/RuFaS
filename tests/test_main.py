@@ -17,7 +17,7 @@ from main import set_global_variables
 from main import METADATA_PATHS
 from RUFAS.simulation_engine import SimulationEngine
 from RUFAS.input_manager import InputManager
-from RUFAS.output_manager import OutputManager
+from RUFAS.output_manager import OutputManager, LogType
 
 dir_path = os.path.join(global_variables.ROOT_DIR, "input")
 file_path = os.path.join(dir_path, "input/ARL.json")
@@ -26,19 +26,19 @@ file_path = os.path.join(dir_path, "input/ARL.json")
 def test_main(mocker: MockerFixture):
     """Unit test for main() function in main.py"""
     mock_cmd_arguments = MagicMock()
+    setattr(mock_cmd_arguments, "verbose", LogType.NONE)
     patch_run_rufas = mocker.patch(
         "main.run_rufas"
     )
     patch_parse_gnu_args = mocker.patch(
         "main.parse_gnu_args", return_value=mock_cmd_arguments
     )
-
     main()
 
     patch_run_rufas.assert_called_once_with(
         format_option=mock_cmd_arguments.format_option,
         make_graphs=not mock_cmd_arguments.no_graphics,
-        verbose_log_type=mock_cmd_arguments.verbose_log_type,
+        verbose=LogType.NONE,
         clear_output=mock_cmd_arguments.clear_output,
         exclude_info_maps=mock_cmd_arguments.exclude_info_maps,
         only_run_validation=mock_cmd_arguments.only_run_validation,
@@ -47,30 +47,30 @@ def test_main(mocker: MockerFixture):
 
 
 @pytest.mark.parametrize(
-    "format_option, make_graphs, verbose_log_type, clear_output, exclude_info_maps, only_run_validation",
+    "format_option, make_graphs, verbose, clear_output, exclude_info_maps, only_run_validation",
     [
-        ("verbose", True, "none", True, True, True),
-        ("block", False, "logs", True, True, True),
-        ("inline", True, "errors", True, True, True),
-        ("basic", True, "warnings", False, True, True),
-        ("verbose", True, "none", True, False, True),
-        ("block", True, "logs", True, True, False),
-        ("inline", False, "errors", True, True, True),
-        ("basic", False, "warnings", False, True, True),
-        ("verbose", False, "none", True, False, True),
-        ("block", False, "logs", True, True, False),
-        ("inline", False, "errors", False, True, True),
-        ("basic", False, "warnings", True, False, True),
-        ("verbose", False, "none", True, True, False),
-        ("block", False, "warnings", False, False, True),
-        ("inline", False, "logs", False, True, False),
-        ("basic", False, "errors", False, False, False)
+        ("verbose", True, LogType.NONE, True, True, True),
+        ("block", False, LogType.LOGS, True, True, True),
+        ("inline", True, LogType.ERRORS, True, True, True),
+        ("basic", True, LogType.WARNINGS, False, True, True),
+        ("verbose", True, LogType.NONE, True, False, True),
+        ("block", True, LogType.LOGS, True, True, False),
+        ("inline", False, LogType.ERRORS, True, True, True),
+        ("basic", False, LogType.WARNINGS, False, True, True),
+        ("verbose", False, LogType.NONE, True, False, True),
+        ("block", False, LogType.LOGS, True, True, False),
+        ("inline", False, LogType.ERRORS, False, True, True),
+        ("basic", False, LogType.WARNINGS, True, False, True),
+        ("verbose", False, LogType.NONE, True, True, False),
+        ("block", False, LogType.WARNINGS, False, False, True),
+        ("inline", False, LogType.LOGS, False, True, False),
+        ("basic", False, LogType.ERRORS, False, False, False)
     ],
 )
 def test_run_rufas(
     format_option: str,
     make_graphs: bool,
-    verbose_log_type: str,
+    verbose: LogType,
     clear_output: bool,
     exclude_info_maps: bool,
     only_run_validation: bool,
@@ -86,24 +86,24 @@ def test_run_rufas(
     patch_empty_dir = mocker.patch("RUFAS.util.Utility.empty_dir")
 
     # Act
-    run_rufas(format_option, make_graphs, verbose_log_type, clear_output, exclude_info_maps, only_run_validation)
+    run_rufas(format_option, make_graphs, verbose, clear_output, exclude_info_maps, only_run_validation)
 
     # Assert
     patch_set_global_variables.assert_called_once_with(make_graphs)
 
     if only_run_validation:
         patch_run_validation.assert_called_once_with(metadata_file_list, exclude_info_maps,
-                                                     format_option, verbose_log_type)
+                                                     format_option, verbose)
     else:
         patch_execute_simulations.assert_called_once_with(metadata_file_list, exclude_info_maps,
-                                                          format_option, verbose_log_type)
+                                                          format_option, verbose)
 
     if clear_output:
         patch_empty_dir.assert_called_once()
     else:
         patch_empty_dir.assert_not_called()
 
-    if verbose_log_type != "none":
+    if verbose != LogType.NONE:
         captured = capsys.readouterr()
         expected_message = "RuFaS: Ruminant Farm Systems Model 2023\n"
         assert expected_message in captured.out
@@ -235,7 +235,7 @@ def test_parse_gnu_args(mocker: MockerFixture) -> None:
         ),
         mocker.call(
             "-v",
-            "--verbose-log-type",
+            "--verbose",
             choices=["errors", "warnings", "logs", "none"],
             default="none",
             help="Specify the log type to be printed",
