@@ -446,7 +446,7 @@ class InputManager:
                                                  input_data)
 
     @staticmethod
-    def _get_nested_dict_value(data, keys: list[str, int]):
+    def _get_nested_dict_value(data, keys: list[str | int]):
         for key in keys:
             if type(data) in (list, dict):
                 data = data[key]
