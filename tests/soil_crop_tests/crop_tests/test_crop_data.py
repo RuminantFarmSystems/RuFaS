@@ -12,8 +12,7 @@ from RUFAS.routines.field.crop.crop_data import CropData, PlantCategory
 def test_is_mature_property(frac, expect):
     """check that the is_mature property is properly assigning maturity by heat fraction"""
     data = CropData()
-    with patch("RUFAS.routines.field.crop.crop_data.CropData.heat_fraction", new_callable=PropertyMock,
-               return_value=frac):
+    with patch.object(CropData, "heat_fraction", new_callable=PropertyMock, return_value=frac):
         assert data.is_mature == expect
 
 
