@@ -15,7 +15,7 @@ from RUFAS.scenario_manager import METADATA_PATHS, MetadataPaths
 import config.global_variables
 from RUFAS.simulation_engine import SimulationEngine
 from RUFAS.input_manager import InputManager
-from RUFAS.output_manager import OutputManager
+from RUFAS.output_manager import OutputManager, LogType
 from RUFAS.util import Utility
 
 
@@ -24,7 +24,7 @@ def main():
     run_rufas(
         format_option=cmd_arguments.format_option,
         make_graphs=not cmd_arguments.no_graphics,
-        verbose_log_type=cmd_arguments.verbose_log_type,
+        verbose=LogType(cmd_arguments.verbose),
         clear_output=cmd_arguments.clear_output,
         exclude_info_maps=cmd_arguments.exclude_info_maps,
         only_run_validation=cmd_arguments.only_run_validation,
@@ -34,7 +34,7 @@ def main():
 def run_rufas(
     format_option: str = "verbose",
     make_graphs: bool = True,
-    verbose_log_type: str = "none",
+    verbose: LogType = LogType.NONE,
     clear_output: bool = False,
     exclude_info_maps: bool = False,
     only_run_validation: bool = False,
@@ -55,13 +55,13 @@ def run_rufas(
         Utility.empty_dir(output_dir, keep=keep_list)
 
     set_global_variables(make_graphs)
-    if verbose_log_type != "none":
+    if verbose != LogType.NONE:
         sys.stdout.write("RuFaS: Ruminant Farm Systems Model 2023\n")
     metadata_file_list: List[MetadataPaths] = METADATA_PATHS
     if only_run_validation:
-        run_validation(metadata_file_list, exclude_info_maps, format_option, verbose_log_type)
+        run_validation(metadata_file_list, exclude_info_maps, format_option, verbose)
     else:
-        execute_simulations(metadata_file_list, exclude_info_maps, format_option, verbose_log_type)
+        execute_simulations(metadata_file_list, exclude_info_maps, format_option, verbose)
 
 
 def set_global_variables(make_graphs: bool) -> None:
@@ -70,7 +70,7 @@ def set_global_variables(make_graphs: bool) -> None:
 
 
 def run_validation(metadata_files: List[Path], exclude_info_maps: bool = False,
-                   format_option: str = "verbose", verbose_log_type: str = "none") -> None:
+                   format_option: str = "verbose", verbose: LogType = LogType.NONE) -> None:
     """Instantiates I/O Managers and triggers validation of input data.
 
     Parameters
@@ -87,12 +87,12 @@ def run_validation(metadata_files: List[Path], exclude_info_maps: bool = False,
                 }
     output_manager = OutputManager()
     input_manager = InputManager()
-    sys.stdout.write("***Only validating data, no simulation will follow.***\n\n")
+    output_manager.add_log("Validation only", "***Only validating data, no simulation will follow.***", info_map)
     for metadata_file in metadata_files:
         input_manager.flush_pool()
         output_manager.flush_pools()
         output_manager.add_log("Validation start.", f"Validating data for {str(metadata_file['path'])}...\n", info_map)
-        output_manager.set_log_type(verbose_log_type)
+        output_manager.set_log_type(verbose)
         is_data_valid = input_manager.start_data_processing(str(metadata_file["path"]), False)
         if is_data_valid:
             output_manager.add_log("Validation", "Data is valid.\n\n", info_map)
@@ -103,7 +103,7 @@ def run_validation(metadata_files: List[Path], exclude_info_maps: bool = False,
 
 def execute_simulations(
     metadata_files: List[Path], exclude_info_maps: bool = False, format_option: str = "verbose",
-    verbose_log_type: str = "none"
+    verbose: LogType = LogType.NONE
 ) -> None:
     """Instantiates I/O Managers and processes the metadata files provided by the user to run the simulation.
 
@@ -128,7 +128,7 @@ def execute_simulations(
         output_manager.flush_pools()
         output_manager.add_log("Validation start.", f"Validating data for {str(metadata_file['path'])}...\n", info_map)
         output_manager.set_metadata_prefix(metadata_file['prefix'])
-        output_manager.set_log_type(verbose_log_type)
+        output_manager.set_log_type(verbose)
         is_data_valid = input_manager.start_data_processing(str(metadata_file["path"]), True)
         if is_data_valid:
             output_manager.add_log("Validation complete", "Data is valid. \nSimulating...\n", info_map)
@@ -158,7 +158,7 @@ def parse_gnu_args():
     )
     parser.add_argument(
         "-v",
-        "--verbose-log-type",
+        "--verbose",
         choices=["errors", "warnings", "logs", "none"],
         default="none",
         help="Specify the log type to be printed",

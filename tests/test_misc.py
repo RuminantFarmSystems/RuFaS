@@ -174,12 +174,12 @@ def test_set_metadata_prefix(mock_output_manager: OutputManager) -> None:
 
 @pytest.mark.parametrize(
         "log_type",
-        ["none", "errors", "warnings", "logs"]
+        [LogType.NONE, LogType.ERRORS, LogType.WARNINGS, LogType.LOGS]
         )
-def test_set_log_type(mock_output_manager: OutputManager, log_type: str) -> None:
+def test_set_log_type(mock_output_manager: OutputManager, log_type: LogType) -> None:
     """Unit test for the function set_log_type in the file output_manager.py"""
     mock_output_manager.set_log_type(log_type)
-    assert mock_output_manager._OutputManager__log_type == LogType(log_type)
+    assert mock_output_manager._OutputManager__log_type == log_type
 
 
 def test_dict_to_csv_column_list(mock_output_manager: OutputManager) -> None:
@@ -478,12 +478,12 @@ def test_get_timestamp(mocker: MockerFixture) -> None:
 
 @pytest.mark.parametrize(
         "log_type",
-        ["none", "errors", "warnings", "logs"]
+        [LogType.NONE, LogType.ERRORS, LogType.WARNINGS, LogType.LOGS]
         )
 def test_add_error(
     mock_output_manager: OutputManager,
     output_manager_original_method_states: Dict[str, Callable],
-    log_type: str,
+    log_type: LogType,
     capsys,
 ) -> None:
     """Unit test for function add_error in file output_manager.py"""
@@ -504,7 +504,7 @@ def test_add_error(
     mock_output_manager._generate_key.assert_called_once_with(name, info_map)
 
     assert info_map.get("timestamp") == timestamp
-    if log_type in ["logs", "warnings", "errors"]:
+    if log_type in [LogType.ERRORS, LogType.WARNINGS, LogType.LOGS]:
         captured = capsys.readouterr()
         expected_message = f"{metadata_prefix}[ERROR]: {name}: {message}\n"
         assert expected_message in captured.out
@@ -525,12 +525,12 @@ def test_add_error(
 
 @pytest.mark.parametrize(
         "log_type",
-        ["none", "errors", "warnings", "logs"]
+        [LogType.NONE, LogType.ERRORS, LogType.WARNINGS, LogType.LOGS]
         )
 def test_add_warning(
     mock_output_manager: OutputManager,
     output_manager_original_method_states: Dict[str, Callable],
-    log_type: str,
+    log_type: LogType,
     capsys
 ) -> None:
     """Unit test for function add_warning in file output_manager.py"""
@@ -552,7 +552,7 @@ def test_add_warning(
 
     assert info_map.get("timestamp") == timestamp
 
-    if log_type in ["logs", "warnings"]:
+    if log_type in [LogType.WARNINGS, LogType.LOGS]:
         captured = capsys.readouterr()
         expected_message = f"{metadata_prefix}[WARNING]: {name}: {message}\n"
         assert expected_message in captured.out
@@ -574,12 +574,12 @@ def test_add_warning(
 
 @pytest.mark.parametrize(
         "log_type",
-        ["none", "errors", "warnings", "logs"]
+        [LogType.NONE, LogType.ERRORS, LogType.WARNINGS, LogType.LOGS]
         )
 def test_add_log(
     mock_output_manager: OutputManager,
     output_manager_original_method_states: Dict[str, Callable],
-    log_type: str,
+    log_type: LogType,
     capsys,
 ) -> None:
     """Unit test for function add_log in file output_manager.py"""
@@ -601,7 +601,7 @@ def test_add_log(
 
     assert info_map.get("timestamp") == timestamp
 
-    if log_type == "logs":
+    if log_type == LogType.LOGS:
         captured = capsys.readouterr()
         expected_message = f"{metadata_prefix}[LOG]: {name}: {message}\n"
         assert expected_message in captured.out

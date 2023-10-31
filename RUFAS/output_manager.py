@@ -232,9 +232,9 @@ class OutputManager(object):
         """Sets the metadata_prefix attribute."""
         self.__metadata_prefix = metadata_prefix
 
-    def set_log_type(self, log_type: str = "none") -> None:
+    def set_log_type(self, log_type: LogType = LogType.NONE) -> None:
         """Sets the log_type attribute"""
-        self.__log_type = LogType(log_type)
+        self.__log_type = log_type
 
     def _get_timestamp(self, include_millis: bool = False) -> str:
         """
