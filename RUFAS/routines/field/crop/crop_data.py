@@ -158,7 +158,7 @@ class CropData:
     """biomass accumulated by the plant on the previous day (kg/ha)"""
     above_ground_biomass: float = 0.1
     """biomass stored in the above ground portion of the plant; plant biomass excluding roots (kg/ha)"""
-    root_biomass: Optional[float] = None
+    root_biomass: Optional[float] = 0.0
     """biomass stored in roots (kg/ha)"""
 
     # ---- growth constraints
@@ -445,6 +445,7 @@ class CropData:
 
         """
         return self.accumulated_heat_units / self.potential_heat_units
+
 
 """
 The species child classes provide default configuration for the supported CropSpecies.

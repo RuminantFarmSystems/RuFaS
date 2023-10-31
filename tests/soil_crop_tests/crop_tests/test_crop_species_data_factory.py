@@ -1,6 +1,6 @@
 import pytest
 from RUFAS.routines.field.crop.species_data_factory import CropSpecies, CropSpeciesDataFactory
-from RUFAS.routines.field.crop.crop_data import CropData, PlantCategory
+from RUFAS.routines.field.crop.crop_data import PlantCategory
 from dataclasses import asdict
 
 
