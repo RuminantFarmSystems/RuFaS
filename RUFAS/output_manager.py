@@ -15,7 +15,7 @@ from deprecated.sphinx import deprecated
 from RUFAS.util import Utility
 
 
-class LogType(Enum):
+class LogVerbosity(Enum):
     """
     The different types of logs printed by Output Manager. Set by the `verbose` gnu arg in main.py.
 
@@ -71,7 +71,7 @@ class OutputManager(object):
             self.errors_pool: Dict[str, OutputManager.pool_element_type] = {}
             self.logs_pool: Dict[str, OutputManager.pool_element_type] = {}
             self.__metadata_prefix: str = ""
-            self.__log_type: LogType = LogType("none")
+            self.__log_type: LogVerbosity = LogVerbosity("none")
             self.add_log(
                 "init_log",
                 "Output Manager instantiated.",
@@ -165,7 +165,7 @@ class OutputManager(object):
         info_map["timestamp"] = self._get_timestamp(include_millis=True)
         key = self._generate_key(name, info_map)
         self._add_to_pool(self.logs_pool, key, msg, info_map)
-        if self.__log_type == LogType.LOGS:
+        if self.__log_type == LogVerbosity.LOGS:
             sys.stdout.write(f"{self.__metadata_prefix}[LOG]: {name}: {msg}\n")
 
     def add_warning(self, name: str, msg: str, info_map: Dict[str, Any]) -> None:
@@ -195,7 +195,7 @@ class OutputManager(object):
         info_map["timestamp"] = self._get_timestamp(include_millis=True)
         key = self._generate_key(name, info_map)
         self._add_to_pool(self.warnings_pool, key, msg, info_map)
-        if self.__log_type in [LogType.LOGS, LogType.WARNINGS]:
+        if self.__log_type in [LogVerbosity.LOGS, LogVerbosity.WARNINGS]:
             sys.stdout.write(f"{self.__metadata_prefix}[WARNING]: {name}: {msg}\n")
 
     def add_error(self, name: str, msg: str, info_map: Dict[str, Any]) -> None:
@@ -225,14 +225,14 @@ class OutputManager(object):
         info_map["timestamp"] = self._get_timestamp(include_millis=True)
         key = self._generate_key(name, info_map)
         self._add_to_pool(self.errors_pool, key, msg, info_map)
-        if self.__log_type in [LogType.LOGS, LogType.WARNINGS, LogType.ERRORS]:
+        if self.__log_type in [LogVerbosity.LOGS, LogVerbosity.WARNINGS, LogVerbosity.ERRORS]:
             sys.stdout.write(f"{self.__metadata_prefix}[ERROR]: {name}: {msg}\n")
 
     def set_metadata_prefix(self, metadata_prefix: str) -> None:
         """Sets the metadata_prefix attribute."""
         self.__metadata_prefix = metadata_prefix
 
-    def set_log_type(self, log_type: LogType = LogType.NONE) -> None:
+    def set_log_type(self, log_type: LogVerbosity = LogVerbosity.NONE) -> None:
         """Sets the log_type attribute"""
         self.__log_type = log_type
 

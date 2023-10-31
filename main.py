@@ -15,7 +15,7 @@ from RUFAS.scenario_manager import METADATA_PATHS, MetadataPaths
 import config.global_variables
 from RUFAS.simulation_engine import SimulationEngine
 from RUFAS.input_manager import InputManager
-from RUFAS.output_manager import OutputManager, LogType
+from RUFAS.output_manager import OutputManager, LogVerbosity
 from RUFAS.util import Utility
 
 
@@ -24,7 +24,7 @@ def main():
     run_rufas(
         format_option=cmd_arguments.format_option,
         make_graphs=not cmd_arguments.no_graphics,
-        verbose=LogType(cmd_arguments.verbose),
+        verbose=LogVerbosity(cmd_arguments.verbose),
         clear_output=cmd_arguments.clear_output,
         exclude_info_maps=cmd_arguments.exclude_info_maps,
         only_run_validation=cmd_arguments.only_run_validation,
@@ -34,7 +34,7 @@ def main():
 def run_rufas(
     format_option: str = "verbose",
     make_graphs: bool = True,
-    verbose: LogType = LogType.NONE,
+    verbose: LogVerbosity = LogVerbosity.NONE,
     clear_output: bool = False,
     exclude_info_maps: bool = False,
     only_run_validation: bool = False,
@@ -55,8 +55,7 @@ def run_rufas(
         Utility.empty_dir(output_dir, keep=keep_list)
 
     set_global_variables(make_graphs)
-    if verbose != LogType.NONE:
-        sys.stdout.write("RuFaS: Ruminant Farm Systems Model 2023\n")
+    sys.stdout.write("RuFaS: Ruminant Farm Systems Model 2023\n")
     metadata_file_list: List[MetadataPaths] = METADATA_PATHS
     if only_run_validation:
         run_validation(metadata_file_list, exclude_info_maps, format_option, verbose)
@@ -70,7 +69,7 @@ def set_global_variables(make_graphs: bool) -> None:
 
 
 def run_validation(metadata_files: List[Path], exclude_info_maps: bool = False,
-                   format_option: str = "verbose", verbose: LogType = LogType.NONE) -> None:
+                   format_option: str = "verbose", verbose: LogVerbosity = LogVerbosity.NONE) -> None:
     """Instantiates I/O Managers and triggers validation of input data.
 
     Parameters
@@ -81,6 +80,8 @@ def run_validation(metadata_files: List[Path], exclude_info_maps: bool = False,
         Flag for whether or not the user wants to inlcude info_maps data in their results files.
     format_option : str
         The formatting option for select output files.
+    verbose : LogVerbosity
+        The verbose option set by the user.
     """
     info_map = {"class": "No caller class",
                 "function": run_validation.__name__,
@@ -103,7 +104,7 @@ def run_validation(metadata_files: List[Path], exclude_info_maps: bool = False,
 
 def execute_simulations(
     metadata_files: List[Path], exclude_info_maps: bool = False, format_option: str = "verbose",
-    verbose: LogType = LogType.NONE
+    verbose: LogVerbosity = LogVerbosity.NONE
 ) -> None:
     """Instantiates I/O Managers and processes the metadata files provided by the user to run the simulation.
 
@@ -116,6 +117,8 @@ def execute_simulations(
         Flag for whether or not the user wants to inlcude info_maps data in their results files.
     format_option : str
         The formatting option for select output files.
+    verbose : LogVerbosity
+        The verbose option set by the user.
     """
     info_map = {"class": "No caller class",
                 "function": execute_simulations.__name__,

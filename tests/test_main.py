@@ -17,7 +17,7 @@ from main import set_global_variables
 from main import METADATA_PATHS
 from RUFAS.simulation_engine import SimulationEngine
 from RUFAS.input_manager import InputManager
-from RUFAS.output_manager import OutputManager, LogType
+from RUFAS.output_manager import OutputManager, LogVerbosity
 
 dir_path = os.path.join(global_variables.ROOT_DIR, "input")
 file_path = os.path.join(dir_path, "input/ARL.json")
@@ -26,7 +26,7 @@ file_path = os.path.join(dir_path, "input/ARL.json")
 def test_main(mocker: MockerFixture):
     """Unit test for main() function in main.py"""
     mock_cmd_arguments = MagicMock()
-    setattr(mock_cmd_arguments, "verbose", LogType.NONE)
+    setattr(mock_cmd_arguments, "verbose", LogVerbosity.NONE)
     patch_run_rufas = mocker.patch(
         "main.run_rufas"
     )
@@ -38,7 +38,7 @@ def test_main(mocker: MockerFixture):
     patch_run_rufas.assert_called_once_with(
         format_option=mock_cmd_arguments.format_option,
         make_graphs=not mock_cmd_arguments.no_graphics,
-        verbose=LogType.NONE,
+        verbose=LogVerbosity.NONE,
         clear_output=mock_cmd_arguments.clear_output,
         exclude_info_maps=mock_cmd_arguments.exclude_info_maps,
         only_run_validation=mock_cmd_arguments.only_run_validation,
@@ -49,28 +49,28 @@ def test_main(mocker: MockerFixture):
 @pytest.mark.parametrize(
     "format_option, make_graphs, verbose, clear_output, exclude_info_maps, only_run_validation",
     [
-        ("verbose", True, LogType.NONE, True, True, True),
-        ("block", False, LogType.LOGS, True, True, True),
-        ("inline", True, LogType.ERRORS, True, True, True),
-        ("basic", True, LogType.WARNINGS, False, True, True),
-        ("verbose", True, LogType.NONE, True, False, True),
-        ("block", True, LogType.LOGS, True, True, False),
-        ("inline", False, LogType.ERRORS, True, True, True),
-        ("basic", False, LogType.WARNINGS, False, True, True),
-        ("verbose", False, LogType.NONE, True, False, True),
-        ("block", False, LogType.LOGS, True, True, False),
-        ("inline", False, LogType.ERRORS, False, True, True),
-        ("basic", False, LogType.WARNINGS, True, False, True),
-        ("verbose", False, LogType.NONE, True, True, False),
-        ("block", False, LogType.WARNINGS, False, False, True),
-        ("inline", False, LogType.LOGS, False, True, False),
-        ("basic", False, LogType.ERRORS, False, False, False)
+        ("verbose", True, LogVerbosity.NONE, True, True, True),
+        ("block", False, LogVerbosity.LOGS, True, True, True),
+        ("inline", True, LogVerbosity.ERRORS, True, True, True),
+        ("basic", True, LogVerbosity.WARNINGS, False, True, True),
+        ("verbose", True, LogVerbosity.NONE, True, False, True),
+        ("block", True, LogVerbosity.LOGS, True, True, False),
+        ("inline", False, LogVerbosity.ERRORS, True, True, True),
+        ("basic", False, LogVerbosity.WARNINGS, False, True, True),
+        ("verbose", False, LogVerbosity.NONE, True, False, True),
+        ("block", False, LogVerbosity.LOGS, True, True, False),
+        ("inline", False, LogVerbosity.ERRORS, False, True, True),
+        ("basic", False, LogVerbosity.WARNINGS, True, False, True),
+        ("verbose", False, LogVerbosity.NONE, True, True, False),
+        ("block", False, LogVerbosity.WARNINGS, False, False, True),
+        ("inline", False, LogVerbosity.LOGS, False, True, False),
+        ("basic", False, LogVerbosity.ERRORS, False, False, False)
     ],
 )
 def test_run_rufas(
     format_option: str,
     make_graphs: bool,
-    verbose: LogType,
+    verbose: LogVerbosity,
     clear_output: bool,
     exclude_info_maps: bool,
     only_run_validation: bool,
@@ -103,7 +103,7 @@ def test_run_rufas(
     else:
         patch_empty_dir.assert_not_called()
 
-    if verbose != LogType.NONE:
+    if verbose != LogVerbosity.NONE:
         captured = capsys.readouterr()
         expected_message = "RuFaS: Ruminant Farm Systems Model 2023\n"
         assert expected_message in captured.out

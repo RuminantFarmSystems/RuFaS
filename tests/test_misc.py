@@ -18,7 +18,7 @@ from pytest import approx, raises
 from pytest_mock.plugin import MockerFixture
 
 from RUFAS.general_constants import GeneralConstants
-from RUFAS.output_manager import LogType, OutputManager
+from RUFAS.output_manager import LogVerbosity, OutputManager
 from RUFAS.simulation_engine import SimulationEngine
 from RUFAS.util import Utility
 
@@ -174,9 +174,9 @@ def test_set_metadata_prefix(mock_output_manager: OutputManager) -> None:
 
 @pytest.mark.parametrize(
         "log_type",
-        [LogType.NONE, LogType.ERRORS, LogType.WARNINGS, LogType.LOGS]
+        [LogVerbosity.NONE, LogVerbosity.ERRORS, LogVerbosity.WARNINGS, LogVerbosity.LOGS]
         )
-def test_set_log_type(mock_output_manager: OutputManager, log_type: LogType) -> None:
+def test_set_log_type(mock_output_manager: OutputManager, log_type: LogVerbosity) -> None:
     """Unit test for the function set_log_type in the file output_manager.py"""
     mock_output_manager.set_log_type(log_type)
     assert mock_output_manager._OutputManager__log_type == log_type
@@ -478,12 +478,12 @@ def test_get_timestamp(mocker: MockerFixture) -> None:
 
 @pytest.mark.parametrize(
         "log_type",
-        [LogType.NONE, LogType.ERRORS, LogType.WARNINGS, LogType.LOGS]
+        [LogVerbosity.NONE, LogVerbosity.ERRORS, LogVerbosity.WARNINGS, LogVerbosity.LOGS]
         )
 def test_add_error(
     mock_output_manager: OutputManager,
     output_manager_original_method_states: Dict[str, Callable],
-    log_type: LogType,
+    log_type: LogVerbosity,
     capsys,
 ) -> None:
     """Unit test for function add_error in file output_manager.py"""
@@ -504,7 +504,7 @@ def test_add_error(
     mock_output_manager._generate_key.assert_called_once_with(name, info_map)
 
     assert info_map.get("timestamp") == timestamp
-    if log_type in [LogType.ERRORS, LogType.WARNINGS, LogType.LOGS]:
+    if log_type in [LogVerbosity.ERRORS, LogVerbosity.WARNINGS, LogVerbosity.LOGS]:
         captured = capsys.readouterr()
         expected_message = f"{metadata_prefix}[ERROR]: {name}: {message}\n"
         assert expected_message in captured.out
@@ -525,12 +525,12 @@ def test_add_error(
 
 @pytest.mark.parametrize(
         "log_type",
-        [LogType.NONE, LogType.ERRORS, LogType.WARNINGS, LogType.LOGS]
+        [LogVerbosity.NONE, LogVerbosity.ERRORS, LogVerbosity.WARNINGS, LogVerbosity.LOGS]
         )
 def test_add_warning(
     mock_output_manager: OutputManager,
     output_manager_original_method_states: Dict[str, Callable],
-    log_type: LogType,
+    log_type: LogVerbosity,
     capsys
 ) -> None:
     """Unit test for function add_warning in file output_manager.py"""
@@ -552,7 +552,7 @@ def test_add_warning(
 
     assert info_map.get("timestamp") == timestamp
 
-    if log_type in [LogType.WARNINGS, LogType.LOGS]:
+    if log_type in [LogVerbosity.WARNINGS, LogVerbosity.LOGS]:
         captured = capsys.readouterr()
         expected_message = f"{metadata_prefix}[WARNING]: {name}: {message}\n"
         assert expected_message in captured.out
@@ -574,12 +574,12 @@ def test_add_warning(
 
 @pytest.mark.parametrize(
         "log_type",
-        [LogType.NONE, LogType.ERRORS, LogType.WARNINGS, LogType.LOGS]
+        [LogVerbosity.NONE, LogVerbosity.ERRORS, LogVerbosity.WARNINGS, LogVerbosity.LOGS]
         )
 def test_add_log(
     mock_output_manager: OutputManager,
     output_manager_original_method_states: Dict[str, Callable],
-    log_type: LogType,
+    log_type: LogVerbosity,
     capsys,
 ) -> None:
     """Unit test for function add_log in file output_manager.py"""
@@ -601,7 +601,7 @@ def test_add_log(
 
     assert info_map.get("timestamp") == timestamp
 
-    if log_type == LogType.LOGS:
+    if log_type == LogVerbosity.LOGS:
         captured = capsys.readouterr()
         expected_message = f"{metadata_prefix}[LOG]: {name}: {message}\n"
         assert expected_message in captured.out
