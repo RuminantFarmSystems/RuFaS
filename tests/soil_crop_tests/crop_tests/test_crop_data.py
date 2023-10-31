@@ -9,7 +9,7 @@ from RUFAS.routines.field.crop.crop_data import CropData, PlantCategory
     (1, True),
     (1.5, True)
 ])
-def test_is_mature_property(frac, expect):
+def test_is_mature_property(frac: float, expect: bool) -> None:
     """check that the is_mature property is properly assigning maturity by heat fraction"""
     data = CropData()
     with patch.object(CropData, "heat_fraction", new_callable=PropertyMock, return_value=frac):
