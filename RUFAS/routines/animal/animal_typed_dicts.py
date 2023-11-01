@@ -10,7 +10,7 @@ class HerdInfoTypedDict(TypedDict):
     calf_num: int
     heiferI_num: int
     heiferII_num: int
-    heiferIII_num: int
+    heiferIII_num_springers: int
     cow_num: int
     replace_num: int
     herd_num: int
