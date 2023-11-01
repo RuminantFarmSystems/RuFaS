@@ -198,3 +198,10 @@ def test_generate_graph_exception(graph_generator: GraphGenerator) -> None:
         graph_generator.generate_graph(
             filtered_pool, graph_details, save_path, filter_file_name, graphics_dir
         )
+
+
+def test_draw_graph_exception(graph_generator: GraphGenerator) -> None:
+    with pytest.raises(ValueError):
+        graph_generator._draw_graph(
+            graph_type="invalid graph type", data={}, selected_variables=["var1", "var2"]
+        )
