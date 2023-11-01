@@ -403,7 +403,7 @@ class RationReporter:
             dm_amount = 1
         for nutr in nutrients:
             if nutr == "DM":
-                nutrient_conc["dm"] = (dm_amount / nutrient_amount["as_fed"] ) * 100
+                nutrient_conc["dm"] = (dm_amount / nutrient_amount["as_fed"]) * 100
             else:
                 # all values on a 100% dry matter basis
                 if nutr == 'DE':
