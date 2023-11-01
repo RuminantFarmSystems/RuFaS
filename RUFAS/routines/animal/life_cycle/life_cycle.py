@@ -500,8 +500,8 @@ class LifeCycleManager:
             'pen_history': heiferI.pen_history
         })
         heiferI_vals.update(repro_program=AnimalBase.config['heifer_repro_method'])
-        heiferI_vals.update(tai_method_h=AnimalBase.config['heifer_repro_programs']['heifer_TAI_protocol'])
-        heiferI_vals.update(synch_ed_method_h=AnimalBase.config['heifer_repro_programs']['heifer_synchED_protocol'])
+        heiferI_vals.update(tai_method_h=AnimalBase.config['heifers']['repro_protocols']['TAI']['sub_protocol'])
+        heiferI_vals.update(synch_ed_method_h=AnimalBase.config['heifers']['repro_protocols']['SynchED']['sub_protocol'])
         new_heiferII = HeiferII(heiferI_vals)
         heiferIIs.append(new_heiferII)
 
@@ -649,9 +649,9 @@ class LifeCycleManager:
             'calf_birth_weight': heiferIII.calf_birth_weight
         })
         args.update(repro_program=AnimalBase.config['cow_repro_method'])
-        args.update(presynch_method=AnimalBase.config["cow_repro_programs"]['cow_presynch_protocol'])
-        args.update(tai_method_c=AnimalBase.config["cow_repro_programs"]['cow_TAI_protocol'])
-        args.update(resynch_method=AnimalBase.config["cow_repro_programs"]['cow_resynch_protocol'])
+        args.update(presynch_method=AnimalBase.config['cows']['repro_protocols']['Presynch']['sub_protocol'])
+        args.update(tai_method_c=AnimalBase.config['cows']['repro_protocols']['TAI']['sub_protocol'])
+        args.update(resynch_method=AnimalBase.config['cows']['repro_protocols']['Resynch']['sub_protocol'])
         new_cow = Cow(args)
         if len(cows)>0:
             new_cow.milk_production_reduction = cows[0].milk_production_reduction

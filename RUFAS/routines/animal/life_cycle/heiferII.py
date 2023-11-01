@@ -232,7 +232,7 @@ class HeiferII(HeiferI):
         if nutrient_conc and nutrient_conc['dm'] != 0.0:
             NDF_conc = nutrient_conc['NDF'] / 100
             TDN_conc = nutrient_conc['TDN'] / 100
-            net_energy_diet_concentration = (metabolizable_energy * 0.64)/previous_DMI
+            net_energy_diet_concentration = (metabolizable_energy * 0.64) / previous_DMI
         else:
             NDF_conc = 0.3
             TDN_conc = 0.7
@@ -352,7 +352,7 @@ class HeiferII(HeiferI):
                 raise ValueError(f"Invalid heifer repro program: {self.repro_program}")
 
             if self.days_born == self.ai_day:
-                self._perform_ai(sim_day)
+                self._perform_ai(sim_day)  # days_in_preg = 1
             elif self.is_pregnant:
                 self.days_in_preg += 1
                 self.preg_update(sim_day)
