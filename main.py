@@ -7,6 +7,7 @@ The main function run_rufas() will execute the model simulation(s). It accepts a
 file(s) or, if this input is not given, it will run in interactive mode and accept input from the user.
 """
 import argparse
+import glob
 from pathlib import Path
 import sys
 from typing import List
@@ -138,12 +139,22 @@ def execute_simulations(
         output_manager.dump_all_nondata_pools(r"output", exclude_info_maps, format_option)
 
 
-def reload_pool(file_path: str = ""):
-    """Loads the pool from OM variables output csv"""
-    if not file_path:
-        file_path = "output/CSVs/om/default_scenario_saved_variables_csv_all_variables.txt_31-Oct-2023_Tue_15-00-07.csv"
-    variables_pool = pd.read_csv(file_path)
-    variables_pool = variables_pool.convert_dtypes()
+def reload_pool():
+    """Loads the pool from OM variables output json all variables file"""
+    all_variables_file_path = get_filepath("output/", "*all_variables*")
+    try:
+        with open(all_variables_file_path, 'r') as file:
+            print('had some success opening this file')
+    except Exception as e:
+        raise e
+
+
+def get_filepath(directory_path: str = "output/", file_pattern: str = "*all_variables") -> Path:
+    matching_file_path = glob.glob(f"{directory_path}/{file_pattern}")
+    if matching_file_path:
+        return Path(matching_file_path[0])
+    else:
+        return ""
 
 
 def parse_gnu_args():
