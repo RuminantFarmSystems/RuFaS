@@ -52,7 +52,7 @@
     "NASEM_Comp": {
       "title": "NASEM Comp data",
       "description": "Nutrients!",
-      "path": "input/data/feed/NASEM_comp_with_TDN.csv",
+      "path": "input/data/feed/NASEM_omp_with_TDN.csv",
       "type": "csv",
       "properties": "NASEM_Comp_properties"
     },
