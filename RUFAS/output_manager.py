@@ -594,11 +594,11 @@ class OutputManager(object):
             self.add_error("Unexpected error", str(e), info_map)
             raise
 
-    def _load_filter_file_to_list(
+    def _load_filter_file(
         self, path: str
     ) -> List[str] | Tuple[List[str], Dict[str, str]]:
         """
-        Load data from a file and return it as a list of strings or a tuple.
+        Loads and return filter data from a file.
 
         Parameters:
         path (str): The path to the file to be loaded.
@@ -734,7 +734,7 @@ class OutputManager(object):
         list_of_filter_files = self._list_txt_and_json_files_in_dir(dir_path)
         for filter_file in list_of_filter_files:
             input_path = os.path.join(dir_path, filter_file)
-            filter_patterns, graph_info = self._load_filter_file_to_list(input_path)
+            filter_patterns, graph_info = self._load_filter_file(input_path)
             filtered_pool = self._filter_variables_pool(filter_patterns, filter_file)
             if exclude_info_maps:
                 filtered_pool = self._exclude_info_maps(filtered_pool)
