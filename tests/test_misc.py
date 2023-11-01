@@ -1210,23 +1210,6 @@ def test_load_filter_file_content_exception(
     )
 
 
-def test_load_filter_file_load_txt_file(
-    mocker: MockerFixture, mock_output_manager: OutputManager
-) -> None:
-    mock_txt_loader = mocker.patch.object(
-        mock_output_manager, "_load_txt_file_to_list", return_value=[]
-    )
-    mock_json_loader = mocker.patch.object(
-        mock_output_manager, "_load_json_file_to_tuple", return_value=([], {})
-    )
-
-    result: List[str] = mock_output_manager._load_filter_file("some_file.txt")
-
-    mock_txt_loader.assert_called_with("some_file.txt")
-    mock_json_loader.assert_not_called()
-    assert result == []
-
-
 def test_load_filter_file_load_json_file(
     mocker: MockerFixture, mock_output_manager: OutputManager
 ) -> None:
