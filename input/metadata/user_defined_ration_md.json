@@ -52,7 +52,7 @@
     "NASEM_Comp": {
       "title": "NASEM Comp data",
       "description": "Nutrients!",
-      "path": "input/data/feed/NASEM_comp.csv",
+      "path": "input/data/feed/NASEM_comp_with_TDN.csv",
       "type": "csv",
       "properties": "NASEM_Comp_properties"
     },
@@ -111,6 +111,20 @@
       "path": "input/data/weather/barnyard_weather.csv",
       "type": "csv",
       "properties": "weather_properties"
+    },
+    "feed_quality": {
+      "title": "Feed Quality",
+      "description": "Hows the feed!",
+      "path": "input/data/feed/feed_quality.csv",
+      "type": "csv",
+      "properties": "feed_quality_properties"
+    },
+    "user_feeds": {
+      "title": "User Feed",
+      "description": "Bring the feed!",
+      "path": "input/data/feed/example_user_feeds.csv",
+      "type": "csv",
+      "properties": "user_feeds_properties"
     }
   },
   "properties": {
@@ -1432,22 +1446,6 @@
           "maximum": 300
         }
       },
-      "feed_database": {
-        "type": "string",
-        "description": "The location of the feed database"
-      },
-      "feeds_table": {
-        "type": "string",
-        "description": "The name of the feeds table in the feed database"
-      },
-      "feed_quality_table": {
-        "type": "string",
-        "description": "The name of the feed quality table in the feed database"
-      },
-      "nutrient_table": {
-        "type": "string",
-        "description": "The name of the nutrient table in the feed database"
-      },
       "storage_options": {
         "type": "array",
         "description": "Storage Options.",
@@ -1604,7 +1602,7 @@
         "description": "Unique integer identifier for feeds used within the RuFaS model.",
         "minimum": 1
       },
-      "feed_name": {
+      "Name": {
         "type": "string",
         "description": "A general common name for the feed as defined within RuFaS.",
         "pattern": "(ALFALFA|ALMOND|Ammonium Chloride|Ammonium phosphate (monobasic)|Ammonium Phosphate, dibasic|Ammonium Sulfate|APPLE|BAKERY BYPRODUCT|BARLEY|BEET, SUGAR|BERMUDAGRASS|BLOOD|Bone Meal|BREWERS GRAINS|BREWERS YEAST|Calcium carbonate|Calcium Choride dihydrate|Calcium Choride,anhydrous|Calcium hydroxide|Calcium iodate|Calcium oxide|Calcium Phosphate monobasic|Calcium Sulfate, dihydrate|Calf grower 14CP (Fed to calves only)|Calf grower 16CP (Fed to calves only)|Calf starter 18CP high starch (Fed to calves only)|Calf starter 18CP low starch (Fed to calves only)|Calf starter 22CP high starch (Fed to calves only)|Calf starter 22CP med starch (Fed to calves only)|CANDY|CANOLA|Casein|CHOCOLATE|CITRUS|Cobalt carbonate|Cobalt carbonate (6H2O)|Cobalt chloride (6H2O)|Cobalt organic generic|Cobalt sulfate (7H2O)|Copper chloride (2H2O)|Copper organic, generic|Copper oxide|Copper sulfate (5H2O)|CORN, YELLOW|COTTON SEED|DESTILLERY BYPRODUCT|Dicalcium Phosphate, dibasic|EDDI|FATS AND OILS|FEATHERS|Ferrous carbonate|Ferrous sulfate (7H2O)|Ferrous sulfate (H2O)|FISH BYPRODUCTS|FRUIT AND VEGETABLE|GLYCEROL|GRAIN SCREENINGS|GRASSES, COOL SEASON|GRASS-Legume MIXTURES Pr. GR.   (17-22% Hcel.)|Grass-LEGUME MIXTURES Pr. LG. (10-13% HCEL.)|Iron oxide|Iron, organic generic|LEGUMES, FORAGE|Limestone, dolomite|Limestone, ground|LINSEED (FLAX)|LINSEED (FLAXSEED)|Magnesium carbonate|Magnesium Chloride, Hexahydrate|Magnesium hydroxide|Magnesium Oxide|Magnesium sulfate (7H2O)|Manganese carbonate|Manganese chloride|Manganese chloride (4H2O)|Manganese organic generic|Manganese oxide|Manganese sulfate (5H2O)|Manganese sulfate (H2O)|MEAT|MILK|Milk Replacer|Milk replacer 20 CP 20 fat|Milk replacer 26 CP 17 fat|MILLET|Mixed grass-legume (12-15% Hcel.)|MOLASSES|OATS|Oystershell|PEANUT|PEAS|Phosphate rock|Phosphate, Curacao|Phosphate, defluorinated|Phosphoric acid|PINEAPPLE|Potassium bicarbonate|Potassium carbonate|Potassium Chloride|Potassium iodide|Potassium Sulfate|POTATO|POULTRY|RICE|RUMEN PROTECTED AA|RYE, ANNUAL|SAFFLOWER|Selenate, sodium (10 H2O)|Selenite, sodium|Selenium yeast, generic|Skim milk, fresh|Sodium Bicarbonate|Sodium carbonate (H2O)|Sodium Choride|Sodium Phosphate, Monohydrate|Sodium sesquicarbonate (2H2O)|Sodium Sulfate decahydrate|Sodium tripolyphosphate|SORGHUM, GRAIN TYPE|SORGHUM, SUDAN TYPE|SOYBEAN|SPELT|SUDAN GRASS|SUGAR|SUGARCANE|SUNFLOWER|SWEET CORN|TAPIOCA|TOMATO|TRITICALE|UREA|Vit A premix|Vit D premix|Vit E premix|VitTM Premix, generic|WHEAT|WHEY|Whole Milk|Zinc carbonate|Zinc chloride|Zinc oxide|Zinc sulfate (H2O)|Zinc, organic generic)"
