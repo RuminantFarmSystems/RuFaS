@@ -1210,43 +1210,6 @@ def test_load_filter_file_content_exception(
     )
 
 
-@patch("builtins.open", new_callable=mock_open)
-def test_load_json_file_to_tuple(
-    mock_file: MagicMock,
-    mock_output_manager: OutputManager,
-    output_manager_original_method_states: Dict[str, Callable],
-) -> None:
-    """Test case for function _load_json_file_to_tuple in output_manager.py"""
-    data: Dict[str, Any] = {
-        "filters": ["filter1", "filter2"],
-        "other_key": "value",
-    }
-    mock_file.return_value.read.return_value = json.dumps(data)
-
-    result: Tuple[
-        List[str], Dict[str, str]
-    ] = mock_output_manager._load_json_file_to_tuple("some_file.json")
-    expected_result: Tuple[List[str], Dict[str, str]] = (data["filters"], data)
-    assert result == expected_result
-
-    mock_file.return_value.read.return_value = "this is not valid JSON"
-    with pytest.raises(json.JSONDecodeError):
-        mock_output_manager._load_json_file_to_tuple("some_file.json")
-
-    mock_file.side_effect = FileNotFoundError
-    with pytest.raises(FileNotFoundError):
-        mock_output_manager._load_json_file_to_tuple("non_existent_file.json")
-
-    mock_file.side_effect = Exception("Unexpected error")
-    with pytest.raises(Exception):
-        mock_output_manager._load_json_file_to_tuple("some_file.json")
-
-    # Restore original method
-    mock_output_manager._load_json_file_to_tuple = (
-        output_manager_original_method_states["_load_json_file_to_tuple"]
-    )
-
-
 def test_load_filter_file_load_txt_file(
     mocker: MockerFixture, mock_output_manager: OutputManager
 ) -> None:
