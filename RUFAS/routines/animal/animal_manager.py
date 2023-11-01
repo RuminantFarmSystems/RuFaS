@@ -1641,6 +1641,17 @@ class AnimalManager:
 
             self._handle_newly_added_animals([*animals_added, *calves_born], feed, temp)
 
+            info_map = {"class": self.__class__.__name__, "function": self.daily_updates.__name__}
+            om.add_variable('sim_day', self.simulation_day, info_map)
+            om.add_variable('num_animals', len(self.calves) + len(self.heiferIs) + len(self.heiferIIs) +
+                            len(self.heiferIIIs) + len(self.cows), info_map)
+            om.add_variable('num_calves', len(self.calves), info_map)
+            om.add_variable('num_heiferIs', len(self.heiferIs), info_map)
+            om.add_variable('num_heiferIIs', len(self.heiferIIs), info_map)
+            om.add_variable('num_heiferIIIs', len(self.heiferIIIs), info_map)
+            om.add_variable('num_lactating_cows', len([cow for cow in self.cows if cow.is_lactating]), info_map)
+            om.add_variable('num_dry_cows', len([cow for cow in self.cows if not cow.is_lactating]), info_map)
+
             for pen in self.all_pens:
                 pen.classes_in_pen = self._get_classes_in_pen(pen)
                 pen.calc_total_manure(feed, self.methane_model, self.methane_mitigation_method,
