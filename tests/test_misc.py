@@ -10,7 +10,7 @@ import os
 from pathlib import Path
 import re
 import json
-from typing import Any, Callable, Dict, List, Tuple
+from typing import Any, Callable, Dict, List
 from mock import mock_open, patch
 
 import pytest
@@ -1139,6 +1139,7 @@ def test_exclude_info_maps(
     mock_output_manager._exclude_info_maps = output_manager_original_method_states[
         "_exclude_info_maps"
     ]
+
 
 @patch("builtins.open", new_callable=mock_open)
 def test_load_filter_file_content_txt(
