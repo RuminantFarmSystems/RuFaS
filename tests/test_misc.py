@@ -679,7 +679,6 @@ def output_manager_original_method_states(
         "_get_timestamp": mock_output_manager._get_timestamp,
         "_list_to_file_txt": mock_output_manager._list_to_file_txt,
         "_list_txt_and_json_files_in_dir": mock_output_manager._list_txt_and_json_files_in_dir,
-        "_load_txt_file_to_list": mock_output_manager._load_txt_file_to_list,
         "_load_json_file_to_tuple": mock_output_manager._load_json_file_to_tuple,
         "_load_filter_file": mock_output_manager._load_filter_file,
         "_save_variables_to_csv_files ": mock_output_manager._save_variables_to_csv_files,
@@ -1773,9 +1772,6 @@ def test_save_variables(
     ]
     mock_output_manager._dict_to_file_json = output_manager_original_method_states[
         "_dict_to_file_json"
-    ]
-    mock_output_manager._load_txt_file_to_list = output_manager_original_method_states[
-        "_load_txt_file_to_list"
     ]
     mock_output_manager._load_filter_file = output_manager_original_method_states[
         "_load_filter_file"
