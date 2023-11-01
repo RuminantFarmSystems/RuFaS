@@ -67,10 +67,7 @@ class SoilErosion:
         sediment_yield = self._determine_sediment_yield(self.data.surface_runoff_volume, peak_runoff_rate, field_size,
                                                         erodibility_factor, cover_factor, support_practice_factor,
                                                         topographic_factor, fragment_factor)
-        self.data.eroded_sediment = self._determine_adjusted_sediment_yield(sediment_yield,
-                                                                            self.data.snow_cover_water_content)
-
-        # TODO: does the soil profile needs to have mass removed from it as it gets eroded? - Issue #351
+        self.data.eroded_sediment = self._determine_adjusted_sediment_yield(sediment_yield, self.data.snow_content)
 
         # Update annual totals
         self.data.annual_eroded_sediment_total += self.data.eroded_sediment
@@ -264,7 +261,7 @@ class SoilErosion:
         return exp(first_multiplicative_term * second_multiplicative_term + second_additive_term)
 
     @staticmethod
-    def _determine_support_practice_factor() -> float:  # TODO: implement this for version 2 (GitHub issue #348)
+    def _determine_support_practice_factor() -> float:
         """SWAT Reference: section 4:1.1.3 (only applies to fields that are doing contour tillage/planting,
             stripcropping, and/or terracing)"""
         return 1
@@ -319,9 +316,11 @@ class SoilErosion:
         as far to reach channels and be removed from the soil. A steeper slope means that there is less
         resistance against the gravitational forces acting on a piece of sediment as it moves down the slope,
         resulting in the soil eroding more easily.
+
+        arctan(tan(x)) == x does not always hold, it is only true from -90 to 90 degrees, inclusive. It is safe to use
+        here because there will never be a field at an angle < -90 or > 90 degrees.
+
         """
-        # Note: arctan(tan(x)) == x does not always hold, it is only true from -90 to 90 degrees, inclusive. It is safe
-        # to use here because there will never be a field at an angle < -90 or > 90 degrees
         slope_angle_in_rad = atan(average_subbasin_slope)
         exponential_term = SoilErosion._determine_exponential_term(average_subbasin_slope)
         first_term = (slope_length / 22.1) ** exponential_term
@@ -388,7 +387,6 @@ class SoilErosion:
         -----
         This equation actually demands the area of the subbasin, not the field, as a parameter. But the field area was
         used in the old code, and is used here until the data for subbasin areas can be found.
-        TODO: find subbasin areas database and/or make it a parameter - issue #601
 
         """
         if rainfall == 0.0:
@@ -575,7 +573,8 @@ class SoilErosion:
             Ratio of soil loss from land cropped under given conditions to corresponding loss from clean-tilled,
             continuous fallow (unitless).
         support_practice_factor : float
-            Ratio of soil loss with specific support practice to corresponding loss with up-and-down slope culture (unitless).
+            Ratio of soil loss with specific support practice to corresponding loss with up-and-down slope culture
+            (unitless).
         topographic_factor : float
             Expected ratio of soil loss per unit area from a field slope to that from a 22.1 m length of uniform 9%
             slope under identical conditions (unitless).
@@ -586,6 +585,7 @@ class SoilErosion:
         -------
         float
             Sediment yield on a given day (metric tons).
+
         """
         term_with_exponent = (surface_area_runoff * peak_runoff_rate * field_area) ** 0.56
         return (11.8 * term_with_exponent * soil_erodibility_factor * cover_management_factor * support_practice_factor
