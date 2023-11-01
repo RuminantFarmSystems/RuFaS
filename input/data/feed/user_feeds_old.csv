@@ -98,17 +98,17 @@ rufas_id,Name,feed_description,feed_type,units
 130,WHEAT,"Silage, early head",Forage,kg
 131,WHEAT,Straw,Forage,kg
 132,WHEY,"Wet, cattle",Conc,kg
-133,MILK,"Skim, dried powder",Milk,kg
-134,Bone Meal,Steamed,Milk,kg
+133,MILK,"Skim, dried powder",,kg
+134,Bone Meal,Steamed,,kg
 135,Calcium carbonate,CaCO3,Mineral,kg
 136,"Dicalcium Phosphate, dibasic",CaHPO4,Mineral,kg
 137,Calcium Phosphate monobasic,Ca(H2PO4)2,Mineral,kg
 138,"Calcium Sulfate, dihydrate",CaSO4.2H2O,Mineral,kg
-139,"Limestone, ground",No Description,Mineral,kg
-140,"Limestone, dolomite",No Description,Mineral,kg
+139,"Limestone, ground",NA,Mineral,kg
+140,"Limestone, dolomite",NA,Mineral,kg
 141,Magnesium Oxide,MgO,Mineral,kg
 142,Potassium Chloride,KCl,Mineral,kg
-143,Phosphate rock,No Description,Mineral,kg
+143,Phosphate rock,NA,Mineral,kg
 144,Sodium Choride,NaCl,Mineral,kg
 145,Sodium Bicarbonate,NaHCO3,Mineral,kg
 146,"Sodium Phosphate, Monohydrate",NaH2PO4.H2O,Mineral,kg
@@ -116,7 +116,7 @@ rufas_id,Name,feed_description,feed_type,units
 148,Potassium Sulfate,K2SO4,Mineral,kg
 149,Ammonium Sulfate,(NH4)2SO4,Mineral,kg
 150,"Ammonium Phosphate, dibasic",(NH4)H2PO4,Mineral,kg
-151,Ammonium Chloride,No Description,Mineral,kg
+151,Ammonium Chloride,NA,Mineral,kg
 152,Calcium Choride dihydrate,CaCl2.2H2O,Mineral,kg
 153,"Calcium Choride,anhydrous",CaCl2,Mineral,kg
 154,"Magnesium Chloride, Hexahydrate",MgCl2.6H2O,Mineral,kg
