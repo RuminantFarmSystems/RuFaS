@@ -2,7 +2,7 @@
 
 from copy import deepcopy
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Tuple, Union
+from typing import Any, Dict, List, Optional, Union
 import datetime
 import json
 import os
@@ -498,93 +498,63 @@ class OutputManager(object):
         else:
             raise NotADirectoryError("The specified path must be a directory")
 
-    def _load_txt_file_to_list(self, path: str) -> List[str]:
+    def _load_filter_file_content(self, path: str) -> Dict[str, str]:
         """
-        Load text data from a text file located at the specified path and return it as a list of strings.
-
-        Parameters:
-        -----------
-        path (str):
-            The path to the text file to be loaded.
-
-        Returns:
-        --------
-        List[str]:
-            A list of strings representing the lines of text from the file.
-
-        Raises:
-        -------
-        FileNotFoundError: If the specified file does not exist.
-        UnicodeDecodeError: If there is an issue decoding the file (e.g., due to an encoding error).
-        Exception: For other unexpected errors.
-
-        This method attempts to open and read a text file, splitting the content into lines and returning
-        them as a list of strings. If successful, it returns the list of lines. If the file does not exist,
-        a FileNotFoundError is raised. If there is an issue with decoding the text, a UnicodeDecodeError
-        is raised. For any other unexpected errors, a generic Exception is raised.
-        """
-        info_map = {
-            "class": self.__class__.__name__,
-            "function": self._load_txt_file_to_list.__name__,
-        }
-
-        try:
-            with open(path) as text_file:
-                list_of_elements = text_file.read().splitlines()
-                load_message = f"Successfully opened {path} and read {len(list_of_elements)} lines."
-                self.add_log("text_file_load_log", load_message, info_map)
-                return list_of_elements
-        except FileNotFoundError:
-            self.add_error(
-                "File not found", f"The file '{path}' does not exist.", info_map
-            )
-            raise
-        except UnicodeDecodeError as e:
-            self.add_error("Text decoding error", str(e), info_map)
-            raise
-        except Exception as e:
-            self.add_error("Unexpected error", str(e), info_map)
-            raise
-
-    def _load_json_file_to_tuple(self, path: str) -> Tuple[List[str], Dict[str, str]]:
-        """
-        Load data from a JSON file located at the specified path and return it as a tuple.
+        Loads and processes the content of a filter file from the specified path.
 
         Parameters
         ----------
-        path (str):
-            The path to the JSON file to be loaded.
+        path : str
+            The path to the filter file (either .json or .txt).
 
         Returns
         -------
-        Tuple[List[str], Dict[str, str]]:
-            A tuple containing two elements:
-            1. A list of strings, representing the 'filters' key from the JSON file.
-            2. A dictionary of string key-value pairs, representing the parsed JSON content.
+        Dict[str, str]
+            A dictionary containing the loaded filter content, with keys and values depending on the file type.
 
         Raises
         ------
-        FileNotFoundError: If the specified file does not exist.
-        json.JSONDecodeError: If there is an issue parsing the JSON content.
-        Exception: For other unexpected errors.
+        FileNotFoundError
+            If the specified file does not exist.
 
-        This method loads a JSON file, extracting the 'filters' key as a list of strings and the rest of
-        the JSON content as a dictionary. If successful, it returns these values in a tuple. If the file
-        does not exist, a FileNotFoundError is raised. If there is an issue with JSON parsing, a
-        json.JSONDecodeError is raised. For any other unexpected errors, a generic Exception is raised.
+        json.JSONDecodeError
+            If there is an issue with parsing a JSON file.
+
+        UnicodeDecodeError
+            If there is an issue with decoding a text file.
+
+        Exception
+            If an unsupported file format is encountered; only .json and .txt are supported.
+
+        Notes
+        -----
+        This method attempts to open and process a filter file located at the specified path.
+        It supports two file formats: JSON and plain text (.txt). If the file is a JSON file,
+        it loads the JSON content into a dictionary. If the file is a .txt file, it reads the
+        lines and creates a dictionary with a "filters" key and a list of filter elements as values.
+        Unsupported file formats will raise an exception.
+
+        This method is used to handle loading filter content from external files, which are
+        used to define filtering criteria for the variables pool.
         """
         info_map = {
             "class": self.__class__.__name__,
-            "function": self._load_json_file_to_tuple.__name__,
+            "function": self._load_filter_file_content.__name__,
         }
         self.add_log("open_filter_file", f"Attempting to open {path}.", info_map)
         try:
             with open(path) as filter_file:
-                graph_metadata = json.load(filter_file)
-                list_of_elements = graph_metadata["filters"]
-                load_message = f"Successfully opened {path} and read {len(list_of_elements)} lines."
-                self.add_log("filter_pattern_file_load_log", load_message, info_map)
-                return list_of_elements, graph_metadata
+                if path.endswith(".json"):
+                    result = json.load(filter_file)
+                elif path.endswith(".txt"):
+                    list_of_elements = filter_file.read().splitlines()
+                    result = {"filters": list_of_elements}
+                else:
+                    raise Exception(
+                        "Unsupported file format; only json and txt are supported."
+                    )
+            self.add_log("text_file_load_log", f"Successfully opened {path}.", info_map)
+            return result
         except FileNotFoundError:
             self.add_error(
                 "File not found", f"The file '{path}' does not exist.", info_map
@@ -593,38 +563,11 @@ class OutputManager(object):
         except json.JSONDecodeError as e:
             self.add_error("JSON parsing error", str(e), info_map)
             raise
+        except UnicodeDecodeError as e:
+            self.add_error("Text decoding error", str(e), info_map)
+            raise
         except Exception as e:
             self.add_error("Unexpected error", str(e), info_map)
-            raise
-
-    def _load_filter_file(self, path: str) -> Tuple[List[str], Dict[str, str]]:
-        """
-        Loads and return filter data from a file.
-
-        Parameters:
-        path (str): The path to the file to be loaded.
-
-        Returns:
-        - If the file is a .txt, return a list of strings (lines of text) and an empty dictionary.
-        - If the file is a .json, return a tuple of a list (filters) and a dictionary (parsed content).
-
-        Raises:
-        - FileNotFoundError: If the file does not exist.
-        - json.JSONDecodeError: If there is an issue parsing the JSON content (for .json files).
-        - UnicodeDecodeError: If there is an issue decoding the file (e.g., encoding error) (for .txt files).
-        - Exception: If the file format is unsupported (only .txt and .json are supported).
-        - Exception: For other unexpected errors.
-        """
-        try:
-            if path.endswith(".txt"):
-                return (self._load_txt_file_to_list(path), {})
-            elif path.endswith(".json"):
-                return self._load_json_file_to_tuple(path)
-            else:
-                raise Exception(
-                    "Unsupported file format; only json and txt are supported."
-                )
-        except Exception:
             raise
 
     def _filter_variables_pool(
@@ -735,8 +678,17 @@ class OutputManager(object):
         list_of_filter_files = self._list_txt_and_json_files_in_dir(dir_path)
         for filter_file in list_of_filter_files:
             input_path = os.path.join(dir_path, filter_file)
-            filter_patterns, graph_info = self._load_filter_file(input_path)
-            filtered_pool = self._filter_variables_pool(filter_patterns, filter_file)
+            filter_content = self._load_filter_file_content(input_path)
+            if "filters" not in filter_content.keys():
+                self.add_error(
+                    "Missing filters entry",
+                    f"'filters' does not exist in {filter_file}",
+                    info_map,
+                )
+                continue
+            filtered_pool = self._filter_variables_pool(
+                filter_content["filters"], filter_file
+            )
             if exclude_info_maps:
                 filtered_pool = self._exclude_info_maps(filtered_pool)
 
@@ -756,7 +708,7 @@ class OutputManager(object):
                     try:
                         graph_generator.generate_graph(
                             filtered_pool,
-                            graph_info,
+                            filter_content,
                             save_path,
                             filter_file,
                             graphics_dir,
