@@ -46,6 +46,6 @@ class MetadataPaths(TypedDict):
     path: Path
 
 
-METADATA_PATHS: List[MetadataPaths] = [{"prefix": "user_defined",
-                                        "path": Path('input/metadata/user_defined_ration_md.json')},
+METADATA_PATHS: List[MetadataPaths] = [{"prefix": "default_scenario",
+                                        "path": Path('input/metadata/default_metadata.json')},
                                        ]
