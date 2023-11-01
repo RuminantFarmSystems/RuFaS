@@ -1522,7 +1522,9 @@ def test_daily_updates(is_end_ration_interval: bool, mocker: MockerFixture) -> N
     mock_feed = mocker.MagicMock()
     mock_weather = mocker.MagicMock()
     temp = 25
-    mock_weather.T_avg.__getitem__.return_value = [temp for _ in range(365)]
+    mock_current_day_conditions = mocker.MagicMock()
+    setattr(mock_current_day_conditions, "mean_air_temperature", temp)
+    mock_weather.get_current_day_conditions.return_value = mock_current_day_conditions
     mock_time = mocker.MagicMock()
     mock_time.year = 2023
     mock_time.day = 1
@@ -1615,7 +1617,7 @@ def test_daily_updates(is_end_ration_interval: bool, mocker: MockerFixture) -> N
     if is_end_ration_interval:
         patch_for_reset_milk_production_reduction.assert_called()
 
-    mock_weather.T_avg.__getitem__.assert_called_with(mock_time.year - 1)
+    mock_weather.get_current_day_conditions.assert_called_with(mock_time)
 
     patch_for_get_animals_snapshot.assert_has_calls([mocker.call(), mocker.call()])
 
