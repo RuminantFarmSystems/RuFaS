@@ -15,13 +15,13 @@ def mock_weather(mocker: MockerFixture) -> Weather:
     mocker.patch("RUFAS.weather.Weather.__init__", return_value=None)
     mock_config = MagicMock(Config)
     mock_weather = Weather({}, mock_config)
-    mock_weather.radiation = [[1.0, 2.0, 3.0]]
-    mock_weather.T_min = [[1.1, 2.1, 3.1]]
-    mock_weather.T_avg = [[1.2, 2.2, 3.2]]
-    mock_weather.T_max = [[1.3, 2.3, 3.3]]
-    mock_weather.rainfall = [[1.4, 2.4, 3.4]]
-    mock_weather.irrigation = [[1.5, 2.5, 3.5]]
-    mock_weather.T_avg_annual = 15.0
+    mock_weather._Weather__radiation = [[1.0, 2.0, 3.0]]
+    mock_weather._Weather__min_daily_temperature = [[1.1, 2.1, 3.1]]
+    mock_weather._Weather__mean_daily_temperature = [[1.2, 2.2, 3.2]]
+    mock_weather._Weather__max_daily_temperature = [[1.3, 2.3, 3.3]]
+    mock_weather._Weather__precipitation = [[1.4, 2.4, 3.4]]
+    mock_weather._Weather__irrigation = [[1.5, 2.5, 3.5]]
+    mock_weather._Weather__mean_annual_temperature = 15.0
 
     return mock_weather
 
