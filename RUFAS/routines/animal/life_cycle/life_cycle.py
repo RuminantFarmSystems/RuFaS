@@ -195,9 +195,8 @@ class LifeCycleManager:
 
         """
         self.animal_data = AnimalData(self.animal_config['calving_interval'],
-                                      herd_data['breed'],
-                                      config.set_seed,
-                                      herd_data['herd_init'])
+                                      herd_data,
+                                      config.set_seed)
         self.herd_num = herd_data['herd_num']
         self._set_avg_CI()
 
