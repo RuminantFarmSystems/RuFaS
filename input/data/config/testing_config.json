@@ -6,5 +6,6 @@
   "graphic_dir": "output/graphics/",
   "set_seed": false,
   "random_seed": 0,
-  "simulate_animals": false
+  "simulate_animals": false,
+  "nutrient_standard": "NASEM"
 }
