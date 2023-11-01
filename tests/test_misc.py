@@ -1609,7 +1609,7 @@ def test_save_variables(
     mock_output_manager.variables_pool = {}
     mock_output_manager._generate_file_name = MagicMock(return_value="dummy_name")
     mock_output_manager._dict_to_file_json = MagicMock()
-    mock_output_manager._load_txt_file_to_list = MagicMock()
+    mock_output_manager._load_filter_file_content = MagicMock()
     mock_output_manager._exclude_info_maps = MagicMock()
     mock_output_manager._save_variables_to_csv_files = MagicMock()
 
@@ -1619,7 +1619,7 @@ def test_save_variables(
     mock_output_manager._list_txt_and_json_files_in_dir.assert_called_once_with(
         "dummy_dir_path/"
     )
-    mock_output_manager._load_txt_file_to_list.assert_not_called()
+    mock_output_manager._load_filter_file_content.assert_not_called()
     mock_output_manager._generate_file_name.assert_not_called()
     mock_output_manager._exclude_info_maps.assert_not_called()
     mock_output_manager._dict_to_file_json.assert_not_called()
@@ -1632,14 +1632,14 @@ def test_save_variables(
             "csv_dummy_input_filepath.txt",
         ]
     )
-    mock_output_manager._load_txt_file_to_list = MagicMock(
-        return_value=([".*"], {"title": "dummy_title"})
+    mock_output_manager._load_filter_file_content = MagicMock(
+        return_value={"filters": ".*", "title": "dummy_title"}
     )
     mock_output_manager.save_variables("dummy_path", "dummy_dir_path/", False)
     mock_output_manager._list_txt_and_json_files_in_dir.assert_called_with(
         "dummy_dir_path/"
     )
-    mock_output_manager._load_txt_file_to_list.assert_called_with(
+    mock_output_manager._load_filter_file_content.assert_called_with(
         "dummy_dir_path/csv_dummy_input_filepath.txt"
     )
     mock_output_manager._generate_file_name.assert_called_once_with(
@@ -1661,7 +1661,7 @@ def test_save_variables(
     mock_output_manager._list_txt_and_json_files_in_dir.assert_called_with(
         "dummy_dir_path/"
     )
-    mock_output_manager._load_txt_file_to_list.assert_called_with(
+    mock_output_manager._load_filter_file_content.assert_called_with(
         "dummy_dir_path/csv_dummy_input_filepath.txt"
     )
     dummy_file_name = "saved_variables_json_dummy_input_filepath.txt"
@@ -1694,7 +1694,8 @@ def test_save_variables(
     mock_output_manager._list_txt_and_json_files_in_dir = MagicMock(
         return_value=["graph_input_filepath.json"]
     )
-    # mock_output_manager._load_filter_file = MagicMock(return_value=)
+    graph_data = {"filters": ".*", "other keys": "other values"}
+    mock_output_manager._load_filter_file_content = MagicMock(return_value=graph_data)
     with patch(
         "RUFAS.graph_generator.GraphGenerator.generate_graph"
     ) as mock_generate_graph:
@@ -1704,7 +1705,9 @@ def test_save_variables(
             produce_graphics=True,
             graphics_dir=Path("graphics"),
         )
-        mock_generate_graph.assert_called_once_with("a")
+        mock_generate_graph.assert_called_once_with(
+            {}, graph_data, "dummy_path", "graph_input_filepath.json", Path("graphics")
+        )
 
     # Restore original method
     mock_output_manager.save_variables = output_manager_original_method_states[
@@ -1719,8 +1722,8 @@ def test_save_variables(
     mock_output_manager._dict_to_file_json = output_manager_original_method_states[
         "_dict_to_file_json"
     ]
-    mock_output_manager._load_filter_file = output_manager_original_method_states[
-        "_load_filter_file"
+    mock_output_manager._load_filter_file_content = output_manager_original_method_states[
+        "_load_filter_file_content"
     ]
     mock_output_manager._exclude_info_maps = output_manager_original_method_states[
         "_exclude_info_maps"
