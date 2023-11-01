@@ -2,8 +2,7 @@ import math
 from typing import Optional
 
 from RUFAS.routines.field.soil.soil_data import SoilData
-from RUFAS.routines.field.manager.current_weather import CurrentWeather
-
+from RUFAS.current_day_conditions import CurrentDayConditions
 from RUFAS.output_manager import OutputManager
 
 om = OutputManager()
@@ -25,10 +24,10 @@ class Snow:
 
     Methods
     -------
-    _calc_snow_temp(current_day_weather: CurrentWeather) -> float:
+    _calc_snow_temp(current_day_conditions: CurrentDayConditions) -> float:
         Calculate the snow pack temperature for the current day.
 
-    _melt_snow(current_day_weather: CurrentWeather, day: int) -> float:
+    _melt_snow(current_day_conditions: CurrentDayConditions, day: int) -> float:
         Calculate the snow melt for the current day.
 
     _melt_factor(day: int) -> float:
@@ -37,7 +36,7 @@ class Snow:
     sublimation():
         Placeholder function for sublimation calculations.
 
-    update_snow(current_day_weather: CurrentWeather, day: int) -> None:
+    update_snow(current_day_conditions: CurrentDayConditions, day: int) -> None:
         Update snow-related data including snow content and temperatures.
     """
 
@@ -46,7 +45,7 @@ class Snow:
         self.soil_data = soil_data or SoilData(field_size=field_size)
 
     @staticmethod
-    def _calc_snow_temp(soil_data: SoilData, current_day_weather: CurrentWeather) -> float:
+    def _calc_snow_temp(soil_data: SoilData, current_day_conditions: CurrentDayConditions) -> float:
         """
         This function calculates the snow pack temperature for the current day.
 
@@ -54,7 +53,7 @@ class Snow:
         ----------
         soil_data : SoilData
             The object that tracks all soil variables throughout the simulation.
-        current_day_weather : CurrentWeather
+        current_day_conditions : CurrentDayConditions
             The current day weather data.
 
         Returns
@@ -67,10 +66,10 @@ class Snow:
         Equation 1:2.5.1 in SWAT 2009 Theoretical Documentation.
         """
         return (soil_data.previous_day_snow_temperature * (1 - soil_data.snow_lag_factor)) + \
-               (current_day_weather.mean_air_temperature * soil_data.snow_lag_factor)
+               (current_day_conditions.mean_air_temperature * soil_data.snow_lag_factor)
 
     @staticmethod
-    def _melt_snow(soil_data: SoilData, current_day_weather: CurrentWeather, day: int) -> float:
+    def _melt_snow(soil_data: SoilData, current_day_conditions: CurrentDayConditions, day: int) -> float:
         """
         This function calculates the amount of snow melting for the current day.
 
@@ -78,7 +77,7 @@ class Snow:
         ----------
         soil_data : SoilData
             The object that tracks all soil variables throughout the simulation.
-        current_day_weather : CurrentWeather
+        current_day_conditions : CurrentDayConditions
             The current day weather data.
         day :int
             The day number of the year.
@@ -99,7 +98,7 @@ class Snow:
         melt_factor = Snow._melt_factor(soil_data=soil_data, day=day)
         snow_coverage_fraction = soil_data.snow_coverage_fraction
         snow_temperature = soil_data.current_day_snow_temperature
-        max_air_temperature = current_day_weather.max_air_temperature
+        max_air_temperature = current_day_conditions.max_air_temperature
         snow_melt_base_temperature = soil_data.snow_melt_base_temperature
 
         snow_melt_amount = melt_factor * snow_coverage_fraction * ((snow_temperature + max_air_temperature) / 2 -
@@ -137,10 +136,7 @@ class Snow:
         mlt12 = soil_data.snow_melt_factor_minimum
         return (mlt6 + mlt12) / 2 + ((mlt6 - mlt12) / 2 * (math.sin(2 * math.pi / 365) * (day - 81)))
 
-    def sublimation(self):
-        pass
-
-    def update_snow(self, current_day_weather: CurrentWeather, day: int) -> None:
+    def update_snow(self, current_day_conditions: CurrentDayConditions, day: int) -> None:
         """
         Update snow-related data for the current day.
 
@@ -160,7 +156,7 @@ class Snow:
 
         Parameters
         ----------
-        current_day_weather : CurrentWeather
+        current_day_conditions : CurrentDayConditions
             The current day weather data.
         day : int
             The day number of the year.
@@ -176,15 +172,33 @@ class Snow:
         if self.soil_data.snow_content < 0.0:
             raise ValueError("Snow Content should not be a negative number.")
 
-        self.soil_data.snow_content += current_day_weather.snow_fall
+        self.soil_data.snow_content += current_day_conditions.snowfall
 
         if self.soil_data.snow_content == 0.0:
             self.soil_data.previous_day_snow_temperature, self.soil_data.current_day_snow_temperature = None, None
             self.soil_data.snow_content, self.soil_data.snow_melt_amount = 0.0, 0.0
         else:
             self.soil_data.previous_day_snow_temperature = self.soil_data.current_day_snow_temperature if \
-                self.soil_data.current_day_snow_temperature is not None else current_day_weather.mean_air_temperature
-            self.soil_data.current_day_snow_temperature = self._calc_snow_temp(self.soil_data, current_day_weather)
+                self.soil_data.current_day_snow_temperature is not None else current_day_conditions.mean_air_temperature
+            self.soil_data.current_day_snow_temperature = self._calc_snow_temp(self.soil_data, current_day_conditions)
 
-            self.soil_data.snow_melt_amount = self._melt_snow(self.soil_data, current_day_weather, day)
+            self.soil_data.snow_melt_amount = self._melt_snow(self.soil_data, current_day_conditions, day)
             self.soil_data.snow_content -= self.soil_data.snow_melt_amount
+
+    def sublimate(self, maximum_sublimation: float) -> None:
+        """
+        Performs sublimation on the snowpack.
+
+        Parameters
+        ----------
+        maximum_sublimation : float
+            The maximum amount of sublimation possible on the current day (mm).
+
+        References
+        ----------
+        SWAT Theoretical documentation section 2:2.3.3.1
+
+        """
+        sublimation = min(maximum_sublimation, self.soil_data.snow_content)
+        self.soil_data.water_sublimated = sublimation
+        self.soil_data.snow_content -= sublimation

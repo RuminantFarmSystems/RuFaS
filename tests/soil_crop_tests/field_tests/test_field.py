@@ -6,7 +6,7 @@ from RUFAS.routines.field.crop.crop import Crop
 from RUFAS.routines.field.crop.crop_data import CropData
 from RUFAS.routines.field.crop.harvest_operations import HarvestOperation
 from RUFAS.routines.field.crop.species_data_factory import CropSpecies
-from RUFAS.routines.field.manager.current_weather import CurrentWeather
+from RUFAS.current_day_conditions import CurrentDayConditions
 from RUFAS.routines.field.manager.events import Event, PlantingEvent, HarvestEvent, FertilizerEvent, ManureEvent
 from RUFAS.routines.field.soil.soil import Soil
 from RUFAS.routines.field.soil.soil_data import SoilData
@@ -51,7 +51,7 @@ def test_manage_field() -> None:
     field._remove_dead_crops = MagicMock()
     field._reset_crop_field_coverage_fractions = MagicMock()
     mocked_time = MagicMock(Time)
-    mocked_weather = MagicMock(CurrentWeather)
+    mocked_weather = MagicMock(CurrentDayConditions)
     setattr(mocked_weather, "daylength", 12)
 
     field.manage_field(mocked_time, mocked_weather)
@@ -941,9 +941,9 @@ def test_execute_daily_processes(field_size: float, crops_growing: bool, residue
         crop_2 = Crop()
         crop_2.data.max_transpiration = transpiration
         incorp.crops = [crop_1, crop_2]
-        current_weather = CurrentWeather(incoming_light=light, mean_air_temperature=mean_temp,
-                                         min_air_temperature=min_temp, max_air_temperature=max_temp,
-                                         annual_mean_air_temperature=annual_mean_temp)
+        current_conditions = CurrentDayConditions(incoming_light=light, mean_air_temperature=mean_temp,
+                                                  min_air_temperature=min_temp, max_air_temperature=max_temp,
+                                                  annual_mean_air_temperature=annual_mean_temp)
 
         incorp.soil.snow.update_snow = MagicMock()
         incorp._determine_total_above_ground_biomass = MagicMock(return_value=89)
@@ -960,14 +960,15 @@ def test_execute_daily_processes(field_size: float, crops_growing: bool, residue
         mocked_time = MagicMock(Time)
         setattr(mocked_time, "year", 2023)
         setattr(mocked_time, "day", 178)
-        incorp._execute_daily_processes(current_weather, mocked_time)
+        incorp._execute_daily_processes(current_conditions, mocked_time)
 
-        incorp.soil.snow.update_snow.assert_called_once_with(current_day_weather=current_weather, day=mocked_time.day)
+        incorp.soil.snow.update_snow.assert_called_once_with(current_day_conditions=current_conditions,
+                                                             day=mocked_time.day)
         incorp._determine_total_above_ground_biomass.assert_called_once()
         incorp.soil.soil_temp.daily_soil_temperature_update.assert_called_once_with(light, mean_temp, min_temp,
                                                                                     max_temp, 89 + residue, 0,
                                                                                     annual_mean_temp)
-        incorp._cycle_water.assert_called_once_with(current_weather, mocked_time)
+        incorp._cycle_water.assert_called_once_with(current_conditions, mocked_time)
         for crop in incorp.crops:
             if crops_growing:
                 crop.heat_units.absorb_heat_units.assert_called_once_with(mean_temp, min_temp, max_temp)
@@ -998,7 +999,8 @@ def test_cycle_water(field_size: float, rainfall: float, runoff: float, high_wat
     """Tests that cycle_water() correctly executes all water processes on its soil profile and the crops it contains."""
     with patch("RUFAS.routines.field.crop.crop_data.CropData.in_growing_season", new_callable=PropertyMock,
                return_value=crops_growing):
-        soil_data = SoilData(field_size=field_size, accumulated_runoff=runoff, water_evaporated=3.5)
+        soil_data = SoilData(field_size=field_size, accumulated_runoff=runoff, water_evaporated=3.5,
+                             water_sublimated=1.0)
         soil_data.plant_surface_residue = surface_residue
         soil = Soil(soil_data)
         crop_data_1 = CropData(field_proportion=crop_1_proportion, max_transpiration=44.1, cumulative_evaporation=105.5,
@@ -1009,8 +1011,9 @@ def test_cycle_water(field_size: float, rainfall: float, runoff: float, high_wat
                                cumulative_transpiration=219.2, cumulative_potential_evapotranspiration=480.1,
                                total_water_uptake=3.25)
         crop_2 = Crop(crop_data_2)
-        current_weather = CurrentWeather(incoming_light=light, min_air_temperature=min_temp, precipitation=rainfall,
-                                         max_air_temperature=max_temp, mean_air_temperature=mean_temp)
+        current_conditions = CurrentDayConditions(incoming_light=light, min_air_temperature=min_temp,
+                                                  precipitation=rainfall, max_air_temperature=max_temp,
+                                                  mean_air_temperature=mean_temp)
         field_data = FieldData(field_size=field_size, current_residue=residue,
                                seasonal_high_water_table=high_water_table)
         incorp = Field(field_data=field_data, soil=soil, manure_manager=MagicMock(ManureManager))
@@ -1022,6 +1025,7 @@ def test_cycle_water(field_size: float, rainfall: float, runoff: float, high_wat
         incorp.soil.phosphorus_cycling.cycle_phosphorus = MagicMock()
         incorp.soil.nitrogen_cycling.cycle_nitrogen = MagicMock()
         incorp.soil.carbon_cycling.cycle_carbon = MagicMock()
+        incorp.soil.snow.sublimate = MagicMock()
         incorp.soil.evaporation.evaporate = MagicMock()
 
         incorp._determine_watering_amount = MagicMock(return_value=0)
@@ -1041,7 +1045,7 @@ def test_cycle_water(field_size: float, rainfall: float, runoff: float, high_wat
         setattr(mocked_time, "year", 2023)
         setattr(mocked_time, "day", 178)
 
-        incorp._cycle_water(current_weather, mocked_time)
+        incorp._cycle_water(current_conditions, mocked_time)
         incorp._determine_watering_amount.assert_called_once_with(rainfall=rainfall, year=mocked_time.year,
                                                                   day=mocked_time.day, irrigation=0.0)
         incorp._handle_water_in_crop_canopies.assert_called_once_with(rainfall)
@@ -1060,8 +1064,10 @@ def test_cycle_water(field_size: float, rainfall: float, runoff: float, high_wat
         expected_average_transpiration = 44.1 * crop_1_proportion + 39.5 * crop_2_proportion
         incorp._determine_soil_evaporation_and_sublimation_adjusted.assert_called_once_with(
             40.0, surface_residue, 0, expected_remaining_demand, expected_average_transpiration)
-        incorp.soil.evaporation.evaporate.assert_called_once_with(10.5)
-        expected_actual_evaporation = 33.5 - (expected_remaining_demand - 3.5)
+        incorp.soil.snow.sublimate.assert_called_once_with(10.5)
+        expected_soil_evaporation_after_sublimation = 10.5 - 1.0
+        incorp.soil.evaporation.evaporate.assert_called_once_with(expected_soil_evaporation_after_sublimation)
+        expected_actual_evaporation = 33.5 - (expected_remaining_demand - 4.5)
         if crops_growing:
             crop_1.water_uptake.uptake_water.assert_called_once_with(incorp.soil.data)
             crop_1.water_dynamics.cycle_water.assert_called_once_with(expected_actual_evaporation, 3.5, 33.5)
@@ -1268,20 +1274,6 @@ def test_determine_soil_cover_index(above_ground_biomass: float, residue: float,
         expect = exp((-0.00005) * (above_ground_biomass + residue))
     observe = Field._determine_soil_cover_index(above_ground_biomass, residue, snow_water)
     assert expect == observe
-
-
-@pytest.mark.parametrize("soil_evaporation_adj,snow_water_content", [
-    (1.3, 3.2),
-    (0, 0),
-    (1.3, 0.4),
-    (1.8954, 0)
-])
-def test_determine_maximum_soil_evaporation(soil_evaporation_adj, snow_water_content):
-    observe = Field._determine_maximum_soil_evaporation(soil_evaporation_adj, snow_water_content)
-    if snow_water_content > soil_evaporation_adj:
-        assert 0 == observe
-    else:
-        assert (soil_evaporation_adj - snow_water_content) == observe
 
 
 def test_annual_reset() -> None:
