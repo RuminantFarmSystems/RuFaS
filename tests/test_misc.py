@@ -1187,6 +1187,9 @@ def test_load_filter_file_content_exception(
     output_manager_original_method_states: Dict[str, Callable],
 ) -> None:
     """Test case for function _load_filter_file_content in output_manager.py"""
+    with pytest.raises(Exception):
+        mock_output_manager._load_filter_file_content("invalid_extention.abc")
+
     mock_file.return_value.read.return_value = "this is not valid JSON"
     with pytest.raises(json.JSONDecodeError):
         mock_output_manager._load_filter_file_content("some_file.json")
@@ -1694,11 +1697,21 @@ def test_save_variables(
     mock_output_manager._list_txt_and_json_files_in_dir = MagicMock(
         return_value=["graph_input_filepath.json"]
     )
-    graph_data = {"filters": ".*", "other keys": "other values"}
-    mock_output_manager._load_filter_file_content = MagicMock(return_value=graph_data)
     with patch(
         "RUFAS.graph_generator.GraphGenerator.generate_graph"
     ) as mock_generate_graph:
+        graph_data = {"no_filters": ".*", "other keys": "other values"}
+        mock_output_manager._load_filter_file_content = MagicMock(return_value=graph_data)
+        mock_output_manager.save_variables(
+            "dummy_path",
+            "dummy_dir_path/",
+            produce_graphics=True,
+            graphics_dir=Path("graphics"),
+        )
+        mock_generate_graph.assert_not_called()
+
+        graph_data = {"filters": ".*", "other keys": "other values"}
+        mock_output_manager._load_filter_file_content = MagicMock(return_value=graph_data)
         mock_output_manager.save_variables(
             "dummy_path",
             "dummy_dir_path/",
