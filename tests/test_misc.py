@@ -679,8 +679,7 @@ def output_manager_original_method_states(
         "_get_timestamp": mock_output_manager._get_timestamp,
         "_list_to_file_txt": mock_output_manager._list_to_file_txt,
         "_list_txt_and_json_files_in_dir": mock_output_manager._list_txt_and_json_files_in_dir,
-        "_load_json_file_to_tuple": mock_output_manager._load_json_file_to_tuple,
-        "_load_filter_file": mock_output_manager._load_filter_file,
+        "_load_filter_file_content": mock_output_manager._load_filter_file_content,
         "_save_variables_to_csv_files ": mock_output_manager._save_variables_to_csv_files,
         "save_variables": mock_output_manager.save_variables,
         "_save_variables_to_csv_files": mock_output_manager._save_variables_to_csv_files,
@@ -1143,34 +1142,47 @@ def test_exclude_info_maps(
 
 
 @patch("builtins.open", new_callable=mock_open)
-def test_load_txt_file_to_list(
+def test_load_filter_file_content(
     mock_file: MagicMock,
     mock_output_manager: OutputManager,
     output_manager_original_method_states: Dict[str, Callable],
 ) -> None:
-    """Test case for function _load_txt_file_to_list in output_manager.py"""
+    """Test case for function _load_filter_file_content in output_manager.py"""
     mock_file.return_value.read.return_value = "apples\nbananas\ncherries"
-    result = mock_output_manager._load_txt_file_to_list("path/to/file.txt")
-    assert result == ["apples", "bananas", "cherries"]
+    result = mock_output_manager._load_filter_file_content("path/to/file.txt")
+    assert result == {"filters": ["apples", "bananas", "cherries"]}
+
+    data: Dict[str, Any] = {
+        "filters": ["filter1", "filter2"],
+        "other_key": "value",
+    }
+    mock_file.return_value.read.return_value = json.dumps(data)
+
+    result = mock_output_manager._load_filter_file_content("some_file.json")
+    assert result == data
+
+    mock_file.return_value.read.return_value = "this is not valid JSON"
+    with pytest.raises(json.JSONDecodeError):
+        mock_output_manager._load_filter_file_content("some_file.json")
 
     mock_file.side_effect = FileNotFoundError
     with pytest.raises(FileNotFoundError):
-        mock_output_manager._load_txt_file_to_list("non_existent_file.txt")
+        mock_output_manager._load_filter_file_content("non_existent_file.txt")
 
     mock_file.side_effect = UnicodeDecodeError(
         "encoding", b"", 1, 2, "Fake decode error"
     )
     with pytest.raises(UnicodeDecodeError):
-        mock_output_manager._load_txt_file_to_list("corrupted_file.txt")
+        mock_output_manager._load_filter_file_content("corrupted_file.txt")
 
     mock_file.side_effect = Exception("Unexpected error")
     with pytest.raises(Exception):
-        mock_output_manager._load_txt_file_to_list("some_file.txt")
+        mock_output_manager._load_filter_file_content("some_file.txt")
 
     # Restore original method
-    mock_output_manager._load_txt_file_to_list = output_manager_original_method_states[
-        "_load_txt_file_to_list"
-    ]
+    mock_output_manager._load_filter_file_content = (
+        output_manager_original_method_states["_load_filter_file_content"]
+    )
 
 
 @patch("builtins.open", new_callable=mock_open)
