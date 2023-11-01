@@ -82,7 +82,12 @@ class OutputManager(object):
         # the function key; as they are already stored in element key and
         # having them increases the final file size.
         reduced_info_map = {
-            k: info_map[k] for k in info_map.keys() - {"class", "function", }
+            k: info_map[k]
+            for k in info_map.keys()
+            - {
+                "class",
+                "function",
+            }
         }
         pool[key]["info_maps"].append(reduced_info_map)
 
@@ -359,9 +364,7 @@ class OutputManager(object):
                         csv_column_lists[subkey].append(value)
 
                 for subkey in csv_column_lists.keys():
-                    column_title = (
-                        f"{variable_name}.{subkey}"
-                    )
+                    column_title = f"{variable_name}.{subkey}"
                     column_list.append(
                         pd.Series(
                             csv_column_lists[subkey], dtype=object, name=column_title
@@ -594,9 +597,7 @@ class OutputManager(object):
             self.add_error("Unexpected error", str(e), info_map)
             raise
 
-    def _load_filter_file(
-        self, path: str
-    ) -> List[str] | Tuple[List[str], Dict[str, str]]:
+    def _load_filter_file(self, path: str) -> Tuple[List[str], Dict[str, str]]:
         """
         Loads and return filter data from a file.
 
@@ -604,7 +605,7 @@ class OutputManager(object):
         path (str): The path to the file to be loaded.
 
         Returns:
-        - If the file is a .txt, return a list of strings (lines of text).
+        - If the file is a .txt, return a list of strings (lines of text) and an empty dictionary.
         - If the file is a .json, return a tuple of a list (filters) and a dictionary (parsed content).
 
         Raises:
@@ -616,7 +617,7 @@ class OutputManager(object):
         """
         try:
             if path.endswith(".txt"):
-                return self._load_txt_file_to_list(path)
+                return (self._load_txt_file_to_list(path), {})
             elif path.endswith(".json"):
                 return self._load_json_file_to_tuple(path)
             else:
@@ -849,9 +850,12 @@ class OutputManager(object):
         file_path = os.path.join(path, self._generate_file_name("errors", "json"))
         self._dict_to_file_json(self.errors_pool, file_path)
 
-    def dump_variable_names_and_contexts(self, path: str, exclude_info_maps: bool,  # noqa: C901
-                                         format_option: str = "verbose",
-                                         ) -> None:
+    def dump_variable_names_and_contexts(  # noqa: C901
+        self,
+        path: str,
+        exclude_info_maps: bool,
+        format_option: str = "verbose",
+    ) -> None:
         """
         Dumps names of all variables added to variables_pool along with the caller class
         and function contextual information into a txt file in the given path to a directory.
@@ -936,7 +940,10 @@ class OutputManager(object):
         self._list_to_file_txt(var_list, file_path)
 
     def dump_all_nondata_pools(
-        self, path: str, exclude_info_maps: bool = False, format_option: str = "verbose",
+        self,
+        path: str,
+        exclude_info_maps: bool = False,
+        format_option: str = "verbose",
     ) -> None:
         """
         Dumps all non-data pools into the given path to a directory.

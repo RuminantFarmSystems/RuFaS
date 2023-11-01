@@ -7,6 +7,7 @@ Author(s): Pooya Hekmati, sh2235@cornell.edu
 
 from copy import deepcopy
 import os
+from pathlib import Path
 import re
 import json
 from typing import Any, Callable, Dict, List, Tuple
@@ -1237,9 +1238,9 @@ def test_load_filter_file_load_json_file(
         mock_output_manager, "_load_json_file_to_tuple", return_value=([], {})
     )
 
-    result: Tuple[
-        List[str], Dict[str, str]
-    ] = mock_output_manager._load_filter_file("some_file.json")
+    result: Tuple[List[str], Dict[str, str]] = mock_output_manager._load_filter_file(
+        "some_file.json"
+    )
 
     mock_json_loader.assert_called_with("some_file.json")
     mock_txt_loader.assert_not_called()
@@ -1744,21 +1745,22 @@ def test_save_variables(
     mock_output_manager._save_variables_to_csv_files.assert_not_called()
     mock_output_manager._dict_to_file_json.assert_not_called()
 
-    # test case for when the filter files to don start with graph_
-    # mock_output_manager._list_txt_and_json_files_in_dir = MagicMock(
-    #     return_value=["graph_input_filepath.json"]
-    # )
+    # test case for when the filter file starts with graph_
+    mock_output_manager._list_txt_and_json_files_in_dir = MagicMock(
+        return_value=["graph_input_filepath.json"]
+    )
     # mock_output_manager._load_filter_file = MagicMock(return_value=)
-    # with patch(
-    #     "RUFAS.graph_generator.GraphGenerator.generate_graph"
-    # ) as mock_generate_graph:
-    #     mock_output_manager.save_variables(
-    #         "dummy_path",
-    #         "dummy_dir_path/",
-    #         produce_graphics=True,
-    #         graphics_dir=Path("graphics"),
-    #     )
-    #     mock_generate_graph.assert_called_once_with("a")
+    with patch(
+        "RUFAS.graph_generator.GraphGenerator.generate_graph"
+    ) as mock_generate_graph:
+        mock_output_manager.save_variables(
+            "dummy_path",
+            "dummy_dir_path/",
+            produce_graphics=True,
+            graphics_dir=Path("graphics"),
+        )
+        mock_generate_graph.assert_called_once_with("a")
+
     # Restore original method
     mock_output_manager.save_variables = output_manager_original_method_states[
         "save_variables"
