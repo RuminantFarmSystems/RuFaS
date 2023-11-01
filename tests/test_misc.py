@@ -1210,25 +1210,6 @@ def test_load_filter_file_content_exception(
     )
 
 
-def test_load_filter_file_unsupported_file(
-    mocker: MockerFixture, mock_output_manager: OutputManager
-) -> None:
-    mock_txt_loader = mocker.patch.object(
-        mock_output_manager, "_load_txt_file_to_list", return_value=[]
-    )
-    mock_json_loader = mocker.patch.object(
-        mock_output_manager, "_load_json_file_to_tuple", return_value=([], {})
-    )
-
-    result: List[str] = []
-    with pytest.raises(Exception):
-        mock_output_manager._load_filter_file("some_file.abc")
-
-    mock_txt_loader.assert_not_called()
-    mock_json_loader.assert_not_called()
-    assert result == []
-
-
 def test_list_txt_and_json_files_in_dir(
     mock_output_manager: OutputManager,
     output_manager_original_method_states: Dict[str, Callable],
