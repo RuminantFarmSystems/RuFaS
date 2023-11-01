@@ -8,6 +8,7 @@ file(s) or, if this input is not given, it will run in interactive mode and acce
 """
 import argparse
 import glob
+import json
 from pathlib import Path
 import sys
 from typing import List
@@ -140,16 +141,31 @@ def execute_simulations(
 
 
 def reload_pool():
-    """Loads the pool from OM variables output json all variables file"""
+    """Loads pool """
     all_variables_file_path = get_filepath("output/", "*all_variables*")
     try:
         with open(all_variables_file_path, 'r') as file:
-            print('had some success opening this file')
+            om_vars_pool = json.load(file)
+            print(om_vars_pool)
     except Exception as e:
         raise e
 
 
 def get_filepath(directory_path: str = "output/", file_pattern: str = "*all_variables") -> Path:
+    """Searches the given directory for a file containing the pattern provided.
+
+    Parameters
+    ----------
+    directory_path : str, optional
+        The path to the directory to be searched.
+    file_pattern : str, optional
+        The pattern searched for in the file names in the directory_path.
+
+    Returns
+    -------
+    Path
+        The path to the file.
+    """
     matching_file_path = glob.glob(f"{directory_path}/{file_pattern}")
     if matching_file_path:
         return Path(matching_file_path[0])
@@ -201,3 +217,4 @@ def parse_gnu_args():
 
 if __name__ == "__main__":
     reload_pool()
+    # main()
