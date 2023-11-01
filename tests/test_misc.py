@@ -506,7 +506,7 @@ def test_add_error(
     assert info_map.get("timestamp") == timestamp
     if log_type in [LogVerbosity.ERRORS, LogVerbosity.WARNINGS, LogVerbosity.LOGS]:
         captured = capsys.readouterr()
-        expected_message = f"{metadata_prefix}[ERROR]: {name}: {message}\n"
+        expected_message = f"[{timestamp}][ERROR][{metadata_prefix}] {name}: {message}\n"
         assert expected_message in captured.out
     mock_output_manager._add_to_pool(
         mock_output_manager.errors_pool, key, message, info_map
@@ -554,7 +554,7 @@ def test_add_warning(
 
     if log_type in [LogVerbosity.WARNINGS, LogVerbosity.LOGS]:
         captured = capsys.readouterr()
-        expected_message = f"{metadata_prefix}[WARNING]: {name}: {message}\n"
+        expected_message = f"[{timestamp}][WARNING][{metadata_prefix}] {name}: {message}\n"
         assert expected_message in captured.out
 
     mock_output_manager._add_to_pool(
@@ -603,7 +603,7 @@ def test_add_log(
 
     if log_type == LogVerbosity.LOGS:
         captured = capsys.readouterr()
-        expected_message = f"{metadata_prefix}[LOG]: {name}: {message}\n"
+        expected_message = f"[{timestamp}][LOG][{metadata_prefix}] {name}: {message}\n"
         assert expected_message in captured.out
 
     mock_output_manager._add_to_pool(

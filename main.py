@@ -92,7 +92,7 @@ def run_validation(metadata_files: List[Path], exclude_info_maps: bool = False,
     for metadata_file in metadata_files:
         input_manager.flush_pool()
         output_manager.flush_pools()
-        output_manager.add_log("Validation start.", f"Validating data for {str(metadata_file['path'])}...\n", info_map)
+        output_manager.add_log("Validation start", f"Validating data for {str(metadata_file['path'])}...\n", info_map)
         output_manager.set_log_type(verbose)
         is_data_valid = input_manager.start_data_processing(str(metadata_file["path"]), False)
         if is_data_valid:
@@ -129,7 +129,7 @@ def execute_simulations(
     for metadata_file in metadata_files:
         input_manager.flush_pool()
         output_manager.flush_pools()
-        output_manager.add_log("Validation start.", f"Validating data for {str(metadata_file['path'])}...\n", info_map)
+        output_manager.add_log("Validation start", f"Validating data for {str(metadata_file['path'])}...\n", info_map)
         output_manager.set_metadata_prefix(metadata_file['prefix'])
         output_manager.set_log_type(verbose)
         is_data_valid = input_manager.start_data_processing(str(metadata_file["path"]), True)
