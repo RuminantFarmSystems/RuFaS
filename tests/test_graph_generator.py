@@ -203,5 +203,18 @@ def test_generate_graph_exception(graph_generator: GraphGenerator) -> None:
 def test_draw_graph_exception(graph_generator: GraphGenerator) -> None:
     with pytest.raises(ValueError):
         graph_generator._draw_graph(
-            graph_type="invalid graph type", data={}, selected_variables=["var1", "var2"]
+            graph_type="invalid graph type",
+            data={},
+            selected_variables=["var1", "var2"],
         )
+
+
+def test_draw_graph_success(graph_generator: GraphGenerator) -> None:
+    gaph_type = "plot"
+    data = {
+        "key1": {"values": [1, 2, 3]},
+        "key2": {"values": [4, 5, 6]},
+    }
+    plt.close()
+    graph_generator._draw_graph(gaph_type, data)
+    assert plt.gcf().number == 1
