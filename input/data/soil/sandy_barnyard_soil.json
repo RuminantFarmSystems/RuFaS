@@ -64,9 +64,9 @@
         {
             "bottom_depth": 450,
             "soil_water_concentration": 0.3,
-            "wilting_point_water_concentration": 0.1,
-            "field_capacity_water_concentration": 0.30,
-            "saturation_point_water_concentration": 0.5,
+            "wilting_point_water_concentration": 0.05,
+            "field_capacity_water_concentration": 0.1,
+            "saturation_point_water_concentration": 0.3,
             "saturated_hydraulic_conductivity": 20,
             "initial_temperature": 13.38623,
             "bulk_density": 1.6,
