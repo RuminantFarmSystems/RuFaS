@@ -1693,15 +1693,29 @@ def test_save_variables(
     mock_output_manager._save_variables_to_csv_files.assert_not_called()
     mock_output_manager._dict_to_file_json.assert_not_called()
 
-    # test case for when the filter file starts with graph_
+    # test cases for when the filter file starts with graph_
     mock_output_manager._list_txt_and_json_files_in_dir = MagicMock(
         return_value=["graph_input_filepath.json"]
     )
     with patch(
         "RUFAS.graph_generator.GraphGenerator.generate_graph"
     ) as mock_generate_graph:
+        graph_data = {"filters": ".*", "other keys": "other values"}
+        mock_output_manager._load_filter_file_content = MagicMock(
+            return_value=graph_data
+        )
+        mock_output_manager.save_variables(
+            "dummy_path",
+            "dummy_dir_path/",
+            produce_graphics=False,
+            graphics_dir=Path("graphics"),
+        )
+        mock_generate_graph.assert_not_called()
+
         graph_data = {"no_filters": ".*", "other keys": "other values"}
-        mock_output_manager._load_filter_file_content = MagicMock(return_value=graph_data)
+        mock_output_manager._load_filter_file_content = MagicMock(
+            return_value=graph_data
+        )
         mock_output_manager.save_variables(
             "dummy_path",
             "dummy_dir_path/",
@@ -1711,7 +1725,9 @@ def test_save_variables(
         mock_generate_graph.assert_not_called()
 
         graph_data = {"filters": ".*", "other keys": "other values"}
-        mock_output_manager._load_filter_file_content = MagicMock(return_value=graph_data)
+        mock_output_manager._load_filter_file_content = MagicMock(
+            return_value=graph_data
+        )
         mock_output_manager.save_variables(
             "dummy_path",
             "dummy_dir_path/",
@@ -1721,6 +1737,16 @@ def test_save_variables(
         mock_generate_graph.assert_called_once_with(
             {}, graph_data, "dummy_path", "graph_input_filepath.json", Path("graphics")
         )
+
+        mock_generate_graph.side_effect = Exception("dummy error")
+        mock_output_manager.add_error = MagicMock()
+        mock_output_manager.save_variables(
+            "dummy_path",
+            "dummy_dir_path/",
+            produce_graphics=True,
+            graphics_dir=Path("graphics"),
+        )
+        mock_output_manager.add_error.assert_called_once()
 
     # Restore original method
     mock_output_manager.save_variables = output_manager_original_method_states[
@@ -1735,12 +1761,13 @@ def test_save_variables(
     mock_output_manager._dict_to_file_json = output_manager_original_method_states[
         "_dict_to_file_json"
     ]
-    mock_output_manager._load_filter_file_content = output_manager_original_method_states[
-        "_load_filter_file_content"
-    ]
+    mock_output_manager._load_filter_file_content = (
+        output_manager_original_method_states["_load_filter_file_content"]
+    )
     mock_output_manager._exclude_info_maps = output_manager_original_method_states[
         "_exclude_info_maps"
     ]
+    mock_output_manager.add_error = output_manager_original_method_states["add_error"]
 
 
 class DummyClass:
