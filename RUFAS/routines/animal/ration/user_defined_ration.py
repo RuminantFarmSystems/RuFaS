@@ -36,33 +36,6 @@ class UserDefinedRationManager(object):
             self.tolerance = []
             self.milk_reduction_maximum = []
 
-    def feed_quality_fix(ration_percents: Dict, available_feeds: Dict) -> Dict:
-        """
-        This checks the keys in the ration_percents dictionary and checks
-         against the AvailableFeeds dictionary. If a given key is not found in the
-         latter, 2 is added to the key. This is because there is a 'quality' change
-         in the Feed module that changes keys that vary in quality.
-
-        Parameters
-        ----------
-        ration_percents: Dict
-            dictionary of feed ids and their associated percentage of DMI
-        available_feeds: available feeds dictionary from the Feed class object
-
-        Returns
-        -------
-        ration_percents: Dict
-            dictionary of feed ids and their associated percentage of DMI
-
-        """
-        key_list = list(ration_percents.keys())
-        for key in key_list:
-            if int(key) not in available_feeds["feed_id"]:
-                new_key = str(int(key) + 2)
-                ration_percents[new_key] = ration_percents[key]
-                del ration_percents[key]
-        return ration_percents
-
     def ration_to_use(animal_combination, available_feeds: Dict) -> Dict:
         """
         Function outputs the dictionary for a given animal combination from the UserDefinedRationManager class
@@ -90,7 +63,7 @@ class UserDefinedRationManager(object):
             ration_percents = udrm.close_up_ration
         else:
             ration_percents = udrm.calf_ration
-        return UserDefinedRationManager.feed_quality_fix(ration_percents, available_feeds)
+        return ration_percents
 
     def make_ration_from_user_values(ration_percents: Dict, available_feeds, req) -> Dict:
         """

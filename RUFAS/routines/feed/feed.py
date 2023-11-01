@@ -18,16 +18,17 @@ Author(s): Kass Chupongstimun, kass_c@hotmail.com,
 from . import nitrogen_loss, carbon_loss, protein_degradation
 from .feed_typed_dicts import PurchasedFeedTypedDict
 from ..animal.pen import Pen
-from ...database_reader import DatabaseReader
 from RUFAS.output_manager import OutputManager
-from typing import Dict, List, Union
-
-om = OutputManager()
-
+from typing import Dict, List, Union, Any
+from RUFAS.input_manager import InputManager
 from RUFAS.routines.animal.ration.user_defined_ration import \
     UserDefinedRationManager as UserDefinedRationManager
 
+im = InputManager()
+om = OutputManager()
+
 udrm = UserDefinedRationManager()
+
 
 def daily_feed_routine(feed, fields, animal_manager):
     """
@@ -62,11 +63,14 @@ class Feed:
         Args:
             data: the feed information from the input JSON file
         """
-        self.feed_database = data['feed_database']
-        self.feeds_table = data['feeds_table']
-        self.feed_quality_table = data['feed_quality_table']
-        self.nutrient_table = data['nutrient_table']
-        self.db_reader = DatabaseReader(self.feed_database)
+        self.nutrient_standard = im.get_data("config.nutrient_standard")
+        self.nutrient_table = 'NASEM_Comp' if self.nutrient_standard == 'NASEM' else 'NRC_Comp'
+
+        self.feeds_split_by_maturity = self._retrieve_data(data_source='feed_quality', var_names=['rufas_id'],
+                                                           unique_value=True)
+        self.all_feed_units = self._retrieve_data(data_source='user_feeds',
+                                                  var_names=['rufas_id', 'Name', 'units'])
+
         purchased_feeds_list = [feed_item["purchased_feed"] for feed_item in data["purchased_feeds"]]
         purchased_feed_costs = {str(feed_item["purchased_feed"]): feed_item["purchased_feed_cost"]
                                 for feed_item in data["purchased_feeds"]}
@@ -127,22 +131,22 @@ class Feed:
         # Loading in user-defined ration values
         self.user_defined_ration_percentages = data['user_defined_ration_percentages']
 
-        udrm.calf_ration = {str(dict['feed_type']):dict['ration_percentage'] for 
+        udrm.calf_ration = {str(dict['feed_type']): dict['ration_percentage'] for
                             dict in self.user_defined_ration_percentages['calf']}
 
-        udrm.growing_ration = {str(dict['feed_type']):dict['ration_percentage'] for 
-                            dict in self.user_defined_ration_percentages['growing']}
-        
-        udrm.close_up_ration = {str(dict['feed_type']):dict['ration_percentage'] for 
-                            dict in self.user_defined_ration_percentages['close_up']}
+        udrm.growing_ration = {str(dict['feed_type']): dict['ration_percentage'] for
+                               dict in self.user_defined_ration_percentages['growing']}
 
-        udrm.lactating_cow_ration = {str(dict['feed_type']):dict['ration_percentage'] for 
-                            dict in self.user_defined_ration_percentages['lac_cow']}
+        udrm.close_up_ration = {str(dict['feed_type']): dict['ration_percentage'] for
+                                dict in self.user_defined_ration_percentages['close_up']}
+
+        udrm.lactating_cow_ration = {str(dict['feed_type']): dict['ration_percentage'] for
+                                     dict in self.user_defined_ration_percentages['lac_cow']}
 
         udrm.tolerance = self.user_defined_ration_percentages['tolerance']
 
         udrm.milk_reduction_maximum = self.user_defined_ration_percentages['milk_reduction_maximum']
-         
+
     def summarize_feed_storage(self):
         """
         Description:
@@ -265,7 +269,7 @@ class Feed:
             self.CP_leachate_percent = 0.0
             self.NPN_min_percent = 0.0
 
-        def calibrate_storage(self, crop):
+        def calibrate_storage(self, crop):  # noqa
             """
             Description:
                 Calibrates the feed storage loss model to the crop being stored in the receptacle.
@@ -549,7 +553,7 @@ class Feed:
         storage.animal_avg_BW = avg_BW
 
     @staticmethod
-    def forage_inventory_plan(storage):
+    def forage_inventory_plan(storage):  # noqa
         """
         Description:
             Assess farm grown forage stocks and plan maximum intake of each
@@ -614,8 +618,7 @@ class Feed:
                         ) * 100
                         storage.inclusion_rate_est[animal] = \
                             (storage.inclusion_pct[animal] / 100) * storage.animal_avg_BW[animal]
-                        storage.req_inv[animal] = storage.inclusion_rate_est[animal] \
-                            * storage.cow_days[animal]
+                        storage.req_inv[animal] = storage.inclusion_rate_est[animal] * storage.cow_days[animal]
                     tot_req_inv_non_lactating_cows = 0
 
                     for animal in storage.req_inv:
@@ -689,7 +692,7 @@ class Feed:
                     storage.DMI_forage_max['lactating_cows'] = available_forage \
                                                                / storage.cow_days['lactating_cows']
 
-    def daily_feed_storage(self, fields):
+    def daily_feed_storage(self, fields):  # noqa
         """
         Description:
             Executes daily routines relating to crop and feed storage, which
@@ -765,7 +768,7 @@ class Feed:
 
             self.summarize_feed_storage()
 
-    def daily_feed_management(self, animal_manager):
+    def daily_feed_management(self, animal_manager):  # noqa
         """
         Description:
             Executes daily routines relating to feed management, specifically a
@@ -851,9 +854,8 @@ class Feed:
         Returns: a set-like list (no duplicates) of the entries listed in the
             table which splits feeds by quality
         """
-        column = 'entry'
-        dict_list = self.db_reader.query(self.feed_quality_table,
-                                         distinct=True, cols=[column])
+        column = 'rufas_id'
+        dict_list = self.feeds_split_by_maturity
         return [result[column] for result in dict_list]
 
     def get_all_feed_units(self, purchased_feeds, grown_feeds):
@@ -879,14 +881,10 @@ class Feed:
             - units is the string representing the units for the feed
             (e.g. 'kg')
         """
-        columns = ['entry', 'feed_name', 'units']
-        all_feeds = purchased_feeds + grown_feeds
-        dict_list = self.db_reader.query(self.feeds_table, cols=columns,
-                                         identifier='entry',
-                                         desired_rows=tuple(all_feeds))
+        dict_list = self.all_feed_units
 
-        all_feed_info = {str(result['entry']): {
-            'feed_name': result['feed_name'],
+        all_feed_info = {str(result['rufas_id']): {
+            'Name': result['Name'],
             'units': result['units']
         }
             for result in dict_list}
@@ -932,11 +930,7 @@ class Feed:
 
         purchased_feed_ids: List[int] = []
         for entry in entry_list:
-            if entry in self.entries_split_by_maturity:
-                # making the assumption that purchased feeds are at mid-maturity
-                purchased_feed_ids.append(entry + 2)
-            else:
-                purchased_feed_ids.append(entry)
+            purchased_feed_ids.append(entry)
         return purchased_feed_ids
 
     def get_quality_specific_feed_costs(self, input_feed_ids: List[int]) -> Dict[str, float]:
@@ -983,20 +977,15 @@ class Feed:
         rounded_DM = round(DM)
         rounded_NDF = round(NDF)
         column = 'differentiating_nutrient'
-        dict_list = self.db_reader.query(self.feed_quality_table,
-                                         distinct=True, cols=[column],
-                                         identifier='entry',
-                                         desired_rows=(grown_feed_entry,))
+        dict_list = self._retrieve_data(data_source='feed_quality', var_names=[column], unique_value=True,
+                                        identifier='rufas_id', desired_rows=grown_feed_entry)
         nutrient = dict_list[0][column]
 
         column = 'quality_id'
         rounded_nutrient = rounded_DM if nutrient == 'DM' else rounded_NDF
-        dict_list = self.db_reader.query(self.feed_quality_table,
-                                         cols=[column], identifier='entry',
-                                         desired_rows=(str(grown_feed_entry),),
-                                         compare_val=str(rounded_nutrient),
-                                         low_col='low_percent',
-                                         high_col='high_percent', )
+        dict_list = self._retrieve_data(data_source='feed_quality', var_names=[column],
+                                        identifier='rufas_id', desired_rows=grown_feed_entry,
+                                        compare_val=rounded_nutrient, low_col='low_percent', high_col='high_percent')
 
         return dict_list[0][column]
 
@@ -1013,9 +1002,9 @@ class Feed:
         Returns: a string representation of the quality status
         """
         column = 'status'
-        status_dict = self.db_reader.query(self.feed_quality_table,
-                                           cols=[column], identifier='quality_id',
-                                           desired_rows=(str(quality_id),))
+        status_dict = self._retrieve_data(data_source='feed_quality',
+                                          var_names=[column], unique_value=False,
+                                          identifier='quality_id', desired_rows=quality_id)
 
         return status_dict[0][column]
 
@@ -1084,12 +1073,11 @@ class Feed:
         Returns: a dictionary where the keys are the the feed identifiers and
         the values are nutrient dictionaries
         """
-        dict_list = self.db_reader.query(self.nutrient_table,
-                                         identifier='feed_id',
-                                         desired_rows=tuple(feed_ids))
+        dict_list = self._retrieve_data(data_source=self.nutrient_table, identifier='rufas_id', desired_rows=feed_ids)
+        # missing: (26, 54, 136, 139, 157)
         nutrient_vals = {}
         for dictionary in dict_list:
-            feed_id = dictionary['feed_id']
+            feed_id = dictionary['rufas_id']
             # the key in the available_feeds dictionary has a 'g' as the
             # suffix if it is a grown feed
             feed_key = str(feed_id)
@@ -1101,12 +1089,148 @@ class Feed:
         return nutrient_vals
 
     def get_calf_feeds(self):
-        feed_ids = [155, 156, 157]
-        columns = ['DM', 'CP', 'EE', 'DE']
-        nutrients = self.db_reader.query(
-            self.nutrient_table,
-            cols=columns,
-            identifier='feed_id',
-            desired_rows=tuple(feed_ids))
-        calf_feeds = {155: nutrients[0], 156: nutrients[1], 157: nutrients[2]}
+        feed_ids = [202, 203, 216]
+        if 'DE_Base' in list(self.available_feeds.items())[0][1].keys():
+            columns = ['rufas_id', 'DM', 'CP', 'EE', 'DE_Base']
+        else:
+            columns = ['rufas_id', 'DM', 'CP', 'EE', 'DE']
+
+        nutrients = self._retrieve_data(data_source=self.nutrient_table, var_names=columns,
+                                        identifier='rufas_id', desired_rows=feed_ids)
+
+        calf_feeds = {}
+        for feed_id in feed_ids:
+            feed_id_nutrient = next(nutrient for nutrient in nutrients if nutrient['rufas_id'] == feed_id)
+            calf_feeds[feed_id] = {key: feed_id_nutrient[key]
+                                   for key in list(feed_id_nutrient.keys())
+                                   if key != 'rufas_id'}
         return calf_feeds
+
+    def _pack_into_dict(self, var_names: List[str], var_values: List[Any]) -> Dict[str, Any]:
+        """
+        Pack the provided variable names and values into a dictionary.
+
+        Parameters
+        ----------
+        var_names : List[str]
+            List of keys for the resulting dictionary.
+        var_values : List[Any]
+            Corresponding values for the keys specified in `var_names`.
+
+        Returns
+        -------
+        Dict[str, Any]
+            Dictionary constructed from the provided variable names and values.
+
+        Raises
+        ------
+        ValueError
+            If the lengths of `var_names` and `var_values` are not the same.
+
+        Notes
+        -----
+        Ensure that both `var_names` and `var_values` have the same length.
+        Each name in `var_names` will be paired with its corresponding value from `var_values`.
+
+        Example
+        -------
+        >>> self._pack_into_dict(['a', 'b'], [1, 2])
+        {'a': 1, 'b': 2}
+
+        """
+        result_dict = {}
+        for id_var, var_name in enumerate(var_names):
+            result_dict[var_name] = var_values[id_var]
+        return result_dict
+
+    def _retrieve_data(self, data_source: str, var_names: List[str] = None, unique_value: bool = False,
+                       identifier: str = None, desired_rows: List[Any] = None,
+                       compare_val: int = None, low_col: str = None, high_col: str = None) -> List[Dict[str, Any]]:
+        """
+        This function retrieves and filters the desired data, pack each "row" into a dictionary object, and returns a
+        list of desired rows
+
+        Parameters
+        ----------
+        data_source : str
+            Path to retrieve the desired data from IM.
+        var_names : List[str] = None
+            A list of desired variables (columns) to retrieve.
+            If omitted, all existing columns are returned.
+        unique_value: bool = False
+            If True, returns only unique values. Default is False.
+        identifier: str = None
+            Column name used for filtering based on `desired_rows`.
+            Both `identifier` and `desired_rows` must be provided for filtering.
+        desired_rows: List[Any] = None
+            Desired row values for filtering. Rows with these values in the `identifier` column are returned.
+        compare_val: int = None
+            Baseline value for comparison. Used with `low_col` and `high_col` to filter rows. The "compare_val" should
+            fall in the range of [low_col_value, high_col_value], otherwise the current row will be ignored.
+        low_col: str = None
+            Column indicating the lower bound for comparison with `compare_val`.
+        high_col: str = None
+            Column indicating the upper bound for comparison with `compare_val`.
+
+        Returns
+        -------
+        List[Dict[str, Any]]
+            Returns a list of dictionaries, each dictionary corresponds to a row in the csv file.
+
+        Example
+        -------
+       1. Retrieve specific columns:
+        >>> self._retrieve_data(data_source="NASEM_Comp", var_names=["rufas_id", "Name", "feed_type"])
+        Returns rows from the data source "NASEM_Comp" with columns "rufas_id", "Name", and "feed_type" packed into
+        dictionaries.
+
+        2. Filter by specific rows based on an identifier:
+        >>> self._retrieve_data(data_source="NASEM_Comp", identifier="rufas_id", desired_rows=[1, 2, 157])
+        Returns rows where the "rufas_id" column has values 1, 2 or 157.
+
+        3. Use a value for range comparison:
+        >>> self._retrieve_data(data_source="NASEM_Comp", compare_val=5, low_col="lower_limit", high_col="limit")
+        Returns rows where the "compare_val" of 5 lies between the values in columns "lower_limit" and "limit".
+
+        4. Retrieve unique values from specified columns:
+        >>> self._retrieve_data(data_source="NASEM_Comp", var_names=["rufas_id", "Name"], unique_value=True)
+        Returns unique rows (based on "rufas_id" and "Name" columns) from the data source "NASEM_Comp".
+
+        5. No filters or specific columns, retrieve all data:
+        >>> self._retrieve_data(data_source="NASEM_Comp")
+        Returns all rows from the data source "NASEM_Comp" with all columns packed into dictionaries.
+
+        6. Filtering with range comparison and specific desired rows:
+        >>> self._retrieve_data(data_source="NASEM_Comp", identifier="feed_type", desired_rows=["Conc"], compare_val=10,
+                          low_col="lower_limit", high_col="limit")
+        Returns rows where the "feed_type" column has values "Conc" and where the value 10 lies between the values in
+        columns "lower_limit" and "limit".
+        """
+        info_map = {"class": self.__class__.__name__,
+                    "function": self._retrieve_data.__name__,
+                    }
+
+        result_list = []
+        values = []
+        data = im.get_data(data_source)
+        if not var_names:
+            var_names = list(data.keys())
+
+        for i in range(len(data[var_names[0]])):
+            try:
+                if desired_rows and identifier and data[identifier][i] not in desired_rows:
+                    continue
+                if compare_val and low_col and high_col:
+                    low_val, high_val = data[low_col][i], data[high_col][i]
+                    if not (low_val <= compare_val <= high_val):
+                        continue
+                var_values = [data[key][i] for key in var_names]
+                if unique_value and var_values in values:
+                    continue
+                values.append(var_values)
+                result_list.append(self._pack_into_dict(var_names, var_values))
+            except IndexError as e:
+                om.add_error("Length mismatch", str(e), info_map=info_map)
+                raise e
+
+        return result_list
