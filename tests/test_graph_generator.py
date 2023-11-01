@@ -42,7 +42,7 @@ def test_save_graph_successful(graph_generator: GraphGenerator) -> None:
             assert result == mock_generate_graph_path.return_value
 
 
-# @pytest.mark.skip
+@pytest.mark.skip
 def test_save_graph_exception(graph_generator: GraphGenerator) -> None:
     graph_details: Dict[str, str] = {
         "title": "Test Graph",
@@ -183,3 +183,18 @@ def test_generate_graph_success(graph_generator: GraphGenerator) -> None:
     graph_generator._save_graph.assert_called_once_with(
         graph_details, filter_file_name, save_path, graphics_dir
     )
+
+
+def test_generate_graph_exception(graph_generator: GraphGenerator) -> None:
+    graph_generator._draw_graph = MagicMock()
+    graph_generator._customize_graph = MagicMock()
+    graph_generator._save_graph = MagicMock(side_effect=Exception)
+    filtered_pool = {}
+    graph_details = {"type": "plot", "variables": ["var1", "var2"]}
+    save_path = Path("save")
+    filter_file_name = "filter_file"
+    graphics_dir = Path("graphs")
+    with pytest.raises(Exception):
+        graph_generator.generate_graph(
+            filtered_pool, graph_details, save_path, filter_file_name, graphics_dir
+        )
