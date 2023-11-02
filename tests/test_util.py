@@ -160,21 +160,14 @@ def test_percent_calculator() -> None:
         pc(1.0)
 
 
-@pytest.mark.parametrize(
-    "year, day, expected_month",
-    [
-        (2000, 366, 12),  # leap year
-        (2001, 365, 12),  # normal year
-        (2000, 60, 2),
-        (2001, 60, 3),
-    ],
-)
+@pytest.mark.parametrize("year, day, expected_month", [
+    (2000, 366, 12),  # leap year
+    (2001, 365, 12),  # normal year
+    (2000, 60, 2),
+    (2001, 60, 3)
+])
 def test_day_to_month_conversion(year: int, day: int, expected_month: int):
     """Tests that number of days were converted into months correctly"""
-    mocked_time = MagicMock(Time)
-    setattr(mocked_time, "calendar_year", year)
-    setattr(mocked_time, "day", day)
-    assert Utility.day_to_month_conversion(mocked_time) == expected_month
     assert Utility.day_to_month_conversion(day, year) == expected_month
 
 
