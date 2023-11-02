@@ -90,8 +90,6 @@ class HeiferII(HeiferI):
         self.conception_rate = 0.0
         self.tai_program_start_day = 0
         self.synch_ed_program_start_day = 0
-        self.days_in_preg = 0
-        self.gestation_length = 0.0
         self.abortion_day = None
         self.p_gest_for_calf = 0
 
