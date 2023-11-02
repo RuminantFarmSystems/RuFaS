@@ -108,16 +108,17 @@ class AnimalData:
             return
 
         if self.init:
-            self._init_calves_from_simulation(num-current_num_calves, breed)
+            self.calves += self._init_calves_from_simulation(num - current_num_calves, breed)
 
         else:
             if current_num_calves + self.num_calves_in_data < num:
-                self._init_calves_from_data(self.num_calves_in_data)
-                self._init_calves_from_simulation(num-current_num_calves-self.num_calves_in_data, breed)
+                self.calves += self._init_calves_from_data(self.num_calves_in_data)
+                self.calves += self._init_calves_from_simulation(num - current_num_calves - self.num_calves_in_data,
+                                                                 breed)
             else:
-                self._init_calves_from_data(num-current_num_calves)
+                self.calves += self._init_calves_from_data(num - current_num_calves)
 
-    def _init_calves_from_simulation(self, num: int, breed: str) -> None:
+    def _init_calves_from_simulation(self, num: int, breed: str) -> List[Calf]:
         calves: List[Calf] = []
         while len(calves) < num:
             args = {
@@ -132,9 +133,9 @@ class AnimalData:
             if not (calf.culled or calf.sold):
                 calves.append(calf)
 
-        self.calves += calves
+        return calves
 
-    def _init_calves_from_data(self, num: int) -> None:
+    def _init_calves_from_data(self, num: int) -> List[Calf]:
         calves: List[Calf] = []
         calves_data = im.get_data("calves")
         args_properties = ['id', 'breed', 'birth_date', 'days_born', 'p_init', 'birth_weight', 'body_weight',
@@ -144,7 +145,7 @@ class AnimalData:
             calf = Calf(args)
             calves.append(calf)
 
-        self.calves += calves
+        return calves
 
     def _init_heiferIs(self, num: int, breed: str) -> None:
         current_num_heiferIs = len(self.heiferIs)
@@ -153,18 +154,19 @@ class AnimalData:
             return
 
         if self.init:
-            self._init_heiferIs_from_simulation(num - current_num_heiferIs, breed)
+            self.heiferIs += self._init_heiferIs_from_simulation(num - current_num_heiferIs, breed)
 
         else:
             if current_num_heiferIs + self.num_heiferIs_in_data < num:
-                self._init_heiferIs_from_data(self.num_heiferIs_in_data)
-                self._init_heiferIs_from_simulation(num - current_num_heiferIs - self.num_heiferIs_in_data, breed)
+                self.heiferIs += self._init_heiferIs_from_data(self.num_heiferIs_in_data)
+                self.heiferIs += self._init_heiferIs_from_simulation(
+                    num - current_num_heiferIs - self.num_heiferIs_in_data, breed)
             else:
-                self._init_heiferIs_from_data(num - current_num_heiferIs)
+                self.heiferIs += self._init_heiferIs_from_data(num - current_num_heiferIs)
 
-    def _init_heiferIs_from_simulation(self, num: int, breed: str, sim_days=5000) -> None:
+    def _init_heiferIs_from_simulation(self, num: int, breed: str, sim_days=5000) -> List[HeiferI]:
         heiferIs: List[HeiferI] = []
-        calves = self.get_calves(num, breed)
+        calves = self._init_calves_from_simulation(num, breed)
 
         for day in range(sim_days):
             for calf in calves:
@@ -181,9 +183,9 @@ class AnimalData:
             if len(heiferIs) == num:
                 break
 
-        self.heiferIs += heiferIs
+        return heiferIs
 
-    def _init_heiferIs_from_data(self, num: int) -> None:
+    def _init_heiferIs_from_data(self, num: int) -> List[HeiferI]:
         heiferIs: List[HeiferI] = []
         heiferI_data = im.get_data("heiferIs")
         args_properties = ['id', 'breed', 'birth_date', 'days_born', 'birth_weight', 'body_weight', 'wean_weight',
@@ -193,7 +195,7 @@ class AnimalData:
             heiferI = HeiferI(args)
             heiferIs.append(heiferI)
 
-        self.heiferIs += heiferIs
+        return heiferIs
 
     def _init_heiferIIs(self, num: int, breed: str) -> None:
         current_num_heiferIIs = len(self.heiferIIs)
@@ -202,18 +204,19 @@ class AnimalData:
             return
 
         if self.init:
-            self._init_heiferIIs_from_simulation(num - current_num_heiferIIs, breed)
+            self.heiferIIs += self._init_heiferIIs_from_simulation(num - current_num_heiferIIs, breed)
 
         else:
             if current_num_heiferIIs + self.num_heiferIIs_in_data < num:
-                self._init_heiferIIs_from_data(self.num_heiferIIs_in_data)
-                self._init_heiferIIs_from_simulation(num - current_num_heiferIIs - self.num_heiferIIs_in_data, breed)
+                self.heiferIIs += self._init_heiferIIs_from_data(self.num_heiferIIs_in_data)
+                self.heiferIIs += self._init_heiferIIs_from_simulation(
+                    num - current_num_heiferIIs - self.num_heiferIIs_in_data, breed)
             else:
-                self._init_heiferIIs_from_data(num - current_num_heiferIIs)
+                self.heiferIIs += self._init_heiferIIs_from_data(num - current_num_heiferIIs)
 
-    def _init_heiferIIs_from_simulation(self, num: int, breed: str, sim_days=5000) -> None:
+    def _init_heiferIIs_from_simulation(self, num: int, breed: str, sim_days=5000) -> List[HeiferII]:
         heiferIIs: List[HeiferII] = []
-        heiferIs = self.get_heiferIs(num, breed)
+        heiferIs = self._init_heiferIs_from_simulation(num, breed)
 
         for day in range(sim_days):
             for heiferI in heiferIs:
@@ -235,9 +238,9 @@ class AnimalData:
                 if len(heiferIIs) == num:
                     break
 
-        self.heiferIIs += heiferIIs
+        return heiferIIs
 
-    def _init_heiferIIs_from_data(self, num: int) -> None:
+    def _init_heiferIIs_from_data(self, num: int) -> List[HeiferII]:
         heiferIIs: List[HeiferII] = []
         heiferII_data = im.get_data("heiferIIs")
         args_properties = ['id', 'breed', 'birth_date', 'days_born', 'birth_weight', 'body_weight', 'wean_weight',
@@ -250,7 +253,7 @@ class AnimalData:
             heiferII = HeiferII(args)
             heiferIIs.append(heiferII)
 
-        self.heiferIIs += heiferIIs
+        return heiferIIs
 
     def _init_heiferIIIs(self, num: int, breed: str) -> None:
         current_num_heiferIIIs = len(self.heiferIIIs)
@@ -259,18 +262,19 @@ class AnimalData:
             return
 
         if self.init:
-            self._init_heiferIIIs_from_simulation(num - current_num_heiferIIIs, breed)
+            self.heiferIIs += self._init_heiferIIIs_from_simulation(num - current_num_heiferIIIs, breed)
 
         else:
             if current_num_heiferIIIs + self.num_heiferIIIs_in_data < num:
-                self._init_heiferIIIs_from_data(self.num_heiferIIIs_in_data)
-                self._init_heiferIIIs_from_simulation(num - current_num_heiferIIIs - self.num_heiferIIIs_in_data, breed)
+                self.heiferIIs += self._init_heiferIIIs_from_data(self.num_heiferIIIs_in_data)
+                self.heiferIIs += self._init_heiferIIIs_from_simulation(
+                    num - current_num_heiferIIIs - self.num_heiferIIIs_in_data, breed)
             else:
-                self._init_heiferIIIs_from_data(num - current_num_heiferIIIs)
+                self.heiferIIs += self._init_heiferIIIs_from_data(num - current_num_heiferIIIs)
 
-    def _init_heiferIIIs_from_simulation(self, num: int, breed: str, sim_days=5000) -> None:
+    def _init_heiferIIIs_from_simulation(self, num: int, breed: str, sim_days=5000) -> List[HeiferIII]:
         heiferIIIs: List[HeiferIII] = []
-        heiferIIs = self.get_heiferIIs(num, breed)
+        heiferIIs = self._init_heiferIIs_from_simulation(num, breed)
 
         for day in range(sim_days):
             for heiferII in heiferIIs:
@@ -289,9 +293,9 @@ class AnimalData:
                 if len(heiferIIIs) == num:
                     break
 
-        self.heiferIIIs += heiferIIIs
+        return heiferIIIs
 
-    def _init_heiferIIIs_from_data(self, num: int) -> None:
+    def _init_heiferIIIs_from_data(self, num: int) -> List[HeiferIII]:
         heiferIIIs: List[HeiferIII] = []
         heiferIII_data = im.get_data("heiferIIIs")
         args_properties = ['id', 'breed', 'birth_date', 'days_born', 'birth_weight', 'body_weight', 'wean_weight',
@@ -304,7 +308,7 @@ class AnimalData:
             heiferIII = HeiferIII(args)
             heiferIIIs.append(heiferIII)
 
-        self.heiferIIIs += heiferIIIs
+        return heiferIIIs
 
     def _init_cows(self, num: int, breed: str) -> None:
         current_num_cows = len(self.cows)
@@ -313,18 +317,18 @@ class AnimalData:
             return
 
         if self.init:
-            self._init_cows_from_simulation(num - current_num_cows, breed)
+            self.cows += self._init_cows_from_simulation(num - current_num_cows, breed)
 
         else:
             if current_num_cows + self.num_cows_in_data < num:
-                self._init_cows_from_data(self.num_cows_in_data)
-                self._init_cows_from_simulation(num - current_num_cows - self.num_cows_in_data, breed)
+                self.cows += self._init_cows_from_data(self.num_cows_in_data)
+                self.cows += self._init_cows_from_simulation(num - current_num_cows - self.num_cows_in_data, breed)
             else:
-                self._init_cows_from_data(num - current_num_cows)
+                self.cows += self._init_cows_from_data(num - current_num_cows)
 
-    def _init_cows_from_simulation(self, num: int, breed: str, sim_days=5000) -> None:
+    def _init_cows_from_simulation(self, num: int, breed: str, sim_days=5000) -> List[Cow]:
         cows: List[Cow] = []
-        heiferIIIs = self.get_heiferIIIs(num, breed)
+        heiferIIIs = self._init_heiferIIIs_from_simulation(num, breed)
 
         for day in range(sim_days):
             for heiferIII in heiferIIIs:
@@ -346,9 +350,9 @@ class AnimalData:
                 if len(cows) == num:
                     break
 
-        self.cows += cows
+        return cows
 
-    def _init_cows_from_data(self, num: int) -> None:
+    def _init_cows_from_data(self, num: int) -> List[Cow]:
         cows: List[Cow] = []
         cow_data = im.get_data("cows")
         args_properties = ['id', 'breed', 'birth_date', 'days_born', 'birth_weight', 'body_weight', 'wean_weight',
@@ -363,7 +367,7 @@ class AnimalData:
             cow = Cow(args)
             cows.append(cow)
 
-        self.cows += cows
+        return cows
 
     def _init_replacement_cows(self, num: int, breed: str) -> None:
         current_num_replacement_cows = len(self.replacement)
@@ -372,17 +376,18 @@ class AnimalData:
             return
 
         if self.init:
-            self._init_replacement_cows_from_simulation(num - current_num_replacement_cows, breed)
+            self.replacement += self._init_replacement_cows_from_simulation(num - current_num_replacement_cows, breed)
 
         else:
             if current_num_replacement_cows + self.num_replacement_cows_in_data < num:
-                self._init_replacement_cows_from_data(self.num_replacement_cows_in_data)
-                self._init_replacement_cows_from_simulation(num - current_num_replacement_cows -
-                                                            self.num_replacement_cows_in_data, breed)
+                self.replacement += self._init_replacement_cows_from_data(self.num_replacement_cows_in_data)
+                self.replacement += self._init_replacement_cows_from_simulation(num - current_num_replacement_cows -
+                                                                                self.num_replacement_cows_in_data,
+                                                                                breed)
             else:
-                self._init_replacement_cows_from_data(num - current_num_replacement_cows)
+                self.replacement += self._init_replacement_cows_from_data(num - current_num_replacement_cows)
 
-    def _init_replacement_cows_from_simulation(self, num: int, breed: str, sim_days=5000) -> None:
+    def _init_replacement_cows_from_simulation(self, num: int, breed: str, sim_days=5000) -> List[Cow]:
         replacement_cows: List[Cow] = []
         heiferIIIs = self.get_heiferIIIs(num, breed)
 
@@ -406,9 +411,9 @@ class AnimalData:
                 if len(replacement_cows) == num:
                     break
 
-        self.replacement += replacement_cows
+        return replacement_cows
 
-    def _init_replacement_cows_from_data(self, num: int) -> None:
+    def _init_replacement_cows_from_data(self, num: int) -> List[Cow]:
         replacement_cows: List[Cow] = []
         replacement_data = im.get_data("replacement_cows")
         args_properties = ['id', 'breed', 'birth_date', 'days_born', 'birth_weight', 'body_weight', 'wean_weight',
@@ -422,7 +427,7 @@ class AnimalData:
             replacement_cow = Cow(args)
             replacement_cows.append(replacement_cow)
 
-        self.replacement += replacement_cows
+        return replacement_cows
 
     def get_calves(self, num, breed):
         self._init_calves(num, breed)
