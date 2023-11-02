@@ -295,7 +295,7 @@ class Utility:
     @staticmethod
     def day_to_month_conversion(day: int, calendar_year: int) -> int:
         """
-        Converts the day number into the corresponding month of the year.
+        Converts the julian day into the corresponding month of the current calendar year.
 
         Parameters
         ----------
@@ -308,6 +308,11 @@ class Utility:
         -------
         int
             The corresponding month of the year (1 for January, 2 for February, etc.).
+
+        Notes
+        -----
+        The calendar year is specified so it can be determined if it is a leap year.
+
         """
         non_leap_cumulative_days_in_months = [31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334, 365]
         leap_cumulative_days_in_months = [31, 60, 91, 121, 152, 182, 213, 244, 274, 305, 335, 366]
