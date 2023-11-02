@@ -1,8 +1,6 @@
 import pytest
 from pytest import approx, raises
-from unittest.mock import MagicMock
 
-from RUFAS.time import Time
 from RUFAS.util import Utility
 
 
@@ -177,6 +175,7 @@ def test_day_to_month_conversion(year: int, day: int, expected_month: int):
     setattr(mocked_time, "calendar_year", year)
     setattr(mocked_time, "day", day)
     assert Utility.day_to_month_conversion(mocked_time) == expected_month
+    assert Utility.day_to_month_conversion(day, year) == expected_month
 
 
 def test_convert_list_of_dicts_to_dict_of_lists_empty_list():
