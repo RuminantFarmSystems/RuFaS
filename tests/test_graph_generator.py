@@ -5,7 +5,7 @@ from unittest.mock import patch
 from matplotlib import pyplot as plt
 from mock.mock import MagicMock
 import pytest
-from RUFAS.graph_generator import GraphGenerator
+from RUFAS.graph_generator import GraphGenerator, TUPLE_BASED_FUNCTIONS
 
 
 @pytest.fixture
@@ -211,20 +211,23 @@ def test_draw_graph_exception(graph_generator: GraphGenerator) -> None:
         graph_generator._draw_graph(
             graph_type="plot",
             data={
-                "key1": {"values": [{"a": 1, "b": 2}, {"a": 3, "c": 4}]},
-                "key2": {"values": [{"a": 5, "b": 6}, {"a": 7, "c": 8}]},
+                "key1": {"values": [{"a": 1, "b": 2}, {"a": 3, "b": 4}]},
+                "key2": {"values": [{"a": 5, "b": 6}, {"a": 7, "b": 8}]},
             },
             selected_variables=None,
         )
 
 
 def test_draw_graph_success(graph_generator: GraphGenerator) -> None:
-    gaph_type = "plot"
+    graph_type = TUPLE_BASED_FUNCTIONS[0]
     data = {
-        "key1": {"values": [{"a": 1, "b": 2}, {"a": 3, "c": 4}]},
-        "key2": {"values": [{"a": 5, "b": 6}, {"a": 7, "c": 8}]},
+        "key1": {"values": [{"a": 1, "b": 2}, {"a": 3, "b": 4}]},
+        "key2": {"values": [{"a": 5, "b": 6}, {"a": 7, "b": 8}]},
     }
-    num_figures_before = plt.gcf().number
-    graph_generator._draw_graph(gaph_type, data)
-    num_figures_after = plt.gcf().number
-    assert num_figures_before < num_figures_after
+    graph_generator._handle_tuple_based_plot = MagicMock()
+    with patch(
+        "RUFAS.graph_generator.Utility.convert_list_of_dicts_to_dict_of_lists"
+    ) as mock_utility:
+        graph_generator._draw_graph(graph_type, data, ["a", "b"])
+        assert graph_generator._handle_tuple_based_plot.call_count == 2
+        assert mock_utility.call_count == 2
