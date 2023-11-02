@@ -1,14 +1,15 @@
 import argparse
+import json
 import os.path
 from pathlib import Path
-from mock import MagicMock
+from mock import MagicMock, mock_open, patch
 
 import pytest
 from pytest_mock import MockerFixture
 
 import config.global_variables
 from config import global_variables
-from main import execute_simulations
+from main import execute_simulations, get_filepath, reload_pool
 from main import main
 from main import parse_gnu_args
 from main import run_rufas
@@ -199,6 +200,16 @@ def test_execute_simulations(mocker: MockerFixture, is_data_valid: bool,
     assert mock_output_manager.save_variables.call_args_list == [
         mocker.call("output", "output/output_filters/", True),
     ] * len(metadata_file_list)
+
+
+def test_reload_pool() -> None:
+    """Checks that reload_pool loads the filepath provided"""
+    dummy_data = {"vars": {"var1": {"values": [1, 2, 3], "info_map": {"imvar1": 1, "imvar2": 2}},
+                           "var2": {"values": {"a": 1, "b": 2}, "info_map": {}}}}
+    with patch('main.open', mock_open(read_data=json.dumps(dummy_data))):
+        with patch('main.get_filepath', return_value="temp_dir/valid_file.json"):
+            result = reload_pool()
+            assert result == dummy_data
 
 
 def test_parse_gnu_args(mocker: MockerFixture) -> None:
