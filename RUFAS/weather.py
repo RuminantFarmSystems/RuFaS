@@ -1,8 +1,12 @@
 import numpy as np
 
+from RUFAS.config import Config
 from RUFAS.current_day_conditions import CurrentDayConditions
+from RUFAS.output_manager import OutputManager
 from RUFAS.time import Time
 from RUFAS.util import Utility
+
+om = OutputManager()
 
 
 def is_leap_year(year):
@@ -25,20 +29,50 @@ def is_leap_year(year):
 
 
 class Weather:
+    """
+    The `Weather` class manages all weather data used to run a single simulation.
 
-    def __init__(self, weather_file, config):
+    Attributes
+    ----------
+    __precipitation : list
+        Amounts of precipitation that fall on given days (mm).
+    __max_daily_temperature : list
+        Maximum temperatures of days (°C).
+    __min_daily_temperature : list
+        Minimum temperatures of days (°C).
+    __mean_daily_temperature : list
+        Mean temperatures of days (°C).
+    __radiation : list
+        Energy from the sun (MJ/m^2).
+    __irrigation : list
+        Amounts of irrigation applied to fields on given days (mm).
+    __mean_annual_temperature : float
+        Mean of mean daily temperatures over all the weather data used by the simulation (°C).
+
+    Notes
+    -----
+    All attributes besides the mean annual temperature are held as two-dimensional arrays, with the first array being
+    the year, and the second being the day.
+
+    """
+
+    def __init__(self, weather_file: dict, config: Config):
         """
-        Description:
-            Contains daily weather information stored in 2D lists
-            Data lists are in the format Data[year][julian_day].
-            Allows daily information to be accessed by indexing to
-            [time.year - 1][time.day - 1] (list indexing starts at 0,
-            time starts at 1)
+        Initializes the a `Weather` instance using user-supplied whether data and overall simulation parameters.
 
-        Args:
-            weather_file: path to the weather file specified in the json file
-            config: instance of the Config class containing information necessary
-                to initialize the Weather object
+        Parameters
+        ----------
+        weather_file : dict
+            All the weather data available to be used by the simulation.
+        config : Config
+            Config instance containing information about the configuration of the simulation.
+
+        Notes
+        -----
+        Contains daily weather information stored in 2D lists. Data lists are in the format Data[year][julian_day].
+        Allows daily information to be accessed by indexing to [time.year - 1][time.day - 1] (list indexing starts at 0,
+        time starts at 1).
+
         """
 
         years = config.years
@@ -48,13 +82,13 @@ class Weather:
         start_day = config.start_day
 
         # initialize data sets
-        self.rainfall = []
-        self.T_max = []
-        self.T_min = []
-        self.T_avg = []
-        self.radiation = []
-        self.irrigation = []
-        self.T_avg_annual = []
+        self.__precipitation = []
+        self.__max_daily_temperature = []
+        self.__min_daily_temperature = []
+        self.__mean_daily_temperature = []
+        self.__radiation = []
+        self.__irrigation = []
+        self.__mean_annual_temperature: float = None
 
         year_length = config.year_length
         leap_year_length = config.leap_year_length
@@ -84,12 +118,12 @@ class Weather:
 
         # fill the weather arrays with zeros for the size of each year in years[]
         for year in years:
-            self.rainfall.append([0.0 for _ in range(len(year))])
-            self.T_max.append([0.0 for _ in range(len(year))])
-            self.T_min.append([0.0 for _ in range(len(year))])
-            self.T_avg.append([0.0 for _ in range(len(year))])
-            self.radiation.append([0.0 for _ in range(len(year))])
-            self.irrigation.append([0.0 for _ in range(len(year))])
+            self.__precipitation.append([0.0 for _ in range(len(year))])
+            self.__max_daily_temperature.append([0.0 for _ in range(len(year))])
+            self.__min_daily_temperature.append([0.0 for _ in range(len(year))])
+            self.__mean_daily_temperature.append([0.0 for _ in range(len(year))])
+            self.__radiation.append([0.0 for _ in range(len(year))])
+            self.__irrigation.append([0.0 for _ in range(len(year))])
 
         for i in range(len(weather_file['year'])):
             current_year = weather_file['year'][i]
@@ -103,14 +137,17 @@ class Weather:
             elif current_year == config.end_year and current_day > config.end_day:
                 break
 
-            self.rainfall[current_year_index][current_day_index] = weather_file['precip'][i]
-            self.T_max[current_year_index][current_day_index] = weather_file['high'][i]
-            self.T_min[current_year_index][current_day_index] = weather_file['low'][i]
-            self.T_avg[current_year_index][current_day_index] = weather_file['avg'][i]
-            self.radiation[current_year_index][current_day_index] = weather_file['Hday'][i]
-            self.irrigation[current_year_index][current_day_index] = weather_file['irrigation'][i]
+            self.__precipitation[current_year_index][current_day_index] = weather_file['precip'][i]
+            self.__max_daily_temperature[current_year_index][current_day_index] = weather_file['high'][i]
+            self.__min_daily_temperature[current_year_index][current_day_index] = weather_file['low'][i]
+            self.__mean_daily_temperature[current_year_index][current_day_index] = weather_file['avg'][i]
+            self.__radiation[current_year_index][current_day_index] = weather_file['Hday'][i]
+            self.__irrigation[current_year_index][current_day_index] = weather_file['irrigation'][i]
 
-        self.T_avg_annual = self._calculate_average_annual_temperature(weather_file['avg'])
+        self.__mean_annual_temperature = self._calculate_average_annual_temperature(weather_file['avg'])
+
+        info_map = {"class": self.__class__.__name__, "function": self.__init__.__name__, "prefix": "Weather"}
+        om.add_variable("average_annual_temperature", self.__mean_annual_temperature, info_map)
 
     def get_current_day_conditions(self, time: Time) -> CurrentDayConditions:
         """
@@ -134,21 +171,45 @@ class Weather:
         """
         year = time.year
         day = time.day
-        month = Utility.day_to_month_conversion(time)
+        month = Utility.day_to_month_conversion(day, time.calendar_year)
         daylength = CurrentDayConditions.determine_daylength(month)
         try:
-            current_conditions = CurrentDayConditions(incoming_light=self.radiation[year - 1][day - 1],
-                                                      min_air_temperature=self.T_min[year - 1][day - 1],
-                                                      mean_air_temperature=self.T_avg[year - 1][day - 1],
-                                                      max_air_temperature=self.T_max[year - 1][day - 1],
-                                                      annual_mean_air_temperature=self.T_avg_annual,
-                                                      precipitation=self.rainfall[year - 1][day - 1],
-                                                      irrigation=self.irrigation[year - 1][day - 1],
-                                                      daylength=daylength)
+            current_conditions = CurrentDayConditions(
+                incoming_light=self.__radiation[year - 1][day - 1],
+                min_air_temperature=self.__min_daily_temperature[year - 1][day - 1],
+                mean_air_temperature=self.__mean_daily_temperature[year - 1][day - 1],
+                max_air_temperature=self.__max_daily_temperature[year - 1][day - 1],
+                annual_mean_air_temperature=self.__mean_annual_temperature,
+                precipitation=self.__precipitation[year - 1][day - 1],
+                irrigation=self.__irrigation[year - 1][day - 1],
+                daylength=daylength
+            )
         except IndexError:
-            raise IndexError(f"Attempted to get weather conditions for day: {time.day}, year: {time.year}.")
+            raise IndexError(f"Attempted to get weather conditions for day: {day}, year: {year}.")
 
         return current_conditions
+
+    def record_weather(self, time: Time) -> None:
+        """
+        Records the current weather conditions in the OutputManager.
+
+        Parameters
+        ----------
+        time: Time
+            Time object containing the current time of the simulation.
+
+        """
+        info_map = {"class": self.__class__.__name__, "function": self.record_weather.__name__, "prefix": "Weather"}
+        current_weather = self.get_current_day_conditions(time)
+        om.add_variable("precipitation", current_weather.rainfall, info_map)
+        om.add_variable("rainfall", current_weather.rainfall, info_map)
+        om.add_variable("snowfall", current_weather.snowfall, info_map)
+        om.add_variable("daylength", current_weather.daylength, info_map)
+        om.add_variable("maximum_temperature", current_weather.max_air_temperature, info_map)
+        om.add_variable("minimum_temperature", current_weather.min_air_temperature, info_map)
+        om.add_variable("average_temperature", current_weather.mean_air_temperature, info_map)
+        om.add_variable("radiation", current_weather.incoming_light, info_map)
+        om.add_variable("irrigation", current_weather.irrigation, info_map)
 
     @staticmethod
     def _calculate_average_annual_temperature(daily_average_temperatures: list[float]) -> float:
