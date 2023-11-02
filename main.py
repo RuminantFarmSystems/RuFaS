@@ -165,7 +165,7 @@ def reload_pool(directory_path: str = "output/", file_pattern: str = "*all_varia
             raise e
 
 
-def get_filepath(directory_path: str = "output/", file_pattern: str = "*all_variables") -> str:
+def get_filepath(directory_path: str = "output/", file_pattern: str = "*all_variables*") -> str:
     """Searches the given directory for a file containing the pattern provided.
 
     Parameters
