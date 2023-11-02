@@ -312,10 +312,6 @@ class OutputManager(object):
             "function": self._dict_to_file_json.__name__,
         }
         self.add_log("save_dict_file_try", f"Attempting to save to {path}.", info_map)
-        first_25_items = {key: data_dict[key] for key in list(data_dict)[:25]}
-        for key in first_25_items.keys():
-            print(key)
-        print("done")
         try:
             with open(path, "w") as json_file:
                 json.dump(

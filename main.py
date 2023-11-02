@@ -231,5 +231,4 @@ def parse_gnu_args():
 
 
 if __name__ == "__main__":
-    reload_pool()
-    # main()
+    main()
