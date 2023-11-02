@@ -1657,6 +1657,16 @@ class AnimalManager:
             om.add_variable('num_cow_parity_3', LifeCycleManager.num_cow_for_parity['3'], info_map)
             om.add_variable('num_cow_parity_3+', LifeCycleManager.num_cow_for_parity['greater_than_3'], info_map)
 
+            if time.is_last_day_of_simulation:
+                for heiferII in self.heiferIIs:
+                    om.add_variable(f'heiferII_{heiferII.id}_last_day',
+                                    heiferII.events,
+                                    info_map)
+                for cow in self.cows:
+                    om.add_variable(f'cow_{cow.id}_last_day',
+                                    cow.events,
+                                    info_map)
+
             for pen in self.all_pens:
                 pen.classes_in_pen = self._get_classes_in_pen(pen)
                 pen.calc_total_manure(feed, self.methane_model, self.methane_mitigation_method,

@@ -181,6 +181,7 @@ def parse_gnu_args():
         "--exclude_info_maps",
         help="Exclude info_maps from the output",
         action="store_true",
+        default=True
     )
     parser.add_argument(
         "-ov",
