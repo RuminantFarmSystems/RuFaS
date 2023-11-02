@@ -9,9 +9,10 @@ file(s) or, if this input is not given, it will run in interactive mode and acce
 import argparse
 import glob
 import json
+import os
 from pathlib import Path
 import sys
-from typing import List
+from typing import Any, Dict, List
 
 from RUFAS.scenario_manager import METADATA_PATHS, MetadataPaths
 
@@ -139,18 +140,32 @@ def execute_simulations(
         output_manager.dump_all_nondata_pools(r"output", exclude_info_maps, format_option)
 
 
-def reload_pool():
-    """Loads pool """
-    all_variables_file_path = get_filepath("output/", "*all_variables*")
-    try:
-        with open(all_variables_file_path, 'r') as file:
-            om_vars_pool = json.load(file)
-            print(om_vars_pool)
-    except Exception as e:
-        raise e
+def reload_pool(directory_path: str = "output/", file_pattern: str = "*all_variables") -> Dict[str, Any]:
+    """Reloads the Output Manager variables pool.
+
+    Parameters
+    ----------
+    directory_path : str, optional
+        The path to the directory to be searched.
+    file_pattern : str, optional
+        The pattern searched for in the file names in the directory_path.
+
+    Returns
+    -------
+    Dict [str, Any]
+        The variables pool data.
+    """
+    all_variables_file_path = get_filepath(directory_path, file_pattern)
+    if all_variables_file_path is not None:
+        try:
+            with open(all_variables_file_path) as file:
+                reloaded_vars_pool = json.load(file)
+                return reloaded_vars_pool
+        except Exception as e:
+            raise e
 
 
-def get_filepath(directory_path: str = "output/", file_pattern: str = "*all_variables") -> Path:
+def get_filepath(directory_path: str = "output/", file_pattern: str = "*all_variables") -> str:
     """Searches the given directory for a file containing the pattern provided.
 
     Parameters
@@ -162,14 +177,15 @@ def get_filepath(directory_path: str = "output/", file_pattern: str = "*all_vari
 
     Returns
     -------
-    Path
+    str
         The path to the file.
     """
-    matching_file_path = glob.glob(f"{directory_path}/{file_pattern}")
-    if matching_file_path:
-        return Path(matching_file_path[0])
+    matching_filepaths = glob.glob(f"{directory_path}/{file_pattern}")
+    if matching_filepaths:
+        most_recent_filepath = max(matching_filepaths, key=os.path.getctime)
+        return most_recent_filepath
     else:
-        return ""
+        return None
 
 
 def parse_gnu_args():
