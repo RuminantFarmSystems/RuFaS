@@ -140,7 +140,7 @@ def execute_simulations(
         output_manager.dump_all_nondata_pools(r"output", exclude_info_maps, format_option)
 
 
-def reload_pool(directory_path: str = "output/", file_pattern: str = "*all_variables") -> Dict[str, Any]:
+def reload_pool(directory_path: str = "output/", file_pattern: str = "*all_variables*") -> Dict[str, Any]:
     """Reloads the Output Manager variables pool.
 
     Parameters
