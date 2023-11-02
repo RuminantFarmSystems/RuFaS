@@ -171,6 +171,8 @@ class GraphGenerator:
         ------
         ValueError
             if graph_type is not found in MATPLOTLIB_PLOT_FUNCTIONS
+        TypeError
+            if data is Dict[str, List[Dict[str, List[Any]]]]] and selected_variables is None
         """
         if graph_type not in MATPLOTLIB_PLOT_FUNCTIONS:
             raise ValueError(f"Unsupported graph type: {graph_type}")
