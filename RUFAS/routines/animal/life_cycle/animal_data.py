@@ -50,7 +50,7 @@ class AnimalData:
         self.init = herd_data['herd_init']
 
         self.calf_num = herd_data['calf_num']
-        self.heiferI_num = herd_data['heiferII_num']
+        self.heiferI_num = herd_data['heiferI_num']
         self.heiferII_num = herd_data['heiferII_num']
         self.heiferIII_num = herd_data['heiferIII_num_springers']
         self.cow_num = herd_data['cow_num']
@@ -262,15 +262,15 @@ class AnimalData:
             return
 
         if self.init:
-            self.heiferIIs += self._init_heiferIIIs_from_simulation(num - current_num_heiferIIIs, breed)
+            self.heiferIIIs += self._init_heiferIIIs_from_simulation(num - current_num_heiferIIIs, breed)
 
         else:
             if current_num_heiferIIIs + self.num_heiferIIIs_in_data < num:
-                self.heiferIIs += self._init_heiferIIIs_from_data(self.num_heiferIIIs_in_data)
-                self.heiferIIs += self._init_heiferIIIs_from_simulation(
+                self.heiferIIIs += self._init_heiferIIIs_from_data(self.num_heiferIIIs_in_data)
+                self.heiferIIIs += self._init_heiferIIIs_from_simulation(
                     num - current_num_heiferIIIs - self.num_heiferIIIs_in_data, breed)
             else:
-                self.heiferIIs += self._init_heiferIIIs_from_data(num - current_num_heiferIIIs)
+                self.heiferIIIs += self._init_heiferIIIs_from_data(num - current_num_heiferIIIs)
 
     def _init_heiferIIIs_from_simulation(self, num: int, breed: str, sim_days=5000) -> List[HeiferIII]:
         heiferIIIs: List[HeiferIII] = []
