@@ -215,6 +215,7 @@ def test_draw_graph_success(graph_generator: GraphGenerator) -> None:
         "key1": {"values": [1, 2, 3]},
         "key2": {"values": [4, 5, 6]},
     }
-    plt.close()
+    num_figures_before = plt.gcf().number
     graph_generator._draw_graph(gaph_type, data)
-    assert plt.gcf().number == 1
+    num_figures_after = plt.gcf().number
+    assert num_figures_before < num_figures_after
