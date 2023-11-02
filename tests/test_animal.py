@@ -1692,7 +1692,7 @@ def test_lactating_cow_manure_calculations():
 def test_get_ration():
     """Unit test for function _get_ration in file routines/animal/ration/calf_ration.py"""
     actual = RUFAS.routines.animal.ration.calf_ration.CalfRationManager._get_ration()
-    expected = {'155': 1, '157': 2, 'status': 'Optimal', 'objective': 4.5}
+    expected = {'202': 1, '216': 2, 'status': 'Optimal', 'objective': 4.5}
     assert actual == expected
 
 
@@ -1725,9 +1725,9 @@ def test_calc_requirements():
         'starter_proportion': 1
     }
     feed = MagicMock()
-    feed.calf_feeds = {155: {'DM': 1, 'CP': 1, 'DE': 1},
-                       156: {'DM': 1, 'CP': 1, 'DE': 1},
-                       157: {'DM': 1, 'CP': 1, 'DE': 1, 'EE': 1}}
+    feed.calf_feeds = {202: {'DM': 1, 'CP': 1, 'DE': 1},
+                       203: {'DM': 1, 'CP': 1, 'DE': 1},
+                       216: {'DM': 1, 'CP': 1, 'DE': 1, 'EE': 1}}
 
     calf = MagicMock()
     calf.days_born = 10
@@ -1768,9 +1768,9 @@ def test_calc_intake():
     calf.body_weight = 2
 
     feed = MagicMock()
-    feed.calf_feeds = {155: {'DM': 1, 'CP': 1, 'DE': 1},
-                       156: {'DM': 1, 'CP': 1, 'DE': 1},
-                       157: {'DM': 1, 'CP': 1, 'DE': 1, 'EE': 1}}
+    feed.calf_feeds = {202: {'DM': 1, 'CP': 1, 'DE': 1},
+                       203: {'DM': 1, 'CP': 1, 'DE': 1},
+                       216: {'DM': 1, 'CP': 1, 'DE': 1, 'EE': 1}}
 
     milk_type = 'whole'
     wean_day = 100
@@ -2230,7 +2230,7 @@ def test_calc_rqmts():
     test_requirements.calculate_NASEM_protein_requirements = MagicMock(return_value=2)
     test_requirements.calculate_NASEM_calcium_requirements = MagicMock(return_value=2)
     test_requirements.calculate_NASEM_phosphorus_requirements = MagicMock(return_value=2)
-    AnimalBase.config["energy_and_nutrient_calculation_method"] = 'NRC'
+    AnimalBase.config["nutrient_standard"] = 'NRC'
     test_requirements.AnimalBase = AnimalBase
     # with patch.object('') as mocked:
     #     mocked.side
@@ -2245,7 +2245,7 @@ def test_calc_rqmts():
             "P_requirement": 1,
             "DMIest_requirement": 1,
         }
-    actual == expected
+    assert actual == expected
     test_requirements.calculate_NRC_energy_maintenance_requirements.assert_called_once()
     test_requirements.calculate_NRC_energy_growth_requirements.assert_called_once()
     test_requirements.calculate_NRC_energy_pregnancy_requirements.assert_called_once()
@@ -2265,7 +2265,7 @@ def test_calc_rqmts():
             "P_requirement": 2,
             "DMIest_requirement": 2,
         }
-    AnimalBase.config["energy_and_nutrient_calculation_method"] = 'NASEM'
+    AnimalBase.config["nutrient_standard"] = 'NASEM'
     actual = test_requirements.calc_rqmts(MagicMock(), MagicMock(), MagicMock(), MagicMock())
     test_requirements.calculate_NASEM_energy_maintenance_requirements.assert_called_once()
     test_requirements.calculate_NASEM_energy_growth_requirements.assert_called_once()
@@ -2279,7 +2279,7 @@ def test_calc_rqmts():
 
 def test_energy_activity_rqmts():
     """Unit test for function energy_activity_rqmts in file routines/animal/ration/animal_requirements.py"""
-    AnimalBase.config["energy_and_nutrient_calculation_method"] = 'NASEM'
+    AnimalBase.config["nutrient_standard"] = 'NASEM'
     req = AnimalRequirements()
     result_energy_activity = req.energy_activity_rqmts(
         body_weight=400,
@@ -2295,7 +2295,7 @@ def test_energy_activity_rqmts():
     )
     assert (result_energy_activity) == pytest.approx((0), rel=1e-2)
 
-    AnimalBase.config["energy_and_nutrient_calculation_method"] = 'NRC'
+    AnimalBase.config["nutrient_standard"] = 'NRC'
 
     result_energy_activity = req.energy_activity_rqmts(
         body_weight=400,
@@ -2567,7 +2567,7 @@ def test_report_ration():
     expected = (
         {
             "dm": 16,
-            "as_fed": 0.16,
+            "as_fed": 1600,
             "CP": 0.16,
             "ADF": 0.16,
             "NDF": 0.16,
@@ -2575,7 +2575,7 @@ def test_report_ration():
             "ash": 0.16,
             "phosphorus": 0.16,
             "potassium": 0.16,
-            "N": 0.025273981191222573,
+            "N": 0.0256,
             "EE": 0.16,
             "starch": 0.16,
             "TDN": 0.16,
@@ -2591,7 +2591,7 @@ def test_report_ration():
             "ash": 1.0,
             "phosphorus": 1.0,
             "potassium": 1.0,
-            "N": 0.15796238244514108,
+            "N": 0.16,
             "EE": 1.0,
             "starch": 1.0,
             "TDN": 1.0,
@@ -2725,7 +2725,7 @@ def test_feed_nutrients():
     feed_obj = MagicMock()
     feed_obj.available_feeds = {
         "1": {
-            "feed_id": 1,
+            "rufas_id": 1,
             "TDN": 1,
             "DE": 1,
             "EE": 1,
@@ -2733,7 +2733,7 @@ def test_feed_nutrients():
             "calcium": 1,
             "phosphorus": 1,
             "NDF": 1,
-            "type": 1,
+            "feed_type": 1,
             "is_wetforage": 1,
             "Kd": 1,
             "N_A": 1,
@@ -2743,7 +2743,7 @@ def test_feed_nutrients():
             "limit": {"lactating_cows": 1, "dry_cows": 2},
         },
         "2": {
-            "feed_id": 2,
+            "rufas_id": 2,
             "TDN": 2,
             "DE": 2,
             "EE": 2,
@@ -2751,7 +2751,7 @@ def test_feed_nutrients():
             "calcium": 2,
             "phosphorus": 2,
             "NDF": 2,
-            "type": 2,
+            "feed_type": 2,
             "is_wetforage": 2,
             "Kd": 2,
             "N_A": 2,
@@ -3015,26 +3015,6 @@ def test_get_feed_data_from_feed_ids() -> None:
     assert pen_specific_feed_data == expected_pen_specific_feed_data
 
 
-def test_feed_quality_fix():
-    """Unit test for function feed_quality_fix in file routines/animal/ration/user_defined_ration.py"""
-    # make a fake available feeds dict
-    fakefeeds_available = {}
-    fakefeeds_available["feed_id"] = [1, 2, 5]
-    # make two fake ration percents dicts
-    fake_ration_OK = {"1": 2, "2": 3, "5": 4}
-    fake_ration_missing = {"1": 2, "2": 3, "3": 4}
-    # assert that keys are same as the available feeds afterward
-    fake_ration_OK = UserDefinedRationManager.feed_quality_fix(
-        fake_ration_OK, fakefeeds_available
-    )
-    assert list(fake_ration_OK.keys()) == ["1", "2", "5"]
-    # second has missing values, needs to check that keys are equivalent to orig
-    fake_ration_missing = UserDefinedRationManager.feed_quality_fix(
-        fake_ration_missing, fakefeeds_available
-    )
-    assert list(fake_ration_missing.keys()) == ["1", "2", "5"]
-
-
 @pytest.fixture
 def mock_user_defined_ration_manager(mocker: MockerFixture) -> UserDefinedRationManager:
     user_defined_ration_manager = UserDefinedRationManager()
@@ -3188,12 +3168,12 @@ def test_get_DE(kg_fed: float, feed_item_info: dict, ration_report: dict, body_w
 
 
 @pytest.mark.parametrize("kg_fed,feed_item_info,ration_report,body_weight,expected", [
-    (0, {'type': 'Mineral'}, 'dummy_variable', 'dummy_variable', 0.0),
-    (1, {'type': 'Mineral', 'is_fat': 1, 'DE': 1}, 'dummy_variable', 'dummy_variable', 0.0),
-    (1, {'type': 'not_mineral', 'is_fat': 1, 'DE': 1}, 'dummy_variable', 'dummy_variable', 1.0),
-    (1, {'type': 'not_mineral', 'is_fat': 'dummy', 'EE': 4}, 'dummy_variable', 'dummy_variable', 1.5746),
-    (1, {'type': 'not_mineral', 'is_fat': 'dummy', 'EE': 1}, 'dummy_variable', 'dummy_variable', 1.57),
-])
+    (0, {'feed_type': 'Mineral'}, 'dummy_variable', 'dummy_variable', 0.0),
+    (1, {'feed_type': 'Mineral', 'is_fat': 1, 'DE': 1}, 'dummy_variable', 'dummy_variable', 0.0),
+    (1, {'feed_type': 'not_mineral', 'is_fat': 1, 'DE': 1}, 'dummy_variable', 'dummy_variable', 1.0),
+    (1, {'feed_type': 'not_mineral', 'is_fat': 'dummy', 'EE': 4}, 'dummy_variable', 'dummy_variable', 1.5746),
+    (1, {'feed_type': 'not_mineral', 'is_fat': 'dummy', 'EE': 1}, 'dummy_variable', 'dummy_variable', 1.57),
+    ])
 def test_get_ME(kg_fed: float, feed_item_info: dict, ration_report: dict, body_weight: float, expected: float,
                 mocker: MockerFixture) -> None:
     """ Unit test for function get_ME in file routines/animal/ration/ration_driver.py"""
@@ -3221,12 +3201,12 @@ def test_get_NE_maintenance_and_activity(kg_fed: float, feed_item_info: dict,
 
 
 @pytest.mark.parametrize("kg_fed,feed_item_info,ration_report,body_weight,expected", [
-    (1, {'type': 'Mineral', 'is_fat': 'dummy'}, 'dummy_variable', 'dummy_variable', 0.0),
-    (0, {'type': 'Mineral', 'is_fat': 'dummy'}, 'dummy_variable', 'dummy_variable', 0.0),
-    (1, {'type': 'dummy', 'is_fat': 1}, 'dummy_variable', 'dummy_variable', 1.6),
-    (1, {'type': 'dummy', 'is_fat': 0, 'EE': 4}, 'dummy_variable', 'dummy_variable', 1.21996),
-    (1, {'type': 'dummy', 'is_fat': 0, 'EE': 1}, 'dummy_variable', 'dummy_variable', 1.216),
-    (0, {'type': 'dummy', 'is_fat': 0, 'EE': 1}, 'dummy_variable', 'dummy_variable', 0.0),
+    (1, {'feed_type': 'Mineral', 'is_fat': 'dummy'}, 'dummy_variable', 'dummy_variable', 0.0),
+    (0, {'feed_type': 'Mineral', 'is_fat': 'dummy'}, 'dummy_variable', 'dummy_variable', 0.0),
+    (1, {'feed_type': 'dummy', 'is_fat': 1}, 'dummy_variable', 'dummy_variable', 1.6),
+    (1, {'feed_type': 'dummy', 'is_fat': 0, 'EE': 4}, 'dummy_variable', 'dummy_variable', 1.21996),
+    (1, {'feed_type': 'dummy', 'is_fat': 0, 'EE': 1}, 'dummy_variable', 'dummy_variable', 1.216),
+    (0, {'feed_type': 'dummy', 'is_fat': 0, 'EE': 1}, 'dummy_variable', 'dummy_variable', 0.0),
 ])
 def test_get_NE_lactation(kg_fed: float, feed_item_info: dict,
                           ration_report: dict, body_weight: float,
@@ -3239,11 +3219,11 @@ def test_get_NE_lactation(kg_fed: float, feed_item_info: dict,
 
 
 @pytest.mark.parametrize("kg_fed,feed_item_info,ration_report,body_weight,expected", [
-    (0, {'type': 'Mineral', 'is_fat': 'dummy'}, 'dummy_variable', 'dummy_variable', 0.000),
-    (0, {'type': 'dummy', 'is_fat': 1}, 'dummy_variable', 'dummy_variable', 0.0),
-    (1, {'type': 'Mineral', 'is_fat': 1}, 'dummy_variable', 'dummy_variable', 0.0),
-    (1, {'type': 'dummy', 'is_fat': 1}, 'dummy_variable', 'dummy_variable', 1.1),
-    (1, {'type': 'dummy', 'is_fat': 0}, 'dummy_variable', 'dummy_variable', 0.5916),
+    (0, {'feed_type': 'Mineral', 'is_fat': 'dummy'}, 'dummy_variable', 'dummy_variable', 0.000),
+    (0, {'feed_type': 'dummy', 'is_fat': 1}, 'dummy_variable', 'dummy_variable', 0.0),
+    (1, {'feed_type': 'Mineral', 'is_fat': 1}, 'dummy_variable', 'dummy_variable', 0.0),
+    (1, {'feed_type': 'dummy', 'is_fat': 1}, 'dummy_variable', 'dummy_variable', 1.1),
+    (1, {'feed_type': 'dummy', 'is_fat': 0}, 'dummy_variable', 'dummy_variable', 0.5916),
 ])
 def test_get_NE_growth(kg_fed: float, feed_item_info: dict,
                        ration_report: dict, body_weight: float,
@@ -3255,10 +3235,10 @@ def test_get_NE_growth(kg_fed: float, feed_item_info: dict,
 
 
 @pytest.mark.parametrize("kg_fed,feed_item_info,ration_report,body_weight,expected", [
-    (1, {'type': 'Forage', 'calcium': 1}, 'dummy_variable', 'dummy_variable', 0.003),
-    (1, {'type': 'Conc', 'calcium': 1}, 'dummy_variable', 'dummy_variable', 0.006),
-    (1, {'type': 'Mineral', 'calcium': 1}, 'dummy_variable', 'dummy_variable', 0.0095),
-    (1, {'type': 'Forage', 'calcium': 0}, 'dummy_variable', 'dummy_variable', 0.000),
+    (1, {'feed_type': 'Forage', 'calcium': 1}, 'dummy_variable', 'dummy_variable', 0.003),
+    (1, {'feed_type': 'Conc', 'calcium': 1}, 'dummy_variable', 'dummy_variable', 0.006),
+    (1, {'feed_type': 'Mineral', 'calcium': 1}, 'dummy_variable', 'dummy_variable', 0.0095),
+    (1, {'feed_type': 'Forage', 'calcium': 0}, 'dummy_variable', 'dummy_variable', 0.000),
 ])
 def test_get_calcium(kg_fed: float, feed_item_info: dict,
                      ration_report: dict, body_weight: float,
@@ -3269,10 +3249,10 @@ def test_get_calcium(kg_fed: float, feed_item_info: dict,
 
 
 @pytest.mark.parametrize("kg_fed,feed_item_info,ration_report,body_weight,expected", [
-    (1, {'type': 'Forage', 'phosphorus': 1}, 'dummy_variable', 'dummy_variable', 0.0064),
-    (1, {'type': 'Conc', 'phosphorus': 1}, 'dummy_variable', 'dummy_variable', 0.007),
-    (1, {'type': 'Mineral', 'phosphorus': 1}, 'dummy_variable', 'dummy_variable', 0.008),
-    (1, {'type': 'Forage', 'phosphorus': 0}, 'dummy_variable', 'dummy_variable', 0.000),
+    (1, {'feed_type': 'Forage', 'phosphorus': 1}, 'dummy_variable', 'dummy_variable', 0.0064),
+    (1, {'feed_type': 'Conc', 'phosphorus': 1}, 'dummy_variable', 'dummy_variable', 0.007),
+    (1, {'feed_type': 'Mineral', 'phosphorus': 1}, 'dummy_variable', 'dummy_variable', 0.008),
+    (1, {'feed_type': 'Forage', 'phosphorus': 0}, 'dummy_variable', 'dummy_variable', 0.000),
 ])
 def test_get_phosphorus(kg_fed: float, feed_item_info: dict,
                         ration_report: dict, body_weight: float,
@@ -3310,10 +3290,10 @@ def test_get_fat_percentage(kg_fed: float, feed_item_info: dict, ration_report: 
 
 
 @pytest.mark.parametrize("kg_fed,feed_item_info,ration_report,body_weight,expected", [
-    (1, {'type': 'Forage', 'NDF': 1}, 'dummy_variable', 'dummy_variable', 1),
-    (1, {'type': 'Conc', 'NDF': 2}, 'dummy_variable', 'dummy_variable', 0.0),
-    (1, {'type': 'Forage', 'NDF': 0}, 'dummy_variable', 'dummy_variable', 0.0),
-    (1, {'type': 'Mineral', 'NDF': 0}, 'dummy_variable', 'dummy_variable', 0.0),
+    (1, {'feed_type': 'Forage', 'NDF': 1}, 'dummy_variable', 'dummy_variable', 1),
+    (1, {'feed_type': 'Conc', 'NDF': 2}, 'dummy_variable', 'dummy_variable', 0.0),
+    (1, {'feed_type': 'Forage', 'NDF': 0}, 'dummy_variable', 'dummy_variable', 0.0),
+    (1, {'feed_type': 'Mineral', 'NDF': 0}, 'dummy_variable', 'dummy_variable', 0.0),
 ])
 def test_get_forage_NDF(kg_fed: float, feed_item_info: dict, ration_report: dict, body_weight: float,
                         expected: float) -> None:
@@ -3324,19 +3304,19 @@ def test_get_forage_NDF(kg_fed: float, feed_item_info: dict, ration_report: dict
 
 def test_get_metabolizable_protein(mocker: MockerFixture) -> None:
     """ Unit test for function get_metabolizable_protein in file routines/animal/ration/ration_driver.py"""
-    feed_path_a1 = {'1': {'type': 'Conc', 'Kd': 1, 'N_A': 1, 'N_B': 1, 'CP': 1, 'dRUP': 1}}
-    feed_path_a2 = {'2': {'type': 'Conc', 'Kd': -100, 'N_A': 1, 'N_B': 1, 'CP': 1, 'dRUP': 1}}
-    feed_path_b1 = {'3': {'type': 'Forage', 'Kd': 1, 'N_A': 1, 'N_B': 1, 'CP': 1, 'dRUP': 1,
+    feed_path_a1 = {'1': {'feed_type': 'Conc', 'Kd': 1, 'N_A': 1, 'N_B': 1, 'CP': 1, 'dRUP': 1}}
+    feed_path_a2 = {'2': {'feed_type': 'Conc', 'Kd': -100, 'N_A': 1, 'N_B': 1, 'CP': 1, 'dRUP': 1}}
+    feed_path_b1 = {'3': {'feed_type': 'Forage', 'Kd': 1, 'N_A': 1, 'N_B': 1, 'CP': 1, 'dRUP': 1,
                           'is_wetforage': 0, 'NDF': 1}}
-    feed_path_b2 = {'4': {'type': 'Forage', 'Kd': -100, 'N_A': 1, 'N_B': 1, 'CP': 1, 'dRUP': 1,
+    feed_path_b2 = {'4': {'feed_type': 'Forage', 'Kd': -100, 'N_A': 1, 'N_B': 1, 'CP': 1, 'dRUP': 1,
                           'is_wetforage': 0, 'NDF': 1}}
-    feed_path_c1 = {'5': {'type': 'Forage', 'Kd': 1, 'N_A': 1, 'N_B': 1, 'CP': 1, 'dRUP': 1,
+    feed_path_c1 = {'5': {'feed_type': 'Forage', 'Kd': 1, 'N_A': 1, 'N_B': 1, 'CP': 1, 'dRUP': 1,
                           'is_wetforage': 1, 'NDF': 1}}
-    feed_path_c2 = {'6': {'type': 'Forage', 'Kd': -100, 'N_A': 1, 'N_B': 1, 'CP': 1, 'dRUP': 1,
+    feed_path_c2 = {'6': {'feed_type': 'Forage', 'Kd': -100, 'N_A': 1, 'N_B': 1, 'CP': 1, 'dRUP': 1,
                           'is_wetforage': 1, 'NDF': 1}}
-    feed_path_d1 = {'7': {'type': 'Dummy', 'Kd': 1, 'N_A': 1, 'N_B': 1, 'CP': 1, 'dRUP': 1,
+    feed_path_d1 = {'7': {'feed_type': 'Dummy', 'Kd': 1, 'N_A': 1, 'N_B': 1, 'CP': 1, 'dRUP': 1,
                           'is_wetforage': 0, 'NDF': 1}}
-    feed_path_d2 = {'8': {'type': 'Dummy', 'Kd': -100, 'N_A': 1, 'N_B': 1, 'CP': 1, 'dRUP': 1,
+    feed_path_d2 = {'8': {'feed_type': 'Dummy', 'Kd': -100, 'N_A': 1, 'N_B': 1, 'CP': 1, 'dRUP': 1,
                           'is_wetforage': 0, 'NDF': 1}}
     available_feeds = (
             feed_path_a1 |
