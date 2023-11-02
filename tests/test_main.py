@@ -223,9 +223,9 @@ def test_reload_pool_invalid_path_raises_exception() -> None:
 
 def test_get_filepath_matches_found(tmpdir) -> None:
     """Checks that get_filepath returns a valid filepath if one is present"""
-    filepath_match1 = tmpdir.join("file1_all_variables.json")
+    filepath_match1 = tmpdir.join("file1_all_variables_datetime.json")
     filepath_match1.write("")
-    filepath_match2 = tmpdir.join("file2_all_variables.json")
+    filepath_match2 = tmpdir.join("file2_all_variables_datetime.json")
     filepath_match2.write("")
 
     with patch('glob.glob', return_value=[str(filepath_match1), str(filepath_match2)]):
