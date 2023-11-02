@@ -1,20 +1,23 @@
 import argparse
 import os.path
 from pathlib import Path
-from mock import MagicMock
+from mock import patch
 
 import pytest
 from pytest_mock import MockerFixture
 
-import config.global_variables
 from config import global_variables
-from main import execute_simulations
-from main import main
-from main import parse_gnu_args
-from main import run_rufas
-from main import run_validation
-from main import set_global_variables
-from main import METADATA_PATHS
+from main import (
+    CaseInsensitiveArgumentAction,
+    execute_simulations,
+    main,
+    parse_gnu_args,
+    run_rufas,
+    run_validation,
+    set_global_variables,
+    METADATA_PATHS,
+)
+
 from RUFAS.simulation_engine import SimulationEngine
 from RUFAS.input_manager import InputManager
 from RUFAS.output_manager import OutputManager
@@ -23,57 +26,80 @@ dir_path = os.path.join(global_variables.ROOT_DIR, "input")
 file_path = os.path.join(dir_path, "input/ARL.json")
 
 
-def test_main(mocker: MockerFixture):
-    """Unit test for main() function in main.py"""
-    mock_cmd_arguments = MagicMock()
-    patch_run_rufas = mocker.patch(
-        "main.run_rufas"
-    )
-    patch_parse_gnu_args = mocker.patch(
-        "main.parse_gnu_args", return_value=mock_cmd_arguments
-    )
-
-    main()
-
-    patch_run_rufas.assert_called_once_with(
-        format_option=mock_cmd_arguments.format_option,
-        make_graphs=not mock_cmd_arguments.no_graphics,
-        verbose=mock_cmd_arguments.verbose,
-        clear_output=mock_cmd_arguments.clear_output,
-        exclude_info_maps=mock_cmd_arguments.exclude_info_maps,
-        only_run_validation=mock_cmd_arguments.only_run_validation,
-    )
-    patch_parse_gnu_args.assert_called_once()
-
-
 @pytest.mark.parametrize(
-    "format_option, make_graphs, verbose, clear_output, exclude_info_maps, only_run_validation",
+    "format_option, no_graphics, graphics_dir, verbose, clear_output, exclude_info_maps, only_run_validation",
     [
-        ("verbose", True, True, True, True, True),
-        ("block", False, True, True, True, True),
-        ("inline", True, False, True, True, True),
-        ("basic", True, True, False, True, True),
-        ("verbose", True, True, True, False, True),
-        ("block", True, True, True, True, False),
-        ("inline", False, False, True, True, True),
-        ("basic", False, True, False, True, True),
-        ("verbose", False, True, True, False, True),
-        ("block", False, True, True, True, False),
-        ("inline", False, False, False, True, True),
-        ("basic", False, False, True, False, True),
-        ("verbose", False, False, True, True, False),
-        ("block", False, False, False, False, True),
-        ("inline", False, False, False, True, False),
-        ("basic", False, False, False, False, False)
+        ("verbose", False, "graphics", True, True, True, True),
+        ("basic", True, "custom_graphics", False, False, False, False),
+        ("block", True, "graphics", False, True, False, False),
+        ("inline", False, "custom_graphics", True, False, False, False),
+        ("verbose", True, "graphics", False, False, True, False),
     ],
 )
-def test_run_rufas(
+def test_main(
     format_option: str,
-    make_graphs: bool,
+    no_graphics: bool,
+    graphics_dir: str,
     verbose: bool,
     clear_output: bool,
     exclude_info_maps: bool,
     only_run_validation: bool,
+) -> None:
+    with patch("main.parse_gnu_args") as mock_parse_gnu_args:
+        mock_parse_gnu_args.return_value = argparse.Namespace(
+            format_option=format_option,
+            no_graphics=no_graphics,
+            graphics_dir=graphics_dir,
+            verbose=verbose,
+            clear_output=clear_output,
+            exclude_info_maps=exclude_info_maps,
+            only_run_validation=only_run_validation,
+        )
+
+        with patch("main.run_rufas") as mock_run_rufas:
+            main()
+            mock_parse_gnu_args.assert_called_once()
+            mock_run_rufas.assert_called_once_with(
+                produce_graphics=not no_graphics,
+                format_option=format_option,
+                verbose=verbose,
+                clear_output=clear_output,
+                exclude_info_maps=exclude_info_maps,
+                only_run_validation=only_run_validation,
+                graphics_dir=Path(graphics_dir),
+            )
+
+
+@pytest.mark.parametrize(
+    "format_option, produce_graphics, verbose, clear_output, exclude_info_maps, only_run_validation, graphics_dir",
+    [
+        ("verbose", True, True, True, True, True, ""),
+        ("block", False, True, True, True, True, ""),
+        ("inline", True, False, True, True, True, ""),
+        ("basic", True, True, False, True, True, ""),
+        ("verbose", True, True, True, False, True, ""),
+        ("block", True, True, True, True, False, ""),
+        ("inline", False, False, True, True, True, ""),
+        ("basic", False, True, False, True, True, ""),
+        ("verbose", False, True, True, False, True, ""),
+        ("block", False, True, True, True, False, ""),
+        ("inline", False, False, False, True, True, ""),
+        ("basic", False, False, True, False, True, ""),
+        ("verbose", False, False, True, True, False, ""),
+        ("block", False, False, False, False, True, ""),
+        ("inline", False, False, False, True, False, ""),
+        ("basic", False, False, False, False, False, ""),
+        ("basic", False, False, False, False, False, "graphics"),
+    ],
+)
+def test_run_rufas(
+    format_option: str,
+    produce_graphics: bool,
+    verbose: bool,
+    clear_output: bool,
+    exclude_info_maps: bool,
+    only_run_validation: bool,
+    graphics_dir: str,
     mocker: MockerFixture,
 ) -> None:
     """Checks that run_rufas() calls the correct functions in the correct order"""
@@ -85,15 +111,30 @@ def test_run_rufas(
     patch_empty_dir = mocker.patch("RUFAS.util.Utility.empty_dir")
 
     # Act
-    run_rufas(format_option, make_graphs, verbose, clear_output, exclude_info_maps, only_run_validation)
+    run_rufas(
+        produce_graphics,
+        format_option,
+        verbose,
+        clear_output,
+        exclude_info_maps,
+        only_run_validation,
+        graphics_dir,
+    )
 
     # Assert
-    patch_set_global_variables.assert_called_once_with(make_graphs, verbose)
-
+    patch_set_global_variables.assert_called_once_with(verbose)
     if only_run_validation:
-        patch_run_validation.assert_called_once_with(metadata_file_list, exclude_info_maps, format_option)
+        patch_run_validation.assert_called_once_with(
+            metadata_file_list, exclude_info_maps, format_option
+        )
     else:
-        patch_execute_simulations.assert_called_once_with(metadata_file_list, exclude_info_maps, format_option)
+        patch_execute_simulations.assert_called_once_with(
+            metadata_file_list,
+            exclude_info_maps,
+            produce_graphics,
+            graphics_dir,
+            format_option,
+        )
 
     if clear_output:
         patch_empty_dir.assert_called_once()
@@ -101,32 +142,23 @@ def test_run_rufas(
         patch_empty_dir.assert_not_called()
 
 
-@pytest.mark.parametrize(
-    "make_graphs, verbose", [(True, True), (False, True), (True, False), (False, False)]
-)
-def test_set_global_variables(make_graphs: bool, verbose: bool) -> None:
+@pytest.mark.parametrize("verbose", [True, False])
+def test_set_global_variables(verbose: bool) -> None:
     """Checks that set_global_variables() sets the global variables correctly"""
     # Arrange
-    old_make_graphs = config.global_variables.PRODUCE_GRAPHICS
-    old_verbose = config.global_variables.PRINT_STATUS_MESSAGES
+    old_verbose = global_variables.PRINT_STATUS_MESSAGES
 
     # Act
-    set_global_variables(make_graphs, verbose)
+    set_global_variables(verbose)
 
     # Assert
-    assert config.global_variables.PRODUCE_GRAPHICS == make_graphs
-    assert config.global_variables.PRINT_STATUS_MESSAGES == verbose
+    assert global_variables.PRINT_STATUS_MESSAGES == verbose
 
     # Cleanup
-    config.global_variables.PRODUCE_GRAPHICS = old_make_graphs
-    config.global_variables.PRINT_STATUS_MESSAGES = old_verbose
+    global_variables.PRINT_STATUS_MESSAGES = old_verbose
 
 
-@pytest.mark.parametrize(
-        "is_data_valid",
-        [(True), (False)
-         ]
-)
+@pytest.mark.parametrize("is_data_valid", [(True), (False)])
 def test_run_validation(mocker: MockerFixture, is_data_valid: bool) -> None:
     """Checks that run_validation() calls the correct functions in the correct order"""
     mock_output_manager = mocker.MagicMock(auto_spec=OutputManager)
@@ -141,27 +173,46 @@ def test_run_validation(mocker: MockerFixture, is_data_valid: bool) -> None:
     metadata_prefix2 = "dummy_prefix2"
     metadata_file_path1 = Path("metadata_file1.json")
     metadata_file_path2 = Path("metadata_file2.json")
-    metadata_file_list = [{"prefix": metadata_prefix1, "path": metadata_file_path1},
-                          {"prefix": metadata_prefix2, "path": metadata_file_path2}, ]
+    metadata_file_list = [
+        {"prefix": metadata_prefix1, "path": metadata_file_path1},
+        {"prefix": metadata_prefix2, "path": metadata_file_path2},
+    ]
     mock_input_manager.start_data_processing.return_value = is_data_valid
 
     run_validation(metadata_file_list, True, "verbose")
 
     assert mock_output_manager.flush_pools.call_count == len(metadata_file_list)
     assert mock_input_manager.flush_pool.call_count == len(metadata_file_list)
-    assert mock_output_manager.dump_all_nondata_pools.call_count == len(metadata_file_list)
+    assert mock_output_manager.dump_all_nondata_pools.call_count == len(
+        metadata_file_list
+    )
     assert mock_output_manager.dump_all_nondata_pools.call_args_list == [
         mocker.call("output", True, "verbose")
     ] * len(metadata_file_list)
 
 
 @pytest.mark.parametrize(
-        "is_data_valid, simulate_call_count, add_error_call_count, format_option",
-        [(True, 2, 0, "verbose"), (False, 0, 2, "block")]
+    "produce_graphics, exlclude_info_maps, is_data_valid, simulate_call_count, add_error_call_count, format_option",
+    [
+        (False, False, True, 2, 0, "verbose"),
+        (False, False, False, 0, 2, "block"),
+        (False, True, True, 2, 0, "verbose"),
+        (False, True, False, 0, 2, "block"),
+        (True, False, True, 2, 0, "verbose"),
+        (True, False, False, 0, 2, "block"),
+        (True, True, True, 2, 0, "verbose"),
+        (True, True, False, 0, 2, "block"),
+    ],
 )
-def test_execute_simulations(mocker: MockerFixture, is_data_valid: bool,
-                             simulate_call_count: int, add_error_call_count: int,
-                             format_option) -> None:
+def test_execute_simulations(
+    mocker: MockerFixture,
+    produce_graphics: bool,
+    exlclude_info_maps: bool,
+    is_data_valid: bool,
+    simulate_call_count: int,
+    add_error_call_count: int,
+    format_option,
+) -> None:
     """Checks that execute_simulations() calls the correct functions in the correct order"""
     # Arrange
     mock_output_manager = mocker.MagicMock(auto_spec=OutputManager)
@@ -176,28 +227,44 @@ def test_execute_simulations(mocker: MockerFixture, is_data_valid: bool,
     metadata_file_path2 = Path("metadata_file2.json")
     metadata_prefix1 = "dummy_prefix1"
     metadata_prefix2 = "dummy_prefix2"
-    metadata_file_list = [{"prefix": metadata_prefix1, "path": metadata_file_path1},
-                          {"prefix": metadata_prefix2, "path": metadata_file_path2}, ]
+    metadata_file_list = [
+        {"prefix": metadata_prefix1, "path": metadata_file_path1},
+        {"prefix": metadata_prefix2, "path": metadata_file_path2},
+    ]
     mock_input_manager.start_data_processing.return_value = is_data_valid
     mock_simulator = mocker.MagicMock(auto_spec=SimulationEngine)
     mock_simulator.simulate.return_value = None
     mocker.patch("main.SimulationEngine", return_value=mock_simulator)
 
     # Act
-    execute_simulations(metadata_file_list, True, format_option)
+    execute_simulations(
+        metadata_files=metadata_file_list,
+        exclude_info_maps=exlclude_info_maps,
+        produce_graphics=produce_graphics,
+        graphics_dir=Path(""),
+        format_option=format_option,
+    )
 
     # Assert
     assert mock_simulator.simulate.call_count == simulate_call_count
     assert mock_output_manager.add_error.call_count == add_error_call_count
     assert mock_output_manager.flush_pools.call_count == len(metadata_file_list)
     assert mock_input_manager.flush_pool.call_count == len(metadata_file_list)
-    assert mock_output_manager.dump_all_nondata_pools.call_count == len(metadata_file_list)
+    assert mock_output_manager.dump_all_nondata_pools.call_count == len(
+        metadata_file_list
+    )
     assert mock_output_manager.dump_all_nondata_pools.call_args_list == [
-        mocker.call("output", True, format_option)
+        mocker.call("output", exlclude_info_maps, format_option)
     ] * len(metadata_file_list)
     assert mock_output_manager.save_variables.call_count == len(metadata_file_list)
     assert mock_output_manager.save_variables.call_args_list == [
-        mocker.call("output", "output/output_filters/", True),
+        mocker.call(
+            Path("output"),
+            Path("output/output_filters/"),
+            exlclude_info_maps,
+            produce_graphics,
+            Path(""),
+        ),
     ] * len(metadata_file_list)
 
 
@@ -215,19 +282,25 @@ def test_parse_gnu_args(mocker: MockerFixture) -> None:
     actual_args = parse_gnu_args()
 
     # Assert
-    assert mock_add_argument.call_count == 6
+    assert mock_add_argument.call_count == 7
     assert mock_add_argument.call_args_list == [
         mocker.call(
-            '-f',
+            "-f",
             "--format-option",
-            choices=['block', 'inline', 'verbose', 'basic'],
+            choices=["block", "inline", "verbose", "basic"],
             help="Select formatting option for variable_names.txt file",
         ),
         mocker.call(
-            "-ng",
+            "-g",
             "--no-graphics",
             help="Prevent graphics from generating",
             action="store_true",
+        ),
+        mocker.call(
+            "-G",
+            "--graphics_dir",
+            help="The saving directory for graphics",
+            default="graphics",
         ),
         mocker.call(
             "-v",
@@ -236,19 +309,19 @@ def test_parse_gnu_args(mocker: MockerFixture) -> None:
             action="store_true",
         ),
         mocker.call(
-            "-co",
+            "-c",
             "--clear-output",
             help="Clear output directory before running the simulation",
             action="store_true",
         ),
         mocker.call(
-            "-ei",
+            "-i",
             "--exclude_info_maps",
             help="Exclude info_maps from the output",
             action="store_true",
         ),
         mocker.call(
-            "-ov",
+            "-o",
             "--only-run-validation",
             help="Only validate the data, don't run a simulation",
             action="store_true",
@@ -256,3 +329,21 @@ def test_parse_gnu_args(mocker: MockerFixture) -> None:
     ]
     mock_parse_args.assert_called_once()
     assert actual_args == "test_args"
+
+
+def test_case_insensitive_argument_action():
+    parser = argparse.ArgumentParser()
+    parser.register("action", "ci_action", CaseInsensitiveArgumentAction)
+
+    namespace = argparse.Namespace()
+
+    arguments = ["-f", "-F"]
+    value = "test_value"
+
+    for argument in arguments:
+        action = parser.add_argument(argument, action="ci_action")
+        action(parser, namespace, value, option_string=argument)
+
+    for argument in arguments:
+        assert hasattr(namespace, argument)
+        assert getattr(namespace, argument) == value
