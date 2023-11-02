@@ -207,13 +207,22 @@ def test_draw_graph_exception(graph_generator: GraphGenerator) -> None:
             data={},
             selected_variables=["var1", "var2"],
         )
+    with pytest.raises(TypeError):
+        graph_generator._draw_graph(
+            graph_type="plot",
+            data={
+                "key1": {"values": [{"a": 1, "b": 2}, {"a": 3, "c": 4}]},
+                "key2": {"values": [{"a": 5, "b": 6}, {"a": 7, "c": 8}]},
+            },
+            selected_variables=None,
+        )
 
 
 def test_draw_graph_success(graph_generator: GraphGenerator) -> None:
     gaph_type = "plot"
     data = {
-        "key1": {"values": [1, 2, 3]},
-        "key2": {"values": [4, 5, 6]},
+        "key1": {"values": [{"a": 1, "b": 2}, {"a": 3, "c": 4}]},
+        "key2": {"values": [{"a": 5, "b": 6}, {"a": 7, "c": 8}]},
     }
     num_figures_before = plt.gcf().number
     graph_generator._draw_graph(gaph_type, data)
