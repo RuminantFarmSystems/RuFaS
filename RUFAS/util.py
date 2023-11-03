@@ -25,12 +25,13 @@ class Utility:
 
         Parameters
         ----------
-        list_of_dicts (List[Dict[str, Any]]):
+        list_of_dicts : List[Dict[str, Any]]
             A list of dictionaries with string keys and integer values.
 
-        Returns:
-        --------
-            Dict[str, List[Any]]: A dictionary where keys are unique keys from input dictionaries,
+        Returns
+        -------
+        Dict[str, List[Any]]
+            A dictionary where keys are unique keys from input dictionaries,
             and values are lists of corresponding values from input dictionaries.
         """
         result = {}
