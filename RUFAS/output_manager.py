@@ -28,6 +28,7 @@ class LogVerbosity(Enum):
     Selecting WARNINGS will tell OutputManager to print out all warnings and errors added during a simulation.
     Selecting LOGS will tell OutputManager to print out all logs, warnings, and errors added during a simulation.
     """
+
     NONE = "none"
     ERRORS = "errors"
     WARNINGS = "warnings"
@@ -35,7 +36,7 @@ class LogVerbosity(Enum):
 
     def __le__(self, other) -> bool:
         return self.value <= other.value
-    
+
     def __ge__(self, other) -> bool:
         return self.value >= other.value
 
@@ -178,7 +179,9 @@ class OutputManager(object):
         key = self._generate_key(name, info_map)
         self._add_to_pool(self.logs_pool, key, msg, info_map)
         if self.__log_type == LogVerbosity.LOGS:
-            sys.stdout.write(f"[{info_map['timestamp']}][LOG][{self.__metadata_prefix}] {name}: {msg}\n")
+            sys.stdout.write(
+                f"[{info_map['timestamp']}][LOG][{self.__metadata_prefix}] {name}: {msg}\n"
+            )
 
     def add_warning(self, name: str, msg: str, info_map: Dict[str, Any]) -> None:
         """
@@ -208,7 +211,9 @@ class OutputManager(object):
         key = self._generate_key(name, info_map)
         self._add_to_pool(self.warnings_pool, key, msg, info_map)
         if self.__log_type in [LogVerbosity.LOGS, LogVerbosity.WARNINGS]:
-            sys.stdout.write(f"[{info_map['timestamp']}][WARNING][{self.__metadata_prefix}] {name}: {msg}\n")
+            sys.stdout.write(
+                f"[{info_map['timestamp']}][WARNING][{self.__metadata_prefix}] {name}: {msg}\n"
+            )
 
     def add_error(self, name: str, msg: str, info_map: Dict[str, Any]) -> None:
         """
@@ -237,8 +242,28 @@ class OutputManager(object):
         info_map["timestamp"] = self._get_timestamp(include_millis=True)
         key = self._generate_key(name, info_map)
         self._add_to_pool(self.errors_pool, key, msg, info_map)
-        if self.__log_type in [LogVerbosity.LOGS, LogVerbosity.WARNINGS, LogVerbosity.ERRORS]:
-            sys.stdout.write(f"[{info_map['timestamp']}][ERROR][{self.__metadata_prefix}] {name}: {msg}\n")
+        if self.__log_type in [
+            LogVerbosity.LOGS,
+            LogVerbosity.WARNINGS,
+            LogVerbosity.ERRORS,
+        ]:
+            sys.stdout.write(
+                f"[{info_map['timestamp']}][ERROR][{self.__metadata_prefix}] {name}: {msg}\n"
+            )
+
+    def _handle_log_output(
+        self, name: str, msg: str, info_map: Dict[str, Any], log_level: LogVerbosity
+    ) -> None:
+        colors: Dict[LogVerbosity, str] = {
+            LogVerbosity.NONE: "\033[0m",
+            LogVerbosity.ERRORS: "\33[101m",
+            LogVerbosity.WARNINGS: "\33[103m",
+            LogVerbosity.LOGS: "\33[102m",
+        }
+        if log_level <= self.__log_type:
+            sys.stdout.write(
+                f"{colors[log_level]}[{info_map['timestamp']}][ERROR][{self.__metadata_prefix}] {name}: {msg}\n{colors[LogVerbosity.NONE]}"
+            )
 
     def set_metadata_prefix(self, metadata_prefix: str) -> None:
         """Sets the metadata_prefix attribute."""
