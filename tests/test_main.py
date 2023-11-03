@@ -212,6 +212,13 @@ def test_reload_pool_valid_path() -> None:
             assert result == dummy_data
 
 
+def test_reload_pool_no_valid_path() -> None:
+    """Checks that reload_pool returns an empty dictionary if no valid filepath is provided"""
+    with patch('main.get_filepath', return_value=None):
+        result = reload_pool()
+        assert result == {}
+
+
 def test_reload_pool_invalid_path_raises_exception() -> None:
     """Checks that reload_pool raises an exception with a bad filepath provided"""
     with patch('main.open', mock_open(read_data="no/data/found")):
