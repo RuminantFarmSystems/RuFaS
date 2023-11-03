@@ -276,7 +276,7 @@ class OutputManager(object):
         """Sets the metadata_prefix attribute."""
         self.__metadata_prefix = metadata_prefix
 
-    def set_log_verobse(self, log_verbose: LogVerbosity = LogVerbosity.NONE) -> None:
+    def set_log_verbose(self, log_verbose: LogVerbosity = LogVerbosity.NONE) -> None:
         """Sets the __log_verbose attribute"""
         self.__log_verbose = log_verbose
 
