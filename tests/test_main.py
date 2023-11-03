@@ -28,18 +28,18 @@ file_path = os.path.join(dir_path, "input/ARL.json")
 @pytest.mark.parametrize(
     "format_option, no_graphics, graphics_dir, verbose, clear_output, exclude_info_maps, only_run_validation",
     [
-        ("verbose", False, "graphics", True, True, True, True),
-        ("basic", True, "custom_graphics", False, False, False, False),
-        ("block", True, "graphics", False, True, False, False),
-        ("inline", False, "custom_graphics", True, False, False, False),
-        ("verbose", True, "graphics", False, False, True, False),
+        ("verbose", False, "graphics", LogVerbosity.ERRORS, True, True, True),
+        ("basic", True, "custom_graphics", LogVerbosity.LOGS, False, False, False),
+        ("block", True, "graphics", LogVerbosity.NONE, True, False, False),
+        ("inline", False, "custom_graphics", LogVerbosity.WARNINGS, False, False, False),
+        ("verbose", True, "graphics", LogVerbosity.LOGS, False, True, False),
     ],
 )
 def test_main(
     format_option: str,
     no_graphics: bool,
     graphics_dir: str,
-    verbose: bool,
+    verbose: LogVerbosity,
     clear_output: bool,
     exclude_info_maps: bool,
     only_run_validation: bool,
@@ -88,7 +88,7 @@ def test_main(
         ("block", False, LogVerbosity.WARNINGS, False, False, True, ""),
         ("inline", False, LogVerbosity.LOGS, False, True, False, ""),
         ("basic", False, LogVerbosity.ERRORS, False, False, False, ""),
-        ("basic", False, False, False, False, False, "graphics"),
+        ("basic", False, LogVerbosity.LOGS, False, False, False, "graphics"),
     ],
 )
 def test_run_rufas(
@@ -104,7 +104,6 @@ def test_run_rufas(
 ) -> None:
     """Checks that run_rufas() calls the correct functions in the correct order"""
     # Arrange
-    patch_set_global_variables = mocker.patch("main.set_global_variables")
     metadata_file_list = METADATA_PATHS
     patch_execute_simulations = mocker.patch("main.execute_simulations")
     patch_run_validation = mocker.patch("main.run_validation")
@@ -122,7 +121,6 @@ def test_run_rufas(
     )
 
     # Assert
-    patch_set_global_variables.assert_called_once_with(verbose)
     if only_run_validation:
         patch_run_validation.assert_called_once_with(
             metadata_file_list, exclude_info_maps, format_option, verbose

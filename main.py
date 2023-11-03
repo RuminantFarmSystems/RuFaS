@@ -78,6 +78,7 @@ def run_rufas(
             produce_graphics,
             graphics_dir,
             format_option,
+            verbose,
         )
 
 
