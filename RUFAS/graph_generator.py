@@ -204,7 +204,20 @@ class GraphGenerator:
         selected_variables: List[str],
         plot_function: FUNCTION_TYPE,
     ) -> None:
-        """Draw a plot using the provided data and selected variables where the data is tuple"""
+        """
+        Plot selected variables from data organized as a tuple.
+
+        Parameters
+        ----------
+        data_dict : Dict[str, List[float | int]]
+            Dictionary of variable data.
+        selected_variables : List[str]
+            List of variables to plot.
+        plot_function : Callable[..., None]
+            Matplotlib function for plotting.
+
+        Returns: None
+        """
         values_tuple = tuple(data_dict[variable] for variable in selected_variables)
         plot_function(list(range(len(values_tuple[0]))), values_tuple)
 
