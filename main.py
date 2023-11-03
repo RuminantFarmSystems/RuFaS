@@ -146,8 +146,8 @@ def execute_simulations(
     produce_graphics: bool, optional
         Flag for whether or not the user wants to produce graphs at after the simulation.
 
-        graphics_dir : Path, optional
-            The directory for saving graphics.
+    graphics_dir : Path, optional
+        The directory for saving graphics.
     format_option : str
         The formatting option for select output files.
     """
