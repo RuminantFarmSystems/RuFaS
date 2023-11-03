@@ -571,12 +571,12 @@ class InputManager:
                     }
 
         if 'default' not in variable_properties.keys():
-            om.add_error("Validation: invalid data not able to be fixed: ", f"{element_hierarchy[-1]}\n", info_map)
+            om.add_error("Validation: invalid data not able to be fixed: ", f"{element_hierarchy[-1]}", info_map)
             return False
         variable_parent = reduce(lambda d, key: d[key], element_hierarchy[:-1],
                                  input_data)
         om.add_warning("Validation: invalid data found",
-                       f"{element_hierarchy[-1]}: {variable_parent[element_hierarchy[-1]]}\n",
+                       f"{element_hierarchy[-1]}: {variable_parent[element_hierarchy[-1]]}",
                        info_map)
         variable_parent[element_hierarchy[-1]] = variable_properties['default']
         om.add_warning("Validation: data fixed",
