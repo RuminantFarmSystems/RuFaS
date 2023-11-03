@@ -33,6 +33,12 @@ class LogVerbosity(Enum):
     WARNINGS = "warnings"
     LOGS = "logs"
 
+    def __le__(self, other) -> bool:
+        return self.value <= other.value
+    
+    def __ge__(self, other) -> bool:
+        return self.value >= other.value
+
 
 class OutputManager(object):
     """
