@@ -163,6 +163,8 @@ def reload_pool(directory_path: str = "output/", file_pattern: str = "*all_varia
                 return reloaded_vars_pool
         except Exception as e:
             raise e
+    else:
+        return {}
 
 
 def get_filepath(directory_path: str = "output/", file_pattern: str = "*all_variables*") -> str:
