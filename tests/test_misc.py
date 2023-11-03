@@ -176,13 +176,13 @@ def test_set_metadata_prefix(mock_output_manager: OutputManager) -> None:
 
 
 @pytest.mark.parametrize(
-        "log_type",
+        "log_verbose",
         [LogVerbosity.NONE, LogVerbosity.ERRORS, LogVerbosity.WARNINGS, LogVerbosity.LOGS]
         )
-def test_set_log_verbose(mock_output_manager: OutputManager, log_type: LogVerbosity) -> None:
+def test_set_log_verbose(mock_output_manager: OutputManager, log_verbose: LogVerbosity) -> None:
     """Unit test for the function set_log_verbose in the file output_manager.py"""
-    mock_output_manager.set_log_verbose(log_type)
-    assert mock_output_manager._OutputManager__log_type == log_type
+    mock_output_manager.set_log_verbose(log_verbose)
+    assert mock_output_manager._OutputManager__log_verbose == log_verbose
 
 
 def test_dict_to_csv_column_list(mock_output_manager: OutputManager) -> None:
