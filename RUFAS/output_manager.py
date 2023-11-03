@@ -91,7 +91,7 @@ class OutputManager(object):
             self.errors_pool: Dict[str, OutputManager.pool_element_type] = {}
             self.logs_pool: Dict[str, OutputManager.pool_element_type] = {}
             self.__metadata_prefix: str = ""
-            self.supported_filter_types_prefixes: Dict[str, str] = {
+            self.__supported_filter_types_prefixes: Dict[str, str] = {
                 "csv": "csv_",
                 "graph": "graph_",
                 "json": "json_",
@@ -267,7 +267,7 @@ class OutputManager(object):
         if log_level <= self.__log_verbose:
             log_format = "[{timestamp}]{color}[{log_level}]{color_reset}[{metadata_prefix}] {name}: {message}\n"
             formatted_msg = log_format.format(
-                timestamp=info_map['timestamp'],
+                timestamp=info_map["timestamp"],
                 color=colors[log_level],
                 color_reset=colors[LogVerbosity.NONE],
                 metadata_prefix=self.__metadata_prefix,
@@ -766,18 +766,20 @@ class OutputManager(object):
             if exclude_info_maps:
                 filtered_pool = self._exclude_info_maps(filtered_pool)
 
-            if filter_file.startswith(self.supported_filter_types_prefixes["json"]):
+            if filter_file.startswith(self.__supported_filter_types_prefixes["json"]):
                 file_path = os.path.join(
                     save_path,
                     self._generate_file_name(f"saved_variables_{filter_file}", "json"),
                 )
                 self._dict_to_file_json(filtered_pool, file_path)
-            elif filter_file.startswith(self.supported_filter_types_prefixes["csv"]):
+            elif filter_file.startswith(self.__supported_filter_types_prefixes["csv"]):
                 csv_directory = os.path.join(save_path, "CSVs", "om")
                 self._save_variables_to_csv_files(
                     filtered_pool, filter_file, csv_directory
                 )
-            elif filter_file.startswith(self.supported_filter_types_prefixes["graph"]):
+            elif filter_file.startswith(
+                self.__supported_filter_types_prefixes["graph"]
+            ):
                 if produce_graphics:
                     try:
                         graph_generator.generate_graph(
@@ -798,7 +800,7 @@ class OutputManager(object):
             else:
                 self.add_warning(
                     "invalid filter file",
-                    f"{filter_file} must be prefixed with one of {list(self.supported_filter_types_prefixes.values())}",
+                    f"{filter_file} must be prefixed with one of {list(self.__supported_filter_types_prefixes.values())}",
                     info_map,
                 )
 
