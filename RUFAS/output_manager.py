@@ -799,8 +799,8 @@ class OutputManager(object):
                     )
             else:
                 self.add_warning(
-                    "invalid filter file",
-                    f"{filter_file} must be prefixed with one of {list(self.__supported_filter_types_prefixes.values())}",
+                    "invalid filter file prefix",
+                    f"{filter_file} prefix is not in {list(self.__supported_filter_types_prefixes.values())}",
                     info_map,
                 )
 
