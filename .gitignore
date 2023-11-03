@@ -30,6 +30,9 @@ RUFAS/scenario_manager.py
 # only stores non-empty directories
 output/*
 !output/.keep
+!output/graphics/
+output/graphics/*
+!output/output_filters/
 output/output_filters/*
 
 # ignore project files
