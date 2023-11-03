@@ -185,13 +185,13 @@ def test_run_validation(mocker: MockerFixture, is_data_valid: bool) -> None:
     "produce_graphics, exlclude_info_maps, is_data_valid, simulate_call_count, add_error_call_count, format_option",
     [
         (False, False, True, 2, 0, "verbose"),
-        (False, False, False, 0, 2, "block"),
+        (False, False, False, 0, 4, "block"),
         (False, True, True, 2, 0, "verbose"),
-        (False, True, False, 0, 2, "block"),
+        (False, True, False, 0, 4, "block"),
         (True, False, True, 2, 0, "verbose"),
-        (True, False, False, 0, 2, "block"),
+        (True, False, False, 0, 4, "block"),
         (True, True, True, 2, 0, "verbose"),
-        (True, True, False, 0, 2, "block"),
+        (True, True, False, 0, 4, "block"),
     ],
 )
 def test_execute_simulations(
@@ -201,7 +201,7 @@ def test_execute_simulations(
     is_data_valid: bool,
     simulate_call_count: int,
     add_error_call_count: int,
-    format_option,
+    format_option: str,
 ) -> None:
     """Checks that execute_simulations() calls the correct functions in the correct order"""
     # Arrange
