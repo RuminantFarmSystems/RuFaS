@@ -176,10 +176,12 @@ def test_set_metadata_prefix(mock_output_manager: OutputManager) -> None:
 
 
 @pytest.mark.parametrize(
-        "log_verbose",
-        [LogVerbosity.NONE, LogVerbosity.ERRORS, LogVerbosity.WARNINGS, LogVerbosity.LOGS]
-        )
-def test_set_log_verbose(mock_output_manager: OutputManager, log_verbose: LogVerbosity) -> None:
+    "log_verbose",
+    [LogVerbosity.NONE, LogVerbosity.ERRORS, LogVerbosity.WARNINGS, LogVerbosity.LOGS],
+)
+def test_set_log_verbose(
+    mock_output_manager: OutputManager, log_verbose: LogVerbosity
+) -> None:
     """Unit test for the function set_log_verbose in the file output_manager.py"""
     mock_output_manager.set_log_verbose(log_verbose)
     assert mock_output_manager._OutputManager__log_verbose == log_verbose
@@ -480,13 +482,13 @@ def test_get_timestamp(mocker: MockerFixture) -> None:
 
 
 @pytest.mark.parametrize(
-        "log_type",
-        [LogVerbosity.NONE, LogVerbosity.ERRORS, LogVerbosity.WARNINGS, LogVerbosity.LOGS]
-        )
+    "log_verobse",
+    [LogVerbosity.NONE, LogVerbosity.ERRORS, LogVerbosity.WARNINGS, LogVerbosity.LOGS],
+)
 def test_add_error(
     mock_output_manager: OutputManager,
     output_manager_original_method_states: Dict[str, Callable],
-    log_type: LogVerbosity,
+    log_verobse: LogVerbosity,
     capsys,
 ) -> None:
     """Unit test for function add_error in file output_manager.py"""
@@ -499,7 +501,7 @@ def test_add_error(
     mock_output_manager._generate_key = MagicMock(return_value=key)
     mock_output_manager._add_to_pool = MagicMock()
     mock_output_manager._get_timestamp = MagicMock(return_value=timestamp)
-    mock_output_manager.set_log_verbose(log_type)
+    mock_output_manager.set_log_verbose(log_verobse)
     mock_output_manager.set_metadata_prefix(metadata_prefix)
 
     mock_output_manager.add_error(name, message, info_map)
@@ -507,9 +509,11 @@ def test_add_error(
     mock_output_manager._generate_key.assert_called_once_with(name, info_map)
 
     assert info_map.get("timestamp") == timestamp
-    if log_type in [LogVerbosity.ERRORS, LogVerbosity.WARNINGS, LogVerbosity.LOGS]:
+    if log_verobse in [LogVerbosity.ERRORS, LogVerbosity.WARNINGS, LogVerbosity.LOGS]:
         captured = capsys.readouterr()
-        expected_message = f"[{timestamp}][ERROR][{metadata_prefix}] {name}: {message}\n"
+        expected_message = (
+            f"[{timestamp}][ERROR][{metadata_prefix}] {name}: {message}\n"
+        )
         assert expected_message in captured.out
     mock_output_manager._add_to_pool(
         mock_output_manager.errors_pool, key, message, info_map
@@ -527,14 +531,13 @@ def test_add_error(
 
 
 @pytest.mark.parametrize(
-        "log_type",
-        [LogVerbosity.NONE, LogVerbosity.ERRORS, LogVerbosity.WARNINGS, LogVerbosity.LOGS]
-        )
+    "log_verobse",
+    [LogVerbosity.NONE, LogVerbosity.ERRORS, LogVerbosity.WARNINGS, LogVerbosity.LOGS],
+)
 def test_add_warning(
     mock_output_manager: OutputManager,
     output_manager_original_method_states: Dict[str, Callable],
-    log_type: LogVerbosity,
-    capsys
+    log_verobse: LogVerbosity,
 ) -> None:
     """Unit test for function add_warning in file output_manager.py"""
     key = "dummy_key"
@@ -546,19 +549,18 @@ def test_add_warning(
     mock_output_manager._generate_key = MagicMock(return_value=key)
     mock_output_manager._add_to_pool = MagicMock()
     mock_output_manager._get_timestamp = MagicMock(return_value=timestamp)
-    mock_output_manager.set_log_verbose(log_type)
+    mock_output_manager.set_log_verbose(log_verobse)
     mock_output_manager.set_metadata_prefix(metadata_prefix)
+    mock_output_manager._handle_log_output = MagicMock()
 
     mock_output_manager.add_warning(name, message, info_map)
 
     mock_output_manager._generate_key.assert_called_once_with(name, info_map)
 
     assert info_map.get("timestamp") == timestamp
-
-    if log_type in [LogVerbosity.WARNINGS, LogVerbosity.LOGS]:
-        captured = capsys.readouterr()
-        expected_message = f"[{timestamp}][WARNING][{metadata_prefix}] {name}: {message}\n"
-        assert expected_message in captured.out
+    mock_output_manager._handle_log_output.assert_called_once_with(
+        name, message, info_map, LogVerbosity.WARNINGS
+    )
 
     mock_output_manager._add_to_pool(
         mock_output_manager.warnings_pool, key, message, info_map
@@ -573,16 +575,19 @@ def test_add_warning(
     mock_output_manager._get_timestamp = output_manager_original_method_states[
         "_get_timestamp"
     ]
+    mock_output_manager._handle_log_output = output_manager_original_method_states[
+        "_handle_log_output"
+    ]
 
 
 @pytest.mark.parametrize(
-        "log_type",
-        [LogVerbosity.NONE, LogVerbosity.ERRORS, LogVerbosity.WARNINGS, LogVerbosity.LOGS]
-        )
+    "log_verobse",
+    [LogVerbosity.NONE, LogVerbosity.ERRORS, LogVerbosity.WARNINGS, LogVerbosity.LOGS],
+)
 def test_add_log(
     mock_output_manager: OutputManager,
     output_manager_original_method_states: Dict[str, Callable],
-    log_type: LogVerbosity,
+    log_verobse: LogVerbosity,
     capsys,
 ) -> None:
     """Unit test for function add_log in file output_manager.py"""
@@ -595,7 +600,7 @@ def test_add_log(
     mock_output_manager._generate_key = MagicMock(return_value=key)
     mock_output_manager._add_to_pool = MagicMock()
     mock_output_manager._get_timestamp = MagicMock(return_value=timestamp)
-    mock_output_manager.set_log_verbose(log_type)
+    mock_output_manager.set_log_verbose(log_verobse)
     mock_output_manager.set_metadata_prefix(metadata_prefix)
 
     mock_output_manager.add_log(name, message, info_map)
@@ -604,7 +609,7 @@ def test_add_log(
 
     assert info_map.get("timestamp") == timestamp
 
-    if log_type == LogVerbosity.LOGS:
+    if log_verobse == LogVerbosity.LOGS:
         captured = capsys.readouterr()
         expected_message = f"[{timestamp}][LOG][{metadata_prefix}] {name}: {message}\n"
         assert expected_message in captured.out
@@ -732,6 +737,7 @@ def output_manager_original_method_states(
         "_generate_file_name": mock_output_manager._generate_file_name,
         "_generate_key": mock_output_manager._generate_key,
         "_get_timestamp": mock_output_manager._get_timestamp,
+        "_handle_log_output": mock_output_manager._handle_log_output,
         "set_metadata_prefix": mock_output_manager.set_metadata_prefix,
         "set_log_verbose": mock_output_manager.set_log_verbose,
         "_list_to_file_txt": mock_output_manager._list_to_file_txt,
