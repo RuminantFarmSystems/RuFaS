@@ -260,9 +260,17 @@ class OutputManager(object):
             LogVerbosity.LOGS: "\33[102m",
         }
         if log_level <= self.__log_verbose:
-            sys.stdout.write(
-                f"[{info_map['timestamp']}]{colors[log_level]}[{log_level}]{colors[LogVerbosity.NONE]}[{self.__metadata_prefix}] {name}: {msg}\n"
+            log_format = "[{timestamp}]{color}[{log_level}]{color_reset}[{metadata_prefix}] {name}: {message}\n"
+            formatted_msg = log_format.format(
+                timestamp=info_map['timestamp'],
+                color=colors[log_level],
+                color_reset=colors[LogVerbosity.NONE],
+                metadata_prefix=self.__metadata_prefix,
+                name=name,
+                message=msg,
+                log_level=log_level,
             )
+            sys.stdout.write(formatted_msg)
 
     def set_metadata_prefix(self, metadata_prefix: str) -> None:
         """Sets the metadata_prefix attribute."""
