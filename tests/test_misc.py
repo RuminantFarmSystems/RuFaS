@@ -714,9 +714,9 @@ def test_output_manager_singleton(mocker: MockerFixture) -> None:
     "log_level, color_code",
     [
         (LogVerbosity.NONE, "\033[0m"),
-        (LogVerbosity.ERRORS, "\33[101m"),
-        (LogVerbosity.WARNINGS, "\33[103m"),
-        (LogVerbosity.LOGS, "\33[102m"),
+        (LogVerbosity.ERRORS, "\33[91m"),
+        (LogVerbosity.WARNINGS, "\33[93m"),
+        (LogVerbosity.LOGS, "\33[92m"),
     ],
 )
 def test_handle_log_output(capsys, log_level: LogVerbosity, color_code: str) -> None:

@@ -260,12 +260,12 @@ class OutputManager(object):
     ) -> None:
         colors: Dict[LogVerbosity, str] = {
             LogVerbosity.NONE: "\033[0m",
-            LogVerbosity.ERRORS: "\33[101m",
-            LogVerbosity.WARNINGS: "\33[103m",
-            LogVerbosity.LOGS: "\33[102m",
+            LogVerbosity.ERRORS: "\33[91m",
+            LogVerbosity.WARNINGS: "\33[93m",
+            LogVerbosity.LOGS: "\33[92m",
         }
         if log_level <= self.__log_verbose:
-            log_format = "[{timestamp}]{color}[{log_level}]{color_reset}[{metadata_prefix}] {name}: {message}\n"
+            log_format = "{color}[{timestamp}][{log_level}][{metadata_prefix}] {name}: {message}{color_reset}\n"
             formatted_msg = log_format.format(
                 timestamp=info_map["timestamp"],
                 color=colors[log_level],
