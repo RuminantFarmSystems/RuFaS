@@ -13,6 +13,7 @@ import re
 from deprecated.sphinx import deprecated
 
 from RUFAS.util import Utility
+from RUFAS.graph_generator import GraphGenerator
 
 
 class LogVerbosity(Enum):
@@ -102,7 +103,12 @@ class OutputManager(object):
         # the function key; as they are already stored in element key and
         # having them increases the final file size.
         reduced_info_map = {
-            k: info_map[k] for k in info_map.keys() - {"class", "function", }
+            k: info_map[k]
+            for k in info_map.keys()
+            - {
+                "class",
+                "function",
+            }
         }
         pool[key]["info_maps"].append(reduced_info_map)
 
@@ -389,9 +395,7 @@ class OutputManager(object):
                         csv_column_lists[subkey].append(value)
 
                 for subkey in csv_column_lists.keys():
-                    column_title = (
-                        f"{variable_name}.{subkey}"
-                    )
+                    column_title = f"{variable_name}.{subkey}"
                     column_list.append(
                         pd.Series(
                             csv_column_lists[subkey], dtype=object, name=column_title
@@ -497,11 +501,11 @@ class OutputManager(object):
                 value.pop("info_maps")
         return pool_copy
 
-    def _list_txt_file_names_in_dir(self, dir_path: str) -> List[str]:
-        """Returns the list of files in the given path"""
+    def _list_txt_and_json_files_in_dir(self, dir_path: str) -> List[str]:
+        """Returns the list of txt and json files in the given path"""
         info_map = {
             "class": self.__class__.__name__,
-            "function": self._list_txt_file_names_in_dir.__name__,
+            "function": self._list_txt_and_json_files_in_dir.__name__,
         }
         self.add_log(
             "search_path_for_filenames_try",
@@ -510,53 +514,92 @@ class OutputManager(object):
         )
         dir_path_check = Path(dir_path)
         if dir_path_check.is_dir():
-            txt_files = []
+            filter_files = []
             all_files = os.listdir(dir_path)
             for filename in all_files:
-                if filename.endswith(".txt"):
-                    txt_files.append(filename)
+                if filename.endswith(".txt") or filename.endswith(".json"):
+                    filter_files.append(filename)
             self.add_log(
                 "search_path_for_filenames_success",
                 f"Successfully searched in {dir_path}"
-                f" and found {len(txt_files)} text files.",
+                f" and found {len(filter_files)} text files.",
                 info_map,
             )
-            return txt_files
+            return filter_files
         else:
             raise NotADirectoryError("The specified path must be a directory")
 
-    def _load_txt_file_to_list(self, path: str) -> List[str]:
-        """Reads a text file into a list.
+    def _load_filter_file_content(self, path: str) -> Dict[str, str]:
+        """
+        Loads and processes the content of a filter file from the specified path.
 
         Parameters
         ----------
         path : str
-            Path of the input file to be read.
+            The path to the filter file (either .json or .txt).
 
         Returns
         -------
-        List[str]
-            A list of strings from a text file where each line of the file becomes a list element.
+        Dict[str, str]
+            A dictionary containing the loaded filter content, with keys and values depending on the file type.
 
         Raises
-        -------
-        Exception
-            If an error occurs while opening or reading the file.
+        ------
+        FileNotFoundError
+            If the specified file does not exist.
 
+        json.JSONDecodeError
+            If there is an issue with parsing a JSON file.
+
+        UnicodeDecodeError
+            If there is an issue with decoding a text file.
+
+        Exception
+            If an unsupported file format is encountered; only .json and .txt are supported.
+
+        Notes
+        -----
+        This method attempts to open and process a filter file located at the specified path.
+        It supports two file formats: JSON and plain text (.txt). If the file is a JSON file,
+        it loads the JSON content into a dictionary. If the file is a .txt file, it reads the
+        lines and creates a dictionary with a "filters" key and a list of filter elements as values.
+        Unsupported file formats will raise an exception.
+
+        This method is used to handle loading filter content from external files, which are
+        used to define filtering criteria for the variables pool.
         """
         info_map = {
             "class": self.__class__.__name__,
-            "function": self._load_txt_file_to_list.__name__,
+            "function": self._load_filter_file_content.__name__,
         }
-        self.add_log("open_text_file", f"Attempting to open {path}.", info_map)
+        self.add_log("open_filter_file", f"Attempting to open {path}.", info_map)
         try:
-            with open(path) as text_file:
-                list_of_elements = text_file.read().splitlines()
-                load_message = f"Successfully opened {path} and read {len(list_of_elements)} lines."
-                self.add_log("filter_pattern_file_load_log", load_message, info_map)
-                return list_of_elements
+            with open(path) as filter_file:
+                if path.endswith(".json"):
+                    result = json.load(filter_file)
+                elif path.endswith(".txt"):
+                    list_of_elements = filter_file.read().splitlines()
+                    result = {"filters": list_of_elements}
+                else:
+                    raise Exception(
+                        "Unsupported file format; only json and txt are supported."
+                    )
+            self.add_log("text_file_load_log", f"Successfully opened {path}.", info_map)
+            return result
+        except FileNotFoundError:
+            self.add_error(
+                "File not found", f"The file '{path}' does not exist.", info_map
+            )
+            raise
+        except json.JSONDecodeError as e:
+            self.add_error("JSON parsing error", str(e), info_map)
+            raise
+        except UnicodeDecodeError as e:
+            self.add_error("Text decoding error", str(e), info_map)
+            raise
         except Exception as e:
-            raise e
+            self.add_error("Unexpected error", str(e), info_map)
+            raise
 
     def _filter_variables_pool(
         self, filter_patterns: List[str], input_file_name: Optional[str]
@@ -625,7 +668,12 @@ class OutputManager(object):
         return filter_pattern_matches
 
     def save_variables(
-        self, save_path: str, dir_path: str, exclude_info_maps: bool = False
+        self,
+        save_path: Path,
+        dir_path: Path,
+        exclude_info_maps: bool = False,
+        produce_graphics: bool = True,
+        graphics_dir: Path = Path(""),
     ) -> None:
         """
         Reads a text file containing a list of keys and filters the variables pool by those keys.
@@ -633,15 +681,20 @@ class OutputManager(object):
 
         Parameters
         ----------
-        save_path : str
+        save_path : Path
             Path to the directory where the file will be saved.
 
-        dir_path : str
+        dir_path : Path
             Path of the directory containing the files containing the keys for filtering.
 
         exclude_info_maps : bool
             Flag for whether or not the user wants to include info_maps data in their results files.
 
+        produce_graphics: bool, optional
+            Flag for whether or not the user wants to produce graphs at after the simulation.
+
+        graphics_dir : Path, optional
+            The directory for saving graphics.
         """
         info_map = {
             "class": self.__class__.__name__,
@@ -652,11 +705,21 @@ class OutputManager(object):
             f"exclude_info_maps flag set to {exclude_info_maps}",
             info_map,
         )
-        list_of_filter_files = self._list_txt_file_names_in_dir(dir_path)
+        graph_generator = GraphGenerator()
+        list_of_filter_files = self._list_txt_and_json_files_in_dir(dir_path)
         for filter_file in list_of_filter_files:
             input_path = os.path.join(dir_path, filter_file)
-            filter_patterns = self._load_txt_file_to_list(input_path)
-            filtered_pool = self._filter_variables_pool(filter_patterns, filter_file)
+            filter_content = self._load_filter_file_content(input_path)
+            if "filters" not in filter_content.keys():
+                self.add_error(
+                    "Missing filters entry",
+                    f"'filters' does not exist in {filter_file}",
+                    info_map,
+                )
+                continue
+            filtered_pool = self._filter_variables_pool(
+                filter_content["filters"], filter_file
+            )
             if exclude_info_maps:
                 filtered_pool = self._exclude_info_maps(filtered_pool)
 
@@ -668,7 +731,27 @@ class OutputManager(object):
                 self._dict_to_file_json(filtered_pool, file_path)
             elif filter_file.startswith("csv_"):
                 csv_directory = os.path.join(save_path, "CSVs", "om")
-                self._save_variables_to_csv_files(filtered_pool, filter_file, csv_directory)
+                self._save_variables_to_csv_files(
+                    filtered_pool, filter_file, csv_directory
+                )
+            elif filter_file.startswith("graph_"):
+                if produce_graphics:
+                    try:
+                        graph_generator.generate_graph(
+                            filtered_pool,
+                            filter_content,
+                            save_path,
+                            filter_file,
+                            graphics_dir,
+                        )
+                    except Exception as e:
+                        self.add_error("graph generation exception", str(e), info_map)
+                else:
+                    self.add_warning(
+                        "No Graphics",
+                        f"Graphic generation is disabled, skipping {filter_file=}",
+                        info_map,
+                    )
             else:
                 self.add_warning(
                     "invalid filter file",
@@ -750,9 +833,12 @@ class OutputManager(object):
         file_path = os.path.join(path, self._generate_file_name("errors", "json"))
         self._dict_to_file_json(self.errors_pool, file_path)
 
-    def dump_variable_names_and_contexts(self, path: str, exclude_info_maps: bool,  # noqa: C901
-                                         format_option: str = "verbose",
-                                         ) -> None:
+    def dump_variable_names_and_contexts(  # noqa: C901
+        self,
+        path: str,
+        exclude_info_maps: bool,
+        format_option: str = "verbose",
+    ) -> None:
         """
         Dumps names of all variables added to variables_pool along with the caller class
         and function contextual information into a txt file in the given path to a directory.
@@ -837,7 +923,10 @@ class OutputManager(object):
         self._list_to_file_txt(var_list, file_path)
 
     def dump_all_nondata_pools(
-        self, path: str, exclude_info_maps: bool = False, format_option: str = "verbose",
+        self,
+        path: str,
+        exclude_info_maps: bool = False,
+        format_option: str = "verbose",
     ) -> None:
         """
         Dumps all non-data pools into the given path to a directory.

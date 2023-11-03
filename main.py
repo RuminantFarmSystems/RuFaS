@@ -10,6 +10,7 @@ import argparse
 from pathlib import Path
 import sys
 from typing import List
+
 from RUFAS.scenario_manager import METADATA_PATHS, MetadataPaths
 
 import config.global_variables
@@ -22,54 +23,70 @@ from RUFAS.util import Utility
 def main():
     cmd_arguments = parse_gnu_args()
     run_rufas(
+        produce_graphics=not cmd_arguments.no_graphics,
         format_option=cmd_arguments.format_option,
-        make_graphs=not cmd_arguments.no_graphics,
         verbose=LogVerbosity(cmd_arguments.verbose),
         clear_output=cmd_arguments.clear_output,
         exclude_info_maps=cmd_arguments.exclude_info_maps,
         only_run_validation=cmd_arguments.only_run_validation,
+        graphics_dir=Path(cmd_arguments.graphics_dir),
     )
 
 
 def run_rufas(
+    produce_graphics: bool = True,
     format_option: str = "verbose",
-    make_graphs: bool = True,
     verbose: LogVerbosity = LogVerbosity.NONE,
     clear_output: bool = False,
     exclude_info_maps: bool = False,
     only_run_validation: bool = False,
+    graphics_dir: Path = Path(""),
 ) -> None:
     """Main function to run RuFaS, with options.
 
     Args:
+        produce_graphics: produce graphics after simulation
+        verbose: print progress messages while simulation is running
+        clear_output: lear output directory before running the simulation
+        exclude_info_map: exclude info_maps from the output
+        graphics_dir : Path, optional
+            The directory for saving graphics.
+        produce_graphics: produce graphics after simulation
         format_option: format for variable_names.txt output file
-        make_graphs: prevent graphics from generating
         verbose: print errors, warnings, and/or logs during the simulation
         clear_output: lear output directory before running the simulation
         exclude_info_map: exclude info_maps from the output
         only_run_validation: validate input data and don't run a simulation
+        graphics_dir : Path, optional
+            The directory for saving graphics.
     """
     if clear_output:
         output_dir = Path(config.global_variables.OUT_DIR)
         keep_list = [".keep", "output_filters"]
         Utility.empty_dir(output_dir, keep=keep_list)
 
-    set_global_variables(make_graphs)
     sys.stdout.write("RuFaS: Ruminant Farm Systems Model 2023\n")
+    if verbose:
+        print("RuFaS: Ruminant Farm Systems Model 2023")
     metadata_file_list: List[MetadataPaths] = METADATA_PATHS
     if only_run_validation:
         run_validation(metadata_file_list, exclude_info_maps, format_option, verbose)
     else:
-        execute_simulations(metadata_file_list, exclude_info_maps, format_option, verbose)
+        execute_simulations(
+            metadata_file_list,
+            exclude_info_maps,
+            produce_graphics,
+            graphics_dir,
+            format_option,
+        )
 
 
-def set_global_variables(make_graphs: bool) -> None:
-    """Sets values of global variables in config/global_variables.py"""
-    config.global_variables.PRODUCE_GRAPHICS = make_graphs
-
-
-def run_validation(metadata_files: List[Path], exclude_info_maps: bool = False,
-                   format_option: str = "verbose", verbose: LogVerbosity = LogVerbosity.NONE) -> None:
+def run_validation(
+    metadata_files: List[Path],
+    exclude_info_maps: bool = False,
+    format_option: str = "verbose",
+    verbose: LogVerbosity = LogVerbosity.NONE,
+) -> None:
     """Instantiates I/O Managers and triggers validation of input data.
 
     Parameters
@@ -83,70 +100,129 @@ def run_validation(metadata_files: List[Path], exclude_info_maps: bool = False,
     verbose : LogVerbosity
         The verbose option set by the user.
     """
-    info_map = {"class": "No caller class",
-                "function": run_validation.__name__,
-                }
+    info_map = {
+        "class": "No caller class",
+        "function": run_validation.__name__,
+    }
     output_manager = OutputManager()
     input_manager = InputManager()
-    output_manager.add_log("Validation only", "***Only validating data, no simulation will follow.***", info_map)
+    output_manager.add_log(
+        "Validation only",
+        "***Only validating data, no simulation will follow.***",
+        info_map,
+    )
     for metadata_file in metadata_files:
         input_manager.flush_pool()
         output_manager.flush_pools()
-        output_manager.add_log("Validation start", f"Validating data for {str(metadata_file['path'])}...\n", info_map)
+        output_manager.add_log(
+            "Validation start",
+            f"Validating data for {str(metadata_file['path'])}...\n",
+            info_map,
+        )
         output_manager.set_log_type(verbose)
-        is_data_valid = input_manager.start_data_processing(str(metadata_file["path"]), False)
+        is_data_valid = input_manager.start_data_processing(
+            str(metadata_file["path"]), False
+        )
         if is_data_valid:
             output_manager.add_log("Validation", "Data is valid.\n\n", info_map)
         else:
-            output_manager.add_warning("Validation", f"Data not valid for {metadata_file['path']}.\n\n", info_map)
-        output_manager.dump_all_nondata_pools(r"output", exclude_info_maps, format_option)
+            output_manager.add_warning(
+                "Validation",
+                f"Data not valid for {metadata_file['path']}.\n\n",
+                info_map,
+            )
+        output_manager.dump_all_nondata_pools(
+            r"output", exclude_info_maps, format_option
+        )
 
 
 def execute_simulations(
-    metadata_files: List[Path], exclude_info_maps: bool = False, format_option: str = "verbose",
-    verbose: LogVerbosity = LogVerbosity.NONE
+    metadata_files: List[MetadataPaths],
+    exclude_info_maps: bool = False,
+    produce_graphics: bool = True,
+    graphics_dir: Path = Path(""),
+    format_option: str = "verbose",
+    verbose: LogVerbosity = LogVerbosity.NONE,
 ) -> None:
     """Instantiates I/O Managers and processes the metadata files provided by the user to run the simulation.
 
     Parameters
     ----------
-    metadata_files : MetadataPaths
+    metadata_files : List[MetadataPaths]
         A list of custom TypedDict objects including the specified prefix for the save_variables output file
         and the path to the metadata file.
+
     exclude_info_maps : bool, optional
         Flag for whether or not the user wants to inlcude info_maps data in their results files.
+    produce_graphics: bool, optional
+        Flag for whether or not the user wants to produce graphs at after the simulation.
+
+    graphics_dir : Path, optional
+        The directory for saving graphics.
     format_option : str
         The formatting option for select output files.
     verbose : LogVerbosity
         The verbose option set by the user.
     """
-    info_map = {"class": "No caller class",
-                "function": execute_simulations.__name__,
-                }
+    info_map = {
+        "class": "No caller class",
+        "function": execute_simulations.__name__,
+    }
     sys.stdout.write("Simulating...\n")
     output_manager = OutputManager()
     input_manager = InputManager()
+    output_manager.set_log_type(verbose)
     for metadata_file in metadata_files:
         input_manager.flush_pool()
         output_manager.flush_pools()
-        output_manager.add_log("Validation start", f"Validating data for {str(metadata_file['path'])}...\n", info_map)
-        output_manager.set_metadata_prefix(metadata_file['prefix'])
-        output_manager.set_log_type(verbose)
-        is_data_valid = input_manager.start_data_processing(str(metadata_file["path"]), True)
+        output_manager.add_log(
+            "Validation start",
+            f"Validating data for {str(metadata_file['path'])}...\n",
+            info_map,
+        )
+        output_manager.set_metadata_prefix(metadata_file["prefix"])
+        is_data_valid = input_manager.start_data_processing(
+            str(metadata_file["path"]), True
+        )
         if is_data_valid:
-            output_manager.add_log("Validation complete", "Data is valid. \nSimulating...\n", info_map)
+            output_manager.add_log(
+                "Validation complete", "Data is valid. \nSimulating...\n", info_map
+            )
             simulator = SimulationEngine()
             simulator.simulate()
         else:
-            output_manager.add_error("Validation complete",
-                                     f"Data not valid for {str(metadata_file['path'])}, simulation not run", info_map)
-        output_manager.save_variables(r"output", r"output/output_filters/", exclude_info_maps)
-        output_manager.dump_all_nondata_pools(r"output", exclude_info_maps, format_option)
+            output_manager.add_error(
+                "Validation complete",
+                f"Data not valid for {str(metadata_file['path'])}, simulation not run",
+                info_map,
+            )
+            output_manager.add_error(
+                "No simulation run",
+                f"Data not valid for {str(metadata_file['path'])}, simulation not run",
+                info_map,
+            )
+        output_manager.dump_all_nondata_pools(
+            r"output", exclude_info_maps, format_option
+        )
+        output_manager.save_variables(
+            Path(r"output"),
+            Path(r"output/output_filters/"),
+            exclude_info_maps,
+            produce_graphics,
+            graphics_dir,
+        )
 
 
-def parse_gnu_args():
+class CaseInsensitiveArgumentAction(argparse.Action):
+    def __call__(self, parser, namespace, values, option_string=None) -> None:
+        for action in self.option_strings:
+            setattr(namespace, action, values)
+
+
+def parse_gnu_args() -> argparse.Namespace:
     """Parse command line options, if applicable"""
-    parser = argparse.ArgumentParser()
+    parser = argparse.ArgumentParser(description="RuFaS: Whole dairy farm simulation")
+    parser.register("action", "ci_action", CaseInsensitiveArgumentAction)
     parser.add_argument(
         "-f",
         "--format-option",
@@ -154,10 +230,16 @@ def parse_gnu_args():
         help="Select formatting option for variable_names.txt file",
     )
     parser.add_argument(
-        "-ng",
+        "-g",
         "--no-graphics",
         help="Prevent graphics from generating",
         action="store_true",
+    )
+    parser.add_argument(
+        "-G",
+        "--graphics_dir",
+        help="The saving directory for graphics",
+        default="graphics",
     )
     parser.add_argument(
         "-v",
@@ -167,19 +249,19 @@ def parse_gnu_args():
         help="Specify the log type to be printed",
     )
     parser.add_argument(
-        "-co",
+        "-c",
         "--clear-output",
         help="Clear output directory before running the simulation",
         action="store_true",
     )
     parser.add_argument(
-        "-ei",
+        "-i",
         "--exclude_info_maps",
         help="Exclude info_maps from the output",
         action="store_true",
     )
     parser.add_argument(
-        "-ov",
+        "-o",
         "--only-run-validation",
         help="Only validate the data, don't run a simulation",
         action="store_true",

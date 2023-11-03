@@ -381,7 +381,8 @@ class RationReporter:
             for nutr in nutrients:
                 # all values on a 100% dry matter basis
                 if nutr == "DM":
-                    nutrient_amount["as_fed"] += val * (available_feeds[key][nutr] / 100)
+                    if available_feeds[key][nutr]:
+                        nutrient_amount["as_fed"] += val / (available_feeds[key][nutr] / 100)
                 elif nutr == "N":
                     # [A.2.A.2]
                     if key[:3] in ['172', '181', '202', '216']:
@@ -403,7 +404,10 @@ class RationReporter:
             dm_amount = 1
         for nutr in nutrients:
             if nutr == "DM":
-                nutrient_conc["dm"] = (nutrient_amount["as_fed"] / dm_amount) * 100
+                if nutrient_amount["as_fed"]:
+                    nutrient_conc["dm"] = (dm_amount / nutrient_amount["as_fed"]) * 100
+                else:
+                    nutrient_conc["dm"] = 0.0
             else:
                 # all values on a 100% dry matter basis
                 if nutr == 'DE':
