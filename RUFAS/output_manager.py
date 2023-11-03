@@ -81,7 +81,7 @@ class OutputManager(object):
             self.errors_pool: Dict[str, OutputManager.pool_element_type] = {}
             self.logs_pool: Dict[str, OutputManager.pool_element_type] = {}
             self.__metadata_prefix: str = ""
-            self.__log_type: LogVerbosity = LogVerbosity("none")
+            self.__log_verbose: LogVerbosity = LogVerbosity("none")
             self.add_log(
                 "init_log",
                 "Output Manager instantiated.",
