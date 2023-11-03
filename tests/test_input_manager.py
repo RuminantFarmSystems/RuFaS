@@ -42,10 +42,10 @@ def input_manager_original_method_states(
         "_filter_input_data_by_metadata": mock_input_manager._filter_input_data_by_metadata,
         "_populate_pool": mock_input_manager._populate_pool,
         "_validate_json_element": mock_input_manager._validate_json_element,
-        "_array_type_validator": mock_input_manager._array_type_validator,
-        "_num_type_validator": mock_input_manager._num_type_validator,
-        "_string_type_validator": mock_input_manager._string_type_validator,
-        "_bool_type_validator": mock_input_manager._bool_type_validator,
+        "_validate_array_type": mock_input_manager._validate_array_type,
+        "_validate_num_type": mock_input_manager._validate_num_type,
+        "_validate_str_type": mock_input_manager._validate_str_type,
+        "_validate_bool_type": mock_input_manager._validate_bool_type,
         "_fix_data": mock_input_manager._fix_data,
         "get_data": mock_input_manager.get_data,
         "get_metadata": mock_input_manager.get_metadata,
@@ -447,7 +447,7 @@ def test_validate_element_fixable_data(mock_input_manager: InputManager,
                                        input_manager_original_method_states: Dict[str, Callable], ) -> None:
     """Unit test for a fixable number type input_data for _validate_json_element in file input_manager.py"""
     mock_input_manager._InputManager__metadata = mock_metadata_for_validate_element
-    mock_input_manager._num_type_validator = MagicMock(return_value=False)
+    mock_input_manager._validate_num_type = MagicMock(return_value=False)
     mock_input_manager._fix_data = MagicMock(return_value=True)
 
     input_data = {"element2": 123}
@@ -456,7 +456,7 @@ def test_validate_element_fixable_data(mock_input_manager: InputManager,
     assert result["is_valid"] is True
 
     mock_input_manager._validate_json_element = input_manager_original_method_states["_validate_json_element"]
-    mock_input_manager._num_type_validator = input_manager_original_method_states["_num_type_validator"]
+    mock_input_manager._validate_num_type = input_manager_original_method_states["_validate_num_type"]
     mock_input_manager._fix_data = input_manager_original_method_states["_fix_data"]
 
 
@@ -676,10 +676,10 @@ def test_validate_element_invalid_nested_object_type(mock_input_manager: InputMa
     ],
 )
 def test_bool_type_validator(input_data_value: bool, expected_result: bool, mock_input_manager: InputManager) -> None:
-    """Unit test for function _bool_type_validator in file input_manager.py"""
+    """Unit test for function _validate_bool_type in file input_manager.py"""
     variable_properties = {}
     var_name = "dummy_var_name"
-    result = mock_input_manager._bool_type_validator(variable_properties, var_name, input_data_value)
+    result = mock_input_manager._validate_bool_type(variable_properties, var_name, input_data_value)
 
     assert result == expected_result
 
@@ -778,11 +778,11 @@ def test_validate_json_element_missing_type_raises_keyerror(mock_input_manager: 
 )
 def test_array_type_validator(dummy_value: list, dummy_variable_to_check: Dict[str, int], expected_result: bool,
                               expected_warning_call_count: int, mock_input_manager: InputManager) -> None:
-    """Unit test for function _array_type_validator in file input_manager.py"""
+    """Unit test for function _validate_array_type in file input_manager.py"""
     dummy_var_name = "dummy_array"
 
     with patch("RUFAS.output_manager.OutputManager.add_warning") as add_warning:
-        result = mock_input_manager._array_type_validator(dummy_variable_to_check, dummy_var_name, dummy_value)
+        result = mock_input_manager._validate_array_type(dummy_variable_to_check, dummy_var_name, dummy_value)
 
     assert result == expected_result
     assert add_warning.call_count == expected_warning_call_count
@@ -806,11 +806,11 @@ def test_num_type_validator(dummy_value: int,
                             expected_result: bool,
                             expected_warning_call_count: int,
                             mock_input_manager: InputManager) -> None:
-    """Unit test for function _num_type_validator in file input_manager.py"""
+    """Unit test for function _validate_num_type in file input_manager.py"""
     dummy_var_name = "dummy_num"
 
     with patch("RUFAS.output_manager.OutputManager.add_warning") as add_warning:
-        result = mock_input_manager._num_type_validator(dummy_variable_to_check, dummy_var_name, dummy_value)
+        result = mock_input_manager._validate_num_type(dummy_variable_to_check, dummy_var_name, dummy_value)
 
     assert result == expected_result
     assert add_warning.call_count == expected_warning_call_count
@@ -834,11 +834,11 @@ def test_string_type_validator(dummy_value: int,
                                expected_result: bool,
                                expected_warning_call_count: int,
                                mock_input_manager: InputManager) -> None:
-    """Unit test for _string_type_validator function in file input_manager.py"""
+    """Unit test for _validate_str_type function in file input_manager.py"""
     dummy_var_name = "dummy_var"
 
     with patch("RUFAS.output_manager.OutputManager.add_warning") as add_warning:
-        result = mock_input_manager._string_type_validator(dummy_variable_to_check, dummy_var_name, dummy_value)
+        result = mock_input_manager._validate_str_type(dummy_variable_to_check, dummy_var_name, dummy_value)
 
     assert result == expected_result
     assert add_warning.call_count == expected_warning_call_count
