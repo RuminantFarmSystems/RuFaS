@@ -35,7 +35,17 @@ class LogVerbosity(Enum):
     LOGS = "logs"
 
     def __le__(self, other) -> bool:
-        return self.value <= other.value
+        if self == other:
+            return True
+        if self == LogVerbosity.NONE:
+            return True
+        if self == LogVerbosity.ERRORS and other != LogVerbosity.NONE:
+            return True
+        if self == LogVerbosity.WARNINGS and other == LogVerbosity.LOGS:
+            return True
+        if self == LogVerbosity.LOGS:
+            return False
+        return False
 
     def __str__(self) -> bool:
         if self.value == "none":
@@ -251,7 +261,7 @@ class OutputManager(object):
         }
         if log_level <= self.__log_verbose:
             sys.stdout.write(
-                f"{colors[log_level]}[{info_map['timestamp']}][{log_level}][{self.__metadata_prefix}] {name}: {msg}\n{colors[LogVerbosity.NONE]}"
+                f"[{info_map['timestamp']}]{colors[log_level]}[{log_level}]{colors[LogVerbosity.NONE]}[{self.__metadata_prefix}] {name}: {msg}\n"
             )
 
     def set_metadata_prefix(self, metadata_prefix: str) -> None:
