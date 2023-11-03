@@ -631,14 +631,6 @@ def test_add_log(
     ]
 
 
-def test_handle_log(self):
-    pass
-
-    # captured = capsys.readouterr()
-    # expected_message = f"[{timestamp}][LOG][{metadata_prefix}] {name}: {message}\n"
-    # assert expected_message in captured.out
-
-
 def test_add_variable(
     mock_output_manager: OutputManager,
     output_manager_original_method_states: Dict[str, Callable],
@@ -716,6 +708,36 @@ def test_output_manager_singleton(mocker: MockerFixture) -> None:
         "info_maps": [{"context": "dummy_context"}],
         "values": ["dummy_value"],
     }
+
+
+@pytest.mark.parametrize(
+    "log_level, color_code",
+    [
+        (LogVerbosity.NONE, "\033[0m"),
+        (LogVerbosity.ERRORS, "\33[101m"),
+        (LogVerbosity.WARNINGS, "\33[103m"),
+        (LogVerbosity.LOGS, "\33[102m"),
+    ],
+)
+def test_handle_log_output(capsys, log_level: LogVerbosity, color_code: str) -> None:
+    name = "dummy name"
+    msg = "dummy message"
+    info_map = {"timestamp": "dummy_timestamp"}
+    om = OutputManager()
+    om.set_metadata_prefix("dummy_prefix")
+    om._handle_log_output(name, msg, info_map, log_level)
+    log_format = "[{timestamp}]{color}[{log_level}]{color_reset}[{metadata_prefix}] {name}: {message}\n"
+    expected_message = log_format.format(
+        timestamp=info_map["timestamp"],
+        color=color_code,
+        color_reset="\033[0m",
+        metadata_prefix="dummy_prefix",
+        name=name,
+        message=msg,
+        log_level=log_level,
+    )
+    captured = capsys.readouterr()
+    assert expected_message in captured.out
 
 
 def test_flush_pools() -> None:
