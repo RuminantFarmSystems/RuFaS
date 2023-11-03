@@ -52,6 +52,11 @@ class OutputManager(object):
             self.errors_pool: Dict[str, OutputManager.pool_element_type] = {}
             self.logs_pool: Dict[str, OutputManager.pool_element_type] = {}
             self.__metadata_prefix: str = ""
+            self.supported_filter_types_prefixes: Dict[str, str] = {
+                "csv": "csv_",
+                "graph": "graph_",
+                "json": "json_",
+            }
             self.add_log(
                 "init_log",
                 "Output Manager instantiated.",
