@@ -37,8 +37,10 @@ class LogVerbosity(Enum):
     def __le__(self, other) -> bool:
         return self.value <= other.value
 
-    def __ge__(self, other) -> bool:
-        return self.value >= other.value
+    def __str__(self) -> bool:
+        if self.value:
+            return "NONE"
+        return self.value[:-1].upper()
 
 
 class OutputManager(object):
@@ -178,10 +180,7 @@ class OutputManager(object):
         info_map["timestamp"] = self._get_timestamp(include_millis=True)
         key = self._generate_key(name, info_map)
         self._add_to_pool(self.logs_pool, key, msg, info_map)
-        if self.__log_type == LogVerbosity.LOGS:
-            sys.stdout.write(
-                f"[{info_map['timestamp']}][LOG][{self.__metadata_prefix}] {name}: {msg}\n"
-            )
+        self._handle_log_output(name, msg, info_map, LogVerbosity.LOGS)
 
     def add_warning(self, name: str, msg: str, info_map: Dict[str, Any]) -> None:
         """
@@ -210,10 +209,7 @@ class OutputManager(object):
         info_map["timestamp"] = self._get_timestamp(include_millis=True)
         key = self._generate_key(name, info_map)
         self._add_to_pool(self.warnings_pool, key, msg, info_map)
-        if self.__log_type in [LogVerbosity.LOGS, LogVerbosity.WARNINGS]:
-            sys.stdout.write(
-                f"[{info_map['timestamp']}][WARNING][{self.__metadata_prefix}] {name}: {msg}\n"
-            )
+        self._handle_log_output(name, msg, info_map, LogVerbosity.WARNINGS)
 
     def add_error(self, name: str, msg: str, info_map: Dict[str, Any]) -> None:
         """
@@ -242,14 +238,7 @@ class OutputManager(object):
         info_map["timestamp"] = self._get_timestamp(include_millis=True)
         key = self._generate_key(name, info_map)
         self._add_to_pool(self.errors_pool, key, msg, info_map)
-        if self.__log_type in [
-            LogVerbosity.LOGS,
-            LogVerbosity.WARNINGS,
-            LogVerbosity.ERRORS,
-        ]:
-            sys.stdout.write(
-                f"[{info_map['timestamp']}][ERROR][{self.__metadata_prefix}] {name}: {msg}\n"
-            )
+        self._handle_log_output(name, msg, info_map, LogVerbosity.ERRORS)
 
     def _handle_log_output(
         self, name: str, msg: str, info_map: Dict[str, Any], log_level: LogVerbosity
@@ -260,18 +249,18 @@ class OutputManager(object):
             LogVerbosity.WARNINGS: "\33[103m",
             LogVerbosity.LOGS: "\33[102m",
         }
-        if log_level <= self.__log_type:
+        if log_level <= self.__log_verbose:
             sys.stdout.write(
-                f"{colors[log_level]}[{info_map['timestamp']}][ERROR][{self.__metadata_prefix}] {name}: {msg}\n{colors[LogVerbosity.NONE]}"
+                f"{colors[log_level]}[{info_map['timestamp']}][{log_level}][{self.__metadata_prefix}] {name}: {msg}\n{colors[LogVerbosity.NONE]}"
             )
 
     def set_metadata_prefix(self, metadata_prefix: str) -> None:
         """Sets the metadata_prefix attribute."""
         self.__metadata_prefix = metadata_prefix
 
-    def set_log_type(self, log_type: LogVerbosity = LogVerbosity.NONE) -> None:
-        """Sets the log_type attribute"""
-        self.__log_type = log_type
+    def set_log_verobse(self, log_verbose: LogVerbosity = LogVerbosity.NONE) -> None:
+        """Sets the __log_verbose attribute"""
+        self.__log_verbose = log_verbose
 
     def _get_timestamp(self, include_millis: bool = False) -> str:
         """
