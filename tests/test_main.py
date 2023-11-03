@@ -14,7 +14,6 @@ from main import (
     parse_gnu_args,
     run_rufas,
     run_validation,
-    set_global_variables,
     METADATA_PATHS,
 )
 
@@ -101,7 +100,7 @@ def test_run_rufas(
     only_run_validation: bool,
     graphics_dir: str,
     mocker: MockerFixture,
-    capsys
+    capsys,
 ) -> None:
     """Checks that run_rufas() calls the correct functions in the correct order"""
     # Arrange
@@ -126,18 +125,17 @@ def test_run_rufas(
     patch_set_global_variables.assert_called_once_with(verbose)
     if only_run_validation:
         patch_run_validation.assert_called_once_with(
-            metadata_file_list, exclude_info_maps,
-                                                     format_option
-        , verbose)
+            metadata_file_list, exclude_info_maps, format_option, verbose
+        )
     else:
         patch_execute_simulations.assert_called_once_with(
             metadata_file_list,
             exclude_info_maps,
             produce_graphics,
             graphics_dir,
-           
-                                                          format_option,
-        , verbose)
+            format_option,
+            verbose,
+        )
 
     if clear_output:
         patch_empty_dir.assert_called_once()
@@ -148,22 +146,6 @@ def test_run_rufas(
         captured = capsys.readouterr()
         expected_message = "RuFaS: Ruminant Farm Systems Model 2023\n"
         assert expected_message in captured.out
-
-
-@pytest.mark.parametrize("verbose", [True, False])
-def test_set_global_variables(verbose: bool) -> None:
-    """Checks that set_global_variables() sets the global variables correctly"""
-    # Arrange
-    old_verbose = global_variables.PRINT_STATUS_MESSAGES
-
-    # Act
-    set_global_variables(verbose)
-
-    # Assert
-    assert global_variables.PRINT_STATUS_MESSAGES == verbose
-
-    # Cleanup
-    global_variables.PRINT_STATUS_MESSAGES = old_verbose
 
 
 @pytest.mark.parametrize("is_data_valid", [(True), (False)])
