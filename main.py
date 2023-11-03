@@ -187,7 +187,7 @@ def execute_simulations(
 
 
 class CaseInsensitiveArgumentAction(argparse.Action):
-    def __call__(self, parser, namespace, values, option_string=None):
+    def __call__(self, parser, namespace, values, option_string=None) -> None:
         for action in self.option_strings:
             setattr(namespace, action, values)
 
