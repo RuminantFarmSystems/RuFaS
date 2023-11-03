@@ -708,7 +708,7 @@ class OutputManager(object):
                 self._save_variables_to_csv_files(
                     filtered_pool, filter_file, csv_directory
                 )
-            elif filter_file.startswith("graph_"):
+            elif filter_file.startswith(self.supported_filter_types_prefixes["graph"]):
                 if produce_graphics:
                     try:
                         graph_generator.generate_graph(
@@ -729,7 +729,7 @@ class OutputManager(object):
             else:
                 self.add_warning(
                     "invalid filter file",
-                    f"{filter_file} must be prefixed with csv_ or json_",
+                    f"{filter_file} must be prefixed with one of {list(self.supported_filter_types_prefixes.keys())}",
                     info_map,
                 )
 
