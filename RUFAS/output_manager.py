@@ -697,13 +697,13 @@ class OutputManager(object):
             if exclude_info_maps:
                 filtered_pool = self._exclude_info_maps(filtered_pool)
 
-            if filter_file.startswith("json_"):
+            if filter_file.startswith(self.supported_filter_types_prefixes["json"]):
                 file_path = os.path.join(
                     save_path,
                     self._generate_file_name(f"saved_variables_{filter_file}", "json"),
                 )
                 self._dict_to_file_json(filtered_pool, file_path)
-            elif filter_file.startswith("csv_"):
+            elif filter_file.startswith(self.supported_filter_types_prefixes["csv"]):
                 csv_directory = os.path.join(save_path, "CSVs", "om")
                 self._save_variables_to_csv_files(
                     filtered_pool, filter_file, csv_directory
