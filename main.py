@@ -66,8 +66,6 @@ def run_rufas(
         Utility.empty_dir(output_dir, keep=keep_list)
 
     sys.stdout.write("RuFaS: Ruminant Farm Systems Model 2023\n")
-    if verbose:
-        print("RuFaS: Ruminant Farm Systems Model 2023")
     metadata_file_list: List[MetadataPaths] = METADATA_PATHS
     if only_run_validation:
         run_validation(metadata_file_list, exclude_info_maps, format_option, verbose)
