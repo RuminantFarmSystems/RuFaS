@@ -179,9 +179,9 @@ def test_set_metadata_prefix(mock_output_manager: OutputManager) -> None:
         "log_type",
         [LogVerbosity.NONE, LogVerbosity.ERRORS, LogVerbosity.WARNINGS, LogVerbosity.LOGS]
         )
-def test_set_log_type(mock_output_manager: OutputManager, log_type: LogVerbosity) -> None:
-    """Unit test for the function set_log_type in the file output_manager.py"""
-    mock_output_manager.set_log_type(log_type)
+def test_set_log_verbose(mock_output_manager: OutputManager, log_type: LogVerbosity) -> None:
+    """Unit test for the function set_log_verbose in the file output_manager.py"""
+    mock_output_manager.set_log_verbose(log_type)
     assert mock_output_manager._OutputManager__log_type == log_type
 
 
@@ -499,7 +499,7 @@ def test_add_error(
     mock_output_manager._generate_key = MagicMock(return_value=key)
     mock_output_manager._add_to_pool = MagicMock()
     mock_output_manager._get_timestamp = MagicMock(return_value=timestamp)
-    mock_output_manager.set_log_type(log_type)
+    mock_output_manager.set_log_verbose(log_type)
     mock_output_manager.set_metadata_prefix(metadata_prefix)
 
     mock_output_manager.add_error(name, message, info_map)
@@ -546,7 +546,7 @@ def test_add_warning(
     mock_output_manager._generate_key = MagicMock(return_value=key)
     mock_output_manager._add_to_pool = MagicMock()
     mock_output_manager._get_timestamp = MagicMock(return_value=timestamp)
-    mock_output_manager.set_log_type(log_type)
+    mock_output_manager.set_log_verbose(log_type)
     mock_output_manager.set_metadata_prefix(metadata_prefix)
 
     mock_output_manager.add_warning(name, message, info_map)
@@ -595,7 +595,7 @@ def test_add_log(
     mock_output_manager._generate_key = MagicMock(return_value=key)
     mock_output_manager._add_to_pool = MagicMock()
     mock_output_manager._get_timestamp = MagicMock(return_value=timestamp)
-    mock_output_manager.set_log_type(log_type)
+    mock_output_manager.set_log_verbose(log_type)
     mock_output_manager.set_metadata_prefix(metadata_prefix)
 
     mock_output_manager.add_log(name, message, info_map)
@@ -733,7 +733,7 @@ def output_manager_original_method_states(
         "_generate_key": mock_output_manager._generate_key,
         "_get_timestamp": mock_output_manager._get_timestamp,
         "set_metadata_prefix": mock_output_manager.set_metadata_prefix,
-        "set_log_type": mock_output_manager.set_log_type,
+        "set_log_verbose": mock_output_manager.set_log_verbose,
         "_list_to_file_txt": mock_output_manager._list_to_file_txt,
         "_list_txt_and_json_files_in_dir": mock_output_manager._list_txt_and_json_files_in_dir,
         "_load_filter_file_content": mock_output_manager._load_filter_file_content,

@@ -110,7 +110,7 @@ def run_validation(
         "***Only validating data, no simulation will follow.***",
         info_map,
     )
-    output_manager.set_log_verobse(verbose)
+    output_manager.set_log_verbose(verbose)
     for metadata_file in metadata_files:
         input_manager.flush_pool()
         output_manager.flush_pools()
@@ -170,7 +170,7 @@ def execute_simulations(
     sys.stdout.write("Simulating...\n")
     output_manager = OutputManager()
     input_manager = InputManager()
-    output_manager.set_log_verobse(verbose)
+    output_manager.set_log_verbose(verbose)
     for metadata_file in metadata_files:
         input_manager.flush_pool()
         output_manager.flush_pools()
