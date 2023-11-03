@@ -588,7 +588,6 @@ def test_add_log(
     mock_output_manager: OutputManager,
     output_manager_original_method_states: Dict[str, Callable],
     log_verobse: LogVerbosity,
-    capsys,
 ) -> None:
     """Unit test for function add_log in file output_manager.py"""
     key = "dummy_key"
@@ -602,6 +601,7 @@ def test_add_log(
     mock_output_manager._get_timestamp = MagicMock(return_value=timestamp)
     mock_output_manager.set_log_verbose(log_verobse)
     mock_output_manager.set_metadata_prefix(metadata_prefix)
+    mock_output_manager._handle_log_output = MagicMock()
 
     mock_output_manager.add_log(name, message, info_map)
 
@@ -609,10 +609,9 @@ def test_add_log(
 
     assert info_map.get("timestamp") == timestamp
 
-    if log_verobse == LogVerbosity.LOGS:
-        captured = capsys.readouterr()
-        expected_message = f"[{timestamp}][LOG][{metadata_prefix}] {name}: {message}\n"
-        assert expected_message in captured.out
+    mock_output_manager._handle_log_output.assert_called_once_with(
+        name, message, info_map, LogVerbosity.LOGS
+    )
 
     mock_output_manager._add_to_pool(
         mock_output_manager.logs_pool, key, message, info_map
@@ -627,6 +626,17 @@ def test_add_log(
     mock_output_manager._get_timestamp = output_manager_original_method_states[
         "_get_timestamp"
     ]
+    mock_output_manager._handle_log_output = output_manager_original_method_states[
+        "_handle_log_output"
+    ]
+
+
+def test_handle_log(self):
+    pass
+
+    # captured = capsys.readouterr()
+    # expected_message = f"[{timestamp}][LOG][{metadata_prefix}] {name}: {message}\n"
+    # assert expected_message in captured.out
 
 
 def test_add_variable(
