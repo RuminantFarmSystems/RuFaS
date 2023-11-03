@@ -38,7 +38,7 @@ class LogVerbosity(Enum):
         return self.value <= other.value
 
     def __str__(self) -> bool:
-        if self.value:
+        if self.value == "none":
             return "NONE"
         return self.value[:-1].upper()
 
