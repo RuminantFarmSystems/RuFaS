@@ -37,7 +37,7 @@ class OutputManager(object):
     """
 
     __instance = None
-    pool_element_type = Dict[str, List[Dict[str, Any]]]
+    pool_element_type = Dict[str, List[Any]]
 
     def __new__(cls):
         if not hasattr(cls, "instance"):
