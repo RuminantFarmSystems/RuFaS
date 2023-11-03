@@ -1,1 +1,2 @@
 output/output_filters/json_all_variables.txt filter=skip-worktree
+output/output_filters/_csv_all_variables.txt filter=skip-worktree
