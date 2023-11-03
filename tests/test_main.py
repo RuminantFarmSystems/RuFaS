@@ -186,12 +186,12 @@ def test_run_validation(mocker: MockerFixture, is_data_valid: bool) -> None:
     [
         (False, False, True, 2, 0, "verbose"),
         (False, False, False, 0, 4, "block"),
-        (False, True, True, 2, 0, "verbose"),
-        (False, True, False, 0, 4, "block"),
+        (False, True, True, 2, 0, "inline"),
+        (False, True, False, 0, 4, "basic"),
         (True, False, True, 2, 0, "verbose"),
         (True, False, False, 0, 4, "block"),
-        (True, True, True, 2, 0, "verbose"),
-        (True, True, False, 0, 4, "block"),
+        (True, True, True, 2, 0, "basic"),
+        (True, True, False, 0, 4, "inline"),
     ],
 )
 def test_execute_simulations(
