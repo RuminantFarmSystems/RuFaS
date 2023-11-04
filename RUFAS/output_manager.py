@@ -258,6 +258,19 @@ class OutputManager(object):
     def _handle_log_output(
         self, name: str, msg: str, info_map: Dict[str, Any], log_level: LogVerbosity
     ) -> None:
+        """Formats log output based on log_level.
+
+        Parameters
+        ----------
+        name : str
+            The name of the log.
+        msg : str
+            The log message to be added to the pool.
+        info_map : Dict[str, Any]
+            Additional args to be logged.
+        log_level : LogVerbosity
+            The LogVerbosity level.
+        """
         colors: Dict[LogVerbosity, str] = {
             LogVerbosity.NONE: "\033[0m",
             LogVerbosity.ERRORS: "\33[91m",
