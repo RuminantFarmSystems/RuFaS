@@ -39,3 +39,25 @@ jobs:
       run: |
         # stop the build if there are Python syntax errors or undefined names
         flake8 ${{ env.FILES }}
+    - name: Check for Unauthorized Changes
+      run: |
+        changed_files=$(git diff --name-only ${{ github.event.before }} ${{ github.sha }})
+        paths_to_monitor=(
+          'output/output_filters/_csv_all_variables.txt'
+          'RUFAS/scenario_manager.py'
+        )
+        unauthorized_changes=false
+        
+        for path in "${paths_to_monitor[@]}"; do
+          if echo "$changed_files" | grep -q "$path"; then
+            unauthorized_changes=true
+            break
+          fi
+        done
+
+        if $unauthorized_changes; then
+          echo "Unauthorized changes detected in monitored files. Review and remove these changes if they are not intended."
+          exit 1
+        else
+          echo "No unauthorized changes detected."
+        fi
