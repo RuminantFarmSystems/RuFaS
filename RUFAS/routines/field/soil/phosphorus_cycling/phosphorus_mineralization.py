@@ -49,12 +49,13 @@ class PhosphorusMineralization:
 
         """
         for layer in self.data.soil_layers:
-            soil_phosphorus_content = layer.determine_soil_nutrient_concentration(
-                layer.labile_inorganic_phosphorus_content, layer.bulk_density, layer.layer_thickness, field_size)
-            current_phosphorus_sorption_parameter = layer.calculate_phosphorus_sorption_parameter(
-                layer.percent_clay_content, soil_phosphorus_content, layer.percent_organic_carbon_content)
-            layer.mean_phosphorus_sorption_parameter = self._recompute_mean_phosphorus_sorption_parameter(
-                layer.mean_phosphorus_sorption_parameter, current_phosphorus_sorption_parameter)
+            # soil_phosphorus_content = layer.determine_soil_nutrient_concentration(
+            #     layer.labile_inorganic_phosphorus_content, layer.bulk_density, layer.layer_thickness, field_size)
+            # current_phosphorus_sorption_parameter = layer.calculate_phosphorus_sorption_parameter(
+            #     layer.percent_clay_content, soil_phosphorus_content, layer.percent_organic_carbon_content)
+            # layer.mean_phosphorus_sorption_parameter = self._recompute_mean_phosphorus_sorption_parameter(
+            #     layer.mean_phosphorus_sorption_parameter, current_phosphorus_sorption_parameter)
+            layer.mean_phosphorus_sorption_parameter = 0.3
 
             balance = self._determine_phosphorus_imbalance(layer.labile_inorganic_phosphorus_content,
                                                            layer.active_inorganic_phosphorus_content,
