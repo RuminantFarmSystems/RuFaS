@@ -1,7 +1,6 @@
 # !/usr/bin/env python3
 
 from copy import deepcopy
-from glob import glob
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Union
 import datetime
@@ -826,50 +825,45 @@ class OutputManager(object):
         self.errors_pool: Dict[str, OutputManager.pool_element_type] = {}
         self.logs_pool: Dict[str, OutputManager.pool_element_type] = {}
 
-    def reload_pool(self, directory_path: str = "output/", file_pattern: str = "*all_variables*") -> Dict[str, Any]:
+    def reload_pool(self) -> Dict[str, Any]:
         """Reloads the Output Manager variables pool.
-
-        Parameters
-        ----------
-        directory_path : str, optional
-            The path to the directory to be searched.
-        file_pattern : str, optional
-            The pattern searched for in the file names in the directory_path.
 
         Returns
         -------
         Dict [str, Any]
             The variables pool data.
         """
-        all_variables_file_path = self.get_filepath(directory_path, file_pattern)
-        if all_variables_file_path is not None:
-            try:
-                with open(all_variables_file_path) as file:
-                    reloaded_vars_pool = json.load(file)
-                    return reloaded_vars_pool
-            except Exception as e:
-                raise e
-        else:
-            return {}
+        all_variables_file_path = self.get_filepath()
+        try:
+            with open(all_variables_file_path) as file:
+                self.variables_pool = json.load(file)
+        except Exception as e:
+            raise e
 
-    def get_filepath(self, directory_path: str = "output/", file_pattern: str = "*all_variables*") -> str:
-        """Searches the given directory for a file containing the pattern provided.
-
-        Parameters
-        ----------
-        directory_path : str, optional
-            The path to the directory to be searched.
-        file_pattern : str, optional
-            The pattern searched for in the file names in the directory_path.
+    def get_filepath(self) -> str:
+        """User prompt to get the path to the desired output all_variables file.
 
         Returns
         -------
         str
             The path to the file.
         """
-        matching_filepaths = glob(f"{directory_path}/{file_pattern}")
-        if matching_filepaths:
-            most_recent_filepath = max(matching_filepaths, key=os.path.getctime)
-            return most_recent_filepath
-        else:
-            return None
+        try:
+            rel_root = 'output/'
+
+            user_filepath = input("Enter path to all_variables json file: ")
+
+            while user_filepath == 'dir':
+                print(str(Utility.get_base_dir()))
+                user_filepath = input("Enter path to all_variables json file: ")
+
+            while user_filepath.strip() == "":
+                user_filepath = input("Enter path to all_variables json file: ")
+
+            while user_filepath.endswith != ".json":
+                user_filepath = input("Enter path to all_variables json file: ")
+
+            return rel_root + user_filepath
+
+        except Exception as e:
+            raise e
