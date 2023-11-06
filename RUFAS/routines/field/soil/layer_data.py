@@ -217,7 +217,6 @@ class LayerData:
     """plant metabolic carbon amount (hg/ha)"""
     tillage_fraction: float = 0.0
     """Fraction of metabolic carbon incorporated into soil during tillage (unitless)"""
-    # TODO: needs to create a method to update this, not sure where it would be
     structural_carbon_transfer_amount: float = 0.0
     """the amount of transfer of structural carbon during tillage (kg/ha)"""
     soil_dry_matter_residue_amount: float = 0.0
