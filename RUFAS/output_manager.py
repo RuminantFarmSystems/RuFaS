@@ -825,22 +825,33 @@ class OutputManager(object):
         self.errors_pool: Dict[str, OutputManager.pool_element_type] = {}
         self.logs_pool: Dict[str, OutputManager.pool_element_type] = {}
 
-    def reload_pool(self) -> Dict[str, Any]:
+    def reload_pool(self) -> None:
         """Reloads the Output Manager variables pool.
 
         Returns
         -------
         Dict [str, Any]
             The variables pool data.
+
+        Raises
+        ------
+        Exception
+            If an error occurs while opening or reading the user-provided filepath.
         """
-        all_variables_file_path = self.get_filepath()
+        info_map = {"class": self.__class__.__name__,
+                    "function": self.reload_pool.__name__,
+                    }
+        all_variables_file_path = self._get_user_filepath()
+        self.add_log("open_json_file", f"Attempting to open {all_variables_file_path}.", info_map)
         try:
             with open(all_variables_file_path) as file:
                 self.variables_pool = json.load(file)
+                self.add_log("load_data_successful", f"Successfully loaded data from {all_variables_file_path}.",
+                             info_map)
         except Exception as e:
             raise e
 
-    def get_filepath(self) -> str:
+    def _get_user_filepath(self) -> str:
         """User prompt to get the path to the desired output all_variables file.
 
         Returns
@@ -848,22 +859,7 @@ class OutputManager(object):
         str
             The path to the file.
         """
-        try:
-            rel_root = 'output/'
+        rel_root = 'output/'
+        user_filepath = input("Enter path to all_variables json file: ")
 
-            user_filepath = input("Enter path to all_variables json file: ")
-
-            while user_filepath == 'dir':
-                print(str(Utility.get_base_dir()))
-                user_filepath = input("Enter path to all_variables json file: ")
-
-            while user_filepath.strip() == "":
-                user_filepath = input("Enter path to all_variables json file: ")
-
-            while user_filepath.endswith != ".json":
-                user_filepath = input("Enter path to all_variables json file: ")
-
-            return rel_root + user_filepath
-
-        except Exception as e:
-            raise e
+        return rel_root + user_filepath

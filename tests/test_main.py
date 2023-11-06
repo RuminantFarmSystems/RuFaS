@@ -1,15 +1,14 @@
 import argparse
-import json
 import os.path
 from pathlib import Path
-from mock import MagicMock, mock_open, patch
+from mock import MagicMock
 
 import pytest
 from pytest_mock import MockerFixture
 
 import config.global_variables
 from config import global_variables
-from main import execute_simulations, get_filepath, reload_pool
+from main import execute_simulations
 from main import main
 from main import parse_gnu_args
 from main import run_rufas
@@ -200,54 +199,6 @@ def test_execute_simulations(mocker: MockerFixture, is_data_valid: bool,
     assert mock_output_manager.save_variables.call_args_list == [
         mocker.call("output", "output/output_filters/", True),
     ] * len(metadata_file_list)
-
-
-def test_reload_pool_valid_path() -> None:
-    """Checks that reload_pool loads the valid filepath provided"""
-    dummy_data = {"vars": {"var1": {"values": [1, 2, 3], "info_map": {"imvar1": 1, "imvar2": 2}},
-                           "var2": {"values": {"a": 1, "b": 2}, "info_map": {}}}}
-    with patch('builtins.open', mock_open(read_data=json.dumps(dummy_data))):
-        with patch('main.get_filepath', return_value="output/all_variables.json"):
-            result = reload_pool()
-            assert result == dummy_data
-
-
-def test_reload_pool_no_valid_path() -> None:
-    """Checks that reload_pool returns an empty dictionary if no valid filepath is provided"""
-    with patch('main.get_filepath', return_value=None):
-        result = reload_pool()
-        assert result == {}
-
-
-def test_reload_pool_invalid_path_raises_exception() -> None:
-    """Checks that reload_pool raises an exception with a bad filepath provided"""
-    with patch('main.open', mock_open(read_data="no/data/found")):
-        with patch('main.get_filepath', return_value="invalid/data/path"):
-            with pytest.raises(Exception):
-                result = reload_pool()
-                assert result is None
-
-
-def test_get_filepath_matches_found(tmpdir) -> None:
-    """Checks that get_filepath returns a valid filepath if one is present"""
-    filepath_match = tmpdir.join("file1_all_variables_datetime.json")
-    filepath_match.write("")
-    filepath_no_match = tmpdir.join("file2_some_variables_datetime.json")
-    filepath_no_match.write("")
-
-    with patch('glob.glob', return_value=[str(filepath_match)]):
-        result = get_filepath(directory_path=str(tmpdir), file_pattern="*all_variables*")
-        assert result == str(filepath_match)
-
-
-def test_get_filepath_no_matches_found(tmpdir) -> None:
-    """Checks that get_filepath returns a valid filepath if one is present"""
-    filepath_no_match = tmpdir.join("no_variables.json")
-    filepath_no_match.write("")
-
-    with patch('glob.glob', return_value=[]):
-        result = get_filepath(directory_path=str(tmpdir), file_pattern="*all_variables*")
-        assert result is None
 
 
 def test_parse_gnu_args(mocker: MockerFixture) -> None:
