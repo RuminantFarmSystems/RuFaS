@@ -94,7 +94,7 @@
     "tillage_schedule": {
       "title": "Tillage schedule.",
       "description": "Barnyard tillage application schedule.",
-      "path": "input/data/tillage_schedule/barnyard_scheduled_tillage_schedule.json",
+      "path": "input/data/tillage_schedule/no_till.json",
       "type": "json",
       "properties": "tillage_schedule_properties"
     },
