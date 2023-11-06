@@ -169,3 +169,36 @@ def test_percent_calculator() -> None:
 def test_day_to_month_conversion(year: int, day: int, expected_month: int):
     """Tests that number of days were converted into months correctly"""
     assert Utility.day_to_month_conversion(day, year) == expected_month
+
+
+def test_convert_list_of_dicts_to_dict_of_lists_empty_list():
+    result = Utility.convert_list_of_dicts_to_dict_of_lists([])
+    assert result == {}
+
+
+def test_convert_list_of_dicts_to_dict_of_lists_single_dict():
+    input_data = [{"a": 1, "b": 2}]
+    expected_result = {"a": [1], "b": [2]}
+    result = Utility.convert_list_of_dicts_to_dict_of_lists(input_data)
+    assert result == expected_result
+
+
+def test_convert_list_of_dicts_to_dict_of_lists_multiple_dicts():
+    input_data = [{"a": 1, "b": 2}, {"a": 3, "c": 4}]
+    expected_result = {"a": [1, 3], "b": [2], "c": [4]}
+    result = Utility.convert_list_of_dicts_to_dict_of_lists(input_data)
+    assert result == expected_result
+
+
+def test_convert_list_of_dicts_to_dict_of_lists_empty_values():
+    input_data = [{"a": 1, "b": 2}, {"a": None, "b": 3}]
+    expected_result = {"a": [1, None], "b": [2, 3]}
+    result = Utility.convert_list_of_dicts_to_dict_of_lists(input_data)
+    assert result == expected_result
+
+
+def test_convert_list_of_dicts_to_dict_of_lists_empty_keys():
+    input_data = [{"a": 1, "b": 2}, {"": 3, "b": 4}]
+    expected_result = {"a": [1], "b": [2, 4], "": [3]}
+    result = Utility.convert_list_of_dicts_to_dict_of_lists(input_data)
+    assert result == expected_result

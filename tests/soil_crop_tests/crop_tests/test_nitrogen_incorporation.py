@@ -561,22 +561,21 @@ def test_uptake_nitrogen(depths, nitrates):
     ([.5, .3, .2], [1, 2, 5], .692, True),
     ([.5, .3, .2], [1, 2, 5], .692, False)
 ])
-def test_incorporate_nitrogen(nitrates, depths, water_factor, gate):
+def test_incorporate_nitrogen(nitrates: list[float], depths: list[float], water_factor: float, gate: bool) -> None:
+    """Tests that nitrogen uptake and fixation is performed correctly."""
     # initialize object
-    data = CropData(heat_fraction=0.38, half_mature_heat_fraction=.54, mature_heat_fraction=0.99,
-                    emergence_nitrogen_fraction=0.71, half_mature_nitrogen_fraction=0.68,
-                    near_mature_nitrogen_fraction=0.62, mature_nitrogen_fraction=0.60,
-                    biomass=122.8, previous_nitrogen=0, biomass_growth_max=999)
+    data = CropData(half_mature_heat_fraction=.54, mature_heat_fraction=0.99, emergence_nitrogen_fraction=0.71,
+                    half_mature_nitrogen_fraction=0.68, near_mature_nitrogen_fraction=0.62,
+                    mature_nitrogen_fraction=0.60, biomass=122.8, previous_nitrogen=0, biomass_growth_max=999)
     with patch("RUFAS.routines.field.soil.soil_data.SoilData.soil_water_factor", new_callable=PropertyMock,
-               return_value=water_factor):
+               return_value=water_factor), \
+            patch.object(CropData, "heat_fraction", new_callable=PropertyMock, return_value=0.38):
         soil = SoilData(field_size=1.3)
-        # soil.soil_water_factor = mock.PropertyMock(return_value=water_factor)
         del soil.soil_layers[3]  # delete 4th layer
         top_depths = [0] + depths[:2]
         soil.set_vectorized_layer_attribute("top_depth", top_depths)
         soil.set_vectorized_layer_attribute("bottom_depth", depths)
         soil.set_vectorized_layer_attribute("nitrate", nitrates)
-        # indirectly set soil_water_factor
         incorp = NitrogenIncorporation(data)
         # mock intermediate functions
         incorp.shift_nitrogen_time = MagicMock(return_value=None)
@@ -587,7 +586,7 @@ def test_incorporate_nitrogen(nitrates, depths, water_factor, gate):
         else:
             incorp.determine_optimal_nutrient = MagicMock(return_value=268)
         incorp.determine_potential_nutrient_uptake = MagicMock(return_value=123.1)
-        incorp.uptake_nitrogen = MagicMock(return_value=None)  # TODO - don't know how to mock attribute updates
+        incorp.uptake_nitrogen = MagicMock(return_value=None)
         incorp.access_layers = MagicMock(return_value=[5, 10, 15.3])
         incorp.try_fixation = MagicMock(return_value=None)
         NitrogenIncorporation.determine_stored_nutrient = MagicMock(return_value=99.3)
@@ -610,8 +609,6 @@ def test_incorporate_nitrogen(nitrates, depths, water_factor, gate):
             assert data.optimal_nitrogen == 268
             incorp.determine_potential_nutrient_uptake.assert_called_once_with(268, 0, 0.60, 999)
             assert data.potential_nitrogen_uptake == 123.1
-        incorp.try_fixation.assert_called_once()
         incorp.try_fixation.assert_called_once_with(5 + 10 + 15.3, water_factor)
-        #   Don't know how to mock property without breaking other things
         NitrogenIncorporation.determine_stored_nutrient.assert_called_once()  # should called_once_with() w/attr mocked
         assert data.nitrogen == 99.3
