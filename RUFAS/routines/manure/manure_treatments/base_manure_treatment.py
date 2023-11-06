@@ -292,8 +292,8 @@ class BaseManureTreatment(ABC):
 
         """
         current_conditions = self.weather.get_current_day_conditions(self.time)
-        rainfall = current_conditions.rainfall
-        return rainfall * GeneralConstants.MM_TO_M
+        precipitation = current_conditions.precipitation
+        return precipitation * GeneralConstants.MM_TO_M
 
     def _accumulate_daily_output(
         self, manure_treatment_daily_output: ManureTreatmentDailyOutput
