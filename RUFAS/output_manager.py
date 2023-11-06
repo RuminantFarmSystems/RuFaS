@@ -922,11 +922,6 @@ class OutputManager(object):
     def reload_pool(self) -> None:
         """Reloads the Output Manager variables pool.
 
-        Returns
-        -------
-        Dict [str, Any]
-            The variables pool data.
-
         Raises
         ------
         Exception
