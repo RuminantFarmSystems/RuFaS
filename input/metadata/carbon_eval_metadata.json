@@ -104,6 +104,20 @@
       "path": "input/data/weather/ARL_weather.csv",
       "type": "csv",
       "properties": "weather_properties"
+    },
+    "feed_quality": {
+      "title": "Feed Quality",
+      "description": "Hows the feed!",
+      "path": "input/data/feed/feed_quality.csv",
+      "type": "csv",
+      "properties": "feed_quality_properties"
+    },
+    "user_feeds": {
+      "title": "User Feed",
+      "description": "Bring the feed!",
+      "path": "input/data/feed/example_user_feeds.csv",
+      "type": "csv",
+      "properties": "user_feeds_properties"
     }
   },
   "properties": {
