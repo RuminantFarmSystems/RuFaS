@@ -1923,3 +1923,44 @@ def test_make_serializable_recursive(
 
     # Assert
     assert result == expected_output
+
+
+@pytest.mark.parametrize(
+    "self, other, expected_result",
+    [
+        (LogVerbosity.NONE, LogVerbosity.NONE, True),
+        (LogVerbosity.NONE, LogVerbosity.ERRORS, True),
+        (LogVerbosity.NONE, LogVerbosity.WARNINGS, True),
+        (LogVerbosity.NONE, LogVerbosity.LOGS, True),
+        (LogVerbosity.ERRORS, LogVerbosity.ERRORS, True),
+        (LogVerbosity.ERRORS, LogVerbosity.NONE, False),
+        (LogVerbosity.ERRORS, LogVerbosity.WARNINGS, True),
+        (LogVerbosity.ERRORS, LogVerbosity.LOGS, True),
+        (LogVerbosity.WARNINGS, LogVerbosity.NONE, False),
+        (LogVerbosity.WARNINGS, LogVerbosity.WARNINGS, True),
+        (LogVerbosity.WARNINGS, LogVerbosity.ERRORS, False),
+        (LogVerbosity.WARNINGS, LogVerbosity.LOGS, True),
+        (LogVerbosity.LOGS, LogVerbosity.LOGS, True),
+        (LogVerbosity.LOGS, LogVerbosity.NONE, False),
+        (LogVerbosity.LOGS, LogVerbosity.ERRORS, False),
+        (LogVerbosity.LOGS, LogVerbosity.WARNINGS, False),
+    ],
+)
+def test_log_verbosity_less_than_method(self: LogVerbosity, other: LogVerbosity, expected_result: bool) -> None:
+    """Checks __le__ method in LogVerbosity class"""
+    actual_result = self <= other
+    assert actual_result == expected_result
+
+
+def test_log_verbosity_str_method() -> None:
+    assert str(LogVerbosity.NONE) == "NONE"
+    assert str(LogVerbosity.ERRORS) == "ERROR"
+    assert str(LogVerbosity.WARNINGS) == "WARNING"
+    assert str(LogVerbosity.LOGS) == "LOG"
+
+
+def test_log_verbosity_enum_values() -> None:
+    assert LogVerbosity.NONE.value == "none"
+    assert LogVerbosity.ERRORS.value == "errors"
+    assert LogVerbosity.WARNINGS.value == "warnings"
+    assert LogVerbosity.LOGS.value == "logs"
