@@ -43,13 +43,14 @@ jobs:
       run: |
         paths_to_monitor=(
           'RUFAS/scenario_manager.py'
+          'input/metadata/default_metadata.json'
         )
         unauthorized_changes=false
         
         for path in "${paths_to_monitor[@]}"; do
           if echo ${{ env.FILES }} | grep -q "$path"; then
             unauthorized_changes=true
-            break
+            unauthorized_paths+="$path, "
           fi
         done
 
