@@ -123,7 +123,7 @@ class RationOptimizer:
         return sum(np.multiply(decision_vector, ration_config.price_list))
 
     @staticmethod
-    def total_energy(decision_vector: np.ndarray, ration_config: RationConfig) -> float:
+    def total_energy(decision_vector: np.ndarray, ration_config: RationConfig) -> float:  # noqa
         """
         Sets up the RHS multipliers for the sum of the lactation, pregnancy, maintenance, and activity requirements
         satisfied by the feed. Each equation has a reference to the respective
@@ -233,7 +233,7 @@ class RationOptimizer:
         return max(NEm_act_constraint, NEl_constraint, NEg_constraint) - all_req
 
     @staticmethod
-    def NEmact_constraint(decision_vector: np.ndarray, ration_config: RationConfig) -> float:
+    def NEmact_constraint(decision_vector: np.ndarray, ration_config: RationConfig) -> float:  # noqa
         """
         Sets up the RHS multipliers for the maintenance and activity requirements
         satisfied by the feed. Each equation has a reference to the respective
@@ -459,7 +459,7 @@ class RationOptimizer:
                        ration_config.P_requirement / 1000)
 
     @staticmethod
-    def protein_constraint(decision_vector: np.ndarray, ration_config: RationConfig) -> float:
+    def protein_constraint(decision_vector: np.ndarray, ration_config: RationConfig) -> float:  # noqa
         """
         Sets up the protein requirement constraint in the NLP. Because part of the
         maintenance requirement for protein contains non-linearity properties, that

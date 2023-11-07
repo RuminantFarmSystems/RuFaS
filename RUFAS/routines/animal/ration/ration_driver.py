@@ -330,7 +330,7 @@ class RationReporter:
     """
 
     @classmethod
-    def report_ration(cls, ration: Dict, available_feeds: Dict) -> Tuple[Dict, Dict]:
+    def report_ration(cls, ration: Dict, available_feeds: Dict) -> Tuple[Dict, Dict]:  # noqa
         """
         Calculates information in the ration about nutrient information including
         nutrient amounts and concentrations. Returns a dictionary of nutrient amounts
