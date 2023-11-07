@@ -74,6 +74,7 @@ class Infiltration:
         self.data.accumulated_runoff = min(rainfall, self._determine_accumulated_runoff(rainfall, retention_parameter))
         infiltrated_water = max(0.0, rainfall - self.data.accumulated_runoff)
         self.data.infiltrated_water = infiltrated_water
+        self.data.set_vectorized_layer_attribute("percolated_water", [0.0] * len(self.data.soil_layers))
         if infiltrated_water > self.data.soil_layers[0].acceptable_percolation_amount:
             self._percolate_excess_water()
         else:
@@ -84,9 +85,8 @@ class Infiltration:
 
     def _percolate_excess_water(self) -> None:
         """
-        !TODO
+        !TODO docstring
         """
-        self.data.set_vectorized_layer_attribute("water_percolated", [0.0] * len(self.data.soil_layers))
         water_remaining_to_percolate = self.data.infiltrated_water
         for layer in self.data.soil_layers:
             acceptable_percolation = layer.acceptable_percolation_amount

@@ -1000,6 +1000,8 @@ class Field:
         if water_reaching_soil > 0.0:
             self.soil.infiltration.infiltrate(water_reaching_soil)
         else:
+            self.soil.data.infiltrated_water = 0.0
+            self.soil.data.accumulated_runoff = 0.0
             self.soil.percolation.percolate(self.field_data.seasonal_high_water_table)
         self.soil.soil_erosion.erode(self.field_data.field_size, 0.02, self.field_data.current_residue,
                                      total_precipitation)

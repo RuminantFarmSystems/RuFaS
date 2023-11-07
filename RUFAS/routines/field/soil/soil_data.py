@@ -84,7 +84,7 @@ class SoilData:
     """average slope of the subbasin expressed as rise over run (meters / meters)"""
     moisture_condition_parameter: Optional[float] = None
     """curve number value adjusted for moisture content (unitless) (SWAT 2:1.1.11)"""
-    accumulated_runoff: Optional[float] = None
+    accumulated_runoff: float = 0.0
     """Amount of rainfall discharged as runoff on the current day (mm)."""
     infiltrated_water: float = 0.0
     """Amount of water that infiltrated the soil profile on the day (mm)."""
