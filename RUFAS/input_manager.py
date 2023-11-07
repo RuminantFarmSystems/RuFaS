@@ -179,15 +179,12 @@ class InputManager:
                                                                      properties_blob_key,
                                                                      input_data)
                 elif file_type == "csv":
-                    validation_result = self._validate_csv_element(first_level_prop,
-                                                                   properties_blob_key,
-                                                                   input_data,
-                                                                   eager_termination)
-                    is_prop_acceptable = validation_result["is_valid"]
-
-                    for key, value in validation_result.items():
-                        if key != "is_valid":
-                            self.counter.increment(key, value)
+                    is_prop_acceptable = self._validate_csv_element(first_level_prop,
+                                                                    properties_blob_key,
+                                                                    input_data)
+                else:
+                    raise KeyError(f"Faulty data type in {file_blob_key},"
+                                   f"supported types are: {data_type_to_loader_map.keys()}")
 
                 if is_prop_acceptable:
                     self.__pool[file_blob_key] = input_data
@@ -286,8 +283,8 @@ class InputManager:
 
         return data_type_to_validator_map[var_type](variable_path, variable_properties, input_data_value)
 
-    def _validate_csv_element(self, var_name: str, properties_blob_key: str,
-                              input_data: Dict[str, Any], eager_termination: bool) -> dict:
+    def _validate_csv_element(self, first_level_prop: str, properties_blob_key: str,
+                              input_data: Dict[str, Any]) -> bool:
         """
         Receives data loaded from csv input file and then validates each row element in the csv column it's sent.
         It attempts to fix any invalid elements and tracks the number of valid, invalid, fixed,
@@ -295,49 +292,28 @@ class InputManager:
 
         Parameters
         ----------
-        var_name : str
+        first_level_prop : str
             The name of the csv data element being validated.
         properties_blob_key : str
             The metadata properties section keyword for the data input file being checked.
         input_data : Dict[str, Any]
             A buffer dictionary that holds the input data for validation and fixing.
-        eager_termination : bool
-            If true, the process will be terminated upon finding invalid data.
 
-        Returns
-        -------
-        dict
-            A dictionary that collects the counts of total elements checked,
-            invalid elements, valid elements, and fixed elements as well as a boolean
-            which is True if the data is valid, False otherwise.
         """
-        info_map = {"class": self.__class__.__name__,
-                    "function": self._validate_csv_element.__name__,
-                    }
-        element_counter_and_validity = {"fixed_elements": 0, "total_elements": 0, "valid_elements": 0,
-                                        "invalid_elements": 0, "is_valid": True}
-        variable = input_data[var_name]
-        variable_properties = reduce(lambda d, key: d[key], [var_name],
-                                     self.__metadata["properties"][properties_blob_key])
 
-        for element_num in range(len(variable)):
-            element_counter_and_validity["total_elements"] += 1
-            is_valid = self._validate_input_type_dynamic(variable_properties, var_name, variable[element_num])
-            if is_valid:
-                element_counter_and_validity["valid_elements"] += 1
-            else:
-                is_fixed = self._fix_data(variable_properties, [var_name, element_num], input_data)
-                if is_fixed:
-                    element_counter_and_validity["fixed_elements"] += 1
-                else:
-                    element_counter_and_validity["invalid_elements"] += 1
-                    element_counter_and_validity["is_valid"] = False
-                    om.add_warning("Invalid unfixable element found",
-                                   f"{var_name} element {element_num} was invalid and could not be fixed", info_map)
-                    if eager_termination:
-                        return element_counter_and_validity
+        variable_properties = self._get_nested_dict_value(self.__metadata["properties"][properties_blob_key],
+                                                          [first_level_prop])
 
-        return element_counter_and_validity
+        column_data = input_data[first_level_prop]
+
+        for idx in range(len(column_data)):
+            is_sub_element_acceptable = self._validate_input_type_dynamic(variable_properties,
+                                                                          [first_level_prop, idx],
+                                                                          input_data)
+            if not is_sub_element_acceptable:
+                return False
+
+        return True
 
     def _validate_json_element(self, first_level_prop: str, properties_blob_key: str,
                                input_data: Dict[str, Any]) -> bool:
@@ -455,7 +431,6 @@ class InputManager:
         -------
         Tuple[bool, str]
             A tuple containing a boolean indicating if the check passed and a string containing the reason for failure.
-
         """
 
         if not type(variable_value) in (int, float):
@@ -548,13 +523,13 @@ class InputManager:
         self.counter.increment("invalid_elements")
         return False
 
-    def _validate_generic_type_without_revalidation(self, variable_path: List[str | int],
-                                                    variable_properties: Dict[str, Any],
-                                                    input_data: Dict[str, Any],
-                                                    type_specific_validators: List[
-                                                        Callable[[Any, Dict[str, Any]], Tuple[bool, str]]]) -> bool:
+    def _validate_primitive_type_without_revalidation(self, variable_path: List[str | int],
+                                                      variable_properties: Dict[str, Any],
+                                                      input_data: Dict[str, Any],
+                                                      primitive_type_specific_validators: List[
+                                                          Callable[[Any, Dict[str, Any]], Tuple[bool, str]]]) -> bool:
         """
-        Validate an input data element generically without revalidation the fixed data.
+        Validate input data of primitive type (string, number, boolean) without revalidation of the fixed data.
 
         Parameters
         ----------
@@ -564,14 +539,14 @@ class InputManager:
             The properties for the variable of interest.
         input_data : Dict[str, Any]
             A reference to the input data dictionary to enable in-place fixing.
-        type_specific_validators : List[Callable[[Any, Dict[str, Any]], Tuple[bool, str]]]
+        primitive_type_specific_validators : List[Callable[[Any, Dict[str, Any]], Tuple[bool, str]]]
             A list of functions to use for validating the input data element.
         """
 
         self.counter.increment("total_elements")
         element_to_validate = self._get_nested_dict_value(input_data, variable_path)
 
-        for validator in type_specific_validators:
+        for validator in primitive_type_specific_validators:
             is_valid, error_msg = validator(element_to_validate, variable_properties)
             if not is_valid:
                 return self._handle_validation_error(error_msg, variable_path, variable_properties, input_data)
@@ -579,14 +554,34 @@ class InputManager:
         self.counter.increment("valid_elements")
         return True
 
-    def _validate_generic_type_with_revalidation(self, variable_path: List[str | int],
-                                                 variable_properties: Dict[str, Any],
-                                                 input_data: Dict[str, Any],
-                                                 type_specific_validators: List[
-                                                     Callable[[Any, Dict[str, Any]], Tuple[
-                                                         bool, str]]]) -> bool:
+    def _handle_container_error(self, error_msg: str, variable_path: List[str | int],
+                                variable_properties: Dict[str, Any],
+                                input_data: Dict[str, Any], ) -> bool:
+        info_map = {
+            "class": self.__class__.__name__,
+            "function": self._handle_validation_error.__name__,
+        }
+        variable_path_str = self._convert_variable_path_to_str(variable_path)
+        element_to_validate = self._get_nested_dict_value(input_data, variable_path)
+        om.add_warning(error_msg, f"{variable_path_str} = {element_to_validate}", info_map)
+
+        is_variable_fixed = self._fix_data(variable_properties, variable_path, input_data)
+        if is_variable_fixed:
+            return self._validate_input_type_dynamic(variable_properties, variable_path, input_data)
+
+        om.add_error("Invalid unfixable element found", f"{variable_path_str} = {element_to_validate}", info_map)
+        self.counter.increment("total_elements")
+        self.counter.increment("invalid_elements")
+        return False
+
+    def _validate_primitive_type_with_revalidation(self, variable_path: List[str | int],
+                                                   variable_properties: Dict[str, Any],
+                                                   input_data: Dict[str, Any],
+                                                   primitive_type_specific_validators: List[
+                                                       Callable[[Any, Dict[str, Any]], Tuple[
+                                                           bool, str]]]) -> bool:
         """
-        Validate an input data element generically with revalidation the fixed data.
+        Validate input data of primitive type (string, number, boolean) with revalidation of the fixed data.
 
         Parameters
         ----------
@@ -596,7 +591,7 @@ class InputManager:
             The properties for the variable of interest.
         input_data : Dict[str, Any]
             A reference to the input data dictionary to enable in-place fixing.
-        type_specific_validators : List[Callable[[Any, Dict[str, Any]], Tuple[bool, str]]]
+        primitive_type_specific_validators : List[Callable[[Any, Dict[str, Any]], Tuple[bool, str]]]
             A list of functions to use for validating the input data element.
 
         Returns
@@ -614,30 +609,32 @@ class InputManager:
         variable_path_str = self._convert_variable_path_to_str(variable_path)
 
         idx = 0
-        while idx < len(type_specific_validators):
+        while idx < len(primitive_type_specific_validators):
             element_to_validate = self._get_nested_dict_value(input_data, variable_path)
-            is_valid, error_msg = type_specific_validators[idx](element_to_validate, variable_properties)
-            if not is_valid:
-                if attempted_fix:
-                    om.add_error("Fixed element is still invalid",
-                                 f"{variable_path_str} = {element_to_validate}",
-                                 info_map)
-                    self.counter.increment("invalid_elements")
-                    return False
-
-                om.add_warning(error_msg, f"{variable_path_str} = {element_to_validate}", info_map)
-                is_variable_fixable = self._fix_data(variable_properties, variable_path, input_data)
-                if is_variable_fixable:
-                    attempted_fix = True
-                    idx = 0
-                else:
-                    om.add_error("Invalid unfixable element found",
-                                 f"{variable_path_str} = {element_to_validate}",
-                                 info_map)
-                    self.counter.increment("invalid_elements")
-                    return False
-            else:
+            is_valid, error_msg = primitive_type_specific_validators[idx](element_to_validate, variable_properties)
+            if is_valid:
                 idx += 1
+                continue
+
+            if attempted_fix:
+                om.add_error("Fixed element is still invalid",
+                             f"{variable_path_str} = {element_to_validate}",
+                             info_map)
+                self.counter.increment("invalid_elements")
+                return False
+
+            om.add_warning(error_msg, f"{variable_path_str} = {element_to_validate}", info_map)
+            is_variable_fixable = self._fix_data(variable_properties, variable_path, input_data)
+            if is_variable_fixable:
+                attempted_fix = True
+                idx = 0
+                continue
+
+            om.add_error("Invalid unfixable element found",
+                         f"{variable_path_str} = {element_to_validate}",
+                         info_map)
+            self.counter.increment("invalid_elements")
+            return False
 
         if attempted_fix:
             self.counter.increment("fixed_elements")
@@ -666,14 +663,14 @@ class InputManager:
             True if the element was valid or fixed, False otherwise.
         """
 
-        type_specific_validators = [
+        primitive_type_specific_validators = [
             self._is_numeric_value,
             self._check_num_lower_bound,
             self._check_num_upper_bound,
         ]
 
-        return self._validate_generic_type_with_revalidation(variable_path, variable_properties,
-                                                             input_data, type_specific_validators)
+        return self._validate_primitive_type_with_revalidation(variable_path, variable_properties,
+                                                               input_data, primitive_type_specific_validators)
 
     @staticmethod
     def _is_str_value(variable_value: Any, variable_properties: Dict[str, Any]) -> Tuple[bool, str]:
@@ -795,8 +792,8 @@ class InputManager:
             self._check_str_pattern_match,
         ]
 
-        return self._validate_generic_type_with_revalidation(variable_path, variable_properties,
-                                                             input_data, type_specific_validators)
+        return self._validate_primitive_type_with_revalidation(variable_path, variable_properties,
+                                                               input_data, type_specific_validators)
 
     @staticmethod
     def _is_bool_value(variable_value: Any, variable_properties: Dict[str, Any]) -> Tuple[bool, str]:
@@ -842,8 +839,8 @@ class InputManager:
             True if the input data value is valid for the specified type, False otherwise.
         """
 
-        return self._validate_generic_type_with_revalidation(variable_path, variable_properties,
-                                                             input_data, [self._is_bool_value])
+        return self._validate_primitive_type_with_revalidation(variable_path, variable_properties,
+                                                               input_data, [self._is_bool_value])
 
     @staticmethod
     def _is_object_value(variable_value: Dict, variable_properties: Dict[str, Any]) -> Tuple[bool, str]:
@@ -868,31 +865,6 @@ class InputManager:
             return False, "Object variable is not a dictionary."
         return True, ""
 
-    @staticmethod
-    def _check_object_keys_present_in_metadata(variable_value: dict[str, Any], variable_properties: Dict[str, Any]) -> \
-            Tuple[bool, str]:
-        """
-        Check if the keys in the variable value are present in the metadata.
-
-        Parameters
-        ----------
-        variable_value : dict[str, Any]
-            The value of the variable to check.
-        variable_properties : Dict[str, Any]
-            The properties for the variable of interest.
-
-        Returns
-        -------
-        Tuple[bool, str]
-            A tuple containing a boolean indicating if the check passed and a string containing the reason for failure.
-
-        """
-
-        for key in variable_value.keys():
-            if key not in variable_properties:
-                return False, f"Object key {key} not found in metadata."
-        return True, ""
-
     def _validate_object_type(self, variable_path: List[str | int],
                               variable_properties: Dict[str, Any],
                               input_data: Dict[str, Any]) -> bool:
@@ -914,17 +886,18 @@ class InputManager:
             True if the element was valid or fixed, False otherwise.
         """
 
-        type_specific_validators = [
+        object_container_validators = [
             self._is_object_value,
-            self._check_object_keys_present_in_metadata,
         ]
 
-        if not self._validate_generic_type_with_revalidation(variable_path, variable_properties,
-                                                             input_data, type_specific_validators):
-            return False
+        object_data = self._get_nested_dict_value(input_data, variable_path)
 
-        element_to_validate = self._get_nested_dict_value(input_data, variable_path)
-        for key in element_to_validate.keys():
+        for container_validator in object_container_validators:
+            is_valid, error_msg = container_validator(object_data, variable_properties)
+            if not is_valid:
+                return self._handle_container_error(error_msg, variable_path, variable_properties, input_data)
+
+        for key in object_data.keys():
             is_sub_element_acceptable = self._validate_input_type_dynamic(variable_properties[key],
                                                                           variable_path + [key], input_data)
             if not is_sub_element_acceptable:
@@ -955,8 +928,9 @@ class InputManager:
         return True, ""
 
     @staticmethod
-    def _check_array_len_lower_bound(variable_value: List[Any], variable_properties: Dict[str, Any]) -> Tuple[
-        bool, str]:
+    def _check_array_len_lower_bound(variable_value: List[Any],
+                                     variable_properties: Dict[str, Any]) \
+            -> Tuple[bool, str]:
         """
         Check if the list has a length greater than or equal to the minimum specified.
 
@@ -974,7 +948,8 @@ class InputManager:
         """
 
         if "minimum_length" in variable_properties and len(variable_value) < variable_properties["minimum_length"]:
-            return False, "Array length less than minimum."
+            return False, f"Array length less than minimum: " \
+                          f"{len(variable_value)} < {variable_properties['minimum_length']}"
         return True, ""
 
     @staticmethod
@@ -997,7 +972,8 @@ class InputManager:
         """
 
         if "maximum_length" in variable_properties and len(variable_value) > variable_properties["maximum_length"]:
-            return False, "Array length more than maximum."
+            return False, f"Array length more than maximum: " \
+                          f"{len(variable_value)} > {variable_properties['maximum_length']}"
         return True, ""
 
     def _validate_array_type(self, variable_path: List[str | int],
@@ -1020,18 +996,21 @@ class InputManager:
         bool
             True if the element was valid or fixed, False otherwise.
         """
-        type_specific_validators = [
+
+        array_container_validators = [
             self._is_array_value,
             self._check_array_len_lower_bound,
             self._check_array_len_upper_bound,
         ]
 
-        if not self._validate_generic_type_with_revalidation(variable_path, variable_properties,
-                                                             input_data, type_specific_validators):
-            return False
+        array_data = self._get_nested_dict_value(input_data, variable_path)
 
-        element_to_validate = self._get_nested_dict_value(input_data, variable_path)
-        for idx in range(len(element_to_validate)):
+        for container_validator in array_container_validators:
+            is_valid, error_msg = container_validator(array_data, variable_properties)
+            if not is_valid:
+                return self._handle_container_error(error_msg, variable_path, variable_properties, input_data)
+
+        for idx in range(len(array_data)):
             is_sub_element_acceptable = self._validate_input_type_dynamic(variable_properties["properties"],
                                                                           variable_path + [idx],
                                                                           input_data)
@@ -1073,7 +1052,7 @@ class InputManager:
         old_value = variable_parent[element_hierarchy[-1]]
         variable_parent[element_hierarchy[-1]] = variable_properties['default']
         om.add_warning("Data fixed",
-                       f"{variable_path_str}: {old_value} => {variable_properties['default']}",
+                       f"{variable_path_str}: Replaced {old_value} with => {variable_properties['default']}",
                        info_map)
         return True
 

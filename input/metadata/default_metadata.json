@@ -1410,7 +1410,7 @@
           "type": "number",
           "minimum": 1,
           "maximum": 300,
-          "default": 155
+          "default": 231
         }
       },
       "growing_feeds": {
@@ -1736,7 +1736,7 @@
         "description": "Processing adjustment factor.",
         "minimum": 0.87,
         "maximum": 1.04,
-        "default": 0
+        "default": 0.87
       },
       "TDN": {
         "type": "number",
@@ -2382,16 +2382,24 @@
             "pattern": "^(flush system|alley scraper|manual scraping|tillage|manual skid steer scraping)$"
           },
           "cleaning_water_use_rate": {
-            "type": "number"
+            "type": "number",
+            "minimum": 0,
+            "default": 0
           },
           "minutes_per_cleaning": {
-            "type": "number"
+            "type": "number",
+            "minimum": 0,
+            "default": 8
           },
           "cleanings_per_day": {
-            "type": "number"
+            "type": "number",
+            "minimum": 0,
+            "default": 2
           },
           "daily_tillage_frequency": {
-            "type": "number"
+            "type": "number",
+            "minimum": 0,
+            "default": 0
           }
         }
       },
