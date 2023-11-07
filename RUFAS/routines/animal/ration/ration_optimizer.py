@@ -228,8 +228,8 @@ class RationOptimizer:
         NEm_act_constraint = (sum(np.multiply(decision_vector, ration_config.NEm_act_list)))
         NEg_constraint = sum(np.multiply(decision_vector, ration_config.NEgact_list))
 
-        all_req = ration_config.NEl_requirement + ration_config.NEg_requirement + ration_config.NEmaint_requirement + \
-                  ration_config.NEa_requirement + ration_config.NEpreg_requirement
+        all_req = (ration_config.NEl_requirement + ration_config.NEg_requirement + ration_config.NEmaint_requirement +
+                   ration_config.NEa_requirement + ration_config.NEpreg_requirement)
         return max(NEm_act_constraint, NEl_constraint, NEg_constraint) - all_req
 
     @staticmethod
@@ -341,10 +341,8 @@ class RationOptimizer:
                 elif ration_config.is_fat_list[i] == 1:
                     ration_config.NElact_list.append(0.8 * ration_config.DEact_list[i])
                 elif ration_config.EE_list[i] >= 3:
-                    ration_config.NElact_list.append(0.703 * ration_config.MEact_list[i] - 0.19 + ((0.097 *
-                                                                                                    ration_config.MEact_list[
-                                                                                                        i] + 0.19) / 97) *
-                                                     (ration_config.EE_list[i] - 3))
+                    ration_config.NElact_list.append(0.703 * ration_config.MEact_list[i] - 0.19 + (
+                            (0.097 * ration_config.MEact_list[i] + 0.19) / 97) * (ration_config.EE_list[i] - 3))
                 else:
                     ration_config.NElact_list.append(0.703 * ration_config.MEact_list[i] - 0.19)
             # returning the NElact constraint in the NLP
