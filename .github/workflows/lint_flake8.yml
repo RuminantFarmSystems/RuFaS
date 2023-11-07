@@ -47,7 +47,7 @@ jobs:
         )
         unauthorized_changes=false
         
-        for path in "${paths_to_monitor[@]}"; do
+        for path in "${paths_to_protect[@]}"; do
           if echo ${{ env.FILES }} | grep -q "$path"; then
             unauthorized_changes=true
             unauthorized_paths+="$path, "
