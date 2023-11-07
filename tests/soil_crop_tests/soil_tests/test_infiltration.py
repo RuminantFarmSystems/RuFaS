@@ -1,6 +1,6 @@
 import pytest
-from math import log, exp
-from unittest.mock import MagicMock, patch, call
+from math import log, exp, inf
+from unittest.mock import MagicMock, patch, call, PropertyMock
 
 from RUFAS.routines.field.soil.infiltration import Infiltration
 from RUFAS.routines.field.soil.soil_data import SoilData
@@ -181,6 +181,43 @@ def test_determine_moisture_condition_parameter(retention_param):
 
 
 # --- Integration tests ----
+@pytest.mark.parametrize("infiltration,water_contents,acceptable_percolation_amounts,percolated_water,"
+                         "expected_water_contents", [
+                             (10.0, [5.0, 5.0, 5.0, 5.0], [3.0] * 4, [7.0, 4.0, 1.0, 0.0], [8.0, 8.0, 8.0, 6.0, 0.0]),
+                             (4.0, [5.0, 5.0, 5.0, 5.0], [3.0] * 4, [1.0, 0.0, 0.0, 0.0], [8.0, 6.0, 5.0, 5.0, 0.0]),
+                             (8.5, [6.0, 12.4, 19.3, 18.0], [1.3, 2.4, 5.0, 4.7], [7.2, 4.8, 0.0, 0.0],
+                              [7.3, 14.8, 24.1, 18.0, 0.0]),
+                             (20.0, [5.0, 5.0, 5.0, 5.0], [3.0] * 4, [17.0, 14.0, 11.0, 8.0],
+                              [8.0, 8.0, 8.0, 8.0, 8.0]),
+                             (20.0, [8.0, 8.0, 8.0, 8.0], [0.0] * 4, [20.0] * 4, [8.0, 8.0, 8.0, 8.0, 20.0])
+                         ])
+def test_percolate_excess_water(infiltration: float, water_contents: list[float],
+                                acceptable_percolation_amounts: list[float], percolated_water: list[float],
+                                expected_water_contents: list[float]) -> None:
+    """Tests that extreme levels of infiltration are handled correctly."""
+    layers = []
+    for index in range(4):
+        new_layer = LayerData(top_depth=0, bottom_depth=100, field_size=3.0)
+        new_layer.water_content = water_contents[index]
+        layers.append(new_layer)
+    vadose_zone = MagicMock(LayerData)
+    vadose_zone.acceptable_percolation_amount = inf
+    vadose_zone.water_content = 0.0
+    soil_data = MagicMock(SoilData)
+    soil_data.soil_layers = layers
+    soil_data.vadose_zone_layer = vadose_zone
+    soil_data.infiltrated_water = infiltration
+    infiltration = Infiltration(soil_data)
+    with patch("RUFAS.routines.field.soil.layer_data.LayerData.acceptable_percolation_amount",
+               new_callable=PropertyMock, side_effect=acceptable_percolation_amounts):
+        infiltration._percolate_excess_water()
+
+    for index, layer in enumerate(infiltration.data.soil_layers):
+        assert pytest.approx(layer.water_content) == expected_water_contents[index]
+        assert pytest.approx(layer.percolated_water) == percolated_water[index]
+    assert infiltration.data.vadose_zone_layer.water_content == expected_water_contents[-1]
+
+
 @pytest.mark.parametrize("rainfall,is_top_frozen,expected_runoff,expected_infiltration,expected_surface_content,"
                          "expected_total_runoff", [
                              (1.4, False, 1.4, 0.0, 8.0, 2.7),
@@ -196,6 +233,7 @@ def test_infiltrate(rainfall: float, is_top_frozen: bool, expected_runoff: float
         setattr(surface_layer, "temperature", -1.0)
     else:
         setattr(surface_layer, "temperature", 15.0)
+    setattr(surface_layer, "acceptable_percolation_amount", 1.0)
     setattr(surface_layer, "water_content", 8.0)
     data = MagicMock(SoilData)
     setattr(data, "soil_layers", [surface_layer])
@@ -214,7 +252,7 @@ def test_infiltrate(rainfall: float, is_top_frozen: bool, expected_runoff: float
                   return_value=10) as first_curve_num, \
             patch("RUFAS.routines.field.soil.infiltration.Infiltration."
                   "_determine_retention_parameter_for_moisture_condition", return_value=0.5) as \
-            retention_param_for_moisture, \
+                    retention_param_for_moisture, \
             patch("RUFAS.routines.field.soil.infiltration.Infiltration._determine_second_shape_coefficient",
                   return_value=1.1) as second_shape, \
             patch("RUFAS.routines.field.soil.infiltration.Infiltration._determine_first_shape_coefficient",
@@ -224,7 +262,8 @@ def test_infiltrate(rainfall: float, is_top_frozen: bool, expected_runoff: float
             patch("RUFAS.routines.field.soil.infiltration.Infiltration._determine_frozen_retention_parameter",
                   return_value=0.6) as frozen_retention_param, \
             patch("RUFAS.routines.field.soil.infiltration.Infiltration._determine_accumulated_runoff",
-                  return_value=3.0) as runoff:
+                  return_value=3.0) as runoff, \
+            patch("RUFAS.routines.field.soil.infiltration.Infiltration._percolate_excess_water") as percolate_excess:
         incorp.infiltrate(rainfall)
 
         third_curve_num.assert_called_once_with(85.0)
