@@ -70,9 +70,7 @@ class PoolGasPartition:
             layer.decomposition_moisture_effect, self.data.decomposition_temperature_effect,
             layer.slow_carbon_amount)
 
-        layer.passive_carbon_decomposition_amount = self._determine_passive_carbon_decomposition_amount(
-            layer.decomposition_moisture_effect, self.data.decomposition_temperature_effect,
-            layer.passive_carbon_amount)
+        layer.passive_carbon_decomposition_amount = 0.0
 
         layer.active_carbon_to_slow_amount = self._determine_active_carbon_to_slow_amount(
             layer.active_carbon_decomposition_amount, layer.carbon_lost_adjusted_factor)
@@ -88,8 +86,7 @@ class PoolGasPartition:
         # aggregate active carbon pool flux
         layer.plant_active_decompose_carbon = self._determine_plant_active_decompose_carbon(
             layer.plant_metabolic_active_carbon_remaining, layer.plant_structural_active_carbon_remaining)
-        layer.soil_active_decompose_carbon = self._determine_soil_active_decompose_carbon(
-            layer.plant_metabolic_active_carbon_remaining, layer.soil_structural_active_carbon_remaining)
+        layer.soil_active_decompose_carbon = 0.0
         layer.active_carbon_amount = self._determine_soil_active_carbon_amount(
             layer.active_carbon_amount, layer.plant_active_decompose_carbon, layer.soil_active_decompose_carbon,
             layer.passive_to_active_carbon_amount, layer.slow_to_active_carbon_amount,

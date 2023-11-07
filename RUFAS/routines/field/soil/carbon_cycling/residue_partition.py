@@ -40,7 +40,7 @@ class ResiduePartition:
         self.data.plant_residue_metabolic_fraction = self._determine_plant_residue_metabolic_fraction(
             self.data.plant_lignin_nitrogen_ratio)
 
-        self._add_residue_to_pools()
+        self._add_litter_to_pools()
 
     def partition_residue(self, rainfall: float) -> None:
         """Main routine to updates attributes by using static methods, this method should only be called (by the field/
@@ -157,7 +157,7 @@ class ResiduePartition:
                 layer.structural_litter_amount
             )
 
-    def _add_residue_to_pools(self) -> None:
+    def _add_litter_to_pools(self) -> None:
         """
         Partitions residue between metabolic and structural pools in all layers of the soil profile.
         """
@@ -170,7 +170,6 @@ class ResiduePartition:
 
         if self.data.plant_root_residue != 0.0 and self.data.crop_root_depth != 0.0:
             self._add_subsurface_residue(self.data.plant_root_residue, self.data.crop_root_depth)
-            self.data.plant_residue_metabolic_fraction = 0.0
             self.data.plant_root_residue = 0.0
             self.data.crop_root_depth = 0.0
 
