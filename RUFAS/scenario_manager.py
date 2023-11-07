@@ -35,7 +35,7 @@ class MetadataPaths(TypedDict):
         METADATA_PATHS = [{"prefix": "default_scenario",
                            "path": Path('input/metadata/default_metadata.json')},
                           {"prefix": "ARL_scenario",
-                           "pathsy": Path('input/metadata/ARL_metadata.json')},
+                           "path": Path('input/metadata/ARL_metadata.json')},
                          ]
         This will run 2 simulations back to back - the first simulation will use the default_metadata.json
         file to point to one set of input files and will save the generated output files with the "default_scenario"
