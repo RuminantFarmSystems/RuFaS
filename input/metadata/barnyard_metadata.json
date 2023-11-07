@@ -1169,7 +1169,7 @@
       "tai_method_h": {
         "type": "string",
         "description": "Reproduction Program",
-        "pattern": "^(5dCG2P|5dCGP)$"
+        "pattern": "^(md5CG2P|md5CGP)$"
       },
       "synch_ed_method_h": {
         "type": "string",
@@ -1295,7 +1295,7 @@
       "tai_method_h": {
         "type": "string",
         "description": "Heifer Reproduction Program",
-        "pattern": "^(5dCG2P|5dCGP)$"
+        "pattern": "^(md5CG2P|md5CGP)$"
       },
       "synch_ed_method_h": {
         "type": "string",
@@ -1421,7 +1421,7 @@
       "tai_method_h": {
         "type": "string",
         "description": "Heifer Reproduction Program",
-        "pattern": "^(5dCG2P|5dCGP)$"
+        "pattern": "^(md5CG2P|md5CGP)$"
       },
       "synch_ed_method_h": {
         "type": "string",
@@ -1577,7 +1577,7 @@
       "tai_method_h": {
         "type": "string",
         "description": "Heifer Reproduction Program",
-        "pattern": "^(5dCG2P|5dCGP)$"
+        "pattern": "^(md5CG2P|md5CGP)$"
       },
       "synch_ed_method_h": {
         "type": "string",
