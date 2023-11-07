@@ -40,8 +40,6 @@ class HeatUnits:
             use_temp = mean_air_temperature
         self.data.is_growing = self.data.minimum_temperature <= use_temp <= self.data.maximum_temperature
         self.accumulate_heat_units(mean_air_temperature)
-        self.data.previous_heat_fraction = self.data.heat_fraction
-        self.data.heat_fraction = self.data.accumulated_heat_units / self.data.potential_heat_units
 
     def accumulate_heat_units(self, air_temperature: float = None) -> None:
         """accumulates heat units during a day
