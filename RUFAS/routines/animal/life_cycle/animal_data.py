@@ -171,14 +171,14 @@ class AnimalData:
         self.animal_id += 1
         return self.animal_id
 
-    def __init__(self, CI, herd_data: HerdInfoTypedDict, set_seed) -> None:
+    def __init__(self, CI: float, herd_data: HerdInfoTypedDict, set_seed) -> None:
         """
         Initialize the AnimalData instance with herd information and configurations.
 
         Parameters:
         -----------
-        CI :
-            CI.
+        CI : float
+            Calving Interval.
         herd_data : HerdInfoTypedDict
             A dictionary containing information about the herd such as breed, number of animals, etc.
         set_seed : Bool
