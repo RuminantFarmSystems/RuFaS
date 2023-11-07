@@ -41,7 +41,7 @@ jobs:
         flake8 ${{ env.FILES }}
     - name: Check for Unauthorized Changes
       run: |
-        paths_to_monitor=(
+        paths_to_protect=(
           'RUFAS/scenario_manager.py'
           'input/metadata/default_metadata.json'
         )
@@ -55,7 +55,7 @@ jobs:
         done
 
         if $unauthorized_changes; then
-          echo "Unauthorized changes detected in monitored files: ${unauthorized_paths%, }"
+          echo "Unauthorized changes detected in protected files: ${unauthorized_paths%, }"
           echo "Review and remove these changes if they are not intended."
           exit 1
         else
