@@ -438,14 +438,15 @@ def test_add_litter_to_pools(surface_residue: float, root_residue: float, root_d
 def test_add_subsurface_residue(residue: float, depth: float, expected_metabolic: list[float],
                                 expected_structural: list[float]) -> None:
     """Tests that residue is added to soil layers correctly."""
-    top_layer = MagicMock(LayerData(top_depth=0.0, bottom_depth=50, field_size=2.5))
-    second_layer = MagicMock(LayerData(top_depth=50.0, bottom_depth=300, field_size=2.5))
-    third_layer = MagicMock(LayerData(top_depth=300, bottom_depth=500, field_size=2.5))
+    top_layer = LayerData(top_depth=0.0, bottom_depth=50, field_size=2.5)
+    second_layer = LayerData(top_depth=50.0, bottom_depth=300, field_size=2.5)
+    third_layer = LayerData(top_depth=300, bottom_depth=500, field_size=2.5)
     data = MagicMock(SoilData)
     data.soil_layers = [top_layer, second_layer, third_layer]
     for layer in data.soil_layers:
         layer.metabolic_litter_amount = 0.0
         layer.structural_litter_amount = 0.0
+    data.plant_residue_metabolic_fraction = 0.25
     partitioner = ResiduePartition(data)
     expected_litter_amounts = \
         [metabolic + structural for metabolic, structural in zip(expected_metabolic, expected_structural)]
