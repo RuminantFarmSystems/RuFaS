@@ -42,7 +42,7 @@ class MetadataPaths(TypedDict):
         METADATA_PATHS = [{"prefix": "default_scenario",
                            "path": Path('input/metadata/default_metadata.json')},
                           {"prefix": "ARL_scenario",
-                           "pathsy": Path('input/metadata/ARL_metadata.json')},
+                           "path": Path('input/metadata/ARL_metadata.json')},
                          ]
 >>>>>>> a668100fe (adds default_metadata to protected files and updates error message in action)
         This will run 2 simulations back to back - the first simulation will use the default_metadata.json
