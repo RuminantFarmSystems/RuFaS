@@ -34,6 +34,10 @@ jobs:
                         tr " " "\n" |
                         grep -E "\.py$" |
                         tr "\n" " ")" >> "$GITHUB_ENV"
+        echo "OTHER_FILES=$( echo ${{ steps.files.outputs.added_modified }} |
+                        tr " " "\n" |
+                        grep -E "\.txt$|\.json$"  |
+                        tr "\n" " ")" >> "$GITHUB_ENV"
     - name: Lint with flake8
       if: ${{ env.FILES != '' }}
       run: |
@@ -48,7 +52,7 @@ jobs:
         unauthorized_changes=false
         
         for path in "${paths_to_protect[@]}"; do
-          if echo ${{ env.FILES }} | grep -q "$path"; then
+          if (echo ${{ env.FILES }}; echo ${{ env.OTHER_FILES }}) | grep -q "$path"; then
             unauthorized_changes=true
             unauthorized_paths+="$path, "
           fi
