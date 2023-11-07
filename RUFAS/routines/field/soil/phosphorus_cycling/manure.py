@@ -51,6 +51,11 @@ class Manure:
         the moisture factors. Decomposition and assimilation occur simultaneously.
 
         """
+        self.data.machine_organic_phosphorus_runoff = 0.0
+        self.data.machine_inorganic_phosphorus_runoff = 0.0
+        self.data.grazing_organic_phosphorus_runoff = 0.0
+        self.data.grazing_inorganic_phosphorus_runoff = 0.0
+
         if rainfall > 0:
             self._leach_and_update_phosphorus_pools(rainfall, runoff, field_size)
 
@@ -198,11 +203,6 @@ class Manure:
             The size of the field (ha)
 
         """
-        self.data.machine_organic_phosphorus_runoff = 0.0
-        self.data.machine_inorganic_phosphorus_runoff = 0.0
-        self.data.grazing_organic_phosphorus_runoff = 0.0
-        self.data.grazing_inorganic_phosphorus_runoff = 0.0
-
         if self.data.machine_manure_dry_mass > 0 and self.data.machine_manure_field_coverage > 0:
             machine_organic_results = \
                 self._determine_phosphorus_leached_from_surface(rainfall, runoff, field_size,
