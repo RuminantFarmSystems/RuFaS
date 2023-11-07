@@ -1947,12 +1947,13 @@ def test_make_serializable_recursive(
     ],
 )
 def test_log_verbosity_less_than_method(self: LogVerbosity, other: LogVerbosity, expected_result: bool) -> None:
-    """Checks __le__ method in LogVerbosity class"""
+    """Unit test for __le__ method in LogVerbosity class"""
     actual_result = self <= other
     assert actual_result == expected_result
 
 
 def test_log_verbosity_str_method() -> None:
+    """Unit test for __str__ method in LogVerbosity class"""
     assert str(LogVerbosity.NONE) == "NONE"
     assert str(LogVerbosity.ERRORS) == "ERROR"
     assert str(LogVerbosity.WARNINGS) == "WARNING"
@@ -1960,6 +1961,7 @@ def test_log_verbosity_str_method() -> None:
 
 
 def test_log_verbosity_enum_values() -> None:
+    """Unit test for LogVerbosity class enum values"""
     assert LogVerbosity.NONE.value == "none"
     assert LogVerbosity.ERRORS.value == "errors"
     assert LogVerbosity.WARNINGS.value == "warnings"
