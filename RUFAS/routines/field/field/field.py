@@ -894,14 +894,15 @@ class Field:
         Details
         -------
         If the length of the current day is at or below the dormancy threshold length, all crops that can go dormant
-        should be put into dormancy. If the length is greater than the threshold length, all crops
-        should be brought out of dormancy.
+        should be put into dormancy. If the length is greater than the threshold length, all crops should be brought out
+        of dormancy.
+
         """
 
         if daylength <= self.field_data.dormancy_threshold_daylength:
-
             for crop in self.crops:
                 crop.dormancy.enter_dormancy()
+                crop.biomass_allocation.partition_biomass()
         else:
             for crop in self.crops:
                 crop.data.is_dormant = False
