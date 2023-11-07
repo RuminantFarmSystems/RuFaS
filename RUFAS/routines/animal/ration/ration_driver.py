@@ -105,6 +105,7 @@ class RationManager:
         else:
             return pen.ration, ration_vals
 
+    @staticmethod
     def calc_milk_average(pen) -> float:
         """
         Calculates average milk produced in a pen.
@@ -201,7 +202,7 @@ class RationManager:
 
     @classmethod
     def get_user_defined_ration(cls, req: animal_requirements, pen, available_feeds, animal_grouping_scenario) -> \
-            tuple[Dict[str, float], Dict[str, float]]:  # noqa
+            tuple[Dict[str, float], Dict[str, float]]:
         """
         Function that links the ration_driver file with the calc_ration function in
         pen.py. Returns a dictionary of the rations by feed and status of the NLP
@@ -237,7 +238,7 @@ class RationManager:
             "class": "RationManager",
             "function": cls.get_user_defined_ration.__name__,
         }
-        ration_percents = UserDefinedRationManager.ration_to_use(pen.animal_combination, available_feeds)
+        ration_percents = UserDefinedRationManager.ration_to_use(pen.animal_combination)
         fixed_ration = False
         num_reattempts = 0
         constraints_failed_list = []
@@ -329,7 +330,7 @@ class RationReporter:
     """
 
     @classmethod
-    def report_ration(cls, ration: Dict, available_feeds: Dict) -> Tuple[Dict, Dict]:  # noqa
+    def report_ration(cls, ration: Dict, available_feeds: Dict) -> Tuple[Dict, Dict]:
         """
         Calculates information in the ration about nutrient information including
         nutrient amounts and concentrations. Returns a dictionary of nutrient amounts
@@ -1034,6 +1035,6 @@ class AvailableFeeds:
                 continue
             for feed_id in sorted(list(feed_ids)):
                 # Get the list index of the feed_id in self.feed_id list.
-                idx = self._feed_id_to_list_idx_dict[int(feed_id)]      # missing 54, 136, 26, 118, 139
+                idx = self._feed_id_to_list_idx_dict[int(feed_id)]  # missing 54, 136, 26, 118, 139
                 result[key].append(vals[idx])
         return result

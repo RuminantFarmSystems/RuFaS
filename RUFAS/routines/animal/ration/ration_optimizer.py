@@ -123,7 +123,7 @@ class RationOptimizer:
         return sum(np.multiply(decision_vector, ration_config.price_list))
 
     @staticmethod
-    def total_energy(decision_vector: np.ndarray, ration_config: RationConfig) -> float:  # noqa
+    def total_energy(decision_vector: np.ndarray, ration_config: RationConfig) -> float:
         """
         Sets up the RHS multipliers for the sum of the lactation, pregnancy, maintenance, and activity requirements
         satisfied by the feed. Each equation has a reference to the respective
@@ -233,7 +233,7 @@ class RationOptimizer:
         return max(NEm_act_constraint, NEl_constraint, NEg_constraint) - all_req
 
     @staticmethod
-    def NEmact_constraint(decision_vector: np.ndarray, ration_config: RationConfig) -> float:  # noqa
+    def NEmact_constraint(decision_vector: np.ndarray, ration_config: RationConfig) -> float:
         """
         Sets up the RHS multipliers for the maintenance and activity requirements
         satisfied by the feed. Each equation has a reference to the respective
@@ -461,7 +461,7 @@ class RationOptimizer:
                        ration_config.P_requirement / 1000)
 
     @staticmethod
-    def protein_constraint(decision_vector: np.ndarray, ration_config: RationConfig) -> float:  # noqa
+    def protein_constraint(decision_vector: np.ndarray, ration_config: RationConfig) -> float:
         """
         Sets up the protein requirement constraint in the NLP. Because part of the
         maintenance requirement for protein contains non-linearity properties, that
@@ -763,22 +763,14 @@ class RationOptimizer:
             x0.append(random.random() * 10)
         # Dividing limit by 3 for tri-decision variables for farm grown feeds
         if udrm.is_udr:
-            bnds = self.make_user_bounds(UserDefinedRationManager.ration_to_use(animal_combination, available_feeds),
+            bnds = self.make_user_bounds(UserDefinedRationManager.ration_to_use(animal_combination),
                                          ration_config.DMIest_requirement)
             x0 = [np.mean(bnd) for bnd in bnds]
         else:
             bnds = []
             bnds = [(0, (lim / 3) + 0.0001) for lim in ration_config.feed_limit_list]
-        if udrm.is_udr:
-            if str(animal_combination) in ['AnimalCombination.LAC_COW']:
-                usermod = minimize(self.objective, x0, method='SLSQP', bounds=bnds,
-                                   constraints=self.cow_cons, args=arguments)
-            else:
-                usermod = minimize(self.objective, x0, method='SLSQP', bounds=bnds,
-                                   constraints=self.heifer_cons, args=arguments)
-            return usermod
-        # TODO: Put AnimalCombination enum in a separate file and import it here to avoid circular import
-        elif str(animal_combination) in ['AnimalCombination.LAC_COW']:
+
+        if str(animal_combination) in ['AnimalCombination.LAC_COW']:
             return minimize(self.objective, x0, method='SLSQP', bounds=bnds,
                             constraints=self.cow_cons, args=arguments)
         elif str(animal_combination) in ['AnimalCombination.GROWING', 'AnimalCombination.CLOSE_UP',
@@ -872,6 +864,8 @@ class RationOptimizer:
             solution.x array from minimize function used in ration_NLP.py
         constraint: dict[str, Any]
             constraint function as defined in ration_NLP.py
+        ration_config : RationConfig object
+            Attributes are animal requirement and feed supply information required for optimization
 
         Returns
         -------
@@ -900,6 +894,9 @@ class RationOptimizer:
 
         constraints: List[dict[str, Callable]]
             list of constraint functions as defined in ration_NLP.py
+
+        ration_config : RationConfig object
+            Attributes are animal requirement and feed supply information required for optimization
 
         Returns
         -------
