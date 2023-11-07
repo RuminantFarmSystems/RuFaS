@@ -2567,7 +2567,7 @@ def test_report_ration():
     expected = (
         {
             "dm": 16,
-            "as_fed": 0.16,
+            "as_fed": 1600,
             "CP": 0.16,
             "ADF": 0.16,
             "NDF": 0.16,

@@ -213,18 +213,24 @@ def test_check_crop_harvest_schedule(year: int, day: int, all_harvest_events: Li
     field._harvest_heat_scheduled_crops.assert_called_once()
 
 
-@pytest.mark.parametrize("crops,heat_scheduled,expected_harvested", [
-    ([Crop(), Crop(), Crop(), Crop(), Crop()], [True, False, True, True, False], [True, False, False, True, False]),
-    ([Crop(), Crop()], [True, True], [False, True]),
-    ([Crop(), Crop()], [False, False], [False, False]),
-    ([], [], [])
+@pytest.mark.parametrize("crop_num,heat_scheduled,expected_harvested", [
+    (5, [True, False, True, True, False], [True, False, False, True, False]),
+    (2, [True, True], [False, True]),
+    (2, [False, False], [False, False]),
+    (0, [], [])
 ])
-def test_harvest_heat_scheduled_crops(crops: List[Crop], heat_scheduled: List[bool],
+def test_harvest_heat_scheduled_crops(crop_num: int, heat_scheduled: List[bool],
                                       expected_harvested: List[bool]) -> None:
     """Tests that all crops which are set to be harvested based on heat level are."""
-    for index in range(len(crops)):
+    crops = []
+    for index in range(crop_num):
+        mock_data = MagicMock(CropData)
+        crops.append(MagicMock(Crop(mock_data)))
         if heat_scheduled[index]:
             crops[index].data.use_heat_scheduling = True
+        else:
+            crops[index].data.use_heat_scheduling = False
+        crops[index].data.harvest_heat_fraction = 1.0
         if expected_harvested[index]:
             crops[index].data.heat_fraction = crops[index].data.harvest_heat_fraction
         else:
@@ -467,22 +473,23 @@ def test_reset_crop_field_coverage_fractions(crop_list: List[Crop], expected_fie
     (7.293485893, 8.234850920),
 ])
 def test_start_dormancy(daylength: float, threshold_daylength: float) -> None:
-    """Tests that each crop's dormancy method is called"""
-    # Initialize objects
+    """Tests that each crop's dormancy method is called."""
     crop = Crop()
     field = Field(manure_manager=MagicMock(ManureManager))
     field.field_data.dormancy_threshold_daylength = threshold_daylength
     field.crops = [crop]
 
-    # Mock functions used
-    crop.dormancy.enter_dormancy = MagicMock()
+    with patch("RUFAS.routines.field.crop.dormancy.Dormancy.enter_dormancy", new_callable=MagicMock) as dormancy, \
+            patch("RUFAS.routines.field.crop.biomass_allocation.BiomassAllocation.partition_biomass",
+                  new_callable=MagicMock) as biomass:
+        field._assess_dormancy(daylength)
 
-    # Run method being tested
-    field._assess_dormancy(daylength)
-
-    # Check that subroutines were called correct number of times
     if daylength <= threshold_daylength:
-        assert crop.dormancy.enter_dormancy.call_count == 1
+        assert dormancy.call_count == 1
+        assert biomass.call_count == 1
+    else:
+        dormancy.assert_not_called()
+        biomass.assert_not_called()
 
 
 @pytest.mark.parametrize("species,specs", [
