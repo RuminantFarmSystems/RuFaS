@@ -1818,14 +1818,14 @@
         "default": 0
       },
       "is_fat": {
-        "type": "number",
-        "description": "Identifier of fat type feed (0 or 1).",
+        "type": "bool",
+        "description": "Identifier of fat type feed.",
         "minimum": 0,
         "maximum": 1
       },
       "is_wetforage": {
-        "type": "number",
-        "description": "Identifier of wet forage type feed (0 or 1).",
+        "type": "bool",
+        "description": "Identifier of wet forage type feed.",
         "minimum": 0,
         "maximum": 1
       },
