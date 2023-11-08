@@ -18,7 +18,7 @@ import collections
 import math
 import random
 from statistics import mean
-from typing import Any, Dict, Tuple, List, Set
+from typing import Any, Dict, Tuple, List, Set, Union
 
 from RUFAS.general_constants import GeneralConstants
 from RUFAS.time import Time
@@ -1638,7 +1638,7 @@ class AnimalManager:
                                   animals_snapshot_after_update,
                                   feed, temp) -> None:
         """
-        # TODO
+        TODO
         """
         graduated_animals = set()
         for animal_class_name in ['heiferIs', 'heiferIIs', 'heiferIIIs', 'cows']:
@@ -1647,25 +1647,53 @@ class AnimalManager:
         for animal in graduated_animals:
             self._add_animal_to_pen_and_id_map(animal, feed, temp)
 
-    def _handle_newly_added_animals(self, new_animals, feed, temp) -> None:
+    def _handle_newly_added_animals(self, new_animals: List[Union[Calf, HeiferI, HeiferII, HeiferIII, Cow]],
+                                    feed: Feed, temp: float) -> None:
         """
-        # TODO
+        For all new animals, adds animal to a pen, and updates the pen id map.
+
+        Parameters
+        ----------
+        animal : List(Union[Calf, HeiferI, HeiferII, HeiferIII, Cow])
+            One of the possible animal types.
+        feed : Feed
+            instance of the Feed class defined in feed.py.
+        temp : float
+            The temperature on the current day.
+
         """
         for animal in new_animals:
             self._add_animal_to_pen_and_id_map(animal, feed, temp)
             self.animals_by_type[type(animal)].append(animal)
 
-    def _remove_animal_from_pen_and_id_map(self, animal) -> None:
+    def _remove_animal_from_pen_and_id_map(self, animal: Union[Calf, HeiferI, HeiferII, HeiferIII, Cow]) -> None:
         """
-        # TODO
+        Removes animal from its current pen, and removes it from the pen id map.
+
+        Parameters
+        ----------
+        animal : Union[Calf, HeiferI, HeiferII, HeiferIII, Cow]
+            One of the possible animal types.
+
         """
         pen_id = self.animal_to_pen_id_map[animal.id]
         self.all_pens[pen_id].remove_animal(animal.id)
         del self.animal_to_pen_id_map[animal.id]
 
-    def _add_animal_to_pen_and_id_map(self, animal, feed, temp) -> None:
+    def _add_animal_to_pen_and_id_map(self, animal: Union[Calf, HeiferI, HeiferII, HeiferIII, Cow], feed: Feed,
+                                      temp: float) -> None:
         """
-        # TODO
+        Adds animal to pen with lowest stocking density, and updates the pen id map accordingly.
+
+        Parameters
+        ----------
+        animal : Union[Calf, HeiferI, HeiferII, HeiferIII, Cow]
+            One of the possible animal types.
+        feed : Feed
+            instance of the Feed class defined in feed.py.
+        temp : float
+            The temperature on the current day.
+
         """
         animal_combination = self.ANIMAL_GROUPING_SCENARIO.find_animal_combination(animal)
         pen_with_min_stocking_density = min(self.pens_by_animal_combination[animal_combination],
