@@ -1008,7 +1008,7 @@ class OutputManager(object):
 
         Parameters
         ----------
-        file_path : str
+        file_path : Path
             The path to the file to be loaded to the variables pool.
 
         Raises
@@ -1025,5 +1025,9 @@ class OutputManager(object):
                 self.variables_pool = json.load(file)
                 self.add_log("load_data_successful", f"Successfully loaded data from {str(file_path)}.",
                              info_map)
-        except Exception as e:
-            raise e
+        except FileNotFoundError:
+            self.add_error("File not found", f"The file '{str(file_path)}' does not exist.", info_map)
+            raise
+        except json.JSONDecodeError as e:
+            self.add_error("JSON parsing error", str(e), info_map)
+            raise

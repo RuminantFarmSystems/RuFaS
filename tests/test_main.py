@@ -12,7 +12,7 @@ from main import (
     execute_simulations,
     main,
     parse_gnu_args,
-    run_reload,
+    run_load_vars_pool,
     run_rufas,
     run_validation,
     METADATA_PATHS,
@@ -28,7 +28,7 @@ file_path = os.path.join(dir_path, "input/ARL.json")
 
 @pytest.mark.parametrize(
     "no_graphics, format_option, verbose, clear_output, exclude_info_maps, only_run_validation, graphics_dir,"
-    "reload_pool",
+    "load_pool",
     [
         (False, "verbose", LogVerbosity.ERRORS, True, True, True, "graphics", "all_vars.json"),
         (True, "basic", LogVerbosity.LOGS, False, False, False, "custom_graphics", "all_vars.json"),
@@ -45,7 +45,7 @@ def test_main(
     exclude_info_maps: bool,
     only_run_validation: bool,
     graphics_dir: str,
-    reload_pool: str,
+    load_pool: str,
 ) -> None:
     with patch("main.parse_gnu_args") as mock_parse_gnu_args:
         mock_parse_gnu_args.return_value = argparse.Namespace(
@@ -56,7 +56,7 @@ def test_main(
             exclude_info_maps=exclude_info_maps,
             only_run_validation=only_run_validation,
             graphics_dir=graphics_dir,
-            reload_pool=reload_pool,
+            load_pool=load_pool,
         )
 
         with patch("main.run_rufas") as mock_run_rufas:
@@ -70,7 +70,7 @@ def test_main(
                 exclude_info_maps=exclude_info_maps,
                 only_run_validation=only_run_validation,
                 graphics_dir=Path(graphics_dir),
-                vars_file_path=reload_pool
+                vars_file_path=load_pool
             )
 
 
@@ -116,7 +116,7 @@ def test_run_rufas(
     patch_execute_simulations = mocker.patch("main.execute_simulations")
     patch_run_validation = mocker.patch("main.run_validation")
     patch_empty_dir = mocker.patch("RUFAS.util.Utility.empty_dir")
-    patch_run_reload = mocker.patch("main.run_reload")
+    patch_run_load_vars_pool = mocker.patch("main.run_load_vars_pool")
 
     # Act
     run_rufas(
@@ -132,7 +132,7 @@ def test_run_rufas(
 
     # Assert
     if vars_file_path:
-        patch_run_reload.assert_called_once_with(
+        patch_run_load_vars_pool.assert_called_once_with(
             vars_file_path, exclude_info_maps, format_option, produce_graphics, graphics_dir
         )
         return
@@ -270,8 +270,8 @@ def test_execute_simulations(
     ] * len(metadata_file_list)
 
 
-def test_run_reload(mocker: MockerFixture) -> None:
-    """Checks the reload_vars_pool function in main.py"""
+def test_run_load_vars_pool(mocker: MockerFixture) -> None:
+    """Checks the run_load_vars_pool function in main.py"""
     mock_output_manager = mocker.MagicMock(auto_spec=OutputManager)
     mock_output_manager.flush_pools.return_value = None
     mock_output_manager.reload_vars_pool.return_value = None
@@ -280,7 +280,7 @@ def test_run_reload(mocker: MockerFixture) -> None:
     mock_output_manager.save_variables.return_value = None
     mocker.patch("main.OutputManager", return_value=mock_output_manager)
 
-    run_reload("all_vars.json", False, True, Path(""))
+    run_load_vars_pool("all_vars.json", False, True, Path(""))
 
     assert mock_output_manager.flush_pools.call_count == 1
     assert mock_output_manager.reload_vars_pool.call_count == 1
@@ -349,9 +349,9 @@ def test_parse_gnu_args(mocker: MockerFixture) -> None:
             action="store_true",
         ),
         mocker.call(
-            "-r",
-            "--reload-pool",
-            help="Reload the output manager's variables pool from provided path",
+            "-l",
+            "--load-pool",
+            help="Load the output manager's variables pool from provided path",
         ),
     ]
     mock_parse_args.assert_called_once()
