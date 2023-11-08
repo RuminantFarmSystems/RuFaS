@@ -217,6 +217,7 @@ def test_percolate_excess_water(infiltration: float, water_contents: list[float]
         assert pytest.approx(layer.percolated_water) == percolated_water[index]
     assert infiltration.data.vadose_zone_layer.water_content == expected_water_contents[-1]
 
+
 @pytest.mark.parametrize("rainfall,is_top_frozen,expected_runoff,expected_infiltration,expected_surface_content,"
                          "expected_total_runoff,excess_infiltration", [
                              (1.4, False, 1.4, 0.0, 8.0, 2.7, False),
