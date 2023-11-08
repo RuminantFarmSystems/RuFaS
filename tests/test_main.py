@@ -14,13 +14,12 @@ from main import (
     parse_gnu_args,
     run_rufas,
     run_validation,
-    set_global_variables,
     METADATA_PATHS,
 )
 
 from RUFAS.simulation_engine import SimulationEngine
 from RUFAS.input_manager import InputManager
-from RUFAS.output_manager import OutputManager
+from RUFAS.output_manager import OutputManager, LogVerbosity
 
 dir_path = os.path.join(global_variables.ROOT_DIR, "input")
 file_path = os.path.join(dir_path, "input/ARL.json")
@@ -29,18 +28,18 @@ file_path = os.path.join(dir_path, "input/ARL.json")
 @pytest.mark.parametrize(
     "format_option, no_graphics, graphics_dir, verbose, clear_output, exclude_info_maps, only_run_validation",
     [
-        ("verbose", False, "graphics", True, True, True, True),
-        ("basic", True, "custom_graphics", False, False, False, False),
-        ("block", True, "graphics", False, True, False, False),
-        ("inline", False, "custom_graphics", True, False, False, False),
-        ("verbose", True, "graphics", False, False, True, False),
+        ("verbose", False, "graphics", LogVerbosity.ERRORS, True, True, True),
+        ("basic", True, "custom_graphics", LogVerbosity.LOGS, False, False, False),
+        ("block", True, "graphics", LogVerbosity.NONE, True, False, False),
+        ("inline", False, "custom_graphics", LogVerbosity.WARNINGS, False, False, False),
+        ("verbose", True, "graphics", LogVerbosity.LOGS, False, True, False),
     ],
 )
 def test_main(
     format_option: str,
     no_graphics: bool,
     graphics_dir: str,
-    verbose: bool,
+    verbose: LogVerbosity,
     clear_output: bool,
     exclude_info_maps: bool,
     only_run_validation: bool,
@@ -73,38 +72,38 @@ def test_main(
 @pytest.mark.parametrize(
     "format_option, produce_graphics, verbose, clear_output, exclude_info_maps, only_run_validation, graphics_dir",
     [
-        ("verbose", True, True, True, True, True, ""),
-        ("block", False, True, True, True, True, ""),
-        ("inline", True, False, True, True, True, ""),
-        ("basic", True, True, False, True, True, ""),
-        ("verbose", True, True, True, False, True, ""),
-        ("block", True, True, True, True, False, ""),
-        ("inline", False, False, True, True, True, ""),
-        ("basic", False, True, False, True, True, ""),
-        ("verbose", False, True, True, False, True, ""),
-        ("block", False, True, True, True, False, ""),
-        ("inline", False, False, False, True, True, ""),
-        ("basic", False, False, True, False, True, ""),
-        ("verbose", False, False, True, True, False, ""),
-        ("block", False, False, False, False, True, ""),
-        ("inline", False, False, False, True, False, ""),
-        ("basic", False, False, False, False, False, ""),
-        ("basic", False, False, False, False, False, "graphics"),
+        ("verbose", True, LogVerbosity.NONE, True, True, True, ""),
+        ("block", False, LogVerbosity.LOGS, True, True, True, ""),
+        ("inline", True, LogVerbosity.ERRORS, True, True, True, ""),
+        ("basic", True, LogVerbosity.WARNINGS, False, True, True, ""),
+        ("verbose", True, LogVerbosity.NONE, True, False, True, ""),
+        ("block", True, LogVerbosity.LOGS, True, True, False, ""),
+        ("inline", False, LogVerbosity.ERRORS, True, True, True, ""),
+        ("basic", False, LogVerbosity.WARNINGS, False, True, True, ""),
+        ("verbose", False, LogVerbosity.NONE, True, False, True, ""),
+        ("block", False, LogVerbosity.LOGS, True, True, False, ""),
+        ("inline", False, LogVerbosity.ERRORS, False, True, True, ""),
+        ("basic", False, LogVerbosity.WARNINGS, True, False, True, ""),
+        ("verbose", False, LogVerbosity.NONE, True, True, False, ""),
+        ("block", False, LogVerbosity.WARNINGS, False, False, True, ""),
+        ("inline", False, LogVerbosity.LOGS, False, True, False, ""),
+        ("basic", False, LogVerbosity.ERRORS, False, False, False, ""),
+        ("basic", False, LogVerbosity.LOGS, False, False, False, "graphics"),
     ],
 )
 def test_run_rufas(
     format_option: str,
     produce_graphics: bool,
-    verbose: bool,
+    verbose: LogVerbosity,
     clear_output: bool,
     exclude_info_maps: bool,
     only_run_validation: bool,
     graphics_dir: str,
     mocker: MockerFixture,
+    capsys,
 ) -> None:
     """Checks that run_rufas() calls the correct functions in the correct order"""
     # Arrange
-    patch_set_global_variables = mocker.patch("main.set_global_variables")
     metadata_file_list = METADATA_PATHS
     patch_execute_simulations = mocker.patch("main.execute_simulations")
     patch_run_validation = mocker.patch("main.run_validation")
@@ -122,10 +121,9 @@ def test_run_rufas(
     )
 
     # Assert
-    patch_set_global_variables.assert_called_once_with(verbose)
     if only_run_validation:
         patch_run_validation.assert_called_once_with(
-            metadata_file_list, exclude_info_maps, format_option
+            metadata_file_list, exclude_info_maps, format_option, verbose
         )
     else:
         patch_execute_simulations.assert_called_once_with(
@@ -134,6 +132,7 @@ def test_run_rufas(
             produce_graphics,
             graphics_dir,
             format_option,
+            verbose,
         )
 
     if clear_output:
@@ -141,21 +140,10 @@ def test_run_rufas(
     else:
         patch_empty_dir.assert_not_called()
 
-
-@pytest.mark.parametrize("verbose", [True, False])
-def test_set_global_variables(verbose: bool) -> None:
-    """Checks that set_global_variables() sets the global variables correctly"""
-    # Arrange
-    old_verbose = global_variables.PRINT_STATUS_MESSAGES
-
-    # Act
-    set_global_variables(verbose)
-
-    # Assert
-    assert global_variables.PRINT_STATUS_MESSAGES == verbose
-
-    # Cleanup
-    global_variables.PRINT_STATUS_MESSAGES = old_verbose
+    if verbose != LogVerbosity.NONE:
+        captured = capsys.readouterr()
+        expected_message = "RuFaS: Ruminant Farm Systems Model 2023\n"
+        assert expected_message in captured.out
 
 
 @pytest.mark.parametrize("is_data_valid", [(True), (False)])
@@ -179,7 +167,7 @@ def test_run_validation(mocker: MockerFixture, is_data_valid: bool) -> None:
     ]
     mock_input_manager.start_data_processing.return_value = is_data_valid
 
-    run_validation(metadata_file_list, True, "verbose")
+    run_validation(metadata_file_list, True, "verbose", "none")
 
     assert mock_output_manager.flush_pools.call_count == len(metadata_file_list)
     assert mock_input_manager.flush_pool.call_count == len(metadata_file_list)
@@ -195,13 +183,13 @@ def test_run_validation(mocker: MockerFixture, is_data_valid: bool) -> None:
     "produce_graphics, exlclude_info_maps, is_data_valid, simulate_call_count, add_error_call_count, format_option",
     [
         (False, False, True, 2, 0, "verbose"),
-        (False, False, False, 0, 2, "block"),
-        (False, True, True, 2, 0, "verbose"),
-        (False, True, False, 0, 2, "block"),
+        (False, False, False, 0, 4, "block"),
+        (False, True, True, 2, 0, "inline"),
+        (False, True, False, 0, 4, "basic"),
         (True, False, True, 2, 0, "verbose"),
-        (True, False, False, 0, 2, "block"),
-        (True, True, True, 2, 0, "verbose"),
-        (True, True, False, 0, 2, "block"),
+        (True, False, False, 0, 4, "block"),
+        (True, True, True, 2, 0, "basic"),
+        (True, True, False, 0, 4, "inline"),
     ],
 )
 def test_execute_simulations(
@@ -211,7 +199,7 @@ def test_execute_simulations(
     is_data_valid: bool,
     simulate_call_count: int,
     add_error_call_count: int,
-    format_option,
+    format_option: str,
 ) -> None:
     """Checks that execute_simulations() calls the correct functions in the correct order"""
     # Arrange
@@ -305,8 +293,9 @@ def test_parse_gnu_args(mocker: MockerFixture) -> None:
         mocker.call(
             "-v",
             "--verbose",
-            help="Print progress messages while simulation is running",
-            action="store_true",
+            choices=["errors", "warnings", "logs", "none"],
+            default="none",
+            help="Specify the log type to be printed",
         ),
         mocker.call(
             "-c",
