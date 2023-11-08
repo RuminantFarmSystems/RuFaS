@@ -379,9 +379,9 @@ def test_post_init(top: float, bottom: float, concentration: float) -> None:
 
 
 @pytest.mark.parametrize("field_size,expected", [
-                             (1.4, 0.0693),
-                             (3.556, 0.06930000000000003),
-                             (0.88, 0.06930000000000001)
+                             (1.4, 69300.0),
+                             (3.556, 69300.0),
+                             (0.88, 69300.0)
 ])
 def test_initialize_carbon_pools(field_size: float, expected: float) -> None:
     """Tests that carbon pools in a soil layer are properly initialized."""
