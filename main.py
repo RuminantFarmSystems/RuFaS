@@ -30,6 +30,7 @@ def main():
         exclude_info_maps=cmd_arguments.exclude_info_maps,
         only_run_validation=cmd_arguments.only_run_validation,
         graphics_dir=Path(cmd_arguments.graphics_dir),
+        vars_file_path=cmd_arguments.reload_pool,
     )
 
 
@@ -41,25 +42,32 @@ def run_rufas(
     exclude_info_maps: bool = False,
     only_run_validation: bool = False,
     graphics_dir: Path = Path(""),
+    vars_file_path: str = None,
 ) -> None:
     """Main function to run RuFaS, with options.
 
-    Args:
-        produce_graphics: produce graphics after simulation
-        verbose: print progress messages while simulation is running
-        clear_output: lear output directory before running the simulation
-        exclude_info_map: exclude info_maps from the output
-        graphics_dir : Path, optional
-            The directory for saving graphics.
-        produce_graphics: produce graphics after simulation
-        format_option: format for variable_names.txt output file
-        verbose: print errors, warnings, and/or logs during the simulation
-        clear_output: lear output directory before running the simulation
-        exclude_info_map: exclude info_maps from the output
-        only_run_validation: validate input data and don't run a simulation
-        graphics_dir : Path, optional
-            The directory for saving graphics.
+    Parameters
+    ----------
+    produce_graphics : bool, optional, default=True
+        Produce graphics after simulation.
+    format_option : str, optional, default="verbose"
+        Format for variable_names.txt output file.
+    verbose : bool, optional, default=True
+        Print progress messages while simulation is running.
+    clear_output : bool, optional, default=False
+        Clear output directory before running the simulation.
+    exclude_info_maps : bool, optional, default=False
+        Exclude info_maps from the output.
+    only_run_validation : bool, optional, default=False
+        Validate input data and don't run a simulation.
+    graphics_dir : Path, optional, default=Path("")
+        The directory for saving graphics.
+    vars_file_path : str, optional, default=None
+        The path to the variables file to be reloaded into the Output Manager's variables pool.
     """
+    if vars_file_path:
+        reload_var_pool(vars_file_path)
+        return
     if clear_output:
         output_dir = Path(config.global_variables.OUT_DIR)
         keep_list = [".keep", "output_filters"]
@@ -78,6 +86,19 @@ def run_rufas(
             format_option,
             verbose,
         )
+
+
+def reload_var_pool(vars_file_path: str) -> None:
+    """Instantiates Output Manager and triggers reloading of the variables pool from the provided file path.
+
+    Parameters
+    ----------
+    vars_file_path : str
+        The file path to the variables file to reload into the Output Manager's variables pool.
+    """
+    output_manager = OutputManager()
+    vars_file_path = Path(vars_file_path)
+    output_manager.reload_pool(vars_file_path)
 
 
 def run_validation(
@@ -264,6 +285,11 @@ def parse_gnu_args() -> argparse.Namespace:
         "--only-run-validation",
         help="Only validate the data, don't run a simulation",
         action="store_true",
+    )
+    parser.add_argument(
+        "-r",
+        "--reload-pool",
+        help="Reload the output manager's variables pool from provided path",
     )
     return parser.parse_args()
 

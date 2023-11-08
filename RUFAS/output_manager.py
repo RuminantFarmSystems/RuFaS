@@ -1003,36 +1003,27 @@ class OutputManager(object):
         self.errors_pool: Dict[str, OutputManager.pool_element_type] = {}
         self.logs_pool: Dict[str, OutputManager.pool_element_type] = {}
 
-    def reload_pool(self) -> None:
-        """Reloads the Output Manager variables pool.
+    def reload_pool(self, file_path: Path) -> None:
+        """Reloads the Output Manager variables pool from file path provided by user in gnu arg.
+
+        Parameters
+        ----------
+        file_path : str
+            The path to the file to be loaded to the variables pool.
 
         Raises
         ------
         Exception
-            If an error occurs while opening or reading the user-provided filepath.
+            If an error occurs while opening or reading the user-provided file path.
         """
         info_map = {"class": self.__class__.__name__,
                     "function": self.reload_pool.__name__,
                     }
-        all_variables_file_path = self._get_user_filepath()
-        self.add_log("open_json_file", f"Attempting to open {all_variables_file_path}.", info_map)
+        self.add_log("open_json_file", f"Attempting to open {str(file_path)}.", info_map)
         try:
-            with open(all_variables_file_path) as file:
+            with open(file_path) as file:
                 self.variables_pool = json.load(file)
-                self.add_log("load_data_successful", f"Successfully loaded data from {all_variables_file_path}.",
+                self.add_log("load_data_successful", f"Successfully loaded data from {str(file_path)}.",
                              info_map)
         except Exception as e:
             raise e
-
-    def _get_user_filepath(self) -> str:
-        """User prompt to get the path to the desired output all_variables file.
-
-        Returns
-        -------
-        str
-            The path to the file.
-        """
-        rel_root = 'output/'
-        user_filepath = input("Enter path to all_variables json file: ")
-
-        return rel_root + user_filepath
