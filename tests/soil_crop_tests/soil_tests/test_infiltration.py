@@ -217,16 +217,15 @@ def test_percolate_excess_water(infiltration: float, water_contents: list[float]
         assert pytest.approx(layer.percolated_water) == percolated_water[index]
     assert infiltration.data.vadose_zone_layer.water_content == expected_water_contents[-1]
 
-
 @pytest.mark.parametrize("rainfall,is_top_frozen,expected_runoff,expected_infiltration,expected_surface_content,"
-                         "expected_total_runoff", [
-                             (1.4, False, 1.4, 0.0, 8.0, 2.7),
-                             (3.5, True, 3.0, 0.5, 8.5, 4.3),
-                             (20.0, False, 3.0, 17.0, 25.0, 4.3),
-                             (0.0, False, 0.0, 0.0, 8.0, 1.3)
+                         "expected_total_runoff,excess_infiltration", [
+                             (1.4, False, 1.4, 0.0, 8.0, 2.7, False),
+                             (3.5, True, 3.0, 0.5, 8.5, 4.3, False),
+                             (20.0, False, 3.0, 17.0, 8.0, 4.3, True),
+                             (0.0, False, 0.0, 0.0, 8.0, 1.3, False)
                          ])
 def test_infiltrate(rainfall: float, is_top_frozen: bool, expected_runoff: float, expected_infiltration: float,
-                    expected_surface_content: float, expected_total_runoff: float) -> None:
+                    expected_surface_content: float, expected_total_runoff: float, excess_infiltration: bool) -> None:
     """Test that infiltrate() correctly stores all values in SoilData object and calls all the methods it should."""
     surface_layer = MagicMock(LayerData)
     if is_top_frozen:
@@ -278,6 +277,10 @@ def test_infiltrate(rainfall: float, is_top_frozen: bool, expected_runoff: float
         else:
             frozen_retention_param.assert_not_called()
         runoff.assert_called_once_with(rainfall, 0.6)
+        if excess_infiltration:
+            assert percolate_excess.call_count == 1
+        else:
+            assert percolate_excess.call_count == 0
 
         assert incorp.data.accumulated_runoff == expected_runoff
         assert incorp.data.infiltrated_water == expected_infiltration
