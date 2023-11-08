@@ -30,7 +30,7 @@ def main():
         exclude_info_maps=cmd_arguments.exclude_info_maps,
         only_run_validation=cmd_arguments.only_run_validation,
         graphics_dir=Path(cmd_arguments.graphics_dir),
-        vars_file_path=cmd_arguments.load_pool,
+        load_pool=cmd_arguments.load_pool,
     )
 
 
@@ -42,7 +42,7 @@ def run_rufas(
     exclude_info_maps: bool = False,
     only_run_validation: bool = False,
     graphics_dir: Path = Path(""),
-    vars_file_path: str = None,
+    load_pool: bool = False,
 ) -> None:
     """Main function to run RuFaS, with options.
 
@@ -65,15 +65,29 @@ def run_rufas(
     vars_file_path : str, optional, default=None
         The path to the variables file to be loaded into the Output Manager's variables pool.
     """
-    if vars_file_path:
-        run_load_vars_pool(vars_file_path, exclude_info_maps, format_option, produce_graphics, graphics_dir)
-        return
+    sys.stdout.write("RuFaS: Ruminant Farm Systems Model 2023\n")
+
+    info_map = {
+        "class": "No caller class",
+        "function": run_rufas.__name__,
+    }
+    output_manager = OutputManager()
+
     if clear_output:
         output_dir = Path(config.global_variables.OUT_DIR)
         keep_list = [".keep", "output_filters"]
-        Utility.empty_dir(output_dir, keep=keep_list)
+        if load_pool:
+            vars_file_path = Path(input("Enter path to variables json file: ").strip())
+            if output_dir in vars_file_path.parents:
+                output_manager.add_error("Can't clear output folder",
+                                         "vars_file_path supplied by user is in output folder", info_map)
+            else:
+                Utility.empty_dir(output_dir, keep=keep_list)
+            run_load_vars_pool(vars_file_path, exclude_info_maps, format_option, produce_graphics, graphics_dir)
+            return
+        else:
+            Utility.empty_dir(output_dir, keep=keep_list)
 
-    sys.stdout.write("RuFaS: Ruminant Farm Systems Model 2023\n")
     metadata_files: List[MetadataPaths] = METADATA_PATHS
     if only_run_validation:
         run_validation(metadata_files, exclude_info_maps, format_option, verbose)
@@ -313,6 +327,7 @@ def parse_gnu_args() -> argparse.Namespace:
         "-l",
         "--load-pool",
         help="Load the output manager's variables pool from provided path",
+        action="store_true"
     )
     return parser.parse_args()
 
