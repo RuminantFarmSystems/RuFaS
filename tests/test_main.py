@@ -12,6 +12,7 @@ from main import (
     execute_simulations,
     main,
     parse_gnu_args,
+    run_reload,
     run_rufas,
     run_validation,
     METADATA_PATHS,
@@ -74,25 +75,27 @@ def test_main(
 
 
 @pytest.mark.parametrize(
-    "format_option, produce_graphics, verbose, clear_output, exclude_info_maps, only_run_validation, graphics_dir",
+    "format_option, produce_graphics, verbose, clear_output, exclude_info_maps, only_run_validation," 
+    "graphics_dir, vars_file_path",
     [
-        ("verbose", True, LogVerbosity.NONE, True, True, True, ""),
-        ("block", False, LogVerbosity.LOGS, True, True, True, ""),
-        ("inline", True, LogVerbosity.ERRORS, True, True, True, ""),
-        ("basic", True, LogVerbosity.WARNINGS, False, True, True, ""),
-        ("verbose", True, LogVerbosity.NONE, True, False, True, ""),
-        ("block", True, LogVerbosity.LOGS, True, True, False, ""),
-        ("inline", False, LogVerbosity.ERRORS, True, True, True, ""),
-        ("basic", False, LogVerbosity.WARNINGS, False, True, True, ""),
-        ("verbose", False, LogVerbosity.NONE, True, False, True, ""),
-        ("block", False, LogVerbosity.LOGS, True, True, False, ""),
-        ("inline", False, LogVerbosity.ERRORS, False, True, True, ""),
-        ("basic", False, LogVerbosity.WARNINGS, True, False, True, ""),
-        ("verbose", False, LogVerbosity.NONE, True, True, False, ""),
-        ("block", False, LogVerbosity.WARNINGS, False, False, True, ""),
-        ("inline", False, LogVerbosity.LOGS, False, True, False, ""),
-        ("basic", False, LogVerbosity.ERRORS, False, False, False, ""),
-        ("basic", False, LogVerbosity.LOGS, False, False, False, "graphics"),
+        ("verbose", True, LogVerbosity.NONE, True, True, True, "", None),
+        ("block", False, LogVerbosity.LOGS, True, True, True, "", None),
+        ("inline", True, LogVerbosity.ERRORS, True, True, True, "", None),
+        ("basic", True, LogVerbosity.WARNINGS, False, True, True, "", None),
+        ("verbose", True, LogVerbosity.NONE, True, False, True, "", ""),
+        ("block", True, LogVerbosity.LOGS, True, True, False, "", ""),
+        ("inline", False, LogVerbosity.ERRORS, True, True, True, "", ""),
+        ("basic", False, LogVerbosity.WARNINGS, False, True, True, "", ""),
+        ("verbose", False, LogVerbosity.NONE, True, False, True, "", ""),
+        ("block", False, LogVerbosity.LOGS, True, True, False, "", ""),
+        ("inline", False, LogVerbosity.ERRORS, False, True, True, "", ""),
+        ("basic", False, LogVerbosity.WARNINGS, True, False, True, "", ""),
+        ("verbose", False, LogVerbosity.NONE, True, True, False, "", ""),
+        ("block", False, LogVerbosity.WARNINGS, False, False, True, "", ""),
+        ("inline", False, LogVerbosity.LOGS, False, True, False, "", ""),
+        ("basic", False, LogVerbosity.ERRORS, False, False, False, "", ""),
+        ("basic", False, LogVerbosity.LOGS, False, False, False, "graphics", ""),
+        ("basic", False, LogVerbosity.LOGS, False, False, False, "graphics", "all_vars.json"),
     ],
 )
 def test_run_rufas(
@@ -103,6 +106,7 @@ def test_run_rufas(
     exclude_info_maps: bool,
     only_run_validation: bool,
     graphics_dir: str,
+    vars_file_path: str, 
     mocker: MockerFixture,
     capsys,
 ) -> None:
@@ -112,6 +116,7 @@ def test_run_rufas(
     patch_execute_simulations = mocker.patch("main.execute_simulations")
     patch_run_validation = mocker.patch("main.run_validation")
     patch_empty_dir = mocker.patch("RUFAS.util.Utility.empty_dir")
+    patch_run_reload = mocker.patch("main.run_reload")
 
     # Act
     run_rufas(
@@ -122,10 +127,16 @@ def test_run_rufas(
         exclude_info_maps,
         only_run_validation,
         graphics_dir,
+        vars_file_path,
     )
 
     # Assert
-    if only_run_validation:
+    if vars_file_path:
+        patch_run_reload.assert_called_once_with(
+            vars_file_path, exclude_info_maps, format_option, produce_graphics, graphics_dir
+        )
+        return
+    elif only_run_validation:
         patch_run_validation.assert_called_once_with(
             metadata_file_list, exclude_info_maps, format_option, verbose
         )
@@ -144,10 +155,9 @@ def test_run_rufas(
     else:
         patch_empty_dir.assert_not_called()
 
-    if verbose != LogVerbosity.NONE:
-        captured = capsys.readouterr()
-        expected_message = "RuFaS: Ruminant Farm Systems Model 2023\n"
-        assert expected_message in captured.out
+    captured = capsys.readouterr()
+    expected_message = "RuFaS: Ruminant Farm Systems Model 2023\n"
+    assert expected_message in captured.out
 
 
 @pytest.mark.parametrize("is_data_valid", [(True), (False)])
@@ -258,6 +268,25 @@ def test_execute_simulations(
             Path(""),
         ),
     ] * len(metadata_file_list)
+
+
+def test_run_reload(mocker: MockerFixture) -> None:
+    """Checks the reload_vars_pool function in main.py"""
+    mock_output_manager = mocker.MagicMock(auto_spec=OutputManager)
+    mock_output_manager.flush_pools.return_value = None
+    mock_output_manager.reload_vars_pool.return_value = None
+    mock_output_manager.set_metadata_prefix.return_value = None
+    mock_output_manager.dump_all_nondata_pools.return_value = None
+    mock_output_manager.save_variables.return_value = None
+    mocker.patch("main.OutputManager", return_value=mock_output_manager)
+
+    run_reload("all_vars.json", False, True, Path(""))
+
+    assert mock_output_manager.flush_pools.call_count == 1
+    assert mock_output_manager.reload_vars_pool.call_count == 1
+    assert mock_output_manager.set_metadata_prefix.call_count == 1
+    assert mock_output_manager.save_variables.call_count == 1
+    assert mock_output_manager.dump_all_nondata_pools.call_count == 1
 
 
 def test_parse_gnu_args(mocker: MockerFixture) -> None:

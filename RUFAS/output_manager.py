@@ -1003,7 +1003,7 @@ class OutputManager(object):
         self.errors_pool: Dict[str, OutputManager.pool_element_type] = {}
         self.logs_pool: Dict[str, OutputManager.pool_element_type] = {}
 
-    def reload_pool(self, file_path: Path) -> None:
+    def reload_vars_pool(self, file_path: Path) -> None:
         """Reloads the Output Manager variables pool from file path provided by user in gnu arg.
 
         Parameters
@@ -1017,7 +1017,7 @@ class OutputManager(object):
             If an error occurs while opening or reading the user-provided file path.
         """
         info_map = {"class": self.__class__.__name__,
-                    "function": self.reload_pool.__name__,
+                    "function": self.reload_vars_pool.__name__,
                     }
         self.add_log("open_json_file", f"Attempting to open {str(file_path)}.", info_map)
         try:

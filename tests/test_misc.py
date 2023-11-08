@@ -775,7 +775,7 @@ def output_manager_original_method_states(
         "_list_to_file_txt": mock_output_manager._list_to_file_txt,
         "_list_txt_and_json_files_in_dir": mock_output_manager._list_txt_and_json_files_in_dir,
         "_load_filter_file_content": mock_output_manager._load_filter_file_content,
-        "reload_pool": mock_output_manager.reload_pool,
+        "reload_vars_pool": mock_output_manager.reload_vars_pool,
         "_save_variables_to_csv_files ": mock_output_manager._save_variables_to_csv_files,
         "save_variables": mock_output_manager.save_variables,
         "_save_variables_to_csv_files": mock_output_manager._save_variables_to_csv_files,
@@ -1926,32 +1926,32 @@ def test_make_serializable_recursive(
     assert result == expected_output
 
 
-def test_reload_pool_valid_path(mock_output_manager: OutputManager,
-                                output_manager_original_method_states: Dict[str, Callable],
-                                ) -> None:
-    """Checks that reload_pool loads the valid filepath provided to the OM variables pool"""
+def test_reload_vars_pool_valid_path(mock_output_manager: OutputManager,
+                                     output_manager_original_method_states: Dict[str, Callable],
+                                     ) -> None:
+    """Checks that reload_vars_pool loads the valid filepath provided to the OM variables pool"""
     dummy_data = {"vars": {"var1": {"values": [1, 2, 3], "info_map": {"imvar1": 1, "imvar2": 2}},
                            "var2": {"values": {"a": 1, "b": 2}, "info_map": {}}}}
     with patch('builtins.open', mock_open(read_data=json.dumps(dummy_data))):
-        mock_output_manager.reload_pool(Path("path/to/file"))
+        mock_output_manager.reload_vars_pool(Path("path/to/file"))
         assert mock_output_manager.variables_pool == dummy_data
 
-    mock_output_manager.reload_pool = output_manager_original_method_states[
-        "reload_pool"
+    mock_output_manager.reload_vars_pool = output_manager_original_method_states[
+        "reload_vars_pool"
     ]
 
 
-def test_reload_pool_invalid_path_raises_exception(mock_output_manager: OutputManager,
-                                                   output_manager_original_method_states: Dict[str, Callable],
-                                                   ) -> None:
-    """Checks that reload_pool raises an exception with a bad filepath provided"""
+def test_reload_vars_pool_invalid_path_raises_exception(mock_output_manager: OutputManager,
+                                                        output_manager_original_method_states: Dict[str, Callable],
+                                                        ) -> None:
+    """Checks that reload_vars_pool raises an exception with a bad filepath provided"""
     with patch('builtins.open', mock_open(read_data="bad/file/path")):
         with pytest.raises(Exception):
-            mock_output_manager.reload_pool(Path("bad/file/path"))
+            mock_output_manager.reload_vars_pool(Path("bad/file/path"))
             assert mock_output_manager.variables_pool == {}
 
-    mock_output_manager.reload_pool = output_manager_original_method_states[
-        "reload_pool"
+    mock_output_manager.reload_vars_pool = output_manager_original_method_states[
+        "reload_vars_pool"
     ]
 
 
