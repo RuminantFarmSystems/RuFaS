@@ -26,33 +26,36 @@ file_path = os.path.join(dir_path, "input/ARL.json")
 
 
 @pytest.mark.parametrize(
-    "format_option, no_graphics, graphics_dir, verbose, clear_output, exclude_info_maps, only_run_validation",
+    "no_graphics, format_option, verbose, clear_output, exclude_info_maps, only_run_validation, graphics_dir,"
+    "reload_pool",
     [
-        ("verbose", False, "graphics", LogVerbosity.ERRORS, True, True, True),
-        ("basic", True, "custom_graphics", LogVerbosity.LOGS, False, False, False),
-        ("block", True, "graphics", LogVerbosity.NONE, True, False, False),
-        ("inline", False, "custom_graphics", LogVerbosity.WARNINGS, False, False, False),
-        ("verbose", True, "graphics", LogVerbosity.LOGS, False, True, False),
+        (False, "verbose", LogVerbosity.ERRORS, True, True, True, "graphics", "all_vars.json"),
+        (True, "basic", LogVerbosity.LOGS, False, False, False, "custom_graphics", "all_vars.json"),
+        (True, "block", LogVerbosity.NONE, True, False, False, "graphics", "all_vars.json"),
+        (False, "inline", LogVerbosity.WARNINGS, False, False, False, "custom_graphics", ""),
+        (True, "verbose", LogVerbosity.LOGS, False, True, False, "graphics", ""),
     ],
 )
 def test_main(
-    format_option: str,
     no_graphics: bool,
-    graphics_dir: str,
+    format_option: str,
     verbose: LogVerbosity,
     clear_output: bool,
     exclude_info_maps: bool,
     only_run_validation: bool,
+    graphics_dir: str,
+    reload_pool: str,
 ) -> None:
     with patch("main.parse_gnu_args") as mock_parse_gnu_args:
         mock_parse_gnu_args.return_value = argparse.Namespace(
-            format_option=format_option,
             no_graphics=no_graphics,
-            graphics_dir=graphics_dir,
+            format_option=format_option,
             verbose=verbose,
             clear_output=clear_output,
             exclude_info_maps=exclude_info_maps,
             only_run_validation=only_run_validation,
+            graphics_dir=graphics_dir,
+            reload_pool=reload_pool,
         )
 
         with patch("main.run_rufas") as mock_run_rufas:
@@ -66,6 +69,7 @@ def test_main(
                 exclude_info_maps=exclude_info_maps,
                 only_run_validation=only_run_validation,
                 graphics_dir=Path(graphics_dir),
+                vars_file_path=reload_pool
             )
 
 
@@ -270,7 +274,7 @@ def test_parse_gnu_args(mocker: MockerFixture) -> None:
     actual_args = parse_gnu_args()
 
     # Assert
-    assert mock_add_argument.call_count == 7
+    assert mock_add_argument.call_count == 8
     assert mock_add_argument.call_args_list == [
         mocker.call(
             "-f",
@@ -314,6 +318,11 @@ def test_parse_gnu_args(mocker: MockerFixture) -> None:
             "--only-run-validation",
             help="Only validate the data, don't run a simulation",
             action="store_true",
+        ),
+        mocker.call(
+            "-r",
+            "--reload-pool",
+            help="Reload the output manager's variables pool from provided path",
         ),
     ]
     mock_parse_args.assert_called_once()

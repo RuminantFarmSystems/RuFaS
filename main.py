@@ -74,12 +74,12 @@ def run_rufas(
         Utility.empty_dir(output_dir, keep=keep_list)
 
     sys.stdout.write("RuFaS: Ruminant Farm Systems Model 2023\n")
-    metadata_file_list: List[MetadataPaths] = METADATA_PATHS
+    metadata_files: List[MetadataPaths] = METADATA_PATHS
     if only_run_validation:
-        run_validation(metadata_file_list, exclude_info_maps, format_option, verbose)
+        run_validation(metadata_files, exclude_info_maps, format_option, verbose)
     else:
         execute_simulations(
-            metadata_file_list,
+            metadata_files,
             exclude_info_maps,
             produce_graphics,
             graphics_dir,
@@ -93,11 +93,11 @@ def reload_var_pool(vars_file_path: str) -> None:
 
     Parameters
     ----------
-    vars_file_path : str
+    reload_pool_path : str
         The file path to the variables file to reload into the Output Manager's variables pool.
     """
     output_manager = OutputManager()
-    vars_file_path = Path(vars_file_path)
+    vars_file_path = Path("output/" + vars_file_path)
     output_manager.reload_pool(vars_file_path)
 
 
