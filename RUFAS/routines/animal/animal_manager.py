@@ -835,7 +835,8 @@ class AnimalManager:
         return num_animals / num_spaces
 
     @classmethod
-    def _allocate_animals_to_pens_helper(cls, animals, pens: List[Pen]) -> None:
+    def _allocate_animals_to_pens_helper(cls, animals: List[Union[Calf, HeiferI, HeiferII, HeiferIII, Cow]],
+                                         pens: List[Pen]) -> None:
         """
         Allocate animals to pens based on overall density while preventing overcrowding.
 
@@ -844,9 +845,8 @@ class AnimalManager:
 
         Parameters
         ----------
-        animals :
+        animals : List[Union[Calf, HeiferI, HeiferII, HeiferIII, Cow]]
             A list of animal to be allocated to pens.
-            # TODO: Add type hint for animals later
         pens : List[Pen]
             A list of Pen objects representing the available pens. All these pens should have
             the same animal combination.
@@ -872,7 +872,7 @@ class AnimalManager:
     @classmethod
     def execute_allocation_plan(cls,
                                 allocation_plan: List[int],
-                                animals,
+                                animals: List[Union[Calf, HeiferI, HeiferII, HeiferIII, Cow]],
                                 animal_pens: List[Pen]) -> None:
         """
         Execute an allocation plan to distribute animals into pens according to the given plan.
@@ -886,9 +886,8 @@ class AnimalManager:
             A list of integers representing the number of animals to be allocated to each pen.
             The length of the allocation_plan list must match the number of pens in animal_pens.
 
-        animals
+        animals : List[Union[Calf, HeiferI, HeiferII, HeiferIII, Cow]]
             A list of animals to be allocated among the pens.
-            # TODO: Add type hint for animals later
 
         animal_pens : List[Pen]
             A list of Pen objects representing the pens to which animals will be allocated.
@@ -1032,9 +1031,11 @@ class AnimalManager:
         self.fully_update_animal_to_pen_id_map()
 
     def _sort_animals_before_allocation(self) -> None:
-        # Sort lactating cows by days in milk in increasing order
+        """
+        Sort lactating cows by days in milk in increasing order.
+        """
         self.cows = self._get_dry_cows(self.cows) + \
-                    sorted(self._get_lactating_cows(self.cows), key=lambda cow: cow.days_in_milk)
+            sorted(self._get_lactating_cows(self.cows), key=lambda cow: cow.days_in_milk)
 
     def clear_pens(self) -> None:
         """
@@ -1220,7 +1221,6 @@ class AnimalManager:
             'CI_avg': CI_avg
         }
 
-# TODO check the new type hints here are correct
     def get_life_cycle_output(self, num_animals: int) -> Tuple[List[Tuple[AnimalBase, str, bool]],
                                                                Dict[str, Dict | int]]:
         """
@@ -1230,13 +1230,14 @@ class AnimalManager:
 
         Parameters
         ----------
-        num_animals: the number of each type of animal (calves, heiferIs,
-        heiferIIs, heiferIIIs, cows, sold_heifers, and culled_cows) for
-        which information will be collected and returned. If num_animals is
-        larger than the minimum length of the animal lists, then num_animals
-        will be set to the minimum length of the animal lists
+        num_animals: int
+            the number of each type of animal (calves, heiferIs, heiferIIs, heiferIIIs, cows, sold_heifers, and
+            culled_cows) for which information will be collected and returned. If num_animals is largerthan the minimum
+            length of the animal lists, then num_animals will be set to the minimum length of the animal lists.
 
-        Returns: a dictionary which contains the individual life cycle output
+        Returns : Tuple[List[Tuple[AnimalBase, str, bool]], Dict[str, Dict | int]]
+            A list of animals, and a dictionary which contains the individual life cycle output.
+
         """
         minimum_num = min(len(self.calves), len(self.heiferIs),
                           len(self.heiferIIs), len(self.heiferIIIs),
@@ -1636,9 +1637,22 @@ class AnimalManager:
 
     def _handle_graduated_animals(self, animals_snapshot_before_update,
                                   animals_snapshot_after_update,
-                                  feed, temp) -> None:
+                                  feed: Feed, temp: float) -> None:
         """
-        TODO
+        Finds animals that have graduated (moved from one class to another), moves them between pens,
+         and updates pen id map accordingly.
+
+        Parameters
+        ----------
+        animals_snapshot_before_update : TODO
+
+        animals_snapshot_after_update : TODO
+
+        feed : Feed
+            instance of the Feed class defined in feed.py.
+        temp : float
+            The temperature on the current day.
+
         """
         graduated_animals = set()
         for animal_class_name in ['heiferIs', 'heiferIIs', 'heiferIIIs', 'cows']:
@@ -1654,7 +1668,7 @@ class AnimalManager:
 
         Parameters
         ----------
-        animal : List(Union[Calf, HeiferI, HeiferII, HeiferIII, Cow])
+        animal : List[Union[Calf, HeiferI, HeiferII, HeiferIII, Cow]]
             One of the possible animal types.
         feed : Feed
             instance of the Feed class defined in feed.py.
