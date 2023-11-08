@@ -83,20 +83,20 @@ class SoilTemp:
                                                                      combined_previous_top_soil_layer_temp,
                                                                      bare_soil_surface_temp)
 
-        new_combined_previous_top_soil_temperature = self._determine_weighted_average_temperature(
-            self.data.soil_layers[0].temperature, self.data.soil_layers[0].layer_thickness,
-            self.data.soil_layers[1].temperature, self.data.soil_layers[1].layer_thickness
-        )
-        combined_top_layer_center_depth = self.data.soil_layers[1].bottom_depth / 2
-        depth_factor = self._determine_depth_factor(combined_top_layer_center_depth, damping_depth)
-        new_combined_top_soil_temperature = self._determine_average_soil_temperature(
-            self.data.previous_temperature_effect, new_combined_previous_top_soil_temperature, depth_factor,
-            avg_annual_air_temp, actual_soil_surface_temp)
-        for layer in self.data.soil_layers[:2]:
-            layer.previous_day_temperature = combined_previous_top_soil_layer_temp
-            layer.temperature = new_combined_top_soil_temperature
+        # new_combined_previous_top_soil_temperature = self._determine_weighted_average_temperature(
+        #     self.data.soil_layers[0].temperature, self.data.soil_layers[0].layer_thickness,
+        #     self.data.soil_layers[1].temperature, self.data.soil_layers[1].layer_thickness
+        # )
+        # combined_top_layer_center_depth = self.data.soil_layers[1].bottom_depth / 2
+        # depth_factor = self._determine_depth_factor(combined_top_layer_center_depth, damping_depth)
+        # new_combined_top_soil_temperature = self._determine_average_soil_temperature(
+        #     self.data.previous_temperature_effect, new_combined_previous_top_soil_temperature, depth_factor,
+        #     avg_annual_air_temp, actual_soil_surface_temp)
+        # for layer in self.data.soil_layers[:2]:
+        #     layer.previous_day_temperature = combined_previous_top_soil_layer_temp
+        #     layer.temperature = new_combined_top_soil_temperature
 
-        for layer in self.data.soil_layers[2:]:
+        for layer in self.data.soil_layers:
             new_previous_temperature = layer.temperature
             layer_depth_factor = self._determine_depth_factor(layer.depth_of_layer_center, damping_depth)
             if layer.previous_day_temperature is None:
