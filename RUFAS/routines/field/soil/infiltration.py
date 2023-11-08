@@ -85,7 +85,15 @@ class Infiltration:
 
     def _percolate_excess_water(self) -> None:
         """
-        !TODO docstring
+        Percolates large amounts of infiltration through the entire soil profile.
+
+        Notes
+        -----
+        The amount of water allowed to infiltrate the soil on any given day is based on the available capacity of the
+        entire soil profile. So when there is an extreme amount of infiltration or there are multiple days of high
+        infiltration in a row, this method ensures that the excess water will be distributed appropriately throughout
+        the entire soil profile. This method is a used instead of the `percolate()` method in the `Percolation` module.
+
         """
         water_remaining_to_percolate = self.data.infiltrated_water
         for layer in self.data.soil_layers:
