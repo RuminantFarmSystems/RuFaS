@@ -1982,7 +1982,8 @@ def test_get_user_filepath(mock_output_manager: OutputManager, monkeypatch,
     mock_output_manager._get_user_filepath = output_manager_original_method_states[
         "_get_user_filepath"
     ]
-=======
+
+
 @pytest.mark.parametrize(
     "self, other, expected_result",
     [
