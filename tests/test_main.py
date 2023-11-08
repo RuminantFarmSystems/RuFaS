@@ -75,7 +75,7 @@ def test_main(
 
 
 @pytest.mark.parametrize(
-    "format_option, produce_graphics, verbose, clear_output, exclude_info_maps, only_run_validation," 
+    "format_option, produce_graphics, verbose, clear_output, exclude_info_maps, only_run_validation,"
     "graphics_dir, vars_file_path",
     [
         ("verbose", True, LogVerbosity.NONE, True, True, True, "", None),
@@ -106,7 +106,7 @@ def test_run_rufas(
     exclude_info_maps: bool,
     only_run_validation: bool,
     graphics_dir: str,
-    vars_file_path: str, 
+    vars_file_path: str,
     mocker: MockerFixture,
     capsys,
 ) -> None:
