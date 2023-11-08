@@ -16,7 +16,7 @@
     },
     "crop": {
       "title": "Crop data",
-      "description": "The configuration file for the crop and soil module.",
+      "description": "Contains a crop rotation specification.",
       "path": "input/data/crop/default_rotation.json",
       "type": "json",
       "properties": "crop_schedule_properties"
@@ -65,14 +65,14 @@
     },
     "soil_1": {
       "title": "Soil data",
-      "description": "The configuration file for the soil module.",
+      "description": "The first configuration file for the soil module.",
       "path": "input/data/soil/default_soil.json",
       "type": "json",
       "properties": "soil_profile_properties"
     },
     "soil_2": {
       "title": "Soil data",
-      "description": "Another configuration file for the soil module.",
+      "description": "The second configuration file for the soil module.",
       "path": "input/data/soil/default_soil_2.json",
       "type": "json",
       "properties": "soil_profile_properties"
