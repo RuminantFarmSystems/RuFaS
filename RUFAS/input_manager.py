@@ -597,78 +597,28 @@ class InputManager:
         self.counter.increment("invalid_elements")
         return False
 
-    # def _validate_primitive_type_with_revalidation(self, variable_path: List[str | int],
-    #                                                variable_properties: Dict[str, Any],
-    #                                                input_data: Dict[str, Any],
-    #                                                primitive_type_specific_validators: List[
-    #                                                    Callable[[Any, Dict[str, Any]], Tuple[
-    #                                                        bool, str]]]) -> bool:
-    #     """
-    #     Validate input data of primitive type (string, number, boolean) with revalidation of the fixed data.
-    #
-    #     If the input data element is invalid, the function will attempt to fix it and then revalidate it.
-    #
-    #     Parameters
-    #     ----------
-    #     variable_path : List[str | int]
-    #         The path to the variable by following the keys in the input_data dictionary.
-    #     variable_properties : Dict[str, Any]
-    #         The properties for the variable of interest.
-    #     input_data : Dict[str, Any]
-    #         A reference to the input data dictionary to enable in-place fixing.
-    #     primitive_type_specific_validators : List[Callable[[Any, Dict[str, Any]], Tuple[bool, str]]]
-    #         A list of functions to use for validating the input data element.
-    #
-    #     Returns
-    #     -------
-    #     bool
-    #         True if the element was valid or fixed, False otherwise.
-    #     """
-    #
-    #     self.counter.increment("total_elements")
-    #     attempted_fix = False
-    #     info_map = {
-    #         "class": self.__class__.__name__,
-    #         "function": self._handle_validation_error.__name__,
-    #     }
-    #     variable_path_str = self._convert_variable_path_to_str(variable_path)
-    #
-    #     idx = 0
-    #     while idx < len(primitive_type_specific_validators):
-    #         element_to_validate = self._get_nested_dict_value(input_data, variable_path)
-    #         is_valid, error_msg = primitive_type_specific_validators[idx](element_to_validate, variable_properties)
-    #         if is_valid:
-    #             idx += 1
-    #             continue
-    #
-    #         if attempted_fix:
-    #             om.add_error("Fixed element is still invalid",
-    #                          f"{variable_path_str} = {element_to_validate}",
-    #                          info_map)
-    #             self.counter.increment("invalid_elements")
-    #             return False
-    #
-    #         om.add_warning(error_msg, f"{variable_path_str} = {element_to_validate}", info_map)
-    #         is_variable_fixable = self._fix_data(variable_properties, variable_path, input_data)
-    #         if is_variable_fixable:
-    #             attempted_fix = True
-    #             idx = 0
-    #             continue
-    #
-    #         om.add_error("Invalid unfixable element found",
-    #                      f"{variable_path_str} = {element_to_validate}",
-    #                      info_map)
-    #         self.counter.increment("invalid_elements")
-    #         return False
-    #
-    #     if attempted_fix:
-    #         self.counter.increment("fixed_elements")
-    #     else:
-    #         self.counter.increment("valid_elements")
-    #     return True
-
     def _revalidate_element_after_fix(self, variable_path, variable_properties, input_data,
                                       primitive_type_specific_validators):
+        """
+        Revalidate an element after fixing it.
+
+        Parameters
+        ----------
+        variable_path : List[str | int]
+            The path to the variable by following the keys in the input_data dictionary.
+        variable_properties : Dict[str, Any]
+            The properties for the variable of interest.
+        input_data : Dict[str, Any]
+            A reference to the input data dictionary to enable in-place fixing.
+        primitive_type_specific_validators : List[Callable[[Any, Dict[str, Any]], Tuple[bool, str]]]
+            A list of functions to use for validating the input data element.
+
+        Returns
+        -------
+        bool
+            True if the element was valid or fixed, False otherwise.
+        """
+
         element_to_validate = self._get_nested_dict_value(input_data, variable_path)
         variable_path_str = self._convert_variable_path_to_str(variable_path)
         info_map = {
@@ -693,6 +643,26 @@ class InputManager:
                                                    primitive_type_specific_validators: List[
                                                        Callable[[Any, Dict[str, Any]], Tuple[
                                                            bool, str]]]) -> bool:
+        """
+        Validate input data of primitive type (string, number, boolean) with revalidation of the fixed data.
+
+        Parameters
+        ----------
+        variable_path : List[str | int]
+            The path to the variable by following the keys in the input_data dictionary.
+        variable_properties : Dict[str, Any]
+            The properties for the variable of interest.
+        input_data : Dict[str, Any]
+            A reference to the input data dictionary to enable in-place fixing.
+        primitive_type_specific_validators : List[Callable[[Any, Dict[str, Any]], Tuple[bool, str]]]
+            A list of functions to use for validating the input data element.
+
+        Returns
+        -------
+        bool
+            True if the element was valid or fixed, False otherwise.
+        """
+
         self.counter.increment("total_elements")
         element_to_validate = self._get_nested_dict_value(input_data, variable_path)
         variable_path_str = self._convert_variable_path_to_str(variable_path)
