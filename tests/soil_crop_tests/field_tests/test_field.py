@@ -1000,7 +1000,7 @@ def test_execute_daily_processes(field_size: float, crops_growing: bool, residue
                              (1.9, 4.66, 1.22, False, 30.6, 200, 16.5, 20.5, 18.5, 44.5, 0.6, 0.4, True),
                              (2.3, 5.6, 2.1, True, 44.5, 250, 22.33, 25.36, 24.6, 80.4, 0.77, 0.23, False),
                              (2.3, 5.6, 2.1, True, 44.5, 250, 22.33, 25.36, 24.6, 80.4, 0.0, 0.0, False)
-])
+                         ])
 def test_cycle_water(field_size: float, rainfall: float, runoff: float, high_water_table: bool, residue: float,
                      light: float, min_temp: float, max_temp: float, mean_temp: float, surface_residue: float,
                      crop_1_proportion: float, crop_2_proportion: float, crops_growing: bool) -> None:

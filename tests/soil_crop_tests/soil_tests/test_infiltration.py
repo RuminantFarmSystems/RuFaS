@@ -251,8 +251,7 @@ def test_infiltrate(rainfall: float, is_top_frozen: bool, expected_runoff: float
             patch("RUFAS.routines.field.soil.infiltration.Infiltration._determine_first_moisture_condition_parameter",
                   return_value=10) as first_curve_num, \
             patch("RUFAS.routines.field.soil.infiltration.Infiltration."
-                  "_determine_retention_parameter_for_moisture_condition", return_value=0.5) as \
-                    retention_param_for_moisture, \
+                  "_determine_retention_parameter_for_moisture_condition", return_value=0.5) as moisture_param, \
             patch("RUFAS.routines.field.soil.infiltration.Infiltration._determine_second_shape_coefficient",
                   return_value=1.1) as second_shape, \
             patch("RUFAS.routines.field.soil.infiltration.Infiltration._determine_first_shape_coefficient",
@@ -269,7 +268,7 @@ def test_infiltrate(rainfall: float, is_top_frozen: bool, expected_runoff: float
         third_curve_num.assert_called_once_with(85.0)
         first_curve_num.assert_called_once_with(85.0)
         retention_param_for_moisture_calls = [call(10), call(90)]
-        retention_param_for_moisture.assert_has_calls(retention_param_for_moisture_calls)
+        moisture_param.assert_has_calls(retention_param_for_moisture_calls)
         second_shape.assert_called_once_with(125.0, 200.0, 0.5, 0.5)
         first_shape.assert_called_once_with(125.0, 0.5, 0.5, 1.1)
         retention_param.assert_called_once_with(115.0, 0.5, 1.2, 1.1)
