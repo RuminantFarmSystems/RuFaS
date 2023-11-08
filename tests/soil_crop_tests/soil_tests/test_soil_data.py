@@ -1,14 +1,10 @@
 import pytest
-from typing import Dict, List
-from math import inf, log, exp
-from dataclasses import asdict
-from unittest.mock import patch, PropertyMock, MagicMock
+from typing import List
+from math import inf
+from unittest.mock import patch, PropertyMock
 
-from RUFAS.routines.field.soil.soil_config_factory import SoilConfiguration, SoilConfigFactory
 from RUFAS.routines.field.soil.soil_data import SoilData
 from RUFAS.routines.field.soil.layer_data import LayerData
-from RUFAS.routines.field.crop_and_soil_constants import MEGAGRAMS_TO_KILOGRAMS, HECTARES_TO_SQUARE_MILLIMETERS, \
-    CUBIC_MILLIMETERS_TO_CUBIC_METERS, KILOGRAMS_TO_MILLIGRAMS, MILLIGRAMS_TO_KILOGRAMS
 
 
 def test_get_vectorized_layer_attribute() -> None:
