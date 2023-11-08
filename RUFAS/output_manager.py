@@ -1,7 +1,9 @@
 # !/usr/bin/env python3
 
 from copy import deepcopy
+from enum import Enum
 from pathlib import Path
+import sys
 from typing import Any, Dict, List, Optional, Union
 import datetime
 import json
@@ -12,6 +14,43 @@ from deprecated.sphinx import deprecated
 
 from RUFAS.util import Utility
 from RUFAS.graph_generator import GraphGenerator
+
+
+class LogVerbosity(Enum):
+    """
+    The different types of logs printed by Output Manager. Set by the `verbose` gnu arg in main.py.
+
+    Notes
+    -----
+    NONE is the default setting.
+    Selecting NONE will tell OutputManager not to print out anything during a simulation.
+    Selecting ERRORS will tell OutputManager to print out all errors added during a simulation.
+    Selecting WARNINGS will tell OutputManager to print out all warnings and errors added during a simulation.
+    Selecting LOGS will tell OutputManager to print out all logs, warnings, and errors added during a simulation.
+    """
+
+    NONE = "none"
+    ERRORS = "errors"
+    WARNINGS = "warnings"
+    LOGS = "logs"
+
+    def __le__(self, other) -> bool:
+        if self == other:
+            return True
+        if self == LogVerbosity.NONE:
+            return True
+        if self == LogVerbosity.ERRORS and other != LogVerbosity.NONE:
+            return True
+        if self == LogVerbosity.WARNINGS and other == LogVerbosity.LOGS:
+            return True
+        if self == LogVerbosity.LOGS:
+            return False
+        return False
+
+    def __str__(self) -> bool:
+        if self.value == "none":
+            return "NONE"
+        return self.value[:-1].upper()
 
 
 class OutputManager(object):
@@ -52,11 +91,12 @@ class OutputManager(object):
             self.errors_pool: Dict[str, OutputManager.pool_element_type] = {}
             self.logs_pool: Dict[str, OutputManager.pool_element_type] = {}
             self.__metadata_prefix: str = ""
-            self.supported_filter_types_prefixes: Dict[str, str] = {
+            self.__supported_filter_types_prefixes: Dict[str, str] = {
                 "csv": "csv_",
                 "graph": "graph_",
                 "json": "json_",
             }
+            self.__log_verbose: LogVerbosity = LogVerbosity("none")
             self.add_log(
                 "init_log",
                 "Output Manager instantiated.",
@@ -155,6 +195,7 @@ class OutputManager(object):
         info_map["timestamp"] = self._get_timestamp(include_millis=True)
         key = self._generate_key(name, info_map)
         self._add_to_pool(self.logs_pool, key, msg, info_map)
+        self._handle_log_output(name, msg, info_map, LogVerbosity.LOGS)
 
     def add_warning(self, name: str, msg: str, info_map: Dict[str, Any]) -> None:
         """
@@ -183,6 +224,7 @@ class OutputManager(object):
         info_map["timestamp"] = self._get_timestamp(include_millis=True)
         key = self._generate_key(name, info_map)
         self._add_to_pool(self.warnings_pool, key, msg, info_map)
+        self._handle_log_output(name, msg, info_map, LogVerbosity.WARNINGS)
 
     def add_error(self, name: str, msg: str, info_map: Dict[str, Any]) -> None:
         """
@@ -211,10 +253,50 @@ class OutputManager(object):
         info_map["timestamp"] = self._get_timestamp(include_millis=True)
         key = self._generate_key(name, info_map)
         self._add_to_pool(self.errors_pool, key, msg, info_map)
+        self._handle_log_output(name, msg, info_map, LogVerbosity.ERRORS)
+
+    def _handle_log_output(
+        self, name: str, msg: str, info_map: Dict[str, Any], log_level: LogVerbosity
+    ) -> None:
+        """Formats log output based on log_level.
+
+        Parameters
+        ----------
+        name : str
+            The name of the log.
+        msg : str
+            The log message to be added to the pool.
+        info_map : Dict[str, Any]
+            Additional args to be logged.
+        log_level : LogVerbosity
+            The LogVerbosity level.
+        """
+        colors: Dict[LogVerbosity, str] = {
+            LogVerbosity.NONE: "\033[0m",
+            LogVerbosity.ERRORS: "\33[91m",
+            LogVerbosity.WARNINGS: "\33[93m",
+            LogVerbosity.LOGS: "\33[92m",
+        }
+        if log_level <= self.__log_verbose:
+            log_format = "{color}[{timestamp}][{log_level}][{metadata_prefix}] {name}: {message}{color_reset}\n"
+            formatted_msg = log_format.format(
+                timestamp=info_map["timestamp"],
+                color=colors[log_level],
+                color_reset=colors[LogVerbosity.NONE],
+                metadata_prefix=self.__metadata_prefix,
+                name=name,
+                message=msg,
+                log_level=log_level,
+            )
+            sys.stdout.write(formatted_msg)
 
     def set_metadata_prefix(self, metadata_prefix: str) -> None:
         """Sets the metadata_prefix attribute."""
         self.__metadata_prefix = metadata_prefix
+
+    def set_log_verbose(self, log_verbose: LogVerbosity = LogVerbosity.NONE) -> None:
+        """Sets the __log_verbose attribute"""
+        self.__log_verbose = log_verbose
 
     def _get_timestamp(self, include_millis: bool = False) -> str:
         """
@@ -697,18 +779,20 @@ class OutputManager(object):
             if exclude_info_maps:
                 filtered_pool = self._exclude_info_maps(filtered_pool)
 
-            if filter_file.startswith(self.supported_filter_types_prefixes["json"]):
+            if filter_file.startswith(self.__supported_filter_types_prefixes["json"]):
                 file_path = os.path.join(
                     save_path,
                     self._generate_file_name(f"saved_variables_{filter_file}", "json"),
                 )
                 self._dict_to_file_json(filtered_pool, file_path)
-            elif filter_file.startswith(self.supported_filter_types_prefixes["csv"]):
+            elif filter_file.startswith(self.__supported_filter_types_prefixes["csv"]):
                 csv_directory = os.path.join(save_path, "CSVs", "om")
                 self._save_variables_to_csv_files(
                     filtered_pool, filter_file, csv_directory
                 )
-            elif filter_file.startswith(self.supported_filter_types_prefixes["graph"]):
+            elif filter_file.startswith(
+                self.__supported_filter_types_prefixes["graph"]
+            ):
                 if produce_graphics:
                     try:
                         graph_generator.generate_graph(
@@ -728,8 +812,8 @@ class OutputManager(object):
                     )
             else:
                 self.add_warning(
-                    "invalid filter file",
-                    f"{filter_file} must be prefixed with one of {list(self.supported_filter_types_prefixes.values())}",
+                    "invalid filter file prefix",
+                    f"{filter_file} prefix is not in {list(self.__supported_filter_types_prefixes.values())}",
                     info_map,
                 )
 
