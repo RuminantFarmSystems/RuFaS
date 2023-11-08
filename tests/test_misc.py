@@ -1941,13 +1941,20 @@ def test_reload_vars_pool_valid_path(mock_output_manager: OutputManager,
     ]
 
 
-def test_reload_vars_pool_invalid_path_raises_exception(mock_output_manager: OutputManager,
+@patch("builtins.open", new_callable=mock_open)
+def test_reload_vars_pool_invalid_path_raises_exception(mock_file: MagicMock, mock_output_manager: OutputManager,
                                                         output_manager_original_method_states: Dict[str, Callable],
                                                         ) -> None:
-    """Checks that reload_vars_pool raises an exception with a bad filepath provided"""
+    """Checks that reload_vars_pool raises exceptions with a bad filepath provided"""
+    mock_file.side_effect = FileNotFoundError
+    with pytest.raises(FileNotFoundError):
+        mock_output_manager.reload_vars_pool(Path("bad/file/path"))
+        assert mock_output_manager.variables_pool == {}
+
+    mock_file.return_value.read.return_value = "this is not valid JSON"
     with patch('builtins.open', mock_open(read_data="bad/file/path")):
-        with pytest.raises(Exception):
-            mock_output_manager.reload_vars_pool(Path("bad/file/path"))
+        with pytest.raises(json.JSONDecodeError):
+            mock_output_manager.reload_vars_pool(Path("bad/file/path.json"))
             assert mock_output_manager.variables_pool == {}
 
     mock_output_manager.reload_vars_pool = output_manager_original_method_states[

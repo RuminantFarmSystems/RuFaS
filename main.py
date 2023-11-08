@@ -30,7 +30,7 @@ def main():
         exclude_info_maps=cmd_arguments.exclude_info_maps,
         only_run_validation=cmd_arguments.only_run_validation,
         graphics_dir=Path(cmd_arguments.graphics_dir),
-        vars_file_path=cmd_arguments.reload_pool,
+        vars_file_path=cmd_arguments.load_pool,
     )
 
 
@@ -63,10 +63,10 @@ def run_rufas(
     graphics_dir : Path, optional, default=Path("")
         The directory for saving graphics.
     vars_file_path : str, optional, default=None
-        The path to the variables file to be reloaded into the Output Manager's variables pool.
+        The path to the variables file to be loaded into the Output Manager's variables pool.
     """
     if vars_file_path:
-        run_reload(vars_file_path, exclude_info_maps, format_option, produce_graphics, graphics_dir)
+        run_load_vars_pool(vars_file_path, exclude_info_maps, format_option, produce_graphics, graphics_dir)
         return
     if clear_output:
         output_dir = Path(config.global_variables.OUT_DIR)
@@ -88,20 +88,20 @@ def run_rufas(
         )
 
 
-def run_reload(
+def run_load_vars_pool(
     vars_file_path: str,
     exclude_info_maps: bool = False,
     format_option: str = "verbose",
     produce_graphics: bool = True,
     graphics_dir: Path = Path("")
 ) -> None:
-    """Instantiates Output Manager and triggers reloading of the variables pool from the provided file path
+    """Instantiates Output Manager and triggers loading of the variables pool from the provided file path
     for post-processing.
 
     Parameters
     ----------
     vars_file_path : str
-        The file path to the variables file to reload into the Output Manager's variables pool.
+        The file path to the variables file to load into the Output Manager's variables pool.
     exclude_info_maps : bool, optional
         Flag for whether or not the user wants to inlcude info_maps data in their results files.
     produce_graphics : bool, optional
@@ -111,7 +111,7 @@ def run_reload(
     """
     output_manager = OutputManager()
     output_manager.flush_pools()
-    output_manager.reload_vars_pool(Path("output/" + vars_file_path))
+    output_manager.reload_vars_pool(Path(vars_file_path))
     output_manager.set_metadata_prefix("reload")
     output_manager.dump_all_nondata_pools(
             r"output", exclude_info_maps, format_option
@@ -310,9 +310,9 @@ def parse_gnu_args() -> argparse.Namespace:
         action="store_true",
     )
     parser.add_argument(
-        "-r",
-        "--reload-pool",
-        help="Reload the output manager's variables pool from provided path",
+        "-l",
+        "--load-pool",
+        help="Load the output manager's variables pool from provided path",
     )
     return parser.parse_args()
 
