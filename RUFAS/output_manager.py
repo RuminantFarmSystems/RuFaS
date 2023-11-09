@@ -731,7 +731,7 @@ class OutputManager(object):
     def save_variables(
         self,
         save_path: Path,
-        dir_path: Path,
+        filters_dir_path: Path,
         exclude_info_maps: bool = False,
         produce_graphics: bool = True,
         graphics_dir: Path = Path(""),
@@ -745,7 +745,7 @@ class OutputManager(object):
         save_path : Path
             Path to the directory where the file will be saved.
 
-        dir_path : Path
+        filters_dir_path : Path
             Path of the directory containing the files containing the keys for filtering.
 
         exclude_info_maps : bool
@@ -766,7 +766,7 @@ class OutputManager(object):
             f"exclude_info_maps flag set to {exclude_info_maps}",
             info_map,
         )
-        list_of_filter_files = self._list_txt_and_json_files_in_dir(dir_path)
+        list_of_filter_files = self._list_txt_and_json_files_in_dir(filters_dir_path)
         for filter_file in list_of_filter_files:
             for _, supported_prefix in self.__supported_filter_types_prefixes.items():
                 if filter_file.startswith(supported_prefix):
@@ -778,7 +778,7 @@ class OutputManager(object):
                     info_map,
                 )
                 continue
-            input_path = os.path.join(dir_path, filter_file)
+            input_path = os.path.join(filters_dir_path, filter_file)
             filter_contents = self._load_filter_file_content(input_path)
             for filter_content in filter_contents:
                 if "filters" not in filter_content.keys():
