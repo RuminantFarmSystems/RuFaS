@@ -155,8 +155,7 @@ def mock_soil_data() -> SoilData:
     (True, False, 10.0, True, [10.0, 50.0, 100.0])
 ])
 def test_percolate(can_percolate: bool, seasonal_high_water_table: bool, infiltration: float,
-                   excessive_infiltration: bool, expected: List[float],
-                   mock_soil_data: SoilData) -> None:
+                   excessive_infiltration: bool, expected: List[float], mock_soil_data: SoilData) -> None:
     """Tests the main routine of percolation.py and check that it updates all values correctly."""
     mock_soil_data.infiltrated_water = infiltration
     incorp = Percolation(mock_soil_data)

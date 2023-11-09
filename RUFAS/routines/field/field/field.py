@@ -997,7 +997,9 @@ class Field:
 
         remaining_evapotranspirative_demand = self._evaporate_from_crop_canopies(full_evapotranspirative_demand)
 
-        self._handle_soil_water_movement(water_reaching_soil)
+        # self._handle_soil_water_movement(water_reaching_soil)
+        self.soil.infiltration.infiltrate(water_reaching_soil)
+        self.soil.percolation.percolate(self.field_data.seasonal_high_water_table)
         self.soil.soil_erosion.erode(self.field_data.field_size, 0.02, self.field_data.current_residue,
                                      total_precipitation)
         self.soil.phosphorus_cycling.cycle_phosphorus(water_reaching_soil, self.soil.data.accumulated_runoff,
@@ -1043,22 +1045,22 @@ class Field:
                 crop.data.cumulative_transpiration = 0.0
                 crop.data.cumulative_potential_evapotranspiration = 0.0
 
-    def _handle_soil_water_movement(self, water_reaching_soil: float) -> None:
-        """
-        Properly executes water movement within the soil profile.
-
-        Parameters
-        ----------
-        water_reaching_soil : float
-            Amount of water reaching the soil surface (mm).
-
-        """
-        if water_reaching_soil > 0.0:
-            self.soil.infiltration.infiltrate(water_reaching_soil)
-        else:
-            self.soil.data.infiltrated_water = 0.0
-            self.soil.data.accumulated_runoff = 0.0
-            self.soil.percolation.percolate(self.field_data.seasonal_high_water_table)
+    # def _handle_soil_water_movement(self, water_reaching_soil: float) -> None:
+    #     """
+    #     Properly executes water movement within the soil profile.
+    #
+    #     Parameters
+    #     ----------
+    #     water_reaching_soil : float
+    #         Amount of water reaching the soil surface (mm).
+    #
+    #     """
+    #     if water_reaching_soil > 0.0:
+    #         self.soil.infiltration.infiltrate(water_reaching_soil)
+    #     else:
+    #         self.soil.data.infiltrated_water = 0.0
+    #         self.soil.data.accumulated_runoff = 0.0
+    #         self.soil.percolation.percolate(self.field_data.seasonal_high_water_table)
 
     def _determine_watering_amount(self, rainfall: float, year: int, day: int, irrigation: float) -> float:
         """Manages watering of the field.
