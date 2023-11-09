@@ -1,6 +1,6 @@
 from RUFAS.routines.field.manager.field_manager import FieldManager
 from RUFAS.routines.field.manager.crop_schedule import CropSchedule
-from RUFAS.routines.field.manager.current_weather import CurrentWeather
+from RUFAS.current_day_conditions import CurrentDayConditions
 from RUFAS.routines.field.manager.fertilizer_schedule import FertilizerSchedule
 from RUFAS.routines.field.manager.manure_schedule import ManureSchedule
 from RUFAS.routines.field.manager.tillage_schedule import TillageSchedule
@@ -8,69 +8,57 @@ from RUFAS.routines.field.field.field_data import FieldData
 from RUFAS.routines.field.field.field import Field
 from RUFAS.routines.field.soil.layer_data import LayerData
 from RUFAS.routines.field.soil.soil import Soil
-from RUFAS.classes import Time, Weather
-from RUFAS.util import Utility
+from RUFAS.routines.field.soil.soil_data import SoilData
+from RUFAS.config import Config
+from RUFAS.time import Time
+from RUFAS.weather import Weather
 from RUFAS.routines.manure.manure_manager import ManureManager
 import pytest
-from typing import List, Dict
-from unittest.mock import MagicMock, patch
+from pytest_mock.plugin import MockerFixture
+from typing import List, Dict, Callable
+from unittest.mock import MagicMock, patch, call
 
 
-@pytest.mark.parametrize("year,day,expected", [
-    (1, 3, CurrentWeather(incoming_light=3, min_air_temperature=3, mean_air_temperature=3, max_air_temperature=3,
-                          annual_mean_air_temperature=1, rainfall=3, irrigation=3, daylength=15.5)),
-    (2, 1, CurrentWeather(incoming_light=4, min_air_temperature=4, mean_air_temperature=4, max_air_temperature=4,
-                          annual_mean_air_temperature=2, rainfall=4, irrigation=4, daylength=15.5)),
-    (3, 2, CurrentWeather(incoming_light=8, min_air_temperature=8, mean_air_temperature=8, max_air_temperature=8,
-                          annual_mean_air_temperature=3, rainfall=8, irrigation=8, daylength=15.5))
+@pytest.mark.parametrize("field_blob_names", [
+    [],
+    ["field_1", "field_2", "field_3"]
 ])
-def test_create_current_weather(year: int, day: int, expected) -> None:
-    """Tests that current weather objects are correctly created from a time and weather object."""
-    weather = MagicMock()
-    setattr(weather, "radiation", [[1, 2, 3], [4, 5, 6], [7, 8, 9]])
-    setattr(weather, "T_min", [[1, 2, 3], [4, 5, 6], [7, 8, 9]])
-    setattr(weather, "T_avg", [[1, 2, 3], [4, 5, 6], [7, 8, 9]])
-    setattr(weather, "T_max", [[1, 2, 3], [4, 5, 6], [7, 8, 9]])
-    setattr(weather, "T_avg_annual", [1, 2, 3])
-    setattr(weather, "rainfall", [[1, 2, 3], [4, 5, 6], [7, 8, 9]])
-    setattr(weather, "irrigation", [[1, 2, 3], [4, 5, 6], [7, 8, 9]])
-    CurrentWeather.determine_daylength = MagicMock(return_value=15.5)
-    time = MagicMock()
-    setattr(time, "year", year)
-    setattr(time, "day", day)
+def test_field_manager_init(field_blob_names) -> None:
+    """Tests that FieldManager init method runs correctly."""
+    mocked_manure_manager = MagicMock(ManureManager)
+    expected_field_setup_calls = [call(field_name, mocked_manure_manager) for field_name in field_blob_names]
+    with patch("RUFAS.routines.field.manager.field_manager.FieldManager._get_field_blob_names",
+               return_value=field_blob_names) as patched_field_blob_names, \
+            patch("RUFAS.routines.field.manager.field_manager.FieldManager._setup_field",
+                  return_value=MagicMock(Field)) as patched_field_setup:
+        field_manager = FieldManager(mocked_manure_manager)
 
-    actual = FieldManager._create_current_weather(weather, time, 4)
-
-    assert actual == expected
-    CurrentWeather.determine_daylength.assert_called_once()
+        assert len(field_manager.fields) == len(field_blob_names)
+        assert len(field_manager.output_gatherer.fields) == len(field_blob_names)
+        patched_field_blob_names.assert_called_once()
+        if len(field_blob_names) > 0:
+            patched_field_setup.assert_has_calls(expected_field_setup_calls)
+        else:
+            patched_field_setup.assert_not_called()
 
 
-@pytest.mark.parametrize("year, day, expected_month", [
-    (2000, 366, 12),  # leap year
-    (2001, 365, 12),  # normal year
-    (2000, 60, 2),
-    (2001, 60, 3)
-])
-def test_date_conversion_month(year: int, day: int, expected_month: int):
-    """Tests that number of days were converted into months correctly"""
-    mocked_time = MagicMock(Time)
-    setattr(mocked_time, "calendar_year", year)
-    setattr(mocked_time, "day", day)
-    assert FieldManager._date_conversion_month(mocked_time) == expected_month
+@pytest.fixture
+def mock_weather(mocker: MockerFixture) -> Weather:
+    """Fixture for Weather object."""
+    mocker.patch("RUFAS.weather.Weather.__init__", return_value=None)
+
+    mock_config = MagicMock(Config)
+
+    mock_weather = Weather({}, mock_config)
+    return mock_weather
 
 
-@pytest.mark.parametrize("year, day, expected_day", [
-    (2000, 366, 31),  # leap year
-    (2001, 365, 31),  # normal year
-    (2000, 60, 29),
-    (2001, 60, 1)
-])
-def test_date_conversion_day(year: int, day: int, expected_day: int):
-    """Tests that number of days were converted into day of the month correctly"""
-    mocked_time = MagicMock(Time)
-    setattr(mocked_time, "calendar_year", year)
-    setattr(mocked_time, "day", day)
-    assert FieldManager._date_conversion_day(mocked_time) == expected_day
+@pytest.fixture
+def weather_original_method_states(mock_weather: Weather) -> Dict[str, Callable]:
+    """Fixture to store unmocked methods of Weather."""
+    return {
+        "get_current_day_conditions": mock_weather.get_current_day_conditions
+    }
 
 
 @pytest.mark.parametrize("fields", [
@@ -79,35 +67,30 @@ def test_date_conversion_day(year: int, day: int, expected_day: int):
      Field(field_data=FieldData(name="field3"), manure_manager=MagicMock(ManureManager))],
     []
 ])
-def test_daily_update_routine(fields: List[Field]) -> None:
+def test_daily_update_routine(fields: List[Field], mock_weather: Weather,
+                              weather_original_method_states: Dict[str, Callable]) -> None:
     """Tests that the daily routines and it's methods were called and updated correctly"""
     mocked_time = MagicMock(Time)
-    mocked_weather = MagicMock(Weather)
     setattr(mocked_time, "year", 1)
     setattr(mocked_time, "calendar_year", 1998)
     setattr(mocked_time, "year", 1998)
     setattr(mocked_time, "day", 5)
-    setattr(mocked_weather, "radiation", 3)
-    setattr(mocked_weather, "T_min", 3)
-    setattr(mocked_weather, "T_avg", 3)
-    setattr(mocked_weather, "T_max", 3)
-    setattr(mocked_weather, "T_avg_annual", 3)
-    setattr(mocked_weather, "rainfall", 3)
-    setattr(mocked_weather, "irrigation", 3)
 
     mocked_manure_manager = MagicMock(ManureManager)
-    fm = FieldManager({}, mocked_manure_manager)
+    mock_weather.get_current_day_conditions = MagicMock(return_value=MagicMock(CurrentDayConditions))
+    with patch("RUFAS.routines.field.manager.field_manager.FieldManager._get_field_blob_names", return_value=[]):
+        fm = FieldManager(mocked_manure_manager)
 
-    fm.fields = fields
-    for field in fields:
-        field.manage_field = MagicMock()
-    fm.output_gatherer.send_daily_variables = MagicMock()
-    FieldManager._create_current_weather = MagicMock()
-    fm.daily_update_routine(weather=mocked_weather, time=mocked_time)
-    for field in fields:
-        assert field.manage_field.call_count == 1
-    assert FieldManager._create_current_weather.call_count == len(fields)
-    assert fm.output_gatherer.send_daily_variables.call_count == 1
+        fm.fields = fields
+        for field in fields:
+            field.manage_field = MagicMock()
+        fm.output_gatherer.send_daily_variables = MagicMock()
+        fm.daily_update_routine(weather=mock_weather, time=mocked_time)
+        for field in fields:
+            assert field.manage_field.call_count == 1
+        assert mock_weather.get_current_day_conditions.call_count == 1
+        assert fm.output_gatherer.send_daily_variables.call_count == 1
+    mock_weather.get_current_day_conditions = weather_original_method_states["get_current_day_conditions"]
 
 
 @pytest.mark.parametrize("fields", [
@@ -121,198 +104,379 @@ def test_annual_update_routine(fields: List[Field]):
     for field in fields:
         field.perform_annual_reset = MagicMock()
     mocked_field_manager = MagicMock(ManureManager)
-    fm = FieldManager({}, mocked_field_manager)
-    fm.fields = fields
-    fm.output_gatherer.send_annual_variables = MagicMock()
-    fm.annual_update_routine()
-    for field in fields:
-        assert field.perform_annual_reset.call_count == 1
-    assert fm.output_gatherer.send_annual_variables.call_count == 1
+    with patch("RUFAS.routines.field.manager.field_manager.FieldManager._get_field_blob_names", return_value=[]):
+        fm = FieldManager(mocked_field_manager)
+        fm.fields = fields
+        fm.output_gatherer.send_annual_variables = MagicMock()
+        fm.annual_update_routine()
+        for field in fields:
+            assert field.perform_annual_reset.call_count == 1
+        assert fm.output_gatherer.send_annual_variables.call_count == 1
 
 
-@pytest.mark.parametrize("field_name,config", [
-    ("test_1", {
-        "fertilizer": {
-            "mixes": {
-                "0_0_60": {
-                    "N": 0.0,
-                    "P": 0.0,
-                    "K": 0.6
-                },
-                "6_10_20": {
-                    "N": 0.0672511,
-                    "P": 0.112085,
-                    "K": 0.22417
-                },
-                "5_4_27": {
-                    "N": 0.0560426,
-                    "P": 0.0493175,
-                    "K": 0.2790919
-                },
-                "5_6_40": {
-                    "N": 0.0560426,
-                    "P": 0.06904443,
-                    "K": 0.39
-                },
-                "82_0_0": {
-                    "N": 0.82,
-                    "P": 0.0,
-                    "K": 0.0
-                }
-            },
-            "rotation_years": [],
-            "repeat": 0,
-            "mix": ["6_10_20", "6_10_20", "5_4_27", "5_6_40", "5_6_40", "5_6_40", "5_6_40"],
-            "year": [1993, 1996, 2001, 2005, 2009, 2013, 2017],
-            "day": [103, 103, 103, 103, 103, 103, 103],
-            "N_mass": [6.72511, 6.72511, 5.60426, 5.60426, 5.6, 5.60426, 5.60426],
-            "P_mass": [11.2085, 11.2085, 4.93175, 6.904443, 6.72511, 6.904443, 6.904443],
-            "K_mass": [22.417, 22.417, 27.90919, 39.072871, 39.072871, 39.072871, 39.072871],
-            "depth": [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
-            "surface_percent": [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0]
-        },
-        "manure": {
-            "rotation_years": [],
-            "repeat": 0,
-            "year": [1990, 1992, 1993, 1996, 1997, 2000, 2001, 2004, 2005, 2008, 2009, 2012, 2013, 2016, 2017],
-            "day": [113, 335, 311, 311, 310, 315, 316, 316, 314, 310, 327, 304, 324, 280, 318],
-            "N_mass": [266, 266, 201, 207, 230, 279, 214, 244, 320, 169, 355, 163, 245, 66, 275],
-            "P_mass": [70, 70, 45, 36, 37, 50, 31, 48, 53, 20, 60, 29, 43, 30, 54],
-            "K_mass": [188, 188, 211, 164, 183, 198, 112, 156, 227, 167, 270, 128, 192, 86, 178],
-            "cover_percent": [0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1],
-            "depth": [150.0, 150.0, 150.0, 150.0, 150.0, 150.0, 150.0, 150.0, 150.0, 150.0, 150.0, 150.0, 150.0, 150.0,
-                      150.0],
-            "surface_percent": [0.80, 0.80, 0.80, 0.80, 0.80, 0.80, 0.80, 0.80, 0.80, 0.80, 0.80, 0.80, 0.80, 0.80,
-                                0.80]
-        },
-        "tillage": {
-            "rotation_years": [],
-            "repeat": 0,
-            "year": [1989, 1989, 1992, 1993, 1993, 1993, 1994, 1997, 1997, 1997, 1998, 2000, 2001, 2001, 2001, 2001,
-                     2002, 2004, 2005, 2005, 2006, 2008, 2009, 2009, 2010, 2010, 2012, 2013, 2013, 2014, 2016, 2017,
-                     2018, 2018],
-            "day": [305, 306, 335, 120, 121, 313, 108, 100, 114, 324, 98, 316, 114, 136, 142, 317, 175, 321, 118, 318,
-                    95, 315, 121, 327, 83, 88, 321, 126, 339, 112, 280, 125, 117, 120],
-            "percent_incorporated": [0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3,
+@pytest.mark.parametrize("fertilizer_schedule_data,expected_available_mixes,expected_schedule", [
+    ({
+         "available_fertilizer_mixes": [
+             {
+                 "name": "0_0_60",
+                 "N": 0.0,
+                 "P": 0.0,
+                 "K": 0.6
+             },
+             {
+                 "name": "6_10_20",
+                 "N": 0.0672511,
+                 "P": 0.112085,
+                 "K": 0.22417
+             },
+             {
+                 "name": "5_4_27",
+                 "N": 0.0560426,
+                 "P": 0.0493175,
+                 "K": 0.2790919
+             },
+             {
+                 "name": "5_6_40",
+                 "N": 0.0560426,
+                 "P": 0.06904443,
+                 "K": 0.39
+             },
+             {
+                 "name": "82_0_0",
+                 "N": 0.82,
+                 "P": 0.0,
+                 "K": 0.0
+             }
+         ],
+         "mix_names": ["6_10_20", "6_10_20", "5_4_27", "5_6_40", "5_6_40", "5_6_40", "5_6_40"],
+         "years": [1993, 1996, 2001, 2005, 2009, 2013, 2017],
+         "days": [103, 103, 103, 103, 103, 103, 103],
+         "nitrogen_masses": [6.72511, 6.72511, 5.60426, 5.60426, 5.6, 5.60426, 5.60426],
+         "phosphorus_masses": [11.2085, 11.2085, 4.93175, 6.904443, 6.72511, 6.904443, 6.904443],
+         "potassium_masses": [22.417, 22.417, 27.90919, 39.072871, 39.072871, 39.072871, 39.072871],
+         "application_depths": [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
+         "surface_remainder_fractions": [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0],
+         "pattern_repeat": 0,
+         "pattern_skip": 0
+     }, {
+         "0_0_60": {
+             "N": 0.0,
+             "P": 0.0,
+             "K": 0.6
+         },
+         "6_10_20": {
+
+             "N": 0.0672511,
+             "P": 0.112085,
+             "K": 0.22417
+         },
+         "5_4_27": {
+             "N": 0.0560426,
+             "P": 0.0493175,
+             "K": 0.2790919
+         },
+         "5_6_40": {
+             "N": 0.0560426,
+             "P": 0.06904443,
+             "K": 0.39
+         },
+         "82_0_0": {
+             "N": 0.82,
+             "P": 0.0,
+             "K": 0.0
+         }
+     }, FertilizerSchedule(name="fertilizer_schedule",
+                           mix_names=["6_10_20", "6_10_20", "5_4_27", "5_6_40", "5_6_40", "5_6_40", "5_6_40"],
+                           years=[1993, 1996, 2001, 2005, 2009, 2013, 2017],
+                           days=[103, 103, 103, 103, 103, 103, 103],
+                           nitrogen_masses=[6.72511, 6.72511, 5.60426, 5.60426, 5.6, 5.60426, 5.60426],
+                           phosphorus_masses=[11.2085, 11.2085, 4.93175, 6.904443, 6.72511, 6.904443, 6.904443],
+                           application_depths=[0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
+                           surface_remainder_fractions=[1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0],
+                           pattern_repeat=0,
+                           pattern_skip=0)
+     ),
+    ({
+         "available_fertilizer_mixes": [
+             {
+                 "name": "barnyard_fert",
+                 "N": 0.4,
+                 "P": 0.2,
+                 "K": 0.1
+             }
+         ],
+         "mix_names": ["barnyard_fert"],
+         "years": [2010],
+         "days": [200],
+         "nitrogen_masses": [1000],
+         "phosphorus_masses": [5],
+         "potassium_masses": [400],
+         "application_depths": [0.0],
+         "surface_remainder_fractions": [1.0],
+         "pattern_repeat": 0,
+         "pattern_skip": 0
+     }, {
+         "barnyard_fert": {
+             "N": 0.4,
+             "P": 0.2,
+             "K": 0.1
+         }
+     }, FertilizerSchedule(name="fertilizer_schedule",
+                           mix_names=["barnyard_fert"],
+                           years=[2010],
+                           days=[200],
+                           nitrogen_masses=[1000],
+                           phosphorus_masses=[5],
+                           application_depths=[0.0],
+                           surface_remainder_fractions=[1.0],
+                           pattern_repeat=0,
+                           pattern_skip=0)
+     )
+])
+def test_setup_fertilizer_schedule(fertilizer_schedule_data: Dict, expected_available_mixes: Dict,
+                                   expected_schedule: FertilizerSchedule) -> None:
+    """Tests that fertilizer schedules and available fertilizer mixes are correctly setup."""
+    with patch("RUFAS.input_manager.InputManager.get_data", return_value=fertilizer_schedule_data) as patched_get_data:
+        actual_available_mixes, actual_schedule = FieldManager._setup_fertilizer_schedule("test_fert_schedule")
+        assert actual_available_mixes == expected_available_mixes
+        assert actual_schedule.generate_fertilizer_events() == expected_schedule.generate_fertilizer_events()
+        patched_get_data.assert_called_once_with("test_fert_schedule")
+
+
+@pytest.mark.parametrize("manure_schedule_data,expected_manure_schedule", [
+    ({
+         "years": [1990, 1992, 1993, 1996, 1997, 2000, 2001, 2004, 2005, 2008, 2009, 2012, 2013, 2016, 2017],
+         "days": [113, 335, 311, 311, 310, 315, 316, 316, 314, 310, 327, 304, 324, 280, 318],
+         "nitrogen_masses": [266, 266, 201, 207, 230, 279, 214, 244, 320, 169, 355, 163, 245, 66, 275],
+         "phosphorus_masses": [70, 70, 45, 36, 37, 50, 31, 48, 53, 20, 60, 29, 43, 30, 54],
+         "potassium_masses": [188, 188, 211, 164, 183, 198, 112, 156, 227, 167, 270, 128, 192, 86, 178],
+         "coverage_fractions": [0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1],
+         "application_depths": [150.0, 150.0, 150.0, 150.0, 150.0, 150.0, 150.0, 150.0, 150.0, 150.0, 150.0, 150.0,
+                                150.0, 150.0, 150.0],
+         "surface_remainder_fractions": [0.80, 0.80, 0.80, 0.80, 0.80, 0.80, 0.80, 0.80, 0.80, 0.80, 0.80, 0.80, 0.80,
+                                         0.80, 0.80],
+         "pattern_repeat": 0,
+         "pattern_skip": 0
+     }, ManureSchedule(name="manure_schedule",
+                       years=[1990, 1992, 1993, 1996, 1997, 2000, 2001, 2004, 2005, 2008, 2009, 2012, 2013, 2016, 2017],
+                       days=[113, 335, 311, 311, 310, 315, 316, 316, 314, 310, 327, 304, 324, 280, 318],
+                       nitrogen_masses=[266, 266, 201, 207, 230, 279, 214, 244, 320, 169, 355, 163, 245, 66, 275],
+                       phosphorus_masses=[70, 70, 45, 36, 37, 50, 31, 48, 53, 20, 60, 29, 43, 30, 54],
+                       field_coverages=[0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1],
+                       application_depths=[150.0, 150.0, 150.0, 150.0, 150.0, 150.0, 150.0, 150.0, 150.0, 150.0, 150.0,
+                                           150.0, 150.0, 150.0, 150.0],
+                       surface_remainder_fractions=[0.80, 0.80, 0.80, 0.80, 0.80, 0.80, 0.80, 0.80, 0.80, 0.80, 0.80,
+                                                    0.80, 0.80, 0.80, 0.80],
+                       pattern_repeat=0,
+                       pattern_skip=0)),
+    ({
+         "years": [2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2016],
+         "days": [200, 200, 200, 200, 200, 200, 200, 200, 200],
+         "nitrogen_masses": [1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000],
+         "phosphorus_masses": [500, 500, 500, 500, 500, 500, 500, 500, 500],
+         "potassium_masses": [0.0],
+         "coverage_fractions": [0.95, 0.95, 0.95, 0.95, 0.95, 0.95, 0.95, 0.95, 0.95],
+         "application_depths": [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
+         "surface_remainder_fractions": [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0],
+         "pattern_repeat": 0,
+         "pattern_skip": 0
+     }, ManureSchedule(name="manure_schedule", years=[2008], days=[200], nitrogen_masses=[1000],
+                       phosphorus_masses=[500], field_coverages=[0.95], application_depths=[0.0],
+                       surface_remainder_fractions=[1.0], pattern_repeat=8, pattern_skip=0))
+])
+def test_setup_manure_schedule(manure_schedule_data: Dict, expected_manure_schedule: ManureSchedule) -> None:
+    """Tests that ManureSchedules are correctly initialized with data from the InputManager."""
+    with patch("RUFAS.input_manager.InputManager.get_data", return_value=manure_schedule_data) as patched_get_data:
+        actual_manure_schedule = FieldManager._setup_manure_schedule("test_manure_schedule")
+        assert actual_manure_schedule.generate_manure_events() == expected_manure_schedule.generate_manure_events()
+        patched_get_data.assert_called_once_with("test_manure_schedule")
+
+
+@pytest.mark.parametrize("tillage_schedule_data,expected_tillage_schedule", [
+    ({
+         "pattern_repeat": 0,
+         "pattern_skip": 0,
+         "years": [1989, 1989, 1992, 1993, 1993, 1993, 1994, 1997, 1997, 1997, 1998, 2000, 2001, 2001, 2001, 2001, 2002,
+                   2004, 2005, 2005, 2006, 2008, 2009, 2009, 2010, 2010, 2012, 2013, 2013, 2014, 2016, 2017, 2018,
+                   2018],
+         "days": [305, 306, 335, 120, 121, 313, 108, 100, 114, 324, 98, 316, 114, 136, 142, 317, 175, 321, 118, 318, 95,
+                  315, 121, 327, 83, 88, 321, 126, 339, 112, 280, 125, 117, 120],
+         "incorporation_fractions": [0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3,
                                      0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3,
                                      0.3, 0.3],
-            "percent_mixed": [0.3, 0.55, 0.3, 0.85, 0.55, 0.3, 0.55, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.1, 0.25, 0.3, 0.3,
+         "mixing_fractions": [0.3, 0.55, 0.3, 0.85, 0.55, 0.3, 0.55, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.1, 0.25, 0.3, 0.3,
                               0.3, 0.3, 0.3, 0.55, 0.55, 0.3, 0.3, 0.55, 0.3, 0.55, 0.3, 0.55, 0.3, 0.3, 0.3, 0.3, 0.3],
-            "depth": [150, 75, 150, 100, 75, 150, 75, 150, 100, 150, 100, 150, 100, 5, 25, 150, 100, 150, 100, 150, 75,
-                      150, 100, 100, 150, 100, 150, 100, 150, 100, 100, 100, 100, 100]
-        }
-    })
+         "tillage_depths": [150, 75, 150, 100, 75, 150, 75, 150, 100, 150, 100, 150, 100, 5, 25, 150, 100, 150, 100,
+                            150, 75, 150, 100, 100, 150, 100, 150, 100, 150, 100, 100, 100, 100, 100]
+     }, TillageSchedule(
+        name="tillage_schedule",
+        years=[1989, 1989, 1992, 1993, 1993, 1993, 1994, 1997, 1997, 1997, 1998, 2000, 2001, 2001, 2001, 2001, 2002,
+               2004, 2005, 2005, 2006, 2008, 2009, 2009, 2010, 2010, 2012, 2013, 2013, 2014, 2016, 2017, 2018, 2018],
+        days=[305, 306, 335, 120, 121, 313, 108, 100, 114, 324, 98, 316, 114, 136, 142, 317, 175, 321, 118, 318, 95,
+              315, 121, 327, 83, 88, 321, 126, 339, 112, 280, 125, 117, 120],
+        incorporation_fractions=[0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3,
+                                 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3,
+                                 0.3, 0.3],
+        mixing_fractions=[0.3, 0.55, 0.3, 0.85, 0.55, 0.3, 0.55, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.1, 0.25, 0.3, 0.3,
+                          0.3, 0.3, 0.3, 0.55, 0.55, 0.3, 0.3, 0.55, 0.3, 0.55, 0.3, 0.55, 0.3, 0.3, 0.3, 0.3, 0.3],
+        tillage_depths=[150, 75, 150, 100, 75, 150, 75, 150, 100, 150, 100, 150, 100, 5, 25, 150, 100, 150, 100, 150,
+                        75, 150, 100, 100, 150, 100, 150, 100, 150, 100, 100, 100, 100, 100])),
+    ({
+         "years": [2014],
+         "days": [322],
+         "incorporation_fractions": [0.95],
+         "mixing_fractions": [0.95],
+         "tillage_depths": [150],
+         "pattern_repeat": 0,
+         "pattern_skip": 0
+     }, TillageSchedule(
+        name="tillage_schedule",
+        years=[2014],
+        days=[322],
+        incorporation_fractions=[0.95],
+        mixing_fractions=[0.95],
+        tillage_depths=[150],
+        pattern_skip=0,
+        pattern_repeat=0))
 ])
-def test_setup_management(field_name: str, config: Dict) -> None:
-    """Tests that farm management practices are correctly set up for simulations."""
-    mixes, fert_sched, manure_sched, till_sched = FieldManager._setup_management(field_name, config)
-    assert mixes == config.get("fertilizer").get("mixes")
-    assert fert_sched.years == config.get("fertilizer").get("year")
-    assert manure_sched.days == config.get("manure").get("day")
-    assert till_sched.tillage_depths == config.get("tillage").get("depth")
-
-
-@pytest.mark.parametrize("crop_input_file_name", [
-    "ARL_rotation.json",
-    "corn_rotation.json",
-    "double_cropping_1yr_rotation.json",
-    "double_cropping_2yr_rotation.json",
-    "LT_rotation.json",
-    "multi_crop_rotation.json",
-    "swat_rotation.json",
-    "testing_rotation.json"
-])
-def test_setup_crop_schedules(crop_input_file_name: str) -> None:
-    """Tests that the crop schedule setup method is able to correctly parse all the currently available crop
-        datasets."""
-    input_directory = Utility.get_base_dir() / 'input'
-    crops_config = Utility.read_json_file(input_directory / 'crop' / crop_input_file_name)
-    crop_specifications = crops_config.get("crops")
-    FieldManager._setup_crop_schedules(crop_specifications)
-    assert True
+def test_setup_tillage_schedule(tillage_schedule_data: Dict, expected_tillage_schedule: TillageSchedule) -> None:
+    """Tests that TillageSchedules are correctly initialized with data from the InputManager."""
+    with patch("RUFAS.input_manager.InputManager.get_data", return_value=tillage_schedule_data) as patched_get_data:
+        actual_tillage_schedule = FieldManager._setup_tillage_schedule("test_tillage_schedule")
+        assert actual_tillage_schedule.generate_tillage_events() == expected_tillage_schedule.generate_tillage_events()
+        patched_get_data.assert_called_once_with("test_tillage_schedule")
 
 
 @pytest.mark.parametrize("crop_schedule_config,expected", [
-    ({"corn": {
-        "crop_reference": "corn",
-        "plant_years": [2009],
-        "repeat": 1,
-        "planting_day": [121],
-        "harvest_years": [2009],
-        "harvest_day": [319],
-        "harvest_operations": ["default"],
-        "harvest_type": "scheduled"
-    }
-     }, [CropSchedule(name="corn", crop_reference="corn", planting_years=[2009], planting_days=[121],
+    ([
+         {"crop_species": "corn",
+          "planting_years": [2009],
+          "pattern_repeat": 1,
+          "pattern_skip": 0,
+          "planting_days": [121],
+          "harvest_years": [2009],
+          "harvest_days": [319],
+          "harvest_operations": ["default"],
+          "harvest_type": "scheduled"}
+     ], [CropSchedule(name="crop_schedule_0", crop_reference="corn", planting_years=[2009], planting_days=[121],
                       harvest_years=[2009], harvest_days=[319], harvest_operations=["default"],
                       use_heat_scheduling=False, pattern_repeat=1)]),
-    ({
-         "Corn10": {"crop_reference": "corn", "plant_years": [2010], "repeat": 0, "planting_day": [121],
-                    "harvest_years": [2010], "harvest_day": [319], "harvest_operations": ["default"],
-                    "harvest_type": "scheduled", "planting_order": "1st", "extracted": True},
-         "Corn11": {"crop_reference": "corn", "plant_years": [2011], "repeat": 0, "planting_day": [121],
-                    "harvest_years": [2011], "harvest_day": [319], "harvest_operations": ["default"],
-                    "harvest_type": "scheduled", "planting_order": "1st", "extracted": True},
-         "Corn12": {"crop_reference": "corn", "plant_years": [2012], "repeat": 0, "planting_day": [121],
-                    "harvest_years": [2012], "harvest_day": [319], "harvest_operations": ["default"],
-                    "harvest_type": "scheduled", "planting_order": "1st", "extracted": True},
-         "Corn13": {"crop_reference": "corn", "plant_years": [2013], "repeat": 0, "planting_day": [121],
-                    "harvest_years": [2013], "harvest_day": [319], "harvest_operations": ["default"],
-                    "harvest_type": "scheduled", "planting_order": "1st", "extracted": True}
-     }, [CropSchedule(name="Corn10", crop_reference="corn", planting_years=[2010], planting_days=[121],
+    ([
+         {"crop_species": "corn", "planting_years": [2010], "pattern_repeat": 0, "pattern_skip": 1,
+          "planting_days": [121], "harvest_years": [2010], "harvest_days": [319], "harvest_operations": ["default"],
+          "harvest_type": "optimal", "planting_order": "1st", "extracted": True},
+         {"crop_species": "corn", "planting_years": [2011], "pattern_repeat": 0, "pattern_skip": 3,
+          "planting_days": [121], "harvest_years": [2011], "harvest_days": [319], "harvest_operations": ["default"],
+          "harvest_type": "scheduled", "planting_order": "1st", "extracted": True},
+         {"crop_species": "corn", "planting_years": [2012], "pattern_repeat": 0, "pattern_skip": 0,
+          "planting_days": [121], "harvest_years": [2012], "harvest_days": [319], "harvest_operations": ["default"],
+          "harvest_type": "optimal", "planting_order": "1st", "extracted": True},
+         {"crop_species": "corn", "planting_years": [2013], "pattern_repeat": 0, "pattern_skip": 2,
+          "planting_days": [121], "harvest_years": [2013], "harvest_days": [319], "harvest_operations": ["default"],
+          "harvest_type": "scheduled", "planting_order": "1st", "extracted": True}
+     ], [CropSchedule(name="crop_schedule_0", crop_reference="corn", planting_years=[2010], planting_days=[121],
                       harvest_years=[2010], harvest_days=[319], harvest_operations=["default"],
-                      use_heat_scheduling=False, pattern_repeat=0),
-         CropSchedule(name="Corn11", crop_reference="corn", planting_years=[2011], planting_days=[121],
+                      use_heat_scheduling=True, pattern_repeat=0),
+         CropSchedule(name="crop_schedule_1", crop_reference="corn", planting_years=[2011], planting_days=[121],
                       harvest_years=[2011], harvest_days=[319], harvest_operations=["default"],
                       use_heat_scheduling=False, pattern_repeat=0),
-         CropSchedule(name="Corn12", crop_reference="corn", planting_years=[2012], planting_days=[121],
+         CropSchedule(name="crop_schedule_2", crop_reference="corn", planting_years=[2012], planting_days=[121],
                       harvest_years=[2012], harvest_days=[319], harvest_operations=["default"],
-                      use_heat_scheduling=False, pattern_repeat=0),
-         CropSchedule(name="Corn13", crop_reference="corn", planting_years=[2013], planting_days=[121],
+                      use_heat_scheduling=True, pattern_repeat=0),
+         CropSchedule(name="crop_schedule_3", crop_reference="corn", planting_years=[2013], planting_days=[121],
                       harvest_years=[2013], harvest_days=[319], harvest_operations=["default"],
                       use_heat_scheduling=False, pattern_repeat=0)
          ])
 ])
-def test_correct_crop_schedule_setup(crop_schedule_config: Dict, expected: List[CropSchedule]) -> None:
+def test_crop_schedule_setup(crop_schedule_config: Dict, expected: List[CropSchedule]) -> None:
     """Tests that crop schedules are created correctly from the crop schedule configuration passed to it."""
-    actual = FieldManager._setup_crop_schedules(crop_schedule_config)
-    for index in range(len(expected)):
-        assert actual[index].generate_planting_events() == expected[index].generate_planting_events()
-        assert actual[index].generate_harvest_events() == expected[index].generate_harvest_events()
+    with patch("RUFAS.input_manager.InputManager.get_data", return_value=crop_schedule_config) as patched_get_data:
+        actual = FieldManager._setup_crop_schedules("test_crop_schedule")
+        for index in range(len(expected)):
+            assert actual[index].generate_planting_events() == expected[index].generate_planting_events()
+            assert actual[index].generate_harvest_events() == expected[index].generate_harvest_events()
+        patched_get_data.assert_called_once_with("test_crop_schedule.crop_schedules")
 
 
-@pytest.mark.parametrize("field_size,top,sand,silt,residue,nitrogen_mineralization,config,expected", [
-    (1.3, 0.0, 15, 65, 0.0, 0.05,
-     {"bottom_depth": 279.4, "wilting_point": 0.1, "field_capacity": 0.29, "saturation": 0.58, "K_sat": 20.0,
-      "clay": 22.5, "initial_temperature": 0.0, "bulk_density": 1.34, "org_C_percent": 0.012, "NH4": 1,
-      "active_N_percent": 0.02, "labile_P": 23.7, "active_mineral_rate": 0.0003, "volatile_exchange_factor": 0.15,
-      "denitrification_rate": 0.1, "soil_water_percent": 0.3, "OM_percent": 0.019},
-     LayerData(field_size=1.3, top_depth=0.0, bottom_depth=279.4, wilting_point_water_concentration=0.1,
+@pytest.mark.parametrize("field_size,top,residue,config,expected", [
+    (1.3, 0.0, 0.0,
+     {
+         "bottom_depth": 279.4,
+         "soil_water_concentration": 0.3,
+         "wilting_point_water_concentration": 0.23,
+         "field_capacity_water_concentration": 0.29,
+         "saturation_point_water_concentration": 0.58,
+         "saturated_hydraulic_conductivity": 9.17,
+         "initial_temperature": 15.77575,
+         "bulk_density": 1.34,
+         "percent_organic_carbon_content": 0.012,
+         "percent_clay_content": 21.95,
+         "percent_silt_content": 63.42,
+         "percent_sand_content": 14.63,
+         "percent_rock_content": 0.0,
+         "initial_labile_inorganic_phosphorus_concentration": 2.7,
+         "initial_fresh_organic_phosphorus_concentration": 0.0,
+         "initial_soil_nitrate_concentration": 1,
+         "initial_soil_ammonium_concentration": 1,
+         "humus_mineralization_rate_factor": 0.0003,
+         "ammonium_volatilization_cation_exchange_factor": 0.15,
+         "denitrification_rate_coefficient": 1.4,
+         "denitrification_threshold_water_content": 1.1,
+         "residue_fresh_organic_mineralization_rate": 0.05,
+         "denitrification_rate": 0.1,
+         "active_N_percent": 0.02,
+         "OM_percent": 0.04
+     },
+     LayerData(field_size=1.3, top_depth=0.0, bottom_depth=279.4, wilting_point_water_concentration=0.23,
                field_capacity_water_concentration=0.29, saturation_point_water_concentration=0.58,
-               saturated_hydraulic_conductivity=20.0, percent_clay_content=22.5, temperature=0.0, bulk_density=1.34,
-               percent_organic_carbon_content=0.012, initial_soil_ammonium_concentration=1.0,
-               initial_soil_nitrate_concentration=None, initial_labile_inorganic_phosphorus_concentration=23.7,
+               saturated_hydraulic_conductivity=9.17, percent_clay_content=21.95, temperature=15.77575,
+               bulk_density=1.34, percent_organic_carbon_content=0.012, initial_soil_ammonium_concentration=1.0,
+               initial_soil_nitrate_concentration=1.0, initial_labile_inorganic_phosphorus_concentration=2.7,
                humus_mineralization_rate_factor=0.0003, ammonium_volatilization_cation_exchange_factor=0.15,
-               denitrification_rate_coefficient=0.1, soil_water_concentration=0.3, percent_sand_content=15.0,
-               percent_silt_content=65.0, residue=0.0, residue_fresh_organic_mineralization_rate=0.05)),
-    (2.2, 279.4, 15, 65, 0.0, 0.05,
-     {"bottom_depth": 1041.4, "wilting_point": 0.163, "field_capacity": 0.306, "saturation": 0.5, "K_sat": 9.17,
-      "clay": 30, "initial_temperature": 14.50797297, "bulk_density": 1.42, "org_C_percent": 0.012, "NH4": 1, "N03": 1,
-      "active_N_percent": 0.02, "labile_P": 2.7, "active_mineral_rate": 0.0003, "volatile_exchange_factor": 0.15,
-      "denitrification_rate": 0.1, "soil_water_percent": 0.3, "OM_percent": 0.006},
+               denitrification_rate_coefficient=1.4, soil_water_concentration=0.3, percent_sand_content=14.63,
+               percent_silt_content=63.42, percent_rock_content=0.0, residue=0.0,
+               residue_fresh_organic_mineralization_rate=0.05)),
+    (2.2, 279.4, 0.0,
+     {
+         "bottom_depth": 1041.4,
+         "soil_water_concentration": 0.3,
+         "wilting_point_water_concentration": 0.163,
+         "field_capacity_water_concentration": 0.306,
+         "saturation_point_water_concentration": 0.5,
+         "saturated_hydraulic_conductivity": 9.17,
+         "initial_temperature": 14.50797297,
+         "bulk_density": 1.42,
+         "percent_organic_carbon_content": 0.012,
+         "percent_clay_content": 27.27,
+         "percent_silt_content": 59.09,
+         "percent_sand_content": 13.64,
+         "percent_rock_content": 0.0,
+         "initial_labile_inorganic_phosphorus_concentration": 2.7,
+         "initial_fresh_organic_phosphorus_concentration": 0.0,
+         "initial_soil_nitrate_concentration": 1,
+         "initial_soil_ammonium_concentration": 1,
+         "humus_mineralization_rate_factor": 0.0003,
+         "ammonium_volatilization_cation_exchange_factor": 0.15,
+         "denitrification_rate_coefficient": 1.4,
+         "denitrification_threshold_water_content": 1.1,
+         "residue_fresh_organic_mineralization_rate": 0.05,
+         "denitrification_rate": 0.1,
+         "active_N_percent": 0.02,
+         "OM_percent": 0.006
+     },
      LayerData(field_size=2.2, top_depth=279.4, bottom_depth=1041.4, wilting_point_water_concentration=0.163,
                field_capacity_water_concentration=0.306, saturation_point_water_concentration=0.5,
-               saturated_hydraulic_conductivity=9.17, percent_clay_content=30, temperature=14.50797297,
+               saturated_hydraulic_conductivity=9.17, percent_clay_content=27.27, temperature=14.50797297,
                bulk_density=1.42, percent_organic_carbon_content=0.012, initial_soil_ammonium_concentration=1,
                initial_soil_nitrate_concentration=1, initial_labile_inorganic_phosphorus_concentration=2.7,
                humus_mineralization_rate_factor=0.0003, ammonium_volatilization_cation_exchange_factor=0.15,
-               denitrification_rate_coefficient=0.1, soil_water_concentration=0.3, percent_sand_content=15.0,
-               percent_silt_content=65.0, residue=0.0, residue_fresh_organic_mineralization_rate=0.05))
+               denitrification_rate_coefficient=1.4, soil_water_concentration=0.3, percent_sand_content=13.64,
+               percent_silt_content=59.09, percent_rock_content=0.0, residue=0.0,
+               residue_fresh_organic_mineralization_rate=0.05))
 ])
-def test_setup_soil_layer(field_size: float, top: float, sand: float, silt: float, residue: float,
-                          nitrogen_mineralization: float, config: Dict, expected: LayerData) -> None:
+def test_setup_soil_layer(field_size: float, top: float, residue: float, config: Dict, expected: LayerData) -> None:
     """Tests that LayerData instances are configured correctly with a given specification."""
-    actual = FieldManager._setup_soil_layer(field_size, top, sand, silt, residue, nitrogen_mineralization, config)
+    actual = FieldManager._setup_soil_layer(field_size, top, residue, config)
     assert actual == expected
 
 
@@ -326,73 +490,394 @@ def test_setup_soil_layer(field_size: float, top: float, sand: float, silt: floa
 def test_setup_soil_layer_error(config: Dict) -> None:
     """Tests that errors are thrown correctly when not enough information is provided to create one."""
     with pytest.raises(ValueError) as e:
-        FieldManager._setup_soil_layer(1.0, 0.0, 65.0, 15.0, 0.0, 0.05, config)
+        FieldManager._setup_soil_layer(1.0, 0.0, 0.0, config)
     assert str(e.value) == "Bottom depth is required for each soil layer."
 
 
-@pytest.mark.parametrize("soil_input_file_name,expected_soil_layer_count", [
-    ("ARL_soil.json", 5),
-    ("ARL_soil_tillage.json", 5),
-    ("barnyard_soil.json", 4),
-    ("base_case_soil.json", 5),
-    ("LT_soil.json", 3),
-    ("multi_crop_soil.json", 5),
-    ("swat_soil.json", 5),
-    ("testing_soil.json", 5)
+@pytest.mark.parametrize("soil_configuration", [
+    {
+        "second_moisture_condition_parameter": 85.00,
+        "average_subbasin_slope": 0.02,
+        "slope_length": 3,
+        "manning_roughness_coefficient": 0.4,
+        "support_practice_factor": 0.8,
+        "albedo": 0.16,
+        "soil_evaporation_compensation_coefficient": 0.95,
+        "initial_residue": 0,
+        "soil_layers":
+            [
+                {
+                    "bottom_depth": 279.4,
+                    "soil_water_concentration": 0.3,
+                    "wilting_point_water_concentration": 0.23,
+                    "field_capacity_water_concentration": 0.29,
+                    "saturation_point_water_concentration": 0.58,
+                    "saturated_hydraulic_conductivity": 9.17,
+                    "initial_temperature": 15.77575,
+                    "bulk_density": 1.34,
+                    "percent_organic_carbon_content": 0.012,
+                    "percent_clay_content": 21.95,
+                    "percent_silt_content": 63.42,
+                    "percent_sand_content": 14.63,
+                    "percent_rock_content": 0.0,
+                    "initial_labile_inorganic_phosphorus_concentration": 2.7,
+                    "initial_fresh_organic_phosphorus_concentration": 0.0,
+                    "initial_soil_nitrate_concentration": 1,
+                    "initial_soil_ammonium_concentration": 1,
+                    "humus_mineralization_rate_factor": 0.0003,
+                    "ammonium_volatilization_cation_exchange_factor": 0.15,
+                    "denitrification_rate_coefficient": 1.4,
+                    "denitrification_threshold_water_content": 1.1,
+                    "residue_fresh_organic_mineralization_rate": 0.05,
+                    "denitrification_rate": 0.1,
+                    "active_N_percent": 0.02,
+                    "OM_percent": 0.04
+                },
+                {
+                    "bottom_depth": 1041.4,
+                    "soil_water_concentration": 0.3,
+                    "wilting_point_water_concentration": 0.163,
+                    "field_capacity_water_concentration": 0.306,
+                    "saturation_point_water_concentration": 0.5,
+                    "saturated_hydraulic_conductivity": 9.17,
+                    "initial_temperature": 14.50797297,
+                    "bulk_density": 1.42,
+                    "percent_organic_carbon_content": 0.012,
+                    "percent_clay_content": 27.27,
+                    "percent_silt_content": 59.09,
+                    "percent_sand_content": 13.64,
+                    "percent_rock_content": 0.0,
+                    "initial_labile_inorganic_phosphorus_concentration": 2.7,
+                    "initial_fresh_organic_phosphorus_concentration": 0.0,
+                    "initial_soil_nitrate_concentration": 1,
+                    "initial_soil_ammonium_concentration": 1,
+                    "humus_mineralization_rate_factor": 0.0003,
+                    "ammonium_volatilization_cation_exchange_factor": 0.15,
+                    "denitrification_rate_coefficient": 1.4,
+                    "denitrification_threshold_water_content": 1.1,
+                    "residue_fresh_organic_mineralization_rate": 0.05,
+                    "denitrification_rate": 0.1,
+                    "active_N_percent": 0.02,
+                    "OM_percent": 0.006
+                },
+                {
+                    "bottom_depth": 1168.4,
+                    "soil_water_concentration": 0.3,
+                    "wilting_point_water_concentration": 0.151,
+                    "field_capacity_water_concentration": 0.298,
+                    "saturation_point_water_concentration": 0.5,
+                    "saturated_hydraulic_conductivity": 23.29,
+                    "initial_temperature": 13.38623,
+                    "bulk_density": 1.6,
+                    "percent_organic_carbon_content": 0.012,
+                    "percent_clay_content": 22.33,
+                    "percent_silt_content": 63.11,
+                    "percent_sand_content": 14.56,
+                    "percent_rock_content": 0.0,
+                    "initial_labile_inorganic_phosphorus_concentration": 2.7,
+                    "initial_fresh_organic_phosphorus_concentration": 0.0,
+                    "initial_soil_nitrate_concentration": 1,
+                    "initial_soil_ammonium_concentration": 1,
+                    "humus_mineralization_rate_factor": 0.0003,
+                    "ammonium_volatilization_cation_exchange_factor": 0.15,
+                    "denitrification_rate_coefficient": 1.4,
+                    "denitrification_threshold_water_content": 1.1,
+                    "residue_fresh_organic_mineralization_rate": 0.05,
+                    "denitrification_rate": 0.1,
+                    "active_N_percent": 0.02,
+                    "OM_percent": 0.0025
+                },
+                {
+                    "bottom_depth": 2006.6,
+                    "soil_water_concentration": 0.3,
+                    "wilting_point_water_concentration": 0.132,
+                    "field_capacity_water_concentration": 0.211,
+                    "saturation_point_water_concentration": 0.5,
+                    "saturated_hydraulic_conductivity": 23.29,
+                    "initial_temperature": 13.38623,
+                    "bulk_density": 1.5,
+                    "percent_organic_carbon_content": 0.012,
+                    "percent_clay_content": 13.04,
+                    "percent_silt_content": 70.66,
+                    "percent_sand_content": 16.30,
+                    "percent_rock_content": 0.0,
+                    "initial_labile_inorganic_phosphorus_concentration": 2.7,
+                    "initial_fresh_organic_phosphorus_concentration": 0.0,
+                    "initial_soil_nitrate_concentration": 1,
+                    "initial_soil_ammonium_concentration": 1,
+                    "humus_mineralization_rate_factor": 0.0003,
+                    "ammonium_volatilization_cation_exchange_factor": 0.15,
+                    "denitrification_rate_coefficient": 1.4,
+                    "denitrification_threshold_water_content": 1.1,
+                    "residue_fresh_organic_mineralization_rate": 0.05,
+                    "denitrification_rate": 0.1,
+                    "active_N_percent": 0.02,
+                    "OM_percent": 0.0025
+                }
+            ]
+    },
+    {
+        "second_moisture_condition_parameter": 85.00,
+        "average_subbasin_slope": 0.02,
+        "slope_length": 3,
+        "manning_roughness_coefficient": 0.4,
+        "support_practice_factor": 0.08,
+        "albedo": 0.16,
+        "soil_evaporation_compensation_coefficient": 0.95,
+        "initial_residue": 0,
+        "soil_layers":
+            [
+                {
+                    "bottom_depth": 150,
+                    "soil_water_concentration": 0.3,
+                    "wilting_point_water_concentration": 0.1,
+                    "field_capacity_water_concentration": 0.30,
+                    "saturation_point_water_concentration": 0.5,
+                    "saturated_hydraulic_conductivity": 20,
+                    "initial_temperature": 15.77575,
+                    "bulk_density": 1.3,
+                    "percent_organic_carbon_content": 0.012,
+                    "percent_clay_content": 20,
+                    "percent_silt_content": 65,
+                    "percent_sand_content": 15,
+                    "percent_rock_content": 0.0,
+                    "initial_labile_inorganic_phosphorus_concentration": 23.7,
+                    "initial_soil_nitrate_concentration": 0.0,
+                    "initial_soil_ammonium_concentration": 1,
+                    "humus_mineralization_rate_factor": 0.0003,
+                    "ammonium_volatilization_cation_exchange_factor": 0.15,
+                    "denitrification_rate_coefficient": 1.4,
+                    "denitrification_threshold_water_content": 1.1,
+                    "residue_fresh_organic_mineralization_rate": 0.05,
+                    "active_N_percent": 0.02,
+                    "denitrification_rate": 0.1,
+                    "OM_percent": 0.019
+                },
+                {
+                    "bottom_depth": 300,
+                    "soil_water_concentration": 0.3,
+                    "wilting_point_water_concentration": 0.1,
+                    "field_capacity_water_concentration": 0.3,
+                    "saturation_point_water_concentration": 0.5,
+                    "saturated_hydraulic_conductivity": 20,
+                    "initial_temperature": 14.50797297,
+                    "bulk_density": 1.3,
+                    "percent_organic_carbon_content": 0.012,
+                    "percent_clay_content": 20,
+                    "percent_silt_content": 65,
+                    "percent_sand_content": 15,
+                    "percent_rock_content": 0.0,
+                    "initial_labile_inorganic_phosphorus_concentration": 10,
+                    "initial_soil_nitrate_concentration": 0.0,
+                    "initial_soil_ammonium_concentration": 1,
+                    "humus_mineralization_rate_factor": 0.0003,
+                    "ammonium_volatilization_cation_exchange_factor": 0.15,
+                    "denitrification_rate_coefficient": 1.4,
+                    "denitrification_threshold_water_content": 1.1,
+                    "residue_fresh_organic_mineralization_rate": 0.05,
+                    "active_N_percent": 0.02,
+                    "denitrification_rate": 0.1,
+                    "OM_percent": 0.019
+                },
+                {
+                    "bottom_depth": 450,
+                    "soil_water_concentration": 0.3,
+                    "wilting_point_water_concentration": 0.1,
+                    "field_capacity_water_concentration": 0.30,
+                    "saturation_point_water_concentration": 0.5,
+                    "saturated_hydraulic_conductivity": 20,
+                    "initial_temperature": 13.38623,
+                    "bulk_density": 1.3,
+                    "percent_organic_carbon_content": 0.012,
+                    "percent_clay_content": 20,
+                    "percent_silt_content": 65,
+                    "percent_sand_content": 15,
+                    "percent_rock_content": 0.0,
+                    "initial_labile_inorganic_phosphorus_concentration": 10,
+                    "initial_soil_nitrate_concentration": 0.0,
+                    "initial_soil_ammonium_concentration": 1,
+                    "humus_mineralization_rate_factor": 0.0003,
+                    "ammonium_volatilization_cation_exchange_factor": 0.15,
+                    "denitrification_rate_coefficient": 1.4,
+                    "denitrification_threshold_water_content": 1.1,
+                    "residue_fresh_organic_mineralization_rate": 0.05,
+                    "active_N_percent": 0.02,
+                    "denitrification_rate": 0.1,
+                    "OM_percent": 0.019
+                }
+            ]
+    }
 ])
-def test_setup_soil_with_full_inputs(soil_input_file_name: str, expected_soil_layer_count: int) -> None:
-    """Tests that current soil inputs can be handled by the soil setup routine."""
-    input_directory = Utility.get_base_dir() / 'input'
-    soil_config = Utility.read_json_file(input_directory / 'soil' / soil_input_file_name)
-    actual = FieldManager._setup_soil(soil_config)
-    assert len(actual.data.soil_layers) == expected_soil_layer_count
+def test_setup_soil(soil_configuration: Dict) -> None:
+    """Tests that Soil profiles are setup correctly with data from the InputManager."""
+    with patch("RUFAS.input_manager.InputManager.get_data", return_value=soil_configuration) as patched_get_data:
+        actual_soil = FieldManager._setup_soil("test_soil_setup", 1.0)
+        assert actual_soil.data.second_moisture_condition_parameter == \
+               soil_configuration.get("second_moisture_condition_parameter")
+        assert actual_soil.data.average_subbasin_slope == soil_configuration.get("average_subbasin_slope")
+        assert actual_soil.data.slope_length == soil_configuration.get("slope_length")
+        assert actual_soil.data.manning == soil_configuration.get("manning_roughness_coefficient")
+        assert actual_soil.data.albedo == soil_configuration.get("albedo")
+        assert len(actual_soil.data.soil_layers) == len(soil_configuration.get("soil_layers")) + 1
+        patched_get_data.assert_called_once_with("test_soil_setup")
 
 
-@pytest.mark.parametrize("soil_config,soil_layer_count", [
-    ({"CN2": 85.00, "field_slope": 0.02, "slope_length": 3, "manning": 0.4, "field_size": 1.0, "sand": 15, "silt": 65,
-      "soil_albedo": 0.16, "initial_residue": 0, "fresh_N_mineral_rate": 0.05, "soil_cover_type": "BARE", "soil_layers":
-          {"layer_1": {"bottom_depth": 279.4},
-           "layer_2": {"bottom_depth": 1041.4},
-           "layer_3": {"bottom_depth": 1168.4},
-           "layer_4": {"bottom_depth": 2006.6}}
-      }, 4)
+@pytest.mark.parametrize("soil_configuration,error_message", [
+    ({
+         "second_moisture_condition_parameter": 85.00,
+         "average_subbasin_slope": 0.02,
+         "slope_length": 3,
+         "manning_roughness_coefficient": 0.4,
+         "support_practice_factor": 0.08,
+         "albedo": 0.16,
+         "soil_evaporation_compensation_coefficient": 0.95,
+         "initial_residue": 0,
+     }, "Configuration for soil layers must be provided."),
+    ({
+         "second_moisture_condition_parameter": 85.00,
+         "average_subbasin_slope": 0.02,
+         "slope_length": 3,
+         "manning_roughness_coefficient": 0.4,
+         "support_practice_factor": 0.08,
+         "albedo": 0.16,
+         "soil_evaporation_compensation_coefficient": 0.95,
+         "initial_residue": 0,
+         "soil_layers": None
+     }, "Configuration for soil layers must be provided.")
 ])
-def test_setup_soil_subroutine_calls(soil_config: Dict, soil_layer_count: int) -> None:
-    """Tests that soil setup routine correctly parses input and calls subroutine."""
-    FieldManager._setup_soil_layer = MagicMock(return_value=LayerData(top_depth=0.0, bottom_depth=1000.0,
-                                                                      field_size=1.0))
-    FieldManager._setup_soil(soil_config)
+def test_setup_soil_error(soil_configuration: dict, error_message: str) -> None:
+    """Tests that errors are raised correctly when invalid soil configurations are passed."""
+    with pytest.raises(ValueError) as e, \
+            patch("RUFAS.input_manager.InputManager.get_data", return_value=soil_configuration):
+        FieldManager._setup_soil("soil_config", 1.3)
+    assert str(e.value) == error_message
 
-    assert FieldManager._setup_soil_layer.call_count == soil_layer_count
+
+@pytest.mark.parametrize("blobs,expected", [
+    ({
+         "tillage_schedule": {
+             "properties": "tillage_schedule_properties"
+         },
+         "field": {
+             "properties": "field_properties"
+         },
+         "weather": {
+             "properties": "weather_properties"
+         }}, ["field"]),
+    ({
+         "tillage_schedule": {
+             "properties": "tillage_schedule_properties"
+         },
+         "field_1": {
+             "properties": "field_properties"
+         },
+         "field_2": {
+             "properties": "field_properties"
+         }}, ["field_1", "field_2"]),
+    ({
+         "tillage_schedule": {
+             "properties": "tillage_schedule_properties"
+         },
+         "weather": {
+             "properties": "weather_properties"
+         }}, []),
+    ({}, [])
+])
+def test_get_field_blob_names(blobs: Dict[str, Dict[str, str]], expected: List[str]) -> None:
+    """Tests that all field blob names are correctly pulled from the InputManager."""
+    with patch("RUFAS.input_manager.InputManager.get_metadata", return_value=blobs):
+        actual = FieldManager._get_field_blob_names()
+        assert actual == expected
+
+
+def test_get_field_blob_names_error() -> None:
+    """Tests that exceptions are correctly raised when metadata does not contain expected values."""
+    with patch("RUFAS.input_manager.InputManager.get_metadata", side_effect=KeyError), \
+            pytest.raises(KeyError) as e:
+        FieldManager._get_field_blob_names()
+    assert str(e.value) == '"Could not find \'files\' section of metadata."'
+
+    with patch("RUFAS.input_manager.InputManager.get_metadata",
+               return_value={"dummy_blob": {"title": "Title", "description": "Described"}}), \
+            pytest.raises(KeyError) as e:
+        FieldManager._get_field_blob_names()
+    assert str(e.value) == '"dummy_blob in metadata did not contain \'properties\' value."'
 
 
 @pytest.mark.parametrize("field_name,field_config", [
-    ("field_1", {"soil": "ARL_soil.json", "crop": "ARL_rotation.json",
-                 "field_management": "ARL_field_management.json"}),
-    ("field_2", {"soil": "barnyard_soil.json", "crop": "corn_scheduled_rotation.json",
-                 "field_management": "barnyard_scheduled_field_management.json"})
+    ("field_1", {
+        "soil_specification": "soil",
+        "crop_specification": "crop",
+        "fertilizer_management_specification": "fertilizer_schedule",
+        "manure_management_specification": "manure_schedule",
+        "tillage_management_specification": "tillage_schedule",
+        "field_size": 1.0,
+        "absolute_latitude": 43.304346,
+        "longitude": None,
+        "minimum_daylength": 9.0,
+        "seasonal_high_water_table": False,
+        "watering_amount_in_liters": 0.0,
+        "watering_interval": 0
+    }),
+    ("field_2", {
+        "soil_specification": "soil",
+        "crop_specification": "crop",
+        "fertilizer_management_specification": "fertilizer_schedule_1",
+        "manure_management_specification": "manure_schedule_1",
+        "tillage_management_specification": "tillage_schedule_1",
+        "field_size": 1.0,
+        "absolute_latitude": 43.5,
+        "longitude": -89.4,
+        "minimum_daylength": 9.0,
+        "seasonal_high_water_table": False,
+        "watering_amount_in_liters": 500.0,
+        "watering_interval": 3
+    })
 ])
-def test_setup_field(field_name: str, field_config: Dict[str, str]) -> None:
+def test_setup_field(field_name: str, field_config: Dict) -> None:
     """Tests that a Field instance is correctly initialized with a given input configuration."""
-    with patch("RUFAS.util.Utility.get_base_dir", new_callable=MagicMock) as mocked_base_dir:
-        with patch("RUFAS.util.Utility.read_json_file", new_callable=MagicMock,
-                   return_value={"field_size": 1.0, "initial_residue": 0.0, "latitude": 40.0}) as mocked_json_dir:
-            FieldManager._setup_management = MagicMock(return_value=({}, FertilizerSchedule("name", [], [], [], [], [],
-                                                                                            [], []),
-                                                                     ManureSchedule("name", [], [], [], [], []),
-                                                                     TillageSchedule("name", [], [], [], [], [])))
-            FieldManager._setup_crop_schedules = MagicMock(return_value=[CropSchedule("name", "crop", [1999], [100],
-                                                                                      [1999], [240], ["default"])])
-            FieldManager._setup_soil = MagicMock(return_value=Soil(field_size=1.0))
-            mocked_manure_manager = MagicMock(ManureManager)
+    mocked_manure_manager = MagicMock(ManureManager)
+    mocked_fertilizer_schedule = MagicMock(FertilizerSchedule)
+    mocked_manure_schedule = MagicMock(ManureSchedule)
+    mocked_tillage_schedule = MagicMock(TillageSchedule)
+    mocked_crop_schedules = [MagicMock(CropSchedule)]
 
-            actual = FieldManager._setup_field(field_name, field_config, mocked_manure_manager)
+    mocked_soil_profile = MagicMock(Soil)
+    mocked_soil_data = MagicMock(SoilData)
+    mocked_soil_profile.data = mocked_soil_data
 
-            mocked_base_dir.assert_called_once()
-            assert mocked_json_dir.call_count == 3
-            FieldManager._setup_management.assert_called_once()
-            FieldManager._setup_crop_schedules.assert_called_once()
-            FieldManager._setup_soil.assert_called_once()
-            assert actual.field_data.name == field_name
-            assert actual.field_data.current_residue == 0.0
-            assert actual.field_data.absolute_latitude == 40.0
+    with patch("RUFAS.input_manager.InputManager.get_data", return_value=field_config) as patched_get_data, \
+            patch("RUFAS.routines.field.manager.field_manager.FieldManager._setup_fertilizer_schedule",
+                  new_callable=MagicMock, return_value=({}, mocked_fertilizer_schedule)) as patched_fertilizer_setup, \
+            patch("RUFAS.routines.field.manager.field_manager.FieldManager._setup_manure_schedule",
+                  new_callable=MagicMock, return_value=mocked_manure_schedule) as patched_manure_setup, \
+            patch("RUFAS.routines.field.manager.field_manager.FieldManager._setup_tillage_schedule",
+                  new_callable=MagicMock, return_value=mocked_tillage_schedule) as patched_tillage_setup, \
+            patch("RUFAS.routines.field.manager.field_manager.FieldManager._setup_crop_schedules",
+                  new_callable=MagicMock, return_value=mocked_crop_schedules) as patched_crop_schedules, \
+            patch("RUFAS.routines.field.manager.field_manager.FieldManager._setup_soil", new_callable=MagicMock,
+                  return_value=mocked_soil_profile) as patched_soil_setup:
+        new_field = FieldManager._setup_field(field_name, mocked_manure_manager)
+
+        assert new_field.field_data.name == field_name
+        assert new_field.field_data.field_size == field_config.get("field_size")
+        assert new_field.field_data.absolute_latitude == field_config.get("absolute_latitude")
+        assert new_field.field_data.longitude == field_config.get("longitude")
+        assert new_field.field_data.minimum_daylength == field_config.get("minimum_daylength")
+        assert new_field.field_data.watering_amount_in_liters == field_config.get("watering_amount_in_liters")
+        assert new_field.field_data.watering_interval == field_config.get("watering_interval")
+
+        assert new_field.soil == mocked_soil_profile
+        assert new_field.available_fertilizer_mixes == {
+            "100_0_0": {"N": 1.0, "P": 0.0, "K": 0.0},
+            "26_4_24": {"N": 0.26, "P": 0.04, "K": 0.24}
+        }
+        assert new_field.manure_manager == mocked_manure_manager
+
+        patched_get_data.assert_called_once_with(field_name)
+        patched_fertilizer_setup.assert_called_once_with(field_config.get("fertilizer_management_specification"))
+        patched_manure_setup.assert_called_once_with(field_config.get("manure_management_specification"))
+        patched_tillage_setup.assert_called_once_with(field_config.get("tillage_management_specification"))
+        patched_crop_schedules.assert_called_once_with(field_config.get("crop_specification"))
+        patched_soil_setup.assert_called_once_with(field_config.get("soil_specification"),
+                                                   field_config.get("field_size"))

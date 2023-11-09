@@ -1,33 +1,29 @@
 """
 RUFAS: Ruminant Farm Systems Model
-File name: animal_base.py
-Author(s): Manfei Li, mli497@wisc.edu
-           Militsa Sotirova, militsasotrirova@gmail.com
-           Tayler Hansen, tlhansen@cornell.edu
-Description: This file initialize common parameters including ID, breed,
-birth date, and age for all animals to be identified.
+----------------------------------
+
+File Name: animal_base.py
+
+Authors:
+    - Manfei Li: mli497@wisc.edu
+    - Militsa Sotirova: militsasotrirova@gmail.com
+    - Tayler Hansen: tlhansen@cornell.edu
+
+Description:
+    This file initializes common parameters including ID, breed, birth date,
+    and age for all animals to be identified.
 """
-###############################################################################
 
+from RUFAS.routines.animal.animal_typed_dicts import AnimalBaseInitArgsTypedDict
 from RUFAS.routines.animal.life_cycle.animal_events import AnimalEvents
+from RUFAS.routines.animal.life_cycle.body_weight_history import BodyWeightHistory
+from RUFAS.routines.animal.life_cycle.pen_history import PenHistory
+from RUFAS.input_manager import InputManager
+
+im = InputManager()
 
 
-class PenHistory:
-    def __init__(self, start, end, pen, classes_in_pen):
-        self.start_date = start
-        self.end_date = end
-        self.pen = pen
-        self.classes_in_pen = classes_in_pen
-
-
-class BodyWeightHistory:
-    def __init__(self, sim_day, days_born, body_weight):
-        self.simulation_day = sim_day
-        self.days_born = days_born
-        self.body_weight = body_weight
-
-
-class AnimalBase(object):
+class AnimalBase:
     config = {}
     nutrients = None
 
@@ -38,8 +34,9 @@ class AnimalBase(object):
     @staticmethod
     def set_config(config):
         AnimalBase.config = config
+        AnimalBase.config['nutrient_standard'] = im.get_data("config.nutrient_standard")
 
-    def __init__(self, args):
+    def __init__(self, args: AnimalBaseInitArgsTypedDict):
         """
         Initializes common parameters for all animals
         Args:
@@ -143,8 +140,7 @@ class AnimalBase(object):
             self.dP_reserves = 0
 
         # amount of P in the animal (A.1G.A.3)
-        self.p_animal = self.p_animal + self.p_gest + self.p_growth + \
-                        (self.dP_reserves - dP_reserves_prev)
+        self.p_animal = self.p_animal + self.p_gest + self.p_growth + (self.dP_reserves - dP_reserves_prev)
 
     def calc_base_manure(self):
         """
