@@ -60,6 +60,8 @@ class LayerData:
         calculating this field as well)"""
     previous_day_temperature: Optional[float] = None
     """temperature of soil layer on the previous day (degrees C)"""
+    decomposition_temperature_effect: Optional[float] = None
+    """temperature effect on decomposition factor (unitless) (pseudocode_soil S.6.A.1)"""
 
     # --- Erosion
     percent_organic_carbon_content: float = 1.2
@@ -418,7 +420,6 @@ class LayerData:
         This is an extremely simply and arbitrary way of initializing carbon pools in the soil, and is intended to be a
         temporary solution until SWAT-C is implemented. Dividing the carbon equally between the three soil pools is an
         arbitrary assumption, but is somewhat reasonable.
-        TODO - #512
 
         """
         soil_volume_in_cubic_meters = self.layer_thickness * (field_size * HECTARES_TO_SQUARE_MILLIMETERS) * \
