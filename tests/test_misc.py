@@ -1,10 +1,3 @@
-"""
-RUFAS: Ruminant Farm Systems Model
-File name: test_misc.py
-Description: Implements test cases
-Author(s): Pooya Hekmati, sh2235@cornell.edu
-"""
-
 from copy import deepcopy
 import os
 from pathlib import Path
@@ -787,6 +780,7 @@ def output_manager_original_method_states(
         "dump_warnings": mock_output_manager.dump_warnings,
         "dump_errors": mock_output_manager.dump_errors,
         "dump_variable_names_and_contexts": mock_output_manager.dump_variable_names_and_contexts,
+        "_route_save_functions": mock_output_manager._route_save_functions,
     }
 
 
@@ -1715,14 +1709,11 @@ def test_save_variables_unsupported_prefix(
     mock_output_manager.save_variables("save_path", "filters_path")
 
     mock_output_manager._load_filter_file_content.assert_not_called()
-    assert (
-        len(
-            mock_output_manager.warnings_pool[
-                "OutputManager.save_variables.invalid filter file prefix"
-            ]
-        )
-        == len(mock_output_manager._list_txt_and_json_files_in_dir.return_value)
-    )
+    assert len(
+        mock_output_manager.warnings_pool[
+            "OutputManager.save_variables.invalid filter file prefix"
+        ]
+    ) == len(mock_output_manager._list_txt_and_json_files_in_dir.return_value)
 
     # Restore original method
     mock_output_manager.save_variables = output_manager_original_method_states[
@@ -1739,7 +1730,84 @@ def test_save_variables_unsupported_prefix(
     )
 
 
+@pytest.mark.parametrize(
+    "exclude_info_maps, produce_graphics",
+    [(True, True), (True, False), (False, True), (False, False)],
+)
 def test_save_variables(
+    mock_output_manager: OutputManager,
+    output_manager_original_method_states: Dict[str, Callable],
+    exclude_info_maps: bool,
+    produce_graphics: bool,
+) -> None:
+    # Arrange
+    mock_output_manager.variables_pool = {}
+    mock_output_manager._generate_file_name = MagicMock(return_value="dummy_name")
+    mock_output_manager._load_filter_file_content = MagicMock(
+        return_value=[{"filters": ".*", "title": "dummy_title"}]
+    )
+    mock_output_manager._list_txt_and_json_files_in_dir = MagicMock(
+        return_value=[
+            "csv_input_filepath1.txt",
+            "graph_input_filepath2.txt",
+        ]
+    )
+    mock_output_manager._exclude_info_maps = MagicMock(return_value={})
+    mock_output_manager._route_save_functions = MagicMock()
+
+    # Act
+    mock_output_manager.save_variables(
+        "save_path", "filters_path", exclude_info_maps, produce_graphics, "graphics_dir"
+    )
+
+    # Assert
+    if exclude_info_maps:
+        mock_output_manager._exclude_info_maps.assert_has_calls([call({}), call({})])
+    else:
+        mock_output_manager._exclude_info_maps.assert_not_called()
+    mock_output_manager._route_save_functions.assert_has_calls(
+        [
+            call(
+                "csv_input_filepath1.txt",
+                "save_path",
+                {},
+                produce_graphics,
+                {"filters": ".*", "title": "dummy_title"},
+                "graphics_dir",
+            ),
+            call(
+                "graph_input_filepath2.txt",
+                "save_path",
+                {},
+                produce_graphics,
+                {"filters": ".*", "title": "dummy_title"},
+                "graphics_dir",
+            ),
+        ]
+    )
+
+    # Restore original method
+    mock_output_manager.save_variables = output_manager_original_method_states[
+        "save_variables"
+    ]
+    mock_output_manager._list_txt_and_json_files_in_dir = (
+        output_manager_original_method_states["_list_txt_and_json_files_in_dir"]
+    )
+    mock_output_manager._generate_file_name = output_manager_original_method_states[
+        "_generate_file_name"
+    ]
+    mock_output_manager._load_filter_file_content = (
+        output_manager_original_method_states["_load_filter_file_content"]
+    )
+    mock_output_manager._exclude_info_maps = output_manager_original_method_states[
+        "_exclude_info_maps"
+    ]
+    mock_output_manager._route_save_functions = output_manager_original_method_states[
+        "_route_save_functions"
+    ]
+
+
+def test_route_save_functions(
     mock_output_manager: OutputManager,
     output_manager_original_method_states: Dict[str, Callable],
 ) -> None:
