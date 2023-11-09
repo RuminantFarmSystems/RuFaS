@@ -804,12 +804,12 @@ class OutputManager(object):
 
     def _route_save_functions(
         self,
-        filter_file,
-        save_path,
-        filtered_pool,
-        produce_graphics,
-        filter_content,
-        graphics_dir,
+        filter_file: str,
+        save_path: Path,
+        filtered_pool: Dict[str, pool_element_type],
+        produce_graphics: bool,
+        filter_content: Dict[str, str],
+        graphics_dir: Path,
     ) -> None:
         info_map = {
             "class": self.__class__.__name__,
