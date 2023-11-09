@@ -62,8 +62,8 @@ def run_rufas(
         Validate input data and don't run a simulation.
     graphics_dir : Path, optional, default=Path("")
         The directory for saving graphics.
-    vars_file_path : str, optional, default=None
-        The path to the variables file to be loaded into the Output Manager's variables pool.
+    load_pool : bool, optional, default=False
+        Load json file into Output Manager variables pool for processing.
     """
     sys.stdout.write("RuFaS: Ruminant Farm Systems Model 2023\n")
 
@@ -90,16 +90,16 @@ def run_rufas(
 
 
 def clear_output_dir(vars_file_path: Path = None) -> None:
-    """Clears the output directory if vars_file_path not in output directory
+    """Clears the output directory if vars_file_path not in output directory.
 
     Parameters
     ----------
-    vars_file_path : Path, optional
-        _description_, by default None
+    vars_file_path : Path, optional, default=None
+        Path to file used to load Output Manager vars pool.
     """
     info_map = {
         "class": "No caller class",
-        "function": run_validation.__name__,
+        "function": clear_output_dir.__name__,
     }
     output_manager = OutputManager()
     output_dir = Path(config.global_variables.OUT_DIR)
@@ -112,8 +112,16 @@ def clear_output_dir(vars_file_path: Path = None) -> None:
         output_manager.add_log("Output directory cleared", "No conflicts to clearing output directory.", info_map)
 
 
-def is_file_in_dir(dir_path: Path = Path(config.global_variables.OUT_DIR), vars_file_path: Path = None) -> None:
-    """Checks if a file path is in the provided directory"""
+def is_file_in_dir(dir_path: Path = Path(config.global_variables.OUT_DIR), vars_file_path: Path = None) -> bool:
+    """Checks if a file path is in the provided directory.
+
+    Parameters
+    ----------
+    dir_path : Path, optional, default=Path(config.global_variables.OUT_DIR)
+        Path to the directory to be checked.
+    vars_file_path : Path, optional, default=None
+        Path to file to be checked.
+    """
     if vars_file_path is None:
         return False
     file_path = vars_file_path.resolve()
