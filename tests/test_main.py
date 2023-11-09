@@ -344,6 +344,7 @@ def test_clear_output_dir(mocker: MockerFixture, is_in_dir: bool) -> None:
         (Path("path/to/directory"), Path("path/to/directory/file.json"), True),
         (Path("path/to/directory"), Path("path/to/different_directory/file.json"), False),
         (Path("path/to/directory"), Path("path/to/directory/subdirectory/file.json"), True),
+        (Path("path/to/directory"), None, False),
     ],
 )
 def test_is_file_in_dir(dir_path: Path, vars_file_path: Path, expected_result: bool) -> None:
