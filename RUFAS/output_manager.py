@@ -728,7 +728,7 @@ class OutputManager(object):
         self.add_log("num_filter_pattern_matches", filter_log_count_msg, info_map)
         return filter_pattern_matches
 
-    def save_variables(
+    def save_variables(  # noqa: C901
         self,
         save_path: Path,
         dir_path: Path,
@@ -770,57 +770,66 @@ class OutputManager(object):
         list_of_filter_files = self._list_txt_and_json_files_in_dir(dir_path)
         for filter_file in list_of_filter_files:
             input_path = os.path.join(dir_path, filter_file)
-            filter_content = self._load_filter_file_content(input_path)
-            if "filters" not in filter_content.keys():
-                self.add_error(
-                    "Missing filters entry",
-                    f"'filters' does not exist in {filter_file}",
-                    info_map,
-                )
-                continue
-            filtered_pool = self._filter_variables_pool(
-                filter_content["filters"], filter_file
-            )
-            if exclude_info_maps:
-                filtered_pool = self._exclude_info_maps(filtered_pool)
-
-            if filter_file.startswith(self.__supported_filter_types_prefixes["json"]):
-                file_path = os.path.join(
-                    save_path,
-                    self._generate_file_name(f"saved_variables_{filter_file}", "json"),
-                )
-                self._dict_to_file_json(filtered_pool, file_path)
-            elif filter_file.startswith(self.__supported_filter_types_prefixes["csv"]):
-                csv_directory = os.path.join(save_path, "CSVs", "om")
-                self._save_variables_to_csv_files(
-                    filtered_pool, filter_file, csv_directory
-                )
-            elif filter_file.startswith(
-                self.__supported_filter_types_prefixes["graph"]
-            ):
-                if produce_graphics:
-                    try:
-                        graph_generator.generate_graph(
-                            filtered_pool,
-                            filter_content,
-                            save_path,
-                            filter_file,
-                            graphics_dir,
-                        )
-                    except Exception as e:
-                        self.add_error("graph generation exception", str(e), info_map)
-                else:
-                    self.add_warning(
-                        "No Graphics",
-                        f"Graphic generation is disabled, skipping {filter_file=}",
+            filter_contents = self._load_filter_file_content(input_path)
+            for filter_content in filter_contents:
+                if "filters" not in filter_content.keys():
+                    self.add_error(
+                        "Missing filters entry",
+                        f"'filters' does not exist in {filter_file}",
                         info_map,
                     )
-            else:
-                self.add_warning(
-                    "invalid filter file prefix",
-                    f"{filter_file} prefix is not in {list(self.__supported_filter_types_prefixes.values())}",
-                    info_map,
+                    continue
+                filtered_pool = self._filter_variables_pool(
+                    filter_content["filters"], filter_file
                 )
+                if exclude_info_maps:
+                    filtered_pool = self._exclude_info_maps(filtered_pool)
+
+                if filter_file.startswith(
+                    self.__supported_filter_types_prefixes["json"]
+                ):
+                    file_path = os.path.join(
+                        save_path,
+                        self._generate_file_name(
+                            f"saved_variables_{filter_file}", "json"
+                        ),
+                    )
+                    self._dict_to_file_json(filtered_pool, file_path)
+                elif filter_file.startswith(
+                    self.__supported_filter_types_prefixes["csv"]
+                ):
+                    csv_directory = os.path.join(save_path, "CSVs", "om")
+                    self._save_variables_to_csv_files(
+                        filtered_pool, filter_file, csv_directory
+                    )
+                elif filter_file.startswith(
+                    self.__supported_filter_types_prefixes["graph"]
+                ):
+                    if produce_graphics:
+                        try:
+                            graph_generator.generate_graph(
+                                filtered_pool,
+                                filter_content,
+                                save_path,
+                                filter_file,
+                                graphics_dir,
+                            )
+                        except Exception as e:
+                            self.add_error(
+                                "graph generation exception", str(e), info_map
+                            )
+                    else:
+                        self.add_warning(
+                            "No Graphics",
+                            f"Graphic generation is disabled, skipping {filter_file=}",
+                            info_map,
+                        )
+                else:
+                    self.add_warning(
+                        "invalid filter file prefix",
+                        f"{filter_file} prefix is not in {list(self.__supported_filter_types_prefixes.values())}",
+                        info_map,
+                    )
 
     def _save_variables_to_csv_files(
         self, data_dict: Dict[str, Any], filter_name: str, path: str
