@@ -200,15 +200,15 @@ def execute_simulations(
                 f"Data not valid for {str(metadata_file['path'])}, simulation not run",
                 info_map,
             )
-        output_manager.dump_all_nondata_pools(
-            r"output", exclude_info_maps, format_option
-        )
         output_manager.save_variables(
             Path(r"output"),
             Path(r"output/output_filters/"),
             exclude_info_maps,
             produce_graphics,
             graphics_dir,
+        )
+        output_manager.dump_all_nondata_pools(
+            r"output", exclude_info_maps, format_option
         )
 
 
