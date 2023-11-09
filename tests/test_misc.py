@@ -1836,6 +1836,32 @@ def test_route_save_functions_json(
     mock_output_manager: OutputManager,
     output_manager_original_method_states: Dict[str, Callable],
 ) -> None:
+    mock_output_manager._dict_to_file_json = MagicMock()
+    mock_output_manager._generate_file_name = MagicMock(return_value="filename.json")
+    mock_output_manager._route_save_functions(
+        "json_file",
+        "save_path",
+        {"key": {"var": "value"}},
+        True,
+        {"filters": "regex"},
+        True,
+    )
+    mock_output_manager._dict_to_file_json.assert_called_once_with(
+        {"key": {"var": "value"}}, "save_path\\filename.json"
+    )
+    # Restore original method
+    mock_output_manager._dict_to_file_json = output_manager_original_method_states[
+        "_dict_to_file_json"
+    ]
+    mock_output_manager._route_save_functions = output_manager_original_method_states[
+        "_route_save_functions"
+    ]
+
+
+def test_route_save_functions_graph(
+    mock_output_manager: OutputManager,
+    output_manager_original_method_states: Dict[str, Callable],
+) -> None:
     mock_output_manager.variables_pool = {}
     mock_output_manager._dict_to_file_json = MagicMock()
     mock_output_manager._save_variables_to_csv_files = MagicMock()
