@@ -30,11 +30,11 @@ file_path = os.path.join(dir_path, "input/ARL.json")
     "no_graphics, format_option, verbose, clear_output, exclude_info_maps, only_run_validation, graphics_dir,"
     "load_pool",
     [
-        (False, "verbose", LogVerbosity.ERRORS, True, True, True, "graphics", "all_vars.json"),
-        (True, "basic", LogVerbosity.LOGS, False, False, False, "custom_graphics", "all_vars.json"),
-        (True, "block", LogVerbosity.NONE, True, False, False, "graphics", "all_vars.json"),
-        (False, "inline", LogVerbosity.WARNINGS, False, False, False, "custom_graphics", ""),
-        (True, "verbose", LogVerbosity.LOGS, False, True, False, "graphics", ""),
+        (False, "verbose", LogVerbosity.ERRORS, True, True, True, "graphics", False),
+        (True, "basic", LogVerbosity.LOGS, False, False, False, "custom_graphics", False),
+        (True, "block", LogVerbosity.NONE, True, False, False, "graphics", False),
+        (False, "inline", LogVerbosity.WARNINGS, False, False, False, "custom_graphics", True),
+        (True, "verbose", LogVerbosity.LOGS, False, True, False, "graphics", True),
     ],
 )
 def test_main(
@@ -45,7 +45,7 @@ def test_main(
     exclude_info_maps: bool,
     only_run_validation: bool,
     graphics_dir: str,
-    load_pool: str,
+    load_pool: bool,
 ) -> None:
     with patch("main.parse_gnu_args") as mock_parse_gnu_args:
         mock_parse_gnu_args.return_value = argparse.Namespace(
@@ -70,32 +70,32 @@ def test_main(
                 exclude_info_maps=exclude_info_maps,
                 only_run_validation=only_run_validation,
                 graphics_dir=Path(graphics_dir),
-                vars_file_path=load_pool
+                load_pool=load_pool
             )
 
 
 @pytest.mark.parametrize(
     "format_option, produce_graphics, verbose, clear_output, exclude_info_maps, only_run_validation,"
-    "graphics_dir, vars_file_path",
+    "graphics_dir, load_pool",
     [
-        ("verbose", True, LogVerbosity.NONE, True, True, True, "", None),
-        ("block", False, LogVerbosity.LOGS, True, True, True, "", None),
-        ("inline", True, LogVerbosity.ERRORS, True, True, True, "", None),
-        ("basic", True, LogVerbosity.WARNINGS, False, True, True, "", None),
-        ("verbose", True, LogVerbosity.NONE, True, False, True, "", ""),
-        ("block", True, LogVerbosity.LOGS, True, True, False, "", ""),
-        ("inline", False, LogVerbosity.ERRORS, True, True, True, "", ""),
-        ("basic", False, LogVerbosity.WARNINGS, False, True, True, "", ""),
-        ("verbose", False, LogVerbosity.NONE, True, False, True, "", ""),
-        ("block", False, LogVerbosity.LOGS, True, True, False, "", ""),
-        ("inline", False, LogVerbosity.ERRORS, False, True, True, "", ""),
-        ("basic", False, LogVerbosity.WARNINGS, True, False, True, "", ""),
-        ("verbose", False, LogVerbosity.NONE, True, True, False, "", ""),
-        ("block", False, LogVerbosity.WARNINGS, False, False, True, "", ""),
-        ("inline", False, LogVerbosity.LOGS, False, True, False, "", ""),
-        ("basic", False, LogVerbosity.ERRORS, False, False, False, "", ""),
-        ("basic", False, LogVerbosity.LOGS, False, False, False, "graphics", ""),
-        ("basic", False, LogVerbosity.LOGS, False, False, False, "graphics", "all_vars.json"),
+        ("verbose", True, LogVerbosity.NONE, True, True, True, "", False),
+        ("block", False, LogVerbosity.LOGS, True, True, True, "", False),
+        ("inline", True, LogVerbosity.ERRORS, True, True, True, "", False),
+        ("basic", True, LogVerbosity.WARNINGS, False, True, True, "", False),
+        ("verbose", True, LogVerbosity.NONE, True, False, True, "", False),
+        ("block", True, LogVerbosity.LOGS, True, True, False, "", False),
+        ("inline", False, LogVerbosity.ERRORS, True, True, True, "", False),
+        ("basic", False, LogVerbosity.WARNINGS, False, True, True, "", False),
+        ("verbose", False, LogVerbosity.NONE, True, False, True, "", False),
+        ("block", False, LogVerbosity.LOGS, True, True, False, "", False),
+        ("inline", False, LogVerbosity.ERRORS, False, True, True, "", False),
+        ("basic", False, LogVerbosity.WARNINGS, True, False, True, "", False),
+        ("verbose", False, LogVerbosity.NONE, True, True, False, "", False),
+        ("block", False, LogVerbosity.WARNINGS, False, False, True, "", False),
+        ("inline", False, LogVerbosity.LOGS, False, True, False, "", False),
+        ("basic", False, LogVerbosity.ERRORS, False, False, False, "", False),
+        ("basic", False, LogVerbosity.LOGS, False, False, False, "graphics", False),
+        ("basic", False, LogVerbosity.LOGS, False, False, False, "graphics", True),
     ],
 )
 def test_run_rufas(
@@ -106,7 +106,7 @@ def test_run_rufas(
     exclude_info_maps: bool,
     only_run_validation: bool,
     graphics_dir: str,
-    vars_file_path: str,
+    load_pool: bool,
     mocker: MockerFixture,
     capsys,
 ) -> None:
@@ -115,8 +115,9 @@ def test_run_rufas(
     metadata_file_list = METADATA_PATHS
     patch_execute_simulations = mocker.patch("main.execute_simulations")
     patch_run_validation = mocker.patch("main.run_validation")
-    patch_empty_dir = mocker.patch("RUFAS.util.Utility.empty_dir")
+    # patch_empty_dir = mocker.patch("RUFAS.util.Utility.empty_dir")
     patch_run_load_vars_pool = mocker.patch("main.run_load_vars_pool")
+    patch_clear_output_dir = mocker.patch("main.clear_output_dir")
 
     # Act
     run_rufas(
@@ -127,13 +128,13 @@ def test_run_rufas(
         exclude_info_maps,
         only_run_validation,
         graphics_dir,
-        vars_file_path,
+        load_pool,
     )
 
     # Assert
-    if vars_file_path:
+    if load_pool:
         patch_run_load_vars_pool.assert_called_once_with(
-            vars_file_path, exclude_info_maps, format_option, produce_graphics, graphics_dir
+            exclude_info_maps, format_option, produce_graphics, graphics_dir, clear_output
         )
         return
     elif only_run_validation:
@@ -151,9 +152,9 @@ def test_run_rufas(
         )
 
     if clear_output:
-        patch_empty_dir.assert_called_once()
+        patch_clear_output_dir.assert_called_once()
     else:
-        patch_empty_dir.assert_not_called()
+        patch_clear_output_dir.assert_not_called()
 
     captured = capsys.readouterr()
     expected_message = "RuFaS: Ruminant Farm Systems Model 2023\n"
@@ -352,6 +353,7 @@ def test_parse_gnu_args(mocker: MockerFixture) -> None:
             "-l",
             "--load-pool",
             help="Load the output manager's variables pool from provided path",
+            action="store_true"
         ),
     ]
     mock_parse_args.assert_called_once()
