@@ -109,35 +109,45 @@ class CropManagement:
         self.data.above_ground_biomass -= (self.data.above_ground_biomass * self.data.dry_down_fraction)
 
     def cut_crop(self, collected_fraction: float = 0) -> None:
-        """performs a cut operation on the crop and, optionally, collects yield
+        """
+        Performs a cut operation on the crop and, optionally, collects yield.
 
-        Args:
-            collected_fraction: The fraction of the cut biomass that is collected. The remaining portion remains
-                in the field (between 0 and 1, inclusive).
+        Parameters
+        ----------
+        collected_fraction: The fraction of the cut biomass that is collected. The remaining portion remains
+            in the field (between 0 and 1, inclusive).
 
-        SWAT Reference: 5:2.4
+        References
+        ----------
+        SWAT Theoretical documentation section 5:2.4
 
-        Raises: a ValueError if collected_fraction is not between 0 and 1
+        Raises
+        ------
+        ValueError
+            If collected_fraction is not between 0 and 1.
 
-        Details: The proportion of a crop that is cut is determined by the harvest index. A harvest index < 1 is the
-            typical scenario and indicates that a proportion of biomass equal to the harvest index will be removed
-            from the above-ground biomass of the plant. A harvest index > 1 will cut into below ground biomass as well.
+        Notes
+        -----
+        The proportion of a crop that is cut is determined by the harvest index. A harvest index < 1 is the typical
+        scenario and indicates that a proportion of biomass equal to the harvest index will be removed from the
+        above-ground biomass of the plant. A harvest index > 1 will cut into below ground biomass as well.
 
-            The cut biomass is removed from the plant's total biomass and the amount collected as yield is determined
-            by the collected fraction. The remaining portion is left in the field. Cut operations without a harvest
-            are conducted by setting collected_fraction = 0 (the default).
+        The cut biomass is removed from the plant's total biomass and the amount collected as yield is determined by the
+        collected fraction. The remaining portion is left in the field. Cut operations without a harvest are conducted
+        by setting collected_fraction = 0 (the default).
 
-            In addition to total biomass, the nutrient content for both the collected and uncollected portions are
-            updated. If the simulation is using the internally-derived harvest index for cutting, then nutrients are
-            determined with the crop-specific yield nutrient fractions. Otherwise, (harvest index override), the
-            optimal nutrient values are used.
+        In addition to total biomass, the nutrient content for both the collected and uncollected portions are updated.
+        If the simulation is using the internally-derived harvest index for cutting, then nutrients are determined with
+        the crop-specific yield nutrient fractions. Otherwise, (harvest index override), the optimal nutrient values are
+        used.
 
-            Note that, because above-ground biomass is calculated daily as a function of the total biomass and the root
-            fraction (biomass_allocation.py, root_development.py), it does not make sense to alter the above-ground
-            biomass here directly, even though that is more realistic. The current process should produce effective
-            estimates over the growing season
+        Note that, because above-ground biomass is calculated daily as a function of the total biomass and the root
+        fraction (biomass_allocation.py, root_development.py), it does not make sense to alter the above-ground biomass
+        here directly, even though that is more realistic. The current process should produce effective estimates over
+        the growing season
 
-            This method is meant to be called from one of the various harvest operations.
+        This method is meant to be called from one of the various harvest operations.
+
         """
         if not 0 <= collected_fraction <= 1.0:
             raise ValueError(
@@ -145,13 +155,15 @@ class CropManagement:
             )
 
         # Biomass removed from plant
-        if self.data.harvest_index <= 1.0:
+        roots_harvested = self.data.harvest_index > 1.0
+        if not roots_harvested:
             self.data.cut_biomass = self.data.above_ground_biomass * self.data.harvest_index  # SWAT 5:2.4.2
         else:
             self.data.cut_biomass = self.determine_biomass_cut_from_whole_plant(self.data.biomass,
                                                                                 self.data.harvest_index)
         fraction_cut = self.data.cut_biomass / self.data.biomass
         self.data.biomass -= self.data.cut_biomass
+        self._recalculate_biomass_distribution(roots_harvested)
 
         # Reset some growth parameters (SWAT 6:1.2)
         self.data.leaf_area_index = self.data.leaf_area_index * (1 - fraction_cut)
@@ -176,8 +188,33 @@ class CropManagement:
             self.data.residue_nitrogen = self.data.yield_nitrogen_fraction * self.data.yield_residue
             self.data.residue_phosphorus = self.data.yield_phosphorus_fraction * self.data.yield_residue
 
-        # TODO: are above- and below-ground lignin residue (percent) needed?
-        #   in the old version, they were both hard-coded to 17 - GitHub Issue #163
+    def _recalculate_biomass_distribution(self, roots_harvested: bool) -> None:
+        """
+        Recalculates how much biomass is stored above ground and how much is stored in the roots.
+
+        Parameters
+        ----------
+        roots_harvested : bool
+            Whether the roots were harvested.
+
+        Notes
+        -----
+        SWAT does not specifically state how biomass should be redistributed after a harvest event. It has equation
+        5:2.4.4, but does not specify if this equation is used to calculate biomass distributions pre- or post-harvest.
+
+        If roots are not harvested, then the amount of biomass cut in the harvest operation is removed from the above
+        ground biomass and the fraction of biomass that is below ground is recalculated directly. If roots are
+        harvested, no biomass is left above ground and the fraction of biomass that is below ground is set to 1.0.
+
+        """
+        if not roots_harvested:
+            self.data.above_ground_biomass -= self.data.cut_biomass
+            self.data.root_fraction = self.data.root_biomass / self.data.biomass
+        else:
+            root_biomass_removed = self.data.cut_biomass - self.data.above_ground_biomass
+            self.data.root_biomass -= root_biomass_removed
+            self.data.above_ground_biomass = 0.0
+            self.data.root_fraction = 1.0
 
     def _record_yield(self, field_name: str, field_size: float, year: int, day: int) -> None:
         """
@@ -220,7 +257,6 @@ class CropManagement:
         """
         soil_data.plant_surface_residue += self.data.yield_residue
         soil_data.soil_layers[0].fresh_organic_nitrogen_content += self.data.yield_nitrogen
-        # TODO: Add organic phosphorus to correct pool in soil - GitHub issue #444
 
     # ---- Harvest Scheduling ----
 
