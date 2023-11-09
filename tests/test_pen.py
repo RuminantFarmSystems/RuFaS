@@ -26,6 +26,7 @@ from RUFAS.routines.animal.pen import Pen
 @pytest.fixture
 def pen() -> Pen:
     id_number = 0
+    pen_name = ""
     vert_dist = 0.1
     horiz_dist = 1.6
     num_stalls = 100
@@ -38,8 +39,8 @@ def pen() -> Pen:
     animal_combination = Pen.AnimalCombination.CALF
     max_stocking_density = 1.2
 
-    pen = Pen(id_number, vert_dist, horiz_dist, num_stalls, housing_type, bedding_type, pen_type, manure_handling,
-              manure_separator, manure_storage, animal_combination, max_stocking_density)
+    pen = Pen(id_number, pen_name, vert_dist, horiz_dist, num_stalls, housing_type, bedding_type, pen_type,
+              manure_handling, manure_separator, manure_storage, animal_combination, max_stocking_density)
 
     return pen
 
@@ -76,15 +77,15 @@ def pen_with_animals(pen: Pen, mock_animal_list: List[MagicMock]) -> Pen:
 
 def test_set_avg_nutrient_rqmts(pen: Pen):
     """Unit test for function set_avg_nutrient_rqmts in file routines/animal/pen.py"""
-    avg_nutrient_rqmts = {'NEmaint': 22.739694446587276,
-                          'NEa': 0,
-                          'NEg': 0.0,
-                          'NEpreg': 0.8809032714863911,
-                          'NEl': 0,
-                          'MP_req': 169.60219829211576,
-                          'Ca_req': 8.551061771355254,
-                          'P_req': 0.8978663353409345,
-                          'DMIest': 0,
+    avg_nutrient_rqmts = {'NEmaint_requirement': 22.739694446587276,
+                          'NEa_requirement': 0,
+                          'NEg_requirement': 0.0,
+                          'NEpreg_requirement': 0.8809032714863911,
+                          'NEl_requirement': 0,
+                          'MP_requirement': 169.60219829211576,
+                          'Ca_requirement': 8.551061771355254,
+                          'P_requirement': 0.8978663353409345,
+                          'DMIest_requirement': 0,
                           'avg_BW': 445.74074026264447}
 
     pen.set_avg_nutrient_rqmts(avg_nutrient_rqmts)

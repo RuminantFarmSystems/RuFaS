@@ -8,7 +8,7 @@ from RUFAS.routines.field.soil.layer_data import LayerData
 from RUFAS.routines.field.soil.soil_data import SoilData
 
 
-@pytest.mark.parametrize("temp_average", [
+@pytest.mark.parametrize("layer_temp", [
     -40.33,
     -20.1,
     0.0,
@@ -16,13 +16,13 @@ from RUFAS.routines.field.soil.soil_data import SoilData
     150,  # higher values
     88.8,  # arbitrary
 ])
-def test_calc_temp_factor(temp_average, x_inflection: float = 15.4, y_inflection: float = 11.75,
+def test_calc_temp_factor(layer_temp, x_inflection: float = 15.4, y_inflection: float = 11.75,
                           point_distance: float = 29.7, inflection_slope=0.03,
                           normalizer=20.80546):
     """ensures that temperature effect was calculated according to the formula in "pseudocode_soil" S.6.A.1"""
     expect = max(0.0, (y_inflection + (point_distance / math.pi) * math.atan(math.pi * inflection_slope * (
-            temp_average - x_inflection))) / normalizer)
-    assert Decomposition._calc_temp_factor(temp_average) == expect
+            layer_temp - x_inflection))) / normalizer)
+    assert Decomposition._calc_temp_factor(layer_temp) == expect
 
 
 @pytest.mark.parametrize("water_factor", [
@@ -84,12 +84,12 @@ def test_decompose(temp_average, layers):
     Decomposition._calc_temp_factor = MagicMock(return_value=3.99)
 
     # calls function
-    decomp.decompose(temp_average)
+    decomp.decompose()
 
     # making sure functions were called properly
-    Decomposition._calc_temp_factor.assert_called_once()
+    assert Decomposition._calc_temp_factor.call_count == len(layers)
     assert Decomposition._calc_moisture_factor.call_count == len(layers)
 
-    assert data.decomposition_temperature_effect == 3.99
     for layer in data.soil_layers:
         assert layer.decomposition_moisture_effect == 1.89
+        assert layer.decomposition_temperature_effect == 3.99

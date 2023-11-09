@@ -16,27 +16,60 @@ from typing import Tuple
 from RUFAS.routines.animal.animal_manager import AnimalManager
 from RUFAS.routines.manure.beddings.bedding_classes import BaseBedding
 from RUFAS.routines.manure.beddings.bedding_classes import BeddingFactory
-from RUFAS.routines.manure.constants.manure_constants import ManureConstants
-from RUFAS.routines.manure.input_handler.manure_manager_config_handler import ManureManagerConfigHandler
-from RUFAS.routines.manure.manure_handlers.manure_handler_classes import BaseManureHandler
-from RUFAS.routines.manure.manure_handlers.manure_handler_classes import ManureHandlerFactory
-from RUFAS.routines.manure.manure_handlers.manure_handler_daily_output import ManureHandlerDailyOutput
-from RUFAS.routines.manure.manure_nutrients.manure_nutrient_manager import ManureNutrientManager
+from RUFAS.routines.manure.constants_and_units.manure_constants import ManureConstants
+from RUFAS.routines.manure.IO_helpers.manure_manager_config_handler import (
+    ManureManagerConfigHandler,
+)
+from RUFAS.routines.manure.manure_handlers.manure_handler_classes import (
+    BaseManureHandler,
+)
+from RUFAS.routines.manure.manure_handlers.manure_handler_classes import (
+    ManureHandlerFactory,
+)
+from RUFAS.routines.manure.manure_handlers.manure_handler_daily_output import (
+    ManureHandlerDailyOutput,
+)
+from RUFAS.routines.manure.manure_nutrients.manure_nutrient_manager import (
+    ManureNutrientManager,
+)
 from RUFAS.routines.manure.manure_nutrients.manure_nutrients import ManureNutrients
 from RUFAS.routines.manure.manure_nutrients.nutrient_request import NutrientRequest
-from RUFAS.routines.manure.manure_nutrients.nutrient_request_results import NutrientRequestResults
-from RUFAS.routines.manure.manure_separators.manure_separator_classes import BaseManureSeparator
-from RUFAS.routines.manure.manure_separators.manure_separator_classes import ManureSeparatorFactory
-from RUFAS.routines.manure.manure_separators.manure_separator_daily_output import ManureSeparatorDailyOutput
-from RUFAS.routines.manure.manure_treatments.anaerobic_digestion_and_lagoon import AnaerobicDigestionAndLagoon
-from RUFAS.routines.manure.manure_treatments.base_manure_treatment import BaseManureTreatment
-from RUFAS.routines.manure.manure_treatments.manure_treatment_daily_output import ManureTreatmentDailyOutput
-from RUFAS.routines.manure.manure_treatments.manure_treatment_factory import ManureTreatmentFactory
-from RUFAS.routines.manure.manure_treatments.manure_treatment_types import ManureTreatmentType
+from RUFAS.routines.manure.manure_nutrients.nutrient_request_results import (
+    NutrientRequestResults,
+)
+from RUFAS.routines.manure.manure_separators.manure_separator_classes import (
+    BaseManureSeparator,
+)
+from RUFAS.routines.manure.manure_separators.manure_separator_classes import (
+    ManureSeparatorFactory,
+)
+from RUFAS.routines.manure.manure_separators.manure_separator_daily_output import (
+    ManureSeparatorDailyOutput,
+)
+from RUFAS.routines.manure.manure_treatments.anaerobic_digestion_and_lagoon import (
+    AnaerobicDigestionAndLagoon,
+)
+from RUFAS.routines.manure.manure_treatments.base_manure_treatment import (
+    BaseManureTreatment,
+)
+from RUFAS.routines.manure.manure_treatments.manure_treatment_daily_output import (
+    ManureTreatmentDailyOutput,
+)
+from RUFAS.routines.manure.manure_treatments.manure_treatment_factory import (
+    ManureTreatmentFactory,
+)
+from RUFAS.routines.manure.manure_treatments.manure_treatment_types import (
+    ManureTreatmentType,
+)
 from RUFAS.routines.manure.manure_treatments.manure_types import ManureType
-from RUFAS.routines.manure.pen.manure_manager_pen import ManureManagerPen
+from RUFAS.routines.manure.IO_helpers.manure_module_output_manager_helper import (
+    ManureModuleOutputManagerHelper,
+)
+from RUFAS.routines.manure.pen_manure.manure_manager_pen import ManureManagerPen
 from RUFAS.routines.manure.reception_pits.reception_pit import ReceptionPit
-from RUFAS.routines.manure.reception_pits.reception_pit_daily_output import ReceptionPitDailyOutput
+from RUFAS.routines.manure.reception_pits.reception_pit_daily_output import (
+    ReceptionPitDailyOutput,
+)
 
 
 class ManureManager:
@@ -57,11 +90,9 @@ class ManureManager:
 
     """
 
-    def __init__(self,
-                 animal_manager: AnimalManager,
-                 weather,
-                 time,
-                 manure_manager_config):
+    def __init__(
+        self, animal_manager: AnimalManager, weather, time, manure_manager_config
+    ):
         """Initializes a ManureManager object by setting up the appropriate manure
         manager components as specified by the data in the animal_manager object.
 
@@ -86,7 +117,9 @@ class ManureManager:
         self.manure_treatments: Dict[int, BaseManureTreatment] = {}
         self.weather = weather
         self.time = time
-        self.manure_manager_config_handler = ManureManagerConfigHandler(manure_manager_config)
+        self.manure_manager_config_handler = ManureManagerConfigHandler(
+            manure_manager_config
+        )
         self._daily_output_per_pen = []
         self._manure_nutrient_manager = ManureNutrientManager()
         self._configure_manure_manager_components(animal_manager)
@@ -116,7 +149,9 @@ class ManureManager:
         """
         return self._daily_output_per_pen
 
-    def _configure_manure_manager_components(self, animal_manager: AnimalManager) -> None:
+    def _configure_manure_manager_components(
+        self, animal_manager: AnimalManager
+    ) -> None:
         """Configures the manure manager components for each animal pen.
 
         Each pen is associated with the following components - bedding, manure handler,
@@ -131,14 +166,21 @@ class ManureManager:
         for pen in animal_manager.all_pens:
             mm_pen = ManureManagerPen(pen)
 
-            custom_bedding_config = self.manure_manager_config_handler.get_custom_bedding_config(mm_pen.bedding_type)
+            custom_bedding_config = (
+                self.manure_manager_config_handler.get_custom_bedding_config(
+                    mm_pen.bedding_type
+                )
+            )
             self.beddings[mm_pen.id] = BeddingFactory.get_instance(
                 bedding_type_name=mm_pen.bedding_type,
-                custom_bedding_config=custom_bedding_config  # type: ignore
+                custom_bedding_config=custom_bedding_config,  # type: ignore
             )
 
-            custom_manure_handler_config = \
-                self.manure_manager_config_handler.get_custom_manure_handler_config(mm_pen.manure_handler)
+            custom_manure_handler_config = (
+                self.manure_manager_config_handler.get_custom_manure_handler_config(
+                    mm_pen.manure_handler
+                )
+            )
             self.manure_handlers[mm_pen.id] = ManureHandlerFactory.get_instance(
                 manure_handler_type_name=mm_pen.manure_handler,
                 weather=self.weather,
@@ -148,23 +190,27 @@ class ManureManager:
 
             self.reception_pits[mm_pen.id] = ReceptionPit()
 
-            if mm_pen.manure_separator.lower() == 'none':
+            if mm_pen.manure_separator.lower() == "none":
                 self.manure_separators[mm_pen.id] = None
             else:
-                custom_manure_separator_config = \
-                    self.manure_manager_config_handler.get_custom_manure_separator_config(mm_pen.manure_separator)
+                custom_manure_separator_config = self.manure_manager_config_handler.get_custom_manure_separator_config(
+                    mm_pen.manure_separator
+                )
                 self.manure_separators[mm_pen.id] = ManureSeparatorFactory.get_instance(
                     manure_separator_type_name=mm_pen.manure_separator,
-                    custom_manure_separator_config=custom_manure_separator_config  # type: ignore
+                    custom_manure_separator_config=custom_manure_separator_config,  # type: ignore
                 )
 
-            custom_manure_treatment_config = \
-                self.manure_manager_config_handler.get_custom_manure_treatment_config(mm_pen.manure_treatment)
+            custom_manure_treatment_config = (
+                self.manure_manager_config_handler.get_custom_manure_treatment_config(
+                    mm_pen.manure_treatment
+                )
+            )
             self.manure_treatments[mm_pen.id] = ManureTreatmentFactory.get_instance(
                 manure_treatment_type_name=mm_pen.manure_treatment,
                 weather=self.weather,
                 time=self.time,
-                custom_manure_treatment_config=custom_manure_treatment_config  # type: ignore
+                custom_manure_treatment_config=custom_manure_treatment_config,  # type: ignore
             )
 
     def daily_update(self, animal_manager: AnimalManager) -> None:
@@ -209,6 +255,7 @@ class ManureManager:
             ManureTreatmentType.ANAEROBIC_DIGESTION_AND_LAGOON: ManureType.LIQUID,
             ManureTreatmentType.ANAEROBIC_DIGESTION: ManureType.LIQUID,
             ManureTreatmentType.ANAEROBIC_DIGESTION_AND_LAGOON_WITH_SPLIT: ManureType.LIQUID,
+            ManureTreatmentType.COMPOST_BEDDED_PACK_BARN: ManureType.SOLID,
         }
         return manure_type_by_treatment_type[treatment_type]
 
@@ -241,8 +288,11 @@ class ManureManager:
         }
         return manure_density_by_manure_type[manure_type]
 
-    def _add_manure_nutrients(self, pen: ManureManagerPen,
-                              manure_treatment_daily_output: ManureTreatmentDailyOutput) -> None:
+    def _add_manure_nutrients(
+        self,
+        pen: ManureManagerPen,
+        manure_treatment_daily_output: ManureTreatmentDailyOutput,
+    ) -> None:
         """
         Add the nutrients in the manure produced by a given pen to the manure nutrient manager.
 
@@ -266,8 +316,10 @@ class ManureManager:
                 phosphorus=manure_treatment_daily_output.liquid_manure_phosphorus,
                 potassium=manure_treatment_daily_output.liquid_manure_potassium,
                 dry_matter=manure_treatment_daily_output.liquid_manure_total_solids,
-                total_manure_mass=(manure_treatment_daily_output.liquid_manure_daily_volume
-                                   * self._get_manure_density(pen))
+                total_manure_mass=(
+                    manure_treatment_daily_output.liquid_manure_daily_volume
+                    * self._get_manure_density(pen)
+                ),
             )
         )
 
@@ -302,7 +354,8 @@ class ManureManager:
         return self._manure_nutrient_manager.request_nutrients(request)
 
     def _pen_daily_update(self, simulation_day: int, pen) -> None:
-        """Calculates and stores daily output for each manure manager component for a given animal pen.
+        """
+        Calculate daily output data for each manure manager component for a given animal pen.
 
         Parameters
         ----------
@@ -311,26 +364,65 @@ class ManureManager:
         pen
             The animal pen for which the daily output data will be calculated.
 
+        Returns
+        -------
+        None
+
         """
+
         mm_pen = ManureManagerPen(pen)
+        class_and_function_info_maps = {
+            "class": self.__class__.__name__,
+            "function": self._pen_daily_update.__name__,
+        }
+        excluded_fields = ["pen_id", "simulation_day"]
+
+        pen_manure_prefix = {
+            "prefix": "AnimalModuleInputToManureModule_Pen_" + str(mm_pen.id)
+        }
+        ManureModuleOutputManagerHelper.add_dataclass_object(
+            mm_pen.manure,
+            class_and_function_info_maps | pen_manure_prefix,
+            excluded_fields,
+        )
 
         manure_handler_daily_output = self.manure_handlers[mm_pen.id].daily_update(
-            pen=mm_pen,
-            bedding=self.beddings[mm_pen.id],
-            sim_day=simulation_day
+            pen=mm_pen, bedding=self.beddings[mm_pen.id], sim_day=simulation_day
+        )
+
+        manure_handler_daily_output_prefix = {
+            "prefix": manure_handler_daily_output.__class__.__name__
+            + "_Pen_"
+            + str(mm_pen.id)
+        }
+        ManureModuleOutputManagerHelper.add_dataclass_object(
+            manure_handler_daily_output,
+            class_and_function_info_maps | manure_handler_daily_output_prefix,
+            excluded_fields,
         )
 
         reception_pit_daily_output = self.reception_pits[mm_pen.id].daily_update(
             manure_handler_daily_output=manure_handler_daily_output,
             pen=mm_pen,
-            bedding=self.beddings[mm_pen.id]
+            bedding=self.beddings[mm_pen.id],
+        )
+
+        reception_pit_daily_output_prefix = {
+            "prefix": reception_pit_daily_output.__class__.__name__
+            + "_Pen_"
+            + str(mm_pen.id)
+        }
+        ManureModuleOutputManagerHelper.add_dataclass_object(
+            reception_pit_daily_output,
+            class_and_function_info_maps | reception_pit_daily_output_prefix,
+            excluded_fields,
         )
 
         results = self._pen_daily_update_for_separator_and_treatment(
             simulation_day=simulation_day,
             pen=mm_pen,
             manure_handler_daily_output=manure_handler_daily_output,
-            reception_pit_daily_output=reception_pit_daily_output
+            reception_pit_daily_output=reception_pit_daily_output,
         )
 
         anaerobic_digestion_daily_output = results[0]
@@ -338,31 +430,81 @@ class ManureManager:
         manure_treatment_daily_output = results[2]
         manure_treatment_accumulated_output = results[3]
 
+        if anaerobic_digestion_daily_output:
+            anaerobic_digestion_daily_output_prefix = {
+                "prefix": "AnaerobicDigestion_"
+                + anaerobic_digestion_daily_output.__class__.__name__
+                + "_Pen_"
+                + str(mm_pen.id)
+            }
+            ManureModuleOutputManagerHelper.add_dataclass_object(
+                anaerobic_digestion_daily_output,
+                class_and_function_info_maps | anaerobic_digestion_daily_output_prefix,
+                excluded_fields,
+            )
+        if manure_separator_daily_output:
+            manure_separator_daily_output_prefix = {
+                "prefix": manure_separator_daily_output.__class__.__name__
+                + "_Pen_"
+                + str(mm_pen.id)
+            }
+            ManureModuleOutputManagerHelper.add_dataclass_object(
+                manure_separator_daily_output,
+                class_and_function_info_maps | manure_separator_daily_output_prefix,
+                excluded_fields,
+            )
+
+        manure_treatment_daily_output_prefix = {
+            "prefix": manure_treatment_daily_output.__class__.__name__
+            + "_Pen_"
+            + str(mm_pen.id)
+        }
+        ManureModuleOutputManagerHelper.add_dataclass_object(
+            manure_treatment_daily_output,
+            class_and_function_info_maps | manure_treatment_daily_output_prefix,
+            excluded_fields,
+        )
+
+        accumulated_manure_treatment_output_prefix = {
+            "prefix": "Accumulated_"
+            + manure_treatment_daily_output.__class__.__name__
+            + "_Pen_"
+            + str(mm_pen.id)
+        }
+        ManureModuleOutputManagerHelper.add_dataclass_object(
+            manure_treatment_accumulated_output,
+            class_and_function_info_maps | accumulated_manure_treatment_output_prefix,
+            excluded_fields,
+        )
+
         daily_output_data = {
-            'simulation_day': simulation_day,
-            'pen': mm_pen,
-            'animal_manure_excretions': mm_pen.manure,
-            'manure_handler_daily_output': manure_handler_daily_output,
-            'reception_pit_daily_output': reception_pit_daily_output,
-            'manure_separator_daily_output': manure_separator_daily_output,
-            'manure_treatment_daily_output': manure_treatment_daily_output,
-            'manure_treatment_accumulated_output': manure_treatment_accumulated_output,
-            'anaerobic_digestion_daily_output': anaerobic_digestion_daily_output
+            "simulation_day": simulation_day,
+            "pen": mm_pen,
+            "animal_manure_excretions": mm_pen.manure,
+            "manure_handler_daily_output": manure_handler_daily_output,
+            "reception_pit_daily_output": reception_pit_daily_output,
+            "manure_separator_daily_output": manure_separator_daily_output,
+            "manure_treatment_daily_output": manure_treatment_daily_output,
+            "manure_treatment_accumulated_output": manure_treatment_accumulated_output,
+            "anaerobic_digestion_daily_output": anaerobic_digestion_daily_output,
         }
 
         self._add_manure_nutrients(mm_pen, manure_treatment_daily_output)
 
         self._daily_output_per_pen.append(daily_output_data)
 
-    def _pen_daily_update_for_separator_and_treatment(self, simulation_day: int,
-                                                      pen: ManureManagerPen,
-                                                      manure_handler_daily_output: ManureHandlerDailyOutput,
-                                                      reception_pit_daily_output: ReceptionPitDailyOutput) \
-            -> Tuple[
-                Optional[ManureTreatmentDailyOutput],
-                Optional[ManureSeparatorDailyOutput],
-                ManureTreatmentDailyOutput,
-                ManureTreatmentDailyOutput]:
+    def _pen_daily_update_for_separator_and_treatment(
+        self,
+        simulation_day: int,
+        pen: ManureManagerPen,
+        manure_handler_daily_output: ManureHandlerDailyOutput,
+        reception_pit_daily_output: ReceptionPitDailyOutput,
+    ) -> Tuple[
+        Optional[ManureTreatmentDailyOutput],
+        Optional[ManureSeparatorDailyOutput],
+        ManureTreatmentDailyOutput,
+        ManureTreatmentDailyOutput,
+    ]:
         """Calculates daily output for the manure separator and treatment components of a pen.
 
         Parameters
@@ -383,7 +525,7 @@ class ManureManager:
                 simulation_day=simulation_day,
                 pen=pen,
                 manure_handler_daily_output=manure_handler_daily_output,
-                reception_pit_daily_output=reception_pit_daily_output
+                reception_pit_daily_output=reception_pit_daily_output,
             )
             anaerobic_digestion_daily_output = results[0]
             manure_separator_daily_output = results[1]
@@ -394,17 +536,23 @@ class ManureManager:
                 simulation_day=simulation_day,
                 pen=pen,
                 manure_handler_daily_output=manure_handler_daily_output,
-                reception_pit_daily_output=reception_pit_daily_output
+                reception_pit_daily_output=reception_pit_daily_output,
             )
             manure_separator_daily_output = results[0]
             manure_treatment_daily_output = results[1]
             manure_treatment_accumulated_output = results[2]
 
-        return (anaerobic_digestion_daily_output, manure_separator_daily_output,
-                manure_treatment_daily_output, manure_treatment_accumulated_output)
+        return (
+            anaerobic_digestion_daily_output,
+            manure_separator_daily_output,
+            manure_treatment_daily_output,
+            manure_treatment_accumulated_output,
+        )
 
     @classmethod
-    def _is_compound_anaerobic_manure_treatment(cls, manure_treatment_name: str) -> bool:
+    def _is_compound_anaerobic_manure_treatment(
+        cls, manure_treatment_name: str
+    ) -> bool:
         """Returns True if the manure treatment is a compound anaerobic manure treatment, False otherwise.
 
         Parameters
@@ -425,17 +573,20 @@ class ManureManager:
         ]
         return manure_treatment_type in compound_anaerobic_manure_treatment_types
 
-    def _handle_daily_update_for_compound_anaerobic_manure_treatment(self, simulation_day: int,
-                                                                     pen: ManureManagerPen,
-                                                                     manure_handler_daily_output:
-                                                                     ManureHandlerDailyOutput,
-                                                                     reception_pit_daily_output:
-                                                                     ReceptionPitDailyOutput) \
-            -> Tuple[
-                ManureTreatmentDailyOutput, Optional[ManureSeparatorDailyOutput],
-                ManureTreatmentDailyOutput, ManureTreatmentDailyOutput]:
+    def _handle_daily_update_for_compound_anaerobic_manure_treatment(
+        self,
+        simulation_day: int,
+        pen: ManureManagerPen,
+        manure_handler_daily_output: ManureHandlerDailyOutput,
+        reception_pit_daily_output: ReceptionPitDailyOutput,
+    ) -> Tuple[
+        ManureTreatmentDailyOutput,
+        Optional[ManureSeparatorDailyOutput],
+        ManureTreatmentDailyOutput,
+        ManureTreatmentDailyOutput,
+    ]:
         """Handles the daily update for a compound anaerobic manure treatment.
-        
+
         Parameters
         ----------
         simulation_day : int
@@ -445,16 +596,16 @@ class ManureManager:
         manure_handler_daily_output : ManureHandlerDailyOutput
             The daily output of the manure handler for the current day.
         reception_pit_daily_output : ReceptionPitDailyOutput
-            The daily output of the reception pit for the current day.    
-        
+            The daily output of the reception pit for the current day.
+
         Returns
         -------
         Tuple[ManureTreatmentDailyOutput, Optional[ManureSeparatorDailyOutput], ManureTreatmentDailyOutput, ManureTreatmentDailyOutput]
-            The daily output of the anaerobic digestion, 
+            The daily output of the anaerobic digestion,
             the daily output of the manure separator,
             the daily output of the anaerobic lagoon, and
             the accumulated output of the anaerobic lagoon.
-        
+
         """
         # Currently, calling the daily_update on the treatment only returns one final output
         manure_treatment_daily_output = self.manure_treatments[pen.id].daily_update(
@@ -462,27 +613,41 @@ class ManureManager:
             manure_treatment_daily_input=reception_pit_daily_output,
             pen=pen,
             sim_day=simulation_day,
-            manure_separator=self.manure_separators[pen.id]
+            manure_separator=self.manure_separators[pen.id],
         )
 
         # To retrieve the following three intermediate results,
         # we need to access them via instance variables of the treatment object
-        anaerobic_digestion_daily_output = (
-            typing.cast(AnaerobicDigestionAndLagoon, self.manure_treatments[pen.id])
-            .anaerobic_digestion_daily_output)
+        anaerobic_digestion_daily_output = typing.cast(
+            AnaerobicDigestionAndLagoon, self.manure_treatments[pen.id]
+        ).anaerobic_digestion_daily_output
 
-        manure_separator_daily_output = self.manure_treatments[pen.id].manure_separator_daily_output
+        manure_separator_daily_output = self.manure_treatments[
+            pen.id
+        ].manure_separator_daily_output
 
-        manure_treatment_accumulated_output = self.manure_treatments[pen.id].accumulated_output
+        manure_treatment_accumulated_output = self.manure_treatments[
+            pen.id
+        ].accumulated_output
 
-        return (anaerobic_digestion_daily_output, manure_separator_daily_output,
-                manure_treatment_daily_output, manure_treatment_accumulated_output)
+        return (
+            anaerobic_digestion_daily_output,
+            manure_separator_daily_output,
+            manure_treatment_daily_output,
+            manure_treatment_accumulated_output,
+        )
 
-    def _handle_daily_update_for_simple_manure_treatment(self, simulation_day: int,
-                                                         pen: ManureManagerPen,
-                                                         manure_handler_daily_output: ManureHandlerDailyOutput,
-                                                         reception_pit_daily_output: ReceptionPitDailyOutput) \
-            -> Tuple[Optional[ManureSeparatorDailyOutput], ManureTreatmentDailyOutput, ManureTreatmentDailyOutput]:
+    def _handle_daily_update_for_simple_manure_treatment(
+        self,
+        simulation_day: int,
+        pen: ManureManagerPen,
+        manure_handler_daily_output: ManureHandlerDailyOutput,
+        reception_pit_daily_output: ReceptionPitDailyOutput,
+    ) -> Tuple[
+        Optional[ManureSeparatorDailyOutput],
+        ManureTreatmentDailyOutput,
+        ManureTreatmentDailyOutput,
+    ]:
         """Handles the daily update for a manure treatment that is not a compound anaerobic manure treatment.
 
         If the given pen does not use a manure separator, the manure separator daily output will be None.
@@ -504,23 +669,36 @@ class ManureManager:
             The manure separator daily output and the manure treatment daily output.
 
         """
-        manure_separator_daily_output = self.manure_separators[pen.id].daily_update(
-            manure_separator_daily_input=reception_pit_daily_output
-        ) if self.manure_separators[pen.id] else None
+        manure_separator_daily_output = (
+            self.manure_separators[pen.id].daily_update(
+                manure_separator_daily_input=reception_pit_daily_output
+            )
+            if self.manure_separators[pen.id]
+            else None
+        )
 
         manure_treatment_daily_output = self.manure_treatments[pen.id].daily_update(
             manure_handler_daily_output=manure_handler_daily_output,
-            manure_treatment_daily_input=manure_separator_daily_output or reception_pit_daily_output,
+            manure_treatment_daily_input=manure_separator_daily_output
+            or reception_pit_daily_output,
             pen=pen,
-            sim_day=simulation_day
+            sim_day=simulation_day,
         )
 
-        manure_treatment_accumulated_output = self.manure_treatments[pen.id].accumulated_output
+        manure_treatment_accumulated_output = self.manure_treatments[
+            pen.id
+        ].accumulated_output
 
-        return manure_separator_daily_output, manure_treatment_daily_output, manure_treatment_accumulated_output
+        return (
+            manure_separator_daily_output,
+            manure_treatment_daily_output,
+            manure_treatment_accumulated_output,
+        )
 
 
-def simulate_daily_manure_manager(manure_manager: ManureManager, animal_manager: AnimalManager) -> None:
+def simulate_daily_manure_manager(
+    manure_manager: ManureManager, animal_manager: AnimalManager
+) -> None:
     """A wrapper function for the daily_update method of the ManureManager class.
 
     There is no strict reason why this function is needed. It is simply to make the code

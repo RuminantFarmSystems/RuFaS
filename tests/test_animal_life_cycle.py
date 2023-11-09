@@ -8,7 +8,7 @@ from pytest import approx
 from pytest import fixture
 from pytest_mock import MockerFixture
 
-from RUFAS.classes import Config
+from RUFAS.config import Config
 from RUFAS.routines.animal.animal_typed_dicts import AnimalConfigTypedDict
 from RUFAS.routines.animal.life_cycle import animal_constants
 from RUFAS.routines.animal.life_cycle.animal_constants import ENTER_HERD
@@ -125,7 +125,7 @@ def test_initialize_herd(mocker: MockerFixture, life_cycle_manager: LifeCycleMan
         'calf_num': 80,
         'heiferI_num': 440,
         'heiferII_num': 380,
-        'heiferIII_num': 50,
+        'heiferIII_num_springers': 50,
         'cow_num': 1000,
         'replace_num': 5000,
         'herd_num': 1000,
@@ -152,7 +152,7 @@ def test_initialize_herd(mocker: MockerFixture, life_cycle_manager: LifeCycleMan
     assert patch_get_animals.call_args_list[0] == mocker.call(Calf, herd_data['calf_num'], breed)
     assert patch_get_animals.call_args_list[1] == mocker.call(HeiferI, herd_data['heiferI_num'], breed)
     assert patch_get_animals.call_args_list[2] == mocker.call(HeiferII, herd_data['heiferII_num'], breed)
-    assert patch_get_animals.call_args_list[3] == mocker.call(HeiferIII, herd_data['heiferIII_num'], breed)
+    assert patch_get_animals.call_args_list[3] == mocker.call(HeiferIII, herd_data['heiferIII_num_springers'], breed)
     assert patch_get_animals.call_args_list[4] == mocker.call(Cow, herd_data['cow_num'], breed)
     mock_animal_initializer.get_replacement_cows.assert_called_once_with(herd_data['replace_num'], breed)
     assert life_cycle_manager.replacement_market == mock_replacement_cows
@@ -284,8 +284,10 @@ def test_convert_heiferI_to_heiferII(mocker: MockerFixture) -> None:
     heifer_synchedED_protocol = '2P'
     animal_base_config = {
         "heifer_repro_method": heifer_repro_method,
-        "heifer_TAI_protocol": heifer_TAI_protocol,
-        "heifer_synchED_protocol": heifer_synchedED_protocol
+        "heifer_repro_programs": {
+            "heifer_TAI_protocol": heifer_TAI_protocol,
+            "heifer_synchED_protocol": heifer_synchedED_protocol
+        }
     }
     mocker.patch('RUFAS.routines.animal.life_cycle.life_cycle.AnimalBase.config', animal_base_config)
 
@@ -532,9 +534,11 @@ def test_move_heiferIII_to_cow_stage(mocker: MockerFixture) -> None:
     cow_resynch_protocol = 'TAIafterPD'
     animal_base_config = {
         "cow_repro_method": cow_repro_method,
-        "cow_presynch_protocol": cow_presynch_protocol,
-        "cow_TAI_protocol": cow_TAI_protocol,
-        "cow_resynch_protocol": cow_resynch_protocol
+        "cow_repro_programs": {
+            "cow_presynch_protocol": cow_presynch_protocol,
+            "cow_TAI_protocol": cow_TAI_protocol,
+            "cow_resynch_protocol": cow_resynch_protocol
+        }
     }
     mocker.patch('RUFAS.routines.animal.life_cycle.life_cycle.AnimalBase.config', animal_base_config)
 
@@ -1132,15 +1136,13 @@ def test_calc_cow_percentages(mocker: MockerFixture, life_cycle_manager: LifeCyc
                               cow_num: int) -> None:
     """Unit test for function _calculate_cow_percentages() in file life_cycle.py."""
     # Arrange
-    dry_cow_num = milking_cow_num = preg_cow_num = open_cow_num = vwp_cow_num = 0
+    dry_cow_num = milking_cow_num = preg_cow_num = open_cow_num = 0
     life_cycle_manager.cow_num = cow_num
     if cow_num > 0:
         life_cycle_manager.dry_cow_num = dry_cow_num = int(0.2 * cow_num)
         life_cycle_manager.milking_cow_num = milking_cow_num = int(0.2 * cow_num)
         life_cycle_manager.preg_cow_num = preg_cow_num = int(0.2 * cow_num)
         life_cycle_manager.open_cow_num = open_cow_num = int(0.2 * cow_num)
-        life_cycle_manager.vwp_cow_num = vwp_cow_num = (cow_num - dry_cow_num - milking_cow_num
-                                                        - preg_cow_num - open_cow_num)
     spy_calc_cow_percentages = mocker.spy(life_cycle_manager, '_calculate_cow_percentages')
 
     # Act

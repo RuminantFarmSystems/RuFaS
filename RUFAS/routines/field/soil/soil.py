@@ -2,6 +2,7 @@ from __future__ import annotations
 from typing import Optional
 
 from RUFAS.routines.field.soil.carbon_cycling.carbon_cycle import CarbonCycling
+from RUFAS.routines.field.soil.snow import Snow
 from RUFAS.routines.field.soil.soil_data import SoilData
 from RUFAS.routines.field.soil.evaporation import Evaporation
 from RUFAS.routines.field.soil.infiltration import Infiltration
@@ -52,20 +53,31 @@ class Soil:
         self.percolation = Percolation(self.data)
         """Process component that controls percolation of water from upper layers to lower layers"""
         self.soil_erosion = SoilErosion(self.data)
-        """Process component that track erosion from the soil profile"""
+        """Process component that tracks erosion from the soil profile"""
+        self.snow = Snow(self.data)
+        """Process component that tracks snow"""
 
     def daily_soil_routine(self, solar_radiation: float, avg_temp: float, min_temp: float, max_temp: float,
                            plant_cover: float, snow_cover: float, avg_annual_air_temp: float) -> None:
-        """this method calls all now-water related daily update routines
+        """
+        Call all non-water related daily update routines.
 
-        Args:
-            solar_radiation: solar radiation reaching the ground on the current day (MJ per square meter per day)
-            avg_temp: average temperature of the current day (degrees C)
-            min_temp: minimum temperature of the current day (degrees C)
-            max_temp: maximum temperature of the current day (degrees C)
-            plant_cover: total above-ground plant biomass and residue on the current day (kg per hectare)
-            snow_cover: water content of the snow cover on the current day (mm)
-            avg_annual_air_temp: average annual air temperature (degrees C)
+        Parameters
+        ----------
+        solar_radiation : float
+            Solar radiation reaching the ground on the current day (MJ per square meter per day).
+        avg_temp : float
+            Average temperature of the current day (degrees C).
+        min_temp : float
+            Minimum temperature of the current day (degrees C).
+        max_temp : float
+            Maximum temperature of the current day (degrees C).
+        plant_cover : float
+            Total above-ground plant biomass and residue on the current day (kg per hectare).
+        snow_cover : float
+            Water content of the snow cover on the current day (mm).
+        avg_annual_air_temp : float
+            Average annual air temperature (degrees C).
         """
         # TODO: if no other daily update methods are added here, this method should be removed and Field should call
         #       this method directly
@@ -76,28 +88,36 @@ class Soil:
                                  potential_evapotranspiration: float, has_seasonal_high_water_table: bool,
                                  maximum_soil_evaporation: float, avg_air_temp: float, residue: float,
                                  minimum_cover_management_factor: float, field_size: float) -> None:
-        """this method calls all water related daily update routines
+        """
+        Call all water-related daily update routines.
 
-        Args:
-            rainfall: rainfall depth of current day (mm)
-            weighting_coefficient: weighting coefficient used to calculate retention coefficient for daily curve number
-                calculations dependent on plant evapotranspiration (unitless)
-            potential_evapotranspiration: total potential evaporation and transpiration that can occur on the current
-                day (mm)
-            has_seasonal_high_water_table: if the HRU has a seasonal high water table (true/false)
-            maximum_soil_evaporation: maximum amount of water that can be evaporated from the soil profile on the
-                current day (mm)
-            avg_air_temp: average air temperature (degrees C)
-            residue: biomass separated from plant on the ground (kg per hectare)
-            minimum_cover_management_factor: minimum value for cover and management factor for water erosion applicable
-                to land cover/plant (unitless)
-            field_size: size of the field (ha)
+        Parameters
+        ----------
+        rainfall : float
+            Rainfall depth of the current day (mm).
+        weighting_coefficient : float
+            Weighting coefficient used to calculate the retention coefficient for daily curve number calculations,
+            dependent on plant evapotranspiration (unitless).
+        potential_evapotranspiration : float
+            Total potential evaporation and transpiration that can occur on the current day (mm).
+        has_seasonal_high_water_table : bool
+            Whether the HRU has a seasonal high water table (True/False).
+        maximum_soil_evaporation : float
+            Maximum amount of water that can be evaporated from the soil profile on the current day (mm).
+        avg_air_temp : float
+            Average air temperature (degrees C).
+        residue : float
+            Biomass separated from plants on the ground (kg per hectare).
+        minimum_cover_management_factor : float
+            Minimum value for the cover and management factor for water erosion applicable to land cover/plant
+            (unitless).
+        field_size : float
+            Size of the field (ha).
 
         Notes
         -----
         The daily phosphorus cycling method is called here because in large part the phosphorus dynamics of the soil
-        profile depend on how much water enters and move through the soil profile.
-
+        profile depend on how much water enters and moves through the soil profile.
         """
         self.infiltration.infiltrate(rainfall, weighting_coefficient, potential_evapotranspiration)
         self.percolation.percolate(has_seasonal_high_water_table)

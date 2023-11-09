@@ -24,6 +24,8 @@ class FieldData:
     """The absolute latitude value (degrees above or below equator) where field is located (degrees)"""
     minimum_daylength: float = 6.33  # TODO: set default to somewhere other than Wisconsin, or no default?
     """Shortest day of the year for this watershed (hours)"""
+    longitude: float = -88.6  # TODO: set default to somewhere other than Wisconsin, or no default?
+    """The longitude value of where the field is located (degrees)."""
     dormancy_threshold_daylength: Optional[float] = None
     """Threshold daylength to initiate dormancy in a plant (hours)"""
     current_residue: float = 0
@@ -35,17 +37,13 @@ class FieldData:
     # --- Field-level Variables ---
     name: Optional[str] = None
     """Name of this field for identification purposes."""
-    evaporation: Optional[float] = None
-    """total water lost to evaporation in the field on the current day (mm)"""
-    transpiration: Optional[float] = None
+    transpiration: float = 0.0
     """total amount of water lost to transpiration in the field on the current day (mm)"""
-    max_transpiration: Optional[float] = None  # TODO: should probably not default to None
+    max_transpiration: float = 0.0
     """maximum possible amount of water that could be lost to transpiration in the field for the current day (mm)"""
-    max_evapotranspiration: Optional[float] = None  # TODO: should probably not default to None
+    max_evapotranspiration: float = 0.0
     """maximum possible amount of water that could be lost to evapotranspiration in the field for the current day
     (mm)"""
-    potential_evapotranspiration_adjusted: Optional[float] = None  # TODO, needed?
-    """adjusted max evapotranspiration (mm)"""
     grazers_present: bool = False
     """are grazers currently in the field? is grazing occurring?"""
     seasonal_high_water_table: bool = False

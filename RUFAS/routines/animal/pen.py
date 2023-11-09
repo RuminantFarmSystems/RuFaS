@@ -24,9 +24,11 @@ from RUFAS.routines.animal.life_cycle.heiferII import HeiferII
 from RUFAS.routines.animal.life_cycle.heiferIII import HeiferIII
 from RUFAS.routines.animal.manure.general_manure import AnimalManureExcretions, add_animal_manure_excretions, \
     get_default_animal_manure_excretions
-from RUFAS.routines.animal.ration import animal_requirements as req
+from RUFAS.routines.animal.ration.animal_requirements import AnimalRequirements
 
 om = OutputManager()
+
+req = AnimalRequirements()
 
 
 class Pen:
@@ -175,10 +177,10 @@ class Pen:
 
         GROWING_AND_CLOSE_UP = 4  # all heifers and dry cows
 
-    def __init__(self, pen_id: int, vertical_dist_to_milking_parlor: float, horizontal_dist_to_milking_parlor: float,
-                 number_of_stalls: int, housing_type: str, bedding_type: str, pen_type: str, manure_handling: str,
-                 manure_separator: str, manure_storage: str, animal_combination: AnimalCombination,
-                 max_stocking_density: float) -> None:
+    def __init__(self, pen_id: int, pen_name: str, vertical_dist_to_milking_parlor: float,
+                 horizontal_dist_to_milking_parlor: float, number_of_stalls: int, housing_type: str, bedding_type: str,
+                 pen_type: str, manure_handling: str, manure_separator: str, manure_storage: str,
+                 animal_combination: AnimalCombination, max_stocking_density: float) -> None:
         """
         Initializes a pen with the given arguments.
 
@@ -219,6 +221,7 @@ class Pen:
         self.housing_type = housing_type
         self.bedding_type = bedding_type
         self._pen_type = pen_type
+        self.pen_name = pen_name
 
         self.manure_handling = manure_handling
         self.manure_separator = manure_separator
@@ -419,7 +422,7 @@ class Pen:
         self.update_animal_combination(animal_combination)
         self.update_classes_in_pen()
 
-    def calc_manure(self, feed, methane_model):
+    def calc_manure(self, feed, methane_model): # noqa
         """
         Calculates the total manure excretion of the animals in the pen,
          and updates the manure attributes to contain the new amounts.
@@ -455,19 +458,19 @@ class Pen:
         # TODO: Write an accumulator function
         for animal in self.animals_in_pen:
             curr_manure = animal.manure_excretion
-            if type(animal) == Calf:
+            if type(animal) == Calf: # noqa
                 for key in manure.keys():
                     manure[key] += curr_manure[key]
                     calf_total[key] += curr_manure[key]
-            elif type(animal) in [HeiferI, HeiferII, HeiferIII]:
+            elif type(animal) in [HeiferI, HeiferII, HeiferIII]: # noqa
                 for key in manure.keys():
                     manure[key] += curr_manure[key]
                     heifer_total[key] += curr_manure[key]
-            elif type(animal) == Cow and not animal.milking:
+            elif type(animal) == Cow and not animal.milking: # noqa
                 for key in manure.keys():
                     manure[key] += curr_manure[key]
                     dry_total[key] += curr_manure[key]
-            elif type(animal) == Cow and animal.milking:
+            elif type(animal) == Cow and animal.milking: # noqa
                 for key in manure.keys():
                     manure[key] += curr_manure[key]
                     lactating_total[key] += curr_manure[key]
@@ -547,7 +550,7 @@ class Pen:
             total_p_animal = max(total_p_animal, 0)
             self.avg_p_animal = total_p_animal / len(self.animals_in_pen)
 
-    def set_up_new_animal(self, animal, p_conc, feed, temp, num_animals_before_additions):
+    def set_up_new_animal(self, animal, p_conc, feed, temp, num_animals_before_additions): # noqa
         """
         Sets the necessary attributes for @animal to be a replacement in this
         pen.
@@ -582,17 +585,17 @@ class Pen:
                                           milk_lactose=animal.lactose_milk,
                                           milk_production=animal.estimated_daily_milk_produced,
                                           days_in_milk=animal.days_in_milk, lactating=animal.milking)
-            animal.NEmaint = requirements['NEmaint']
-            animal.NEg = requirements['NEg']
-            animal.NEpreg = requirements['NEpreg']
-            animal.NEl = requirements['NEl']
-            animal.MP_req = requirements['MP_req']
-            animal.Ca_req = requirements['Ca_req']
-            animal.P_req = requirements['P_req']
-            animal.DMIest = requirements['DMIest']
-            animal.DNED_req = (requirements['NEmaint'] + requirements[
-                'NEl']) / animal.DMIest
-            animal.DMPD_req = (requirements['MP_req']) / animal.DMIest
+            animal.NEmaint_requirement = requirements['NEmaint_requirement']
+            animal.NEg_requirement = requirements['NEg_requirement']
+            animal.NEpreg_requirement = requirements['NEpreg_requirement']
+            animal.NEl_requirement = requirements['NEl_requirement']
+            animal.MP_requirement = requirements['MP_requirement']
+            animal.Ca_requirement = requirements['Ca_requirement']
+            animal.P_requirement = requirements['P_requirement']
+            animal.DMIest_requirement = requirements['DMIest_requirement']
+            animal.DNED_requirement = (requirements['NEmaint_requirement'] + requirements[
+                'NEl_requirement']) / animal.DMIest_requirement
+            animal.DMPD_requirement = (requirements['MP_requirement']) / animal.DMIest_requirement
 
         animal.dry_matter_intake = self.dry_matter_intake
 
@@ -820,7 +823,7 @@ class Pen:
         animal_prefix_to_output_data_dict = {
             'pen': {
                 'prefix': f'pen_{self.id}_daily',
-                'manure': self.manure,
+                'manure': None,
             }
         }
 
@@ -829,6 +832,8 @@ class Pen:
                                                                 methane_mitigation_method,
                                                                 methane_mitigation_additive_amount)
             self._update_animal_manure_excretion_data(animal_prefix_to_output_data_dict, prefix, manure, animal)
+
+        animal_prefix_to_output_data_dict['pen']['manure'] = self.manure
 
         for output_data_dict in animal_prefix_to_output_data_dict.values():
             if output_data_dict['manure'] is None:
@@ -863,6 +868,7 @@ class Pen:
         """
         animal_type = animal_grouping_scenario.get_animal_type(animal)
         if animal_type in [AnimalType.LAC_COW, AnimalType.DRY_COW]:
+            req = AnimalRequirements()
             requirements = req.calc_rqmts(body_weight=animal.body_weight, mature_body_weight=animal.mature_body_weight,
                                           day_of_pregnancy=animal.days_in_preg, animal_type=animal_type,
                                           parity=animal.calves, calving_interval=animal.CI,
@@ -871,17 +877,17 @@ class Pen:
                                           milk_production=animal.estimated_daily_milk_produced,
                                           days_in_milk=animal.days_in_milk, lactating=animal.milking,
                                           previous_temperature=temp)
-            animal.NEmaint = requirements['NEmaint']
-            animal.NEg = requirements['NEg']
-            animal.NEpreg = requirements['NEpreg']
-            animal.NEl = requirements['NEl']
-            animal.MP_req = requirements['MP_req']
-            animal.Ca_req = requirements['Ca_req']
-            animal.P_req = requirements['P_req']
-            animal.DMIest = requirements['DMIest']
-            animal.DNED_req = (requirements['NEmaint'] + requirements[
-                'NEl']) / animal.DMIest
-            animal.DMPD_req = (requirements['MP_req']) / animal.DMIest
+            animal.NEmaint_requirement = requirements['NEmaint_requirement']
+            animal.NEg_requirement = requirements['NEg_requirement']
+            animal.NEpreg_requirement = requirements['NEpreg_requirement']
+            animal.NEl_requirement = requirements['NEl_requirement']
+            animal.MP_requirement = requirements['MP_requirement']
+            animal.Ca_requirement = requirements['Ca_requirement']
+            animal.P_requirement = requirements['P_requirement']
+            animal.DMIest_requirement = requirements['DMIest_requirement']
+            animal.DNED_requirement = (requirements['NEmaint_requirement'] + requirements[
+                'NEl_requirement']) / animal.DMIest_requirement
+            animal.DMPD_requirement = (requirements['MP_requirement']) / animal.DMIest_requirement
 
             animal.calc_daily_walking_dist(
                 self.vertical_dist_to_parlor, self.horizontal_dist_to_parlor)
