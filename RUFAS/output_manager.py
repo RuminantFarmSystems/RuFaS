@@ -769,6 +769,15 @@ class OutputManager(object):
         graph_generator = GraphGenerator()
         list_of_filter_files = self._list_txt_and_json_files_in_dir(dir_path)
         for filter_file in list_of_filter_files:
+            for _, supported_prefix in self.__supported_filter_types_prefixes.items():
+                if filter_file.startswith(supported_prefix):
+                    break
+            else:
+                self.add_warning(
+                    "invalid filter file prefix",
+                    f"{filter_file} prefix is not in {list(self.__supported_filter_types_prefixes.values())}",
+                    info_map,
+                )
             input_path = os.path.join(dir_path, filter_file)
             filter_contents = self._load_filter_file_content(input_path)
             for filter_content in filter_contents:
@@ -824,12 +833,6 @@ class OutputManager(object):
                             f"Graphic generation is disabled, skipping {filter_file=}",
                             info_map,
                         )
-                else:
-                    self.add_warning(
-                        "invalid filter file prefix",
-                        f"{filter_file} prefix is not in {list(self.__supported_filter_types_prefixes.values())}",
-                        info_map,
-                    )
 
     def _save_variables_to_csv_files(
         self, data_dict: Dict[str, Any], filter_name: str, path: str
