@@ -812,7 +812,7 @@ class OutputManager(object):
         graphics_dir: Path,
     ) -> None:
         """
-        Checks the prefix of the filter_file to determine the format for saving. It then delegates the 
+        Checks the prefix of the filter_file to determine the format for saving. It then delegates the
         saving process to the corresponding function to handle specific formats such as JSON, CSV, or graphical output.
         """
         info_map = {

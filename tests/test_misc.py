@@ -1699,6 +1699,37 @@ def test_filter_variables_pool_exclude_regex_patterns(
     mock_output_manager.variables_pool = {}
 
 
+def test_save_variables_unsupported_prefix(
+    mock_output_manager: OutputManager,
+    output_manager_original_method_states: Dict[str, Callable],
+) -> None:
+    mock_output_manager.variables_pool = {}
+    mock_output_manager._generate_file_name = MagicMock(return_value="dummy_name")
+    mock_output_manager._load_filter_file_content = MagicMock()
+    mock_output_manager._list_txt_and_json_files_in_dir = MagicMock(
+        return_value=[
+            "dummy_input_filepath1.txt",
+            "dummy_input_filepath2.txt",
+        ]
+    )
+    mock_output_manager.save_variables("save_path", "filters_path")
+    mock_output_manager._load_filter_file_content.assert_not_called()
+
+    # Restore original method
+    mock_output_manager.save_variables = output_manager_original_method_states[
+        "save_variables"
+    ]
+    mock_output_manager._list_txt_and_json_files_in_dir = (
+        output_manager_original_method_states["_list_txt_and_json_files_in_dir"]
+    )
+    mock_output_manager._generate_file_name = output_manager_original_method_states[
+        "_generate_file_name"
+    ]
+    mock_output_manager._load_filter_file_content = (
+        output_manager_original_method_states["_load_filter_file_content"]
+    )
+
+
 def test_save_variables(
     mock_output_manager: OutputManager,
     output_manager_original_method_states: Dict[str, Callable],
@@ -1731,7 +1762,7 @@ def test_save_variables(
         ]
     )
     mock_output_manager._load_filter_file_content = MagicMock(
-        return_value={"filters": ".*", "title": "dummy_title"}
+        return_value=[{"filters": ".*", "title": "dummy_title"}]
     )
     mock_output_manager.save_variables("dummy_path", "dummy_dir_path/", False)
     mock_output_manager._list_txt_and_json_files_in_dir.assert_called_with(
@@ -1946,7 +1977,9 @@ def test_make_serializable_recursive(
         (LogVerbosity.LOGS, LogVerbosity.WARNINGS, False),
     ],
 )
-def test_log_verbosity_less_than_method(self: LogVerbosity, other: LogVerbosity, expected_result: bool) -> None:
+def test_log_verbosity_less_than_method(
+    self: LogVerbosity, other: LogVerbosity, expected_result: bool
+) -> None:
     """Unit test for __le__ method in LogVerbosity class"""
     actual_result = self <= other
     assert actual_result == expected_result
