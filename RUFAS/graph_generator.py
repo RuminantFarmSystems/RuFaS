@@ -276,11 +276,17 @@ class GraphGenerator:
         graph_path = self._generate_graph_path(
             save_path, graph_details, filter_file_name, graphics_dir
         )
+        counter = 1
+        while graph_path.exists():
+            graph_path = graph_path.with_name(
+                f"{graph_path.stem}({counter}){graph_path.suffix}"
+            )
+            counter += 1
         try:
             plt.savefig(graph_path)
             return graph_path
-        except Exception as e:
-            raise e
+        except Exception:
+            raise
 
     def _generate_graph_path(
         self,
@@ -317,8 +323,8 @@ class GraphGenerator:
         graph_directory = os.path.join(save_path, graphics_dir)
         try:
             Path(graph_directory).mkdir(parents=True, exist_ok=True)
-        except Exception as e:
-            raise e
+        except Exception:
+            raise
 
         timestamp: str = datetime.datetime.now().strftime("%d-%b-%Y_%a_%H-%M-%S")
 
