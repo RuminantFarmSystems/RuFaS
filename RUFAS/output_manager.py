@@ -811,6 +811,10 @@ class OutputManager(object):
         filter_content: Dict[str, str],
         graphics_dir: Path,
     ) -> None:
+        """
+        Checks the prefix of the filter_file to determine the format for saving. It then delegates the 
+        saving process to the corresponding function to handle specific formats such as JSON, CSV, or graphical output.
+        """
         info_map = {
             "class": self.__class__.__name__,
             "function": self._route_save_functions.__name__,
