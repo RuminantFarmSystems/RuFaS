@@ -2332,26 +2332,7 @@ def test_calculate_rqmts():
 # @pytest.mark.parameterize("udrm, om, expected", [MagicMock(), MagicMock(), True])
 def test_formulate_ration() -> None:
     """Unit test for function formulate_ration in file routines/animal/ration/ration_driver.py"""
-    # test 1
     pass
-    # udrm = MagicMock()
-    # udrm.udr_or_not = True
-    # expected = True
-    # result = udrm.udr_or_not
-    # assert result == expected
-    # patch get_user_defined_ration()
-    # assert that the return == ration, ration_vals
-
-    # test 2
-    # udrm.udr_or_not = True
-    # patch attempt_optimization
-    # pen.animal_combination.name in ['LAC_COW']
-
-    # test 2b: success = False
-
-    # test 3 pen.animal_combination.name NOT in ['LAC_COW']
-
-    # test 4 - solution == None
 
 
 def test_calc_milk_average() -> None:
