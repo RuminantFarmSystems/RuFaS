@@ -44,6 +44,8 @@ class Percolation:
         if self.data.infiltrated_water > self.data.soil_layers[0].acceptable_percolation_amount:
             self._percolate_excess_water()
             return
+        else:
+            self.data.soil_layers[0].water_content += self.data.infiltrated_water
 
         layer_count = len(self.data.soil_layers)
         deepest_layer = layer_count - 1
@@ -77,16 +79,17 @@ class Percolation:
 
     def _percolate_excess_water(self) -> None:
         """
-        Percolates large amounts of infiltration through the entire soil profile.
+        Percolates large amounts of infiltrated water through the entire soil profile.
 
         Notes
         -----
         The amount of water allowed to infiltrate the soil on any given day is based on the available capacity of the
         entire soil profile. So when there is an extreme amount of infiltration or there are multiple days of high
         infiltration in a row, this method ensures that the excess water will be distributed appropriately throughout
-        the entire soil profile. This method is a used instead of the `percolate()` method in the `Percolation` module.
+        the entire soil profile.
 
         """
+        self.data.set_vectorized_layer_attribute("percolated_water", [0.0] * len(self.data.soil_layers))
         water_remaining_to_percolate = self.data.infiltrated_water
         for layer in self.data.soil_layers:
             acceptable_percolation = layer.acceptable_percolation_amount
