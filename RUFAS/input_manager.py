@@ -294,8 +294,10 @@ class InputManager:
         ----------
         first_level_prop : str
             The name of the csv data element being validated.
+
         properties_blob_key : str
             The metadata properties section keyword for the data input file being checked.
+
         input_data : Dict[str, Any]
             A buffer dictionary that holds the input data for validation and fixing.
 
@@ -1090,6 +1092,7 @@ class InputManager:
                     }
 
         if 'default' not in variable_properties.keys():
+            om.add_error("Validation: invalid data not able to be fixed: ", f"{element_hierarchy[-1]}", info_map)
             return False
         variable_path_str = self._convert_variable_path_to_str(element_hierarchy)
         variable_parent = self._get_nested_dict_value(input_data, element_hierarchy[:-1])
