@@ -728,7 +728,7 @@ class OutputManager(object):
         self.add_log("num_filter_pattern_matches", filter_log_count_msg, info_map)
         return filter_pattern_matches
 
-    def save_variables(  # noqa: C901
+    def save_variables(
         self,
         save_path: Path,
         dir_path: Path,
@@ -766,7 +766,6 @@ class OutputManager(object):
             f"exclude_info_maps flag set to {exclude_info_maps}",
             info_map,
         )
-        graph_generator = GraphGenerator()
         list_of_filter_files = self._list_txt_and_json_files_in_dir(dir_path)
         for filter_file in list_of_filter_files:
             for _, supported_prefix in self.__supported_filter_types_prefixes.items():
@@ -794,46 +793,56 @@ class OutputManager(object):
                 )
                 if exclude_info_maps:
                     filtered_pool = self._exclude_info_maps(filtered_pool)
+                self._route_save_functions(
+                    filter_file,
+                    save_path,
+                    filtered_pool,
+                    produce_graphics,
+                    filter_content,
+                    graphics_dir,
+                )
 
-                if filter_file.startswith(
-                    self.__supported_filter_types_prefixes["json"]
-                ):
-                    file_path = os.path.join(
+    def _route_save_functions(
+        self,
+        filter_file,
+        save_path,
+        filtered_pool,
+        produce_graphics,
+        filter_content,
+        graphics_dir,
+    ) -> None:
+        info_map = {
+            "class": self.__class__.__name__,
+            "function": self._route_save_functions.__name__,
+        }
+        if filter_file.startswith(self.__supported_filter_types_prefixes["json"]):
+            file_path = os.path.join(
+                save_path,
+                self._generate_file_name(f"saved_variables_{filter_file}", "json"),
+            )
+            self._dict_to_file_json(filtered_pool, file_path)
+        elif filter_file.startswith(self.__supported_filter_types_prefixes["csv"]):
+            csv_directory = os.path.join(save_path, "CSVs", "om")
+            self._save_variables_to_csv_files(filtered_pool, filter_file, csv_directory)
+        elif filter_file.startswith(self.__supported_filter_types_prefixes["graph"]):
+            if produce_graphics:
+                try:
+                    graph_generator = GraphGenerator()
+                    graph_generator.generate_graph(
+                        filtered_pool,
+                        filter_content,
                         save_path,
-                        self._generate_file_name(
-                            f"saved_variables_{filter_file}", "json"
-                        ),
+                        filter_file,
+                        graphics_dir,
                     )
-                    self._dict_to_file_json(filtered_pool, file_path)
-                elif filter_file.startswith(
-                    self.__supported_filter_types_prefixes["csv"]
-                ):
-                    csv_directory = os.path.join(save_path, "CSVs", "om")
-                    self._save_variables_to_csv_files(
-                        filtered_pool, filter_file, csv_directory
-                    )
-                elif filter_file.startswith(
-                    self.__supported_filter_types_prefixes["graph"]
-                ):
-                    if produce_graphics:
-                        try:
-                            graph_generator.generate_graph(
-                                filtered_pool,
-                                filter_content,
-                                save_path,
-                                filter_file,
-                                graphics_dir,
-                            )
-                        except Exception as e:
-                            self.add_error(
-                                "graph generation exception", str(e), info_map
-                            )
-                    else:
-                        self.add_warning(
-                            "No Graphics",
-                            f"Graphic generation is disabled, skipping {filter_file=}",
-                            info_map,
-                        )
+                except Exception as e:
+                    self.add_error("graph generation exception", str(e), info_map)
+            else:
+                self.add_warning(
+                    "No Graphics",
+                    f"Graphic generation is disabled, skipping {filter_file=}",
+                    info_map,
+                )
 
     def _save_variables_to_csv_files(
         self, data_dict: Dict[str, Any], filter_name: str, path: str
