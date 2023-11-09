@@ -1245,7 +1245,7 @@ def test_load_filter_file_content_txt(
     """Test case for function _load_filter_file_content in output_manager.py"""
     mock_file.return_value.read.return_value = "apples\nbananas\ncherries"
     result = mock_output_manager._load_filter_file_content("path/to/file.txt")
-    assert result == {"filters": ["apples", "bananas", "cherries"]}
+    assert result == [{"filters": ["apples", "bananas", "cherries"]}]
 
     # Restore original method
     mock_output_manager._load_filter_file_content = (
