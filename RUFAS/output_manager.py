@@ -637,7 +637,7 @@ class OutputManager(object):
                     if "multiple" in json_content.keys():
                         result = json_content["multiple"]
                     else:
-                        result = json_content
+                        result = [json_content]
                 elif path.endswith(".txt"):
                     list_of_elements = filter_file.read().splitlines()
                     result = [{"filters": list_of_elements}]
