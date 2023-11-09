@@ -1038,7 +1038,6 @@ def test_cycle_water(field_size: float, rainfall: float, runoff: float, high_wat
 
         incorp._determine_watering_amount = MagicMock(return_value=0)
         incorp._handle_water_in_crop_canopies = MagicMock(return_value=2.0)
-        incorp._handle_soil_water_movement = MagicMock()
         incorp._determine_potential_evapotranspiration = MagicMock(return_value=33.5)
         incorp._evaporate_from_crop_canopies = MagicMock(return_value=30.5)
         incorp._determine_total_above_ground_biomass = MagicMock(return_value=40.0)
@@ -1055,13 +1054,15 @@ def test_cycle_water(field_size: float, rainfall: float, runoff: float, high_wat
         setattr(mocked_time, "day", 178)
 
         incorp._cycle_water(current_conditions, mocked_time)
+
         incorp._determine_watering_amount.assert_called_once_with(rainfall=rainfall, year=mocked_time.year,
                                                                   day=mocked_time.day, irrigation=0.0)
         incorp._handle_water_in_crop_canopies.assert_called_once_with(rainfall)
         incorp._determine_potential_evapotranspiration.assert_called_once_with(light, max_temp, min_temp,
                                                                                mean_temp)
         incorp._evaporate_from_crop_canopies.assert_called_once_with(33.5)
-        incorp._handle_soil_water_movement.assert_called_once_with(2.0)
+        incorp.soil.infiltration.infiltrate.assert_called_once_with(2.0)
+        incorp.soil.percolation.percolate.assert_called_once_with(high_water_table)
         incorp.soil.soil_erosion.erode.assert_called_once_with(field_size, 0.02, residue, rainfall)
         incorp.soil.phosphorus_cycling.cycle_phosphorus.assert_called_once_with(2.0, runoff, field_size, mean_temp)
         incorp.soil.nitrogen_cycling.cycle_nitrogen.assert_called_once_with(field_size)
@@ -1088,35 +1089,6 @@ def test_cycle_water(field_size: float, rainfall: float, runoff: float, high_wat
             assert crop_2.data.cumulative_evaporation == 0
             assert crop_2.data.cumulative_transpiration == 0
             assert crop_2.data.cumulative_potential_evapotranspiration == 0
-
-
-@pytest.mark.parametrize("water_reaching_soil,expected_infiltration,expected_runoff", [
-    (10.0, 4.0, 6.0),
-    (0.0, 0.0, 0.0)
-])
-def test_handle_soil_water_movement(water_reaching_soil: float, expected_infiltration: float,
-                                    expected_runoff: float) -> None:
-    """Tests that subroutines for handling water movement in the soil are properly called."""
-    data = MagicMock(SoilData)
-    data.infiltrated_water = 4.0
-    data.accumulated_runoff = 6.0
-    soil = Soil(soil_data=data)
-    field_data = FieldData(seasonal_high_water_table=False)
-    incorp = Field(soil=soil, field_data=field_data, manure_manager=MagicMock(ManureManager))
-
-    with patch("RUFAS.routines.field.soil.infiltration.Infiltration.infiltrate", new_callable=MagicMock) as infil, \
-            patch("RUFAS.routines.field.soil.percolation.Percolation.percolate", new_callable=MagicMock) as percolate:
-        incorp._handle_soil_water_movement(water_reaching_soil)
-
-    if water_reaching_soil:
-        infil.assert_called_once_with(water_reaching_soil)
-        percolate.assert_not_called()
-    else:
-        infil.assert_not_called()
-        percolate.assert_called_once_with(False)
-
-    assert incorp.soil.data.infiltrated_water == expected_infiltration
-    assert incorp.soil.data.accumulated_runoff == expected_runoff
 
 
 @pytest.mark.parametrize("rainfall,days_into_interval,water_deficit,watering_occurs,irrigation,old_method",
