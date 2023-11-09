@@ -67,26 +67,13 @@ def run_rufas(
     """
     sys.stdout.write("RuFaS: Ruminant Farm Systems Model 2023\n")
 
-    info_map = {
-        "class": "No caller class",
-        "function": run_rufas.__name__,
-    }
-    output_manager = OutputManager()
+    if load_pool:
+        run_load_vars_pool(exclude_info_maps, format_option,
+                           produce_graphics, graphics_dir, clear_output)
+        return
 
     if clear_output:
-        output_dir = Path(config.global_variables.OUT_DIR)
-        keep_list = [".keep", "output_filters"]
-        if load_pool:
-            vars_file_path = Path(input("Enter path to variables json file: ").strip())
-            if output_dir in vars_file_path.parents:
-                output_manager.add_error("Can't clear output folder",
-                                         "vars_file_path supplied by user is in output folder", info_map)
-            else:
-                Utility.empty_dir(output_dir, keep=keep_list)
-            run_load_vars_pool(vars_file_path, exclude_info_maps, format_option, produce_graphics, graphics_dir)
-            return
-        else:
-            Utility.empty_dir(output_dir, keep=keep_list)
+        clear_output_dir()
 
     metadata_files: List[MetadataPaths] = METADATA_PATHS
     if only_run_validation:
@@ -102,30 +89,66 @@ def run_rufas(
         )
 
 
+def clear_output_dir(vars_file_path: Path = None) -> None:
+    """Clears the output directory if vars_file_path not in output directory
+
+    Parameters
+    ----------
+    vars_file_path : Path, optional
+        _description_, by default None
+    """
+    info_map = {
+        "class": "No caller class",
+        "function": run_validation.__name__,
+    }
+    output_manager = OutputManager()
+    output_dir = Path(config.global_variables.OUT_DIR)
+    is_in_output_dir = check_parent_dir(output_dir, vars_file_path)
+    if is_in_output_dir:
+        output_manager.add_error("Can't clear output directory", f"{vars_file_path} in output directory.", info_map)
+    else:
+        keep_list = [".keep", "output_filters"]
+        Utility.empty_dir(output_dir, keep=keep_list)
+        output_manager.add_log("Output directory cleared", "No conflicts to clearing output directory.", info_map)
+
+
+def check_parent_dir(output_dir: Path = Path(config.global_variables.OUT_DIR), vars_file_path: Path = None) -> None:
+    """Checks if file path provided is in the output directory"""
+    if vars_file_path is None:
+        return False
+    file_path = vars_file_path.resolve()
+    directory_path = output_dir.resolve()
+
+    return directory_path == file_path or directory_path in file_path.parents
+
+
 def run_load_vars_pool(
-    vars_file_path: str,
     exclude_info_maps: bool = False,
     format_option: str = "verbose",
     produce_graphics: bool = True,
-    graphics_dir: Path = Path("")
+    graphics_dir: Path = Path(""),
+    clear_output: bool = False,
 ) -> None:
     """Instantiates Output Manager and triggers loading of the variables pool from the provided file path
     for post-processing.
 
     Parameters
     ----------
-    vars_file_path : str
-        The file path to the variables file to load into the Output Manager's variables pool.
     exclude_info_maps : bool, optional
         Flag for whether or not the user wants to inlcude info_maps data in their results files.
     produce_graphics : bool, optional
         Flag for whether or not the user wants to produce graphs at after the simulation.
     graphics_dir : Path, optional
         The directory for saving graphics.
+    clear_output : bool, optional
+        Flag for whether or not the user wants to clear the output directory.
     """
+    vars_file_path = Path(input("Enter path to variables json file: ").strip())
+    if clear_output:
+        clear_output_dir(vars_file_path)
     output_manager = OutputManager()
     output_manager.flush_pools()
-    output_manager.reload_vars_pool(Path(vars_file_path))
+    output_manager.reload_vars_pool(vars_file_path)
     output_manager.set_metadata_prefix("reload")
     output_manager.dump_all_nondata_pools(
             r"output", exclude_info_maps, format_option
