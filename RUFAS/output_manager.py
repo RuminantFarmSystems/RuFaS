@@ -585,7 +585,7 @@ class OutputManager(object):
         else:
             raise NotADirectoryError("The specified path must be a directory")
 
-    def _load_filter_file_content(self, path: str) -> Dict[str, str]:
+    def _load_filter_file_content(self, path: str) -> List[Dict[str, str]]:
         """
         Loads and processes the content of a filter file from the specified path.
 
@@ -596,8 +596,9 @@ class OutputManager(object):
 
         Returns
         -------
-        Dict[str, str]
-            A dictionary containing the loaded filter content, with keys and values depending on the file type.
+        List[Dict[str, str]]
+            A list of dictionaries, each containing the loaded filter content,
+            with keys and values depending on the file type.
 
         Raises
         ------
@@ -632,10 +633,14 @@ class OutputManager(object):
         try:
             with open(path) as filter_file:
                 if path.endswith(".json"):
-                    result = json.load(filter_file)
+                    json_content = json.load(filter_file)
+                    if "multiple" in json_content.keys():
+                        result = json_content["multiple"]
+                    else:
+                        result = json_content
                 elif path.endswith(".txt"):
                     list_of_elements = filter_file.read().splitlines()
-                    result = {"filters": list_of_elements}
+                    result = [{"filters": list_of_elements}]
                 else:
                     raise Exception(
                         "Unsupported file format; only json and txt are supported."
