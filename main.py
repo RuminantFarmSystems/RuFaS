@@ -103,8 +103,8 @@ def clear_output_dir(vars_file_path: Path = None) -> None:
     }
     output_manager = OutputManager()
     output_dir = Path(config.global_variables.OUT_DIR)
-    is_in_output_dir = check_parent_dir(output_dir, vars_file_path)
-    if is_in_output_dir:
+    is_in_dir = is_file_in_dir(output_dir, vars_file_path)
+    if is_in_dir:
         output_manager.add_error("Can't clear output directory", f"{vars_file_path} in output directory.", info_map)
     else:
         keep_list = [".keep", "output_filters"]
@@ -112,12 +112,12 @@ def clear_output_dir(vars_file_path: Path = None) -> None:
         output_manager.add_log("Output directory cleared", "No conflicts to clearing output directory.", info_map)
 
 
-def check_parent_dir(output_dir: Path = Path(config.global_variables.OUT_DIR), vars_file_path: Path = None) -> None:
-    """Checks if file path provided is in the output directory"""
+def is_file_in_dir(dir_path: Path = Path(config.global_variables.OUT_DIR), vars_file_path: Path = None) -> None:
+    """Checks if a file path is in the provided directory"""
     if vars_file_path is None:
         return False
     file_path = vars_file_path.resolve()
-    directory_path = output_dir.resolve()
+    directory_path = dir_path.resolve()
 
     return directory_path == file_path or directory_path in file_path.parents
 
