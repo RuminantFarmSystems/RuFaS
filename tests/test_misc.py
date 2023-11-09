@@ -1261,13 +1261,13 @@ def test_load_filter_file_content_json(
 ) -> None:
     """Test case for function _load_filter_file_content in output_manager.py"""
 
-    data: Dict[str, Any] = {
+    data: List[Dict[str, Any]] = {
         "filters": ["filter1", "filter2"],
         "other_key": "value",
     }
     mock_file.return_value.read.return_value = json.dumps(data)
     result = mock_output_manager._load_filter_file_content("some_file.json")
-    assert result == data
+    assert result == [data]
 
     # Restore original method
     mock_output_manager._load_filter_file_content = (
