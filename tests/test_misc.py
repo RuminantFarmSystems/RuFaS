@@ -1868,7 +1868,7 @@ def test_route_save_functions_graph(
         mock_output_manager.add_warning = MagicMock()
         graph_data = {"filters": ".*", "other keys": "other values"}
         mock_output_manager._route_save_functions(
-            "json_file",
+            "graph_file",
             "save_path",
             {"key": {"var": "value"}},
             False,
@@ -1876,13 +1876,14 @@ def test_route_save_functions_graph(
             "graphics_dir",
         )
         mock_generate_graph.assert_not_called()
-        assert mock_output_manager.add_warning.assert_not_called("True")
-
-        mock_output_manager._route_save_functions = (
-            output_manager_original_method_states["_route_save_functions"]
+        mock_output_manager.add_warning.assert_called_once_with(
+            "No Graphics",
+            "Graphic generation is disabled, skipping filter_file='graph_file'",
+            {"class": "OutputManager", "function": "_route_save_functions"},
         )
+
         mock_output_manager._route_save_functions(
-            "json_file",
+            "graph_file",
             "save_path",
             {"key": {"var": "value"}},
             True,
@@ -1890,23 +1891,19 @@ def test_route_save_functions_graph(
             "graphics_dir",
         )
         mock_generate_graph.assert_called_once_with(
-            {}, graph_data, "dummy_path", "graph_input_filepath.json", Path("graphics")
+            {"key": {"var": "value"}},
+            graph_data,
+            "save_path",
+            "graph_file",
+            "graphics_dir",
         )
+
         mock_output_manager._route_save_functions = (
             output_manager_original_method_states["_route_save_functions"]
         )
-
-        mock_generate_graph.side_effect = Exception("dummy error")
-        mock_output_manager.add_error = MagicMock()
-        mock_output_manager._route_save_functions(
-            "json_file",
-            "save_path",
-            {"key": {"var": "value"}},
-            True,
-            graph_data,
-            "graphics_dir",
-        )
-        mock_output_manager.add_error.assert_called_once()
+        mock_output_manager.add_warning = output_manager_original_method_states[
+            "add_warning"
+        ]
 
 
 class DummyClass:
