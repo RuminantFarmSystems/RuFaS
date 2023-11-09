@@ -582,7 +582,7 @@ class InputManager:
 
         info_map = {
             "class": self.__class__.__name__,
-            "function": self._handle_validation_error.__name__,
+            "function": self._handle_container_error.__name__,
         }
         variable_path_str = self._convert_variable_path_to_str(variable_path)
         element_to_validate = self._get_nested_dict_value(input_data, variable_path)
