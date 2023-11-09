@@ -148,10 +148,6 @@ class SoilData:
     surface_runoff_volume: Optional[float] = None
     """volume of surface runoff (mm per hectare), used in SWAT equation 4:1.1.1."""
 
-    # ---- decomposition
-    decomposition_temperature_effect: Optional[float] = None
-    """temperature effect on decomposition factor (unitless) (pseudocode_soil S.6.A.1)"""
-
     # ---- Fertilizer (Phosphorus Cycling)
     cover_type: str = "BARE"
     """The cover type of the soil surface, can be bare, residue covered, or grassed"""
