@@ -1820,7 +1820,7 @@ def test_route_save_functions_csv(
         "graphics_dir",
     )
     mock_output_manager._save_variables_to_csv_files.assert_called_once_with(
-        {"key": {"var": "value"}}, "csv_file", r"save_path\CSVs\om"
+        {"key": {"var": "value"}}, "csv_file", os.path.join("save_path", "CSVs", "om")
     )
     # Restore original method
     mock_output_manager._save_variables_to_csv_files = (
@@ -1846,7 +1846,7 @@ def test_route_save_functions_json(
         "graphics_dir",
     )
     mock_output_manager._dict_to_file_json.assert_called_once_with(
-        {"key": {"var": "value"}}, r"save_path\filename.json"
+        {"key": {"var": "value"}}, os.path.join("save_path", "filename.json")
     )
     # Restore original method
     mock_output_manager._dict_to_file_json = output_manager_original_method_states[
