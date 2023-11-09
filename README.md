@@ -82,7 +82,7 @@ Complete model evaluation||||Moved to Milestone 3
 Complete Sensitivity Analysis||||Moved to Milestone 3
 Complete External/Scientific Documentation for Animal, Manure, & EEE modules and put on GitHub|Varma, Joe, Haowen, Kristan, Jenn, Emmanuel||P1
 Complete Cohort 1 Pilot testing|Kristan, Haowen, Kat||P0
-Complete evaluation of soil temperature|Ed, Jenn, Matthew|In progress|P0|[#764](https://github.com/RuminantFarmSystems/MASM/issues/764)
+Complete evaluation of soil temperature|Ed, Jenn, Matthew|Completed|P0|[#764](https://github.com/RuminantFarmSystems/MASM/issues/764)
 
 ## Milestone 2.5: Oct 31th
 [GitHub Milestone](https://github.com/RuminantFarmSystems/MASM/milestone/5)
