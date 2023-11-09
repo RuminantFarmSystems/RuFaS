@@ -778,6 +778,7 @@ class OutputManager(object):
                     f"{filter_file} prefix is not in {list(self.__supported_filter_types_prefixes.values())}",
                     info_map,
                 )
+                continue
             input_path = os.path.join(dir_path, filter_file)
             filter_contents = self._load_filter_file_content(input_path)
             for filter_content in filter_contents:
