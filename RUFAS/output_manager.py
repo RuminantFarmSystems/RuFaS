@@ -781,10 +781,13 @@ class OutputManager(object):
             input_path = os.path.join(filters_dir_path, filter_file)
             filter_contents = self._load_filter_file_content(input_path)
             for filter_content in filter_contents:
-                if "filters" not in filter_content.keys():
+                if (
+                    not isinstance(filter_content, dict)
+                    or "filters" not in filter_content.keys()
+                ):
                     self.add_error(
-                        "Missing filters entry",
-                        f"'filters' does not exist in {filter_file}",
+                        "Parsing error",
+                        f"Could not parse {filter_file=}, it has to have JSON blobs and have `filters` entry.",
                         info_map,
                     )
                     continue
