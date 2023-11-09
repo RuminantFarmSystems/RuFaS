@@ -1889,6 +1889,7 @@ def test_route_save_functions_graph(
             graph_data,
             "graphics_dir",
         )
+        assert mock_output_manager.add_warning.call_count == 1
         mock_generate_graph.assert_called_once_with(
             {"key": {"var": "value"}},
             graph_data,
