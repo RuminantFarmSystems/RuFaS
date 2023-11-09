@@ -1713,7 +1713,16 @@ def test_save_variables_unsupported_prefix(
         ]
     )
     mock_output_manager.save_variables("save_path", "filters_path")
+
     mock_output_manager._load_filter_file_content.assert_not_called()
+    assert (
+        len(
+            mock_output_manager.warnings_pool[
+                "OutputManager.save_variables.invalid filter file prefix"
+            ]
+        )
+        == len(mock_output_manager._list_txt_and_json_files_in_dir.return_value)
+    )
 
     # Restore original method
     mock_output_manager.save_variables = output_manager_original_method_states[
