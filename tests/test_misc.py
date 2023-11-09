@@ -19,7 +19,7 @@ from pytest import approx, raises
 from pytest_mock.plugin import MockerFixture
 
 from RUFAS.general_constants import GeneralConstants
-from RUFAS.output_manager import OutputManager
+from RUFAS.output_manager import LogVerbosity, OutputManager
 from RUFAS.simulation_engine import SimulationEngine
 from RUFAS.util import Utility
 
@@ -173,6 +173,18 @@ def test_set_metadata_prefix(mock_output_manager: OutputManager) -> None:
     """Unit test for the function set_metadata_prefix in the file output_manager.py"""
     mock_output_manager.set_metadata_prefix("dummy_prefix")
     assert mock_output_manager._OutputManager__metadata_prefix == "dummy_prefix"
+
+
+@pytest.mark.parametrize(
+    "log_verbose",
+    [LogVerbosity.NONE, LogVerbosity.ERRORS, LogVerbosity.WARNINGS, LogVerbosity.LOGS],
+)
+def test_set_log_verbose(
+    mock_output_manager: OutputManager, log_verbose: LogVerbosity
+) -> None:
+    """Unit test for the function set_log_verbose in the file output_manager.py"""
+    mock_output_manager.set_log_verbose(log_verbose)
+    assert mock_output_manager._OutputManager__log_verbose == log_verbose
 
 
 def test_dict_to_csv_column_list(mock_output_manager: OutputManager) -> None:
@@ -469,27 +481,39 @@ def test_get_timestamp(mocker: MockerFixture) -> None:
     )
 
 
+@pytest.mark.parametrize(
+    "log_verobse",
+    [LogVerbosity.NONE, LogVerbosity.ERRORS, LogVerbosity.WARNINGS, LogVerbosity.LOGS],
+)
 def test_add_error(
     mock_output_manager: OutputManager,
     output_manager_original_method_states: Dict[str, Callable],
+    log_verobse: LogVerbosity,
 ) -> None:
     """Unit test for function add_error in file output_manager.py"""
     key = "dummy_key"
     name = "dummy_name"
-    value = "dummy_value"
+    message = "dummy_value"
     timestamp = "18-Jan-2023_Wed_22-38-14.123456"
     info_map = {}
+    metadata_prefix = "dummy_prefix"
     mock_output_manager._generate_key = MagicMock(return_value=key)
     mock_output_manager._add_to_pool = MagicMock()
     mock_output_manager._get_timestamp = MagicMock(return_value=timestamp)
+    mock_output_manager.set_log_verbose(log_verobse)
+    mock_output_manager.set_metadata_prefix(metadata_prefix)
+    mock_output_manager._handle_log_output = MagicMock()
 
-    mock_output_manager.add_error(name, value, info_map)
+    mock_output_manager.add_error(name, message, info_map)
 
     mock_output_manager._generate_key.assert_called_once_with(name, info_map)
 
     assert info_map.get("timestamp") == timestamp
+    mock_output_manager._handle_log_output.assert_called_once_with(
+        name, message, info_map, LogVerbosity.ERRORS
+    )
     mock_output_manager._add_to_pool(
-        mock_output_manager.errors_pool, key, value, info_map
+        mock_output_manager.errors_pool, key, message, info_map
     )
 
     mock_output_manager._generate_key = output_manager_original_method_states[
@@ -501,29 +525,45 @@ def test_add_error(
     mock_output_manager._get_timestamp = output_manager_original_method_states[
         "_get_timestamp"
     ]
+    mock_output_manager._handle_log_output = output_manager_original_method_states[
+        "_handle_log_output"
+    ]
 
 
+@pytest.mark.parametrize(
+    "log_verobse",
+    [LogVerbosity.NONE, LogVerbosity.ERRORS, LogVerbosity.WARNINGS, LogVerbosity.LOGS],
+)
 def test_add_warning(
     mock_output_manager: OutputManager,
     output_manager_original_method_states: Dict[str, Callable],
+    log_verobse: LogVerbosity,
 ) -> None:
     """Unit test for function add_warning in file output_manager.py"""
     key = "dummy_key"
     name = "dummy_name"
-    value = "dummy_value"
+    message = "dummy_value"
     timestamp = "18-Jan-2023_Wed_22-38-14.123456"
     info_map = {}
+    metadata_prefix = "dummy_prefix"
     mock_output_manager._generate_key = MagicMock(return_value=key)
     mock_output_manager._add_to_pool = MagicMock()
     mock_output_manager._get_timestamp = MagicMock(return_value=timestamp)
+    mock_output_manager.set_log_verbose(log_verobse)
+    mock_output_manager.set_metadata_prefix(metadata_prefix)
+    mock_output_manager._handle_log_output = MagicMock()
 
-    mock_output_manager.add_warning(name, value, info_map)
+    mock_output_manager.add_warning(name, message, info_map)
 
     mock_output_manager._generate_key.assert_called_once_with(name, info_map)
 
     assert info_map.get("timestamp") == timestamp
+    mock_output_manager._handle_log_output.assert_called_once_with(
+        name, message, info_map, LogVerbosity.WARNINGS
+    )
+
     mock_output_manager._add_to_pool(
-        mock_output_manager.warnings_pool, key, value, info_map
+        mock_output_manager.warnings_pool, key, message, info_map
     )
 
     mock_output_manager._generate_key = output_manager_original_method_states[
@@ -535,29 +575,46 @@ def test_add_warning(
     mock_output_manager._get_timestamp = output_manager_original_method_states[
         "_get_timestamp"
     ]
+    mock_output_manager._handle_log_output = output_manager_original_method_states[
+        "_handle_log_output"
+    ]
 
 
+@pytest.mark.parametrize(
+    "log_verobse",
+    [LogVerbosity.NONE, LogVerbosity.ERRORS, LogVerbosity.WARNINGS, LogVerbosity.LOGS],
+)
 def test_add_log(
     mock_output_manager: OutputManager,
     output_manager_original_method_states: Dict[str, Callable],
+    log_verobse: LogVerbosity,
 ) -> None:
     """Unit test for function add_log in file output_manager.py"""
     key = "dummy_key"
     name = "dummy_name"
-    value = "dummy_value"
+    message = "dummy_value"
     timestamp = "18-Jan-2023_Wed_22-38-14.123456"
     info_map = {}
+    metadata_prefix = "dummy_prefix"
     mock_output_manager._generate_key = MagicMock(return_value=key)
     mock_output_manager._add_to_pool = MagicMock()
     mock_output_manager._get_timestamp = MagicMock(return_value=timestamp)
+    mock_output_manager.set_log_verbose(log_verobse)
+    mock_output_manager.set_metadata_prefix(metadata_prefix)
+    mock_output_manager._handle_log_output = MagicMock()
 
-    mock_output_manager.add_log(name, value, info_map)
+    mock_output_manager.add_log(name, message, info_map)
 
     mock_output_manager._generate_key.assert_called_once_with(name, info_map)
 
     assert info_map.get("timestamp") == timestamp
+
+    mock_output_manager._handle_log_output.assert_called_once_with(
+        name, message, info_map, LogVerbosity.LOGS
+    )
+
     mock_output_manager._add_to_pool(
-        mock_output_manager.logs_pool, key, value, info_map
+        mock_output_manager.logs_pool, key, message, info_map
     )
 
     mock_output_manager._generate_key = output_manager_original_method_states[
@@ -568,6 +625,9 @@ def test_add_log(
     ]
     mock_output_manager._get_timestamp = output_manager_original_method_states[
         "_get_timestamp"
+    ]
+    mock_output_manager._handle_log_output = output_manager_original_method_states[
+        "_handle_log_output"
     ]
 
 
@@ -650,6 +710,36 @@ def test_output_manager_singleton(mocker: MockerFixture) -> None:
     }
 
 
+@pytest.mark.parametrize(
+    "log_level, color_code",
+    [
+        (LogVerbosity.NONE, "\033[0m"),
+        (LogVerbosity.ERRORS, "\33[91m"),
+        (LogVerbosity.WARNINGS, "\33[93m"),
+        (LogVerbosity.LOGS, "\33[92m"),
+    ],
+)
+def test_handle_log_output(capsys, log_level: LogVerbosity, color_code: str) -> None:
+    name = "dummy name"
+    msg = "dummy message"
+    info_map = {"timestamp": "dummy_timestamp"}
+    om = OutputManager()
+    om.set_metadata_prefix("dummy_prefix")
+    om._handle_log_output(name, msg, info_map, log_level)
+    log_format = "{color}[{timestamp}][{log_level}][{metadata_prefix}] {name}: {message}{color_reset}\n"
+    expected_message = log_format.format(
+        timestamp=info_map["timestamp"],
+        color=color_code,
+        color_reset="\033[0m",
+        metadata_prefix="dummy_prefix",
+        name=name,
+        message=msg,
+        log_level=log_level,
+    )
+    captured = capsys.readouterr()
+    assert expected_message in captured.out
+
+
 def test_flush_pools() -> None:
     """Test case for function flush_pools in output_manager.py"""
     om = OutputManager()
@@ -679,6 +769,9 @@ def output_manager_original_method_states(
         "_generate_file_name": mock_output_manager._generate_file_name,
         "_generate_key": mock_output_manager._generate_key,
         "_get_timestamp": mock_output_manager._get_timestamp,
+        "_handle_log_output": mock_output_manager._handle_log_output,
+        "set_metadata_prefix": mock_output_manager.set_metadata_prefix,
+        "set_log_verbose": mock_output_manager.set_log_verbose,
         "_list_to_file_txt": mock_output_manager._list_to_file_txt,
         "_list_txt_and_json_files_in_dir": mock_output_manager._list_txt_and_json_files_in_dir,
         "_load_filter_file_content": mock_output_manager._load_filter_file_content,
@@ -1830,3 +1923,46 @@ def test_make_serializable_recursive(
 
     # Assert
     assert result == expected_output
+
+
+@pytest.mark.parametrize(
+    "self, other, expected_result",
+    [
+        (LogVerbosity.NONE, LogVerbosity.NONE, True),
+        (LogVerbosity.NONE, LogVerbosity.ERRORS, True),
+        (LogVerbosity.NONE, LogVerbosity.WARNINGS, True),
+        (LogVerbosity.NONE, LogVerbosity.LOGS, True),
+        (LogVerbosity.ERRORS, LogVerbosity.ERRORS, True),
+        (LogVerbosity.ERRORS, LogVerbosity.NONE, False),
+        (LogVerbosity.ERRORS, LogVerbosity.WARNINGS, True),
+        (LogVerbosity.ERRORS, LogVerbosity.LOGS, True),
+        (LogVerbosity.WARNINGS, LogVerbosity.NONE, False),
+        (LogVerbosity.WARNINGS, LogVerbosity.WARNINGS, True),
+        (LogVerbosity.WARNINGS, LogVerbosity.ERRORS, False),
+        (LogVerbosity.WARNINGS, LogVerbosity.LOGS, True),
+        (LogVerbosity.LOGS, LogVerbosity.LOGS, True),
+        (LogVerbosity.LOGS, LogVerbosity.NONE, False),
+        (LogVerbosity.LOGS, LogVerbosity.ERRORS, False),
+        (LogVerbosity.LOGS, LogVerbosity.WARNINGS, False),
+    ],
+)
+def test_log_verbosity_less_than_method(self: LogVerbosity, other: LogVerbosity, expected_result: bool) -> None:
+    """Unit test for __le__ method in LogVerbosity class"""
+    actual_result = self <= other
+    assert actual_result == expected_result
+
+
+def test_log_verbosity_str_method() -> None:
+    """Unit test for __str__ method in LogVerbosity class"""
+    assert str(LogVerbosity.NONE) == "NONE"
+    assert str(LogVerbosity.ERRORS) == "ERROR"
+    assert str(LogVerbosity.WARNINGS) == "WARNING"
+    assert str(LogVerbosity.LOGS) == "LOG"
+
+
+def test_log_verbosity_enum_values() -> None:
+    """Unit test for LogVerbosity class enum values"""
+    assert LogVerbosity.NONE.value == "none"
+    assert LogVerbosity.ERRORS.value == "errors"
+    assert LogVerbosity.WARNINGS.value == "warnings"
+    assert LogVerbosity.LOGS.value == "logs"

@@ -421,7 +421,6 @@ class LayerData:
         This is an extremely simply and arbitrary way of initializing carbon pools in the soil, and is intended to be a
         temporary solution until SWAT-C is implemented. Dividing the carbon equally between the three soil pools is an
         arbitrary assumption, but is somewhat reasonable.
-        TODO - #512
 
         """
         soil_volume_in_cubic_meters = self.layer_thickness * (field_size * HECTARES_TO_SQUARE_MILLIMETERS) * \
