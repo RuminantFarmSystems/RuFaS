@@ -873,7 +873,7 @@ class OutputManager(object):
         selected_variables = filter_content.get("variables")
         slice_start = filter_content.get("slice_start", 0)
         slice_end = filter_content.get("slice_end", 0)
-        data_dict = self._prepare_report_data(
+        report_data = self._prepare_report_data(
             filtered_pool, selected_variables, slice_start, slice_end
         )
 
@@ -884,6 +884,32 @@ class OutputManager(object):
         slice_start: int,
         slice_end: int,
     ) -> Dict[str, List[Any]]:
+        """
+        Processes and structures a filtered data pool for report generation.
+
+        This method organizes data from a filtered pool based on selected variables and slicing parameters.
+        It caters to different data structures within the pool, ensuring data is formatted appropriately
+        for report inclusion.
+
+        Parameters
+        ----------
+        filtered_pool : Dict[str, pool_element_type]
+            The filtered data pool with each key mapping to its respective data element.
+
+        selected_variables : List[str]
+            Variables to be included from the filtered pool.
+
+        slice_start : int
+            Starting index for slicing data elements.
+
+        slice_end : int
+            Ending index for slicing; slices to end if set to 0.
+
+        Returns
+        -------
+        Dict[str, List[Any]]
+            Processed data suitable for report generation, keyed by selected variables.
+        """
         info_map = {
             "class": self.__class__.__name__,
             "function": self._prepare_report_data.__name__,
