@@ -1,5 +1,6 @@
 from copy import deepcopy
 import os
+from pathlib import Path
 import re
 import json
 from typing import Any, Callable, Dict, List
@@ -767,6 +768,7 @@ def output_manager_original_method_states(
         "_list_to_file_txt": mock_output_manager._list_to_file_txt,
         "_list_filter_files_in_dir": mock_output_manager._list_filter_files_in_dir,
         "_load_filter_file_content": mock_output_manager._load_filter_file_content,
+        "load_variables_pool_from_file": mock_output_manager.load_variables_pool_from_file,
         "_save_variables_to_csv_files ": mock_output_manager._save_variables_to_csv_files,
         "save_results": mock_output_manager.save_results,
         "_save_variables_to_csv_files": mock_output_manager._save_variables_to_csv_files,
@@ -2008,6 +2010,43 @@ def test_make_serializable_recursive(
 
     # Assert
     assert result == expected_output
+
+
+def test_load_variables_pool_from_file_valid_path(mock_output_manager: OutputManager,
+                                                  output_manager_original_method_states: Dict[str, Callable],
+                                                  ) -> None:
+    """Checks that load_variables_pool_from_file loads the valid filepath provided to the OM variables pool"""
+    dummy_data = {"vars": {"var1": {"values": [1, 2, 3], "info_map": {"imvar1": 1, "imvar2": 2}},
+                           "var2": {"values": {"a": 1, "b": 2}, "info_map": {}}}}
+    with patch('builtins.open', mock_open(read_data=json.dumps(dummy_data))):
+        mock_output_manager.load_variables_pool_from_file(Path("path/to/file"))
+        assert mock_output_manager.variables_pool == dummy_data
+
+    mock_output_manager.load_variables_pool_from_file = output_manager_original_method_states[
+        "load_variables_pool_from_file"
+    ]
+
+
+@patch("builtins.open", new_callable=mock_open)
+def test_load_variables_pool_from_file_raises_exception(mock_file: MagicMock,
+                                                        mock_output_manager: OutputManager,
+                                                        output_manager_original_method_states: Dict[str, Callable],
+                                                        ) -> None:
+    """Checks that load_variables_pool_from_file raises exceptions with a bad filepath provided"""
+    mock_file.side_effect = FileNotFoundError
+    with pytest.raises(FileNotFoundError):
+        mock_output_manager.load_variables_pool_from_file(Path("bad/file/path"))
+        assert mock_output_manager.variables_pool == {}
+
+    mock_file.return_value.read.return_value = "this is not valid JSON"
+    with patch('builtins.open', mock_open(read_data="bad/file/path")):
+        with pytest.raises(json.JSONDecodeError):
+            mock_output_manager.load_variables_pool_from_file(Path("bad/file/path.json"))
+            assert mock_output_manager.variables_pool == {}
+
+    mock_output_manager.load_variables_pool_from_file = output_manager_original_method_states[
+        "load_variables_pool_from_file"
+    ]
 
 
 @pytest.mark.parametrize(
