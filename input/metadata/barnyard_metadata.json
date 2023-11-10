@@ -270,11 +270,6 @@
           "default": 100,
           "minimum": 0
         },
-        "herd_init": {
-          "type": "bool",
-          "default": false,
-          "description": "Initialize Herd? -- Whether to re-initialize the animal database, where the herd animals are selected from."
-        },
         "replace_num": {
           "type": "number",
           "default": 5000,
@@ -285,6 +280,22 @@
           "default": "HO",
           "pattern": "(HO|JE)",
           "description": "Breed (select one Holstein/Jersey) -- The predominant breed of the herd (Holstein or Jersey)"
+        }
+      },
+      "herd_initialization": {
+        "type": "object",
+        "description": "Animal generation related inputs",
+        "initial_animal_num": {
+          "type": "number",
+          "description": "The initial number of animals for the simulation starting with to generate the herd",
+          "minimum": 0,
+          "default": 10000
+        },
+        "simulation_days": {
+          "type": "number",
+          "description": "The number of days to simulate for generating the herd",
+          "minimum": 0,
+          "default": 5000
         }
       },
       "animal_config": {
