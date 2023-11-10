@@ -557,11 +557,11 @@ class OutputManager(object):
                 value.pop("info_maps")
         return pool_copy
 
-    def _list_txt_and_json_files_in_dir(self, dir_path: str) -> List[str]:
-        """Returns the list of txt and json files in the given path"""
+    def _list_filter_files_in_dir(self, dir_path: str) -> List[str]:
+        """Returns the list of supported filter files in the given path"""
         info_map = {
             "class": self.__class__.__name__,
-            "function": self._list_txt_and_json_files_in_dir.__name__,
+            "function": self._list_filter_files_in_dir.__name__,
         }
         self.add_log(
             "search_path_for_filenames_try",
@@ -574,11 +574,24 @@ class OutputManager(object):
             all_files = os.listdir(dir_path)
             for filename in all_files:
                 if filename.endswith(".txt") or filename.endswith(".json"):
+                    for (
+                        _,
+                        supported_prefix,
+                    ) in self.__supported_filter_types_prefixes.items():
+                        if filename.startswith(supported_prefix):
+                            break
+                    else:
+                        self.add_warning(
+                            "invalid filter file prefix",
+                            f"{filename} prefix is not in {list(self.__supported_filter_types_prefixes.values())}",
+                            info_map,
+                        )
+                        continue
                     filter_files.append(filename)
             self.add_log(
                 "search_path_for_filenames_success",
                 f"Successfully searched in {dir_path}"
-                f" and found {len(filter_files)} text files.",
+                f" and found {len(filter_files)} filter files.",
                 info_map,
             )
             return filter_files
@@ -728,7 +741,7 @@ class OutputManager(object):
         self.add_log("num_filter_pattern_matches", filter_log_count_msg, info_map)
         return filter_pattern_matches
 
-    def save_variables(
+    def save_results(
         self,
         save_path: Path,
         filters_dir_path: Path,
@@ -759,25 +772,15 @@ class OutputManager(object):
         """
         info_map = {
             "class": self.__class__.__name__,
-            "function": self.save_variables.__name__,
+            "function": self.save_results.__name__,
         }
         self.add_log(
             "exclude_info_maps",
             f"exclude_info_maps flag set to {exclude_info_maps}",
             info_map,
         )
-        list_of_filter_files = self._list_txt_and_json_files_in_dir(filters_dir_path)
+        list_of_filter_files = self._list_filter_files_in_dir(filters_dir_path)
         for filter_file in list_of_filter_files:
-            for _, supported_prefix in self.__supported_filter_types_prefixes.items():
-                if filter_file.startswith(supported_prefix):
-                    break
-            else:
-                self.add_warning(
-                    "invalid filter file prefix",
-                    f"{filter_file} prefix is not in {list(self.__supported_filter_types_prefixes.values())}",
-                    info_map,
-                )
-                continue
             input_path = os.path.join(filters_dir_path, filter_file)
             filter_contents = self._load_filter_file_content(input_path)
             for filter_content in filter_contents:
