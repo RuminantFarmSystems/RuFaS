@@ -22,10 +22,6 @@ from RUFAS.util import Utility
 
 def main():
     cmd_arguments = parse_gnu_args()
-    print("no_graphics: " + str(cmd_arguments.no_graphics))
-    print("init_herd: " + str(cmd_arguments.init_herd))
-    print("save_animals: " + str(cmd_arguments.save_animals))
-    print("terminate_simulation_post_herd_generation: " + str(cmd_arguments.terminate_simulation_post_herd_generation))
     run_rufas(
         produce_graphics=not cmd_arguments.no_graphics,
         format_option=cmd_arguments.format_option,
@@ -56,26 +52,26 @@ def run_rufas(
 
     Parameters
     ----------
-        produce_graphics: bool
-            produce graphics after simulation
-        format_option: bool
-            format for variable_names.txt output file
-        verbose: bool
-            print progress messages while simulation is running
-        clear_output: bool
-            lear output directory before running the simulation
-        exclude_info_maps: bool
-            exclude info_maps from the output
-        only_run_validation: bool
-            validate input data and don't run a simulation
-        graphics_dir : Path, optional
-            The directory for saving graphics.
-        init_herd: bool
-            Initialize herd with simulation.
-        save_animals: bool
-            Save animals to CSV files.
-        terminate_simulation_post_herd_generation: bool
-            Save generated animals to CSV files.
+    produce_graphics: bool
+        produce graphics after simulation
+    format_option: bool
+        format for variable_names.txt output file
+    verbose: bool
+        print progress messages while simulation is running
+    clear_output: bool
+        lear output directory before running the simulation
+    exclude_info_maps: bool
+        exclude info_maps from the output
+    only_run_validation: bool
+        validate input data and don't run a simulation
+    graphics_dir : Path, optional
+        The directory for saving graphics.
+    init_herd: bool
+        Initialize herd with simulation.
+    save_animals: bool
+        Save animals to CSV files.
+    terminate_simulation_post_herd_generation: bool
+        Save generated animals to CSV files.
     """
     if clear_output:
         output_dir = Path(config.global_variables.OUT_DIR)
