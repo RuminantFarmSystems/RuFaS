@@ -7,7 +7,6 @@ from pytest import approx
 from pytest_mock import MockerFixture
 
 from RUFAS.routines import AnimalManager
-from RUFAS.routines.animal.animal_grouping_scenarios import AnimalGroupingScenario
 from RUFAS.routines.animal.animal_module_constants import AnimalModuleConstants
 from RUFAS.routines.animal.life_cycle.cow import Cow
 from RUFAS.routines.animal.pen import Pen
@@ -505,6 +504,7 @@ def test_allocate_animals_to_pens(mocker: MockerFixture) -> None:
         feed=mocker.MagicMock(),
         weather=mocker.MagicMock(),
         time=mocker.MagicMock(),
+
     )
     animal_manager.calves = calves
     animal_manager.heiferIs = heiferIs
@@ -512,6 +512,8 @@ def test_allocate_animals_to_pens(mocker: MockerFixture) -> None:
     animal_manager.heiferIIIs = heiferIIIs
     animal_manager.cows = cows
     animal_manager.all_pens = mock_pens
+    animal_manager.ANIMAL_GROUPING_SCENARIO = mocker.MagicMock()
+    animal_manager.ANIMAL_GROUPING_SCENARIO.find_animal_combination = mocker.MagicMock()
 
     patch_for_sort_animals_before_allocation = mocker.patch.object(
         AnimalManager,
@@ -519,14 +521,15 @@ def test_allocate_animals_to_pens(mocker: MockerFixture) -> None:
         return_value=None
     )
 
-    mocker.patch('RUFAS.routines.animal.animal_manager.AnimalManager.ANIMAL_GROUPING_SCENARIO.find_animal_combination',
-                 side_effect=lambda animal: Pen.AnimalCombination.CALF
-                 if animal in calves
-                 else Pen.AnimalCombination.GROWING
-                 if animal in heiferIs + heiferIIs
-                 else Pen.AnimalCombination.CLOSE_UP
-                 if animal in heiferIIIs + dry_cows
-                 else Pen.AnimalCombination.LAC_COW)
+    animal_manager.ANIMAL_GROUPING_SCENARIO = mocker.MagicMock(
+        'animal_manager.ANIMAL_GROUPING_SCENARIO.find_animal_combination',
+        side_effect=lambda animal: Pen.AnimalCombination.CALF
+        if animal in calves
+        else Pen.AnimalCombination.GROWING
+        if animal in heiferIs + heiferIIs
+        else Pen.AnimalCombination.CLOSE_UP
+        if animal in heiferIIIs + dry_cows
+        else Pen.AnimalCombination.LAC_COW)
 
     # Act
     animal_manager.allocate_animals_to_pens()

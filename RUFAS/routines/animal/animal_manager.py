@@ -86,11 +86,6 @@ class AnimalManager:
         AnimalModuleConstants.DEFAULT_NUM_STALLS_FOR_GROWING_AND_CLOSE_UP_PEN,
     }
 
-    ANIMAL_GROUPING_SCENARIO = AnimalGroupingScenario.CALF__GROWING__CLOSE_UP__LACCOW
-
-    # ANIMAL_GROUPING_SCENARIO = AnimalGroupingScenario.CALF__GROWING_AND_CLOSE_UP__LACCOW
-
-    # TODO use this method! Determine if we want to add another user input
     @classmethod
     def set_animal_grouping_scenario(cls, scenario: AnimalGroupingScenario) -> None:
         """
@@ -175,6 +170,10 @@ class AnimalManager:
         # dictionary: key is animal ID, value is the pen ID that animal is in
         self.animal_to_pen_id_map = {}
 
+        # alternative option: AnimalGroupingScenario.CALF__GROWING_AND_CLOSE_UP__LACCOW
+        self.set_animal_grouping_scenario(AnimalGroupingScenario.CALF__GROWING__CLOSE_UP__LACCOW)
+
+        # TODO: have below work with animal_grouping_scenario?
         # dictionary for keeping track of what animal types each pen is holding
         # (value of the dictionaries are lists of pen objects)
         self.pens_by_animal_combination = {Pen.AnimalCombination.CALF: [],
