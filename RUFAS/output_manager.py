@@ -586,7 +586,7 @@ class OutputManager(object):
         else:
             raise NotADirectoryError("The specified path must be a directory")
 
-    def _load_filter_file_content(self, path: str) -> List[Dict[str, str]]:
+    def _load_filter_file_content(self, path: str) -> List[Dict[str, str | int]]:
         """
         Loads and processes the content of a filter file from the specified path.
 
@@ -597,7 +597,7 @@ class OutputManager(object):
 
         Returns
         -------
-        List[Dict[str, str]]
+        List[Dict[str, str|int]]
             A list of dictionaries, each containing the loaded filter content,
             with keys and values depending on the file type.
 
@@ -812,7 +812,7 @@ class OutputManager(object):
         save_path: Path,
         filtered_pool: Dict[str, pool_element_type],
         produce_graphics: bool,
-        filter_content: Dict[str, str],
+        filter_content: Dict[str, str | int],
         graphics_dir: Path,
     ) -> None:
         """
@@ -855,13 +855,14 @@ class OutputManager(object):
             self._save_reports(
                 filtered_pool,
                 filter_content,
+                save_path,
                 Path(filter_file),
             )
 
     def _save_reports(
         self,
         filtered_pool: Dict[str, pool_element_type],
-        filter_content: Dict[str, str],
+        filter_content: Dict[str, str | int],
         save_path: Path,
         filter_file: Path,
     ) -> None:
