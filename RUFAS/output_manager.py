@@ -856,15 +856,14 @@ class OutputManager(object):
                 filtered_pool,
                 filter_content,
                 Path(filter_file),
-                Path(csv_directory),
             )
 
     def _save_reports(
         self,
         filtered_pool: Dict[str, pool_element_type],
         filter_content: Dict[str, str],
+        save_path: Path,
         filter_file: Path,
-        csv_directory: Path,
     ) -> None:
         pass
 
