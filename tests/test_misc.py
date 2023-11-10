@@ -1337,9 +1337,10 @@ def test_list_filter_files_in_dir(
     output_manager_original_method_states: Dict[str, Callable],
     tmpdir,
 ) -> None:
+    mock_output_manager.add_warning = MagicMock()
     tmpdir.join("json_file1.txt").write("File 1 content")
     tmpdir.join("csv_file2.json").write("File 2 content")
-    tmpdir.join("file3.csv").write("File 3 content")
+    tmpdir.join("file3.txt").write("File 3 content")
 
     filter_files = mock_output_manager._list_filter_files_in_dir(tmpdir)
 
@@ -1347,6 +1348,7 @@ def test_list_filter_files_in_dir(
     assert "json_file1.txt" in filter_files
     assert "csv_file2.json" in filter_files
     assert "file3.csv" not in filter_files
+    mock_output_manager.add_warning.assert_called_once()
 
     with pytest.raises(NotADirectoryError):
         mock_output_manager._list_filter_files_in_dir("nonexistent_directory")
@@ -1355,6 +1357,9 @@ def test_list_filter_files_in_dir(
     mock_output_manager._list_filter_files_in_dir = (
         output_manager_original_method_states["_list_filter_files_in_dir"]
     )
+    mock_output_manager.add_warning = output_manager_original_method_states[
+        "add_warning"
+    ]
 
 
 def test_filter_variables_pool_include_empty_filter_pattern_pool(
