@@ -95,6 +95,7 @@ class OutputManager(object):
                 "csv": "csv_",
                 "graph": "graph_",
                 "json": "json_",
+                "report": "report_",
             }
             self.__log_verbose: LogVerbosity = LogVerbosity("none")
             self.add_log(
@@ -850,6 +851,22 @@ class OutputManager(object):
                     f"Graphic generation is disabled, skipping {filter_file=}",
                     info_map,
                 )
+        elif filter_file.startswith(self.__supported_filter_types_prefixes["report"]):
+            self._save_reports(
+                filtered_pool,
+                filter_content,
+                Path(filter_file),
+                Path(csv_directory),
+            )
+
+    def _save_reports(
+        self,
+        filtered_pool: Dict[str, pool_element_type],
+        filter_content: Dict[str, str],
+        filter_file: Path,
+        csv_directory: Path,
+    ) -> None:
+        pass
 
     def _save_variables_to_csv_files(
         self, data_dict: Dict[str, Any], filter_name: str, path: str
