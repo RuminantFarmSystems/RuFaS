@@ -62,12 +62,12 @@ class PoolGasPartition:
             layer.plant_structural_slow_carbon_usage)
 
         layer.active_carbon_decomposition_amount = self._determine_active_carbon_decomposition_amount(
-            layer.decomposition_moisture_effect, self.data.decomposition_temperature_effect,
+            layer.decomposition_moisture_effect, layer.decomposition_temperature_effect,
             layer.active_carbon_amount, layer.active_carbon_decomposition_rate
         )
 
         layer.slow_carbon_decomposition_amount = self._determine_slow_carbon_decomposition_amount(
-            layer.decomposition_moisture_effect, self.data.decomposition_temperature_effect,
+            layer.decomposition_moisture_effect, layer.decomposition_temperature_effect,
             layer.slow_carbon_amount)
 
         layer.passive_carbon_decomposition_amount = 0.0

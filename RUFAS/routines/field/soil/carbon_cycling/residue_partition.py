@@ -55,7 +55,7 @@ class ResiduePartition:
         layer = self.data.soil_layers[0]
         layer.plant_metabolic_active_carbon_usage = self._determine_plant_metabolic_active_carbon_usage(
             layer.decomposition_moisture_effect,
-            self.data.decomposition_temperature_effect,
+            layer.decomposition_temperature_effect,
             layer.metabolic_litter_amount)
 
         layer.soil_dry_matter_residue_amount = self._determine_soil_dry_matter_residue_amount(
@@ -90,7 +90,7 @@ class ResiduePartition:
             self._determine_plant_structural_to_slow_active_carbon_amount(
                 layer.plant_structural_to_slow_or_active_rate,
                 layer.decomposition_moisture_effect,
-                self.data.decomposition_temperature_effect,
+                layer.decomposition_temperature_effect,
                 layer.structural_litter_amount)
 
         layer.plant_structural_slow_carbon_usage = \
