@@ -148,7 +148,7 @@ def execute_simulations(
     Parameters
     ----------
     metadata_files : List[MetadataPaths]
-        A list of custom TypedDict objects including the specified prefix for the save_variables output file
+        A list of custom TypedDict objects including the specified prefix for the save_results output file
         and the path to the metadata file.
 
     exclude_info_maps : bool, optional
@@ -200,7 +200,7 @@ def execute_simulations(
                 f"Data not valid for {str(metadata_file['path'])}, simulation not run",
                 info_map,
             )
-        output_manager.save_variables(
+        output_manager.save_results(
             Path(r"output"),
             Path(r"output/output_filters/"),
             exclude_info_maps,
