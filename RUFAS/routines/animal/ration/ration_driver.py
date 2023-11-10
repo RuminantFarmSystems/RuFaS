@@ -981,7 +981,6 @@ class AvailableFeeds:
             if feed['DE'] != -1:
                 self.DE.append(feed['DE'])
             else:
-                print('DE_Base')
                 self.DE.append(feed['DE_Base'])
             self.EE.append(feed['EE'])
             self.is_fat.append(feed['is_fat'])
