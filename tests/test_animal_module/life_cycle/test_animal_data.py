@@ -1,18 +1,6 @@
 import pytest
-import numpy as np
-from typing import Any, Dict
-from unittest.mock import patch
-from mock import MagicMock
-from pytest_mock import MockerFixture
 
 from RUFAS.input_manager import InputManager
-
-from RUFAS.routines.animal.life_cycle.animal_data import AnimalData
-from RUFAS.routines.animal.life_cycle.calf import Calf
-from RUFAS.routines.animal.life_cycle.cow import Cow
-from RUFAS.routines.animal.life_cycle.heiferI import HeiferI
-from RUFAS.routines.animal.life_cycle.heiferII import HeiferII
-from RUFAS.routines.animal.life_cycle.heiferIII import HeiferIII
 
 
 @pytest.fixture
