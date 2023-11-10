@@ -632,6 +632,18 @@
               "minimum": 1,
               "default": 6
             },
+            "avg_estrus_cycle_heifer": {
+              "type": "number",
+              "description": "Average length of estrus cycle for heifers (default is 21).",
+              "minimum": 1,
+              "default": 21
+            },
+            "std_estrus_cycle_heifer": {
+              "type": "number",
+              "description": "Standard deviation of the length of estrus cycle for heifers (default is 2.5).",
+              "minimum": 1,
+              "default": 2.5
+            },
             "avg_estrus_cycle_cow": {
               "type": "number",
               "description": "Average length of estrus cycle for cows (default is 21).",
@@ -2279,6 +2291,10 @@
         "description": ""
       },
       "TDN": {
+        "type": "number",
+        "description": ""
+      },
+      "DE": {
         "type": "number",
         "description": ""
       }

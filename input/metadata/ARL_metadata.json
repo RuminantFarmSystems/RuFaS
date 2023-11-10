@@ -170,7 +170,7 @@
       "nutrient_standard": {
         "type": "string",
         "default": "NASEM",
-        "pattern": "^(NASEM|NRC)$",
+        "pattern": "(NASEM|NRC)",
         "description": "The nutrient standard to use for feed."
       }
     },
@@ -617,6 +617,18 @@
               "description": "Standard deviation of days between calving and first estrus after calving (default is 6).",
               "minimum": 1,
               "default": 6
+            },
+            "avg_estrus_cycle_heifer": {
+              "type": "number",
+              "description": "Average length of estrus cycle for heifers (default is 21).",
+              "minimum": 1,
+              "default": 21
+            },
+            "std_estrus_cycle_heifer": {
+              "type": "number",
+              "description": "Standard deviation of the length of estrus cycle for heifers (default is 2.5).",
+              "minimum": 1,
+              "default": 2.5
             },
             "avg_estrus_cycle_cow": {
               "type": "number",
@@ -2265,6 +2277,10 @@
         "description": ""
       },
       "TDN": {
+        "type": "number",
+        "description": ""
+      },
+      "DE": {
         "type": "number",
         "description": ""
       }
