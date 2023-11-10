@@ -1229,14 +1229,21 @@ def test_exclude_info_maps(
     ]
 
 
+@pytest.mark.parametrize(
+    "mock_file_text",
+    ["apples\nbananas\ncherries",
+     "apples\nbananas\ncherries\n\n\n",
+     "apples\nbananas\n\n\n\ncherries",
+     "apples\nbananas\n\n\ncherries\n\n\n"])
 @patch("builtins.open", new_callable=mock_open)
 def test_load_filter_file_content_txt(
     mock_file: MagicMock,
     mock_output_manager: OutputManager,
     output_manager_original_method_states: Dict[str, Callable],
+    mock_file_text: str,
 ) -> None:
     """Test case for function _load_filter_file_content in output_manager.py"""
-    mock_file.return_value.read.return_value = "apples\nbananas\ncherries"
+    mock_file.return_value.read.return_value = mock_file_text
     result = mock_output_manager._load_filter_file_content("path/to/file.txt")
     assert result == [{"filters": ["apples", "bananas", "cherries"]}]
 

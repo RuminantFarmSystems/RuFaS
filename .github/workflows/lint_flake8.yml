@@ -34,8 +34,33 @@ jobs:
                         tr " " "\n" |
                         grep -E "\.py$" |
                         tr "\n" " ")" >> "$GITHUB_ENV"
+        echo "OTHER_FILES=$( echo ${{ steps.files.outputs.added_modified }} |
+                        tr " " "\n" |
+                        grep -E "\.txt$|\.json$|\.csv$"  |
+                        tr "\n" " ")" >> "$GITHUB_ENV"
     - name: Lint with flake8
       if: ${{ env.FILES != '' }}
       run: |
         # stop the build if there are Python syntax errors or undefined names
         flake8 ${{ env.FILES }}
+    - name: Check for Unauthorized Changes
+      run: |
+        paths_to_protect=(
+          'RUFAS/scenario_manager.py'
+        )
+        unauthorized_changes=false
+        
+        for path in "${paths_to_protect[@]}"; do
+          if (echo ${{ env.FILES }}; echo ${{ env.OTHER_FILES }}) | grep -q "$path"; then
+            unauthorized_changes=true
+            unauthorized_paths+="$path, "
+          fi
+        done
+
+        if $unauthorized_changes; then
+          echo "Unauthorized changes detected in protected files: ${unauthorized_paths%, }"
+          echo "Review and remove these changes if they are not intended."
+          exit 1
+        else
+          echo "No unauthorized changes detected."
+        fi
