@@ -29,7 +29,7 @@ def test_save_graph_successful(graph_generator: GraphGenerator) -> None:
         with patch(
             "RUFAS.graph_generator.GraphGenerator._generate_graph_path"
         ) as mock_generate_graph_path:
-            mock_generate_graph_path.return_value = "graph_path"
+            mock_generate_graph_path.return_value = Path("graph_path")
 
             result = graph_generator._save_graph(
                 graph_details, filter_file_name, save_path, graphics_dir
