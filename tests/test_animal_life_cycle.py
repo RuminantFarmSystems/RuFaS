@@ -144,7 +144,7 @@ def test_initialize_herd(mocker: MockerFixture, life_cycle_manager: LifeCycleMan
     patch_set_avg_CI = mocker.patch.object(life_cycle_manager, '_set_avg_CI')
     patch_get_animals = mocker.patch.object(life_cycle_manager, '_get_animals')
 
-    results = life_cycle_manager.initialize_herd(mock_config, herd_data)
+    results = life_cycle_manager.initialize_herd(mock_config, herd_data, False, False, False)
 
     assert life_cycle_manager.herd_num == herd_data['herd_num']
     patch_set_avg_CI.assert_called_once()

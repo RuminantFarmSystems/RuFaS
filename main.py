@@ -98,7 +98,7 @@ def run_rufas(
 
 
 def run_validation(
-    metadata_files: List[Path],
+    metadata_files: List[MetadataPaths],
     exclude_info_maps: bool = False,
     format_option: str = "verbose",
     verbose: LogVerbosity = LogVerbosity.NONE,
@@ -107,7 +107,7 @@ def run_validation(
 
     Parameters
     ----------
-    metadata_files : List[Path]
+    metadata_files : List[MetadataPaths]
         The list of Paths to the metadata files the user entered with which to run the simulation.
     exclude_info_maps : bool, optional
         Flag for whether the user wants to include info_maps data in their results files.

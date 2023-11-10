@@ -26,23 +26,27 @@ file_path = os.path.join(dir_path, "input/ARL.json")
 
 
 @pytest.mark.parametrize(
-    "format_option, no_graphics, graphics_dir, verbose, clear_output, exclude_info_maps, only_run_validation",
+    "format_option, no_graphics, graphics_dir, verbose, clear_output, exclude_info_maps, only_run_validation, init_herd"
+    ", save_animals, terminate_simulation_post_herd_generation",
     [
-        ("verbose", False, "graphics", LogVerbosity.ERRORS, True, True, True),
-        ("basic", True, "custom_graphics", LogVerbosity.LOGS, False, False, False),
-        ("block", True, "graphics", LogVerbosity.NONE, True, False, False),
-        ("inline", False, "custom_graphics", LogVerbosity.WARNINGS, False, False, False),
-        ("verbose", True, "graphics", LogVerbosity.LOGS, False, True, False),
+        ("verbose", False, "graphics", LogVerbosity.ERRORS, True, True, True, False, False, False),
+        ("basic", True, "custom_graphics", LogVerbosity.LOGS, False, False, False, True, False, False),
+        ("block", True, "graphics", LogVerbosity.NONE, True, False, False, True, True, False),
+        ("inline", False, "custom_graphics", LogVerbosity.WARNINGS, False, False, False, True, True, True),
+        ("verbose", True, "graphics", LogVerbosity.LOGS, False, True, False, False, False, True),
     ],
 )
 def test_main(
-    format_option: str,
-    no_graphics: bool,
-    graphics_dir: str,
-    verbose: LogVerbosity,
-    clear_output: bool,
-    exclude_info_maps: bool,
-    only_run_validation: bool,
+        format_option: str,
+        no_graphics: bool,
+        graphics_dir: str,
+        verbose: LogVerbosity,
+        clear_output: bool,
+        exclude_info_maps: bool,
+        only_run_validation: bool,
+        init_herd: bool,
+        save_animals: bool,
+        terminate_simulation_post_herd_generation: bool
 ) -> None:
     with patch("main.parse_gnu_args") as mock_parse_gnu_args:
         mock_parse_gnu_args.return_value = argparse.Namespace(
@@ -53,6 +57,9 @@ def test_main(
             clear_output=clear_output,
             exclude_info_maps=exclude_info_maps,
             only_run_validation=only_run_validation,
+            init_herd=init_herd,
+            save_animals=save_animals,
+            terminate_simulation_post_herd_generation=terminate_simulation_post_herd_generation
         )
 
         with patch("main.run_rufas") as mock_run_rufas:
@@ -66,41 +73,48 @@ def test_main(
                 exclude_info_maps=exclude_info_maps,
                 only_run_validation=only_run_validation,
                 graphics_dir=Path(graphics_dir),
+                init_herd=init_herd,
+                save_animals=save_animals,
+                terminate_simulation_post_herd_generation=terminate_simulation_post_herd_generation
             )
 
 
 @pytest.mark.parametrize(
-    "format_option, produce_graphics, verbose, clear_output, exclude_info_maps, only_run_validation, graphics_dir",
+    "format_option, produce_graphics, verbose, clear_output, exclude_info_maps, only_run_validation, graphics_dir, "
+    "init_herd, save_animals, terminate_simulation_post_herd_generation",
     [
-        ("verbose", True, LogVerbosity.NONE, True, True, True, ""),
-        ("block", False, LogVerbosity.LOGS, True, True, True, ""),
-        ("inline", True, LogVerbosity.ERRORS, True, True, True, ""),
-        ("basic", True, LogVerbosity.WARNINGS, False, True, True, ""),
-        ("verbose", True, LogVerbosity.NONE, True, False, True, ""),
-        ("block", True, LogVerbosity.LOGS, True, True, False, ""),
-        ("inline", False, LogVerbosity.ERRORS, True, True, True, ""),
-        ("basic", False, LogVerbosity.WARNINGS, False, True, True, ""),
-        ("verbose", False, LogVerbosity.NONE, True, False, True, ""),
-        ("block", False, LogVerbosity.LOGS, True, True, False, ""),
-        ("inline", False, LogVerbosity.ERRORS, False, True, True, ""),
-        ("basic", False, LogVerbosity.WARNINGS, True, False, True, ""),
-        ("verbose", False, LogVerbosity.NONE, True, True, False, ""),
-        ("block", False, LogVerbosity.WARNINGS, False, False, True, ""),
-        ("inline", False, LogVerbosity.LOGS, False, True, False, ""),
-        ("basic", False, LogVerbosity.ERRORS, False, False, False, ""),
-        ("basic", False, LogVerbosity.LOGS, False, False, False, "graphics"),
+        ("verbose", True, LogVerbosity.NONE, True, True, True, "", False, False, False),
+        ("block", False, LogVerbosity.LOGS, True, True, True, "", False, False, False),
+        ("inline", True, LogVerbosity.ERRORS, True, True, True, "", False, False, False),
+        ("basic", True, LogVerbosity.WARNINGS, False, True, True, "", False, False, False),
+        ("verbose", True, LogVerbosity.NONE, True, False, True, "", False, False, False),
+        ("block", True, LogVerbosity.LOGS, True, True, False, "", False, False, False),
+        ("inline", False, LogVerbosity.ERRORS, True, True, True, "", False, False, False),
+        ("basic", False, LogVerbosity.WARNINGS, False, True, True, "", False, False, False),
+        ("verbose", False, LogVerbosity.NONE, True, False, True, "", False, False, False),
+        ("block", False, LogVerbosity.LOGS, True, True, False, "", False, False, False),
+        ("inline", False, LogVerbosity.ERRORS, False, True, True, "", False, False, False),
+        ("basic", False, LogVerbosity.WARNINGS, True, False, True, "", False, False, False),
+        ("verbose", False, LogVerbosity.NONE, True, True, False, "", False, False, False),
+        ("block", False, LogVerbosity.WARNINGS, False, False, True, "", False, False, False),
+        ("inline", False, LogVerbosity.LOGS, False, True, False, "", False, False, False),
+        ("basic", False, LogVerbosity.ERRORS, False, False, False, "", False, False, False),
+        ("basic", False, LogVerbosity.LOGS, False, False, False, "graphics", False, False, False),
     ],
 )
 def test_run_rufas(
-    format_option: str,
-    produce_graphics: bool,
-    verbose: LogVerbosity,
-    clear_output: bool,
-    exclude_info_maps: bool,
-    only_run_validation: bool,
-    graphics_dir: str,
-    mocker: MockerFixture,
-    capsys,
+        format_option: str,
+        produce_graphics: bool,
+        verbose: LogVerbosity,
+        clear_output: bool,
+        exclude_info_maps: bool,
+        only_run_validation: bool,
+        graphics_dir: str,
+        init_herd: bool,
+        save_animals: bool,
+        terminate_simulation_post_herd_generation: bool,
+        mocker: MockerFixture,
+        capsys,
 ) -> None:
     """Checks that run_rufas() calls the correct functions in the correct order"""
     # Arrange
@@ -118,6 +132,9 @@ def test_run_rufas(
         exclude_info_maps,
         only_run_validation,
         graphics_dir,
+        init_herd,
+        save_animals,
+        terminate_simulation_post_herd_generation
     )
 
     # Assert
@@ -133,6 +150,9 @@ def test_run_rufas(
             graphics_dir,
             format_option,
             verbose,
+            init_herd,
+            save_animals,
+            terminate_simulation_post_herd_generation
         )
 
     if clear_output:
@@ -193,13 +213,13 @@ def test_run_validation(mocker: MockerFixture, is_data_valid: bool) -> None:
     ],
 )
 def test_execute_simulations(
-    mocker: MockerFixture,
-    produce_graphics: bool,
-    exlclude_info_maps: bool,
-    is_data_valid: bool,
-    simulate_call_count: int,
-    add_error_call_count: int,
-    format_option: str,
+        mocker: MockerFixture,
+        produce_graphics: bool,
+        exlclude_info_maps: bool,
+        is_data_valid: bool,
+        simulate_call_count: int,
+        add_error_call_count: int,
+        format_option: str,
 ) -> None:
     """Checks that execute_simulations() calls the correct functions in the correct order"""
     # Arrange
@@ -270,7 +290,7 @@ def test_parse_gnu_args(mocker: MockerFixture) -> None:
     actual_args = parse_gnu_args()
 
     # Assert
-    assert mock_add_argument.call_count == 7
+    assert mock_add_argument.call_count == 10
     assert mock_add_argument.call_args_list == [
         mocker.call(
             "-f",
@@ -313,6 +333,24 @@ def test_parse_gnu_args(mocker: MockerFixture) -> None:
             "-o",
             "--only-run-validation",
             help="Only validate the data, don't run a simulation",
+            action="store_true",
+        ),
+        mocker.call(
+            "-I",
+            "--init_herd",
+            help="Initialize herd with simulation",
+            action="store_true",
+        ),
+        mocker.call(
+            "-s",
+            "--save_animals",
+            help="Save animals to CSV files",
+            action="store_true",
+        ),
+        mocker.call(
+            "-t",
+            "--terminate_simulation_post_herd_generation",
+            help="Save generated animals to CSV files",
             action="store_true",
         ),
     ]
