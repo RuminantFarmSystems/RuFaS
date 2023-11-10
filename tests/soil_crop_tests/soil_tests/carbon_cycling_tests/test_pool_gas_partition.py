@@ -300,7 +300,7 @@ def test_slow_carbon_co2_lost_amount(slow_carbon_decomposition_amount: float) ->
     9.24,  # arbitrary values
 ])
 def test_slow_to_passive_carbon_amount(slow_carbon_decomposition_amount: float) -> None:
-    """Tests that the the amount of slow carbon decomposed into passive carbon was calculated correctly"""
+    """Tests that the amount of slow carbon decomposed into passive carbon was calculated correctly"""
     slow_carbon_passive_decompose_rate = 0.03
     expected = slow_carbon_decomposition_amount * slow_carbon_passive_decompose_rate
     assert expected == PoolGasPartition._determine_slow_to_passive_carbon_amount(slow_carbon_decomposition_amount)
@@ -324,7 +324,7 @@ def test_passive_to_active_carbon_amount(passive_carbon_decomposition_amount: fl
     7.7,  # arbitrary values
 ])
 def test_passive_carbon_co2_lost_amount(passive_carbon_decomposition_amount: float) -> None:
-    """Tests that the the amount of lost passive carbon decomposed into CO2 was calculated correctly"""
+    """Tests that the amount of lost passive carbon decomposed into CO2 was calculated correctly"""
     passive_carbon_co2_lost_rate = 0.55
     expected = passive_carbon_decomposition_amount * passive_carbon_co2_lost_rate
     assert expected == PoolGasPartition._determine_passive_carbon_co2_lost_amount(passive_carbon_decomposition_amount)

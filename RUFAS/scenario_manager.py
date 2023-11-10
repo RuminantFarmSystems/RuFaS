@@ -32,11 +32,11 @@ class MetadataPaths(TypedDict):
         prefix: e.g. "default_scenario_errors_09-Oct...", "default_scenario_logs_09-Oct...", etc.
 
     Multiple simulations:
-        METADATA_PATHS = [{"prefix": "default_scenario",
-                           "path": Path('input/metadata/default_metadata.json')},
-                          {"prefix": "ARL_scenario",
-                           "path": Path('input/metadata/ARL_metadata.json')},
-                         ]
+        METADATA_PATHS: List[MetadataPaths] = [{"prefix": "default_scenario",
+                                                "path": Path('input/metadata/default_metadata.json')},
+                                               {"prefix": "ARL_scenario",
+                                                "path": Path('input/metadata/ARL_metadata.json')},
+                                              ]
         This will run 2 simulations back to back - the first simulation will use the default_metadata.json
         file to point to one set of input files and will save the generated output files with the "default_scenario"
         prefix. The second simulation will run immediately after with no extra input from the user and will

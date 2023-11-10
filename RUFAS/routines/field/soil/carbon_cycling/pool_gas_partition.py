@@ -123,16 +123,16 @@ class PoolGasPartition:
                 layer.soil_structural_slow_carbon_usage)
 
             layer.active_carbon_decomposition_amount = self._determine_active_carbon_decomposition_amount(
-                layer.decomposition_moisture_effect, self.data.decomposition_temperature_effect,
+                layer.decomposition_moisture_effect, layer.decomposition_temperature_effect,
                 layer.active_carbon_amount, layer.active_carbon_decomposition_rate
             )
 
             layer.slow_carbon_decomposition_amount = self._determine_slow_carbon_decomposition_amount(
-                layer.decomposition_moisture_effect, self.data.decomposition_temperature_effect,
+                layer.decomposition_moisture_effect, layer.decomposition_temperature_effect,
                 layer.slow_carbon_amount)
 
             layer.passive_carbon_decomposition_amount = self._determine_passive_carbon_decomposition_amount(
-                layer.decomposition_moisture_effect, self.data.decomposition_temperature_effect,
+                layer.decomposition_moisture_effect, layer.decomposition_temperature_effect,
                 layer.passive_carbon_amount)
 
             layer.active_carbon_to_slow_amount = self._determine_active_carbon_to_slow_amount(
@@ -747,7 +747,7 @@ class PoolGasPartition:
 
         Parameters
         ----------
-        plant_metabolic_active_carbon_usage : float
+        plant_structural_active_carbon_usage : float
             Plant metabolic carbon decomposed into active carbon (kg/ha).
         structural_active_carbon_loss_rate : float
             Rate of carbon dioxide loss during transformation of structural to active carbon.
@@ -797,7 +797,7 @@ class PoolGasPartition:
 
         Parameters
         ----------
-        plant_metabolic_slow_carbon_usage : float
+        plant_structural_slow_carbon_usage : float
             Plant metabolic carbon decomposed into slow carbon (kg/ha).
         structural_slow_carbon_loss_rate : float
             Rate of carbon dioxide loss during transformation of structural to slow carbon.

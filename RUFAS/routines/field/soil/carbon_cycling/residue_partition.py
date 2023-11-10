@@ -97,7 +97,7 @@ class ResiduePartition:
             self._determine_plant_structural_to_slow_active_carbon_amount(
                 layer.plant_structural_to_slow_or_active_rate,
                 layer.decomposition_moisture_effect,
-                self.data.decomposition_temperature_effect,
+                layer.decomposition_temperature_effect,
                 layer.structural_litter_amount)
 
         layer.weighted_residue_dry_matter_lignin_fraction = \
@@ -124,7 +124,7 @@ class ResiduePartition:
 
             layer.soil_metabolic_active_carbon_usage = self._determine_soil_metabolic_to_active_carbon_amount(
                 layer.decomposition_moisture_effect,
-                self.data.decomposition_temperature_effect,
+                layer.decomposition_temperature_effect,
                 layer.metabolic_litter_amount,
             )
 
@@ -138,13 +138,13 @@ class ResiduePartition:
 
             layer.soil_structural_active_carbon_usage = self._determine_soil_structural_to_slow_active_carbon_amount(
                 layer.decomposition_moisture_effect,
-                self.data.decomposition_temperature_effect,
+                layer.decomposition_temperature_effect,
                 layer.structural_litter_amount
             )
 
             layer.soil_structural_slow_carbon_usage = self._determine_soil_structural_to_slow_active_carbon_amount(
                 layer.decomposition_moisture_effect,
-                self.data.decomposition_temperature_effect,
+                layer.decomposition_temperature_effect,
                 layer.structural_litter_amount
             )
 
