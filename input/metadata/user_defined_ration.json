@@ -2274,6 +2274,10 @@
       "TDN": {
         "type": "number",
         "description": ""
+      },
+      "DE": {
+        "type": "number",
+        "description": ""
       }
     },
     "manure_management_properties": {
