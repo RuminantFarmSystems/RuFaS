@@ -103,8 +103,8 @@ def clear_output_dir(vars_file_path: Path = None) -> None:
     }
     output_manager = OutputManager()
     output_dir = Path(config.global_variables.OUT_DIR)
-    is_in_dir = is_file_in_dir(output_dir, vars_file_path)
-    if is_in_dir:
+    is_file_found_in_dir = is_file_in_dir(output_dir, vars_file_path)
+    if is_file_found_in_dir:
         output_manager.add_error("Can't clear output directory", f"{vars_file_path} in output directory.", info_map)
     else:
         keep_list = [".keep", "output_filters"]
@@ -112,19 +112,19 @@ def clear_output_dir(vars_file_path: Path = None) -> None:
         output_manager.add_log("Output directory cleared", "No conflicts to clearing output directory.", info_map)
 
 
-def is_file_in_dir(dir_path: Path = Path(config.global_variables.OUT_DIR), vars_file_path: Path = None) -> bool:
+def is_file_in_dir(dir_path: Path = Path(config.global_variables.OUT_DIR), file_path: Path = None) -> bool:
     """Checks if a file path is in the provided directory.
 
     Parameters
     ----------
     dir_path : Path, optional, default=Path(config.global_variables.OUT_DIR)
         Path to the directory to be checked.
-    vars_file_path : Path, optional, default=None
+    file_path : Path, optional, default=None
         Path to file to be checked.
     """
-    if vars_file_path is None:
+    if file_path is None:
         return False
-    file_path = vars_file_path.resolve()
+    file_path = file_path.resolve()
     directory_path = dir_path.resolve()
 
     return directory_path == file_path or directory_path in file_path.parents
@@ -156,17 +156,17 @@ def run_load_vars_pool(
         clear_output_dir(vars_file_path)
     output_manager = OutputManager()
     output_manager.flush_pools()
-    output_manager.reload_vars_pool(vars_file_path)
+    output_manager.load_variables_pool_from_file(vars_file_path)
     output_manager.set_metadata_prefix("reload")
-    output_manager.dump_all_nondata_pools(
-            r"output", exclude_info_maps, format_option
-        )
     output_manager.save_variables(
             Path(r"output"),
             Path(r"output/output_filters/"),
             exclude_info_maps,
             produce_graphics,
             graphics_dir,
+        )
+    output_manager.dump_all_nondata_pools(
+            r"output", exclude_info_maps, format_option
         )
 
 
