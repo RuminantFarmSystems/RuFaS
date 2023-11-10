@@ -523,7 +523,7 @@ def test_partition_pool_gas(layers: list) -> None:
 
     assert PoolGasPartition._determine_plant_active_decompose_carbon.call_count == len(layers)
     assert PoolGasPartition._determine_soil_active_decompose_carbon.call_count == len(layers) - 1
-    assert PoolGasPartition._determine_soil_active_carbon_amount.call_count == len(layers) - 1
+    assert PoolGasPartition._determine_soil_active_carbon_amount.call_count == len(layers)
 
     assert PoolGasPartition._determine_soil_slow_carbon_amount.call_count == len(layers)
 
@@ -569,7 +569,7 @@ def test_partition_pool_gas(layers: list) -> None:
 
     assert layer.slow_carbon_amount == 5.1
 
-    assert layer.passive_carbon_amount == 0.0
+    assert layer.passive_carbon_amount == 1120.0
 
     for layer in data.soil_layers[1:]:
         assert layer.active_carbon_decomposition_rate == 0.87

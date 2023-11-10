@@ -289,7 +289,7 @@ def test_record_yield(field_name: str, field_size: float, species: str, year: in
         (150, 150, 22, True, 100, 0.0, 150.0),
         (100, 150, 22, True, 100, 50, 100),
         (100, 150, 22, False, 0, 150, 0)
-])
+    ])
 def test_transfer_residue(root_biomass: float, residue: float, nitrogen: float, killed: bool,
                           expected_root_depth: float, expected_surface_residue: float,
                           expected_root_residue: float) -> None:
