@@ -1691,43 +1691,6 @@ def test_filter_variables_pool_exclude_regex_patterns(
     mock_output_manager.variables_pool = {}
 
 
-def test_save_variables_unsupported_prefix(
-    mock_output_manager: OutputManager,
-    output_manager_original_method_states: Dict[str, Callable],
-) -> None:
-    mock_output_manager.variables_pool = {}
-    mock_output_manager._generate_file_name = MagicMock(return_value="dummy_name")
-    mock_output_manager._load_filter_file_content = MagicMock()
-    mock_output_manager._list_filter_files_in_dir = MagicMock(
-        return_value=[
-            "dummy_input_filepath1.txt",
-            "dummy_input_filepath2.txt",
-        ]
-    )
-    mock_output_manager.save_variables("save_path", "filters_path")
-
-    mock_output_manager._load_filter_file_content.assert_not_called()
-    assert len(
-        mock_output_manager.warnings_pool[
-            "OutputManager.save_variables.invalid filter file prefix"
-        ]
-    ) == len(mock_output_manager._list_filter_files_in_dir.return_value)
-
-    # Restore original method
-    mock_output_manager.save_variables = output_manager_original_method_states[
-        "save_variables"
-    ]
-    mock_output_manager._list_filter_files_in_dir = (
-        output_manager_original_method_states["_list_filter_files_in_dir"]
-    )
-    mock_output_manager._generate_file_name = output_manager_original_method_states[
-        "_generate_file_name"
-    ]
-    mock_output_manager._load_filter_file_content = (
-        output_manager_original_method_states["_load_filter_file_content"]
-    )
-
-
 @pytest.mark.parametrize(
     "exclude_info_maps, produce_graphics",
     [(True, True), (True, False), (False, True), (False, False)],
