@@ -58,14 +58,6 @@ class ResiduePartition:
             layer.decomposition_temperature_effect,
             layer.metabolic_litter_amount)
 
-        layer.soil_dry_matter_residue_amount = self._determine_soil_dry_matter_residue_amount(
-            self.data.crop_root_depth,
-            self.data.plant_root_residue,
-            layer.bottom_depth,
-            layer.top_depth,
-            layer.layer_thickness
-        )
-
         layer.metabolic_litter_amount = self._determine_plant_metabolic_carbon_amount(
             layer.metabolic_litter_amount,
             layer.plant_residue_metabolic_fraction,
@@ -106,6 +98,10 @@ class ResiduePartition:
 
         for layer in self.data.soil_layers[1:]:
             layer.soil_dry_matter_residue_amount = 0
+
+            layer.weighted_residue_dry_matter_lignin_fraction = \
+                self._determine_weighted_residue_dry_matter_lignin_fraction(layer.soil_dry_matter_residue_amount,
+                                                                            self.data.plant_root_residue)
 
             layer.soil_residue_lignin_fraction = self._determine_soil_residue_lignin_fraction(
                 layer.weighted_residue_dry_matter_lignin_fraction,
@@ -342,8 +338,8 @@ class ResiduePartition:
 
         """
         plant_metabolic_carbon_amount += plant_dry_matter_residue_amount \
-                                         * plant_residue_metabolic_fraction - \
-                                         (plant_metabolic_active_carbon_usage + plant_metabolic_to_soil_carbon_amount)
+            * plant_residue_metabolic_fraction - \
+            (plant_metabolic_active_carbon_usage + plant_metabolic_to_soil_carbon_amount)
         return plant_metabolic_carbon_amount
 
     @staticmethod
@@ -373,7 +369,7 @@ class ResiduePartition:
         pseudocode_soil S.6.B.I.5
         """
         return decomposition_moisture_effect * decomposition_temperature_effect * \
-               plant_metabolic_carbon_amount * plant_metabolic_active_carbon_rate
+            plant_metabolic_carbon_amount * plant_metabolic_active_carbon_rate
 
     @staticmethod
     def _determine_plant_metabolic_to_soil_carbon_amount(plant_metabolic_carbon_amount: float,
@@ -451,8 +447,7 @@ class ResiduePartition:
         pseudocode_soil S.6.B.I.10
         """
         return plant_structural_to_slow_or_active_rate * decomposition_moisture_effect \
-               * decomposition_temperature_effect \
-               * plant_structural_carbon_amount
+            * decomposition_temperature_effect * plant_structural_carbon_amount
 
     @staticmethod
     def _determine_structural_carbon_transfer_amount(plant_structural_carbon_amount: float,
@@ -510,9 +505,8 @@ class ResiduePartition:
         pseudocode_soil S.6.B.I.8, S.6.B.I.12
         """
         updated_amount = plant_structural_carbon_amount + plant_dry_matter_residue_amount \
-                         * (1 - plant_residue_metabolic_fraction) - structural_carbon_transfer_amount \
-                         - plant_structural_to_active_carbon_amount \
-                         - plant_structural_to_slow_carbon_amount
+            * (1 - plant_residue_metabolic_fraction) - structural_carbon_transfer_amount \
+            - plant_structural_to_active_carbon_amount - plant_structural_to_slow_carbon_amount
 
         return updated_amount
 
@@ -659,7 +653,7 @@ class ResiduePartition:
         pseudocode_soil S.6.B.II.6, S.6.B.II.8
         """
         result = soil_metabolic_carbon_amount + plant_metabolic_to_soil_carbon_amount + \
-                 (root_biomass * soil_residue_metabolic_fraction) - soil_metabolic_active_carbon_usage
+            (root_biomass * soil_residue_metabolic_fraction) - soil_metabolic_active_carbon_usage
         return result
 
     @staticmethod
@@ -691,7 +685,7 @@ class ResiduePartition:
 
         """
         return decomposition_temperature_effect * decomposition_moisture_effect * soil_metabolic_carbon_amount * \
-               soil_metabolic_active_carbon_rate
+            soil_metabolic_active_carbon_rate
 
     @staticmethod
     def _determine_soil_structural_to_slow_active_carbon_amount(decomposition_moisture_effect: float,
@@ -726,7 +720,7 @@ class ResiduePartition:
         amount of soil structural carbon decomposed into active carbon.
         """
         return decomposition_moisture_effect * decomposition_temperature_effect * soil_structural_carbon_amount * \
-               soil_structural_to_slow_or_active_rate
+            soil_structural_to_slow_or_active_rate
 
     @staticmethod
     def _determine_soil_structural_carbon_amount(soil_residue_metabolic_fraction: float,
@@ -761,7 +755,7 @@ class ResiduePartition:
         pseudocode_soil S.6.B.II.9, S.6.B.II.11
         """
         updated_amount = soil_structural_carbon_amount + structural_carbon_transfer_amount + root_biomass * \
-                         (1 - soil_residue_metabolic_fraction) - soil_structural_to_active_carbon_amount - \
-                         soil_structural_to_slow_carbon_amount
+            (1 - soil_residue_metabolic_fraction) - soil_structural_to_active_carbon_amount - \
+            soil_structural_to_slow_carbon_amount
 
         return updated_amount

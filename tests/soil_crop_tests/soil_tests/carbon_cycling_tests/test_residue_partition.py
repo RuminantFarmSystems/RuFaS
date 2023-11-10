@@ -527,14 +527,7 @@ def test_partition_residue(layers: list, crop: CropData, rainfall=10):
     data.plant_root_residue = crop.root_biomass or 0
     partition = ResiduePartition(data)
 
-    ResiduePartition._determine_soil_dry_matter_residue_amount = MagicMock(return_value=15.3)
-    ResiduePartition._determine_plant_residue_lignin_composition = MagicMock(return_value=0.55)
-    ResiduePartition._determine_plant_lignin_nitrogen_fraction = MagicMock(return_value=0.56)
-    ResiduePartition._determine_plant_residue_metabolic_fraction = MagicMock(return_value=0.57)
-
     ResiduePartition._determine_plant_metabolic_active_carbon_usage = MagicMock(return_value=2.1)
-    ResiduePartition._determine_plant_metabolic_to_soil_carbon_amount = MagicMock(return_value=2.2)
-    ResiduePartition._determine_structural_carbon_transfer_amount = MagicMock(return_value=2.3)
     ResiduePartition._determine_plant_metabolic_carbon_amount = MagicMock(return_value=2.4)
     ResiduePartition._determine_plant_structural_to_slow_or_active_rate = MagicMock(return_value=0.58)
     ResiduePartition._determine_plant_structural_carbon_amount = MagicMock(return_value=2.5)
@@ -552,52 +545,57 @@ def test_partition_residue(layers: list, crop: CropData, rainfall=10):
     partition.partition_residue(rainfall)
 
     # Checking if methods are called correct number of times
-    assert ResiduePartition._determine_soil_dry_matter_residue_amount.call_count == len(layers)
-    assert ResiduePartition._determine_plant_residue_lignin_composition.call_count == 1
-    assert ResiduePartition._determine_plant_lignin_nitrogen_fraction.call_count == 1
-    assert ResiduePartition._determine_plant_residue_metabolic_fraction.call_count == 1
-    assert ResiduePartition._determine_plant_metabolic_active_carbon_usage.call_count == len(layers)
-    assert ResiduePartition._determine_plant_metabolic_to_soil_carbon_amount.call_count == len(layers)
+    assert ResiduePartition._determine_plant_metabolic_active_carbon_usage.call_count == 1
 
-    assert ResiduePartition._determine_structural_carbon_transfer_amount.call_count == 1
-    assert ResiduePartition._determine_plant_metabolic_carbon_amount.call_count == len(layers)
-    assert ResiduePartition._determine_plant_structural_to_slow_or_active_rate.call_count == len(layers)
-    assert ResiduePartition._determine_plant_structural_carbon_amount.call_count == len(layers)
-    assert ResiduePartition._determine_plant_structural_to_slow_active_carbon_amount.call_count == len(layers) * 2
+    assert ResiduePartition._determine_plant_metabolic_carbon_amount.call_count == 1
+    assert ResiduePartition._determine_plant_structural_to_slow_or_active_rate.call_count == 1
+    assert ResiduePartition._determine_plant_structural_carbon_amount.call_count == 1
+    assert ResiduePartition._determine_plant_structural_to_slow_active_carbon_amount.call_count == 2
     assert ResiduePartition._determine_weighted_residue_dry_matter_lignin_fraction.call_count == len(layers)
-    assert ResiduePartition._determine_soil_residue_lignin_fraction.call_count == len(layers)
-    assert ResiduePartition._determine_soil_lignin_to_nitrogen_fraction.call_count == len(layers)
-    assert ResiduePartition._determine_soil_residue_metabolic_fraction.call_count == len(layers)
-    assert ResiduePartition._determine_soil_metabolic_to_active_carbon_amount.call_count == len(layers)
-    assert ResiduePartition._determine_soil_metabolic_carbon_amount.call_count == len(layers)
-    assert ResiduePartition._determine_soil_structural_to_slow_active_carbon_amount.call_count == len(layers) * 2
-    assert ResiduePartition._determine_soil_structural_carbon_amount.call_count == len(layers)
+    assert ResiduePartition._determine_soil_residue_lignin_fraction.call_count == len(layers) - 1
+    assert ResiduePartition._determine_soil_lignin_to_nitrogen_fraction.call_count == len(layers) - 1
+    assert ResiduePartition._determine_soil_residue_metabolic_fraction.call_count == len(layers) - 1
+    assert ResiduePartition._determine_soil_metabolic_to_active_carbon_amount.call_count == len(layers) - 1
+    assert ResiduePartition._determine_soil_metabolic_carbon_amount.call_count == len(layers) - 1
+    assert ResiduePartition._determine_soil_structural_to_slow_active_carbon_amount.call_count == (len(layers) - 1) * 2
+    assert ResiduePartition._determine_soil_structural_carbon_amount.call_count == len(layers) - 1
 
-    assert data.plant_residue_lignin_composition == 0.55
-    assert data.plant_lignin_nitrogen_ratio == 0.56
-    assert data.plant_residue_metabolic_fraction == 0.57
+    layer = data.soil_layers[0]
+    assert layer.plant_metabolic_active_carbon_usage == 2.1
+    assert layer.plant_metabolic_to_soil_carbon_amount == 0.0
+    assert layer.structural_carbon_transfer_amount == 0.0
+    assert layer.soil_dry_matter_residue_amount == 0.0
+    assert layer.metabolic_litter_amount == 2.4
+    assert layer.plant_structural_to_slow_or_active_rate == 0.58
+    assert layer.structural_litter_amount == 2.5
+    assert layer.plant_structural_active_carbon_usage == 2.6
+    assert layer.plant_structural_slow_carbon_usage == 2.6
+    assert layer.weighted_residue_dry_matter_lignin_fraction == 0.59
+    assert layer.soil_residue_lignin_fraction == 0.17
+    assert layer.soil_lignin_to_nitrogen_fraction == 0.0
+    assert layer.soil_residue_metabolic_fraction == 0.0
+    assert layer.soil_metabolic_active_carbon_usage == 0.0
+    assert layer.soil_metabolic_carbon_amount == 0.0
+    assert layer.soil_structural_active_carbon_usage == 0.0
+    assert layer.soil_structural_slow_carbon_usage == 0.0
+    assert layer.soil_structural_carbon_amount == 0.0
 
-    for layer in data.soil_layers:
-        assert layer.plant_metabolic_active_carbon_usage == 2.1
-        assert layer.plant_metabolic_to_soil_carbon_amount == 2.2
-
-        if layers.index(layer) == 0:
-            assert layer.structural_carbon_transfer_amount == 2.3
-        else:
-            assert layer.structural_carbon_transfer_amount == 0
-            assert data.plant_surface_residue == 0
-        assert layer.soil_dry_matter_residue_amount == 15.3
-        assert layer.metabolic_litter_amount == 2.4
-        assert layer.plant_structural_to_slow_or_active_rate == 0.58
-        assert layer.structural_litter_amount == 2.5
-        assert layer.plant_structural_active_carbon_usage == 2.6
-        assert layer.plant_structural_slow_carbon_usage == 2.6
+    for layer in data.soil_layers[1:]:
+        assert layer.plant_metabolic_active_carbon_usage == 0.0
+        assert layer.plant_metabolic_to_soil_carbon_amount == 0.0
+        assert layer.structural_carbon_transfer_amount == 0.0
+        assert layer.soil_dry_matter_residue_amount == 0.0
+        assert layer.metabolic_litter_amount == 2.8
+        assert layer.plant_structural_to_slow_or_active_rate == 0.0
+        assert layer.structural_litter_amount == 3
+        assert layer.plant_structural_active_carbon_usage == 0.0
+        assert layer.plant_structural_slow_carbon_usage == 0.0
         assert layer.weighted_residue_dry_matter_lignin_fraction == 0.59
         assert layer.soil_residue_lignin_fraction == 0.6
         assert layer.soil_lignin_to_nitrogen_fraction == 0.61
         assert layer.soil_residue_metabolic_fraction == 0.62
         assert layer.soil_metabolic_active_carbon_usage == 2.7
-        assert layer.soil_metabolic_carbon_amount == 2.8
+        assert layer.soil_metabolic_carbon_amount == 0.0
         assert layer.soil_structural_active_carbon_usage == 2.9
         assert layer.soil_structural_slow_carbon_usage == 2.9
-        assert layer.soil_structural_carbon_amount == 3
+        assert layer.soil_structural_carbon_amount == 0.0
