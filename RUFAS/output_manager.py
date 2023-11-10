@@ -639,7 +639,7 @@ class OutputManager(object):
                     else:
                         result = [json_content]
                 elif path.endswith(".txt"):
-                    list_of_elements = [i for i in filter_file.read().splitlines() if i]
+                    list_of_elements = [element for element in filter_file.read().splitlines() if element ]
                     result = [{"filters": list_of_elements}]
                 else:
                     raise Exception(
