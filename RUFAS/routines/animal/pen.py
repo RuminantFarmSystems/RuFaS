@@ -759,7 +759,8 @@ class Pen:
             animal.calc_manure_excretion(feed, methane_model)
         return self._get_prefix_and_default_manure_excretion(animal, is_lactating_cow)
 
-    def _update_animal_manure_excretion_data(self, animal_prefix_to_output_data_dict: dict[
+    @staticmethod
+    def _update_animal_manure_excretion_data(manure_excretions_output_data: dict[
         str, dict[str, str | AnimalManureExcretions]],
                                              prefix: str,
                                              manure: AnimalManureExcretions,
@@ -770,7 +771,7 @@ class Pen:
 
         Parameters
         ----------
-        animal_prefix_to_output_data_dict: dict[str, AnimalManureExcretions]
+        manure_excretions_output_data: dict[str, dict[str, str | AnimalManureExcretions]]
             Dictionary mapping prefixes to animal manure data.
         prefix: str
             Prefix related to the animal type.
@@ -784,15 +785,15 @@ class Pen:
         None
 
         """
-        if prefix not in animal_prefix_to_output_data_dict:
-            animal_prefix_to_output_data_dict[prefix] = {'prefix': prefix, 'manure': manure}
+        if prefix not in manure_excretions_output_data:
+            manure_excretions_output_data[prefix] = {'prefix': prefix, 'manure': manure}
 
-        animal_prefix_to_output_data_dict[prefix]['manure'] = add_animal_manure_excretions(
-            animal_prefix_to_output_data_dict[prefix]['manure'], animal.manure_excretion)
+        manure_excretions_output_data[prefix]['manure'] = add_animal_manure_excretions(
+            manure_excretions_output_data[prefix]['manure'], animal.manure_excretion)
 
     def calc_total_manure(self, feed, methane_model: str, methane_mitigation_method: str,
                           methane_mitigation_additive_amount: float,
-                          manure_excretions_output_data) -> None:
+                          manure_excretions_output_data: dict[str, dict[str | AnimalManureExcretions]]) -> None:
         """
         Calculate the total manure excreted by all animals in the pen.
 
@@ -809,6 +810,8 @@ class Pen:
             The amount of methane mitigation feed additive that is added, mg/kg dry matter intake (DMI).
             The recommended dose for 3-NOP is between 40 and 100 mg/kg DMI, while that for monensin is
             between 16 and 36 mg/kg DMI.
+        manure_excretions_output_data : dict[str, dict[str | AnimalManureExcretions]]
+            Dictionary mapping prefixes to animal manure data.
 
         Returns
         -------
