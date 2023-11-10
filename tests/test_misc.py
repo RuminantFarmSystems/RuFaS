@@ -1882,7 +1882,11 @@ def test_route_save_functions_graph(
             graph_data,
             "graphics_dir",
         )
-        assert mock_output_manager.add_warning.call_count == 1
+        mock_output_manager.add_warning.assert_called_once_with(
+            "No Graphics",
+            "Graphic generation is disabled, skipping filter_file='graph_file'",
+            {"class": "OutputManager", "function": "_route_save_functions"},
+        )
         mock_generate_graph.assert_called_once_with(
             {"key": {"var": "value"}},
             graph_data,
