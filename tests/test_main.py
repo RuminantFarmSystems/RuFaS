@@ -293,7 +293,7 @@ def test_run_load_vars_pool(mocker: MockerFixture, exclude_info_maps: bool,
     mock_output_manager = mocker.MagicMock(auto_spec=OutputManager)
     patch_clear_output_dir = mocker.patch("main.clear_output_dir")
     mock_output_manager.flush_pools.return_value = None
-    mock_output_manager.reload_vars_pool.return_value = None
+    mock_output_manager.load_variables_pool_from_file.return_value = None
     mock_output_manager.set_metadata_prefix.return_value = None
     mock_output_manager.dump_all_nondata_pools.return_value = None
     mock_output_manager.save_variables.return_value = None
@@ -306,28 +306,28 @@ def test_run_load_vars_pool(mocker: MockerFixture, exclude_info_maps: bool,
     else:
         patch_clear_output_dir.assert_not_called()
     assert mock_output_manager.flush_pools.call_count == 1
-    assert mock_output_manager.reload_vars_pool.call_count == 1
+    assert mock_output_manager.load_variables_pool_from_file.call_count == 1
     assert mock_output_manager.set_metadata_prefix.call_count == 1
     assert mock_output_manager.save_variables.call_count == 1
     assert mock_output_manager.dump_all_nondata_pools.call_count == 1
 
 
 @pytest.mark.parametrize(
-    "is_in_dir",
+    "is_file_found_in_dir",
     [True, False],
 )
-def test_clear_output_dir(mocker: MockerFixture, is_in_dir: bool) -> None:
+def test_clear_output_dir(mocker: MockerFixture, is_file_found_in_dir: bool) -> None:
     """Checks clear_output_dir function in main.py"""
     mock_output_manager = mocker.MagicMock(auto_spec=OutputManager)
     mock_output_manager.add_log.return_value = None
     mock_output_manager.add_error.return_value = None
     mocker.patch("main.OutputManager", return_value=mock_output_manager)
     patch_empty_dir = mocker.patch("RUFAS.util.Utility.empty_dir")
-    with patch("main.is_file_in_dir", return_value=is_in_dir):
+    with patch("main.is_file_in_dir", return_value=is_file_found_in_dir):
         with patch('main.Path', new_callable=MagicMock) as mock_path:
             vars_file_path = mock_path.return_value / "dummy_vars_file.txt"
             clear_output_dir(vars_file_path)
-            if is_in_dir:
+            if is_file_found_in_dir:
                 assert mock_output_manager.add_log.call_count == 0
                 assert mock_output_manager.add_error.call_count == 1
                 patch_empty_dir.assert_not_called()
@@ -338,7 +338,7 @@ def test_clear_output_dir(mocker: MockerFixture, is_in_dir: bool) -> None:
 
 
 @pytest.mark.parametrize(
-    "dir_path, vars_file_path, expected_result",
+    "dir_path, file_path, expected_result",
     [
         (None, None, False),
         (Path("path/to/directory"), Path("path/to/directory/file.json"), True),
@@ -347,9 +347,9 @@ def test_clear_output_dir(mocker: MockerFixture, is_in_dir: bool) -> None:
         (Path("path/to/directory"), None, False),
     ],
 )
-def test_is_file_in_dir(dir_path: Path, vars_file_path: Path, expected_result: bool) -> None:
+def test_is_file_in_dir(dir_path: Path, file_path: Path, expected_result: bool) -> None:
     """Checks is_file_in_dir function in main.py"""
-    assert is_file_in_dir(dir_path, vars_file_path) is expected_result
+    assert is_file_in_dir(dir_path, file_path) is expected_result
 
 
 def test_parse_gnu_args(mocker: MockerFixture) -> None:
