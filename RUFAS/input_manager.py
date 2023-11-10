@@ -804,7 +804,8 @@ class InputManager:
         Returns
         -------
         Tuple[bool, str]
-              A tuple containing a boolean indicating if the check passed and a string containing the reason for failure.
+              A tuple containing a boolean indicating if the check passed and a string containing the reason for
+              failure.
         """
 
         if "pattern" in variable_properties and not re.fullmatch(variable_properties["pattern"], variable_value):

@@ -911,10 +911,8 @@ def test_validate_json_element_invalid_var_name_raises_input_data_keyerror(mock_
                                                                            Dict[str, Callable],
                                                                            ) -> None:
     """Unit test for keyerror raised for invalid var name for _validate_json_element in file input_manager.py"""
-    mock_input_manager._InputManager__metadata = {"properties": {"dummy_properties_blob_key":
-                                                                     {"valid_key":
-                                                                          {"type": "object", "secondary_key":
-                                                                              {"type": "string"}}}}}
+    mock_input_manager._InputManager__metadata = {"properties": {"dummy_properties_blob_key": {"valid_key": {
+        "type": "object", "secondary_key": {"type": "string"}}}}}
     element_hierarchy = ["valid_key", "secondary_key"]
     properties_blob_key = "dummy_properties_blob_key"
     input_data = {"valid_key": {"another_valid_key": "value"}}
