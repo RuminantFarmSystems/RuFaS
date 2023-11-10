@@ -1722,20 +1722,29 @@ def test_filter_variables_pool_exclude_regex_patterns(
 
 
 @pytest.mark.parametrize(
-    "exclude_info_maps, produce_graphics",
-    [(True, True), (True, False), (False, True), (False, False)],
+    "exclude_info_maps, produce_graphics, filter_content, is_faulty",
+    [
+        (True, True, [{"filters": ".*", "title": "dummy_title"}], False),
+        (True, False, [{"filters": ".*", "title": "dummy_title"}], False),
+        (False, True, [{"filters": ".*", "title": "dummy_title"}], False),
+        (False, False, [{"filters": ".*", "title": "dummy_title"}], False),
+        (True, True, [{"no_filters": ".*", "title": "dummy_title"}], True),
+        (True, True, ["no_dict"], True),
+    ],
 )
 def test_save_results(
     mock_output_manager: OutputManager,
     output_manager_original_method_states: Dict[str, Callable],
     exclude_info_maps: bool,
     produce_graphics: bool,
+    filter_content: List[Dict[str, str]],
+    is_faulty: bool,
 ) -> None:
     # Arrange
     mock_output_manager.variables_pool = {}
     mock_output_manager._generate_file_name = MagicMock(return_value="dummy_name")
     mock_output_manager._load_filter_file_content = MagicMock(
-        return_value=[{"filters": ".*", "title": "dummy_title"}]
+        return_value=filter_content
     )
     mock_output_manager._list_filter_files_in_dir = MagicMock(
         return_value=[
@@ -1745,6 +1754,7 @@ def test_save_results(
     )
     mock_output_manager._exclude_info_maps = MagicMock(return_value={})
     mock_output_manager._route_save_functions = MagicMock()
+    mock_output_manager.add_error = MagicMock()
 
     # Act
     mock_output_manager.save_results(
@@ -1752,30 +1762,38 @@ def test_save_results(
     )
 
     # Assert
-    if exclude_info_maps:
-        mock_output_manager._exclude_info_maps.assert_has_calls([call({}), call({})])
-    else:
+    if is_faulty:
         mock_output_manager._exclude_info_maps.assert_not_called()
-    mock_output_manager._route_save_functions.assert_has_calls(
-        [
-            call(
-                "csv_input_filepath1.txt",
-                "save_path",
-                {},
-                produce_graphics,
-                {"filters": ".*", "title": "dummy_title"},
-                "graphics_dir",
-            ),
-            call(
-                "graph_input_filepath2.txt",
-                "save_path",
-                {},
-                produce_graphics,
-                {"filters": ".*", "title": "dummy_title"},
-                "graphics_dir",
-            ),
-        ]
-    )
+        mock_output_manager._route_save_functions.assert_not_called()
+        assert mock_output_manager.add_error.call_count == 2
+    else:
+        mock_output_manager.add_error.assert_not_called()
+        if exclude_info_maps:
+            mock_output_manager._exclude_info_maps.assert_has_calls(
+                [call({}), call({})]
+            )
+        else:
+            mock_output_manager._exclude_info_maps.assert_not_called()
+        mock_output_manager._route_save_functions.assert_has_calls(
+            [
+                call(
+                    "csv_input_filepath1.txt",
+                    "save_path",
+                    {},
+                    produce_graphics,
+                    {"filters": ".*", "title": "dummy_title"},
+                    "graphics_dir",
+                ),
+                call(
+                    "graph_input_filepath2.txt",
+                    "save_path",
+                    {},
+                    produce_graphics,
+                    {"filters": ".*", "title": "dummy_title"},
+                    "graphics_dir",
+                ),
+            ]
+        )
 
     # Restore original method
     mock_output_manager.save_results = output_manager_original_method_states[
@@ -1796,6 +1814,7 @@ def test_save_results(
     mock_output_manager._route_save_functions = output_manager_original_method_states[
         "_route_save_functions"
     ]
+    mock_output_manager.add_error = output_manager_original_method_states["add_error"]
 
 
 def test_route_save_functions_csv(
