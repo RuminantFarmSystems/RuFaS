@@ -1269,6 +1269,36 @@ def test_load_filter_file_content_json(
 
 
 @patch("builtins.open", new_callable=mock_open)
+def test_load_filter_file_content_json_multiple(
+    mock_file: MagicMock,
+    mock_output_manager: OutputManager,
+    output_manager_original_method_states: Dict[str, Callable],
+) -> None:
+    """Test case for function _load_filter_file_content in output_manager.py"""
+
+    data: List[Dict[str, Any]] = {
+        "multiple": [
+            {
+                "filters": ["filter1", "filter2"],
+                "other_key": "value1",
+            },
+            {
+                "filters": ["filter3", "filter4"],
+                "other_key": "value2",
+            },
+        ]
+    }
+    mock_file.return_value.read.return_value = json.dumps(data)
+    result = mock_output_manager._load_filter_file_content("some_file.json")
+    assert result == data["multiple"]
+
+    # Restore original method
+    mock_output_manager._load_filter_file_content = (
+        output_manager_original_method_states["_load_filter_file_content"]
+    )
+
+
+@patch("builtins.open", new_callable=mock_open)
 def test_load_filter_file_content_exception(
     mock_file: MagicMock,
     mock_output_manager: OutputManager,
