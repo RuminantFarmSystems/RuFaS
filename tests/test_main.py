@@ -170,7 +170,7 @@ def test_run_validation(mocker: MockerFixture, is_data_valid: bool) -> None:
     mock_output_manager.flush_pools.return_value = None
     mock_input_manager.flush_pool.return_value = None
     mock_output_manager.dump_all_nondata_pools.return_value = None
-    mock_output_manager.save_variables.return_value = None
+    mock_output_manager.save_results.return_value = None
     mocker.patch("main.OutputManager", return_value=mock_output_manager)
     mocker.patch("main.InputManager", return_value=mock_input_manager)
     metadata_prefix1 = "dummy_prefix1"
@@ -224,7 +224,7 @@ def test_execute_simulations(
     mock_output_manager.flush_pools.return_value = None
     mock_input_manager.flush_pool.return_value = None
     mock_output_manager.dump_all_nondata_pools.return_value = None
-    mock_output_manager.save_variables.return_value = None
+    mock_output_manager.save_results.return_value = None
     mocker.patch("main.OutputManager", return_value=mock_output_manager)
     mocker.patch("main.InputManager", return_value=mock_input_manager)
     metadata_file_path1 = Path("metadata_file1.json")
@@ -260,8 +260,8 @@ def test_execute_simulations(
     assert mock_output_manager.dump_all_nondata_pools.call_args_list == [
         mocker.call("output", exlclude_info_maps, format_option)
     ] * len(metadata_file_list)
-    assert mock_output_manager.save_variables.call_count == len(metadata_file_list)
-    assert mock_output_manager.save_variables.call_args_list == [
+    assert mock_output_manager.save_results.call_count == len(metadata_file_list)
+    assert mock_output_manager.save_results.call_args_list == [
         mocker.call(
             Path("output"),
             Path("output/output_filters/"),
