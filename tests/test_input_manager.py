@@ -15,6 +15,7 @@ import pytest
 from pytest_mock import MockerFixture
 
 from RUFAS.input_manager import InputManager
+from RUFAS.output_manager import OutputManager
 
 
 @pytest.fixture
@@ -783,17 +784,17 @@ def test_validate_element_invalid_nested_object_type(mock_input_manager: InputMa
 @pytest.mark.parametrize("variable_value, variable_properties, expected_result", [
     (True, {}, (True, "")),  # Test with a boolean True
     (False, {}, (True, "")),  # Test with a boolean False
-    ("True", {}, (False, "Bool variable is not a boolean.")),  # Test with a string "True"
-    ("False", {}, (False, "Bool variable is not a boolean.")),  # Test with a string "False"
-    (1, {}, (False, "Bool variable is not a boolean.")),  # Test with an integer 1
-    (0, {}, (False, "Bool variable is not a boolean.")),  # Test with an integer 0
-    (None, {}, (False, "Bool variable is not a boolean.")),  # Test with a None value
-    ([], {}, (False, "Bool variable is not a boolean.")),  # Test with an empty list
-    ([1, 2, 3], {}, (False, "Bool variable is not a boolean.")),  # Test with a list
-    ({}, {}, (False, "Bool variable is not a boolean.")),  # Test with an empty dictionary
-    ({"key": "value"}, {}, (False, "Bool variable is not a boolean.")),  # Test with a dictionary
-    (1.0, {}, (False, "Bool variable is not a boolean.")),  # Test with a float 1.0
-    (0.0, {}, (False, "Bool variable is not a boolean.")),  # Test with a float 0.0
+    ("True", {}, (False, "Bool variable is not a boolean")),  # Test with a string "True"
+    ("False", {}, (False, "Bool variable is not a boolean")),  # Test with a string "False"
+    (1, {}, (False, "Bool variable is not a boolean")),  # Test with an integer 1
+    (0, {}, (False, "Bool variable is not a boolean")),  # Test with an integer 0
+    (None, {}, (False, "Bool variable is not a boolean")),  # Test with a None value
+    ([], {}, (False, "Bool variable is not a boolean")),  # Test with an empty list
+    ([1, 2, 3], {}, (False, "Bool variable is not a boolean")),  # Test with a list
+    ({}, {}, (False, "Bool variable is not a boolean")),  # Test with an empty dictionary
+    ({"key": "value"}, {}, (False, "Bool variable is not a boolean")),  # Test with a dictionary
+    (1.0, {}, (False, "Bool variable is not a boolean")),  # Test with a float 1.0
+    (0.0, {}, (False, "Bool variable is not a boolean")),  # Test with a float 0.0
 ])
 def test_is_bool_value(variable_value: Any, variable_properties: dict[str, Any],
                        expected_result: tuple[bool, str]) -> None:
@@ -836,28 +837,52 @@ def test_validate_bool_type(mocker: MockerFixture,
     (["key1"], {"type": "bool"}, {"key1": True}, True),
     # Test with a boolean False
     (["key1"], {"type": "bool"}, {"key1": False}, True),
-    # Test with a string "True" and default True
+    # Test with a string and default True
     (["key1"], {"type": "bool", "default": True}, {"key1": "not a bool"}, True),
-    # Test with a string "False" and default False
+    # Test with a string and default False
     (["key1"], {"type": "bool", "default": False}, {"key1": "not a bool"}, True),
     # Test with a string but have no default
     (["key1"], {"type": "bool"}, {"key1": "not a bool"}, False),
     # Test with an integer 1 but have no default
     (["key1"], {"type": "bool"}, {"key1": 1}, False),
+    # Test with a string but default is not boolean
+    (["key1"], {"type": "bool", "default": "not a bool"}, {"key1": "not a bool"}, False),
+    # Test with an integer 1 but default is not boolean
+    (["key1"], {"type": "bool", "default": "not a bool"}, {"key1": 1}, False),
 ])
-def test_validate_bool_type_integration_test(mocker: MockerFixture,
-                                             variable_path: list[str | int],
+def test_validate_bool_type_integration_test(variable_path: list[str | int],
                                              variable_properties: dict[str, Any],
                                              input_data: dict[str, Any],
                                              expected_result: bool) -> None:
+    """
+    Integration test for method _validate_bool_type() in file input_manager.py.
+
+    This test is to test the integration between _validate_bool_type() and
+    _validate_primitive_type_with_revalidation().
+    """
     # Arrange
     input_manager = InputManager()
+    om = OutputManager()
+    initial_data = InputManager._get_nested_dict_value(input_data, variable_path)
 
     # Act
     result = input_manager._validate_bool_type(variable_path, variable_properties, input_data)
 
     # Assert
     assert result == expected_result
+    if type(initial_data) is not bool:
+        assert "InputManager._validate_primitive_type_with_revalidation.Bool variable is not a boolean" \
+               in om.warnings_pool
+        if "default" in variable_properties and type(variable_properties["default"]) is bool:
+            assert "InputManager._fix_data.Data fixed" in om.warnings_pool
+        elif "default" in variable_properties:
+            assert "InputManager._revalidate_element_after_fix.Fixed element is still invalid" in om.errors_pool
+        else:
+            assert "InputManager._validate_primitive_type_with_revalidation.Invalid, unfixable element found" \
+                   in om.errors_pool
+
+    # Cleanup
+    om.flush_pools()
 
 
 @pytest.mark.skip(reason="This test is not working")

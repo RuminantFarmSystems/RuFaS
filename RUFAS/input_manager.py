@@ -478,7 +478,8 @@ class InputManager:
         Returns
         -------
         Tuple[bool, str]
-              A tuple containing a boolean indicating if the check passed and a string containing the reason for failure.
+              A tuple containing a boolean indicating if the check passed and a string containing the reason for
+              failure.
         """
 
         if "maximum" in variable_properties and variable_value > variable_properties["maximum"]:
@@ -737,7 +738,7 @@ class InputManager:
 
         """
 
-        if type(variable_value) != str:
+        if type(variable_value) is not str:
             return False, "String variable is not a string."
         return True, ""
 
@@ -860,8 +861,8 @@ class InputManager:
 
         """
 
-        if type(variable_value) != bool:
-            return False, "Bool variable is not a boolean."
+        if type(variable_value) is not bool:
+            return False, "Bool variable is not a boolean"
         return True, ""
 
     def _validate_bool_type(self, variable_path: List[str | int],
@@ -907,7 +908,7 @@ class InputManager:
 
         """
 
-        if type(variable_value) != dict:
+        if type(variable_value) is not dict:
             return False, "Object variable is not a dictionary."
         return True, ""
 
@@ -969,7 +970,7 @@ class InputManager:
             A tuple containing a boolean indicating if the check passed and a string containing the reason for failure.
         """
 
-        if type(variable_value) != list:
+        if type(variable_value) is not list:
             return False, "Array variable is not a list."
         return True, ""
 
@@ -999,8 +1000,8 @@ class InputManager:
         return True, ""
 
     @staticmethod
-    def _check_array_len_upper_bound(variable_value: List[Any], variable_properties: Dict[str, Any]) -> Tuple[
-        bool, str]:
+    def _check_array_len_upper_bound(variable_value: List[Any], variable_properties: Dict[str, Any]) \
+            -> Tuple[bool, str]:
         """
         Check if the list has a length less than or equal to the maximum specified.
 
