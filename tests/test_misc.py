@@ -768,7 +768,7 @@ def output_manager_original_method_states(
         "_list_filter_files_in_dir": mock_output_manager._list_filter_files_in_dir,
         "_load_filter_file_content": mock_output_manager._load_filter_file_content,
         "_save_variables_to_csv_files ": mock_output_manager._save_variables_to_csv_files,
-        "save_variables": mock_output_manager.save_variables,
+        "save_results": mock_output_manager.save_results,
         "_save_variables_to_csv_files": mock_output_manager._save_variables_to_csv_files,
         "add_variable": mock_output_manager.add_variable,
         "add_error": mock_output_manager.add_error,
@@ -1695,7 +1695,7 @@ def test_filter_variables_pool_exclude_regex_patterns(
     "exclude_info_maps, produce_graphics",
     [(True, True), (True, False), (False, True), (False, False)],
 )
-def test_save_variables(
+def test_save_results(
     mock_output_manager: OutputManager,
     output_manager_original_method_states: Dict[str, Callable],
     exclude_info_maps: bool,
@@ -1717,7 +1717,7 @@ def test_save_variables(
     mock_output_manager._route_save_functions = MagicMock()
 
     # Act
-    mock_output_manager.save_variables(
+    mock_output_manager.save_results(
         "save_path", "filters_path", exclude_info_maps, produce_graphics, "graphics_dir"
     )
 
@@ -1748,8 +1748,8 @@ def test_save_variables(
     )
 
     # Restore original method
-    mock_output_manager.save_variables = output_manager_original_method_states[
-        "save_variables"
+    mock_output_manager.save_results = output_manager_original_method_states[
+        "save_results"
     ]
     mock_output_manager._list_filter_files_in_dir = (
         output_manager_original_method_states["_list_filter_files_in_dir"]
