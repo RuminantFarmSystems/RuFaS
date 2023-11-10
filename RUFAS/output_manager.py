@@ -878,7 +878,11 @@ class OutputManager(object):
         )
 
     def _prepare_report_data(
-        self, filtered_pool, selected_variables, slice_start, slice_end
+        self,
+        filtered_pool: Dict[str, pool_element_type],
+        selected_variables: List[str],
+        slice_start: int,
+        slice_end: int,
     ) -> Dict[str, List[Any]]:
         info_map = {
             "class": self.__class__.__name__,
