@@ -741,7 +741,7 @@ class OutputManager(object):
         self.add_log("num_filter_pattern_matches", filter_log_count_msg, info_map)
         return filter_pattern_matches
 
-    def save_variables(
+    def save_results(
         self,
         save_path: Path,
         filters_dir_path: Path,
@@ -772,7 +772,7 @@ class OutputManager(object):
         """
         info_map = {
             "class": self.__class__.__name__,
-            "function": self.save_variables.__name__,
+            "function": self.save_results.__name__,
         }
         self.add_log(
             "exclude_info_maps",
