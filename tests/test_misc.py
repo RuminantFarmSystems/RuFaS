@@ -1231,7 +1231,7 @@ def test_exclude_info_maps(
 
 @pytest.mark.parametrize(
     "mock_file_text",
-    ["apples\nbananas\ncherries", 
+    ["apples\nbananas\ncherries",
      "apples\nbananas\ncherries\n\n\n",
      "apples\nbananas\n\n\n\ncherries",
      "apples\nbananas\n\n\ncherries\n\n\n"])
