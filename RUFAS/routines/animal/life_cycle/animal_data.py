@@ -26,8 +26,22 @@ class AnimalData:
         ----------
         animal_id : int
             A class variable that holds a unique identifier for the animal which auto-increments.
+        CI: float
+            Calving interval.
         breed : str
             The breed of the animal.
+        order_by_random: bool
+            Whether to shuffle the order of animals from input data.
+        init_herd: bool
+            Whether to generate animals or not.
+        save_animals: bool
+            Whether to save the generated animals or not.
+        terminate_simulation_post_herd_generation: bool
+            Whether to terminate the simulation after generating animals or not.
+        initial_animal_num: int
+            The initial number of animals for the simulation starting with to generate the herd.
+        simulation_days: int
+            The number of days to simulate for generating the herd.
         calf_num : int
             The number of calves.
         heiferI_num : int
@@ -40,6 +54,18 @@ class AnimalData:
             The number of cows.
         replace_num : int
             The number of cows available for replacement.
+        num_calves_in_data: int
+            The number of calves available from the input data.
+        num_heiferIs_in_data: int
+            The number of heiferIs available from the input data.
+        num_heiferIIs_in_data: int
+            The number of heiferIIs available from the input data.
+        num_heiferIIIs_in_data: int
+            The number of heiferIIIs available from the input data.
+        num_cows_in_data: int
+            The number of cows available from the input data.
+        num_replacement_cows_in_data: int
+            The number of replacement cows available from the input data.
         calves : List[Calf]
             A list of Calf instances.
         heiferIs : List[HeiferI]
@@ -141,13 +167,29 @@ class AnimalData:
         """
     animal_id = 378165
 
+    CI: float
     breed: str
+    order_by_random: bool
+    init_herd: bool
+    save_animals: bool
+    terminate_simulation_post_herd_generation: bool
+
+    initial_animal_num: int
+    simulation_days: int
+
     calf_num: int
     heiferI_num: int
     heiferII_num: int
     heiferIII_num: int
     cow_num: int
     replace_num: int
+
+    num_calves_in_data: int
+    num_heiferIs_in_data: int
+    num_heiferIIs_in_data: int
+    num_heiferIIIs_in_data: int
+    num_cows_in_data: int
+    num_replacement_cows_in_data: int
 
     calves: List[Calf]
     heiferIs: List[HeiferI]
@@ -197,6 +239,9 @@ class AnimalData:
         self.init_herd = init_herd
         self.save_animals = save_animals
         self.terminate_simulation_post_herd_generation = terminate_simulation_post_herd_generation
+
+        self.initial_animal_num = im.get_data("animal.herd_initialization.initial_animal_num")
+        self.simulation_days = im.get_data("animal.herd_initialization.simulation_days")
 
         self.calf_num = herd_data['calf_num']
         self.heiferI_num = herd_data['heiferI_num']
