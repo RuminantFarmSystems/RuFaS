@@ -886,7 +886,7 @@ class OutputManager(object):
 
     @deprecated(
         reason="""This function is still in the code base but it is not used. We want to keep it for debugging purposes
-        when save_variables() is not working.""",
+        when save_results() is not working.""",
         version="MVP",
     )
     def dump_variables(self, path: str, exclude_info_maps: bool = False) -> None:
