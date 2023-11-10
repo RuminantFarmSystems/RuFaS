@@ -394,7 +394,7 @@ class RationReporter:
                     nutrient_amount[nutr] += (available_feeds[key]["CP"] / (denom * 100)) * val
                 else:
                     if nutr == 'DE':
-                        if available_feeds[key]['DE'] != 'NA':
+                        if available_feeds[key]['DE'] != -1:
                             nutrient_amount[nutr] += val * (available_feeds[key]['DE'] / 100)
                         else:
                             nutrient_amount[nutr] += val * (available_feeds[key]['DE_Base'] / 100)
@@ -534,7 +534,7 @@ class RationReporter:
             actual digestible energy of feed item, Mcal/kg.
 
         """
-        de_key = 'DE_Base' if feed_item_info['DE'] == 'NA' else 'DE'
+        de_key = 'DE_Base' if feed_item_info['DE'] == -1 else 'DE'
         DE_act = feed_item_info[de_key] * RationReporter.get_TDN_discount(ration_report, body_weight)
         return DE_act
 
@@ -565,7 +565,7 @@ class RationReporter:
         if feed_item_info["feed_type"] == "Mineral":
             ME_item = 0.0
         elif feed_item_info["is_fat"] == 1:
-            ME_item = feed_item_info["DE"] if feed_item_info["DE"] != "NA" else feed_item_info["DE_Base"]
+            ME_item = feed_item_info["DE"] if feed_item_info["DE"] != -1 else feed_item_info["DE_Base"]
         elif feed_item_info["EE"] >= 3:
             ME_item = 1.01 * DE_act - 0.45 + 0.0046 * (feed_item_info["EE"] - 3)
         else:
@@ -978,9 +978,10 @@ class AvailableFeeds:
             self.feed_id.append(feed['rufas_id'])
             self.price.append(feed_costs[str(key)])
             self.TDN.append(feed['TDN'])
-            if feed['DE'] != 'NA':
+            if feed['DE'] != -1:
                 self.DE.append(feed['DE'])
             else:
+                print('DE_Base')
                 self.DE.append(feed['DE_Base'])
             self.EE.append(feed['EE'])
             self.is_fat.append(feed['is_fat'])
