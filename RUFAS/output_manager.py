@@ -871,7 +871,8 @@ class OutputManager(object):
             "function": self._save_reports.__name__,
         }
         selected_variables = filter_content.get("variables")
-        aggregation_slice = filter_content.get("aggregation_slice", 0)
+        slice_start = filter_content.get("slice_start", 0)
+        slice_end = filter_content.get("slice_end", 0)
         data_dict: Dict[str, List[Any]] = {}
         for key in filtered_pool.keys():
             is_data_in_dict = isinstance(filtered_pool[key]["values"][0], dict)
@@ -884,11 +885,19 @@ class OutputManager(object):
                     )
                 data_dict.update(
                     Utility.convert_list_of_dicts_to_dict_of_lists(
-                        filtered_pool[key]["values"]
+                        filtered_pool[key]["values"][
+                            slice_start: slice_end
+                            if slice_end != 0
+                            else len(filtered_pool[key]["values"])
+                        ]
                     )
                 )
             else:
-                data_dict[key] = filtered_pool[key]["values"][-aggregation_slice:]
+                data_dict[key] = filtered_pool[key]["values"][
+                    slice_start: slice_end
+                    if slice_end != 0
+                    else len(filtered_pool[key]["values"])
+                ]
         print(data_dict)
 
     def _save_variables_to_csv_files(
