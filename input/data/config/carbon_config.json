@@ -1,6 +1,6 @@
 {
-    "start_date": "2000:1",
-    "end_date": "2019:365",
+    "start_date": "1970:1",
+    "end_date": "2069:365",
     "graphic_dir": "output/graphics/",
     "output_dir": "output/",
     "csv_dir": "output/CSVs/",
