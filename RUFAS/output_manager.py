@@ -1,7 +1,9 @@
 # !/usr/bin/env python3
 
 from copy import deepcopy
+from enum import Enum
 from pathlib import Path
+import sys
 from typing import Any, Dict, List, Optional, Union
 import datetime
 import json
@@ -12,6 +14,43 @@ from deprecated.sphinx import deprecated
 
 from RUFAS.util import Utility
 from RUFAS.graph_generator import GraphGenerator
+
+
+class LogVerbosity(Enum):
+    """
+    The different types of logs printed by Output Manager. Set by the `verbose` gnu arg in main.py.
+
+    Notes
+    -----
+    NONE is the default setting.
+    Selecting NONE will tell OutputManager not to print out anything during a simulation.
+    Selecting ERRORS will tell OutputManager to print out all errors added during a simulation.
+    Selecting WARNINGS will tell OutputManager to print out all warnings and errors added during a simulation.
+    Selecting LOGS will tell OutputManager to print out all logs, warnings, and errors added during a simulation.
+    """
+
+    NONE = "none"
+    ERRORS = "errors"
+    WARNINGS = "warnings"
+    LOGS = "logs"
+
+    def __le__(self, other) -> bool:
+        if self == other:
+            return True
+        if self == LogVerbosity.NONE:
+            return True
+        if self == LogVerbosity.ERRORS and other != LogVerbosity.NONE:
+            return True
+        if self == LogVerbosity.WARNINGS and other == LogVerbosity.LOGS:
+            return True
+        if self == LogVerbosity.LOGS:
+            return False
+        return False
+
+    def __str__(self) -> bool:
+        if self.value == "none":
+            return "NONE"
+        return self.value[:-1].upper()
 
 
 class OutputManager(object):
@@ -52,11 +91,12 @@ class OutputManager(object):
             self.errors_pool: Dict[str, OutputManager.pool_element_type] = {}
             self.logs_pool: Dict[str, OutputManager.pool_element_type] = {}
             self.__metadata_prefix: str = ""
-            self.supported_filter_types_prefixes: Dict[str, str] = {
+            self.__supported_filter_types_prefixes: Dict[str, str] = {
                 "csv": "csv_",
                 "graph": "graph_",
                 "json": "json_",
             }
+            self.__log_verbose: LogVerbosity = LogVerbosity("none")
             self.add_log(
                 "init_log",
                 "Output Manager instantiated.",
@@ -155,6 +195,7 @@ class OutputManager(object):
         info_map["timestamp"] = self._get_timestamp(include_millis=True)
         key = self._generate_key(name, info_map)
         self._add_to_pool(self.logs_pool, key, msg, info_map)
+        self._handle_log_output(name, msg, info_map, LogVerbosity.LOGS)
 
     def add_warning(self, name: str, msg: str, info_map: Dict[str, Any]) -> None:
         """
@@ -183,6 +224,7 @@ class OutputManager(object):
         info_map["timestamp"] = self._get_timestamp(include_millis=True)
         key = self._generate_key(name, info_map)
         self._add_to_pool(self.warnings_pool, key, msg, info_map)
+        self._handle_log_output(name, msg, info_map, LogVerbosity.WARNINGS)
 
     def add_error(self, name: str, msg: str, info_map: Dict[str, Any]) -> None:
         """
@@ -211,10 +253,50 @@ class OutputManager(object):
         info_map["timestamp"] = self._get_timestamp(include_millis=True)
         key = self._generate_key(name, info_map)
         self._add_to_pool(self.errors_pool, key, msg, info_map)
+        self._handle_log_output(name, msg, info_map, LogVerbosity.ERRORS)
+
+    def _handle_log_output(
+        self, name: str, msg: str, info_map: Dict[str, Any], log_level: LogVerbosity
+    ) -> None:
+        """Formats log output based on log_level.
+
+        Parameters
+        ----------
+        name : str
+            The name of the log.
+        msg : str
+            The log message to be added to the pool.
+        info_map : Dict[str, Any]
+            Additional args to be logged.
+        log_level : LogVerbosity
+            The LogVerbosity level.
+        """
+        colors: Dict[LogVerbosity, str] = {
+            LogVerbosity.NONE: "\033[0m",
+            LogVerbosity.ERRORS: "\33[91m",
+            LogVerbosity.WARNINGS: "\33[93m",
+            LogVerbosity.LOGS: "\33[92m",
+        }
+        if log_level <= self.__log_verbose:
+            log_format = "{color}[{timestamp}][{log_level}][{metadata_prefix}] {name}: {message}{color_reset}\n"
+            formatted_msg = log_format.format(
+                timestamp=info_map["timestamp"],
+                color=colors[log_level],
+                color_reset=colors[LogVerbosity.NONE],
+                metadata_prefix=self.__metadata_prefix,
+                name=name,
+                message=msg,
+                log_level=log_level,
+            )
+            sys.stdout.write(formatted_msg)
 
     def set_metadata_prefix(self, metadata_prefix: str) -> None:
         """Sets the metadata_prefix attribute."""
         self.__metadata_prefix = metadata_prefix
+
+    def set_log_verbose(self, log_verbose: LogVerbosity = LogVerbosity.NONE) -> None:
+        """Sets the __log_verbose attribute"""
+        self.__log_verbose = log_verbose
 
     def _get_timestamp(self, include_millis: bool = False) -> str:
         """
@@ -503,7 +585,7 @@ class OutputManager(object):
         else:
             raise NotADirectoryError("The specified path must be a directory")
 
-    def _load_filter_file_content(self, path: str) -> Dict[str, str]:
+    def _load_filter_file_content(self, path: str) -> List[Dict[str, str]]:
         """
         Loads and processes the content of a filter file from the specified path.
 
@@ -514,8 +596,9 @@ class OutputManager(object):
 
         Returns
         -------
-        Dict[str, str]
-            A dictionary containing the loaded filter content, with keys and values depending on the file type.
+        List[Dict[str, str]]
+            A list of dictionaries, each containing the loaded filter content,
+            with keys and values depending on the file type.
 
         Raises
         ------
@@ -550,10 +633,14 @@ class OutputManager(object):
         try:
             with open(path) as filter_file:
                 if path.endswith(".json"):
-                    result = json.load(filter_file)
+                    json_content = json.load(filter_file)
+                    if "multiple" in json_content.keys():
+                        result = json_content["multiple"]
+                    else:
+                        result = [json_content]
                 elif path.endswith(".txt"):
                     list_of_elements = filter_file.read().splitlines()
-                    result = {"filters": list_of_elements}
+                    result = [{"filters": list_of_elements}]
                 else:
                     raise Exception(
                         "Unsupported file format; only json and txt are supported."
@@ -644,7 +731,7 @@ class OutputManager(object):
     def save_variables(
         self,
         save_path: Path,
-        dir_path: Path,
+        filters_dir_path: Path,
         exclude_info_maps: bool = False,
         produce_graphics: bool = True,
         graphics_dir: Path = Path(""),
@@ -658,7 +745,7 @@ class OutputManager(object):
         save_path : Path
             Path to the directory where the file will be saved.
 
-        dir_path : Path
+        filters_dir_path : Path
             Path of the directory containing the files containing the keys for filtering.
 
         exclude_info_maps : bool
@@ -679,57 +766,88 @@ class OutputManager(object):
             f"exclude_info_maps flag set to {exclude_info_maps}",
             info_map,
         )
-        graph_generator = GraphGenerator()
-        list_of_filter_files = self._list_txt_and_json_files_in_dir(dir_path)
+        list_of_filter_files = self._list_txt_and_json_files_in_dir(filters_dir_path)
         for filter_file in list_of_filter_files:
-            input_path = os.path.join(dir_path, filter_file)
-            filter_content = self._load_filter_file_content(input_path)
-            if "filters" not in filter_content.keys():
-                self.add_error(
-                    "Missing filters entry",
-                    f"'filters' does not exist in {filter_file}",
+            for _, supported_prefix in self.__supported_filter_types_prefixes.items():
+                if filter_file.startswith(supported_prefix):
+                    break
+            else:
+                self.add_warning(
+                    "invalid filter file prefix",
+                    f"{filter_file} prefix is not in {list(self.__supported_filter_types_prefixes.values())}",
                     info_map,
                 )
                 continue
-            filtered_pool = self._filter_variables_pool(
-                filter_content["filters"], filter_file
-            )
-            if exclude_info_maps:
-                filtered_pool = self._exclude_info_maps(filtered_pool)
-
-            if filter_file.startswith(self.supported_filter_types_prefixes["json"]):
-                file_path = os.path.join(
-                    save_path,
-                    self._generate_file_name(f"saved_variables_{filter_file}", "json"),
-                )
-                self._dict_to_file_json(filtered_pool, file_path)
-            elif filter_file.startswith(self.supported_filter_types_prefixes["csv"]):
-                csv_directory = os.path.join(save_path, "CSVs", "om")
-                self._save_variables_to_csv_files(
-                    filtered_pool, filter_file, csv_directory
-                )
-            elif filter_file.startswith(self.supported_filter_types_prefixes["graph"]):
-                if produce_graphics:
-                    try:
-                        graph_generator.generate_graph(
-                            filtered_pool,
-                            filter_content,
-                            save_path,
-                            filter_file,
-                            graphics_dir,
-                        )
-                    except Exception as e:
-                        self.add_error("graph generation exception", str(e), info_map)
-                else:
-                    self.add_warning(
-                        "No Graphics",
-                        f"Graphic generation is disabled, skipping {filter_file=}",
+            input_path = os.path.join(filters_dir_path, filter_file)
+            filter_contents = self._load_filter_file_content(input_path)
+            for filter_content in filter_contents:
+                if (
+                    not isinstance(filter_content, dict)
+                    or "filters" not in filter_content.keys()
+                ):
+                    self.add_error(
+                        "Parsing error",
+                        f"Could not parse {filter_file=}, it has to have JSON blobs and have `filters` entry.",
                         info_map,
                     )
+                    continue
+                filtered_pool = self._filter_variables_pool(
+                    filter_content["filters"], filter_file
+                )
+                if exclude_info_maps:
+                    filtered_pool = self._exclude_info_maps(filtered_pool)
+                self._route_save_functions(
+                    filter_file,
+                    save_path,
+                    filtered_pool,
+                    produce_graphics,
+                    filter_content,
+                    graphics_dir,
+                )
+
+    def _route_save_functions(
+        self,
+        filter_file: str,
+        save_path: Path,
+        filtered_pool: Dict[str, pool_element_type],
+        produce_graphics: bool,
+        filter_content: Dict[str, str],
+        graphics_dir: Path,
+    ) -> None:
+        """
+        Checks the prefix of the filter_file to determine the format for saving. It then delegates the
+        saving process to the corresponding function to handle specific formats such as JSON, CSV, or graphical output.
+        """
+        info_map = {
+            "class": self.__class__.__name__,
+            "function": self._route_save_functions.__name__,
+        }
+        if filter_file.startswith(self.__supported_filter_types_prefixes["json"]):
+            file_path = os.path.join(
+                save_path,
+                self._generate_file_name(f"saved_variables_{filter_file}", "json"),
+            )
+            self._dict_to_file_json(filtered_pool, file_path)
+        elif filter_file.startswith(self.__supported_filter_types_prefixes["csv"]):
+            csv_directory = os.path.join(save_path, "CSVs", "om")
+            self._save_variables_to_csv_files(filtered_pool, filter_file, csv_directory)
+        elif filter_file.startswith(self.__supported_filter_types_prefixes["graph"]):
+            if produce_graphics:
+                try:
+                    graph_generator = GraphGenerator()
+                    graph_generator.generate_graph(
+                        filtered_pool,
+                        filter_content,
+                        save_path,
+                        filter_file,
+                        graphics_dir,
+                    )
+                except Exception as e:
+                    self.add_error("graph generation exception", str(e), info_map)
             else:
                 self.add_warning(
-                    "invalid filter file",
-                    f"{filter_file} must be prefixed with one of {list(self.supported_filter_types_prefixes.values())}",
+                    "No Graphics",
+                    f"Graphic generation is disabled, skipping {filter_file=}",
                     info_map,
                 )
 
