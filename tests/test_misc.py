@@ -1307,17 +1307,16 @@ def test_list_filter_files_in_dir(
     output_manager_original_method_states: Dict[str, Callable],
     tmpdir,
 ) -> None:
-    """Test case for function _list_txt_file_names_in_dir in output_manager.py"""
-    tmpdir.join("file1.txt").write("File 1 content")
-    tmpdir.join("file2.txt").write("File 2 content")
+    tmpdir.join("json_file1.txt").write("File 1 content")
+    tmpdir.join("csv_file2.json").write("File 2 content")
     tmpdir.join("file3.csv").write("File 3 content")
 
-    txt_files = mock_output_manager._list_filter_files_in_dir(tmpdir)
+    filter_files = mock_output_manager._list_filter_files_in_dir(tmpdir)
 
-    assert len(txt_files) == 2
-    assert "file1.txt" in txt_files
-    assert "file2.txt" in txt_files
-    assert "file3.csv" not in txt_files
+    assert len(filter_files) == 2
+    assert "json_file1.txt" in filter_files
+    assert "csv_file2.json" in filter_files
+    assert "file3.csv" not in filter_files
 
     with pytest.raises(NotADirectoryError):
         mock_output_manager._list_filter_files_in_dir("nonexistent_directory")
