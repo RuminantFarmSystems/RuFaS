@@ -765,7 +765,7 @@ def output_manager_original_method_states(
         "set_metadata_prefix": mock_output_manager.set_metadata_prefix,
         "set_log_verbose": mock_output_manager.set_log_verbose,
         "_list_to_file_txt": mock_output_manager._list_to_file_txt,
-        "_list_txt_and_json_files_in_dir": mock_output_manager._list_txt_and_json_files_in_dir,
+        "_list_filter_files_in_dir": mock_output_manager._list_filter_files_in_dir,
         "_load_filter_file_content": mock_output_manager._load_filter_file_content,
         "_save_variables_to_csv_files ": mock_output_manager._save_variables_to_csv_files,
         "save_variables": mock_output_manager.save_variables,
@@ -1302,7 +1302,7 @@ def test_load_filter_file_content_exception(
     )
 
 
-def test_list_txt_and_json_files_in_dir(
+def test_list_filter_files_in_dir(
     mock_output_manager: OutputManager,
     output_manager_original_method_states: Dict[str, Callable],
     tmpdir,
@@ -1312,7 +1312,7 @@ def test_list_txt_and_json_files_in_dir(
     tmpdir.join("file2.txt").write("File 2 content")
     tmpdir.join("file3.csv").write("File 3 content")
 
-    txt_files = mock_output_manager._list_txt_and_json_files_in_dir(tmpdir)
+    txt_files = mock_output_manager._list_filter_files_in_dir(tmpdir)
 
     assert len(txt_files) == 2
     assert "file1.txt" in txt_files
@@ -1320,11 +1320,11 @@ def test_list_txt_and_json_files_in_dir(
     assert "file3.csv" not in txt_files
 
     with pytest.raises(NotADirectoryError):
-        mock_output_manager._list_txt_and_json_files_in_dir("nonexistent_directory")
+        mock_output_manager._list_filter_files_in_dir("nonexistent_directory")
 
     # Restore original method
-    mock_output_manager._list_txt_and_json_files_in_dir = (
-        output_manager_original_method_states["_list_txt_and_json_files_in_dir"]
+    mock_output_manager._list_filter_files_in_dir = (
+        output_manager_original_method_states["_list_filter_files_in_dir"]
     )
 
 
@@ -1699,7 +1699,7 @@ def test_save_variables_unsupported_prefix(
     mock_output_manager.variables_pool = {}
     mock_output_manager._generate_file_name = MagicMock(return_value="dummy_name")
     mock_output_manager._load_filter_file_content = MagicMock()
-    mock_output_manager._list_txt_and_json_files_in_dir = MagicMock(
+    mock_output_manager._list_filter_files_in_dir = MagicMock(
         return_value=[
             "dummy_input_filepath1.txt",
             "dummy_input_filepath2.txt",
@@ -1712,14 +1712,14 @@ def test_save_variables_unsupported_prefix(
         mock_output_manager.warnings_pool[
             "OutputManager.save_variables.invalid filter file prefix"
         ]
-    ) == len(mock_output_manager._list_txt_and_json_files_in_dir.return_value)
+    ) == len(mock_output_manager._list_filter_files_in_dir.return_value)
 
     # Restore original method
     mock_output_manager.save_variables = output_manager_original_method_states[
         "save_variables"
     ]
-    mock_output_manager._list_txt_and_json_files_in_dir = (
-        output_manager_original_method_states["_list_txt_and_json_files_in_dir"]
+    mock_output_manager._list_filter_files_in_dir = (
+        output_manager_original_method_states["_list_filter_files_in_dir"]
     )
     mock_output_manager._generate_file_name = output_manager_original_method_states[
         "_generate_file_name"
@@ -1745,7 +1745,7 @@ def test_save_variables(
     mock_output_manager._load_filter_file_content = MagicMock(
         return_value=[{"filters": ".*", "title": "dummy_title"}]
     )
-    mock_output_manager._list_txt_and_json_files_in_dir = MagicMock(
+    mock_output_manager._list_filter_files_in_dir = MagicMock(
         return_value=[
             "csv_input_filepath1.txt",
             "graph_input_filepath2.txt",
@@ -1789,8 +1789,8 @@ def test_save_variables(
     mock_output_manager.save_variables = output_manager_original_method_states[
         "save_variables"
     ]
-    mock_output_manager._list_txt_and_json_files_in_dir = (
-        output_manager_original_method_states["_list_txt_and_json_files_in_dir"]
+    mock_output_manager._list_filter_files_in_dir = (
+        output_manager_original_method_states["_list_filter_files_in_dir"]
     )
     mock_output_manager._generate_file_name = output_manager_original_method_states[
         "_generate_file_name"
