@@ -171,7 +171,8 @@ class AnimalData:
         self.animal_id += 1
         return self.animal_id
 
-    def __init__(self, CI: float, herd_data: HerdInfoTypedDict, set_seed) -> None:
+    def __init__(self, CI: float, herd_data: HerdInfoTypedDict, set_seed: bool, init_herd: bool = False,
+                 save_animals: bool = False, terminate_simulation_post_herd_generation: bool = False) -> None:
         """
         Initialize the AnimalData instance with herd information and configurations.
 
@@ -183,11 +184,19 @@ class AnimalData:
             A dictionary containing information about the herd such as breed, number of animals, etc.
         set_seed : Bool
             A boolean to determine if a random seed should be set for reproducibility of data.
+        init_herd: bool
+            Initialize herd with simulation.
+        save_animals: bool
+            Save animals to CSV files.
+        terminate_simulation_post_herd_generation: bool
+            Save generated animals to CSV files.
         """
         self.CI = CI
         self.breed = herd_data['breed']
         self.order_by_random = not set_seed
-        self.init = herd_data['herd_init']
+        self.init_herd = init_herd
+        self.save_animals = save_animals
+        self.terminate_simulation_post_herd_generation = terminate_simulation_post_herd_generation
 
         self.calf_num = herd_data['calf_num']
         self.heiferI_num = herd_data['heiferI_num']
@@ -289,7 +298,7 @@ class AnimalData:
         if current_num_calves >= num:
             return
 
-        if self.init:
+        if self.init_herd:
             self.calves += self._init_calves_from_simulation(num - current_num_calves, breed)
 
         else:
@@ -368,7 +377,7 @@ class AnimalData:
     def _init_heiferIs(self, num: int, breed: str) -> None:
         """
         Initialize the list of HeiferI instances up to the specified number, based on either simulation data or
-        existing data, depending on the `init` flag.
+        existing data, depending on the `init_herd` flag.
 
         If the current number of HeiferI instances is less than the required number (`num`), new instances are
         created through simulation or loaded from existing data to meet the required count.
@@ -389,7 +398,7 @@ class AnimalData:
         if current_num_heiferIs >= num:
             return
 
-        if self.init:
+        if self.init_herd:
             self.heiferIs += self._init_heiferIs_from_simulation(num - current_num_heiferIs, breed)
 
         else:
@@ -473,7 +482,7 @@ class AnimalData:
     def _init_heiferIIs(self, num: int, breed: str) -> None:
         """
         Initialize the list of HeiferII instances up to the specified number, based on either simulation data or
-        existing data, depending on the `init` flag.
+        existing data, depending on the `init_herd` flag.
 
         If the current number of HeiferII instances is less than the required number (`num`), new instances are
         created through simulation or loaded from existing data to meet the required count.
@@ -494,7 +503,7 @@ class AnimalData:
         if current_num_heiferIIs >= num:
             return
 
-        if self.init:
+        if self.init_herd:
             self.heiferIIs += self._init_heiferIIs_from_simulation(num - current_num_heiferIIs, breed)
 
         else:
@@ -586,7 +595,7 @@ class AnimalData:
     def _init_heiferIIIs(self, num: int, breed: str) -> None:
         """
         Initialize the list of HeiferIII instances up to the specified number, based on either simulation data or
-        existing data, depending on the `init` flag.
+        existing data, depending on the `init_herd` flag.
 
         If the current number of HeiferIII instances is less than the required number (`num`), new instances are
         created through simulation or loaded from existing data to meet the required count.
@@ -607,7 +616,7 @@ class AnimalData:
         if current_num_heiferIIIs >= num:
             return
 
-        if self.init:
+        if self.init_herd:
             self.heiferIIIs += self._init_heiferIIIs_from_simulation(num - current_num_heiferIIIs, breed)
 
         else:
@@ -696,7 +705,7 @@ class AnimalData:
     def _init_cows(self, num: int, breed: str) -> None:
         """
         Initialize the list of Cow instances up to the specified number, based on either simulation data or
-        existing data, depending on the `init` flag.
+        existing data, depending on the `init_herd` flag.
 
         If the current number of Cow instances is less than the required number (`num`), new instances are
         created through simulation or loaded from existing data to meet the required count.
@@ -717,7 +726,7 @@ class AnimalData:
         if current_num_cows >= num:
             return
 
-        if self.init:
+        if self.init_herd:
             self.cows += self._init_cows_from_simulation(num - current_num_cows, breed)
 
         else:
@@ -810,7 +819,7 @@ class AnimalData:
     def _init_replacement_cows(self, num: int, breed: str) -> None:
         """
         Initialize the list of replacement Cow instances up to the specified number, based on either simulation data or
-        existing data, depending on the `init` flag.
+        existing data, depending on the `init_herd` flag.
 
         If the current number of replacement Cow instances is less than the required number (`num`), new instances are
         created through simulation or loaded from existing data to meet the required count.
@@ -831,7 +840,7 @@ class AnimalData:
         if current_num_replacement_cows >= num:
             return
 
-        if self.init:
+        if self.init_herd:
             self.replacement += self._init_replacement_cows_from_simulation(num - current_num_replacement_cows, breed)
 
         else:

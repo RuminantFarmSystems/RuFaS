@@ -18,6 +18,7 @@ from typing import Type
 from typing import TypeVar
 from typing import Union
 
+from RUFAS.config import Config
 from RUFAS.output_manager import OutputManager
 from RUFAS.routines.animal.animal_typed_dicts import AnimalConfigTypedDict, HerdInfoTypedDict
 from RUFAS.routines.animal.animal_typed_dicts import InitializationDBSummaryTypedDict
@@ -177,16 +178,23 @@ class LifeCycleManager:
         self.animal_data: Optional[AnimalData] = None
 
     # TODO: Annotate config after removing all the imports in all the __init__.py files
-    def initialize_herd(self, config, herd_data: HerdInfoTypedDict) \
-            -> Tuple[List[Calf], List[HeiferI], List[HeiferII], List[HeiferIII], List[Cow]]:
+    def initialize_herd(self, config: Config, herd_data: HerdInfoTypedDict, init_herd, save_animals,
+                        terminate_simulation_post_herd_generation) -> Tuple[List[Calf], List[HeiferI], List[HeiferII],
+                                                                            List[HeiferIII], List[Cow]]:
         """Generates a replacement herd to simulate the market, for the herd to get replacements.
 
         Parameters
         ----------
-        config
+        config: Config
             stores (among other things) information on whether the seed has been set by the user
         herd_data : HerdInfoTypedDict
             The data for the herd to be initialized
+        init_herd: bool
+            Initialize herd with simulation.
+        save_animals: bool
+            Save animals to CSV files.
+        terminate_simulation_post_herd_generation: bool
+            Save generated animals to CSV files.
 
         Returns
         -------
@@ -194,9 +202,8 @@ class LifeCycleManager:
             A tuple of animal lists for the calves, heiferIs, heiferIIs, heiferIIIs, and cows
 
         """
-        self.animal_data = AnimalData(self.animal_config['calving_interval'],
-                                      herd_data,
-                                      config.set_seed)
+        self.animal_data = AnimalData(self.animal_config['calving_interval'], herd_data, config.set_seed, init_herd,
+                                      save_animals, terminate_simulation_post_herd_generation)
         self.herd_num = herd_data['herd_num']
         self._set_avg_CI()
 
