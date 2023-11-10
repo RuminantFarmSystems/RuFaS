@@ -829,7 +829,8 @@ def test_validate_bool_type(mocker: MockerFixture,
 
     # Assert
     assert result == expected_result
-    mock_validate_primitive.assert_called_once()
+    mock_validate_primitive.assert_called_once_with(variable_path, variable_properties,
+                                                    input_data, [InputManager._is_bool_value])
 
 
 @pytest.mark.parametrize("variable_path, variable_properties, input_data, expected_result", [
@@ -874,6 +875,170 @@ def test_validate_bool_type_integration_test(variable_path: list[str | int],
         assert "InputManager._validate_primitive_type_with_revalidation.Bool variable is not a boolean" \
                in om.warnings_pool
         if "default" in variable_properties and type(variable_properties["default"]) is bool:
+            assert "InputManager._fix_data.Data fixed" in om.warnings_pool
+        elif "default" in variable_properties:
+            assert "InputManager._revalidate_element_after_fix.Fixed element is still invalid" in om.errors_pool
+        else:
+            assert "InputManager._validate_primitive_type_with_revalidation.Invalid, unfixable element found" \
+                   in om.errors_pool
+
+    # Cleanup
+    om.flush_pools()
+
+
+@pytest.mark.parametrize("variable_value, variable_properties, expected_result", [
+    (10, {}, (True, "")),  # Test with an integer
+    (0, {}, (True, "")),  # Test with zero
+    (-1, {}, (True, "")),  # Test with a negative integer
+    (1.5, {}, (True, "")),  # Test with a float
+    (-2.3, {}, (True, "")),  # Test with a negative float
+    ("string", {}, (False, "Value is not a number")),  # Test with a string
+    (True, {}, (False, "Value is not a number")),  # Test with a boolean True
+    (None, {}, (False, "Value is not a number")),  # Test with a None value
+    ([1, 2, 3], {}, (False, "Value is not a number")),  # Test with a list
+    ({"key": "value"}, {}, (False, "Value is not a number")),  # Test with a dictionary
+])
+def test_is_numeric_value(variable_value: Any, variable_properties: dict[str, Any],
+                          expected_result: tuple[bool, str]) -> None:
+    """
+    Unit test for method _is_numeric_value() in file input_manager.py.
+    """
+
+    assert InputManager._is_numeric_value(variable_value, variable_properties) == expected_result
+
+
+@pytest.mark.parametrize("variable_value, variable_properties, expected_result", [
+    (5, {"minimum": 3}, (True, "")),  # Value greater than minimum
+    (3, {"minimum": 3}, (True, "")),  # Value equal to minimum
+    (2, {"minimum": 3}, (False, "Value less than minimum")),  # Value less than minimum
+    (5, {}, (True, "")),  # No minimum set
+    (-1, {"minimum": 0}, (False, "Value less than minimum")),  # Negative value less than minimum
+    (0, {"minimum": -1}, (True, "")),  # Zero value greater than negative minimum
+])
+def test_check_num_lower_bound(variable_value: int | float, variable_properties: dict[str, Any],
+                               expected_result: tuple[bool, str]) -> None:
+    """
+    Unit test for method _check_num_lower_bound() in file input_manager.py.
+    """
+
+    assert InputManager._check_num_lower_bound(variable_value, variable_properties) == expected_result
+
+
+@pytest.mark.parametrize("variable_value, variable_properties, expected_result", [
+    (5, {"maximum": 7}, (True, "")),  # Value less than maximum
+    (7, {"maximum": 7}, (True, "")),  # Value equal to maximum
+    (8, {"maximum": 7}, (False, "Value greater than maximum")),  # Value greater than maximum
+    (5, {}, (True, "")),  # No maximum set
+    (0, {"maximum": -1}, (False, "Value greater than maximum")),  # Zero value greater than negative maximum
+    (-2, {"maximum": -1}, (True, "")),  # Negative value less than maximum
+])
+def test_check_num_upper_bound(variable_value: int | float, variable_properties: dict[str, Any],
+                               expected_result: tuple[bool, str]) -> None:
+    """
+    Unit test for method _check_num_upper_bound() in file input_manager.py.
+    """
+
+    assert InputManager._check_num_upper_bound(variable_value, variable_properties) == expected_result
+
+
+@pytest.mark.parametrize("variable_path, variable_properties, input_data, expected_result", [
+    (["key1"], {"type": "number"}, {"key1": 5}, True),  # Valid integer
+    (["key1"], {"type": "number"}, {"key1": 3.5}, True),  # Valid float
+    (["key1"], {"type": "number", "minimum": 2}, {"key1": 1}, False),  # Less than minimum
+    (["key1"], {"type": "number", "maximum": 10}, {"key1": 11}, False),  # Greater than maximum
+    (["key1"], {"type": "number"}, {"key1": "not a number"}, False),  # Non-numeric string
+    (["key1"], {"type": "number", "default": 5}, {"key1": "not a number"}, True),  # Invalid but fixable
+    (["key1"], {"type": "number", "minimum": 5, "maximum": 10}, {"key1": 5}, True),  # Exactly at minimum
+    (["key1"], {"type": "number", "minimum": 5, "maximum": 10}, {"key1": 10}, True),  # Exactly at maximum
+    (["key1"], {"type": "number", "minimum": 5, "maximum": 10}, {"key1": 7}, True),  # In between minimum and maximum
+    (["key1"], {"type": "number", "minimum": 5}, {"key1": 4.999}, False),  # Just below minimum
+    (["key1"], {"type": "number", "maximum": 10}, {"key1": 10.001}, False),  # Just above maximum
+])
+def test_validate_num_type(mocker: MockerFixture,
+                           variable_path: list[str | int],
+                           variable_properties: dict[str, Any],
+                           input_data: dict[str, Any],
+                           expected_result: bool) -> None:
+    """
+    Unit test for method _validate_num_type() in file input_manager.py.
+    """
+
+    # Arrange
+    mock_validate_primitive = mocker.patch.object(
+        InputManager,
+        '_validate_primitive_type_with_revalidation',
+        return_value=expected_result
+    )
+    input_manager = InputManager()
+
+    # Act
+    result = input_manager._validate_num_type(variable_path, variable_properties, input_data)
+
+    # Assert
+    assert result == expected_result
+    mock_validate_primitive.assert_called_once_with(
+        variable_path, variable_properties, input_data, [
+            InputManager._is_numeric_value,
+            InputManager._check_num_lower_bound,
+            InputManager._check_num_upper_bound
+        ]
+    )
+
+
+@pytest.mark.parametrize("variable_path, variable_properties, input_data, expected_result", [
+    # Test with valid integer
+    (["key1"], {"type": "number"}, {"key1": 5}, True),
+    # Test with valid float
+    (["key1"], {"type": "number"}, {"key1": 3.5}, True),
+    # Test with integer less than minimum
+    (["key1"], {"type": "number", "minimum": 6}, {"key1": 5}, False),
+    # Test with integer equal to minimum
+    (["key1"], {"type": "number", "minimum": 5}, {"key1": 5}, True),
+    # Test with integer more than minimum
+    (["key1"], {"type": "number", "minimum": 4}, {"key1": 5}, True),
+    # Test with integer more than maximum
+    (["key1"], {"type": "number", "maximum": 4}, {"key1": 5}, False),
+    # Test with integer equal to maximum
+    (["key1"], {"type": "number", "maximum": 5}, {"key1": 5}, True),
+    # Test with integer less than maximum
+    (["key1"], {"type": "number", "maximum": 6}, {"key1": 5}, True),
+    # Test with non-numeric string, no default
+    (["key1"], {"type": "number"}, {"key1": "not a number"}, False),
+    # Test with non-numeric string, fixable with default
+    (["key1"], {"type": "number", "default": 5}, {"key1": "not a number"}, True),
+    # Test with non-numeric string, unfixable
+    (["key1"], {"type": "number", "default": "not a number"}, {"key1": "not a number"}, False),
+    # Test with float less than minimum
+    (["key1"], {"type": "number", "minimum": 6}, {"key1": 5.999}, False),
+    # Test with float equal to minimum
+    (["key1"], {"type": "number", "minimum": 5}, {"key1": 5.0}, True),
+    # Test with float more than minimum
+    (["key1"], {"type": "number", "minimum": 4}, {"key1": 4.001}, True),
+])
+def test_validate_num_type_integration_test(variable_path: list[str | int],
+                                            variable_properties: dict[str, Any],
+                                            input_data: dict[str, Any],
+                                            expected_result: bool) -> None:
+    """
+    Integration test for method _validate_num_type() in file input_manager.py.
+
+    This test checks the integration between _validate_num_type() and
+    _validate_primitive_type_with_revalidation().
+    """
+    # Arrange
+    input_manager = InputManager()
+    om = OutputManager()
+    initial_data = InputManager._get_nested_dict_value(input_data, variable_path)
+
+    # Act
+    result = input_manager._validate_num_type(variable_path, variable_properties, input_data)
+
+    # Assert
+    assert result == expected_result
+    if type(initial_data) not in (int, float):
+        assert "InputManager._validate_primitive_type_with_revalidation.Value is not a number" \
+               in om.warnings_pool
+        if "default" in variable_properties and isinstance(variable_properties["default"], (int, float)):
             assert "InputManager._fix_data.Data fixed" in om.warnings_pool
         elif "default" in variable_properties:
             assert "InputManager._revalidate_element_after_fix.Fixed element is still invalid" in om.errors_pool
@@ -994,35 +1159,6 @@ def test_array_type_validator(dummy_value: list, dummy_variable_to_check: Dict[s
 
     with patch("RUFAS.output_manager.OutputManager.add_warning") as add_warning:
         result = mock_input_manager._validate_array_type(dummy_variable_to_check, dummy_var_name, dummy_value)
-
-    assert result == expected_result
-    assert add_warning.call_count == expected_warning_call_count
-
-
-@pytest.mark.skip(reason="This test is not working")
-@pytest.mark.parametrize(
-    'dummy_value, dummy_variable_to_check, expected_result, expected_warning_call_count',
-    [
-        (1, {"minimum": 3, "maximum": 7}, False, 1),
-        (3, {"minimum": 3, "maximum": 7}, True, 0),
-        (5, {"minimum": 3}, True, 0),
-        (7, {"minimum": 3, "maximum": 7}, True, 0),
-        (9, {"maximum": 7}, False, 1),
-        (-1, {"minimum": 3, "maximum": 7}, False, 1),
-        (None, {"maximum": 1, "minimum": 0}, False, 1),
-        ("42", {"minimum": 4, "maximum": 32}, False, 1)
-    ]
-)
-def test_num_type_validator(dummy_value: int,
-                            dummy_variable_to_check: Dict[str, int],
-                            expected_result: bool,
-                            expected_warning_call_count: int,
-                            mock_input_manager: InputManager) -> None:
-    """Unit test for function _validate_num_type in file input_manager.py"""
-    dummy_var_name = "dummy_num"
-
-    with patch("RUFAS.output_manager.OutputManager.add_warning") as add_warning:
-        result = mock_input_manager._validate_num_type(dummy_variable_to_check, dummy_var_name, dummy_value)
 
     assert result == expected_result
     assert add_warning.call_count == expected_warning_call_count

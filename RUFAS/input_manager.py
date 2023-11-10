@@ -436,7 +436,7 @@ class InputManager:
         """
 
         if not type(variable_value) in (int, float):
-            return False, "Value is not a number."
+            return False, "Value is not a number"
         return True, ""
 
     @staticmethod
@@ -459,7 +459,7 @@ class InputManager:
         """
 
         if "minimum" in variable_properties and variable_value < variable_properties["minimum"]:
-            return False, "Value less than minimum."
+            return False, "Value less than minimum"
         return True, ""
 
     @staticmethod
@@ -483,8 +483,38 @@ class InputManager:
         """
 
         if "maximum" in variable_properties and variable_value > variable_properties["maximum"]:
-            return False, "Value greater than maximum."
+            return False, "Value greater than maximum"
         return True, ""
+
+    def _validate_num_type(self, variable_path: List[str | int],
+                           variable_properties: Dict[str, Any],
+                           input_data: Dict[str, Any]) -> bool:
+        """
+        Validate an input data element of type number.
+
+        Parameters
+        ----------
+        variable_properties : Dict[str, Any]
+            The properties for the variable of interest.
+        variable_path : List[str | int]
+            The path to the variable by following the keys in the input_data dictionary.
+        input_data : Dict[str, Any]
+            A reference to the input data dictionary to enable in-place fixing.
+
+        Returns
+        -------
+        bool
+            True if the element was valid or fixed, False otherwise.
+        """
+
+        primitive_type_specific_validators = [
+            self._is_numeric_value,
+            self._check_num_lower_bound,
+            self._check_num_upper_bound,
+        ]
+
+        return self._validate_primitive_type_with_revalidation(variable_path, variable_properties,
+                                                               input_data, primitive_type_specific_validators)
 
     def _handle_validation_error(self, error_msg: str, variable_path: List[str | int],
                                  variable_properties: Dict[str, Any],
@@ -688,36 +718,6 @@ class InputManager:
 
         self.counter.increment("valid_elements")
         return True
-
-    def _validate_num_type(self, variable_path: List[str | int],
-                           variable_properties: Dict[str, Any],
-                           input_data: Dict[str, Any]) -> bool:
-        """
-        Validate an input data element of type number.
-
-        Parameters
-        ----------
-        variable_properties : Dict[str, Any]
-            The properties for the variable of interest.
-        variable_path : List[str | int]
-            The path to the variable by following the keys in the input_data dictionary.
-        input_data : Dict[str, Any]
-            A reference to the input data dictionary to enable in-place fixing.
-
-        Returns
-        -------
-        bool
-            True if the element was valid or fixed, False otherwise.
-        """
-
-        primitive_type_specific_validators = [
-            self._is_numeric_value,
-            self._check_num_lower_bound,
-            self._check_num_upper_bound,
-        ]
-
-        return self._validate_primitive_type_with_revalidation(variable_path, variable_properties,
-                                                               input_data, primitive_type_specific_validators)
 
     @staticmethod
     def _is_str_value(variable_value: Any, variable_properties: Dict[str, Any]) -> Tuple[bool, str]:
