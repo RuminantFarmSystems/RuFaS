@@ -14,6 +14,48 @@
       "type": "json",
       "properties": "animal_properties"
     },
+    "calves": {
+      "title": "Calves data",
+      "description": "Moo Moo!",
+      "path": "input/data/animal/calves.csv",
+      "type": "csv",
+      "properties": "calves_properties"
+    },
+    "heiferIs": {
+      "title": "heiferIs data",
+      "description": "Moo Moo!",
+      "path": "input/data/animal/heiferIs.csv",
+      "type": "csv",
+      "properties": "heiferIs_properties"
+    },
+    "heiferIIs": {
+      "title": "heiferIIs data",
+      "description": "Moo Moo!",
+      "path": "input/data/animal/heiferIIs.csv",
+      "type": "csv",
+      "properties": "heiferIIs_properties"
+    },
+    "heiferIIIs": {
+      "title": "heiferIIIs data",
+      "description": "Moo Moo!",
+      "path": "input/data/animal/heiferIIIs.csv",
+      "type": "csv",
+      "properties": "heiferIIIs_properties"
+    },
+    "cows": {
+      "title": "Cows data",
+      "description": "Moo Moo!",
+      "path": "input/data/animal/cows.csv",
+      "type": "csv",
+      "properties": "cows_properties"
+    },
+    "replacement_cows": {
+      "title": "Replacement Cows data",
+      "description": "Moo Moo!",
+      "path": "input/data/animal/replacement.csv",
+      "type": "csv",
+      "properties": "replacement_cows_properties"
+    },
     "crop": {
       "title": "Crop data",
       "description": "Alfafa is fun!",
@@ -969,6 +1011,645 @@
             "default": 0
           }
         }
+      }
+    },
+    "calves_properties": {
+      "id": {
+        "type": "number",
+        "description": "Unique integer identifier.",
+        "minimum": 1
+      },
+      "breed": {
+        "type": "string",
+        "description": "Breed.",
+        "pattern": "^(HO|JE)$"
+      },
+      "birth_date": {
+        "type": "number",
+        "description": "Birth date.",
+        "minimum": 0
+      },
+      "days_born": {
+        "type": "number",
+        "description": "Days born.",
+        "minimum": 0
+      },
+      "birth_weight": {
+        "type": "number",
+        "description": "Birth weight.",
+        "minimum": 0
+      },
+      "body_weight": {
+        "type": "number",
+        "description": "Body weight.",
+        "minimum": 0
+      },
+      "wean_weight": {
+        "type": "number",
+        "description": "Wean weight.",
+        "minimum": 0
+      },
+      "mature_body_weight": {
+        "type": "number",
+        "description": "Mature Body weight.",
+        "minimum": 0
+      },
+      "events": {
+        "type": "string"
+      }
+    },
+    "heiferIs_properties": {
+      "id": {
+        "type": "number",
+        "description": "Unique integer identifier.",
+        "minimum": 1
+      },
+      "breed": {
+        "type": "string",
+        "description": "Breed.",
+        "pattern": "^(HO|JE)$"
+      },
+      "birth_date": {
+        "type": "number",
+        "description": "Birth date.",
+        "minimum": 0
+      },
+      "days_born": {
+        "type": "number",
+        "description": "Days born.",
+        "minimum": 0
+      },
+      "birth_weight": {
+        "type": "number",
+        "description": "Birth weight.",
+        "minimum": 0
+      },
+      "body_weight": {
+        "type": "number",
+        "description": "Body weight.",
+        "minimum": 0
+      },
+      "wean_weight": {
+        "type": "number",
+        "description": "Wean weight.",
+        "minimum": 0
+      },
+      "mature_body_weight": {
+        "type": "number",
+        "description": "Mature Body weight.",
+        "minimum": 0
+      },
+      "events": {
+        "type": "string"
+      }
+    },
+    "heiferIIs_properties": {
+      "id": {
+        "type": "number",
+        "description": "Unique integer identifier.",
+        "minimum": 1
+      },
+      "breed": {
+        "type": "string",
+        "description": "Breed.",
+        "pattern": "^(HO|JE)$"
+      },
+      "birth_date": {
+        "type": "number",
+        "description": "Birth date.",
+        "minimum": 0
+      },
+      "days_born": {
+        "type": "number",
+        "description": "Days born.",
+        "minimum": 0
+      },
+      "birth_weight": {
+        "type": "number",
+        "description": "Birth weight.",
+        "minimum": 0
+      },
+      "body_weight": {
+        "type": "number",
+        "description": "Body weight.",
+        "minimum": 0
+      },
+      "wean_weight": {
+        "type": "number",
+        "description": "Wean weight.",
+        "minimum": 0
+      },
+      "mature_body_weight": {
+        "type": "number",
+        "description": "Mature Body weight.",
+        "minimum": 0
+      },
+      "events": {
+        "type": "string"
+      },
+      "repro_program": {
+        "type": "string",
+        "description": "Heifer Reproduction Program",
+        "pattern": "^(TAI|ED)$"
+      },
+      "tai_method_h": {
+        "type": "string",
+        "description": "Reproduction Program",
+        "pattern": "^(md5CG2P|md5CGP)$"
+      },
+      "synch_ed_method_h": {
+        "type": "string",
+        "description": "Heifer SynchED Program",
+        "pattern": "^(2P|CP)$"
+      },
+      "estrus_count": {
+        "type": "number",
+        "description": "Estrus count.",
+        "minimum": 0
+      },
+      "estrus_day": {
+        "type": "number",
+        "description": "Estrus Day.",
+        "minimum": 0
+      },
+      "tai_program_start_day_h": {
+        "type": "number",
+        "description": "Heifer TAI Program Start Day.",
+        "minimum": 0
+      },
+      "synch_ed_program_start_day_h": {
+        "type": "number",
+        "description": "Heifer SynchED Program Start Day.",
+        "minimum": 0
+      },
+      "synch_ed_estrus_day": {
+        "type": "number",
+        "description": "SynchED Program Estrus Day.",
+        "minimum": 0
+      },
+      "synch_ed_stop_day": {
+        "type": "number",
+        "description": "SynchED Program Stop Day.",
+        "minimum": 0
+      },
+      "conception_rate": {
+        "type": "number",
+        "description": "ED Conception Rate - The % of serviced animals that would be concepted in the ED (Estrus Detection) programs (default is 0.6).",
+        "minimum": 0,
+        "default": 0.6
+      },
+      "ai_day": {
+        "type": "number",
+        "description": "AI Day",
+        "minimum": 0
+      },
+      "abortion_day": {
+        "type": "number",
+        "description": "Abortion Day",
+        "minimum": 0
+      },
+      "days_in_preg": {
+        "type": "number",
+        "description": "Days in Pregnancy",
+        "minimum": 0
+      },
+      "gestation_length": {
+        "type": "number",
+        "description": "Gestation Length",
+        "minimum": 0
+      },
+      "p_gest_for_calf": {
+        "type": "number",
+        "description": "Pregnancy Gestation for Calf",
+        "minimum": 0
+      },
+      "calf_birth_weight": {
+        "type": "number",
+        "description": "Calf Birth weight.",
+        "minimum": 0
+      }
+    },
+    "heiferIIIs_properties": {
+      "id": {
+        "type": "number",
+        "description": "Unique integer identifier.",
+        "minimum": 1
+      },
+      "breed": {
+        "type": "string",
+        "description": "Breed.",
+        "pattern": "^(HO|JE)$"
+      },
+      "birth_date": {
+        "type": "number",
+        "description": "Birth date.",
+        "minimum": 0
+      },
+      "days_born": {
+        "type": "number",
+        "description": "Days born.",
+        "minimum": 0
+      },
+      "birth_weight": {
+        "type": "number",
+        "description": "Birth weight.",
+        "minimum": 0
+      },
+      "body_weight": {
+        "type": "number",
+        "description": "Body weight.",
+        "minimum": 0
+      },
+      "wean_weight": {
+        "type": "number",
+        "description": "Wean weight.",
+        "minimum": 0
+      },
+      "mature_body_weight": {
+        "type": "number",
+        "description": "Mature Body weight.",
+        "minimum": 0
+      },
+      "events": {
+        "type": "string"
+      },
+      "repro_program": {
+        "type": "string",
+        "description": "Reproduction Program",
+        "pattern": "^(TAI|ED)$"
+      },
+      "tai_method_h": {
+        "type": "string",
+        "description": "Heifer Reproduction Program",
+        "pattern": "^(md5CG2P|md5CGP)$"
+      },
+      "synch_ed_method_h": {
+        "type": "string",
+        "description": "Heifer SynchED Program",
+        "pattern": "^(2P|CP)$"
+      },
+      "estrus_count": {
+        "type": "number",
+        "description": "Estrus count.",
+        "minimum": 0
+      },
+      "estrus_day": {
+        "type": "number",
+        "description": "Estrus Day.",
+        "minimum": 0
+      },
+      "tai_program_start_day_h": {
+        "type": "number",
+        "description": "Heifer TAI Program Start Day.",
+        "minimum": 0
+      },
+      "synch_ed_program_start_day_h": {
+        "type": "number",
+        "description": "Heifer SynchED Program Start Day.",
+        "minimum": 0
+      },
+      "synch_ed_estrus_day": {
+        "type": "number",
+        "description": "SynchED Program Estrus Day.",
+        "minimum": 0
+      },
+      "synch_ed_stop_day": {
+        "type": "number",
+        "description": "SynchED Program Stop Day.",
+        "minimum": 0
+      },
+      "conception_rate": {
+        "type": "number",
+        "description": "ED Conception Rate - The % of serviced animals that would be concepted in the ED (Estrus Detection) programs (default is 0.6).",
+        "minimum": 0,
+        "default": 0.6
+      },
+      "ai_day": {
+        "type": "number",
+        "description": "AI Day",
+        "minimum": 0
+      },
+      "abortion_day": {
+        "type": "number",
+        "description": "Abortion Day",
+        "minimum": 0
+      },
+      "days_in_preg": {
+        "type": "number",
+        "description": "Days in Pregnancy",
+        "minimum": 0
+      },
+      "gestation_length": {
+        "type": "number",
+        "description": "Gestation Length",
+        "minimum": 0
+      },
+      "p_gest_for_calf": {
+        "type": "number",
+        "description": "Pregnancy Gestation for Calf",
+        "minimum": 0
+      },
+      "calf_birth_weight": {
+        "type": "number",
+        "description": "Calf Birth weight.",
+        "minimum": 0
+      }
+    },
+    "cows_properties": {
+      "id": {
+        "type": "number",
+        "description": "Unique integer identifier.",
+        "minimum": 1
+      },
+      "breed": {
+        "type": "string",
+        "description": "Breed.",
+        "pattern": "^(HO|JE)$"
+      },
+      "birth_date": {
+        "type": "number",
+        "description": "Birth date.",
+        "minimum": 0
+      },
+      "days_born": {
+        "type": "number",
+        "description": "Days born.",
+        "minimum": 0
+      },
+      "birth_weight": {
+        "type": "number",
+        "description": "Birth weight.",
+        "minimum": 0
+      },
+      "body_weight": {
+        "type": "number",
+        "description": "Body weight.",
+        "minimum": 0
+      },
+      "wean_weight": {
+        "type": "number",
+        "description": "Wean weight.",
+        "minimum": 0
+      },
+      "mature_body_weight": {
+        "type": "number",
+        "description": "Mature Body weight.",
+        "minimum": 0
+      },
+      "events": {
+        "type": "string"
+      },
+      "repro_program": {
+        "type": "string",
+        "description": "Reproduction Program",
+        "pattern": "^(TAI|ED)$"
+      },
+      "tai_method_h": {
+        "type": "string",
+        "description": "Heifer Reproduction Program",
+        "pattern": "^(md5CG2P|md5CGP)$"
+      },
+      "synch_ed_method_h": {
+        "type": "string",
+        "description": "Heifer SynchED Program",
+        "pattern": "^(2P|CP)$"
+      },
+      "estrus_count": {
+        "type": "number",
+        "description": "Estrus count.",
+        "minimum": 0
+      },
+      "estrus_day": {
+        "type": "number",
+        "description": "Estrus Day.",
+        "minimum": 0
+      },
+      "tai_program_start_day_h": {
+        "type": "number",
+        "description": "Heifer TAI Program Start Day.",
+        "minimum": 0
+      },
+      "synch_ed_program_start_day_h": {
+        "type": "number",
+        "description": "Heifer SynchED Program Start Day.",
+        "minimum": 0
+      },
+      "synch_ed_estrus_day": {
+        "type": "number",
+        "description": "SynchED Program Estrus Day.",
+        "minimum": 0
+      },
+      "synch_ed_stop_day": {
+        "type": "number",
+        "description": "SynchED Program Stop Day.",
+        "minimum": 0
+      },
+      "conception_rate": {
+        "type": "number",
+        "description": "ED Conception Rate - The % of serviced animals that would be concepted in the ED (Estrus Detection) programs (default is 0.6).",
+        "minimum": 0,
+        "default": 0.6
+      },
+      "ai_day": {
+        "type": "number",
+        "description": "AI Day",
+        "minimum": 0
+      },
+      "abortion_day": {
+        "type": "number",
+        "description": "Abortion Day",
+        "minimum": 0
+      },
+      "days_in_preg": {
+        "type": "number",
+        "description": "Days in Pregnancy",
+        "minimum": 0
+      },
+      "gestation_length": {
+        "type": "number",
+        "description": "Gestation Length",
+        "minimum": 0
+      },
+      "p_gest_for_calf": {
+        "type": "number",
+        "description": "Pregnancy Gestation for Calf",
+        "minimum": 0
+      },
+      "calf_birth_weight": {
+        "type": "number",
+        "description": "Calf Birth weight.",
+        "minimum": 0
+      },
+      "presynch_method": {
+        "type": "string",
+        "description": "Cow PreSynch Protocol.",
+        "pattern": "^(PreSynch|Double OvSynch|G6G)$"
+      },
+      "tai_method_c": {
+        "type": "string",
+        "description": "Reproduction Program",
+        "pattern": "^(OvSynch 56|OvSynch 48|CoSynch 72|5d CoSynch)$"
+      },
+      "resynch_method": {
+        "type": "string",
+        "description": "Cow ReSynch Protocol.",
+        "pattern": "^(TAIafterPD|TAIbeforePD|PGFatPD)$"
+      },
+      "days_in_milk": {
+        "type": "number",
+        "description": "Days in Milk",
+        "minimum": 0
+      },
+      "parity": {
+        "type": "number",
+        "description": "Parity",
+        "minimum": 0
+      },
+      "calving_interval": {
+        "type": "number",
+        "description": "Calving Interval",
+        "minimum": 0
+      }
+    },
+    "replacement_cows_properties": {
+      "id": {
+        "type": "number",
+        "description": "Unique integer identifier.",
+        "minimum": 1
+      },
+      "breed": {
+        "type": "string",
+        "description": "Breed.",
+        "pattern": "^(HO|JE)$"
+      },
+      "birth_date": {
+        "type": "number",
+        "description": "Birth date.",
+        "minimum": 0
+      },
+      "days_born": {
+        "type": "number",
+        "description": "Days born.",
+        "minimum": 0
+      },
+      "birth_weight": {
+        "type": "number",
+        "description": "Birth weight.",
+        "minimum": 0
+      },
+      "body_weight": {
+        "type": "number",
+        "description": "Body weight.",
+        "minimum": 0
+      },
+      "wean_weight": {
+        "type": "number",
+        "description": "Wean weight.",
+        "minimum": 0
+      },
+      "mature_body_weight": {
+        "type": "number",
+        "description": "Mature Body weight.",
+        "minimum": 0
+      },
+      "events": {
+        "type": "string"
+      },
+      "repro_program": {
+        "type": "string",
+        "description": "Reproduction Program",
+        "pattern": "^(TAI|ED)$"
+      },
+      "tai_method_h": {
+        "type": "string",
+        "description": "Heifer Reproduction Program",
+        "pattern": "^(md5CG2P|md5CGP)$"
+      },
+      "synch_ed_method_h": {
+        "type": "string",
+        "description": "Heifer SynchED Program",
+        "pattern": "^(2P|CP)$"
+      },
+      "estrus_count": {
+        "type": "number",
+        "description": "Estrus count.",
+        "minimum": 0
+      },
+      "estrus_day": {
+        "type": "number",
+        "description": "Estrus Day.",
+        "minimum": 0
+      },
+      "tai_program_start_day_h": {
+        "type": "number",
+        "description": "Heifer TAI Program Start Day.",
+        "minimum": 0
+      },
+      "synch_ed_program_start_day_h": {
+        "type": "number",
+        "description": "Heifer SynchED Program Start Day.",
+        "minimum": 0
+      },
+      "synch_ed_estrus_day": {
+        "type": "number",
+        "description": "SynchED Program Estrus Day.",
+        "minimum": 0
+      },
+      "synch_ed_stop_day": {
+        "type": "number",
+        "description": "SynchED Program Stop Day.",
+        "minimum": 0
+      },
+      "conception_rate": {
+        "type": "number",
+        "description": "ED Conception Rate - The % of serviced animals that would be concepted in the ED (Estrus Detection) programs (default is 0.6).",
+        "minimum": 0,
+        "default": 0.6
+      },
+      "ai_day": {
+        "type": "number",
+        "description": "AI Day",
+        "minimum": 0
+      },
+      "abortion_day": {
+        "type": "number",
+        "description": "Abortion Day",
+        "minimum": 0
+      },
+      "days_in_preg": {
+        "type": "number",
+        "description": "Days in Pregnancy",
+        "minimum": 0
+      },
+      "gestation_length": {
+        "type": "number",
+        "description": "Gestation Length",
+        "minimum": 0
+      },
+      "p_gest_for_calf": {
+        "type": "number",
+        "description": "Pregnancy Gestation for Calf",
+        "minimum": 0
+      },
+      "calf_birth_weight": {
+        "type": "number",
+        "description": "Calf Birth weight.",
+        "minimum": 0
+      },
+      "presynch_method": {
+        "type": "string",
+        "description": "Cow PreSynch Protocol.",
+        "pattern": "^(PreSynch|Double OvSynch|G6G)$"
+      },
+      "tai_method_c": {
+        "type": "string",
+        "description": "Reproduction Program",
+        "pattern": "^(OvSynch 56|OvSynch 48|CoSynch 72|5d CoSynch)$"
+      },
+      "resynch_method": {
+        "type": "string",
+        "description": "Cow ReSynch Protocol.",
+        "pattern": "^(TAIafterPD|TAIbeforePD|PGFatPD)$"
       }
     },
     "crop_schedule_properties": {
