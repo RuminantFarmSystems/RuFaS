@@ -115,7 +115,7 @@ def test_generate_graph_path_no_title(graph_generator: GraphGenerator) -> None:
             )
             mock_mkdir.assert_called_once()
             assert result == Path(
-                r"/path/to/save/graphics/saved_graph_test_filter.png-13-Oct-2023_Fri_11-41-23.png"
+                r"/path/to/save/graphics/_test_filter.png-13-Oct-2023_Fri_11-41-23.png"
             )
 
 
