@@ -1857,6 +1857,7 @@ def test_route_save_functions_graph(
         "RUFAS.graph_generator.GraphGenerator.generate_graph"
     ) as mock_generate_graph:
         mock_output_manager.add_warning = MagicMock()
+        mock_output_manager.add_error = MagicMock()
         graph_data = {"filters": ".*", "other keys": "other values"}
         mock_output_manager._route_save_functions(
             "graph_file",
@@ -1890,12 +1891,28 @@ def test_route_save_functions_graph(
             "graphics_dir",
         )
 
-        mock_output_manager._route_save_functions = (
-            output_manager_original_method_states["_route_save_functions"]
+        mock_generate_graph.side_effect = Exception("test exception")
+        mock_output_manager._route_save_functions(
+            "graph_file",
+            "save_path",
+            {"key": {"var": "value"}},
+            True,
+            graph_data,
+            "graphics_dir",
         )
-        mock_output_manager.add_warning = output_manager_original_method_states[
-            "add_warning"
-        ]
+        mock_output_manager.add_error.assert_called_once_with(
+            "graph generation exception",
+            "test exception",
+            {"class": "OutputManager", "function": "_route_save_functions"},
+        )
+
+    mock_output_manager._route_save_functions = output_manager_original_method_states[
+        "_route_save_functions"
+    ]
+    mock_output_manager.add_warning = output_manager_original_method_states[
+        "add_warning"
+    ]
+    mock_output_manager.add_error = output_manager_original_method_states["add_error"]
 
 
 class DummyClass:
