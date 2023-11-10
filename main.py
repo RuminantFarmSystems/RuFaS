@@ -30,6 +30,7 @@ def main():
         exclude_info_maps=cmd_arguments.exclude_info_maps,
         only_run_validation=cmd_arguments.only_run_validation,
         graphics_dir=Path(cmd_arguments.graphics_dir),
+        load_pool=cmd_arguments.load_pool,
         init_herd=cmd_arguments.init_herd,
         save_animals=cmd_arguments.save_animals,
         terminate_simulation_post_herd_generation=cmd_arguments.terminate_simulation_post_herd_generation
@@ -44,6 +45,7 @@ def run_rufas(
     exclude_info_maps: bool = False,
     only_run_validation: bool = False,
     graphics_dir: Path = Path(""),
+    load_pool: bool = False,
     init_herd: bool = False,
     save_animals: bool = False,
     terminate_simulation_post_herd_generation: bool = False
@@ -53,20 +55,22 @@ def run_rufas(
 
     Parameters
     ----------
-    produce_graphics: bool
-        produce graphics after simulation
-    format_option: bool
-        format for variable_names.txt output file
-    verbose: LogVerbosity
-        The verbose option set by the user.
-    clear_output: bool
-        lear output directory before running the simulation
-    exclude_info_maps: bool
-        exclude info_maps from the output
-    only_run_validation: bool
-        validate input data and don't run a simulation
-    graphics_dir : Path, optional
+    produce_graphics : bool, optional, default=True
+        Produce graphics after simulation.
+    format_option : str, optional, default="verbose"
+        Format for variable_names.txt output file.
+    verbose : bool, optional, default=True
+        Print progress messages while simulation is running.
+    clear_output : bool, optional, default=False
+        Clear output directory before running the simulation.
+    exclude_info_maps : bool, optional, default=False
+        Exclude info_maps from the output.
+    only_run_validation : bool, optional, default=False
+        Validate input data and don't run a simulation.
+    graphics_dir : Path, optional, default=Path("")
         The directory for saving graphics.
+    load_pool : bool, optional, default=False
+        Load json file into Output Manager variables pool for processing.
     init_herd: bool
         Initialize herd with simulation.
     save_animals: bool
@@ -74,18 +78,22 @@ def run_rufas(
     terminate_simulation_post_herd_generation: bool
         Save generated animals to CSV files.
     """
-    if clear_output:
-        output_dir = Path(config.global_variables.OUT_DIR)
-        keep_list = [".keep", "output_filters"]
-        Utility.empty_dir(output_dir, keep=keep_list)
-
     sys.stdout.write("RuFaS: Ruminant Farm Systems Model 2023\n")
-    metadata_file_list: List[MetadataPaths] = METADATA_PATHS
+
+    if load_pool:
+        run_load_vars_pool(exclude_info_maps, format_option,
+                           produce_graphics, graphics_dir, clear_output)
+        return
+
+    if clear_output:
+        clear_output_dir()
+
+    metadata_files: List[MetadataPaths] = METADATA_PATHS
     if only_run_validation:
-        run_validation(metadata_file_list, exclude_info_maps, format_option, verbose)
+        run_validation(metadata_files, exclude_info_maps, format_option, verbose)
     else:
         execute_simulations(
-            metadata_file_list,
+            metadata_files,
             exclude_info_maps,
             produce_graphics,
             graphics_dir,
@@ -94,6 +102,87 @@ def run_rufas(
             init_herd,
             save_animals,
             terminate_simulation_post_herd_generation
+        )
+
+
+def clear_output_dir(vars_file_path: Path = None) -> None:
+    """Clears the output directory if vars_file_path not in output directory.
+
+    Parameters
+    ----------
+    vars_file_path : Path, optional, default=None
+        Path to file used to load Output Manager vars pool.
+    """
+    info_map = {
+        "class": "No caller class",
+        "function": clear_output_dir.__name__,
+    }
+    output_manager = OutputManager()
+    output_dir = Path(config.global_variables.OUT_DIR)
+    is_file_found_in_dir = is_file_in_dir(output_dir, vars_file_path)
+    if is_file_found_in_dir:
+        output_manager.add_error("Can't clear output directory", f"{vars_file_path} in output directory.", info_map)
+    else:
+        keep_list = [".keep", "output_filters"]
+        Utility.empty_dir(output_dir, keep=keep_list)
+        output_manager.add_log("Output directory cleared", "No conflicts to clearing output directory.", info_map)
+
+
+def is_file_in_dir(dir_path: Path = Path(config.global_variables.OUT_DIR), file_path: Path = None) -> bool:
+    """Checks if a file path is in the provided directory.
+
+    Parameters
+    ----------
+    dir_path : Path, optional, default=Path(config.global_variables.OUT_DIR)
+        Path to the directory to be checked.
+    file_path : Path, optional, default=None
+        Path to file to be checked.
+    """
+    if file_path is None:
+        return False
+    file_path = file_path.resolve()
+    directory_path = dir_path.resolve()
+
+    return directory_path == file_path or directory_path in file_path.parents
+
+
+def run_load_vars_pool(
+    exclude_info_maps: bool = False,
+    format_option: str = "verbose",
+    produce_graphics: bool = True,
+    graphics_dir: Path = Path(""),
+    clear_output: bool = False,
+) -> None:
+    """Instantiates Output Manager and triggers loading of the variables pool from the provided file path
+    for post-processing.
+
+    Parameters
+    ----------
+    exclude_info_maps : bool, optional
+        Flag for whether or not the user wants to inlcude info_maps data in their results files.
+    produce_graphics : bool, optional
+        Flag for whether or not the user wants to produce graphs at after the simulation.
+    graphics_dir : Path, optional
+        The directory for saving graphics.
+    clear_output : bool, optional
+        Flag for whether or not the user wants to clear the output directory.
+    """
+    vars_file_path = Path(input("Enter path to variables json file: ").strip())
+    if clear_output:
+        clear_output_dir(vars_file_path)
+    output_manager = OutputManager()
+    output_manager.flush_pools()
+    output_manager.load_variables_pool_from_file(vars_file_path)
+    output_manager.set_metadata_prefix("reload")
+    output_manager.save_variables(
+            Path(r"output"),
+            Path(r"output/output_filters/"),
+            exclude_info_maps,
+            produce_graphics,
+            graphics_dir,
+        )
+    output_manager.dump_all_nondata_pools(
+            r"output", exclude_info_maps, format_option
         )
 
 
@@ -168,13 +257,13 @@ def execute_simulations(
     Parameters
     ----------
     metadata_files : List[MetadataPaths]
-        A list of custom TypedDict objects including the specified prefix for the save_variables output file
+        A list of custom TypedDict objects including the specified prefix for the save_results output file
         and the path to the metadata file.
 
     exclude_info_maps : bool, optional
         Flag for whether the user wants to include info_maps data in their results files.
     produce_graphics: bool, optional
-        Flag for whether the user wants to produce graphs at after the simulation.
+        Flag for whether or not the user wants to produce graphs at after the simulation.
     graphics_dir : Path, optional
         The directory for saving graphics.
     format_option : str
@@ -227,7 +316,7 @@ def execute_simulations(
                 f"Data not valid for {str(metadata_file['path'])}, simulation not run",
                 info_map,
             )
-        output_manager.save_variables(
+        output_manager.save_results(
             Path(r"output"),
             Path(r"output/output_filters/"),
             exclude_info_maps,
@@ -291,6 +380,12 @@ def parse_gnu_args() -> argparse.Namespace:
         "--only-run-validation",
         help="Only validate the data, don't run a simulation",
         action="store_true",
+    )
+    parser.add_argument(
+        "-l",
+        "--load-pool",
+        help="Load the output manager's variables pool from provided path",
+        action="store_true"
     )
     parser.add_argument(
         "-I",
