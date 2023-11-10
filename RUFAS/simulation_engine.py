@@ -22,8 +22,25 @@ im = InputManager()
 
 class SimulationEngine:
 
-    def __init__(self) -> None:
-        self._initialize_simulation()
+    def __init__(self,
+                 init_herd: bool = False,
+                 save_animals: bool = False,
+                 terminate_simulation_post_herd_generation: bool = False) -> None:
+        """
+        Initialize simulation
+
+        Parameters
+        ----------
+        init_herd: bool
+            Initialize herd with simulation.
+        save_animals: bool
+            Save animals to CSV files.
+        terminate_simulation_post_herd_generation: bool
+            Save generated animals to CSV files.
+        """
+        self._initialize_simulation(init_herd,
+                                    save_animals,
+                                    terminate_simulation_post_herd_generation)
 
     def simulate(self) -> None:
         """
@@ -102,7 +119,7 @@ class SimulationEngine:
         chars = ['-', '\\', '|', '/']
         if day % update_interval == 0:
             sys.stdout.write("\b")
-            sys.stdout.write(chars[(day//update_interval) % len(chars)])
+            sys.stdout.write(chars[(day // update_interval) % len(chars)])
 
     def _annual_simulation(self) -> None:
         """
@@ -115,9 +132,21 @@ class SimulationEngine:
 
         self._run_post_annual_routines()
 
-    def _initialize_simulation(self) -> None:
+    def _initialize_simulation(self,
+                               init_herd: bool = False,
+                               save_animals: bool = False,
+                               terminate_simulation_post_herd_generation: bool = False) -> None:
         """
         Instantiates the simulation object by requesting data from the Input Manager.
+
+        Parameters
+        ----------
+        init_herd: bool
+            Initialize herd with simulation.
+        save_animals: bool
+            Save animals to CSV files.
+        terminate_simulation_post_herd_generation: bool
+            Save generated animals to CSV files.
         """
         data_config = im.get_data('config')
         data_weather = im.get_data('weather')
@@ -129,4 +158,9 @@ class SimulationEngine:
 
         self.weather = Weather(data_weather, self.config)
         self.time = Time(self.config)
-        self.state = State(self.config, self.weather, self.time)
+        self.state = State(self.config,
+                           self.weather,
+                           self.time,
+                           init_herd,
+                           save_animals,
+                           terminate_simulation_post_herd_generation)
