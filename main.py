@@ -22,6 +22,10 @@ from RUFAS.util import Utility
 
 def main():
     cmd_arguments = parse_gnu_args()
+    print("no_graphics: " + str(cmd_arguments.no_graphics))
+    print("init_herd: " + str(cmd_arguments.init_herd))
+    print("save_animals: " + str(cmd_arguments.save_animals))
+    print("terminate_simulation_post_herd_generation: " + str(cmd_arguments.terminate_simulation_post_herd_generation))
     run_rufas(
         produce_graphics=not cmd_arguments.no_graphics,
         format_option=cmd_arguments.format_option,
@@ -30,35 +34,48 @@ def main():
         exclude_info_maps=cmd_arguments.exclude_info_maps,
         only_run_validation=cmd_arguments.only_run_validation,
         graphics_dir=Path(cmd_arguments.graphics_dir),
+        init_herd=cmd_arguments.init_herd,
+        save_animals=cmd_arguments.save_animals,
+        terminate_simulation_post_herd_generation=cmd_arguments.terminate_simulation_post_herd_generation
     )
 
 
 def run_rufas(
-    produce_graphics: bool = True,
-    format_option: str = "verbose",
-    verbose: bool = True,
-    clear_output: bool = False,
-    exclude_info_maps: bool = False,
-    only_run_validation: bool = False,
-    graphics_dir: Path = Path(""),
+        produce_graphics: bool = True,
+        format_option: str = "verbose",
+        verbose: bool = True,
+        clear_output: bool = False,
+        exclude_info_maps: bool = False,
+        only_run_validation: bool = False,
+        graphics_dir: Path = Path(""),
+        init_herd: bool = False,
+        save_animals: bool = False,
+        terminate_simulation_post_herd_generation: bool = False
 ) -> None:
     """Main function to run RuFaS, with options.
 
-    Args:
-        produce_graphics: produce graphics after simulation
-        verbose: print progress messages while simulation is running
-        clear_output: lear output directory before running the simulation
-        exclude_info_map: exclude info_maps from the output
+    Parameters
+    ----------
+        produce_graphics: bool
+            produce graphics after simulation
+        format_option: bool
+            format for variable_names.txt output file
+        verbose: bool
+            print progress messages while simulation is running
+        clear_output: bool
+            lear output directory before running the simulation
+        exclude_info_maps: bool
+            exclude info_maps from the output
+        only_run_validation: bool
+            validate input data and don't run a simulation
         graphics_dir : Path, optional
             The directory for saving graphics.
-        produce_graphics: produce graphics after simulation
-        format_option: format for variable_names.txt output file
-        verbose: print progress messages while simulation is running
-        clear_output: lear output directory before running the simulation
-        exclude_info_map: exclude info_maps from the output
-        only_run_validation: validate input data and don't run a simulation
-        graphics_dir : Path, optional
-            The directory for saving graphics.
+        init_herd: bool
+            Initialize herd with simulation.
+        save_animals: bool
+            Save animals to CSV files.
+        terminate_simulation_post_herd_generation: bool
+            Save generated animals to CSV files.
     """
     if clear_output:
         output_dir = Path(config.global_variables.OUT_DIR)
@@ -78,6 +95,9 @@ def run_rufas(
             produce_graphics,
             graphics_dir,
             format_option,
+            init_herd,
+            save_animals,
+            terminate_simulation_post_herd_generation
         )
 
 
@@ -89,9 +109,9 @@ def set_global_variables(verbose: bool) -> None:
 
 
 def run_validation(
-    metadata_files: List[Path],
-    exclude_info_maps: bool = False,
-    format_option: str = "verbose",
+        metadata_files: List[MetadataPaths],
+        exclude_info_maps: bool = False,
+        format_option: str = "verbose",
 ) -> None:
     """Instantiates I/O Managers and triggers validation of input data.
 
@@ -100,7 +120,7 @@ def run_validation(
     metadata_files : List[Path]
         The list of Paths to the metadata files the user entered with which to run the simulation.
     exclude_info_maps : bool, optional
-        Flag for whether or not the user wants to inlcude info_maps data in their results files.
+        Flag for whether the user wants to include info_maps data in their results files.
     format_option : str
         The formatting option for select output files.
     """
@@ -127,11 +147,14 @@ def run_validation(
 
 
 def execute_simulations(
-    metadata_files: List[MetadataPaths],
-    exclude_info_maps: bool = False,
-    produce_graphics: bool = True,
-    graphics_dir: Path = Path(""),
-    format_option: str = "verbose",
+        metadata_files: List[MetadataPaths],
+        exclude_info_maps: bool = False,
+        produce_graphics: bool = True,
+        graphics_dir: Path = Path(""),
+        format_option: str = "verbose",
+        init_herd: bool = False,
+        save_animals: bool = False,
+        terminate_simulation_post_herd_generation: bool = False
 ) -> None:
     """Instantiates I/O Managers and processes the metadata files provided by the user to run the simulation.
 
@@ -142,14 +165,19 @@ def execute_simulations(
         and the path to the metadata file.
 
     exclude_info_maps : bool, optional
-        Flag for whether or not the user wants to inlcude info_maps data in their results files.
+        Flag for whether the user wants to include info_maps data in their results files.
     produce_graphics: bool, optional
-        Flag for whether or not the user wants to produce graphs at after the simulation.
-
+        Flag for whether the user wants to produce graphs at after the simulation.
     graphics_dir : Path, optional
         The directory for saving graphics.
     format_option : str
         The formatting option for select output files.
+    init_herd: bool
+        Initialize herd with simulation.
+    save_animals: bool
+        Save animals to CSV files.
+    terminate_simulation_post_herd_generation: bool
+        Save generated animals to CSV files.
     """
     info_map = {
         "class": "No caller class",
@@ -166,7 +194,9 @@ def execute_simulations(
             str(metadata_file["path"]), True
         )
         if is_data_valid:
-            simulator = SimulationEngine()
+            simulator = SimulationEngine(init_herd,
+                                         save_animals,
+                                         terminate_simulation_post_herd_generation)
             simulator.simulate()
         else:
             output_manager.add_error(
@@ -236,6 +266,24 @@ def parse_gnu_args() -> argparse.Namespace:
         "-o",
         "--only-run-validation",
         help="Only validate the data, don't run a simulation",
+        action="store_true",
+    )
+    parser.add_argument(
+        "-I",
+        "--init_herd",
+        help="Initialize herd with simulation",
+        action="store_true",
+    )
+    parser.add_argument(
+        "-s",
+        "--save_animals",
+        help="Save animals to CSV files",
+        action="store_true",
+    )
+    parser.add_argument(
+        "-t",
+        "--terminate_simulation_post_herd_generation",
+        help="Save generated animals to CSV files",
         action="store_true",
     )
     return parser.parse_args()
