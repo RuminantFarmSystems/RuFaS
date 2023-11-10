@@ -873,6 +873,17 @@ class OutputManager(object):
         selected_variables = filter_content.get("variables")
         slice_start = filter_content.get("slice_start", 0)
         slice_end = filter_content.get("slice_end", 0)
+        data_dict = self._prepare_report_data(
+            filtered_pool, selected_variables, slice_start, slice_end
+        )
+
+    def _prepare_report_data(
+        self, filtered_pool, selected_variables, slice_start, slice_end
+    ) -> Dict[str, List[Any]]:
+        info_map = {
+            "class": self.__class__.__name__,
+            "function": self._prepare_report_data.__name__,
+        }
         data_dict: Dict[str, List[Any]] = {}
         for key in filtered_pool.keys():
             is_data_in_dict = isinstance(filtered_pool[key]["values"][0], dict)
@@ -886,7 +897,7 @@ class OutputManager(object):
                 data_dict.update(
                     Utility.convert_list_of_dicts_to_dict_of_lists(
                         filtered_pool[key]["values"][
-                            slice_start: slice_end
+                            slice_start : slice_end
                             if slice_end != 0
                             else len(filtered_pool[key]["values"])
                         ]
@@ -894,11 +905,10 @@ class OutputManager(object):
                 )
             else:
                 data_dict[key] = filtered_pool[key]["values"][
-                    slice_start: slice_end
+                    slice_start : slice_end
                     if slice_end != 0
                     else len(filtered_pool[key]["values"])
                 ]
-        print(data_dict)
 
     def _save_variables_to_csv_files(
         self, data_dict: Dict[str, Any], filter_name: str, path: str
