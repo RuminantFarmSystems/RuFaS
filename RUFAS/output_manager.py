@@ -653,7 +653,11 @@ class OutputManager(object):
                     else:
                         result = [json_content]
                 elif path.endswith(".txt"):
-                    list_of_elements = [element for element in filter_file.read().splitlines() if element]
+                    list_of_elements = [
+                        element
+                        for element in filter_file.read().splitlines()
+                        if element
+                    ]
                     result = [{"filters": list_of_elements}]
                 else:
                     raise Exception(
@@ -873,12 +877,17 @@ class OutputManager(object):
             "class": self.__class__.__name__,
             "function": self._save_reports.__name__,
         }
+        self.add_log("init_report_generation", "Report Generation Started", info_map)
         selected_variables = filter_content.get("variables")
         slice_start = filter_content.get("slice_start", 0)
         slice_end = filter_content.get("slice_end", 0)
         report_data = self._prepare_report_data(
             filtered_pool, selected_variables, slice_start, slice_end
         )
+        number_of_elements = len(report_data[next(iter(report_data))])
+        for i in range(number_of_elements):
+            ith_element = [lst[i] for lst in report_data.values()]
+            print(ith_element)
 
     def _prepare_report_data(
         self,
@@ -917,7 +926,7 @@ class OutputManager(object):
             "class": self.__class__.__name__,
             "function": self._prepare_report_data.__name__,
         }
-        data_dict: Dict[str, List[Any]] = {}
+        report_data: Dict[str, List[Any]] = {}
         for key in filtered_pool.keys():
             is_data_in_dict = isinstance(filtered_pool[key]["values"][0], dict)
             if is_data_in_dict:
@@ -927,7 +936,7 @@ class OutputManager(object):
                         "Can't generate report, use 'variables' arg to select items from data",
                         info_map,
                     )
-                data_dict.update(
+                report_data.update(
                     Utility.convert_list_of_dicts_to_dict_of_lists(
                         filtered_pool[key]["values"][
                             slice_start : slice_end
@@ -937,11 +946,12 @@ class OutputManager(object):
                     )
                 )
             else:
-                data_dict[key] = filtered_pool[key]["values"][
+                report_data[key] = filtered_pool[key]["values"][
                     slice_start : slice_end
                     if slice_end != 0
                     else len(filtered_pool[key]["values"])
                 ]
+        return report_data
 
     def _save_variables_to_csv_files(
         self, data_dict: Dict[str, Any], filter_name: str, path: str
@@ -1142,17 +1152,27 @@ class OutputManager(object):
         Exception
             If an error occurs while opening or reading the user-provided file path.
         """
-        info_map = {"class": self.__class__.__name__,
-                    "function": self.load_variables_pool_from_file.__name__,
-                    }
-        self.add_log("open_json_file", f"Attempting to open {str(file_path)}.", info_map)
+        info_map = {
+            "class": self.__class__.__name__,
+            "function": self.load_variables_pool_from_file.__name__,
+        }
+        self.add_log(
+            "open_json_file", f"Attempting to open {str(file_path)}.", info_map
+        )
         try:
             with open(file_path) as file:
                 self.variables_pool = json.load(file)
-                self.add_log("load_data_successful", f"Successfully loaded data from {str(file_path)}.",
-                             info_map)
+                self.add_log(
+                    "load_data_successful",
+                    f"Successfully loaded data from {str(file_path)}.",
+                    info_map,
+                )
         except FileNotFoundError:
-            self.add_error("File not found", f"The file '{str(file_path)}' does not exist.", info_map)
+            self.add_error(
+                "File not found",
+                f"The file '{str(file_path)}' does not exist.",
+                info_map,
+            )
             raise
         except json.JSONDecodeError as e:
             self.add_error("JSON parsing error", str(e), info_map)
