@@ -866,7 +866,30 @@ class OutputManager(object):
         save_path: Path,
         filter_file: Path,
     ) -> None:
-        pass
+        info_map = {
+            "class": self.__class__.__name__,
+            "function": self._save_reports.__name__,
+        }
+        selected_variables = filter_content.get("variables")
+        aggregation_slice = filter_content.get("aggregation_slice", 0)
+        data_dict: Dict[str, List[Any]] = {}
+        for key in filtered_pool.keys():
+            is_data_in_dict = isinstance(filtered_pool[key]["values"][0], dict)
+            if is_data_in_dict:
+                if selected_variables is None:
+                    self.add_error(
+                        "missing_variables_entry",
+                        "Can't generate report, use 'variables' arg to select items from data",
+                        info_map,
+                    )
+                data_dict.update(
+                    Utility.convert_list_of_dicts_to_dict_of_lists(
+                        filtered_pool[key]["values"]
+                    )
+                )
+            else:
+                data_dict[key] = filtered_pool[key]["values"][-aggregation_slice:]
+        print(data_dict)
 
     def _save_variables_to_csv_files(
         self, data_dict: Dict[str, Any], filter_name: str, path: str
