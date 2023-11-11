@@ -46,6 +46,6 @@ class MetadataPaths(TypedDict):
     path: Path
 
 
-METADATA_PATHS: List[MetadataPaths] = [{"prefix": "carbon_eval",
-                                        "path": Path('input/metadata/carbon_eval_metadata.json')},
+METADATA_PATHS: List[MetadataPaths] = [{"prefix": "default_metadata",
+                                        "path": Path('input/metadata/default_metadata.json')},
                                        ]

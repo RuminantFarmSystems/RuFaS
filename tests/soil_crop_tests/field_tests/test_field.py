@@ -10,7 +10,6 @@ from RUFAS.current_day_conditions import CurrentDayConditions
 from RUFAS.routines.field.manager.events import Event, PlantingEvent, HarvestEvent, FertilizerEvent, ManureEvent
 from RUFAS.routines.field.soil.soil import Soil
 from RUFAS.routines.field.soil.soil_data import SoilData
-from RUFAS.routines.field.soil.carbon_cycling.residue_partition import ResiduePartition
 from RUFAS.routines.field.field.field import Field
 from RUFAS.routines.field.field.field_data import FieldData
 from RUFAS.routines.field.crop.dormancy import Dormancy
@@ -394,6 +393,7 @@ def test_harvest_crop(crop_reference: str, harvest_op: str, field_name: str, fie
             crop.crop_management.manage_harvest.assert_called_once_with(expected_operation, field_name, field_size,
                                                                         1995, 100, field.soil.data)
     assert add_residue.call_count == 1
+
 
 @pytest.mark.parametrize("crops,expected_info_map,expected_message", [
     ([Crop(), Crop()], {"prefix": "field_name:'test'", "date": {"day": 200, "year": 2000},
