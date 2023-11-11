@@ -275,6 +275,8 @@ class ResiduePartition:
         -------
         pseudocode_soil S.6.B.I.2
         """
+        if total_residue == 0.0:
+            return 0.0
         nitrogen_fraction_plant_residue = crop_yield_nitrogen / total_residue
         if 0 < nitrogen_fraction_plant_residue <= 1.0:
             return (plant_residue_lignin_composition / 100) / nitrogen_fraction_plant_residue

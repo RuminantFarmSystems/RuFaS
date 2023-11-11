@@ -10,6 +10,7 @@ from RUFAS.current_day_conditions import CurrentDayConditions
 from RUFAS.routines.field.manager.events import Event, PlantingEvent, HarvestEvent, FertilizerEvent, ManureEvent
 from RUFAS.routines.field.soil.soil import Soil
 from RUFAS.routines.field.soil.soil_data import SoilData
+from RUFAS.routines.field.soil.carbon_cycling.residue_partition import ResiduePartition
 from RUFAS.routines.field.field.field import Field
 from RUFAS.routines.field.field.field_data import FieldData
 from RUFAS.routines.field.crop.dormancy import Dormancy
@@ -62,7 +63,7 @@ def test_manage_field() -> None:
     field._execute_daily_processes.assert_called_once_with(mocked_weather, mocked_time)
     field._assess_dormancy.assert_called_once_with(12)
     field._check_crop_planting_schedule.assert_called_once_with(mocked_time)
-    field._check_crop_harvest_schedule.assert_called_once_with(mocked_time)
+    field._check_crop_harvest_schedule.assert_called_once_with(mocked_time, mocked_weather)
     field._remove_dead_crops.assert_called_once()
     field._reset_crop_field_coverage_fractions.assert_called_once()
 
@@ -196,6 +197,8 @@ def test_check_crop_harvest_schedule(year: int, day: int, all_harvest_events: Li
     mocked_time = MagicMock(Time)
     setattr(mocked_time, "calendar_year", year)
     setattr(mocked_time, "day", day)
+    mock_conditions = MagicMock(CurrentDayConditions)
+    setattr(mock_conditions, "rainfall", 10.0)
     remaining_harvest_events = [events for events in all_harvest_events if events not in current_harvest_events]
     field._filter_events = MagicMock(return_value=(remaining_harvest_events, current_harvest_events))
     field._harvest_crop = MagicMock()
@@ -203,24 +206,24 @@ def test_check_crop_harvest_schedule(year: int, day: int, all_harvest_events: Li
 
     harvest_crop_calls = []
     for event in current_harvest_events:
-        new_call = call(event.crop_reference, event.operation, mocked_time)
+        new_call = call(event.crop_reference, event.operation, mocked_time, 10.0)
         harvest_crop_calls.append(new_call)
 
-    field._check_crop_harvest_schedule(mocked_time)
+    field._check_crop_harvest_schedule(mocked_time, mock_conditions)
 
     field._filter_events.assert_called_once_with(all_harvest_events, mocked_time)
     field._harvest_crop.assert_has_calls(harvest_crop_calls)
     field._harvest_heat_scheduled_crops.assert_called_once()
 
 
-@pytest.mark.parametrize("crop_num,heat_scheduled,expected_harvested", [
-    (5, [True, False, True, True, False], [True, False, False, True, False]),
-    (2, [True, True], [False, True]),
-    (2, [False, False], [False, False]),
-    (0, [], [])
+@pytest.mark.parametrize("crop_num,heat_scheduled,expected_harvested,expected_harvest_count", [
+    (5, [True, False, True, True, False], [True, False, False, True, False], 2),
+    (2, [True, True], [False, True], 1),
+    (2, [False, False], [False, False], 0),
+    (0, [], [], 0)
 ])
 def test_harvest_heat_scheduled_crops(crop_num: int, heat_scheduled: List[bool],
-                                      expected_harvested: List[bool]) -> None:
+                                      expected_harvested: List[bool], expected_harvest_count: int) -> None:
     """Tests that all crops which are set to be harvested based on heat level are."""
     crops = []
     for index in range(crop_num):
@@ -239,14 +242,16 @@ def test_harvest_heat_scheduled_crops(crop_num: int, heat_scheduled: List[bool],
 
     field = Field(manure_manager=MagicMock(ManureManager))
     field.crops = crops
-
-    field._harvest_heat_scheduled_crops()
+    with patch.object(field.soil.carbon_cycling.residue_partition, "add_residue_to_pools", new_callable=MagicMock) \
+            as add_residue:
+        field._harvest_heat_scheduled_crops(10.0)
 
     for index in range(len(crops)):
         if expected_harvested[index]:
             crops[index].crop_management.manage_harvest.assert_called_once_with(HarvestOperation.HARVEST_NOKILL)
         else:
             crops[index].crop_management.manage_harvest.assert_not_called()
+    assert add_residue.call_count == expected_harvest_count
 
 
 @pytest.mark.parametrize("events,year,day,expected_remaining,expected_current", [
@@ -355,11 +360,11 @@ def test_plant_crop_error(field_name: str, crop_reference: str, custom_crop_spec
     assert expected in str(e.value)
 
 
-@pytest.mark.parametrize("crop_reference,harvest_op,field_name,field_size,expected_operation", [
-    ("test_1", "default", "field_1", 1.4, HarvestOperation.HARVEST),
-    ("test_2", "no_kill", "field_2", 2.33, HarvestOperation.HARVEST_NOKILL),
+@pytest.mark.parametrize("crop_reference,harvest_op,field_name,field_size,rainfall,expected_operation", [
+    ("test_1", "default", "field_1", 1.4, 0.0, HarvestOperation.HARVEST),
+    ("test_2", "no_kill", "field_2", 2.33, 10.3, HarvestOperation.HARVEST_NOKILL),
 ])
-def test_harvest_crop(crop_reference: str, harvest_op: str, field_name: str, field_size: float,
+def test_harvest_crop(crop_reference: str, harvest_op: str, field_name: str, field_size: float, rainfall: float,
                       expected_operation: HarvestOperation) -> None:
     """Tests that crops are harvested correctly."""
     harvest_crop = Crop()
@@ -375,9 +380,12 @@ def test_harvest_crop(crop_reference: str, harvest_op: str, field_name: str, fie
     mocked_time = MagicMock(Time)
     setattr(mocked_time, "day", 100)
     setattr(mocked_time, "calendar_year", 1995)
-    with patch.object(field.soil.carbon_cycling.residue_partition, "partition_residue", new_callable=MagicMock) \
-            as partition:
-        field._harvest_crop(crop_reference, harvest_op, mocked_time)
+    mock_conditions = MagicMock(CurrentDayConditions)
+    mock_conditions.rainfall == rainfall
+
+    with patch.object(field.soil.carbon_cycling.residue_partition, "add_residue_to_pools", new_callable=MagicMock) \
+            as add_residue:
+        field._harvest_crop(crop_reference, harvest_op, mocked_time, mock_conditions)
 
     for crop in field.crops:
         if crop.data.id == "not this crop":
@@ -385,8 +393,7 @@ def test_harvest_crop(crop_reference: str, harvest_op: str, field_name: str, fie
         else:
             crop.crop_management.manage_harvest.assert_called_once_with(expected_operation, field_name, field_size,
                                                                         1995, 100, field.soil.data)
-    partition.assert_called_once()
-
+    assert add_residue.call_count == 1
 
 @pytest.mark.parametrize("crops,expected_info_map,expected_message", [
     ([Crop(), Crop()], {"prefix": "field_name:'test'", "date": {"day": 200, "year": 2000},
@@ -408,15 +415,17 @@ def test_harvest_crop_warnings(crops: List[Crop], expected_info_map: Dict, expec
         setattr(mocked_time, "day", 200)
         setattr(mocked_time, "calendar_year", 2000)
         mocked_timestamp.return_value = "00-Jan-1970_Thu_00-00-00"
+        mock_conditions = MagicMock(CurrentDayConditions)
+        mock_conditions.rainfall = 11.0
 
-        with patch.object(field.soil.carbon_cycling.residue_partition, "partition_residue", new_callable=MagicMock) \
-                as partition:
-            field._harvest_crop("test", "default", mocked_time)
+        with patch.object(field.soil.carbon_cycling.residue_partition, "add_residue_to_pools", new_callable=MagicMock) \
+                as add_residue:
+            field._harvest_crop("test", "default", mocked_time, mock_conditions)
 
         for crop in crops:
             crop.crop_management.manage_harvest.assert_called_once_with(HarvestOperation.HARVEST, "test", 1.0, 2000,
                                                                         200, field.soil.data)
-        assert partition.call_count == len(crops)
+        assert add_residue.call_count == len(crops)
         actual = om.warnings_pool["field_name:'test'.harvest_warning"]
         assert actual['info_maps'].__contains__(expected_info_map)
         assert actual['values'].__contains__(expected_message)

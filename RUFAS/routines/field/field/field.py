@@ -17,6 +17,7 @@ from RUFAS.routines.field.manager.events import TillageEvent
 from RUFAS.output_manager import OutputManager
 from RUFAS.routines.manure.manure_manager import ManureManager
 from RUFAS.routines.manure.manure_nutrients.nutrient_request import NutrientRequest
+from RUFAS.time import Time
 from copy import copy
 
 """
@@ -149,7 +150,7 @@ class Field:
 
         self._check_crop_planting_schedule(time)
 
-        self._check_crop_harvest_schedule(time)
+        self._check_crop_harvest_schedule(time, current_conditions)
 
         self._remove_dead_crops()
         self._reset_crop_field_coverage_fractions()
@@ -599,7 +600,7 @@ class Field:
                                              event.application_depth, event.surface_remainder_fraction, event.year,
                                              event.day)
 
-    def _check_crop_harvest_schedule(self, time) -> None:
+    def _check_crop_harvest_schedule(self, time: Time, current_conditions: CurrentDayConditions) -> None:
         """
         Checks for all crops for potential harvests that may happen on the current day.
 
@@ -607,6 +608,8 @@ class Field:
         ----------
         time : Time
             Time object containing the current day and year of the simulation.
+        current_conditions : CurrentDayConditions
+            CurrentDayConditions object containing the current weather conditions of the simulated day.
 
         Notes
         -----
@@ -616,14 +619,19 @@ class Field:
         """
         self.harvest_events, todays_harvest_events = self._filter_events(self.harvest_events, time)
         for event in todays_harvest_events:
-            self._harvest_crop(event.crop_reference, event.operation, time)
+            self._harvest_crop(event.crop_reference, event.operation, time, current_conditions.rainfall)
 
-        self._harvest_heat_scheduled_crops()
+        self._harvest_heat_scheduled_crops(current_conditions.rainfall)
 
-    def _harvest_heat_scheduled_crops(self) -> None:
+    def _harvest_heat_scheduled_crops(self, rainfall: float) -> None:
         """
         Checks if any of the active plants in the field are harvested based on their heat schedule, and if so harvests
         them if they meet the heat threshold.
+
+        Parameters
+        ----------
+        rainfall : float
+            Amount of rainfall on the current day (mm).
 
         References
         ----------
@@ -635,6 +643,7 @@ class Field:
                                              crop.data.heat_fraction >= crop.data.harvest_heat_fraction
             if execute_heat_scheduled_harvest:
                 crop.crop_management.manage_harvest(HarvestOperation.HARVEST_NOKILL)
+                self.soil.carbon_cycling.residue_partition.add_residue_to_pools(rainfall)
 
     @staticmethod
     def _filter_events(all_events: List[Event], time) -> Tuple[List[Event], List[Event]]:
@@ -752,7 +761,8 @@ class Field:
                  "date": {"year": year, "day": day}}
         om.add_variable("crop_planting", value, info_map)
 
-    def _harvest_crop(self, crop_reference: str, harvest_operation: str, time) -> None:
+    def _harvest_crop(self, crop_reference: str, harvest_operation: str, time: Time,
+                      current_conditions: CurrentDayConditions) -> None:
         """
         Performs the specified crop operation on the specified crop.
 
@@ -764,6 +774,8 @@ class Field:
             Name of the harvest operation to be performed on the referenced crop.
         time : Time
             Object containing the current day and year of the simulation.
+        current_conditions : CurrentDayConditions
+            Object containing the conditions of the current simulated day.
 
         Notes
         -----
@@ -790,7 +802,7 @@ class Field:
             crop.crop_management.manage_harvest(harvest_operation_enum, self.field_data.name,
                                                 self.field_data.field_size, time.calendar_year, time.day,
                                                 self.soil.data)
-            self.soil.carbon_cycling.residue_partition.add_residue_to_pools(self.soil.data.accumulated_runoff)
+            self.soil.carbon_cycling.residue_partition.add_residue_to_pools(current_conditions.rainfall)
 
     def _remove_dead_crops(self) -> None:
         """
