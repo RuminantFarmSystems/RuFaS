@@ -184,6 +184,10 @@ def run_load_vars_pool(
     output_manager.dump_all_nondata_pools(r"output", exclude_info_maps, format_option)
 
 
+def run_validation_packed(args: Tuple[MetadataPath, bool, str, LogVerbosity]) -> None:
+    run_validation(*args)
+
+
 def run_validation(
     metadata_file: MetadataPath,
     exclude_info_maps: bool = False,
