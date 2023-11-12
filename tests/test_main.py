@@ -10,7 +10,7 @@ from config import global_variables
 from main import (
     CaseInsensitiveArgumentAction,
     clear_output_dir,
-    execute_simulations,
+    execute_simulation,
     is_file_in_dir,
     main,
     parse_gnu_args,
@@ -115,7 +115,7 @@ def test_run_rufas(
     """Checks that run_rufas() calls the correct functions in the correct order"""
     # Arrange
     metadata_file_list = METADATA_PATHS
-    patch_execute_simulations = mocker.patch("main.execute_simulations")
+    patch_execute_simulation = mocker.patch("main.execute_simulation")
     patch_run_validation = mocker.patch("main.run_validation")
     patch_run_load_vars_pool = mocker.patch("main.run_load_vars_pool")
     patch_clear_output_dir = mocker.patch("main.clear_output_dir")
@@ -143,7 +143,7 @@ def test_run_rufas(
             metadata_file_list, exclude_info_maps, format_option, verbose
         )
     else:
-        patch_execute_simulations.assert_called_once_with(
+        patch_execute_simulation.assert_called_once_with(
             metadata_file_list,
             exclude_info_maps,
             produce_graphics,
@@ -208,7 +208,7 @@ def test_run_validation(mocker: MockerFixture, is_data_valid: bool) -> None:
         (True, True, False, 0, 4, "inline"),
     ],
 )
-def test_execute_simulations(
+def test_execute_simulation(
     mocker: MockerFixture,
     produce_graphics: bool,
     exlclude_info_maps: bool,
@@ -217,7 +217,7 @@ def test_execute_simulations(
     add_error_call_count: int,
     format_option: str,
 ) -> None:
-    """Checks that execute_simulations() calls the correct functions in the correct order"""
+    """Checks that execute_simulation() calls the correct functions in the correct order"""
     # Arrange
     mock_output_manager = mocker.MagicMock(auto_spec=OutputManager)
     mock_input_manager = mocker.MagicMock(auto_spec=InputManager)
@@ -241,7 +241,7 @@ def test_execute_simulations(
     mocker.patch("main.SimulationEngine", return_value=mock_simulator)
 
     # Act
-    execute_simulations(
+    execute_simulation(
         metadata_files=metadata_file_list,
         exclude_info_maps=exlclude_info_maps,
         produce_graphics=produce_graphics,
