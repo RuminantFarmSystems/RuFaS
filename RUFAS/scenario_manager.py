@@ -5,7 +5,7 @@ from pathlib import Path
 from typing import List, TypedDict
 
 
-class MetadataPaths(TypedDict):
+class MetadataPath(TypedDict):
     """
     Contains the path(s) to the metadata file(s) that will run when a user runs a simulation and the
     prefix(es) the user wants to use to designate the output files from this simulation.
@@ -24,7 +24,7 @@ class MetadataPaths(TypedDict):
     Examples
     --------
     Single simulation:
-        METADATA_PATHS: List[MetadataPaths] = [{"prefix": "default_scenario",
+        METADATA_PATHS: List[MetadataPath] = [{"prefix": "default_scenario",
                                                 "path": Path('input/metadata/default_metadata.json')},
                                               ]
         This will use the default_metadata.json file to point to the input
@@ -32,7 +32,7 @@ class MetadataPaths(TypedDict):
         prefix: e.g. "default_scenario_errors_09-Oct...", "default_scenario_logs_09-Oct...", etc.
 
     Multiple simulations:
-        METADATA_PATHS: List[MetadataPaths] = [{"prefix": "default_scenario",
+        METADATA_PATHS: List[MetadataPath] = [{"prefix": "default_scenario",
                                                 "path": Path('input/metadata/default_metadata.json')},
                                                {"prefix": "ARL_scenario",
                                                 "path": Path('input/metadata/ARL_metadata.json')},
@@ -47,7 +47,7 @@ class MetadataPaths(TypedDict):
     path: Path
 
 
-METADATA_PATHS: List[MetadataPaths] = [
+METADATA_PATHS: List[MetadataPath] = [
     {
         "prefix": "ARL_metadata.json",
         "path": Path("input/metadata/ARL_metadata.json"),

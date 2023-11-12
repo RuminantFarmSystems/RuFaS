@@ -10,8 +10,8 @@ import argparse
 from pathlib import Path
 import sys
 from typing import List
-
-from RUFAS.scenario_manager import METADATA_PATHS, MetadataPaths
+import time
+from RUFAS.scenario_manager import METADATA_PATHS, MetadataPath
 
 import config.global_variables
 from RUFAS.simulation_engine import SimulationEngine
@@ -22,6 +22,8 @@ from RUFAS.util import Utility
 
 def main():
     cmd_arguments = parse_gnu_args()
+    start = time.time()
+    print(f"********************Main started at {start}")
     run_rufas(
         produce_graphics=not cmd_arguments.no_graphics,
         format_option=cmd_arguments.format_option,
@@ -32,6 +34,9 @@ def main():
         graphics_dir=Path(cmd_arguments.graphics_dir),
         load_pool=cmd_arguments.load_pool,
     )
+    end = time.time()
+    print(f"********************Main ended at {end}")
+    print(f"********************Main run time {start-end}")
 
 
 def run_rufas(
@@ -80,7 +85,7 @@ def run_rufas(
     if clear_output:
         clear_output_dir()
 
-    metadata_files: List[MetadataPaths] = METADATA_PATHS
+    metadata_files: List[MetadataPath] = METADATA_PATHS
     if only_run_validation:
         for metadata_file in metadata_files:
             run_validation(metadata_file, exclude_info_maps, format_option, verbose)
@@ -186,7 +191,7 @@ def run_load_vars_pool(
 
 
 def run_validation(
-    metadata_file: MetadataPaths,
+    metadata_file: MetadataPath,
     exclude_info_maps: bool = False,
     format_option: str = "verbose",
     verbose: LogVerbosity = LogVerbosity.NONE,
@@ -195,7 +200,7 @@ def run_validation(
 
     Parameters
     ----------
-    metadata_files : MetadataPaths
+    metadata_files : MetadataPath
         The list of Paths to the metadata files the user entered with which to run the simulation.
     exclude_info_maps : bool, optional
         Flag for whether or not the user wants to inlcude info_maps data in their results files.
@@ -238,7 +243,7 @@ def run_validation(
 
 
 def execute_simulations(
-    metadata_file: MetadataPaths,
+    metadata_file: MetadataPath,
     exclude_info_maps: bool = False,
     produce_graphics: bool = True,
     graphics_dir: Path = Path(""),
@@ -249,7 +254,7 @@ def execute_simulations(
 
     Parameters
     ----------
-    metadata_files : MetadataPaths
+    metadata_files : MetadataPath
         A list of custom TypedDict objects including the specified prefix for the save_results output file
         and the path to the metadata file.
 
@@ -264,11 +269,13 @@ def execute_simulations(
     verbose : LogVerbosity
         The verbose option set by the user.
     """
+    start = time.time()
+    print(f"********************{[metadata_file['prefix']]} started at {start}")
     info_map = {
         "class": "No caller class",
         "function": execute_simulations.__name__,
     }
-    sys.stdout.write("Simulating...\n")
+    sys.stdout.write(f"{[metadata_file['prefix']]}Simulating...\n")
     output_manager = OutputManager()
     input_manager = InputManager()
     output_manager.set_log_verbose(verbose)
@@ -308,6 +315,9 @@ def execute_simulations(
         graphics_dir,
     )
     output_manager.dump_all_nondata_pools(r"output", exclude_info_maps, format_option)
+    end = time.time()
+    print(f"********************{[metadata_file['prefix']]} ended at {end}")
+    print(f"********************{[metadata_file['prefix']]} run time {start-end}")
 
 
 class CaseInsensitiveArgumentAction(argparse.Action):
