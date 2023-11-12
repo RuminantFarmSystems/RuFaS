@@ -265,6 +265,24 @@ def run_validation(
 def execute_simulation_packed(
     args: Tuple[MetadataPath, bool, bool, Path, str, LogVerbosity]
 ) -> None:
+    """
+    A wrapper function for 'execute_simulations' designed for parallel processing.
+
+    This function adapts 'execute_simulations' to be compatible with multiprocessing's
+    imap_unordered method by accepting a single tuple of arguments. It unpacks these
+    arguments and forwards them to 'execute_simulations'.
+
+    Parameters
+    ----------
+    args : Tuple[MetadataPath, bool, bool, Path, str, LogVerbosity]
+        A tuple containing the arguments for the 'execute_simulation' function.
+        - metadata_file: MetadataPath - The path of the metadata file for simulation.
+        - exclude_info_maps: bool - Flag to exclude information maps in the results.
+        - produce_graphics: bool - Flag to determine if graphics should be produced.
+        - graphics_dir: Path - Directory path for saving graphics.
+        - format_option: str - Formatting option for output files.
+        - verbose: LogVerbosity - Verbosity level for logging.
+    """
     execute_simulation(*args)
 
 
