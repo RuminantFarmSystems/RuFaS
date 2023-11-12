@@ -1,15 +1,8 @@
 # !/usr/bin/env python3
-
-"""
-This file serves as a main entry point to RuFaS.
-
-The main function run_rufas() will execute the model simulation(s). It accepts a path to the location of the input
-file(s) or, if this input is not given, it will run in interactive mode and accept input from the user.
-"""
 import argparse
 from pathlib import Path
 import sys
-from typing import List, Tuple
+from typing import Tuple
 from multiprocessing import Pool
 
 from RUFAS.scenario_manager import METADATA_PATHS, MetadataPath
@@ -81,9 +74,8 @@ def run_rufas(
     if clear_output:
         clear_output_dir()
 
-    metadata_files: List[MetadataPath] = METADATA_PATHS
     if only_run_validation:
-        for metadata_file in metadata_files:
+        for metadata_file in METADATA_PATHS:
             run_validation(metadata_file, exclude_info_maps, format_option, verbose)
     else:
         args_generator: Tuple[MetadataPath, bool, bool, Path, str, LogVerbosity] = (
@@ -95,7 +87,7 @@ def run_rufas(
                 format_option,
                 verbose,
             )
-            for metadata_file in metadata_files
+            for metadata_file in METADATA_PATHS
         )
         with Pool() as pool:
             results = pool.imap_unordered(execute_simulation_packed, args_generator)
