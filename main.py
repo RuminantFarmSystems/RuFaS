@@ -17,7 +17,7 @@ from RUFAS.util import Utility
 def main():
     cmd_arguments = parse_gnu_args()
     run_rufas(
-        produce_graphics=not cmd_arguments.no_graphics,
+        produce_graphics=cmd_arguments.produce_graphics,
         format_option=cmd_arguments.format_option,
         verbose=LogVerbosity(cmd_arguments.verbose),
         clear_output=cmd_arguments.clear_output,
@@ -379,8 +379,9 @@ def parse_gnu_args() -> argparse.Namespace:
     parser.add_argument(
         "-g",
         "--no-graphics",
-        help="Prevent graphics from generating",
-        action="store_true",
+        help="Disable graphics generation",
+        action="store_false",
+        dest="produce_graphics"
     )
     parser.add_argument(
         "-G",
