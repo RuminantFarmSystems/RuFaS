@@ -235,6 +235,7 @@ def run_validation(
     }
     output_manager = OutputManager()
     input_manager = InputManager()
+    output_manager.set_metadata_prefix(metadata_file["prefix"])
     output_manager.add_log(
         "Validation only",
         "***Only validating data, no simulation will follow.***",
