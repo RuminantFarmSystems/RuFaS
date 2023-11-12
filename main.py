@@ -381,7 +381,7 @@ def parse_gnu_args() -> argparse.Namespace:
         "--no-graphics",
         help="Disable graphics generation",
         action="store_false",
-        dest="produce_graphics"
+        dest="produce_graphics",
     )
     parser.add_argument(
         "-G",
