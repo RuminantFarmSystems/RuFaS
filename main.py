@@ -98,7 +98,7 @@ def run_rufas(
             for metadata_file in metadata_files
         )
         with Pool() as pool:
-            results = pool.imap_unordered(execute_simulations_packed, args_generator)
+            results = pool.imap_unordered(execute_simulation_packed, args_generator)
             for _ in results:
                 pass
 
@@ -244,13 +244,13 @@ def run_validation(
     output_manager.dump_all_nondata_pools(r"output", exclude_info_maps, format_option)
 
 
-def execute_simulations_packed(
+def execute_simulation_packed(
     args: Tuple[MetadataPath, bool, bool, Path, str, LogVerbosity]
 ) -> None:
-    execute_simulations(*args)
+    execute_simulation(*args)
 
 
-def execute_simulations(
+def execute_simulation(
     metadata_file: MetadataPath,
     exclude_info_maps: bool = False,
     produce_graphics: bool = True,
@@ -279,7 +279,7 @@ def execute_simulations(
     """
     info_map = {
         "class": "No caller class",
-        "function": execute_simulations.__name__,
+        "function": execute_simulation.__name__,
     }
     sys.stdout.write(f"{[metadata_file['prefix']]}Simulating...\n")
     output_manager = OutputManager()
