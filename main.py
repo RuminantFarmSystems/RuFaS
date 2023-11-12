@@ -9,8 +9,9 @@ file(s) or, if this input is not given, it will run in interactive mode and acce
 import argparse
 from pathlib import Path
 import sys
-from typing import List
-import time
+from typing import List, Tuple
+from multiprocessing import Pool
+
 from RUFAS.scenario_manager import METADATA_PATHS, MetadataPath
 
 import config.global_variables
@@ -22,8 +23,6 @@ from RUFAS.util import Utility
 
 def main():
     cmd_arguments = parse_gnu_args()
-    start = time.time()
-    print(f"********************Main started at {start}")
     run_rufas(
         produce_graphics=not cmd_arguments.no_graphics,
         format_option=cmd_arguments.format_option,
@@ -34,9 +33,6 @@ def main():
         graphics_dir=Path(cmd_arguments.graphics_dir),
         load_pool=cmd_arguments.load_pool,
     )
-    end = time.time()
-    print(f"********************Main ended at {end}")
-    print(f"********************Main run time {start-end}")
 
 
 def run_rufas(
@@ -90,8 +86,8 @@ def run_rufas(
         for metadata_file in metadata_files:
             run_validation(metadata_file, exclude_info_maps, format_option, verbose)
     else:
-        for metadata_file in metadata_files:
-            execute_simulations(
+        args_generator: Tuple[MetadataPath, bool, bool, Path, str, LogVerbosity] = (
+            (
                 metadata_file,
                 exclude_info_maps,
                 produce_graphics,
@@ -99,6 +95,12 @@ def run_rufas(
                 format_option,
                 verbose,
             )
+            for metadata_file in metadata_files
+        )
+        with Pool() as pool:
+            results = pool.imap_unordered(execute_simulations_packed, args_generator)
+            for _ in results:
+                pass
 
 
 def clear_output_dir(vars_file_path: Path = None) -> None:
@@ -242,6 +244,12 @@ def run_validation(
     output_manager.dump_all_nondata_pools(r"output", exclude_info_maps, format_option)
 
 
+def execute_simulations_packed(
+    args: Tuple[MetadataPath, bool, bool, Path, str, LogVerbosity]
+) -> None:
+    execute_simulations(*args)
+
+
 def execute_simulations(
     metadata_file: MetadataPath,
     exclude_info_maps: bool = False,
@@ -269,8 +277,6 @@ def execute_simulations(
     verbose : LogVerbosity
         The verbose option set by the user.
     """
-    start = time.time()
-    print(f"********************{[metadata_file['prefix']]} started at {start}")
     info_map = {
         "class": "No caller class",
         "function": execute_simulations.__name__,
@@ -315,9 +321,6 @@ def execute_simulations(
         graphics_dir,
     )
     output_manager.dump_all_nondata_pools(r"output", exclude_info_maps, format_option)
-    end = time.time()
-    print(f"********************{[metadata_file['prefix']]} ended at {end}")
-    print(f"********************{[metadata_file['prefix']]} run time {start-end}")
 
 
 class CaseInsensitiveArgumentAction(argparse.Action):

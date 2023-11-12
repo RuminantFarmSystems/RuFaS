@@ -72,8 +72,4 @@ METADATA_PATHS: List[MetadataPath] = [
         "prefix": "testing_metadata",
         "path": Path("input/metadata/testing_metadata.json"),
     },
-    {
-        "prefix": "user_defined_ration",
-        "path": Path("input/metadata/user_defined_ration.json"),
-    },
 ]
