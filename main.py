@@ -68,8 +68,13 @@ def run_rufas(
     sys.stdout.write("RuFaS: Ruminant Farm Systems Model 2023\n")
 
     if load_pool:
-        run_load_vars_pool(exclude_info_maps, format_option,
-                           produce_graphics, graphics_dir, clear_output)
+        run_load_vars_pool(
+            exclude_info_maps,
+            format_option,
+            produce_graphics,
+            graphics_dir,
+            clear_output,
+        )
         return
 
     if clear_output:
@@ -77,16 +82,18 @@ def run_rufas(
 
     metadata_files: List[MetadataPaths] = METADATA_PATHS
     if only_run_validation:
-        run_validation(metadata_files, exclude_info_maps, format_option, verbose)
+        for metadata_file in metadata_files:
+            run_validation(metadata_file, exclude_info_maps, format_option, verbose)
     else:
-        execute_simulations(
-            metadata_files,
-            exclude_info_maps,
-            produce_graphics,
-            graphics_dir,
-            format_option,
-            verbose,
-        )
+        for metadata_file in metadata_files:
+            execute_simulations(
+                metadata_file,
+                exclude_info_maps,
+                produce_graphics,
+                graphics_dir,
+                format_option,
+                verbose,
+            )
 
 
 def clear_output_dir(vars_file_path: Path = None) -> None:
@@ -105,14 +112,24 @@ def clear_output_dir(vars_file_path: Path = None) -> None:
     output_dir = Path(config.global_variables.OUT_DIR)
     is_file_found_in_dir = is_file_in_dir(output_dir, vars_file_path)
     if is_file_found_in_dir:
-        output_manager.add_error("Can't clear output directory", f"{vars_file_path} in output directory.", info_map)
+        output_manager.add_error(
+            "Can't clear output directory",
+            f"{vars_file_path} in output directory.",
+            info_map,
+        )
     else:
         keep_list = [".keep", "output_filters"]
         Utility.empty_dir(output_dir, keep=keep_list)
-        output_manager.add_log("Output directory cleared", "No conflicts to clearing output directory.", info_map)
+        output_manager.add_log(
+            "Output directory cleared",
+            "No conflicts to clearing output directory.",
+            info_map,
+        )
 
 
-def is_file_in_dir(dir_path: Path = Path(config.global_variables.OUT_DIR), file_path: Path = None) -> bool:
+def is_file_in_dir(
+    dir_path: Path = Path(config.global_variables.OUT_DIR), file_path: Path = None
+) -> bool:
     """Checks if a file path is in the provided directory.
 
     Parameters
@@ -159,19 +176,17 @@ def run_load_vars_pool(
     output_manager.load_variables_pool_from_file(vars_file_path)
     output_manager.set_metadata_prefix("reload")
     output_manager.save_results(
-            Path(r"output"),
-            Path(r"output/output_filters/"),
-            exclude_info_maps,
-            produce_graphics,
-            graphics_dir,
-        )
-    output_manager.dump_all_nondata_pools(
-            r"output", exclude_info_maps, format_option
-        )
+        Path(r"output"),
+        Path(r"output/output_filters/"),
+        exclude_info_maps,
+        produce_graphics,
+        graphics_dir,
+    )
+    output_manager.dump_all_nondata_pools(r"output", exclude_info_maps, format_option)
 
 
 def run_validation(
-    metadata_files: List[Path],
+    metadata_file: MetadataPaths,
     exclude_info_maps: bool = False,
     format_option: str = "verbose",
     verbose: LogVerbosity = LogVerbosity.NONE,
@@ -180,7 +195,7 @@ def run_validation(
 
     Parameters
     ----------
-    metadata_files : List[Path]
+    metadata_files : MetadataPaths
         The list of Paths to the metadata files the user entered with which to run the simulation.
     exclude_info_maps : bool, optional
         Flag for whether or not the user wants to inlcude info_maps data in their results files.
@@ -201,32 +216,29 @@ def run_validation(
         info_map,
     )
     output_manager.set_log_verbose(verbose)
-    for metadata_file in metadata_files:
-        input_manager.flush_pool()
-        output_manager.flush_pools()
-        output_manager.add_log(
-            "Validation start",
-            f"Validating data for {str(metadata_file['path'])}...\n",
+    input_manager.flush_pool()
+    output_manager.flush_pools()
+    output_manager.add_log(
+        "Validation start",
+        f"Validating data for {str(metadata_file['path'])}...\n",
+        info_map,
+    )
+    is_data_valid = input_manager.start_data_processing(
+        str(metadata_file["path"]), False
+    )
+    if is_data_valid:
+        output_manager.add_log("Validation", "Data is valid.\n\n", info_map)
+    else:
+        output_manager.add_warning(
+            "Validation",
+            f"Data not valid for {metadata_file['path']}.\n\n",
             info_map,
         )
-        is_data_valid = input_manager.start_data_processing(
-            str(metadata_file["path"]), False
-        )
-        if is_data_valid:
-            output_manager.add_log("Validation", "Data is valid.\n\n", info_map)
-        else:
-            output_manager.add_warning(
-                "Validation",
-                f"Data not valid for {metadata_file['path']}.\n\n",
-                info_map,
-            )
-        output_manager.dump_all_nondata_pools(
-            r"output", exclude_info_maps, format_option
-        )
+    output_manager.dump_all_nondata_pools(r"output", exclude_info_maps, format_option)
 
 
 def execute_simulations(
-    metadata_files: List[MetadataPaths],
+    metadata_file: MetadataPaths,
     exclude_info_maps: bool = False,
     produce_graphics: bool = True,
     graphics_dir: Path = Path(""),
@@ -237,7 +249,7 @@ def execute_simulations(
 
     Parameters
     ----------
-    metadata_files : List[MetadataPaths]
+    metadata_files : MetadataPaths
         A list of custom TypedDict objects including the specified prefix for the save_results output file
         and the path to the metadata file.
 
@@ -260,45 +272,42 @@ def execute_simulations(
     output_manager = OutputManager()
     input_manager = InputManager()
     output_manager.set_log_verbose(verbose)
-    for metadata_file in metadata_files:
-        input_manager.flush_pool()
-        output_manager.flush_pools()
+    input_manager.flush_pool()
+    output_manager.flush_pools()
+    output_manager.add_log(
+        "Validation start",
+        f"Validating data for {str(metadata_file['path'])}...\n",
+        info_map,
+    )
+    output_manager.set_metadata_prefix(metadata_file["prefix"])
+    is_data_valid = input_manager.start_data_processing(
+        str(metadata_file["path"]), True
+    )
+    if is_data_valid:
         output_manager.add_log(
-            "Validation start",
-            f"Validating data for {str(metadata_file['path'])}...\n",
+            "Validation complete", "Data is valid. \nSimulating...\n", info_map
+        )
+        simulator = SimulationEngine()
+        simulator.simulate()
+    else:
+        output_manager.add_error(
+            "Validation complete",
+            f"Data not valid for {str(metadata_file['path'])}, simulation not run",
             info_map,
         )
-        output_manager.set_metadata_prefix(metadata_file["prefix"])
-        is_data_valid = input_manager.start_data_processing(
-            str(metadata_file["path"]), True
+        output_manager.add_error(
+            "No simulation run",
+            f"Data not valid for {str(metadata_file['path'])}, simulation not run",
+            info_map,
         )
-        if is_data_valid:
-            output_manager.add_log(
-                "Validation complete", "Data is valid. \nSimulating...\n", info_map
-            )
-            simulator = SimulationEngine()
-            simulator.simulate()
-        else:
-            output_manager.add_error(
-                "Validation complete",
-                f"Data not valid for {str(metadata_file['path'])}, simulation not run",
-                info_map,
-            )
-            output_manager.add_error(
-                "No simulation run",
-                f"Data not valid for {str(metadata_file['path'])}, simulation not run",
-                info_map,
-            )
-        output_manager.save_results(
-            Path(r"output"),
-            Path(r"output/output_filters/"),
-            exclude_info_maps,
-            produce_graphics,
-            graphics_dir,
-        )
-        output_manager.dump_all_nondata_pools(
-            r"output", exclude_info_maps, format_option
-        )
+    output_manager.save_results(
+        Path(r"output"),
+        Path(r"output/output_filters/"),
+        exclude_info_maps,
+        produce_graphics,
+        graphics_dir,
+    )
+    output_manager.dump_all_nondata_pools(r"output", exclude_info_maps, format_option)
 
 
 class CaseInsensitiveArgumentAction(argparse.Action):
@@ -358,7 +367,7 @@ def parse_gnu_args() -> argparse.Namespace:
         "-l",
         "--load-pool",
         help="Load the output manager's variables pool from provided path",
-        action="store_true"
+        action="store_true",
     )
     return parser.parse_args()
 
