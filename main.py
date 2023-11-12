@@ -191,6 +191,22 @@ def run_load_vars_pool(
 
 
 def run_validation_packed(args: Tuple[MetadataPath, bool, str, LogVerbosity]) -> None:
+    """
+    A wrapper function for 'run_validation' to facilitate parallel processing.
+
+    This function is designed to be compatible with multiprocessing's imap_unordered method.
+    It takes a single tuple argument that encapsulates all the arguments needed for the
+    'run_validation' function and unpacks them for processing.
+
+    Parameters
+    ----------
+    args : Tuple[MetadataPath, bool, str, LogVerbosity]
+        A tuple containing the arguments for the 'run_validation' function.
+        - metadata_file: MetadataPath - The path of the metadata file to be processed.
+        - exclude_info_maps: bool - Flag to indicate whether information maps should be excluded.
+        - format_option: str - The format option for output files.
+        - verbose: LogVerbosity - The verbosity level for logging.
+    """
     run_validation(*args)
 
 
