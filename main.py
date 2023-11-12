@@ -75,8 +75,14 @@ def run_rufas(
         clear_output_dir()
 
     if only_run_validation:
-        for metadata_file in METADATA_PATHS:
-            run_validation(metadata_file, exclude_info_maps, format_option, verbose)
+        args_generator: Tuple[MetadataPath, bool, str, LogVerbosity] = (
+            (metadata_file, exclude_info_maps, format_option, verbose)
+            for metadata_file in METADATA_PATHS
+        )
+        with Pool() as pool:
+            results = pool.imap_unordered(run_validation_packed, args_generator)
+            for _ in results:
+                pass
     else:
         args_generator: Tuple[MetadataPath, bool, bool, Path, str, LogVerbosity] = (
             (
