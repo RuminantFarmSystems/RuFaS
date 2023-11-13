@@ -513,7 +513,6 @@ def test_allocate_animals_to_pens(mocker: MockerFixture) -> None:
     animal_manager.cows = cows
     animal_manager.all_pens = mock_pens
     animal_manager.ANIMAL_GROUPING_SCENARIO = mocker.MagicMock()
-    animal_manager.ANIMAL_GROUPING_SCENARIO.find_animal_combination = mocker.MagicMock()
 
     patch_for_sort_animals_before_allocation = mocker.patch.object(
         AnimalManager,
@@ -521,7 +520,7 @@ def test_allocate_animals_to_pens(mocker: MockerFixture) -> None:
         return_value=None
     )
 
-    animal_manager.ANIMAL_GROUPING_SCENARIO = mocker.MagicMock(
+    animal_manager.ANIMAL_GROUPING_SCENARIO.find_animal_combination = mocker.MagicMock(
         'animal_manager.ANIMAL_GROUPING_SCENARIO.find_animal_combination',
         side_effect=lambda animal: Pen.AnimalCombination.CALF
         if animal in calves
