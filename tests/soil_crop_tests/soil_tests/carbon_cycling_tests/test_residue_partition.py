@@ -26,7 +26,8 @@ def test_determine_plant_residue_lignin_composition(plant_residue_lignin_composi
                          "expected_result", [
                              (0.5, 50, 20, 0.0125),  # default
                              (0.5, 50, 0, 0),  # no nitrogen
-                             (0.5, 50, -50, 0)  # negative case
+                             (0.5, 50, -50, 0),  # negative case
+                             (0.0, 0.0, 0.0, 0.0)
                          ])
 def test_determine_plant_lignin_nitrogen_fraction(plant_residue_lignin_composition: float,
                                                   total_residue: float,
@@ -34,7 +35,11 @@ def test_determine_plant_lignin_nitrogen_fraction(plant_residue_lignin_compositi
                                                   expected_result: float) -> None:
     """Test that metabolic plant residue ration is correctly determined under current nitrogen_fraction_plant_residue
     """
-    nitrogen_fraction_plant_residue = crop_yield_nitrogen / total_residue
+    if total_residue:
+        nitrogen_fraction_plant_residue = crop_yield_nitrogen / total_residue
+    else:
+        nitrogen_fraction_plant_residue = 0.0
+
     if 0 < nitrogen_fraction_plant_residue <= 1.0:
         assert expected_result == pytest.approx(ResiduePartition._determine_plant_lignin_nitrogen_fraction(
             plant_residue_lignin_composition,
