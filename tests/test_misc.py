@@ -1,5 +1,6 @@
 from copy import deepcopy
 import os
+from pathlib import Path
 import re
 import json
 from typing import Any, Callable, Dict, List
@@ -765,10 +766,11 @@ def output_manager_original_method_states(
         "set_metadata_prefix": mock_output_manager.set_metadata_prefix,
         "set_log_verbose": mock_output_manager.set_log_verbose,
         "_list_to_file_txt": mock_output_manager._list_to_file_txt,
-        "_list_txt_and_json_files_in_dir": mock_output_manager._list_txt_and_json_files_in_dir,
+        "_list_filter_files_in_dir": mock_output_manager._list_filter_files_in_dir,
         "_load_filter_file_content": mock_output_manager._load_filter_file_content,
+        "load_variables_pool_from_file": mock_output_manager.load_variables_pool_from_file,
         "_save_variables_to_csv_files ": mock_output_manager._save_variables_to_csv_files,
-        "save_variables": mock_output_manager.save_variables,
+        "save_results": mock_output_manager.save_results,
         "_save_variables_to_csv_files": mock_output_manager._save_variables_to_csv_files,
         "add_variable": mock_output_manager.add_variable,
         "add_error": mock_output_manager.add_error,
@@ -1229,14 +1231,21 @@ def test_exclude_info_maps(
     ]
 
 
+@pytest.mark.parametrize(
+    "mock_file_text",
+    ["apples\nbananas\ncherries",
+     "apples\nbananas\ncherries\n\n\n",
+     "apples\nbananas\n\n\n\ncherries",
+     "apples\nbananas\n\n\ncherries\n\n\n"])
 @patch("builtins.open", new_callable=mock_open)
 def test_load_filter_file_content_txt(
     mock_file: MagicMock,
     mock_output_manager: OutputManager,
     output_manager_original_method_states: Dict[str, Callable],
+    mock_file_text: str,
 ) -> None:
     """Test case for function _load_filter_file_content in output_manager.py"""
-    mock_file.return_value.read.return_value = "apples\nbananas\ncherries"
+    mock_file.return_value.read.return_value = mock_file_text
     result = mock_output_manager._load_filter_file_content("path/to/file.txt")
     assert result == [{"filters": ["apples", "bananas", "cherries"]}]
 
@@ -1261,6 +1270,36 @@ def test_load_filter_file_content_json(
     mock_file.return_value.read.return_value = json.dumps(data)
     result = mock_output_manager._load_filter_file_content("some_file.json")
     assert result == [data]
+
+    # Restore original method
+    mock_output_manager._load_filter_file_content = (
+        output_manager_original_method_states["_load_filter_file_content"]
+    )
+
+
+@patch("builtins.open", new_callable=mock_open)
+def test_load_filter_file_content_json_multiple(
+    mock_file: MagicMock,
+    mock_output_manager: OutputManager,
+    output_manager_original_method_states: Dict[str, Callable],
+) -> None:
+    """Test case for function _load_filter_file_content in output_manager.py"""
+
+    data: List[Dict[str, Any]] = {
+        "multiple": [
+            {
+                "filters": ["filter1", "filter2"],
+                "other_key": "value1",
+            },
+            {
+                "filters": ["filter3", "filter4"],
+                "other_key": "value2",
+            },
+        ]
+    }
+    mock_file.return_value.read.return_value = json.dumps(data)
+    result = mock_output_manager._load_filter_file_content("some_file.json")
+    assert result == data["multiple"]
 
     # Restore original method
     mock_output_manager._load_filter_file_content = (
@@ -1302,30 +1341,34 @@ def test_load_filter_file_content_exception(
     )
 
 
-def test_list_txt_and_json_files_in_dir(
+def test_list_filter_files_in_dir(
     mock_output_manager: OutputManager,
     output_manager_original_method_states: Dict[str, Callable],
     tmpdir,
 ) -> None:
-    """Test case for function _list_txt_file_names_in_dir in output_manager.py"""
-    tmpdir.join("file1.txt").write("File 1 content")
-    tmpdir.join("file2.txt").write("File 2 content")
-    tmpdir.join("file3.csv").write("File 3 content")
+    mock_output_manager.add_warning = MagicMock()
+    tmpdir.join("json_file1.txt").write("File 1 content")
+    tmpdir.join("csv_file2.json").write("File 2 content")
+    tmpdir.join("file3.txt").write("File 3 content")
 
-    txt_files = mock_output_manager._list_txt_and_json_files_in_dir(tmpdir)
+    filter_files = mock_output_manager._list_filter_files_in_dir(tmpdir)
 
-    assert len(txt_files) == 2
-    assert "file1.txt" in txt_files
-    assert "file2.txt" in txt_files
-    assert "file3.csv" not in txt_files
+    assert len(filter_files) == 2
+    assert "json_file1.txt" in filter_files
+    assert "csv_file2.json" in filter_files
+    assert "file3.csv" not in filter_files
+    mock_output_manager.add_warning.assert_called_once()
 
     with pytest.raises(NotADirectoryError):
-        mock_output_manager._list_txt_and_json_files_in_dir("nonexistent_directory")
+        mock_output_manager._list_filter_files_in_dir("nonexistent_directory")
 
     # Restore original method
-    mock_output_manager._list_txt_and_json_files_in_dir = (
-        output_manager_original_method_states["_list_txt_and_json_files_in_dir"]
+    mock_output_manager._list_filter_files_in_dir = (
+        output_manager_original_method_states["_list_filter_files_in_dir"]
     )
+    mock_output_manager.add_warning = output_manager_original_method_states[
+        "add_warning"
+    ]
 
 
 def test_filter_variables_pool_include_empty_filter_pattern_pool(
@@ -1692,60 +1735,32 @@ def test_filter_variables_pool_exclude_regex_patterns(
     mock_output_manager.variables_pool = {}
 
 
-def test_save_variables_unsupported_prefix(
-    mock_output_manager: OutputManager,
-    output_manager_original_method_states: Dict[str, Callable],
-) -> None:
-    mock_output_manager.variables_pool = {}
-    mock_output_manager._generate_file_name = MagicMock(return_value="dummy_name")
-    mock_output_manager._load_filter_file_content = MagicMock()
-    mock_output_manager._list_txt_and_json_files_in_dir = MagicMock(
-        return_value=[
-            "dummy_input_filepath1.txt",
-            "dummy_input_filepath2.txt",
-        ]
-    )
-    mock_output_manager.save_variables("save_path", "filters_path")
-
-    mock_output_manager._load_filter_file_content.assert_not_called()
-    assert len(
-        mock_output_manager.warnings_pool[
-            "OutputManager.save_variables.invalid filter file prefix"
-        ]
-    ) == len(mock_output_manager._list_txt_and_json_files_in_dir.return_value)
-
-    # Restore original method
-    mock_output_manager.save_variables = output_manager_original_method_states[
-        "save_variables"
-    ]
-    mock_output_manager._list_txt_and_json_files_in_dir = (
-        output_manager_original_method_states["_list_txt_and_json_files_in_dir"]
-    )
-    mock_output_manager._generate_file_name = output_manager_original_method_states[
-        "_generate_file_name"
-    ]
-    mock_output_manager._load_filter_file_content = (
-        output_manager_original_method_states["_load_filter_file_content"]
-    )
-
-
 @pytest.mark.parametrize(
-    "exclude_info_maps, produce_graphics",
-    [(True, True), (True, False), (False, True), (False, False)],
+    "exclude_info_maps, produce_graphics, filter_content, is_faulty",
+    [
+        (True, True, [{"filters": ".*", "title": "dummy_title"}], False),
+        (True, False, [{"filters": ".*", "title": "dummy_title"}], False),
+        (False, True, [{"filters": ".*", "title": "dummy_title"}], False),
+        (False, False, [{"filters": ".*", "title": "dummy_title"}], False),
+        (True, True, [{"no_filters": ".*", "title": "dummy_title"}], True),
+        (True, True, ["no_dict"], True),
+    ],
 )
-def test_save_variables(
+def test_save_results(
     mock_output_manager: OutputManager,
     output_manager_original_method_states: Dict[str, Callable],
     exclude_info_maps: bool,
     produce_graphics: bool,
+    filter_content: List[Dict[str, str]],
+    is_faulty: bool,
 ) -> None:
     # Arrange
     mock_output_manager.variables_pool = {}
     mock_output_manager._generate_file_name = MagicMock(return_value="dummy_name")
     mock_output_manager._load_filter_file_content = MagicMock(
-        return_value=[{"filters": ".*", "title": "dummy_title"}]
+        return_value=filter_content
     )
-    mock_output_manager._list_txt_and_json_files_in_dir = MagicMock(
+    mock_output_manager._list_filter_files_in_dir = MagicMock(
         return_value=[
             "csv_input_filepath1.txt",
             "graph_input_filepath2.txt",
@@ -1753,44 +1768,53 @@ def test_save_variables(
     )
     mock_output_manager._exclude_info_maps = MagicMock(return_value={})
     mock_output_manager._route_save_functions = MagicMock()
+    mock_output_manager.add_error = MagicMock()
 
     # Act
-    mock_output_manager.save_variables(
+    mock_output_manager.save_results(
         "save_path", "filters_path", exclude_info_maps, produce_graphics, "graphics_dir"
     )
 
     # Assert
-    if exclude_info_maps:
-        mock_output_manager._exclude_info_maps.assert_has_calls([call({}), call({})])
-    else:
+    if is_faulty:
         mock_output_manager._exclude_info_maps.assert_not_called()
-    mock_output_manager._route_save_functions.assert_has_calls(
-        [
-            call(
-                "csv_input_filepath1.txt",
-                "save_path",
-                {},
-                produce_graphics,
-                {"filters": ".*", "title": "dummy_title"},
-                "graphics_dir",
-            ),
-            call(
-                "graph_input_filepath2.txt",
-                "save_path",
-                {},
-                produce_graphics,
-                {"filters": ".*", "title": "dummy_title"},
-                "graphics_dir",
-            ),
-        ]
-    )
+        mock_output_manager._route_save_functions.assert_not_called()
+        assert mock_output_manager.add_error.call_count == 2
+    else:
+        mock_output_manager.add_error.assert_not_called()
+        if exclude_info_maps:
+            mock_output_manager._exclude_info_maps.assert_has_calls(
+                [call({}), call({})]
+            )
+        else:
+            mock_output_manager._exclude_info_maps.assert_not_called()
+        mock_output_manager._route_save_functions.assert_has_calls(
+            [
+                call(
+                    "csv_input_filepath1.txt",
+                    "save_path",
+                    {},
+                    produce_graphics,
+                    {"filters": ".*", "title": "dummy_title"},
+                    "graphics_dir",
+                ),
+                call(
+                    "graph_input_filepath2.txt",
+                    "save_path",
+                    {},
+                    produce_graphics,
+                    {"filters": ".*", "title": "dummy_title"},
+                    "graphics_dir",
+                ),
+            ]
+        )
 
     # Restore original method
-    mock_output_manager.save_variables = output_manager_original_method_states[
-        "save_variables"
+    mock_output_manager.save_results = output_manager_original_method_states[
+        "save_results"
     ]
-    mock_output_manager._list_txt_and_json_files_in_dir = (
-        output_manager_original_method_states["_list_txt_and_json_files_in_dir"]
+    mock_output_manager._list_filter_files_in_dir = (
+        output_manager_original_method_states["_list_filter_files_in_dir"]
     )
     mock_output_manager._generate_file_name = output_manager_original_method_states[
         "_generate_file_name"
@@ -1804,6 +1828,7 @@ def test_save_variables(
     mock_output_manager._route_save_functions = output_manager_original_method_states[
         "_route_save_functions"
     ]
+    mock_output_manager.add_error = output_manager_original_method_states["add_error"]
 
 
 def test_route_save_functions_csv(
@@ -1865,6 +1890,7 @@ def test_route_save_functions_graph(
         "RUFAS.graph_generator.GraphGenerator.generate_graph"
     ) as mock_generate_graph:
         mock_output_manager.add_warning = MagicMock()
+        mock_output_manager.add_error = MagicMock()
         graph_data = {"filters": ".*", "other keys": "other values"}
         mock_output_manager._route_save_functions(
             "graph_file",
@@ -1889,7 +1915,11 @@ def test_route_save_functions_graph(
             graph_data,
             "graphics_dir",
         )
-        assert mock_output_manager.add_warning.call_count == 1
+        mock_output_manager.add_warning.assert_called_once_with(
+            "No Graphics",
+            "Graphic generation is disabled, skipping filter_file='graph_file'",
+            {"class": "OutputManager", "function": "_route_save_functions"},
+        )
         mock_generate_graph.assert_called_once_with(
             {"key": {"var": "value"}},
             graph_data,
@@ -1898,12 +1928,28 @@ def test_route_save_functions_graph(
             "graphics_dir",
         )
 
-        mock_output_manager._route_save_functions = (
-            output_manager_original_method_states["_route_save_functions"]
+        mock_generate_graph.side_effect = Exception("test exception")
+        mock_output_manager._route_save_functions(
+            "graph_file",
+            "save_path",
+            {"key": {"var": "value"}},
+            True,
+            graph_data,
+            "graphics_dir",
         )
-        mock_output_manager.add_warning = output_manager_original_method_states[
-            "add_warning"
-        ]
+        mock_output_manager.add_error.assert_called_once_with(
+            "graph generation exception",
+            "test exception",
+            {"class": "OutputManager", "function": "_route_save_functions"},
+        )
+
+    mock_output_manager._route_save_functions = output_manager_original_method_states[
+        "_route_save_functions"
+    ]
+    mock_output_manager.add_warning = output_manager_original_method_states[
+        "add_warning"
+    ]
+    mock_output_manager.add_error = output_manager_original_method_states["add_error"]
 
 
 class DummyClass:
@@ -1964,6 +2010,43 @@ def test_make_serializable_recursive(
 
     # Assert
     assert result == expected_output
+
+
+def test_load_variables_pool_from_file_valid_path(mock_output_manager: OutputManager,
+                                                  output_manager_original_method_states: Dict[str, Callable],
+                                                  ) -> None:
+    """Checks that load_variables_pool_from_file loads the valid filepath provided to the OM variables pool"""
+    dummy_data = {"vars": {"var1": {"values": [1, 2, 3], "info_map": {"imvar1": 1, "imvar2": 2}},
+                           "var2": {"values": {"a": 1, "b": 2}, "info_map": {}}}}
+    with patch('builtins.open', mock_open(read_data=json.dumps(dummy_data))):
+        mock_output_manager.load_variables_pool_from_file(Path("path/to/file"))
+        assert mock_output_manager.variables_pool == dummy_data
+
+    mock_output_manager.load_variables_pool_from_file = output_manager_original_method_states[
+        "load_variables_pool_from_file"
+    ]
+
+
+@patch("builtins.open", new_callable=mock_open)
+def test_load_variables_pool_from_file_raises_exception(mock_file: MagicMock,
+                                                        mock_output_manager: OutputManager,
+                                                        output_manager_original_method_states: Dict[str, Callable],
+                                                        ) -> None:
+    """Checks that load_variables_pool_from_file raises exceptions with a bad filepath provided"""
+    mock_file.side_effect = FileNotFoundError
+    with pytest.raises(FileNotFoundError):
+        mock_output_manager.load_variables_pool_from_file(Path("bad/file/path"))
+        assert mock_output_manager.variables_pool == {}
+
+    mock_file.return_value.read.return_value = "this is not valid JSON"
+    with patch('builtins.open', mock_open(read_data="bad/file/path")):
+        with pytest.raises(json.JSONDecodeError):
+            mock_output_manager.load_variables_pool_from_file(Path("bad/file/path.json"))
+            assert mock_output_manager.variables_pool == {}
+
+    mock_output_manager.load_variables_pool_from_file = output_manager_original_method_states[
+        "load_variables_pool_from_file"
+    ]
 
 
 @pytest.mark.parametrize(
