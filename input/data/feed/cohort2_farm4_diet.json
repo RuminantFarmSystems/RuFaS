@@ -4,6 +4,7 @@
     216
   ],
   "growing_feeds": [
+    ???,
     32,
     36,
     44,
@@ -11,11 +12,11 @@
     51,
     66,
     89,
-    91, 
-    234,
-    301
+    91,
+    300
   ],
   "close_up_feeds": [
+    ???,
     32,
     36,
     44,
@@ -23,10 +24,10 @@
     51,
     66,
     89,
-    234,
-    301
+    300
   ],
   "lac_cow_feeds": [
+    ???,
     32,
     36,
     44,
@@ -34,8 +35,7 @@
     51,
     66,
     97,
-    234,
-    301
+    300
   ],
   "purchased_feeds": [
     {
@@ -56,7 +56,7 @@
     },
     {
       "purchased_feed": 51,
-      "purchased_feed_cost": 0.01
+      "purchased_feed_cost": 0.001
     },
     {
       "purchased_feed": 66,
@@ -83,11 +83,7 @@
       "purchased_feed_cost": 0.44
     },
     {
-      "purchased_feed": 234,
-      "purchased_feed_cost": 0.1
-    },
-    {
-      "purchased_feed": 301,
+      "purchased_feed": 300,
       "purchased_feed_cost": 0.1
     }
   ],
@@ -96,26 +92,26 @@
   ],
   "storage_options": [
     {
-      "storage_type": "Bunker Silo",
-      "moisture": "Direct Cut",
+      "storage_type": "bunker",
+      "moisture": "direct_cut",
       "additive": "preservative",
-      "packing_density": 800,
-      "inoculation": "None",
-      "bunk_type": "Concrete",
-      "ventilation": false,
-      "removal_rate": 0.2,
-      "initial_dry_matter": 29 
+      "packing_density": 14,
+      "inoculation": "heterofermentative",
+      "bunk_type": "open_floor",
+      "ventilation": true,
+      "removal_rate": 6,
+      "initial_dry_matter": 0
     },
     {
-      "storage_type": "Bunker Silo",
-      "moisture": "Haylage",
+      "storage_type": "bunker",
+      "moisture": "direct_cut",
       "additive": "preservative",
-      "packing_density": 800,
-      "inoculation": "None",
-      "bunk_type": "Concrete",
-      "ventilation": false, 
-      "removal_rate": 0.3,
-      "initial_dry_matter": 38
+      "packing_density": 14,
+      "inoculation": "heterofermentative",
+      "bunk_type": "open_floor",
+      "ventilation": true,
+      "removal_rate": 6,
+      "initial_dry_matter": 0
     }
   ],
   "user_defined_ration_percentages": {
@@ -130,6 +126,10 @@
       }
     ],
     "growing": [
+      {
+        "feed_type": ???,
+        "ration_percentage": 5.3
+      },
       {
         "feed_type": 32,
         "ration_percentage": 3.4
@@ -163,16 +163,16 @@
         "ration_percentage": 31.8
       },
       {
-        "feed_type": 234,
+        "feed_type": 300,
         "ration_percentage": 1.2
-      },
-      {
-        "feed_type": 301,
-        "ration_percentage": 5.3
       }
      
     ],
     "close_up": [
+      {
+        "feed_type": ???,
+        "ration_percentage": 3.2
+      },
       {
         "feed_type": 32,
         "ration_percentage": 2.1
@@ -202,15 +202,15 @@
         "ration_percentage": 18.5
       },
       {
-        "feed_type": 234,
+        "feed_type": 300,
         "ration_percentage": 0.9
-      },
-      {
-        "feed_type": 301,
-        "ration_percentage": 3.2
       }
     ],
     "lac_cow": [
+      {
+        "feed_type": ???,
+        "ration_percentage": 6.7
+      },
       {
         "feed_type": 32,
         "ration_percentage": 4.3
@@ -240,15 +240,11 @@
         "ration_percentage": 31.9
       },
       {
-        "feed_type": 234,
+        "feed_type": 300,
         "ration_percentage": 0.6
-      },
-      {
-        "feed_type": 301,
-        "ration_percentage": 6.7
       }
     ],
     "tolerance": 0.1,
-    "milk_reduction_maximum": 20 
+    "milk_reduction_maximum": 0.50
   }
 }
