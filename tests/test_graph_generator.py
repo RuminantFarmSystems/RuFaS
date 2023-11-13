@@ -10,7 +10,7 @@ from RUFAS.graph_generator import GraphGenerator, TUPLE_BASED_FUNCTIONS
 
 @pytest.fixture
 def graph_generator() -> GraphGenerator:
-    return GraphGenerator()
+    return GraphGenerator("metadata_name")
 
 
 def test_save_graph_successful(graph_generator: GraphGenerator) -> None:
@@ -29,7 +29,7 @@ def test_save_graph_successful(graph_generator: GraphGenerator) -> None:
         with patch(
             "RUFAS.graph_generator.GraphGenerator._generate_graph_path"
         ) as mock_generate_graph_path:
-            mock_generate_graph_path.return_value = "graph_path"
+            mock_generate_graph_path.return_value = Path("graph_path")
 
             result = graph_generator._save_graph(
                 graph_details, filter_file_name, save_path, graphics_dir
@@ -95,7 +95,7 @@ def test_generate_graph_path_with_title(graph_generator: GraphGenerator) -> None
             )
             mock_mkdir.assert_called_once()
             assert result == Path(
-                r"/path/to/save/graphics/test-graph-13-Oct-2023_Fri_11-41-23.png"
+                r"/path/to/save/graphics/metadata_name_test-graph-13-Oct-2023_Fri_11-41-23.png"
             )
 
 
@@ -115,7 +115,7 @@ def test_generate_graph_path_no_title(graph_generator: GraphGenerator) -> None:
             )
             mock_mkdir.assert_called_once()
             assert result == Path(
-                r"/path/to/save/graphics/saved_graph_test_filter.png-13-Oct-2023_Fri_11-41-23.png"
+                r"/path/to/save/graphics/metadata_name_test_filter.png-13-Oct-2023_Fri_11-41-23.png"
             )
 
 
