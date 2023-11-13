@@ -1,17 +1,20 @@
 # !/usr/bin/env python3
 
+import random
 import sys
 import time as timer
-
-from RUFAS import routines
-from RUFAS.classes import Config, State, Weather, Time
-from RUFAS.output_manager import OutputManager
-from RUFAS.input_manager import InputManager
-from RUFAS.routines.manure.manure_manager import simulate_daily_manure_manager
-import random
-import numpy
 from typing import Optional
 
+import numpy
+
+from RUFAS import routines
+from RUFAS.config import Config
+from RUFAS.state import State
+from RUFAS.weather import Weather
+from RUFAS.time import Time
+from RUFAS.input_manager import InputManager
+from RUFAS.output_manager import OutputManager
+from RUFAS.routines.manure.manure_manager import simulate_daily_manure_manager
 
 om = OutputManager()
 im = InputManager()
@@ -33,7 +36,7 @@ class SimulationEngine:
         self._run_simulation_main_loop()
         t_end_sim = timer.time()
 
-        sys.stdout.write("\nSimulation Successful\n")
+        sys.stdout.write("\nSimulation Successful\n\n")
         total_simulation_time = t_end_sim - t_start_sim
         total_simulation_time_log = f"Total simulation time is: {total_simulation_time}"
         om.add_log("total_simulation_time",
@@ -54,6 +57,9 @@ class SimulationEngine:
             self.state.manure_manager, self.state.animal_manager)
         self.state.field_manager.daily_update_routine(self.weather, self.time)
         routines.daily_feed_routine(self.state.feed, self.state.field_manager, self.state.animal_manager)
+
+        self.time.record_time()
+        self.weather.record_weather(self.time)
 
         self._advance_time()
 
@@ -115,7 +121,7 @@ class SimulationEngine:
         """
         data_config = im.get_data('config')
         data_weather = im.get_data('weather')
-        self.config = Config(data_config, data_weather)
+        self.config = Config(data_config)
 
         if self.config.set_seed:
             random.seed(self.config.seed)

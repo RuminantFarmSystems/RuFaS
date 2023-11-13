@@ -21,6 +21,8 @@ from statistics import mean
 from typing import Any, Dict, Tuple, List, Set
 
 from RUFAS.general_constants import GeneralConstants
+from RUFAS.time import Time
+from RUFAS.weather import Weather
 from RUFAS.output_manager import OutputManager
 from RUFAS.routines.animal.animal_grouping_scenarios import AnimalGroupingScenario
 from RUFAS.routines.animal.animal_types import AnimalType
@@ -44,7 +46,7 @@ from RUFAS.routines.animal.ration import user_defined_ration as udr
 om = OutputManager()
 
 
-def daily_animal_routine(animal_manager, feed, weather, time):
+def daily_animal_routine(animal_manager, feed, weather: Weather, time: Time):
     """
     Executes daily routines relating to Animals. This method is called every day
     in the simulation and calls @animal_manager's daily_updates() method
@@ -54,8 +56,8 @@ def daily_animal_routine(animal_manager, feed, weather, time):
     Args:
         animal_manager: instance of the AnimalManager class
         feed: instance of the Feed class
-        weather: instance of the Weather class as defined in classes.py
-        time: instance of the Time class as defined in classes.py
+        weather: instance of the Weather class
+        time: instance of the Time class
     """
 
     animal_manager.daily_updates(feed, weather, time)
@@ -113,7 +115,7 @@ class AnimalManager:
         config.update(data['from_literature']['life_cycle'])
         return config
 
-    def __init__(self, data, config, feed, weather, time):
+    def __init__(self, data, config, feed, weather: Weather, time: Time):
         """
         Initializes the pens and animals in the simulation with data from the
         JSON file by calling init_pens() and init_animals(). Creates instance
@@ -264,8 +266,7 @@ class AnimalManager:
         are calculated and the animals are allocated to pens.
 
         Args:
-            config: an instance of the Config class defined in classes.py
-                contains model configuration information
+            config: an instance of the Config class contains model configuration information
             herd_data: dictionary containing information about the herd
         """
 
@@ -309,7 +310,7 @@ class AnimalManager:
                        "simulate_animals is true",
                        info_map)
 
-    def init_nutrient_rqmts(self, weather, time, feed):
+    def init_nutrient_rqmts(self, weather: Weather, time: Time, feed):
         """
         Calculates initial nutrient requirements at the beginning of the
         simulation for initial pen allocation. For the nutrient requirements
@@ -318,15 +319,16 @@ class AnimalManager:
 
         Args:
             feed: an instance of the Feed class defined in feed.py
-            weather: instance of the Weather class defined in classes.py
-            time: instance of the Time class defined in classes.py
+            weather: instance of the Weather class
+            time: instance of the Time class
         """
 
         # average vertical & horizontal distance (VD, HD) of pens to the
         # milking parlor
         # avg_VD_parlor, avg_HD_parlor = self.avg_pen_dist()
+        current_conditions = weather.get_current_day_conditions(time)
+        temp = current_conditions.mean_air_temperature
         for calf in self.calves:
-            temp = weather.T_avg[time.year - 1][time.day - 1]
             calf.calc_nutrient_rqmts(feed, temp)
             calf.p_animal = 0.0072 * calf.body_weight * 1000
 
@@ -1591,7 +1593,7 @@ class AnimalManager:
                                                  self.phosphorus_concentration_by_animal_class[type(animal)])
         self.animal_to_pen_id_map[animal.id] = pen_with_min_stocking_density.id
 
-    def daily_updates(self, feed, weather, time):
+    def daily_updates(self, feed, weather: Weather, time: Time):
         """
         Execute the daily routines relating to Animals. All animals are
         updated through the life_cycle_manager's daily_update() method. The
@@ -1607,15 +1609,16 @@ class AnimalManager:
         feed
             instance of the Feed class defined in feed.py
         weather
-            instance of the Weather class defined in classes.py
+            instance of the Weather class
         time
-            instance of the Time class defined in classes.py
+            instance of the Time class
 
         """
         if self.simulate_animals:
             if self.end_ration_interval():
                 self.reset_milk_production_reduction()
-            temp = weather.T_avg[time.year - 1][time.day - 1]
+            current_conditions = weather.get_current_day_conditions(time)
+            temp = current_conditions.mean_air_temperature
             animals_snapshot_before_update = self._get_animals_snapshot()
 
             animals_added, animals_removed, calves_born, *rest = \
@@ -1637,6 +1640,17 @@ class AnimalManager:
             )
 
             self._handle_newly_added_animals([*animals_added, *calves_born], feed, temp)
+
+            info_map = {"class": self.__class__.__name__, "function": self.daily_updates.__name__}
+            om.add_variable('sim_day', self.simulation_day, info_map)
+            om.add_variable('num_animals', len(self.calves) + len(self.heiferIs) + len(self.heiferIIs) +
+                            len(self.heiferIIIs) + len(self.cows), info_map)
+            om.add_variable('num_calves', len(self.calves), info_map)
+            om.add_variable('num_heiferIs', len(self.heiferIs), info_map)
+            om.add_variable('num_heiferIIs', len(self.heiferIIs), info_map)
+            om.add_variable('num_heiferIIIs', len(self.heiferIIIs), info_map)
+            om.add_variable('num_lactating_cows', len([cow for cow in self.cows if cow.is_lactating]), info_map)
+            om.add_variable('num_dry_cows', len([cow for cow in self.cows if not cow.is_lactating]), info_map)
 
             for pen in self.all_pens:
                 pen.classes_in_pen = self._get_classes_in_pen(pen)

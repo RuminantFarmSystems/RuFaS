@@ -1,6 +1,6 @@
 from RUFAS.routines.field.manager.field_manager import FieldManager
 from RUFAS.routines.field.manager.crop_schedule import CropSchedule
-from RUFAS.routines.field.manager.current_weather import CurrentWeather
+from RUFAS.current_day_conditions import CurrentDayConditions
 from RUFAS.routines.field.manager.fertilizer_schedule import FertilizerSchedule
 from RUFAS.routines.field.manager.manure_schedule import ManureSchedule
 from RUFAS.routines.field.manager.tillage_schedule import TillageSchedule
@@ -9,10 +9,13 @@ from RUFAS.routines.field.field.field import Field
 from RUFAS.routines.field.soil.layer_data import LayerData
 from RUFAS.routines.field.soil.soil import Soil
 from RUFAS.routines.field.soil.soil_data import SoilData
-from RUFAS.classes import Time, Weather
+from RUFAS.config import Config
+from RUFAS.time import Time
+from RUFAS.weather import Weather
 from RUFAS.routines.manure.manure_manager import ManureManager
 import pytest
-from typing import List, Dict
+from pytest_mock.plugin import MockerFixture
+from typing import List, Dict, Callable
 from unittest.mock import MagicMock, patch, call
 
 
@@ -39,89 +42,23 @@ def test_field_manager_init(field_blob_names) -> None:
             patched_field_setup.assert_not_called()
 
 
-@pytest.mark.parametrize("year,day,expected", [
-    (1, 3, CurrentWeather(incoming_light=3, min_air_temperature=3, mean_air_temperature=3, max_air_temperature=3,
-                          annual_mean_air_temperature=2.1, precipitation=3, irrigation=3, daylength=15.5)),
-    (2, 1, CurrentWeather(incoming_light=4, min_air_temperature=4, mean_air_temperature=4, max_air_temperature=4,
-                          annual_mean_air_temperature=2.1, precipitation=4, irrigation=4, daylength=15.5)),
-    (3, 2, CurrentWeather(incoming_light=8, min_air_temperature=8, mean_air_temperature=8, max_air_temperature=8,
-                          annual_mean_air_temperature=2.1, precipitation=8, irrigation=8, daylength=15.5))
-])
-def test_create_current_weather(year: int, day: int, expected: CurrentWeather) -> None:
-    """Tests that current weather objects are correctly created from a time and weather object."""
-    weather = MagicMock()
-    setattr(weather, "radiation", [[1, 2, 3], [4, 5, 6], [7, 8, 9]])
-    setattr(weather, "T_min", [[1, 2, 3], [4, 5, 6], [7, 8, 9]])
-    setattr(weather, "T_avg", [[1, 2, 3], [4, 5, 6], [7, 8, 9]])
-    setattr(weather, "T_max", [[1, 2, 3], [4, 5, 6], [7, 8, 9]])
-    setattr(weather, "T_avg_annual", 2.1)
-    setattr(weather, "rainfall", [[1, 2, 3], [4, 5, 6], [7, 8, 9]])
-    setattr(weather, "irrigation", [[1, 2, 3], [4, 5, 6], [7, 8, 9]])
-    CurrentWeather.determine_daylength = MagicMock(return_value=15.5)
-    time = MagicMock()
-    setattr(time, "year", year)
-    setattr(time, "day", day)
+@pytest.fixture
+def mock_weather(mocker: MockerFixture) -> Weather:
+    """Fixture for Weather object."""
+    mocker.patch("RUFAS.weather.Weather.__init__", return_value=None)
 
-    actual = FieldManager._create_current_weather(weather, time, 4)
+    mock_config = MagicMock(Config)
 
-    assert actual == expected
-    CurrentWeather.determine_daylength.assert_called_once()
+    mock_weather = Weather({}, mock_config)
+    return mock_weather
 
 
-@pytest.mark.parametrize("year, day, snow_fall, rainfall, expected", [
-    (1, 1, 0, 1, CurrentWeather(incoming_light=1, min_air_temperature=1, mean_air_temperature=1, max_air_temperature=1,
-                                annual_mean_air_temperature=1, precipitation=1, irrigation=1,
-                                daylength=8.5)),
-    (1, 2, 0, 2, CurrentWeather(incoming_light=1, min_air_temperature=1, mean_air_temperature=0, max_air_temperature=1,
-                                annual_mean_air_temperature=1, precipitation=2, irrigation=1,
-                                daylength=8.5)),
-    (1, 3, 3, 0, CurrentWeather(incoming_light=1, min_air_temperature=1, mean_air_temperature=-1, max_air_temperature=1,
-                                annual_mean_air_temperature=1, precipitation=3, irrigation=1,
-                                daylength=8.5))
-])
-def test_current_weather_snowfall(year: int, day: int, snow_fall: int, rainfall: int, expected: CurrentWeather) -> None:
-    weather = MagicMock()
-    setattr(weather, "radiation", [[1, 2, 3]])
-    setattr(weather, "T_min", [[1, 2, 3]])
-    setattr(weather, "T_avg", [[1, 0, -1]])
-    setattr(weather, "T_max", [[1, 2, 3]])
-    setattr(weather, "T_avg_annual", [1])
-    setattr(weather, "rainfall", [[1, 2, 3]])
-    setattr(weather, "irrigation", [[1, 2, 3]])
-    CurrentWeather.determine_daylength = MagicMock(return_value=8.5)
-    time = MagicMock()
-    setattr(time, "year", year)
-    setattr(time, "day", day)
-    assert expected.snow_fall == snow_fall
-    assert expected.rainfall == rainfall
-
-
-@pytest.mark.parametrize("year, day, expected_month", [
-    (2000, 366, 12),  # leap year
-    (2001, 365, 12),  # normal year
-    (2000, 60, 2),
-    (2001, 60, 3)
-])
-def test_date_conversion_month(year: int, day: int, expected_month: int):
-    """Tests that number of days were converted into months correctly"""
-    mocked_time = MagicMock(Time)
-    setattr(mocked_time, "calendar_year", year)
-    setattr(mocked_time, "day", day)
-    assert FieldManager._date_conversion_month(mocked_time) == expected_month
-
-
-@pytest.mark.parametrize("year, day, expected_day", [
-    (2000, 366, 31),  # leap year
-    (2001, 365, 31),  # normal year
-    (2000, 60, 29),
-    (2001, 60, 1)
-])
-def test_date_conversion_day(year: int, day: int, expected_day: int):
-    """Tests that number of days were converted into day of the month correctly"""
-    mocked_time = MagicMock(Time)
-    setattr(mocked_time, "calendar_year", year)
-    setattr(mocked_time, "day", day)
-    assert FieldManager._date_conversion_day(mocked_time) == expected_day
+@pytest.fixture
+def weather_original_method_states(mock_weather: Weather) -> Dict[str, Callable]:
+    """Fixture to store unmocked methods of Weather."""
+    return {
+        "get_current_day_conditions": mock_weather.get_current_day_conditions
+    }
 
 
 @pytest.mark.parametrize("fields", [
@@ -130,23 +67,17 @@ def test_date_conversion_day(year: int, day: int, expected_day: int):
      Field(field_data=FieldData(name="field3"), manure_manager=MagicMock(ManureManager))],
     []
 ])
-def test_daily_update_routine(fields: List[Field]) -> None:
+def test_daily_update_routine(fields: List[Field], mock_weather: Weather,
+                              weather_original_method_states: Dict[str, Callable]) -> None:
     """Tests that the daily routines and it's methods were called and updated correctly"""
     mocked_time = MagicMock(Time)
-    mocked_weather = MagicMock(Weather)
     setattr(mocked_time, "year", 1)
     setattr(mocked_time, "calendar_year", 1998)
     setattr(mocked_time, "year", 1998)
     setattr(mocked_time, "day", 5)
-    setattr(mocked_weather, "radiation", 3)
-    setattr(mocked_weather, "T_min", 3)
-    setattr(mocked_weather, "T_avg", 3)
-    setattr(mocked_weather, "T_max", 3)
-    setattr(mocked_weather, "T_avg_annual", 3)
-    setattr(mocked_weather, "rainfall", 3)
-    setattr(mocked_weather, "irrigation", 3)
 
     mocked_manure_manager = MagicMock(ManureManager)
+    mock_weather.get_current_day_conditions = MagicMock(return_value=MagicMock(CurrentDayConditions))
     with patch("RUFAS.routines.field.manager.field_manager.FieldManager._get_field_blob_names", return_value=[]):
         fm = FieldManager(mocked_manure_manager)
 
@@ -154,12 +85,12 @@ def test_daily_update_routine(fields: List[Field]) -> None:
         for field in fields:
             field.manage_field = MagicMock()
         fm.output_gatherer.send_daily_variables = MagicMock()
-        FieldManager._create_current_weather = MagicMock()
-        fm.daily_update_routine(weather=mocked_weather, time=mocked_time)
+        fm.daily_update_routine(weather=mock_weather, time=mocked_time)
         for field in fields:
             assert field.manage_field.call_count == 1
-        assert FieldManager._create_current_weather.call_count == len(fields)
+        assert mock_weather.get_current_day_conditions.call_count == 1
         assert fm.output_gatherer.send_daily_variables.call_count == 1
+    mock_weather.get_current_day_conditions = weather_original_method_states["get_current_day_conditions"]
 
 
 @pytest.mark.parametrize("fields", [

@@ -823,7 +823,7 @@ class Pen:
         animal_prefix_to_output_data_dict = {
             'pen': {
                 'prefix': f'pen_{self.id}_daily',
-                'manure': self.manure,
+                'manure': None,
             }
         }
 
@@ -832,6 +832,8 @@ class Pen:
                                                                 methane_mitigation_method,
                                                                 methane_mitigation_additive_amount)
             self._update_animal_manure_excretion_data(animal_prefix_to_output_data_dict, prefix, manure, animal)
+
+        animal_prefix_to_output_data_dict['pen']['manure'] = self.manure
 
         for output_data_dict in animal_prefix_to_output_data_dict.values():
             if output_data_dict['manure'] is None:

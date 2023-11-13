@@ -52,7 +52,7 @@
     "NASEM_Comp": {
       "title": "NASEM Comp data",
       "description": "Nutrients!",
-      "path": "input/data/feed/NASEM_comp.csv",
+      "path": "input/data/feed/NASEM_Comp_with_TDN.csv",
       "type": "csv",
       "properties": "NASEM_Comp_properties"
     },
@@ -104,6 +104,20 @@
       "path": "input/data/weather/ARL_weather.csv",
       "type": "csv",
       "properties": "weather_properties"
+    },
+    "feed_quality": {
+      "title": "Feed Quality",
+      "description": "Hows the feed!",
+      "path": "input/data/feed/feed_quality.csv",
+      "type": "csv",
+      "properties": "feed_quality_properties"
+    },
+    "user_feeds": {
+      "title": "User Feed",
+      "description": "Bring the feed!",
+      "path": "input/data/feed/user_feeds.csv",
+      "type": "csv",
+      "properties": "user_feeds_properties"
     }
   },
   "properties": {
@@ -138,10 +152,26 @@
         "minimum": 0,
         "default": 42
       },
+      "set_seed": {
+        "type": "bool",
+        "description": "Whether or not to set random seed",
+        "default": true
+      },
+      "csv_dir": {
+        "type": "string",
+        "description": "The path to where the CSV output files will be saved",
+        "default": "output/CSVs"
+      },
       "simulate_animals": {
         "type": "bool",
         "description": "Whether or not to simulate animals during the simulation",
         "default": true
+      },
+      "nutrient_standard": {
+        "type": "string",
+        "default": "NASEM",
+        "pattern": "(NASEM|NRC)",
+        "description": "The nutrient standard to use for feed."
       }
     },
     "animal_properties": {
@@ -188,6 +218,11 @@
           "type": "bool",
           "default": false,
           "description": "Initialize Herd? -- Whether to re-initialize the animal database, where the herd animals are selected from."
+        },
+        "replace_num": {
+          "type": "number",
+          "default": 5000,
+          "minimum": 0
         },
         "breed": {
           "type": "string",
@@ -255,12 +290,6 @@
             "description": "Number of Times Cows Milked (per day) -- The average or most common number of times the cows are milked, whole numbers 1-3",
             "default": 3,
             "minimum": 0
-          },
-          "energy_and_nutrient_calculation_method": {
-            "type": "string",
-            "default": "NASEM",
-            "pattern": "^(NASEM|NRC)$",
-            "description": "Energy and Nutrient Calculation Method -- The method used to calculate the animal nutrient requirements."
           }
         },
         "farm_level": {
@@ -435,7 +464,7 @@
                 "type": "string",
                 "description": "Cow Presynch Protocol -- The preSynch protocol (1st breeding) for cow in TAI (Timed Artificial Insemination) program",
                 "default": "Double OvSynch",
-                "pattern": "^{Double OvSynch|Presynch|G6G}$"
+                "pattern": "^(Double OvSynch|Presynch|G6G)$"
               },
               "cow_TAI_protocol": {
                 "type": "string",
@@ -773,6 +802,15 @@
                 "maximum": 1
               }
             },
+            "death_cull_prob": {
+              "type": "array",
+              "description": "Culling rate for death",
+              "properties": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1
+              }
+            },
             "cull_day_count": {
               "type": "array",
               "description": "Culling day count",
@@ -802,6 +840,10 @@
           "description": "Methane Mitigation Method -- The type of enteric methane mitigation supplement that is fed to the lactating dairy cattle",
           "default": "None",
           "pattern": "^(None|3-NOP|monensin|essential_oils|seaweed)$"
+        },
+        "methane_mitigation_additive_amount": {
+          "type": "number",
+          "default": 0
         },
         "3-NOP_additive_amount": {
           "type": "number",
@@ -1397,22 +1439,6 @@
           "maximum": 300
         }
       },
-      "feed_database": {
-        "type": "string",
-        "description": "The location of the feed database"
-      },
-      "feeds_table": {
-        "type": "string",
-        "description": "The name of the feeds table in the feed database"
-      },
-      "feed_quality_table": {
-        "type": "string",
-        "description": "The name of the feed quality table in the feed database"
-      },
-      "nutrient_table": {
-        "type": "string",
-        "description": "The name of the nutrient table in the feed database"
-      },
       "storage_options": {
         "type": "array",
         "description": "Storage Options.",
@@ -1569,20 +1595,18 @@
         "description": "Unique integer identifier for feeds used within the RuFaS model.",
         "minimum": 1
       },
-      "feed_name": {
+      "Name": {
         "type": "string",
-        "description": "A general common name for the feed as defined within RuFaS.",
-        "pattern": "(ALFALFA|ALMOND|Ammonium Chloride|Ammonium phosphate (monobasic)|Ammonium Phosphate, dibasic|Ammonium Sulfate|APPLE|BAKERY BYPRODUCT|BARLEY|BEET, SUGAR|BERMUDAGRASS|BLOOD|Bone Meal|BREWERS GRAINS|BREWERS YEAST|Calcium carbonate|Calcium Choride dihydrate|Calcium Choride,anhydrous|Calcium hydroxide|Calcium iodate|Calcium oxide|Calcium Phosphate monobasic|Calcium Sulfate, dihydrate|Calf grower 14CP (Fed to calves only)|Calf grower 16CP (Fed to calves only)|Calf starter 18CP high starch (Fed to calves only)|Calf starter 18CP low starch (Fed to calves only)|Calf starter 22CP high starch (Fed to calves only)|Calf starter 22CP med starch (Fed to calves only)|CANDY|CANOLA|Casein|CHOCOLATE|CITRUS|Cobalt carbonate|Cobalt carbonate (6H2O)|Cobalt chloride (6H2O)|Cobalt organic generic|Cobalt sulfate (7H2O)|Copper chloride (2H2O)|Copper organic, generic|Copper oxide|Copper sulfate (5H2O)|CORN, YELLOW|COTTON SEED|DESTILLERY BYPRODUCT|Dicalcium Phosphate, dibasic|EDDI|FATS AND OILS|FEATHERS|Ferrous carbonate|Ferrous sulfate (7H2O)|Ferrous sulfate (H2O)|FISH BYPRODUCTS|FRUIT AND VEGETABLE|GLYCEROL|GRAIN SCREENINGS|GRASSES, COOL SEASON|GRASS-Legume MIXTURES Pr. GR.   (17-22% Hcel.)|Grass-LEGUME MIXTURES Pr. LG. (10-13% HCEL.)|Iron oxide|Iron, organic generic|LEGUMES, FORAGE|Limestone, dolomite|Limestone, ground|LINSEED (FLAX)|LINSEED (FLAXSEED)|Magnesium carbonate|Magnesium Chloride, Hexahydrate|Magnesium hydroxide|Magnesium Oxide|Magnesium sulfate (7H2O)|Manganese carbonate|Manganese chloride|Manganese chloride (4H2O)|Manganese organic generic|Manganese oxide|Manganese sulfate (5H2O)|Manganese sulfate (H2O)|MEAT|MILK|Milk Replacer|Milk replacer 20 CP 20 fat|Milk replacer 26 CP 17 fat|MILLET|Mixed grass-legume (12-15% Hcel.)|MOLASSES|OATS|Oystershell|PEANUT|PEAS|Phosphate rock|Phosphate, Curacao|Phosphate, defluorinated|Phosphoric acid|PINEAPPLE|Potassium bicarbonate|Potassium carbonate|Potassium Chloride|Potassium iodide|Potassium Sulfate|POTATO|POULTRY|RICE|RUMEN PROTECTED AA|RYE, ANNUAL|SAFFLOWER|Selenate, sodium (10 H2O)|Selenite, sodium|Selenium yeast, generic|Skim milk, fresh|Sodium Bicarbonate|Sodium carbonate (H2O)|Sodium Choride|Sodium Phosphate, Monohydrate|Sodium sesquicarbonate (2H2O)|Sodium Sulfate decahydrate|Sodium tripolyphosphate|SORGHUM, GRAIN TYPE|SORGHUM, SUDAN TYPE|SOYBEAN|SPELT|SUDAN GRASS|SUGAR|SUGARCANE|SUNFLOWER|SWEET CORN|TAPIOCA|TOMATO|TRITICALE|UREA|Vit A premix|Vit D premix|Vit E premix|VitTM Premix, generic|WHEAT|WHEY|Whole Milk|Zinc carbonate|Zinc chloride|Zinc oxide|Zinc sulfate (H2O)|Zinc, organic generic)"
+        "description": "A general common name for the feed as defined within RuFaS."
       },
       "feed_description": {
         "type": "string",
-        "description": "A more specific description of the feed that uniquely distinguishes it from other feeds with a similar or same name.",
-        "pattern": "((NH4)2SO4|(NH4)H2PO4|Anchovy, meal, mech.|Arg|Bagasse, hay|Bagasse, silage|Barley hay|Beet sugar|Bran|Bran, deffated|Bread, waste|Byproduct|Byproduct meal|Byproduct, wet|Ca(H2PO4)2|Ca(OH)2|CaCl2|CaCl2.2H2O|CaCO3|CaHPO4|Calcium soaps|Cannery waste|CaO|Casein|CaSO4.2H2O|Cassava|Cereal byproduct|Cobs|Cookie byproduct|Corn grain dry, fine grind|Corn silage, immature|Corn silage, mature|Corn silage, mid maturity|Corn stalks, ensiled, high DM|Corn stalks, ensiled, low DM|Corn, ear w husk, stlk, hi fbr|Corn, ear, huks, stlk, low fbr|DDGS, high fat|DDGS, high protein|DDGS, low fat|Delactosed|DGS modified|DGS wet|Distillers solubles|Dried|Dry, cattle|Fat, canola oil|Fat, corn oil|Fat, cottonseed oil|Fat, flaxseed oil|Fat, lard|Fat, safflower oil|Fat, soybean oil|Fat, sunflower oil|forage silage, immature|Fresh, immature|Fresh, mid-maturity|Germ|Germ meal|Gin trash|Gluten feed, dried|Gluten feed, wet|Gluten meal, dried|Glycerol|Grain|Grain and cob, dry, ground|Grain and cob, high moisture, ground|Grain, cracked, dry|Grain, dry rolled|Grain, ground, dry|Grain, ground, high moisture|Grain, rolled|Grain, rolled, high moisture|Grain, steam-flaked|Grain, steam-rolled|Grower|Hay|Hay, all samples|Hay, headed|Hay, immature|Hay, mature|Hay, mid mature|Hay, mid maturity|Hay, mid-maturity|Hay, vegetative|High protein, byproduct|His|Hominy feed|Hulls|Hydrolyzed meal|Hydrolyzed meal with some viscera|Hydrolyzed tallow fatty acids|Ile|K2SO4|KCl|Leu|Lys|Malt sprouts|Meal|Meal, expellers|Meal, extruded|Meal, high dRUP|Meal, low dRUP|Meal, nonenzymatically browned|Meal, rendered|Meal, solvent|Meal, solvent, 44% CP|Meal, solvent, 48% CP|Meat and bone, rendered|Menhaden, meal, mech.|Met|MgCl2.6H2O|MgO|Middlings|Milk Replacer|Mineral|NA|Na2SO4.10H2O|NaCl|NaH2PO4.H2O|NaHCO3|Not chocolate, byproduct|Oil seeds, whole|Partially hydrogenated tallow|Pasture|Pasture, intensively managed|Peanuts|Peas|Permeate|Phe|Plus pea silage|Pomace|Pomace, wet|Protein concentrate|Pulp dried|Pulp dried, molasses added|Pulp wet|Replacer|Seed|Seeds, whole|Seeds, whole roasted|Silage|Silage, all samples|Silage, early head|Silage, early maturity|Silage, headed|Silage, headed (mature)|Silage, immature|Silage, mature|Silage, mid maturity|Silage, mid-maturity|Silage, vegetative|Silage, vegetative (mature)|Skim, dried powder|Skimmed|Skins|Sorghum soybean,silage|Source unknown|Starter|Steamed|Straw|Sugar|Sugarcane|Tallow|Thr|Tifton-85, hay, 3-4wk growth|Trp|Urea|Val|Vegetable oil|Vitamins|Wet|Wet, cattle|Whole|Whole Milk)"
+        "description": "A more specific description of the feed that uniquely distinguishes it from other feeds with a similar or same name."
       },
       "feed_type": {
         "type": "string",
         "description": "The general type or category of the feed (group).",
-        "pattern": "(Aminoacids|Forage|Conc|Milk|Mineral|Vitamins)"
+        "pattern": "(Aminoacids|Forage|Conc|Milk|Mineral|Vitamins|Starter)"
       },
       "units": {
         "type": "string",
@@ -1599,7 +1623,7 @@
       "feed_type": {
         "type": "string",
         "description": "The general type or category of the feed.",
-        "pattern": "^(Aminoacids|Forage|Conc|Milk|Mineral|Vitamins)$"
+        "pattern": "^(Aminoacids|Forage|Conc|Milk|Mineral|Vitamins|Starter|No)$"
       },
       "DM": {
         "type": "number",
@@ -1617,139 +1641,162 @@
         "type": "number",
         "description": "Neutral detergent insoluble nitrogen multiplied by 6.25 (% DM).",
         "minimum": 0,
-        "maximum": 12
+        "maximum": 12,
+        "default": 0
       },
       "ADICP": {
         "type": "number",
         "description": "Acid detergent insoluble nitrogen multiplied by 6.25 (% DM).",
         "minimum": 0,
-        "maximum": 8
+        "maximum": 8,
+        "default": 0
       },
       "EE": {
         "type": "number",
         "description": "Ether extract (% DM).",
         "minimum": 0,
-        "maximum": 100
+        "maximum": 100,
+        "default": 0
       },
       "NDF": {
         "type": "number",
         "description": "Neutral detergent fiber (% DM).",
         "minimum": 0,
-        "maximum": 85
+        "maximum": 85,
+        "default": 0
       },
       "ADF": {
         "type": "number",
         "description": "Acid detergent fiber (% DM)",
         "minimum": 0,
-        "maximum": 66
+        "maximum": 66,
+        "default": 0
       },
       "lignin": {
         "type": "number",
         "description": "Acid detergent lignin (% DM).",
         "minimum": 0,
-        "maximum": 25
+        "maximum": 25,
+        "default": 0
       },
       "ash": {
         "type": "number",
         "description": "Ash contents (% DM) ",
         "minimum": 0,
-        "maximum": 100
+        "maximum": 100,
+        "default": 0
       },
       "non_fiber_carb": {
         "type": "number",
         "description": "Non fiber carbohydrates (% DM).",
         "minimum": 0,
-        "maximum": 100
+        "maximum": 100,
+        "default": 0
       },
       "PAF": {
         "type": "number",
         "description": "Processing adjustment factor.",
         "minimum": 0.87,
-        "maximum": 1.04
+        "maximum": 1.04,
+        "default": 0
       },
       "TDN": {
         "type": "number",
         "description": "Total digestible nutrients (% DM).",
         "minimum": 0,
-        "maximum": 184
+        "maximum": 184,
+        "default": 0
       },
       "N_A": {
         "type": "number",
         "description": "Nitrogen Fraction A (% CP).",
         "minimum": 0,
-        "maximum": 100
+        "maximum": 100,
+        "default": 0
       },
       "N_B": {
         "type": "number",
         "description": "Nitrogen Fraction B (% CP).",
         "minimum": 0,
-        "maximum": 100
+        "maximum": 100,
+        "default": 0
       },
       "N_C": {
         "type": "number",
         "description": "Nitrogen Fraction C (% CP).",
         "minimum": 0,
-        "maximum": 100
+        "maximum": 100,
+        "default": 0
       },
       "Kd": {
         "type": "number",
         "description": "Feed degradation rate of B fraction (% h).",
         "minimum": 0,
-        "maximum": 30
+        "maximum": 30,
+        "default": 0
       },
       "dRUP": {
         "type": "number",
         "description": "Digested rumen undegradable protein (% of RUP).",
         "minimum": 0,
-        "maximum": 100
+        "maximum": 100,
+        "default": 0
       },
       "calcium": {
         "type": "number",
         "description": "Calcium (% DM).",
         "minimum": 0,
-        "maximum": 72
+        "maximum": 72,
+        "default": 0
       },
       "phosphorus": {
         "type": "number",
         "description": "Phosphorus (% DM).",
         "minimum": 0,
-        "maximum": 32
+        "maximum": 32,
+        "default": 0
       },
       "magnesium": {
         "type": "number",
         "description": "Magnesium (% DM).",
         "minimum": 0,
-        "maximum": 57
+        "maximum": 57,
+        "default": 0
       },
       "potassium": {
         "type": "number",
         "description": "Potassium (% DM).",
         "minimum": 0,
-        "maximum": 57
+        "maximum": 57,
+        "default": 0
       },
       "sodium": {
         "type": "number",
         "description": "Sodium (% DM).",
         "minimum": 0,
-        "maximum": 40
+        "maximum": 40,
+        "default": 0
       },
       "chlorine": {
         "type": "number",
         "description": "Chlorine (% DM).",
         "minimum": 0,
-        "maximum": 67
+        "maximum": 67,
+        "default": 0
       },
       "sulfur": {
         "type": "number",
         "description": "Sulphur (% DM).",
         "minimum": 0,
-        "maximum": 25
+        "maximum": 25,
+        "default": 0
       },
       "DE": {
         "type": "number",
         "description": "Digestible energy (Mcal/kg).",
         "minimum": 0,
-        "maximum": 100
+        "maximum": 100,
+        "default": 0
       },
       "is_fat": {
         "type": "number",
@@ -1763,11 +1810,24 @@
         "minimum": 0,
         "maximum": 1
       },
+      "units": {
+        "type": "string",
+        "description": ""
+      },
       "starch": {
         "type": "number",
         "description": "Starch (%)",
         "minimum": 0,
-        "maximum": 80
+        "maximum": 80,
+        "default": 0
+      },
+      "limit": {
+        "type": "number",
+        "description": ""
+      },
+      "lower_limit": {
+        "type": "number",
+        "description": ""
       }
     },
     "NASEM_Comp_properties": {
@@ -1775,6 +1835,15 @@
         "type": "number",
         "description": "Unique integer identifier for feeds used within the RuFaS model.",
         "minimum": 1
+      },
+      "Name": {
+        "type": "string",
+        "description": "Feed Name"
+      },
+      "Fd_Category": {
+        "type": "string",
+        "description": "Feed Category.",
+        "pattern": "^(Animal Protein|By-Product\/Other|Calf Liquid Feed|Energy Source|Fat Supplement|Fatty Acid Supplement|Grain Crop Forage|Grass\/Legume Forage|Pasture|Plant Protein|Vitamin/Mineral)$"
       },
       "feed_type": {
         "type": "string",
@@ -1845,109 +1914,331 @@
         "type": "number",
         "description": "Acid detergent insoluble nitrogen multiplied by 6.25 (% DM).",
         "minimum": 0,
-        "maximum": 8
+        "maximum": 8,
+        "default": 0
       },
       "NDICP": {
         "type": "number",
         "description": "Neutral detergent insoluble nitrogen multiplied by 6.25 (% DM).",
         "minimum": 0,
-        "maximum": 12
+        "maximum": 12,
+        "default": 0
       },
       "ADF": {
         "type": "number",
         "description": "Acid detergent fiber (% DM)",
         "minimum": 0,
-        "maximum": 66
+        "maximum": 66,
+        "default": 0
       },
       "NDF": {
         "type": "number",
         "description": "Neutral detergent fiber (% DM).",
         "minimum": 0,
-        "maximum": 85
+        "maximum": 85,
+        "default": 0
       },
       "NDF48": {
         "type": "number",
         "description": "In vitro 48-hour digestibility (% NDF).",
         "minimum": 0,
-        "maximum": 89
+        "maximum": 89,
+        "default": 0
       },
       "lignin": {
         "type": "number",
         "description": "Acid detergent lignin (% DM).",
         "minimum": 0,
-        "maximum": 25
+        "maximum": 25,
+        "default": 0
       },
       "starch": {
         "type": "number",
         "description": "Starch (%).",
         "minimum": 0,
-        "maximum": 80
+        "maximum": 80,
+        "default": 0
       },
       "WSC": {
         "type": "number",
         "description": "Water soluble carbohydrates (% DM).",
         "minimum": 0,
-        "maximum": 100
+        "maximum": 100,
+        "default": 0
       },
       "FA": {
         "type": "number",
         "description": "Fatty acids (% DM).",
         "minimum": 0,
-        "maximum": 100
+        "maximum": 100,
+        "default": 0
       },
       "EE": {
         "type": "number",
         "description": "Ether extract (% DM).",
         "minimum": 0,
-        "maximum": 100
+        "maximum": 100,
+        "default": 0
       },
       "DE_Base": {
         "type": "number",
         "description": "Digestible energy standard (Mcal/kg).",
         "minimum": 0,
-        "maximum": 100
+        "maximum": 100,
+        "default": 0
       },
       "calcium": {
         "type": "number",
         "description": "Calcium (% DM).",
         "minimum": 0,
-        "maximum": 72
+        "maximum": 72,
+        "default": 0
       },
       "phosphorus": {
         "type": "number",
         "description": "Phosphorus (% DM).",
         "minimum": 0,
-        "maximum": 32
+        "maximum": 32,
+        "default": 0
       },
       "magnesium": {
         "type": "number",
         "description": "Magnesium (% DM).",
         "minimum": 0,
-        "maximum": 57
+        "maximum": 57,
+        "default": 0
       },
       "potassium": {
         "type": "number",
         "description": "Potassium (% DM).",
         "minimum": 0,
-        "maximum": 57
+        "maximum": 57,
+        "default": 0
       },
       "sodium": {
         "type": "number",
         "description": "Sodium (% DM).",
         "minimum": 0,
-        "maximum": 40
+        "maximum": 40,
+        "default": 0
       },
       "chlorine": {
         "type": "number",
         "description": "Chlorine (% DM).",
         "minimum": 0,
-        "maximum": 67
+        "maximum": 67,
+        "default": 0
       },
       "sulfur": {
         "type": "number",
         "description": "Sulphur (% DM).",
         "minimum": 0,
-        "maximum": 25
+        "maximum": 25,
+        "default": 0
+      },
+      "cooper": {
+        "type": "number",
+        "description": ""
+      },
+      "iron": {
+        "type": "number",
+        "description": ""
+      },
+      "manganese": {
+        "type": "number",
+        "description": ""
+      },
+      "zinc": {
+        "type": "number",
+        "description": ""
+      },
+      "molibdenum": {
+        "type": "number",
+        "description": ""
+      },
+      "chromium": {
+        "type": "number",
+        "description": ""
+      },
+      "cobalt": {
+        "type": "number",
+        "description": ""
+      },
+      "iodine": {
+        "type": "number",
+        "description": ""
+      },
+      "selenium": {
+        "type": "number",
+        "description": ""
+      },
+      "arginine": {
+        "type": "number",
+        "description": ""
+      },
+      "histidine": {
+        "type": "number",
+        "description": ""
+      },
+      "isoleucine": {
+        "type": "number",
+        "description": ""
+      },
+      "leucine": {
+        "type": "number",
+        "description": ""
+      },
+      "lysine": {
+        "type": "number",
+        "description": ""
+      },
+      "methionine": {
+        "type": "number",
+        "description": ""
+      },
+      "phenylalanine": {
+        "type": "number",
+        "description": ""
+      },
+      "threonine": {
+        "type": "number",
+        "description": ""
+      },
+      "triptophan": {
+        "type": "number",
+        "description": ""
+      },
+      "valine": {
+        "type": "number",
+        "description": ""
+      },
+      "C120_FA": {
+        "type": "number",
+        "description": ""
+      },
+      "C140_FA": {
+        "type": "number",
+        "description": ""
+      },
+      "C160_FA": {
+        "type": "number",
+        "description": ""
+      },
+      "C161_FA": {
+        "type": "number",
+        "description": ""
+      },
+      "C180_FA": {
+        "type": "number",
+        "description": ""
+      },
+      "C181t_FA": {
+        "type": "number",
+        "description": ""
+      },
+      "C181c_FA": {
+        "type": "number",
+        "description": ""
+      },
+      "C182_FA": {
+        "type": "number",
+        "description": ""
+      },
+      "C183_FA": {
+        "type": "number",
+        "description": ""
+      },
+      "otherFA_FA": {
+        "type": "number",
+        "description": ""
+      },
+      "NPN_source": {
+        "type": "number",
+        "description": ""
+      },
+      "starch_digested": {
+        "type": "number",
+        "description": ""
+      },
+      "FA_dig": {
+        "type": "number",
+        "description": ""
+      },
+      "P_inorg": {
+        "type": "number",
+        "description": ""
+      },
+      "P_org": {
+        "type": "number",
+        "description": ""
+      },
+      "B_Carotene": {
+        "type": "number",
+        "description": ""
+      },
+      "biotin": {
+        "type": "number",
+        "description": ""
+      },
+      "choline": {
+        "type": "number",
+        "description": ""
+      },
+      "niacin": {
+        "type": "number",
+        "description": ""
+      },
+      "Vit_A": {
+        "type": "number",
+        "description": ""
+      },
+      "Vit_D": {
+        "type": "number",
+        "description": ""
+      },
+      "Vit_E": {
+        "type": "number",
+        "description": ""
+      },
+      "Abs_calcium": {
+        "type": "number",
+        "description": ""
+      },
+      "Abs_phosphorus": {
+        "type": "number",
+        "description": ""
+      },
+      "Abs_sodium": {
+        "type": "number",
+        "description": ""
+      },
+      "Abs_chloride": {
+        "type": "number",
+        "description": ""
+      },
+      "Abs_potassium": {
+        "type": "number",
+        "description": ""
+      },
+      "Abs_cooper": {
+        "type": "number",
+        "description": ""
+      },
+      "Abs_iron": {
+        "type": "number",
+        "description": ""
+      },
+      "Abs_magnesium": {
+        "type": "number",
+        "description": ""
+      },
+      "Abs_manganesum": {
+        "type": "number",
+        "description": ""
+      },
+      "Abs_zinc": {
+        "type": "number",
+        "description": ""
       },
       "is_fat": {
         "type": "number",
@@ -1960,6 +2251,22 @@
         "description": "Identifier of wet forage type feed (0 or 1).",
         "minimum": 0,
         "maximum": 1
+      },
+      "units": {
+        "type": "string",
+        "description": ""
+      },
+      "limit": {
+        "type": "number",
+        "description": ""
+      },
+      "lower_limit": {
+        "type": "number",
+        "description": ""
+      },
+      "TDN": {
+        "type": "number",
+        "description": ""
       }
     },
     "manure_management_properties": {
@@ -2323,7 +2630,7 @@
             "default": 0.05
           }
         }
-        }
+      }
     },
     "field_properties": {
       "soil_specification": {
@@ -2392,14 +2699,83 @@
       }
     },
     "weather_properties": {
+      "year": {
+        "description": "Year.",
+        "type": "number",
+        "minimum": 1900
+      },
+      "jday": {
+        "description": "Julian day of the year.",
+        "type": "number",
+        "minimum": 0,
+        "maximum": 366
+      },
       "precip": {
-        "description": "amount of precipitation",
+        "description": "Amount of precipitation (mm H2O).",
         "type": "number",
         "minimum": 0,
         "default": 0
+      },
+      "high": {
+        "description": "The maximum air temperature of the day (°C).",
+        "type": "number",
+        "default": 21
+      },
+      "low": {
+        "description": "The minimum air temperature of the day (°C).",
+        "type": "number",
+        "default": 0
+      },
+      "avg": {
+        "description": "The average air temperature of the day (°C).",
+        "type": "number",
+        "default": 0
+      },
+      "Hday": {
+        "description": "The solar radiation of the day (MJ m^-2).",
+        "type": "number",
+        "default": 0
+      },
+      "irrigation": {
+        "description": "Irrigation (mm H2O).",
+        "type": "number",
+        "default": 0
+      }
+    },
+    "feed_quality_properties": {
+      "rufas_id": {
+        "type": "number",
+        "description": "Unique integer identifier for feeds used within the RuFaS model.",
+        "minimum": 1
+      },
+      "quality_id": {
+        "type": "number",
+        "description": "Quality ID",
+        "minimum": 1
+      },
+      "status": {
+        "type": "string",
+        "description": "Status",
+        "pattern": "(immature|mid-maturity|mature)"
+      },
+      "differentiating_nutrient": {
+        "type": "string",
+        "description": "Differentiating Nutrient",
+        "pattern": "(DM|NDF)"
+      },
+      "low_percent": {
+        "type": "number",
+        "description": "Low Percent",
+        "minimum": 0,
+        "maximum": 100
+      },
+      "high_percent": {
+        "type": "number",
+        "description": "High Percent",
+        "minimum": 0,
+        "maximum": 100
       }
     }
   },
   "cross-validation": {}
 }
-

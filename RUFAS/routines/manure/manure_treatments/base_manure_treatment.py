@@ -7,6 +7,8 @@ from typing import Tuple
 from typing import Union
 
 from RUFAS.general_constants import GeneralConstants
+from RUFAS.time import Time
+from RUFAS.weather import Weather
 from RUFAS.routines.manure.manure_handlers.manure_handler_daily_output import (
     ManureHandlerDailyOutput,
 )
@@ -40,8 +42,8 @@ class BaseManureTreatment(ABC):
 
     def __init__(
         self,
-        weather,
-        time,
+        weather: Weather,
+        time: Time,
         manure_treatment_config: Union[
             ManureTreatmentConfig, Tuple[ManureTreatmentConfig, ManureTreatmentConfig]
         ],
@@ -276,7 +278,8 @@ class BaseManureTreatment(ABC):
             The average temperature of the current day in Celsius.
 
         """
-        return self.weather.T_avg[self.time.year - 1][self.time.day - 1]
+        current_conditions = self.weather.get_current_day_conditions(self.time)
+        return current_conditions.mean_air_temperature
 
     def _get_current_day_rainfall(self) -> float:
         """
@@ -288,10 +291,9 @@ class BaseManureTreatment(ABC):
             The rainfall of the current day in meters (m).
 
         """
-        return (
-            self.weather.rainfall[self.time.year - 1][self.time.day - 1]
-            * GeneralConstants.MM_TO_M
-        )
+        current_conditions = self.weather.get_current_day_conditions(self.time)
+        precipitation = current_conditions.precipitation
+        return precipitation * GeneralConstants.MM_TO_M
 
     def _accumulate_daily_output(
         self, manure_treatment_daily_output: ManureTreatmentDailyOutput

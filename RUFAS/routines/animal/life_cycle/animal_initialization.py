@@ -160,7 +160,7 @@ class AnimalInitialization:
             animal_num: number of animals to simulate
             sim_days: number of days to simulate
     '''
-    def init_animals(self, breed, animal_num=20000, sim_days=5000):
+    def init_animals(self, breed, animal_num=20000, sim_days=5000):  # noqa: C901
         calves = []
         heiferIs = []
         heiferIIs = []
@@ -466,6 +466,13 @@ class AnimalInitialization:
                 'p_gest_for_calf': int(row[AnimalValues.p_gest_for_calf]),
                 'calf_birth_weight': float(row[AnimalValues.calf_birth_weight])
             }
+            tai_protocol_name_conversion_map = {
+                '5dCG2P': 'md5CG2P',
+                '5dCGP': 'md5CGP',
+            }
+            if args['tai_method_h'] in tai_protocol_name_conversion_map:
+                old_tai_method_h = args['tai_method_h']
+                args['tai_method_h'] = tai_protocol_name_conversion_map[old_tai_method_h]
             heiferII = HeiferII(args)
             heiferIIs.append(heiferII)
         conn.close()

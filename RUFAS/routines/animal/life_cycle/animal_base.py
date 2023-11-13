@@ -18,6 +18,9 @@ from RUFAS.routines.animal.animal_typed_dicts import AnimalBaseInitArgsTypedDict
 from RUFAS.routines.animal.life_cycle.animal_events import AnimalEvents
 from RUFAS.routines.animal.life_cycle.body_weight_history import BodyWeightHistory
 from RUFAS.routines.animal.life_cycle.pen_history import PenHistory
+from RUFAS.input_manager import InputManager
+
+im = InputManager()
 
 
 class AnimalBase:
@@ -31,6 +34,7 @@ class AnimalBase:
     @staticmethod
     def set_config(config):
         AnimalBase.config = config
+        AnimalBase.config['nutrient_standard'] = im.get_data("config.nutrient_standard")
 
     def __init__(self, args: AnimalBaseInitArgsTypedDict):
         """
@@ -136,8 +140,7 @@ class AnimalBase:
             self.dP_reserves = 0
 
         # amount of P in the animal (A.1G.A.3)
-        self.p_animal = self.p_animal + self.p_gest + self.p_growth + \
-                        (self.dP_reserves - dP_reserves_prev)
+        self.p_animal = self.p_animal + self.p_gest + self.p_growth + (self.dP_reserves - dP_reserves_prev)
 
     def calc_base_manure(self):
         """

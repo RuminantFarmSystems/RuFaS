@@ -328,8 +328,8 @@ class RationReporter:
     Reports information about a formulated ration.
     """
 
-    @staticmethod
-    def report_ration(ration: Dict, available_feeds: Dict) -> Tuple[Dict, Dict]:  # noqa
+    @classmethod
+    def report_ration(cls, ration: Dict, available_feeds: Dict) -> Tuple[Dict, Dict]:  # noqa
         """
         Calculates information in the ration about nutrient information including
         nutrient amounts and concentrations. Returns a dictionary of nutrient amounts
@@ -342,6 +342,7 @@ class RationReporter:
             Dictionary of formulated ration, with keys as feed IDs, values as kg fed.
         available_feeds : Dict
             available feeds dictionary from the Feed class object.
+
 
         Returns
         -------
@@ -380,31 +381,45 @@ class RationReporter:
             for nutr in nutrients:
                 # all values on a 100% dry matter basis
                 if nutr == "DM":
-                    nutrient_amount["as_fed"] += val * (available_feeds[key][nutr] / 100)
+                    if available_feeds[key][nutr]:
+                        nutrient_amount["as_fed"] += val / (available_feeds[key][nutr] / 100)
                 elif nutr == "N":
                     # [A.2.A.2]
-                    if key[:3] in ["121", "122", "155", "157"]:
+                    if key[:3] in ['172', '181', '202', '216']:
+
                         denom = 6.38
                     # [A.2.A.1]
                     else:
                         denom = 6.25
                     nutrient_amount[nutr] += (available_feeds[key]["CP"] / (denom * 100)) * val
                 else:
-                    nutrient_amount[nutr] += val * (available_feeds[key][nutr] / 100)
+                    if nutr == 'DE':
+                        de_key = 'DE_Base' if 'DE_Base' in available_feeds[key].keys() else 'DE'
+                        nutrient_amount[nutr] += val * (available_feeds[key][de_key] / 100)
+                    else:
+                        nutrient_amount[nutr] += val * (available_feeds[key][nutr] / 100)
 
         dm_amount = nutrient_amount["dm"]
         if dm_amount == 0:
             dm_amount = 1
         for nutr in nutrients:
             if nutr == "DM":
-                nutrient_conc["dm"] = (nutrient_amount["as_fed"] / dm_amount) * 100
+                if nutrient_amount["as_fed"]:
+                    nutrient_conc["dm"] = (dm_amount / nutrient_amount["as_fed"]) * 100
+                else:
+                    nutrient_conc["dm"] = 0.0
             else:
                 # all values on a 100% dry matter basis
-                nutrient_conc[nutr] = (nutrient_amount[nutr] / dm_amount) * 100
+                if nutr == 'DE':
+                    de_key = 'DE_Base' if 'DE_Base' in nutrient_amount.keys() else 'DE'
+                    nutrient_conc[nutr] = (nutrient_amount[de_key] / dm_amount) * 100
+                else:
+                    nutrient_conc[nutr] = (nutrient_amount[nutr] / dm_amount) * 100
         return nutrient_amount, nutrient_conc
 
-    @staticmethod
-    def report_ration_supply(ration: Dict, available_feeds: Dict, ration_report: Dict, body_weight: float) -> Dict:
+    @classmethod
+    def report_ration_supply(cls, ration: Dict, available_feeds: Dict, ration_report: Dict, body_weight: float) -> Dict:
+
         """
         Nutrient and energy supply of a formulated ration
         Different from the report_ration method, since this takes into account digestibility and other factors
@@ -419,6 +434,7 @@ class RationReporter:
             Dictionary of nutrient amount and concentrations.
         body_weight : float
             Animal body weight in kg.
+
 
         Returns
         -------
@@ -461,6 +477,7 @@ class RationReporter:
         Crucial step to take into account Total digestible nutrient (TDN)
          digesitbility (% of DM).
         Initial step in net energy (NE) and metabolizable energy (ME) calculations.
+
 
         Parameters
         ----------
@@ -519,7 +536,8 @@ class RationReporter:
             actual digestible energy of feed item, Mcal/kg.
 
         """
-        DE_act = feed_item_info["DE"] * RationReporter.get_TDN_discount(ration_report, body_weight)
+        de_key = 'DE_Base' if 'DE_Base' in feed_item_info.keys() else 'DE'
+        DE_act = feed_item_info[de_key] * RationReporter.get_TDN_discount(ration_report, body_weight)
         return DE_act
 
     @staticmethod
@@ -546,10 +564,10 @@ class RationReporter:
         """
         DE_act = RationReporter.get_DE(kg_fed, feed_item_info, ration_report, body_weight)
 
-        if feed_item_info["type"] == "Mineral":
+        if feed_item_info["feed_type"] == "Mineral":
             ME_item = 0.0
         elif feed_item_info["is_fat"] == 1:
-            ME_item = feed_item_info["DE"]
+            ME_item = feed_item_info["DE"] if 'DE' in feed_item_info.keys() else feed_item_info["DE_Base"]
         elif feed_item_info["EE"] >= 3:
             ME_item = 1.01 * DE_act - 0.45 + 0.0046 * (feed_item_info["EE"] - 3)
         else:
@@ -610,7 +628,7 @@ class RationReporter:
         """
         DE_act = RationReporter.get_DE(kg_fed, feed_item_info, ration_report, body_weight)
         ME_item = RationReporter.get_ME(kg_fed, feed_item_info, ration_report, body_weight)
-        if feed_item_info["type"] == "Mineral":
+        if feed_item_info["feed_type"] == "Mineral":
             NE_lactation_item = 0.0
         elif feed_item_info["is_fat"] == 1:
             NE_lactation_item = 0.8 * DE_act
@@ -643,7 +661,7 @@ class RationReporter:
 
         """
         ME_item = RationReporter.get_ME(kg_fed, feed_item_info, ration_report, body_weight)
-        if feed_item_info["type"] == "Mineral":
+        if feed_item_info["feed_type"] == "Mineral":
             NE_growth = 0.0
         elif feed_item_info["is_fat"] == 1:
             NE_growth = 0.55 * ME_item
@@ -673,11 +691,11 @@ class RationReporter:
             Calcium supply of feed item, g.
 
         """
-        if feed_item_info["type"] == "Forage":
+        if feed_item_info["feed_type"] == "Forage":
             dCa = 0.3
-        elif feed_item_info["type"] == "Conc":
+        elif feed_item_info["feed_type"] == "Conc":
             dCa = 0.6
-        elif feed_item_info["type"] == "Mineral":
+        elif feed_item_info["feed_type"] == "Mineral":
             dCa = 0.95
         else:
             dCa = 0.0
@@ -706,11 +724,11 @@ class RationReporter:
             Phosphorus supply, g.
 
         """
-        if feed_item_info["type"] == "Forage":
+        if feed_item_info["feed_type"] == "Forage":
             dP = 0.64
-        elif feed_item_info["type"] == "Conc":
+        elif feed_item_info["feed_type"] == "Conc":
             dP = 0.70
-        elif feed_item_info["type"] == "Mineral":
+        elif feed_item_info["feed_type"] == "Mineral":
             dP = 0.80
         else:
             dP = 0.0
@@ -788,7 +806,7 @@ class RationReporter:
             Forage neutral detergent fiber content of feed item, g.
 
         """
-        if feed_item_info["type"] == "Forage":
+        if feed_item_info["feed_type"] == "Forage":
             forage_NDF_item = feed_item_info["NDF"] * kg_fed
         else:
             forage_NDF_item = 0.0
@@ -823,7 +841,7 @@ class RationReporter:
         DMI_estimate = sum(ration.values())
         is_conc = []
         for item in ration:
-            if available_feeds[item]["type"] == "Conc":
+            if available_feeds[item]["feed_type"] == "Conc":
                 is_conc.append(ration[item])
         DMI_conc_percentage = sum(is_conc) / DMI_estimate * 100
         Kp = []
@@ -835,9 +853,9 @@ class RationReporter:
             feed_item_info = available_feeds[key]
 
             # KP calcs
-            if feed_item_info["type"] == "Conc":
+            if feed_item_info["feed_type"] == "Conc":
                 Kp.append(2.904 + 1.375 * (DMI_estimate / body_weight) * 100 - 0.02 * DMI_conc_percentage)
-            elif feed_item_info["type"] == "Forage" and feed_item_info["is_wetforage"] == 0:
+            elif feed_item_info["feed_type"] == "Forage" and feed_item_info["is_wetforage"] == 0:
                 Kp.append(
                     3.362
                     + 0.479 * (DMI_estimate / body_weight) * 100
@@ -959,25 +977,28 @@ class AvailableFeeds:
 
         for key, feed in available_feeds.items():
             self.feed_key.append(key)
-            self.feed_id.append(feed["feed_id"])
+            self.feed_id.append(feed['rufas_id'])
             self.price.append(feed_costs[str(key)])
-            self.TDN.append(feed["TDN"])
-            self.DE.append(feed["DE"])
-            self.EE.append(feed["EE"])
-            self.is_fat.append(feed["is_fat"])
-            self.calcium.append(feed["calcium"])
-            self.phosphorus.append(feed["phosphorus"])
-            self.NDF.append(feed["NDF"])
-            self.type.append(feed["type"])
-            self.is_wetforage.append(feed["is_wetforage"])
-            self.Kd.append(feed["Kd"])
-            self.N_A.append(feed["N_A"])
-            self.N_B.append(feed["N_B"])
-            self.CP.append(feed["CP"])
-            self.dRUP.append(feed["dRUP"])
-            if isinstance(feed["limit"], dict):
-                self.lactating_cow_limit.append(feed["limit"]["lactating_cows"])
-                self.dry_cow_limit.append(feed["limit"]["dry_cows"])
+            self.TDN.append(feed['TDN'])
+            if 'DE_Base' in feed.keys():
+                self.DE.append(feed['DE_Base'])
+            else:
+                self.DE.append(feed['DE'])
+            self.EE.append(feed['EE'])
+            self.is_fat.append(feed['is_fat'])
+            self.calcium.append(feed['calcium'])
+            self.phosphorus.append(feed['phosphorus'])
+            self.NDF.append(feed['NDF'])
+            self.type.append(feed['feed_type'])
+            self.is_wetforage.append(feed['is_wetforage'])
+            self.Kd.append(feed['Kd'])
+            self.N_A.append(feed['N_A'])
+            self.N_B.append(feed['N_B'])
+            self.CP.append(feed['CP'])
+            self.dRUP.append(feed['dRUP'])
+            if isinstance(feed['limit'], dict):
+                self.lactating_cow_limit.append(feed['limit']['lactating_cows'])
+                self.dry_cow_limit.append(feed['limit']['dry_cows'])
 
             else:
                 self.lactating_cow_limit.append(feed["limit"])
@@ -1013,6 +1034,6 @@ class AvailableFeeds:
                 continue
             for feed_id in sorted(list(feed_ids)):
                 # Get the list index of the feed_id in self.feed_id list.
-                idx = self._feed_id_to_list_idx_dict[int(feed_id)]
+                idx = self._feed_id_to_list_idx_dict[int(feed_id)]      # missing 54, 136, 26, 118, 139
                 result[key].append(vals[idx])
         return result
