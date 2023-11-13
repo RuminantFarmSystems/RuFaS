@@ -41,6 +41,7 @@ from RUFAS.routines.feed.feed import Feed
 from RUFAS.routines.animal.ration.calf_ration import CalfRationManager
 from RUFAS.routines.animal.ration.ration_driver import RationReporter
 from RUFAS.routines.animal.ration.ration_driver import RationManager
+from RUFAS.routines.animal.animal_reporter import AnimalReporter
 
 from RUFAS.routines.animal.ration import user_defined_ration as udr
 
@@ -1442,20 +1443,6 @@ class AnimalManager:
                 pen.ration = ration_per_pen
                 pen.ration_per_animal = ration_per_animal  # Important
 
-                info_map = {"class": self.__class__.__name__,
-                            "function": self._calc_ration_at_interval.__name__,
-                            f'number_animals_in_pen_{pen.id}': len(pen.animals_in_pen)}
-                om.add_variable(f'ration_nutrient_amount_pen_{pen.id}', nutrient_amount, info_map)
-                om.add_variable(f'MEdiet_pen_{pen.id}', pen.MEdiet, info_map)
-                om.add_variable(f'avg_rqmts_pen_{pen.id}', pen.avg_nutrient_rqmts, info_map)
-                om.add_variable(f'ration_per_animal_for_pen_{pen.id}', pen.ration_per_animal, info_map)
-                if pen.animal_combination != Pen.AnimalCombination.CALF:
-                    ration_supply_report = RationReporter.report_ration_supply(ration_per_animal,
-                                                                               feed.available_feeds,
-                                                                               ration_report,
-                                                                               pen.avg_nutrient_rqmts['avg_BW'])
-                    om.add_variable(f'ration_supply_report_for_pen_{pen.id}', ration_supply_report, info_map)
-
     @classmethod
     def _get_animal_types_in_pen(cls, pen: Pen) -> Set[AnimalType]:
         """
@@ -1764,16 +1751,7 @@ class AnimalManager:
 
             self._handle_newly_added_animals([*animals_added, *calves_born], feed, temp)
 
-            info_map = {"class": self.__class__.__name__, "function": self.daily_updates.__name__}
-            om.add_variable('sim_day', self.simulation_day, info_map)
-            om.add_variable('num_animals', len(self.calves) + len(self.heiferIs) + len(self.heiferIIs) +
-                            len(self.heiferIIIs) + len(self.cows), info_map)
-            om.add_variable('num_calves', len(self.calves), info_map)
-            om.add_variable('num_heiferIs', len(self.heiferIs), info_map)
-            om.add_variable('num_heiferIIs', len(self.heiferIIs), info_map)
-            om.add_variable('num_heiferIIIs', len(self.heiferIIIs), info_map)
-            om.add_variable('num_lactating_cows', len([cow for cow in self.cows if cow.is_lactating]), info_map)
-            om.add_variable('num_dry_cows', len([cow for cow in self.cows if not cow.is_lactating]), info_map)
+            AnimalReporter.report_daily_animal_data(self)
 
             for pen in self.all_pens:
                 pen.classes_in_pen = self._get_classes_in_pen(pen)
@@ -1791,6 +1769,7 @@ class AnimalManager:
                 self.clear_pens()
                 self.allocate_animals_to_pens()
                 self._calc_ration_at_interval(feed)  # per pen
+                AnimalReporter.report_ration_interval_data(self, feed)
                 self.calc_avg_growth()  # per pen
                 for pen in self.all_pens:
                     if pen.animal_combination.name == 'LAC_COW':
@@ -1798,3 +1777,6 @@ class AnimalManager:
                             animal.update_milk_production_history(self.simulation_day)
 
             self.life_cycle_manager.daily_milk_production = self.sum_daily_milk(self.cows)
+            for pen in self.all_pens:
+                if pen.animal_combination.name == 'LAC_COW':
+                    AnimalReporter.report_milk(pen, self.simulation_day)
