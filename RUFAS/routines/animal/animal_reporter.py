@@ -97,6 +97,3 @@ class AnimalReporter:
             milk_data_update["cow_id"] = animal.id
 
             om.add_variable("milk_data_at_milk_update", milk_data_update, info_map)
-
-    def report_monthly_animal_data():
-        pass
