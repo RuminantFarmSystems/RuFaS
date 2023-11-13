@@ -1658,10 +1658,25 @@ class AnimalManager:
             om.add_variable('num_cow_parity_3+', LifeCycleManager.num_cow_for_parity['greater_than_3'], info_map)
 
             if time.is_last_day_of_simulation:
+                inseminated_heiferIIs = 0
+                pregnant_heiferIIs = 0
+                not_pregnant_heiferIIs = 0
                 for heiferII in self.heiferIIs:
                     om.add_variable(f'heiferII_{heiferII.id}_last_day',
                                     heiferII.events,
                                     info_map)
+                    for day_str, event_list in heiferII.events.events.items():
+                        for event in event_list:
+                            if "inseminated" in event:
+                                inseminated_heiferIIs += 1
+                            if "heifer pregnant" in event:
+                                pregnant_heiferIIs += 1
+                            if "heifer not pregnant" in event:
+                                not_pregnant_heiferIIs += 1
+                om.add_variable('inseminated_heiferIIs', inseminated_heiferIIs, info_map)
+                om.add_variable('pregnant_heiferIIs', pregnant_heiferIIs, info_map)
+                om.add_variable('non_pregnant_heiferIIs', not_pregnant_heiferIIs, info_map)
+
                 for cow in self.cows:
                     om.add_variable(f'cow_{cow.id}_last_day',
                                     cow.events,

@@ -430,9 +430,12 @@ class HeiferII(HeiferI):
         if not self.is_pregnant:
             self.ED_days += 1
         if self.days_born == self._get_breeding_start_day():
-            self._simulate_estrus(self._get_breeding_start_day(), sim_day, const.FIRST_ESTRUS_NOTE)
+            self._simulate_estrus(self._get_breeding_start_day(), sim_day, const.ESTRUS_DAY_SCHEDULED_NOTE)
         elif self.days_born == self.estrus_day:
+            # self.log_event(, const.ESTRUS_OCCURRED)
             estrus_detected = self._detect_estrus(sim_day)
+            # if estrus_detected:
+            #     self.log_event(, const.ESTRUS_DETECTED)
             should_perform_ai = self._decide_on_ai(estrus_detected)
             if not should_perform_ai:
                 self._simulate_estrus(self.estrus_day, sim_day, const.BASIC_ESTRUS_NOTE)
@@ -640,9 +643,7 @@ class HeiferII(HeiferI):
 
     def _handle_failed_conception(self, sim_day: int):
         self.log_event(self.days_born, sim_day, const.HEIFER_NOT_PREG)
-
-        # TODO: Should I use days_born or estrus_day?
-        self._simulate_estrus(self.days_born, sim_day, const.ESTRUS_AFTER_AI_NOTE)
+        self._simulate_estrus(self.days_born, sim_day, const.ESTRUS_DAY_SCHEDULED_NOTE)
 
     @staticmethod
     def _calculate_gestation_length():
