@@ -6,12 +6,12 @@ from RUFAS.routines.field.soil.soil_data import SoilData
 from RUFAS.routines.field.soil.layer_data import LayerData
 from RUFAS.routines.field.manager.crop_schedule import CropSchedule
 from RUFAS.routines.manure.manure_manager import ManureManager
-from RUFAS.routines.field.manager.current_weather import CurrentWeather
+from RUFAS.weather import Weather
+from RUFAS.time import Time
 from RUFAS.routines.field.manager.output_gatherer import OutputGatherer
 from RUFAS.routines.field.manager.fertilizer_schedule import FertilizerSchedule
 from RUFAS.routines.field.manager.manure_schedule import ManureSchedule
 from RUFAS.routines.field.manager.tillage_schedule import TillageSchedule
-from RUFAS.routines.field.manager.schedule import Schedule
 from typing import Dict, List, Tuple
 
 """
@@ -31,7 +31,7 @@ class FieldManager:
             self.fields.append(new_field)
         self.output_gatherer = OutputGatherer(fields=self.fields)
 
-    def daily_update_routine(self, weather, time) -> None:
+    def daily_update_routine(self, weather: Weather, time: Time) -> None:
         """
         This method will run the daily routine in the field, which will be calling the manage field method on each
         field.
@@ -48,10 +48,9 @@ class FieldManager:
         Because different fields can have different latitudes, the day length has to be recalculated for each field.
 
         """
+        current_conditions = weather.get_current_day_conditions(time)
         for field in self.fields:
-            month = FieldManager._date_conversion_month(time)
-            current_weather = FieldManager._create_current_weather(weather=weather, time=time, month=month)
-            field.manage_field(time, current_weather=current_weather)
+            field.manage_field(time, current_conditions=current_conditions)
         self.output_gatherer.send_daily_variables()
 
     def annual_update_routine(self) -> None:
@@ -62,91 +61,6 @@ class FieldManager:
         self.output_gatherer.send_annual_variables()
         for field in self.fields:
             field.perform_annual_reset()
-
-    @staticmethod
-    def _date_conversion_month(time) -> int:
-        """
-        Converts the day number into the corresponding month of the year.
-
-        Parameters
-        ----------
-        time: Time
-            Object containing the current year and day of the simulation.
-
-        Returns
-        -------
-        int
-            The corresponding month of the year.
-
-        """
-        days = [31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334, 365]
-        leap_days = [31, 60, 91, 121, 152, 182, 213, 244, 274, 305, 335, 366]
-        prev_month = 0
-        if Schedule.is_leap_year(time.calendar_year):
-            for day in leap_days:
-                if prev_month < time.day <= day:
-                    return leap_days.index(day) + 1
-                else:
-                    prev_month = day
-        else:
-            for day in days:
-                if prev_month < time.day <= day:
-                    return days.index(day) + 1
-                else:
-                    prev_month = day
-
-    @staticmethod
-    def _date_conversion_day(time) -> int:
-        """
-        Converts the day number into the corresponding day of the month.
-        Parameters
-        ----------
-        time:
-            Object containing the current year and day of the simulation.
-
-        Returns
-        -------
-        int
-        Corresponding day of the month.
-
-        """
-        days = [31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334, 365]
-        leap_days = [31, 60, 91, 121, 152, 182, 213, 244, 274, 305, 335, 366]
-
-        if Schedule.is_leap_year(time.calendar_year):
-            return time.day - leap_days[FieldManager._date_conversion_month(time) - 2]
-        else:
-            return time.day - days[FieldManager._date_conversion_month(time) - 2]
-
-    @staticmethod
-    def _create_current_weather(weather, time, month: int) -> CurrentWeather:
-        """
-        Creates a CurrentWeather object containing all the weather conditions of the current day.
-
-        Parameters
-        ----------
-        weather : Weather
-            Object containing all the environmental conditions of the simulation.
-        time : Time
-            Object containing the current time and day of the simulation.
-        month : int
-            Number representing the current month of the simulation.
-
-        Returns
-        -------
-        CurrentWeather
-            Object containing the weather conditions of the current day.
-
-        """
-        daylength = CurrentWeather.determine_daylength(month)
-        return CurrentWeather(incoming_light=weather.radiation[time.year - 1][time.day - 1],
-                              min_air_temperature=weather.T_min[time.year - 1][time.day - 1],
-                              mean_air_temperature=weather.T_avg[time.year - 1][time.day - 1],
-                              max_air_temperature=weather.T_max[time.year - 1][time.day - 1],
-                              annual_mean_air_temperature=weather.T_avg_annual,
-                              precipitation=weather.rainfall[time.year - 1][time.day - 1],
-                              irrigation=weather.irrigation[time.year - 1][time.day - 1],
-                              daylength=daylength)
 
     @staticmethod
     def _get_field_blob_names() -> List[str]:

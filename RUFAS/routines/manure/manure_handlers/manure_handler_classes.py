@@ -15,6 +15,8 @@ from typing import Dict
 from typing import Optional
 from typing import Type
 
+from RUFAS.time import Time
+from RUFAS.weather import Weather
 from RUFAS.routines.manure.beddings.bedding_classes import BaseBedding
 from RUFAS.routines.manure.default_enum.default_enum import DefaultEnum
 from RUFAS.routines.manure.gas_emissions.calculator import (
@@ -50,7 +52,7 @@ class BaseManureHandler:
 
     """
 
-    def __init__(self, weather, time, manure_handler_config: ManureHandlerConfig):
+    def __init__(self, weather: Weather, time: Time, manure_handler_config: ManureHandlerConfig):
         """Initialize a BaseManureHandler object.
 
         Args:
@@ -71,7 +73,8 @@ class BaseManureHandler:
         Returns:
             The average temperature of the day, in Celsius.
         """
-        avg_temp = self.weather.T_avg[self.time.year - 1][self.time.day - 1]
+        current_conditions = self.weather.get_current_day_conditions(self.time)
+        avg_temp = current_conditions.mean_air_temperature
 
         return avg_temp
 
@@ -285,8 +288,8 @@ class ManureHandlerFactory:
     def get_instance(
         cls,
         manure_handler_type_name: str,
-        weather,
-        time,
+        weather: Weather,
+        time: Time,
         custom_manure_handler_config: Optional[ManureHandlerConfig] = None,
     ) -> BaseManureHandler:
         """Returns an instance of a specific subtype of BaseManureHandler.

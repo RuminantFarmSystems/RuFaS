@@ -6,5 +6,6 @@
     "csv_dir": "output/CSVs",
     "random_seed": 42,
     "set_seed": true,
-    "simulate_animals": true
+    "simulate_animals": true,
+    "nutrient_standard": "NASEM"
 }

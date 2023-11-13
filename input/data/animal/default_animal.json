@@ -20,8 +20,7 @@
 			"heifer_repro_cull_time": 500,
 			"do_not_breed_time" : 185,
 			"cull_milk_production": 30,
-			"cow_times_milked_per_day": 3,
-			"energy_and_nutrient_calculation_method": "NASEM"
+			"cow_times_milked_per_day": 3
 		},
 		"farm_level": {
 			"calf": {
@@ -83,6 +82,8 @@
 				"preg_loss_rate_3": 0.017,
 				"avg_estrus_cycle_return": 23,
 				"std_estrus_cycle_return": 6,
+				"avg_estrus_cycle_heifer": 21,
+				"std_estrus_cycle_heifer": 2.5,
 				"avg_estrus_cycle_cow": 21,
 				"std_estrus_cycle_cow": 4,
 				"avg_estrus_cycle_after_pgf": 5,

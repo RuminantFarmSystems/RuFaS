@@ -9,10 +9,11 @@ from RUFAS.routines.field.crop.crop_data import CropData, PlantCategory
     (1, True),
     (1.5, True)
 ])
-def test_is_mature_property(frac, expect):
+def test_is_mature_property(frac: float, expect: bool) -> None:
     """check that the is_mature property is properly assigning maturity by heat fraction"""
-    data = CropData(heat_fraction=frac)
-    assert data.is_mature == expect
+    data = CropData()
+    with patch.object(CropData, "heat_fraction", new_callable=PropertyMock, return_value=frac):
+        assert data.is_mature == expect
 
 
 @pytest.mark.parametrize("mature,dormant,alive,growing,expected", [
@@ -61,3 +62,55 @@ def test_tree_dormancy_loss() -> None:
     crop_data = CropData(plant_category=PlantCategory("tree"))
     print(crop_data.plant_category)
     assert crop_data.dormancy_loss_fraction == 0.3
+
+
+@pytest.mark.parametrize("plant_type", [
+    PlantCategory.PERENNIAL,
+    PlantCategory.PERENNIAL_LEGUME,
+    PlantCategory.TREE,
+    PlantCategory.WARM_ANNUAL,
+    PlantCategory.WARM_ANNUAL_LEGUME,
+    PlantCategory.COOL_ANNUAL,
+    PlantCategory.COOL_ANNUAL_LEGUME,
+])
+def test_is_perennial(plant_type: PlantCategory) -> None:
+    """Tests that is_perennial() correctly determines whether a plant is a perennial"""
+    # Initialize CropData object
+    crop = CropData(plant_category=plant_type)
+
+    # Determine observed and expected results
+    observe = crop.is_perennial
+    perennial_set = {PlantCategory.PERENNIAL, PlantCategory.PERENNIAL_LEGUME, PlantCategory.TREE}
+    expect = plant_type in perennial_set
+
+    # Check results
+    assert observe == expect
+
+
+@pytest.mark.parametrize("accumulated,potential,expected", [
+    (100, 800, 0.125),
+    (0, 1200, 0.0),
+    (1000, 800, 1.25),
+    (900, 900, 1.0)
+])
+def test_heat_fraction(accumulated: float, potential: float, expected: float) -> None:
+    """Tests that the heat fraction is correctly calculated based on the heat units."""
+    data = CropData(accumulated_heat_units=accumulated, potential_heat_units=potential)
+    assert data.heat_fraction == expected
+
+
+def test_manual_custom_crop_data():
+    """checks (and demonstrates) the alternate way of customizing a crop"""
+    # setup custom crop
+    aspen = CropData(name="custom crop: aspen", species="aspen", scientific_name="Populus tremuloides",
+                     plant_code="PTREM", plant_category=PlantCategory("tree"), is_nitrogen_fixer=False,
+                     max_leaf_area_index=5.0)
+
+    # check that each attribute is set appropriately
+    assert aspen.name == "custom crop: aspen"
+    assert aspen.species == "aspen"
+    assert aspen.scientific_name == "Populus tremuloides"
+    assert aspen.plant_code == "PTREM"
+    assert aspen.plant_category == PlantCategory("tree")
+    assert aspen.is_nitrogen_fixer is False
+    assert aspen.max_leaf_area_index == 5.0

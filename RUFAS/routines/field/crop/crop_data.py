@@ -158,7 +158,7 @@ class CropData:
     """biomass accumulated by the plant on the previous day (kg/ha)"""
     above_ground_biomass: float = 0.1
     """biomass stored in the above ground portion of the plant; plant biomass excluding roots (kg/ha)"""
-    root_biomass: Optional[float] = None
+    root_biomass: Optional[float] = 0.0
     """biomass stored in roots (kg/ha)"""
 
     # ---- growth constraints
@@ -186,7 +186,7 @@ class CropData:
     """maximum temperature above which plant growth cannot occur (Celsius)"""
     potential_heat_units: float = 800
     """total heat units required for the plant to reach maturity (unitless)"""
-    accumulated_heat_units: float = 0  # accumulator
+    accumulated_heat_units: float = 0
     """total heat units accumulated to date (unitless)"""
     is_growing: bool = True
     """is the crop currently growing?"""
@@ -197,16 +197,12 @@ class CropData:
     Determines if heat unit temperature will be used for heat unit accumulation."""
     new_heat_units: Optional[float] = None
     """heat units accumulated on the current day; degrees C above minimum growth temperature (Celsius*)"""
-    heat_fraction: Optional[float] = None
-    """fraction of potential heat units accumulated to date (unitless)"""
     minimum_heat_unit_temperature: Optional[float] = None
     """minimum temperature used for heat unit calculations during the alternative heat unit method (Celsius)"""
     maximum_heat_unit_temperature: Optional[float] = None
     """maximum temperature used for heat unit calculations during the alternative heat unit method (Celsius)"""
     heat_unit_temperature: Optional[float] = None
     """heat unit temperature used by alternative heat unit method (Celsius)"""
-    previous_heat_fraction: Optional[float] = None
-    """fraction of potential heat units on the previous day (unitless)"""
 
     # ---- leaf area index
     max_canopy_height: float = 2.5  # m
@@ -399,16 +395,15 @@ class CropData:
                 self.plant_category == PlantCategory.COOL_ANNUAL_LEGUME:
             self.is_nitrogen_fixer = True
 
-        if self.heat_fraction is None:
-            self.heat_fraction = self.accumulated_heat_units / self.potential_heat_units
-
     @property
     def is_mature(self) -> bool:
-        """checks if maturity has been reached based on the fraction of potential heat units accumulated
+        """
+        Checks if maturity has been reached based on the fraction of potential heat units accumulated.
 
         References
         ----------
         SWAT Theoretical documentation section 5:2.1.4
+
         """
         return self.heat_fraction >= 1.0
 
@@ -438,6 +433,18 @@ class CropData:
 
         """
         return self.max_canopy_water_capacity * (self.leaf_area_index / self.max_leaf_area_index)
+
+    @property
+    def heat_fraction(self) -> float:
+        """
+        Fraction of potential heat units accumulated.
+
+        References
+        ----------
+        SWAT Theoretical documentation section 5:2.1.4
+
+        """
+        return self.accumulated_heat_units / self.potential_heat_units
 
 
 """

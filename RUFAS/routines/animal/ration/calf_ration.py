@@ -30,7 +30,7 @@ class CalfRationManager:
             Dictionary of formulated ration.
 
         """
-        return {'155': 1, '157': 2, 'status': 'Optimal', 'objective': 4.5}
+        return {'202': 1, '216': 2, 'status': 'Optimal', 'objective': 4.5}
 
     @classmethod
     def optimize(cls):
@@ -85,23 +85,27 @@ class CalfRationManager:
         starter_proportion = animal_intake['starter_proportion']
 
         # nutrient composition of feeds from the feed library
-        whole_milk_id = 155
-        milk_replacer_id = 156
-        starter_id = 157
+        whole_milk_id = 202
+        milk_replacer_id = 203
+        starter_id = 216
         calf_feeds = feed.calf_feeds
 
         whole_milk_cp = calf_feeds[whole_milk_id]['CP']
-        whole_milk_de = calf_feeds[whole_milk_id]['DE']
+        de_key = 'DE_Base' if 'DE_Base' in calf_feeds[whole_milk_id].keys() else 'DE'
+        whole_milk_de = calf_feeds[whole_milk_id][de_key]
+        milk_replacer_de = calf_feeds[milk_replacer_id][de_key]
+        starter_de = calf_feeds[starter_id][de_key]
+
         # [A.1B.C.1]
         whole_milk_me = 0.96 * whole_milk_de
 
         milk_replacer_cp = calf_feeds[milk_replacer_id]['CP']
-        milk_replacer_de = calf_feeds[milk_replacer_id]['DE']
+
         # [A.1B.C.1]
         milk_replacer_me = 0.96 * milk_replacer_de
 
         starter_cp = calf_feeds[starter_id]['CP']
-        starter_de = calf_feeds[starter_id]['DE']
+
         starter_ee = calf_feeds[starter_id]['EE']
         # [A.1B.C.2]
         starter_me = (1.01 * starter_de - 0.45) + 0.0046 * (starter_ee - 3)
@@ -159,7 +163,7 @@ class CalfRationManager:
         # [A.1B.H.3]
         energy_allow_gain = 0
         if ne_gain >= 0:
-            energy_allow_gain = math.exp(0.833 * math.log((1.19 * ne_gain)/(0.69 * calf.body_weight ** 0.355)))
+            energy_allow_gain = math.exp(0.833 * math.log((1.19 * ne_gain) / (0.69 * calf.body_weight ** 0.355)))
 
         # [A.1B.H.4]
         adp_allow_gain = (adp_intake - adp_maint) * bio_val / 0.188 * 0.001
@@ -209,25 +213,27 @@ class CalfRationManager:
 
         """
         # nutrient composition of feeds from the feed library
-        whole_milk_id = 155
-        milk_replacer_id = 156
-        starter_id = 157
+        whole_milk_id = 202
+        milk_replacer_id = 203
+        starter_id = 216
         calf_feeds = feed.calf_feeds
 
         whole_milk_dm = calf_feeds[whole_milk_id]['DM']
         whole_milk_cp = calf_feeds[whole_milk_id]['CP']
-        whole_milk_de = calf_feeds[whole_milk_id]['DE']
+        de_key = 'DE_Base' if 'DE_Base' in calf_feeds[whole_milk_id].keys() else 'DE'
+        whole_milk_de = calf_feeds[whole_milk_id][de_key]
+        milk_replacer_de = calf_feeds[milk_replacer_id][de_key]
+        starter_de = calf_feeds[starter_id][de_key]
+
         # [A.1B.C.1]
         whole_milk_me = 0.96 * whole_milk_de
 
         milk_replacer_dm = calf_feeds[milk_replacer_id]['DM']
         milk_replacer_cp = calf_feeds[milk_replacer_id]['CP']
-        milk_replacer_de = calf_feeds[milk_replacer_id]['DE']
         # [A.1B.C.1]
         milk_replacer_me = 0.96 * milk_replacer_de
 
         starter_cp = calf_feeds[starter_id]['CP']
-        starter_de = calf_feeds[starter_id]['DE']
         starter_ee = calf_feeds[starter_id]['EE']
         # [A.1B.C.2]
         starter_me = (1.01 * starter_de - 0.45) + 0.0046 * (starter_ee - 3)

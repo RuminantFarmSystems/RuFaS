@@ -151,11 +151,6 @@ def test_get_calf_feeds():
     pass
 
 
-def test_update_all():
-    """Unit test for function update_all in file routines/feed/nitrogen_loss.py"""
-    pass
-
-
 def test_CP_loss():
     """Unit test for function CP_loss in file routines/feed/nitrogen_loss.py"""
     pass
@@ -171,11 +166,6 @@ def test_update_CP():
     pass
 
 
-def test_update_all():
-    """Unit test for function update_all in file routines/feed/protein_degradation.py"""
-    pass
-
-
 def test_degrade_protein():
     """Unit test for function degrade_protein in file routines/feed/protein_degradation.py"""
     pass
@@ -187,7 +177,7 @@ def feed(mocker: MockerFixture) -> Feed:
 
     mocker.patch('RUFAS.routines.feed.Feed.__init__',
                  return_value=None)
-    return Feed(data=mocker.MagicMock())
+    return Feed(data=mocker.MagicMock(), nutrient_standard='NASEM')
 
 
 def test_get_quality_specific_feed_costs(mocker: MockerFixture, feed: Feed) -> None:

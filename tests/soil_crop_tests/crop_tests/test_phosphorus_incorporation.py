@@ -3,7 +3,7 @@ import pytest
 from RUFAS.routines.field.crop.nitrogen_incorporation import NitrogenIncorporation
 from RUFAS.routines.field.crop.phosphorus_incorporation import PhosphorusIncorporation
 from RUFAS.routines.field.crop.crop_data import CropData
-from unittest.mock import MagicMock
+from unittest.mock import MagicMock, patch, PropertyMock
 
 from RUFAS.routines.field.soil.soil_data import SoilData
 
@@ -155,13 +155,12 @@ def test_uptake_phosphorus(phosphates, depths):
     ([.5, .3, .2], [1, 2, 5], True),
     ([.5, .3, .2], [1, 2, 5], False)
 ])
-def test_incorporate_phosphorus(phosphates, depths, gate):
-    """check that incorporate_phosphorus() correctly called functions and variables were updated as expected"""
+def test_incorporate_phosphorus(phosphates: list[float], depths: list[float], gate: bool) -> None:
+    """Check that incorporate_phosphorus() correctly called functions and variables were updated as expected."""
     # initialize object
-    data = CropData(heat_fraction=0.38, half_mature_heat_fraction=.54, mature_heat_fraction=0.99,
-                    emergence_phosphorus_fraction=0.71, half_mature_phosphorus_fraction=0.68,
-                    near_mature_phosphorus_fraction=0.62, mature_phosphorus_fraction=0.60,
-                    biomass=122.8, previous_phosphorus=0, biomass_growth_max=999)
+    data = CropData(half_mature_heat_fraction=.54, mature_heat_fraction=0.99, emergence_phosphorus_fraction=0.71,
+                    half_mature_phosphorus_fraction=0.68, near_mature_phosphorus_fraction=0.62,
+                    mature_phosphorus_fraction=0.60, biomass=122.8, previous_phosphorus=0, biomass_growth_max=999)
     soil = SoilData(field_size=1.55)
     del soil.soil_layers[3]
     top_depths = [0] + depths[:2]
@@ -184,7 +183,8 @@ def test_incorporate_phosphorus(phosphates, depths, gate):
     NitrogenIncorporation.determine_stored_nutrient = MagicMock(return_value=99.3)
 
     # run method
-    incorp.incorporate_phosphorus(soil)
+    with patch.object(CropData, "heat_fraction", new_callable=PropertyMock, return_value=0.38):
+        incorp.incorporate_phosphorus(soil)
 
     # assertions
     incorp.shift_phosphorus_time.assert_called_once()

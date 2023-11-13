@@ -2,6 +2,7 @@ from __future__ import annotations
 from typing import Optional
 
 from RUFAS.routines.field.soil.carbon_cycling.carbon_cycle import CarbonCycling
+from RUFAS.routines.field.soil.snow import Snow
 from RUFAS.routines.field.soil.soil_data import SoilData
 from RUFAS.routines.field.soil.evaporation import Evaporation
 from RUFAS.routines.field.soil.infiltration import Infiltration
@@ -52,7 +53,9 @@ class Soil:
         self.percolation = Percolation(self.data)
         """Process component that controls percolation of water from upper layers to lower layers"""
         self.soil_erosion = SoilErosion(self.data)
-        """Process component that track erosion from the soil profile"""
+        """Process component that tracks erosion from the soil profile"""
+        self.snow = Snow(self.data)
+        """Process component that tracks snow"""
 
     def daily_soil_routine(self, solar_radiation: float, avg_temp: float, min_temp: float, max_temp: float,
                            plant_cover: float, snow_cover: float, avg_annual_air_temp: float) -> None:

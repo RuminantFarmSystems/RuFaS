@@ -28,6 +28,10 @@ class OutputGatherer:
             om.add_variable("eroded_sediment", field.soil.data.eroded_sediment, info_map)
             om.add_variable("accumulated_runoff", field.soil.data.accumulated_runoff, info_map)
             om.add_variable("infiltrated_water", field.soil.data.infiltrated_water, info_map)
+            om.add_variable("snow_content", field.soil.data.snow_content, info_map)
+            om.add_variable("snow_melt", field.soil.data.snow_melt_amount, info_map)
+            om.add_variable("current_day_snow_temperature", field.soil.data.current_day_snow_temperature, info_map)
+            om.add_variable("water_sublimated", field.soil.data.water_sublimated, info_map)
             om.add_variable("cover_type",
                             field.soil.data.cover_type,
                             info_map)
