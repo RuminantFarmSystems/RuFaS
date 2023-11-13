@@ -1,1 +1,4 @@
 .*heiferII_.*_last_day
+.*inseminated_heiferIIs.*
+.*pregnant_heiferIIs.*
+.*non_pregnant_heiferIIs.*
