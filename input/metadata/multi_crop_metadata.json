@@ -947,7 +947,7 @@
           "pen_type": {
             "description": "Pen Type -- The type of stalls the pen has.",
             "type": "string",
-            "pattern": "^(freestall|tilestall|drylot)$",
+            "pattern": "^(freestall|tiestall|drylot)$",
             "default": "freestall"
           },
           "max_stocking_density": {

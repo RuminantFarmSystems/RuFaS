@@ -3,7 +3,7 @@
     "config": {
       "title": "Config Data",
       "description": "Configuration Information for farm 4",
-      "path": "input/data/config/pilot_testing_config.json",
+      "path": "input/data/config/cohort2_farm4_config.json",
       "type": "json",
       "properties": "config_properties"
     },
@@ -37,8 +37,8 @@
     },
     "feed": {
       "title": "Feed data",
-      "description": "Feed Information for farm 4",
-      "path": "input/data/feed/cohort2_farm4_feed.json",
+      "description": "Diet Information for farm 4",
+      "path": "input/data/feed/cohort2_farm4_diet.json",
       "type": "json",
       "properties": "feed_properties"
     },
