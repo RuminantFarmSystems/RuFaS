@@ -197,7 +197,6 @@ def test_check_crop_harvest_schedule(year: int, day: int, all_harvest_events: Li
     setattr(mocked_time, "calendar_year", year)
     setattr(mocked_time, "day", day)
     mock_conditions = MagicMock(CurrentDayConditions)
-    setattr(mock_conditions, "rainfall", 10.0)
     remaining_harvest_events = [events for events in all_harvest_events if events not in current_harvest_events]
     field._filter_events = MagicMock(return_value=(remaining_harvest_events, current_harvest_events))
     field._harvest_crop = MagicMock()
@@ -205,7 +204,7 @@ def test_check_crop_harvest_schedule(year: int, day: int, all_harvest_events: Li
 
     harvest_crop_calls = []
     for event in current_harvest_events:
-        new_call = call(event.crop_reference, event.operation, mocked_time, 10.0)
+        new_call = call(event.crop_reference, event.operation, mocked_time, mock_conditions)
         harvest_crop_calls.append(new_call)
 
     field._check_crop_harvest_schedule(mocked_time, mock_conditions)

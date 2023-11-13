@@ -30,12 +30,13 @@ class PoolGasPartition:
 
     def partition_pool_gas(self):
         """
-        main routine to update variables associated with gas partitioning in all layers
+        Main routine to update variables associated with gas partitioning in all layers.
 
         Notes
         ------
         This method applies all the gas-partitioning sub routines to each layer of soil that is present in the soil
         `data` object.
+
         """
         layer = self.data.soil_layers[0]
         layer.active_carbon_decomposition_rate = self._determine_active_carbon_decomposition_rate(

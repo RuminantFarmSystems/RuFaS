@@ -619,7 +619,7 @@ class Field:
         """
         self.harvest_events, todays_harvest_events = self._filter_events(self.harvest_events, time)
         for event in todays_harvest_events:
-            self._harvest_crop(event.crop_reference, event.operation, time, current_conditions.rainfall)
+            self._harvest_crop(event.crop_reference, event.operation, time, current_conditions)
 
         self._harvest_heat_scheduled_crops(current_conditions.rainfall)
 
