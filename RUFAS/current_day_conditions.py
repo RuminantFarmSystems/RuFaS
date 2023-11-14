@@ -1,3 +1,4 @@
+import math
 from dataclasses import dataclass
 from typing import Optional
 
@@ -57,23 +58,31 @@ class CurrentDayConditions:
             self.rainfall = self.precipitation
 
     @staticmethod
-    def determine_daylength(month: int) -> int:
+    def determine_daylength(solar_declination_radians: float, geographic_latitude_radians: float,
+                            angular_velocity=0.2618) -> float:
         """
-        Approximate day length of the month by using data from Madison, WI.
+        Calculates the day length for the field based on its day and latitude
 
         Parameters
         ----------
-        month: int
-            Month of the year.
+        solar_declination_radians : float
+            solar declination in radians
+        geographic_latitude_radians : float
+            geographic latitude in radians
+        angular_velocity: float default = 0.2618
+            angular velocity of earth
+
 
         Returns
         -------
-        int
-            Day length of the month (hour).
+        float
+            The day length of  the field on specific day
 
         References
         ----------
-        https://sunrise.maplogs.com/dane_county_wi_usa.15449.html
+        SWAT 1:1.1.6
         """
-        daylength = [9, 10, 11, 13, 14, 15, 15, 15, 13, 12, 10, 9]
-        return daylength[month-1]
+
+        day_length = ((2 * math.acos(-math.tan(solar_declination_radians) * math.tan(geographic_latitude_radians)))
+                      / angular_velocity)
+        return day_length
