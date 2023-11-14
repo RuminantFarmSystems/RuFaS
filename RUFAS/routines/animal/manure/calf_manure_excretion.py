@@ -97,7 +97,7 @@ def manure_calculations(ration_formulation,
 
     manure_excretion_values = AnimalManureExcretions(
         urea=9.52,  # 0.340 mol/L TODO: Implement with correct equation
-        urine=2,
+        urine=urine,
         # TODO: Implement with correct equation
         total_ammoniacal_nitrogen_concentration=0.14,
         urine_nitrogen=urine_nitrogen,

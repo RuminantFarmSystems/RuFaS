@@ -61,7 +61,7 @@ def manure_calculations(ration_formulation,
     nutrient_amounts, nutrient_concentrations = RationReporter.report_ration(
         ration_formulation, feed.available_feeds)
     dry_matter_intake = nutrient_amounts['dm']
-    ash_diet_content = nutrient_amounts['ash']
+    # ash_diet_content = nutrient_amounts['ash']
     CP_concentration = nutrient_concentrations['CP']
     potassium_concentration = nutrient_concentrations['potassium']
     ASH_concentration = nutrient_concentrations["ash"]  # TODO: Unused
@@ -127,7 +127,7 @@ def manure_calculations(ration_formulation,
                       ) * GeneralConstants.GRAMS_TO_KG
 
     # Nitrogen excretion in feces, kg [A.3B.B.3]
-    fecal_nitrogen = manure_nitrogen - urine_nitrogen  # TODO: Unused
+    # fecal_nitrogen = manure_nitrogen - urine_nitrogen  # TODO: Unused
 
     # Urinary N concentration, g N/kg [A.3G.B.1]
     urinary_nitrogen_concentration = (
