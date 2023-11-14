@@ -123,8 +123,7 @@ class Cow(HeiferIII):
         self.repro_program = args['repro_program']
         self.first_ai = False
         self.fat_percent = 0
-        
-    
+
         # TAI params
         self.presynch_method = args['presynch_method']
         self.tai_method_c = args['tai_method_c']
@@ -342,18 +341,13 @@ class Cow(HeiferIII):
             daily_fat_correct_milk_production = \
                 0.4 * estimated_daily_milk_produced + \
                 0.15 * fat_percent * estimated_daily_milk_produced
-            self.daily_milk_fat_kg = fat_percent*estimated_daily_milk_produced 
-            self.daily_milk_protein_kg = self.mPrt * self.estimated_daily_milk_produced 
-            
-
+            self.daily_milk_fat_kg = fat_percent*estimated_daily_milk_produced
+            self.daily_milk_protein_kg = self.mPrt * self.estimated_daily_milk_produced
         else:
             fat_percent = 0
             daily_fat_correct_milk_production = 0
             self.daily_milk_fat_kg = 0
             self.daily_milk_protein_kg = 0
-
-        
-        
 
         self.daily_growth = self.get_bw_change(calving_interval)
 

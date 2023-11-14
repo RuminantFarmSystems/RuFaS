@@ -251,7 +251,7 @@ class LifeCycleManager:
                      heiferIIIs: List[HeiferIII],
                      cows: List[Cow]) \
             -> Tuple[List[Cow], List[Cow], List[Calf], List[Calf],
-            List[HeiferI], List[HeiferII], List[HeiferIII], List[Cow]]:
+                     List[HeiferI], List[HeiferII], List[HeiferIII], List[Cow]]:
         """
         Updates the status of the animals.
 
@@ -308,8 +308,7 @@ class LifeCycleManager:
         self.daily_herd_milk_fat_kg = sum(cow.daily_milk_fat_kg for cow in cows)
         self.daily_herd_milk_fat_percent = self.daily_herd_milk_fat_kg / self.daily_milk_production
         self.daily_herd_milk_protein_kg = sum(cow.daily_milk_protein_kg for cow in cows)
-        self.daily_herd_milk_protein_percent = self.daily_herd_milk_protein_kg / self.daily_milk_production 
-      
+        self.daily_herd_milk_protein_percent = self.daily_herd_milk_protein_kg / self.daily_milk_production
 
         info_map = {"class": self.__class__.__name__,
                     "function": self.daily_update.__name__,
@@ -319,7 +318,8 @@ class LifeCycleManager:
                                              "sold_heifer_num", "bought_heifer_num", "culled_heifer_num",
                                              "culled_cow_num", "GnRH_injection_num_h", "GnRH_injection_num",
                                              "PGF_injection_num", "PGF_injection_num_h", "ai_num", "preg_check_num",
-                                             "preg_check_num_h", "sold_calf_num", "daily_milk_production", "daily_herd_milk_fat_percent", "daily_herd_milk_protein_percent",
+                                             "preg_check_num_h", "sold_calf_num", "daily_milk_production",
+                                             "daily_herd_milk_fat_percent", "daily_herd_milk_protein_percent",
                                              "open_cow_num", "vwp_cow_num", "preg_cow_num", "milking_cow_num",
                                              "dry_cow_num", "avg_days_in_milk", "avg_days_in_preg",
                                              "avg_cow_body_weight", "avg_parity_num", "avg_calving_interval",
@@ -666,7 +666,7 @@ class LifeCycleManager:
         args.update(tai_method_c=AnimalBase.config["cow_repro_programs"]['cow_TAI_protocol'])
         args.update(resynch_method=AnimalBase.config["cow_repro_programs"]['cow_resynch_protocol'])
         new_cow = Cow(args)
-        if len(cows)>0:
+        if len(cows) > 0:
             new_cow.milk_production_reduction = cows[0].milk_production_reduction
         cows.append(new_cow)
 
