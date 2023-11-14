@@ -80,7 +80,6 @@ class AnimalReporter:
         info_map = {
             "class": AnimalReporter.__name__,
             "function": AnimalReporter.report_milk.__name__,
-            "simulation_day": simulation_day,
         }
 
         for animal in pen.animals_in_pen:
@@ -95,5 +94,23 @@ class AnimalReporter:
             milk_data_update["lactating"] = animal.milking
             milk_data_update["parity"] = animal.calves
             milk_data_update["cow_id"] = animal.id
+            milk_data_update["pen_id"] = animal.pen_history[-1].pen
+            milk_data_update["simulation_day"] = simulation_day
 
             om.add_variable("milk_data_at_milk_update", milk_data_update, info_map)
+
+    def report_daily_ration(animal_manager):
+        info_map = {
+            "class": AnimalReporter.__name__,
+            "function": AnimalReporter.report_daily_ration.__name__,
+        }
+        for pen in animal_manager.all_pens:
+            ration_total = {}
+            ration_total["dry_matter_intake_total"] = 0
+            for key in pen.ration_per_animal.keys():
+                if key != "status" and key != 'objective':
+                    ration_total[key] = pen.ration_per_animal[key] * len(
+                        pen.animals_in_pen
+                    )
+                    ration_total["dry_matter_intake_total"] += ration_total[key]
+            om.add_variable(f"daily_feed_totals_for_pen_{pen.id}", ration_total, info_map)
