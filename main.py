@@ -36,6 +36,8 @@ def main():
         only_run_validation=cmd_arguments.only_run_validation,
         graphics_dir=Path(cmd_arguments.graphics_dir),
         vars_file_path=Path(cmd_arguments.load_pool),
+        output_dir=Path(cmd_arguments.output_dir),
+        filters_dir=Path(cmd_arguments.filters_dir)
     )
 
 
@@ -49,6 +51,8 @@ def run_rufas(
     only_run_validation: bool = False,
     graphics_dir: Path = Path(""),
     vars_file_path: Path = Path(""),
+    output_dir: Path = Path("output/"),
+    filters_dir: Path = Path("output/output_filters/")
 ) -> None:
     """Main function to run RuFaS, with options.
 
@@ -72,12 +76,17 @@ def run_rufas(
         The directory for saving graphics.
     vars_file_path : Path, optional, default=Path("")
         The path to the json file to load into Output Manager variables pool for processing.
+    output_dir : Path, optional, default=Path("output/")
+        The directory for saving output.
+    filters_dir : Path, optional, default=Path("output/output_filters")
+        The directory for the files containing the keys for filtering.
     """
     sys.stdout.write("RuFaS: Ruminant Farm Systems Model 2023\n")
 
     if load_pool:
         run_load_vars_pool(vars_file_path, exclude_info_maps, format_option,
-                           produce_graphics, graphics_dir, clear_output)
+                           produce_graphics, graphics_dir, clear_output, output_dir,
+                           filters_dir)
         return
 
     if clear_output:
@@ -85,7 +94,7 @@ def run_rufas(
 
     metadata_files: List[MetadataPaths] = METADATA_PATHS
     if only_run_validation:
-        run_validation(metadata_files, exclude_info_maps, format_option, verbose)
+        run_validation(metadata_files, exclude_info_maps, format_option, verbose, output_dir)
     else:
         execute_simulations(
             metadata_files,
@@ -145,6 +154,8 @@ def run_load_vars_pool(
     produce_graphics: bool = True,
     graphics_dir: Path = Path(""),
     clear_output: bool = False,
+    output_dir: Path = Path("output/"),
+    filters_dir: Path = Path("output/output_filters/")
 ) -> None:
     """Instantiates Output Manager and triggers loading of the variables pool from the provided file path
     for post-processing.
@@ -161,6 +172,10 @@ def run_load_vars_pool(
         The directory for saving graphics.
     clear_output : bool, optional
         Flag for whether or not the user wants to clear the output directory.
+    output_dir : Path, optional, default=Path("output/")
+        The directory for saving output.
+    filters_dir : Path, optional, default=Path("output/output_filters")
+        The directory for the files containing the keys for filtering.
     """
     if clear_output:
         clear_output_dir(vars_file_path)
@@ -169,14 +184,14 @@ def run_load_vars_pool(
     output_manager.load_variables_pool_from_file(vars_file_path)
     output_manager.set_metadata_prefix("reload")
     output_manager.save_results(
-            Path(r"output"),
-            Path(r"output/output_filters/"),
+            output_dir,
+            filters_dir,
             exclude_info_maps,
             produce_graphics,
             graphics_dir,
         )
     output_manager.dump_all_nondata_pools(
-            r"output", exclude_info_maps, format_option
+            output_dir, exclude_info_maps, format_option
         )
 
 
@@ -185,6 +200,7 @@ def run_validation(
     exclude_info_maps: bool = False,
     format_option: str = "verbose",
     verbose: LogVerbosity = LogVerbosity.NONE,
+    output_dir: Path = Path("output/"),
 ) -> None:
     """Instantiates I/O Managers and triggers validation of input data.
 
@@ -198,6 +214,8 @@ def run_validation(
         The formatting option for select output files.
     verbose : LogVerbosity
         The verbose option set by the user.
+    output_dir : Path, optional, default=Path("output/")
+        The directory for saving output.
     """
     info_map = {
         "class": "No caller class",
@@ -231,7 +249,7 @@ def run_validation(
                 info_map,
             )
         output_manager.dump_all_nondata_pools(
-            r"output", exclude_info_maps, format_option
+            output_dir, exclude_info_maps, format_option
         )
 
 
@@ -242,6 +260,8 @@ def execute_simulations(
     graphics_dir: Path = Path(""),
     format_option: str = "verbose",
     verbose: LogVerbosity = LogVerbosity.NONE,
+    output_dir: Path = Path("output/"),
+    filters_dir: Path = Path("output/output_filters/")
 ) -> None:
     """Instantiates I/O Managers and processes the metadata files provided by the user to run the simulation.
 
@@ -261,6 +281,10 @@ def execute_simulations(
         The formatting option for select output files.
     verbose : LogVerbosity
         The verbose option set by the user.
+    output_dir : Path, optional, default=Path("output/")
+        The directory for saving output.
+    filters_dir : Path, optional, default=Path("output/output_filters")
+        The directory for the files containing the keys for filtering.
     """
     info_map = {
         "class": "No caller class",
@@ -300,14 +324,14 @@ def execute_simulations(
                 info_map,
             )
         output_manager.save_results(
-            Path(r"output"),
-            Path(r"output/output_filters/"),
+            output_dir,
+            filters_dir,
             exclude_info_maps,
             produce_graphics,
             graphics_dir,
         )
         output_manager.dump_all_nondata_pools(
-            r"output", exclude_info_maps, format_option
+            output_dir, exclude_info_maps, format_option
         )
 
 
@@ -368,6 +392,19 @@ def parse_gnu_args() -> argparse.Namespace:
         "-l",
         "--load-pool",
         help="Load the output manager's variables pool from provided path",
+        default=""
+    )
+    parser.add_argument(
+        "-O",
+        "--output-dir",
+        help="The saving directory for output",
+        default="output/",
+    )
+    parser.add_argument(
+        "-F",
+        "--filters-dir",
+        help="The directory for the files containing the keys for filtering",
+        default="output/",
     )
     return parser.parse_args()
 
