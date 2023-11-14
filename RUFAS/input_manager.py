@@ -460,7 +460,7 @@ class InputManager:
                     }
         if type(input_data_value) is not list:
             warning_string = "Validation: array is not a list."
-            om.add_warning(warning_string, f"{var_name=}", info_map)
+            om.add_warning(warning_string, f"Variable '{var_name}' is type: {type(input_data_value)}", info_map)
             return False
 
         maximum_length = variable_properties.get("maximum_length")
@@ -468,14 +468,18 @@ class InputManager:
         if minimum_length is not None:
             is_in_range = variable_properties["minimum_length"] <= len(input_data_value)
             if not is_in_range:
-                warning_string = f"Validation: array length less than {minimum_length}."
-                om.add_warning(warning_string, f"{var_name=}", info_map)
+                warning_name = f"Validation: array length less than minimum."
+                warning_message = f"Variable '{var_name}' has length: {len(input_data_value)}, less than minimum " \
+                                  f"length: {minimum_length}."
+                om.add_warning(warning_name, warning_message, info_map)
                 return False
         if maximum_length is not None:
             is_in_range = len(input_data_value) <= variable_properties["maximum_length"]
             if not is_in_range:
-                warning_string = f"Validation: array length more than {maximum_length}."
-                om.add_warning(warning_string, f"{var_name=}", info_map)
+                warning_name = f"Validation: array length greater than maximum."
+                warning_message = f"Variable '{var_name}' has length : {len(input_data_value)}, greater than " \
+                                  f"maximum length: {maximum_length}."
+                om.add_warning(warning_name, warning_message, info_map)
                 return False
         return True
 
@@ -489,19 +493,23 @@ class InputManager:
         maximum_value = variable_properties.get("maximum")
         if type(input_data_value) is not float and type(input_data_value) is not int:
             warning_string = "Validation: value is not a number."
-            om.add_warning(warning_string, f"{var_name=}", info_map)
+            om.add_warning(warning_string, f"Variable '{var_name}' is type: {type(input_data_value)}.", info_map)
             return False
         if minimum_value is not None:
             is_in_range = minimum_value <= input_data_value
             if not is_in_range:
-                warning_string = f"Validation: value less than {minimum_value: .2f}."
-                om.add_warning(warning_string, f"{var_name=}", info_map)
+                warning_name = "Validation: value less than minimum."
+                warning_message = f"Variable '{var_name}' has value: {input_data_value}, less than minimum value: " \
+                                  f"{minimum_value: .2f}."
+                om.add_warning(warning_name, warning_message, info_map)
                 return False
         if maximum_value is not None:
             is_in_range = input_data_value <= maximum_value
             if not is_in_range:
-                warning_string = f"Validation: value greater than {maximum_value: .2f}."
-                om.add_warning(warning_string, f"{var_name=}", info_map)
+                warning_name = "Validation: value greater than maximum."
+                warning_string = f"Variable '{var_name}' has value: {input_data_value}, greater than maximum value: " \
+                                 f"{maximum_value: .2f}."
+                om.add_warning(warning_name, warning_string, info_map)
                 return False
 
         return True
@@ -512,16 +520,19 @@ class InputManager:
                     "function": self._string_type_validator.__name__,
                     }
         if type(input_data_value) is not str:
-            warning_string = "Validation: string variable is not a string."
-            om.add_warning(warning_string, f"{var_name=}", info_map)
+            warning_name = "Validation: string variable is not a string."
+            warning_message = f"Variable '{var_name}' is type: {type(input_data_value)}."
+            om.add_warning(warning_name, warning_message, info_map)
             return False
 
         pattern_check = variable_properties.get("pattern")
         if pattern_check is not None:
             is_valid_string = bool(re.match(pattern_check, input_data_value))
             if not is_valid_string:
-                warning_string = f"Validation: string variable must match pattern {variable_properties['pattern']}."
-                om.add_warning(warning_string, f"{var_name=}", info_map)
+                warning_name = "Validation: string variable does not match pattern."
+                warning_message = f"Variable '{var_name}' has value: '{input_data_value}', does not match pattern " \
+                                  f"'{pattern_check}'."
+                om.add_warning(warning_name, warning_message, info_map)
                 return False
 
         minimum_length = variable_properties.get("minimum_length")
@@ -529,14 +540,18 @@ class InputManager:
         if minimum_length is not None:
             is_valid_string = variable_properties["minimum_length"] <= len(input_data_value)
             if not is_valid_string:
-                warning_string = f"Validation: string length less than {minimum_length}."
-                om.add_warning(warning_string, f"{var_name=}", info_map)
+                warning_name = "Validation: string length less than minimum."
+                warning_message = f"Variable '{var_name}' has value: '{input_data_value}', length is less than " \
+                                  f"minimum length: {minimum_length}."
+                om.add_warning(warning_name, warning_message, info_map)
                 return False
         if maximum_length is not None:
             is_valid_string = len(input_data_value) <= variable_properties["maximum_length"]
             if not is_valid_string:
-                warning_string = f"Validation: string length more than {maximum_length}."
-                om.add_warning(warning_string, f"{var_name=}", info_map)
+                warning_name = "Validation: string length greater than maximum."
+                warning_message = f"Variable '{var_name}' has value: '{input_data_value}', length is greater than " \
+                                  f"maximum length: {maximum_length}."
+                om.add_warning(warning_name, warning_message, info_map)
                 return False
 
         return True
