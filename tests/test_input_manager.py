@@ -783,8 +783,14 @@ def test_bool_type_validator(input_data_value: bool, expected_result: bool, mock
     """Unit test for function _bool_type_validator in file input_manager.py"""
     variable_properties = {}
     var_name = "dummy_var_name"
-    result = mock_input_manager._bool_type_validator(variable_properties, var_name, input_data_value)
 
+    with patch("RUFAS.output_manager.OutputManager.add_warning") as add_warning:
+        result = mock_input_manager._bool_type_validator(variable_properties, var_name, input_data_value)
+
+    if not expected_result:
+        add_warning.assert_called_once()
+    else:
+        add_warning.assert_not_called()
     assert result == expected_result
 
 

@@ -468,7 +468,7 @@ class InputManager:
         if minimum_length is not None:
             is_in_range = variable_properties["minimum_length"] <= len(input_data_value)
             if not is_in_range:
-                warning_name = f"Validation: array length less than minimum."
+                warning_name = "Validation: array length less than minimum."
                 warning_message = f"Variable '{var_name}' has length: {len(input_data_value)}, less than minimum " \
                                   f"length: {minimum_length}."
                 om.add_warning(warning_name, warning_message, info_map)
@@ -476,7 +476,7 @@ class InputManager:
         if maximum_length is not None:
             is_in_range = len(input_data_value) <= variable_properties["maximum_length"]
             if not is_in_range:
-                warning_name = f"Validation: array length greater than maximum."
+                warning_name = "Validation: array length greater than maximum."
                 warning_message = f"Variable '{var_name}' has length : {len(input_data_value)}, greater than " \
                                   f"maximum length: {maximum_length}."
                 om.add_warning(warning_name, warning_message, info_map)
@@ -493,7 +493,8 @@ class InputManager:
         maximum_value = variable_properties.get("maximum")
         if type(input_data_value) is not float and type(input_data_value) is not int:
             warning_string = "Validation: value is not a number."
-            om.add_warning(warning_string, f"Variable '{var_name}' is type: {type(input_data_value)}.", info_map)
+            om.add_warning(warning_string, f"Variable '{var_name}' has value: {input_data_value}, is type: "
+                                           f"{type(input_data_value)}.", info_map)
             return False
         if minimum_value is not None:
             is_in_range = minimum_value <= input_data_value
@@ -521,7 +522,7 @@ class InputManager:
                     }
         if type(input_data_value) is not str:
             warning_name = "Validation: string variable is not a string."
-            warning_message = f"Variable '{var_name}' is type: {type(input_data_value)}."
+            warning_message = f"Variable '{var_name}' has value: {input_data_value}, is type: {type(input_data_value)}."
             om.add_warning(warning_name, warning_message, info_map)
             return False
 
@@ -558,6 +559,16 @@ class InputManager:
 
     def _bool_type_validator(self, variable_properties: Dict[str, Any], var_name: str, input_data_value: bool) -> bool:
         """Validates an input data bool element."""
+        info_map = {"class": self.__class__.__name__,
+                    "function": self._bool_type_validator.__name__,
+                    }
+        if type(input_data_value) is not bool:
+            warning_name = "Validation: bool variable is not a bool."
+            warning_message = f"Variable '{var_name}' has value: '{input_data_value}', is type: " \
+                              f"'{type(input_data_value)}'."
+            om.add_warning(warning_name, warning_message, info_map)
+            return False
+
         return input_data_value in (True, False)
 
     def _fix_data(self, variable_properties: Dict[str, Any], element_hierarchy: List[Union[str, int]],
