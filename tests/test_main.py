@@ -29,17 +29,18 @@ file_path = os.path.join(dir_path, "input/ARL.json")
 
 
 @pytest.mark.parametrize(
-    "no_graphics, format_option, verbose, clear_output, exclude_info_maps, only_run_validation, graphics_dir,"
-    "load_pool",
+    "load_pool, no_graphics, format_option, verbose, clear_output, exclude_info_maps, only_run_validation,"
+    "graphics_dir, vars_file_path",
     [
-        (False, "verbose", LogVerbosity.ERRORS, True, True, True, "graphics", False),
-        (True, "basic", LogVerbosity.LOGS, False, False, False, "custom_graphics", False),
-        (True, "block", LogVerbosity.NONE, True, False, False, "graphics", False),
-        (False, "inline", LogVerbosity.WARNINGS, False, False, False, "custom_graphics", True),
-        (True, "verbose", LogVerbosity.LOGS, False, True, False, "graphics", True),
+        (False, False, "verbose", LogVerbosity.ERRORS, True, True, True, "graphics", ""),
+        (False, True, "basic", LogVerbosity.LOGS, False, False, False, "custom_graphics", ""),
+        (False, True, "block", LogVerbosity.NONE, True, False, False, "graphics", ""),
+        (True, False, "inline", LogVerbosity.WARNINGS, False, False, False, "custom_graphics", "path.json"),
+        (True, True, "verbose", LogVerbosity.LOGS, False, True, False, "graphics", "path.json"),
     ],
 )
 def test_main(
+    load_pool: bool,
     no_graphics: bool,
     format_option: str,
     verbose: LogVerbosity,
@@ -47,7 +48,7 @@ def test_main(
     exclude_info_maps: bool,
     only_run_validation: bool,
     graphics_dir: str,
-    load_pool: bool,
+    vars_file_path: str,
 ) -> None:
     with patch("main.parse_gnu_args") as mock_parse_gnu_args:
         mock_parse_gnu_args.return_value = argparse.Namespace(
@@ -58,13 +59,14 @@ def test_main(
             exclude_info_maps=exclude_info_maps,
             only_run_validation=only_run_validation,
             graphics_dir=graphics_dir,
-            load_pool=load_pool,
+            load_pool=vars_file_path,
         )
 
         with patch("main.run_rufas") as mock_run_rufas:
             main()
             mock_parse_gnu_args.assert_called_once()
             mock_run_rufas.assert_called_once_with(
+                load_pool,
                 produce_graphics=not no_graphics,
                 format_option=format_option,
                 verbose=verbose,
@@ -72,32 +74,32 @@ def test_main(
                 exclude_info_maps=exclude_info_maps,
                 only_run_validation=only_run_validation,
                 graphics_dir=Path(graphics_dir),
-                load_pool=load_pool
+                vars_file_path=Path(vars_file_path)
             )
 
 
 @pytest.mark.parametrize(
     "format_option, produce_graphics, verbose, clear_output, exclude_info_maps, only_run_validation,"
-    "graphics_dir, load_pool",
+    "graphics_dir, load_pool, vars_file_path",
     [
-        ("verbose", True, LogVerbosity.NONE, True, True, True, "", False),
-        ("block", False, LogVerbosity.LOGS, True, True, True, "", False),
-        ("inline", True, LogVerbosity.ERRORS, True, True, True, "", False),
-        ("basic", True, LogVerbosity.WARNINGS, False, True, True, "", False),
-        ("verbose", True, LogVerbosity.NONE, True, False, True, "", False),
-        ("block", True, LogVerbosity.LOGS, True, True, False, "", False),
-        ("inline", False, LogVerbosity.ERRORS, True, True, True, "", False),
-        ("basic", False, LogVerbosity.WARNINGS, False, True, True, "", False),
-        ("verbose", False, LogVerbosity.NONE, True, False, True, "", False),
-        ("block", False, LogVerbosity.LOGS, True, True, False, "", False),
-        ("inline", False, LogVerbosity.ERRORS, False, True, True, "", False),
-        ("basic", False, LogVerbosity.WARNINGS, True, False, True, "", False),
-        ("verbose", False, LogVerbosity.NONE, True, True, False, "", False),
-        ("block", False, LogVerbosity.WARNINGS, False, False, True, "", False),
-        ("inline", False, LogVerbosity.LOGS, False, True, False, "", False),
-        ("basic", False, LogVerbosity.ERRORS, False, False, False, "", False),
-        ("basic", False, LogVerbosity.LOGS, False, False, False, "graphics", False),
-        ("basic", False, LogVerbosity.LOGS, False, False, False, "graphics", True),
+        ("verbose", True, LogVerbosity.NONE, True, True, True, "", False, ""),
+        ("block", False, LogVerbosity.LOGS, True, True, True, "", False, ""),
+        ("inline", True, LogVerbosity.ERRORS, True, True, True, "", False, ""),
+        ("basic", True, LogVerbosity.WARNINGS, False, True, True, "", False, ""),
+        ("verbose", True, LogVerbosity.NONE, True, False, True, "", False, ""),
+        ("block", True, LogVerbosity.LOGS, True, True, False, "", False, ""),
+        ("inline", False, LogVerbosity.ERRORS, True, True, True, "", False, ""),
+        ("basic", False, LogVerbosity.WARNINGS, False, True, True, "", False, ""),
+        ("verbose", False, LogVerbosity.NONE, True, False, True, "", False, ""),
+        ("block", False, LogVerbosity.LOGS, True, True, False, "", False, ""),
+        ("inline", False, LogVerbosity.ERRORS, False, True, True, "", False, ""),
+        ("basic", False, LogVerbosity.WARNINGS, True, False, True, "", False, ""),
+        ("verbose", False, LogVerbosity.NONE, True, True, False, "", False, ""),
+        ("block", False, LogVerbosity.WARNINGS, False, False, True, "", False, ""),
+        ("inline", False, LogVerbosity.LOGS, False, True, False, "", False, ""),
+        ("basic", False, LogVerbosity.ERRORS, False, False, False, "", False, ""),
+        ("basic", False, LogVerbosity.LOGS, False, False, False, "graphics", False, ""),
+        ("basic", False, LogVerbosity.LOGS, False, False, False, "graphics", True, "path.json"),
     ],
 )
 def test_run_rufas(
@@ -109,6 +111,7 @@ def test_run_rufas(
     only_run_validation: bool,
     graphics_dir: str,
     load_pool: bool,
+    vars_file_path: str,
     mocker: MockerFixture,
     capsys,
 ) -> None:
@@ -122,6 +125,7 @@ def test_run_rufas(
 
     # Act
     run_rufas(
+        load_pool,
         produce_graphics,
         format_option,
         verbose,
@@ -129,13 +133,13 @@ def test_run_rufas(
         exclude_info_maps,
         only_run_validation,
         graphics_dir,
-        load_pool,
+        vars_file_path,
     )
 
     # Assert
     if load_pool:
         patch_run_load_vars_pool.assert_called_once_with(
-            exclude_info_maps, format_option, produce_graphics, graphics_dir, clear_output
+            vars_file_path, exclude_info_maps, format_option, produce_graphics, graphics_dir, clear_output
         )
         return
     elif only_run_validation:
@@ -273,23 +277,21 @@ def test_execute_simulations(
 
 
 @pytest.mark.parametrize(
-    "exclude_info_maps, format_option, produce_graphics, graphics_dir, clear_output",
+    "vars_file_path, exclude_info_maps, format_option, produce_graphics, graphics_dir, clear_output",
     [
-        (True, "verbose", True, Path(""), True),
-        (True, "verbose", True, Path(""), False),
-        (True, "verbose", False, Path(""), False),
-        (True, "verbose", False, Path(""), True),
-        (False, "verbose", True, Path(""), False),
-        (False, "verbose", False, Path(""), False),
-        (False, "verbose", False, Path(""), True),
+        ("", True, "verbose", True, Path(""), True),
+        ("", True, "verbose", True, Path(""), False),
+        ("path.json", True, "verbose", False, Path(""), False),
+        ("path.json", True, "verbose", False, Path(""), True),
+        ("", False, "verbose", True, Path(""), False),
+        ("", False, "verbose", False, Path(""), False),
+        ("path.json", False, "verbose", False, Path(""), True),
     ],
 )
-def test_run_load_vars_pool(mocker: MockerFixture, exclude_info_maps: bool,
+def test_run_load_vars_pool(mocker: MockerFixture, vars_file_path: str, exclude_info_maps: bool,
                             format_option: str, produce_graphics: bool,
-                            graphics_dir: Path, clear_output: bool, monkeypatch) -> None:
+                            graphics_dir: Path, clear_output: bool, ) -> None:
     """Checks the run_load_vars_pool function in main.py"""
-    user_input = "test.json"
-    monkeypatch.setattr('builtins.input', lambda _: user_input)
     mock_output_manager = mocker.MagicMock(auto_spec=OutputManager)
     patch_clear_output_dir = mocker.patch("main.clear_output_dir")
     mock_output_manager.flush_pools.return_value = None
@@ -299,7 +301,7 @@ def test_run_load_vars_pool(mocker: MockerFixture, exclude_info_maps: bool,
     mock_output_manager.save_results.return_value = None
     mocker.patch("main.OutputManager", return_value=mock_output_manager)
 
-    run_load_vars_pool(exclude_info_maps, format_option, produce_graphics, graphics_dir, clear_output)
+    run_load_vars_pool(vars_file_path, exclude_info_maps, format_option, produce_graphics, graphics_dir, clear_output)
 
     if clear_output:
         patch_clear_output_dir.assert_called_once()
@@ -415,7 +417,6 @@ def test_parse_gnu_args(mocker: MockerFixture) -> None:
             "-l",
             "--load-pool",
             help="Load the output manager's variables pool from provided path",
-            action="store_true"
         ),
     ]
     mock_parse_args.assert_called_once()

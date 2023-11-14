@@ -35,7 +35,7 @@ def main():
         exclude_info_maps=cmd_arguments.exclude_info_maps,
         only_run_validation=cmd_arguments.only_run_validation,
         graphics_dir=Path(cmd_arguments.graphics_dir),
-        vars_file_path=cmd_arguments.load_pool,
+        vars_file_path=Path(cmd_arguments.load_pool),
     )
 
 
@@ -368,7 +368,6 @@ def parse_gnu_args() -> argparse.Namespace:
         "-l",
         "--load-pool",
         help="Load the output manager's variables pool from provided path",
-        type=Path,
     )
     return parser.parse_args()
 
