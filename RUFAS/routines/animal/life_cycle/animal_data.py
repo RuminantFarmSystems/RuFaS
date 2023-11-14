@@ -291,12 +291,23 @@ class AnimalData:
             animal_factory.generate_animals()
             raise Exception
         else:
-            self._init_calves(self.calf_num, self.breed)
-            self._init_heiferIs(self.heiferI_num, self.breed)
-            self._init_heiferIIs(self.heiferII_num, self.breed)
-            self._init_heiferIIIs(self.heiferIII_num, self.breed)
-            self._init_cows(self.cow_num, self.breed)
-            self._init_replacement_cows(self.replace_num, self.breed)
+            self._init_calves(self.calf_num)
+            self._init_heiferIs(self.heiferI_num)
+            self._init_heiferIIs(self.heiferII_num)
+            self._init_heiferIIIs(self.heiferIII_num)
+            self._init_cows(self.cow_num)
+            self._init_replacement_cows(self.replace_num)
+
+    def _random_sample_with_replacement(self, all_animal_data: Dict[str, List[Any]], animal_num) -> Dict[str,
+                                                                                                         List[Any]]:
+        random_choices = random.choices(list(range(animal_num)), k=animal_num)
+        animal_data = {}
+        for key in all_animal_data.keys():
+            data = []
+            for choice in random_choices:
+                data.append(all_animal_data[key][choice])
+            animal_data[key] = data
+        return animal_data
 
     def _get_args_list(self, data: Dict[str, List[Any]], args_properties: List[str], num: int) -> \
             List[Dict[str, Any]]:
@@ -337,7 +348,7 @@ class AnimalData:
             args_list.append(args)
         return args_list
 
-    def _init_calves(self, num: int, breed: str) -> None:
+    def _init_calves(self, num_calf: int) -> None:
         """
         Initializes the list of calves either from simulation data or existing data up to the required number.
 
@@ -351,97 +362,19 @@ class AnimalData:
         breed : str
             The breed of the calves to be initialized.
         """
-
-        # current_num_calves = len(self.calves)
-        #
-        # if current_num_calves >= num:
-        #     return
-        #
-        # if self.init_herd:
-        #     self.calves += self._init_calves_from_simulation(num - current_num_calves, breed)
-        #
-        # else:
-        #     if current_num_calves + self.num_calves_in_data < num:
-        #         self.calves += self._init_calves_from_data(self.num_calves_in_data)
-        #         self.calves += self._init_calves_from_simulation(num - current_num_calves - self.num_calves_in_data,
-        #                                                          breed)
-        #     else:
-        #         self.calves += self._init_calves_from_data(num - current_num_calves)
-        self._init_calves_from_data(num)
-
-    def _init_calves_from_simulation(self, num: int, breed: str) -> List[Calf]:
-        """
-        Initializes a list of Calf instances based on simulation data.
-
-        It generates calves with default values and assigns birth weights based on the breed. Each calf
-        is assigned a unique ID through the `next_id` method. Only calves that are not culled or sold
-        are added to the list.
-
-        Parameters:
-        ----------
-        num : int
-            The number of calf instances to generate.
-        breed : str
-            The breed type for the calves.
-
-        Returns:
-        --------
-        List[Calf]
-            A list containing the initialized Calf instances.
-        """
-        calves: List[Calf] = []
-        while len(calves) < num:
-            args = {
-                'id': self.next_id(),
-                'breed': breed,
-                'birth_date': 0,
-                'days_born': 0,
-                'p_init': 0,
-                'birth_weight': self.birth_weight_ho if breed == 'HO' else self.birth_weight_je
-            }
-            calf = Calf(args)
-            if not (calf.culled or calf.sold):
-                calves.append(calf)
-
-        return calves
-
-    def _init_calves_from_data(self, num: int) -> List[Calf]:
-        """
-        Initializes a list of Calf instances based on existing data.
-
-        The existing data is accessed through the `im.get_data` method and processed to initialize
-        Calf instances. Each calf's arguments are prepared and used to instantiate Calf objects which are
-        then added to the list of calves.
-
-        Parameters:
-        ----------
-        num : int
-            The number of calf instances to initialize from the data.
-
-        Returns:
-        --------
-        List[Calf]
-            A list containing the initialized Calf instances from the existing data.
-        """
         calves: List[Calf] = []
         all_calves_data: Dict[str, List[Any]] = im.get_data("calves")
-        random_choices = random.choices(list(range(num)), k=num)
-        calves_data = {}
-        for key in all_calves_data.keys():
-            temp = []
-            for choice in random_choices:
-                temp.append(all_calves_data[key][choice])
-            calves_data[key] = temp
+        calves_data = self._random_sample_with_replacement(all_animal_data=all_calves_data,
+                                                           animal_num=num_calf)
         args_properties = ['id', 'breed', 'birth_date', 'days_born', 'p_init', 'birth_weight', 'body_weight',
                            'wean_weight', 'mature_body_weight', 'events']
-        args_list = self._get_args_list(calves_data, args_properties, num)
+        args_list = self._get_args_list(calves_data, args_properties, num_calf)
         for args in args_list:
             calf = Calf(args)
             calves.append(calf)
         self.calves = calves
-        return calves
 
-    def _init_heiferIs(self, num: int, breed: str) -> None:
+    def _init_heiferIs(self, num_heiferI: int) -> None:
         """
         Initialize the list of HeiferI instances up to the specified number, based on either simulation data or
         existing data, depending on the `init_herd` flag.
@@ -460,93 +393,19 @@ class AnimalData:
         --------
         None
         """
-        current_num_heiferIs = len(self.heiferIs)
-
-        if current_num_heiferIs >= num:
-            return
-
-        if self.init_herd:
-            self.heiferIs += self._init_heiferIs_from_simulation(num - current_num_heiferIs, breed)
-
-        else:
-            if current_num_heiferIs + self.num_heiferIs_in_data < num:
-                self.heiferIs += self._init_heiferIs_from_data(self.num_heiferIs_in_data)
-                self.heiferIs += self._init_heiferIs_from_simulation(
-                    num - current_num_heiferIs - self.num_heiferIs_in_data, breed)
-            else:
-                self.heiferIs += self._init_heiferIs_from_data(num - current_num_heiferIs)
-
-    def _init_heiferIs_from_simulation(self, num: int, breed: str, sim_days=5000) -> List[HeiferI]:
-        """
-        Simulate and initialize a list of HeiferI instances.
-
-        This method first creates calf instances via simulation and then simulates them for a given number of days
-        until they become heifers. New HeiferI instances are initialized with the updated values from calves
-        and added to the list.
-
-        Parameters:
-        ----------
-        num : int
-            The number of HeiferI instances to generate via simulation.
-        breed : str
-            The breed type for the HeiferI instances.
-        sim_days : int, optional
-            The number of days to simulate the calves' development into heifers (default is 5000).
-
-        Returns:
-        --------
-        List[HeiferI]
-            A list of simulated HeiferI instances.
-        """
         heiferIs: List[HeiferI] = []
-        calves = self._init_calves_from_simulation(num, breed)
-
-        for day in range(sim_days):
-            for calf in calves:
-                wean_day = calf.update(0)
-                if wean_day:
-                    args = calf.get_calf_values()
-                    args.update(id=self.next_id())
-
-                    heiferI = HeiferI(args)
-                    heiferIs.append(heiferI)
-                    calves.remove(calf)
-                    if len(heiferIs) == num:
-                        break
-            if len(heiferIs) == num:
-                break
-
-        return heiferIs
-
-    def _init_heiferIs_from_data(self, num: int) -> List[HeiferI]:
-        """
-        Initialize a list of HeiferI instances from existing data.
-
-        This method retrieves data for the specified number of HeiferI instances and creates a list of HeiferI
-        objects from this data.
-
-        Parameters:
-        ----------
-        num : int
-            The number of HeiferI instances to initialize from the data.
-
-        Returns:
-        --------
-        List[HeiferI]
-            A list containing the initialized HeiferI instances from the existing data.
-        """
-        heiferIs: List[HeiferI] = []
-        heiferI_data = im.get_data("heiferIs")
+        all_heiferI_data: Dict[str, List[Any]] = im.get_data("heiferIs")
+        heiferI_data = self._random_sample_with_replacement(all_animal_data=all_heiferI_data,
+                                                            animal_num=num_heiferI)
         args_properties = ['id', 'breed', 'birth_date', 'days_born', 'birth_weight', 'body_weight', 'wean_weight',
                            'mature_body_weight', 'events']
-        args_list = self._get_args_list(heiferI_data, args_properties, num)
+        args_list = self._get_args_list(heiferI_data, args_properties, num_heiferI)
         for args in args_list:
             heiferI = HeiferI(args)
             heiferIs.append(heiferI)
+        self.heiferIs = heiferIs
 
-        return heiferIs
-
-    def _init_heiferIIs(self, num: int, breed: str) -> None:
+    def _init_heiferIIs(self, num_heiferII: int) -> None:
         """
         Initialize the list of HeiferII instances up to the specified number, based on either simulation data or
         existing data, depending on the `init_herd` flag.
@@ -565,100 +424,22 @@ class AnimalData:
         --------
         None
         """
-        current_num_heiferIIs = len(self.heiferIIs)
-
-        if current_num_heiferIIs >= num:
-            return
-
-        if self.init_herd:
-            self.heiferIIs += self._init_heiferIIs_from_simulation(num - current_num_heiferIIs, breed)
-
-        else:
-            if current_num_heiferIIs + self.num_heiferIIs_in_data < num:
-                self.heiferIIs += self._init_heiferIIs_from_data(self.num_heiferIIs_in_data)
-                self.heiferIIs += self._init_heiferIIs_from_simulation(
-                    num - current_num_heiferIIs - self.num_heiferIIs_in_data, breed)
-            else:
-                self.heiferIIs += self._init_heiferIIs_from_data(num - current_num_heiferIIs)
-
-    def _init_heiferIIs_from_simulation(self, num: int, breed: str, sim_days=5000) -> List[HeiferII]:
-        """
-        Simulate and initialize a list of HeiferII instances.
-
-        This method first simulates HeiferI instances transitioning into the second stage of development and then
-        creates HeiferII instances. The simulation continues for a specified number of days, or until the desired number
-        of HeiferII instances is reached.
-
-        Parameters:
-        ----------
-        num : int
-            The number of HeiferII instances to generate via simulation.
-        breed : str
-            The breed type for the HeiferII instances.
-        sim_days : int, optional
-            The number of days to simulate the HeiferIs' development into HeiferIIs (default is 5000).
-
-        Returns:
-        --------
-        List[HeiferII]
-            A list of simulated HeiferII instances.
-        """
         heiferIIs: List[HeiferII] = []
-        heiferIs = self._init_heiferIs_from_simulation(num, breed)
-
-        for day in range(sim_days):
-            for heiferI in heiferIs:
-                second_stage = heiferI.update(0)
-                if second_stage:
-                    args = heiferI.get_heiferI_values()
-
-                    args.update(id=self.next_id())
-                    args.update(repro_program=AnimalBase.config['heifer_repro_method'])
-                    args.update(tai_method_h=AnimalBase.config['heifer_repro_programs']['heifer_TAI_protocol'])
-                    args.update(synch_ed_method_h=AnimalBase.config['heifer_repro_programs']['heifer_synchED_protocol'])
-
-                    heiferII = HeiferII(args)
-                    heiferIIs.append(heiferII)
-                    heiferIs.remove(heiferI)
-                    if len(heiferIIs) == num:
-                        break
-                if len(heiferIIs) == num:
-                    break
-
-        return heiferIIs
-
-    def _init_heiferIIs_from_data(self, num: int) -> List[HeiferII]:
-        """
-        Initialize a list of HeiferII instances from existing data.
-
-        This method retrieves data for the specified number of HeiferII instances and creates a list of HeiferII
-        objects from this data.
-
-        Parameters:
-        ----------
-        num : int
-            The number of HeiferII instances to initialize from the data.
-
-        Returns:
-        --------
-        List[HeiferII]
-            A list containing the initialized HeiferII instances from the existing data.
-        """
-        heiferIIs: List[HeiferII] = []
-        heiferII_data = im.get_data("heiferIIs")
+        all_heiferII_data: Dict[str, List[Any]] = im.get_data("heiferIIs")
+        heiferII_data = self._random_sample_with_replacement(all_animal_data=all_heiferII_data,
+                                                             animal_num=num_heiferII)
         args_properties = ['id', 'breed', 'birth_date', 'days_born', 'birth_weight', 'body_weight', 'wean_weight',
                            'mature_body_weight', 'events', 'repro_program', 'tai_method_h', 'synch_ed_method_h',
                            'estrus_count', 'estrus_day', 'tai_program_start_day_h', 'synch_ed_program_start_day_h',
                            'synch_ed_estrus_day', 'synch_ed_stop_day', 'conception_rate', 'ai_day', 'abortion_day',
                            'days_in_preg', 'gestation_length', 'p_gest_for_calf', 'calf_birth_weight']
-        args_list = self._get_args_list(heiferII_data, args_properties, num)
+        args_list = self._get_args_list(heiferII_data, args_properties, num_heiferII)
         for args in args_list:
             heiferII = HeiferII(args)
             heiferIIs.append(heiferII)
+        self.heiferIIs = heiferIIs
 
-        return heiferIIs
-
-    def _init_heiferIIIs(self, num: int, breed: str) -> None:
+    def _init_heiferIIIs(self, num_heiferIII: int) -> None:
         """
         Initialize the list of HeiferIII instances up to the specified number, based on either simulation data or
         existing data, depending on the `init_herd` flag.
@@ -677,98 +458,22 @@ class AnimalData:
         --------
         None
         """
-        current_num_heiferIIIs = len(self.heiferIIIs)
-
-        if current_num_heiferIIIs >= num:
-            return
-
-        if self.init_herd:
-            self.heiferIIIs += self._init_heiferIIIs_from_simulation(num - current_num_heiferIIIs, breed)
-
-        else:
-            if current_num_heiferIIIs + self.num_heiferIIIs_in_data < num:
-                self.heiferIIIs += self._init_heiferIIIs_from_data(self.num_heiferIIIs_in_data)
-                self.heiferIIIs += self._init_heiferIIIs_from_simulation(
-                    num - current_num_heiferIIIs - self.num_heiferIIIs_in_data, breed)
-            else:
-                self.heiferIIIs += self._init_heiferIIIs_from_data(num - current_num_heiferIIIs)
-
-    def _init_heiferIIIs_from_simulation(self, num: int, breed: str, sim_days=5000) -> List[HeiferIII]:
-        """
-        Simulate and initialize a list of HeiferIII instances.
-
-        This method first simulates HeiferII instances transitioning into the third stage of development and then
-        creates HeiferIII instances. The simulation continues for a specified number of days, or until the desired
-        number of HeiferIII instances is reached.
-
-        Parameters:
-        ----------
-        num : int
-            The number of HeiferIII instances to generate via simulation.
-        breed : str
-            The breed type for the HeiferIII instances.
-        sim_days : int, optional
-            The number of days to simulate the HeiferIIs' development into HeiferIIIs (default is 5000).
-
-        Returns:
-        --------
-        List[HeiferIII]
-            A list of simulated HeiferIII instances.
-        """
         heiferIIIs: List[HeiferIII] = []
-        heiferIIs = self._init_heiferIIs_from_simulation(num, breed)
-
-        for day in range(sim_days):
-            for heiferII in heiferIIs:
-                cull_stage, third_stage = heiferII.update(0)
-                if cull_stage:
-                    heiferIIs.remove(heiferII)
-                if third_stage:
-                    args = heiferII.get_heiferII_values()
-                    args.update(id=self.next_id())
-
-                    heiferIII = HeiferIII(args)
-                    heiferIIIs.append(heiferIII)
-                    heiferIIs.remove(heiferII)
-                    if len(heiferIIIs) == num:
-                        break
-                if len(heiferIIIs) == num:
-                    break
-
-        return heiferIIIs
-
-    def _init_heiferIIIs_from_data(self, num: int) -> List[HeiferIII]:
-        """
-        Initialize a list of HeiferIII instances from existing data.
-
-        This method retrieves data for the specified number of HeiferIII instances and creates a list of HeiferIII
-        objects from this data.
-
-        Parameters:
-        ----------
-        num : int
-            The number of HeiferIII instances to initialize from the data.
-
-        Returns:
-        --------
-        List[HeiferIII]
-            A list containing the initialized HeiferIII instances from the existing data.
-        """
-        heiferIIIs: List[HeiferIII] = []
-        heiferIII_data = im.get_data("heiferIIIs")
+        all_heiferIII_data: Dict[str, List[Any]] = im.get_data("heiferIIIs")
+        heiferIII_data = self._random_sample_with_replacement(all_animal_data=all_heiferIII_data,
+                                                              animal_num=num_heiferIII)
         args_properties = ['id', 'breed', 'birth_date', 'days_born', 'birth_weight', 'body_weight', 'wean_weight',
                            'mature_body_weight', 'events', 'repro_program', 'tai_method_h', 'synch_ed_method_h',
                            'estrus_count', 'estrus_day', 'tai_program_start_day_h', 'synch_ed_program_start_day_h',
                            'synch_ed_estrus_day', 'synch_ed_stop_day', 'conception_rate', 'ai_day', 'abortion_day',
                            'days_in_preg', 'gestation_length', 'p_gest_for_calf', 'calf_birth_weight']
-        args_list = self._get_args_list(heiferIII_data, args_properties, num)
+        args_list = self._get_args_list(heiferIII_data, args_properties, num_heiferIII)
         for args in args_list:
             heiferIII = HeiferIII(args)
             heiferIIIs.append(heiferIII)
+        self.heiferIIIs = heiferIIIs
 
-        return heiferIIIs
-
-    def _init_cows(self, num: int, breed: str) -> None:
+    def _init_cows(self, num_cow: int) -> None:
         """
         Initialize the list of Cow instances up to the specified number, based on either simulation data or
         existing data, depending on the `init_herd` flag.
@@ -787,87 +492,10 @@ class AnimalData:
         --------
         None
         """
-        current_num_cows = len(self.cows)
-
-        if current_num_cows >= num:
-            return
-
-        if self.init_herd:
-            self.cows += self._init_cows_from_simulation(num - current_num_cows, breed)
-
-        else:
-            if current_num_cows + self.num_cows_in_data < num:
-                self.cows += self._init_cows_from_data(self.num_cows_in_data)
-                self.cows += self._init_cows_from_simulation(num - current_num_cows - self.num_cows_in_data, breed)
-            else:
-                self.cows += self._init_cows_from_data(num - current_num_cows)
-
-    def _init_cows_from_simulation(self, num: int, breed: str, sim_days=5000) -> List[Cow]:
-        """
-        Simulate and initialize a list of Cow instances.
-
-        This method first simulates HeiferIII instances transitioning into the fourth stage of development and then
-        creates Cow instances. The simulation continues for a specified number of days, or until the desired number of
-        Cow instances is reached.
-
-        Parameters:
-        ----------
-        num : int
-            The number of Cow instances to generate via simulation.
-        breed : str
-            The breed type for the Cow instances.
-        sim_days : int, optional
-            The number of days to simulate the Cows' development into HeiferIIIs (default is 5000).
-
-        Returns:
-        --------
-        List[Cow]
-            A list of simulated Cow instances.
-        """
         cows: List[Cow] = []
-        heiferIIIs = self._init_heiferIIIs_from_simulation(num, breed)
-
-        for day in range(sim_days):
-            for heiferIII in heiferIIIs:
-                cow_stage = heiferIII.update(0)
-                if cow_stage:
-                    args = heiferIII.get_heiferIII_values()
-
-                    args.update(id=self.next_id())
-                    args.update(repro_program='TAI')
-                    args.update(presynch_method='PreSynch')
-                    args.update(tai_method_c='OvSynch 56')
-                    args.update(resynch_method='TAIafterPD')
-
-                    cow = Cow(args)
-                    cows.append(cow)
-                    heiferIIIs.remove(heiferIII)
-                    if len(cows) == num:
-                        break
-                if len(cows) == num:
-                    break
-
-        return cows
-
-    def _init_cows_from_data(self, num: int) -> List[Cow]:
-        """
-        Initialize a list of Cow instances from existing data.
-
-        This method retrieves data for the specified number of Cow instances and creates a list of Cow objects from this
-        data.
-
-        Parameters:
-        ----------
-        num : int
-            The number of Cow instances to initialize from the data.
-
-        Returns:
-        --------
-        List[Cow]
-            A list containing the initialized Cow instances from the existing data.
-        """
-        cows: List[Cow] = []
-        cow_data = im.get_data("cows")
+        all_cow_data: Dict[str, List[Any]] = im.get_data("cows")
+        cow_data = self._random_sample_with_replacement(all_animal_data=all_cow_data,
+                                                        animal_num=num_cow)
         args_properties = ['id', 'breed', 'birth_date', 'days_born', 'birth_weight', 'body_weight', 'wean_weight',
                            'mature_body_weight', 'events', 'repro_program', 'tai_method_h', 'synch_ed_method_h',
                            'estrus_count', 'estrus_day', 'tai_program_start_day_h', 'synch_ed_program_start_day_h',
@@ -875,14 +503,13 @@ class AnimalData:
                            'days_in_preg', 'gestation_length', 'p_gest_for_calf', 'calf_birth_weight',
                            'presynch_method', 'tai_method_c', 'resynch_method', 'days_in_milk', 'parity',
                            'calving_interval']
-        args_list = self._get_args_list(cow_data, args_properties, num)
+        args_list = self._get_args_list(cow_data, args_properties, num_cow)
         for args in args_list:
             cow = Cow(args)
             cows.append(cow)
+        self.cows = cows
 
-        return cows
-
-    def _init_replacement_cows(self, num: int, breed: str) -> None:
+    def _init_replacement_cows(self, num_replacement: int) -> None:
         """
         Initialize the list of replacement Cow instances up to the specified number, based on either simulation data or
         existing data, depending on the `init_herd` flag.
@@ -901,101 +528,21 @@ class AnimalData:
         --------
         None
         """
-        current_num_replacement_cows = len(self.replacement)
-
-        if current_num_replacement_cows >= num:
-            return
-
-        if self.init_herd:
-            self.replacement += self._init_replacement_cows_from_simulation(num - current_num_replacement_cows, breed)
-
-        else:
-            if current_num_replacement_cows + self.num_replacement_cows_in_data < num:
-                self.replacement += self._init_replacement_cows_from_data(self.num_replacement_cows_in_data)
-                self.replacement += self._init_replacement_cows_from_simulation(num - current_num_replacement_cows -
-                                                                                self.num_replacement_cows_in_data,
-                                                                                breed)
-            else:
-                self.replacement += self._init_replacement_cows_from_data(num - current_num_replacement_cows)
-
-    def _init_replacement_cows_from_simulation(self, num: int, breed: str, sim_days=5000) -> List[Cow]:
-        """
-        Simulate and initialize a list of replacement Cow instances.
-
-        This method simulates the process of HeiferIII instances transitioning into the replacement Cow stage and then
-        creates Cow instances accordingly. The simulation runs for a set number of days or until the required number
-        of replacement Cow instances is reached, whichever comes first.
-
-        Parameters:
-        ----------
-        num : int
-            The number of replacement Cow instances to generate via simulation.
-        breed : str
-            The breed type for the replacement Cow instances.
-        sim_days : int, optional
-            The number of days to simulate the replacement Cows' development (default is 5000).
-
-        Returns:
-        --------
-        List[Cow]
-            A list of simulated replacement Cow instances.
-        """
         replacement_cows: List[Cow] = []
-        heiferIIIs = self.get_heiferIIIs(num, breed)
-
-        for day in range(sim_days):
-            for heiferIII in heiferIIIs:
-                cow_stage = heiferIII.update(0)
-                if cow_stage:
-                    args = heiferIII.get_heiferIII_values()
-
-                    args.update(id=self.next_id())
-                    args.update(repro_program='TAI')
-                    args.update(presynch_method='PreSynch')
-                    args.update(tai_method_c='OvSynch 56')
-                    args.update(resynch_method='TAIafterPD')
-
-                    replacement_cow = Cow(args)
-                    replacement_cows.append(replacement_cow)
-                    heiferIIIs.remove(heiferIII)
-                    if len(replacement_cows) == num:
-                        break
-                if len(replacement_cows) == num:
-                    break
-
-        return replacement_cows
-
-    def _init_replacement_cows_from_data(self, num: int) -> List[Cow]:
-        """
-        Initialize a list of replacement Cow instances from existing data.
-
-        This method accesses stored data for the specified number of replacement Cow instances and creates a list of Cow
-        objects from that data. The method ensures that the actual number of instances matches the desired count (`num`)
-
-        Parameters:
-        ----------
-        num : int
-            The number of replacement Cow instances to initialize from the data.
-
-        Returns:
-        --------
-        List[Cow]
-            A list containing the initialized replacement Cow instances from existing data.
-        """
-        replacement_cows: List[Cow] = []
-        replacement_data = im.get_data("replacement_cows")
+        all_replacement_data: Dict[str, List[Any]] = im.get_data("replacement_cows")
+        replacement_data = self._random_sample_with_replacement(all_animal_data=all_replacement_data,
+                                                        animal_num=num_replacement)
         args_properties = ['id', 'breed', 'birth_date', 'days_born', 'birth_weight', 'body_weight', 'wean_weight',
                            'mature_body_weight', 'events', 'repro_program', 'tai_method_h', 'synch_ed_method_h',
                            'estrus_count', 'estrus_day', 'tai_program_start_day_h', 'synch_ed_program_start_day_h',
                            'synch_ed_estrus_day', 'synch_ed_stop_day', 'conception_rate', 'ai_day', 'abortion_day',
                            'days_in_preg', 'gestation_length', 'p_gest_for_calf', 'calf_birth_weight',
                            'presynch_method', 'tai_method_c', 'resynch_method']
-        args_list = self._get_args_list(replacement_data, args_properties, num)
+        args_list = self._get_args_list(replacement_data, args_properties, num_replacement)
         for args in args_list:
             replacement_cow = Cow(args)
             replacement_cows.append(replacement_cow)
-
-        return replacement_cows
+        self.replacement = replacement_cows
 
     def get_calves(self, num, breed):
         """
@@ -1039,8 +586,6 @@ class AnimalData:
         List[HeiferI]
             A list of HeiferI instances.
         """
-        self._init_heiferIs(num, breed)
-
         if self.order_by_random:
             shuffle(self.heiferIs)
 
@@ -1065,8 +610,6 @@ class AnimalData:
         List[HeiferII]
             A list of HeiferII instances.
         """
-        self._init_heiferIIs(num, breed)
-
         if self.order_by_random:
             shuffle(self.heiferIIs)
 
@@ -1091,8 +634,6 @@ class AnimalData:
         List[HeiferIII]
             A list of HeiferIII instances.
         """
-        self._init_heiferIIIs(num, breed)
-
         if self.order_by_random:
             shuffle(self.heiferIIIs)
         return self.heiferIIIs
@@ -1116,8 +657,6 @@ class AnimalData:
         List[Cow]
             A list of Cow instances.
         """
-        self._init_cows(num, breed)
-
         if self.order_by_random:
             shuffle(self.cows)
         return self.cows
@@ -1141,8 +680,6 @@ class AnimalData:
         List[Cow]
             A list of replacement Cow instances.
         """
-        self._init_replacement_cows(num, breed)
-
         if self.order_by_random:
             shuffle(self.replacement)
         return self.replacement
