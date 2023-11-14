@@ -1,7 +1,7 @@
 import random
 from dataclasses import dataclass
 from random import shuffle
-from typing import List, Dict, Any
+from typing import List, Dict, Any, Callable, Type
 
 from scipy.stats import truncnorm
 
@@ -272,16 +272,15 @@ class AnimalData:
         self.birth_weight_je = truncnorm.rvs(-2, 2, AnimalBase.config["birth_weight_avg_je"],
                                              AnimalBase.config["birth_weight_std_je"])
 
-        self._init_animals()
+        self._init_herd()
 
-    def _init_animals(self) -> None:
+    def _init_herd(self) -> None:
         """
         Initializes animal lists by calling the respective initializer methods for each animal type.
 
         This private method is typically called within the constructor to populate the animal lists based
         on the numbers provided in the herd data.
         """
-        print(self.init_herd)
         if self.init_herd:
             animal_factory = AnimalFactory(breed=self.breed, CI=self.CI, initial_animal_num=self.initial_animal_num,
                                            simulation_days=self.simulation_days, initial_animal_id=self.animal_id,
@@ -291,15 +290,16 @@ class AnimalData:
             animal_factory.generate_animals()
             raise Exception
         else:
-            self._init_calves(self.calf_num)
-            self._init_heiferIs(self.heiferI_num)
-            self._init_heiferIIs(self.heiferII_num)
-            self._init_heiferIIIs(self.heiferIII_num)
-            self._init_cows(self.cow_num)
-            self._init_replacement_cows(self.replace_num)
+            self.calves = self._init_animals("calves", self.calf_num)
+            self.heiferIs = self._init_animals("heiferIs", self.heiferI_num)
+            self.heiferIIs = self._init_animals("heiferIIs", self.heiferII_num)
+            self.heiferIIIs = self._init_animals("heiferIIIs", self.heiferIII_num)
+            self.cows = self._init_animals("cows", self.cow_num)
+            self.replacement = self._init_animals("replacement_cows", self.replace_num)
 
-    def _random_sample_with_replacement(self, all_animal_data: Dict[str, List[Any]], animal_num) -> Dict[str,
-                                                                                                         List[Any]]:
+    @staticmethod
+    def _random_sample_with_replacement(all_animal_data: Dict[str, List[Any]], animal_num) -> Dict[str,
+                                                                                                   List[Any]]:
         random_choices = random.choices(list(range(animal_num)), k=animal_num)
         animal_data = {}
         for key in all_animal_data.keys():
@@ -348,201 +348,57 @@ class AnimalData:
             args_list.append(args)
         return args_list
 
-    def _init_calves(self, num_calf: int) -> None:
-        """
-        Initializes the list of calves either from simulation data or existing data up to the required number.
-
-        If the existing number of calves is less than the required number, this method either adds more calves
-        from the simulation or the existing data based on the initialization settings.
-
-        Parameters:
-        ----------
-        num : int
-            The number of calves required.
-        breed : str
-            The breed of the calves to be initialized.
-        """
-        calves: List[Calf] = []
-        all_calves_data: Dict[str, List[Any]] = im.get_data("calves")
-        calves_data = self._random_sample_with_replacement(all_animal_data=all_calves_data,
-                                                           animal_num=num_calf)
-        args_properties = ['id', 'breed', 'birth_date', 'days_born', 'p_init', 'birth_weight', 'body_weight',
-                           'wean_weight', 'mature_body_weight', 'events']
-        args_list = self._get_args_list(calves_data, args_properties, num_calf)
-        for args in args_list:
-            calf = Calf(args)
-            calves.append(calf)
-        self.calves = calves
-
-    def _init_heiferIs(self, num_heiferI: int) -> None:
-        """
-        Initialize the list of HeiferI instances up to the specified number, based on either simulation data or
-        existing data, depending on the `init_herd` flag.
-
-        If the current number of HeiferI instances is less than the required number (`num`), new instances are
-        created through simulation or loaded from existing data to meet the required count.
-
-        Parameters:
-        ----------
-        num : int
-            The desired number of HeiferI instances to be available.
-        breed : str
-            The breed type for the HeiferI instances.
-
-        Returns:
-        --------
-        None
-        """
-        heiferIs: List[HeiferI] = []
-        all_heiferI_data: Dict[str, List[Any]] = im.get_data("heiferIs")
-        heiferI_data = self._random_sample_with_replacement(all_animal_data=all_heiferI_data,
-                                                            animal_num=num_heiferI)
-        args_properties = ['id', 'breed', 'birth_date', 'days_born', 'birth_weight', 'body_weight', 'wean_weight',
-                           'mature_body_weight', 'events']
-        args_list = self._get_args_list(heiferI_data, args_properties, num_heiferI)
-        for args in args_list:
-            heiferI = HeiferI(args)
-            heiferIs.append(heiferI)
-        self.heiferIs = heiferIs
-
-    def _init_heiferIIs(self, num_heiferII: int) -> None:
-        """
-        Initialize the list of HeiferII instances up to the specified number, based on either simulation data or
-        existing data, depending on the `init_herd` flag.
-
-        If the current number of HeiferII instances is less than the required number (`num`), new instances are
-        created through simulation or loaded from existing data to meet the required count.
-
-        Parameters:
-        ----------
-        num : int
-            The desired number of HeiferII instances to be available.
-        breed : str
-            The breed type for the HeiferII instances.
-
-        Returns:
-        --------
-        None
-        """
-        heiferIIs: List[HeiferII] = []
-        all_heiferII_data: Dict[str, List[Any]] = im.get_data("heiferIIs")
-        heiferII_data = self._random_sample_with_replacement(all_animal_data=all_heiferII_data,
-                                                             animal_num=num_heiferII)
-        args_properties = ['id', 'breed', 'birth_date', 'days_born', 'birth_weight', 'body_weight', 'wean_weight',
+    def _init_animals(self, animal_type: str, num_animal: int) -> (List[Calf] | List[HeiferI] | List[HeiferII] |
+                                                                   List[HeiferIII] | List[Cow]):
+        animals: (List[Calf] | List[HeiferI] | List[HeiferII] | List[HeiferIII] | List[Cow]) = []
+        all_animal_data: Dict[str, List[Any]] = im.get_data(animal_type)
+        animal_data = self._random_sample_with_replacement(all_animal_data=all_animal_data,
+                                                           animal_num=num_animal)
+        args_properties: Dict[str, List[str]] = {
+            "calves": ['id', 'breed', 'birth_date', 'days_born', 'p_init', 'birth_weight', 'body_weight', 'wean_weight',
+                       'mature_body_weight', 'events'],
+            "heiferIs": ['id', 'breed', 'birth_date', 'days_born', 'birth_weight', 'body_weight', 'wean_weight',
+                         'mature_body_weight', 'events'],
+            "heiferIIs": ['id', 'breed', 'birth_date', 'days_born', 'birth_weight', 'body_weight', 'wean_weight',
+                          'mature_body_weight', 'events', 'repro_program', 'tai_method_h', 'synch_ed_method_h',
+                          'estrus_count', 'estrus_day', 'tai_program_start_day_h', 'synch_ed_program_start_day_h',
+                          'synch_ed_estrus_day', 'synch_ed_stop_day', 'conception_rate', 'ai_day', 'abortion_day',
+                          'days_in_preg', 'gestation_length', 'p_gest_for_calf', 'calf_birth_weight'],
+            "heiferIIIs": ['id', 'breed', 'birth_date', 'days_born', 'birth_weight', 'body_weight', 'wean_weight',
                            'mature_body_weight', 'events', 'repro_program', 'tai_method_h', 'synch_ed_method_h',
                            'estrus_count', 'estrus_day', 'tai_program_start_day_h', 'synch_ed_program_start_day_h',
                            'synch_ed_estrus_day', 'synch_ed_stop_day', 'conception_rate', 'ai_day', 'abortion_day',
-                           'days_in_preg', 'gestation_length', 'p_gest_for_calf', 'calf_birth_weight']
-        args_list = self._get_args_list(heiferII_data, args_properties, num_heiferII)
+                           'days_in_preg', 'gestation_length', 'p_gest_for_calf', 'calf_birth_weight'],
+            "cows": ['id', 'breed', 'birth_date', 'days_born', 'birth_weight', 'body_weight', 'wean_weight',
+                     'mature_body_weight', 'events', 'repro_program', 'tai_method_h', 'synch_ed_method_h',
+                     'estrus_count', 'estrus_day', 'tai_program_start_day_h', 'synch_ed_program_start_day_h',
+                     'synch_ed_estrus_day', 'synch_ed_stop_day', 'conception_rate', 'ai_day', 'abortion_day',
+                     'days_in_preg', 'gestation_length', 'p_gest_for_calf', 'calf_birth_weight',
+                     'presynch_method', 'tai_method_c', 'resynch_method', 'days_in_milk', 'parity',
+                     'calving_interval'],
+            "replacement_cows": ['id', 'breed', 'birth_date', 'days_born', 'birth_weight', 'body_weight', 'wean_weight',
+                                 'mature_body_weight', 'events', 'repro_program', 'tai_method_h', 'synch_ed_method_h',
+                                 'estrus_count', 'estrus_day', 'tai_program_start_day_h',
+                                 'synch_ed_program_start_day_h', 'synch_ed_estrus_day', 'synch_ed_stop_day',
+                                 'conception_rate', 'ai_day', 'abortion_day', 'days_in_preg', 'gestation_length',
+                                 'p_gest_for_calf', 'calf_birth_weight', 'presynch_method', 'tai_method_c',
+                                 'resynch_method'],
+        }
+        args_list = self._get_args_list(animal_data, args_properties[animal_type], num_animal)
+
+        ANIMAL_CLASSES: Dict[str, Type] = {
+            "calves": Calf,
+            "heiferIs": HeiferI,
+            "heiferIIs": HeiferII,
+            "heiferIIIs": HeiferIII,
+            "cows": Cow,
+            "replacement_cows": Cow,
+        }
+        animal_class = ANIMAL_CLASSES[animal_type]
         for args in args_list:
-            heiferII = HeiferII(args)
-            heiferIIs.append(heiferII)
-        self.heiferIIs = heiferIIs
-
-    def _init_heiferIIIs(self, num_heiferIII: int) -> None:
-        """
-        Initialize the list of HeiferIII instances up to the specified number, based on either simulation data or
-        existing data, depending on the `init_herd` flag.
-
-        If the current number of HeiferIII instances is less than the required number (`num`), new instances are
-        created through simulation or loaded from existing data to meet the required count.
-
-        Parameters:
-        ----------
-        num : int
-            The desired number of HeiferIII instances to be available.
-        breed : str
-            The breed type for the HeiferIII instances.
-
-        Returns:
-        --------
-        None
-        """
-        heiferIIIs: List[HeiferIII] = []
-        all_heiferIII_data: Dict[str, List[Any]] = im.get_data("heiferIIIs")
-        heiferIII_data = self._random_sample_with_replacement(all_animal_data=all_heiferIII_data,
-                                                              animal_num=num_heiferIII)
-        args_properties = ['id', 'breed', 'birth_date', 'days_born', 'birth_weight', 'body_weight', 'wean_weight',
-                           'mature_body_weight', 'events', 'repro_program', 'tai_method_h', 'synch_ed_method_h',
-                           'estrus_count', 'estrus_day', 'tai_program_start_day_h', 'synch_ed_program_start_day_h',
-                           'synch_ed_estrus_day', 'synch_ed_stop_day', 'conception_rate', 'ai_day', 'abortion_day',
-                           'days_in_preg', 'gestation_length', 'p_gest_for_calf', 'calf_birth_weight']
-        args_list = self._get_args_list(heiferIII_data, args_properties, num_heiferIII)
-        for args in args_list:
-            heiferIII = HeiferIII(args)
-            heiferIIIs.append(heiferIII)
-        self.heiferIIIs = heiferIIIs
-
-    def _init_cows(self, num_cow: int) -> None:
-        """
-        Initialize the list of Cow instances up to the specified number, based on either simulation data or
-        existing data, depending on the `init_herd` flag.
-
-        If the current number of Cow instances is less than the required number (`num`), new instances are
-        created through simulation or loaded from existing data to meet the required count.
-
-        Parameters:
-        ----------
-        num : int
-            The desired number of Cow instances to be available.
-        breed : str
-            The breed type for the Cow instances.
-
-        Returns:
-        --------
-        None
-        """
-        cows: List[Cow] = []
-        all_cow_data: Dict[str, List[Any]] = im.get_data("cows")
-        cow_data = self._random_sample_with_replacement(all_animal_data=all_cow_data,
-                                                        animal_num=num_cow)
-        args_properties = ['id', 'breed', 'birth_date', 'days_born', 'birth_weight', 'body_weight', 'wean_weight',
-                           'mature_body_weight', 'events', 'repro_program', 'tai_method_h', 'synch_ed_method_h',
-                           'estrus_count', 'estrus_day', 'tai_program_start_day_h', 'synch_ed_program_start_day_h',
-                           'synch_ed_estrus_day', 'synch_ed_stop_day', 'conception_rate', 'ai_day', 'abortion_day',
-                           'days_in_preg', 'gestation_length', 'p_gest_for_calf', 'calf_birth_weight',
-                           'presynch_method', 'tai_method_c', 'resynch_method', 'days_in_milk', 'parity',
-                           'calving_interval']
-        args_list = self._get_args_list(cow_data, args_properties, num_cow)
-        for args in args_list:
-            cow = Cow(args)
-            cows.append(cow)
-        self.cows = cows
-
-    def _init_replacement_cows(self, num_replacement: int) -> None:
-        """
-        Initialize the list of replacement Cow instances up to the specified number, based on either simulation data or
-        existing data, depending on the `init_herd` flag.
-
-        If the current number of replacement Cow instances is less than the required number (`num`), new instances are
-        created through simulation or loaded from existing data to meet the required count.
-
-        Parameters:
-        ----------
-        num : int
-            The desired number of replacement Cow instances to be available.
-        breed : str
-            The breed type for the replacement Cow instances.
-
-        Returns:
-        --------
-        None
-        """
-        replacement_cows: List[Cow] = []
-        all_replacement_data: Dict[str, List[Any]] = im.get_data("replacement_cows")
-        replacement_data = self._random_sample_with_replacement(all_animal_data=all_replacement_data,
-                                                        animal_num=num_replacement)
-        args_properties = ['id', 'breed', 'birth_date', 'days_born', 'birth_weight', 'body_weight', 'wean_weight',
-                           'mature_body_weight', 'events', 'repro_program', 'tai_method_h', 'synch_ed_method_h',
-                           'estrus_count', 'estrus_day', 'tai_program_start_day_h', 'synch_ed_program_start_day_h',
-                           'synch_ed_estrus_day', 'synch_ed_stop_day', 'conception_rate', 'ai_day', 'abortion_day',
-                           'days_in_preg', 'gestation_length', 'p_gest_for_calf', 'calf_birth_weight',
-                           'presynch_method', 'tai_method_c', 'resynch_method']
-        args_list = self._get_args_list(replacement_data, args_properties, num_replacement)
-        for args in args_list:
-            replacement_cow = Cow(args)
-            replacement_cows.append(replacement_cow)
-        self.replacement = replacement_cows
+            animal = animal_class(args)
+            animals.append(animal)
+        return animals
 
     def get_calves(self, num, breed):
         """
