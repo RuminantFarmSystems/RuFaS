@@ -30,13 +30,18 @@ file_path = os.path.join(dir_path, "input/ARL.json")
 
 @pytest.mark.parametrize(
     "load_pool, no_graphics, format_option, verbose, clear_output, exclude_info_maps, only_run_validation,"
-    "graphics_dir, vars_file_path",
+    "graphics_dir, vars_file_path, output_dir, filters_dir",
     [
-        (False, False, "verbose", LogVerbosity.ERRORS, True, True, True, "graphics", ""),
-        (False, True, "basic", LogVerbosity.LOGS, False, False, False, "custom_graphics", ""),
-        (False, True, "block", LogVerbosity.NONE, True, False, False, "graphics", ""),
-        (True, False, "inline", LogVerbosity.WARNINGS, False, False, False, "custom_graphics", "path.json"),
-        (True, True, "verbose", LogVerbosity.LOGS, False, True, False, "graphics", "path.json"),
+        (False, False, "verbose", LogVerbosity.ERRORS, True, True, True, "graphics", "", "output/",
+         "output/output_filters"),
+        (False, True, "basic", LogVerbosity.LOGS, False, False, False, "custom_graphics", "", "output/",
+         "output/output_filters"),
+        (False, True, "block", LogVerbosity.NONE, True, False, False, "graphics", "", "output/",
+         "output/output_filters"),
+        (True, False, "inline", LogVerbosity.WARNINGS, False, False, False, "custom_graphics", "path.json", "output/",
+         "output/output_filters"),
+        (True, True, "verbose", LogVerbosity.LOGS, False, True, False, "graphics", "path.json", "output/",
+         "output/output_filters"),
     ],
 )
 def test_main(
@@ -49,6 +54,8 @@ def test_main(
     only_run_validation: bool,
     graphics_dir: str,
     vars_file_path: str,
+    output_dir: str,
+    filters_dir: str,
 ) -> None:
     with patch("main.parse_gnu_args") as mock_parse_gnu_args:
         mock_parse_gnu_args.return_value = argparse.Namespace(
@@ -60,6 +67,8 @@ def test_main(
             only_run_validation=only_run_validation,
             graphics_dir=graphics_dir,
             load_pool=vars_file_path,
+            output_dir=output_dir,
+            filters_dir=filters_dir,
         )
 
         with patch("main.run_rufas") as mock_run_rufas:
@@ -74,32 +83,36 @@ def test_main(
                 exclude_info_maps=exclude_info_maps,
                 only_run_validation=only_run_validation,
                 graphics_dir=Path(graphics_dir),
-                vars_file_path=Path(vars_file_path)
+                vars_file_path=Path(vars_file_path),
+                output_dir=Path(output_dir),
+                filters_dir=Path(filters_dir)
             )
 
 
 @pytest.mark.parametrize(
     "format_option, produce_graphics, verbose, clear_output, exclude_info_maps, only_run_validation,"
-    "graphics_dir, load_pool, vars_file_path",
+    "graphics_dir, load_pool, vars_file_path, output_dir, filters_dir",
     [
-        ("verbose", True, LogVerbosity.NONE, True, True, True, "", False, ""),
-        ("block", False, LogVerbosity.LOGS, True, True, True, "", False, ""),
-        ("inline", True, LogVerbosity.ERRORS, True, True, True, "", False, ""),
-        ("basic", True, LogVerbosity.WARNINGS, False, True, True, "", False, ""),
-        ("verbose", True, LogVerbosity.NONE, True, False, True, "", False, ""),
-        ("block", True, LogVerbosity.LOGS, True, True, False, "", False, ""),
-        ("inline", False, LogVerbosity.ERRORS, True, True, True, "", False, ""),
-        ("basic", False, LogVerbosity.WARNINGS, False, True, True, "", False, ""),
-        ("verbose", False, LogVerbosity.NONE, True, False, True, "", False, ""),
-        ("block", False, LogVerbosity.LOGS, True, True, False, "", False, ""),
-        ("inline", False, LogVerbosity.ERRORS, False, True, True, "", False, ""),
-        ("basic", False, LogVerbosity.WARNINGS, True, False, True, "", False, ""),
-        ("verbose", False, LogVerbosity.NONE, True, True, False, "", False, ""),
-        ("block", False, LogVerbosity.WARNINGS, False, False, True, "", False, ""),
-        ("inline", False, LogVerbosity.LOGS, False, True, False, "", False, ""),
-        ("basic", False, LogVerbosity.ERRORS, False, False, False, "", False, ""),
-        ("basic", False, LogVerbosity.LOGS, False, False, False, "graphics", False, ""),
-        ("basic", False, LogVerbosity.LOGS, False, False, False, "graphics", True, "path.json"),
+        ("verbose", True, LogVerbosity.NONE, True, True, True, "", False, "", "output/", "output/output_filters"),
+        ("block", False, LogVerbosity.LOGS, True, True, True, "", False, "", "output/", "output/output_filters"),
+        ("inline", True, LogVerbosity.ERRORS, True, True, True, "", False, "", "output/", "output/output_filters"),
+        ("basic", True, LogVerbosity.WARNINGS, False, True, True, "", False, "", "output/", "output/output_filters"),
+        ("verbose", True, LogVerbosity.NONE, True, False, True, "", False, "", "output/", "output/output_filters"),
+        ("block", True, LogVerbosity.LOGS, True, True, False, "", False, "", "output/", "output/output_filters"),
+        ("inline", False, LogVerbosity.ERRORS, True, True, True, "", False, "", "output/", "output/output_filters"),
+        ("basic", False, LogVerbosity.WARNINGS, False, True, True, "", False, "", "output/", "output/output_filters"),
+        ("verbose", False, LogVerbosity.NONE, True, False, True, "", False, "", "output/", "output/output_filters"),
+        ("block", False, LogVerbosity.LOGS, True, True, False, "", False, "", "output/", "output/output_filters"),
+        ("inline", False, LogVerbosity.ERRORS, False, True, True, "", False, "", "output/", "output/output_filters"),
+        ("basic", False, LogVerbosity.WARNINGS, True, False, True, "", False, "", "output/", "output/output_filters"),
+        ("verbose", False, LogVerbosity.NONE, True, True, False, "", False, "", "output/", "output/output_filters"),
+        ("block", False, LogVerbosity.WARNINGS, False, False, True, "", False, "", "output/", "output/output_filters"),
+        ("inline", False, LogVerbosity.LOGS, False, True, False, "", False, "", "output/", "output/output_filters"),
+        ("basic", False, LogVerbosity.ERRORS, False, False, False, "", False, "", "output/", "output/output_filters"),
+        ("basic", False, LogVerbosity.LOGS, False, False, False, "graphics", False, "", "output/",
+         "output/output_filters"),
+        ("basic", False, LogVerbosity.LOGS, False, False, False, "graphics", True, "path.json", "output/",
+         "output/output_filters"),
     ],
 )
 def test_run_rufas(
@@ -112,6 +125,8 @@ def test_run_rufas(
     graphics_dir: str,
     load_pool: bool,
     vars_file_path: str,
+    output_dir: str,
+    filters_dir: str,
     mocker: MockerFixture,
     capsys,
 ) -> None:
@@ -134,17 +149,30 @@ def test_run_rufas(
         only_run_validation,
         graphics_dir,
         vars_file_path,
+        output_dir,
+        filters_dir
     )
 
     # Assert
     if load_pool:
         patch_run_load_vars_pool.assert_called_once_with(
-            vars_file_path, exclude_info_maps, format_option, produce_graphics, graphics_dir, clear_output
+            vars_file_path,
+            exclude_info_maps,
+            format_option,
+            produce_graphics,
+            graphics_dir,
+            clear_output,
+            output_dir,
+            filters_dir,
         )
         return
     elif only_run_validation:
         patch_run_validation.assert_called_once_with(
-            metadata_file_list, exclude_info_maps, format_option, verbose
+            metadata_file_list,
+            exclude_info_maps,
+            format_option,
+            verbose,
+            output_dir,
         )
     else:
         patch_execute_simulations.assert_called_once_with(
@@ -154,6 +182,8 @@ def test_run_rufas(
             graphics_dir,
             format_option,
             verbose,
+            output_dir,
+            filters_dir,
         )
 
     if clear_output:
@@ -186,8 +216,12 @@ def test_run_validation(mocker: MockerFixture, is_data_valid: bool) -> None:
         {"prefix": metadata_prefix2, "path": metadata_file_path2},
     ]
     mock_input_manager.start_data_processing.return_value = is_data_valid
+    exclude_info_maps = False
+    format_option = "verbose"
+    verbose = LogVerbosity.NONE
+    output_dir = Path("output/")
 
-    run_validation(metadata_file_list, True, "verbose", "none")
+    run_validation(metadata_file_list, exclude_info_maps, format_option, verbose, output_dir)
 
     assert mock_output_manager.flush_pools.call_count == len(metadata_file_list)
     assert mock_input_manager.flush_pool.call_count == len(metadata_file_list)
@@ -195,7 +229,7 @@ def test_run_validation(mocker: MockerFixture, is_data_valid: bool) -> None:
         metadata_file_list
     )
     assert mock_output_manager.dump_all_nondata_pools.call_args_list == [
-        mocker.call("output", True, "verbose")
+        mocker.call(output_dir, exclude_info_maps, format_option)
     ] * len(metadata_file_list)
 
 
@@ -243,6 +277,8 @@ def test_execute_simulations(
     mock_simulator = mocker.MagicMock(auto_spec=SimulationEngine)
     mock_simulator.simulate.return_value = None
     mocker.patch("main.SimulationEngine", return_value=mock_simulator)
+    output_dir = Path("output/")
+    filters_dir = Path("output/output_filters/")
 
     # Act
     execute_simulations(
@@ -251,6 +287,8 @@ def test_execute_simulations(
         produce_graphics=produce_graphics,
         graphics_dir=Path(""),
         format_option=format_option,
+        output_dir=output_dir,
+        filters_dir=filters_dir,
     )
 
     # Assert
@@ -262,13 +300,13 @@ def test_execute_simulations(
         metadata_file_list
     )
     assert mock_output_manager.dump_all_nondata_pools.call_args_list == [
-        mocker.call("output", exlclude_info_maps, format_option)
+        mocker.call(output_dir, exlclude_info_maps, format_option)
     ] * len(metadata_file_list)
     assert mock_output_manager.save_results.call_count == len(metadata_file_list)
     assert mock_output_manager.save_results.call_args_list == [
         mocker.call(
-            Path("output"),
-            Path("output/output_filters/"),
+            output_dir,
+            filters_dir,
             exlclude_info_maps,
             produce_graphics,
             Path(""),
@@ -292,6 +330,8 @@ def test_run_load_vars_pool(mocker: MockerFixture, vars_file_path: str, exclude_
                             format_option: str, produce_graphics: bool,
                             graphics_dir: Path, clear_output: bool, ) -> None:
     """Checks the run_load_vars_pool function in main.py"""
+    output_dir = Path("output/")
+    filters_dir = Path("output/output_filters/")
     mock_output_manager = mocker.MagicMock(auto_spec=OutputManager)
     patch_clear_output_dir = mocker.patch("main.clear_output_dir")
     mock_output_manager.flush_pools.return_value = None
@@ -301,7 +341,8 @@ def test_run_load_vars_pool(mocker: MockerFixture, vars_file_path: str, exclude_
     mock_output_manager.save_results.return_value = None
     mocker.patch("main.OutputManager", return_value=mock_output_manager)
 
-    run_load_vars_pool(vars_file_path, exclude_info_maps, format_option, produce_graphics, graphics_dir, clear_output)
+    run_load_vars_pool(vars_file_path, exclude_info_maps, format_option, produce_graphics, graphics_dir, clear_output,
+                       output_dir, filters_dir)
 
     if clear_output:
         patch_clear_output_dir.assert_called_once()
@@ -368,7 +409,7 @@ def test_parse_gnu_args(mocker: MockerFixture) -> None:
     actual_args = parse_gnu_args()
 
     # Assert
-    assert mock_add_argument.call_count == 8
+    assert mock_add_argument.call_count == 10
     assert mock_add_argument.call_args_list == [
         mocker.call(
             "-f",
@@ -417,6 +458,19 @@ def test_parse_gnu_args(mocker: MockerFixture) -> None:
             "-l",
             "--load-pool",
             help="Load the output manager's variables pool from provided path",
+            default="",
+        ),
+        mocker.call(
+            "-O",
+            "--output-dir",
+            help="The saving directory for output",
+            default="output/",
+        ),
+        mocker.call(
+            "-F",
+            "--filters-dir",
+            help="The directory for the files containing the keys for filtering",
+            default="output/output_filters/",
         ),
     ]
     mock_parse_args.assert_called_once()
