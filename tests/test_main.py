@@ -314,7 +314,7 @@ def test_run_load_vars_pool(mocker: MockerFixture, exclude_info_maps: bool,
     mock_output_manager.load_variables_pool_from_file.return_value = None
     mock_output_manager.set_metadata_prefix.return_value = None
     mock_output_manager.dump_all_nondata_pools.return_value = None
-    mock_output_manager.save_variables.return_value = None
+    mock_output_manager.save_results.return_value = None
     mocker.patch("main.OutputManager", return_value=mock_output_manager)
 
     run_load_vars_pool(exclude_info_maps, format_option, produce_graphics, graphics_dir, clear_output)
@@ -326,7 +326,7 @@ def test_run_load_vars_pool(mocker: MockerFixture, exclude_info_maps: bool,
     assert mock_output_manager.flush_pools.call_count == 1
     assert mock_output_manager.load_variables_pool_from_file.call_count == 1
     assert mock_output_manager.set_metadata_prefix.call_count == 1
-    assert mock_output_manager.save_variables.call_count == 1
+    assert mock_output_manager.save_results.call_count == 1
     assert mock_output_manager.dump_all_nondata_pools.call_count == 1
 
 

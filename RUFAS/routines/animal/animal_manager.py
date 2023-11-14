@@ -208,7 +208,7 @@ class AnimalManager:
 
         udrm = udr.UserDefinedRationManager()
         self.ration_user_input = data['ration']['user_input']
-        udrm.udr_or_not = self.ration_user_input
+        udrm.is_udr = self.ration_user_input
 
         # how often a ration is calculated, days
         self.formulation_interval = data['ration']['formulation_interval']

@@ -174,7 +174,7 @@ def run_load_vars_pool(
     output_manager.flush_pools()
     output_manager.load_variables_pool_from_file(vars_file_path)
     output_manager.set_metadata_prefix("reload")
-    output_manager.save_variables(
+    output_manager.save_results(
             Path(r"output"),
             Path(r"output/output_filters/"),
             exclude_info_maps,
