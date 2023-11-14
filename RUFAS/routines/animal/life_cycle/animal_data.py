@@ -1,3 +1,4 @@
+import random
 from dataclasses import dataclass
 from random import shuffle
 from typing import List, Dict, Any
@@ -6,6 +7,7 @@ from scipy.stats import truncnorm
 
 from RUFAS.routines.animal.life_cycle.animal_base import AnimalBase
 from RUFAS.routines.animal.animal_typed_dicts import HerdInfoTypedDict
+from RUFAS.routines.animal.life_cycle.animal_factory import AnimalFactory
 from RUFAS.routines.animal.life_cycle.calf import Calf
 from RUFAS.routines.animal.life_cycle.heiferI import HeiferI
 from RUFAS.routines.animal.life_cycle.heiferII import HeiferII
@@ -278,12 +280,22 @@ class AnimalData:
         This private method is typically called within the constructor to populate the animal lists based
         on the numbers provided in the herd data.
         """
-        self._init_calves(self.calf_num, self.breed)
-        self._init_heiferIs(self.heiferI_num, self.breed)
-        self._init_heiferIIs(self.heiferII_num, self.breed)
-        self._init_heiferIIIs(self.heiferIII_num, self.breed)
-        self._init_cows(self.cow_num, self.breed)
-        self._init_replacement_cows(self.replace_num, self.breed)
+        print(self.init_herd)
+        if self.init_herd:
+            animal_factory = AnimalFactory(breed=self.breed, CI=self.CI, initial_animal_num=self.initial_animal_num,
+                                           simulation_days=self.simulation_days, initial_animal_id=self.animal_id,
+                                           save_animals=self.save_animals,
+                                           terminate_simulation_post_herd_generation=
+                                           self.terminate_simulation_post_herd_generation)
+            animal_factory.generate_animals()
+            raise Exception
+        else:
+            self._init_calves(self.calf_num, self.breed)
+            self._init_heiferIs(self.heiferI_num, self.breed)
+            self._init_heiferIIs(self.heiferII_num, self.breed)
+            self._init_heiferIIIs(self.heiferIII_num, self.breed)
+            self._init_cows(self.cow_num, self.breed)
+            self._init_replacement_cows(self.replace_num, self.breed)
 
     def _get_args_list(self, data: Dict[str, List[Any]], args_properties: List[str], num: int) -> \
             List[Dict[str, Any]]:
@@ -310,7 +322,7 @@ class AnimalData:
         """
 
         args_list = []
-        for i in range(num):
+        for i in range(len(data)):
             args = {}
             for arg in args_properties:
                 if arg == 'p_init':
@@ -338,21 +350,22 @@ class AnimalData:
             The breed of the calves to be initialized.
         """
 
-        current_num_calves = len(self.calves)
-
-        if current_num_calves >= num:
-            return
-
-        if self.init_herd:
-            self.calves += self._init_calves_from_simulation(num - current_num_calves, breed)
-
-        else:
-            if current_num_calves + self.num_calves_in_data < num:
-                self.calves += self._init_calves_from_data(self.num_calves_in_data)
-                self.calves += self._init_calves_from_simulation(num - current_num_calves - self.num_calves_in_data,
-                                                                 breed)
-            else:
-                self.calves += self._init_calves_from_data(num - current_num_calves)
+        # current_num_calves = len(self.calves)
+        #
+        # if current_num_calves >= num:
+        #     return
+        #
+        # if self.init_herd:
+        #     self.calves += self._init_calves_from_simulation(num - current_num_calves, breed)
+        #
+        # else:
+        #     if current_num_calves + self.num_calves_in_data < num:
+        #         self.calves += self._init_calves_from_data(self.num_calves_in_data)
+        #         self.calves += self._init_calves_from_simulation(num - current_num_calves - self.num_calves_in_data,
+        #                                                          breed)
+        #     else:
+        #         self.calves += self._init_calves_from_data(num - current_num_calves)
+        self._init_calves_from_data(num)
 
     def _init_calves_from_simulation(self, num: int, breed: str) -> List[Calf]:
         """
@@ -417,6 +430,8 @@ class AnimalData:
             calf = Calf(args)
             calves.append(calf)
 
+        self.calves = random.choices(calves, k=num)
+        print(len(calves), len(self.calves), num)
         return calves
 
     def _init_heiferIs(self, num: int, breed: str) -> None:
