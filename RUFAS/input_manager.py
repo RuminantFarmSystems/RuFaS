@@ -596,17 +596,22 @@ class InputManager:
                     "function": self._fix_data.__name__,
                     }
 
+        element_path = ".".join([str(element) for element in element_hierarchy])
         if 'default' not in variable_properties.keys():
-            om.add_error("Validation: invalid data not able to be fixed: ", f"{element_hierarchy[-1]}", info_map)
+            error_message = f"Variable '{element_path}' has invalid value and cannot be changed to a default value."
+            om.add_error("Validation: invalid data not able to be fixed.", error_message, info_map)
             return False
         variable_parent = reduce(lambda d, key: d[key], element_hierarchy[:-1],
                                  input_data)
+
+        original_invalid_value = variable_parent[element_hierarchy[-1]]
         om.add_warning("Validation: invalid data found",
-                       f"{element_hierarchy[-1]}: {variable_parent[element_hierarchy[-1]]}",
+                       f"Variable '{element_path}' has value: {original_invalid_value}.",
                        info_map)
         variable_parent[element_hierarchy[-1]] = variable_properties['default']
         om.add_warning("Validation: data fixed",
-                       f"Invalid data fixed: {element_hierarchy[-1]} => {variable_properties['default']}",
+                       f"Invalid data fixed: '{element_path}' value changed from "
+                       f"{original_invalid_value} to {variable_properties['default']}.",
                        info_map)
         return True
 
