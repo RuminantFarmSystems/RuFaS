@@ -6,7 +6,7 @@
 		"heiferIII_num_springers": 4,
 		"cow_num": 117,
 		"replace_num": 500,
-		"herd_num": 126,
+		"herd_num": 117,
 		"herd_init": false,
 		"breed": "HO"
 	},
@@ -14,12 +14,12 @@
 		"management_decisions": {
 			"breeding_start_day_h": 403,
 			"heifer_repro_method": "ED",
-			"cow_repro_method": "Synch-ED",
+			"cow_repro_method": "ED-TAI",
 			"semen_type": "sexed",
 			"days_in_preg_when_dry": 230,
 			"heifer_repro_cull_time": 510,
 			"do_not_breed_time" : 220,
-			"cull_milk_production": 40,
+			"cull_milk_production": 18,
 			"cow_times_milked_per_day": 2
 		},
 		"farm_level": {
@@ -125,9 +125,9 @@
 	},
 	"housing": "barn",
 	"pasture_concentrate": 0,
-	"methane_model": "IPCC",
+	"methane_model": "Mutian",
 	"ration": {
-		"user_input": false,
+		"user_input": true,
 		"formulation_interval": 30
 	},
 	"pen_information": [
