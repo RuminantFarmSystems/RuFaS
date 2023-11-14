@@ -167,7 +167,8 @@ class AnimalData:
         initialization_db_summary(self) -> Dict[str, int | float]
             Return a dictionary which stores the summary of the initialization.
         """
-    animal_id = 378165
+    # animal_id = 378165
+    animal_id = 0
 
     CI: float
     breed: str
@@ -322,16 +323,17 @@ class AnimalData:
         """
 
         args_list = []
-        for i in range(len(data)):
+        for i in range(num):
             args = {}
             for arg in args_properties:
-                if arg == 'p_init':
+                if arg == 'id':
+                    args['id'] = self.next_id()
+                elif arg == 'p_init':
                     args['p_init'] = 0
-                    continue
                 elif arg == 'events' and data['events'][i].lower() == 'no events':
                     args['events'] = ''
-                    continue
-                args[arg] = data[arg][i]
+                else:
+                    args[arg] = data[arg][i]
             args_list.append(args)
         return args_list
 
@@ -422,16 +424,21 @@ class AnimalData:
             A list containing the initialized Calf instances from the existing data.
         """
         calves: List[Calf] = []
-        calves_data = im.get_data("calves")
+        all_calves_data: Dict[str, List[Any]] = im.get_data("calves")
+        random_choices = random.choices(list(range(num)), k=num)
+        calves_data = {}
+        for key in all_calves_data.keys():
+            temp = []
+            for choice in random_choices:
+                temp.append(all_calves_data[key][choice])
+            calves_data[key] = temp
         args_properties = ['id', 'breed', 'birth_date', 'days_born', 'p_init', 'birth_weight', 'body_weight',
                            'wean_weight', 'mature_body_weight', 'events']
         args_list = self._get_args_list(calves_data, args_properties, num)
         for args in args_list:
             calf = Calf(args)
             calves.append(calf)
-
-        self.calves = random.choices(calves, k=num)
-        print(len(calves), len(self.calves), num)
+        self.calves = calves
         return calves
 
     def _init_heiferIs(self, num: int, breed: str) -> None:
@@ -1009,7 +1016,6 @@ class AnimalData:
         List[Calf]
             A list of Calf instances.
         """
-        self._init_calves(num, breed)
         if self.order_by_random:
             shuffle(self.calves)
         return self.calves
