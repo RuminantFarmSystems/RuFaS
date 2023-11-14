@@ -129,6 +129,10 @@ class LifeCycleManager:
         self.non_preg_cow_percent = 0.0
 
         self.daily_milk_production = 0.0
+        self.daily_herd_milk_fat_kg = 0.0
+        self.daily_herd_milk_fat_percent = 0.0
+        self.daily_herd_milk_protein_kg = 0.0
+        self.daily_herd_milk_protein_percent = 0.0
         self.avg_days_in_milk = 0.0
         self.avg_days_in_preg = 0.0
         self.avg_cow_body_weight = 0.0
@@ -301,6 +305,11 @@ class LifeCycleManager:
         self._calculate_percent_cow_per_parity()
 
         self.daily_milk_production = sum(cow.estimated_daily_milk_produced for cow in cows)
+        self.daily_herd_milk_fat_kg = sum(cow.daily_milk_fat_kg for cow in cows)
+        self.daily_herd_milk_fat_percent = self.daily_herd_milk_fat_kg / self.daily_milk_production
+        self.daily_herd_milk_protein_kg = sum(cow.daily_milk_protein_kg for cow in cows)
+        self.daily_herd_milk_protein_percent = self.daily_herd_milk_protein_kg / self.daily_milk_production 
+      
 
         info_map = {"class": self.__class__.__name__,
                     "function": self.daily_update.__name__,
@@ -310,7 +319,7 @@ class LifeCycleManager:
                                              "sold_heiferIII_num", "bought_heifer_num", "sold_heiferII_num",
                                              "sold_and_died_cow_num", "GnRH_injection_num_h", "GnRH_injection_num",
                                              "PGF_injection_num", "PGF_injection_num_h", "ai_num", "preg_check_num",
-                                             "preg_check_num_h", "sold_calf_num", "daily_milk_production",
+                                             "preg_check_num_h", "sold_calf_num", "daily_milk_production", "daily_herd_milk_fat_percent", "daily_herd_milk_protein_percent",
                                              "open_cow_num", "vwp_cow_num", "preg_cow_num", "milking_cow_num",
                                              "dry_cow_num", "avg_days_in_milk", "avg_days_in_preg",
                                              "avg_cow_body_weight", "avg_parity_num", "avg_calving_interval",
@@ -380,6 +389,10 @@ class LifeCycleManager:
         self.non_preg_cow_percent = 0.0
 
         self.daily_milk_production = 0.0
+        self.daily_herd_milk_fat_kg = 0.0
+        self.daily_herd_milk_fat_percent = 0.0
+        self.daily_herd_milk_protein_kg = 0.0
+        self.daily_herd_milk_protein_percent = 0.0
         self.avg_days_in_milk = 0.0
         self.avg_days_in_preg = 0.0
         self.avg_cow_body_weight = 0.0
