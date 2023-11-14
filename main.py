@@ -103,6 +103,8 @@ def run_rufas(
             graphics_dir,
             format_option,
             verbose,
+            output_dir,
+            filters_dir,
         )
 
 
@@ -392,7 +394,7 @@ def parse_gnu_args() -> argparse.Namespace:
         "-l",
         "--load-pool",
         help="Load the output manager's variables pool from provided path",
-        default=""
+        default="",
     )
     parser.add_argument(
         "-O",
@@ -404,7 +406,7 @@ def parse_gnu_args() -> argparse.Namespace:
         "-F",
         "--filters-dir",
         help="The directory for the files containing the keys for filtering",
-        default="output/",
+        default="output/output_filters/",
     )
     return parser.parse_args()
 
