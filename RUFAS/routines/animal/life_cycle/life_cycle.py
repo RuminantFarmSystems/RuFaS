@@ -18,12 +18,14 @@ from typing import Type
 from typing import TypeVar
 from typing import Union
 
+from RUFAS.config import Config
 from RUFAS.output_manager import OutputManager
 from RUFAS.routines.animal.animal_typed_dicts import AnimalConfigTypedDict, HerdInfoTypedDict
 from RUFAS.routines.animal.animal_typed_dicts import InitializationDBSummaryTypedDict
 from RUFAS.routines.animal.life_cycle import animal_constants
 from RUFAS.routines.animal.life_cycle.animal_base import AnimalBase
-from RUFAS.routines.animal.life_cycle.animal_initialization import AnimalInitialization
+from RUFAS.routines.animal.life_cycle.animal_data import AnimalData
+
 from RUFAS.routines.animal.life_cycle.calf import Calf
 from RUFAS.routines.animal.life_cycle.cow import Cow
 from RUFAS.routines.animal.life_cycle.heiferI import HeiferI
@@ -173,19 +175,26 @@ class LifeCycleManager:
         }
 
         self.replacement_market: List[Cow] = []
-        self.animal_initializer: Optional[AnimalInitialization] = None
+        self.animal_data: Optional[AnimalData] = None
 
     # TODO: Annotate config after removing all the imports in all the __init__.py files
-    def initialize_herd(self, config, herd_data: HerdInfoTypedDict) \
-            -> Tuple[List[Calf], List[HeiferI], List[HeiferII], List[HeiferIII], List[Cow]]:
+    def initialize_herd(self, config: Config, herd_data: HerdInfoTypedDict, init_herd, save_animals,
+                        terminate_simulation_post_herd_generation) -> Tuple[List[Calf], List[HeiferI], List[HeiferII],
+                                                                            List[HeiferIII], List[Cow]]:
         """Generates a replacement herd to simulate the market, for the herd to get replacements.
 
         Parameters
         ----------
-        config
+        config: Config
             stores (among other things) information on whether the seed has been set by the user
         herd_data : HerdInfoTypedDict
             The data for the herd to be initialized
+        init_herd: bool
+            Initialize herd with simulation.
+        save_animals: bool
+            Save animals to CSV files.
+        terminate_simulation_post_herd_generation: bool
+            Save generated animals to CSV files.
 
         Returns
         -------
@@ -193,10 +202,8 @@ class LifeCycleManager:
             A tuple of animal lists for the calves, heiferIs, heiferIIs, heiferIIIs, and cows
 
         """
-        self.animal_initializer = AnimalInitialization(self.animal_config['calving_interval'],
-                                                       herd_data['breed'],
-                                                       config.set_seed,
-                                                       herd_data['herd_init'])
+        self.animal_data = AnimalData(self.animal_config['calving_interval'], herd_data, config.set_seed, init_herd,
+                                      save_animals, terminate_simulation_post_herd_generation)
         self.herd_num = herd_data['herd_num']
         self._set_avg_CI()
 
@@ -205,15 +212,15 @@ class LifeCycleManager:
         heiferIIs = self._get_animals(HeiferII, herd_data['heiferII_num'], herd_data['breed'])
         heiferIIIs = self._get_animals(HeiferIII, herd_data['heiferIII_num_springers'], herd_data['breed'])
         cows = self._get_animals(Cow, herd_data['cow_num'], herd_data['breed'])
-        self.replacement_market = self.animal_initializer.get_replacement_cows(herd_data['replace_num'],
-                                                                               herd_data['breed'])
+        self.replacement_market = self.animal_data.get_replacement_cows(herd_data['replace_num'],
+                                                                        herd_data['breed'])
         return calves, heiferIs, heiferIIs, heiferIIIs, cows
 
     def _set_avg_CI(self) -> None:
         if 'use_input_calving_interval' in self.animal_config and self.animal_config['use_input_calving_interval']:
             self.avg_CI = self.animal_config['calving_interval']
         else:
-            self.initialize_db_summary = self.animal_initializer.initialization_db_summary()
+            self.initialize_db_summary = self.animal_data.initialization_db_summary()
             self.avg_CI = self.initialize_db_summary['cow_avg_CI']
 
     def _get_animals(self, animal_type: Type[GenericAnimal], num: int, breed: str) -> List[GenericAnimal]:
@@ -229,11 +236,11 @@ class LifeCycleManager:
 
         """
         animal_getter_by_animal_type: Dict[Type[GenericAnimal], Callable[[int, str], List[GenericAnimal]]] = {
-            Calf: self.animal_initializer.get_calves,
-            HeiferI: self.animal_initializer.get_heiferIs,
-            HeiferII: self.animal_initializer.get_heiferIIs,
-            HeiferIII: self.animal_initializer.get_heiferIIIs,
-            Cow: self.animal_initializer.get_cows
+            Calf: self.animal_data.get_calves,
+            HeiferI: self.animal_data.get_heiferIs,
+            HeiferII: self.animal_data.get_heiferIIs,
+            HeiferIII: self.animal_data.get_heiferIIIs,
+            Cow: self.animal_data.get_cows
         }
         animals = animal_getter_by_animal_type[animal_type](num, breed)
         for animal in animals:
@@ -247,7 +254,7 @@ class LifeCycleManager:
                      heiferIIIs: List[HeiferIII],
                      cows: List[Cow]) \
             -> Tuple[List[Cow], List[Cow], List[Calf], List[Calf],
-            List[HeiferI], List[HeiferII], List[HeiferIII], List[Cow]]:
+                     List[HeiferI], List[HeiferII], List[HeiferIII], List[Cow]]:
         """
         Updates the status of the animals.
 
@@ -653,7 +660,7 @@ class LifeCycleManager:
         args.update(tai_method_c=AnimalBase.config["cow_repro_programs"]['cow_TAI_protocol'])
         args.update(resynch_method=AnimalBase.config["cow_repro_programs"]['cow_resynch_protocol'])
         new_cow = Cow(args)
-        if len(cows)>0:
+        if len(cows) > 0:
             new_cow.milk_production_reduction = cows[0].milk_production_reduction
         cows.append(new_cow)
 
@@ -873,7 +880,7 @@ class LifeCycleManager:
 
     def _handle_new_born(self, sim_day: int, cow: Cow, calves_born: List[Calf]) -> None:
         args = {
-            'id': self.animal_initializer.next_id(),
+            'id': self.animal_data.next_id(),
             'breed': 'HO',
             'birth_date': sim_day,
             'days_born': 0,

@@ -31,6 +31,9 @@ def main():
         only_run_validation=cmd_arguments.only_run_validation,
         graphics_dir=Path(cmd_arguments.graphics_dir),
         load_pool=cmd_arguments.load_pool,
+        init_herd=cmd_arguments.init_herd,
+        save_animals=cmd_arguments.save_animals,
+        terminate_simulation_post_herd_generation=cmd_arguments.terminate_simulation_post_herd_generation
     )
 
 
@@ -43,8 +46,12 @@ def run_rufas(
     only_run_validation: bool = False,
     graphics_dir: Path = Path(""),
     load_pool: bool = False,
+    init_herd: bool = False,
+    save_animals: bool = False,
+    terminate_simulation_post_herd_generation: bool = False
 ) -> None:
-    """Main function to run RuFaS, with options.
+    """
+    Main function to run RuFaS, with options.
 
     Parameters
     ----------
@@ -64,6 +71,12 @@ def run_rufas(
         The directory for saving graphics.
     load_pool : bool, optional, default=False
         Load json file into Output Manager variables pool for processing.
+    init_herd: bool
+        Initialize herd with simulation.
+    save_animals: bool
+        Save animals to CSV files.
+    terminate_simulation_post_herd_generation: bool
+        Save generated animals to CSV files.
     """
     sys.stdout.write("RuFaS: Ruminant Farm Systems Model 2023\n")
 
@@ -86,6 +99,9 @@ def run_rufas(
             graphics_dir,
             format_option,
             verbose,
+            init_herd,
+            save_animals,
+            terminate_simulation_post_herd_generation
         )
 
 
@@ -171,7 +187,7 @@ def run_load_vars_pool(
 
 
 def run_validation(
-    metadata_files: List[Path],
+    metadata_files: List[MetadataPaths],
     exclude_info_maps: bool = False,
     format_option: str = "verbose",
     verbose: LogVerbosity = LogVerbosity.NONE,
@@ -180,10 +196,10 @@ def run_validation(
 
     Parameters
     ----------
-    metadata_files : List[Path]
+    metadata_files : List[MetadataPaths]
         The list of Paths to the metadata files the user entered with which to run the simulation.
     exclude_info_maps : bool, optional
-        Flag for whether or not the user wants to inlcude info_maps data in their results files.
+        Flag for whether the user wants to include info_maps data in their results files.
     format_option : str
         The formatting option for select output files.
     verbose : LogVerbosity
@@ -232,6 +248,9 @@ def execute_simulations(
     graphics_dir: Path = Path(""),
     format_option: str = "verbose",
     verbose: LogVerbosity = LogVerbosity.NONE,
+    init_herd: bool = False,
+    save_animals: bool = False,
+    terminate_simulation_post_herd_generation: bool = False
 ) -> None:
     """Instantiates I/O Managers and processes the metadata files provided by the user to run the simulation.
 
@@ -242,7 +261,7 @@ def execute_simulations(
         and the path to the metadata file.
 
     exclude_info_maps : bool, optional
-        Flag for whether or not the user wants to inlcude info_maps data in their results files.
+        Flag for whether the user wants to include info_maps data in their results files.
     produce_graphics: bool, optional
         Flag for whether or not the user wants to produce graphs at after the simulation.
     graphics_dir : Path, optional
@@ -251,6 +270,12 @@ def execute_simulations(
         The formatting option for select output files.
     verbose : LogVerbosity
         The verbose option set by the user.
+    init_herd: bool
+        Initialize herd with simulation.
+    save_animals: bool
+        Save animals to CSV files.
+    terminate_simulation_post_herd_generation: bool
+        Save generated animals to CSV files.
     """
     info_map = {
         "class": "No caller class",
@@ -276,7 +301,9 @@ def execute_simulations(
             output_manager.add_log(
                 "Validation complete", "Data is valid. \nSimulating...\n", info_map
             )
-            simulator = SimulationEngine()
+            simulator = SimulationEngine(init_herd,
+                                         save_animals,
+                                         terminate_simulation_post_herd_generation)
             simulator.simulate()
         else:
             output_manager.add_error(
@@ -359,6 +386,24 @@ def parse_gnu_args() -> argparse.Namespace:
         "--load-pool",
         help="Load the output manager's variables pool from provided path",
         action="store_true"
+    )
+    parser.add_argument(
+        "-I",
+        "--init_herd",
+        help="Initialize herd with simulation",
+        action="store_true",
+    )
+    parser.add_argument(
+        "-s",
+        "--save_animals",
+        help="Save animals to CSV files",
+        action="store_true",
+    )
+    parser.add_argument(
+        "-t",
+        "--terminate_simulation_post_herd_generation",
+        help="Save generated animals to CSV files",
+        action="store_true",
     )
     return parser.parse_args()
 
