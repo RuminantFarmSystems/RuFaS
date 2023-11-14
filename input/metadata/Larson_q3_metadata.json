@@ -3,21 +3,21 @@
     "config": {
       "title": "Config Data",
       "description": "Configuration Information",
-      "path": "input/data/config/multi_crop_config.json",
+      "path": "input/data/config/Larson_q3_config.json",
       "type": "json",
       "properties": "config_properties"
     },
     "animal": {
       "title": "Animal data",
-      "description": "Animal module specification.",
-      "path": "input/data/animal/no_animal.json",
+      "description": "Moo Moo!",
+      "path": "input/data/animal/Larson_q3_animal.json",
       "type": "json",
       "properties": "animal_properties"
     },
     "crop": {
       "title": "Crop data",
-      "description": "Crop rotation schedule.",
-      "path": "input/data/crop/multi_crop_rotation.json",
+      "description": "Alfafa is fun!",
+      "path": "input/data/crop/default_rotation.json",
       "type": "json",
       "properties": "crop_schedule_properties"
     },
@@ -63,45 +63,52 @@
       "type": "json",
       "properties": "manure_management_properties"
     },
-    "soil": {
+    "soil_1": {
       "title": "Soil data",
-      "description": "Soil configuration.",
-      "path": "input/data/soil/ARL_soil.json",
+      "description": "Stop treating soil like dirt!",
+      "path": "input/data/soil/default_soil.json",
+      "type": "json",
+      "properties": "soil_profile_properties"
+    },
+    "soil_2": {
+      "title": "Soil data",
+      "description": "Stop treating soil like dirt!",
+      "path": "input/data/soil/default_soil_2.json",
       "type": "json",
       "properties": "soil_profile_properties"
     },
     "fertilizer_schedule": {
       "title": "Fertilizer schedule.",
-      "description": "Fertilizer application schedule.",
-      "path": "input/data/fertilizer_schedule/multi_crop_fertilizer_schedule.json",
+      "description": "Fertilizer is like butter, you can never have too much.",
+      "path": "input/data/fertilizer_schedule/default_fertilizer_schedule.json",
       "type": "json",
       "properties": "fertilizer_schedule_properties"
     },
     "manure_schedule": {
       "title": "Manure schedule.",
-      "description": "Manure application schedule.",
-      "path": "input/data/manure_schedule/multi_crop_manure_schedule.json",
+      "description": "Crappier than having 7:45 am classes Monday - Friday.",
+      "path": "input/data/manure_schedule/default_manure_schedule.json",
       "type": "json",
       "properties": "manure_schedule_properties"
     },
     "tillage_schedule": {
       "title": "Tillage schedule.",
-      "description": "Tillage application schedule.",
-      "path": "input/data/tillage_schedule/multi_crop_tillage_schedule.json",
+      "description": "Requires the will to till.",
+      "path": "input/data/tillage_schedule/default_tillage_schedule.json",
       "type": "json",
       "properties": "tillage_schedule_properties"
     },
     "field": {
       "title": "Field specification",
       "description": "Contains overall field properties and references to specification files.",
-      "path": "input/data/field/multi_crop_field.json",
+      "path": "input/data/field/default_field.json",
       "type": "json",
       "properties": "field_properties"
     },
     "weather": {
       "title": "Weather data",
       "description": "Let's turn on the AC",
-      "path": "input/data/weather/ARL_weather.csv",
+      "path": "input/data/weather/barnyard_weather.csv",
       "type": "csv",
       "properties": "weather_properties"
     },
@@ -618,6 +625,18 @@
               "minimum": 1,
               "default": 6
             },
+            "avg_estrus_cycle_heifer": {
+              "type": "number",
+              "description": "Average length of estrus cycle for heifers (default is 21).",
+              "minimum": 1,
+              "default": 21
+            },
+            "std_estrus_cycle_heifer": {
+              "type": "number",
+              "description": "Standard deviation of the length of estrus cycle for heifers (default is 2.5).",
+              "minimum": 1,
+              "default": 2.5
+            },
             "avg_estrus_cycle_cow": {
               "type": "number",
               "description": "Average length of estrus cycle for cows (default is 21).",
@@ -952,7 +971,7 @@
           "pen_type": {
             "description": "Pen Type -- The type of stalls the pen has.",
             "type": "string",
-            "pattern": "^(freestall|tiestall|drylot)$",
+            "pattern": "^(freestall|tilestall|drylot)$",
             "default": "freestall"
           },
           "max_stocking_density": {
@@ -2779,3 +2798,4 @@
   },
   "cross-validation": {}
 }
+
