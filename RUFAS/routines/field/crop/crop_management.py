@@ -49,20 +49,19 @@ class CropManagement:
             The object tracking the attributes of the soil profile.
 
         """
-        killed = False
+        is_killed = False
         self.determine_harvest_index()
 
         if harvest_op == HarvestOperation.HARVEST:
             self.cut_crop(collected_fraction=self.data.harvest_efficiency)
             self.kill()
-            killed = True
+            is_killed = True
 
         if harvest_op == HarvestOperation.HARVEST_NOKILL:
             self.cut_crop(collected_fraction=self.data.harvest_efficiency)
-            # non of the roots gets killed, soil litter not used
 
         self._record_yield(field_name, field_size, year, day)
-        self._transfer_residue(soil_data, killed)
+        self._transfer_residue(soil_data, is_killed)
 
     # ---- Sub Methods ----
     # TODO: implement management practice for dry-down and collecting cut yields that have been left in the field - #353
