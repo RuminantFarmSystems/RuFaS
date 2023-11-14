@@ -422,14 +422,16 @@ class Pen:
         self.update_animal_combination(animal_combination)
         self.update_classes_in_pen()
 
-    def calc_manure(self, feed, methane_model):  # noqa
+    def calc_manure(self, feed: Feed, methane_model: str):  # noqa
         """
-        Calculates the total manure excretion of the animals in the pen,
-         and updates the manure attributes to contain the new amounts.
+        Calculate the manure excretion of the animals in the pen.
 
-        Args:
-            feed: instance of the Feed class
-            methane_model: methane model used for methane emission calculations
+        Parameters
+        ----------
+        feed: Feed
+            An object of the Feed class containing information about the feed.
+        methane_model : str
+            Methane model used for calculations.
         """
 
         for animal in self.animals_in_pen:
