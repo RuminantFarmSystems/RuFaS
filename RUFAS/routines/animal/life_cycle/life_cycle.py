@@ -247,7 +247,7 @@ class LifeCycleManager:
                      heiferIIIs: List[HeiferIII],
                      cows: List[Cow]) \
             -> Tuple[List[Cow], List[Cow], List[Calf], List[Calf],
-            List[HeiferI], List[HeiferII], List[HeiferIII], List[Cow]]:
+                     List[HeiferI], List[HeiferII], List[HeiferIII], List[Cow]]:
         """
         Updates the status of the animals.
 
@@ -327,8 +327,6 @@ class LifeCycleManager:
 
         om.add_variable("life_cycle_daily_herd_update", life_cycle_daily_herd_update, info_map)
         om.add_variable("died_cow_num", self.cull_reason_stats['culled for death'], info_map)
-
-    
 
         return (animals_added, animals_removed, calves_born, calves, heiferIs,
                 heiferIIs, heiferIIIs, cows)
@@ -656,7 +654,7 @@ class LifeCycleManager:
         args.update(tai_method_c=AnimalBase.config["cow_repro_programs"]['cow_TAI_protocol'])
         args.update(resynch_method=AnimalBase.config["cow_repro_programs"]['cow_resynch_protocol'])
         new_cow = Cow(args)
-        if len(cows)>0:
+        if len(cows) > 0:
             new_cow.milk_production_reduction = cows[0].milk_production_reduction
         cows.append(new_cow)
 
