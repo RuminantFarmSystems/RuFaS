@@ -92,60 +92,6 @@ class AnimalData:
         __init__(CI, herd_data: HerdInfoTypedDict, set_seed) -> None:
             The class constructor which initializes the AnimalData instance with the provided herd data.
 
-        _init_calves(num: int, breed: str) -> None
-            Initialize calves up to the specified number and breed.
-
-        _init_calves_from_simulation(num: int, breed: str, sim_days=5000) -> List[Calf]
-            Simulate and initialize Calf instances.
-
-        _init_calves_from_data(num: int) -> List[Calf]
-            Initialize Calf instances from existing data.
-
-        _init_heiferIs(num: int, breed: str) -> None
-            Initialize HeiferIs up to the specified number and breed.
-
-        _init_heiferIs_from_simulation(num: int, breed: str, sim_days=5000) -> List[HeiferI]
-            Simulate and initialize HeiferI instances.
-
-        _init_heiferIs_from_data(num: int) -> List[HeiferI]
-            Initialize HeiferI instances from existing data.
-
-        _init_heiferIIs(num: int, breed: str) -> None
-            Initialize HeiferIIs up to the specified number and breed.
-
-        _init_heiferIIs_from_simulation(num: int, breed: str, sim_days=5000) -> List[HeiferII]
-            Simulate and initialize HeiferII instances.
-
-        _init_heiferIIs_from_data(num: int) -> List[HeiferII]
-            Initialize HeiferII instances from existing data.
-
-        _init_heiferIIIs(num: int, breed: str) -> None
-            Initialize HeiferIIIs up to the specified number and breed.
-
-        _init_heiferIIIs_from_simulation(num: int, breed: str, sim_days=5000) -> List[HeiferIII]
-            Simulate and initialize HeiferIII instances.
-
-        _init_heiferIIIs_from_data(num: int) -> List[HeiferIII]
-            Initialize HeiferIII instances from existing data.
-
-        _init_cows(num: int, breed: str) -> None
-            Initialize cows up to the specified number and breed.
-
-        _init_cows_from_simulation(num: int, breed: str, sim_days=5000) -> List[Cow]
-            Simulate and initialize Cow instances.
-
-        _init_cows_from_data(num: int) -> List[Cow]
-            Initialize Cow instances from existing data.
-
-        _init_replacement_cows(num: int, breed: str) -> None
-            Initialize replacement cows up to the specified number and breed.
-
-        _init_replacement_cows_from_simulation(num: int, breed: str, sim_days=5000) -> List[Cow]
-            Simulate and initialize replacement Cow instances.
-
-        _init_replacement_cows_from_data(num: int) -> List[Cow]
-            Initialize replacement Cow instances from existing data.
-
         get_calves(num: int, breed: str) -> List[Calf]
             Retrieve and optionally shuffle a list of calf instances.
 
