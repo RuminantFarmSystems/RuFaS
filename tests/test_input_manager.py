@@ -8,7 +8,7 @@ from __future__ import annotations
 
 import json
 from functools import reduce
-from typing import Any, Callable, Dict, Union
+from typing import Any, Callable, Dict
 
 import pandas as pd
 import pytest
