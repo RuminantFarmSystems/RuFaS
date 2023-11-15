@@ -4,8 +4,8 @@
     "graphic_dir": "output/graphics/",
     "output_dir": "output/",
     "csv_dir": "output/CSVs",
-    "random_seed": 42,
-    "set_seed": true,
+    "random_seed": 0,
+    "set_seed": false,
     "simulate_animals": true,
     "nutrient_standard": "NASEM"
 }
