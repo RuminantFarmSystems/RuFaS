@@ -58,15 +58,15 @@ class CurrentDayConditions:
             self.rainfall = self.precipitation
 
     @staticmethod
-    def determine_daylength(solar_declination_radians: float, geographic_latitude_radians: float, month: int,
+    def determine_daylength(day_number: int, geographic_latitude_radians: float, month: int,
                             angular_velocity=0.2618) -> float:
         """
         Calculates the day length for the field based on its day and latitude
 
         Parameters
         ----------
-        solar_declination_radians : float
-            solar declination in radians
+        day_number : int
+            Day number of the year
         geographic_latitude_radians : float
             geographic latitude in radians
         angular_velocity: float default = 0.2618
@@ -84,6 +84,7 @@ class CurrentDayConditions:
         ----------
         SWAT 1:1.1.6
         """
+        solar_declination_radians = CurrentDayConditions.calculate_solar_declination_radians(day_number)
         if abs(-math.tan(solar_declination_radians) * math.tan(geographic_latitude_radians)) > 1:
             if month >= 6 or month <= 9:
                 return 24
@@ -97,6 +98,7 @@ class CurrentDayConditions:
     @staticmethod
     def calculate_solar_declination_radians(day_number: int) -> float:
         """
+        Helper method to determine the solar declination in radians
 
         Parameters
         ----------
