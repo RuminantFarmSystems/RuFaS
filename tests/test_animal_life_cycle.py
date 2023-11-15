@@ -161,8 +161,8 @@ def test_initialize_herd(mocker: MockerFixture, life_cycle_manager: LifeCycleMan
 
 def test_reset_parity(life_cycle_manager: LifeCycleManager) -> None:
     """Unit test for function _reset_parity in file life_cycle.py"""
-    parities = LifeCycleManager.num_cow_for_parity
-    preg_times = LifeCycleManager.avg_calving_to_preg_time
+    parities = life_cycle_manager.num_cow_for_parity
+    preg_times = life_cycle_manager.avg_calving_to_preg_time
     count_per_parity = 10
     avg_calving_to_preg_time_default = 10.0
     avg_age_for_parity_default = 200.0
@@ -188,7 +188,7 @@ def test_reset_parity(life_cycle_manager: LifeCycleManager) -> None:
 
 def test_reset_cull_reason_stats(life_cycle_manager: LifeCycleManager) -> None:
     """Unit test for function _reset_cull_reason_stats in file life_cycle.py"""
-    stats = LifeCycleManager.cull_reason_stats
+    stats = life_cycle_manager.cull_reason_stats
     num_reasons = len(stats)
     count_per_reason = 10
     life_cycle_manager.culled_cow_num = num_reasons * count_per_reason
@@ -807,7 +807,7 @@ def test_cull_cow(mocker: MockerFixture, life_cycle_manager: LifeCycleManager) -
     # Assert before
     assert len(life_cycle_manager.culled_cows) == 0
     assert len(life_cycle_manager.cull_reason_stats_range) == 0
-    assert LifeCycleManager.cull_reason_stats[LOW_PROD_CULL] == 0
+    assert life_cycle_manager.cull_reason_stats[LOW_PROD_CULL] == 0
     assert len(life_cycle_manager.parity_culling_stats_range) == 0
 
     # Act
@@ -818,7 +818,7 @@ def test_cull_cow(mocker: MockerFixture, life_cycle_manager: LifeCycleManager) -
     assert len(life_cycle_manager.cull_reason_stats_range) == 1
     assert LOW_PROD_CULL in life_cycle_manager.cull_reason_stats_range
     assert life_cycle_manager.cull_reason_stats_range[LOW_PROD_CULL] == 1
-    assert LifeCycleManager.cull_reason_stats[LOW_PROD_CULL] == 1
+    assert life_cycle_manager.cull_reason_stats[LOW_PROD_CULL] == 1
 
     assert len(life_cycle_manager.parity_culling_stats_range) == 1
     assert parity in life_cycle_manager.parity_culling_stats_range
@@ -1168,8 +1168,8 @@ def test_calc_cull_reason_stats_percent(mocker: MockerFixture, life_cycle_manage
     """Unit test for function _calculate_cull_reason_stats_percent() in file life_cycle.py."""
     # Arrange
     life_cycle_manager.culled_cow_num = culled_cow_num
-    num_reasons = len(LifeCycleManager.cull_reason_stats)
-    LifeCycleManager.cull_reason_stats.update({
+    num_reasons = len(life_cycle_manager.cull_reason_stats)
+    life_cycle_manager.cull_reason_stats.update({
         animal_constants.DEATH_CULL: int(culled_cow_num / num_reasons),
         animal_constants.LOW_PROD_CULL: int(culled_cow_num / num_reasons),
         animal_constants.LAMENESS_CULL: int(culled_cow_num / num_reasons),
@@ -1179,8 +1179,8 @@ def test_calc_cull_reason_stats_percent(mocker: MockerFixture, life_cycle_manage
         animal_constants.UDDER_CULL: int(culled_cow_num / num_reasons),
         animal_constants.UNKNOWN_CULL: 0  # Initialized with 0
     })
-    LifeCycleManager.cull_reason_stats[animal_constants.UNKNOWN_CULL] = \
-        culled_cow_num - sum(LifeCycleManager.cull_reason_stats.values())
+    life_cycle_manager.cull_reason_stats[animal_constants.UNKNOWN_CULL] = \
+        culled_cow_num - sum(life_cycle_manager.cull_reason_stats.values())
 
     spy_calc_cull_reason_stats_percent = mocker.spy(life_cycle_manager, '_calculate_cull_reason_stats_percent')
 
@@ -1192,7 +1192,7 @@ def test_calc_cull_reason_stats_percent(mocker: MockerFixture, life_cycle_manage
     for cull_reason in life_cycle_manager.cull_reason_stats_percent:
         if culled_cow_num > 0:
             assert life_cycle_manager.cull_reason_stats_percent[cull_reason] == \
-                   approx(LifeCycleManager.cull_reason_stats[cull_reason] * 100.0 / culled_cow_num)
+                   approx(life_cycle_manager.cull_reason_stats[cull_reason] * 100.0 / culled_cow_num)
         elif culled_cow_num == 0:
             assert life_cycle_manager.cull_reason_stats_percent[cull_reason] == approx(0.0)
 
@@ -1203,15 +1203,15 @@ def test_calc_percent_cow_per_parity(mocker: MockerFixture, life_cycle_manager: 
     """Unit test for function _calculate_percent_cow_per_parity() in file life_cycle.py."""
     # Arrange
     life_cycle_manager.cow_num = cow_num
-    num_parities = len(LifeCycleManager.num_cow_for_parity)
-    LifeCycleManager.num_cow_for_parity.update({
+    num_parities = len(life_cycle_manager.num_cow_for_parity)
+    life_cycle_manager.num_cow_for_parity.update({
         '1': int(cow_num / num_parities),
         '2': int(cow_num / num_parities),
         '3': int(cow_num / num_parities),
         'greater_than_3': 0
     })
-    LifeCycleManager.num_cow_for_parity['greater_than_3'] = \
-        cow_num - sum(LifeCycleManager.num_cow_for_parity.values())
+    life_cycle_manager.num_cow_for_parity['greater_than_3'] = \
+        cow_num - sum(life_cycle_manager.num_cow_for_parity.values())
 
     spy_calc_percent_cow_per_parity = mocker.spy(life_cycle_manager, '_calculate_percent_cow_per_parity')
 
@@ -1223,7 +1223,7 @@ def test_calc_percent_cow_per_parity(mocker: MockerFixture, life_cycle_manager: 
     for parity in life_cycle_manager.num_cow_for_parity:
         if cow_num > 0:
             assert life_cycle_manager.percent_cow_for_parity[parity] == \
-                   approx(LifeCycleManager.num_cow_for_parity[parity] * 100.0 / cow_num)
+                   approx(life_cycle_manager.num_cow_for_parity[parity] * 100.0 / cow_num)
         elif cow_num == 0:
             assert life_cycle_manager.percent_cow_for_parity[parity] == approx(0.0)
 
