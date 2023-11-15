@@ -132,7 +132,7 @@ class LayerData:
     active_carbon_decomposition_amount: float = 0.0
     """active carbon decomposed into slow or passive carbon and CO2 (kg/ha)"""
     active_carbon_amount: Optional[float] = None
-    """active carbon stored in the soil (kg/ha)"""
+    """active carbon stored in the layer (kg/ha)"""
 
     # pseudocode_soil S.6.C.4
     slow_carbon_amount: Optional[float] = None
@@ -213,13 +213,12 @@ class LayerData:
     # --- Residue partition
     plant_metabolic_to_soil_carbon_amount: float = 0.0
     """metabolic carbon incorporated into soil during tillage (kg/ha)"""
-    plant_structural_carbon_amount: float = 0.0
+    structural_litter_amount: float = 0.0
     """amount of plant structural carbon (kg/ha)"""
-    plant_metabolic_carbon_amount: float = 0.0
+    metabolic_litter_amount: float = 0.0
     """plant metabolic carbon amount (hg/ha)"""
     tillage_fraction: float = 0.0
     """Fraction of metabolic carbon incorporated into soil during tillage (unitless)"""
-    # TODO: needs to create a method to update this, not sure where it would be
     structural_carbon_transfer_amount: float = 0.0
     """the amount of transfer of structural carbon during tillage (kg/ha)"""
     soil_dry_matter_residue_amount: float = 0.0
@@ -232,7 +231,7 @@ class LayerData:
     """the rate at which above ground structural carbon decomposes into slow or active carbon (unitless)"""
     weighted_residue_dry_matter_lignin_fraction: float = 0.0
     """the weighted fractional of lignin amount in residue dry matter (unitless)"""
-    soil_residue_lignin_fraction: float = 0.0
+    soil_residue_lignin_fraction: float = 0.17
     """the fraction of soil residue that's comprised of lignin (unitless)"""
     soil_lignin_to_nitrogen_fraction: float = 0.0
     """soil lignin to nitrogen fraction(unitless)"""
