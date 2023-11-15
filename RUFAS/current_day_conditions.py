@@ -108,7 +108,11 @@ class CurrentDayConditions:
         Returns
         -------
         float
-        solar declination in radians
+            Solar declination in radians
+
+        References
+        ----------
+        SWAT 1:1.1.2
         """
 
         return math.asin(0.4*(math.sin((2*math.pi/365)*(day_number-82))))
