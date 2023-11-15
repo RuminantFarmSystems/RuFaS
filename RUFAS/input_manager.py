@@ -488,7 +488,7 @@ class InputManager:
             is_in_range = len(input_data_value) <= variable_properties["maximum_length"]
             if not is_in_range:
                 warning_name = "Validation: array length greater than maximum."
-                warning_message = f"Variable '{var_name}' has length : {len(input_data_value)}, greater than " \
+                warning_message = f"Variable '{var_name}' has length: {len(input_data_value)}, greater than " \
                                   f"maximum length: {maximum_length}."
                 warning_message += properties_location_string
                 om.add_warning(warning_name, warning_message, info_map)
@@ -550,8 +550,8 @@ class InputManager:
             is_valid_string = bool(re.match(pattern_check, input_data_value))
             if not is_valid_string:
                 warning_name = "Validation: string variable does not match pattern."
-                warning_message = f"Variable '{var_name}' has value: '{input_data_value}', does not match pattern " \
-                                  f"'{pattern_check}'."
+                warning_message = f"Variable '{var_name}' has value: '{input_data_value}', does not match pattern: " \
+                                  f"{pattern_check}."
                 warning_message += properties_location_string
                 om.add_warning(warning_name, warning_message, info_map)
                 return False
