@@ -1,5 +1,5 @@
 {
-    "second_moisture_condition_parameter": 0.00,
+    "second_moisture_condition_parameter": 85.00,
     "average_subbasin_slope": 0.02,
     "slope_length": 3,
     "manning_roughness_coefficient": 0.4,
