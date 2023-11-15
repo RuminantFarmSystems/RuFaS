@@ -437,7 +437,8 @@ class LayerData:
             self.active_carbon_amount = 0.02 * total_soil_carbon_amount
             self.slow_carbon_amount = 0.54 * total_soil_carbon_amount
             self.passive_carbon_amount = 0.44 * total_soil_carbon_amount
-
+            self.structural_litter_amount = 0.0
+            self.metabolic_litter_amount = 0.0
     def add_to_labile_phosphorus(self, phosphorus_to_add: float, field_size: float) -> None:
         """This method is a wrapper for adding a specified mass of phosphorus to the labile phosphorus content of this
             soil layer.
