@@ -652,7 +652,11 @@ class OutputManager(object):
                     else:
                         result = [json_content]
                 elif path.endswith(".txt"):
-                    list_of_elements = [element for element in filter_file.read().splitlines() if element]
+                    list_of_elements = [
+                        element
+                        for element in filter_file.read().splitlines()
+                        if element
+                    ]
                     result = [{"filters": list_of_elements}]
                 else:
                     raise Exception(
@@ -837,7 +841,7 @@ class OutputManager(object):
         elif filter_file.startswith(self.__supported_filter_types_prefixes["graph"]):
             if produce_graphics:
                 try:
-                    graph_generator = GraphGenerator()
+                    graph_generator = GraphGenerator(self.__metadata_prefix)
                     graph_generator.generate_graph(
                         filtered_pool,
                         filter_content,
@@ -882,7 +886,7 @@ class OutputManager(object):
 
     @deprecated(
         reason="""This function is still in the code base but it is not used. We want to keep it for debugging purposes
-        when save_variables() is not working.""",
+        when save_results() is not working.""",
         version="MVP",
     )
     def dump_variables(self, path: str, exclude_info_maps: bool = False) -> None:
@@ -1039,3 +1043,42 @@ class OutputManager(object):
         self.warnings_pool: Dict[str, OutputManager.pool_element_type] = {}
         self.errors_pool: Dict[str, OutputManager.pool_element_type] = {}
         self.logs_pool: Dict[str, OutputManager.pool_element_type] = {}
+
+    def load_variables_pool_from_file(self, file_path: Path) -> None:
+        """Loads the Output Manager variables pool from file path provided by user.
+
+        Parameters
+        ----------
+        file_path : Path
+            The path to the file to be loaded to the variables pool.
+
+        Raises
+        ------
+        Exception
+            If an error occurs while opening or reading the user-provided file path.
+        """
+        info_map = {
+            "class": self.__class__.__name__,
+            "function": self.load_variables_pool_from_file.__name__,
+        }
+        self.add_log(
+            "open_json_file", f"Attempting to open {str(file_path)}.", info_map
+        )
+        try:
+            with open(file_path) as file:
+                self.variables_pool = json.load(file)
+                self.add_log(
+                    "load_data_successful",
+                    f"Successfully loaded data from {str(file_path)}.",
+                    info_map,
+                )
+        except FileNotFoundError:
+            self.add_error(
+                "File not found",
+                f"The file '{str(file_path)}' does not exist.",
+                info_map,
+            )
+            raise
+        except json.JSONDecodeError as e:
+            self.add_error("JSON parsing error", str(e), info_map)
+            raise
