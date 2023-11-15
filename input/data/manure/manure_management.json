@@ -217,7 +217,7 @@
       "anaerobic_digestion_temperature_celsius": 37.5
     },
     {
-      "manure_treatment_type": "composted bedded pack barn",
+      "manure_treatment_type": "compost bedded pack barn",
       "total_solids_removal_efficiency_for_treatment": 0.45,
       "nitrogen_removal_efficiency_for_treatment": 0.0,
       "total_ammoniacal_nitrogen_removal_efficiency_for_treatment": 0.0,
