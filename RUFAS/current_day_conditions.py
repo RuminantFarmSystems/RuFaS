@@ -93,3 +93,20 @@ class CurrentDayConditions:
             day_length = ((2 * math.acos(-math.tan(solar_declination_radians) * math.tan(geographic_latitude_radians)))
                           / angular_velocity)
             return day_length
+
+    @staticmethod
+    def calculate_solar_declination_radians(day_number: int) -> float:
+        """
+
+        Parameters
+        ----------
+        day_number : int
+            Day number of the year
+
+        Returns
+        -------
+        float
+        solar declination in radians
+        """
+
+        return math.asin(0.4*(math.sin((2*math.pi/365)*(day_number-82))))
