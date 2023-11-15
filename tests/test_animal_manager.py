@@ -1604,6 +1604,7 @@ def test_daily_updates(is_end_ration_interval: bool, mocker: MockerFixture) -> N
         AnimalManager, '_calc_ration_at_interval', return_value=None)
     patch_for_calc_avg_growth = mocker.patch.object(
         AnimalManager, 'calc_avg_growth', return_value=None)
+    mock_manure_excretions_output_data = {}
 
     sum_daily_milk = 1000.0
     patch_for_sum_daily_milk = mocker.patch.object(
@@ -1641,7 +1642,8 @@ def test_daily_updates(is_end_ration_interval: bool, mocker: MockerFixture) -> N
     for mock_pen in mock_all_pens:
         mock_pen.calc_total_manure.assert_called_once_with(mock_feed, mock_methane_model,
                                                            mock_methane_mitigation_method,
-                                                           mock_methane_mitigation_additive_amount)
+                                                           mock_methane_mitigation_additive_amount,
+                                                           mock_manure_excretions_output_data)
         mock_pen.call_p_rqmts.assert_called_once()
         mock_pen.daily_p_update.assert_called_once()
 

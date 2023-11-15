@@ -102,6 +102,9 @@ class GraphGenerator:
     NOTE: This class is not multi-thread safe!!!
     """
 
+    def __init__(self, metadata_prefix: str = "") -> None:
+        self.metadata_prefix = metadata_prefix
+
     def generate_graph(
         self,
         filtered_pool: Dict[str, Dict[str, List[Any]]],
@@ -330,9 +333,9 @@ class GraphGenerator:
 
         if "title" in graph_details.keys():
             title = "-".join(graph_details["title"].split()).lower()
-            filename = f"{title}-{timestamp}.png"
+            filename = f"{self.metadata_prefix}_{title}-{timestamp}.png"
         else:
-            filename = f"saved_graph_{filter_file_name}-{timestamp}.png"
+            filename = f"{self.metadata_prefix}_{filter_file_name}-{timestamp}.png"
 
         graph_path = os.path.join(graph_directory, filename)
         return Path(graph_path)
