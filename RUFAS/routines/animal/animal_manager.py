@@ -20,6 +20,7 @@ import random
 from statistics import mean
 from typing import Any, Dict, Tuple, List, Set
 
+from RUFAS.config import Config
 from RUFAS.general_constants import GeneralConstants
 from RUFAS.time import Time
 from RUFAS.weather import Weather
@@ -115,16 +116,32 @@ class AnimalManager:
         config.update(data['from_literature']['life_cycle'])
         return config
 
-    def __init__(self, data, config, feed, weather: Weather, time: Time):
+    def __init__(self, data: Dict[str, Any], config: Config, feed: Feed, weather: Weather, time: Time,
+                 init_herd: bool = False, save_animals: bool = False,
+                 terminate_simulation_post_herd_generation: bool = False):
         """
         Initializes the pens and animals in the simulation with data from the
         JSON file by calling init_pens() and init_animals(). Creates instance
         of LifeCycleManager class and sets up the animal environment.
 
-        Args:
-            data: dictionary with animal information from the input JSON file
-            config: instance of the Config class
-            feed: instance of the Feed class
+        Parameters
+        ----------
+        data: Dict[str, Any]
+            Dictionary with animal information from the input JSON file.
+        config: Config
+            Instance of the Config class.
+        feed: Feed
+            Instance of the Feed class.
+        weather: Weather
+            Instance of the Weather class.
+        time: Time
+            Instance of the Time class.
+        init_herd: bool
+            Initialize herd with simulation.
+        save_animals: bool
+            Save animals to CSV files.
+        terminate_simulation_post_herd_generation: bool
+            Save generated animals to CSV files.
         """
 
         # simulation length, days
@@ -203,7 +220,8 @@ class AnimalManager:
         self.init_pens(data['pen_information'], data['herd_information'], data['manure_management_scenarios'])
 
         if self.simulate_animals:
-            self.init_animals(config, data['herd_information'])
+            self.init_animals(config, data['herd_information'], init_herd, save_animals,
+                              terminate_simulation_post_herd_generation)
 
             self.init_nutrient_rqmts(weather, time, feed)
 
@@ -256,7 +274,8 @@ class AnimalManager:
 
             self.all_pens.append(pen)
 
-    def init_animals(self, config, herd_data: Dict[str, Any]):
+    def init_animals(self, config: Config, herd_data: Dict[str, Any], init_herd: bool = False,
+                     save_animals: bool = False, terminate_simulation_post_herd_generation: bool = False):
         """
         Populates the list of animals with the information from the
         input JSON file: constructs the calves, heiferI’s, heiferII’s,
@@ -265,13 +284,23 @@ class AnimalManager:
         numbers to create instances of the animals. The nutrient requirements
         are calculated and the animals are allocated to pens.
 
-        Args:
-            config: an instance of the Config class contains model configuration information
-            herd_data: dictionary containing information about the herd
+        Parameters
+        ----------
+        config: Config
+            An instance of the Config class contains model configuration information
+        herd_data: Dict[str, Any]
+            A dictionary containing information about the herd.
+        init_herd: bool
+            Initialize herd with simulation.
+        save_animals: bool
+            Save animals to CSV files.
+        terminate_simulation_post_herd_generation: bool
+            Save generated animals to CSV files.
         """
 
         self.calves, self.heiferIs, self.heiferIIs, self.heiferIIIs, self.cows \
-            = self.life_cycle_manager.initialize_herd(config, herd_data)
+            = self.life_cycle_manager.initialize_herd(config, herd_data, init_herd, save_animals,
+                                                      terminate_simulation_post_herd_generation)
 
     def _print_animal_num_warnings(self, herd_data: Dict[str, Any]):
         """
