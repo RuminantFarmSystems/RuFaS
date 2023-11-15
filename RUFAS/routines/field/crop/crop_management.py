@@ -49,19 +49,19 @@ class CropManagement:
             The object tracking the attributes of the soil profile.
 
         """
+        is_killed = False
         self.determine_harvest_index()
 
         if harvest_op == HarvestOperation.HARVEST:
             self.cut_crop(collected_fraction=self.data.harvest_efficiency)
             self.kill()
+            is_killed = True
 
         if harvest_op == HarvestOperation.HARVEST_NOKILL:
             self.cut_crop(collected_fraction=self.data.harvest_efficiency)
 
         self._record_yield(field_name, field_size, year, day)
-        self._transfer_residue(soil_data)
-
-    # TODO: implement grazing feature - issue #590
+        self._transfer_residue(soil_data, is_killed)
 
     # ---- Sub Methods ----
     # TODO: implement management practice for dry-down and collecting cut yields that have been left in the field - #353
@@ -244,7 +244,7 @@ class CropManagement:
                  "harvest_date": {"year": year, "day": day}}
         om.add_variable("harvest_yield", value, info_map)
 
-    def _transfer_residue(self, soil_data: SoilData) -> None:
+    def _transfer_residue(self, soil_data: SoilData, killed: bool) -> None:
         """
         Transfers residue from harvest to SoilData that tracks how that residue is degraded and assimilated into the
         soil.
@@ -253,10 +253,27 @@ class CropManagement:
         ----------
         soil_data : SoilData
             Object that tracks the attributes of the soil profile that contains this crop.
+        killed : bool
+            Indicates whether the crop was killed by the harvest.
+
+        Notes
+        -----
+        If a crop is harvested but not killed, then there is only residue added to the surface. If it is harvested and
+        killed, then both surface and root residue is added to the soil profile.
 
         """
-        soil_data.plant_surface_residue += self.data.yield_residue
-        soil_data.soil_layers[0].fresh_organic_nitrogen_content += self.data.yield_nitrogen
+        soil_data.crop_yield_nitrogen = self.data.residue_nitrogen
+        soil_data.plant_residue_lignin_composition = 0.17
+        if killed:
+            soil_data.plant_surface_residue = self.data.yield_residue - self.data.root_biomass
+            soil_data.plant_root_residue = self.data.root_biomass
+            soil_data.crop_root_depth = self.data.root_depth
+        else:
+            soil_data.plant_surface_residue = self.data.yield_residue
+            soil_data.plant_root_residue = 0
+            soil_data.crop_root_depth = 0
+
+        soil_data.soil_layers[0].fresh_organic_nitrogen_content += self.data.residue_nitrogen
 
     # ---- Harvest Scheduling ----
 
