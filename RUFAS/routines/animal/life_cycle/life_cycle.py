@@ -327,6 +327,8 @@ class LifeCycleManager:
         om.add_variable("preg_check_num_h", self.preg_check_num_h, info_map)
         om.add_variable("sold_calf_num", self.sold_calf_num, info_map)
         om.add_variable("daily_milk_production", self.daily_milk_production, info_map)
+        om.add_variable("daily_herd_milk_fat_percent", self.daily_herd_milk_fat_percent, info_map)
+        om.add_variable("daily_herd_milk_protein_percent", self.daily_herd_milk_protein_percent, info_map)
         om.add_variable("open_cow_num", self.open_cow_num, info_map)
         om.add_variable("vwp_cow_num", self.vwp_cow_num, info_map)
         om.add_variable("preg_cow_num", self.preg_cow_num, info_map)
