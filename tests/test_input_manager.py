@@ -336,8 +336,10 @@ def test_validate_input_type_dynamic_valid_data(mock_input_manager: InputManager
                                                 input_data_value: Any) -> None:
     """Unit test for valid data type for function _validate_input_type_dynamic in file input_manager.py"""
     var_name = "dummy_var"
+    dummy_properties_key = "dummy_variable_properties"
 
-    result = mock_input_manager._validate_input_type_dynamic(variable_properties, var_name, input_data_value)
+    result = mock_input_manager._validate_input_type_dynamic(variable_properties, var_name, input_data_value,
+                                                             dummy_properties_key)
     assert result is True
 
     mock_input_manager._validate_input_type_dynamic = \
@@ -353,9 +355,11 @@ def test_validate_input_type_dynamic_invalid_type_raises_keyerror(mock_input_man
     variable_properties = {"type": "invalid_type", "dummy_property": "dummy_value"}
     var_name = "dummy_var"
     input_data_value = "dummy_value"
+    dummy_properties_key = "dummy_variable_properties"
 
     with pytest.raises(KeyError, match="Invalid type invalid_type"):
-        mock_input_manager._validate_input_type_dynamic(variable_properties, var_name, input_data_value)
+        mock_input_manager._validate_input_type_dynamic(variable_properties, var_name, input_data_value,
+                                                        dummy_properties_key)
 
     mock_input_manager._validate_input_type_dynamic = \
         input_manager_original_method_states["_validate_input_type_dynamic"]
@@ -370,9 +374,11 @@ def test_validate_input_type_dynamic_missing_type_raises_keyerror(mock_input_man
     variable_properties = {"dummy_property": "dummy_value"}
     var_name = "dummy_var"
     input_data_value = "dummy_value"
+    dummy_properties_key = "dummy_variable_properties"
 
     with pytest.raises(KeyError, match="Missing 'type' key in variable_properties"):
-        mock_input_manager._validate_input_type_dynamic(variable_properties, var_name, input_data_value)
+        mock_input_manager._validate_input_type_dynamic(variable_properties, var_name, input_data_value,
+                                                        dummy_properties_key)
 
     mock_input_manager._validate_input_type_dynamic = \
         input_manager_original_method_states["_validate_input_type_dynamic"]
@@ -783,9 +789,11 @@ def test_bool_type_validator(input_data_value: bool, expected_result: bool, mock
     """Unit test for function _bool_type_validator in file input_manager.py"""
     variable_properties = {}
     var_name = "dummy_var_name"
+    dummy_properties_key = "dummy_variable_properties"
 
     with patch("RUFAS.output_manager.OutputManager.add_warning") as add_warning:
-        result = mock_input_manager._bool_type_validator(variable_properties, var_name, input_data_value)
+        result = mock_input_manager._bool_type_validator(variable_properties, var_name, input_data_value,
+                                                         dummy_properties_key)
 
     if not expected_result:
         add_warning.assert_called_once()
@@ -835,7 +843,7 @@ def test_validate_json_element_invalid_var_name_raises_input_data_keyerror(mock_
                                                   eager_termination, mock_element_counter_and_validity)
 
         assert add_error.call_count == 1
-        fix_data.assert_called_once_with({"type": "string"}, element_hierarchy, input_data)
+        fix_data.assert_called_once_with({"type": "string"}, element_hierarchy, input_data, properties_blob_key)
 
     mock_input_manager._validate_json_element = input_manager_original_method_states["_validate_json_element"]
 
@@ -900,9 +908,11 @@ def test_array_type_validator(dummy_value: list, dummy_variable_to_check: Dict[s
                               expected_warning_call_count: int, mock_input_manager: InputManager) -> None:
     """Unit test for function _array_type_validator in file input_manager.py"""
     dummy_var_name = "dummy_array"
+    dummy_properties_key = "dummy_variable_properties"
 
     with patch("RUFAS.output_manager.OutputManager.add_warning") as add_warning:
-        result = mock_input_manager._array_type_validator(dummy_variable_to_check, dummy_var_name, dummy_value)
+        result = mock_input_manager._array_type_validator(dummy_variable_to_check, dummy_var_name, dummy_value,
+                                                          dummy_properties_key)
 
     assert result == expected_result
     assert add_warning.call_count == expected_warning_call_count
@@ -928,9 +938,11 @@ def test_num_type_validator(dummy_value: int,
                             mock_input_manager: InputManager) -> None:
     """Unit test for function _num_type_validator in file input_manager.py"""
     dummy_var_name = "dummy_num"
+    dummy_properties_key = "dummy_variable_properties"
 
     with patch("RUFAS.output_manager.OutputManager.add_warning") as add_warning:
-        result = mock_input_manager._num_type_validator(dummy_variable_to_check, dummy_var_name, dummy_value)
+        result = mock_input_manager._num_type_validator(dummy_variable_to_check, dummy_var_name, dummy_value,
+                                                        dummy_properties_key)
 
     assert result == expected_result
     assert add_warning.call_count == expected_warning_call_count
@@ -956,9 +968,11 @@ def test_string_type_validator(dummy_value: int,
                                mock_input_manager: InputManager) -> None:
     """Unit test for _string_type_validator function in file input_manager.py"""
     dummy_var_name = "dummy_var"
+    dummy_properties_key = "dummy_variable_properties"
 
     with patch("RUFAS.output_manager.OutputManager.add_warning") as add_warning:
-        result = mock_input_manager._string_type_validator(dummy_variable_to_check, dummy_var_name, dummy_value)
+        result = mock_input_manager._string_type_validator(dummy_variable_to_check, dummy_var_name, dummy_value,
+                                                           dummy_properties_key)
 
     assert result == expected_result
     assert add_warning.call_count == expected_warning_call_count
@@ -1237,9 +1251,11 @@ def test_fix_array_type_fixable_data(dummy_variable_properties: dict[str, Any],
     """Unit test for fixable array-type data for _fix_data function in file input_manager.py"""
 
     dummy_input_data = mock_input_array_data_for_fix_data()
+    dummy_properties_key = "dummy_variable_properties"
 
     with patch("RUFAS.output_manager.OutputManager.add_warning") as add_warning:
-        result = mock_input_manager._fix_data(dummy_variable_properties, dummy_element_hierarchy, dummy_input_data)
+        result = mock_input_manager._fix_data(dummy_variable_properties, dummy_element_hierarchy, dummy_input_data,
+                                              dummy_properties_key)
 
     variable_to_check = reduce(lambda d, key: d[key], dummy_element_hierarchy,
                                dummy_input_data)
@@ -1279,9 +1295,11 @@ def test_fix_array_type_critical_data(dummy_variable_properties: dict[str, Any],
     """Unit test for critical array-type data for _fix_data function in file input_manager.py"""
 
     dummy_input_data = mock_input_array_data_for_fix_data()
+    dummy_properties_key = "dummy_variable_properties"
 
     with patch("RUFAS.output_manager.OutputManager.add_warning") as add_warning:
-        result = mock_input_manager._fix_data(dummy_variable_properties, dummy_element_hierarchy, dummy_input_data)
+        result = mock_input_manager._fix_data(dummy_variable_properties, dummy_element_hierarchy, dummy_input_data,
+                                              dummy_properties_key)
 
     assert result == expected_result
     assert add_warning.call_count == expected_warning_call_count
@@ -1342,9 +1360,11 @@ def test_fix_string_type_fixable_data(dummy_variable_properties: dict[str, Any],
     """Unit test for fixable string-type data for _fix_data function in file input_manager.py"""
 
     dummy_input_data = mock_input_string_data_for_fix_data()
+    dummy_properties_key = "dummy_variable_properties"
 
     with patch("RUFAS.output_manager.OutputManager.add_warning") as add_warning:
-        result = mock_input_manager._fix_data(dummy_variable_properties, dummy_element_hierarchy, dummy_input_data)
+        result = mock_input_manager._fix_data(dummy_variable_properties, dummy_element_hierarchy, dummy_input_data,
+                                              dummy_properties_key)
 
     variable_to_check = reduce(lambda d, key: d[key], dummy_element_hierarchy,
                                dummy_input_data)
@@ -1359,9 +1379,11 @@ def test_fix_string_type_csv_data(mock_input_manager: InputManager) -> None:
     dummy_input_data = {"element1": [1, 2, 3, 4, 5]}
     dummy_variable_properties = {"type": "number", "maximum": 4, "default": 3}
     dummy_element_hierarchy = ["element1", 4]
+    dummy_properties_key = "dummy_variable_properties"
 
     with patch("RUFAS.output_manager.OutputManager.add_warning") as add_warning:
-        result = mock_input_manager._fix_data(dummy_variable_properties, dummy_element_hierarchy, dummy_input_data)
+        result = mock_input_manager._fix_data(dummy_variable_properties, dummy_element_hierarchy, dummy_input_data,
+                                              dummy_properties_key)
 
     fixed_variable = reduce(lambda d, key: d[key], dummy_element_hierarchy,
                             dummy_input_data)
@@ -1406,10 +1428,11 @@ def test_fix_string_type_critical_data(dummy_variable_properties: dict[str, Any]
     """Unit test for critical string-type data for _fix_data function in file input_manager.py"""
 
     dummy_input_data = mock_input_string_data_for_fix_data()
+    dummy_properties_key = "dummy_variable_properties"
 
     with patch("RUFAS.output_manager.OutputManager.add_warning") as add_warning:
-        result = mock_input_manager._fix_data(dummy_variable_properties,
-                                              dummy_element_hierarchy, dummy_input_data)
+        result = mock_input_manager._fix_data(dummy_variable_properties, dummy_element_hierarchy, dummy_input_data,
+                                              dummy_properties_key)
 
     assert result == expected_result
     assert add_warning.call_count == expected_warning_call_count
@@ -1468,9 +1491,11 @@ def test_fix_number_type_fixable_data(dummy_variable_properties: dict[str, Any],
     """Unit test for fixable number-type data for _fix_data function in file input_manager.py"""
 
     dummy_input_data = mock_input_number_data_for_fix_data()
+    dummy_properties_key = "dummy_variable_properties"
 
     with patch("RUFAS.output_manager.OutputManager.add_warning") as add_warning:
-        result = mock_input_manager._fix_data(dummy_variable_properties, dummy_element_hierarchy, dummy_input_data)
+        result = mock_input_manager._fix_data(dummy_variable_properties, dummy_element_hierarchy, dummy_input_data,
+                                              dummy_properties_key)
 
     variable_to_check = reduce(lambda d, key: d[key], dummy_element_hierarchy,
                                dummy_input_data)
@@ -1512,10 +1537,11 @@ def test_fix_number_type_critical_data(dummy_variable_properties: dict[str, Any]
     """Unit test for critical number-type data for _fix_data function in file input_manager.py"""
 
     dummy_input_data = mock_input_number_data_for_fix_data()
+    dummy_properties_key = "dummy_variable_properties"
 
     with patch("RUFAS.output_manager.OutputManager.add_warning") as add_warning:
-        result = mock_input_manager._fix_data(dummy_variable_properties,
-                                              dummy_element_hierarchy, dummy_input_data)
+        result = mock_input_manager._fix_data(dummy_variable_properties, dummy_element_hierarchy, dummy_input_data,
+                                              dummy_properties_key)
 
     assert result == expected_result
     assert add_warning.call_count == expected_warning_call_count
