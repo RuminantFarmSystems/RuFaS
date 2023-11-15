@@ -89,18 +89,28 @@ def test_post_init(top: float, bottom: float, concentration: float) -> None:
         init_carbon_pools.assert_called_once()
 
 
-@pytest.mark.parametrize("field_size,expected", [
-                             (1.4, 69300.0),
-                             (3.556, 69300.0),
-                             (0.88, 69300.0)
-])
-def test_initialize_carbon_pools(field_size: float, expected: float) -> None:
+@pytest.mark.parametrize(
+    "field_size,top_depth,expected_active,expected_passive,expected_slow,"
+    "expected_structural_litter,expected_metabolic_litter",
+    [
+        (1.4, 0, 4950.0, None, 242550.0, 0.0, 0.0),
+        (3.556, 0, 4950.0, None, 242550.0, 0.0, 0.0),
+        (0.88, 0, 4950.0, None, 242550.0, 0.0, 0.0),
+        (1.4, 120, 4158.0, 91476.0, 112266.0, 0.0, 0.0),
+        (3.556, 120, 4158.0, 91476.0, 112266.0, 0.0, 0.0),
+        (0.88, 120, 4158.0, 91476.0, 112266.0, 0.0, 0.0),
+    ])
+def test_initialize_carbon_pools(field_size: float, top_depth: int, expected_active: float,
+                                 expected_passive: float, expected_slow: float,
+                                 expected_structural_litter: float, expected_metabolic_litter: float) -> None:
     """Tests that carbon pools in a soil layer are properly initialized."""
-    actual = LayerData(field_size=field_size, top_depth=120.0, bottom_depth=750.0, bulk_density=1.5,
+    actual = LayerData(field_size=field_size, top_depth=top_depth, bottom_depth=750.0, bulk_density=1.5,
                        percent_organic_carbon_content=2.2)
-    assert actual.active_carbon_amount == pytest.approx(expected)
-    assert actual.passive_carbon_amount == pytest.approx(expected)
-    assert actual.slow_carbon_amount == pytest.approx(expected)
+    assert actual.active_carbon_amount == pytest.approx(expected_active)
+    assert actual.passive_carbon_amount == pytest.approx(expected_passive)
+    assert actual.slow_carbon_amount == pytest.approx(expected_slow)
+    assert actual.structural_litter_amount == pytest.approx(expected_structural_litter)
+    assert actual.metabolic_litter_amount == pytest.approx(expected_metabolic_litter)
 
 
 @pytest.mark.parametrize("top,bottom", [

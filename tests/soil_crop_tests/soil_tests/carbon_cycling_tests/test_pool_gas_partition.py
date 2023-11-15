@@ -569,7 +569,10 @@ def test_partition_pool_gas(layers: list) -> None:
 
     assert layer.slow_carbon_amount == 5.1
 
-    assert layer.passive_carbon_amount == 1120.0
+    if layer.top_depth == 0:
+        assert layer.passive_carbon_amount is None
+    else:
+        assert layer.passive_carbon_amount == 1120.0
 
     for layer in data.soil_layers[1:]:
         assert layer.active_carbon_decomposition_rate == 0.87
