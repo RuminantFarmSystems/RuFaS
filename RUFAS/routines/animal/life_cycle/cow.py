@@ -351,17 +351,15 @@ class Cow(HeiferIII):
                     "simulation_day": sim_day
                     }
 
-        milk_data_update = {}
-        milk_data_update["days_in_milk"] = self.days_in_milk
-        milk_data_update["estimated_daily_milk_produced"] = self.estimated_daily_milk_produced
-        milk_data_update["milk_protein"] = self.mPrt
-        milk_data_update["milk_fat"] = self.fat_percent
-        milk_data_update["milk_lactose"] = self.lactose_milk
-        milk_data_update["lactating"] = self.milking
-        milk_data_update["parity"] = self.calves
-        milk_data_update["cow_id"] = self.id
-
-        om.add_variable("milk_data_at_milk_update", milk_data_update, info_map)
+        om.add_variable("sim_day", sim_day, info_map)
+        om.add_variable("days_in_milk", self.days_in_milk, info_map)
+        om.add_variable("estimated_daily_milk_produced", self.estimated_daily_milk_produced, info_map)
+        om.add_variable("milk_fat", self.fat_percent, info_map)
+        om.add_variable("milk_protein", self.mPrt, info_map)
+        om.add_variable("milk_lactose", self.lactose_milk, info_map)
+        om.add_variable("lactating", self.milking, info_map)
+        om.add_variable("cow_id", self.id, info_map)
+        om.add_variable("parity", self.calves, info_map)
 
         # if not self.milking:
         # 	self.daily_growth = self.body_weight - prev_weight
