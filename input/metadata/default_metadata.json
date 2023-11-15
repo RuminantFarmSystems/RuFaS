@@ -187,7 +187,7 @@
         "description": "Herd Demographics",
         "calf_num": {
           "type": "number",
-          "description": "Number of Calves (head) -- The average number of pre-weaned calves (default is ~8% of herd number)",
+          "description": "Number of Calves (head) -- The initial number of pre-weaned calves",
           "default": 8,
           "minimum": 0
         },
@@ -211,7 +211,7 @@
         },
         "cow_num": {
           "type": "number",
-          "description": "Number of Cows (head) -- The initial number of dry and lactating cows (all parities, default is ~51% of herd number).",
+          "description": "Number of Cows (head) -- The initial number of dry and lactating cows.",
           "default": 100,
           "minimum": 0
         },
@@ -252,7 +252,7 @@
           },
           "heifer_repro_method": {
             "type": "string",
-            "description": "Heifer Reproductive Program (select one) -- TAI - Timed Artificial Insemination; ED - Estrus Detection; Synch-ED - Combination of ED and TAI",
+            "description": "Heifer Reproductive Program (select one) -- TAI - Timed Artificial Insemination; ED - Estrus Detection; Synch-ED - Synchronized Estrus Detection",
             "default": "TAI",
             "pattern": "^(TAI|ED|Synch-ED)$"
           },
@@ -328,7 +328,7 @@
             },
             "wean_day": {
               "type": "number",
-              "description": "Wean Day (days) -- Days the calf is fully weaned from milk or milk replace (default is 60",
+              "description": "Wean Day (days) -- Days the calf is fully weaned from milk or milk replace (default is 60)",
               "default": 60,
               "minimum": 0
             },
@@ -433,7 +433,7 @@
                 "type": "string",
                 "default": "2P",
                 "pattern": "^(2P|CP)$",
-                "description": "Heifer SynchED Protocol (select one) -- 2P: two injections of PGF (prostaglandin), watch for estrus after each injection with insemination upon heat detection; CP: 7 days CIDR implements, inject PGF upon removal, insemination upon heat detection"
+                "description": "Heifer SynchED Protocol (select one) -- 2P: two injections of PGF (prostaglandin), watch for estrus after the second injection with insemination upon heat detection; CP: 7 days CIDR implements, inject PGF upon removal, insemination upon heat detection"
               },
               "estrus_detection_rate_h_synch": {
                 "type": "number",
@@ -469,7 +469,7 @@
               },
               "cow_presynch_protocol": {
                 "type": "string",
-                "description": "Cow Presynch Protocol -- The preSynch protocol (1st breeding) for cow in TAI (Timed Artificial Insemination) program",
+                "description": "Cow Presynch Protocol -- The optional preSynch protocol (1st breeding) for cow in TAI (Timed Artificial Insemination) program",
                 "default": "Double OvSynch",
                 "pattern": "^(Double OvSynch|Presynch|G6G)$"
               },
