@@ -422,14 +422,16 @@ class Pen:
         self.update_animal_combination(animal_combination)
         self.update_classes_in_pen()
 
-    def calc_manure(self, feed, methane_model): # noqa
+    def calc_manure(self, feed: Feed, methane_model: str):  # noqa
         """
-        Calculates the total manure excretion of the animals in the pen,
-         and updates the manure attributes to contain the new amounts.
+        Calculate the manure excretion of the animals in the pen.
 
-        Args:
-            feed: instance of the Feed class
-            methane_model: methane model used for methane emission calculations
+        Parameters
+        ----------
+        feed: Feed
+            An object of the Feed class containing information about the feed.
+        methane_model : str
+            Methane model used for calculations.
         """
 
         for animal in self.animals_in_pen:
@@ -458,19 +460,19 @@ class Pen:
         # TODO: Write an accumulator function
         for animal in self.animals_in_pen:
             curr_manure = animal.manure_excretion
-            if type(animal) == Calf: # noqa
+            if type(animal) == Calf:  # noqa
                 for key in manure.keys():
                     manure[key] += curr_manure[key]
                     calf_total[key] += curr_manure[key]
-            elif type(animal) in [HeiferI, HeiferII, HeiferIII]: # noqa
+            elif type(animal) in [HeiferI, HeiferII, HeiferIII]:  # noqa
                 for key in manure.keys():
                     manure[key] += curr_manure[key]
                     heifer_total[key] += curr_manure[key]
-            elif type(animal) == Cow and not animal.milking: # noqa
+            elif type(animal) == Cow and not animal.milking:  # noqa
                 for key in manure.keys():
                     manure[key] += curr_manure[key]
                     dry_total[key] += curr_manure[key]
-            elif type(animal) == Cow and animal.milking: # noqa
+            elif type(animal) == Cow and animal.milking:  # noqa
                 for key in manure.keys():
                     manure[key] += curr_manure[key]
                     lactating_total[key] += curr_manure[key]
@@ -550,7 +552,7 @@ class Pen:
             total_p_animal = max(total_p_animal, 0)
             self.avg_p_animal = total_p_animal / len(self.animals_in_pen)
 
-    def set_up_new_animal(self, animal, p_conc, feed, temp, num_animals_before_additions): # noqa
+    def set_up_new_animal(self, animal, p_conc, feed, temp, num_animals_before_additions):  # noqa
         """
         Sets the necessary attributes for @animal to be a replacement in this
         pen.
@@ -759,7 +761,8 @@ class Pen:
             animal.calc_manure_excretion(feed, methane_model)
         return self._get_prefix_and_default_manure_excretion(animal, is_lactating_cow)
 
-    def _update_animal_manure_excretion_data(self, animal_prefix_to_output_data_dict: dict[
+    @staticmethod
+    def _update_animal_manure_excretion_data(manure_excretions_output_data: dict[
         str, dict[str, str | AnimalManureExcretions]],
                                              prefix: str,
                                              manure: AnimalManureExcretions,
@@ -770,7 +773,7 @@ class Pen:
 
         Parameters
         ----------
-        animal_prefix_to_output_data_dict: dict[str, AnimalManureExcretions]
+        manure_excretions_output_data: dict[str, dict[str, str | AnimalManureExcretions]]
             Dictionary mapping prefixes to animal manure data.
         prefix: str
             Prefix related to the animal type.
@@ -784,16 +787,15 @@ class Pen:
         None
 
         """
-        if prefix not in animal_prefix_to_output_data_dict:
-            animal_prefix_to_output_data_dict[prefix] = {'prefix': prefix, 'manure': manure}
+        if prefix not in manure_excretions_output_data:
+            manure_excretions_output_data[prefix] = {'prefix': prefix, 'manure': manure}
 
-        animal_prefix_to_output_data_dict[prefix]['manure'] = add_animal_manure_excretions(
-            animal_prefix_to_output_data_dict[prefix]['manure'], animal.manure_excretion)
-
-        self.manure = add_animal_manure_excretions(self.manure, animal.manure_excretion)
+        manure_excretions_output_data[prefix]['manure'] = add_animal_manure_excretions(
+            manure_excretions_output_data[prefix]['manure'], animal.manure_excretion)
 
     def calc_total_manure(self, feed, methane_model: str, methane_mitigation_method: str,
-                          methane_mitigation_additive_amount: float) -> None:
+                          methane_mitigation_additive_amount: float,
+                          manure_excretions_output_data: dict[str, dict[str | AnimalManureExcretions]]) -> None:
         """
         Calculate the total manure excreted by all animals in the pen.
 
@@ -810,6 +812,8 @@ class Pen:
             The amount of methane mitigation feed additive that is added, mg/kg dry matter intake (DMI).
             The recommended dose for 3-NOP is between 40 and 100 mg/kg DMI, while that for monensin is
             between 16 and 36 mg/kg DMI.
+        manure_excretions_output_data : dict[str, dict[str | AnimalManureExcretions]]
+            Dictionary mapping prefixes to animal manure data.
 
         Returns
         -------
@@ -820,32 +824,22 @@ class Pen:
             return
 
         self.manure = get_default_animal_manure_excretions()
-        animal_prefix_to_output_data_dict = {
-            'pen': {
-                'prefix': f'pen_{self.id}_daily',
-                'manure': None,
-            }
-        }
 
         for animal in self.animals_in_pen:
             prefix, manure = self._calc_animal_manure_excretion(animal, feed, methane_model,
                                                                 methane_mitigation_method,
                                                                 methane_mitigation_additive_amount)
-            self._update_animal_manure_excretion_data(animal_prefix_to_output_data_dict, prefix, manure, animal)
+            self._update_animal_manure_excretion_data(manure_excretions_output_data, prefix, manure, animal)
+            self.manure = add_animal_manure_excretions(self.manure, animal.manure_excretion)
 
-        animal_prefix_to_output_data_dict['pen']['manure'] = self.manure
-
-        for output_data_dict in animal_prefix_to_output_data_dict.values():
-            if output_data_dict['manure'] is None:
-                continue
-            for manure_property, manure_value in output_data_dict['manure'].items():
-                info_map = {
-                    'class': self.__class__.__name__,
-                    'function': self.calc_total_manure.__name__,
-                }
-                om.add_variable(f'{output_data_dict["prefix"]}_{str(manure_property)}',
-                                manure_value,
-                                info_map=info_map)
+        for manure_property, manure_value in self.manure.items():
+            info_map = {
+                'class': self.__class__.__name__,
+                'function': self.calc_total_manure.__name__,
+            }
+            om.add_variable(f'pen_{self.id}_daily_{str(manure_property)}',
+                            manure_value,
+                            info_map=info_map)
 
     def _set_animal_nutrient_values(self, animal, animal_grouping_scenario,
                                     feed, temp, phosphorus_concentration) -> None:
