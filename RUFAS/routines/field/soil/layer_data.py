@@ -418,9 +418,10 @@ class LayerData:
 
         Notes
         -----
-        This is an extremely simply and arbitrary way of initializing carbon pools in the soil, and is intended to be a
-        temporary solution until SWAT-C is implemented. Dividing the carbon equally between the three soil pools is an
-        arbitrary assumption, but is somewhat reasonable.
+        The splits for the initialization of carbon pools are not empirical but generally are
+        the same as values used by other models. The 50/50 split between litter pools is
+        a heavy abstraction but a more accurate split cannot be predicted without knowing management
+        practices prior to initialization.
 
         """
         soil_volume_in_cubic_meters = self.layer_thickness * (field_size * HECTARES_TO_SQUARE_MILLIMETERS) * \
@@ -439,6 +440,7 @@ class LayerData:
             self.passive_carbon_amount = 0.44 * total_soil_carbon_amount
             self.structural_litter_amount = 0.0
             self.metabolic_litter_amount = 0.0
+
     def add_to_labile_phosphorus(self, phosphorus_to_add: float, field_size: float) -> None:
         """This method is a wrapper for adding a specified mass of phosphorus to the labile phosphorus content of this
             soil layer.
