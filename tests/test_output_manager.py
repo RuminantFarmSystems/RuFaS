@@ -1870,7 +1870,7 @@ def test_load_variables_pool_from_file_raises_exception(
     "is_file_found_in_dir",
     [True, False],
 )
-def test_clear_output_dir(mocker: MockerFixture, mock_output_manager: OutputManager, is_file_found_in_dir: bool, 
+def test_clear_output_dir(mocker: MockerFixture, mock_output_manager: OutputManager, is_file_found_in_dir: bool,
                           output_manager_original_method_states: Dict[str, Callable]) -> None:
     """Checks clear_output_dir function in output_manager.py"""
     patch_empty_dir = mocker.patch("RUFAS.util.Utility.empty_dir")
@@ -1891,6 +1891,7 @@ def test_clear_output_dir(mocker: MockerFixture, mock_output_manager: OutputMana
 
     mock_output_manager.is_file_in_dir = output_manager_original_method_states["is_file_in_dir"]
     mock_output_manager.clear_output_dir = output_manager_original_method_states["clear_output_dir"]
+
 
 @pytest.mark.parametrize(
     "dir_path, file_path, expected_result",
