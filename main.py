@@ -37,7 +37,7 @@ def main():
         graphics_dir=Path(cmd_arguments.graphics_dir),
         vars_file_path=Path(cmd_arguments.load_pool),
         output_dir=Path(cmd_arguments.output_dir),
-        filters_dir=Path(cmd_arguments.filters_dir)
+        filters_dir=Path(cmd_arguments.filters_dir),
         init_herd=cmd_arguments.init_herd,
         save_animals=cmd_arguments.save_animals,
         terminate_simulation_post_herd_generation=cmd_arguments.terminate_simulation_post_herd_generation
@@ -55,7 +55,7 @@ def run_rufas(
     graphics_dir: Path = Path(""),
     vars_file_path: Path = Path(""),
     output_dir: Path = Path("output/"),
-    filters_dir: Path = Path("output/output_filters/")
+    filters_dir: Path = Path("output/output_filters/"),
     init_herd: bool = False,
     save_animals: bool = False,
     terminate_simulation_post_herd_generation: bool = False
@@ -279,7 +279,7 @@ def execute_simulations(
     format_option: str = "verbose",
     verbose: LogVerbosity = LogVerbosity.NONE,
     output_dir: Path = Path("output/"),
-    filters_dir: Path = Path("output/output_filters/")
+    filters_dir: Path = Path("output/output_filters/"),
     init_herd: bool = False,
     save_animals: bool = False,
     terminate_simulation_post_herd_generation: bool = False
