@@ -232,8 +232,8 @@ class AnimalData:
             animal_factory = AnimalFactory(breed=self.breed, CI=self.CI, initial_animal_num=self.initial_animal_num,
                                            simulation_days=self.simulation_days, initial_animal_id=self.animal_id,
                                            save_animals=self.save_animals,
-                                           terminate_simulation_post_herd_generation=
-                                           self.terminate_simulation_post_herd_generation)
+                                           terminate_simulation_post_herd_generation=self.
+                                           terminate_simulation_post_herd_generation)
             herd: Dict[str, List[Calf | HeiferI | HeiferII | HeiferIII | Cow]] = animal_factory.generate_animals()
 
             self.calves = self._random_sample_with_replacement(herd["calves"], self.calf_num)
