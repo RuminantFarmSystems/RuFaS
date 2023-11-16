@@ -3,6 +3,7 @@
 from copy import deepcopy
 from enum import Enum
 from pathlib import Path
+import config.global_variables
 import sys
 from typing import Any, Dict, List, Optional, Union
 import datetime
@@ -1082,3 +1083,41 @@ class OutputManager(object):
         except json.JSONDecodeError as e:
             self.add_error("JSON parsing error", str(e), info_map)
             raise
+
+    def clear_output_dir(self, vars_file_path: Path = None) -> None:
+        """Clears the output directory if vars_file_path not in output directory.
+
+        Parameters
+        ----------
+        vars_file_path : Path, optional, default=None
+            Path to file used to load Output Manager vars pool.
+        """
+        info_map = {
+            "class": self.__class__.__name__,
+            "function": self.clear_output_dir.__name__,
+        }
+        output_dir = Path(config.global_variables.OUT_DIR)
+        is_file_found_in_dir = self.is_file_in_dir(output_dir, vars_file_path)
+        if is_file_found_in_dir:
+            self.add_error("Can't clear output directory", f"{vars_file_path} in output directory.", info_map)
+        else:
+            keep_list = [".keep", "output_filters"]
+            Utility.empty_dir(output_dir, keep=keep_list)
+            self.add_log("Output directory cleared", "No conflicts to clearing output directory.", info_map)
+
+    def is_file_in_dir(self, dir_path: Path = Path(config.global_variables.OUT_DIR), file_path: Path = None) -> bool:
+        """Checks if a file path is in the provided directory.
+
+        Parameters
+        ----------
+        dir_path : Path, optional, default=Path(config.global_variables.OUT_DIR)
+            Path to the directory to be checked.
+        file_path : Path, optional, default=None
+            Path to file to be checked.
+        """
+        if file_path is None:
+            return False
+        file_path = file_path.resolve()
+        directory_path = dir_path.resolve()
+
+        return directory_path == file_path or directory_path in file_path.parents
