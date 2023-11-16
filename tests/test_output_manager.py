@@ -1891,6 +1891,8 @@ def test_clear_output_dir(mocker: MockerFixture, mock_output_manager: OutputMana
 
     mock_output_manager.is_file_in_dir = output_manager_original_method_states["is_file_in_dir"]
     mock_output_manager.clear_output_dir = output_manager_original_method_states["clear_output_dir"]
+    mock_output_manager.add_log = output_manager_original_method_states["add_log"]
+    mock_output_manager.add_error = output_manager_original_method_states["add_error"]
 
 
 @pytest.mark.parametrize(
