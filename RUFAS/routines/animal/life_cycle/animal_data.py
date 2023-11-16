@@ -230,16 +230,12 @@ class AnimalData:
         on the numbers provided in the herd data.
         """
         if self.init_herd:
-            t_start_animal_gen = time()
             animal_factory = AnimalFactory(breed=self.breed, CI=self.CI, initial_animal_num=self.initial_animal_num,
                                            simulation_days=self.simulation_days, initial_animal_id=self.animal_id,
                                            save_animals=self.save_animals,
                                            terminate_simulation_post_herd_generation=
                                            self.terminate_simulation_post_herd_generation)
             herd: Dict[str, List[Calf | HeiferI | HeiferII | HeiferIII | Cow]] = animal_factory.generate_animals()
-            t_end_animal_gen = time()
-            total_animal_gen_time = t_end_animal_gen - t_start_animal_gen
-            print("Animal generation took " + str(total_animal_gen_time))
 
             self.calves = self._random_sample_with_replacement(herd["calves"], self.calf_num)
             self.heiferIs = self._random_sample_with_replacement(herd["heiferIs"], self.heiferI_num)
