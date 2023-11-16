@@ -179,9 +179,9 @@ class AnimalData:
         init_herd: bool
             Initialize herd with simulation.
         save_animals: bool
-            Save animals to CSV files.
+            User input indicating whether to save the generated animals to CSV files.
         terminate_simulation_post_herd_generation: bool
-            Save generated animals to CSV files.
+            User input indicating whether to terminate the simulation after herd generation.
         """
         self.CI = CI
         self.breed = herd_data['breed']
@@ -366,19 +366,12 @@ class AnimalData:
             animals.append(animal)
         return animals
 
-    def get_calves(self, num, breed):
+    def get_calves(self):
         """
         Retrieve a list of Calf instances up to the specified number and breed.
 
         Initializes Calf instances through a separate initialization method if the current count is insufficient and
         optionally shuffles the list if `order_by_random` is set to True.
-
-        Parameters:
-        ----------
-        num : int
-            The number of Calf instances desired.
-        breed : str
-            The breed type for the Calf instances.
 
         Returns:
         --------
@@ -389,19 +382,12 @@ class AnimalData:
             shuffle(self.calves)
         return self.calves
 
-    def get_heiferIs(self, num, breed):
+    def get_heiferIs(self):
         """
         Retrieve a list of HeiferI instances up to the specified number and breed.
 
         Initializes HeiferI instances through a separate initialization method if the current count is insufficient and
         optionally shuffles the list if `order_by_random` is set to True.
-
-        Parameters:
-        ----------
-        num : int
-            The number of HeiferI instances desired.
-        breed : str
-            The breed type for the HeiferI instances.
 
         Returns:
         --------
@@ -413,19 +399,12 @@ class AnimalData:
 
         return self.heiferIs
 
-    def get_heiferIIs(self, num, breed):
+    def get_heiferIIs(self):
         """
         Retrieve a list of HeiferII instances up to the specified number and breed.
 
         Initializes HeiferII instances through a separate initialization method if the current count is insufficient and
         optionally shuffles the list if `order_by_random` is set to True.
-
-        Parameters:
-        ----------
-        num : int
-            The number of HeiferII instances desired.
-        breed : str
-            The breed type for the HeiferII instances.
 
         Returns:
         --------
@@ -437,19 +416,12 @@ class AnimalData:
 
         return self.heiferIIs
 
-    def get_heiferIIIs(self, num, breed):
+    def get_heiferIIIs(self):
         """
         Retrieve a list of HeiferIII instances up to the specified number and breed.
 
         Initializes HeiferIII instances through a separate initialization method if the current count is insufficient
         and optionally shuffles the list if `order_by_random` is set to True.
-
-        Parameters:
-        ----------
-        num : int
-            The number of HeiferIII instances desired.
-        breed : str
-            The breed type for the HeiferIII instances.
 
         Returns:
         --------
@@ -460,19 +432,12 @@ class AnimalData:
             shuffle(self.heiferIIIs)
         return self.heiferIIIs
 
-    def get_cows(self, num, breed):
+    def get_cows(self):
         """
         Retrieve a list of Cow instances up to the specified number and breed.
 
         Initializes Cow instances through a separate initialization method if the current count is insufficient and
         optionally shuffles the list if `order_by_random` is set to True.
-
-        Parameters:
-        ----------
-        num : int
-            The number of Cow instances desired.
-        breed : str
-            The breed type for the Cow instances.
 
         Returns:
         --------
@@ -483,19 +448,12 @@ class AnimalData:
             shuffle(self.cows)
         return self.cows
 
-    def get_replacement_cows(self, num, breed):
+    def get_replacement_cows(self):
         """
         Retrieve a list of replacement Cow instances up to the specified number and breed.
 
         Initializes replacement cows through a separate initialization method if the current count is insufficient and
         optionally shuffles the list if `order_by_random` is set to True.
-
-        Parameters:
-        ----------
-        num : int
-            The number of replacement Cow instances desired.
-        breed : str
-            The breed type for the replacement Cow instances.
 
         Returns:
         --------

@@ -139,9 +139,9 @@ class AnimalManager:
         init_herd: bool
             Initialize herd with simulation.
         save_animals: bool
-            Save animals to CSV files.
+            User input indicating whether to save the generated animals to CSV files.
         terminate_simulation_post_herd_generation: bool
-            Save generated animals to CSV files.
+            User input indicating whether to terminate the simulation after herd generation.
         """
 
         # simulation length, days
@@ -293,9 +293,9 @@ class AnimalManager:
         init_herd: bool
             Initialize herd with simulation.
         save_animals: bool
-            Save animals to CSV files.
+            User input indicating whether to save the generated animals to CSV files.
         terminate_simulation_post_herd_generation: bool
-            Save generated animals to CSV files.
+            User input indicating whether to terminate the simulation after herd generation.
         """
 
         self.calves, self.heiferIs, self.heiferIIs, self.heiferIIIs, self.cows \

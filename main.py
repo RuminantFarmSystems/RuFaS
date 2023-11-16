@@ -90,9 +90,9 @@ def run_rufas(
     init_herd: bool
         Initialize herd with simulation.
     save_animals: bool
-        Save animals to CSV files.
+        User input indicating whether to save the generated animals to CSV files.
     terminate_simulation_post_herd_generation: bool
-        Save generated animals to CSV files.
+        User input indicating whether to terminate the simulation after herd generation.
     """
     sys.stdout.write("RuFaS: Ruminant Farm Systems Model 2023\n")
 
@@ -309,9 +309,9 @@ def execute_simulations(
     init_herd: bool
         Initialize herd with simulation.
     save_animals: bool
-        Save animals to CSV files.
+        User input indicating whether to save the generated animals to CSV files.
     terminate_simulation_post_herd_generation: bool
-        Save generated animals to CSV files.
+        User input indicating whether to terminate the simulation after herd generation.
     """
     info_map = {
         "class": "No caller class",

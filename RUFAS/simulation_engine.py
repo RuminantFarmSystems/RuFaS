@@ -34,9 +34,9 @@ class SimulationEngine:
         init_herd: bool
             Initialize herd with simulation.
         save_animals: bool
-            Save animals to CSV files.
+            User input indicating whether to save the generated animals to CSV files.
         terminate_simulation_post_herd_generation: bool
-            Save generated animals to CSV files.
+            User input indicating whether to terminate the simulation after herd generation.
         """
         self._initialize_simulation(init_herd,
                                     save_animals,
@@ -144,9 +144,9 @@ class SimulationEngine:
         init_herd: bool
             Initialize herd with simulation.
         save_animals: bool
-            Save animals to CSV files.
+            User input indicating whether to save the generated animals to CSV files.
         terminate_simulation_post_herd_generation: bool
-            Save generated animals to CSV files.
+            User input indicating whether to terminate the simulation after herd generation.
         """
         data_config = im.get_data('config')
         data_weather = im.get_data('weather')

@@ -187,9 +187,9 @@ class LifeCycleManager:
         init_herd: bool
             Initialize herd with simulation.
         save_animals: bool
-            Save animals to CSV files.
+            User input indicating whether to save the generated animals to CSV files.
         terminate_simulation_post_herd_generation: bool
-            Save generated animals to CSV files.
+            User input indicating whether to terminate the simulation after herd generation.
 
         Returns
         -------
@@ -202,13 +202,12 @@ class LifeCycleManager:
         self.herd_num = herd_data['herd_num']
         self._set_avg_CI()
 
-        calves = self._get_animals(Calf, herd_data['calf_num'], herd_data['breed'])
-        heiferIs = self._get_animals(HeiferI, herd_data['heiferI_num'], herd_data['breed'])
-        heiferIIs = self._get_animals(HeiferII, herd_data['heiferII_num'], herd_data['breed'])
-        heiferIIIs = self._get_animals(HeiferIII, herd_data['heiferIII_num_springers'], herd_data['breed'])
-        cows = self._get_animals(Cow, herd_data['cow_num'], herd_data['breed'])
-        self.replacement_market = self.animal_data.get_replacement_cows(herd_data['replace_num'],
-                                                                        herd_data['breed'])
+        calves = self._get_animals(Calf)
+        heiferIs = self._get_animals(HeiferI)
+        heiferIIs = self._get_animals(HeiferII)
+        heiferIIIs = self._get_animals(HeiferIII)
+        cows = self._get_animals(Cow)
+        self.replacement_market = self.animal_data.get_replacement_cows()
         return calves, heiferIs, heiferIIs, heiferIIIs, cows
 
     def _set_avg_CI(self) -> None:
@@ -218,26 +217,24 @@ class LifeCycleManager:
             self.initialize_db_summary = self.animal_data.initialization_db_summary()
             self.avg_CI = self.initialize_db_summary['cow_avg_CI']
 
-    def _get_animals(self, animal_type: Type[GenericAnimal], num: int, breed: str) -> List[GenericAnimal]:
+    def _get_animals(self, animal_type: Type[GenericAnimal]) -> List[GenericAnimal]:
         """Gets a list of animals of a given type.
 
         Args:
             animal_type: The type of animal to get.
-            num: The number of animals to get.
-            breed: The breed of the animal.
 
         Returns:
             A list of animals of the given type.
 
         """
-        animal_getter_by_animal_type: Dict[Type[GenericAnimal], Callable[[int, str], List[GenericAnimal]]] = {
+        animal_getter_by_animal_type: Dict[Type[GenericAnimal], Callable[..., List[GenericAnimal]]] = {
             Calf: self.animal_data.get_calves,
             HeiferI: self.animal_data.get_heiferIs,
             HeiferII: self.animal_data.get_heiferIIs,
             HeiferIII: self.animal_data.get_heiferIIIs,
             Cow: self.animal_data.get_cows
         }
-        animals = animal_getter_by_animal_type[animal_type](num, breed)
+        animals = animal_getter_by_animal_type[animal_type]()
         for animal in animals:
             animal.events.add_event(animal.days_born, 0, animal_constants.INIT_HERD)
         return animals
