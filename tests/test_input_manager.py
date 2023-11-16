@@ -2415,17 +2415,21 @@ def test_is_object_value(variable_value: Any, variable_properties: dict[str, Any
     "mock_get_nested_dict_value_return, mock_is_object_value_return, "
     "mock_validate_input_type_dynamic_return, mock_handle_container_error_return",
     [
-        # Case 1: Object validation fails
-        (["key1"], {"type": "object"}, {"key1": {}}, False,
-         {"key1": {}}, (False, "Error Message"), True, False),
+        # Case 1: Handle container error unsuccessfully
+        (["key1"], {"type": "object"}, {"key1": "not an object"}, False,
+         "not an object", (False, "Error Message"), None, False),
 
-        # Case 2: Object validation passes, but sub-element validation fails
-        (["key1"], {"type": "object", "subkey": {"type": "string"}}, {"key1": {"subkey": "value"}}, False,
-         {"subkey": "value"}, (True, ""), False, False),
+        # Case 2: Handle container error successfully
+        (["key1"], {"type": "object"}, {"key1": "not an object"}, True,
+         "not an object", (False, "Error Message"), None, True),
 
-        # Case 3: All validations pass
-        (["key1"], {"type": "object", "subkey": {"type": "string"}}, {"key1": {"subkey": "value"}}, False,
-         {"subkey": "value"}, (True, ""), True, False),
+        # Case 3: Object validation passes, but sub-element validation fails
+        (["key1"], {"type": "object", "subkey": {"type": "string"}}, {"key1": {"subkey": 1}}, False,
+         {"subkey": 1}, (True, ""), False, None),
+
+        # Case 4: Object validation passes, and sub-element validation passes
+        (["key1"], {"type": "object", "subkey": {"type": "string"}}, {"key1": {"subkey": "value"}}, True,
+         {"subkey": "value"}, (True, ""), True, None),
     ]
 )
 def test_validate_object_type(
@@ -2442,8 +2446,10 @@ def test_validate_object_type(
     """
     Unit test for method _validate_object_type() in file input_manager.py.
 
-    This test simply checks if the method calls the correct methods with the correct arguments.
+    This test simply checks if the method calls the correct methods with the correct arguments and all the
+    possible return routes are reachable.
     """
+
     # Arrange
     input_manager = InputManager()
     mocker.patch.object(InputManager, '_get_nested_dict_value', return_value=mock_get_nested_dict_value_return)
@@ -2451,6 +2457,61 @@ def test_validate_object_type(
     mocker.patch.object(InputManager, '_validate_input_type_dynamic',
                         return_value=mock_validate_input_type_dynamic_return)
     mocker.patch.object(InputManager, '_handle_container_error', return_value=mock_handle_container_error_return)
+
+    # Act
+    result = input_manager._validate_object_type(variable_path, variable_properties, input_data)
+
+    # Assert
+    assert result == expected_result
+
+
+@pytest.mark.parametrize("variable_path, variable_properties, input_data, expected_result", [
+    # Test with valid dictionary
+    (["key1"], {"type": "object", "subkey": {"type": "string"}},
+     {"key1": {"subkey": "value"}}, True),
+
+    # Test with valid dictionary
+    (["key1"], {"type": "object", "subkey": {"type": "string"}},
+     {"key1": {"subkey": 123}}, False),
+
+    # Test with invalid type (not a dictionary)
+    (["key1"], {"type": "object"},
+     {"key1": "not a dictionary"}, False),
+
+    # Test with valid dictionary and nested elements
+    (["key1", "subkey1"], {"type": "object", "sub_subkey1": {"type": "string"}},
+     {"key1": {"subkey1": {"sub_subkey1": "value"}}}, True),
+
+    # Test with dictionary containing invalid nested element
+    (["key1"], {"type": "object", "subkey1": {"type": "number"}},
+     {"key1": {"subkey1": "not a number"}}, False),
+
+    # Test with empty dictionary
+    (["key1"], {"type": "object"},
+     {"key1": {}}, True),
+
+    # Test with dictionary containing multiple nested elements
+    (["key1"], {"type": "object", "subkey1": {"type": "string"}, "subkey2": {"type": "number"}},
+     {"key1": {"subkey1": "value", "subkey2": 123}}, True),
+
+    # Test with null dictionary
+    (["key1"], {"type": "object"},
+     {"key1": None}, False),
+
+    # Test with dictionary containing a list
+    (["key1"], {"type": "object", "subkey1": {"type": "array", "properties": {"type": "number"}}},
+     {"key1": {"subkey1": [1, 2, 3]}}, True),
+])
+def test_validate_object_type_integration_test(variable_path: list[str | int],
+                                               variable_properties: dict[str, Any],
+                                               input_data: dict[str, Any],
+                                               expected_result: bool) -> None:
+    """
+    Integration test for method _validate_object_type() in file input_manager.py.
+    """
+
+    # Arrange
+    input_manager = InputManager()
 
     # Act
     result = input_manager._validate_object_type(variable_path, variable_properties, input_data)
