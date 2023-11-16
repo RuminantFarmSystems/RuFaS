@@ -52,7 +52,11 @@ jobs:
         unauthorized_changes=false
         
         for path in "${paths_to_protect[@]}"; do
+<<<<<<< HEAD
           if (echo ${{ env.FILES }}; echo ${{ env.OTHER_FILES }}) | grep -q "$path"; then
+=======
+          if echo ${{ env.FILES }} | grep -q "$path"; then
+>>>>>>> 12c6e23e1 (fixes var name match error)
             unauthorized_changes=true
             unauthorized_paths+="$path, "
           fi
