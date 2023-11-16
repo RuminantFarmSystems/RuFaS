@@ -161,7 +161,7 @@ class SoilData:
     """
     recalcitrant_phosphorus_pool: float = 0
     """Amount of phosphorus available for soil adsorption and leaching via runoff after the first rainfall event (kg)"""
-    runoff_phosphorus_pool: float = 0
+    runoff_fertilizer_phosphorus: float = 0.0
     """Amount of solubilized phosphorus that has been leached off the field by runoff (kg)"""
     days_since_application: int = 0
     """Number of days since phosphorus was applied to field via fertilizer"""

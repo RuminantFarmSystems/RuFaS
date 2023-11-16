@@ -44,8 +44,8 @@ class OutputGatherer:
             om.add_variable("recalcitrant_phosphorus_pool",
                             field.soil.data.recalcitrant_phosphorus_pool,
                             info_map)
-            om.add_variable("runoff_phosphorus_pool",
-                            field.soil.data.runoff_phosphorus_pool,
+            om.add_variable("runoff_fertilizer_phosphorus",
+                            field.soil.data.runoff_fertilizer_phosphorus,
                             info_map)
             om.add_variable("days_since_application",
                             field.soil.data.days_since_application,

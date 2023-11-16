@@ -50,6 +50,8 @@ class Fertilizer:
 
         first_rainfall_occurred = rainfall and self.data.rain_events_after_fertilizer_application == 1
 
+        self.data.runoff_fertilizer_phosphorus = 0.0
+
         if self.data.rain_events_after_fertilizer_application == 0 or first_rainfall_occurred:
             self._update_before_and_at_first_rain(rainfall, runoff, field_size)
         else:
@@ -98,6 +100,7 @@ class Fertilizer:
             runoff_phosphorus_to_remove = amounts_to_remove["runoff_phosphorus"]
             absorbed_phosphorus_to_remove = amounts_to_remove["absorbed_phosphorus"]
             self.data.available_phosphorus_pool -= (runoff_phosphorus_to_remove + absorbed_phosphorus_to_remove)
+            self.data.runoff_fertilizer_phosphorus = runoff_phosphorus_to_remove
             self.data.annual_runoff_fertilizer_phosphorus += runoff_phosphorus_to_remove
             self.data.soil_layers[0].add_to_labile_phosphorus(absorbed_phosphorus_to_remove, field_size)
             return
@@ -132,6 +135,7 @@ class Fertilizer:
             runoff_phosphorus_to_remove = amounts_to_remove["runoff_phosphorus"]
             absorbed_phosphorus_to_remove = amounts_to_remove["absorbed_phosphorus"]
             self.data.recalcitrant_phosphorus_pool -= (runoff_phosphorus_to_remove + absorbed_phosphorus_to_remove)
+            self.data.runoff_fertilizer_phosphorus = runoff_phosphorus_to_remove
             self.data.annual_runoff_fertilizer_phosphorus += runoff_phosphorus_to_remove
             self.data.soil_layers[0].add_to_labile_phosphorus(absorbed_phosphorus_to_remove, field_size)
             return

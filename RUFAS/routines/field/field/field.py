@@ -355,7 +355,7 @@ class Field:
                     "mix_name": mix_name, "field_size": self.field_data.field_size}
         value = {"mass": total_mass, "nitrogen": nitrogen_mass, "phosphorus": phosphorus_mass,
                  "potassium": potassium_mass, "application_depth": application_depth,
-                 "surface_remainder_fraction": surface_remainder_fraction}
+                 "surface_remainder_fraction": surface_remainder_fraction, "day": day, "year": year}
         om.add_variable("fertilizer_application", value, info_map)
 
     def _execute_manure_application(self, requested_nitrogen: float, requested_phosphorus: float, field_coverage: float,
