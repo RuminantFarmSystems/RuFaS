@@ -358,7 +358,7 @@ class Cow(HeiferIII):
         om.add_variable("milk_protein", self.mPrt, info_map)
         om.add_variable("milk_lactose", self.lactose_milk, info_map)
         om.add_variable("lactating", self.milking, info_map)
-        om.add_variable("cow_id", self.cow_id, info_map)
+        om.add_variable("cow_id", self.id, info_map)
         om.add_variable("parity", self.calves, info_map)
 
         # if not self.milking:
