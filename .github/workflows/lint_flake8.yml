@@ -36,15 +36,7 @@ jobs:
                         tr "\n" " ")" >> "$GITHUB_ENV"
         echo "OTHER_FILES=$( echo ${{ steps.files.outputs.added_modified }} |
                         tr " " "\n" |
-<<<<<<< HEAD
-<<<<<<< HEAD
                         grep -E "\.txt$|\.json$|\.csv$"  |
-=======
-                        grep -E "\.txt$|\.json$"  |
->>>>>>> 74ad8a585 (adds check on protected .txt and .json files as well)
-=======
-                        grep -E "\.txt$|\.json$|\.csv$"  |
->>>>>>> 32837425e (adds .csvs to OTHER_FILES and removes default_metadata.json from protected paths)
                         tr "\n" " ")" >> "$GITHUB_ENV"
     - name: Lint with flake8
       if: ${{ env.FILES != '' }}
@@ -59,15 +51,7 @@ jobs:
         unauthorized_changes=false
         
         for path in "${paths_to_protect[@]}"; do
-<<<<<<< HEAD
-<<<<<<< HEAD
           if (echo ${{ env.FILES }}; echo ${{ env.OTHER_FILES }}) | grep -q "$path"; then
-=======
-          if echo ${{ env.FILES }} | grep -q "$path"; then
->>>>>>> 12c6e23e1 (fixes var name match error)
-=======
-          if (echo ${{ env.FILES }}; echo ${{ env.OTHER_FILES }}) | grep -q "$path"; then
->>>>>>> 74ad8a585 (adds check on protected .txt and .json files as well)
             unauthorized_changes=true
             unauthorized_paths+="$path, "
           fi
