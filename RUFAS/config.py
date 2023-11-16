@@ -81,8 +81,6 @@ class Config:
         self.year_length = year_length
 
         self.sim_length = self.calc_sim_length()
-        self.csv_dir = data['csv_dir']
-        self.graphic_dir = data['graphic_dir']
 
     def calc_sim_length(self):
         """

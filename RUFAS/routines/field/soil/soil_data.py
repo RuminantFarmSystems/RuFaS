@@ -148,10 +148,6 @@ class SoilData:
     surface_runoff_volume: Optional[float] = None
     """volume of surface runoff (mm per hectare), used in SWAT equation 4:1.1.1."""
 
-    # ---- decomposition
-    decomposition_temperature_effect: Optional[float] = None
-    """temperature effect on decomposition factor (unitless) (pseudocode_soil S.6.A.1)"""
-
     # ---- Fertilizer (Phosphorus Cycling)
     cover_type: str = "BARE"
     """The cover type of the soil surface, can be bare, residue covered, or grassed"""
@@ -227,7 +223,7 @@ class SoilData:
     """plant residue on the surface of the soil (kg/ha)"""
     plant_root_residue = 0
     """plant residue below the surface of the soil (kg/ha)"""
-    plant_residue_lignin_composition: float = 0
+    plant_residue_lignin_composition: float = 0.17
     """lignin fraction of plant residue (unitless)"""
     plant_lignin_nitrogen_ratio: float = 0
     """plant lignin to nitrogen ratio (unitless)"""
@@ -235,6 +231,10 @@ class SoilData:
     """plant residue fraction that is metabolic (unitless)"""
     total_residue: float = 0
     """total amount of soil residue ever added to the field"""  # TODO: needed?
+    crop_root_depth: float = 0
+    """Root depth of the crop harvested (mm)"""
+    crop_yield_nitrogen: float = 0
+    """nitrogen contained in the harvested yield (kg/ha)"""
     @property
     def all_residue(self) -> float:  # TODO: not currently used.
         """amount of total plant residue, above and below-ground, on the field (kg/ha)"""
@@ -549,3 +549,19 @@ class SoilData:
             return 0.40
         else:
             return 0.075
+
+    @property
+    def profile_carbon_emissions(self) -> float:
+        """
+        Calculates the total amount of CO2 respirated from the soil profile.
+
+        Returns
+        -------
+        float
+            Total amount of CO2 emitted from carbon decomposition in the soil profile (kg/ha).
+
+        """
+        emissions_from_active = sum(self.get_vectorized_layer_attribute('active_carbon_to_slow_loss'))
+        emissions_from_slow = sum(self.get_vectorized_layer_attribute('slow_carbon_co2_lost_amount'))
+        emissions_from_passive = sum(self.get_vectorized_layer_attribute('passive_carbon_co2_lost_amount'))
+        return emissions_from_active + emissions_from_slow + emissions_from_passive
