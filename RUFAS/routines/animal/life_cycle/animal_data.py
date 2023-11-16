@@ -1,9 +1,11 @@
+import copy
 import random
 from dataclasses import dataclass
 from random import shuffle
-from typing import List, Dict, Any, Callable, Type
+from typing import List, Dict, Any, Type
 
 from scipy.stats import truncnorm
+from time import time
 
 from RUFAS.routines.animal.life_cycle.animal_base import AnimalBase
 from RUFAS.routines.animal.animal_typed_dicts import HerdInfoTypedDict
@@ -28,7 +30,7 @@ class AnimalData:
         ----------
         animal_id : int
             A class variable that holds a unique identifier for the animal which auto-increments.
-        CI: float
+        CI: int
             Calving interval.
         breed : str
             The breed of the animal.
@@ -116,7 +118,7 @@ class AnimalData:
     # animal_id = 378165
     animal_id = 0
 
-    CI: float
+    CI: int
     breed: str
     order_by_random: bool
     init_herd: bool
@@ -162,14 +164,14 @@ class AnimalData:
         self.animal_id += 1
         return self.animal_id
 
-    def __init__(self, CI: float, herd_data: HerdInfoTypedDict, set_seed: bool, init_herd: bool = False,
+    def __init__(self, CI: int, herd_data: HerdInfoTypedDict, set_seed: bool, init_herd: bool = False,
                  save_animals: bool = False, terminate_simulation_post_herd_generation: bool = False) -> None:
         """
         Initialize the AnimalData instance with herd information and configurations.
 
         Parameters:
         -----------
-        CI : float
+        CI : int
             Calving Interval.
         herd_data : HerdInfoTypedDict
             A dictionary containing information about the herd such as breed, number of animals, etc.
@@ -228,13 +230,24 @@ class AnimalData:
         on the numbers provided in the herd data.
         """
         if self.init_herd:
+            t_start_animal_gen = time()
             animal_factory = AnimalFactory(breed=self.breed, CI=self.CI, initial_animal_num=self.initial_animal_num,
                                            simulation_days=self.simulation_days, initial_animal_id=self.animal_id,
                                            save_animals=self.save_animals,
                                            terminate_simulation_post_herd_generation=
                                            self.terminate_simulation_post_herd_generation)
-            animal_factory.generate_animals()
-            raise Exception
+            herd: Dict[str, List[Calf | HeiferI | HeiferII | HeiferIII | Cow]] = animal_factory.generate_animals()
+            t_end_animal_gen = time()
+            total_animal_gen_time = t_end_animal_gen - t_start_animal_gen
+            print("Animal generation took " + str(total_animal_gen_time))
+
+            self.calves = self._random_sample_with_replacement(herd["calves"], self.calf_num)
+            self.heiferIs = self._random_sample_with_replacement(herd["heiferIs"], self.heiferI_num)
+            self.heiferIIs = self._random_sample_with_replacement(herd["heiferIIs"], self.heiferII_num)
+            self.heiferIIIs = self._random_sample_with_replacement(herd["heiferIIIs"], self.heiferIII_num)
+            self.cows = self._random_sample_with_replacement(herd["cows"], self.cow_num)
+            self.replacement = self._random_sample_with_replacement(herd["replacement_cows"], self.replace_num)
+
         else:
             self.calves = self._init_animals("calves", self.calf_num)
             self.heiferIs = self._init_animals("heiferIs", self.heiferI_num)
@@ -243,10 +256,22 @@ class AnimalData:
             self.cows = self._init_animals("cows", self.cow_num)
             self.replacement = self._init_animals("replacement_cows", self.replace_num)
 
+    def _random_sample_with_replacement(self, all_animals: (List[Calf] | List[HeiferI] | List[HeiferII] |
+                                                            List[HeiferIII] | List[Cow]), animal_num: int) -> \
+            (List[Calf] | List[HeiferI] | List[HeiferII] | List[HeiferIII] | List[Cow]):
+        animals = []
+        random_choices = random.choices(list(range(len(all_animals))), k=animal_num)
+        for choice in random_choices:
+            animal = copy.deepcopy(all_animals[choice])
+            animal.id = self.next_id()
+            animals.append(animal)
+
+        return animals
+
     @staticmethod
-    def _random_sample_with_replacement(all_animal_data: Dict[str, List[Any]], animal_num) -> Dict[str,
-                                                                                                   List[Any]]:
-        random_choices = random.choices(list(range(animal_num)), k=animal_num)
+    def _sample_animal_data_with_replacement(all_animal_data: Dict[str, List[Any]], animal_num: int) -> Dict[str,
+                                                                                                             List[Any]]:
+        random_choices = random.choices(list(range(len(all_animal_data['id']))), k=animal_num)
         animal_data = {}
         for key in all_animal_data.keys():
             data = []
@@ -298,8 +323,8 @@ class AnimalData:
                                                                    List[HeiferIII] | List[Cow]):
         animals: (List[Calf] | List[HeiferI] | List[HeiferII] | List[HeiferIII] | List[Cow]) = []
         all_animal_data: Dict[str, List[Any]] = im.get_data(animal_type)
-        animal_data = self._random_sample_with_replacement(all_animal_data=all_animal_data,
-                                                           animal_num=num_animal)
+        animal_data = self._sample_animal_data_with_replacement(all_animal_data=all_animal_data,
+                                                                animal_num=num_animal)
         args_properties: Dict[str, List[str]] = {
             "calves": ['id', 'breed', 'birth_date', 'days_born', 'p_init', 'birth_weight', 'body_weight', 'wean_weight',
                        'mature_body_weight', 'events'],
