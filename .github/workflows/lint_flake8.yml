@@ -47,6 +47,7 @@ jobs:
       run: |
         paths_to_protect=(
           'RUFAS/scenario_manager.py'
+          'input/metadata/default_metadata.json'
         )
         unauthorized_changes=false
         
