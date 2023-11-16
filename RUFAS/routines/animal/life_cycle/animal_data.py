@@ -5,7 +5,6 @@ from random import shuffle
 from typing import List, Dict, Any, Type
 
 from scipy.stats import truncnorm
-from time import time
 
 from RUFAS.routines.animal.life_cycle.animal_base import AnimalBase
 from RUFAS.routines.animal.animal_typed_dicts import HerdInfoTypedDict
