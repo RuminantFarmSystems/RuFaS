@@ -110,6 +110,7 @@ class OutputGatherer:
             om.add_variable("grazing_inorganic_phosphorus_runoff", field.soil.data.grazing_inorganic_phosphorus_runoff,
                             info_map)
             om.add_variable("phosphorus_runoff", field.soil.data.phosphorus_runoff, info_map)
+            om.add_variable("profile_carbon_emissions", field.soil.data.profile_carbon_emissions, info_map)
             # Adding vadose zone layer data
             info_map["prefix"] = "field='" + field.field_data.name + "',vadose_zone_layer"
             om.add_variable("active_organic_nitrogen_content",
@@ -147,6 +148,8 @@ class OutputGatherer:
                                 layer.plant_metabolic_active_carbon_remaining, info_map)
                 om.add_variable("plant_structural_active_carbon_usage", layer.plant_structural_active_carbon_usage,
                                 info_map)
+                om.add_variable("metabolic_litter_amount", layer.metabolic_litter_amount, info_map)
+                om.add_variable("structural_litter_amount", layer.structural_litter_amount, info_map)
                 om.add_variable("plant_structural_active_carbon_remaining",
                                 layer.plant_structural_active_carbon_remaining, info_map)
                 om.add_variable("plant_structural_slow_carbon_usage", layer.plant_structural_slow_carbon_usage,
@@ -177,6 +180,7 @@ class OutputGatherer:
                                 info_map)
                 om.add_variable("active_carbon_amount", layer.active_carbon_amount, info_map)
                 om.add_variable("slow_carbon_amount", layer.slow_carbon_amount, info_map)
+                om.add_variable("passive_carbon_amount", layer.passive_carbon_amount, info_map)
                 om.add_variable("slow_carbon_decomposition_amount", layer.slow_carbon_decomposition_amount,
                                 info_map)
                 om.add_variable("passive_carbon_decomposition_amount", layer.passive_carbon_decomposition_amount,
