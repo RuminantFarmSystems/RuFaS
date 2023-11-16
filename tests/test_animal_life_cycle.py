@@ -105,7 +105,7 @@ def test_get_animals(mocker: MockerFixture,
     life_cycle_manager.animal_data = mock_animal_data
 
     # Act
-    animals = life_cycle_manager._get_animals(animal_type, animal_num, breed)
+    animals = life_cycle_manager._get_animals(animal_type)
 
     # Assert
     assert len(animals) == animal_num
@@ -113,8 +113,8 @@ def test_get_animals(mocker: MockerFixture,
         assert animal.breed == breed
         animal.events.add_event.assert_called_once_with(days_born, 0, INIT_HERD)
 
-    spy_get_animals.assert_called_once_with(animal_type, animal_num, breed)
-    animal_getter_by_animal_type[animal_type].assert_called_once_with(animal_num, breed)
+    spy_get_animals.assert_called_once_with(animal_type)
+    animal_getter_by_animal_type[animal_type].assert_called_once()
 
 
 def test_initialize_herd(mocker: MockerFixture, life_cycle_manager: LifeCycleManager) -> None:
@@ -129,7 +129,6 @@ def test_initialize_herd(mocker: MockerFixture, life_cycle_manager: LifeCycleMan
         'cow_num': 1000,
         'replace_num': 5000,
         'herd_num': 1000,
-        'herd_init': False,
         'breed': breed,
     }
 
@@ -149,12 +148,12 @@ def test_initialize_herd(mocker: MockerFixture, life_cycle_manager: LifeCycleMan
     assert life_cycle_manager.herd_num == herd_data['herd_num']
     patch_set_avg_CI.assert_called_once()
     assert patch_get_animals.call_count == 5
-    assert patch_get_animals.call_args_list[0] == mocker.call(Calf, herd_data['calf_num'], breed)
-    assert patch_get_animals.call_args_list[1] == mocker.call(HeiferI, herd_data['heiferI_num'], breed)
-    assert patch_get_animals.call_args_list[2] == mocker.call(HeiferII, herd_data['heiferII_num'], breed)
-    assert patch_get_animals.call_args_list[3] == mocker.call(HeiferIII, herd_data['heiferIII_num_springers'], breed)
-    assert patch_get_animals.call_args_list[4] == mocker.call(Cow, herd_data['cow_num'], breed)
-    mock_animal_data.get_replacement_cows.assert_called_once_with(herd_data['replace_num'], breed)
+    assert patch_get_animals.call_args_list[0] == mocker.call(Calf)
+    assert patch_get_animals.call_args_list[1] == mocker.call(HeiferI)
+    assert patch_get_animals.call_args_list[2] == mocker.call(HeiferII)
+    assert patch_get_animals.call_args_list[3] == mocker.call(HeiferIII)
+    assert patch_get_animals.call_args_list[4] == mocker.call(Cow)
+    mock_animal_data.get_replacement_cows.assert_called_once_with()
     assert life_cycle_manager.replacement_market == mock_replacement_cows
     assert len(results) == 5
 
