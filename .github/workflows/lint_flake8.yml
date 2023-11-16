@@ -37,10 +37,14 @@ jobs:
         echo "OTHER_FILES=$( echo ${{ steps.files.outputs.added_modified }} |
                         tr " " "\n" |
 <<<<<<< HEAD
+<<<<<<< HEAD
                         grep -E "\.txt$|\.json$|\.csv$"  |
 =======
                         grep -E "\.txt$|\.json$"  |
 >>>>>>> 74ad8a585 (adds check on protected .txt and .json files as well)
+=======
+                        grep -E "\.txt$|\.json$|\.csv$"  |
+>>>>>>> 32837425e (adds .csvs to OTHER_FILES and removes default_metadata.json from protected paths)
                         tr "\n" " ")" >> "$GITHUB_ENV"
     - name: Lint with flake8
       if: ${{ env.FILES != '' }}
@@ -51,7 +55,6 @@ jobs:
       run: |
         paths_to_protect=(
           'RUFAS/scenario_manager.py'
-          'input/metadata/default_metadata.json'
         )
         unauthorized_changes=false
         
