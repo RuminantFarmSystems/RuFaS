@@ -646,6 +646,8 @@ def output_manager_original_method_states(
         "dump_errors": mock_output_manager.dump_errors,
         "dump_variable_names_and_contexts": mock_output_manager.dump_variable_names_and_contexts,
         "_route_save_functions": mock_output_manager._route_save_functions,
+        "clear_output_dir": mock_output_manager.clear_output_dir,
+        "is_file_in_dir": mock_output_manager.is_file_in_dir,
     }
 
 
@@ -1862,6 +1864,50 @@ def test_load_variables_pool_from_file_raises_exception(
     mock_output_manager.load_variables_pool_from_file = (
         output_manager_original_method_states["load_variables_pool_from_file"]
     )
+
+
+@pytest.mark.parametrize(
+    "is_file_found_in_dir",
+    [True, False],
+)
+def test_clear_output_dir(mocker: MockerFixture, mock_output_manager: OutputManager, is_file_found_in_dir: bool, 
+                          output_manager_original_method_states: Dict[str, Callable]) -> None:
+    """Checks clear_output_dir function in output_manager.py"""
+    patch_empty_dir = mocker.patch("RUFAS.util.Utility.empty_dir")
+    mock_output_manager.add_log = MagicMock()
+    mock_output_manager.add_error = MagicMock()
+    mock_output_manager.is_file_in_dir = MagicMock(return_value=is_file_found_in_dir)
+    with patch("pathlib.Path.mkdir") as mock_mkdir:
+        vars_file_path = mock_mkdir.return_value / "dummy_vars_file.txt"
+        mock_output_manager.clear_output_dir(vars_file_path)
+        if is_file_found_in_dir:
+            patch_empty_dir.assert_not_called()
+            assert mock_output_manager.add_log.call_count == 0
+            assert mock_output_manager.add_error.call_count == 1
+        else:
+            patch_empty_dir.assert_called_once()
+            assert mock_output_manager.add_log.call_count == 1
+            assert mock_output_manager.add_error.call_count == 0
+
+    mock_output_manager.is_file_in_dir = output_manager_original_method_states["is_file_in_dir"]
+    mock_output_manager.clear_output_dir = output_manager_original_method_states["clear_output_dir"]
+
+@pytest.mark.parametrize(
+    "dir_path, file_path, expected_result",
+    [
+        (None, None, False),
+        (Path("path/to/directory"), Path("path/to/directory/file.json"), True),
+        (Path("path/to/directory"), Path("path/to/different_directory/file.json"), False),
+        (Path("path/to/directory"), Path("path/to/directory/subdirectory/file.json"), True),
+        (Path("path/to/directory"), None, False),
+    ],
+)
+def test_is_file_in_dir(mock_output_manager: OutputManager, dir_path: Path, file_path: Path, expected_result: bool,
+                        output_manager_original_method_states: Dict[str, Callable]) -> None:
+    """Checks is_file_in_dir function in output_manager.py"""
+    assert mock_output_manager.is_file_in_dir(dir_path, file_path) is expected_result
+
+    mock_output_manager.is_file_in_dir = output_manager_original_method_states["is_file_in_dir"]
 
 
 @pytest.mark.parametrize(

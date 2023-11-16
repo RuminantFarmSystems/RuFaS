@@ -12,12 +12,9 @@ import sys
 from typing import List
 
 from RUFAS.scenario_manager import METADATA_PATHS, MetadataPaths
-
-import config.global_variables
 from RUFAS.simulation_engine import SimulationEngine
 from RUFAS.input_manager import InputManager
 from RUFAS.output_manager import OutputManager, LogVerbosity
-from RUFAS.util import Utility
 
 
 def main():
@@ -90,7 +87,8 @@ def run_rufas(
         return
 
     if clear_output:
-        clear_output_dir()
+        output_manager = OutputManager()
+        output_manager.clear_output_dir()
 
     metadata_files: List[MetadataPaths] = METADATA_PATHS
     if only_run_validation:
@@ -106,47 +104,6 @@ def run_rufas(
             output_dir,
             filters_dir,
         )
-
-
-def clear_output_dir(vars_file_path: Path = None) -> None:
-    """Clears the output directory if vars_file_path not in output directory.
-
-    Parameters
-    ----------
-    vars_file_path : Path, optional, default=None
-        Path to file used to load Output Manager vars pool.
-    """
-    info_map = {
-        "class": "No caller class",
-        "function": clear_output_dir.__name__,
-    }
-    output_manager = OutputManager()
-    output_dir = Path(config.global_variables.OUT_DIR)
-    is_file_found_in_dir = is_file_in_dir(output_dir, vars_file_path)
-    if is_file_found_in_dir:
-        output_manager.add_error("Can't clear output directory", f"{vars_file_path} in output directory.", info_map)
-    else:
-        keep_list = [".keep", "output_filters"]
-        Utility.empty_dir(output_dir, keep=keep_list)
-        output_manager.add_log("Output directory cleared", "No conflicts to clearing output directory.", info_map)
-
-
-def is_file_in_dir(dir_path: Path = Path(config.global_variables.OUT_DIR), file_path: Path = None) -> bool:
-    """Checks if a file path is in the provided directory.
-
-    Parameters
-    ----------
-    dir_path : Path, optional, default=Path(config.global_variables.OUT_DIR)
-        Path to the directory to be checked.
-    file_path : Path, optional, default=None
-        Path to file to be checked.
-    """
-    if file_path is None:
-        return False
-    file_path = file_path.resolve()
-    directory_path = dir_path.resolve()
-
-    return directory_path == file_path or directory_path in file_path.parents
 
 
 def run_load_vars_pool(
@@ -179,9 +136,9 @@ def run_load_vars_pool(
     filters_dir : Path, optional, default=Path("output/output_filters")
         The directory for the files containing the keys for filtering.
     """
-    if clear_output:
-        clear_output_dir(vars_file_path)
     output_manager = OutputManager()
+    if clear_output:
+        output_manager.clear_output_dir(vars_file_path)
     output_manager.flush_pools()
     output_manager.load_variables_pool_from_file(vars_file_path)
     output_manager.set_metadata_prefix("reload")
