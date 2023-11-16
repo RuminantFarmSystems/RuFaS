@@ -164,7 +164,7 @@ def test_run_rufas(
         graphics_dir,
         vars_file_path,
         output_dir,
-        filters_dir
+        filters_dir,
         init_herd,
         save_animals,
         terminate_simulation_post_herd_generation
