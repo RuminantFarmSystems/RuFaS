@@ -1,4 +1,6 @@
-from typing import List, Dict, Any
+from typing import List, Dict
+
+from tqdm import tqdm
 
 from RUFAS.routines.animal.animal_typed_dicts import AnimalBaseInitArgsTypedDict
 from RUFAS.routines.animal.life_cycle.animal_base import AnimalBase
@@ -11,7 +13,7 @@ from RUFAS.routines.animal.life_cycle.heiferIII import HeiferIII
 
 class AnimalFactory:
     breed: str
-    CI: float
+    CI: int
 
     initial_animal_num: int
     simulation_days: int
@@ -28,7 +30,7 @@ class AnimalFactory:
     cows: List[Cow]
     replacement: List[Cow]
 
-    def __init__(self, breed: str, CI: float, initial_animal_num: int, simulation_days: int, initial_animal_id: int,
+    def __init__(self, breed: str, CI: int, initial_animal_num: int, simulation_days: int, initial_animal_id: int,
                  save_animals: bool = False, terminate_simulation_post_herd_generation: bool = False) -> None:
         self.breed = breed
         self.CI = CI
@@ -54,7 +56,7 @@ class AnimalFactory:
         self.animal_id += 1
         return self.animal_id
 
-    def generate_animals(self):
+    def generate_animals(self) -> Dict[str, List[Calf | HeiferI | HeiferII | HeiferIII | Cow]]:
         for _ in range(self.initial_animal_num):
             args = AnimalBaseInitArgsTypedDict(id=self.next_id(),
                                                breed=self.breed,
@@ -66,7 +68,7 @@ class AnimalFactory:
             if not (calf.culled or calf.sold):
                 self.calves.append(calf)
 
-        for day in range(self.simulation_days):
+        for day in tqdm(range(self.simulation_days)):
             for calf in self.calves:
                 wean_day = calf.update(0)
                 if wean_day:
@@ -143,12 +145,8 @@ class AnimalFactory:
                     if not (calf.culled or calf.sold):
                         self.calves.append(calf)
 
-            if day % 100 == 0:
-                print(str(day) + '/' + str(self.simulation_days))
-
-        print('Calves: ' + str(len(self.calves)))
-        print('HeiferIs: ' + str(len(self.heiferIs)))
-        print('HeiferIIs: ' + str(len(self.heiferIIs)))
-        print('HeiferIIIs: ' + str(len(self.heiferIIIs)))
-        print('Cows: ' + str(len(self.cows)))
-        print('Replacement: ' + str(len(self.replacement)))
+        if self.save_animals:
+            pass
+        if not self.terminate_simulation_post_herd_generation:
+            return {"calves": self.calves, "heiferIs": self.heiferIs, "heiferIIs": self.heiferIIs,
+                    "heiferIIIs": self.heiferIIIs, "cows": self.cows, "replacement_cows": self.replacement}
