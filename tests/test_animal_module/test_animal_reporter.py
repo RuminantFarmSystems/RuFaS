@@ -6,6 +6,10 @@ from RUFAS.routines.animal.animal_manager import AnimalManager
 from RUFAS.routines.animal.animal_reporter import om
 
 
+def test___init__():
+    pass
+
+
 def test_report_daily_animal_data(mocker: MockerFixture):
     """Unit test for function report_daily_animal_data in file
     routines/animal/ration/animal_reporter.py"""
@@ -62,6 +66,24 @@ def test_report_daily_animal_data(mocker: MockerFixture):
         )
     ]
 
-    assert om.variables_pool[
-        "AnimalReporter.report_daily_animal_data.num_animals"
-    ]["info_maps"] == [{}]
+    assert om.variables_pool["AnimalReporter.report_daily_animal_data.num_animals"][
+        "info_maps"
+    ] == [{}]
+
+
+def test_report_milk():
+    """Unit test for function report_milk in file
+    routines/animal/ration/animal_reporter.py"""
+    pass
+
+
+def test_report_ration_interval_data():
+    """Unit test for function report_ration_interval_data in file
+    routines/animal/ration/animal_reporter.py"""
+    pass
+
+
+def test_report_daily_ration():
+    """Unit test for function report_daily_ration in file
+    routines/animal/ration/animal_reporter.py"""
+    pass
