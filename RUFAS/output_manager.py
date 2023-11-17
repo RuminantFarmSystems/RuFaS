@@ -3,7 +3,6 @@
 from copy import deepcopy
 from enum import Enum
 from pathlib import Path
-import config.global_variables
 import sys
 from typing import Any, Dict, List, Optional, Union
 import datetime
