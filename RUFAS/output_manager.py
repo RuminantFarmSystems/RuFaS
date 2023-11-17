@@ -804,6 +804,16 @@ class OutputManager(object):
                 )
                 if exclude_info_maps:
                     filtered_pool = self._exclude_info_maps(filtered_pool)
+
+                if filter_file.startswith(
+                    self.__supported_filter_types_prefixes["report"]
+                ):
+                    self._generate_report(
+                        filtered_pool,
+                        filter_content,
+                        save_path,
+                        Path(filter_file),
+                    )
                 self._route_save_functions(
                     filter_file,
                     save_path,
@@ -858,24 +868,16 @@ class OutputManager(object):
                     f"Graphic generation is disabled, skipping {filter_file=}",
                     info_map,
                 )
-        elif filter_file.startswith(self.__supported_filter_types_prefixes["report"]):
-            self._save_reports(
-                filtered_pool,
-                filter_content,
-                save_path,
-                Path(filter_file),
-            )
 
-    def _save_reports(
+    def _generate_report(
         self,
         filtered_pool: Dict[str, pool_element_type],
         filter_content: Dict[str, str | int],
-        save_path: Path,
         filter_file: Path,
-    ) -> None:
+    ) -> Dict[str : List[Any]]:
         info_map = {
             "class": self.__class__.__name__,
-            "function": self._save_reports.__name__,
+            "function": self._generate_report.__name__,
         }
         self.add_log("init_report_generation", "Report Generation Started", info_map)
         selected_variables = filter_content.get("variables")
@@ -900,6 +902,12 @@ class OutputManager(object):
                     key: report_data[key][index_counter] for key in report_data.keys()
                 }
                 horinzontally_aggregated.append(horizontal_aggregator(horizon))
+            return vertical_aggregator(horinzontally_aggregated)
+        else:
+            vertically_aggregated: Dict[str, Any] = {}
+            for key, data_series in report_data:
+                vertically_aggregated[key] = vertical_aggregator(data_series)
+            return horizontal_aggregator(vertical_aggregator)
 
     def horizontal_aggregator(self, x):
         pass
@@ -975,7 +983,7 @@ class OutputManager(object):
         self, data_dict: Dict[str, Any], filter_name: str, path: str
     ) -> None:
         """
-        Saves the data_dict into a single CSV file in the specified path. If the directory at the given path 
+        Saves the data_dict into a single CSV file in the specified path. If the directory at the given path
         does not exist, it is created.
 
         Parameters
