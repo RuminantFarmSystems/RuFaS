@@ -134,36 +134,43 @@ class TillageApplication:
         pool_name = "passive_carbon_amount"
         redistribution_fractions = []
         total_to_mix_from_pools = 0
+        top_layer_size = 0
         for layer in self.soil_data.soil_layers:
+            if layer.top_depth == 0:
+                top_layer_size == layer.bottom_depth  # gets top layer size for use in adjusting fraction denominators further along
+                redistribution_fractions.append(0)  # no passive carbon so keeps number of soil layers and number of redistribution fractions in sync
+                break
             layer_not_tilled = layer.top_depth >= tillage_depth  # checks whether the layer is tilled based on the tillage depth reaching the top depth of the layer
             layer_partially_tilled = layer.bottom_depth > tillage_depth  # checks if layer is only partially tilled because tillage depth doesn't reach bottom of layer
             if layer_not_tilled:  # break if the layer isn't tilled at all
                 break
             elif layer_partially_tilled:
                 tilled_depth = tillage_depth - layer.top_depth  # get how much of partial layer is tilled
-                layer_redistribution_fraction = tilled_depth / tillage_depth  # get the fraction of the redistribution for the partially tilled layer
+                layer_redistribution_fraction = tilled_depth / (tillage_depth - top_layer_size)  # get the fraction of the redistribution for the partially tilled layer
                 fraction_of_layer_mixed = tilled_depth / layer.layer_thickness  # calculate the fraction of the layer mixed
             else:
-                layer_redistribution_fraction = layer.layer_thickness / tillage_depth  # calculate redistribution factor
+                layer_redistribution_fraction = layer.layer_thickness / (tillage_depth - top_layer_size)  # calculate redistribution factor
                 fraction_of_layer_mixed = 1.0  # set fraction mixed as 100%
             redistribution_fractions.append(layer_redistribution_fraction)  # add the layer distribution fraction
 
             current_pool_amount = getattr(layer, pool_name)  # for the layer, get the current amount of passive carbon
-            amount_to_remove = current_pool_amount * mixing_fraction * fraction_of_layer_mixed  # remove the appropriate fraction from the layer
-            unmixed_amount_in_pool = current_pool_amount - amount_to_remove
-            setattr(layer, pool_name, unmixed_amount_in_pool)
-            total_to_mix_from_pools += amount_to_remove
+            amount_to_remove = current_pool_amount * mixing_fraction * fraction_of_layer_mixed  # calculate appropriate fraction to remove from the layer
+            unmixed_amount_in_pool = current_pool_amount - amount_to_remove  # calculate amount remaining in that layer after removing appropriate amount
+            setattr(layer, pool_name, unmixed_amount_in_pool)  # reset the amount in the layer based on removing what got mixed out
+            total_to_mix_from_pools += amount_to_remove  # add amount removed to total pool from tilled layers
 
-        number_of_tilled_layers = len(redistribution_fractions)
+        number_of_tilled_layers = len(redistribution_fractions)  # set pup variable with more understandable name for num of tilled layers
         for layer_index in range(number_of_tilled_layers):
-            layer = self.soil_data.soil_layers[layer_index]
-            layer_fraction = redistribution_fractions[layer_index]
+            if layer_index == 0:  # if it's the first layer, no need to add any passive carbon, so break
+                break
+            layer = self.soil_data.soil_layers[layer_index]  # get the current layer data
+            layer_fraction = redistribution_fractions[layer_index]  # get the layer fraction as calculated above
 
-            amount_to_add = total_to_mix_from_pools * layer_fraction
+            amount_to_add = total_to_mix_from_pools * layer_fraction  # calc amount to add to layer
 
-            amount_in_pool = getattr(layer, pool_name)
-            new_pool_amount = amount_in_pool + amount_to_add
-            setattr(layer, pool_name, new_pool_amount)
+            amount_in_pool = getattr(layer, pool_name)  # get current amount in layer
+            new_pool_amount = amount_in_pool + amount_to_add  # add the current amount and amount that shld be added to the layer
+            setattr(layer, pool_name, new_pool_amount)  # set the new pool amount to the above calculated amount
 
     def _mix_soil_layers(self, pool_name: str, tillage_depth: float, mixing_fraction: float) -> None:
         """
