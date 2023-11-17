@@ -1011,7 +1011,8 @@ def test_execute_daily_processes(field_size: float, crops_growing: bool, residue
 @pytest.mark.parametrize("field_size,rainfall,runoff,high_water_table,residue,light,min_temp,max_temp,mean_temp,"
                          "surface_residue,crop_1_proportion,crop_2_proportion,crops_growing", [
                              (1.9, 4.66, 1.22, False, 30.6, 200, 16.5, 20.5, 18.5, 44.5, 0.6, 0.4, True),
-                             (2.3, 5.6, 2.1, True, 44.5, 250, 22.33, 25.36, 24.6, 80.4, 0.77, 0.23, False)
+                             (2.3, 5.6, 2.1, True, 44.5, 250, 22.33, 25.36, 24.6, 80.4, 0.77, 0.23, False),
+                             (2.3, 5.6, 2.1, True, 44.5, 250, 22.33, 25.36, 24.6, 80.4, 0.0, 0.0, False)
                          ])
 def test_cycle_water(field_size: float, rainfall: float, runoff: float, high_water_table: bool, residue: float,
                      light: float, min_temp: float, max_temp: float, mean_temp: float, surface_residue: float,
@@ -1066,6 +1067,7 @@ def test_cycle_water(field_size: float, rainfall: float, runoff: float, high_wat
         setattr(mocked_time, "day", 178)
 
         incorp._cycle_water(current_conditions, mocked_time)
+
         incorp._determine_watering_amount.assert_called_once_with(rainfall=rainfall, year=mocked_time.year,
                                                                   day=mocked_time.day, irrigation=0.0)
         incorp._handle_water_in_crop_canopies.assert_called_once_with(rainfall)
