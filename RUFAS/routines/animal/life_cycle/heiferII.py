@@ -406,12 +406,7 @@ class HeiferII(HeiferI):
 
     def _detect_estrus(self, sim_day: int) -> bool:
         self.estrus_count += 1
-        estrus_detected = self._compare_randomized_rate_less_than(self._get_repro_data('estrus_detection_rate'))
-        if not estrus_detected:
-            return False
-
-        self.log_event(self.days_born, sim_day, const.ESTRUS_DETECTED)
-        return True
+        return self._compare_randomized_rate_less_than(self._get_repro_data('estrus_detection_rate'))
 
     def _decide_on_ai(self, estrus_detected: bool) -> bool:
         if not estrus_detected:
@@ -432,13 +427,17 @@ class HeiferII(HeiferI):
         if self.days_born == self._get_breeding_start_day():
             self._simulate_estrus(self._get_breeding_start_day(), sim_day, const.ESTRUS_DAY_SCHEDULED_NOTE)
         elif self.days_born == self.estrus_day:
-            # self.log_event(, const.ESTRUS_OCCURRED)
+            self.log_event(self.days_born, sim_day, const.ESTRUS_OCCURRED)
+
             estrus_detected = self._detect_estrus(sim_day)
-            # if estrus_detected:
-            #     self.log_event(, const.ESTRUS_DETECTED)
-            should_perform_ai = self._decide_on_ai(estrus_detected)
-            if not should_perform_ai:
-                self._simulate_estrus(self.estrus_day, sim_day, const.BASIC_ESTRUS_NOTE)
+            if estrus_detected:
+                self.log_event(self.days_born, sim_day, const.ESTRUS_DETECTED)
+
+            is_ai_scheduled = self._decide_on_ai(estrus_detected)
+            if is_ai_scheduled:
+                self.log_event(self.days_born, sim_day, const.AI_DAY_SCHEDULED_NOTE)
+            else:
+                self._simulate_estrus(self.days_born, sim_day, const.ESTRUS_DAY_SCHEDULED_NOTE)
 
     # TODO: Where to use this?
     def tai_program_day_after_abortion(self):
@@ -474,6 +473,7 @@ class HeiferII(HeiferI):
                 self._deliver_hormones(actions['deliver_hormones'], self.days_born, sim_day)
             if actions.get('set_ai_day', False):
                 self.ai_day = self.days_born
+                self.log_event(self.days_born, sim_day, const.AI_DAY_SCHEDULED_NOTE)
             if actions.get('set_conception_rate', False):
                 self.conception_rate = self._get_repro_data('estrus_conception_rate')
 
@@ -628,6 +628,7 @@ class HeiferII(HeiferI):
         return self.days_in_preg > 0
 
     def _perform_ai(self, sim_day: int):
+        self.log_event(self.days_born, sim_day, const.AI_PERFORMED_NOTE)
         self.log_event(self.days_born, sim_day, const.INSEMINATED_W_BASE + AnimalBase.config["semen_type"])
         self.semen_num += 1
         self.AI_times += 1
