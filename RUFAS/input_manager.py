@@ -177,12 +177,16 @@ class InputManager:
             metadata_properties = self.__metadata["properties"][properties_blob_key]
             filtered_input_data = self._filter_input_data_by_metadata(input_data, metadata_properties)
             for metadata_property in metadata_properties.keys():
+                element_counter_and_validity = {"fixed_elements": 0, "total_elements": 0, "valid_elements": 0,
+                                                "invalid_elements": 0, "is_valid": True}
                 if file_type == "json":
                     element_counter_and_validity = self._validate_json_element([metadata_property], properties_blob_key,
-                                                                               filtered_input_data, eager_termination)
+                                                                               filtered_input_data, eager_termination,
+                                                                               element_counter_and_validity)
                 if file_type == "csv":
                     element_counter_and_validity = self._validate_csv_element(metadata_property, properties_blob_key,
-                                                                              filtered_input_data, eager_termination)
+                                                                              filtered_input_data, eager_termination,
+                                                                              element_counter_and_validity)
 
                 fixed_elements_counter += element_counter_and_validity["fixed_elements"]
                 valid_elements_counter += element_counter_and_validity["valid_elements"]
@@ -195,10 +199,10 @@ class InputManager:
                     else:
                         return False
 
-        om.add_log("Total Valid Items", f"{valid_elements_counter=}", info_map)
-        om.add_log("Total Checked Items", f"{total_elements_counter=}", info_map)
-        om.add_log("Total Fixed Items", f"{fixed_elements_counter=}", info_map)
-        om.add_log("Total Invalid Items", f"{invalid_elements_counter=}", info_map)
+        om.add_log("Validation count: total items", f"{total_elements_counter=}", info_map)
+        om.add_log("Validation count: total valid", f"{valid_elements_counter=}", info_map)
+        om.add_log("Validation count: total fixed", f"{fixed_elements_counter=}", info_map)
+        om.add_log("Validation count: total invalid", f"{invalid_elements_counter=}", info_map)
         return invalid_elements_counter == 0
 
     def _filter_input_data_by_metadata(self, input_data: Dict[str, Any],
@@ -230,7 +234,8 @@ class InputManager:
 
         return filtered_input_data
 
-    def _validate_input_type_dynamic(self, variable_properties: Dict[str, Any], var_name: str, input_data_value: Any):
+    def _validate_input_type_dynamic(self, variable_properties: Dict[str, Any], var_name: str, input_data_value: Any,
+                                     properties_blob_key: str) -> bool:
         """
         Validates the input data value based on its specified dynamic type.
 
@@ -238,10 +243,15 @@ class InputManager:
         ----------
         variable_properties : Dict[str, Any]
             A dictionary containing properties relevant to the validation.
+
         var_name : str
             The name of the variable being validated.
+
         input_data_value : Any
             The input data value to be validated.
+
+        properties_blob_key : str
+            The metadata properties section keyword for the data input file being checked.
 
         Returns
         -------
@@ -286,10 +296,11 @@ class InputManager:
             raise KeyError(
                 f"Invalid type {var_type}: Element must be type {data_type_to_validator_map.keys()}"
             )
-        return validator(variable_properties, var_name, input_data_value)
+        return validator(variable_properties, var_name, input_data_value, properties_blob_key)
 
     def _validate_csv_element(self, var_name: str, properties_blob_key: str, input_data: Dict[str, Any],
-                              eager_termination: bool) -> dict:
+                              eager_termination: bool, element_counter_and_validity: Dict[str, int | bool]
+                              ) -> Dict[str, int | bool]:
         """
         Receives data loaded from csv input file and the validates each row element in the csv column it's sent.
         It attempts to fix any invalid elements and tracks the number of valid, invalid, fixed,
@@ -299,12 +310,20 @@ class InputManager:
         ----------
         var_name : str
             The name of the csv data element being validated.
+
         properties_blob_key : str
             The metadata properties section keyword for the data input file being checked.
+
         input_data : Dict[str, Any]
             A buffer dictionary that holds the input data for validation and fixing.
+
         eager_termination : bool
             If true, the process will be terminated upon finding invalid data.
+
+        element_counter_and_validity : Dict[str, int | bool]
+            A dictionary that collects the counts of total elements checked,
+            invalid elements, valid elements, and fixed elements as well as a boolean
+            which is True if the data is valid, False otherwise.
 
         Returns
         -------
@@ -316,25 +335,24 @@ class InputManager:
         info_map = {"class": self.__class__.__name__,
                     "function": self._validate_csv_element.__name__,
                     }
-        element_counter_and_validity = {"fixed_elements": 0, "total_elements": 0, "valid_elements": 0,
-                                        "invalid_elements": 0, "is_valid": True}
         variable = input_data[var_name]
         variable_properties = reduce(lambda d, key: d[key], [var_name],
                                      self.__metadata["properties"][properties_blob_key])
 
         for element_num in range(len(variable)):
             element_counter_and_validity["total_elements"] += 1
-            is_valid = self._validate_input_type_dynamic(variable_properties, var_name, variable[element_num])
+            is_valid = self._validate_input_type_dynamic(variable_properties, var_name, variable[element_num],
+                                                         properties_blob_key)
             if is_valid:
                 element_counter_and_validity["valid_elements"] += 1
             else:
-                is_fixed = self._fix_data(variable_properties, [var_name, element_num], input_data)
+                is_fixed = self._fix_data(variable_properties, [var_name, element_num], input_data, properties_blob_key)
                 if is_fixed:
                     element_counter_and_validity["fixed_elements"] += 1
                 else:
                     element_counter_and_validity["invalid_elements"] += 1
                     element_counter_and_validity["is_valid"] = False
-                    om.add_warning("Invalid unfixable element found",
+                    om.add_warning("Validation: invalid unfixable element found",
                                    f"{var_name} element {element_num} was invalid and could not be fixed", info_map)
                     if eager_termination:
                         return element_counter_and_validity
@@ -342,7 +360,8 @@ class InputManager:
         return element_counter_and_validity
 
     def _validate_json_element(self, element_hierarchy: List[str], properties_blob_key: str,   # noqa
-                               input_data: Dict[str, Any], eager_termination: bool, ) -> dict:
+                               input_data: Dict[str, Any], eager_termination: bool,
+                               element_counter_and_validity: Dict[str, int | bool], ) -> dict:
         """
         Receives data loaded from json input file, recursively finds and then validates nested elements,
         attempts to fix any invalid elements, and tracks the number of valid, invalid, fixed,
@@ -362,6 +381,11 @@ class InputManager:
         eager_termination : bool
             If true, the process will be terminated upon finding invalid data.
 
+        element_counter_and_validity : Dict[str, int | bool]
+            A dictionary that collects the counts of total elements checked,
+            invalid elements, valid elements, and fixed elements as well as a boolean
+            which is True if the data is valid, False otherwise.
+
         Returns
         -------
         dict
@@ -374,8 +398,6 @@ class InputManager:
         info_map = {"class": self.__class__.__name__,
                     "function": self._validate_json_element.__name__,
                     }
-        element_counter_and_validity = {"fixed_elements": 0, "total_elements": 0, "valid_elements": 0,
-                                        "invalid_elements": 0, "is_valid": True}
         try:
             variable_properties = reduce(lambda d, key: d[key], element_hierarchy,
                                          self.__metadata["properties"][properties_blob_key])
@@ -393,14 +415,15 @@ class InputManager:
                 if nested_key not in variable_properties_to_ignore:
                     element_hierarchy.append(nested_key)
                     element_counter_and_validity = self._validate_json_element(element_hierarchy, properties_blob_key,
-                                                                               input_data, eager_termination)
+                                                                               input_data, eager_termination,
+                                                                               element_counter_and_validity)
                     is_child_valid = element_counter_and_validity["is_valid"]
                     if eager_termination and not is_child_valid:
                         return element_counter_and_validity
                     element_path = ".".join(element_hierarchy)
                     children_status[element_path] = is_child_valid
                     if not is_child_valid:
-                        om.add_warning("Invalid nested element found", f"{element_path}", info_map)
+                        om.add_warning("Validation: invalid nested element found", f"{element_path}", info_map)
                         false_counter += 1
                     element_hierarchy.remove(nested_key)
 
@@ -414,34 +437,41 @@ class InputManager:
             try:
                 input_data_value = reduce(lambda d, key: d[key], element_hierarchy, input_data)
             except KeyError:
-                om.add_error("Key not found in input data", f"Key {var_name} not found in input data.", info_map)
+                om.add_error("Validation: key not found in input data", f"Key {var_name} not found in input data.",
+                             info_map)
                 input_data_value = None
 
-            is_valid = self._validate_input_type_dynamic(variable_properties, var_name, input_data_value)
+            is_valid = self._validate_input_type_dynamic(variable_properties, var_name, input_data_value,
+                                                         properties_blob_key)
 
             element_counter_and_validity["total_elements"] += 1
             if is_valid:
                 element_counter_and_validity["valid_elements"] += 1
                 return element_counter_and_validity
             else:
-                is_fixed = self._fix_data(variable_properties, element_hierarchy, input_data)
+                is_fixed = self._fix_data(variable_properties, element_hierarchy, input_data, properties_blob_key)
                 if is_fixed:
                     element_counter_and_validity["fixed_elements"] += 1
                 else:
-                    om.add_warning("Invalid unfixable element found",
-                                   f"{var_name} was invalid and could not be fixed", info_map)
+                    om.add_warning("Validation: invalid unfixable element found",
+                                   f"Variable: '{var_name}' was invalid and could not be fixed", info_map)
                     element_counter_and_validity["invalid_elements"] += 1
                     element_counter_and_validity["is_valid"] = False
                 return element_counter_and_validity
 
-    def _array_type_validator(self, variable_properties: Dict[str, Any], var_name: str, input_data_value: list) -> bool:
+    def _array_type_validator(self, variable_properties: Dict[str, Any], var_name: str, input_data_value: list,
+                              properties_blob_key: str) -> bool:
         """Validates an input data element of type array."""
         info_map = {"class": self.__class__.__name__,
                     "function": self._array_type_validator.__name__,
                     }
+        properties_violation_message = f"Violates properties defined in metadata properties section" \
+                                       f" '{properties_blob_key}'."
         if type(input_data_value) is not list:
-            warning_string = "Array is not a list."
-            om.add_warning(warning_string, f"{var_name=}", info_map)
+            warning_string = "Validation: array is not a list"
+            warning_message = f"Variable: '{var_name}' is type: {type(input_data_value)}. " \
+                              f"{properties_violation_message}"
+            om.add_warning(warning_string, warning_message, info_map)
             return False
 
         maximum_length = variable_properties.get("maximum_length")
@@ -449,60 +479,79 @@ class InputManager:
         if minimum_length is not None:
             is_in_range = variable_properties["minimum_length"] <= len(input_data_value)
             if not is_in_range:
-                warning_string = f"Array length less than {minimum_length}."
-                om.add_warning(warning_string, f"{var_name=}", info_map)
+                warning_name = "Validation: array length less than minimum"
+                warning_message = f"Variable: '{var_name}' has length: {len(input_data_value)}, less than minimum " \
+                                  f"length: {minimum_length}. {properties_violation_message}"
+                om.add_warning(warning_name, warning_message, info_map)
                 return False
         if maximum_length is not None:
             is_in_range = len(input_data_value) <= variable_properties["maximum_length"]
             if not is_in_range:
-                warning_string = f"Array length more than {maximum_length}."
-                om.add_warning(warning_string, f"{var_name=}", info_map)
+                warning_name = "Validation: array length greater than maximum"
+                warning_message = f"Variable: '{var_name}' has length: {len(input_data_value)}, greater than " \
+                                  f"maximum length: {maximum_length}. {properties_violation_message}"
+                om.add_warning(warning_name, warning_message, info_map)
                 return False
         return True
 
     def _num_type_validator(self, variable_properties: Dict[str, Any], var_name: str,
-                            input_data_value: Union[int, float]) -> bool:
+                            input_data_value: Union[int, float], properties_blob_key: str) -> bool:
         """Validates an input data number element."""
         info_map = {"class": self.__class__.__name__,
                     "function": self._num_type_validator.__name__,
                     }
         minimum_value = variable_properties.get("minimum")
         maximum_value = variable_properties.get("maximum")
+        properties_violation_message = f"Violates properties defined in metadata properties section" \
+                                       f" '{properties_blob_key}'."
         if type(input_data_value) is not float and type(input_data_value) is not int:
-            warning_string = "Value is not a number."
-            om.add_warning(warning_string, f"{var_name=}", info_map)
+            warning_string = "Validation: value is not a number"
+            warning_message = f"Variable: '{var_name}' has value: {input_data_value}, is type: " \
+                              f"{type(input_data_value)}. {properties_violation_message}"
+            om.add_warning(warning_string, warning_message, info_map)
             return False
         if minimum_value is not None:
             is_in_range = minimum_value <= input_data_value
             if not is_in_range:
-                warning_string = f"Value less than {minimum_value}."
-                om.add_warning(warning_string, f"{var_name=}", info_map)
+                warning_name = "Validation: value less than minimum"
+                warning_message = f"Variable: '{var_name}' has value: {input_data_value}, less than minimum value: " \
+                                  f"{minimum_value: .2f}. {properties_violation_message}"
+                om.add_warning(warning_name, warning_message, info_map)
                 return False
         if maximum_value is not None:
             is_in_range = input_data_value <= maximum_value
             if not is_in_range:
-                warning_string = f"Value greater than {maximum_value}."
-                om.add_warning(warning_string, f"{var_name=}", info_map)
+                warning_name = "Validation: value greater than maximum"
+                warning_string = f"Variable: '{var_name}' has value: {input_data_value}, greater than maximum value: " \
+                                 f"{maximum_value: .2f}. {properties_violation_message}"
+                om.add_warning(warning_name, warning_string, info_map)
                 return False
 
         return True
 
-    def _string_type_validator(self, variable_properties: Dict[str, Any], var_name: str, input_data_value: str) -> bool:
+    def _string_type_validator(self, variable_properties: Dict[str, Any], var_name: str, input_data_value: str,
+                               properties_blob_key: str) -> bool:
         """Validates an input data string element."""
         info_map = {"class": self.__class__.__name__,
                     "function": self._string_type_validator.__name__,
                     }
+        properties_violation_message = f"Violates properties defined in metadata properties section" \
+                                       f" '{properties_blob_key}'."
         if type(input_data_value) is not str:
-            warning_string = "String variable is not a string."
-            om.add_warning(warning_string, f"{var_name=}", info_map)
+            warning_name = "Validation: string variable is not a string"
+            warning_message = f"Variable: '{var_name}' has value: {input_data_value}, is type: " \
+                              f"{type(input_data_value)}. {properties_violation_message}"
+            om.add_warning(warning_name, warning_message, info_map)
             return False
 
         pattern_check = variable_properties.get("pattern")
         if pattern_check is not None:
             is_valid_string = bool(re.match(pattern_check, input_data_value))
             if not is_valid_string:
-                warning_string = f"String variable must match pattern {variable_properties['pattern']}."
-                om.add_warning(warning_string, f"{var_name=}", info_map)
+                warning_name = "Validation: string variable does not match pattern"
+                warning_message = f"Variable: '{var_name}' has value: '{input_data_value}', does not match pattern: " \
+                                  f"{pattern_check}. {properties_violation_message}"
+                om.add_warning(warning_name, warning_message, info_map)
                 return False
 
         minimum_length = variable_properties.get("minimum_length")
@@ -510,24 +559,41 @@ class InputManager:
         if minimum_length is not None:
             is_valid_string = variable_properties["minimum_length"] <= len(input_data_value)
             if not is_valid_string:
-                warning_string = f"String length less than {minimum_length}."
-                om.add_warning(warning_string, f"{var_name=}", info_map)
+                warning_name = "Validation: string length less than minimum"
+                warning_message = f"Variable: '{var_name}' has value: '{input_data_value}', length is less than " \
+                                  f"minimum length: {minimum_length}. {properties_violation_message}"
+                om.add_warning(warning_name, warning_message, info_map)
                 return False
         if maximum_length is not None:
             is_valid_string = len(input_data_value) <= variable_properties["maximum_length"]
             if not is_valid_string:
-                warning_string = f"String length more than {maximum_length}."
-                om.add_warning(warning_string, f"{var_name=}", info_map)
+                warning_name = "Validation: string length greater than maximum"
+                warning_message = f"Variable: '{var_name}' has value: '{input_data_value}', length is greater than " \
+                                  f"maximum length: {maximum_length}. {properties_violation_message}"
+                om.add_warning(warning_name, warning_message, info_map)
                 return False
 
         return True
 
-    def _bool_type_validator(self, variable_properties: Dict[str, Any], var_name: str, input_data_value: bool) -> bool:
+    def _bool_type_validator(self, variable_properties: Dict[str, Any], var_name: str, input_data_value: bool,
+                             properties_blob_key: str) -> bool:
         """Validates an input data bool element."""
+        info_map = {"class": self.__class__.__name__,
+                    "function": self._bool_type_validator.__name__,
+                    }
+        properties_violation_message = f"Violates properties defined in metadata properties section" \
+                                       f" '{properties_blob_key}'."
+        if type(input_data_value) is not bool:
+            warning_name = "Validation: bool variable is not a bool"
+            warning_message = f"Variable: '{var_name}' has value: '{input_data_value}', is type: " \
+                              f"'{type(input_data_value)}'. {properties_violation_message}"
+            om.add_warning(warning_name, warning_message, info_map)
+            return False
+
         return input_data_value in (True, False)
 
     def _fix_data(self, variable_properties: Dict[str, Any], element_hierarchy: List[Union[str, int]],
-                  input_data: Dict[str, Any]) -> bool:
+                  input_data: Dict[str, Any], properties_blob_key: str) -> bool:
         """
         Attempt to fix the invalid data.
 
@@ -542,6 +608,9 @@ class InputManager:
         input_data: dict[str, Any]
             A buffer dictionary that holds the input data for validation and fixing.
 
+        properties_blob_key : str
+            The metadata properties section keyword for the data input file being checked.
+
         Returns
         -------
         bool
@@ -551,14 +620,31 @@ class InputManager:
                     "function": self._fix_data.__name__,
                     }
 
-        if 'default' not in variable_properties.keys():
-            return False
         variable_parent = reduce(lambda d, key: d[key], element_hierarchy[:-1],
                                  input_data)
-        variable_parent[element_hierarchy[-1]] = variable_properties['default']
-        om.add_warning("Data fixed",
-                       f"Invalid data fixed: {element_hierarchy[-1]} => {variable_properties['default']}",
+
+        element_path = ".".join([str(element) for element in element_hierarchy])
+        properties_violation_message = f"Violates properties defined in metadata properties section" \
+                                       f" '{properties_blob_key}'."
+        if 'default' not in variable_properties.keys():
+            error_message = f"Variable: '{element_path}' has invalid value: {variable_parent[element_hierarchy[-1]]}" \
+                            f", and cannot be changed to a default value. {properties_violation_message}"
+            om.add_error("Validation: invalid data not able to be fixed", error_message, info_map)
+            return False
+
+        original_invalid_value = variable_parent[element_hierarchy[-1]]
+        warning_message = f"Variable: '{element_path}' has value: {original_invalid_value}. " \
+                          f"{properties_violation_message}"
+        om.add_warning("Validation: invalid data found",
+                       warning_message,
                        info_map)
+
+        variable_parent[element_hierarchy[-1]] = variable_properties['default']
+
+        warning_message = f"Invalid data fixed: '{element_path}' value changed from {original_invalid_value} to " \
+                          f"{variable_properties['default']}. Fix enabled by default value specified in " \
+                          f"'{properties_blob_key}'."
+        om.add_warning("Validation: data fixed", warning_message, info_map)
         return True
 
     def get_data(self, data_address: str) -> Any:
@@ -621,9 +707,9 @@ class InputManager:
             invalid_key = str(key_error).strip("\'")
             parent_address = str(data_address.split("." + invalid_key)[0])
 
-            om.add_error("Data not found:", f"Cannot find \"{data_address}\", "
-                                            f"\"{parent_address}\" does not have attribute \"{invalid_key}\".",
-                                            info_map)
+            om.add_error("Validation: data not found:", f"Cannot find \"{data_address}\", "
+                         f"\"{parent_address}\" does not have attribute \"{invalid_key}\".",
+                         info_map)
 
             raise KeyError(f"Data not found: Cannot find \"{data_address}\", "
                            f"\"{parent_address}\" does not have attribute \"{invalid_key}\".")
@@ -687,9 +773,9 @@ class InputManager:
             invalid_key = element_hierarchy[-1]
             parent_address = ".".join(element_hierarchy[:-1])
 
-            om.add_error("Data not found:", f"Cannot find \"{metadata_address}\", "
-                                            f"\"{parent_address}\" does not have attribute \"{invalid_key}\".",
-                                            info_map)
+            om.add_error("Validation: data not found:", f"Cannot find \"{metadata_address}\", "
+                         f"\"{parent_address}\" does not have attribute \"{invalid_key}\".",
+                         info_map)
 
             raise KeyError(f"Data not found: Cannot find \"{metadata_address}\", "
                            f"\"{parent_address}\" does not have attribute \"{invalid_key}\".")
