@@ -157,16 +157,10 @@ class TillageApplication:
                 break
             elif layer_partially_tilled:
                 tilled_depth = tillage_depth - layer.top_depth
-                if is_passive_carbon_pool:
-                    layer_redistribution_fraction = tilled_depth / (tillage_depth - top_layer_offset)
-                else:
-                    layer_redistribution_fraction = tilled_depth / tillage_depth
+                layer_redistribution_fraction = tilled_depth / (tillage_depth - top_layer_offset)
                 fraction_of_layer_mixed = tilled_depth / layer.layer_thickness
             else:
-                if is_passive_carbon_pool:
-                    layer_redistribution_fraction = layer.layer_thickness / (tillage_depth - top_layer_offset)
-                else:
-                    layer_redistribution_fraction = layer.layer_thickness / tillage_depth
+                layer_redistribution_fraction = layer.layer_thickness / (tillage_depth - top_layer_offset)
                 fraction_of_layer_mixed = 1.0
             redistribution_fractions.append(layer_redistribution_fraction)
 
