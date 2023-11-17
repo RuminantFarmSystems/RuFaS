@@ -975,7 +975,8 @@ class OutputManager(object):
         self, data_dict: Dict[str, Any], filter_name: str, path: str
     ) -> None:
         """
-        Saves the variables_pool into one csv file per variable in the given path to a directory.
+        Saves the data_dict into a single CSV file in the specified path. If the directory at the given path 
+        does not exist, it is created.
 
         Parameters
         ----------
@@ -989,8 +990,8 @@ class OutputManager(object):
         """
         try:
             Path(path).mkdir(parents=True, exist_ok=True)
-        except Exception as e:
-            raise e
+        except Exception:
+            raise
 
         variable_csv_file_path = os.path.join(
             path, self._generate_file_name(f"saved_variables_{filter_name}", "csv")
