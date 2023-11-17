@@ -106,10 +106,64 @@ class TillageApplication:
                                  "ammonium_content",
                                  "active_organic_nitrogen_content",
                                  "stable_organic_nitrogen_content",
-                                 "fresh_organic_nitrogen_content"]
+                                 "fresh_organic_nitrogen_content",
+                                 "metabolic_litter_amount",
+                                 "structural_litter_amount",
+                                 "active_carbon_amount",
+                                 "slow_carbon_amount"]
         for pool in pools_to_till_in_soil:
             self._mix_soil_layers(pool, tillage_depth, mixing_fraction)
+        self._mix_passive_carbon(tillage_depth, mixing_fraction)
         self._record_tillage(tillage_depth, incorporation_fraction, mixing_fraction, year, day)
+
+    def _mix_passive_carbon(self, tillage_depth: float, mixing_fraction: float) -> None:
+        """
+        Redistributes matter from the passive carbon pool between subsurface layers of the soil profile.
+
+        Parameters
+        ----------
+        tillage_depth : float
+            The lowest depth the tilling implement reaches (mm)
+        mixing_fraction : float
+            Fraction taken from each layer that is mixed and redistributed back into the soil profile (unitless)
+
+        References
+        ----------
+        SWAT Theoretical documentation. # TODO add specific documentation ref
+        """
+        pool_name = "passive_carbon_amount"
+        redistribution_fractions = []
+        total_to_mix_from_pools = 0
+        for layer in self.soil_data.soil_layers:
+            layer_not_tilled = layer.top_depth >= tillage_depth  # checks whether the layer is tilled based on the tillage depth reaching the top depth of the layer
+            layer_partially_tilled = layer.bottom_depth > tillage_depth  # checks if layer is only partially tilled because tillage depth doesn't reach bottom of layer
+            if layer_not_tilled:  # break if the layer isn't tilled at all
+                break
+            elif layer_partially_tilled:
+                tilled_depth = tillage_depth - layer.top_depth  # get how much of partial layer is tilled
+                layer_redistribution_fraction = tilled_depth / tillage_depth  # get the fraction of the redistribution for the partially tilled layer
+                fraction_of_layer_mixed = tilled_depth / layer.layer_thickness  # calculate the fraction of the layer mixed
+            else:
+                layer_redistribution_fraction = layer.layer_thickness / tillage_depth  # calculate redistribution factor
+                fraction_of_layer_mixed = 1.0  # set fraction mixed as 100%
+            redistribution_fractions.append(layer_redistribution_fraction)  # add the layer distribution fraction
+
+            current_pool_amount = getattr(layer, pool_name)  # for the layer, get the current amount of passive carbon
+            amount_to_remove = current_pool_amount * mixing_fraction * fraction_of_layer_mixed  # remove the appropriate fraction from the layer
+            unmixed_amount_in_pool = current_pool_amount - amount_to_remove
+            setattr(layer, pool_name, unmixed_amount_in_pool)
+            total_to_mix_from_pools += amount_to_remove
+
+        number_of_tilled_layers = len(redistribution_fractions)
+        for layer_index in range(number_of_tilled_layers):
+            layer = self.soil_data.soil_layers[layer_index]
+            layer_fraction = redistribution_fractions[layer_index]
+
+            amount_to_add = total_to_mix_from_pools * layer_fraction
+
+            amount_in_pool = getattr(layer, pool_name)
+            new_pool_amount = amount_in_pool + amount_to_add
+            setattr(layer, pool_name, new_pool_amount)
 
     def _mix_soil_layers(self, pool_name: str, tillage_depth: float, mixing_fraction: float) -> None:
         """
