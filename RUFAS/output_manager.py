@@ -842,7 +842,7 @@ class OutputManager(object):
         elif filter_file.startswith(self.__supported_filter_types_prefixes["graph"]):
             if produce_graphics:
                 try:
-                    graph_generator = GraphGenerator()
+                    graph_generator = GraphGenerator(self.__metadata_prefix)
                     graph_generator.generate_graph(
                         filtered_pool,
                         filter_content,
@@ -981,7 +981,7 @@ class OutputManager(object):
 
     @deprecated(
         reason="""This function is still in the code base but it is not used. We want to keep it for debugging purposes
-        when save_variables() is not working.""",
+        when save_results() is not working.""",
         version="MVP",
     )
     def dump_variables(self, path: str, exclude_info_maps: bool = False) -> None:
