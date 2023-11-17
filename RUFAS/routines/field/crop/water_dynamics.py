@@ -25,6 +25,9 @@ class WaterDynamics:
                                                self.data.cumulative_transpiration)
         self.data.water_deficiency = self._determine_water_deficiency(self.data.cumulative_evapotranspiration,
                                                                       self.data.cumulative_potential_evapotranspiration)
+        actual_transpiration = min(self.data.water_content, self.data.max_transpiration)
+        self.data.actual_transpiration = actual_transpiration
+        self.data.water_content -= actual_transpiration
 
     def evaporate_from_canopy(self, potential_evapotranspiration: float) -> float:
         """Evaporates water from the canopy.
