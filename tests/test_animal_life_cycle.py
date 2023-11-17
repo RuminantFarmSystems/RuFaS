@@ -1194,8 +1194,6 @@ def test_calc_cull_reason_stats_percent(mocker: MockerFixture, life_cycle_manage
             assert life_cycle_manager.cull_reason_stats_percent[cull_reason] == \
                    approx(life_cycle_manager.cull_reason_stats[cull_reason] * 100.0 / cow_herd_exit_num)
         elif cow_herd_exit_num == 0:
-                   approx(life_cycle_manager.cull_reason_stats[cull_reason] * 100.0 / culled_cow_num)
-        elif culled_cow_num == 0:
             assert life_cycle_manager.cull_reason_stats_percent[cull_reason] == approx(0.0)
 
 
