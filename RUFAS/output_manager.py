@@ -893,8 +893,11 @@ class OutputManager(object):
             )
             return
         number_of_elements = len(report_data[next(iter(report_data))])
+        # TODO: get horizontal_aggregator and vertical_aggregator from the filter
         horizontal_aggregator = self.horizontal_aggregator
         vertical_aggregator = self.vertical_aggregator
+        # TODO: right now we are assuming both horizontal_aggregator and vertical_aggregator are requested,
+        # whatif only one of them is needed?
         if filter_content.get("horizontal_first"):
             horinzontally_aggregated: List[Any] = []
             for index_counter in range(number_of_elements):
