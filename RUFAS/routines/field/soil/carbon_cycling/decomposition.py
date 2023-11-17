@@ -23,37 +23,31 @@ class Decomposition:
         """
         self.data = soil_data or SoilData(field_size=field_size)
 
-    def decompose(self, temp_average: float) -> None:
+    def decompose(self) -> None:
         """
         Determines decomposition effect for each layer and temperature effect.
-
-        Parameters
-        ----------
-        temp_average : float
-            Average temperature (Celsius).
 
         Returns
         -------
         None
         """
-        self.data.decomposition_temperature_effect = self._calc_temp_factor(temp_average)
-
         for layer in self.data.soil_layers:
             layer.decomposition_moisture_effect = self._calc_moisture_factor(layer.water_factor)
+            layer.decomposition_temperature_effect = self._calc_temp_factor(layer.temperature)
 
     @staticmethod
-    def _calc_temp_factor(temp_average, x_inflection: float = 15.4, y_inflection: float = 11.75,
+    def _calc_temp_factor(layer_temp, x_inflection: float = 15.4, y_inflection: float = 11.75,
                           point_distance: float = 29.7, inflection_slope=0.03,
                           normalizer=20.80546) -> float:
         """
-        Calculate the temperature factor for carbon decomposition.
+        Calculate the temperature factor for each layer.
 
         This function implements the "pseudocode_soil" S.6.A.1 and uses defaults drawn from defac: course soil.
 
         Parameters
         ----------
-        temp_average : float
-            Average temperature (Celsius).
+        layer_temp : float
+            Temperature of the layer (Celsius).
 
         Returns
         -------
@@ -67,7 +61,7 @@ class Decomposition:
         """
         # S.6.A.4
         temp_factor = (y_inflection + (point_distance / math.pi) * math.atan(math.pi * inflection_slope * (
-                       temp_average - x_inflection))) / normalizer
+                layer_temp - x_inflection))) / normalizer
         return max(0.0, temp_factor)
 
     @staticmethod
