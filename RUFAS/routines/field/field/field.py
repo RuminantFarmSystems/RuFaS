@@ -1375,3 +1375,5 @@ class Field:
                     "prefix": f"field='{self.field_data.name}'", "date": {"year": year, "day": day},
                     "field_size": self.field_data.field_size, "units": "mm"}
         om.add_variable("field_watering", watering_amount, info_map)
+
+    # </editor-fold>
