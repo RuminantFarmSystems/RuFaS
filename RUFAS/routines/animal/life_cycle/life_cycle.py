@@ -95,7 +95,7 @@ class LifeCycleManager:
         self.sold_heiferIII_oversupply_num = 0
         self.bought_heifer_num = 0
         self.sold_heiferII_num = 0
-        self.sold_and_died_cow_num = 0
+        self.cow_herd_exit_num = 0
 
         self.calf_percent = 0.0
         self.heiferI_percent = 0.0
@@ -308,7 +308,7 @@ class LifeCycleManager:
 
         life_cycle_daily_herd_update_keys = ["calf_num", "heiferI_num", "heiferII_num", "heiferIII_num", "cow_num",
                                              "sold_heiferIII_oversupply_num", "bought_heifer_num", "sold_heiferII_num",
-                                             "sold_and_died_cow_num", "GnRH_injection_num_h", "GnRH_injection_num",
+                                             "cow_herd_exit_num", "GnRH_injection_num_h", "GnRH_injection_num",
                                              "PGF_injection_num", "PGF_injection_num_h", "ai_num", "preg_check_num",
                                              "preg_check_num_h", "sold_calf_num", "daily_milk_production",
                                              "open_cow_num", "vwp_cow_num", "preg_cow_num", "milking_cow_num",
@@ -343,7 +343,7 @@ class LifeCycleManager:
         self.sold_heiferIII_oversupply_num = 0
         self.bought_heifer_num = 0
         self.sold_heiferII_num = 0
-        self.sold_and_died_cow_num = 0
+        self.cow_herd_exit_num = 0
 
         self.calf_percent = 0.0
         self.heiferI_percent = 0.0
@@ -769,8 +769,8 @@ class LifeCycleManager:
 
         parity = cow.calves if cow.calves <= 3 else '4+'
         self.parity_culling_stats_range[parity] += 1
-        self.sold_and_died_cow_num, self.avg_cow_culling_age = \
-            Utility.calc_average(self.sold_and_died_cow_num, self.avg_cow_culling_age, cow.days_born)
+        self.cow_herd_exit_num, self.avg_cow_culling_age = \
+            Utility.calc_average(self.cow_herd_exit_num, self.avg_cow_culling_age, cow.days_born)
 
     def _handle_cow_body_weight_and_parity(self, cow: Cow, total_animal_num: int) -> int:
         """Adjusts the average cow body weight, average parity number, and average mature body weight
@@ -924,7 +924,7 @@ class LifeCycleManager:
 
     def _calculate_cull_reason_stats_percent(self) -> None:
         """Calculates the percentage of culled cows for each cull reason."""
-        denominator = self.sold_and_died_cow_num if self.sold_and_died_cow_num > 0 else 1
+        denominator = self.cow_herd_exit_num if self.cow_herd_exit_num > 0 else 1
         pc = Utility.percent_calculator(denominator)
         for cull_reason in LifeCycleManager.cull_reason_stats:
             self.cull_reason_stats_percent[cull_reason] = pc(LifeCycleManager.cull_reason_stats[cull_reason])

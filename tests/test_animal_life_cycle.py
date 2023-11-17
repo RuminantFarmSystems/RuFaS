@@ -801,7 +801,7 @@ def test_cull_cow(mocker: MockerFixture, life_cycle_manager: LifeCycleManager) -
     life_cycle_manager.parity_culling_stats_range = collections.defaultdict(int)
 
     mock_cow.days_born = 100
-    life_cycle_manager.sold_and_died_cow_num = 0
+    life_cycle_manager.cow_herd_exit_num = 0
     life_cycle_manager.avg_cow_culling_age = 0
 
     # Assert before
@@ -824,7 +824,7 @@ def test_cull_cow(mocker: MockerFixture, life_cycle_manager: LifeCycleManager) -
     assert parity in life_cycle_manager.parity_culling_stats_range
     assert life_cycle_manager.parity_culling_stats_range[parity] == 1
 
-    assert life_cycle_manager.sold_and_died_cow_num == 1
+    assert life_cycle_manager.cow_herd_exit_num == 1
     assert life_cycle_manager.avg_cow_culling_age == approx(100.0)
 
 
@@ -1162,25 +1162,25 @@ def test_calc_cow_percentages(mocker: MockerFixture, life_cycle_manager: LifeCyc
         assert life_cycle_manager.non_preg_cow_percent == approx(0.0)
 
 
-@pytest.mark.parametrize('sold_and_died_cow_num', [0, 50, 100])
+@pytest.mark.parametrize('cow_herd_exit_num', [0, 50, 100])
 def test_calc_cull_reason_stats_percent(mocker: MockerFixture, life_cycle_manager: LifeCycleManager,
-                                        sold_and_died_cow_num: int) -> None:
+                                        cow_herd_exit_num: int) -> None:
     """Unit test for function _calculate_cull_reason_stats_percent() in file life_cycle.py."""
     # Arrange
-    life_cycle_manager.sold_and_died_cow_num = sold_and_died_cow_num
+    life_cycle_manager.cow_herd_exit_num = cow_herd_exit_num
     num_reasons = len(LifeCycleManager.cull_reason_stats)
     LifeCycleManager.cull_reason_stats.update({
-        animal_constants.DEATH_CULL: int(sold_and_died_cow_num / num_reasons),
-        animal_constants.LOW_PROD_CULL: int(sold_and_died_cow_num / num_reasons),
-        animal_constants.LAMENESS_CULL: int(sold_and_died_cow_num / num_reasons),
-        animal_constants.INJURY_CULL: int(sold_and_died_cow_num / num_reasons),
-        animal_constants.MASTITIS_CULL: int(sold_and_died_cow_num / num_reasons),
-        animal_constants.DISEASE_CULL: int(sold_and_died_cow_num / num_reasons),
-        animal_constants.UDDER_CULL: int(sold_and_died_cow_num / num_reasons),
+        animal_constants.DEATH_CULL: int(cow_herd_exit_num / num_reasons),
+        animal_constants.LOW_PROD_CULL: int(cow_herd_exit_num / num_reasons),
+        animal_constants.LAMENESS_CULL: int(cow_herd_exit_num / num_reasons),
+        animal_constants.INJURY_CULL: int(cow_herd_exit_num / num_reasons),
+        animal_constants.MASTITIS_CULL: int(cow_herd_exit_num / num_reasons),
+        animal_constants.DISEASE_CULL: int(cow_herd_exit_num / num_reasons),
+        animal_constants.UDDER_CULL: int(cow_herd_exit_num / num_reasons),
         animal_constants.UNKNOWN_CULL: 0  # Initialized with 0
     })
     LifeCycleManager.cull_reason_stats[animal_constants.UNKNOWN_CULL] = \
-        sold_and_died_cow_num - sum(LifeCycleManager.cull_reason_stats.values())
+        cow_herd_exit_num - sum(LifeCycleManager.cull_reason_stats.values())
 
     spy_calc_cull_reason_stats_percent = mocker.spy(life_cycle_manager, '_calculate_cull_reason_stats_percent')
 
@@ -1190,10 +1190,10 @@ def test_calc_cull_reason_stats_percent(mocker: MockerFixture, life_cycle_manage
     # Assert
     spy_calc_cull_reason_stats_percent.assert_called_once()
     for cull_reason in life_cycle_manager.cull_reason_stats_percent:
-        if sold_and_died_cow_num > 0:
+        if cow_herd_exit_num > 0:
             assert life_cycle_manager.cull_reason_stats_percent[cull_reason] == \
-                   approx(LifeCycleManager.cull_reason_stats[cull_reason] * 100.0 / sold_and_died_cow_num)
-        elif sold_and_died_cow_num == 0:
+                   approx(LifeCycleManager.cull_reason_stats[cull_reason] * 100.0 / cow_herd_exit_num)
+        elif cow_herd_exit_num == 0:
             assert life_cycle_manager.cull_reason_stats_percent[cull_reason] == approx(0.0)
 
 
@@ -1344,7 +1344,7 @@ def test_reset_daily_stats(life_cycle_manager: LifeCycleManager) -> None:
     life_cycle_manager.sold_heiferIII_oversupply_num = 7
     life_cycle_manager.bought_heifer_num = 8
     life_cycle_manager.sold_heiferII_num = 9
-    life_cycle_manager.sold_and_died_cow_num = 10
+    life_cycle_manager.cow_herd_exit_num = 10
 
     life_cycle_manager.calf_percent = 11.0
     life_cycle_manager.heiferI_percent = 12.0
@@ -1402,7 +1402,7 @@ def test_reset_daily_stats(life_cycle_manager: LifeCycleManager) -> None:
     assert life_cycle_manager.sold_heiferIII_oversupply_num == 0
     assert life_cycle_manager.bought_heifer_num == 0
     assert life_cycle_manager.sold_heiferII_num == 0
-    assert life_cycle_manager.sold_and_died_cow_num == 0
+    assert life_cycle_manager.cow_herd_exit_num == 0
 
     assert life_cycle_manager.calf_percent == approx(0.0)
     assert life_cycle_manager.heiferI_percent == approx(0.0)
