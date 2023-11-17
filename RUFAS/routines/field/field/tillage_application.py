@@ -114,7 +114,6 @@ class TillageApplication:
                                  "passive_carbon_amount"]
         for pool in pools_to_till_in_soil:
             self._mix_soil_layers(pool, tillage_depth, mixing_fraction)
-        self._mix_passive_carbon(tillage_depth, mixing_fraction)
         self._record_tillage(tillage_depth, incorporation_fraction, mixing_fraction, year, day)
 
     def _mix_soil_layers(self, pool_name: str, tillage_depth: float, mixing_fraction: float) -> None:
