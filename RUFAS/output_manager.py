@@ -891,10 +891,21 @@ class OutputManager(object):
             )
             return
         number_of_elements = len(report_data[next(iter(report_data))])
-        for i in range(number_of_elements):
-            ith_element = [lst[i] for lst in report_data.values()]
-            print(ith_element)
-            # average
+        horizontal_aggregator = self.horizontal_aggregator
+        vertical_aggregator = self.vertical_aggregator
+        if filter_content.get("horizontal_first"):
+            horinzontally_aggregated: List[Any] = []
+            for index_counter in range(number_of_elements):
+                horizon = {
+                    key: report_data[key][index_counter] for key in report_data.keys()
+                }
+                horinzontally_aggregated.append(horizontal_aggregator(horizon))
+
+    def horizontal_aggregator(self, x):
+        pass
+
+    def vertical_aggregator(self, x):
+        pass
 
     def _prepare_report_data(
         self,
