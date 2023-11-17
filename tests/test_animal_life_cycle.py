@@ -619,11 +619,11 @@ def test_check_if_heifers_need_to_be_sold(mocker: MockerFixture,
     mock_cows: List[Cow] = [mocker.MagicMock(autospec=Cow)] * 50
     animals_removed = []
     life_cycle_manager.sold_heiferIIIs = []
-    life_cycle_manager.sold_heiferIII_num = 0
+    life_cycle_manager.sold_heiferIII_oversupply_num = 0
 
     # Assert before
     assert len(life_cycle_manager.sold_heiferIIIs) == 0
-    assert life_cycle_manager.sold_heiferIII_num == 0
+    assert life_cycle_manager.sold_heiferIII_oversupply_num == 0
 
     # Act
     life_cycle_manager._check_if_heifers_need_to_be_sold(mock_heiferIIIs, mock_cows, animals_removed)
@@ -632,7 +632,7 @@ def test_check_if_heifers_need_to_be_sold(mocker: MockerFixture,
     assert len(mock_heiferIIIs) == 53
     assert len(mock_cows) == 50
     assert len(life_cycle_manager.sold_heiferIIIs) == 2
-    assert life_cycle_manager.sold_heiferIII_num == 2
+    assert life_cycle_manager.sold_heiferIII_oversupply_num == 2
     assert len(animals_removed) == 2
     # ---------------------------------------------------------------
 
@@ -647,11 +647,11 @@ def test_check_if_heifers_need_to_be_sold(mocker: MockerFixture,
     mock_cows: List[Cow] = [mocker.MagicMock(autospec=Cow)] * 50
     animals_removed = []
     life_cycle_manager.sold_heiferIIIs = []
-    life_cycle_manager.sold_heiferIII_num = 0
+    life_cycle_manager.sold_heiferIII_oversupply_num = 0
 
     # Assert before
     assert len(life_cycle_manager.sold_heiferIIIs) == 0
-    assert life_cycle_manager.sold_heiferIII_num == 0
+    assert life_cycle_manager.sold_heiferIII_oversupply_num == 0
 
     # Act
     life_cycle_manager._check_if_heifers_need_to_be_sold(mock_heiferIIIs, mock_cows, animals_removed)
@@ -660,7 +660,7 @@ def test_check_if_heifers_need_to_be_sold(mocker: MockerFixture,
     assert len(mock_heiferIIIs) == 53
     assert len(mock_cows) == 50
     assert len(life_cycle_manager.sold_heiferIIIs) == 0
-    assert life_cycle_manager.sold_heiferIII_num == 0
+    assert life_cycle_manager.sold_heiferIII_oversupply_num == 0
     assert len(animals_removed) == 0
     # ---------------------------------------------------------------
 
@@ -671,11 +671,11 @@ def test_check_if_heifers_need_to_be_sold(mocker: MockerFixture,
     mock_cows: List[Cow] = [mocker.MagicMock(autospec=Cow)] * 104
     animals_removed = []
     life_cycle_manager.sold_heiferIIIs = []
-    life_cycle_manager.sold_heiferIII_num = 0
+    life_cycle_manager.sold_heiferIII_oversupply_num = 0
 
     # Assert before
     assert len(life_cycle_manager.sold_heiferIIIs) == 0
-    assert life_cycle_manager.sold_heiferIII_num == 0
+    assert life_cycle_manager.sold_heiferIII_oversupply_num == 0
 
     # Act
     life_cycle_manager._check_if_heifers_need_to_be_sold(mock_heiferIIIs, mock_cows, animals_removed)
@@ -684,7 +684,7 @@ def test_check_if_heifers_need_to_be_sold(mocker: MockerFixture,
     assert len(mock_heiferIIIs) == 0
     assert len(mock_cows) == 104
     assert len(life_cycle_manager.sold_heiferIIIs) == 0
-    assert life_cycle_manager.sold_heiferIII_num == 0
+    assert life_cycle_manager.sold_heiferIII_oversupply_num == 0
     assert len(animals_removed) == 0
 
 
@@ -1341,7 +1341,7 @@ def test_reset_daily_stats(life_cycle_manager: LifeCycleManager) -> None:
     life_cycle_manager.cow_num = 5
 
     life_cycle_manager.sold_calf_num = 6
-    life_cycle_manager.sold_heiferIII_num = 7
+    life_cycle_manager.sold_heiferIII_oversupply_num = 7
     life_cycle_manager.bought_heifer_num = 8
     life_cycle_manager.sold_heiferII_num = 9
     life_cycle_manager.sold_and_died_cow_num = 10
@@ -1399,7 +1399,7 @@ def test_reset_daily_stats(life_cycle_manager: LifeCycleManager) -> None:
     assert life_cycle_manager.cow_num == 0
 
     assert life_cycle_manager.sold_calf_num == 0
-    assert life_cycle_manager.sold_heiferIII_num == 0
+    assert life_cycle_manager.sold_heiferIII_oversupply_num == 0
     assert life_cycle_manager.bought_heifer_num == 0
     assert life_cycle_manager.sold_heiferII_num == 0
     assert life_cycle_manager.sold_and_died_cow_num == 0

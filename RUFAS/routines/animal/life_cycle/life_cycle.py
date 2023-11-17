@@ -92,7 +92,7 @@ class LifeCycleManager:
         self.cow_num = 0
 
         self.sold_calf_num = 0
-        self.sold_heiferIII_num = 0
+        self.sold_heiferIII_oversupply_num = 0
         self.bought_heifer_num = 0
         self.sold_heiferII_num = 0
         self.sold_and_died_cow_num = 0
@@ -307,7 +307,7 @@ class LifeCycleManager:
                     "sim_day": sim_day, }
 
         life_cycle_daily_herd_update_keys = ["calf_num", "heiferI_num", "heiferII_num", "heiferIII_num", "cow_num",
-                                             "sold_heiferIII_num", "bought_heifer_num", "sold_heiferII_num",
+                                             "sold_heiferIII_oversupply_num", "bought_heifer_num", "sold_heiferII_num",
                                              "sold_and_died_cow_num", "GnRH_injection_num_h", "GnRH_injection_num",
                                              "PGF_injection_num", "PGF_injection_num_h", "ai_num", "preg_check_num",
                                              "preg_check_num_h", "sold_calf_num", "daily_milk_production",
@@ -340,7 +340,7 @@ class LifeCycleManager:
         self.cow_num = 0
 
         self.sold_calf_num = 0
-        self.sold_heiferIII_num = 0
+        self.sold_heiferIII_oversupply_num = 0
         self.bought_heifer_num = 0
         self.sold_heiferII_num = 0
         self.sold_and_died_cow_num = 0
@@ -675,7 +675,7 @@ class LifeCycleManager:
             removed_heiferIII = heiferIIIs.pop()
             animals_removed.append(removed_heiferIII)
             self.sold_heiferIIIs.append(removed_heiferIII)
-            self.sold_heiferIII_num += 1
+            self.sold_heiferIII_oversupply_num += 1
             self.heiferIII_num -= 1
 
     def _check_if_replacement_heifers_needed(self, sim_day: int, heiferIIIs: List[HeiferIII], cows: List[Cow],
