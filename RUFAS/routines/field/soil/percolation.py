@@ -41,6 +41,12 @@ class Percolation:
         ----------
         SWAT sections 2:3.1 and 2
         """
+        if self.data.infiltrated_water > self.data.soil_layers[0].acceptable_percolation_amount:
+            self._percolate_excess_water()
+            return
+        else:
+            self.data.soil_layers[0].water_content += self.data.infiltrated_water
+
         layer_count = len(self.data.soil_layers)
         deepest_layer = layer_count - 1
 
@@ -70,6 +76,33 @@ class Percolation:
                 self.data.vadose_zone_layer.water_content += percolated_water
             else:
                 self.data.soil_layers[layer_number].water_content += percolated_water
+
+    def _percolate_excess_water(self) -> None:
+        """
+        Percolates large amounts of infiltrated water through the entire soil profile.
+
+        Notes
+        -----
+        The amount of water allowed to infiltrate the soil on any given day is based on the available capacity of the
+        entire soil profile. So when there is an extreme amount of infiltration or there are multiple days of high
+        infiltration in a row, this method ensures that the excess water will be distributed appropriately throughout
+        the entire soil profile.
+
+        """
+        self.data.set_vectorized_layer_attribute("percolated_water", [0.0] * len(self.data.soil_layers))
+        water_remaining_to_percolate = self.data.infiltrated_water
+        for layer in self.data.soil_layers:
+            acceptable_percolation = layer.acceptable_percolation_amount
+            if water_remaining_to_percolate > acceptable_percolation:
+                layer.water_content += acceptable_percolation
+                water_remaining_to_percolate -= acceptable_percolation
+                layer.percolated_water = water_remaining_to_percolate
+            else:
+                layer.water_content += water_remaining_to_percolate
+                water_remaining_to_percolate = 0.0
+                break
+        if water_remaining_to_percolate > 0.0:
+            self.data.vadose_zone_layer.water_content += water_remaining_to_percolate
 
     # --- Static methods ---
     @staticmethod
