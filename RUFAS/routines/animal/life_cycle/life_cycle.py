@@ -326,7 +326,6 @@ class LifeCycleManager:
         life_cycle_daily_herd_update["avg_calving_to_preg_time"] = self.avg_calving_to_preg_time
 
         om.add_variable("life_cycle_daily_herd_update", life_cycle_daily_herd_update, info_map)
-        om.add_variable("died_cow_num", self.cull_reason_stats['culled for death'], info_map)
 
         return (animals_added, animals_removed, calves_born, calves, heiferIs,
                 heiferIIs, heiferIIIs, cows)
