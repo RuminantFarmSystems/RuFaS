@@ -134,18 +134,6 @@
         "pattern": "[12][019][0-9]{2}:(?:[1-9]|[1-9][0-9]|[12][0-9]{2}|3[0-5][0-9]|36[0-6])$",
         "default": "2009:100"
       },
-      "graphic_dir": {
-        "type": "string",
-        "description": "The location of the output graphics directory",
-        "pattern": ".{1,50}",
-        "default": "output/graphics/"
-      },
-      "output_dir": {
-        "type": "string",
-        "description": "The location of the output directory",
-        "pattern": ".{1,50}",
-        "default": "output/"
-      },
       "random_seed": {
         "type": "number",
         "description": "The random seed",
@@ -157,11 +145,6 @@
         "description": "Whether or not to set random seed",
         "default": true
       },
-      "csv_dir": {
-        "type": "string",
-        "description": "The path to where the CSV output files will be saved",
-        "default": "output/CSVs"
-      },
       "simulate_animals": {
         "type": "bool",
         "description": "Whether or not to simulate animals during the simulation",
@@ -170,7 +153,7 @@
       "nutrient_standard": {
         "type": "string",
         "default": "NASEM",
-        "pattern": "(NASEM|NRC)",
+        "pattern": "^(NASEM|NRC)$",
         "description": "The nutrient standard to use for feed."
       }
     },
@@ -617,6 +600,18 @@
               "description": "Standard deviation of days between calving and first estrus after calving (default is 6).",
               "minimum": 1,
               "default": 6
+            },
+            "avg_estrus_cycle_heifer": {
+              "type": "number",
+              "description": "Average length of estrus cycle for heifers (default is 21).",
+              "minimum": 1,
+              "default": 21
+            },
+            "std_estrus_cycle_heifer": {
+              "type": "number",
+              "description": "Standard deviation of the length of estrus cycle for heifers (default is 2.5).",
+              "minimum": 1,
+              "default": 2.5
             },
             "avg_estrus_cycle_cow": {
               "type": "number",
@@ -2265,6 +2260,10 @@
         "description": ""
       },
       "TDN": {
+        "type": "number",
+        "description": ""
+      },
+      "DE": {
         "type": "number",
         "description": ""
       }
