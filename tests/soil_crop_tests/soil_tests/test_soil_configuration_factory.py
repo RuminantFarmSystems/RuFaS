@@ -42,7 +42,7 @@ def test_config_factory_defaults():
     assert generic.previous_retention_parameter is None
     assert generic.average_subbasin_slope == 0.05
     assert generic.moisture_condition_parameter is None
-    assert generic.accumulated_runoff is None
+    assert generic.accumulated_runoff == 0.0
     expected_vadose_zone_layer = LayerData(top_depth=200, bottom_depth=10000000, soil_water_concentration=0,
                                            saturation_point_water_concentration=inf, field_size=1.0,
                                            initial_labile_inorganic_phosphorus_concentration=0,

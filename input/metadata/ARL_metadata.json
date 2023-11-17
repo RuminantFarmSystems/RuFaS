@@ -195,7 +195,7 @@
       "nutrient_standard": {
         "type": "string",
         "default": "NASEM",
-        "pattern": "^(NASEM|NRC)$",
+        "pattern": "(NASEM|NRC)",
         "description": "The nutrient standard to use for feed."
       }
     },
@@ -2952,6 +2952,10 @@
         "description": ""
       },
       "TDN": {
+        "type": "number",
+        "description": ""
+      },
+      "DE": {
         "type": "number",
         "description": ""
       }
