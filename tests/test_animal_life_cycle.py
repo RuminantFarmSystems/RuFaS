@@ -191,11 +191,11 @@ def test_reset_cull_reason_stats(life_cycle_manager: LifeCycleManager) -> None:
     stats = life_cycle_manager.cull_reason_stats
     num_reasons = len(stats)
     count_per_reason = 10
-    life_cycle_manager.culled_cow_num = num_reasons * count_per_reason
+    life_cycle_manager.cow_herd_exit_num = num_reasons * count_per_reason
     for cull_reason in stats:
         stats[cull_reason] = count_per_reason
         life_cycle_manager.cull_reason_stats_percent[cull_reason] = \
-            count_per_reason * 100.0 / life_cycle_manager.culled_cow_num
+            count_per_reason * 100.0 / life_cycle_manager.cow_herd_exit_num
 
     life_cycle_manager._reset_cull_reason_stats()
 
