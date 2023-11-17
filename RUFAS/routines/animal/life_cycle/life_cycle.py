@@ -274,7 +274,7 @@ class LifeCycleManager:
         animals_added: List[Cow] = []
         calves_born: List[Calf] = []
         total_animal_num = 0
-        preg_heifer_num = 0  # TODO: Seems unused after calculation
+        preg_heifer_num = 0
 
         self._reset_daily_stats()
         self._reset_parity()

@@ -95,7 +95,7 @@ def manure_calculations(ration_formulation,
                       ) * GeneralConstants.GRAMS_TO_KG
 
     # Nitrogen excretion in feces, kg [A.3B.B.3]
-    # fecal_nitrogen = manure_nitrogen - urine_nitrogen  # TODO: Unused
+    # fecal_nitrogen = manure_nitrogen - urine_nitrogen
 
     # Urinary N concentration, g N/kg [A.3G.B.1]
     urinary_nitrogen_concentration = (
