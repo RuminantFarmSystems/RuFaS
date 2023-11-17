@@ -25,6 +25,9 @@ ESTRUS_OCCURRED = "estrus occurred"
 # When simulate_estrus() is called
 ESTRUS_DAY_SCHEDULED_NOTE = "estrus day scheduled"
 
+AI_DAY_SCHEDULED_NOTE = "AI day scheduled"
+AI_PERFORMED_NOTE = "AI performed"
+
 ESTRUS_AFTER_AI_NOTE = "estrus after AI"
 ESTRUS_AFTER_ABORTION_NOTE = "estrus after abortion"
 FIRST_ESTRUS_NOTE = "first estrus"
