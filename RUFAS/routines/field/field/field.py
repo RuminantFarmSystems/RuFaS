@@ -446,21 +446,21 @@ class Field:
                                             surface_remainder_fraction=surface_remainder_fraction,
                                             year=year,
                                             day=day)
-        else:
-            supplied_nitrogen = 0.0
-            supplied_phosphorus = 0.0
-
-        unmet_nitrogen_demand = max(0.0, requested_nitrogen - supplied_nitrogen)
-        unmet_phosphorus_demand = max(0.0, requested_phosphorus - supplied_phosphorus)
-        if unmet_nitrogen_demand == 0.0 and unmet_phosphorus_demand == 0.0:
-            return
-        elif unmet_nitrogen_demand > 0.0 and unmet_phosphorus_demand == 0.0:
-            optimal_mix = self.ONLY_NITROGEN_MIX
-        else:
-            optimal_mix = self._determine_optimal_fertilizer_mix(unmet_nitrogen_demand, unmet_phosphorus_demand,
-                                                                 self.available_fertilizer_mixes)
-        self._execute_fertilizer_application(optimal_mix, unmet_nitrogen_demand, unmet_phosphorus_demand,
-                                             application_depth, surface_remainder_fraction, year, day)
+        # else:
+        #     supplied_nitrogen = 0.0
+        #     supplied_phosphorus = 0.0
+        #
+        # unmet_nitrogen_demand = max(0.0, requested_nitrogen - supplied_nitrogen)
+        # unmet_phosphorus_demand = max(0.0, requested_phosphorus - supplied_phosphorus)
+        # if unmet_nitrogen_demand == 0.0 and unmet_phosphorus_demand == 0.0:
+        #     return
+        # elif unmet_nitrogen_demand > 0.0 and unmet_phosphorus_demand == 0.0:
+        #     optimal_mix = self.ONLY_NITROGEN_MIX
+        # else:
+        #     optimal_mix = self._determine_optimal_fertilizer_mix(unmet_nitrogen_demand, unmet_phosphorus_demand,
+        #                                                          self.available_fertilizer_mixes)
+        # self._execute_fertilizer_application(optimal_mix, unmet_nitrogen_demand, unmet_phosphorus_demand,
+        #                                      application_depth, surface_remainder_fraction, year, day)
 
     def _record_manure_application(self, dry_matter_mass: float, dry_matter_fraction: float, field_coverage: float,
                                    nitrogen: float, phosphorus: float, application_depth: float,
