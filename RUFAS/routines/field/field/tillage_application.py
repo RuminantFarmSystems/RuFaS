@@ -106,7 +106,12 @@ class TillageApplication:
                                  "ammonium_content",
                                  "active_organic_nitrogen_content",
                                  "stable_organic_nitrogen_content",
-                                 "fresh_organic_nitrogen_content"]
+                                 "fresh_organic_nitrogen_content",
+                                 "metabolic_litter_amount",
+                                 "structural_litter_amount",
+                                 "active_carbon_amount",
+                                 "slow_carbon_amount",
+                                 "passive_carbon_amount"]
         for pool in pools_to_till_in_soil:
             self._mix_soil_layers(pool, tillage_depth, mixing_fraction)
         self._record_tillage(tillage_depth, incorporation_fraction, mixing_fraction, year, day)
@@ -139,17 +144,29 @@ class TillageApplication:
         """
         redistribution_fractions = []
         total_to_mix_from_pools = 0
+        top_layer_offset = 0
+        is_passive_carbon_pool = pool_name == "passive_carbon_amount"
         for layer in self.soil_data.soil_layers:
+            if is_passive_carbon_pool and layer.top_depth == 0:
+                top_layer_offset == layer.bottom_depth
+                redistribution_fractions.append(0)
+                break
             layer_not_tilled = layer.top_depth >= tillage_depth
             layer_partially_tilled = layer.bottom_depth > tillage_depth
             if layer_not_tilled:
                 break
             elif layer_partially_tilled:
                 tilled_depth = tillage_depth - layer.top_depth
-                layer_redistribution_fraction = tilled_depth / tillage_depth
+                if is_passive_carbon_pool:
+                    layer_redistribution_fraction = tilled_depth / (tillage_depth - top_layer_offset)
+                else:
+                    layer_redistribution_fraction = tilled_depth / tillage_depth
                 fraction_of_layer_mixed = tilled_depth / layer.layer_thickness
             else:
-                layer_redistribution_fraction = layer.layer_thickness / tillage_depth
+                if is_passive_carbon_pool:
+                    layer_redistribution_fraction = layer.layer_thickness / (tillage_depth - top_layer_offset)
+                else:
+                    layer_redistribution_fraction = layer.layer_thickness / tillage_depth
                 fraction_of_layer_mixed = 1.0
             redistribution_fractions.append(layer_redistribution_fraction)
 
@@ -161,6 +178,8 @@ class TillageApplication:
 
         number_of_tilled_layers = len(redistribution_fractions)
         for layer_index in range(number_of_tilled_layers):
+            if is_passive_carbon_pool and layer_index == 0:
+                break
             layer = self.soil_data.soil_layers[layer_index]
             layer_fraction = redistribution_fractions[layer_index]
 
