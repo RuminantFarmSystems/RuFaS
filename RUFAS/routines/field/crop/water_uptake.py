@@ -65,7 +65,8 @@ class WaterUptake:
 
         self.extract_water_from_soil(soil_data)
 
-        self.crop_data.total_water_uptake = sum(self.crop_data.actual_water_uptakes)
+        self.crop_data.water_uptake = sum(self.crop_data.actual_water_uptakes)
+        self.crop_data.water_content += self.crop_data.water_uptake
 
     def extract_water_from_soil(self, soil_data: SoilData) -> None:
         """transfers the current day's water uptake from soil layers to the crop

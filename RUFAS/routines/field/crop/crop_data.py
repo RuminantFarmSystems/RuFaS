@@ -162,8 +162,6 @@ class CropData:
     """biomass stored in roots (kg/ha)"""
 
     # ---- growth constraints
-    water_uptake: float = 18
-    """water taken up by the plant for the day (mm)"""
     nitrogen: float = 35
     """nitrogen stored in plant biomass (kg/ha)"""
     optimal_nitrogen: float = 100
@@ -299,6 +297,8 @@ class CropData:
     """water deficiency factor for the plant (unitless)"""
     max_transpiration: Optional[float] = None
     """maximum transpiration on a given day (mm)"""
+    actual_transpiration: float = 0.0
+    """Actual amount of transpiration from the crop on a given day (mm)."""
     evapotranspiration_weighting_coefficient: float = 1
     """plant evapotranspiration curve number coefficient (unitless), in the range 0.5 to 2.0 inclusive(?).
         Used in SWAT equation 2:1.1.9, definition in .bsn input data description (named CNCOEF there)"""
@@ -330,8 +330,10 @@ class CropData:
     """cumulative water demands not met by all previous layers"""
     actual_water_uptakes: Optional[List[float]] = None
     """the actual amount of water to be removed from the soil"""
-    total_water_uptake: float = 0.0
+    water_uptake: float = 0.0
     """Total amount of water the plant took from the soil on the current day (mm)"""
+    water_content: float = 0.0
+    """Total amount of water currently held by the plant (mm)."""
 
     # ---- yields
     harvest_efficiency: float = 1.0
