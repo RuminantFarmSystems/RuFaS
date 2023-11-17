@@ -369,7 +369,7 @@ class Field:
             field_size=self.field_data.field_size
         )
 
-        self._record_manure_application(dry_matter_mass=1000,
+        self._record_manure_application(dry_matter_mass=10_000,
                                         dry_matter_fraction=0.1,
                                         field_coverage=None,
                                         nitrogen=0.0,

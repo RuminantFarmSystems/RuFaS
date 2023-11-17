@@ -87,7 +87,7 @@
     "manure_schedule": {
       "title": "Manure schedule.",
       "description": "Barnyard manure application schedule.",
-      "path": "input/data/manure_schedule/barnyard_scheduled_manure_schedule.json",
+      "path": "others/barnyard_experimental_manure_aggregated.json",
       "type": "json",
       "properties": "manure_schedule_properties"
     },
