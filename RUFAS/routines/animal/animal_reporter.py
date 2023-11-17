@@ -45,7 +45,12 @@ class AnimalReporter:
         for pen in animal_manager.all_pens:
             nutrient_amount = pen.ration_nutrient_amount
             nutrient_conc = pen.ration_nutrient_conc
-            ration_per_animal = pen.ration_per_animal
+            ration_per_animal = pen.ration_per_animal.copy()
+            del ration_per_animal["status"]
+            del ration_per_animal["objective"]
+            ration_per_animal["dry_matter_intake_total"] = sum(
+                [ration_per_animal[key] for key in ration_per_animal.keys()]
+            )
             ration_report = {}
             ration_report["nutrient_amount"] = nutrient_amount
             ration_report["nutrient_conc"] = nutrient_conc
@@ -53,25 +58,39 @@ class AnimalReporter:
             info_map = {
                 "class": AnimalReporter.__name__,
                 "function": AnimalReporter.report_ration_interval_data.__name__,
-                f"number_animals_in_pen_{pen.id}": len(pen.animals_in_pen),
+                "number_animals_in_pen": len(
+                    pen.animals_in_pen
+                ),
             }
             om.add_variable(
-                f"ration_nutrient_amount_pen_{pen.id}", nutrient_amount, info_map
+                f"ration_nutrient_amount_pen_{pen.id}_{pen.animal_combination.name}",
+                nutrient_amount,
+                info_map,
             )
-            om.add_variable(f"MEdiet_pen_{pen.id}", pen.MEdiet, info_map)
-            om.add_variable(f"avg_rqmts_pen_{pen.id}", pen.avg_nutrient_rqmts, info_map)
             om.add_variable(
-                f"ration_per_animal_for_pen_{pen.id}", pen.ration_per_animal, info_map
+                f"MEdiet_pen_{pen.id}_{pen.animal_combination.name}",
+                pen.MEdiet,
+                info_map,
+            )
+            om.add_variable(
+                f"avg_rqmts_pen_{pen.id}_{pen.animal_combination.name}",
+                pen.avg_nutrient_rqmts,
+                info_map,
+            )
+            om.add_variable(
+                f"ration_per_animal_for_pen_{pen.id}_{pen.animal_combination.name}",
+                pen.ration_per_animal,
+                info_map,
             )
             if pen.animal_combination != Pen.AnimalCombination.CALF:
                 ration_supply_report = RationReporter.report_ration_supply(
-                    ration_per_animal,
+                    pen.ration_per_animal,
                     feed.available_feeds,
                     ration_report,
                     pen.avg_nutrient_rqmts["avg_BW"],
                 )
                 om.add_variable(
-                    f"ration_supply_report_for_pen_{pen.id}",
+                    f"ration_supply_report_for_pen_{pen.id}_{pen.animal_combination.name}",
                     ration_supply_report,
                     info_map,
                 )
@@ -105,12 +124,19 @@ class AnimalReporter:
             "function": AnimalReporter.report_daily_ration.__name__,
         }
         for pen in animal_manager.all_pens:
+            ration_per_animal = pen.ration_per_animal.copy()
+            del ration_per_animal["status"]
+            del ration_per_animal["objective"]
             ration_total = {}
             ration_total["dry_matter_intake_total"] = 0
-            for key in pen.ration_per_animal.keys():
-                if key != "status" and key != 'objective':
+            for key in ration_per_animal.keys():
+                if key != "status" and key != "objective":
                     ration_total[key] = pen.ration_per_animal[key] * len(
                         pen.animals_in_pen
                     )
                     ration_total["dry_matter_intake_total"] += ration_total[key]
-            om.add_variable(f"daily_feed_totals_for_pen_{pen.id}", ration_total, info_map)
+            om.add_variable(
+                f"ration_daily_feed_totals_for_pen_{pen.id}_{pen.animal_combination.name}",
+                ration_total,
+                info_map,
+            )
