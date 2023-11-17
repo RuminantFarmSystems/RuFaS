@@ -74,7 +74,6 @@ class Infiltration:
         self.data.accumulated_runoff = min(rainfall, self._determine_accumulated_runoff(rainfall, retention_parameter))
         infiltrated_water = max(0.0, rainfall - self.data.accumulated_runoff)
         self.data.infiltrated_water = infiltrated_water
-        self.data.soil_layers[0].water_content += infiltrated_water
 
         # Update annual totals
         self.data.annual_runoff_total += self.data.accumulated_runoff
