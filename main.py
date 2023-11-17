@@ -88,7 +88,7 @@ def run_rufas(
 
     if clear_output:
         output_manager = OutputManager()
-        output_manager.clear_output_dir()
+        output_manager.clear_output_dir(vars_file_path, output_dir)
 
     metadata_files: List[MetadataPaths] = METADATA_PATHS
     if only_run_validation:
@@ -138,7 +138,7 @@ def run_load_vars_pool(
     """
     output_manager = OutputManager()
     if clear_output:
-        output_manager.clear_output_dir(vars_file_path)
+        output_manager.clear_output_dir(vars_file_path, output_dir)
     output_manager.flush_pools()
     output_manager.load_variables_pool_from_file(vars_file_path)
     output_manager.set_metadata_prefix("reload")
