@@ -21,7 +21,6 @@ class GrowthConstraints:
         """
 
         self.data.water_stress = GrowthConstraints._determine_water_stress(self.data.water_uptake, max_transpiration)
-        #  TODO: plant transpiration should be an attribute of the crop (in addition to the soil?)
 
         self.data.temp_stress = GrowthConstraints._determine_temperature_stress(temperature,
                                                                                 self.data.minimum_temperature,

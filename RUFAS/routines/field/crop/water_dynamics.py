@@ -23,11 +23,9 @@ class WaterDynamics:
         self.data.cumulative_evapotranspiration += \
             self._determine_evapotranspiration(self.data.cumulative_evaporation,
                                                self.data.cumulative_transpiration)
-        self.data.water_deficiency = self._determine_water_deficiency(self.data.cumulative_evapotranspiration,
+
+        self.data.water_deficiency = self._determine_water_deficiency(self.data.cumulative_water_uptake,
                                                                       self.data.cumulative_potential_evapotranspiration)
-        actual_transpiration = min(self.data.water_content, self.data.max_transpiration)
-        self.data.actual_transpiration = actual_transpiration
-        self.data.water_content -= actual_transpiration
 
     def evaporate_from_canopy(self, potential_evapotranspiration: float) -> float:
         """Evaporates water from the canopy.
@@ -131,7 +129,3 @@ class WaterDynamics:
             return 100 * (cumulative_evapotranspiration / cumulative_potential_evapotranspiration)
         else:
             return 0
-
-    # TODO: Further functions water files need to be translated (into soil methods?) - GitHub Issue #303
-    #    RUFAS/routines/field/crop/transpiration.py
-    #    No water uptake yet?

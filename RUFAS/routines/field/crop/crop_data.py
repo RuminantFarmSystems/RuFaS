@@ -170,7 +170,7 @@ class CropData:
     """phosphorus stored in plant biomass (kg/ha)"""
     optimal_phosphorus: float = 80
     """optimal amount of phosphorus stored in the plant for the current growth stage (kg/ha)"""
-    water_stress: Optional[float] = None
+    water_stress: float = 0.0
     """water stress for the day (unitless; [0, 1])"""
     temp_stress: Optional[float] = None
     """temperature stress for the day (unitless; [0, 1])"""
@@ -297,8 +297,6 @@ class CropData:
     """water deficiency factor for the plant (unitless)"""
     max_transpiration: Optional[float] = None
     """maximum transpiration on a given day (mm)"""
-    actual_transpiration: float = 0.0
-    """Actual amount of transpiration from the crop on a given day (mm)."""
     evapotranspiration_weighting_coefficient: float = 1
     """plant evapotranspiration curve number coefficient (unitless), in the range 0.5 to 2.0 inclusive(?).
         Used in SWAT equation 2:1.1.9, definition in .bsn input data description (named CNCOEF there)"""
@@ -331,9 +329,10 @@ class CropData:
     actual_water_uptakes: Optional[List[float]] = None
     """the actual amount of water to be removed from the soil"""
     water_uptake: float = 0.0
-    """Total amount of water the plant took from the soil on the current day (mm)"""
-    water_content: float = 0.0
-    """Total amount of water currently held by the plant (mm)."""
+    """Total amount of water the plant took from the soil on the current day (mm). Note that SWAT considers the amount
+        of water taken up on any given day to be the actual amount of transpiration on that day."""
+    cumulative_water_uptake: float = 0.0
+    """Cumulative sum of water uptaked by the plant (mm)."""
 
     # ---- yields
     harvest_efficiency: float = 1.0

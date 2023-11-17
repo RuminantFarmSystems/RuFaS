@@ -962,8 +962,7 @@ class Field:
             crop.root_development.develop_roots()
             crop.nitrogen_incorporation.incorporate_nitrogen(self.soil.data)
             crop.phosphorus_incorporation.incorporate_phosphorus(self.soil.data)
-            crop.growth_constraints.constrain_growth(crop.data.max_transpiration,
-                                                     current_conditions.mean_air_temperature)
+            crop.growth_constraints.constrain_growth(crop.data.water_uptake, current_conditions.mean_air_temperature)
             crop.leaf_area_index.grow_canopy()
             crop.biomass_allocation.allocate_biomass(current_conditions.incoming_light)
 

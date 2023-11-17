@@ -8,8 +8,6 @@ from RUFAS.routines.field.soil.soil_data import SoilData
 This module is based upon the "Water Uptake By Plants" section of SWAT (5:2.2.1)
 """
 
-# TODO These functions belong in either water_dynamics.py or as soil process methods - GitHub Issue #450
-
 # TODO: these methods do not currently account for whether or not the roots can reach a layer. See Nitrogen module.
 #   I'm not entirely sure if that should happen for this module, since the methods allow a crop to pull water up
 #   from deeper in the soil if the given layer does not have enough to meet the demands of that depth.
@@ -66,7 +64,6 @@ class WaterUptake:
         self.extract_water_from_soil(soil_data)
 
         self.crop_data.water_uptake = sum(self.crop_data.actual_water_uptakes)
-        self.crop_data.water_content += self.crop_data.water_uptake
 
     def extract_water_from_soil(self, soil_data: SoilData) -> None:
         """transfers the current day's water uptake from soil layers to the crop
