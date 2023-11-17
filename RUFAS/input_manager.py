@@ -630,10 +630,13 @@ class InputManager:
         self.counter.increment("invalid_elements")
         return False
 
-    def _revalidate_element_after_fix(self, variable_path, variable_properties, input_data,
-                                      primitive_type_specific_validators):
+    def _revalidate_primitive_element_after_fix(self, variable_path: List[str | int],
+                                                variable_properties: Dict[str, Any],
+                                                input_data: Dict[str, Any],
+                                                primitive_type_specific_validators: List[
+                                                    Callable[[Any, Dict[str, Any]], Tuple[bool, str]]]) -> bool:
         """
-        Revalidate an element after fixing it.
+        Revalidate a primitive data element after fixing it.
 
         Parameters
         ----------
@@ -656,7 +659,7 @@ class InputManager:
         variable_path_str = self._convert_variable_path_to_str(variable_path)
         info_map = {
             "class": self.__class__.__name__,
-            "function": self._revalidate_element_after_fix.__name__,
+            "function": self._revalidate_primitive_element_after_fix.__name__,
         }
         for validator in primitive_type_specific_validators:
             is_valid, error_msg = validator(element_to_validate, variable_properties)
@@ -710,8 +713,8 @@ class InputManager:
             om.add_warning(error_msg, f"{variable_path_str} = {element_to_validate}", info_map)
             is_variable_fixable = self._fix_data(variable_properties, variable_path, input_data)
             if is_variable_fixable:
-                return self._revalidate_element_after_fix(variable_path, variable_properties, input_data,
-                                                          primitive_type_specific_validators)
+                return self._revalidate_primitive_element_after_fix(variable_path, variable_properties, input_data,
+                                                                    primitive_type_specific_validators)
             om.add_error("Invalid, unfixable element found", f"{variable_path_str} = {element_to_validate}", info_map)
             self.counter.increment("invalid_elements")
             return False
@@ -1068,7 +1071,7 @@ class InputManager:
         return True
 
     def _fix_data(self, variable_properties: Dict[str, Any],
-                  element_hierarchy: List[Union[str, int]],
+                  variable_path: List[Union[str, int]],
                   input_data: Dict[str, Any]) -> bool:
         """
         Attempt to fix the invalid data.
@@ -1078,7 +1081,7 @@ class InputManager:
         variable_properties : dict[str, Any]
             The properties for the variable of interest.
 
-        element_hierarchy: list
+        variable_path: list
             A list indicating the path to reach the variable of interest in self.__metadata and self.__pool.
 
         input_data: dict[str, Any]
@@ -1094,15 +1097,19 @@ class InputManager:
                     }
 
         if 'default' not in variable_properties.keys():
-            om.add_error("Validation: invalid data not able to be fixed: ", f"{element_hierarchy[-1]}", info_map)
+            om.add_error("Validation: invalid data not able to be fixed: ", f"{variable_path[-1]}", info_map)
             return False
-        variable_path_str = self._convert_variable_path_to_str(element_hierarchy)
-        variable_parent = self._get_nested_dict_value(input_data, element_hierarchy[:-1])
-        old_value = variable_parent[element_hierarchy[-1]]
-        variable_parent[element_hierarchy[-1]] = variable_properties['default']
+        variable_path_str = self._convert_variable_path_to_str(variable_path)
+        variable_parent = self._get_nested_dict_value(input_data, variable_path[:-1])
+        old_value = variable_parent[variable_path[-1]]
+        variable_parent[variable_path[-1]] = variable_properties['default']
         om.add_warning("Data fixed",
                        f"{variable_path_str}: Replaced {old_value} with => {variable_properties['default']}",
                        info_map)
+
+        # Remove the 'default' key to avoid potential recursive calls
+        variable_properties.pop('default')
+
         return True
 
     def get_data(self, data_address: str) -> Any:
@@ -1335,7 +1342,21 @@ class ElementsCounter:
 
         self.update(name, getattr(self, name) - value)
 
-    def __str__(self):
+    def reset(self) -> None:
+        """
+        Reset all counts to zero.
+
+        Returns
+        -------
+        None
+        """
+
+        self.total_elements = 0
+        self.valid_elements = 0
+        self.fixed_elements = 0
+        self.invalid_elements = 0
+
+    def __str__(self) -> str:
         """
         String representation of the ElementsCounter instance.
 

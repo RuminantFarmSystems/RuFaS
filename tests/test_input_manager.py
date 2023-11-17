@@ -8,7 +8,7 @@ from __future__ import annotations
 
 import json
 from functools import reduce
-from typing import Any, Callable, Dict
+from typing import Any, Callable, Dict, Type
 
 import pandas as pd
 import pytest
@@ -1802,28 +1802,40 @@ def test_flush_pool(mock_input_manager: InputManager) -> None:
 @pytest.mark.parametrize("variable_value, variable_properties, expected_result", [
     # Test with a boolean True
     (True, {}, (True, "")),
+
     # Test with a boolean False
     (False, {}, (True, "")),
+
     # Test with a string "True"
     ("True", {}, (False, "Bool variable is not a boolean")),
+
     # Test with a string "False"
     ("False", {}, (False, "Bool variable is not a boolean")),
+
     # Test with an integer 1
     (1, {}, (False, "Bool variable is not a boolean")),
+
     # Test with an integer 0
     (0, {}, (False, "Bool variable is not a boolean")),
+
     # Test with a None value
     (None, {}, (False, "Bool variable is not a boolean")),
+
     # Test with an empty list
     ([], {}, (False, "Bool variable is not a boolean")),
+
     # Test with a list
     ([1, 2, 3], {}, (False, "Bool variable is not a boolean")),
+
     # Test with an empty dictionary
     ({}, {}, (False, "Bool variable is not a boolean")),
+
     # Test with a dictionary
     ({"key": "value"}, {}, (False, "Bool variable is not a boolean")),
+
     # Test with a float 1.0
     (1.0, {}, (False, "Bool variable is not a boolean")),
+
     # Test with a float 0.0
     (0.0, {}, (False, "Bool variable is not a boolean")),
 ])
@@ -1839,10 +1851,13 @@ def test_is_bool_value(variable_value: Any, variable_properties: dict[str, Any],
 @pytest.mark.parametrize("variable_path, variable_properties, input_data, expected_result", [
     # Test with a boolean True
     (["key1"], {"type": "bool"}, {"key1": True}, True),
+
     # Test with a boolean False
     (["key2"], {"type": "bool"}, {"key2": False}, False),
+
     # Test with a non-boolean string and default True
     (["key3"], {"type": "bool", "default": True}, {"key3": "not a bool"}, True),
+
     # Test with a non-boolean string and default False
     (["key4"], {"type": "bool", "default": False}, {"key4": "not a bool"}, False),
 ])
@@ -1877,18 +1892,25 @@ def test_validate_bool_type(mocker: MockerFixture,
 @pytest.mark.parametrize("variable_path, variable_properties, input_data, expected_result", [
     # Test with a boolean True
     (["key1"], {"type": "bool"}, {"key1": True}, True),
+
     # Test with a boolean False
     (["key1"], {"type": "bool"}, {"key1": False}, True),
+
     # Test with a string and default True
     (["key1"], {"type": "bool", "default": True}, {"key1": "not a bool"}, True),
+
     # Test with a string and default False
     (["key1"], {"type": "bool", "default": False}, {"key1": "not a bool"}, True),
+
     # Test with a string but have no default
     (["key1"], {"type": "bool"}, {"key1": "not a bool"}, False),
+
     # Test with an integer 1 but have no default
     (["key1"], {"type": "bool"}, {"key1": 1}, False),
+
     # Test with a string but default is not boolean
     (["key1"], {"type": "bool", "default": "not a bool"}, {"key1": "not a bool"}, False),
+
     # Test with an integer 1 but default is not boolean
     (["key1"], {"type": "bool", "default": "not a bool"}, {"key1": 1}, False),
 ])
@@ -1902,10 +1924,16 @@ def test_validate_bool_type_integration_test(variable_path: list[str | int],
     This test is to test the integration between _validate_bool_type() and
     _validate_primitive_type_with_revalidation().
     """
+
     # Arrange
     input_manager = InputManager()
     om = OutputManager()
     initial_data = InputManager._get_nested_dict_value(input_data, variable_path)
+    old_variable_properties = variable_properties.copy()
+
+    # Assert before
+    assert len(om.warnings_pool) == 0
+    assert len(om.errors_pool) == 0
 
     # Act
     result = input_manager._validate_bool_type(variable_path, variable_properties, input_data)
@@ -1915,10 +1943,10 @@ def test_validate_bool_type_integration_test(variable_path: list[str | int],
     if type(initial_data) is not bool:
         assert "InputManager._validate_primitive_type_with_revalidation.Bool variable is not a boolean" \
                in om.warnings_pool
-        if "default" in variable_properties and type(variable_properties["default"]) is bool:
+        if "default" in old_variable_properties and type(old_variable_properties["default"]) is bool:
             assert "InputManager._fix_data.Data fixed" in om.warnings_pool
-        elif "default" in variable_properties:
-            assert "InputManager._revalidate_element_after_fix.Fixed element is still invalid" in om.errors_pool
+        elif "default" in old_variable_properties:
+            assert "InputManager._revalidate_primitive_element_after_fix.Fixed element is still invalid" in om.errors_pool
         else:
             assert "InputManager._validate_primitive_type_with_revalidation.Invalid, unfixable element found" \
                    in om.errors_pool
@@ -1930,22 +1958,31 @@ def test_validate_bool_type_integration_test(variable_path: list[str | int],
 @pytest.mark.parametrize("variable_value, variable_properties, expected_result", [
     # Test with an integer
     (10, {}, (True, "")),
+
     # Test with zero
     (0, {}, (True, "")),
+
     # Test with a negative integer
     (-1, {}, (True, "")),
+
     # Test with a float
     (1.5, {}, (True, "")),
+
     # Test with a negative float
     (-2.3, {}, (True, "")),
+
     # Test with a string
     ("string", {}, (False, "Value is not a number")),
+
     # Test with a boolean True
     (True, {}, (False, "Value is not a number")),
+
     # Test with a None value
     (None, {}, (False, "Value is not a number")),
+
     # Test with a list
     ([1, 2, 3], {}, (False, "Value is not a number")),
+
     # Test with a dictionary
     ({"key": "value"}, {}, (False, "Value is not a number")),
 ])
@@ -1961,14 +1998,19 @@ def test_is_numeric_value(variable_value: Any, variable_properties: dict[str, An
 @pytest.mark.parametrize("variable_value, variable_properties, expected_result", [
     # Value greater than minimum
     (5, {"minimum": 3}, (True, "")),
+
     # Value equal to minimum
     (3, {"minimum": 3}, (True, "")),
+
     # Value less than minimum
     (2, {"minimum": 3}, (False, "Value less than minimum")),
+
     # No minimum set
     (5, {}, (True, "")),
+
     # Negative value less than minimum
     (-1, {"minimum": 0}, (False, "Value less than minimum")),
+
     # Zero value greater than negative minimum
     (0, {"minimum": -1}, (True, "")),
 ])
@@ -1984,14 +2026,19 @@ def test_check_num_lower_bound(variable_value: int | float, variable_properties:
 @pytest.mark.parametrize("variable_value, variable_properties, expected_result", [
     # Value less than maximum
     (5, {"maximum": 7}, (True, "")),
+
     # Value equal to maximum
     (7, {"maximum": 7}, (True, "")),
+
     # Value greater than maximum
     (8, {"maximum": 7}, (False, "Value greater than maximum")),
+
     # No maximum set
     (5, {}, (True, "")),
+
     # Zero value greater than negative maximum
     (0, {"maximum": -1}, (False, "Value greater than maximum")),
+
     # Negative value less than maximum
     (-2, {"maximum": -1}, (True, "")),
 ])
@@ -2007,24 +2054,34 @@ def test_check_num_upper_bound(variable_value: int | float, variable_properties:
 @pytest.mark.parametrize("variable_path, variable_properties, input_data, expected_result", [
     # Test with valid integer
     (["key1"], {"type": "number"}, {"key1": 5}, True),
+
     # Test with valid float
     (["key1"], {"type": "number"}, {"key1": 3.5}, True),
+
     # Test with integer less than minimum
     (["key1"], {"type": "number", "minimum": 2}, {"key1": 1}, False),
+
     # Test with integer greater than maximum
     (["key1"], {"type": "number", "maximum": 10}, {"key1": 11}, False),
+
     # Test with non-numeric string
     (["key1"], {"type": "number"}, {"key1": "not a number"}, False),
+
     # Test with invalid but fixable input (non-numeric string with default numeric value)
     (["key1"], {"type": "number", "default": 5}, {"key1": "not a number"}, True),
+
     # Test with integer exactly at minimum
     (["key1"], {"type": "number", "minimum": 5, "maximum": 10}, {"key1": 5}, True),
+
     # Test with integer exactly at maximum
     (["key1"], {"type": "number", "minimum": 5, "maximum": 10}, {"key1": 10}, True),
+
     # Test with integer in between minimum and maximum
     (["key1"], {"type": "number", "minimum": 5, "maximum": 10}, {"key1": 7}, True),
+
     # Test with float just below minimum
     (["key1"], {"type": "number", "minimum": 5}, {"key1": 4.999}, False),
+
     # Test with float just above maximum
     (["key1"], {"type": "number", "maximum": 10}, {"key1": 10.001}, False),
 ])
@@ -2065,30 +2122,43 @@ def test_validate_num_type(mocker: MockerFixture,
 @pytest.mark.parametrize("variable_path, variable_properties, input_data, expected_result", [
     # Test with valid integer
     (["key1"], {"type": "number"}, {"key1": 5}, True),
+
     # Test with valid float
     (["key1"], {"type": "number"}, {"key1": 3.5}, True),
+
     # Test with integer less than minimum
     (["key1"], {"type": "number", "minimum": 6}, {"key1": 5}, False),
+
     # Test with integer equal to minimum
     (["key1"], {"type": "number", "minimum": 5}, {"key1": 5}, True),
+
     # Test with integer more than minimum
     (["key1"], {"type": "number", "minimum": 4}, {"key1": 5}, True),
+
     # Test with integer more than maximum
     (["key1"], {"type": "number", "maximum": 4}, {"key1": 5}, False),
+
     # Test with integer equal to maximum
     (["key1"], {"type": "number", "maximum": 5}, {"key1": 5}, True),
+
     # Test with integer less than maximum
     (["key1"], {"type": "number", "maximum": 6}, {"key1": 5}, True),
+
     # Test with non-numeric string, no default
     (["key1"], {"type": "number"}, {"key1": "not a number"}, False),
+
     # Test with non-numeric string, fixable with default
     (["key1"], {"type": "number", "default": 5}, {"key1": "not a number"}, True),
+
     # Test with non-numeric string, unfixable
     (["key1"], {"type": "number", "default": "not a number"}, {"key1": "not a number"}, False),
+
     # Test with float less than minimum
     (["key1"], {"type": "number", "minimum": 6}, {"key1": 5.999}, False),
+
     # Test with float equal to minimum
     (["key1"], {"type": "number", "minimum": 5}, {"key1": 5.0}, True),
+
     # Test with float more than minimum
     (["key1"], {"type": "number", "minimum": 4}, {"key1": 4.001}, True),
 ])
@@ -2106,19 +2176,24 @@ def test_validate_num_type_integration_test(variable_path: list[str | int],
     input_manager = InputManager()
     om = OutputManager()
     initial_data = InputManager._get_nested_dict_value(input_data, variable_path)
+    old_variable_properties = variable_properties.copy()
+
+    # Assert before
+    assert len(om.warnings_pool) == 0
+    assert len(om.errors_pool) == 0
 
     # Act
     result = input_manager._validate_num_type(variable_path, variable_properties, input_data)
 
-    # Assert
+    # Assert after
     assert result == expected_result
     if type(initial_data) not in (int, float):
         assert "InputManager._validate_primitive_type_with_revalidation.Value is not a number" \
                in om.warnings_pool
-        if "default" in variable_properties and isinstance(variable_properties["default"], (int, float)):
+        if "default" in old_variable_properties and isinstance(old_variable_properties["default"], (int, float)):
             assert "InputManager._fix_data.Data fixed" in om.warnings_pool
-        elif "default" in variable_properties:
-            assert "InputManager._revalidate_element_after_fix.Fixed element is still invalid" in om.errors_pool
+        elif "default" in old_variable_properties:
+            assert "InputManager._revalidate_primitive_element_after_fix.Fixed element is still invalid" in om.errors_pool
         else:
             assert "InputManager._validate_primitive_type_with_revalidation.Invalid, unfixable element found" \
                    in om.errors_pool
@@ -2130,18 +2205,25 @@ def test_validate_num_type_integration_test(variable_path: list[str | int],
 @pytest.mark.parametrize("variable_value, variable_properties, expected_result", [
     # Test with a regular string
     ("hello", {}, (True, "")),
+
     # Test with an empty string
     ("", {}, (True, "")),
+
     # Test with an integer
     (123, {}, (False, "String variable is not a string.")),
+
     # Test with a float
     (1.0, {}, (False, "String variable is not a string.")),
+
     # Test with a boolean
     (True, {}, (False, "String variable is not a string.")),
+
     # Test with a list
     ([1, 2, 3], {}, (False, "String variable is not a string.")),
+
     # Test with a dictionary
     ({"key": "value"}, {}, (False, "String variable is not a string.")),
+
     # Test with a None value
     (None, {}, (False, "String variable is not a string."))
 ])
@@ -2156,12 +2238,16 @@ def test_is_str_value(variable_value, variable_properties, expected_result):
 @pytest.mark.parametrize("variable_value, variable_properties, expected_result", [
     # Test with string longer than minimum
     ("hello", {"minimum_length": 3}, (True, "")),
+
     # Test with string shorter than minimum
     ("hi", {"minimum_length": 3}, (False, "String length less than minimum.")),
+
     # Test with string equal to minimum
     ("hello", {}, (True, "")),
+
     # Test with empty string and some minimum length
     ("", {"minimum_length": 1}, (False, "String length less than minimum.")),
+
     # Test with empty string and zero minimum length
     ("", {"minimum_length": 0}, (True, "")),
 ])
@@ -2177,14 +2263,19 @@ def test_check_str_len_lower_bound(variable_value: str, variable_properties: dic
 @pytest.mark.parametrize("variable_value, variable_properties, expected_result", [
     # Test with string equal to maximum length
     ("hello", {"maximum_length": 5}, (True, "")),
+
     # Test with string shorter than maximum length
     ("hello", {"maximum_length": 10}, (True, "")),
+
     # Test with string longer than maximum length
     ("hello", {"maximum_length": 4}, (False, "String length greater than maximum.")),
+
     # Test with string but no maximum length specified
     ("hello", {}, (True, "")),
+
     # Test with empty string and no maximum length specified
     ("", {"maximum_length": 0}, (True, "")),
+
     # Test with empty string and some maximum length
     ("", {"maximum_length": 1}, (True, "")),
 ])
@@ -2200,54 +2291,79 @@ def test_check_str_len_upper_bound(variable_value: str, variable_properties: dic
 @pytest.mark.parametrize("variable_value, variable_properties, expected_result", [
     # Test with an alphanumeric string matching the pattern
     ("hello123", {"pattern": r"\w+"}, (True, "")),
+
     # Test with an alphanumeric string not matching the pattern
     ("hello123", {"pattern": r"\d+"}, (False, "String does not match pattern.")),
+
     # Test with a numeric string matching the pattern
     ("12345", {"pattern": r"\d+"}, (True, "")),
+
     # Test with an exact match
     ("hello", {"pattern": r"hello"}, (True, "")),
+
     # Test with a case-sensitive failed match
     ("HELLO", {"pattern": r"hello"}, (False, "String does not match pattern.")),
+
     # Test with a string containing a space
     ("hello world", {"pattern": r"hello world"}, (True, "")),
+
     # Test with a string matching a character class pattern
     ("hello", {"pattern": r"[a-z]+"}, (True, "")),
+
     # Test with an empty string and a pattern that matches anything
     ("", {"pattern": r".*"}, (True, "")),
+
     # Test with a string but no pattern specified
     ("hello", {}, (True, "")),
+
     # Test with case-insensitive flag
     ("HELLO", {"pattern": r"(?i)hello"}, (True, "")),  # Case-insensitive flag, should match
+
     # Test with pipe character to match one of two options
     ("cat", {"pattern": r"cat|dog"}, (True, "")),
+
     # Test with pipe character to match one of two options
     ("dog", {"pattern": r"cat|dog"}, (True, "")),
+
     # Test with pipe character and no match
     ("bird", {"pattern": r"cat|dog"}, (False, "String does not match pattern.")),
+
     # Test with pipe character and match all options
     ("catdog", {"pattern": r"cat|dog"}, (False, "String does not match pattern.")),
+
     # Test with pipe character and match some options but not all
     ("dogfish", {"pattern": r"cat|dog"}, (False, "String does not match pattern.")),
+
     # Test with pipe character, start, and end of string
     ("dog", {"pattern": r"^dog|cat$"}, (True, "")),
+
     # Test with pipe character, start, and end of string
     ("cat", {"pattern": r"^dog|cat$"}, (True, "")),
+
     # Test with pipe character, start, and end of string and only part of the string matches
     ("a cat", {"pattern": r"^dog|cat$"}, (False, "String does not match pattern.")),
+
     # Test with dot character
     ("hello.world", {"pattern": r"hello.world"}, (True, "")),
+
     # Test with dot character but no match
     ("helloworld", {"pattern": r"hello.world"}, (False, "String does not match pattern.")),
+
     # Test with literal dot character
     ("hello.world", {"pattern": r"hello\.world"}, (True, "")),
+
     # Test with literal dot character but no match
     ("helloworld", {"pattern": r"hello\.world"}, (False, "String does not match pattern.")),
+
     # Test with minimum number of characters
     ("helloooo", {"pattern": r"hello{2,}"}, (True, "")),
+
     # Test with minimum number of characters but no match
     ("hello", {"pattern": r"hello{2,}"}, (False, "String does not match pattern.")),
+
     # Test with maximum number of characters
     ("hello", {"pattern": r"hello{,2}"}, (True, "")),
+
     # Test with maximum number of characters but no match
     ("helloooo", {"pattern": r"hello{,2}"}, (False, "String does not match pattern.")),
 ])
@@ -2360,19 +2476,25 @@ def test_validate_str_type_integration_test(variable_path: list[str | int],
     input_manager = InputManager()
     om = OutputManager()
     initial_data = InputManager._get_nested_dict_value(input_data, variable_path)
+    old_variable_properties = variable_properties.copy()
+
+    # Assert before
+    assert len(om.warnings_pool) == 0
+    assert len(om.errors_pool) == 0
 
     # Act
     result = input_manager._validate_str_type(variable_path, variable_properties, input_data)
 
-    # Assert
+    # Assert after
     assert result == expected_result
     if type(initial_data) is not str:
         assert "InputManager._validate_primitive_type_with_revalidation.String variable is not a string." \
                in om.warnings_pool
-        if "default" in variable_properties and isinstance(variable_properties["default"], str):
+        if "default" in old_variable_properties and isinstance(old_variable_properties["default"], str):
             assert "InputManager._fix_data.Data fixed" in om.warnings_pool
-        elif "default" in variable_properties:
-            assert "InputManager._revalidate_element_after_fix.Fixed element is still invalid" in om.errors_pool
+        elif "default" in old_variable_properties:
+            assert "InputManager._revalidate_primitive_element_after_fix.Fixed element is still invalid" \
+                   in om.errors_pool
         else:
             assert "InputManager._validate_primitive_type_with_revalidation.Invalid, unfixable element found" \
                    in om.errors_pool
@@ -2415,19 +2537,19 @@ def test_is_object_value(variable_value: Any, variable_properties: dict[str, Any
     "mock_get_nested_dict_value_return, mock_is_object_value_return, "
     "mock_validate_input_type_dynamic_return, mock_handle_container_error_return",
     [
-        # Case 1: Handle container error unsuccessfully
+        # Handle container error unsuccessfully
         (["key1"], {"type": "object"}, {"key1": "not an object"}, False,
          "not an object", (False, "Error Message"), None, False),
 
-        # Case 2: Handle container error successfully
+        # Handle container error successfully
         (["key1"], {"type": "object"}, {"key1": "not an object"}, True,
          "not an object", (False, "Error Message"), None, True),
 
-        # Case 3: Object validation passes, but sub-element validation fails
+        # Object validation passes, but sub-element validation fails
         (["key1"], {"type": "object", "subkey": {"type": "string"}}, {"key1": {"subkey": 1}}, False,
          {"subkey": 1}, (True, ""), False, None),
 
-        # Case 4: Object validation passes, and sub-element validation passes
+        # Object validation passes, and sub-element validation passes
         (["key1"], {"type": "object", "subkey": {"type": "string"}}, {"key1": {"subkey": "value"}}, True,
          {"subkey": "value"}, (True, ""), True, None),
     ]
@@ -2439,9 +2561,9 @@ def test_validate_object_type(
         input_data: dict[str, Any],
         expected_result: bool,
         mock_get_nested_dict_value_return: Any,
-        mock_is_object_value_return: tuple[bool, str],
-        mock_validate_input_type_dynamic_return: bool,
-        mock_handle_container_error_return: bool
+        mock_is_object_value_return: tuple[bool, str] | None,
+        mock_validate_input_type_dynamic_return: bool | None,
+        mock_handle_container_error_return: bool | None
 ) -> None:
     """
     Unit test for method _validate_object_type() in file input_manager.py.
@@ -2452,11 +2574,11 @@ def test_validate_object_type(
 
     # Arrange
     input_manager = InputManager()
-    mocker.patch.object(InputManager, '_get_nested_dict_value', return_value=mock_get_nested_dict_value_return)
-    mocker.patch.object(InputManager, '_is_object_value', return_value=mock_is_object_value_return)
-    mocker.patch.object(InputManager, '_validate_input_type_dynamic',
+    mocker.patch.object(input_manager, '_get_nested_dict_value', return_value=mock_get_nested_dict_value_return)
+    mocker.patch.object(input_manager, '_is_object_value', return_value=mock_is_object_value_return)
+    mocker.patch.object(input_manager, '_validate_input_type_dynamic',
                         return_value=mock_validate_input_type_dynamic_return)
-    mocker.patch.object(InputManager, '_handle_container_error', return_value=mock_handle_container_error_return)
+    mocker.patch.object(input_manager, '_handle_container_error', return_value=mock_handle_container_error_return)
 
     # Act
     result = input_manager._validate_object_type(variable_path, variable_properties, input_data)
@@ -2518,3 +2640,628 @@ def test_validate_object_type_integration_test(variable_path: list[str | int],
 
     # Assert
     assert result == expected_result
+
+
+@pytest.mark.parametrize("variable_value, variable_properties, expected_result", [
+    # Test with a list
+    ([1, 2, 3], {}, (True, "")),
+
+    # Test with an empty list
+    ([], {}, (True, "")),
+
+    # Test with a string
+    ("string", {}, (False, "Array variable is not a list.")),
+
+    # Test with a dictionary
+    ({"key": "value"}, {}, (False, "Array variable is not a list.")),
+
+    # Test with a tuple
+    ((1, 2, 3), {}, (False, "Array variable is not a list.")),
+
+    # Test with an integer
+    (10, {}, (False, "Array variable is not a list.")),
+
+    # Test with None
+    (None, {}, (False, "Array variable is not a list.")),
+
+    # Test with a boolean
+    (True, {}, (False, "Array variable is not a list.")),
+
+    # Test with a float
+    (1.5, {}, (False, "Array variable is not a list.")),
+])
+def test_is_array_value(variable_value: Any, variable_properties: dict[str, Any],
+                        expected_result: tuple[bool, str]) -> None:
+    """
+    Unit test for method _is_array_value() in file input_manager.py.
+    """
+
+    assert InputManager._is_array_value(variable_value, variable_properties) == expected_result
+
+
+@pytest.mark.parametrize("variable_value, variable_properties, expected_result", [
+    # Test with a list longer than minimum length
+    ([1, 2, 3, 4], {"minimum_length": 3}, (True, "")),
+
+    # Test with a list equal to minimum length
+    ([1, 2, 3], {"minimum_length": 3}, (True, "")),
+
+    # Test with a list shorter than minimum length
+    ([1, 2], {"minimum_length": 3}, (False, "Array length less than minimum: 2 < 3")),
+
+    # Test with no minimum length specified
+    ([1, 2, 3], {}, (True, "")),
+
+    # Test with an empty list and a minimum length
+    ([], {"minimum_length": 1}, (False, "Array length less than minimum: 0 < 1")),
+
+    # Test with an empty list and no minimum length
+    ([], {}, (True, "")),
+])
+def test_check_array_len_lower_bound(variable_value: list[Any], variable_properties: dict[str, Any],
+                                     expected_result: tuple[bool, str]) -> None:
+    """
+    Unit test for method _check_array_len_lower_bound() in file input_manager.py.
+    """
+
+    assert InputManager._check_array_len_lower_bound(variable_value, variable_properties) == expected_result
+
+
+@pytest.mark.parametrize("variable_value, variable_properties, expected_result", [
+    # Test with a list shorter than maximum length
+    ([1, 2, 3], {"maximum_length": 4}, (True, "")),
+
+    # Test with a list equal to maximum length
+    ([1, 2, 3, 4], {"maximum_length": 4}, (True, "")),
+
+    # Test with a list longer than maximum length
+    ([1, 2, 3, 4, 5], {"maximum_length": 4}, (False, "Array length more than maximum: 5 > 4")),
+
+    # Test with no maximum length specified
+    ([1, 2, 3], {}, (True, "")),
+
+    # Test with an empty list and a maximum length
+    ([], {"maximum_length": 3}, (True, "")),
+
+    # Test with an empty list and no maximum length
+    ([], {}, (True, "")),
+])
+def test_check_array_len_upper_bound(variable_value: list[Any], variable_properties: dict[str, Any],
+                                     expected_result: tuple[bool, str]) -> None:
+    """
+    Unit test for method _check_array_len_upper_bound() in file input_manager.py.
+    """
+
+    assert InputManager._check_array_len_upper_bound(variable_value, variable_properties) == expected_result
+
+
+@pytest.mark.parametrize(
+    "variable_path, variable_properties, input_data, expected_result, "
+    "mock_get_nested_dict_value_return, mock_is_array_value_return, "
+    "mock_check_array_len_bounds_return, mock_validate_input_type_dynamic_return, "
+    "mock_handle_container_error_return",
+    [
+        # Array validation fails (is not an array) and container error is not handled successfully
+        (["key1"], {"type": "array"}, {"key1": "not an array"}, False,
+         "not an array", (False, "Error Message"), None, None, False),
+
+        # Array validation fails (is not an array) but container error is handled successfully
+        (["key1"], {"type": "array"}, {"key1": "not an array"}, True,
+         "not an array", (False, "Error Message"), None, None, True),
+
+        # Array length lower bound check fails and container error is not handled successfully
+        (["key1"], {"type": "array", "minimum_length": 3}, {"key1": [1, 2]}, False,
+         [1, 2], (True, ""), (False, "Array length less than minimum"), None, False),
+
+        # Array length upper bound check fails and container error is not handled successfully
+        (["key1"], {"type": "array", "maximum_length": 2}, {"key1": [1, 2, 3]}, False,
+         [1, 2, 3], (True, ""), (False, "Array length more than maximum"), None, False),
+
+        # Array length upper bound check fails but container error is handled successfully
+        (["key1"], {"type": "array", "maximum_length": 2}, {"key1": [1, 2, 3]}, True,
+         [1, 2, 3], (True, ""), (False, "Array length more than maximum"), None, True),
+
+        # Array validation passes, but sub-element validation fails and container error is not handled successfully
+        (["key1"], {"type": "array", "properties": {"type": "number"}}, {"key1": [1, "not a number"]}, False,
+         [1, "not a number"], (True, ""), (True, ""), False, None),
+
+        # Array validation passes, and sub-element validation passes
+        (["key1"], {"type": "array", "properties": {"type": "number"}}, {"key1": [1, 2]}, True,
+         [1, 2], (True, ""), (True, ""), True, None),
+    ]
+)
+def test_validate_array_type(
+        mocker: MockerFixture,
+        variable_path: list[str | int],
+        variable_properties: dict[str, Any],
+        input_data: dict[str, Any],
+        expected_result: bool,
+        mock_get_nested_dict_value_return: Any,
+        mock_is_array_value_return: tuple[bool, str] | None,
+        mock_check_array_len_bounds_return: tuple[bool, str] | None,
+        mock_validate_input_type_dynamic_return: bool | None,
+        mock_handle_container_error_return: bool | None
+) -> None:
+    """
+    Unit test for method _validate_array_type() in file input_manager.py.
+
+    This test checks if the method calls the correct methods with the correct arguments and all possible
+    return routes are reachable.
+    """
+
+    # Arrange
+    input_manager = InputManager()
+    mocker.patch.object(input_manager, '_get_nested_dict_value', return_value=mock_get_nested_dict_value_return)
+    mocker.patch.object(input_manager, '_is_array_value', return_value=mock_is_array_value_return)
+    mocker.patch.object(input_manager, '_check_array_len_lower_bound', return_value=mock_check_array_len_bounds_return)
+    mocker.patch.object(input_manager, '_check_array_len_upper_bound', return_value=mock_check_array_len_bounds_return)
+    mocker.patch.object(input_manager, '_validate_input_type_dynamic',
+                        return_value=mock_validate_input_type_dynamic_return)
+    mocker.patch.object(input_manager, '_handle_container_error', return_value=mock_handle_container_error_return)
+
+    # Act
+    result = input_manager._validate_array_type(variable_path, variable_properties, input_data)
+
+    # Assert
+    assert result == expected_result
+
+
+@pytest.mark.parametrize("variable_path, variable_properties, input_data, expected_result", [
+    # Test with valid array
+    (["key1"], {"type": "array", "properties": {"type": "string"}},
+     {"key1": ["value1", "value2"]}, True),
+
+    # Test with array containing invalid elements
+    (["key1"], {"type": "array", "properties": {"type": "string"}},
+     {"key1": ["value1", 123]}, False),
+
+    # Test with invalid type (not an array)
+    (["key1"], {"type": "array"},
+     {"key1": "not an array"}, False),
+
+    # Test with array exceeding maximum length
+    (["key1"], {"type": "array", "maximum_length": 2},
+     {"key1": ["value1", "value2", "value3"]}, False),
+
+    # Test with array shorter than minimum length
+    (["key1"], {"type": "array", "minimum_length": 3},
+     {"key1": ["value1", "value2"]}, False),
+
+    # Test with empty array
+    (["key1"], {"type": "array"},
+     {"key1": []}, True),
+
+    # Test with nested array
+    (["key1"], {"type": "array", "properties": {"type": "array", "properties": {"type": "number"}}},
+     {"key1": [[1, 2], [3, 4]]}, True),
+
+    # Test with null array
+    (["key1"], {"type": "array"},
+     {"key1": None}, False),
+
+    # Test with array containing a dictionary
+    (["key1"], {"type": "array", "properties": {"type": "object", "subkey": {"type": "string"}}},
+     {"key1": [{"subkey": "value"}]}, True),
+])
+def test_validate_array_type_integration_test(variable_path: list[str | int],
+                                              variable_properties: dict[str, Any],
+                                              input_data: dict[str, Any],
+                                              expected_result: bool) -> None:
+    """
+    Integration test for method _validate_array_type() in file input_manager.py.
+    """
+
+    # Arrange
+    input_manager = InputManager()
+
+    # Act
+    result = input_manager._validate_array_type(variable_path, variable_properties, input_data)
+
+    # Assert
+    assert result == expected_result
+
+
+@pytest.mark.parametrize("input_data, keys, expected_result, expected_exception", [
+    # Test for getting a nested value in a dictionary
+    ({"a": {"b": 1}}, ["a", "b"], 1, None),
+
+    # Test for getting a value in a list inside a nested dictionary
+    ({"a": {"b": {"c": [1, 2, 3]}}}, ["a", "b", "c", 1], 2, None),
+
+    # Test for KeyError when the key is not present in the dictionary
+    ({"a": {"b": {"c": {"d": 1}}}}, ["a", "b", "c", "e"], None, KeyError),
+
+    # Test for IndexError when the index is not present in the list
+    ({"a": {"b": {"c": [1, 2, 3]}}}, ["a", "b", "c", 3], None, IndexError),
+
+    # Test for accessing a value in a nested list
+    ([{"a": [1, 2]}, {"b": [3, 4]}], [1, "b", 0], 3, None),
+])
+def test_get_nested_dict_value(
+        input_data: list[Any] | dict[str, Any] | Any,
+        keys: list[str | int],
+        expected_result: Any,
+        expected_exception: Type[BaseException] | None,
+) -> None:
+    """
+    Unit test for method _get_nested_dict_value() in file input_manager.py.
+
+    """
+
+    # Act and Assert
+    if expected_exception:
+        with pytest.raises(expected_exception):
+            InputManager._get_nested_dict_value(input_data, keys)
+    else:
+        assert InputManager._get_nested_dict_value(input_data, keys) == expected_result
+
+
+@pytest.mark.parametrize("variable_path, expected_result", [
+    # Test with mix of strings and integer
+    (["a", "b", 1], "a.b.[1]"),
+
+    # Test with only strings
+    (["a", "b", "c"], "a.b.c"),
+
+    # Test with multiple integers
+    (["a", "b", "c", 0, 1], "a.b.c.[0].[1]"),
+
+    # Test with single string
+    (["a"], "a"),
+
+    # Test with single integer
+    ([0], "[0]"),
+
+    # Test with empty list
+    ([], ""),
+])
+def test_convert_variable_path_to_str(variable_path: list[str | int], expected_result: str) -> None:
+    """
+    Unit test for method _convert_variable_path_to_str() in file input_manager.py.
+    """
+
+    # Act
+    result = InputManager._convert_variable_path_to_str(variable_path)
+
+    # Assert
+    assert result == expected_result
+
+
+@pytest.mark.parametrize(
+    "variable_properties, variable_path, input_data, "
+    "expected_result, expected_old_value, expected_new_value", [
+        # Test case where default value is present and data is fixed
+        ({"default": "new_value"}, ["a"], {"a": "old_value"},
+         True, "old_value", "new_value"),
+
+        # Test case where default value is not present and data is not fixed
+        ({}, ["a"], {"a": "old_value"},
+         False, "old_value", None),
+    ])
+def test_fix_data(mocker: MockerFixture, variable_properties: dict[str, Any],
+                  variable_path: list[str | int], input_data: dict[str, Any],
+                  expected_result: bool, expected_old_value: Any, expected_new_value: Any) -> None:
+    """
+    Unit test for method _fix_data() in file input_manager.py.
+
+    This test checks that the method calls the correct methods with the correct arguments and all possible
+    return routes are reachable.
+    """
+
+    # Arrange
+    input_manager = InputManager()
+    mocker.patch.object(input_manager, '_convert_variable_path_to_str', return_value='.'.join(map(str, variable_path)))
+    mocker.patch.object(input_manager, '_get_nested_dict_value', return_value=input_data)
+    om = OutputManager()
+
+    # Act
+    result = input_manager._fix_data(variable_properties, variable_path, input_data)
+
+    # Assert
+    assert result == expected_result
+    if expected_result:
+        assert input_data[variable_path[-1]] == expected_new_value
+        assert any("Data fixed" in warning for warning in om.warnings_pool)
+        assert "default" not in variable_properties
+    else:
+        assert any("Validation: invalid data not able to be fixed" in error for error in om.errors_pool)
+
+    # Cleanup
+    om.flush_pools()
+
+
+@pytest.mark.parametrize(
+    "variable_properties, variable_path, input_data, expected_result, expected_data", [
+        # Test case where default value is present and data is fixed at root level
+        ({"default": "new_value"}, ["a"], {"a": "old_value"}, True, {"a": "new_value"}),
+
+        # Test case where default value is not present and data is not fixed at root level
+        ({}, ["a"], {"a": "old_value"}, False, {"a": "old_value"}),
+
+        # Test with nested path and default value present
+        ({"default": 10}, ["a", "b"], {"a": {"b": 5}}, True, {"a": {"b": 10}}),
+
+        # Test with nested path and no default value
+        ({}, ["a", "b"], {"a": {"b": 5}}, False, {"a": {"b": 5}}),
+
+        # Test with complex nested path and default value present
+        ({"default": "fixed"}, ["a", 1, "c"], {"a": [{}, {"c": "broken"}]}, True, {"a": [{}, {"c": "fixed"}]}),
+    ]
+)
+def test_fix_data_integration_test(variable_properties: dict[str, Any], variable_path: list[str | int],
+                                   input_data: dict[str, Any], expected_result: bool, expected_data: dict[str, Any]
+                                   ) -> None:
+    """
+    Integration test for method _fix_data() in file input_manager.py.
+
+    This test checks the integration between _fix_data() and _convert_variable_path_to_str() and
+    _get_nested_dict_value(). It also checks that the method correctly modifies the input data.
+    The warnings and errors pools are also checked.
+    """
+
+    # Arrange
+    input_manager = InputManager()
+    om = OutputManager()
+
+    # Assert before
+    assert len(om.warnings_pool) == 0
+    assert len(om.errors_pool) == 0
+
+    # Act
+    result = input_manager._fix_data(variable_properties, variable_path, input_data)
+
+    # Assert after
+    assert result == expected_result
+    assert input_data == expected_data
+    if expected_result:
+        assert any("Data fixed" in warning for warning in om.warnings_pool)
+        assert "default" not in variable_properties
+    else:
+        assert any("Validation: invalid data not able to be fixed" in error for error in om.errors_pool)
+
+    # Cleanup
+    om.flush_pools()
+
+
+@pytest.mark.parametrize(
+    "variable_properties, variable_path, input_data, "
+    "expected_result, is_fixed, is_validated", [
+        # Test case where data is fixed and validated successfully
+        ({"default": "new_value"}, ["a"], {"a": "old_value"}, True, True, True),
+
+        # Test case where data cannot be fixed
+        ({}, ["a"], {"a": "old_value"}, False, False, None),
+
+        # Test case where data is fixed but validation fails
+        ({"default": "invalid_value", "type": "number"}, ["a"], {"a": "old_value"}, False, True, False),
+    ]
+)
+def test_handle_container_error(
+        mocker,
+        variable_properties: dict[str, Any],
+        variable_path: list[str | int],
+        input_data: dict[str, Any],
+        expected_result: bool,
+        is_fixed: bool,
+        is_validated: bool | None
+):
+    """
+    Unit test for method _handle_container_error() in file input_manager.py.
+
+    This test simply checks if the method calls the correct methods with the correct arguments and all possible
+    return routes are reachable.
+    """
+
+    # Arrange
+    input_manager = InputManager()
+    input_manager.counter.reset()
+    om = OutputManager()
+    mocker.patch.object(input_manager, '_convert_variable_path_to_str', return_value='.'.join(map(str, variable_path)))
+    mocker.patch.object(input_manager, '_get_nested_dict_value', return_value=input_data)
+    patch_for_fix_data = mocker.patch.object(input_manager, '_fix_data', return_value=is_fixed)
+    patch_for_validate_input_type = mocker.patch.object(input_manager, '_validate_input_type_dynamic',
+                                                        return_value=is_validated)
+
+    # Assert before
+    assert len(om.warnings_pool) == 0
+    assert len(om.errors_pool) == 0
+    assert input_manager.counter.total_elements == 0
+    assert input_manager.counter.invalid_elements == 0
+
+    # Act
+    result = input_manager._handle_container_error("Test error", variable_path, variable_properties, input_data)
+
+    # Assert
+    assert any("Test error" in warning for warning in om.warnings_pool)
+    assert result == expected_result
+    patch_for_fix_data.assert_called_once_with(variable_properties, variable_path, input_data)
+
+    if is_fixed:
+        patch_for_validate_input_type.assert_called_once_with(variable_properties, variable_path, input_data)
+    else:
+        assert any("Invalid unfixable element found" in error for error in om.errors_pool)
+        assert input_manager.counter.total_elements == 1
+        assert input_manager.counter.invalid_elements == 1
+
+    # Cleanup
+    om.flush_pools()
+    input_manager.counter.reset()
+
+
+@pytest.mark.parametrize(
+    "variable_properties, "
+    "variable_path, input_data, "
+    "expected_result, expected_fixed_data, expected_warnings, expected_errors", [
+        # Test case: data is expected to be an array but isn't; can be fixed
+        ({"type": "array", "default": ["fixed"], "properties": {"type": "string"}},
+         ["a"], {"a": "not an array"},
+         True, {"a": ["fixed"]}, ["Test error", "Data fixed"], []),
+
+        # Test case: data is expected to be an object, but isn't; can't be fixed
+        ({"type": "object"},
+         ["a"], {"a": "not an object"},
+         False, {"a": "not an object"}, ["Test error"],
+         ["Validation: invalid data not able to be fixed", "Invalid unfixable element found"]),
+
+        # Test case: data is expected to be an object but isn't; can be fixed but invalid
+        ({"type": "object", "default": "invalid"}, ["a"], {"a": "not an object"},
+         False, {"a": "invalid"}, ["Test error", "Data fixed", "Object variable is not a dictionary"],
+         ["Validation: invalid data not able to be fixed", "Invalid unfixable element found"]),
+
+        # Test case: data is expected to be an object but isn't; can be fixed and fixed data is valid
+        ({"type": "object", "default": {"key": "value"}, "key": {"type": "number", "default": 1}},
+         ["a"], {"a": "not an object"},
+         True, {"a": {"key": 1}}, ["Test error", "Data fixed", "Value is not a number"],
+         []),
+    ]
+)
+def test_handle_container_error_integration_test(variable_properties: dict[str, Any],
+                                                 variable_path: list[str | int],
+                                                 input_data: dict[str, Any],
+                                                 expected_result: bool,
+                                                 expected_fixed_data: dict[str, Any],
+                                                 expected_warnings: list[str],
+                                                 expected_errors: list[str]):
+    """
+    Integration test for _handle_container_error() method in input_manager.py.
+
+    This test checks the real interactions between _handle_container_error() and its dependencies,
+    ensuring it correctly handles data fixing, validation, and logging.
+    """
+
+    # Arrange
+    input_manager = InputManager()
+    om = OutputManager()
+
+    # Act
+    result = input_manager._handle_container_error("Test error", variable_path, variable_properties, input_data)
+
+    # Assert
+    assert result == expected_result
+    assert input_data == expected_fixed_data
+
+    for warning in expected_warnings:
+        assert any(warning in w for w in om.warnings_pool)
+
+    for error in expected_errors:
+        assert any(error in e for e in om.errors_pool)
+
+    # Cleanup
+    om.flush_pools()
+
+
+@pytest.mark.parametrize(
+    "input_data, variable_path, variable_properties, validators, expected_result, expected_error_count", [
+        # Test with all validators passing
+        ({"a": 10}, ["a"], {"type": "number"}, [Mock(return_value=(True, ""))], True, 0),
+
+        # Test with a validator failing
+        ({"a": "invalid"}, ["a"], {"type": "number"}, [MagicMock(return_value=(False, "Invalid number"))], False, 1),
+
+        # Test with multiple validators, one failing
+        ({"a": "invalid"}, ["a"], {"type": "number"},
+         [Mock(return_value=(True, "")), MagicMock(return_value=(False, "Invalid number"))], False, 1),
+    ]
+)
+def test_revalidate_primitive_element_after_fix(mocker: MockerFixture, input_data: dict[str, Any],
+                                                variable_path: list[str | int], variable_properties: dict[str, Any],
+                                                validators: list[MagicMock], expected_result: bool,
+                                                expected_error_count: int) -> None:
+    """
+    Unit test for method _revalidate_primitive_element_after_fix() in file input_manager.py.
+
+    This test simply checks if the method calls the correct methods with the correct arguments and all possible
+    return routes are reachable.
+    """
+
+    # Arrange
+    input_manager = InputManager()
+    input_manager.counter.reset()
+    mocker.patch.object(input_manager, '_get_nested_dict_value', return_value=input_data[variable_path[-1]])
+    mocker.patch.object(input_manager, '_convert_variable_path_to_str', return_value='.'.join(map(str, variable_path)))
+    om = OutputManager()
+
+    # Assert before
+    assert len(om.errors_pool) == 0
+    assert input_manager.counter.fixed_elements == 0
+    assert input_manager.counter.invalid_elements == 0
+
+    # Act
+    result = input_manager._revalidate_primitive_element_after_fix(variable_path, variable_properties, input_data,
+                                                                   validators)
+
+    # Assert
+    assert result == expected_result
+    assert input_manager.counter.invalid_elements == expected_error_count
+    if expected_error_count > 0:
+        assert any("Fixed element is still invalid" in error for error in om.errors_pool)
+    else:
+        assert input_manager.counter.fixed_elements == 1
+
+    # Cleanup
+    om.flush_pools()
+    input_manager.counter.reset()
+
+
+@pytest.mark.parametrize(
+    "input_data, variable_path, variable_properties, expected_result, expected_error_count", [
+        # Numeric value test cases
+        ({"a": 10}, ["a"], {"type": "number"}, True, 0),
+        ({"a": "invalid"}, ["a"], {"type": "number"}, False, 1),
+        ({"a": 5}, ["a"], {"type": "number", "minimum": 10}, False, 1),
+        ({"a": 15}, ["a"], {"type": "number", "maximum": 10}, False, 1),
+
+        # String value test cases
+        ({"a": "test"}, ["a"], {"type": "string"}, True, 0),
+        ({"a": 123}, ["a"], {"type": "string"}, False, 1),
+        ({"a": "short"}, ["a"], {"type": "string", "minimum_length": 10}, False, 1),
+        ({"a": "very long string"}, ["a"], {"type": "string", "maximum_length": 5}, False, 1),
+        ({"a": "abcd"}, ["a"], {"type": "string", "pattern": r"\d+"}, False, 1),
+
+        # Boolean value test cases
+        ({"a": True}, ["a"], {"type": "bool"}, True, 0),
+        ({"a": "not_bool"}, ["a"], {"type": "bool"}, False, 1),
+    ]
+)
+def test_revalidate_primitive_element_after_fix_integration(input_data: dict[str, Any],
+                                                            variable_path: list[str | int],
+                                                            variable_properties: dict[str, Any],
+                                                            expected_result: bool,
+                                                            expected_error_count: int) -> None:
+    """
+    Integration test for method _revalidate_primitive_element_after_fix() in file input_manager.py.
+
+    This test checks the functionality of the method with actual validators.
+    """
+
+    # Arrange
+    input_manager = InputManager()
+    input_manager.counter.reset()
+    om = OutputManager()
+
+    validators = []
+    if variable_properties.get("type") == "number":
+        validators = [InputManager._is_numeric_value,
+                      InputManager._check_num_lower_bound,
+                      InputManager._check_num_upper_bound]
+    elif variable_properties.get("type") == "string":
+        validators = [InputManager._is_str_value,
+                      InputManager._check_str_len_lower_bound,
+                      InputManager._check_str_len_upper_bound,
+                      InputManager._check_str_pattern_match]
+    elif variable_properties.get("type") == "bool":
+        validators = [InputManager._is_bool_value]
+
+    # Act
+    result = input_manager._revalidate_primitive_element_after_fix(variable_path, variable_properties, input_data,
+                                                                   validators)
+
+    # Assert
+    assert result == expected_result
+    assert input_manager.counter.invalid_elements == expected_error_count
+    if expected_error_count > 0:
+        assert any("Fixed element is still invalid" in error for error in om.errors_pool)
+
+    # Cleanup
+    om.flush_pools()
+    input_manager.counter.reset()
