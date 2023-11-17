@@ -113,8 +113,11 @@ class Cow(HeiferIII):
         self.milking = False
         self.days_in_milk = 0
         self.estimated_daily_milk_produced = 0
+        # Milk production as estimated from the lactation curve, kg/day.
         self.daily_milk_fat_kg = 0
+        # Milk fat content estimate, kg/day.
         self.daily_milk_protein_kg = 0
+        # Milk protein content estimate, kg/day.
         self.milk_production_reduction = 0.0
         self.single_acc_milk_prod = 0
         self.future_cull_date = 0
