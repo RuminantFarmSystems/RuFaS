@@ -741,7 +741,7 @@ class OutputManager(object):
         self.add_log("filtering_log", filter_vars_msg, info_map)
         filter_log_count_msg = (
             f"There were {len(filter_pattern_matches)} matches for the {len(filter_patterns)}"
-            f" filter patterns in the {input_file_name} file."
+            f" filter pattern(s) in the {input_file_name} file."
         )
         self.add_log("num_filter_pattern_matches", filter_log_count_msg, info_map)
         return filter_pattern_matches
@@ -884,10 +884,17 @@ class OutputManager(object):
         report_data = self._prepare_report_data(
             filtered_pool, selected_variables, slice_start, slice_end
         )
+        if not report_data:
+            self.add_error(
+                "empty report data",
+                f"filter {filter_content.get('filters')} in {filter_file} led to empty report data.",
+            )
+            return
         number_of_elements = len(report_data[next(iter(report_data))])
         for i in range(number_of_elements):
             ith_element = [lst[i] for lst in report_data.values()]
             print(ith_element)
+            # average
 
     def _prepare_report_data(
         self,
