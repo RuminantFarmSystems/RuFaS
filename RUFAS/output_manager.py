@@ -788,7 +788,7 @@ class OutputManager(object):
         for filter_file in list_of_filter_files:
             input_path = os.path.join(filters_dir_path, filter_file)
             filter_contents = self._load_filter_file_content(input_path)
-            reports: Dict[str: List[Any]]={}
+            reports: Dict[str : List[Any]] = {}
             for filter_content in filter_contents:
                 if (
                     not isinstance(filter_content, dict)
@@ -809,7 +809,9 @@ class OutputManager(object):
                 if filter_file.startswith(
                     self.__supported_filter_types_prefixes["report"]
                 ):
-                    self._generate_report(
+                    reports[
+                        filter_content.get("name", "untitled")
+                    ] = self._generate_report(
                         filtered_pool,
                         filter_content,
                         save_path,
@@ -824,6 +826,11 @@ class OutputManager(object):
                         filter_content,
                         graphics_dir,
                     )
+            report_file_path = os.path.join(
+                save_path,
+                self._generate_file_name(f"report_{filter_file}", "csv"),
+            )
+            self._dict_to_file_csv(reports, report_file_path)
 
     def _route_save_functions(
         self,
