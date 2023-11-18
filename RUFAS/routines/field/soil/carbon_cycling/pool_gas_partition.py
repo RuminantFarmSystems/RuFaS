@@ -29,36 +29,82 @@ class PoolGasPartition:
         self.data = soil_data or SoilData(field_size=field_size)
 
     def partition_pool_gas(self):
-        """main routine to update variables associated with gas partitioning in all layers
+        """
+        Main routine to update variables associated with gas partitioning in all layers.
+
         Notes
         ------
         This method applies all the gas-partitioning sub routines to each layer of soil that is present in the soil
         `data` object.
-        """
 
-        for layer in self.data.soil_layers:
+        """
+        layer = self.data.soil_layers[0]
+        layer.active_carbon_decomposition_rate = self._determine_active_carbon_decomposition_rate(
+            layer.silt_clay_content)
+
+        layer.carbon_lost_adjusted_factor = self._determine_carbon_lost_adjusted_factor(
+            layer.silt_clay_content)
+
+        # ---- plants
+        layer.plant_metabolic_active_carbon_loss = self._determine_plant_metabolic_active_carbon_loss(
+            layer.plant_metabolic_active_carbon_usage)
+        layer.plant_metabolic_active_carbon_remaining = self._determine_plant_metabolic_active_carbon_remaining(
+            layer.plant_metabolic_active_carbon_usage)
+
+        # above ground structural C
+        layer.plant_structural_active_carbon_loss = self._determine_plant_structural_active_carbon_loss(
+            layer.plant_structural_active_carbon_usage)
+        layer.plant_structural_active_carbon_remaining = self._determine_plant_structural_active_carbon_remaining(
+            layer.plant_structural_active_carbon_usage)
+
+        layer.plant_structural_slow_carbon_loss = self._determine_plant_structural_slow_carbon_loss(
+            layer.plant_structural_slow_carbon_usage)
+        layer.plant_structural_slow_carbon_remaining = self._determine_plant_structural_slow_carbon_remaining(
+            layer.plant_structural_slow_carbon_usage)
+
+        layer.active_carbon_decomposition_amount = self._determine_active_carbon_decomposition_amount(
+            layer.decomposition_moisture_effect, layer.decomposition_temperature_effect,
+            layer.active_carbon_amount, layer.active_carbon_decomposition_rate
+        )
+
+        layer.slow_carbon_decomposition_amount = self._determine_slow_carbon_decomposition_amount(
+            layer.decomposition_moisture_effect, layer.decomposition_temperature_effect,
+            layer.slow_carbon_amount)
+
+        layer.passive_carbon_decomposition_amount = 0.0
+
+        layer.active_carbon_to_slow_amount = self._determine_active_carbon_to_slow_amount(
+            layer.active_carbon_decomposition_amount, layer.carbon_lost_adjusted_factor)
+
+        layer.active_carbon_to_slow_loss = self._determine_active_carbon_to_slow_loss(
+            layer.active_carbon_decomposition_amount, layer.carbon_lost_adjusted_factor)
+
+        layer.slow_to_active_carbon_amount = self._determine_slow_to_active_carbon_amount(
+            layer.slow_carbon_decomposition_amount)
+        layer.slow_carbon_co2_lost_amount = self._determine_slow_carbon_co2_lost_amount(
+            layer.slow_carbon_decomposition_amount)
+
+        # aggregate active carbon pool flux
+        layer.plant_active_decompose_carbon = self._determine_plant_active_decompose_carbon(
+            layer.plant_metabolic_active_carbon_remaining, layer.plant_structural_active_carbon_remaining)
+        layer.soil_active_decompose_carbon = 0.0
+        layer.active_carbon_amount = self._determine_soil_active_carbon_amount(
+            layer.active_carbon_amount, layer.plant_active_decompose_carbon, layer.soil_active_decompose_carbon,
+            layer.passive_to_active_carbon_amount, layer.slow_to_active_carbon_amount,
+            layer.active_carbon_decomposition_amount)
+        # aggregate slow carbon pool flux
+
+        layer.slow_carbon_amount = self._determine_soil_slow_carbon_amount(
+            layer.slow_carbon_amount, layer.plant_structural_slow_carbon_remaining,
+            layer.soil_structural_slow_carbon_remaining, layer.active_carbon_to_slow_amount,
+            layer.slow_carbon_decomposition_amount)
+
+        for layer in self.data.soil_layers[1:]:
             layer.active_carbon_decomposition_rate = self._determine_active_carbon_decomposition_rate(
                 layer.silt_clay_content)
 
             layer.carbon_lost_adjusted_factor = self._determine_carbon_lost_adjusted_factor(
                 layer.silt_clay_content)
-
-            # ---- plants
-            layer.plant_metabolic_active_carbon_loss = self._determine_plant_metabolic_active_carbon_loss(
-                layer.plant_metabolic_active_carbon_usage)
-            layer.plant_metabolic_active_carbon_remaining = self._determine_plant_metabolic_active_carbon_remaining(
-                layer.plant_metabolic_active_carbon_usage)
-
-            # above ground structural C
-            layer.plant_structural_active_carbon_loss = self._determine_plant_structural_active_carbon_loss(
-                layer.plant_structural_active_carbon_usage)
-            layer.plant_structural_active_carbon_remaining = self._determine_plant_structural_active_carbon_remaining(
-                layer.plant_structural_active_carbon_usage)
-
-            layer.plant_structural_slow_carbon_loss = self._determine_plant_structural_slow_carbon_loss(
-                layer.plant_structural_slow_carbon_usage)
-            layer.plant_structural_slow_carbon_remaining = self._determine_plant_structural_slow_carbon_remaining(
-                layer.plant_structural_slow_carbon_usage)
 
             # ----- soil
             layer.soil_metabolic_active_carbon_loss = self._determine_soil_metabolic_active_carbon_loss(
