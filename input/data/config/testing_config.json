@@ -1,9 +1,6 @@
 {
   "start_date" : "1989:1",
   "end_date" : "1998:365",
-  "csv_dir": "output/CSVs/",
-  "output_dir": "output/",
-  "graphic_dir": "output/graphics/",
   "set_seed": false,
   "random_seed": 0,
   "simulate_animals": false,
