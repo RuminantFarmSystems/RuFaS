@@ -141,12 +141,12 @@ def test_determine_harvest_index(harvest, heat_frac, water_def):
         assert data.harvest_index == CropManagement._adjust_harvest_index(potential, 0.5, water_def)
 
 
-@pytest.mark.parametrize("harvest_op,field_name,field_size,year,day,soil_data", [
-    (HarvestOperation.HARVEST, "test_1", 1.8, 1995, 200, SoilData(field_size=1.3)),
-    (HarvestOperation.HARVEST_NOKILL, "test_2", 4.5, 2010, 150, SoilData(field_size=2.4))
+@pytest.mark.parametrize("harvest_op,field_name,field_size,year,day,soil_data, killed", [
+    (HarvestOperation.HARVEST, "test_1", 1.8, 1995, 200, SoilData(field_size=1.3), True),
+    (HarvestOperation.HARVEST_NOKILL, "test_2", 4.5, 2010, 150, SoilData(field_size=2.4), False)
 ])
 def test_manage_harvest(harvest_op: HarvestOperation, field_name: str, field_size: float, year: int, day: int,
-                        soil_data: SoilData) -> None:
+                        soil_data: SoilData, killed: bool) -> None:
     """ensure that crops are harvested properly, dependent on their operation specs"""
     # Setup
     crop = CropManagement()
@@ -171,7 +171,7 @@ def test_manage_harvest(harvest_op: HarvestOperation, field_name: str, field_siz
         crop.kill.assert_not_called()
 
     crop._record_yield.assert_called_once_with(field_name, field_size, year, day)
-    crop._transfer_residue.assert_called_once_with(soil_data)
+    crop._transfer_residue.assert_called_once_with(soil_data, killed)
 
 
 @pytest.mark.parametrize("efficiency,harvest,override,should_fail", [
@@ -284,21 +284,27 @@ def test_record_yield(field_name: str, field_size: float, species: str, year: in
     assert actual['values'].__contains__(expected_value)
 
 
-@pytest.mark.parametrize("residue,nitrogen", [
-    (100, 22),
-    (0, 0),
-    (200.23, 45.66)
-])
-def test_transfer_residue(residue: float, nitrogen: float) -> None:
+@pytest.mark.parametrize(
+    "root_biomass,residue,nitrogen,killed,expected_root_depth,expected_surface_residue,expected_root_residue", [
+        (150, 150, 22, True, 100, 0.0, 150.0),
+        (100, 150, 22, True, 100, 50, 100),
+        (100, 150, 22, False, 0, 150, 0)
+    ])
+def test_transfer_residue(root_biomass: float, residue: float, nitrogen: float, killed: bool,
+                          expected_root_depth: float, expected_surface_residue: float,
+                          expected_root_residue: float) -> None:
     """Tests that residue and associated nutrients from harvests and not collected are properly transferred to the
         soil."""
     soil_data = SoilData(field_size=1)
-    soil_data.plant_surface_residue = 0
     soil_data.soil_layers[0].fresh_organic_nitrogen_content = 0
-    crop_data = CropData(yield_residue=residue, yield_nitrogen=nitrogen)
+    crop_data = CropData(yield_residue=residue, residue_nitrogen=nitrogen)
+    crop_data.root_depth = 100.0
+    crop_data.root_biomass = root_biomass
     crop_manage = CropManagement(crop_data)
 
-    crop_manage._transfer_residue(soil_data)
+    crop_manage._transfer_residue(soil_data, killed)
 
-    assert soil_data.plant_surface_residue == residue
+    assert soil_data.plant_surface_residue == expected_surface_residue
+    assert soil_data.plant_root_residue == expected_root_residue
+    assert soil_data.crop_root_depth == expected_root_depth
     assert soil_data.soil_layers[0].fresh_organic_nitrogen_content == nitrogen
