@@ -1,4 +1,7 @@
+import math
 from typing import List
+from unittest.mock import MagicMock, patch
+
 import pytest
 
 from RUFAS.current_day_conditions import CurrentDayConditions
@@ -18,12 +21,38 @@ def test_current_weather_snowfall(snow_fall: int, rainfall: int, actual: Current
     assert actual.rainfall == rainfall
 
 
-@pytest.mark.parametrize("months, expected", [
-    ([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12], [9, 10, 11, 13, 14, 15, 15, 15, 13, 12, 10, 9])
+@pytest.mark.parametrize("day_number, geographic_latitude_radians, month, polar_location", [
+    (15, 0.752, 1, False),  # Madison example, no polar day or night possible
+    (365, 1.222, 12, True),  # Winter in polar circle
+    (180, 1.222, 8, True),  # Sumer in polar circle
 ])
-def test_determine_daylength(months: List[int], expected: List[int]):
+def test_determine_daylength(day_number: int, geographic_latitude_radians: float, month: int, polar_location: bool) \
+        -> None:
     """Tests that correct day length were returned by the corresponding month"""
-    day_length = []
-    for month in months:
-        day_length.append(CurrentDayConditions.determine_daylength(month))
-    assert day_length == expected
+    with patch('RUFAS.current_day_conditions.CurrentDayConditions.calculate_solar_declination_radians',
+               wraps=CurrentDayConditions.calculate_solar_declination_radians) as mocked_radian_calculation:
+        if polar_location:
+            if month >= 6 or month <= 9:
+                assert CurrentDayConditions.determine_daylength(day_number, geographic_latitude_radians, month) == 24
+            elif month == 12 or month <= 3:
+                assert CurrentDayConditions.determine_daylength(day_number, geographic_latitude_radians, month) == 0
+            assert mocked_radian_calculation.call_count == 1
+        else:
+            actual = ((2 * math.acos(-math.tan(math.asin(0.4 * (math.sin((2 * math.pi / 365) * (day_number - 82))))) *
+                                     math.tan(geographic_latitude_radians))) / 0.2618)
+            assert actual == CurrentDayConditions.determine_daylength(day_number, geographic_latitude_radians, month)
+            assert mocked_radian_calculation.call_count == 1
+
+
+@pytest.mark.parametrize("day_number", [
+    2,
+    82,
+    365
+])
+def test_calculate_solar_declination_radians(day_number: int) -> None:
+    """Tests the calculation of solar declination radians is as expected"""
+    observed = CurrentDayConditions.calculate_solar_declination_radians(day_number)
+    sin_param = (2 * math.pi) / 365 * (day_number - 82)
+    asin_param = 0.4 * math.sin(sin_param)
+    expected = math.asin(asin_param)
+    assert observed == expected

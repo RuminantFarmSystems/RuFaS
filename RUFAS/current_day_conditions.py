@@ -74,7 +74,6 @@ class CurrentDayConditions:
         month : int
             month of the simulation
 
-
         Returns
         -------
         float
