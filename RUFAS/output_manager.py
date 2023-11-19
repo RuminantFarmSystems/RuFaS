@@ -280,7 +280,7 @@ class OutputManager(object):
             LogVerbosity.LOGS: "\33[92m",
         }
         if log_level <= self.__log_verbose:
-            log_format = "{color}[{timestamp}][{log_level}][{metadata_prefix}] {name}: {message}{color_reset}\n"
+            log_format = "{color}[{timestamp}][{log_level}][{metadata_prefix}] {name}. {message}{color_reset}\n"
             formatted_msg = log_format.format(
                 timestamp=info_map["timestamp"],
                 color=colors[log_level],
