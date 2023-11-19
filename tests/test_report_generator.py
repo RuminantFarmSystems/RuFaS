@@ -36,3 +36,9 @@ def test_sd_aggregator():
     assert sd_aggregator([]) == 0
 
 
+def test_sum_aggregator():
+    assert sum_aggregator([1, 2, 3, 4, 5]) == 15
+    assert sum_aggregator([-1, -2, -3, -4, -5]) == -15
+    assert sum_aggregator([]) == 0
+
+
