@@ -818,8 +818,6 @@ class OutputManager(object):
                         ] = report_generator.generate_report(
                             filtered_pool,
                             filter_content,
-                            save_path,
-                            Path(filter_file),
                         )
                     except (ValueError, KeyError) as e:
                         self.add_error("report generation error", str(e), info_map)
