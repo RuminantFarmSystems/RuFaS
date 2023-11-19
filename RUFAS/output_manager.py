@@ -798,7 +798,8 @@ class OutputManager(object):
                 ):
                     self.add_error(
                         "Parsing error",
-                        f"Could not parse {filter_file=}, it has to have JSON blobs and have `filters` entry.",
+                        f"Could not parse {filter_content.get('name')=} in {filter_file=},\
+                            it has to have JSON blobs and have `filters` entry.",
                         info_map,
                     )
                     continue

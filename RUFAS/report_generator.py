@@ -147,7 +147,7 @@ class ReportGenerator:
         )
         if not report_data:
             raise ValueError(
-                f"filter {filter_content.get('name')} in {filter_content.get('filters')} led to empty report data."
+                f"filter {filter_content.get('filters')} in {filter_content.get('name')} led to empty report data."
             )
 
         number_of_elements = len(report_data[next(iter(report_data))])
@@ -189,8 +189,7 @@ class ReportGenerator:
             return [vertical_aggregator(data_series) for _, data_series in report_data.items()]
 
         raise ValueError(
-            f"Didn't find `horizontal_aggregation` or `vertical_aggregation` in \
-             {filter_content.get('name')} in {filter_content.get('filters')}."
+            f"Didn't find `horizontal_aggregation` or `vertical_aggregation` in {filter_content.get('name')}."
         )
 
     def _prepare_report_data(
