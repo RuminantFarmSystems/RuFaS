@@ -138,7 +138,7 @@ class ReportGenerator:
                 for key, data_series in report_data.items()
             }
 
-        return report_data
+        return report_data.values()
 
     def _prepare_report_data(
         self,
