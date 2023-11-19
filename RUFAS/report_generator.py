@@ -2,24 +2,21 @@ from typing import Dict, List, Any, Callable
 from RUFAS.util import Utility
 
 
-def product_aggregator(data: List[float]) -> float:
+def average_aggregator(data: List[float]) -> float:
     """
-    Returns the product of a list of numbers.
+    Calculates the average of a list of numbers.
 
     Parameters
     ----------
     data : List[float]
-        A list of numbers whose product is to be calculated.
+        A list of numbers whose average is to be calculated.
 
     Returns
     -------
     float
-        The product of the input numbers. Returns 1 for an empty list.
+        The average of the input numbers.
     """
-    product = 1
-    for num in data:
-        product *= num
-    return product
+    return sum(data) / len(data) if data else 0
 
 
 def division_aggregator(data: List[float]) -> float:
@@ -47,38 +44,24 @@ def division_aggregator(data: List[float]) -> float:
     return result
 
 
-def sum_aggregator(data: List[float]) -> float:
+def product_aggregator(data: List[float]) -> float:
     """
-    Returns the sum of a list of numbers.
+    Returns the product of a list of numbers.
 
     Parameters
     ----------
     data : List[float]
-        A list of numbers whose sum is to be calculated.
+        A list of numbers whose product is to be calculated.
 
     Returns
     -------
     float
-        The sum of the input numbers.
+        The product of the input numbers. Returns 1 for an empty list.
     """
-    return sum(data)
-
-
-def average_aggregator(data: List[float]) -> float:
-    """
-    Calculates the average of a list of numbers.
-
-    Parameters
-    ----------
-    data : List[float]
-        A list of numbers whose average is to be calculated.
-
-    Returns
-    -------
-    float
-        The average of the input numbers.
-    """
-    return sum(data) / len(data) if data else 0
+    product = 1
+    for num in data:
+        product *= num
+    return product
 
 
 def sd_aggregator(data: List[float]) -> float:
@@ -99,12 +82,29 @@ def sd_aggregator(data: List[float]) -> float:
     return (sum((x - mean) ** 2 for x in data) / len(data)) ** 0.5 if data else 0
 
 
+def sum_aggregator(data: List[float]) -> float:
+    """
+    Returns the sum of a list of numbers.
+
+    Parameters
+    ----------
+    data : List[float]
+        A list of numbers whose sum is to be calculated.
+
+    Returns
+    -------
+    float
+        The sum of the input numbers.
+    """
+    return sum(data)
+
+
 AGGREGATION_FUNCTIONS: Dict[str, Callable[[List[float]], float]] = {
-    "sum": sum_aggregator,
     "average": average_aggregator,
-    "SD": sd_aggregator,
-    "product": product_aggregator,
     "division": division_aggregator,
+    "product": product_aggregator,
+    "SD": sd_aggregator,
+    "sum": sum_aggregator,
 }
 
 
