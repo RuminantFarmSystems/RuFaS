@@ -1,9 +1,32 @@
-class ReportGenerator:    
-    def _generate_report(
+from typing import Dict, List, Any
+from RUFAS.util import Utility
+
+
+def sum_aggregator(data):
+    return sum(data)
+
+
+def average_aggregator(data):
+    return sum(data) / len(data) if data else 0
+
+
+def sd_aggregator(data):
+    mean = average_aggregator(data)
+    return (sum((x - mean) ** 2 for x in data) / len(data)) ** 0.5 if data else 0
+
+
+AGGREGATION_FUNCTIONS = {
+    "sum": sum_aggregator,
+    "average": average_aggregator,
+    "SD": sd_aggregator,
+}
+
+
+class ReportGenerator:
+    def generate_report(
         self,
-        filtered_pool: Dict[str, pool_element_type],
+        filtered_pool: Dict[str, Dict[str, List[Any]]],
         filter_content: Dict[str, str | int],
-        filter_file: Path,
     ) -> List[Any]:
         info_map = {
             "class": self.__class__.__name__,
@@ -26,15 +49,15 @@ class ReportGenerator:
 
         horizontal_agg_key = filter_content.get("horizontal_aggregation")
         horizontal_aggregator = (
-            aggregator_functions.get(horizontal_agg_key)
-            if horizontal_agg_key in aggregator_functions
+            AGGREGATION_FUNCTIONS.get(horizontal_agg_key)
+            if horizontal_agg_key in AGGREGATION_FUNCTIONS
             else None
         )
 
         vertical_agg_key = filter_content.get("vertical_aggregation")
         vertical_aggregator = (
-            aggregator_functions.get(vertical_agg_key)
-            if vertical_agg_key in aggregator_functions
+            AGGREGATION_FUNCTIONS.get(vertical_agg_key)
+            if vertical_agg_key in AGGREGATION_FUNCTIONS
             else None
         )
 
@@ -68,7 +91,7 @@ class ReportGenerator:
 
     def _prepare_report_data(
         self,
-        filtered_pool: Dict[str, pool_element_type],
+        filtered_pool: Dict[str, Dict[str, List[Any]]],
         selected_variables: List[str],
         slice_start: int,
         slice_end: int,
@@ -116,7 +139,7 @@ class ReportGenerator:
                 report_data.update(
                     Utility.convert_list_of_dicts_to_dict_of_lists(
                         filtered_pool[key]["values"][
-                            slice_start : slice_end
+                            slice_start: slice_end
                             if slice_end != 0
                             else len(filtered_pool[key]["values"])
                         ]
@@ -124,7 +147,7 @@ class ReportGenerator:
                 )
             else:
                 report_data[key] = filtered_pool[key]["values"][
-                    slice_start : slice_end
+                    slice_start: slice_end
                     if slice_end != 0
                     else len(filtered_pool[key]["values"])
                 ]

@@ -14,6 +14,7 @@ from deprecated.sphinx import deprecated
 
 from RUFAS.util import Utility
 from RUFAS.graph_generator import GraphGenerator
+from RUFAS.report_generator import ReportGenerator
 
 
 class LogVerbosity(Enum):
@@ -809,9 +810,10 @@ class OutputManager(object):
                 if filter_file.startswith(
                     self.__supported_filter_types_prefixes["report"]
                 ):
+                    report_generator = ReportGenerator()
                     reports[
                         filter_content.get("name", "untitled")
-                    ] = self._generate_report(
+                    ] = report_generator.generate_report(
                         filtered_pool,
                         filter_content,
                         save_path,
