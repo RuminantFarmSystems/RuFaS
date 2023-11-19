@@ -262,19 +262,29 @@ class ReportGenerator:
                     raise KeyError(
                         "Can't generate report, use 'variables' arg to select items from data"
                     )
-                report_data.update(
-                    Utility.convert_list_of_dicts_to_dict_of_lists(
-                        filtered_pool[key]["values"][
-                            slice_start: slice_end
-                            if slice_end != 0
-                            else len(filtered_pool[key]["values"])
-                        ]
-                    )
+                temp_data = Utility.convert_list_of_dicts_to_dict_of_lists(
+                    filtered_pool[key]["values"][
+                        slice_start: slice_end
+                        if slice_end != 0
+                        else len(filtered_pool[key]["values"])
+                    ]
                 )
+                for temp_key, temp_values in temp_data.items():
+                    if temp_key in report_data:
+                        report_data[temp_key].extend(temp_values)
+                    else:
+                        report_data[temp_key] = temp_values
             else:
-                report_data[key] = filtered_pool[key]["values"][
-                    slice_start: slice_end
-                    if slice_end != 0
-                    else len(filtered_pool[key]["values"])
-                ]
+                if key in report_data:
+                    report_data[key].extend(filtered_pool[key]["values"][
+                        slice_start: slice_end
+                        if slice_end != 0
+                        else len(filtered_pool[key]["values"])
+                    ])
+                else:
+                    report_data[key] = filtered_pool[key]["values"][
+                        slice_start: slice_end
+                        if slice_end != 0
+                        else len(filtered_pool[key]["values"])
+                    ]
         return report_data

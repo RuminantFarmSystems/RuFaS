@@ -70,8 +70,8 @@ def test_generate_report_valid_horizontal_vertical(
     report_generator: ReportGenerator,
 ) -> None:
     filtered_pool: Dict[str, Dict[str, List[Dict[str, int]]]] = {
-        "data1": {"values": [{"a": 1, "b": 2}, {"a": 3, "b": 4}]},
-        "data2": {"values": [{"a": 5, "b": 6}, {"a": 7, "b": 8}]},
+        "data1": {"values": [{"a": 1, "b": 2, "c": 10}, {"a": 3, "b": 4, "c": 10}]},
+        "data2": {"values": [{"a": 5, "b": 6, "c": 10}, {"a": 7, "b": 8, "c": 10}]},
     }
     filter_content: Dict[str, Any] = {
         "variables": ["a", "b"],
@@ -95,15 +95,35 @@ def test_generate_report_invalid_empty_data(report_generator: ReportGenerator) -
         report_generator.generate_report(filtered_pool, filter_content)
 
 
-def test_prepare_report_data_valid(report_generator: ReportGenerator) -> None:
+def test_prepare_report_data_valid_list(report_generator: ReportGenerator) -> None:
     filtered_pool: Dict[str, Dict[str, List[int]]] = {
         "data1": {"values": [1, 2, 3, 4]},
         "data2": {"values": [5, 6, 7, 8]},
     }
-    selected_variables: List[str] = ["data1", "data2"]
-    assert report_generator._prepare_report_data(
-        filtered_pool, selected_variables, 1, 3
-    ) == {"data1": [2, 3], "data2": [6, 7]}
+    assert report_generator._prepare_report_data(filtered_pool, None, 1, 3) == {
+        "data1": [2, 3],
+        "data2": [6, 7],
+    }
+
+
+def test_prepare_report_data_valid_dict(report_generator: ReportGenerator) -> None:
+    filtered_pool: Dict[str, Dict[str, List[int]]] = {
+        "data1": {
+            "values": [
+                {"a": 1, "b": 2, "c": 3, "d": 4},
+                {"a": 5, "b": 6, "c": 7, "d": 8},
+            ]
+        },
+        "data2": {
+            "values": [
+                {"a": 11, "b": 12, "c": 13, "d": 14},
+                {"a": 15, "b": 16, "c": 17, "d": 18},
+            ]
+        },
+    }
+    actual = report_generator._prepare_report_data(filtered_pool, ["a", "b"], 1, 3)
+    expected = {"a": [5, 15], "b": [6, 16], "c": [7, 17], "d": [8, 18]}
+    assert actual == expected
 
 
 def test_prepare_report_data_invalid_no_variables(
