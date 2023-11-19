@@ -902,30 +902,26 @@ class OutputManager(object):
             )
             return
         number_of_elements = len(report_data[next(iter(report_data))])
-        # TODO: get horizontal_aggregator and vertical_aggregator from the filter
-        horizontal_aggregator = self.horizontal_aggregator
-        vertical_aggregator = self.vertical_aggregator
-        # TODO: right now we are assuming both horizontal_aggregator and vertical_aggregator are requested,
-        # whatif only one of them is needed?
-        if filter_content.get("horizontal_first"):
-            horinzontally_aggregated: List[Any] = []
-            for index_counter in range(number_of_elements):
-                horizon = {
-                    key: report_data[key][index_counter] for key in report_data.keys()
-                }
-                horinzontally_aggregated.append(horizontal_aggregator(horizon))
-            return vertical_aggregator(horinzontally_aggregated)
-        else:
-            vertically_aggregated: Dict[str, Any] = {}
-            for key, data_series in report_data:
-                vertically_aggregated[key] = vertical_aggregator(data_series)
-            return horizontal_aggregator(vertical_aggregator)
 
-    def horizontal_aggregator(self, x):
-        pass
+        horizontal_agg_key = filter_content.get("horizontal_aggregation")
+        horizontal_aggregator = aggregator_functions.get(horizontal_agg_key) if horizontal_agg_key in aggregator_functions else None
 
-    def vertical_aggregator(self, x):
-        pass
+        vertical_agg_key = filter_content.get("vertical_aggregation")
+        vertical_aggregator = aggregator_functions.get(vertical_agg_key) if vertical_agg_key in aggregator_functions else None
+
+        if horizontal_aggregator and vertical_aggregator:
+            if filter_content.get("horizontal_first", True):
+                horizontally_aggregated = [horizontal_aggregator({key: report_data[key][i] for key in report_data}) for i in range(number_of_elements)]
+                return vertical_aggregator(horizontally_aggregated)
+            else:
+                vertically_aggregated = {key: vertical_aggregator(data_series) for key, data_series in report_data.items()}
+                return horizontal_aggregator(vertically_aggregated)
+        elif horizontal_aggregator:
+            return [horizontal_aggregator({key: report_data[key][i] for key in report_data}) for i in range(number_of_elements)]
+        elif vertical_aggregator:
+            return {key: vertical_aggregator(data_series) for key, data_series in report_data.items()}
+
+        return report_data
 
     def _prepare_report_data(
         self,
