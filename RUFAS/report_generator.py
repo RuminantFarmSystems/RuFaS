@@ -99,12 +99,36 @@ def sum_aggregator(data: List[float]) -> float:
     return sum(data)
 
 
+def subtraction_aggregator(data: List[float]) -> float:
+    """
+    Subtracts each subsequent number in the list from the first number.
+
+    Parameters
+    ----------
+    data : List[float]
+        A list of numbers for the subtraction operation.
+
+    Returns
+    -------
+    float
+        The result of subtracting each subsequent number from the first number.
+        Returns None if the list is empty or has only one element.
+    """
+    if len(data) < 2:
+        return None
+    result = data[0]
+    for num in data[1:]:
+        result -= num
+    return result
+
+
 AGGREGATION_FUNCTIONS: Dict[str, Callable[[List[float]], float]] = {
     "average": average_aggregator,
     "division": division_aggregator,
     "product": product_aggregator,
     "SD": sd_aggregator,
     "sum": sum_aggregator,
+    "subtraction": subtraction_aggregator
 }
 
 
