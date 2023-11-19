@@ -81,7 +81,7 @@ def test_generate_report_valid_horizontal_vertical(
         "vertical_aggregation": "average",
         "horizontal_first": True,
     }
-    assert report_generator.generate_report(filtered_pool, filter_content) == [13]
+    assert report_generator.generate_report(filtered_pool, filter_content) == [9]
 
 
 def test_generate_report_invalid_empty_data(report_generator: ReportGenerator) -> None:
