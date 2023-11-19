@@ -66,7 +66,7 @@ class ReportGenerator:
         self,
         filtered_pool: Dict[str, Dict[str, List[Any]]],
         filter_content: Dict[str, str | int],
-    ) -> float | List[float]:
+    ) -> List[float]:
         """
         Generates a report based on filtered data and aggregation criteria.
 
@@ -84,8 +84,8 @@ class ReportGenerator:
 
         Returns
         -------
-        float | List[float]
-            The aggregated report data as a list or scalar.
+        List[float]
+            The aggregated report data as a list.
 
         Raises
         ------
@@ -123,17 +123,16 @@ class ReportGenerator:
             if filter_content.get("horizontal_first", True):
                 horizontally_aggregated = [
                     horizontal_aggregator(
-                        {key: report_data[key][i] for key in report_data}
+                        [report_data[key][i] for key in report_data.keys()]
                     )
                     for i in range(number_of_elements)
                 ]
-                return vertical_aggregator(horizontally_aggregated)
+                return [vertical_aggregator(horizontally_aggregated)]
             else:
-                vertically_aggregated = {
-                    key: vertical_aggregator(data_series)
-                    for key, data_series in report_data.items()
-                }
-                return horizontal_aggregator(vertically_aggregated)
+                vertically_aggregated = [
+                    vertical_aggregator(data_series) for _, data_series in report_data
+                ]
+                return [horizontal_aggregator(vertically_aggregated)]
         elif horizontal_aggregator:
             return [
                 horizontal_aggregator({key: report_data[key][i] for key in report_data})
