@@ -1,21 +1,60 @@
-from typing import Dict, List, Any
+from typing import Dict, List, Any, Callable
 from RUFAS.util import Utility
 
 
-def sum_aggregator(data):
+def sum_aggregator(data: List[float]) -> float:
+    """
+    Returns the sum of a list of numbers.
+
+    Parameters
+    ----------
+    data : List[float]
+        A list of numbers whose sum is to be calculated.
+
+    Returns
+    -------
+    float
+        The sum of the input numbers.
+    """
     return sum(data)
 
 
-def average_aggregator(data):
+def average_aggregator(data: List[float]) -> float:
+    """
+    Calculates the average of a list of numbers.
+
+    Parameters
+    ----------
+    data : List[float]
+        A list of numbers whose average is to be calculated.
+
+    Returns
+    -------
+    float
+        The average of the input numbers.
+    """
     return sum(data) / len(data) if data else 0
 
 
-def sd_aggregator(data):
+def sd_aggregator(data: List[float]) -> float:
+    """
+    Calculates the standard deviation of a list of numbers.
+
+    Parameters
+    ----------
+    data : List[float]
+        A list of numbers whose standard deviation is to be calculated.
+
+    Returns
+    -------
+    float
+        The standard deviation of the input numbers.
+    """
     mean = average_aggregator(data)
     return (sum((x - mean) ** 2 for x in data) / len(data)) ** 0.5 if data else 0
 
 
-AGGREGATION_FUNCTIONS = {
+AGGREGATION_FUNCTIONS: Dict[str, Callable[[List[float]], float]] = {
     "sum": sum_aggregator,
     "average": average_aggregator,
     "SD": sd_aggregator,
@@ -28,6 +67,26 @@ class ReportGenerator:
         filtered_pool: Dict[str, Dict[str, List[Any]]],
         filter_content: Dict[str, str | int],
     ) -> List[Any]:
+        """
+        Generates a report based on filtered data and aggregation criteria.
+
+        This method processes filtered data and performs specified horizontal and/or vertical aggregations
+        based on the instructions provided in filter_content.
+
+        Parameters
+        ----------
+        filtered_pool : Dict[str, Dict[str, List[Any]]]
+            The data pool from which the report is to be generated, structured as a dictionary.
+            Has the same structure of OutputManager's variables pool.
+
+        filter_content : Dict[str, str | int]
+            A dictionary containing filter criteria and aggregation instructions.
+
+        Returns
+        -------
+        List[Any]
+            The aggregated report data as a list.
+        """
         selected_variables = filter_content.get("variables")
         slice_start = filter_content.get("slice_start", 0)
         slice_end = filter_content.get("slice_end", 0)
