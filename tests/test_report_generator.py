@@ -49,3 +49,33 @@ def test_subtraction_aggregator():
     assert subtraction_aggregator([10]) is None
 
 
+class MockUtility:
+    @staticmethod
+    def convert_list_of_dicts_to_dict_of_lists(data):
+        return {k: [dic[k] for dic in data] for k in data[0]}
+
+
+Utility = MockUtility
+
+
+@pytest.fixture
+def report_generator():
+    return ReportGenerator()
+
+
+def test_generate_report_valid_horizontal_vertical(report_generator):
+    filtered_pool = {
+        "data1": {"values": [{"a": 1, "b": 2}, {"a": 3, "b": 4}]},
+        "data2": {"values": [{"a": 5, "b": 6}, {"a": 7, "b": 8}]},
+    }
+    filter_content = {
+        "variables": ["a", "b"],
+        "slice_start": 0,
+        "slice_end": 0,
+        "horizontal_aggregation": "sum",
+        "vertical_aggregation": "average",
+        "horizontal_first": True,
+    }
+    assert report_generator.generate_report(filtered_pool, filter_content) == [13]
+
+
