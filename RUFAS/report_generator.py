@@ -270,6 +270,8 @@ class ReportGenerator:
                     ]
                 )
                 for temp_key, temp_values in temp_data.items():
+                    if temp_key not in selected_variables:
+                        continue
                     if temp_key in report_data:
                         report_data[temp_key].extend(temp_values)
                     else:

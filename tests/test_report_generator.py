@@ -122,7 +122,7 @@ def test_prepare_report_data_valid_dict(report_generator: ReportGenerator) -> No
         },
     }
     actual = report_generator._prepare_report_data(filtered_pool, ["a", "b"], 1, 3)
-    expected = {"a": [5, 15], "b": [6, 16], "c": [7, 17], "d": [8, 18]}
+    expected = {"a": [5, 15], "b": [6, 16]}
     assert actual == expected
 
 
