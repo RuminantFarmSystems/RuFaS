@@ -86,6 +86,11 @@ class ReportGenerator:
         -------
         float | List[float]
             The aggregated report data as a list or scalar.
+
+        Raises
+        ------
+        ValueError
+            If the report data is empty or if the necessary aggregation keys are not found in filter_content.
         """
         selected_variables = filter_content.get("variables")
         slice_start = filter_content.get("slice_start", 0)
@@ -173,6 +178,11 @@ class ReportGenerator:
         -------
         Dict[str, List[Any]]
             Processed data suitable for report generation, keyed by selected variables.
+
+        Raises
+        ------
+        KeyError
+            If selected_variables is None and the data within the pool requires variable selection.
         """
         report_data: Dict[str, List[Any]] = {}
         for key in filtered_pool.keys():
