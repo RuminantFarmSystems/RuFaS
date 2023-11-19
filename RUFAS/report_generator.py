@@ -1,50 +1,4 @@
-class ReportGenerator():
-    def _route_save_functions(
-        self,
-        filter_file: str,
-        save_path: Path,
-        filtered_pool: Dict[str, pool_element_type],
-        produce_graphics: bool,
-        filter_content: Dict[str, str | int],
-        graphics_dir: Path,
-    ) -> None:
-        """
-        Checks the prefix of the filter_file to determine the format for saving. It then delegates the
-        saving process to the corresponding function to handle specific formats such as JSON, CSV, or graphical output.
-        """
-        info_map = {
-            "class": self.__class__.__name__,
-            "function": self._route_save_functions.__name__,
-        }
-        if filter_file.startswith(self.__supported_filter_types_prefixes["json"]):
-            file_path = os.path.join(
-                save_path,
-                self._generate_file_name(f"saved_variables_{filter_file}", "json"),
-            )
-            self._dict_to_file_json(filtered_pool, file_path)
-        elif filter_file.startswith(self.__supported_filter_types_prefixes["csv"]):
-            csv_directory = os.path.join(save_path, "CSVs", "om")
-            self._save_variables_to_csv_files(filtered_pool, filter_file, csv_directory)
-        elif filter_file.startswith(self.__supported_filter_types_prefixes["graph"]):
-            if produce_graphics:
-                try:
-                    graph_generator = GraphGenerator(self.__metadata_prefix)
-                    graph_generator.generate_graph(
-                        filtered_pool,
-                        filter_content,
-                        save_path,
-                        filter_file,
-                        graphics_dir,
-                    )
-                except Exception as e:
-                    self.add_error("graph generation exception", str(e), info_map)
-            else:
-                self.add_warning(
-                    "No Graphics",
-                    f"Graphic generation is disabled, skipping {filter_file=}",
-                    info_map,
-                )
-
+class ReportGenerator:    
     def _generate_report(
         self,
         filtered_pool: Dict[str, pool_element_type],
@@ -175,4 +129,3 @@ class ReportGenerator():
                     else len(filtered_pool[key]["values"])
                 ]
         return report_data
-
