@@ -79,3 +79,14 @@ def test_generate_report_valid_horizontal_vertical(report_generator):
     assert report_generator.generate_report(filtered_pool, filter_content) == [13]
 
 
+def test_generate_report_invalid_empty_data(report_generator):
+    filtered_pool = {}
+    filter_content = {
+        "variables": ["a", "b"],
+        "horizontal_aggregation": "sum",
+        "vertical_aggregation": "average",
+    }
+    with pytest.raises(ValueError):
+        report_generator.generate_report(filtered_pool, filter_content)
+
+
