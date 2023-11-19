@@ -42,3 +42,10 @@ def test_sum_aggregator():
     assert sum_aggregator([]) == 0
 
 
+def test_subtraction_aggregator():
+    assert subtraction_aggregator([10, 2, 3]) == 5
+    assert subtraction_aggregator([10, -2, -3]) == 15
+    assert subtraction_aggregator([]) is None
+    assert subtraction_aggregator([10]) is None
+
+
