@@ -28,11 +28,6 @@ class ReportGenerator:
         filtered_pool: Dict[str, Dict[str, List[Any]]],
         filter_content: Dict[str, str | int],
     ) -> List[Any]:
-        info_map = {
-            "class": self.__class__.__name__,
-            "function": self._generate_report.__name__,
-        }
-        self.add_log("init_report_generation", "Report Generation Started", info_map)
         selected_variables = filter_content.get("variables")
         slice_start = filter_content.get("slice_start", 0)
         slice_end = filter_content.get("slice_end", 0)
@@ -119,20 +114,12 @@ class ReportGenerator:
         Dict[str, List[Any]]
             Processed data suitable for report generation, keyed by selected variables.
         """
-        info_map = {
-            "class": self.__class__.__name__,
-            "function": self._prepare_report_data.__name__,
-        }
         report_data: Dict[str, List[Any]] = {}
         for key in filtered_pool.keys():
             is_data_in_dict = isinstance(filtered_pool[key]["values"][0], dict)
             if is_data_in_dict:
                 if selected_variables is None:
-                    self.add_error(
-                        "missing_variables_entry",
-                        "Can't generate report, use 'variables' arg to select items from data",
-                        info_map,
-                    )
+                    raise KeyError("Can't generate report, use 'variables' arg to select items from data")
                 report_data.update(
                     Utility.convert_list_of_dicts_to_dict_of_lists(
                         filtered_pool[key]["values"][

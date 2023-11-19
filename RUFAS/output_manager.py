@@ -810,15 +810,19 @@ class OutputManager(object):
                 if filter_file.startswith(
                     self.__supported_filter_types_prefixes["report"]
                 ):
+                    self.add_log("init_report_generation", "Report Generation Started", info_map)
                     report_generator = ReportGenerator()
-                    reports[
-                        filter_content.get("name", "untitled")
-                    ] = report_generator.generate_report(
-                        filtered_pool,
-                        filter_content,
-                        save_path,
-                        Path(filter_file),
-                    )
+                    try:
+                        reports[
+                            filter_content.get("name", "untitled")
+                        ] = report_generator.generate_report(
+                            filtered_pool,
+                            filter_content,
+                            save_path,
+                            Path(filter_file),
+                        )
+                    except (ValueError, KeyError) as e:
+                        self.add_error("report generation error", str(e), info_map)
                 else:
                     self._route_save_functions(
                         filter_file,
