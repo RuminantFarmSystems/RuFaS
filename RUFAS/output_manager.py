@@ -493,8 +493,7 @@ class OutputManager(object):
             return
 
         csv_columns = []
-        for variable_name in data_dict.keys():
-            variable_data = data_dict[variable_name]
+        for variable_name, variable_data in data_dict.items():
             csv_column_data = self._dict_to_csv_column_list(
                 variable_name, variable_data
             )
@@ -787,10 +786,12 @@ class OutputManager(object):
         )
         list_of_filter_files = self._list_filter_files_in_dir(filters_dir_path)
         for filter_file in list_of_filter_files:
+            info_map["filter file"] = filter_file
             input_path = os.path.join(filters_dir_path, filter_file)
             filter_contents = self._load_filter_file_content(input_path)
             reports: Dict[str: List[Any]] = {}
             for filter_content in filter_contents:
+                info_map["filter_content"] = filter_content
                 if (
                     not isinstance(filter_content, dict)
                     or "filters" not in filter_content.keys()
@@ -815,7 +816,7 @@ class OutputManager(object):
                     try:
                         reports[
                             filter_content.get("name", "untitled")
-                        ] = report_generator.generate_report(
+                        ]["values"] = report_generator.generate_report(
                             filtered_pool,
                             filter_content,
                         )

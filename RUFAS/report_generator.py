@@ -130,16 +130,16 @@ class ReportGenerator:
                 return [vertical_aggregator(horizontally_aggregated)]
             else:
                 vertically_aggregated = [
-                    vertical_aggregator(data_series) for _, data_series in report_data
+                    vertical_aggregator(data_series) for _, data_series in report_data.items()
                 ]
                 return [horizontal_aggregator(vertically_aggregated)]
         elif horizontal_aggregator:
             return [
-                horizontal_aggregator({key: report_data[key][i] for key in report_data})
+                horizontal_aggregator([report_data[key][i] for key in report_data.keys()])
                 for i in range(number_of_elements)
             ]
         elif vertical_aggregator:
-            return [vertical_aggregator(data_series) for _, data_series in report_data]
+            return [vertical_aggregator(data_series) for _, data_series in report_data.items()]
 
         raise ValueError(
             "Didn't find `horizontal_aggregation` or `vertical_aggregation` in the filter content."
