@@ -2,6 +2,51 @@ from typing import Dict, List, Any, Callable
 from RUFAS.util import Utility
 
 
+def product_aggregator(data: List[float]) -> float:
+    """
+    Returns the product of a list of numbers.
+
+    Parameters
+    ----------
+    data : List[float]
+        A list of numbers whose product is to be calculated.
+
+    Returns
+    -------
+    float
+        The product of the input numbers. Returns 1 for an empty list.
+    """
+    product = 1
+    for num in data:
+        product *= num
+    return product
+
+
+def division_aggregator(data: List[float]) -> float:
+    """
+    Divides the first number in the list by each of the subsequent numbers.
+
+    Parameters
+    ----------
+    data : List[float]
+        A list of numbers for the division operation.
+
+    Returns
+    -------
+    float
+        The result of dividing the first number by each subsequent number.
+        Returns None if the list is empty or has only one element.
+    """
+    if len(data) < 2:
+        return None
+    result = data[0]
+    for num in data[1:]:
+        if num == 0:  # Avoid division by zero
+            return None
+        result /= num
+    return result
+
+
 def sum_aggregator(data: List[float]) -> float:
     """
     Returns the sum of a list of numbers.
@@ -58,6 +103,8 @@ AGGREGATION_FUNCTIONS: Dict[str, Callable[[List[float]], float]] = {
     "sum": sum_aggregator,
     "average": average_aggregator,
     "SD": sd_aggregator,
+    "product": product_aggregator,
+    "division": division_aggregator,
 }
 
 
