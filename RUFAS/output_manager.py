@@ -816,7 +816,7 @@ class OutputManager(object):
                     report_generator = ReportGenerator()
                     try:
                         reports[
-                            filter_content.get("name", "untitled")
+                            filter_content.get("name", f"untitled_{self._get_timestamp()}")
                         ] = {"values": report_generator.generate_report(
                             filtered_pool,
                             filter_content,
