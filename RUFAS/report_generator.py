@@ -66,7 +66,7 @@ class ReportGenerator:
         self,
         filtered_pool: Dict[str, Dict[str, List[Any]]],
         filter_content: Dict[str, str | int],
-    ) -> List[Any]:
+    ) -> float | List[float]:
         """
         Generates a report based on filtered data and aggregation criteria.
 
@@ -84,8 +84,8 @@ class ReportGenerator:
 
         Returns
         -------
-        List[Any]
-            The aggregated report data as a list.
+        float | List[float]
+            The aggregated report data as a list or scalar.
         """
         selected_variables = filter_content.get("variables")
         slice_start = filter_content.get("slice_start", 0)
@@ -94,7 +94,9 @@ class ReportGenerator:
             filtered_pool, selected_variables, slice_start, slice_end
         )
         if not report_data:
-            raise ValueError(f"filter {filter_content.get('filters')} led to empty report data.")
+            raise ValueError(
+                f"filter {filter_content.get('filters')} led to empty report data."
+            )
 
         number_of_elements = len(report_data[next(iter(report_data))])
 
@@ -133,12 +135,11 @@ class ReportGenerator:
                 for i in range(number_of_elements)
             ]
         elif vertical_aggregator:
-            return {
-                key: vertical_aggregator(data_series)
-                for key, data_series in report_data.items()
-            }
+            return [vertical_aggregator(data_series) for _, data_series in report_data]
 
-        return report_data.values()
+        raise ValueError(
+            "Didn't find `horizontal_aggregation` or `vertical_aggregation` in the filter content."
+        )
 
     def _prepare_report_data(
         self,
@@ -178,7 +179,9 @@ class ReportGenerator:
             is_data_in_dict = isinstance(filtered_pool[key]["values"][0], dict)
             if is_data_in_dict:
                 if selected_variables is None:
-                    raise KeyError("Can't generate report, use 'variables' arg to select items from data")
+                    raise KeyError(
+                        "Can't generate report, use 'variables' arg to select items from data"
+                    )
                 report_data.update(
                     Utility.convert_list_of_dicts_to_dict_of_lists(
                         filtered_pool[key]["values"][
