@@ -789,7 +789,7 @@ class OutputManager(object):
             info_map["filter file"] = filter_file
             input_path = os.path.join(filters_dir_path, filter_file)
             filter_contents = self._load_filter_file_content(input_path)
-            reports: Dict[str: Dict[str: List[Any]]] = {"values": {}}
+            reports: Dict[str: Dict[str: List[Any]]] = {}
             for filter_content in filter_contents:
                 info_map["filter_content"] = filter_content
                 if (
@@ -816,10 +816,10 @@ class OutputManager(object):
                     try:
                         reports[
                             filter_content.get("name", "untitled")
-                        ]["values"] = report_generator.generate_report(
+                        ] = {"values": report_generator.generate_report(
                             filtered_pool,
                             filter_content,
-                        )
+                        )}
                     except (ValueError, KeyError) as e:
                         self.add_error("report generation error", str(e), info_map)
                 else:
