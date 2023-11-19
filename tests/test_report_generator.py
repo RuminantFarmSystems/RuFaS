@@ -90,3 +90,14 @@ def test_generate_report_invalid_empty_data(report_generator):
         report_generator.generate_report(filtered_pool, filter_content)
 
 
+def test_prepare_report_data_valid(report_generator):
+    filtered_pool = {
+        "data1": {"values": [1, 2, 3, 4]},
+        "data2": {"values": [5, 6, 7, 8]},
+    }
+    selected_variables = ["data1", "data2"]
+    assert report_generator._prepare_report_data(
+        filtered_pool, selected_variables, 1, 3
+    ) == {"data1": [2, 3], "data2": [6, 7]}
+
+
