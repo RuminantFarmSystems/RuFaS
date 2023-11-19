@@ -24,3 +24,9 @@ def test_division_aggregator():
     assert division_aggregator([10, 0]) is None
 
 
+def test_product_aggregator():
+    assert product_aggregator([1, 2, 3, 4, 5]) == 120
+    assert product_aggregator([-1, 2, -3, 4, -5]) == -120
+    assert product_aggregator([]) == 1
+
+
