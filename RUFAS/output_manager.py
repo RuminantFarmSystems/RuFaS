@@ -812,15 +812,24 @@ class OutputManager(object):
                 if filter_file.startswith(
                     self.__supported_filter_types_prefixes["report"]
                 ):
-                    self.add_log("init_report_generation", "Report Generation Started", info_map)
+                    self.add_log(
+                        "init_report_generation", "Report Generation Started", info_map
+                    )
                     report_generator = ReportGenerator()
                     try:
+                        report_name = filter_content.get(
+                            "name", f"untitled_{self._get_timestamp(True)}"
+                        )
                         reports[
-                            filter_content.get("name", f"untitled_{self._get_timestamp()}")
-                        ] = {"values": report_generator.generate_report(
-                            filtered_pool,
-                            filter_content,
-                        )}
+                            report_name
+                            if report_name not in reports.keys()
+                            else f"{report_name} {self._get_timestamp(True)}"
+                        ] = {
+                            "values": report_generator.generate_report(
+                                filtered_pool,
+                                filter_content,
+                            )
+                        }
                     except (ValueError, KeyError) as e:
                         self.add_error("report generation error", str(e), info_map)
                 else:
