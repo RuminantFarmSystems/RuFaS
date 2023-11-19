@@ -101,3 +101,10 @@ def test_prepare_report_data_valid(report_generator):
     ) == {"data1": [2, 3], "data2": [6, 7]}
 
 
+def test_prepare_report_data_invalid_no_variables(report_generator):
+    filtered_pool = {
+        "data1": {"values": [{"a": 1}, {"a": 2}]},
+        "data2": {"values": [{"b": 3}, {"b": 4}]},
+    }
+    with pytest.raises(KeyError):
+        report_generator._prepare_report_data(filtered_pool, None, 0, 0)
