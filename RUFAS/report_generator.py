@@ -40,11 +40,8 @@ class ReportGenerator:
             filtered_pool, selected_variables, slice_start, slice_end
         )
         if not report_data:
-            self.add_error(
-                "empty report data",
-                f"filter {filter_content.get('filters')} in {filter_file} led to empty report data.",
-            )
-            return
+            raise ValueError(f"filter {filter_content.get('filters')} led to empty report data.")
+
         number_of_elements = len(report_data[next(iter(report_data))])
 
         horizontal_agg_key = filter_content.get("horizontal_aggregation")
