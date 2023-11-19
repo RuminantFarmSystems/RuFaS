@@ -30,3 +30,9 @@ def test_product_aggregator():
     assert product_aggregator([]) == 1
 
 
+def test_sd_aggregator():
+    assert sd_aggregator([2, 4, 4, 4, 5, 5, 7, 9]) == pytest.approx(2)
+    assert sd_aggregator([-2, -4, -4, -4, -5, -5, -7, -9]) == pytest.approx(2)
+    assert sd_aggregator([]) == 0
+
+
