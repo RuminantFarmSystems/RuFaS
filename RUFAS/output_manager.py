@@ -789,7 +789,7 @@ class OutputManager(object):
             info_map["filter file"] = filter_file
             input_path = os.path.join(filters_dir_path, filter_file)
             filter_contents = self._load_filter_file_content(input_path)
-            reports: Dict[str: List[Any]] = {}
+            reports: Dict[str: Dict[str: List[Any]]] = {"values": {}}
             for filter_content in filter_contents:
                 info_map["filter_content"] = filter_content
                 if (
