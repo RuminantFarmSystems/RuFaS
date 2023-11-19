@@ -1,3 +1,4 @@
+from typing import Dict, List, Any
 import pytest
 from RUFAS.report_generator import (
     average_aggregator,
@@ -51,7 +52,9 @@ def test_subtraction_aggregator():
 
 class MockUtility:
     @staticmethod
-    def convert_list_of_dicts_to_dict_of_lists(data):
+    def convert_list_of_dicts_to_dict_of_lists(
+        data: List[Dict[str, Any]]
+    ) -> Dict[str, List[Any]]:
         return {k: [dic[k] for dic in data] for k in data[0]}
 
 
@@ -59,16 +62,18 @@ Utility = MockUtility
 
 
 @pytest.fixture
-def report_generator():
+def report_generator() -> ReportGenerator:
     return ReportGenerator()
 
 
-def test_generate_report_valid_horizontal_vertical(report_generator):
-    filtered_pool = {
+def test_generate_report_valid_horizontal_vertical(
+    report_generator: ReportGenerator,
+) -> None:
+    filtered_pool: Dict[str, Dict[str, List[Dict[str, int]]]] = {
         "data1": {"values": [{"a": 1, "b": 2}, {"a": 3, "b": 4}]},
         "data2": {"values": [{"a": 5, "b": 6}, {"a": 7, "b": 8}]},
     }
-    filter_content = {
+    filter_content: Dict[str, Any] = {
         "variables": ["a", "b"],
         "slice_start": 0,
         "slice_end": 0,
@@ -79,9 +84,9 @@ def test_generate_report_valid_horizontal_vertical(report_generator):
     assert report_generator.generate_report(filtered_pool, filter_content) == [13]
 
 
-def test_generate_report_invalid_empty_data(report_generator):
-    filtered_pool = {}
-    filter_content = {
+def test_generate_report_invalid_empty_data(report_generator: ReportGenerator) -> None:
+    filtered_pool: Dict[str, Dict[str, List[Any]]] = {}
+    filter_content: Dict[str, Any] = {
         "variables": ["a", "b"],
         "horizontal_aggregation": "sum",
         "vertical_aggregation": "average",
@@ -90,19 +95,21 @@ def test_generate_report_invalid_empty_data(report_generator):
         report_generator.generate_report(filtered_pool, filter_content)
 
 
-def test_prepare_report_data_valid(report_generator):
-    filtered_pool = {
+def test_prepare_report_data_valid(report_generator: ReportGenerator) -> None:
+    filtered_pool: Dict[str, Dict[str, List[int]]] = {
         "data1": {"values": [1, 2, 3, 4]},
         "data2": {"values": [5, 6, 7, 8]},
     }
-    selected_variables = ["data1", "data2"]
+    selected_variables: List[str] = ["data1", "data2"]
     assert report_generator._prepare_report_data(
         filtered_pool, selected_variables, 1, 3
     ) == {"data1": [2, 3], "data2": [6, 7]}
 
 
-def test_prepare_report_data_invalid_no_variables(report_generator):
-    filtered_pool = {
+def test_prepare_report_data_invalid_no_variables(
+    report_generator: ReportGenerator,
+) -> None:
+    filtered_pool: Dict[str, Dict[str, List[Dict[str, int]]]] = {
         "data1": {"values": [{"a": 1}, {"a": 2}]},
         "data2": {"values": [{"b": 3}, {"b": 4}]},
     }
