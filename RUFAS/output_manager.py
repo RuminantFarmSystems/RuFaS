@@ -789,7 +789,7 @@ class OutputManager(object):
         for filter_file in list_of_filter_files:
             input_path = os.path.join(filters_dir_path, filter_file)
             filter_contents = self._load_filter_file_content(input_path)
-            reports: Dict[str : List[Any]] = {}
+            reports: Dict[str: List[Any]] = {}
             for filter_content in filter_contents:
                 if (
                     not isinstance(filter_content, dict)
