@@ -66,9 +66,6 @@ def test_mix_soil_layers(layers: List[LayerData], field_size: float, pool_values
     tillage_app = TillageApplication(field_data, soil_data)
 
     tillage_app._mix_soil_layers(pool_name, till_depth, mix_frac, offset_top_layer)
-    print(till_depth)
-    print(mix_frac)
-    print(offset_top_layer)
 
     actual = tillage_app.soil_data.get_vectorized_layer_attribute(pool_name)
     assert actual == expected
