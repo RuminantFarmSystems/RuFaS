@@ -570,7 +570,7 @@ def test_partition_pool_gas(layers: list) -> None:
     assert layer.slow_carbon_amount == 5.1
 
     if layer.top_depth == 0:
-        assert layer.passive_carbon_amount is None
+        assert layer.passive_carbon_amount == 0.0
     else:
         assert layer.passive_carbon_amount == 1120.0
 
