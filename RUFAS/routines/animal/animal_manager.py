@@ -1913,7 +1913,7 @@ class AnimalManager:
         )
         self.animal_to_pen_id_map[animal.id] = pen_with_min_stocking_density.id
 
-    def daily_updates(self, feed, weather: Weather, time: Time):
+    def daily_updates(self, feed, weather: Weather, time: Time): # noqa
         """
         Execute the daily routines relating to Animals. All animals are
         updated through the life_cycle_manager's daily_update() method. The
@@ -1996,6 +1996,7 @@ class AnimalManager:
                 pen.call_p_rqmts()
                 pen.daily_p_update()  # Average phosphorus concentration per pen
 
+            # TODO make this a new method
             for output_data_dict in manure_excretions_output_data.values():
                 for manure_property, manure_value in output_data_dict['manure'].items():
                     info_map = {
@@ -2025,6 +2026,7 @@ class AnimalManager:
             self.life_cycle_manager.daily_milk_production = self.sum_daily_milk(
                 self.cows
             )
+            # TODO put all these in one big method for the daily reports
             for pen in self.all_pens:
                 if pen.animal_combination.name == "LAC_COW":
                     AnimalReporter.report_milk(pen, self.simulation_day)
