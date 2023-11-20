@@ -144,5 +144,6 @@ def test_till_soil(till_depth: float, incorp_frac: float, mix_frac: float, year:
                  call("structural_litter_amount", expected_till_depth, mix_frac, False),
                  call("active_carbon_amount", expected_till_depth, mix_frac, False),
                  call("slow_carbon_amount", expected_till_depth, mix_frac, False),
-                 call("passive_carbon_amount", expected_till_depth, mix_frac, True),]
+                 call("passive_carbon_amount", expected_till_depth, mix_frac, True),
+                 ]
     till_app._mix_soil_layers.assert_has_calls(mix_calls)
