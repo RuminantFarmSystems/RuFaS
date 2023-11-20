@@ -132,12 +132,17 @@ def test_till_soil(till_depth: float, incorp_frac: float, mix_frac: float, year:
     till_app._remove_amount_incorporated.assert_has_calls(remove_calls)
     expected_total_phosphorus = len(remove_calls) * 8
     till_app.soil_data.soil_layers[0].add_to_labile_phosphorus.assert_called_once_with(expected_total_phosphorus, 1.5)
-    mix_calls = [call("labile_inorganic_phosphorus_content", expected_till_depth, mix_frac),
-                 call("active_inorganic_phosphorus_content", expected_till_depth, mix_frac),
-                 call("stable_inorganic_phosphorus_content", expected_till_depth, mix_frac),
-                 call("nitrate_content", expected_till_depth, mix_frac),
-                 call("ammonium_content", expected_till_depth, mix_frac),
-                 call("active_organic_nitrogen_content", expected_till_depth, mix_frac),
-                 call("stable_organic_nitrogen_content", expected_till_depth, mix_frac),
-                 call("fresh_organic_nitrogen_content", expected_till_depth, mix_frac)]
+    mix_calls = [call("labile_inorganic_phosphorus_content", expected_till_depth, mix_frac, False),
+                 call("active_inorganic_phosphorus_content", expected_till_depth, mix_frac, False),
+                 call("stable_inorganic_phosphorus_content", expected_till_depth, mix_frac, False),
+                 call("nitrate_content", expected_till_depth, mix_frac, False),
+                 call("ammonium_content", expected_till_depth, mix_frac, False),
+                 call("active_organic_nitrogen_content", expected_till_depth, mix_frac, False),
+                 call("stable_organic_nitrogen_content", expected_till_depth, mix_frac, False),
+                 call("fresh_organic_nitrogen_content", expected_till_depth, mix_frac, False),
+                 call("metabolic_litter_amount", expected_till_depth, mix_frac, False),
+                 call("structural_litter_amount", expected_till_depth, mix_frac, False),
+                 call("active_carbon_amount", expected_till_depth, mix_frac, False),
+                 call("slow_carbon_amount", expected_till_depth, mix_frac, False),
+                 call("passive_carbon_amount", expected_till_depth, mix_frac, True),]
     till_app._mix_soil_layers.assert_has_calls(mix_calls)
