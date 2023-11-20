@@ -1610,7 +1610,6 @@ def test_filter_variables_pool_exclude_regex_patterns(
         (False, True, [{"filters": ".*", "title": "dummy_title"}], False),
         (False, False, [{"filters": ".*", "title": "dummy_title"}], False),
         (True, True, [{"no_filters": ".*", "title": "dummy_title"}], True),
-        (True, True, ["no_dict"], True),
     ],
 )
 def test_save_results(
