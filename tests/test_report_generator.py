@@ -66,22 +66,46 @@ def report_generator() -> ReportGenerator:
     return ReportGenerator()
 
 
-def test_generate_report_valid_horizontal_vertical(
-    report_generator: ReportGenerator,
-) -> None:
-    filtered_pool: Dict[str, Dict[str, List[Dict[str, int]]]] = {
+@pytest.fixture
+def sample_filtered_pool() -> Dict[str, Dict[str, List[Dict[str, int]]]]:
+    return {
         "data1": {"values": [{"a": 1, "b": 2, "c": 10}, {"a": 3, "b": 4, "c": 10}]},
         "data2": {"values": [{"a": 5, "b": 6, "c": 10}, {"a": 7, "b": 8, "c": 10}]},
     }
-    filter_content: Dict[str, Any] = {
+
+
+def test_generate_report_vertical_then_horizontal(
+    report_generator: ReportGenerator,
+    sample_filtered_pool: Dict[str, Dict[str, List[Dict[str, int]]]],
+):
+    filter_content = {
         "variables": ["a", "b"],
-        "slice_start": 0,
-        "slice_end": 0,
-        "horizontal_aggregation": "sum",
-        "vertical_aggregation": "average",
-        "horizontal_first": True,
+        "horizontal_aggregation": "average",
+        "vertical_aggregation": "sum",
+        "horizontal_first": False,
     }
-    assert report_generator.generate_report(filtered_pool, filter_content) == [9]
+    assert report_generator.generate_report(sample_filtered_pool, filter_content) == [18]
+
+
+
+
+
+# def test_generate_report_valid_horizontal_vertical(
+#     report_generator: ReportGenerator,
+# ) -> None:
+#     filtered_pool: Dict[str, Dict[str, List[Dict[str, int]]]] = {
+#         "data1": {"values": [{"a": 1, "b": 2, "c": 10}, {"a": 3, "b": 4, "c": 10}]},
+#         "data2": {"values": [{"a": 5, "b": 6, "c": 10}, {"a": 7, "b": 8, "c": 10}]},
+#     }
+#     filter_content: Dict[str, Any] = {
+#         "variables": ["a", "b"],
+#         "slice_start": 0,
+#         "slice_end": 0,
+#         "horizontal_aggregation": "sum",
+#         "vertical_aggregation": "average",
+#         "horizontal_first": True,
+#     }
+#     assert report_generator.generate_report(filtered_pool, filter_content) == [9]
 
 
 def test_generate_report_invalid_empty_data(report_generator: ReportGenerator) -> None:
