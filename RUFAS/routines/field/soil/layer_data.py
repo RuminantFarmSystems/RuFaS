@@ -432,6 +432,7 @@ class LayerData:
         if self.top_depth == 0:
             self.active_carbon_amount = 0.02 * total_soil_carbon_amount
             self.slow_carbon_amount = 0.98 * total_soil_carbon_amount
+            self.passive_carbon_amount = 0.0
             self.structural_litter_amount = (1 / 2) * residue
             self.metabolic_litter_amount = (1 / 2) * residue
         else:
