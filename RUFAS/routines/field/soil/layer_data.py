@@ -351,7 +351,7 @@ class LayerData:
 
         self._initialize_nitrogen_pools(field_size, residue)
 
-        self._initialize_carbon_pools(field_size)
+        self._initialize_carbon_pools(field_size, residue)
 
     def _initialize_nitrogen_pools(self, field_size: float, residue: float) -> None:
         """Initializes the nitrogen pools in the soil layer
@@ -405,31 +405,41 @@ class LayerData:
         if self.top_depth == 0:
             self.fresh_organic_nitrogen_content = 0.0015 * residue  # SWAT eqn. 3:1.1.5
 
-    def _initialize_carbon_pools(self, field_size: float) -> None:
+    def _initialize_carbon_pools(self, field_size: float, residue: float) -> None:
         """
         Initializes soil carbon pools based on the carbon content fraction of the layer.
 
         Parameters
         ----------
-        field_size: float
+        field_size : float
             Size of the field (ha).
+        residue : float
+            Amount of residue on the soil surface when this soil layer is initialized (kg / ha).
 
         Notes
         -----
-        This is an extremely simply and arbitrary way of initializing carbon pools in the soil, and is intended to be a
-        temporary solution until SWAT-C is implemented. Dividing the carbon equally between the three soil pools is an
-        arbitrary assumption, but is somewhat reasonable.
+        The splits for the initialization of carbon pools are not empirical but generally are
+        the same as values used by other models. The 50/50 split between litter pools is
+        a heavy abstraction but a more accurate split cannot be predicted without knowing management
+        practices prior to initialization.
 
         """
         soil_volume_in_cubic_meters = self.layer_thickness * (field_size * HECTARES_TO_SQUARE_MILLIMETERS) * \
             CUBIC_MILLIMETERS_TO_CUBIC_METERS
         soil_mass_in_kg = self.bulk_density * MEGAGRAMS_TO_KILOGRAMS * soil_volume_in_cubic_meters
+        total_soil_carbon_amount = (soil_mass_in_kg * (self.percent_organic_carbon_content / 100) / field_size)
 
-        one_third_soil_carbon = (1 / 3) * (soil_mass_in_kg * (self.percent_organic_carbon_content / 100) / field_size)
-
-        self.active_carbon_amount = one_third_soil_carbon
-        self.passive_carbon_amount = one_third_soil_carbon
-        self.slow_carbon_amount = one_third_soil_carbon
+        if self.top_depth == 0:
+            self.active_carbon_amount = 0.02 * total_soil_carbon_amount
+            self.slow_carbon_amount = 0.98 * total_soil_carbon_amount
+            self.structural_litter_amount = (1 / 2) * residue
+            self.metabolic_litter_amount = (1 / 2) * residue
+        else:
+            self.active_carbon_amount = 0.02 * total_soil_carbon_amount
+            self.slow_carbon_amount = 0.54 * total_soil_carbon_amount
+            self.passive_carbon_amount = 0.44 * total_soil_carbon_amount
+            self.structural_litter_amount = 0.0
+            self.metabolic_litter_amount = 0.0
 
     def add_to_labile_phosphorus(self, phosphorus_to_add: float, field_size: float) -> None:
         """This method is a wrapper for adding a specified mass of phosphorus to the labile phosphorus content of this
