@@ -717,7 +717,8 @@ class InputManager:
             parent_address = str(data_address.split("." + invalid_key)[0])
 
             om.add_error("Validation: data not found:", f"Cannot find \"{data_address}\", "
-                                                        f"\"{parent_address}\" does not have attribute \"{invalid_key}\".",
+                                                        f"\"{parent_address}\" does not have attribute "
+                                                        f"\"{invalid_key}\".",
                          info_map)
 
             raise KeyError(f"Data not found: Cannot find \"{data_address}\", "
@@ -783,7 +784,8 @@ class InputManager:
             parent_address = ".".join(element_hierarchy[:-1])
 
             om.add_error("Validation: data not found:", f"Cannot find \"{metadata_address}\", "
-                                                        f"\"{parent_address}\" does not have attribute \"{invalid_key}\".",
+                                                        f"\"{parent_address}\" does not have attribute "
+                                                        f"\"{invalid_key}\".",
                          info_map)
 
             raise KeyError(f"Data not found: Cannot find \"{metadata_address}\", "
