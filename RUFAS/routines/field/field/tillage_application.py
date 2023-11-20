@@ -114,9 +114,7 @@ class TillageApplication:
                                  "passive_carbon_amount"]
         pools_to_offset_top_layer = ["passive_carbon_amount"]
         for pool in pools_to_till_in_soil:
-            offset_top_layer = False
-            if pool in pools_to_offset_top_layer:
-                offset_top_layer = True
+            offset_top_layer = pool in pools_to_offset_top_layer
             self._mix_soil_layers(pool, tillage_depth, mixing_fraction, offset_top_layer)
         self._record_tillage(tillage_depth, incorporation_fraction, mixing_fraction, year, day)
 
