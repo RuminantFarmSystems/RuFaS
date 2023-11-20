@@ -158,7 +158,7 @@ class TillageApplication:
             if offset_top_layer and layer.top_depth == 0:
                 top_layer_offset == layer.bottom_depth
                 redistribution_fractions.append(0)
-                break
+                continue
             layer_not_tilled = layer.top_depth >= tillage_depth
             layer_partially_tilled = layer.bottom_depth > tillage_depth
             if layer_not_tilled:
@@ -181,7 +181,7 @@ class TillageApplication:
         number_of_tilled_layers = len(redistribution_fractions)
         for layer_index in range(number_of_tilled_layers):
             if offset_top_layer and layer_index == 0:
-                break
+                continue
             layer = self.soil_data.soil_layers[layer_index]
             layer_fraction = redistribution_fractions[layer_index]
 
