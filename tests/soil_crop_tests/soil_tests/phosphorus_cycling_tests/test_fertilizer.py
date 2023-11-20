@@ -1,5 +1,5 @@
 import pytest
-from unittest.mock import MagicMock
+from unittest.mock import MagicMock, patch
 from math import log, exp
 
 from RUFAS.routines.field.soil.soil_data import SoilData
@@ -50,33 +50,31 @@ def test_determine_dissolved_phosphorus_concentration(phosphorus, frac_released,
 
 
 # --- Helper function tests ---
-@pytest.mark.parametrize("initial_pool_amount,available_pool_amount,days_since_application,cover_type,field_size", [
-    (100, 100, 1, "BARE", 1.56),
-    (120, 96, 5, "GRASSED", 2.876),
-    (96, 21, 40, "RESIDUE_COVER", 1.243),
-    (100, 15, 35, "GRASSED", 2.3954),  # All phosphorus should be removed from pool
-    (90, 0, 78, "RESIDUE_COVER", 0.897),  # No phosphorus left in available pool
-])
+@pytest.mark.parametrize("initial_pool_amount,available_pool_amount,sorption_fraction,absorbed_phos,"
+                         "days_since_application,cover_type,field_size", [
+                             (100, 100, 0.10, 90.0, 1, "BARE", 1.56),
+                             (120, 96, 0.33, 56.4, 5, "GRASSED", 2.876),
+                             (96, 21, 0.266, 21.0, 40, "RESIDUE_COVER", 1.243),
+                             (100, 15, 1.0, 15.0, 35, "GRASSED", 2.3954),  # All phosphorus should be removed from pool
+                             (90, 0, 0.0, 0.0, 78, "RESIDUE_COVER", 0.897),  # No phosphorus left in available pool
+                         ])
 def test_absorb_phosphorus_from_available_pool(initial_pool_amount: float, available_pool_amount: float,
+                                               sorption_fraction: float, absorbed_phos: float,
                                                days_since_application: int, cover_type: str, field_size: float) -> None:
     """Tests that soil absorbs the correct amount of phosphorus from the available phosphorus pool"""
     data = SoilData(full_available_phosphorus_pool=initial_pool_amount, available_phosphorus_pool=available_pool_amount,
                     days_since_application=days_since_application, cover_type=cover_type, field_size=field_size)
     fert = Fertilizer(data)
 
-    fert._add_to_labile_phosphorus = MagicMock()
-    fert._determine_fraction_phosphorus_remaining = MagicMock(return_value=0.2)
+    expected_remaining_phosphorus = available_pool_amount - absorbed_phos
+    with patch.object(fert.data.soil_layers[0], "add_to_labile_phosphorus", new_callable=MagicMock) as add_phos, \
+            patch.object(fert, "_determine_fraction_phosphorus_remaining", new_callable=MagicMock,
+                         return_value=sorption_fraction) as determine_fraction:
+        fert._absorb_phosphorus_from_available_pool(field_size)
 
-    fraction_to_remain_in_pool = 0.2
-    amount_to_remove = available_pool_amount - (initial_pool_amount * fraction_to_remain_in_pool)
-    if amount_to_remove < 0:
-        amount_to_remove = available_pool_amount
-
-    observe = fert._absorb_phosphorus_from_available_pool()
-
-    fert._determine_fraction_phosphorus_remaining.assert_called_with(fert.data.cover_factor,
-                                                                     days_since_application)
-    assert observe == amount_to_remove
+    add_phos.assert_called_once_with(absorbed_phos, field_size)
+    determine_fraction.assert_called_with(fert.data.cover_factor, days_since_application)
+    assert fert.data.available_phosphorus_pool == expected_remaining_phosphorus
 
 
 @pytest.mark.parametrize("pool_amount,days_since_application,rainfall_events,rainfall,runoff,field_size", [
