@@ -40,33 +40,37 @@ def test_remove_amount_incorporated_error(data: object, expected: str) -> None:
                            f"'{expected}'."
 
 
-@pytest.mark.parametrize("layers,field_size,pool_values,pool_name,till_depth,mix_frac,expected", [
+@pytest.mark.parametrize("layers,field_size,pool_values,pool_name,till_depth,mix_frac,offset_top_layer,expected", [
     ([LayerData(field_size=1.3, top_depth=0, bottom_depth=20), LayerData(field_size=1.3, top_depth=20, bottom_depth=60),
-      LayerData(field_size=1.3, top_depth=60, bottom_depth=180)], 1.3, [40, 50, 20], "nitrate_content", 120, 0.3,
+      LayerData(field_size=1.3, top_depth=60, bottom_depth=180)], 1.3, [40, 50, 20], "nitrate_content", 120, 0.3, False,
      [33, 45, 32]),
     ([LayerData(field_size=1.4, top_depth=0, bottom_depth=20),
       LayerData(field_size=1.4, top_depth=20, bottom_depth=50)], 1.4, [30, 10], "active_inorganic_phosphorus_content",
-     50, 0.25, [26.5, 13.5]),
+     50, 0.25, False, [26.5, 13.5]),
     ([LayerData(field_size=2.1, top_depth=0, bottom_depth=20), LayerData(field_size=2.1, top_depth=20, bottom_depth=50),
       LayerData(field_size=2.1, top_depth=50, bottom_depth=110), LayerData(field_size=2.1, top_depth=110,
                                                                            bottom_depth=500)],
-     2.1, [30, 10, 3, 2], "nitrate_content", 50, 0.25, [26.5, 13.5, 3, 2]),
+     2.1, [30, 10, 3, 2], "nitrate_content", 50, 0.25, False, [26.5, 13.5, 3, 2]),
     ([LayerData(field_size=1, top_depth=0, bottom_depth=20)], 1.0, [20], "fresh_organic_nitrogen_content", 20, 0.4,
-     [20])
+     False, [20]),
+    ([LayerData(field_size=1.3, top_depth=0, bottom_depth=20), LayerData(field_size=1.3, top_depth=20, bottom_depth=60),
+      LayerData(field_size=1.3, top_depth=60, bottom_depth=180)], 1.3, [0, 50, 20], "passive_carbon_amount", 160, 0.3,
+     True, [0, 40, 27.5]),
 ])
 def test_mix_soil_layers(layers: List[LayerData], field_size: float, pool_values: List[float], pool_name: str,
-                         till_depth: float, mix_frac: float, expected: List[float]) -> None:
+                         till_depth: float, mix_frac: float, offset_top_layer: bool, expected: List[float]) -> None:
     """Tests that stuff is correctly redistributed between different pools in the soil layer."""
     soil_data = SoilData(field_size=field_size, soil_layers=layers)
     soil_data.set_vectorized_layer_attribute(pool_name, pool_values)
     field_data = FieldData(field_size=field_size)
     tillage_app = TillageApplication(field_data, soil_data)
-    print(tillage_app.soil_data.get_vectorized_layer_attribute(pool_name))
 
-    tillage_app._mix_soil_layers(pool_name, till_depth, mix_frac)
+    tillage_app._mix_soil_layers(pool_name, till_depth, mix_frac, offset_top_layer)
+    print(till_depth)
+    print(mix_frac)
+    print(offset_top_layer)
 
     actual = tillage_app.soil_data.get_vectorized_layer_attribute(pool_name)
-    print(actual)
     assert actual == expected
 
 
