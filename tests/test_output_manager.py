@@ -1731,23 +1731,41 @@ def test_save_results_report_generation(
     mock_output_manager._dict_to_file_csv = MagicMock()
     mock_output_manager.add_error = MagicMock()
 
-    with patch('RUFAS.output_manager.ReportGenerator') as mock_report_generator_class:
+    with patch("RUFAS.output_manager.ReportGenerator") as mock_report_generator_class:
         mock_report_generator = mock_report_generator_class.return_value
         mock_report_generator.generate_report = MagicMock()
 
         # Act
         mock_output_manager.save_results(
-            "save_path", "filters_path", exclude_info_maps, produce_graphics, "graphics_dir"
+            "save_path",
+            "filters_path",
+            exclude_info_maps,
+            produce_graphics,
+            "graphics_dir",
         )
 
         # Assert
-        if is_faulty:
-            mock_output_manager.add_error.assert_called()
-        else:
+        assert mock_output_manager.add_error.call_count == is_faulty * len(
+            mock_output_manager._list_filter_files_in_dir.return_value
+        )
+        if not is_faulty:
             mock_output_manager.add_error.assert_not_called()
-            assert (
-                mock_output_manager._dict_to_file_csv.call_count == 2
+            assert mock_output_manager._dict_to_file_csv.call_count == len(
+                mock_output_manager._list_filter_files_in_dir.return_value
             )
+
+        # test for exception handling
+        mock_report_generator.generate_report.side_effect = ValueError()
+        mock_output_manager.save_results(
+            "save_path",
+            "filters_path",
+            exclude_info_maps,
+            produce_graphics,
+            "graphics_dir",
+        )
+        assert mock_output_manager.add_error.call_count == len(
+            mock_output_manager._list_filter_files_in_dir.return_value
+        ) + is_faulty * len(mock_output_manager._list_filter_files_in_dir.return_value)
 
     # Restore original method states
     mock_output_manager.save_results = output_manager_original_method_states[
