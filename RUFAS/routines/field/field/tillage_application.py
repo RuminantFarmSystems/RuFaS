@@ -132,7 +132,7 @@ class TillageApplication:
         mixing_fraction : float
             Fraction taken from each layer that is mixed and redistributed back into the soil profile (unitless)
         offset_top_layer : bool, optional, by default=False
-            A flag that determines whether to offset the top layer of soil in redistribution calculations.
+            A flag that determines whether to offset the top layer of soil in redistribution calculations
 
         References
         ----------
@@ -146,8 +146,8 @@ class TillageApplication:
         redistributes mixed matter back into the tilled layers of the profile. The amount mixed back in to a layer is
         determined by the ratio between the depth of tillage in the layer and the total overall tillage depth.
 
-
-
+        This method acts in accordance with research from Dr. Xuesong Zhang which says that passive carbon is not
+        present in the top soil layer and is not mixed into the top soil layer during tillage operations.
         """
         redistribution_fractions = []
         total_to_mix_from_pools = 0
