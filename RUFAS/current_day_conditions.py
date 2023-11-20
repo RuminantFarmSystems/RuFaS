@@ -86,9 +86,15 @@ class CurrentDayConditions:
         solar_declination_radians = CurrentDayConditions.calculate_solar_declination_radians(day_number)
         if abs(-math.tan(solar_declination_radians) * math.tan(geographic_latitude_radians)) > 1:
             if month >= 6 or month <= 9:
-                return 24
+                if geographic_latitude_radians > 0:
+                    return 24
+                else:
+                    return 0
             elif month == 12 or month <= 3:
-                return 0
+                if geographic_latitude_radians > 0:
+                    return 0
+                else:
+                    return 24
         else:
             day_length = ((2 * math.acos(-math.tan(solar_declination_radians) * math.tan(geographic_latitude_radians)))
                           / angular_velocity)
@@ -113,5 +119,4 @@ class CurrentDayConditions:
         ----------
         SWAT 1:1.1.2
         """
-
         return math.asin(0.4*(math.sin((2*math.pi/365)*(day_number-82))))

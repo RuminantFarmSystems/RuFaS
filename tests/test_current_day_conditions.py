@@ -20,21 +20,33 @@ def test_current_weather_snowfall(snow_fall: int, rainfall: int, actual: Current
     assert actual.rainfall == rainfall
 
 
-@pytest.mark.parametrize("day_number, geographic_latitude_radians, month, polar_location", [
-    (15, 0.752, 1, False),  # Madison example, no polar day or night possible
-    (365, 1.222, 12, True),  # Winter in polar circle
-    (180, 1.222, 8, True),  # Sumer in polar circle
+@pytest.mark.parametrize("day_number, geographic_latitude_radians, month, polar_location, northern_hemisphere", [
+    (15, 0.752, 1, False, True),  # Madison example, no polar day or night possible
+    (365, 1.222, 12, True, True),  # Winter in polar circle
+    (180, 1.222, 8, True, True),  # Summer in polar circle
+    (365, -1.222, 12, True, False),  # Winter in polar circle (south hemisphere)
+    (180, -1.222, 8, True, False),  # Sumer in polar circle (south hemisphere)
 ])
-def test_determine_daylength(day_number: int, geographic_latitude_radians: float, month: int, polar_location: bool) \
-        -> None:
+def test_determine_daylength(day_number: int, geographic_latitude_radians: float, month: int, polar_location: bool,
+                             northern_hemisphere: bool) -> None:
     """Tests that correct day length were returned by the corresponding month"""
     with patch('RUFAS.current_day_conditions.CurrentDayConditions.calculate_solar_declination_radians',
                wraps=CurrentDayConditions.calculate_solar_declination_radians) as mocked_radian_calculation:
         if polar_location:
             if month >= 6 or month <= 9:
-                assert CurrentDayConditions.determine_daylength(day_number, geographic_latitude_radians, month) == 24
+                if northern_hemisphere:
+                    assert CurrentDayConditions.determine_daylength(
+                        day_number, geographic_latitude_radians, month) == 24
+                else:
+                    assert CurrentDayConditions.determine_daylength(
+                        day_number, geographic_latitude_radians, month) == 0
             elif month == 12 or month <= 3:
-                assert CurrentDayConditions.determine_daylength(day_number, geographic_latitude_radians, month) == 0
+                if northern_hemisphere:
+                    assert CurrentDayConditions.determine_daylength(
+                        day_number, geographic_latitude_radians, month) == 0
+                else:
+                    assert CurrentDayConditions.determine_daylength(
+                        day_number, geographic_latitude_radians, month) == 24
             assert mocked_radian_calculation.call_count == 1
         else:
             actual = ((2 * math.acos(-math.tan(math.asin(0.4 * (math.sin((2 * math.pi / 365) * (day_number - 82))))) *

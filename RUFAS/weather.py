@@ -172,7 +172,8 @@ class Weather:
         year = time.year
         day = time.day
         month = Utility.day_to_month_conversion(day, time.calendar_year)
-        daylength = CurrentDayConditions.determine_daylength(month)
+        # 0.752 as radian is hard-coded to Madison,WI
+        daylength = CurrentDayConditions.determine_daylength(day, 0.752, month)
         try:
             current_conditions = CurrentDayConditions(
                 incoming_light=self.__radiation[year - 1][day - 1],
