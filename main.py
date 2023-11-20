@@ -34,7 +34,8 @@ def main():
         graphics_dir=Path(cmd_arguments.graphics_dir),
         vars_file_path=Path(cmd_arguments.load_pool),
         output_dir=Path(cmd_arguments.output_dir),
-        filters_dir=Path(cmd_arguments.filters_dir)
+        filters_dir=Path(cmd_arguments.filters_dir),
+        csvs_dir=Path(cmd_arguments.csvs_dir)
     )
 
 
@@ -49,7 +50,8 @@ def run_rufas(
     graphics_dir: Path = Path(""),
     vars_file_path: Path = Path(""),
     output_dir: Path = Path("output/"),
-    filters_dir: Path = Path("output/output_filters/")
+    filters_dir: Path = Path("output/output_filters/"),
+    csvs_dir: Path = Path("output/CSVs/")
 ) -> None:
     """Main function to run RuFaS, with options.
 
@@ -77,6 +79,8 @@ def run_rufas(
         The directory for saving output.
     filters_dir : Path, optional, default=Path("output/output_filters")
         The directory for the files containing the keys for filtering.
+    csvs_dir : Path, optional, default=Path("output/CSVs")
+        The directory for the csv output files to be saved.
     """
     sys.stdout.write("RuFaS: Ruminant Farm Systems Model 2023\n")
 
@@ -364,6 +368,12 @@ def parse_gnu_args() -> argparse.Namespace:
         "--filters-dir",
         help="The directory for the files containing the keys for filtering",
         default="output/output_filters/",
+    )
+    parser.add_argument(
+        "-C",
+        "-csvs-dir",
+        help="The directory for the csv output files to be saved",
+        default="output/CSVs/"
     )
     return parser.parse_args()
 
