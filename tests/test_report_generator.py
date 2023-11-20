@@ -98,6 +98,15 @@ def test_generate_report_only_horizontal(
     assert report_generator.generate_report(sample_filtered_pool, filter_content) == [3, 7, 11, 15]
 
 
+def test_generate_report_only_vertical(
+    report_generator: ReportGenerator,
+    sample_filtered_pool: Dict[str, Dict[str, List[Dict[str, int]]]],
+):
+    filter_content = {
+        "variables": ["a", "b"],
+        "vertical_aggregation": "average",
+    }
+    assert report_generator.generate_report(sample_filtered_pool, filter_content) == [4, 5]
 
 
 # def test_generate_report_valid_horizontal_vertical(
