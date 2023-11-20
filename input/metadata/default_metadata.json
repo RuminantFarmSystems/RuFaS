@@ -1068,7 +1068,8 @@
         "minimum": 0
       },
       "events": {
-        "type": "string"
+        "type": "string",
+        "default": ""
       }
     },
     "heiferIs_properties": {
