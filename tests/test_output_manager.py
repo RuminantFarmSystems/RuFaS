@@ -1731,19 +1731,23 @@ def test_save_results_report_generation(
     mock_output_manager._dict_to_file_csv = MagicMock()
     mock_output_manager.add_error = MagicMock()
 
-    # Act
-    mock_output_manager.save_results(
-        "save_path", "filters_path", exclude_info_maps, produce_graphics, "graphics_dir"
-    )
+    with patch('RUFAS.output_manager.ReportGenerator') as mock_report_generator_class:
+        mock_report_generator = mock_report_generator_class.return_value
+        mock_report_generator.generate_report = MagicMock()
 
-    # Assert
-    if is_faulty:
-        mock_output_manager.add_error.assert_called()
-    else:
-        mock_output_manager.add_error.assert_not_called()
-        assert (
-            mock_output_manager._dict_to_file_csv.call_count == 2
+        # Act
+        mock_output_manager.save_results(
+            "save_path", "filters_path", exclude_info_maps, produce_graphics, "graphics_dir"
         )
+
+        # Assert
+        if is_faulty:
+            mock_output_manager.add_error.assert_called()
+        else:
+            mock_output_manager.add_error.assert_not_called()
+            assert (
+                mock_output_manager._dict_to_file_csv.call_count == 2
+            )
 
     # Restore original method states
     mock_output_manager.save_results = output_manager_original_method_states[
