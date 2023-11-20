@@ -747,11 +747,12 @@ class OutputManager(object):
 
     def save_results(
         self,
-        save_path: Path,
-        filters_dir_path: Path,
+        save_path: Path = Path("output/"),
+        filters_dir_path: Path = Path("output/output_filters/"),
         exclude_info_maps: bool = False,
         produce_graphics: bool = True,
         graphics_dir: Path = Path(""),
+        csvs_dir: Path = Path("output/CSVs/")
     ) -> None:
         """
         Reads a text file containing a list of keys and filters the variables pool by those keys.
@@ -810,6 +811,7 @@ class OutputManager(object):
                     produce_graphics,
                     filter_content,
                     graphics_dir,
+                    # TODO add csv dir here
                 )
 
     def _route_save_functions(
@@ -836,8 +838,11 @@ class OutputManager(object):
             )
             self._dict_to_file_json(filtered_pool, file_path)
         elif filter_file.startswith(self.__supported_filter_types_prefixes["csv"]):
-            csv_directory = os.path.join(save_path, "CSVs", "om")
-            self._save_variables_to_csv_files(filtered_pool, filter_file, csv_directory)
+            # TODO need gnu arg csv dir here (or default)
+            # TODO need to call _dict_to_file_csv
+            # TODO need to move some of save_vars_to_csv_files logic here
+            # csv_directory = os.path.join(save_path, "CSVs", "om")
+            # self._save_variables_to_csv_files(filtered_pool, filter_file, csv_directory)
         elif filter_file.startswith(self.__supported_filter_types_prefixes["graph"]):
             if produce_graphics:
                 try:
@@ -858,31 +863,31 @@ class OutputManager(object):
                     info_map,
                 )
 
-    def _save_variables_to_csv_files(
-        self, data_dict: Dict[str, Any], filter_name: str, path: str
-    ) -> None:
-        """
-        Saves the variables_pool into one csv file per variable in the given path to a directory.
+    # def _save_variables_to_csv_files(
+    #     self, data_dict: Dict[str, Any], filter_name: str, path: str
+    # ) -> None:
+    #     """
+    #     Saves the variables_pool into one csv file per variable in the given path to a directory.
 
-        Parameters
-        ----------
-        data_dict : Dict[str, Any]
-            The dictionary to be saved
-        filter_name : str
-            Name of the filter that is being used for selecting data for the CSV.
-        path : str
-            Path to the output directory for the OutputManager.
+    #     Parameters
+    #     ----------
+    #     data_dict : Dict[str, Any]
+    #         The dictionary to be saved
+    #     filter_name : str
+    #         Name of the filter that is being used for selecting data for the CSV.
+    #     path : str
+    #         Path to the output directory for the OutputManager.
 
-        """
-        try:
-            Path(path).mkdir(parents=True, exist_ok=True)
-        except Exception as e:
-            raise e
+    #     """
+    #     try:
+    #         Path(path).mkdir(parents=True, exist_ok=True)
+    #     except Exception as e:
+    #         raise e
 
-        variable_csv_file_path = os.path.join(
-            path, self._generate_file_name(f"saved_variables_{filter_name}", "csv")
-        )
-        self._dict_to_file_csv(data_dict, variable_csv_file_path)
+    #     variable_csv_file_path = os.path.join(
+    #         path, self._generate_file_name(f"saved_variables_{filter_name}", "csv")
+    #     )
+    #     self._dict_to_file_csv(data_dict, variable_csv_file_path)
 
     @deprecated(
         reason="""This function is still in the code base but it is not used. We want to keep it for debugging purposes
