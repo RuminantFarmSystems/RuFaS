@@ -417,176 +417,6 @@ class InputManager:
                 elems.append(elem)
         return ".".join(elems)
 
-    @staticmethod
-    def _is_numeric_value(variable_value: Any, variable_properties: Dict[str, Any]) -> Tuple[bool, str]:
-        """
-        Check if the variable value is a number.
-
-        Parameters
-        ----------
-        variable_value : Any
-            The value of the variable to check.
-        variable_properties : Dict[str, Any]
-            The properties for the variable of interest.
-
-        Returns
-        -------
-        Tuple[bool, str]
-            A tuple containing a boolean indicating if the check passed and a string containing the reason for failure.
-        """
-
-        if not type(variable_value) in (int, float):
-            return False, "Value is not a number"
-        return True, ""
-
-    @staticmethod
-    def _check_num_lower_bound(variable_value: int | float,
-                               variable_properties: Dict[str, Any]) -> Tuple[bool, str]:
-        """
-        Check if the variable value is greater than the minimum value.
-
-        Parameters
-        ----------
-        variable_value : int | float
-            The value of the variable to check.
-        variable_properties : Dict[str, Any]
-            The properties for the variable of interest.
-
-        Returns
-        -------
-        Tuple[bool, str]
-            A tuple containing a boolean indicating if the check passed and a string containing the reason for failure.
-        """
-
-        if "minimum" in variable_properties and variable_value < variable_properties["minimum"]:
-            return False, "Value less than minimum"
-        return True, ""
-
-    @staticmethod
-    def _check_num_upper_bound(variable_value: int | float,
-                               variable_properties: Dict[str, Any]) -> Tuple[bool, str]:
-        """
-        Check if the variable value is less than the maximum value.
-
-        Parameters
-        ----------
-        variable_value : int | float
-              The value of the variable to check.
-        variable_properties : Dict[str, Any]
-              The properties for the variable of interest.
-
-        Returns
-        -------
-        Tuple[bool, str]
-              A tuple containing a boolean indicating if the check passed and a string containing the reason for
-              failure.
-        """
-
-        if "maximum" in variable_properties and variable_value > variable_properties["maximum"]:
-            return False, "Value greater than maximum"
-        return True, ""
-
-    def _validate_num_type(self, variable_path: List[str | int],
-                           variable_properties: Dict[str, Any],
-                           input_data: Dict[str, Any]) -> bool:
-        """
-        Validate an input data element of type number.
-
-        Parameters
-        ----------
-        variable_properties : Dict[str, Any]
-            The properties for the variable of interest.
-        variable_path : List[str | int]
-            The path to the variable by following the keys in the input_data dictionary.
-        input_data : Dict[str, Any]
-            A reference to the input data dictionary to enable in-place fixing.
-
-        Returns
-        -------
-        bool
-            True if the element was valid or fixed, False otherwise.
-        """
-
-        primitive_type_specific_validators = [
-            self._is_numeric_value,
-            self._check_num_lower_bound,
-            self._check_num_upper_bound,
-        ]
-
-        return self._validate_primitive_type_with_revalidation(variable_path, variable_properties,
-                                                               input_data, primitive_type_specific_validators)
-
-    def _handle_validation_error(self, error_msg: str, variable_path: List[str | int],
-                                 variable_properties: Dict[str, Any],
-                                 input_data: Dict[str, Any], ) -> bool:
-        """
-        Handle the validation error by either fixing the data or logging an error.
-
-        Parameters
-        ----------
-        error_msg : str
-            The error message to log.
-        variable_path : List[str | int]
-            The path to the variable by following the keys in the input_data dictionary.
-        variable_properties : Dict[str, Any]
-            The properties for the variable of interest.
-        input_data : Dict[str, Any]
-            A reference to the input data dictionary to enable in-place fixing.
-
-        Returns
-        -------
-        bool
-            True if the data was fixed successfully, False otherwise.
-        """
-
-        info_map = {
-            "class": self.__class__.__name__,
-            "function": self._handle_validation_error.__name__,
-        }
-        variable_path_str = self._convert_variable_path_to_str(variable_path)
-        element_to_validate = self._get_nested_dict_value(input_data, variable_path)
-        om.add_warning(error_msg, f"{variable_path_str} = {element_to_validate}", info_map)
-
-        is_variable_fixed = self._fix_data(variable_properties, variable_path, input_data)
-        if is_variable_fixed:
-            self.counter.increment("fixed_elements")
-            return True
-
-        om.add_error("Invalid unfixable element found", f"{variable_path_str} = {element_to_validate}", info_map)
-        self.counter.increment("invalid_elements")
-        return False
-
-    def _validate_primitive_type_without_revalidation(self, variable_path: List[str | int],
-                                                      variable_properties: Dict[str, Any],
-                                                      input_data: Dict[str, Any],
-                                                      primitive_type_specific_validators: List[
-                                                          Callable[[Any, Dict[str, Any]], Tuple[bool, str]]]) -> bool:
-        """
-        Validate input data of primitive type (string, number, boolean) without revalidation of the fixed data.
-
-        Parameters
-        ----------
-        variable_path : List[str | int]
-            The path to the variable by following the keys in the input_data dictionary.
-        variable_properties : Dict[str, Any]
-            The properties for the variable of interest.
-        input_data : Dict[str, Any]
-            A reference to the input data dictionary to enable in-place fixing.
-        primitive_type_specific_validators : List[Callable[[Any, Dict[str, Any]], Tuple[bool, str]]]
-            A list of functions to use for validating the input data element.
-        """
-
-        self.counter.increment("total_elements")
-        element_to_validate = self._get_nested_dict_value(input_data, variable_path)
-
-        for validator in primitive_type_specific_validators:
-            is_valid, error_msg = validator(element_to_validate, variable_properties)
-            if not is_valid:
-                return self._handle_validation_error(error_msg, variable_path, variable_properties, input_data)
-
-        self.counter.increment("valid_elements")
-        return True
-
     def _handle_container_error(self, error_msg: str, variable_path: List[str | int],
                                 variable_properties: Dict[str, Any],
                                 input_data: Dict[str, Any], ) -> bool:
@@ -723,6 +553,152 @@ class InputManager:
         return True
 
     @staticmethod
+    def _is_bool_value(variable_value: Any, variable_properties: Dict[str, Any]) -> Tuple[bool, str]:
+        """
+        Check if the variable value is a boolean.
+
+        Parameters
+        ----------
+        variable_value : Any
+            The value of the variable to check.
+        variable_properties : Dict[str, Any]
+            The properties for the variable of interest.
+
+        Returns
+        -------
+        Tuple[bool, str]
+            A tuple containing a boolean indicating if the check passed and a string containing the reason for failure.
+
+        """
+
+        if type(variable_value) is not bool:
+            return False, "Bool variable is not a boolean"
+        return True, ""
+
+    def _validate_bool_type(self, variable_path: List[str | int],
+                            variable_properties: Dict[str, Any],
+                            input_data: Dict[str, Any]) -> bool:
+        """
+        Validate an input data boolean element.
+
+        Parameters
+        ----------
+        variable_path : List[str | int]
+            The path to the variable by following the keys in the input_data dictionary.
+        variable_properties : Dict[str, Any]
+            The properties for the variable of interest.
+        input_data : Dict[str, Any]
+            A reference to the input data dictionary to enable in-place fixing.
+
+        Returns
+        -------
+        bool
+            True if the input data value is valid for the specified type, False otherwise.
+        """
+
+        return self._validate_primitive_type_with_revalidation(variable_path, variable_properties,
+                                                               input_data, [self._is_bool_value])
+
+    @staticmethod
+    def _is_numeric_value(variable_value: Any, variable_properties: Dict[str, Any]) -> Tuple[bool, str]:
+        """
+        Check if the variable value is a number.
+
+        Parameters
+        ----------
+        variable_value : Any
+            The value of the variable to check.
+        variable_properties : Dict[str, Any]
+            The properties for the variable of interest.
+
+        Returns
+        -------
+        Tuple[bool, str]
+            A tuple containing a boolean indicating if the check passed and a string containing the reason for failure.
+        """
+
+        if not type(variable_value) in (int, float):
+            return False, "Value is not a number"
+        return True, ""
+
+    @staticmethod
+    def _check_num_lower_bound(variable_value: int | float,
+                               variable_properties: Dict[str, Any]) -> Tuple[bool, str]:
+        """
+        Check if the variable value is greater than the minimum value.
+
+        Parameters
+        ----------
+        variable_value : int | float
+            The value of the variable to check.
+        variable_properties : Dict[str, Any]
+            The properties for the variable of interest.
+
+        Returns
+        -------
+        Tuple[bool, str]
+            A tuple containing a boolean indicating if the check passed and a string containing the reason for failure.
+        """
+
+        if "minimum" in variable_properties and variable_value < variable_properties["minimum"]:
+            return False, "Value less than minimum"
+        return True, ""
+
+    @staticmethod
+    def _check_num_upper_bound(variable_value: int | float,
+                               variable_properties: Dict[str, Any]) -> Tuple[bool, str]:
+        """
+        Check if the variable value is less than the maximum value.
+
+        Parameters
+        ----------
+        variable_value : int | float
+              The value of the variable to check.
+        variable_properties : Dict[str, Any]
+              The properties for the variable of interest.
+
+        Returns
+        -------
+        Tuple[bool, str]
+              A tuple containing a boolean indicating if the check passed and a string containing the reason for
+              failure.
+        """
+
+        if "maximum" in variable_properties and variable_value > variable_properties["maximum"]:
+            return False, "Value greater than maximum"
+        return True, ""
+
+    def _validate_num_type(self, variable_path: List[str | int],
+                           variable_properties: Dict[str, Any],
+                           input_data: Dict[str, Any]) -> bool:
+        """
+        Validate an input data element of type number.
+
+        Parameters
+        ----------
+        variable_properties : Dict[str, Any]
+            The properties for the variable of interest.
+        variable_path : List[str | int]
+            The path to the variable by following the keys in the input_data dictionary.
+        input_data : Dict[str, Any]
+            A reference to the input data dictionary to enable in-place fixing.
+
+        Returns
+        -------
+        bool
+            True if the element was valid or fixed, False otherwise.
+        """
+
+        primitive_type_specific_validators = [
+            self._is_numeric_value,
+            self._check_num_lower_bound,
+            self._check_num_upper_bound,
+        ]
+
+        return self._validate_primitive_type_with_revalidation(variable_path, variable_properties,
+                                                               input_data, primitive_type_specific_validators)
+
+    @staticmethod
     def _is_str_value(variable_value: Any, variable_properties: Dict[str, Any]) -> Tuple[bool, str]:
         """
         Check if the variable value is a string.
@@ -845,53 +821,6 @@ class InputManager:
 
         return self._validate_primitive_type_with_revalidation(variable_path, variable_properties,
                                                                input_data, type_specific_validators)
-
-    @staticmethod
-    def _is_bool_value(variable_value: Any, variable_properties: Dict[str, Any]) -> Tuple[bool, str]:
-        """
-        Check if the variable value is a boolean.
-
-        Parameters
-        ----------
-        variable_value : Any
-            The value of the variable to check.
-        variable_properties : Dict[str, Any]
-            The properties for the variable of interest.
-
-        Returns
-        -------
-        Tuple[bool, str]
-            A tuple containing a boolean indicating if the check passed and a string containing the reason for failure.
-
-        """
-
-        if type(variable_value) is not bool:
-            return False, "Bool variable is not a boolean"
-        return True, ""
-
-    def _validate_bool_type(self, variable_path: List[str | int],
-                            variable_properties: Dict[str, Any],
-                            input_data: Dict[str, Any]) -> bool:
-        """
-        Validate an input data boolean element.
-
-        Parameters
-        ----------
-        variable_path : List[str | int]
-            The path to the variable by following the keys in the input_data dictionary.
-        variable_properties : Dict[str, Any]
-            The properties for the variable of interest.
-        input_data : Dict[str, Any]
-            A reference to the input data dictionary to enable in-place fixing.
-
-        Returns
-        -------
-        bool
-            True if the input data value is valid for the specified type, False otherwise.
-        """
-
-        return self._validate_primitive_type_with_revalidation(variable_path, variable_properties,
-                                                               input_data, [self._is_bool_value])
 
     @staticmethod
     def _is_object_value(variable_value: Dict, variable_properties: Dict[str, Any]) -> Tuple[bool, str]:

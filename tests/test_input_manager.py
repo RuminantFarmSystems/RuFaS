@@ -3240,16 +3240,16 @@ def test_revalidate_primitive_element_after_fix_integration(input_data: dict[str
     om = OutputManager()
 
     validators = []
-    if variable_properties.get("type") == "number":
+    if variable_properties["type"] == "number":
         validators = [InputManager._is_numeric_value,
                       InputManager._check_num_lower_bound,
                       InputManager._check_num_upper_bound]
-    elif variable_properties.get("type") == "string":
+    elif variable_properties["type"] == "string":
         validators = [InputManager._is_str_value,
                       InputManager._check_str_len_lower_bound,
                       InputManager._check_str_len_upper_bound,
                       InputManager._check_str_pattern_match]
-    elif variable_properties.get("type") == "bool":
+    elif variable_properties["type"] == "bool":
         validators = [InputManager._is_bool_value]
 
     # Act
@@ -3261,6 +3261,205 @@ def test_revalidate_primitive_element_after_fix_integration(input_data: dict[str
     assert input_manager.counter.invalid_elements == expected_error_count
     if expected_error_count > 0:
         assert any("Fixed element is still invalid" in error for error in om.errors_pool)
+
+    # Cleanup
+    om.flush_pools()
+    input_manager.counter.reset()
+
+
+@pytest.mark.parametrize(
+    "input_data, variable_path, variable_properties, validators, "
+    "validator_results, fix_data_result, revalidation_result, expected_result", [
+        # Test case where all validators pass
+        ({"a": 10}, ["a"], {"type": "number"}, [MagicMock(return_value=(True, ""))],
+         [True], None, None, True),
+
+        # Test case where at least one validator fails, but data is fixable and fixed successfully
+        ({"a": "invalid"}, ["a"], {"type": "number", "default": 10},
+         [MagicMock(return_value=(False, "Invalid number"))],
+         [False], True, True, True),
+
+        # Test case where at least one validator fails, but data is not fixable
+        ({"a": "invalid"}, ["a"], {"type": "number"},
+         [MagicMock(return_value=(False, "Invalid number"))],
+         [False], False, None, False),
+
+        # Test case where at least one validator fails, and data is fixable but still invalid
+        ({"a": "invalid"}, ["a"], {"type": "number", "default": "still_invalid"},
+         [MagicMock(return_value=(False, "Invalid number"))],
+         [False], True, False, False),
+    ]
+)
+def test_validate_primitive_type_with_revalidation(mocker: MockerFixture,
+                                                   input_data: dict[str, Any],
+                                                   variable_path: list[str | int],
+                                                   variable_properties: dict[str, Any],
+                                                   validators: list[MagicMock],
+                                                   validator_results: list[bool],
+                                                   fix_data_result: bool | None,
+                                                   revalidation_result: bool | None,
+                                                   expected_result: bool):
+    """
+    Unit test for method _validate_primitive_type_with_revalidation() in file input_manager.py.
+
+    This test checks if the method calls the correct methods with the correct arguments and all possible
+    return routes are reachable.
+    """
+
+    # Arrange
+    input_manager = InputManager()
+    input_manager.counter.reset()
+    om = OutputManager()
+    mocker.patch.object(input_manager, '_get_nested_dict_value', return_value=input_data[variable_path[-1]])
+    mocker.patch.object(input_manager, '_convert_variable_path_to_str', return_value='.'.join(map(str, variable_path)))
+    mocker.patch.object(input_manager, '_fix_data', return_value=fix_data_result)
+    patch_for_revalidate = mocker.patch.object(input_manager, '_revalidate_primitive_element_after_fix',
+                                               return_value=revalidation_result)
+
+    # Assert Before
+    assert len(om.warnings_pool) == 0
+    assert len(om.errors_pool) == 0
+    assert input_manager.counter.total_elements == 0
+    assert input_manager.counter.invalid_elements == 0
+    assert input_manager.counter.valid_elements == 0
+
+    # Act
+    result = input_manager._validate_primitive_type_with_revalidation(variable_path, variable_properties,
+                                                                      input_data, validators)
+
+    # Assert
+    assert result == expected_result
+    assert input_manager.counter.total_elements == 1
+    for i, validator in enumerate(validators):
+        validator.assert_called_once_with(input_data[variable_path[-1]], variable_properties)
+        if validator_results[i]:
+            continue
+
+        assert any(validator.return_value[1] in warning for warning in om.warnings_pool)
+        if fix_data_result is None:
+            patch_for_revalidate.assert_not_called()
+            continue
+
+        if fix_data_result:
+            patch_for_revalidate.assert_called_once_with(variable_path, variable_properties, input_data,
+                                                         validators[i:])
+        else:
+            assert any("Invalid, unfixable element found" in error for error in om.errors_pool)
+            assert input_manager.counter.invalid_elements == 1
+
+    if all(validator_result for validator_result in validator_results):
+        assert input_manager.counter.valid_elements == 1
+
+    # Cleanup
+    om.flush_pools()
+    input_manager.counter.reset()
+
+
+@pytest.mark.parametrize(
+    "input_data, variable_path, variable_properties, "
+    "expected_result, expected_data, "
+    "valid_element, fixed_element, invalid_element", [
+        # Testing number types
+
+        # Test case where the initial data is valid
+        ({"a": 10}, ["a"], {"type": "number", "minimum": 5, "maximum": 15},
+         True, {"a": 10},
+         True, False, False),
+
+        # Test case where the data is invalid but fixable, and the fixed data is valid
+        ({"a": "invalid"}, ["a"], {"type": "number", "default": 10, "minimum": 5, "maximum": 15},
+         True, {"a": 10},
+         False, True, False),
+
+        # Test case where the data is invalid and unfixable
+        ({"a": "invalid"}, ["a"], {"type": "number", "minimum": 5, "maximum": 15},
+         False, {"a": "invalid"},
+         False, False, True),
+
+        # Test case where the data is invalid, fixable, but the fixed data is still invalid
+        ({"a": "invalid"}, ["a"], {"type": "number", "default": 20, "minimum": 5, "maximum": 15},
+         False, {"a": 20},
+         False, False, True),
+
+        # Testing string types
+
+        # Test case where the initial data is valid
+        ({"a": "validString"}, ["a"], {"type": "string", "minimum_length": 5, "maximum_length": 15},
+         True, {"a": "validString"},
+         True, False, False),
+
+        # Test case where the data is invalid but fixable, and the fixed data is valid
+        ({"a": 12345}, ["a"], {"type": "string", "default": "fixedString", "minimum_length": 5, "maximum_length": 15},
+         True, {"a": "fixedString"},
+         False, True, False),
+
+        # Test case where the data is invalid and unfixable
+        ({"a": 12345}, ["a"], {"type": "string", "minimum_length": 5, "maximum_length": 15},
+         False, {"a": 12345},
+         False, False, True),
+
+        # Test case where the data is invalid, fixable, but the fixed data is still invalid (too short)
+        ({"a": "short"}, ["a"], {"type": "string", "default": "small", "minimum_length": 6, "maximum_length": 15},
+         False, {"a": "small"},
+         False, False, True),
+
+        # Testing boolean types
+
+        # Test case where the initial data is valid
+        ({"a": True}, ["a"], {"type": "bool"}, True, {"a": True}, True, False, False),
+
+        # Test case where the data is invalid but fixable, and the fixed data is valid
+        ({"a": "not a bool"}, ["a"], {"type": "bool", "default": False}, True, {"a": False}, False, True, False),
+
+        # Test case where the data is invalid and unfixable
+        ({"a": "not a bool"}, ["a"], {"type": "bool"}, False, {"a": "not a bool"}, False, False, True),
+
+        # Test case where the data is invalid, fixable, but the fixed data is still invalid (non-boolean default)
+        ({"a": "not a bool"}, ["a"], {"type": "bool", "default": "still not a bool"}, False, {"a": "still not a bool"},
+         False, False, True),
+
+    ]
+)
+def test_validate_primitive_type_with_revalidation_integration_test(input_data: dict[str, Any],
+                                                                    variable_path: list[str | int],
+                                                                    variable_properties: dict[str, Any],
+                                                                    expected_result: bool,
+                                                                    expected_data: dict[str, Any],
+                                                                    valid_element: bool,
+                                                                    fixed_element: bool,
+                                                                    invalid_element: bool) -> None:
+    """
+    Integration test for method _validate_primitive_type_with_revalidation() in file input_manager.py.
+
+    This test checks the interaction of the method with actual validators and data fixing mechanism.
+    """
+
+    # Arrange
+    input_manager = InputManager()
+    om = OutputManager()
+    input_manager.counter.reset()
+
+    validators = []
+    if variable_properties["type"] == "number":
+        validators = [InputManager._is_numeric_value, InputManager._check_num_lower_bound,
+                      InputManager._check_num_upper_bound]
+    elif variable_properties["type"] == "string":
+        validators = [InputManager._is_str_value, InputManager._check_str_len_lower_bound,
+                      InputManager._check_str_len_upper_bound, InputManager._check_str_pattern_match]
+    elif variable_properties["type"] == "bool":
+        validators = [InputManager._is_bool_value]
+
+    # Act
+    result = input_manager._validate_primitive_type_with_revalidation(variable_path, variable_properties, input_data,
+                                                                      validators)
+
+    # Assert
+    assert result == expected_result
+    assert input_data == expected_data
+    assert input_manager.counter.total_elements == 1
+    assert input_manager.counter.valid_elements == int(valid_element)
+    assert input_manager.counter.fixed_elements == int(fixed_element)
+    assert input_manager.counter.invalid_elements == int(invalid_element)
 
     # Cleanup
     om.flush_pools()
