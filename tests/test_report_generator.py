@@ -84,7 +84,22 @@ def test_generate_report_vertical_then_horizontal(
         "vertical_aggregation": "sum",
         "horizontal_first": False,
     }
-    assert report_generator.generate_report(sample_filtered_pool, filter_content) == [18]
+    assert report_generator.generate_report(sample_filtered_pool, filter_content) == [
+        18
+    ]
+
+
+def test_generate_report_horizontal_then_vertical(
+    report_generator: ReportGenerator,
+    sample_filtered_pool: Dict[str, Dict[str, List[Dict[str, int]]]],
+):
+    filter_content = {
+        "variables": ["a", "b"],
+        "horizontal_aggregation": "sum",
+        "vertical_aggregation": "average",
+        "horizontal_first": True,
+    }
+    assert report_generator.generate_report(sample_filtered_pool, filter_content) == [9]
 
 
 def test_generate_report_only_horizontal(
@@ -95,7 +110,12 @@ def test_generate_report_only_horizontal(
         "variables": ["a", "b"],
         "horizontal_aggregation": "sum",
     }
-    assert report_generator.generate_report(sample_filtered_pool, filter_content) == [3, 7, 11, 15]
+    assert report_generator.generate_report(sample_filtered_pool, filter_content) == [
+        3,
+        7,
+        11,
+        15,
+    ]
 
 
 def test_generate_report_only_vertical(
@@ -106,7 +126,10 @@ def test_generate_report_only_vertical(
         "variables": ["a", "b"],
         "vertical_aggregation": "average",
     }
-    assert report_generator.generate_report(sample_filtered_pool, filter_content) == [4, 5]
+    assert report_generator.generate_report(sample_filtered_pool, filter_content) == [
+        4,
+        5,
+    ]
 
 
 def test_generate_report_no_aggregation(
