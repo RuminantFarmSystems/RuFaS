@@ -1697,6 +1697,76 @@ def test_save_results(
     mock_output_manager.add_error = output_manager_original_method_states["add_error"]
 
 
+@pytest.mark.parametrize(
+    "exclude_info_maps, produce_graphics, filter_content, is_faulty",
+    [
+        (True, True, [{"filters": ".*", "title": "dummy_title"}], False),
+        (True, False, [{"filters": ".*", "title": "dummy_title"}], False),
+        (False, True, [{"filters": ".*", "title": "dummy_title"}], False),
+        (False, False, [{"filters": ".*", "title": "dummy_title"}], False),
+        (True, True, [{"no_filters": ".*", "title": "dummy_title"}], True),
+    ],
+)
+def test_save_results_report_generation(
+    mock_output_manager: OutputManager,
+    output_manager_original_method_states: Dict[str, Callable],
+    exclude_info_maps: bool,
+    produce_graphics: bool,
+    filter_content: List[Dict[str, str]],
+    is_faulty: bool,
+) -> None:
+    # Arrange
+    mock_output_manager.variables_pool = {}
+    mock_output_manager._generate_file_name = MagicMock(return_value="dummy_name")
+    mock_output_manager._load_filter_file_content = MagicMock(
+        return_value=filter_content
+    )
+    mock_output_manager._list_filter_files_in_dir = MagicMock(
+        return_value=[
+            "report_input_filepath1.txt",
+            "report_input_filepath2.txt",
+        ]
+    )
+    mock_output_manager._exclude_info_maps = MagicMock(return_value={})
+    mock_output_manager._dict_to_file_csv = MagicMock()
+    mock_output_manager.add_error = MagicMock()
+
+    # Act
+    mock_output_manager.save_results(
+        "save_path", "filters_path", exclude_info_maps, produce_graphics, "graphics_dir"
+    )
+
+    # Assert
+    if is_faulty:
+        mock_output_manager.add_error.assert_called()
+    else:
+        mock_output_manager.add_error.assert_not_called()
+        assert (
+            mock_output_manager._dict_to_file_csv.call_count == 2
+        )
+
+    # Restore original method states
+    mock_output_manager.save_results = output_manager_original_method_states[
+        "save_results"
+    ]
+    mock_output_manager._list_filter_files_in_dir = (
+        output_manager_original_method_states["_list_filter_files_in_dir"]
+    )
+    mock_output_manager._generate_file_name = output_manager_original_method_states[
+        "_generate_file_name"
+    ]
+    mock_output_manager._load_filter_file_content = (
+        output_manager_original_method_states["_load_filter_file_content"]
+    )
+    mock_output_manager._exclude_info_maps = output_manager_original_method_states[
+        "_exclude_info_maps"
+    ]
+    mock_output_manager._dict_to_file_csv = output_manager_original_method_states[
+        "_dict_to_file_csv"
+    ]
+    mock_output_manager.add_error = output_manager_original_method_states["add_error"]
+
+
 def test_route_save_functions_csv(
     mock_output_manager: OutputManager,
     output_manager_original_method_states: Dict[str, Callable],
