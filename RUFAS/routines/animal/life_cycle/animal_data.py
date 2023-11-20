@@ -307,8 +307,6 @@ class AnimalData:
                     args['id'] = self.next_id()
                 elif arg == 'p_init':
                     args['p_init'] = 0
-                elif arg == 'events' and data['events'][i].lower() == 'no events':
-                    args['events'] = ''
                 else:
                     args[arg] = data[arg][i]
             args_list.append(args)
