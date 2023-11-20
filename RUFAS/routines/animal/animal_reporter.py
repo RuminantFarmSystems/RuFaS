@@ -100,7 +100,7 @@ class AnimalReporter:
             )
             om.add_variable(
                 f"ration_per_animal_for_pen_{pen.id}_{pen.animal_combination.name}",
-                pen.ration_per_animal,
+                ration_per_animal,
                 info_map,
             )
             if pen.animal_combination != Pen.AnimalCombination.CALF:

@@ -20,6 +20,7 @@ from RUFAS.routines.animal.life_cycle.heiferI import HeiferI
 from RUFAS.routines.animal.life_cycle.heiferII import HeiferII
 from RUFAS.routines.animal.life_cycle.heiferIII import HeiferIII
 from RUFAS.routines.animal.pen import Pen
+from RUFAS.routines.animal.ration.ration_driver import RationReporter
 from RUFAS.routines.feed.feed import Feed
 from RUFAS.input_manager import InputManager
 
@@ -1606,6 +1607,10 @@ def test_daily_updates(is_end_ration_interval: bool, mocker: MockerFixture) -> N
         AnimalManager, 'calc_avg_growth', return_value=None)
     mock_manure_excretions_output_data = {}
 
+    patch_for_report_ration_supply = mocker.patch.object(
+        RationReporter, 'report_ration_supply', return_value=None
+    )
+
     sum_daily_milk = 1000.0
     patch_for_sum_daily_milk = mocker.patch.object(
         AnimalManager, 'sum_daily_milk', return_value=sum_daily_milk)
@@ -1617,6 +1622,7 @@ def test_daily_updates(is_end_ration_interval: bool, mocker: MockerFixture) -> N
     assert patch_for_end_ration_interval.call_count == 2
     if is_end_ration_interval:
         patch_for_reset_milk_production_reduction.assert_called()
+        patch_for_report_ration_supply.assert_called()
 
     mock_weather.get_current_day_conditions.assert_called_with(mock_time)
 
