@@ -109,6 +109,17 @@ def test_generate_report_only_vertical(
     assert report_generator.generate_report(sample_filtered_pool, filter_content) == [4, 5]
 
 
+def test_generate_report_no_aggregation(
+    report_generator: ReportGenerator,
+    sample_filtered_pool: Dict[str, Dict[str, List[Dict[str, int]]]],
+):
+    filter_content = {
+        "variables": ["a", "b"],
+    }
+    with pytest.raises(ValueError):
+        report_generator.generate_report(sample_filtered_pool, filter_content)
+
+
 # def test_generate_report_valid_horizontal_vertical(
 #     report_generator: ReportGenerator,
 # ) -> None:
