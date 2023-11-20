@@ -202,8 +202,8 @@ class AnimalInitialization:
 
                     args.update(id=self.next_id())
                     args.update(repro_program=AnimalBase.config['heifer_repro_method'])
-                    args.update(tai_method_h=AnimalBase.config['heifer_TAI_protocol'])
-                    args.update(synch_ed_method_h=AnimalBase.config['heifer_synchED_protocol'])
+                    args.update(tai_method_h=AnimalBase.config['heifer_repro_programs']['heifer_TAI_protocol'])
+                    args.update(synch_ed_method_h=AnimalBase.config['heifer_repro_programs']['heifer_synchED_protocol'])
 
                     heiferII = HeiferII(args)
                     heiferIIs.append(heiferII)
