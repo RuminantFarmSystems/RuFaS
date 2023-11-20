@@ -77,9 +77,9 @@ def run_rufas(
         The path to the json file to load into Output Manager variables pool for processing.
     output_dir : Path, optional, default=Path("output/")
         The directory for saving output.
-    filters_dir : Path, optional, default=Path("output/output_filters")
+    filters_dir : Path, optional, default=Path("output/output_filters/")
         The directory for the files containing the keys for filtering.
-    csvs_dir : Path, optional, default=Path("output/CSVs")
+    csvs_dir : Path, optional, default=Path("output/CSVs/")
         The directory for the csv output files to be saved.
     """
     sys.stdout.write("RuFaS: Ruminant Farm Systems Model 2023\n")
@@ -87,7 +87,7 @@ def run_rufas(
     if load_pool:
         run_load_vars_pool(vars_file_path, exclude_info_maps, format_option,
                            produce_graphics, graphics_dir, clear_output, output_dir,
-                           filters_dir)
+                           filters_dir, csvs_dir)
         return
 
     if clear_output:
@@ -107,6 +107,7 @@ def run_rufas(
             verbose,
             output_dir,
             filters_dir,
+            csvs_dir
         )
 
 
@@ -118,7 +119,8 @@ def run_load_vars_pool(
     graphics_dir: Path = Path(""),
     clear_output: bool = False,
     output_dir: Path = Path("output/"),
-    filters_dir: Path = Path("output/output_filters/")
+    filters_dir: Path = Path("output/output_filters/"),
+    csvs_dir: Path = Path("output/CSVs/")
 ) -> None:
     """Instantiates Output Manager and triggers loading of the variables pool from the provided file path
     for post-processing.
@@ -137,8 +139,10 @@ def run_load_vars_pool(
         Flag for whether or not the user wants to clear the output directory.
     output_dir : Path, optional, default=Path("output/")
         The directory for saving output.
-    filters_dir : Path, optional, default=Path("output/output_filters")
+    filters_dir : Path, optional, default=Path("output/output_filters/")
         The directory for the files containing the keys for filtering.
+    csvs_dir : Path, optional, default=Path("output/CSVs/")
+        The directory for the csv output files to be saved.
     """
     output_manager = OutputManager()
     if clear_output:
@@ -152,6 +156,7 @@ def run_load_vars_pool(
             exclude_info_maps,
             produce_graphics,
             graphics_dir,
+            csvs_dir
         )
     output_manager.dump_all_nondata_pools(
             output_dir, exclude_info_maps, format_option
@@ -224,7 +229,8 @@ def execute_simulations(
     format_option: str = "verbose",
     verbose: LogVerbosity = LogVerbosity.NONE,
     output_dir: Path = Path("output/"),
-    filters_dir: Path = Path("output/output_filters/")
+    filters_dir: Path = Path("output/output_filters/"),
+    csvs_dir: Path = Path("output/CSVs/")
 ) -> None:
     """Instantiates I/O Managers and processes the metadata files provided by the user to run the simulation.
 
@@ -246,8 +252,10 @@ def execute_simulations(
         The verbose option set by the user.
     output_dir : Path, optional, default=Path("output/")
         The directory for saving output.
-    filters_dir : Path, optional, default=Path("output/output_filters")
+    filters_dir : Path, optional, default=Path("output/output_filters/")
         The directory for the files containing the keys for filtering.
+    csvs_dir : Path, optional, default=Path("output/CSVs/")
+        The directory for the csv output files to be saved.
     """
     info_map = {
         "class": "No caller class",
@@ -292,6 +300,7 @@ def execute_simulations(
             exclude_info_maps,
             produce_graphics,
             graphics_dir,
+            csvs_dir
         )
         output_manager.dump_all_nondata_pools(
             output_dir, exclude_info_maps, format_option
@@ -371,7 +380,7 @@ def parse_gnu_args() -> argparse.Namespace:
     )
     parser.add_argument(
         "-C",
-        "-csvs-dir",
+        "--csvs-dir",
         help="The directory for the csv output files to be saved",
         default="output/CSVs/"
     )
