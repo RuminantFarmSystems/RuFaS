@@ -9,7 +9,6 @@ import pandas as pd
 from RUFAS.output_manager import OutputManager
 from typing import Any, Dict, List, Union
 
-
 om = OutputManager()
 
 
@@ -49,7 +48,7 @@ class InputManager:
             True if data is valid, otherwise False.
         """
         self._load_metadata(metadata_path)
-        is_input_data_valid = self._populate_pool(eager_termination)
+        is_input_data_valid = self.populate_pool(eager_termination)
         return is_input_data_valid
 
     def _load_metadata(self, metadata_path: str) -> None:
@@ -134,7 +133,7 @@ class InputManager:
         except Exception as e:
             raise e
 
-    def _populate_pool(self, eager_termination: bool) -> bool:
+    def populate_pool(self, eager_termination: bool, variable_name: str = None, data: Any = None) -> bool:
         """
         Loads input files, runs validations on the data from the input files, attempts to fix invalid data,
         then adds data to the pool.
@@ -145,6 +144,12 @@ class InputManager:
             If True, the process will be terminated as soon as finding invalid data and failing to fix it.
             If False, the process will be terminated after going through and validating the entire data,
             if invalid data is found.
+        variable_name: str
+            This argument specifies the variable name of the data to be added to the InputManager variable pool during
+            runtime.
+        data: Any
+            This argument is designed to add data to the InputManager variable pool during runtime. It is defaulted to
+            None; if specified, the data will be added to InputManager.__pool.
 
         Returns
         -------
@@ -152,8 +157,12 @@ class InputManager:
             True if data is valid, otherwise False.
         """
         info_map = {"class": self.__class__.__name__,
-                    "function": self._populate_pool.__name__,
+                    "function": self.populate_pool.__name__,
                     }
+        if variable_name is not None and data is not None:
+            self.__pool[variable_name] = data
+            om.add_log("Variable added to IM pool:", f"{variable_name} is added to IM.__pool during runtime.", info_map)
+            return True
         valid_elements_counter = 0
         invalid_elements_counter = 0
         total_elements_counter = 0
@@ -359,7 +368,7 @@ class InputManager:
 
         return element_counter_and_validity
 
-    def _validate_json_element(self, element_hierarchy: List[str], properties_blob_key: str,   # noqa
+    def _validate_json_element(self, element_hierarchy: List[str], properties_blob_key: str,  # noqa
                                input_data: Dict[str, Any], eager_termination: bool,
                                element_counter_and_validity: Dict[str, int | bool], ) -> dict:
         """
@@ -708,7 +717,8 @@ class InputManager:
             parent_address = str(data_address.split("." + invalid_key)[0])
 
             om.add_error("Validation: data not found:", f"Cannot find \"{data_address}\", "
-                         f"\"{parent_address}\" does not have attribute \"{invalid_key}\".",
+                                                        f"\"{parent_address}\" does not have attribute "
+                                                        f"\"{invalid_key}\".",
                          info_map)
 
             raise KeyError(f"Data not found: Cannot find \"{data_address}\", "
@@ -774,7 +784,8 @@ class InputManager:
             parent_address = ".".join(element_hierarchy[:-1])
 
             om.add_error("Validation: data not found:", f"Cannot find \"{metadata_address}\", "
-                         f"\"{parent_address}\" does not have attribute \"{invalid_key}\".",
+                                                        f"\"{parent_address}\" does not have attribute "
+                                                        f"\"{invalid_key}\".",
                          info_map)
 
             raise KeyError(f"Data not found: Cannot find \"{metadata_address}\", "

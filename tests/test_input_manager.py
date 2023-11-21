@@ -40,7 +40,7 @@ def input_manager_original_method_states(
         "_load_data_from_json": mock_input_manager._load_data_from_json,
         "_load_data_from_csv": mock_input_manager._load_data_from_csv,
         "_filter_input_data_by_metadata": mock_input_manager._filter_input_data_by_metadata,
-        "_populate_pool": mock_input_manager._populate_pool,
+        "populate_pool": mock_input_manager.populate_pool,
         "_validate_json_element": mock_input_manager._validate_json_element,
         "_array_type_validator": mock_input_manager._array_type_validator,
         "_num_type_validator": mock_input_manager._num_type_validator,
@@ -145,7 +145,7 @@ def test_start_data_processing(mock_input_manager: InputManager,
                                input_manager_original_method_states: Dict[str, Callable], ) -> None:
     """Unit test for function start_data_processing in file input_manager.py"""
     mock_input_manager._load_metadata = MagicMock()
-    mock_input_manager._populate_pool = MagicMock(return_value=True)
+    mock_input_manager.populate_pool = MagicMock(return_value=True)
 
     eager_termination = True
     mock_metadata_path = "mock/metadata/path"
@@ -153,12 +153,12 @@ def test_start_data_processing(mock_input_manager: InputManager,
     mock_input_manager.start_data_processing(mock_metadata_path, eager_termination)
 
     mock_input_manager._load_metadata.assert_called_once_with(mock_metadata_path)
-    mock_input_manager._populate_pool.assert_called_once_with(eager_termination)
+    mock_input_manager.populate_pool.assert_called_once_with(eager_termination)
 
     # Restore original methods
     mock_input_manager._load_metadata = input_manager_original_method_states["_load_metadata"]
-    mock_input_manager._populate_pool = \
-        input_manager_original_method_states["_populate_pool"]
+    mock_input_manager.populate_pool = \
+        input_manager_original_method_states["populate_pool"]
 
 
 @pytest.mark.parametrize("input_data, metadata_properties, expected_result", [
@@ -201,7 +201,7 @@ def mock_metadata(mocker: MockerFixture) -> Dict[str, Dict[str, Any]]:
 
 def test_populate_pool_valid(mock_input_manager: InputManager, mock_metadata: Dict[str, Dict[str, Any]],
                              input_manager_original_method_states: Dict[str, Callable], ) -> None:
-    """Unit test for valid data for function _populate_pool in file input_manager.py"""
+    """Unit test for valid data for function populate_pool in file input_manager.py"""
     mock_input_manager._InputManager__metadata = mock_metadata
     mock_input_manager._load_data_from_json = lambda _: {"element1": "value1", "element2": "value2"}
     mock_input_manager._load_data_from_csv = lambda _: {"element3": "value3", "element4": "value4"}
@@ -220,7 +220,7 @@ def test_populate_pool_valid(mock_input_manager: InputManager, mock_metadata: Di
 
     with patch("RUFAS.output_manager.OutputManager.add_log") as add_log:
         with patch("RUFAS.output_manager.OutputManager.add_warning") as add_warning:
-            result = mock_input_manager._populate_pool(eager_termination=True)
+            result = mock_input_manager.populate_pool(eager_termination=True)
 
         assert result is True
         assert add_log.call_count == 4
@@ -228,15 +228,15 @@ def test_populate_pool_valid(mock_input_manager: InputManager, mock_metadata: Di
         assert "file1" in mock_input_manager._InputManager__pool
         assert "file2" in mock_input_manager._InputManager__pool
 
-    mock_input_manager._populate_pool = \
-        input_manager_original_method_states["_populate_pool"]
+    mock_input_manager.populate_pool = \
+        input_manager_original_method_states["populate_pool"]
     mock_input_manager._validate_json_element = input_manager_original_method_states["_validate_json_element"]
     mock_input_manager._validate_csv_element = input_manager_original_method_states["_validate_csv_element"]
 
 
 def test_populate_pool_invalid(mock_input_manager: InputManager, mock_metadata: Dict[str, Dict[str, Any]],
                                input_manager_original_method_states: Dict[str, Callable], ):
-    """Unit test for invalid data for function _populate_pool in file input_manager.py"""
+    """Unit test for invalid data for function populate_pool in file input_manager.py"""
     mock_input_manager._InputManager__metadata = mock_metadata
 
     mock_input_manager._load_data_from_json = lambda _: {"element1": "value1", "element2": "value2"}
@@ -257,7 +257,7 @@ def test_populate_pool_invalid(mock_input_manager: InputManager, mock_metadata: 
     with patch("RUFAS.output_manager.OutputManager.add_log") as add_log:
         with patch("RUFAS.output_manager.OutputManager.add_warning") as add_warning:
 
-            result = mock_input_manager._populate_pool(eager_termination=False)
+            result = mock_input_manager.populate_pool(eager_termination=False)
 
         assert result is False
         assert add_log.call_count == 4
@@ -265,8 +265,8 @@ def test_populate_pool_invalid(mock_input_manager: InputManager, mock_metadata: 
         assert "file1" not in mock_input_manager._InputManager__pool
         assert "file2" not in mock_input_manager._InputManager__pool
 
-    mock_input_manager._populate_pool = \
-        input_manager_original_method_states["_populate_pool"]
+    mock_input_manager.populate_pool = \
+        input_manager_original_method_states["populate_pool"]
     mock_input_manager._validate_json_element = input_manager_original_method_states["_validate_json_element"]
     mock_input_manager._validate_csv_element = input_manager_original_method_states["_validate_csv_element"]
 
@@ -274,7 +274,7 @@ def test_populate_pool_invalid(mock_input_manager: InputManager, mock_metadata: 
 def test_populate_pool_eager_termination(mock_input_manager: InputManager, mock_metadata: Dict[str, Dict[str, Any]],
                                          input_manager_original_method_states: Dict[str, Callable], ):
     """Unit test for invalid data with eager termination for function
-    _populate_pool in file input_manager.py"""
+    populate_pool in file input_manager.py"""
     mock_input_manager._InputManager__metadata = mock_metadata
 
     mock_input_manager._load_data_from_json = lambda _: {"element1": "value1", "element2": "value2"}
@@ -289,21 +289,21 @@ def test_populate_pool_eager_termination(mock_input_manager: InputManager, mock_
     with patch("RUFAS.output_manager.OutputManager.add_log") as add_log:
         with patch("RUFAS.output_manager.OutputManager.add_warning") as add_warning:
 
-            result = mock_input_manager._populate_pool(eager_termination=True)
+            result = mock_input_manager.populate_pool(eager_termination=True)
             assert result is False
             assert add_log.call_count == 0
             assert add_warning.call_count == 0
             assert "file1" not in mock_input_manager._InputManager__pool
             assert "file2" not in mock_input_manager._InputManager__pool
 
-    mock_input_manager._populate_pool = \
-        input_manager_original_method_states["_populate_pool"]
+    mock_input_manager.populate_pool = \
+        input_manager_original_method_states["populate_pool"]
     mock_input_manager._validate_json_element = input_manager_original_method_states["_validate_json_element"]
 
 
 def test_populate_pool_raises_keyerror(mock_input_manager: InputManager,
                                        input_manager_original_method_states: Dict[str, Callable], ) -> None:
-    """Unit test for invalid data file type for function _populate_pool in file input_manager.py"""
+    """Unit test for invalid data file type for function populate_pool in file input_manager.py"""
     mock_input_manager._InputManager__metadata = {"files": {"dummy_file_key": {"type": "invalid_data_type",
                                                                                "path": "/path/to/your/file",
                                                                                "properties": "some_properties_key"}}}
@@ -311,14 +311,40 @@ def test_populate_pool_raises_keyerror(mock_input_manager: InputManager,
     with patch("RUFAS.output_manager.OutputManager.add_log") as add_log:
         with patch("RUFAS.output_manager.OutputManager.add_warning") as add_warning:
             with pytest.raises(KeyError):
-                mock_input_manager._populate_pool(eager_termination=True)
+                mock_input_manager.populate_pool(eager_termination=True)
 
                 assert add_log.call_count == 0
                 assert add_warning.call_count == 0
 
-    mock_input_manager._populate_pool = \
-        input_manager_original_method_states["_populate_pool"]
+    mock_input_manager.populate_pool = \
+        input_manager_original_method_states["populate_pool"]
     mock_input_manager._validate_json_element = input_manager_original_method_states["_validate_json_element"]
+
+
+@pytest.mark.parametrize("variable_name, data", [
+        ("str_data", "example_str"),
+        ("int_data", 0),
+        ("float_data", 0.0),
+        ("bool_data", True),
+        ("dict_data", {"int": 0, "str": "", "float": 0.0, "int_array": [0, 1, 2], "float_array": [0.0, 1.1, 2.2],
+                       "str_arr": ["example_str1", "example_str2", "example_str3"]}),
+        ("array_of_int_data", [0, 1, 2]),
+        ("array_of_float_data", [0.0, 1.1, 2.2]),
+        ("array_of_str_data", ["example_str1", "example_str2", "example_str3"]),
+        ("array_of_dict_data", [{"a": 0}, {"b": 1}, {"c": 2}]),
+])
+def test_populate_pool_runtime(variable_name: str,
+                               data: Any,
+                               mock_input_manager: InputManager,
+                               input_manager_original_method_states: Dict[str, Callable]) -> None:
+    """Unit test for adding data to InputManager.__pool during runtime with function populate_pool in file
+    input_manager.py"""
+    with patch("RUFAS.output_manager.OutputManager.add_log") as add_log:
+        mock_input_manager.populate_pool(eager_termination=False, variable_name=variable_name, data=data)
+
+        assert add_log.call_count == 1
+
+    assert variable_name in mock_input_manager._InputManager__pool
 
 
 @pytest.mark.parametrize(
