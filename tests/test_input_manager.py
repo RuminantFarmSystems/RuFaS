@@ -10,6 +10,7 @@ import json
 from functools import reduce
 from typing import Any, Callable, Dict, Type
 
+import numpy as np
 import pandas as pd
 import pytest
 from mock import MagicMock, Mock, mock_open, patch
@@ -1968,6 +1969,12 @@ def test_validate_bool_type_integration_test(variable_path: list[str | int],
     # Test with a float
     (1.5, {}, (True, "")),
 
+    # Test with a NaN float
+    (float("nan"), {}, (False, "Value is not a number")),
+
+    # Test with numpy NaN float
+    (np.nan, {}, (False, "Value is not a number")),
+
     # Test with a negative float
     (-2.3, {}, (True, "")),
 
@@ -3464,3 +3471,431 @@ def test_validate_primitive_type_with_revalidation_integration_test(input_data: 
     # Cleanup
     om.flush_pools()
     input_manager.counter.reset()
+
+
+@pytest.mark.parametrize(
+    "first_level_prop, properties_blob_key, input_data, "
+    "metadata, validate_input_type_dynamic_return, expected_result", [
+        # Test case where the data is valid
+        ("prop1", "blob_key", {"prop1": "value"},
+         {"properties": {"blob_key": {"prop1": {"type": "string"}}}},
+         True, True),
+
+        # Test case where the data is invalid
+        ("prop1", "blob_key", {"prop1": "invalid"},
+         {"properties": {"blob_key": {"prop1": {"type": "number"}}}},
+         False, False),
+    ]
+)
+def test_validate_json_element(mocker: MockerFixture,
+                               first_level_prop: str,
+                               properties_blob_key: str,
+                               input_data: dict[str, Any],
+                               metadata: dict[str, Any],
+                               validate_input_type_dynamic_return: bool,
+                               expected_result: bool) -> None:
+    """
+    Unit test for method _validate_json_element() in file input_manager.py.
+
+    This test simply checks if the method calls the correct methods with the correct arguments.
+    """
+
+    # Arrange
+    input_manager = InputManager()
+    mocker.patch.object(input_manager, '_InputManager__metadata',
+                        return_value=metadata)
+    mocker.patch.object(input_manager, '_get_nested_dict_value',
+                        return_value=metadata["properties"][properties_blob_key][first_level_prop])
+    mock_validate = mocker.patch.object(input_manager, '_validate_input_type_dynamic',
+                                        return_value=validate_input_type_dynamic_return)
+
+    # Act
+    result = input_manager._validate_json_element(first_level_prop, properties_blob_key, input_data)
+
+    # Assert
+    assert result == expected_result
+    mock_validate.assert_called_once_with(
+        metadata["properties"][properties_blob_key][first_level_prop],
+        [first_level_prop], input_data
+    )
+
+
+@pytest.mark.parametrize(
+    "first_level_prop, properties_blob_key, input_data, "
+    "metadata, dynamic_validation_results, expected_result", [
+        # Test case where all CSV data elements are valid
+        ("elementName", "blob_key", {"elementName": ["valid1", "valid2"]},
+         {"properties": {"blob_key": {"elementName": {"type": "string"}}}},
+         [True, True], True),
+
+        # Test case with some invalid CSV data elements
+        ("elementName", "blob_key", {"elementName": [123, "valid"]},
+         {"properties": {"blob_key": {"elementName": {"type": "string"}}}},
+         [False, True], False),
+    ]
+)
+def test_validate_csv_element(mocker: MockerFixture,
+                              first_level_prop: str,
+                              properties_blob_key: str,
+                              input_data: dict[str, Any],
+                              metadata: dict[str, Any],
+                              dynamic_validation_results: list[bool],
+                              expected_result: bool) -> None:
+    """
+    Unit test for method _validate_csv_element() in file input_manager.py.
+
+    This test simply checks if the method calls the correct methods with the correct arguments.
+    """
+
+    # Arrange
+    input_manager = InputManager()
+    mocker.patch.object(input_manager, '_InputManager__metadata', return_value=metadata)
+    mocker.patch.object(input_manager, '_get_nested_dict_value',
+                        return_value=metadata["properties"][properties_blob_key][first_level_prop])
+    mock_validate = mocker.patch.object(input_manager, '_validate_input_type_dynamic',
+                                        side_effect=dynamic_validation_results)
+
+    # Act
+    result = input_manager._validate_csv_element(first_level_prop, properties_blob_key, input_data)
+
+    # Assert
+    assert result == expected_result
+
+    # Verify calls to _validate_input_type_dynamic up to the first failure
+    idx = 0
+    while idx < len(dynamic_validation_results) and dynamic_validation_results[idx]:
+        assert mock_validate.call_args_list[idx] == mocker.call(
+            metadata["properties"][properties_blob_key][first_level_prop],
+            [first_level_prop, idx], input_data
+        )
+        idx += 1
+
+
+# @pytest.mark.parametrize(
+#     "first_level_prop, properties_blob_key, input_data, "
+#     "metadata, expected_result", [
+#         # Test cases for the string type
+#         # =============================
+#
+#         # Test case where all elements in the CSV column are valid strings.
+#         ("strColumn", "blob_key", {"strColumn": ["apple", "banana", "cherry"]},
+#          {"properties": {"blob_key": {"strColumn": {"type": "string"}}}}, True),
+#
+#         # Test case where one element in the CSV column is a number, invalid for string type.
+#         ("strColumn", "blob_key", {"strColumn": ["apple", 123, "cherry"]},
+#          {"properties": {"blob_key": {"strColumn": {"type": "string"}}}}, False),
+#
+#         # Test case where an invalid (numeric) element can be fixed with a default string value.
+#         ("strColumn", "blob_key", {"strColumn": ["apple", 123, "cherry"]},
+#          {"properties": {"blob_key": {"strColumn": {"type": "string", "default": "default"}}}}, True),
+#
+#         # Test case where the CSV column has mixed types, fixable with a default string value.
+#         ("strColumn", "blob_key", {"strColumn": ["apple", True, "cherry"]},
+#          {"properties": {"blob_key": {"strColumn": {"type": "string", "default": "default"}}}}, True),
+#
+#         # Test case where strings are validated against minimum and maximum length constraints.
+#         ("strColumn", "blob_key", {"strColumn": ["apple", "a", "long string exceeding limit"]},
+#          {"properties": {"blob_key": {"strColumn": {"type": "string", "minimum_length": 2, "maximum_length": 10}}}},
+#          False),
+#
+#         # Test case where the CSV column contains empty strings.
+#         ("strColumn", "blob_key", {"strColumn": ["", "valid", "another"]},
+#          {"properties": {"blob_key": {"strColumn": {"type": "string"}}}}, True),
+#
+#         # Test case where the CSV column contains null values.
+#         ("strColumn", "blob_key", {"strColumn": [None, "valid", "another"]},
+#          {"properties": {"blob_key": {"strColumn": {"type": "string"}}}}, False),
+#
+#         # Test case where strings are validated against a specific regex pattern.
+#         ("strColumn", "blob_key", {"strColumn": ["apple", "banana123", "cherry"]},
+#          {"properties": {"blob_key": {"strColumn": {"type": "string", "pattern": r"^[a-zA-Z]+$"}}}}, False),
+#
+#         # Test cases for the number type
+#         # =============================
+#
+#         # Test case where all CSV data elements are valid
+#         ("numColumn", "blob_key", {"numColumn": [5, 10, 15]},
+#          {"properties": {"blob_key": {"numColumn": {"type": "number"}}}}, True),
+#
+#         # Test case where there are invalid elements that cannot be fixed.
+#         ("numColumn", "blob_key", {"numColumn": [5, "invalid", 15]},
+#          {"properties": {"blob_key": {"numColumn": {"type": "number"}}}}, False),
+#
+#         # Test case where there are invalid elements that can be fixed.
+#         ("numColumn", "blob_key", {"numColumn": [5, "invalid", 15]},
+#          {"properties": {"blob_key": {"numColumn": {"type": "number", "default": 10}}}}, True),
+#
+#         # Test case where all the numbers are within the specified minimum and maximum limits.
+#         ("numColumn", "blob_key", {"numColumn": [5, 10, 15]},
+#          {"properties": {"blob_key": {"numColumn": {"type": "number", "minimum": 5, "maximum": 15}}}}, True),
+#
+#         # Test case where there are elements outside the specified minimum and maximum limits that cannot be fixed.
+#         ("numColumn", "blob_key", {"numColumn": [2, 20, 30]},
+#          {"properties": {"blob_key": {"numColumn": {"type": "number", "minimum": 5, "maximum": 15}}}}, False),
+#
+#         # Test case where there are NaN values, which are invalid for the number type.
+#         ("numColumn", "blob_key", {"numColumn": [5, np.nan, 15]},
+#          {"properties": {"blob_key": {"numColumn": {"type": "number"}}}}, False),
+#
+#         # Test case where there are NaN values, which are invalid but can be fixed with a default value.
+#         ("numColumn", "blob_key", {"numColumn": [5, np.nan, 15]},
+#          {"properties": {"blob_key": {"numColumn": {"type": "number", "default": 10}}}}, True),
+#
+#         # Test case where the numbers are valid floats.
+#         ("numColumn", "blob_key", {"numColumn": [5.5, 10.0, 15.2]},
+#          {"properties": {"blob_key": {"numColumn": {"type": "number"}}}}, True),
+#
+#         # Test cases for the bool type
+#         # ===========================
+#
+#         # Test case where all elements in the CSV column are valid booleans.
+#         ("boolColumn", "blob_key", {"boolColumn": [True, False, True]},
+#          {"properties": {"blob_key": {"boolColumn": {"type": "bool"}}}}, True),
+#
+#         # Test case where one element in the CSV column is a string, invalid for boolean type.
+#         ("boolColumn", "blob_key", {"boolColumn": [True, "invalid", False]},
+#          {"properties": {"blob_key": {"boolColumn": {"type": "bool"}}}}, False),
+#
+#         # Test case where an invalid (string) element can be fixed with a default boolean value.
+#         ("boolColumn", "blob_key", {"boolColumn": [True, "invalid", False]},
+#          {"properties": {"blob_key": {"boolColumn": {"type": "bool", "default": True}}}}, True),
+#
+#         # Test case where the CSV column has mixed types, fixable with a default boolean value.
+#         ("boolColumn", "blob_key", {"boolColumn": [True, 123, False]},
+#          {"properties": {"blob_key": {"boolColumn": {"type": "bool", "default": False}}}}, True),
+#
+#         # Test case where the CSV column contains null values.
+#         ("boolColumn", "blob_key", {"boolColumn": [None, True, False]},
+#          {"properties": {"blob_key": {"boolColumn": {"type": "bool"}}}}, False),
+#
+#         # Test case where the CSV column contains numeric representations of booleans.
+#         ("boolColumn", "blob_key", {"boolColumn": [1, 0, True]},
+#          {"properties": {"blob_key": {"boolColumn": {"type": "bool"}}}}, False),
+#     ]
+# )
+# def test_validate_csv_element_integration_test(first_level_prop: str,
+#                                                properties_blob_key: str,
+#                                                input_data: dict[str, Any],
+#                                                metadata: dict[str, Any],
+#                                                expected_result: bool) -> None:
+#     """
+#     Integration test for method _validate_csv_element() in file input_manager.py.
+#
+#     This test checks the integration between _validate_csv_element() and _validate_input_type_dynamic().
+#     """
+#
+#     # Arrange
+#     input_manager = InputManager()
+#     old_metadata = input_manager._InputManager__metadata
+#     input_manager._InputManager__metadata = metadata
+#
+#     # Act
+#     result = input_manager._validate_csv_element(first_level_prop, properties_blob_key, input_data)
+#
+#     # Assert
+#     assert result == expected_result
+#
+#     # Cleanup
+#     input_manager._InputManager__metadata = old_metadata
+
+
+@pytest.mark.parametrize(
+    "first_level_prop, properties_blob_key, input_data, "
+    "metadata, expected_result, expected_total, expected_valid, expected_fixed, expected_invalid", [
+        # Test cases for the string type
+        # =============================
+
+        # Test case where all elements in the CSV column are valid strings.
+        ("strColumn", "blob_key", {"strColumn": ["apple", "banana", "cherry"]},
+         {"properties": {"blob_key": {"strColumn": {"type": "string"}}}}, True, 3, 3, 0, 0),
+
+        # Test case where one element in the CSV column is a number, invalid for string type.
+        ("strColumn", "blob_key", {"strColumn": ["apple", 123, "cherry"]},
+         {"properties": {"blob_key": {"strColumn": {"type": "string"}}}}, False, 2, 1, 0, 1),
+
+        # Test case where an invalid (numeric) element can be fixed with a default string value.
+        ("strColumn", "blob_key", {"strColumn": ["apple", 123, "cherry"]},
+         {"properties": {"blob_key": {"strColumn": {"type": "string", "default": "default"}}}}, True, 3, 2, 1, 0),
+
+        # Test case where the CSV column has mixed types, fixable with a default string value.
+        ("strColumn", "blob_key", {"strColumn": ["apple", True, "cherry"]},
+         {"properties": {"blob_key": {"strColumn": {"type": "string", "default": "default"}}}}, True, 3, 2, 1, 0),
+
+        # Test case where strings are validated against minimum and maximum length constraints.
+        ("strColumn", "blob_key", {"strColumn": ["apple", "a", "long string exceeding limit"]},
+         {"properties": {"blob_key": {"strColumn": {"type": "string", "minimum_length": 2, "maximum_length": 10}}}},
+         False, 2, 1, 0, 1),
+
+        # Test case where the CSV column contains empty strings.
+        ("strColumn", "blob_key", {"strColumn": ["", "valid", "another"]},
+         {"properties": {"blob_key": {"strColumn": {"type": "string"}}}}, True, 3, 3, 0, 0),
+
+        # Test case where the CSV column contains null values.
+        ("strColumn", "blob_key", {"strColumn": [None, "valid", "another"]},
+         {"properties": {"blob_key": {"strColumn": {"type": "string"}}}}, False, 1, 0, 0, 1),
+
+        # Test case where strings are validated against a specific regex pattern.
+        ("strColumn", "blob_key", {"strColumn": ["apple", "banana123", "cherry"]},
+         {"properties": {"blob_key": {"strColumn": {"type": "string", "pattern": r"^[a-zA-Z]+$"}}}}, False, 2, 1, 0, 1),
+
+        # Test cases for the number type
+        # =============================
+
+        # Test case where all CSV data elements are valid
+        ("numColumn", "blob_key", {"numColumn": [5, 10, 15]},
+         {"properties": {"blob_key": {"numColumn": {"type": "number"}}}}, True, 3, 3, 0, 0),
+
+        # Test case where there are invalid elements that cannot be fixed.
+        ("numColumn", "blob_key", {"numColumn": [5, "invalid", 15]},
+         {"properties": {"blob_key": {"numColumn": {"type": "number"}}}}, False, 2, 1, 0, 1),
+
+        # Test case where there are invalid elements that can be fixed.
+        ("numColumn", "blob_key", {"numColumn": [5, "invalid", 15]},
+         {"properties": {"blob_key": {"numColumn": {"type": "number", "default": 10}}}}, True, 3, 2, 1, 0),
+
+        # Test case where all the numbers are within the specified minimum and maximum limits.
+        ("numColumn", "blob_key", {"numColumn": [5, 10, 15]},
+         {"properties": {"blob_key": {"numColumn": {"type": "number", "minimum": 5, "maximum": 15}}}}, True, 3, 3, 0,
+         0),
+
+        # Test case where there are elements outside the specified minimum and maximum limits that cannot be fixed.
+        ("numColumn", "blob_key", {"numColumn": [2, 20, 30]},
+         {"properties": {"blob_key": {"numColumn": {"type": "number", "minimum": 5, "maximum": 15}}}}, False, 1, 0, 0,
+         1),
+
+        # Test case where there are NaN values, which are invalid for the number type.
+        ("numColumn", "blob_key", {"numColumn": [5, np.nan, 15]},
+         {"properties": {"blob_key": {"numColumn": {"type": "number"}}}}, False, 2, 1, 0, 1),
+
+        # Test case where there are NaN values, which are invalid but can be fixed with a default value.
+        ("numColumn", "blob_key", {"numColumn": [5, np.nan, 15]},
+         {"properties": {"blob_key": {"numColumn": {"type": "number", "default": 10}}}}, True, 3, 2, 1, 0),
+
+        # Test case where the numbers are valid floats.
+        ("numColumn", "blob_key", {"numColumn": [5.5, 10.0, 15.2]},
+         {"properties": {"blob_key": {"numColumn": {"type": "number"}}}}, True, 3, 3, 0, 0),
+
+        # Test cases for the bool type
+        # ===========================
+
+        # Test case where all elements in the CSV column are valid booleans.
+        ("boolColumn", "blob_key", {"boolColumn": [True, False, True]},
+         {"properties": {"blob_key": {"boolColumn": {"type": "bool"}}}}, True, 3, 3, 0, 0),
+
+        # Test case where one element in the CSV column is a string, invalid for boolean type.
+        ("boolColumn", "blob_key", {"boolColumn": [True, "invalid", False]},
+         {"properties": {"blob_key": {"boolColumn": {"type": "bool"}}}}, False, 2, 1, 0, 1),
+
+        # Test case where an invalid (string) element can be fixed with a default boolean value.
+        ("boolColumn", "blob_key", {"boolColumn": [True, "invalid", False]},
+         {"properties": {"blob_key": {"boolColumn": {"type": "bool", "default": True}}}}, True, 3, 2, 1, 0),
+
+        # Test case where the CSV column has mixed types, fixable with a default boolean value.
+        ("boolColumn", "blob_key", {"boolColumn": [True, 123, False]},
+         {"properties": {"blob_key": {"boolColumn": {"type": "bool", "default": False}}}}, True, 3, 2, 1, 0),
+
+        # Test case where the CSV column contains null values.
+        ("boolColumn", "blob_key", {"boolColumn": [None, True, False]},
+         {"properties": {"blob_key": {"boolColumn": {"type": "bool"}}}}, False, 1, 0, 0, 1),
+
+        # Test case where the CSV column contains numeric representations of booleans.
+        ("boolColumn", "blob_key", {"boolColumn": [1, 0, True]},
+         {"properties": {"blob_key": {"boolColumn": {"type": "bool"}}}}, False, 1, 0, 0, 1),
+    ]
+)
+def test_validate_csv_element_integration_test(first_level_prop: str,
+                                               properties_blob_key: str,
+                                               input_data: dict[str, Any],
+                                               metadata: dict[str, Any],
+                                               expected_result: bool,
+                                               expected_total: int,
+                                               expected_valid: int,
+                                               expected_fixed: int,
+                                               expected_invalid: int) -> None:
+    """
+    Integration test for method _validate_csv_element() in file input_manager.py.
+
+    This test checks the integration between _validate_csv_element() and _validate_input_type_dynamic(),
+    and verifies the counts of total, valid, fixed, and invalid elements.
+    """
+
+    # Arrange
+    input_manager = InputManager()
+    old_metadata = input_manager._InputManager__metadata
+    input_manager._InputManager__metadata = metadata
+    input_manager.counter.reset()
+
+    # Act
+    result = input_manager._validate_csv_element(first_level_prop, properties_blob_key, input_data)
+
+    # Assert
+    assert result == expected_result
+    assert input_manager.counter.total_elements == expected_total
+    assert input_manager.counter.valid_elements == expected_valid
+    assert input_manager.counter.fixed_elements == expected_fixed
+    assert input_manager.counter.invalid_elements == expected_invalid
+
+    # Cleanup
+    input_manager._InputManager__metadata = old_metadata
+    input_manager.counter.reset()
+
+
+@pytest.mark.parametrize(
+    "variable_properties, variable_path, input_data_value, "
+    "expected_result, expected_exception", [
+        # Test case for valid string type
+        ({"type": "string"}, ["key"], "validString", True, None),
+
+        # Test case for valid number type
+        ({"type": "number"}, ["key"], 10, True, None),
+
+        # Test case for valid boolean type
+        ({"type": "bool"}, ["key"], True, True, None),
+
+        # Test case for valid object type
+        ({"type": "object"}, ["key"], {"subkey": "value"}, True, None),
+
+        # Test case for valid array type
+        ({"type": "array"}, ["key"], [1, 2, 3], True, None),
+
+        # Test case for missing 'type' key
+        ({}, ["key"], "value", False, KeyError),
+
+        # Test case for invalid type
+        ({"type": "invalid_type"}, ["key"], "value", False, KeyError),
+    ]
+)
+def test_validate_input_type_dynamic(mocker: MockerFixture,
+                                     variable_properties: dict[str, Any],
+                                     variable_path: list[str | int],
+                                     input_data_value: Any,
+                                     expected_result: bool,
+                                     expected_exception: Type[BaseException] | None) -> None:
+    """
+    Unit test for method _validate_input_type_dynamic() in file input_manager.py.
+
+    This test checks if the method calls the correct validator function based on the data type and handles
+    missing or invalid types appropriately.
+    """
+
+    # Arrange
+    input_manager = InputManager()
+    validator_mapping = {
+        "string": InputManager._validate_str_type,
+        "number": InputManager._validate_num_type,
+        "bool": InputManager._validate_bool_type,
+        "object": InputManager._validate_object_type,
+        "array": InputManager._validate_array_type,
+    }
+
+    if "type" in variable_properties and variable_properties["type"] in validator_mapping:
+        patch_method = validator_mapping[variable_properties["type"]]
+        mocker.patch.object(input_manager, patch_method.__name__, return_value=expected_result)
+
+    # Act and Assert
+    if expected_exception:
+        with pytest.raises(expected_exception):
+            input_manager._validate_input_type_dynamic(variable_properties, variable_path, input_data_value)
+    else:
+        result = input_manager._validate_input_type_dynamic(variable_properties, variable_path, input_data_value)
+        assert result == expected_result

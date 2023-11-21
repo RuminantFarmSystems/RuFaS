@@ -7,6 +7,7 @@ from copy import deepcopy
 from functools import reduce
 from typing import Any, Dict, List, Union, Tuple, Callable
 
+import numpy as np
 import pandas as pd
 
 from RUFAS.output_manager import OutputManager
@@ -286,7 +287,8 @@ class InputManager:
     def _validate_csv_element(self, first_level_prop: str, properties_blob_key: str,
                               input_data: Dict[str, Any]) -> bool:
         """
-        Receives data loaded from csv input file and then validates each row element in the csv column it's sent.
+        Receive data loaded from csv input file and then validates each row element in the csv column it's sent.
+
         It attempts to fix any invalid elements and tracks the number of valid, invalid, fixed,
         and total elements from the input file are checked.
 
@@ -302,7 +304,7 @@ class InputManager:
             A buffer dictionary that holds the input data for validation and fixing.
 
         """
-
+        blob_key_data = self.__metadata["properties"][properties_blob_key]
         variable_properties = self._get_nested_dict_value(self.__metadata["properties"][properties_blob_key],
                                                           [first_level_prop])
 
@@ -602,7 +604,7 @@ class InputManager:
     @staticmethod
     def _is_numeric_value(variable_value: Any, variable_properties: Dict[str, Any]) -> Tuple[bool, str]:
         """
-        Check if the variable value is a number.
+        Check if the variable value is a number and not NaN.
 
         Parameters
         ----------
@@ -617,7 +619,7 @@ class InputManager:
             A tuple containing a boolean indicating if the check passed and a string containing the reason for failure.
         """
 
-        if not type(variable_value) in (int, float):
+        if not type(variable_value) in (int, float) or np.isnan(variable_value):
             return False, "Value is not a number"
         return True, ""
 
