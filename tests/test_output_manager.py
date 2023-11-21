@@ -578,7 +578,7 @@ def test_handle_log_output(capsys, log_level: LogVerbosity, color_code: str) -> 
     om = OutputManager()
     om.set_metadata_prefix("dummy_prefix")
     om._handle_log_output(name, msg, info_map, log_level)
-    log_format = "{color}[{timestamp}][{log_level}][{metadata_prefix}] {name}: {message}{color_reset}\n"
+    log_format = "{color}[{timestamp}][{log_level}][{metadata_prefix}] {name}. {message}{color_reset}\n"
     expected_message = log_format.format(
         timestamp=info_map["timestamp"],
         color=color_code,
