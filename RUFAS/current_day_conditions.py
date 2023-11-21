@@ -2,6 +2,8 @@ import math
 from dataclasses import dataclass
 from typing import Optional
 
+from RUFAS.util import Utility
+
 
 @dataclass
 class CurrentDayConditions:
@@ -58,62 +60,59 @@ class CurrentDayConditions:
             self.rainfall = self.precipitation
 
     @staticmethod
-    def determine_daylength(day_number: int, geographic_latitude_radians: float, month: int,
-                            angular_velocity=0.2618) -> float:
+    def determine_daylength(day_number: int, geographic_latitude: float, year: int) -> float:
         """
-        Calculates the day length for the field based on its day and latitude
+        Calculates the day length for the field based on its day and latitude.
 
         Parameters
         ----------
         day_number : int
-            Day number of the year
-        geographic_latitude_radians : float
-            geographic latitude in radians
-        angular_velocity: float default = 0.2618
-            angular velocity of earth
-        month : int
-            month of the simulation
+            Day number of the year.
+        geographic_latitude : float
+            Geographic latitude (degrees).
 
         Returns
         -------
         float
-            The day length of  the field on specific day
+            The length of the current day (hours).
 
         References
         ----------
         SWAT 1:1.1.6
         """
+        angular_velocity = 0.2618
+        month = Utility.day_to_month_conversion(day_number, year)
         solar_declination_radians = CurrentDayConditions.calculate_solar_declination_radians(day_number)
-        if abs(-math.tan(solar_declination_radians) * math.tan(geographic_latitude_radians)) > 1:
-            if month >= 6 or month <= 9:
-                if geographic_latitude_radians > 0:
-                    return 24
-                else:
-                    return 0
-            elif month == 12 or month <= 3:
-                if geographic_latitude_radians > 0:
-                    return 0
-                else:
-                    return 24
+        tangent_product = -math.tan(solar_declination_radians) * math.tan(geographic_latitude)
+        is_polar_solstice = abs(tangent_product) > 1
+        if is_polar_solstice:
+            is_summer = 6 <= month <= 9
+            in_northern_hemisphere = geographic_latitude > 0
+            if is_summer and in_northern_hemisphere:
+                return 24
+            elif not is_summer and in_northern_hemisphere:
+                return 0
+            elif is_summer and not in_northern_hemisphere:
+                return 0
+            else:
+                return 24
         else:
-            day_length = ((2 * math.acos(-math.tan(solar_declination_radians) * math.tan(geographic_latitude_radians)))
-                          / angular_velocity)
-            return day_length
+            return (2 * math.acos(tangent_product)) / angular_velocity
 
     @staticmethod
     def calculate_solar_declination_radians(day_number: int) -> float:
         """
-        Helper method to determine the solar declination in radians
+        Helper method to determine the solar declination in radians.
 
         Parameters
         ----------
         day_number : int
-            Day number of the year
+            Day number of the year.
 
         Returns
         -------
         float
-            Solar declination in radians
+            Solar declination (radians).
 
         References
         ----------
