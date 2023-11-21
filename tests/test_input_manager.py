@@ -16,7 +16,7 @@ import pytest
 from mock import MagicMock, Mock, mock_open, patch
 from pytest_mock import MockerFixture
 
-from RUFAS.input_manager import InputManager
+from RUFAS.input_manager import InputManager, ElementsCounter
 from RUFAS.output_manager import OutputManager
 
 
@@ -3899,3 +3899,116 @@ def test_validate_input_type_dynamic(mocker: MockerFixture,
     else:
         result = input_manager._validate_input_type_dynamic(variable_properties, variable_path, input_data_value)
         assert result == expected_result
+
+
+def test_elements_counter_init() -> None:
+    """
+    Test the __init__ method of the ElementsCounter class.
+
+    This test checks if all counters are initialized to zero.
+    """
+
+    # Arrange & Act
+    counter = ElementsCounter()
+
+    # Assert
+    assert counter.total_elements == 0
+    assert counter.valid_elements == 0
+    assert counter.fixed_elements == 0
+    assert counter.invalid_elements == 0
+
+
+@pytest.mark.parametrize(
+    "attribute_name, new_value, expected_values, should_raise_exception",
+    [
+        # Valid cases for each counter
+        ("total_elements", 5,
+         {"total_elements": 5, "valid_elements": 0, "fixed_elements": 0, "invalid_elements": 0},
+         False),
+
+        ("valid_elements", 3,
+         {"total_elements": 0, "valid_elements": 3, "fixed_elements": 0, "invalid_elements": 0},
+         False),
+
+        ("fixed_elements", 2,
+         {"total_elements": 0, "valid_elements": 0, "fixed_elements": 2, "invalid_elements": 0},
+         False),
+
+        ("invalid_elements", 4,
+         {"total_elements": 0, "valid_elements": 0, "fixed_elements": 0, "invalid_elements": 4},
+         False),
+
+        # Invalid case
+        ("nonexistent_counter", 1, None, True),
+    ]
+)
+def test_elements_counter_update(attribute_name, new_value, expected_values, should_raise_exception):
+    """
+    Unit test for the update method of the ElementsCounter class.
+
+    This test checks if the counters are correctly updated for valid attributes,
+    and if an exception is raised for invalid attributes.
+    """
+
+    # Arrange
+    counter = ElementsCounter()
+
+    # Act & Assert
+    if should_raise_exception:
+        with pytest.raises(Exception) as excinfo:
+            counter.update(attribute_name, new_value)
+        assert f"Invalid sub-counter name: {attribute_name}" in str(excinfo.value)
+    else:
+        counter.update(attribute_name, new_value)
+        for attr, expected in expected_values.items():
+            assert getattr(counter, attr) == expected
+
+
+@pytest.mark.parametrize(
+    "attribute_name, increment_value, initial_values, expected_values, should_raise_exception",
+    [
+        # Valid increment cases for each counter
+        ("total_elements", 2, {"total_elements": 3},
+         {"total_elements": 5, "valid_elements": 0, "fixed_elements": 0, "invalid_elements": 0}, False),
+
+        ("valid_elements", 1, {"valid_elements": 2},
+         {"total_elements": 0, "valid_elements": 3, "fixed_elements": 0, "invalid_elements": 0}, False),
+
+        ("fixed_elements", 3, {"fixed_elements": 1},
+         {"total_elements": 0, "valid_elements": 0, "fixed_elements": 4, "invalid_elements": 0}, False),
+
+        ("invalid_elements", 4, {"invalid_elements": 5},
+         {"total_elements": 0, "valid_elements": 0, "fixed_elements": 0, "invalid_elements": 9}, False),
+
+        # Increment with default value of 1
+        ("total_elements", 1, {},
+         {"total_elements": 1, "valid_elements": 0, "fixed_elements": 0, "invalid_elements": 0},
+         False),
+
+        # Invalid case
+        ("nonexistent_counter", 1, {}, None, True),
+    ]
+)
+def test_elements_counter_increment(attribute_name, increment_value, initial_values, expected_values,
+                                    should_raise_exception):
+    """
+    Test the increment method of the ElementsCounter class.
+
+    This test checks if the counters are correctly incremented for valid attributes,
+    and if an exception is raised for invalid attributes.
+    """
+
+    # Arrange
+    counter = ElementsCounter()
+    for attr, value in initial_values.items():
+        setattr(counter, attr, value)
+
+    # Act & Assert
+    if should_raise_exception:
+        with pytest.raises(Exception) as excinfo:
+            counter.increment(attribute_name, increment_value)
+            assert f"Invalid sub-counter name: {attribute_name}" in str(excinfo.value)
+    else:
+        counter.increment(attribute_name, increment_value)
+        for attr, expected in expected_values.items():
+            assert getattr(counter, attr) == expected

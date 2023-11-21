@@ -1233,7 +1233,7 @@ class ElementsCounter:
         if hasattr(self, name):
             setattr(self, name, value)
         else:
-            raise Exception(f"Invalid counter name: {name}")
+            raise Exception(f"Invalid sub-counter name: {name}")
 
     def increment(self, name: str, value: int = 1):
         """
