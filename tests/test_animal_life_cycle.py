@@ -9,12 +9,12 @@ from pytest import fixture
 from pytest_mock import MockerFixture
 
 from RUFAS.config import Config
-from RUFAS.routines.animal.animal_typed_dicts import AnimalConfigTypedDict
+from RUFAS.routines.animal.animal_typed_dicts import AnimalConfigTypedDict, HerdInfoTypedDict
 from RUFAS.routines.animal.life_cycle import animal_constants
 from RUFAS.routines.animal.life_cycle.animal_constants import ENTER_HERD
 from RUFAS.routines.animal.life_cycle.animal_constants import INIT_HERD
 from RUFAS.routines.animal.life_cycle.animal_constants import LOW_PROD_CULL
-from RUFAS.routines.animal.life_cycle.animal_data import AnimalData
+from RUFAS.routines.animal.life_cycle.animal_population import AnimalPopulation
 from RUFAS.routines.animal.life_cycle.calf import Calf
 from RUFAS.routines.animal.life_cycle.cow import Cow
 from RUFAS.routines.animal.life_cycle.heiferI import HeiferI
@@ -53,9 +53,9 @@ def test_set_avg_CI(mocker: MockerFixture,
     mock_init_db_summary = {
         'cow_avg_CI': cow_avg_CI
     }
-    mock_animal_data = mocker.MagicMock(autospec=AnimalData)
-    mock_animal_data.initialization_db_summary.return_value = mock_init_db_summary
-    life_cycle_manager.animal_data = mock_animal_data
+    mock_animal_population = mocker.MagicMock(autospec=AnimalPopulation)
+    mock_animal_population.get_herd_summary.return_value = mock_init_db_summary
+    life_cycle_manager.animal_population = mock_animal_population
     spy_set_avg_CI = mocker.spy(life_cycle_manager, '_set_avg_CI')
 
     # Assert before
@@ -70,7 +70,7 @@ def test_set_avg_CI(mocker: MockerFixture,
         assert life_cycle_manager.avg_CI == approx(custom_avg_CI)
     else:
         assert life_cycle_manager.avg_CI == approx(cow_avg_CI)
-        mock_animal_data.initialization_db_summary.assert_called_once()
+        mock_animal_population.get_herd_summary.assert_called_once()
 
 
 @pytest.mark.parametrize(
@@ -90,19 +90,19 @@ def test_get_animals(mocker: MockerFixture,
         mock_new_animal.breed = breed
         mock_new_animal.days_born = days_born
         mock_animals.append(mock_new_animal)
-    mock_animal_data = mocker.MagicMock(autospec=AnimalData)
+    mock_animal_population = mocker.MagicMock(autospec=AnimalPopulation)
 
     animal_getter_by_animal_type = {
-        Calf: mock_animal_data.get_calves,
-        HeiferI: mock_animal_data.get_heiferIs,
-        HeiferII: mock_animal_data.get_heiferIIs,
-        HeiferIII: mock_animal_data.get_heiferIIIs,
-        Cow: mock_animal_data.get_cows
+        Calf: mock_animal_population.get_calves,
+        HeiferI: mock_animal_population.get_heiferIs,
+        HeiferII: mock_animal_population.get_heiferIIs,
+        HeiferIII: mock_animal_population.get_heiferIIIs,
+        Cow: mock_animal_population.get_cows
     }
     animal_getter_by_animal_type[animal_type].return_value = mock_animals
 
     spy_get_animals = mocker.spy(life_cycle_manager, '_get_animals')
-    life_cycle_manager.animal_data = mock_animal_data
+    life_cycle_manager.animal_population = mock_animal_population
 
     # Act
     animals = life_cycle_manager._get_animals(animal_type)
@@ -119,31 +119,29 @@ def test_get_animals(mocker: MockerFixture,
 
 def test_initialize_herd(mocker: MockerFixture, life_cycle_manager: LifeCycleManager) -> None:
     """Unit test for function initialize_herd() in file life_cycle.py"""
-    mock_config = mocker.MagicMock(autospec=Config)
     breed = 'HO'
-    herd_data = {
-        'calf_num': 80,
-        'heiferI_num': 440,
-        'heiferII_num': 380,
-        'heiferIII_num_springers': 50,
-        'cow_num': 1000,
-        'replace_num': 5000,
-        'herd_num': 1000,
-        'breed': breed,
-    }
+    herd_data: HerdInfoTypedDict = HerdInfoTypedDict(calf_num=80,
+                                                     heiferI_num=440,
+                                                     heiferII_num=380,
+                                                     heiferIII_num_springers=50,
+                                                     cow_num=1000,
+                                                     replace_num=5000,
+                                                     herd_num=1000,
+                                                     breed=breed)
+
 
     life_cycle_manager.animal_config = mocker.MagicMock(autospec=AnimalConfigTypedDict)
 
-    mock_animal_data = mocker.MagicMock(autospec=AnimalData)
+    mock_animal_population = mocker.MagicMock(autospec=AnimalPopulation)
     mock_replacement_cows = [mocker.MagicMock(autospec=Cow) for _ in range(herd_data['replace_num'])]
-    mock_animal_data.get_replacement_cows.return_value = mock_replacement_cows
-    mocker.patch('RUFAS.routines.animal.life_cycle.life_cycle.AnimalData',
-                 return_value=mock_animal_data)
+    mock_animal_population.get_replacement_cows.return_value = mock_replacement_cows
+    mocker.patch('RUFAS.routines.animal.life_cycle.life_cycle.AnimalPopulation',
+                 return_value=mock_animal_population)
 
     patch_set_avg_CI = mocker.patch.object(life_cycle_manager, '_set_avg_CI')
     patch_get_animals = mocker.patch.object(life_cycle_manager, '_get_animals')
 
-    results = life_cycle_manager.initialize_herd(mock_config, herd_data, False, False, False)
+    results = life_cycle_manager.initialize_herd(herd_data)
 
     assert life_cycle_manager.herd_num == herd_data['herd_num']
     patch_set_avg_CI.assert_called_once()
@@ -153,7 +151,7 @@ def test_initialize_herd(mocker: MockerFixture, life_cycle_manager: LifeCycleMan
     assert patch_get_animals.call_args_list[2] == mocker.call(HeiferII)
     assert patch_get_animals.call_args_list[3] == mocker.call(HeiferIII)
     assert patch_get_animals.call_args_list[4] == mocker.call(Cow)
-    mock_animal_data.get_replacement_cows.assert_called_once_with()
+    mock_animal_population.get_replacement_cows.assert_called_once_with()
     assert life_cycle_manager.replacement_market == mock_replacement_cows
     assert len(results) == 5
 
@@ -1012,9 +1010,9 @@ def test_handle_new_born(mocker: MockerFixture, life_cycle_manager: LifeCycleMan
     # Arrange
     sim_day = 1
     life_cycle_manager.sold_calf_num = sold_calf_num = 0
-    mock_animal_data = mocker.MagicMock(autospec=AnimalData)
-    mock_animal_data.next_id.return_value = calf_id = 100
-    life_cycle_manager.animal_data = mock_animal_data
+    mock_animal_population = mocker.MagicMock(autospec=AnimalPopulation)
+    mock_animal_population.next_id.return_value = calf_id = 100
+    life_cycle_manager.animal_population = mock_animal_population
     mock_cow = mocker.MagicMock(autospec=Cow)
     mock_cow.p_animal = p_animal = 1.0
     mock_cow.p_gest_for_calf = p_gest_for_calf = 2.0

@@ -339,9 +339,7 @@ def test_init_animals(animal_manager: AnimalManager, mocker: MockerFixture):
     mocker.patch('RUFAS.routines.animal.animal_manager.AnimalManager._print_animal_num_warnings')
 
     herd_data = MagicMock()
-    config = MagicMock()
-
-    animal_manager.init_animals(herd_data, config)
+    animal_manager.init_animals(herd_data)
 
     animal_manager.life_cycle_manager.initialize_herd.assert_called_once()
 

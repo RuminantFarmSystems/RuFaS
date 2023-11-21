@@ -13,10 +13,7 @@ om = OutputManager()
 
 
 class State:
-    def __init__(self, config: Config, weather: Weather, time: Time,
-                 init_herd: bool = False,
-                 save_animals: bool = False,
-                 terminate_simulation_post_herd_generation: bool = False):
+    def __init__(self, config: Config, weather: Weather, time: Time):
         """
         Description:
             Contains information about the current state of the farm.
@@ -39,20 +36,13 @@ class State:
             Instance of Weather class containing weather data from InputManager.
         time: Time
             Instance of the Time class containing information necessary to initialize the state.
-        init_herd: bool
-            Initialize herd with simulation.
-        save_animals: bool
-            User input indicating whether to save the generated animals to CSV files.
-        terminate_simulation_post_herd_generation: bool
-            User input indicating whether to terminate the simulation after herd generation.
         """
         feed_class_config = im.get_data("feed")
         self.feed = Feed(feed_class_config)
         manure_class_config = im.get_data("manure_management")
         animal_class_config = im.get_data("animal")
         animal_class_config['manure_management_scenarios'] = manure_class_config['manure_management_scenarios']
-        self.animal_manager = AnimalManager(animal_class_config, config, self.feed, weather, time, init_herd,
-                                            save_animals, terminate_simulation_post_herd_generation)
+        self.animal_manager = AnimalManager(animal_class_config, config, self.feed, weather, time)
         self.manure_manager = ManureManager(self.animal_manager, weather, time, manure_class_config)
 
         self.field_manager = FieldManager(manure_manager=self.manure_manager)
