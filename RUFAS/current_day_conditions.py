@@ -70,6 +70,8 @@ class CurrentDayConditions:
             Day number of the year.
         geographic_latitude : float
             Geographic latitude (degrees).
+        year : int
+            Year of the current simulation.
 
         Returns
         -------
