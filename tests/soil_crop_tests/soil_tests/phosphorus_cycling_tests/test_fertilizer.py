@@ -12,6 +12,7 @@ from RUFAS.routines.field.soil.phosphorus_cycling.fertilizer import Fertilizer
     (0.5333, 20),
     (0.6667, 60),
     (0.8, 4),
+    (0.5333, 1_000)
 ])
 def test_determine_fraction_phosphorus_remaining(cover_factor, days):
     """Tests that the fraction of phosphorus remaining in the available pool after absorption by soil is correctly
