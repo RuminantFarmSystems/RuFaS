@@ -81,6 +81,7 @@ class CurrentDayConditions:
         SWAT 1:1.1.6
         """
         angular_velocity = 0.2618
+        geographic_latitude = math.radians(geographic_latitude)
         month = Utility.day_to_month_conversion(day_number, year)
         solar_declination_radians = CurrentDayConditions.calculate_solar_declination_radians(day_number)
         tangent_product = -math.tan(solar_declination_radians) * math.tan(geographic_latitude)
