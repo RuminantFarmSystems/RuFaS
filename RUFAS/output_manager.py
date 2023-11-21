@@ -844,6 +844,7 @@ class OutputManager(object):
                 Path(csvs_dir).mkdir(parents=True, exist_ok=True)
             except FileExistsError:
                 self.add_error("Unable to make CSVs directory.", f"Directory {csvs_dir} already exists.", info_map)
+                raise
             variable_csv_file_path = os.path.join(
                 csvs_dir, self._generate_file_name(f"saved_variables_{filter_file}", "csv")
             )
