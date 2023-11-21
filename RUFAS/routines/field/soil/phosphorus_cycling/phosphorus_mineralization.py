@@ -49,13 +49,13 @@ class PhosphorusMineralization:
 
         """
         for layer in self.data.soil_layers:
-            # soil_phosphorus_content = layer.determine_soil_nutrient_concentration(
-            #     layer.labile_inorganic_phosphorus_content, layer.bulk_density, layer.layer_thickness, field_size)
-            # current_phosphorus_sorption_parameter = layer.calculate_phosphorus_sorption_parameter(
-            #     layer.percent_clay_content, soil_phosphorus_content, layer.percent_organic_carbon_content)
-            # layer.mean_phosphorus_sorption_parameter = self._recompute_mean_phosphorus_sorption_parameter(
-            #     layer.mean_phosphorus_sorption_parameter, current_phosphorus_sorption_parameter)
-            layer.mean_phosphorus_sorption_parameter = 0.3
+            soil_phosphorus_content = layer.determine_soil_nutrient_concentration(
+                layer.labile_inorganic_phosphorus_content, layer.bulk_density, layer.layer_thickness, field_size)
+            current_phosphorus_sorption_parameter = layer.calculate_phosphorus_sorption_parameter(
+                layer.percent_clay_content, soil_phosphorus_content, layer.percent_organic_carbon_content)
+            layer.mean_phosphorus_sorption_parameter = self._recompute_mean_phosphorus_sorption_parameter(
+                layer.mean_phosphorus_sorption_parameter, current_phosphorus_sorption_parameter)
+            # layer.mean_phosphorus_sorption_parameter = 0.3
 
             balance = self._determine_phosphorus_imbalance(layer.labile_inorganic_phosphorus_content,
                                                            layer.active_inorganic_phosphorus_content,
@@ -126,7 +126,9 @@ class PhosphorusMineralization:
         calculate_phosphorus_sorption_parameter() in LayerData), we keep changes in it limited.
 
         """
-        new_mean_phosphorus_sorption_parameter = ((29 * mean_sorption_parameter) + current_sorption_parameter) / 30
+        day_count = 356
+        new_mean_phosphorus_sorption_parameter = \
+            (((day_count - 1) * mean_sorption_parameter) + current_sorption_parameter) / day_count
         return max(0.05, min(0.7, new_mean_phosphorus_sorption_parameter))
 
     @staticmethod
