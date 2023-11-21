@@ -91,7 +91,7 @@ class Fertilizer:
         first_rainfall_occurred = self.data.rain_events_after_fertilizer_application == 1 \
             and self.data.available_phosphorus_pool > 0
         if first_rainfall_occurred and runoff == 0:
-            self.data.soil_layers[0].add_to_labile_phosphorus(self.data.available_phosphorus_pool, field_size)
+            self._add_phosphorus_to_soil(self.data.available_phosphorus_pool, field_size)
             self.data.available_phosphorus_pool = 0
             return
         elif first_rainfall_occurred and runoff > 0:
@@ -102,7 +102,7 @@ class Fertilizer:
             self.data.available_phosphorus_pool -= (runoff_phosphorus_to_remove + absorbed_phosphorus_to_remove)
             self.data.runoff_fertilizer_phosphorus = runoff_phosphorus_to_remove
             self.data.annual_runoff_fertilizer_phosphorus += runoff_phosphorus_to_remove
-            self.data.soil_layers[0].add_to_labile_phosphorus(absorbed_phosphorus_to_remove, field_size)
+            self._add_phosphorus_to_soil(absorbed_phosphorus_to_remove, field_size)
             return
 
     def _update_after_first_rain(self, rainfall: float, runoff: float, field_size: float) -> None:
@@ -127,7 +127,7 @@ class Fertilizer:
         elif runoff == 0:
             solubilized_phosphorus = self.data.recalcitrant_phosphorus_pool * self.data.solubilizing_factor
             self.data.recalcitrant_phosphorus_pool -= solubilized_phosphorus
-            self.data.soil_layers[0].add_to_labile_phosphorus(solubilized_phosphorus, field_size)
+            self._add_phosphorus_to_soil(solubilized_phosphorus, field_size)
             return
         else:
             amounts_to_remove = self._determine_leached_phosphorus(rainfall, runoff, field_size,
@@ -137,7 +137,7 @@ class Fertilizer:
             self.data.recalcitrant_phosphorus_pool -= (runoff_phosphorus_to_remove + absorbed_phosphorus_to_remove)
             self.data.runoff_fertilizer_phosphorus = runoff_phosphorus_to_remove
             self.data.annual_runoff_fertilizer_phosphorus += runoff_phosphorus_to_remove
-            self.data.soil_layers[0].add_to_labile_phosphorus(absorbed_phosphorus_to_remove, field_size)
+            self._add_phosphorus_to_soil(absorbed_phosphorus_to_remove, field_size)
             return
 
     def add_fertilizer_phosphorus(self, fertilizer_phosphorus_applied: float) -> None:
