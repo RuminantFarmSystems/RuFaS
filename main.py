@@ -84,6 +84,19 @@ def run_rufas(
     """
     sys.stdout.write("RuFaS: Ruminant Farm Systems Model 2023\n")
 
+    output_manager = OutputManager()
+    info_map = {
+        "class": "No caller class",
+        "function": run_rufas.__name__,
+    }
+    try:
+        output_dir.mkdir(parents=True, exist_ok=True)
+    except FileExistsError:
+        output_manager.add_error("Unable to make outputs directory.",
+                                 f"Directory {output_dir} already exists.",
+                                 info_map)
+        raise
+
     if load_pool:
         run_load_vars_pool(vars_file_path, exclude_info_maps, format_option,
                            produce_graphics, graphics_dir, clear_output, output_dir,
