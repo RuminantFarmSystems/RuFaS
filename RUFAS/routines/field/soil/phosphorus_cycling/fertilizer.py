@@ -1,4 +1,3 @@
-import pdb
 from typing import Optional, Dict
 from math import log, exp
 
@@ -84,13 +83,13 @@ class Fertilizer:
             return
 
         phosphorus_absorbed_only = self.data.rain_events_after_fertilizer_application == 0 \
-                                   and self.data.days_since_application > 0 and self.data.available_phosphorus_pool > 0
+            and self.data.days_since_application > 0 and self.data.available_phosphorus_pool > 0
         if phosphorus_absorbed_only:
             self._absorb_phosphorus_from_available_pool(field_size)
             return
 
         first_rainfall_occurred = self.data.rain_events_after_fertilizer_application == 1 \
-                                  and self.data.available_phosphorus_pool > 0
+            and self.data.available_phosphorus_pool > 0
         if first_rainfall_occurred and runoff == 0:
             self.data.soil_layers[0].add_to_labile_phosphorus(self.data.available_phosphorus_pool, field_size)
             self.data.available_phosphorus_pool = 0
@@ -193,7 +192,7 @@ class Fertilizer:
         self.data.soil_layers[0].add_to_labile_phosphorus(phosphorus_absorbed, field_size)
 
     def _determine_leached_phosphorus(self, rainfall: float, runoff: float, field_size: float, phosphorus_pool: float) \
-            -> Dict[float, float]:
+            -> Dict[str, float]:
         """
         Determine the amount of phosphorus removed from the specified pool and partition the loss between soil
          absorption
@@ -218,7 +217,7 @@ class Fertilizer:
         phosphorus_in_mg = phosphorus_pool * KILOGRAMS_TO_MILLIGRAMS
         distribution_factor = self._determine_phosphorus_distribution_factor(rainfall, runoff)
         rainfall_in_liters = rainfall * (field_size * HECTARES_TO_SQUARE_MILLIMETERS) * \
-                             (1 / LITERS_TO_CUBIC_MILLIMETERS)
+            (1 / LITERS_TO_CUBIC_MILLIMETERS)
         solubilized_phosphorus = phosphorus_pool * self.data.solubilizing_factor
 
         dissolved_phosphorus_concentration = self._determine_dissolved_phosphorus_concentration(
@@ -234,6 +233,26 @@ class Fertilizer:
         return_dict["absorbed_phosphorus"] = absorbed_phosphorus
 
         return return_dict
+
+    def _add_phosphorus_to_soil(self, added_phosphorus: float, field_size: float) -> None:
+        """
+        Adds partitions and adds phosphorus to the top two soil layers.
+
+        Parameters
+        ----------
+        added_phosphorus : float
+            Phosphorus to be added to the soil profile (kg).
+        field_size : float
+            Size of the field (ha).
+
+        Notes
+        -----
+        80% of added phosphorus goes into the surface soil layer, and 20% of it goes into the soil layer immediately
+        below the surface soil layer.
+
+        """
+        self.data.soil_layers[0].add_to_labile_phosphorus(0.8 * added_phosphorus, field_size)
+        self.data.soil_layers[1].add_to_labile_phosphorus(0.2 * added_phosphorus, field_size)
 
     # --- Static methods ---
     @staticmethod

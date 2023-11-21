@@ -1,7 +1,8 @@
 import pytest
-from unittest.mock import MagicMock, patch
+from unittest.mock import MagicMock, patch, call
 from math import log, exp
 
+from RUFAS.routines.field.soil.layer_data import LayerData
 from RUFAS.routines.field.soil.soil_data import SoilData
 from RUFAS.routines.field.soil.phosphorus_cycling.fertilizer import Fertilizer
 
@@ -75,6 +76,23 @@ def test_absorb_phosphorus_from_available_pool(initial_pool_amount: float, avail
     add_phos.assert_called_once_with(absorbed_phos, field_size)
     determine_fraction.assert_called_with(fert.data.cover_factor, days_since_application)
     assert fert.data.available_phosphorus_pool == expected_remaining_phosphorus
+
+
+@pytest.mark.parametrize("phosphorus_added,field_size", [
+    (100, 1.33),
+    (20.22, 2.4),
+    (300.1, 0.5)
+])
+def test_add_phosphorus_to_soil_profile(phosphorus_added: float, field_size: float) -> None:
+    """Tests that added phosphorus is correctly partitioned between the top two soil layers."""
+    data = SoilData(field_size=field_size)
+    fertilizer = Fertilizer(soil_data=data)
+    expected_calls = [call(0.8 * phosphorus_added, field_size), call(0.2 * phosphorus_added, field_size)]
+
+    with patch.object(LayerData, "add_to_labile_phosphorus") as add_to_pool:
+        fertilizer._add_phosphorus_to_soil(phosphorus_added, field_size)
+
+    add_to_pool.assert_has_calls(expected_calls)
 
 
 @pytest.mark.parametrize("pool_amount,days_since_application,rainfall_events,rainfall,runoff,field_size", [
