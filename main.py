@@ -11,6 +11,7 @@ from pathlib import Path
 import sys
 from typing import List
 
+from RUFAS.routines.animal.life_cycle.animal_factory import AnimalFactory
 from RUFAS.scenario_manager import METADATA_PATHS, MetadataPaths
 
 import config.global_variables
@@ -40,25 +41,27 @@ def main():
         filters_dir=Path(cmd_arguments.filters_dir),
         init_herd=cmd_arguments.init_herd,
         save_animals=cmd_arguments.save_animals,
+        save_animals_dir=Path(cmd_arguments.save_animals_dir),
         terminate_simulation_post_herd_generation=cmd_arguments.terminate_simulation_post_herd_generation
     )
 
 
 def run_rufas(
-    load_pool: bool = False,
-    produce_graphics: bool = True,
-    format_option: str = "verbose",
-    verbose: LogVerbosity = LogVerbosity.NONE,
-    clear_output: bool = False,
-    exclude_info_maps: bool = False,
-    only_run_validation: bool = False,
-    graphics_dir: Path = Path(""),
-    vars_file_path: Path = Path(""),
-    output_dir: Path = Path("output/"),
-    filters_dir: Path = Path("output/output_filters/"),
-    init_herd: bool = False,
-    save_animals: bool = False,
-    terminate_simulation_post_herd_generation: bool = False
+        load_pool: bool = False,
+        produce_graphics: bool = True,
+        format_option: str = "verbose",
+        verbose: LogVerbosity = LogVerbosity.NONE,
+        clear_output: bool = False,
+        exclude_info_maps: bool = False,
+        only_run_validation: bool = False,
+        graphics_dir: Path = Path(""),
+        vars_file_path: Path = Path(""),
+        output_dir: Path = Path("output/"),
+        filters_dir: Path = Path("output/output_filters/"),
+        init_herd: bool = False,
+        save_animals: bool = False,
+        save_animals_dir: Path = Path("output/"),
+        terminate_simulation_post_herd_generation: bool = False
 ) -> None:
     """
     Main function to run RuFaS, with options.
@@ -120,6 +123,7 @@ def run_rufas(
             filters_dir,
             init_herd,
             save_animals,
+            save_animals_dir,
             terminate_simulation_post_herd_generation
         )
 
@@ -166,14 +170,14 @@ def is_file_in_dir(dir_path: Path = Path(config.global_variables.OUT_DIR), file_
 
 
 def run_load_vars_pool(
-    vars_file_path: Path = Path(""),
-    exclude_info_maps: bool = False,
-    format_option: str = "verbose",
-    produce_graphics: bool = True,
-    graphics_dir: Path = Path(""),
-    clear_output: bool = False,
-    output_dir: Path = Path("output/"),
-    filters_dir: Path = Path("output/output_filters/")
+        vars_file_path: Path = Path(""),
+        exclude_info_maps: bool = False,
+        format_option: str = "verbose",
+        produce_graphics: bool = True,
+        graphics_dir: Path = Path(""),
+        clear_output: bool = False,
+        output_dir: Path = Path("output/"),
+        filters_dir: Path = Path("output/output_filters/")
 ) -> None:
     """Instantiates Output Manager and triggers loading of the variables pool from the provided file path
     for post-processing.
@@ -202,23 +206,23 @@ def run_load_vars_pool(
     output_manager.load_variables_pool_from_file(vars_file_path)
     output_manager.set_metadata_prefix("reload")
     output_manager.save_results(
-            output_dir,
-            filters_dir,
-            exclude_info_maps,
-            produce_graphics,
-            graphics_dir,
-        )
+        output_dir,
+        filters_dir,
+        exclude_info_maps,
+        produce_graphics,
+        graphics_dir,
+    )
     output_manager.dump_all_nondata_pools(
-            output_dir, exclude_info_maps, format_option
-        )
+        output_dir, exclude_info_maps, format_option
+    )
 
 
 def run_validation(
-    metadata_files: List[MetadataPaths],
-    exclude_info_maps: bool = False,
-    format_option: str = "verbose",
-    verbose: LogVerbosity = LogVerbosity.NONE,
-    output_dir: Path = Path("output/"),
+        metadata_files: List[MetadataPaths],
+        exclude_info_maps: bool = False,
+        format_option: str = "verbose",
+        verbose: LogVerbosity = LogVerbosity.NONE,
+        output_dir: Path = Path("output/"),
 ) -> None:
     """Instantiates I/O Managers and triggers validation of input data.
 
@@ -272,17 +276,18 @@ def run_validation(
 
 
 def execute_simulations(
-    metadata_files: List[MetadataPaths],
-    exclude_info_maps: bool = False,
-    produce_graphics: bool = True,
-    graphics_dir: Path = Path(""),
-    format_option: str = "verbose",
-    verbose: LogVerbosity = LogVerbosity.NONE,
-    output_dir: Path = Path("output/"),
-    filters_dir: Path = Path("output/output_filters/"),
-    init_herd: bool = False,
-    save_animals: bool = False,
-    terminate_simulation_post_herd_generation: bool = False
+        metadata_files: List[MetadataPaths],
+        exclude_info_maps: bool = False,
+        produce_graphics: bool = True,
+        graphics_dir: Path = Path(""),
+        format_option: str = "verbose",
+        verbose: LogVerbosity = LogVerbosity.NONE,
+        output_dir: Path = Path("output/"),
+        filters_dir: Path = Path("output/output_filters/"),
+        init_herd: bool = False,
+        save_animals: bool = False,
+        save_animals_dir: Path = Path("output/"),
+        terminate_simulation_post_herd_generation: bool = False
 ) -> None:
     """Instantiates I/O Managers and processes the metadata files provided by the user to run the simulation.
 
@@ -337,10 +342,17 @@ def execute_simulations(
             output_manager.add_log(
                 "Validation complete", "Data is valid. \nSimulating...\n", info_map
             )
-            simulator = SimulationEngine(init_herd,
-                                         save_animals,
-                                         terminate_simulation_post_herd_generation)
-            simulator.simulate()
+            animal_factory = AnimalFactory(
+                init_herd=init_herd,
+                save_animals=save_animals,
+                save_animals_path=save_animals_dir)
+            animal_factory.initialize_herd()
+
+            if terminate_simulation_post_herd_generation:
+                return
+            else:
+                simulator = SimulationEngine()
+                simulator.simulate()
         else:
             output_manager.add_error(
                 "Validation complete",
@@ -446,6 +458,12 @@ def parse_gnu_args() -> argparse.Namespace:
         "--save_animals",
         help="Save animals to CSV files",
         action="store_true",
+    )
+    parser.add_argument(
+        "-S",
+        "--save_animals_dir",
+        help="The directory for the output animal population JSON file",
+        default="output/",
     )
     parser.add_argument(
         "-t",

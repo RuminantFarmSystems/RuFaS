@@ -30,19 +30,19 @@ file_path = os.path.join(dir_path, "input/ARL.json")
 
 @pytest.mark.parametrize(
     "load_pool, no_graphics, format_option, verbose, clear_output, exclude_info_maps, only_run_validation,"
-    "graphics_dir, vars_file_path, output_dir, filters_dir, init_herd, save_animals,"
+    "graphics_dir, vars_file_path, output_dir, filters_dir, init_herd, save_animals, save_animals_path,"
     "terminate_simulation_post_herd_generation",
     [
         (False, False, "verbose", LogVerbosity.ERRORS, True, True, True, "graphics", "", "output/",
-         "output/output_filters", False, False, False),
+         "output/output_filters", False, False, "output/", False),
         (False, True, "basic", LogVerbosity.LOGS, False, False, False, "custom_graphics", "", "output/",
-         "output/output_filters", True, False, False),
+         "output/output_filters", True, False, "output/", False),
         (False, True, "block", LogVerbosity.NONE, True, False, False, "graphics", "", "output/",
-         "output/output_filters", True, True, False),
+         "output/output_filters", True, True, "output/", False),
         (True, False, "inline", LogVerbosity.WARNINGS, False, False, False, "custom_graphics", "path.json", "output/",
-         "output/output_filters", True, True, True),
+         "output/output_filters", True, True, "output/", True),
         (True, True, "verbose", LogVerbosity.LOGS, False, True, False, "graphics", "path.json", "output/",
-         "output/output_filters", False, False, True),
+         "output/output_filters", False, False, "output/", True),
     ],
 )
 def test_main(
@@ -59,6 +59,7 @@ def test_main(
         filters_dir: str,
         init_herd: bool,
         save_animals: bool,
+        save_animals_path: str,
         terminate_simulation_post_herd_generation: bool
 ) -> None:
     with patch("main.parse_gnu_args") as mock_parse_gnu_args:
@@ -75,6 +76,7 @@ def test_main(
             filters_dir=filters_dir,
             init_herd=init_herd,
             save_animals=save_animals,
+            save_animals_dir=save_animals_path,
             terminate_simulation_post_herd_generation=terminate_simulation_post_herd_generation
         )
 
@@ -95,6 +97,7 @@ def test_main(
                 filters_dir=Path(filters_dir),
                 init_herd=init_herd,
                 save_animals=save_animals,
+                save_animals_dir=Path(save_animals_path),
                 terminate_simulation_post_herd_generation=terminate_simulation_post_herd_generation
             )
 
@@ -445,7 +448,7 @@ def test_parse_gnu_args(mocker: MockerFixture) -> None:
     actual_args = parse_gnu_args()
 
     # Assert
-    assert mock_add_argument.call_count == 13
+    assert mock_add_argument.call_count == 14
     assert mock_add_argument.call_args_list == [
         mocker.call(
             "-f",
@@ -519,6 +522,12 @@ def test_parse_gnu_args(mocker: MockerFixture) -> None:
             "--save_animals",
             help="Save animals to CSV files",
             action="store_true",
+        ),
+        mocker.call(
+            "-S",
+            "--save_animals_dir",
+            help="The directory for the output animal population JSON file",
+            default="output/",
         ),
         mocker.call(
             "-t",

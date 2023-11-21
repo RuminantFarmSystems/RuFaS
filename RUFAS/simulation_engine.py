@@ -22,25 +22,11 @@ im = InputManager()
 
 class SimulationEngine:
 
-    def __init__(self,
-                 init_herd: bool = False,
-                 save_animals: bool = False,
-                 terminate_simulation_post_herd_generation: bool = False) -> None:
+    def __init__(self) -> None:
         """
         Initialize simulation
-
-        Parameters
-        ----------
-        init_herd: bool
-            Initialize herd with simulation.
-        save_animals: bool
-            User input indicating whether to save the generated animals to CSV files.
-        terminate_simulation_post_herd_generation: bool
-            User input indicating whether to terminate the simulation after herd generation.
         """
-        self._initialize_simulation(init_herd,
-                                    save_animals,
-                                    terminate_simulation_post_herd_generation)
+        self._initialize_simulation()
 
     def simulate(self) -> None:
         """
@@ -132,21 +118,9 @@ class SimulationEngine:
 
         self._run_post_annual_routines()
 
-    def _initialize_simulation(self,
-                               init_herd: bool = False,
-                               save_animals: bool = False,
-                               terminate_simulation_post_herd_generation: bool = False) -> None:
+    def _initialize_simulation(self) -> None:
         """
         Instantiates the simulation object by requesting data from the Input Manager.
-
-        Parameters
-        ----------
-        init_herd: bool
-            Initialize herd with simulation.
-        save_animals: bool
-            User input indicating whether to save the generated animals to CSV files.
-        terminate_simulation_post_herd_generation: bool
-            User input indicating whether to terminate the simulation after herd generation.
         """
         data_config = im.get_data('config')
         data_weather = im.get_data('weather')
@@ -160,7 +134,4 @@ class SimulationEngine:
         self.time = Time(self.config)
         self.state = State(self.config,
                            self.weather,
-                           self.time,
-                           init_herd,
-                           save_animals,
-                           terminate_simulation_post_herd_generation)
+                           self.time)

@@ -8,7 +8,7 @@ from scipy.stats import truncnorm
 
 from RUFAS.routines.animal.life_cycle.animal_base import AnimalBase
 from RUFAS.routines.animal.animal_typed_dicts import HerdInfoTypedDict
-from RUFAS.routines.animal.life_cycle.animal_factory import AnimalFactory
+# from RUFAS.routines.animal.life_cycle.animal_factory import AnimalFactory
 from RUFAS.routines.animal.life_cycle.calf import Calf
 from RUFAS.routines.animal.life_cycle.heiferI import HeiferI
 from RUFAS.routines.animal.life_cycle.heiferII import HeiferII

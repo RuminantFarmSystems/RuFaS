@@ -116,9 +116,7 @@ class AnimalManager:
         config.update(data['from_literature']['life_cycle'])
         return config
 
-    def __init__(self, data: Dict[str, Any], config: Config, feed: Feed, weather: Weather, time: Time,
-                 init_herd: bool = False, save_animals: bool = False,
-                 terminate_simulation_post_herd_generation: bool = False):
+    def __init__(self, data: Dict[str, Any], config: Config, feed: Feed, weather: Weather, time: Time):
         """
         Initializes the pens and animals in the simulation with data from the
         JSON file by calling init_pens() and init_animals(). Creates instance
@@ -136,11 +134,6 @@ class AnimalManager:
             Instance of the Weather class.
         time: Time
             Instance of the Time class.
-        init_herd: bool
-            Initialize herd with simulation.
-        save_animals: bool
-            User input indicating whether to save the generated animals to CSV files.
-        terminate_simulation_post_herd_generation: bool
             User input indicating whether to terminate the simulation after herd generation.
         """
 
@@ -220,8 +213,7 @@ class AnimalManager:
         self.init_pens(data['pen_information'], data['herd_information'], data['manure_management_scenarios'])
 
         if self.simulate_animals:
-            self.init_animals(config, data['herd_information'], init_herd, save_animals,
-                              terminate_simulation_post_herd_generation)
+            self.init_animals(data['herd_information'])
 
             self.init_nutrient_rqmts(weather, time, feed)
 
@@ -274,8 +266,7 @@ class AnimalManager:
 
             self.all_pens.append(pen)
 
-    def init_animals(self, config: Config, herd_data: Dict[str, Any], init_herd: bool = False,
-                     save_animals: bool = False, terminate_simulation_post_herd_generation: bool = False):
+    def init_animals(self, herd_data: Dict[str, Any]):
         """
         Populates the list of animals with the information from the
         input JSON file: constructs the calves, heiferI’s, heiferII’s,
@@ -286,21 +277,12 @@ class AnimalManager:
 
         Parameters
         ----------
-        config: Config
-            An instance of the Config class contains model configuration information
         herd_data: Dict[str, Any]
             A dictionary containing information about the herd.
-        init_herd: bool
-            Initialize herd with simulation.
-        save_animals: bool
-            User input indicating whether to save the generated animals to CSV files.
-        terminate_simulation_post_herd_generation: bool
-            User input indicating whether to terminate the simulation after herd generation.
         """
 
         self.calves, self.heiferIs, self.heiferIIs, self.heiferIIIs, self.cows \
-            = self.life_cycle_manager.initialize_herd(config, herd_data, init_herd, save_animals,
-                                                      terminate_simulation_post_herd_generation)
+            = self.life_cycle_manager.initialize_herd(herd_data)
 
     def _print_animal_num_warnings(self, herd_data: Dict[str, Any]):
         """
@@ -1286,12 +1268,11 @@ class AnimalManager:
 
         return animals, output
 
-    def get_initialize_db_summary(self):
+    def get_initial_herd_summary(self):
         """
-        Returns: a dictionary which is the summary of the animal initialization
-        database
+        Returns: a dictionary which is the summary of the initial herd
         """
-        return self.life_cycle_manager.initialize_db_summary
+        return self.life_cycle_manager.initial_herd_summary
 
     @classmethod
     def _calc_phosphorus_concentration(cls, animals) -> float:
