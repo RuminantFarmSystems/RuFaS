@@ -884,6 +884,99 @@ class InputManager:
             return False, "Value greater than maximum"
         return True, ""
 
+    @staticmethod
+    def _is_str_value(variable_value: Any, variable_properties: Dict[str, Any]) -> Tuple[bool, str]:
+        """
+        Check if the variable value is a string.
+
+        Parameters
+        ----------
+        variable_value : Any
+            The value of the variable to check.
+        variable_properties : Dict[str, Any]
+            The properties for the variable of interest.
+
+        Returns
+        -------
+        Tuple[bool, str]
+            A tuple containing a boolean indicating if the check passed and a string containing the reason for failure.
+
+        """
+
+        if type(variable_value) is not str:
+            return False, "String variable is not a string."
+        return True, ""
+
+    @staticmethod
+    def _check_str_len_lower_bound(variable_value: str,
+                                   variable_properties: Dict[str, Any]) -> Tuple[bool, str]:
+        """
+        Check if the variable value is greater than the minimum length.
+
+        Parameters
+        ----------
+        variable_value : str
+            The value of the variable to check.
+        variable_properties : Dict[str, Any]
+            The properties for the variable of interest.
+
+        Returns
+        -------
+        Tuple[bool, str]
+            A tuple containing a boolean indicating if the check passed and a string containing the reason for failure.
+        """
+
+        if "minimum_length" in variable_properties and len(variable_value) < variable_properties["minimum_length"]:
+            return False, "String length less than minimum."
+        return True, ""
+
+    @staticmethod
+    def _check_str_len_upper_bound(variable_value: str,
+                                   variable_properties: Dict[str, Any]) -> Tuple[bool, str]:
+        """
+        Check if the variable value is less than the maximum length.
+
+        Parameters
+        ----------
+        variable_value : str
+            The value of the variable to check.
+        variable_properties : Dict[str, Any]
+            The properties for the variable of interest.
+
+        Returns
+        -------
+        Tuple[bool, str]
+            A tuple containing a boolean indicating if the check passed and a string containing the reason for failure.
+        """
+
+        if "maximum_length" in variable_properties and len(variable_value) > variable_properties["maximum_length"]:
+            return False, "String length greater than maximum."
+        return True, ""
+
+    @staticmethod
+    def _check_str_pattern_match(variable_value: str,
+                                 variable_properties: Dict[str, Any]) -> Tuple[bool, str]:
+        """
+        Check if the variable value matches the specified pattern.
+
+        Parameters
+        ----------
+        variable_value : str
+              The value of the variable to check.
+        variable_properties : Dict[str, Any]
+              The properties for the variable of interest.
+
+        Returns
+        -------
+        Tuple[bool, str]
+              A tuple containing a boolean indicating if the check passed and a string containing the reason for
+              failure.
+        """
+
+        if "pattern" in variable_properties and not re.fullmatch(variable_properties["pattern"], variable_value):
+            return False, "String does not match pattern."
+        return True, ""
+
 
 class ElementsCounter:
     """
