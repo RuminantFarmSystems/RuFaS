@@ -795,6 +795,80 @@ class InputManager:
         om.add_log("Clear variable pool", "The pool is emptied.", info_map)
 
     @staticmethod
+    def _get_nested_dict_value(input_data: List | Dict[str, Any], keys: List[str | int]) -> Any:
+        """
+        Get a value from a nested dictionary by following the keys in the input_data dictionary.
+
+        Parameters
+        ----------
+        input_data : List | Dict[str, Any]
+            The list or dictionary to get the value from.
+        keys : List[str | int]
+            The keys to follow in the dictionary to get the value. When the key is an int, it is used to index a list.
+
+        Returns
+        -------
+        Any
+            The value from the nested dictionary.
+
+        Raises
+        ------
+        KeyError
+            If the key is not found in the input_data dictionary.
+        IndexError
+            If the index is not found in the input_data list.
+
+        Examples
+        --------
+        >>> InputManager._get_nested_dict_value({"a": {"b": 1}}, ["a", "b"])
+        1
+        >>> InputManager._get_nested_dict_value({"a": {"b": {"c": [1, 2, 3]}}}, ["a", "b", "c", 1])
+        2
+        >>> InputManager._get_nested_dict_value({"a": {"b": {"c": [1, 2, 3]}}}, ["a", "b", "c", 3])
+        KeyError: 3
+        """
+
+        for key in keys:
+            if isinstance(input_data, dict) or isinstance(input_data, list):
+                input_data = input_data[key]
+            else:
+                return input_data
+        return input_data
+
+    @staticmethod
+    def _convert_variable_path_to_str(variable_path: List[str | int]) -> str:
+        """
+        Convert a variable path list to a string.
+
+        Parameters
+        ----------
+        variable_path : List[str | int]
+            The variable path to convert.
+
+        Returns
+        -------
+        str
+            The variable path as a string.
+
+        Examples
+        --------
+        >>> InputManager._convert_variable_path_to_str(["a", "b", 1])
+        "a.b.[1]"
+        >>> InputManager._convert_variable_path_to_str(["a", "b", "c"])
+        "a.b.c"
+        >>> InputManager._convert_variable_path_to_str(["a", "b", "c", 0, 1])
+        "a.b.c.[0].[1]"
+        """
+
+        elems = []
+        for elem in variable_path:
+            if isinstance(elem, int):
+                elems.append(f"[{elem}]")
+            else:
+                elems.append(elem)
+        return ".".join(elems)
+
+    @staticmethod
     def _is_bool_value(variable_value: Any, variable_properties: Dict[str, Any]) -> Tuple[bool, str]:
         """
         Check if the variable value is a boolean.
