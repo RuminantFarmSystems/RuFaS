@@ -3903,7 +3903,7 @@ def test_validate_input_type_dynamic(mocker: MockerFixture,
 
 def test_elements_counter_init() -> None:
     """
-    Test the __init__ method of the ElementsCounter class.
+    Unit test for the __init__() method of the ElementsCounter class in file input_manager.py.
 
     This test checks if all counters are initialized to zero.
     """
@@ -3942,9 +3942,12 @@ def test_elements_counter_init() -> None:
         ("nonexistent_counter", 1, None, True),
     ]
 )
-def test_elements_counter_update(attribute_name, new_value, expected_values, should_raise_exception):
+def test_elements_counter_update(attribute_name: str,
+                                 new_value: int,
+                                 expected_values: dict[str, int],
+                                 should_raise_exception: bool) -> None:
     """
-    Unit test for the update method of the ElementsCounter class.
+    Unit test for the update() method of the ElementsCounter class in file input_manager.py.
 
     This test checks if the counters are correctly updated for valid attributes,
     and if an exception is raised for invalid attributes.
@@ -3989,10 +3992,13 @@ def test_elements_counter_update(attribute_name, new_value, expected_values, sho
         ("nonexistent_counter", 1, {}, None, True),
     ]
 )
-def test_elements_counter_increment(attribute_name, increment_value, initial_values, expected_values,
-                                    should_raise_exception):
+def test_elements_counter_increment(attribute_name: str,
+                                    increment_value: int,
+                                    initial_values: dict[str, int],
+                                    expected_values: dict[str, int],
+                                    should_raise_exception: bool) -> None:
     """
-    Test the increment method of the ElementsCounter class.
+    Unit test for the increment() method of the ElementsCounter class in file input_manager.py.
 
     This test checks if the counters are correctly incremented for valid attributes,
     and if an exception is raised for invalid attributes.
@@ -4012,3 +4018,80 @@ def test_elements_counter_increment(attribute_name, increment_value, initial_val
         counter.increment(attribute_name, increment_value)
         for attr, expected in expected_values.items():
             assert getattr(counter, attr) == expected
+
+
+@pytest.mark.parametrize(
+    "attribute_name, decrement_value, initial_values, expected_values, should_raise_exception",
+    [
+        # Valid decrement cases for each counter
+        ("total_elements", 2, {"total_elements": 5},
+         {"total_elements": 3, "valid_elements": 0, "fixed_elements": 0, "invalid_elements": 0}, False),
+
+        ("valid_elements", 1, {"valid_elements": 4},
+         {"total_elements": 0, "valid_elements": 3, "fixed_elements": 0, "invalid_elements": 0}, False),
+
+        ("fixed_elements", 3, {"fixed_elements": 7},
+         {"total_elements": 0, "valid_elements": 0, "fixed_elements": 4, "invalid_elements": 0}, False),
+
+        ("invalid_elements", 4, {"invalid_elements": 8},
+         {"total_elements": 0, "valid_elements": 0, "fixed_elements": 0, "invalid_elements": 4}, False),
+
+        # Decrement with default value of 1
+        ("total_elements", 1, {"total_elements": 2},
+         {"total_elements": 1, "valid_elements": 0, "fixed_elements": 0, "invalid_elements": 0}, False),
+
+        # Invalid case
+        ("nonexistent_counter", 1, {}, None, True),
+    ]
+)
+def test_elements_counter_decrement(attribute_name: str,
+                                    decrement_value: int,
+                                    initial_values: dict[str, int],
+                                    expected_values: dict[str, int],
+                                    should_raise_exception: bool) -> None:
+    """
+    Unit test for the decrement() method of the ElementsCounter class in file input_manager.py.
+
+    This test checks if the counters are correctly decremented for valid attributes,
+    and if an exception is raised for invalid attributes.
+    """
+
+    # Arrange
+    counter = ElementsCounter()
+    for attr, value in initial_values.items():
+        setattr(counter, attr, value)
+
+    # Act & Assert
+    if should_raise_exception:
+        with pytest.raises(Exception) as excinfo:
+            counter.decrement(attribute_name, decrement_value)
+        assert f"Invalid sub-counter name: {attribute_name}" in str(excinfo.value)
+    else:
+        counter.decrement(attribute_name, decrement_value)
+        for attr, expected in expected_values.items():
+            assert getattr(counter, attr) == expected
+
+
+def test_elements_counter_reset() -> None:
+    """
+    Unit test for the reset() method of the ElementsCounter class in file input_manager.py.
+
+    This test checks if all counters are reset to zero.
+    """
+
+    # Arrange
+    counter = ElementsCounter()
+    # Initially set the counters to some non-zero values
+    counter.total_elements = 5
+    counter.valid_elements = 3
+    counter.fixed_elements = 2
+    counter.invalid_elements = 1
+
+    # Act
+    counter.reset()
+
+    # Assert
+    assert counter.total_elements == 0
+    assert counter.valid_elements == 0
+    assert counter.fixed_elements == 0
+    assert counter.invalid_elements == 0

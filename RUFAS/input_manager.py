@@ -1220,7 +1220,7 @@ class ElementsCounter:
 
     def update(self, name: str, value: int):
         """
-        Update the count of a specific attribute by the given value.
+        Update the count of a specific attribute to the given value.
 
         Parameters
         ----------
