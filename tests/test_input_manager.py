@@ -2006,6 +2006,180 @@ def test_check_num_upper_bound(variable_value: int | float, variable_properties:
     assert InputManager._check_num_upper_bound(variable_value, variable_properties) == expected_result
 
 
+@pytest.mark.parametrize("variable_value, variable_properties, expected_result", [
+    # Test with a regular string
+    ("hello", {}, (True, "")),
+
+    # Test with an empty string
+    ("", {}, (True, "")),
+
+    # Test with an integer
+    (123, {}, (False, "String variable is not a string.")),
+
+    # Test with a float
+    (1.0, {}, (False, "String variable is not a string.")),
+
+    # Test with a boolean
+    (True, {}, (False, "String variable is not a string.")),
+
+    # Test with a list
+    ([1, 2, 3], {}, (False, "String variable is not a string.")),
+
+    # Test with a dictionary
+    ({"key": "value"}, {}, (False, "String variable is not a string.")),
+
+    # Test with a None value
+    (None, {}, (False, "String variable is not a string."))
+])
+def test_is_str_value(variable_value, variable_properties, expected_result):
+    """
+    Unit test for method _is_str_value() in file input_manager.py.
+    """
+
+    assert InputManager._is_str_value(variable_value, variable_properties) == expected_result
+
+
+@pytest.mark.parametrize("variable_value, variable_properties, expected_result", [
+    # Test with string longer than minimum
+    ("hello", {"minimum_length": 3}, (True, "")),
+
+    # Test with string shorter than minimum
+    ("hi", {"minimum_length": 3}, (False, "String length less than minimum.")),
+
+    # Test with string equal to minimum
+    ("hello", {}, (True, "")),
+
+    # Test with empty string and some minimum length
+    ("", {"minimum_length": 1}, (False, "String length less than minimum.")),
+
+    # Test with empty string and zero minimum length
+    ("", {"minimum_length": 0}, (True, "")),
+])
+def test_check_str_len_lower_bound(variable_value: str, variable_properties: dict[str, Any],
+                                   expected_result: tuple[bool, str]) -> None:
+    """
+    Unit test for method _check_str_len_lower_bound() in file input_manager.py.
+    """
+
+    assert InputManager._check_str_len_lower_bound(variable_value, variable_properties) == expected_result
+
+
+@pytest.mark.parametrize("variable_value, variable_properties, expected_result", [
+    # Test with string equal to maximum length
+    ("hello", {"maximum_length": 5}, (True, "")),
+
+    # Test with string shorter than maximum length
+    ("hello", {"maximum_length": 10}, (True, "")),
+
+    # Test with string longer than maximum length
+    ("hello", {"maximum_length": 4}, (False, "String length greater than maximum.")),
+
+    # Test with string but no maximum length specified
+    ("hello", {}, (True, "")),
+
+    # Test with empty string and no maximum length specified
+    ("", {"maximum_length": 0}, (True, "")),
+
+    # Test with empty string and some maximum length
+    ("", {"maximum_length": 1}, (True, "")),
+])
+def test_check_str_len_upper_bound(variable_value: str, variable_properties: dict[str, Any],
+                                   expected_result: tuple[bool, str]) -> None:
+    """
+    Unit test for method _check_str_len_upper_bound() in file input_manager.py.
+    """
+
+    assert InputManager._check_str_len_upper_bound(variable_value, variable_properties) == expected_result
+
+
+@pytest.mark.parametrize("variable_value, variable_properties, expected_result", [
+    # Test with an alphanumeric string matching the pattern
+    ("hello123", {"pattern": r"\w+"}, (True, "")),
+
+    # Test with an alphanumeric string not matching the pattern
+    ("hello123", {"pattern": r"\d+"}, (False, "String does not match pattern.")),
+
+    # Test with a numeric string matching the pattern
+    ("12345", {"pattern": r"\d+"}, (True, "")),
+
+    # Test with an exact match
+    ("hello", {"pattern": r"hello"}, (True, "")),
+
+    # Test with a case-sensitive failed match
+    ("HELLO", {"pattern": r"hello"}, (False, "String does not match pattern.")),
+
+    # Test with a string containing a space
+    ("hello world", {"pattern": r"hello world"}, (True, "")),
+
+    # Test with a string matching a character class pattern
+    ("hello", {"pattern": r"[a-z]+"}, (True, "")),
+
+    # Test with an empty string and a pattern that matches anything
+    ("", {"pattern": r".*"}, (True, "")),
+
+    # Test with a string but no pattern specified
+    ("hello", {}, (True, "")),
+
+    # Test with case-insensitive flag
+    ("HELLO", {"pattern": r"(?i)hello"}, (True, "")),  # Case-insensitive flag, should match
+
+    # Test with pipe character to match one of two options
+    ("cat", {"pattern": r"cat|dog"}, (True, "")),
+
+    # Test with pipe character to match one of two options
+    ("dog", {"pattern": r"cat|dog"}, (True, "")),
+
+    # Test with pipe character and no match
+    ("bird", {"pattern": r"cat|dog"}, (False, "String does not match pattern.")),
+
+    # Test with pipe character and match all options
+    ("catdog", {"pattern": r"cat|dog"}, (False, "String does not match pattern.")),
+
+    # Test with pipe character and match some options but not all
+    ("dogfish", {"pattern": r"cat|dog"}, (False, "String does not match pattern.")),
+
+    # Test with pipe character, start, and end of string
+    ("dog", {"pattern": r"^dog|cat$"}, (True, "")),
+
+    # Test with pipe character, start, and end of string
+    ("cat", {"pattern": r"^dog|cat$"}, (True, "")),
+
+    # Test with pipe character, start, and end of string and only part of the string matches
+    ("a cat", {"pattern": r"^dog|cat$"}, (False, "String does not match pattern.")),
+
+    # Test with dot character
+    ("hello.world", {"pattern": r"hello.world"}, (True, "")),
+
+    # Test with dot character but no match
+    ("helloworld", {"pattern": r"hello.world"}, (False, "String does not match pattern.")),
+
+    # Test with literal dot character
+    ("hello.world", {"pattern": r"hello\.world"}, (True, "")),
+
+    # Test with literal dot character but no match
+    ("helloworld", {"pattern": r"hello\.world"}, (False, "String does not match pattern.")),
+
+    # Test with minimum number of characters
+    ("helloooo", {"pattern": r"hello{2,}"}, (True, "")),
+
+    # Test with minimum number of characters but no match
+    ("hello", {"pattern": r"hello{2,}"}, (False, "String does not match pattern.")),
+
+    # Test with maximum number of characters
+    ("hello", {"pattern": r"hello{,2}"}, (True, "")),
+
+    # Test with maximum number of characters but no match
+    ("helloooo", {"pattern": r"hello{,2}"}, (False, "String does not match pattern.")),
+])
+def test_check_str_pattern_match(variable_value: str, variable_properties: dict[str, Any],
+                                 expected_result: tuple[bool, str]) -> None:
+    """
+    Unit test for method _check_str_pattern_match() in file input_manager.py.
+    """
+
+    assert InputManager._check_str_pattern_match(variable_value, variable_properties) == expected_result
+
+
 def test_elements_counter_init() -> None:
     """
     Unit test for the __init__() method of the ElementsCounter class in file input_manager.py.
