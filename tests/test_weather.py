@@ -132,7 +132,7 @@ def test_get_current_day_conditions(mock_weather: Weather, day: int, year: int, 
 
         assert actual == expected
         assert conversion.call_count == 1
-        daylength.assert_called_once_with(day, 0.752, 3)
+        daylength.assert_called_once_with(day, 43.0723, 3)
 
 
 @pytest.mark.parametrize("day,year,calendar_year,expected", [
