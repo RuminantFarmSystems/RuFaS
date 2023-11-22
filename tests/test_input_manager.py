@@ -9,6 +9,7 @@ import json
 from typing import Any, Callable, Dict
 from mock import MagicMock, Mock, mock_open, patch
 import pandas as pd
+import numpy as np
 import pytest
 from pytest_mock import MockerFixture
 
@@ -2344,7 +2345,7 @@ def test_elements_counter_decrement(attribute_name: str,
     if should_raise_exception:
         with pytest.raises(Exception) as excinfo:
             counter.decrement(attribute_name, decrement_value)
-        assert f"Invalid sub-counter name: {attribute_name}" in str(excinfo.value)
+            assert f"Invalid sub-counter name: {attribute_name}" in str(excinfo.value)
     else:
         counter.decrement(attribute_name, decrement_value)
         for attr, expected in expected_values.items():
