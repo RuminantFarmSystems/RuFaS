@@ -10,7 +10,6 @@ import shutil
 import sys
 from pathlib import Path
 from typing import Any, Callable, Dict, List, Tuple, Optional
-from RUFAS.output_manager import OutputManager
 
 from RUFAS import errors
 from RUFAS.config import is_leap_year
@@ -357,36 +356,3 @@ class Utility:
         for month, day_count in enumerate(cumulative_days_in_months):
             if day <= day_count:
                 return month + 1
-
-    @staticmethod
-    def create_directory(path: Path) -> None:
-        """
-        Creates a dir from the provided path if it does not already exist.
-
-        Parameters
-        ----------
-        path : Path
-            The path where the dir will be created if it does not already exist.
-        """
-        info_map = {"class": Utility.__class__.__name__,
-                    "function": Utility.create_directory.__name__}
-        output_manager = OutputManager()
-        output_manager.add_log("Attempting to create a new directory", 
-                               f"Attempting to create a new directory at {path}")
-        try:
-            path.mkdir(parents=True, exist_ok=True)
-        except FileExistsError:
-            output_manager.add_error("Unable to make outputs directory.",
-                                     f"Directory {path} already exists.",
-                                     info_map)
-            raise
-        except PermissionError:
-            output_manager.add_error("Unable to make output directory.",
-                                     f"User does not have necessary permissions to create a dir at {path}.",
-                                     info_map)
-            raise
-        except Exception:
-            output_manager.add_error("Unable to make output directory.",
-                                     f"{path} not able to be created for an unknown reason.",
-                                     info_map)
-            raise

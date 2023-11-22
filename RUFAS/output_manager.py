@@ -1106,3 +1106,34 @@ class OutputManager(object):
         directory_path = dir_path.resolve()
 
         return directory_path == file_path or directory_path in file_path.parents
+
+    def create_directory(self, path: Path) -> None:
+        """
+        Creates a dir from the provided path if it does not already exist.
+
+        Parameters
+        ----------
+        path : Path
+            The path where the dir will be created if it does not already exist.
+        """
+        info_map = {"class": Utility.__class__.__name__,
+                    "function": Utility.create_directory.__name__}
+        self.add_log("Attempting to create a new directory",
+                     f"Attempting to create a new directory at {path}")
+        try:
+            path.mkdir(parents=True, exist_ok=True)
+        except FileExistsError:
+            self.add_error("Unable to make outputs directory.",
+                           f"Directory {path} already exists.",
+                           info_map)
+            raise
+        except PermissionError:
+            self.add_error("Unable to make output directory.",
+                           f"User does not have necessary permissions to create a dir at {path}.",
+                           info_map)
+            raise
+        except Exception:
+            self.add_error("Unable to make output directory.",
+                           f"{path} not able to be created for an unknown reason.",
+                           info_map)
+            raise
