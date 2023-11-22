@@ -126,16 +126,6 @@ class Manure:
         assimilated_grazing_water_extractable_inorganic = self._determine_assimilated_phosphorus_amount(
             grazing_assimilation_ratio, self.data.grazing_water_extractable_inorganic_phosphorus)
 
-        # Calculate bounding ratio
-        # TODO: bound decomposition plus assimilation changes so that their sum cannot be greater than the original, ask
-        #   Pete about best way to bound decomposition plus assimilation changes.
-        #   Problem: when the sum of decomposition and assimilation changes are greater than the amount in the pool they
-        #   are changing, the code limits the amount of decrease in the pool to the amount currently in the pool. But it
-        #   doesn't reset the decomposition and assimilation changes, so when it calculates increases in the pools that
-        #   stuff is decomposed or assimilated into it can be more than the amount that was removed from the pools.
-        #   Possible Solution: ratio = total / (decomposition + assimilation), multiply decomposition and assimilation
-        #   amounts by ratio to bound changes
-
         # Set machine attributes
         self.data.machine_manure_dry_mass = \
             max(0.0, self.data.machine_manure_dry_mass - assimilated_machine_mass - decomposed_machine_mass)
@@ -271,8 +261,6 @@ class Manure:
         This method follows what is outlined in SurPhos (theoretical documentation, page 8, paragraph just below eqn.
         [13]), which is that 80% of infiltrated phosphorus stays in the top 20 mm of soil, and the rest infiltrates
         deeper.
-        TODO: implement distribution mechanism for the 20% of phosphorus that infiltrates deeper after talking with Pete
-            about how that mechanism works.
 
         """
         self.data.soil_layers[0].add_to_labile_phosphorus(0.8 * infiltrated_phosphorus_amount, field_size)
@@ -305,7 +293,7 @@ class Manure:
             self.data.grazing_manure_moisture_factor += change_in_grazing_manure_moisture
             self.data.grazing_manure_moisture_factor = min(0.9, max(self.data.grazing_manure_moisture_factor, 0.0))
 
-    def _determine_decomposed_surface_manure(self, temperature_factor: float) -> Dict:
+    def _determine_decomposed_surface_manure(self, temperature_factor: float) -> Dict[str, float]:
         """This method calculates how much manure in both the machine and grazer-applied pools decompose on a given day,
             and how much the field coverage changes as a result.
 
@@ -405,7 +393,8 @@ class Manure:
     @staticmethod
     def _determine_phosphorus_leached_from_surface(rainfall: float, runoff: float, field_size: float,
                                                    manure_dry_mass: float, field_coverage: float,
-                                                   water_extractable_phosphorus: float, is_organic: bool) -> Dict:
+                                                   water_extractable_phosphorus: float, is_organic: bool) \
+            -> Dict[str, float]:
         """This method determines how much phosphorus is leached from the given pool, how that phosphorus is distributed
             between runoff and soil infiltration, and how much phosphorus remains in the given pool.
 
@@ -705,7 +694,6 @@ class Manure:
         is why the is_from_cow parameter is necessary.
 
         """
-        # TODO: combine this method with _determine_water_extractable_organic_phosphorus_leached() - GitHub issue #423
         if is_from_cow:
             first_term = (1.2 * rainfall_to_dry_manure_ratio) / (rainfall_to_dry_manure_ratio + 73.1)
         else:
@@ -740,7 +728,6 @@ class Manure:
         SurPhos [9, 10], pseudocode_soil [S.5.D.I.3, II.1]
 
         """
-        # TODO: combine this method with _determine_water_extractable_organic_phosphorus_leached() - GitHub issue #423
         result = Manure._determine_water_extractable_inorganic_phosphorus_leached(
             manure_water_extractable_organic_phosphorus, rainfall_to_dry_manure_ratio, is_from_cow)
         return result / 0.6
