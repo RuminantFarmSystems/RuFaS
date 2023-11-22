@@ -96,6 +96,16 @@ def run_rufas(
                                  f"Directory {output_dir} already exists.",
                                  info_map)
         raise
+    except PermissionError:
+        output_manager.add_error("Unable to make output directory.",
+                                 f"User does not have necessary permissions to create a dir at {output_dir}.",
+                                 info_map)
+        raise
+    except Exception:
+        output_manager.add_error("Unable to make output directory.",
+                                 f"{output_dir} not able to be created for an unknown reason.",
+                                 info_map)
+        raise
 
     if load_pool:
         run_load_vars_pool(vars_file_path, exclude_info_maps, format_option,
