@@ -1855,6 +1855,55 @@ def test_flush_pool(mock_input_manager: InputManager) -> None:
         assert add_log.call_count == 1
 
 
+@pytest.mark.parametrize("variable_value, variable_properties, expected_result", [
+    # Test with a boolean True
+    (True, {}, (True, "")),
+
+    # Test with a boolean False
+    (False, {}, (True, "")),
+
+    # Test with a string "True"
+    ("True", {}, (False, "Bool variable is not a boolean")),
+
+    # Test with a string "False"
+    ("False", {}, (False, "Bool variable is not a boolean")),
+
+    # Test with an integer 1
+    (1, {}, (False, "Bool variable is not a boolean")),
+
+    # Test with an integer 0
+    (0, {}, (False, "Bool variable is not a boolean")),
+
+    # Test with a None value
+    (None, {}, (False, "Bool variable is not a boolean")),
+
+    # Test with an empty list
+    ([], {}, (False, "Bool variable is not a boolean")),
+
+    # Test with a list
+    ([1, 2, 3], {}, (False, "Bool variable is not a boolean")),
+
+    # Test with an empty dictionary
+    ({}, {}, (False, "Bool variable is not a boolean")),
+
+    # Test with a dictionary
+    ({"key": "value"}, {}, (False, "Bool variable is not a boolean")),
+
+    # Test with a float 1.0
+    (1.0, {}, (False, "Bool variable is not a boolean")),
+
+    # Test with a float 0.0
+    (0.0, {}, (False, "Bool variable is not a boolean")),
+])
+def test_is_bool_value(variable_value: Any, variable_properties: dict[str, Any],
+                       expected_result: tuple[bool, str]) -> None:
+    """
+    Unit test for method _is_bool_value() in file input_manager.py.
+    """
+
+    assert InputManager._is_bool_value(variable_value, variable_properties) == expected_result
+
+
 def test_elements_counter_init() -> None:
     """
     Unit test for the __init__() method of the ElementsCounter class in file input_manager.py.
