@@ -1,6 +1,7 @@
 import pytest
 from pytest_mock import MockerFixture
-from pytest_lazyfixture import lazy_fixture
+
+# from pytest_lazyfixture import lazy_fixture
 
 from RUFAS.routines.animal.animal_reporter import AnimalReporter
 from RUFAS.routines.animal.animal_manager import AnimalManager
@@ -122,25 +123,58 @@ def test_report_milk():
 def test_report_ration_interval_data(animal_manager_fixture, mocker: MockerFixture):
     """Unit test for function report_ration_interval_data in file
     routines/animal/ration/animal_reporter.py"""
+    test_data = {
+        "ration_nutrient_amount": {"dummy1": 100},
+        "ration_nutrient_conc": {"dummy2": 200},
+        "ration_per_animal": {"dummy3": 300, "status": 1, "objective": 2},
+        "formatted_ration": {"dry_matter_intake_total": 300, "dummy3": 300},
+        "MEdiet": 500,
+        "avg_nutrient_rqmts": {
+            "avg_BW": 1,
+        },
+    }
     feed = mocker.MagicMock()
     pen1 = mocker.MagicMock()
+    pen1.id = "1"
+    pen1.animal_combination.name = "combo1"
     pen2 = mocker.MagicMock()
+    pen2.id = "2"
+    pen2.animal_combination.name = "combo2"
     animal_manager_fixture.all_pens = [pen1, pen2]
     for pen in animal_manager_fixture.all_pens:
-        pen.ration_nutrient_amount = {"dummy1": 100}
-        pen.ration_nutrient_conc = {"dummy2": 200}
-        pen.ration_per_animal = {"dummy3": 300, "status": 1, "objective": 2}
+        pen.ration_nutrient_amount = test_data["ration_nutrient_amount"]
+        pen.ration_nutrient_conc = test_data["ration_nutrient_conc"]
+        pen.ration_per_animal = test_data["ration_per_animal"]
+        pen.MEdiet = test_data["MEdiet"]
+        pen.avg_nutrient_rqmts = test_data["avg_nutrient_rqmts"]
 
     mocker.patch(
         "RUFAS.routines.animal.ration.ration_driver.RationReporter.report_ration_supply",
-        return_value=None,
+        return_value="ration_supply_report",
     )
 
     AnimalReporter.report_ration_interval_data(animal_manager_fixture, feed)
 
-    # report_ration_interval = om.variables_pool[
-    #     "AnimalReporter.report_ration_interval_data.____"
-    # ]["values"]
+    for i in range(1, 2):
+        assert om.variables_pool[
+            f"AnimalReporter.report_ration_interval_data.ration_nutrient_amount_pen_{i}_combo{i}"
+        ]["values"] == [test_data["ration_nutrient_amount"]]
+
+        assert om.variables_pool[
+            f"AnimalReporter.report_ration_interval_data.MEdiet_pen_{i}_combo{i}"
+        ]["values"] == [test_data["MEdiet"]]
+
+        assert om.variables_pool[
+            f"AnimalReporter.report_ration_interval_data.avg_rqmts_pen_{i}_combo{i}"
+        ]["values"] == [test_data["avg_nutrient_rqmts"]]
+
+        assert om.variables_pool[
+            f"AnimalReporter.report_ration_interval_data.ration_per_animal_for_pen_{i}_combo{i}"
+        ]["values"] == [test_data["formatted_ration"]]
+
+        assert om.variables_pool[
+            f"AnimalReporter.report_ration_interval_data.ration_supply_report_for_pen_{i}_combo{i}"
+        ]["values"] == ["ration_supply_report"]
 
 
 def test_report_daily_ration():
