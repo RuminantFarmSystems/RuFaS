@@ -4,9 +4,11 @@ File name: test_input_manager.py
 Description: Implements test cases for Input Manager
 Author(s): Niko Tomlinson, ndt2@cornell.edu; Allister Liu, al25632@cornell.edu; Michael Richards, mr2372@cornell.edu
 """
+from __future__ import annotations
+
 from functools import reduce
 import json
-from typing import Any, Callable, Dict
+from typing import Any, Callable, Dict, Type
 from mock import MagicMock, Mock, mock_open, patch
 import pandas as pd
 import numpy as np
@@ -1854,6 +1856,72 @@ def test_flush_pool(mock_input_manager: InputManager) -> None:
 
         assert mock_input_manager._InputManager__pool == {}
         assert add_log.call_count == 1
+
+
+@pytest.mark.parametrize("input_data, keys, expected_result, expected_exception", [
+    # Test for getting a nested value in a dictionary
+    ({"a": {"b": 1}}, ["a", "b"], 1, None),
+
+    # Test for getting a value in a list inside a nested dictionary
+    ({"a": {"b": {"c": [1, 2, 3]}}}, ["a", "b", "c", 1], 2, None),
+
+    # Test for KeyError when the key is not present in the dictionary
+    ({"a": {"b": {"c": {"d": 1}}}}, ["a", "b", "c", "e"], None, KeyError),
+
+    # Test for IndexError when the index is not present in the list
+    ({"a": {"b": {"c": [1, 2, 3]}}}, ["a", "b", "c", 3], None, IndexError),
+
+    # Test for accessing a value in a nested list
+    ([{"a": [1, 2]}, {"b": [3, 4]}], [1, "b", 0], 3, None),
+])
+def test_get_nested_dict_value(
+        input_data: list[Any] | dict[str, Any] | Any,
+        keys: list[str | int],
+        expected_result: Any,
+        expected_exception: Type[BaseException] | None,
+) -> None:
+    """
+    Unit test for method _get_nested_dict_value() in file input_manager.py.
+
+    """
+
+    # Act and Assert
+    if expected_exception:
+        with pytest.raises(expected_exception):
+            InputManager._get_nested_dict_value(input_data, keys)
+    else:
+        assert InputManager._get_nested_dict_value(input_data, keys) == expected_result
+
+
+@pytest.mark.parametrize("variable_path, expected_result", [
+    # Test with mix of strings and integer
+    (["a", "b", 1], "a.b.[1]"),
+
+    # Test with only strings
+    (["a", "b", "c"], "a.b.c"),
+
+    # Test with multiple integers
+    (["a", "b", "c", 0, 1], "a.b.c.[0].[1]"),
+
+    # Test with single string
+    (["a"], "a"),
+
+    # Test with single integer
+    ([0], "[0]"),
+
+    # Test with empty list
+    ([], ""),
+])
+def test_convert_variable_path_to_str(variable_path: list[str | int], expected_result: str) -> None:
+    """
+    Unit test for method _convert_variable_path_to_str() in file input_manager.py.
+    """
+
+    # Act
+    result = InputManager._convert_variable_path_to_str(variable_path)
+
+    # Assert
+    assert result == expected_result
 
 
 @pytest.mark.parametrize("variable_value, variable_properties, expected_result", [
