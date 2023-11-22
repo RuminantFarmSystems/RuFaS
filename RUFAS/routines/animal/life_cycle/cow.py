@@ -344,19 +344,19 @@ class Cow(HeiferIII):
 
         # calculate fat percent in milk and fat corrected milk production
         if self.milking:
-            fat_percent = 12.86 * self.days_in_milk ** (-1.081) * math.exp(
+            self.fat_percent = 12.86 * self.days_in_milk ** (-1.081) * math.exp(
                 0.0926 * (math.log(self.days_in_milk)) ** 2) * \
                 (math.log(self.days_in_milk) ** 1.107)
             daily_fat_correct_milk_production = \
                 0.4 * estimated_daily_milk_produced + \
-                0.15 * fat_percent * estimated_daily_milk_produced
-            self.milk_fat_kg = fat_percent*estimated_daily_milk_produced
+                0.15 * self.fat_percent * estimated_daily_milk_produced
+            self.milk_fat_kg = self.fat_percent*estimated_daily_milk_produced
             self.milk_protein_kg = self.mPrt * self.estimated_daily_milk_produced
         else:
-            fat_percent = 0
-            daily_fat_correct_milk_production = 0
-            self.milk_fat_kg = 0
-            self.milk_protein_kg = 0
+            self.fat_percent = 0.0
+            daily_fat_correct_milk_production = 0.0
+            self.milk_fat_kg = 0.0
+            self.milk_protein_kg = 0.0
 
         self.daily_growth = self.get_bw_change(calving_interval)
 
@@ -380,7 +380,7 @@ class Cow(HeiferIII):
         # if not self.milking:
         # 	self.daily_growth = self.body_weight - prev_weight
 
-        return self.estimated_daily_milk_produced, fat_percent, \
+        return self.estimated_daily_milk_produced, self.fat_percent, \
             daily_fat_correct_milk_production
 
     def calc_manure_excretion(self, feed, methane_model, methane_mitigation_method, methane_mitigation_additive_amount,
@@ -641,7 +641,6 @@ class Cow(HeiferIII):
             else:
                 raise ValueError(f'Invalid cow repro program: {self.repro_program}')
 
-        self.fat_percent = fat_percent
         if not self.do_not_breed:
             self.preg_update(sim_day)
         cull_stage = self.cull_update(sim_day)
