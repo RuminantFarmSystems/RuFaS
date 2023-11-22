@@ -12,7 +12,7 @@ import pandas as pd
 import pytest
 from pytest_mock import MockerFixture
 
-from RUFAS.input_manager import InputManager
+from RUFAS.input_manager import InputManager, ElementsCounter
 
 
 @pytest.fixture
@@ -162,17 +162,17 @@ def test_start_data_processing(mock_input_manager: InputManager,
 
 
 @pytest.mark.parametrize("input_data, metadata_properties, expected_result", [
-        (
+    (
             {'key1': 'value1', 'key2': 'value2'},
             {'key1': {'default': 'value3'}},
             {'key1': 'value1'}
-        ),
-        (
+    ),
+    (
             {'key1': {'nested_key1': 'value1', 'nested_key2': 'value2'}},
             {'key1': {'nested_key1': {'default': 'value2'}}},
             {'key1': {'nested_key1': 'value1'}}
-        )
-    ])
+    )
+])
 def test_filter_input_data_by_metadata(mock_input_manager: InputManager, input_data: Dict[str, Any],
                                        metadata_properties: Dict[str, Any], expected_result: Dict[str, Any],
                                        input_manager_original_method_states: Dict[str, Callable], ) -> None:
@@ -182,7 +182,7 @@ def test_filter_input_data_by_metadata(mock_input_manager: InputManager, input_d
 
     mock_input_manager._filter_input_data_by_metadata = input_manager_original_method_states[
         "_filter_input_data_by_metadata"
-        ]
+    ]
 
 
 @pytest.fixture
@@ -256,7 +256,6 @@ def test_populate_pool_invalid(mock_input_manager: InputManager, mock_metadata: 
 
     with patch("RUFAS.output_manager.OutputManager.add_log") as add_log:
         with patch("RUFAS.output_manager.OutputManager.add_warning") as add_warning:
-
             result = mock_input_manager._populate_pool(eager_termination=False)
 
         assert result is False
@@ -288,7 +287,6 @@ def test_populate_pool_eager_termination(mock_input_manager: InputManager, mock_
 
     with patch("RUFAS.output_manager.OutputManager.add_log") as add_log:
         with patch("RUFAS.output_manager.OutputManager.add_warning") as add_warning:
-
             result = mock_input_manager._populate_pool(eager_termination=True)
             assert result is False
             assert add_log.call_count == 0
@@ -322,13 +320,13 @@ def test_populate_pool_raises_keyerror(mock_input_manager: InputManager,
 
 
 @pytest.mark.parametrize(
-        "variable_properties, input_data_value",
-        [
-            ({"type": "string", "dummy_property": "dummy_value"}, "dummy_value"),
-            ({"type": "number", "dummy_property": 10}, 10),
-            ({"type": "bool", "dummy_property": True}, True),
-            ({"type": "array", "dummy_property": []}, []),
-        ]
+    "variable_properties, input_data_value",
+    [
+        ({"type": "string", "dummy_property": "dummy_value"}, "dummy_value"),
+        ({"type": "number", "dummy_property": 10}, 10),
+        ({"type": "bool", "dummy_property": True}, True),
+        ({"type": "array", "dummy_property": []}, []),
+    ]
 )
 def test_validate_input_type_dynamic_valid_data(mock_input_manager: InputManager,
                                                 input_manager_original_method_states: Dict[str, Callable],
@@ -406,12 +404,12 @@ def mock_metadata_for_validate_element(mocker: MockerFixture) -> Dict[str, Dict[
                                  "type": "string",
                                  "minimum_length": 1,
                                  "maximum_length": 20
-                                },
+                             },
                              "nested_element2": {
                                  "type": "number",
                                  "minimum": 0,
                                  "maximum": 250
-                                }
+                             }
                              },
                 "element5": {"type": "object",
                              "description": "dummy_description",
@@ -419,26 +417,26 @@ def mock_metadata_for_validate_element(mocker: MockerFixture) -> Dict[str, Dict[
                                  "type": "string",
                                  "minimum_length": 1,
                                  "maximum_length": 20
-                                },
+                             },
                              "nested_element2": {
                                  "type": "number",
                                  "minimum": 0,
                                  "maximum": 250
-                                },
+                             },
                              "nested_element3": {
                                  "type": "object",
                                  "description": "dummy_description",
                                  "nested_sub_element1": {
-                                    "type": "string",
-                                    "minimum_length": 1,
-                                    "maximum_length": 5
+                                     "type": "string",
+                                     "minimum_length": 1,
+                                     "maximum_length": 5
                                  },
                                  "nested_sub_element2": {
-                                    "type": "array",
-                                    "minimum_length": 1,
-                                    "maximum_length": 5
+                                     "type": "array",
+                                     "minimum_length": 1,
+                                     "maximum_length": 5
                                  },
-                                }
+                             }
                              },
                 "element6": {"type": "bool"},
                 "element7": {"type": "number", "maximum": 10, "default": 5},
@@ -474,12 +472,12 @@ def test_validate_element_fixable_data(mock_input_manager: InputManager,
 
 
 @pytest.mark.parametrize(
-        "property, input_data, total_elements, valid_elements, invalid_elements, fixed_elements",
-        [
-            ("element1", {"element1": ["123-45-6789", "000-11-6123", "555-55-5555"]}, 3, 3, 0, 0),
-            ("element2", {"element2": [6, 149, 55, 22]}, 4, 4, 0, 0),
-            ("element6", {"element6": [True, False, True]}, 3, 3, 0, 0),
-        ]
+    "property, input_data, total_elements, valid_elements, invalid_elements, fixed_elements",
+    [
+        ("element1", {"element1": ["123-45-6789", "000-11-6123", "555-55-5555"]}, 3, 3, 0, 0),
+        ("element2", {"element2": [6, 149, 55, 22]}, 4, 4, 0, 0),
+        ("element6", {"element6": [True, False, True]}, 3, 3, 0, 0),
+    ]
 )
 def test_validate_csv_element_valid_data(mock_input_manager: InputManager,
                                          mock_metadata_for_validate_element: Dict[str, Dict[str, Any]],
@@ -509,13 +507,13 @@ def test_validate_csv_element_valid_data(mock_input_manager: InputManager,
 
 
 @pytest.mark.parametrize(
-        "property, input_data, total_elements, valid_elements, invalid_elements, fixed_elements, is_valid,"
-        " eager_termination",
-        [
-            ("element1", {"element1": ["invalid1", "invalid2", "invalid3"]}, 3, 0, 3, 0, False, False),
-            ("element2", {"element2": [-6, 1149, 955, -22]}, 1, 0, 1, 0, False, True),
-            ("element7", {"element7": [50]}, 1, 0, 0, 1, True, False),
-        ]
+    "property, input_data, total_elements, valid_elements, invalid_elements, fixed_elements, is_valid,"
+    " eager_termination",
+    [
+        ("element1", {"element1": ["invalid1", "invalid2", "invalid3"]}, 3, 0, 3, 0, False, False),
+        ("element2", {"element2": [-6, 1149, 955, -22]}, 1, 0, 1, 0, False, True),
+        ("element7", {"element7": [50]}, 1, 0, 0, 1, True, False),
+    ]
 )
 def test_validate_csv_element_invalid_data(mock_input_manager: InputManager,
                                            mock_metadata_for_validate_element: Dict[str, Dict[str, Any]],
@@ -827,9 +825,9 @@ def test_validate_json_element_invalid_var_name_raises_input_data_keyerror(mock_
                                                                            ) -> None:
     """Unit test for keyerror raised for invalid var name for _validate_json_element in file input_manager.py"""
     mock_input_manager._InputManager__metadata = {"properties": {"dummy_properties_blob_key":
-                                                                 {"valid_key":
-                                                                  {"type": "object", "secondary_key":
-                                                                   {"type": "string"}}}}}
+                                                                     {"valid_key":
+                                                                          {"type": "object", "secondary_key":
+                                                                              {"type": "string"}}}}}
     element_hierarchy = ["valid_key", "secondary_key"]
     properties_blob_key = "dummy_properties_blob_key"
     input_data = {"valid_key": {"another_valid_key": "value"}}
@@ -857,7 +855,7 @@ def test_validate_json_element_invalid_var_type_raises_keyerror(mock_input_manag
     properties_blob_key = "dummy_valid_key"
     input_data = {"valid_key": "some_value"}
     mock_input_manager._InputManager__metadata = {"properties": {properties_blob_key:
-                                                                 {"valid_key": {"type": "invalid_type"}}}}
+                                                                     {"valid_key": {"type": "invalid_type"}}}}
     eager_termination = False
     mock_element_counter_and_validity = {"fixed_elements": 0, "total_elements": 0, "valid_elements": 0,
                                          "invalid_elements": 0, "is_valid": True}
@@ -879,7 +877,7 @@ def test_validate_json_element_missing_type_raises_keyerror(mock_input_manager: 
     properties_blob_key = "dummy_valid_key"
     input_data = {"valid_key": "some_value"}
     mock_input_manager._InputManager__metadata = {"properties": {properties_blob_key:
-                                                                 {"valid_key": {}}}}
+                                                                     {"valid_key": {}}}}
     eager_termination = False
     mock_element_counter_and_validity = {"fixed_elements": 0, "total_elements": 0, "valid_elements": 0,
                                          "invalid_elements": 0, "is_valid": True}
@@ -1663,32 +1661,32 @@ def mock_pool_for_get_metadata(mocker: MockerFixture) -> Dict[str, Dict[str, Any
                         "description": "Number of Calves (head)",
                         "default": 8,
                         "minimum": 0
-                        },
+                    },
                     "cow_repro_method": {
                         "type": "string",
                         "description": "Cow Reproductive Program (select one)",
                         "default": "ED",
                         "pattern": "^{TAI|ED|ED-TAI}$"
-                        },
+                    },
                     "simulate_animals": {
                         "type": "boolean",
                         "description": "Whether or not to simulate animals during the simulation",
                         "default": True
-                        },
+                    },
                     "dummy_cow_array": {
                         "type": "array",
                         "description": "dummy array for testing purposes",
                         "default": [1, 2, 3, 4],
                         "maximum_length": 7
-                        }
                     }
-                },
+                }
+            },
             "dummy_crop_properties": {
                 "crop_species": {
                     "type": "string",
                     "description": "Name of the crop being grown.",
                     "pattern": "^{generic|corn|spring_wheat|winter_wheat|cereal_rye|spring_barley}$"
-                    },
+                },
                 "harvest_years": {
                     "type": "array",
                     "description": "Calendar years in which the harvesting occurs",
@@ -1697,22 +1695,22 @@ def mock_pool_for_get_metadata(mocker: MockerFixture) -> Dict[str, Dict[str, Any
                     "properties": {
                         "type": "number",
                         "minimum": 1
-                        }
-                    },
+                    }
+                },
                 "pattern_skip": {
                     "type": "number",
                     "description": "Number of years to be skipped between schedule repetitions.",
                     "minimum": 0,
                     "default": 0
-                    },
+                },
                 "simulate_crops": {
                     "type": "boolean",
                     "description": "Dummy boolean variable for testing",
                     "default": False
-                    }
                 }
             }
         }
+    }
 
 
 @pytest.mark.parametrize(
@@ -1747,32 +1745,32 @@ def mock_pool_for_get_metadata(mocker: MockerFixture) -> Dict[str, Dict[str, Any
                         "description": "Number of Calves (head)",
                         "default": 8,
                         "minimum": 0
-                        },
+                    },
                     "cow_repro_method": {
                         "type": "string",
                         "description": "Cow Reproductive Program (select one)",
                         "default": "ED",
                         "pattern": "^{TAI|ED|ED-TAI}$"
-                        },
+                    },
                     "simulate_animals": {
                         "type": "boolean",
                         "description": "Whether or not to simulate animals during the simulation",
                         "default": True
-                        },
+                    },
                     "dummy_cow_array": {
                         "type": "array",
                         "description": "dummy array for testing purposes",
                         "default": [1, 2, 3, 4],
                         "maximum_length": 7
-                        }
                     }
-                },
+                }
+            },
             "dummy_crop_properties": {
                 "crop_species": {
                     "type": "string",
                     "description": "Name of the crop being grown.",
                     "pattern": "^{generic|corn|spring_wheat|winter_wheat|cereal_rye|spring_barley}$"
-                    },
+                },
                 "harvest_years": {
                     "type": "array",
                     "description": "Calendar years in which the harvesting occurs",
@@ -1781,21 +1779,21 @@ def mock_pool_for_get_metadata(mocker: MockerFixture) -> Dict[str, Dict[str, Any
                     "properties": {
                         "type": "number",
                         "minimum": 1
-                        }
-                    },
+                    }
+                },
                 "pattern_skip": {
                     "type": "number",
                     "description": "Number of years to be skipped between schedule repetitions.",
                     "minimum": 0,
                     "default": 0
-                    },
+                },
                 "simulate_crops": {
                     "type": "boolean",
                     "description": "Dummy boolean variable for testing",
                     "default": False
-                    }
                 }
-            }, 0)
+            }
+        }, 0)
     ]
 )
 def test_get_metadata_with_valid_key(dummy_metadata_path: str,
@@ -1855,3 +1853,199 @@ def test_flush_pool(mock_input_manager: InputManager) -> None:
 
         assert mock_input_manager._InputManager__pool == {}
         assert add_log.call_count == 1
+
+
+def test_elements_counter_init() -> None:
+    """
+    Unit test for the __init__() method of the ElementsCounter class in file input_manager.py.
+
+    This test checks if all counters are initialized to zero.
+    """
+
+    # Arrange & Act
+    counter = ElementsCounter()
+
+    # Assert
+    assert counter.total_elements == 0
+    assert counter.valid_elements == 0
+    assert counter.fixed_elements == 0
+    assert counter.invalid_elements == 0
+
+
+@pytest.mark.parametrize(
+    "attribute_name, new_value, expected_values, should_raise_exception",
+    [
+        # Valid cases for each counter
+        ("total_elements", 5,
+         {"total_elements": 5, "valid_elements": 0, "fixed_elements": 0, "invalid_elements": 0},
+         False),
+
+        ("valid_elements", 3,
+         {"total_elements": 0, "valid_elements": 3, "fixed_elements": 0, "invalid_elements": 0},
+         False),
+
+        ("fixed_elements", 2,
+         {"total_elements": 0, "valid_elements": 0, "fixed_elements": 2, "invalid_elements": 0},
+         False),
+
+        ("invalid_elements", 4,
+         {"total_elements": 0, "valid_elements": 0, "fixed_elements": 0, "invalid_elements": 4},
+         False),
+
+        # Invalid case
+        ("nonexistent_counter", 1, None, True),
+    ]
+)
+def test_elements_counter_update(attribute_name: str,
+                                 new_value: int,
+                                 expected_values: dict[str, int],
+                                 should_raise_exception: bool) -> None:
+    """
+    Unit test for the update() method of the ElementsCounter class in file input_manager.py.
+
+    This test checks if the counters are correctly updated for valid attributes,
+    and if an exception is raised for invalid attributes.
+    """
+
+    # Arrange
+    counter = ElementsCounter()
+
+    # Act & Assert
+    if should_raise_exception:
+        with pytest.raises(Exception) as excinfo:
+            counter.update(attribute_name, new_value)
+        assert f"Invalid sub-counter name: {attribute_name}" in str(excinfo.value)
+    else:
+        counter.update(attribute_name, new_value)
+        for attr, expected in expected_values.items():
+            assert getattr(counter, attr) == expected
+
+
+@pytest.mark.parametrize(
+    "attribute_name, increment_value, initial_values, expected_values, should_raise_exception",
+    [
+        # Valid increment cases for each counter
+        ("total_elements", 2, {"total_elements": 3},
+         {"total_elements": 5, "valid_elements": 0, "fixed_elements": 0, "invalid_elements": 0}, False),
+
+        ("valid_elements", 1, {"valid_elements": 2},
+         {"total_elements": 0, "valid_elements": 3, "fixed_elements": 0, "invalid_elements": 0}, False),
+
+        ("fixed_elements", 3, {"fixed_elements": 1},
+         {"total_elements": 0, "valid_elements": 0, "fixed_elements": 4, "invalid_elements": 0}, False),
+
+        ("invalid_elements", 4, {"invalid_elements": 5},
+         {"total_elements": 0, "valid_elements": 0, "fixed_elements": 0, "invalid_elements": 9}, False),
+
+        # Increment with default value of 1
+        ("total_elements", 1, {},
+         {"total_elements": 1, "valid_elements": 0, "fixed_elements": 0, "invalid_elements": 0},
+         False),
+
+        # Invalid case
+        ("nonexistent_counter", 1, {}, None, True),
+    ]
+)
+def test_elements_counter_increment(attribute_name: str,
+                                    increment_value: int,
+                                    initial_values: dict[str, int],
+                                    expected_values: dict[str, int],
+                                    should_raise_exception: bool) -> None:
+    """
+    Unit test for the increment() method of the ElementsCounter class in file input_manager.py.
+
+    This test checks if the counters are correctly incremented for valid attributes,
+    and if an exception is raised for invalid attributes.
+    """
+
+    # Arrange
+    counter = ElementsCounter()
+    for attr, value in initial_values.items():
+        setattr(counter, attr, value)
+
+    # Act & Assert
+    if should_raise_exception:
+        with pytest.raises(Exception) as excinfo:
+            counter.increment(attribute_name, increment_value)
+            assert f"Invalid sub-counter name: {attribute_name}" in str(excinfo.value)
+    else:
+        counter.increment(attribute_name, increment_value)
+        for attr, expected in expected_values.items():
+            assert getattr(counter, attr) == expected
+
+
+@pytest.mark.parametrize(
+    "attribute_name, decrement_value, initial_values, expected_values, should_raise_exception",
+    [
+        # Valid decrement cases for each counter
+        ("total_elements", 2, {"total_elements": 5},
+         {"total_elements": 3, "valid_elements": 0, "fixed_elements": 0, "invalid_elements": 0}, False),
+
+        ("valid_elements", 1, {"valid_elements": 4},
+         {"total_elements": 0, "valid_elements": 3, "fixed_elements": 0, "invalid_elements": 0}, False),
+
+        ("fixed_elements", 3, {"fixed_elements": 7},
+         {"total_elements": 0, "valid_elements": 0, "fixed_elements": 4, "invalid_elements": 0}, False),
+
+        ("invalid_elements", 4, {"invalid_elements": 8},
+         {"total_elements": 0, "valid_elements": 0, "fixed_elements": 0, "invalid_elements": 4}, False),
+
+        # Decrement with default value of 1
+        ("total_elements", 1, {"total_elements": 2},
+         {"total_elements": 1, "valid_elements": 0, "fixed_elements": 0, "invalid_elements": 0}, False),
+
+        # Invalid case
+        ("nonexistent_counter", 1, {}, None, True),
+    ]
+)
+def test_elements_counter_decrement(attribute_name: str,
+                                    decrement_value: int,
+                                    initial_values: dict[str, int],
+                                    expected_values: dict[str, int],
+                                    should_raise_exception: bool) -> None:
+    """
+    Unit test for the decrement() method of the ElementsCounter class in file input_manager.py.
+
+    This test checks if the counters are correctly decremented for valid attributes,
+    and if an exception is raised for invalid attributes.
+    """
+
+    # Arrange
+    counter = ElementsCounter()
+    for attr, value in initial_values.items():
+        setattr(counter, attr, value)
+
+    # Act & Assert
+    if should_raise_exception:
+        with pytest.raises(Exception) as excinfo:
+            counter.decrement(attribute_name, decrement_value)
+        assert f"Invalid sub-counter name: {attribute_name}" in str(excinfo.value)
+    else:
+        counter.decrement(attribute_name, decrement_value)
+        for attr, expected in expected_values.items():
+            assert getattr(counter, attr) == expected
+
+
+def test_elements_counter_reset() -> None:
+    """
+    Unit test for the reset() method of the ElementsCounter class in file input_manager.py.
+
+    This test checks if all counters are reset to zero.
+    """
+
+    # Arrange
+    counter = ElementsCounter()
+    # Initially set the counters to some non-zero values
+    counter.total_elements = 5
+    counter.valid_elements = 3
+    counter.fixed_elements = 2
+    counter.invalid_elements = 1
+
+    # Act
+    counter.reset()
+
+    # Assert
+    assert counter.total_elements == 0
+    assert counter.valid_elements == 0
+    assert counter.fixed_elements == 0
+    assert counter.invalid_elements == 0
