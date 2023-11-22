@@ -3,6 +3,7 @@ from dataclasses import dataclass
 from typing import Optional
 
 from RUFAS.util import Utility
+from RUFAS.general_constants import GeneralConstants
 
 
 @dataclass
@@ -67,11 +68,11 @@ class CurrentDayConditions:
         Parameters
         ----------
         day_number : int
-            Day number of the year.
+            Calendar day number of the year.
         geographic_latitude : float
             Geographic latitude (degrees).
         year : int
-            Year of the current simulation.
+            Calendar year of the current simulation.
 
         Returns
         -------
@@ -82,7 +83,6 @@ class CurrentDayConditions:
         ----------
         SWAT 1:1.1.6
         """
-        angular_velocity = 0.2618
         geographic_latitude = math.radians(geographic_latitude)
         month = Utility.day_to_month_conversion(day_number, year)
         solar_declination_radians = CurrentDayConditions.calculate_solar_declination_radians(day_number)
@@ -100,7 +100,7 @@ class CurrentDayConditions:
             else:
                 return 24
         else:
-            return (2 * math.acos(tangent_product)) / angular_velocity
+            return (2 * math.acos(tangent_product)) / GeneralConstants.EARTH_ANGULAR_VELOCITY
 
     @staticmethod
     def calculate_solar_declination_radians(day_number: int) -> float:
@@ -110,7 +110,7 @@ class CurrentDayConditions:
         Parameters
         ----------
         day_number : int
-            Day number of the year.
+            Calendar day number of the year.
 
         Returns
         -------

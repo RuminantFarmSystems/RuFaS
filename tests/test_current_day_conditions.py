@@ -38,24 +38,9 @@ def test_determine_daylength(day_number: int, geographic_latitude: float, is_win
                wraps=CurrentDayConditions.calculate_solar_declination_radians) as mocked_radian_calculation:
         with patch('RUFAS.util.Utility.day_to_month_conversion',
                    wraps=Utility.day_to_month_conversion) as mocked_month_conversion:
-            if polar_location:
-                if not is_winter:
-                    if northern_hemisphere:
-                        assert CurrentDayConditions.determine_daylength(
-                            day_number, geographic_latitude, year) == expected
-                    else:
-                        assert CurrentDayConditions.determine_daylength(
-                            day_number, geographic_latitude, year) == expected
-                elif is_winter:
-                    if northern_hemisphere:
-                        assert CurrentDayConditions.determine_daylength(
-                            day_number, geographic_latitude, year) == expected
-                    else:
-                        assert CurrentDayConditions.determine_daylength(
-                            day_number, geographic_latitude, year) == expected
-            else:
-                assert expected == pytest.approx(CurrentDayConditions.determine_daylength(
-                    day_number, geographic_latitude, year), 0.1)
+            observed = CurrentDayConditions.determine_daylength(day_number, geographic_latitude, year)
+            tolerance = 0.1 if not polar_location else 0.0
+            assert expected == pytest.approx(observed, tolerance)
             assert mocked_radian_calculation.call_count == 1
             assert mocked_month_conversion.call_count == 1
 
