@@ -204,7 +204,9 @@ class CarbonCycling:
         -------
         pseudoode_soil S.6.D.2
         """
-        return passive_carbon_amount*field_size/soil_mass
+        if passive_carbon_amount is None:
+            return 0
+        return passive_carbon_amount * field_size / soil_mass
 
     @staticmethod
     def _determine_soil_overall_carbon_fraction(soil_active_carbon_fraction: float,
