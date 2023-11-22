@@ -109,7 +109,7 @@ class OutputGatherer:
                             info_map)
             om.add_variable("grazing_inorganic_phosphorus_runoff", field.soil.data.grazing_inorganic_phosphorus_runoff,
                             info_map)
-            om.add_variable("phosphorus_runoff", field.soil.data.phosphorus_runoff, info_map)
+            om.add_variable("soil_phosphorus_runoff", field.soil.data.soil_phosphorus_runoff, info_map)
             om.add_variable("profile_carbon_emissions", field.soil.data.profile_carbon_emissions, info_map)
             # Adding vadose zone layer data
             info_map["prefix"] = "field='" + field.field_data.name + "',vadose_zone_layer"
