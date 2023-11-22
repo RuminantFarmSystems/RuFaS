@@ -1,13 +1,16 @@
 # !/usr/bin/env python3
+from __future__ import annotations
 
-from copy import deepcopy
-from functools import reduce
 import json
 import re
+from copy import deepcopy
+from functools import reduce
+from typing import Any, Dict, List, Union, Tuple
 
+import numpy as np
 import pandas as pd
+
 from RUFAS.output_manager import OutputManager
-from typing import Any, Dict, List, Union
 
 om = OutputManager()
 
@@ -788,6 +791,98 @@ class InputManager:
                     }
         self.__pool = {}
         om.add_log("Clear variable pool", "The pool is emptied.", info_map)
+
+    @staticmethod
+    def _is_bool_value(variable_value: Any, variable_properties: Dict[str, Any]) -> Tuple[bool, str]:
+        """
+        Check if the variable value is a boolean.
+
+        Parameters
+        ----------
+        variable_value : Any
+            The value of the variable to check.
+        variable_properties : Dict[str, Any]
+            The properties for the variable of interest.
+
+        Returns
+        -------
+        Tuple[bool, str]
+            A tuple containing a boolean indicating if the check passed and a string containing the reason for failure.
+
+        """
+
+        if type(variable_value) is not bool:
+            return False, "Bool variable is not a boolean"
+        return True, ""
+
+    @staticmethod
+    def _is_numeric_value(variable_value: Any, variable_properties: Dict[str, Any]) -> Tuple[bool, str]:
+        """
+        Check if the variable value is a number and not NaN.
+
+        Parameters
+        ----------
+        variable_value : Any
+            The value of the variable to check.
+        variable_properties : Dict[str, Any]
+            The properties for the variable of interest.
+
+        Returns
+        -------
+        Tuple[bool, str]
+            A tuple containing a boolean indicating if the check passed and a string containing the reason for failure.
+        """
+
+        if not type(variable_value) in (int, float) or np.isnan(variable_value):
+            return False, "Value is not a number"
+        return True, ""
+
+    @staticmethod
+    def _check_num_lower_bound(variable_value: int | float,
+                               variable_properties: Dict[str, Any]) -> Tuple[bool, str]:
+        """
+        Check if the variable value is greater than the minimum value.
+
+        Parameters
+        ----------
+        variable_value : int | float
+            The value of the variable to check.
+        variable_properties : Dict[str, Any]
+            The properties for the variable of interest.
+
+        Returns
+        -------
+        Tuple[bool, str]
+            A tuple containing a boolean indicating if the check passed and a string containing the reason for failure.
+        """
+
+        if "minimum" in variable_properties and variable_value < variable_properties["minimum"]:
+            return False, "Value less than minimum"
+        return True, ""
+
+    @staticmethod
+    def _check_num_upper_bound(variable_value: int | float,
+                               variable_properties: Dict[str, Any]) -> Tuple[bool, str]:
+        """
+        Check if the variable value is less than the maximum value.
+
+        Parameters
+        ----------
+        variable_value : int | float
+              The value of the variable to check.
+        variable_properties : Dict[str, Any]
+              The properties for the variable of interest.
+
+        Returns
+        -------
+        Tuple[bool, str]
+              A tuple containing a boolean indicating if the check passed and a string containing the reason for
+              failure.
+        """
+
+        if "maximum" in variable_properties and variable_value > variable_properties["maximum"]:
+            return False, "Value greater than maximum"
+        return True, ""
 
 
 class ElementsCounter:
