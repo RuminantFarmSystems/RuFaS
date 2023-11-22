@@ -80,21 +80,21 @@
     "fertilizer_schedule": {
       "title": "Fertilizer schedule.",
       "description": "Barnyard fertilizer application schedule.",
-      "path": "input/data/fertilizer_schedule/no_fertilizer.json",
+      "path": "input/data/fertilizer_schedule/barnyard_scheduled_fertilizer_schedule.json",
       "type": "json",
       "properties": "fertilizer_schedule_properties"
     },
     "manure_schedule": {
       "title": "Manure schedule.",
       "description": "Barnyard manure application schedule.",
-      "path": "others/barnyard_experimental_manure_aggregated.json",
+      "path": "input/data/manure_schedule/barnyard_scheduled_manure_schedule.json",
       "type": "json",
       "properties": "manure_schedule_properties"
     },
     "tillage_schedule": {
       "title": "Tillage schedule.",
       "description": "Barnyard tillage application schedule.",
-      "path": "input/data/tillage_schedule/no_till.json",
+      "path": "input/data/tillage_schedule/barnyard_scheduled_tillage_schedule.json",
       "type": "json",
       "properties": "tillage_schedule_properties"
     },
