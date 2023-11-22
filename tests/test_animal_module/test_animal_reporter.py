@@ -209,7 +209,28 @@ def test_report_ration_interval_data(animal_manager_fixture, mocker: MockerFixtu
         ]["values"] == ["ration_supply_report"]
 
 
-def test_report_daily_ration():
+def test_report_daily_ration(animal_manager_fixture, mocker: MockerFixture):
     """Unit test for function report_daily_ration in file
     routines/animal/ration/animal_reporter.py"""
-    pass
+    test_data = {
+        "ration_per_animal": {"dummy3": 300, "status": 1, "objective": 2},
+        "formatted_ration_1": {"dry_matter_intake_total": 300, "dummy3": 300},
+        "formatted_ration_2": {"dry_matter_intake_total": 600, "dummy3": 600},
+    }
+    pen1 = mocker.MagicMock()
+    pen1.id = "1"
+    pen1.animals_in_pen = [mocker.MagicMock()]
+    pen1.animal_combination.name = "combo1"
+    pen2 = mocker.MagicMock()
+    pen2.id = "2"
+    pen2.animals_in_pen = [mocker.MagicMock(), mocker.MagicMock()]
+    pen2.animal_combination.name = "combo2"
+    animal_manager_fixture.all_pens = [pen1, pen2]
+    for pen in animal_manager_fixture.all_pens:
+        pen.ration_per_animal = test_data["ration_per_animal"]
+    AnimalReporter.report_daily_ration(animal_manager_fixture)
+
+    for i in range(1, 2):
+        assert om.variables_pool[
+            f"AnimalReporter.report_daily_ration.ration_daily_feed_totals_for_pen_{i}_combo{i}"
+        ]["values"] == [test_data[f"formatted_ration_{i}"]]
