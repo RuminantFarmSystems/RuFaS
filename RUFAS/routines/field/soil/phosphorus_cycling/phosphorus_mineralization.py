@@ -55,7 +55,6 @@ class PhosphorusMineralization:
                 layer.percent_clay_content, soil_phosphorus_content, layer.percent_organic_carbon_content)
             layer.mean_phosphorus_sorption_parameter = self._recompute_mean_phosphorus_sorption_parameter(
                 layer.mean_phosphorus_sorption_parameter, current_phosphorus_sorption_parameter)
-            # layer.mean_phosphorus_sorption_parameter = 0.3
 
             balance = self._determine_phosphorus_imbalance(layer.labile_inorganic_phosphorus_content,
                                                            layer.active_inorganic_phosphorus_content,
