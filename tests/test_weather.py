@@ -125,14 +125,14 @@ def test_get_current_day_conditions(mock_weather: Weather, day: int, year: int, 
     setattr(mocked_time, "day", day)
     setattr(mocked_time, "year", year)
     setattr(mocked_time, "calendar_year", calendar_year)
-    with patch("RUFAS.util.Utility.day_to_month_conversion", new_callable=MagicMock, return_value=3) as day, \
-            patch("RUFAS.current_day_conditions.CurrentDayConditions.determine_daylength", new_callable=MagicMock,
-                  return_value=10.0) as daylength:
+    with (patch("RUFAS.util.Utility.day_to_month_conversion", new_callable=MagicMock, return_value=3)
+          as conversion, patch("RUFAS.current_day_conditions.CurrentDayConditions.determine_daylength",
+                               new_callable=MagicMock, return_value=10.0) as daylength):
         actual = mock_weather.get_current_day_conditions(mocked_time)
 
         assert actual == expected
-        assert day.call_count == 1
-        daylength.assert_called_once_with(3)
+        assert conversion.call_count == 1
+        daylength.assert_called_once_with(day, 43.0723, 3)
 
 
 @pytest.mark.parametrize("day,year,calendar_year,expected", [
