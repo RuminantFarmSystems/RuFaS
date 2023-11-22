@@ -76,7 +76,6 @@ class AnimalManager:
     well as an instance of the LifeCycleManager class in order to update the
     animals' life cycles.
     """
-    # TODO: make this a method?
     DEFAULT_NUM_STALLS_BY_COMBINATION = {
         Pen.AnimalCombination.CALF: AnimalModuleConstants.DEFAULT_NUM_STALLS_FOR_CALF_PEN,
         Pen.AnimalCombination.GROWING: AnimalModuleConstants.DEFAULT_NUM_STALLS_FOR_GROWING_PEN,
@@ -90,7 +89,6 @@ class AnimalManager:
 
     # ANIMAL_GROUPING_SCENARIO = AnimalGroupingScenario.CALF__GROWING_AND_CLOSE_UP__LACCOW
 
-    # TODO use this method! Determine if we want to add another user input
     @classmethod
     def set_animal_grouping_scenario(cls, scenario: AnimalGroupingScenario) -> None:
         """
@@ -349,7 +347,6 @@ class AnimalManager:
 
         """
 
-        # TODO reevaluate the below: walking distance was removed because it is calculated at a later step.
         # average vertical & horizontal distance (VD, HD) of pens to the
         # milking parlor
         # avg_VD_parlor, avg_HD_parlor = self.avg_pen_dist()
@@ -1146,7 +1143,6 @@ class AnimalManager:
         return self.simulation_day % self.formulation_interval == 1 or self.formulation_interval == 1 or \
             self.simulation_day == 0
 
-# TODO revisit this method
     def annual_reset(self) -> None:
         pass
 
@@ -1174,7 +1170,6 @@ class AnimalManager:
         """
         is_cow = False
         is_heifer_repr = False  # True if animal is heiferII or heiferIII
-        # TODO reevaluate the above, as Life Cycle refactor may have better method for assignment
 
         if animal_type == 'calf':
             animal = self.calves[index]
@@ -1412,7 +1407,6 @@ class AnimalManager:
                         ration_per_animal, ration_vals = \
                             RationManager.formulate_ration(pen, pen_specific_feed_data, self.ANIMAL_GROUPING_SCENARIO)
 
-                    # TODO: Remove this check before merging to master
                     counter += 1
                     if counter > 50:
                         raise Exception('Too many attempts at optimizing ration.')
@@ -1493,8 +1487,6 @@ class AnimalManager:
     def _get_classes_in_pen(cls, pen: Pen) -> Set[str]:
         """
         Get the classes of animals in the pen.
-
-        TODO: Eventually, we want to get rid of this method and use _get_animal_types_in_pen() instead.
 
         Parameters
         ----------
