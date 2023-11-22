@@ -391,7 +391,7 @@ def test_parse_gnu_args(mocker: MockerFixture) -> None:
             "-G",
             "--graphics_dir",
             help="The saving directory for graphics",
-            default="graphics",
+            default="output/graphics/",
         ),
         mocker.call(
             "-v",

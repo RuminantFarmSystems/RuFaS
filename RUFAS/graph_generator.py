@@ -109,7 +109,6 @@ class GraphGenerator:
         self,
         filtered_pool: Dict[str, Dict[str, List[Any]]],
         graph_details: Dict[str, str | List[str]],
-        save_path: Path,
         filter_file_name: str,
         graphics_dir: Path,
     ) -> str:
@@ -146,7 +145,7 @@ class GraphGenerator:
             )
             self._customize_graph(fig, graph_details)
             return self._save_graph(
-                graph_details, filter_file_name, save_path, graphics_dir
+                graph_details, filter_file_name, graphics_dir
             )
         except Exception as e:
             raise e
@@ -248,7 +247,6 @@ class GraphGenerator:
         self,
         graph_details: Dict[str, str],
         filter_file_name: str,
-        save_path: Path,
         graphics_dir: Path,
     ) -> str:
         """

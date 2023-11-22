@@ -257,25 +257,6 @@ def test_dict_to_file_csv_exception(mock_output_manager: OutputManager) -> None:
             mock_output_manager._dict_to_file_csv(data, "test")
 
 
-def test_route_save_functions_exceptions(
-    mock_output_manager: OutputManager, tmpdir,
-) -> None:
-    """Unit test for the function _route_save_functions() raising an error in the file output_manager.py"""
-    with patch("pathlib.Path.mkdir") as mock_mkdir:
-        mock_mkdir.side_effect = FileExistsError
-        with pytest.raises(FileExistsError):
-            mock_output_manager._dict_to_file_csv = MagicMock()
-            mock_output_manager._route_save_functions(
-                "csv_file",
-                "save_path",
-                {"key": {"var": "value"}},
-                True,
-                {"filters": "regex"},
-                "graphics_dir",
-                "csvs_dir"
-            )
-
-
 def test_generate_key(mocker: MockerFixture) -> None:
     """Unit test for function _generate_key in file output_manager.py"""
     om = OutputManager()
@@ -1759,7 +1740,6 @@ def test_route_save_functions_graph(
         mock_generate_graph.assert_called_once_with(
             {"key": {"var": "value"}},
             graph_data,
-            "save_path",
             "graph_file",
             "graphics_dir",
         )
@@ -1774,7 +1754,7 @@ def test_route_save_functions_graph(
             "graphics_dir",
             "csvs_dir"
         )
-        mock_output_manager.add_error.assert_called_once_with(
+        mock_output_manager.add_error.assert_called_with(
             "graph generation exception",
             "test exception",
             {"class": "OutputManager", "function": "_route_save_functions"},

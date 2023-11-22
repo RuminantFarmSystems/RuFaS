@@ -852,7 +852,6 @@ class OutputManager(object):
                     graph_generator.generate_graph(
                         filtered_pool,
                         filter_content,
-                        save_path,
                         filter_file,
                         graphics_dir,
                     )
