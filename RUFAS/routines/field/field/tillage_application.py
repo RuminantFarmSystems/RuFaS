@@ -106,12 +106,20 @@ class TillageApplication:
                                  "ammonium_content",
                                  "active_organic_nitrogen_content",
                                  "stable_organic_nitrogen_content",
-                                 "fresh_organic_nitrogen_content"]
+                                 "fresh_organic_nitrogen_content",
+                                 "metabolic_litter_amount",
+                                 "structural_litter_amount",
+                                 "active_carbon_amount",
+                                 "slow_carbon_amount",
+                                 "passive_carbon_amount"]
+        pools_to_offset_top_layer = ["passive_carbon_amount"]
         for pool in pools_to_till_in_soil:
-            self._mix_soil_layers(pool, tillage_depth, mixing_fraction)
+            offset_top_layer = pool in pools_to_offset_top_layer
+            self._mix_soil_layers(pool, tillage_depth, mixing_fraction, offset_top_layer)
         self._record_tillage(tillage_depth, incorporation_fraction, mixing_fraction, year, day)
 
-    def _mix_soil_layers(self, pool_name: str, tillage_depth: float, mixing_fraction: float) -> None:
+    def _mix_soil_layers(self, pool_name: str, tillage_depth: float, mixing_fraction: float,
+                         offset_top_layer: bool = False) -> None:
         """
         Redistributes matter from the specified pool throughout the soil profile.
 
@@ -123,6 +131,8 @@ class TillageApplication:
             The lowest depth the tilling implement reaches (mm)
         mixing_fraction : float
             Fraction taken from each layer that is mixed and redistributed back into the soil profile (unitless)
+        offset_top_layer : bool, optional, by default=False
+            A flag that determines whether to offset the top layer of soil in redistribution calculations
 
         References
         ----------
@@ -136,20 +146,27 @@ class TillageApplication:
         redistributes mixed matter back into the tilled layers of the profile. The amount mixed back in to a layer is
         determined by the ratio between the depth of tillage in the layer and the total overall tillage depth.
 
+        This method acts in accordance with research from Dr. Xuesong Zhang which says that passive carbon is not
+        present in the top soil layer and is not mixed into the top soil layer during tillage operations.
         """
         redistribution_fractions = []
         total_to_mix_from_pools = 0
+        top_layer_offset = 0
         for layer in self.soil_data.soil_layers:
+            if offset_top_layer and layer.top_depth == 0:
+                top_layer_offset == layer.bottom_depth
+                redistribution_fractions.append(0)
+                continue
             layer_not_tilled = layer.top_depth >= tillage_depth
             layer_partially_tilled = layer.bottom_depth > tillage_depth
             if layer_not_tilled:
                 break
             elif layer_partially_tilled:
                 tilled_depth = tillage_depth - layer.top_depth
-                layer_redistribution_fraction = tilled_depth / tillage_depth
+                layer_redistribution_fraction = tilled_depth / (tillage_depth - top_layer_offset)
                 fraction_of_layer_mixed = tilled_depth / layer.layer_thickness
             else:
-                layer_redistribution_fraction = layer.layer_thickness / tillage_depth
+                layer_redistribution_fraction = layer.layer_thickness / (tillage_depth - top_layer_offset)
                 fraction_of_layer_mixed = 1.0
             redistribution_fractions.append(layer_redistribution_fraction)
 
@@ -161,6 +178,8 @@ class TillageApplication:
 
         number_of_tilled_layers = len(redistribution_fractions)
         for layer_index in range(number_of_tilled_layers):
+            if offset_top_layer and layer_index == 0:
+                continue
             layer = self.soil_data.soil_layers[layer_index]
             layer_fraction = redistribution_fractions[layer_index]
 
