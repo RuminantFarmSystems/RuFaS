@@ -47,7 +47,7 @@ def run_rufas(
     clear_output: bool = False,
     exclude_info_maps: bool = False,
     only_run_validation: bool = False,
-    graphics_dir: Path = Path(""),
+    graphics_dir: Path = Path("output/graphics/"),
     vars_file_path: Path = Path(""),
     output_dir: Path = Path("output/"),
     filters_dir: Path = Path("output/output_filters/"),
@@ -86,7 +86,6 @@ def run_rufas(
 
     output_manager = OutputManager()
     output_manager.create_directory(output_dir)
-    print(f'should be {output_dir}')
 
     if load_pool:
         run_load_vars_pool(vars_file_path, exclude_info_maps, format_option,
@@ -120,7 +119,7 @@ def run_load_vars_pool(
     exclude_info_maps: bool = False,
     format_option: str = "verbose",
     produce_graphics: bool = True,
-    graphics_dir: Path = Path(""),
+    graphics_dir: Path = Path("output/graphics/"),
     clear_output: bool = False,
     output_dir: Path = Path("output/"),
     filters_dir: Path = Path("output/output_filters/"),
@@ -229,7 +228,7 @@ def execute_simulations(
     metadata_files: List[MetadataPaths],
     exclude_info_maps: bool = False,
     produce_graphics: bool = True,
-    graphics_dir: Path = Path(""),
+    graphics_dir: Path = Path("output/graphics/"),
     format_option: str = "verbose",
     verbose: LogVerbosity = LogVerbosity.NONE,
     output_dir: Path = Path("output/"),
@@ -248,7 +247,7 @@ def execute_simulations(
         Flag for whether or not the user wants to inlcude info_maps data in their results files.
     produce_graphics: bool, optional
         Flag for whether or not the user wants to produce graphs at after the simulation.
-    graphics_dir : Path, optional
+    graphics_dir : Path, optional, default=Path("output/graphics/")
         The directory for saving graphics.
     format_option : str
         The formatting option for select output files.
@@ -337,7 +336,7 @@ def parse_gnu_args() -> argparse.Namespace:
         "-G",
         "--graphics_dir",
         help="The saving directory for graphics",
-        default="graphics",
+        default="output/graphics/",
     )
     parser.add_argument(
         "-v",

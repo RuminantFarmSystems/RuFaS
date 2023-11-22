@@ -489,7 +489,7 @@ class OutputManager(object):
                 info_map,
             )
             return
-        print(path)
+
         csv_columns = []
         for variable_name in data_dict.keys():
             variable_data = data_dict[variable_name]
@@ -1117,20 +1117,16 @@ class OutputManager(object):
         self.add_log("Attempting to create a new directory.",
                      f"Attempting to create a new directory at {path}.",
                      info_map)
-        print('about to make the dir')
         try:
             path.mkdir(parents=True, exist_ok=True)
-            self.add_error("New directory successfully create.",
-                           f"Created a new directory at {path}.",
-                           info_map)
-            print('made the dir')
+            self.add_log("New directory successfully create.",
+                         f"Created a new directory at {path}.",
+                         info_map)
         except PermissionError:
             self.add_error("Unable to make output directory.",
                            f"User does not have necessary permissions to create a dir at {path}.",
                            info_map)
-            print('couldnt make the dir 1')
         except Exception:
             self.add_error("Unable to make output directory.",
                            f"{path} not able to be created for an unknown reason.",
                            info_map)
-            print('couldnt make the dir 2')
