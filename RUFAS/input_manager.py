@@ -9,7 +9,6 @@ import pandas as pd
 from RUFAS.output_manager import OutputManager
 from typing import Any, Dict, List, Union
 
-
 om = OutputManager()
 
 
@@ -359,7 +358,7 @@ class InputManager:
 
         return element_counter_and_validity
 
-    def _validate_json_element(self, element_hierarchy: List[str], properties_blob_key: str,   # noqa
+    def _validate_json_element(self, element_hierarchy: List[str], properties_blob_key: str,  # noqa
                                input_data: Dict[str, Any], eager_termination: bool,
                                element_counter_and_validity: Dict[str, int | bool], ) -> dict:
         """
@@ -708,7 +707,7 @@ class InputManager:
             parent_address = str(data_address.split("." + invalid_key)[0])
 
             om.add_error("Validation: data not found:", f"Cannot find \"{data_address}\", "
-                         f"\"{parent_address}\" does not have attribute \"{invalid_key}\".",
+                                                        f"\"{parent_address}\" does not have attribute \"{invalid_key}\".",
                          info_map)
 
             raise KeyError(f"Data not found: Cannot find \"{data_address}\", "
@@ -774,7 +773,7 @@ class InputManager:
             parent_address = ".".join(element_hierarchy[:-1])
 
             om.add_error("Validation: data not found:", f"Cannot find \"{metadata_address}\", "
-                         f"\"{parent_address}\" does not have attribute \"{invalid_key}\".",
+                                                        f"\"{parent_address}\" does not have attribute \"{invalid_key}\".",
                          info_map)
 
             raise KeyError(f"Data not found: Cannot find \"{metadata_address}\", "
@@ -789,3 +788,121 @@ class InputManager:
                     }
         self.__pool = {}
         om.add_log("Clear variable pool", "The pool is emptied.", info_map)
+
+
+class ElementsCounter:
+    """
+    A class to keep track of element counts in various categories: total, valid, fixed, and invalid.
+
+    Attributes
+    ----------
+    total_elements : int
+        The count of all elements processed.
+    valid_elements : int
+        The count of all valid elements processed.
+    fixed_elements : int
+        The count of all elements that were fixed during processing.
+    invalid_elements : int
+        The count of all elements found to be invalid during processing.
+
+    Methods
+    -------
+    increment(name, value=1)
+        Increment the count of a specific attribute by the given value.
+    """
+
+    def __init__(self):
+        """
+        Initialize the ElementsCounter with all counts set to zero.
+        """
+
+        self.total_elements = 0
+        self.valid_elements = 0
+        self.fixed_elements = 0
+        self.invalid_elements = 0
+
+    def update(self, name: str, value: int):
+        """
+        Update the count of a specific attribute to the given value.
+
+        Parameters
+        ----------
+        name : str
+            The name of the attribute to update.
+        value : int
+            The new value of the attribute.
+        """
+
+        if hasattr(self, name):
+            setattr(self, name, value)
+        else:
+            raise Exception(f"Invalid sub-counter name: {name}")
+
+    def increment(self, name: str, value: int = 1):
+        """
+        Increment the count of a specific attribute by the given value.
+
+        Parameters
+        ----------
+        name : str
+            The name of the attribute to increment.
+        value : int, optional
+            The amount by which to increment the attribute (default is 1).
+
+        Raises
+        ------
+        Exception
+            If the given name is not an attribute of ElementsCounter.
+        """
+
+        self.update(name, getattr(self, name) + value)
+
+    def decrement(self, name: str, value: int = 1):
+        """
+        Decrement the count of a specific attribute by the given value.
+
+        Parameters
+        ----------
+        name : str
+            The name of the attribute to decrement.
+        value : int, optional
+            The amount by which to decrement the attribute (default is 1).
+
+        Raises
+        ------
+        Exception
+            If the given name is not an attribute of ElementsCounter.
+        """
+
+        self.update(name, getattr(self, name) - value)
+
+    def reset(self) -> None:
+        """
+        Reset all counts to zero.
+
+        Returns
+        -------
+        None
+        """
+
+        self.total_elements = 0
+        self.valid_elements = 0
+        self.fixed_elements = 0
+        self.invalid_elements = 0
+
+    def __str__(self) -> str:
+        """
+        String representation of the ElementsCounter instance.
+
+        Returns
+        -------
+        str
+            A string representation of the ElementsCounter, showing the counts of all categories.
+        """
+
+        return str({
+            "total_elements": self.total_elements,
+            "valid_elements": self.valid_elements,
+            "fixed_elements": self.fixed_elements,
+            "invalid_elements": self.invalid_elements,
+        })
