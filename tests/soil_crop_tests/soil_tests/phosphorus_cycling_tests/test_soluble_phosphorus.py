@@ -149,11 +149,15 @@ def test_daily_update_routine(runoff: float, field_size: float) -> None:
                                                                                   3.4, 1.4, 20)
         assert incorp.data.soil_layers[0].labile_inorganic_phosphorus_content == (3.4 - 0.9 - 1.2)
         assert incorp.data.annual_soil_phosphorus_runoff == (0.9 * field_size)
+        assert incorp.data.phosphorus_runoff == (0.9 * field_size)
     else:
         incorp._determine_phosphorus_runoff_from_top_soil.assert_not_called()
         assert incorp.data.soil_layers[0].labile_inorganic_phosphorus_content == 3.4 - 1.2
+        assert incorp.data.phosphorus_runoff == 0.0
     assert incorp._determine_phosphorus_percolated_from_layer.call_count == len(layers)
     assert pytest.approx(incorp.data.soil_layers[1].labile_inorganic_phosphorus_content) == 3.18
     assert pytest.approx(incorp.data.soil_layers[2].labile_inorganic_phosphorus_content) == 2.8
     assert pytest.approx(incorp.data.soil_layers[3].labile_inorganic_phosphorus_content) == 2.9
     assert incorp.data.vadose_zone_layer.labile_inorganic_phosphorus_content == 1.2
+    for layer in incorp.data.soil_layers:
+        assert layer.percolated_phosphorus == 1.2
