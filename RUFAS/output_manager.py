@@ -1125,7 +1125,9 @@ class OutputManager(object):
             self.add_error("Unable to make output directory.",
                            f"User does not have necessary permissions to create a dir at {path}.",
                            info_map)
+            raise
         except Exception:
             self.add_error("Unable to make output directory.",
                            f"{path} not able to be created for an unknown reason.",
                            info_map)
+            raise

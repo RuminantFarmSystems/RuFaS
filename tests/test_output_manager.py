@@ -622,6 +622,7 @@ def output_manager_original_method_states(
         "_route_save_functions": mock_output_manager._route_save_functions,
         "clear_output_dir": mock_output_manager.clear_output_dir,
         "is_file_in_dir": mock_output_manager.is_file_in_dir,
+        "create_directory": mock_output_manager.create_directory,
     }
 
 
@@ -1655,7 +1656,7 @@ def test_route_save_functions_csv(
         True,
         {"filters": "regex"},
         "graphics_dir",
-        "output/CSVs/"
+        Path("output/CSVs/")
     )
     variable_csv_file_path = mock_output_manager._generate_file_name("saved_variables_csv_file", "csv")
     mock_output_manager._dict_to_file_csv.assert_called_once_with(
@@ -1713,7 +1714,7 @@ def test_route_save_functions_graph(
             {"key": {"var": "value"}},
             False,
             graph_data,
-            "graphics_dir",
+            Path("graphics_dir"),
             "csvs_dir"
         )
         mock_generate_graph.assert_not_called()
@@ -1729,7 +1730,7 @@ def test_route_save_functions_graph(
             {"key": {"var": "value"}},
             True,
             graph_data,
-            "graphics_dir",
+            Path("graphics_dir"),
             "csvs_dir"
         )
         mock_output_manager.add_warning.assert_called_once_with(
@@ -1741,7 +1742,7 @@ def test_route_save_functions_graph(
             {"key": {"var": "value"}},
             graph_data,
             "graph_file",
-            "graphics_dir",
+            Path("graphics_dir"),
         )
 
         mock_generate_graph.side_effect = Exception("test exception")
@@ -1751,7 +1752,7 @@ def test_route_save_functions_graph(
             {"key": {"var": "value"}},
             True,
             graph_data,
-            "graphics_dir",
+            Path("graphics_dir"),
             "csvs_dir"
         )
         mock_output_manager.add_error.assert_called_with(
@@ -1859,6 +1860,47 @@ def test_is_file_in_dir(mock_output_manager: OutputManager, dir_path: Path, file
     assert mock_output_manager.is_file_in_dir(dir_path, file_path) is expected_result
 
     mock_output_manager.is_file_in_dir = output_manager_original_method_states["is_file_in_dir"]
+
+
+def test_create_directory_successful(mock_output_manager: OutputManager,
+                                     output_manager_original_method_states: Dict[str, Callable]) -> None:
+    """Checks create_directory function successfully creates a dir in output_manager.py"""
+    mock_output_manager.add_log = MagicMock()
+    mock_output_manager.add_error = MagicMock()
+    mock_path = "new/dir/to/create"
+    mock_output_manager.create_directory(Path(mock_path))
+    assert mock_output_manager.add_log.call_count == 2
+    assert mock_output_manager.add_error.call_count == 0
+
+    mock_output_manager.create_directory = output_manager_original_method_states["create_directory"]
+    mock_output_manager.add_log = output_manager_original_method_states["add_log"]
+    mock_output_manager.add_error = output_manager_original_method_states["add_error"]
+
+
+def test_create_directory_raises_errors(mock_output_manager: OutputManager,
+                                        output_manager_original_method_states: Dict[str, Callable]) -> None:
+    """Checks create_directory function raises errors properly"""
+    mock_output_manager.add_log = MagicMock()
+    mock_output_manager.add_error = MagicMock()
+    with patch("pathlib.Path.mkdir", side_effect=PermissionError):
+        with pytest.raises(PermissionError):
+            mock_output_manager.create_directory(Path("unauthorized/path/"))
+
+    assert mock_output_manager.add_log.call_count == 1
+    assert mock_output_manager.add_error.call_count == 1
+
+    mock_output_manager.add_log = MagicMock()
+    mock_output_manager.add_error = MagicMock()
+    with patch("pathlib.Path.mkdir", side_effect=Exception):
+        with pytest.raises(Exception):
+            mock_output_manager.create_directory(Path("unauthorized/path/"))
+
+    assert mock_output_manager.add_log.call_count == 1
+    assert mock_output_manager.add_error.call_count == 1
+
+    mock_output_manager.create_directory = output_manager_original_method_states["create_directory"]
+    mock_output_manager.add_log = output_manager_original_method_states["add_log"]
+    mock_output_manager.add_error = output_manager_original_method_states["add_error"]
 
 
 @pytest.mark.parametrize(
