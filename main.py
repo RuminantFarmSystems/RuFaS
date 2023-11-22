@@ -85,27 +85,12 @@ def run_rufas(
     sys.stdout.write("RuFaS: Ruminant Farm Systems Model 2023\n")
 
     output_manager = OutputManager()
-    info_map = {
-        "class": "No caller class",
-        "function": run_rufas.__name__,
-    }
-    try:
-        output_dir.mkdir(parents=True, exist_ok=True)
-    except FileExistsError:
-        output_manager.add_error("Unable to make outputs directory.",
-                                 f"Directory {output_dir} already exists.",
-                                 info_map)
-        raise
-    except PermissionError:
-        output_manager.add_error("Unable to make output directory.",
-                                 f"User does not have necessary permissions to create a dir at {output_dir}.",
-                                 info_map)
-        raise
-    except Exception:
-        output_manager.add_error("Unable to make output directory.",
-                                 f"{output_dir} not able to be created for an unknown reason.",
-                                 info_map)
-        raise
+    output_manager.create_directory(output_dir)
+    print('should be an output dir')
+    output_manager.create_directory(graphics_dir)
+    print('should be an graphics dir')
+    output_manager.create_directory(csvs_dir)
+    print('should be an csvs dir')
 
     if load_pool:
         run_load_vars_pool(vars_file_path, exclude_info_maps, format_option,

@@ -489,7 +489,7 @@ class OutputManager(object):
                 info_map,
             )
             return
-
+        print(path)
         csv_columns = []
         for variable_name in data_dict.keys():
             variable_data = data_dict[variable_name]
@@ -839,12 +839,6 @@ class OutputManager(object):
             )
             self._dict_to_file_json(filtered_pool, file_path)
         elif filter_file.startswith(self.__supported_filter_types_prefixes["csv"]):
-            self.add_log("Attempting to create CSVs dir.", f"Creating a dir to save CSVs at {csvs_dir}", info_map)
-            try:
-                Path(csvs_dir).mkdir(parents=True, exist_ok=True)
-            except FileExistsError:
-                self.add_error("Unable to make CSVs directory.", f"Directory {csvs_dir} already exists.", info_map)
-                raise
             variable_csv_file_path = os.path.join(
                 csvs_dir, self._generate_file_name(f"saved_variables_{filter_file}", "csv")
             )
@@ -1116,24 +1110,25 @@ class OutputManager(object):
         path : Path
             The path where the dir will be created if it does not already exist.
         """
-        info_map = {"class": Utility.__class__.__name__,
-                    "function": Utility.create_directory.__name__}
-        self.add_log("Attempting to create a new directory",
-                     f"Attempting to create a new directory at {path}")
+        info_map = {"class": self.__class__.__name__,
+                    "function": self.create_directory.__name__}
+        self.add_log("Attempting to create a new directory.",
+                     f"Attempting to create a new directory at {path}.",
+                     info_map)
+        print('about to make the dir')
         try:
             path.mkdir(parents=True, exist_ok=True)
-        except FileExistsError:
-            self.add_error("Unable to make outputs directory.",
-                           f"Directory {path} already exists.",
+            self.add_error("New directory successfully create.",
+                           f"Created a new directory at {path}.",
                            info_map)
-            raise
+            print('made the dir')
         except PermissionError:
             self.add_error("Unable to make output directory.",
                            f"User does not have necessary permissions to create a dir at {path}.",
                            info_map)
-            raise
+            print('couldnt make the dir 1')
         except Exception:
             self.add_error("Unable to make output directory.",
                            f"{path} not able to be created for an unknown reason.",
                            info_map)
-            raise
+            print('couldnt make the dir 2')
