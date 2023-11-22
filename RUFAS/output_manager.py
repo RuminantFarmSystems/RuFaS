@@ -839,11 +839,13 @@ class OutputManager(object):
             )
             self._dict_to_file_json(filtered_pool, file_path)
         elif filter_file.startswith(self.__supported_filter_types_prefixes["csv"]):
+            self.create_directory(csvs_dir)
             variable_csv_file_path = os.path.join(
                 csvs_dir, self._generate_file_name(f"saved_variables_{filter_file}", "csv")
             )
             self._dict_to_file_csv(filtered_pool, variable_csv_file_path)
         elif filter_file.startswith(self.__supported_filter_types_prefixes["graph"]):
+            self.create_directory(graphics_dir)
             if produce_graphics:
                 try:
                     graph_generator = GraphGenerator(self.__metadata_prefix)

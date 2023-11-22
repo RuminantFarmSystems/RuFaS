@@ -86,11 +86,7 @@ def run_rufas(
 
     output_manager = OutputManager()
     output_manager.create_directory(output_dir)
-    print('should be an output dir')
-    output_manager.create_directory(graphics_dir)
-    print('should be an graphics dir')
-    output_manager.create_directory(csvs_dir)
-    print('should be an csvs dir')
+    print(f'should be {output_dir}')
 
     if load_pool:
         run_load_vars_pool(vars_file_path, exclude_info_maps, format_option,
