@@ -136,7 +136,7 @@ class ReportGenerator:
     def generate_report(
         self,
         filtered_pool: Dict[str, Dict[str, List[Any]]],
-        filter_content: Dict[str, str | int],
+        filter_content: Dict[str, str | int | List[str]],
     ) -> List[float]:
         """
         Generates a report based on filtered data and aggregation criteria.
