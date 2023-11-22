@@ -114,10 +114,42 @@ def test_report_daily_animal_data(mocker: MockerFixture):
     ] == [{}]
 
 
-def test_report_milk():
+def test_report_milk(mocker: MockerFixture):
     """Unit test for function report_milk in file
     routines/animal/ration/animal_reporter.py"""
-    pass
+    test_milk_data_update = {
+        "days_in_milk": 1,
+        "estimated_daily_milk_produced": 2,
+        "milk_protein": 3,
+        "milk_fat": 4,
+        "milk_lactose": 5,
+        "lactating": 6,
+        "parity": 7,
+        "cow_id": 8,
+        "pen_id": 9,
+        "simulation_day": 10,
+    }
+    simulation_day = test_milk_data_update["simulation_day"]
+    pen = mocker.MagicMock()
+    pen.animals_in_pen = [mocker.MagicMock(), mocker.MagicMock(), mocker.MagicMock()]
+    for idx, animal in enumerate(pen.animals_in_pen):
+        animal.days_in_milk = test_milk_data_update["days_in_milk"]
+        animal.estimated_daily_milk_produced = test_milk_data_update[
+            "estimated_daily_milk_produced"
+        ]
+        animal.mPrt = test_milk_data_update["milk_protein"]
+        animal.fat_percent = test_milk_data_update["milk_fat"]
+        animal.lactose_milk = test_milk_data_update["milk_lactose"]
+        animal.milking = test_milk_data_update["lactating"]
+        animal.calves = test_milk_data_update["parity"]
+        animal.id = test_milk_data_update["cow_id"]
+        animal.pen_history[-1].pen = test_milk_data_update["pen_id"]
+    # act
+    AnimalReporter.report_milk(pen, simulation_day)
+    # assert
+    assert om.variables_pool["AnimalReporter.report_milk.milk_data_at_milk_update"][
+        "values"
+    ] == [test_milk_data_update, test_milk_data_update, test_milk_data_update]
 
 
 def test_report_ration_interval_data(animal_manager_fixture, mocker: MockerFixture):
