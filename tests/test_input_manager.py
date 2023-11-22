@@ -827,10 +827,10 @@ def test_validate_json_element_invalid_var_name_raises_input_data_keyerror(mock_
                                                                            Dict[str, Callable],
                                                                            ) -> None:
     """Unit test for keyerror raised for invalid var name for _validate_json_element in file input_manager.py"""
-    mock_input_manager._InputManager__metadata = {"properties": {"dummy_properties_blob_key":
-                                                                     {"valid_key":
-                                                                          {"type": "object", "secondary_key":
-                                                                              {"type": "string"}}}}}
+    mock_input_manager._InputManager__metadata = {"properties": {"dummy_properties_blob_key": {
+                                                                "valid_key": {
+                                                                    "type": "object", "secondary_key": {
+                                                                        "type": "string"}}}}}
     element_hierarchy = ["valid_key", "secondary_key"]
     properties_blob_key = "dummy_properties_blob_key"
     input_data = {"valid_key": {"another_valid_key": "value"}}
@@ -857,8 +857,9 @@ def test_validate_json_element_invalid_var_type_raises_keyerror(mock_input_manag
     element_hierarchy = ["valid_key"]
     properties_blob_key = "dummy_valid_key"
     input_data = {"valid_key": "some_value"}
-    mock_input_manager._InputManager__metadata = {"properties": {properties_blob_key:
-                                                                     {"valid_key": {"type": "invalid_type"}}}}
+    mock_input_manager._InputManager__metadata = {"properties": {properties_blob_key: {
+        "valid_key": {
+            "type": "invalid_type"}}}}
     eager_termination = False
     mock_element_counter_and_validity = {"fixed_elements": 0, "total_elements": 0, "valid_elements": 0,
                                          "invalid_elements": 0, "is_valid": True}
@@ -879,8 +880,8 @@ def test_validate_json_element_missing_type_raises_keyerror(mock_input_manager: 
     element_hierarchy = ["valid_key"]
     properties_blob_key = "dummy_valid_key"
     input_data = {"valid_key": "some_value"}
-    mock_input_manager._InputManager__metadata = {"properties": {properties_blob_key:
-                                                                     {"valid_key": {}}}}
+    mock_input_manager._InputManager__metadata = {"properties": {properties_blob_key: {
+        "valid_key": {}}}}
     eager_termination = False
     mock_element_counter_and_validity = {"fixed_elements": 0, "total_elements": 0, "valid_elements": 0,
                                          "invalid_elements": 0, "is_valid": True}
