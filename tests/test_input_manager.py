@@ -1904,6 +1904,108 @@ def test_is_bool_value(variable_value: Any, variable_properties: dict[str, Any],
     assert InputManager._is_bool_value(variable_value, variable_properties) == expected_result
 
 
+@pytest.mark.parametrize("variable_value, variable_properties, expected_result", [
+    # Test with an integer
+    (10, {}, (True, "")),
+
+    # Test with zero
+    (0, {}, (True, "")),
+
+    # Test with a negative integer
+    (-1, {}, (True, "")),
+
+    # Test with a float
+    (1.5, {}, (True, "")),
+
+    # Test with a NaN float
+    (float("nan"), {}, (False, "Value is not a number")),
+
+    # Test with numpy NaN float
+    (np.nan, {}, (False, "Value is not a number")),
+
+    # Test with a negative float
+    (-2.3, {}, (True, "")),
+
+    # Test with a string
+    ("string", {}, (False, "Value is not a number")),
+
+    # Test with a boolean True
+    (True, {}, (False, "Value is not a number")),
+
+    # Test with a None value
+    (None, {}, (False, "Value is not a number")),
+
+    # Test with a list
+    ([1, 2, 3], {}, (False, "Value is not a number")),
+
+    # Test with a dictionary
+    ({"key": "value"}, {}, (False, "Value is not a number")),
+])
+def test_is_numeric_value(variable_value: Any, variable_properties: dict[str, Any],
+                          expected_result: tuple[bool, str]) -> None:
+    """
+    Unit test for method _is_numeric_value() in file input_manager.py.
+    """
+
+    assert InputManager._is_numeric_value(variable_value, variable_properties) == expected_result
+
+
+@pytest.mark.parametrize("variable_value, variable_properties, expected_result", [
+    # Value greater than minimum
+    (5, {"minimum": 3}, (True, "")),
+
+    # Value equal to minimum
+    (3, {"minimum": 3}, (True, "")),
+
+    # Value less than minimum
+    (2, {"minimum": 3}, (False, "Value less than minimum")),
+
+    # No minimum set
+    (5, {}, (True, "")),
+
+    # Negative value less than minimum
+    (-1, {"minimum": 0}, (False, "Value less than minimum")),
+
+    # Zero value greater than negative minimum
+    (0, {"minimum": -1}, (True, "")),
+])
+def test_check_num_lower_bound(variable_value: int | float, variable_properties: dict[str, Any],
+                               expected_result: tuple[bool, str]) -> None:
+    """
+    Unit test for method _check_num_lower_bound() in file input_manager.py.
+    """
+
+    assert InputManager._check_num_lower_bound(variable_value, variable_properties) == expected_result
+
+
+@pytest.mark.parametrize("variable_value, variable_properties, expected_result", [
+    # Value less than maximum
+    (5, {"maximum": 7}, (True, "")),
+
+    # Value equal to maximum
+    (7, {"maximum": 7}, (True, "")),
+
+    # Value greater than maximum
+    (8, {"maximum": 7}, (False, "Value greater than maximum")),
+
+    # No maximum set
+    (5, {}, (True, "")),
+
+    # Zero value greater than negative maximum
+    (0, {"maximum": -1}, (False, "Value greater than maximum")),
+
+    # Negative value less than maximum
+    (-2, {"maximum": -1}, (True, "")),
+])
+def test_check_num_upper_bound(variable_value: int | float, variable_properties: dict[str, Any],
+                               expected_result: tuple[bool, str]) -> None:
+    """
+    Unit test for method _check_num_upper_bound() in file input_manager.py.
+    """
+
+    assert InputManager._check_num_upper_bound(variable_value, variable_properties) == expected_result
+
+
 def test_elements_counter_init() -> None:
     """
     Unit test for the __init__() method of the ElementsCounter class in file input_manager.py.
