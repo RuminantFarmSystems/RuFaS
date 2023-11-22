@@ -97,9 +97,9 @@ class Cow(HeiferIII):
         # current hard-coded values necessary for nutrient requirement
         # calculations
         self.BCS = 3.5  # body condition score
-        self.CP_milk = 3.2
-        self.lactose_milk = 4.85
-        self.mPrt = 3.5  # milk protein
+        self.CP_milk = AnimalModuleConstants.MILK_CRUDE_PROTEIN
+        self.lactose_milk = AnimalModuleConstants.MILK_LACTOSE
+        self.mPrt = AnimalModuleConstants.MILK_TRUE_PROTEIN
 
         self.DVD = 0  # daily vertical distance, km
         self.DHD = 0  # daily horizontal distance, km
@@ -332,8 +332,14 @@ class Cow(HeiferIII):
 
         if self.milking:
             self.estimated_daily_milk_produced = max(0.0, estimated_daily_milk_produced)
+            self.lactose_milk = AnimalModuleConstants.MILK_LACTOSE
+            self.CP_milk = AnimalModuleConstants.MILK_CRUDE_PROTEIN
+            self.mPrt = AnimalModuleConstants.MILK_TRUE_PROTEIN
         else:
             self.estimated_daily_milk_produced = 0.0
+            self.lactose_milk = 0.0
+            self.CP_milk = 0.0
+            self.mPrt = 0.0
         self.single_acc_milk_prod += estimated_daily_milk_produced
 
         # calculate fat percent in milk and fat corrected milk production
