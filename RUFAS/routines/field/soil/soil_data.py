@@ -215,7 +215,7 @@ class SoilData:
     grazing_inorganic_phosphorus_runoff: float = 0.0
     """Amount of inorganic phosphorus from grazing manure dissolved in and removed by runoff (kg)."""
 
-    phosphorus_runoff: float = 0.0
+    soil_phosphorus_runoff: float = 0.0
     """Amount of phosphorus removed from surface soil layer by runoff (kg / ha)."""
 
     # ---- Residue partition (Carbon Cycling)
