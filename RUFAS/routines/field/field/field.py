@@ -453,7 +453,7 @@ class Field:
         unmet_nitrogen_demand = max(0.0, requested_nitrogen - supplied_nitrogen)
         unmet_phosphorus_demand = max(0.0, requested_phosphorus - supplied_phosphorus)
 
-        if not unmet_nitrogen_demand and not unmet_phosphorus_demand:
+        if unmet_nitrogen_demand == 0.0 and unmet_phosphorus_demand == 0.0:
             return
 
         if not self.field_data.backfill_manure_nutrient_deficiencies:
@@ -465,9 +465,7 @@ class Field:
             om.add_warning(warning_name, warning_message, info_map)
             return
 
-        if unmet_nitrogen_demand == 0.0 and unmet_phosphorus_demand == 0.0:
-            return
-        elif unmet_nitrogen_demand > 0.0 and unmet_phosphorus_demand == 0.0:
+        if unmet_nitrogen_demand > 0.0 and unmet_phosphorus_demand == 0.0:
             optimal_mix = self.ONLY_NITROGEN_MIX
         else:
             optimal_mix = self._determine_optimal_fertilizer_mix(unmet_nitrogen_demand, unmet_phosphorus_demand,

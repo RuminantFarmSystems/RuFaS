@@ -728,7 +728,7 @@ def test_record_fertilizer_application(mix_name: str, total_mass: float, nitroge
                                                      organic_phosphorus_fraction=0.5,
                                                      inorganic_phosphorus_fraction=0.5),
                               NutrientRequest(nitrogen=75.0, phosphorus=75.0), 25.0, 25.0),
-                             (100.0, 0.0, 0.88, 120.0, 0.7, 2003, 200, False, True, True,
+                             (100.0, 0.0, 0.88, 120.0, 0.7, 2003, 200, True, True, True,
                               NutrientRequestResults(nitrogen=50.0, phosphorus=50.0, dry_matter=250.0,
                                                      dry_matter_fraction=0.33, organic_nitrogen_fraction=0.3,
                                                      inorganic_nitrogen_fraction=0.7, ammonium_nitrogen_fraction=0.25,
@@ -742,9 +742,23 @@ def test_record_fertilizer_application(mix_name: str, total_mass: float, nitroge
                                                      organic_phosphorus_fraction=0.544,
                                                      inorganic_phosphorus_fraction=0.456),
                               NutrientRequest(nitrogen=50.0, phosphorus=50.0), 0.0, 0.0),
-                             (65.0, 40.0, 0.77, 75.0, 0.78, 1999, 160, False, True, False, None,
+                             (65.0, 40.0, 0.77, 75.0, 0.78, 1999, 160, True, True, False, None,
                               NutrientRequest(nitrogen=65.0, phosphorus=40.0), 65.0, 40.0),
-                             (0, 0, 0.5, 0.0, 1.0, 1996, 155, True, False, False, None, None, 0.0, 0.0)
+                             (0, 0, 0.5, 0.0, 1.0, 1996, 155, True, False, False, None, None, 0.0, 0.0),
+                             (75.0, 50.0, 0.7, 0.0, 1.0, 2010, 120, False, True, True,
+                              NutrientRequestResults(nitrogen=50.0, phosphorus=50.0, dry_matter=250.0,
+                                                     dry_matter_fraction=0.33, organic_nitrogen_fraction=0.3,
+                                                     inorganic_nitrogen_fraction=0.7, ammonium_nitrogen_fraction=0.25,
+                                                     organic_phosphorus_fraction=0.544,
+                                                     inorganic_phosphorus_fraction=0.456),
+                              NutrientRequest(nitrogen=75.0, phosphorus=50.0), 25.0, 0.0),
+                             (50.0, 50.0, 0.7, 0.0, 1.0, 2010, 120, False, False, False,
+                              NutrientRequestResults(nitrogen=50.0, phosphorus=50.0, dry_matter=250.0,
+                                                     dry_matter_fraction=0.33, organic_nitrogen_fraction=0.3,
+                                                     inorganic_nitrogen_fraction=0.7, ammonium_nitrogen_fraction=0.25,
+                                                     organic_phosphorus_fraction=0.544,
+                                                     inorganic_phosphorus_fraction=0.456),
+                              NutrientRequest(nitrogen=50.0, phosphorus=50.0), 50.0, 0.0),
                          ])
 def test_execute_manure_application(nitrogen: float, phosphorus: float, coverage: float, depth: float, remainder: float,
                                     year: int, day: int, supplement: bool, fertilizer_applied: bool,
@@ -763,17 +777,9 @@ def test_execute_manure_application(nitrogen: float, phosphorus: float, coverage
 
     with patch.object(om, "add_log") as log, \
             patch.object(om, "add_warning") as warn:
-        # mocked_timestamp.return_value = "00-Jan-1970_Thu_00-00-00"
-
         field._execute_manure_application(nitrogen, phosphorus, coverage, depth, remainder, year, day)
 
         if nitrogen == phosphorus == 0.0:
-            # expected_info_map = {"prefix": "field='test'", "date": {"year": year, "day": day},
-            #                      "timestamp": "00-Jan-1970_Thu_00-00-00"}
-            # expected_log_message = "Tried to apply manure with no nitrogen or phosphorus requested."
-            # actual = om.logs_pool["field='test'.manure_application_log"]
-            # assert actual["info_maps"].__contains__(expected_info_map)
-            # assert actual["values"].__contains__(expected_log_message)
             log.assert_called_once()
 
             mocked_manure_manager.request_nutrients.assert_not_called()
@@ -836,10 +842,6 @@ def test_execute_manure_application(nitrogen: float, phosphorus: float, coverage
                                                                               expected_unmet_nitrogen,
                                                                               expected_unmet_phosphorus, depth,
                                                                               remainder, year, day)
-            # else:
-            #     warn.assert_called_once()
-            #     field._determine_optimal_fertilizer_mix.assert_not_called()
-            #     field._execute_fertilizer_application.assert_not_called()
 
 
 @pytest.mark.parametrize("depth,remainder,expected_depth,expected_remainder,invalid_combination", [
