@@ -122,7 +122,7 @@ def test_nitrogen_loss_in_compost_bedded_pack_barn_due_to_ammonia_emission(
     expected_error: type[Exception],
 ) -> None:
     """
-    Unit test for _nitrogen_loss_in_compost_bedded_pack_barn_due_to_ammonia_emission() method in calculator.py.
+    Unit test for nitrogen_loss_in_compost_bedded_pack_barn_from_ammonia_emission() method in calculator.py.
 
     This test verifies that the method correctly calculates the nitrogen loss from ammonia emission in a
     compost bedded pack barn given the daily nitrogen input and whether the bedding is tilled or not.
@@ -131,11 +131,11 @@ def test_nitrogen_loss_in_compost_bedded_pack_barn_due_to_ammonia_emission(
     # Act and Assert
     if expected_error:
         with pytest.raises(expected_error):
-            GasEmissionsCalculator._nitrogen_loss_in_compost_bedded_pack_barn_due_to_ammonia_emission(
+            GasEmissionsCalculator.nitrogen_loss_in_compost_bedded_pack_barn_from_ammonia_emission(
                 daily_nitrogen_input, is_bedding_tilled
             )
     else:
-        actual = GasEmissionsCalculator._nitrogen_loss_in_compost_bedded_pack_barn_due_to_ammonia_emission(
+        actual = GasEmissionsCalculator.nitrogen_loss_in_compost_bedded_pack_barn_from_ammonia_emission(
             daily_nitrogen_input, is_bedding_tilled
         )
         assert actual == pytest.approx(expected)
@@ -156,7 +156,7 @@ def test_nitrogen_loss_in_compost_bedded_pack_barn_due_to_leaching(
     daily_nitrogen_input: float, expected: float, expected_error: type[Exception]
 ) -> None:
     """
-    Unit test for _nitrogen_loss_in_compost_bedded_pack_barn_due_to_leaching() method in calculator.py.
+    Unit test for _nitrogen_loss_from_leaching() method in calculator.py.
 
     This test verifies that the method correctly calculates the nitrogen loss due to leaching in a
     compost bedded pack barn given the daily nitrogen input.
@@ -165,11 +165,11 @@ def test_nitrogen_loss_in_compost_bedded_pack_barn_due_to_leaching(
     # Act and Assert
     if expected_error:
         with pytest.raises(expected_error):
-            GasEmissionsCalculator._nitrogen_loss_in_compost_bedded_pack_barn_due_to_leaching(
+            GasEmissionsCalculator._nitrogen_loss_from_leaching(
                 daily_nitrogen_input
             )
     else:
-        actual = GasEmissionsCalculator._nitrogen_loss_in_compost_bedded_pack_barn_due_to_leaching(
+        actual = GasEmissionsCalculator._nitrogen_loss_from_leaching(
             daily_nitrogen_input
         )
         assert actual == pytest.approx(expected)
@@ -196,7 +196,7 @@ def test_nitrogen_loss_in_compost_bedded_pack_barn_due_to_nitrous_oxide_emission
     expected_error: type[Exception],
 ) -> None:
     """
-    Unit test for _nitrogen_loss_in_compost_bedded_pack_barn_due_to_nitrous_oxide_emission() method in calculator.py.
+    Unit test for nitrogen_loss_in_compost_bedded_pack_barn_from_nitrous_oxide_emission() method in calculator.py.
 
     This test verifies that the method correctly calculates the nitrogen loss due to nitrous oxide emission in a
     compost bedded pack barn given the daily nitrogen input and whether the bedding is tilled or not.
@@ -205,11 +205,11 @@ def test_nitrogen_loss_in_compost_bedded_pack_barn_due_to_nitrous_oxide_emission
     # Act and Assert
     if expected_error:
         with pytest.raises(expected_error):
-            GasEmissionsCalculator._nitrogen_loss_in_compost_bedded_pack_barn_due_to_nitrous_oxide_emission(
+            GasEmissionsCalculator.nitrogen_loss_in_compost_bedded_pack_barn_from_nitrous_oxide_emission(
                 daily_nitrogen_input, is_bedding_tilled
             )
     else:
-        actual = GasEmissionsCalculator._nitrogen_loss_in_compost_bedded_pack_barn_due_to_nitrous_oxide_emission(
+        actual = GasEmissionsCalculator.nitrogen_loss_in_compost_bedded_pack_barn_from_nitrous_oxide_emission(
             daily_nitrogen_input, is_bedding_tilled
         )
         assert actual == pytest.approx(expected)
@@ -250,17 +250,17 @@ def test_total_nitrogen_loss_from_compost_bedded_pack_barn(
     # Arrange
     mocker.patch(
         "RUFAS.routines.manure.gas_emissions.calculator.GasEmissionsCalculator"
-        "._nitrogen_loss_in_compost_bedded_pack_barn_due_to_ammonia_emission",
+        ".nitrogen_loss_in_compost_bedded_pack_barn_from_ammonia_emission",
         return_value=expected_ammonia,
     )
     mocker.patch(
         "RUFAS.routines.manure.gas_emissions.calculator.GasEmissionsCalculator"
-        "._nitrogen_loss_in_compost_bedded_pack_barn_due_to_leaching",
+        "._nitrogen_loss_from_leaching",
         return_value=expected_leaching,
     )
     mocker.patch(
         "RUFAS.routines.manure.gas_emissions.calculator.GasEmissionsCalculator."
-        "_nitrogen_loss_in_compost_bedded_pack_barn_due_to_nitrous_oxide_emission",
+        "nitrogen_loss_in_compost_bedded_pack_barn_from_nitrous_oxide_emission",
         return_value=expected_nitrous_oxide,
     )
 

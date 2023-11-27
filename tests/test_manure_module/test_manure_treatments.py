@@ -20,7 +20,7 @@ from RUFAS.routines.manure.manure_treatments.anaerobic_lagoon import AnaerobicLa
 from RUFAS.routines.manure.manure_treatments.base_manure_treatment import (
     BaseManureTreatment,
 )
-from RUFAS.routines.manure.manure_treatments.manure_treatment_cbpb import (
+from RUFAS.routines.manure.manure_treatments.compost_bedded_pack_barn import (
     CompostBeddedPackBarn,
 )
 from RUFAS.routines.manure.manure_treatments.manure_treatment_configs import (
@@ -54,77 +54,68 @@ from RUFAS.routines.manure.protocols.liquid_manure_portion_protocol import (
 
 
 def test_manure_treatment_daily_output() -> None:
-    """Tests the ManureTreatmentDailyOutput class."""
+    """
+    Unit test for the __init__() method in manure_treatment_daily_output.py
+    """
+
+    # Arrange
+    expected_values = {
+        "pen_id": 1,
+        "simulation_day": 2,
+        "liquid_manure_total_ammoniacal_nitrogen": 3.0,
+        "liquid_manure_nitrogen": 4.0,
+        "liquid_manure_total_solids": 5.0,
+        "liquid_manure_total_volatile_solids": 6.0,
+        "liquid_manure_phosphorus": 7.0,
+        "liquid_manure_potassium": 8.0,
+        "daily_final_manure_volume": 9.0,
+        "storage_methane": 11.0,
+        "storage_ammonia": 12.0,
+        "storage_nitrous_oxide": 13.0,
+        "sludge_manure_total_solids": 14.0,
+        "sludge_manure_total_volatile_solids": 15.0,
+        "sludge_manure_nitrogen": 16.0,
+        "sludge_manure_phosphorus": 17.0,
+        "sludge_manure_potassium": 18.0,
+        "sludge_manure_daily_volume": 19.0,
+        "solid_manure_total_solids": 20.0,
+        "solid_manure_total_volatile_solids": 21.0,
+        "solid_manure_nitrogen": 22.0,
+        "solid_manure_inorganic_nitrogen": 23.0,
+        "solid_manure_organic_nitrogen": 24.0,
+        "solid_manure_inorganic_nitrogen_ammonium": 25.0,
+        "solid_manure_phosphorus": 26.0,
+        "solid_manure_water_extractable_inorganic_phosphorus": 27.0,
+        "solid_manure_water_extractable_organic_phosphorus": 28.0,
+        "solid_manure_non_water_extractable_inorganic_phosphorus": 29.0,
+        "solid_manure_non_water_extractable_organic_phosphorus": 30.0,
+        "solid_manure_potassium": 31.0,
+        "solid_manure_daily_mass": 32.0,
+        "biogas": 33.0,
+        "biogas_energy_content": 34.0,
+        "methane_generation_volume": 35.0,
+        "heating_input_energy": 36.0,
+        "evaporated_water": 37.0,
+        "minimum_digester_volume": 38.0,
+        "top_cover_volume": 39.0
+    }
+
     # Act
-    manure_treatment_daily_output = ManureTreatmentDailyOutput(
-        pen_id=1,
-        simulation_day=2,
-        liquid_manure_total_ammoniacal_nitrogen=3.0,
-        liquid_manure_nitrogen=4.0,
-        liquid_manure_total_solids=5.0,
-        liquid_manure_total_volatile_solids=6.0,
-        liquid_manure_phosphorus=7.0,
-        liquid_manure_potassium=8.0,
-        daily_final_manure_volume=9.0,
-        liquid_manure_daily_volume=10.0,  # Intentionally made different from daily_final_manure_volume
-        storage_methane=11.0,
-        storage_ammonia=12.0,
-        sludge_manure_total_solids=13.0,
-        sludge_manure_total_volatile_solids=14.0,
-        sludge_manure_nitrogen=15.0,
-        sludge_manure_phosphorus=16.0,
-        sludge_manure_potassium=17.0,
-        sludge_manure_daily_volume=18.0,
-        biogas=19.0,
-        biogas_energy_content=20.0,
-        methane_generation_volume=21.0,
-        heating_input_energy=22.0,
-        evaporated_water=23.0,
-        minimum_digester_volume=24.0,
-        top_cover_volume=25.0,
-    )
+    manure_treatment_daily_output = ManureTreatmentDailyOutput(**expected_values)
 
     # Assert
-    assert manure_treatment_daily_output.pen_id == 1
-    assert manure_treatment_daily_output.simulation_day == 2
-    assert (
-            manure_treatment_daily_output.liquid_manure_total_ammoniacal_nitrogen
-            == approx(3.0)
-    )
-    assert manure_treatment_daily_output.liquid_manure_nitrogen == approx(4.0)
-    assert manure_treatment_daily_output.liquid_manure_total_solids == approx(5.0)
-    assert manure_treatment_daily_output.liquid_manure_total_volatile_solids == approx(
-        6.0
-    )
-    assert manure_treatment_daily_output.liquid_manure_phosphorus == approx(7.0)
-    assert manure_treatment_daily_output.liquid_manure_potassium == approx(8.0)
+    for key, value in expected_values.items():
+        assert getattr(manure_treatment_daily_output, key) == approx(value), key
 
-    # Note: daily_final_manure_volume is the same as liquid_manure_daily_volume
-    assert manure_treatment_daily_output.daily_final_manure_volume == approx(9.0)
-    assert manure_treatment_daily_output.liquid_manure_daily_volume == approx(9.0)
-
-    assert manure_treatment_daily_output.storage_methane == approx(11.0)
-    assert manure_treatment_daily_output.storage_ammonia == approx(12.0)
-
-    assert manure_treatment_daily_output.sludge_manure_total_solids == approx(13.0)
-    assert manure_treatment_daily_output.sludge_manure_total_volatile_solids == approx(
-        14.0
-    )
-    assert manure_treatment_daily_output.sludge_manure_nitrogen == approx(15.0)
-    assert manure_treatment_daily_output.sludge_manure_phosphorus == approx(16.0)
-    assert manure_treatment_daily_output.sludge_manure_potassium == approx(17.0)
-    assert manure_treatment_daily_output.sludge_manure_daily_volume == approx(18.0)
-
-    assert manure_treatment_daily_output.biogas == approx(19.0)
-    assert manure_treatment_daily_output.biogas_energy_content == approx(20.0)
-    assert manure_treatment_daily_output.methane_generation_volume == approx(21.0)
-    assert manure_treatment_daily_output.heating_input_energy == approx(22.0)
-    assert manure_treatment_daily_output.evaporated_water == approx(23.0)
-    assert manure_treatment_daily_output.minimum_digester_volume == approx(24.0)
-    assert manure_treatment_daily_output.top_cover_volume == approx(25.0)
+    assert manure_treatment_daily_output.liquid_manure_daily_volume == \
+           approx(expected_values["daily_final_manure_volume"])
 
 
 def test_manure_treatment_daily_output_add() -> None:
+    """
+    Unit test for the __add__() method in manure_treatment_daily_output.py
+    """
+
     # Case 1: Add a ManureTreatmentDailyOutput to a non-ManureTreatmentDailyOutput object.
 
     # Arrange
@@ -154,98 +145,121 @@ def test_manure_treatment_daily_output_add() -> None:
         liquid_manure_daily_volume=10.0,
         storage_methane=11.0,
         storage_ammonia=12.0,
-        sludge_manure_total_solids=13.0,
-        sludge_manure_total_volatile_solids=14.0,
-        sludge_manure_nitrogen=15.0,
-        sludge_manure_phosphorus=16.0,
-        sludge_manure_potassium=17.0,
-        sludge_manure_daily_volume=18.0,
-        biogas=19.0,
-        biogas_energy_content=20.0,
-        methane_generation_volume=21.0,
-        heating_input_energy=22.0,
-        evaporated_water=23.0,
-        minimum_digester_volume=24.0,
-        top_cover_volume=25.0,
+        storage_nitrous_oxide=13.0,
+        sludge_manure_total_solids=14.0,
+        sludge_manure_total_volatile_solids=15.0,
+        sludge_manure_nitrogen=16.0,
+        sludge_manure_phosphorus=17.0,
+        sludge_manure_potassium=18.0,
+        sludge_manure_daily_volume=19.0,
+        solid_manure_total_solids=20.0,
+        solid_manure_total_volatile_solids=21.0,
+        solid_manure_nitrogen=22.0,
+        solid_manure_inorganic_nitrogen=23.0,
+        solid_manure_organic_nitrogen=24.0,
+        solid_manure_inorganic_nitrogen_ammonium=25.0,
+        solid_manure_phosphorus=26.0,
+        solid_manure_water_extractable_inorganic_phosphorus=27.0,
+        solid_manure_water_extractable_organic_phosphorus=28.0,
+        solid_manure_non_water_extractable_inorganic_phosphorus=29.0,
+        solid_manure_non_water_extractable_organic_phosphorus=30.0,
+        solid_manure_potassium=31.0,
+        solid_manure_daily_mass=32.0,
+        biogas=33.0,
+        biogas_energy_content=34.0,
+        methane_generation_volume=35.0,
+        heating_input_energy=36.0,
+        evaporated_water=37.0,
+        minimum_digester_volume=38.0,
+        top_cover_volume=39.0,
     )
 
     manure_treatment_daily_output_2 = ManureTreatmentDailyOutput(
         pen_id=3,
         simulation_day=4,
-        liquid_manure_total_ammoniacal_nitrogen=21.0,
-        liquid_manure_nitrogen=22.0,
-        liquid_manure_total_solids=23.0,
-        liquid_manure_total_volatile_solids=24.0,
-        liquid_manure_phosphorus=25.0,
-        liquid_manure_potassium=26.0,
-        daily_final_manure_volume=27.0,
-        liquid_manure_daily_volume=28.0,
-        storage_methane=29.0,
-        storage_ammonia=30.0,
-        sludge_manure_total_solids=31.0,
-        sludge_manure_total_volatile_solids=32.0,
-        sludge_manure_nitrogen=33.0,
-        sludge_manure_phosphorus=34.0,
-        sludge_manure_potassium=35.0,
-        sludge_manure_daily_volume=36.0,
-        biogas=37.0,
-        biogas_energy_content=38.0,
-        methane_generation_volume=39.0,
-        heating_input_energy=40.0,
-        evaporated_water=41.0,
-        minimum_digester_volume=42.0,
-        top_cover_volume=43.0,
+        liquid_manure_total_ammoniacal_nitrogen=100.0,
+        liquid_manure_nitrogen=101.0,
+        liquid_manure_total_solids=102.0,
+        liquid_manure_total_volatile_solids=103.0,
+        liquid_manure_phosphorus=104.0,
+        liquid_manure_potassium=105.0,
+        daily_final_manure_volume=106.0,
+        liquid_manure_daily_volume=107.0,
+        storage_methane=108.0,
+        storage_ammonia=109.0,
+        storage_nitrous_oxide=110.0,
+        sludge_manure_total_solids=111.0,
+        sludge_manure_total_volatile_solids=112.0,
+        sludge_manure_nitrogen=113.0,
+        sludge_manure_phosphorus=114.0,
+        sludge_manure_potassium=115.0,
+        sludge_manure_daily_volume=116.0,
+        solid_manure_total_solids=117.0,
+        solid_manure_total_volatile_solids=118.0,
+        solid_manure_nitrogen=119.0,
+        solid_manure_inorganic_nitrogen=120.0,
+        solid_manure_organic_nitrogen=121.0,
+        solid_manure_inorganic_nitrogen_ammonium=122.0,
+        solid_manure_phosphorus=123.0,
+        solid_manure_water_extractable_inorganic_phosphorus=124.0,
+        solid_manure_water_extractable_organic_phosphorus=125.0,
+        solid_manure_non_water_extractable_inorganic_phosphorus=126.0,
+        solid_manure_non_water_extractable_organic_phosphorus=127.0,
+        solid_manure_potassium=128.0,
+        solid_manure_daily_mass=129.0,
+        biogas=130.0,
+        biogas_energy_content=131.0,
+        methane_generation_volume=132.0,
+        heating_input_energy=133.0,
+        evaporated_water=134.0,
+        minimum_digester_volume=135.0,
+        top_cover_volume=136.0,
     )
 
     # Act
-    sum_of_manure_treatment_daily_outputs = (
-            manure_treatment_daily_output_1 + manure_treatment_daily_output_2
-    )
+    sum_of_manure_treatment_daily_outputs = manure_treatment_daily_output_1 + manure_treatment_daily_output_2
 
     # Assert
-    assert sum_of_manure_treatment_daily_outputs.pen_id == 4
-    assert sum_of_manure_treatment_daily_outputs.simulation_day == 6
-    assert (
-            sum_of_manure_treatment_daily_outputs.liquid_manure_total_ammoniacal_nitrogen
-            == approx(24.0)
-    )
-    assert sum_of_manure_treatment_daily_outputs.liquid_manure_nitrogen == approx(26.0)
-    assert sum_of_manure_treatment_daily_outputs.liquid_manure_total_solids == approx(
-        28.0
-    )
-    assert (
-            sum_of_manure_treatment_daily_outputs.liquid_manure_total_volatile_solids
-            == approx(30.0)
-    )
-    assert sum_of_manure_treatment_daily_outputs.liquid_manure_phosphorus == approx(
-        32.0
-    )
-    assert sum_of_manure_treatment_daily_outputs.liquid_manure_potassium == approx(34.0)
-
-    # Note: daily_final_manure_volume is the same as liquid_manure_daily_volume
-    assert sum_of_manure_treatment_daily_outputs.daily_final_manure_volume == approx(
-        36.0
-    )
-    assert sum_of_manure_treatment_daily_outputs.liquid_manure_daily_volume == approx(
-        36.0
-    )
-
-    assert sum_of_manure_treatment_daily_outputs.storage_methane == approx(40.0)
-    assert sum_of_manure_treatment_daily_outputs.storage_ammonia == approx(42.0)
-    assert sum_of_manure_treatment_daily_outputs.sludge_manure_total_solids == approx(
-        44.0
-    )
-    assert (
-            sum_of_manure_treatment_daily_outputs.sludge_manure_total_volatile_solids
-            == approx(46.0)
-    )
-    assert sum_of_manure_treatment_daily_outputs.sludge_manure_nitrogen == approx(48.0)
-    assert sum_of_manure_treatment_daily_outputs.sludge_manure_phosphorus == approx(
-        50.0
-    )
-    assert sum_of_manure_treatment_daily_outputs.sludge_manure_potassium == approx(52.0)
-    assert sum_of_manure_treatment_daily_outputs.sludge_manure_daily_volume == approx(
-        54.0
+    assert sum_of_manure_treatment_daily_outputs == ManureTreatmentDailyOutput(
+        pen_id=4,
+        simulation_day=6,
+        liquid_manure_total_ammoniacal_nitrogen=103.0,
+        liquid_manure_nitrogen=105.0,
+        liquid_manure_total_solids=107.0,
+        liquid_manure_total_volatile_solids=109.0,
+        liquid_manure_phosphorus=111.0,
+        liquid_manure_potassium=113.0,
+        liquid_manure_daily_volume=117.0,
+        daily_final_manure_volume=115.0,
+        storage_methane=119.0,
+        storage_ammonia=121.0,
+        storage_nitrous_oxide=123.0,
+        sludge_manure_total_solids=125.0,
+        sludge_manure_total_volatile_solids=127.0,
+        sludge_manure_nitrogen=129.0,
+        sludge_manure_phosphorus=131.0,
+        sludge_manure_potassium=133.0,
+        sludge_manure_daily_volume=135.0,
+        solid_manure_total_solids=137.0,
+        solid_manure_daily_mass=161.0,
+        solid_manure_total_volatile_solids=139.0,
+        solid_manure_nitrogen=141.0,
+        solid_manure_inorganic_nitrogen=143.0,
+        solid_manure_organic_nitrogen=145.0,
+        solid_manure_inorganic_nitrogen_ammonium=147.0,
+        solid_manure_phosphorus=149.0,
+        solid_manure_water_extractable_inorganic_phosphorus=151.0,
+        solid_manure_water_extractable_organic_phosphorus=153.0,
+        solid_manure_non_water_extractable_inorganic_phosphorus=155.0,
+        solid_manure_non_water_extractable_organic_phosphorus=157.0,
+        solid_manure_potassium=159.0,
+        biogas=163.0,
+        biogas_energy_content=165.0,
+        methane_generation_volume=167.0,
+        heating_input_energy=169.0,
+        evaporated_water=171.0,
+        minimum_digester_volume=173.0,
+        top_cover_volume=175.0,
     )
 
 
@@ -292,19 +306,33 @@ def test_manure_treatment_daily_output_clone() -> None:
         liquid_manure_daily_volume=10.0,
         storage_methane=11.0,
         storage_ammonia=12.0,
-        sludge_manure_total_solids=13.0,
-        sludge_manure_total_volatile_solids=14.0,
-        sludge_manure_nitrogen=15.0,
-        sludge_manure_phosphorus=16.0,
-        sludge_manure_potassium=17.0,
-        sludge_manure_daily_volume=18.0,
-        biogas=19.0,
-        biogas_energy_content=20.0,
-        methane_generation_volume=21.0,
-        heating_input_energy=22.0,
-        evaporated_water=23.0,
-        minimum_digester_volume=24.0,
-        top_cover_volume=25.0,
+        storage_nitrous_oxide=13.0,
+        sludge_manure_total_solids=14.0,
+        sludge_manure_total_volatile_solids=15.0,
+        sludge_manure_nitrogen=16.0,
+        sludge_manure_phosphorus=17.0,
+        sludge_manure_potassium=18.0,
+        sludge_manure_daily_volume=19.0,
+        solid_manure_total_solids=20.0,
+        solid_manure_total_volatile_solids=21.0,
+        solid_manure_nitrogen=22.0,
+        solid_manure_inorganic_nitrogen=23.0,
+        solid_manure_organic_nitrogen=24.0,
+        solid_manure_inorganic_nitrogen_ammonium=25.0,
+        solid_manure_phosphorus=26.0,
+        solid_manure_water_extractable_inorganic_phosphorus=27.0,
+        solid_manure_water_extractable_organic_phosphorus=28.0,
+        solid_manure_non_water_extractable_inorganic_phosphorus=29.0,
+        solid_manure_non_water_extractable_organic_phosphorus=30.0,
+        solid_manure_potassium=31.0,
+        solid_manure_daily_mass=32.0,
+        biogas=33.0,
+        biogas_energy_content=34.0,
+        methane_generation_volume=35.0,
+        heating_input_energy=36.0,
+        evaporated_water=37.0,
+        minimum_digester_volume=38.0,
+        top_cover_volume=39.0,
     )
 
     # Act
@@ -3259,7 +3287,7 @@ def test_anaerobic_digestion_and_lagoon_daily_update_helper(
 
 
 def test_compost_bedded_pack_barn_init(mocker: MockFixture) -> None:
-    """Unit test for __init__() in CompostBeddedPackBarn in manure_treatment_cbpb.py"""
+    """Unit test for __init__() in CompostBeddedPackBarn in compost_bedded_pack_barn.py"""
     # Arrange
     mock_weather = mocker.MagicMock()
     mock_time = mocker.MagicMock()
@@ -3287,40 +3315,6 @@ def test_compost_bedded_pack_barn_init(mocker: MockFixture) -> None:
     # Assert
     assert cbpb.weather == mock_weather
     assert cbpb.time == mock_time
-
-
-def test_compost_bedded_pack_barn_calc_bedding_potassium_content(
-        mocker: MockFixture,
-) -> None:
-    """Unit test for calc_bedding_potassium_content() in CompostBeddedPackBarn in manure_treatment_cbpb.py"""
-    # Arrange
-    mock_weather = mocker.MagicMock()
-    mock_time = mocker.MagicMock()
-    mock_manure_treatment_config = mocker.MagicMock()
-
-    def mock_base_manure_treatment(
-            self, weather, time, manure_treatment_config: ManureTreatmentConfig
-    ) -> None:
-        self.weather = weather
-        self.time = time
-        self.config = manure_treatment_config
-
-    mocker.patch(
-        "RUFAS.routines.manure.manure_treatments.base_manure_treatment.BaseManureTreatment.__init__",
-        new=mock_base_manure_treatment,
-    )
-
-    # Act
-    cbpb = CompostBeddedPackBarn(
-        weather=mock_weather,
-        time=mock_time,
-        manure_treatment_config=mock_manure_treatment_config,
-    )
-
-    assert cbpb._calc_bedding_potassium_content(1.0, 2.0, 4.0, 1.0) == pytest.approx(6.0)
-    assert cbpb._calc_bedding_potassium_content(1.0, 2.0, 4.0, 1.0) == pytest.approx(
-        6.0
-    )
 
 
 @pytest.mark.parametrize(
@@ -3375,14 +3369,14 @@ def test_calc_dry_matter_changes(
         expected_outputs: tuple[float, float, float]
 ) -> None:
     """
-    Unit test for _calc_dry_matter_changes() in CompostBeddedPackBarn in manure_treatment_cbpb.py
+    Unit test for _calc_dry_matter_changes() in CompostBeddedPackBarn in compost_bedded_pack_barn.py
 
     This test verifies that the method correctly calculates changes in dry matter based on various parameters.
     """
 
     # Arrange
     mocker.patch(
-        'RUFAS.routines.manure.manure_treatments.manure_treatment_cbpb.CompostBeddedPackBarn.__init__',
+        'RUFAS.routines.manure.manure_treatments.compost_bedded_pack_barn.CompostBeddedPackBarn.__init__',
         return_value=None
     )
     cbpb = CompostBeddedPackBarn(weather=mocker.MagicMock(), time=mocker.MagicMock(),
@@ -3409,3 +3403,117 @@ def test_calc_dry_matter_changes(
 
     # Assert
     assert result == approx(expected_outputs)
+
+
+def test_compost_bedded_pack_barn_daily_update_helper(mocker: MockFixture) -> None:
+    """
+    Unit test for _daily_update_helper() in CompostBeddedPackBarn in compost_bedded_pack_barn.py
+    """
+
+    # Arrange
+    weather_mock = mocker.MagicMock()
+    time_mock = mocker.MagicMock()
+    manure_treatment_config_mock = mocker.MagicMock()
+    daily_input_mock = mocker.MagicMock()
+    daily_input_mock.liquid_manure_nitrogen = 1
+    daily_input_mock.liquid_manure_total_volatile_solids = 2
+    daily_input_mock.liquid_manure_total_solids = 3
+    daily_input_mock.liquid_manure_daily_volume = 4
+    daily_input_mock.liquid_manure_potassium = 5
+    daily_input_mock.liquid_manure_phosphorus = 6
+
+    mocker.patch("RUFAS.routines.manure.manure_treatments.compost_bedded_pack_barn"
+                 ".CompostBeddedPackBarn.__init__",
+                 return_value=None)
+    remaining_volatile_solids = 4
+    remaining_total_solids = 5
+    dry_matter_loss = 6
+    mocker.patch("RUFAS.routines.manure.manure_treatments.compost_bedded_pack_barn"
+                 ".CompostBeddedPackBarn._calc_dry_matter_changes",
+                 return_value=(remaining_volatile_solids, remaining_total_solids, dry_matter_loss))
+
+    expected_storage_methane = 10
+    mocker.patch(
+        'RUFAS.routines.manure.manure_treatments.compost_bedded_pack_barn'
+        '.GasEmissionsCalculator.ifsm_methane_emission',
+        return_value=expected_storage_methane)
+
+    total_nitrogen_loss_from_cbpb = 11
+    mocker.patch(
+        'RUFAS.routines.manure.manure_treatments.compost_bedded_pack_barn'
+        '.GasEmissionsCalculator.total_nitrogen_loss_from_compost_bedded_pack_barn',
+        return_value=total_nitrogen_loss_from_cbpb)
+
+    nitrogen_loss_from_ammonia_emission = 12
+    mocker.patch(
+        'RUFAS.routines.manure.manure_treatments.compost_bedded_pack_barn'
+        '.GasEmissionsCalculator.nitrogen_loss_in_compost_bedded_pack_barn_from_ammonia_emission',
+        return_value=nitrogen_loss_from_ammonia_emission)
+
+    nitrogen_loss_from_nitrous_oxide_emission = 13
+    mocker.patch(
+        'RUFAS.routines.manure.manure_treatments.compost_bedded_pack_barn'
+        '.GasEmissionsCalculator.nitrogen_loss_in_compost_bedded_pack_barn_from_nitrous_oxide_emission',
+        return_value=nitrogen_loss_from_nitrous_oxide_emission)
+
+    compost_bedded_pack_barn = CompostBeddedPackBarn(weather_mock, time_mock, manure_treatment_config_mock)
+    compost_bedded_pack_barn._current_manure_treatment_daily_input = daily_input_mock
+    compost_bedded_pack_barn._manure_handler_daily_output = mocker.MagicMock()
+    config_mock = mocker.MagicMock()
+    config_mock.potassium_removal_efficiency_for_treatment = 0.5
+    config_mock.phosphorus_removal_efficiency_for_treatment = 0.5
+    compost_bedded_pack_barn.config = config_mock
+    pen_mock = mocker.MagicMock()
+    pen_mock.manure.inorganic_phosphorus_fraction = 0.4
+    pen_mock.manure.organic_phosphorus_fraction = 0.6
+    pen_mock.manure.non_water_inorganic_phosphorus_fraction = 0.3
+    pen_mock.manure.non_water_organic_phosphorus_fraction = 0.7
+    compost_bedded_pack_barn._current_pen = pen_mock
+    mocker.patch.object(compost_bedded_pack_barn, '_get_current_day_average_temperature_celsius', return_value=20)
+    mocker.patch.object(compost_bedded_pack_barn, '_accumulate_daily_output')
+
+    expected_manure_nitrogen = daily_input_mock.liquid_manure_nitrogen - total_nitrogen_loss_from_cbpb
+    expected_manure_organic_nitrogen = (ManureConstants.COMPOST_BEDDING_ORGANIC_NITROGEN_FRACTION *
+                                        expected_manure_nitrogen)
+    expected_manure_inorganic_nitrogen = expected_manure_nitrogen - expected_manure_organic_nitrogen
+    expected_manure_inorganic_nitrogen_ammonium = (
+            ManureConstants.COMPOST_BEDDING_INORGANIC_NITROGEN_AMMONIUM_FRACTION * expected_manure_inorganic_nitrogen
+    )
+    expected_solid_manure_daily_mass = remaining_total_solids / (
+            daily_input_mock.liquid_manure_total_solids / (daily_input_mock.liquid_manure_daily_volume *
+                                                           ManureConstants.SOLID_MANURE_DENSITY)
+    )
+    expected_manure_potassium = (daily_input_mock.liquid_manure_potassium *
+                                 (1 - config_mock.potassium_removal_efficiency_for_treatment))
+    expected_manure_phosphorus = (daily_input_mock.liquid_manure_phosphorus *
+                                  (1 - config_mock.phosphorus_removal_efficiency_for_treatment))
+    expected_water_extractable_inorganic_phosphorus = (pen_mock.manure.inorganic_phosphorus_fraction *
+                                                       expected_manure_phosphorus)
+    expected_water_extractable_organic_phosphorus = (pen_mock.manure.organic_phosphorus_fraction *
+                                                     expected_manure_phosphorus)
+    expected_non_water_extractable_inorganic_phosphorus = (pen_mock.manure.non_water_inorganic_phosphorus_fraction *
+                                                           expected_manure_phosphorus)
+    expected_non_water_extractable_organic_phosphorus = (pen_mock.manure.non_water_organic_phosphorus_fraction *
+                                                         expected_manure_phosphorus)
+
+    # Act
+    result = compost_bedded_pack_barn._daily_update_helper()
+
+    # Assert
+    assert isinstance(result, ManureTreatmentDailyOutput)
+    assert result.solid_manure_nitrogen == expected_manure_nitrogen
+    assert result.solid_manure_organic_nitrogen == expected_manure_organic_nitrogen
+    assert result.solid_manure_inorganic_nitrogen == expected_manure_inorganic_nitrogen
+    assert result.solid_manure_inorganic_nitrogen_ammonium == expected_manure_inorganic_nitrogen_ammonium
+    assert result.solid_manure_daily_mass == expected_solid_manure_daily_mass
+    assert result.solid_manure_potassium == expected_manure_potassium
+    assert result.solid_manure_phosphorus == expected_manure_phosphorus
+    assert result.solid_manure_water_extractable_inorganic_phosphorus == expected_water_extractable_inorganic_phosphorus
+    assert result.solid_manure_water_extractable_organic_phosphorus == expected_water_extractable_organic_phosphorus
+    assert result.solid_manure_non_water_extractable_inorganic_phosphorus == \
+           expected_non_water_extractable_inorganic_phosphorus
+    assert result.solid_manure_non_water_extractable_organic_phosphorus == \
+           expected_non_water_extractable_organic_phosphorus
+    assert result.storage_methane == expected_storage_methane
+    assert result.storage_ammonia == nitrogen_loss_from_ammonia_emission
+    assert result.storage_nitrous_oxide == nitrogen_loss_from_nitrous_oxide_emission
