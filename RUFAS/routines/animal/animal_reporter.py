@@ -1,5 +1,6 @@
 from RUFAS.output_manager import OutputManager
 from RUFAS.routines.animal.ration.ration_driver import RationReporter
+
 # from RUFAS.routines.animal.pen import Pen
 from RUFAS.routines.animal.manure.general_manure import AnimalManureExcretions
 
@@ -291,3 +292,27 @@ class AnimalReporter:
         om.add_variable("avg_age_for_calving_3", avg_age_for_calving_3, info_map)
         om.add_variable("avg_age_for_calving_greater_than_3", avg_age_for_calving_greater_than_3, info_map)
         om.add_variable("cull_reason_stats", life_cycle_manager.cull_reason_stats, info_map)
+
+
+def report_sold_animal_information(sold_animals):
+    """
+    Adds a dictionary of sold animal information to the output manager.
+
+    Parameters
+    ----------
+    sold_animals : List[HeiferII|HeiferIII|Cow]
+        List of sold animal objects.
+
+    """
+    info_map = {
+        "class": "life_cycle_manager",
+        "function": "daily_update",
+    }
+    sold_report = {}
+    for animal in sold_animals:
+        sold_report["animal_type"].append(animal.__class__.name)
+        sold_report["cull_reason"].append(animal.cull_reason)
+        sold_report["body_weight"].append(animal.body_weight)
+        sold_report["days_in_milk"].append(animal.days_in_milk)
+        sold_report["parity"].append(animal.calves)
+    om.add_variable("sold_report", sold_report, info_map)
