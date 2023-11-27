@@ -473,7 +473,6 @@ class AnimalInitialization:
             if args['tai_method_h'] in tai_protocol_name_conversion_map:
                 old_tai_method_h = args['tai_method_h']
                 args['tai_method_h'] = tai_protocol_name_conversion_map[old_tai_method_h]
-
             heiferII = HeiferII(args)
             heiferIIs.append(heiferII)
         conn.close()

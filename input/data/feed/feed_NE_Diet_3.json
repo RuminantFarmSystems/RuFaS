@@ -125,11 +125,11 @@
   "user_defined_ration_percentages": {
     "calf": [
       {
-        "feed_type": 155,
+        "feed_type": 202,
         "ration_percentage": 50
       },
       {
-        "feed_type": 157,
+        "feed_type": 216,
         "ration_percentage": 50
       }
     ],

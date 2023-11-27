@@ -9,14 +9,41 @@ import json
 import shutil
 import sys
 from pathlib import Path
-from typing import Callable, List, Tuple, Optional
+from typing import Any, Callable, Dict, List, Tuple, Optional
 
 from RUFAS import errors
 from RUFAS.config import is_leap_year
-from RUFAS.time import Time
 
 
 class Utility:
+    @staticmethod
+    def convert_list_of_dicts_to_dict_of_lists(
+        list_of_dicts: List[Dict[str, Any]]
+    ) -> Dict[str, List[Any]]:
+        """
+        Convert a list of dictionaries into a dictionary of lists.
+
+        Parameters
+        ----------
+        list_of_dicts : List[Dict[str, Any]]
+            A list of dictionaries with string keys and integer values.
+
+        Returns
+        -------
+        Dict[str, List[Any]]
+            A dictionary where keys are unique keys from input dictionaries,
+            and values are lists of corresponding values from input dictionaries.
+        """
+        result = {}
+
+        for item in list_of_dicts:
+            for key, value in item.items():
+                if key not in result:
+                    result[key] = []
+                result[key].append(value)
+
+        return result
+
     @staticmethod
     def get_base_dir():
         """
@@ -32,7 +59,7 @@ class Utility:
         """
 
         # Frozen
-        if getattr(sys, 'frozen', False):
+        if getattr(sys, "frozen", False):
             #
             # Get the executable file path
             # Resolve to absolute path
@@ -74,13 +101,13 @@ class Utility:
         """
 
         try:
-            if file_path.suffix == '.json':
+            if file_path.suffix == ".json":
                 if not file_path.is_file():
-                    raise errors.UserInput((str(file_path), 'does not exist'))
+                    raise errors.UserInput((str(file_path), "does not exist"))
             else:
-                raise errors.UserInput((str(file_path), 'is not a JSON file'))
+                raise errors.UserInput((str(file_path), "is not a JSON file"))
 
-            with file_path.open('r') as f:
+            with file_path.open("r") as f:
                 data = json.load(f)
 
             return data
@@ -89,7 +116,9 @@ class Utility:
             print(e.msg)
 
     @staticmethod
-    def calc_average(num_values: int, cur_avg: float, new_value: float) -> Tuple[int, float]:
+    def calc_average(
+        num_values: int, cur_avg: float, new_value: float
+    ) -> Tuple[int, float]:
         """
         Calculate the new average given the number of values,
         the current average, and the new value.
@@ -210,7 +239,9 @@ class Utility:
 
         # If the object is a tuple, serialize each element recursively
         if isinstance(obj, tuple):
-            return tuple([cls._make_serializable(elem, depth + 1, max_depth) for elem in obj])
+            return tuple(
+                [cls._make_serializable(elem, depth + 1, max_depth) for elem in obj]
+            )
 
         # If the object is a set, serialize each element recursively
         # Note: sets are not serializable by default, so we convert them to lists
@@ -221,13 +252,14 @@ class Utility:
         # Note: dictionary keys must be strings
         if isinstance(obj, dict):
             return {
-                str(cls._make_serializable(key, depth, max_depth)):
-                    cls._make_serializable(value, depth, max_depth)
+                str(
+                    cls._make_serializable(key, depth, max_depth)
+                ): cls._make_serializable(value, depth, max_depth)
                 for key, value in obj.items()
             }
 
         # If the object is a custom class, serialize its __dict__ attribute
-        if hasattr(obj, '__dict__'):
+        if hasattr(obj, "__dict__"):
             return cls._make_serializable(obj.__dict__, depth, max_depth)
 
         # When none of the above conditions are met, return a string representation of the object.
@@ -265,7 +297,7 @@ class Utility:
 
         class_name = obj.__class__.__name__
         memory_address = hex(id(obj))
-        return f'{class_name} object at {memory_address}'
+        return f"{class_name} object at {memory_address}"
 
     @classmethod
     def empty_dir(cls, dir_path: Path, keep: Optional[List[str]] = None) -> None:
@@ -294,26 +326,33 @@ class Utility:
                     shutil.rmtree(file)
 
     @staticmethod
-    def day_to_month_conversion(time: Time) -> int:
+    def day_to_month_conversion(day: int, calendar_year: int) -> int:
         """
-        Converts the day number into the corresponding month of the year.
+        Converts the julian day into the corresponding month of the current calendar year.
 
         Parameters
         ----------
-        time: Time
-            Time object containing the current time of the simulation.
+        day : int
+            Current julian day of the simulation.
+        calendar_year : int
+            Current calendar year of the simulation.
 
         Returns
         -------
         int
             The corresponding month of the year (1 for January, 2 for February, etc.).
+
+        Notes
+        -----
+        The calendar year is specified so it can be determined if it is a leap year.
+
         """
         non_leap_cumulative_days_in_months = [31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334, 365]
         leap_cumulative_days_in_months = [31, 60, 91, 121, 152, 182, 213, 244, 274, 305, 335, 366]
 
         cumulative_days_in_months = \
-            leap_cumulative_days_in_months if is_leap_year(time.calendar_year) else non_leap_cumulative_days_in_months
+            leap_cumulative_days_in_months if is_leap_year(calendar_year) else non_leap_cumulative_days_in_months
 
         for month, day_count in enumerate(cumulative_days_in_months):
-            if time.day <= day_count:
+            if day <= day_count:
                 return month + 1

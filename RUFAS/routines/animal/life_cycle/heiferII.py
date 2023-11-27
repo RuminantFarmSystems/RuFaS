@@ -44,8 +44,8 @@ class HeiferII(HeiferI):
             args.repro_program: reproduction program used in heifer,
                 three of them: ED, TAI, and synch-ED programs
             args.tai_method_h: timed-AI protocols used for
-                reproduction programs, three of them: 5dCG2P,
-                5dCGP, and user-defined
+                reproduction programs, three of them: md5CG2P,
+                md5CGP, and user-defined
             args.synch_ed_method_h: synch ed protocols used for
                 reproduction programs, two of them: 2P and CP
             (optional: include the following to assign animal information)
@@ -550,12 +550,12 @@ class HeiferII(HeiferI):
         if self.days_born == self.synch_ed_estrus_day:
             self.events.add_event(self.days_born, sim_day, const.ESTRUS_OCCURRED)
             estrus_detection_rand = random()
-            if estrus_detection_rand < AnimalBase.config["estrus_detection_rate"]:
+            if estrus_detection_rand < AnimalBase.config['heifer_repro_programs']["estrus_detection_rate_h_synch"]:
                 self.events.add_event(self.days_born, sim_day, const.ESTRUS_DETECTED)
                 ed_service_rand = random()
-                if ed_service_rand < AnimalBase.config["estrus_service_rate"]:
+                if ed_service_rand < AnimalBase.config['heifer_repro_programs']["estrus_service_rate"]:
                     self.ai_day = self.synch_ed_estrus_day + 1
-                    self.conception_rate = AnimalBase.config["estrus_conception_rate"]
+                    self.conception_rate = AnimalBase.config['heifer_repro_programs']["ed_conception_rate"]
                 else:
                     if self.days_born - self.synch_ed_program_start_day_h < 14:
                         # second round of injection

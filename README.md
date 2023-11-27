@@ -1,6 +1,7 @@
 [![Testing](https://github.com/RuminantFarmSystems/MASM/actions/workflows/testing_pytest.yml/badge.svg)](https://github.com/RuminantFarmSystems/MASM/actions/workflows/testing_pytest.yml)
 [![Linting](https://github.com/RuminantFarmSystems/MASM/actions/workflows/lint_flake8.yml/badge.svg)](https://github.com/RuminantFarmSystems/MASM/actions/workflows/lint_flake8.yml)
-[![Coverage](https://img.shields.io/badge/coverage-90%25-green)](https://github.com/RuminantFarmSystems/MASM/actions/workflows/coverage_pytest-cov.yml)
+[![Coverage](https://img.shields.io/badge/coverage-91%25-green)](https://github.com/RuminantFarmSystems/MASM/actions/workflows/coverage_pytest-cov.yml)
+
 # Vision
 To support research and sustainable decision-making in ruminant animal production through a state-of-art, open-source modeling environment that is continuously adapting as technology and scientific knowledge advance.
 
@@ -25,6 +26,18 @@ N/A
 - **P2 (Priority 2):** These are the friendly village tasks 🏘️. They're less urgent but still vital to the kingdom. Team members can take a leisurely stroll through the village (work on P2 tasks) when the dragons and drawbridges are at bay. If they happen upon a blocked path, they can enjoy a cup of tea with the villagers ☕ (work on P2 tasks), all while devising clever plans to remove any obstacles in their way.
 
 Remember, in the grand adventure of project work, flexibility and creativity are your allies! 🚀
+
+# 2023 Dev team sprint and on-call schedule
+| Start Date | End Date   | Sprint | On-Call |
+|------------|------------|--------|---------|
+| 11/8/2023  | 11/14/2023 | 1      | Niko       |
+| 11/15/2023 | 11/21/2023 | 1      | Allister       |
+| 11/22/2023 | 11/28/2023 | 2      | Ed       |
+| 11/29/2023 | 12/5/2023  | 2      | Loi       |
+| 12/6/2023  | 12/12/2023 | 3      | Pooya       |
+| 12/13/2023 | 12/19/2023 | 3      | Niko       |
+| 12/20/2023 | 12/26/2023 | 4      | Allister       |
+| 12/27/2023 | 1/2/2024   | 4      | Ed       |
 
 # 2023 H2 Roadmap
 ## Milestone 1: Aug 11th
@@ -61,7 +74,7 @@ Revisit the Animal Module design – Refactoring -- Animal Ration formulation|Jo
 Revisit the Animal Module design – Refactoring -- Animal Life Cycle|Yijing, Simon, Anchey|Design phase|P0
 Deprecate the output handler, add missing functionalities, and reports to OM|Niko, Allister||P0
 Go through the entire codebase and ensure IM is the only way we are receiving input data|Allister, Niko||P0|[IM Integration tracking](https://docs.google.com/spreadsheets/d/1k8J6MelPrsrz6Tv4fQNAG-kLSN7oQTQOCEy3I6F0IqU/edit?usp=sharing)
-Revert soil profile properties and rewrite soil profile inputs|Ed||P1|[#773](https://github.com/RuminantFarmSystems/MASM/issues/773)
+Revert soil profile properties and rewrite soil profile inputs|Ed|Completed|P1|[#773](https://github.com/RuminantFarmSystems/MASM/issues/773)
 
 SMEs:
 |Title|Owner|Status|Priority|Remarks|
@@ -70,7 +83,7 @@ Complete model evaluation||||Moved to Milestone 3
 Complete Sensitivity Analysis||||Moved to Milestone 3
 Complete External/Scientific Documentation for Animal, Manure, & EEE modules and put on GitHub|Varma, Joe, Haowen, Kristan, Jenn, Emmanuel||P1
 Complete Cohort 1 Pilot testing|Kristan, Haowen, Kat||P0
-Complete evaluation of soil temperature|Ed, Jenn, Matthew|In progress|P0|[#764](https://github.com/RuminantFarmSystems/MASM/issues/764)
+Complete evaluation of soil temperature|Ed, Jenn, Matthew|Completed|P0|[#764](https://github.com/RuminantFarmSystems/MASM/issues/764)
 
 ## Milestone 2.5: Oct 31th
 [GitHub Milestone](https://github.com/RuminantFarmSystems/MASM/milestone/5)
@@ -80,13 +93,13 @@ Dev Team:
 |--|--|--|--|--|
 Redesign and implement the Feed storage module|Pooya, Kevin, Kristan||P1
 Refactor Animal Module -- Animal Manager|Joe||P0
-Rewrite and clean field input files in the `input/` directory|Ed, Matthew||P1|[#769](https://github.com/RuminantFarmSystems/MASM/issues/769) 
+Rewrite and clean field input files in the `input/` directory|Ed, Matthew|Completed|P1|[#769](https://github.com/RuminantFarmSystems/MASM/issues/769) 
 
 SMEs:
 |Title|Owner|Status|Priority|Remarks|
 |--|--|--|--|--|
 Complete Cohort 1 Pilot testing|Kristan, Haowen, Kat||P0
-Complete evaluation of soil hydrology|Ed, Jenn, Matthew|In progress|P0|[#766](https://github.com/RuminantFarmSystems/MASM/issues/766)
+Complete evaluation of soil hydrology|Ed, Jenn, Matthew|Completed|P0|[#766](https://github.com/RuminantFarmSystems/MASM/issues/766)
 
 ## Milestone 3: Dec 31th
 [GitHub Milestone](https://github.com/RuminantFarmSystems/MASM/milestone/6)

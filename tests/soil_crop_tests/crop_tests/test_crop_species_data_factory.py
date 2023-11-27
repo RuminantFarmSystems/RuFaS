@@ -1,6 +1,6 @@
 import pytest
 from RUFAS.routines.field.crop.species_data_factory import CropSpecies, CropSpeciesDataFactory
-from RUFAS.routines.field.crop.crop_data import CropData, PlantCategory
+from RUFAS.routines.field.crop.crop_data import PlantCategory
 from dataclasses import asdict
 
 
@@ -392,24 +392,34 @@ def test_species_factory_defaults():
     assert potato.yield_phosphorus_fraction == 0.0023
 
     # ---- Triticale ----
-    # TODO: omitting triticale test, since it does not have non-default values at present
-
-
-def test_manual_custom_crop_data():
-    """checks (and demonstrates) the alternate way of customizing a crop"""
-    # setup custom crop
-    aspen = CropData(name="custom crop: aspen", species="aspen", scientific_name="Populus tremuloides",
-                     plant_code="PTREM", plant_category=PlantCategory("tree"), is_nitrogen_fixer=False,
-                     max_leaf_area_index=5.0)
-
-    # check that each attribute is set appropriately
-    assert aspen.name == "custom crop: aspen"
-    assert aspen.species == "aspen"
-    assert aspen.scientific_name == "Populus tremuloides"
-    assert aspen.plant_code == "PTREM"
-    assert aspen.plant_category == PlantCategory("tree")
-    assert aspen.is_nitrogen_fixer is False
-    assert aspen.max_leaf_area_index == 5.0
+    triticale = CropSpeciesDataFactory.create_species_data(CropSpecies("triticale"), id=42)
+    assert triticale.species == "triticale"
+    assert triticale.name == "default triticale"
+    assert triticale.id == 42
+    assert triticale.plant_code == "DWHT"
+    assert triticale.scientific_name == "Triticum durum"
+    assert triticale.plant_category == PlantCategory("cool_annual")
+    assert triticale.is_nitrogen_fixer is False
+    assert triticale.minimum_temperature == 0.0
+    assert triticale.optimal_temperature == 15.0
+    assert triticale.max_leaf_area_index == 4.0
+    assert triticale.first_heat_fraction_point == 0.15
+    assert triticale.first_leaf_fraction_point == 0.01
+    assert triticale.second_heat_fraction_point == 0.50
+    assert triticale.second_leaf_fraction_point == 0.95
+    assert triticale.senescent_heat_fraction == 0.90
+    assert triticale.light_use_efficiency == 30.0
+    assert triticale.emergence_nitrogen_fraction == 0.06
+    assert triticale.half_mature_nitrogen_fraction == 0.0231
+    assert triticale.mature_nitrogen_fraction == 0.013
+    assert triticale.emergence_phosphorus_fraction == 0.0084
+    assert triticale.half_mature_phosphorus_fraction == 0.0032
+    assert triticale.mature_phosphorus_fraction == 0.0019
+    assert triticale.max_root_depth == 2000
+    assert triticale.optimal_harvest_index == 0.40
+    assert triticale.min_harvest_index == 0.20
+    assert triticale.yield_nitrogen_fraction == 0.0263
+    assert triticale.yield_phosphorus_fraction == 0.0057
 
 
 @pytest.mark.parametrize("species,vars_dict", [
@@ -459,27 +469,3 @@ def test_factory_errors(species, bad_attr):
     with pytest.raises(AttributeError) as e:
         CropSpeciesDataFactory.create_species_data(CropSpecies(species), **bad_attr)
     assert "is not a valid attribute" in str(e.value)
-
-
-# --- Test @property methods ---
-@pytest.mark.parametrize("plant_type", [
-    PlantCategory.PERENNIAL,
-    PlantCategory.PERENNIAL_LEGUME,
-    PlantCategory.TREE,
-    PlantCategory.WARM_ANNUAL,
-    PlantCategory.WARM_ANNUAL_LEGUME,
-    PlantCategory.COOL_ANNUAL,
-    PlantCategory.COOL_ANNUAL_LEGUME,
-])
-def test_is_perennial(plant_type: PlantCategory) -> None:
-    """Tests that is_perennial() correctly determines whether a plant is a perennial"""
-    # Initialize CropData object
-    crop = CropData(plant_category=plant_type)
-
-    # Determine observed and expected results
-    observe = crop.is_perennial
-    perennial_set = {PlantCategory.PERENNIAL, PlantCategory.PERENNIAL_LEGUME, PlantCategory.TREE}
-    expect = plant_type in perennial_set
-
-    # Check results
-    assert observe == expect

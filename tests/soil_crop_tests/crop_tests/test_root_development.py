@@ -2,6 +2,7 @@ from RUFAS.routines.field.crop.root_development import RootDevelopment
 from RUFAS.routines.field.crop.crop_data import CropData
 from RUFAS.routines.field.crop.crop_data import PlantCategory
 import pytest
+from unittest.mock import patch, PropertyMock
 
 
 # ---- Test Static Functions ----
@@ -50,19 +51,19 @@ def test_determine_root_depth(maxd, heatfrac):
     (0, 0.5),
     (100, 0.5),
 ])
-def test_develop_roots(maxd, heatfrac):
-    """integration test for main root development function develop_roots()"""
+def test_develop_roots(maxd: int, heatfrac: float) -> None:
+    """Integration test for main root development function develop_roots()."""
+    with patch.object(CropData, "heat_fraction", new_callable=PropertyMock, return_value=heatfrac):
+        # ---- perennial crop ----
+        data_perennial = CropData(max_root_depth=maxd, plant_category=PlantCategory("perennial"))
+        rd = RootDevelopment(data_perennial)
+        rd.develop_roots()
+        assert data_perennial.root_fraction == RootDevelopment._determine_root_fraction(heatfrac)
+        assert data_perennial.root_depth == maxd
 
-    # ---- perennial crop ----
-    data_perennial = CropData(heat_fraction=heatfrac, max_root_depth=maxd, plant_category=PlantCategory("perennial"))
-    rd = RootDevelopment(data_perennial)
-    rd.develop_roots()
-    assert data_perennial.root_fraction == RootDevelopment._determine_root_fraction(heatfrac)
-    assert data_perennial.root_depth == maxd
-
-    # ---- annual crop ----
-    data_annual = CropData(heat_fraction=heatfrac, max_root_depth=maxd, plant_category=PlantCategory("warm_annual"))
-    rd = RootDevelopment(data_annual)
-    rd.develop_roots()
-    assert data_annual.root_fraction == RootDevelopment._determine_root_fraction(heatfrac)
-    assert data_annual.root_depth == RootDevelopment._determine_root_depth(maxd, heatfrac)
+        # ---- annual crop ----
+        data_annual = CropData(max_root_depth=maxd, plant_category=PlantCategory("warm_annual"))
+        rd = RootDevelopment(data_annual)
+        rd.develop_roots()
+        assert data_annual.root_fraction == RootDevelopment._determine_root_fraction(heatfrac)
+        assert data_annual.root_depth == RootDevelopment._determine_root_depth(maxd, heatfrac)

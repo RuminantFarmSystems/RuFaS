@@ -247,55 +247,55 @@ rufas_id,Name,feed_description,feed_type,units,Comp_location
 246,Ammonium Chloride,No,Mineral,kg,NRC_and_NASEM
 247,Calcium Choride dihydrate,CaCl2.2H2O,Mineral,kg,NRC_and_NASEM
 248,"Calcium Choride,anhydrous",CaCl2,Mineral,kg,NRC_and_NASEM
-249,Calcium hydroxide,Ca(OH)2,Mineral,kg,----
-250,Calcium oxide,CaO,Mineral,kg,----
+249,Calcium hydroxide,Ca(OH)2,Mineral,kg,NASEM_only
+250,Calcium oxide,CaO,Mineral,kg,NASEM_only
 251,"Magnesium Chloride, Hexahydrate",MgCl2.6H2O,Mineral,kg,NRC_and_NASEM
-252,Oystershell,Mineral,Mineral,kg,----
-253,Magnesium carbonate,Mineral,Mineral,kg,----
-254,Magnesium hydroxide,Mineral,Mineral,kg,----
-255,Magnesium sulfate (7H2O),Mineral,Mineral,kg,----
-256,Ammonium phosphate (monobasic),Mineral,Mineral,kg,----
-257,"Phosphate, Curacao",Mineral,Mineral,kg,----
-258,"Phosphate, defluorinated",Mineral,Mineral,kg,----
-259,Phosphoric acid,Mineral,Mineral,kg,----
-260,Sodium tripolyphosphate,Mineral,Mineral,kg,----
-261,Potassium bicarbonate,Mineral,Mineral,kg,----
-262,Potassium carbonate,Mineral,Mineral,kg,----
-263,Potassium iodide,Mineral,Mineral,kg,----
-264,Sodium carbonate (H2O),Mineral,Mineral,kg,----
-265,Sodium sesquicarbonate (2H2O),Mineral,Mineral,kg,----
-266,Cobalt carbonate,Mineral,Mineral,kg,----
-267,Cobalt carbonate (6H2O),Mineral,Mineral,kg,----
-268,Cobalt chloride (6H2O),Mineral,Mineral,kg,----
-269,Cobalt sulfate (7H2O),Mineral,Mineral,kg,----
-270,Cobalt organic generic,Mineral,Mineral,kg,----
-271,Copper chloride (2H2O),Mineral,Mineral,kg,----
-272,Copper sulfate (5H2O),Mineral,Mineral,kg,----
-273,Copper oxide,Mineral,Mineral,kg,----
-274,"Copper organic, generic",Mineral,Mineral,kg,----
-275,EDDI,Mineral,Mineral,kg,----
-276,Calcium iodate,Mineral,Mineral,kg,----
-277,Ferrous sulfate (7H2O),Mineral,Mineral,kg,----
-278,Ferrous sulfate (H2O),Mineral,Mineral,kg,----
-279,Ferrous carbonate,Mineral,Mineral,kg,----
-280,Iron oxide,Mineral,Mineral,kg,----
-281,"Iron, organic generic",Mineral,Mineral,kg,----
-282,Manganese chloride,Mineral,Mineral,kg,----
-283,Manganese chloride (4H2O),Mineral,Mineral,kg,----
-284,Manganese carbonate,Mineral,Mineral,kg,----
-285,Manganese sulfate (H2O),Mineral,Mineral,kg,----
-286,Manganese sulfate (5H2O),Mineral,Mineral,kg,----
-287,Manganese oxide,Mineral,Mineral,kg,----
-288,Manganese organic generic,Mineral,Mineral,kg,----
-289,"Selenite, sodium",Mineral,Mineral,kg,----
-290,"Selenate, sodium (10 H2O)",Mineral,Mineral,kg,----
-291,"Selenium yeast, generic",Mineral,Mineral,kg,----
-292,Zinc carbonate,Mineral,Mineral,kg,----
-293,Zinc chloride,Mineral,Mineral,kg,----
-294,Zinc oxide,Mineral,Mineral,kg,----
-295,Zinc sulfate (H2O),Mineral,Mineral,kg,----
-296,"Zinc, organic generic",Mineral,Mineral,kg,----
-297,Vit A premix,Vitamins,Vitamins,kg,----
-298,Vit D premix,Vitamins,Vitamins,kg,----
-299,Vit E premix,Vitamins,Vitamins,kg,----
-300,"VitTM Premix, generic",Vitamins,Vitamins,kg,----
+252,Oystershell,Mineral,Mineral,kg,NASEM_only
+253,Magnesium carbonate,Mineral,Mineral,kg,NASEM_only
+254,Magnesium hydroxide,Mineral,Mineral,kg,NASEM_only
+255,Magnesium sulfate (7H2O),Mineral,Mineral,kg,NASEM_only
+256,Ammonium phosphate (monobasic),Mineral,Mineral,kg,NASEM_only
+257,"Phosphate, Curacao",Mineral,Mineral,kg,NASEM_only
+258,"Phosphate, defluorinated",Mineral,Mineral,kg,NASEM_only
+259,Phosphoric acid,Mineral,Mineral,kg,NASEM_only
+260,Sodium tripolyphosphate,Mineral,Mineral,kg,NASEM_only
+261,Potassium bicarbonate,Mineral,Mineral,kg,NASEM_only
+262,Potassium carbonate,Mineral,Mineral,kg,NASEM_only
+263,Potassium iodide,Mineral,Mineral,kg,NASEM_only
+264,Sodium carbonate (H2O),Mineral,Mineral,kg,NASEM_only
+265,Sodium sesquicarbonate (2H2O),Mineral,Mineral,kg,NASEM_only
+266,Cobalt carbonate,Mineral,Mineral,kg,NASEM_only
+267,Cobalt carbonate (6H2O),Mineral,Mineral,kg,NASEM_only
+268,Cobalt chloride (6H2O),Mineral,Mineral,kg,NASEM_only
+269,Cobalt sulfate (7H2O),Mineral,Mineral,kg,NASEM_only
+270,Cobalt organic generic,Mineral,Mineral,kg,NASEM_only
+271,Copper chloride (2H2O),Mineral,Mineral,kg,NASEM_only
+272,Copper sulfate (5H2O),Mineral,Mineral,kg,NASEM_only
+273,Copper oxide,Mineral,Mineral,kg,NASEM_only
+274,"Copper organic, generic",Mineral,Mineral,kg,NASEM_only
+275,EDDI,Mineral,Mineral,kg,NASEM_only
+276,Calcium iodate,Mineral,Mineral,kg,NASEM_only
+277,Ferrous sulfate (7H2O),Mineral,Mineral,kg,NASEM_only
+278,Ferrous sulfate (H2O),Mineral,Mineral,kg,NASEM_only
+279,Ferrous carbonate,Mineral,Mineral,kg,NASEM_only
+280,Iron oxide,Mineral,Mineral,kg,NASEM_only
+281,"Iron, organic generic",Mineral,Mineral,kg,NASEM_only
+282,Manganese chloride,Mineral,Mineral,kg,NASEM_only
+283,Manganese chloride (4H2O),Mineral,Mineral,kg,NASEM_only
+284,Manganese carbonate,Mineral,Mineral,kg,NASEM_only
+285,Manganese sulfate (H2O),Mineral,Mineral,kg,NASEM_only
+286,Manganese sulfate (5H2O),Mineral,Mineral,kg,NASEM_only
+287,Manganese oxide,Mineral,Mineral,kg,NASEM_only
+288,Manganese organic generic,Mineral,Mineral,kg,NASEM_only
+289,"Selenite, sodium",Mineral,Mineral,kg,NASEM_only
+290,"Selenate, sodium (10 H2O)",Mineral,Mineral,kg,NASEM_only
+291,"Selenium yeast, generic",Mineral,Mineral,kg,NASEM_only
+292,Zinc carbonate,Mineral,Mineral,kg,NASEM_only
+293,Zinc chloride,Mineral,Mineral,kg,NASEM_only
+294,Zinc oxide,Mineral,Mineral,kg,NASEM_only
+295,Zinc sulfate (H2O),Mineral,Mineral,kg,NASEM_only
+296,"Zinc, organic generic",Mineral,Mineral,kg,NASEM_only
+297,Vit A premix,Vitamins,Vitamins,kg,NASEM_only
+298,Vit D premix,Vitamins,Vitamins,kg,NASEM_only
+299,Vit E premix,Vitamins,Vitamins,kg,NASEM_only
+300,"VitTM Premix, generic",Vitamins,Vitamins,kg,NASEM_only

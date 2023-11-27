@@ -13,5 +13,6 @@ typing_extensions
 sphinx
 sphinx-rtd-theme
 juliandate
-salib
 seaborn
+freezegun
+salib
