@@ -177,18 +177,10 @@ class ReportGenerator:
         number_of_elements = len(report_data[next(iter(report_data))])
 
         horizontal_agg_key = filter_content.get("horizontal_aggregation")
-        horizontal_aggregator = (
-            AGGREGATION_FUNCTIONS.get(horizontal_agg_key)
-            if horizontal_agg_key in AGGREGATION_FUNCTIONS
-            else None
-        )
+        horizontal_aggregator = AGGREGATION_FUNCTIONS.get(horizontal_agg_key)
 
         vertical_agg_key = filter_content.get("vertical_aggregation")
-        vertical_aggregator = (
-            AGGREGATION_FUNCTIONS.get(vertical_agg_key)
-            if vertical_agg_key in AGGREGATION_FUNCTIONS
-            else None
-        )
+        vertical_aggregator = AGGREGATION_FUNCTIONS.get(vertical_agg_key)
 
         if horizontal_aggregator and vertical_aggregator:
             if filter_content.get("horizontal_first", True):
