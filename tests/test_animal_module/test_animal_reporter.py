@@ -147,7 +147,7 @@ def test_report_milk(mocker: MockerFixture):
     # act
     AnimalReporter.report_milk(pen, simulation_day)
     # assert
-    assert om.variables_pool["AnimalReporter.report_milk.milk_data_at_milk_update"][
+    assert om.variables_pool["cow.milking_update.milk_data_at_milk_update"][
         "values"
     ] == [test_milk_data_update, test_milk_data_update, test_milk_data_update]
 
