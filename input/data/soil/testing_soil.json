@@ -18,7 +18,7 @@
             "saturated_hydraulic_conductivity": 20,
             "initial_temperature": 14.50797297,
             "bulk_density": 1.4,
-            "percent_organic_carbon_content": 0.012,
+            "percent_organic_carbon_content": 1.2,
             "percent_clay_content": 20,
             "percent_silt_content": 65,
             "percent_sand_content": 15,
@@ -32,8 +32,7 @@
             "denitrification_threshold_water_content": 1.1,
             "residue_fresh_organic_mineralization_rate": 0.05,
             "active_N_percent": 0.0,
-            "denitrification_rate": 0.05,
-            "OM_percent": 0.0
+            "denitrification_rate": 0.05
         },
         {
             "bottom_depth": 300,
@@ -44,7 +43,7 @@
             "saturated_hydraulic_conductivity": 20,
             "initial_temperature": 14.50797297,
             "bulk_density": 1.4,
-            "percent_organic_carbon_content": 0.012,
+            "percent_organic_carbon_content": 1.2,
             "percent_clay_content": 20,
             "percent_silt_content": 65,
             "percent_sand_content": 15,
@@ -58,8 +57,7 @@
             "denitrification_threshold_water_content": 1.1,
             "residue_fresh_organic_mineralization_rate": 0.05,
             "active_N_percent": 0.0,
-            "denitrification_rate": 0.05,
-            "OM_percent": 0.0
+            "denitrification_rate": 0.05
         },
         {
             "bottom_depth": 450,
@@ -70,7 +68,7 @@
             "saturated_hydraulic_conductivity": 20,
             "initial_temperature": 13.38632147,
             "bulk_density": 1.4,
-            "percent_organic_carbon_content": 0.012,
+            "percent_organic_carbon_content": 1.2,
             "percent_clay_content": 20,
             "percent_silt_content": 65,
             "percent_sand_content": 15,
@@ -84,8 +82,7 @@
             "denitrification_threshold_water_content": 1.1,
             "residue_fresh_organic_mineralization_rate": 0.05,
             "active_N_percent": 0.0,
-            "denitrification_rate": 0.5,
-            "OM_percent": 0.0
+            "denitrification_rate": 0.5
         }
     ]
 }

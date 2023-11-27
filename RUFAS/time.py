@@ -1,3 +1,8 @@
+from RUFAS.output_manager import OutputManager
+
+om = OutputManager()
+
+
 class Time:
     def __init__(self, config):
         """
@@ -80,6 +85,15 @@ class Time:
             return self.day > len(self.years[self.year - 1])
 
         return False
+
+    def record_time(self) -> None:
+        """
+        Records the current day, simulated year, and calendar year of the simulation in the OutputManager.
+        """
+        info_map = {"class": self.__class__.__name__, "function": self.record_time.__name__, "prefix": "Time"}
+        om.add_variable("day", self.day, info_map)
+        om.add_variable("year", self.year, info_map)
+        om.add_variable("calendar_year", self.calendar_year, info_map)
 
     @property
     def is_last_day_of_simulation(self):

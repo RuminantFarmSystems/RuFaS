@@ -2,8 +2,11 @@ import numpy as np
 
 from RUFAS.config import Config
 from RUFAS.current_day_conditions import CurrentDayConditions
+from RUFAS.output_manager import OutputManager
 from RUFAS.time import Time
 from RUFAS.util import Utility
+
+om = OutputManager()
 
 
 def is_leap_year(year):
@@ -143,6 +146,9 @@ class Weather:
 
         self.__mean_annual_temperature = self._calculate_average_annual_temperature(weather_file['avg'])
 
+        info_map = {"class": self.__class__.__name__, "function": self.__init__.__name__, "prefix": "Weather"}
+        om.add_variable("average_annual_temperature", self.__mean_annual_temperature, info_map)
+
     def get_current_day_conditions(self, time: Time) -> CurrentDayConditions:
         """
         Creates a CurrentDayConditions object containing all the weather conditions on the current day.
@@ -165,8 +171,9 @@ class Weather:
         """
         year = time.year
         day = time.day
-        month = Utility.day_to_month_conversion(time)
-        daylength = CurrentDayConditions.determine_daylength(month)
+        month = Utility.day_to_month_conversion(day, time.calendar_year)
+        # 0.752 as radian is hard-coded to Madison,WI
+        daylength = CurrentDayConditions.determine_daylength(day, 43.0723, month)
         try:
             current_conditions = CurrentDayConditions(
                 incoming_light=self.__radiation[year - 1][day - 1],
@@ -179,9 +186,31 @@ class Weather:
                 daylength=daylength
             )
         except IndexError:
-            raise IndexError(f"Attempted to get weather conditions for day: {time.day}, year: {time.year}.")
+            raise IndexError(f"Attempted to get weather conditions for day: {day}, year: {year}.")
 
         return current_conditions
+
+    def record_weather(self, time: Time) -> None:
+        """
+        Records the current weather conditions in the OutputManager.
+
+        Parameters
+        ----------
+        time: Time
+            Time object containing the current time of the simulation.
+
+        """
+        info_map = {"class": self.__class__.__name__, "function": self.record_weather.__name__, "prefix": "Weather"}
+        current_weather = self.get_current_day_conditions(time)
+        om.add_variable("precipitation", current_weather.rainfall, info_map)
+        om.add_variable("rainfall", current_weather.rainfall, info_map)
+        om.add_variable("snowfall", current_weather.snowfall, info_map)
+        om.add_variable("daylength", current_weather.daylength, info_map)
+        om.add_variable("maximum_temperature", current_weather.max_air_temperature, info_map)
+        om.add_variable("minimum_temperature", current_weather.min_air_temperature, info_map)
+        om.add_variable("average_temperature", current_weather.mean_air_temperature, info_map)
+        om.add_variable("radiation", current_weather.incoming_light, info_map)
+        om.add_variable("irrigation", current_weather.irrigation, info_map)
 
     @staticmethod
     def _calculate_average_annual_temperature(daily_average_temperatures: list[float]) -> float:

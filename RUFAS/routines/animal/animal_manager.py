@@ -191,7 +191,7 @@ class AnimalManager:
 
         udrm = udr.UserDefinedRationManager()
         self.ration_user_input = data['ration']['user_input']
-        udrm.udr_or_not = self.ration_user_input
+        udrm.is_udr = self.ration_user_input
 
         # how often a ration is calculated, days
         self.formulation_interval = data['ration']['formulation_interval']
@@ -1682,12 +1682,24 @@ class AnimalManager:
                                     cow.events,
                                     info_map)
 
+            manure_excretions_output_data = {}
             for pen in self.all_pens:
                 pen.classes_in_pen = self._get_classes_in_pen(pen)
                 pen.calc_total_manure(feed, self.methane_model, self.methane_mitigation_method,
-                                      self.methane_mitigation_additive_amount)
+                                      self.methane_mitigation_additive_amount,
+                                      manure_excretions_output_data)
                 pen.call_p_rqmts()
                 pen.daily_p_update()  # Average phosphorus concentration per pen
+
+            for output_data_dict in manure_excretions_output_data.values():
+                for manure_property, manure_value in output_data_dict['manure'].items():
+                    info_map = {
+                        'class': self.__class__.__name__,
+                        'function': self.daily_updates.__name__,
+                    }
+                    om.add_variable(f'{output_data_dict["prefix"]}_{str(manure_property)}',
+                                    manure_value,
+                                    info_map=info_map)
 
             self._update_phosphorus_concentrations()  # Average phosphorus concentration per animal type
             self.record_pen_history()

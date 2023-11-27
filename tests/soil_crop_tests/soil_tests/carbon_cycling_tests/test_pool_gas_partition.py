@@ -300,7 +300,7 @@ def test_slow_carbon_co2_lost_amount(slow_carbon_decomposition_amount: float) ->
     9.24,  # arbitrary values
 ])
 def test_slow_to_passive_carbon_amount(slow_carbon_decomposition_amount: float) -> None:
-    """Tests that the the amount of slow carbon decomposed into passive carbon was calculated correctly"""
+    """Tests that the amount of slow carbon decomposed into passive carbon was calculated correctly"""
     slow_carbon_passive_decompose_rate = 0.03
     expected = slow_carbon_decomposition_amount * slow_carbon_passive_decompose_rate
     assert expected == PoolGasPartition._determine_slow_to_passive_carbon_amount(slow_carbon_decomposition_amount)
@@ -324,7 +324,7 @@ def test_passive_to_active_carbon_amount(passive_carbon_decomposition_amount: fl
     7.7,  # arbitrary values
 ])
 def test_passive_carbon_co2_lost_amount(passive_carbon_decomposition_amount: float) -> None:
-    """Tests that the the amount of lost passive carbon decomposed into CO2 was calculated correctly"""
+    """Tests that the amount of lost passive carbon decomposed into CO2 was calculated correctly"""
     passive_carbon_co2_lost_rate = 0.55
     expected = passive_carbon_decomposition_amount * passive_carbon_co2_lost_rate
     assert expected == PoolGasPartition._determine_passive_carbon_co2_lost_amount(passive_carbon_decomposition_amount)
@@ -488,18 +488,18 @@ def test_partition_pool_gas(layers: list) -> None:
     partition.partition_pool_gas()
 
     # Checking if methods are called correct number of times
-    assert PoolGasPartition._determine_plant_metabolic_active_carbon_loss.call_count == len(layers)
-    assert PoolGasPartition._determine_plant_metabolic_active_carbon_remaining.call_count == len(layers)
-    assert PoolGasPartition._determine_plant_structural_active_carbon_loss.call_count == len(layers)
-    assert PoolGasPartition._determine_plant_structural_active_carbon_remaining.call_count == len(layers)
-    assert PoolGasPartition._determine_plant_structural_slow_carbon_loss.call_count == len(layers)
-    assert PoolGasPartition._determine_plant_structural_slow_carbon_remaining.call_count == len(layers)
-    assert PoolGasPartition._determine_soil_metabolic_active_carbon_loss.call_count == len(layers)
-    assert PoolGasPartition._determine_soil_metabolic_active_carbon_remaining.call_count == len(layers)
-    assert PoolGasPartition._determine_soil_structural_active_carbon_loss.call_count == len(layers)
-    assert PoolGasPartition._determine_soil_structural_active_carbon_remaining.call_count == len(layers)
-    assert PoolGasPartition._determine_soil_structural_slow_carbon_loss.call_count == len(layers)
-    assert PoolGasPartition._determine_soil_structural_slow_carbon_remaining.call_count == len(layers)
+    assert PoolGasPartition._determine_plant_metabolic_active_carbon_loss.call_count == 1
+    assert PoolGasPartition._determine_plant_metabolic_active_carbon_remaining.call_count == 1
+    assert PoolGasPartition._determine_plant_structural_active_carbon_loss.call_count == 1
+    assert PoolGasPartition._determine_plant_structural_active_carbon_remaining.call_count == 1
+    assert PoolGasPartition._determine_plant_structural_slow_carbon_loss.call_count == 1
+    assert PoolGasPartition._determine_plant_structural_slow_carbon_remaining.call_count == 1
+    assert PoolGasPartition._determine_soil_metabolic_active_carbon_loss.call_count == len(layers) - 1
+    assert PoolGasPartition._determine_soil_metabolic_active_carbon_remaining.call_count == len(layers) - 1
+    assert PoolGasPartition._determine_soil_structural_active_carbon_loss.call_count == len(layers) - 1
+    assert PoolGasPartition._determine_soil_structural_active_carbon_remaining.call_count == len(layers) - 1
+    assert PoolGasPartition._determine_soil_structural_slow_carbon_loss.call_count == len(layers) - 1
+    assert PoolGasPartition._determine_soil_structural_slow_carbon_remaining.call_count == len(layers) - 1
 
     assert PoolGasPartition._determine_active_carbon_decomposition_rate.call_count == len(layers)
 
@@ -507,7 +507,7 @@ def test_partition_pool_gas(layers: list) -> None:
 
     assert PoolGasPartition._determine_slow_carbon_decomposition_amount.call_count == len(layers)
 
-    assert PoolGasPartition._determine_passive_carbon_decomposition_amount.call_count == len(layers)
+    assert PoolGasPartition._determine_passive_carbon_decomposition_amount.call_count == len(layers) - 1
 
     assert PoolGasPartition._determine_carbon_lost_adjusted_factor.call_count == len(layers)
 
@@ -516,28 +516,72 @@ def test_partition_pool_gas(layers: list) -> None:
 
     assert PoolGasPartition._determine_slow_to_active_carbon_amount.call_count == len(layers)
     assert PoolGasPartition._determine_slow_carbon_co2_lost_amount.call_count == len(layers)
-    assert PoolGasPartition._determine_slow_to_passive_carbon_amount.call_count == len(layers)
+    assert PoolGasPartition._determine_slow_to_passive_carbon_amount.call_count == len(layers) - 1
 
-    assert PoolGasPartition._determine_passive_to_active_carbon_amount.call_count == len(layers)
-    assert PoolGasPartition._determine_passive_carbon_co2_lost_amount.call_count == len(layers)
+    assert PoolGasPartition._determine_passive_to_active_carbon_amount.call_count == len(layers) - 1
+    assert PoolGasPartition._determine_passive_carbon_co2_lost_amount.call_count == len(layers) - 1
 
     assert PoolGasPartition._determine_plant_active_decompose_carbon.call_count == len(layers)
-    assert PoolGasPartition._determine_soil_active_decompose_carbon.call_count == len(layers)
+    assert PoolGasPartition._determine_soil_active_decompose_carbon.call_count == len(layers) - 1
     assert PoolGasPartition._determine_soil_active_carbon_amount.call_count == len(layers)
 
     assert PoolGasPartition._determine_soil_slow_carbon_amount.call_count == len(layers)
 
-    assert PoolGasPartition._determine_soil_passive_carbon_amount.call_count == len(layers)
+    assert PoolGasPartition._determine_soil_passive_carbon_amount.call_count == len(layers) - 1
 
     # Checking values were set correctly by the main routine
-    for layer in data.soil_layers:
+    layer = data.soil_layers[0]
+    assert layer.active_carbon_decomposition_rate == 0.87
+    assert layer.carbon_lost_adjusted_factor == 3.7
+    assert layer.plant_metabolic_active_carbon_loss == 1.89
+    assert layer.plant_metabolic_active_carbon_remaining == 2.1
+    assert layer.plant_structural_active_carbon_remaining == 2.3
+    assert layer.plant_structural_slow_carbon_loss == 2.4
+    assert layer.plant_structural_slow_carbon_remaining == 2.5
+    assert layer.soil_metabolic_active_carbon_loss == 0.0
+    assert layer.soil_metabolic_active_carbon_remaining == 0.0
+    assert layer.soil_structural_active_carbon_loss == 0.0
+    assert layer.soil_structural_active_carbon_remaining == 0.0
+    assert layer.soil_structural_slow_carbon_loss == 0.0
+    assert layer.soil_structural_slow_carbon_remaining == 0.0
+
+    assert layer.active_carbon_decomposition_amount == 3.4
+
+    assert layer.slow_carbon_decomposition_amount == 3.5
+
+    assert layer.passive_carbon_decomposition_amount == 0.0
+
+    assert layer.active_carbon_to_slow_amount == 3.8
+    assert layer.active_carbon_to_slow_loss == 3.9
+
+    assert layer.active_carbon_to_passive_amount == 0.0
+
+    assert layer.slow_to_active_carbon_amount == 4.2
+    assert layer.slow_carbon_co2_lost_amount == 4.3
+    assert layer.slow_to_passive_carbon_amount == 0.0
+
+    assert layer.passive_to_active_carbon_amount == 0.0
+    assert layer.passive_carbon_co2_lost_amount == 0.0
+
+    assert layer.plant_active_decompose_carbon == 4.7
+    assert layer.soil_active_decompose_carbon == 0.0
+    assert layer.active_carbon_amount == 4.9
+
+    assert layer.slow_carbon_amount == 5.1
+
+    if layer.top_depth == 0:
+        assert layer.passive_carbon_amount == 0.0
+    else:
+        assert layer.passive_carbon_amount == 1120.0
+
+    for layer in data.soil_layers[1:]:
         assert layer.active_carbon_decomposition_rate == 0.87
         assert layer.carbon_lost_adjusted_factor == 3.7
-        assert layer.plant_metabolic_active_carbon_loss == 1.89
-        assert layer.plant_metabolic_active_carbon_remaining == 2.1
-        assert layer.plant_structural_active_carbon_remaining == 2.3
-        assert layer.plant_structural_slow_carbon_loss == 2.4
-        assert layer.plant_structural_slow_carbon_remaining == 2.5
+        assert layer.plant_metabolic_active_carbon_loss == 0.0
+        assert layer.plant_metabolic_active_carbon_remaining == 0.0
+        assert layer.plant_structural_active_carbon_remaining == 0.0
+        assert layer.plant_structural_slow_carbon_loss == 0.0
+        assert layer.plant_structural_slow_carbon_remaining == 0.0
         assert layer.soil_metabolic_active_carbon_loss == 2.6
         assert layer.soil_metabolic_active_carbon_remaining == 2.7
         assert layer.soil_structural_active_carbon_loss == 2.8
