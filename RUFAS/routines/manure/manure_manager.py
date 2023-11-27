@@ -256,6 +256,7 @@ class ManureManager:
             ManureTreatmentType.ANAEROBIC_DIGESTION: ManureType.LIQUID,
             ManureTreatmentType.ANAEROBIC_DIGESTION_AND_LAGOON_WITH_SPLIT: ManureType.LIQUID,
             ManureTreatmentType.COMPOST_BEDDED_PACK_BARN: ManureType.SOLID,
+            ManureTreatmentType.OPEN_LOTS: ManureType.SOLID,
         }
         return manure_type_by_treatment_type[treatment_type]
 
