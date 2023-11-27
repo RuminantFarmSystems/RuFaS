@@ -255,11 +255,11 @@ class ReportGenerator:
         report_data: Dict[str, List[Any]] = {}
         for key in filtered_pool.keys():
             is_data_in_dict = isinstance(filtered_pool[key]["values"][0], dict)
+            if is_data_in_dict and selected_variables is None:
+                raise KeyError(
+                    "Can't generate report, use 'variables' arg to select items from data"
+                )
             if is_data_in_dict:
-                if selected_variables is None:
-                    raise KeyError(
-                        "Can't generate report, use 'variables' arg to select items from data"
-                    )
                 temp_data = Utility.convert_list_of_dicts_to_dict_of_lists(
                     filtered_pool[key]["values"][slice_start:slice_end]
                 )
