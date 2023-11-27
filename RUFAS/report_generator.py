@@ -128,7 +128,7 @@ AGGREGATION_FUNCTIONS: Dict[str, Callable[[List[float]], float]] = {
     "product": product_aggregator,
     "SD": sd_aggregator,
     "sum": sum_aggregator,
-    "subtraction": subtraction_aggregator
+    "subtraction": subtraction_aggregator,
 }
 
 
@@ -165,7 +165,7 @@ class ReportGenerator:
         """
         selected_variables = filter_content.get("variables")
         slice_start = filter_content.get("slice_start", 0)
-        slice_end = filter_content.get("slice_end", 0)
+        slice_end = filter_content.get("slice_end")
         report_data = self._prepare_report_data(
             filtered_pool, selected_variables, slice_start, slice_end
         )
@@ -201,16 +201,22 @@ class ReportGenerator:
                 return [vertical_aggregator(horizontally_aggregated)]
             else:
                 vertically_aggregated = [
-                    vertical_aggregator(data_series) for _, data_series in report_data.items()
+                    vertical_aggregator(data_series)
+                    for _, data_series in report_data.items()
                 ]
                 return [horizontal_aggregator(vertically_aggregated)]
         elif horizontal_aggregator:
             return [
-                horizontal_aggregator([report_data[key][i] for key in report_data.keys()])
+                horizontal_aggregator(
+                    [report_data[key][i] for key in report_data.keys()]
+                )
                 for i in range(number_of_elements)
             ]
         elif vertical_aggregator:
-            return [vertical_aggregator(data_series) for _, data_series in report_data.items()]
+            return [
+                vertical_aggregator(data_series)
+                for _, data_series in report_data.items()
+            ]
 
         raise ValueError(
             f"Didn't find `horizontal_aggregation` or `vertical_aggregation` in {filter_content.get('name')}."
@@ -242,7 +248,7 @@ class ReportGenerator:
             Starting index for slicing data elements.
 
         slice_end : int
-            Ending index for slicing; slices to end if set to 0.
+            Ending index for slicing.
 
         Returns
         -------
@@ -263,11 +269,7 @@ class ReportGenerator:
                         "Can't generate report, use 'variables' arg to select items from data"
                     )
                 temp_data = Utility.convert_list_of_dicts_to_dict_of_lists(
-                    filtered_pool[key]["values"][
-                        slice_start: slice_end
-                        if slice_end != 0
-                        else len(filtered_pool[key]["values"])
-                    ]
+                    filtered_pool[key]["values"][slice_start:slice_end]
                 )
                 for temp_key, temp_values in temp_data.items():
                     if temp_key not in selected_variables:
@@ -278,15 +280,11 @@ class ReportGenerator:
                         report_data[temp_key] = temp_values
             else:
                 if key in report_data:
-                    report_data[key].extend(filtered_pool[key]["values"][
-                        slice_start: slice_end
-                        if slice_end != 0
-                        else len(filtered_pool[key]["values"])
-                    ])
+                    report_data[key].extend(
+                        filtered_pool[key]["values"][slice_start:slice_end]
+                    )
                 else:
                     report_data[key] = filtered_pool[key]["values"][
-                        slice_start: slice_end
-                        if slice_end != 0
-                        else len(filtered_pool[key]["values"])
+                        slice_start:slice_end
                     ]
         return report_data
