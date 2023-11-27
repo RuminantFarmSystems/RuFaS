@@ -1192,6 +1192,7 @@ class Cow(HeiferIII):
                     self.days_born, sim_day, const.DO_NOT_BREED)
                 self.do_not_breed = True
             return True
+     
 
     # Cull methods
     def cull_update(self, sim_day):
