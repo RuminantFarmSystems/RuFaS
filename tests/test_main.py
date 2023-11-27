@@ -1,12 +1,10 @@
 import argparse
-import os.path
 from pathlib import Path
 from mock import patch
 
 import pytest
 from pytest_mock import MockerFixture
 
-from config import global_variables
 from main import (
     CaseInsensitiveArgumentAction,
     execute_simulations,
@@ -21,9 +19,6 @@ from main import (
 from RUFAS.simulation_engine import SimulationEngine
 from RUFAS.input_manager import InputManager
 from RUFAS.output_manager import OutputManager, LogVerbosity
-
-dir_path = os.path.join(global_variables.ROOT_DIR, "input")
-file_path = os.path.join(dir_path, "input/ARL.json")
 
 
 @pytest.mark.parametrize(
