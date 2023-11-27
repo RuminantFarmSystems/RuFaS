@@ -1,5 +1,10 @@
+from typing import List
+
 from RUFAS.output_manager import OutputManager
 from RUFAS.routines.animal.ration.ration_driver import RationReporter
+from RUFAS.routines.animal.life_cycle.heiferII import HeiferII
+from RUFAS.routines.animal.life_cycle.heiferIII import HeiferIII
+from RUFAS.routines.animal.life_cycle.cow import Cow
 
 # from RUFAS.routines.animal.pen import Pen
 from RUFAS.routines.animal.manure.general_manure import AnimalManureExcretions
@@ -179,7 +184,6 @@ class AnimalReporter:
             )
 
     def report_animal_module_manure(
-        animal_manager,
         manure_excretions_output_data: dict[str, dict[str | AnimalManureExcretions]],
     ) -> None:
         """
@@ -196,8 +200,8 @@ class AnimalReporter:
         for output_data_dict in manure_excretions_output_data.values():
             for manure_property, manure_value in output_data_dict["manure"].items():
                 info_map = {
-                    "class": animal_manager.__class__.__name__,
-                    "function": animal_manager.daily_updates.__name__,
+                    "class": "AnimalManager",
+                    "function": "daily_updates",
                 }
                 om.add_variable(
                     f'{output_data_dict["prefix"]}_{str(manure_property)}',
@@ -293,26 +297,40 @@ class AnimalReporter:
         om.add_variable("avg_age_for_calving_greater_than_3", avg_age_for_calving_greater_than_3, info_map)
         om.add_variable("cull_reason_stats", life_cycle_manager.cull_reason_stats, info_map)
 
+    def report_sold_animal_information(sold_animals: List[HeiferII | HeiferIII | Cow]) -> None:
+        """
+        Adds a dictionary of sold animal information to the output manager.
 
-def report_sold_animal_information(sold_animals):
-    """
-    Adds a dictionary of sold animal information to the output manager.
+        Parameters
+        ----------
+        sold_animals : List[HeiferII|HeiferIII|Cow]
+            List of sold animal objects.
 
-    Parameters
-    ----------
-    sold_animals : List[HeiferII|HeiferIII|Cow]
-        List of sold animal objects.
-
-    """
-    info_map = {
-        "class": "life_cycle_manager",
-        "function": "daily_update",
-    }
-    sold_report = {}
-    for animal in sold_animals:
-        sold_report["animal_type"].append(animal.__class__.name)
-        sold_report["cull_reason"].append(animal.cull_reason)
-        sold_report["body_weight"].append(animal.body_weight)
-        sold_report["days_in_milk"].append(animal.days_in_milk)
-        sold_report["parity"].append(animal.calves)
-    om.add_variable("sold_report", sold_report, info_map)
+        """
+        info_map = {
+            "class": "life_cycle_manager",
+            "function": "daily_update",
+        }
+        sold_report = {
+            "animal_id": [],
+            "animal_type": [],
+            "cull_reason": [],
+            "body_weight": [],
+            "days_in_milk": [],
+            "parity": [],
+        }
+        for animal in sold_animals:
+            sold_report["animal_id"].append(animal.id)
+            sold_report["animal_type"].append(animal.__class__.__name__)
+            if hasattr(animal, "cull_reason"):
+                sold_report["cull_reason"].append(animal.cull_reason)
+            else:
+                sold_report["cull_reason"].append("Just for funsies")  # TODO TOdon't actually report this
+            sold_report["body_weight"].append(animal.body_weight)
+            if hasattr(animal, "days_in_milk"):
+                sold_report["days_in_milk"].append(animal.days_in_milk)
+                sold_report["parity"].append(animal.calves)
+            else:
+                sold_report["days_in_milk"].append("NA")
+                sold_report["parity"].append("NA")
+        om.add_variable("sold_report", sold_report, info_map)

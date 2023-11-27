@@ -1376,7 +1376,7 @@ class AnimalManager:
         ----------
         num_animals: int
             the number of each type of animal (calves, heiferIs, heiferIIs, heiferIIIs, cows, sold_heifers, and
-            culled_cows) for which information will be collected and returned. If num_animals is largerthan the minimum
+            culled_cows) for which information will be collected and returned. If num_animals is larger than the minimum
             length of the animal lists, then num_animals will be set to the minimum length of the animal lists.
 
         Returns : Tuple[List[Tuple[AnimalBase, str, bool]], Dict[str, Dict | int]]
@@ -1984,7 +1984,7 @@ class AnimalManager:
                                       manure_excretions_output_data)
                 pen.call_p_rqmts()
                 pen.daily_p_update()  # Average phosphorus concentration per pen
-
+            AnimalReporter.report_animal_module_manure(manure_excretions_output_data)
             self._update_phosphorus_concentrations()  # Average phosphorus concentration per animal type
             self.record_pen_history()
 
@@ -2004,10 +2004,13 @@ class AnimalManager:
             self.life_cycle_manager.daily_milk_production = self.sum_daily_milk(
                 self.cows
             )
-            # TODO put all these in one big method for the daily reports
             for pen in self.all_pens:
                 AnimalReporter.report_pen_manure_properties(pen)
                 if pen.animal_combination.name == "LAC_COW":
                     AnimalReporter.report_milk(pen, self.simulation_day)
             AnimalReporter.report_daily_animal_population(self)
             AnimalReporter.report_daily_ration(self)
+            
+            AnimalReporter.report_sold_animal_information(self.life_cycle_manager.sold_heifers +
+                                                          self.life_cycle_manager.culled_heifers +
+                                                          self.life_cycle_manager.culled_cows)

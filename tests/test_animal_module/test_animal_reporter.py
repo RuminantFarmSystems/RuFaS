@@ -10,9 +10,7 @@ from RUFAS.routines.animal.animal_reporter import om
 
 @pytest.fixture
 def animal_manager_fixture(mocker: MockerFixture):
-    mocker.patch(
-        "RUFAS.routines.animal.animal_manager.AnimalManager.__init__", return_value=None
-    )
+    mocker.patch("RUFAS.routines.animal.animal_manager.AnimalManager.__init__", return_value=None)
     animal_manager = AnimalManager(
         data=mocker.MagicMock(),
         config=mocker.MagicMock(),
@@ -56,9 +54,7 @@ def test___init__():
 def test_report_daily_animal_population(mocker: MockerFixture):
     """Unit test for function report_daily_animal_population in file
     routines/animal/ration/animal_reporter.py"""
-    mocker.patch(
-        "RUFAS.routines.animal.animal_manager.AnimalManager.__init__", return_value=None
-    )
+    mocker.patch("RUFAS.routines.animal.animal_manager.AnimalManager.__init__", return_value=None)
     animal_manager = AnimalManager(
         data=mocker.MagicMock(),
         config=mocker.MagicMock(),
@@ -94,9 +90,7 @@ def test_report_daily_animal_population(mocker: MockerFixture):
 
     AnimalReporter.report_daily_animal_population(animal_manager)
 
-    report_daily_animal_total = om.variables_pool[
-        "AnimalReporter.report_daily_animal_population.num_animals"
-    ]["values"]
+    report_daily_animal_total = om.variables_pool["AnimalReporter.report_daily_animal_population.num_animals"]["values"]
     assert report_daily_animal_total == [
         sum(
             (
@@ -109,9 +103,7 @@ def test_report_daily_animal_population(mocker: MockerFixture):
         )
     ]
 
-    assert om.variables_pool["AnimalReporter.report_daily_animal_population.num_animals"][
-        "info_maps"
-    ] == [{}]
+    assert om.variables_pool["AnimalReporter.report_daily_animal_population.num_animals"]["info_maps"] == [{}]
 
 
 def test_report_milk(mocker: MockerFixture):
@@ -134,9 +126,7 @@ def test_report_milk(mocker: MockerFixture):
     pen.animals_in_pen = [mocker.MagicMock(), mocker.MagicMock(), mocker.MagicMock()]
     for idx, animal in enumerate(pen.animals_in_pen):
         animal.days_in_milk = test_milk_data_update["days_in_milk"]
-        animal.estimated_daily_milk_produced = test_milk_data_update[
-            "estimated_daily_milk_produced"
-        ]
+        animal.estimated_daily_milk_produced = test_milk_data_update["estimated_daily_milk_produced"]
         animal.mPrt = test_milk_data_update["milk_protein"]
         animal.fat_percent = test_milk_data_update["milk_fat"]
         animal.lactose_milk = test_milk_data_update["milk_lactose"]
@@ -147,9 +137,11 @@ def test_report_milk(mocker: MockerFixture):
     # act
     AnimalReporter.report_milk(pen, simulation_day)
     # assert
-    assert om.variables_pool["cow.milking_update.milk_data_at_milk_update"][
-        "values"
-    ] == [test_milk_data_update, test_milk_data_update, test_milk_data_update]
+    assert om.variables_pool["cow.milking_update.milk_data_at_milk_update"]["values"] == [
+        test_milk_data_update,
+        test_milk_data_update,
+        test_milk_data_update,
+    ]
 
 
 def test_report_ration_interval_data(animal_manager_fixture, mocker: MockerFixture):
@@ -188,21 +180,21 @@ def test_report_ration_interval_data(animal_manager_fixture, mocker: MockerFixtu
     AnimalReporter.report_ration_interval_data(animal_manager_fixture, feed)
 
     for i in range(1, 2):
-        assert om.variables_pool[
-            f"AnimalReporter.report_ration_interval_data.ration_nutrient_amount_pen_{i}_combo{i}"
-        ]["values"] == [test_data["ration_nutrient_amount"]]
+        assert om.variables_pool[f"AnimalReporter.report_ration_interval_data.ration_nutrient_amount_pen_{i}_combo{i}"][
+            "values"
+        ] == [test_data["ration_nutrient_amount"]]
 
-        assert om.variables_pool[
-            f"AnimalReporter.report_ration_interval_data.MEdiet_pen_{i}_combo{i}"
-        ]["values"] == [test_data["MEdiet"]]
+        assert om.variables_pool[f"AnimalReporter.report_ration_interval_data.MEdiet_pen_{i}_combo{i}"]["values"] == [
+            test_data["MEdiet"]
+        ]
 
-        assert om.variables_pool[
-            f"AnimalReporter.report_ration_interval_data.avg_rqmts_pen_{i}_combo{i}"
-        ]["values"] == [test_data["avg_nutrient_rqmts"]]
+        assert om.variables_pool[f"AnimalReporter.report_ration_interval_data.avg_rqmts_pen_{i}_combo{i}"][
+            "values"
+        ] == [test_data["avg_nutrient_rqmts"]]
 
-        assert om.variables_pool[
-            f"AnimalReporter.report_ration_interval_data.ration_per_animal_for_pen_{i}_combo{i}"
-        ]["values"] == [test_data["formatted_ration"]]
+        assert om.variables_pool[f"AnimalReporter.report_ration_interval_data.ration_per_animal_for_pen_{i}_combo{i}"][
+            "values"
+        ] == [test_data["formatted_ration"]]
 
         assert om.variables_pool[
             f"AnimalReporter.report_ration_interval_data.ration_supply_report_for_pen_{i}_combo{i}"
@@ -231,18 +223,35 @@ def test_report_daily_ration(animal_manager_fixture, mocker: MockerFixture):
     AnimalReporter.report_daily_ration(animal_manager_fixture)
 
     for i in range(1, 2):
-        assert om.variables_pool[
-            f"AnimalReporter.report_daily_ration.ration_daily_feed_totals_for_pen_{i}_combo{i}"
-        ]["values"] == [test_data[f"formatted_ration_{i}"]]
+        assert om.variables_pool[f"AnimalReporter.report_daily_ration.ration_daily_feed_totals_for_pen_{i}_combo{i}"][
+            "values"
+        ] == [test_data[f"formatted_ration_{i}"]]
 
 
 def test_report_animal_module_manure():
-    pass
+    test_output_dict = {"prefix": "dummy", "manure": {"property1": 100, "property2": 200}}
+    test_dict = {"example": test_output_dict}
+
+    AnimalReporter.report_animal_module_manure(test_dict)
+
+    for i in range(1, 2):
+        assert om.variables_pool[f"AnimalManager.daily_updates.dummy_property{i}"]["values"] == [100 * i]
 
 
-def test_report_pen_manure():
-    pass
+def test_report_pen_manure(mocker: MockerFixture):
+    dummy_pen = mocker.MagicMock()
+    dummy_pen.id = 1
+    dummy_pen.animal_combination._name_ = "dummy_name"
+    dummy_pen.manure = {"dummy_dict": 100}
+
+    AnimalReporter.report_pen_manure(dummy_pen)
+
+    assert om.variables_pool["pen.calc_manure.pen_manure_data"]["values"] == [dummy_pen.manure]
 
 
 def test_report_life_cycle_manager_data():
+    pass
+
+
+def test_report_sold_animal_information():
     pass
