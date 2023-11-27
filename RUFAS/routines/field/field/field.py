@@ -452,6 +452,19 @@ class Field:
 
         unmet_nitrogen_demand = max(0.0, requested_nitrogen - supplied_nitrogen)
         unmet_phosphorus_demand = max(0.0, requested_phosphorus - supplied_phosphorus)
+
+        if not unmet_nitrogen_demand and not unmet_phosphorus_demand:
+            return
+
+        if not self.field_data.backfill_manure_nutrient_deficiencies:
+            warning_name = "nutrient_deficient_manure_application"
+            warning_message = f"Manure nitrogen deficient by {unmet_nitrogen_demand} kg, manure phosphorus " \
+                              f"deficient by {unmet_phosphorus_demand} kg."
+            info_map = {"class": self.__class__.__name__, "function": self._execute_manure_application.__name__,
+                        "prefix": f"field='{self.field_data.name}'", "year": year, "day": day}
+            om.add_warning(warning_name, warning_message, info_map)
+            return
+
         if unmet_nitrogen_demand == 0.0 and unmet_phosphorus_demand == 0.0:
             return
         elif unmet_nitrogen_demand > 0.0 and unmet_phosphorus_demand == 0.0:
