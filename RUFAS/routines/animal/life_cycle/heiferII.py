@@ -15,7 +15,7 @@ from __future__ import annotations
 
 import math
 from random import random
-from typing import Literal
+from typing import Literal, Any
 
 from scipy.stats import truncnorm
 
@@ -412,10 +412,6 @@ class HeiferII(HeiferI):
         if not estrus_detected:
             return False
 
-        should_perform_ai = self._compare_randomized_rate_less_than(self._get_repro_data('estrus_insemination_rate'))
-        if not should_perform_ai:
-            return False
-
         self.ai_day = self.days_born + 1
         # TODO: Check if we need to subtract 0.05 from a positive conception rate
         self.conception_rate = self._get_repro_data('estrus_conception_rate')
@@ -482,14 +478,22 @@ class HeiferII(HeiferI):
         return AnimalBase.config['breeding_start_day_h']
 
     @staticmethod
-    def _get_repro_data(attribute: str):
+    def _get_repro_data(attribute: str) -> Any:
         return AnimalBase.config['heifers'][attribute]
+
+    @staticmethod
+    def _get_repro_sub_protocol() -> str:
+        return HeiferII._get_repro_data('repro_sub_protocol')
+
+    @staticmethod
+    def _get_repro_sub_properties() -> dict:
+        return HeiferII._get_repro_data('repro_sub_properties')
 
     def execute_tai_protocol(self, sim_day: int):
         if self.days_born == self._get_breeding_start_day():
             self.tai_program_start_day = self._get_breeding_start_day()
 
-        tai_sub_protocol = self._get_repro_data('repro_protocols')['TAI']['sub_protocol']
+        tai_sub_protocol = self._get_repro_sub_protocol()
 
         hormone_delivery_schedule = HormoneDeliverySchedule.get_schedule('heifers', tai_sub_protocol)
         if hormone_delivery_schedule is None:
@@ -620,6 +624,7 @@ class HeiferII(HeiferI):
             self._simulate_estrus(self.abortion_day, sim_day, const.ESTRUS_AFTER_ABORTION_NOTE)
         elif self.repro_program == "TAI":
             self.tai_program_start_day = self.abortion_day + 1
+            # TODO: Should I simulate estrus here?
         elif self.repro_program == "synch-ED":
             self.synch_ed_program_day_after_abortion()
 

@@ -13,7 +13,7 @@
 	"animal_config": {
 		"management_decisions": {
 			"breeding_start_day_h": 380,
-			"heifer_repro_method": "ED",
+			"heifer_repro_method": "TAI",
 			"cow_repro_method": "TAI",
 			"semen_type": "conventional",
 			"days_in_preg_when_dry": 218,
@@ -40,52 +40,22 @@
                 "calving_interval": 400,
 				"heifers": {
 					"estrus_detection_rate": 0.6,
-					"estrus_insemination_rate": 1,
 					"estrus_conception_rate": 0.6,
-					"repro_protocols": {
-						"ED": {
-							"sub_protocol": null,
-							"properties": {}
-						},
-						"TAI": {
-							"sub_protocol": "md5CG2P",
-							"properties": {}
-						},
-						"SynchED": {
-							"sub_protocol": "2P",
-							"properties": {}
-						}
+					"repro_sub_protocol": "md5CG2P",
+					"repro_sub_properties": {
+						"conception_rate": 0.6,
+						"estrus_detection_rate": 0.7
 					}
 				},
 				"cows": {
 					"estrus_detection_rate": 0.6,
-					"estrus_insemination_rate": 1,
 					"estrus_conception_rate": 0.6,
-					"repro_protocols": {
-						"Presynch": {
-							"sub_protocol": "Double OvSynch",
-							"properties": {}
-						},
-						"TAI": {
-							"sub_protocol": "OvSynch 56",
-							"properties": {
-								"tai_program_start_day": 40
-							}
-						},
-						"Resynch": {
-							"sub_protocol": "TAIafterPD",
-							"properties": {}
-						},
-						"ED": {
-							"sub_protocol": null,
-							"properties": {}
-						},
-						"ED-TAI": {
-							"sub_protocol": "OvSynch 56",
-							"properties": {
-								"tai_program_start_day": 70
-							}
-						}
+					"presynch_protocol": "Double OvSynch",
+                    "resynch_protocol": "TAIafterPD",
+                    "repro_sub_protocol": "OvSynch 56",
+					"repro_sub_properties": {
+						"conception_rate": 0.5,
+						"tai_program_start_day": 70
 					}
 				},
                 "heifer_repro_programs": {
@@ -120,7 +90,7 @@
 				"target_heifer_preg_day": 420,
 				"mature_body_weight_avg": 740.1,
         		"mature_body_weight_std": 73.5
-			}		
+			}
 		},
 		"from_literature": {
 			"repro": {
