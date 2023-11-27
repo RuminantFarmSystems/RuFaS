@@ -18,7 +18,7 @@
             "saturated_hydraulic_conductivity": 9.17,
             "initial_temperature": 15.77575,
             "bulk_density": 1.34,
-            "percent_organic_carbon_content": 0.012,
+            "percent_organic_carbon_content": 2.32,
             "percent_clay_content": 21.95,
             "percent_silt_content": 63.42,
             "percent_sand_content": 14.63,
@@ -33,8 +33,7 @@
             "denitrification_threshold_water_content": 1.1,
             "residue_fresh_organic_mineralization_rate": 0.05,
             "denitrification_rate": 0.1,
-            "active_N_percent": 0.02,
-            "OM_percent": 0.04
+            "active_N_percent": 0.02
         },
         {
             "bottom_depth": 1041.4,
@@ -45,7 +44,7 @@
             "saturated_hydraulic_conductivity": 9.17,
             "initial_temperature": 14.50797297,
             "bulk_density": 1.42,
-            "percent_organic_carbon_content": 0.012,
+            "percent_organic_carbon_content": 0.348,
             "percent_clay_content": 27.27,
             "percent_silt_content": 59.09,
             "percent_sand_content": 13.64,
@@ -60,8 +59,7 @@
             "denitrification_threshold_water_content": 1.1,
             "residue_fresh_organic_mineralization_rate": 0.05,
             "denitrification_rate": 0.1,
-            "active_N_percent": 0.02,
-            "OM_percent": 0.006
+            "active_N_percent": 0.02
         },
         {
             "bottom_depth": 1168.4,
@@ -72,7 +70,7 @@
             "saturated_hydraulic_conductivity": 23.29,
             "initial_temperature": 13.38623,
             "bulk_density": 1.6,
-            "percent_organic_carbon_content": 0.012,
+            "percent_organic_carbon_content": 0.145,
             "percent_clay_content": 22.33,
             "percent_silt_content": 63.11,
             "percent_sand_content": 14.56,
@@ -87,8 +85,7 @@
             "denitrification_threshold_water_content": 1.1,
             "residue_fresh_organic_mineralization_rate": 0.05,
             "denitrification_rate": 0.1,
-            "active_N_percent": 0.02,
-            "OM_percent": 0.0025
+            "active_N_percent": 0.02
         },
         {
             "bottom_depth": 2006.6,
@@ -99,7 +96,7 @@
             "saturated_hydraulic_conductivity": 23.29,
             "initial_temperature": 13.38623,
             "bulk_density": 1.5,
-            "percent_organic_carbon_content": 0.012,
+            "percent_organic_carbon_content": 0.145,
             "percent_clay_content": 13.04,
             "percent_silt_content": 70.66,
             "percent_sand_content": 16.30,
@@ -114,8 +111,7 @@
             "denitrification_threshold_water_content": 1.1,
             "residue_fresh_organic_mineralization_rate": 0.05,
             "denitrification_rate": 0.1,
-            "active_N_percent": 0.02,
-            "OM_percent": 0.0025
+            "active_N_percent": 0.02
         }
     ]
 }
