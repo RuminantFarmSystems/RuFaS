@@ -334,9 +334,9 @@ class ManureManager:
         and checks against the nutrients available in the manager.
 
         If the request can be fulfilled either partially or wholly, the corresponding amount of nutrients
-        is subtracted from the manager's internal bookkeeping. The method then returns the results of the nutrient request,
-        which detail the amounts of nutrients that can be provided to fulfill the request. If the request
-        cannot be fulfilled at all, the method will return None.
+        is subtracted from the manager's internal bookkeeping. The method then returns the results of
+        the nutrient request, which detail the amounts of nutrients that can be provided to fulfill the request.
+        If the request cannot be fulfilled at all, the method will return None.
 
         Notes
         -----
