@@ -163,11 +163,11 @@ class ReportGenerator:
         ValueError
             If the report data is empty or if the necessary aggregation keys are not found in filter_content.
         """
-        selected_variables = filter_content.get("variables")
-        slice_start = filter_content.get("slice_start", 0)
-        slice_end = filter_content.get("slice_end")
         report_data = self._prepare_report_data(
-            filtered_pool, selected_variables, slice_start, slice_end
+            filtered_pool,
+            selected_variables=filter_content.get("variables"),
+            slice_start=filter_content.get("slice_start", 0),
+            slice_end=filter_content.get("slice_end"),
         )
         if not report_data:
             raise ValueError(
