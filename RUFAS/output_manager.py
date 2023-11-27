@@ -751,7 +751,7 @@ class OutputManager(object):
         filters_dir_path: Path = Path("output/output_filters/"),
         exclude_info_maps: bool = False,
         produce_graphics: bool = True,
-        graphics_dir: Path = Path(""),
+        graphics_dir: Path = Path("output/graphics"),
         csvs_dir: Path = Path("output/CSVs/")
     ) -> None:
         """
@@ -774,6 +774,9 @@ class OutputManager(object):
 
         graphics_dir : Path, optional
             The directory for saving graphics.
+
+        csvs_dir : Path, optional
+            The directory for saving csvs.
         """
         info_map = {
             "class": self.__class__.__name__,
@@ -1109,7 +1112,15 @@ class OutputManager(object):
         Parameters
         ----------
         path : Path
-            The path where the dir will be created if it does not already exist.
+            The path where the directorygit a will be created if it does not already exist.
+
+        Raises
+        ------
+        PermissionError
+            If the user does not have necessary permissions to create a directory in the location provided.
+
+        Exception
+            If an unexpected error occurred while trying to create the directory.
         """
         info_map = {"class": self.__class__.__name__,
                     "function": self.create_directory.__name__}
