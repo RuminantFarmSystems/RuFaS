@@ -265,7 +265,8 @@ class ManureManager:
         """
         Look up the density of manure produced by a given pen.
         This method determines the manure density based on the type of manure treatment system of a given pen.
-        Each manure type (SLURRY, LIQUID, SOLID) has a predefined density, which is specified in the class :class:`ManureConstants`.
+        Each manure type (SLURRY, LIQUID, SOLID) has a predefined density,
+        which is specified in the class :class:`ManureConstants`.
 
         Parameters
         ----------
@@ -307,9 +308,10 @@ class ManureManager:
         Returns
         -------
         None
-
         """
-        # TODO: With the introduction of different manure types, we should rename attributes in ManureTreatmentDailyOutput
+
+        # TODO: With the introduction of different manure types, we should
+        # rename attributes in ManureTreatmentDailyOutput
         # to make it more generic and not specific to any manure type.
         self._manure_nutrient_manager.add_nutrients(
             ManureNutrients(
@@ -348,7 +350,8 @@ class ManureManager:
         -------
         NutrientRequestResults | None
             The results of the nutrient request, detailed in a `NutrientRequestResults` object, which includes
-            the amount of nitrogen, phosphorus, total manure mass, dry matter, and others that can be provided to fulfill the request.
+            the amount of nitrogen, phosphorus, total manure mass, dry matter, and others that
+            can be provided to fulfill the request.
             Returns None if the request cannot be fulfilled.
 
         """
@@ -601,7 +604,8 @@ class ManureManager:
 
         Returns
         -------
-        Tuple[ManureTreatmentDailyOutput, Optional[ManureSeparatorDailyOutput], ManureTreatmentDailyOutput, ManureTreatmentDailyOutput]
+        Tuple[ManureTreatmentDailyOutput, Optional[ManureSeparatorDailyOutput],
+        ManureTreatmentDailyOutput, ManureTreatmentDailyOutput]
             The daily output of the anaerobic digestion,
             the daily output of the manure separator,
             the daily output of the anaerobic lagoon, and
