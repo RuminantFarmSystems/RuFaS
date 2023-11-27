@@ -194,3 +194,16 @@ def test_prepare_report_data_invalid_no_variables(
     }
     with pytest.raises(KeyError):
         report_generator._prepare_report_data(filtered_pool, None, 0, 0)
+
+
+def test_prepare_report_data_aggregate_values(report_generator: ReportGenerator) -> None:
+    filtered_pool: Dict[str, Dict[str, List[Dict[str, int]]]] = {
+        "data1": {"values": [{"a": 1, "b": 2}, {"a": 3, "b": 4}]},
+        "data2": {"values": [{"a": 5, "b": 6}, {"a": 7, "b": 8}]},
+    }
+    actual = report_generator._prepare_report_data(filtered_pool, ["a", "b"], 0, None)
+    expected = {
+        "a": [1, 3, 5, 7],
+        "b": [2, 4, 6, 8],
+    }
+    assert actual == expected
