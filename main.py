@@ -94,7 +94,6 @@ def run_rufas(
         return
 
     if clear_output:
-        output_manager = OutputManager()
         output_manager.clear_output_dir(vars_file_path, output_dir)
 
     metadata_files: List[MetadataPaths] = METADATA_PATHS
