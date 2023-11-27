@@ -53,8 +53,8 @@ def test___init__():
     pass
 
 
-def test_report_daily_animal_data(mocker: MockerFixture):
-    """Unit test for function report_daily_animal_data in file
+def test_report_daily_animal_population(mocker: MockerFixture):
+    """Unit test for function report_daily_animal_population in file
     routines/animal/ration/animal_reporter.py"""
     mocker.patch(
         "RUFAS.routines.animal.animal_manager.AnimalManager.__init__", return_value=None
@@ -92,10 +92,10 @@ def test_report_daily_animal_data(mocker: MockerFixture):
         cow.is_lactating = True
     animal_manager.cows[0].is_lactating = False
 
-    AnimalReporter.report_daily_animal_data(animal_manager)
+    AnimalReporter.report_daily_animal_population(animal_manager)
 
     report_daily_animal_total = om.variables_pool[
-        "AnimalReporter.report_daily_animal_data.num_animals"
+        "AnimalReporter.report_daily_animal_population.num_animals"
     ]["values"]
     assert report_daily_animal_total == [
         sum(
@@ -109,7 +109,7 @@ def test_report_daily_animal_data(mocker: MockerFixture):
         )
     ]
 
-    assert om.variables_pool["AnimalReporter.report_daily_animal_data.num_animals"][
+    assert om.variables_pool["AnimalReporter.report_daily_animal_population.num_animals"][
         "info_maps"
     ] == [{}]
 
@@ -234,3 +234,15 @@ def test_report_daily_ration(animal_manager_fixture, mocker: MockerFixture):
         assert om.variables_pool[
             f"AnimalReporter.report_daily_ration.ration_daily_feed_totals_for_pen_{i}_combo{i}"
         ]["values"] == [test_data[f"formatted_ration_{i}"]]
+
+
+def test_report_animal_module_manure():
+    pass
+
+
+def test_report_pen_manure():
+    pass
+
+
+def test_report_life_cycle_manager_data():
+    pass

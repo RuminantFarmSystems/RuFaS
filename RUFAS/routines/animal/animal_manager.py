@@ -1976,17 +1976,6 @@ class AnimalManager:
 
             self._handle_newly_added_animals([*animals_added, *calves_born], feed, temp)
 
-            info_map = {"class": self.__class__.__name__, "function": self.daily_updates.__name__}
-            om.add_variable('sim_day', self.simulation_day, info_map)
-            om.add_variable('num_animals', len(self.calves) + len(self.heiferIs) + len(self.heiferIIs) +
-                            len(self.heiferIIIs) + len(self.cows), info_map)
-            om.add_variable('num_calves', len(self.calves), info_map)
-            om.add_variable('num_heiferIs', len(self.heiferIs), info_map)
-            om.add_variable('num_heiferIIs', len(self.heiferIIs), info_map)
-            om.add_variable('num_heiferIIIs', len(self.heiferIIIs), info_map)
-            om.add_variable('num_lactating_cows', len([cow for cow in self.cows if cow.is_lactating]), info_map)
-            om.add_variable('num_dry_cows', len([cow for cow in self.cows if not cow.is_lactating]), info_map)
-
             manure_excretions_output_data = {}
             for pen in self.all_pens:
                 pen.classes_in_pen = self._get_classes_in_pen(pen)
@@ -1995,17 +1984,6 @@ class AnimalManager:
                                       manure_excretions_output_data)
                 pen.call_p_rqmts()
                 pen.daily_p_update()  # Average phosphorus concentration per pen
-
-            # TODO make this a new method
-            for output_data_dict in manure_excretions_output_data.values():
-                for manure_property, manure_value in output_data_dict['manure'].items():
-                    info_map = {
-                        'class': self.__class__.__name__,
-                        'function': self.daily_updates.__name__,
-                    }
-                    om.add_variable(f'{output_data_dict["prefix"]}_{str(manure_property)}',
-                                    manure_value,
-                                    info_map=info_map)
 
             self._update_phosphorus_concentrations()  # Average phosphorus concentration per animal type
             self.record_pen_history()
@@ -2028,7 +2006,8 @@ class AnimalManager:
             )
             # TODO put all these in one big method for the daily reports
             for pen in self.all_pens:
+                AnimalReporter.report_pen_manure_properties(pen)
                 if pen.animal_combination.name == "LAC_COW":
                     AnimalReporter.report_milk(pen, self.simulation_day)
-            AnimalReporter.report_daily_animal_data(self)
+            AnimalReporter.report_daily_animal_population(self)
             AnimalReporter.report_daily_ration(self)

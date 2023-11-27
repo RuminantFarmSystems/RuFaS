@@ -422,7 +422,7 @@ class Pen:
         self.update_animal_combination(animal_combination)
         self.update_classes_in_pen()
 
-    def calc_manure(self, feed: Feed, methane_model: str):  # noqa
+    def calc_manure(self, feed, methane_model: str):  # noqa
         """
         Calculate the manure excretion of the animals in the pen.
 
@@ -482,14 +482,6 @@ class Pen:
         self.heifer_total = heifer_total
         self.dry_total = dry_total
         self.lactating_total = lactating_total
-
-        info_map = {"class": self.__class__.__name__,
-                    "function": self.calc_manure.__name__,
-                    "pen_id": self.id,
-                    "pen_animal_combination": self.animal_combination._name_,
-                    }
-
-        om.add_variable("pen_manure_data", self.manure, info_map)
 
     def _copy_manure_template(self):
         return copy.deepcopy(self._manure_dict_template)
@@ -831,15 +823,6 @@ class Pen:
                                                                 methane_mitigation_additive_amount)
             self._update_animal_manure_excretion_data(manure_excretions_output_data, prefix, manure, animal)
             self.manure = add_animal_manure_excretions(self.manure, animal.manure_excretion)
-
-        for manure_property, manure_value in self.manure.items():
-            info_map = {
-                'class': self.__class__.__name__,
-                'function': self.calc_total_manure.__name__,
-            }
-            om.add_variable(f'pen_{self.id}_daily_{str(manure_property)}',
-                            manure_value,
-                            info_map=info_map)
 
     def _set_animal_nutrient_values(self, animal, animal_grouping_scenario,
                                     feed, temp, phosphorus_concentration) -> None:
