@@ -1,4 +1,4 @@
-from typing import Optional, List, Dict
+from typing import Optional
 from dataclasses import dataclass
 from RUFAS.routines.field.crop.dormancy import Dormancy
 from RUFAS.routines.field.crop_and_soil_constants import LITERS_TO_CUBIC_MILLIMETERS, HECTARES_TO_SQUARE_MILLIMETERS
@@ -6,68 +6,82 @@ from RUFAS.routines.field.crop_and_soil_constants import LITERS_TO_CUBIC_MILLIME
 
 @dataclass(kw_only=True)
 class FieldData:
-    """data object to track the field-specific variables"""
+    """
+    Data object to track the field-specific variables.
 
-    # --- Soil Management Variables ---
-    is_amendment_day: bool = False
-    """should nutrients be added to the soil today?"""
-    is_tillage_day: bool = False
-    """should the soil be tilled today?"""
+    Attributes
+    ----------
+    name : str, optional
+        Name of this field for identification purposes.
+    absolute_latitude : float, default=43.5
+        The absolute latitude value (degrees above or below equator) where field is located (degrees).
+    longitude : float, default=-88.6
+        The longitude value of where the field is located (degrees).
+    minimum_daylength : float, default=6.33
+        Shortest day of the year for this watershed (hours).
+    dormancy_threshold_daylength : float, optional
+        Threshold daylength to initiate dormancy in a plant (hours).
+    current_residue : float, default=0.0
+        Total amount of residue on the current day (kg per hectare).
+    transpiration : float, default=0.0
+        Total amount of water lost to transpiration in the field on the current day (mm).
+    max_transpiration : float, default=0.0
+        Maximum possible amount of water that could be lost to transpiration in the field for the current day (mm).
+    max_evapotranspiration : float, default=0.0
+        Maximum possible amount of water that could be lost to evapotranspiration in the field for the current day (mm).
+    seasonal_high_water_table : bool, default=False
+        Does the Hydrologic Response Unit containing this field have a seasonally high water table.
+    field_size : float, default=1.0
+        Size of the field (ha).
+    backfill_manure_nutrient_deficiencies : bool, default=False
+        Supplement manure applications that do not meet requested nutrient amount with chemical fertilizers.
+    watering_amount_in_liters : float, optional
+        User-supplied amount of water to be applied to the field over a specified interval of days (liters).
+    watering_amount_in_mm : float, default=0.0
+        Amount of water to be applied to the field over a specified interval of days (mm).
+    watering_interval : int, optional
+        Number of days over which the specified amount of water needs to be applied.
+    days_into_watering_interval : int, default=0.0
+        Number of days since the start of the current watering interval.
+    current_water_deficit : float, default=0.0
+        Amount of water that still needs to be applied to the field in the current interval (mm).
+    watering_occurs : bool, default=True
+        Status indicating if this field is watered at all.
+    annual_irrigation_water_use_total : float, default=0.0
+        Cumulative total of water used for irrigation in a year (mm).
 
-    # --- Crop management Variables ---
-    use_scheduled_harvest: bool = True
-    """Should harvesting be done according to user-defined schedule? False will trigger the alternative: heat unit
-    scheduling, whereby harvest operations are conducted to maximize yield (based on heat unit accumulation)."""
-    is_planting_day: bool = False
-    """is today the day to plant new crops?"""
-    absolute_latitude: float = 43.5  # TODO: set default to somewhere other than Wisconsin, or no default?
-    """The absolute latitude value (degrees above or below equator) where field is located (degrees)"""
-    minimum_daylength: float = 6.33  # TODO: set default to somewhere other than Wisconsin, or no default?
-    """Shortest day of the year for this watershed (hours)"""
-    longitude: float = -88.6  # TODO: set default to somewhere other than Wisconsin, or no default?
-    """The longitude value of where the field is located (degrees)."""
-    dormancy_threshold_daylength: Optional[float] = None
-    """Threshold daylength to initiate dormancy in a plant (hours)"""
-    current_residue: float = 0
-    """total amount of residue on the current day (kg per hectare)"""
-    current_crop_config: Optional[List[Dict]] = None
-    """list of dictionaries to configure crops to be planted in the field. The dicts should contain
-    attribute-value pairs, with attributes matching those of CropData."""
+    Methods
+    -------
+    perform_annual_field_reset
+        Resets all cumulative totals that are calculated annually for the field.
+    convert_liters_to_millimeters(liter_amount, field_size)
+        Converts an amount in liters to an amount in mm based on the area the liters are distributed over.
 
-    # --- Field-level Variables ---
+    """
     name: Optional[str] = None
-    """Name of this field for identification purposes."""
+    absolute_latitude: float = 43.5
+    longitude: float = -88.6
+    minimum_daylength: float = 6.33
+    dormancy_threshold_daylength: Optional[float] = None
+    current_residue: float = 0.0
+
     transpiration: float = 0.0
-    """total amount of water lost to transpiration in the field on the current day (mm)"""
     max_transpiration: float = 0.0
-    """maximum possible amount of water that could be lost to transpiration in the field for the current day (mm)"""
     max_evapotranspiration: float = 0.0
-    """maximum possible amount of water that could be lost to evapotranspiration in the field for the current day
-    (mm)"""
-    grazers_present: bool = False
-    """are grazers currently in the field? is grazing occurring?"""
     seasonal_high_water_table: bool = False
-    """if the HRU has a seasonal high water table (true/false)"""
-    field_size: float = 1
-    """size of the field (ha)"""
+    field_size: float = 1.
+    backfill_manure_nutrient_deficiencies: bool = False
 
     # --- Irrigation variables ---
     watering_amount_in_liters: Optional[float] = None
-    """User-supplied amount of water to be applied to the field over a specified interval of days (liters)"""
-    watering_amount_in_mm: float = 0
-    """Amount of water to be applied to the field over a specified interval of days (mm)"""
+    watering_amount_in_mm: float = 0.0
     watering_interval: Optional[int] = None
-    """Number of days over which the specified amount of water needs to be applied."""
     days_into_watering_interval: int = 0
-    """Number of days since the start of the current watering interval."""
-    current_water_deficit: float = 0
-    """Amount of water that still needs to be applied to the field in the current interval (mm)"""
+    current_water_deficit: float = 0.0
     watering_occurs: bool = True
-    """Status indicating if this field is watered at all."""
 
     # --- Annual totals ---
     annual_irrigation_water_use_total: float = 0
-    """Cumulative total of water used for irrigation in a year (mm)"""
 
     def __post_init__(self):
         """Initialize all attributes in FieldData object that need to be set based on other FieldData attributes.
