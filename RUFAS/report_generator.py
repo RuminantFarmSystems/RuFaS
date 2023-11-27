@@ -271,12 +271,5 @@ class ReportGenerator:
                     else:
                         report_data[temp_key] = temp_values
             else:
-                if key in report_data:
-                    report_data[key].extend(
-                        filtered_pool[key]["values"][slice_start:slice_end]
-                    )
-                else:
-                    report_data[key] = filtered_pool[key]["values"][
-                        slice_start:slice_end
-                    ]
+                report_data[key] = filtered_pool[key]["values"][slice_start:slice_end]
         return report_data
