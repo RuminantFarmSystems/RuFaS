@@ -456,7 +456,7 @@ class Field:
         if unmet_nitrogen_demand == 0.0 and unmet_phosphorus_demand == 0.0:
             return
 
-        if not self.field_data.backfill_manure_nutrient_deficiencies:
+        if not self.field_data.supplement_manure_nutrient_deficiencies:
             warning_name = "nutrient_deficient_manure_application"
             warning_message = f"Manure nitrogen deficient by {unmet_nitrogen_demand} kg, manure phosphorus " \
                               f"deficient by {unmet_phosphorus_demand} kg."

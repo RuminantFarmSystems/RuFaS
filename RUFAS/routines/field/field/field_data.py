@@ -33,7 +33,7 @@ class FieldData:
         Does the Hydrologic Response Unit containing this field have a seasonally high water table.
     field_size : float, default=1.0
         Size of the field (ha).
-    backfill_manure_nutrient_deficiencies : bool, default=False
+    supplement_manure_nutrient_deficiencies : bool, default=False
         Supplement manure applications that do not meet requested nutrient amount with chemical fertilizers.
     watering_amount_in_liters : float, optional
         User-supplied amount of water to be applied to the field over a specified interval of days (liters).
@@ -52,7 +52,7 @@ class FieldData:
 
     Methods
     -------
-    perform_annual_field_reset
+    perform_annual_field_reset()
         Resets all cumulative totals that are calculated annually for the field.
     convert_liters_to_millimeters(liter_amount, field_size)
         Converts an amount in liters to an amount in mm based on the area the liters are distributed over.
@@ -70,7 +70,7 @@ class FieldData:
     max_evapotranspiration: float = 0.0
     seasonal_high_water_table: bool = False
     field_size: float = 1.
-    backfill_manure_nutrient_deficiencies: bool = False
+    supplement_manure_nutrient_deficiencies: bool = False
 
     # --- Irrigation variables ---
     watering_amount_in_liters: Optional[float] = None
