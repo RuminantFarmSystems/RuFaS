@@ -1164,7 +1164,7 @@ class OutputManager(object):
                      info_map)
         try:
             path.mkdir(parents=True, exist_ok=True)
-            self.add_log("New directory successfully create.",
+            self.add_log("Directory successfully created.",
                          f"Created a new directory at {path}.",
                          info_map)
         except PermissionError as e:
