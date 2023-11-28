@@ -183,10 +183,9 @@ class ReportGenerator:
         vertical_aggregator = AGGREGATION_FUNCTIONS.get(vertical_agg_key)
 
         if horizontal_aggregator:
+            loop_list = filter_content.get("horizontal_order", List[report_data.keys()])
             horizontally_aggregated = [
-                horizontal_aggregator(
-                    [report_data[key][i] for key in report_data.keys()]
-                )
+                horizontal_aggregator([report_data[key][i] for key in loop_list])
                 for i in range(number_of_elements)
             ]
 
