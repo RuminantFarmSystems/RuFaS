@@ -18,6 +18,8 @@ Description: This file updates the cow form first calving to leaving the herd.
 from __future__ import annotations
 
 import math
+from typing import Any
+
 import numpy as np
 from scipy.stats import truncnorm
 
@@ -1182,18 +1184,63 @@ class Cow(HeiferIII):
 
     @property
     def avg_estrus_cycle(self):
+        """
+        Get the literature value for the average estrus cycle length for cows.
+
+        Returns
+        -------
+        float
+            The average estrus cycle length for cows
+        """
+
         return AnimalBase.config['avg_estrus_cycle_cow']
 
     @property
     def std_estrus_cycle(self):
+        """
+        Get the literature value for the standard deviation of the estrus cycle length for cows.
+
+        Returns
+        -------
+        float
+            The standard deviation of the estrus cycle length for cows
+        """
+
         return AnimalBase.config['std_estrus_cycle_cow']
 
     @staticmethod
-    def _get_repro_data(attribute: str):
+    def get_repro_data(attribute: str) -> Any:
+        """
+        Get the reproduction data for cows.
+
+        Parameters
+        ----------
+        attribute : str
+            The name of the attribute to get from the reproduction data.
+
+        Returns
+        -------
+        Any
+            The value of the attribute in the reproduction data.
+
+        """
         return AnimalBase.config['cows'][attribute]
 
     # Note: Not used yet. Will revisit next.
-    def _handle_successful_conception(self, sim_day: int):
+    def _handle_successful_conception(self, sim_day: int) -> None:
+        """
+        Handle a successful conception event.
+
+        Parameters
+        ----------
+        sim_day : int
+            The current simulation day.
+
+        Returns
+        -------
+        None
+        """
+
         self.log_event(self.days_born, sim_day, const.COW_PREG)
         self._initialize_pregnancy_parameters()
         if self.calves > 0:
@@ -1201,7 +1248,20 @@ class Cow(HeiferIII):
             self.calving_to_preg_time = self.days_born - last_time_given_birth
 
     # Note: Not used yet. Will revisit next.
-    def _handle_failed_conception(self, sim_day: int):
+    def _handle_failed_conception(self, sim_day: int) -> None:
+        """
+        Handle a failed conception event.
+
+        Parameters
+        ----------
+        sim_day : int
+            The current simulation day.
+
+        Returns
+        -------
+        None
+        """
+
         self.log_event(self.days_born, sim_day, const.COW_NOT_PREG)
         self.open_stage = True
         if self.repro_program in ['ED'] or self.resynch_method in ['TAIafterPD', 'PGFatPD']:

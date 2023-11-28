@@ -27,6 +27,7 @@ ESTRUS_DAY_SCHEDULED_NOTE = "estrus day scheduled"
 
 AI_DAY_SCHEDULED_NOTE = "AI day scheduled"
 AI_PERFORMED_NOTE = "AI performed"
+REBREEDING_NOTE = "rebreeding and using ED"
 
 ESTRUS_AFTER_AI_NOTE = "estrus after AI"
 ESTRUS_AFTER_ABORTION_NOTE = "estrus after abortion"
