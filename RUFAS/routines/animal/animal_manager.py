@@ -385,38 +385,38 @@ class AnimalManager:
         return mean(pen.vertical_dist_to_parlor for pen in self.all_pens), \
             mean(pen.horizontal_dist_to_parlor for pen in self.all_pens)
 
-    def calc_nutrient_rqmts(self, feed, temp: float) -> None:
+    def calc_nutrient_rqmts(self, feed, current_temperature: float) -> None:
         """
         Calls each animal's method to calculate its nutrient requirements.
 
         Parameters
         ----------
         feed : Feed
-            instance of the feed class
-        temp : float
-            the temperature on the current day
+            Instance of the Feed class.
+        current_temperature : float
+            The temperature on the current day.
 
         """
         for calf in self.calves:
-            calf.calc_nutrient_rqmts(feed, temp)
+            calf.calc_nutrient_rqmts(feed, current_temperature)
 
         for heiferI in self.heiferIs:
             latest_pen = heiferI.pen_history[-1].pen
-            heiferI.set_nutrient_rqmts(temp, self.ANIMAL_GROUPING_SCENARIO,
+            heiferI.set_nutrient_rqmts(current_temperature, self.ANIMAL_GROUPING_SCENARIO,
                                        nutrient_conc=self.all_pens[latest_pen].ration_nutrient_conc,
                                        metabolizable_energy=self.all_pens[latest_pen].MEdiet,
                                        previous_DMI=self.all_pens[latest_pen].dry_matter_intake)
 
         for heiferII in self.heiferIIs:
             latest_pen = heiferII.pen_history[-1].pen
-            heiferII.set_nutrient_rqmts(temp, self.ANIMAL_GROUPING_SCENARIO,
+            heiferII.set_nutrient_rqmts(current_temperature, self.ANIMAL_GROUPING_SCENARIO,
                                         nutrient_conc=self.all_pens[latest_pen].ration_nutrient_conc,
                                         metabolizable_energy=self.all_pens[latest_pen].MEdiet,
                                         previous_DMI=self.all_pens[latest_pen].dry_matter_intake)
 
         for heiferIII in self.heiferIIIs:
             latest_pen = heiferIII.pen_history[-1].pen
-            heiferIII.set_nutrient_rqmts(temp, self.ANIMAL_GROUPING_SCENARIO,
+            heiferIII.set_nutrient_rqmts(current_temperature, self.ANIMAL_GROUPING_SCENARIO,
                                          nutrient_conc=self.all_pens[latest_pen].ration_nutrient_conc,
                                          metabolizable_energy=self.all_pens[latest_pen].MEdiet,
                                          previous_DMI=self.all_pens[latest_pen].dry_matter_intake)
