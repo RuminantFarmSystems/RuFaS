@@ -177,11 +177,13 @@ class GraphGenerator:
         TypeError
             if data is Dict[str, List[Dict[str, List[Any]]]]] and selected_variables is None
         """
+
         if graph_type not in MATPLOTLIB_PLOT_FUNCTIONS:
             raise ValueError(f"Unsupported graph type: {graph_type}")
 
+        values_dict = {}
         plot_function = MATPLOTLIB_PLOT_FUNCTIONS[graph_type]
-        for key in data.keys():
+        for index, key in enumerate(data.keys()):
             values: List[Any] = data[key]["values"]
             is_data_in_dict = isinstance(values[0], dict)
 
@@ -191,27 +193,30 @@ class GraphGenerator:
                         "Can't plot dictionary, use 'variables' arg to select items from data"
                     )
                 data_dict = Utility.convert_list_of_dicts_to_dict_of_lists(values)
-                if graph_type in TUPLE_BASED_FUNCTIONS:
-                    self._handle_tuple_based_plot(
-                        data_dict, selected_variables, plot_function
-                    )
+                self._handle_dict_plots(graph_type, data_dict, selected_variables, plot_function)
+            elif plot_function == plt.stackplot:
+                values_dict[key] = values
+                if index == len(data) - 1:
+                    selected_variables = values_dict.keys()
+                    self._handle_dict_plots(graph_type, values_dict, selected_variables, plot_function)
                 else:
-                    for variable in selected_variables:
-                        plot_function(data_dict[variable])
+                    continue
             else:
                 plot_function(values)
 
-    def _handle_tuple_based_plot(
-        self,
-        data_dict: Dict[str, List[float | int]],
-        selected_variables: List[str],
-        plot_function: FUNCTION_TYPE,
-    ) -> None:
+    def _handle_dict_plots(self,
+                           graph_type: str,
+                           data_dict: Dict[str, List[float | int]],
+                           selected_variables: List[str],
+                           plot_function: FUNCTION_TYPE,
+                           ) -> None:
         """
-        Plot selected variables from data organized as a tuple.
+        Checks the plot_function to determine how the data_dict should be plotted.
 
         Parameters
         ----------
+        graph_type : str
+            The type of graph to draw.
         data_dict : Dict[str, List[float | int]]
             Dictionary of variable data.
         selected_variables : List[str]
@@ -221,8 +226,12 @@ class GraphGenerator:
 
         Returns: None
         """
-        values_tuple = tuple(data_dict[variable] for variable in selected_variables)
-        plot_function(list(range(len(values_tuple[0]))), values_tuple)
+        if graph_type in TUPLE_BASED_FUNCTIONS:
+            values_tuple = tuple(data_dict[variable] for variable in selected_variables)
+            plot_function(list(range(len(values_tuple[0]))), values_tuple)
+        else:
+            for variable in selected_variables:
+                plot_function(data_dict[variable])
 
     def _customize_graph(
         self, fig: Figure, customization_details: Dict[str, Any]

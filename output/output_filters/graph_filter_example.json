@@ -10,7 +10,7 @@
     },
     {
       "type": "stackplot",
-      "filters": ["Cow\\.milking_update\\.milk_data_at_milk_update"],
+      "filters": ["Cow\\.milking_update\\.milk_(lactose|protein|fat)"],
       "variables": ["milk_lactose", "milk_protein", "milk_fat"],
       "title": "Daily Milk Nutritions",
       "legend": ["lactose", "fat", "protein"]
