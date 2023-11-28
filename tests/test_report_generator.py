@@ -187,13 +187,10 @@ def test_prepare_report_data_valid_dict(report_generator: ReportGenerator) -> No
 
 def test_prepare_report_data_invalid_no_variables(
     report_generator: ReportGenerator,
+    sample_filtered_pool: Dict[str, Dict[str, List[Dict[str, int]]]],
 ) -> None:
-    filtered_pool: Dict[str, Dict[str, List[Dict[str, int]]]] = {
-        "data1": {"values": [{"a": 1}, {"a": 2}]},
-        "data2": {"values": [{"b": 3}, {"b": 4}]},
-    }
     with pytest.raises(KeyError):
-        report_generator._prepare_report_data(filtered_pool, None, 0, 0)
+        report_generator._prepare_report_data(sample_filtered_pool, None, 0, 0)
 
 
 def test_prepare_report_data_aggregate_values(
