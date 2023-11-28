@@ -162,6 +162,9 @@ class ReportGenerator:
         ------
         ValueError
             If the report data is empty or if the necessary aggregation keys are not found in filter_content.
+        KeyError
+            If a key specified in the `horizontal_order` of `filter_content` is not found in the `report_data`.
+            This usually indicates a mismatch between the expected structure of `filtered_pool` and its actual content.
         """
         report_data = self._prepare_report_data(
             filtered_pool,
@@ -189,8 +192,10 @@ class ReportGenerator:
                     horizontal_aggregator([report_data[key][i] for key in loop_list])
                     for i in range(number_of_elements)
                 ]
-            except KeyError:
-                raise
+            except KeyError as e:
+                raise KeyError(
+                    f"{e.args[0]} not found in filtered pool. Check the `horizontal_order` entry in the filter file."
+                )
 
         if vertical_aggregator:
             vertically_aggregated = [
