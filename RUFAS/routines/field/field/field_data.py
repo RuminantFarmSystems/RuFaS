@@ -40,7 +40,7 @@ class FieldData:
     watering_amount_in_mm : float, default=0.0
         Amount of water to be applied to the field over a specified interval of days (mm).
     watering_interval : int, optional
-        Number of days over which the specified amount of water needs to be applied.
+        Number of days between waterings of the field.
     days_into_watering_interval : int, default=0.0
         Number of days since the start of the current watering interval.
     current_water_deficit : float, default=0.0
@@ -69,7 +69,7 @@ class FieldData:
     max_transpiration: float = 0.0
     max_evapotranspiration: float = 0.0
     seasonal_high_water_table: bool = False
-    field_size: float = 1.
+    field_size: float = 1.0
     supplement_manure_nutrient_deficiencies: bool = False
 
     # --- Irrigation variables ---
