@@ -1,11 +1,11 @@
 from pathlib import Path
 from freezegun import freeze_time
-from typing import Dict
+from typing import Any, Dict, List
 from unittest.mock import patch
 from matplotlib import pyplot as plt
 from mock.mock import MagicMock
 import pytest
-from RUFAS.graph_generator import GraphGenerator, TUPLE_BASED_FUNCTIONS
+from RUFAS.graph_generator import GraphGenerator
 
 
 @pytest.fixture
@@ -218,25 +218,29 @@ def test_draw_graph_exception(graph_generator: GraphGenerator) -> None:
         )
 
 
-def test_draw_graph_success(graph_generator: GraphGenerator) -> None:
-    graph_type = TUPLE_BASED_FUNCTIONS[0]
-    data = {
-        "key1": {"values": [{"a": 1, "b": 2}, {"a": 3, "b": 4}]},
-        "key2": {"values": [{"a": 5, "b": 6}, {"a": 7, "b": 8}]},
-    }
+@pytest.mark.parametrize(
+        "data,handle_plots_call_count,util_call_count,graph_type",
+        [
+            ({"key1": {"values": [{"a": 1, "b": 2}, {"a": 3, "b": 4}]},
+              "key2": {"values": [{"a": 5, "b": 6}, {"a": 7, "b": 8}]},
+              }, 2, 2, "stackplot"),
+            ({"key1": {"values": [1, 2, 3, 4]},
+              "key2": {"values": [5, 6, 7, 8]}
+              }, 1, 0, "stackplot"),
+            ({"key1": {"values": [1, 2, 3, 4]},
+              "key2": {"values": [5, 6, 7, 8]}
+              }, 0, 0, "plot")
+        ]
+)
+def test_draw_graph_success(graph_generator: GraphGenerator,
+                            data: Dict[str, Dict[str, List[Any]] | Dict[str, List[Dict[str, List[Any]]]]],
+                            handle_plots_call_count: int,
+                            util_call_count: int,
+                            graph_type: str) -> None:
     graph_generator._handle_dict_plots = MagicMock()
     with patch(
         "RUFAS.graph_generator.Utility.convert_list_of_dicts_to_dict_of_lists"
     ) as mock_utility:
         graph_generator._draw_graph(graph_type, data, ["a", "b"])
-        assert graph_generator._handle_dict_plots.call_count == 2
-        assert mock_utility.call_count == 2
-
-    data = {
-        "key1": {"values": [1, 2, 3, 4]},
-        "key2": {"values": [5, 6, 7, 8]}
-    }
-
-    graph_generator._handle_dict_plots = MagicMock()
-    graph_generator._draw_graph(graph_type, data)
-    assert graph_generator._handle_dict_plots.call_count == 1
+        assert graph_generator._handle_dict_plots.call_count == handle_plots_call_count
+        assert mock_utility.call_count == util_call_count
