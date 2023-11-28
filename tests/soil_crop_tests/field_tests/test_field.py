@@ -768,7 +768,7 @@ def test_execute_manure_application(nitrogen: float, phosphorus: float, coverage
     """Tests that manure is applied to the soil correctly."""
     mocked_manure_manager = MagicMock(ManureManager)
     mocked_manure_manager.request_nutrients = MagicMock(return_value=supplied_manure)
-    field = Field(field_data=FieldData(name="test", field_size=1.4, backfill_manure_nutrient_deficiencies=supplement),
+    field = Field(field_data=FieldData(name="test", field_size=1.4, supplement_manure_nutrient_deficiencies=supplement),
                   manure_manager=mocked_manure_manager)
     field.manure_applicator.apply_machine_manure = MagicMock()
     field._record_manure_application = MagicMock()
