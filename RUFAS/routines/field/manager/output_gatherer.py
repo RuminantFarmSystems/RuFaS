@@ -77,6 +77,10 @@ class OutputGatherer:
             om.add_variable("machine_stable_organic_phosphorus",
                             field.soil.data.machine_stable_organic_phosphorus,
                             info_map)
+            om.add_variable("machine_organic_phosphorus_runoff", field.soil.data.machine_organic_phosphorus_runoff,
+                            info_map)
+            om.add_variable("machine_inorganic_phosphorus_runoff", field.soil.data.machine_inorganic_phosphorus_runoff,
+                            info_map)
             om.add_variable("grazing_manure_dry_mass",
                             field.soil.data.grazing_manure_dry_mass,
                             info_map)
@@ -101,6 +105,11 @@ class OutputGatherer:
             om.add_variable("grazing_stable_organic_phosphorus",
                             field.soil.data.grazing_stable_organic_phosphorus,
                             info_map)
+            om.add_variable("grazing_organic_phosphorus_runoff", field.soil.data.grazing_organic_phosphorus_runoff,
+                            info_map)
+            om.add_variable("grazing_inorganic_phosphorus_runoff", field.soil.data.grazing_inorganic_phosphorus_runoff,
+                            info_map)
+            om.add_variable("soil_phosphorus_runoff", field.soil.data.soil_phosphorus_runoff, info_map)
             om.add_variable("profile_carbon_emissions", field.soil.data.profile_carbon_emissions, info_map)
             # Adding vadose zone layer data
             info_map["prefix"] = "field='" + field.field_data.name + "',vadose_zone_layer"
@@ -199,6 +208,7 @@ class OutputGatherer:
                                 info_map)
                 om.add_variable("labile_inorganic_unbalanced_counter", layer.labile_inorganic_unbalanced_counter,
                                 info_map)
+                om.add_variable("percolated_phosphorus", layer.percolated_phosphorus, info_map)
                 om.add_variable("nitrate_content", layer.nitrate_content, info_map)
                 om.add_variable("ammonium_content", layer.ammonium_content, info_map)
                 om.add_variable("active_organic_nitrogen_content", layer.active_organic_nitrogen_content, info_map)
