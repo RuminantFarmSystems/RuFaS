@@ -224,3 +224,23 @@ def test_generate_report_with_invalid_horizontal_order(
     }
     with pytest.raises(KeyError):
         report_generator.generate_report(sample_filtered_pool, filter_content)
+
+
+def test_generate_report_with_valid_horizontal_order(
+    report_generator: ReportGenerator,
+    sample_filtered_pool: Dict[str, Dict[str, List[Dict[str, int]]]],
+):
+    filter_content = {
+        "variables": ["a", "b"],
+        "horizontal_aggregation": "division",
+        "vertical_aggregation": "sum",
+        "horizontal_first": True,
+    }
+    filter_content["horizontal_order"] = ["a", "b"]
+    assert report_generator.generate_report(sample_filtered_pool, filter_content) == [
+        2.9583333333333335
+    ]
+    filter_content["horizontal_order"] = ["b", "a"]
+    assert report_generator.generate_report(sample_filtered_pool, filter_content) == [
+        5.676190476190476
+    ]
