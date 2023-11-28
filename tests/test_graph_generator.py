@@ -231,3 +231,12 @@ def test_draw_graph_success(graph_generator: GraphGenerator) -> None:
         graph_generator._draw_graph(graph_type, data, ["a", "b"])
         assert graph_generator._handle_dict_plots.call_count == 2
         assert mock_utility.call_count == 2
+
+    data = {
+        "key1": {"values": [1, 2, 3, 4]},
+        "key2": {"values": [5, 6, 7, 8]}
+    }
+
+    graph_generator._handle_dict_plots = MagicMock()
+    graph_generator._draw_graph(graph_type, data)
+    assert graph_generator._handle_dict_plots.call_count == 1
