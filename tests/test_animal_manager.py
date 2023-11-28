@@ -1056,11 +1056,6 @@ def test_end_ration_interval():
     pass
 
 
-def test_annual_reset():
-    """Unit test for function annual_reset in file routines/animal/animal_manager.py"""
-    pass
-
-
 def test_get_life_cycle_output():
     """Unit test for function get_life_cycle_output in file routines/animal/animal_manager.py"""
     pass
