@@ -1061,11 +1061,6 @@ def test_annual_reset():
     pass
 
 
-def test_generate_animal_output():
-    """Unit test for function generate_animal_output in file routines/animal/animal_manager.py"""
-    pass
-
-
 def test_get_life_cycle_output():
     """Unit test for function get_life_cycle_output in file routines/animal/animal_manager.py"""
     pass
