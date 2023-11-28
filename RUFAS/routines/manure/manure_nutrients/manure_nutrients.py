@@ -34,7 +34,7 @@ class ManureNutrients:
         """
         for field in fields(self):
             if getattr(self, field.name) < 0:
-                raise ValueError(f'Field {field.name} must be non-negative.')
+                raise ValueError(f"Field {field.name} must be non-negative.")
 
     @property
     def dry_matter_fraction(self) -> float:
@@ -102,9 +102,14 @@ class ManureNutrients:
 
         """
         if not isinstance(other, ManureNutrients):
-            raise TypeError(f'Cannot add {type(self)} to {type(other)}.')
+            raise TypeError(f"Cannot add {type(self)} to {type(other)}.")
 
-        return ManureNutrients(**{f.name: getattr(self, f.name) + getattr(other, f.name) for f in fields(self)})
+        return ManureNutrients(
+            **{
+                f.name: getattr(self, f.name) + getattr(other, f.name)
+                for f in fields(self)
+            }
+        )
 
     def __mul__(self, scalar: int | float) -> ManureNutrients:
         """
@@ -129,12 +134,14 @@ class ManureNutrients:
 
         """
         if not isinstance(scalar, (int, float)):
-            raise TypeError(f'Cannot multiply {type(self)} by {type(scalar)}.')
+            raise TypeError(f"Cannot multiply {type(self)} by {type(scalar)}.")
 
         if scalar < 0.0:
-            raise ValueError(f'Cannot multiply {type(self)} by a negative scalar.')
+            raise ValueError(f"Cannot multiply {type(self)} by a negative scalar.")
 
-        return ManureNutrients(**{f.name: getattr(self, f.name) * scalar for f in fields(self)})
+        return ManureNutrients(
+            **{f.name: getattr(self, f.name) * scalar for f in fields(self)}
+        )
 
     def __sub__(self, other: ManureNutrients) -> ManureNutrients:
         """
@@ -157,9 +164,14 @@ class ManureNutrients:
 
         """
         if not isinstance(other, ManureNutrients):
-            raise TypeError(f'Cannot subtract {type(self)} from {type(other)}.')
+            raise TypeError(f"Cannot subtract {type(self)} from {type(other)}.")
 
-        return ManureNutrients(**{f.name: getattr(self, f.name) - getattr(other, f.name) for f in fields(self)})
+        return ManureNutrients(
+            **{
+                f.name: getattr(self, f.name) - getattr(other, f.name)
+                for f in fields(self)
+            }
+        )
 
     def __rmul__(self, scalar: int | float) -> ManureNutrients:
         """

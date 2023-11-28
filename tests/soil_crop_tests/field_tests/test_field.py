@@ -6,7 +6,7 @@ from RUFAS.routines.field.crop.crop import Crop
 from RUFAS.routines.field.crop.crop_data import CropData
 from RUFAS.routines.field.crop.harvest_operations import HarvestOperation
 from RUFAS.routines.field.crop.species_data_factory import CropSpecies
-from RUFAS.routines.field.manager.current_weather import CurrentWeather
+from RUFAS.current_day_conditions import CurrentDayConditions
 from RUFAS.routines.field.manager.events import Event, PlantingEvent, HarvestEvent, FertilizerEvent, ManureEvent
 from RUFAS.routines.field.soil.soil import Soil
 from RUFAS.routines.field.soil.soil_data import SoilData
@@ -14,7 +14,7 @@ from RUFAS.routines.field.field.field import Field
 from RUFAS.routines.field.field.field_data import FieldData
 from RUFAS.routines.field.crop.dormancy import Dormancy
 from RUFAS.routines.field.crop_and_soil_constants import LITERS_TO_CUBIC_MILLIMETERS, HECTARES_TO_SQUARE_MILLIMETERS
-from RUFAS.classes import Time
+from RUFAS.time import Time
 from RUFAS.routines.field.manager.events import TillageEvent
 from RUFAS.output_manager import OutputManager
 from RUFAS.routines.manure.manure_manager import ManureManager
@@ -51,7 +51,7 @@ def test_manage_field() -> None:
     field._remove_dead_crops = MagicMock()
     field._reset_crop_field_coverage_fractions = MagicMock()
     mocked_time = MagicMock(Time)
-    mocked_weather = MagicMock(CurrentWeather)
+    mocked_weather = MagicMock(CurrentDayConditions)
     setattr(mocked_weather, "daylength", 12)
 
     field.manage_field(mocked_time, mocked_weather)
@@ -62,7 +62,7 @@ def test_manage_field() -> None:
     field._execute_daily_processes.assert_called_once_with(mocked_weather, mocked_time)
     field._assess_dormancy.assert_called_once_with(12)
     field._check_crop_planting_schedule.assert_called_once_with(mocked_time)
-    field._check_crop_harvest_schedule.assert_called_once_with(mocked_time)
+    field._check_crop_harvest_schedule.assert_called_once_with(mocked_time, mocked_weather)
     field._remove_dead_crops.assert_called_once()
     field._reset_crop_field_coverage_fractions.assert_called_once()
 
@@ -196,6 +196,7 @@ def test_check_crop_harvest_schedule(year: int, day: int, all_harvest_events: Li
     mocked_time = MagicMock(Time)
     setattr(mocked_time, "calendar_year", year)
     setattr(mocked_time, "day", day)
+    mock_conditions = MagicMock(CurrentDayConditions)
     remaining_harvest_events = [events for events in all_harvest_events if events not in current_harvest_events]
     field._filter_events = MagicMock(return_value=(remaining_harvest_events, current_harvest_events))
     field._harvest_crop = MagicMock()
@@ -203,28 +204,34 @@ def test_check_crop_harvest_schedule(year: int, day: int, all_harvest_events: Li
 
     harvest_crop_calls = []
     for event in current_harvest_events:
-        new_call = call(event.crop_reference, event.operation, mocked_time)
+        new_call = call(event.crop_reference, event.operation, mocked_time, mock_conditions)
         harvest_crop_calls.append(new_call)
 
-    field._check_crop_harvest_schedule(mocked_time)
+    field._check_crop_harvest_schedule(mocked_time, mock_conditions)
 
     field._filter_events.assert_called_once_with(all_harvest_events, mocked_time)
     field._harvest_crop.assert_has_calls(harvest_crop_calls)
     field._harvest_heat_scheduled_crops.assert_called_once()
 
 
-@pytest.mark.parametrize("crops,heat_scheduled,expected_harvested", [
-    ([Crop(), Crop(), Crop(), Crop(), Crop()], [True, False, True, True, False], [True, False, False, True, False]),
-    ([Crop(), Crop()], [True, True], [False, True]),
-    ([Crop(), Crop()], [False, False], [False, False]),
-    ([], [], [])
+@pytest.mark.parametrize("crop_num,heat_scheduled,expected_harvested,expected_harvest_count", [
+    (5, [True, False, True, True, False], [True, False, False, True, False], 2),
+    (2, [True, True], [False, True], 1),
+    (2, [False, False], [False, False], 0),
+    (0, [], [], 0)
 ])
-def test_harvest_heat_scheduled_crops(crops: List[Crop], heat_scheduled: List[bool],
-                                      expected_harvested: List[bool]) -> None:
+def test_harvest_heat_scheduled_crops(crop_num: int, heat_scheduled: List[bool],
+                                      expected_harvested: List[bool], expected_harvest_count: int) -> None:
     """Tests that all crops which are set to be harvested based on heat level are."""
-    for index in range(len(crops)):
+    crops = []
+    for index in range(crop_num):
+        mock_data = MagicMock(CropData)
+        crops.append(MagicMock(Crop(mock_data)))
         if heat_scheduled[index]:
             crops[index].data.use_heat_scheduling = True
+        else:
+            crops[index].data.use_heat_scheduling = False
+        crops[index].data.harvest_heat_fraction = 1.0
         if expected_harvested[index]:
             crops[index].data.heat_fraction = crops[index].data.harvest_heat_fraction
         else:
@@ -233,14 +240,16 @@ def test_harvest_heat_scheduled_crops(crops: List[Crop], heat_scheduled: List[bo
 
     field = Field(manure_manager=MagicMock(ManureManager))
     field.crops = crops
-
-    field._harvest_heat_scheduled_crops()
+    with patch.object(field.soil.carbon_cycling.residue_partition, "add_residue_to_pools", new_callable=MagicMock) \
+            as add_residue:
+        field._harvest_heat_scheduled_crops(10.0)
 
     for index in range(len(crops)):
         if expected_harvested[index]:
             crops[index].crop_management.manage_harvest.assert_called_once_with(HarvestOperation.HARVEST_NOKILL)
         else:
             crops[index].crop_management.manage_harvest.assert_not_called()
+    assert add_residue.call_count == expected_harvest_count
 
 
 @pytest.mark.parametrize("events,year,day,expected_remaining,expected_current", [
@@ -349,11 +358,11 @@ def test_plant_crop_error(field_name: str, crop_reference: str, custom_crop_spec
     assert expected in str(e.value)
 
 
-@pytest.mark.parametrize("crop_reference,harvest_op,field_name,field_size,expected_operation", [
-    ("test_1", "default", "field_1", 1.4, HarvestOperation.HARVEST),
-    ("test_2", "no_kill", "field_2", 2.33, HarvestOperation.HARVEST_NOKILL),
+@pytest.mark.parametrize("crop_reference,harvest_op,field_name,field_size,rainfall,expected_operation", [
+    ("test_1", "default", "field_1", 1.4, 0.0, HarvestOperation.HARVEST),
+    ("test_2", "no_kill", "field_2", 2.33, 10.3, HarvestOperation.HARVEST_NOKILL),
 ])
-def test_harvest_crop(crop_reference: str, harvest_op: str, field_name: str, field_size: float,
+def test_harvest_crop(crop_reference: str, harvest_op: str, field_name: str, field_size: float, rainfall: float,
                       expected_operation: HarvestOperation) -> None:
     """Tests that crops are harvested correctly."""
     harvest_crop = Crop()
@@ -369,8 +378,12 @@ def test_harvest_crop(crop_reference: str, harvest_op: str, field_name: str, fie
     mocked_time = MagicMock(Time)
     setattr(mocked_time, "day", 100)
     setattr(mocked_time, "calendar_year", 1995)
+    mock_conditions = MagicMock(CurrentDayConditions)
+    mock_conditions.rainfall == rainfall
 
-    field._harvest_crop(crop_reference, harvest_op, mocked_time)
+    with patch.object(field.soil.carbon_cycling.residue_partition, "add_residue_to_pools", new_callable=MagicMock) \
+            as add_residue:
+        field._harvest_crop(crop_reference, harvest_op, mocked_time, mock_conditions)
 
     for crop in field.crops:
         if crop.data.id == "not this crop":
@@ -378,6 +391,7 @@ def test_harvest_crop(crop_reference: str, harvest_op: str, field_name: str, fie
         else:
             crop.crop_management.manage_harvest.assert_called_once_with(expected_operation, field_name, field_size,
                                                                         1995, 100, field.soil.data)
+    assert add_residue.call_count == 1
 
 
 @pytest.mark.parametrize("crops,expected_info_map,expected_message", [
@@ -400,12 +414,17 @@ def test_harvest_crop_warnings(crops: List[Crop], expected_info_map: Dict, expec
         setattr(mocked_time, "day", 200)
         setattr(mocked_time, "calendar_year", 2000)
         mocked_timestamp.return_value = "00-Jan-1970_Thu_00-00-00"
+        mock_conditions = MagicMock(CurrentDayConditions)
+        mock_conditions.rainfall = 11.0
 
-        field._harvest_crop("test", "default", mocked_time)
+        with patch.object(field.soil.carbon_cycling.residue_partition, "add_residue_to_pools", new_callable=MagicMock) \
+                as add_residue:
+            field._harvest_crop("test", "default", mocked_time, mock_conditions)
 
         for crop in crops:
             crop.crop_management.manage_harvest.assert_called_once_with(HarvestOperation.HARVEST, "test", 1.0, 2000,
                                                                         200, field.soil.data)
+        assert add_residue.call_count == len(crops)
         actual = om.warnings_pool["field_name:'test'.harvest_warning"]
         assert actual['info_maps'].__contains__(expected_info_map)
         assert actual['values'].__contains__(expected_message)
@@ -467,22 +486,23 @@ def test_reset_crop_field_coverage_fractions(crop_list: List[Crop], expected_fie
     (7.293485893, 8.234850920),
 ])
 def test_start_dormancy(daylength: float, threshold_daylength: float) -> None:
-    """Tests that each crop's dormancy method is called"""
-    # Initialize objects
+    """Tests that each crop's dormancy method is called."""
     crop = Crop()
     field = Field(manure_manager=MagicMock(ManureManager))
     field.field_data.dormancy_threshold_daylength = threshold_daylength
     field.crops = [crop]
 
-    # Mock functions used
-    crop.dormancy.enter_dormancy = MagicMock()
+    with patch("RUFAS.routines.field.crop.dormancy.Dormancy.enter_dormancy", new_callable=MagicMock) as dormancy, \
+            patch("RUFAS.routines.field.crop.biomass_allocation.BiomassAllocation.partition_biomass",
+                  new_callable=MagicMock) as biomass:
+        field._assess_dormancy(daylength)
 
-    # Run method being tested
-    field._assess_dormancy(daylength)
-
-    # Check that subroutines were called correct number of times
     if daylength <= threshold_daylength:
-        assert crop.dormancy.enter_dormancy.call_count == 1
+        assert dormancy.call_count == 1
+        assert biomass.call_count == 1
+    else:
+        dormancy.assert_not_called()
+        biomass.assert_not_called()
 
 
 @pytest.mark.parametrize("species,specs", [
@@ -941,10 +961,11 @@ def test_execute_daily_processes(field_size: float, crops_growing: bool, residue
         crop_2 = Crop()
         crop_2.data.max_transpiration = transpiration
         incorp.crops = [crop_1, crop_2]
-        current_weather = CurrentWeather(incoming_light=light, mean_air_temperature=mean_temp,
-                                         min_air_temperature=min_temp, max_air_temperature=max_temp,
-                                         annual_mean_air_temperature=annual_mean_temp)
+        current_conditions = CurrentDayConditions(incoming_light=light, mean_air_temperature=mean_temp,
+                                                  min_air_temperature=min_temp, max_air_temperature=max_temp,
+                                                  annual_mean_air_temperature=annual_mean_temp)
 
+        incorp.soil.snow.update_snow = MagicMock()
         incorp._determine_total_above_ground_biomass = MagicMock(return_value=89)
         incorp.soil.soil_temp.daily_soil_temperature_update = MagicMock()
         incorp._cycle_water = MagicMock()
@@ -959,13 +980,15 @@ def test_execute_daily_processes(field_size: float, crops_growing: bool, residue
         mocked_time = MagicMock(Time)
         setattr(mocked_time, "year", 2023)
         setattr(mocked_time, "day", 178)
-        incorp._execute_daily_processes(current_weather, mocked_time)
+        incorp._execute_daily_processes(current_conditions, mocked_time)
 
+        incorp.soil.snow.update_snow.assert_called_once_with(current_day_conditions=current_conditions,
+                                                             day=mocked_time.day)
         incorp._determine_total_above_ground_biomass.assert_called_once()
         incorp.soil.soil_temp.daily_soil_temperature_update.assert_called_once_with(light, mean_temp, min_temp,
                                                                                     max_temp, 89 + residue, 0,
                                                                                     annual_mean_temp)
-        incorp._cycle_water.assert_called_once_with(current_weather, mocked_time)
+        incorp._cycle_water.assert_called_once_with(current_conditions, mocked_time)
         for crop in incorp.crops:
             if crops_growing:
                 crop.heat_units.absorb_heat_units.assert_called_once_with(mean_temp, min_temp, max_temp)
@@ -988,7 +1011,8 @@ def test_execute_daily_processes(field_size: float, crops_growing: bool, residue
 @pytest.mark.parametrize("field_size,rainfall,runoff,high_water_table,residue,light,min_temp,max_temp,mean_temp,"
                          "surface_residue,crop_1_proportion,crop_2_proportion,crops_growing", [
                              (1.9, 4.66, 1.22, False, 30.6, 200, 16.5, 20.5, 18.5, 44.5, 0.6, 0.4, True),
-                             (2.3, 5.6, 2.1, True, 44.5, 250, 22.33, 25.36, 24.6, 80.4, 0.77, 0.23, False)
+                             (2.3, 5.6, 2.1, True, 44.5, 250, 22.33, 25.36, 24.6, 80.4, 0.77, 0.23, False),
+                             (2.3, 5.6, 2.1, True, 44.5, 250, 22.33, 25.36, 24.6, 80.4, 0.0, 0.0, False)
                          ])
 def test_cycle_water(field_size: float, rainfall: float, runoff: float, high_water_table: bool, residue: float,
                      light: float, min_temp: float, max_temp: float, mean_temp: float, surface_residue: float,
@@ -996,7 +1020,8 @@ def test_cycle_water(field_size: float, rainfall: float, runoff: float, high_wat
     """Tests that cycle_water() correctly executes all water processes on its soil profile and the crops it contains."""
     with patch("RUFAS.routines.field.crop.crop_data.CropData.in_growing_season", new_callable=PropertyMock,
                return_value=crops_growing):
-        soil_data = SoilData(field_size=field_size, accumulated_runoff=runoff, water_evaporated=3.5)
+        soil_data = SoilData(field_size=field_size, accumulated_runoff=runoff, water_evaporated=3.5,
+                             water_sublimated=1.0)
         soil_data.plant_surface_residue = surface_residue
         soil = Soil(soil_data)
         crop_data_1 = CropData(field_proportion=crop_1_proportion, max_transpiration=44.1, cumulative_evaporation=105.5,
@@ -1007,8 +1032,9 @@ def test_cycle_water(field_size: float, rainfall: float, runoff: float, high_wat
                                cumulative_transpiration=219.2, cumulative_potential_evapotranspiration=480.1,
                                total_water_uptake=3.25)
         crop_2 = Crop(crop_data_2)
-        current_weather = CurrentWeather(incoming_light=light, min_air_temperature=min_temp, rainfall=rainfall,
-                                         max_air_temperature=max_temp, mean_air_temperature=mean_temp)
+        current_conditions = CurrentDayConditions(incoming_light=light, min_air_temperature=min_temp,
+                                                  precipitation=rainfall, max_air_temperature=max_temp,
+                                                  mean_air_temperature=mean_temp)
         field_data = FieldData(field_size=field_size, current_residue=residue,
                                seasonal_high_water_table=high_water_table)
         incorp = Field(field_data=field_data, soil=soil, manure_manager=MagicMock(ManureManager))
@@ -1020,6 +1046,7 @@ def test_cycle_water(field_size: float, rainfall: float, runoff: float, high_wat
         incorp.soil.phosphorus_cycling.cycle_phosphorus = MagicMock()
         incorp.soil.nitrogen_cycling.cycle_nitrogen = MagicMock()
         incorp.soil.carbon_cycling.cycle_carbon = MagicMock()
+        incorp.soil.snow.sublimate = MagicMock()
         incorp.soil.evaporation.evaporate = MagicMock()
 
         incorp._determine_watering_amount = MagicMock(return_value=0)
@@ -1039,14 +1066,15 @@ def test_cycle_water(field_size: float, rainfall: float, runoff: float, high_wat
         setattr(mocked_time, "year", 2023)
         setattr(mocked_time, "day", 178)
 
-        incorp._cycle_water(current_weather, mocked_time)
+        incorp._cycle_water(current_conditions, mocked_time)
+
         incorp._determine_watering_amount.assert_called_once_with(rainfall=rainfall, year=mocked_time.year,
                                                                   day=mocked_time.day, irrigation=0.0)
         incorp._handle_water_in_crop_canopies.assert_called_once_with(rainfall)
         incorp._determine_potential_evapotranspiration.assert_called_once_with(light, max_temp, min_temp,
                                                                                mean_temp)
         incorp._evaporate_from_crop_canopies.assert_called_once_with(33.5)
-        incorp.soil.infiltration.infiltrate.assert_called_once_with(2.0, 1, 33.5)
+        incorp.soil.infiltration.infiltrate.assert_called_once_with(2.0)
         incorp.soil.percolation.percolate.assert_called_once_with(high_water_table)
         incorp.soil.soil_erosion.erode.assert_called_once_with(field_size, 0.02, residue, rainfall)
         incorp.soil.phosphorus_cycling.cycle_phosphorus.assert_called_once_with(2.0, runoff, field_size, mean_temp)
@@ -1058,8 +1086,10 @@ def test_cycle_water(field_size: float, rainfall: float, runoff: float, high_wat
         expected_average_transpiration = 44.1 * crop_1_proportion + 39.5 * crop_2_proportion
         incorp._determine_soil_evaporation_and_sublimation_adjusted.assert_called_once_with(
             40.0, surface_residue, 0, expected_remaining_demand, expected_average_transpiration)
-        incorp.soil.evaporation.evaporate.assert_called_once_with(10.5)
-        expected_actual_evaporation = 33.5 - (expected_remaining_demand - 3.5)
+        incorp.soil.snow.sublimate.assert_called_once_with(10.5)
+        expected_soil_evaporation_after_sublimation = 10.5 - 1.0
+        incorp.soil.evaporation.evaporate.assert_called_once_with(expected_soil_evaporation_after_sublimation)
+        expected_actual_evaporation = 33.5 - (expected_remaining_demand - 4.5)
         if crops_growing:
             crop_1.water_uptake.uptake_water.assert_called_once_with(incorp.soil.data)
             crop_1.water_dynamics.cycle_water.assert_called_once_with(expected_actual_evaporation, 3.5, 33.5)
@@ -1189,30 +1219,22 @@ def test_determine_total_above_ground_biomass(biomasses: List[float], expected: 
     assert actual == expected
 
 
-@pytest.mark.parametrize("extraterrestrial_radiation,max_temp,min_temp,avg_temp", [
-    (100, 28, 10, 14),
-    (568, 20, 14, 18),
-    (568, 20, 14, None),
-    (80, 14, 0, 8),
-    (678.0098, 26.8896, 10.3339, 18.3345),
-    (678.0098, 26.8896, 10.3339, -100000)
+@pytest.mark.parametrize("extraterrestrial_radiation,max_temp,min_temp,avg_temp,expected_avg,expected_result", [
+    (100, 28, 10, 14, 14, 23.869749),
+    (568, 20, 14, 18, 18, 88.123445),
+    (568, 20, 14, None, 17, 85.661897),
+    (80, 14, 0, 8, 8, 13.663381),
+    (678.0098, 26.8896, 10.3339, 18.3345, 18.3345, 176.36657),
+    (678.0098, 26.8896, 10.3339, -100000, -100000, 0.0)
 ])
-def test_potential_evapotranspiration(extraterrestrial_radiation, max_temp, min_temp, avg_temp):
+def test_potential_evapotranspiration(extraterrestrial_radiation: float, max_temp: float, min_temp: float,
+                                      avg_temp: float, expected_avg: float, expected_result) -> None:
     with patch("RUFAS.routines.field.field.field.Field._determine_latent_heat_vaporization",
                new_callable=MagicMock, return_value=1.3) as mocked_latent_heat:
         actual = Field._determine_potential_evapotranspiration(extraterrestrial_radiation, max_temp, min_temp, avg_temp)
-        if avg_temp is not None:
-            expect = max(0.0, (0.0023 * extraterrestrial_radiation * ((max_temp - min_temp) ** (-0.5)) *
-                             (avg_temp + 17.8)) / 1.3)
-        else:
-            expect = max(0.0, (0.0023 * extraterrestrial_radiation * ((max_temp - min_temp) ** (-0.5)) *
-                             (((max_temp + min_temp) / 2) + 17.8)) / 1.3)
 
-        if avg_temp is not None:
-            mocked_latent_heat.assert_called_once_with(avg_temp)
-        else:
-            mocked_latent_heat.assert_called_once_with((max_temp + min_temp) / 2)
-        assert actual == expect
+        mocked_latent_heat.assert_called_once_with(expected_avg)
+        assert pytest.approx(actual) == expected_result
 
 
 @pytest.mark.parametrize("avg_temp", [
@@ -1274,20 +1296,6 @@ def test_determine_soil_cover_index(above_ground_biomass: float, residue: float,
         expect = exp((-0.00005) * (above_ground_biomass + residue))
     observe = Field._determine_soil_cover_index(above_ground_biomass, residue, snow_water)
     assert expect == observe
-
-
-@pytest.mark.parametrize("soil_evaporation_adj,snow_water_content", [
-    (1.3, 3.2),
-    (0, 0),
-    (1.3, 0.4),
-    (1.8954, 0)
-])
-def test_determine_maximum_soil_evaporation(soil_evaporation_adj, snow_water_content):
-    observe = Field._determine_maximum_soil_evaporation(soil_evaporation_adj, snow_water_content)
-    if snow_water_content > soil_evaporation_adj:
-        assert 0 == observe
-    else:
-        assert (soil_evaporation_adj - snow_water_content) == observe
 
 
 def test_annual_reset() -> None:

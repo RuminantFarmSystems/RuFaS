@@ -11,7 +11,8 @@ from RUFAS.routines.animal.manure.lactating_cow_manure_excretion import methane_
 
 
 @pytest.mark.parametrize(
-    "NDF_concentration, EE_concentration, starch_concentration, CP_concentration, methane_mitigation_method, methane_mitigation_additive_amount, expected_reduction",
+    "NDF_concentration, EE_concentration, starch_concentration, CP_concentration, methane_mitigation_method,\
+          methane_mitigation_additive_amount, expected_reduction",
     [
         (35.0, 5.0, 20.0, 15.0, "3-NOP", 70.0, -25.3169),
         (40.0, 4.0, 25.0, 18.0, "Monensin", 24.0, -7.40),
@@ -21,7 +22,8 @@ from RUFAS.routines.animal.manure.lactating_cow_manure_excretion import methane_
         (55.0, 1.0, 40.0, 6.0, "None", 70.0, 0.0)
     ]
 )
-def test_methane_mitigation(NDF_concentration, EE_concentration, starch_concentration, CP_concentration, methane_mitigation_method, methane_mitigation_additive_amount, expected_reduction):
+def test_methane_mitigation(NDF_concentration, EE_concentration, starch_concentration, CP_concentration,
+                            methane_mitigation_method, methane_mitigation_additive_amount, expected_reduction):
     # Act
     actual_reduction = methane_mitigation(
         NDF_concentration,
@@ -46,7 +48,7 @@ def test_methane_mitigation(NDF_concentration, EE_concentration, starch_concentr
         ("Mutian", "None")
     ]
 )
-def test_lactating_cow_manure_calculations(methane_model: str, methane_mitigation_method: str, mocker: MockerFixture) -> None:
+def test_lactating_cow_manure_calculations(methane_model: str, methane_mitigation_method: str, mocker: MockerFixture) -> None: # noqa
     """Unit test for the manure_calculations function in lactating_cow_manure_excretion.py."""
     # Arrange
     mock_ration_formulation = mocker.MagicMock()
@@ -86,11 +88,13 @@ def test_lactating_cow_manure_calculations(methane_model: str, methane_mitigatio
              + 2.066 * milk_protein)
     total_manure_excreted = fecal_water + fecal_solids + urine
 
-    manure_nitrogen = (20.3 + 0.654 * (dry_matter_intake * GeneralConstants.KG_TO_GRAMS) * (CP_concentration * GeneralConstants.PROTEIN_TO_NITROGEN) / 100
+    manure_nitrogen = (20.3 + 0.654 * (dry_matter_intake * GeneralConstants.KG_TO_GRAMS) *
+                       (CP_concentration * GeneralConstants.PROTEIN_TO_NITROGEN) / 100
                        ) * GeneralConstants.GRAMS_TO_KG
-    urine_nitrogen = (12.0 + 0.333 * (dry_matter_intake * GeneralConstants.KG_TO_GRAMS) * (CP_concentration * GeneralConstants.PROTEIN_TO_NITROGEN) / 100
+    urine_nitrogen = (12.0 + 0.333 * (dry_matter_intake * GeneralConstants.KG_TO_GRAMS) *
+                      (CP_concentration * GeneralConstants.PROTEIN_TO_NITROGEN) / 100
                       ) * GeneralConstants.GRAMS_TO_KG
-    fecal_nitrogen = manure_nitrogen - urine_nitrogen
+    # fecal_nitrogen = manure_nitrogen - urine_nitrogen
 
     organic_matter_intake = dry_matter_intake - ASH_diet_content
     degradable_volatile_solids = (-1.017
@@ -167,14 +171,15 @@ def test_lactating_cow_manure_calculations(methane_model: str, methane_mitigatio
     if dry_matter_intake != 0:
         methane_yield_original = methane_emission_original / dry_matter_intake
         methane_yield_reduction = methane_mitigation(
-            NDF_concentration, EE_concentration, starch_concentration, CP_concentration, methane_mitigation_method, methane_mitigation_additive_amount)
+            NDF_concentration, EE_concentration, starch_concentration, CP_concentration, methane_mitigation_method,
+            methane_mitigation_additive_amount)
 
     methane_emission = methane_yield_original * \
         (1 + methane_yield_reduction / 100) * dry_matter_intake
 
     # Patching
     patch_for_ration_report = mocker.patch(
-        'RUFAS.routines.animal.manure.lactating_cow_manure_excretion.ration_report'
+        'RUFAS.routines.animal.manure.lactating_cow_manure_excretion.RationReporter.report_ration'
     )
     patch_for_ration_report.return_value = (
         {
@@ -224,7 +229,7 @@ def test_lactating_cow_manure_calculations(methane_model: str, methane_mitigatio
         metabolizable_energy_intake=metabolizable_energy_intake,
     )
 
-    #Assert
+    # Assert
     patch_for_ration_report.assert_called_once_with(
         mock_ration_formulation, mock_feed.available_feeds
     )
@@ -273,4 +278,4 @@ def test_lactating_cow_manure_calculations(methane_model: str, methane_mitigatio
         manure_phosphorus_fraction
     )
     assert manure_excretion_values['potassium'] == approx(potassium)
-    assert manure_excretion_values['methane'] == approx(methane_emission)
+    assert manure_excretion_values['enteric_methane_g'] == approx(methane_emission)

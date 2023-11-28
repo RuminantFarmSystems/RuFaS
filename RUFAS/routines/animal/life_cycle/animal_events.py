@@ -1,21 +1,40 @@
 """
 RUFAS: Ruminant Farm Systems Model
+----------------------------------
+
 File name: animal_events.py
-Author(s): Manfei Li, mli497@wisc.edu
-			Militsa Sotirova, militsasotirova@gmail.com
-Description: This file initialize life events with the age of the animal
-				when event happens and the description of the event.
+
+Authors:
+    - Manfei Li, mli497@wisc.edu
+    - Militsa Sotirova, militsasotirova@gmail.com
+
+Description:
+    This file initializes life events with the age of the animal when the
+    event happens and the description of the event.
 """
 
 
-class AnimalEvents(object):
-    def __init__(self):
-        """
-        Initialization of AnimalEvents object.
-        """
-        self.events = {}
+class AnimalEvents:
+    """
+    A class to represent animal events in a farm simulation.
 
-    def init_from_string(self, events_str):
+    This class tracks the events related to animals including birth and other significant
+    occurrences.
+
+    Attributes
+    ----------
+    events : dict[int, list[str]]
+        A dictionary containing the events indexed by the animal's age in days. The values
+        are lists of descriptions for the events on that day.
+    """
+
+    def __init__(self) -> None:
+        """
+        Initialize a new AnimalEvents object.
+        """
+        self.events: dict[int, list[str]] = {}
+
+    def init_from_string(self, events_str: str) -> None:
         """
         Initialize event from a string
 
@@ -33,7 +52,7 @@ class AnimalEvents(object):
             for event in events:
                 self.add_event(date, 0, event)
 
-    def add_event(self, animal_age, simulation_day, description):
+    def add_event(self, animal_age: int, simulation_day: int, description: str) -> None:
         """
         Add a cow life event
 
@@ -51,7 +70,7 @@ class AnimalEvents(object):
                 self.events[animal_age] = [
                     'simulation_day=' + str(simulation_day), description]
 
-    def __str__(self):
+    def __str__(self) -> str:
         res_str = ''
         for key, value in sorted(self.events.items()):
             res_str += '\tdays born {}: {} \n'.format(key, value)
@@ -72,7 +91,7 @@ class AnimalEvents(object):
                          -1 if not found.
         """
         dates = list(self.events.keys())
-        for i in range(-1, -len(dates)-1, -1):
+        for i in range(-1, -len(dates) - 1, -1):
             if event_description in self.events[dates[i]]:
                 return dates[i]
         return -1

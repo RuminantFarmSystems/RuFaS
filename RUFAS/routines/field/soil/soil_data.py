@@ -72,7 +72,7 @@ class SoilData:
     """Cumulative total of active organic nitrogen that was removed from the top soil layer by erosion (kg)"""
 
     # ---- evaporation
-    water_evaporated: float = 0
+    water_evaporated: float = 0.0
     """Amount of water evaporated from the soil profile on the current day (mm)"""
 
     # ---- infiltration
@@ -84,8 +84,10 @@ class SoilData:
     """average slope of the subbasin expressed as rise over run (meters / meters)"""
     moisture_condition_parameter: Optional[float] = None
     """curve number value adjusted for moisture content (unitless) (SWAT 2:1.1.11)"""
-    accumulated_runoff: Optional[float] = None
-    """the amount of rainfall discharged as runoff during the day (mm)"""
+    accumulated_runoff: float = 0.0
+    """Amount of rainfall discharged as runoff on the current day (mm)."""
+    infiltrated_water: float = 0.0
+    """Amount of water that infiltrated the soil profile on the day (mm)."""
 
     # ---- percolation
     vadose_zone_layer: Optional[LayerData] = None
@@ -102,21 +104,49 @@ class SoilData:
     to 1, inclusive. SWAT sets the lag coefficient to 0.8 (paragraph between equations 1:1.3.3, 4) (unitless)
     """
 
+    # ---- Snow
+    snow_content: float = 0.0
+    """The water content of the snow pack, (mm H2O)."""
+    snow_melt_amount: float = 0.0
+    """The water content of the snow that melted on the current day, (mm H2O)."""
+    previous_day_snow_temperature: Optional[float] = None
+    """Snow pack temperature on the previous day, (ºC)"""
+    current_day_snow_temperature: Optional[float] = None
+    """Snow pack temperature of the current day, (ºC)"""
+    snow_lag_factor: float = 1.0
+    """Snow pack temperature lag factor, unitless."""
+    snow_coverage_fraction: float = 1.0
+    snow_melt_base_temperature: float = 0.5
+    """
+    Snow melt base temperature, (ºC).
+    The snow pack will not melt until the snow pack temperature exceeds a threshold value.
+    """
+    snow_coverage_maximum: float = 1.0
+    """Minimum snow water content that corresponds to 100% snow cover, (mm H2O)."""
+    snow_melt_factor_maximum: float = 4.5
+    """
+    Melt factor for snow on June 21, SMFMX, (mm H2O/°C-day)
+    If the watershed is in the Northern Hemisphere, SMFMX will be the maximum melt factor.
+    If the watershed is in the Southern Hemisphere, SMFMX will be the minimum melt factor.
+    """
+    snow_melt_factor_minimum: float = 4.5
+    """
+    Melt factor for snow on December 21, SMFMN, (mm H2O/°C-day)
+    If the watershed is in the Northern Hemisphere, SMFMN will be the minimum melt factor.
+    If the watershed is in the Southern Hemisphere, SMFMN will be the maximum melt factor.
+    """
+    water_sublimated: float = 0.0
+    """Amount of snow water content lost through sublimation on the current day (mm)."""
+
     # ---- Erosion
     slope_length: float = 3
     """length of the slope (meters)"""
     manning: float = 0.4
     """the Manning roughness coefficient for this subbasin (unitless)"""
-    snow_cover_water_content: float = 0
-    """water content of the snow cover (mm)"""
     eroded_sediment: float = 0
     """cumulative amount of sediment that has been eroded off of the field in a day (metric tons)"""
     surface_runoff_volume: Optional[float] = None
     """volume of surface runoff (mm per hectare), used in SWAT equation 4:1.1.1."""
-
-    # ---- decomposition
-    decomposition_temperature_effect: Optional[float] = None
-    """temperature effect on decomposition factor (unitless) (pseudocode_soil S.6.A.1)"""
 
     # ---- Fertilizer (Phosphorus Cycling)
     cover_type: str = "BARE"
@@ -131,7 +161,7 @@ class SoilData:
     """
     recalcitrant_phosphorus_pool: float = 0
     """Amount of phosphorus available for soil adsorption and leaching via runoff after the first rainfall event (kg)"""
-    runoff_phosphorus_pool: float = 0
+    runoff_fertilizer_phosphorus: float = 0.0
     """Amount of solubilized phosphorus that has been leached off the field by runoff (kg)"""
     days_since_application: int = 0
     """Number of days since phosphorus was applied to field via fertilizer"""
@@ -157,6 +187,10 @@ class SoilData:
     """Amount of stable inorganic phosphorus on the field that was applied by machine (kg)"""
     machine_stable_organic_phosphorus: float = 0
     """Amount of stable organic phosphorus on the field that was applied by machine (kg)"""
+    machine_organic_phosphorus_runoff: float = 0.0
+    """Amount of organic phosphorus from machine-applied manure dissolved in and removed by runoff (kg)."""
+    machine_inorganic_phosphorus_runoff: float = 0.0
+    """Amount of inorganic phosphorus from machine-applied manure dissolved in and removed by runoff (kg)."""
 
     grazing_manure_dry_mass: float = 0
     """The dry weight equivalent of manure mass on the field that was applied by grazers (kg)"""
@@ -176,13 +210,20 @@ class SoilData:
     """Amount of stable inorganic phosphorus on the field that was applied by grazing (kg)"""
     grazing_stable_organic_phosphorus: float = 0
     """Amount of stable organic phosphorus on the field that was applied by grazing (kg)"""
+    grazing_organic_phosphorus_runoff: float = 0.0
+    """Amount of organic phosphorus from grazing manure dissolved in and removed by runoff (kg)."""
+    grazing_inorganic_phosphorus_runoff: float = 0.0
+    """Amount of inorganic phosphorus from grazing manure dissolved in and removed by runoff (kg)."""
+
+    soil_phosphorus_runoff: float = 0.0
+    """Amount of phosphorus removed from surface soil layer by runoff (kg / ha)."""
 
     # ---- Residue partition (Carbon Cycling)
     plant_surface_residue = 0
     """plant residue on the surface of the soil (kg/ha)"""
     plant_root_residue = 0
     """plant residue below the surface of the soil (kg/ha)"""
-    plant_residue_lignin_composition: float = 0
+    plant_residue_lignin_composition: float = 0.17
     """lignin fraction of plant residue (unitless)"""
     plant_lignin_nitrogen_ratio: float = 0
     """plant lignin to nitrogen ratio (unitless)"""
@@ -190,6 +231,10 @@ class SoilData:
     """plant residue fraction that is metabolic (unitless)"""
     total_residue: float = 0
     """total amount of soil residue ever added to the field"""  # TODO: needed?
+    crop_root_depth: float = 0
+    """Root depth of the crop harvested (mm)"""
+    crop_yield_nitrogen: float = 0
+    """nitrogen contained in the harvested yield (kg/ha)"""
     @property
     def all_residue(self) -> float:  # TODO: not currently used.
         """amount of total plant residue, above and below-ground, on the field (kg/ha)"""
@@ -339,12 +384,20 @@ class SoilData:
     @property
     def profile_soil_water_content(self) -> float:
         """
-        Returns: amount of water in the entire soil profile (excluding the amount of water held in the profile at the
-            wilting point) (mm)
-        Details: this method for calculating total soil water content assumes the lower bound of water to be 0. It also
-            calculates the soil water content per layer, meaning that if one layer has water content greater than its
-            wilting water point and another layer has water content less than its wilting point, the first layer will
-            not have to compensate for the deficit in the second layer.
+        Calculate the amount of water in the entire soil profile (excluding the amount of water held in the profile at
+        the wilting point) (mm).
+
+        Returns
+        -------
+        float
+            The total soil water content in millimeters (mm).
+
+        Notes
+        -----
+        This method calculates the total soil water content in the entire soil profile. It assumes that the lower bound
+        of water is 0. The calculation is done per layer, meaning that if one layer has water content greater than its
+        wilting water point and another layer has water content less than its wilting point, the first layer will not
+        have to compensate for the deficit in the second layer.
         """
         water_sum = 0
         for layer in self.soil_layers:
@@ -354,7 +407,12 @@ class SoilData:
     @property
     def profile_saturation(self) -> float:
         """
-        Returns: amount of water in the soil profile when completely saturated (mm)
+        Calculate the amount of water in the soil profile when completely saturated (mm).
+
+        Returns
+        -------
+        float
+            The saturated soil water content in millimeters (mm).
         """
         saturation_sum = 0
         for layer in self.soil_layers:
@@ -364,7 +422,13 @@ class SoilData:
     @property
     def profile_field_capacity(self) -> float:
         """
-         Returns: total amount of water contained in the entire soil profile at field capacity (but not saturated) (mm)
+        Calculate the total amount of water contained in the entire soil profile at field capacity
+        (but not saturated) (mm).
+
+        Returns
+        -------
+        float
+            The soil water content at field capacity in millimeters (mm).
         """
         field_capacity_sum = 0
         for layer in self.soil_layers:
@@ -373,10 +437,21 @@ class SoilData:
 
     @property
     def soil_water_factor(self) -> float:
-        """Returns: the soil water factor (unitless)
-        SWAT Reference: 5:2.3.18
         """
-        return self.profile_soil_water_content / (0.85 * self.profile_field_capacity)
+        Get the soil water factor (unitless).
+
+        Returns
+        -------
+        float
+            The soil water factor, in the range [0.0, 1.0] (unitless).
+
+        References
+        ----------
+        SWAT Theoretical documentation eqn. 5:2.3.18
+        """
+        unclamped_water_factor = self.profile_soil_water_content / (0.85 * self.profile_field_capacity)
+        clamped_water_factor = min(1.0, max(0.0, unclamped_water_factor))
+        return clamped_water_factor
 
     # TODO: implement method that validates all the values inside the SoilData object, including
     #   - soil layers all have top depths above bottom depths, top depth of top layer is 0, none of the layers are
@@ -387,8 +462,15 @@ class SoilData:
 
     @property
     def profile_bulk_density(self) -> float:
-        """Average bulk density of the soil profile based on the bulk density of each soil layer, weighted by the
-            thickness (Mg per cubic meter)"""
+        """
+        Calculate the average bulk density of the soil profile based on the bulk density of each soil layer,
+        weighted by the thickness.
+
+        Returns
+        -------
+        float
+            The average bulk density of the soil profile (Mg per cubic meter)
+        """
         weighted_densities_sum = 0
         weights_sum = 0
         for layer in self.soil_layers:
@@ -398,7 +480,14 @@ class SoilData:
 
     @property
     def profile_nitrates_total(self) -> float:
-        """Calculates and returns the total amount of nitrates in the soil (kg per hectare)"""
+        """
+        Calculate and return the total amount of nitrates in the soil.
+
+        Returns
+        -------
+        float
+            The total amount of nitrates in the soil (kg per hectare).
+        """
         nitrates_sum = 0
         for layer in self.soil_layers:
             nitrates_sum += layer.nitrate_content
@@ -406,13 +495,24 @@ class SoilData:
 
     @property
     def cover_factor(self) -> float:
-        """Returns the cover factor based on the cover type, for use in determining how much phosphorus is absorbed by
-            the soil from surface applied fertilizer before the first rainfall event after application (unitless).
-        Raises:
-            ValueError: If cover type is not one of the three acceptable types ("BARE", "RESIDUE_COVER", or "GRASSED")
-        References:
-            pseudocode_soil [S.5.C.I.1], SurPhos [14] (Note: constants differ between these documents, defer to
-            pseudocode_soil and old code)
+        """
+        Returns the cover factor based on the cover type for determining phosphorus absorption by soil
+        from surface-applied fertilizer before the first rainfall event after application.
+
+        Returns
+        -------
+        float
+            The cover factor (unitless).
+
+        Raises
+        ------
+        ValueError
+            If the cover type is not one of the acceptable types ("BARE", "RESIDUE_COVER", or "GRASSED").
+
+        References
+        ----------
+        pseudocode_soil [S.5.C.I.1], SurPhos [14] (Note: constants may differ between documents; defer to
+        pseudocode_soil and old code).
         """
         if self.cover_type == "BARE":
             return 0.5333
@@ -425,11 +525,23 @@ class SoilData:
 
     @property
     def solubilizing_factor(self) -> float:
-        """Returns the fraction of fertilizer phosphorus that is removed from the available fertilizer phosphorus pool
-            (when number of rain events is less than or equal to 1) or the recalcitrant fertilizer phosphorus pool
-            (when number of rain events is greater than or equal to 2) (unitless).
-            References:
-                SurPhos paragraph just below [16]
+        """
+        Returns the fraction of fertilizer phosphorus removed from the available or recalcitrant pool based on the
+        number of rain events.
+
+        Parameters
+        ----------
+        rain_events : int
+            The number of rain events.
+
+        Returns
+        -------
+        float
+            The fraction of fertilizer phosphorus removed (unitless).
+
+        References
+        ----------
+        SurPhos paragraph just below [16].
         """
         if self.rain_events_after_fertilizer_application <= 1:
             return 1
@@ -437,3 +549,19 @@ class SoilData:
             return 0.40
         else:
             return 0.075
+
+    @property
+    def profile_carbon_emissions(self) -> float:
+        """
+        Calculates the total amount of CO2 respirated from the soil profile.
+
+        Returns
+        -------
+        float
+            Total amount of CO2 emitted from carbon decomposition in the soil profile (kg/ha).
+
+        """
+        emissions_from_active = sum(self.get_vectorized_layer_attribute('active_carbon_to_slow_loss'))
+        emissions_from_slow = sum(self.get_vectorized_layer_attribute('slow_carbon_co2_lost_amount'))
+        emissions_from_passive = sum(self.get_vectorized_layer_attribute('passive_carbon_co2_lost_amount'))
+        return emissions_from_active + emissions_from_slow + emissions_from_passive

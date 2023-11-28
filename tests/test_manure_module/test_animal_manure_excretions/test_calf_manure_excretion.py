@@ -1,5 +1,3 @@
-from typing import Optional
-
 import pytest
 from pytest import approx
 from pytest_mock import MockFixture
@@ -35,7 +33,7 @@ def test_calf_manure_excretions(methane_model: str,
         'CP': CP_concentration
     }
     patch_for_ration_report = mocker.patch(
-        'RUFAS.routines.animal.manure.calf_manure_excretion.ration_report',
+        'RUFAS.routines.animal.manure.calf_manure_excretion.RationReporter.report_ration',
         return_value=(mock_nutrient_amounts, mock_nutrient_concentrations)
     )
 
@@ -120,4 +118,4 @@ def test_calf_manure_excretions(methane_model: str,
     assert manure_excretion_values['phosphorus_fraction'] == approx(
         manure_phosphorus_fraction)
     assert manure_excretion_values['potassium'] == approx(potassium)
-    assert manure_excretion_values['methane'] == approx(methane_emission)
+    assert manure_excretion_values['enteric_methane_g'] == approx(methane_emission)

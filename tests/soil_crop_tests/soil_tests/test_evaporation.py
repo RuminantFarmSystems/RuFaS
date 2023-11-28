@@ -2,7 +2,7 @@ from RUFAS.routines.field.soil.evaporation import Evaporation
 from RUFAS.routines.field.soil.soil_data import SoilData
 from RUFAS.routines.field.soil.layer_data import LayerData
 from math import exp
-from unittest.mock import MagicMock
+from unittest.mock import MagicMock, patch
 import pytest
 from typing import List
 
@@ -91,16 +91,17 @@ def test_determine_amount_water_removed(reduced_evap_demand, soil_water, wilting
     assert expect == observe
 
 
-@pytest.mark.parametrize("max_evaporation,expected_evaporation,expected_loop_iterations,expected_water_contents", [
-    (10, 2.8, 4, [0.8, 0.8, 0.8, 0.8]),
-    (5.5, 2.8, 4, [0.8, 0.8, 0.8, 0.8]),
-    (2.2, 2.2, 4, [0.8, 0.8, 0.8, 1.4]),
-    (1.5, 1.5, 3, [0.8, 0.8, 1.4, 1.5]),
-    (0, 0, 1, [1.5, 1.5, 1.5, 1.5])
-])
+@pytest.mark.parametrize("max_evaporation,expected_evaporation,expected_loop_iterations,expected_water_contents,"
+                         "expected_water_evaporated", [
+                             (10, 2.8, 4, [0.8, 0.8, 0.8, 0.8], [0.7, 0.7, 0.7, 0.7]),
+                             (5.5, 2.8, 4, [0.8, 0.8, 0.8, 0.8], [0.7, 0.7, 0.7, 0.7]),
+                             (2.2, 2.2, 4, [0.8, 0.8, 0.8, 1.4], [0.7, 0.7, 0.7, 0.1]),
+                             (1.5, 1.5, 3, [0.8, 0.8, 1.4, 1.5], [0.7, 0.7, 0.1, 0.0]),
+                             (0, 0, 1, [1.5, 1.5, 1.5, 1.5], [0.0, 0.0, 0.0, 0.0])
+                         ])
 def test_evaporate(max_evaporation: float, expected_evaporation: float, expected_loop_iterations: int,
-                   expected_water_contents: List[float]) -> None:
-    """Tests that evaporation evaporates the correct amount of water from the soil profile, and stores that amount
+                   expected_water_contents: List[float], expected_water_evaporated: List[float]) -> None:
+    """Tests that `evaporate()` evaporates the correct amount of water from the soil profile, and stores that amount
         properly"""
     data = SoilData(field_size=1.33, soil_layers=[LayerData(top_depth=0, bottom_depth=20, field_size=1.33),
                                                   LayerData(top_depth=20, bottom_depth=50, field_size=1.33),
@@ -109,17 +110,21 @@ def test_evaporate(max_evaporation: float, expected_evaporation: float, expected
     incorp = Evaporation(data)
     incorp.data.set_vectorized_layer_attribute("water_content", [1.5] * 4)
     incorp.data.set_vectorized_layer_attribute("soil_evaporation_compensation_coefficient", [0.9] * 4)
+    incorp.data.set_vectorized_layer_attribute("evaporated_water_content", [1.1] * 4)
 
-    incorp._determine_layer_evaporative_demand = MagicMock(return_value=0.8)
-    incorp._determine_evaporative_demand_reduced = MagicMock(return_value=0.6)
-    incorp._determine_amount_water_removed = MagicMock(return_value=0.7)
+    path_str = "RUFAS.routines.field.soil.evaporation.Evaporation"
+    with patch(f"{path_str}._determine_layer_evaporative_demand", new_callable=MagicMock, return_value=0.8) as demand, \
+            patch(f"{path_str}._determine_evaporative_demand_reduced", new_callable=MagicMock, return_value=0.6) as \
+            reduced, \
+            patch(f"{path_str}._determine_amount_water_removed", new_callable=MagicMock, return_value=0.7) as removed:
+        incorp.evaporate(max_evaporation)
+        actual_water_contents = incorp.data.get_vectorized_layer_attribute("water_content")
+        actual_water_evaporated = incorp.data.get_vectorized_layer_attribute("evaporated_water_content")
 
-    incorp.evaporate(max_evaporation)
-    actual_water_contents = incorp.data.get_vectorized_layer_attribute("water_content")
-
-    assert incorp._determine_layer_evaporative_demand.call_count == expected_loop_iterations
-    assert incorp._determine_evaporative_demand_reduced.call_count == expected_loop_iterations
-    assert incorp._determine_amount_water_removed.call_count == expected_loop_iterations
-    assert pytest.approx(actual_water_contents) == expected_water_contents
-    assert pytest.approx(incorp.data.water_evaporated) == expected_evaporation
-    assert pytest.approx(incorp.data.annual_soil_evaporation_total) == expected_evaporation
+        assert demand.call_count == expected_loop_iterations
+        assert reduced.call_count == expected_loop_iterations
+        assert removed.call_count == expected_loop_iterations
+        assert pytest.approx(actual_water_contents) == expected_water_contents
+        assert pytest.approx(actual_water_evaporated) == expected_water_evaporated
+        assert pytest.approx(incorp.data.water_evaporated) == expected_evaporation
+        assert pytest.approx(incorp.data.annual_soil_evaporation_total) == expected_evaporation

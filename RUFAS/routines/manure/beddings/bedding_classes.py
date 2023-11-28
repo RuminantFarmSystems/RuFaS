@@ -33,11 +33,12 @@ class BeddingType(DefaultEnum):
         The default type of bedding is 'sand' if none is specified.
 
     """
-    SAWDUST = 'sawdust'
-    CBPB_SAWDUST = 'CBPB sawdust'
-    MANURE_SOLIDS = 'manure solids'
-    STRAW = 'straw'
-    SAND = 'sand'
+
+    SAWDUST = "sawdust"
+    CBPB_SAWDUST = "CBPB sawdust"
+    MANURE_SOLIDS = "manure solids"
+    STRAW = "straw"
+    SAND = "sand"
     DEFAULT = SAND
 
 
@@ -152,7 +153,9 @@ class BaseBedding(ABC):
             The total amount of dry solids in the bedding (kg/day).
 
         """
-        return self.calc_total_bedding_mass(num_animals) / self.bedding_dry_matter_content
+        return (
+            self.calc_total_bedding_mass(num_animals) / self.bedding_dry_matter_content
+        )
 
 
 class BaseOrganicBedding(BaseBedding):
@@ -188,6 +191,7 @@ class SawdustBedding(BaseOrganicBedding):
 
     All attributes and methods are inherited from BaseOrganicBedding.
     """
+
     pass
 
 
@@ -197,6 +201,7 @@ class CBPBSawdustBedding(BaseOrganicBedding):
 
     All attributes and methods are inherited from BaseOrganicBedding.
     """
+
     pass
 
 
@@ -206,6 +211,7 @@ class ManureSolidsBedding(BaseOrganicBedding):
 
     All attributes and methods are inherited from BaseOrganicBedding.
     """
+
     pass
 
 
@@ -215,6 +221,7 @@ class StrawBedding(BaseOrganicBedding):
 
     All attributes and methods are inherited from BaseOrganicBedding.
     """
+
     pass
 
 
@@ -401,13 +408,15 @@ class DefaultBeddingConfigFactory:
             BeddingType.CBPB_SAWDUST: cls.CBPB_SAWDUST_BEDDING_CONFIG,
             BeddingType.MANURE_SOLIDS: cls.MANURE_SOLIDS_BEDDING_CONFIG,
             BeddingType.STRAW: cls.STRAW_BEDDING_CONFIG,
-            BeddingType.SAND: cls.SAND_BEDDING_CONFIG
+            BeddingType.SAND: cls.SAND_BEDDING_CONFIG,
         }
 
         if bedding_type not in bedding_config_by_type:
-            raise ValueError(f"Bedding type {bedding_type} is not recognized. "
-                             f"It may be a new bedding type that has not been added "
-                             f"to the 'get_instance' method.")
+            raise ValueError(
+                f"Bedding type {bedding_type} is not recognized. "
+                f"It may be a new bedding type that has not been added "
+                f"to the 'get_instance' method."
+            )
 
         return bedding_config_by_type[bedding_type]
 
@@ -423,8 +432,11 @@ class BeddingFactory:
     """
 
     @classmethod
-    def get_instance(cls, bedding_type_name: str, custom_bedding_config: Optional[BeddingConfig] = None) \
-            -> BaseBedding:
+    def get_instance(
+        cls,
+        bedding_type_name: str,
+        custom_bedding_config: Optional[BeddingConfig] = None,
+    ) -> BaseBedding:
         """
         Create a bedding object of the specified type.
 
@@ -458,7 +470,9 @@ class BeddingFactory:
         if custom_bedding_config:
             bedding_obj = bedding_class(custom_bedding_config)
         else:
-            default_bedding_config = DefaultBeddingConfigFactory.get_instance(bedding_type)
+            default_bedding_config = DefaultBeddingConfigFactory.get_instance(
+                bedding_type
+            )
             bedding_obj = bedding_class(default_bedding_config)
 
         return bedding_obj

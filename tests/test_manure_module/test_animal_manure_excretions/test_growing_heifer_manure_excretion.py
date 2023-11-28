@@ -6,6 +6,7 @@ from RUFAS.general_constants import GeneralConstants
 from RUFAS.routines.animal.manure.general_manure import AnimalManureExcretions
 from RUFAS.routines.animal.manure.growing_heifer_manure_excretion import manure_calculations
 
+
 @pytest.mark.parametrize(
     'methane_model',
     [
@@ -40,7 +41,7 @@ def test_growing_heifer_manure_calculations(methane_model: str,
         'EE': EE_concentration
     }
     patch_for_ration_report = mocker.patch(
-        'RUFAS.routines.animal.manure.growing_heifer_manure_excretion.ration_report',
+        'RUFAS.routines.animal.manure.growing_heifer_manure_excretion.RationReporter.report_ration',
         return_value=(mock_nutrient_amounts, mock_nutrient_concentrations)
     )
 
@@ -50,9 +51,11 @@ def test_growing_heifer_manure_calculations(methane_model: str,
     degradable_volatile_solids = 0.9 * total_volatile_solids
     non_degradable_volatile_solids = total_volatile_solids - degradable_volatile_solids
     urine = 9.0
-    manure_nitrogen = (15.1 + 0.83 * (dry_matter_intake * GeneralConstants.KG_TO_GRAMS) * (CP_concentration * GeneralConstants.PROTEIN_TO_NITROGEN / 100)
+    manure_nitrogen = (15.1 + 0.83 * (dry_matter_intake * GeneralConstants.KG_TO_GRAMS) *
+                       (CP_concentration * GeneralConstants.PROTEIN_TO_NITROGEN / 100)
                        ) * GeneralConstants.GRAMS_TO_KG
-    urine_nitrogen = (14.3 + 0.510 * (dry_matter_intake * GeneralConstants.KG_TO_GRAMS) * (CP_concentration * GeneralConstants.PROTEIN_TO_NITROGEN / 100)
+    urine_nitrogen = (14.3 + 0.510 * (dry_matter_intake * GeneralConstants.KG_TO_GRAMS) *
+                      (CP_concentration * GeneralConstants.PROTEIN_TO_NITROGEN / 100)
                       ) * GeneralConstants.GRAMS_TO_KG
     urinary_nitrogen_concentration = (
         urine_nitrogen * GeneralConstants.KG_TO_GRAMS) / urine
@@ -74,8 +77,8 @@ def test_growing_heifer_manure_calculations(methane_model: str,
     methane_emission = 0.0
     if methane_model:
         soluble_residue = (100 - ASH_concentration) - NDF_concentration - CP_concentration - EE_concentration
-        gross_energy_concentration = (0.263 * CP_concentration + 0.522 * EE_concentration 
-                                    + 0.198 * NDF_concentration + 0.160 * soluble_residue) 
+        gross_energy_concentration = (0.263 * CP_concentration + 0.522 * EE_concentration
+                                      + 0.198 * NDF_concentration + 0.160 * soluble_residue)
         methane_emission = (0.065 * gross_energy_concentration * dry_matter_intake) / 0.05565
 
     total_phosphorus_excreted = 4.0
@@ -141,4 +144,4 @@ def test_growing_heifer_manure_calculations(methane_model: str,
     assert manure_excretion_values['phosphorus_fraction'] == approx(
         manure_phosphorus_fraction)
     assert manure_excretion_values['potassium'] == approx(potassium)
-    assert manure_excretion_values['methane'] == approx(methane_emission)
+    assert manure_excretion_values['enteric_methane_g'] == approx(methane_emission)

@@ -30,7 +30,10 @@ class DefaultEnum(Enum):
         for member in cls:
             if member.name.upper() == lookup_name.strip().upper():
                 return member
-            elif type(member.value) == str and member.value.upper() == lookup_name.strip().upper():
+            elif (
+                type(member.value) == str
+                and member.value.upper() == lookup_name.strip().upper()
+            ):
                 return member
 
         return cls.get_default_type()
@@ -47,10 +50,10 @@ class DefaultEnum(Enum):
                 first member is returned.
 
         """
-        if hasattr(cls, 'DEFAULT'):
-            return getattr(cls, 'DEFAULT')
+        if hasattr(cls, "DEFAULT"):
+            return getattr(cls, "DEFAULT")
 
         try:
             return list(cls)[0]
         except IndexError:
-            raise IndexError(f'Enum {cls.__name__} has no members.')
+            raise IndexError(f"Enum {cls.__name__} has no members.")

@@ -17,7 +17,6 @@ class OutputGatherer:
             info_map["prefix"] = "field='" + field.field_data.name + "'"
             # --------------------------adding field data
             om.add_variable("current_residue", field.field_data.current_residue, info_map)
-            om.add_variable("evaporation", field.field_data.evaporation, info_map)
             om.add_variable("transpiration", field.field_data.transpiration, info_map)
             om.add_variable("max_transpiration", field.field_data.max_transpiration, info_map)
             om.add_variable("max_evapotranspiration", field.field_data.max_evapotranspiration, info_map)
@@ -28,6 +27,11 @@ class OutputGatherer:
                             info_map)
             om.add_variable("eroded_sediment", field.soil.data.eroded_sediment, info_map)
             om.add_variable("accumulated_runoff", field.soil.data.accumulated_runoff, info_map)
+            om.add_variable("infiltrated_water", field.soil.data.infiltrated_water, info_map)
+            om.add_variable("snow_content", field.soil.data.snow_content, info_map)
+            om.add_variable("snow_melt", field.soil.data.snow_melt_amount, info_map)
+            om.add_variable("current_day_snow_temperature", field.soil.data.current_day_snow_temperature, info_map)
+            om.add_variable("water_sublimated", field.soil.data.water_sublimated, info_map)
             om.add_variable("cover_type",
                             field.soil.data.cover_type,
                             info_map)
@@ -40,8 +44,8 @@ class OutputGatherer:
             om.add_variable("recalcitrant_phosphorus_pool",
                             field.soil.data.recalcitrant_phosphorus_pool,
                             info_map)
-            om.add_variable("runoff_phosphorus_pool",
-                            field.soil.data.runoff_phosphorus_pool,
+            om.add_variable("runoff_fertilizer_phosphorus",
+                            field.soil.data.runoff_fertilizer_phosphorus,
                             info_map)
             om.add_variable("days_since_application",
                             field.soil.data.days_since_application,
@@ -73,6 +77,10 @@ class OutputGatherer:
             om.add_variable("machine_stable_organic_phosphorus",
                             field.soil.data.machine_stable_organic_phosphorus,
                             info_map)
+            om.add_variable("machine_organic_phosphorus_runoff", field.soil.data.machine_organic_phosphorus_runoff,
+                            info_map)
+            om.add_variable("machine_inorganic_phosphorus_runoff", field.soil.data.machine_inorganic_phosphorus_runoff,
+                            info_map)
             om.add_variable("grazing_manure_dry_mass",
                             field.soil.data.grazing_manure_dry_mass,
                             info_map)
@@ -97,6 +105,12 @@ class OutputGatherer:
             om.add_variable("grazing_stable_organic_phosphorus",
                             field.soil.data.grazing_stable_organic_phosphorus,
                             info_map)
+            om.add_variable("grazing_organic_phosphorus_runoff", field.soil.data.grazing_organic_phosphorus_runoff,
+                            info_map)
+            om.add_variable("grazing_inorganic_phosphorus_runoff", field.soil.data.grazing_inorganic_phosphorus_runoff,
+                            info_map)
+            om.add_variable("soil_phosphorus_runoff", field.soil.data.soil_phosphorus_runoff, info_map)
+            om.add_variable("profile_carbon_emissions", field.soil.data.profile_carbon_emissions, info_map)
             # Adding vadose zone layer data
             info_map["prefix"] = "field='" + field.field_data.name + "',vadose_zone_layer"
             om.add_variable("active_organic_nitrogen_content",
@@ -124,6 +138,8 @@ class OutputGatherer:
 
                 om.add_variable("temperature", layer.temperature, info_map)
                 om.add_variable("percolated_water", layer.percolated_water, info_map)
+                om.add_variable("water_content", layer.water_content, info_map)
+                om.add_variable("evaporated_water_content", layer.evaporated_water_content, info_map)
                 om.add_variable("plant_metabolic_active_carbon_usage", layer.plant_metabolic_active_carbon_usage,
                                 info_map)
                 om.add_variable("plant_metabolic_active_carbon_loss", layer.plant_metabolic_active_carbon_loss,
@@ -132,6 +148,8 @@ class OutputGatherer:
                                 layer.plant_metabolic_active_carbon_remaining, info_map)
                 om.add_variable("plant_structural_active_carbon_usage", layer.plant_structural_active_carbon_usage,
                                 info_map)
+                om.add_variable("metabolic_litter_amount", layer.metabolic_litter_amount, info_map)
+                om.add_variable("structural_litter_amount", layer.structural_litter_amount, info_map)
                 om.add_variable("plant_structural_active_carbon_remaining",
                                 layer.plant_structural_active_carbon_remaining, info_map)
                 om.add_variable("plant_structural_slow_carbon_usage", layer.plant_structural_slow_carbon_usage,
@@ -162,6 +180,7 @@ class OutputGatherer:
                                 info_map)
                 om.add_variable("active_carbon_amount", layer.active_carbon_amount, info_map)
                 om.add_variable("slow_carbon_amount", layer.slow_carbon_amount, info_map)
+                om.add_variable("passive_carbon_amount", layer.passive_carbon_amount, info_map)
                 om.add_variable("slow_carbon_decomposition_amount", layer.slow_carbon_decomposition_amount,
                                 info_map)
                 om.add_variable("passive_carbon_decomposition_amount", layer.passive_carbon_decomposition_amount,
@@ -189,6 +208,7 @@ class OutputGatherer:
                                 info_map)
                 om.add_variable("labile_inorganic_unbalanced_counter", layer.labile_inorganic_unbalanced_counter,
                                 info_map)
+                om.add_variable("percolated_phosphorus", layer.percolated_phosphorus, info_map)
                 om.add_variable("nitrate_content", layer.nitrate_content, info_map)
                 om.add_variable("ammonium_content", layer.ammonium_content, info_map)
                 om.add_variable("active_organic_nitrogen_content", layer.active_organic_nitrogen_content, info_map)

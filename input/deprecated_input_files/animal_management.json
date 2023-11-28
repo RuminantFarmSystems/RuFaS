@@ -1,0 +1,20 @@
+{
+    "config": {
+      "start_date": "2009:244",
+      "end_date": "2010:264",
+      "csv_dir": "output/CSVs/",
+      "graphic_dir": "output/graphics/",
+      "run_tests": true,
+      "set_seed": true,
+      "seed": 42,
+      "simulate_animals": true
+    },
+    "weather": "barnyard_weather.csv",
+    "farm": {
+      "fields": {
+      },
+      "animal": "animal_management_animal.json",
+      "feed": "purchased_feed.json",
+      "manure": "manure_management.json"
+    }
+  }

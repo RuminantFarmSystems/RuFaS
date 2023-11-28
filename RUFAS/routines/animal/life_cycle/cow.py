@@ -28,7 +28,7 @@ from RUFAS.routines.animal.manure.lactating_cow_manure_excretion import \
     manure_calculations as lactating_manure_calculations
 from RUFAS.routines.animal.manure.dry_cow_manure_excretion import \
     manure_calculations as dry_manure_calculations
-from RUFAS.routines.animal.ration.animal_requirements import calc_rqmts
+from RUFAS.routines.animal.ration.animal_requirements import AnimalRequirements
 from random import random
 from RUFAS.routines.animal.life_cycle import animal_constants as const
 
@@ -54,8 +54,8 @@ class Cow(HeiferIII):
             args.birth_date: the date of the simulation when the calf was born
             args.daysBorn: age of the animal
             args.tai_method_h: timed-AI protocols used for
-                reproduction programs, three of them: 5dCG2P,
-                5dCGP, and user-defined
+                reproduction programs, three of them: md5CG2P,
+                md5CGP, and user-defined
             args.synch_ed_method_h: synch ed protocols used for
                 reproduction programs, two of them: 2P and CP
             args.repro_program: reproduction program used in cow,
@@ -132,7 +132,7 @@ class Cow(HeiferIII):
         self.wood_m = 0
         self.wood_n = 0
 
-        self.lactation_curve = AnimalBase.config['lactation_curve']
+        self.lactation_curve = 'wood'
         self.milk_production_history = []
         self.breed_index = 0
         self.parity_index = 0
@@ -322,12 +322,12 @@ class Cow(HeiferIII):
             daily_milk_variation = self.determine_param_value(AnimalModuleConstants.DAILY_MILK_VARIATION_MEAN,
                                                               AnimalModuleConstants.DAILY_MILK_VARIATION_STD_DEV)
             estimated_daily_milk_produced += daily_milk_variation
+            estimated_daily_milk_produced += self.milk_production_reduction
 
         if self.milking:
-            self.estimated_daily_milk_produced = estimated_daily_milk_produced
+            self.estimated_daily_milk_produced = max(0.0, estimated_daily_milk_produced)
         else:
-            self.estimated_daily_milk_produced = 0
-        self.estimated_daily_milk_produced += self.milk_production_reduction
+            self.estimated_daily_milk_produced = 0.0
         self.single_acc_milk_prod += estimated_daily_milk_produced
 
         # calculate fat percent in milk and fat corrected milk production
@@ -351,25 +351,24 @@ class Cow(HeiferIII):
                     "simulation_day": sim_day
                     }
 
-        milk_data_update = {}
-        milk_data_update["days_in_milk"] = self.days_in_milk
-        milk_data_update["estimated_daily_milk_produced"] = self.estimated_daily_milk_produced
-        milk_data_update["milk_protein"] = self.mPrt
-        milk_data_update["milk_fat"] = self.fat_percent
-        milk_data_update["milk_lactose"] = self.lactose_milk
-        milk_data_update["lactating"] = self.milking
-        milk_data_update["parity"] = self.calves
-        milk_data_update["cow_id"] = self.id
-
-        om.add_variable("milk_data_at_milk_update", milk_data_update, info_map)
+        om.add_variable("sim_day", sim_day, info_map)
+        om.add_variable("days_in_milk", self.days_in_milk, info_map)
+        om.add_variable("estimated_daily_milk_produced", self.estimated_daily_milk_produced, info_map)
+        om.add_variable("milk_fat", self.fat_percent, info_map)
+        om.add_variable("milk_protein", self.mPrt, info_map)
+        om.add_variable("milk_lactose", self.lactose_milk, info_map)
+        om.add_variable("lactating", self.milking, info_map)
+        om.add_variable("cow_id", self.id, info_map)
+        om.add_variable("parity", self.calves, info_map)
 
         # if not self.milking:
         # 	self.daily_growth = self.body_weight - prev_weight
 
         return self.estimated_daily_milk_produced, fat_percent, \
-               daily_fat_correct_milk_production
+            daily_fat_correct_milk_production
 
-    def calc_manure_excretion(self, feed, methane_model, methane_mitigation_method, methane_mitigation_additive_amount, ME_intake):
+    def calc_manure_excretion(self, feed, methane_model, methane_mitigation_method, methane_mitigation_additive_amount,
+                              ME_intake):
         """
         Calculates and sets the manure excretion components.
         Args:
@@ -383,41 +382,50 @@ class Cow(HeiferIII):
             self.p_excrt, self.manure_excretion = lactating_manure_calculations(
                 self.ration_formulation, feed, self.body_weight,
                 self.days_in_milk, self.mPrt, self.estimated_daily_milk_produced,
-                p_feces_excrt, p_urine, methane_model, methane_mitigation_method, methane_mitigation_additive_amount, self.fat_percent, ME_intake)
+                p_feces_excrt, p_urine, methane_model, methane_mitigation_method, methane_mitigation_additive_amount,
+                self.fat_percent, ME_intake)
         else:
             self.p_excrt, self.manure_excretion = dry_manure_calculations(
                 self.ration_formulation, feed, self.body_weight,
                 self.estimated_daily_milk_produced, p_feces_excrt, p_urine, methane_model, ME_intake)
 
-    def set_nutrient_rqmts(self, animal_grouping_scenario):
+    def set_nutrient_rqmts(self, animal_grouping_scenario, nutrient_conc: dict = {}):
         """
         Calculates this Cow's nutrient requirements.
         """
+        if nutrient_conc and nutrient_conc['dm'] != 0.0:
+            NDF_conc = nutrient_conc['NDF'] / 100
+            TDN_conc = nutrient_conc['TDN'] / 100
+        else:
+            NDF_conc = 0.3
+            TDN_conc = 0.7
+        req = AnimalRequirements()
+        animal_requirements = req.calc_rqmts(body_weight=self.body_weight,
+                                             mature_body_weight=self.mature_body_weight,
+                                             day_of_pregnancy=self.days_in_preg,
+                                             animal_type=animal_grouping_scenario.get_animal_type(self),
+                                             parity=self.calves,
+                                             calving_interval=self.CI,
+                                             milk_true_protein=self.mPrt,
+                                             milk_fat=self.fat_percent,
+                                             milk_lactose=self.lactose_milk,
+                                             milk_production=self.estimated_daily_milk_produced,
+                                             days_in_milk=self.days_in_milk,
+                                             lactating=self.milking,
+                                             NDF_conc=NDF_conc,
+                                             TDN_conc=TDN_conc)
 
-        req = calc_rqmts(body_weight=self.body_weight,
-                         mature_body_weight=self.mature_body_weight,
-                         day_of_pregnancy=self.days_in_preg,
-                         animal_type=animal_grouping_scenario.get_animal_type(
-                             self),
-                         parity=self.calves,
-                         calving_interval=self.CI,
-                         milk_true_protein=self.mPrt,
-                         milk_fat=self.fat_percent,
-                         milk_lactose=self.lactose_milk,
-                         milk_production=self.estimated_daily_milk_produced,
-                         days_in_milk=self.days_in_milk,
-                         lactating=self.milking)
-
-        self.NEmaint = req['NEmaint']
-        self.NEg = req['NEg']
-        self.NEpreg = req['NEpreg']
-        self.NEl = req['NEl']
-        self.MP_req = req['MP_req']
-        self.Ca_req = req['Ca_req']
-        self.P_req = req['P_req']
-        self.DMIest = req['DMIest']
-        self.DNED_req = (req['NEmaint'] + req['NEl']) / self.DMIest
-        self.DMDP_req = (req['MP_req']) / self.DMIest
+        self.NEmaint_requirement = animal_requirements['NEmaint_requirement']
+        self.NEg_requirement = animal_requirements['NEg_requirement']
+        self.NEpreg_requirement = animal_requirements['NEpreg_requirement']
+        self.NEl_requirement = animal_requirements['NEl_requirement']
+        self.MP_requirement = animal_requirements['MP_requirement']
+        self.Ca_requirement = animal_requirements['Ca_requirement']
+        self.P_requirement = animal_requirements['P_requirement']
+        self.DMIest_requirement = animal_requirements['DMIest_requirement']
+        self.DNED_requirement = (animal_requirements['NEmaint_requirement'] + animal_requirements['NEl_requirement']) \
+            / self.DMIest_requirement
+        self.DMDP_requirement = (animal_requirements['MP_requirement']) / self.DMIest_requirement
 
     def phosphorus_rqmts(self, DMI):
         """
@@ -483,7 +491,7 @@ class Cow(HeiferIII):
         self.DVD = 2 * vertical_dist_to_parlor * AnimalBase.config['cow_times_milked_per_day']
         self.DHD = 2 * horizontal_dist_to_parlor * AnimalBase.config['cow_times_milked_per_day']
 
-    def get_bw_change(self, CI):
+    def get_bw_change(self, CI): # noqa
         """
         life cycle psedocode @[A.1A.C.56/57/58]
         Calculates the body weight change for a cow.
@@ -553,7 +561,7 @@ class Cow(HeiferIII):
 
         return target_adg_cow + conceptus_growth + bodyweight_tissue
 
-    def update(self, sim_day, calving_interval):
+    def update(self, sim_day, calving_interval): # noqa
         """
         Update cow status from the moment of calving, parity+1,
         milking start, pregnancy stop, and estrus restart.
@@ -606,7 +614,6 @@ class Cow(HeiferIII):
         self.update_body_weight_history(sim_day)
         self.update_milk_production_history(sim_day)
 
-
         if not self.do_not_breed:
             if self.repro_program == 'ED':
                 self.ed_update(sim_day)
@@ -615,6 +622,8 @@ class Cow(HeiferIII):
             elif self.repro_program == 'TAI':
                 if self.days_in_milk >= AnimalBase.config['voluntary_waiting_period']:
                     self.tai_update(sim_day)
+            else:
+                raise ValueError(f'Invalid cow repro program: {self.repro_program}')
 
         self.fat_percent = fat_percent
         if not self.do_not_breed:
@@ -706,17 +715,17 @@ class Cow(HeiferIII):
             elif not self.do_not_breed:
                 estrus_detection_rand = random()
                 if estrus_detection_rand < \
-                        AnimalBase.config['estrus_detection_rate']:
+                        AnimalBase.config['cow_repro_programs']['estrus_detection_rate']:
                     # Estrus detected
                     self.events.add_event(
                         self.days_born, sim_day, const.ESTRUS_DETECTED)
                     estrus_service_rand = random()
                     if estrus_service_rand < \
-                            AnimalBase.config['estrus_service_rate']:
+                            AnimalBase.config['cow_repro_programs']['estrus_service_rate']:
                         # serviced
                         self.ai_day = self.estrus_day + 1
                         self.conception_rate = \
-                            AnimalBase.config['estrus_conception_rate']
+                            AnimalBase.config['cow_repro_programs']['ed_conception_rate']
                     else:
                         self.return_estrus(sim_day)
                 else:
@@ -759,6 +768,8 @@ class Cow(HeiferIII):
             self.tai_program_start_day_c = self.abortion_day + 8
             self.conception_rate -= \
                 AnimalBase.config['conception_rate_decrease']
+        else:
+            raise ValueError(f'Invalid resynch method: {self.resynch_method}')
 
     def OvSynch56_update(self, sim_day):
         """
@@ -781,7 +792,7 @@ class Cow(HeiferIII):
                 self.GnRH_injections = self.GnRH_injections + 1
             elif self.days_born == self.tai_program_start_day_c + 10:
                 self.ai_day = self.days_born
-                self.conception_rate = AnimalBase.config['ovsynch56_conception_rate']
+                self.conception_rate = AnimalBase.config['cow_repro_programs']['ovsynch56_conception_rate']
 
     def OvSynch48_update(self, sim_day):
         """
@@ -805,7 +816,7 @@ class Cow(HeiferIII):
             elif self.days_born == self.tai_program_start_day_c + 10:
                 self.ai_day = self.days_born
                 self.conception_rate = \
-                    AnimalBase.config['ovsynch48_conception_rate']
+                    AnimalBase.config['cow_repro_programs']['ovsynch48_conception_rate']
 
     def CoSynch72_update(self, sim_day):
         """
@@ -828,7 +839,7 @@ class Cow(HeiferIII):
                 self.GnRH_injections = self.GnRH_injections + 1
                 self.ai_day = self.days_born
                 self.conception_rate = \
-                    AnimalBase.config['cosynch72_conception_rate']
+                    AnimalBase.config['cow_repro_programs']['cosynch72_conception_rate']
 
     def d5CoSynch_update(self, sim_day):
         """
@@ -855,18 +866,7 @@ class Cow(HeiferIII):
                 self.GnRH_injections = self.GnRH_injections + 1
                 self.ai_day = self.days_born
                 self.conception_rate = \
-                    AnimalBase.config['cosynch5d_conception_rate']
-
-    def user_defined_update(self):
-        """
-        User_defined protocol for tai method
-        """
-        if not self.do_not_breed:
-            if self.days_born == self.tai_program_start_day_c + \
-                    AnimalBase.config['user_define_tai_length']:
-                self.ai_day = self.days_born
-                self.conception_rate = \
-                    AnimalBase.config['cow_user_defined_tai_cr']
+                    AnimalBase.config['cow_repro_programs']['cosynch5d_conception_rate']
 
     def determine_presynch_program_day(self, date):
         """
@@ -930,17 +930,7 @@ class Cow(HeiferIII):
             self.tai_program_start_day_c = self.days_born
             self.events.add_event(self.days_born, sim_day, const.C6G_END)
 
-    def user_defined_presynch_update(self):
-        """
-        User_defined_presynch protocol for presynch method
-        """
-
-        if self.days_born == self.presynch_program_start_day:
-            self.tai_program_start_day_c = \
-                self.days_born + \
-                AnimalBase.config['user_defined_presynch_length']
-
-    def tai_update(self, sim_day):
+    def tai_update(self, sim_day): # noqa
         """
         Assign tai and presynch method, update time AI method status, TAI can
         be performed with or without presynch.
@@ -960,8 +950,8 @@ class Cow(HeiferIII):
                 self.doubleovsynch_update(sim_day)
             elif self.presynch_method == 'G6G':
                 self.g6g_update(sim_day)
-            elif self.presynch_method == 'user_defined':
-                self.user_defined_presynch_update()
+            else:
+                raise ValueError(f'Invalid cow presynch program: {self.presynch_method}')
 
         if self.tai_method_c == 'OvSynch 56':
             self.OvSynch56_update(sim_day)
@@ -971,11 +961,11 @@ class Cow(HeiferIII):
             self.CoSynch72_update(sim_day)
         elif self.tai_method_c == '5d CoSynch':
             self.d5CoSynch_update(sim_day)
-        elif self.tai_method_c == 'user_defined':
-            self.user_defined_update()
+        else:
+            raise ValueError(f'Invalid cow tai program: {self.tai_method_c}')
 
     # ED-TAI methods
-    def ed_tai_update(self, sim_day):
+    def ed_tai_update(self, sim_day): # noqa
         """
         Update ED-TAI method, perform estrus detection before the TAI program
         Args:
@@ -983,7 +973,7 @@ class Cow(HeiferIII):
         """
         # if on estrus day, start detecting estrus
         if self.days_born == self.estrus_day and \
-                self.days_in_milk < AnimalBase.config['tai_program_start_day']:
+                self.days_in_milk < AnimalBase.config['cow_repro_programs']['tai_program_start_day']:
             self.estrus_count += 1
 
             if 1 <= self.days_in_milk <= AnimalBase.config['voluntary_waiting_period']:
@@ -991,17 +981,17 @@ class Cow(HeiferIII):
             else:
                 estrus_detection_rand = random()
                 if estrus_detection_rand < \
-                        AnimalBase.config['estrus_detection_rate']:
+                        AnimalBase.config['cow_repro_programs']['estrus_detection_rate']:
                     # Estrus detected
                     self.events.add_event(
                         self.days_born, sim_day, const.ESTRUS_DETECTED)
                     estrus_service_rand = random()
                     if estrus_service_rand < \
-                            AnimalBase.config['estrus_service_rate']:
+                            AnimalBase.config['cow_repro_programs']['estrus_service_rate']:
                         # serviced
                         self.ai_day = self.estrus_day + 1
                         self.conception_rate = \
-                            AnimalBase.config['estrus_conception_rate']
+                            AnimalBase.config['cow_repro_programs']['ed_conception_rate']
                     else:
                         self.return_estrus(sim_day)
                 else:
@@ -1010,12 +1000,12 @@ class Cow(HeiferIII):
         if self.milking:
             self.ED_days += 1
 
-        if self.days_in_milk == AnimalBase.config['tai_program_start_day'] and \
+        if self.days_in_milk == AnimalBase.config['cow_repro_programs']['tai_program_start_day'] and \
                 self.ai_day == 0:
             self.estrus_day = 0
             self.determine_tai_program_day(self.days_born)
 
-        if self.days_in_milk == AnimalBase.config['tai_program_start_day'] and \
+        if self.days_in_milk == AnimalBase.config['cow_repro_programs']['tai_program_start_day'] and \
                 self.ai_day == 0:
             if self.tai_method_c == 'OvSynch 56':
                 self.OvSynch56_update(sim_day)
@@ -1025,8 +1015,8 @@ class Cow(HeiferIII):
                 self.CoSynch72_update(sim_day)
             elif self.tai_method_c == '5d CoSynch':
                 self.d5CoSynch_update(sim_day)
-            elif self.tai_method_c == 'user_defined':
-                self.user_defined_update()
+            else:
+                raise ValueError(f'Invalid cow tai program: {self.tai_method_c}')
 
     def resynch_ed_tai(self, sim_day):
         """
@@ -1056,6 +1046,8 @@ class Cow(HeiferIII):
                 self.abortion_day, const.ESTRUS_AFTER_PGF_NOTE,
                 AnimalBase.config['avg_estrus_cycle_after_pgf'],
                 AnimalBase.config['std_estrus_cycle_after_pgf'], sim_day)
+        else:
+            raise ValueError(f'Invalid cow resynch method: {self.resynch_method}')
 
     # Preg methods
     def open(self, sim_day):
@@ -1071,6 +1063,8 @@ class Cow(HeiferIII):
             self.tai_program_day_after_preg_check(sim_day)
         elif self.repro_program == 'ED-TAI':
             self.resynch_ed_tai(sim_day)
+        else:
+            raise ValueError(f'Invalid cow repro program: {self.repro_program}')
 
     def adjust_conception(self):
         """
@@ -1083,7 +1077,7 @@ class Cow(HeiferIII):
         else:
             return self.conception_rate - 0.1
 
-    def preg_update(self, sim_day):
+    def preg_update(self, sim_day): # noqa
         """
         Update AI for cows reach ai day, inseminate the cow with specific semen
         type. By comparing with conception rate, if conception success,
@@ -1123,6 +1117,8 @@ class Cow(HeiferIII):
                     self.calf_birth_weight = truncnorm.rvs(-const.STDI, const.STDI,
                                                            AnimalBase.config['birth_weight_avg_je'],
                                                            AnimalBase.config['birth_weight_std_je'])
+                else:
+                    raise ValueError(f'Invalid cow breed: {self.breed}')
 
                 self.events.add_event(self.days_born, sim_day, const.COW_PREG)
             else:

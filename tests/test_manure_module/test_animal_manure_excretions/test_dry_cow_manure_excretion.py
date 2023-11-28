@@ -51,7 +51,7 @@ def test_dry_cow_manure_calculations(methane_model: str,
         'starch': starch_concentration
     }
     patch_for_ration_report = mocker.patch(
-        'RUFAS.routines.animal.manure.dry_cow_manure_excretion.ration_report',
+        'RUFAS.routines.animal.manure.dry_cow_manure_excretion.RationReporter.report_ration',
         return_value=(mock_nutrient_amounts, mock_nutrient_concentrations)
     )
 
@@ -76,9 +76,11 @@ def test_dry_cow_manure_calculations(methane_model: str,
                                   + 0.029 * NDF_concentration
                                   - 0.023 * CP_concentration)
     non_degradable_volatile_solids = total_volatile_solids - degradable_volatile_solids
-    manure_nitrogen = (15.1 + 0.83 * (dry_matter_intake * GeneralConstants.KG_TO_GRAMS) * (CP_concentration * GeneralConstants.PROTEIN_TO_NITROGEN) / 100
+    manure_nitrogen = (15.1 + 0.83 * (dry_matter_intake * GeneralConstants.KG_TO_GRAMS) *
+                       (CP_concentration * GeneralConstants.PROTEIN_TO_NITROGEN) / 100
                        ) * GeneralConstants.GRAMS_TO_KG
-    urine_nitrogen = (14.3 + 0.510 * (dry_matter_intake * GeneralConstants.KG_TO_GRAMS) * (CP_concentration * GeneralConstants.PROTEIN_TO_NITROGEN) / 100
+    urine_nitrogen = (14.3 + 0.510 * (dry_matter_intake * GeneralConstants.KG_TO_GRAMS) *
+                      (CP_concentration * GeneralConstants.PROTEIN_TO_NITROGEN) / 100
                       ) * GeneralConstants.GRAMS_TO_KG
     urinary_nitrogen_concentration = (
         urine_nitrogen * GeneralConstants.KG_TO_GRAMS) / urine
@@ -175,4 +177,4 @@ def test_dry_cow_manure_calculations(methane_model: str,
     assert manure_excretion_values['phosphorus_fraction'] == approx(
         manure_phosphorus_fraction)
     assert manure_excretion_values['potassium'] == approx(potassium)
-    assert manure_excretion_values['methane'] == approx(methane_emission)
+    assert manure_excretion_values['enteric_methane_g'] == approx(methane_emission)

@@ -149,8 +149,8 @@ class AnimalConfigTypedDict(TypedDict):
     # farm level -> repro -> TAI_related
     heifer_TAI_protocol: str
     TAI_conception_rate_h: float
-    m5dCG2P_conception_rate: float
-    m5dCGP_conception_rate: float
+    md5CG2P_conception_rate: float
+    md5CGP_conception_rate: float
     heifer_user_defined_tai_cr: float
     cow_presynch_protocol: str
     cow_TAI_protocol: str

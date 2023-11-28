@@ -11,7 +11,7 @@ from typing import Tuple
 from RUFAS.general_constants import GeneralConstants
 from RUFAS.routines.animal.manure.general_manure import AnimalManureExcretions
 from RUFAS.routines.animal.manure.general_manure import calculate_phosphorus_excretion_values
-from RUFAS.routines.animal.ration.ration_driver import ration_report
+from RUFAS.routines.animal.ration.ration_driver import RationReporter
 
 
 def manure_calculations(ration_formulation,
@@ -47,7 +47,7 @@ def manure_calculations(ration_formulation,
             in the AnimalManureExcretions class definition.
 
     """
-    nutrient_amounts, nutrient_concentrations = ration_report(
+    nutrient_amounts, nutrient_concentrations = RationReporter.report_ration(
         ration_formulation, feed.available_feeds)
     dry_matter_intake = nutrient_amounts['dm']
     CP_concentration = nutrient_concentrations['CP']
@@ -97,7 +97,7 @@ def manure_calculations(ration_formulation,
 
     manure_excretion_values = AnimalManureExcretions(
         urea=9.52,  # 0.340 mol/L TODO: Implement with correct equation
-        urine=2,
+        urine=urine,
         # TODO: Implement with correct equation
         total_ammoniacal_nitrogen_concentration=0.14,
         urine_nitrogen=urine_nitrogen,
@@ -113,7 +113,7 @@ def manure_calculations(ration_formulation,
         phosphorus=manure_phosphorus_excreted,
         phosphorus_fraction=manure_phosphorus_fraction,
         potassium=0,
-        methane=methane_emission
+        enteric_methane_g=methane_emission
     )
 
     return total_phosphorus_excreted, manure_excretion_values

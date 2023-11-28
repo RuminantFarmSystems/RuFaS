@@ -4,26 +4,29 @@ File name: test_pen.py
 Description: Implements test cases for the Pen class
 Author(s): Pooya Hekmati, sh2235@cornell.edu, Anchey Peng, ap724@cornell.edu
 """
+from __future__ import annotations
+
+from statistics import mean
+from typing import Set, List, Dict, Tuple
+from unittest.mock import MagicMock
 
 import pytest
-from unittest.mock import MagicMock
-from pytest_mock.plugin import MockerFixture
-from typing import Set, List, Dict, Tuple
-from statistics import mean
 from pytest_lazyfixture import lazy_fixture
+from pytest_mock.plugin import MockerFixture
 
-from RUFAS.routines.animal.manure.general_manure import AnimalManureExcretions
 from RUFAS.routines.animal.life_cycle.calf import Calf
 from RUFAS.routines.animal.life_cycle.cow import Cow
 from RUFAS.routines.animal.life_cycle.heiferI import HeiferI
 from RUFAS.routines.animal.life_cycle.heiferII import HeiferII
 from RUFAS.routines.animal.life_cycle.heiferIII import HeiferIII
+from RUFAS.routines.animal.manure.general_manure import AnimalManureExcretions
 from RUFAS.routines.animal.pen import Pen
 
 
 @pytest.fixture
 def pen() -> Pen:
     id_number = 0
+    pen_name = ""
     vert_dist = 0.1
     horiz_dist = 1.6
     num_stalls = 100
@@ -36,8 +39,8 @@ def pen() -> Pen:
     animal_combination = Pen.AnimalCombination.CALF
     max_stocking_density = 1.2
 
-    pen = Pen(id_number, vert_dist, horiz_dist, num_stalls, housing_type, bedding_type, pen_type, manure_handling,
-              manure_separator, manure_storage, animal_combination, max_stocking_density)
+    pen = Pen(id_number, pen_name, vert_dist, horiz_dist, num_stalls, housing_type, bedding_type, pen_type,
+              manure_handling, manure_separator, manure_storage, animal_combination, max_stocking_density)
 
     return pen
 
@@ -74,15 +77,15 @@ def pen_with_animals(pen: Pen, mock_animal_list: List[MagicMock]) -> Pen:
 
 def test_set_avg_nutrient_rqmts(pen: Pen):
     """Unit test for function set_avg_nutrient_rqmts in file routines/animal/pen.py"""
-    avg_nutrient_rqmts = {'NEmaint': 22.739694446587276,
-                          'NEa': 0,
-                          'NEg': 0.0,
-                          'NEpreg': 0.8809032714863911,
-                          'NEl': 0,
-                          'MP_req': 169.60219829211576,
-                          'Ca_req': 8.551061771355254,
-                          'P_req': 0.8978663353409345,
-                          'DMIest': 0,
+    avg_nutrient_rqmts = {'NEmaint_requirement': 22.739694446587276,
+                          'NEa_requirement': 0,
+                          'NEg_requirement': 0.0,
+                          'NEpreg_requirement': 0.8809032714863911,
+                          'NEl_requirement': 0,
+                          'MP_requirement': 169.60219829211576,
+                          'Ca_requirement': 8.551061771355254,
+                          'P_requirement': 0.8978663353409345,
+                          'DMIest_requirement': 0,
                           'avg_BW': 445.74074026264447}
 
     pen.set_avg_nutrient_rqmts(avg_nutrient_rqmts)
@@ -221,7 +224,7 @@ def test_reset_manure(pen: Pen) -> None:
         phosphorus=0.0,
         phosphorus_fraction=0.0,
         potassium=0.0,
-        methane=0.0
+        enteric_methane_g=0.0
     )
 
     pen.reset_manure()
@@ -338,3 +341,298 @@ def test_subset_class_feeds(pen: Pen,
     pen.animal_combination = test_animal_combination
     pen.subset_class_feeds(feed)
     assert pen.allocated_feeds == expected_feed_allocation
+
+
+@pytest.mark.parametrize(
+    'animal_type, is_lactating_cow, expected_prefix',
+    [
+        # Testing with each animal type and its corresponding prefix
+        (Calf, False, 'daily_aggregate_calf'),
+        (HeiferI, False, 'daily_aggregate_heifer'),
+        (HeiferII, False, 'daily_aggregate_heifer'),
+        (HeiferIII, False, 'daily_aggregate_heifer'),
+        (Cow, False, 'daily_aggregate_dry_cow'),
+
+        # Testing with a lactating cow, which should have a different prefix compared to a dry cow
+        (Cow, True, 'daily_aggregate_lactating_cow'),
+
+        # Edge case: Unrecognized animal type
+        (MagicMock, False, ValueError)
+    ]
+)
+def test_get_prefix_and_default_manure_excretion(mocker: MockerFixture,
+                                                 animal_type: Calf | HeiferI | HeiferII | HeiferIII | Cow | MagicMock,
+                                                 is_lactating_cow: bool,
+                                                 expected_prefix: str | ValueError):
+    """
+    Unit test for the static method _get_prefix_and_default_manure_excretion in pen.py.
+
+    This test verifies that the method correctly returns the prefix and default manure excretion value
+    based on the given animal type and whether it's a lactating cow.
+
+    """
+    # Arrange
+    animal = MagicMock(spec=animal_type)
+    animal.__class__.__name__ = animal_type.__name__
+    mock_default_manure = mocker.MagicMock()
+    patch_for_get_default_animal_manure_excretions = mocker.patch(
+        'RUFAS.routines.animal.pen.get_default_animal_manure_excretions',
+        return_value=mock_default_manure
+    )
+
+    # Act and assert
+    if expected_prefix is ValueError:
+        with pytest.raises(ValueError, match=f'Unrecognized animal type: {type(animal)}'):
+            Pen._get_prefix_and_default_manure_excretion(animal, is_lactating_cow)
+    else:
+        prefix, manure = Pen._get_prefix_and_default_manure_excretion(animal, is_lactating_cow)
+        assert prefix == expected_prefix
+        assert manure == mock_default_manure
+        patch_for_get_default_animal_manure_excretions.assert_called_once()
+
+
+@pytest.mark.parametrize(
+    'animal_class, is_lactating',
+    [
+        (Calf, False),
+        (HeiferI, False),
+        (HeiferII, False),
+        (HeiferIII, False),
+        (Cow, False),
+        (Cow, True),
+    ]
+)
+def test_calc_animal_manure_excretion(mocker: MockerFixture,
+                                      animal_class: Calf | HeiferI | HeiferII | HeiferIII | Cow | MagicMock,
+                                      is_lactating: bool) -> None:
+    """
+    Unit test for the _calc_animal_manure_excretion method in pen.py.
+
+    This test verifies that the method correctly calculates the manure excretion for a given animal
+    and returns the appropriate prefix and excretions. It tests different animal types and whether the animal
+    is lactating or not.
+
+    """
+    # Arrange
+    animal = mocker.MagicMock(spec=animal_class)
+    animal.is_lactating = is_lactating
+    animal.__class__.__name__ = animal_class.__name__
+    mock_feed = mocker.MagicMock(spec='Feed')
+    mock_prefix = mocker.MagicMock()
+    mock_default_manure = mocker.MagicMock()
+    mocker.patch(
+        'RUFAS.routines.animal.pen.Pen.__init__',
+        return_value=None
+    )
+    pen = Pen()  # type: ignore
+    patch_for_get_prefix_and_default_manure_excretion = mocker.patch.object(
+        Pen,
+        '_get_prefix_and_default_manure_excretion',
+        return_value=(mock_prefix, mock_default_manure)
+    )
+    pen.MEdiet = mock_MEdiet = mocker.MagicMock()
+    mock_methane_model = mocker.MagicMock()
+    mock_methane_mitigation_method = mocker.MagicMock()
+    mock_methane_mitigation_additive_amount = mocker.MagicMock()
+
+    # Act
+    actual_prefix, actual_manure = pen._calc_animal_manure_excretion(animal, mock_feed,
+                                                                     mock_methane_model,
+                                                                     mock_methane_mitigation_method,
+                                                                     mock_methane_mitigation_additive_amount)
+
+    # Assert
+    assert actual_prefix == mock_prefix
+    assert actual_manure == mock_default_manure
+    patch_for_get_prefix_and_default_manure_excretion.assert_called_once_with(animal, is_lactating)
+    if animal_class.__name__ == 'Cow':
+        animal.calc_manure_excretion.assert_called_once_with(mock_feed, mock_methane_model,
+                                                             mock_methane_mitigation_method,
+                                                             mock_methane_mitigation_additive_amount,
+                                                             mock_MEdiet)
+    else:
+        animal.calc_manure_excretion.assert_called_once_with(mock_feed, mock_methane_model)
+
+
+@pytest.mark.parametrize(
+    'initial_dict, prefix, default_manure, initial_pen_manure, animal_manure_excretion, expected_dict, expected_manure',
+    [
+        # Existing Prefix
+        (
+                {'test_prefix': {'prefix': 'nested_test_prefix', 'manure': 'test_manure'}},
+                'test_prefix', 'default_manure', 'initial_manure', 'animal_manure_excretion',
+                {'test_prefix': {'prefix': 'nested_test_prefix', 'manure': 'test_manure_animal_manure_excretion'}},
+                'initial_manure_animal_manure_excretion'
+        ),
+
+        # New Prefix
+        (
+                {},
+                'new_prefix', 'default_manure', 'initial_manure', 'animal_manure_excretion',
+                {'new_prefix': {'prefix': 'new_prefix', 'manure': 'default_manure_animal_manure_excretion'}},
+                'initial_manure_animal_manure_excretion'
+        ),
+
+        # Multiple Existing Prefixes
+        (
+                {'prefix1': {'prefix': 'prefix1', 'manure': 'manure1'},
+                 'prefix2': {'prefix': 'prefix2', 'manure': 'manure2'}},
+                'prefix1', 'default_manure', 'initial_manure', 'animal_manure_excretion',
+                {'prefix1': {'prefix': 'prefix1', 'manure': 'manure1_animal_manure_excretion'},
+                 'prefix2': {'prefix': 'prefix2', 'manure': 'manure2'}},
+                'initial_manure_animal_manure_excretion'
+        ),
+
+        # Empty Manure for Specific Prefix
+        (
+                {'test_prefix': {'prefix': 'nested_test_prefix', 'manure': ''}},
+                'test_prefix', 'default_manure', 'initial_manure', 'animal_manure_excretion',
+                {'test_prefix': {'prefix': 'nested_test_prefix', 'manure': '_animal_manure_excretion'}},
+                'initial_manure_animal_manure_excretion'
+        )
+    ]
+)
+def test_update_animal_manure_excretion_data(mocker: MockerFixture,
+                                             initial_dict: dict,
+                                             prefix: str,
+                                             default_manure: str,
+                                             initial_pen_manure: str,
+                                             animal_manure_excretion: str,
+                                             expected_dict: dict,
+                                             expected_manure: str) -> None:
+    """
+    Unit test for the _update_animal_manure_excretion_data method in pen.py.
+
+    This test verifies that the method correctly updates the manure excretion dictionaries and
+    the `self.manure` variable according to the given parameters.
+
+    """
+    # Arrange
+    is_prefix_in_dict = prefix in initial_dict  # Need to save this check before update
+    initial_animal_manure = initial_dict[prefix]['manure'] if is_prefix_in_dict else ''
+    mock_animal = mocker.MagicMock()
+    mock_animal.manure_excretion = animal_manure_excretion
+    patch_for_add_animal_manure_excretions = mocker.patch(
+        'RUFAS.routines.animal.pen.add_animal_manure_excretions',
+        side_effect=lambda x, y: x + '_' + y
+    )
+
+    # Act
+    Pen._update_animal_manure_excretion_data(initial_dict, prefix, default_manure, mock_animal)  # type: ignore
+
+    # Assert
+    assert initial_dict == expected_dict
+
+    if is_prefix_in_dict:
+        patch_for_add_animal_manure_excretions.assert_has_calls(
+            [mocker.call(initial_animal_manure, animal_manure_excretion)]
+        )
+    else:
+        patch_for_add_animal_manure_excretions.assert_has_calls(
+            [mocker.call(default_manure, animal_manure_excretion)]
+        )
+
+
+@pytest.mark.parametrize(
+    'is_populated, animals_in_pen, mock_pen_manure',
+    [
+        # Testing with two distinct animal types and two manure properties
+        (True, [MagicMock(spec=Calf), MagicMock(spec=HeiferI)], {'property1': 'value1', 'property2': 'value2'}),
+
+        # Testing with three distinct animal types (Calf, HeiferI, and Cow) and a single manure property
+        (True, [MagicMock(spec=Calf), MagicMock(spec=HeiferI), MagicMock(spec=Cow)], {'property3': 'value3'}),
+
+        # Testing with an empty pen and no manure properties
+        (False, [], {}),
+
+        # Testing with an empty pen but with one manure property
+        (False, [], {'property4': 'value4'}),
+
+        # Testing with empty manure dictionary but populated pen
+        (True, [MagicMock(spec=Calf)], {}),
+
+        # Testing with a single animal type in pen
+        (True, [MagicMock(spec=Calf)], {'property1': 'value1'}),
+
+        # Testing with mixed animal types in the pen
+        (True, [MagicMock(spec=Calf), MagicMock(spec=HeiferI), MagicMock(spec=Cow)],
+         {'property1': 'value1', 'property2': 'value2'}),
+
+        # Testing with multiple similar animals in the pen
+        (True, [MagicMock(spec=Calf), MagicMock(spec=Calf)], {'property1': 'value1'}),
+
+        # Testing with null or None values within manure properties
+        (True, [MagicMock(spec=Calf)], {'property1': None}),
+
+        # Testing with a large number of animals
+        (True, [MagicMock(spec=Calf)] * 1000, {'property1': 'value1'})
+    ]
+)
+def test_calc_total_manure(mocker: MockerFixture, is_populated: bool,
+                           animals_in_pen: list[MagicMock],
+                           mock_pen_manure: dict[str, str]) -> None:
+    """
+    Unit test for method calc_total_manure in file pen.py.
+
+    This test verifies that the method correctly calculates the total manure based on
+    the pen's population and manure properties. The test covers various scenarios,
+    including populated and unpopulated pens with different animal types and
+    corresponding manure properties.
+
+    """
+    # Arrange
+    mocker.patch('RUFAS.routines.animal.pen.Pen.__init__', return_value=None)
+    pen = Pen()  # type: ignore
+    pen.id = 'mock_pen_id'
+    pen.manure = mock_pen_manure
+    type(pen).is_populated = mocker.PropertyMock(return_value=is_populated)
+    for animal in animals_in_pen:
+        animal.manure_excretion = MagicMock(spec=AnimalManureExcretions)
+    pen.animals_in_pen = animals_in_pen
+    feed = MagicMock(spec='Feed')
+    methane_model = mocker.MagicMock()
+    methane_mitigation_method = mocker.MagicMock()
+    methane_mitigation_additive_amount = mocker.MagicMock()
+    manure_excretions_output_data = mocker.MagicMock()
+    mock_prefixes = [mocker.MagicMock() for _ in range(len(animals_in_pen))]
+    mock_animal_manure_excretions = [mocker.MagicMock() for _ in range(len(animals_in_pen))]
+    patch_for_calc_animal_manure_excretion = mocker.patch.object(pen, '_calc_animal_manure_excretion',
+                                                                 side_effect=zip(mock_prefixes,
+                                                                                 mock_animal_manure_excretions))
+    patch_for_update_animal_manure_excretion_data = mocker.patch.object(pen, '_update_animal_manure_excretion_data')
+    patch_for_add_animal_manure_excretions = mocker.patch(
+        'RUFAS.routines.animal.pen.add_animal_manure_excretions',
+        return_value=mock_pen_manure
+    )
+    patch_for_add_variable = mocker.patch('RUFAS.routines.animal.pen.OutputManager.add_variable')
+    patch_for_get_default_animal_manure_excretions = mocker.patch(
+        'RUFAS.routines.animal.pen.get_default_animal_manure_excretions',
+        return_value=mock_pen_manure
+    )
+
+    # Act
+    pen.calc_total_manure(feed, methane_model, methane_mitigation_method, methane_mitigation_additive_amount,
+                          manure_excretions_output_data)
+
+    if is_populated:
+        patch_for_get_default_animal_manure_excretions.assert_called_once()
+        for animal in animals_in_pen:
+            patch_for_calc_animal_manure_excretion.assert_has_calls([
+                mocker.call(animal, feed, methane_model, methane_mitigation_method, methane_mitigation_additive_amount)
+            ])
+            patch_for_add_animal_manure_excretions.assert_has_calls([
+                mocker.call(mock_pen_manure, animal.manure_excretion)
+            ])
+        assert patch_for_update_animal_manure_excretion_data.call_count == len(animals_in_pen)
+        assert patch_for_add_variable.call_count == len(mock_pen_manure)
+        for prop, value in pen.manure.items():
+            patch_for_add_variable.assert_has_calls([
+                mocker.call(f'pen_{pen.id}_daily_{prop}', value,
+                            info_map={'class': 'Pen', 'function': 'calc_total_manure'})
+            ])
+    else:
+        patch_for_get_default_animal_manure_excretions.assert_not_called()
+        patch_for_calc_animal_manure_excretion.assert_not_called()
+        patch_for_add_animal_manure_excretions.assert_not_called()
+        patch_for_update_animal_manure_excretion_data.assert_not_called()
+        patch_for_add_variable.assert_not_called()

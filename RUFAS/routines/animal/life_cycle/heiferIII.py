@@ -11,11 +11,9 @@ Description: This file updates the heifer form close to calving to calving,
 """
 from RUFAS.output_manager import OutputManager
 from RUFAS.routines.animal.life_cycle.heiferII import HeiferII
-from RUFAS.routines.animal.life_cycle.animal_base import AnimalBase
 
-from RUFAS.routines.animal.manure.growing_heifer_manure_excretion import \
-    manure_calculations
-from RUFAS.routines.animal.ration.animal_requirements import calc_rqmts
+from RUFAS.routines.animal.manure.growing_heifer_manure_excretion import manure_calculations
+from RUFAS.routines.animal.ration.animal_requirements import AnimalRequirements
 from RUFAS.routines.animal.life_cycle import animal_constants as const
 
 om = OutputManager()
@@ -36,8 +34,8 @@ class HeiferIII(HeiferII):
             args.repro_program: reproduction program used in heifer,
                 three of them: ED, TAI, and synch-ED programs
             args.tai_method_h: timed-AI protocols used for
-                reproduction programs, three of them: 5dCG2P,
-                5dCGP, and user-defined
+                reproduction programs, three of them: md5CG2P,
+                md5CGP, and user-defined
             args.synch_ed_method_h: synch ed protocols used for
                 reproduction programs, two of them: 2P and CP
             (optional: include the following to assign cow information)
@@ -60,10 +58,10 @@ class HeiferIII(HeiferII):
             args.p_gest_for_calf
         """
         super().__init__(args)
-        if 'conceptus_weight' in args:
-            self.conceptus_weight = args['conceptus_weight']
-        if 'calf_birth_weight' in args:
-            self.calf_birth_weight = args['calf_birth_weight']
+        if "conceptus_weight" in args:
+            self.conceptus_weight = args["conceptus_weight"]
+        if "calf_birth_weight" in args:
+            self.calf_birth_weight = args["calf_birth_weight"]
 
     def get_heiferIII_values(self):
         """
@@ -71,25 +69,45 @@ class HeiferIII(HeiferII):
         """
         return self.get_heiferII_values()
 
-    def set_nutrient_rqmts(self, temp, animal_grouping_scenario):
+    def set_nutrient_rqmts(self, temp, animal_grouping_scenario, nutrient_conc: dict = {},
+                           metabolizable_energy: float = 15.625, previous_DMI: float = 10.0):
         """
         Calculates this heiferIII's nutrient requirements.
         """
-        req = calc_rqmts(body_weight=self.body_weight,
-                         mature_body_weight=self.mature_body_weight,
-                         day_of_pregnancy=self.days_in_preg,
-                         animal_type=animal_grouping_scenario.get_animal_type(self),
-                         body_condition_score_5=3,
-                         previous_temperature=temp,
-                         average_daily_gain_heifer=self.daily_growth)
-        self.NEmaint = req['NEmaint']
-        self.NEg = req['NEg']
-        self.NEpreg = req['NEpreg']
-        self.NEl = req['NEl']
-        self.MP_req = req['MP_req']
-        self.Ca_req = req['Ca_req']
-        self.P_req = req['P_req']
-        self.DMIest = req['DMIest']
+        if metabolizable_energy == 0.0:
+            metabolizable_energy = 15.625
+        if previous_DMI == 0.0:
+            previous_DMI = 10.0
+        if nutrient_conc and nutrient_conc['dm'] != 0.0:
+            NDF_conc = nutrient_conc['NDF'] / 100
+            TDN_conc = nutrient_conc['TDN'] / 100
+            net_energy_diet_concentration = (metabolizable_energy * 0.64)/previous_DMI
+        else:
+            NDF_conc = 0.3
+            TDN_conc = 0.7
+            net_energy_diet_concentration = 1.0
+        req = AnimalRequirements()
+        animal_requirements = req.calc_rqmts(
+            body_weight=self.body_weight,
+            mature_body_weight=self.mature_body_weight,
+            day_of_pregnancy=self.days_in_preg,
+            animal_type=animal_grouping_scenario.get_animal_type(self),
+            body_condition_score_5=3,
+            previous_temperature=temp,
+            average_daily_gain_heifer=self.daily_growth,
+            NDF_conc=NDF_conc,
+            TDN_conc=TDN_conc,
+            net_energy_diet_concentration=net_energy_diet_concentration,
+            days_born=self.days_born
+        )
+        self.NEmaint_requirement = animal_requirements["NEmaint_requirement"]
+        self.NEg_requirement = animal_requirements["NEg_requirement"]
+        self.NEpreg_requirement = animal_requirements["NEpreg_requirement"]
+        self.NEl_requirement = animal_requirements["NEl_requirement"]
+        self.MP_requirement = animal_requirements["MP_requirement"]
+        self.Ca_requirement = animal_requirements["Ca_requirement"]
+        self.P_requirement = animal_requirements["P_requirement"]
+        self.DMIest_requirement = animal_requirements["DMIest_requirement"]
 
     def calc_manure_excretion(self, feed, methane_model):
         """
@@ -101,9 +119,9 @@ class HeiferIII(HeiferII):
         """
         p_urine, p_feces_excrt = self.calc_base_manure()
 
-        self.p_excrt, self.manure_excretion = \
-            manure_calculations(self.ration_formulation, feed,
-                                self.body_weight, p_feces_excrt, p_urine, methane_model)
+        self.p_excrt, self.manure_excretion = manure_calculations(
+            self.ration_formulation, feed, self.body_weight, p_feces_excrt, p_urine, methane_model
+        )
 
     def update(self, sim_day):
         """
@@ -131,8 +149,7 @@ class HeiferIII(HeiferII):
 
         else:
             self.body_weight = self.mature_body_weight
-            self.events.add_event(self.days_born, sim_day,
-                                  const.MATURE_BODY_WEIGHT_REGULAR)
+            self.events.add_event(self.days_born, sim_day, const.MATURE_BODY_WEIGHT_REGULAR)
 
         if self.days_in_preg == self.gestation_length:
             self.days_born -= 1  # will be incremented again in next stage

@@ -15,23 +15,27 @@ from typing import Dict
 from typing import Optional
 from typing import Type
 
-from RUFAS.output_manager import OutputManager
+from RUFAS.time import Time
+from RUFAS.weather import Weather
 from RUFAS.routines.manure.beddings.bedding_classes import BaseBedding
 from RUFAS.routines.manure.default_enum.default_enum import DefaultEnum
-from RUFAS.routines.manure.gas_emissions.gas_emissions import GasEmissions
-from RUFAS.routines.manure.manure_handlers.manure_handler_daily_output import ManureHandlerDailyOutput
+from RUFAS.routines.manure.gas_emissions.calculator import (
+    GasEmissionsCalculator,
+)
+from RUFAS.routines.manure.manure_handlers.manure_handler_daily_output import (
+    ManureHandlerDailyOutput,
+)
 from RUFAS.routines.manure.manure_handlers.milking_parlor import MilkingParlor
-from RUFAS.routines.manure.pen.manure_manager_pen import ManureManagerPen
-
-om = OutputManager()
+from RUFAS.routines.manure.pen_manure.manure_manager_pen import ManureManagerPen
 
 
 class ManureHandlerType(DefaultEnum):
     """Enumerates the different types of manure handlers."""
-    FLUSH_SYSTEM = 'flush system'
-    MANUAL_SCRAPING = 'manual scraping'
-    ALLEY_SCRAPER = 'alley scraper'
-    TILLAGE = 'tillage'
+
+    FLUSH_SYSTEM = "flush system"
+    MANUAL_SCRAPING = "manual scraping"
+    ALLEY_SCRAPER = "alley scraper"
+    TILLAGE = "tillage"
     DEFAULT = FLUSH_SYSTEM
 
 
@@ -48,7 +52,7 @@ class BaseManureHandler:
 
     """
 
-    def __init__(self, weather, time, manure_handler_config: ManureHandlerConfig):
+    def __init__(self, weather: Weather, time: Time, manure_handler_config: ManureHandlerConfig):
         """Initialize a BaseManureHandler object.
 
         Args:
@@ -56,21 +60,12 @@ class BaseManureHandler:
             time: A Time object.
             manure_handler_config: A ManureHandlerInitData object that specifies default data
                 specific to the choice of manure handler.
-
         """
-        info_map = {"class": self.__class__.__name__,
-                    "function": self.__init__.__name__,
-                    "weather": vars(weather),
-                    "time": vars(time),
-                    "config": vars(manure_handler_config),
-                    }
 
         self.weather = weather
         self.time = time
         self.config = manure_handler_config
         self.milking_parlor = MilkingParlor()
-
-        om.add_variable("milking_parlor", vars(self.milking_parlor), info_map)
 
     def _get_current_day_average_temperature_in_celsius(self) -> float:
         """Gets the average temperature of the day, in Celsius.
@@ -78,63 +73,52 @@ class BaseManureHandler:
         Returns:
             The average temperature of the day, in Celsius.
         """
-
-        info_map = {"class": self.__class__.__name__,
-                    "function": self._get_current_day_average_temperature_in_celsius.__name__,
-                    }
-
-        avg_temp = self.weather.T_avg[self.time.year - 1][self.time.day - 1]
-
-        om.add_variable(
-            "current_day_average_temperature_in_celsius", avg_temp, info_map)
+        current_conditions = self.weather.get_current_day_conditions(self.time)
+        avg_temp = current_conditions.mean_air_temperature
 
         return avg_temp
 
     def daily_update(self,
                      pen: ManureManagerPen,
-                     bedding: BaseBedding,
+                     bedding: BaseBedding | None,
                      sim_day: int) -> ManureHandlerDailyOutput:
-        """Calculates and stores the daily output of the manure handler.
-
-        Notes:
-            "pseudocode_manure_management" MS.3
-
-        Args:
-            pen: A ManureManagerPen object.
-            bedding: A BaseBedding object that specifies the type of bedding used.
-            sim_day: The current simulation day.
-
-        Returns:
-            A ManureHandlerDailyOutput object.
         """
+        Calculate the daily manure handler output based on input passed from the animal module.
+
+        Parameters
+        ----------
+        pen : ManureManagerPen
+            A ManureManagerPen object that stores relevant information about the pen that
+            can helpful in the manure module.
+        bedding : BaseBedding | None
+            A BaseBedding object that specifies the type of bedding use or None if no bedding is used.
+        sim_day : int
+            The current simulation day.
+        Returns
+        -------
+        ManureHandlerDailyOutput
+            A ManureHandlerDailyOutput object that stores the daily manure handler output.
+            See details in the class definition (:class:`ManureHandlerDailyOutput`).
+        """
+
         if pen.num_animals == 0:
             return ManureHandlerDailyOutput()
 
-        bedding_data = {"bedding_mass_per_day": bedding.bedding_mass_per_day,
-                        "bedding_density": bedding.bedding_density,
-                        "bedding_dry_matter_content": bedding.bedding_dry_matter_content,
-                        "bedding_cleaned_fraction": bedding.bedding_cleaned_fraction,
-                        "bedding_type": bedding.bedding_type._name_,
-                        }
-
-        info_map = {"class": self.__class__.__name__,
-                    "function": self.daily_update.__name__,
-                    "bedding": bedding_data,
-                    "sim_day": sim_day, }
-
-        housing_methane_emission = GasEmissions.calc_housing_methane_emission(
+        housing_methane_emission = GasEmissionsCalculator.housing_methane_emission(
             num_animals=pen.num_animals,
             barn_area=pen.barn_area_from_pen_type,
             barn_temp=self._get_current_day_average_temperature_in_celsius(),
         )
 
-        housing_carbon_dioxide_emission = GasEmissions.calc_housing_carbon_dioxide_emission(
-            num_animals=pen.num_animals,
-            barn_area=pen.barn_area_from_pen_type,
-            barn_temp=self._get_current_day_average_temperature_in_celsius(),
+        housing_carbon_dioxide_emission = (
+            GasEmissionsCalculator.housing_carbon_dioxide_emission(
+                num_animals=pen.num_animals,
+                barn_area=pen.barn_area_from_pen_type,
+                barn_temp=self._get_current_day_average_temperature_in_celsius(),
+            )
         )
 
-        housing_ammonia_emission = GasEmissions.calc_housing_ammonia_emission(
+        housing_ammonia_emission = GasEmissionsCalculator.housing_ammonia_emission(
             num_animals=pen.num_animals,
             barn_area_per_animal=pen.barn_area_from_pen_type,  # m^2/animal
             urine_total_ammoniacal_nitrogen=pen.manure.urine_total_ammoniacal_nitrogen,  # kg
@@ -147,7 +131,12 @@ class BaseManureHandler:
             pen_id=pen.id,
             manure_urea=pen.manure.urea,
             liquid_manure_total_ammoniacal_nitrogen=(
-                max(0.0, pen.manure.manure_total_ammoniacal_nitrogen - housing_ammonia_emission)),
+                max(
+                    0.0,
+                    pen.manure.manure_total_ammoniacal_nitrogen
+                    - housing_ammonia_emission,
+                )
+            ),
             liquid_manure_nitrogen=pen.manure.nitrogen,
             liquid_manure_total_solids=pen.manure.total_solids,
             manure_degradable_volatile_solids=pen.manure.degradable_volatile_solids,
@@ -162,12 +151,15 @@ class BaseManureHandler:
                 pen.num_animals),
             total_bedding_volume=bedding.calc_total_bedding_volume(
                 pen.num_animals),
+            total_bedding_mass=bedding.calc_total_bedding_mass(
+                pen.num_animals),
             total_water_volume_in_milking_parlor=(
-                self.milking_parlor.calc_total_water_volume_used_in_milking_parlor(pen.num_lactating_cows)),
-            tempC=self._get_current_day_average_temperature_in_celsius()
+                self.milking_parlor.calc_total_water_volume_used_in_milking_parlor(
+                    pen.num_lactating_cows
+                )
+            ),
+            tempC=self._get_current_day_average_temperature_in_celsius(),
         )
-
-        om.add_variable("daily_output", vars(daily_output), info_map)
 
         return daily_output
 
@@ -181,15 +173,7 @@ class BaseManureHandler:
             Volume of cleaning water needed for the given pen, L.
 
         """
-
-        info_map = {"class": self.__class__.__name__,
-                    "function": self.calc_cleaning_water_volume_in_main_barn.__name__,
-                    }
-
         cleaning_water_volume = num_animals * self.config.cleaning_water_use_rate
-
-        om.add_variable(
-            "cleaning_water_volume_in_main_barn", cleaning_water_volume, info_map)
 
         return cleaning_water_volume
 
@@ -201,6 +185,7 @@ class FlushSystem(BaseManureHandler):
         All inherited from BaseManureHandler.
 
     """
+
     pass
 
 
@@ -211,6 +196,7 @@ class ManualScraping(BaseManureHandler):
         All inherited from BaseManureHandler.
 
     """
+
     pass
 
 
@@ -221,6 +207,7 @@ class AlleyScraper(BaseManureHandler):
         All inherited from BaseManureHandler.
 
     """
+
     pass
 
 
@@ -231,6 +218,7 @@ class Tillage(BaseManureHandler):
         All inherited from BaseManureHandler.
 
     """
+
     pass
 
 
@@ -245,6 +233,7 @@ class ManureHandlerConfig:
         daily_tillage_frequency: Number of times per day that compost bedding is tilled.
 
     """
+
     cleaning_water_use_rate: float = 0.0
     minutes_per_cleaning: int = 8
     cleanings_per_day: int = 2
@@ -268,7 +257,9 @@ class DefaultManureHandlerConfigFactory:
     )
 
     @classmethod
-    def get_instance(cls, manure_handler_type: ManureHandlerType) -> ManureHandlerConfig:
+    def get_instance(
+        cls, manure_handler_type: ManureHandlerType
+    ) -> ManureHandlerConfig:
         """Return a default manure handler configuration for the given manure handler type.
 
         Args:
@@ -276,11 +267,7 @@ class DefaultManureHandlerConfigFactory:
 
         Returns:
             A default ManureHandlerConfig object for the given manure handler type.
-
         """
-        info_map = {"class": cls.__name__,
-                    "function": cls.get_instance.__name__,
-                    }
 
         manure_handler_config_by_type = {
             ManureHandlerType.FLUSH_SYSTEM: cls.FLUSH_SYSTEM_CONFIG,
@@ -290,8 +277,6 @@ class DefaultManureHandlerConfigFactory:
         }
 
         manure_handler_config = manure_handler_config_by_type[manure_handler_type]
-        om.add_variable("manure_handler_config",
-                        vars(manure_handler_config), info_map)
 
         return manure_handler_config
 
@@ -300,12 +285,13 @@ class ManureHandlerFactory:
     """A class that contains the logic for creating different types of manure handlers."""
 
     @classmethod
-    def get_instance(cls,
-                     manure_handler_type_name: str,
-                     weather,
-                     time,
-                     custom_manure_handler_config: Optional[ManureHandlerConfig] = None) \
-            -> BaseManureHandler:
+    def get_instance(
+        cls,
+        manure_handler_type_name: str,
+        weather: Weather,
+        time: Time,
+        custom_manure_handler_config: Optional[ManureHandlerConfig] = None,
+    ) -> BaseManureHandler:
         """Returns an instance of a specific subtype of BaseManureHandler.
 
         Args:
@@ -319,26 +305,30 @@ class ManureHandlerFactory:
             A new instance of a BaseManureHandler subtype.
 
         """
-        manure_handler_class_by_type: Dict[ManureHandlerType, Type[BaseManureHandler]] = {
+        manure_handler_class_by_type: Dict[
+            ManureHandlerType, Type[BaseManureHandler]
+        ] = {
             ManureHandlerType.FLUSH_SYSTEM: FlushSystem,
             ManureHandlerType.ALLEY_SCRAPER: AlleyScraper,
             ManureHandlerType.MANUAL_SCRAPING: ManualScraping,
-            ManureHandlerType.TILLAGE: Tillage
+            ManureHandlerType.TILLAGE: Tillage,
         }
 
-        manure_handler_type = ManureHandlerType.get_type(
-            manure_handler_type_name)
+        manure_handler_type = ManureHandlerType.get_type(manure_handler_type_name)
         manure_handler_class = manure_handler_class_by_type[manure_handler_type]
 
         if custom_manure_handler_config:
             manure_handler_subtype = manure_handler_class(
-                weather, time, custom_manure_handler_config)
+                weather, time, custom_manure_handler_config
+            )
 
             return manure_handler_subtype
         else:
-            default_manure_handler_config = DefaultManureHandlerConfigFactory.get_instance(
-                manure_handler_type)
+            default_manure_handler_config = (
+                DefaultManureHandlerConfigFactory.get_instance(manure_handler_type)
+            )
             manure_handler_subtype = manure_handler_class(
-                weather, time, default_manure_handler_config)
+                weather, time, default_manure_handler_config
+            )
 
             return manure_handler_subtype

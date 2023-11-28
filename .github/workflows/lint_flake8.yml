@@ -5,9 +5,9 @@ name: Linting
 
 on:
   push:
-    branches: [ master ]
+    branches: [ main ]
   pull_request:
-    branches: [ master ]
+    branches: [ main ]
 
 jobs:
   build:
@@ -20,14 +20,47 @@ jobs:
       uses: actions/setup-python@v2
       with:
         python-version: "3.10"
+    - id: files
+      name: Set up dependency for gettting changed files
+      uses: jitterbit/get-changed-files@v1
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        pip install flake8 pytest
+        pip install flake8
         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+    - name: Get all added or modified files
+      run: |
+        echo "FILES=$( echo ${{ steps.files.outputs.added_modified }} |
+                        tr " " "\n" |
+                        grep -E "\.py$" |
+                        tr "\n" " ")" >> "$GITHUB_ENV"
+        echo "OTHER_FILES=$( echo ${{ steps.files.outputs.added_modified }} |
+                        tr " " "\n" |
+                        grep -E "\.txt$|\.json$|\.csv$"  |
+                        tr "\n" " ")" >> "$GITHUB_ENV"
     - name: Lint with flake8
+      if: ${{ env.FILES != '' }}
       run: |
         # stop the build if there are Python syntax errors or undefined names
-        flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
-        # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
-        flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
+        flake8 ${{ env.FILES }}
+    - name: Check for Unauthorized Changes
+      run: |
+        paths_to_protect=(
+          'RUFAS/scenario_manager.py'
+        )
+        unauthorized_changes=false
+        
+        for path in "${paths_to_protect[@]}"; do
+          if (echo ${{ env.FILES }}; echo ${{ env.OTHER_FILES }}) | grep -q "$path"; then
+            unauthorized_changes=true
+            unauthorized_paths+="$path, "
+          fi
+        done
+
+        if $unauthorized_changes; then
+          echo "Unauthorized changes detected in protected files: ${unauthorized_paths%, }"
+          echo "Review and remove these changes if they are not intended."
+          exit 1
+        else
+          echo "No unauthorized changes detected."
+        fi

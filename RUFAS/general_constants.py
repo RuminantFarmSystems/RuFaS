@@ -2,6 +2,8 @@ class GeneralConstants:
     """Contains general constants used in the manure treatment module.
 
     Attributes:
+        MM_TO_M: The conversion factor from millimeters to meters.
+
         GRAMS_TO_KG: The conversion factor from grams to kilograms.
         LITERS_TO_CUBIC_METERS: The conversion factor from liters to cubic meters.
         KG_TO_CUBIC_METERS: The conversion factor from kilograms to cubic meters.
@@ -12,9 +14,14 @@ class GeneralConstants:
         WATER_DENSITY_KG_PER_LITER: The density of water in kilograms per liter.
         WATER_DENSITY_KG_PER_M3: The density of water in kilograms per cubic meter.
 
-        PROTEIN_TO_NITROGEN: The nitrogen content of proteins is assumed to be 16%.   
+        PROTEIN_TO_NITROGEN: The nitrogen content of proteins is assumed to be 16%.
+
+        EARTH_ANGULAR_VELOCITY: Earth's angular velocity.
 
     """
+    # Length-related
+    MM_TO_M = 0.001
+
     # Mass-related
     GRAMS_TO_KG = 0.001
     KG_TO_GRAMS = 1000
@@ -34,4 +41,7 @@ class GeneralConstants:
 
     # Biochemistry-related
     PROTEIN_TO_NITROGEN = 0.16
-    NITROGEN_TO_PROTEIN = 6.25 
+    NITROGEN_TO_PROTEIN = 6.25
+
+    # Earth related data
+    EARTH_ANGULAR_VELOCITY = 0.2618

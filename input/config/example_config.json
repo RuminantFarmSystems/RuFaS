@@ -1,8 +1,0 @@
-{
-    "start_date": "2009:1",
-    "end_date": "2009:100",
-    "graphic_dir": "output/graphics/",
-    "output_dir": "output/",
-    "random_seed": 42,
-    "simulate_animals": true
-}

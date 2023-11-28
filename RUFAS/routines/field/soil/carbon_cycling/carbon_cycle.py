@@ -40,7 +40,7 @@ class CarbonCycling:
             Size of the field (ha)
 
         """
-        self.decomposition.decompose(temp_average)
+        self.decomposition.decompose()
         self.residue_partition.partition_residue(rainfall)
         self.pool_gas_partition.partition_pool_gas()
         self._soil_carbon_aggregation(field_size)
@@ -204,7 +204,9 @@ class CarbonCycling:
         -------
         pseudoode_soil S.6.D.2
         """
-        return passive_carbon_amount*field_size/soil_mass
+        if passive_carbon_amount is None:
+            return 0
+        return passive_carbon_amount * field_size / soil_mass
 
     @staticmethod
     def _determine_soil_overall_carbon_fraction(soil_active_carbon_fraction: float,

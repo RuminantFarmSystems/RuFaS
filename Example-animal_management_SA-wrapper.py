@@ -3,12 +3,15 @@ import json
 from pathlib import Path
 from typing import Dict, Tuple, Any
 
-from RUFAS.classes import Config, Feed, Weather, Time
+from RUFAS.config import Config
+from RUFAS.routines.feed import Feed
+from RUFAS.weather import Weather
+from RUFAS.time import Time
 from RUFAS.routines.animal.animal_manager import AnimalManager
 
 """
 This module is an example of how to apply the SensitivityAnalysis module (generalized_sensitivity.py) to RuFas
-components. 
+components.
 
 Here are the basic steps needed to apply SA:
 1) First, decide which component(s) of the model on which you would like to conduct SA. For this example, I chose to
@@ -16,15 +19,15 @@ evaluate the effects of feed composition on phosphorus requirements and manure p
 over the course of a single day. Within RuFaS, `AnimalManager.daily_updates()` simulates the animals over the course
 of a day, so this will be the basis for our objective function.
 2) Then, ensure that the method of interest can be called from an objective function that meets the requirements of the
-SAlib. 
-    * These requirements are that the function must take a :math:`N \\times P` numpy array `X` as its first argument and 
+SAlib.
+    * These requirements are that the function must take a :math:`N \\times P` numpy array `X` as its first argument and
     must return a :math`N \\times K` numpy array as output. Here, :math:`P` is the number of input parameters, :math:`K`
-    is the number of responses, and :math:`N` is the number of samples. The model will be run :math:`N` times, once for 
-    each row of `X`. 
-    * In this example, an objective function was created by wrapping `AnimalManager.daily_updates()` (and its setup 
-    methods) into a function (`@staticmethod`) that accepts the parameters of interest as arguments (as floats) and 
+    is the number of responses, and :math:`N` is the number of samples. The model will be run :math:`N` times, once for
+    each row of `X`.
+    * In this example, an objective function was created by wrapping `AnimalManager.daily_updates()` (and its setup
+    methods) into a function (`@staticmethod`) that accepts the parameters of interest as arguments (as floats) and
     returns the outputs of interest (as a tuple). The objective function is then 'vectorized' into the desired format.
-3) Then we pass our objective function to the `SensitivityAnalysis` module to perform SA. 
+3) Then we pass our objective function to the `SensitivityAnalysis` module to perform SA.
 
 The features of this example are contained within a class for simplicity, but the same principles could be implemented
 in basic (functional) scripts. To view the example in practice, execute this program from the root MASM directory:
@@ -34,12 +37,13 @@ python Example-animal_management_SA.wrapper.py
 ```
 
 Note that the specific structure of this module (and any for conducting SA) was largely determined by how the source
-`AnimalManager` module is written. If modules had a more consistent structure (in the future), it would be much 
-easier to apply SA universally. For now, though, users will need to design their own objective functions based on how 
-their module functions is designed. It should also be noted that objective functions of the form in this module are 
-perfectly suited for both model validation and mathematical optimization, in addition to SA. This means that writing 
+`AnimalManager` module is written. If modules had a more consistent structure (in the future), it would be much
+easier to apply SA universally. For now, though, users will need to design their own objective functions based on how
+their module functions is designed. It should also be noted that objective functions of the form in this module are
+perfectly suited for both model validation and mathematical optimization, in addition to SA. This means that writing
 such objective functions will be broadly useful beyond SA.
 """
+
 
 class ExampleAnimalSA:
     """Object for running an example SA on the AnimalManagement module
@@ -200,7 +204,8 @@ class ExampleAnimalSA:
         Returns
         -------
         Y : numpy.array
-            an :math:`N \\times 2` matrix of response values. Columns correspond to `phosphorus_requirements` and `manure_production`,
+            an :math:`N \\times 2` matrix of response values. Columns correspond to `phosphorus_requirements` and `
+            manure_production`,
             respectively. Rows correspond to rows of `X`: the evaluation of X[i, ] corresponds to Y[i, ]
         """
 
@@ -258,7 +263,7 @@ class ExampleAnimalSA:
     def _setup_main_object(self):
         """Creates an instance the main AnimalManager class, after creating instances of the objects needed to
         initialize this class"""
-        self.config_instance = Config(self.config_dict, self.weather_path)
+        self.config_instance = Config(self.config_dict)
         self.feed_instance = Feed(self.make_data_dict_from_json(self.feed_path))
         self.weather_instance = Weather(self.weather_path, self.config_instance)
         self.time_instance = Time(self.config_instance)

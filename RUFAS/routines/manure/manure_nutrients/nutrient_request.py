@@ -22,13 +22,11 @@ class NutrientRequest:
                 If no fields are positive.
 
         """
-        # Check that all fields are non-negative
         for field in fields(self):
             if getattr(self, field.name) < 0:
-                raise ValueError(f'Field {field.name} must be non-negative.')
+                raise ValueError(f"Field {field.name} must be non-negative.")
 
-        # Check that at least one field is requested and positive
         if any(getattr(self, field.name) > 0.0 for field in fields(self)):
             return
         else:
-            raise ValueError('At least one nutrient must be requested and positive.')
+            raise ValueError("At least one nutrient must be requested and positive.")

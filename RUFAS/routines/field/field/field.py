@@ -4,7 +4,7 @@ from RUFAS.routines.field.crop.crop import Crop
 from RUFAS.routines.field.crop.crop_data import CropData
 from RUFAS.routines.field.crop.species_data_factory import CropSpecies, CropSpeciesDataFactory
 from RUFAS.routines.field.manager.events import Event, PlantingEvent, HarvestEvent, FertilizerEvent, ManureEvent
-from RUFAS.routines.field.manager.current_weather import CurrentWeather
+from RUFAS.current_day_conditions import CurrentDayConditions
 from RUFAS.routines.field.soil.soil import Soil
 from RUFAS.routines.field.field.field_data import FieldData
 from RUFAS.routines.field.field.fertilizer_application import FertilizerApplication
@@ -17,6 +17,7 @@ from RUFAS.routines.field.manager.events import TillageEvent
 from RUFAS.output_manager import OutputManager
 from RUFAS.routines.manure.manure_manager import ManureManager
 from RUFAS.routines.manure.manure_nutrients.nutrient_request import NutrientRequest
+from RUFAS.time import Time
 from copy import copy
 
 """
@@ -39,33 +40,53 @@ class Field:
                  fertilizer_mixes: Optional[Dict[str, Dict[str, float]]] = None,
                  manure_events: Optional[List[ManureEvent]] = None,
                  manure_manager: Optional[ManureManager] = None):
+        """
+        Initialize the related data fields that this module will work with, or create one if none provided.
+
+        Parameters
+        ----------
+        field_data : FieldData
+            FieldData object that will be simulated.
+        soil : Soil
+            The soil component of the field.
+        plantings : List[PlantingEvent]
+            List of all planting events that will occur over the run of the simulation in this field.
+        harvestings : List[HarvestEvent]
+            List of all harvesting events that will occur over the run of the simulation in the field.
+        custom_crop_specifications : Dict[str, Dict]
+            Dictionary where keys are crop references and values are dictionaries containing crop specifications.
+        tillage_events : List[TillageEvent]
+            List of all tillage events that will occur over the run of the simulation in this field.
+        fertilizer_events : List[FertilizerEvent]
+            List of all fertilizer mixes available for application to this field.
+        fertilizer_mixes : Dict[str, Dict[str, float]]
+            List of all fertilizer mixes available for application to this field.
+        manure_events : List[ManureEvent]
+            Manure application interface.
+        manure_manager : ManureManager
+            ManureManager Object to be used during simulation
+
+        """
         # field-wide attributes
         self.field_data = field_data or FieldData()
-        """field data component"""
 
         # soil attributes
         self.soil = soil or Soil(soil_data=None, field_size=self.field_data.field_size)  # default soil if not given.
-        """the soil component of the field"""
 
         # crop attributes
         self.crops: List[Crop] = list()  # empty crop list
-        """crops currently in the field"""
 
         self.planting_events: List[PlantingEvent] = plantings or []
-        """List of all planting events that will occur over the run of the simulation in this field."""
 
         self.harvest_events: List[HarvestEvent] = harvestings or []
-        """List of all harvesting events that will occur over the run of the simulation in the field."""
 
         self.custom_crop_specifications: Dict[str, Dict] = custom_crop_specifications or {}
-        """Dictionary where keys are crop references and values are dictionaries containing crop specifications."""
 
         # Soil amendment attributes
         self.fertilizer_applicator = FertilizerApplication(self.soil)
         """Provides interface for adding fertilizer to the field."""
 
         self.fertilizer_events = fertilizer_events or []
-        """List of all fertilizer application events that will be applied to this field."""
 
         self.available_fertilizer_mixes = fertilizer_mixes or {}
         self.available_fertilizer_mixes["100_0_0"] = {"N": 1.0, "P": 0.0, "K": 0.0}
@@ -83,7 +104,6 @@ class Field:
         """List of all tillage events that will occur over the run of the simulation in this field."""
 
         self.manure_applicator = ManureApplication(self.soil.data)
-        """Manure application interface."""
 
         self.manure_events: List[ManureEvent] = manure_events or []
         """List of all manure applications that will be applied to this field."""
@@ -94,7 +114,7 @@ class Field:
         self.manure_manager: ManureManager = manure_manager
         """:class:`ManureManager` instance from which manure is requested for application to the field."""
 
-    def manage_field(self, time, current_weather: CurrentWeather) -> None:
+    def manage_field(self, time, current_conditions: CurrentDayConditions) -> None:
         """
         Main Field routine, runs all subroutines routines based on current attribute configuration.
 
@@ -102,8 +122,8 @@ class Field:
         ----------
         time : Time
             Contains the current year and day that the simulation is on.
-        current_weather : CurrentWeather
-            Contains a collection of today's weather variables needed for field processes.
+        current_conditions : CurrentDayConditions
+            Contains a collection of today's conditions variables needed for field processes.
 
         Notes
         -----
@@ -122,15 +142,15 @@ class Field:
 
         # --- Whole-Field Methods ---
         # Allow non-management field processes (water/nutrient cycling) to occur
-        self._execute_daily_processes(current_weather, time)
+        self._execute_daily_processes(current_conditions, time)
         # ... Other ...
 
         # --- Crop Management ---
-        self._assess_dormancy(current_weather.daylength)
+        self._assess_dormancy(current_conditions.daylength)
 
         self._check_crop_planting_schedule(time)
 
-        self._check_crop_harvest_schedule(time)
+        self._check_crop_harvest_schedule(time, current_conditions)
 
         self._remove_dead_crops()
         self._reset_crop_field_coverage_fractions()
@@ -476,8 +496,8 @@ class Field:
         info_map = {"class": self.__class__.__name__, "function": self._record_manure_application.__name__,
                     "prefix": f"field='{self.field_data.name}'", "date": {"year": year, "day": day},
                     "field_size": self.field_data.field_size}
-        value = {"dry_matter_mass": dry_matter_mass, "dry_matter_fraction": dry_matter_fraction, "field_coverage":
-                 field_coverage, "application_depth": application_depth,
+        value = {"dry_matter_mass": dry_matter_mass, "dry_matter_fraction": dry_matter_fraction,
+                 "field_coverage": field_coverage, "application_depth": application_depth,
                  "surface_remainder_fraction": surface_remainder_fraction, "nitrogen": nitrogen,
                  "phosphorus": phosphorus, "potassium": potassium}
         om.add_variable("manure_application", value, info_map)
@@ -515,6 +535,7 @@ class Field:
                             f"the soil profile, setting the application depth to be at the bottom of the soil " \
                             f"profile."
         om.add_error(error_name, error_message, info_map)
+
     # </editor-fold>
 
     # <editor-fold desc="--- Scheduling Methods ---">
@@ -579,7 +600,7 @@ class Field:
                                              event.application_depth, event.surface_remainder_fraction, event.year,
                                              event.day)
 
-    def _check_crop_harvest_schedule(self, time) -> None:
+    def _check_crop_harvest_schedule(self, time: Time, current_conditions: CurrentDayConditions) -> None:
         """
         Checks for all crops for potential harvests that may happen on the current day.
 
@@ -587,6 +608,8 @@ class Field:
         ----------
         time : Time
             Time object containing the current day and year of the simulation.
+        current_conditions : CurrentDayConditions
+            CurrentDayConditions object containing the current weather conditions of the simulated day.
 
         Notes
         -----
@@ -596,14 +619,19 @@ class Field:
         """
         self.harvest_events, todays_harvest_events = self._filter_events(self.harvest_events, time)
         for event in todays_harvest_events:
-            self._harvest_crop(event.crop_reference, event.operation, time)
+            self._harvest_crop(event.crop_reference, event.operation, time, current_conditions)
 
-        self._harvest_heat_scheduled_crops()
+        self._harvest_heat_scheduled_crops(current_conditions.rainfall)
 
-    def _harvest_heat_scheduled_crops(self) -> None:
+    def _harvest_heat_scheduled_crops(self, rainfall: float) -> None:
         """
         Checks if any of the active plants in the field are harvested based on their heat schedule, and if so harvests
         them if they meet the heat threshold.
+
+        Parameters
+        ----------
+        rainfall : float
+            Amount of rainfall on the current day (mm).
 
         References
         ----------
@@ -615,6 +643,7 @@ class Field:
                                              crop.data.heat_fraction >= crop.data.harvest_heat_fraction
             if execute_heat_scheduled_harvest:
                 crop.crop_management.manage_harvest(HarvestOperation.HARVEST_NOKILL)
+                self.soil.carbon_cycling.residue_partition.add_residue_to_pools(rainfall)
 
     @staticmethod
     def _filter_events(all_events: List[Event], time) -> Tuple[List[Event], List[Event]]:
@@ -732,7 +761,8 @@ class Field:
                  "date": {"year": year, "day": day}}
         om.add_variable("crop_planting", value, info_map)
 
-    def _harvest_crop(self, crop_reference: str, harvest_operation: str, time) -> None:
+    def _harvest_crop(self, crop_reference: str, harvest_operation: str, time: Time,
+                      current_conditions: CurrentDayConditions) -> None:
         """
         Performs the specified crop operation on the specified crop.
 
@@ -744,6 +774,8 @@ class Field:
             Name of the harvest operation to be performed on the referenced crop.
         time : Time
             Object containing the current day and year of the simulation.
+        current_conditions : CurrentDayConditions
+            Object containing the conditions of the current simulated day.
 
         Notes
         -----
@@ -770,6 +802,7 @@ class Field:
             crop.crop_management.manage_harvest(harvest_operation_enum, self.field_data.name,
                                                 self.field_data.field_size, time.calendar_year, time.day,
                                                 self.soil.data)
+            self.soil.carbon_cycling.residue_partition.add_residue_to_pools(current_conditions.rainfall)
 
     def _remove_dead_crops(self) -> None:
         """
@@ -791,16 +824,24 @@ class Field:
 
     @staticmethod
     def _make_crop_from_config_dict(config: Dict) -> Crop:
-        """Initializes a new crop from a configuration dictionary
+        """
+        Initialize a new crop from a configuration dictionary.
 
-        Args:
-            config: a dictionary containing specifications for the crop to be initialized.
+        Parameters
+        ----------
+        config : dict
+            A dictionary containing specifications for the crop to be initialized.
 
-        Details: if the "species" key is present in the dictionary, that value is checked against the supported
-            crop species. If it is supported, that supported crop is initialized. Otherwise, a custom crop is
-            created (with 'custom' prepended to species name, if given).
+        Details
+        -------
+        If the "species" key is present in the dictionary, that value is checked against the supported
+        crop species. If it is supported, that supported crop is initialized. Otherwise, a custom crop is
+        created (with 'custom' prepended to the species name, if given).
 
-        Returns: a Crop object, initialized with the desired attribute values.
+        Returns
+        -------
+        Crop
+            A Crop object initialized with the desired attribute values.
         """
         if "species" in config.keys():
             accepted_species = set(item.value for item in CropSpecies)
@@ -815,19 +856,28 @@ class Field:
 
     @staticmethod
     def _make_supported_crop(species: str, **specs) -> Crop:
-        """creates a crop instance with attributes determined by the species of the crop.
-
-        Args:
-            species: one of the supported species
-            **specs: an optional set of arguments, passed to CropSpeciesDataFactory that customize the
-              crop species
-
-        Details: species attributes are read from species configuration files/classes. This method of creating
-            a crop does not allow for customizing crop values. It is limited to creating the default crops
-            supported by the CropSpecies Enum.
-
-        Returns: a Crop object, initialized with the desired attribute values.
         """
+        Create a crop instance with attributes determined by the species of the crop.
+
+        Parameters
+        ----------
+        species : str
+            One of the supported species.
+        **specs : optional
+            An optional set of keyword arguments passed to CropSpeciesDataFactory to customize the crop species.
+
+        Details
+        -------
+        Species attributes are read from species configuration files/classes. This method of creating a crop
+        does not allow for customizing crop values. It is limited to creating the default crops supported by the
+        CropSpecies Enum.
+
+        Returns
+        -------
+        Crop
+            A Crop object initialized with the desired attribute values.
+        """
+
         crop_species = CropSpecies(species)
         crop_data = CropSpeciesDataFactory.create_species_data(crop_species, **specs)
         return Crop(crop_data)
@@ -846,21 +896,26 @@ class Field:
         return Crop(crop_data)
 
     def _assess_dormancy(self, daylength: float) -> None:
-        """Transitions all crops to dormancy, that are capable of going dormant
+        """
+        Transition all crops to dormancy if they are capable of going dormant.
 
-        Args:
-            daylength: length of time from sunup to sundown on the current day (hours)
+        Parameters
+        ----------
+        daylength : float
+            Length of time from sunup to sundown on the current day (hours).
 
-        Details:
-            If the length of the current day is at or below the dormancy threshold length, all crops that can go dormant
-            should be put into dormancy. If the length is greater than the threshold length, all crops
-            should be brought out of dormancy.
+        Details
+        -------
+        If the length of the current day is at or below the dormancy threshold length, all crops that can go dormant
+        should be put into dormancy. If the length is greater than the threshold length, all crops should be brought out
+        of dormancy.
 
         """
-        if daylength <= self.field_data.dormancy_threshold_daylength:
 
+        if daylength <= self.field_data.dormancy_threshold_daylength:
             for crop in self.crops:
                 crop.dormancy.enter_dormancy()
+                crop.biomass_allocation.partition_biomass()
         else:
             for crop in self.crops:
                 crop.data.is_dormant = False
@@ -868,12 +923,12 @@ class Field:
     # </editor-fold>
 
     # <editor-fold desc="--- Field-level Methods ---">
-    def _execute_daily_processes(self, current_weather: CurrentWeather, time) -> None:
+    def _execute_daily_processes(self, current_conditions: CurrentDayConditions, time) -> None:
         """Executes all daily updates on this field's soil and crop objects.
 
         Parameters
         ----------
-        current_weather : CurrentWeather
+        current_conditions : CurrentDayConditions
             Object containing the environment conditions on this day.
         time : Time
             Object containing the current year and day of the simulation.
@@ -884,79 +939,87 @@ class Field:
         it will allow subject-matter experts to more easily experiment with different orders.
 
         """
-        # TODO: implement snow addition, melting, and sublimation - issue #317
-        snow_cover = 0
-        total_plant_cover = self.field_data.current_residue + self._determine_total_above_ground_biomass()
-        self.soil.soil_temp.daily_soil_temperature_update(current_weather.incoming_light,
-                                                          current_weather.mean_air_temperature,
-                                                          current_weather.min_air_temperature,
-                                                          current_weather.max_air_temperature,
-                                                          total_plant_cover,
-                                                          snow_cover,
-                                                          current_weather.annual_mean_air_temperature)
+        self.soil.snow.update_snow(current_day_conditions=current_conditions, day=time.day)
 
-        self._cycle_water(current_weather, time)
+        total_plant_cover = self.field_data.current_residue + self._determine_total_above_ground_biomass()
+        self.soil.soil_temp.daily_soil_temperature_update(current_conditions.incoming_light,
+                                                          current_conditions.mean_air_temperature,
+                                                          current_conditions.min_air_temperature,
+                                                          current_conditions.max_air_temperature,
+                                                          total_plant_cover,
+                                                          self.soil.data.snow_content,
+                                                          current_conditions.annual_mean_air_temperature)
+
+        self._cycle_water(current_conditions, time)
 
         for crop in self.crops:
             if crop.data.is_mature or crop.data.is_dormant:
                 continue
 
-            crop.heat_units.absorb_heat_units(current_weather.mean_air_temperature, current_weather.min_air_temperature,
-                                              current_weather.max_air_temperature)
+            crop.heat_units.absorb_heat_units(current_conditions.mean_air_temperature,
+                                              current_conditions.min_air_temperature,
+                                              current_conditions.max_air_temperature)
             crop.root_development.develop_roots()
             crop.nitrogen_incorporation.incorporate_nitrogen(self.soil.data)
             crop.phosphorus_incorporation.incorporate_phosphorus(self.soil.data)
-            crop.growth_constraints.constrain_growth(crop.data.max_transpiration, current_weather.mean_air_temperature)
+            crop.growth_constraints.constrain_growth(crop.data.max_transpiration,
+                                                     current_conditions.mean_air_temperature)
             crop.leaf_area_index.grow_canopy()
-            crop.biomass_allocation.allocate_biomass(current_weather.incoming_light)
+            crop.biomass_allocation.allocate_biomass(current_conditions.incoming_light)
 
-    def _cycle_water(self, current_weather: CurrentWeather, time):
-        """allow the water to cycle through the field.
+    def _cycle_water(self, current_conditions: CurrentDayConditions, time):
+        """
+        Allow water to cycle through the field.
 
-        Args:
-            current_weather: a CurrentWeather object, containing a collection of today's weather variables needed
-                for field processes.
+        Parameters
+        ----------
+        current_conditions : CurrentDayConditions
+            A CurrentDayConditions object containing a collection of today's weather variables needed for field
+            processes.
         time : Time
-            Object containing the current year and day of the simulation.
+            An object containing the current year and day of the simulation.
 
-        Details: This method executes all water-related processes that occur within Crop and Soil objects. Having a
-            separate method to handle water processes altogether is necessary because processes that effect water in the
-            soil are dependent on processes that effect water in crops and vice versa. The most complex process that is
-            executed in this method is evapotranspiration, which is executed in the following order
-                - Evaporation of water in canopies of crops.
-                - Sublimation of water in snow pack (not implemented in V1)
-                - Evaporation from the soil profile.
-                - Transpiration from crops (amount of water taken up by plants is equal to the amount they transpirate,
-                    and this amount depends on the evapotranspirative demand after water has been removed from canopies)
+        Notes
+        -----
+        This method executes all water-related processes that occur within Crop and Soil objects. Having a
+        separate method to handle water processes altogether is necessary because processes that affect water in the
+        soil are dependent on processes that affect water in crops and vice versa. The most complex process that is
+        executed in this method is evapotranspiration, which is executed in the following order:
 
-            It should also be noted that while this method is more messy and complex than it could be, this is a
-            conscious design choice that will allow for SME's to more easily and freely experiment with different orders
-            of processes. This is necessary because there is not necessarily one correct order for processes to run in.
+            - Evaporation of water in canopies of crops.
+            - Sublimation of water in the snowpack (not implemented in V1).
+            - Evaporation from the soil profile.
+            - Transpiration from crops (the amount of water taken up by plants is equal to the amount they transpirate,
+              and this amount depends on the evapotranspirative demand after water has been removed from canopies).
+
+        It should also be noted that while this method is more messy and complex than it could be, this is a
+        conscious design choice that will allow for SMEs to more easily and freely experiment with different orders
+        of processes. This is necessary because there is not necessarily one correct order for processes to run in.
 
         """
-        watering_amount = self._determine_watering_amount(rainfall=current_weather.rainfall, year=time.year,
-                                                          day=time.day, irrigation=current_weather.irrigation)
-        total_precipitation = current_weather.rainfall + watering_amount
+        watering_amount = self._determine_watering_amount(rainfall=current_conditions.rainfall, year=time.year,
+                                                          day=time.day, irrigation=current_conditions.irrigation)
+        total_precipitation = current_conditions.rainfall + watering_amount
         precipitation_reaching_soil = self._handle_water_in_crop_canopies(total_precipitation)
+        water_reaching_soil = precipitation_reaching_soil + self.soil.data.snow_melt_amount
 
         full_evapotranspirative_demand = self._determine_potential_evapotranspiration(
-            current_weather.incoming_light, current_weather.max_air_temperature, current_weather.min_air_temperature,
-            current_weather.mean_air_temperature)
+            current_conditions.incoming_light, current_conditions.max_air_temperature,
+            current_conditions.min_air_temperature, current_conditions.mean_air_temperature)
+        self.field_data.max_evapotranspiration = full_evapotranspirative_demand
 
         remaining_evapotranspirative_demand = self._evaporate_from_crop_canopies(full_evapotranspirative_demand)
 
-        # TODO: figure out how to determine weighting coefficient when there are multiple crops in the field - issue
-        #  #519
-        self.soil.infiltration.infiltrate(precipitation_reaching_soil, 1.0, full_evapotranspirative_demand)
+        self.soil.infiltration.infiltrate(water_reaching_soil)
         self.soil.percolation.percolate(self.field_data.seasonal_high_water_table)
-        # TODO: find reasonable values/way to set minimum cover management factor - issue #520
         self.soil.soil_erosion.erode(self.field_data.field_size, 0.02, self.field_data.current_residue,
                                      total_precipitation)
-        self.soil.phosphorus_cycling.cycle_phosphorus(precipitation_reaching_soil, self.soil.data.accumulated_runoff,
-                                                      self.field_data.field_size, current_weather.mean_air_temperature)
-        self.soil.nitrogen_cycling.cycle_nitrogen(self.field_data.field_size)
-        self.soil.carbon_cycling.cycle_carbon(precipitation_reaching_soil, current_weather.mean_air_temperature,
+        self.soil.phosphorus_cycling.cycle_phosphorus(water_reaching_soil, self.soil.data.accumulated_runoff,
+                                                      self.field_data.field_size,
+                                                      current_conditions.mean_air_temperature)
+        self.soil.carbon_cycling.cycle_carbon(water_reaching_soil, current_conditions.mean_air_temperature,
                                               self.field_data.field_size)
+        self.soil.nitrogen_cycling.cycle_nitrogen(self.field_data.field_size)
 
         weighted_transpiration_total = 0.0
         weights_sum = 0.0
@@ -970,16 +1033,15 @@ class Field:
         else:
             weighted_average_transpiration = weighted_transpiration_total / weights_sum
 
-        # TODO: Implement snow (melting and sublimation) - issue #317
-        snow_water_content = 0.0
         above_ground_biomass = self._determine_total_above_ground_biomass()
 
         soil_evaporation_and_sublimation_amount = self._determine_soil_evaporation_and_sublimation_adjusted(
-            above_ground_biomass, self.soil.data.plant_surface_residue, snow_water_content,
+            above_ground_biomass, self.soil.data.plant_surface_residue, self.soil.data.snow_content,
             remaining_evapotranspirative_demand, weighted_average_transpiration)
 
-        # TODO: sublimate and adjust soil_evaporation_and_sublimation_amount here - issue #317
-
+        self.soil.snow.sublimate(soil_evaporation_and_sublimation_amount)
+        soil_evaporation_and_sublimation_amount -= self.soil.data.water_sublimated
+        remaining_evapotranspirative_demand -= self.soil.data.water_sublimated
         self.soil.evaporation.evaporate(soil_evaporation_and_sublimation_amount)
         remaining_evapotranspirative_demand -= self.soil.data.water_evaporated
 
@@ -1066,7 +1128,7 @@ class Field:
         the canopy went down overnight, so water is lost from the canopy to the ground before any evapotranspiration can
         happen. A caveat is that if there is excess water in the canopy of one crop, it cannot be transferred to the
         canopy of another.
-        TODO: distribute water evenly/proportionally/fairly between crop canopies - issue #513
+
         """
         precipitation_reaching_soil = precipitation_total
         excess_canopy_water = 0
@@ -1107,7 +1169,7 @@ class Field:
         This method iterates through the crops in the field, for each determines how much water was evaporated from its
         canopy, then reduces the evapotranspirative demand by that amount. If the remaining evapotranspirative demand
         reaches 0, then no more water should be evaporated so the method stops running.
-        TODO: evaporate water evenly/proportionally/fairly from crop canopies - issue #513
+
         """
         remaining_evapotranspirative_demand = evapotranspirative_demand
         for crop in self.crops:
@@ -1125,26 +1187,25 @@ class Field:
         return total_above_ground_biomass
 
     @staticmethod
-    def _determine_potential_evapotranspiration(extra_terrestrial_radiation: float, max_air_temp: float,
-                                                min_air_temp: float,
-                                                avg_air_temp: float) -> float:
+    def _determine_potential_evapotranspiration(extraterrestrial_radiation: float, max_air_temp: float,
+                                                min_air_temp: float, avg_air_temp: float) -> float:
         """Calculates the potential evapotranspiration for a given day.
 
         Parameters
         ----------
-        extra_terrestrial_radiation : float
-            Radiation from the aliens (MJ per square meter per day)
+        extraterrestrial_radiation : float
+            Radiation from sunlight (MJ per square meter per day).
         max_air_temp : float
-            Maximum air temperature (degrees C)
+            Maximum air temperature (degrees C).
         min_air_temp : float
-            Minimum air temperature (degrees C)
+            Minimum air temperature (degrees C).
         avg_air_temp : float
-            Average air temperature (degrees C)
+            Average air temperature (degrees C).
 
         Returns
         -------
         float
-            potential evapotranspiration (mm)
+            Potential evapotranspiration (mm).
 
         References
         ----------
@@ -1155,20 +1216,15 @@ class Field:
         This method calculates the evapotranspirative demand for the entire field on any given day using the Hargreaves
         method. This method lower-bounds the potential evapotranspiration at 0.0 mm.
 
+        If the average temperature for the day is not specified, then the average temperature for the day is calculated
+        as the average of the maximum and minimum temperatures of the day.
+
         """
-        if avg_air_temp is None:
-            calculated_avg_air_temp = (max_air_temp + min_air_temp) / 2
-            latent_heat_vaporization = Field._determine_latent_heat_vaporization(calculated_avg_air_temp)
-            potential_evapotranspiration = (0.0023 *
-                                            extra_terrestrial_radiation * ((max_air_temp - min_air_temp) ** (-0.5))
-                                            * (calculated_avg_air_temp + 17.8)) / latent_heat_vaporization
-            return max(0.0, potential_evapotranspiration)
-        else:
-            latent_heat_vaporization = Field._determine_latent_heat_vaporization(avg_air_temp)
-            potential_evapotranspiration = (0.0023 *
-                                            extra_terrestrial_radiation * ((max_air_temp - min_air_temp) ** (-0.5))
-                                            * (avg_air_temp + 17.8)) / latent_heat_vaporization
-            return max(0.0, potential_evapotranspiration)
+        avg_air_temp = avg_air_temp if avg_air_temp else (max_air_temp + min_air_temp) / 2
+        latent_heat_vaporization = Field._determine_latent_heat_vaporization(avg_air_temp)
+        potential_evapotranspiration = (0.0023 * extraterrestrial_radiation * ((max_air_temp - min_air_temp) ** 0.5)
+                                        * (avg_air_temp + 17.8)) / latent_heat_vaporization
+        return max(0.0, potential_evapotranspiration)
 
     @staticmethod
     def _determine_latent_heat_vaporization(avg_air_temp: float) -> float:
@@ -1242,52 +1298,30 @@ class Field:
     @staticmethod
     def _determine_soil_cover_index(above_ground_biomass: float, residue: float, snow_water_content: float) -> float:
         """Calculate the soil cover index.
+
         Parameters
         ----------
         above_ground_biomass : float
-            Mass of plant above ground (kg per hectare)
+            Mass of plant above ground (kg per hectare).
         residue : float
-            Biomass separated from plant on the ground (kg per hectare)
+            Biomass separated from plant on the ground (kg per hectare).
         snow_water_content : float
-            Amount of water from snow (mm)
+            Amount of water from snow (mm).
+
         Returns
         -------
         Float
-            Soil cover index (unitless)
+            Soil cover index (unitless).
+
         References
         ----------
         SWAT Theoretical documentation eqn. 2:2.3.8
+
         """
         if snow_water_content > 0.5:
             return 0.5
         else:
             return exp((-5.0 * (10 ** (-5))) * (above_ground_biomass + residue))
-
-    # TODO: this method will not be used until sublimation is implemented - issue #317
-    @staticmethod
-    def _determine_maximum_soil_evaporation(soil_evaporation_adj: float, snow_water_content: float) -> float:
-        """Calculates the maximum amount of evaporation from soil in a given day
-        Parameters
-        ----------
-        soil_evaporation_adj : float
-            Maximum soil evaporation adjusted for plant water use on a given day (mm)
-        snow_water_content : float
-            Amount of water in the snow pack on a given day prior to accounting for sublimation (mm)
-        TODO: verify that "amount of water in the snow pack on a given day" (2:2.3.3.1) and "snow water content"
-            (2:2.3.3) mean the same thing - address this with #317
-        Returns
-        -------
-        float
-            Maximum soil water evaporation on a given day (mm)
-        References
-        ----------
-        SWAT Theoretical documentation section 2:2.3.3.1
-        """
-        if soil_evaporation_adj < snow_water_content:
-            return 0.0
-        else:
-            return soil_evaporation_adj - snow_water_content
-
     # </editor-fold>
 
     # <editor-fold desc="--- Annual Reset Methods ---">
@@ -1318,3 +1352,5 @@ class Field:
                     "prefix": f"field='{self.field_data.name}'", "date": {"year": year, "day": day},
                     "field_size": self.field_data.field_size, "units": "mm"}
         om.add_variable("field_watering", watering_amount, info_map)
+
+    # </editor-fold>

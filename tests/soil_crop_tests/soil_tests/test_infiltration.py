@@ -1,6 +1,6 @@
 import pytest
 from math import log, exp
-from unittest.mock import MagicMock
+from unittest.mock import MagicMock, patch, call
 
 from RUFAS.routines.field.soil.infiltration import Infiltration
 from RUFAS.routines.field.soil.soil_data import SoilData
@@ -181,82 +181,64 @@ def test_determine_moisture_condition_parameter(retention_param):
 
 
 # --- Integration tests ----
-@pytest.mark.parametrize("average_subbasin_slope,rainfall,is_top_frozen,coefficient,potential_evapotranspiration,"
-                         "previous_retention_parameter", [
-                             (0.07, 1.4, False, 0.91, 1.9, 27),
-                             (0.07, 3.5, True, 0.4858, 3.8, 27),
-                             (0.07, 2.5, False, 0.694, 0.0, 27),
-                             (0.07, 0.3, False, 0.58392, 4.9, 27),
-                             (0.07, 4.697, False, 0.5938, 5.1, 27),
-                             (0.07, 2.45, False, 0.9694, 2.2, 27),
-                             (0.05, 2.45, False, 0.9694, 2.2, 27),
-                             (0.07, 2.5, False, 0.694, 0.0, None)
+@pytest.mark.parametrize("rainfall,is_top_frozen,expected_runoff,expected_infiltration,expected_total_runoff", [
+                             (1.4, False, 1.4, 0.0, 2.7),
+                             (3.5, True, 3.0, 0.5, 4.3),
+                             (20.0, False, 3.0, 17.0, 4.3),
+                             (0.0, False, 0.0, 0.0, 1.3)
                          ])
-def test_infiltrate(average_subbasin_slope: float, rainfall: float, is_top_frozen: bool, coefficient: float,
-                    potential_evapotranspiration: float, previous_retention_parameter: float) -> None:
-    """test that infiltrate() correctly stores all values in SoilData object and calls all the methods it should"""
-    # initialize objects
+def test_infiltrate(rainfall: float, is_top_frozen: bool, expected_runoff: float, expected_infiltration: float,
+                    expected_total_runoff: float) -> None:
+    """Test that infiltrate() correctly stores all values in SoilData object and calls all the methods it should."""
+    surface_layer = MagicMock(LayerData)
     if is_top_frozen:
-        data = SoilData(average_subbasin_slope=average_subbasin_slope,
-                        previous_retention_parameter=previous_retention_parameter, field_size=1.33,
-                        soil_layers=[LayerData(top_depth=0, bottom_depth=20, temperature=-1,
-                                               soil_water_concentration=0, field_size=1.33),
-                                     LayerData(top_depth=20, bottom_depth=50, temperature=-1,
-                                               soil_water_concentration=0, field_size=1.33)])
+        setattr(surface_layer, "temperature", -1.0)
     else:
-        data = SoilData(average_subbasin_slope=average_subbasin_slope,
-                        previous_retention_parameter=previous_retention_parameter, field_size=1.33,
-                        soil_layers=[LayerData(top_depth=0, bottom_depth=20, soil_water_concentration=0,
-                                               field_size=1.33),
-                                     LayerData(top_depth=20, bottom_depth=50, soil_water_concentration=0,
-                                               field_size=1.33)])
+        setattr(surface_layer, "temperature", 15.0)
+    setattr(surface_layer, "acceptable_percolation_amount", 1.0)
+    setattr(surface_layer, "water_content", 8.0)
+    data = MagicMock(SoilData)
+    setattr(data, "soil_layers", [surface_layer])
+    setattr(data, "second_moisture_condition_parameter", 85.0)
+    setattr(data, "profile_saturation", 200.0)
+    setattr(data, "profile_field_capacity", 125.0)
+    setattr(data, "profile_soil_water_content", 115.0)
+    setattr(data, "accumulated_runoff", 1.1)
+    setattr(data, "infiltrated_water", 1.2)
+    setattr(data, "annual_runoff_total", 1.3)
     incorp = Infiltration(data)
-    if incorp.data.previous_retention_parameter is None:
-        is_prev_retention_none = True
-    else:
-        is_prev_retention_none = False
 
-    # mock helper functions
-    incorp._determine_third_moisture_condition_parameter = MagicMock(return_value=25)
-    incorp._determine_second_moisture_condition_adjusted = MagicMock(return_value=40)
-    incorp._determine_first_moisture_condition_parameter = MagicMock(return_value=15)
-    incorp._determine_retention_parameter_for_moisture_condition = MagicMock(return_value=300)
-    incorp._determine_second_shape_coefficient = MagicMock(return_value=0.8)
-    incorp._determine_first_shape_coefficient = MagicMock(return_value=0.85)
-    incorp._determine_retention_parameter = MagicMock(return_value=23)
-    incorp._determine_frozen_retention_parameter = MagicMock(return_value=20)
-    incorp._determine_updated_retention_parameter = MagicMock(return_value=21.34)
-    incorp._determine_accumulated_runoff = MagicMock(return_value=0.95)
-    incorp._determine_moisture_condition_parameter = MagicMock(return_value=50)
+    with patch("RUFAS.routines.field.soil.infiltration.Infiltration._determine_third_moisture_condition_parameter",
+               return_value=90) as third_curve_num, \
+            patch("RUFAS.routines.field.soil.infiltration.Infiltration._determine_first_moisture_condition_parameter",
+                  return_value=10) as first_curve_num, \
+            patch("RUFAS.routines.field.soil.infiltration.Infiltration."
+                  "_determine_retention_parameter_for_moisture_condition", return_value=0.5) as moisture_param, \
+            patch("RUFAS.routines.field.soil.infiltration.Infiltration._determine_second_shape_coefficient",
+                  return_value=1.1) as second_shape, \
+            patch("RUFAS.routines.field.soil.infiltration.Infiltration._determine_first_shape_coefficient",
+                  return_value=1.2) as first_shape, \
+            patch("RUFAS.routines.field.soil.infiltration.Infiltration._determine_retention_parameter",
+                  return_value=0.6) as retention_param, \
+            patch("RUFAS.routines.field.soil.infiltration.Infiltration._determine_frozen_retention_parameter",
+                  return_value=0.6) as frozen_retention_param, \
+            patch("RUFAS.routines.field.soil.infiltration.Infiltration._determine_accumulated_runoff",
+                  return_value=3.0) as runoff:
+        incorp.infiltrate(rainfall)
 
-    # run main method
-    incorp.infiltrate(rainfall, coefficient, potential_evapotranspiration)
-    expected_infiltrated_water = max(0.0, rainfall - 0.95)
-    # assertions
-    if average_subbasin_slope == 0.05:
-        assert incorp._determine_third_moisture_condition_parameter.call_count == 1
-        assert incorp._determine_second_moisture_condition_adjusted.call_count == 0
-    else:
-        assert incorp._determine_third_moisture_condition_parameter.call_count == 2
-        assert incorp._determine_second_moisture_condition_adjusted.call_count == 1
-    assert incorp._determine_first_moisture_condition_parameter.call_count == 1
-    assert incorp._determine_retention_parameter_for_moisture_condition.call_count == 2
-    assert incorp._determine_second_shape_coefficient.call_count == 1
-    assert incorp._determine_first_shape_coefficient.call_count == 1
-    assert incorp._determine_retention_parameter.call_count == 1
-    if is_top_frozen:
-        assert incorp._determine_frozen_retention_parameter.call_count == 1
-    else:
-        assert incorp._determine_frozen_retention_parameter.call_count == 0
-    assert incorp._determine_accumulated_runoff.call_count == 1
-    if is_prev_retention_none:
-        assert incorp._determine_updated_retention_parameter.call_count == 0
-        assert incorp.data.previous_retention_parameter == 0.9 * 300
-    else:
-        assert incorp._determine_updated_retention_parameter.call_count == 1
-        assert incorp.data.previous_retention_parameter == 21.34
-    assert incorp._determine_moisture_condition_parameter.call_count == 1
-    assert incorp.data.moisture_condition_parameter == 50
-    assert incorp.data.accumulated_runoff == 0.95
-    assert incorp.data.soil_layers[0].water_content == expected_infiltrated_water
-    assert incorp.data.annual_runoff_total == 0.95
+        third_curve_num.assert_called_once_with(85.0)
+        first_curve_num.assert_called_once_with(85.0)
+        retention_param_for_moisture_calls = [call(10), call(90)]
+        moisture_param.assert_has_calls(retention_param_for_moisture_calls)
+        second_shape.assert_called_once_with(125.0, 200.0, 0.5, 0.5)
+        first_shape.assert_called_once_with(125.0, 0.5, 0.5, 1.1)
+        retention_param.assert_called_once_with(115.0, 0.5, 1.2, 1.1)
+        if is_top_frozen:
+            frozen_retention_param.assert_called_once_with(0.5, 0.6)
+        else:
+            frozen_retention_param.assert_not_called()
+        runoff.assert_called_once_with(rainfall, 0.6)
+
+        assert incorp.data.accumulated_runoff == expected_runoff
+        assert incorp.data.infiltrated_water == expected_infiltration
+        assert incorp.data.annual_runoff_total == expected_total_runoff

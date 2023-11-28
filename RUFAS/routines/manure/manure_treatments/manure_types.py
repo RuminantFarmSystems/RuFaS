@@ -11,6 +11,7 @@ class ManureType(Enum):
     SOLID: Represents manure in solid form.
 
     """
-    LIQUID = 'liquid'
-    SLURRY = 'slurry'
-    SOLID = 'solid'
+
+    LIQUID = "liquid"
+    SLURRY = "slurry"
+    SOLID = "solid"

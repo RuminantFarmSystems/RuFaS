@@ -2,7 +2,7 @@ import pytest
 from pytest import approx
 from pytest_mock import MockerFixture
 
-from RUFAS.routines.manure.constants.manure_constants import ManureConstants
+from RUFAS.routines.manure.constants_and_units.manure_constants import ManureConstants
 from RUFAS.routines.manure.manure_handlers import milking_parlor
 from RUFAS.routines.manure.manure_handlers.milking_parlor import MilkingParlor
 

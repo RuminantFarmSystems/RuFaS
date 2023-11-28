@@ -13,8 +13,9 @@ from typing import Tuple
 from RUFAS.general_constants import GeneralConstants
 from RUFAS.routines.animal.manure.general_manure import AnimalManureExcretions
 from RUFAS.routines.animal.manure.general_manure import calculate_phosphorus_excretion_values
-from RUFAS.routines.animal.ration.ration_driver import ration_report
+from RUFAS.routines.animal.ration.ration_driver import RationReporter
 from RUFAS.routines.animal.animal_module_constants import AnimalModuleConstants
+
 
 def methane_mitigation(NDF_concentration: float,
                        EE_concentration: float,
@@ -34,25 +35,28 @@ def methane_mitigation(NDF_concentration: float,
         Concentration of starch in the ration.
     CP_concentration : float
         Concentration of crude protein (CP) in the ration.
-    methane_mitigation_method: str 
-        Methane mitigation method used to reduce enteric methane emissions, including "3-NOP", "Monensin", "Essential Oils", and "Seaweed". 
-    methane_mitigation_additive_amount: float 
-        The amount of methane mitigation feed additive that is added, mg/kg dry matter intake (DMI). The recommended dose for 3-NOP is between 40 and 100 mg/kg DMI, while that for monensin is between 16 and 36 mg/kg DMI. 
+    methane_mitigation_method: str
+        Methane mitigation method used to reduce enteric methane emissions, including "3-NOP", "Monensin",
+        "EssentialOils", and "Seaweed".
+    methane_mitigation_additive_amount: float
+        The amount of methane mitigation feed additive that is added, mg/kg dry matter intake (DMI).
+        The recommended dose for 3-NOP is
+        between 40 and 100 mg/kg DMI, while that for monensin is between 16 and 36 mg/kg DMI.
 
     Returns
     -------
-    float 
-        Reduction in methane yield (methane production/DMI), %.   
+    float
+        Reduction in methane yield (methane production/DMI), %.
     """
 
     methane_yield_reduction = 0.0
-    Monensin_CP_lower_bound = AnimalModuleConstants.MONENSIN_CP_LOWER_BOUND 
+    Monensin_CP_lower_bound = AnimalModuleConstants.MONENSIN_CP_LOWER_BOUND
     Monensin_CP_upper_bound = AnimalModuleConstants.MONENSIN_CP_UPPER_BOUND
 
     if methane_mitigation_method == "3-NOP":
         methane_yield_reduction = -30.8 - 0.226 * (methane_mitigation_additive_amount - 70.5) + 0.906 * (
             NDF_concentration - 32.9) + 3.871 * (EE_concentration - 4.2) - 0.337 * (starch_concentration - 21.1)
-    elif methane_mitigation_method == "Monensin":    
+    elif methane_mitigation_method == "Monensin":
         if Monensin_CP_lower_bound <= CP_concentration <= Monensin_CP_upper_bound:
             methane_yield_reduction = (0.30054 - 0.00377 *
                                        methane_mitigation_additive_amount - 1.57832 * CP_concentration/100) * 100
@@ -116,7 +120,7 @@ def manure_calculations(ration_formulation,
             in the AnimalManureExcretions class definition.
 
     """
-    nutrient_amounts, nutrient_concentrations = ration_report(
+    nutrient_amounts, nutrient_concentrations = RationReporter.report_ration(
         ration_formulation, feed.available_feeds)
     dry_matter_intake = nutrient_amounts['dm']
     ASH_diet_content = nutrient_amounts['ash']
@@ -124,7 +128,7 @@ def manure_calculations(ration_formulation,
     dry_matter_concentration = nutrient_concentrations['dm']
     ADF_concentration = nutrient_concentrations['ADF']
     CP_concentration = nutrient_concentrations['CP']
-    lignin_concentration = nutrient_concentrations['lignin']
+    # lignin_concentration = nutrient_concentrations['lignin']
     NDF_concentration = nutrient_concentrations['NDF']
     potassium_concentration = nutrient_concentrations['potassium']
     EE_concentration = nutrient_concentrations["EE"]
@@ -167,7 +171,7 @@ def manure_calculations(ration_formulation,
                       ) * GeneralConstants.GRAMS_TO_KG
 
     # Fecal nitrogen, kg [A.3B.B.3]
-    fecal_nitrogen = manure_nitrogen - urine_nitrogen
+    # fecal_nitrogen = manure_nitrogen - urine_nitrogen
 
     # Organic matter intake, kg [A.2.A.3]
     organic_matter_intake = dry_matter_intake - ASH_diet_content
@@ -246,7 +250,8 @@ def manure_calculations(ration_formulation,
     if dry_matter_intake != 0:
         methane_yield = methane_emission/dry_matter_intake
         methane_yield_reduction = methane_mitigation(
-            NDF_concentration, EE_concentration, starch_concentration, CP_concentration, methane_mitigation_method, methane_mitigation_additive_amount)
+            NDF_concentration, EE_concentration, starch_concentration, CP_concentration, methane_mitigation_method,
+            methane_mitigation_additive_amount)
 
     methane_emission = methane_yield * \
         (1 + methane_yield_reduction/100) * dry_matter_intake
@@ -278,7 +283,7 @@ def manure_calculations(ration_formulation,
         phosphorus=manure_phosphorus_excreted,
         phosphorus_fraction=manure_phosphorus_fraction,
         potassium=potassium,
-        methane=methane_emission
+        enteric_methane_g=methane_emission
     )
 
     return total_phosphorus_excreted, manure_excretion_values

@@ -1,0 +1,8 @@
+{
+    "start_date": "2009:244",
+    "end_date": "2016:243",
+    "random_seed": 0,
+    "set_seed": false,
+    "simulate_animals": false,
+    "nutrient_standard": "NASEM"
+}
