@@ -32,8 +32,12 @@ output/*
 !output/.keep
 !output/graphics/
 output/graphics/*
+!output/graphics/herd_composition.png
+!output/graphics/cow_parity_composition.png
 !output/output_filters/
 output/output_filters/*
+!output/output_filters/csv_life_cycle_daily_updates.txt
+!output/output_filters/json_animal_events.txt
 
 # ignore project files
 *.sublime-project
