@@ -534,7 +534,7 @@ class OutputManager(object):
         except Exception as e:
             raise e
 
-    def _generate_file_name(self, base_name: str, extension: str = "json") -> str:
+    def _generate_file_name(self, base_name: str, extension: str) -> str:
         """
         Returns a file name using the given base_name and timestamp.
         """
@@ -748,12 +748,12 @@ class OutputManager(object):
 
     def save_results(
         self,
-        save_path: Path = Path("output/"),
-        filters_dir_path: Path = Path("output/output_filters/"),
-        exclude_info_maps: bool = False,
-        produce_graphics: bool = True,
-        graphics_dir: Path = Path("output/graphics"),
-        csvs_dir: Path = Path("output/CSVs/")
+        save_path: Path,
+        filters_dir_path: Path,
+        exclude_info_maps: bool,
+        produce_graphics: bool,
+        graphics_dir: Path,
+        csv_dir: Path
     ) -> None:
         """
         Reads a text file containing a list of keys and filters the variables pool by those keys.
@@ -776,7 +776,7 @@ class OutputManager(object):
         graphics_dir : Path, optional
             The directory for saving graphics.
 
-        csvs_dir : Path, optional
+        csv_dir : Path, optional
             The directory for saving csvs.
         """
         info_map = {
@@ -844,7 +844,7 @@ class OutputManager(object):
                         produce_graphics,
                         filter_content,
                         graphics_dir,
-                        csvs_dir
+                        csv_dir
                     )
             report_file_path = os.path.join(
                 save_path,
@@ -860,7 +860,7 @@ class OutputManager(object):
         produce_graphics: bool,
         filter_content: Dict[str, str | int],
         graphics_dir: Path,
-        csvs_dir: Path
+        csv_dir: Path
     ) -> None:
         """
         Checks the prefix of the filter_file to determine the format for saving. It then delegates the
@@ -877,9 +877,9 @@ class OutputManager(object):
             )
             self._dict_to_file_json(filtered_pool, file_path)
         elif filter_file.startswith(self.__supported_filter_types_prefixes["csv"]):
-            self.create_directory(csvs_dir)
+            self.create_directory(csv_dir)
             variable_csv_file_path = os.path.join(
-                csvs_dir, self._generate_file_name(f"saved_variables_{filter_file}", "csv")
+                csv_dir, self._generate_file_name(f"saved_variables_{filter_file}", "csv")
             )
             self._dict_to_file_csv(filtered_pool, variable_csv_file_path)
         elif filter_file.startswith(self.__supported_filter_types_prefixes["graph"]):
@@ -907,7 +907,7 @@ class OutputManager(object):
         when save_results() is not working.""",
         version="MVP",
     )
-    def dump_variables(self, path: str, exclude_info_maps: bool = False) -> None:
+    def dump_variables(self, path: str, exclude_info_maps: bool) -> None:
         """
         Dumps variables_pool into a json file in the given path to a directory.
 
@@ -954,7 +954,7 @@ class OutputManager(object):
         self,
         path: str,
         exclude_info_maps: bool,
-        format_option: str = "verbose",
+        format_option: str,
     ) -> None:
         """
         Dumps names of all variables added to variables_pool along with the caller class
@@ -1042,8 +1042,8 @@ class OutputManager(object):
     def dump_all_nondata_pools(
         self,
         path: str,
-        exclude_info_maps: bool = False,
-        format_option: str = "verbose",
+        exclude_info_maps: bool,
+        format_option: str,
     ) -> None:
         """
         Dumps all non-data pools into the given path to a directory.
@@ -1101,7 +1101,7 @@ class OutputManager(object):
             self.add_error("JSON parsing error", str(e), info_map)
             raise
 
-    def clear_output_dir(self, vars_file_path: Path = None, output_dir: Path = Path("output/")) -> None:
+    def clear_output_dir(self, vars_file_path: Path, output_dir: Path) -> None:
         """Clears the output directory if vars_file_path not in output directory.
 
         Parameters
@@ -1124,7 +1124,7 @@ class OutputManager(object):
             self.add_log("Output directory successfully cleared",
                          "Provided variables-file path was not in output directory.", info_map)
 
-    def is_file_in_dir(self, dir_path: Path = Path("output/"), file_path: Path = None) -> bool:
+    def is_file_in_dir(self, dir_path: Path, file_path: Path) -> bool:
         """Checks if a file path is in the provided directory.
 
         Parameters
