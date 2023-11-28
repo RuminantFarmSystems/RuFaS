@@ -388,6 +388,11 @@ class Field:
         also checks for invalid application depths and surface remainder fractions. If invalid values are found, they
         are corrected, an error is logged to the OutputManager, and execution continues with the new values.
 
+        If the manure supplied by the Manure module does not meet or exceed the requested nutrients amounts, then either
+        a) a warning will be raised to the OutputManager that the manure supplied was nutrient deficient, or b) an
+        optimized chemical fertilizer application will be created and executed to supplement the nutrient deficiencies.
+        This behavior is regulated by the `supplement_manure_nutrient_deficiencies` attribute of the `FieldData` class.
+
         """
         if requested_nitrogen == requested_phosphorus == 0.0:
             info_map = {"class": self.__class__.__name__, "function": self._execute_manure_application.__name__,
@@ -452,9 +457,20 @@ class Field:
 
         unmet_nitrogen_demand = max(0.0, requested_nitrogen - supplied_nitrogen)
         unmet_phosphorus_demand = max(0.0, requested_phosphorus - supplied_phosphorus)
+
         if unmet_nitrogen_demand == 0.0 and unmet_phosphorus_demand == 0.0:
             return
-        elif unmet_nitrogen_demand > 0.0 and unmet_phosphorus_demand == 0.0:
+
+        if not self.field_data.supplement_manure_nutrient_deficiencies:
+            warning_name = "nutrient_deficient_manure_application"
+            warning_message = f"Manure nitrogen deficient by {unmet_nitrogen_demand} kg, manure phosphorus " \
+                              f"deficient by {unmet_phosphorus_demand} kg."
+            info_map = {"class": self.__class__.__name__, "function": self._execute_manure_application.__name__,
+                        "prefix": f"field='{self.field_data.name}'", "year": year, "day": day}
+            om.add_warning(warning_name, warning_message, info_map)
+            return
+
+        if unmet_nitrogen_demand > 0.0 and unmet_phosphorus_demand == 0.0:
             optimal_mix = self.ONLY_NITROGEN_MIX
         else:
             optimal_mix = self._determine_optimal_fertilizer_mix(unmet_nitrogen_demand, unmet_phosphorus_demand,
