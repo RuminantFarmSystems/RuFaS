@@ -150,7 +150,7 @@ class ReportGenerator:
             The data pool from which the report is to be generated, structured as a dictionary.
             Has the same structure of OutputManager's variables pool.
 
-        filter_content : Dict[str, str | int]
+        filter_content : Dict[str, str | int | List[str]]
             A dictionary containing filter criteria and aggregation instructions.
 
         Returns
@@ -184,10 +184,13 @@ class ReportGenerator:
 
         if horizontal_aggregator:
             loop_list = filter_content.get("horizontal_order", List[report_data.keys()])
-            horizontally_aggregated = [
-                horizontal_aggregator([report_data[key][i] for key in loop_list])
-                for i in range(number_of_elements)
-            ]
+            try:
+                horizontally_aggregated = [
+                    horizontal_aggregator([report_data[key][i] for key in loop_list])
+                    for i in range(number_of_elements)
+                ]
+            except KeyError:
+                raise
 
         if vertical_aggregator:
             vertically_aggregated = [
