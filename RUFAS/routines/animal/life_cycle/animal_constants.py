@@ -48,7 +48,6 @@ PRESYNCH_END = "Presynch ended"
 DOUBLE_OVSYNCH_END = "Double OvSynch ended"
 C6G_END = "G6G ended"
 
-
 # pregnancy
 HEIFER_PREG = "heifer pregnant"
 HEIFER_NOT_PREG = "heifer not pregnant"

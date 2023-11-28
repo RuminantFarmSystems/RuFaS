@@ -660,7 +660,7 @@ class HeiferII(HeiferI):
 
         return HeiferII.get_repro_data('repro_sub_properties')
 
-    def execute_tai_protocol(self, sim_day: int):
+    def execute_tai_protocol(self, sim_day: int) -> None:
         """
         Execute the timed artificial insemination (TAI) protocol.
 
