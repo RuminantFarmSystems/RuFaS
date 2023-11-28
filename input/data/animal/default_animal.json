@@ -58,16 +58,6 @@
 						"tai_program_start_day": 70
 					}
 				},
-                "heifer_repro_programs": {
-                    "estrus_detection_rate": 0.6,
-                    "estrus_service_rate": 1,
-                    "ed_conception_rate": 0.6,
-                    "heifer_TAI_protocol": "md5CG2P",
-                    "md5CG2P_conception_rate": 0.6,
-                    "md5CGP_conception_rate": 0.48,
-                    "heifer_synchED_protocol": "2P",
-                    "estrus_detection_rate_h_synch": 0.7
-                },
                 "cow_repro_programs": {
                     "estrus_detection_rate": 0.6,
                     "estrus_service_rate": 1,

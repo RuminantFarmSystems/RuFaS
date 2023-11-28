@@ -1652,10 +1652,10 @@ class AnimalManager:
             om.add_variable('num_lactating_cows', len([cow for cow in self.cows if cow.is_lactating]), info_map)
             om.add_variable('num_dry_cows', len([cow for cow in self.cows if not cow.is_lactating]), info_map)
             om.add_variable('num_cows', len(self.cows), info_map)
-            om.add_variable('num_cow_parity_1', LifeCycleManager.num_cow_for_parity['1'], info_map)
-            om.add_variable('num_cow_parity_2', LifeCycleManager.num_cow_for_parity['2'], info_map)
-            om.add_variable('num_cow_parity_3', LifeCycleManager.num_cow_for_parity['3'], info_map)
-            om.add_variable('num_cow_parity_3+', LifeCycleManager.num_cow_for_parity['greater_than_3'], info_map)
+            om.add_variable('num_cow_parity_1', self.life_cycle_manager.num_cow_for_parity['1'], info_map)
+            om.add_variable('num_cow_parity_2', self.life_cycle_manager.num_cow_for_parity['2'], info_map)
+            om.add_variable('num_cow_parity_3', self.life_cycle_manager.num_cow_for_parity['3'], info_map)
+            om.add_variable('num_cow_parity_3+', self.life_cycle_manager.num_cow_for_parity['greater_than_3'], info_map)
 
             if time.is_last_day_of_simulation:
                 inseminated_heiferIIs = 0
