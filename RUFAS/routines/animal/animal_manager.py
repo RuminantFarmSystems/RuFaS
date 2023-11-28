@@ -82,7 +82,8 @@ class AnimalManager:
         Pen.AnimalCombination.GROWING: AnimalModuleConstants.DEFAULT_NUM_STALLS_FOR_GROWING_PEN,
         Pen.AnimalCombination.CLOSE_UP: AnimalModuleConstants.DEFAULT_NUM_STALLS_FOR_CLOSE_UP_PEN,
         Pen.AnimalCombination.LAC_COW: AnimalModuleConstants.DEFAULT_NUM_STALLS_FOR_LAC_COW_PEN,
-        Pen.AnimalCombination.GROWING_AND_CLOSE_UP: AnimalModuleConstants.DEFAULT_NUM_STALLS_FOR_GROWING_AND_CLOSE_UP_PEN,
+        Pen.AnimalCombination.GROWING_AND_CLOSE_UP:
+        AnimalModuleConstants.DEFAULT_NUM_STALLS_FOR_GROWING_AND_CLOSE_UP_PEN,
     }
 
     ANIMAL_GROUPING_SCENARIO = AnimalGroupingScenario.CALF__GROWING__CLOSE_UP__LACCOW
@@ -1130,8 +1131,7 @@ class AnimalManager:
         """
         return sum(cow.estimated_daily_milk_produced for cow in cows)
 
-    def gather_animal_type_history(self, animal_type_list: List[Union[Calf, HeiferI, HeiferII, HeiferIII,
-                                                                      Cow]]) -> None:
+    def gather_pen_history(self, animal_type_list: List[Union[Calf, HeiferI, HeiferII, HeiferIII, Cow]]) -> None:
         """
         Updates pen history data for a given animal type.
 
@@ -1152,11 +1152,11 @@ class AnimalManager:
         """
         Records the pen history of all of the animals.
         """
-        self.gather_cow_class_history(self.calves)
-        self.gather_cow_class_history(self.heiferIs)
-        self.gather_cow_class_history(self.heiferIIs)
-        self.gather_cow_class_history(self.heiferIIIs)
-        self.gather_cow_class_history(self.cows)
+        self.gather_pen_history(self.calves)
+        self.gather_pen_history(self.heiferIs)
+        self.gather_pen_history(self.heiferIIs)
+        self.gather_pen_history(self.heiferIIIs)
+        self.gather_pen_history(self.cows)
 
     def calc_p_rqmts(self) -> None:
         """
