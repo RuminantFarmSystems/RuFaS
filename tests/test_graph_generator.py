@@ -140,7 +140,7 @@ def test_handle_dict_plots(graph_generator: GraphGenerator) -> None:
         assert x == [1, 2, 3]
 
     selected_variables = ["var1"]
-    
+
     graph_generator._handle_dict_plots(
         "plot", data_dict, selected_variables, mock_plot_single_list
     )
