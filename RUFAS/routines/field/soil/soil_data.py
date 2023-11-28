@@ -161,7 +161,7 @@ class SoilData:
     """
     recalcitrant_phosphorus_pool: float = 0
     """Amount of phosphorus available for soil adsorption and leaching via runoff after the first rainfall event (kg)"""
-    runoff_phosphorus_pool: float = 0
+    runoff_fertilizer_phosphorus: float = 0.0
     """Amount of solubilized phosphorus that has been leached off the field by runoff (kg)"""
     days_since_application: int = 0
     """Number of days since phosphorus was applied to field via fertilizer"""
@@ -187,6 +187,10 @@ class SoilData:
     """Amount of stable inorganic phosphorus on the field that was applied by machine (kg)"""
     machine_stable_organic_phosphorus: float = 0
     """Amount of stable organic phosphorus on the field that was applied by machine (kg)"""
+    machine_organic_phosphorus_runoff: float = 0.0
+    """Amount of organic phosphorus from machine-applied manure dissolved in and removed by runoff (kg)."""
+    machine_inorganic_phosphorus_runoff: float = 0.0
+    """Amount of inorganic phosphorus from machine-applied manure dissolved in and removed by runoff (kg)."""
 
     grazing_manure_dry_mass: float = 0
     """The dry weight equivalent of manure mass on the field that was applied by grazers (kg)"""
@@ -206,6 +210,13 @@ class SoilData:
     """Amount of stable inorganic phosphorus on the field that was applied by grazing (kg)"""
     grazing_stable_organic_phosphorus: float = 0
     """Amount of stable organic phosphorus on the field that was applied by grazing (kg)"""
+    grazing_organic_phosphorus_runoff: float = 0.0
+    """Amount of organic phosphorus from grazing manure dissolved in and removed by runoff (kg)."""
+    grazing_inorganic_phosphorus_runoff: float = 0.0
+    """Amount of inorganic phosphorus from grazing manure dissolved in and removed by runoff (kg)."""
+
+    soil_phosphorus_runoff: float = 0.0
+    """Amount of phosphorus removed from surface soil layer by runoff (kg / ha)."""
 
     # ---- Residue partition (Carbon Cycling)
     plant_surface_residue = 0
