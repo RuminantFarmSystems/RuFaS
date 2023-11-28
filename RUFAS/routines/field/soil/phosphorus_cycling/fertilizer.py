@@ -195,8 +195,7 @@ class Fertilizer:
             -> Dict[str, float]:
         """
         Determine the amount of phosphorus removed from the specified pool and partition the loss between soil
-         absorption
-        and runoff.
+        absorption and runoff.
 
         Parameters
         ----------
@@ -236,7 +235,7 @@ class Fertilizer:
 
     def _add_phosphorus_to_soil(self, added_phosphorus: float, field_size: float) -> None:
         """
-        Adds partitions and adds phosphorus to the top two soil layers.
+        Partitions and adds phosphorus to the top two soil layers.
 
         Parameters
         ----------
@@ -248,7 +247,10 @@ class Fertilizer:
         Notes
         -----
         80% of added phosphorus goes into the surface soil layer, and 20% of it goes into the soil layer immediately
-        below the surface soil layer.
+        below the surface soil layer. This distribution of phosphorus into the top two layers of soil is not explicitly
+        stated to occur for phosphorus from chemical fertilizer, but is specified to happen for phosphorus from manure
+        in the top paragraph of page 9 in the SurPhos Theoretical documentation. Pete Vadas instructed the use of this
+        distribution of phosphorus for chemical fertilizer.
 
         """
         self.data.soil_layers[0].add_to_labile_phosphorus(0.8 * added_phosphorus, field_size)
