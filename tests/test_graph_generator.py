@@ -119,7 +119,7 @@ def test_generate_graph_path_no_title(graph_generator: GraphGenerator) -> None:
             )
 
 
-def test_handle_tuple_based_plot(graph_generator: GraphGenerator) -> None:
+def test_handle_dict_plots(graph_generator: GraphGenerator) -> None:
     data_dict = {
         "var1": [1, 2, 3],
         "var2": [4, 5, 6],
@@ -132,8 +132,8 @@ def test_handle_tuple_based_plot(graph_generator: GraphGenerator) -> None:
         assert x == [0, 1, 2]
         assert y == (data_dict["var1"], data_dict["var2"])
 
-    graph_generator._handle_tuple_based_plot(
-        data_dict, selected_variables, mock_plot_function
+    graph_generator._handle_dict_plots(
+        "stackplot", data_dict, selected_variables, mock_plot_function
     )
 
 
@@ -224,10 +224,10 @@ def test_draw_graph_success(graph_generator: GraphGenerator) -> None:
         "key1": {"values": [{"a": 1, "b": 2}, {"a": 3, "b": 4}]},
         "key2": {"values": [{"a": 5, "b": 6}, {"a": 7, "b": 8}]},
     }
-    graph_generator._handle_tuple_based_plot = MagicMock()
+    graph_generator._handle_dict_plots = MagicMock()
     with patch(
         "RUFAS.graph_generator.Utility.convert_list_of_dicts_to_dict_of_lists"
     ) as mock_utility:
         graph_generator._draw_graph(graph_type, data, ["a", "b"])
-        assert graph_generator._handle_tuple_based_plot.call_count == 2
+        assert graph_generator._handle_dict_plots.call_count == 2
         assert mock_utility.call_count == 2
