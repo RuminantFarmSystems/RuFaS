@@ -210,6 +210,9 @@ class LayerData:
     previous_phosphorus_balance: float = None
     """The phosphorus balance on the previous day (unitless)"""
 
+    percolated_phosphorus: float = 0.0
+    """Amount of phosphorus removed from the layer by water percolating out (kg / ha)."""
+
     # --- Residue partition
     plant_metabolic_to_soil_carbon_amount: float = 0.0
     """metabolic carbon incorporated into soil during tillage (kg/ha)"""
