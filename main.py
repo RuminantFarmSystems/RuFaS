@@ -35,23 +35,23 @@ def main():
         vars_file_path=Path(cmd_arguments.load_pool),
         output_dir=Path(cmd_arguments.output_dir),
         filters_dir=Path(cmd_arguments.filters_dir),
-        csvs_dir=Path(cmd_arguments.csvs_dir)
+        csv_dir=Path(cmd_arguments.csv_dir)
     )
 
 
 def run_rufas(
-    load_pool: bool = False,
-    produce_graphics: bool = True,
-    format_option: str = "verbose",
-    verbose: LogVerbosity = LogVerbosity.NONE,
-    clear_output: bool = False,
-    exclude_info_maps: bool = False,
-    only_run_validation: bool = False,
-    graphics_dir: Path = Path("output/graphics/"),
-    vars_file_path: Path = Path(""),
-    output_dir: Path = Path("output/"),
-    filters_dir: Path = Path("output/output_filters/"),
-    csvs_dir: Path = Path("output/CSVs/")
+    load_pool: bool,
+    produce_graphics: bool,
+    format_option: str,
+    verbose: LogVerbosity,
+    clear_output: bool,
+    exclude_info_maps: bool,
+    only_run_validation: bool,
+    graphics_dir: Path,
+    vars_file_path: Path,
+    output_dir: Path,
+    filters_dir: Path,
+    csv_dir: Path
 ) -> None:
     """Main function to run RuFaS, with options.
 
@@ -79,7 +79,7 @@ def run_rufas(
         The directory for saving output.
     filters_dir : Path, optional, default=Path("output/output_filters/")
         The directory for the files containing the keys for filtering.
-    csvs_dir : Path, optional, default=Path("output/CSVs/")
+    csv_dir : Path, optional, default=Path("output/CSVs/")
         The directory for the csv output files to be saved.
     """
     sys.stdout.write("RuFaS: Ruminant Farm Systems Model 2023\n")
@@ -90,7 +90,7 @@ def run_rufas(
     if load_pool:
         run_load_vars_pool(vars_file_path, exclude_info_maps, format_option,
                            produce_graphics, graphics_dir, clear_output, output_dir,
-                           filters_dir, csvs_dir)
+                           filters_dir, csv_dir)
         return
 
     if clear_output:
@@ -109,20 +109,20 @@ def run_rufas(
             verbose,
             output_dir,
             filters_dir,
-            csvs_dir
+            csv_dir
         )
 
 
 def run_load_vars_pool(
-    vars_file_path: Path = Path(""),
-    exclude_info_maps: bool = False,
-    format_option: str = "verbose",
-    produce_graphics: bool = True,
-    graphics_dir: Path = Path("output/graphics/"),
-    clear_output: bool = False,
-    output_dir: Path = Path("output/"),
-    filters_dir: Path = Path("output/output_filters/"),
-    csvs_dir: Path = Path("output/CSVs/")
+    vars_file_path: Path,
+    exclude_info_maps: bool,
+    format_option: str,
+    produce_graphics: bool,
+    graphics_dir: Path,
+    clear_output: bool,
+    output_dir: Path,
+    filters_dir: Path,
+    csv_dir: Path
 ) -> None:
     """Instantiates Output Manager and triggers loading of the variables pool from the provided file path
     for post-processing.
@@ -143,7 +143,7 @@ def run_load_vars_pool(
         The directory for saving output.
     filters_dir : Path, optional, default=Path("output/output_filters/")
         The directory for the files containing the keys for filtering.
-    csvs_dir : Path, optional, default=Path("output/CSVs/")
+    csv_dir : Path, optional, default=Path("output/CSVs/")
         The directory for the csv output files to be saved.
     """
     output_manager = OutputManager()
@@ -158,7 +158,7 @@ def run_load_vars_pool(
             exclude_info_maps,
             produce_graphics,
             graphics_dir,
-            csvs_dir
+            csv_dir
         )
     output_manager.dump_all_nondata_pools(
             output_dir, exclude_info_maps, format_option
@@ -167,10 +167,10 @@ def run_load_vars_pool(
 
 def run_validation(
     metadata_files: List[Path],
-    exclude_info_maps: bool = False,
-    format_option: str = "verbose",
-    verbose: LogVerbosity = LogVerbosity.NONE,
-    output_dir: Path = Path("output/"),
+    exclude_info_maps: bool,
+    format_option: str,
+    verbose: LogVerbosity,
+    output_dir: Path,
 ) -> None:
     """Instantiates I/O Managers and triggers validation of input data.
 
@@ -225,14 +225,14 @@ def run_validation(
 
 def execute_simulations(
     metadata_files: List[MetadataPaths],
-    exclude_info_maps: bool = False,
-    produce_graphics: bool = True,
-    graphics_dir: Path = Path("output/graphics/"),
-    format_option: str = "verbose",
-    verbose: LogVerbosity = LogVerbosity.NONE,
-    output_dir: Path = Path("output/"),
-    filters_dir: Path = Path("output/output_filters/"),
-    csvs_dir: Path = Path("output/CSVs/")
+    exclude_info_maps: bool,
+    produce_graphics: bool,
+    graphics_dir: Path,
+    format_option: str,
+    verbose: LogVerbosity,
+    output_dir: Path,
+    filters_dir: Path,
+    csv_dir: Path
 ) -> None:
     """Instantiates I/O Managers and processes the metadata files provided by the user to run the simulation.
 
@@ -256,7 +256,7 @@ def execute_simulations(
         The directory for saving output.
     filters_dir : Path, optional, default=Path("output/output_filters/")
         The directory for the files containing the keys for filtering.
-    csvs_dir : Path, optional, default=Path("output/CSVs/")
+    csv_dir : Path, optional, default=Path("output/CSVs/")
         The directory for the csv output files to be saved.
     """
     info_map = {
@@ -302,7 +302,7 @@ def execute_simulations(
             exclude_info_maps,
             produce_graphics,
             graphics_dir,
-            csvs_dir
+            csv_dir
         )
         output_manager.dump_all_nondata_pools(
             output_dir, exclude_info_maps, format_option
@@ -333,9 +333,9 @@ def parse_gnu_args() -> argparse.Namespace:
     )
     parser.add_argument(
         "-G",
-        "--graphic_dir",
+        "--graphics_dir",
         help="The saving directory for graphics",
-        default="output/graphic/",
+        default="output/graphics/",
     )
     parser.add_argument(
         "-v",
@@ -376,15 +376,15 @@ def parse_gnu_args() -> argparse.Namespace:
     )
     parser.add_argument(
         "-F",
-        "--filter-dir",
+        "--filters-dir",
         help="The directory for the files containing the keys for filtering",
-        default="output/output_filter/",
+        default="output/output_filters/",
     )
     parser.add_argument(
         "-C",
         "--csv-dir",
         help="The directory for the csv output files to be saved",
-        default="output/CSV/"
+        default="output/CSVs/"
     )
     return parser.parse_args()
 

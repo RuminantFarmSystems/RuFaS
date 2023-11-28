@@ -646,7 +646,7 @@ def test_dump_all_nondata_pools(
         path, False, "verbose"
     )
 
-    mock_output_manager.dump_all_nondata_pools(path, True)
+    mock_output_manager.dump_all_nondata_pools(path, True, "verbose")
     mock_output_manager.dump_variable_names_and_contexts.assert_called_with(
         path, True, "verbose"
     )
@@ -1688,6 +1688,7 @@ def test_save_results_report_generation(
             exclude_info_maps,
             produce_graphics,
             "graphics_dir",
+            "csv_dir"
         )
 
         # Assert
@@ -1708,6 +1709,7 @@ def test_save_results_report_generation(
             exclude_info_maps,
             produce_graphics,
             "graphics_dir",
+            "csv_dir"
         )
         assert mock_output_manager.add_error.call_count == len(
             mock_output_manager._list_filter_files_in_dir.return_value
@@ -1919,7 +1921,7 @@ def test_clear_output_dir(mocker: MockerFixture, mock_output_manager: OutputMana
     mock_output_manager.is_file_in_dir = MagicMock(return_value=is_file_found_in_dir)
     with patch("pathlib.Path.mkdir") as mock_mkdir:
         vars_file_path = mock_mkdir.return_value / "dummy_vars_file.txt"
-        mock_output_manager.clear_output_dir(vars_file_path)
+        mock_output_manager.clear_output_dir(vars_file_path, Path("output_dir"))
         if is_file_found_in_dir:
             patch_empty_dir.assert_not_called()
             assert mock_output_manager.add_log.call_count == 0

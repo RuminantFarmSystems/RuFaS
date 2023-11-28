@@ -50,7 +50,7 @@ def test_main(
 ) -> None:
     output_dir = "output/"
     filters_dir = "output/output_filters/"
-    csvs_dir = "output/CSVs/"
+    csv_dir = "output/CSVs/"
     with patch("main.parse_gnu_args") as mock_parse_gnu_args:
         mock_parse_gnu_args.return_value = argparse.Namespace(
             no_graphics=no_graphics,
@@ -63,7 +63,7 @@ def test_main(
             load_pool=vars_file_path,
             output_dir=output_dir,
             filters_dir=filters_dir,
-            csvs_dir=csvs_dir,
+            csv_dir=csv_dir,
         )
 
         with patch("main.run_rufas") as mock_run_rufas:
@@ -81,7 +81,7 @@ def test_main(
                 vars_file_path=Path(vars_file_path),
                 output_dir=Path(output_dir),
                 filters_dir=Path(filters_dir),
-                csvs_dir=Path(csvs_dir)
+                csv_dir=Path(csv_dir)
             )
 
 
@@ -133,7 +133,7 @@ def test_run_rufas(
     mocker.patch("main.OutputManager", return_value=mock_output_manager)
     output_dir = Path("output/")
     filters_dir = Path("output/output_filters/")
-    csvs_dir = Path("output/CSVs/")
+    csv_dir = Path("output/CSVs/")
 
     # Act
     run_rufas(
@@ -148,7 +148,7 @@ def test_run_rufas(
         vars_file_path,
         output_dir,
         filters_dir,
-        csvs_dir
+        csv_dir
     )
 
     # Assert
@@ -162,7 +162,7 @@ def test_run_rufas(
             clear_output,
             output_dir,
             filters_dir,
-            csvs_dir,
+            csv_dir,
         )
         return
     elif only_run_validation:
@@ -183,7 +183,7 @@ def test_run_rufas(
             verbose,
             output_dir,
             filters_dir,
-            csvs_dir,
+            csv_dir,
         )
 
     if clear_output:
@@ -279,8 +279,9 @@ def test_execute_simulations(
     mocker.patch("main.SimulationEngine", return_value=mock_simulator)
     output_dir = Path("output/")
     filters_dir = Path("output/output_filters/")
-    csvs_dir = Path("output/CSVs/")
+    csv_dir = Path("output/CSVs/")
     graphics_dir = Path("")
+    verbose = LogVerbosity("none")
 
     # Act
     execute_simulations(
@@ -289,9 +290,10 @@ def test_execute_simulations(
         produce_graphics=produce_graphics,
         graphics_dir=graphics_dir,
         format_option=format_option,
+        verbose=verbose,
         output_dir=output_dir,
         filters_dir=filters_dir,
-        csvs_dir=csvs_dir,
+        csv_dir=csv_dir,
     )
 
     # Assert
@@ -313,7 +315,7 @@ def test_execute_simulations(
             exlclude_info_maps,
             produce_graphics,
             graphics_dir,
-            csvs_dir
+            csv_dir
         ),
     ] * len(metadata_file_list)
 
@@ -336,6 +338,7 @@ def test_run_load_vars_pool(mocker: MockerFixture, vars_file_path: str, exclude_
     """Checks the run_load_vars_pool function in main.py"""
     output_dir = Path("output/")
     filters_dir = Path("output/output_filters/")
+    csv_dir = Path("output/CSVs/")
     mock_output_manager = mocker.MagicMock(auto_spec=OutputManager)
     mock_output_manager.clear_output_dir.return_value = None
     mock_output_manager.flush_pools.return_value = None
@@ -346,7 +349,7 @@ def test_run_load_vars_pool(mocker: MockerFixture, vars_file_path: str, exclude_
     mocker.patch("main.OutputManager", return_value=mock_output_manager)
 
     run_load_vars_pool(vars_file_path, exclude_info_maps, format_option, produce_graphics, graphics_dir, clear_output,
-                       output_dir, filters_dir)
+                       output_dir, filters_dir, csv_dir)
 
     if clear_output:
         assert mock_output_manager.clear_output_dir.call_count == 1
@@ -389,9 +392,9 @@ def test_parse_gnu_args(mocker: MockerFixture) -> None:
         ),
         mocker.call(
             "-G",
-            "--graphic_dir",
+            "--graphics_dir",
             help="The saving directory for graphics",
-            default="output/graphic/",
+            default="output/graphics/",
         ),
         mocker.call(
             "-v",
@@ -432,15 +435,15 @@ def test_parse_gnu_args(mocker: MockerFixture) -> None:
         ),
         mocker.call(
             "-F",
-            "--filter-dir",
+            "--filters-dir",
             help="The directory for the files containing the keys for filtering",
-            default="output/output_filter/",
+            default="output/output_filters/",
         ),
         mocker.call(
             "-C",
             "--csv-dir",
             help="The directory for the csv output files to be saved",
-            default="output/CSV/"
+            default="output/CSVs/"
         ),
     ]
     mock_parse_args.assert_called_once()
