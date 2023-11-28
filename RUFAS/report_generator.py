@@ -182,14 +182,16 @@ class ReportGenerator:
         vertical_agg_key = filter_content.get("vertical_aggregation")
         vertical_aggregator = AGGREGATION_FUNCTIONS.get(vertical_agg_key)
 
+        if horizontal_aggregator:
+            horizontally_aggregated = [
+                horizontal_aggregator(
+                    [report_data[key][i] for key in report_data.keys()]
+                )
+                for i in range(number_of_elements)
+            ]
+
         if horizontal_aggregator and vertical_aggregator:
             if filter_content.get("horizontal_first", True):
-                horizontally_aggregated = [
-                    horizontal_aggregator(
-                        [report_data[key][i] for key in report_data.keys()]
-                    )
-                    for i in range(number_of_elements)
-                ]
                 return [vertical_aggregator(horizontally_aggregated)]
             else:
                 vertically_aggregated = [
@@ -197,14 +199,11 @@ class ReportGenerator:
                     for _, data_series in report_data.items()
                 ]
                 return [horizontal_aggregator(vertically_aggregated)]
-        elif horizontal_aggregator:
-            return [
-                horizontal_aggregator(
-                    [report_data[key][i] for key in report_data.keys()]
-                )
-                for i in range(number_of_elements)
-            ]
-        elif vertical_aggregator:
+
+        if horizontal_aggregator:
+            return horizontally_aggregated
+
+        if vertical_aggregator:
             return [
                 vertical_aggregator(data_series)
                 for _, data_series in report_data.items()
