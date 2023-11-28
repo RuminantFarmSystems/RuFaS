@@ -34,6 +34,27 @@
 				"milk_type": "whole"
 			},
 			"repro": {
+				"heifers": {
+					"estrus_detection_rate": 0.6,
+					"estrus_insemination_rate": 1.0,
+					"estrus_conception_rate": 0.6,
+					"breeding_protocols": {
+						"TAI": "5dCG2P",
+						"Synch-ED": "2P"
+					}
+				},
+				"cows": {
+					"estrus_detection_rate": 0.6,
+					"estrus_insemination_rate": 1.0,
+					"estrus_conception_rate": 0.5,
+					"breeding_protocols": {
+						"TAI": {
+							"protocol": "OvSynch 56",
+							"presynch": "Double OvSynch",
+							"resynch": "TAIbeforePD"
+						}
+					}
+				},
 				"ED_related":{
 					"estrus_detection_rate": 0.4,
 					"estrus_service_rate": 0.9,

@@ -1593,7 +1593,7 @@ class AnimalManager:
                                                  self.phosphorus_concentration_by_animal_class[type(animal)])
         self.animal_to_pen_id_map[animal.id] = pen_with_min_stocking_density.id
 
-    def daily_updates(self, feed, weather: Weather, time: Time):
+    def daily_updates(self, feed, weather: Weather, time: Time):  # noqa: C901
         """
         Execute the daily routines relating to Animals. All animals are
         updated through the life_cycle_manager's daily_update() method. The
@@ -1651,6 +1651,36 @@ class AnimalManager:
             om.add_variable('num_heiferIIIs', len(self.heiferIIIs), info_map)
             om.add_variable('num_lactating_cows', len([cow for cow in self.cows if cow.is_lactating]), info_map)
             om.add_variable('num_dry_cows', len([cow for cow in self.cows if not cow.is_lactating]), info_map)
+            om.add_variable('num_cows', len(self.cows), info_map)
+            om.add_variable('num_cow_parity_1', self.life_cycle_manager.num_cow_for_parity['1'], info_map)
+            om.add_variable('num_cow_parity_2', self.life_cycle_manager.num_cow_for_parity['2'], info_map)
+            om.add_variable('num_cow_parity_3', self.life_cycle_manager.num_cow_for_parity['3'], info_map)
+            om.add_variable('num_cow_parity_3+', self.life_cycle_manager.num_cow_for_parity['greater_than_3'], info_map)
+
+            if time.is_last_day_of_simulation:
+                inseminated_heiferIIs = 0
+                pregnant_heiferIIs = 0
+                not_pregnant_heiferIIs = 0
+                for heiferII in self.heiferIIs:
+                    om.add_variable(f'heiferII_{heiferII.id}_last_day',
+                                    heiferII.events,
+                                    info_map)
+                    for day_str, event_list in heiferII.events.events.items():
+                        for event in event_list:
+                            if "inseminated" in event:
+                                inseminated_heiferIIs += 1
+                            if "heifer pregnant" in event:
+                                pregnant_heiferIIs += 1
+                            if "heifer not pregnant" in event:
+                                not_pregnant_heiferIIs += 1
+                om.add_variable('inseminated_heiferIIs', inseminated_heiferIIs, info_map)
+                om.add_variable('pregnant_heiferIIs', pregnant_heiferIIs, info_map)
+                om.add_variable('non_pregnant_heiferIIs', not_pregnant_heiferIIs, info_map)
+
+                for cow in self.cows:
+                    om.add_variable(f'cow_{cow.id}_last_day',
+                                    cow.events,
+                                    info_map)
 
             manure_excretions_output_data = {}
             for pen in self.all_pens:
