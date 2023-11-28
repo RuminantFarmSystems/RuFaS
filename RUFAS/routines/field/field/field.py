@@ -388,6 +388,11 @@ class Field:
         also checks for invalid application depths and surface remainder fractions. If invalid values are found, they
         are corrected, an error is logged to the OutputManager, and execution continues with the new values.
 
+        If the manure supplied by the Manure module does not meet or exceed the requested nutrients amounts, then either
+        a) a warning will be raised to the OutputManager that the manure supplied was nutrient deficient, or b) an
+        optimized chemical fertilizer application will be created and executed to supplement the nutrient deficiencies.
+        This behavior is regulated by the `supplement_manure_nutrient_deficiencies` attribute of the `FieldData` class.
+
         """
         if requested_nitrogen == requested_phosphorus == 0.0:
             info_map = {"class": self.__class__.__name__, "function": self._execute_manure_application.__name__,
