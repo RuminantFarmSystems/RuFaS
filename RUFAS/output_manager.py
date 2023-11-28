@@ -1121,7 +1121,8 @@ class OutputManager(object):
         else:
             keep_list = [".keep", "output_filters"]
             Utility.empty_dir(output_dir, keep=keep_list)
-            self.add_log("Output directory cleared", "No conflicts to clearing output directory.", info_map)
+            self.add_log("Output directory successfully cleared",
+                         "Provided variables-file path was not in output directory.", info_map)
 
     def is_file_in_dir(self, dir_path: Path = Path("output/"), file_path: Path = None) -> bool:
         """Checks if a file path is in the provided directory.
@@ -1147,7 +1148,7 @@ class OutputManager(object):
         Parameters
         ----------
         path : Path
-            The path where the directorygit a will be created if it does not already exist.
+            The path where the directory will be created if it does not already exist.
 
         Raises
         ------
@@ -1168,6 +1169,6 @@ class OutputManager(object):
                          f"Created a new directory at {path}.",
                          info_map)
         except PermissionError as e:
-            self.add_error("Permission Error",f"{path=}; Exception: {str(e)}",info_map)
+            self.add_error("Permission Error", f"{path=}; Exception: {str(e)}", info_map)
         except Exception as e:
-            self.add_error("mkdir failure", ,f"{path=}; Exception: {str(e)}",info_map)
+            self.add_error("mkdir failure", f"{path=}; Exception: {str(e)}", info_map)

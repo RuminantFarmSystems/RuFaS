@@ -333,9 +333,9 @@ def parse_gnu_args() -> argparse.Namespace:
     )
     parser.add_argument(
         "-G",
-        "--graphics_dir",
+        "--graphic_dir",
         help="The saving directory for graphics",
-        default="output/graphics/",
+        default="output/graphic/",
     )
     parser.add_argument(
         "-v",
@@ -376,15 +376,15 @@ def parse_gnu_args() -> argparse.Namespace:
     )
     parser.add_argument(
         "-F",
-        "--filters-dir",
+        "--filter-dir",
         help="The directory for the files containing the keys for filtering",
-        default="output/output_filters/",
+        default="output/output_filter/",
     )
     parser.add_argument(
         "-C",
-        "--csvs-dir",
+        "--csv-dir",
         help="The directory for the csv output files to be saved",
-        default="output/CSVs/"
+        default="output/CSV/"
     )
     return parser.parse_args()
 

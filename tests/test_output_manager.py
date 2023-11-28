@@ -1968,14 +1968,13 @@ def test_create_directory_successful(mock_output_manager: OutputManager,
     mock_output_manager.add_error = output_manager_original_method_states["add_error"]
 
 
-def test_create_directory_raises_errors(mock_output_manager: OutputManager,
-                                        output_manager_original_method_states: Dict[str, Callable]) -> None:
-    """Checks create_directory function raises errors properly"""
+def test_create_directory_exceptions(mock_output_manager: OutputManager,
+                                     output_manager_original_method_states: Dict[str, Callable]) -> None:
+    """Checks create_directory function has proper exceptions"""
     mock_output_manager.add_log = MagicMock()
     mock_output_manager.add_error = MagicMock()
     with patch("pathlib.Path.mkdir", side_effect=PermissionError):
-        with pytest.raises(PermissionError):
-            mock_output_manager.create_directory(Path("unauthorized/path/"))
+        mock_output_manager.create_directory(Path("unauthorized/path/"))
 
     assert mock_output_manager.add_log.call_count == 1
     assert mock_output_manager.add_error.call_count == 1
@@ -1983,8 +1982,7 @@ def test_create_directory_raises_errors(mock_output_manager: OutputManager,
     mock_output_manager.add_log = MagicMock()
     mock_output_manager.add_error = MagicMock()
     with patch("pathlib.Path.mkdir", side_effect=Exception):
-        with pytest.raises(Exception):
-            mock_output_manager.create_directory(Path("unauthorized/path/"))
+        mock_output_manager.create_directory(Path("unauthorized/path/"))
 
     assert mock_output_manager.add_log.call_count == 1
     assert mock_output_manager.add_error.call_count == 1

@@ -389,9 +389,9 @@ def test_parse_gnu_args(mocker: MockerFixture) -> None:
         ),
         mocker.call(
             "-G",
-            "--graphics_dir",
+            "--graphic_dir",
             help="The saving directory for graphics",
-            default="output/graphics/",
+            default="output/graphic/",
         ),
         mocker.call(
             "-v",
@@ -432,15 +432,15 @@ def test_parse_gnu_args(mocker: MockerFixture) -> None:
         ),
         mocker.call(
             "-F",
-            "--filters-dir",
+            "--filter-dir",
             help="The directory for the files containing the keys for filtering",
-            default="output/output_filters/",
+            default="output/output_filter/",
         ),
         mocker.call(
             "-C",
-            "--csvs-dir",
+            "--csv-dir",
             help="The directory for the csv output files to be saved",
-            default="output/CSVs/"
+            default="output/CSV/"
         ),
     ]
     mock_parse_args.assert_called_once()
