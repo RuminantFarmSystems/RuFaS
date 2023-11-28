@@ -196,7 +196,9 @@ def test_prepare_report_data_invalid_no_variables(
         report_generator._prepare_report_data(filtered_pool, None, 0, 0)
 
 
-def test_prepare_report_data_aggregate_values(report_generator: ReportGenerator) -> None:
+def test_prepare_report_data_aggregate_values(
+    report_generator: ReportGenerator,
+) -> None:
     filtered_pool: Dict[str, Dict[str, List[Dict[str, int]]]] = {
         "data1": {"values": [{"a": 1, "b": 2}, {"a": 3, "b": 4}]},
         "data2": {"values": [{"a": 5, "b": 6}, {"a": 7, "b": 8}]},
@@ -207,3 +209,18 @@ def test_prepare_report_data_aggregate_values(report_generator: ReportGenerator)
         "b": [2, 4, 6, 8],
     }
     assert actual == expected
+
+
+def test_generate_report_with_invalid_horizontal_order(
+    report_generator: ReportGenerator,
+    sample_filtered_pool: Dict[str, Dict[str, List[Dict[str, int]]]],
+):
+    filter_content = {
+        "variables": ["a", "b"],
+        "horizontal_order": ["invalid_key", "b"],
+        "horizontal_aggregation": "average",
+        "vertical_aggregation": "sum",
+        "horizontal_first": True,
+    }
+    with pytest.raises(KeyError):
+        report_generator.generate_report(sample_filtered_pool, filter_content)
