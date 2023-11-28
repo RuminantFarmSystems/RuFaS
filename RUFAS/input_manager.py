@@ -48,7 +48,7 @@ class InputManager:
             True if data is valid, otherwise False.
         """
         self._load_metadata(metadata_path)
-        is_input_data_valid = self.populate_pool(eager_termination)
+        is_input_data_valid = self._populate_pool(eager_termination)
         return is_input_data_valid
 
     def _load_metadata(self, metadata_path: str) -> None:
@@ -133,7 +133,7 @@ class InputManager:
         except Exception as e:
             raise e
 
-    def populate_pool(self, eager_termination: bool, variable_name: str = None, data: Any = None) -> bool:
+    def _populate_pool(self, eager_termination: bool) -> bool:
         """
         Loads input files, runs validations on the data from the input files, attempts to fix invalid data,
         then adds data to the pool.
@@ -157,12 +157,8 @@ class InputManager:
             True if data is valid, otherwise False.
         """
         info_map = {"class": self.__class__.__name__,
-                    "function": self.populate_pool.__name__,
+                    "function": self._populate_pool.__name__,
                     }
-        if variable_name is not None and data is not None:
-            self.__pool[variable_name] = data
-            om.add_log("Variable added to IM pool:", f"{variable_name} is added to IM.__pool during runtime.", info_map)
-            return True
         valid_elements_counter = 0
         invalid_elements_counter = 0
         total_elements_counter = 0
@@ -189,13 +185,13 @@ class InputManager:
                 element_counter_and_validity = {"fixed_elements": 0, "total_elements": 0, "valid_elements": 0,
                                                 "invalid_elements": 0, "is_valid": True}
                 if file_type == "json":
-                    element_counter_and_validity = self._validate_json_element([metadata_property], properties_blob_key,
+                    element_counter_and_validity = self._validate_dict_element([metadata_property], properties_blob_key,
                                                                                filtered_input_data, eager_termination,
                                                                                element_counter_and_validity)
                 if file_type == "csv":
-                    element_counter_and_validity = self._validate_csv_element(metadata_property, properties_blob_key,
-                                                                              filtered_input_data, eager_termination,
-                                                                              element_counter_and_validity)
+                    element_counter_and_validity = self._validate_tabular_element(metadata_property, properties_blob_key,
+                                                                                  filtered_input_data, eager_termination,
+                                                                                  element_counter_and_validity)
 
                 fixed_elements_counter += element_counter_and_validity["fixed_elements"]
                 valid_elements_counter += element_counter_and_validity["valid_elements"]
@@ -307,9 +303,9 @@ class InputManager:
             )
         return validator(variable_properties, var_name, input_data_value, properties_blob_key)
 
-    def _validate_csv_element(self, var_name: str, properties_blob_key: str, input_data: Dict[str, Any],
-                              eager_termination: bool, element_counter_and_validity: Dict[str, int | bool]
-                              ) -> Dict[str, int | bool]:
+    def _validate_tabular_element(self, var_name: str, properties_blob_key: str, input_data: Dict[str, Any],
+                                  eager_termination: bool, element_counter_and_validity: Dict[str, int | bool]
+                                  ) -> Dict[str, int | bool]:
         """
         Receives data loaded from csv input file and the validates each row element in the csv column it's sent.
         It attempts to fix any invalid elements and tracks the number of valid, invalid, fixed,
@@ -342,7 +338,7 @@ class InputManager:
             which is True if the data is valid, False otherwise.
         """
         info_map = {"class": self.__class__.__name__,
-                    "function": self._validate_csv_element.__name__,
+                    "function": self._validate_tabular_element.__name__,
                     }
         variable = input_data[var_name]
         variable_properties = reduce(lambda d, key: d[key], [var_name],
@@ -368,7 +364,7 @@ class InputManager:
 
         return element_counter_and_validity
 
-    def _validate_json_element(self, element_hierarchy: List[str], properties_blob_key: str,  # noqa
+    def _validate_dict_element(self, element_hierarchy: List[str], properties_blob_key: str,  # noqa
                                input_data: Dict[str, Any], eager_termination: bool,
                                element_counter_and_validity: Dict[str, int | bool], ) -> dict:
         """
@@ -405,7 +401,7 @@ class InputManager:
 
         """
         info_map = {"class": self.__class__.__name__,
-                    "function": self._validate_json_element.__name__,
+                    "function": self._validate_dict_element.__name__,
                     }
         try:
             variable_properties = reduce(lambda d, key: d[key], element_hierarchy,
@@ -423,7 +419,7 @@ class InputManager:
             for nested_key in variable_properties.keys():
                 if nested_key not in variable_properties_to_ignore:
                     element_hierarchy.append(nested_key)
-                    element_counter_and_validity = self._validate_json_element(element_hierarchy, properties_blob_key,
+                    element_counter_and_validity = self._validate_dict_element(element_hierarchy, properties_blob_key,
                                                                                input_data, eager_termination,
                                                                                element_counter_and_validity)
                     is_child_valid = element_counter_and_validity["is_valid"]
