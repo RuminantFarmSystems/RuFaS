@@ -2004,12 +2004,14 @@ class AnimalManager:
             self.life_cycle_manager.daily_milk_production = self.sum_daily_milk(
                 self.cows
             )
-            for pen in self.all_pens:
-                AnimalReporter.report_pen_manure_properties(pen)
-                if pen.animal_combination.name == "LAC_COW":
-                    AnimalReporter.report_milk(pen, self.simulation_day)
+
             AnimalReporter.report_daily_animal_population(self)
+            AnimalReporter.report_life_cycle_manager_data
             AnimalReporter.report_daily_ration(self)
             AnimalReporter.report_sold_animal_information(self.life_cycle_manager.sold_heifers +
                                                           self.life_cycle_manager.culled_heifers +
                                                           self.life_cycle_manager.culled_cows)
+            for pen in self.all_pens:
+                AnimalReporter.report_pen_manure_properties(pen)
+                if pen.animal_combination.name == "LAC_COW":
+                    AnimalReporter.report_milk(pen, self.simulation_day)
