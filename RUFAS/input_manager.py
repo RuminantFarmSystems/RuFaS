@@ -7,7 +7,7 @@ import re
 
 import pandas as pd
 from RUFAS.output_manager import OutputManager
-from typing import Any, Dict, List, Union
+from typing import Any, Dict, List, Union, Callable
 
 om = OutputManager()
 
@@ -48,7 +48,7 @@ class InputManager:
             True if data is valid, otherwise False.
         """
         self._load_metadata(metadata_path)
-        is_input_data_valid = self.populate_pool(eager_termination)
+        is_input_data_valid = self._populate_pool(eager_termination)
         return is_input_data_valid
 
     def _load_metadata(self, metadata_path: str) -> None:
@@ -133,7 +133,7 @@ class InputManager:
         except Exception as e:
             raise e
 
-    def populate_pool(self, eager_termination: bool, variable_name: str = None, data: Any = None) -> bool:
+    def _populate_pool(self, eager_termination: bool) -> bool:
         """
         Loads input files, runs validations on the data from the input files, attempts to fix invalid data,
         then adds data to the pool.
@@ -144,12 +144,6 @@ class InputManager:
             If True, the process will be terminated as soon as finding invalid data and failing to fix it.
             If False, the process will be terminated after going through and validating the entire data,
             if invalid data is found.
-        variable_name: str
-            This argument specifies the variable name of the data to be added to the InputManager variable pool during
-            runtime.
-        data: Any
-            This argument is designed to add data to the InputManager variable pool during runtime. It is defaulted to
-            None; if specified, the data will be added to InputManager.__pool.
 
         Returns
         -------
@@ -157,19 +151,15 @@ class InputManager:
             True if data is valid, otherwise False.
         """
         info_map = {"class": self.__class__.__name__,
-                    "function": self.populate_pool.__name__,
+                    "function": self._populate_pool.__name__,
                     }
-        if variable_name is not None and data is not None:
-            self.__pool[variable_name] = data
-            om.add_log("Variable added to IM pool:", f"{variable_name} is added to IM.__pool during runtime.", info_map)
-            return True
         valid_elements_counter = 0
         invalid_elements_counter = 0
         total_elements_counter = 0
         fixed_elements_counter = 0
 
-        data_type_to_loader_map = {"json": self._load_data_from_json,
-                                   "csv": self._load_data_from_csv}
+        data_type_to_loader_map: Dict[str, Callable] = {"json": self._load_data_from_json,
+                                                        "csv": self._load_data_from_csv}
 
         for file_blob_key, file_details in self.__metadata["files"].items():
             file_path = file_details["path"]
@@ -189,18 +179,21 @@ class InputManager:
                 element_counter_and_validity = {"fixed_elements": 0, "total_elements": 0, "valid_elements": 0,
                                                 "invalid_elements": 0, "is_valid": True}
                 if file_type == "json":
-                    element_counter_and_validity = self._validate_json_element([metadata_property], properties_blob_key,
+                    element_counter_and_validity = self._validate_dict_element([metadata_property], properties_blob_key,
                                                                                filtered_input_data, eager_termination,
                                                                                element_counter_and_validity)
                 if file_type == "csv":
-                    element_counter_and_validity = self._validate_csv_element(metadata_property, properties_blob_key,
-                                                                              filtered_input_data, eager_termination,
-                                                                              element_counter_and_validity)
+                    element_counter_and_validity = self._validate_tabular_element(metadata_property,
+                                                                                  properties_blob_key,
+                                                                                  filtered_input_data,
+                                                                                  eager_termination,
+                                                                                  element_counter_and_validity)
 
                 fixed_elements_counter += element_counter_and_validity["fixed_elements"]
                 valid_elements_counter += element_counter_and_validity["valid_elements"]
                 total_elements_counter += element_counter_and_validity["total_elements"]
                 if element_counter_and_validity["is_valid"]:
+                    # POTENTIAL ISSUE!!!
                     self.__pool[file_blob_key] = filtered_input_data
                 else:
                     if not eager_termination:
@@ -307,9 +300,9 @@ class InputManager:
             )
         return validator(variable_properties, var_name, input_data_value, properties_blob_key)
 
-    def _validate_csv_element(self, var_name: str, properties_blob_key: str, input_data: Dict[str, Any],
-                              eager_termination: bool, element_counter_and_validity: Dict[str, int | bool]
-                              ) -> Dict[str, int | bool]:
+    def _validate_tabular_element(self, var_name: str, properties_blob_key: str, input_data: Dict[str, Any],
+                                  eager_termination: bool, element_counter_and_validity: Dict[str, int | bool]
+                                  ) -> Dict[str, int | bool]:
         """
         Receives data loaded from csv input file and the validates each row element in the csv column it's sent.
         It attempts to fix any invalid elements and tracks the number of valid, invalid, fixed,
@@ -342,7 +335,7 @@ class InputManager:
             which is True if the data is valid, False otherwise.
         """
         info_map = {"class": self.__class__.__name__,
-                    "function": self._validate_csv_element.__name__,
+                    "function": self._validate_tabular_element.__name__,
                     }
         variable = input_data[var_name]
         variable_properties = reduce(lambda d, key: d[key], [var_name],
@@ -368,7 +361,7 @@ class InputManager:
 
         return element_counter_and_validity
 
-    def _validate_json_element(self, element_hierarchy: List[str], properties_blob_key: str,  # noqa
+    def _validate_dict_element(self, element_hierarchy: List[str], properties_blob_key: str,  # noqa
                                input_data: Dict[str, Any], eager_termination: bool,
                                element_counter_and_validity: Dict[str, int | bool], ) -> dict:
         """
@@ -405,7 +398,7 @@ class InputManager:
 
         """
         info_map = {"class": self.__class__.__name__,
-                    "function": self._validate_json_element.__name__,
+                    "function": self._validate_dict_element.__name__,
                     }
         try:
             variable_properties = reduce(lambda d, key: d[key], element_hierarchy,
@@ -423,7 +416,7 @@ class InputManager:
             for nested_key in variable_properties.keys():
                 if nested_key not in variable_properties_to_ignore:
                     element_hierarchy.append(nested_key)
-                    element_counter_and_validity = self._validate_json_element(element_hierarchy, properties_blob_key,
+                    element_counter_and_validity = self._validate_dict_element(element_hierarchy, properties_blob_key,
                                                                                input_data, eager_termination,
                                                                                element_counter_and_validity)
                     is_child_valid = element_counter_and_validity["is_valid"]
@@ -800,3 +793,40 @@ class InputManager:
                     }
         self.__pool = {}
         om.add_log("Clear variable pool", "The pool is emptied.", info_map)
+
+    def add_variable_to_pool(self, variable_name: str, data: Dict[str, Any], properties_blob_key: str,
+                             eager_termination: bool) -> bool:
+        info_map = {"class": self.__class__.__name__,
+                    "function": self.add_variable_to_pool.__name__,
+                    }
+        valid_elements_counter = 0
+        invalid_elements_counter = 0
+        total_elements_counter = 0
+        fixed_elements_counter = 0
+
+        metadata_properties = self.__metadata["properties"][properties_blob_key]
+        for metadata_property in metadata_properties.keys():
+            element_counter_and_validity = {"fixed_elements": 0, "total_elements": 0, "valid_elements": 0,
+                                            "invalid_elements": 0, "is_valid": True}
+            element_counter_and_validity = self._validate_dict_element([metadata_property], properties_blob_key,
+                                                                       data, False,
+                                                                       element_counter_and_validity)
+            fixed_elements_counter += element_counter_and_validity["fixed_elements"]
+            valid_elements_counter += element_counter_and_validity["valid_elements"]
+            invalid_elements_counter += element_counter_and_validity["invalid_elements"]
+            total_elements_counter += element_counter_and_validity["total_elements"]
+
+        om.add_log("Validation count: total items", f"{total_elements_counter=}", info_map)
+        om.add_log("Validation count: total valid", f"{valid_elements_counter=}", info_map)
+        om.add_log("Validation count: total fixed", f"{fixed_elements_counter=}", info_map)
+        om.add_log("Validation count: total invalid", f"{invalid_elements_counter=}", info_map)
+
+        if invalid_elements_counter == 0:
+            self.__pool[variable_name] = data
+            return True
+        else:
+            if eager_termination:
+                raise RuntimeError(f"Attempting to add an invalid variable {variable_name} to InputManager pool during"
+                                   f"runtime.")
+            else:
+                return False
