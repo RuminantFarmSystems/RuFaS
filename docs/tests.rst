@@ -7,23 +7,17 @@ Subpackages
 .. toctree::
    :maxdepth: 4
 
+   tests.animal_module_tests
+   tests.soil_crop_tests
    tests.test_manure_module
 
 Submodules
 ----------
 
-tests.test\_animal module
--------------------------
+tests.test\_current\_day\_conditions module
+-------------------------------------------
 
-.. automodule:: tests.test_animal
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-tests.test\_animal\_management module
--------------------------------------
-
-.. automodule:: tests.test_animal_management
+.. automodule:: tests.test_current_day_conditions
    :members:
    :undoc-members:
    :show-inheritance:
@@ -36,10 +30,26 @@ tests.test\_feed module
    :undoc-members:
    :show-inheritance:
 
-tests.test\_field module
-------------------------
+tests.test\_graph\_generator module
+-----------------------------------
 
-.. automodule:: tests.test_field
+.. automodule:: tests.test_graph_generator
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+tests.test\_input\_manager module
+---------------------------------
+
+.. automodule:: tests.test_input_manager
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+tests.test\_main module
+-----------------------
+
+.. automodule:: tests.test_main
    :members:
    :undoc-members:
    :show-inheritance:
@@ -60,26 +70,42 @@ tests.test\_misc module
    :undoc-members:
    :show-inheritance:
 
-tests.test\_output\_handler module
+tests.test\_output\_manager module
 ----------------------------------
 
-.. automodule:: tests.test_output_handler
+.. automodule:: tests.test_output_manager
    :members:
    :undoc-members:
    :show-inheritance:
 
-tests.test\_pen module
-----------------------
+tests.test\_report\_generator module
+------------------------------------
 
-.. automodule:: tests.test_pen
+.. automodule:: tests.test_report_generator
    :members:
    :undoc-members:
    :show-inheritance:
 
-tests.test\_user\_prompt module
--------------------------------
+tests.test\_time module
+-----------------------
 
-.. automodule:: tests.test_user_prompt
+.. automodule:: tests.test_time
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+tests.test\_util module
+-----------------------
+
+.. automodule:: tests.test_util
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+tests.test\_weather module
+--------------------------
+
+.. automodule:: tests.test_weather
    :members:
    :undoc-members:
    :show-inheritance:

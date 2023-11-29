@@ -11,7 +11,6 @@ Subpackages
    RUFAS.routines.feed
    RUFAS.routines.field
    RUFAS.routines.manure
-   RUFAS.routines.manure_storage
 
 Module contents
 ---------------
