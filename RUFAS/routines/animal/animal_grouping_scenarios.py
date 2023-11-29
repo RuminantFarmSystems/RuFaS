@@ -11,7 +11,7 @@ from RUFAS.routines.animal.pen import Pen
 
 
 class AnimalGroupingScenario(Enum):
-    """  
+    """
     The different scenarios for grouping animals on a farm.
     Each scenario is a dictionary of the form: { Pen.AnimalCombination: [List of animal types/subtypes] }
 

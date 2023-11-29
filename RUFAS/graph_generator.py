@@ -102,6 +102,9 @@ class GraphGenerator:
     NOTE: This class is not multi-thread safe!!!
     """
 
+    def __init__(self, metadata_prefix: str = "") -> None:
+        self.metadata_prefix = metadata_prefix
+
     def generate_graph(
         self,
         filtered_pool: Dict[str, Dict[str, List[Any]]],
@@ -276,11 +279,17 @@ class GraphGenerator:
         graph_path = self._generate_graph_path(
             save_path, graph_details, filter_file_name, graphics_dir
         )
+        counter = 1
+        while graph_path.exists():
+            graph_path = graph_path.with_name(
+                f"{graph_path.stem}({counter}){graph_path.suffix}"
+            )
+            counter += 1
         try:
             plt.savefig(graph_path)
             return graph_path
-        except Exception as e:
-            raise e
+        except Exception:
+            raise
 
     def _generate_graph_path(
         self,
@@ -317,16 +326,16 @@ class GraphGenerator:
         graph_directory = os.path.join(save_path, graphics_dir)
         try:
             Path(graph_directory).mkdir(parents=True, exist_ok=True)
-        except Exception as e:
-            raise e
+        except Exception:
+            raise
 
         timestamp: str = datetime.datetime.now().strftime("%d-%b-%Y_%a_%H-%M-%S")
 
         if "title" in graph_details.keys():
             title = "-".join(graph_details["title"].split()).lower()
-            filename = f"{title}-{timestamp}.png"
+            filename = f"{self.metadata_prefix}_{title}-{timestamp}.png"
         else:
-            filename = f"saved_graph_{filter_file_name}-{timestamp}.png"
+            filename = f"{self.metadata_prefix}_{filter_file_name}-{timestamp}.png"
 
         graph_path = os.path.join(graph_directory, filename)
         return Path(graph_path)
