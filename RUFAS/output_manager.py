@@ -14,6 +14,7 @@ from deprecated.sphinx import deprecated
 
 from RUFAS.util import Utility
 from RUFAS.graph_generator import GraphGenerator
+from RUFAS.report_generator import ReportGenerator
 
 
 class LogVerbosity(Enum):
@@ -95,6 +96,7 @@ class OutputManager(object):
                 "csv": "csv_",
                 "graph": "graph_",
                 "json": "json_",
+                "report": "report_",
             }
             self.__log_verbose: LogVerbosity = LogVerbosity("none")
             self.add_log(
@@ -491,8 +493,7 @@ class OutputManager(object):
             return
 
         csv_columns = []
-        for variable_name in data_dict.keys():
-            variable_data = data_dict[variable_name]
+        for variable_name, variable_data in data_dict.items():
             csv_column_data = self._dict_to_csv_column_list(
                 variable_name, variable_data
             )
@@ -598,7 +599,7 @@ class OutputManager(object):
         else:
             raise NotADirectoryError("The specified path must be a directory")
 
-    def _load_filter_file_content(self, path: str) -> List[Dict[str, str]]:
+    def _load_filter_file_content(self, path: str) -> List[Dict[str, str | int]]:
         """
         Loads and processes the content of a filter file from the specified path.
 
@@ -609,7 +610,7 @@ class OutputManager(object):
 
         Returns
         -------
-        List[Dict[str, str]]
+        List[Dict[str, str|int]]
             A list of dictionaries, each containing the loaded filter content,
             with keys and values depending on the file type.
 
@@ -740,7 +741,7 @@ class OutputManager(object):
         self.add_log("filtering_log", filter_vars_msg, info_map)
         filter_log_count_msg = (
             f"There were {len(filter_pattern_matches)} matches for the {len(filter_patterns)}"
-            f" filter patterns in the {input_file_name} file."
+            f" filter pattern(s) in the {input_file_name} file."
         )
         self.add_log("num_filter_pattern_matches", filter_log_count_msg, info_map)
         return filter_pattern_matches
@@ -785,16 +786,20 @@ class OutputManager(object):
         )
         list_of_filter_files = self._list_filter_files_in_dir(filters_dir_path)
         for filter_file in list_of_filter_files:
+            info_map["filter file"] = filter_file
             input_path = os.path.join(filters_dir_path, filter_file)
             filter_contents = self._load_filter_file_content(input_path)
+            reports: Dict[str: Dict[str: List[Any]]] = {}
             for filter_content in filter_contents:
+                info_map["filter_content"] = filter_content
                 if (
                     not isinstance(filter_content, dict)
                     or "filters" not in filter_content.keys()
                 ):
                     self.add_error(
                         "Parsing error",
-                        f"Could not parse {filter_file=}, it has to have JSON blobs and have `filters` entry.",
+                        f"Could not parse {filter_content.get('name')=} in {filter_file=},\
+                            it has to have JSON blobs and have `filters` entry.",
                         info_map,
                     )
                     continue
@@ -803,14 +808,44 @@ class OutputManager(object):
                 )
                 if exclude_info_maps:
                     filtered_pool = self._exclude_info_maps(filtered_pool)
-                self._route_save_functions(
-                    filter_file,
-                    save_path,
-                    filtered_pool,
-                    produce_graphics,
-                    filter_content,
-                    graphics_dir,
-                )
+
+                if filter_file.startswith(
+                    self.__supported_filter_types_prefixes["report"]
+                ):
+                    self.add_log(
+                        "init_report_generation", "Report Generation Started", info_map
+                    )
+                    report_generator = ReportGenerator()
+                    try:
+                        report_name = filter_content.get(
+                            "name", f"untitled_{self._get_timestamp(True)}"
+                        )
+                        reports[
+                            report_name
+                            if report_name not in reports.keys()
+                            else f"{report_name} {self._get_timestamp(True)}"
+                        ] = {
+                            "values": report_generator.generate_report(
+                                filtered_pool,
+                                filter_content,
+                            )
+                        }
+                    except (ValueError, KeyError) as e:
+                        self.add_error("report generation error", str(e), info_map)
+                else:
+                    self._route_save_functions(
+                        filter_file,
+                        save_path,
+                        filtered_pool,
+                        produce_graphics,
+                        filter_content,
+                        graphics_dir,
+                    )
+            report_file_path = os.path.join(
+                save_path,
+                self._generate_file_name(f"report_{filter_file}", "csv"),
+            )
+            self._dict_to_file_csv(reports, report_file_path)
 
     def _route_save_functions(
         self,
@@ -818,7 +853,7 @@ class OutputManager(object):
         save_path: Path,
         filtered_pool: Dict[str, pool_element_type],
         produce_graphics: bool,
-        filter_content: Dict[str, str],
+        filter_content: Dict[str, str | int],
         graphics_dir: Path,
     ) -> None:
         """
@@ -862,7 +897,8 @@ class OutputManager(object):
         self, data_dict: Dict[str, Any], filter_name: str, path: str
     ) -> None:
         """
-        Saves the variables_pool into one csv file per variable in the given path to a directory.
+        Saves the data_dict into a single CSV file in the specified path. If the directory at the given path
+        does not exist, it is created.
 
         Parameters
         ----------
@@ -876,8 +912,8 @@ class OutputManager(object):
         """
         try:
             Path(path).mkdir(parents=True, exist_ok=True)
-        except Exception as e:
-            raise e
+        except Exception:
+            raise
 
         variable_csv_file_path = os.path.join(
             path, self._generate_file_name(f"saved_variables_{filter_name}", "csv")
