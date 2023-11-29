@@ -212,10 +212,10 @@ def test_populate_pool_valid(mock_input_manager: InputManager, mock_metadata: Di
                                                                          "is_valid": True
                                                                          }
     mock_input_manager._validate_tabular_element = lambda *args, **kwargs: {"fixed_elements": 1,
-                                                                        "valid_elements": 1,
-                                                                        "total_elements": 1,
-                                                                        "invalid_elements": 0,
-                                                                        "is_valid": True
+                                                                            "valid_elements": 1,
+                                                                            "total_elements": 1,
+                                                                            "invalid_elements": 0,
+                                                                            "is_valid": True
                                                                             }
 
     with patch("RUFAS.output_manager.OutputManager.add_log") as add_log:
@@ -248,10 +248,10 @@ def test_populate_pool_invalid(mock_input_manager: InputManager, mock_metadata: 
                                                                          "is_valid": False
                                                                          }
     mock_input_manager._validate_tabular_element = lambda *args, **kwargs: {"fixed_elements": 1,
-                                                                        "valid_elements": 1,
-                                                                        "total_elements": 1,
-                                                                        "invalid_elements": 1,
-                                                                        "is_valid": False
+                                                                            "valid_elements": 1,
+                                                                            "total_elements": 1,
+                                                                            "invalid_elements": 1,
+                                                                            "is_valid": False
                                                                             }
 
     with patch("RUFAS.output_manager.OutputManager.add_log") as add_log:
