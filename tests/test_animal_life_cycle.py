@@ -280,14 +280,11 @@ def test_convert_heiferI_to_heiferII(mocker: MockerFixture) -> None:
                  return_value=mock_new_heiferII)
 
     heifer_repro_method = 'TAI'
-    heifer_TAI_protocol = 'd5CG2P'
-    heifer_synchedED_protocol = '2P'
+    dummy_repro_sub_protocol = 'dummy'
+    mocker.patch('RUFAS.routines.animal.life_cycle.life_cycle.HeiferII.get_repro_sub_protocol',
+                 return_value=dummy_repro_sub_protocol)
     animal_base_config = {
         "heifer_repro_method": heifer_repro_method,
-        "heifer_repro_programs": {
-            "heifer_TAI_protocol": heifer_TAI_protocol,
-            "heifer_synchED_protocol": heifer_synchedED_protocol
-        }
     }
     mocker.patch('RUFAS.routines.animal.life_cycle.life_cycle.AnimalBase.config', animal_base_config)
 
@@ -299,8 +296,8 @@ def test_convert_heiferI_to_heiferII(mocker: MockerFixture) -> None:
             'pen_history': heiferI_pen_history
         }),
         mocker.call(repro_program=heifer_repro_method),
-        mocker.call(tai_method_h=heifer_TAI_protocol),
-        mocker.call(synch_ed_method_h=heifer_synchedED_protocol)
+        mocker.call(tai_method_h=dummy_repro_sub_protocol),
+        mocker.call(synch_ed_method_h=dummy_repro_sub_protocol)
     ]
 
     assert len(heiferIIs) == 1
@@ -534,10 +531,10 @@ def test_move_heiferIII_to_cow_stage(mocker: MockerFixture) -> None:
     cow_resynch_protocol = 'TAIafterPD'
     animal_base_config = {
         "cow_repro_method": cow_repro_method,
-        "cow_repro_programs": {
-            "cow_presynch_protocol": cow_presynch_protocol,
-            "cow_TAI_protocol": cow_TAI_protocol,
-            "cow_resynch_protocol": cow_resynch_protocol
+        "cows": {
+            "presynch_protocol": cow_presynch_protocol,
+            "repro_sub_protocol": cow_TAI_protocol,
+            "resynch_protocol": cow_resynch_protocol
         }
     }
     mocker.patch('RUFAS.routines.animal.life_cycle.life_cycle.AnimalBase.config', animal_base_config)
