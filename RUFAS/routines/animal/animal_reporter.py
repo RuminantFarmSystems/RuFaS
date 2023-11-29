@@ -229,8 +229,7 @@ class AnimalReporter:
         Adds daily life cycle data to output manager.
 
         life_cycle_manager : LifeCycleManager
-            Instance of LifeCycleManager
-
+            Active instance of LifeCycleManager.
         sim_day : int
             Day of simulation.
         """

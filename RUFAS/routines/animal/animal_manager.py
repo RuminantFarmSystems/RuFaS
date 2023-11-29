@@ -2006,7 +2006,7 @@ class AnimalManager:
             )
 
             AnimalReporter.report_daily_animal_population(self)
-            AnimalReporter.report_life_cycle_manager_data
+            AnimalReporter.report_life_cycle_manager_data(self.life_cycle_manager, self.simulation_day)
             AnimalReporter.report_daily_ration(self)
             AnimalReporter.report_sold_animal_information(self.life_cycle_manager.sold_heifers +
                                                           self.life_cycle_manager.culled_heifers +
