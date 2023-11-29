@@ -247,4 +247,24 @@ class AnimalFactory:
             om._dict_to_file_json(self.pre_animal_population.__repr__(), save_path)
 
         self.post_animal_population = self._random_sample_with_replacement()
-        im.populate_pool(eager_termination=False, variable_name="animal_population", data=self.post_animal_population)
+        im.add_variable_to_pool(variable_name="runtime_animal_population", data=self.post_animal_population.__repr__(),
+                                properties_blob_key="animal_population_properties", eager_termination=False)
+
+    def initialize_herd_from_dict(self, herd_data: Dict[str, List[Dict[str, Any]]]) -> AnimalPopulation:
+        calves = list(map(Calf, herd_data["calves"]))
+        for i in range(len(self.post_animal_population.calves)):
+            expected = self.post_animal_population.calves[i].get_calf_values()
+            actual = calves[i].get_calf_values()
+            if expected != actual:
+                print(False)
+        heiferIs = list(map(HeiferI, herd_data["heiferIs"]))
+        heiferIIs = list(map(HeiferII, herd_data["heiferIIs"]))
+        heiferIIIs = list(map(HeiferIII, herd_data["heiferIIIs"]))
+        cows = list(map(Cow, herd_data["cows"]))
+        replacement = list(map(Cow, herd_data["replacement"]))
+        return AnimalPopulation(calves=calves,
+                                heiferIs=heiferIs,
+                                heiferIIs=heiferIIs,
+                                heiferIIIs=heiferIIIs,
+                                cows=cows,
+                                replacement=replacement)
