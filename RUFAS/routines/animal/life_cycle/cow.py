@@ -114,6 +114,7 @@ class Cow(HeiferIII):
         self.days_in_milk = 0
         self.estimated_daily_milk_produced = 0
         self.milk_production_reduction = 0.0
+        self.latest_milk_production_305days = 0.0
         self.single_acc_milk_prod = 0
         self.future_cull_date = 0
         self.future_death_date = 0
@@ -276,8 +277,14 @@ class Cow(HeiferIII):
         """
         if len(self.milk_production_history) > 0 and self.milk_production_history[-1].simulation_day == sim_day:
             del self.milk_production_history[-1]
-        self.milk_production_history.append(MilkProductionHistory(sim_day, self.days_in_milk,
-                                                                  self.estimated_daily_milk_produced, self.days_born))
+
+        if self.days_in_milk == 305 and len(self.milk_production_history) > 305:
+            milk_history = [day.milk_production for day in self.milk_production_history[-305:]]
+            self.latest_milk_production_305days = np.sum(milk_history)
+
+        self.milk_production_history.append(
+            MilkProductionHistory(sim_day, self.days_in_milk, self.estimated_daily_milk_produced, self.days_born)
+        )
 
     @staticmethod
     def determine_param_value(mean, std):
@@ -314,6 +321,7 @@ class Cow(HeiferIII):
             self.events.add_event(self.days_born, sim_day, const.DRY)
             self.days_in_milk = 0
             self.estimated_daily_milk_produced = 0
+            self.latest_milk_production_305days = 0.0
             return 0, 0, 0
 
         if self.milking:
