@@ -1605,12 +1605,12 @@ class AnimalManager:
 
         Parameters
         ----------
-        animals_snapshot_before_update : dict
+        animals_snapshot_before_update : Dict[str, set | Dict]
             A snapshot of the state of all the animals before the update. This dictionary uses
             animal class names as keys ('calves', 'heiferIs', etc.) and sets of animal instances
             as values.
 
-        animals_snapshot_after_update : dict
+        animals_snapshot_after_update : Dict[str, set | Dict]
             A snapshot of the state of all the animals after the update. This dictionary should
             have the same structure as `animals_snapshot_before_update`.
 
@@ -1648,11 +1648,11 @@ class AnimalManager:
 
         Parameters
         ----------
-        animals_snapshot_before_update : dict
+        animals_snapshot_before_update : Dict[str, set | Dict]
             Snapshot of the animals before the update. This should be a dictionary with animal
             class names as keys and sets of animals as values. There should also be a special key
             'animal_combination_by_id' that maps animal IDs to their animal combinations.
-        animals_snapshot_after_update : dict
+        animals_snapshot_after_update : Dict[str, set | Dict]
             Snapshot of the animals after the update. This should be a dictionary with the same
             structure as animals_snapshot_before_update.
         feed : Feed
@@ -1686,7 +1686,9 @@ class AnimalManager:
             self._add_animal_to_pen_and_id_map(animal, feed, temp)
 
     def _handle_graduated_animals(
-        self, animals_snapshot_before_update, animals_snapshot_after_update, feed: Feed, temp: float
+        self, animals_snapshot_before_update: Dict[str, set | Dict],
+        animals_snapshot_after_update: Dict[str, set | Dict],
+        feed: Feed, temp: float
     ) -> None:
         """
         Finds animals that have graduated (moved from one class to another), moves them between pens,
@@ -1694,10 +1696,13 @@ class AnimalManager:
 
         Parameters
         ----------
-        animals_snapshot_before_update : TODO
-
-        animals_snapshot_after_update : TODO
-
+        animals_snapshot_before_update : Dict[str, set | Dict]
+            Snapshot of the animals before the update. This should be a dictionary with animal
+            class names as keys and sets of animals as values. There should also be a special key
+            'animal_combination_by_id' that maps animal IDs to their animal combinations.
+        animals_snapshot_after_update : Dict[str, set | Dict]
+            Snapshot of the animals after the update. This should be a dictionary with the same
+            structure as animals_snapshot_before_update.
         feed : Feed
             instance of the Feed class defined in feed.py.
         temp : float
