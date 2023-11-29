@@ -1,1 +1,1 @@
-.*heiferII_.*_last_day
+.*HeiferII_.*_last_day
