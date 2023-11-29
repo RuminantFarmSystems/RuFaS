@@ -10,7 +10,7 @@ import argparse
 from pathlib import Path
 import sys
 from typing import List
-
+from RUFAS.graph_herd_composition import HerdCompositionGraphGenerator
 from RUFAS.scenario_manager import METADATA_PATHS, MetadataPaths
 
 import config.global_variables
@@ -336,6 +336,18 @@ def execute_simulations(
             output_dir, exclude_info_maps, format_option
         )
 
+        HerdCompositionGraphGenerator.generate_herd_composition_graph(
+            Path(__file__).parent / 'output/CSVs/om/',
+            Path(__file__).parent / 'output/graphics/',
+            'life_cycle_daily_updates'
+        )
+
+        HerdCompositionGraphGenerator.generate_cow_parity_composition_graph(
+            Path(__file__).parent / 'output/CSVs/om/',
+            Path(__file__).parent / 'output/graphics/',
+            'life_cycle_daily_updates'
+        )
+
 
 class CaseInsensitiveArgumentAction(argparse.Action):
     def __call__(self, parser, namespace, values, option_string=None) -> None:
@@ -383,6 +395,7 @@ def parse_gnu_args() -> argparse.Namespace:
         "--exclude_info_maps",
         help="Exclude info_maps from the output",
         action="store_true",
+        default=True
     )
     parser.add_argument(
         "-o",

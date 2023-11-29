@@ -1,0 +1,2 @@
+.*_record_animal_counts.*
+.*_record_animal_events.*
