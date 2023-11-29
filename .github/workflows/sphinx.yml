@@ -24,4 +24,5 @@ jobs:
     - name: Build HTML from Sphinx
       run: |
         cd docs
+        make clean
         make html
