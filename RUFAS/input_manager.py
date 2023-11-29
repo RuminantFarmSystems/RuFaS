@@ -7,7 +7,7 @@ import re
 
 import pandas as pd
 from RUFAS.output_manager import OutputManager
-from typing import Any, Dict, List, Union
+from typing import Any, Dict, List, Union, Callable
 
 om = OutputManager()
 
@@ -144,12 +144,6 @@ class InputManager:
             If True, the process will be terminated as soon as finding invalid data and failing to fix it.
             If False, the process will be terminated after going through and validating the entire data,
             if invalid data is found.
-        variable_name: str
-            This argument specifies the variable name of the data to be added to the InputManager variable pool during
-            runtime.
-        data: Any
-            This argument is designed to add data to the InputManager variable pool during runtime. It is defaulted to
-            None; if specified, the data will be added to InputManager.__pool.
 
         Returns
         -------
@@ -164,8 +158,8 @@ class InputManager:
         total_elements_counter = 0
         fixed_elements_counter = 0
 
-        data_type_to_loader_map = {"json": self._load_data_from_json,
-                                   "csv": self._load_data_from_csv}
+        data_type_to_loader_map: Dict[str, Callable] = {"json": self._load_data_from_json,
+                                                        "csv": self._load_data_from_csv}
 
         for file_blob_key, file_details in self.__metadata["files"].items():
             file_path = file_details["path"]
@@ -189,14 +183,17 @@ class InputManager:
                                                                                filtered_input_data, eager_termination,
                                                                                element_counter_and_validity)
                 if file_type == "csv":
-                    element_counter_and_validity = self._validate_tabular_element(metadata_property, properties_blob_key,
-                                                                                  filtered_input_data, eager_termination,
+                    element_counter_and_validity = self._validate_tabular_element(metadata_property,
+                                                                                  properties_blob_key,
+                                                                                  filtered_input_data,
+                                                                                  eager_termination,
                                                                                   element_counter_and_validity)
 
                 fixed_elements_counter += element_counter_and_validity["fixed_elements"]
                 valid_elements_counter += element_counter_and_validity["valid_elements"]
                 total_elements_counter += element_counter_and_validity["total_elements"]
                 if element_counter_and_validity["is_valid"]:
+                    # POTENTIAL ISSUE!!!
                     self.__pool[file_blob_key] = filtered_input_data
                 else:
                     if not eager_termination:
@@ -796,3 +793,40 @@ class InputManager:
                     }
         self.__pool = {}
         om.add_log("Clear variable pool", "The pool is emptied.", info_map)
+
+    def add_variable_to_pool(self, variable_name: str, data: Dict[str, Any], properties_blob_key: str,
+                             eager_termination: bool) -> bool:
+        info_map = {"class": self.__class__.__name__,
+                    "function": self.add_variable_to_pool.__name__,
+                    }
+        valid_elements_counter = 0
+        invalid_elements_counter = 0
+        total_elements_counter = 0
+        fixed_elements_counter = 0
+
+        metadata_properties = self.__metadata["properties"][properties_blob_key]
+        for metadata_property in metadata_properties.keys():
+            element_counter_and_validity = {"fixed_elements": 0, "total_elements": 0, "valid_elements": 0,
+                                            "invalid_elements": 0, "is_valid": True}
+            element_counter_and_validity = self._validate_dict_element([metadata_property], properties_blob_key,
+                                                                       data, False,
+                                                                       element_counter_and_validity)
+            fixed_elements_counter += element_counter_and_validity["fixed_elements"]
+            valid_elements_counter += element_counter_and_validity["valid_elements"]
+            invalid_elements_counter += element_counter_and_validity["invalid_elements"]
+            total_elements_counter += element_counter_and_validity["total_elements"]
+
+        om.add_log("Validation count: total items", f"{total_elements_counter=}", info_map)
+        om.add_log("Validation count: total valid", f"{valid_elements_counter=}", info_map)
+        om.add_log("Validation count: total fixed", f"{fixed_elements_counter=}", info_map)
+        om.add_log("Validation count: total invalid", f"{invalid_elements_counter=}", info_map)
+
+        if invalid_elements_counter == 0:
+            self.__pool[variable_name] = data
+            return True
+        else:
+            if eager_termination:
+                raise RuntimeError(f"Attempting to add an invalid variable {variable_name} to InputManager pool during"
+                                   f"runtime.")
+            else:
+                return False
