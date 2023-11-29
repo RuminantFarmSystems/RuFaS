@@ -1,4 +1,5 @@
 from typing import List
+import numpy as np
 
 from RUFAS.output_manager import OutputManager
 from RUFAS.routines.animal.ration.ration_driver import RationReporter
@@ -332,3 +333,21 @@ class AnimalReporter:
             else:
                 sold_report["parity"].append("NA")
         om.add_variable("sold_report", sold_report, info_map)
+
+    def report_305d_milk(animal_manager):
+        milk_history_list = [cow.milk_production_history for cow in animal_manager.cows if cow.is_lactating]
+        herd_milk_list = []
+        for cow_history in milk_history_list:
+            days_in_milk_list = [day.days_in_milk for day in cow_history]
+            milk_production_list = [day.milk_production for day in cow_history]
+
+        #     [milk_production_list for milk_production_list if days_in_milk_list > 305]
+
+        #     for day in cow_list:
+        #         milk_list = []
+        #         if day.days_in_milk > 305:
+        #             if day.days_in_milk < 305:
+        #                 milk_list.append(day.milk_production)
+        #         herd_milk_list.append(np.average(milk_list))
+        # print(herd_milk_list)
+        # print(np.average(herd_milk_list))

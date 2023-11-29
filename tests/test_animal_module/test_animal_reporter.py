@@ -338,3 +338,7 @@ def test_report_sold_animal_information(mocker: MockerFixture):
 
     # assert
     assert om.variables_pool["LifeCycleManager.daily_update.sold_report"]["values"] == [sold_report_expected]
+
+
+def test_report_305d_milk():
+    pass

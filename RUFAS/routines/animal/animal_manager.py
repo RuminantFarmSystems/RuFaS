@@ -2011,6 +2011,7 @@ class AnimalManager:
             AnimalReporter.report_sold_animal_information(self.life_cycle_manager.sold_heifers +
                                                           self.life_cycle_manager.culled_heifers +
                                                           self.life_cycle_manager.culled_cows)
+            AnimalReporter.report_305d_milk(self)
             for pen in self.all_pens:
                 AnimalReporter.report_pen_manure_properties(pen)
                 if pen.animal_combination.name == "LAC_COW":

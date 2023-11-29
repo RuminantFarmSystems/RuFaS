@@ -270,7 +270,8 @@ class Cow(HeiferIII):
         Args:
             sim_day: simulation day
         """
-
+        if len(self.milk_production_history) > 0 and self.milk_production_history[-1].simulation_day == sim_day:
+            del self.milk_production_history[-1]
         self.milk_production_history.append(MilkProductionHistory(sim_day, self.days_in_milk,
                                                                   self.estimated_daily_milk_produced, self.days_born))
 
