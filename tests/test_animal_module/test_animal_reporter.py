@@ -90,7 +90,7 @@ def test_report_daily_animal_population(mocker: MockerFixture):
 
     AnimalReporter.report_daily_animal_population(animal_manager)
 
-    report_daily_animal_total = om.variables_pool["AnimalReporter.report_daily_animal_population.num_animals"]["values"]
+    report_daily_animal_total = om.variables_pool["AnimalManager.daily_updates.num_animals"]["values"]
     assert report_daily_animal_total == [
         sum(
             (
@@ -103,7 +103,7 @@ def test_report_daily_animal_population(mocker: MockerFixture):
         )
     ]
 
-    assert om.variables_pool["AnimalReporter.report_daily_animal_population.num_animals"]["info_maps"] == [{}]
+    assert om.variables_pool["AnimalManager.daily_updates.num_animals"]["info_maps"] == [{}]
 
 
 def test_report_milk(mocker: MockerFixture):
@@ -180,25 +180,25 @@ def test_report_ration_interval_data(animal_manager_fixture, mocker: MockerFixtu
     AnimalReporter.report_ration_interval_data(animal_manager_fixture, feed)
 
     for i in range(1, 2):
-        assert om.variables_pool[f"AnimalReporter.report_ration_interval_data.ration_nutrient_amount_pen_{i}_combo{i}"][
+        assert om.variables_pool[f"AnimalManager._calc_ration_at_interval.ration_nutrient_amount_pen_{i}_combo{i}"][
             "values"
         ] == [test_data["ration_nutrient_amount"]]
 
-        assert om.variables_pool[f"AnimalReporter.report_ration_interval_data.MEdiet_pen_{i}_combo{i}"]["values"] == [
+        assert om.variables_pool[f"AnimalManager._calc_ration_at_interval.MEdiet_pen_{i}_combo{i}"]["values"] == [
             test_data["MEdiet"]
         ]
 
-        assert om.variables_pool[f"AnimalReporter.report_ration_interval_data.avg_rqmts_pen_{i}_combo{i}"][
-            "values"
-        ] == [test_data["avg_nutrient_rqmts"]]
+        assert om.variables_pool[f"AnimalManager._calc_ration_at_interval.avg_rqmts_pen_{i}_combo{i}"]["values"] == [
+            test_data["avg_nutrient_rqmts"]
+        ]
 
-        assert om.variables_pool[f"AnimalReporter.report_ration_interval_data.ration_per_animal_for_pen_{i}_combo{i}"][
+        assert om.variables_pool[f"AnimalManager._calc_ration_at_interval.ration_per_animal_for_pen_{i}_combo{i}"][
             "values"
         ] == [test_data["formatted_ration"]]
 
-        assert om.variables_pool[
-            f"AnimalReporter.report_ration_interval_data.ration_supply_report_for_pen_{i}_combo{i}"
-        ]["values"] == ["ration_supply_report"]
+        assert om.variables_pool[f"AnimalManager._calc_ration_at_interval.ration_supply_report_for_pen_{i}_combo{i}"][
+            "values"
+        ] == ["ration_supply_report"]
 
 
 def test_report_daily_ration(animal_manager_fixture, mocker: MockerFixture):
@@ -294,15 +294,15 @@ def test_report_life_cycle_manager_data(mocker: MockerFixture):
 
     # assert
     for key, value in keydict.items():
-        assert om.variables_pool[f"life_cycle_manager.daily_update.{key}"]["values"] == [keydict[key]]
-    assert om.variables_pool["life_cycle_manager.daily_update.sim_day"]["values"] == [sim_day]
+        assert om.variables_pool[f"LifeCycleManager.daily_update.{key}"]["values"] == [keydict[key]]
+    assert om.variables_pool["LifeCycleManager.daily_update.sim_day"]["values"] == [sim_day]
     for i in range(1, 3):
-        assert om.variables_pool[f"life_cycle_manager.daily_update.num_cow_for_parity_{i}"]["values"] == [100 * i]
-        assert om.variables_pool[f"life_cycle_manager.daily_update.calving_to_preg_time_{i}"]["values"] == [100 * i]
-        assert om.variables_pool[f"life_cycle_manager.daily_update.avg_age_for_calving_{i}"]["values"] == [100 * i]
-    assert om.variables_pool["life_cycle_manager.daily_update.num_cow_for_parity_greater_than_3"]["values"] == [400]
-    assert om.variables_pool["life_cycle_manager.daily_update.calving_to_preg_time_greater_than_3"]["values"] == [400]
-    assert om.variables_pool["life_cycle_manager.daily_update.avg_age_for_calving_greater_than_3"]["values"] == [400]
+        assert om.variables_pool[f"LifeCycleManager.daily_update.num_cow_for_parity_{i}"]["values"] == [100 * i]
+        assert om.variables_pool[f"LifeCycleManager.daily_update.calving_to_preg_time_{i}"]["values"] == [100 * i]
+        assert om.variables_pool[f"LifeCycleManager.daily_update.avg_age_for_calving_{i}"]["values"] == [100 * i]
+    assert om.variables_pool["LifeCycleManager.daily_update.num_cow_for_parity_greater_than_3"]["values"] == [400]
+    assert om.variables_pool["LifeCycleManager.daily_update.calving_to_preg_time_greater_than_3"]["values"] == [400]
+    assert om.variables_pool["LifeCycleManager.daily_update.avg_age_for_calving_greater_than_3"]["values"] == [400]
 
 
 def test_report_sold_animal_information(mocker: MockerFixture):
@@ -337,4 +337,4 @@ def test_report_sold_animal_information(mocker: MockerFixture):
     AnimalReporter.report_sold_animal_information(sold_animals)
 
     # assert
-    assert om.variables_pool["life_cycle_manager.daily_update.sold_report"]["values"] == [sold_report_expected]
+    assert om.variables_pool["LifeCycleManager.daily_update.sold_report"]["values"] == [sold_report_expected]

@@ -29,8 +29,8 @@ class AnimalReporter:
 
         """
         info_map = {
-            "class": AnimalReporter.__name__,
-            "function": AnimalReporter.report_daily_animal_population.__name__,
+            "class": "AnimalManager",
+            "function": "daily_updates",
         }
         om.add_variable("sim_day", animal_manager.simulation_day, info_map)
         om.add_variable(
@@ -116,8 +116,8 @@ class AnimalReporter:
             ration_report["nutrient_conc"] = nutrient_conc
 
             info_map = {
-                "class": AnimalReporter.__name__,
-                "function": AnimalReporter.report_ration_interval_data.__name__,
+                "class": "AnimalManager",
+                "function": "_calc_ration_at_interval",
                 "number_animals_in_pen": len(pen.animals_in_pen),
             }
             om.add_variable(
@@ -164,8 +164,8 @@ class AnimalReporter:
 
         """
         info_map = {
-            "class": AnimalReporter.__name__,
-            "function": AnimalReporter.report_daily_ration.__name__,
+            "class": "AnimalReporter",
+            "function": "report_daily_ration",
         }
         for pen in animal_manager.all_pens:
             ration_per_animal = pen.ration_per_animal.copy()
@@ -234,10 +234,7 @@ class AnimalReporter:
         sim_day : int
             Day of simulation.
         """
-        info_map = {
-            "class": "life_cycle_manager",
-            "function": "daily_update"
-        }
+        info_map = {"class": "LifeCycleManager", "function": "daily_update"}
         # om.add_variable("calf_num", life_cycle_manager.calf_num, info_map)
         # om.add_variable("heiferI_num", life_cycle_manager.heiferI_num, info_map)
         # om.add_variable("heiferII_num", life_cycle_manager.heiferII_num, info_map)
@@ -308,29 +305,31 @@ class AnimalReporter:
 
         """
         info_map = {
-            "class": "life_cycle_manager",
+            "class": "LifeCycleManager",
             "function": "daily_update",
         }
         sold_report = {
             "animal_id": [],
             "animal_type": [],
-            "cull_reason": [],
             "body_weight": [],
+            "cull_reason": [],
             "days_in_milk": [],
             "parity": [],
         }
         for animal in sold_animals:
             sold_report["animal_id"].append(animal.id)
             sold_report["animal_type"].append(animal.__class__.__name__)
+            sold_report["body_weight"].append(animal.body_weight)
             if hasattr(animal, "cull_reason"):
                 sold_report["cull_reason"].append(animal.cull_reason)
             else:
                 sold_report["cull_reason"].append("cull_reason_not_set")
-            sold_report["body_weight"].append(animal.body_weight)
             if hasattr(animal, "days_in_milk"):
                 sold_report["days_in_milk"].append(animal.days_in_milk)
-                sold_report["parity"].append(animal.calves)
             else:
                 sold_report["days_in_milk"].append("NA")
+            if hasattr(animal, "calves"):
+                sold_report["parity"].append(animal.calves)
+            else:
                 sold_report["parity"].append("NA")
         om.add_variable("sold_report", sold_report, info_map)
