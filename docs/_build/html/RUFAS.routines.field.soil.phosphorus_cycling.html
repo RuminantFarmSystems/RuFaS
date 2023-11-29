@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>RUFAS.routines.field.soil.phosphorus_cycling package &mdash; Ruminant Farm Simulation (RuFaS)  documentation</title>
@@ -11,12 +11,11 @@
     <script src="_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
-        <script src="_static/jquery.js"></script>
-        <script src="_static/underscore.js"></script>
-        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
-        <script src="_static/doctools.js"></script>
-        <script src="_static/sphinx_highlight.js"></script>
+        <script src="_static/jquery.js?v=5d32c60e"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="_static/documentation_options.js?v=5929fcd5"></script>
+        <script src="_static/doctools.js?v=888ff710"></script>
+        <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
@@ -29,11 +28,15 @@
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-            <a href="index.html" class="icon icon-home"> Ruminant Farm Simulation (RuFaS)
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            Ruminant Farm Simulation (RuFaS)
           </a>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" />
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
     <input type="hidden" name="check_keywords" value="yes" />
     <input type="hidden" name="area" value="default" />
   </form>
@@ -50,12 +53,12 @@
 </li>
 <li class="toctree-l3"><a class="reference internal" href="RUFAS.html#submodules">Submodules</a></li>
 <li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.classes">RUFAS.classes module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.database_reader">RUFAS.database_reader module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#rufas-database-reader-module">RUFAS.database_reader module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.errors">RUFAS.errors module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.general_constants">RUFAS.general_constants module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.output_manager">RUFAS.output_manager module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.simulation_engine">RUFAS.simulation_engine module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.user_prompt">RUFAS.user_prompt module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#rufas-user-prompt-module">RUFAS.user_prompt module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.util">RUFAS.util module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS">Module contents</a></li>
 </ul>
@@ -81,7 +84,7 @@
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a href="index.html" class="icon icon-home"></a></li>
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
           <li class="breadcrumb-item"><a href="modules.html">GitHub</a></li>
           <li class="breadcrumb-item"><a href="RUFAS.html">RUFAS package</a></li>
           <li class="breadcrumb-item"><a href="RUFAS.routines.html">RUFAS.routines package</a></li>
@@ -98,184 +101,79 @@
            <div itemprop="articleBody">
              
   <section id="rufas-routines-field-soil-phosphorus-cycling-package">
-<h1>RUFAS.routines.field.soil.phosphorus_cycling package<a class="headerlink" href="#rufas-routines-field-soil-phosphorus-cycling-package" title="Permalink to this heading"></a></h1>
+<h1>RUFAS.routines.field.soil.phosphorus_cycling package<a class="headerlink" href="#rufas-routines-field-soil-phosphorus-cycling-package" title="Link to this heading"></a></h1>
 <section id="submodules">
-<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this heading"></a></h2>
+<h2>Submodules<a class="headerlink" href="#submodules" title="Link to this heading"></a></h2>
 </section>
-<section id="module-RUFAS.routines.field.soil.phosphorus_cycling.P_mineralization">
-<span id="rufas-routines-field-soil-phosphorus-cycling-p-mineralization-module"></span><h2>RUFAS.routines.field.soil.phosphorus_cycling.P_mineralization module<a class="headerlink" href="#module-RUFAS.routines.field.soil.phosphorus_cycling.P_mineralization" title="Permalink to this heading"></a></h2>
-<p>RUFAS
-SurPhos</p>
-<p>File name: P_mineralization.py</p>
-<dl class="simple">
-<dt>Author(s):  DR. Peter A. Vadas</dt><dd><p>USDA-ARS Dairy Forage Research Center
-E-mail: <a class="reference external" href="mailto:peter&#46;vadas&#37;&#52;&#48;ars&#46;usda&#46;gov">peter<span>&#46;</span>vadas<span>&#64;</span>ars<span>&#46;</span>usda<span>&#46;</span>gov</a></p>
-</dd>
-<dt>Coder(s):   Jacob Johnson <a class="reference external" href="mailto:jacob8399&#37;&#52;&#48;gmail&#46;com">jacob8399<span>&#64;</span>gmail<span>&#46;</span>com</a></dt><dd><p>William Donovan <a class="reference external" href="mailto:wmdonovan&#37;&#52;&#48;wisc&#46;edu">wmdonovan<span>&#64;</span>wisc<span>&#46;</span>edu</a></p>
-</dd>
-</dl>
-<dl class="py function">
-<dt class="sig sig-object py" id="RUFAS.routines.field.soil.phosphorus_cycling.P_mineralization.update_all">
-<span class="sig-prename descclassname"><span class="pre">RUFAS.routines.field.soil.phosphorus_cycling.P_mineralization.</span></span><span class="sig-name descname"><span class="pre">update_all</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">soil</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.field.soil.phosphorus_cycling.P_mineralization.update_all" title="Permalink to this definition"></a></dt>
-<dd><dl class="simple">
-<dt>Description:</dt><dd><p>computes P flux between labile and active P pools
-“pseudocode_soil” S.5.E</p>
-</dd>
-<dt>Args:</dt><dd><p>soil: instance of the Soil class specified in soil.py
-time: instance of the Time class specified in classes.py</p>
-</dd>
-</dl>
-</dd></dl>
-
+<section id="rufas-routines-field-soil-phosphorus-cycling-p-mineralization-module">
+<h2>RUFAS.routines.field.soil.phosphorus_cycling.P_mineralization module<a class="headerlink" href="#rufas-routines-field-soil-phosphorus-cycling-p-mineralization-module" title="Link to this heading"></a></h2>
 </section>
-<section id="module-RUFAS.routines.field.soil.phosphorus_cycling.erosion">
-<span id="rufas-routines-field-soil-phosphorus-cycling-erosion-module"></span><h2>RUFAS.routines.field.soil.phosphorus_cycling.erosion module<a class="headerlink" href="#module-RUFAS.routines.field.soil.phosphorus_cycling.erosion" title="Permalink to this heading"></a></h2>
-<p>RUFAS</p>
-<p>File name: erosion.py</p>
-<dl class="simple">
-<dt>Author(s):  DR. Melissa Motew</dt><dd><p>USDA-ARS Dairy Forage Research Center</p>
-</dd>
-<dt>Coder(s):   Jacob Johnson <a class="reference external" href="mailto:jacob8399&#37;&#52;&#48;gmail&#46;com">jacob8399<span>&#64;</span>gmail<span>&#46;</span>com</a></dt><dd><p>William Donovan <a class="reference external" href="mailto:wmdonovan&#37;&#52;&#48;wisc&#46;edu">wmdonovan<span>&#64;</span>wisc<span>&#46;</span>edu</a></p>
-</dd>
-</dl>
-<dl class="py function">
-<dt class="sig sig-object py" id="RUFAS.routines.field.soil.phosphorus_cycling.erosion.update_all">
-<span class="sig-prename descclassname"><span class="pre">RUFAS.routines.field.soil.phosphorus_cycling.erosion.</span></span><span class="sig-name descname"><span class="pre">update_all</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">soil</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.field.soil.phosphorus_cycling.erosion.update_all" title="Permalink to this definition"></a></dt>
-<dd><dl class="simple">
-<dt>Description:</dt><dd><p>TODO: Peter was skeptical about the compatibility of this module with SurPhos
-Calculates sediment P transported in runoff using SWAT
-“pseudocode_soil” S.5.F</p>
-</dd>
-<dt>Args:</dt><dd><p>soil: instance of the Soil class specified in soil.py</p>
-</dd>
-</dl>
-</dd></dl>
-
+<section id="rufas-routines-field-soil-phosphorus-cycling-erosion-module">
+<h2>RUFAS.routines.field.soil.phosphorus_cycling.erosion module<a class="headerlink" href="#rufas-routines-field-soil-phosphorus-cycling-erosion-module" title="Link to this heading"></a></h2>
 </section>
-<section id="module-RUFAS.routines.field.soil.phosphorus_cycling.fert_leach">
-<span id="rufas-routines-field-soil-phosphorus-cycling-fert-leach-module"></span><h2>RUFAS.routines.field.soil.phosphorus_cycling.fert_leach module<a class="headerlink" href="#module-RUFAS.routines.field.soil.phosphorus_cycling.fert_leach" title="Permalink to this heading"></a></h2>
-<p>RUFAS
-SurPhos</p>
-<p>File name: fert_leach.py</p>
-<dl class="simple">
-<dt>Author(s):  DR. Peter A. Vadas</dt><dd><p>USDA-ARS Dairy Forage Research Center
-E-mail: <a class="reference external" href="mailto:peter&#46;vadas&#37;&#52;&#48;ars&#46;usda&#46;gov">peter<span>&#46;</span>vadas<span>&#64;</span>ars<span>&#46;</span>usda<span>&#46;</span>gov</a></p>
-</dd>
-<dt>Coder(s):   Jacob Johnson <a class="reference external" href="mailto:jacob8399&#37;&#52;&#48;gmail&#46;com">jacob8399<span>&#64;</span>gmail<span>&#46;</span>com</a></dt><dd><p>William Donovan <a class="reference external" href="mailto:wmdonovan&#37;&#52;&#48;wisc&#46;edu">wmdonovan<span>&#64;</span>wisc<span>&#46;</span>edu</a></p>
-</dd>
-</dl>
-<dl class="py function">
-<dt class="sig sig-object py" id="RUFAS.routines.field.soil.phosphorus_cycling.fert_leach.update_all">
-<span class="sig-prename descclassname"><span class="pre">RUFAS.routines.field.soil.phosphorus_cycling.fert_leach.</span></span><span class="sig-name descname"><span class="pre">update_all</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">soil</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weather</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.field.soil.phosphorus_cycling.fert_leach.update_all" title="Permalink to this definition"></a></dt>
-<dd><dl class="simple">
-<dt>Description:</dt><dd><p>estimates P leaching from surface fertilizer with rainfall and
-P infiltration into soil and loss in runoff
-“pseudocode_soil” S.5.C</p>
-</dd>
-<dt>Args:</dt><dd><p>soil: instance of the Soil class specified in soil.py
-weather: instance of the Weather class specified in classes.py
-time: instance of the Time class specified in classes.py</p>
-</dd>
-</dl>
-</dd></dl>
-
+<section id="rufas-routines-field-soil-phosphorus-cycling-fert-leach-module">
+<h2>RUFAS.routines.field.soil.phosphorus_cycling.fert_leach module<a class="headerlink" href="#rufas-routines-field-soil-phosphorus-cycling-fert-leach-module" title="Link to this heading"></a></h2>
 </section>
-<section id="module-RUFAS.routines.field.soil.phosphorus_cycling.manure_leach">
-<span id="rufas-routines-field-soil-phosphorus-cycling-manure-leach-module"></span><h2>RUFAS.routines.field.soil.phosphorus_cycling.manure_leach module<a class="headerlink" href="#module-RUFAS.routines.field.soil.phosphorus_cycling.manure_leach" title="Permalink to this heading"></a></h2>
-<p>RUFAS
-SurPhos</p>
-<p>File name: manure_leach.py</p>
-<dl class="simple">
-<dt>Author(s):  DR. Peter A. Vadas</dt><dd><p>USDA-ARS Dairy Forage Research Center
-E-mail: <a class="reference external" href="mailto:peter&#46;vadas&#37;&#52;&#48;ars&#46;usda&#46;gov">peter<span>&#46;</span>vadas<span>&#64;</span>ars<span>&#46;</span>usda<span>&#46;</span>gov</a></p>
-</dd>
-<dt>Coder(s):   Jacob Johnson <a class="reference external" href="mailto:jacob8399&#37;&#52;&#48;gmail&#46;com">jacob8399<span>&#64;</span>gmail<span>&#46;</span>com</a></dt><dd><p>William Donovan <a class="reference external" href="mailto:wmdonovan&#37;&#52;&#48;wisc&#46;edu">wmdonovan<span>&#64;</span>wisc<span>&#46;</span>edu</a></p>
-</dd>
-</dl>
-<dl class="py function">
-<dt class="sig sig-object py" id="RUFAS.routines.field.soil.phosphorus_cycling.manure_leach.update_all">
-<span class="sig-prename descclassname"><span class="pre">RUFAS.routines.field.soil.phosphorus_cycling.manure_leach.</span></span><span class="sig-name descname"><span class="pre">update_all</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">soil</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">field_management</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weather</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.field.soil.phosphorus_cycling.manure_leach.update_all" title="Permalink to this definition"></a></dt>
-<dd><dl>
-<dt>Description:</dt><dd><p>this subroutine estimates P leaching from surface manure with rainfall
-and P infiltration into soil and loss in runoff
-“pseudocode_soil” S.5.D</p>
-</dd>
-<dt>Args:</dt><dd><p>soil: instance of the Soil class specified in soil.py
-field_management: instance of the FieldManagement class specified in</p>
-<blockquote>
-<div><p>field_management.py</p>
-</div></blockquote>
-<p>weather: instance of the Weather class specified in classes.py
-time: instance of the Time class specified in classes.py</p>
-</dd>
-</dl>
-</dd></dl>
-
+<section id="rufas-routines-field-soil-phosphorus-cycling-manure-leach-module">
+<h2>RUFAS.routines.field.soil.phosphorus_cycling.manure_leach module<a class="headerlink" href="#rufas-routines-field-soil-phosphorus-cycling-manure-leach-module" title="Link to this heading"></a></h2>
 </section>
 <section id="module-RUFAS.routines.field.soil.phosphorus_cycling.phosphorus_cycling">
-<span id="rufas-routines-field-soil-phosphorus-cycling-phosphorus-cycling-module"></span><h2>RUFAS.routines.field.soil.phosphorus_cycling.phosphorus_cycling module<a class="headerlink" href="#module-RUFAS.routines.field.soil.phosphorus_cycling.phosphorus_cycling" title="Permalink to this heading"></a></h2>
-<p>RUFAS: Ruminant Farm Systems Model</p>
-<p>phosphorus_cycling.py</p>
+<span id="rufas-routines-field-soil-phosphorus-cycling-phosphorus-cycling-module"></span><h2>RUFAS.routines.field.soil.phosphorus_cycling.phosphorus_cycling module<a class="headerlink" href="#module-RUFAS.routines.field.soil.phosphorus_cycling.phosphorus_cycling" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.phosphorus_cycling.phosphorus_cycling.PhosphorusCycling">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">RUFAS.routines.field.soil.phosphorus_cycling.phosphorus_cycling.</span></span><span class="sig-name descname"><span class="pre">PhosphorusCycling</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">soil_data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">SoilData</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">field_size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.field.soil.phosphorus_cycling.phosphorus_cycling.PhosphorusCycling" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.phosphorus_cycling.phosphorus_cycling.PhosphorusCycling.cycle_phosphorus">
+<span class="sig-name descname"><span class="pre">cycle_phosphorus</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rainfall</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">runoff</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">field_size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mean_air_temperature</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.routines.field.soil.phosphorus_cycling.phosphorus_cycling.PhosphorusCycling.cycle_phosphorus" title="Link to this definition"></a></dt>
+<dd><p>This method calls all daily routines that manage phosphorus on the soil surface and in the soil profile.</p>
+<section id="parameters">
+<h3>Parameters<a class="headerlink" href="#parameters" title="Link to this heading"></a></h3>
 <dl class="simple">
-<dt>Author(s):  Jacob Johnson <a class="reference external" href="mailto:jacob8399&#37;&#52;&#48;gmail&#46;com">jacob8399<span>&#64;</span>gmail<span>&#46;</span>com</a></dt><dd><p>William Donovan <a class="reference external" href="mailto:wmdonovan&#37;&#52;&#48;wisc&#46;edu">wmdonovan<span>&#64;</span>wisc<span>&#46;</span>edu</a></p>
+<dt>rainfall<span class="classifier">float</span></dt><dd><p>The amount of rainfall on the current day (mm)</p>
+</dd>
+<dt>runoff<span class="classifier">float</span></dt><dd><p>The amount of runoff from rainfall on the current day (mm)</p>
+</dd>
+<dt>field_size<span class="classifier">float</span></dt><dd><p>The size of the field (ha)</p>
+</dd>
+<dt>mean_air_temperature<span class="classifier">float</span></dt><dd><p>Mean air temperature on the current day (degrees C)</p>
 </dd>
 </dl>
-<dl class="py function">
-<dt class="sig sig-object py" id="RUFAS.routines.field.soil.phosphorus_cycling.phosphorus_cycling.update_all">
-<span class="sig-prename descclassname"><span class="pre">RUFAS.routines.field.soil.phosphorus_cycling.phosphorus_cycling.</span></span><span class="sig-name descname"><span class="pre">update_all</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">soil</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">field_management</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weather</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.field.soil.phosphorus_cycling.phosphorus_cycling.update_all" title="Permalink to this definition"></a></dt>
-<dd><dl>
-<dt>Description:</dt><dd><p>Runs the phosphorus cycling sub-module.
-Currently largely based on Peter Vadas’ SurPhos</p>
-</dd>
-<dt>Args:</dt><dd><p>soil: instance of the Soil class specified in soil.py
-field_management: instance of the FieldManagement class</p>
-<blockquote>
-<div><p>specified in field_management.py</p>
-</div></blockquote>
-<p>weather: instance of the Weather class specified in classes.py
-time: instance of the Time class specified in classes.py</p>
-</dd>
-</dl>
+</section>
 </dd></dl>
 
-<dl class="py function">
-<dt class="sig sig-object py" id="RUFAS.routines.field.soil.phosphorus_cycling.phosphorus_cycling.update_annual_P">
-<span class="sig-prename descclassname"><span class="pre">RUFAS.routines.field.soil.phosphorus_cycling.phosphorus_cycling.</span></span><span class="sig-name descname"><span class="pre">update_annual_P</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">soil</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.field.soil.phosphorus_cycling.phosphorus_cycling.update_annual_P" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.phosphorus_cycling.phosphorus_cycling.PhosphorusCycling.fertilizer">
+<span class="sig-name descname"><span class="pre">fertilizer</span></span><a class="headerlink" href="#RUFAS.routines.field.soil.phosphorus_cycling.phosphorus_cycling.PhosphorusCycling.fertilizer" title="Link to this definition"></a></dt>
+<dd><p>Process component that manages fertilizer on the field.</p>
+</dd></dl>
 
-<dl class="py function">
-<dt class="sig sig-object py" id="RUFAS.routines.field.soil.phosphorus_cycling.phosphorus_cycling.update_profile_P">
-<span class="sig-prename descclassname"><span class="pre">RUFAS.routines.field.soil.phosphorus_cycling.phosphorus_cycling.</span></span><span class="sig-name descname"><span class="pre">update_profile_P</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">soil</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">field_management</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.field.soil.phosphorus_cycling.phosphorus_cycling.update_profile_P" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.phosphorus_cycling.phosphorus_cycling.PhosphorusCycling.manure">
+<span class="sig-name descname"><span class="pre">manure</span></span><a class="headerlink" href="#RUFAS.routines.field.soil.phosphorus_cycling.phosphorus_cycling.PhosphorusCycling.manure" title="Link to this definition"></a></dt>
+<dd><p>Process component that manages manure on the field.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.phosphorus_cycling.phosphorus_cycling.PhosphorusCycling.mineralization">
+<span class="sig-name descname"><span class="pre">mineralization</span></span><a class="headerlink" href="#RUFAS.routines.field.soil.phosphorus_cycling.phosphorus_cycling.PhosphorusCycling.mineralization" title="Link to this definition"></a></dt>
+<dd><p>Process component that controls the mineralization of phosphorus within the soil profile.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.phosphorus_cycling.phosphorus_cycling.PhosphorusCycling.soluble_phosphorus">
+<span class="sig-name descname"><span class="pre">soluble_phosphorus</span></span><a class="headerlink" href="#RUFAS.routines.field.soil.phosphorus_cycling.phosphorus_cycling.PhosphorusCycling.soluble_phosphorus" title="Link to this definition"></a></dt>
+<dd><p>Process component that controls the movement of phosphorus between layers of soil.</p>
+</dd></dl>
+
+</dd></dl>
 
 </section>
-<section id="module-RUFAS.routines.field.soil.phosphorus_cycling.soluble_P">
-<span id="rufas-routines-field-soil-phosphorus-cycling-soluble-p-module"></span><h2>RUFAS.routines.field.soil.phosphorus_cycling.soluble_P module<a class="headerlink" href="#module-RUFAS.routines.field.soil.phosphorus_cycling.soluble_P" title="Permalink to this heading"></a></h2>
-<p>RUFAS
-SurPhos</p>
-<p>File name: soluble_P.py</p>
-<dl class="simple">
-<dt>Author(s):  DR. Peter A. Vadas</dt><dd><p>USDA-ARS Dairy Forage Research Center
-E-mail: <a class="reference external" href="mailto:peter&#46;vadas&#37;&#52;&#48;ars&#46;usda&#46;gov">peter<span>&#46;</span>vadas<span>&#64;</span>ars<span>&#46;</span>usda<span>&#46;</span>gov</a></p>
-</dd>
-<dt>Coder(s):   Jacob Johnson <a class="reference external" href="mailto:jacob8399&#37;&#52;&#48;gmail&#46;com">jacob8399<span>&#64;</span>gmail<span>&#46;</span>com</a></dt><dd><p>William Donovan <a class="reference external" href="mailto:wmdonovan&#37;&#52;&#48;wisc&#46;edu">wmdonovan<span>&#64;</span>wisc<span>&#46;</span>edu</a></p>
-</dd>
-</dl>
-<dl class="py function">
-<dt class="sig sig-object py" id="RUFAS.routines.field.soil.phosphorus_cycling.soluble_P.update_all">
-<span class="sig-prename descclassname"><span class="pre">RUFAS.routines.field.soil.phosphorus_cycling.soluble_P.</span></span><span class="sig-name descname"><span class="pre">update_all</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">soil</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.field.soil.phosphorus_cycling.soluble_P.update_all" title="Permalink to this definition"></a></dt>
-<dd><dl class="simple">
-<dt>Description:</dt><dd><p>calculates the transfer of phosphorus through hydrological processes
-“pseudocode_soil” S.5.B</p>
-</dd>
-<dt>Args:</dt><dd><p>soil: an instance of the Soil class specified in soil.py</p>
-</dd>
-</dl>
-</dd></dl>
-
+<section id="rufas-routines-field-soil-phosphorus-cycling-soluble-p-module">
+<h2>RUFAS.routines.field.soil.phosphorus_cycling.soluble_P module<a class="headerlink" href="#rufas-routines-field-soil-phosphorus-cycling-soluble-p-module" title="Link to this heading"></a></h2>
 </section>
 <section id="module-RUFAS.routines.field.soil.phosphorus_cycling">
-<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-RUFAS.routines.field.soil.phosphorus_cycling" title="Permalink to this heading"></a></h2>
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-RUFAS.routines.field.soil.phosphorus_cycling" title="Link to this heading"></a></h2>
 </section>
 </section>
 

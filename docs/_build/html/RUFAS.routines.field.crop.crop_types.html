@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>RUFAS.routines.field.crop.crop_types package &mdash; Ruminant Farm Simulation (RuFaS)  documentation</title>
@@ -11,12 +11,11 @@
     <script src="_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
-        <script src="_static/jquery.js"></script>
-        <script src="_static/underscore.js"></script>
-        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
-        <script src="_static/doctools.js"></script>
-        <script src="_static/sphinx_highlight.js"></script>
+        <script src="_static/jquery.js?v=5d32c60e"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="_static/documentation_options.js?v=5929fcd5"></script>
+        <script src="_static/doctools.js?v=888ff710"></script>
+        <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
@@ -29,11 +28,15 @@
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-            <a href="index.html" class="icon icon-home"> Ruminant Farm Simulation (RuFaS)
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            Ruminant Farm Simulation (RuFaS)
           </a>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" />
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
     <input type="hidden" name="check_keywords" value="yes" />
     <input type="hidden" name="area" value="default" />
   </form>
@@ -50,12 +53,12 @@
 </li>
 <li class="toctree-l3"><a class="reference internal" href="RUFAS.html#submodules">Submodules</a></li>
 <li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.classes">RUFAS.classes module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.database_reader">RUFAS.database_reader module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#rufas-database-reader-module">RUFAS.database_reader module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.errors">RUFAS.errors module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.general_constants">RUFAS.general_constants module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.output_manager">RUFAS.output_manager module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.simulation_engine">RUFAS.simulation_engine module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.user_prompt">RUFAS.user_prompt module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#rufas-user-prompt-module">RUFAS.user_prompt module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.util">RUFAS.util module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS">Module contents</a></li>
 </ul>
@@ -81,7 +84,7 @@
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a href="index.html" class="icon icon-home"></a></li>
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
           <li class="breadcrumb-item"><a href="modules.html">GitHub</a></li>
           <li class="breadcrumb-item"><a href="RUFAS.html">RUFAS package</a></li>
           <li class="breadcrumb-item"><a href="RUFAS.routines.html">RUFAS.routines package</a></li>
@@ -98,471 +101,39 @@
            <div itemprop="articleBody">
              
   <section id="rufas-routines-field-crop-crop-types-package">
-<h1>RUFAS.routines.field.crop.crop_types package<a class="headerlink" href="#rufas-routines-field-crop-crop-types-package" title="Permalink to this heading"></a></h1>
+<h1>RUFAS.routines.field.crop.crop_types package<a class="headerlink" href="#rufas-routines-field-crop-crop-types-package" title="Link to this heading"></a></h1>
 <section id="submodules">
-<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this heading"></a></h2>
+<h2>Submodules<a class="headerlink" href="#submodules" title="Link to this heading"></a></h2>
 </section>
-<section id="module-RUFAS.routines.field.crop.crop_types.alfalfa">
-<span id="rufas-routines-field-crop-crop-types-alfalfa-module"></span><h2>RUFAS.routines.field.crop.crop_types.alfalfa module<a class="headerlink" href="#module-RUFAS.routines.field.crop.crop_types.alfalfa" title="Permalink to this heading"></a></h2>
-<dl class="py class">
-<dt class="sig sig-object py" id="RUFAS.routines.field.crop.crop_types.alfalfa.Alfalfa">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">RUFAS.routines.field.crop.crop_types.alfalfa.</span></span><span class="sig-name descname"><span class="pre">Alfalfa</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">crop_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.field.crop.crop_types.alfalfa.Alfalfa" title="Permalink to this definition"></a></dt>
-<dd><p>Bases: <a class="reference internal" href="#RUFAS.routines.field.crop.crop_types.base_crop.BaseCrop" title="RUFAS.routines.field.crop.crop_types.base_crop.BaseCrop"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseCrop</span></code></a></p>
-<dl class="py attribute">
-<dt class="sig sig-object py" id="RUFAS.routines.field.crop.crop_types.alfalfa.Alfalfa.LAI_actual">
-<span class="sig-name descname"><span class="pre">LAI_actual</span></span><a class="headerlink" href="#RUFAS.routines.field.crop.crop_types.alfalfa.Alfalfa.LAI_actual" title="Permalink to this definition"></a></dt>
-<dd><p>ROOT DEPTH DATA</p>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="RUFAS.routines.field.crop.crop_types.alfalfa.Alfalfa.N_actual_up">
-<span class="sig-name descname"><span class="pre">N_actual_up</span></span><a class="headerlink" href="#RUFAS.routines.field.crop.crop_types.alfalfa.Alfalfa.N_actual_up" title="Permalink to this definition"></a></dt>
-<dd><p>Phosphorus Uptake Data</p>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="RUFAS.routines.field.crop.crop_types.alfalfa.Alfalfa.P_act_up">
-<span class="sig-name descname"><span class="pre">P_act_up</span></span><a class="headerlink" href="#RUFAS.routines.field.crop.crop_types.alfalfa.Alfalfa.P_act_up" title="Permalink to this definition"></a></dt>
-<dd><p>Yields Data</p>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="RUFAS.routines.field.crop.crop_types.alfalfa.Alfalfa.fix_nitrogen">
-<span class="sig-name descname"><span class="pre">fix_nitrogen</span></span><a class="headerlink" href="#RUFAS.routines.field.crop.crop_types.alfalfa.Alfalfa.fix_nitrogen" title="Permalink to this definition"></a></dt>
-<dd><p>HEAT UNIT DATA</p>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="RUFAS.routines.field.crop.crop_types.alfalfa.Alfalfa.prev_biomass_actual">
-<span class="sig-name descname"><span class="pre">prev_biomass_actual</span></span><a class="headerlink" href="#RUFAS.routines.field.crop.crop_types.alfalfa.Alfalfa.prev_biomass_actual" title="Permalink to this definition"></a></dt>
-<dd><p>Soil Water Uptake Data</p>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="RUFAS.routines.field.crop.crop_types.alfalfa.Alfalfa.prev_fr_PHU">
-<span class="sig-name descname"><span class="pre">prev_fr_PHU</span></span><a class="headerlink" href="#RUFAS.routines.field.crop.crop_types.alfalfa.Alfalfa.prev_fr_PHU" title="Permalink to this definition"></a></dt>
-<dd><p>LEAF AREA INDEX (LAI) DATA</p>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="RUFAS.routines.field.crop.crop_types.alfalfa.Alfalfa.water_uptake_each_layer">
-<span class="sig-name descname"><span class="pre">water_uptake_each_layer</span></span><a class="headerlink" href="#RUFAS.routines.field.crop.crop_types.alfalfa.Alfalfa.water_uptake_each_layer" title="Permalink to this definition"></a></dt>
-<dd><p>Nitrogen Uptake Data</p>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="RUFAS.routines.field.crop.crop_types.alfalfa.Alfalfa.z_root">
-<span class="sig-name descname"><span class="pre">z_root</span></span><a class="headerlink" href="#RUFAS.routines.field.crop.crop_types.alfalfa.Alfalfa.z_root" title="Permalink to this definition"></a></dt>
-<dd><p>BIOMASS DATA</p>
-</dd></dl>
-
-</dd></dl>
-
+<section id="rufas-routines-field-crop-crop-types-alfalfa-module">
+<h2>RUFAS.routines.field.crop.crop_types.alfalfa module<a class="headerlink" href="#rufas-routines-field-crop-crop-types-alfalfa-module" title="Link to this heading"></a></h2>
 </section>
-<section id="module-RUFAS.routines.field.crop.crop_types.base_crop">
-<span id="rufas-routines-field-crop-crop-types-base-crop-module"></span><h2>RUFAS.routines.field.crop.crop_types.base_crop module<a class="headerlink" href="#module-RUFAS.routines.field.crop.crop_types.base_crop" title="Permalink to this heading"></a></h2>
-<dl class="py class">
-<dt class="sig sig-object py" id="RUFAS.routines.field.crop.crop_types.base_crop.BaseCrop">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">RUFAS.routines.field.crop.crop_types.base_crop.</span></span><span class="sig-name descname"><span class="pre">BaseCrop</span></span><a class="headerlink" href="#RUFAS.routines.field.crop.crop_types.base_crop.BaseCrop" title="Permalink to this definition"></a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-</dd></dl>
-
+<section id="rufas-routines-field-crop-crop-types-base-crop-module">
+<h2>RUFAS.routines.field.crop.crop_types.base_crop module<a class="headerlink" href="#rufas-routines-field-crop-crop-types-base-crop-module" title="Link to this heading"></a></h2>
 </section>
-<section id="module-RUFAS.routines.field.crop.crop_types.corn">
-<span id="rufas-routines-field-crop-crop-types-corn-module"></span><h2>RUFAS.routines.field.crop.crop_types.corn module<a class="headerlink" href="#module-RUFAS.routines.field.crop.crop_types.corn" title="Permalink to this heading"></a></h2>
-<dl class="py class">
-<dt class="sig sig-object py" id="RUFAS.routines.field.crop.crop_types.corn.Corn">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">RUFAS.routines.field.crop.crop_types.corn.</span></span><span class="sig-name descname"><span class="pre">Corn</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">crop_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.field.crop.crop_types.corn.Corn" title="Permalink to this definition"></a></dt>
-<dd><p>Bases: <a class="reference internal" href="#RUFAS.routines.field.crop.crop_types.base_crop.BaseCrop" title="RUFAS.routines.field.crop.crop_types.base_crop.BaseCrop"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseCrop</span></code></a></p>
-<dl class="py attribute">
-<dt class="sig sig-object py" id="RUFAS.routines.field.crop.crop_types.corn.Corn.LAI_actual">
-<span class="sig-name descname"><span class="pre">LAI_actual</span></span><a class="headerlink" href="#RUFAS.routines.field.crop.crop_types.corn.Corn.LAI_actual" title="Permalink to this definition"></a></dt>
-<dd><p>ROOT DEPTH DATA</p>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="RUFAS.routines.field.crop.crop_types.corn.Corn.N_actual_up">
-<span class="sig-name descname"><span class="pre">N_actual_up</span></span><a class="headerlink" href="#RUFAS.routines.field.crop.crop_types.corn.Corn.N_actual_up" title="Permalink to this definition"></a></dt>
-<dd><p>Phosphorus Uptake Data</p>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="RUFAS.routines.field.crop.crop_types.corn.Corn.P_act_up">
-<span class="sig-name descname"><span class="pre">P_act_up</span></span><a class="headerlink" href="#RUFAS.routines.field.crop.crop_types.corn.Corn.P_act_up" title="Permalink to this definition"></a></dt>
-<dd><p>Yields Data</p>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="RUFAS.routines.field.crop.crop_types.corn.Corn.fix_nitrogen">
-<span class="sig-name descname"><span class="pre">fix_nitrogen</span></span><a class="headerlink" href="#RUFAS.routines.field.crop.crop_types.corn.Corn.fix_nitrogen" title="Permalink to this definition"></a></dt>
-<dd><p>HEAT UNIT DATA</p>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="RUFAS.routines.field.crop.crop_types.corn.Corn.prev_biomass_actual">
-<span class="sig-name descname"><span class="pre">prev_biomass_actual</span></span><a class="headerlink" href="#RUFAS.routines.field.crop.crop_types.corn.Corn.prev_biomass_actual" title="Permalink to this definition"></a></dt>
-<dd><p>Soil Water Uptake Data</p>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="RUFAS.routines.field.crop.crop_types.corn.Corn.prev_fr_PHU">
-<span class="sig-name descname"><span class="pre">prev_fr_PHU</span></span><a class="headerlink" href="#RUFAS.routines.field.crop.crop_types.corn.Corn.prev_fr_PHU" title="Permalink to this definition"></a></dt>
-<dd><p>LEAF AREA INDEX (LAI) DATA</p>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="RUFAS.routines.field.crop.crop_types.corn.Corn.water_uptake_each_layer">
-<span class="sig-name descname"><span class="pre">water_uptake_each_layer</span></span><a class="headerlink" href="#RUFAS.routines.field.crop.crop_types.corn.Corn.water_uptake_each_layer" title="Permalink to this definition"></a></dt>
-<dd><p>Nitrogen Uptake Data</p>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="RUFAS.routines.field.crop.crop_types.corn.Corn.z_root">
-<span class="sig-name descname"><span class="pre">z_root</span></span><a class="headerlink" href="#RUFAS.routines.field.crop.crop_types.corn.Corn.z_root" title="Permalink to this definition"></a></dt>
-<dd><p>BIOMASS DATA</p>
-</dd></dl>
-
-</dd></dl>
-
+<section id="rufas-routines-field-crop-crop-types-corn-module">
+<h2>RUFAS.routines.field.crop.crop_types.corn module<a class="headerlink" href="#rufas-routines-field-crop-crop-types-corn-module" title="Link to this heading"></a></h2>
 </section>
-<section id="module-RUFAS.routines.field.crop.crop_types.potato">
-<span id="rufas-routines-field-crop-crop-types-potato-module"></span><h2>RUFAS.routines.field.crop.crop_types.potato module<a class="headerlink" href="#module-RUFAS.routines.field.crop.crop_types.potato" title="Permalink to this heading"></a></h2>
-<dl class="py class">
-<dt class="sig sig-object py" id="RUFAS.routines.field.crop.crop_types.potato.Potato">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">RUFAS.routines.field.crop.crop_types.potato.</span></span><span class="sig-name descname"><span class="pre">Potato</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">crop_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.field.crop.crop_types.potato.Potato" title="Permalink to this definition"></a></dt>
-<dd><p>Bases: <a class="reference internal" href="#RUFAS.routines.field.crop.crop_types.base_crop.BaseCrop" title="RUFAS.routines.field.crop.crop_types.base_crop.BaseCrop"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseCrop</span></code></a></p>
-<dl class="py attribute">
-<dt class="sig sig-object py" id="RUFAS.routines.field.crop.crop_types.potato.Potato.LAI_actual">
-<span class="sig-name descname"><span class="pre">LAI_actual</span></span><a class="headerlink" href="#RUFAS.routines.field.crop.crop_types.potato.Potato.LAI_actual" title="Permalink to this definition"></a></dt>
-<dd><p>ROOT DEPTH DATA</p>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="RUFAS.routines.field.crop.crop_types.potato.Potato.N_actual_up">
-<span class="sig-name descname"><span class="pre">N_actual_up</span></span><a class="headerlink" href="#RUFAS.routines.field.crop.crop_types.potato.Potato.N_actual_up" title="Permalink to this definition"></a></dt>
-<dd><p>Phosphorus Uptake Data</p>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="RUFAS.routines.field.crop.crop_types.potato.Potato.P_act_up">
-<span class="sig-name descname"><span class="pre">P_act_up</span></span><a class="headerlink" href="#RUFAS.routines.field.crop.crop_types.potato.Potato.P_act_up" title="Permalink to this definition"></a></dt>
-<dd><p>Yields Data</p>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="RUFAS.routines.field.crop.crop_types.potato.Potato.fix_nitrogen">
-<span class="sig-name descname"><span class="pre">fix_nitrogen</span></span><a class="headerlink" href="#RUFAS.routines.field.crop.crop_types.potato.Potato.fix_nitrogen" title="Permalink to this definition"></a></dt>
-<dd><p>HEAT UNIT DATA</p>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="RUFAS.routines.field.crop.crop_types.potato.Potato.prev_biomass_actual">
-<span class="sig-name descname"><span class="pre">prev_biomass_actual</span></span><a class="headerlink" href="#RUFAS.routines.field.crop.crop_types.potato.Potato.prev_biomass_actual" title="Permalink to this definition"></a></dt>
-<dd><p>Soil Water Uptake Data</p>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="RUFAS.routines.field.crop.crop_types.potato.Potato.prev_fr_PHU">
-<span class="sig-name descname"><span class="pre">prev_fr_PHU</span></span><a class="headerlink" href="#RUFAS.routines.field.crop.crop_types.potato.Potato.prev_fr_PHU" title="Permalink to this definition"></a></dt>
-<dd><p>LEAF AREA INDEX (LAI) DATA</p>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="RUFAS.routines.field.crop.crop_types.potato.Potato.water_uptake_each_layer">
-<span class="sig-name descname"><span class="pre">water_uptake_each_layer</span></span><a class="headerlink" href="#RUFAS.routines.field.crop.crop_types.potato.Potato.water_uptake_each_layer" title="Permalink to this definition"></a></dt>
-<dd><p>Nitrogen Uptake Data</p>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="RUFAS.routines.field.crop.crop_types.potato.Potato.z_root">
-<span class="sig-name descname"><span class="pre">z_root</span></span><a class="headerlink" href="#RUFAS.routines.field.crop.crop_types.potato.Potato.z_root" title="Permalink to this definition"></a></dt>
-<dd><p>BIOMASS DATA</p>
-</dd></dl>
-
-</dd></dl>
-
+<section id="rufas-routines-field-crop-crop-types-potato-module">
+<h2>RUFAS.routines.field.crop.crop_types.potato module<a class="headerlink" href="#rufas-routines-field-crop-crop-types-potato-module" title="Link to this heading"></a></h2>
 </section>
-<section id="module-RUFAS.routines.field.crop.crop_types.soybean">
-<span id="rufas-routines-field-crop-crop-types-soybean-module"></span><h2>RUFAS.routines.field.crop.crop_types.soybean module<a class="headerlink" href="#module-RUFAS.routines.field.crop.crop_types.soybean" title="Permalink to this heading"></a></h2>
-<dl class="py class">
-<dt class="sig sig-object py" id="RUFAS.routines.field.crop.crop_types.soybean.Soybean">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">RUFAS.routines.field.crop.crop_types.soybean.</span></span><span class="sig-name descname"><span class="pre">Soybean</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">crop_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.field.crop.crop_types.soybean.Soybean" title="Permalink to this definition"></a></dt>
-<dd><p>Bases: <a class="reference internal" href="#RUFAS.routines.field.crop.crop_types.base_crop.BaseCrop" title="RUFAS.routines.field.crop.crop_types.base_crop.BaseCrop"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseCrop</span></code></a></p>
-<dl class="py attribute">
-<dt class="sig sig-object py" id="RUFAS.routines.field.crop.crop_types.soybean.Soybean.LAI_actual">
-<span class="sig-name descname"><span class="pre">LAI_actual</span></span><a class="headerlink" href="#RUFAS.routines.field.crop.crop_types.soybean.Soybean.LAI_actual" title="Permalink to this definition"></a></dt>
-<dd><p>Nitrogen Uptake Data</p>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="RUFAS.routines.field.crop.crop_types.soybean.Soybean.N_actual_up">
-<span class="sig-name descname"><span class="pre">N_actual_up</span></span><a class="headerlink" href="#RUFAS.routines.field.crop.crop_types.soybean.Soybean.N_actual_up" title="Permalink to this definition"></a></dt>
-<dd><p>Phosphorus Uptake Data</p>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="RUFAS.routines.field.crop.crop_types.soybean.Soybean.P_act_up">
-<span class="sig-name descname"><span class="pre">P_act_up</span></span><a class="headerlink" href="#RUFAS.routines.field.crop.crop_types.soybean.Soybean.P_act_up" title="Permalink to this definition"></a></dt>
-<dd><p>Yields Data</p>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="RUFAS.routines.field.crop.crop_types.soybean.Soybean.fix_nitrogen">
-<span class="sig-name descname"><span class="pre">fix_nitrogen</span></span><a class="headerlink" href="#RUFAS.routines.field.crop.crop_types.soybean.Soybean.fix_nitrogen" title="Permalink to this definition"></a></dt>
-<dd><p>HEAT UNIT DATA</p>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="RUFAS.routines.field.crop.crop_types.soybean.Soybean.prev_biomass_actual">
-<span class="sig-name descname"><span class="pre">prev_biomass_actual</span></span><a class="headerlink" href="#RUFAS.routines.field.crop.crop_types.soybean.Soybean.prev_biomass_actual" title="Permalink to this definition"></a></dt>
-<dd><p>Soil Water Uptake Data</p>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="RUFAS.routines.field.crop.crop_types.soybean.Soybean.prev_fr_PHU">
-<span class="sig-name descname"><span class="pre">prev_fr_PHU</span></span><a class="headerlink" href="#RUFAS.routines.field.crop.crop_types.soybean.Soybean.prev_fr_PHU" title="Permalink to this definition"></a></dt>
-<dd><p>LEAF AREA INDEX (LAI) DATA</p>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="RUFAS.routines.field.crop.crop_types.soybean.Soybean.z_root">
-<span class="sig-name descname"><span class="pre">z_root</span></span><a class="headerlink" href="#RUFAS.routines.field.crop.crop_types.soybean.Soybean.z_root" title="Permalink to this definition"></a></dt>
-<dd><p>BIOMASS DATA</p>
-</dd></dl>
-
-</dd></dl>
-
+<section id="rufas-routines-field-crop-crop-types-soybean-module">
+<h2>RUFAS.routines.field.crop.crop_types.soybean module<a class="headerlink" href="#rufas-routines-field-crop-crop-types-soybean-module" title="Link to this heading"></a></h2>
 </section>
-<section id="module-RUFAS.routines.field.crop.crop_types.spring_barley">
-<span id="rufas-routines-field-crop-crop-types-spring-barley-module"></span><h2>RUFAS.routines.field.crop.crop_types.spring_barley module<a class="headerlink" href="#module-RUFAS.routines.field.crop.crop_types.spring_barley" title="Permalink to this heading"></a></h2>
-<dl class="py class">
-<dt class="sig sig-object py" id="RUFAS.routines.field.crop.crop_types.spring_barley.SpringBarley">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">RUFAS.routines.field.crop.crop_types.spring_barley.</span></span><span class="sig-name descname"><span class="pre">SpringBarley</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">crop_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.field.crop.crop_types.spring_barley.SpringBarley" title="Permalink to this definition"></a></dt>
-<dd><p>Bases: <a class="reference internal" href="#RUFAS.routines.field.crop.crop_types.base_crop.BaseCrop" title="RUFAS.routines.field.crop.crop_types.base_crop.BaseCrop"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseCrop</span></code></a></p>
-<dl class="py attribute">
-<dt class="sig sig-object py" id="RUFAS.routines.field.crop.crop_types.spring_barley.SpringBarley.LAI_actual">
-<span class="sig-name descname"><span class="pre">LAI_actual</span></span><a class="headerlink" href="#RUFAS.routines.field.crop.crop_types.spring_barley.SpringBarley.LAI_actual" title="Permalink to this definition"></a></dt>
-<dd><p>ROOT DEPTH DATA</p>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="RUFAS.routines.field.crop.crop_types.spring_barley.SpringBarley.N_actual_up">
-<span class="sig-name descname"><span class="pre">N_actual_up</span></span><a class="headerlink" href="#RUFAS.routines.field.crop.crop_types.spring_barley.SpringBarley.N_actual_up" title="Permalink to this definition"></a></dt>
-<dd><p>Phosphorus Uptake Data</p>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="RUFAS.routines.field.crop.crop_types.spring_barley.SpringBarley.P_act_up">
-<span class="sig-name descname"><span class="pre">P_act_up</span></span><a class="headerlink" href="#RUFAS.routines.field.crop.crop_types.spring_barley.SpringBarley.P_act_up" title="Permalink to this definition"></a></dt>
-<dd><p>Yields Data</p>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="RUFAS.routines.field.crop.crop_types.spring_barley.SpringBarley.fix_nitrogen">
-<span class="sig-name descname"><span class="pre">fix_nitrogen</span></span><a class="headerlink" href="#RUFAS.routines.field.crop.crop_types.spring_barley.SpringBarley.fix_nitrogen" title="Permalink to this definition"></a></dt>
-<dd><p>HEAT UNIT DATA</p>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="RUFAS.routines.field.crop.crop_types.spring_barley.SpringBarley.prev_biomass_actual">
-<span class="sig-name descname"><span class="pre">prev_biomass_actual</span></span><a class="headerlink" href="#RUFAS.routines.field.crop.crop_types.spring_barley.SpringBarley.prev_biomass_actual" title="Permalink to this definition"></a></dt>
-<dd><p>Soil Water Uptake Data</p>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="RUFAS.routines.field.crop.crop_types.spring_barley.SpringBarley.prev_fr_PHU">
-<span class="sig-name descname"><span class="pre">prev_fr_PHU</span></span><a class="headerlink" href="#RUFAS.routines.field.crop.crop_types.spring_barley.SpringBarley.prev_fr_PHU" title="Permalink to this definition"></a></dt>
-<dd><p>LEAF AREA INDEX (LAI) DATA</p>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="RUFAS.routines.field.crop.crop_types.spring_barley.SpringBarley.water_uptake_each_layer">
-<span class="sig-name descname"><span class="pre">water_uptake_each_layer</span></span><a class="headerlink" href="#RUFAS.routines.field.crop.crop_types.spring_barley.SpringBarley.water_uptake_each_layer" title="Permalink to this definition"></a></dt>
-<dd><p>Nitrogen Uptake Data</p>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="RUFAS.routines.field.crop.crop_types.spring_barley.SpringBarley.z_root">
-<span class="sig-name descname"><span class="pre">z_root</span></span><a class="headerlink" href="#RUFAS.routines.field.crop.crop_types.spring_barley.SpringBarley.z_root" title="Permalink to this definition"></a></dt>
-<dd><p>BIOMASS DATA</p>
-</dd></dl>
-
-</dd></dl>
-
+<section id="rufas-routines-field-crop-crop-types-spring-barley-module">
+<h2>RUFAS.routines.field.crop.crop_types.spring_barley module<a class="headerlink" href="#rufas-routines-field-crop-crop-types-spring-barley-module" title="Link to this heading"></a></h2>
 </section>
-<section id="module-RUFAS.routines.field.crop.crop_types.spring_wheat">
-<span id="rufas-routines-field-crop-crop-types-spring-wheat-module"></span><h2>RUFAS.routines.field.crop.crop_types.spring_wheat module<a class="headerlink" href="#module-RUFAS.routines.field.crop.crop_types.spring_wheat" title="Permalink to this heading"></a></h2>
-<dl class="py class">
-<dt class="sig sig-object py" id="RUFAS.routines.field.crop.crop_types.spring_wheat.SpringWheat">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">RUFAS.routines.field.crop.crop_types.spring_wheat.</span></span><span class="sig-name descname"><span class="pre">SpringWheat</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">crop_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.field.crop.crop_types.spring_wheat.SpringWheat" title="Permalink to this definition"></a></dt>
-<dd><p>Bases: <a class="reference internal" href="#RUFAS.routines.field.crop.crop_types.base_crop.BaseCrop" title="RUFAS.routines.field.crop.crop_types.base_crop.BaseCrop"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseCrop</span></code></a></p>
-<dl class="py attribute">
-<dt class="sig sig-object py" id="RUFAS.routines.field.crop.crop_types.spring_wheat.SpringWheat.LAI_actual">
-<span class="sig-name descname"><span class="pre">LAI_actual</span></span><a class="headerlink" href="#RUFAS.routines.field.crop.crop_types.spring_wheat.SpringWheat.LAI_actual" title="Permalink to this definition"></a></dt>
-<dd><p>ROOT DEPTH DATA</p>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="RUFAS.routines.field.crop.crop_types.spring_wheat.SpringWheat.N_actual_up">
-<span class="sig-name descname"><span class="pre">N_actual_up</span></span><a class="headerlink" href="#RUFAS.routines.field.crop.crop_types.spring_wheat.SpringWheat.N_actual_up" title="Permalink to this definition"></a></dt>
-<dd><p>Phosphorus Uptake Data</p>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="RUFAS.routines.field.crop.crop_types.spring_wheat.SpringWheat.P_act_up">
-<span class="sig-name descname"><span class="pre">P_act_up</span></span><a class="headerlink" href="#RUFAS.routines.field.crop.crop_types.spring_wheat.SpringWheat.P_act_up" title="Permalink to this definition"></a></dt>
-<dd><p>Yields Data</p>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="RUFAS.routines.field.crop.crop_types.spring_wheat.SpringWheat.fix_nitrogen">
-<span class="sig-name descname"><span class="pre">fix_nitrogen</span></span><a class="headerlink" href="#RUFAS.routines.field.crop.crop_types.spring_wheat.SpringWheat.fix_nitrogen" title="Permalink to this definition"></a></dt>
-<dd><p>HEAT UNIT DATA</p>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="RUFAS.routines.field.crop.crop_types.spring_wheat.SpringWheat.prev_biomass_actual">
-<span class="sig-name descname"><span class="pre">prev_biomass_actual</span></span><a class="headerlink" href="#RUFAS.routines.field.crop.crop_types.spring_wheat.SpringWheat.prev_biomass_actual" title="Permalink to this definition"></a></dt>
-<dd><p>Soil Water Uptake Data</p>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="RUFAS.routines.field.crop.crop_types.spring_wheat.SpringWheat.prev_fr_PHU">
-<span class="sig-name descname"><span class="pre">prev_fr_PHU</span></span><a class="headerlink" href="#RUFAS.routines.field.crop.crop_types.spring_wheat.SpringWheat.prev_fr_PHU" title="Permalink to this definition"></a></dt>
-<dd><p>LEAF AREA INDEX (LAI) DATA</p>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="RUFAS.routines.field.crop.crop_types.spring_wheat.SpringWheat.water_uptake_each_layer">
-<span class="sig-name descname"><span class="pre">water_uptake_each_layer</span></span><a class="headerlink" href="#RUFAS.routines.field.crop.crop_types.spring_wheat.SpringWheat.water_uptake_each_layer" title="Permalink to this definition"></a></dt>
-<dd><p>Nitrogen Uptake Data</p>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="RUFAS.routines.field.crop.crop_types.spring_wheat.SpringWheat.z_root">
-<span class="sig-name descname"><span class="pre">z_root</span></span><a class="headerlink" href="#RUFAS.routines.field.crop.crop_types.spring_wheat.SpringWheat.z_root" title="Permalink to this definition"></a></dt>
-<dd><p>BIOMASS DATA</p>
-</dd></dl>
-
-</dd></dl>
-
+<section id="rufas-routines-field-crop-crop-types-spring-wheat-module">
+<h2>RUFAS.routines.field.crop.crop_types.spring_wheat module<a class="headerlink" href="#rufas-routines-field-crop-crop-types-spring-wheat-module" title="Link to this heading"></a></h2>
 </section>
-<section id="module-RUFAS.routines.field.crop.crop_types.sugar_beet">
-<span id="rufas-routines-field-crop-crop-types-sugar-beet-module"></span><h2>RUFAS.routines.field.crop.crop_types.sugar_beet module<a class="headerlink" href="#module-RUFAS.routines.field.crop.crop_types.sugar_beet" title="Permalink to this heading"></a></h2>
-<dl class="py class">
-<dt class="sig sig-object py" id="RUFAS.routines.field.crop.crop_types.sugar_beet.SugarBeet">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">RUFAS.routines.field.crop.crop_types.sugar_beet.</span></span><span class="sig-name descname"><span class="pre">SugarBeet</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">crop_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.field.crop.crop_types.sugar_beet.SugarBeet" title="Permalink to this definition"></a></dt>
-<dd><p>Bases: <a class="reference internal" href="#RUFAS.routines.field.crop.crop_types.base_crop.BaseCrop" title="RUFAS.routines.field.crop.crop_types.base_crop.BaseCrop"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseCrop</span></code></a></p>
-<dl class="py attribute">
-<dt class="sig sig-object py" id="RUFAS.routines.field.crop.crop_types.sugar_beet.SugarBeet.LAI_actual">
-<span class="sig-name descname"><span class="pre">LAI_actual</span></span><a class="headerlink" href="#RUFAS.routines.field.crop.crop_types.sugar_beet.SugarBeet.LAI_actual" title="Permalink to this definition"></a></dt>
-<dd><p>ROOT DEPTH DATA</p>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="RUFAS.routines.field.crop.crop_types.sugar_beet.SugarBeet.N_actual_up">
-<span class="sig-name descname"><span class="pre">N_actual_up</span></span><a class="headerlink" href="#RUFAS.routines.field.crop.crop_types.sugar_beet.SugarBeet.N_actual_up" title="Permalink to this definition"></a></dt>
-<dd><p>Phosphorus Uptake Data</p>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="RUFAS.routines.field.crop.crop_types.sugar_beet.SugarBeet.P_act_up">
-<span class="sig-name descname"><span class="pre">P_act_up</span></span><a class="headerlink" href="#RUFAS.routines.field.crop.crop_types.sugar_beet.SugarBeet.P_act_up" title="Permalink to this definition"></a></dt>
-<dd><p>Yields Data</p>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="RUFAS.routines.field.crop.crop_types.sugar_beet.SugarBeet.fix_nitrogen">
-<span class="sig-name descname"><span class="pre">fix_nitrogen</span></span><a class="headerlink" href="#RUFAS.routines.field.crop.crop_types.sugar_beet.SugarBeet.fix_nitrogen" title="Permalink to this definition"></a></dt>
-<dd><p>HEAT UNIT DATA</p>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="RUFAS.routines.field.crop.crop_types.sugar_beet.SugarBeet.prev_biomass_actual">
-<span class="sig-name descname"><span class="pre">prev_biomass_actual</span></span><a class="headerlink" href="#RUFAS.routines.field.crop.crop_types.sugar_beet.SugarBeet.prev_biomass_actual" title="Permalink to this definition"></a></dt>
-<dd><p>Soil Water Uptake Data</p>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="RUFAS.routines.field.crop.crop_types.sugar_beet.SugarBeet.prev_fr_PHU">
-<span class="sig-name descname"><span class="pre">prev_fr_PHU</span></span><a class="headerlink" href="#RUFAS.routines.field.crop.crop_types.sugar_beet.SugarBeet.prev_fr_PHU" title="Permalink to this definition"></a></dt>
-<dd><p>LEAF AREA INDEX (LAI) DATA</p>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="RUFAS.routines.field.crop.crop_types.sugar_beet.SugarBeet.water_uptake_each_layer">
-<span class="sig-name descname"><span class="pre">water_uptake_each_layer</span></span><a class="headerlink" href="#RUFAS.routines.field.crop.crop_types.sugar_beet.SugarBeet.water_uptake_each_layer" title="Permalink to this definition"></a></dt>
-<dd><p>Nitrogen Uptake Data</p>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="RUFAS.routines.field.crop.crop_types.sugar_beet.SugarBeet.z_root">
-<span class="sig-name descname"><span class="pre">z_root</span></span><a class="headerlink" href="#RUFAS.routines.field.crop.crop_types.sugar_beet.SugarBeet.z_root" title="Permalink to this definition"></a></dt>
-<dd><p>BIOMASS DATA</p>
-</dd></dl>
-
-</dd></dl>
-
+<section id="rufas-routines-field-crop-crop-types-sugar-beet-module">
+<h2>RUFAS.routines.field.crop.crop_types.sugar_beet module<a class="headerlink" href="#rufas-routines-field-crop-crop-types-sugar-beet-module" title="Link to this heading"></a></h2>
 </section>
-<section id="module-RUFAS.routines.field.crop.crop_types.tall_fescue">
-<span id="rufas-routines-field-crop-crop-types-tall-fescue-module"></span><h2>RUFAS.routines.field.crop.crop_types.tall_fescue module<a class="headerlink" href="#module-RUFAS.routines.field.crop.crop_types.tall_fescue" title="Permalink to this heading"></a></h2>
-<dl class="py class">
-<dt class="sig sig-object py" id="RUFAS.routines.field.crop.crop_types.tall_fescue.TallFescue">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">RUFAS.routines.field.crop.crop_types.tall_fescue.</span></span><span class="sig-name descname"><span class="pre">TallFescue</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">crop_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.field.crop.crop_types.tall_fescue.TallFescue" title="Permalink to this definition"></a></dt>
-<dd><p>Bases: <a class="reference internal" href="#RUFAS.routines.field.crop.crop_types.base_crop.BaseCrop" title="RUFAS.routines.field.crop.crop_types.base_crop.BaseCrop"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseCrop</span></code></a></p>
-<dl class="py attribute">
-<dt class="sig sig-object py" id="RUFAS.routines.field.crop.crop_types.tall_fescue.TallFescue.LAI_actual">
-<span class="sig-name descname"><span class="pre">LAI_actual</span></span><a class="headerlink" href="#RUFAS.routines.field.crop.crop_types.tall_fescue.TallFescue.LAI_actual" title="Permalink to this definition"></a></dt>
-<dd><p>ROOT DEPTH DATA</p>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="RUFAS.routines.field.crop.crop_types.tall_fescue.TallFescue.N_actual_up">
-<span class="sig-name descname"><span class="pre">N_actual_up</span></span><a class="headerlink" href="#RUFAS.routines.field.crop.crop_types.tall_fescue.TallFescue.N_actual_up" title="Permalink to this definition"></a></dt>
-<dd><p>Phosphorus Uptake Data</p>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="RUFAS.routines.field.crop.crop_types.tall_fescue.TallFescue.P_act_up">
-<span class="sig-name descname"><span class="pre">P_act_up</span></span><a class="headerlink" href="#RUFAS.routines.field.crop.crop_types.tall_fescue.TallFescue.P_act_up" title="Permalink to this definition"></a></dt>
-<dd><p>Yields Data</p>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="RUFAS.routines.field.crop.crop_types.tall_fescue.TallFescue.fix_nitrogen">
-<span class="sig-name descname"><span class="pre">fix_nitrogen</span></span><a class="headerlink" href="#RUFAS.routines.field.crop.crop_types.tall_fescue.TallFescue.fix_nitrogen" title="Permalink to this definition"></a></dt>
-<dd><p>HEAT UNIT DATA</p>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="RUFAS.routines.field.crop.crop_types.tall_fescue.TallFescue.prev_biomass_actual">
-<span class="sig-name descname"><span class="pre">prev_biomass_actual</span></span><a class="headerlink" href="#RUFAS.routines.field.crop.crop_types.tall_fescue.TallFescue.prev_biomass_actual" title="Permalink to this definition"></a></dt>
-<dd><p>Soil Water Uptake Data</p>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="RUFAS.routines.field.crop.crop_types.tall_fescue.TallFescue.prev_fr_PHU">
-<span class="sig-name descname"><span class="pre">prev_fr_PHU</span></span><a class="headerlink" href="#RUFAS.routines.field.crop.crop_types.tall_fescue.TallFescue.prev_fr_PHU" title="Permalink to this definition"></a></dt>
-<dd><p>LEAF AREA INDEX (LAI) DATA</p>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="RUFAS.routines.field.crop.crop_types.tall_fescue.TallFescue.water_uptake_each_layer">
-<span class="sig-name descname"><span class="pre">water_uptake_each_layer</span></span><a class="headerlink" href="#RUFAS.routines.field.crop.crop_types.tall_fescue.TallFescue.water_uptake_each_layer" title="Permalink to this definition"></a></dt>
-<dd><p>Nitrogen Uptake Data</p>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="RUFAS.routines.field.crop.crop_types.tall_fescue.TallFescue.z_root">
-<span class="sig-name descname"><span class="pre">z_root</span></span><a class="headerlink" href="#RUFAS.routines.field.crop.crop_types.tall_fescue.TallFescue.z_root" title="Permalink to this definition"></a></dt>
-<dd><p>BIOMASS DATA</p>
-</dd></dl>
-
-</dd></dl>
-
+<section id="rufas-routines-field-crop-crop-types-tall-fescue-module">
+<h2>RUFAS.routines.field.crop.crop_types.tall_fescue module<a class="headerlink" href="#rufas-routines-field-crop-crop-types-tall-fescue-module" title="Link to this heading"></a></h2>
 </section>
 <section id="module-RUFAS.routines.field.crop.crop_types">
-<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-RUFAS.routines.field.crop.crop_types" title="Permalink to this heading"></a></h2>
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-RUFAS.routines.field.crop.crop_types" title="Link to this heading"></a></h2>
 </section>
 </section>
 

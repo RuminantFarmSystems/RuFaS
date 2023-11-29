@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>RUFAS.routines.manure_storage package &mdash; Ruminant Farm Simulation (RuFaS)  documentation</title>
@@ -11,12 +11,11 @@
     <script src="_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
-        <script src="_static/jquery.js"></script>
-        <script src="_static/underscore.js"></script>
-        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
-        <script src="_static/doctools.js"></script>
-        <script src="_static/sphinx_highlight.js"></script>
+        <script src="_static/jquery.js?v=5d32c60e"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="_static/documentation_options.js?v=5929fcd5"></script>
+        <script src="_static/doctools.js?v=888ff710"></script>
+        <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
@@ -29,11 +28,15 @@
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-            <a href="index.html" class="icon icon-home"> Ruminant Farm Simulation (RuFaS)
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            Ruminant Farm Simulation (RuFaS)
           </a>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" />
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
     <input type="hidden" name="check_keywords" value="yes" />
     <input type="hidden" name="area" value="default" />
   </form>
@@ -50,12 +53,12 @@
 </li>
 <li class="toctree-l3"><a class="reference internal" href="RUFAS.html#submodules">Submodules</a></li>
 <li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.classes">RUFAS.classes module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.database_reader">RUFAS.database_reader module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#rufas-database-reader-module">RUFAS.database_reader module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.errors">RUFAS.errors module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.general_constants">RUFAS.general_constants module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.output_manager">RUFAS.output_manager module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.simulation_engine">RUFAS.simulation_engine module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.user_prompt">RUFAS.user_prompt module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#rufas-user-prompt-module">RUFAS.user_prompt module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.util">RUFAS.util module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS">Module contents</a></li>
 </ul>
@@ -81,7 +84,7 @@
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a href="index.html" class="icon icon-home"></a></li>
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
           <li class="breadcrumb-item"><a href="modules.html">GitHub</a></li>
           <li class="breadcrumb-item"><a href="RUFAS.html">RUFAS package</a></li>
           <li class="breadcrumb-item"><a href="RUFAS.routines.html">RUFAS.routines package</a></li>
@@ -96,361 +99,24 @@
            <div itemprop="articleBody">
              
   <section id="rufas-routines-manure-storage-package">
-<h1>RUFAS.routines.manure_storage package<a class="headerlink" href="#rufas-routines-manure-storage-package" title="Permalink to this heading"></a></h1>
+<h1>RUFAS.routines.manure_storage package<a class="headerlink" href="#rufas-routines-manure-storage-package" title="Link to this heading"></a></h1>
 <section id="submodules">
-<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this heading"></a></h2>
+<h2>Submodules<a class="headerlink" href="#submodules" title="Link to this heading"></a></h2>
 </section>
-<section id="module-RUFAS.routines.manure_storage.manure_emissions">
-<span id="rufas-routines-manure-storage-manure-emissions-module"></span><h2>RUFAS.routines.manure_storage.manure_emissions module<a class="headerlink" href="#module-RUFAS.routines.manure_storage.manure_emissions" title="Permalink to this heading"></a></h2>
-<p>RUFAS: Ruminant Farm Systems Model</p>
-<p>File name: manure_emissions.py</p>
-<p>Description:</p>
-<p>Author(s): William Donovan, <a class="reference external" href="mailto:wmdonovan&#37;&#52;&#48;wisc&#46;edu">wmdonovan<span>&#64;</span>wisc<span>&#46;</span>edu</a></p>
-<dl class="py function">
-<dt class="sig sig-object py" id="RUFAS.routines.manure_storage.manure_emissions.WIP_WOP_frac">
-<span class="sig-prename descclassname"><span class="pre">RUFAS.routines.manure_storage.manure_emissions.</span></span><span class="sig-name descname"><span class="pre">WIP_WOP_frac</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">storage</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.manure_storage.manure_emissions.WIP_WOP_frac" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="RUFAS.routines.manure_storage.manure_emissions.methane">
-<span class="sig-prename descclassname"><span class="pre">RUFAS.routines.manure_storage.manure_emissions.</span></span><span class="sig-name descname"><span class="pre">methane</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">storage</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">manure</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.manure_storage.manure_emissions.methane" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="RUFAS.routines.manure_storage.manure_emissions.update_all">
-<span class="sig-prename descclassname"><span class="pre">RUFAS.routines.manure_storage.manure_emissions.</span></span><span class="sig-name descname"><span class="pre">update_all</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">storage</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">manure</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.manure_storage.manure_emissions.update_all" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
-
+<section id="rufas-routines-manure-storage-manure-emissions-module">
+<h2>RUFAS.routines.manure_storage.manure_emissions module<a class="headerlink" href="#rufas-routines-manure-storage-manure-emissions-module" title="Link to this heading"></a></h2>
 </section>
-<section id="module-RUFAS.routines.manure_storage.manure_handling">
-<span id="rufas-routines-manure-storage-manure-handling-module"></span><h2>RUFAS.routines.manure_storage.manure_handling module<a class="headerlink" href="#module-RUFAS.routines.manure_storage.manure_handling" title="Permalink to this heading"></a></h2>
-<p>RUFAS: Ruminant Farm Systems Model</p>
-<p>File name: manure_handling.py</p>
-<p>Description:
-Description: Calculates nutrient losses and transformations during manure</p>
-<blockquote>
-<div><p>handling and updates separators. update_all() is called during
-the daily_manure_storage_routine() and it is the only method
-intended to be called from this file.</p>
-</div></blockquote>
-<p>Author(s): William Donovan, <a class="reference external" href="mailto:wmdonovan&#37;&#52;&#48;wisc&#46;edu">wmdonovan<span>&#64;</span>wisc<span>&#46;</span>edu</a></p>
-<dl class="py function">
-<dt class="sig sig-object py" id="RUFAS.routines.manure_storage.manure_handling.CH4">
-<span class="sig-prename descclassname"><span class="pre">RUFAS.routines.manure_storage.manure_handling.</span></span><span class="sig-name descname"><span class="pre">CH4</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pen</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">manure</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.manure_storage.manure_handling.CH4" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="RUFAS.routines.manure_storage.manure_handling.K_loss">
-<span class="sig-prename descclassname"><span class="pre">RUFAS.routines.manure_storage.manure_handling.</span></span><span class="sig-name descname"><span class="pre">K_loss</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pen</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">manure</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.manure_storage.manure_handling.K_loss" title="Permalink to this definition"></a></dt>
-<dd><dl class="simple">
-<dt>Description:</dt><dd><p>Updates Potassium mass in the separator from excreted manure
-“pseudocode_manure_storage” MS.3.D</p>
-</dd>
-<dt>Args:</dt><dd><p>pen
-manure</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="RUFAS.routines.manure_storage.manure_handling.N_loss">
-<span class="sig-prename descclassname"><span class="pre">RUFAS.routines.manure_storage.manure_handling.</span></span><span class="sig-name descname"><span class="pre">N_loss</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pen</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">manure</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.manure_storage.manure_handling.N_loss" title="Permalink to this definition"></a></dt>
-<dd><dl class="simple">
-<dt>Description:</dt><dd><p>Updates Nitrogen mass in the separator from excreted manure
-“pseudocode_manure_storage” MS.3.B</p>
-</dd>
-<dt>Args:</dt><dd><p>pen
-manure</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="RUFAS.routines.manure_storage.manure_handling.P_loss">
-<span class="sig-prename descclassname"><span class="pre">RUFAS.routines.manure_storage.manure_handling.</span></span><span class="sig-name descname"><span class="pre">P_loss</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pen</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">manure</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.manure_storage.manure_handling.P_loss" title="Permalink to this definition"></a></dt>
-<dd><blockquote>
-<div><dl class="simple">
-<dt>Description:</dt><dd><p>Updates Phosphorus mass in the separator from excreted manure</p>
-</dd>
-</dl>
-</div></blockquote>
-<p>”       pseudocode_manure_storage” MS.3.C</p>
-<blockquote>
-<div><dl class="simple">
-<dt>Args:</dt><dd><p>pen
-manure</p>
-</dd>
-</dl>
-</div></blockquote>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="RUFAS.routines.manure_storage.manure_handling.WIP_WOP">
-<span class="sig-prename descclassname"><span class="pre">RUFAS.routines.manure_storage.manure_handling.</span></span><span class="sig-name descname"><span class="pre">WIP_WOP</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pen</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">manure</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.manure_storage.manure_handling.WIP_WOP" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="RUFAS.routines.manure_storage.manure_handling.flush_water">
-<span class="sig-prename descclassname"><span class="pre">RUFAS.routines.manure_storage.manure_handling.</span></span><span class="sig-name descname"><span class="pre">flush_water</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pen</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">manure</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.manure_storage.manure_handling.flush_water" title="Permalink to this definition"></a></dt>
-<dd><dl class="simple">
-<dt>Description:</dt><dd><p>Calculates Flush Water Volume in the separator that processes the
-collected manure
-“pseudocode_manure_storage” MS.3.A</p>
-</dd>
-<dt>Args:</dt><dd><p>pen
-manure</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="RUFAS.routines.manure_storage.manure_handling.solids">
-<span class="sig-prename descclassname"><span class="pre">RUFAS.routines.manure_storage.manure_handling.</span></span><span class="sig-name descname"><span class="pre">solids</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pen</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">manure</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.manure_storage.manure_handling.solids" title="Permalink to this definition"></a></dt>
-<dd><dl class="simple">
-<dt>Description:</dt><dd><p>Updates Total and Volatile Solids in the separator from excreted manure
-“pseudocode_manure_storage” MS.3.E</p>
-</dd>
-<dt>Args:</dt><dd><p>pen
-manure</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="RUFAS.routines.manure_storage.manure_handling.update_all">
-<span class="sig-prename descclassname"><span class="pre">RUFAS.routines.manure_storage.manure_handling.</span></span><span class="sig-name descname"><span class="pre">update_all</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pen</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">manure</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.manure_storage.manure_handling.update_all" title="Permalink to this definition"></a></dt>
-<dd><dl class="simple">
-<dt>Description:</dt><dd><p>Calls functions to calculate nutrient losses and transformations during
-manure handling.
-“pseudocode_manure_storage” MS.3</p>
-</dd>
-<dt>Args:</dt><dd><dl class="simple">
-<dt>pen: an instance of the Pen class specified in pen.py representing</dt><dd><p>the pen from which manure is being collected</p>
-</dd>
-<dt>manure: an instance of the ManureStorage class specified in</dt><dd><p>manure_storage.py</p>
-</dd>
-</dl>
-</dd>
-</dl>
-</dd></dl>
-
+<section id="rufas-routines-manure-storage-manure-handling-module">
+<h2>RUFAS.routines.manure_storage.manure_handling module<a class="headerlink" href="#rufas-routines-manure-storage-manure-handling-module" title="Link to this heading"></a></h2>
 </section>
-<section id="module-RUFAS.routines.manure_storage.manure_separator">
-<span id="rufas-routines-manure-storage-manure-separator-module"></span><h2>RUFAS.routines.manure_storage.manure_separator module<a class="headerlink" href="#module-RUFAS.routines.manure_storage.manure_separator" title="Permalink to this heading"></a></h2>
-<p>RUFAS: Ruminant Farm Systems Model</p>
-<p>File name: manure_emissions.py</p>
-<p>Description:
-Description: Calculates nutrient losses and transformations during manure</p>
-<blockquote>
-<div><p>separation and updates storage receptacles. update_all() is
-called during the daily_manure_storage_routine() and it is the
-only method intended to be called from this file.</p>
-</div></blockquote>
-<p>Author(s): William Donovan, <a class="reference external" href="mailto:wmdonovan&#37;&#52;&#48;wisc&#46;edu">wmdonovan<span>&#64;</span>wisc<span>&#46;</span>edu</a></p>
-<dl class="py function">
-<dt class="sig sig-object py" id="RUFAS.routines.manure_storage.manure_separator.effluent_liquid">
-<span class="sig-prename descclassname"><span class="pre">RUFAS.routines.manure_storage.manure_separator.</span></span><span class="sig-name descname"><span class="pre">effluent_liquid</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">separator</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.manure_storage.manure_separator.effluent_liquid" title="Permalink to this definition"></a></dt>
-<dd><dl class="simple">
-<dt>Description:</dt><dd><p>Calculate liquid nutrient content of the separator
-“pseudocode_manure_storage” MS.4.A</p>
-</dd>
-<dt>Args:</dt><dd><p>separator</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="RUFAS.routines.manure_storage.manure_separator.effluent_solid">
-<span class="sig-prename descclassname"><span class="pre">RUFAS.routines.manure_storage.manure_separator.</span></span><span class="sig-name descname"><span class="pre">effluent_solid</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">separator</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.manure_storage.manure_separator.effluent_solid" title="Permalink to this definition"></a></dt>
-<dd><dl class="simple">
-<dt>Description:</dt><dd><p>Update solid nutrient content of the separator
-“pseudocode_manure_storage” MS.4.B</p>
-</dd>
-<dt>Args:</dt><dd><p>separator</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="RUFAS.routines.manure_storage.manure_separator.update_all">
-<span class="sig-prename descclassname"><span class="pre">RUFAS.routines.manure_storage.manure_separator.</span></span><span class="sig-name descname"><span class="pre">update_all</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">separator</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">manure</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.manure_storage.manure_separator.update_all" title="Permalink to this definition"></a></dt>
-<dd><dl class="simple">
-<dt>Description:</dt><dd><p>Calls functions to calculate nutrient losses and transformations during
-manure separation.
-“pseudocode_manure_storage” MS.4</p>
-</dd>
-<dt>Args:</dt><dd><dl class="simple">
-<dt>separator: an instance of the Separator class defined in</dt><dd><p>manure_storage.py</p>
-</dd>
-<dt>manure: an instance of the ManureStorage class defined in</dt><dd><p>manure_storage.py</p>
-</dd>
-</dl>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="RUFAS.routines.manure_storage.manure_separator.update_storage">
-<span class="sig-prename descclassname"><span class="pre">RUFAS.routines.manure_storage.manure_separator.</span></span><span class="sig-name descname"><span class="pre">update_storage</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">separator</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">manure</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.manure_storage.manure_separator.update_storage" title="Permalink to this definition"></a></dt>
-<dd><dl class="simple">
-<dt>Description:</dt><dd><p>Update solid and liquid nutrient contents of the storage receptacle
-“pseudocode_manure_storage” MS.4.C</p>
-</dd>
-<dt>Args:</dt><dd><p>separator
-manure</p>
-</dd>
-</dl>
-</dd></dl>
-
+<section id="rufas-routines-manure-storage-manure-separator-module">
+<h2>RUFAS.routines.manure_storage.manure_separator module<a class="headerlink" href="#rufas-routines-manure-storage-manure-separator-module" title="Link to this heading"></a></h2>
 </section>
-<section id="module-RUFAS.routines.manure_storage.manure_storage">
-<span id="rufas-routines-manure-storage-manure-storage-module"></span><h2>RUFAS.routines.manure_storage.manure_storage module<a class="headerlink" href="#module-RUFAS.routines.manure_storage.manure_storage" title="Permalink to this heading"></a></h2>
-<p>RUFAS: Ruminant Farm Systems Model
-File name: manure_storage.py</p>
-<p>Description:
-Description: Driver for the manure storage model</p>
-<p>Author(s): William Donovan, <a class="reference external" href="mailto:wmdonovan&#37;&#52;&#48;wisc&#46;edu">wmdonovan<span>&#64;</span>wisc<span>&#46;</span>edu</a></p>
-<dl class="py class">
-<dt class="sig sig-object py" id="RUFAS.routines.manure_storage.manure_storage.ManureStorage">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">RUFAS.routines.manure_storage.manure_storage.</span></span><span class="sig-name descname"><span class="pre">ManureStorage</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">animal_management</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.manure_storage.manure_storage.ManureStorage" title="Permalink to this definition"></a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<dl class="py class">
-<dt class="sig sig-object py" id="RUFAS.routines.manure_storage.manure_storage.ManureStorage.Pen">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Pen</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pen</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.manure_storage.manure_storage.ManureStorage.Pen" title="Permalink to this definition"></a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<dl class="py method">
-<dt class="sig sig-object py" id="RUFAS.routines.manure_storage.manure_storage.ManureStorage.Pen.calibrate_bedding">
-<span class="sig-name descname"><span class="pre">calibrate_bedding</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.manure_storage.manure_storage.ManureStorage.Pen.calibrate_bedding" title="Permalink to this definition"></a></dt>
-<dd><dl class="simple">
-<dt>Description:</dt><dd><p>Class helper method calibrates the empirical manure handling
-model
-“pseudocode_manure_storage” MS.2</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="RUFAS.routines.manure_storage.manure_storage.ManureStorage.Pen.calibrate_water_use">
-<span class="sig-name descname"><span class="pre">calibrate_water_use</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.manure_storage.manure_storage.ManureStorage.Pen.calibrate_water_use" title="Permalink to this definition"></a></dt>
-<dd><dl class="simple">
-<dt>Description:</dt><dd><p>Class helper method calibrates the empirical manure handling
-model
-“pseudocode_manure_storage” MS.2</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="RUFAS.routines.manure_storage.manure_storage.ManureStorage.Pen.update_pen">
-<span class="sig-name descname"><span class="pre">update_pen</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">animal_management</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.manure_storage.manure_storage.ManureStorage.Pen.update_pen" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
-
-</dd></dl>
-
-<dl class="py class">
-<dt class="sig sig-object py" id="RUFAS.routines.manure_storage.manure_storage.ManureStorage.Separator">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Separator</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pen</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.manure_storage.manure_storage.ManureStorage.Separator" title="Permalink to this definition"></a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<dl class="py method">
-<dt class="sig sig-object py" id="RUFAS.routines.manure_storage.manure_storage.ManureStorage.Separator.calibrate_separator">
-<span class="sig-name descname"><span class="pre">calibrate_separator</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.manure_storage.manure_storage.ManureStorage.Separator.calibrate_separator" title="Permalink to this definition"></a></dt>
-<dd><dl class="simple">
-<dt>Description:</dt><dd><p>Class helper method calibrates the empirical manure separator
-model
-“pseudocode_manure_storage” MS.2</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="RUFAS.routines.manure_storage.manure_storage.ManureStorage.Separator.reset_daily_variables">
-<span class="sig-name descname"><span class="pre">reset_daily_variables</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.manure_storage.manure_storage.ManureStorage.Separator.reset_daily_variables" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
-
-</dd></dl>
-
-<dl class="py class">
-<dt class="sig sig-object py" id="RUFAS.routines.manure_storage.manure_storage.ManureStorage.Storage">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Storage</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pen</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.manure_storage.manure_storage.ManureStorage.Storage" title="Permalink to this definition"></a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="RUFAS.routines.manure_storage.manure_storage.ManureStorage.annual_mass_balance">
-<span class="sig-name descname"><span class="pre">annual_mass_balance</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.manure_storage.manure_storage.ManureStorage.annual_mass_balance" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="RUFAS.routines.manure_storage.manure_storage.ManureStorage.annual_reset">
-<span class="sig-name descname"><span class="pre">annual_reset</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.manure_storage.manure_storage.ManureStorage.annual_reset" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="RUFAS.routines.manure_storage.manure_storage.ManureStorage.initialize_pens">
-<span class="sig-name descname"><span class="pre">initialize_pens</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">animal_management</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.manure_storage.manure_storage.ManureStorage.initialize_pens" title="Permalink to this definition"></a></dt>
-<dd><dl class="simple">
-<dt>Description:</dt><dd><p>Class helper method initializes ManureStorage’s dictionary of pens
-based on the Animal model</p>
-</dd>
-<dt>Args:</dt><dd><p>animal_management</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="RUFAS.routines.manure_storage.manure_storage.ManureStorage.initialize_separators">
-<span class="sig-name descname"><span class="pre">initialize_separators</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">animal_management</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.manure_storage.manure_storage.ManureStorage.initialize_separators" title="Permalink to this definition"></a></dt>
-<dd><dl class="simple">
-<dt>Description:</dt><dd><p>Class helper method initializes ManureStorage’s dictionary of
-separators based on the Animal model</p>
-</dd>
-<dt>Args:</dt><dd><p>animal_management</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="RUFAS.routines.manure_storage.manure_storage.ManureStorage.initialize_storage">
-<span class="sig-name descname"><span class="pre">initialize_storage</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">animal_management</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.manure_storage.manure_storage.ManureStorage.initialize_storage" title="Permalink to this definition"></a></dt>
-<dd><dl class="simple">
-<dt>Description:</dt><dd><p>Class helper method initializes ManureStorage’s dictionary of
-storage receptacles based on the Animal model</p>
-</dd>
-<dt>Args:</dt><dd><p>animal_management</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="RUFAS.routines.manure_storage.manure_storage.ManureStorage.reset_daily_variables">
-<span class="sig-name descname"><span class="pre">reset_daily_variables</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.manure_storage.manure_storage.ManureStorage.reset_daily_variables" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="RUFAS.routines.manure_storage.manure_storage.ManureStorage.summarize_annual_variables">
-<span class="sig-name descname"><span class="pre">summarize_annual_variables</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.manure_storage.manure_storage.ManureStorage.summarize_annual_variables" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="RUFAS.routines.manure_storage.manure_storage.ManureStorage.summarize_manure_storage">
-<span class="sig-name descname"><span class="pre">summarize_manure_storage</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.manure_storage.manure_storage.ManureStorage.summarize_manure_storage" title="Permalink to this definition"></a></dt>
-<dd><dl class="simple">
-<dt>Description:</dt><dd><p>Class method summarizes whole-model variables from components for
-output</p>
-</dd>
-</dl>
-</dd></dl>
-
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="RUFAS.routines.manure_storage.manure_storage.daily_manure_storage_routine">
-<span class="sig-prename descclassname"><span class="pre">RUFAS.routines.manure_storage.manure_storage.</span></span><span class="sig-name descname"><span class="pre">daily_manure_storage_routine</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">manure_storage</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">animal_management</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.manure_storage.manure_storage.daily_manure_storage_routine" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
-
+<section id="rufas-routines-manure-storage-manure-storage-module">
+<h2>RUFAS.routines.manure_storage.manure_storage module<a class="headerlink" href="#rufas-routines-manure-storage-manure-storage-module" title="Link to this heading"></a></h2>
 </section>
 <section id="module-RUFAS.routines.manure_storage">
-<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-RUFAS.routines.manure_storage" title="Permalink to this heading"></a></h2>
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-RUFAS.routines.manure_storage" title="Link to this heading"></a></h2>
 </section>
 </section>
 
