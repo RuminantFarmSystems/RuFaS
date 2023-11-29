@@ -262,6 +262,8 @@ class LayerData:
     """Fresh organic nitrogen content of this soil layer (kg / ha)
         Note: all layers except the top layer are initialized with 0 fresh organic nitrogen."""
 
+    nitrous_oxide_emissions: float = 0.0
+    """Amount of nitrous oxide emitted from this soil layer on the current day (kg / ha)."""
     annual_denitrified_nitrogen_total: float = 0
     """Cumulative total amount of nitrates that have denitrified in a year (kg / ha)"""
 
@@ -283,8 +285,17 @@ class LayerData:
     """Exchange factor that accounts for the soil's cation exchange capacity, default = 0.15 (unitless)
         Reference: SWAT Theoretical documentation eqn. 3:1.3.5"""
 
+    volatilized_ammonium_emissions: float = 0.0
+    """Amount of ammonium that volatilized out of the soil layer on the current day (kg / ha)."""
     annual_volatilized_ammonium_total: float = 0
     """Cumulative total of ammonium volatilized in this year (kg / ha)"""
+
+    percolated_nitrates: float = 0.0
+    """Amount of nitrates removed from the soil layer by water percolating out (kg / ha)."""
+    percolated_ammonium: float = 0.0
+    """Amount of ammonium removed from the soil layer by water percolating out (kg / ha)."""
+    percolated_active_organic_nitrogen: float = 0.0
+    """Amount of active organic nitrogen removed from the soil layer by water percolating out (kg / ha)."""
 
     # --- Carbon cycling
     soil_overall_carbon_fraction: Optional[float] = None
