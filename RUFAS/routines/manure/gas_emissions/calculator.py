@@ -996,7 +996,7 @@ class GasEmissionsCalculator:
             Resistance of :math:`NH_3` transport to the atmosphere in a barn, s/m.
 
         """
-        return hsc * (1 - 0.027 * (20.0 - temp))
+        return hsc * (1 - 0.027 * (20.0 - max(temp, -15.0)))
 
     @classmethod
     def _henry_law_coefficient_of_ammonia(cls, temp: float) -> float:
