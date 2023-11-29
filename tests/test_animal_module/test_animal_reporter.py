@@ -340,5 +340,27 @@ def test_report_sold_animal_information(mocker: MockerFixture):
     assert om.variables_pool["LifeCycleManager.daily_update.sold_report"]["values"] == [sold_report_expected]
 
 
-def test_report_305d_milk():
-    pass
+def test_report_305d_milk(mocker: MockerFixture):
+    animal_manager = mocker.MagicMock()
+    animal_manager.cows = [mocker.MagicMock(), mocker.MagicMock()]
+    for cow in animal_manager.cows:
+        cow.is_lactating = True
+    animal_manager.cows[0].latest_milk_production_305days = 100
+    animal_manager.cows[1].latest_milk_production_305days = 200
+
+    # act
+    AnimalReporter.report_305d_milk(animal_manager)
+
+    # assert it's 150
+    assert om.variables_pool["cow.update_milk_production_history.milk_production_305days_herd_mean"]["values"] == [
+        150.0
+    ]
+
+    animal_manager.cows[0].latest_milk_production_305days = 0.0
+    # re assert other case, different average
+    AnimalReporter.report_305d_milk(animal_manager)
+
+    # assert it's 150
+    assert om.variables_pool["cow.update_milk_production_history.milk_production_305days_herd_mean"]["values"] == [
+        150.0, 200.0
+    ]
