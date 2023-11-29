@@ -31,13 +31,15 @@ class NitrificationVolatilization:
         self.data = soil_data or SoilData(field_size=field_size)
 
     def do_daily_nitrification_and_volatilization(self) -> None:
-        """Conducts the nitrification and volatilization of ammonium within the soil profile on a daily basis.
+        """
+        Conducts the nitrification and volatilization of ammonium within the soil profile on a daily basis.
 
         References
         ----------
         SWAT Theoretical documentation section 3:1.3
 
         """
+        self.data.set_vectorized_layer_attribute("volatilized_ammonium_emissions", [0.0] * len(self.data.soil_layers))
         for layer in self.data.soil_layers:
             if layer.temperature <= 5:
                 continue
@@ -67,6 +69,7 @@ class NitrificationVolatilization:
 
             layer.ammonium_content -= total_ammonium_lost
             layer.nitrate_content += nitrified_ammonium
+            layer.volatilized_ammonium_emissions = volatilized_ammonium
             layer.annual_volatilized_ammonium_total += volatilized_ammonium
 
     # --- Static methods ---
