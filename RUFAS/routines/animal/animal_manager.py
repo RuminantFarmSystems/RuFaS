@@ -1592,10 +1592,11 @@ class AnimalManager:
             )
         return snapshot
 
-    def _handle_removed_animals_after_update(
-        self, animals_snapshot_before_update: Dict, animals_snapshot_after_update: Dict
-    ) -> None:
+    def _handle_removed_animals_after_update(self,
+                                             animals_snapshot_before_update: Dict[str, set | Dict],
+                                             animals_snapshot_after_update: Dict[str, set | Dict]) -> None:
         """
+        Dict[str, Dict[Union[Calf | HeiferI | HeiferII | HeiferIII]]]
         Identifies and handles animals that were present prior to the update, but not afterwards.
 
         This function detects any animals that have been removed between updates (e.g., due to graduation,
