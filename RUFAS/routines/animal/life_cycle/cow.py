@@ -267,7 +267,11 @@ class Cow(HeiferIII):
         Updates the animal's milk production history by appending a
         MilkProductionHistory object to the list.
 
-        Args:
+        If milk production history has already been updated for the day,
+        the most recent entry is deleted before appending the latest values.
+
+        Parameter
+        ---------
             sim_day: simulation day
         """
         if len(self.milk_production_history) > 0 and self.milk_production_history[-1].simulation_day == sim_day:
