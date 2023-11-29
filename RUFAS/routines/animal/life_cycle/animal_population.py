@@ -22,12 +22,10 @@ class AnimalPopulation:
     order_by_random: bool = True
 
     def __post_init__(self):
-        print(len([i.id for i in self.calves]), len(set([i.id for i in self.calves])))
-        print(len([i.id for i in self.heiferIs]), len(set([i.id for i in self.heiferIs])))
-        print(len([i.id for i in self.heiferIIs]), len(set([i.id for i in self.heiferIIs])))
-        print(len([i.id for i in self.heiferIIIs]), len(set([i.id for i in self.heiferIIIs])))
-        print(len([i.id for i in self.cows]), len(set([i.id for i in self.cows])))
-        print(len([i.id for i in self.replacement]), len(set([i.id for i in self.replacement])))
+        ids = [i.id for i in self.calves] + [i.id for i in self.heiferIs] + [i.id for i in self.heiferIIs] + \
+              [i.id for i in self.heiferIIIs] + [i.id for i in self.cows] + [i.id for i in self.replacement]
+        if ids:
+            self.current_animal_id = max(ids)
 
     def __repr__(self):
         return {
