@@ -1,10 +1,3 @@
-"""
-RUFAS: Ruminant Farm Systems Model
-File name: test_animal_manager.py
-Description: Implements test cases for the AnimalManager class
-Author(s): Pooya Hekmati, sh2235@cornell.edu, Anchey Peng, ap724@cornell.edu
-"""
-
 from typing import Any
 from typing import List, Dict, Union
 from mock import MagicMock, patch

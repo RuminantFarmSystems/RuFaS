@@ -1,10 +1,3 @@
-"""
-RUFAS: Ruminant Farm Systems Model
-File name: test_animal.py
-Description: Implements test cases
-Author(s): Michael Richards mr2732@cornell.edu
-"""
-
 from unittest.mock import patch
 from pytest_mock import MockerFixture
 from RUFAS.routines.animal.life_cycle.cow import Cow
