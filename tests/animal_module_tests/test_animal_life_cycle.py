@@ -9,6 +9,7 @@ from pytest import fixture
 from pytest_mock import MockerFixture
 
 from RUFAS.config import Config
+from RUFAS.input_manager import InputManager
 from RUFAS.routines.animal.animal_typed_dicts import AnimalConfigTypedDict, HerdInfoTypedDict
 from RUFAS.routines.animal.life_cycle import animal_constants
 from RUFAS.routines.animal.life_cycle.animal_constants import ENTER_HERD
@@ -130,7 +131,15 @@ def test_initialize_herd(mocker: MockerFixture, life_cycle_manager: LifeCycleMan
                                                      breed=breed)
 
 
-    life_cycle_manager.animal_config = mocker.MagicMock(autospec=AnimalConfigTypedDict)
+    mock_input_manager = InputManager()
+    patch_im_getdata = mocker.patch.object(mock_input_manager, 'get_data', return_value={
+        "calves": [],
+        "heiferIs": [],
+        "heiferIIs": [],
+        "heiferIIIs": [],
+        "cows": [],
+        "replacement": []
+    })
 
     mock_animal_population = mocker.MagicMock(autospec=AnimalPopulation)
     mock_replacement_cows = [mocker.MagicMock(autospec=Cow) for _ in range(herd_data['replace_num'])]
@@ -144,6 +153,7 @@ def test_initialize_herd(mocker: MockerFixture, life_cycle_manager: LifeCycleMan
     results = life_cycle_manager.initialize_herd(herd_data)
 
     assert life_cycle_manager.herd_num == herd_data['herd_num']
+    patch_im_getdata.assert_called_once_with("runtime_animal_population")
     patch_set_avg_CI.assert_called_once()
     assert patch_get_animals.call_count == 5
     assert patch_get_animals.call_args_list[0] == mocker.call(Calf)

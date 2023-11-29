@@ -342,14 +342,28 @@ def execute_simulations(
             output_manager.add_log(
                 "Validation complete", "Data is valid. \nSimulating...\n", info_map
             )
+            output_manager.add_log(
+                "Herd initialization start",
+                f"Initializing herd data for {str(metadata_file['path'])}...\n",
+                info_map
+            )
             animal_factory = AnimalFactory(
                 init_herd=init_herd,
                 save_animals=save_animals,
                 save_animals_path=save_animals_dir)
             animal_factory.initialize_herd()
 
+            output_manager.add_log(
+                "Herd initialization complete",
+                f"Herd data for {str(metadata_file['path'])} initialized.\n",
+                info_map
+            )
+
             if terminate_simulation_post_herd_generation:
-                return
+                output_manager.add_log("Herd generation only",
+                                       f"***Only generating herd data, no simulation will follow.***",
+                                       info_map)
+
             else:
                 simulator = SimulationEngine()
                 simulator.simulate()
