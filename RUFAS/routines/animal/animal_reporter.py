@@ -8,6 +8,7 @@ from RUFAS.routines.animal.life_cycle.heiferIII import HeiferIII
 from RUFAS.routines.animal.life_cycle.cow import Cow
 
 # from RUFAS.routines.animal.pen import Pen
+# from RUFAS.routines.animal.animal_manager import AnimalManager
 from RUFAS.routines.animal.manure.general_manure import AnimalManureExcretions
 
 # from RUFAS.routines.animal import AnimalManager
@@ -16,9 +17,6 @@ om = OutputManager()
 
 
 class AnimalReporter:
-    def __init__():
-        pass
-
     def report_daily_animal_population(animal_manager) -> None:
         """
         Adds daily totals for animal types to output manager.
@@ -211,7 +209,14 @@ class AnimalReporter:
                 )
 
     def report_pen_manure(pen) -> None:
-        """ """
+        """
+        Adds pen manure data to output manager.
+
+        Parameters
+        ----------
+        pen : Pen
+            Current pen.
+        """
         info_map = {
             "class": "pen",
             "function": "calc_manure",
@@ -225,7 +230,7 @@ class AnimalReporter:
         for manure_property, manure_value in pen.manure.items():
             om.add_variable(f"pen_{pen.id}_daily_{str(manure_property)}", manure_value, info_map=info_map)
 
-    def report_life_cycle_manager_data(life_cycle_manager, sim_day: int):
+    def report_life_cycle_manager_data(life_cycle_manager, sim_day: int) -> None:
         """
         Adds daily life cycle data to output manager.
 
@@ -336,7 +341,8 @@ class AnimalReporter:
 
     def report_305d_milk(animal_manager):
         """
-        Adds latest_milk_production_305days to output manager.
+        Adds herd mean of latest_milk_production_305days to output manager,
+        though only for lactating cows with nonzero values.
 
         Parameters
         ----------
