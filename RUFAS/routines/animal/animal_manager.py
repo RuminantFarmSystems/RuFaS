@@ -21,27 +21,26 @@ from statistics import mean
 from typing import Any, Dict, Tuple, List, Set
 
 from RUFAS.general_constants import GeneralConstants
-from RUFAS.time import Time
-from RUFAS.weather import Weather
 from RUFAS.output_manager import OutputManager
 from RUFAS.routines.animal.animal_grouping_scenarios import AnimalGroupingScenario
-from RUFAS.routines.animal.animal_types import AnimalType
 from RUFAS.routines.animal.animal_module_constants import AnimalModuleConstants
+from RUFAS.routines.animal.animal_types import AnimalType
 from RUFAS.routines.animal.life_cycle.animal_base import AnimalBase
+from RUFAS.routines.animal.life_cycle.calf import Calf
 from RUFAS.routines.animal.life_cycle.cow import Cow
 from RUFAS.routines.animal.life_cycle.heiferI import HeiferI
 from RUFAS.routines.animal.life_cycle.heiferII import HeiferII
 from RUFAS.routines.animal.life_cycle.heiferIII import HeiferIII
 from RUFAS.routines.animal.life_cycle.life_cycle import LifeCycleManager
-from RUFAS.routines.animal.life_cycle.calf import Calf
 from RUFAS.routines.animal.pen import Pen
 from RUFAS.routines.animal.ration import ration_driver as ration_driver
-from RUFAS.routines.feed.feed import Feed
-from RUFAS.routines.animal.ration.calf_ration import CalfRationManager
-from RUFAS.routines.animal.ration.ration_driver import RationReporter
-from RUFAS.routines.animal.ration.ration_driver import RationManager
-
 from RUFAS.routines.animal.ration import user_defined_ration as udr
+from RUFAS.routines.animal.ration.calf_ration import CalfRationManager
+from RUFAS.routines.animal.ration.ration_driver import RationManager
+from RUFAS.routines.animal.ration.ration_driver import RationReporter
+from RUFAS.routines.feed.feed import Feed
+from RUFAS.time import Time
+from RUFAS.weather import Weather
 
 om = OutputManager()
 
@@ -77,7 +76,7 @@ class AnimalManager:
         Pen.AnimalCombination.CLOSE_UP: AnimalModuleConstants.DEFAULT_NUM_STALLS_FOR_CLOSE_UP_PEN,
         Pen.AnimalCombination.LAC_COW: AnimalModuleConstants.DEFAULT_NUM_STALLS_FOR_LAC_COW_PEN,
         Pen.AnimalCombination.GROWING_AND_CLOSE_UP:
-        AnimalModuleConstants.DEFAULT_NUM_STALLS_FOR_GROWING_AND_CLOSE_UP_PEN,
+            AnimalModuleConstants.DEFAULT_NUM_STALLS_FOR_GROWING_AND_CLOSE_UP_PEN,
     }
 
     ANIMAL_GROUPING_SCENARIO = AnimalGroupingScenario.CALF__GROWING__CLOSE_UP__LACCOW
@@ -1641,46 +1640,10 @@ class AnimalManager:
 
             self._handle_newly_added_animals([*animals_added, *calves_born], feed, temp)
 
-            info_map = {"class": self.__class__.__name__, "function": self.daily_updates.__name__}
-            om.add_variable('sim_day', self.simulation_day, info_map)
-            om.add_variable('num_animals', len(self.calves) + len(self.heiferIs) + len(self.heiferIIs) +
-                            len(self.heiferIIIs) + len(self.cows), info_map)
-            om.add_variable('num_calves', len(self.calves), info_map)
-            om.add_variable('num_heiferIs', len(self.heiferIs), info_map)
-            om.add_variable('num_heiferIIs', len(self.heiferIIs), info_map)
-            om.add_variable('num_heiferIIIs', len(self.heiferIIIs), info_map)
-            om.add_variable('num_lactating_cows', len([cow for cow in self.cows if cow.is_lactating]), info_map)
-            om.add_variable('num_dry_cows', len([cow for cow in self.cows if not cow.is_lactating]), info_map)
-            om.add_variable('num_cows', len(self.cows), info_map)
-            om.add_variable('num_cow_parity_1', self.life_cycle_manager.num_cow_for_parity['1'], info_map)
-            om.add_variable('num_cow_parity_2', self.life_cycle_manager.num_cow_for_parity['2'], info_map)
-            om.add_variable('num_cow_parity_3', self.life_cycle_manager.num_cow_for_parity['3'], info_map)
-            om.add_variable('num_cow_parity_3+', self.life_cycle_manager.num_cow_for_parity['greater_than_3'], info_map)
-
+            self._record_animal_counts()
             if time.is_last_day_of_simulation:
-                inseminated_heiferIIs = 0
-                pregnant_heiferIIs = 0
-                not_pregnant_heiferIIs = 0
-                for heiferII in self.heiferIIs:
-                    om.add_variable(f'heiferII_{heiferII.id}_last_day',
-                                    heiferII.events,
-                                    info_map)
-                    for day_str, event_list in heiferII.events.events.items():
-                        for event in event_list:
-                            if "inseminated" in event:
-                                inseminated_heiferIIs += 1
-                            if "heifer pregnant" in event:
-                                pregnant_heiferIIs += 1
-                            if "heifer not pregnant" in event:
-                                not_pregnant_heiferIIs += 1
-                om.add_variable('inseminated_heiferIIs', inseminated_heiferIIs, info_map)
-                om.add_variable('pregnant_heiferIIs', pregnant_heiferIIs, info_map)
-                om.add_variable('non_pregnant_heiferIIs', not_pregnant_heiferIIs, info_map)
-
-                for cow in self.cows:
-                    om.add_variable(f'cow_{cow.id}_last_day',
-                                    cow.events,
-                                    info_map)
+                self._record_animal_events(self.heiferIIs)
+                self._record_animal_events(self.cows)
 
             manure_excretions_output_data = {}
             for pen in self.all_pens:
@@ -1717,3 +1680,48 @@ class AnimalManager:
                             animal.update_milk_production_history(self.simulation_day)
 
             self.life_cycle_manager.daily_milk_production = self.sum_daily_milk(self.cows)
+
+    def _record_animal_events(self, animals: list[Calf, HeiferI, HeiferII, HeiferIII, Cow]) -> None:
+        """
+        Record the events of the animals.
+
+        Parameters
+        ----------
+        animals : list[Calf, HeiferI, HeiferII, HeiferIII, Cow]
+            A list of animals.
+
+        Returns
+        -------
+        None
+        """
+
+        info_map = {"class": self.__class__.__name__, "function": self._record_animal_events.__name__}
+        for animal in animals:
+            om.add_variable(f'{animal.__class__.__name__}_{animal.id}_last_day',
+                            animal.events,
+                            info_map)
+
+    def _record_animal_counts(self) -> None:
+        """
+        Record the number of animals in each animal class.
+
+        Returns
+        -------
+        None
+        """
+
+        info_map = {"class": self.__class__.__name__, "function": self._record_animal_counts.__name__}
+        om.add_variable('sim_day', self.simulation_day, info_map)
+        om.add_variable('num_animals', len(self.calves) + len(self.heiferIs) + len(self.heiferIIs) +
+                        len(self.heiferIIIs) + len(self.cows), info_map)
+        om.add_variable('num_calves', len(self.calves), info_map)
+        om.add_variable('num_heiferIs', len(self.heiferIs), info_map)
+        om.add_variable('num_heiferIIs', len(self.heiferIIs), info_map)
+        om.add_variable('num_heiferIIIs', len(self.heiferIIIs), info_map)
+        om.add_variable('num_lactating_cows', len([cow for cow in self.cows if cow.is_lactating]), info_map)
+        om.add_variable('num_dry_cows', len([cow for cow in self.cows if not cow.is_lactating]), info_map)
+        om.add_variable('num_cows', len(self.cows), info_map)
+        om.add_variable('num_cow_parity_1', self.life_cycle_manager.num_cow_for_parity['1'], info_map)
+        om.add_variable('num_cow_parity_2', self.life_cycle_manager.num_cow_for_parity['2'], info_map)
+        om.add_variable('num_cow_parity_3', self.life_cycle_manager.num_cow_for_parity['3'], info_map)
+        om.add_variable('num_cow_parity_3+', self.life_cycle_manager.num_cow_for_parity['greater_than_3'], info_map)

@@ -9,7 +9,7 @@ class HerdCompositionGraphGenerator:
     @staticmethod
     def generate_herd_composition_graph(indir: Path, outdir: Path, infile_name_substr: str,
                                         outfile_name: str = 'herd_composition.png',
-                                        common_prefix: str = 'AnimalManager.daily_updates.') -> None:
+                                        common_prefix: str = 'AnimalManager._record_animal_counts.') -> None:
         # Load Data
         csv_files = list(indir.glob(f'*{infile_name_substr}*.csv'))
         if not csv_files:
@@ -46,7 +46,7 @@ class HerdCompositionGraphGenerator:
     @staticmethod
     def generate_cow_parity_composition_graph(indir: Path, outdir: Path, infile_name_substr: str,
                                               outfile_name: str = 'cow_parity_composition.png',
-                                              common_prefix: str = 'AnimalManager.daily_updates.') -> None:
+                                              common_prefix: str = 'AnimalManager._record_animal_counts.') -> None:
         # Load Data
         csv_files = list(indir.glob(f'*{infile_name_substr}*.csv'))
         if not csv_files:

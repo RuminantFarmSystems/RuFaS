@@ -707,7 +707,7 @@ class Cow(HeiferIII):
                         AnimalBase.config['cow_repro_programs']['estrus_detection_rate']:
                     # Estrus detected
                     self.events.add_event(
-                        self.days_born, sim_day, const.ESTRUS_DETECTED)
+                        self.days_born, sim_day, const.ESTRUS_DETECTED_NOTE)
                     estrus_service_rand = random()
                     if estrus_service_rand < \
                             AnimalBase.config['cow_repro_programs']['estrus_service_rate']:
@@ -973,7 +973,7 @@ class Cow(HeiferIII):
                         AnimalBase.config['cow_repro_programs']['estrus_detection_rate']:
                     # Estrus detected
                     self.events.add_event(
-                        self.days_born, sim_day, const.ESTRUS_DETECTED)
+                        self.days_born, sim_day, const.ESTRUS_DETECTED_NOTE)
                     estrus_service_rand = random()
                     if estrus_service_rand < \
                             AnimalBase.config['cow_repro_programs']['estrus_service_rate']:
@@ -1183,7 +1183,7 @@ class Cow(HeiferIII):
             return True
 
     @property
-    def avg_estrus_cycle(self):
+    def get_avg_estrus_cycle(self):
         """
         Get the literature value for the average estrus cycle length for cows.
 
@@ -1196,7 +1196,7 @@ class Cow(HeiferIII):
         return AnimalBase.config['avg_estrus_cycle_cow']
 
     @property
-    def std_estrus_cycle(self):
+    def get_std_estrus_cycle(self):
         """
         Get the literature value for the standard deviation of the estrus cycle length for cows.
 

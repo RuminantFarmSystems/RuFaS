@@ -237,7 +237,7 @@
             "type": "string",
             "description": "Heifer Reproductive Program (select one) -- TAI - Timed Artificial Insemination; ED - Estrus Detection; Synch-ED - Combination of ED and TAI",
             "default": "TAI",
-            "pattern": "^(TAI|ED|Synch-ED)$"
+            "pattern": "^(TAI|ED|SynchED)$"
           },
           "cow_repro_method": {
             "type": "string",

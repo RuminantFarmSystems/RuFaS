@@ -16,18 +16,21 @@ INSEMINATED_W_BASE = "inseminated with "
 BREEDING_START = "breeding start"
 DO_NOT_BREED = "mark as do not breed"
 
-ESTRUS_DETECTED = "estrus detected"
+ESTRUS_DETECTED_NOTE = "estrus detected"
+ESTRUS_NOT_DETECTED_NOTE = "estrus not detected"
 BASIC_ESTRUS_NOTE = "estrus"
 
 # When days born == estrus day
-ESTRUS_OCCURRED = "estrus occurred"
+ESTRUS_OCCURRED_NOTE = "estrus occurred"
 
 # When simulate_estrus() is called
 ESTRUS_DAY_SCHEDULED_NOTE = "estrus day scheduled"
 
 AI_DAY_SCHEDULED_NOTE = "AI day scheduled"
 AI_PERFORMED_NOTE = "AI performed"
-REBREEDING_NOTE = "rebreeding and using ED"
+TAI_AFTER_ESTRUS_NOT_DETECTED_IN_SYNCH_ED_NOTE = "TAI after estrus not detected in SynchED"
+REBREEDING_NOTE = "rebreeding start"
+SETTING_REPRO_PROGRAM_NOTE = "setting repro program"
 
 ESTRUS_AFTER_AI_NOTE = "estrus after AI"
 ESTRUS_AFTER_ABORTION_NOTE = "estrus after abortion"

@@ -46,12 +46,10 @@ class HormoneDeliverySchedule:
         '2P': {
             0: {'deliver_hormones': ['PGF']},
             14: {'deliver_hormones': ['PGF']},
-            15: {'set_ai_day': True, 'set_conception_rate': True}
         },
         'CP': {
             0: {'deliver_hormones': ['PGF']},
             7: {'deliver_hormones': ['PGF']},
-            8: {'set_ai_day': True, 'set_conception_rate': True}
         }
     }
 
@@ -118,3 +116,36 @@ class HormoneDeliverySchedule:
             return None
 
         return protocols[protocol_name]
+
+    @staticmethod
+    def get_adjusted_schedule(animal_category: Literal['heifers', 'cows'],
+                              protocol_name: str,
+                              start_day: int) -> dict[int, dict] | None:
+        """
+        Get the hormone delivery schedule for the given animal category and protocol name, adjusted to start
+        on the given start day.
+
+        Parameters
+        ----------
+        animal_category : Literal['heifers', 'cows']
+            The animal category to get the schedule for. Must be either 'heifers' or 'cows'.
+        protocol_name : str
+            The name of the protocol to get the schedule for. Must be one of the protocols defined in
+            HEIFER_REPRO_PROTOCOLS or COW_REPRO_PROTOCOLS.
+        start_day : int
+            The day to start the schedule on.
+
+        Returns
+        -------
+        dict[int, dict] | None
+            The hormone delivery schedule for the given animal category and protocol name, adjusted to start
+            on the given start day. None if the animal category or protocol name is invalid.
+        """
+
+        schedule = HormoneDeliverySchedule.get_schedule(animal_category, protocol_name)
+        if schedule is None:
+            return None
+        adjusted_schedule = {}
+        for offset_days in schedule:
+            adjusted_schedule[start_day + offset_days] = schedule[offset_days]
+        return adjusted_schedule
