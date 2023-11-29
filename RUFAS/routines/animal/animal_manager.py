@@ -47,7 +47,7 @@ from RUFAS.routines.animal.ration import user_defined_ration as udr
 om = OutputManager()
 
 
-def daily_animal_routine(animal_manager, feed, weather: Weather, time: Time):
+def daily_animal_routine(animal_manager, feed: Feed, weather: Weather, time: Time):
     """
     Executes daily routines relating to Animals. This method is called every day
     in the simulation and calls @animal_manager's daily_updates() method
@@ -121,7 +121,7 @@ class AnimalManager:
         config.update(data["from_literature"]["life_cycle"])
         return config
 
-    def __init__(self, data, config, feed, weather: Weather, time: Time):
+    def __init__(self, data, config, feed: Feed, weather: Weather, time: Time):
         """
         Initializes the pens and animals in the simulation with data from the
         JSON file by calling init_pens() and init_animals(). Creates instance
@@ -233,7 +233,8 @@ class AnimalManager:
             Cow: self.cows,
         }
 
-    def init_pens(self, all_pen_data: list, herd_data: Dict[str, Any], manure_management_scenarios) -> None:
+    def init_pens(self, all_pen_data: list, herd_data: Dict[str, Any],
+                  manure_management_scenarios: Dict[str, Any]) -> None:
         """
         Populates the list of pens with the information from the input json file.
 
@@ -243,7 +244,7 @@ class AnimalManager:
             List containing information about the pens.
         herd_data: Dict[str, Any]
             Dictionary containing information about the herd.
-        manure_management_scenarios : Dict TODO: [str, Any]?
+        manure_management_scenarios : Dict[str, Any]
             Dictionary containing information about the manure management scenarios.
 
         """
@@ -332,7 +333,7 @@ class AnimalManager:
         else:
             om.add_log("simulate_animals_flag", "simulate_animals is true", info_map)
 
-    def init_nutrient_rqmts(self, weather: Weather, time: Time, feed):
+    def init_nutrient_rqmts(self, weather: Weather, time: Time, feed: Feed) -> None:
         """
         Calculates initial nutrient requirements at the beginning of the
         simulation for initial pen allocation. For the nutrient requirements
@@ -389,7 +390,7 @@ class AnimalManager:
             pen.horizontal_dist_to_parlor for pen in self.all_pens
         )
 
-    def calc_nutrient_rqmts(self, feed, current_temperature: float) -> None:
+    def calc_nutrient_rqmts(self, feed: Feed, current_temperature: float) -> None:
         """
         Calls each animal's method to calculate its nutrient requirements.
 
@@ -1086,7 +1087,7 @@ class AnimalManager:
         for pen in self.all_pens:
             pen.clear()
 
-    def calc_manure_excretion(self, feed, methane_model: str) -> None:
+    def calc_manure_excretion(self, feed: Feed, methane_model: str) -> None:
         """
         Calls each animal's method to calculate manure excretion to find the
         total for each pen. This is part of the routines that happen every
@@ -1116,14 +1117,14 @@ class AnimalManager:
         for pen in self.all_pens:
             pen.calc_avg_growth()
 
-    def sum_daily_milk(self, cows) -> float:
+    def sum_daily_milk(self, cows: List[Cow]) -> float:
         """
         sums the daily milk production across all cows
 
         Parameters
         ----------
         cows: List
-            the list of cows in the animal manager class
+            List of cows in the animal manager class.
 
         Returns
         -------
@@ -1131,7 +1132,7 @@ class AnimalManager:
         """
         return sum(cow.estimated_daily_milk_produced for cow in cows)
 
-    def gather_pen_history(self, animal_type_list: List[Union[Calf, HeiferI, HeiferII, HeiferIII, Cow]]) -> None:
+    def gather_pen_history(self, animal_type_list: List[Calf | HeiferI | HeiferII | HeiferIII | Cow]) -> None:
         """
         Updates pen history data for a given animal type.
 
@@ -1378,7 +1379,7 @@ class AnimalManager:
         return self.life_cycle_manager.initialize_db_summary
 
     @classmethod
-    def _calc_phosphorus_concentration(cls, animals) -> float:
+    def _calc_phosphorus_concentration(cls, animals: List[Calf | HeiferI | HeiferII | HeiferIII | Cow]) -> float:
         """
         Calculate the phosphorus concentration of a group of animals.
 
@@ -1419,7 +1420,7 @@ class AnimalManager:
             animals = self.animals_by_type[animal_type]
             self.phosphorus_concentration_by_animal_class[animal_type] = self._calc_phosphorus_concentration(animals)
 
-    def _calc_ration_at_interval(self, feed):
+    def _calc_ration_at_interval(self, feed: Feed) -> None:
         """
         Calculate the ration for each pen at the given interval and update the
         ration for each animal in the pen.
@@ -1632,7 +1633,7 @@ class AnimalManager:
             self._remove_animal_from_pen_and_id_map(animal)
 
     def _handle_animals_with_unchanged_class_and_changed_combination(
-        self, animals_snapshot_before_update: Dict, animals_snapshot_after_update: Dict, feed, temp: float
+        self, animals_snapshot_before_update: Dict, animals_snapshot_after_update: Dict, feed: Feed, temp: float
     ):
         """
         Handle animals that didn't change their classes but changed their animal combination.
@@ -1773,7 +1774,7 @@ class AnimalManager:
         )
         self.animal_to_pen_id_map[animal.id] = pen_with_min_stocking_density.id
 
-    def daily_updates(self, feed, weather: Weather, time: Time):
+    def daily_updates(self, feed: Feed, weather: Weather, time: Time):
         """
         Execute the daily routines relating to Animals. All animals are
         updated through the life_cycle_manager's daily_update() method. The
