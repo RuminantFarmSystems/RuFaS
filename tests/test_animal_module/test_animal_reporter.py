@@ -305,5 +305,36 @@ def test_report_life_cycle_manager_data(mocker: MockerFixture):
     assert om.variables_pool["life_cycle_manager.daily_update.avg_age_for_calving_greater_than_3"]["values"] == [400]
 
 
-def test_report_sold_animal_information():
-    pass
+def test_report_sold_animal_information(mocker: MockerFixture):
+    sold_animals = [mocker.MagicMock(), mocker.MagicMock(), mocker.MagicMock()]
+    sold_report = {
+        "id": [1, 2, 3],
+        "cull_reason": ["low1", "low2"],
+        "body_weight": [100, 200, 300],
+        "days_in_milk": [100],
+        "calves": [42],
+    }
+    sold_report_expected = {
+        "animal_id": [1, 2, 3],
+        "animal_type": ["dummy", "dummy", "dummy"],
+        "cull_reason": ["low1", "low2", "cull_reason_not_set"],
+        "body_weight": [100, 200, 300],
+        "days_in_milk": [100, "NA", "NA"],
+        "parity": [42, "NA", "NA"],
+    }
+    animalcount = 0
+    for animal in sold_animals:
+        for key in sold_report.keys():
+            if len(sold_report[key]) > animalcount:
+                setattr(animal, key, sold_report[key][animalcount])
+            else:
+                delattr(animal, key)
+        animalcount += 1
+
+    for animal in sold_animals:
+        animal.__class__.__name__ = "dummy"
+    # act
+    AnimalReporter.report_sold_animal_information(sold_animals)
+
+    # assert
+    assert om.variables_pool["life_cycle_manager.daily_update.sold_report"]["values"] == [sold_report_expected]

@@ -325,7 +325,7 @@ class AnimalReporter:
             if hasattr(animal, "cull_reason"):
                 sold_report["cull_reason"].append(animal.cull_reason)
             else:
-                sold_report["cull_reason"].append("Just for funsies")  # TODO TOdon't actually report this
+                sold_report["cull_reason"].append("cull_reason_not_set")
             sold_report["body_weight"].append(animal.body_weight)
             if hasattr(animal, "days_in_milk"):
                 sold_report["days_in_milk"].append(animal.days_in_milk)
