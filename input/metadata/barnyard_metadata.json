@@ -80,7 +80,7 @@
     "fertilizer_schedule": {
       "title": "Fertilizer schedule.",
       "description": "Barnyard fertilizer application schedule.",
-      "path": "input/data/fertilizer_schedule/barnyard_scheduled_fertilizer_schedule.json",
+      "path": "input/data/fertilizer_schedule/no_fertilizer.json",
       "type": "json",
       "properties": "fertilizer_schedule_properties"
     },
