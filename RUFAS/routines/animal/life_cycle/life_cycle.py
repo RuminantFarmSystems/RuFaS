@@ -192,7 +192,15 @@ class LifeCycleManager:
             A tuple of animal lists for the calves, heiferIs, heiferIIs, heiferIIIs, and cows
 
         """
-        self.animal_population: AnimalPopulation = im.get_data("animal_population")
+        animal_population = im.get_data("runtime_animal_population")
+        self.animal_population = AnimalPopulation(
+            calves=list(map(Calf, animal_population["calves"])),
+            heiferIs=list(map(HeiferI, animal_population["heiferIs"])),
+            heiferIIs=list(map(HeiferII, animal_population["heiferIIs"])),
+            heiferIIIs=list(map(HeiferIII, animal_population["heiferIIIs"])),
+            cows=list(map(Cow, animal_population["cows"])),
+            replacement=list(map(Cow, animal_population["replacement"]))
+        )
         self.herd_num = herd_data['herd_num']
         self._set_avg_CI()
 
