@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>RUFAS.routines.manure.manure_separators package &mdash; Ruminant Farm Simulation (RuFaS)  documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="_static/jquery.js?v=5d32c60e"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="_static/documentation_options.js?v=5929fcd5"></script>
+        <script src="_static/doctools.js?v=888ff710"></script>
+        <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="RUFAS.routines.manure.manure_treatments package" href="RUFAS.routines.manure.manure_treatments.html" />
+    <link rel="prev" title="RUFAS.routines.manure.manure_nutrients package" href="RUFAS.routines.manure.manure_nutrients.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            Ruminant Farm Simulation (RuFaS)
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">MASM</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="Example-animal_management_SA-wrapper.html">Example-animal_management_SA-wrapper module</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="RUFAS.html">RUFAS package</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="RUFAS.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l4 current"><a class="reference internal" href="RUFAS.routines.html">RUFAS.routines package</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#submodules">Submodules</a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.config">RUFAS.config module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.current_day_conditions">RUFAS.current_day_conditions module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.errors">RUFAS.errors module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.general_constants">RUFAS.general_constants module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.graph_generator">RUFAS.graph_generator module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.input_manager">RUFAS.input_manager module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.output_manager">RUFAS.output_manager module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.report_generator">RUFAS.report_generator module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.scenario_manager">RUFAS.scenario_manager module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.simulation_engine">RUFAS.simulation_engine module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.state">RUFAS.state module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.time">RUFAS.time module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.util">RUFAS.util module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.weather">RUFAS.weather module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="main.html">main module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="setup.html">setup module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tests.html">tests package</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Ruminant Farm Simulation (RuFaS)</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="modules.html">MASM</a></li>
+          <li class="breadcrumb-item"><a href="RUFAS.html">RUFAS package</a></li>
+          <li class="breadcrumb-item"><a href="RUFAS.routines.html">RUFAS.routines package</a></li>
+          <li class="breadcrumb-item"><a href="RUFAS.routines.manure.html">RUFAS.routines.manure package</a></li>
+      <li class="breadcrumb-item active">RUFAS.routines.manure.manure_separators package</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/RUFAS.routines.manure.manure_separators.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="rufas-routines-manure-manure-separators-package">
+<h1>RUFAS.routines.manure.manure_separators package<a class="headerlink" href="#rufas-routines-manure-manure-separators-package" title="Link to this heading"></a></h1>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Link to this heading"></a></h2>
+</section>
+<section id="module-RUFAS.routines.manure.manure_separators.manure_separator_classes">
+<span id="rufas-routines-manure-manure-separators-manure-separator-classes-module"></span><h2>RUFAS.routines.manure.manure_separators.manure_separator_classes module<a class="headerlink" href="#module-RUFAS.routines.manure.manure_separators.manure_separator_classes" title="Link to this heading"></a></h2>
+<p>RUFAS: Ruminant Farm Systems Model</p>
+<p>File name: manure_separator_classes.py</p>
+<p>Description:</p>
+<dl class="simple">
+<dt>Author(s):  William Donovan, <a class="reference external" href="mailto:wmdonovan&#37;&#52;&#48;wisc&#46;edu">wmdonovan<span>&#64;</span>wisc<span>&#46;</span>edu</a></dt><dd><p>Yunus Mohammed, <a class="reference external" href="mailto:ymm26&#37;&#52;&#48;cornell&#46;edu">ymm26<span>&#64;</span>cornell<span>&#46;</span>edu</a></p>
+</dd>
+</dl>
+<dl class="py class">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_separators.manure_separator_classes.BaseManureSeparator">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">RUFAS.routines.manure.manure_separators.manure_separator_classes.</span></span><span class="sig-name descname"><span class="pre">BaseManureSeparator</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">manure_separator_config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#RUFAS.routines.manure.manure_separators.manure_separator_classes.ManureSeparatorConfig" title="RUFAS.routines.manure.manure_separators.manure_separator_classes.ManureSeparatorConfig"><span class="pre">ManureSeparatorConfig</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.manure.manure_separators.manure_separator_classes.BaseManureSeparator" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Base class for all manure separators.</p>
+<dl class="simple">
+<dt>Attributes:</dt><dd><p>config: ManureSeparatorConfig object containing the configuration for the manure separator.</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_separators.manure_separator_classes.BaseManureSeparator.daily_update">
+<span class="sig-name descname"><span class="pre">daily_update</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">manure_separator_daily_input</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.routines.manure.protocols.html#RUFAS.routines.manure.protocols.liquid_manure_portion_protocol.LiquidManurePortionProtocol" title="RUFAS.routines.manure.protocols.liquid_manure_portion_protocol.LiquidManurePortionProtocol"><span class="pre">LiquidManurePortionProtocol</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#RUFAS.routines.manure.manure_separators.manure_separator_daily_output.ManureSeparatorDailyOutput" title="RUFAS.routines.manure.manure_separators.manure_separator_daily_output.ManureSeparatorDailyOutput"><span class="pre">ManureSeparatorDailyOutput</span></a></span></span><a class="headerlink" href="#RUFAS.routines.manure.manure_separators.manure_separator_classes.BaseManureSeparator.daily_update" title="Link to this definition"></a></dt>
+<dd><p>Calculates the daily output of the manure separator.</p>
+<dl class="simple">
+<dt>Notes:</dt><dd><p>“pseudocode_manure_management” MS.4</p>
+</dd>
+<dt>Args:</dt><dd><p>manure_separator_daily_input: A daily output object that can come from a reception pit
+or an anaerobic digester.</p>
+</dd>
+<dt>Returns:</dt><dd><p>ManureSeparatorDailyOutput object containing the daily output of the manure separator.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_separators.manure_separator_classes.BeltPress">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">RUFAS.routines.manure.manure_separators.manure_separator_classes.</span></span><span class="sig-name descname"><span class="pre">BeltPress</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">manure_separator_config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#RUFAS.routines.manure.manure_separators.manure_separator_classes.ManureSeparatorConfig" title="RUFAS.routines.manure.manure_separators.manure_separator_classes.ManureSeparatorConfig"><span class="pre">ManureSeparatorConfig</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.manure.manure_separators.manure_separator_classes.BeltPress" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#RUFAS.routines.manure.manure_separators.manure_separator_classes.BaseManureSeparator" title="RUFAS.routines.manure.manure_separators.manure_separator_classes.BaseManureSeparator"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseManureSeparator</span></code></a></p>
+<p>Class for a belt press manure separator.</p>
+<dl class="simple">
+<dt>Attributes:</dt><dd><p>All inherited from BaseManureSeparator.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_separators.manure_separator_classes.DecantingCentrifuge">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">RUFAS.routines.manure.manure_separators.manure_separator_classes.</span></span><span class="sig-name descname"><span class="pre">DecantingCentrifuge</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">manure_separator_config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#RUFAS.routines.manure.manure_separators.manure_separator_classes.ManureSeparatorConfig" title="RUFAS.routines.manure.manure_separators.manure_separator_classes.ManureSeparatorConfig"><span class="pre">ManureSeparatorConfig</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.manure.manure_separators.manure_separator_classes.DecantingCentrifuge" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#RUFAS.routines.manure.manure_separators.manure_separator_classes.BaseManureSeparator" title="RUFAS.routines.manure.manure_separators.manure_separator_classes.BaseManureSeparator"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseManureSeparator</span></code></a></p>
+<p>Class for a decanting centrifuge manure separator.</p>
+<dl class="simple">
+<dt>Attributes:</dt><dd><p>All inherited from BaseManureSeparator.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_separators.manure_separator_classes.DefaultManureSeparatorConfigFactory">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">RUFAS.routines.manure.manure_separators.manure_separator_classes.</span></span><span class="sig-name descname"><span class="pre">DefaultManureSeparatorConfigFactory</span></span><a class="headerlink" href="#RUFAS.routines.manure.manure_separators.manure_separator_classes.DefaultManureSeparatorConfigFactory" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Class for creating default manure separator configuration data.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_separators.manure_separator_classes.DefaultManureSeparatorConfigFactory.ROTARY_SCREEN_CONFIG">
+<span class="sig-name descname"><span class="pre">ROTARY_SCREEN_CONFIG</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">ManureSeparatorConfig(percent_dry_solids=0.2,</span> <span class="pre">total_solids_removal_efficiency_for_separator=0.35,</span> <span class="pre">volatile_solids_removal_efficiency_for_separator=0.4,</span> <span class="pre">nitrogen_removal_efficiency_for_separator=0.3,</span> <span class="pre">total_ammoniacal_nitrogen_removal_efficiency_for_separator=0.15,</span> <span class="pre">phosphorus_removal_efficiency_for_separator=0.4,</span> <span class="pre">potassium_removal_efficiency_for_separator=0.15)</span></em><a class="headerlink" href="#RUFAS.routines.manure.manure_separators.manure_separator_classes.DefaultManureSeparatorConfigFactory.ROTARY_SCREEN_CONFIG" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_separators.manure_separator_classes.DefaultManureSeparatorConfigFactory.SCREW_PRESS_CONFIG">
+<span class="sig-name descname"><span class="pre">SCREW_PRESS_CONFIG</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">ManureSeparatorConfig(percent_dry_solids=0.35,</span> <span class="pre">total_solids_removal_efficiency_for_separator=0.25,</span> <span class="pre">volatile_solids_removal_efficiency_for_separator=0.3,</span> <span class="pre">nitrogen_removal_efficiency_for_separator=0.3,</span> <span class="pre">total_ammoniacal_nitrogen_removal_efficiency_for_separator=0.1,</span> <span class="pre">phosphorus_removal_efficiency_for_separator=0.2,</span> <span class="pre">potassium_removal_efficiency_for_separator=0.23)</span></em><a class="headerlink" href="#RUFAS.routines.manure.manure_separators.manure_separator_classes.DefaultManureSeparatorConfigFactory.SCREW_PRESS_CONFIG" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_separators.manure_separator_classes.DefaultManureSeparatorConfigFactory.get_instance">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_instance</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">manure_separator_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#RUFAS.routines.manure.manure_separators.manure_separator_classes.ManureSeparatorType" title="RUFAS.routines.manure.manure_separators.manure_separator_classes.ManureSeparatorType"><span class="pre">ManureSeparatorType</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#RUFAS.routines.manure.manure_separators.manure_separator_classes.ManureSeparatorConfig" title="RUFAS.routines.manure.manure_separators.manure_separator_classes.ManureSeparatorConfig"><span class="pre">ManureSeparatorConfig</span></a></span></span><a class="headerlink" href="#RUFAS.routines.manure.manure_separators.manure_separator_classes.DefaultManureSeparatorConfigFactory.get_instance" title="Link to this definition"></a></dt>
+<dd><p>Return a default manure separator configuration data instance for the given separator type.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>manure_separator_type: The type of manure separator.</p>
+</dd>
+<dt>Returns:</dt><dd><p>A default ManureSeparatorConfig object for the given manure separator type.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_separators.manure_separator_classes.ManureSeparatorConfig">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">RUFAS.routines.manure.manure_separators.manure_separator_classes.</span></span><span class="sig-name descname"><span class="pre">ManureSeparatorConfig</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">percent_dry_solids</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">total_solids_removal_efficiency_for_separator</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">volatile_solids_removal_efficiency_for_separator</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nitrogen_removal_efficiency_for_separator</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">total_ammoniacal_nitrogen_removal_efficiency_for_separator</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">phosphorus_removal_efficiency_for_separator</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">potassium_removal_efficiency_for_separator</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.manure.manure_separators.manure_separator_classes.ManureSeparatorConfig" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Class for storing manure separator configuration data.</p>
+<dl class="simple">
+<dt>Attributes:</dt><dd><p>percent_dry_solids: Percent dry content in manure solids.
+total_solids_removal_efficiency_for_separator: Percent of total solids removed from manure.
+volatile_solids_removal_efficiency_for_separator: Percent of volatile solids removed from manure.
+nitrogen_removal_efficiency_for_separator: Percent of nitrogen removed from manure.
+total_ammoniacal_nitrogen_removal_efficiency_for_separator: Percent of total ammonia nitrogen removed from
+manure.
+phosphorus_removal_efficiency_for_separator: Percent of phosphorus removed from manure.
+potassium_removal_efficiency_for_separator: Percent of potassium removed from manure.</p>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_separators.manure_separator_classes.ManureSeparatorConfig.nitrogen_removal_efficiency_for_separator">
+<span class="sig-name descname"><span class="pre">nitrogen_removal_efficiency_for_separator</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.0</span></em><a class="headerlink" href="#RUFAS.routines.manure.manure_separators.manure_separator_classes.ManureSeparatorConfig.nitrogen_removal_efficiency_for_separator" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_separators.manure_separator_classes.ManureSeparatorConfig.percent_dry_solids">
+<span class="sig-name descname"><span class="pre">percent_dry_solids</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">1.0</span></em><a class="headerlink" href="#RUFAS.routines.manure.manure_separators.manure_separator_classes.ManureSeparatorConfig.percent_dry_solids" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_separators.manure_separator_classes.ManureSeparatorConfig.phosphorus_removal_efficiency_for_separator">
+<span class="sig-name descname"><span class="pre">phosphorus_removal_efficiency_for_separator</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.0</span></em><a class="headerlink" href="#RUFAS.routines.manure.manure_separators.manure_separator_classes.ManureSeparatorConfig.phosphorus_removal_efficiency_for_separator" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_separators.manure_separator_classes.ManureSeparatorConfig.potassium_removal_efficiency_for_separator">
+<span class="sig-name descname"><span class="pre">potassium_removal_efficiency_for_separator</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.0</span></em><a class="headerlink" href="#RUFAS.routines.manure.manure_separators.manure_separator_classes.ManureSeparatorConfig.potassium_removal_efficiency_for_separator" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_separators.manure_separator_classes.ManureSeparatorConfig.total_ammoniacal_nitrogen_removal_efficiency_for_separator">
+<span class="sig-name descname"><span class="pre">total_ammoniacal_nitrogen_removal_efficiency_for_separator</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.0</span></em><a class="headerlink" href="#RUFAS.routines.manure.manure_separators.manure_separator_classes.ManureSeparatorConfig.total_ammoniacal_nitrogen_removal_efficiency_for_separator" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_separators.manure_separator_classes.ManureSeparatorConfig.total_solids_removal_efficiency_for_separator">
+<span class="sig-name descname"><span class="pre">total_solids_removal_efficiency_for_separator</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.0</span></em><a class="headerlink" href="#RUFAS.routines.manure.manure_separators.manure_separator_classes.ManureSeparatorConfig.total_solids_removal_efficiency_for_separator" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_separators.manure_separator_classes.ManureSeparatorConfig.volatile_solids_removal_efficiency_for_separator">
+<span class="sig-name descname"><span class="pre">volatile_solids_removal_efficiency_for_separator</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.0</span></em><a class="headerlink" href="#RUFAS.routines.manure.manure_separators.manure_separator_classes.ManureSeparatorConfig.volatile_solids_removal_efficiency_for_separator" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_separators.manure_separator_classes.ManureSeparatorFactory">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">RUFAS.routines.manure.manure_separators.manure_separator_classes.</span></span><span class="sig-name descname"><span class="pre">ManureSeparatorFactory</span></span><a class="headerlink" href="#RUFAS.routines.manure.manure_separators.manure_separator_classes.ManureSeparatorFactory" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>A class that contains the logic for creating different types of manure separators.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_separators.manure_separator_classes.ManureSeparatorFactory.get_instance">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_instance</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">manure_separator_type_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">custom_manure_separator_config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#RUFAS.routines.manure.manure_separators.manure_separator_classes.ManureSeparatorConfig" title="RUFAS.routines.manure.manure_separators.manure_separator_classes.ManureSeparatorConfig"><span class="pre">ManureSeparatorConfig</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#RUFAS.routines.manure.manure_separators.manure_separator_classes.BaseManureSeparator" title="RUFAS.routines.manure.manure_separators.manure_separator_classes.BaseManureSeparator"><span class="pre">BaseManureSeparator</span></a></span></span><a class="headerlink" href="#RUFAS.routines.manure.manure_separators.manure_separator_classes.ManureSeparatorFactory.get_instance" title="Link to this definition"></a></dt>
+<dd><p>Return an instance of a specific subtype of BaseManureSeparator.</p>
+<dl>
+<dt>Args:</dt><dd><p>manure_separator_type_name: The name of the manure separator type.
+custom_manure_separator_config: A ManureSeparatorConfig object for</p>
+<blockquote>
+<div><p>a custom manure separator.</p>
+</div></blockquote>
+</dd>
+<dt>Returns:</dt><dd><p>An instance of a specific subtype of BaseManureSeparator.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_separators.manure_separator_classes.ManureSeparatorType">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">RUFAS.routines.manure.manure_separators.manure_separator_classes.</span></span><span class="sig-name descname"><span class="pre">ManureSeparatorType</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.manure.manure_separators.manure_separator_classes.ManureSeparatorType" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="RUFAS.routines.manure.default_enum.html#RUFAS.routines.manure.default_enum.default_enum.DefaultEnum" title="RUFAS.routines.manure.default_enum.default_enum.DefaultEnum"><code class="xref py py-class docutils literal notranslate"><span class="pre">DefaultEnum</span></code></a></p>
+<p>Enumerates the different types of manure separators.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_separators.manure_separator_classes.ManureSeparatorType.BELT_PRESS">
+<span class="sig-name descname"><span class="pre">BELT_PRESS</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'belt</span> <span class="pre">press'</span></em><a class="headerlink" href="#RUFAS.routines.manure.manure_separators.manure_separator_classes.ManureSeparatorType.BELT_PRESS" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_separators.manure_separator_classes.ManureSeparatorType.DECANTING_CENTRIFUGE">
+<span class="sig-name descname"><span class="pre">DECANTING_CENTRIFUGE</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'decanting</span> <span class="pre">centrifuge'</span></em><a class="headerlink" href="#RUFAS.routines.manure.manure_separators.manure_separator_classes.ManureSeparatorType.DECANTING_CENTRIFUGE" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_separators.manure_separator_classes.ManureSeparatorType.DEFAULT_ORGANIC">
+<span class="sig-name descname"><span class="pre">DEFAULT_ORGANIC</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'rotary</span> <span class="pre">screen'</span></em><a class="headerlink" href="#RUFAS.routines.manure.manure_separators.manure_separator_classes.ManureSeparatorType.DEFAULT_ORGANIC" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_separators.manure_separator_classes.ManureSeparatorType.DEFAULT_SAND">
+<span class="sig-name descname"><span class="pre">DEFAULT_SAND</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'sand</span> <span class="pre">lane</span> <span class="pre">manure</span> <span class="pre">separation'</span></em><a class="headerlink" href="#RUFAS.routines.manure.manure_separators.manure_separator_classes.ManureSeparatorType.DEFAULT_SAND" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_separators.manure_separator_classes.ManureSeparatorType.MECHANICAL_SAND_SEPARATOR">
+<span class="sig-name descname"><span class="pre">MECHANICAL_SAND_SEPARATOR</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'mechanical</span> <span class="pre">sand</span> <span class="pre">separator'</span></em><a class="headerlink" href="#RUFAS.routines.manure.manure_separators.manure_separator_classes.ManureSeparatorType.MECHANICAL_SAND_SEPARATOR" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_separators.manure_separator_classes.ManureSeparatorType.MOVING_DISC_PRESS">
+<span class="sig-name descname"><span class="pre">MOVING_DISC_PRESS</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'moving</span> <span class="pre">disc</span> <span class="pre">press'</span></em><a class="headerlink" href="#RUFAS.routines.manure.manure_separators.manure_separator_classes.ManureSeparatorType.MOVING_DISC_PRESS" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_separators.manure_separator_classes.ManureSeparatorType.ROTARY_SCREEN">
+<span class="sig-name descname"><span class="pre">ROTARY_SCREEN</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'rotary</span> <span class="pre">screen'</span></em><a class="headerlink" href="#RUFAS.routines.manure.manure_separators.manure_separator_classes.ManureSeparatorType.ROTARY_SCREEN" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_separators.manure_separator_classes.ManureSeparatorType.SAND_LANE_MANURE_SEPARATION">
+<span class="sig-name descname"><span class="pre">SAND_LANE_MANURE_SEPARATION</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'sand</span> <span class="pre">lane</span> <span class="pre">manure</span> <span class="pre">separation'</span></em><a class="headerlink" href="#RUFAS.routines.manure.manure_separators.manure_separator_classes.ManureSeparatorType.SAND_LANE_MANURE_SEPARATION" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_separators.manure_separator_classes.ManureSeparatorType.SCREW_PRESS">
+<span class="sig-name descname"><span class="pre">SCREW_PRESS</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'screw</span> <span class="pre">press'</span></em><a class="headerlink" href="#RUFAS.routines.manure.manure_separators.manure_separator_classes.ManureSeparatorType.SCREW_PRESS" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_separators.manure_separator_classes.ManureSeparatorType.SLOPE_SCREEN">
+<span class="sig-name descname"><span class="pre">SLOPE_SCREEN</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'slope</span> <span class="pre">screen'</span></em><a class="headerlink" href="#RUFAS.routines.manure.manure_separators.manure_separator_classes.ManureSeparatorType.SLOPE_SCREEN" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_separators.manure_separator_classes.MechanicalSandSeparator">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">RUFAS.routines.manure.manure_separators.manure_separator_classes.</span></span><span class="sig-name descname"><span class="pre">MechanicalSandSeparator</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">manure_separator_config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#RUFAS.routines.manure.manure_separators.manure_separator_classes.ManureSeparatorConfig" title="RUFAS.routines.manure.manure_separators.manure_separator_classes.ManureSeparatorConfig"><span class="pre">ManureSeparatorConfig</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.manure.manure_separators.manure_separator_classes.MechanicalSandSeparator" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#RUFAS.routines.manure.manure_separators.manure_separator_classes.BaseManureSeparator" title="RUFAS.routines.manure.manure_separators.manure_separator_classes.BaseManureSeparator"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseManureSeparator</span></code></a></p>
+<p>Class for a mechanical sand separator manure separator.</p>
+<dl class="simple">
+<dt>Attributes:</dt><dd><p>All inherited from BaseManureSeparator.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_separators.manure_separator_classes.MechanicalSeparator">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">RUFAS.routines.manure.manure_separators.manure_separator_classes.</span></span><span class="sig-name descname"><span class="pre">MechanicalSeparator</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">manure_separator_config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#RUFAS.routines.manure.manure_separators.manure_separator_classes.ManureSeparatorConfig" title="RUFAS.routines.manure.manure_separators.manure_separator_classes.ManureSeparatorConfig"><span class="pre">ManureSeparatorConfig</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.manure.manure_separators.manure_separator_classes.MechanicalSeparator" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#RUFAS.routines.manure.manure_separators.manure_separator_classes.BaseManureSeparator" title="RUFAS.routines.manure.manure_separators.manure_separator_classes.BaseManureSeparator"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseManureSeparator</span></code></a></p>
+<p>Class for a mechanical separator manure separator.</p>
+<dl class="simple">
+<dt>Attributes:</dt><dd><p>All inherited from BaseManureSeparator.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_separators.manure_separator_classes.MovingDiscPress">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">RUFAS.routines.manure.manure_separators.manure_separator_classes.</span></span><span class="sig-name descname"><span class="pre">MovingDiscPress</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">manure_separator_config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#RUFAS.routines.manure.manure_separators.manure_separator_classes.ManureSeparatorConfig" title="RUFAS.routines.manure.manure_separators.manure_separator_classes.ManureSeparatorConfig"><span class="pre">ManureSeparatorConfig</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.manure.manure_separators.manure_separator_classes.MovingDiscPress" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#RUFAS.routines.manure.manure_separators.manure_separator_classes.BaseManureSeparator" title="RUFAS.routines.manure.manure_separators.manure_separator_classes.BaseManureSeparator"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseManureSeparator</span></code></a></p>
+<p>Class for a moving disc press manure separator.</p>
+<dl class="simple">
+<dt>Attributes:</dt><dd><p>All inherited from BaseManureSeparator.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_separators.manure_separator_classes.RotaryScreen">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">RUFAS.routines.manure.manure_separators.manure_separator_classes.</span></span><span class="sig-name descname"><span class="pre">RotaryScreen</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">manure_separator_config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#RUFAS.routines.manure.manure_separators.manure_separator_classes.ManureSeparatorConfig" title="RUFAS.routines.manure.manure_separators.manure_separator_classes.ManureSeparatorConfig"><span class="pre">ManureSeparatorConfig</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.manure.manure_separators.manure_separator_classes.RotaryScreen" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#RUFAS.routines.manure.manure_separators.manure_separator_classes.BaseManureSeparator" title="RUFAS.routines.manure.manure_separators.manure_separator_classes.BaseManureSeparator"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseManureSeparator</span></code></a></p>
+<p>Class for a rotary screen manure separator.</p>
+<dl class="simple">
+<dt>Attributes:</dt><dd><p>All inherited from BaseManureSeparator.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_separators.manure_separator_classes.SandLaneSystem">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">RUFAS.routines.manure.manure_separators.manure_separator_classes.</span></span><span class="sig-name descname"><span class="pre">SandLaneSystem</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">manure_separator_config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#RUFAS.routines.manure.manure_separators.manure_separator_classes.ManureSeparatorConfig" title="RUFAS.routines.manure.manure_separators.manure_separator_classes.ManureSeparatorConfig"><span class="pre">ManureSeparatorConfig</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.manure.manure_separators.manure_separator_classes.SandLaneSystem" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#RUFAS.routines.manure.manure_separators.manure_separator_classes.BaseManureSeparator" title="RUFAS.routines.manure.manure_separators.manure_separator_classes.BaseManureSeparator"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseManureSeparator</span></code></a></p>
+<p>Class for a sand lane system manure separator.</p>
+<dl class="simple">
+<dt>Attributes:</dt><dd><p>All inherited from BaseManureSeparator.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_separators.manure_separator_classes.ScrewPress">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">RUFAS.routines.manure.manure_separators.manure_separator_classes.</span></span><span class="sig-name descname"><span class="pre">ScrewPress</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">manure_separator_config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#RUFAS.routines.manure.manure_separators.manure_separator_classes.ManureSeparatorConfig" title="RUFAS.routines.manure.manure_separators.manure_separator_classes.ManureSeparatorConfig"><span class="pre">ManureSeparatorConfig</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.manure.manure_separators.manure_separator_classes.ScrewPress" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#RUFAS.routines.manure.manure_separators.manure_separator_classes.BaseManureSeparator" title="RUFAS.routines.manure.manure_separators.manure_separator_classes.BaseManureSeparator"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseManureSeparator</span></code></a></p>
+<p>Class for a screw press manure separator.</p>
+<dl class="simple">
+<dt>Attributes:</dt><dd><p>All inherited from BaseManureSeparator.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_separators.manure_separator_classes.Sedimentation">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">RUFAS.routines.manure.manure_separators.manure_separator_classes.</span></span><span class="sig-name descname"><span class="pre">Sedimentation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">manure_separator_config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#RUFAS.routines.manure.manure_separators.manure_separator_classes.ManureSeparatorConfig" title="RUFAS.routines.manure.manure_separators.manure_separator_classes.ManureSeparatorConfig"><span class="pre">ManureSeparatorConfig</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.manure.manure_separators.manure_separator_classes.Sedimentation" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#RUFAS.routines.manure.manure_separators.manure_separator_classes.BaseManureSeparator" title="RUFAS.routines.manure.manure_separators.manure_separator_classes.BaseManureSeparator"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseManureSeparator</span></code></a></p>
+<p>Class for a sedimentation manure separator.</p>
+<dl class="simple">
+<dt>Attributes:</dt><dd><p>All inherited from BaseManureSeparator.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_separators.manure_separator_classes.SlopeScreen">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">RUFAS.routines.manure.manure_separators.manure_separator_classes.</span></span><span class="sig-name descname"><span class="pre">SlopeScreen</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">manure_separator_config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#RUFAS.routines.manure.manure_separators.manure_separator_classes.ManureSeparatorConfig" title="RUFAS.routines.manure.manure_separators.manure_separator_classes.ManureSeparatorConfig"><span class="pre">ManureSeparatorConfig</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.manure.manure_separators.manure_separator_classes.SlopeScreen" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#RUFAS.routines.manure.manure_separators.manure_separator_classes.BaseManureSeparator" title="RUFAS.routines.manure.manure_separators.manure_separator_classes.BaseManureSeparator"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseManureSeparator</span></code></a></p>
+<p>Class for a slope screen manure separator.</p>
+<dl class="simple">
+<dt>Attributes:</dt><dd><p>All inherited from BaseManureSeparator.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-RUFAS.routines.manure.manure_separators.manure_separator_daily_output">
+<span id="rufas-routines-manure-manure-separators-manure-separator-daily-output-module"></span><h2>RUFAS.routines.manure.manure_separators.manure_separator_daily_output module<a class="headerlink" href="#module-RUFAS.routines.manure.manure_separators.manure_separator_daily_output" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_separators.manure_separator_daily_output.ManureSeparatorDailyOutput">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">RUFAS.routines.manure.manure_separators.manure_separator_daily_output.</span></span><span class="sig-name descname"><span class="pre">ManureSeparatorDailyOutput</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pen_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">-1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">simulation_day</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">-1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">total_daily_manure_volume</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">final_solids_wet_mass</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">solid_manure_total_solids</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">solid_manure_total_volatile_solids</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">solid_manure_nitrogen</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">solid_manure_phosphorus</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">solid_manure_potassium</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">liquid_manure_total_solids</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">liquid_manure_total_volatile_solids</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">liquid_manure_nitrogen</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">liquid_manure_total_ammoniacal_nitrogen</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">liquid_manure_phosphorus</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">liquid_manure_potassium</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.manure.manure_separators.manure_separator_daily_output.ManureSeparatorDailyOutput" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="RUFAS.routines.manure.protocols.html#RUFAS.routines.manure.protocols.liquid_manure_portion_protocol.LiquidManurePortionProtocol" title="RUFAS.routines.manure.protocols.liquid_manure_portion_protocol.LiquidManurePortionProtocol"><code class="xref py py-class docutils literal notranslate"><span class="pre">LiquidManurePortionProtocol</span></code></a></p>
+<p>Daily output of a manure separator.</p>
+<dl>
+<dt>Attributes:</dt><dd><p>pen_id: ID of the pen that this output is associated with.
+simulation_day: Number of days into the simulation.
+total_daily_manure_volume: Total amount of manure, bedding, and water combined, m^3.
+final_solids_wet_mass: Total mass of the solids on wet-weight basis, kg.
+final_solids_wet_mass_volume: Total volume of the solids on wet-weight basis, m^3.</p>
+<p>solid_manure_total_solids: Total amount of solids in the separated solids, kg.
+solid_manure_total_volatile_solids: Total amount of volatile solids in the separated solids, kg.
+solid_manure_nitrogen: Amount of nitrogen in the separated solids, kg.
+solid_manure_phosphorus: Total amount of phosphorus in the separated solids, kg.
+solid_manure_potassium: Total amount of potassium in the separated solids, kg.</p>
+<p>liquid_manure_total_solids: Total amount of solids in the manure volume, kg.
+liquid_manure_total_volatile_solids: Total amount of volatile solids in the manure volume, kg.
+liquid_manure_nitrogen: Amount of nitrogen in the manure volume, kg.
+liquid_manure_total_ammoniacal_nitrogen: Total ammoniacal nitrogen in the manure volume, kg.
+liquid_manure_phosphorus: Total amount of phosphorus in the manure volume, kg.
+liquid_manure_potassium: Total amount of potassium in the manure volume, kg.</p>
+<p>final_daily_volume: Total manure volume after separation, m^3.
+liquid_manure_daily_volume: Same as final_daily_volume.
+Used for satisfying the LiquidManurePortionProtocol.</p>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_separators.manure_separator_daily_output.ManureSeparatorDailyOutput.final_daily_volume">
+<span class="sig-name descname"><span class="pre">final_daily_volume</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#RUFAS.routines.manure.manure_separators.manure_separator_daily_output.ManureSeparatorDailyOutput.final_daily_volume" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_separators.manure_separator_daily_output.ManureSeparatorDailyOutput.final_solids_wet_mass">
+<span class="sig-name descname"><span class="pre">final_solids_wet_mass</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.0</span></em><a class="headerlink" href="#RUFAS.routines.manure.manure_separators.manure_separator_daily_output.ManureSeparatorDailyOutput.final_solids_wet_mass" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_separators.manure_separator_daily_output.ManureSeparatorDailyOutput.final_solids_wet_mass_volume">
+<span class="sig-name descname"><span class="pre">final_solids_wet_mass_volume</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#RUFAS.routines.manure.manure_separators.manure_separator_daily_output.ManureSeparatorDailyOutput.final_solids_wet_mass_volume" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_separators.manure_separator_daily_output.ManureSeparatorDailyOutput.liquid_manure_daily_volume">
+<span class="sig-name descname"><span class="pre">liquid_manure_daily_volume</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#RUFAS.routines.manure.manure_separators.manure_separator_daily_output.ManureSeparatorDailyOutput.liquid_manure_daily_volume" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_separators.manure_separator_daily_output.ManureSeparatorDailyOutput.liquid_manure_nitrogen">
+<span class="sig-name descname"><span class="pre">liquid_manure_nitrogen</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.0</span></em><a class="headerlink" href="#RUFAS.routines.manure.manure_separators.manure_separator_daily_output.ManureSeparatorDailyOutput.liquid_manure_nitrogen" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_separators.manure_separator_daily_output.ManureSeparatorDailyOutput.liquid_manure_phosphorus">
+<span class="sig-name descname"><span class="pre">liquid_manure_phosphorus</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.0</span></em><a class="headerlink" href="#RUFAS.routines.manure.manure_separators.manure_separator_daily_output.ManureSeparatorDailyOutput.liquid_manure_phosphorus" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_separators.manure_separator_daily_output.ManureSeparatorDailyOutput.liquid_manure_potassium">
+<span class="sig-name descname"><span class="pre">liquid_manure_potassium</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.0</span></em><a class="headerlink" href="#RUFAS.routines.manure.manure_separators.manure_separator_daily_output.ManureSeparatorDailyOutput.liquid_manure_potassium" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_separators.manure_separator_daily_output.ManureSeparatorDailyOutput.liquid_manure_total_ammoniacal_nitrogen">
+<span class="sig-name descname"><span class="pre">liquid_manure_total_ammoniacal_nitrogen</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.0</span></em><a class="headerlink" href="#RUFAS.routines.manure.manure_separators.manure_separator_daily_output.ManureSeparatorDailyOutput.liquid_manure_total_ammoniacal_nitrogen" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_separators.manure_separator_daily_output.ManureSeparatorDailyOutput.liquid_manure_total_solids">
+<span class="sig-name descname"><span class="pre">liquid_manure_total_solids</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.0</span></em><a class="headerlink" href="#RUFAS.routines.manure.manure_separators.manure_separator_daily_output.ManureSeparatorDailyOutput.liquid_manure_total_solids" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_separators.manure_separator_daily_output.ManureSeparatorDailyOutput.liquid_manure_total_volatile_solids">
+<span class="sig-name descname"><span class="pre">liquid_manure_total_volatile_solids</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.0</span></em><a class="headerlink" href="#RUFAS.routines.manure.manure_separators.manure_separator_daily_output.ManureSeparatorDailyOutput.liquid_manure_total_volatile_solids" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_separators.manure_separator_daily_output.ManureSeparatorDailyOutput.pen_id">
+<span class="sig-name descname"><span class="pre">pen_id</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">-1</span></em><a class="headerlink" href="#RUFAS.routines.manure.manure_separators.manure_separator_daily_output.ManureSeparatorDailyOutput.pen_id" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_separators.manure_separator_daily_output.ManureSeparatorDailyOutput.simulation_day">
+<span class="sig-name descname"><span class="pre">simulation_day</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">-1</span></em><a class="headerlink" href="#RUFAS.routines.manure.manure_separators.manure_separator_daily_output.ManureSeparatorDailyOutput.simulation_day" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_separators.manure_separator_daily_output.ManureSeparatorDailyOutput.solid_manure_nitrogen">
+<span class="sig-name descname"><span class="pre">solid_manure_nitrogen</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.0</span></em><a class="headerlink" href="#RUFAS.routines.manure.manure_separators.manure_separator_daily_output.ManureSeparatorDailyOutput.solid_manure_nitrogen" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_separators.manure_separator_daily_output.ManureSeparatorDailyOutput.solid_manure_phosphorus">
+<span class="sig-name descname"><span class="pre">solid_manure_phosphorus</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.0</span></em><a class="headerlink" href="#RUFAS.routines.manure.manure_separators.manure_separator_daily_output.ManureSeparatorDailyOutput.solid_manure_phosphorus" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_separators.manure_separator_daily_output.ManureSeparatorDailyOutput.solid_manure_potassium">
+<span class="sig-name descname"><span class="pre">solid_manure_potassium</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.0</span></em><a class="headerlink" href="#RUFAS.routines.manure.manure_separators.manure_separator_daily_output.ManureSeparatorDailyOutput.solid_manure_potassium" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_separators.manure_separator_daily_output.ManureSeparatorDailyOutput.solid_manure_total_solids">
+<span class="sig-name descname"><span class="pre">solid_manure_total_solids</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.0</span></em><a class="headerlink" href="#RUFAS.routines.manure.manure_separators.manure_separator_daily_output.ManureSeparatorDailyOutput.solid_manure_total_solids" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_separators.manure_separator_daily_output.ManureSeparatorDailyOutput.solid_manure_total_volatile_solids">
+<span class="sig-name descname"><span class="pre">solid_manure_total_volatile_solids</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.0</span></em><a class="headerlink" href="#RUFAS.routines.manure.manure_separators.manure_separator_daily_output.ManureSeparatorDailyOutput.solid_manure_total_volatile_solids" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_separators.manure_separator_daily_output.ManureSeparatorDailyOutput.total_daily_manure_volume">
+<span class="sig-name descname"><span class="pre">total_daily_manure_volume</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.0</span></em><a class="headerlink" href="#RUFAS.routines.manure.manure_separators.manure_separator_daily_output.ManureSeparatorDailyOutput.total_daily_manure_volume" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-RUFAS.routines.manure.manure_separators">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-RUFAS.routines.manure.manure_separators" title="Link to this heading"></a></h2>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="RUFAS.routines.manure.manure_nutrients.html" class="btn btn-neutral float-left" title="RUFAS.routines.manure.manure_nutrients package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="RUFAS.routines.manure.manure_treatments.html" class="btn btn-neutral float-right" title="RUFAS.routines.manure.manure_treatments package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, RuFaS team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

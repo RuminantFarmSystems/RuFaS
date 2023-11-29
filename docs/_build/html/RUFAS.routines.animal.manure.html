@@ -1,0 +1,765 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>RUFAS.routines.animal.manure package &mdash; Ruminant Farm Simulation (RuFaS)  documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="_static/jquery.js?v=5d32c60e"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="_static/documentation_options.js?v=5929fcd5"></script>
+        <script src="_static/doctools.js?v=888ff710"></script>
+        <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="RUFAS.routines.animal.ration package" href="RUFAS.routines.animal.ration.html" />
+    <link rel="prev" title="RUFAS.routines.animal.life_cycle package" href="RUFAS.routines.animal.life_cycle.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            Ruminant Farm Simulation (RuFaS)
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">MASM</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="Example-animal_management_SA-wrapper.html">Example-animal_management_SA-wrapper module</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="RUFAS.html">RUFAS package</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="RUFAS.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l4 current"><a class="reference internal" href="RUFAS.routines.html">RUFAS.routines package</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#submodules">Submodules</a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.config">RUFAS.config module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.current_day_conditions">RUFAS.current_day_conditions module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.errors">RUFAS.errors module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.general_constants">RUFAS.general_constants module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.graph_generator">RUFAS.graph_generator module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.input_manager">RUFAS.input_manager module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.output_manager">RUFAS.output_manager module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.report_generator">RUFAS.report_generator module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.scenario_manager">RUFAS.scenario_manager module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.simulation_engine">RUFAS.simulation_engine module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.state">RUFAS.state module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.time">RUFAS.time module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.util">RUFAS.util module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.weather">RUFAS.weather module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="main.html">main module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="setup.html">setup module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tests.html">tests package</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Ruminant Farm Simulation (RuFaS)</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="modules.html">MASM</a></li>
+          <li class="breadcrumb-item"><a href="RUFAS.html">RUFAS package</a></li>
+          <li class="breadcrumb-item"><a href="RUFAS.routines.html">RUFAS.routines package</a></li>
+          <li class="breadcrumb-item"><a href="RUFAS.routines.animal.html">RUFAS.routines.animal package</a></li>
+      <li class="breadcrumb-item active">RUFAS.routines.animal.manure package</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/RUFAS.routines.animal.manure.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="rufas-routines-animal-manure-package">
+<h1>RUFAS.routines.animal.manure package<a class="headerlink" href="#rufas-routines-animal-manure-package" title="Link to this heading"></a></h1>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Link to this heading"></a></h2>
+</section>
+<section id="module-RUFAS.routines.animal.manure.calf_manure_excretion">
+<span id="rufas-routines-animal-manure-calf-manure-excretion-module"></span><h2>RUFAS.routines.animal.manure.calf_manure_excretion module<a class="headerlink" href="#module-RUFAS.routines.animal.manure.calf_manure_excretion" title="Link to this heading"></a></h2>
+<p>RUFAS: Ruminant Farm Systems Model
+File name: calf_manure_excretion.py
+Description: Determines manure excretion with information from the ration</p>
+<blockquote>
+<div><p>formulation, outputs used by the manure module.</p>
+</div></blockquote>
+<dl class="simple">
+<dt>Author(s): Militsa Sotirova, <a class="reference external" href="mailto:militsasotirova&#37;&#52;&#48;gmail&#46;com">militsasotirova<span>&#64;</span>gmail<span>&#46;</span>com</a></dt><dd><p>Joseph Merhi, <a class="reference external" href="mailto:jm2257&#37;&#52;&#48;cornell&#46;edu">jm2257<span>&#64;</span>cornell<span>&#46;</span>edu</a></p>
+</dd>
+</dl>
+<dl class="py function">
+<dt class="sig sig-object py" id="RUFAS.routines.animal.manure.calf_manure_excretion.manure_calculations">
+<span class="sig-prename descclassname"><span class="pre">RUFAS.routines.animal.manure.calf_manure_excretion.</span></span><span class="sig-name descname"><span class="pre">manure_calculations</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ration_formulation</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">feed</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">body_weight</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fecal_phosphorus</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">urine_phosphorus_required</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">methane_model</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#RUFAS.routines.animal.manure.general_manure.AnimalManureExcretions" title="RUFAS.routines.animal.manure.general_manure.AnimalManureExcretions"><span class="pre">AnimalManureExcretions</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#RUFAS.routines.animal.manure.calf_manure_excretion.manure_calculations" title="Link to this definition"></a></dt>
+<dd><p>Calculates the manure excretion values for a calf with information from the ration formulation.</p>
+<section id="parameters">
+<h3>Parameters<a class="headerlink" href="#parameters" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>ration_formulation<span class="classifier">Dict[str, float]</span></dt><dd><p>Dictionary that stores the calculated ration.</p>
+</dd>
+<dt>feed<span class="classifier">Dict[str, float]</span></dt><dd><p>A Feed object that contains information about the available feeds.</p>
+</dd>
+<dt>body_weight<span class="classifier">float</span></dt><dd><p>Body weight of the current animal, kg.</p>
+</dd>
+<dt>fecal_phosphorus<span class="classifier">float</span></dt><dd><p>Amount of fecal phosphorus excreted by the current animal, g.</p>
+</dd>
+<dt>urine_phosphorus_required<span class="classifier">float</span></dt><dd><p>Amount of phosphorus required for urine production, g.</p>
+</dd>
+<dt>methane_model<span class="classifier">str</span></dt><dd><p>Methane model used for methane emission calculations, including Mutian, Mills, IPCC.</p>
+</dd>
+</dl>
+</section>
+<section id="returns">
+<h3>Returns<a class="headerlink" href="#returns" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>float</dt><dd><p>Total amount of phosphorus excreted by the given animal, g.</p>
+</dd>
+<dt>AnimalManureExcretions</dt><dd><dl class="simple">
+<dt>A dictionary that contains the manure excretion values as specified</dt><dd><p>in the AnimalManureExcretions class definition.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+</section>
+<section id="module-RUFAS.routines.animal.manure.dry_cow_manure_excretion">
+<span id="rufas-routines-animal-manure-dry-cow-manure-excretion-module"></span><h2>RUFAS.routines.animal.manure.dry_cow_manure_excretion module<a class="headerlink" href="#module-RUFAS.routines.animal.manure.dry_cow_manure_excretion" title="Link to this heading"></a></h2>
+<p>RUFAS: Ruminant Farm Systems Model
+File name: dry_cow_manure_excretion.py
+Description: Determines manure excretion with information from the ration</p>
+<blockquote>
+<div><p>formulation, outputs used by the manure module.</p>
+</div></blockquote>
+<dl class="simple">
+<dt>Author(s): Militsa Sotirova, <a class="reference external" href="mailto:militsasotirova&#37;&#52;&#48;gmail&#46;com">militsasotirova<span>&#64;</span>gmail<span>&#46;</span>com</a></dt><dd><p>Joseph Merhi, <a class="reference external" href="mailto:jm2257&#37;&#52;&#48;cornell&#46;edu">jm2257<span>&#64;</span>cornell<span>&#46;</span>edu</a></p>
+</dd>
+</dl>
+<dl class="py function">
+<dt class="sig sig-object py" id="RUFAS.routines.animal.manure.dry_cow_manure_excretion.manure_calculations">
+<span class="sig-prename descclassname"><span class="pre">RUFAS.routines.animal.manure.dry_cow_manure_excretion.</span></span><span class="sig-name descname"><span class="pre">manure_calculations</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ration_formulation</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">feed</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">body_weight</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">daily_milk_production</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fecal_phosphorus</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">urine_phosphorus_required</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">methane_model</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metabolizable_energy_intake</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#RUFAS.routines.animal.manure.general_manure.AnimalManureExcretions" title="RUFAS.routines.animal.manure.general_manure.AnimalManureExcretions"><span class="pre">AnimalManureExcretions</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#RUFAS.routines.animal.manure.dry_cow_manure_excretion.manure_calculations" title="Link to this definition"></a></dt>
+<dd><p>Calculates the manure excretion values for a non-lactating cow with information from the ration formulation.</p>
+<section id="id1">
+<h3>Parameters<a class="headerlink" href="#id1" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>ration_formulation<span class="classifier">Dict[str, float]</span></dt><dd><p>Dictionary that stores the calculated ration.</p>
+</dd>
+<dt>feed<span class="classifier">Dict[str, float]</span></dt><dd><p>A Feed object that contains information about the available feeds.</p>
+</dd>
+<dt>body_weight<span class="classifier">float</span></dt><dd><p>Body weight of the current animal, kg.</p>
+</dd>
+<dt>daily_milk_production<span class="classifier">float</span></dt><dd><p>Daily milk production of the current animal, kg.</p>
+</dd>
+<dt>fecal_phosphorus<span class="classifier">float</span></dt><dd><p>Amount of fecal phosphorus excreted by the current animal, g.</p>
+</dd>
+<dt>urine_phosphorus_required<span class="classifier">float</span></dt><dd><p>Amount of phosphorus required for urine production, g.</p>
+</dd>
+<dt>methane_model<span class="classifier">str</span></dt><dd><p>Methane model used for methane emission calculations, including Mills, IPCC.</p>
+</dd>
+<dt>metabolizable_energy_intake<span class="classifier">float</span></dt><dd><p>Metabolizable energy intake, Mcal/kg dry matter.</p>
+</dd>
+</dl>
+</section>
+<section id="id2">
+<h3>Returns<a class="headerlink" href="#id2" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>float</dt><dd><p>Total amount of phosphorus excreted by the given animal, g.</p>
+</dd>
+<dt>AnimalManureExcretions</dt><dd><dl class="simple">
+<dt>A dictionary that contains the manure excretion values as specified</dt><dd><p>in the AnimalManureExcretions class definition.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+</section>
+<section id="module-RUFAS.routines.animal.manure.general_manure">
+<span id="rufas-routines-animal-manure-general-manure-module"></span><h2>RUFAS.routines.animal.manure.general_manure module<a class="headerlink" href="#module-RUFAS.routines.animal.manure.general_manure" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="RUFAS.routines.animal.manure.general_manure.AnimalManureExcretions">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">RUFAS.routines.animal.manure.general_manure.</span></span><span class="sig-name descname"><span class="pre">AnimalManureExcretions</span></span><a class="headerlink" href="#RUFAS.routines.animal.manure.general_manure.AnimalManureExcretions" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">TypedDict</span></code></p>
+<p>A TypedDict class that specifies the structure of the dictionary of animal manure excretion values.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.animal.manure.general_manure.AnimalManureExcretions.degradable_volatile_solids">
+<span class="sig-name descname"><span class="pre">degradable_volatile_solids</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#RUFAS.routines.animal.manure.general_manure.AnimalManureExcretions.degradable_volatile_solids" title="Link to this definition"></a></dt>
+<dd><p>Amount of degradable volatile solids (kg).</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.animal.manure.general_manure.AnimalManureExcretions.enteric_methane_g">
+<span class="sig-name descname"><span class="pre">enteric_methane_g</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#RUFAS.routines.animal.manure.general_manure.AnimalManureExcretions.enteric_methane_g" title="Link to this definition"></a></dt>
+<dd><p>Amount of methane emissions (g/day).</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.animal.manure.general_manure.AnimalManureExcretions.inorganic_phosphorus_fraction">
+<span class="sig-name descname"><span class="pre">inorganic_phosphorus_fraction</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#RUFAS.routines.animal.manure.general_manure.AnimalManureExcretions.inorganic_phosphorus_fraction" title="Link to this definition"></a></dt>
+<dd><p>Fraction of water extractable inorganic phosphorus (unitless).</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.animal.manure.general_manure.AnimalManureExcretions.manure_mass">
+<span class="sig-name descname"><span class="pre">manure_mass</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#RUFAS.routines.animal.manure.general_manure.AnimalManureExcretions.manure_mass" title="Link to this definition"></a></dt>
+<dd><p>Amount of manure (kg).</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.animal.manure.general_manure.AnimalManureExcretions.manure_nitrogen">
+<span class="sig-name descname"><span class="pre">manure_nitrogen</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#RUFAS.routines.animal.manure.general_manure.AnimalManureExcretions.manure_nitrogen" title="Link to this definition"></a></dt>
+<dd><p>Amount of nitrogen in manure (kg).</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.animal.manure.general_manure.AnimalManureExcretions.non_degradable_volatile_solids">
+<span class="sig-name descname"><span class="pre">non_degradable_volatile_solids</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#RUFAS.routines.animal.manure.general_manure.AnimalManureExcretions.non_degradable_volatile_solids" title="Link to this definition"></a></dt>
+<dd><p>Amount of non-degradable volatile solids (kg).</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.animal.manure.general_manure.AnimalManureExcretions.non_water_inorganic_phosphorus_fraction">
+<span class="sig-name descname"><span class="pre">non_water_inorganic_phosphorus_fraction</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#RUFAS.routines.animal.manure.general_manure.AnimalManureExcretions.non_water_inorganic_phosphorus_fraction" title="Link to this definition"></a></dt>
+<dd><p>Fraction of non-water extractable inorganic phosphorus (unitless).</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.animal.manure.general_manure.AnimalManureExcretions.non_water_organic_phosphorus_fraction">
+<span class="sig-name descname"><span class="pre">non_water_organic_phosphorus_fraction</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#RUFAS.routines.animal.manure.general_manure.AnimalManureExcretions.non_water_organic_phosphorus_fraction" title="Link to this definition"></a></dt>
+<dd><p>Fraction of non-water extractable organic phosphorus (unitless).</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.animal.manure.general_manure.AnimalManureExcretions.organic_phosphorus_fraction">
+<span class="sig-name descname"><span class="pre">organic_phosphorus_fraction</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#RUFAS.routines.animal.manure.general_manure.AnimalManureExcretions.organic_phosphorus_fraction" title="Link to this definition"></a></dt>
+<dd><p>Fraction of water extractable organic phosphorus (unitless).</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.animal.manure.general_manure.AnimalManureExcretions.phosphorus">
+<span class="sig-name descname"><span class="pre">phosphorus</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#RUFAS.routines.animal.manure.general_manure.AnimalManureExcretions.phosphorus" title="Link to this definition"></a></dt>
+<dd><p>Amount of phosphorus excreted in manure (g).</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.animal.manure.general_manure.AnimalManureExcretions.phosphorus_fraction">
+<span class="sig-name descname"><span class="pre">phosphorus_fraction</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#RUFAS.routines.animal.manure.general_manure.AnimalManureExcretions.phosphorus_fraction" title="Link to this definition"></a></dt>
+<dd><p>Fraction of phosphorus in manure (unitless).</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.animal.manure.general_manure.AnimalManureExcretions.potassium">
+<span class="sig-name descname"><span class="pre">potassium</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#RUFAS.routines.animal.manure.general_manure.AnimalManureExcretions.potassium" title="Link to this definition"></a></dt>
+<dd><p>Amount of potassium in manure (g).</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.animal.manure.general_manure.AnimalManureExcretions.total_ammoniacal_nitrogen_concentration">
+<span class="sig-name descname"><span class="pre">total_ammoniacal_nitrogen_concentration</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#RUFAS.routines.animal.manure.general_manure.AnimalManureExcretions.total_ammoniacal_nitrogen_concentration" title="Link to this definition"></a></dt>
+<dd><p>Concentration of total ammoniacal manure_nitrogen in the manure slurry (g/L).</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.animal.manure.general_manure.AnimalManureExcretions.total_solids">
+<span class="sig-name descname"><span class="pre">total_solids</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#RUFAS.routines.animal.manure.general_manure.AnimalManureExcretions.total_solids" title="Link to this definition"></a></dt>
+<dd><p>Amount of total solids (kg).</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.animal.manure.general_manure.AnimalManureExcretions.urea">
+<span class="sig-name descname"><span class="pre">urea</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#RUFAS.routines.animal.manure.general_manure.AnimalManureExcretions.urea" title="Link to this definition"></a></dt>
+<dd><p>Concentration of urea in manure (g/L).</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.animal.manure.general_manure.AnimalManureExcretions.urine">
+<span class="sig-name descname"><span class="pre">urine</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#RUFAS.routines.animal.manure.general_manure.AnimalManureExcretions.urine" title="Link to this definition"></a></dt>
+<dd><p>Amount of urine excreted (kg).</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.animal.manure.general_manure.AnimalManureExcretions.urine_nitrogen">
+<span class="sig-name descname"><span class="pre">urine_nitrogen</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#RUFAS.routines.animal.manure.general_manure.AnimalManureExcretions.urine_nitrogen" title="Link to this definition"></a></dt>
+<dd><p>Amount of nitrogen in urine (kg).</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="RUFAS.routines.animal.manure.general_manure.add_animal_manure_excretions">
+<span class="sig-prename descclassname"><span class="pre">RUFAS.routines.animal.manure.general_manure.</span></span><span class="sig-name descname"><span class="pre">add_animal_manure_excretions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">first</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#RUFAS.routines.animal.manure.general_manure.AnimalManureExcretions" title="RUFAS.routines.animal.manure.general_manure.AnimalManureExcretions"><span class="pre">AnimalManureExcretions</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">second</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#RUFAS.routines.animal.manure.general_manure.AnimalManureExcretions" title="RUFAS.routines.animal.manure.general_manure.AnimalManureExcretions"><span class="pre">AnimalManureExcretions</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#RUFAS.routines.animal.manure.general_manure.AnimalManureExcretions" title="RUFAS.routines.animal.manure.general_manure.AnimalManureExcretions"><span class="pre">AnimalManureExcretions</span></a></span></span><a class="headerlink" href="#RUFAS.routines.animal.manure.general_manure.add_animal_manure_excretions" title="Link to this definition"></a></dt>
+<dd><p>Add two AnimalManureExcretions objects together.</p>
+<section id="id3">
+<h3>Parameters<a class="headerlink" href="#id3" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>first<span class="classifier">AnimalManureExcretions</span></dt><dd><p>First AnimalManureExcretions object.</p>
+</dd>
+<dt>second<span class="classifier">AnimalManureExcretions</span></dt><dd><p>Second AnimalManureExcretions object.</p>
+</dd>
+</dl>
+</section>
+<section id="id4">
+<h3>Returns<a class="headerlink" href="#id4" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>AnimalManureExcretions</dt><dd><p>Sum of the two AnimalManureExcretions objects.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="RUFAS.routines.animal.manure.general_manure.calculate_phosphorus_excretion_values">
+<span class="sig-prename descclassname"><span class="pre">RUFAS.routines.animal.manure.general_manure.</span></span><span class="sig-name descname"><span class="pre">calculate_phosphorus_excretion_values</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">daily_milk_production</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">total_manure_excreted</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fecal_phosphorus</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">urine_phosphorus_required</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#RUFAS.routines.animal.manure.general_manure.calculate_phosphorus_excretion_values" title="Link to this definition"></a></dt>
+<dd><p>Calculates a set of phosphorus excretion values produced by a given animal.</p>
+<section id="id5">
+<h3>Parameters<a class="headerlink" href="#id5" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>daily_milk_production<span class="classifier">float</span></dt><dd><p>Amount of daily milk produced by the animal, kg.
+This parameter should be set to 0 if this function is called for a non-cow animal.</p>
+</dd>
+<dt>total_manure_excreted<span class="classifier">float</span></dt><dd><p>Amount of manure excreted by the animal, kg.</p>
+</dd>
+<dt>fecal_phosphorus<span class="classifier">float</span></dt><dd><p>Amount of fecal phosphorus excreted by the animal, g.</p>
+</dd>
+<dt>urine_phosphorus_required<span class="classifier">float</span></dt><dd><p>Amount of phosphorus required for urine production, g.</p>
+</dd>
+</dl>
+</section>
+<section id="id6">
+<h3>Returns<a class="headerlink" href="#id6" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>float</dt><dd><p>Total amount of phosphorus excreted by the animal, g.</p>
+</dd>
+<dt>float</dt><dd><p>Fraction of extractable inorganic phosphorus, unitless.</p>
+</dd>
+<dt>float</dt><dd><p>Fraction of water extractable organic phosphorus, unitless.</p>
+</dd>
+<dt>float</dt><dd><p>Amount of manure phosphorus excreted, g.</p>
+</dd>
+<dt>float</dt><dd><p>Fraction of phosphorus in the manure, unitless.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="RUFAS.routines.animal.manure.general_manure.get_default_animal_manure_excretions">
+<span class="sig-prename descclassname"><span class="pre">RUFAS.routines.animal.manure.general_manure.</span></span><span class="sig-name descname"><span class="pre">get_default_animal_manure_excretions</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#RUFAS.routines.animal.manure.general_manure.AnimalManureExcretions" title="RUFAS.routines.animal.manure.general_manure.AnimalManureExcretions"><span class="pre">AnimalManureExcretions</span></a></span></span><a class="headerlink" href="#RUFAS.routines.animal.manure.general_manure.get_default_animal_manure_excretions" title="Link to this definition"></a></dt>
+<dd><p>Get a default AnimalManureExcretions object.</p>
+<section id="id7">
+<h3>Returns<a class="headerlink" href="#id7" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>AnimalManureExcretions</dt><dd><p>Default AnimalManureExcretions object.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="RUFAS.routines.animal.manure.general_manure.scalar_mult_animal_manure_excretions">
+<span class="sig-prename descclassname"><span class="pre">RUFAS.routines.animal.manure.general_manure.</span></span><span class="sig-name descname"><span class="pre">scalar_mult_animal_manure_excretions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">manure</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#RUFAS.routines.animal.manure.general_manure.AnimalManureExcretions" title="RUFAS.routines.animal.manure.general_manure.AnimalManureExcretions"><span class="pre">AnimalManureExcretions</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">scalar</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#RUFAS.routines.animal.manure.general_manure.AnimalManureExcretions" title="RUFAS.routines.animal.manure.general_manure.AnimalManureExcretions"><span class="pre">AnimalManureExcretions</span></a></span></span><a class="headerlink" href="#RUFAS.routines.animal.manure.general_manure.scalar_mult_animal_manure_excretions" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</section>
+<section id="module-RUFAS.routines.animal.manure.growing_heifer_manure_excretion">
+<span id="rufas-routines-animal-manure-growing-heifer-manure-excretion-module"></span><h2>RUFAS.routines.animal.manure.growing_heifer_manure_excretion module<a class="headerlink" href="#module-RUFAS.routines.animal.manure.growing_heifer_manure_excretion" title="Link to this heading"></a></h2>
+<p>RUFAS: Ruminant Farm Systems Model
+File name: growing_heifer_manure_excretion.py
+Description: Determines manure excretion with information from the</p>
+<blockquote>
+<div><p>ration formulation, outputs used by the manure module.</p>
+</div></blockquote>
+<dl class="simple">
+<dt>Author(s): Militsa Sotirova, <a class="reference external" href="mailto:militsasotirova&#37;&#52;&#48;gmail&#46;com">militsasotirova<span>&#64;</span>gmail<span>&#46;</span>com</a></dt><dd><p>Joseph Merhi, <a class="reference external" href="mailto:jm2257&#37;&#52;&#48;cornell&#46;edu">jm2257<span>&#64;</span>cornell<span>&#46;</span>edu</a></p>
+</dd>
+</dl>
+<dl class="py function">
+<dt class="sig sig-object py" id="RUFAS.routines.animal.manure.growing_heifer_manure_excretion.manure_calculations">
+<span class="sig-prename descclassname"><span class="pre">RUFAS.routines.animal.manure.growing_heifer_manure_excretion.</span></span><span class="sig-name descname"><span class="pre">manure_calculations</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ration_formulation</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">feed</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">body_weight</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fecal_phosphorus</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">urine_phosphorus_required</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">methane_model</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#RUFAS.routines.animal.manure.general_manure.AnimalManureExcretions" title="RUFAS.routines.animal.manure.general_manure.AnimalManureExcretions"><span class="pre">AnimalManureExcretions</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#RUFAS.routines.animal.manure.growing_heifer_manure_excretion.manure_calculations" title="Link to this definition"></a></dt>
+<dd><p>Calculates the manure excretion values for a growing heifer with information from the ration formulation.</p>
+<section id="id8">
+<h3>Parameters<a class="headerlink" href="#id8" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>ration_formulation<span class="classifier">Dict[str, float]</span></dt><dd><p>Dictionary that stores the calculated ration.</p>
+</dd>
+<dt>feed<span class="classifier">Dict[str, float]</span></dt><dd><p>A Feed object that contains information about the available feeds.</p>
+</dd>
+<dt>body_weight<span class="classifier">float</span></dt><dd><p>Body weight of the current animal, kg.</p>
+</dd>
+<dt>fecal_phosphorus<span class="classifier">float</span></dt><dd><p>Amount of fecal phosphorus excreted by the current animal, g.</p>
+</dd>
+<dt>urine_phosphorus_required<span class="classifier">float</span></dt><dd><p>Amount of phosphorus required for urine production, g.</p>
+</dd>
+<dt>methane_model<span class="classifier">str</span></dt><dd><p>Methane model used for methane emission calculations, including Boadi, IPCC.</p>
+</dd>
+</dl>
+</section>
+<section id="id9">
+<h3>Returns<a class="headerlink" href="#id9" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>float</dt><dd><p>Total amount of phosphorus excreted by the given animal, g.</p>
+</dd>
+<dt>AnimalManureExcretions</dt><dd><dl class="simple">
+<dt>A dictionary that contains the manure excretion values as specified</dt><dd><p>in the AnimalManureExcretions class definition.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+</section>
+<section id="module-RUFAS.routines.animal.manure.lactating_cow_manure_excretion">
+<span id="rufas-routines-animal-manure-lactating-cow-manure-excretion-module"></span><h2>RUFAS.routines.animal.manure.lactating_cow_manure_excretion module<a class="headerlink" href="#module-RUFAS.routines.animal.manure.lactating_cow_manure_excretion" title="Link to this heading"></a></h2>
+<p>RUFAS: Ruminant Farm Systems Model
+File name: lactating_cow_manure_excretion.py
+Description: Determines manure excretion with information from the ration</p>
+<blockquote>
+<div><p>formulation, outputs used by the manure module.</p>
+</div></blockquote>
+<dl class="simple">
+<dt>Author(s): Militsa Sotirova, <a class="reference external" href="mailto:militsasotirova&#37;&#52;&#48;gmail&#46;com">militsasotirova<span>&#64;</span>gmail<span>&#46;</span>com</a></dt><dd><p>Joseph Merhi, <a class="reference external" href="mailto:jm2257&#37;&#52;&#48;cornell&#46;edu">jm2257<span>&#64;</span>cornell<span>&#46;</span>edu</a>
+Haowen Hu, <a class="reference external" href="mailto:hh598&#37;&#52;&#48;cornell&#46;edu">hh598<span>&#64;</span>cornell<span>&#46;</span>edu</a></p>
+</dd>
+</dl>
+<dl class="py function">
+<dt class="sig sig-object py" id="RUFAS.routines.animal.manure.lactating_cow_manure_excretion.manure_calculations">
+<span class="sig-prename descclassname"><span class="pre">RUFAS.routines.animal.manure.lactating_cow_manure_excretion.</span></span><span class="sig-name descname"><span class="pre">manure_calculations</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ration_formulation</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">feed</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">body_weight</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">days_in_milk</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">milk_protein</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">daily_milk_production</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fecal_phosphorus</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">urine_phosphorus_required</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">methane_model</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">methane_mitigation_method</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">methane_mitigation_additive_amount</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">milk_fat</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metabolizable_energy_intake</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#RUFAS.routines.animal.manure.general_manure.AnimalManureExcretions" title="RUFAS.routines.animal.manure.general_manure.AnimalManureExcretions"><span class="pre">AnimalManureExcretions</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#RUFAS.routines.animal.manure.lactating_cow_manure_excretion.manure_calculations" title="Link to this definition"></a></dt>
+<dd><p>Calculates the manure excretion values for a cow with information from the ration formulation.</p>
+<section id="id10">
+<h3>Parameters<a class="headerlink" href="#id10" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>ration_formulation<span class="classifier">Dict[str, float]</span></dt><dd><p>Dictionary that stores the calculated ration.</p>
+</dd>
+<dt>feed<span class="classifier">Dict[str, float]</span></dt><dd><p>A Feed object that contains information about the available feeds.</p>
+</dd>
+<dt>body_weight<span class="classifier">float</span></dt><dd><p>Body weight of the current cow, kg.</p>
+</dd>
+<dt>days_in_milk<span class="classifier">int</span></dt><dd><p>Days in milk, days.</p>
+</dd>
+<dt>milk_protein<span class="classifier">float</span></dt><dd><p>Milk protein (from animal input), % of milk.</p>
+</dd>
+<dt>daily_milk_production<span class="classifier">float</span></dt><dd><p>Daily milk production of the current cow, kg.</p>
+</dd>
+<dt>fecal_phosphorus<span class="classifier">float</span></dt><dd><p>Amount of fecal phosphorus excreted by the current cow, g.</p>
+</dd>
+<dt>urine_phosphorus_required<span class="classifier">float</span></dt><dd><p>Amount of phosphorus required for urine production, g.</p>
+</dd>
+<dt>methane_model<span class="classifier">str</span></dt><dd><p>Methane model used for methane emission calculations, including “Mutian”, “Mills”, “IPCC”.</p>
+</dd>
+<dt>milk_fat<span class="classifier">float</span></dt><dd><p>Milk fat (from animal input), % of milk.</p>
+</dd>
+<dt>metabolizable_energy_intake<span class="classifier">float</span></dt><dd><p>Metabolizable energy intake, Mcal/kg dry matter.</p>
+</dd>
+</dl>
+</section>
+<section id="id11">
+<h3>Returns<a class="headerlink" href="#id11" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>float</dt><dd><p>Total amount of phosphorus excreted by the given animal, g.</p>
+</dd>
+<dt>AnimalManureExcretions</dt><dd><dl class="simple">
+<dt>A dictionary that contains the manure excretion values as specified</dt><dd><p>in the AnimalManureExcretions class definition.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="RUFAS.routines.animal.manure.lactating_cow_manure_excretion.methane_mitigation">
+<span class="sig-prename descclassname"><span class="pre">RUFAS.routines.animal.manure.lactating_cow_manure_excretion.</span></span><span class="sig-name descname"><span class="pre">methane_mitigation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">NDF_concentration</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">EE_concentration</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">starch_concentration</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">CP_concentration</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">methane_mitigation_method</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">methane_mitigation_additive_amount</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.routines.animal.manure.lactating_cow_manure_excretion.methane_mitigation" title="Link to this definition"></a></dt>
+<dd><p>Calculates reduction in methane yield (%) due to addition of certain methane mitigation feed additive.</p>
+<section id="id12">
+<h3>Parameters<a class="headerlink" href="#id12" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>NDF_concentration<span class="classifier">float</span></dt><dd><p>Concentration of neutral detergent fiber (NDF) in the ration.</p>
+</dd>
+<dt>EE_concentration<span class="classifier">float</span></dt><dd><p>Concentration of ether extract (EE) in the ration.</p>
+</dd>
+<dt>starch_concentration<span class="classifier">float</span></dt><dd><p>Concentration of starch in the ration.</p>
+</dd>
+<dt>CP_concentration<span class="classifier">float</span></dt><dd><p>Concentration of crude protein (CP) in the ration.</p>
+</dd>
+<dt>methane_mitigation_method: str</dt><dd><p>Methane mitigation method used to reduce enteric methane emissions, including “3-NOP”, “Monensin”,
+“EssentialOils”, and “Seaweed”.</p>
+</dd>
+<dt>methane_mitigation_additive_amount: float</dt><dd><p>The amount of methane mitigation feed additive that is added, mg/kg dry matter intake (DMI).
+The recommended dose for 3-NOP is
+between 40 and 100 mg/kg DMI, while that for monensin is between 16 and 36 mg/kg DMI.</p>
+</dd>
+</dl>
+</section>
+<section id="id13">
+<h3>Returns<a class="headerlink" href="#id13" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>float</dt><dd><p>Reduction in methane yield (methane production/DMI), %.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+</section>
+<section id="module-RUFAS.routines.animal.manure.methane_mitigation">
+<span id="rufas-routines-animal-manure-methane-mitigation-module"></span><h2>RUFAS.routines.animal.manure.methane_mitigation module<a class="headerlink" href="#module-RUFAS.routines.animal.manure.methane_mitigation" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="RUFAS.routines.animal.manure.methane_mitigation.EssentialOils">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">RUFAS.routines.animal.manure.methane_mitigation.</span></span><span class="sig-name descname"><span class="pre">EssentialOils</span></span><a class="headerlink" href="#RUFAS.routines.animal.manure.methane_mitigation.EssentialOils" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#RUFAS.routines.animal.manure.methane_mitigation.MethaneMitigationMethod" title="RUFAS.routines.animal.manure.methane_mitigation.MethaneMitigationMethod"><code class="xref py py-class docutils literal notranslate"><span class="pre">MethaneMitigationMethod</span></code></a></p>
+<p>A class representing the Essential Oils methane mitigation method.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.animal.manure.methane_mitigation.EssentialOils.calculate">
+<span class="sig-name descname"><span class="pre">calculate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nutrient_concentrations</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">additive_amount</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.routines.animal.manure.methane_mitigation.EssentialOils.calculate" title="Link to this definition"></a></dt>
+<dd><p>Calculate the reduction in methane yield for the Essential Oils method.</p>
+<section id="id14">
+<h3>Parameters<a class="headerlink" href="#id14" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>nutrient_concentrations<span class="classifier">dict</span></dt><dd><p>A dictionary containing nutrient concentrations.</p>
+</dd>
+<dt>additive_amount<span class="classifier">float</span></dt><dd><p>The amount of essential oils additive.</p>
+</dd>
+</dl>
+</section>
+<section id="id15">
+<h3>Returns<a class="headerlink" href="#id15" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>float</dt><dd><p>The reduction in methane yield. This implementation always returns 0.0.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="RUFAS.routines.animal.manure.methane_mitigation.MethaneMitigationMethod">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">RUFAS.routines.animal.manure.methane_mitigation.</span></span><span class="sig-name descname"><span class="pre">MethaneMitigationMethod</span></span><a class="headerlink" href="#RUFAS.routines.animal.manure.methane_mitigation.MethaneMitigationMethod" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ABC</span></code></p>
+<p>A class representing a methane mitigation method. This is a base class and should be subclassed.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.animal.manure.methane_mitigation.MethaneMitigationMethod.calculate">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">calculate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nutrient_concentrations</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">additive_amount</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.routines.animal.manure.methane_mitigation.MethaneMitigationMethod.calculate" title="Link to this definition"></a></dt>
+<dd><p>Calculate the reduction in methane yield.</p>
+<p>This is a placeholder and should be overridden by subclasses.</p>
+<section id="id16">
+<h3>Parameters<a class="headerlink" href="#id16" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>nutrient_concentrations<span class="classifier">dict</span></dt><dd><p>A dictionary containing nutrient concentrations.</p>
+</dd>
+<dt>additive_amount<span class="classifier">float</span></dt><dd><p>The amount of additive.</p>
+</dd>
+</dl>
+</section>
+<section id="id17">
+<h3>Returns<a class="headerlink" href="#id17" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>float</dt><dd><p>The reduction in methane yield.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="RUFAS.routines.animal.manure.methane_mitigation.MethaneMitigationMethodManager">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">RUFAS.routines.animal.manure.methane_mitigation.</span></span><span class="sig-name descname"><span class="pre">MethaneMitigationMethodManager</span></span><a class="headerlink" href="#RUFAS.routines.animal.manure.methane_mitigation.MethaneMitigationMethodManager" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>A class to manage the creation and use of MethaneMitigationMethod subclasses.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.animal.manure.methane_mitigation.MethaneMitigationMethodManager.calculate_methane_mitigation">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">calculate_methane_mitigation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nutrient_concentrations</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">methane_mitigation_method</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">methane_mitigation_additive_amount</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.routines.animal.manure.methane_mitigation.MethaneMitigationMethodManager.calculate_methane_mitigation" title="Link to this definition"></a></dt>
+<dd><p>Calculate the reduction in methane yield for a given mitigation method.</p>
+<section id="id18">
+<h3>Parameters<a class="headerlink" href="#id18" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>nutrient_concentrations<span class="classifier">dict</span></dt><dd><p>A dictionary containing nutrient concentrations.</p>
+</dd>
+<dt>methane_mitigation_method<span class="classifier">str</span></dt><dd><p>The name of the methane mitigation method. The accepted names are
+‘nop’, ‘monensin’, ‘essentialoils’, ‘seaweed’, ‘3-NOP’, ‘Monensin’, ‘Essential Oils’, and ‘Seaweed’.</p>
+</dd>
+<dt>methane_mitigation_additive_amount<span class="classifier">float</span></dt><dd><p>The amount of additive.</p>
+</dd>
+</dl>
+</section>
+<section id="id19">
+<h3>Returns<a class="headerlink" href="#id19" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>float</dt><dd><p>The reduction in methane yield.</p>
+</dd>
+</dl>
+</section>
+<section id="raises">
+<h3>Raises<a class="headerlink" href="#raises" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>ValueError</dt><dd><p>If the mitigation method name is not recognized.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="RUFAS.routines.animal.manure.methane_mitigation.Monensin">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">RUFAS.routines.animal.manure.methane_mitigation.</span></span><span class="sig-name descname"><span class="pre">Monensin</span></span><a class="headerlink" href="#RUFAS.routines.animal.manure.methane_mitigation.Monensin" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#RUFAS.routines.animal.manure.methane_mitigation.MethaneMitigationMethod" title="RUFAS.routines.animal.manure.methane_mitigation.MethaneMitigationMethod"><code class="xref py py-class docutils literal notranslate"><span class="pre">MethaneMitigationMethod</span></code></a></p>
+<p>A class representing the Monensin methane mitigation method.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.animal.manure.methane_mitigation.Monensin.calculate">
+<span class="sig-name descname"><span class="pre">calculate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nutrient_concentrations</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">additive_amount</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.routines.animal.manure.methane_mitigation.Monensin.calculate" title="Link to this definition"></a></dt>
+<dd><p>Calculate the reduction in methane yield for the Monensin method.</p>
+<section id="id20">
+<h3>Parameters<a class="headerlink" href="#id20" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>nutrient_concentrations<span class="classifier">dict</span></dt><dd><p>A dictionary containing nutrient concentrations.</p>
+</dd>
+<dt>additive_amount<span class="classifier">float</span></dt><dd><p>The amount of Monensin additive.</p>
+</dd>
+</dl>
+</section>
+<section id="id21">
+<h3>Returns<a class="headerlink" href="#id21" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>float</dt><dd><p>The reduction in methane yield.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="RUFAS.routines.animal.manure.methane_mitigation.NOP">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">RUFAS.routines.animal.manure.methane_mitigation.</span></span><span class="sig-name descname"><span class="pre">NOP</span></span><a class="headerlink" href="#RUFAS.routines.animal.manure.methane_mitigation.NOP" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#RUFAS.routines.animal.manure.methane_mitigation.MethaneMitigationMethod" title="RUFAS.routines.animal.manure.methane_mitigation.MethaneMitigationMethod"><code class="xref py py-class docutils literal notranslate"><span class="pre">MethaneMitigationMethod</span></code></a></p>
+<p>A class representing the 3-NOP methane mitigation method.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.animal.manure.methane_mitigation.NOP.calculate">
+<span class="sig-name descname"><span class="pre">calculate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nutrient_concentrations</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">additive_amount</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.routines.animal.manure.methane_mitigation.NOP.calculate" title="Link to this definition"></a></dt>
+<dd><p>Calculate the reduction in methane yield for the 3-NOP method.</p>
+<section id="id22">
+<h3>Parameters<a class="headerlink" href="#id22" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>nutrient_concentrations<span class="classifier">dict</span></dt><dd><p>A dictionary containing nutrient concentrations.</p>
+</dd>
+<dt>additive_amount<span class="classifier">float</span></dt><dd><p>The amount of 3-NOP additive.</p>
+</dd>
+</dl>
+</section>
+<section id="id23">
+<h3>Returns<a class="headerlink" href="#id23" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>float</dt><dd><p>The reduction in methane yield.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="RUFAS.routines.animal.manure.methane_mitigation.Seaweed">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">RUFAS.routines.animal.manure.methane_mitigation.</span></span><span class="sig-name descname"><span class="pre">Seaweed</span></span><a class="headerlink" href="#RUFAS.routines.animal.manure.methane_mitigation.Seaweed" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#RUFAS.routines.animal.manure.methane_mitigation.MethaneMitigationMethod" title="RUFAS.routines.animal.manure.methane_mitigation.MethaneMitigationMethod"><code class="xref py py-class docutils literal notranslate"><span class="pre">MethaneMitigationMethod</span></code></a></p>
+<p>A class representing the Seaweed methane mitigation method.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.animal.manure.methane_mitigation.Seaweed.calculate">
+<span class="sig-name descname"><span class="pre">calculate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nutrient_concentrations</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">additive_amount</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.routines.animal.manure.methane_mitigation.Seaweed.calculate" title="Link to this definition"></a></dt>
+<dd><p>Calculate the reduction in methane yield for the Seaweed method.</p>
+<section id="id24">
+<h3>Parameters<a class="headerlink" href="#id24" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>nutrient_concentrations<span class="classifier">dict</span></dt><dd><p>A dictionary containing nutrient concentrations.</p>
+</dd>
+<dt>additive_amount<span class="classifier">float</span></dt><dd><p>The amount of Seaweed additive.</p>
+</dd>
+</dl>
+</section>
+<section id="id25">
+<h3>Returns<a class="headerlink" href="#id25" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>float</dt><dd><p>The reduction in methane yield. This implementation always returns 0.0.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-RUFAS.routines.animal.manure">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-RUFAS.routines.animal.manure" title="Link to this heading"></a></h2>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="RUFAS.routines.animal.life_cycle.html" class="btn btn-neutral float-left" title="RUFAS.routines.animal.life_cycle package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="RUFAS.routines.animal.ration.html" class="btn btn-neutral float-right" title="RUFAS.routines.animal.ration package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, RuFaS team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

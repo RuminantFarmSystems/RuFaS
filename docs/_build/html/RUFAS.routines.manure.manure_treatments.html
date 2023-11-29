@@ -1,0 +1,1088 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>RUFAS.routines.manure.manure_treatments package &mdash; Ruminant Farm Simulation (RuFaS)  documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="_static/jquery.js?v=5d32c60e"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="_static/documentation_options.js?v=5929fcd5"></script>
+        <script src="_static/doctools.js?v=888ff710"></script>
+        <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="RUFAS.routines.manure.pen package" href="RUFAS.routines.manure.pen.html" />
+    <link rel="prev" title="RUFAS.routines.manure.manure_separators package" href="RUFAS.routines.manure.manure_separators.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            Ruminant Farm Simulation (RuFaS)
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">MASM</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="Example-animal_management_SA-wrapper.html">Example-animal_management_SA-wrapper module</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="RUFAS.html">RUFAS package</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="RUFAS.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l4 current"><a class="reference internal" href="RUFAS.routines.html">RUFAS.routines package</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#submodules">Submodules</a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.config">RUFAS.config module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.current_day_conditions">RUFAS.current_day_conditions module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.errors">RUFAS.errors module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.general_constants">RUFAS.general_constants module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.graph_generator">RUFAS.graph_generator module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.input_manager">RUFAS.input_manager module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.output_manager">RUFAS.output_manager module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.report_generator">RUFAS.report_generator module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.scenario_manager">RUFAS.scenario_manager module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.simulation_engine">RUFAS.simulation_engine module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.state">RUFAS.state module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.time">RUFAS.time module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.util">RUFAS.util module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.weather">RUFAS.weather module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="main.html">main module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="setup.html">setup module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tests.html">tests package</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Ruminant Farm Simulation (RuFaS)</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="modules.html">MASM</a></li>
+          <li class="breadcrumb-item"><a href="RUFAS.html">RUFAS package</a></li>
+          <li class="breadcrumb-item"><a href="RUFAS.routines.html">RUFAS.routines package</a></li>
+          <li class="breadcrumb-item"><a href="RUFAS.routines.manure.html">RUFAS.routines.manure package</a></li>
+      <li class="breadcrumb-item active">RUFAS.routines.manure.manure_treatments package</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/RUFAS.routines.manure.manure_treatments.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="rufas-routines-manure-manure-treatments-package">
+<h1>RUFAS.routines.manure.manure_treatments package<a class="headerlink" href="#rufas-routines-manure-manure-treatments-package" title="Link to this heading"></a></h1>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Link to this heading"></a></h2>
+</section>
+<section id="module-RUFAS.routines.manure.manure_treatments.anaerobic_digestion">
+<span id="rufas-routines-manure-manure-treatments-anaerobic-digestion-module"></span><h2>RUFAS.routines.manure.manure_treatments.anaerobic_digestion module<a class="headerlink" href="#module-RUFAS.routines.manure.manure_treatments.anaerobic_digestion" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_treatments.anaerobic_digestion.AnaerobicDigestion">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">RUFAS.routines.manure.manure_treatments.anaerobic_digestion.</span></span><span class="sig-name descname"><span class="pre">AnaerobicDigestion</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">weather</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.html#RUFAS.weather.Weather" title="RUFAS.weather.Weather"><span class="pre">Weather</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.html#RUFAS.time.Time" title="RUFAS.time.Time"><span class="pre">Time</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">manure_treatment_config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#RUFAS.routines.manure.manure_treatments.manure_treatment_configs.ManureTreatmentConfig" title="RUFAS.routines.manure.manure_treatments.manure_treatment_configs.ManureTreatmentConfig"><span class="pre">ManureTreatmentConfig</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#RUFAS.routines.manure.manure_treatments.manure_treatment_configs.ManureTreatmentConfig" title="RUFAS.routines.manure.manure_treatments.manure_treatment_configs.ManureTreatmentConfig"><span class="pre">ManureTreatmentConfig</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#RUFAS.routines.manure.manure_treatments.manure_treatment_configs.ManureTreatmentConfig" title="RUFAS.routines.manure.manure_treatments.manure_treatment_configs.ManureTreatmentConfig"><span class="pre">ManureTreatmentConfig</span></a><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.manure.manure_treatments.anaerobic_digestion.AnaerobicDigestion" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#RUFAS.routines.manure.manure_treatments.base_manure_treatment.BaseManureTreatment" title="RUFAS.routines.manure.manure_treatments.base_manure_treatment.BaseManureTreatment"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseManureTreatment</span></code></a></p>
+<p>A class that calculates the output of an anaerobic digester.</p>
+<dl class="simple">
+<dt>Attributes:</dt><dd><p>Same as BaseManureTreatment.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-RUFAS.routines.manure.manure_treatments.anaerobic_digestion_and_lagoon">
+<span id="rufas-routines-manure-manure-treatments-anaerobic-digestion-and-lagoon-module"></span><h2>RUFAS.routines.manure.manure_treatments.anaerobic_digestion_and_lagoon module<a class="headerlink" href="#module-RUFAS.routines.manure.manure_treatments.anaerobic_digestion_and_lagoon" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_treatments.anaerobic_digestion_and_lagoon.AnaerobicDigestionAndLagoon">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">RUFAS.routines.manure.manure_treatments.anaerobic_digestion_and_lagoon.</span></span><span class="sig-name descname"><span class="pre">AnaerobicDigestionAndLagoon</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">weather</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">manure_treatment_config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#RUFAS.routines.manure.manure_treatments.manure_treatment_configs.ManureTreatmentConfig" title="RUFAS.routines.manure.manure_treatments.manure_treatment_configs.ManureTreatmentConfig"><span class="pre">ManureTreatmentConfig</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#RUFAS.routines.manure.manure_treatments.manure_treatment_configs.ManureTreatmentConfig" title="RUFAS.routines.manure.manure_treatments.manure_treatment_configs.ManureTreatmentConfig"><span class="pre">ManureTreatmentConfig</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#RUFAS.routines.manure.manure_treatments.manure_treatment_configs.ManureTreatmentConfig" title="RUFAS.routines.manure.manure_treatments.manure_treatment_configs.ManureTreatmentConfig"><span class="pre">ManureTreatmentConfig</span></a><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.manure.manure_treatments.anaerobic_digestion_and_lagoon.AnaerobicDigestionAndLagoon" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#RUFAS.routines.manure.manure_treatments.base_manure_treatment.BaseManureTreatment" title="RUFAS.routines.manure.manure_treatments.base_manure_treatment.BaseManureTreatment"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseManureTreatment</span></code></a></p>
+<p>A class that models the coupling of the anaerobic digestion and lagoon manure treatments.</p>
+<p>There are two distinct scenarios that this class models: (1) This combination of manure treatments
+is preceded by a manure separator, and (2) this combination of manure treatments sandwiches
+a manure separator.</p>
+<dl class="simple">
+<dt>Attributes:</dt><dd><p>Same as BaseManureTreatment.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-RUFAS.routines.manure.manure_treatments.anaerobic_lagoon">
+<span id="rufas-routines-manure-manure-treatments-anaerobic-lagoon-module"></span><h2>RUFAS.routines.manure.manure_treatments.anaerobic_lagoon module<a class="headerlink" href="#module-RUFAS.routines.manure.manure_treatments.anaerobic_lagoon" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_treatments.anaerobic_lagoon.AnaerobicLagoon">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">RUFAS.routines.manure.manure_treatments.anaerobic_lagoon.</span></span><span class="sig-name descname"><span class="pre">AnaerobicLagoon</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">weather</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">manure_treatment_config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#RUFAS.routines.manure.manure_treatments.manure_treatment_configs.ManureTreatmentConfig" title="RUFAS.routines.manure.manure_treatments.manure_treatment_configs.ManureTreatmentConfig"><span class="pre">ManureTreatmentConfig</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.manure.manure_treatments.anaerobic_lagoon.AnaerobicLagoon" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#RUFAS.routines.manure.manure_treatments.base_manure_treatment.BaseManureTreatment" title="RUFAS.routines.manure.manure_treatments.base_manure_treatment.BaseManureTreatment"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseManureTreatment</span></code></a></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_treatments.anaerobic_lagoon.AnaerobicLagoon.LAGOON_DEPTH">
+<span class="sig-name descname"><span class="pre">LAGOON_DEPTH</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">3.657</span></em><a class="headerlink" href="#RUFAS.routines.manure.manure_treatments.anaerobic_lagoon.AnaerobicLagoon.LAGOON_DEPTH" title="Link to this definition"></a></dt>
+<dd><p>The depth of the lagoon (m). Default is set to 3.657 m (12 ft).</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_treatments.anaerobic_lagoon.AnaerobicLagoon.LAGOON_SLOPE">
+<span class="sig-name descname"><span class="pre">LAGOON_SLOPE</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">2.0</span></em><a class="headerlink" href="#RUFAS.routines.manure.manure_treatments.anaerobic_lagoon.AnaerobicLagoon.LAGOON_SLOPE" title="Link to this definition"></a></dt>
+<dd><p>The slope of the lagoon (unitless). Default is set to 2.0.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_treatments.anaerobic_lagoon.AnaerobicLagoon.flushing_volume">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">flushing_volume</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#RUFAS.routines.manure.manure_treatments.anaerobic_lagoon.AnaerobicLagoon.flushing_volume" title="Link to this definition"></a></dt>
+<dd><p>Returns flushing water recycled.</p>
+<dl class="simple">
+<dt>Returns:</dt><dd><p>Flushing water volume, m^3</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_treatments.anaerobic_lagoon.AnaerobicLagoon.freeboard_volume">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">freeboard_volume</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#RUFAS.routines.manure.manure_treatments.anaerobic_lagoon.AnaerobicLagoon.freeboard_volume" title="Link to this definition"></a></dt>
+<dd><p>Calculate additional lagoon volume needed for freeboard.</p>
+<section id="returns">
+<h3>Returns<a class="headerlink" href="#returns" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>float</dt><dd><p>Additional lagoon volume needed for freeboard (<span class="math notranslate nohighlight">\(m^3\)</span>).</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_treatments.anaerobic_lagoon.AnaerobicLagoon.lagoon_depth">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">lagoon_depth</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#RUFAS.routines.manure.manure_treatments.anaerobic_lagoon.AnaerobicLagoon.lagoon_depth" title="Link to this definition"></a></dt>
+<dd><p>Get the lagoon depth.</p>
+<p>This property provides access to the depth of the lagoon.</p>
+<section id="id1">
+<h3>Returns<a class="headerlink" href="#id1" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>float</dt><dd><p>Lagoon depth in meters (m).</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_treatments.anaerobic_lagoon.AnaerobicLagoon.lagoon_length">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">lagoon_length</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#RUFAS.routines.manure.manure_treatments.anaerobic_lagoon.AnaerobicLagoon.lagoon_length" title="Link to this definition"></a></dt>
+<dd><p>Calculate and return the length of the lagoon in meters (m).</p>
+<p>The length of the lagoon is calculated as three times the width of the lagoon.</p>
+<section id="id2">
+<h3>Returns<a class="headerlink" href="#id2" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>float</dt><dd><p>Lagoon length in meters (m).</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_treatments.anaerobic_lagoon.AnaerobicLagoon.lagoon_slope">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">lagoon_slope</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#RUFAS.routines.manure.manure_treatments.anaerobic_lagoon.AnaerobicLagoon.lagoon_slope" title="Link to this definition"></a></dt>
+<dd><p>Get the lagoon slope.</p>
+<p>This property provides access to the slope of the lagoon.</p>
+<section id="id3">
+<h3>Returns<a class="headerlink" href="#id3" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>float</dt><dd><p>Lagoon slope (unitless).</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_treatments.anaerobic_lagoon.AnaerobicLagoon.lagoon_surface_area">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">lagoon_surface_area</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#RUFAS.routines.manure.manure_treatments.anaerobic_lagoon.AnaerobicLagoon.lagoon_surface_area" title="Link to this definition"></a></dt>
+<dd><p>Calculate and return the surface area of the lagoon in square meters (m^2).</p>
+<p>The surface area is calculated as the product of the lagoon’s width and length.</p>
+<section id="id4">
+<h3>Returns<a class="headerlink" href="#id4" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>float</dt><dd><p>Lagoon surface area in square meters (<span class="math notranslate nohighlight">\(m^2\)</span>).</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_treatments.anaerobic_lagoon.AnaerobicLagoon.lagoon_width">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">lagoon_width</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#RUFAS.routines.manure.manure_treatments.anaerobic_lagoon.AnaerobicLagoon.lagoon_width" title="Link to this definition"></a></dt>
+<dd><p>Calculate and return the lagoon width in meters.</p>
+<p>The width of the lagoon is computed by solving a quadratic equation derived from the lagoon’s depth
+and slope. The coefficients for this equation are computed in the _calc_lagoon_width_coefficients method.</p>
+<p>If the quadratic equation does not have real roots (discriminant &lt; 0), the width is considered to be 0.0.
+If both roots of the quadratic equation are negative, the width is also considered to be 0.0 as negative
+width is not physically meaningful.</p>
+<section id="id5">
+<h3>Returns<a class="headerlink" href="#id5" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>float</dt><dd><p>Lagoon width in meters (m). If the quadratic equation has no real solutions or both roots are negative,
+returns 0.0.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_treatments.anaerobic_lagoon.AnaerobicLagoon.precipitation_volume">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">precipitation_volume</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#RUFAS.routines.manure.manure_treatments.anaerobic_lagoon.AnaerobicLagoon.precipitation_volume" title="Link to this definition"></a></dt>
+<dd><p>Return additional lagoon volume needed for precipitation.</p>
+<p>The additional volume needed for precipitation is calculated as the product of
+the current day’s rainfall and the lagoon’s surface area.</p>
+<section id="id6">
+<h3>Returns<a class="headerlink" href="#id6" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>float</dt><dd><p>Additional lagoon volume needed for precipitation (<span class="math notranslate nohighlight">\(m^3\)</span>).</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_treatments.anaerobic_lagoon.AnaerobicLagoon.sludge_accumulation_volume">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">sludge_accumulation_volume</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#RUFAS.routines.manure.manure_treatments.anaerobic_lagoon.AnaerobicLagoon.sludge_accumulation_volume" title="Link to this definition"></a></dt>
+<dd><p>Returns sludge accumulation volume.</p>
+<dl class="simple">
+<dt>Returns:</dt><dd><p>Sludge accumulation volume, m^3.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_treatments.anaerobic_lagoon.AnaerobicLagoon.volume_needed">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">volume_needed</span></span><a class="headerlink" href="#RUFAS.routines.manure.manure_treatments.anaerobic_lagoon.AnaerobicLagoon.volume_needed" title="Link to this definition"></a></dt>
+<dd><p>Returns volume needed.</p>
+<dl class="simple">
+<dt>Returns:</dt><dd><p>Volume needed, m^3.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-RUFAS.routines.manure.manure_treatments.base_manure_treatment">
+<span id="rufas-routines-manure-manure-treatments-base-manure-treatment-module"></span><h2>RUFAS.routines.manure.manure_treatments.base_manure_treatment module<a class="headerlink" href="#module-RUFAS.routines.manure.manure_treatments.base_manure_treatment" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_treatments.base_manure_treatment.BaseManureTreatment">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">RUFAS.routines.manure.manure_treatments.base_manure_treatment.</span></span><span class="sig-name descname"><span class="pre">BaseManureTreatment</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">weather</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.html#RUFAS.weather.Weather" title="RUFAS.weather.Weather"><span class="pre">Weather</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.html#RUFAS.time.Time" title="RUFAS.time.Time"><span class="pre">Time</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">manure_treatment_config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#RUFAS.routines.manure.manure_treatments.manure_treatment_configs.ManureTreatmentConfig" title="RUFAS.routines.manure.manure_treatments.manure_treatment_configs.ManureTreatmentConfig"><span class="pre">ManureTreatmentConfig</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#RUFAS.routines.manure.manure_treatments.manure_treatment_configs.ManureTreatmentConfig" title="RUFAS.routines.manure.manure_treatments.manure_treatment_configs.ManureTreatmentConfig"><span class="pre">ManureTreatmentConfig</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#RUFAS.routines.manure.manure_treatments.manure_treatment_configs.ManureTreatmentConfig" title="RUFAS.routines.manure.manure_treatments.manure_treatment_configs.ManureTreatmentConfig"><span class="pre">ManureTreatmentConfig</span></a><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.manure.manure_treatments.base_manure_treatment.BaseManureTreatment" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ABC</span></code></p>
+<p>Base class for all manure treatment classes.</p>
+<dl class="simple">
+<dt>Attributes:</dt><dd><p>weather: A Weather object.
+time: A Time object.
+config: A ManureTreatmentConfig object containing the configuration for the manure treatment.</p>
+</dd>
+</dl>
+<dl class="py property">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_treatments.base_manure_treatment.BaseManureTreatment.accumulated_output">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">accumulated_output</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#RUFAS.routines.manure.manure_treatments.manure_treatment_daily_output.ManureTreatmentDailyOutput" title="RUFAS.routines.manure.manure_treatments.manure_treatment_daily_output.ManureTreatmentDailyOutput"><span class="pre">ManureTreatmentDailyOutput</span></a></em><a class="headerlink" href="#RUFAS.routines.manure.manure_treatments.base_manure_treatment.BaseManureTreatment.accumulated_output" title="Link to this definition"></a></dt>
+<dd><p>Returns the accumulated output of the manure treatment.
+Returns
+——-
+ManureTreatmentDailyOutput</p>
+<blockquote>
+<div><p>A ManureTreatmentDailyOutput object containing the accumulated output of the manure treatment.</p>
+</div></blockquote>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_treatments.base_manure_treatment.BaseManureTreatment.calc_ammonia_emission">
+<span class="sig-name descname"><span class="pre">calc_ammonia_emission</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.routines.manure.manure_treatments.base_manure_treatment.BaseManureTreatment.calc_ammonia_emission" title="Link to this definition"></a></dt>
+<dd><p>Calculates the ammonia emission of the manure treatment.</p>
+<p>For those treatments that do not produce ammonia emission, this method will return 0.0.
+Otherwise, the method will be overridden by the subclass.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_treatments.base_manure_treatment.BaseManureTreatment.calc_methane_emission">
+<span class="sig-name descname"><span class="pre">calc_methane_emission</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.routines.manure.manure_treatments.base_manure_treatment.BaseManureTreatment.calc_methane_emission" title="Link to this definition"></a></dt>
+<dd><p>Calculates the methane emission of the manure treatment.</p>
+<p>For those treatments that do not produce methane emission, this method will return 0.0.
+Otherwise, the method will be overridden by the subclass.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_treatments.base_manure_treatment.BaseManureTreatment.daily_update">
+<span class="sig-name descname"><span class="pre">daily_update</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">manure_handler_daily_output</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.routines.manure.manure_handlers.html#RUFAS.routines.manure.manure_handlers.manure_handler_daily_output.ManureHandlerDailyOutput" title="RUFAS.routines.manure.manure_handlers.manure_handler_daily_output.ManureHandlerDailyOutput"><span class="pre">ManureHandlerDailyOutput</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">manure_treatment_daily_input</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.routines.manure.protocols.html#RUFAS.routines.manure.protocols.liquid_manure_portion_protocol.LiquidManurePortionProtocol" title="RUFAS.routines.manure.protocols.liquid_manure_portion_protocol.LiquidManurePortionProtocol"><span class="pre">LiquidManurePortionProtocol</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">pen</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.routines.manure.pen_manure.html#RUFAS.routines.manure.pen_manure.manure_manager_pen.ManureManagerPen" title="RUFAS.routines.manure.pen_manure.manure_manager_pen.ManureManagerPen"><span class="pre">ManureManagerPen</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">sim_day</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">manure_separator</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.routines.manure.manure_separators.html#RUFAS.routines.manure.manure_separators.manure_separator_classes.BaseManureSeparator" title="RUFAS.routines.manure.manure_separators.manure_separator_classes.BaseManureSeparator"><span class="pre">BaseManureSeparator</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#RUFAS.routines.manure.manure_treatments.manure_treatment_daily_output.ManureTreatmentDailyOutput" title="RUFAS.routines.manure.manure_treatments.manure_treatment_daily_output.ManureTreatmentDailyOutput"><span class="pre">ManureTreatmentDailyOutput</span></a></span></span><a class="headerlink" href="#RUFAS.routines.manure.manure_treatments.base_manure_treatment.BaseManureTreatment.daily_update" title="Link to this definition"></a></dt>
+<dd><p>Calculates the daily output of the manure treatment.</p>
+<dl>
+<dt>Args:</dt><dd><dl class="simple">
+<dt>manure_handler_daily_output: A ManureHandlerDailyOutput object containing the</dt><dd><p>daily output of the manure handler.</p>
+</dd>
+<dt>manure_treatment_daily_input: A LiquidManurePortionProtocol object containing</dt><dd><p>the daily input of the manure treatment.</p>
+</dd>
+</dl>
+<p>pen: A ManureManagerPen object.
+sim_day: The current simulation day.
+manure_separator: A optional BaseManureSeparator object meant to be used in the special</p>
+<blockquote>
+<div><p>case of digester-separator-lagoon configuration triple.</p>
+</div></blockquote>
+</dd>
+<dt>Returns:</dt><dd><dl class="simple">
+<dt>A ManureTreatmentDailyOutput object containing the output of the manure</dt><dd><p>treatment for the current simulation day.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_treatments.base_manure_treatment.BaseManureTreatment.manure_separator_daily_output">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">manure_separator_daily_output</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="RUFAS.routines.manure.manure_separators.html#RUFAS.routines.manure.manure_separators.manure_separator_daily_output.ManureSeparatorDailyOutput" title="RUFAS.routines.manure.manure_separators.manure_separator_daily_output.ManureSeparatorDailyOutput"><span class="pre">ManureSeparatorDailyOutput</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#RUFAS.routines.manure.manure_treatments.base_manure_treatment.BaseManureTreatment.manure_separator_daily_output" title="Link to this definition"></a></dt>
+<dd><p>Returns the daily output of the intervening separator in the digester - separator - lagoon scenario.</p>
+<dl class="simple">
+<dt>Returns:</dt><dd><p>A ManureSeparatorDailyOutput object containing the daily output of
+the intervening separator in the digester - separator - lagoon scenario.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-RUFAS.routines.manure.manure_treatments.manure_treatment_cbpb">
+<span id="rufas-routines-manure-manure-treatments-manure-treatment-cbpb-module"></span><h2>RUFAS.routines.manure.manure_treatments.manure_treatment_cbpb module<a class="headerlink" href="#module-RUFAS.routines.manure.manure_treatments.manure_treatment_cbpb" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_treatments.manure_treatment_cbpb.CompostBeddedPackBarn">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">RUFAS.routines.manure.manure_treatments.manure_treatment_cbpb.</span></span><span class="sig-name descname"><span class="pre">CompostBeddedPackBarn</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">weather</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">manure_treatment_config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#RUFAS.routines.manure.manure_treatments.manure_treatment_configs.ManureTreatmentConfig" title="RUFAS.routines.manure.manure_treatments.manure_treatment_configs.ManureTreatmentConfig"><span class="pre">ManureTreatmentConfig</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.manure.manure_treatments.manure_treatment_cbpb.CompostBeddedPackBarn" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#RUFAS.routines.manure.manure_treatments.base_manure_treatment.BaseManureTreatment" title="RUFAS.routines.manure.manure_treatments.base_manure_treatment.BaseManureTreatment"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseManureTreatment</span></code></a></p>
+<p>Class for the compost bedded pack barn.</p>
+<dl class="simple">
+<dt>Attributes:</dt><dd><p>All attributes inherited from BaseManureTreatment.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-RUFAS.routines.manure.manure_treatments.manure_treatment_configs">
+<span id="rufas-routines-manure-manure-treatments-manure-treatment-configs-module"></span><h2>RUFAS.routines.manure.manure_treatments.manure_treatment_configs module<a class="headerlink" href="#module-RUFAS.routines.manure.manure_treatments.manure_treatment_configs" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_treatments.manure_treatment_configs.DefaultManureTreatmentConfigFactory">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">RUFAS.routines.manure.manure_treatments.manure_treatment_configs.</span></span><span class="sig-name descname"><span class="pre">DefaultManureTreatmentConfigFactory</span></span><a class="headerlink" href="#RUFAS.routines.manure.manure_treatments.manure_treatment_configs.DefaultManureTreatmentConfigFactory" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Class for creating default manure treatment configuration data.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_treatments.manure_treatment_configs.DefaultManureTreatmentConfigFactory.ANAEROBIC_DIGESTION_CONFIG">
+<span class="sig-name descname"><span class="pre">ANAEROBIC_DIGESTION_CONFIG</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">ManureTreatmentConfig(total_solids_removal_efficiency_for_treatment=0.45,</span> <span class="pre">volatile_solids_removal_efficiency_for_treatment=0.4,</span> <span class="pre">nitrogen_removal_efficiency_for_treatment=0.0,</span> <span class="pre">total_ammoniacal_nitrogen_removal_efficiency_for_treatment=0.1,</span> <span class="pre">phosphorus_removal_efficiency_for_treatment=0.0,</span> <span class="pre">potassium_removal_efficiency_for_treatment=0.0,</span> <span class="pre">hydraulic_retention_time=25,</span> <span class="pre">sludge_accumulation_period=1.0,</span> <span class="pre">sludge_accumulation_volume_fraction=0.03,</span> <span class="pre">top_cover_volume_fraction=0.2,</span> <span class="pre">biogas_generation_ratio=0.38,</span> <span class="pre">methane_generation_ratio=0.65,</span> <span class="pre">evaporation_fraction=0.02,</span> <span class="pre">anaerobic_digestion_temperature_set_point=37.5,</span> <span class="pre">anaerobic_digestion_temperature_celsius=37.5,</span> <span class="pre">storage_time_period=0,</span> <span class="pre">freeboard_input=0.0)</span></em><a class="headerlink" href="#RUFAS.routines.manure.manure_treatments.manure_treatment_configs.DefaultManureTreatmentConfigFactory.ANAEROBIC_DIGESTION_CONFIG" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_treatments.manure_treatment_configs.DefaultManureTreatmentConfigFactory.ANAEROBIC_LAGOON_CONFIG">
+<span class="sig-name descname"><span class="pre">ANAEROBIC_LAGOON_CONFIG</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">ManureTreatmentConfig(total_solids_removal_efficiency_for_treatment=0.75,</span> <span class="pre">volatile_solids_removal_efficiency_for_treatment=0.85,</span> <span class="pre">nitrogen_removal_efficiency_for_treatment=0.65,</span> <span class="pre">total_ammoniacal_nitrogen_removal_efficiency_for_treatment=0.7,</span> <span class="pre">phosphorus_removal_efficiency_for_treatment=0.6,</span> <span class="pre">potassium_removal_efficiency_for_treatment=0.2,</span> <span class="pre">hydraulic_retention_time=365,</span> <span class="pre">sludge_accumulation_period=10.0,</span> <span class="pre">sludge_accumulation_volume_fraction=0.00251,</span> <span class="pre">top_cover_volume_fraction=0.0,</span> <span class="pre">biogas_generation_ratio=0.0,</span> <span class="pre">methane_generation_ratio=0.0,</span> <span class="pre">evaporation_fraction=0.0,</span> <span class="pre">anaerobic_digestion_temperature_set_point=0.0,</span> <span class="pre">anaerobic_digestion_temperature_celsius=0.0,</span> <span class="pre">storage_time_period=365,</span> <span class="pre">freeboard_input=0.3048)</span></em><a class="headerlink" href="#RUFAS.routines.manure.manure_treatments.manure_treatment_configs.DefaultManureTreatmentConfigFactory.ANAEROBIC_LAGOON_CONFIG" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_treatments.manure_treatment_configs.DefaultManureTreatmentConfigFactory.COMPOST_BEDDED_PACK_BARN_CONFIG">
+<span class="sig-name descname"><span class="pre">COMPOST_BEDDED_PACK_BARN_CONFIG</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">ManureTreatmentConfig(total_solids_removal_efficiency_for_treatment=0.0,</span> <span class="pre">volatile_solids_removal_efficiency_for_treatment=0.0,</span> <span class="pre">nitrogen_removal_efficiency_for_treatment=0.0,</span> <span class="pre">total_ammoniacal_nitrogen_removal_efficiency_for_treatment=0.0,</span> <span class="pre">phosphorus_removal_efficiency_for_treatment=0.0,</span> <span class="pre">potassium_removal_efficiency_for_treatment=0.0,</span> <span class="pre">hydraulic_retention_time=0,</span> <span class="pre">sludge_accumulation_period=0.0,</span> <span class="pre">sludge_accumulation_volume_fraction=0.0,</span> <span class="pre">top_cover_volume_fraction=0.0,</span> <span class="pre">biogas_generation_ratio=0.0,</span> <span class="pre">methane_generation_ratio=0.0,</span> <span class="pre">evaporation_fraction=0.0,</span> <span class="pre">anaerobic_digestion_temperature_set_point=0.0,</span> <span class="pre">anaerobic_digestion_temperature_celsius=0.0,</span> <span class="pre">storage_time_period=0,</span> <span class="pre">freeboard_input=0.0)</span></em><a class="headerlink" href="#RUFAS.routines.manure.manure_treatments.manure_treatment_configs.DefaultManureTreatmentConfigFactory.COMPOST_BEDDED_PACK_BARN_CONFIG" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_treatments.manure_treatment_configs.DefaultManureTreatmentConfigFactory.SLURRY_STORAGE_OUTDOOR_CONFIG">
+<span class="sig-name descname"><span class="pre">SLURRY_STORAGE_OUTDOOR_CONFIG</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">ManureTreatmentConfig(total_solids_removal_efficiency_for_treatment=0.1,</span> <span class="pre">volatile_solids_removal_efficiency_for_treatment=0.2,</span> <span class="pre">nitrogen_removal_efficiency_for_treatment=0.1,</span> <span class="pre">total_ammoniacal_nitrogen_removal_efficiency_for_treatment=0.45,</span> <span class="pre">phosphorus_removal_efficiency_for_treatment=0.05,</span> <span class="pre">potassium_removal_efficiency_for_treatment=0.05,</span> <span class="pre">hydraulic_retention_time=0,</span> <span class="pre">sludge_accumulation_period=0.0,</span> <span class="pre">sludge_accumulation_volume_fraction=0.0,</span> <span class="pre">top_cover_volume_fraction=0.0,</span> <span class="pre">biogas_generation_ratio=0.0,</span> <span class="pre">methane_generation_ratio=0.0,</span> <span class="pre">evaporation_fraction=0.0,</span> <span class="pre">anaerobic_digestion_temperature_set_point=0.0,</span> <span class="pre">anaerobic_digestion_temperature_celsius=0.0,</span> <span class="pre">storage_time_period=120,</span> <span class="pre">freeboard_input=0.3048)</span></em><a class="headerlink" href="#RUFAS.routines.manure.manure_treatments.manure_treatment_configs.DefaultManureTreatmentConfigFactory.SLURRY_STORAGE_OUTDOOR_CONFIG" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_treatments.manure_treatment_configs.DefaultManureTreatmentConfigFactory.SLURRY_STORAGE_UNDERFLOOR_CONFIG">
+<span class="sig-name descname"><span class="pre">SLURRY_STORAGE_UNDERFLOOR_CONFIG</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">ManureTreatmentConfig(total_solids_removal_efficiency_for_treatment=0.1,</span> <span class="pre">volatile_solids_removal_efficiency_for_treatment=0.2,</span> <span class="pre">nitrogen_removal_efficiency_for_treatment=0.1,</span> <span class="pre">total_ammoniacal_nitrogen_removal_efficiency_for_treatment=0.45,</span> <span class="pre">phosphorus_removal_efficiency_for_treatment=0.05,</span> <span class="pre">potassium_removal_efficiency_for_treatment=0.05,</span> <span class="pre">hydraulic_retention_time=0,</span> <span class="pre">sludge_accumulation_period=0.0,</span> <span class="pre">sludge_accumulation_volume_fraction=0.0,</span> <span class="pre">top_cover_volume_fraction=0.0,</span> <span class="pre">biogas_generation_ratio=0.0,</span> <span class="pre">methane_generation_ratio=0.0,</span> <span class="pre">evaporation_fraction=0.0,</span> <span class="pre">anaerobic_digestion_temperature_set_point=0.0,</span> <span class="pre">anaerobic_digestion_temperature_celsius=0.0,</span> <span class="pre">storage_time_period=120,</span> <span class="pre">freeboard_input=0.0)</span></em><a class="headerlink" href="#RUFAS.routines.manure.manure_treatments.manure_treatment_configs.DefaultManureTreatmentConfigFactory.SLURRY_STORAGE_UNDERFLOOR_CONFIG" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_treatments.manure_treatment_configs.DefaultManureTreatmentConfigFactory.get_instance">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_instance</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">treatment_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#RUFAS.routines.manure.manure_treatments.manure_treatment_types.ManureTreatmentType" title="RUFAS.routines.manure.manure_treatments.manure_treatment_types.ManureTreatmentType"><span class="pre">ManureTreatmentType</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#RUFAS.routines.manure.manure_treatments.manure_treatment_configs.ManureTreatmentConfig" title="RUFAS.routines.manure.manure_treatments.manure_treatment_configs.ManureTreatmentConfig"><span class="pre">ManureTreatmentConfig</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#RUFAS.routines.manure.manure_treatments.manure_treatment_configs.ManureTreatmentConfig" title="RUFAS.routines.manure.manure_treatments.manure_treatment_configs.ManureTreatmentConfig"><span class="pre">ManureTreatmentConfig</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#RUFAS.routines.manure.manure_treatments.manure_treatment_configs.ManureTreatmentConfig" title="RUFAS.routines.manure.manure_treatments.manure_treatment_configs.ManureTreatmentConfig"><span class="pre">ManureTreatmentConfig</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#RUFAS.routines.manure.manure_treatments.manure_treatment_configs.DefaultManureTreatmentConfigFactory.get_instance" title="Link to this definition"></a></dt>
+<dd><p>Return a default manure treatment configuration data instance for the given treatment type.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>treatment_type: The type of manure treatment.</p>
+</dd>
+<dt>Returns:</dt><dd><p>A default manure treatment configuration data instance for the given treatment type.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_treatments.manure_treatment_configs.ManureTreatmentConfig">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">RUFAS.routines.manure.manure_treatments.manure_treatment_configs.</span></span><span class="sig-name descname"><span class="pre">ManureTreatmentConfig</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">total_solids_removal_efficiency_for_treatment</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">volatile_solids_removal_efficiency_for_treatment</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nitrogen_removal_efficiency_for_treatment</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">total_ammoniacal_nitrogen_removal_efficiency_for_treatment</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">phosphorus_removal_efficiency_for_treatment</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">potassium_removal_efficiency_for_treatment</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hydraulic_retention_time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sludge_accumulation_period</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sludge_accumulation_volume_fraction</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">top_cover_volume_fraction</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">biogas_generation_ratio</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">methane_generation_ratio</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">evaporation_fraction</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">anaerobic_digestion_temperature_set_point</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">anaerobic_digestion_temperature_celsius</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">storage_time_period</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">freeboard_input</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.manure.manure_treatments.manure_treatment_configs.ManureTreatmentConfig" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Class for storing manure treatment configuration data.</p>
+<dl>
+<dt>Attributes:</dt><dd><p>total_solids_removal_efficiency_for_treatment: Percent of total solids removed from manure during treatment.
+volatile_solids_removal_efficiency_for_treatment: Percent of volatile solids removed from manure during
+treatment.
+nitrogen_removal_efficiency_for_treatment: Percent of nitrogen removed from manure during treatment.
+total_ammoniacal_nitrogen_removal_efficiency_for_treatment: Percent of total ammoniacal nitrogen removed from
+manure during treatment.
+phosphorus_removal_efficiency_for_treatment: Percent of phosphorus removed from manure during treatment.
+potassium_removal_efficiency_for_treatment: Percent of potassium removed from manure during treatment.</p>
+<p>hydraulic_retention_time: Time in days spent in the treatment system.
+sludge_accumulation_period: Time in days/years that sludge accumulates in the treatment system.
+sludge_accumulation_volume_fraction: Sludge Accumulation Volume (SAV) fraction based on the manure solids</p>
+<blockquote>
+<div><p>entering the treatment system.</p>
+</div></blockquote>
+<dl class="simple">
+<dt>top_cover_volume_fraction: Fraction of the total volume of the treatment system</dt><dd><p>that is assumed to be the top cover volume.</p>
+</dd>
+</dl>
+<p>biogas_generation_ratio: Amount of biogas generated from the treatment system.
+methane_generation_ratio: Amount of methane generated from the treatment system</p>
+<blockquote>
+<div><p>(calculated from the amount of biogas generated).</p>
+</div></blockquote>
+<p>evaporation_fraction: Fraction of the liquid portion evaporated from the treatment system.
+anaerobic_digestion_temperature_set_point: Temperature set point for the anaerobic digestion.
+anaerobic_digestion_temperature_celsius: Temperature of the anaerobic digestion.</p>
+<p>storage_time_period: Time in days that manure is stored in the treatment system.
+freeboard_input: Empty storage space above the manure in the treatment system.</p>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_treatments.manure_treatment_configs.ManureTreatmentConfig.anaerobic_digestion_temperature_celsius">
+<span class="sig-name descname"><span class="pre">anaerobic_digestion_temperature_celsius</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.0</span></em><a class="headerlink" href="#RUFAS.routines.manure.manure_treatments.manure_treatment_configs.ManureTreatmentConfig.anaerobic_digestion_temperature_celsius" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_treatments.manure_treatment_configs.ManureTreatmentConfig.anaerobic_digestion_temperature_set_point">
+<span class="sig-name descname"><span class="pre">anaerobic_digestion_temperature_set_point</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.0</span></em><a class="headerlink" href="#RUFAS.routines.manure.manure_treatments.manure_treatment_configs.ManureTreatmentConfig.anaerobic_digestion_temperature_set_point" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_treatments.manure_treatment_configs.ManureTreatmentConfig.biogas_generation_ratio">
+<span class="sig-name descname"><span class="pre">biogas_generation_ratio</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.0</span></em><a class="headerlink" href="#RUFAS.routines.manure.manure_treatments.manure_treatment_configs.ManureTreatmentConfig.biogas_generation_ratio" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_treatments.manure_treatment_configs.ManureTreatmentConfig.evaporation_fraction">
+<span class="sig-name descname"><span class="pre">evaporation_fraction</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.0</span></em><a class="headerlink" href="#RUFAS.routines.manure.manure_treatments.manure_treatment_configs.ManureTreatmentConfig.evaporation_fraction" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_treatments.manure_treatment_configs.ManureTreatmentConfig.freeboard_input">
+<span class="sig-name descname"><span class="pre">freeboard_input</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.0</span></em><a class="headerlink" href="#RUFAS.routines.manure.manure_treatments.manure_treatment_configs.ManureTreatmentConfig.freeboard_input" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_treatments.manure_treatment_configs.ManureTreatmentConfig.hydraulic_retention_time">
+<span class="sig-name descname"><span class="pre">hydraulic_retention_time</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0</span></em><a class="headerlink" href="#RUFAS.routines.manure.manure_treatments.manure_treatment_configs.ManureTreatmentConfig.hydraulic_retention_time" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_treatments.manure_treatment_configs.ManureTreatmentConfig.methane_generation_ratio">
+<span class="sig-name descname"><span class="pre">methane_generation_ratio</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.0</span></em><a class="headerlink" href="#RUFAS.routines.manure.manure_treatments.manure_treatment_configs.ManureTreatmentConfig.methane_generation_ratio" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_treatments.manure_treatment_configs.ManureTreatmentConfig.nitrogen_removal_efficiency_for_treatment">
+<span class="sig-name descname"><span class="pre">nitrogen_removal_efficiency_for_treatment</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.0</span></em><a class="headerlink" href="#RUFAS.routines.manure.manure_treatments.manure_treatment_configs.ManureTreatmentConfig.nitrogen_removal_efficiency_for_treatment" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_treatments.manure_treatment_configs.ManureTreatmentConfig.phosphorus_removal_efficiency_for_treatment">
+<span class="sig-name descname"><span class="pre">phosphorus_removal_efficiency_for_treatment</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.0</span></em><a class="headerlink" href="#RUFAS.routines.manure.manure_treatments.manure_treatment_configs.ManureTreatmentConfig.phosphorus_removal_efficiency_for_treatment" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_treatments.manure_treatment_configs.ManureTreatmentConfig.potassium_removal_efficiency_for_treatment">
+<span class="sig-name descname"><span class="pre">potassium_removal_efficiency_for_treatment</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.0</span></em><a class="headerlink" href="#RUFAS.routines.manure.manure_treatments.manure_treatment_configs.ManureTreatmentConfig.potassium_removal_efficiency_for_treatment" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_treatments.manure_treatment_configs.ManureTreatmentConfig.sludge_accumulation_period">
+<span class="sig-name descname"><span class="pre">sludge_accumulation_period</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.0</span></em><a class="headerlink" href="#RUFAS.routines.manure.manure_treatments.manure_treatment_configs.ManureTreatmentConfig.sludge_accumulation_period" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_treatments.manure_treatment_configs.ManureTreatmentConfig.sludge_accumulation_volume_fraction">
+<span class="sig-name descname"><span class="pre">sludge_accumulation_volume_fraction</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.0</span></em><a class="headerlink" href="#RUFAS.routines.manure.manure_treatments.manure_treatment_configs.ManureTreatmentConfig.sludge_accumulation_volume_fraction" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_treatments.manure_treatment_configs.ManureTreatmentConfig.storage_time_period">
+<span class="sig-name descname"><span class="pre">storage_time_period</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0</span></em><a class="headerlink" href="#RUFAS.routines.manure.manure_treatments.manure_treatment_configs.ManureTreatmentConfig.storage_time_period" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_treatments.manure_treatment_configs.ManureTreatmentConfig.top_cover_volume_fraction">
+<span class="sig-name descname"><span class="pre">top_cover_volume_fraction</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.0</span></em><a class="headerlink" href="#RUFAS.routines.manure.manure_treatments.manure_treatment_configs.ManureTreatmentConfig.top_cover_volume_fraction" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_treatments.manure_treatment_configs.ManureTreatmentConfig.total_ammoniacal_nitrogen_removal_efficiency_for_treatment">
+<span class="sig-name descname"><span class="pre">total_ammoniacal_nitrogen_removal_efficiency_for_treatment</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.0</span></em><a class="headerlink" href="#RUFAS.routines.manure.manure_treatments.manure_treatment_configs.ManureTreatmentConfig.total_ammoniacal_nitrogen_removal_efficiency_for_treatment" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_treatments.manure_treatment_configs.ManureTreatmentConfig.total_solids_removal_efficiency_for_treatment">
+<span class="sig-name descname"><span class="pre">total_solids_removal_efficiency_for_treatment</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.0</span></em><a class="headerlink" href="#RUFAS.routines.manure.manure_treatments.manure_treatment_configs.ManureTreatmentConfig.total_solids_removal_efficiency_for_treatment" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_treatments.manure_treatment_configs.ManureTreatmentConfig.volatile_solids_removal_efficiency_for_treatment">
+<span class="sig-name descname"><span class="pre">volatile_solids_removal_efficiency_for_treatment</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.0</span></em><a class="headerlink" href="#RUFAS.routines.manure.manure_treatments.manure_treatment_configs.ManureTreatmentConfig.volatile_solids_removal_efficiency_for_treatment" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-RUFAS.routines.manure.manure_treatments.manure_treatment_daily_output">
+<span id="rufas-routines-manure-manure-treatments-manure-treatment-daily-output-module"></span><h2>RUFAS.routines.manure.manure_treatments.manure_treatment_daily_output module<a class="headerlink" href="#module-RUFAS.routines.manure.manure_treatments.manure_treatment_daily_output" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_treatments.manure_treatment_daily_output.ManureTreatmentDailyOutput">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">RUFAS.routines.manure.manure_treatments.manure_treatment_daily_output.</span></span><span class="sig-name descname"><span class="pre">ManureTreatmentDailyOutput</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pen_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">-1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">simulation_day</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">-1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">liquid_manure_total_ammoniacal_nitrogen</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">liquid_manure_nitrogen</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">liquid_manure_total_solids</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">liquid_manure_total_volatile_solids</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">liquid_manure_phosphorus</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">liquid_manure_potassium</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">daily_final_manure_volume</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">liquid_manure_daily_volume</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">storage_methane</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">storage_ammonia</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sludge_manure_total_solids</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sludge_manure_total_volatile_solids</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sludge_manure_nitrogen</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sludge_manure_phosphorus</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sludge_manure_potassium</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sludge_manure_daily_volume</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">biogas</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">biogas_energy_content</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">methane_generation_volume</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">heating_input_energy</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">evaporated_water</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">minimum_digester_volume</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">top_cover_volume</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.manure.manure_treatments.manure_treatment_daily_output.ManureTreatmentDailyOutput" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="RUFAS.routines.manure.protocols.html#RUFAS.routines.manure.protocols.liquid_manure_portion_protocol.LiquidManurePortionProtocol" title="RUFAS.routines.manure.protocols.liquid_manure_portion_protocol.LiquidManurePortionProtocol"><code class="xref py py-class docutils literal notranslate"><span class="pre">LiquidManurePortionProtocol</span></code></a></p>
+<p>Daily output of a manure treatment.</p>
+<dl>
+<dt>Attributes:</dt><dd><p>pen_id: ID of the pen that this output is associated with.
+simulation_day: Number of days into the simulation.
+liquid_manure_total_ammoniacal_nitrogen: Total ammoniacal nitrogen, kg.
+liquid_manure_nitrogen: Amount of nitrogen in manure, kg.
+liquid_manure_total_solids: Total amount of solids from the manure and the bedding, kg.
+liquid_manure_total_volatile_solids: Total amount of volatile solids, kg.
+liquid_manure_phosphorus: Amount of phosphorus excreted in manure, kg.
+liquid_manure_potassium: Amount of potassium in manure, kg.
+daily_final_manure_volume: Final manure volume after treatment, m^3.</p>
+<p># TODO: Document remaining attributes.</p>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_treatments.manure_treatment_daily_output.ManureTreatmentDailyOutput.biogas">
+<span class="sig-name descname"><span class="pre">biogas</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.0</span></em><a class="headerlink" href="#RUFAS.routines.manure.manure_treatments.manure_treatment_daily_output.ManureTreatmentDailyOutput.biogas" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_treatments.manure_treatment_daily_output.ManureTreatmentDailyOutput.biogas_energy_content">
+<span class="sig-name descname"><span class="pre">biogas_energy_content</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.0</span></em><a class="headerlink" href="#RUFAS.routines.manure.manure_treatments.manure_treatment_daily_output.ManureTreatmentDailyOutput.biogas_energy_content" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_treatments.manure_treatment_daily_output.ManureTreatmentDailyOutput.clone">
+<span class="sig-name descname"><span class="pre">clone</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#RUFAS.routines.manure.manure_treatments.manure_treatment_daily_output.ManureTreatmentDailyOutput" title="RUFAS.routines.manure.manure_treatments.manure_treatment_daily_output.ManureTreatmentDailyOutput"><span class="pre">ManureTreatmentDailyOutput</span></a></span></span><a class="headerlink" href="#RUFAS.routines.manure.manure_treatments.manure_treatment_daily_output.ManureTreatmentDailyOutput.clone" title="Link to this definition"></a></dt>
+<dd><p>Returns a clone of this object.</p>
+<dl class="simple">
+<dt>Returns:</dt><dd><p>ManureTreatmentDailyOutput object with the same attributes as this object.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_treatments.manure_treatment_daily_output.ManureTreatmentDailyOutput.daily_final_manure_volume">
+<span class="sig-name descname"><span class="pre">daily_final_manure_volume</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.0</span></em><a class="headerlink" href="#RUFAS.routines.manure.manure_treatments.manure_treatment_daily_output.ManureTreatmentDailyOutput.daily_final_manure_volume" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_treatments.manure_treatment_daily_output.ManureTreatmentDailyOutput.evaporated_water">
+<span class="sig-name descname"><span class="pre">evaporated_water</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.0</span></em><a class="headerlink" href="#RUFAS.routines.manure.manure_treatments.manure_treatment_daily_output.ManureTreatmentDailyOutput.evaporated_water" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_treatments.manure_treatment_daily_output.ManureTreatmentDailyOutput.heating_input_energy">
+<span class="sig-name descname"><span class="pre">heating_input_energy</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.0</span></em><a class="headerlink" href="#RUFAS.routines.manure.manure_treatments.manure_treatment_daily_output.ManureTreatmentDailyOutput.heating_input_energy" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_treatments.manure_treatment_daily_output.ManureTreatmentDailyOutput.liquid_manure_daily_volume">
+<span class="sig-name descname"><span class="pre">liquid_manure_daily_volume</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.0</span></em><a class="headerlink" href="#RUFAS.routines.manure.manure_treatments.manure_treatment_daily_output.ManureTreatmentDailyOutput.liquid_manure_daily_volume" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_treatments.manure_treatment_daily_output.ManureTreatmentDailyOutput.liquid_manure_nitrogen">
+<span class="sig-name descname"><span class="pre">liquid_manure_nitrogen</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.0</span></em><a class="headerlink" href="#RUFAS.routines.manure.manure_treatments.manure_treatment_daily_output.ManureTreatmentDailyOutput.liquid_manure_nitrogen" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_treatments.manure_treatment_daily_output.ManureTreatmentDailyOutput.liquid_manure_phosphorus">
+<span class="sig-name descname"><span class="pre">liquid_manure_phosphorus</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.0</span></em><a class="headerlink" href="#RUFAS.routines.manure.manure_treatments.manure_treatment_daily_output.ManureTreatmentDailyOutput.liquid_manure_phosphorus" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_treatments.manure_treatment_daily_output.ManureTreatmentDailyOutput.liquid_manure_potassium">
+<span class="sig-name descname"><span class="pre">liquid_manure_potassium</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.0</span></em><a class="headerlink" href="#RUFAS.routines.manure.manure_treatments.manure_treatment_daily_output.ManureTreatmentDailyOutput.liquid_manure_potassium" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_treatments.manure_treatment_daily_output.ManureTreatmentDailyOutput.liquid_manure_total_ammoniacal_nitrogen">
+<span class="sig-name descname"><span class="pre">liquid_manure_total_ammoniacal_nitrogen</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.0</span></em><a class="headerlink" href="#RUFAS.routines.manure.manure_treatments.manure_treatment_daily_output.ManureTreatmentDailyOutput.liquid_manure_total_ammoniacal_nitrogen" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_treatments.manure_treatment_daily_output.ManureTreatmentDailyOutput.liquid_manure_total_solids">
+<span class="sig-name descname"><span class="pre">liquid_manure_total_solids</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.0</span></em><a class="headerlink" href="#RUFAS.routines.manure.manure_treatments.manure_treatment_daily_output.ManureTreatmentDailyOutput.liquid_manure_total_solids" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_treatments.manure_treatment_daily_output.ManureTreatmentDailyOutput.liquid_manure_total_volatile_solids">
+<span class="sig-name descname"><span class="pre">liquid_manure_total_volatile_solids</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.0</span></em><a class="headerlink" href="#RUFAS.routines.manure.manure_treatments.manure_treatment_daily_output.ManureTreatmentDailyOutput.liquid_manure_total_volatile_solids" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_treatments.manure_treatment_daily_output.ManureTreatmentDailyOutput.methane_generation_volume">
+<span class="sig-name descname"><span class="pre">methane_generation_volume</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.0</span></em><a class="headerlink" href="#RUFAS.routines.manure.manure_treatments.manure_treatment_daily_output.ManureTreatmentDailyOutput.methane_generation_volume" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_treatments.manure_treatment_daily_output.ManureTreatmentDailyOutput.minimum_digester_volume">
+<span class="sig-name descname"><span class="pre">minimum_digester_volume</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.0</span></em><a class="headerlink" href="#RUFAS.routines.manure.manure_treatments.manure_treatment_daily_output.ManureTreatmentDailyOutput.minimum_digester_volume" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_treatments.manure_treatment_daily_output.ManureTreatmentDailyOutput.pen_id">
+<span class="sig-name descname"><span class="pre">pen_id</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">-1</span></em><a class="headerlink" href="#RUFAS.routines.manure.manure_treatments.manure_treatment_daily_output.ManureTreatmentDailyOutput.pen_id" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_treatments.manure_treatment_daily_output.ManureTreatmentDailyOutput.set_daily_final_manure_volume">
+<span class="sig-name descname"><span class="pre">set_daily_final_manure_volume</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">daily_final_manure_volume</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.routines.manure.manure_treatments.manure_treatment_daily_output.ManureTreatmentDailyOutput.set_daily_final_manure_volume" title="Link to this definition"></a></dt>
+<dd><p>Sets the daily final manure volume and ensures that the daily volume is set to the final manure volume.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>daily_final_manure_volume: Daily final manure volume, m^3.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_treatments.manure_treatment_daily_output.ManureTreatmentDailyOutput.simulation_day">
+<span class="sig-name descname"><span class="pre">simulation_day</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">-1</span></em><a class="headerlink" href="#RUFAS.routines.manure.manure_treatments.manure_treatment_daily_output.ManureTreatmentDailyOutput.simulation_day" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_treatments.manure_treatment_daily_output.ManureTreatmentDailyOutput.sludge_manure_daily_volume">
+<span class="sig-name descname"><span class="pre">sludge_manure_daily_volume</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.0</span></em><a class="headerlink" href="#RUFAS.routines.manure.manure_treatments.manure_treatment_daily_output.ManureTreatmentDailyOutput.sludge_manure_daily_volume" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_treatments.manure_treatment_daily_output.ManureTreatmentDailyOutput.sludge_manure_nitrogen">
+<span class="sig-name descname"><span class="pre">sludge_manure_nitrogen</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.0</span></em><a class="headerlink" href="#RUFAS.routines.manure.manure_treatments.manure_treatment_daily_output.ManureTreatmentDailyOutput.sludge_manure_nitrogen" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_treatments.manure_treatment_daily_output.ManureTreatmentDailyOutput.sludge_manure_phosphorus">
+<span class="sig-name descname"><span class="pre">sludge_manure_phosphorus</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.0</span></em><a class="headerlink" href="#RUFAS.routines.manure.manure_treatments.manure_treatment_daily_output.ManureTreatmentDailyOutput.sludge_manure_phosphorus" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_treatments.manure_treatment_daily_output.ManureTreatmentDailyOutput.sludge_manure_potassium">
+<span class="sig-name descname"><span class="pre">sludge_manure_potassium</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.0</span></em><a class="headerlink" href="#RUFAS.routines.manure.manure_treatments.manure_treatment_daily_output.ManureTreatmentDailyOutput.sludge_manure_potassium" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_treatments.manure_treatment_daily_output.ManureTreatmentDailyOutput.sludge_manure_total_solids">
+<span class="sig-name descname"><span class="pre">sludge_manure_total_solids</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.0</span></em><a class="headerlink" href="#RUFAS.routines.manure.manure_treatments.manure_treatment_daily_output.ManureTreatmentDailyOutput.sludge_manure_total_solids" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_treatments.manure_treatment_daily_output.ManureTreatmentDailyOutput.sludge_manure_total_volatile_solids">
+<span class="sig-name descname"><span class="pre">sludge_manure_total_volatile_solids</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.0</span></em><a class="headerlink" href="#RUFAS.routines.manure.manure_treatments.manure_treatment_daily_output.ManureTreatmentDailyOutput.sludge_manure_total_volatile_solids" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_treatments.manure_treatment_daily_output.ManureTreatmentDailyOutput.storage_ammonia">
+<span class="sig-name descname"><span class="pre">storage_ammonia</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.0</span></em><a class="headerlink" href="#RUFAS.routines.manure.manure_treatments.manure_treatment_daily_output.ManureTreatmentDailyOutput.storage_ammonia" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_treatments.manure_treatment_daily_output.ManureTreatmentDailyOutput.storage_methane">
+<span class="sig-name descname"><span class="pre">storage_methane</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.0</span></em><a class="headerlink" href="#RUFAS.routines.manure.manure_treatments.manure_treatment_daily_output.ManureTreatmentDailyOutput.storage_methane" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_treatments.manure_treatment_daily_output.ManureTreatmentDailyOutput.top_cover_volume">
+<span class="sig-name descname"><span class="pre">top_cover_volume</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.0</span></em><a class="headerlink" href="#RUFAS.routines.manure.manure_treatments.manure_treatment_daily_output.ManureTreatmentDailyOutput.top_cover_volume" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-RUFAS.routines.manure.manure_treatments.manure_treatment_factory">
+<span id="rufas-routines-manure-manure-treatments-manure-treatment-factory-module"></span><h2>RUFAS.routines.manure.manure_treatments.manure_treatment_factory module<a class="headerlink" href="#module-RUFAS.routines.manure.manure_treatments.manure_treatment_factory" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_treatments.manure_treatment_factory.ManureTreatmentFactory">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">RUFAS.routines.manure.manure_treatments.manure_treatment_factory.</span></span><span class="sig-name descname"><span class="pre">ManureTreatmentFactory</span></span><a class="headerlink" href="#RUFAS.routines.manure.manure_treatments.manure_treatment_factory.ManureTreatmentFactory" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Class for creating different types of manure treatment systems.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_treatments.manure_treatment_factory.ManureTreatmentFactory.get_instance">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_instance</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">manure_treatment_type_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weather</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">custom_manure_treatment_config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#RUFAS.routines.manure.manure_treatments.manure_treatment_configs.ManureTreatmentConfig" title="RUFAS.routines.manure.manure_treatments.manure_treatment_configs.ManureTreatmentConfig"><span class="pre">ManureTreatmentConfig</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#RUFAS.routines.manure.manure_treatments.manure_treatment_configs.ManureTreatmentConfig" title="RUFAS.routines.manure.manure_treatments.manure_treatment_configs.ManureTreatmentConfig"><span class="pre">ManureTreatmentConfig</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#RUFAS.routines.manure.manure_treatments.manure_treatment_configs.ManureTreatmentConfig" title="RUFAS.routines.manure.manure_treatments.manure_treatment_configs.ManureTreatmentConfig"><span class="pre">ManureTreatmentConfig</span></a><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#RUFAS.routines.manure.manure_treatments.base_manure_treatment.BaseManureTreatment" title="RUFAS.routines.manure.manure_treatments.base_manure_treatment.BaseManureTreatment"><span class="pre">BaseManureTreatment</span></a></span></span><a class="headerlink" href="#RUFAS.routines.manure.manure_treatments.manure_treatment_factory.ManureTreatmentFactory.get_instance" title="Link to this definition"></a></dt>
+<dd><p>Returns a manure treatment system instance for the given manure treatment type name.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>manure_treatment_type_name: The name of the manure treatment type.
+weather: The weather data.
+time: The time data.
+custom_manure_treatment_config: The custom manure treatment configuration data.</p>
+</dd>
+<dt>Returns:</dt><dd><p>A manure treatment system instance for the given manure treatment type name.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-RUFAS.routines.manure.manure_treatments.manure_treatment_types">
+<span id="rufas-routines-manure-manure-treatments-manure-treatment-types-module"></span><h2>RUFAS.routines.manure.manure_treatments.manure_treatment_types module<a class="headerlink" href="#module-RUFAS.routines.manure.manure_treatments.manure_treatment_types" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_treatments.manure_treatment_types.ManureTreatmentType">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">RUFAS.routines.manure.manure_treatments.manure_treatment_types.</span></span><span class="sig-name descname"><span class="pre">ManureTreatmentType</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.manure.manure_treatments.manure_treatment_types.ManureTreatmentType" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="RUFAS.routines.manure.default_enum.html#RUFAS.routines.manure.default_enum.default_enum.DefaultEnum" title="RUFAS.routines.manure.default_enum.default_enum.DefaultEnum"><code class="xref py py-class docutils literal notranslate"><span class="pre">DefaultEnum</span></code></a></p>
+<p>Enumerates the different types of manure treatments.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_treatments.manure_treatment_types.ManureTreatmentType.ANAEROBIC_DIGESTION">
+<span class="sig-name descname"><span class="pre">ANAEROBIC_DIGESTION</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'anaerobic</span> <span class="pre">digestion'</span></em><a class="headerlink" href="#RUFAS.routines.manure.manure_treatments.manure_treatment_types.ManureTreatmentType.ANAEROBIC_DIGESTION" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_treatments.manure_treatment_types.ManureTreatmentType.ANAEROBIC_DIGESTION_AND_LAGOON">
+<span class="sig-name descname"><span class="pre">ANAEROBIC_DIGESTION_AND_LAGOON</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'anaerobic</span> <span class="pre">digestion</span> <span class="pre">and</span> <span class="pre">lagoon'</span></em><a class="headerlink" href="#RUFAS.routines.manure.manure_treatments.manure_treatment_types.ManureTreatmentType.ANAEROBIC_DIGESTION_AND_LAGOON" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_treatments.manure_treatment_types.ManureTreatmentType.ANAEROBIC_DIGESTION_AND_LAGOON_WITH_SPLIT">
+<span class="sig-name descname"><span class="pre">ANAEROBIC_DIGESTION_AND_LAGOON_WITH_SPLIT</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'anaerobic</span> <span class="pre">digestion</span> <span class="pre">and</span> <span class="pre">lagoon</span> <span class="pre">with</span> <span class="pre">split'</span></em><a class="headerlink" href="#RUFAS.routines.manure.manure_treatments.manure_treatment_types.ManureTreatmentType.ANAEROBIC_DIGESTION_AND_LAGOON_WITH_SPLIT" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_treatments.manure_treatment_types.ManureTreatmentType.ANAEROBIC_LAGOON">
+<span class="sig-name descname"><span class="pre">ANAEROBIC_LAGOON</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'anaerobic</span> <span class="pre">lagoon'</span></em><a class="headerlink" href="#RUFAS.routines.manure.manure_treatments.manure_treatment_types.ManureTreatmentType.ANAEROBIC_LAGOON" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_treatments.manure_treatment_types.ManureTreatmentType.COMPOST_BEDDED_PACK_BARN">
+<span class="sig-name descname"><span class="pre">COMPOST_BEDDED_PACK_BARN</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'compost</span> <span class="pre">bedded</span> <span class="pre">pack</span> <span class="pre">barn'</span></em><a class="headerlink" href="#RUFAS.routines.manure.manure_treatments.manure_treatment_types.ManureTreatmentType.COMPOST_BEDDED_PACK_BARN" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_treatments.manure_treatment_types.ManureTreatmentType.DEFAULT">
+<span class="sig-name descname"><span class="pre">DEFAULT</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'slurry</span> <span class="pre">storage</span> <span class="pre">underfloor'</span></em><a class="headerlink" href="#RUFAS.routines.manure.manure_treatments.manure_treatment_types.ManureTreatmentType.DEFAULT" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_treatments.manure_treatment_types.ManureTreatmentType.SLURRY_STORAGE_OUTDOOR">
+<span class="sig-name descname"><span class="pre">SLURRY_STORAGE_OUTDOOR</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'slurry</span> <span class="pre">storage</span> <span class="pre">outdoor'</span></em><a class="headerlink" href="#RUFAS.routines.manure.manure_treatments.manure_treatment_types.ManureTreatmentType.SLURRY_STORAGE_OUTDOOR" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_treatments.manure_treatment_types.ManureTreatmentType.SLURRY_STORAGE_UNDERFLOOR">
+<span class="sig-name descname"><span class="pre">SLURRY_STORAGE_UNDERFLOOR</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'slurry</span> <span class="pre">storage</span> <span class="pre">underfloor'</span></em><a class="headerlink" href="#RUFAS.routines.manure.manure_treatments.manure_treatment_types.ManureTreatmentType.SLURRY_STORAGE_UNDERFLOOR" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-RUFAS.routines.manure.manure_treatments.manure_types">
+<span id="rufas-routines-manure-manure-treatments-manure-types-module"></span><h2>RUFAS.routines.manure.manure_treatments.manure_types module<a class="headerlink" href="#module-RUFAS.routines.manure.manure_treatments.manure_types" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_treatments.manure_types.ManureType">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">RUFAS.routines.manure.manure_treatments.manure_types.</span></span><span class="sig-name descname"><span class="pre">ManureType</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.manure.manure_treatments.manure_types.ManureType" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Enum</span></code></p>
+<p>This is an Enum class that represents different types of manure.</p>
+<p>The Enum class contains the following members:
+LIQUID: Represents liquid manure.
+SLURRY: Represents manure in a semi-liquid, slurry state.
+SOLID: Represents manure in solid form.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_treatments.manure_types.ManureType.LIQUID">
+<span class="sig-name descname"><span class="pre">LIQUID</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'liquid'</span></em><a class="headerlink" href="#RUFAS.routines.manure.manure_treatments.manure_types.ManureType.LIQUID" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_treatments.manure_types.ManureType.SLURRY">
+<span class="sig-name descname"><span class="pre">SLURRY</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'slurry'</span></em><a class="headerlink" href="#RUFAS.routines.manure.manure_treatments.manure_types.ManureType.SLURRY" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_treatments.manure_types.ManureType.SOLID">
+<span class="sig-name descname"><span class="pre">SOLID</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'solid'</span></em><a class="headerlink" href="#RUFAS.routines.manure.manure_treatments.manure_types.ManureType.SOLID" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-RUFAS.routines.manure.manure_treatments.slurry_storage_outdoor">
+<span id="rufas-routines-manure-manure-treatments-slurry-storage-outdoor-module"></span><h2>RUFAS.routines.manure.manure_treatments.slurry_storage_outdoor module<a class="headerlink" href="#module-RUFAS.routines.manure.manure_treatments.slurry_storage_outdoor" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_treatments.slurry_storage_outdoor.SlurryStorageOutdoor">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">RUFAS.routines.manure.manure_treatments.slurry_storage_outdoor.</span></span><span class="sig-name descname"><span class="pre">SlurryStorageOutdoor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">weather</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">manure_treatment_config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#RUFAS.routines.manure.manure_treatments.manure_treatment_configs.ManureTreatmentConfig" title="RUFAS.routines.manure.manure_treatments.manure_treatment_configs.ManureTreatmentConfig"><span class="pre">ManureTreatmentConfig</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.manure.manure_treatments.slurry_storage_outdoor.SlurryStorageOutdoor" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#RUFAS.routines.manure.manure_treatments.base_manure_treatment.BaseManureTreatment" title="RUFAS.routines.manure.manure_treatments.base_manure_treatment.BaseManureTreatment"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseManureTreatment</span></code></a></p>
+<p>Class for the outdoor slurry storage.</p>
+<dl>
+<dt>Attributes:</dt><dd><p>All attributes inherited from BaseManureTreatment.
+In addition, the following attributes are defined:
+storage_time_period: Time in days that the manure is stored in the manure</p>
+<blockquote>
+<div><p>treatment system, days.</p>
+</div></blockquote>
+<dl class="simple">
+<dt>freeboard_input: Empty storage space above the manure in the treatment system.</dt><dd><p>onto the treatment system.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_treatments.slurry_storage_outdoor.SlurryStorageOutdoor.calc_ammonia_emission">
+<span class="sig-name descname"><span class="pre">calc_ammonia_emission</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_animals</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">barn_area</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">accumulated_manure_volume</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">accumulated_manure_total_ammoniacal_nitrogen</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#RUFAS.routines.manure.manure_treatments.slurry_storage_outdoor.SlurryStorageOutdoor.calc_ammonia_emission" title="Link to this definition"></a></dt>
+<dd><p>Calculates the ammonia emission from the outdoor slurry storage treatment system.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>num_animals: The number of animals in the barn.
+barn_area: The area of the barn per animal, m^2/animal.
+accumulated_manure_volume: The accumulated manure volume in the treatment system, m^3.
+accumulated_manure_total_ammoniacal_nitrogen: The accumulated TAN in the treatment system, kg.</p>
+</dd>
+<dt>Returns:</dt><dd><p>ammonia_loss: ammonia emission from the outdoor slurry storage, kg.
+new_accumulated_liquid_manure_total_ammoniacal_nitrogen: Accumulated total ammoniacal nitrogen
+in the treatment system after the ammonia emission is calculated, kg.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_treatments.slurry_storage_outdoor.SlurryStorageOutdoor.calc_methane_emission">
+<span class="sig-name descname"><span class="pre">calc_methane_emission</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">accumulated_liquid_manure_total_solids</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#RUFAS.routines.manure.manure_treatments.slurry_storage_outdoor.SlurryStorageOutdoor.calc_methane_emission" title="Link to this definition"></a></dt>
+<dd><p>Calculates the CH4 emission from the outdoor slurry storage treatment system.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>accumulated_liquid_manure_total_solids: The accumulated TS in the treatment system, kg TS.</p>
+</dd>
+<dt>Returns:</dt><dd><p>methane_loss: methane emission from the outdoor slurry storage treatment system, kg.
+new_accumulated_liquid_manure_total_solids: Accumulated total solids in the treatment system
+after the methane emission is calculated, kg.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_treatments.slurry_storage_outdoor.SlurryStorageOutdoor.freeboard_volume">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">freeboard_volume</span></span><a class="headerlink" href="#RUFAS.routines.manure.manure_treatments.slurry_storage_outdoor.SlurryStorageOutdoor.freeboard_volume" title="Link to this definition"></a></dt>
+<dd><p>Calculates the additional pit volume needed for freeboard.</p>
+<dl class="simple">
+<dt>Returns:</dt><dd><p>The additional pit volume needed for freeboard, m^3.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_treatments.slurry_storage_outdoor.SlurryStorageOutdoor.pit_depth">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">pit_depth</span></span><a class="headerlink" href="#RUFAS.routines.manure.manure_treatments.slurry_storage_outdoor.SlurryStorageOutdoor.pit_depth" title="Link to this definition"></a></dt>
+<dd><p>Returns the depth of the pit.</p>
+<dl class="simple">
+<dt>Returns:</dt><dd><p>The depth of the pit, m.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_treatments.slurry_storage_outdoor.SlurryStorageOutdoor.pit_length">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">pit_length</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#RUFAS.routines.manure.manure_treatments.slurry_storage_outdoor.SlurryStorageOutdoor.pit_length" title="Link to this definition"></a></dt>
+<dd><p>Calculate the length of the pit.</p>
+<dl class="simple">
+<dt>Returns:</dt><dd><p>The length of the pit, m.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_treatments.slurry_storage_outdoor.SlurryStorageOutdoor.pit_slope">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">pit_slope</span></span><a class="headerlink" href="#RUFAS.routines.manure.manure_treatments.slurry_storage_outdoor.SlurryStorageOutdoor.pit_slope" title="Link to this definition"></a></dt>
+<dd><p>Returns the slope of the pit.</p>
+<dl class="simple">
+<dt>Returns:</dt><dd><p>The slope of the pit, dimensionless.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_treatments.slurry_storage_outdoor.SlurryStorageOutdoor.pit_surface_area">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">pit_surface_area</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#RUFAS.routines.manure.manure_treatments.slurry_storage_outdoor.SlurryStorageOutdoor.pit_surface_area" title="Link to this definition"></a></dt>
+<dd><p>Calculate the surface area of the pit.</p>
+<dl class="simple">
+<dt>Returns:</dt><dd><p>The surface area of the pit, m^2.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_treatments.slurry_storage_outdoor.SlurryStorageOutdoor.pit_volume">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">pit_volume</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#RUFAS.routines.manure.manure_treatments.slurry_storage_outdoor.SlurryStorageOutdoor.pit_volume" title="Link to this definition"></a></dt>
+<dd><p>Calculates the volume of the pit.</p>
+<dl class="simple">
+<dt>Returns:</dt><dd><p>The volume of the pit, m^3.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_treatments.slurry_storage_outdoor.SlurryStorageOutdoor.pit_width">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">pit_width</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#RUFAS.routines.manure.manure_treatments.slurry_storage_outdoor.SlurryStorageOutdoor.pit_width" title="Link to this definition"></a></dt>
+<dd><p>Calculates the width of the pit.</p>
+<dl class="simple">
+<dt>Returns:</dt><dd><p>The width of the pit, m.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_treatments.slurry_storage_outdoor.SlurryStorageOutdoor.precipitation_volume">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">precipitation_volume</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#RUFAS.routines.manure.manure_treatments.slurry_storage_outdoor.SlurryStorageOutdoor.precipitation_volume" title="Link to this definition"></a></dt>
+<dd><p>Calculates the additional pit volume needed for precipitation.</p>
+<dl class="simple">
+<dt>Returns:</dt><dd><p>The additional pit volume needed for precipitation, m^3.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_treatments.slurry_storage_outdoor.SlurryStorageOutdoor.total_pit_volume">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">total_pit_volume</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#RUFAS.routines.manure.manure_treatments.slurry_storage_outdoor.SlurryStorageOutdoor.total_pit_volume" title="Link to this definition"></a></dt>
+<dd><p>Calculates the total pit volume.</p>
+<dl class="simple">
+<dt>Returns:</dt><dd><p>The total lagoon pit, m^3.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_treatments.slurry_storage_outdoor.SlurryStorageOutdoor.treatment_volume">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">treatment_volume</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#RUFAS.routines.manure.manure_treatments.slurry_storage_outdoor.SlurryStorageOutdoor.treatment_volume" title="Link to this definition"></a></dt>
+<dd><p>Calculates the minimum treatment volume.</p>
+<dl class="simple">
+<dt>Returns:</dt><dd><p>The minimum treatment volume, m^3.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_treatments.slurry_storage_outdoor.SlurryStorageOutdoor.wastewater_volume">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">wastewater_volume</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#RUFAS.routines.manure.manure_treatments.slurry_storage_outdoor.SlurryStorageOutdoor.wastewater_volume" title="Link to this definition"></a></dt>
+<dd><p>Calculates the volume of wastewater in the treatment system.</p>
+<dl class="simple">
+<dt>Returns:</dt><dd><p>The volume of wastewater in the treatment system, m^3.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-RUFAS.routines.manure.manure_treatments.slurry_storage_underfloor">
+<span id="rufas-routines-manure-manure-treatments-slurry-storage-underfloor-module"></span><h2>RUFAS.routines.manure.manure_treatments.slurry_storage_underfloor module<a class="headerlink" href="#module-RUFAS.routines.manure.manure_treatments.slurry_storage_underfloor" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_treatments.slurry_storage_underfloor.SlurryStorageUnderfloor">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">RUFAS.routines.manure.manure_treatments.slurry_storage_underfloor.</span></span><span class="sig-name descname"><span class="pre">SlurryStorageUnderfloor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">weather</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">manure_treatment_config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#RUFAS.routines.manure.manure_treatments.manure_treatment_configs.ManureTreatmentConfig" title="RUFAS.routines.manure.manure_treatments.manure_treatment_configs.ManureTreatmentConfig"><span class="pre">ManureTreatmentConfig</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.manure.manure_treatments.slurry_storage_underfloor.SlurryStorageUnderfloor" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#RUFAS.routines.manure.manure_treatments.base_manure_treatment.BaseManureTreatment" title="RUFAS.routines.manure.manure_treatments.base_manure_treatment.BaseManureTreatment"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseManureTreatment</span></code></a></p>
+<p>Class for the underfloor slurry storage.</p>
+<dl>
+<dt>Attributes:</dt><dd><p>All attributes inherited from BaseManureTreatment.
+In addition, the following attributes are defined:
+storage_time_period: Time in days that the manure is stored in the manure</p>
+<blockquote>
+<div><p>treatment system, days.</p>
+</div></blockquote>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_treatments.slurry_storage_underfloor.SlurryStorageUnderfloor.calc_ammonia_emission">
+<span class="sig-name descname"><span class="pre">calc_ammonia_emission</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_animals</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">barn_area</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">accumulated_manure_volume</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">accumulated_manure_total_ammoniacal_nitrogen</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#RUFAS.routines.manure.manure_treatments.slurry_storage_underfloor.SlurryStorageUnderfloor.calc_ammonia_emission" title="Link to this definition"></a></dt>
+<dd><p>Calculates the ammonia emission from the underfloor slurry storage.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>num_animals: Number of animals in the pen, animals.
+barn_area: Area of the barn per animal, m^2/animal.
+accumulated_manure_volume: Accumulated manure volume in the treatment system, m^3.
+accumulated_manure_total_ammoniacal_nitrogen: Accumulated total ammoniacal nitrogen in the treatment
+system, kg.</p>
+</dd>
+<dt>Returns:</dt><dd><p>ammonia_loss: ammonia emission from the underfloor slurry storage, kg.
+new_accumulated_liquid_manure_total_ammoniacal_nitrogen: Accumulated total ammoniacal nitrogen
+in the treatment system after the ammonia emission is calculated, kg.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_treatments.slurry_storage_underfloor.SlurryStorageUnderfloor.calc_methane_emission">
+<span class="sig-name descname"><span class="pre">calc_methane_emission</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">accumulated_liquid_manure_total_solids</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#RUFAS.routines.manure.manure_treatments.slurry_storage_underfloor.SlurryStorageUnderfloor.calc_methane_emission" title="Link to this definition"></a></dt>
+<dd><p>Calculates the methane emission from the underfloor slurry storage.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>accumulated_liquid_manure_total_solids: Accumulated manure total solids in the treatment system, kg.</p>
+</dd>
+<dt>Returns:</dt><dd><p>methane_loss: methane emission from the underfloor slurry storage, kg.
+new_accumulated_liquid_manure_total_solids: Accumulated total solids in the treatment system
+after the methane emission is calculated, kg.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-RUFAS.routines.manure.manure_treatments">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-RUFAS.routines.manure.manure_treatments" title="Link to this heading"></a></h2>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="RUFAS.routines.manure.manure_separators.html" class="btn btn-neutral float-left" title="RUFAS.routines.manure.manure_separators package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="RUFAS.routines.manure.pen.html" class="btn btn-neutral float-right" title="RUFAS.routines.manure.pen package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, RuFaS team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
