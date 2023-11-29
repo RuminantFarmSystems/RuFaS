@@ -1,7 +1,8 @@
 import pytest
-from unittest.mock import MagicMock
+from unittest.mock import MagicMock, patch, call
 from math import log, exp
 
+from RUFAS.routines.field.soil.layer_data import LayerData
 from RUFAS.routines.field.soil.soil_data import SoilData
 from RUFAS.routines.field.soil.phosphorus_cycling.fertilizer import Fertilizer
 
@@ -11,6 +12,7 @@ from RUFAS.routines.field.soil.phosphorus_cycling.fertilizer import Fertilizer
     (0.5333, 20),
     (0.6667, 60),
     (0.8, 4),
+    (0.5333, 1_000)
 ])
 def test_determine_fraction_phosphorus_remaining(cover_factor, days):
     """Tests that the fraction of phosphorus remaining in the available pool after absorption by soil is correctly
@@ -50,33 +52,48 @@ def test_determine_dissolved_phosphorus_concentration(phosphorus, frac_released,
 
 
 # --- Helper function tests ---
-@pytest.mark.parametrize("initial_pool_amount,available_pool_amount,days_since_application,cover_type,field_size", [
-    (100, 100, 1, "BARE", 1.56),
-    (120, 96, 5, "GRASSED", 2.876),
-    (96, 21, 40, "RESIDUE_COVER", 1.243),
-    (100, 15, 35, "GRASSED", 2.3954),  # All phosphorus should be removed from pool
-    (90, 0, 78, "RESIDUE_COVER", 0.897),  # No phosphorus left in available pool
-])
+@pytest.mark.parametrize("initial_pool_amount,available_pool_amount,sorption_fraction,absorbed_phos,"
+                         "days_since_application,cover_type,field_size", [
+                             (100, 100, 0.10, 90.0, 1, "BARE", 1.56),
+                             (120, 96, 0.33, 56.4, 5, "GRASSED", 2.876),
+                             (96, 21, 0.266, 21.0, 40, "RESIDUE_COVER", 1.243),
+                             (100, 15, 1.0, 15.0, 35, "GRASSED", 2.3954),  # All phosphorus should be removed from pool
+                             (90, 0, 0.0, 0.0, 78, "RESIDUE_COVER", 0.897),  # No phosphorus left in available pool
+                         ])
 def test_absorb_phosphorus_from_available_pool(initial_pool_amount: float, available_pool_amount: float,
+                                               sorption_fraction: float, absorbed_phos: float,
                                                days_since_application: int, cover_type: str, field_size: float) -> None:
     """Tests that soil absorbs the correct amount of phosphorus from the available phosphorus pool"""
     data = SoilData(full_available_phosphorus_pool=initial_pool_amount, available_phosphorus_pool=available_pool_amount,
                     days_since_application=days_since_application, cover_type=cover_type, field_size=field_size)
     fert = Fertilizer(data)
 
-    fert._add_to_labile_phosphorus = MagicMock()
-    fert._determine_fraction_phosphorus_remaining = MagicMock(return_value=0.2)
+    expected_remaining_phosphorus = available_pool_amount - absorbed_phos
+    with patch.object(fert.data.soil_layers[0], "add_to_labile_phosphorus", new_callable=MagicMock) as add_phos, \
+            patch.object(fert, "_determine_fraction_phosphorus_remaining", new_callable=MagicMock,
+                         return_value=sorption_fraction) as determine_fraction:
+        fert._absorb_phosphorus_from_available_pool(field_size)
 
-    fraction_to_remain_in_pool = 0.2
-    amount_to_remove = available_pool_amount - (initial_pool_amount * fraction_to_remain_in_pool)
-    if amount_to_remove < 0:
-        amount_to_remove = available_pool_amount
+    add_phos.assert_called_once_with(absorbed_phos, field_size)
+    determine_fraction.assert_called_with(fert.data.cover_factor, days_since_application)
+    assert fert.data.available_phosphorus_pool == expected_remaining_phosphorus
 
-    observe = fert._absorb_phosphorus_from_available_pool()
 
-    fert._determine_fraction_phosphorus_remaining.assert_called_with(fert.data.cover_factor,
-                                                                     days_since_application)
-    assert observe == amount_to_remove
+@pytest.mark.parametrize("phosphorus_added,field_size", [
+    (100, 1.33),
+    (20.22, 2.4),
+    (300.1, 0.5)
+])
+def test_add_phosphorus_to_soil_profile(phosphorus_added: float, field_size: float) -> None:
+    """Tests that added phosphorus is correctly partitioned between the top two soil layers."""
+    data = SoilData(field_size=field_size)
+    fertilizer = Fertilizer(soil_data=data)
+    expected_calls = [call(0.8 * phosphorus_added, field_size), call(0.2 * phosphorus_added, field_size)]
+
+    with patch.object(LayerData, "add_to_labile_phosphorus") as add_to_pool:
+        fertilizer._add_phosphorus_to_soil(phosphorus_added, field_size)
+
+    add_to_pool.assert_has_calls(expected_calls)
 
 
 @pytest.mark.parametrize("pool_amount,days_since_application,rainfall_events,rainfall,runoff,field_size", [
@@ -139,24 +156,30 @@ def test_update_before_and_at_first_rain(rainfall: float, runoff: float, field_s
                     days_since_application=days_since_application)
     fert = Fertilizer(data)
 
-    fert.data.soil_layers[0].add_to_labile_phosphorus = MagicMock()
-    fert._absorb_from_available_pool = MagicMock(return_value=10)
-    fert._determine_leached_phosphorus = MagicMock(return_value={"runoff_phosphorus": (0.5 * available_pool),
-                                                                 "absorbed_phosphorus": (0.5 * available_pool)})
-
-    fert._update_before_and_at_first_rain(rainfall, runoff, field_size)
+    phos_leached = {"runoff_phosphorus": (0.5 * available_pool), "absorbed_phosphorus": (0.5 * available_pool)}
+    with patch.object(fert, "_add_phosphorus_to_soil") as add_phos, \
+            patch.object(fert, "_absorb_phosphorus_from_available_pool") as absorb, \
+            patch.object(fert, "_determine_leached_phosphorus", return_value=phos_leached) as leach_phos:
+        fert._update_before_and_at_first_rain(rainfall, runoff, field_size)
 
     if not rainfall and not days_since_application:
-        assert fert.data.soil_layers[0].add_to_labile_phosphorus.call_count == 0
-        assert fert._absorb_from_available_pool.call_count == 0
-        assert fert._determine_leached_phosphorus.call_count == 0
+        assert add_phos.call_count == 0
+        assert absorb.call_count == 0
+        assert leach_phos.call_count == 0
         assert fert.data.available_phosphorus_pool == full_available_pool
+    elif not rainfall and days_since_application:
+        assert add_phos.call_count == 0
+        assert absorb.call_count == 1
+        assert leach_phos.call_count == 0
     elif rainfall and not runoff and not days_since_application:
-        fert.data.soil_layers[0].add_to_labile_phosphorus.assert_called_once_with(available_pool, field_size)
+        add_phos.assert_called_once_with(available_pool, field_size)
+        assert absorb.call_count == 0
+        assert leach_phos.call_count == 0
         assert fert.data.available_phosphorus_pool == 0
     elif rainfall and runoff and not days_since_application:
-        fert._determine_leached_phosphorus.assert_called_once_with(rainfall, runoff, field_size, available_pool)
-        fert.data.soil_layers[0].add_to_labile_phosphorus.assert_called_once_with(0.5 * available_pool, field_size)
+        add_phos.assert_called_once_with(0.5 * available_pool, field_size)
+        assert absorb.call_count == 0
+        leach_phos.assert_called_once_with(rainfall, runoff, field_size, available_pool)
         assert fert.data.annual_runoff_fertilizer_phosphorus == 0.5 * available_pool
         assert fert.data.available_phosphorus_pool == 0
 
@@ -176,31 +199,26 @@ def test_update_after_first_rain(recalcitrant_pool: float, rain_events: int, rai
                     rain_events_after_fertilizer_application=rain_events)
     fert = Fertilizer(data)
 
-    fert.data.soil_layers[0].add_to_labile_phosphorus = MagicMock()
-    fert._determine_leached_phosphorus = MagicMock(
-        return_value={"runoff_phosphorus": (0.5 * (recalcitrant_pool * fert.data.solubilizing_factor)),
-                      "absorbed_phosphorus": (0.5 * (recalcitrant_pool * fert.data.solubilizing_factor))})
+    phos_leached = {"runoff_phosphorus": (0.5 * (recalcitrant_pool * fert.data.solubilizing_factor)),
+                    "absorbed_phosphorus": (0.5 * (recalcitrant_pool * fert.data.solubilizing_factor))}
 
-    fert._update_after_first_rain(rainfall, runoff, field_size)
+    with patch.object(fert, "_add_phosphorus_to_soil") as add_phos, \
+            patch.object(fert, "_determine_leached_phosphorus", return_value=phos_leached) as leach_phos:
+        fert._update_after_first_rain(rainfall, runoff, field_size)
 
+    expected_absorbed_phos = recalcitrant_pool * fert.data.solubilizing_factor
     if not rainfall:
-        assert fert.data.soil_layers[0].add_to_labile_phosphorus.call_count == 0
-        assert fert._determine_leached_phosphorus.call_count == 0
+        assert add_phos.call_count == 0
+        assert leach_phos.call_count == 0
         assert fert.data.recalcitrant_phosphorus_pool == recalcitrant_pool
     elif rainfall and not runoff:
-        fert.data.soil_layers[0].add_to_labile_phosphorus.assert_called_once_with(recalcitrant_pool *
-                                                                                  fert.data.solubilizing_factor,
-                                                                                  field_size)
-        assert fert.data.recalcitrant_phosphorus_pool == \
-               (recalcitrant_pool - (recalcitrant_pool * fert.data.solubilizing_factor))
+        add_phos.assert_called_once_with(expected_absorbed_phos, field_size)
+        assert leach_phos.call_count == 0
+        assert fert.data.recalcitrant_phosphorus_pool == (recalcitrant_pool - expected_absorbed_phos)
     else:
-        fert._determine_leached_phosphorus.assert_called_once_with(rainfall, runoff, field_size, recalcitrant_pool)
-        fert.data.soil_layers[0].add_to_labile_phosphorus.assert_called_once_with(0.5 *
-                                                                                  (recalcitrant_pool *
-                                                                                   fert.data.solubilizing_factor),
-                                                                                  field_size)
-        assert fert.data.recalcitrant_phosphorus_pool == \
-               (recalcitrant_pool - (recalcitrant_pool * fert.data.solubilizing_factor))
+        add_phos.assert_called_once_with(0.5 * expected_absorbed_phos, field_size)
+        leach_phos.assert_called_once_with(rainfall, runoff, field_size, recalcitrant_pool)
+        assert fert.data.recalcitrant_phosphorus_pool == (recalcitrant_pool - expected_absorbed_phos)
 
 
 # --- Top-level routine tests ---
