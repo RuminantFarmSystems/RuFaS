@@ -194,7 +194,7 @@ class GraphGenerator:
                     )
                 data_dict = Utility.convert_list_of_dicts_to_dict_of_lists(values)
                 self._handle_dict_plots(graph_type, data_dict, selected_variables, plot_function)
-            elif plot_function == plt.stackplot:
+            elif graph_type in TUPLE_BASED_FUNCTIONS:
                 values_dict[key] = values
                 if index == len(data) - 1:
                     selected_variables = values_dict.keys()
