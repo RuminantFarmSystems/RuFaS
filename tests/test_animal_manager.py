@@ -317,12 +317,11 @@ def test_get_animal_config():
 
 def test_init_pens(input_manager: InputManager, animal_manager: AnimalManager,
                    mock_pen_data: Dict[str, Dict[str, Union[str, float, int]]],
-                   mock_herd_data: Dict[str, Union[str, int, bool]],
                    mock_manure_management_scenarios: Dict[str, List[Dict[str, Union[str, int]]]],
                    ) -> None:
     """Unit test for function init_pens in file routines/animal/animal_manager.py"""
     # Act
-    animal_manager.init_pens(mock_pen_data, mock_herd_data, mock_manure_management_scenarios)
+    animal_manager.init_pens(mock_pen_data, mock_manure_management_scenarios)
 
     actual = len(animal_manager.all_pens)
     expected = 4

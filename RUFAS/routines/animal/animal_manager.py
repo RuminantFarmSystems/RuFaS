@@ -215,7 +215,7 @@ class AnimalManager:
         self.methane_mitigation_method = data['methane_mitigation']['methane_mitigation_method']
         self.methane_mitigation_additive_amount = data['methane_mitigation']['methane_mitigation_additive_amount']
 
-        self.init_pens(data['pen_information'], data['herd_information'], data['manure_management_scenarios'])
+        self.init_pens(data['pen_information'], data['manure_management_scenarios'])
 
         if self.simulate_animals:
             self.init_animals(config, data['herd_information'])
@@ -236,7 +236,7 @@ class AnimalManager:
             Cow: self.cows
         }
 
-    def init_pens(self, all_pen_data: list, herd_data: Dict[str, Any], manure_management_scenarios) -> None:
+    def init_pens(self, all_pen_data: list, manure_management_scenarios) -> None:
         """
         Populates the list of pens with the information from the input json file.
 
@@ -244,8 +244,6 @@ class AnimalManager:
         ----------
         all_pen_data: list[dict[str, Any]]
             List containing information about the pens.
-        herd_data: Dict[str, Any]
-            Dictionary containing information about the herd.
         manure_management_scenarios : Dict TODO: [str, Any]?
             Dictionary containing information about the manure management scenarios.
 
