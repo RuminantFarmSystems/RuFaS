@@ -1,5 +1,5 @@
 from enum import Enum
-from typing import Union
+from typing import Dict, List, Union
 
 from RUFAS.routines.animal.animal_types import AnimalType
 from RUFAS.routines.animal.life_cycle.calf import Calf
@@ -33,7 +33,7 @@ class AnimalGroupingScenario(Enum):
         Pen.AnimalCombination.LAC_COW: [AnimalType.LAC_COW]
     }
 
-    def __init__(self, value):
+    def __init__(self, value: Dict[Pen.AnimalCombination, List[str]]):
         """
         Initialize the AnimalGroupingScenario.
 
@@ -46,7 +46,7 @@ class AnimalGroupingScenario(Enum):
 
         self._value_ = value
 
-        self._animal_combination_by_animal_type = {}  # key: animal type, value: animal combination
+        self._animal_combination_by_animal_type: Dict[AnimalType, Pen.AnimalCombination] = {}
         for animal_combination, animal_types in self.value.items():
             for animal_type in animal_types:
                 self._animal_combination_by_animal_type[animal_type] = animal_combination

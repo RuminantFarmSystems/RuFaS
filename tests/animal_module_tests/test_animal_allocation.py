@@ -1,4 +1,3 @@
-# Unit tests for the animal allocation part of animal management
 import math
 from typing import List
 

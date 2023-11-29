@@ -1,10 +1,3 @@
-"""
-RUFAS: Ruminant Farm Systems Model
-File name: test_animal_manager.py
-Description: Implements test cases for the AnimalManager class
-Author(s): Pooya Hekmati, sh2235@cornell.edu, Anchey Peng, ap724@cornell.edu
-"""
-
 from typing import Any
 from typing import List, Dict, Union
 from mock import MagicMock, patch
@@ -21,7 +14,10 @@ from RUFAS.routines.animal.life_cycle.heiferII import HeiferII
 from RUFAS.routines.animal.life_cycle.heiferIII import HeiferIII
 from RUFAS.routines.animal.pen import Pen
 from RUFAS.routines.feed.feed import Feed
+from RUFAS.output_manager import OutputManager
 from RUFAS.input_manager import InputManager
+
+om = OutputManager()
 
 
 def create_mock_object_list(attribute_dicts: List[Dict[str, Any]]) -> List[MagicMock]:
@@ -347,8 +343,8 @@ def test_init_animals(animal_manager: AnimalManager, mocker: MockerFixture):
 
 def test_print_animal_num_warnings(animal_manager: AnimalManager):
     """Unit test for function _print_animal_num_warnings in file routines/animal/animal_manager.py"""
-    with patch("RUFAS.output_manager.OutputManager.add_log") as add_log, \
-            patch("RUFAS.output_manager.OutputManager.add_warning") as add_warning:
+    with patch.object(om, "add_log") as add_log, \
+            patch.object(om, "add_warning") as add_warning:
 
         animal_keys = {"calf_num", "heiferI_num", "heiferII_num", "heiferIII_num_springers", "cow_num"}
         herd_data = {
