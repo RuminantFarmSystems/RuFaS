@@ -270,6 +270,7 @@ class Cow(HeiferIII):
 
         If milk production history has already been updated for the day,
         the most recent entry is deleted before appending the latest values.
+        Once a cow reaches 305 days in milk, latest_milk_production_305days is updated.
 
         Parameter
         ---------

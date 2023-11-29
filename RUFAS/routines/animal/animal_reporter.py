@@ -335,23 +335,22 @@ class AnimalReporter:
         om.add_variable("sold_report", sold_report, info_map)
 
     def report_305d_milk(animal_manager):
+        """
+        Adds latest_milk_production_305days to output manager.
+
+        Parameters
+        ----------
+        animal_manager : AnimalManager
+            Instance of Animalmanager class.
+
+        """
+        info_map = {
+            "class": "cow",
+            "function": "update_milk_production_history",
+        }
         milk_history_list = [cow.latest_milk_production_305days for cow in animal_manager.cows if cow.is_lactating]
         nonzero_milk_history_list = [x for x in milk_history_list if x != 0.0]
+        milk_production_305days_herd_mean = ""
         if nonzero_milk_history_list:
-            print(np.mean(nonzero_milk_history_list))
-        # herd_milk_list = []
-        # for cow_history in milk_history_list:
-        #     if cow_history[-1].days_in_milk >= 305:
-        #         days_in_milk_list = [day.days_in_milk for day in cow_history]
-        #         milk_production_list = [day.milk_production for day in cow_history]
-
-        #     [milk_production_list for milk_production_list if days_in_milk_list > 305]
-
-        #     for day in cow_list:
-        #         milk_list = []
-        #         if day.days_in_milk > 305:
-        #             if day.days_in_milk < 305:
-        #                 milk_list.append(day.milk_production)
-        #         herd_milk_list.append(np.average(milk_list))
-        # print(herd_milk_list)
-        # print(np.average(herd_milk_list))
+            milk_production_305days_herd_mean = np.mean(nonzero_milk_history_list)
+        om.add_variable("milk_production_305days_herd_mean", milk_production_305days_herd_mean, info_map)
