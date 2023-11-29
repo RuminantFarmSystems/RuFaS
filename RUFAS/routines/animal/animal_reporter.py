@@ -235,8 +235,8 @@ class AnimalReporter:
             Day of simulation.
         """
         info_map = {
-            "class": life_cycle_manager.__class__.__name__,
-            "function": life_cycle_manager.daily_update.__name__,
+            "class": "life_cycle_manager",
+            "function": "daily_update"
         }
         # om.add_variable("calf_num", life_cycle_manager.calf_num, info_map)
         # om.add_variable("heiferI_num", life_cycle_manager.heiferI_num, info_map)

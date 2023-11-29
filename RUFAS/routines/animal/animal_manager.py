@@ -2010,7 +2010,6 @@ class AnimalManager:
                     AnimalReporter.report_milk(pen, self.simulation_day)
             AnimalReporter.report_daily_animal_population(self)
             AnimalReporter.report_daily_ration(self)
-            
             AnimalReporter.report_sold_animal_information(self.life_cycle_manager.sold_heifers +
                                                           self.life_cycle_manager.culled_heifers +
                                                           self.life_cycle_manager.culled_cows)

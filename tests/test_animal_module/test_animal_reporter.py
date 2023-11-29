@@ -249,8 +249,60 @@ def test_report_pen_manure(mocker: MockerFixture):
     assert om.variables_pool["pen.calc_manure.pen_manure_data"]["values"] == [dummy_pen.manure]
 
 
-def test_report_life_cycle_manager_data():
-    pass
+def test_report_life_cycle_manager_data(mocker: MockerFixture):
+    life_cycle_manager = mocker.MagicMock()
+    keydict = {
+        "sold_heifer_num": 1,
+        "bought_heifer_num": 2,
+        "culled_heifer_num": 3,
+        "culled_cow_num": 4,
+        "GnRH_injection_num_h": 5,
+        "GnRH_injection_num": 6,
+        "PGF_injection_num": 7,
+        "PGF_injection_num_h": 8,
+        "ai_num": 9,
+        "preg_check_num": 10,
+        "preg_check_num_h": 11,
+        "sold_calf_num": 12,
+        "daily_milk_production": 13,
+        "open_cow_num": 14,
+        "vwp_cow_num": 15,
+        "preg_cow_num": 16,
+        "milking_cow_num": 17,
+        "dry_cow_num": 18,
+        "avg_days_in_milk": 19,
+        "avg_days_in_preg": 20,
+        "avg_cow_body_weight": 21,
+        "avg_parity_num": 22,
+        "avg_calving_interval": 23,
+        "avg_breeding_to_preg_time": 24,
+        "avg_heifer_culling_age": 25,
+        "avg_cow_culling_age": 26,
+        "avg_mature_body_weight": 27,
+        "cull_reason_stats": 28,
+    }
+    for key, value in keydict.items():
+        setattr(life_cycle_manager, key, value)
+    life_cycle_manager.num_cow_for_parity = {"1": 100, "2": 200, "3": 300, "greater_than_3": 400}
+    life_cycle_manager.avg_calving_to_preg_time = {"1": 100, "2": 200, "3": 300, "greater_than_3": 400}
+    life_cycle_manager.avg_age_for_calving = {"1": 100, "2": 200, "3": 300, "greater_than_3": 400}
+
+    sim_day = 42
+
+    # act
+    AnimalReporter.report_life_cycle_manager_data(life_cycle_manager, sim_day)
+
+    # assert
+    for key, value in keydict.items():
+        assert om.variables_pool[f"life_cycle_manager.daily_update.{key}"]["values"] == [keydict[key]]
+    assert om.variables_pool["life_cycle_manager.daily_update.sim_day"]["values"] == [sim_day]
+    for i in range(1, 3):
+        assert om.variables_pool[f"life_cycle_manager.daily_update.num_cow_for_parity_{i}"]["values"] == [100 * i]
+        assert om.variables_pool[f"life_cycle_manager.daily_update.calving_to_preg_time_{i}"]["values"] == [100 * i]
+        assert om.variables_pool[f"life_cycle_manager.daily_update.avg_age_for_calving_{i}"]["values"] == [100 * i]
+    assert om.variables_pool["life_cycle_manager.daily_update.num_cow_for_parity_greater_than_3"]["values"] == [400]
+    assert om.variables_pool["life_cycle_manager.daily_update.calving_to_preg_time_greater_than_3"]["values"] == [400]
+    assert om.variables_pool["life_cycle_manager.daily_update.avg_age_for_calving_greater_than_3"]["values"] == [400]
 
 
 def test_report_sold_animal_information():
