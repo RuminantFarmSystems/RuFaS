@@ -69,3 +69,19 @@ def test_invalid_category_type_combinations(
     with pytest.raises(ValueError):
         HarvestedCrop(category=category, type=crop_type, **sample_crop_data)
 
+
+def test_attributes(sample_crop_data: Dict[str, float]):
+    crop = HarvestedCrop(
+        category=CropCategory.SMALL_GRAIN, type=CropType.WHEAT, **sample_crop_data
+    )
+    assert crop.fresh_mass == sample_crop_data["fresh_mass"]
+    assert crop.dry_matter_percentage == sample_crop_data["dry_matter_percentage"]
+    assert crop.dry_matter_digestibility == sample_crop_data["dry_matter_digestibility"]
+    assert crop.crude_protein_percent == sample_crop_data["crude_protein_percent"]
+    assert crop.non_protein_nitrogen == sample_crop_data["non_protein_nitrogen"]
+    assert crop.starch == sample_crop_data["starch"]
+    assert crop.adf == sample_crop_data["adf"]
+    assert crop.ndf == sample_crop_data["ndf"]
+    assert crop.lignin == sample_crop_data["lignin"]
+    assert crop.sugar == sample_crop_data["sugar"]
+    assert crop.ash == sample_crop_data["ash"]
