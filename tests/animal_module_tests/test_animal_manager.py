@@ -1645,3 +1645,27 @@ def test_daily_updates(is_end_ration_interval: bool, mocker: MockerFixture) -> N
 
     patch_for_sum_daily_milk.assert_called_once_with(mock_cows)
     assert mock_animal_manager.life_cycle_manager.daily_milk_production == sum_daily_milk
+
+
+def test_collect_manure_excretions_output_data(mocker: MockerFixture):
+    pen = mocker.MagicMock()
+    pen.calc_total_manure = mocker.MagicMock()
+
+    feed = mocker.MagicMock()
+    manure_excretions_output_data = mocker.MagicMock()
+
+    animal_manager = mocker.MagicMock()
+    animal_manager._get_classes_in_pen = mocker.MagicMock()
+    animal_manager.methane_model = mocker.MagicMock()
+    animal_manager.methane_mitigation_method = mocker.MagicMock()
+    animal_manager.methane_mitigation_additive_amount = mocker.MagicMock()
+
+    # act
+    AnimalManager.collect_manure_excretions_output_data(animal_manager, pen, feed, manure_excretions_output_data)
+
+    # assert
+    animal_manager._get_classes_in_pen.assert_called_once_with(pen)
+    pen.calc_total_manure.assert_called_once_with(feed, animal_manager.methane_model,
+                                                  animal_manager.methane_mitigation_method,
+                                                  animal_manager.methane_mitigation_additive_amount,
+                                                  manure_excretions_output_data)
