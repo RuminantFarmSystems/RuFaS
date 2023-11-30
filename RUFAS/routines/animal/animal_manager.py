@@ -1613,24 +1613,14 @@ class AnimalManager:
         pen_with_min_stocking_density = min(
             self.pens_by_animal_combination[animal_combination], key=lambda p: p.current_stocking_density
         )
-        pen_with_min_stocking_density.add_animal(
-            animal,
-            self.ANIMAL_GROUPING_SCENARIO,
-            feed,
-            temp,
-            self.phosphorus_concentration_by_animal_class[type(animal)],
-        )
+        pen_with_min_stocking_density.add_animal(animal, self.ANIMAL_GROUPING_SCENARIO, feed, temp,
+                                                 self.phosphorus_concentration_by_animal_class[type(animal)])
         self.animal_to_pen_id_map[animal.id] = pen_with_min_stocking_density.id
 
     def collect_manure_excretions_output_data(self, pen: Pen, feed: Feed, manure_excretions_output_data: Dict):
         pen.classes_in_pen = self._get_classes_in_pen(pen)
-        pen.calc_total_manure(
-            feed,
-            self.methane_model,
-            self.methane_mitigation_method,
-            self.methane_mitigation_additive_amount,
-            manure_excretions_output_data,
-        )
+        pen.calc_total_manure(feed, self.methane_model, self.methane_mitigation_method,
+                              self.methane_mitigation_additive_amount, manure_excretions_output_data)
 
     def daily_updates(self, feed: Feed, weather: Weather, time: Time):
         """

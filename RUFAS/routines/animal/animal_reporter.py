@@ -1,18 +1,19 @@
+# TODO remove the below if not necessary in final typing
 # from typing import List
 import numpy as np
 
 from RUFAS.output_manager import OutputManager
 from RUFAS.routines.animal.ration.ration_driver import RationReporter
 
+# TODO remove the below if not necessary in final typing
 # from RUFAS.routines.animal.life_cycle.heiferII import HeiferII
 # from RUFAS.routines.animal.life_cycle.heiferIII import HeiferIII
 # from RUFAS.routines.animal.life_cycle.cow import Cow
 
+# TODO remove the below if can't resolve circular imports!
 # from RUFAS.routines.animal.pen import Pen
 # from RUFAS.routines.animal.animal_manager import AnimalManager
 from RUFAS.routines.animal.manure.general_manure import AnimalManureExcretions
-
-# from RUFAS.routines.animal import AnimalManager
 
 om = OutputManager()
 
@@ -57,7 +58,7 @@ class AnimalReporter:
             info_map,
         )
 
-    def report_milk(pen, simulation_day) -> None:
+    def report_milk(pen, simulation_day: int) -> None:
         """
         Adds milk information for all cows in pen to output manager.
 
@@ -191,8 +192,6 @@ class AnimalReporter:
 
         Parameters
         ----------
-        animal_manager : AnimalManager
-            Instance of Animalmanager class.
         manure_excretions_output_data : dict[str, dict[str | AnimalManureExcretions]]
             Dictionary mapping prefixes to animal manure data.
 
@@ -227,6 +226,14 @@ class AnimalReporter:
         om.add_variable("pen_manure_data", pen.manure, info_map)
 
     def report_pen_manure_properties(pen) -> None:
+        """
+        Adds pen manure properties to output manager.
+
+        Parameters
+        ----------
+        pen : Pen
+            Current pen.
+        """
         info_map = {"class": "pen", "function": "calc_total_manure"}
         for manure_property, manure_value in pen.manure.items():
             om.add_variable(f"pen_{pen.id}_daily_{str(manure_property)}", manure_value, info_map=info_map)
@@ -321,29 +328,6 @@ class AnimalReporter:
             "function": "report_sold_animal_information",
         }
         for animal in sold_animals:
-            # sold_report = {
-            #     "animal_id": [],
-            #     "animal_type": [],
-            #     "body_weight": [],
-            #     "cull_reason": [],
-            #     "days_in_milk": [],
-            #     "parity": [],
-            # }
-            # sold_report["animal_id"].append(animal.id)
-            # sold_report["animal_type"].append(animal.__class__.__name__)
-            # sold_report["body_weight"].append(animal.body_weight)
-            # if hasattr(animal, "cull_reason"):
-            #     sold_report["cull_reason"].append(animal.cull_reason)
-            # else:
-            #     sold_report["cull_reason"].append("cull_reason_not_set")
-            # if hasattr(animal, "days_in_milk"):
-            #     sold_report["days_in_milk"].append(animal.days_in_milk)
-            # else:
-            #     sold_report["days_in_milk"].append("NA")
-            # if hasattr(animal, "calves"):
-            #     sold_report["parity"].append(animal.calves)
-            # else:
-            #     sold_report["parity"].append("NA")
             om.add_variable("animal_id", animal.id, info_map)
             om.add_variable("animal_type", animal.__class__.__name__, info_map)
             om.add_variable("body_weight", animal.body_weight, info_map)
