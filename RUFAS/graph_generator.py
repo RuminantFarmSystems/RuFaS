@@ -153,7 +153,7 @@ class GraphGenerator:
     def _draw_graph(
         self,
         graph_type: str,
-        data: Dict[str, Dict[str, List[Any]] | Dict[str, List[Dict[str, List[Any]]]]],
+        data: Dict[str, List[int | float]],
         selected_variables: Optional[List[str]] = None,
     ) -> None:
         """
@@ -163,7 +163,7 @@ class GraphGenerator:
         ----------
         graph_type : str
             The type of graph to draw.
-        data : Dict[str, Dict[str, List[Any]] | Dict[str, List[Dict[str, List[Any]]]]]
+        data : Dict[str, List[int | float]]
             The data to use for plotting.
         selected_variables : Optional[List[str]]
             If it is present and the data is a list of dicts,
@@ -172,7 +172,7 @@ class GraphGenerator:
         Raises
         ------
         ValueError
-            if graph_type is not found in MATPLOTLIB_PLOT_FUNCTIONS
+            if graph_type is not found in MATPLOTLIB_PLOT_FUNCTIONS.
         """
 
         if graph_type not in MATPLOTLIB_PLOT_FUNCTIONS:
