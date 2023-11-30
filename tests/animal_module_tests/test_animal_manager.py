@@ -301,11 +301,6 @@ def animal_manager_with_mock_pens(animal_manager: AnimalManager,
     return animal_manager
 
 
-def test_daily_animal_routine():
-    """Unit test for function daily_animal_routine in file routines/animal/animal_manager.py"""
-    pass
-
-
 def test_get_animal_config():
     """Unit test for function get_animal_config in file routines/animal/animal_manager.py"""
     pass
