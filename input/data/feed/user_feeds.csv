@@ -299,3 +299,9 @@ rufas_id,Name,feed_description,feed_type,units,Comp_location
 298,Vit D premix,Vitamins,Vitamins,kg,NASEM_only
 299,Vit E premix,Vitamins,Vitamins,kg,NASEM_only
 300,"VitTM Premix, generic",Vitamins,Vitamins,kg,NASEM_only
+301,Farm ES Mineral Mix,MIneral,Mineral,kg,NASEM_only
+302,Farm ES Midwest BP Blend,Byproduct Mix,Conc,kg,NASEM_only
+303,Farm ES Northeast BP Blend,Byproduct Mix,Conc,kg,NASEM_only
+304,Farm ES South BP Blend,Byproduct Mix,Conc,kg,NASEM_only
+305,Farm ES West BP Blend,Byproduct Mix,Conc,kg,NASEM_only
+306,AMINOPLUS,RUP Additive,Conc,kg,NASEM_only
