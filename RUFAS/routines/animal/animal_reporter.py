@@ -384,3 +384,32 @@ class AnimalReporter:
         if nonzero_milk_history_list:
             milk_production_305days_herd_mean = np.mean(nonzero_milk_history_list)
         om.add_variable("milk_production_305days_herd_mean", milk_production_305days_herd_mean, info_map)
+
+    def report_daily_reports(animal_manager):
+        """
+        Calls all reporter methods that should happen at the end of each day.
+
+        Parameters
+        ----------
+        animal_manager : AnimalManager
+            Instance of AnimalManager class.
+        """
+        AnimalReporter.report_daily_animal_population(animal_manager)
+        AnimalReporter.report_life_cycle_manager_data(animal_manager.life_cycle_manager, animal_manager.simulation_day)
+        AnimalReporter.report_daily_ration(animal_manager)
+        AnimalReporter.report_305d_milk(animal_manager)
+        for pen in animal_manager.all_pens:
+            AnimalReporter.report_pen_manure_properties(pen)
+            if pen.animal_combination.name == "LAC_COW":
+                AnimalReporter.report_milk(pen, animal_manager.simulation_day)
+
+    def report_end_of_simulation(animal_manager) -> None:
+        """
+        Calls all reporter methods that should happen at the end of the simulation.
+
+        Parameters
+        ----------
+        animal_manager : AnimalManager
+            Instance of AnimalManager class.
+        """
+        AnimalReporter.report_sold_animal_information(animal_manager)

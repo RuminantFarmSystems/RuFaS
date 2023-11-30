@@ -34,8 +34,7 @@ class SimulationEngine:
         t_start_sim = timer.time()
 
         self._run_simulation_main_loop()
-        routines.animal.animal_reporter.AnimalReporter.report_sold_animal_information(
-            self.state.animal_manager)
+        routines.animal.animal_reporter.AnimalReporter.report_end_of_simulation(self.state.animal_manager)
         t_end_sim = timer.time()
 
         sys.stdout.write("\nSimulation Successful\n\n")

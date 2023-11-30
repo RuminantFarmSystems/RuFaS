@@ -344,8 +344,10 @@ def test_report_sold_animal_information(mocker: MockerFixture):
 
     # assert
     for key in sold_report_expected.keys():
-        assert om.variables_pool[f"AnimalReporter.report_sold_animal_information.{key}"]["values"] ==\
-            sold_report_expected[key]
+        assert (
+            om.variables_pool[f"AnimalReporter.report_sold_animal_information.{key}"]["values"]
+            == sold_report_expected[key]
+        )
 
 
 def test_report_305d_milk(mocker: MockerFixture):
@@ -373,3 +375,50 @@ def test_report_305d_milk(mocker: MockerFixture):
         150.0,
         200.0,
     ]
+
+
+def test_report_daily_reports(mocker: MockerFixture):
+    animal_manager = mocker.MagicMock()
+    animal_manager.all_pens = [mocker.MagicMock(), mocker.MagicMock()]
+    animal_manager.all_pens[0].animal_combination.name = "LAC_COW"
+
+    patch_for_report_daily_animal_population = mocker.patch.object(
+        AnimalReporter, "report_daily_animal_population", return_value=""
+    )
+    patch_for_report_life_cycle_manager_data = mocker.patch.object(
+        AnimalReporter, "report_life_cycle_manager_data", return_value=""
+    )
+    patch_for_report_report_daily_ration = mocker.patch.object(AnimalReporter, "report_daily_ration", return_value="")
+    patch_for_report_305d_milk = mocker.patch.object(AnimalReporter, "report_305d_milk", return_value="")
+    patch_for_report_pen_manure_properties = mocker.patch.object(
+        AnimalReporter, "report_pen_manure_properties", return_value=""
+    )
+    patch_for_report_milk = mocker.patch.object(AnimalReporter, "report_milk", return_value="")
+
+    # act
+    AnimalReporter.report_daily_reports(animal_manager)
+
+    # assert
+    patch_for_report_daily_animal_population.assert_called_once_with(animal_manager)
+    patch_for_report_life_cycle_manager_data.assert_called_once_with(
+        animal_manager.life_cycle_manager, animal_manager.simulation_day
+    )
+    patch_for_report_report_daily_ration.assert_called_once_with(animal_manager)
+    patch_for_report_305d_milk.assert_called_once_with(animal_manager)
+    assert patch_for_report_pen_manure_properties.call_count == len(animal_manager.all_pens)
+    patch_for_report_milk.assert_called_once_with(animal_manager.all_pens[0],
+                                                  animal_manager.simulation_day)
+
+
+def test_report_end_of_simulation(mocker: MockerFixture):
+    animal_manager = mocker.MagicMock()
+    patch_for_plan_animal_allocation = mocker.patch.object(
+        AnimalReporter, "report_sold_animal_information", return_value=""
+    )
+
+    # act
+    AnimalReporter.report_end_of_simulation(animal_manager)
+
+    # assert
+    assert patch_for_plan_animal_allocation.call_count == 1
+    patch_for_plan_animal_allocation.assert_called_once_with(animal_manager)
