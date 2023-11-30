@@ -22,3 +22,34 @@ def sample_crop_data() -> Dict[str, float]:
         "sugar": 20.0,
         "ash": 6.0,
     }
+
+
+@pytest.mark.parametrize(
+    "category, crop_type",
+    [
+        (CropCategory.SMALL_GRAIN, CropType.WHEAT),
+        (CropCategory.SMALL_GRAIN, CropType.RYE),
+        (CropCategory.SMALL_GRAIN, CropType.OAT),
+        (CropCategory.SMALL_GRAIN, CropType.RICE),
+        (CropCategory.CORN, CropType.HIGH_MOISTURE),
+        (CropCategory.CORN, CropType.SILAGE),
+        (CropCategory.CORN, CropType.WHOLE_PLANT),
+        (CropCategory.CORN, CropType.GRAIN),
+        (CropCategory.SOY, CropType.FORAGE),
+        (CropCategory.SOY, CropType.GRAIN),
+        (CropCategory.ALFALFA, CropType.ALFALFA),
+        (CropCategory.GRASS, CropType.RYEGRASS),
+        (CropCategory.GRASS, CropType.ORCHARDGRASS),
+        (CropCategory.GRASS, CropType.FINE_FESCUE),
+        (CropCategory.GRASS, CropType.TALL_FESCUE),
+        (CropCategory.GRASS, CropType.MEADOW_FESCUE),
+    ],
+)
+def test_valid_category_type_combinations(
+    category: CropCategory, crop_type: CropType, sample_crop_data: Dict[str, float]
+):
+    try:
+        HarvestedCrop(category=category, type=crop_type, **sample_crop_data)
+    except ValueError:
+        pytest.fail(f"Unexpected ValueError with {category} and {crop_type}")
+
