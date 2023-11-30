@@ -137,7 +137,7 @@ def test_report_milk(mocker: MockerFixture):
     # act
     AnimalReporter.report_milk(pen, simulation_day)
     # assert
-    assert om.variables_pool["cow.milking_update.milk_data_at_milk_update"]["values"] == [
+    assert om.variables_pool["Cow.milking_update.milk_data_at_milk_update"]["values"] == [
         test_milk_data_update,
         test_milk_data_update,
         test_milk_data_update,
@@ -317,7 +317,7 @@ def test_report_sold_animal_information(mocker: MockerFixture):
     sold_report_expected = {
         "animal_id": [1, 2, 3],
         "animal_type": ["dummy", "dummy", "dummy"],
-        "cull_reason": ["low1", "low2", "cull_reason_not_set"],
+        "cull_reason": ["low1", "low2", "NA"],
         "body_weight": [100, 200, 300],
         "days_in_milk": [100, "NA", "NA"],
         "parity": [42, "NA", "NA"],
@@ -333,11 +333,19 @@ def test_report_sold_animal_information(mocker: MockerFixture):
 
     for animal in sold_animals:
         animal.__class__.__name__ = "dummy"
+
+    animal_manager = mocker.MagicMock()
+    animal_manager.life_cycle_manager.sold_heifers = [sold_animals[0]]
+    animal_manager.life_cycle_manager.culled_heifers = [sold_animals[1]]
+    animal_manager.life_cycle_manager.culled_cows = [sold_animals[2]]
+
     # act
-    AnimalReporter.report_sold_animal_information(sold_animals)
+    AnimalReporter.report_sold_animal_information(animal_manager)
 
     # assert
-    assert om.variables_pool["LifeCycleManager.daily_update.sold_report"]["values"] == [sold_report_expected]
+    for key in sold_report_expected.keys():
+        assert om.variables_pool[f"AnimalReporter.report_sold_animal_information.{key}"]["values"] ==\
+            sold_report_expected[key]
 
 
 def test_report_305d_milk(mocker: MockerFixture):
@@ -362,5 +370,6 @@ def test_report_305d_milk(mocker: MockerFixture):
 
     # assert it's 150
     assert om.variables_pool["cow.update_milk_production_history.milk_production_305days_herd_mean"]["values"] == [
-        150.0, 200.0
+        150.0,
+        200.0,
     ]

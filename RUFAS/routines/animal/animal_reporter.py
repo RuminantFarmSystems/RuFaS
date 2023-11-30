@@ -1,11 +1,12 @@
-from typing import List
+# from typing import List
 import numpy as np
 
 from RUFAS.output_manager import OutputManager
 from RUFAS.routines.animal.ration.ration_driver import RationReporter
-from RUFAS.routines.animal.life_cycle.heiferII import HeiferII
-from RUFAS.routines.animal.life_cycle.heiferIII import HeiferIII
-from RUFAS.routines.animal.life_cycle.cow import Cow
+
+# from RUFAS.routines.animal.life_cycle.heiferII import HeiferII
+# from RUFAS.routines.animal.life_cycle.heiferIII import HeiferIII
+# from RUFAS.routines.animal.life_cycle.cow import Cow
 
 # from RUFAS.routines.animal.pen import Pen
 # from RUFAS.routines.animal.animal_manager import AnimalManager
@@ -69,7 +70,7 @@ class AnimalReporter:
 
         """
         info_map = {
-            "class": "cow",
+            "class": "Cow",
             "function": "milking_update",
         }
 
@@ -299,45 +300,68 @@ class AnimalReporter:
         om.add_variable("avg_age_for_calving_greater_than_3", avg_age_for_calving_greater_than_3, info_map)
         om.add_variable("cull_reason_stats", life_cycle_manager.cull_reason_stats, info_map)
 
-    def report_sold_animal_information(sold_animals: List[HeiferII | HeiferIII | Cow]) -> None:
+    def report_sold_animal_information(animal_manager) -> None:
         """
         Adds a dictionary of sold animal information to the output manager.
 
         Parameters
         ----------
-        sold_animals : List[HeiferII|HeiferIII|Cow]
-            List of sold animal objects.
+        animal_manager : AnimalManager
+            Instance of Class AnimalManager.
 
         """
+        sold_animals = (
+            animal_manager.life_cycle_manager.sold_heifers
+            + animal_manager.life_cycle_manager.culled_heifers
+            + animal_manager.life_cycle_manager.culled_cows
+        )
+
         info_map = {
-            "class": "LifeCycleManager",
-            "function": "daily_update",
-        }
-        sold_report = {
-            "animal_id": [],
-            "animal_type": [],
-            "body_weight": [],
-            "cull_reason": [],
-            "days_in_milk": [],
-            "parity": [],
+            "class": "AnimalReporter",
+            "function": "report_sold_animal_information",
         }
         for animal in sold_animals:
-            sold_report["animal_id"].append(animal.id)
-            sold_report["animal_type"].append(animal.__class__.__name__)
-            sold_report["body_weight"].append(animal.body_weight)
+            # sold_report = {
+            #     "animal_id": [],
+            #     "animal_type": [],
+            #     "body_weight": [],
+            #     "cull_reason": [],
+            #     "days_in_milk": [],
+            #     "parity": [],
+            # }
+            # sold_report["animal_id"].append(animal.id)
+            # sold_report["animal_type"].append(animal.__class__.__name__)
+            # sold_report["body_weight"].append(animal.body_weight)
+            # if hasattr(animal, "cull_reason"):
+            #     sold_report["cull_reason"].append(animal.cull_reason)
+            # else:
+            #     sold_report["cull_reason"].append("cull_reason_not_set")
+            # if hasattr(animal, "days_in_milk"):
+            #     sold_report["days_in_milk"].append(animal.days_in_milk)
+            # else:
+            #     sold_report["days_in_milk"].append("NA")
+            # if hasattr(animal, "calves"):
+            #     sold_report["parity"].append(animal.calves)
+            # else:
+            #     sold_report["parity"].append("NA")
+            om.add_variable("animal_id", animal.id, info_map)
+            om.add_variable("animal_type", animal.__class__.__name__, info_map)
+            om.add_variable("body_weight", animal.body_weight, info_map)
+
             if hasattr(animal, "cull_reason"):
-                sold_report["cull_reason"].append(animal.cull_reason)
+                om.add_variable("cull_reason", animal.cull_reason, info_map)
             else:
-                sold_report["cull_reason"].append("cull_reason_not_set")
+                om.add_variable("cull_reason", "NA", info_map)
+
             if hasattr(animal, "days_in_milk"):
-                sold_report["days_in_milk"].append(animal.days_in_milk)
+                om.add_variable("days_in_milk", animal.days_in_milk, info_map)
             else:
-                sold_report["days_in_milk"].append("NA")
+                om.add_variable("days_in_milk", "NA", info_map)
+
             if hasattr(animal, "calves"):
-                sold_report["parity"].append(animal.calves)
+                om.add_variable("parity", animal.calves, info_map)
             else:
-                sold_report["parity"].append("NA")
-        om.add_variable("sold_report", sold_report, info_map)
+                om.add_variable("parity", "NA", info_map)
 
     def report_305d_milk(animal_manager):
         """
