@@ -122,10 +122,14 @@ class PhosphorusMineralization:
         characteristic of the soil and should NOT be calculated every day. There can be big changes in labile P when P
         is added to soils in fertilizer and manure, and we don’t want PSP changing rapidly." Be recalculating the
         phosphorus sorption parameter with this equation every day (as opposed to recalculating it with
-        calculate_phosphorus_sorption_parameter() in LayerData), we keep changes in it limited.
+        calculate_phosphorus_sorption_parameter() in LayerData), we keep changes in it limited. This equation
+        approximates taking a weighted average over a time span that is determined by the `days_to_average_over_value`,
+        currently set to the length of a year.
 
         """
-        new_mean_phosphorus_sorption_parameter = ((29 * mean_sorption_parameter) + current_sorption_parameter) / 30
+        days_to_average_over = 365
+        weighted_sum_to_average = (days_to_average_over - 1) * mean_sorption_parameter + current_sorption_parameter
+        new_mean_phosphorus_sorption_parameter = weighted_sum_to_average / days_to_average_over
         return max(0.05, min(0.7, new_mean_phosphorus_sorption_parameter))
 
     @staticmethod

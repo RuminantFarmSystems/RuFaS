@@ -1,10 +1,3 @@
-"""
-RUFAS: Ruminant Farm Systems Model
-File name: test_animal.py
-Description: Implements test cases
-Author(s): Pooya Hekmati, sh2235@cornell.edu, Carson Wolber, ctw54@cornell.edu
-"""
-
 import pytest
 import numpy as np
 from typing import Any, Dict

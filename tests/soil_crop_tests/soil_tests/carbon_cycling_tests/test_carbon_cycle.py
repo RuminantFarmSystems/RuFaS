@@ -56,13 +56,14 @@ def test_determine_soil_slow_carbon_fraction(slow_carbon_amount: float, soil_mas
 @pytest.mark.parametrize("passive_carbon_amount, soil_mass, field_size", [
     (66, 100, 50),  # higher value
     (0.5, 1.8, 25.5),  # arbitrary values
-    (2, 9, 1)  # lower value
+    (2, 9, 1),  # lower value
+    (None, 100, 2.1)
 ])
 def test_determine_soil_passive_carbon_fraction(passive_carbon_amount: float,
                                                 soil_mass: float,
                                                 field_size: float) -> None:
     """Checks that the fraction of passive carbon in the soil was calculated correctly"""
-    expected = passive_carbon_amount*field_size/soil_mass
+    expected = passive_carbon_amount*field_size/soil_mass if passive_carbon_amount else 0
     assert expected == CarbonCycling._determine_soil_passive_carbon_fraction(passive_carbon_amount, soil_mass,
                                                                              field_size)
 
