@@ -16,6 +16,8 @@ class GeneralConstants:
 
         PROTEIN_TO_NITROGEN: The nitrogen content of proteins is assumed to be 16%.
 
+        EARTH_ANGULAR_VELOCITY: Earth's angular velocity.
+
     """
     # Length-related
     MM_TO_M = 0.001
@@ -40,3 +42,6 @@ class GeneralConstants:
     # Biochemistry-related
     PROTEIN_TO_NITROGEN = 0.16
     NITROGEN_TO_PROTEIN = 6.25
+
+    # Earth related data
+    EARTH_ANGULAR_VELOCITY = 0.2618

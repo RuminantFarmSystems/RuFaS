@@ -281,7 +281,7 @@ class Pen:
             phosphorus=0.0,
             phosphorus_fraction=0.0,
             potassium=0.0,
-            methane=0.0
+            enteric_methane_g=0.0
         )
 
         # manure attributes are initialized in the reset_manure method

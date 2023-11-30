@@ -1,4 +1,3 @@
-# Unit tests for the animal allocation part of animal management
 import math
 from typing import List
 
@@ -6,7 +5,7 @@ import pytest
 from pytest import approx
 from pytest_mock import MockerFixture
 
-from RUFAS.routines import AnimalManager
+from RUFAS.routines.animal.animal_manager import AnimalManager
 from RUFAS.routines.animal.animal_module_constants import AnimalModuleConstants
 from RUFAS.routines.animal.life_cycle.cow import Cow
 from RUFAS.routines.animal.pen import Pen

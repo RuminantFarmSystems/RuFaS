@@ -75,9 +75,9 @@ class LifeCycleManager:
         self.initialize_db_summary: Optional[InitializationDBSummaryTypedDict] = None
         self.avg_CI = 0.0
 
-        self.sold_heifers: List[HeiferIII] = []
-        self.culled_heifers: List[HeiferII] = []
-        self.culled_cows: List[Cow] = []
+        self.sold_heiferIIIs: List[HeiferIII] = []
+        self.sold_heiferIIs: List[HeiferII] = []
+        self.sold_and_died_cows: List[Cow] = []
 
         self.herd_num = 0
         self.calf_num = 0
@@ -87,10 +87,10 @@ class LifeCycleManager:
         self.cow_num = 0
 
         self.sold_calf_num = 0
-        self.sold_heifer_num = 0
+        self.sold_heiferIII_oversupply_num = 0
         self.bought_heifer_num = 0
-        self.culled_heifer_num = 0
-        self.culled_cow_num = 0
+        self.sold_heiferII_num = 0
+        self.cow_herd_exit_num = 0
 
         self.calf_percent = 0.0
         self.heiferI_percent = 0.0
@@ -310,10 +310,10 @@ class LifeCycleManager:
         self.cow_num = 0
 
         self.sold_calf_num = 0
-        self.sold_heifer_num = 0
+        self.sold_heiferIII_oversupply_num = 0
         self.bought_heifer_num = 0
-        self.culled_heifer_num = 0
-        self.culled_cow_num = 0
+        self.sold_heiferII_num = 0
+        self.cow_herd_exit_num = 0
 
         self.calf_percent = 0.0
         self.heiferI_percent = 0.0
@@ -499,9 +499,9 @@ class LifeCycleManager:
         for idx, heiferII in enumerate(heiferIIs):
             is_cull_stage, is_heiferIII_stage = heiferII.update(sim_day)
             if is_cull_stage:
-                self.culled_heifer_num, self.avg_heifer_culling_age = \
-                    Utility.calc_average(self.culled_heifer_num, self.avg_heifer_culling_age, heiferII.days_born)
-                self.culled_heifers.append(heiferII)
+                self.sold_heiferII_num, self.avg_heifer_culling_age = \
+                    Utility.calc_average(self.sold_heiferII_num, self.avg_heifer_culling_age, heiferII.days_born)
+                self.sold_heiferIIs.append(heiferII)
                 removed_heiferIIs_idx.append(idx)
             elif is_heiferIII_stage:
                 self._convert_heiferII_to_heiferIII(heiferII, heiferIIIs)
@@ -644,8 +644,8 @@ class LifeCycleManager:
         while len(heiferIIIs) + len(cows) > self.herd_num * sell_threshold and len(heiferIIIs) > 0:
             removed_heiferIII = heiferIIIs.pop()
             animals_removed.append(removed_heiferIII)
-            self.sold_heifers.append(removed_heiferIII)
-            self.sold_heifer_num += 1
+            self.sold_heiferIIIs.append(removed_heiferIII)
+            self.sold_heiferIII_oversupply_num += 1
             self.heiferIII_num -= 1
 
     def _check_if_replacement_heifers_needed(self, sim_day: int, heiferIIIs: List[HeiferIII], cows: List[Cow],
@@ -733,14 +733,14 @@ class LifeCycleManager:
             cow: The cow to be culled.
 
         """
-        self.culled_cows.append(cow)
+        self.sold_and_died_cows.append(cow)
         self.cull_reason_stats_range[cow.cull_reason] += 1
         self.cull_reason_stats[cow.cull_reason] += 1
 
         parity = cow.calves if cow.calves <= 3 else '4+'
         self.parity_culling_stats_range[parity] += 1
-        self.culled_cow_num, self.avg_cow_culling_age = \
-            Utility.calc_average(self.culled_cow_num, self.avg_cow_culling_age, cow.days_born)
+        self.cow_herd_exit_num, self.avg_cow_culling_age = \
+            Utility.calc_average(self.cow_herd_exit_num, self.avg_cow_culling_age, cow.days_born)
 
     def _handle_cow_body_weight_and_parity(self, cow: Cow, total_animal_num: int) -> int:
         """Adjusts the average cow body weight, average parity number, and average mature body weight
@@ -893,7 +893,7 @@ class LifeCycleManager:
 
     def _calculate_cull_reason_stats_percent(self) -> None:
         """Calculates the percentage of culled cows for each cull reason."""
-        denominator = self.culled_cow_num if self.culled_cow_num > 0 else 1
+        denominator = self.cow_herd_exit_num if self.cow_herd_exit_num > 0 else 1
         pc = Utility.percent_calculator(denominator)
         for cull_reason in self.cull_reason_stats:
             self.cull_reason_stats_percent[cull_reason] = pc(self.cull_reason_stats[cull_reason])
