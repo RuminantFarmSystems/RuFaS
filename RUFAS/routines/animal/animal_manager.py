@@ -20,13 +20,11 @@ import random
 from statistics import mean
 from typing import Any, Dict, Tuple, List, Set, Union
 
-from RUFAS.config import Config
 from RUFAS.general_constants import GeneralConstants
 from RUFAS.time import Time
 from RUFAS.weather import Weather
 from RUFAS.output_manager import OutputManager
 from RUFAS.routines.animal.animal_grouping_scenarios import AnimalGroupingScenario
-from RUFAS.routines.animal.animal_typed_dicts import InitializationDBSummaryTypedDict
 from RUFAS.routines.animal.animal_types import AnimalType
 from RUFAS.routines.animal.animal_module_constants import AnimalModuleConstants
 from RUFAS.routines.animal.life_cycle.animal_base import AnimalBase

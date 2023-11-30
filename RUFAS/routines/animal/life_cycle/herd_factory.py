@@ -1,4 +1,5 @@
 import copy
+import datetime
 from pathlib import Path
 import random
 from typing import List, Dict, Any, Type
@@ -21,7 +22,7 @@ im = InputManager()
 om = OutputManager()
 
 
-class AnimalFactory:
+class HerdFactory:
 
     def __init__(self, init_herd: bool = False, save_animals: bool = False, save_animals_path: Path = Path("output/"))\
             -> None:
@@ -238,15 +239,13 @@ class AnimalFactory:
         return post_animals
 
     def initialize_herd(self) -> None:
-        info_map = {"class": self.__class__.__name__,
-                    "function": self.initialize_herd.__name__,
-                    }
         AnimalBase.set_config(AnimalManager.get_animal_config(im.get_data("animal.animal_config")))
         AnimalBase.set_nutrient_list(Feed(im.get_data("feed")).nutrient_rqmts)
         if self.init_herd:
             self.pre_animal_population = self._generate_animals()
             if self.save_animals:
-                save_path = Path.joinpath(self.save_animals_path, "animal_population.json")
+                timestamp: str = datetime.datetime.now().strftime("%d-%b-%Y_%a_%H-%M-%S")
+                save_path = Path.joinpath(self.save_animals_path, f"animal_population-{timestamp}.json")
                 om.dict_to_file_json(self.pre_animal_population.__repr__(), save_path)
         else:
             self.pre_animal_population = self._initialize_herd_from_data()
