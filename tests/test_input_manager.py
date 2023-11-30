@@ -51,6 +51,8 @@ def input_manager_original_method_states(
         "get_metadata": mock_input_manager.get_metadata,
         "_validate_input_type_dynamic": mock_input_manager._validate_input_type_dynamic,
         "_validate_tabular_element": mock_input_manager._validate_tabular_element,
+        "flush_pool": mock_input_manager.flush_pool,
+        "add_variable_to_pool": mock_input_manager.add_variable_to_pool
     }
 
 
@@ -1855,3 +1857,134 @@ def test_flush_pool(mock_input_manager: InputManager) -> None:
 
         assert mock_input_manager._InputManager__pool == {}
         assert add_log.call_count == 1
+
+
+@pytest.mark.parametrize("variable_name, data", [
+        ("str_data", "example_str"),
+        ("int_data", 0),
+        ("float_data", 0.0),
+        ("bool_data", True),
+        ("dict_data", {"int": 0, "str": "", "float": 0.0, "int_array": [0, 1, 2], "float_array": [0.0, 1.1, 2.2],
+                       "str_arr": ["example_str1", "example_str2", "example_str3"]}),
+        ("array_of_int_data", [0, 1, 2]),
+        ("array_of_float_data", [0.0, 1.1, 2.2]),
+        ("array_of_str_data", ["example_str1", "example_str2", "example_str3"]),
+        ("array_of_dict_data", [{"a": 0}, {"b": 1}, {"c": 2}]),
+])
+def test_add_variable_to_pool_valid(variable_name: str,
+                                    data: Any,
+                                    mock_input_manager: InputManager,
+                                    mock_metadata: Dict[str, Dict[str, Any]],
+                                    input_manager_original_method_states: Dict[str, Callable]) -> None:
+    mock_input_manager._InputManager__metadata = mock_metadata
+    mock_input_manager._InputManager__pool = {}
+    mock_input_manager._validate_dict_element = lambda *args, **kwargs: {"fixed_elements": 1,
+                                                                         "valid_elements": 1,
+                                                                         "total_elements": 1,
+                                                                         "invalid_elements": 0,
+                                                                         "is_valid": True
+                                                                         }
+
+    with patch("RUFAS.output_manager.OutputManager.add_log") as mock_om_add_log:
+        with patch("RUFAS.output_manager.OutputManager.add_error") as mock_om_add_error:
+
+            result = mock_input_manager.add_variable_to_pool(variable_name=variable_name,
+                                                             data=data,
+                                                             properties_blob_key="properties1",
+                                                             eager_termination=False)
+
+    assert result is True
+    assert mock_om_add_log.call_count == 4
+    assert mock_om_add_error.call_count == 0
+    assert variable_name in mock_input_manager._InputManager__pool
+    assert mock_input_manager.get_data(variable_name) == data
+
+    mock_input_manager.add_variable_to_pool = \
+        input_manager_original_method_states["add_variable_to_pool"]
+    mock_input_manager._validate_dict_element = input_manager_original_method_states["_validate_dict_element"]
+
+
+@pytest.mark.parametrize("variable_name, data", [
+    ("str_data", "example_str"),
+    ("int_data", 0),
+    ("float_data", 0.0),
+    ("bool_data", True),
+    ("dict_data", {"int": 0, "str": "", "float": 0.0, "int_array": [0, 1, 2], "float_array": [0.0, 1.1, 2.2],
+                   "str_arr": ["example_str1", "example_str2", "example_str3"]}),
+    ("array_of_int_data", [0, 1, 2]),
+    ("array_of_float_data", [0.0, 1.1, 2.2]),
+    ("array_of_str_data", ["example_str1", "example_str2", "example_str3"]),
+    ("array_of_dict_data", [{"a": 0}, {"b": 1}, {"c": 2}]),
+])
+def test_add_variable_to_pool_invalid(variable_name: str,
+                                      data: Any,
+                                      mock_input_manager: InputManager,
+                                      mock_metadata: Dict[str, Dict[str, Any]],
+                                      input_manager_original_method_states: Dict[str, Callable]) -> None:
+    mock_input_manager._InputManager__metadata = mock_metadata
+    mock_input_manager._InputManager__pool = {}
+    mock_input_manager._validate_dict_element = lambda *args, **kwargs: {"fixed_elements": 1,
+                                                                         "valid_elements": 1,
+                                                                         "total_elements": 1,
+                                                                         "invalid_elements": 1,
+                                                                         "is_valid": False
+                                                                         }
+
+    with patch("RUFAS.output_manager.OutputManager.add_log") as mock_om_add_log:
+        with patch("RUFAS.output_manager.OutputManager.add_error") as mock_om_add_error:
+            result = mock_input_manager.add_variable_to_pool(variable_name=variable_name,
+                                                             data=data,
+                                                             properties_blob_key="properties1",
+                                                             eager_termination=False)
+
+    assert result is False
+    assert mock_om_add_log.call_count == 4
+    assert mock_om_add_error.call_count == 1
+    assert variable_name not in mock_input_manager._InputManager__pool
+
+    mock_input_manager.add_variable_to_pool = \
+        input_manager_original_method_states["add_variable_to_pool"]
+    mock_input_manager._validate_dict_element = input_manager_original_method_states["_validate_dict_element"]
+
+
+@pytest.mark.parametrize("variable_name, data", [
+    ("str_data", "example_str"),
+    ("int_data", 0),
+    ("float_data", 0.0),
+    ("bool_data", True),
+    ("dict_data", {"int": 0, "str": "", "float": 0.0, "int_array": [0, 1, 2], "float_array": [0.0, 1.1, 2.2],
+                   "str_arr": ["example_str1", "example_str2", "example_str3"]}),
+    ("array_of_int_data", [0, 1, 2]),
+    ("array_of_float_data", [0.0, 1.1, 2.2]),
+    ("array_of_str_data", ["example_str1", "example_str2", "example_str3"]),
+    ("array_of_dict_data", [{"a": 0}, {"b": 1}, {"c": 2}]),
+])
+def test_add_variable_to_pool_eager_termination(variable_name: str,
+                                                data: Any,
+                                                mock_input_manager: InputManager,
+                                                mock_metadata: Dict[str, Dict[str, Any]],
+                                                input_manager_original_method_states: Dict[str, Callable]) -> None:
+    mock_input_manager._InputManager__metadata = mock_metadata
+    mock_input_manager._InputManager__pool = {}
+    mock_input_manager._validate_dict_element = lambda *args, **kwargs: {"fixed_elements": 1,
+                                                                         "valid_elements": 1,
+                                                                         "total_elements": 1,
+                                                                         "invalid_elements": 1,
+                                                                         "is_valid": False
+                                                                         }
+
+    with patch("RUFAS.output_manager.OutputManager.add_log") as mock_om_add_log:
+        with patch("RUFAS.output_manager.OutputManager.add_error") as mock_om_add_error:
+            with pytest.raises(RuntimeError):
+                mock_input_manager.add_variable_to_pool(variable_name=variable_name,
+                                                        data=data,
+                                                        properties_blob_key="properties1",
+                                                        eager_termination=True)
+
+                assert mock_om_add_log.call_count == 4
+                assert mock_om_add_error.call_count == 1
+                assert variable_name not in mock_input_manager._InputManager__pool
+
+    mock_input_manager.add_variable_to_pool = \
+        input_manager_original_method_states["add_variable_to_pool"]
+    mock_input_manager._validate_dict_element = input_manager_original_method_states["_validate_dict_element"]
