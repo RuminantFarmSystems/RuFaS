@@ -184,7 +184,8 @@ class GraphGenerator:
             plt.stackplot(list(range(len(values_tuple[0]))), values_tuple)
         else:
             for value in data.values():
-                plot_function(value)
+                # plot_function(value)
+                plt.plot(value)
 
     def _customize_graph(
         self, fig: Figure, customization_details: Dict[str, Any]

@@ -119,33 +119,6 @@ def test_generate_graph_path_no_title(graph_generator: GraphGenerator) -> None:
             )
 
 
-# def test_handle_dict_plots(graph_generator: GraphGenerator) -> None:
-#     data_dict = {
-#         "var1": [1, 2, 3],
-#         "var2": [4, 5, 6],
-#         "var3": [7, 8, 9],
-#         "var4": [10, 11, 12],
-#     }
-#     selected_variables = ["var1", "var2"]
-
-#     def mock_plot_function(x, y):
-#         assert x == [0, 1, 2]
-#         assert y == (data_dict["var1"], data_dict["var2"])
-
-#     graph_generator._handle_dict_plots(
-#         "stackplot", data_dict, selected_variables, mock_plot_function
-#     )
-
-#     def mock_plot_single_list(x):
-#         assert x == [1, 2, 3]
-
-#     selected_variables = ["var1"]
-
-#     graph_generator._handle_dict_plots(
-#         "plot", data_dict, selected_variables, mock_plot_single_list
-#     )
-
-
 def test_customize_graph_figure_setters(graph_generator: GraphGenerator) -> None:
     customization_details = {
         "figsize": (6, 4),
@@ -240,3 +213,17 @@ def test_draw_graph_success_tuple_plot(graph_generator: GraphGenerator) -> None:
             )
 
         mock_stackplot.assert_called_once()
+
+
+def test_draw_graph_success_plot_single_array(graph_generator: GraphGenerator) -> None:
+
+    data = {"key1": [1, 2, 3, 4],
+            "key2": [5, 6, 7, 8]
+            }
+    with patch("RUFAS.graph_generator.matplotlib.pyplot.plot") as mock_plot:
+        mock_plot.return_value = None
+        graph_generator._draw_graph(
+            "plot", data
+            )
+
+        mock_plot.assert_called()

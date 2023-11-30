@@ -646,6 +646,7 @@ def output_manager_original_method_states(
         "dump_errors": mock_output_manager.dump_errors,
         "dump_variable_names_and_contexts": mock_output_manager.dump_variable_names_and_contexts,
         "_route_save_functions": mock_output_manager._route_save_functions,
+        "_prepare_plot_data": mock_output_manager._prepare_plot_data,
     }
 
 
@@ -1847,13 +1848,15 @@ def test_route_save_functions_graph(
     with patch(
         "RUFAS.graph_generator.GraphGenerator.generate_graph"
     ) as mock_generate_graph:
+        prepared_pool = {"key": [1, 2, 3, 4]}
         mock_output_manager.add_warning = MagicMock()
         mock_output_manager.add_error = MagicMock()
+        mock_output_manager._prepare_plot_data = MagicMock(return_value=prepared_pool)
         graph_data = {"filters": ".*", "other keys": "other values"}
         mock_output_manager._route_save_functions(
             "graph_file",
             "save_path",
-            {"key": {"var": "value"}},
+            prepared_pool,
             False,
             graph_data,
             "graphics_dir",
@@ -1868,7 +1871,7 @@ def test_route_save_functions_graph(
         mock_output_manager._route_save_functions(
             "graph_file",
             "save_path",
-            {"key": {"var": "value"}},
+            prepared_pool,
             True,
             graph_data,
             "graphics_dir",
@@ -1879,7 +1882,7 @@ def test_route_save_functions_graph(
             {"class": "OutputManager", "function": "_route_save_functions"},
         )
         mock_generate_graph.assert_called_once_with(
-            {"key": {"var": "value"}},
+            prepared_pool,
             graph_data,
             "save_path",
             "graph_file",
@@ -1890,7 +1893,7 @@ def test_route_save_functions_graph(
         mock_output_manager._route_save_functions(
             "graph_file",
             "save_path",
-            {"key": {"var": "value"}},
+            prepared_pool,
             True,
             graph_data,
             "graphics_dir",
@@ -1908,6 +1911,8 @@ def test_route_save_functions_graph(
         "add_warning"
     ]
     mock_output_manager.add_error = output_manager_original_method_states["add_error"]
+
+    mock_output_manager._prepare_plot_data = output_manager_original_method_states["_prepare_plot_data"]
 
 
 def test_load_variables_pool_from_file_valid_path(
