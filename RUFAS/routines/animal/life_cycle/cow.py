@@ -280,6 +280,24 @@ class Cow(HeiferIII):
         self.milk_production_history.append(MilkProductionHistory(sim_day, self.days_in_milk,
                                                                   self.estimated_daily_milk_produced, self.days_born))
 
+    def calculate_fat_percent(self, days_in_milk: int):
+        """
+        Calculates fat percent of milk.
+
+        Note that this equation produces 0.0 if days_in_milk is set to one,
+        so we've implemented a minimum days_in_milk value of 2.
+
+        Parameters
+        ----------
+        days_in_milk : int
+            Number of days in milk.
+        """
+        if days_in_milk == 1:
+            days_in_milk = 2
+        fat_percent = 12.86 * days_in_milk ** (-1.081) * math.exp(
+                0.0926 * (math.log(days_in_milk)) ** 2) * (math.log(days_in_milk) ** 1.107)
+        return fat_percent
+
     @staticmethod
     def determine_param_value(mean, std):
         """
@@ -344,9 +362,7 @@ class Cow(HeiferIII):
 
         # calculate fat percent in milk and fat corrected milk production
         if self.milking:
-            self.fat_percent = 12.86 * self.days_in_milk ** (-1.081) * math.exp(
-                0.0926 * (math.log(self.days_in_milk)) ** 2) * \
-                (math.log(self.days_in_milk) ** 1.107)
+            self.fat_percent = self.calculate_fat_percent(self.days_in_milk)
             daily_fat_correct_milk_production = \
                 0.4 * estimated_daily_milk_produced + \
                 0.15 * self.fat_percent * estimated_daily_milk_produced
