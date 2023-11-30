@@ -1983,8 +1983,8 @@ def test_load_variables_pool_from_file_raises_exception(
             2
         ),
         (
-            {"variable1": {"values": [{"a": 1, "b": 2}, {"a": 3, "b": 4}]},
-             "variable2": {"values": [{"a": 5, "b": 6}, {"a": 7, "b": 8}]}},
+            {"variable1": {"values": [{"a": 1, "b": 2, "c": 25}, {"a": 3, "b": 4, "c": 25}]},
+             "variable2": {"values": [{"a": 5, "b": 6, "c": 25}, {"a": 7, "b": 8, "c": 25}]}},
             ["a", "b"],
             {"a": [1, 3, 5, 7], "b": [2, 4, 6, 8]},
             0

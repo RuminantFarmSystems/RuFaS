@@ -924,11 +924,9 @@ class OutputManager(object):
             if is_data_in_dict:
                 if selected_variables:
                     data_dict = Utility.convert_list_of_dicts_to_dict_of_lists(values)
-                    for selected_variables[index], data_dict_value in data_dict.items():
-                        if selected_variables[index] in prepared_pool:
-                            prepared_pool[selected_variables[index]].extend(data_dict_value)
-                        else:
-                            prepared_pool[selected_variables[index]] = data_dict_value
+                    for selected_variable in selected_variables:
+                        if selected_variable in data_dict:
+                            prepared_pool.setdefault(selected_variable, []).extend(data_dict[selected_variable])
                 else:
                     self.add_error("No selected variables. Can't plot this data set.",
                                    "List your 'variables' in the graph output filter.", info_map)
