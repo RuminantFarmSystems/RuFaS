@@ -1961,6 +1961,45 @@ def test_load_variables_pool_from_file_raises_exception(
 
 
 @pytest.mark.parametrize(
+    "filtered_pool,selected_variables,expected_result",
+    [
+        (
+            {"variable1": {"values": [1, 2, 3]}, "variable2": {"values": [4, 5, 6]}},
+            None,
+            {"variable1": [1, 2, 3], "variable2": [4, 5, 6]},
+        ),
+        (
+            {"variable1": {"values": [1, 2, 3]}, "variable2": {"values": [4, 5, 6]}},
+            ["custom_var1", "custom_var2"],
+            {"custom_var1": [1, 2, 3], "custom_var2": [4, 5, 6]},
+        ),
+        (
+            {"variable1": {"values": [{"a": 1, "b": 2}, {"a": 3, "b": 4}]},
+             "variable2": {"values": [{"a": 5, "b": 6}, {"a": 7, "b": 8}]}},
+            None,
+            {"a": [1, 3, 5, 7], "b": [2, 4, 6, 8]},
+        ),
+        (
+            {"variable1": {"values": [{"a": 1, "b": 2}, {"a": 3, "b": 4}]},
+             "variable2": {"values": [{"a": 5, "b": 6}, {"a": 7, "b": 8}]}},
+            ["custom_var1", "custom_var2"],
+            {"a": [1, 3, 5, 7], "b": [2, 4, 6, 8]},
+        ),
+    ],
+)
+def test_prepare_plot_data(mock_output_manager: OutputManager,
+                           output_manager_original_method_states: Dict[str, Callable],
+                           filtered_pool: Dict[str, Dict[str, List[int | float | Dict[str, int | float]]]],
+                           selected_variables: List[str],
+                           expected_result: Dict[str, List[int | float]],
+                           ) -> None:
+    result = mock_output_manager._prepare_plot_data(filtered_pool, selected_variables)
+    assert result == expected_result
+
+    mock_output_manager._prepare_plot_data = output_manager_original_method_states["_prepare_plot_data"]
+
+
+@pytest.mark.parametrize(
     "self, other, expected_result",
     [
         (LogVerbosity.NONE, LogVerbosity.NONE, True),

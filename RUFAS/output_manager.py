@@ -918,7 +918,10 @@ class OutputManager(object):
             if is_data_in_dict:
                 data_dict = Utility.convert_list_of_dicts_to_dict_of_lists(values)
                 for data_dict_key, data_dict_value in data_dict.items():
-                    prepared_pool[data_dict_key] = data_dict_value
+                    if data_dict_key in prepared_pool:
+                        prepared_pool[data_dict_key].extend(data_dict_value)
+                    else:
+                        prepared_pool[data_dict_key] = data_dict_value
                 continue
             else:
                 if selected_variables:
