@@ -46,28 +46,6 @@ from RUFAS.routines.animal.ration import user_defined_ration as udr
 om = OutputManager()
 
 
-def daily_animal_routine(animal_manager, feed: Feed, weather: Weather, time: Time):
-    """
-    Executes daily routines relating to Animals. This method is called every day
-    in the simulation and calls @animal_manager's daily_updates() method
-    with @feed and @time as arguments. [Note that currently, @weather and
-    @ time are not used in animal updates.]
-
-    Parameters
-    ----------
-    animal_manager : AnimalManager
-        instance of the AnimalManager class
-    feed : Feed
-        instance of the Feed class
-    weather : Weather
-        instance of the Weather class
-    time : Time
-        instance of the Time class
-    """
-
-    animal_manager.daily_updates(feed, weather, time)
-
-
 class AnimalManager:
     """
     Manages all animal routines (i.e. calling daily updates, allocating animals
