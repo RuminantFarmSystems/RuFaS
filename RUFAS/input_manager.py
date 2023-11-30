@@ -796,6 +796,37 @@ class InputManager:
 
     def add_variable_to_pool(self, variable_name: str, data: Dict[str, Any], properties_blob_key: str,
                              eager_termination: bool) -> bool:
+        """
+        Adds a variable to the InputManager's pool after validating it against metadata.
+
+        This function takes in a variable along with its name and a key to access its validation metadata.
+        It validates the data against the provided metadata and adds the data to the InputManager pool if it is valid.
+
+        Parameters
+        ----------
+        variable_name: str
+            The name of the variable to be added.
+        data : Dict[str, Any]
+            The data of the variable, structured as a dictionary.
+        properties_blob_key : str
+            A key used to locate the metadata for validation of the variable.
+        eager_termination : bool
+            If True, raises a RuntimeError when the variable is invalid.
+            If False, the function returns False without raising an error.
+
+        Returns
+        -------
+        bool
+            True if the variable is successfully validated and added to the pool.
+            False if the variable is invalid and not added to the pool.
+
+        Raises
+        -------
+        RuntimeError:
+            If eager_termination is True and the variable failed validation.
+
+        The function logs the count of total, valid, fixed, and invalid elements of the variable during validation.
+        """
         info_map = {"class": self.__class__.__name__,
                     "function": self.add_variable_to_pool.__name__,
                     }
