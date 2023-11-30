@@ -36,4 +36,4 @@ jobs:
         git config --global user.name "GitHub Actions"
         git add docs
         git commit -m "Update Sphinx Documentation [skip ci]"
-        git push origin ${{ github.head_ref }}
+        git push origin ${{ github.ref }}
