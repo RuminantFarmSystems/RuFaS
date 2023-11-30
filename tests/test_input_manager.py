@@ -1859,20 +1859,6 @@ def test_flush_pool(mock_input_manager: InputManager) -> None:
         assert add_log.call_count == 1
 
 
-@pytest.fixture
-def mock_metadata(mocker: MockerFixture) -> Dict[str, Dict[str, Any]]:
-    return {
-        "files": {
-            "file1": {"type": "json", "path": "path/to/json/file1.json", "properties": "properties1"},
-            "file2": {"type": "csv", "path": "path/to/csv/file2.csv", "properties": "properties2"},
-        },
-        "properties": {
-            "properties1": {"element1": "some_value1", "element2": "some_value2"},
-            "properties2": {"element3": "some_value3", "element4": "some_value4"},
-        }
-    }
-
-
 @pytest.mark.parametrize("variable_name, data", [
         ("str_data", "example_str"),
         ("int_data", 0),
