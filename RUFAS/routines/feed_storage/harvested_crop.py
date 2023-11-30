@@ -114,3 +114,35 @@ class HarvestedCrop:
     sugar: float
     ash: float
 
+    def __post_init__(self):
+        """
+        Validates that the type of the crop is consistent with its category.
+        """
+        category_to_type = {
+            CropCategory.SMALL_GRAIN: [
+                CropType.WHEAT,
+                CropType.RYE,
+                CropType.OAT,
+                CropType.RICE,
+            ],
+            CropCategory.CORN: [
+                CropType.HIGH_MOISTURE,
+                CropType.SILAGE,
+                CropType.WHOLE_PLANT,
+                CropType.GRAIN,
+            ],
+            CropCategory.SOY: [CropType.FORAGE, CropType.GRAIN],
+            CropCategory.ALFALFA: [CropType.ALFALFA],
+            CropCategory.GRASS: [
+                CropType.RYEGRASS,
+                CropType.ORCHARDGRASS,
+                CropType.FINE_FESCUE,
+                CropType.TALL_FESCUE,
+                CropType.MEADOW_FESCUE,
+            ],
+        }
+
+        if self.type not in category_to_type[self.category]:
+            raise ValueError(
+                f"{self.type} is not a valid type for the category {self.category}."
+            )
