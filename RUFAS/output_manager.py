@@ -875,10 +875,11 @@ class OutputManager(object):
             self._save_variables_to_csv_files(filtered_pool, filter_file, csv_directory)
         elif filter_file.startswith(self.__supported_filter_types_prefixes["graph"]):
             if produce_graphics:
+                prepared_pool = self._prepare_plot_data(filtered_pool, filter_content.get("variables"))
                 try:
                     graph_generator = GraphGenerator(self.__metadata_prefix)
                     graph_generator.generate_graph(
-                        filtered_pool,
+                        prepared_pool,
                         filter_content,
                         save_path,
                         filter_file,
@@ -892,6 +893,40 @@ class OutputManager(object):
                     f"Graphic generation is disabled, skipping {filter_file=}",
                     info_map,
                 )
+
+    def _prepare_plot_data(self, filtered_pool: Dict[str, pool_element_type],
+                           selected_variables: Optional[List[str]] = None
+                           ) -> Dict[str, List[int | float]]:
+        """Extracts the values from the filtered pool data and converts them a dict format
+        that graph_generator can more readily handle.
+
+        Parameters
+        ----------
+        filtered_pool : Dict[str, pool_element_type]
+            The filtered pool of variables that the user wants to graph.
+        filter_content
+
+        Returns
+        -------
+        Dict[str, List[int | float]]
+            The formatted data that can more readily be plotted by graph_generator.
+        """
+        prepared_pool = {}
+        for index, key in enumerate(filtered_pool.keys()):
+            values: List[Any] = filtered_pool[key]["values"]
+            is_data_in_dict = isinstance(values[0], dict)
+            if is_data_in_dict:
+                data_dict = Utility.convert_list_of_dicts_to_dict_of_lists(values)
+                for data_dict_key, data_dict_value in data_dict.items():
+                    prepared_pool[data_dict_key] = data_dict_value
+                continue
+            else:
+                if selected_variables:
+                    prepared_pool[selected_variables[index]] = values
+                else:
+                    prepared_pool[key] = values
+
+        return prepared_pool
 
     def _save_variables_to_csv_files(
         self, data_dict: Dict[str, Any], filter_name: str, path: str

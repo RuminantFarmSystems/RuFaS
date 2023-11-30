@@ -5,7 +5,7 @@ from unittest.mock import patch
 from matplotlib import pyplot as plt
 from mock.mock import MagicMock
 import pytest
-from RUFAS.graph_generator import GraphGenerator
+from RUFAS.graph_generator import MATPLOTLIB_PLOT_FUNCTIONS, GraphGenerator
 
 
 @pytest.fixture
@@ -119,31 +119,31 @@ def test_generate_graph_path_no_title(graph_generator: GraphGenerator) -> None:
             )
 
 
-def test_handle_dict_plots(graph_generator: GraphGenerator) -> None:
-    data_dict = {
-        "var1": [1, 2, 3],
-        "var2": [4, 5, 6],
-        "var3": [7, 8, 9],
-        "var4": [10, 11, 12],
-    }
-    selected_variables = ["var1", "var2"]
+# def test_handle_dict_plots(graph_generator: GraphGenerator) -> None:
+#     data_dict = {
+#         "var1": [1, 2, 3],
+#         "var2": [4, 5, 6],
+#         "var3": [7, 8, 9],
+#         "var4": [10, 11, 12],
+#     }
+#     selected_variables = ["var1", "var2"]
 
-    def mock_plot_function(x, y):
-        assert x == [0, 1, 2]
-        assert y == (data_dict["var1"], data_dict["var2"])
+#     def mock_plot_function(x, y):
+#         assert x == [0, 1, 2]
+#         assert y == (data_dict["var1"], data_dict["var2"])
 
-    graph_generator._handle_dict_plots(
-        "stackplot", data_dict, selected_variables, mock_plot_function
-    )
+#     graph_generator._handle_dict_plots(
+#         "stackplot", data_dict, selected_variables, mock_plot_function
+#     )
 
-    def mock_plot_single_list(x):
-        assert x == [1, 2, 3]
+#     def mock_plot_single_list(x):
+#         assert x == [1, 2, 3]
 
-    selected_variables = ["var1"]
+#     selected_variables = ["var1"]
 
-    graph_generator._handle_dict_plots(
-        "plot", data_dict, selected_variables, mock_plot_single_list
-    )
+#     graph_generator._handle_dict_plots(
+#         "plot", data_dict, selected_variables, mock_plot_single_list
+#     )
 
 
 def test_customize_graph_figure_setters(graph_generator: GraphGenerator) -> None:
@@ -227,29 +227,16 @@ def test_draw_graph_exception(graph_generator: GraphGenerator) -> None:
         )
 
 
-@pytest.mark.parametrize(
-        "data,handle_plots_call_count,util_call_count,graph_type",
-        [
-            ({"key1": {"values": [{"a": 1, "b": 2}, {"a": 3, "b": 4}]},
-              "key2": {"values": [{"a": 5, "b": 6}, {"a": 7, "b": 8}]},
-              }, 2, 2, "stackplot"),
-            ({"key1": {"values": [1, 2, 3, 4]},
-              "key2": {"values": [5, 6, 7, 8]}
-              }, 1, 0, "stackplot"),
-            ({"key1": {"values": [1, 2, 3, 4]},
-              "key2": {"values": [5, 6, 7, 8]}
-              }, 0, 0, "plot")
-        ]
-)
-def test_draw_graph_success(graph_generator: GraphGenerator,
-                            data: Dict[str, Dict[str, List[Any]] | Dict[str, List[Dict[str, List[Any]]]]],
-                            handle_plots_call_count: int,
-                            util_call_count: int,
-                            graph_type: str) -> None:
-    graph_generator._handle_dict_plots = MagicMock()
-    with patch(
-        "RUFAS.graph_generator.Utility.convert_list_of_dicts_to_dict_of_lists"
-    ) as mock_utility:
-        graph_generator._draw_graph(graph_type, data, ["a", "b"])
-        assert graph_generator._handle_dict_plots.call_count == handle_plots_call_count
-        assert mock_utility.call_count == util_call_count
+def test_draw_graph_success_tuple_plot(graph_generator: GraphGenerator) -> None:
+
+    data = {"key1": [1, 2, 3, 4],
+            "key2": [5, 6, 7, 8]
+            }
+    selected_variables = ["key1", "key2"]
+    with patch("RUFAS.graph_generator.matplotlib.pyplot.stackplot") as mock_stackplot:
+        mock_stackplot.return_value = None
+        graph_generator._draw_graph(
+            "stackplot", data, selected_variables
+            )
+
+        mock_stackplot.assert_called_once()
