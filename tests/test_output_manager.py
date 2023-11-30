@@ -1961,29 +1961,33 @@ def test_load_variables_pool_from_file_raises_exception(
 
 
 @pytest.mark.parametrize(
-    "filtered_pool,selected_variables,expected_result",
+    "filtered_pool,selected_variables,expected_result,add_error_call_count",
     [
         (
             {"variable1": {"values": [1, 2, 3]}, "variable2": {"values": [4, 5, 6]}},
             None,
             {"variable1": [1, 2, 3], "variable2": [4, 5, 6]},
+            0
         ),
         (
             {"variable1": {"values": [1, 2, 3]}, "variable2": {"values": [4, 5, 6]}},
             ["custom_var1", "custom_var2"],
             {"custom_var1": [1, 2, 3], "custom_var2": [4, 5, 6]},
+            0
         ),
         (
             {"variable1": {"values": [{"a": 1, "b": 2}, {"a": 3, "b": 4}]},
              "variable2": {"values": [{"a": 5, "b": 6}, {"a": 7, "b": 8}]}},
             None,
-            {"a": [1, 3, 5, 7], "b": [2, 4, 6, 8]},
+            {},
+            2
         ),
         (
             {"variable1": {"values": [{"a": 1, "b": 2}, {"a": 3, "b": 4}]},
              "variable2": {"values": [{"a": 5, "b": 6}, {"a": 7, "b": 8}]}},
-            ["custom_var1", "custom_var2"],
+            ["a", "b"],
             {"a": [1, 3, 5, 7], "b": [2, 4, 6, 8]},
+            0
         ),
     ],
 )
@@ -1992,11 +1996,15 @@ def test_prepare_plot_data(mock_output_manager: OutputManager,
                            filtered_pool: Dict[str, Dict[str, List[int | float | Dict[str, int | float]]]],
                            selected_variables: List[str],
                            expected_result: Dict[str, List[int | float]],
+                           add_error_call_count: int,
                            ) -> None:
+    mock_output_manager.add_error = MagicMock()
     result = mock_output_manager._prepare_plot_data(filtered_pool, selected_variables)
     assert result == expected_result
+    assert mock_output_manager.add_error.call_count == add_error_call_count
 
     mock_output_manager._prepare_plot_data = output_manager_original_method_states["_prepare_plot_data"]
+    mock_output_manager.add_error = output_manager_original_method_states["add_error"]
 
 
 @pytest.mark.parametrize(

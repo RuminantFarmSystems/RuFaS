@@ -904,24 +904,34 @@ class OutputManager(object):
         ----------
         filtered_pool : Dict[str, pool_element_type]
             The filtered pool of variables that the user wants to graph.
-        filter_content
+        selected_variables : Optional[List[str]]
+            If it is present and the data is a list of dicts,
+            it selects the variables to be plotted.
 
         Returns
         -------
         Dict[str, List[int | float]]
             The formatted data that can more readily be plotted by graph_generator.
         """
+        info_map = {
+            "class": self.__class__.__name__,
+            "function": self._prepare_plot_data.__name__,
+        }
         prepared_pool = {}
         for index, key in enumerate(filtered_pool.keys()):
             values: List[Any] = filtered_pool[key]["values"]
             is_data_in_dict = isinstance(values[0], dict)
             if is_data_in_dict:
-                data_dict = Utility.convert_list_of_dicts_to_dict_of_lists(values)
-                for data_dict_key, data_dict_value in data_dict.items():
-                    if data_dict_key in prepared_pool:
-                        prepared_pool[data_dict_key].extend(data_dict_value)
-                    else:
-                        prepared_pool[data_dict_key] = data_dict_value
+                if selected_variables:
+                    data_dict = Utility.convert_list_of_dicts_to_dict_of_lists(values)
+                    for selected_variables[index], data_dict_value in data_dict.items():
+                        if selected_variables[index] in prepared_pool:
+                            prepared_pool[selected_variables[index]].extend(data_dict_value)
+                        else:
+                            prepared_pool[selected_variables[index]] = data_dict_value
+                else:
+                    self.add_error("No selected variables. Can't plot this data set.",
+                                   "List your 'variables' in the graph output filter.", info_map)
                 continue
             else:
                 if selected_variables:
