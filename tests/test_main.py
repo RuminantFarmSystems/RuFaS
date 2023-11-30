@@ -6,7 +6,7 @@ from mock import MagicMock, patch
 import pytest
 from pytest_mock import MockerFixture
 
-from RUFAS.routines.animal.life_cycle.animal_factory import AnimalFactory
+from RUFAS.routines.animal.life_cycle.herd_factory import HerdFactory
 from config import global_variables
 from main import (
     CaseInsensitiveArgumentAction,
@@ -314,7 +314,7 @@ def test_execute_simulations(
     # Arrange
     mock_output_manager = mocker.MagicMock(auto_spec=OutputManager)
     mock_input_manager = mocker.MagicMock(auto_spec=InputManager)
-    mock_animal_factory = mocker.MagicMock(auto_spec=AnimalFactory)
+    mock_herd_factory = mocker.MagicMock(auto_spec=HerdFactory)
     mock_output_manager.flush_pools.return_value = None
     mock_input_manager.flush_pool.return_value = None
     mock_output_manager.dump_all_nondata_pools.return_value = None
@@ -330,8 +330,8 @@ def test_execute_simulations(
         {"prefix": metadata_prefix2, "path": metadata_file_path2},
     ]
     mock_input_manager.start_data_processing.return_value = is_data_valid
-    mock_animal_factory.initialize_herd.return_value = None
-    mocker.patch("main.AnimalFactory", return_value=mock_animal_factory)
+    mock_herd_factory.initialize_herd.return_value = None
+    mocker.patch("main.HerdFactory", return_value=mock_herd_factory)
 
     mock_simulator = mocker.MagicMock(auto_spec=SimulationEngine)
     mock_simulator.simulate.return_value = None
@@ -355,7 +355,7 @@ def test_execute_simulations(
     )
 
     # Assert
-    assert mock_animal_factory.initialize_herd.call_count == initialize_herd_call_count
+    assert mock_herd_factory.initialize_herd.call_count == initialize_herd_call_count
     assert mock_simulator.simulate.call_count == simulate_call_count
     assert mock_output_manager.add_error.call_count == add_error_call_count
     assert mock_output_manager.flush_pools.call_count == len(metadata_file_list)

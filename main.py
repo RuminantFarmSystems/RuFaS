@@ -11,7 +11,7 @@ from pathlib import Path
 import sys
 from typing import List
 
-from RUFAS.routines.animal.life_cycle.animal_factory import AnimalFactory
+from RUFAS.routines.animal.life_cycle.herd_factory import HerdFactory
 from RUFAS.scenario_manager import METADATA_PATHS, MetadataPaths
 
 import config.global_variables
@@ -347,11 +347,11 @@ def execute_simulations(
                 f"Initializing herd data for {str(metadata_file['path'])}...\n",
                 info_map
             )
-            animal_factory = AnimalFactory(
+            herd_factory = HerdFactory(
                 init_herd=init_herd,
                 save_animals=save_animals,
                 save_animals_path=save_animals_dir)
-            animal_factory.initialize_herd()
+            herd_factory.initialize_herd()
 
             output_manager.add_log(
                 "Herd initialization complete",
