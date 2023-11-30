@@ -806,27 +806,42 @@ class InputManager:
 
         metadata_properties = self.__metadata["properties"][properties_blob_key]
         for metadata_property in metadata_properties.keys():
-            element_counter_and_validity = {"fixed_elements": 0, "total_elements": 0, "valid_elements": 0,
-                                            "invalid_elements": 0, "is_valid": True}
-            element_counter_and_validity = self._validate_dict_element([metadata_property], properties_blob_key,
-                                                                       data, False,
-                                                                       element_counter_and_validity)
+            element_counter_and_validity = {
+                "fixed_elements": 0,
+                "total_elements": 0,
+                "valid_elements": 0,
+                "invalid_elements": 0,
+                "is_valid": True
+            }
+            element_counter_and_validity = self._validate_dict_element(
+                element_hierarchy=[metadata_property],
+                properties_blob_key=properties_blob_key,
+                input_data=data,
+                eager_termination=False,
+                element_counter_and_validity=element_counter_and_validity
+            )
             fixed_elements_counter += element_counter_and_validity["fixed_elements"]
             valid_elements_counter += element_counter_and_validity["valid_elements"]
             invalid_elements_counter += element_counter_and_validity["invalid_elements"]
             total_elements_counter += element_counter_and_validity["total_elements"]
 
-        om.add_log("Validation count: total items", f"{total_elements_counter=}", info_map)
-        om.add_log("Validation count: total valid", f"{valid_elements_counter=}", info_map)
-        om.add_log("Validation count: total fixed", f"{fixed_elements_counter=}", info_map)
-        om.add_log("Validation count: total invalid", f"{invalid_elements_counter=}", info_map)
+        om.add_log(f"Validation count for variable {variable_name}: total items",
+                   f"{total_elements_counter=}", info_map)
+        om.add_log(f"Validation count for variable {variable_name}: total valid",
+                   f"{valid_elements_counter=}", info_map)
+        om.add_log(f"Validation count for variable {variable_name}: total fixed",
+                   f"{fixed_elements_counter=}", info_map)
+        om.add_log(f"Validation count for variable {variable_name}: total invalid",
+                   f"{invalid_elements_counter=}", info_map)
 
         if invalid_elements_counter == 0:
             self.__pool[variable_name] = data
             return True
         else:
+            om.add_error("Invalid variable", f"Variable {variable_name} is invalid. It cannot be added to "
+                                             f"InputManager pool during runtime.", info_map)
             if eager_termination:
-                raise RuntimeError(f"Attempting to add an invalid variable {variable_name} to InputManager pool during"
-                                   f"runtime.")
+                raise RuntimeError(f"Variable {variable_name} is invalid. It cannot be added to InputManager pool"
+                                   f" during runtime.")
             else:
                 return False
