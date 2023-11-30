@@ -1,11 +1,11 @@
 from pathlib import Path
 from freezegun import freeze_time
-from typing import Any, Dict, List
+from typing import Dict
 from unittest.mock import patch
 from matplotlib import pyplot as plt
 from mock.mock import MagicMock
 import pytest
-from RUFAS.graph_generator import MATPLOTLIB_PLOT_FUNCTIONS, GraphGenerator
+from RUFAS.graph_generator import GraphGenerator
 
 
 @pytest.fixture
@@ -206,24 +206,26 @@ def test_draw_graph_success_tuple_plot(graph_generator: GraphGenerator) -> None:
             "key2": [5, 6, 7, 8]
             }
     selected_variables = ["key1", "key2"]
-    with patch("RUFAS.graph_generator.matplotlib.pyplot.stackplot") as mock_stackplot:
-        mock_stackplot.return_value = None
+    with patch.dict("RUFAS.graph_generator.MATPLOTLIB_PLOT_FUNCTIONS",
+                    {"stackplot": MagicMock()}) as mock_plot_functions_dict:
         graph_generator._draw_graph(
             "stackplot", data, selected_variables
             )
 
-        mock_stackplot.assert_called_once()
+        mock_plot_functions_dict["stackplot"].assert_called_once_with(list(range(len(data["key1"]))),
+                                                                      (data["key1"], data["key2"]))
 
 
-def test_draw_graph_success_plot_single_array(graph_generator: GraphGenerator) -> None:
+def test_draw_graph_success_plot(graph_generator: GraphGenerator) -> None:
 
     data = {"key1": [1, 2, 3, 4],
             "key2": [5, 6, 7, 8]
             }
-    with patch("RUFAS.graph_generator.matplotlib.pyplot.plot") as mock_plot:
-        mock_plot.return_value = None
+    selected_variables = ["key1", "key2"]
+    with patch.dict("RUFAS.graph_generator.MATPLOTLIB_PLOT_FUNCTIONS",
+                    {"plot": MagicMock()}) as mock_plot_functions_dict:
         graph_generator._draw_graph(
-            "plot", data
+            "plot", data, selected_variables
             )
 
-        mock_plot.assert_called()
+        mock_plot_functions_dict["plot"].assert_called()

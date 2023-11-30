@@ -180,12 +180,10 @@ class GraphGenerator:
         plot_function = MATPLOTLIB_PLOT_FUNCTIONS[graph_type]
         if graph_type in TUPLE_BASED_FUNCTIONS:
             values_tuple = tuple(data[variable] for variable in selected_variables)
-            # plot_function(list(range(len(values_tuple[0]))), values_tuple)
-            plt.stackplot(list(range(len(values_tuple[0]))), values_tuple)
+            plot_function(list(range(len(values_tuple[0]))), values_tuple)
         else:
             for value in data.values():
-                # plot_function(value)
-                plt.plot(value)
+                plot_function(value)
 
     def _customize_graph(
         self, fig: Figure, customization_details: Dict[str, Any]
