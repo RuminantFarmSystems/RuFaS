@@ -150,7 +150,7 @@ class ReportGenerator:
             The data pool from which the report is to be generated, structured as a dictionary.
             Has the same structure of OutputManager's variables pool.
 
-        filter_content : Dict[str, str | int]
+        filter_content : Dict[str, str | int | List[str]]
             A dictionary containing filter criteria and aggregation instructions.
 
         Returns
@@ -162,6 +162,9 @@ class ReportGenerator:
         ------
         ValueError
             If the report data is empty or if the necessary aggregation keys are not found in filter_content.
+        KeyError
+            If a key specified in the `horizontal_order` of `filter_content` is not found in the `report_data`.
+            This usually indicates a mismatch between the expected structure of `filtered_pool` and its actual content.
         """
         report_data = self._prepare_report_data(
             filtered_pool,
@@ -182,33 +185,34 @@ class ReportGenerator:
         vertical_agg_key = filter_content.get("vertical_aggregation")
         vertical_aggregator = AGGREGATION_FUNCTIONS.get(vertical_agg_key)
 
-        if horizontal_aggregator and vertical_aggregator:
-            if filter_content.get("horizontal_first", True):
+        if horizontal_aggregator:
+            loop_list = filter_content.get("horizontal_order", report_data.keys())
+            try:
                 horizontally_aggregated = [
-                    horizontal_aggregator(
-                        [report_data[key][i] for key in report_data.keys()]
-                    )
+                    horizontal_aggregator([report_data[key][i] for key in loop_list])
                     for i in range(number_of_elements)
                 ]
-                return [vertical_aggregator(horizontally_aggregated)]
-            else:
-                vertically_aggregated = [
-                    vertical_aggregator(data_series)
-                    for _, data_series in report_data.items()
-                ]
-                return [horizontal_aggregator(vertically_aggregated)]
-        elif horizontal_aggregator:
-            return [
-                horizontal_aggregator(
-                    [report_data[key][i] for key in report_data.keys()]
+            except KeyError as e:
+                raise KeyError(
+                    f"{e.args[0]} not found in filtered pool. Check the `horizontal_order` entry in the filter file."
                 )
-                for i in range(number_of_elements)
-            ]
-        elif vertical_aggregator:
-            return [
+
+        if vertical_aggregator:
+            vertically_aggregated = [
                 vertical_aggregator(data_series)
                 for _, data_series in report_data.items()
             ]
+
+        if horizontal_aggregator and vertical_aggregator:
+            if filter_content.get("horizontal_first", True):
+                return [vertical_aggregator(horizontally_aggregated)]
+            return [horizontal_aggregator(vertically_aggregated)]
+
+        if horizontal_aggregator:
+            return horizontally_aggregated
+
+        if vertical_aggregator:
+            return vertically_aggregated
 
         raise ValueError(
             f"Didn't find `horizontal_aggregation` or `vertical_aggregation` in {filter_content.get('name')}."
@@ -255,11 +259,11 @@ class ReportGenerator:
         report_data: Dict[str, List[Any]] = {}
         for key in filtered_pool.keys():
             is_data_in_dict = isinstance(filtered_pool[key]["values"][0], dict)
+            if is_data_in_dict and selected_variables is None:
+                raise KeyError(
+                    "Can't generate report, use 'variables' arg to select items from data"
+                )
             if is_data_in_dict:
-                if selected_variables is None:
-                    raise KeyError(
-                        "Can't generate report, use 'variables' arg to select items from data"
-                    )
                 temp_data = Utility.convert_list_of_dicts_to_dict_of_lists(
                     filtered_pool[key]["values"][slice_start:slice_end]
                 )
@@ -271,12 +275,5 @@ class ReportGenerator:
                     else:
                         report_data[temp_key] = temp_values
             else:
-                if key in report_data:
-                    report_data[key].extend(
-                        filtered_pool[key]["values"][slice_start:slice_end]
-                    )
-                else:
-                    report_data[key] = filtered_pool[key]["values"][
-                        slice_start:slice_end
-                    ]
+                report_data[key] = filtered_pool[key]["values"][slice_start:slice_end]
         return report_data
