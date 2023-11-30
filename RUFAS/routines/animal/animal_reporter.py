@@ -253,10 +253,10 @@ class AnimalReporter:
         # om.add_variable("heiferII_num", life_cycle_manager.heiferII_num, info_map)
         # om.add_variable("heiferIII_num", life_cycle_manager.heiferII_num, info_map)
         # om.add_variable("cow_num", life_cycle_manager.cow_num, info_map)
-        om.add_variable("sold_heifer_num", life_cycle_manager.sold_heifer_num, info_map)
+        om.add_variable("sold_heiferIII_oversupply_num", life_cycle_manager.sold_heiferIII_oversupply_num, info_map)
         om.add_variable("bought_heifer_num", life_cycle_manager.bought_heifer_num, info_map)
-        om.add_variable("culled_heifer_num", life_cycle_manager.culled_heifer_num, info_map)
-        om.add_variable("culled_cow_num", life_cycle_manager.culled_cow_num, info_map)
+        om.add_variable("sold_heiferII_num", life_cycle_manager.sold_heiferII_num, info_map)
+        om.add_variable("cow_herd_exit_num", life_cycle_manager.cow_herd_exit_num, info_map)
         om.add_variable("GnRH_injection_num_h", life_cycle_manager.GnRH_injection_num_h, info_map)
         om.add_variable("GnRH_injection_num", life_cycle_manager.GnRH_injection_num, info_map)
         om.add_variable("PGF_injection_num", life_cycle_manager.PGF_injection_num, info_map)
@@ -318,9 +318,9 @@ class AnimalReporter:
 
         """
         sold_animals = (
-            animal_manager.life_cycle_manager.sold_heifers
-            + animal_manager.life_cycle_manager.culled_heifers
-            + animal_manager.life_cycle_manager.culled_cows
+            animal_manager.life_cycle_manager.sold_heiferIIs
+            + animal_manager.life_cycle_manager.sold_heiferIIIs
+            + animal_manager.life_cycle_manager.sold_and_died_cows
         )
 
         info_map = {
