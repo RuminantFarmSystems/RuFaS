@@ -4,26 +4,31 @@
     216
   ],
   "growing_feeds": [
-    89,
+    44,
+    50,
+    95,
     104,
-    231
+    110,
+    301,
+    302
   ],
   "close_up_feeds": [
-    2,
-    43,
-    91,
-    167,
-    231,
-    234
+    44,
+    50,
+    95,
+    104,
+    110,
+    301,
+    302
+    
   ],
   "lac_cow_feeds": [
-    43,
-    51,
+    44,
+    50,
     104,
-    121,
-    167,
-    231,
-    234
+    110,
+    301,
+    302
   ],
   "purchased_feeds": [
     {
@@ -147,73 +152,92 @@
     ],
     "growing": [
       {
-        "feed_type": 89,
-        "ration_percentage": 47
+        "feed type": 50,
+        "ration percentage": 30.41
       },
       {
-        "feed_type": 104,
-        "ration_percentage": 50
+        "feed type": 110,
+        "ration percentage": 26.3
       },
       {
-        "feed_type": 231,
-        "ration_percentage": 3
-      }
+        "feed type": 95,
+        "ration percentage": 10.755
+      },
+      {
+        "feed type": 104,
+        "ration percentage": 10.755
+      },
+      {
+        "feed type": 44,
+        "ration percentage": 3.84
+      },
+      {
+        "feed type": 301,
+        "ration percentage": 2.74
+      },
+      {
+        "feed type": 302,
+        "ration percentage": 15.21
+      }        
+        
     ],
     "close_up": [
       {
-        "feed_type": 2,
-        "ration_percentage": 30.8
+        "feed type": 50,
+        "ration percentage": 33.9
       },
       {
-        "feed_type": 43,
-        "ration_percentage": 29.6
+        "feed type": 110,
+        "ration percentage": 15.12
       },
       {
-        "feed_type": 91,
-        "ration_percentage": 6.70
+        "feed type": 95,
+        "ration percentage": 14.025
       },
       {
-        "feed_type": 167,
-        "ration_percentage": 26.9
+        "feed type": 104,
+        "ration percentage": 14.025
       },
       {
-        "feed_type": 231,
-        "ration_percentage": 3.10
+        "feed type": 44,
+        "ration percentage": 2.03
       },
       {
-        "feed_type": 234,
-        "ration_percentage": 2.9
-      }
+        "feed type": 301,
+        "ration percentage": 2.03
+      },
+      {
+        "feed type": 302,
+        "ration percentage": 18.86
+      }    
     ],
     "lac_cow": [
       {
-        "feed_type": 43,
-        "ration_percentage": 26
+        "feed type": 50,
+        "ration percentage": 36.8
       },
       {
-        "feed_type": 51,
-        "ration_percentage": 48
+        "feed type": 110,
+        "ration percentage": 12.59
       },
       {
-        "feed_type": 104,
-        "ration_percentage": 14
+        "feed type": 104,
+        "ration percentage": 1.92
+    },
+      {
+        "feed type": 44,
+        "ration percentage": 14.27
       },
       {
-        "feed_type": 121,
-        "ration_percentage": 7
+        "feed type": 301,
+        "ration percentage": 3.18
       },
       {
-        "feed_type": 167,
-        "ration_percentage": 3
-      },
-      {
-        "feed_type": 231,
-        "ration_percentage": 1
-      },
-      {
-        "feed_type": 234,
-        "ration_percentage": 1
+        "feed type": 302,
+        "ration percentage": 31.25
       }
+        
+        
     ],
     "tolerance": 0.1,
     "milk_reduction_maximum": 0.50
