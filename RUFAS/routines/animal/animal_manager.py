@@ -150,7 +150,6 @@ class AnimalManager:
         # alternative option: AnimalGroupingScenario.CALF__GROWING_AND_CLOSE_UP__LACCOW
         self.set_animal_grouping_scenario(AnimalGroupingScenario.CALF__GROWING__CLOSE_UP__LACCOW)
 
-        # TODO: have below work with animal_grouping_scenario?
         # dictionary for keeping track of what animal types each pen is holding
         # (value of the dictionaries are lists of pen objects)
         self.pens_by_animal_combination = {
@@ -1572,6 +1571,16 @@ class AnimalManager:
         )
         self.animal_to_pen_id_map[animal.id] = pen_with_min_stocking_density.id
 
+    def collect_manure_excretions_output_data(self, pen: Pen, feed: Feed, manure_excretions_output_data: Dict):
+        pen.classes_in_pen = self._get_classes_in_pen(pen)
+        pen.calc_total_manure(
+            feed,
+            self.methane_model,
+            self.methane_mitigation_method,
+            self.methane_mitigation_additive_amount,
+            manure_excretions_output_data,
+        )
+
     def daily_updates(self, feed: Feed, weather: Weather, time: Time):
         """
         Execute the daily routines relating to Animals. All animals are
@@ -1631,17 +1640,9 @@ class AnimalManager:
 
             manure_excretions_output_data = {}
             for pen in self.all_pens:
-                pen.classes_in_pen = self._get_classes_in_pen(pen)
-                pen.calc_total_manure(
-                    feed,
-                    self.methane_model,
-                    self.methane_mitigation_method,
-                    self.methane_mitigation_additive_amount,
-                    manure_excretions_output_data,
-                )
-                pen.call_p_rqmts()
-                pen.daily_p_update()  # Average phosphorus concentration per pen
-
+                self.collect_manure_excretions_output_data(pen, feed, manure_excretions_output_data)
+            self.calc_p_rqmts()
+            self.daily_p_update()  # Average phosphorus concentration per pen
             for output_data_dict in manure_excretions_output_data.values():
                 for manure_property, manure_value in output_data_dict["manure"].items():
                     info_map = {
