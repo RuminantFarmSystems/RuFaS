@@ -55,7 +55,7 @@ class AnimalManureExcretions(TypedDict):
     potassium: float
     """Amount of potassium in manure (g)."""
 
-    methane: float
+    enteric_methane_g: float
     """Amount of methane emissions (g/day)."""
 
 
@@ -87,7 +87,7 @@ def get_default_animal_manure_excretions() -> AnimalManureExcretions:
         phosphorus=0.0,
         phosphorus_fraction=0.0,
         potassium=0.0,
-        methane=0.0
+        enteric_methane_g=0.0
     )
 
 
