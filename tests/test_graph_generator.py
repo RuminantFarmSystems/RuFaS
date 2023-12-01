@@ -159,7 +159,7 @@ def test_generate_graph_success(graph_generator: GraphGenerator) -> None:
         filtered_pool, graph_details, save_path, filter_file_name, graphics_dir
     )
     graph_generator._draw_graph.assert_called_once_with(
-        "plot", filtered_pool, ["var1", "var2"]
+        "plot", filtered_pool, filtered_pool.keys()
     )
     graph_generator._customize_graph.assert_called_once()
     graph_generator._save_graph.assert_called_once_with(
