@@ -10,7 +10,7 @@
     "animal": {
       "title": "Animal data",
       "description": "Moo Moo!",
-      "path": "input/data/animal/Ryzebol_animal.json",
+      "path": "input/data/animal/c1f3_animal.json",
       "type": "json",
       "properties": "animal_properties"
     },
@@ -59,7 +59,7 @@
     "manure_management": {
       "title": "Manure data",
       "description": "You thought it's a waste, but those crops need to eat as well",
-      "path": "input/data/manure/Ryzebol_manure_management.json",
+      "path": "input/data/manure/c1f3_manure_management.json",
       "type": "json",
       "properties": "manure_management_properties"
     },
@@ -2038,7 +2038,7 @@
         "maximum": 25,
         "default": 0
       },
-      "cooper": {
+      "copper": {
         "type": "number",
         "description": ""
       },
@@ -2222,7 +2222,7 @@
         "type": "number",
         "description": ""
       },
-      "Abs_cooper": {
+      "Abs_copper": {
         "type": "number",
         "description": ""
       },

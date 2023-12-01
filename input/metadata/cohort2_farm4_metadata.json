@@ -2055,7 +2055,7 @@
         "maximum": 25,
         "default": 0
       },
-      "cooper": {
+      "copper": {
         "type": "number",
         "description": ""
       },
@@ -2239,7 +2239,7 @@
         "type": "number",
         "description": ""
       },
-      "Abs_cooper": {
+      "Abs_copper": {
         "type": "number",
         "description": ""
       },

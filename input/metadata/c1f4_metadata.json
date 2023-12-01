@@ -24,7 +24,7 @@
     "feed": {
       "title": "Feed data",
       "description": "Those cows need to eat!",
-      "path": "input/data/feed/CREATE FILE FROM TEMPLATE.json",
+      "path": "input/data/feed/default_feed.json",
       "type": "json",
       "properties": "feed_properties"
     },
@@ -1971,7 +1971,7 @@
         "maximum": 25,
         "default": 0
       },
-      "cooper": {
+      "copper": {
         "type": "number",
         "description": ""
       },
@@ -2155,7 +2155,7 @@
         "type": "number",
         "description": ""
       },
-      "Abs_cooper": {
+      "Abs_copper": {
         "type": "number",
         "description": ""
       },

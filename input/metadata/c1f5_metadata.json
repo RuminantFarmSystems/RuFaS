@@ -10,16 +10,30 @@
     "animal": {
       "title": "Animal data",
       "description": "Moo Moo!",
-      "path": "input/data/animal/cohort1_farm1_animal_updated.json",
+      "path": "input/data/animal/c1f5_animal.json",
       "type": "json",
       "properties": "animal_properties"
     },
     "crop": {
       "title": "Crop data",
       "description": "Alfafa is fun!",
-      "path": "input/data/crop/pilot_testing_rotation.json",
+      "path": "input/data/crop/default_rotation.json",
       "type": "json",
       "properties": "crop_schedule_properties"
+    },
+    "economy": {
+      "title": "Economy data",
+      "description": "Time is money!",
+      "path": "input/data/EEE/default_costs.csv",
+      "type": "csv",
+      "properties": "economic_properties"
+    },
+    "emission": {
+      "title": "Emissions data",
+      "description": "Let's think about global warming",
+      "path": "input/data/EEE/default_emissions.csv",
+      "type": "csv",
+      "properties": "emissions_properties"
     },
     "feed": {
       "title": "Feed data",
@@ -38,63 +52,70 @@
     "NASEM_Comp": {
       "title": "NASEM Comp data",
       "description": "Nutrients!",
-      "path": "input/data/feed/NASEM_Comp_with_TDN.csv",
+      "path": "input/data/feed/NASEM_comp_with_TDN.csv",
       "type": "csv",
       "properties": "NASEM_Comp_properties"
     },
     "manure_management": {
       "title": "Manure data",
       "description": "You thought it's a waste, but those crops need to eat as well",
-      "path": "input/data/manure/cohort1_farm1_manure_management.json",
+      "path": "input/data/manure/c1f5_manure_management.json",
       "type": "json",
       "properties": "manure_management_properties"
     },
     "soil_1": {
       "title": "Soil data",
       "description": "Stop treating soil like dirt!",
-      "path": "input/data/soil/pilot_testing_soil.json",
+      "path": "input/data/soil/default_soil.json",
+      "type": "json",
+      "properties": "soil_profile_properties"
+    },
+    "soil_2": {
+      "title": "Soil data",
+      "description": "Stop treating soil like dirt!",
+      "path": "input/data/soil/default_soil_2.json",
       "type": "json",
       "properties": "soil_profile_properties"
     },
     "fertilizer_schedule": {
       "title": "Fertilizer schedule.",
       "description": "Fertilizer is like butter, you can never have too much.",
-      "path": "input/data/fertilizer_schedule/pilot_testing_fertilizer_schedule.json",
+      "path": "input/data/fertilizer_schedule/default_fertilizer_schedule.json",
       "type": "json",
       "properties": "fertilizer_schedule_properties"
     },
     "manure_schedule": {
       "title": "Manure schedule.",
       "description": "Crappier than having 7:45 am classes Monday - Friday.",
-      "path": "input/data/manure_schedule/pilot_testing_manure_schedule.json",
+      "path": "input/data/manure_schedule/default_manure_schedule.json",
       "type": "json",
       "properties": "manure_schedule_properties"
     },
     "tillage_schedule": {
       "title": "Tillage schedule.",
       "description": "Requires the will to till.",
-      "path": "input/data/tillage_schedule/pilot_testing_tillage_schedule.json",
+      "path": "input/data/tillage_schedule/default_tillage_schedule.json",
       "type": "json",
       "properties": "tillage_schedule_properties"
     },
     "field": {
       "title": "Field specification",
       "description": "Contains overall field properties and references to specification files.",
-      "path": "input/data/field/pilot_testing_field.json",
+      "path": "input/data/field/default_field.json",
       "type": "json",
       "properties": "field_properties"
     },
     "weather": {
       "title": "Weather data",
       "description": "Let's turn on the AC",
-      "path": "input/data/weather/barnyard_weather.csv",
+      "path": "input/data/weather/swat_weather.csv",
       "type": "csv",
       "properties": "weather_properties"
     },
     "feed_quality": {
       "title": "Feed Quality",
       "description": "Hows the feed!",
-      "path": "input/data/feed/pilot_testing_feed_quality.csv",
+      "path": "input/data/feed/feed_quality.csv",
       "type": "csv",
       "properties": "feed_quality_properties"
     },
@@ -347,8 +368,9 @@
               "default": 400,
               "minimum": 0
             },
-            "heifers": {
+            "heifer_repro_programs": {
               "type": "object",
+              "description": "Heifer Reproductive programs",
               "estrus_detection_rate": {
                 "type": "number",
                 "description": "Estrus Detection Rate -- The % of in-heat animals that would be detected in the ED (Estrus Detection) programs (default is 0.6)",
@@ -356,82 +378,52 @@
                 "minimum": 0,
                 "maximum": 1
               },
-              "estrus_conception_rate": {
+              "estrus_service_rate": {
                 "type": "number",
-                "description": "Estrus Conception Rate -- The % of inseminated animals that would be concepted in the ED (Estrus Detection) programs (default is 0.6)",
+                "description": "Estrus Service Rate -- The % of detected in heat animals that would be serviced in the ED (Estrus Detection) programs (default is 1)",
+                "default": 1,
+                "minimum": 0,
+                "maximum": 1
+              },
+              "ed_conception_rate": {
+                "type": "number",
+                "description": "ED Conception Rate -- The % of serviced animals that would be concepted in the ED (Estrus Detection) programs (default is 0.6)",
                 "default": 0.6,
                 "minimum": 0,
                 "maximum": 1
               },
-              "repro_sub_protocol": {
+              "heifer_TAI_protocol": {
                 "type": "string",
-                "pattern": "^(md5CG2P|md5CGP|2P|CP)$"
+                "default": "md5CG2P",
+                "pattern": "^(md5CG2P|md5CGP)$",
+                "description": "Heifer TAI (Timed Artificial Insemination) Protocol (select one) -- The breeding protocol for heifers (md5CG2P or md5CGP)"
               },
-              "repro_sub_properties": {
-                "type": "object",
-                "conception_rate": {
-                  "type": "number",
-                  "description": "Conception Rate -- The conception rate for the heifer reproductive program (default is 0.6)",
-                  "default": 0.6,
-                  "minimum": 0,
-                  "maximum": 1
-                },
-                "estrus_detection_rate": {
-                  "type": "number",
-                  "description": "Estrus Detection Rate -- The % of in-heat animals that would be detected in the ED (Estrus Detection) programs (default is 0.6)",
-                  "default": 0.7,
-                  "minimum": 0,
-                  "maximum": 1
-                }
-              }
-            },
-            "cows": {
-              "type": "object",
-              "estrus_detection_rate": {
+              "md5CG2P_conception_rate": {
                 "type": "number",
-                "description": "Estrus Detection Rate -- The % of in-heat animals that would be detected in the ED (Estrus Detection) programs (default is 0.6)",
+                "description": "Heifer Conception Rate for md5CG2P Protocol -- The conception rate for md5CG2P protocol in heifer TAI (Timed Artificial Insemination) program (default is 0.6)",
                 "default": 0.6,
                 "minimum": 0,
                 "maximum": 1
               },
-              "estrus_conception_rate": {
+              "md5CGP_conception_rate": {
                 "type": "number",
-                "description": "Estrus Conception Rate -- The % of inseminated animals that would be concepted in the ED (Estrus Detection) programs (default is 0.6)",
-                "default": 0.6,
+                "description": "Heifer Conception Rate for md5CGP Protocol -- The conception rate for md5CGP protocol in heifer TAI (Timed Artificial Insemination) program",
                 "minimum": 0,
-                "maximum": 1
+                "maximum": 1,
+                "default": 0.48
               },
-              "presynch_protocol": {
+              "heifer_synchED_protocol": {
                 "type": "string",
-                "description": "Presynch Protocol -- The preSynch protocol (1st breeding) for cow in TAI (Timed Artificial Insemination) program",
-                "default": "Double OvSynch",
-                "pattern": "^(Double OvSynch|Presynch|G6G)$"
+                "default": "2P",
+                "pattern": "^(2P|CP)$",
+                "description": "Heifer SynchED Protocol (select one) -- 2P: two injections of PGF (prostaglandin), watch for estrus after each injection with insemination upon heat detection; CP: 7 days CIDR implements, inject PGF upon removal, insemination upon heat detection"
               },
-              "resynch_protocol": {
-                "type": "string",
-                "description": "Resynch Protocol -- Resynch protocol for cow before/at/after pregnancy check day in the TAI (Timed Artificial Insemination) program",
-                "default": "TAIafterPD",
-                "pattern": "^(TAIafterPD|TAIbeforePD|PGFatPD)$"
-              },
-              "repro_sub_protocol": {
-                "type": "string",
-                "pattern": "^(OvSynch 56|OvSynch 48|CoSynch 72|5d CoSynch)$"
-              },
-              "repro_sub_properties": {
-                "type": "object",
-                "conception_rate": {
-                  "type": "number",
-                  "description": "Conception Rate -- The conception rate for the cow reproductive program (default is 0.6)",
-                  "default": 0.5,
-                  "minimum": 0,
-                  "maximum": 1
-                },
-                "tai_program_start_day": {
-                  "type": "number",
-                  "description": "TAI program start day for ED-TAI protocol -- The TAI program start day for ED-TAI protocol.",
-                  "minimum": 0,
-                  "default": 70
-                }
+              "estrus_detection_rate_h_synch": {
+                "type": "number",
+                "description": "ED Rate for SynchED Protocol -- The estrus detection rate of the SynchED protocol.",
+                "minimum": 0,
+                "maximum": 1,
+                "default": 0.7
               }
             },
             "cow_repro_programs": {
@@ -1336,6 +1328,52 @@
         "description": "Number of years to be skipped between schedule repetitions.",
         "minimum": 0,
         "default": 0
+      }
+    },
+    "economic_properties": {
+      "diesel_cost_gal": {
+        "description": "cost of diesel per gallon",
+        "type": "number",
+        "minimum": 0,
+        "default": 5.00
+      },
+      "electricity_cost_kwh": {
+        "description": "cost of electricity per kwh",
+        "type": "number",
+        "minimum": 0,
+        "default": 0.15
+      },
+      "natural_gas_cost_kwh": {
+        "description": "cost of natural gas per kwh",
+        "type": "number",
+        "minimum": 0,
+        "default": 0.053
+      },
+      "water_cost_gal": {
+        "description": "cost of water per gallon",
+        "type": "number",
+        "minimum": 0,
+        "default": 0.008
+      }
+    },
+    "emissions_properties": {
+      "alfalfa_tillage_emissions": {
+        "type": "number",
+        "description": "The amount of total tonnes CO2-eq generated from alfalfa tillage",
+        "minimum": 0,
+        "default": 500
+      },
+      "corn_grain_tillage_emissions": {
+        "type": "number",
+        "description": "The amount of total tonnes CO2-eq generated from corn grain tillage",
+        "minimum": 0,
+        "default": 300
+      },
+      "corn_silage_tillage_emissions": {
+        "type": "number",
+        "description": "The amount of total tonnes CO2-eq generated from corn silage tillage",
+        "minimum": 0,
+        "default": 400
       }
     },
     "feed_properties": {

@@ -10,7 +10,7 @@
     "animal": {
       "title": "Animal data",
       "description": "Moo Moo!",
-      "path": "input/data/animal/default_animal.json",
+      "path": "input/data/animal/cohort1_farm1_animal.json",
       "type": "json",
       "properties": "animal_properties"
     },
@@ -24,7 +24,7 @@
     "feed": {
       "title": "Feed data",
       "description": "Those cows need to eat!",
-      "path": "input/data/feed/FARMES23_Great Lakes_default.json",
+      "path": "input/data/feed/default_feed.json",
       "type": "json",
       "properties": "feed_properties"
     },
