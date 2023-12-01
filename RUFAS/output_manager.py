@@ -897,7 +897,7 @@ class OutputManager(object):
     def _prepare_plot_data(self, filtered_pool: Dict[str, pool_element_type],
                            selected_variables: Optional[List[str]] = None
                            ) -> Dict[str, List[int | float]]:
-        """Extracts the values from the filtered pool data and converts them a dict format
+        """Extracts the values from the filtered pool data and converts them a dictionary
         that graph_generator can more readily handle.
 
         Parameters
@@ -922,15 +922,15 @@ class OutputManager(object):
             values: List[Any] = filtered_pool[key]["values"]
             is_data_in_dict = isinstance(values[0], dict)
             if is_data_in_dict:
-                if selected_variables:
+                if not selected_variables:
+                    self.add_error("No selected variables. Can't plot this data set.",
+                                   "List the variables you want plotted in the graph output filter.", info_map)
+                    break
+                else:
                     data_dict = Utility.convert_list_of_dicts_to_dict_of_lists(values)
                     for selected_variable in selected_variables:
                         if selected_variable in data_dict:
                             prepared_pool.setdefault(selected_variable, []).extend(data_dict[selected_variable])
-                else:
-                    self.add_error("No selected variables. Can't plot this data set.",
-                                   "List your 'variables' in the graph output filter.", info_map)
-                continue
             else:
                 if selected_variables:
                     prepared_pool[selected_variables[index]] = values
