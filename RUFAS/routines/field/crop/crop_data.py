@@ -338,11 +338,16 @@ class CropData:
     harvest_efficiency: float = 1.0
     """efficiency of the harvest operation: the proportion of yield that will be extracted from the field
     (unitless; [0, 1])"""
+    dry_matter_percentage: float = 85.689
+    """
+    Percentage of fresh yield that is dry matter (unitless).
+    Note: this value is the default for Sorghum harvested as a grain.
+    """
     dry_down_fraction: float = 0.2
     """proportion of plant biomass that is lost to dry-down (unitless; [0, 1])"""
     optimal_phosphorus_fraction: float = 0.073
     """optimal proportion of the plant's biomass comprised of nitrogen for the current growth stage (unitless)"""
-    user_harvest_index: Optional[float] = None  # TODO: handle user input for this. - GitHub Issue #246
+    user_harvest_index: Optional[float] = None
     """a user-specified harvest index (unitless). If given, 'harvest-index-override' is triggered"""
     potential_harvest_index: Optional[float] = None
     """potential harvest index for a given day (unitless)"""
@@ -351,10 +356,12 @@ class CropData:
     (unitless)"""
     cut_biomass: Optional[float] = None
     """total amount of the desired crop product (kg/ha)"""
-    yield_collected: Optional[float] = None
+    fresh_yield_collected: Optional[float] = None
     """amount of the desired crop product to be removed from the field (kg/ha)"""
+    dry_matter_yield_collected: Optional[float] = None
+    """Dry matter mass collected at harvest (kg / ha)."""
     yield_residue: Optional[float] = None
-    """amount of residue created; unharvested yield (kg/ha)"""
+    """Amount of dry matter residue created; unharvested yield (kg/ha)"""
     yield_nitrogen: Optional[float] = None
     """nitrogen contained in the harvested yield (kg/ha)"""
     yield_phosphorus: Optional[float] = None
@@ -494,6 +501,7 @@ class Corn(CropData):
 
     optimal_harvest_index: float = 0.50
     min_harvest_index: float = 0.30
+    dry_matter_percentage: float = 86.0907
     yield_nitrogen_fraction: float = 0.0140
     yield_phosphorus_fraction: float = 0.0016
 
@@ -531,6 +539,7 @@ class CornSilage(CropData):
 
     optimal_harvest_index: float = 0.90
     min_harvest_index: float = 0.90
+    dry_matter_percentage: float = 35.361
     yield_nitrogen_fraction: float = 0.0140
     yield_phosphorus_fraction: float = 0.0016
 
@@ -568,6 +577,10 @@ class SpringWheat(CropData):
 
     optimal_harvest_index: float = 0.42
     min_harvest_index: float = 0.20
+    dry_matter_percentage: float = 85.689
+    """
+    Note: this value comes from the Winter Wheat grain configuration values.
+    """
     yield_nitrogen_fraction: float = 0.0234
     yield_phosphorus_fraction: float = 0.0033
 
@@ -605,6 +618,10 @@ class WinterWheat(CropData):
 
     optimal_harvest_index: float = 0.40
     min_harvest_index: float = 0.20
+    dry_matter_percentage: float = 85.689
+    """
+    Note: this value comes from the Winter Wheat grain configuration values.
+    """
     yield_nitrogen_fraction: float = 0.0250
     yield_phosphorus_fraction: float = 0.0022
 
@@ -642,6 +659,10 @@ class CerealRye(CropData):
 
     optimal_harvest_index: float = 0.40
     min_harvest_index: float = 0.20
+    dry_matter_percentage: float = 85.962
+    """
+    Note: this value comes from the Cereal Rye grain configuration values.
+    """
     yield_nitrogen_fraction: float = 0.0284
     yield_phosphorus_fraction: float = 0.0042
 
@@ -679,6 +700,10 @@ class SpringBarley(CropData):
 
     optimal_harvest_index: float = 0.54
     min_harvest_index: float = 0.20
+    dry_matter_fraction: float = 85.689
+    """
+    Note: this value comes from the Winter Wheat grain configuration values.
+    """
     yield_nitrogen_fraction: float = 0.0210
     yield_phosphorus_fraction: float = 0.0017
 
@@ -716,6 +741,10 @@ class FallOats(CropData):
 
     optimal_harvest_index: float = 0.42
     min_harvest_index: float = 0.175
+    dry_matter_percentage: float = 85.689
+    """
+    Note: this value comes from the Winter Wheat grain configuration values.
+    """
     yield_nitrogen_fraction: float = 0.0316
     yield_phosphorus_fraction: float = 0.0057
 
@@ -753,6 +782,10 @@ class TallFescue(CropData):
 
     optimal_harvest_index: float = 0.90
     min_harvest_index: float = 0.90
+    dry_matter_percentage: float = 39.612
+    """
+    Note: this value comes from the Tall Fescue silage configuration values.
+    """
     yield_nitrogen_fraction: float = 0.0234
     yield_phosphorus_fraction: float = 0.0033
 
@@ -790,6 +823,10 @@ class Alfalfa(CropData):
 
     optimal_harvest_index: float = 0.90
     min_harvest_index: float = 0.90
+    dry_matter_percentage: float = 42.883
+    """
+    Note: this value comes from the Alfalfa silage configuration values.
+    """
     yield_nitrogen_fraction: float = 0.0250
     yield_phosphorus_fraction: float = 0.0035
 
@@ -827,6 +864,10 @@ class Soybean(CropData):
 
     optimal_harvest_index: float = 0.31
     min_harvest_index: float = 0.01
+    dry_matter_percentage: float = 89.105
+    """
+    Note: this value comes from the Soybean grain configuration values.
+    """
     yield_nitrogen_fraction: float = 0.0650
     yield_phosphorus_fraction: float = 0.0091
 
@@ -864,6 +905,10 @@ class SugarBeet(CropData):
 
     optimal_harvest_index: float = 2.00
     min_harvest_index: float = 1.10
+    dry_matter_percentage: float = 22.5
+    """
+    Note: this value is set equal to the dry matter percentage for Potatoes. It is expected to be deprecated as well.
+    """
     yield_nitrogen_fraction: float = 0.0130
     yield_phosphorus_fraction: float = 0.0020
 
@@ -901,6 +946,10 @@ class Potato(CropData):
 
     optimal_harvest_index: float = 0.95
     min_harvest_index: float = 0.95
+    dry_matter_percentage: float = 22.5
+    """
+    Note: this value was pulled from the top result of a Google search. It is expected to be deprecated.
+    """
     yield_nitrogen_fraction: float = 0.0246
     yield_phosphorus_fraction: float = 0.0023
 
@@ -942,5 +991,9 @@ class Triticale(CropData):
 
     optimal_harvest_index: float = 0.40
     min_harvest_index: float = 0.20
+    dry_matter_percentage: float = 88.374
+    """
+    Note: this value comes from the Triticale grain configuration values.
+    """
     yield_nitrogen_fraction: float = 0.0263
     yield_phosphorus_fraction: float = 0.0057

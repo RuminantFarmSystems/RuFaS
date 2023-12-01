@@ -216,7 +216,7 @@ def test_cut_crop(efficiency: float, harvest: float, override: bool, should_fail
         collected = cut_biomass * efficiency
         residue = cut_biomass * (1 - efficiency)
         crop._recalculate_biomass_distribution.assert_called_once()
-        assert data.yield_collected == collected
+        assert data.fresh_yield_collected == collected
         assert data.yield_residue == residue
 
         if override:
@@ -268,7 +268,7 @@ def test_record_yield(field_name: str, field_size: float, species: str, year: in
     crop_manager.data.planting_day = 100
     crop_manager.data.planting_year = 1995
     crop_manager.data.species = species
-    crop_manager.data.yield_collected = mass
+    crop_manager.data.fresh_yield_collected = mass
     crop_manager.data.yield_nitrogen = nitrogen
     crop_manager.data.yield_phosphorus = phosphorus
 
