@@ -174,7 +174,7 @@ rufas_id,Name,feed_description,feed_type,units,Comp_location
 173,SPELT ,Grain,Conc,kg,----
 174,SUDAN GRASS,"Hay, mature",Forage,kg,----
 175,SUDAN GRASS,"Hay, mid-maturity",Forage,kg,----
-176,SUDAN GRASS,"Silage, mature",Forage,kg,----
+176,SUDAN GRASS,"Silage, mature",Forage,kg,NASEM_only
 177,SUDAN GRASS,"Silage, mid-maturity",Forage,kg,----
 178,SUGAR ,Sugar ,Conc,kg,----
 179,SUGARCANE,"Bagasse, hay",Forage,kg,----
