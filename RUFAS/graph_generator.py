@@ -141,7 +141,7 @@ class GraphGenerator:
         try:
             fig, _ = plt.subplots()
             self._draw_graph(
-                graph_details["type"], filtered_pool, graph_details.get("variables")
+                graph_details["type"], filtered_pool, filtered_pool.keys()
             )
             self._customize_graph(fig, graph_details)
             return self._save_graph(
