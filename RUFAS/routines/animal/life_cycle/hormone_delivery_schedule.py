@@ -40,7 +40,7 @@ class HormoneDeliverySchedule:
         'md5CGP': {
             0: {'deliver_hormones': ['GnRH']},
             5: {'deliver_hormones': ['PGF']},
-            8: {'deliver_hormones': ['PGF']},
+            8: {'deliver_hormones': ['GnRH']},
             9: {'set_ai_day': True, 'set_conception_rate': True}
         },
         '2P': {
@@ -48,7 +48,7 @@ class HormoneDeliverySchedule:
             14: {'deliver_hormones': ['PGF']},
         },
         'CP': {
-            0: {'deliver_hormones': ['PGF']},
+            0: {'deliver_hormones': ['CIDR']},
             7: {'deliver_hormones': ['PGF']},
         }
     }

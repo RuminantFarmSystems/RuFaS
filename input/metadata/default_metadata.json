@@ -386,7 +386,7 @@
               },
               "repro_sub_protocol": {
                 "type": "string",
-                "pattern": "^(md5CG2P|md5CGP|2P|CP)$"
+                "pattern": "^(md5CG2P|md5CGP|2P|CP|N/A)$"
               },
               "repro_sub_properties": {
                 "type": "object",

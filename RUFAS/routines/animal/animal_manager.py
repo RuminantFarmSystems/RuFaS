@@ -1644,6 +1644,7 @@ class AnimalManager:
             if time.is_last_day_of_simulation:
                 self._record_animal_events(self.heiferIIs)
                 self._record_animal_events(self.cows)
+                self._record_heiferIIs_conception_rate()
 
             manure_excretions_output_data = {}
             for pen in self.all_pens:
@@ -1725,3 +1726,50 @@ class AnimalManager:
         om.add_variable('num_cow_parity_2', self.life_cycle_manager.num_cow_for_parity['2'], info_map)
         om.add_variable('num_cow_parity_3', self.life_cycle_manager.num_cow_for_parity['3'], info_map)
         om.add_variable('num_cow_parity_3+', self.life_cycle_manager.num_cow_for_parity['greater_than_3'], info_map)
+
+    def _record_heiferIIs_conception_rate(self):
+        """
+        Record the conception rate of heiferIIs.
+
+        Returns
+        -------
+        None
+        """
+
+        info_map = {"class": self.__class__.__name__, "function": self._record_heiferIIs_conception_rate.__name__}
+        om.add_variable('heiferII_total_num_ai_performed', HeiferII.stats['num_ai_performed'], info_map)
+        om.add_variable('heiferII_total_num_successful_conceptions',
+                        HeiferII.stats['num_successful_conceptions'], info_map)
+        om.add_variable('heiferII_overall_conception_rate',
+                        (HeiferII.stats['num_successful_conceptions'] / HeiferII.stats['num_ai_performed'])
+                        if HeiferII.stats['num_ai_performed'] > 0 else 0,
+                        info_map)
+
+        om.add_variable('heiferII_num_ai_performed_in_ED', HeiferII.stats['num_ai_performed_in_ED'], info_map)
+        om.add_variable('heiferII_num_successful_conceptions_in_ED',
+                        HeiferII.stats['num_successful_conceptions_in_ED'], info_map)
+        om.add_variable('heiferII_ED_conception_rate',
+                        (HeiferII.stats['num_successful_conceptions_in_ED'] / HeiferII.stats['num_ai_performed_in_ED'])
+                        if HeiferII.stats['num_ai_performed_in_ED'] > 0 else 0,
+                        info_map)
+
+        om.add_variable('heiferII_num_ai_performed_in_TAI', HeiferII.stats['num_ai_performed_in_TAI'], info_map)
+        om.add_variable('heiferII_num_successful_conceptions_in_TAI',
+                        HeiferII.stats['num_successful_conceptions_in_TAI'], info_map)
+        om.add_variable('heiferII_TAI_conception_rate',
+                        (HeiferII.stats['num_successful_conceptions_in_TAI'] /
+                         HeiferII.stats['num_ai_performed_in_TAI'])
+                        if HeiferII.stats['num_ai_performed_in_TAI'] > 0 else 0,
+                        info_map)
+
+        om.add_variable('heiferII_num_ai_performed_in_SynchED', HeiferII.stats['num_ai_performed_in_SynchED'], info_map)
+        om.add_variable('heiferII_num_successful_conceptions_in_SynchED',
+                        HeiferII.stats['num_successful_conceptions_in_SynchED'], info_map)
+        om.add_variable('heiferII_SynchED_conception_rate',
+                        (HeiferII.stats['num_successful_conceptions_in_SynchED'] /
+                         HeiferII.stats['num_ai_performed_in_SynchED'])
+                        if HeiferII.stats['num_ai_performed_in_SynchED'] > 0 else 0,
+                        info_map)
+
+
+
