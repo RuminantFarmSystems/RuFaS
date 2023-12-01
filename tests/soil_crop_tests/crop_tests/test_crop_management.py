@@ -189,7 +189,7 @@ def test_cut_crop(efficiency: float, harvest: float, override: bool, should_fail
     # setup
     data = CropData(harvest_index=harvest, biomass=100, leaf_area_index=2.3, accumulated_heat_units=1.1,
                     optimal_nitrogen_fraction=0.09, optimal_phosphorus_fraction=0.02,
-                    yield_nitrogen_fraction=0.12, yield_phosphorus_fraction=0.0092, above_ground_biomass=0.37)
+                    yield_nitrogen_fraction=0.12, yield_phosphorus_fraction=0.0092, above_ground_biomass=75.0)
     if override:
         data.user_harvest_index = harvest
     crop = CropManagement(data)
@@ -213,20 +213,22 @@ def test_cut_crop(efficiency: float, harvest: float, override: bool, should_fail
         assert data.biomass == 100 - cut_biomass
         assert data.leaf_area_index == 2.3 * (1 - (cut_biomass / 100))
         assert data.accumulated_heat_units == 1.1 * (1 - (cut_biomass / 100))
-        collected = cut_biomass * efficiency
-        residue = cut_biomass * (1 - efficiency)
+        collected_fresh_yield = cut_biomass * efficiency
+        collected_dry_matter_yield = collected_fresh_yield * crop.data.dry_matter_percentage
+        residue = cut_biomass * (1 - efficiency) * crop.data.dry_matter_percentage
         crop._recalculate_biomass_distribution.assert_called_once()
-        assert data.fresh_yield_collected == collected
+        assert data.fresh_yield_collected == collected_fresh_yield
+        assert data.dry_matter_yield_collected == collected_dry_matter_yield
         assert data.yield_residue == residue
 
         if override:
-            assert data.yield_nitrogen == collected * 0.09
-            assert data.yield_phosphorus == collected * 0.02
+            assert data.yield_nitrogen == collected_fresh_yield * 0.09
+            assert data.yield_phosphorus == collected_fresh_yield * 0.02
             assert data.residue_nitrogen == residue * 0.09
             assert data.residue_phosphorus == residue * 0.02
         else:
-            assert data.yield_nitrogen == collected * 0.12
-            assert data.yield_phosphorus == collected * 0.0092
+            assert data.yield_nitrogen == collected_fresh_yield * 0.12
+            assert data.yield_phosphorus == collected_fresh_yield * 0.0092
             assert data.residue_nitrogen == residue * 0.12
             assert data.residue_phosphorus == residue * 0.0092
 

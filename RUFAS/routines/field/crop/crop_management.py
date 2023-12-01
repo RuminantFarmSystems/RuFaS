@@ -119,7 +119,7 @@ class CropManagement:
 
         References
         ----------
-        SWAT Theoretical documentation section 5:2.4
+        SWAT Theoretical documentation section 5:2.4 and section 6:1.2
 
         Raises
         ------
@@ -154,10 +154,9 @@ class CropManagement:
                 f"Expected collected_fraction to be between 0 and 1 (inclusive), received '{collected_fraction}'."
             )
 
-        # Biomass removed from plant
         roots_harvested = self.data.harvest_index > 1.0
         if not roots_harvested:
-            self.data.cut_biomass = self.data.above_ground_biomass * self.data.harvest_index  # SWAT 5:2.4.2
+            self.data.cut_biomass = self.data.above_ground_biomass * self.data.harvest_index
         else:
             self.data.cut_biomass = self.determine_biomass_cut_from_whole_plant(self.data.biomass,
                                                                                 self.data.harvest_index)
@@ -165,27 +164,24 @@ class CropManagement:
         self.data.biomass -= self.data.cut_biomass
         self._recalculate_biomass_distribution(roots_harvested)
 
-        # Reset some growth parameters (SWAT 6:1.2)
         self.data.leaf_area_index = self.data.leaf_area_index * (1 - fraction_cut)
         self.data.accumulated_heat_units = self.data.accumulated_heat_units * (1 - fraction_cut)
 
-        # Biomass collected as yield, and its nutrient content
         self.data.fresh_yield_collected = self.data.cut_biomass * collected_fraction
         self.data.dry_matter_yield_collected = self.data.fresh_yield_collected * self.data.dry_matter_percentage
+
+        self.data.yield_residue = \
+            self.data.cut_biomass * (1 - collected_fraction) * self.data.dry_matter_percentage
+
         if self.data.do_harvest_index_override:
             self.data.yield_nitrogen = self.data.optimal_nitrogen_fraction * self.data.fresh_yield_collected
             self.data.yield_phosphorus = self.data.optimal_phosphorus_fraction * \
                 self.data.fresh_yield_collected
-        else:
-            self.data.yield_nitrogen = self.data.yield_nitrogen_fraction * self.data.fresh_yield_collected
-            self.data.yield_phosphorus = self.data.yield_phosphorus_fraction * self.data.fresh_yield_collected
-
-        # Uncollected biomass and nutrients
-        self.data.yield_residue = self.data.cut_biomass * (1 - collected_fraction) * self.data.dry_matter_percentage
-        if self.data.do_harvest_index_override:
             self.data.residue_nitrogen = self.data.optimal_nitrogen_fraction * self.data.yield_residue
             self.data.residue_phosphorus = self.data.optimal_phosphorus_fraction * self.data.yield_residue
         else:
+            self.data.yield_nitrogen = self.data.yield_nitrogen_fraction * self.data.fresh_yield_collected
+            self.data.yield_phosphorus = self.data.yield_phosphorus_fraction * self.data.fresh_yield_collected
             self.data.residue_nitrogen = self.data.yield_nitrogen_fraction * self.data.yield_residue
             self.data.residue_phosphorus = self.data.yield_phosphorus_fraction * self.data.yield_residue
 
