@@ -241,7 +241,7 @@ class OutputGatherer:
                 om.add_variable("max_transpiration", crop.data.max_transpiration, info_map)
                 om.add_variable("canopy_water", crop.data.canopy_water, info_map)
                 om.add_variable("cut_biomass", crop.data.cut_biomass, info_map)
-                om.add_variable("yield_collected", crop.data.yield_collected, info_map)
+                om.add_variable("fresh_yield_collected", crop.data.fresh_yield_collected, info_map)
                 om.add_variable("yield_residue", crop.data.yield_residue, info_map)
                 om.add_variable("yield_nitrogen", crop.data.yield_nitrogen, info_map)
                 om.add_variable("yield_phosphorus", crop.data.yield_phosphorus, info_map)
