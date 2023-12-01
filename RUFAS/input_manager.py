@@ -834,7 +834,6 @@ class InputManager:
         invalid_elements_counter = 0
         total_elements_counter = 0
         fixed_elements_counter = 0
-        print(type(data))
 
         metadata_properties = self.__metadata["properties"][properties_blob_key]
         for metadata_property in metadata_properties.keys():
