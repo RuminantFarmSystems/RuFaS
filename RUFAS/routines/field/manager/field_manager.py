@@ -116,6 +116,7 @@ class FieldManager:
         seasonal_high_water_table = field_configuration_data.get("seasonal_high_water_table")
         watering_amount_in_liters = field_configuration_data.get("watering_amount_in_liters")
         watering_interval = field_configuration_data.get("watering_interval")
+        supplement_manure = field_configuration_data.get("supplement_manure_nutrient_deficiencies")
 
         fertilizer_configuration = field_configuration_data.get("fertilizer_management_specification")
         available_fertilizer_mixes, fertilizer_schedule = FieldManager._setup_fertilizer_schedule(
@@ -144,7 +145,8 @@ class FieldManager:
         field_data = FieldData(name=field_name, field_size=field_size, absolute_latitude=absolute_latitude,
                                longitude=longitude, minimum_daylength=minimum_daylength,
                                seasonal_high_water_table=seasonal_high_water_table,
-                               watering_amount_in_liters=watering_amount_in_liters, watering_interval=watering_interval)
+                               watering_amount_in_liters=watering_amount_in_liters, watering_interval=watering_interval,
+                               supplement_manure_nutrient_deficiencies=supplement_manure)
 
         return Field(field_data=field_data, soil=soil_profile, plantings=all_planting_events,
                      harvestings=all_harvest_events, tillage_events=tillage_events, fertilizer_events=fertilizer_events,
