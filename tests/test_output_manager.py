@@ -1980,7 +1980,7 @@ def test_load_variables_pool_from_file_raises_exception(
              "variable2": {"values": [{"a": 5, "b": 6}, {"a": 7, "b": 8}]}},
             None,
             {},
-            2
+            1
         ),
         (
             {"variable1": {"values": [{"a": 1, "b": 2, "c": 25}, {"a": 3, "b": 4, "c": 25}]},
