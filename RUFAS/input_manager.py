@@ -794,7 +794,7 @@ class InputManager:
         self.__pool = {}
         om.add_log("Clear variable pool", "The pool is emptied.", info_map)
 
-    def add_variable_to_pool(self, variable_name: str, data: Dict[str, Any], properties_blob_key: str,
+    def add_variable_to_pool(self, variable_name: str, data: Dict[str, Any] | List[Any], properties_blob_key: str,
                              eager_termination: bool) -> bool:
         """
         Adds a variable to the InputManager's pool after validating it against metadata.
@@ -806,8 +806,8 @@ class InputManager:
         ----------
         variable_name: str
             The name of the variable to be added.
-        data : Dict[str, Any]
-            The data of the variable, structured as a dictionary.
+        data : Dict[str, Any] | List[Any]
+            The data of the variable, structured as a dictionary or a list.
         properties_blob_key : str
             A key used to locate the metadata for validation of the variable.
         eager_termination : bool
@@ -834,6 +834,7 @@ class InputManager:
         invalid_elements_counter = 0
         total_elements_counter = 0
         fixed_elements_counter = 0
+        print(type(data))
 
         metadata_properties = self.__metadata["properties"][properties_blob_key]
         for metadata_property in metadata_properties.keys():
@@ -848,6 +849,12 @@ class InputManager:
                 element_hierarchy=[metadata_property],
                 properties_blob_key=properties_blob_key,
                 input_data=data,
+                eager_termination=False,
+                element_counter_and_validity=element_counter_and_validity
+            ) if isinstance(data, Dict) else self._validate_tabular_element(
+                var_name=variable_name,
+                properties_blob_key=properties_blob_key,
+                input_data={variable_name: data},
                 eager_termination=False,
                 element_counter_and_validity=element_counter_and_validity
             )
