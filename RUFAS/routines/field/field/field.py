@@ -394,9 +394,9 @@ class Field:
         This behavior is regulated by the `supplement_manure_nutrient_deficiencies` attribute of the `FieldData` class.
 
         """
+        info_map = {"class": self.__class__.__name__, "function": self._execute_manure_application.__name__,
+                    "prefix": f"field='{self.field_data.name}'", "date": {"year": year, "day": day}}
         if requested_nitrogen == requested_phosphorus == 0.0:
-            info_map = {"class": self.__class__.__name__, "function": self._execute_manure_application.__name__,
-                        "prefix": f"field='{self.field_data.name}'", "date": {"year": year, "day": day}}
             log_message = "Tried to apply manure with no nitrogen or phosphorus requested."
             om.add_log("manure_application_log", log_message, info_map)
             return
@@ -462,11 +462,9 @@ class Field:
             return
 
         if not self.field_data.supplement_manure_nutrient_deficiencies:
-            warning_name = "nutrient_deficient_manure_application"
+            warning_name = "Nutrient deficient manure application"
             warning_message = f"Manure nitrogen deficient by {unmet_nitrogen_demand} kg, manure phosphorus " \
                               f"deficient by {unmet_phosphorus_demand} kg."
-            info_map = {"class": self.__class__.__name__, "function": self._execute_manure_application.__name__,
-                        "prefix": f"field='{self.field_data.name}'", "year": year, "day": day}
             om.add_warning(warning_name, warning_message, info_map)
             return
 
