@@ -9,12 +9,21 @@ class WaterDynamics:
         self.data = crop_data or CropData()  # initialize with defaults, if not given
 
     def cycle_water(self, evaporation: float, transpiration: float, potential_evapotranspiration: float) -> None:
-        """executes the daily cycling of water between the plants, soil, and environment
+        """
+        Executes the daily cycling of water between the plants, soil, and environment.
 
-        Args:
-            evaporation: evaporation on a given day in mm
-            transpiration: transpiration on a given day in mm
-            potential_evapotranspiration: potential evapotranspiration on a given day in mm
+        Parameters
+        ----------
+        evaporation : float
+            Evaporation on a given day (mm).
+        transpiration : float
+            Transpiration on a given day (mm).
+        potential_evapotranspiration:
+            Potential evapotranspiration on a given day (mm).
+
+        Notes
+        -----
+        This method updates cumulative sums that are used to keep the water deficiency factor updated.
 
         """
         self.data.cumulative_evaporation += evaporation
