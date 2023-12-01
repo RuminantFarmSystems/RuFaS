@@ -1,14 +1,3 @@
-"""
-RUFAS: Ruminant Farm Systems Model
-File name: ration_driver.py
-
-Description: Main file in the ration formulation process that connects all
-    other files such as requirements files and non-linear program files and
-    also connects with the Feed and Animal modules to bring in relevant values.
-
-Author(s): Chris VanKerkhove, cjv47@cornell.edu
-           Joseph Waddell, jw2574@cornell.edu
-"""
 import collections
 from typing import Set, Dict, List, Tuple
 

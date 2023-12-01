@@ -1,10 +1,3 @@
-"""
-RUFAS: Ruminant Farm Systems Model
-File name: util.py
-Description:
-Author(s): Kass Chupongstimun, kass_c@hotmail.com
-           Jit Patil, spatil5@wisc.edu
-"""
 import json
 import shutil
 import sys

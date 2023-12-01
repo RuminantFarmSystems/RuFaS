@@ -1,13 +1,3 @@
-"""
-RUFAS: Ruminant Farm Systems Model
-File name: life_cycle.py
-Description: The class which manages the life cycle of the animals. This
-    includes storing all information necessary for the simulation, initializing
-    the herd to start the simulation at a steady state, updating the animals
-    for each day, and providing end-of-simulation statistics and graphs.
-Author(s): Manfei Li, mli497@wisc.edu
-           Militsa Sotirova, militsasotirova@gmail.com
-"""
 from collections import defaultdict
 from typing import Callable
 from typing import Dict
