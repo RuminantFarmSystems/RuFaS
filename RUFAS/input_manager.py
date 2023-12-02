@@ -822,7 +822,7 @@ class InputManager:
 
         Raises
         -------
-        RuntimeError:
+        RuntimeError
             If eager_termination is True and the variable failed validation.
 
         The function logs the count of total, valid, fixed, and invalid elements of the variable during validation.
