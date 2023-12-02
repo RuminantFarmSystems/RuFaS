@@ -885,7 +885,7 @@ class InputManager:
             om.add_error("Invalid variable", f"Variable {variable_name} is invalid. It cannot be added to "
                                              f"InputManager pool during runtime.", info_map)
             if eager_termination:
-                raise ValueError(f"Variable {variable_name} is invalid. It cannot be added to InputManager pool"
-                                   f" during runtime.")
+                raise ValueError(f"Variable {variable_name} is invalid. It cannot be added to InputManager pool during "
+                                 f"runtime.")
             else:
                 return False
