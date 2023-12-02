@@ -878,6 +878,9 @@ class InputManager:
                     element_counter_and_validity=element_counter_and_validity
                 )
             else:
+                om.add_error("Incorrect variable type", f"Variable {variable_name} has type {type(data)}, does not"
+                                                        f" match the expected type of `Dict[str, Any] | List[Any]`.",
+                             info_map)
                 raise TypeError("Incorrect variable type. Expected types: `data: Dict[str, Any] | List[Any]`.")
 
             fixed_elements_counter += element_counter_and_validity["fixed_elements"]
@@ -895,7 +898,7 @@ class InputManager:
                    info_map)
 
         if invalid_elements_counter == 0:
-            if variable_name in self.__pool:
+            if variable_name in self.__pool.keys():
                 om.add_warning("Overwriting existing variable", f"Variable {variable_name} already exists in "
                                                                 f"InputManager pool, overwriting the old value.",
                                info_map)
