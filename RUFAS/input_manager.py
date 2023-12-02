@@ -844,19 +844,24 @@ class InputManager:
                 "invalid_elements": 0,
                 "is_valid": True
             }
-            element_counter_and_validity = self._validate_dict_element(
-                element_hierarchy=[metadata_property],
-                properties_blob_key=properties_blob_key,
-                input_data=data,
-                eager_termination=False,
-                element_counter_and_validity=element_counter_and_validity
-            ) if isinstance(data, Dict) else self._validate_tabular_element(
-                var_name=variable_name,
-                properties_blob_key=properties_blob_key,
-                input_data={variable_name: data},
-                eager_termination=False,
-                element_counter_and_validity=element_counter_and_validity
-            )
+            if isinstance(data, Dict):
+              element_counter_and_validity = self._validate_dict_element(
+                  element_hierarchy=[metadata_property],
+                  properties_blob_key=properties_blob_key,
+                  input_data=data,
+                  eager_termination=False,
+                  element_counter_and_validity=element_counter_and_validity
+              ) 
+            elif isinstance(data, List):
+              element_counter_and_validity = self._validate_tabular_element(
+                  var_name=variable_name,
+                  properties_blob_key=properties_blob_key,
+                  input_data={variable_name: data},
+                  eager_termination=False,
+                  element_counter_and_validity=element_counter_and_validity
+              )
+           else:
+             raise TypeError with a clear message, don't forget to update the docstring accordingly
             fixed_elements_counter += element_counter_and_validity["fixed_elements"]
             valid_elements_counter += element_counter_and_validity["valid_elements"]
             invalid_elements_counter += element_counter_and_validity["invalid_elements"]
