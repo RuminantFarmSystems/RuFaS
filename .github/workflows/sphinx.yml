@@ -30,16 +30,22 @@ jobs:
         cd docs
         make clean
         make html
+        - name: Debug: Print GitHub Ref
+        run: echo "GitHub Ref: ${{ github.ref }}"
     - name: Extracted Branch Name
       run: |
         branch_name=$(echo "${{ github.ref }}" | awk -F'/' '{print $3}')
         echo "Extracted Branch Name: $branch_name"
+    - name: List Branches
+      run: git branch -a
+    - name: Show Remote
+      run: git remote -v
     - name: Commit and Push Changes
       run: |
         git config --global user.email "actions@github.com"
         git config --global user.name "GitHub Actions"
         echo "Checking out branch: $branch_name"
-        git checkout "${branch_name}"
+        git checkout -b "${branch_name}" origin/"${branch_name}"
         git add docs
         git commit -m "Update Sphinx Documentation [skip ci]"
         git push origin "${branch_name}"
