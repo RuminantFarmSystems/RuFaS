@@ -34,6 +34,8 @@ jobs:
       run: |
         git config --global user.email "actions@github.com"
         git config --global user.name "GitHub Actions"
-        git add docs
-        git commit -m "Update Sphinx Documentation [skip ci]"
-        git push origin ${{ github.ref }}
+        git add .
+        git commit -m "Update documentation [skip ci]"
+        git push origin main
+      env:
+        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
