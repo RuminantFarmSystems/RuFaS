@@ -21,6 +21,10 @@ jobs:
       run: |
         python -m pip install --upgrade pip
         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+    - name: Set git identity
+      run: |
+        git config user.name 'github-actions[bot]'
+        git config user.email 'github-actions[bot]@users.noreply.github.com'
     - name: Remove Existing .rst Files (excluding index.rst and modules.rst)
       run: find docs -maxdepth 1 -type f -name '*.rst' ! -name 'index.rst' ! -name 'modules.rst' -exec rm -f {} \;
     - name: Generate Sphinx Documentation with sphinx-apidoc
@@ -30,23 +34,7 @@ jobs:
         cd docs
         make clean
         make html
-    - name: Print GitHub Ref
+    - name: Push
       run: |
-        echo "GitHub Ref: ${{ github.ref }}"
-    - name: Extracted Branch Name
-      run: |
-        branch_name=$(echo "${{ github.ref }}" | awk -F'/' '{print $3}')
-        echo "Extracted Branch Name: $branch_name"
-    - name: List Branches
-      run: git branch -a
-    - name: Show Remote
-      run: git remote -v
-    - name: Commit and Push Changes
-      run: |
-        git config --global user.email "actions@github.com"
-        git config --global user.name "GitHub Actions"
-        echo "Checking out branch: $branch_name"
-        git checkout -b "${branch_name}" origin/"${branch_name}"
-        git add docs
-        git commit -m "Update Sphinx Documentation [skip ci]"
-        git push origin "${branch_name}"
+        git remote set-url origin https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}
+        git push
