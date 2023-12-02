@@ -802,6 +802,8 @@ class InputManager:
         This function takes in a variable along with its name and a key to access its validation metadata.
         It validates the data against the provided metadata and adds the data to the InputManager pool if it is valid.
 
+        The function logs the count of total, valid, fixed, and invalid elements of the variable during validation.
+
         Parameters
         ----------
         variable_name: str
@@ -822,10 +824,9 @@ class InputManager:
 
         Raises
         -------
-        RuntimeError
+        ValueError
             If eager_termination is True and the variable failed validation.
 
-        The function logs the count of total, valid, fixed, and invalid elements of the variable during validation.
         """
         info_map = {"class": self.__class__.__name__,
                     "function": self.add_variable_to_pool.__name__,
@@ -842,39 +843,40 @@ class InputManager:
                 "total_elements": 0,
                 "valid_elements": 0,
                 "invalid_elements": 0,
-                "is_valid": True
+                "is_valid": False
             }
             if isinstance(data, Dict):
-              element_counter_and_validity = self._validate_dict_element(
-                  element_hierarchy=[metadata_property],
-                  properties_blob_key=properties_blob_key,
-                  input_data=data,
-                  eager_termination=False,
-                  element_counter_and_validity=element_counter_and_validity
-              ) 
+                element_counter_and_validity = self._validate_dict_element(
+                    element_hierarchy=[metadata_property],
+                    properties_blob_key=properties_blob_key,
+                    input_data=data,
+                    eager_termination=False,
+                    element_counter_and_validity=element_counter_and_validity
+                )
             elif isinstance(data, List):
-              element_counter_and_validity = self._validate_tabular_element(
-                  var_name=variable_name,
-                  properties_blob_key=properties_blob_key,
-                  input_data={variable_name: data},
-                  eager_termination=False,
-                  element_counter_and_validity=element_counter_and_validity
-              )
-           else:
-             raise TypeError with a clear message, don't forget to update the docstring accordingly
+                element_counter_and_validity = self._validate_tabular_element(
+                    var_name=variable_name,
+                    properties_blob_key=properties_blob_key,
+                    input_data={variable_name: data},
+                    eager_termination=False,
+                    element_counter_and_validity=element_counter_and_validity
+                )
+            else:
+                raise TypeError("with a clear message, don't forget to update the docstring accordingly")
+
             fixed_elements_counter += element_counter_and_validity["fixed_elements"]
             valid_elements_counter += element_counter_and_validity["valid_elements"]
             invalid_elements_counter += element_counter_and_validity["invalid_elements"]
             total_elements_counter += element_counter_and_validity["total_elements"]
 
-        om.add_log(f"Validation count for variable {variable_name}: total items",
-                   f"{total_elements_counter=}", info_map)
-        om.add_log(f"Validation count for variable {variable_name}: total valid",
-                   f"{valid_elements_counter=}", info_map)
-        om.add_log(f"Validation count for variable {variable_name}: total fixed",
-                   f"{fixed_elements_counter=}", info_map)
-        om.add_log(f"Validation count for variable {variable_name}: total invalid",
-                   f"{invalid_elements_counter=}", info_map)
+        om.add_log(f"Validation count for variable {variable_name}: total items", f"{total_elements_counter=}",
+                   info_map)
+        om.add_log(f"Validation count for variable {variable_name}: total valid", f"{valid_elements_counter=}",
+                   info_map)
+        om.add_log(f"Validation count for variable {variable_name}: total fixed", f"{fixed_elements_counter=}",
+                   info_map)
+        om.add_log(f"Validation count for variable {variable_name}: total invalid", f"{invalid_elements_counter=}",
+                   info_map)
 
         if invalid_elements_counter == 0:
             self.__pool[variable_name] = data
@@ -883,7 +885,7 @@ class InputManager:
             om.add_error("Invalid variable", f"Variable {variable_name} is invalid. It cannot be added to "
                                              f"InputManager pool during runtime.", info_map)
             if eager_termination:
-                raise RuntimeError(f"Variable {variable_name} is invalid. It cannot be added to InputManager pool"
+                raise ValueError(f"Variable {variable_name} is invalid. It cannot be added to InputManager pool"
                                    f" during runtime.")
             else:
                 return False
