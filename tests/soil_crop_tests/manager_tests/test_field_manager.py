@@ -817,7 +817,8 @@ def test_get_field_blob_names_error() -> None:
         "minimum_daylength": 9.0,
         "seasonal_high_water_table": False,
         "watering_amount_in_liters": 0.0,
-        "watering_interval": 0
+        "watering_interval": 0,
+        "supplement_manure_nutrient_deficiencies": True
     }),
     ("field_2", {
         "soil_specification": "soil",
@@ -831,7 +832,8 @@ def test_get_field_blob_names_error() -> None:
         "minimum_daylength": 9.0,
         "seasonal_high_water_table": False,
         "watering_amount_in_liters": 500.0,
-        "watering_interval": 3
+        "watering_interval": 3,
+        "supplement_manure_nutrient_deficiencies": False
     })
 ])
 def test_setup_field(field_name: str, field_config: Dict) -> None:
@@ -866,6 +868,8 @@ def test_setup_field(field_name: str, field_config: Dict) -> None:
         assert new_field.field_data.minimum_daylength == field_config.get("minimum_daylength")
         assert new_field.field_data.watering_amount_in_liters == field_config.get("watering_amount_in_liters")
         assert new_field.field_data.watering_interval == field_config.get("watering_interval")
+        assert new_field.field_data.supplement_manure_nutrient_deficiencies == \
+               field_config.get("supplement_manure_nutrient_deficiencies")
 
         assert new_field.soil == mocked_soil_profile
         assert new_field.available_fertilizer_mixes == {
