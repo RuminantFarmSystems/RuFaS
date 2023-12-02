@@ -193,7 +193,7 @@ class InputManager:
                 valid_elements_counter += element_counter_and_validity["valid_elements"]
                 total_elements_counter += element_counter_and_validity["total_elements"]
                 if element_counter_and_validity["is_valid"]:
-                    # POTENTIAL ISSUE!!!
+                    # ISSUE #1014 !!!
                     self.__pool[file_blob_key] = filtered_input_data
                 else:
                     if not eager_termination:
@@ -824,6 +824,11 @@ class InputManager:
 
         Raises
         -------
+        KeyError
+            If no metadata is loaded in InputManager.__metadata; or if no metadata property can be found with the given
+            `properties_blob_key`.
+        TypeError
+            If `data` is not the expected type of Dict[str, Any] | List[Any].
         ValueError
             If eager_termination is True and the variable failed validation.
 
@@ -836,7 +841,18 @@ class InputManager:
         total_elements_counter = 0
         fixed_elements_counter = 0
 
-        metadata_properties = self.__metadata["properties"][properties_blob_key]
+        if self.__metadata:
+            if properties_blob_key in self.__metadata["properties"]:
+                metadata_properties = self.__metadata["properties"][properties_blob_key]
+            else:
+                om.add_error("No metadata found", f"No metadata is found for variable {variable_name} with given "
+                                                  f"properties_blob_key {properties_blob_key}.", info_map)
+                raise KeyError(f"No metadata is found for variable {variable_name} with given properties_blob_key "
+                               f"{properties_blob_key}.")
+        else:
+            om.add_error("No metadata loaded", f"No metadata is loaded to the InputManager.", info_map)
+            raise KeyError("No metadata loaded.")
+
         for metadata_property in metadata_properties.keys():
             element_counter_and_validity = {
                 "fixed_elements": 0,
@@ -862,7 +878,7 @@ class InputManager:
                     element_counter_and_validity=element_counter_and_validity
                 )
             else:
-                raise TypeError("with a clear message, don't forget to update the docstring accordingly")
+                raise TypeError("Incorrect variable type. Expected types: `data: Dict[str, Any] | List[Any]`.")
 
             fixed_elements_counter += element_counter_and_validity["fixed_elements"]
             valid_elements_counter += element_counter_and_validity["valid_elements"]
@@ -879,6 +895,10 @@ class InputManager:
                    info_map)
 
         if invalid_elements_counter == 0:
+            if variable_name in self.__pool:
+                om.add_warning("Overwriting existing variable", f"Variable {variable_name} already exists in "
+                                                                f"InputManager pool, overwriting the old value.",
+                               info_map)
             self.__pool[variable_name] = data
             return True
         else:
