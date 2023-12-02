@@ -831,7 +831,6 @@ class InputManager:
             If `data` is not the expected type of Dict[str, Any] | List[Any].
         ValueError
             If eager_termination is True and the variable failed validation.
-
         """
         info_map = {"class": self.__class__.__name__,
                     "function": self.add_variable_to_pool.__name__,
