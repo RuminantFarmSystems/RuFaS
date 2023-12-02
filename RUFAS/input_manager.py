@@ -849,7 +849,7 @@ class InputManager:
                 raise KeyError(f"No metadata is found for variable {variable_name} with given properties_blob_key "
                                f"{properties_blob_key}.")
         else:
-            om.add_error("No metadata loaded", f"No metadata is loaded to the InputManager.", info_map)
+            om.add_error("No metadata loaded", "No metadata is loaded to the InputManager.", info_map)
             raise KeyError("No metadata loaded.")
 
         for metadata_property in metadata_properties.keys():
