@@ -1,13 +1,3 @@
-"""
-RUFAS: Ruminant Farm Systems Model
-File name: calf_ration.py
-
-Description: The class which handles calf nutrient requirement calculations and ration formulation methods
-
-Author(s): Katrina Wang, kw433@cornell.edu
-           Militsa Sotirova, militsasotirova@gmail.com
-           Joseph Waddell, jw2574@cornell.edu
-"""
 # from .hardcoded_ration import get_ration
 import math
 from typing import Dict, Any
