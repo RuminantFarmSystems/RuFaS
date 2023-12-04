@@ -2038,7 +2038,7 @@
         "maximum": 25,
         "default": 0
       },
-      "cooper": {
+      "copper": {
         "type": "number",
         "description": ""
       },
@@ -2222,7 +2222,7 @@
         "type": "number",
         "description": ""
       },
-      "Abs_cooper": {
+      "Abs_copper": {
         "type": "number",
         "description": ""
       },
@@ -2702,6 +2702,11 @@
         "description": "Number of days that make up the irrigation interval.\nUnits: days.",
         "minimum": 0,
         "default": 0
+      },
+      "supplement_manure_nutrient_deficiencies": {
+        "type": "bool",
+        "description": "Determines if nutrient deficient manure applications are supplemented with chemical fertilizer.",
+        "default": false
       }
     },
     "weather_properties": {
