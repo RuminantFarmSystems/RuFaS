@@ -6,15 +6,22 @@ PROPERTIES_WITH_SCHEMA = {
     'crop_schedule': "Crop Specifications"
 }
 
-def _setup_number_schema(title: str, properties: dict[str, Any]) -> dict[str, Any]:
+
+def _setup_number_schema(title: str, input_properties: dict[str, Any]) -> dict[str, Any]:
     schema = {
         "title": title,
-        "type": "number"
+        "type": "number",
+        "options": {
+            "grid_columns": 12,
+            "inputAttributes": {
+                "class": "text-primary form-control"
+            }
+        }
     }
-    minimum = properties.get("minimum")
-    maximum = properties.get("maximum")
-    default = properties.get("default")
-    description = properties.get("description")
+    minimum = input_properties.get("minimum")
+    maximum = input_properties.get("maximum")
+    default = input_properties.get("default")
+    description = input_properties.get("description")
 
     if minimum is not None:
         schema["minimum"] = minimum
@@ -24,17 +31,33 @@ def _setup_number_schema(title: str, properties: dict[str, Any]) -> dict[str, An
         schema["format"] = "range"
     if default is not None:
         schema["default"] = default
-
-    schema["options"] = {
-                            "grid_columns": 12,
-                            "inputAttributes": {
-                                "class": "text-primary form-control"
-                            }
-                        }
     if description:
         schema["options"]["infoText"] = description
 
     return schema
+
+
+def _setup_bool_schema(title: str, input_properties: dict[str, Any]) -> dict[str, Any]:
+    schema = {
+        "title": title,
+        "type": "boolean",
+        "options": {
+            "grid_columns": 12,
+            "format": "select2",
+            "inputAttributes": {
+                "class": "text-primary form-control"
+            }
+        }
+    }
+    default = input_properties.get("default")
+    description = input_properties.get("description")
+    if default is not None:
+        schema["default"] = default
+    if description is not None:
+        schema["description"] = description
+
+    return schema
+
 
 # def _setup_schema(title: str, structure: dict[str, Any]) -> dict[str, Any]:
 #     if
@@ -47,14 +70,14 @@ def _setup_number_schema(title: str, properties: dict[str, Any]) -> dict[str, An
 #
 #     return schema
 
-
-with open("input/metadata/default_metadata.json") as metadata:
-    metadata_dict = json.load(metadata)
-
-properties = metadata_dict["properties"]
-
-for key in properties.keys():
-    if key in PROPERTIES_WITH_SCHEMA.keys():
-        new_schema = _setup_schema(PROPERTIES_WITH_SCHEMA[key], properties[key])
-    print(key)
+#
+# with open("input/metadata/default_metadata.json") as metadata:
+#     metadata_dict = json.load(metadata)
+#
+# properties = metadata_dict["properties"]
+#
+# for key in properties.keys():
+#     if key in PROPERTIES_WITH_SCHEMA.keys():
+#         new_schema = _setup_schema(PROPERTIES_WITH_SCHEMA[key], properties[key])
+#     print(key)
 # pprint.pprint(json.dumps(properties, indent=4))
