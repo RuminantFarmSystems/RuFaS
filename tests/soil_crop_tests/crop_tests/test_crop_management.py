@@ -214,8 +214,8 @@ def test_cut_crop(efficiency: float, harvest: float, override: bool, should_fail
         assert data.leaf_area_index == 2.3 * (1 - (cut_biomass / 100))
         assert data.accumulated_heat_units == 1.1 * (1 - (cut_biomass / 100))
         collected_fresh_yield = cut_biomass * efficiency
-        collected_dry_matter_yield = collected_fresh_yield * crop.data.dry_matter_percentage
-        residue = cut_biomass * (1 - efficiency) * crop.data.dry_matter_percentage
+        collected_dry_matter_yield = collected_fresh_yield * (crop.data.dry_matter_percentage / 100)
+        residue = cut_biomass * (1 - efficiency) * (crop.data.dry_matter_percentage / 100)
         crop._recalculate_biomass_distribution.assert_called_once()
         assert data.fresh_yield_collected == collected_fresh_yield
         assert data.dry_matter_yield_collected == collected_dry_matter_yield

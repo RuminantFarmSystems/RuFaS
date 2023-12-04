@@ -168,10 +168,10 @@ class CropManagement:
         self.data.accumulated_heat_units = self.data.accumulated_heat_units * (1 - fraction_cut)
 
         self.data.fresh_yield_collected = self.data.cut_biomass * collected_fraction
-        self.data.dry_matter_yield_collected = self.data.fresh_yield_collected * self.data.dry_matter_percentage
+        self.data.dry_matter_yield_collected = self.data.fresh_yield_collected * (self.data.dry_matter_percentage / 100)
 
         self.data.yield_residue = \
-            self.data.cut_biomass * (1 - collected_fraction) * self.data.dry_matter_percentage
+            self.data.cut_biomass * (1 - collected_fraction) * (self.data.dry_matter_percentage / 100)
 
         if self.data.do_harvest_index_override:
             self.data.yield_nitrogen = self.data.optimal_nitrogen_fraction * self.data.fresh_yield_collected
