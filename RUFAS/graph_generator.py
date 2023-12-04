@@ -7,6 +7,8 @@ import matplotlib
 import matplotlib.pyplot as plt
 from matplotlib.figure import Axes, Figure
 
+from RUFAS.util import Utility
+
 """
 Agg rendering to a Tk canvas (requires TkInter). This backend can be activated in IPython with %matplotlib tk.
 Ref: https://matplotlib.org/stable/users/explain/figure/backends.html
@@ -139,8 +141,9 @@ class GraphGenerator:
         """
         try:
             fig, _ = plt.subplots()
+            prepared_data = self._prepare_plot_data(filtered_pool, graph_details.get("variables"))
             self._draw_graph(
-                graph_details["type"], filtered_pool, filtered_pool.keys()
+                graph_details["type"], prepared_data, prepared_data.keys()
             )
             self._customize_graph(fig, graph_details)
             return self._save_graph(
@@ -148,6 +151,51 @@ class GraphGenerator:
             )
         except Exception as e:
             raise e
+
+    def _prepare_plot_data(self, filtered_pool: Dict[str, Dict[str, List[Any]]],
+                           selected_variables: Optional[List[str]] = None
+                           ) -> Dict[str, List[int | float]]:
+        """Extracts the values from the filtered_pool data and converts them a dictionary
+        that graph_generator can more readily handle.
+
+        Parameters
+        ----------
+        filtered_pool : Dict[str, pool_element_type]
+            The filtered pool of variables that the user wants to graph.
+        selected_variables : Optional[List[str]]
+            If it is present and the data is a list of dicts,
+            it selects the variables to be plotted.
+
+        Returns
+        -------
+        Dict[str, List[int | float]]
+            The formatted data that can more readily be plotted by graph_generator.
+        """
+        info_map = {
+            "class": self.__class__.__name__,
+            "function": self._prepare_plot_data.__name__,
+        }
+        prepared_pool = {}
+        for index, key in enumerate(filtered_pool.keys()):
+            values: List[Any] = filtered_pool[key]["values"]
+            is_data_in_dict = isinstance(values[0], dict)
+            if is_data_in_dict:
+                if not selected_variables:
+                    # self.add_error("No selected variables. Can't plot this data set.",
+                    #                "List the variables you want plotted in the graph output filter.", info_map)
+                    break
+                else:
+                    data_dict = Utility.convert_list_of_dicts_to_dict_of_lists(values)
+                    for selected_variable in selected_variables:
+                        if selected_variable in data_dict:
+                            prepared_pool.setdefault(selected_variable, []).extend(data_dict[selected_variable])
+            else:
+                if selected_variables:
+                    prepared_pool[selected_variables[index]] = values
+                else:
+                    prepared_pool[key] = values
+
+        return prepared_pool
 
     def _draw_graph(
         self,

@@ -1,6 +1,6 @@
 from pathlib import Path
 from freezegun import freeze_time
-from typing import Dict
+from typing import Dict, List
 from unittest.mock import patch
 from matplotlib import pyplot as plt
 from mock.mock import MagicMock
@@ -201,3 +201,39 @@ def test_draw_graph_success_plot(graph_generator: GraphGenerator) -> None:
 
         for value in data.values():
             mock_plot_functions_dict["plot"].assert_any_call(value)
+
+
+@pytest.mark.parametrize(
+    "filtered_pool,selected_variables,expected_result",
+    [
+        (
+            {"variable1": {"values": [1, 2, 3]}, "variable2": {"values": [4, 5, 6]}},
+            None,
+            {"variable1": [1, 2, 3], "variable2": [4, 5, 6]},
+        ),
+        (
+            {"variable1": {"values": [1, 2, 3]}, "variable2": {"values": [4, 5, 6]}},
+            ["custom_var1", "custom_var2"],
+            {"custom_var1": [1, 2, 3], "custom_var2": [4, 5, 6]},
+        ),
+        (
+            {"variable1": {"values": [{"a": 1, "b": 2}, {"a": 3, "b": 4}]},
+             "variable2": {"values": [{"a": 5, "b": 6}, {"a": 7, "b": 8}]}},
+            None,
+            {},
+        ),
+        (
+            {"variable1": {"values": [{"a": 1, "b": 2, "c": 25}, {"a": 3, "b": 4, "c": 25}]},
+             "variable2": {"values": [{"a": 5, "b": 6, "c": 25}, {"a": 7, "b": 8, "c": 25}]}},
+            ["a", "b"],
+            {"a": [1, 3, 5, 7], "b": [2, 4, 6, 8]},
+        ),
+    ],
+)
+def test_prepare_plot_data(graph_generator: GraphGenerator,
+                           filtered_pool: Dict[str, Dict[str, List[int | float | Dict[str, int | float]]]],
+                           selected_variables: List[str],
+                           expected_result: Dict[str, List[int | float]],
+                           ) -> None:
+    result = graph_generator._prepare_plot_data(filtered_pool, selected_variables)
+    assert result == expected_result
