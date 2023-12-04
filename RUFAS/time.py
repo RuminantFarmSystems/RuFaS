@@ -1,11 +1,12 @@
 from typing import List
 from RUFAS.output_manager import OutputManager
+from RUFAS.config import Config
 
 om = OutputManager()
 
 
 class Time:
-    def __init__(self, config):
+    def __init__(self, config: Config):
         """
         Description:
             This object is responsible for creating and tracking time in the simulation.
