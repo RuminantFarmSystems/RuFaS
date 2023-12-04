@@ -356,7 +356,7 @@ class CropData:
     (unitless)"""
     cut_biomass: Optional[float] = None
     """total amount of the desired crop product (kg/ha)"""
-    fresh_yield_collected: Optional[float] = None
+    wet_yield_collected: Optional[float] = None
     """amount of the desired crop product to be removed from the field (kg/ha)"""
     dry_matter_yield_collected: Optional[float] = None
     """Dry matter mass collected at harvest (kg / ha)."""

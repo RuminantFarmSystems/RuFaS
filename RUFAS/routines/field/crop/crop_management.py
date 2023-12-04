@@ -167,21 +167,21 @@ class CropManagement:
         self.data.leaf_area_index = self.data.leaf_area_index * (1 - fraction_cut)
         self.data.accumulated_heat_units = self.data.accumulated_heat_units * (1 - fraction_cut)
 
-        self.data.fresh_yield_collected = self.data.cut_biomass * collected_fraction
-        self.data.dry_matter_yield_collected = self.data.fresh_yield_collected * (self.data.dry_matter_percentage / 100)
+        self.data.wet_yield_collected = self.data.cut_biomass * collected_fraction
+        self.data.dry_matter_yield_collected = self.data.wet_yield_collected * (self.data.dry_matter_percentage / 100)
 
         self.data.yield_residue = \
             self.data.cut_biomass * (1 - collected_fraction) * (self.data.dry_matter_percentage / 100)
 
         if self.data.do_harvest_index_override:
-            self.data.yield_nitrogen = self.data.optimal_nitrogen_fraction * self.data.fresh_yield_collected
+            self.data.yield_nitrogen = self.data.optimal_nitrogen_fraction * self.data.wet_yield_collected
             self.data.yield_phosphorus = self.data.optimal_phosphorus_fraction * \
-                self.data.fresh_yield_collected
+                self.data.wet_yield_collected
             self.data.residue_nitrogen = self.data.optimal_nitrogen_fraction * self.data.yield_residue
             self.data.residue_phosphorus = self.data.optimal_phosphorus_fraction * self.data.yield_residue
         else:
-            self.data.yield_nitrogen = self.data.yield_nitrogen_fraction * self.data.fresh_yield_collected
-            self.data.yield_phosphorus = self.data.yield_phosphorus_fraction * self.data.fresh_yield_collected
+            self.data.yield_nitrogen = self.data.yield_nitrogen_fraction * self.data.wet_yield_collected
+            self.data.yield_phosphorus = self.data.yield_phosphorus_fraction * self.data.wet_yield_collected
             self.data.residue_nitrogen = self.data.yield_nitrogen_fraction * self.data.yield_residue
             self.data.residue_phosphorus = self.data.yield_phosphorus_fraction * self.data.yield_residue
 
@@ -229,7 +229,7 @@ class CropManagement:
             Julian day on which this harvest occurred.
 
         """
-        wet_mass_harvested = self.data.fresh_yield_collected
+        wet_mass_harvested = self.data.wet_yield_collected
         dry_mass_harvested = self.data.dry_matter_yield_collected
         nitrogen_harvested = self.data.yield_nitrogen
         phosphorus_harvested = self.data.yield_phosphorus

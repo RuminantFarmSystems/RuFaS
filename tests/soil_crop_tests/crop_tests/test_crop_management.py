@@ -217,7 +217,7 @@ def test_cut_crop(efficiency: float, harvest: float, override: bool, should_fail
         collected_dry_matter_yield = collected_fresh_yield * (crop.data.dry_matter_percentage / 100)
         residue = cut_biomass * (1 - efficiency) * (crop.data.dry_matter_percentage / 100)
         crop._recalculate_biomass_distribution.assert_called_once()
-        assert data.fresh_yield_collected == collected_fresh_yield
+        assert data.wet_yield_collected == collected_fresh_yield
         assert data.dry_matter_yield_collected == collected_dry_matter_yield
         assert data.yield_residue == residue
 
@@ -270,7 +270,7 @@ def test_record_yield(field_name: str, field_size: float, species: str, year: in
     crop_manager.data.planting_day = 100
     crop_manager.data.planting_year = 1995
     crop_manager.data.species = species
-    crop_manager.data.fresh_yield_collected = mass
+    crop_manager.data.wet_yield_collected = mass
     crop_manager.data.dry_matter_yield_collected = dry_mass
     crop_manager.data.yield_nitrogen = nitrogen
     crop_manager.data.yield_phosphorus = phosphorus
