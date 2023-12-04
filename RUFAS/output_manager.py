@@ -885,11 +885,10 @@ class OutputManager(object):
         elif filter_file.startswith(self.__supported_filter_types_prefixes["graph"]):
             self.create_directory(graphics_dir)
             if produce_graphics:
-                prepared_pool = self._prepare_plot_data(filtered_pool, filter_content.get("variables"))
                 try:
                     graph_generator = GraphGenerator(self.__metadata_prefix)
                     graph_generator.generate_graph(
-                        prepared_pool,
+                        filtered_pool,
                         filter_content,
                         filter_file,
                         graphics_dir,
@@ -902,51 +901,6 @@ class OutputManager(object):
                     f"Graphic generation is disabled, skipping {filter_file=}",
                     info_map,
                 )
-
-    def _prepare_plot_data(self, filtered_pool: Dict[str, pool_element_type],
-                           selected_variables: Optional[List[str]] = None
-                           ) -> Dict[str, List[int | float]]:
-        """Extracts the values from the filtered pool data and converts them a dictionary
-        that graph_generator can more readily handle.
-
-        Parameters
-        ----------
-        filtered_pool : Dict[str, pool_element_type]
-            The filtered pool of variables that the user wants to graph.
-        selected_variables : Optional[List[str]]
-            If it is present and the data is a list of dicts,
-            it selects the variables to be plotted.
-
-        Returns
-        -------
-        Dict[str, List[int | float]]
-            The formatted data that can more readily be plotted by graph_generator.
-        """
-        info_map = {
-            "class": self.__class__.__name__,
-            "function": self._prepare_plot_data.__name__,
-        }
-        prepared_pool = {}
-        for index, key in enumerate(filtered_pool.keys()):
-            values: List[Any] = filtered_pool[key]["values"]
-            is_data_in_dict = isinstance(values[0], dict)
-            if is_data_in_dict:
-                if not selected_variables:
-                    self.add_error("No selected variables. Can't plot this data set.",
-                                   "List the variables you want plotted in the graph output filter.", info_map)
-                    break
-                else:
-                    data_dict = Utility.convert_list_of_dicts_to_dict_of_lists(values)
-                    for selected_variable in selected_variables:
-                        if selected_variable in data_dict:
-                            prepared_pool.setdefault(selected_variable, []).extend(data_dict[selected_variable])
-            else:
-                if selected_variables:
-                    prepared_pool[selected_variables[index]] = values
-                else:
-                    prepared_pool[key] = values
-
-        return prepared_pool
 
     @deprecated(
         reason="""This function is still in the code base but it is not used. We want to keep it for debugging purposes

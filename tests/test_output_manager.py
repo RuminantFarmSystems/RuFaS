@@ -620,7 +620,6 @@ def output_manager_original_method_states(
         "dump_errors": mock_output_manager.dump_errors,
         "dump_variable_names_and_contexts": mock_output_manager.dump_variable_names_and_contexts,
         "_route_save_functions": mock_output_manager._route_save_functions,
-        "_prepare_plot_data": mock_output_manager._prepare_plot_data,
         "clear_output_dir": mock_output_manager.clear_output_dir,
         "is_file_in_dir": mock_output_manager.is_file_in_dir,
         "create_directory": mock_output_manager.create_directory,
@@ -1799,15 +1798,13 @@ def test_route_save_functions_graph(
     with patch(
         "RUFAS.graph_generator.GraphGenerator.generate_graph"
     ) as mock_generate_graph:
-        prepared_pool = {"key": [1, 2, 3, 4]}
         mock_output_manager.add_warning = MagicMock()
         mock_output_manager.add_error = MagicMock()
-        mock_output_manager._prepare_plot_data = MagicMock(return_value=prepared_pool)
         graph_data = {"filters": ".*", "other keys": "other values"}
         mock_output_manager._route_save_functions(
             "graph_file",
             "save_path",
-            prepared_pool,
+            {"key": [1, 2, 3, 4]},
             False,
             graph_data,
             Path("graphics_dir"),
@@ -1823,7 +1820,7 @@ def test_route_save_functions_graph(
         mock_output_manager._route_save_functions(
             "graph_file",
             "save_path",
-            prepared_pool,
+            {"key": [1, 2, 3, 4]},
             True,
             graph_data,
             Path("graphics_dir"),
@@ -1835,7 +1832,7 @@ def test_route_save_functions_graph(
             {"class": "OutputManager", "function": "_route_save_functions"},
         )
         mock_generate_graph.assert_called_once_with(
-            prepared_pool,
+            {"key": [1, 2, 3, 4]},
             graph_data,
             "graph_file",
             Path("graphics_dir"),
@@ -1845,7 +1842,7 @@ def test_route_save_functions_graph(
         mock_output_manager._route_save_functions(
             "graph_file",
             "save_path",
-            prepared_pool,
+            {"key": [1, 2, 3, 4]},
             True,
             graph_data,
             Path("graphics_dir"),
@@ -1864,8 +1861,6 @@ def test_route_save_functions_graph(
         "add_warning"
     ]
     mock_output_manager.add_error = output_manager_original_method_states["add_error"]
-
-    mock_output_manager._prepare_plot_data = output_manager_original_method_states["_prepare_plot_data"]
 
 
 def test_load_variables_pool_from_file_valid_path(
@@ -1911,53 +1906,6 @@ def test_load_variables_pool_from_file_raises_exception(
     mock_output_manager.load_variables_pool_from_file = (
         output_manager_original_method_states["load_variables_pool_from_file"]
     )
-
-
-@pytest.mark.parametrize(
-    "filtered_pool,selected_variables,expected_result,add_error_call_count",
-    [
-        (
-            {"variable1": {"values": [1, 2, 3]}, "variable2": {"values": [4, 5, 6]}},
-            None,
-            {"variable1": [1, 2, 3], "variable2": [4, 5, 6]},
-            0
-        ),
-        (
-            {"variable1": {"values": [1, 2, 3]}, "variable2": {"values": [4, 5, 6]}},
-            ["custom_var1", "custom_var2"],
-            {"custom_var1": [1, 2, 3], "custom_var2": [4, 5, 6]},
-            0
-        ),
-        (
-            {"variable1": {"values": [{"a": 1, "b": 2}, {"a": 3, "b": 4}]},
-             "variable2": {"values": [{"a": 5, "b": 6}, {"a": 7, "b": 8}]}},
-            None,
-            {},
-            1
-        ),
-        (
-            {"variable1": {"values": [{"a": 1, "b": 2, "c": 25}, {"a": 3, "b": 4, "c": 25}]},
-             "variable2": {"values": [{"a": 5, "b": 6, "c": 25}, {"a": 7, "b": 8, "c": 25}]}},
-            ["a", "b"],
-            {"a": [1, 3, 5, 7], "b": [2, 4, 6, 8]},
-            0
-        ),
-    ],
-)
-def test_prepare_plot_data(mock_output_manager: OutputManager,
-                           output_manager_original_method_states: Dict[str, Callable],
-                           filtered_pool: Dict[str, Dict[str, List[int | float | Dict[str, int | float]]]],
-                           selected_variables: List[str],
-                           expected_result: Dict[str, List[int | float]],
-                           add_error_call_count: int,
-                           ) -> None:
-    mock_output_manager.add_error = MagicMock()
-    result = mock_output_manager._prepare_plot_data(filtered_pool, selected_variables)
-    assert result == expected_result
-    assert mock_output_manager.add_error.call_count == add_error_call_count
-
-    mock_output_manager._prepare_plot_data = output_manager_original_method_states["_prepare_plot_data"]
-    mock_output_manager.add_error = output_manager_original_method_states["add_error"]
 
 
 @pytest.mark.parametrize(
