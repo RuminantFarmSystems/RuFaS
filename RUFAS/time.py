@@ -19,7 +19,7 @@ class Time:
         years: List[int] = config.years
 
         self.start_year: int = calendar_year
-        self.calendar_year: int  = calendar_year
+        self.calendar_year: int = calendar_year
         self.years: List[int] = years
         self.year: int = 1  # current year
         self.leap_year_length: int = config.leap_year_length
@@ -91,7 +91,11 @@ class Time:
         """
         Records the current day, simulated year, and calendar year of the simulation in the OutputManager.
         """
-        info_map = {"class": self.__class__.__name__, "function": self.record_time.__name__, "prefix": "Time"}
+        info_map = {
+            "class": self.__class__.__name__,
+            "function": self.record_time.__name__,
+            "prefix": "Time",
+        }
         om.add_variable("day", self.day, info_map)
         om.add_variable("year", self.year, info_map)
         om.add_variable("calendar_year", self.calendar_year, info_map)
