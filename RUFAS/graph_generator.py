@@ -171,18 +171,16 @@ class GraphGenerator:
         Dict[str, List[int | float]]
             The formatted data that can more readily be plotted by graph_generator.
         """
-        info_map = {
-            "class": self.__class__.__name__,
-            "function": self._prepare_plot_data.__name__,
-        }
         prepared_pool = {}
         for index, key in enumerate(filtered_pool.keys()):
             values: List[Any] = filtered_pool[key]["values"]
             is_data_in_dict = isinstance(values[0], dict)
             if is_data_in_dict:
                 if not selected_variables:
-                    # self.add_error("No selected variables. Can't plot this data set.",
-                    #                "List the variables you want plotted in the graph output filter.", info_map)
+                    # plot all the keys in the values dict?
+                    # data_dict = Utility.convert_list_of_dicts_to_dict_of_lists(values)
+                    # for data_dict_key in data_dict.keys():
+                    #     prepared_pool.setdefault(data_dict_key, []).extend(data_dict[data_dict_key])
                     break
                 else:
                     data_dict = Utility.convert_list_of_dicts_to_dict_of_lists(values)
