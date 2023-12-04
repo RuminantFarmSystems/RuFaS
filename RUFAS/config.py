@@ -1,3 +1,6 @@
+from typing import Dict
+
+
 def is_leap_year(year):
     """
     Description:

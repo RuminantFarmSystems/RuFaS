@@ -5,11 +5,14 @@ from RUFAS.routines.feed_storage.harvested_crop import (
     CropCategory,
     CropType,
 )
+from RUFAS.time import Time
 
 
 @pytest.fixture
 def sample_crop_data() -> Dict[str, float]:
     return {
+        "harvest_time": Time(),
+        "storage_time": Time(),
         "fresh_mass": 100.0,
         "dry_matter_percentage": 50.0,
         "dry_matter_digestibility": 70.0,

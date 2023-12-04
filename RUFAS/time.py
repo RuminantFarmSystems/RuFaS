@@ -1,3 +1,4 @@
+from typing import List
 from RUFAS.output_manager import OutputManager
 
 om = OutputManager()
@@ -13,16 +14,16 @@ class Time:
                 to initialize time
         """
 
-        calendar_year = config.start_year
+        calendar_year: int = config.start_year
         # number of years
-        years = config.years
+        years: List[int] = config.years
 
-        self.start_year = calendar_year
-        self.calendar_year = calendar_year
-        self.years = years
-        self.year = 1  # current year
-        self.leap_year_length = config.leap_year_length
-        self.year_length = config.year_length
+        self.start_year: int = calendar_year
+        self.calendar_year: int  = calendar_year
+        self.years: List[int] = years
+        self.year: int = 1  # current year
+        self.leap_year_length: int = config.leap_year_length
+        self.year_length: int = config.year_length
 
         # finds the first non-null day of the first year
         for i in range(0, len(self.years[0])):
