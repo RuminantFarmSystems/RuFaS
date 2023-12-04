@@ -13,6 +13,9 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
+      with:
+        persist-credentials: false # otherwise, the token used is the GITHUB_TOKEN, instead of your personal token
+        fetch-depth: 0 # otherwise, you will fail to push refs to dest repo
     - name: Set up Python 3.10
       uses: actions/setup-python@v2
       with:
@@ -21,10 +24,6 @@ jobs:
       run: |
         python -m pip install --upgrade pip
         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
-    - name: Set git identity
-      run: |
-        git config user.name 'github-actions[bot]'
-        git config user.email 'github-actions[bot]@users.noreply.github.com'
     - name: Remove Existing .rst Files (excluding index.rst and modules.rst)
       run: find docs -maxdepth 1 -type f -name '*.rst' ! -name 'index.rst' ! -name 'modules.rst' -exec rm -f {} \;
     - name: Generate Sphinx Documentation with sphinx-apidoc
@@ -34,7 +33,9 @@ jobs:
         cd docs
         make clean
         make html
-    - name: Push
-      run: |
-        git remote set-url origin https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}
-        git push
+    - name: Commit & Push changes to Sphinx Documentation
+      uses: actions-js/push@master
+      with:
+        message: Update Sphinx Documentation
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        branch: ${{ github.head_ref }}
