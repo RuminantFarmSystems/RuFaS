@@ -215,9 +215,9 @@ class AlleyScraper(BaseManureHandler):
 class Tillage(BaseManureHandler):
     """A class that handles calculations related to tillage.
 
-    Attributes:
-        All inherited from BaseManureHandler.
-
+    Attributes
+    ----------
+    All inherited from BaseManureHandler.
     """
 
     pass
@@ -226,8 +226,9 @@ class Tillage(BaseManureHandler):
 class Harrowing(BaseManureHandler):
     """A class that handles calculations related to harrowing.
 
-    Attributes:
-        All inherited from BaseManureHandler.
+    Attributes
+    ----------
+    All inherited from BaseManureHandler.
 
     """
 
@@ -238,12 +239,16 @@ class Harrowing(BaseManureHandler):
 class ManureHandlerConfig:
     """Class for storing the configuration of a manure handler.
 
-    Attributes:
-        cleaning_water_use_rate: Amount of cleaning water used per animal per day, L.
-        minutes_per_cleaning: Number of minutes needed per animal per cleaning, minutes.
-        cleanings_per_day: Number of cleanings per day.
-        daily_tillage_frequency: Number of times per day that compost bedding is tilled.
-
+    Attributes
+    ----------
+    cleaning_water_use_rate : float
+        Amount of cleaning water used per animal per day, L.
+    minutes_per_cleaning : int
+        Number of minutes needed per animal per cleaning, minutes.
+    cleanings_per_day : int
+        Number of cleanings per day.
+    daily_tillage_frequency : int
+        Number of times per day that compost bedding is tilled.
     """
 
     cleaning_water_use_rate: float = 0.0
