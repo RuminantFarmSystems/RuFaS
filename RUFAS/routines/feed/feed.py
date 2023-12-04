@@ -1,20 +1,3 @@
-"""
-RUFAS: Ruminant Farm Systems Model
-File name: feed.py
-
-
-Description: Main driver for the feed management processes. Executes daily
-             routines that run feed storage updates and losses, and forage
-             inventory planning.
-
-Author(s): Kass Chupongstimun, kass_c@hotmail.com,
-           Andy Achenreiner, achenreiner@wisc.edu
-           William Donovan, wmdonovan@wisc.edu
-           Jacob Johnson, jacob8399@gmail.com
-           Militsa Sotirova, militsasotirova@gmail.com
-           Chris Vankerkhove, cjv47@cornell.edu
-"""
-
 from . import nitrogen_loss, carbon_loss, protein_degradation
 from .feed_typed_dicts import PurchasedFeedTypedDict
 from ..animal.pen import Pen

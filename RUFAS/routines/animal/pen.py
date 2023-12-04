@@ -1,14 +1,3 @@
-"""
-RUFAS: Ruminant Farm Systems Model
-File name: pen.py
-Description: The class which represents a pen on the farm. Each pen has
-    operations as described in the Animal Module Information Flow document on
-    Basecamp (such as calculating average nutrient requirements, ration,
-    manure excretion, etc). Method calls cascade through from the animal
-    manager class to pen to each individual animal in that pen.
-Author(s): Militsa Sotirova, militsasotirova@gmail.com
-           Joseph Merhi, jm2257@cornell.edu
-"""
 from __future__ import annotations
 
 import copy
