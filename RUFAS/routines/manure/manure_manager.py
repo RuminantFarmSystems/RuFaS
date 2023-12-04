@@ -270,28 +270,21 @@ class ManureManager:
         return manure_type_by_treatment_type[treatment_type]
 
     @staticmethod
-    def _get_manure_density(pen: ManureManagerPen) -> float:
+    def _get_manure_density_by_type(manure_type: ManureType) -> float:
         """
-        Look up the density of manure produced by a given pen.
-        This method determines the manure density based on the type of manure treatment system of a given pen.
-        Each manure type (SLURRY, LIQUID, SOLID) has a predefined density,
-        which is specified in the class :class:`ManureConstants`.
+        Look up the density of manure based on the given type.
 
         Parameters
         ----------
-        pen : ManureManagerPen
-            An instance of the ManureManagerPen class representing a specific pen.
-            The pen object should have a manure_treatment attribute that indicates the type of manure treatment system.
+        manure_type : ManureType
+            The type of manure.
 
         Returns
         -------
         float
-            The density of manure produced by the given pen, in units consistent with the densities
-            defined in ManureConstants. This value depends on the type of manure treatment system of the pen.
-
+            The density of manure based on the given type.
         """
-        treatment_type = ManureTreatmentType.get_type(pen.manure_treatment)
-        manure_type = ManureManager._get_manure_type(treatment_type)
+
         manure_density_by_manure_type = {
             ManureType.SLURRY: ManureConstants.SLURRY_MANURE_DENSITY,
             ManureType.LIQUID: ManureConstants.LIQUID_MANURE_DENSITY,
@@ -319,19 +312,50 @@ class ManureManager:
         None
         """
 
-        # TODO: With the introduction of different manure types, we should
-        # rename attributes in ManureTreatmentDailyOutput
-        # to make it more generic and not specific to any manure type.
+        nitrogen = max(
+            manure_treatment_daily_output.liquid_manure_nitrogen
+            + manure_treatment_daily_output.sludge_manure_nitrogen
+            + manure_treatment_daily_output.solid_manure_nitrogen,
+            0.0
+        )
+
+        phosphorus = max(
+            manure_treatment_daily_output.liquid_manure_phosphorus
+            + manure_treatment_daily_output.sludge_manure_phosphorus
+            + manure_treatment_daily_output.solid_manure_phosphorus,
+            0.0
+        )
+
+        potassium = max(
+            manure_treatment_daily_output.liquid_manure_potassium
+            + manure_treatment_daily_output.sludge_manure_potassium
+            + manure_treatment_daily_output.solid_manure_potassium,
+            0.0,
+        )
+
+        dry_matter = max(
+            manure_treatment_daily_output.liquid_manure_total_solids
+            + manure_treatment_daily_output.sludge_manure_total_solids
+            + manure_treatment_daily_output.solid_manure_total_solids,
+            0.0,
+        )
+
+        total_manure_mass = max(
+            manure_treatment_daily_output.liquid_manure_daily_volume
+            * self._get_manure_density_by_type(ManureType.LIQUID)
+            + manure_treatment_daily_output.sludge_manure_daily_volume
+            * self._get_manure_density_by_type(ManureType.SLURRY)
+            + manure_treatment_daily_output.solid_manure_daily_mass,
+            0.0
+        )
+
         self._manure_nutrient_manager.add_nutrients(
             ManureNutrients(
-                nitrogen=manure_treatment_daily_output.liquid_manure_nitrogen,
-                phosphorus=manure_treatment_daily_output.liquid_manure_phosphorus,
-                potassium=manure_treatment_daily_output.liquid_manure_potassium,
-                dry_matter=manure_treatment_daily_output.liquid_manure_total_solids,
-                total_manure_mass=(
-                        manure_treatment_daily_output.liquid_manure_daily_volume
-                        * self._get_manure_density(pen)
-                ),
+                nitrogen=nitrogen,
+                phosphorus=phosphorus,
+                potassium=potassium,
+                dry_matter=dry_matter,
+                total_manure_mass=total_manure_mass,
             )
         )
 
@@ -551,9 +575,9 @@ class ManureManager:
                 manure_handler_daily_output=manure_handler_daily_output,
                 reception_pit_daily_output=reception_pit_daily_output,
             )
-            manure_separator_daily_output = results[0]
-            manure_treatment_daily_output = results[1]
-            manure_treatment_accumulated_output = results[2]
+            manure_separator_daily_output = results[0]  # type: ignore
+            manure_treatment_daily_output = results[1]  # type: ignore
+            manure_treatment_accumulated_output = results[2]  # type: ignore
 
         return (
             anaerobic_digestion_daily_output,

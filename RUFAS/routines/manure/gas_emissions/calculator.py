@@ -1623,8 +1623,18 @@ class GasEmissionsCalculator:
         float
             The amount of nitrogen lost to ammonia emission (kg).
 
+        Raises
+        ------
+        ValueError
+            If the daily nitrogen input is negative.
         """
-        return 0.36 * daily_nitrogen_input
+
+        if daily_nitrogen_input < 0.0:
+            raise ValueError(
+                f"Daily nitrogen input mass must be non-negative: {daily_nitrogen_input}"
+            )
+
+        return GasEmissionConstants.AMMONIA_EMISSION_COEFFICIENT_IN_OPEN_LOTS * daily_nitrogen_input
 
     @staticmethod
     def nitrogen_loss_in_open_lots_from_nitrous_oxide_emission(daily_nitrogen_input: float) -> float:
@@ -1641,8 +1651,18 @@ class GasEmissionsCalculator:
         float
             The nitrogen lost to nitrous oxide emission (kg).
 
+        Raises
+        ------
+        ValueError
+            If the daily nitrogen input is negative.
         """
-        return 2e-2 * daily_nitrogen_input
+
+        if daily_nitrogen_input < 0.0:
+            raise ValueError(
+                f"Daily nitrogen input mass must be non-negative: {daily_nitrogen_input}"
+            )
+
+        return GasEmissionConstants.NITROUS_OXIDE_COEFFICIENT_IN_OPEN_LOTS * daily_nitrogen_input
 
     @staticmethod
     def total_nitrogen_loss_from_open_lots(daily_nitrogen_input: float) -> float:
