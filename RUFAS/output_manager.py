@@ -1149,14 +1149,6 @@ class OutputManager(object):
         ----------
         path : Path
             The path where the directory will be created if it does not already exist.
-
-        Raises
-        ------
-        PermissionError
-            If the user does not have necessary permissions to create a directory in the location provided.
-
-        Exception
-            If an unexpected error occurred while trying to create the directory.
         """
         info_map = {"class": self.__class__.__name__,
                     "function": self.create_directory.__name__}
