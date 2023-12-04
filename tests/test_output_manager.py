@@ -1957,6 +1957,10 @@ def test_prepare_plot_data(mock_output_manager: OutputManager,
     assert mock_output_manager.add_error.call_count == add_error_call_count
 
     mock_output_manager._prepare_plot_data = output_manager_original_method_states["_prepare_plot_data"]
+    mock_output_manager.add_error = output_manager_original_method_states["add_error"]
+
+
+@pytest.mark.parametrize(
     "is_file_found_in_dir",
     [True, False],
 )
