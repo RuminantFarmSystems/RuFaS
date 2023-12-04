@@ -4,6 +4,14 @@ RUFAS.routines.manure.pen\_manure package
 Submodules
 ----------
 
+RUFAS.routines.manure.pen\_manure.manure\_manager\_pen module
+-------------------------------------------------------------
+
+.. automodule:: RUFAS.routines.manure.pen_manure.manure_manager_pen
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 RUFAS.routines.manure.pen\_manure.pen\_manure module
 ----------------------------------------------------
 
