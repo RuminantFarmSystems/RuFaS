@@ -229,14 +229,15 @@ class CropManagement:
             Julian day on which this harvest occurred.
 
         """
-        mass_harvested = self.data.fresh_yield_collected
+        wet_mass_harvested = self.data.fresh_yield_collected
+        dry_mass_harvested = self.data.dry_matter_yield_collected
         nitrogen_harvested = self.data.yield_nitrogen
         phosphorus_harvested = self.data.yield_phosphorus
         info_map = {"class": self.__class__.__name__, "function": self._record_yield.__name__,
                     "prefix": f"field='{field_name}'", "field_size": field_size,
                     "species": f"'{self.data.species}'"}
-        value = {"crop": self.data.name, "yield": mass_harvested, "nitrogen": nitrogen_harvested,
-                 "phosphorus": phosphorus_harvested,
+        value = {"crop": self.data.name, "wet_yield": wet_mass_harvested, "dry_yield": dry_mass_harvested,
+                 "nitrogen": nitrogen_harvested, "phosphorus": phosphorus_harvested,
                  "planting_date": {"year": self.data.planting_year, "day": self.data.planting_day},
                  "harvest_date": {"year": year, "day": day}}
         om.add_variable("harvest_yield", value, info_map)

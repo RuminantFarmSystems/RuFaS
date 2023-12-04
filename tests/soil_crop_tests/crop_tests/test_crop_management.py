@@ -255,14 +255,14 @@ def test_recalculate_biomass_distribution(roots_harvested: bool, cut_biomass: fl
     assert crop.root_fraction == expected_root_fraction
 
 
-@pytest.mark.parametrize("field_name,field_size,species,year,day,mass,nitrogen,phosphorus", [
-    ("field_1", 1.8, "alfalfa", 1993, 200, 100, 12.5, 5),
-    ("field_2", 2.33, "corn", 1998, 216, 1500, 188, 24.5),
-    ("field_2", 2.33, "corn", 1999, 218, 1550, 172, 22.3),
-    ("field_3", 0.98, "soybeans", 2003, 245, 1200, 199, 89.3)
+@pytest.mark.parametrize("field_name,field_size,species,year,day,mass,dry_mass,nitrogen,phosphorus", [
+    ("field_1", 1.8, "alfalfa", 1993, 200, 100, 90, 12.5, 5),
+    ("field_2", 2.33, "corn", 1998, 216, 1500, 1200, 188, 24.5),
+    ("field_2", 2.33, "corn", 1999, 218, 1550, 350, 172, 22.3),
+    ("field_3", 0.98, "soybeans", 2003, 245, 1200, 800, 199, 89.3)
 ])
 def test_record_yield(field_name: str, field_size: float, species: str, year: int, day: int, mass: float,
-                      nitrogen: float, phosphorus: float) -> None:
+                      dry_mass: float, nitrogen: float, phosphorus: float) -> None:
     """Tests that harvest yields are correctly recorded to the OutputManager."""
     crop_manager = CropManagement()
 
@@ -271,6 +271,7 @@ def test_record_yield(field_name: str, field_size: float, species: str, year: in
     crop_manager.data.planting_year = 1995
     crop_manager.data.species = species
     crop_manager.data.fresh_yield_collected = mass
+    crop_manager.data.dry_matter_yield_collected = dry_mass
     crop_manager.data.yield_nitrogen = nitrogen
     crop_manager.data.yield_phosphorus = phosphorus
 
@@ -278,8 +279,9 @@ def test_record_yield(field_name: str, field_size: float, species: str, year: in
 
     expected_info_map = {"prefix": f"field='{field_name}'", "field_size": field_size,
                          "species": f"'{species}'"}
-    expected_value = {"crop": crop_manager.data.name, "yield": mass, "nitrogen": nitrogen, "phosphorus": phosphorus,
-                      "planting_date": {"year": 1995, "day": 100}, "harvest_date": {"year": year, "day": day}}
+    expected_value = {"crop": crop_manager.data.name, "wet_yield": mass, "dry_yield": dry_mass, "nitrogen": nitrogen,
+                      "phosphorus": phosphorus, "planting_date": {"year": 1995, "day": 100},
+                      "harvest_date": {"year": year, "day": day}}
 
     actual = om.variables_pool[f"field='{field_name}'.harvest_yield"]
     assert actual['info_maps'].__contains__(expected_info_map)
