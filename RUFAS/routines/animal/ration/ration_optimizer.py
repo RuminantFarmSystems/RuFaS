@@ -1,14 +1,3 @@
-"""
-RUFAS: Ruminant Farm Systems Model
-File name: ration_NLP.py
-Description: Calculates the ration for animals using a Non-Linear
-    programming method utilizing the scipy package. The NLP is formulated using
-    constraint functions. Note NLP (Non-linear Program) will be used throughout
-    descriptions for functions in this file.
-Author(s):
-    Chris VanKerkhove, cjv47@cornell.edu
-    Joseph Waddell, jw2574@cornell.edu
-"""
 import numpy as np
 import random
 from scipy.optimize import minimize, OptimizeResult

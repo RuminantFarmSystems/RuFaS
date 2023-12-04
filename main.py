@@ -57,29 +57,29 @@ def run_rufas(
 
     Parameters
     ----------
-    load_pool : bool, optional, default=False
+    load_pool : bool
         Flag to load json file into Output Manager variables pool for processing.
-    produce_graphics : bool, optional, default=True
+    produce_graphics : bool
         Produce graphics after simulation.
-    format_option : str, optional, default="verbose"
+    format_option : str
         Format for variable_names.txt output file.
-    verbose : bool, optional, default=True
+    verbose : bool
         Print progress messages while simulation is running.
-    clear_output : bool, optional, default=False
+    clear_output : bool
         Clear output directory before running the simulation.
-    exclude_info_maps : bool, optional, default=False
+    exclude_info_maps : bool
         Exclude info_maps from the output.
-    only_run_validation : bool, optional, default=False
+    only_run_validation : bool
         Validate input data and don't run a simulation.
-    graphics_dir : Path, optional, default=Path("")
+    graphics_dir : Path
         The directory for saving graphics.
-    vars_file_path : Path, optional, default=Path("")
+    vars_file_path : Path
         The path to the json file to load into Output Manager variables pool for processing.
-    output_dir : Path, optional, default=Path("output/")
+    output_dir : Path
         The directory for saving output.
-    filters_dir : Path, optional, default=Path("output/output_filters/")
+    filters_dir : Path
         The directory for the files containing the keys for filtering.
-    csv_dir : Path, optional, default=Path("output/CSVs/")
+    csv_dir : Path
         The directory for the csv output files to be saved.
     """
     sys.stdout.write("RuFaS: Ruminant Farm Systems Model 2023\n")
@@ -129,21 +129,21 @@ def run_load_vars_pool(
 
     Parameters
     ----------
-    vars_file_path : Path, optional, default=Path("")
+    vars_file_path : Path
         The path to the json file to load into Output Manager variables pool for processing.
-    exclude_info_maps : bool, optional
+    exclude_info_maps : bool
         Flag for whether or not the user wants to inlcude info_maps data in their results files.
-    produce_graphics : bool, optional
+    produce_graphics : bool
         Flag for whether or not the user wants to produce graphs at after the simulation.
-    graphics_dir : Path, optional
+    graphics_dir : Path
         The directory for saving graphics.
-    clear_output : bool, optional
+    clear_output : bool
         Flag for whether or not the user wants to clear the output directory.
-    output_dir : Path, optional, default=Path("output/")
+    output_dir : Path
         The directory for saving output.
-    filters_dir : Path, optional, default=Path("output/output_filters/")
+    filters_dir : Path
         The directory for the files containing the keys for filtering.
-    csv_dir : Path, optional, default=Path("output/CSVs/")
+    csv_dir : Path
         The directory for the csv output files to be saved.
     """
     output_manager = OutputManager()
@@ -178,13 +178,13 @@ def run_validation(
     ----------
     metadata_files : List[Path]
         The list of Paths to the metadata files the user entered with which to run the simulation.
-    exclude_info_maps : bool, optional
+    exclude_info_maps : bool
         Flag for whether or not the user wants to inlcude info_maps data in their results files.
     format_option : str
         The formatting option for select output files.
     verbose : LogVerbosity
         The verbose option set by the user.
-    output_dir : Path, optional, default=Path("output/")
+    output_dir : Path
         The directory for saving output.
     """
     info_map = {
@@ -241,22 +241,21 @@ def execute_simulations(
     metadata_files : List[MetadataPaths]
         A list of custom TypedDict objects including the specified prefix for the save_results output file
         and the path to the metadata file.
-
-    exclude_info_maps : bool, optional
+    exclude_info_maps : bool
         Flag for whether or not the user wants to inlcude info_maps data in their results files.
-    produce_graphics: bool, optional
+    produce_graphics: bool
         Flag for whether or not the user wants to produce graphs at after the simulation.
-    graphics_dir : Path, optional, default=Path("output/graphics/")
+    graphics_dir : Path
         The directory for saving graphics.
     format_option : str
         The formatting option for select output files.
     verbose : LogVerbosity
         The verbose option set by the user.
-    output_dir : Path, optional, default=Path("output/")
+    output_dir : Path
         The directory for saving output.
-    filters_dir : Path, optional, default=Path("output/output_filters/")
+    filters_dir : Path
         The directory for the files containing the keys for filtering.
-    csv_dir : Path, optional, default=Path("output/CSVs/")
+    csv_dir : Path
         The directory for the csv output files to be saved.
     """
     info_map = {

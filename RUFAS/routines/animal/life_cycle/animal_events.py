@@ -1,19 +1,3 @@
-"""
-RUFAS: Ruminant Farm Systems Model
-----------------------------------
-
-File name: animal_events.py
-
-Authors:
-    - Manfei Li, mli497@wisc.edu
-    - Militsa Sotirova, militsasotirova@gmail.com
-
-Description:
-    This file initializes life events with the age of the animal when the
-    event happens and the description of the event.
-"""
-
-
 class AnimalEvents:
     """
     A class to represent animal events in a farm simulation.
