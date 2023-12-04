@@ -5,7 +5,7 @@
 		"heiferII_num": 349,
 		"heiferIII_num_springers": 46,
 		"cow_num": 1002,
-		"replace_num": 500,
+		"replace_num": 5010,
 		"herd_num": 1002,
 		"herd_init": false,
 		"breed": "HO"
@@ -98,7 +98,7 @@
 				"wood_n_std": [[3.77e-5, 5.82e-5, 5.54e-5], [6.60e-5, 6.69e-5, 6.53e-5]]
 			},
 			"culling": {
-				"parity_death_prob": [0.001,0.002,0.002,0.117],
+				"parity_death_prob": [0.001,0.002,0.002,0.002],
 				"parity_cull_prob": [0.15, 0.2, 0.25, 0.3],
 				"injury_cull_prob": [0, 0.08, 0.18, 0.28, 0.38, 0.47, 0.56, 0.64, 0.71, 0.78, 0.85, 0.90, 0.95, 1],
  				"death_cull_prob": [0, 0.18, 0.32, 0.42, 0.48, 0.54, 0.60, 0.65, 0.70, 0.77, 0.83, 0.89, 0.95, 1],
