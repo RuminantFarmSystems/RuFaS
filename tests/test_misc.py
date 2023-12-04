@@ -3,6 +3,7 @@ from mock.mock import MagicMock, call
 from pytest import approx
 from pytest_mock.plugin import MockerFixture
 
+from RUFAS.config import Config
 from RUFAS.general_constants import GeneralConstants
 from RUFAS.simulation_engine import SimulationEngine
 from RUFAS.util import Utility
@@ -64,8 +65,9 @@ def test_is_leap_year():
 def patch_simulation_engine(mocker: MockerFixture) -> SimulationEngine:
     """Returns a mocked SimulationEngine"""
     mocker.patch("RUFAS.simulation_engine.SimulationEngine._initialize_simulation")
+    config = mocker.MagicMock(auto_spec=Config)
 
-    sim_eng = SimulationEngine()
+    sim_eng = SimulationEngine(config=config)
     sim_eng.config = MagicMock()
     sim_eng.weather = MagicMock()
     sim_eng.time = MagicMock()

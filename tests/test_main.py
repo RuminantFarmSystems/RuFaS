@@ -6,6 +6,7 @@ from mock import MagicMock, patch
 import pytest
 from pytest_mock import MockerFixture
 
+from RUFAS.config import Config
 from RUFAS.routines.animal.life_cycle.herd_factory import HerdFactory
 from config import global_variables
 from main import (
@@ -19,6 +20,7 @@ from main import (
     run_rufas,
     run_validation,
     METADATA_PATHS,
+    initialize_herd,
 )
 
 from RUFAS.simulation_engine import SimulationEngine
@@ -277,6 +279,57 @@ def test_run_validation(mocker: MockerFixture, is_data_valid: bool) -> None:
 
 
 @pytest.mark.parametrize(
+    "set_seed, seed, terminate_simulation_post_herd_generation, add_log_count",
+    [
+        (False, 42, True, 3),
+        (False, 42, False, 2),
+        (False, 31415, True, 3),
+        (False, 31415, False, 2),
+        (True, 42, True, 3),
+        (True, 42, False, 2),
+        (True, 31415, True, 3),
+        (True, 31415, False, 2),
+    ],
+)
+def test_initialize_herd(
+        mocker: MockerFixture,
+        set_seed: bool,
+        seed: int,
+        terminate_simulation_post_herd_generation: bool,
+        add_log_count: int
+) -> None:
+    mock_output_manager = mocker.MagicMock(auto_spec=OutputManager)
+    mock_simulation_config = mocker.MagicMock(auto_spec=Config)
+    mock_herd_factory = mocker.MagicMock(auto_spec=HerdFactory)
+
+    mock_output_manager.add_log.return_value = None
+    mock_simulation_config.set_seed = set_seed
+    mock_simulation_config.seed = seed
+    mock_herd_factory.initialize_herd.return_value = None
+
+    patch_random_seed = mocker.patch("random.seed", return_value=None)
+    patch_numpy_random_seed = mocker.patch("numpy.random.seed", return_value=None)
+
+    mocker.patch("main.OutputManager", return_value=mock_output_manager)
+    mocker.patch("main.HerdFactory", return_value=mock_herd_factory)
+
+    initialize_herd(simulation_config=mock_simulation_config,
+                    init_herd=False,
+                    save_animals=False,
+                    save_animals_dir=Path("output/"),
+                    terminate_simulation_post_herd_generation=terminate_simulation_post_herd_generation)
+
+    if set_seed:
+        patch_random_seed.assert_called_once_with(seed)
+        patch_numpy_random_seed.assert_called_once_with(seed)
+    else:
+        patch_random_seed.assert_not_called()
+        patch_numpy_random_seed.assert_not_called()
+
+    assert mock_herd_factory.initialize_herd.call_count == 1
+    assert mock_output_manager.add_log.call_count == add_log_count
+
+@pytest.mark.parametrize(
     "produce_graphics, exlclude_info_maps, is_data_valid, terminate_simulation_post_herd_generation, "
     "initialize_herd_call_count, simulate_call_count, add_error_call_count, format_option",
     [
@@ -314,13 +367,14 @@ def test_execute_simulations(
     # Arrange
     mock_output_manager = mocker.MagicMock(auto_spec=OutputManager)
     mock_input_manager = mocker.MagicMock(auto_spec=InputManager)
-    mock_herd_factory = mocker.MagicMock(auto_spec=HerdFactory)
+    mock_config = mocker.MagicMock(auto_spec=Config)
     mock_output_manager.flush_pools.return_value = None
     mock_input_manager.flush_pool.return_value = None
     mock_output_manager.dump_all_nondata_pools.return_value = None
     mock_output_manager.save_results.return_value = None
     mocker.patch("main.OutputManager", return_value=mock_output_manager)
     mocker.patch("main.InputManager", return_value=mock_input_manager)
+    mocker.patch("main.Config", return_value=mock_config)
     metadata_file_path1 = Path("metadata_file1.json")
     metadata_file_path2 = Path("metadata_file2.json")
     metadata_prefix1 = "dummy_prefix1"
@@ -330,8 +384,8 @@ def test_execute_simulations(
         {"prefix": metadata_prefix2, "path": metadata_file_path2},
     ]
     mock_input_manager.start_data_processing.return_value = is_data_valid
-    mock_herd_factory.initialize_herd.return_value = None
-    mocker.patch("main.HerdFactory", return_value=mock_herd_factory)
+
+    patch_initialize_herd = mocker.patch("main.initialize_herd")
 
     mock_simulator = mocker.MagicMock(auto_spec=SimulationEngine)
     mock_simulator.simulate.return_value = None
@@ -355,7 +409,7 @@ def test_execute_simulations(
     )
 
     # Assert
-    assert mock_herd_factory.initialize_herd.call_count == initialize_herd_call_count
+    assert patch_initialize_herd.call_count == initialize_herd_call_count
     assert mock_simulator.simulate.call_count == simulate_call_count
     assert mock_output_manager.add_error.call_count == add_error_call_count
     assert mock_output_manager.flush_pools.call_count == len(metadata_file_list)
