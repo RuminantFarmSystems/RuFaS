@@ -977,9 +977,9 @@ def test_execute_daily_processes(field_size: float, crops_growing: bool, residue
         field_data = FieldData(field_size=field_size, current_residue=residue)
         incorp = Field(field_data=field_data, manure_manager=MagicMock(ManureManager))
         crop_1 = Crop()
-        crop_1.data.water_uptake = transpiration
+        crop_1.data.max_transpiration = transpiration
         crop_2 = Crop()
-        crop_2.data.water_uptake = transpiration
+        crop_2.data.max_transpiration = transpiration
         incorp.crops = [crop_1, crop_2]
         current_conditions = CurrentDayConditions(incoming_light=light, mean_air_temperature=mean_temp,
                                                   min_air_temperature=min_temp, max_air_temperature=max_temp,
