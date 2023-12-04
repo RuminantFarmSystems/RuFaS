@@ -1,15 +1,3 @@
-"""
-RUFAS: Ruminant Farm Systems Model
-File name: calf.py
-Author(s): Manfei Li, mli497@wisc.edu
-Militsa Sotirova, militsasotirova@gmail.com
-Description: This file updates the calf form birth to wean.
-Birth weight initialized with breed specific distributions,
-Gender determined with the semen type used,
-Sold or keep decision made by user input,
-Body weight gain with user input calf average daily gain.
-"""
-
 from random import random
 from scipy.stats import truncnorm
 from typing import Dict
