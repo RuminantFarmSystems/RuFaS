@@ -10,10 +10,11 @@
     },
     {
       "type": "stackplot",
-      "filters": ["Cow\\.milking_update\\.milk_(lactose|protein|fat)"],
-      "variables": ["milk_lactose", "milk_protein", "milk_fat"],
-      "title": "Daily Milk Nutritions",
-      "legend": ["lactose", "fat", "protein"]
+      "filters": [
+        "AnimalManager.daily_updates.(num_calves|num_heiferIs|num_heiferIIs|num_heiferIIIs|num_lactating_cows|num_dry_cows)"
+      ],
+      "title": "Herd composition (stackplot)",
+      "legend": ["num_calves","num_heiferIs","num_heiferIIs","num_heiferIIIs","num_lactating_cows","num_dry_cows"]
     }
   ]
 }
