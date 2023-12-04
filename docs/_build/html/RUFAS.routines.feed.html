@@ -111,17 +111,6 @@
 </section>
 <section id="module-RUFAS.routines.feed.carbon_loss">
 <span id="rufas-routines-feed-carbon-loss-module"></span><h2>RUFAS.routines.feed.carbon_loss module<a class="headerlink" href="#module-RUFAS.routines.feed.carbon_loss" title="Link to this heading"></a></h2>
-<p>RUFAS: Ruminant Farm Systems Model</p>
-<p>File name: carbon_loss.py</p>
-<dl class="simple">
-<dt>Author(s): William Donovan, <a class="reference external" href="mailto:wmdonovan&#37;&#52;&#48;wisc&#46;edu">wmdonovan<span>&#64;</span>wisc<span>&#46;</span>edu</a></dt><dd><p>Jacob Johnson, <a class="reference external" href="mailto:jacob8399&#37;&#52;&#48;gmail&#46;com">jacob8399<span>&#64;</span>gmail<span>&#46;</span>com</a></p>
-</dd>
-<dt>Description: This module contains the necessary functions for calculating and</dt><dd><p>updating the carbon loss during harvest, storage, and feed out.
-The only function meant to be used outside of this file is the
-update_all() function. The other functions are meant to serve as
-helper functions within this file.</p>
-</dd>
-</dl>
 <dl class="py function">
 <dt class="sig sig-object py" id="RUFAS.routines.feed.carbon_loss.feed_out_loss">
 <span class="sig-prename descclassname"><span class="pre">RUFAS.routines.feed.carbon_loss.</span></span><span class="sig-name descname"><span class="pre">feed_out_loss</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">storage</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.feed.carbon_loss.feed_out_loss" title="Link to this definition"></a></dt>
@@ -185,19 +174,6 @@ helper functions within this file.</p>
 </section>
 <section id="module-RUFAS.routines.feed.feed">
 <span id="rufas-routines-feed-feed-module"></span><h2>RUFAS.routines.feed.feed module<a class="headerlink" href="#module-RUFAS.routines.feed.feed" title="Link to this heading"></a></h2>
-<p>RUFAS: Ruminant Farm Systems Model
-File name: feed.py</p>
-<dl class="simple">
-<dt>Description: Main driver for the feed management processes. Executes daily</dt><dd><p>routines that run feed storage updates and losses, and forage
-inventory planning.</p>
-</dd>
-<dt>Author(s): Kass Chupongstimun, <a class="reference external" href="mailto:kass_c&#37;&#52;&#48;hotmail&#46;com">kass_c<span>&#64;</span>hotmail<span>&#46;</span>com</a>,</dt><dd><p>Andy Achenreiner, <a class="reference external" href="mailto:achenreiner&#37;&#52;&#48;wisc&#46;edu">achenreiner<span>&#64;</span>wisc<span>&#46;</span>edu</a>
-William Donovan, <a class="reference external" href="mailto:wmdonovan&#37;&#52;&#48;wisc&#46;edu">wmdonovan<span>&#64;</span>wisc<span>&#46;</span>edu</a>
-Jacob Johnson, <a class="reference external" href="mailto:jacob8399&#37;&#52;&#48;gmail&#46;com">jacob8399<span>&#64;</span>gmail<span>&#46;</span>com</a>
-Militsa Sotirova, <a class="reference external" href="mailto:militsasotirova&#37;&#52;&#48;gmail&#46;com">militsasotirova<span>&#64;</span>gmail<span>&#46;</span>com</a>
-Chris Vankerkhove, <a class="reference external" href="mailto:cjv47&#37;&#52;&#48;cornell&#46;edu">cjv47<span>&#64;</span>cornell<span>&#46;</span>edu</a></p>
-</dd>
-</dl>
 <dl class="py class">
 <dt class="sig sig-object py" id="RUFAS.routines.feed.feed.Feed">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">RUFAS.routines.feed.feed.</span></span><span class="sig-name descname"><span class="pre">Feed</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#RUFAS.routines.feed.feed_typed_dicts.PurchasedFeedTypedDict" title="RUFAS.routines.feed.feed_typed_dicts.PurchasedFeedTypedDict"><span class="pre">PurchasedFeedTypedDict</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.feed.feed.Feed" title="Link to this definition"></a></dt>
@@ -687,17 +663,6 @@ an invalid value type is used, the editor should flag with a warning.</p>
 </section>
 <section id="module-RUFAS.routines.feed.nitrogen_loss">
 <span id="rufas-routines-feed-nitrogen-loss-module"></span><h2>RUFAS.routines.feed.nitrogen_loss module<a class="headerlink" href="#module-RUFAS.routines.feed.nitrogen_loss" title="Link to this heading"></a></h2>
-<p>RUFAS: Ruminant Farm Systems Model
-File name: nitrogen_loss.py</p>
-<dl class="simple">
-<dt>Author(s): William Donovan, <a class="reference external" href="mailto:wmdonovan&#37;&#52;&#48;wisc&#46;edu">wmdonovan<span>&#64;</span>wisc<span>&#46;</span>edu</a></dt><dd><p>Jacob Johnson, <a class="reference external" href="mailto:jacob8399&#37;&#52;&#48;gmail&#46;com">jacob8399<span>&#64;</span>gmail<span>&#46;</span>com</a></p>
-</dd>
-<dt>Description: This module contains the necessary functions for calculating and</dt><dd><p>updating the nitrogen loss during harvest, storage, and feed out.
-The only function meant to be used outside of this file is the
-update_all() function. The other functions are meant to serve as
-helper functions within this file.</p>
-</dd>
-</dl>
 <dl class="py function">
 <dt class="sig sig-object py" id="RUFAS.routines.feed.nitrogen_loss.CP_loss">
 <span class="sig-prename descclassname"><span class="pre">RUFAS.routines.feed.nitrogen_loss.</span></span><span class="sig-name descname"><span class="pre">CP_loss</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">storage</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.feed.nitrogen_loss.CP_loss" title="Link to this definition"></a></dt>
@@ -749,17 +714,6 @@ helper functions within this file.</p>
 </section>
 <section id="module-RUFAS.routines.feed.protein_degradation">
 <span id="rufas-routines-feed-protein-degradation-module"></span><h2>RUFAS.routines.feed.protein_degradation module<a class="headerlink" href="#module-RUFAS.routines.feed.protein_degradation" title="Link to this heading"></a></h2>
-<p>RUFAS: Ruminant Farm Systems Model
-File name: protein_degradation.py</p>
-<dl class="simple">
-<dt>Author(s): William Donovan, <a class="reference external" href="mailto:wmdonovan&#37;&#52;&#48;wisc&#46;edu">wmdonovan<span>&#64;</span>wisc<span>&#46;</span>edu</a></dt><dd><p>Jacob Johnson, <a class="reference external" href="mailto:jacob8399&#37;&#52;&#48;gmail&#46;com">jacob8399<span>&#64;</span>gmail<span>&#46;</span>com</a></p>
-</dd>
-<dt>Description: This module contains the necessary functions for calculating</dt><dd><p>protein degradation during harvest, storage, and feed out.
-The only function meant to be used outside of this file is the
-update_all() function. The other functions are meant to serve as
-helper functions within this file.</p>
-</dd>
-</dl>
 <dl class="py function">
 <dt class="sig sig-object py" id="RUFAS.routines.feed.protein_degradation.degrade_protein">
 <span class="sig-prename descclassname"><span class="pre">RUFAS.routines.feed.protein_degradation.</span></span><span class="sig-name descname"><span class="pre">degrade_protein</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.feed.protein_degradation.degrade_protein" title="Link to this definition"></a></dt>

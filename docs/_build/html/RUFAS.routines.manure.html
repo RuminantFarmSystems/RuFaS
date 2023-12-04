@@ -854,13 +854,6 @@
 </section>
 <section id="module-RUFAS.routines.manure.manure_manager">
 <span id="rufas-routines-manure-manure-manager-module"></span><h2>RUFAS.routines.manure.manure_manager module<a class="headerlink" href="#module-RUFAS.routines.manure.manure_manager" title="Link to this heading"></a></h2>
-<p>RUFAS: Ruminant Farm Systems Model
-File name: manure_manager.py</p>
-<dl class="simple">
-<dt>Author(s):  William Donovan, <a class="reference external" href="mailto:wmdonovan&#37;&#52;&#48;wisc&#46;edu">wmdonovan<span>&#64;</span>wisc<span>&#46;</span>edu</a></dt><dd><p>Yunus Mohammed, <a class="reference external" href="mailto:ymm26&#37;&#52;&#48;cornell&#46;edu">ymm26<span>&#64;</span>cornell<span>&#46;</span>edu</a>
-Sadman Chowdhury, <a class="reference external" href="mailto:skc86&#37;&#52;&#48;cornell&#46;edu">skc86<span>&#64;</span>cornell<span>&#46;</span>edu</a></p>
-</dd>
-</dl>
 <dl class="py class">
 <dt class="sig sig-object py" id="RUFAS.routines.manure.manure_manager.ManureManager">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">RUFAS.routines.manure.manure_manager.</span></span><span class="sig-name descname"><span class="pre">ManureManager</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">animal_manager</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_manager.AnimalManager" title="RUFAS.routines.animal.animal_manager.AnimalManager"><span class="pre">AnimalManager</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">weather</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">manure_manager_config</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.manure.manure_manager.ManureManager" title="Link to this definition"></a></dt>
@@ -928,9 +921,9 @@ This method evaluates the nutrient request made by considering both nitrogen and
 quantities desired. It calculates the projected manure mass that would satisfy the request
 and checks against the nutrients available in the manager.</p>
 <p>If the request can be fulfilled either partially or wholly, the corresponding amount of nutrients
-is subtracted from the manager’s internal bookkeeping. The method then returns the results of the nutrient request,
-which detail the amounts of nutrients that can be provided to fulfill the request. If the request
-cannot be fulfilled at all, the method will return None.</p>
+is subtracted from the manager’s internal bookkeeping. The method then returns the results of the
+nutrient request, which detail the amounts of nutrients that can be provided to fulfill the request.
+If the request cannot be fulfilled at all, the method will return None.</p>
 <section id="notes">
 <h3>Notes<a class="headerlink" href="#notes" title="Link to this heading"></a></h3>
 <p>This is a wrapper method that calls the request_nutrients method of the manure nutrient manager.</p>
@@ -946,8 +939,8 @@ cannot be fulfilled at all, the method will return None.</p>
 <h3>Returns<a class="headerlink" href="#id2" title="Link to this heading"></a></h3>
 <dl class="simple">
 <dt>NutrientRequestResults | None</dt><dd><p>The results of the nutrient request, detailed in a <cite>NutrientRequestResults</cite> object, which includes
-the amount of nitrogen, phosphorus, total manure mass, dry matter, and others that can be provided to fulfill the request.
-Returns None if the request cannot be fulfilled.</p>
+the amount of nitrogen, phosphorus, total manure mass, dry matter, and others that can be provided
+to fulfill the request. Returns None if the request cannot be fulfilled.</p>
 </dd>
 </dl>
 </section>

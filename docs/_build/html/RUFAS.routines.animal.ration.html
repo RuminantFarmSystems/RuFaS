@@ -112,17 +112,6 @@
 </section>
 <section id="module-RUFAS.routines.animal.ration.animal_requirements">
 <span id="rufas-routines-animal-ration-animal-requirements-module"></span><h2>RUFAS.routines.animal.ration.animal_requirements module<a class="headerlink" href="#module-RUFAS.routines.animal.ration.animal_requirements" title="Link to this heading"></a></h2>
-<p>RUFAS: Ruminant Farm Systems Model
-File name: animal_requirements.py
-Description: Calculates the following energy, mineral, and dry matter intake</p>
-<blockquote>
-<div><p>estimation for a single animal using the function in this file.</p>
-</div></blockquote>
-<dl class="simple">
-<dt>Author(s): Chris VanKerkhove, <a class="reference external" href="mailto:cjv47&#37;&#52;&#48;cornell&#46;edu">cjv47<span>&#64;</span>cornell<span>&#46;</span>edu</a>,</dt><dd><p>Joseph Waddell <a class="reference external" href="mailto:jw2574&#37;&#52;&#48;cornell&#46;edu">jw2574<span>&#64;</span>cornell<span>&#46;</span>edu</a>,
-Edward Cabezas Garcia <a class="reference external" href="mailto:ec867&#37;&#52;&#48;cornell&#46;edu">ec867<span>&#64;</span>cornell<span>&#46;</span>edu</a></p>
-</dd>
-</dl>
 <dl class="py class">
 <dt class="sig sig-object py" id="RUFAS.routines.animal.ration.animal_requirements.AnimalRequirements">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">RUFAS.routines.animal.ration.animal_requirements.</span></span><span class="sig-name descname"><span class="pre">AnimalRequirements</span></span><a class="headerlink" href="#RUFAS.routines.animal.ration.animal_requirements.AnimalRequirements" title="Link to this definition"></a></dt>
@@ -1150,14 +1139,6 @@ populates the corresponding class variables.</p>
 </section>
 <section id="module-RUFAS.routines.animal.ration.calf_ration">
 <span id="rufas-routines-animal-ration-calf-ration-module"></span><h2>RUFAS.routines.animal.ration.calf_ration module<a class="headerlink" href="#module-RUFAS.routines.animal.ration.calf_ration" title="Link to this heading"></a></h2>
-<p>RUFAS: Ruminant Farm Systems Model
-File name: calf_ration.py</p>
-<p>Description: The class which handles calf nutrient requirement calculations and ration formulation methods</p>
-<dl class="simple">
-<dt>Author(s): Katrina Wang, <a class="reference external" href="mailto:kw433&#37;&#52;&#48;cornell&#46;edu">kw433<span>&#64;</span>cornell<span>&#46;</span>edu</a></dt><dd><p>Militsa Sotirova, <a class="reference external" href="mailto:militsasotirova&#37;&#52;&#48;gmail&#46;com">militsasotirova<span>&#64;</span>gmail<span>&#46;</span>com</a>
-Joseph Waddell, <a class="reference external" href="mailto:jw2574&#37;&#52;&#48;cornell&#46;edu">jw2574<span>&#64;</span>cornell<span>&#46;</span>edu</a></p>
-</dd>
-</dl>
 <dl class="py class">
 <dt class="sig sig-object py" id="RUFAS.routines.animal.ration.calf_ration.CalfRationManager">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">RUFAS.routines.animal.ration.calf_ration.</span></span><span class="sig-name descname"><span class="pre">CalfRationManager</span></span><a class="headerlink" href="#RUFAS.routines.animal.ration.calf_ration.CalfRationManager" title="Link to this definition"></a></dt>
@@ -1331,15 +1312,6 @@ in rumen for each feed (% of CP).</p>
 </section>
 <section id="module-RUFAS.routines.animal.ration.ration_driver">
 <span id="rufas-routines-animal-ration-ration-driver-module"></span><h2>RUFAS.routines.animal.ration.ration_driver module<a class="headerlink" href="#module-RUFAS.routines.animal.ration.ration_driver" title="Link to this heading"></a></h2>
-<p>RUFAS: Ruminant Farm Systems Model
-File name: ration_driver.py</p>
-<dl class="simple">
-<dt>Description: Main file in the ration formulation process that connects all</dt><dd><p>other files such as requirements files and non-linear program files and
-also connects with the Feed and Animal modules to bring in relevant values.</p>
-</dd>
-<dt>Author(s): Chris VanKerkhove, <a class="reference external" href="mailto:cjv47&#37;&#52;&#48;cornell&#46;edu">cjv47<span>&#64;</span>cornell<span>&#46;</span>edu</a></dt><dd><p>Joseph Waddell, <a class="reference external" href="mailto:jw2574&#37;&#52;&#48;cornell&#46;edu">jw2574<span>&#64;</span>cornell<span>&#46;</span>edu</a></p>
-</dd>
-</dl>
 <dl class="py class">
 <dt class="sig sig-object py" id="RUFAS.routines.animal.ration.ration_driver.AvailableFeeds">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">RUFAS.routines.animal.ration.ration_driver.</span></span><span class="sig-name descname"><span class="pre">AvailableFeeds</span></span><a class="headerlink" href="#RUFAS.routines.animal.ration.ration_driver.AvailableFeeds" title="Link to this definition"></a></dt>
@@ -1898,19 +1870,6 @@ Different from the report_ration method, since this takes into account digestibi
 </section>
 <section id="module-RUFAS.routines.animal.ration.ration_optimizer">
 <span id="rufas-routines-animal-ration-ration-optimizer-module"></span><h2>RUFAS.routines.animal.ration.ration_optimizer module<a class="headerlink" href="#module-RUFAS.routines.animal.ration.ration_optimizer" title="Link to this heading"></a></h2>
-<p>RUFAS: Ruminant Farm Systems Model
-File name: ration_NLP.py
-Description: Calculates the ration for animals using a Non-Linear</p>
-<blockquote>
-<div><p>programming method utilizing the scipy package. The NLP is formulated using
-constraint functions. Note NLP (Non-linear Program) will be used throughout
-descriptions for functions in this file.</p>
-</div></blockquote>
-<dl class="simple">
-<dt>Author(s):</dt><dd><p>Chris VanKerkhove, <a class="reference external" href="mailto:cjv47&#37;&#52;&#48;cornell&#46;edu">cjv47<span>&#64;</span>cornell<span>&#46;</span>edu</a>
-Joseph Waddell, <a class="reference external" href="mailto:jw2574&#37;&#52;&#48;cornell&#46;edu">jw2574<span>&#64;</span>cornell<span>&#46;</span>edu</a></p>
-</dd>
-</dl>
 <dl class="py class">
 <dt class="sig sig-object py" id="RUFAS.routines.animal.ration.ration_optimizer.RationOptimizer">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">RUFAS.routines.animal.ration.ration_optimizer.</span></span><span class="sig-name descname"><span class="pre">RationOptimizer</span></span><a class="headerlink" href="#RUFAS.routines.animal.ration.ration_optimizer.RationOptimizer" title="Link to this definition"></a></dt>
@@ -2397,13 +2356,6 @@ constraint.</p>
 </section>
 <section id="module-RUFAS.routines.animal.ration.user_defined_ration">
 <span id="rufas-routines-animal-ration-user-defined-ration-module"></span><h2>RUFAS.routines.animal.ration.user_defined_ration module<a class="headerlink" href="#module-RUFAS.routines.animal.ration.user_defined_ration" title="Link to this heading"></a></h2>
-<p>RUFAS: Ruminant Farm Systems Model
-File name: user_defined_ration.py
-Description: Tools for accessing and providing user-defined ration  variables</p>
-<blockquote>
-<div><p>Main class used to read JSON as singleton, return ration percentages where needed</p>
-</div></blockquote>
-<p>Author: Joseph C. Waddell, <a class="reference external" href="mailto:jw2574&#37;&#52;&#48;cornell&#46;edu">jw2574<span>&#64;</span>cornell<span>&#46;</span>edu</a></p>
 <dl class="py class">
 <dt class="sig sig-object py" id="RUFAS.routines.animal.ration.user_defined_ration.UserDefinedRationManager">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">RUFAS.routines.animal.ration.user_defined_ration.</span></span><span class="sig-name descname"><span class="pre">UserDefinedRationManager</span></span><a class="headerlink" href="#RUFAS.routines.animal.ration.user_defined_ration.UserDefinedRationManager" title="Link to this definition"></a></dt>
