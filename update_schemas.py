@@ -1,6 +1,7 @@
 import json
 # import pprint
 from typing import Any
+import re
 
 PROPERTIES_WITH_SCHEMA = {
     'crop_schedule': "Crop Specifications"
@@ -51,13 +52,51 @@ def _setup_bool_schema(title: str, input_properties: dict[str, Any]) -> dict[str
     }
     default = input_properties.get("default")
     description = input_properties.get("description")
+
     if default is not None:
         schema["default"] = default
     if description is not None:
-        schema["description"] = description
+        schema["options"]["infoText"] = description
 
     return schema
 
+
+def _setup_string_schema(title: str, input_properties: dict[str, Any]) -> dict[str, Any]:
+    schema = {
+        "title": title,
+        "type": "string",
+        "options": {
+            "grid_columns": 12,
+            "inputAttributes": {
+                "class": "text-primary form-control"
+            }
+        }
+    }
+    default = input_properties["default"]
+    pattern = input_properties["pattern"]
+    description = input_properties["description"]
+
+    if default is not None:
+        schema["default"] = default
+    if pattern is not None:
+        enum = _get_enum_of_options(pattern)
+        schema["enum"] = enum
+        schema["format"] = "select2"
+    if description is not None:
+        schema["options"]["infoText"] = description
+
+    return schema
+
+
+def _get_enum_of_options(string: str) -> list[str]:
+    pattern = "\\^\\(.*\\)\\$"
+    is_valid_pattern = bool(re.match(pattern, string))
+    if not is_valid_pattern:
+        raise ValueError(f"'{string}' is not a valid pattern. Cannot create schema")
+
+    unsplit_list = string[2:-2]
+    split_list = unsplit_list.split("|")
+    return split_list
 
 # def _setup_schema(title: str, structure: dict[str, Any]) -> dict[str, Any]:
 #     if
