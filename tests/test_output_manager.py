@@ -257,30 +257,6 @@ def test_dict_to_file_csv_exception(mock_output_manager: OutputManager) -> None:
             mock_output_manager._dict_to_file_csv(data, "test")
 
 
-@pytest.mark.parametrize(
-    "exception, error_message",
-    [
-        (
-            OSError,
-            "test OS Error",
-        ),
-        (
-            FileNotFoundError,
-            "test File not Found Error",
-        ),
-    ],
-)
-def test_save_variables_to_csv_files_exceptions(
-    mock_output_manager: OutputManager, exception: Exception, error_message: str
-) -> None:
-    """Unit test for the function _save_variables_to_csv_files() in the file output_manager.py"""
-
-    with patch("pathlib.Path.mkdir") as mock_mkdir:
-        mock_mkdir.side_effect = exception(error_message)
-        with pytest.raises(exception, match=error_message):
-            mock_output_manager._save_variables_to_csv_files({}, "filter", "path")
-
-
 def test_generate_key(mocker: MockerFixture) -> None:
     """Unit test for function _generate_key in file output_manager.py"""
     om = OutputManager()
@@ -633,9 +609,7 @@ def output_manager_original_method_states(
         "_list_filter_files_in_dir": mock_output_manager._list_filter_files_in_dir,
         "_load_filter_file_content": mock_output_manager._load_filter_file_content,
         "load_variables_pool_from_file": mock_output_manager.load_variables_pool_from_file,
-        "_save_variables_to_csv_files ": mock_output_manager._save_variables_to_csv_files,
         "save_results": mock_output_manager.save_results,
-        "_save_variables_to_csv_files": mock_output_manager._save_variables_to_csv_files,
         "add_variable": mock_output_manager.add_variable,
         "add_error": mock_output_manager.add_error,
         "add_log": mock_output_manager.add_log,
@@ -647,6 +621,9 @@ def output_manager_original_method_states(
         "dump_variable_names_and_contexts": mock_output_manager.dump_variable_names_and_contexts,
         "_route_save_functions": mock_output_manager._route_save_functions,
         "_prepare_plot_data": mock_output_manager._prepare_plot_data,
+        "clear_output_dir": mock_output_manager.clear_output_dir,
+        "is_file_in_dir": mock_output_manager.is_file_in_dir,
+        "create_directory": mock_output_manager.create_directory,
     }
 
 
@@ -670,7 +647,7 @@ def test_dump_all_nondata_pools(
         path, False, "verbose"
     )
 
-    mock_output_manager.dump_all_nondata_pools(path, True)
+    mock_output_manager.dump_all_nondata_pools(path, True, "verbose")
     mock_output_manager.dump_variable_names_and_contexts.assert_called_with(
         path, True, "verbose"
     )
@@ -755,40 +732,6 @@ def test_dump_variables(
     ]
     mock_output_manager._exclude_info_maps = output_manager_original_method_states[
         "_exclude_info_maps"
-    ]
-
-
-def test_save_variables_to_csv_files(
-    mock_output_manager: OutputManager,
-    output_manager_original_method_states: Dict[str, Callable],
-) -> None:
-    """Test case for function _save_variables_to_csv_files in output_manager.py"""
-    mock_output_manager._generate_file_name = MagicMock(return_value="dummy_name")
-    mock_output_manager._dict_to_file_csv = MagicMock()
-
-    mock_variable_pool = {"var1": {"values": [1], "info_maps": []}}
-
-    with patch("pathlib.Path.mkdir") as mock_mkdir:
-        mock_mkdir.return_value = None
-        mock_output_manager._save_variables_to_csv_files(
-            mock_variable_pool, "csv_dummy_filter_filepath.txt", "dummy_path"
-        )
-
-    mock_mkdir.assert_called_with(parents=True, exist_ok=True)
-    dummy_file_name = "saved_variables_csv_dummy_filter_filepath.txt"
-    mock_output_manager._generate_file_name.assert_called_once_with(
-        dummy_file_name, "csv"
-    )
-    mock_output_manager._dict_to_file_csv.assert_called_once_with(
-        mock_variable_pool, os.path.join("dummy_path", "dummy_name")
-    )
-
-    # Restore original methods
-    mock_output_manager._generate_file_name = output_manager_original_method_states[
-        "_generate_file_name"
-    ]
-    mock_output_manager._dict_to_file_csv = output_manager_original_method_states[
-        "_dict_to_file_csv"
     ]
 
 
@@ -1622,6 +1565,7 @@ def test_save_results(
     is_faulty: bool,
 ) -> None:
     # Arrange
+    csvs_dir = "output/CSVs/"
     mock_output_manager.variables_pool = {}
     mock_output_manager._generate_file_name = MagicMock(return_value="dummy_name")
     mock_output_manager._load_filter_file_content = MagicMock(
@@ -1639,7 +1583,7 @@ def test_save_results(
 
     # Act
     mock_output_manager.save_results(
-        "save_path", "filters_path", exclude_info_maps, produce_graphics, "graphics_dir"
+        "save_path", "filters_path", exclude_info_maps, produce_graphics, "graphics_dir", csvs_dir
     )
 
     # Assert
@@ -1664,6 +1608,7 @@ def test_save_results(
                     produce_graphics,
                     {"filters": ".*", "title": "dummy_title"},
                     "graphics_dir",
+                    csvs_dir
                 ),
                 call(
                     "graph_input_filepath2.txt",
@@ -1672,6 +1617,7 @@ def test_save_results(
                     produce_graphics,
                     {"filters": ".*", "title": "dummy_title"},
                     "graphics_dir",
+                    csvs_dir
                 ),
             ]
         )
@@ -1743,6 +1689,7 @@ def test_save_results_report_generation(
             exclude_info_maps,
             produce_graphics,
             "graphics_dir",
+            "csv_dir"
         )
 
         # Assert
@@ -1763,6 +1710,7 @@ def test_save_results_report_generation(
             exclude_info_maps,
             produce_graphics,
             "graphics_dir",
+            "csv_dir"
         )
         assert mock_output_manager.add_error.call_count == len(
             mock_output_manager._list_filter_files_in_dir.return_value
@@ -1794,7 +1742,7 @@ def test_route_save_functions_csv(
     mock_output_manager: OutputManager,
     output_manager_original_method_states: Dict[str, Callable],
 ) -> None:
-    mock_output_manager._save_variables_to_csv_files = MagicMock()
+    mock_output_manager._dict_to_file_csv = MagicMock()
     mock_output_manager._route_save_functions(
         "csv_file",
         "save_path",
@@ -1802,13 +1750,15 @@ def test_route_save_functions_csv(
         True,
         {"filters": "regex"},
         "graphics_dir",
+        Path("output/CSVs/")
     )
-    mock_output_manager._save_variables_to_csv_files.assert_called_once_with(
-        {"key": {"var": "value"}}, "csv_file", os.path.join("save_path", "CSVs", "om")
+    variable_csv_file_path = mock_output_manager._generate_file_name("saved_variables_csv_file", "csv")
+    mock_output_manager._dict_to_file_csv.assert_called_once_with(
+        {"key": {"var": "value"}}, os.path.join("output/CSVs/", variable_csv_file_path)
     )
     # Restore original method
-    mock_output_manager._save_variables_to_csv_files = (
-        output_manager_original_method_states["_save_variables_to_csv_files"]
+    mock_output_manager._dict_to_file_csv = (
+        output_manager_original_method_states["_dict_to_file_csv"]
     )
     mock_output_manager._route_save_functions = output_manager_original_method_states[
         "_route_save_functions"
@@ -1828,6 +1778,7 @@ def test_route_save_functions_json(
         True,
         {"filters": "regex"},
         "graphics_dir",
+        "csvs_dir"
     )
     mock_output_manager._dict_to_file_json.assert_called_once_with(
         {"key": {"var": "value"}}, os.path.join("save_path", "filename.json")
@@ -1859,7 +1810,8 @@ def test_route_save_functions_graph(
             prepared_pool,
             False,
             graph_data,
-            "graphics_dir",
+            Path("graphics_dir"),
+            "csvs_dir"
         )
         mock_generate_graph.assert_not_called()
         mock_output_manager.add_warning.assert_called_once_with(
@@ -1874,7 +1826,8 @@ def test_route_save_functions_graph(
             prepared_pool,
             True,
             graph_data,
-            "graphics_dir",
+            Path("graphics_dir"),
+            "csvs_dir"
         )
         mock_output_manager.add_warning.assert_called_once_with(
             "No Graphics",
@@ -1884,9 +1837,8 @@ def test_route_save_functions_graph(
         mock_generate_graph.assert_called_once_with(
             prepared_pool,
             graph_data,
-            "save_path",
             "graph_file",
-            "graphics_dir",
+            Path("graphics_dir"),
         )
 
         mock_generate_graph.side_effect = Exception("test exception")
@@ -1896,9 +1848,10 @@ def test_route_save_functions_graph(
             prepared_pool,
             True,
             graph_data,
-            "graphics_dir",
+            Path("graphics_dir"),
+            "csvs_dir"
         )
-        mock_output_manager.add_error.assert_called_once_with(
+        mock_output_manager.add_error.assert_called_with(
             "graph generation exception",
             "test exception",
             {"class": "OutputManager", "function": "_route_save_functions"},
@@ -2004,6 +1957,88 @@ def test_prepare_plot_data(mock_output_manager: OutputManager,
     assert mock_output_manager.add_error.call_count == add_error_call_count
 
     mock_output_manager._prepare_plot_data = output_manager_original_method_states["_prepare_plot_data"]
+    "is_file_found_in_dir",
+    [True, False],
+)
+def test_clear_output_dir(mocker: MockerFixture, mock_output_manager: OutputManager, is_file_found_in_dir: bool,
+                          output_manager_original_method_states: Dict[str, Callable]) -> None:
+    """Checks clear_output_dir function in output_manager.py"""
+    patch_empty_dir = mocker.patch("RUFAS.util.Utility.empty_dir")
+    mock_output_manager.add_log = MagicMock()
+    mock_output_manager.add_error = MagicMock()
+    mock_output_manager.is_file_in_dir = MagicMock(return_value=is_file_found_in_dir)
+    with patch("pathlib.Path.mkdir") as mock_mkdir:
+        vars_file_path = mock_mkdir.return_value / "dummy_vars_file.txt"
+        mock_output_manager.clear_output_dir(vars_file_path, Path("output_dir"))
+        if is_file_found_in_dir:
+            patch_empty_dir.assert_not_called()
+            assert mock_output_manager.add_log.call_count == 0
+            assert mock_output_manager.add_error.call_count == 1
+        else:
+            patch_empty_dir.assert_called_once()
+            assert mock_output_manager.add_log.call_count == 1
+            assert mock_output_manager.add_error.call_count == 0
+
+    mock_output_manager.is_file_in_dir = output_manager_original_method_states["is_file_in_dir"]
+    mock_output_manager.clear_output_dir = output_manager_original_method_states["clear_output_dir"]
+    mock_output_manager.add_log = output_manager_original_method_states["add_log"]
+    mock_output_manager.add_error = output_manager_original_method_states["add_error"]
+
+
+@pytest.mark.parametrize(
+    "dir_path, file_path, expected_result",
+    [
+        (None, None, False),
+        (Path("path/to/directory"), Path("path/to/directory/file.json"), True),
+        (Path("path/to/directory"), Path("path/to/different_directory/file.json"), False),
+        (Path("path/to/directory"), Path("path/to/directory/subdirectory/file.json"), True),
+        (Path("path/to/directory"), None, False),
+    ],
+)
+def test_is_file_in_dir(mock_output_manager: OutputManager, dir_path: Path, file_path: Path, expected_result: bool,
+                        output_manager_original_method_states: Dict[str, Callable]) -> None:
+    """Checks is_file_in_dir function in output_manager.py"""
+    assert mock_output_manager.is_file_in_dir(dir_path, file_path) is expected_result
+
+    mock_output_manager.is_file_in_dir = output_manager_original_method_states["is_file_in_dir"]
+
+
+def test_create_directory_successful(mock_output_manager: OutputManager,
+                                     output_manager_original_method_states: Dict[str, Callable]) -> None:
+    """Checks create_directory function successfully creates a dir in output_manager.py"""
+    mock_output_manager.add_log = MagicMock()
+    mock_output_manager.add_error = MagicMock()
+    mock_path = "new/dir/to/create"
+    mock_output_manager.create_directory(Path(mock_path))
+    assert mock_output_manager.add_log.call_count == 2
+    assert mock_output_manager.add_error.call_count == 0
+
+    mock_output_manager.create_directory = output_manager_original_method_states["create_directory"]
+    mock_output_manager.add_log = output_manager_original_method_states["add_log"]
+    mock_output_manager.add_error = output_manager_original_method_states["add_error"]
+
+
+def test_create_directory_exceptions(mock_output_manager: OutputManager,
+                                     output_manager_original_method_states: Dict[str, Callable]) -> None:
+    """Checks create_directory function has proper exceptions"""
+    mock_output_manager.add_log = MagicMock()
+    mock_output_manager.add_error = MagicMock()
+    with patch("pathlib.Path.mkdir", side_effect=PermissionError):
+        mock_output_manager.create_directory(Path("unauthorized/path/"))
+
+    assert mock_output_manager.add_log.call_count == 1
+    assert mock_output_manager.add_error.call_count == 1
+
+    mock_output_manager.add_log = MagicMock()
+    mock_output_manager.add_error = MagicMock()
+    with patch("pathlib.Path.mkdir", side_effect=Exception):
+        mock_output_manager.create_directory(Path("unauthorized/path/"))
+
+    assert mock_output_manager.add_log.call_count == 1
+    assert mock_output_manager.add_error.call_count == 1
+
+    mock_output_manager.create_directory = output_manager_original_method_states["create_directory"]
+    mock_output_manager.add_log = output_manager_original_method_states["add_log"]
     mock_output_manager.add_error = output_manager_original_method_states["add_error"]
 
 

@@ -12,12 +12,9 @@ import sys
 from typing import List
 
 from RUFAS.scenario_manager import METADATA_PATHS, MetadataPaths
-
-import config.global_variables
 from RUFAS.simulation_engine import SimulationEngine
 from RUFAS.input_manager import InputManager
 from RUFAS.output_manager import OutputManager, LogVerbosity
-from RUFAS.util import Utility
 
 
 def main():
@@ -37,60 +34,67 @@ def main():
         graphics_dir=Path(cmd_arguments.graphics_dir),
         vars_file_path=Path(cmd_arguments.load_pool),
         output_dir=Path(cmd_arguments.output_dir),
-        filters_dir=Path(cmd_arguments.filters_dir)
+        filters_dir=Path(cmd_arguments.filters_dir),
+        csv_dir=Path(cmd_arguments.csv_dir)
     )
 
 
 def run_rufas(
-    load_pool: bool = False,
-    produce_graphics: bool = True,
-    format_option: str = "verbose",
-    verbose: LogVerbosity = LogVerbosity.NONE,
-    clear_output: bool = False,
-    exclude_info_maps: bool = False,
-    only_run_validation: bool = False,
-    graphics_dir: Path = Path(""),
-    vars_file_path: Path = Path(""),
-    output_dir: Path = Path("output/"),
-    filters_dir: Path = Path("output/output_filters/")
+    load_pool: bool,
+    produce_graphics: bool,
+    format_option: str,
+    verbose: LogVerbosity,
+    clear_output: bool,
+    exclude_info_maps: bool,
+    only_run_validation: bool,
+    graphics_dir: Path,
+    vars_file_path: Path,
+    output_dir: Path,
+    filters_dir: Path,
+    csv_dir: Path
 ) -> None:
     """Main function to run RuFaS, with options.
 
     Parameters
     ----------
-    load_pool : bool, optional, default=False
+    load_pool : bool
         Flag to load json file into Output Manager variables pool for processing.
-    produce_graphics : bool, optional, default=True
+    produce_graphics : bool
         Produce graphics after simulation.
-    format_option : str, optional, default="verbose"
+    format_option : str
         Format for variable_names.txt output file.
-    verbose : bool, optional, default=True
+    verbose : bool
         Print progress messages while simulation is running.
-    clear_output : bool, optional, default=False
+    clear_output : bool
         Clear output directory before running the simulation.
-    exclude_info_maps : bool, optional, default=False
+    exclude_info_maps : bool
         Exclude info_maps from the output.
-    only_run_validation : bool, optional, default=False
+    only_run_validation : bool
         Validate input data and don't run a simulation.
-    graphics_dir : Path, optional, default=Path("")
+    graphics_dir : Path
         The directory for saving graphics.
-    vars_file_path : Path, optional, default=Path("")
+    vars_file_path : Path
         The path to the json file to load into Output Manager variables pool for processing.
-    output_dir : Path, optional, default=Path("output/")
+    output_dir : Path
         The directory for saving output.
-    filters_dir : Path, optional, default=Path("output/output_filters")
+    filters_dir : Path
         The directory for the files containing the keys for filtering.
+    csv_dir : Path
+        The directory for the csv output files to be saved.
     """
     sys.stdout.write("RuFaS: Ruminant Farm Systems Model 2023\n")
+
+    output_manager = OutputManager()
+    output_manager.create_directory(output_dir)
 
     if load_pool:
         run_load_vars_pool(vars_file_path, exclude_info_maps, format_option,
                            produce_graphics, graphics_dir, clear_output, output_dir,
-                           filters_dir)
+                           filters_dir, csv_dir)
         return
 
     if clear_output:
-        clear_output_dir()
+        output_manager.clear_output_dir(vars_file_path, output_dir)
 
     metadata_files: List[MetadataPaths] = METADATA_PATHS
     if only_run_validation:
@@ -105,83 +109,46 @@ def run_rufas(
             verbose,
             output_dir,
             filters_dir,
+            csv_dir
         )
 
 
-def clear_output_dir(vars_file_path: Path = None) -> None:
-    """Clears the output directory if vars_file_path not in output directory.
-
-    Parameters
-    ----------
-    vars_file_path : Path, optional, default=None
-        Path to file used to load Output Manager vars pool.
-    """
-    info_map = {
-        "class": "No caller class",
-        "function": clear_output_dir.__name__,
-    }
-    output_manager = OutputManager()
-    output_dir = Path(config.global_variables.OUT_DIR)
-    is_file_found_in_dir = is_file_in_dir(output_dir, vars_file_path)
-    if is_file_found_in_dir:
-        output_manager.add_error("Can't clear output directory", f"{vars_file_path} in output directory.", info_map)
-    else:
-        keep_list = [".keep", "output_filters"]
-        Utility.empty_dir(output_dir, keep=keep_list)
-        output_manager.add_log("Output directory cleared", "No conflicts to clearing output directory.", info_map)
-
-
-def is_file_in_dir(dir_path: Path = Path(config.global_variables.OUT_DIR), file_path: Path = None) -> bool:
-    """Checks if a file path is in the provided directory.
-
-    Parameters
-    ----------
-    dir_path : Path, optional, default=Path(config.global_variables.OUT_DIR)
-        Path to the directory to be checked.
-    file_path : Path, optional, default=None
-        Path to file to be checked.
-    """
-    if file_path is None:
-        return False
-    file_path = file_path.resolve()
-    directory_path = dir_path.resolve()
-
-    return directory_path == file_path or directory_path in file_path.parents
-
-
 def run_load_vars_pool(
-    vars_file_path: Path = Path(""),
-    exclude_info_maps: bool = False,
-    format_option: str = "verbose",
-    produce_graphics: bool = True,
-    graphics_dir: Path = Path(""),
-    clear_output: bool = False,
-    output_dir: Path = Path("output/"),
-    filters_dir: Path = Path("output/output_filters/")
+    vars_file_path: Path,
+    exclude_info_maps: bool,
+    format_option: str,
+    produce_graphics: bool,
+    graphics_dir: Path,
+    clear_output: bool,
+    output_dir: Path,
+    filters_dir: Path,
+    csv_dir: Path
 ) -> None:
     """Instantiates Output Manager and triggers loading of the variables pool from the provided file path
     for post-processing.
 
     Parameters
     ----------
-    vars_file_path : Path, optional, default=Path("")
+    vars_file_path : Path
         The path to the json file to load into Output Manager variables pool for processing.
-    exclude_info_maps : bool, optional
+    exclude_info_maps : bool
         Flag for whether or not the user wants to inlcude info_maps data in their results files.
-    produce_graphics : bool, optional
+    produce_graphics : bool
         Flag for whether or not the user wants to produce graphs at after the simulation.
-    graphics_dir : Path, optional
+    graphics_dir : Path
         The directory for saving graphics.
-    clear_output : bool, optional
+    clear_output : bool
         Flag for whether or not the user wants to clear the output directory.
-    output_dir : Path, optional, default=Path("output/")
+    output_dir : Path
         The directory for saving output.
-    filters_dir : Path, optional, default=Path("output/output_filters")
+    filters_dir : Path
         The directory for the files containing the keys for filtering.
+    csv_dir : Path
+        The directory for the csv output files to be saved.
     """
-    if clear_output:
-        clear_output_dir(vars_file_path)
     output_manager = OutputManager()
+    if clear_output:
+        output_manager.clear_output_dir(vars_file_path, output_dir)
     output_manager.flush_pools()
     output_manager.load_variables_pool_from_file(vars_file_path)
     output_manager.set_metadata_prefix("reload")
@@ -191,6 +158,7 @@ def run_load_vars_pool(
             exclude_info_maps,
             produce_graphics,
             graphics_dir,
+            csv_dir
         )
     output_manager.dump_all_nondata_pools(
             output_dir, exclude_info_maps, format_option
@@ -199,10 +167,10 @@ def run_load_vars_pool(
 
 def run_validation(
     metadata_files: List[Path],
-    exclude_info_maps: bool = False,
-    format_option: str = "verbose",
-    verbose: LogVerbosity = LogVerbosity.NONE,
-    output_dir: Path = Path("output/"),
+    exclude_info_maps: bool,
+    format_option: str,
+    verbose: LogVerbosity,
+    output_dir: Path,
 ) -> None:
     """Instantiates I/O Managers and triggers validation of input data.
 
@@ -210,13 +178,13 @@ def run_validation(
     ----------
     metadata_files : List[Path]
         The list of Paths to the metadata files the user entered with which to run the simulation.
-    exclude_info_maps : bool, optional
+    exclude_info_maps : bool
         Flag for whether or not the user wants to inlcude info_maps data in their results files.
     format_option : str
         The formatting option for select output files.
     verbose : LogVerbosity
         The verbose option set by the user.
-    output_dir : Path, optional, default=Path("output/")
+    output_dir : Path
         The directory for saving output.
     """
     info_map = {
@@ -257,13 +225,14 @@ def run_validation(
 
 def execute_simulations(
     metadata_files: List[MetadataPaths],
-    exclude_info_maps: bool = False,
-    produce_graphics: bool = True,
-    graphics_dir: Path = Path(""),
-    format_option: str = "verbose",
-    verbose: LogVerbosity = LogVerbosity.NONE,
-    output_dir: Path = Path("output/"),
-    filters_dir: Path = Path("output/output_filters/")
+    exclude_info_maps: bool,
+    produce_graphics: bool,
+    graphics_dir: Path,
+    format_option: str,
+    verbose: LogVerbosity,
+    output_dir: Path,
+    filters_dir: Path,
+    csv_dir: Path
 ) -> None:
     """Instantiates I/O Managers and processes the metadata files provided by the user to run the simulation.
 
@@ -272,21 +241,22 @@ def execute_simulations(
     metadata_files : List[MetadataPaths]
         A list of custom TypedDict objects including the specified prefix for the save_results output file
         and the path to the metadata file.
-
-    exclude_info_maps : bool, optional
+    exclude_info_maps : bool
         Flag for whether or not the user wants to inlcude info_maps data in their results files.
-    produce_graphics: bool, optional
+    produce_graphics: bool
         Flag for whether or not the user wants to produce graphs at after the simulation.
-    graphics_dir : Path, optional
+    graphics_dir : Path
         The directory for saving graphics.
     format_option : str
         The formatting option for select output files.
     verbose : LogVerbosity
         The verbose option set by the user.
-    output_dir : Path, optional, default=Path("output/")
+    output_dir : Path
         The directory for saving output.
-    filters_dir : Path, optional, default=Path("output/output_filters")
+    filters_dir : Path
         The directory for the files containing the keys for filtering.
+    csv_dir : Path
+        The directory for the csv output files to be saved.
     """
     info_map = {
         "class": "No caller class",
@@ -331,6 +301,7 @@ def execute_simulations(
             exclude_info_maps,
             produce_graphics,
             graphics_dir,
+            csv_dir
         )
         output_manager.dump_all_nondata_pools(
             output_dir, exclude_info_maps, format_option
@@ -363,7 +334,7 @@ def parse_gnu_args() -> argparse.Namespace:
         "-G",
         "--graphics_dir",
         help="The saving directory for graphics",
-        default="graphics",
+        default="output/graphics/",
     )
     parser.add_argument(
         "-v",
@@ -407,6 +378,12 @@ def parse_gnu_args() -> argparse.Namespace:
         "--filters-dir",
         help="The directory for the files containing the keys for filtering",
         default="output/output_filters/",
+    )
+    parser.add_argument(
+        "-C",
+        "--csv-dir",
+        help="The directory for the csv output files to be saved",
+        default="output/CSVs/"
     )
     return parser.parse_args()
 
