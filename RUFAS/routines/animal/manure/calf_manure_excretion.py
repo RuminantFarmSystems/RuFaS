@@ -1,11 +1,3 @@
-"""
-RUFAS: Ruminant Farm Systems Model
-File name: calf_manure_excretion.py
-Description: Determines manure excretion with information from the ration
-    formulation, outputs used by the manure module.
-Author(s): Militsa Sotirova, militsasotirova@gmail.com
-           Joseph Merhi, jm2257@cornell.edu
-"""
 from typing import Tuple
 
 from RUFAS.general_constants import GeneralConstants
