@@ -22,10 +22,11 @@ im = InputManager()
 
 class SimulationEngine:
 
-    def __init__(self) -> None:
+    def __init__(self, config: Config) -> None:
         """
         Initialize simulation
         """
+        self.config = config
         self._initialize_simulation()
 
     def simulate(self) -> None:
@@ -122,15 +123,9 @@ class SimulationEngine:
         """
         Instantiates the simulation object by requesting data from the Input Manager.
         """
-        data_config = im.get_data('config')
         data_weather = im.get_data('weather')
-        self.config = Config(data_config)
-
-        if self.config.set_seed:
-            random.seed(self.config.seed)
-            numpy.random.seed(self.config.seed)
-
         self.weather = Weather(data_weather, self.config)
+
         self.time = Time(self.config)
         self.state = State(self.config,
                            self.weather,

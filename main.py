@@ -9,8 +9,12 @@ file(s) or, if this input is not given, it will run in interactive mode and acce
 import argparse
 from pathlib import Path
 import sys
-from typing import List
+import random
+from typing import List, Any, Dict
 
+import numpy
+
+from RUFAS.config import Config
 from RUFAS.routines.animal.life_cycle.herd_factory import HerdFactory
 from RUFAS.scenario_manager import METADATA_PATHS, MetadataPaths
 
@@ -275,6 +279,45 @@ def run_validation(
         )
 
 
+def initialize_herd(
+        simulation_config: Config,
+        init_herd: bool = False,
+        save_animals: bool = False,
+        save_animals_dir: Path = Path("output/"),
+        terminate_simulation_post_herd_generation: bool = False
+) -> None:
+    info_map = {
+        "class": "No caller class",
+        "function": initialize_herd.__name__,
+    }
+    output_manager = OutputManager()
+
+    if simulation_config.set_seed:
+        random.seed(simulation_config.seed)
+        numpy.random.seed(simulation_config.seed)
+
+    output_manager.add_log(
+        "Herd initialization start",
+        f"Initializing herd data...\n",
+        info_map
+    )
+    herd_factory = HerdFactory(
+        init_herd=init_herd,
+        save_animals=save_animals,
+        save_animals_path=save_animals_dir)
+    herd_factory.initialize_herd()
+    output_manager.add_log(
+        "Herd initialization complete",
+        f"Herd data initialized.\n",
+        info_map
+    )
+
+    if terminate_simulation_post_herd_generation:
+        output_manager.add_log("Herd generation only",
+                               f"***Only generating herd data, no simulation will follow.***",
+                               info_map)
+
+
 def execute_simulations(
         metadata_files: List[MetadataPaths],
         exclude_info_maps: bool = False,
@@ -342,30 +385,15 @@ def execute_simulations(
             output_manager.add_log(
                 "Validation complete", "Data is valid. \nSimulating...\n", info_map
             )
-            output_manager.add_log(
-                "Herd initialization start",
-                f"Initializing herd data for {str(metadata_file['path'])}...\n",
-                info_map
-            )
-            herd_factory = HerdFactory(
-                init_herd=init_herd,
-                save_animals=save_animals,
-                save_animals_path=save_animals_dir)
-            herd_factory.initialize_herd()
+            simulation_config = Config(input_manager.get_data("config"))
+            initialize_herd(simulation_config=simulation_config,
+                            init_herd=init_herd,
+                            save_animals=save_animals,
+                            save_animals_dir=save_animals_dir,
+                            terminate_simulation_post_herd_generation=terminate_simulation_post_herd_generation)
 
-            output_manager.add_log(
-                "Herd initialization complete",
-                f"Herd data for {str(metadata_file['path'])} initialized.\n",
-                info_map
-            )
-
-            if terminate_simulation_post_herd_generation:
-                output_manager.add_log("Herd generation only",
-                                       f"***Only generating herd data, no simulation will follow.***",
-                                       info_map)
-
-            else:
-                simulator = SimulationEngine()
+            if not terminate_simulation_post_herd_generation:
+                simulator = SimulationEngine(config=simulation_config)
                 simulator.simulate()
         else:
             output_manager.add_error(
