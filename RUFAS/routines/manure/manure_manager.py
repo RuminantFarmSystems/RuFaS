@@ -1,11 +1,3 @@
-"""
-RUFAS: Ruminant Farm Systems Model
-File name: manure_manager.py
-
-Author(s):  William Donovan, wmdonovan@wisc.edu
-            Yunus Mohammed, ymm26@cornell.edu
-            Sadman Chowdhury, skc86@cornell.edu
-"""
 from __future__ import annotations
 
 import typing
@@ -264,7 +256,8 @@ class ManureManager:
         """
         Look up the density of manure produced by a given pen.
         This method determines the manure density based on the type of manure treatment system of a given pen.
-        Each manure type (SLURRY, LIQUID, SOLID) has a predefined density, which is specified in the class :class:`ManureConstants`.
+        Each manure type (SLURRY, LIQUID, SOLID) has a predefined density, which is specified in the
+        class :class:`ManureConstants`.
 
         Parameters
         ----------
@@ -308,8 +301,8 @@ class ManureManager:
         None
 
         """
-        # TODO: With the introduction of different manure types, we should rename attributes in ManureTreatmentDailyOutput
-        # to make it more generic and not specific to any manure type.
+        # TODO: With the introduction of different manure types, we should rename attributes in
+        # ManureTreatmentDailyOutput to make it more generic and not specific to any manure type.
         self._manure_nutrient_manager.add_nutrients(
             ManureNutrients(
                 nitrogen=manure_treatment_daily_output.liquid_manure_nitrogen,
@@ -331,9 +324,9 @@ class ManureManager:
         and checks against the nutrients available in the manager.
 
         If the request can be fulfilled either partially or wholly, the corresponding amount of nutrients
-        is subtracted from the manager's internal bookkeeping. The method then returns the results of the nutrient request,
-        which detail the amounts of nutrients that can be provided to fulfill the request. If the request
-        cannot be fulfilled at all, the method will return None.
+        is subtracted from the manager's internal bookkeeping. The method then returns the results of the
+        nutrient request, which detail the amounts of nutrients that can be provided to fulfill the request.
+        If the request cannot be fulfilled at all, the method will return None.
 
         Notes
         -----
@@ -347,8 +340,8 @@ class ManureManager:
         -------
         NutrientRequestResults | None
             The results of the nutrient request, detailed in a `NutrientRequestResults` object, which includes
-            the amount of nitrogen, phosphorus, total manure mass, dry matter, and others that can be provided to fulfill the request.
-            Returns None if the request cannot be fulfilled.
+            the amount of nitrogen, phosphorus, total manure mass, dry matter, and others that can be provided
+            to fulfill the request. Returns None if the request cannot be fulfilled.
 
         """
         return self._manure_nutrient_manager.request_nutrients(request)
@@ -600,7 +593,8 @@ class ManureManager:
 
         Returns
         -------
-        Tuple[ManureTreatmentDailyOutput, Optional[ManureSeparatorDailyOutput], ManureTreatmentDailyOutput, ManureTreatmentDailyOutput]
+        Tuple[ManureTreatmentDailyOutput, Optional[ManureSeparatorDailyOutput],
+        ManureTreatmentDailyOutput, ManureTreatmentDailyOutput]
             The daily output of the anaerobic digestion,
             the daily output of the manure separator,
             the daily output of the anaerobic lagoon, and
