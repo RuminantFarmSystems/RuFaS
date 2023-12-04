@@ -110,6 +110,12 @@ class OutputGatherer:
             om.add_variable("grazing_inorganic_phosphorus_runoff", field.soil.data.grazing_inorganic_phosphorus_runoff,
                             info_map)
             om.add_variable("soil_phosphorus_runoff", field.soil.data.soil_phosphorus_runoff, info_map)
+            om.add_variable("nitrate_runoff", field.soil.data.nitrate_runoff, info_map)
+            om.add_variable("ammonium_runoff", field.soil.data.ammonium_runoff, info_map)
+            om.add_variable("eroded_fresh_organic_nitrogen", field.soil.data.eroded_fresh_organic_nitrogen, info_map)
+            om.add_variable("eroded_stable_organic_nitrogen", field.soil.data.eroded_stable_organic_nitrogen, info_map)
+            om.add_variable("eroded_active_organic_nitrogen", field.soil.data.eroded_active_organic_nitrogen, info_map)
+
             om.add_variable("profile_carbon_emissions", field.soil.data.profile_carbon_emissions, info_map)
             # Adding vadose zone layer data
             info_map["prefix"] = "field='" + field.field_data.name + "',vadose_zone_layer"
