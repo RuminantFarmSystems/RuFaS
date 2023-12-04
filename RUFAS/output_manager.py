@@ -770,13 +770,13 @@ class OutputManager(object):
         exclude_info_maps : bool
             Flag for whether or not the user wants to include info_maps data in their results files.
 
-        produce_graphics: bool, optional
+        produce_graphics: bool
             Flag for whether or not the user wants to produce graphs at after the simulation.
 
-        graphics_dir : Path, optional
+        graphics_dir : Path
             The directory for saving graphics.
 
-        csv_dir : Path, optional
+        csv_dir : Path
             The directory for saving csvs.
         """
         info_map = {
@@ -1106,9 +1106,9 @@ class OutputManager(object):
 
         Parameters
         ----------
-        vars_file_path : Path, optional, default=None
+        vars_file_path : Path
             Path to file used to load Output Manager vars pool.
-        output_dir : Path, optional, default=Path("output/")
+        output_dir : Path
             The directory for saving output.
         """
         info_map = {
@@ -1129,9 +1129,9 @@ class OutputManager(object):
 
         Parameters
         ----------
-        dir_path : Path, optional, default=Path("output/")
+        dir_path : Path
             Path to the directory to be checked.
-        file_path : Path, optional, default=None
+        file_path : Path
             Path to file to be checked.
         """
         if file_path is None:
