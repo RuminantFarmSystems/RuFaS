@@ -1,9 +1,7 @@
 import json
-import pprint
 from pathlib import Path
 from typing import Any, Callable
 import re
-import os
 
 from RUFAS.util import Utility
 
@@ -11,8 +9,6 @@ DEFAULT_PROPERTIES_PATH = 'inputs/metadata/default_metadata.json'
 
 
 class SchemaSetupMethods:
-    def __init__(self):
-        pass
 
     @staticmethod
     def setup_number_schema(title: str, input_properties: dict[str, Any]) -> dict[str, Any]:
@@ -35,8 +31,6 @@ class SchemaSetupMethods:
             schema["minimum"] = minimum
         if maximum is not None:
             schema["maximum"] = maximum
-        # if minimum is not None and maximum is not None:
-        #     schema["format"] = "range"
         if default is not None:
             schema["default"] = default
         if description:
@@ -86,7 +80,7 @@ class SchemaSetupMethods:
         if default is not None:
             schema["default"] = default
         if pattern is not None:
-            enum = self._get_list_of_options(pattern)
+            enum = SchemaSetupMethods._get_list_of_options(pattern)
             schema["enum"] = enum
             schema["format"] = "select2"
         if description is not None:
@@ -190,7 +184,6 @@ def main() -> None:
 
         with open(new_schema_file_path, "w") as outfile:
             json.dump(new_schema, outfile, indent=2)
-    # pprint.pprint(json.dumps(properties, indent=2))
 
 
 if __name__ == "__main__":
