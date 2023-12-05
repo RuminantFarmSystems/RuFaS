@@ -23,9 +23,9 @@ from RUFAS.weather import Weather
 class OpenLots(BaseManureTreatment):
     """Class for the open lots manure treatment system.
 
-    Attributes:
-        All attributes inherited from BaseManureTreatment.
-
+    Attributes
+    ----------
+    All attributes inherited from BaseManureTreatment.
     """
 
     def __init__(self, weather: Weather, time: Time,
@@ -70,14 +70,19 @@ class OpenLots(BaseManureTreatment):
             The mass of manure volatile solids (kg).
         days_since_last_tillage : float
             The number of days since the manure-bedding mixture was last tilled.
+            The default value can be found in ManureConstants.DEFAULT_DAYS_SINCE_LAST_TILLAGE.
         lag : int
-            The lag time
+            The lag time used in the calculation of the carbon decomposition rate (days).
+            The default value can be found in ManureConstants.DEFAULT_LAG_TIME.
         moisture_effect : float
             The effect of moisture on microbial decomposition (unitless).
+            The default value can be found in ManureConstants.DEFAULT_MOISTURE_EFFECT_MICROBIAL_DECOMP.
         carbon_fraction_available_in_manure : float
             The proportion of carbon available in manure (unitless).
+            The default value can be found in ManureConstants.DEFAULT_CARBON_FRACTION_AVAILABLE_IN_MANURE.
         carbon_fraction_available_in_bedding : float
             The proportion of carbon available in the bedding material (unitless).
+            The default value can be found in GasEmissionConstants.DEFAULT_CARBON_FRACTION_AVAILABLE_IN_BEDDING.
 
         Returns
         -------
