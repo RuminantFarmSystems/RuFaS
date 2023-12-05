@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import math
+
 from RUFAS.routines.manure.constants_and_units.gas_emission_constants import GasEmissionConstants
 from RUFAS.routines.manure.constants_and_units.manure_constants import ManureConstants
 from RUFAS.routines.manure.gas_emissions.calculator import (
@@ -14,6 +16,8 @@ from RUFAS.routines.manure.manure_treatments.manure_treatment_configs import (
 from RUFAS.routines.manure.manure_treatments.manure_treatment_daily_output import (
     ManureTreatmentDailyOutput,
 )
+from RUFAS.time import Time
+from RUFAS.weather import Weather
 
 
 class CompostBeddedPackBarn(BaseManureTreatment):
@@ -24,55 +28,22 @@ class CompostBeddedPackBarn(BaseManureTreatment):
 
     """
 
-    def __init__(
-            self, weather, time, manure_treatment_config: ManureTreatmentConfig
-    ) -> None:
-        """Initializes the compost bedded pack barn manure treatment.
-
-        Args:
-            weather: A Weather object.
-            time: A Time object.
-            manure_treatment_config: A ManureTreatmentConfig object containing
-                the configuration data for the manure treatment system.
+    def __init__(self, weather: Weather, time: Time,
+                 manure_treatment_config: ManureTreatmentConfig) -> None:
         """
-
-        super().__init__(weather, time, manure_treatment_config)
-
-    def _calc_bedding_potassium_content(
-            self,
-            current_manure_bedding_mix_potassium: float,
-            additional_potassium_in_manure: float,
-            additional_potassium_in_bedding: float = 0,
-            potassium_loss: float = 0
-    ) -> float:
-        """Calculates the potassium content of the manure-bedding mixture.
+        Initialize the compost bedded pack barn.
 
         Parameters
         ----------
-        current_manure_bedding_mix_potassium : float
-          The current potassium content of the manure-bedding mixture.
-
-        additional_potassium_in_manure : float
-          The amount of potassium in the current day's manure production amount.
-
-        additional_potassium_in_bedding : float
-          The amount of potassium in the current day's additional bedding amount.
-
-        potassium_loss : float
-          Loss of potassium within the compost bedded pack barn.
-
-        Returns
-        -------
-        float
-            The total potassium within the compost bedded pack barn's manure-bedding mixture (in kg).
-
+        weather : Weather
+            The weather object used for getting the current day's average temperature.
+        time : Time
+            The time object used for checking the last simulation day.
+        manure_treatment_config : ManureTreatmentConfig
+            The configuration data object for the compost bedded pack barn.
         """
-        return (
-                current_manure_bedding_mix_potassium
-                + additional_potassium_in_manure
-                + additional_potassium_in_bedding
-                - potassium_loss
-        )
+
+        super().__init__(weather, time, manure_treatment_config)
 
     def _calc_dry_matter_changes(
             self,
@@ -87,7 +58,7 @@ class CompostBeddedPackBarn(BaseManureTreatment):
                     GasEmissionConstants.DEFAULT_CARBON_FRACTION_AVAILABLE_IN_BEDDING)
     ) -> tuple[float, float, float]:
         """
-        Calculate  the changes in dry-matter for the manure-bedding mixture.
+        Calculate the changes in dry-matter for the manure-bedding mixture.
 
         Parameters
         ----------
@@ -147,8 +118,8 @@ class CompostBeddedPackBarn(BaseManureTreatment):
         ManureTreatmentDailyOutput
             A ManureTreatmentDailyOutput object containing the daily output of the
             compost bedded pack barn manure treatment system.
-
         """
+
         daily_input = self._current_manure_treatment_daily_input
         total_nitrogen_loss = (
             GasEmissionsCalculator.total_nitrogen_loss_from_compost_bedded_pack_barn(
@@ -159,22 +130,72 @@ class CompostBeddedPackBarn(BaseManureTreatment):
         manure_nitrogen = daily_input.liquid_manure_nitrogen - total_nitrogen_loss
         manure_organic_nitrogen = ManureConstants.COMPOST_BEDDING_ORGANIC_NITROGEN_FRACTION * manure_nitrogen
         manure_inorganic_nitrogen = manure_nitrogen - manure_organic_nitrogen
-        # manure_inorganic_nitrogen_ammonium
-        ManureConstants.COMPOST_BEDDING_INORGANIC_NITROGEN_AMMONIUM_FRACTION * manure_inorganic_nitrogen
+        manure_inorganic_nitrogen_ammonium = (
+                ManureConstants.COMPOST_BEDDING_INORGANIC_NITROGEN_AMMONIUM_FRACTION * manure_inorganic_nitrogen
+        )
 
         remaining_volatile_solids, remaining_total_solids, dry_matter_loss = self._calc_dry_matter_changes(
             manure_total_solids=daily_input.liquid_manure_total_solids,
             bedding_total_solids=self._manure_handler_daily_output.total_bedding_mass,
             manure_volatile_solids=daily_input.liquid_manure_total_volatile_solids,
         )
-        initial_total_solids_fraction = (daily_input.liquid_manure_total_solids
-                                         / (daily_input.liquid_manure_daily_volume
-                                            * ManureConstants.SOLID_MANURE_DENSITY))
-        # solid_manure_mass
-        remaining_total_solids / initial_total_solids_fraction
+        initial_manure_mass = (daily_input.liquid_manure_daily_volume *
+                               ManureConstants.SOLID_MANURE_DENSITY)
+        if math.isclose(initial_manure_mass, 0):
+            solid_manure_mass = 0
+        else:
+            initial_total_solids_fraction = daily_input.liquid_manure_total_solids / initial_manure_mass
+            if math.isclose(initial_total_solids_fraction, 0):
+                solid_manure_mass = 0
+            else:
+                solid_manure_mass = remaining_total_solids / initial_total_solids_fraction
+
+        manure_potassium = (daily_input.liquid_manure_potassium *
+                            (1 - self.config.potassium_removal_efficiency_for_treatment))
+        manure_phosphorus = (daily_input.liquid_manure_phosphorus *
+                             (1 - self.config.phosphorus_removal_efficiency_for_treatment))
+        water_extractable_inorganic_phosphorus = (self._current_pen.manure.inorganic_phosphorus_fraction *
+                                                  manure_phosphorus)
+        water_extractable_organic_phosphorus = (self._current_pen.manure.organic_phosphorus_fraction *
+                                                manure_phosphorus)
+        non_water_extractable_inorganic_phosphorus = (self._current_pen.manure.non_water_inorganic_phosphorus_fraction *
+                                                      manure_phosphorus)
+        non_water_extractable_organic_phosphorus = (self._current_pen.manure.non_water_organic_phosphorus_fraction *
+                                                    manure_phosphorus)
+
+        storage_methane = GasEmissionsCalculator.ifsm_methane_emission(
+            manure_volatile_solids=daily_input.liquid_manure_total_volatile_solids,
+            ambient_barn_temp=self._get_current_day_average_temperature_celsius(),
+        )
+        storage_ammonia = GasEmissionsCalculator.nitrogen_loss_in_compost_bedded_pack_barn_from_ammonia_emission(
+            daily_nitrogen_input=daily_input.liquid_manure_nitrogen,
+            is_bedding_tilled=True,
+        )
+        storage_nitrous_oxide = (
+            GasEmissionsCalculator.nitrogen_loss_in_compost_bedded_pack_barn_from_nitrous_oxide_emission(
+                daily_nitrogen_input=daily_input.liquid_manure_nitrogen,
+                is_bedding_tilled=True,
+            ))
+
         daily_output = ManureTreatmentDailyOutput(
             simulation_day=daily_input.simulation_day,
             pen_id=daily_input.pen_id,
+            solid_manure_total_solids=remaining_total_solids,
+            solid_manure_total_volatile_solids=remaining_volatile_solids,
+            solid_manure_nitrogen=manure_nitrogen,
+            solid_manure_inorganic_nitrogen=manure_inorganic_nitrogen,
+            solid_manure_organic_nitrogen=manure_organic_nitrogen,
+            solid_manure_inorganic_nitrogen_ammonium=manure_inorganic_nitrogen_ammonium,
+            solid_manure_phosphorus=manure_phosphorus,
+            solid_manure_potassium=manure_potassium,
+            solid_manure_water_extractable_inorganic_phosphorus=water_extractable_inorganic_phosphorus,
+            solid_manure_water_extractable_organic_phosphorus=water_extractable_organic_phosphorus,
+            solid_manure_non_water_extractable_inorganic_phosphorus=non_water_extractable_inorganic_phosphorus,
+            solid_manure_non_water_extractable_organic_phosphorus=non_water_extractable_organic_phosphorus,
+            storage_methane=storage_methane,
+            storage_ammonia=storage_ammonia,
+            storage_nitrous_oxide=storage_nitrous_oxide,
+            solid_manure_daily_mass=solid_manure_mass,
         )
         self._accumulate_daily_output(daily_output)
         return daily_output
