@@ -117,10 +117,10 @@
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">RUFAS.routines.manure.manure_handlers.manure_handler_classes.</span></span><span class="sig-name descname"><span class="pre">AlleyScraper</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">weather</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.html#RUFAS.weather.Weather" title="RUFAS.weather.Weather"><span class="pre">Weather</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.html#RUFAS.time.Time" title="RUFAS.time.Time"><span class="pre">Time</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">manure_handler_config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#RUFAS.routines.manure.manure_handlers.manure_handler_classes.ManureHandlerConfig" title="RUFAS.routines.manure.manure_handlers.manure_handler_classes.ManureHandlerConfig"><span class="pre">ManureHandlerConfig</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.manure.manure_handlers.manure_handler_classes.AlleyScraper" title="Link to this definition"></a></dt>
 <dd><p>Bases: <a class="reference internal" href="#RUFAS.routines.manure.manure_handlers.manure_handler_classes.BaseManureHandler" title="RUFAS.routines.manure.manure_handlers.manure_handler_classes.BaseManureHandler"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseManureHandler</span></code></a></p>
 <p>A class that handles calculations related to an alley scraper.</p>
-<dl class="simple">
-<dt>Attributes:</dt><dd><p>All inherited from BaseManureHandler.</p>
-</dd>
-</dl>
+<section id="attributes">
+<h3>Attributes<a class="headerlink" href="#attributes" title="Link to this heading"></a></h3>
+<p>All inherited from BaseManureHandler.</p>
+</section>
 </dd></dl>
 
 <dl class="py class">
@@ -197,6 +197,11 @@ See details in the class definition (<code class="xref py py-class docutils lite
 <dd></dd></dl>
 
 <dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_handlers.manure_handler_classes.DefaultManureHandlerConfigFactory.HARROWING_CONFIG">
+<span class="sig-name descname"><span class="pre">HARROWING_CONFIG</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">ManureHandlerConfig(cleaning_water_use_rate=0.0,</span> <span class="pre">minutes_per_cleaning=8,</span> <span class="pre">cleanings_per_day=2,</span> <span class="pre">daily_tillage_frequency=0)</span></em><a class="headerlink" href="#RUFAS.routines.manure.manure_handlers.manure_handler_classes.DefaultManureHandlerConfigFactory.HARROWING_CONFIG" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
 <dt class="sig sig-object py" id="RUFAS.routines.manure.manure_handlers.manure_handler_classes.DefaultManureHandlerConfigFactory.MANUAL_SCRAPING_CONFIG">
 <span class="sig-name descname"><span class="pre">MANUAL_SCRAPING_CONFIG</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">ManureHandlerConfig(cleaning_water_use_rate=10.0,</span> <span class="pre">minutes_per_cleaning=8,</span> <span class="pre">cleanings_per_day=2,</span> <span class="pre">daily_tillage_frequency=0)</span></em><a class="headerlink" href="#RUFAS.routines.manure.manure_handlers.manure_handler_classes.DefaultManureHandlerConfigFactory.MANUAL_SCRAPING_CONFIG" title="Link to this definition"></a></dt>
 <dd></dd></dl>
@@ -225,10 +230,21 @@ See details in the class definition (<code class="xref py py-class docutils lite
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">RUFAS.routines.manure.manure_handlers.manure_handler_classes.</span></span><span class="sig-name descname"><span class="pre">FlushSystem</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">weather</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.html#RUFAS.weather.Weather" title="RUFAS.weather.Weather"><span class="pre">Weather</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.html#RUFAS.time.Time" title="RUFAS.time.Time"><span class="pre">Time</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">manure_handler_config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#RUFAS.routines.manure.manure_handlers.manure_handler_classes.ManureHandlerConfig" title="RUFAS.routines.manure.manure_handlers.manure_handler_classes.ManureHandlerConfig"><span class="pre">ManureHandlerConfig</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.manure.manure_handlers.manure_handler_classes.FlushSystem" title="Link to this definition"></a></dt>
 <dd><p>Bases: <a class="reference internal" href="#RUFAS.routines.manure.manure_handlers.manure_handler_classes.BaseManureHandler" title="RUFAS.routines.manure.manure_handlers.manure_handler_classes.BaseManureHandler"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseManureHandler</span></code></a></p>
 <p>A class that handles calculations related to a flush system.</p>
-<dl class="simple">
-<dt>Attributes:</dt><dd><p>All inherited from BaseManureHandler.</p>
-</dd>
-</dl>
+<section id="id1">
+<h3>Attributes<a class="headerlink" href="#id1" title="Link to this heading"></a></h3>
+<p>All inherited from BaseManureHandler.</p>
+</section>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_handlers.manure_handler_classes.Harrowing">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">RUFAS.routines.manure.manure_handlers.manure_handler_classes.</span></span><span class="sig-name descname"><span class="pre">Harrowing</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">weather</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.html#RUFAS.weather.Weather" title="RUFAS.weather.Weather"><span class="pre">Weather</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.html#RUFAS.time.Time" title="RUFAS.time.Time"><span class="pre">Time</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">manure_handler_config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#RUFAS.routines.manure.manure_handlers.manure_handler_classes.ManureHandlerConfig" title="RUFAS.routines.manure.manure_handlers.manure_handler_classes.ManureHandlerConfig"><span class="pre">ManureHandlerConfig</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.manure.manure_handlers.manure_handler_classes.Harrowing" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#RUFAS.routines.manure.manure_handlers.manure_handler_classes.BaseManureHandler" title="RUFAS.routines.manure.manure_handlers.manure_handler_classes.BaseManureHandler"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseManureHandler</span></code></a></p>
+<p>A class that handles calculations related to harrowing.</p>
+<section id="id2">
+<h3>Attributes<a class="headerlink" href="#id2" title="Link to this heading"></a></h3>
+<p>All inherited from BaseManureHandler.</p>
+</section>
 </dd></dl>
 
 <dl class="py class">
@@ -236,10 +252,10 @@ See details in the class definition (<code class="xref py py-class docutils lite
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">RUFAS.routines.manure.manure_handlers.manure_handler_classes.</span></span><span class="sig-name descname"><span class="pre">ManualScraping</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">weather</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.html#RUFAS.weather.Weather" title="RUFAS.weather.Weather"><span class="pre">Weather</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.html#RUFAS.time.Time" title="RUFAS.time.Time"><span class="pre">Time</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">manure_handler_config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#RUFAS.routines.manure.manure_handlers.manure_handler_classes.ManureHandlerConfig" title="RUFAS.routines.manure.manure_handlers.manure_handler_classes.ManureHandlerConfig"><span class="pre">ManureHandlerConfig</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.manure.manure_handlers.manure_handler_classes.ManualScraping" title="Link to this definition"></a></dt>
 <dd><p>Bases: <a class="reference internal" href="#RUFAS.routines.manure.manure_handlers.manure_handler_classes.BaseManureHandler" title="RUFAS.routines.manure.manure_handlers.manure_handler_classes.BaseManureHandler"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseManureHandler</span></code></a></p>
 <p>A class that handles calculations related to manual scraping.</p>
-<dl class="simple">
-<dt>Attributes:</dt><dd><p>All inherited from BaseManureHandler.</p>
-</dd>
-</dl>
+<section id="id3">
+<h3>Attributes<a class="headerlink" href="#id3" title="Link to this heading"></a></h3>
+<p>All inherited from BaseManureHandler.</p>
+</section>
 </dd></dl>
 
 <dl class="py class">
@@ -247,11 +263,16 @@ See details in the class definition (<code class="xref py py-class docutils lite
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">RUFAS.routines.manure.manure_handlers.manure_handler_classes.</span></span><span class="sig-name descname"><span class="pre">ManureHandlerConfig</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cleaning_water_use_rate</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">minutes_per_cleaning</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">8</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cleanings_per_day</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">daily_tillage_frequency</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.manure.manure_handlers.manure_handler_classes.ManureHandlerConfig" title="Link to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>Class for storing the configuration of a manure handler.</p>
+<section id="id4">
+<h3>Attributes<a class="headerlink" href="#id4" title="Link to this heading"></a></h3>
 <dl class="simple">
-<dt>Attributes:</dt><dd><p>cleaning_water_use_rate: Amount of cleaning water used per animal per day, L.
-minutes_per_cleaning: Number of minutes needed per animal per cleaning, minutes.
-cleanings_per_day: Number of cleanings per day.
-daily_tillage_frequency: Number of times per day that compost bedding is tilled.</p>
+<dt>cleaning_water_use_rate<span class="classifier">float</span></dt><dd><p>Amount of cleaning water used per animal per day, L.</p>
+</dd>
+<dt>minutes_per_cleaning<span class="classifier">int</span></dt><dd><p>Number of minutes needed per animal per cleaning, minutes.</p>
+</dd>
+<dt>cleanings_per_day<span class="classifier">int</span></dt><dd><p>Number of cleanings per day.</p>
+</dd>
+<dt>daily_tillage_frequency<span class="classifier">int</span></dt><dd><p>Number of times per day that compost bedding is tilled.</p>
 </dd>
 </dl>
 <dl class="py attribute">
@@ -274,6 +295,7 @@ daily_tillage_frequency: Number of times per day that compost bedding is tilled.
 <span class="sig-name descname"><span class="pre">minutes_per_cleaning</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">8</span></em><a class="headerlink" href="#RUFAS.routines.manure.manure_handlers.manure_handler_classes.ManureHandlerConfig.minutes_per_cleaning" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
+</section>
 </dd></dl>
 
 <dl class="py class">
@@ -322,6 +344,11 @@ custom_manure_handler_config: A ManureHandlerConfig object that contains</p>
 <dd></dd></dl>
 
 <dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_handlers.manure_handler_classes.ManureHandlerType.HARROWING">
+<span class="sig-name descname"><span class="pre">HARROWING</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'harrowing'</span></em><a class="headerlink" href="#RUFAS.routines.manure.manure_handlers.manure_handler_classes.ManureHandlerType.HARROWING" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
 <dt class="sig sig-object py" id="RUFAS.routines.manure.manure_handlers.manure_handler_classes.ManureHandlerType.MANUAL_SCRAPING">
 <span class="sig-name descname"><span class="pre">MANUAL_SCRAPING</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'manual</span> <span class="pre">scraping'</span></em><a class="headerlink" href="#RUFAS.routines.manure.manure_handlers.manure_handler_classes.ManureHandlerType.MANUAL_SCRAPING" title="Link to this definition"></a></dt>
 <dd></dd></dl>
@@ -338,10 +365,10 @@ custom_manure_handler_config: A ManureHandlerConfig object that contains</p>
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">RUFAS.routines.manure.manure_handlers.manure_handler_classes.</span></span><span class="sig-name descname"><span class="pre">Tillage</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">weather</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.html#RUFAS.weather.Weather" title="RUFAS.weather.Weather"><span class="pre">Weather</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.html#RUFAS.time.Time" title="RUFAS.time.Time"><span class="pre">Time</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">manure_handler_config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#RUFAS.routines.manure.manure_handlers.manure_handler_classes.ManureHandlerConfig" title="RUFAS.routines.manure.manure_handlers.manure_handler_classes.ManureHandlerConfig"><span class="pre">ManureHandlerConfig</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.manure.manure_handlers.manure_handler_classes.Tillage" title="Link to this definition"></a></dt>
 <dd><p>Bases: <a class="reference internal" href="#RUFAS.routines.manure.manure_handlers.manure_handler_classes.BaseManureHandler" title="RUFAS.routines.manure.manure_handlers.manure_handler_classes.BaseManureHandler"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseManureHandler</span></code></a></p>
 <p>A class that handles calculations related to tillage.</p>
-<dl class="simple">
-<dt>Attributes:</dt><dd><p>All inherited from BaseManureHandler.</p>
-</dd>
-</dl>
+<section id="id5">
+<h3>Attributes<a class="headerlink" href="#id5" title="Link to this heading"></a></h3>
+<p>All inherited from BaseManureHandler.</p>
+</section>
 </dd></dl>
 
 </section>

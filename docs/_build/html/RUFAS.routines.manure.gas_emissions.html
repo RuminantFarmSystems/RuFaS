@@ -501,11 +501,123 @@ hydraulic_retention_time: hydraulic retention time, days.</p>
 </dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.gas_emissions.calculator.GasEmissionsCalculator.nitrogen_loss_in_compost_bedded_pack_barn_from_ammonia_emission">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">nitrogen_loss_in_compost_bedded_pack_barn_from_ammonia_emission</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">daily_nitrogen_input</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">is_bedding_tilled</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.routines.manure.gas_emissions.calculator.GasEmissionsCalculator.nitrogen_loss_in_compost_bedded_pack_barn_from_ammonia_emission" title="Link to this definition"></a></dt>
+<dd><p>Calculate the nitrogen loss from ammonia emission in the compost bedded pack barn.</p>
+<section id="id18">
+<h3>Parameters<a class="headerlink" href="#id18" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>daily_nitrogen_input<span class="classifier">float</span></dt><dd><p>The mass of nitrogen present in the manure excreted by animals (kg).</p>
+</dd>
+<dt>is_bedding_tilled<span class="classifier">bool</span></dt><dd><p>Indicator for if the bedding is tilled for the current simulation day.</p>
+</dd>
+</dl>
+</section>
+<section id="id19">
+<h3>Returns<a class="headerlink" href="#id19" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>float</dt><dd><p>The nitrogen lost to ammonia emission in the compost bedded pack barn (kg).</p>
+</dd>
+</dl>
+</section>
+<section id="id20">
+<h3>Raises<a class="headerlink" href="#id20" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>ValueError</dt><dd><p>If the daily nitrogen input is negative.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.gas_emissions.calculator.GasEmissionsCalculator.nitrogen_loss_in_compost_bedded_pack_barn_from_nitrous_oxide_emission">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">nitrogen_loss_in_compost_bedded_pack_barn_from_nitrous_oxide_emission</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">daily_nitrogen_input</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">is_bedding_tilled</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.routines.manure.gas_emissions.calculator.GasEmissionsCalculator.nitrogen_loss_in_compost_bedded_pack_barn_from_nitrous_oxide_emission" title="Link to this definition"></a></dt>
+<dd><p>Calculate the nitrogen loss from nitrous oxide emission in a compost bedded pack barn.</p>
+<section id="id21">
+<h3>Parameters<a class="headerlink" href="#id21" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>daily_nitrogen_input<span class="classifier">float</span></dt><dd><p>The mass of nitrogen present in the manure excreted by animals (kg).</p>
+</dd>
+<dt>is_bedding_tilled<span class="classifier">bool</span></dt><dd><p>Indicator for if the bedding is tilled for the current simulation day.</p>
+</dd>
+</dl>
+</section>
+<section id="id22">
+<h3>Returns<a class="headerlink" href="#id22" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>float</dt><dd><p>The nitrogen lost to nitrous oxide emissions in the compost bedded pack barn (kg).</p>
+</dd>
+</dl>
+</section>
+<section id="id23">
+<h3>Raises<a class="headerlink" href="#id23" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>ValueError</dt><dd><p>If the daily nitrogen input is negative.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.gas_emissions.calculator.GasEmissionsCalculator.nitrogen_loss_in_open_lots_from_ammonia_emission">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">nitrogen_loss_in_open_lots_from_ammonia_emission</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">daily_nitrogen_input</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.routines.manure.gas_emissions.calculator.GasEmissionsCalculator.nitrogen_loss_in_open_lots_from_ammonia_emission" title="Link to this definition"></a></dt>
+<dd><p>Calculate the nitrogen loss from ammonia emission in the open lots manure treatment.</p>
+<section id="id24">
+<h3>Parameters<a class="headerlink" href="#id24" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>daily_nitrogen_input<span class="classifier">float</span></dt><dd><p>The amount of nitrogen present in the manure excreted by animals (kg).</p>
+</dd>
+</dl>
+</section>
+<section id="id25">
+<h3>Returns<a class="headerlink" href="#id25" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>float</dt><dd><p>The amount of nitrogen lost to ammonia emission (kg).</p>
+</dd>
+</dl>
+</section>
+<section id="id26">
+<h3>Raises<a class="headerlink" href="#id26" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>ValueError</dt><dd><p>If the daily nitrogen input is negative.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.gas_emissions.calculator.GasEmissionsCalculator.nitrogen_loss_in_open_lots_from_nitrous_oxide_emission">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">nitrogen_loss_in_open_lots_from_nitrous_oxide_emission</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">daily_nitrogen_input</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.routines.manure.gas_emissions.calculator.GasEmissionsCalculator.nitrogen_loss_in_open_lots_from_nitrous_oxide_emission" title="Link to this definition"></a></dt>
+<dd><p>Calculate the nitrogen loss from nitrous oxide emission in the open lots manure treatment.</p>
+<section id="id27">
+<h3>Parameters<a class="headerlink" href="#id27" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>daily_nitrogen_input<span class="classifier">float</span></dt><dd><p>The amount of nitrogen present in the manure excreted by animals (kg).</p>
+</dd>
+</dl>
+</section>
+<section id="id28">
+<h3>Returns<a class="headerlink" href="#id28" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>float</dt><dd><p>The nitrogen lost to nitrous oxide emission (kg).</p>
+</dd>
+</dl>
+</section>
+<section id="id29">
+<h3>Raises<a class="headerlink" href="#id29" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>ValueError</dt><dd><p>If the daily nitrogen input is negative.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="RUFAS.routines.manure.gas_emissions.calculator.GasEmissionsCalculator.storage_ammonia_emission">
 <em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">storage_ammonia_emission</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_animals</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">manure_total_ammoniacal_nitrogen</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">manure_volume</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">manure_density</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">total_solids</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">temp</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">storage_area_per_animal</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pH</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">7.5</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.routines.manure.gas_emissions.calculator.GasEmissionsCalculator.storage_ammonia_emission" title="Link to this definition"></a></dt>
 <dd><p>Calculate storage ammonia emissions for manure treatments.</p>
-<section id="id18">
-<h3>Notes<a class="headerlink" href="#id18" title="Link to this heading"></a></h3>
+<section id="id30">
+<h3>Notes<a class="headerlink" href="#id30" title="Link to this heading"></a></h3>
 <p>The equation used to calculate storage ammonia emission is:</p>
 <div class="math notranslate nohighlight">
 \[E_{NH_3} = total\_storage\_area \cdot \frac{TAN \cdot c \cdot \gamma}{r \cdot M \cdot Q}\]</div>
@@ -558,8 +670,8 @@ calculated as <span class="math notranslate nohighlight">\((total\_manure\_mass 
 <p><span class="math notranslate nohighlight">\(pH\)</span> is the manure solution acidity (unitless).</p>
 </div></blockquote>
 </section>
-<section id="id19">
-<h3>Parameters<a class="headerlink" href="#id19" title="Link to this heading"></a></h3>
+<section id="id31">
+<h3>Parameters<a class="headerlink" href="#id31" title="Link to this heading"></a></h3>
 <dl class="simple">
 <dt>num_animals<span class="classifier">int</span></dt><dd><p>Number of animals in the storage area (unitless).</p>
 </dd>
@@ -582,15 +694,15 @@ Default is set to a value listed as <code class="xref py py-attr docutils litera
 </dd>
 </dl>
 </section>
-<section id="id20">
-<h3>Returns<a class="headerlink" href="#id20" title="Link to this heading"></a></h3>
+<section id="id32">
+<h3>Returns<a class="headerlink" href="#id32" title="Link to this heading"></a></h3>
 <dl class="simple">
 <dt>float</dt><dd><p>Storage ammonia emission (kg <span class="math notranslate nohighlight">\(NH_3\)</span>/day).</p>
 </dd>
 </dl>
 </section>
-<section id="id21">
-<h3>Raises<a class="headerlink" href="#id21" title="Link to this heading"></a></h3>
+<section id="id33">
+<h3>Raises<a class="headerlink" href="#id33" title="Link to this heading"></a></h3>
 <dl class="simple">
 <dt>ValueError</dt><dd><p>If the number of animals, storage area, manure total ammoniacal nitrogen, manure volume, manure density or
 total solids in manure are less than 0.</p>
@@ -604,8 +716,8 @@ total solids in manure are less than 0.</p>
 <em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">total_carbon_decomposition</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">manure_total_solids</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bedding_total_mass</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">days_since_last_tillage</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lag</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">moisture_effect</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.65</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">carbon_available_in_manure</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">carbon_available_in_bedding</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.35</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.routines.manure.gas_emissions.calculator.GasEmissionsCalculator.total_carbon_decomposition" title="Link to this definition"></a></dt>
 <dd><p>Calculates the carbon decomposition from the composting process of the manure-bed mixture
 due to microbial activity (decomposition, consumption, respiration).</p>
-<section id="id22">
-<h3>Parameters<a class="headerlink" href="#id22" title="Link to this heading"></a></h3>
+<section id="id34">
+<h3>Parameters<a class="headerlink" href="#id34" title="Link to this heading"></a></h3>
 <dl class="simple">
 <dt>manure_total_solids<span class="classifier">float</span></dt><dd><p>The total solids from the manure (in kg)</p>
 </dd>
@@ -623,8 +735,8 @@ due to microbial activity (decomposition, consumption, respiration).</p>
 </dd>
 </dl>
 </section>
-<section id="id23">
-<h3>Returns<a class="headerlink" href="#id23" title="Link to this heading"></a></h3>
+<section id="id35">
+<h3>Returns<a class="headerlink" href="#id35" title="Link to this heading"></a></h3>
 <dl class="simple">
 <dt>float</dt><dd><p>The total carbon decomposition (in kg).</p>
 </dd>
@@ -636,8 +748,8 @@ due to microbial activity (decomposition, consumption, respiration).</p>
 <dt class="sig sig-object py" id="RUFAS.routines.manure.gas_emissions.calculator.GasEmissionsCalculator.total_nitrogen_loss_from_compost_bedded_pack_barn">
 <em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">total_nitrogen_loss_from_compost_bedded_pack_barn</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">daily_nitrogen_input</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">is_bedding_tilled</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.routines.manure.gas_emissions.calculator.GasEmissionsCalculator.total_nitrogen_loss_from_compost_bedded_pack_barn" title="Link to this definition"></a></dt>
 <dd><p>Calculate the total nitrogen loss from a compost bedded pack barn.</p>
-<section id="id24">
-<h3>Parameters<a class="headerlink" href="#id24" title="Link to this heading"></a></h3>
+<section id="id36">
+<h3>Parameters<a class="headerlink" href="#id36" title="Link to this heading"></a></h3>
 <dl class="simple">
 <dt>daily_nitrogen_input<span class="classifier">float</span></dt><dd><p>The mass of nitrogen present in the manure excreted by animals (kg).</p>
 </dd>
@@ -645,17 +757,37 @@ due to microbial activity (decomposition, consumption, respiration).</p>
 </dd>
 </dl>
 </section>
-<section id="id25">
-<h3>Returns<a class="headerlink" href="#id25" title="Link to this heading"></a></h3>
+<section id="id37">
+<h3>Returns<a class="headerlink" href="#id37" title="Link to this heading"></a></h3>
 <dl class="simple">
 <dt>float</dt><dd><p>The total nitrogen loss from the compost bedded pack barn (kg).</p>
 </dd>
 </dl>
 </section>
-<section id="id26">
-<h3>Raises<a class="headerlink" href="#id26" title="Link to this heading"></a></h3>
+<section id="id38">
+<h3>Raises<a class="headerlink" href="#id38" title="Link to this heading"></a></h3>
 <dl class="simple">
 <dt>ValueError</dt><dd><p>If the daily nitrogen input is negative.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.gas_emissions.calculator.GasEmissionsCalculator.total_nitrogen_loss_from_open_lots">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">total_nitrogen_loss_from_open_lots</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">daily_nitrogen_input</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.routines.manure.gas_emissions.calculator.GasEmissionsCalculator.total_nitrogen_loss_from_open_lots" title="Link to this definition"></a></dt>
+<dd><p>Calculate the total nitrogen loss from the open lots manure treatment.</p>
+<section id="id39">
+<h3>Parameters<a class="headerlink" href="#id39" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>daily_nitrogen_input<span class="classifier">float</span></dt><dd><p>The amount of nitrogen present in the manure excreted by animals (kg).</p>
+</dd>
+</dl>
+</section>
+<section id="id40">
+<h3>Returns<a class="headerlink" href="#id40" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>float</dt><dd><p>The total nitrogen loss from the open lots manure treatment (kg).</p>
 </dd>
 </dl>
 </section>
