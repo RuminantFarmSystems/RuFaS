@@ -1,7 +1,7 @@
 import os
 import datetime
 from pathlib import Path
-from typing import Dict, List, Any, Callable, Optional
+from typing import Dict, List, Any, Callable, Optional, Tuple
 
 import matplotlib
 import matplotlib.pyplot as plt
@@ -141,9 +141,9 @@ class GraphGenerator:
         """
         try:
             fig, _ = plt.subplots()
-            prepared_data = self._prepare_plot_data(filtered_pool, graph_details.get("variables"))
+            # prepared_data = self._prepare_plot_data(filtered_pool, graph_details.get("variables"))
             self._draw_graph(
-                graph_details["type"], prepared_data, prepared_data.keys()
+                graph_details["type"], filtered_pool, filtered_pool.keys()
             )
             self._customize_graph(fig, graph_details)
             return self._save_graph(
@@ -152,9 +152,9 @@ class GraphGenerator:
         except Exception as e:
             raise e
 
-    def _prepare_plot_data(self, filtered_pool: Dict[str, Dict[str, List[Any]]],
-                           selected_variables: Optional[List[str]] = None
-                           ) -> Dict[str, List[int | float]]:
+    def prepare_plot_data(self, filtered_pool: Dict[str, Dict[str, List[Any]]],
+                          selected_variables: Optional[List[str]] = None
+                          ) -> Tuple[Dict[str, List[int | float]], Dict[str, List[str]]]:
         """Extracts the values from the filtered_pool data and converts them a dictionary
         that graph_generator can more readily handle.
 
@@ -168,32 +168,54 @@ class GraphGenerator:
 
         Returns
         -------
-        Dict[str, List[int | float]]
-            The formatted data that can more readily be plotted by graph_generator.
+        tuple(Dict[str, List[int | float]], Dict[str, List[str]])
+            A tuple containing the formatted data that can more readily be plotted by
+            graph_generator and the logs to be reported to OutputManager.
         """
+        info_map = {
+            "class": self.__class__.__name__,
+            "function": self.prepare_plot_data.__name__,
+        }
+        log_pool = []
         prepared_pool = {}
         for index, key in enumerate(filtered_pool.keys()):
             values: List[Any] = filtered_pool[key]["values"]
             is_data_in_dict = isinstance(values[0], dict)
             if is_data_in_dict:
                 if not selected_variables:
-                    # plot all the keys in the values dict?
-                    # data_dict = Utility.convert_list_of_dicts_to_dict_of_lists(values)
-                    # for data_dict_key in data_dict.keys():
-                    #     prepared_pool.setdefault(data_dict_key, []).extend(data_dict[data_dict_key])
-                    break
+                    error = {}
+                    error["error"] = f"Can't plot data set for {filtered_pool[key]}."
+                    error["message"] = f"No selected variables for {filtered_pool[key]}. "
+                    error["info_map"] = info_map
+                    log_pool.append(error)
+                    # yield prepared_pool, log_pool
                 else:
                     data_dict = Utility.convert_list_of_dicts_to_dict_of_lists(values)
                     for selected_variable in selected_variables:
                         if selected_variable in data_dict:
                             prepared_pool.setdefault(selected_variable, []).extend(data_dict[selected_variable])
+                            log = {}
+                            log["log"] = "Successfully added data to prepared_pool for graphing."
+                            log["message"] = f"Data for {data_dict[selected_variable]} added to prepared_pool."
+                            log["info_map"] = info_map
+                            log_pool.append(log)
             else:
                 if selected_variables:
                     prepared_pool[selected_variables[index]] = values
+                    log = {}
+                    log["log"] = "Successfully added data to prepared_pool for graphing."
+                    log["message"] = f"Data for {selected_variables[index]} added to prepared_pool."
+                    log["info_map"] = info_map
+                    log_pool.append(log)
                 else:
                     prepared_pool[key] = values
+                    log = {}
+                    log["log"] = "Successfully added data to prepared_pool for graphing."
+                    log["message"] = f"Data for {key} added to prepared_pool."
+                    log["info_map"] = info_map
+                    log_pool.append(log)
 
-        return prepared_pool
+        return prepared_pool, log_pool
 
     def _draw_graph(
         self,
@@ -219,7 +241,6 @@ class GraphGenerator:
         ValueError
             if graph_type is not found in MATPLOTLIB_PLOT_FUNCTIONS.
         """
-
         if graph_type not in MATPLOTLIB_PLOT_FUNCTIONS:
             raise ValueError(f"Unsupported graph type: {graph_type}")
         plot_function = MATPLOTLIB_PLOT_FUNCTIONS[graph_type]

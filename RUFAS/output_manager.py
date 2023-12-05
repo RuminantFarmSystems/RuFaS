@@ -887,8 +887,19 @@ class OutputManager(object):
             if produce_graphics:
                 try:
                     graph_generator = GraphGenerator(self.__metadata_prefix)
+                    prepared_data, log_pool = graph_generator.prepare_plot_data(filtered_pool,
+                                                                                filter_content.get("variables"))
+                    for log in log_pool:
+                        print(log)
+                        # if log["name"] == 
+                        #     if log_key == "log_name":
+                        #         self.add_log(log_pool["log_name"][index], log_value[index], log_pool["info_map"])
+                        #     elif log_key == "error_name":
+                        #         self.add_error(log_pool["error_name"][index], log_value[index], log_pool["info_map"])
+                        #     else:
+                        #         self.add_warning(log_pool["warning_name"][index], log_value[index], log_pool["info_map"])
                     graph_generator.generate_graph(
-                        filtered_pool,
+                        prepared_data,
                         filter_content,
                         filter_file,
                         graphics_dir,
