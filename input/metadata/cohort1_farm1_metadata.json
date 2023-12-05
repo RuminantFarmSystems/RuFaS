@@ -17,7 +17,7 @@
     "crop": {
       "title": "Crop data",
       "description": "Alfafa is fun!",
-      "path": "input/data/crop/pilot_testing_rotation.json",
+      "path": "input/data/crop/default_rotation.json",
       "type": "json",
       "properties": "crop_schedule_properties"
     },
@@ -27,6 +27,20 @@
       "path": "input/data/feed/default_feed.json",
       "type": "json",
       "properties": "feed_properties"
+    },
+    "economy": {
+      "title": "Economy data",
+      "description": "Time is money!",
+      "path": "input/data/EEE/default_costs.csv",
+      "type": "csv",
+      "properties": "economic_properties"
+    },
+    "emission": {
+      "title": "Emissions data",
+      "description": "Let's think about global warming",
+      "path": "input/data/EEE/default_emissions.csv",
+      "type": "csv",
+      "properties": "emissions_properties"
     },
     "NRC_Comp": {
       "title": "NRC Comp data",
@@ -52,35 +66,42 @@
     "soil_1": {
       "title": "Soil data",
       "description": "Stop treating soil like dirt!",
-      "path": "input/data/soil/pilot_testing_soil.json",
+      "path": "input/data/soil/default_soil.json",
+      "type": "json",
+      "properties": "soil_profile_properties"
+    },
+    "soil_2": {
+      "title": "Soil data",
+      "description": "Stop treating soil like dirt!",
+      "path": "input/data/soil/default_soil_2.json",
       "type": "json",
       "properties": "soil_profile_properties"
     },
     "fertilizer_schedule": {
       "title": "Fertilizer schedule.",
       "description": "Fertilizer is like butter, you can never have too much.",
-      "path": "input/data/fertilizer_schedule/pilot_testing_fertilizer_schedule.json",
+      "path": "input/data/fertilizer_schedule/default_fertilizer_schedule.json",
       "type": "json",
       "properties": "fertilizer_schedule_properties"
     },
     "manure_schedule": {
       "title": "Manure schedule.",
       "description": "Crappier than having 7:45 am classes Monday - Friday.",
-      "path": "input/data/manure_schedule/pilot_testing_manure_schedule.json",
+      "path": "input/data/manure_schedule/default_manure_schedule.json",
       "type": "json",
       "properties": "manure_schedule_properties"
     },
     "tillage_schedule": {
       "title": "Tillage schedule.",
       "description": "Requires the will to till.",
-      "path": "input/data/tillage_schedule/pilot_testing_tillage_schedule.json",
+      "path": "input/data/tillage_schedule/default_tillage_schedule.json",
       "type": "json",
       "properties": "tillage_schedule_properties"
     },
     "field": {
       "title": "Field specification",
       "description": "Contains overall field properties and references to specification files.",
-      "path": "input/data/field/pilot_testing_field.json",
+      "path": "input/data/field/default_field.json",
       "type": "json",
       "properties": "field_properties"
     },
@@ -94,7 +115,7 @@
     "feed_quality": {
       "title": "Feed Quality",
       "description": "Hows the feed!",
-      "path": "input/data/feed/pilot_testing_feed_quality.csv",
+      "path": "input/data/feed/feed_quality.csv",
       "type": "csv",
       "properties": "feed_quality_properties"
     },
@@ -1309,6 +1330,52 @@
         "default": 0
       }
     },
+    "economic_properties": {
+      "diesel_cost_gal": {
+        "description": "cost of diesel per gallon",
+        "type": "number",
+        "minimum": 0,
+        "default": 5.00
+      },
+      "electricity_cost_kwh": {
+        "description": "cost of electricity per kwh",
+        "type": "number",
+        "minimum": 0,
+        "default": 0.15
+      },
+      "natural_gas_cost_kwh": {
+        "description": "cost of natural gas per kwh",
+        "type": "number",
+        "minimum": 0,
+        "default": 0.053
+      },
+      "water_cost_gal": {
+        "description": "cost of water per gallon",
+        "type": "number",
+        "minimum": 0,
+        "default": 0.008
+      }
+    },
+    "emissions_properties": {
+      "alfalfa_tillage_emissions": {
+        "type": "number",
+        "description": "The amount of total tonnes CO2-eq generated from alfalfa tillage",
+        "minimum": 0,
+        "default": 500
+      },
+      "corn_grain_tillage_emissions": {
+        "type": "number",
+        "description": "The amount of total tonnes CO2-eq generated from corn grain tillage",
+        "minimum": 0,
+        "default": 300
+      },
+      "corn_silage_tillage_emissions": {
+        "type": "number",
+        "description": "The amount of total tonnes CO2-eq generated from corn silage tillage",
+        "minimum": 0,
+        "default": 400
+      }
+    },
     "feed_properties": {
       "calf_feeds": {
         "type": "array",
@@ -2200,6 +2267,10 @@
         "description": ""
       },
       "TDN": {
+"type": "number",
+        "description": ""
+      },
+      "DE": {
         "type": "number",
         "description": ""
       }
@@ -2631,6 +2702,11 @@
         "description": "Number of days that make up the irrigation interval.\nUnits: days.",
         "minimum": 0,
         "default": 0
+},
+      "supplement_manure_nutrient_deficiencies": {
+        "type": "bool",
+        "description": "Determines if nutrient deficient manure applications are supplemented with chemical fertilizer.",
+        "default": false
       }
     },
     "weather_properties": {
