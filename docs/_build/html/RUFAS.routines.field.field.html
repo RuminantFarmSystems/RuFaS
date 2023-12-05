@@ -1,0 +1,615 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>RUFAS.routines.field.field package &mdash; Ruminant Farm Simulation (RuFaS)  documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="_static/jquery.js?v=5d32c60e"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="_static/documentation_options.js?v=5929fcd5"></script>
+        <script src="_static/doctools.js?v=888ff710"></script>
+        <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="RUFAS.routines.field.manager package" href="RUFAS.routines.field.manager.html" />
+    <link rel="prev" title="RUFAS.routines.field.crop package" href="RUFAS.routines.field.crop.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            Ruminant Farm Simulation (RuFaS)
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">GitHub</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="RUFAS.html">RUFAS package</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="RUFAS.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l4 current"><a class="reference internal" href="RUFAS.routines.html">RUFAS.routines package</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#submodules">Submodules</a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.config">RUFAS.config module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.current_day_conditions">RUFAS.current_day_conditions module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.errors">RUFAS.errors module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.general_constants">RUFAS.general_constants module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.graph_generator">RUFAS.graph_generator module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.input_manager">RUFAS.input_manager module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.output_manager">RUFAS.output_manager module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.report_generator">RUFAS.report_generator module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.scenario_manager">RUFAS.scenario_manager module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.simulation_engine">RUFAS.simulation_engine module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.state">RUFAS.state module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.time">RUFAS.time module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.util">RUFAS.util module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.weather">RUFAS.weather module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="main.html">main module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="setup.html">setup module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tests.html">tests package</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Ruminant Farm Simulation (RuFaS)</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="modules.html">GitHub</a></li>
+          <li class="breadcrumb-item"><a href="RUFAS.html">RUFAS package</a></li>
+          <li class="breadcrumb-item"><a href="RUFAS.routines.html">RUFAS.routines package</a></li>
+          <li class="breadcrumb-item"><a href="RUFAS.routines.field.html">RUFAS.routines.field package</a></li>
+      <li class="breadcrumb-item active">RUFAS.routines.field.field package</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/RUFAS.routines.field.field.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="rufas-routines-field-field-package">
+<h1>RUFAS.routines.field.field package<a class="headerlink" href="#rufas-routines-field-field-package" title="Link to this heading"></a></h1>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Link to this heading"></a></h2>
+</section>
+<section id="module-RUFAS.routines.field.field.fertilizer_application">
+<span id="rufas-routines-field-field-fertilizer-application-module"></span><h2>RUFAS.routines.field.field.fertilizer_application module<a class="headerlink" href="#module-RUFAS.routines.field.field.fertilizer_application" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="RUFAS.routines.field.field.fertilizer_application.FertilizerApplication">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">RUFAS.routines.field.field.fertilizer_application.</span></span><span class="sig-name descname"><span class="pre">FertilizerApplication</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">soil</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.routines.field.soil.html#RUFAS.routines.field.soil.soil.Soil" title="RUFAS.routines.field.soil.soil.Soil"><span class="pre">Soil</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">field_size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.field.field.fertilizer_application.FertilizerApplication" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.field.field.fertilizer_application.FertilizerApplication.apply_fertilizer">
+<span class="sig-name descname"><span class="pre">apply_fertilizer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">phosphorus_applied</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fertilizer_mass</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">inorganic_nitrogen_fraction</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ammonium_fraction</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">organic_nitrogen_fraction</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">application_depth</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">surface_remainder_fraction</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">field_size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.routines.field.field.fertilizer_application.FertilizerApplication.apply_fertilizer" title="Link to this definition"></a></dt>
+<dd><p>Applies nutrients to the soil through fertilizer.</p>
+<section id="parameters">
+<h3>Parameters<a class="headerlink" href="#parameters" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>phosphorus_applied<span class="classifier">float</span></dt><dd><p>Mass of phosphorus applied to the soil (kg).</p>
+</dd>
+<dt>fertilizer_mass<span class="classifier">float</span></dt><dd><p>Total mass of fertilizer application (kg).</p>
+</dd>
+<dt>inorganic_nitrogen_fraction<span class="classifier">float</span></dt><dd><p>Fraction of fertilizer mass applied that is inorganic nitrogen (unitless).</p>
+</dd>
+<dt>ammonium_fraction<span class="classifier">float</span></dt><dd><p>Fraction of inorganic nitrogen mass applied that is ammonium (unitless).</p>
+</dd>
+<dt>organic_nitrogen_fraction<span class="classifier">float</span></dt><dd><p>Fraction of fertilizer mass applied that is organic nitrogen (unitless).</p>
+</dd>
+<dt>application_depth<span class="classifier">float</span></dt><dd><p>Depth at which fertilizer is injected into the soil (mm).</p>
+</dd>
+<dt>surface_remainder_fraction<span class="classifier">float</span></dt><dd><p>Fraction of fertilizer applied that remains on the soil surface after application (unitless).</p>
+</dd>
+<dt>field_size<span class="classifier">float</span></dt><dd><p>Size of the field (ha).</p>
+</dd>
+</dl>
+</section>
+<section id="references">
+<h3>References<a class="headerlink" href="#references" title="Link to this heading"></a></h3>
+<p>SWAT Theoretical documentation section 6:1.7.</p>
+</section>
+<section id="notes">
+<h3>Notes<a class="headerlink" href="#notes" title="Link to this heading"></a></h3>
+<p>This method follows the SWAT model for applying nitrogen to the soil via fertilizer, but uses the fertilizer
+phosphorus application method from SurPhos to apply phosphorus.</p>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.field.field.fertilizer_application.FertilizerApplication.generate_depth_factors">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">generate_depth_factors</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">application_depth</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">soil_layer_bottom_depths</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#RUFAS.routines.field.field.fertilizer_application.FertilizerApplication.generate_depth_factors" title="Link to this definition"></a></dt>
+<dd><p>Generates a list of fractions that partitions sub-surface nutrients between the different soil layers.</p>
+<section id="id1">
+<h3>Parameters<a class="headerlink" href="#id1" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>application_depth<span class="classifier">float</span></dt><dd><p>Bottom depth of nutrient application (mm).</p>
+</dd>
+<dt>soil_layer_bottom_depths<span class="classifier">list[float]</span></dt><dd><p>List of bottom depths of soil layers in the soil profile (mm).</p>
+</dd>
+</dl>
+</section>
+<section id="returns">
+<h3>Returns<a class="headerlink" href="#returns" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>list[float]</dt><dd><p>List of fractions that determine the distribution of nutrients between different soil layers when subsurface
+nutrients are applied (unitless).</p>
+</dd>
+</dl>
+</section>
+<section id="id2">
+<h3>References<a class="headerlink" href="#id2" title="Link to this heading"></a></h3>
+<p>pseudocode_field_management [FM.3.B.3 - 5]</p>
+</section>
+<section id="id3">
+<h3>Notes<a class="headerlink" href="#id3" title="Link to this heading"></a></h3>
+<p>This method of distributing nutrients between soil layers originates with Pete Vadas’ SurPhos model. Its purpose
+is to proportionally distribute nutrients to layers within the soil profile.</p>
+</section>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-RUFAS.routines.field.field.field">
+<span id="rufas-routines-field-field-field-module"></span><h2>RUFAS.routines.field.field.field module<a class="headerlink" href="#module-RUFAS.routines.field.field.field" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="RUFAS.routines.field.field.field.Field">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">RUFAS.routines.field.field.field.</span></span><span class="sig-name descname"><span class="pre">Field</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">field_data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#RUFAS.routines.field.field.field_data.FieldData" title="RUFAS.routines.field.field.field_data.FieldData"><span class="pre">FieldData</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">soil</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.routines.field.soil.html#RUFAS.routines.field.soil.soil.Soil" title="RUFAS.routines.field.soil.soil.Soil"><span class="pre">Soil</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plantings</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="RUFAS.routines.field.manager.html#RUFAS.routines.field.manager.events.PlantingEvent" title="RUFAS.routines.field.manager.events.PlantingEvent"><span class="pre">PlantingEvent</span></a><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">harvestings</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="RUFAS.routines.field.manager.html#RUFAS.routines.field.manager.events.HarvestEvent" title="RUFAS.routines.field.manager.events.HarvestEvent"><span class="pre">HarvestEvent</span></a><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">custom_crop_specifications</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tillage_events</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="RUFAS.routines.field.manager.html#RUFAS.routines.field.manager.events.TillageEvent" title="RUFAS.routines.field.manager.events.TillageEvent"><span class="pre">TillageEvent</span></a><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fertilizer_events</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="RUFAS.routines.field.manager.html#RUFAS.routines.field.manager.events.FertilizerEvent" title="RUFAS.routines.field.manager.events.FertilizerEvent"><span class="pre">FertilizerEvent</span></a><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fertilizer_mixes</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">manure_events</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="RUFAS.routines.field.manager.html#RUFAS.routines.field.manager.events.ManureEvent" title="RUFAS.routines.field.manager.events.ManureEvent"><span class="pre">ManureEvent</span></a><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">manure_manager</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.routines.manure.html#RUFAS.routines.manure.manure_manager.ManureManager" title="RUFAS.routines.manure.manure_manager.ManureManager"><span class="pre">ManureManager</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.field.field.field.Field" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.field.field.field.Field.ONLY_NITROGEN_MIX">
+<span class="sig-name descname"><span class="pre">ONLY_NITROGEN_MIX</span></span><a class="headerlink" href="#RUFAS.routines.field.field.field.Field.ONLY_NITROGEN_MIX" title="Link to this definition"></a></dt>
+<dd><p>Constant with the name of the fertilizer mix that contains only Nitrogen.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.field.field.field.Field.fertilizer_applicator">
+<span class="sig-name descname"><span class="pre">fertilizer_applicator</span></span><a class="headerlink" href="#RUFAS.routines.field.field.field.Field.fertilizer_applicator" title="Link to this definition"></a></dt>
+<dd><p>Provides interface for adding fertilizer to the field.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.field.field.field.Field.manage_field">
+<span class="sig-name descname"><span class="pre">manage_field</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">time</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">current_conditions</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.html#RUFAS.current_day_conditions.CurrentDayConditions" title="RUFAS.current_day_conditions.CurrentDayConditions"><span class="pre">CurrentDayConditions</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.routines.field.field.field.Field.manage_field" title="Link to this definition"></a></dt>
+<dd><p>Main Field routine, runs all subroutines routines based on current attribute configuration.</p>
+<section id="id4">
+<h3>Parameters<a class="headerlink" href="#id4" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>time<span class="classifier">Time</span></dt><dd><p>Contains the current year and day that the simulation is on.</p>
+</dd>
+<dt>current_conditions<span class="classifier">CurrentDayConditions</span></dt><dd><p>Contains a collection of today’s conditions variables needed for field processes.</p>
+</dd>
+</dl>
+</section>
+<section id="id5">
+<h3>Notes<a class="headerlink" href="#id5" title="Link to this heading"></a></h3>
+<p>This method starts by executing any soil amendments that may be scheduled for the day. Then it executes the
+daily update routines for the soil profile and active crops in the field. It then plants and/or harvests crops,
+checks if active crops need to go into dormancy, and resets crop attributes in both the crops and in the field’s
+data object.</p>
+</section>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.field.field.field.Field.manure_events">
+<span class="sig-name descname"><span class="pre">manure_events</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="RUFAS.routines.field.manager.html#RUFAS.routines.field.manager.events.ManureEvent" title="RUFAS.routines.field.manager.events.ManureEvent"><span class="pre">ManureEvent</span></a><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#RUFAS.routines.field.field.field.Field.manure_events" title="Link to this definition"></a></dt>
+<dd><p>List of all manure applications that will be applied to this field.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.field.field.field.Field.manure_manager">
+<span class="sig-name descname"><span class="pre">manure_manager</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="RUFAS.routines.manure.html#RUFAS.routines.manure.manure_manager.ManureManager" title="RUFAS.routines.manure.manure_manager.ManureManager"><span class="pre">ManureManager</span></a></em><a class="headerlink" href="#RUFAS.routines.field.field.field.Field.manure_manager" title="Link to this definition"></a></dt>
+<dd><p><code class="xref py py-class docutils literal notranslate"><span class="pre">ManureManager</span></code> instance from which manure is requested for application to the field.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.field.field.field.Field.perform_annual_reset">
+<span class="sig-name descname"><span class="pre">perform_annual_reset</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.routines.field.field.field.Field.perform_annual_reset" title="Link to this definition"></a></dt>
+<dd><p>Collect all annual accumulated totals from Field, Crop, and Soil modules, write them to some sort of output
+file, and then reset all annual totals</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.field.field.field.Field.tillage_events">
+<span class="sig-name descname"><span class="pre">tillage_events</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="RUFAS.routines.field.manager.html#RUFAS.routines.field.manager.events.TillageEvent" title="RUFAS.routines.field.manager.events.TillageEvent"><span class="pre">TillageEvent</span></a><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#RUFAS.routines.field.field.field.Field.tillage_events" title="Link to this definition"></a></dt>
+<dd><p>List of all tillage events that will occur over the run of the simulation in this field.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.field.field.field.Field.tiller">
+<span class="sig-name descname"><span class="pre">tiller</span></span><a class="headerlink" href="#RUFAS.routines.field.field.field.Field.tiller" title="Link to this definition"></a></dt>
+<dd><p>Provides interface to till the field.</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-RUFAS.routines.field.field.field_data">
+<span id="rufas-routines-field-field-field-data-module"></span><h2>RUFAS.routines.field.field.field_data module<a class="headerlink" href="#module-RUFAS.routines.field.field.field_data" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="RUFAS.routines.field.field.field_data.FieldData">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">RUFAS.routines.field.field.field_data.</span></span><span class="sig-name descname"><span class="pre">FieldData</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">absolute_latitude</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">43.5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">longitude</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">-88.6</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">minimum_daylength</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">6.33</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dormancy_threshold_daylength</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">current_residue</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">transpiration</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_transpiration</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_evapotranspiration</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seasonal_high_water_table</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">field_size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">supplement_manure_nutrient_deficiencies</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">watering_amount_in_liters</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">watering_amount_in_mm</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">watering_interval</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">days_into_watering_interval</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">current_water_deficit</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">watering_occurs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">annual_irrigation_water_use_total</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.field.field.field_data.FieldData" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Data object to track the field-specific variables.</p>
+<section id="attributes">
+<h3>Attributes<a class="headerlink" href="#attributes" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>name<span class="classifier">str, optional</span></dt><dd><p>Name of this field for identification purposes.</p>
+</dd>
+<dt>absolute_latitude<span class="classifier">float, default=43.5</span></dt><dd><p>The absolute latitude value (degrees above or below equator) where field is located (degrees).</p>
+</dd>
+<dt>longitude<span class="classifier">float, default=-88.6</span></dt><dd><p>The longitude value of where the field is located (degrees).</p>
+</dd>
+<dt>minimum_daylength<span class="classifier">float, default=6.33</span></dt><dd><p>Shortest day of the year for this watershed (hours).</p>
+</dd>
+<dt>dormancy_threshold_daylength<span class="classifier">float, optional</span></dt><dd><p>Threshold daylength to initiate dormancy in a plant (hours).</p>
+</dd>
+<dt>current_residue<span class="classifier">float, default=0.0</span></dt><dd><p>Total amount of residue on the current day (kg per hectare).</p>
+</dd>
+<dt>transpiration<span class="classifier">float, default=0.0</span></dt><dd><p>Total amount of water lost to transpiration in the field on the current day (mm).</p>
+</dd>
+<dt>max_transpiration<span class="classifier">float, default=0.0</span></dt><dd><p>Maximum possible amount of water that could be lost to transpiration in the field for the current day (mm).</p>
+</dd>
+<dt>max_evapotranspiration<span class="classifier">float, default=0.0</span></dt><dd><p>Maximum possible amount of water that could be lost to evapotranspiration in the field for the current day (mm).</p>
+</dd>
+<dt>seasonal_high_water_table<span class="classifier">bool, default=False</span></dt><dd><p>Does the Hydrologic Response Unit containing this field have a seasonally high water table.</p>
+</dd>
+<dt>field_size<span class="classifier">float, default=1.0</span></dt><dd><p>Size of the field (ha).</p>
+</dd>
+<dt>supplement_manure_nutrient_deficiencies<span class="classifier">bool, default=False</span></dt><dd><p>Supplement manure applications that do not meet requested nutrient amount with chemical fertilizers.</p>
+</dd>
+<dt>watering_amount_in_liters<span class="classifier">float, optional</span></dt><dd><p>User-supplied amount of water to be applied to the field over a specified interval of days (liters).</p>
+</dd>
+<dt>watering_amount_in_mm<span class="classifier">float, default=0.0</span></dt><dd><p>Amount of water to be applied to the field over a specified interval of days (mm).</p>
+</dd>
+<dt>watering_interval<span class="classifier">int, optional</span></dt><dd><p>Number of days between waterings of the field.</p>
+</dd>
+<dt>days_into_watering_interval<span class="classifier">int, default=0.0</span></dt><dd><p>Number of days since the start of the current watering interval.</p>
+</dd>
+<dt>current_water_deficit<span class="classifier">float, default=0.0</span></dt><dd><p>Amount of water that still needs to be applied to the field in the current interval (mm).</p>
+</dd>
+<dt>watering_occurs<span class="classifier">bool, default=True</span></dt><dd><p>Status indicating if this field is watered at all.</p>
+</dd>
+<dt>annual_irrigation_water_use_total<span class="classifier">float, default=0.0</span></dt><dd><p>Cumulative total of water used for irrigation in a year (mm).</p>
+</dd>
+</dl>
+</section>
+<section id="methods">
+<h3>Methods<a class="headerlink" href="#methods" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>perform_annual_field_reset()</dt><dd><p>Resets all cumulative totals that are calculated annually for the field.</p>
+</dd>
+<dt>convert_liters_to_millimeters(liter_amount, field_size)</dt><dd><p>Converts an amount in liters to an amount in mm based on the area the liters are distributed over.</p>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.field.field.field_data.FieldData.absolute_latitude">
+<span class="sig-name descname"><span class="pre">absolute_latitude</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">43.5</span></em><a class="headerlink" href="#RUFAS.routines.field.field.field_data.FieldData.absolute_latitude" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.field.field.field_data.FieldData.annual_irrigation_water_use_total">
+<span class="sig-name descname"><span class="pre">annual_irrigation_water_use_total</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0</span></em><a class="headerlink" href="#RUFAS.routines.field.field.field_data.FieldData.annual_irrigation_water_use_total" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.field.field.field_data.FieldData.convert_liters_to_millimeters">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">convert_liters_to_millimeters</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">liter_amount</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">field_size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.routines.field.field.field_data.FieldData.convert_liters_to_millimeters" title="Link to this definition"></a></dt>
+<dd><p>Converts an amount in liters to an amount in mm based on the area the liters are distributed over.</p>
+<section id="id6">
+<h4>Parameters<a class="headerlink" href="#id6" title="Link to this heading"></a></h4>
+<dl class="simple">
+<dt>liter_amount<span class="classifier">float</span></dt><dd><p>Volume to be converted (liters)</p>
+</dd>
+<dt>field_size<span class="classifier">float</span></dt><dd><p>Size of the field (ha)</p>
+</dd>
+</dl>
+</section>
+<section id="id7">
+<h4>Returns<a class="headerlink" href="#id7" title="Link to this heading"></a></h4>
+<dl class="simple">
+<dt>float</dt><dd><p>Millimeter amount that is distributed evenly across the specified field area (mm)</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.field.field.field_data.FieldData.current_residue">
+<span class="sig-name descname"><span class="pre">current_residue</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.0</span></em><a class="headerlink" href="#RUFAS.routines.field.field.field_data.FieldData.current_residue" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.field.field.field_data.FieldData.current_water_deficit">
+<span class="sig-name descname"><span class="pre">current_water_deficit</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.0</span></em><a class="headerlink" href="#RUFAS.routines.field.field.field_data.FieldData.current_water_deficit" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.field.field.field_data.FieldData.days_into_watering_interval">
+<span class="sig-name descname"><span class="pre">days_into_watering_interval</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0</span></em><a class="headerlink" href="#RUFAS.routines.field.field.field_data.FieldData.days_into_watering_interval" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.field.field.field_data.FieldData.dormancy_threshold_daylength">
+<span class="sig-name descname"><span class="pre">dormancy_threshold_daylength</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#RUFAS.routines.field.field.field_data.FieldData.dormancy_threshold_daylength" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.field.field.field_data.FieldData.field_size">
+<span class="sig-name descname"><span class="pre">field_size</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">1.0</span></em><a class="headerlink" href="#RUFAS.routines.field.field.field_data.FieldData.field_size" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.field.field.field_data.FieldData.longitude">
+<span class="sig-name descname"><span class="pre">longitude</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">-88.6</span></em><a class="headerlink" href="#RUFAS.routines.field.field.field_data.FieldData.longitude" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.field.field.field_data.FieldData.max_evapotranspiration">
+<span class="sig-name descname"><span class="pre">max_evapotranspiration</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.0</span></em><a class="headerlink" href="#RUFAS.routines.field.field.field_data.FieldData.max_evapotranspiration" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.field.field.field_data.FieldData.max_transpiration">
+<span class="sig-name descname"><span class="pre">max_transpiration</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.0</span></em><a class="headerlink" href="#RUFAS.routines.field.field.field_data.FieldData.max_transpiration" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.field.field.field_data.FieldData.minimum_daylength">
+<span class="sig-name descname"><span class="pre">minimum_daylength</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">6.33</span></em><a class="headerlink" href="#RUFAS.routines.field.field.field_data.FieldData.minimum_daylength" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.field.field.field_data.FieldData.name">
+<span class="sig-name descname"><span class="pre">name</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#RUFAS.routines.field.field.field_data.FieldData.name" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.field.field.field_data.FieldData.perform_annual_field_reset">
+<span class="sig-name descname"><span class="pre">perform_annual_field_reset</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.routines.field.field.field_data.FieldData.perform_annual_field_reset" title="Link to this definition"></a></dt>
+<dd><p>Resets all cumulative totals that are calculated annually for the field.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.field.field.field_data.FieldData.seasonal_high_water_table">
+<span class="sig-name descname"><span class="pre">seasonal_high_water_table</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">False</span></em><a class="headerlink" href="#RUFAS.routines.field.field.field_data.FieldData.seasonal_high_water_table" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.field.field.field_data.FieldData.supplement_manure_nutrient_deficiencies">
+<span class="sig-name descname"><span class="pre">supplement_manure_nutrient_deficiencies</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">False</span></em><a class="headerlink" href="#RUFAS.routines.field.field.field_data.FieldData.supplement_manure_nutrient_deficiencies" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.field.field.field_data.FieldData.transpiration">
+<span class="sig-name descname"><span class="pre">transpiration</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.0</span></em><a class="headerlink" href="#RUFAS.routines.field.field.field_data.FieldData.transpiration" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.field.field.field_data.FieldData.watering_amount_in_liters">
+<span class="sig-name descname"><span class="pre">watering_amount_in_liters</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#RUFAS.routines.field.field.field_data.FieldData.watering_amount_in_liters" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.field.field.field_data.FieldData.watering_amount_in_mm">
+<span class="sig-name descname"><span class="pre">watering_amount_in_mm</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.0</span></em><a class="headerlink" href="#RUFAS.routines.field.field.field_data.FieldData.watering_amount_in_mm" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.field.field.field_data.FieldData.watering_interval">
+<span class="sig-name descname"><span class="pre">watering_interval</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#RUFAS.routines.field.field.field_data.FieldData.watering_interval" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.field.field.field_data.FieldData.watering_occurs">
+<span class="sig-name descname"><span class="pre">watering_occurs</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">True</span></em><a class="headerlink" href="#RUFAS.routines.field.field.field_data.FieldData.watering_occurs" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</section>
+</dd></dl>
+
+</section>
+<section id="module-RUFAS.routines.field.field.manure_application">
+<span id="rufas-routines-field-field-manure-application-module"></span><h2>RUFAS.routines.field.field.manure_application module<a class="headerlink" href="#module-RUFAS.routines.field.field.manure_application" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="RUFAS.routines.field.field.manure_application.ManureApplication">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">RUFAS.routines.field.field.manure_application.</span></span><span class="sig-name descname"><span class="pre">ManureApplication</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">soil_data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.routines.field.soil.html#RUFAS.routines.field.soil.soil_data.SoilData" title="RUFAS.routines.field.soil.soil_data.SoilData"><span class="pre">SoilData</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">field_size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.field.field.manure_application.ManureApplication" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.field.field.manure_application.ManureApplication.apply_grazing_manure">
+<span class="sig-name descname"><span class="pre">apply_grazing_manure</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dry_matter_mass</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dry_matter_fraction</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">total_phosphorus_mass</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">inorganic_nitrogen_fraction</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ammonium_fraction</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">organic_nitrogen_fraction</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">field_size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.routines.field.field.manure_application.ManureApplication.apply_grazing_manure" title="Link to this definition"></a></dt>
+<dd><dl class="simple">
+<dt>This method takes a new application of machine-applied manure phosphorus and adds it to the existing pool to</dt><dd><p>be tracked.</p>
+</dd>
+</dl>
+<section id="id8">
+<h3>Parameters<a class="headerlink" href="#id8" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>dry_matter_mass<span class="classifier">float</span></dt><dd><p>Dry weight equivalent of this application (kg).</p>
+</dd>
+<dt>dry_matter_fraction<span class="classifier">float</span></dt><dd><p>Fraction of this manure application that is dry matter, in the range (0.0, 1.0] (unitless).</p>
+</dd>
+<dt>total_phosphorus_mass<span class="classifier">float</span></dt><dd><p>Total mass of phosphorus in this application of manure (kg).</p>
+</dd>
+<dt>inorganic_nitrogen_fraction<span class="classifier">float</span></dt><dd><p>Fraction of dry manure mass that is inorganic nitrogen (unitless).</p>
+</dd>
+<dt>ammonium_fraction<span class="classifier">float</span></dt><dd><p>Fraction of inorganic nitrogen that is ammonium (unitless).</p>
+</dd>
+<dt>organic_nitrogen_fraction<span class="classifier">float</span></dt><dd><p>Fraction of dry manure mass that is organic nitrogen (unitless).</p>
+</dd>
+<dt>field_size<span class="classifier">float</span></dt><dd><p>Size of the field (ha).</p>
+</dd>
+</dl>
+</section>
+<section id="id9">
+<h3>Notes<a class="headerlink" href="#id9" title="Link to this heading"></a></h3>
+<p>The hardcoded values that determine the distribution of phosphorus between the water extractable
+inorganic/organic and stable inorganic/organic pools are listed in the SurPhos theoretical documentation page 7,
+in the paragraph immediately following the head “Simulation of Grazing Manure Transforms”.</p>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.field.field.manure_application.ManureApplication.apply_machine_manure">
+<span class="sig-name descname"><span class="pre">apply_machine_manure</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dry_matter_mass</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dry_matter_fraction</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">total_phosphorus_mass</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">field_coverage</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">application_depth</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">surface_remainder_fraction</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">field_size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">inorganic_nitrogen_fraction</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ammonium_fraction</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">organic_nitrogen_fraction</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">water_extractable_inorganic_phosphorus_fraction</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">source_animal</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.routines.field.field.manure_application.ManureApplication.apply_machine_manure" title="Link to this definition"></a></dt>
+<dd><dl class="simple">
+<dt>This method takes a new application of machine-applied manure phosphorus and adds it to the existing pool to</dt><dd><p>be tracked.</p>
+</dd>
+</dl>
+<section id="id10">
+<h3>Parameters<a class="headerlink" href="#id10" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>dry_matter_mass<span class="classifier">float</span></dt><dd><p>Dry weight equivalent of this application (kg).</p>
+</dd>
+<dt>dry_matter_fraction<span class="classifier">float</span></dt><dd><p>Fraction of this manure application that is dry matter, in the range (0.0, 1.0] (unitless).</p>
+</dd>
+<dt>total_phosphorus_mass<span class="classifier">float</span></dt><dd><p>Total mass of phosphorus in this application of manure (kg).</p>
+</dd>
+<dt>field_coverage<span class="classifier">float</span></dt><dd><p>Fraction of the field this manure is applied to (unitless).</p>
+</dd>
+<dt>application_depth<span class="classifier">float</span></dt><dd><p>Depth at which fertilizer is injected into the soil (mm).</p>
+</dd>
+<dt>surface_remainder_fraction<span class="classifier">float</span></dt><dd><p>Fraction of fertilizer applied that remains on the soil surface after application (unitless).</p>
+</dd>
+<dt>field_size<span class="classifier">float</span></dt><dd><p>Size of the field (ha).</p>
+</dd>
+<dt>inorganic_nitrogen_fraction<span class="classifier">float</span></dt><dd><p>Fraction of dry manure mass that is inorganic nitrogen (unitless).</p>
+</dd>
+<dt>ammonium_fraction<span class="classifier">float</span></dt><dd><p>Fraction of inorganic nitrogen that is ammonium (unitless).</p>
+</dd>
+<dt>organic_nitrogen_fraction<span class="classifier">float</span></dt><dd><p>Fraction of dry manure mass that is organic nitrogen (unitless).</p>
+</dd>
+<dt>water_extractable_inorganic_phosphorus_fraction<span class="classifier">float, default=None</span></dt><dd><p>Fraction of total phosphorus in this application of manure that is water extractable inorganic phosphorus,
+in the range [0.0, 1.0] (unitless).</p>
+</dd>
+<dt>source_animal<span class="classifier">str, default=None</span></dt><dd><p>Type of animal that produced this manure (options are “CATTLE”, “SWINE”, or “POULTRY”) (unitless).</p>
+</dd>
+</dl>
+</section>
+<section id="raises">
+<h3>Raises<a class="headerlink" href="#raises" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>ValueError</dt><dd><p>If the water extractable inorganic phosphorus fraction is not inside the range [0.0, 0.95].</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-RUFAS.routines.field.field.tillage_application">
+<span id="rufas-routines-field-field-tillage-application-module"></span><h2>RUFAS.routines.field.field.tillage_application module<a class="headerlink" href="#module-RUFAS.routines.field.field.tillage_application" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="RUFAS.routines.field.field.tillage_application.TillageApplication">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">RUFAS.routines.field.field.tillage_application.</span></span><span class="sig-name descname"><span class="pre">TillageApplication</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">field_data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#RUFAS.routines.field.field.field_data.FieldData" title="RUFAS.routines.field.field.field_data.FieldData"><span class="pre">FieldData</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">soil_data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.routines.field.soil.html#RUFAS.routines.field.soil.soil_data.SoilData" title="RUFAS.routines.field.soil.soil_data.SoilData"><span class="pre">SoilData</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">field_size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.field.field.tillage_application.TillageApplication" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.field.field.tillage_application.TillageApplication.till_soil">
+<span class="sig-name descname"><span class="pre">till_soil</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tillage_depth</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">incorporation_fraction</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mixing_fraction</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">year</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">day</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.routines.field.field.tillage_application.TillageApplication.till_soil" title="Link to this definition"></a></dt>
+<dd><p>Mixes nutrients, manure/fertilizer mass, and residue from the soil profile and soil surface together in the soil
+profile.</p>
+<section id="id11">
+<h3>Parameters<a class="headerlink" href="#id11" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>tillage_depth<span class="classifier">float</span></dt><dd><p>The lowest depth the tilling implement reaches (mm)</p>
+</dd>
+<dt>incorporation_fraction<span class="classifier">float</span></dt><dd><p>Fraction of soil surface pool incorporated into the soil profile (unitless)</p>
+</dd>
+<dt>mixing_fraction<span class="classifier">float</span></dt><dd><p>Fraction of pool in each layer mixed and redistributed back into the soil profile (unitless)</p>
+</dd>
+<dt>year<span class="classifier">int</span></dt><dd><p>Year of the time object</p>
+</dd>
+<dt>day<span class="classifier">int</span></dt><dd><p>Day of the time object</p>
+</dd>
+</dl>
+</section>
+<section id="id12">
+<h3>References<a class="headerlink" href="#id12" title="Link to this heading"></a></h3>
+<p>SWAT Theoretical documentation section 6:1.6, SurPhos Fortran code plow.f</p>
+</section>
+<section id="id13">
+<h3>Notes<a class="headerlink" href="#id13" title="Link to this heading"></a></h3>
+<p>The tillage process starts by removing matter from the soil surface pools and putting it into the top soil
+layer, then mixing everything in together from the different soil layers. The method also checks that tillage
+does not go deeper than the bottom of the soil profile.</p>
+</section>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-RUFAS.routines.field.field">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-RUFAS.routines.field.field" title="Link to this heading"></a></h2>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="RUFAS.routines.field.crop.html" class="btn btn-neutral float-left" title="RUFAS.routines.field.crop package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="RUFAS.routines.field.manager.html" class="btn btn-neutral float-right" title="RUFAS.routines.field.manager package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, RuFaS team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

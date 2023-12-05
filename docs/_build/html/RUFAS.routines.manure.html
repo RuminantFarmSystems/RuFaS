@@ -1,26 +1,27 @@
 <!DOCTYPE html>
-<html class="writer-html5" lang="en" >
+<html class="writer-html5" lang="en" data-content_root="./">
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>RUFAS.routines.manure package &mdash; Ruminant Farm Simulation (RuFaS)  documentation</title>
-      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=19f00094" />
+
+  
   <!--[if lt IE 9]>
     <script src="_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
-        <script src="_static/jquery.js"></script>
-        <script src="_static/underscore.js"></script>
-        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
-        <script src="_static/doctools.js"></script>
-        <script src="_static/sphinx_highlight.js"></script>
+        <script src="_static/jquery.js?v=5d32c60e"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="_static/documentation_options.js?v=5929fcd5"></script>
+        <script src="_static/doctools.js?v=888ff710"></script>
+        <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="RUFAS.routines.manure.beddings package" href="RUFAS.routines.manure.beddings.html" />
+    <link rel="next" title="RUFAS.routines.manure.IO_helpers package" href="RUFAS.routines.manure.IO_helpers.html" />
     <link rel="prev" title="RUFAS.routines.field.soil.phosphorus_cycling package" href="RUFAS.routines.field.soil.phosphorus_cycling.html" /> 
 </head>
 
@@ -29,11 +30,15 @@
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-            <a href="index.html" class="icon icon-home"> Ruminant Farm Simulation (RuFaS)
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            Ruminant Farm Simulation (RuFaS)
           </a>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" />
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
     <input type="hidden" name="check_keywords" value="yes" />
     <input type="hidden" name="area" value="default" />
   </form>
@@ -44,23 +49,27 @@
 <li class="toctree-l1 current"><a class="reference internal" href="modules.html">GitHub</a><ul class="current">
 <li class="toctree-l2 current"><a class="reference internal" href="RUFAS.html">RUFAS package</a><ul class="current">
 <li class="toctree-l3 current"><a class="reference internal" href="RUFAS.html#subpackages">Subpackages</a><ul class="current">
-<li class="toctree-l4"><a class="reference internal" href="RUFAS.output_handler.html">RUFAS.output_handler package</a></li>
 <li class="toctree-l4 current"><a class="reference internal" href="RUFAS.routines.html">RUFAS.routines package</a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="RUFAS.html#submodules">Submodules</a></li>
-<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.classes">RUFAS.classes module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.database_reader">RUFAS.database_reader module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.config">RUFAS.config module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.current_day_conditions">RUFAS.current_day_conditions module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.errors">RUFAS.errors module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.general_constants">RUFAS.general_constants module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.graph_generator">RUFAS.graph_generator module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.input_manager">RUFAS.input_manager module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.output_manager">RUFAS.output_manager module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.report_generator">RUFAS.report_generator module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.scenario_manager">RUFAS.scenario_manager module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.simulation_engine">RUFAS.simulation_engine module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.user_prompt">RUFAS.user_prompt module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.state">RUFAS.state module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.time">RUFAS.time module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.util">RUFAS.util module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.weather">RUFAS.weather module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS">Module contents</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="fileReader.html">fileReader module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="main.html">main module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="setup.html">setup module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="tests.html">tests package</a></li>
@@ -81,7 +90,7 @@
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a href="index.html" class="icon icon-home"></a></li>
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
           <li class="breadcrumb-item"><a href="modules.html">GitHub</a></li>
           <li class="breadcrumb-item"><a href="RUFAS.html">RUFAS package</a></li>
           <li class="breadcrumb-item"><a href="RUFAS.routines.html">RUFAS.routines package</a></li>
@@ -96,11 +105,33 @@
            <div itemprop="articleBody">
              
   <section id="rufas-routines-manure-package">
-<h1>RUFAS.routines.manure package<a class="headerlink" href="#rufas-routines-manure-package" title="Permalink to this heading"></a></h1>
+<h1>RUFAS.routines.manure package<a class="headerlink" href="#rufas-routines-manure-package" title="Link to this heading"></a></h1>
 <section id="subpackages">
-<h2>Subpackages<a class="headerlink" href="#subpackages" title="Permalink to this heading"></a></h2>
+<h2>Subpackages<a class="headerlink" href="#subpackages" title="Link to this heading"></a></h2>
 <div class="toctree-wrapper compound">
 <ul>
+<li class="toctree-l1"><a class="reference internal" href="RUFAS.routines.manure.IO_helpers.html">RUFAS.routines.manure.IO_helpers package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="RUFAS.routines.manure.IO_helpers.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="RUFAS.routines.manure.IO_helpers.html#module-RUFAS.routines.manure.IO_helpers.manure_manager_config_handler">RUFAS.routines.manure.IO_helpers.manure_manager_config_handler module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.routines.manure.IO_helpers.html#RUFAS.routines.manure.IO_helpers.manure_manager_config_handler.ManureManagerConfigHandler"><code class="docutils literal notranslate"><span class="pre">ManureManagerConfigHandler</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.IO_helpers.html#RUFAS.routines.manure.IO_helpers.manure_manager_config_handler.ManureManagerConfigHandler.get_custom_bedding_config"><code class="docutils literal notranslate"><span class="pre">ManureManagerConfigHandler.get_custom_bedding_config()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.IO_helpers.html#RUFAS.routines.manure.IO_helpers.manure_manager_config_handler.ManureManagerConfigHandler.get_custom_manure_handler_config"><code class="docutils literal notranslate"><span class="pre">ManureManagerConfigHandler.get_custom_manure_handler_config()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.IO_helpers.html#RUFAS.routines.manure.IO_helpers.manure_manager_config_handler.ManureManagerConfigHandler.get_custom_manure_separator_config"><code class="docutils literal notranslate"><span class="pre">ManureManagerConfigHandler.get_custom_manure_separator_config()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.IO_helpers.html#RUFAS.routines.manure.IO_helpers.manure_manager_config_handler.ManureManagerConfigHandler.get_custom_manure_treatment_config"><code class="docutils literal notranslate"><span class="pre">ManureManagerConfigHandler.get_custom_manure_treatment_config()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="RUFAS.routines.manure.IO_helpers.html#module-RUFAS.routines.manure.IO_helpers.manure_module_output_manager_helper">RUFAS.routines.manure.IO_helpers.manure_module_output_manager_helper module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.routines.manure.IO_helpers.html#RUFAS.routines.manure.IO_helpers.manure_module_output_manager_helper.ManureModuleOutputManagerHelper"><code class="docutils literal notranslate"><span class="pre">ManureModuleOutputManagerHelper</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.IO_helpers.html#RUFAS.routines.manure.IO_helpers.manure_module_output_manager_helper.ManureModuleOutputManagerHelper.add_dataclass_object"><code class="docutils literal notranslate"><span class="pre">ManureModuleOutputManagerHelper.add_dataclass_object()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="RUFAS.routines.manure.IO_helpers.html#module-RUFAS.routines.manure.IO_helpers">Module contents</a></li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="RUFAS.routines.manure.beddings.html">RUFAS.routines.manure.beddings package</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="RUFAS.routines.manure.beddings.html#submodules">Submodules</a></li>
 <li class="toctree-l2"><a class="reference internal" href="RUFAS.routines.manure.beddings.html#module-RUFAS.routines.manure.beddings.bedding_classes">RUFAS.routines.manure.beddings.bedding_classes module</a><ul>
@@ -116,10 +147,12 @@
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="RUFAS.routines.manure.beddings.html#RUFAS.routines.manure.beddings.bedding_classes.BeddingConfig"><code class="docutils literal notranslate"><span class="pre">BeddingConfig</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.beddings.html#RUFAS.routines.manure.beddings.bedding_classes.BeddingConfig.bedding_carbon_fraction"><code class="docutils literal notranslate"><span class="pre">BeddingConfig.bedding_carbon_fraction</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.beddings.html#RUFAS.routines.manure.beddings.bedding_classes.BeddingConfig.bedding_cleaned_fraction"><code class="docutils literal notranslate"><span class="pre">BeddingConfig.bedding_cleaned_fraction</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.beddings.html#RUFAS.routines.manure.beddings.bedding_classes.BeddingConfig.bedding_density"><code class="docutils literal notranslate"><span class="pre">BeddingConfig.bedding_density</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.beddings.html#RUFAS.routines.manure.beddings.bedding_classes.BeddingConfig.bedding_dry_matter_content"><code class="docutils literal notranslate"><span class="pre">BeddingConfig.bedding_dry_matter_content</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.beddings.html#RUFAS.routines.manure.beddings.bedding_classes.BeddingConfig.bedding_mass_per_day"><code class="docutils literal notranslate"><span class="pre">BeddingConfig.bedding_mass_per_day</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.beddings.html#RUFAS.routines.manure.beddings.bedding_classes.BeddingConfig.bedding_phosphorus_content"><code class="docutils literal notranslate"><span class="pre">BeddingConfig.bedding_phosphorus_content</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.beddings.html#RUFAS.routines.manure.beddings.bedding_classes.BeddingConfig.bedding_type"><code class="docutils literal notranslate"><span class="pre">BeddingConfig.bedding_type</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.beddings.html#RUFAS.routines.manure.beddings.bedding_classes.BeddingConfig.sand_removal_efficiency"><code class="docutils literal notranslate"><span class="pre">BeddingConfig.sand_removal_efficiency</span></code></a></li>
 </ul>
@@ -129,16 +162,21 @@
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="RUFAS.routines.manure.beddings.html#RUFAS.routines.manure.beddings.bedding_classes.BeddingType"><code class="docutils literal notranslate"><span class="pre">BeddingType</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.beddings.html#RUFAS.routines.manure.beddings.bedding_classes.BeddingType.CBPB_SAWDUST"><code class="docutils literal notranslate"><span class="pre">BeddingType.CBPB_SAWDUST</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.beddings.html#RUFAS.routines.manure.beddings.bedding_classes.BeddingType.DEFAULT"><code class="docutils literal notranslate"><span class="pre">BeddingType.DEFAULT</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.beddings.html#RUFAS.routines.manure.beddings.bedding_classes.BeddingType.MANURE_SOLIDS"><code class="docutils literal notranslate"><span class="pre">BeddingType.MANURE_SOLIDS</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.beddings.html#RUFAS.routines.manure.beddings.bedding_classes.BeddingType.SAND"><code class="docutils literal notranslate"><span class="pre">BeddingType.SAND</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.beddings.html#RUFAS.routines.manure.beddings.bedding_classes.BeddingType.SAWDUST"><code class="docutils literal notranslate"><span class="pre">BeddingType.SAWDUST</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.beddings.html#RUFAS.routines.manure.beddings.bedding_classes.BeddingType.STRAW"><code class="docutils literal notranslate"><span class="pre">BeddingType.STRAW</span></code></a></li>
 </ul>
 </li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.routines.manure.beddings.html#RUFAS.routines.manure.beddings.bedding_classes.CBPBSawdustBedding"><code class="docutils literal notranslate"><span class="pre">CBPBSawdustBedding</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="RUFAS.routines.manure.beddings.html#RUFAS.routines.manure.beddings.bedding_classes.DefaultBeddingConfigFactory"><code class="docutils literal notranslate"><span class="pre">DefaultBeddingConfigFactory</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.beddings.html#RUFAS.routines.manure.beddings.bedding_classes.DefaultBeddingConfigFactory.CBPB_SAWDUST_BEDDING_CONFIG"><code class="docutils literal notranslate"><span class="pre">DefaultBeddingConfigFactory.CBPB_SAWDUST_BEDDING_CONFIG</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.beddings.html#RUFAS.routines.manure.beddings.bedding_classes.DefaultBeddingConfigFactory.MANURE_SOLIDS_BEDDING_CONFIG"><code class="docutils literal notranslate"><span class="pre">DefaultBeddingConfigFactory.MANURE_SOLIDS_BEDDING_CONFIG</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.beddings.html#RUFAS.routines.manure.beddings.bedding_classes.DefaultBeddingConfigFactory.SAND_BEDDING_CONFIG"><code class="docutils literal notranslate"><span class="pre">DefaultBeddingConfigFactory.SAND_BEDDING_CONFIG</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.beddings.html#RUFAS.routines.manure.beddings.bedding_classes.DefaultBeddingConfigFactory.SAWDUST_BEDDING_CONFIG"><code class="docutils literal notranslate"><span class="pre">DefaultBeddingConfigFactory.SAWDUST_BEDDING_CONFIG</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.beddings.html#RUFAS.routines.manure.beddings.bedding_classes.DefaultBeddingConfigFactory.STRAW_BEDDING_CONFIG"><code class="docutils literal notranslate"><span class="pre">DefaultBeddingConfigFactory.STRAW_BEDDING_CONFIG</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.beddings.html#RUFAS.routines.manure.beddings.bedding_classes.DefaultBeddingConfigFactory.get_instance"><code class="docutils literal notranslate"><span class="pre">DefaultBeddingConfigFactory.get_instance()</span></code></a></li>
 </ul>
 </li>
@@ -148,50 +186,144 @@
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="RUFAS.routines.manure.beddings.html#RUFAS.routines.manure.beddings.bedding_classes.SawdustBedding"><code class="docutils literal notranslate"><span class="pre">SawdustBedding</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.routines.manure.beddings.html#RUFAS.routines.manure.beddings.bedding_classes.StrawBedding"><code class="docutils literal notranslate"><span class="pre">StrawBedding</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="RUFAS.routines.manure.beddings.html#module-RUFAS.routines.manure.beddings">Module contents</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="RUFAS.routines.manure.constants.html">RUFAS.routines.manure.constants package</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="RUFAS.routines.manure.constants.html#submodules">Submodules</a></li>
-<li class="toctree-l2"><a class="reference internal" href="RUFAS.routines.manure.constants.html#module-RUFAS.routines.manure.constants.gas_emission_constants">RUFAS.routines.manure.constants.gas_emission_constants module</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="RUFAS.routines.manure.constants.html#RUFAS.routines.manure.constants.gas_emission_constants.GasEmissionConstants"><code class="docutils literal notranslate"><span class="pre">GasEmissionConstants</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.constants.html#RUFAS.routines.manure.constants.gas_emission_constants.GasEmissionConstants.Bo"><code class="docutils literal notranslate"><span class="pre">GasEmissionConstants.Bo</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.constants.html#RUFAS.routines.manure.constants.gas_emission_constants.GasEmissionConstants.CHEN_HASHIMOTO_KINETIC_CONSTANT_KCH"><code class="docutils literal notranslate"><span class="pre">GasEmissionConstants.CHEN_HASHIMOTO_KINETIC_CONSTANT_KCH</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.constants.html#RUFAS.routines.manure.constants.gas_emission_constants.GasEmissionConstants.DEFAULT_HOUSING_SPECIFIC_CONSTANT"><code class="docutils literal notranslate"><span class="pre">GasEmissionConstants.DEFAULT_HOUSING_SPECIFIC_CONSTANT</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.constants.html#RUFAS.routines.manure.constants.gas_emission_constants.GasEmissionConstants.DEFAULT_SLURRY_STORAGE_TEMPERATURE"><code class="docutils literal notranslate"><span class="pre">GasEmissionConstants.DEFAULT_SLURRY_STORAGE_TEMPERATURE</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.constants.html#RUFAS.routines.manure.constants.gas_emission_constants.GasEmissionConstants.DEFAULT_VOLATILE_SOLIDS_FRACTION"><code class="docutils literal notranslate"><span class="pre">GasEmissionConstants.DEFAULT_VOLATILE_SOLIDS_FRACTION</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.constants.html#RUFAS.routines.manure.constants.gas_emission_constants.GasEmissionConstants.E"><code class="docutils literal notranslate"><span class="pre">GasEmissionConstants.E</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.constants.html#RUFAS.routines.manure.constants.gas_emission_constants.GasEmissionConstants.MCF"><code class="docutils literal notranslate"><span class="pre">GasEmissionConstants.MCF</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.constants.html#RUFAS.routines.manure.constants.gas_emission_constants.GasEmissionConstants.METHANE_DENSITY"><code class="docutils literal notranslate"><span class="pre">GasEmissionConstants.METHANE_DENSITY</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.constants.html#RUFAS.routines.manure.constants.gas_emission_constants.GasEmissionConstants.METHANE_ENERGY_DENSITY"><code class="docutils literal notranslate"><span class="pre">GasEmissionConstants.METHANE_ENERGY_DENSITY</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.constants.html#RUFAS.routines.manure.constants.gas_emission_constants.GasEmissionConstants.METHANE_FACTOR"><code class="docutils literal notranslate"><span class="pre">GasEmissionConstants.METHANE_FACTOR</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.constants.html#RUFAS.routines.manure.constants.gas_emission_constants.GasEmissionConstants.METHANE_POTENTIAL_Go"><code class="docutils literal notranslate"><span class="pre">GasEmissionConstants.METHANE_POTENTIAL_Go</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.constants.html#RUFAS.routines.manure.constants.gas_emission_constants.GasEmissionConstants.MS"><code class="docutils literal notranslate"><span class="pre">GasEmissionConstants.MS</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.constants.html#RUFAS.routines.manure.constants.gas_emission_constants.GasEmissionConstants.POTENTIAL_METHANE_YIELD_OF_MANURE"><code class="docutils literal notranslate"><span class="pre">GasEmissionConstants.POTENTIAL_METHANE_YIELD_OF_MANURE</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.constants.html#RUFAS.routines.manure.constants.gas_emission_constants.GasEmissionConstants.R"><code class="docutils literal notranslate"><span class="pre">GasEmissionConstants.R</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.constants.html#RUFAS.routines.manure.constants.gas_emission_constants.GasEmissionConstants.SPECIFIC_GROWTH_RATE"><code class="docutils literal notranslate"><span class="pre">GasEmissionConstants.SPECIFIC_GROWTH_RATE</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.constants.html#RUFAS.routines.manure.constants.gas_emission_constants.GasEmissionConstants.b1"><code class="docutils literal notranslate"><span class="pre">GasEmissionConstants.b1</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.constants.html#RUFAS.routines.manure.constants.gas_emission_constants.GasEmissionConstants.b2"><code class="docutils literal notranslate"><span class="pre">GasEmissionConstants.b2</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.constants.html#RUFAS.routines.manure.constants.gas_emission_constants.GasEmissionConstants.lnA"><code class="docutils literal notranslate"><span class="pre">GasEmissionConstants.lnA</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="RUFAS.routines.manure.constants_and_units.html">RUFAS.routines.manure.constants_and_units package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="RUFAS.routines.manure.constants_and_units.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="RUFAS.routines.manure.constants_and_units.html#module-RUFAS.routines.manure.constants_and_units.gas_emission_constants">RUFAS.routines.manure.constants_and_units.gas_emission_constants module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.routines.manure.constants_and_units.html#RUFAS.routines.manure.constants_and_units.gas_emission_constants.GasEmissionConstants"><code class="docutils literal notranslate"><span class="pre">GasEmissionConstants</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.constants_and_units.html#RUFAS.routines.manure.constants_and_units.gas_emission_constants.GasEmissionConstants.ACHIEVABLE_METHANE_EMISSION"><code class="docutils literal notranslate"><span class="pre">GasEmissionConstants.ACHIEVABLE_METHANE_EMISSION</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.constants_and_units.html#RUFAS.routines.manure.constants_and_units.gas_emission_constants.GasEmissionConstants.ACTIVATION_ENERGY"><code class="docutils literal notranslate"><span class="pre">GasEmissionConstants.ACTIVATION_ENERGY</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.constants_and_units.html#RUFAS.routines.manure.constants_and_units.gas_emission_constants.GasEmissionConstants.AMMONIA_EMISSION_COEFFICIENT_WITH_TILLED_BEDDING"><code class="docutils literal notranslate"><span class="pre">GasEmissionConstants.AMMONIA_EMISSION_COEFFICIENT_WITH_TILLED_BEDDING</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.constants_and_units.html#RUFAS.routines.manure.constants_and_units.gas_emission_constants.GasEmissionConstants.AMMONIA_EMISSION_COEFFICIENT_WITH_UNTILLED_BEDDING"><code class="docutils literal notranslate"><span class="pre">GasEmissionConstants.AMMONIA_EMISSION_COEFFICIENT_WITH_UNTILLED_BEDDING</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.constants_and_units.html#RUFAS.routines.manure.constants_and_units.gas_emission_constants.GasEmissionConstants.CHEN_HASHIMOTO_KINETIC_CONSTANT_KCH"><code class="docutils literal notranslate"><span class="pre">GasEmissionConstants.CHEN_HASHIMOTO_KINETIC_CONSTANT_KCH</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.constants_and_units.html#RUFAS.routines.manure.constants_and_units.gas_emission_constants.GasEmissionConstants.DEFAULT_CARBON_AVAILABLE_IN_BEDDING"><code class="docutils literal notranslate"><span class="pre">GasEmissionConstants.DEFAULT_CARBON_AVAILABLE_IN_BEDDING</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.constants_and_units.html#RUFAS.routines.manure.constants_and_units.gas_emission_constants.GasEmissionConstants.DEFAULT_CARBON_FRACTION_AVAILABLE_IN_BEDDING"><code class="docutils literal notranslate"><span class="pre">GasEmissionConstants.DEFAULT_CARBON_FRACTION_AVAILABLE_IN_BEDDING</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.constants_and_units.html#RUFAS.routines.manure.constants_and_units.gas_emission_constants.GasEmissionConstants.DEFAULT_HOUSING_SPECIFIC_CONSTANT"><code class="docutils literal notranslate"><span class="pre">GasEmissionConstants.DEFAULT_HOUSING_SPECIFIC_CONSTANT</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.constants_and_units.html#RUFAS.routines.manure.constants_and_units.gas_emission_constants.GasEmissionConstants.DEFAULT_PH_FOR_HOUSING_AMMONIA"><code class="docutils literal notranslate"><span class="pre">GasEmissionConstants.DEFAULT_PH_FOR_HOUSING_AMMONIA</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.constants_and_units.html#RUFAS.routines.manure.constants_and_units.gas_emission_constants.GasEmissionConstants.DEFAULT_PH_FOR_STORAGE_AMMONIA"><code class="docutils literal notranslate"><span class="pre">GasEmissionConstants.DEFAULT_PH_FOR_STORAGE_AMMONIA</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.constants_and_units.html#RUFAS.routines.manure.constants_and_units.gas_emission_constants.GasEmissionConstants.DEFAULT_SLURRY_STORAGE_TEMPERATURE"><code class="docutils literal notranslate"><span class="pre">GasEmissionConstants.DEFAULT_SLURRY_STORAGE_TEMPERATURE</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.constants_and_units.html#RUFAS.routines.manure.constants_and_units.gas_emission_constants.GasEmissionConstants.DEFAULT_STORAGE_AREA_PER_ANIMAL"><code class="docutils literal notranslate"><span class="pre">GasEmissionConstants.DEFAULT_STORAGE_AREA_PER_ANIMAL</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.constants_and_units.html#RUFAS.routines.manure.constants_and_units.gas_emission_constants.GasEmissionConstants.DEFAULT_VOLATILE_SOLIDS_FRACTION"><code class="docutils literal notranslate"><span class="pre">GasEmissionConstants.DEFAULT_VOLATILE_SOLIDS_FRACTION</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.constants_and_units.html#RUFAS.routines.manure.constants_and_units.gas_emission_constants.GasEmissionConstants.DEGRADABLE_VOLATILE_SOLIDS_RATE_CORRECTING_FACTOR"><code class="docutils literal notranslate"><span class="pre">GasEmissionConstants.DEGRADABLE_VOLATILE_SOLIDS_RATE_CORRECTING_FACTOR</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.constants_and_units.html#RUFAS.routines.manure.constants_and_units.gas_emission_constants.GasEmissionConstants.FRACTION_OF_HANDLED_MANURE"><code class="docutils literal notranslate"><span class="pre">GasEmissionConstants.FRACTION_OF_HANDLED_MANURE</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.constants_and_units.html#RUFAS.routines.manure.constants_and_units.gas_emission_constants.GasEmissionConstants.GAS_CONSTANT"><code class="docutils literal notranslate"><span class="pre">GasEmissionConstants.GAS_CONSTANT</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.constants_and_units.html#RUFAS.routines.manure.constants_and_units.gas_emission_constants.GasEmissionConstants.GENERAL_LOWER_BOUND_TEMPERATURE"><code class="docutils literal notranslate"><span class="pre">GasEmissionConstants.GENERAL_LOWER_BOUND_TEMPERATURE</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.constants_and_units.html#RUFAS.routines.manure.constants_and_units.gas_emission_constants.GasEmissionConstants.GENERAL_UPPER_BOUND_TEMPERATURE"><code class="docutils literal notranslate"><span class="pre">GasEmissionConstants.GENERAL_UPPER_BOUND_TEMPERATURE</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.constants_and_units.html#RUFAS.routines.manure.constants_and_units.gas_emission_constants.GasEmissionConstants.LEACHING_COEFFICIENT"><code class="docutils literal notranslate"><span class="pre">GasEmissionConstants.LEACHING_COEFFICIENT</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.constants_and_units.html#RUFAS.routines.manure.constants_and_units.gas_emission_constants.GasEmissionConstants.LIQUID_MANURE_HSC"><code class="docutils literal notranslate"><span class="pre">GasEmissionConstants.LIQUID_MANURE_HSC</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.constants_and_units.html#RUFAS.routines.manure.constants_and_units.gas_emission_constants.GasEmissionConstants.MCF_CONSTANT_A"><code class="docutils literal notranslate"><span class="pre">GasEmissionConstants.MCF_CONSTANT_A</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.constants_and_units.html#RUFAS.routines.manure.constants_and_units.gas_emission_constants.GasEmissionConstants.MCF_CONSTANT_B"><code class="docutils literal notranslate"><span class="pre">GasEmissionConstants.MCF_CONSTANT_B</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.constants_and_units.html#RUFAS.routines.manure.constants_and_units.gas_emission_constants.GasEmissionConstants.METHANE_CONVERSION_FACTOR"><code class="docutils literal notranslate"><span class="pre">GasEmissionConstants.METHANE_CONVERSION_FACTOR</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.constants_and_units.html#RUFAS.routines.manure.constants_and_units.gas_emission_constants.GasEmissionConstants.METHANE_DENSITY"><code class="docutils literal notranslate"><span class="pre">GasEmissionConstants.METHANE_DENSITY</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.constants_and_units.html#RUFAS.routines.manure.constants_and_units.gas_emission_constants.GasEmissionConstants.METHANE_EMISSION_COEFFICIENT"><code class="docutils literal notranslate"><span class="pre">GasEmissionConstants.METHANE_EMISSION_COEFFICIENT</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.constants_and_units.html#RUFAS.routines.manure.constants_and_units.gas_emission_constants.GasEmissionConstants.METHANE_ENERGY_DENSITY"><code class="docutils literal notranslate"><span class="pre">GasEmissionConstants.METHANE_ENERGY_DENSITY</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.constants_and_units.html#RUFAS.routines.manure.constants_and_units.gas_emission_constants.GasEmissionConstants.METHANE_FACTOR"><code class="docutils literal notranslate"><span class="pre">GasEmissionConstants.METHANE_FACTOR</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.constants_and_units.html#RUFAS.routines.manure.constants_and_units.gas_emission_constants.GasEmissionConstants.METHANE_POTENTIAL_Go"><code class="docutils literal notranslate"><span class="pre">GasEmissionConstants.METHANE_POTENTIAL_Go</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.constants_and_units.html#RUFAS.routines.manure.constants_and_units.gas_emission_constants.GasEmissionConstants.NATURAL_LOG_ARRHENIUS_CONSTANT"><code class="docutils literal notranslate"><span class="pre">GasEmissionConstants.NATURAL_LOG_ARRHENIUS_CONSTANT</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.constants_and_units.html#RUFAS.routines.manure.constants_and_units.gas_emission_constants.GasEmissionConstants.NITROUS_OXIDE_COEFFICIENT_WITH_TILLED_BEDDING"><code class="docutils literal notranslate"><span class="pre">GasEmissionConstants.NITROUS_OXIDE_COEFFICIENT_WITH_TILLED_BEDDING</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.constants_and_units.html#RUFAS.routines.manure.constants_and_units.gas_emission_constants.GasEmissionConstants.NITROUS_OXIDE_COEFFICIENT_WITH_UNTILLED_BEDDING"><code class="docutils literal notranslate"><span class="pre">GasEmissionConstants.NITROUS_OXIDE_COEFFICIENT_WITH_UNTILLED_BEDDING</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.constants_and_units.html#RUFAS.routines.manure.constants_and_units.gas_emission_constants.GasEmissionConstants.NON_DEGRADABLE_VOLATILE_SOLIDS_RATE_CORRECTING_FACTOR"><code class="docutils literal notranslate"><span class="pre">GasEmissionConstants.NON_DEGRADABLE_VOLATILE_SOLIDS_RATE_CORRECTING_FACTOR</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.constants_and_units.html#RUFAS.routines.manure.constants_and_units.gas_emission_constants.GasEmissionConstants.OXYGEN_HALF_SATURATION_CONSTANT"><code class="docutils literal notranslate"><span class="pre">GasEmissionConstants.OXYGEN_HALF_SATURATION_CONSTANT</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.constants_and_units.html#RUFAS.routines.manure.constants_and_units.gas_emission_constants.GasEmissionConstants.POTENTIAL_METHANE_YIELD_OF_MANURE"><code class="docutils literal notranslate"><span class="pre">GasEmissionConstants.POTENTIAL_METHANE_YIELD_OF_MANURE</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.constants_and_units.html#RUFAS.routines.manure.constants_and_units.gas_emission_constants.GasEmissionConstants.SLURRY_MANURE_HSC"><code class="docutils literal notranslate"><span class="pre">GasEmissionConstants.SLURRY_MANURE_HSC</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.constants_and_units.html#RUFAS.routines.manure.constants_and_units.gas_emission_constants.GasEmissionConstants.SLURRY_MANURE_THRESHOLD"><code class="docutils literal notranslate"><span class="pre">GasEmissionConstants.SLURRY_MANURE_THRESHOLD</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.constants_and_units.html#RUFAS.routines.manure.constants_and_units.gas_emission_constants.GasEmissionConstants.SOLID_AND_SEMI_SOLID_MANURE_HSC"><code class="docutils literal notranslate"><span class="pre">GasEmissionConstants.SOLID_AND_SEMI_SOLID_MANURE_HSC</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.constants_and_units.html#RUFAS.routines.manure.constants_and_units.gas_emission_constants.GasEmissionConstants.SOLID_MANURE_THRESHOLD"><code class="docutils literal notranslate"><span class="pre">GasEmissionConstants.SOLID_MANURE_THRESHOLD</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.constants_and_units.html#RUFAS.routines.manure.constants_and_units.gas_emission_constants.GasEmissionConstants.SPECIFIC_GROWTH_RATE"><code class="docutils literal notranslate"><span class="pre">GasEmissionConstants.SPECIFIC_GROWTH_RATE</span></code></a></li>
 </ul>
 </li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="RUFAS.routines.manure.constants.html#module-RUFAS.routines.manure.constants.manure_constants">RUFAS.routines.manure.constants.manure_constants module</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="RUFAS.routines.manure.constants.html#RUFAS.routines.manure.constants.manure_constants.ManureConstants"><code class="docutils literal notranslate"><span class="pre">ManureConstants</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.constants.html#RUFAS.routines.manure.constants.manure_constants.ManureConstants.MANURE_DENSITY"><code class="docutils literal notranslate"><span class="pre">ManureConstants.MANURE_DENSITY</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.constants.html#RUFAS.routines.manure.constants.manure_constants.ManureConstants.MANURE_SOLIDS_BEDDING_DENSITY"><code class="docutils literal notranslate"><span class="pre">ManureConstants.MANURE_SOLIDS_BEDDING_DENSITY</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.constants.html#RUFAS.routines.manure.constants.manure_constants.ManureConstants.TAN_MOLAR_MASS"><code class="docutils literal notranslate"><span class="pre">ManureConstants.TAN_MOLAR_MASS</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.constants.html#RUFAS.routines.manure.constants.manure_constants.ManureConstants.UREA_DENSITY"><code class="docutils literal notranslate"><span class="pre">ManureConstants.UREA_DENSITY</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.constants.html#RUFAS.routines.manure.constants.manure_constants.ManureConstants.UREA_MOLAR_MASS"><code class="docutils literal notranslate"><span class="pre">ManureConstants.UREA_MOLAR_MASS</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.constants.html#RUFAS.routines.manure.constants.manure_constants.ManureConstants.URINE_TAN_FACTOR"><code class="docutils literal notranslate"><span class="pre">ManureConstants.URINE_TAN_FACTOR</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="RUFAS.routines.manure.constants_and_units.html#module-RUFAS.routines.manure.constants_and_units.manure_constants">RUFAS.routines.manure.constants_and_units.manure_constants module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.routines.manure.constants_and_units.html#RUFAS.routines.manure.constants_and_units.manure_constants.ManureConstants"><code class="docutils literal notranslate"><span class="pre">ManureConstants</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.constants_and_units.html#RUFAS.routines.manure.constants_and_units.manure_constants.ManureConstants.COMPOST_BEDDING_INORGANIC_NITROGEN_AMMONIUM_FRACTION"><code class="docutils literal notranslate"><span class="pre">ManureConstants.COMPOST_BEDDING_INORGANIC_NITROGEN_AMMONIUM_FRACTION</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.constants_and_units.html#RUFAS.routines.manure.constants_and_units.manure_constants.ManureConstants.COMPOST_BEDDING_ORGANIC_NITROGEN_FRACTION"><code class="docutils literal notranslate"><span class="pre">ManureConstants.COMPOST_BEDDING_ORGANIC_NITROGEN_FRACTION</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.constants_and_units.html#RUFAS.routines.manure.constants_and_units.manure_constants.ManureConstants.DEFAULT_CARBON_FRACTION_AVAILABLE_IN_MANURE"><code class="docutils literal notranslate"><span class="pre">ManureConstants.DEFAULT_CARBON_FRACTION_AVAILABLE_IN_MANURE</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.constants_and_units.html#RUFAS.routines.manure.constants_and_units.manure_constants.ManureConstants.DEFAULT_DAYS_SINCE_LAST_TILLAGE"><code class="docutils literal notranslate"><span class="pre">ManureConstants.DEFAULT_DAYS_SINCE_LAST_TILLAGE</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.constants_and_units.html#RUFAS.routines.manure.constants_and_units.manure_constants.ManureConstants.DEFAULT_LAG_TIME"><code class="docutils literal notranslate"><span class="pre">ManureConstants.DEFAULT_LAG_TIME</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.constants_and_units.html#RUFAS.routines.manure.constants_and_units.manure_constants.ManureConstants.DEFAULT_MOISTURE_EFFECT_MICROBIAL_DECOMP"><code class="docutils literal notranslate"><span class="pre">ManureConstants.DEFAULT_MOISTURE_EFFECT_MICROBIAL_DECOMP</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.constants_and_units.html#RUFAS.routines.manure.constants_and_units.manure_constants.ManureConstants.EFFECTIVE_MICROBIAL_DECOMP_RATE"><code class="docutils literal notranslate"><span class="pre">ManureConstants.EFFECTIVE_MICROBIAL_DECOMP_RATE</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.constants_and_units.html#RUFAS.routines.manure.constants_and_units.manure_constants.ManureConstants.LIQUID_MANURE_DENSITY"><code class="docutils literal notranslate"><span class="pre">ManureConstants.LIQUID_MANURE_DENSITY</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.constants_and_units.html#RUFAS.routines.manure.constants_and_units.manure_constants.ManureConstants.MANURE_DENSITY"><code class="docutils literal notranslate"><span class="pre">ManureConstants.MANURE_DENSITY</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.constants_and_units.html#RUFAS.routines.manure.constants_and_units.manure_constants.ManureConstants.MANURE_SOLIDS_BEDDING_DENSITY"><code class="docutils literal notranslate"><span class="pre">ManureConstants.MANURE_SOLIDS_BEDDING_DENSITY</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.constants_and_units.html#RUFAS.routines.manure.constants_and_units.manure_constants.ManureConstants.SLURRY_MANURE_DENSITY"><code class="docutils literal notranslate"><span class="pre">ManureConstants.SLURRY_MANURE_DENSITY</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.constants_and_units.html#RUFAS.routines.manure.constants_and_units.manure_constants.ManureConstants.SOLID_MANURE_DENSITY"><code class="docutils literal notranslate"><span class="pre">ManureConstants.SOLID_MANURE_DENSITY</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.constants_and_units.html#RUFAS.routines.manure.constants_and_units.manure_constants.ManureConstants.TAN_MOLAR_MASS"><code class="docutils literal notranslate"><span class="pre">ManureConstants.TAN_MOLAR_MASS</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.constants_and_units.html#RUFAS.routines.manure.constants_and_units.manure_constants.ManureConstants.UREA_DENSITY"><code class="docutils literal notranslate"><span class="pre">ManureConstants.UREA_DENSITY</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.constants_and_units.html#RUFAS.routines.manure.constants_and_units.manure_constants.ManureConstants.UREA_MOLAR_MASS"><code class="docutils literal notranslate"><span class="pre">ManureConstants.UREA_MOLAR_MASS</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.constants_and_units.html#RUFAS.routines.manure.constants_and_units.manure_constants.ManureConstants.URINE_TAN_FACTOR"><code class="docutils literal notranslate"><span class="pre">ManureConstants.URINE_TAN_FACTOR</span></code></a></li>
 </ul>
 </li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="RUFAS.routines.manure.constants.html#module-RUFAS.routines.manure.constants">Module contents</a></li>
+<li class="toctree-l2"><a class="reference internal" href="RUFAS.routines.manure.constants_and_units.html#module-RUFAS.routines.manure.constants_and_units.units">RUFAS.routines.manure.constants_and_units.units module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.routines.manure.constants_and_units.html#RUFAS.routines.manure.constants_and_units.units.Units"><code class="docutils literal notranslate"><span class="pre">Units</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.constants_and_units.html#RUFAS.routines.manure.constants_and_units.units.Units.accumulated_final_manure_volume"><code class="docutils literal notranslate"><span class="pre">Units.accumulated_final_manure_volume</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.constants_and_units.html#RUFAS.routines.manure.constants_and_units.units.Units.accumulated_sludge_volume"><code class="docutils literal notranslate"><span class="pre">Units.accumulated_sludge_volume</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.constants_and_units.html#RUFAS.routines.manure.constants_and_units.units.Units.cleaning_water_volume"><code class="docutils literal notranslate"><span class="pre">Units.cleaning_water_volume</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.constants_and_units.html#RUFAS.routines.manure.constants_and_units.units.Units.degradable_volatile_solids"><code class="docutils literal notranslate"><span class="pre">Units.degradable_volatile_solids</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.constants_and_units.html#RUFAS.routines.manure.constants_and_units.units.Units.final_daily_volume"><code class="docutils literal notranslate"><span class="pre">Units.final_daily_volume</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.constants_and_units.html#RUFAS.routines.manure.constants_and_units.units.Units.final_manure_volume"><code class="docutils literal notranslate"><span class="pre">Units.final_manure_volume</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.constants_and_units.html#RUFAS.routines.manure.constants_and_units.units.Units.final_solids_wet_mass"><code class="docutils literal notranslate"><span class="pre">Units.final_solids_wet_mass</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.constants_and_units.html#RUFAS.routines.manure.constants_and_units.units.Units.final_solids_wet_mass_volume"><code class="docutils literal notranslate"><span class="pre">Units.final_solids_wet_mass_volume</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.constants_and_units.html#RUFAS.routines.manure.constants_and_units.units.Units.housing_ammonia"><code class="docutils literal notranslate"><span class="pre">Units.housing_ammonia</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.constants_and_units.html#RUFAS.routines.manure.constants_and_units.units.Units.housing_carbon_dioxide"><code class="docutils literal notranslate"><span class="pre">Units.housing_carbon_dioxide</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.constants_and_units.html#RUFAS.routines.manure.constants_and_units.units.Units.housing_methane"><code class="docutils literal notranslate"><span class="pre">Units.housing_methane</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.constants_and_units.html#RUFAS.routines.manure.constants_and_units.units.Units.liquid_manure_daily_volume"><code class="docutils literal notranslate"><span class="pre">Units.liquid_manure_daily_volume</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.constants_and_units.html#RUFAS.routines.manure.constants_and_units.units.Units.liquid_manure_nitrogen"><code class="docutils literal notranslate"><span class="pre">Units.liquid_manure_nitrogen</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.constants_and_units.html#RUFAS.routines.manure.constants_and_units.units.Units.liquid_manure_phosphorus"><code class="docutils literal notranslate"><span class="pre">Units.liquid_manure_phosphorus</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.constants_and_units.html#RUFAS.routines.manure.constants_and_units.units.Units.liquid_manure_potassium"><code class="docutils literal notranslate"><span class="pre">Units.liquid_manure_potassium</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.constants_and_units.html#RUFAS.routines.manure.constants_and_units.units.Units.liquid_manure_total_ammoniacal_nitrogen"><code class="docutils literal notranslate"><span class="pre">Units.liquid_manure_total_ammoniacal_nitrogen</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.constants_and_units.html#RUFAS.routines.manure.constants_and_units.units.Units.liquid_manure_total_solids"><code class="docutils literal notranslate"><span class="pre">Units.liquid_manure_total_solids</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.constants_and_units.html#RUFAS.routines.manure.constants_and_units.units.Units.liquid_manure_total_volatile_solids"><code class="docutils literal notranslate"><span class="pre">Units.liquid_manure_total_volatile_solids</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.constants_and_units.html#RUFAS.routines.manure.constants_and_units.units.Units.manure_degradable_volatile_solids"><code class="docutils literal notranslate"><span class="pre">Units.manure_degradable_volatile_solids</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.constants_and_units.html#RUFAS.routines.manure.constants_and_units.units.Units.manure_mass"><code class="docutils literal notranslate"><span class="pre">Units.manure_mass</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.constants_and_units.html#RUFAS.routines.manure.constants_and_units.units.Units.manure_nitrogen"><code class="docutils literal notranslate"><span class="pre">Units.manure_nitrogen</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.constants_and_units.html#RUFAS.routines.manure.constants_and_units.units.Units.manure_non_degradable_volatile_solids"><code class="docutils literal notranslate"><span class="pre">Units.manure_non_degradable_volatile_solids</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.constants_and_units.html#RUFAS.routines.manure.constants_and_units.units.Units.manure_phosphorus"><code class="docutils literal notranslate"><span class="pre">Units.manure_phosphorus</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.constants_and_units.html#RUFAS.routines.manure.constants_and_units.units.Units.manure_potassium"><code class="docutils literal notranslate"><span class="pre">Units.manure_potassium</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.constants_and_units.html#RUFAS.routines.manure.constants_and_units.units.Units.manure_total_ammoniacal_nitrogen"><code class="docutils literal notranslate"><span class="pre">Units.manure_total_ammoniacal_nitrogen</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.constants_and_units.html#RUFAS.routines.manure.constants_and_units.units.Units.manure_total_solids"><code class="docutils literal notranslate"><span class="pre">Units.manure_total_solids</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.constants_and_units.html#RUFAS.routines.manure.constants_and_units.units.Units.manure_urea"><code class="docutils literal notranslate"><span class="pre">Units.manure_urea</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.constants_and_units.html#RUFAS.routines.manure.constants_and_units.units.Units.manure_urine"><code class="docutils literal notranslate"><span class="pre">Units.manure_urine</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.constants_and_units.html#RUFAS.routines.manure.constants_and_units.units.Units.manure_volume"><code class="docutils literal notranslate"><span class="pre">Units.manure_volume</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.constants_and_units.html#RUFAS.routines.manure.constants_and_units.units.Units.methane"><code class="docutils literal notranslate"><span class="pre">Units.methane</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.constants_and_units.html#RUFAS.routines.manure.constants_and_units.units.Units.nitrogen"><code class="docutils literal notranslate"><span class="pre">Units.nitrogen</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.constants_and_units.html#RUFAS.routines.manure.constants_and_units.units.Units.non_degradable_volatile_solids"><code class="docutils literal notranslate"><span class="pre">Units.non_degradable_volatile_solids</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.constants_and_units.html#RUFAS.routines.manure.constants_and_units.units.Units.phosphorus"><code class="docutils literal notranslate"><span class="pre">Units.phosphorus</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.constants_and_units.html#RUFAS.routines.manure.constants_and_units.units.Units.potassium"><code class="docutils literal notranslate"><span class="pre">Units.potassium</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.constants_and_units.html#RUFAS.routines.manure.constants_and_units.units.Units.sludge_manure_daily_volume"><code class="docutils literal notranslate"><span class="pre">Units.sludge_manure_daily_volume</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.constants_and_units.html#RUFAS.routines.manure.constants_and_units.units.Units.sludge_manure_nitrogen"><code class="docutils literal notranslate"><span class="pre">Units.sludge_manure_nitrogen</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.constants_and_units.html#RUFAS.routines.manure.constants_and_units.units.Units.sludge_manure_phosphorus"><code class="docutils literal notranslate"><span class="pre">Units.sludge_manure_phosphorus</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.constants_and_units.html#RUFAS.routines.manure.constants_and_units.units.Units.sludge_manure_potassium"><code class="docutils literal notranslate"><span class="pre">Units.sludge_manure_potassium</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.constants_and_units.html#RUFAS.routines.manure.constants_and_units.units.Units.sludge_manure_total_solids"><code class="docutils literal notranslate"><span class="pre">Units.sludge_manure_total_solids</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.constants_and_units.html#RUFAS.routines.manure.constants_and_units.units.Units.sludge_manure_total_volatile_solids"><code class="docutils literal notranslate"><span class="pre">Units.sludge_manure_total_volatile_solids</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.constants_and_units.html#RUFAS.routines.manure.constants_and_units.units.Units.solid_manure_nitrogen"><code class="docutils literal notranslate"><span class="pre">Units.solid_manure_nitrogen</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.constants_and_units.html#RUFAS.routines.manure.constants_and_units.units.Units.solid_manure_phosphorus"><code class="docutils literal notranslate"><span class="pre">Units.solid_manure_phosphorus</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.constants_and_units.html#RUFAS.routines.manure.constants_and_units.units.Units.solid_manure_potassium"><code class="docutils literal notranslate"><span class="pre">Units.solid_manure_potassium</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.constants_and_units.html#RUFAS.routines.manure.constants_and_units.units.Units.solid_manure_total_solids"><code class="docutils literal notranslate"><span class="pre">Units.solid_manure_total_solids</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.constants_and_units.html#RUFAS.routines.manure.constants_and_units.units.Units.solid_manure_total_volatile_solids"><code class="docutils literal notranslate"><span class="pre">Units.solid_manure_total_volatile_solids</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.constants_and_units.html#RUFAS.routines.manure.constants_and_units.units.Units.storage_ammonia"><code class="docutils literal notranslate"><span class="pre">Units.storage_ammonia</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.constants_and_units.html#RUFAS.routines.manure.constants_and_units.units.Units.storage_methane"><code class="docutils literal notranslate"><span class="pre">Units.storage_methane</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.constants_and_units.html#RUFAS.routines.manure.constants_and_units.units.Units.temperature"><code class="docutils literal notranslate"><span class="pre">Units.temperature</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.constants_and_units.html#RUFAS.routines.manure.constants_and_units.units.Units.total_bedding_volume"><code class="docutils literal notranslate"><span class="pre">Units.total_bedding_volume</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.constants_and_units.html#RUFAS.routines.manure.constants_and_units.units.Units.total_daily_manure_volume"><code class="docutils literal notranslate"><span class="pre">Units.total_daily_manure_volume</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.constants_and_units.html#RUFAS.routines.manure.constants_and_units.units.Units.total_solids"><code class="docutils literal notranslate"><span class="pre">Units.total_solids</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.constants_and_units.html#RUFAS.routines.manure.constants_and_units.units.Units.total_water_volume_in_milking_center"><code class="docutils literal notranslate"><span class="pre">Units.total_water_volume_in_milking_center</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.constants_and_units.html#RUFAS.routines.manure.constants_and_units.units.Units.urea"><code class="docutils literal notranslate"><span class="pre">Units.urea</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.constants_and_units.html#RUFAS.routines.manure.constants_and_units.units.Units.urine"><code class="docutils literal notranslate"><span class="pre">Units.urine</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.constants_and_units.html#RUFAS.routines.manure.constants_and_units.units.Units.urine_nitrogen"><code class="docutils literal notranslate"><span class="pre">Units.urine_nitrogen</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.constants_and_units.html#RUFAS.routines.manure.constants_and_units.units.Units.urine_total_ammoniacal_nitrogen"><code class="docutils literal notranslate"><span class="pre">Units.urine_total_ammoniacal_nitrogen</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="RUFAS.routines.manure.constants_and_units.html#module-RUFAS.routines.manure.constants_and_units">Module contents</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="RUFAS.routines.manure.default_enum.html">RUFAS.routines.manure.default_enum package</a><ul>
@@ -209,15 +341,22 @@
 </li>
 <li class="toctree-l1"><a class="reference internal" href="RUFAS.routines.manure.gas_emissions.html">RUFAS.routines.manure.gas_emissions package</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="RUFAS.routines.manure.gas_emissions.html#submodules">Submodules</a></li>
-<li class="toctree-l2"><a class="reference internal" href="RUFAS.routines.manure.gas_emissions.html#module-RUFAS.routines.manure.gas_emissions.gas_emissions">RUFAS.routines.manure.gas_emissions.gas_emissions module</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="RUFAS.routines.manure.gas_emissions.html#RUFAS.routines.manure.gas_emissions.gas_emissions.GasEmissions"><code class="docutils literal notranslate"><span class="pre">GasEmissions</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.gas_emissions.html#RUFAS.routines.manure.gas_emissions.gas_emissions.GasEmissions.calc_ammonia_emission"><code class="docutils literal notranslate"><span class="pre">GasEmissions.calc_ammonia_emission()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.gas_emissions.html#RUFAS.routines.manure.gas_emissions.gas_emissions.GasEmissions.calc_biogas_energy_content"><code class="docutils literal notranslate"><span class="pre">GasEmissions.calc_biogas_energy_content()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.gas_emissions.html#RUFAS.routines.manure.gas_emissions.gas_emissions.GasEmissions.calc_carbon_dioxide_housing_emission"><code class="docutils literal notranslate"><span class="pre">GasEmissions.calc_carbon_dioxide_housing_emission()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.gas_emissions.html#RUFAS.routines.manure.gas_emissions.gas_emissions.GasEmissions.calc_methane_emission_for_anaerobic_lagoon"><code class="docutils literal notranslate"><span class="pre">GasEmissions.calc_methane_emission_for_anaerobic_lagoon()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.gas_emissions.html#RUFAS.routines.manure.gas_emissions.gas_emissions.GasEmissions.calc_methane_emission_for_slurry_storage"><code class="docutils literal notranslate"><span class="pre">GasEmissions.calc_methane_emission_for_slurry_storage()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.gas_emissions.html#RUFAS.routines.manure.gas_emissions.gas_emissions.GasEmissions.calc_methane_housing_emission"><code class="docutils literal notranslate"><span class="pre">GasEmissions.calc_methane_housing_emission()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.gas_emissions.html#RUFAS.routines.manure.gas_emissions.gas_emissions.GasEmissions.calc_methane_volume_via_Chen_equation"><code class="docutils literal notranslate"><span class="pre">GasEmissions.calc_methane_volume_via_Chen_equation()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="RUFAS.routines.manure.gas_emissions.html#module-RUFAS.routines.manure.gas_emissions.calculator">RUFAS.routines.manure.gas_emissions.calculator module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.routines.manure.gas_emissions.html#RUFAS.routines.manure.gas_emissions.calculator.GasEmissionsCalculator"><code class="docutils literal notranslate"><span class="pre">GasEmissionsCalculator</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.gas_emissions.html#RUFAS.routines.manure.gas_emissions.calculator.GasEmissionsCalculator.ammonia_emission"><code class="docutils literal notranslate"><span class="pre">GasEmissionsCalculator.ammonia_emission()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.gas_emissions.html#RUFAS.routines.manure.gas_emissions.calculator.GasEmissionsCalculator.ammonia_storage_emission"><code class="docutils literal notranslate"><span class="pre">GasEmissionsCalculator.ammonia_storage_emission()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.gas_emissions.html#RUFAS.routines.manure.gas_emissions.calculator.GasEmissionsCalculator.biogas_energy_content"><code class="docutils literal notranslate"><span class="pre">GasEmissionsCalculator.biogas_energy_content()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.gas_emissions.html#RUFAS.routines.manure.gas_emissions.calculator.GasEmissionsCalculator.housing_ammonia_emission"><code class="docutils literal notranslate"><span class="pre">GasEmissionsCalculator.housing_ammonia_emission()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.gas_emissions.html#RUFAS.routines.manure.gas_emissions.calculator.GasEmissionsCalculator.housing_carbon_dioxide_emission"><code class="docutils literal notranslate"><span class="pre">GasEmissionsCalculator.housing_carbon_dioxide_emission()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.gas_emissions.html#RUFAS.routines.manure.gas_emissions.calculator.GasEmissionsCalculator.housing_methane_emission"><code class="docutils literal notranslate"><span class="pre">GasEmissionsCalculator.housing_methane_emission()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.gas_emissions.html#RUFAS.routines.manure.gas_emissions.calculator.GasEmissionsCalculator.ifsm_methane_emission"><code class="docutils literal notranslate"><span class="pre">GasEmissionsCalculator.ifsm_methane_emission()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.gas_emissions.html#RUFAS.routines.manure.gas_emissions.calculator.GasEmissionsCalculator.methane_emission_for_slurry_storage"><code class="docutils literal notranslate"><span class="pre">GasEmissionsCalculator.methane_emission_for_slurry_storage()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.gas_emissions.html#RUFAS.routines.manure.gas_emissions.calculator.GasEmissionsCalculator.methane_emission_from_anaerobic_lagoon"><code class="docutils literal notranslate"><span class="pre">GasEmissionsCalculator.methane_emission_from_anaerobic_lagoon()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.gas_emissions.html#RUFAS.routines.manure.gas_emissions.calculator.GasEmissionsCalculator.methane_emission_from_slurry_storage"><code class="docutils literal notranslate"><span class="pre">GasEmissionsCalculator.methane_emission_from_slurry_storage()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.gas_emissions.html#RUFAS.routines.manure.gas_emissions.calculator.GasEmissionsCalculator.methane_volume_via_Chen_equation"><code class="docutils literal notranslate"><span class="pre">GasEmissionsCalculator.methane_volume_via_Chen_equation()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.gas_emissions.html#RUFAS.routines.manure.gas_emissions.calculator.GasEmissionsCalculator.storage_ammonia_emission"><code class="docutils literal notranslate"><span class="pre">GasEmissionsCalculator.storage_ammonia_emission()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.gas_emissions.html#RUFAS.routines.manure.gas_emissions.calculator.GasEmissionsCalculator.total_carbon_decomposition"><code class="docutils literal notranslate"><span class="pre">GasEmissionsCalculator.total_carbon_decomposition()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.gas_emissions.html#RUFAS.routines.manure.gas_emissions.calculator.GasEmissionsCalculator.total_nitrogen_loss_from_compost_bedded_pack_barn"><code class="docutils literal notranslate"><span class="pre">GasEmissionsCalculator.total_nitrogen_loss_from_compost_bedded_pack_barn()</span></code></a></li>
 </ul>
 </li>
 </ul>
@@ -238,6 +377,7 @@
 <li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.manure_handlers.html#RUFAS.routines.manure.manure_handlers.manure_handler_classes.DefaultManureHandlerConfigFactory.ALLEY_SCRAPER_CONFIG"><code class="docutils literal notranslate"><span class="pre">DefaultManureHandlerConfigFactory.ALLEY_SCRAPER_CONFIG</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.manure_handlers.html#RUFAS.routines.manure.manure_handlers.manure_handler_classes.DefaultManureHandlerConfigFactory.FLUSH_SYSTEM_CONFIG"><code class="docutils literal notranslate"><span class="pre">DefaultManureHandlerConfigFactory.FLUSH_SYSTEM_CONFIG</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.manure_handlers.html#RUFAS.routines.manure.manure_handlers.manure_handler_classes.DefaultManureHandlerConfigFactory.MANUAL_SCRAPING_CONFIG"><code class="docutils literal notranslate"><span class="pre">DefaultManureHandlerConfigFactory.MANUAL_SCRAPING_CONFIG</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.manure_handlers.html#RUFAS.routines.manure.manure_handlers.manure_handler_classes.DefaultManureHandlerConfigFactory.TILLAGE_CONFIG"><code class="docutils literal notranslate"><span class="pre">DefaultManureHandlerConfigFactory.TILLAGE_CONFIG</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.manure_handlers.html#RUFAS.routines.manure.manure_handlers.manure_handler_classes.DefaultManureHandlerConfigFactory.get_instance"><code class="docutils literal notranslate"><span class="pre">DefaultManureHandlerConfigFactory.get_instance()</span></code></a></li>
 </ul>
 </li>
@@ -246,6 +386,7 @@
 <li class="toctree-l3"><a class="reference internal" href="RUFAS.routines.manure.manure_handlers.html#RUFAS.routines.manure.manure_handlers.manure_handler_classes.ManureHandlerConfig"><code class="docutils literal notranslate"><span class="pre">ManureHandlerConfig</span></code></a><ul>
 <li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.manure_handlers.html#RUFAS.routines.manure.manure_handlers.manure_handler_classes.ManureHandlerConfig.cleaning_water_use_rate"><code class="docutils literal notranslate"><span class="pre">ManureHandlerConfig.cleaning_water_use_rate</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.manure_handlers.html#RUFAS.routines.manure.manure_handlers.manure_handler_classes.ManureHandlerConfig.cleanings_per_day"><code class="docutils literal notranslate"><span class="pre">ManureHandlerConfig.cleanings_per_day</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.manure_handlers.html#RUFAS.routines.manure.manure_handlers.manure_handler_classes.ManureHandlerConfig.daily_tillage_frequency"><code class="docutils literal notranslate"><span class="pre">ManureHandlerConfig.daily_tillage_frequency</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.manure_handlers.html#RUFAS.routines.manure.manure_handlers.manure_handler_classes.ManureHandlerConfig.minutes_per_cleaning"><code class="docutils literal notranslate"><span class="pre">ManureHandlerConfig.minutes_per_cleaning</span></code></a></li>
 </ul>
 </li>
@@ -258,8 +399,10 @@
 <li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.manure_handlers.html#RUFAS.routines.manure.manure_handlers.manure_handler_classes.ManureHandlerType.DEFAULT"><code class="docutils literal notranslate"><span class="pre">ManureHandlerType.DEFAULT</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.manure_handlers.html#RUFAS.routines.manure.manure_handlers.manure_handler_classes.ManureHandlerType.FLUSH_SYSTEM"><code class="docutils literal notranslate"><span class="pre">ManureHandlerType.FLUSH_SYSTEM</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.manure_handlers.html#RUFAS.routines.manure.manure_handlers.manure_handler_classes.ManureHandlerType.MANUAL_SCRAPING"><code class="docutils literal notranslate"><span class="pre">ManureHandlerType.MANUAL_SCRAPING</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.manure_handlers.html#RUFAS.routines.manure.manure_handlers.manure_handler_classes.ManureHandlerType.TILLAGE"><code class="docutils literal notranslate"><span class="pre">ManureHandlerType.TILLAGE</span></code></a></li>
 </ul>
 </li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.routines.manure.manure_handlers.html#RUFAS.routines.manure.manure_handlers.manure_handler_classes.Tillage"><code class="docutils literal notranslate"><span class="pre">Tillage</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="RUFAS.routines.manure.manure_handlers.html#module-RUFAS.routines.manure.manure_handlers.manure_handler_daily_output">RUFAS.routines.manure.manure_handlers.manure_handler_daily_output module</a><ul>
@@ -282,6 +425,7 @@
 <li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.manure_handlers.html#RUFAS.routines.manure.manure_handlers.manure_handler_daily_output.ManureHandlerDailyOutput.pen_id"><code class="docutils literal notranslate"><span class="pre">ManureHandlerDailyOutput.pen_id</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.manure_handlers.html#RUFAS.routines.manure.manure_handlers.manure_handler_daily_output.ManureHandlerDailyOutput.simulation_day"><code class="docutils literal notranslate"><span class="pre">ManureHandlerDailyOutput.simulation_day</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.manure_handlers.html#RUFAS.routines.manure.manure_handlers.manure_handler_daily_output.ManureHandlerDailyOutput.tempC"><code class="docutils literal notranslate"><span class="pre">ManureHandlerDailyOutput.tempC</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.manure_handlers.html#RUFAS.routines.manure.manure_handlers.manure_handler_daily_output.ManureHandlerDailyOutput.total_bedding_mass"><code class="docutils literal notranslate"><span class="pre">ManureHandlerDailyOutput.total_bedding_mass</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.manure_handlers.html#RUFAS.routines.manure.manure_handlers.manure_handler_daily_output.ManureHandlerDailyOutput.total_bedding_volume"><code class="docutils literal notranslate"><span class="pre">ManureHandlerDailyOutput.total_bedding_volume</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.manure_handlers.html#RUFAS.routines.manure.manure_handlers.manure_handler_daily_output.ManureHandlerDailyOutput.total_daily_manure_volume"><code class="docutils literal notranslate"><span class="pre">ManureHandlerDailyOutput.total_daily_manure_volume</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.manure_handlers.html#RUFAS.routines.manure.manure_handlers.manure_handler_daily_output.ManureHandlerDailyOutput.total_water_volume_in_milking_parlor"><code class="docutils literal notranslate"><span class="pre">ManureHandlerDailyOutput.total_water_volume_in_milking_parlor</span></code></a></li>
@@ -307,6 +451,58 @@
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="RUFAS.routines.manure.manure_handlers.html#module-RUFAS.routines.manure.manure_handlers">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="RUFAS.routines.manure.manure_nutrients.html">RUFAS.routines.manure.manure_nutrients package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="RUFAS.routines.manure.manure_nutrients.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="RUFAS.routines.manure.manure_nutrients.html#module-RUFAS.routines.manure.manure_nutrients.manure_nutrient_manager">RUFAS.routines.manure.manure_nutrients.manure_nutrient_manager module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.routines.manure.manure_nutrients.html#RUFAS.routines.manure.manure_nutrients.manure_nutrient_manager.ManureNutrientManager"><code class="docutils literal notranslate"><span class="pre">ManureNutrientManager</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.manure_nutrients.html#RUFAS.routines.manure.manure_nutrients.manure_nutrient_manager.ManureNutrientManager.add_nutrients"><code class="docutils literal notranslate"><span class="pre">ManureNutrientManager.add_nutrients()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.manure_nutrients.html#RUFAS.routines.manure.manure_nutrients.manure_nutrient_manager.ManureNutrientManager.request_nutrients"><code class="docutils literal notranslate"><span class="pre">ManureNutrientManager.request_nutrients()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.manure_nutrients.html#RUFAS.routines.manure.manure_nutrients.manure_nutrient_manager.ManureNutrientManager.values"><code class="docutils literal notranslate"><span class="pre">ManureNutrientManager.values</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="RUFAS.routines.manure.manure_nutrients.html#module-RUFAS.routines.manure.manure_nutrients.manure_nutrients">RUFAS.routines.manure.manure_nutrients.manure_nutrients module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.routines.manure.manure_nutrients.html#RUFAS.routines.manure.manure_nutrients.manure_nutrients.ManureNutrients"><code class="docutils literal notranslate"><span class="pre">ManureNutrients</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.manure_nutrients.html#RUFAS.routines.manure.manure_nutrients.manure_nutrients.ManureNutrients.dry_matter"><code class="docutils literal notranslate"><span class="pre">ManureNutrients.dry_matter</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.manure_nutrients.html#RUFAS.routines.manure.manure_nutrients.manure_nutrients.ManureNutrients.dry_matter_fraction"><code class="docutils literal notranslate"><span class="pre">ManureNutrients.dry_matter_fraction</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.manure_nutrients.html#RUFAS.routines.manure.manure_nutrients.manure_nutrients.ManureNutrients.nitrogen"><code class="docutils literal notranslate"><span class="pre">ManureNutrients.nitrogen</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.manure_nutrients.html#RUFAS.routines.manure.manure_nutrients.manure_nutrients.ManureNutrients.nitrogen_composition"><code class="docutils literal notranslate"><span class="pre">ManureNutrients.nitrogen_composition</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.manure_nutrients.html#RUFAS.routines.manure.manure_nutrients.manure_nutrients.ManureNutrients.phosphorus"><code class="docutils literal notranslate"><span class="pre">ManureNutrients.phosphorus</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.manure_nutrients.html#RUFAS.routines.manure.manure_nutrients.manure_nutrients.ManureNutrients.phosphorus_composition"><code class="docutils literal notranslate"><span class="pre">ManureNutrients.phosphorus_composition</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.manure_nutrients.html#RUFAS.routines.manure.manure_nutrients.manure_nutrients.ManureNutrients.potassium"><code class="docutils literal notranslate"><span class="pre">ManureNutrients.potassium</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.manure_nutrients.html#RUFAS.routines.manure.manure_nutrients.manure_nutrients.ManureNutrients.total_manure_mass"><code class="docutils literal notranslate"><span class="pre">ManureNutrients.total_manure_mass</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="RUFAS.routines.manure.manure_nutrients.html#module-RUFAS.routines.manure.manure_nutrients.nutrient_request">RUFAS.routines.manure.manure_nutrients.nutrient_request module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.routines.manure.manure_nutrients.html#RUFAS.routines.manure.manure_nutrients.nutrient_request.NutrientRequest"><code class="docutils literal notranslate"><span class="pre">NutrientRequest</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.manure_nutrients.html#RUFAS.routines.manure.manure_nutrients.nutrient_request.NutrientRequest.nitrogen"><code class="docutils literal notranslate"><span class="pre">NutrientRequest.nitrogen</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.manure_nutrients.html#RUFAS.routines.manure.manure_nutrients.nutrient_request.NutrientRequest.phosphorus"><code class="docutils literal notranslate"><span class="pre">NutrientRequest.phosphorus</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="RUFAS.routines.manure.manure_nutrients.html#module-RUFAS.routines.manure.manure_nutrients.nutrient_request_results">RUFAS.routines.manure.manure_nutrients.nutrient_request_results module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.routines.manure.manure_nutrients.html#RUFAS.routines.manure.manure_nutrients.nutrient_request_results.NutrientRequestResults"><code class="docutils literal notranslate"><span class="pre">NutrientRequestResults</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.manure_nutrients.html#RUFAS.routines.manure.manure_nutrients.nutrient_request_results.NutrientRequestResults.ammonium_nitrogen_fraction"><code class="docutils literal notranslate"><span class="pre">NutrientRequestResults.ammonium_nitrogen_fraction</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.manure_nutrients.html#RUFAS.routines.manure.manure_nutrients.nutrient_request_results.NutrientRequestResults.dry_matter"><code class="docutils literal notranslate"><span class="pre">NutrientRequestResults.dry_matter</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.manure_nutrients.html#RUFAS.routines.manure.manure_nutrients.nutrient_request_results.NutrientRequestResults.dry_matter_fraction"><code class="docutils literal notranslate"><span class="pre">NutrientRequestResults.dry_matter_fraction</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.manure_nutrients.html#RUFAS.routines.manure.manure_nutrients.nutrient_request_results.NutrientRequestResults.inorganic_nitrogen_fraction"><code class="docutils literal notranslate"><span class="pre">NutrientRequestResults.inorganic_nitrogen_fraction</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.manure_nutrients.html#RUFAS.routines.manure.manure_nutrients.nutrient_request_results.NutrientRequestResults.inorganic_phosphorus_fraction"><code class="docutils literal notranslate"><span class="pre">NutrientRequestResults.inorganic_phosphorus_fraction</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.manure_nutrients.html#RUFAS.routines.manure.manure_nutrients.nutrient_request_results.NutrientRequestResults.nitrogen"><code class="docutils literal notranslate"><span class="pre">NutrientRequestResults.nitrogen</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.manure_nutrients.html#RUFAS.routines.manure.manure_nutrients.nutrient_request_results.NutrientRequestResults.organic_nitrogen_fraction"><code class="docutils literal notranslate"><span class="pre">NutrientRequestResults.organic_nitrogen_fraction</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.manure_nutrients.html#RUFAS.routines.manure.manure_nutrients.nutrient_request_results.NutrientRequestResults.organic_phosphorus_fraction"><code class="docutils literal notranslate"><span class="pre">NutrientRequestResults.organic_phosphorus_fraction</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.manure_nutrients.html#RUFAS.routines.manure.manure_nutrients.nutrient_request_results.NutrientRequestResults.phosphorus"><code class="docutils literal notranslate"><span class="pre">NutrientRequestResults.phosphorus</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.manure_nutrients.html#RUFAS.routines.manure.manure_nutrients.nutrient_request_results.NutrientRequestResults.total_manure_mass"><code class="docutils literal notranslate"><span class="pre">NutrientRequestResults.total_manure_mass</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="RUFAS.routines.manure.manure_nutrients.html#module-RUFAS.routines.manure.manure_nutrients">Module contents</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="RUFAS.routines.manure.manure_separators.html">RUFAS.routines.manure.manure_separators package</a><ul>
@@ -400,8 +596,8 @@
 </li>
 <li class="toctree-l2"><a class="reference internal" href="RUFAS.routines.manure.manure_treatments.html#module-RUFAS.routines.manure.manure_treatments.anaerobic_lagoon">RUFAS.routines.manure.manure_treatments.anaerobic_lagoon module</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="RUFAS.routines.manure.manure_treatments.html#RUFAS.routines.manure.manure_treatments.anaerobic_lagoon.AnaerobicLagoon"><code class="docutils literal notranslate"><span class="pre">AnaerobicLagoon</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.manure_treatments.html#RUFAS.routines.manure.manure_treatments.anaerobic_lagoon.AnaerobicLagoon.calc_ammonia_emission"><code class="docutils literal notranslate"><span class="pre">AnaerobicLagoon.calc_ammonia_emission()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.manure_treatments.html#RUFAS.routines.manure.manure_treatments.anaerobic_lagoon.AnaerobicLagoon.calc_methane_emission"><code class="docutils literal notranslate"><span class="pre">AnaerobicLagoon.calc_methane_emission()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.manure_treatments.html#RUFAS.routines.manure.manure_treatments.anaerobic_lagoon.AnaerobicLagoon.LAGOON_DEPTH"><code class="docutils literal notranslate"><span class="pre">AnaerobicLagoon.LAGOON_DEPTH</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.manure_treatments.html#RUFAS.routines.manure.manure_treatments.anaerobic_lagoon.AnaerobicLagoon.LAGOON_SLOPE"><code class="docutils literal notranslate"><span class="pre">AnaerobicLagoon.LAGOON_SLOPE</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.manure_treatments.html#RUFAS.routines.manure.manure_treatments.anaerobic_lagoon.AnaerobicLagoon.flushing_volume"><code class="docutils literal notranslate"><span class="pre">AnaerobicLagoon.flushing_volume</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.manure_treatments.html#RUFAS.routines.manure.manure_treatments.anaerobic_lagoon.AnaerobicLagoon.freeboard_volume"><code class="docutils literal notranslate"><span class="pre">AnaerobicLagoon.freeboard_volume</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.manure_treatments.html#RUFAS.routines.manure.manure_treatments.anaerobic_lagoon.AnaerobicLagoon.lagoon_depth"><code class="docutils literal notranslate"><span class="pre">AnaerobicLagoon.lagoon_depth</span></code></a></li>
@@ -418,6 +614,7 @@
 </li>
 <li class="toctree-l2"><a class="reference internal" href="RUFAS.routines.manure.manure_treatments.html#module-RUFAS.routines.manure.manure_treatments.base_manure_treatment">RUFAS.routines.manure.manure_treatments.base_manure_treatment module</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="RUFAS.routines.manure.manure_treatments.html#RUFAS.routines.manure.manure_treatments.base_manure_treatment.BaseManureTreatment"><code class="docutils literal notranslate"><span class="pre">BaseManureTreatment</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.manure_treatments.html#RUFAS.routines.manure.manure_treatments.base_manure_treatment.BaseManureTreatment.accumulated_output"><code class="docutils literal notranslate"><span class="pre">BaseManureTreatment.accumulated_output</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.manure_treatments.html#RUFAS.routines.manure.manure_treatments.base_manure_treatment.BaseManureTreatment.calc_ammonia_emission"><code class="docutils literal notranslate"><span class="pre">BaseManureTreatment.calc_ammonia_emission()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.manure_treatments.html#RUFAS.routines.manure.manure_treatments.base_manure_treatment.BaseManureTreatment.calc_methane_emission"><code class="docutils literal notranslate"><span class="pre">BaseManureTreatment.calc_methane_emission()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.manure_treatments.html#RUFAS.routines.manure.manure_treatments.base_manure_treatment.BaseManureTreatment.daily_update"><code class="docutils literal notranslate"><span class="pre">BaseManureTreatment.daily_update()</span></code></a></li>
@@ -426,10 +623,15 @@
 </li>
 </ul>
 </li>
+<li class="toctree-l2"><a class="reference internal" href="RUFAS.routines.manure.manure_treatments.html#module-RUFAS.routines.manure.manure_treatments.manure_treatment_cbpb">RUFAS.routines.manure.manure_treatments.manure_treatment_cbpb module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.routines.manure.manure_treatments.html#RUFAS.routines.manure.manure_treatments.manure_treatment_cbpb.CompostBeddedPackBarn"><code class="docutils literal notranslate"><span class="pre">CompostBeddedPackBarn</span></code></a></li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="RUFAS.routines.manure.manure_treatments.html#module-RUFAS.routines.manure.manure_treatments.manure_treatment_configs">RUFAS.routines.manure.manure_treatments.manure_treatment_configs module</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="RUFAS.routines.manure.manure_treatments.html#RUFAS.routines.manure.manure_treatments.manure_treatment_configs.DefaultManureTreatmentConfigFactory"><code class="docutils literal notranslate"><span class="pre">DefaultManureTreatmentConfigFactory</span></code></a><ul>
 <li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.manure_treatments.html#RUFAS.routines.manure.manure_treatments.manure_treatment_configs.DefaultManureTreatmentConfigFactory.ANAEROBIC_DIGESTION_CONFIG"><code class="docutils literal notranslate"><span class="pre">DefaultManureTreatmentConfigFactory.ANAEROBIC_DIGESTION_CONFIG</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.manure_treatments.html#RUFAS.routines.manure.manure_treatments.manure_treatment_configs.DefaultManureTreatmentConfigFactory.ANAEROBIC_LAGOON_CONFIG"><code class="docutils literal notranslate"><span class="pre">DefaultManureTreatmentConfigFactory.ANAEROBIC_LAGOON_CONFIG</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.manure_treatments.html#RUFAS.routines.manure.manure_treatments.manure_treatment_configs.DefaultManureTreatmentConfigFactory.COMPOST_BEDDED_PACK_BARN_CONFIG"><code class="docutils literal notranslate"><span class="pre">DefaultManureTreatmentConfigFactory.COMPOST_BEDDED_PACK_BARN_CONFIG</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.manure_treatments.html#RUFAS.routines.manure.manure_treatments.manure_treatment_configs.DefaultManureTreatmentConfigFactory.SLURRY_STORAGE_OUTDOOR_CONFIG"><code class="docutils literal notranslate"><span class="pre">DefaultManureTreatmentConfigFactory.SLURRY_STORAGE_OUTDOOR_CONFIG</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.manure_treatments.html#RUFAS.routines.manure.manure_treatments.manure_treatment_configs.DefaultManureTreatmentConfigFactory.SLURRY_STORAGE_UNDERFLOOR_CONFIG"><code class="docutils literal notranslate"><span class="pre">DefaultManureTreatmentConfigFactory.SLURRY_STORAGE_UNDERFLOOR_CONFIG</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.manure_treatments.html#RUFAS.routines.manure.manure_treatments.manure_treatment_configs.DefaultManureTreatmentConfigFactory.get_instance"><code class="docutils literal notranslate"><span class="pre">DefaultManureTreatmentConfigFactory.get_instance()</span></code></a></li>
@@ -503,9 +705,19 @@
 <li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.manure_treatments.html#RUFAS.routines.manure.manure_treatments.manure_treatment_types.ManureTreatmentType.ANAEROBIC_DIGESTION_AND_LAGOON"><code class="docutils literal notranslate"><span class="pre">ManureTreatmentType.ANAEROBIC_DIGESTION_AND_LAGOON</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.manure_treatments.html#RUFAS.routines.manure.manure_treatments.manure_treatment_types.ManureTreatmentType.ANAEROBIC_DIGESTION_AND_LAGOON_WITH_SPLIT"><code class="docutils literal notranslate"><span class="pre">ManureTreatmentType.ANAEROBIC_DIGESTION_AND_LAGOON_WITH_SPLIT</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.manure_treatments.html#RUFAS.routines.manure.manure_treatments.manure_treatment_types.ManureTreatmentType.ANAEROBIC_LAGOON"><code class="docutils literal notranslate"><span class="pre">ManureTreatmentType.ANAEROBIC_LAGOON</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.manure_treatments.html#RUFAS.routines.manure.manure_treatments.manure_treatment_types.ManureTreatmentType.COMPOST_BEDDED_PACK_BARN"><code class="docutils literal notranslate"><span class="pre">ManureTreatmentType.COMPOST_BEDDED_PACK_BARN</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.manure_treatments.html#RUFAS.routines.manure.manure_treatments.manure_treatment_types.ManureTreatmentType.DEFAULT"><code class="docutils literal notranslate"><span class="pre">ManureTreatmentType.DEFAULT</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.manure_treatments.html#RUFAS.routines.manure.manure_treatments.manure_treatment_types.ManureTreatmentType.SLURRY_STORAGE_OUTDOOR"><code class="docutils literal notranslate"><span class="pre">ManureTreatmentType.SLURRY_STORAGE_OUTDOOR</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.manure_treatments.html#RUFAS.routines.manure.manure_treatments.manure_treatment_types.ManureTreatmentType.SLURRY_STORAGE_UNDERFLOOR"><code class="docutils literal notranslate"><span class="pre">ManureTreatmentType.SLURRY_STORAGE_UNDERFLOOR</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="RUFAS.routines.manure.manure_treatments.html#module-RUFAS.routines.manure.manure_treatments.manure_types">RUFAS.routines.manure.manure_treatments.manure_types module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.routines.manure.manure_treatments.html#RUFAS.routines.manure.manure_treatments.manure_types.ManureType"><code class="docutils literal notranslate"><span class="pre">ManureType</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.manure_treatments.html#RUFAS.routines.manure.manure_treatments.manure_types.ManureType.LIQUID"><code class="docutils literal notranslate"><span class="pre">ManureType.LIQUID</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.manure_treatments.html#RUFAS.routines.manure.manure_treatments.manure_types.ManureType.SLURRY"><code class="docutils literal notranslate"><span class="pre">ManureType.SLURRY</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.manure_treatments.html#RUFAS.routines.manure.manure_treatments.manure_types.ManureType.SOLID"><code class="docutils literal notranslate"><span class="pre">ManureType.SOLID</span></code></a></li>
 </ul>
 </li>
 </ul>
@@ -541,39 +753,41 @@
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="RUFAS.routines.manure.pen.html">RUFAS.routines.manure.pen package</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="RUFAS.routines.manure.pen.html#submodules">Submodules</a></li>
-<li class="toctree-l2"><a class="reference internal" href="RUFAS.routines.manure.pen.html#module-RUFAS.routines.manure.pen.manure_management_pen">RUFAS.routines.manure.pen.manure_management_pen module</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="RUFAS.routines.manure.pen.html#RUFAS.routines.manure.pen.manure_management_pen.ManureManagementPen"><code class="docutils literal notranslate"><span class="pre">ManureManagerPen</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.pen.html#RUFAS.routines.manure.pen.manure_management_pen.ManureManagementPen.barn_area_from_pen_type"><code class="docutils literal notranslate"><span class="pre">ManureManagerPen.barn_area_from_pen_type</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.pen.html#RUFAS.routines.manure.pen.manure_management_pen.ManureManagementPen.count_lactating_cows"><code class="docutils literal notranslate"><span class="pre">ManureManagerPen.count_lactating_cows()</span></code></a></li>
-</ul>
-</li>
-</ul>
-</li>
 <li class="toctree-l2"><a class="reference internal" href="RUFAS.routines.manure.pen.html#module-RUFAS.routines.manure.pen">Module contents</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="RUFAS.routines.manure.pen_manure.html">RUFAS.routines.manure.pen_manure package</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="RUFAS.routines.manure.pen_manure.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="RUFAS.routines.manure.pen_manure.html#module-RUFAS.routines.manure.pen_manure.manure_manager_pen">RUFAS.routines.manure.pen_manure.manure_manager_pen module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.routines.manure.pen_manure.html#RUFAS.routines.manure.pen_manure.manure_manager_pen.ManureManagerPen"><code class="docutils literal notranslate"><span class="pre">ManureManagerPen</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.pen_manure.html#RUFAS.routines.manure.pen_manure.manure_manager_pen.ManureManagerPen.barn_area_from_pen_type"><code class="docutils literal notranslate"><span class="pre">ManureManagerPen.barn_area_from_pen_type</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.pen_manure.html#RUFAS.routines.manure.pen_manure.manure_manager_pen.ManureManagerPen.count_lactating_cows"><code class="docutils literal notranslate"><span class="pre">ManureManagerPen.count_lactating_cows()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="RUFAS.routines.manure.pen_manure.html#module-RUFAS.routines.manure.pen_manure.pen_manure">RUFAS.routines.manure.pen_manure.pen_manure module</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="RUFAS.routines.manure.pen_manure.html#RUFAS.routines.manure.pen_manure.pen_manure.PenManure"><code class="docutils literal notranslate"><span class="pre">PenManure</span></code></a><ul>
 <li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.pen_manure.html#RUFAS.routines.manure.pen_manure.pen_manure.PenManure.degradable_volatile_solids"><code class="docutils literal notranslate"><span class="pre">PenManure.degradable_volatile_solids</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.pen_manure.html#RUFAS.routines.manure.pen_manure.pen_manure.PenManure.enteric_methane_kg"><code class="docutils literal notranslate"><span class="pre">PenManure.enteric_methane_kg</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.pen_manure.html#RUFAS.routines.manure.pen_manure.pen_manure.PenManure.get_instance"><code class="docutils literal notranslate"><span class="pre">PenManure.get_instance()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.pen_manure.html#RUFAS.routines.manure.pen_manure.pen_manure.PenManure.inorganic_phosphorus_fraction"><code class="docutils literal notranslate"><span class="pre">PenManure.inorganic_phosphorus_fraction</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.pen_manure.html#RUFAS.routines.manure.pen_manure.pen_manure.PenManure.manure_mass"><code class="docutils literal notranslate"><span class="pre">PenManure.manure_mass</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.pen_manure.html#RUFAS.routines.manure.pen_manure.pen_manure.PenManure.manure_total_ammoniacal_nitrogen"><code class="docutils literal notranslate"><span class="pre">PenManure.manure_total_ammoniacal_nitrogen</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.pen_manure.html#RUFAS.routines.manure.pen_manure.pen_manure.PenManure.manure_volume"><code class="docutils literal notranslate"><span class="pre">PenManure.manure_volume</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.pen_manure.html#RUFAS.routines.manure.pen_manure.pen_manure.PenManure.methane"><code class="docutils literal notranslate"><span class="pre">PenManure.methane</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.pen_manure.html#RUFAS.routines.manure.pen_manure.pen_manure.PenManure.nitrogen"><code class="docutils literal notranslate"><span class="pre">PenManure.nitrogen</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.pen_manure.html#RUFAS.routines.manure.pen_manure.pen_manure.PenManure.non_degradable_volatile_solids"><code class="docutils literal notranslate"><span class="pre">PenManure.non_degradable_volatile_solids</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.pen_manure.html#RUFAS.routines.manure.pen_manure.pen_manure.PenManure.non_water_inorganic_phosphorus_fraction"><code class="docutils literal notranslate"><span class="pre">PenManure.non_water_inorganic_phosphorus_fraction</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.pen_manure.html#RUFAS.routines.manure.pen_manure.pen_manure.PenManure.non_water_organic_phosphorus_fraction"><code class="docutils literal notranslate"><span class="pre">PenManure.non_water_organic_phosphorus_fraction</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.pen_manure.html#RUFAS.routines.manure.pen_manure.pen_manure.PenManure.organic_phosphorus_fraction"><code class="docutils literal notranslate"><span class="pre">PenManure.organic_phosphorus_fraction</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.pen_manure.html#RUFAS.routines.manure.pen_manure.pen_manure.PenManure.phosphorus"><code class="docutils literal notranslate"><span class="pre">PenManure.phosphorus</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.pen_manure.html#RUFAS.routines.manure.pen_manure.pen_manure.PenManure.phosphorus_fraction"><code class="docutils literal notranslate"><span class="pre">PenManure.phosphorus_fraction</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.pen_manure.html#RUFAS.routines.manure.pen_manure.pen_manure.PenManure.potassium"><code class="docutils literal notranslate"><span class="pre">PenManure.potassium</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.pen_manure.html#RUFAS.routines.manure.pen_manure.pen_manure.PenManure.total_ammoniacal_nitrogen"><code class="docutils literal notranslate"><span class="pre">PenManure.total_ammoniacal_nitrogen</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.pen_manure.html#RUFAS.routines.manure.pen_manure.pen_manure.PenManure.total_solids"><code class="docutils literal notranslate"><span class="pre">PenManure.total_solids</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.pen_manure.html#RUFAS.routines.manure.pen_manure.pen_manure.PenManure.urea"><code class="docutils literal notranslate"><span class="pre">PenManure.urea</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.pen_manure.html#RUFAS.routines.manure.pen_manure.pen_manure.PenManure.urine"><code class="docutils literal notranslate"><span class="pre">PenManure.urine</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.pen_manure.html#RUFAS.routines.manure.pen_manure.pen_manure.PenManure.urine_ammoniacal_nitrogen"><code class="docutils literal notranslate"><span class="pre">PenManure.urine_ammoniacal_nitrogen</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.pen_manure.html#RUFAS.routines.manure.pen_manure.pen_manure.PenManure.urine_nitrogen"><code class="docutils literal notranslate"><span class="pre">PenManure.urine_nitrogen</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.pen_manure.html#RUFAS.routines.manure.pen_manure.pen_manure.PenManure.urine_total_ammoniacal_nitrogen"><code class="docutils literal notranslate"><span class="pre">PenManure.urine_total_ammoniacal_nitrogen</span></code></a></li>
 </ul>
 </li>
 </ul>
@@ -636,21 +850,13 @@
 </div>
 </section>
 <section id="submodules">
-<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this heading"></a></h2>
+<h2>Submodules<a class="headerlink" href="#submodules" title="Link to this heading"></a></h2>
 </section>
-<section id="module-RUFAS.routines.manure.manure_management">
-<span id="rufas-routines-manure-manure-management-module"></span><h2>RUFAS.routines.manure.manure_management module<a class="headerlink" href="#module-RUFAS.routines.manure.manure_management" title="Permalink to this heading"></a></h2>
-<p>RUFAS: Ruminant Farm Systems Model
-File name: manure_management.py</p>
-<p>Description:</p>
-<dl class="simple">
-<dt>Author(s):  William Donovan, <a class="reference external" href="mailto:wmdonovan&#37;&#52;&#48;wisc&#46;edu">wmdonovan<span>&#64;</span>wisc<span>&#46;</span>edu</a></dt><dd><p>Yunus Mohammed, <a class="reference external" href="mailto:ymm26&#37;&#52;&#48;cornell&#46;edu">ymm26<span>&#64;</span>cornell<span>&#46;</span>edu</a>
-Sadman Chowdhury, <a class="reference external" href="mailto:skc86&#37;&#52;&#48;cornell&#46;edu">skc86<span>&#64;</span>cornell<span>&#46;</span>edu</a></p>
-</dd>
-</dl>
+<section id="module-RUFAS.routines.manure.manure_manager">
+<span id="rufas-routines-manure-manure-manager-module"></span><h2>RUFAS.routines.manure.manure_manager module<a class="headerlink" href="#module-RUFAS.routines.manure.manure_manager" title="Link to this heading"></a></h2>
 <dl class="py class">
-<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_management.ManureManagement">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">RUFAS.routines.manure.manure_management.</span></span><span class="sig-name descname"><span class="pre">ManureManager</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">animal_management</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_management.AnimalManagement" title="RUFAS.routines.animal.animal_management.AnimalManager"><span class="pre">AnimalManager</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.manure.manure_management.ManureManagement" title="Permalink to this definition"></a></dt>
+<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_manager.ManureManager">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">RUFAS.routines.manure.manure_manager.</span></span><span class="sig-name descname"><span class="pre">ManureManager</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">animal_manager</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_manager.AnimalManager" title="RUFAS.routines.animal.animal_manager.AnimalManager"><span class="pre">AnimalManager</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">weather</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">manure_manager_config</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.manure.manure_manager.ManureManager" title="Link to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>A class that sets up and manages different manure management components including manure handlers,
 reception pits, manure separators, and manure storage treatments. When the simulation engine performs
@@ -665,67 +871,105 @@ manure_separators: a dictionary that maps an animal pen’s id to a ManureSepara
 manure_treatments: a dictionary that maps an animal pen’s id to a Treatment object.</p>
 </dd>
 </dl>
-<dl class="py property">
-<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_management.ManureManagement.all_data">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">all_data</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Tuple</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#RUFAS.routines.manure.manure_management.ManureManagement.all_data" title="Permalink to this definition"></a></dt>
-<dd><p>Returns all the data generated daily by different manure management components during
-the whole simulation.</p>
-<dl>
-<dt>Returns:</dt><dd><p>A dictionary that stores all the data generated daily by the four main
-manure management components. Its structure is as follows:</p>
-<blockquote>
-<div><p>key = id of an animal pen
-value = a list of tuples where each tuple represents a group of daily output objects.</p>
-<blockquote>
-<div><p>More precisely, each such tuple is of length 5, consisting of a
-pen object, a ManureHandlerOutput object, a ReceptionPitOutput object,
-a ManureSeparatorOutput object, and a ManureTreatment object.</p>
-</div></blockquote>
-</div></blockquote>
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_manager.ManureManager.daily_update">
+<span class="sig-name descname"><span class="pre">daily_update</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">animal_manager</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_manager.AnimalManager" title="RUFAS.routines.animal.animal_manager.AnimalManager"><span class="pre">AnimalManager</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.routines.manure.manure_manager.ManureManager.daily_update" title="Link to this definition"></a></dt>
+<dd><p>Calculates daily output data for each manure manager component for each animal pen.</p>
+<p>On the last day of the simulation, all the data generated daily by the manure manager
+components will be exported to a CSV file.</p>
+<section id="parameters">
+<h3>Parameters<a class="headerlink" href="#parameters" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>animal_manager<span class="classifier">AnimalManager</span></dt><dd><p>The current state of the AnimalManager object.</p>
 </dd>
 </dl>
+</section>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_manager.ManureManager.data">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">data</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">dict</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#RUFAS.routines.manure.manure_manager.ManureManager.data" title="Link to this definition"></a></dt>
+<dd><p>Get all the daily output data for each animal pen.</p>
+<section id="returns">
+<h3>Returns<a class="headerlink" href="#returns" title="Link to this heading"></a></h3>
+<dl>
+<dt>list[dict]</dt><dd><p>A list of dictionaries containing the daily output data for each animal pen.
+The keys and their associated data types of each dictionary are as follows:
+{</p>
+<blockquote>
+<div><p>‘simulation_day’: int,
+‘pen’: ManureManagerPen,
+‘animal_manure_excretions’: PenManure,
+‘manure_handler_daily_output’: ManureHandlerDailyOutput,
+‘reception_pit_daily_output’: ReceptionPitDailyOutput,
+‘manure_separator_daily_output’: ManureSeparatorDailyOutput,
+‘manure_treatment_daily_output’: ManureTreatmentDailyOutput,
+‘manure_treatment_accumulated_output’: ManureTreatmentDailyOutput,
+‘anaerobic_digestion_daily_output’: ManureTreatmentDailyOutput</p>
+</div></blockquote>
+<p>}</p>
+</dd>
+</dl>
+</section>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_management.ManureManagement.update">
-<span class="sig-name descname"><span class="pre">update</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">animal_management</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_management.AnimalManagement" title="RUFAS.routines.animal.animal_management.AnimalManager"><span class="pre">AnimalManager</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.routines.manure.manure_management.ManureManagement.update" title="Permalink to this definition"></a></dt>
-<dd><p>Updates this ManureManager object by calling the update function on
-each manure management component for each animal pen.</p>
+<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_manager.ManureManager.request_nutrients">
+<span class="sig-name descname"><span class="pre">request_nutrients</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.routines.manure.manure_nutrients.html#RUFAS.routines.manure.manure_nutrients.nutrient_request.NutrientRequest" title="RUFAS.routines.manure.manure_nutrients.nutrient_request.NutrientRequest"><span class="pre">NutrientRequest</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="RUFAS.routines.manure.manure_nutrients.html#RUFAS.routines.manure.manure_nutrients.nutrient_request_results.NutrientRequestResults" title="RUFAS.routines.manure.manure_nutrients.nutrient_request_results.NutrientRequestResults"><span class="pre">NutrientRequestResults</span></a></span></span><a class="headerlink" href="#RUFAS.routines.manure.manure_manager.ManureManager.request_nutrients" title="Link to this definition"></a></dt>
+<dd><p>Handle the request for specific nutrients from the crop and soil module.
+This method evaluates the nutrient request made by considering both nitrogen and phosphorus
+quantities desired. It calculates the projected manure mass that would satisfy the request
+and checks against the nutrients available in the manager.</p>
+<p>If the request can be fulfilled either partially or wholly, the corresponding amount of nutrients
+is subtracted from the manager’s internal bookkeeping. The method then returns the results of the
+nutrient request, which detail the amounts of nutrients that can be provided to fulfill the request.
+If the request cannot be fulfilled at all, the method will return None.</p>
+<section id="notes">
+<h3>Notes<a class="headerlink" href="#notes" title="Link to this heading"></a></h3>
+<p>This is a wrapper method that calls the request_nutrients method of the manure nutrient manager.</p>
+</section>
+<section id="id1">
+<h3>Parameters<a class="headerlink" href="#id1" title="Link to this heading"></a></h3>
 <dl class="simple">
-<dt>Args:</dt><dd><dl class="simple">
-<dt>animal_management: A SimpleAnimalManagement object that has been created</dt><dd><p>from the simulation engine’s AnimalManager object.</p>
+<dt>request<span class="classifier">NutrientRequest</span></dt><dd><p>The specific nutrient request, including quantities of nitrogen and phosphorus.</p>
 </dd>
 </dl>
+</section>
+<section id="id2">
+<h3>Returns<a class="headerlink" href="#id2" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>NutrientRequestResults | None</dt><dd><p>The results of the nutrient request, detailed in a <cite>NutrientRequestResults</cite> object, which includes
+the amount of nitrogen, phosphorus, total manure mass, dry matter, and others that can be provided
+to fulfill the request. Returns None if the request cannot be fulfilled.</p>
 </dd>
 </dl>
+</section>
 </dd></dl>
 
 </dd></dl>
 
 <dl class="py function">
-<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_management.simulate_daily_manure_management">
-<span class="sig-prename descclassname"><span class="pre">RUFAS.routines.manure.manure_management.</span></span><span class="sig-name descname"><span class="pre">simulate_daily_manure_management</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">manure_management</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#RUFAS.routines.manure.manure_management.ManureManagement" title="RUFAS.routines.manure.manure_management.ManureManager"><span class="pre">ManureManager</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">animal_management</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_management.AnimalManagement" title="RUFAS.routines.animal.animal_management.AnimalManager"><span class="pre">AnimalManager</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.routines.manure.manure_management.simulate_daily_manure_management" title="Permalink to this definition"></a></dt>
-<dd><p>Entry point to the manure management module. This function is called every time
-the SimulationEngine needs to perform daily simulation. Internally, the new manure data
-from the animal_management object will be extracted and passed through the following
-components sequentially - manure handlers, reception pits, manure separators,
-manure storage treatments - to generate daily output data. This data is then stored
-in the all_data attribute of the manure_management object.</p>
+<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_manager.simulate_daily_manure_manager">
+<span class="sig-prename descclassname"><span class="pre">RUFAS.routines.manure.manure_manager.</span></span><span class="sig-name descname"><span class="pre">simulate_daily_manure_manager</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">manure_manager</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#RUFAS.routines.manure.manure_manager.ManureManager" title="RUFAS.routines.manure.manure_manager.ManureManager"><span class="pre">ManureManager</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">animal_manager</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_manager.AnimalManager" title="RUFAS.routines.animal.animal_manager.AnimalManager"><span class="pre">AnimalManager</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.routines.manure.manure_manager.simulate_daily_manure_manager" title="Link to this definition"></a></dt>
+<dd><p>A wrapper function for the daily_update method of the ManureManager class.</p>
+<p>There is no strict reason why this function is needed. It is simply to make the code
+in the SimulationEngine more readable. It is OK to remove this function and call the
+daily_update method directly from the SimulationEngine.</p>
+<section id="id3">
+<h3>Parameters<a class="headerlink" href="#id3" title="Link to this heading"></a></h3>
 <dl class="simple">
-<dt>Args:</dt><dd><dl class="simple">
-<dt>manure_management: A reference to the ManureManager object stored in the SimulationEngine.</dt><dd><p>The internal states of this object will be updated based on the data extracted from the
-animal_management object.</p>
+<dt>manure_manager<span class="classifier">ManureManager</span></dt><dd><p>A reference to the ManureManager object stored in the SimulationEngine.</p>
 </dd>
-<dt>animal_management: A reference to the AnimalManager object stored in the SimulationEngine.</dt><dd><p>This object is treated as a read-only object so no changes are made to it.</p>
-</dd>
-</dl>
+<dt>animal_manager<span class="classifier">AnimalManager</span></dt><dd><p>A reference to the AnimalManager object stored in the SimulationEngine
+so the latest data can be passed to the ManureManager object.</p>
 </dd>
 </dl>
+</section>
 </dd></dl>
 
 </section>
 <section id="module-RUFAS.routines.manure">
-<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-RUFAS.routines.manure" title="Permalink to this heading"></a></h2>
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-RUFAS.routines.manure" title="Link to this heading"></a></h2>
 </section>
 </section>
 
@@ -734,7 +978,7 @@ animal_management object.</p>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
         <a href="RUFAS.routines.field.soil.phosphorus_cycling.html" class="btn btn-neutral float-left" title="RUFAS.routines.field.soil.phosphorus_cycling package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="RUFAS.routines.manure.beddings.html" class="btn btn-neutral float-right" title="RUFAS.routines.manure.beddings package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="RUFAS.routines.manure.IO_helpers.html" class="btn btn-neutral float-right" title="RUFAS.routines.manure.IO_helpers package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>
