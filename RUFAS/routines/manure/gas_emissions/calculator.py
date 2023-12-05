@@ -996,7 +996,7 @@ class GasEmissionsCalculator:
             Resistance of :math:`NH_3` transport to the atmosphere in a barn, s/m.
 
         """
-        return hsc * (1 - 0.027 * (20.0 - temp))
+        return hsc * (1 - 0.027 * (20.0 - max(temp, -15.0)))
 
     @classmethod
     def _henry_law_coefficient_of_ammonia(cls, temp: float) -> float:
@@ -1259,15 +1259,12 @@ class GasEmissionsCalculator:
         if manure_volatile_solids < 0:
             raise ValueError(f"{manure_volatile_solids=} mass must be positive.")
         Bo = GasEmissionConstants.ACHIEVABLE_METHANE_EMISSION
-        methane_conversion_factor = GasEmissionsCalculator._methane_conversion_factor(
-            ambient_barn_temp
-        )
-        methane_emissions_in_kg = (
-                                          manure_volatile_solids
-                                          * Bo
-                                          * GasEmissionConstants.METHANE_FACTOR
-                                          * methane_conversion_factor
-                                  ) / 100
+        methane_conversion_factor = GasEmissionsCalculator._methane_conversion_factor(ambient_barn_temp)
+        methane_emissions_in_kg = (manure_volatile_solids
+                                   * Bo
+                                   * GasEmissionConstants.METHANE_FACTOR
+                                   * methane_conversion_factor
+                                   ) / 100
         return methane_emissions_in_kg
 
     @classmethod
@@ -1442,7 +1439,7 @@ class GasEmissionsCalculator:
         return total_carbon_decomposition
 
     @staticmethod
-    def _nitrogen_loss_in_compost_bedded_pack_barn_due_to_ammonia_emission(
+    def nitrogen_loss_in_compost_bedded_pack_barn_from_ammonia_emission(
             daily_nitrogen_input: float, is_bedding_tilled: bool
     ) -> float:
         """
@@ -1489,11 +1486,11 @@ class GasEmissionsCalculator:
         return nitrogen_loss_tilled + nitrogen_loss_untilled
 
     @staticmethod
-    def _nitrogen_loss_in_compost_bedded_pack_barn_due_to_leaching(
+    def _nitrogen_loss_from_leaching(
             daily_nitrogen_input: float,
     ) -> float:
         """
-        Calculate the mass of nitrogen that leaches out of the compost bedded pack barn's manure-bedding mixture.
+        Calculate the mass of nitrogen that leaches out of the manure-bedding mixture.
 
         Parameters
         ----------
@@ -1503,7 +1500,7 @@ class GasEmissionsCalculator:
         Returns
         -------
         float
-            The amount of nitrogen that leaches out of the compost bedded pack barn's bedding mixture (kg).
+            The amount of nitrogen that leaches out of the bedding mixture (kg).
 
         Raises
         ------
@@ -1519,7 +1516,7 @@ class GasEmissionsCalculator:
         return GasEmissionConstants.LEACHING_COEFFICIENT * daily_nitrogen_input
 
     @staticmethod
-    def _nitrogen_loss_in_compost_bedded_pack_barn_due_to_nitrous_oxide_emission(
+    def nitrogen_loss_in_compost_bedded_pack_barn_from_nitrous_oxide_emission(
             daily_nitrogen_input: float, is_bedding_tilled: bool
     ) -> float:
         """
@@ -1594,19 +1591,97 @@ class GasEmissionsCalculator:
                 f"Daily nitrogen input mass must be non-negative: {daily_nitrogen_input}"
             )
 
-        ammonia_loss = GasEmissionsCalculator._nitrogen_loss_in_compost_bedded_pack_barn_due_to_ammonia_emission(
+        ammonia_loss = GasEmissionsCalculator.nitrogen_loss_in_compost_bedded_pack_barn_from_ammonia_emission(
             daily_nitrogen_input, is_bedding_tilled
         )
 
         nitrous_oxide_loss = \
-            GasEmissionsCalculator._nitrogen_loss_in_compost_bedded_pack_barn_due_to_nitrous_oxide_emission(
+            GasEmissionsCalculator.nitrogen_loss_in_compost_bedded_pack_barn_from_nitrous_oxide_emission(
                 daily_nitrogen_input, is_bedding_tilled
             )
 
-        leaching_loss = GasEmissionsCalculator._nitrogen_loss_in_compost_bedded_pack_barn_due_to_leaching(
+        leaching_loss = GasEmissionsCalculator._nitrogen_loss_from_leaching(
             daily_nitrogen_input
         )
 
         total_nitrogen_loss = ammonia_loss + nitrous_oxide_loss + leaching_loss
 
         return total_nitrogen_loss
+
+    @staticmethod
+    def nitrogen_loss_in_open_lots_from_ammonia_emission(daily_nitrogen_input: float) -> float:
+        """
+        Calculate the nitrogen loss from ammonia emission in the open lots manure treatment.
+
+        Parameters
+        ----------
+        daily_nitrogen_input : float
+            The amount of nitrogen present in the manure excreted by animals (kg).
+
+        Returns
+        -------
+        float
+            The amount of nitrogen lost to ammonia emission (kg).
+
+        Raises
+        ------
+        ValueError
+            If the daily nitrogen input is negative.
+        """
+
+        if daily_nitrogen_input < 0.0:
+            raise ValueError(
+                f"Daily nitrogen input mass must be non-negative: {daily_nitrogen_input}"
+            )
+
+        return GasEmissionConstants.AMMONIA_EMISSION_COEFFICIENT_IN_OPEN_LOTS * daily_nitrogen_input
+
+    @staticmethod
+    def nitrogen_loss_in_open_lots_from_nitrous_oxide_emission(daily_nitrogen_input: float) -> float:
+        """
+        Calculate the nitrogen loss from nitrous oxide emission in the open lots manure treatment.
+
+        Parameters
+        ----------
+        daily_nitrogen_input : float
+            The amount of nitrogen present in the manure excreted by animals (kg).
+
+        Returns
+        -------
+        float
+            The nitrogen lost to nitrous oxide emission (kg).
+
+        Raises
+        ------
+        ValueError
+            If the daily nitrogen input is negative.
+        """
+
+        if daily_nitrogen_input < 0.0:
+            raise ValueError(
+                f"Daily nitrogen input mass must be non-negative: {daily_nitrogen_input}"
+            )
+
+        return GasEmissionConstants.NITROUS_OXIDE_COEFFICIENT_IN_OPEN_LOTS * daily_nitrogen_input
+
+    @staticmethod
+    def total_nitrogen_loss_from_open_lots(daily_nitrogen_input: float) -> float:
+        """
+        Calculate the total nitrogen loss from the open lots manure treatment.
+
+        Parameters
+        ----------
+        daily_nitrogen_input : float
+            The amount of nitrogen present in the manure excreted by animals (kg).
+
+        Returns
+        -------
+        float
+            The total nitrogen loss from the open lots manure treatment (kg).
+
+        """
+        return (
+                GasEmissionsCalculator.nitrogen_loss_in_open_lots_from_ammonia_emission(daily_nitrogen_input)
+                + GasEmissionsCalculator._nitrogen_loss_from_leaching(daily_nitrogen_input)
+                + GasEmissionsCalculator.nitrogen_loss_in_open_lots_from_nitrous_oxide_emission(daily_nitrogen_input)
+        )
