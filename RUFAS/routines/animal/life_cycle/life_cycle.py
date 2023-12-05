@@ -1,13 +1,3 @@
-"""
-RUFAS: Ruminant Farm Systems Model
-File name: life_cycle.py
-Description: The class which manages the life cycle of the animals. This
-    includes storing all information necessary for the simulation, initializing
-    the herd to start the simulation at a steady state, updating the animals
-    for each day, and providing end-of-simulation statistics and graphs.
-Author(s): Manfei Li, mli497@wisc.edu
-           Militsa Sotirova, militsasotirova@gmail.com
-"""
 from collections import defaultdict
 from typing import Callable
 from typing import Dict
@@ -125,6 +115,10 @@ class LifeCycleManager:
         self.non_preg_cow_percent = 0.0
 
         self.daily_milk_production = 0.0
+        self.herd_milk_fat_kg = 0.0
+        self.herd_milk_fat_percent = 0.0
+        self.herd_milk_protein_kg = 0.0
+        self.herd_milk_protein_percent = 0.0
         self.avg_days_in_milk = 0.0
         self.avg_days_in_preg = 0.0
         self.avg_cow_body_weight = 0.0
@@ -297,6 +291,10 @@ class LifeCycleManager:
         self._calculate_percent_cow_per_parity()
 
         self.daily_milk_production = sum(cow.estimated_daily_milk_produced for cow in cows)
+        self.herd_milk_fat_kg = sum(cow.milk_fat_kg for cow in cows)
+        self.herd_milk_fat_percent = self.herd_milk_fat_kg / self.daily_milk_production
+        self.herd_milk_protein_kg = sum(cow.milk_protein_kg for cow in cows)
+        self.herd_milk_protein_percent = self.herd_milk_protein_kg / self.daily_milk_production
 
         info_map = {"class": self.__class__.__name__,
                     "function": self.daily_update.__name__,
@@ -320,6 +318,8 @@ class LifeCycleManager:
         om.add_variable("preg_check_num_h", self.preg_check_num_h, info_map)
         om.add_variable("sold_calf_num", self.sold_calf_num, info_map)
         om.add_variable("daily_milk_production", self.daily_milk_production, info_map)
+        om.add_variable("herd_milk_fat_percent", self.herd_milk_fat_percent, info_map)
+        om.add_variable("herd_milk_protein_percent", self.herd_milk_protein_percent, info_map)
         om.add_variable("open_cow_num", self.open_cow_num, info_map)
         om.add_variable("dnb_cow_num", self.dnb_cow_num, info_map)
         om.add_variable("vwp_cow_num", self.vwp_cow_num, info_map)
@@ -413,6 +413,10 @@ class LifeCycleManager:
         self.non_preg_cow_percent = 0.0
 
         self.daily_milk_production = 0.0
+        self.herd_milk_fat_kg = 0.0
+        self.herd_milk_fat_percent = 0.0
+        self.herd_milk_protein_kg = 0.0
+        self.herd_milk_protein_percent = 0.0
         self.avg_days_in_milk = 0.0
         self.avg_days_in_preg = 0.0
         self.avg_cow_body_weight = 0.0
