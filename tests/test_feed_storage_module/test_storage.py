@@ -123,3 +123,16 @@ def test_calculate_heat_generated(storage: Storage):
     """
     pass
 
+
+def test_calculate_bale_density(storage: Storage):
+    """
+    Test the calculate_bale_density method of the Storage class.
+    """
+    pass
+
+
+def test_recalculate_nutrient_fractions(storage: Storage):
+    """
+    Test the recalculate_nutrient_fractions method of the Storage class.
+    """
+    pass
