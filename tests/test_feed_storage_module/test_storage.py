@@ -102,3 +102,9 @@ def test_calculate_dry_matter_loss_to_gas(storage: Storage):
     """
     pass
 
+
+def test_calculate_dry_matter_loss_to_effluent(storage: Storage):
+    """
+    Test the calculate_dry_matter_loss_to_effluent method of the Storage class.
+    """
+    pass
