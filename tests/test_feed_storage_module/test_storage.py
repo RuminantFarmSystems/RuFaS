@@ -116,3 +116,10 @@ def test_calculate_protein_degradation(storage: Storage):
     """
     pass
 
+
+def test_calculate_heat_generated(storage: Storage):
+    """
+    Test the calculate_heat_generated method of the Storage class.
+    """
+    pass
+
