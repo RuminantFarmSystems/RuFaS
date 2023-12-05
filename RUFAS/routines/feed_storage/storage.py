@@ -159,4 +159,12 @@ class Storage:
         """
         pass
 
- 
+    def recalculate_nutrient_fractions(self):
+        """
+        Recalculates the relative nutrient concentrations after dry matter loss.
+
+        Returns
+        -------
+        None
+        """
+        pass
