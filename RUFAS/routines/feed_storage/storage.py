@@ -82,4 +82,21 @@ class Storage:
         """
         pass
 
- 
+    def calculate_dry_matter_loss_to_gas(self, dry_matter: float, time_in_silo: int):
+        """
+        Calculates the dry matter loss to gas.
+
+        Parameters
+        ----------
+        dry_matter : float
+            The amount of dry matter.
+        time_in_silo : int
+            Time in days the crop has been in the silo.
+
+        Returns
+        -------
+        float
+            The amount of dry matter lost to gas.
+        """
+        pass
+
