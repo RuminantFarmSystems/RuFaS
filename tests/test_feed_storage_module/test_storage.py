@@ -87,3 +87,10 @@ def test_process_degradations(storage: Storage):
     Test the process_degradations method of the Storage class.
     """
     pass
+
+
+def test_give_feed(storage: Storage):
+    """
+    Test the give_feed method of the Storage class.
+    """
+    pass
