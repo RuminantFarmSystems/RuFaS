@@ -108,3 +108,11 @@ def test_calculate_dry_matter_loss_to_effluent(storage: Storage):
     Test the calculate_dry_matter_loss_to_effluent method of the Storage class.
     """
     pass
+
+
+def test_calculate_protein_degradation(storage: Storage):
+    """
+    Test the calculate_protein_degradation method of the Storage class.
+    """
+    pass
+
