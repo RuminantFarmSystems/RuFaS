@@ -1,13 +1,3 @@
-"""
-RUFAS: Ruminant Farm Systems Model
-File name: test_manure_storage.py
-Description: Implements test cases
-Author(s): Pooya Hekmati, sh2235@cornell.edu
-"""
-
-import pytest
-
-
 def test_update_all():
     """Unit test for function update_all in file routines/manure_storage/manure_emissions.py"""
     pass
@@ -20,11 +10,6 @@ def test_methane():
 
 def test_WIP_WOP_frac():
     """Unit test for function WIP_WOP_frac in file routines/manure_storage/manure_emissions.py"""
-    pass
-
-
-def test_update_all():
-    """Unit test for function update_all in file routines/manure_storage/manure_handling.py"""
     pass
 
 
@@ -60,11 +45,6 @@ def test_CH4():
 
 def test_WIP_WOP():
     """Unit test for function WIP_WOP in file routines/manure_storage/manure_handling.py"""
-    pass
-
-
-def test_update_all():
-    """Unit test for function update_all in file routines/manure_storage/manure_separator.py"""
     pass
 
 
@@ -135,11 +115,6 @@ def test_calibrate_water_use():
 
 def test_calibrate_bedding():
     """Unit test for function calibrate_bedding in file routines/manure_storage/manure_storage.py"""
-    pass
-
-
-def test_reset_daily_variables():
-    """Unit test for function reset_daily_variables in file routines/manure_storage/manure_storage.py"""
     pass
 
 
