@@ -62,6 +62,13 @@
       "manure_handler": "tillage",
       "manure_separator": "none",
       "manure_treatment": "compost bedded pack barn"
+    },
+    {
+      "scenario_id": 9,
+      "bedding_type": "none",
+      "manure_handler": "harrowing",
+      "manure_separator": "none",
+      "manure_treatment": "open lots"
     }
   ],
   "bedding_configs": [
