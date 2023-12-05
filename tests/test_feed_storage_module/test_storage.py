@@ -94,3 +94,11 @@ def test_give_feed(storage: Storage):
     Test the give_feed method of the Storage class.
     """
     pass
+
+
+def test_calculate_dry_matter_loss_to_gas(storage: Storage):
+    """
+    Test the calculate_dry_matter_loss_to_gas method of the Storage class.
+    """
+    pass
+
