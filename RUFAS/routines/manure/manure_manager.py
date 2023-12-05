@@ -1,11 +1,3 @@
-"""
-RUFAS: Ruminant Farm Systems Model
-File name: manure_manager.py
-
-Author(s):  William Donovan, wmdonovan@wisc.edu
-            Yunus Mohammed, ymm26@cornell.edu
-            Sadman Chowdhury, skc86@cornell.edu
-"""
 from __future__ import annotations
 
 import typing
@@ -272,7 +264,8 @@ class ManureManager:
     @staticmethod
     def _get_manure_density_by_type(manure_type: ManureType) -> float:
         """
-        Look up the density of manure based on the given type.
+        Look up the density of manure based on the given type. The specific density values are
+        specified in the class :class:`ManureConstants`.
 
         Parameters
         ----------
