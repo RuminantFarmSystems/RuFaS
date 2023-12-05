@@ -47,3 +47,16 @@ def sample_crop_data() -> Dict[str, float]:
     }
 
 
+@pytest.fixture
+def storage() -> Storage:
+    """
+    Pytest fixture to create a Storage instance for testing.
+
+    Returns
+    -------
+    Storage
+        An instance of the Storage class.
+    """
+    return Storage()
+
+
