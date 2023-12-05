@@ -182,9 +182,9 @@ class BaseManureHandler:
 class FlushSystem(BaseManureHandler):
     """A class that handles calculations related to a flush system.
 
-    Attributes:
-        All inherited from BaseManureHandler.
-
+    Attributes
+    ----------
+    All inherited from BaseManureHandler.
     """
 
     pass
@@ -193,9 +193,9 @@ class FlushSystem(BaseManureHandler):
 class ManualScraping(BaseManureHandler):
     """A class that handles calculations related to manual scraping.
 
-    Attributes:
-        All inherited from BaseManureHandler.
-
+    Attributes
+    ----------
+    All inherited from BaseManureHandler.
     """
 
     pass
@@ -204,9 +204,9 @@ class ManualScraping(BaseManureHandler):
 class AlleyScraper(BaseManureHandler):
     """A class that handles calculations related to an alley scraper.
 
-    Attributes:
-        All inherited from BaseManureHandler.
-
+    Attributes
+    ----------
+    All inherited from BaseManureHandler.
     """
 
     pass
