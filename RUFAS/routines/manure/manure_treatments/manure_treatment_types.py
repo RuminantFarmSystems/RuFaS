@@ -13,4 +13,5 @@ class ManureTreatmentType(DefaultEnum):
         "anaerobic digestion and lagoon with split"
     )
     COMPOST_BEDDED_PACK_BARN = "compost bedded pack barn"
+    OPEN_LOTS = "open lots"
     DEFAULT = SLURRY_STORAGE_UNDERFLOOR

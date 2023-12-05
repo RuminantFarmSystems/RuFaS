@@ -6,7 +6,7 @@ from RUFAS.time import Time
 from RUFAS.weather import Weather
 from RUFAS.general_constants import GeneralConstants
 from RUFAS.routines.manure.beddings.bedding_classes import BaseBedding
-from RUFAS.routines.manure.manure_handlers.manure_handler_classes import AlleyScraper, Tillage
+from RUFAS.routines.manure.manure_handlers.manure_handler_classes import AlleyScraper, Tillage, Harrowing
 from RUFAS.routines.manure.manure_handlers.manure_handler_classes import BaseManureHandler
 from RUFAS.routines.manure.manure_handlers.manure_handler_classes import DefaultManureHandlerConfigFactory
 from RUFAS.routines.manure.manure_handlers.manure_handler_classes import FlushSystem
@@ -143,7 +143,8 @@ def test_manure_handler_config() -> None:
         (ManureHandlerType.FLUSH_SYSTEM, 757.0, 8, 2, 0),
         (ManureHandlerType.MANUAL_SCRAPING, 10.0, 8, 2, 0),
         (ManureHandlerType.ALLEY_SCRAPER, 10.0, 8, 2, 0),
-        (ManureHandlerType.TILLAGE, 0.0, 8, 2, 1)
+        (ManureHandlerType.TILLAGE, 0.0, 8, 2, 1),
+        (ManureHandlerType.HARROWING, 0.0, 8, 2, 0)
     ]
 )
 def test_default_manure_handler_config_factory_get_instance(manure_handler_type: ManureHandlerType,
@@ -175,6 +176,7 @@ def test_manure_handler_type_enum() -> None:
     assert ManureHandlerType.get_type('manual scraping') is ManureHandlerType.MANUAL_SCRAPING
     assert ManureHandlerType.get_type('alley scraper') is ManureHandlerType.ALLEY_SCRAPER
     assert ManureHandlerType.get_type('tillage') is ManureHandlerType.TILLAGE
+    assert ManureHandlerType.get_type('harrowing') is ManureHandlerType.HARROWING
     assert ManureHandlerType.get_type('default') is ManureHandlerType.DEFAULT
     assert ManureHandlerType.DEFAULT is ManureHandlerType.FLUSH_SYSTEM
     assert ManureHandlerType.get_type('dummy') is ManureHandlerType.FLUSH_SYSTEM
@@ -206,26 +208,8 @@ def mock_manure_handler_config() -> ManureHandlerConfig:
          DefaultManureHandlerConfigFactory.ALLEY_SCRAPER_CONFIG),
         ('tillage', None, Tillage,
          DefaultManureHandlerConfigFactory.TILLAGE_CONFIG),
-        ('dummy', None, FlushSystem,
-         DefaultManureHandlerConfigFactory.FLUSH_SYSTEM_CONFIG),
-        ('flush system', None, FlushSystem,
-         DefaultManureHandlerConfigFactory.FLUSH_SYSTEM_CONFIG),
-        ('manual scraping', None, ManualScraping,
-         DefaultManureHandlerConfigFactory.MANUAL_SCRAPING_CONFIG),
-        ('alley scraper', None, AlleyScraper,
-         DefaultManureHandlerConfigFactory.ALLEY_SCRAPER_CONFIG),
-        ('tillage', None, Tillage,
-         DefaultManureHandlerConfigFactory.TILLAGE_CONFIG),
-        ('dummy', None, FlushSystem,
-         DefaultManureHandlerConfigFactory.FLUSH_SYSTEM_CONFIG),
-        ('flush system', None, FlushSystem,
-         DefaultManureHandlerConfigFactory.FLUSH_SYSTEM_CONFIG),
-        ('manual scraping', None, ManualScraping,
-         DefaultManureHandlerConfigFactory.MANUAL_SCRAPING_CONFIG),
-        ('alley scraper', None, AlleyScraper,
-         DefaultManureHandlerConfigFactory.ALLEY_SCRAPER_CONFIG),
-        ('tillage', None, Tillage,
-         DefaultManureHandlerConfigFactory.TILLAGE_CONFIG),
+        ('harrowing', None, Harrowing,
+         DefaultManureHandlerConfigFactory.HARROWING_CONFIG),
         ('dummy', None, FlushSystem,
          DefaultManureHandlerConfigFactory.FLUSH_SYSTEM_CONFIG),
         ('flush system', mock_manure_handler_config,
@@ -236,6 +220,8 @@ def mock_manure_handler_config() -> ManureHandlerConfig:
          AlleyScraper, mock_manure_handler_config),
         ('tillage', mock_manure_handler_config,
          Tillage, mock_manure_handler_config),
+        ('harrowing', mock_manure_handler_config,
+         Harrowing, mock_manure_handler_config),
         ('dummy', mock_manure_handler_config,
          FlushSystem, mock_manure_handler_config),
     ])
