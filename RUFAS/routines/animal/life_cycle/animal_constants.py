@@ -1,10 +1,3 @@
-"""
-RUFAS: Ruminant Farm Systems Model
-File name: animal_constants.py
-Author(s): Militsa Sotirova, militsasotirova@gmail.com
-Description: These constants are all of the event descriptions for the animal
-    classes.
-"""
 # EVENTS
 # calf
 WEAN_DAY = "wean day"

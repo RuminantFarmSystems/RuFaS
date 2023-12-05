@@ -1,11 +1,3 @@
-"""
-RUFAS: Ruminant Farm Systems Model
-File name: user_defined_ration.py
-Description: Tools for accessing and providing user-defined ration  variables
-    Main class used to read JSON as singleton, return ration percentages where needed
-Author: Joseph C. Waddell, jw2574@cornell.edu
-"""
-
 from typing import Dict
 
 

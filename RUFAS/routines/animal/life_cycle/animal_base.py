@@ -1,19 +1,3 @@
-"""
-RUFAS: Ruminant Farm Systems Model
-----------------------------------
-
-File Name: animal_base.py
-
-Authors:
-    - Manfei Li: mli497@wisc.edu
-    - Militsa Sotirova: militsasotrirova@gmail.com
-    - Tayler Hansen: tlhansen@cornell.edu
-
-Description:
-    This file initializes common parameters including ID, breed, birth date,
-    and age for all animals to be identified.
-"""
-
 from RUFAS.routines.animal.animal_typed_dicts import AnimalBaseInitArgsTypedDict
 from RUFAS.routines.animal.life_cycle.animal_events import AnimalEvents
 from RUFAS.routines.animal.life_cycle.body_weight_history import BodyWeightHistory
