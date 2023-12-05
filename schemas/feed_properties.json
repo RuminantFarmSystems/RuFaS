@@ -1,0 +1,507 @@
+{
+  "title": "feed_properties",
+  "type": "object",
+  "format": "grid",
+  "properties": {
+    "calf_feeds": {
+      "title": "calf_feeds",
+      "type": "array",
+      "format": "grid",
+      "options": {
+        "inputAttributes": {
+          "class": "text-primary form-control"
+        },
+        "infoText": "Calf Feeds (raised off farm - 24 hrs of age)."
+      },
+      "items": {
+        "title": "calf_feeds_element",
+        "type": "number",
+        "options": {
+          "grid_columns": 12,
+          "inputAttributes": {
+            "class": "text-primary form-control"
+          }
+        },
+        "minimum": 1,
+        "maximum": 300,
+        "default": 155
+      }
+    },
+    "growing_feeds": {
+      "title": "growing_feeds",
+      "type": "array",
+      "format": "grid",
+      "options": {
+        "inputAttributes": {
+          "class": "text-primary form-control"
+        },
+        "infoText": "Growing Feeds (HeiferI and HeiferII - return at 20 months) -- HeiferI is the number of youngstock post-weaning and before breeding. Heifer II is the number of heifers eligible for breeding and in early pregnancy."
+      },
+      "items": {
+        "title": "growing_feeds_element",
+        "type": "number",
+        "options": {
+          "grid_columns": 12,
+          "inputAttributes": {
+            "class": "text-primary form-control"
+          }
+        },
+        "minimum": 1,
+        "maximum": 300
+      }
+    },
+    "close_up_feeds": {
+      "title": "close_up_feeds",
+      "type": "array",
+      "format": "grid",
+      "options": {
+        "inputAttributes": {
+          "class": "text-primary form-control"
+        },
+        "infoText": "Close Up Feeds (HeiferIII and Dry Cows) -- HeiferIII is the number of close-up heifers and Dry Cows are non-lactating cows."
+      },
+      "items": {
+        "title": "close_up_feeds_element",
+        "type": "number",
+        "options": {
+          "grid_columns": 12,
+          "inputAttributes": {
+            "class": "text-primary form-control"
+          }
+        },
+        "minimum": 1,
+        "maximum": 300
+      }
+    },
+    "lac_cow_feeds": {
+      "title": "lac_cow_feeds",
+      "type": "array",
+      "format": "grid",
+      "options": {
+        "inputAttributes": {
+          "class": "text-primary form-control"
+        },
+        "infoText": "Lactating Cow Feeds"
+      },
+      "items": {
+        "title": "lac_cow_feeds_element",
+        "type": "number",
+        "options": {
+          "grid_columns": 12,
+          "inputAttributes": {
+            "class": "text-primary form-control"
+          }
+        },
+        "minimum": 1,
+        "maximum": 300
+      }
+    },
+    "purchased_feeds": {
+      "title": "purchased_feeds",
+      "type": "array",
+      "format": "grid",
+      "options": {
+        "inputAttributes": {
+          "class": "text-primary form-control"
+        },
+        "infoText": "Purchased Feeds."
+      },
+      "items": {
+        "title": "purchased_feeds_element",
+        "type": "object",
+        "format": "grid",
+        "properties": {
+          "purchased_feed": {
+            "title": "purchased_feed",
+            "type": "number",
+            "options": {
+              "grid_columns": 12,
+              "inputAttributes": {
+                "class": "text-primary form-control"
+              },
+              "infoText": "Purchased Feed"
+            },
+            "minimum": 1,
+            "maximum": 300
+          },
+          "purchased_feed_cost": {
+            "title": "purchased_feed_cost",
+            "type": "number",
+            "options": {
+              "grid_columns": 12,
+              "inputAttributes": {
+                "class": "text-primary form-control"
+              },
+              "infoText": "Cost of Feed (US dollars/kg DM)"
+            },
+            "minimum": 0
+          }
+        }
+      }
+    },
+    "farm_grown_feeds": {
+      "title": "farm_grown_feeds",
+      "type": "array",
+      "format": "grid",
+      "options": {
+        "inputAttributes": {
+          "class": "text-primary form-control"
+        },
+        "infoText": "Farm-Grown Feeds"
+      },
+      "items": {
+        "title": "farm_grown_feeds_element",
+        "type": "number",
+        "options": {
+          "grid_columns": 12,
+          "inputAttributes": {
+            "class": "text-primary form-control"
+          }
+        },
+        "minimum": 1,
+        "maximum": 300
+      }
+    },
+    "storage_options": {
+      "title": "storage_options",
+      "type": "array",
+      "format": "grid",
+      "options": {
+        "inputAttributes": {
+          "class": "text-primary form-control"
+        },
+        "infoText": "Storage Options."
+      },
+      "items": {
+        "title": "storage_options_element",
+        "type": "object",
+        "format": "grid",
+        "properties": {
+          "storage_type": {
+            "title": "storage_type",
+            "type": "boolean",
+            "options": {
+              "grid_columns": 12,
+              "format": "select2",
+              "inputAttributes": {
+                "class": "text-primary form-control"
+              },
+              "infoText": "Storage Type -- The type of storage unit used. This only applies to farm grown forage feeds"
+            },
+            "default": "Bunker Silo"
+          },
+          "moisture": {
+            "title": "moisture",
+            "type": "boolean",
+            "options": {
+              "grid_columns": 12,
+              "format": "select2",
+              "inputAttributes": {
+                "class": "text-primary form-control"
+              },
+              "infoText": "Moisture -- The management practices used that determine the dry matter content of the preserved feed."
+            },
+            "default": "Wilted"
+          },
+          "additive": {
+            "title": "additive",
+            "type": "boolean",
+            "options": {
+              "grid_columns": 12,
+              "format": "select2",
+              "inputAttributes": {
+                "class": "text-primary form-control"
+              },
+              "infoText": "Additive -- Type of additive added to the forage material before ensiling."
+            },
+            "default": "preservative"
+          },
+          "package_density": {
+            "title": "package_density",
+            "type": "number",
+            "options": {
+              "grid_columns": 12,
+              "inputAttributes": {
+                "class": "text-primary form-control"
+              },
+              "infoText": "Package Density -- The density of ensiled feed material, kg DM /m3"
+            },
+            "minimum": 200,
+            "maximum": 800,
+            "default": 14
+          },
+          "inoculation": {
+            "title": "inoculation",
+            "type": "boolean",
+            "options": {
+              "grid_columns": 12,
+              "format": "select2",
+              "inputAttributes": {
+                "class": "text-primary form-control"
+              },
+              "infoText": "Inoculation"
+            },
+            "default": "None"
+          },
+          "ventilation": {
+            "title": "ventilation",
+            "type": "boolean",
+            "options": {
+              "grid_columns": 12,
+              "format": "select2",
+              "inputAttributes": {
+                "class": "text-primary form-control"
+              },
+              "infoText": "Ventilation -- True if the storage unit has appropriate ventilation."
+            },
+            "default": true
+          },
+          "removal_rate": {
+            "title": "removal_rate",
+            "type": "number",
+            "options": {
+              "grid_columns": 12,
+              "inputAttributes": {
+                "class": "text-primary form-control"
+              },
+              "infoText": "Removal Rate -- Average rate of removal of material from the storage unit or silo described as the horizontal distance from the front of the storage. In units of meters."
+            },
+            "minimum": 0,
+            "maximum": 20,
+            "default": 0.5
+          },
+          "initial_dry_matter": {
+            "title": "initial_dry_matter",
+            "type": "number",
+            "options": {
+              "grid_columns": 12,
+              "inputAttributes": {
+                "class": "text-primary form-control"
+              },
+              "infoText": "Initial Dry Matter -- The mass of feed dry matter in the storage unit at initiation of the simulation."
+            },
+            "minimum": 0,
+            "maximum": 500000,
+            "default": 1000
+          }
+        }
+      }
+    },
+    "user_defined_ration_percentages": {
+      "title": "user_defined_ration_percentages",
+      "type": "object",
+      "format": "grid",
+      "properties": {
+        "calf": {
+          "title": "calf",
+          "type": "array",
+          "format": "grid",
+          "options": {
+            "inputAttributes": {
+              "class": "text-primary form-control"
+            },
+            "infoText": "Calf Feeds."
+          },
+          "items": {
+            "title": "calf_element",
+            "type": "object",
+            "format": "grid",
+            "properties": {
+              "feed_type": {
+                "title": "feed_type",
+                "type": "number",
+                "options": {
+                  "grid_columns": 12,
+                  "inputAttributes": {
+                    "class": "text-primary form-control"
+                  },
+                  "infoText": "Calf Feed"
+                },
+                "minimum": 1,
+                "maximum": 300,
+                "default": 155
+              },
+              "ration_percentage": {
+                "title": "ration_percentage",
+                "type": "number",
+                "options": {
+                  "grid_columns": 12,
+                  "inputAttributes": {
+                    "class": "text-primary form-control"
+                  },
+                  "infoText": "Calf Ration Percentage"
+                },
+                "minimum": 0,
+                "maximum": 100
+              }
+            }
+          }
+        },
+        "growing": {
+          "title": "growing",
+          "type": "array",
+          "format": "grid",
+          "options": {
+            "inputAttributes": {
+              "class": "text-primary form-control"
+            },
+            "infoText": "Growing Heifers Feeds."
+          },
+          "items": {
+            "title": "growing_element",
+            "type": "object",
+            "format": "grid",
+            "properties": {
+              "feed_type": {
+                "title": "feed_type",
+                "type": "number",
+                "options": {
+                  "grid_columns": 12,
+                  "inputAttributes": {
+                    "class": "text-primary form-control"
+                  },
+                  "infoText": "Growing Heifers Feed"
+                },
+                "minimum": 1,
+                "maximum": 300,
+                "default": 1
+              },
+              "ration_percentage": {
+                "title": "ration_percentage",
+                "type": "number",
+                "options": {
+                  "grid_columns": 12,
+                  "inputAttributes": {
+                    "class": "text-primary form-control"
+                  },
+                  "infoText": "Growing Heifers Ration Percentage"
+                },
+                "minimum": 0,
+                "maximum": 100
+              }
+            }
+          }
+        },
+        "close_up": {
+          "title": "close_up",
+          "type": "array",
+          "format": "grid",
+          "options": {
+            "inputAttributes": {
+              "class": "text-primary form-control"
+            },
+            "infoText": "Close UP Feeds."
+          },
+          "items": {
+            "title": "close_up_element",
+            "type": "object",
+            "format": "grid",
+            "properties": {
+              "feed_type": {
+                "title": "feed_type",
+                "type": "number",
+                "options": {
+                  "grid_columns": 12,
+                  "inputAttributes": {
+                    "class": "text-primary form-control"
+                  },
+                  "infoText": "Close UP Feed"
+                },
+                "minimum": 1,
+                "maximum": 300,
+                "default": 1
+              },
+              "ration_percentage": {
+                "title": "ration_percentage",
+                "type": "number",
+                "options": {
+                  "grid_columns": 12,
+                  "inputAttributes": {
+                    "class": "text-primary form-control"
+                  },
+                  "infoText": "Close UP Ration Percentage"
+                },
+                "minimum": 0,
+                "maximum": 100
+              }
+            }
+          }
+        },
+        "lac_cow": {
+          "title": "lac_cow",
+          "type": "array",
+          "format": "grid",
+          "options": {
+            "inputAttributes": {
+              "class": "text-primary form-control"
+            },
+            "infoText": "Lactating Cow Feeds."
+          },
+          "items": {
+            "title": "lac_cow_element",
+            "type": "object",
+            "format": "grid",
+            "properties": {
+              "feed_type": {
+                "title": "feed_type",
+                "type": "number",
+                "options": {
+                  "grid_columns": 12,
+                  "inputAttributes": {
+                    "class": "text-primary form-control"
+                  },
+                  "infoText": "Lactating Cow Feed"
+                },
+                "minimum": 1,
+                "maximum": 300,
+                "default": 1
+              },
+              "ration_percentage": {
+                "title": "ration_percentage",
+                "type": "number",
+                "options": {
+                  "grid_columns": 12,
+                  "inputAttributes": {
+                    "class": "text-primary form-control"
+                  },
+                  "infoText": "Lactating Cow Ration Percentage"
+                },
+                "minimum": 0,
+                "maximum": 100
+              }
+            }
+          }
+        },
+        "tolerance": {
+          "title": "tolerance",
+          "type": "number",
+          "options": {
+            "grid_columns": 12,
+            "inputAttributes": {
+              "class": "text-primary form-control"
+            },
+            "infoText": "Tolerance -- Allowable +/- percentage variance in each of the defined percentage values."
+          },
+          "minimum": 0,
+          "maximum": 1
+        },
+        "milk_reduction_maximum": {
+          "title": "milk_reduction_maximum",
+          "type": "number",
+          "options": {
+            "grid_columns": 12,
+            "inputAttributes": {
+              "class": "text-primary form-control"
+            },
+            "infoText": "Milk Reduction Percent -- Allowable amount of milk reduction (kg)"
+          },
+          "minimum": 0,
+          "maximum": 50
+        }
+      },
+      "options": {
+        "infoText": "User Defined Ration Percentages"
+      }
+    }
+  }
+}
