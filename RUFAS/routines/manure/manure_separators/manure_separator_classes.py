@@ -1,13 +1,3 @@
-"""
-RUFAS: Ruminant Farm Systems Model
-
-File name: manure_separator_classes.py
-
-Description:
-
-Author(s):  William Donovan, wmdonovan@wisc.edu
-            Yunus Mohammed, ymm26@cornell.edu
-"""
 from __future__ import annotations
 
 from dataclasses import dataclass
