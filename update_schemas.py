@@ -131,11 +131,39 @@ class SchemaSetupMethods:
 
         return schema
 
+    @staticmethod
+    def _setup_object_schema(title: str, input_properties: dict[str, Any]) -> dict[str, Any]:
+        schema = {
+            "title": title,
+            "type": "object",
+            "format": "grid"
+        }
+        default = input_properties.get("default")
+        description = input_properties.get("description")
+
+        if default is not None:
+            schema["default"] = default
+        if description is not None:
+            schema["options"] = {}
+            schema["options"]["infoText"] = description
+
+        keys = [key for key in input_properties.keys() if key != "type" and key != "description" and key != "default"]
+        for key in keys:
+            sub_property = input_properties[key]
+            schema_setup_method = SchemaSetupMethods.DATA_TYPE_TO_SCHEMA_SETUP_MAP[sub_property["type"]]
+            sub_property_schema = schema_setup_method(key, sub_property)
+            schema[key] = sub_property_schema
+
+        return schema
+
+
+
     DATA_TYPE_TO_SCHEMA_SETUP_MAP: dict[str, Callable[[str, dict[str, Any]], dict[str, Any]]] = {
         "number": _setup_number_schema,
         "bool": _setup_bool_schema,
         "string": _setup_bool_schema,
         "array": _setup_array_schema,
+        "object": _setup_object_schema
     }
 
 
