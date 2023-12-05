@@ -1167,24 +1167,6 @@ def test_housing_specific_constant(
 
 
 @pytest.mark.parametrize(
-    "daily_nitrogen_input, expected_output",
-    [
-        (0, 0),
-        (10, GasEmissionConstants.AMMONIA_EMISSION_COEFFICIENT_IN_OPEN_LOTS * 10),
-    ]
-)
-def test_nitrogen_loss_in_open_lots_from_ammonia_emission(daily_nitrogen_input: float,
-                                                          expected_output: float) -> None:
-    """
-    Unit test for nitrogen_loss_in_open_lots_from_ammonia_emission() method in calculator.py.
-    """
-
-    # Act and assert
-    assert GasEmissionsCalculator.nitrogen_loss_in_open_lots_from_ammonia_emission(
-        daily_nitrogen_input) == expected_output
-
-
-@pytest.mark.parametrize(
     "daily_nitrogen_input, expected_output, expect_exception",
     [
         (0, 0, False),

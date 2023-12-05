@@ -421,9 +421,7 @@ class ManureManager:
         )
 
         manure_handler_daily_output_prefix = {
-            "prefix": manure_handler_daily_output.__class__.__name__
-                      + "_Pen_"
-                      + str(mm_pen.id)
+            "prefix": manure_handler_daily_output.__class__.__name__ + "_Pen_" + str(mm_pen.id)
         }
         ManureModuleOutputManagerHelper.add_dataclass_object(
             manure_handler_daily_output,
@@ -438,9 +436,7 @@ class ManureManager:
         )
 
         reception_pit_daily_output_prefix = {
-            "prefix": reception_pit_daily_output.__class__.__name__
-                      + "_Pen_"
-                      + str(mm_pen.id)
+            "prefix": reception_pit_daily_output.__class__.__name__ + "_Pen_" + str(mm_pen.id)
         }
         ManureModuleOutputManagerHelper.add_dataclass_object(
             reception_pit_daily_output,
@@ -474,9 +470,7 @@ class ManureManager:
             )
         if manure_separator_daily_output:
             manure_separator_daily_output_prefix = {
-                "prefix": manure_separator_daily_output.__class__.__name__
-                          + "_Pen_"
-                          + str(mm_pen.id)
+                "prefix": manure_separator_daily_output.__class__.__name__ + "_Pen_" + str(mm_pen.id)
             }
             ManureModuleOutputManagerHelper.add_dataclass_object(
                 manure_separator_daily_output,
@@ -485,9 +479,7 @@ class ManureManager:
             )
 
         manure_treatment_daily_output_prefix = {
-            "prefix": manure_treatment_daily_output.__class__.__name__
-                      + "_Pen_"
-                      + str(mm_pen.id)
+            "prefix": manure_treatment_daily_output.__class__.__name__ + "_Pen_" + str(mm_pen.id)
         }
         ManureModuleOutputManagerHelper.add_dataclass_object(
             manure_treatment_daily_output,
@@ -710,8 +702,7 @@ class ManureManager:
 
         manure_treatment_daily_output = self.manure_treatments[pen.id].daily_update(
             manure_handler_daily_output=manure_handler_daily_output,
-            manure_treatment_daily_input=manure_separator_daily_output
-                                         or reception_pit_daily_output,
+            manure_treatment_daily_input=manure_separator_daily_output or reception_pit_daily_output,
             pen=pen,
             sim_day=simulation_day,
         )
