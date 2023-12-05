@@ -81,3 +81,9 @@ def test_receive_crop(storage: Storage, harvested_crop: HarvestedCrop):
     """
     pass
 
+
+def test_process_degradations(storage: Storage):
+    """
+    Test the process_degradations method of the Storage class.
+    """
+    pass
