@@ -100,3 +100,26 @@ class Storage:
         """
         pass
 
+    def calculate_dry_matter_loss_to_effluent(
+        self, dry_matter: float, estimated_maximum_effluent: float, time_in_silo: int
+    ):
+        """
+        Calculates the dry matter loss to effluent.
+
+        Parameters
+        ----------
+        dry_matter : float
+            The amount of dry matter.
+        estimated_maximum_effluent : float
+            The estimated maximum effluent.
+        time_in_silo : int
+            Time in days the crop has been in the silo.
+
+        Returns
+        -------
+        float
+            The amount of dry matter lost to effluent.
+        """
+        pass
+
+ 
