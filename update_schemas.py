@@ -3,6 +3,7 @@ import pprint
 from pathlib import Path
 from typing import Any, Callable
 import re
+import os
 
 from RUFAS.util import Utility
 
@@ -34,8 +35,8 @@ class SchemaSetupMethods:
             schema["minimum"] = minimum
         if maximum is not None:
             schema["maximum"] = maximum
-        if minimum is not None and maximum is not None:
-            schema["format"] = "range"
+        # if minimum is not None and maximum is not None:
+        #     schema["format"] = "range"
         if default is not None:
             schema["default"] = default
         if description:
@@ -137,7 +138,8 @@ class SchemaSetupMethods:
         schema = {
             "title": title,
             "type": "object",
-            "format": "grid"
+            "format": "grid",
+            "properties": {}
         }
         default = input_properties.get("default")
         description = input_properties.get("description")
@@ -153,7 +155,7 @@ class SchemaSetupMethods:
             sub_property = input_properties[key]
             schema_setup_method = SchemaSetupMethods.DATA_TYPE_TO_SCHEMA_SETUP_MAP[sub_property["type"]]
             sub_property_schema = schema_setup_method(key, sub_property)
-            schema[key] = sub_property_schema
+            schema["properties"][key] = sub_property_schema
 
         return schema
 
@@ -164,6 +166,7 @@ class SchemaSetupMethods:
         "array": setup_array_schema,
         "object": setup_object_schema
     }
+
 
 def main() -> None:
     schema_dir_path = Path('schemas/')
@@ -178,15 +181,16 @@ def main() -> None:
         try:
             new_schema = SchemaSetupMethods.setup_object_schema(key, properties[key])
         except Exception as e:
-            print(f"Key: '{key}' raised exception: {e}")
+            print(f"Key: '{key}' raised exception: {str(e)}")
             continue
 
         new_schema_file_name = f"{key}.json"
         new_schema_file_path = Path.joinpath(schema_dir_path, new_schema_file_name)
-        
+        print(new_schema_file_path)
 
-        print(key)
-    pprint.pprint(json.dumps(properties, indent=2))
+        with open(new_schema_file_path, "w") as outfile:
+            json.dump(new_schema, outfile, indent=2)
+    # pprint.pprint(json.dumps(properties, indent=2))
 
 
 if __name__ == "__main__":

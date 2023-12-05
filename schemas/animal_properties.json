@@ -1,0 +1,1834 @@
+{
+  "title": "animal_properties",
+  "type": "object",
+  "format": "grid",
+  "properties": {
+    "herd_information": {
+      "title": "herd_information",
+      "type": "object",
+      "format": "grid",
+      "properties": {
+        "calf_num": {
+          "title": "calf_num",
+          "type": "number",
+          "options": {
+            "grid_columns": 12,
+            "inputAttributes": {
+              "class": "text-primary form-control"
+            },
+            "infoText": "Number of Calves (head) -- The average number of pre-weaned calves (default is ~8% of herd number)"
+          },
+          "minimum": 0,
+          "default": 8
+        },
+        "heiferI_num": {
+          "title": "heiferI_num",
+          "type": "number",
+          "options": {
+            "grid_columns": 12,
+            "inputAttributes": {
+              "class": "text-primary form-control"
+            },
+            "infoText": "Number of HeiferIs (head) -- HeiferI is the number of youngstock post-weaning and before breeding"
+          },
+          "minimum": 0,
+          "default": 44
+        },
+        "heiferII_num": {
+          "title": "heiferII_num",
+          "type": "number",
+          "options": {
+            "grid_columns": 12,
+            "inputAttributes": {
+              "class": "text-primary form-control"
+            },
+            "infoText": "Number of HeiferIIs (head) -- HeiferII is the number of heifers eligible for breeding and in early pregnancy"
+          },
+          "minimum": 0,
+          "default": 38
+        },
+        "heiferIII_num_springers": {
+          "title": "heiferIII_num_springers",
+          "type": "number",
+          "options": {
+            "grid_columns": 12,
+            "inputAttributes": {
+              "class": "text-primary form-control"
+            },
+            "infoText": "Number of HeiferIIIs (head) -- HeiferIII is the number of close-up heifers"
+          },
+          "minimum": 0,
+          "default": 5
+        },
+        "cow_num": {
+          "title": "cow_num",
+          "type": "number",
+          "options": {
+            "grid_columns": 12,
+            "inputAttributes": {
+              "class": "text-primary form-control"
+            },
+            "infoText": "Number of Cows (head) -- The initial number of dry and lactating cows (all parities, default is ~51% of herd number)."
+          },
+          "minimum": 0,
+          "default": 100
+        },
+        "herd_num": {
+          "title": "herd_num",
+          "type": "number",
+          "options": {
+            "grid_columns": 12,
+            "inputAttributes": {
+              "class": "text-primary form-control"
+            },
+            "infoText": "Herd Number (head) -- The target number of dry and lactating cows on farm."
+          },
+          "minimum": 0,
+          "default": 100
+        },
+        "herd_init": {
+          "title": "herd_init",
+          "type": "boolean",
+          "options": {
+            "grid_columns": 12,
+            "format": "select2",
+            "inputAttributes": {
+              "class": "text-primary form-control"
+            },
+            "infoText": "Initialize Herd? -- Whether to re-initialize the animal database, where the herd animals are selected from."
+          },
+          "default": false
+        },
+        "replace_num": {
+          "title": "replace_num",
+          "type": "number",
+          "options": {
+            "grid_columns": 12,
+            "inputAttributes": {
+              "class": "text-primary form-control"
+            }
+          },
+          "minimum": 0,
+          "default": 5000
+        },
+        "breed": {
+          "title": "breed",
+          "type": "boolean",
+          "options": {
+            "grid_columns": 12,
+            "format": "select2",
+            "inputAttributes": {
+              "class": "text-primary form-control"
+            },
+            "infoText": "Breed (select one Holstein/Jersey) -- The predominant breed of the herd (Holstein or Jersey)"
+          },
+          "default": "HO"
+        }
+      },
+      "options": {
+        "infoText": "Herd Demographics"
+      }
+    },
+    "animal_config": {
+      "title": "animal_config",
+      "type": "object",
+      "format": "grid",
+      "properties": {
+        "management_decisions": {
+          "title": "management_decisions",
+          "type": "object",
+          "format": "grid",
+          "properties": {
+            "breeding_start_day_h": {
+              "title": "breeding_start_day_h",
+              "type": "number",
+              "options": {
+                "grid_columns": 12,
+                "inputAttributes": {
+                  "class": "text-primary form-control"
+                },
+                "infoText": "Breeding Start Day - Heifers (days) -- Days old when a heifer would be eligible for breeding (days)"
+              },
+              "minimum": 0,
+              "default": 380
+            },
+            "heifer_repro_method": {
+              "title": "heifer_repro_method",
+              "type": "boolean",
+              "options": {
+                "grid_columns": 12,
+                "format": "select2",
+                "inputAttributes": {
+                  "class": "text-primary form-control"
+                },
+                "infoText": "Heifer Reproductive Program (select one) -- TAI - Timed Artificial Insemination; ED - Estrus Detection; Synch-ED - Combination of ED and TAI"
+              },
+              "default": "TAI"
+            },
+            "cow_repro_method": {
+              "title": "cow_repro_method",
+              "type": "boolean",
+              "options": {
+                "grid_columns": 12,
+                "format": "select2",
+                "inputAttributes": {
+                  "class": "text-primary form-control"
+                },
+                "infoText": "Cow Reproductive Program (select one) -- TAI - Timed Artificial Insemination; ED - Estrus Detection; ED-TAI -Combination of ED and TAI"
+              },
+              "default": "TAI"
+            },
+            "semen_type": {
+              "title": "semen_type",
+              "type": "boolean",
+              "options": {
+                "grid_columns": 12,
+                "format": "select2",
+                "inputAttributes": {
+                  "class": "text-primary form-control"
+                },
+                "infoText": "The semen type that makes up a majority of the farm's breedings"
+              },
+              "default": "conventional"
+            },
+            "days_in_preg_when_dry": {
+              "title": "days_in_preg_when_dry",
+              "type": "number",
+              "options": {
+                "grid_columns": 12,
+                "inputAttributes": {
+                  "class": "text-primary form-control"
+                },
+                "infoText": "Days In Pregnancy When Dry (days) -- The average day in pregnancy when a cow is dried off (default is 218)"
+              },
+              "minimum": 0,
+              "default": 218
+            },
+            "heifer_repro_cull_time": {
+              "title": "heifer_repro_cull_time",
+              "type": "number",
+              "options": {
+                "grid_columns": 12,
+                "inputAttributes": {
+                  "class": "text-primary form-control"
+                },
+                "infoText": "Heifer Reproductive Cull Time (days) -- Days old when a heifer would be culled for unsuccessful in breeding (default is 500)"
+              },
+              "minimum": 0,
+              "default": 500
+            },
+            "do_not_breed_time": {
+              "title": "do_not_breed_time",
+              "type": "number",
+              "options": {
+                "grid_columns": 12,
+                "inputAttributes": {
+                  "class": "text-primary form-control"
+                },
+                "infoText": "Do Not Breed Time (days) -- The breeding period (days) for cows before reproductive programs stop if they fail to get pregnant (days)"
+              },
+              "minimum": 0,
+              "default": 185
+            },
+            "cull_milk_production": {
+              "title": "cull_milk_production",
+              "type": "number",
+              "options": {
+                "grid_columns": 12,
+                "inputAttributes": {
+                  "class": "text-primary form-control"
+                },
+                "infoText": "Cull Milk Production (kg/d) -- Minimum daily milk production for do-not breed cow to be culled (default is 30 kg/d)"
+              },
+              "minimum": 0,
+              "default": 30
+            },
+            "cow_times_milked_per_day": {
+              "title": "cow_times_milked_per_day",
+              "type": "number",
+              "options": {
+                "grid_columns": 12,
+                "inputAttributes": {
+                  "class": "text-primary form-control"
+                },
+                "infoText": "Number of Times Cows Milked (per day) -- The average or most common number of times the cows are milked, whole numbers 1-3"
+              },
+              "minimum": 0,
+              "default": 3
+            }
+          },
+          "options": {
+            "infoText": "General Management"
+          }
+        },
+        "farm_level": {
+          "title": "farm_level",
+          "type": "object",
+          "format": "grid",
+          "properties": {
+            "calf": {
+              "title": "calf",
+              "type": "object",
+              "format": "grid",
+              "properties": {
+                "male_calf_rate_sexed_semen": {
+                  "title": "male_calf_rate_sexed_semen",
+                  "type": "number",
+                  "options": {
+                    "grid_columns": 12,
+                    "inputAttributes": {
+                      "class": "text-primary form-control"
+                    },
+                    "infoText": "Male Calf Rate - Sexed Semen -- The rate of male calves when using sexed semen (default is 0.1)"
+                  },
+                  "minimum": 0,
+                  "maximum": 1,
+                  "default": 0.1
+                },
+                "male_calf_rate_conventional_semen": {
+                  "title": "male_calf_rate_conventional_semen",
+                  "type": "number",
+                  "options": {
+                    "grid_columns": 12,
+                    "inputAttributes": {
+                      "class": "text-primary form-control"
+                    },
+                    "infoText": "Male Calf Rate - Conventional Semen -- The rate of male calves when using conventional semen (default is 0.53)"
+                  },
+                  "minimum": 0,
+                  "maximum": 1,
+                  "default": 0.53
+                },
+                "keep_female_calf_rate": {
+                  "title": "keep_female_calf_rate",
+                  "type": "number",
+                  "options": {
+                    "grid_columns": 12,
+                    "inputAttributes": {
+                      "class": "text-primary form-control"
+                    },
+                    "infoText": "Female Calf Rate -- The rate female calves are kept and raised on-farm (default is 1)"
+                  },
+                  "minimum": 0,
+                  "maximum": 1,
+                  "default": 1
+                },
+                "wean_day": {
+                  "title": "wean_day",
+                  "type": "number",
+                  "options": {
+                    "grid_columns": 12,
+                    "inputAttributes": {
+                      "class": "text-primary form-control"
+                    },
+                    "infoText": "Wean Day (days) -- Days the calf is fully weaned from milk or milk replace (default is 60"
+                  },
+                  "minimum": 0,
+                  "default": 60
+                },
+                "wean_length": {
+                  "title": "wean_length",
+                  "type": "number",
+                  "options": {
+                    "grid_columns": 12,
+                    "inputAttributes": {
+                      "class": "text-primary form-control"
+                    },
+                    "infoText": "Wean Length (days) -- Days weaning (default is 7)"
+                  },
+                  "minimum": 0,
+                  "default": 7
+                },
+                "milk_type": {
+                  "title": "milk_type",
+                  "type": "boolean",
+                  "options": {
+                    "grid_columns": 12,
+                    "format": "select2",
+                    "inputAttributes": {
+                      "class": "text-primary form-control"
+                    },
+                    "infoText": "Milk Type (select one) -- The type of milk that is used to feed calves (Whole or Replacer)"
+                  },
+                  "default": "whole"
+                }
+              },
+              "options": {
+                "infoText": "Calf Management"
+              }
+            },
+            "repro": {
+              "title": "repro",
+              "type": "object",
+              "format": "grid",
+              "properties": {
+                "voluntary_waiting_period": {
+                  "title": "voluntary_waiting_period",
+                  "type": "number",
+                  "options": {
+                    "grid_columns": 12,
+                    "inputAttributes": {
+                      "class": "text-primary form-control"
+                    },
+                    "infoText": "Voluntary Waiting Period (days) -- If 'TAI' (Timed Artificial Insemination) is chosen for cow, it is days after parturition when the 1st hormonal injection is made in TAI programs. If 'ED' or 'ED-TAI' is chosen for cow, it is days after parturition when estrus is started to be monitored."
+                  },
+                  "minimum": 0,
+                  "default": 50
+                },
+                "conception_rate_decrease": {
+                  "title": "conception_rate_decrease",
+                  "type": "number",
+                  "options": {
+                    "grid_columns": 12,
+                    "inputAttributes": {
+                      "class": "text-primary form-control"
+                    },
+                    "infoText": "Conception Rate Decrease -- the decrease of the conception rate for later breeding (default is 0.026)"
+                  },
+                  "minimum": 0,
+                  "maximum": 0.1,
+                  "default": 0.026
+                },
+                "avg_gestation_len": {
+                  "title": "avg_gestation_len",
+                  "type": "number",
+                  "options": {
+                    "grid_columns": 12,
+                    "inputAttributes": {
+                      "class": "text-primary form-control"
+                    },
+                    "infoText": "Average Gestation Length (days) -- average length of gestations (default is 278)"
+                  },
+                  "minimum": 0,
+                  "default": 278
+                },
+                "std_gestation_len": {
+                  "title": "std_gestation_len",
+                  "type": "number",
+                  "options": {
+                    "grid_columns": 12,
+                    "inputAttributes": {
+                      "class": "text-primary form-control"
+                    },
+                    "infoText": "Gestation Length Standard Deviation (days) -- standard deviation of gestation length (default is 6)"
+                  },
+                  "minimum": 0,
+                  "default": 6
+                },
+                "prefresh_day": {
+                  "title": "prefresh_day",
+                  "type": "number",
+                  "options": {
+                    "grid_columns": 12,
+                    "inputAttributes": {
+                      "class": "text-primary form-control"
+                    },
+                    "infoText": "Prefresh Day (days) -- length of period of the transition before calving (default is 30)"
+                  },
+                  "minimum": 0,
+                  "default": 30
+                },
+                "calving_interval": {
+                  "title": "calving_interval",
+                  "type": "number",
+                  "options": {
+                    "grid_columns": 12,
+                    "inputAttributes": {
+                      "class": "text-primary form-control"
+                    },
+                    "infoText": "Calving Interval (days) -- current average calving interval (days), used for initial bodyweight adjustment and other calculations"
+                  },
+                  "minimum": 0,
+                  "default": 400
+                },
+                "heifer_repro_programs": {
+                  "title": "heifer_repro_programs",
+                  "type": "object",
+                  "format": "grid",
+                  "properties": {
+                    "estrus_detection_rate": {
+                      "title": "estrus_detection_rate",
+                      "type": "number",
+                      "options": {
+                        "grid_columns": 12,
+                        "inputAttributes": {
+                          "class": "text-primary form-control"
+                        },
+                        "infoText": "Estrus Detection Rate -- The % of in-heat animals that would be detected in the ED (Estrus Detection) programs (default is 0.6)"
+                      },
+                      "minimum": 0,
+                      "maximum": 1,
+                      "default": 0.6
+                    },
+                    "estrus_service_rate": {
+                      "title": "estrus_service_rate",
+                      "type": "number",
+                      "options": {
+                        "grid_columns": 12,
+                        "inputAttributes": {
+                          "class": "text-primary form-control"
+                        },
+                        "infoText": "Estrus Service Rate -- The % of detected in heat animals that would be serviced in the ED (Estrus Detection) programs (default is 1)"
+                      },
+                      "minimum": 0,
+                      "maximum": 1,
+                      "default": 1
+                    },
+                    "ed_conception_rate": {
+                      "title": "ed_conception_rate",
+                      "type": "number",
+                      "options": {
+                        "grid_columns": 12,
+                        "inputAttributes": {
+                          "class": "text-primary form-control"
+                        },
+                        "infoText": "ED Conception Rate -- The % of serviced animals that would be concepted in the ED (Estrus Detection) programs (default is 0.6)"
+                      },
+                      "minimum": 0,
+                      "maximum": 1,
+                      "default": 0.6
+                    },
+                    "heifer_TAI_protocol": {
+                      "title": "heifer_TAI_protocol",
+                      "type": "boolean",
+                      "options": {
+                        "grid_columns": 12,
+                        "format": "select2",
+                        "inputAttributes": {
+                          "class": "text-primary form-control"
+                        },
+                        "infoText": "Heifer TAI (Timed Artificial Insemination) Protocol (select one) -- The breeding protocol for heifers (md5CG2P or md5CGP)"
+                      },
+                      "default": "md5CG2P"
+                    },
+                    "md5CG2P_conception_rate": {
+                      "title": "md5CG2P_conception_rate",
+                      "type": "number",
+                      "options": {
+                        "grid_columns": 12,
+                        "inputAttributes": {
+                          "class": "text-primary form-control"
+                        },
+                        "infoText": "Heifer Conception Rate for md5CG2P Protocol -- The conception rate for md5CG2P protocol in heifer TAI (Timed Artificial Insemination) program (default is 0.6)"
+                      },
+                      "minimum": 0,
+                      "maximum": 1,
+                      "default": 0.6
+                    },
+                    "md5CGP_conception_rate": {
+                      "title": "md5CGP_conception_rate",
+                      "type": "number",
+                      "options": {
+                        "grid_columns": 12,
+                        "inputAttributes": {
+                          "class": "text-primary form-control"
+                        },
+                        "infoText": "Heifer Conception Rate for md5CGP Protocol -- The conception rate for md5CGP protocol in heifer TAI (Timed Artificial Insemination) program"
+                      },
+                      "minimum": 0,
+                      "maximum": 1,
+                      "default": 0.48
+                    },
+                    "heifer_synchED_protocol": {
+                      "title": "heifer_synchED_protocol",
+                      "type": "boolean",
+                      "options": {
+                        "grid_columns": 12,
+                        "format": "select2",
+                        "inputAttributes": {
+                          "class": "text-primary form-control"
+                        },
+                        "infoText": "Heifer SynchED Protocol (select one) -- 2P: two injections of PGF (prostaglandin), watch for estrus after each injection with insemination upon heat detection; CP: 7 days CIDR implements, inject PGF upon removal, insemination upon heat detection"
+                      },
+                      "default": "2P"
+                    },
+                    "estrus_detection_rate_h_synch": {
+                      "title": "estrus_detection_rate_h_synch",
+                      "type": "number",
+                      "options": {
+                        "grid_columns": 12,
+                        "inputAttributes": {
+                          "class": "text-primary form-control"
+                        },
+                        "infoText": "ED Rate for SynchED Protocol -- The estrus detection rate of the SynchED protocol."
+                      },
+                      "minimum": 0,
+                      "maximum": 1,
+                      "default": 0.7
+                    }
+                  },
+                  "options": {
+                    "infoText": "Heifer Reproductive programs"
+                  }
+                },
+                "cow_repro_programs": {
+                  "title": "cow_repro_programs",
+                  "type": "object",
+                  "format": "grid",
+                  "properties": {
+                    "estrus_detection_rate": {
+                      "title": "estrus_detection_rate",
+                      "type": "number",
+                      "options": {
+                        "grid_columns": 12,
+                        "inputAttributes": {
+                          "class": "text-primary form-control"
+                        },
+                        "infoText": "Estrus Detection Rate -- The % of in-heat animals that would be detected in the ED (Estrus Detection) programs (default is 0.6)"
+                      },
+                      "minimum": 0,
+                      "maximum": 1,
+                      "default": 0.6
+                    },
+                    "estrus_service_rate": {
+                      "title": "estrus_service_rate",
+                      "type": "number",
+                      "options": {
+                        "grid_columns": 12,
+                        "inputAttributes": {
+                          "class": "text-primary form-control"
+                        },
+                        "infoText": "Estrus Service Rate -- The % of detected in heat animals that would be serviced in the ED (Estrus Detection) programs (default is 1)"
+                      },
+                      "minimum": 0,
+                      "maximum": 1,
+                      "default": 1
+                    },
+                    "ed_conception_rate": {
+                      "title": "ed_conception_rate",
+                      "type": "number",
+                      "options": {
+                        "grid_columns": 12,
+                        "inputAttributes": {
+                          "class": "text-primary form-control"
+                        },
+                        "infoText": "ED Conception Rate -- The % of serviced animals that would be concepted in the ED (Estrus Detection) programs (default is 0.6)"
+                      },
+                      "minimum": 0,
+                      "maximum": 1,
+                      "default": 0.6
+                    },
+                    "cow_presynch_protocol": {
+                      "title": "cow_presynch_protocol",
+                      "type": "boolean",
+                      "options": {
+                        "grid_columns": 12,
+                        "format": "select2",
+                        "inputAttributes": {
+                          "class": "text-primary form-control"
+                        },
+                        "infoText": "Cow Presynch Protocol -- The preSynch protocol (1st breeding) for cow in TAI (Timed Artificial Insemination) program"
+                      },
+                      "default": "Double OvSynch"
+                    },
+                    "cow_TAI_protocol": {
+                      "title": "cow_TAI_protocol",
+                      "type": "boolean",
+                      "options": {
+                        "grid_columns": 12,
+                        "format": "select2",
+                        "inputAttributes": {
+                          "class": "text-primary form-control"
+                        },
+                        "infoText": "Cow TAI (Timed Artificial Insemination) Protocol -- The timed AI protocol for cows in the TAI (Timed Artificial Insemination) program"
+                      },
+                      "default": "OvSynch 56"
+                    },
+                    "ovsynch56_conception_rate": {
+                      "title": "ovsynch56_conception_rate",
+                      "type": "number",
+                      "options": {
+                        "grid_columns": 12,
+                        "inputAttributes": {
+                          "class": "text-primary form-control"
+                        },
+                        "infoText": "OvSynch56 Conception Rate -- The conception rate for OvSynch56 protocol (pre-breeding GnRH shot given 56hrs post prostaglandin) in cow TAI (Timed Artificial Insemination) program (default is 0.6)"
+                      },
+                      "minimum": 0,
+                      "maximum": 1,
+                      "default": 0.6
+                    },
+                    "ovsynch48_conception_rate": {
+                      "title": "ovsynch48_conception_rate",
+                      "type": "number",
+                      "options": {
+                        "grid_columns": 12,
+                        "inputAttributes": {
+                          "class": "text-primary form-control"
+                        },
+                        "infoText": "OvSynch48 Conception Rate -- The conception rate for OvSynch 48 protocol (pre-breeding GnRH shot given 48hrs post prostaglandin) in cow TAI (Timed Artificial Insemination) program"
+                      },
+                      "minimum": 0,
+                      "maximum": 1,
+                      "default": 0.6
+                    },
+                    "cosynch72_conception_rate": {
+                      "title": "cosynch72_conception_rate",
+                      "type": "number",
+                      "options": {
+                        "grid_columns": 12,
+                        "inputAttributes": {
+                          "class": "text-primary form-control"
+                        },
+                        "infoText": "CoSynch72 Conception Rate -- The conception rate for CoSynch 72 protocol in cow TAI (Timed Artificial Insemination) program"
+                      },
+                      "minimum": 0,
+                      "maximum": 1,
+                      "default": 0.6
+                    },
+                    "cosynch5d_conception_rate": {
+                      "title": "cosynch5d_conception_rate",
+                      "type": "number",
+                      "options": {
+                        "grid_columns": 12,
+                        "inputAttributes": {
+                          "class": "text-primary form-control"
+                        },
+                        "infoText": "5d CoSynch Conception Rate -- The conception rate for 5d CoSynch protocol in cow TAI (Timed Artificial Insemination) program"
+                      },
+                      "minimum": 0,
+                      "maximum": 1,
+                      "default": 0.6
+                    },
+                    "cow_resynch_protocol": {
+                      "title": "cow_resynch_protocol",
+                      "type": "boolean",
+                      "options": {
+                        "grid_columns": 12,
+                        "format": "select2",
+                        "inputAttributes": {
+                          "class": "text-primary form-control"
+                        },
+                        "infoText": "Cow Resynch Protocol -- Resynch protocol for cow before/at/after pregnancy check day in the TAI (Timed Artificial Insemination) program"
+                      },
+                      "default": "TAIafterPD"
+                    },
+                    "tai_program_start_day": {
+                      "title": "tai_program_start_day",
+                      "type": "number",
+                      "options": {
+                        "grid_columns": 12,
+                        "inputAttributes": {
+                          "class": "text-primary form-control"
+                        },
+                        "infoText": "TAI program start day for ED-TAI protocol -- The TAI program start day for ED-TAI protocol."
+                      },
+                      "minimum": 0,
+                      "default": 72
+                    }
+                  },
+                  "options": {
+                    "infoText": "Cow Reproductive programs"
+                  }
+                }
+              },
+              "options": {
+                "infoText": "Repro Management"
+              }
+            },
+            "bodyweight": {
+              "title": "bodyweight",
+              "type": "object",
+              "format": "grid",
+              "properties": {
+                "birth_weight_avg_ho": {
+                  "title": "birth_weight_avg_ho",
+                  "type": "number",
+                  "options": {
+                    "grid_columns": 12,
+                    "inputAttributes": {
+                      "class": "text-primary form-control"
+                    },
+                    "infoText": "Average Holstein Birth Weight (kg/head) -- The average birthweight for Holstein cows (default is 43.9)"
+                  },
+                  "minimum": 0,
+                  "default": 43.9
+                },
+                "birth_weight_std_ho": {
+                  "title": "birth_weight_std_ho",
+                  "type": "number",
+                  "options": {
+                    "grid_columns": 12,
+                    "inputAttributes": {
+                      "class": "text-primary form-control"
+                    },
+                    "infoText": "Holstein Birth Weight Standard Deviation (kg/head) -- The standard deviation birthweight for Holstein cows (default is 1)"
+                  },
+                  "minimum": 0,
+                  "default": 1
+                },
+                "birth_weight_avg_je": {
+                  "title": "birth_weight_avg_je",
+                  "type": "number",
+                  "options": {
+                    "grid_columns": 12,
+                    "inputAttributes": {
+                      "class": "text-primary form-control"
+                    },
+                    "infoText": "Average Jersey Birth Weight (kg/head) -- The average birthweight for Jersey cows (default is 35)"
+                  },
+                  "minimum": 0,
+                  "default": 35
+                },
+                "birth_weight_std_je": {
+                  "title": "birth_weight_std_je",
+                  "type": "number",
+                  "options": {
+                    "grid_columns": 12,
+                    "inputAttributes": {
+                      "class": "text-primary form-control"
+                    },
+                    "infoText": "Jersey Birth Weight Standard Deviation (kg/head) -- The standard deviation birthweight for Jersey cows (default is 1)"
+                  },
+                  "minimum": 0,
+                  "default": 1
+                },
+                "target_heifer_preg_day": {
+                  "title": "target_heifer_preg_day",
+                  "type": "number",
+                  "options": {
+                    "grid_columns": 12,
+                    "inputAttributes": {
+                      "class": "text-primary form-control"
+                    },
+                    "infoText": "Target Heifer Pregnancy Day (days) -- The target pregnant age in days for heifers - for adjusting heifer body weight (default is 420)"
+                  },
+                  "minimum": 0,
+                  "default": 420
+                },
+                "mature_body_weight_avg": {
+                  "title": "mature_body_weight_avg",
+                  "type": "number",
+                  "options": {
+                    "grid_columns": 12,
+                    "inputAttributes": {
+                      "class": "text-primary form-control"
+                    },
+                    "infoText": "Average Mature Body Weight (kg/head) -- The average mature body weight of cows (default is 740.1)"
+                  },
+                  "minimum": 0,
+                  "default": 740.1
+                },
+                "mature_body_weight_std": {
+                  "title": "mature_body_weight_std",
+                  "type": "number",
+                  "options": {
+                    "grid_columns": 12,
+                    "inputAttributes": {
+                      "class": "text-primary form-control"
+                    },
+                    "infoText": "Mature Body Weight Standard Deviation (kg/head) -- The standard deviation of mature body weight of cows (default is 73.5)"
+                  },
+                  "minimum": 0,
+                  "default": 73.5
+                }
+              },
+              "options": {
+                "infoText": "Bodyweight"
+              }
+            }
+          },
+          "options": {
+            "infoText": "Farm Level Management"
+          }
+        },
+        "from_literature": {
+          "title": "from_literature",
+          "type": "object",
+          "format": "grid",
+          "properties": {
+            "repro": {
+              "title": "repro",
+              "type": "object",
+              "format": "grid",
+              "properties": {
+                "preg_check_day_1": {
+                  "title": "preg_check_day_1",
+                  "type": "number",
+                  "options": {
+                    "grid_columns": 12,
+                    "inputAttributes": {
+                      "class": "text-primary form-control"
+                    },
+                    "infoText": "Pregnancy Check Day 1 (days) -- Days since last insemination to check whether the animal is pregnant or not for the first time (default is 32)."
+                  },
+                  "minimum": 1,
+                  "default": 32
+                },
+                "preg_loss_rate_1": {
+                  "title": "preg_loss_rate_1",
+                  "type": "number",
+                  "options": {
+                    "grid_columns": 12,
+                    "inputAttributes": {
+                      "class": "text-primary form-control"
+                    },
+                    "infoText": "Pregnancy Loss Rate 1 -- The % of cows that abort their pregnancy before the 1st pregnancy check (default is 0.02)"
+                  },
+                  "minimum": 0,
+                  "maximum": 1,
+                  "default": 0.02
+                },
+                "preg_check_day_2": {
+                  "title": "preg_check_day_2",
+                  "type": "number",
+                  "options": {
+                    "grid_columns": 12,
+                    "inputAttributes": {
+                      "class": "text-primary form-control"
+                    },
+                    "infoText": "Pregnancy Check Day 2 (days) --  Days since last insemination to check whether the animal is pregnant or not for the second time if the animal pass the first pregnancy check (default is 60)."
+                  },
+                  "minimum": 0,
+                  "default": 60
+                },
+                "preg_loss_rate_2": {
+                  "title": "preg_loss_rate_2",
+                  "type": "number",
+                  "options": {
+                    "grid_columns": 12,
+                    "inputAttributes": {
+                      "class": "text-primary form-control"
+                    },
+                    "infoText": "Pregnancy Loss Rate 2 -- % of cows that abort their pregnancy between the 1st and 2nd pregnancy check (default is 0.096)"
+                  },
+                  "minimum": 0,
+                  "maximum": 0.1,
+                  "default": 0.096
+                },
+                "preg_check_day_3": {
+                  "title": "preg_check_day_3",
+                  "type": "number",
+                  "options": {
+                    "grid_columns": 12,
+                    "inputAttributes": {
+                      "class": "text-primary form-control"
+                    },
+                    "infoText": "Pregnancy Check Day 3 (days) -- Days since last insemination to check whether the animal is pregnant or not for the third time if the animal passes the second pregnancy check (default is 200)."
+                  },
+                  "minimum": 0,
+                  "default": 200
+                },
+                "preg_loss_rate_3": {
+                  "title": "preg_loss_rate_3",
+                  "type": "number",
+                  "options": {
+                    "grid_columns": 12,
+                    "inputAttributes": {
+                      "class": "text-primary form-control"
+                    },
+                    "infoText": "Pregnancy Loss Rate 3 -- The % of cows that abort their pregnancy between the 2nd and 3rd pregnancy check (default is 0.017)"
+                  },
+                  "minimum": 0,
+                  "maximum": 0.1,
+                  "default": 0.017
+                },
+                "avg_estrus_cycle_return": {
+                  "title": "avg_estrus_cycle_return",
+                  "type": "number",
+                  "options": {
+                    "grid_columns": 12,
+                    "inputAttributes": {
+                      "class": "text-primary form-control"
+                    },
+                    "infoText": "Average days between calving and first estrus after calving (default is 23)."
+                  },
+                  "minimum": 1,
+                  "default": 23
+                },
+                "std_estrus_cycle_return": {
+                  "title": "std_estrus_cycle_return",
+                  "type": "number",
+                  "options": {
+                    "grid_columns": 12,
+                    "inputAttributes": {
+                      "class": "text-primary form-control"
+                    },
+                    "infoText": "Standard deviation of days between calving and first estrus after calving (default is 6)."
+                  },
+                  "minimum": 1,
+                  "default": 6
+                },
+                "avg_estrus_cycle_heifer": {
+                  "title": "avg_estrus_cycle_heifer",
+                  "type": "number",
+                  "options": {
+                    "grid_columns": 12,
+                    "inputAttributes": {
+                      "class": "text-primary form-control"
+                    },
+                    "infoText": "Average length of estrus cycle for heifers (default is 21)."
+                  },
+                  "minimum": 1,
+                  "default": 21
+                },
+                "std_estrus_cycle_heifer": {
+                  "title": "std_estrus_cycle_heifer",
+                  "type": "number",
+                  "options": {
+                    "grid_columns": 12,
+                    "inputAttributes": {
+                      "class": "text-primary form-control"
+                    },
+                    "infoText": "Standard deviation of the length of estrus cycle for heifers (default is 2.5)."
+                  },
+                  "minimum": 1,
+                  "default": 2.5
+                },
+                "avg_estrus_cycle_cow": {
+                  "title": "avg_estrus_cycle_cow",
+                  "type": "number",
+                  "options": {
+                    "grid_columns": 12,
+                    "inputAttributes": {
+                      "class": "text-primary form-control"
+                    },
+                    "infoText": "Average length of estrus cycle for cows (default is 21)."
+                  },
+                  "minimum": 1,
+                  "default": 21
+                },
+                "std_estrus_cycle_cow": {
+                  "title": "std_estrus_cycle_cow",
+                  "type": "number",
+                  "options": {
+                    "grid_columns": 12,
+                    "inputAttributes": {
+                      "class": "text-primary form-control"
+                    },
+                    "infoText": "Standard deviation of the length of estrus cycle for cows (default is 4)."
+                  },
+                  "minimum": 1,
+                  "default": 4
+                },
+                "avg_estrus_cycle_after_pgf": {
+                  "title": "avg_estrus_cycle_after_pgf",
+                  "type": "number",
+                  "options": {
+                    "grid_columns": 12,
+                    "inputAttributes": {
+                      "class": "text-primary form-control"
+                    },
+                    "infoText": "Average days between the injection of PGF and the occurrence of estrus in the \u2018PGFatPD\u2019 resynch protocol (default is 5)."
+                  },
+                  "minimum": 1,
+                  "default": 5
+                },
+                "std_estrus_cycle_after_pgf": {
+                  "title": "std_estrus_cycle_after_pgf",
+                  "type": "number",
+                  "options": {
+                    "grid_columns": 12,
+                    "inputAttributes": {
+                      "class": "text-primary form-control"
+                    },
+                    "infoText": "Standard deviation of days between the injection of PGF and the occurrence of estrus in the \u2018PGFatPD\u2019 resynch protocol (default is 2)."
+                  },
+                  "minimum": 1,
+                  "default": 2
+                }
+              },
+              "options": {
+                "infoText": "Literature Repro Values"
+              }
+            },
+            "milking": {
+              "title": "milking",
+              "type": "object",
+              "format": "grid",
+              "properties": {
+                "wood_l": {
+                  "title": "wood_l",
+                  "type": "array",
+                  "format": "grid",
+                  "options": {
+                    "inputAttributes": {
+                      "class": "text-primary form-control"
+                    },
+                    "infoText": "Parameter l in the Wood\u2019s equation. It is a scale factor for the production level."
+                  },
+                  "items": {
+                    "title": "wood_l_element",
+                    "type": "array",
+                    "format": "grid",
+                    "options": {
+                      "inputAttributes": {
+                        "class": "text-primary form-control"
+                      },
+                      "infoText": "Parameter l in the Wood\u2019s equation. It is a scale factor for the production level,"
+                    },
+                    "items": {
+                      "title": "wood_l_element_element",
+                      "type": "number",
+                      "options": {
+                        "grid_columns": 12,
+                        "inputAttributes": {
+                          "class": "text-primary form-control"
+                        },
+                        "infoText": "Parameter l in the Wood\u2019s equation. It is a scale factor for the production level."
+                      },
+                      "minimum": 0
+                    }
+                  }
+                },
+                "wood_m": {
+                  "title": "wood_m",
+                  "type": "array",
+                  "format": "grid",
+                  "options": {
+                    "inputAttributes": {
+                      "class": "text-primary form-control"
+                    },
+                    "infoText": "Parameter m in the Wood\u2019s equation. It indicates the growth rate in milk yield until peak"
+                  },
+                  "items": {
+                    "title": "wood_m_element",
+                    "type": "array",
+                    "format": "grid",
+                    "options": {
+                      "inputAttributes": {
+                        "class": "text-primary form-control"
+                      },
+                      "infoText": "Parameter m in the Wood\u2019s equation. It indicates the growth rate in milk yield until peak"
+                    },
+                    "items": {
+                      "title": "wood_m_element_element",
+                      "type": "number",
+                      "options": {
+                        "grid_columns": 12,
+                        "inputAttributes": {
+                          "class": "text-primary form-control"
+                        },
+                        "infoText": "Parameter m in the Wood\u2019s equation. It indicates the growth rate in milk yield until peak"
+                      },
+                      "minimum": 0
+                    }
+                  }
+                },
+                "wood_n": {
+                  "title": "wood_n",
+                  "type": "array",
+                  "format": "grid",
+                  "options": {
+                    "inputAttributes": {
+                      "class": "text-primary form-control"
+                    },
+                    "infoText": "Parameter n in the Wood\u2019s equation. It describes the rate of decline after the peak"
+                  },
+                  "items": {
+                    "title": "wood_n_element",
+                    "type": "array",
+                    "format": "grid",
+                    "options": {
+                      "inputAttributes": {
+                        "class": "text-primary form-control"
+                      },
+                      "infoText": "Parameter n in the Wood\u2019s equation. It describes the rate of decline after the peak"
+                    },
+                    "items": {
+                      "title": "wood_n_element_element",
+                      "type": "number",
+                      "options": {
+                        "grid_columns": 12,
+                        "inputAttributes": {
+                          "class": "text-primary form-control"
+                        },
+                        "infoText": "Parameter n in the Wood\u2019s equation. It describes the rate of decline after the peak"
+                      },
+                      "minimum": 0
+                    }
+                  }
+                },
+                "wood_l_std": {
+                  "title": "wood_l_std",
+                  "type": "array",
+                  "format": "grid",
+                  "options": {
+                    "inputAttributes": {
+                      "class": "text-primary form-control"
+                    },
+                    "infoText": "Standard deviation of parameter l "
+                  },
+                  "items": {
+                    "title": "wood_l_std_element",
+                    "type": "array",
+                    "format": "grid",
+                    "options": {
+                      "inputAttributes": {
+                        "class": "text-primary form-control"
+                      },
+                      "infoText": "Standard deviation of parameter l "
+                    },
+                    "items": {
+                      "title": "wood_l_std_element_element",
+                      "type": "number",
+                      "options": {
+                        "grid_columns": 12,
+                        "inputAttributes": {
+                          "class": "text-primary form-control"
+                        },
+                        "infoText": "Standard deviation of parameter l "
+                      },
+                      "minimum": 0
+                    }
+                  }
+                },
+                "wood_m_std": {
+                  "title": "wood_m_std",
+                  "type": "array",
+                  "format": "grid",
+                  "options": {
+                    "inputAttributes": {
+                      "class": "text-primary form-control"
+                    },
+                    "infoText": "Standard deviation of parameter m"
+                  },
+                  "items": {
+                    "title": "wood_m_std_element",
+                    "type": "array",
+                    "format": "grid",
+                    "options": {
+                      "inputAttributes": {
+                        "class": "text-primary form-control"
+                      },
+                      "infoText": "Standard deviation of parameter m"
+                    },
+                    "items": {
+                      "title": "wood_m_std_element_element",
+                      "type": "number",
+                      "options": {
+                        "grid_columns": 12,
+                        "inputAttributes": {
+                          "class": "text-primary form-control"
+                        },
+                        "infoText": "Standard deviation of parameter m"
+                      },
+                      "minimum": 0
+                    }
+                  }
+                },
+                "wood_n_std": {
+                  "title": "wood_n_std",
+                  "type": "array",
+                  "format": "grid",
+                  "options": {
+                    "inputAttributes": {
+                      "class": "text-primary form-control"
+                    },
+                    "infoText": "Standard deviation of parameter n"
+                  },
+                  "items": {
+                    "title": "wood_n_std_element",
+                    "type": "array",
+                    "format": "grid",
+                    "options": {
+                      "inputAttributes": {
+                        "class": "text-primary form-control"
+                      },
+                      "infoText": "Standard deviation of parameter n"
+                    },
+                    "items": {
+                      "title": "wood_n_std_element_element",
+                      "type": "number",
+                      "options": {
+                        "grid_columns": 12,
+                        "inputAttributes": {
+                          "class": "text-primary form-control"
+                        },
+                        "infoText": "Standard deviation of parameter n"
+                      },
+                      "minimum": 0
+                    }
+                  }
+                }
+              },
+              "options": {
+                "infoText": ""
+              }
+            },
+            "culling": {
+              "title": "culling",
+              "type": "object",
+              "format": "grid",
+              "properties": {
+                "parity_death_prob": {
+                  "title": "parity_death_prob",
+                  "type": "array",
+                  "format": "grid",
+                  "options": {
+                    "inputAttributes": {
+                      "class": "text-primary form-control"
+                    },
+                    "infoText": "Death rate for first, second, third, and later lactations"
+                  },
+                  "items": {
+                    "title": "parity_death_prob_element",
+                    "type": "number",
+                    "options": {
+                      "grid_columns": 12,
+                      "inputAttributes": {
+                        "class": "text-primary form-control"
+                      },
+                      "infoText": "Death rate for first, second, third, and later lactations"
+                    },
+                    "minimum": 0,
+                    "maximum": 1
+                  }
+                },
+                "parity_cull_prob": {
+                  "title": "parity_cull_prob",
+                  "type": "array",
+                  "format": "grid",
+                  "options": {
+                    "inputAttributes": {
+                      "class": "text-primary form-control"
+                    },
+                    "infoText": "Culling rate for first, second, third, and later lactations"
+                  },
+                  "items": {
+                    "title": "parity_cull_prob_element",
+                    "type": "number",
+                    "options": {
+                      "grid_columns": 12,
+                      "inputAttributes": {
+                        "class": "text-primary form-control"
+                      },
+                      "infoText": "Culling rate for first, second, third, and later lactations"
+                    },
+                    "minimum": 0,
+                    "maximum": 1
+                  }
+                },
+                "mastitis_cull_prob": {
+                  "title": "mastitis_cull_prob",
+                  "type": "array",
+                  "format": "grid",
+                  "options": {
+                    "inputAttributes": {
+                      "class": "text-primary form-control"
+                    },
+                    "infoText": "Culling rate for mastitis"
+                  },
+                  "items": {
+                    "title": "mastitis_cull_prob_element",
+                    "type": "number",
+                    "options": {
+                      "grid_columns": 12,
+                      "inputAttributes": {
+                        "class": "text-primary form-control"
+                      }
+                    },
+                    "minimum": 0,
+                    "maximum": 1
+                  }
+                },
+                "udder_cull_prob": {
+                  "title": "udder_cull_prob",
+                  "type": "array",
+                  "format": "grid",
+                  "options": {
+                    "inputAttributes": {
+                      "class": "text-primary form-control"
+                    },
+                    "infoText": "Culling rate for udder reasons"
+                  },
+                  "items": {
+                    "title": "udder_cull_prob_element",
+                    "type": "number",
+                    "options": {
+                      "grid_columns": 12,
+                      "inputAttributes": {
+                        "class": "text-primary form-control"
+                      }
+                    },
+                    "minimum": 0,
+                    "maximum": 1
+                  }
+                },
+                "feet_leg_cull_prob": {
+                  "title": "feet_leg_cull_prob",
+                  "type": "array",
+                  "format": "grid",
+                  "options": {
+                    "inputAttributes": {
+                      "class": "text-primary form-control"
+                    },
+                    "infoText": "Culling rate for feet and leg reasons"
+                  },
+                  "items": {
+                    "title": "feet_leg_cull_prob_element",
+                    "type": "number",
+                    "options": {
+                      "grid_columns": 12,
+                      "inputAttributes": {
+                        "class": "text-primary form-control"
+                      }
+                    },
+                    "minimum": 0,
+                    "maximum": 1
+                  }
+                },
+                "unknown_cull_prob": {
+                  "title": "unknown_cull_prob",
+                  "type": "array",
+                  "format": "grid",
+                  "options": {
+                    "inputAttributes": {
+                      "class": "text-primary form-control"
+                    },
+                    "infoText": "Culling rate for unknown reasons"
+                  },
+                  "items": {
+                    "title": "unknown_cull_prob_element",
+                    "type": "number",
+                    "options": {
+                      "grid_columns": 12,
+                      "inputAttributes": {
+                        "class": "text-primary form-control"
+                      }
+                    },
+                    "minimum": 0,
+                    "maximum": 1
+                  }
+                },
+                "disease_cull_prob": {
+                  "title": "disease_cull_prob",
+                  "type": "array",
+                  "format": "grid",
+                  "options": {
+                    "inputAttributes": {
+                      "class": "text-primary form-control"
+                    },
+                    "infoText": "Culling rate for disease"
+                  },
+                  "items": {
+                    "title": "disease_cull_prob_element",
+                    "type": "number",
+                    "options": {
+                      "grid_columns": 12,
+                      "inputAttributes": {
+                        "class": "text-primary form-control"
+                      }
+                    },
+                    "minimum": 0,
+                    "maximum": 1
+                  }
+                },
+                "injury_cull_prob": {
+                  "title": "injury_cull_prob",
+                  "type": "array",
+                  "format": "grid",
+                  "options": {
+                    "inputAttributes": {
+                      "class": "text-primary form-control"
+                    },
+                    "infoText": "Culling rate for injury"
+                  },
+                  "items": {
+                    "title": "injury_cull_prob_element",
+                    "type": "number",
+                    "options": {
+                      "grid_columns": 12,
+                      "inputAttributes": {
+                        "class": "text-primary form-control"
+                      }
+                    },
+                    "minimum": 0,
+                    "maximum": 1
+                  }
+                },
+                "death_cull_prob": {
+                  "title": "death_cull_prob",
+                  "type": "array",
+                  "format": "grid",
+                  "options": {
+                    "inputAttributes": {
+                      "class": "text-primary form-control"
+                    },
+                    "infoText": "Culling rate for death"
+                  },
+                  "items": {
+                    "title": "death_cull_prob_element",
+                    "type": "number",
+                    "options": {
+                      "grid_columns": 12,
+                      "inputAttributes": {
+                        "class": "text-primary form-control"
+                      }
+                    },
+                    "minimum": 0,
+                    "maximum": 1
+                  }
+                },
+                "cull_day_count": {
+                  "title": "cull_day_count",
+                  "type": "array",
+                  "format": "grid",
+                  "options": {
+                    "inputAttributes": {
+                      "class": "text-primary form-control"
+                    },
+                    "infoText": "Culling day count"
+                  },
+                  "items": {
+                    "title": "cull_day_count_element",
+                    "type": "number",
+                    "options": {
+                      "grid_columns": 12,
+                      "inputAttributes": {
+                        "class": "text-primary form-control"
+                      }
+                    },
+                    "minimum": 0
+                  }
+                }
+              },
+              "options": {
+                "infoText": ""
+              }
+            },
+            "life_cycle": {
+              "title": "life_cycle",
+              "type": "object",
+              "format": "grid",
+              "properties": {
+                "still_birth_rate": {
+                  "title": "still_birth_rate",
+                  "type": "number",
+                  "options": {
+                    "grid_columns": 12,
+                    "inputAttributes": {
+                      "class": "text-primary form-control"
+                    },
+                    "infoText": "Stillbirth rate"
+                  },
+                  "minimum": 0,
+                  "maximum": 1
+                }
+              },
+              "options": {
+                "infoText": ""
+              }
+            }
+          },
+          "options": {
+            "infoText": "From Literature"
+          }
+        }
+      },
+      "options": {
+        "infoText": "Animal Configuration"
+      }
+    },
+    "methane_mitigation": {
+      "title": "methane_mitigation",
+      "type": "object",
+      "format": "grid",
+      "properties": {
+        "methane_mitigation_method": {
+          "title": "methane_mitigation_method",
+          "type": "boolean",
+          "options": {
+            "grid_columns": 12,
+            "format": "select2",
+            "inputAttributes": {
+              "class": "text-primary form-control"
+            },
+            "infoText": "Methane Mitigation Method -- The type of enteric methane mitigation supplement that is fed to the lactating dairy cattle"
+          },
+          "default": "None"
+        },
+        "methane_mitigation_additive_amount": {
+          "title": "methane_mitigation_additive_amount",
+          "type": "number",
+          "options": {
+            "grid_columns": 12,
+            "inputAttributes": {
+              "class": "text-primary form-control"
+            }
+          },
+          "default": 0
+        },
+        "3-NOP_additive_amount": {
+          "title": "3-NOP_additive_amount",
+          "type": "number",
+          "options": {
+            "grid_columns": 12,
+            "inputAttributes": {
+              "class": "text-primary form-control"
+            },
+            "infoText": "3-NOP Additive Amount (mg/kg DMI) -- The dosage of the 3-NOP mitigation additive (mg/kg DMI)"
+          },
+          "minimum": 40,
+          "maximum": 100,
+          "default": 70
+        },
+        "monensin_additive_amount": {
+          "title": "monensin_additive_amount",
+          "type": "number",
+          "options": {
+            "grid_columns": 12,
+            "inputAttributes": {
+              "class": "text-primary form-control"
+            },
+            "infoText": "Monensin Additive Amount (mg/kg DMI) -- The dosage of the monensin mitigation additive (mg/kg DMI)"
+          },
+          "minimum": 20,
+          "maximum": 36,
+          "default": 24
+        },
+        "essential_oils_additive_amount": {
+          "title": "essential_oils_additive_amount",
+          "type": "number",
+          "options": {
+            "grid_columns": 12,
+            "inputAttributes": {
+              "class": "text-primary form-control"
+            },
+            "infoText": "Essential Oils Additive Amount (mg/kg DMI) -- The dosage of the essential oils mitigation additive (mg/kg DMI)"
+          },
+          "minimum": 0,
+          "maximum": 100,
+          "default": 0
+        },
+        "seaweed_additive_amount": {
+          "title": "seaweed_additive_amount",
+          "type": "number",
+          "options": {
+            "grid_columns": 12,
+            "inputAttributes": {
+              "class": "text-primary form-control"
+            },
+            "infoText": "Seaweed Additive Amount (mg/kg DMI) -- The dosage of the seaweed mitigation additive (mg/kg DMI)"
+          },
+          "minimum": 0,
+          "maximum": 100,
+          "default": 0
+        }
+      },
+      "options": {
+        "infoText": "Methane Mitigation"
+      }
+    },
+    "housing": {
+      "title": "housing",
+      "type": "boolean",
+      "options": {
+        "grid_columns": 12,
+        "format": "select2",
+        "inputAttributes": {
+          "class": "text-primary form-control"
+        },
+        "infoText": "Housing -- The type of housing management for the herd."
+      },
+      "default": "barn"
+    },
+    "pasture_concentrate": {
+      "title": "pasture_concentrate",
+      "type": "number",
+      "options": {
+        "grid_columns": 12,
+        "inputAttributes": {
+          "class": "text-primary form-control"
+        },
+        "infoText": "Pasture Concentration -- Amount of concentrate supplementation provided if animals are housed on pasture. (kg)"
+      },
+      "minimum": 0,
+      "default": 0
+    },
+    "methane_model": {
+      "title": "methane_model",
+      "type": "boolean",
+      "options": {
+        "grid_columns": 12,
+        "format": "select2",
+        "inputAttributes": {
+          "class": "text-primary form-control"
+        },
+        "infoText": "Methane Model -- The method used to estimate enteric methane emissions."
+      },
+      "default": "IPCC"
+    },
+    "ration": {
+      "title": "ration",
+      "type": "object",
+      "format": "grid",
+      "properties": {
+        "user_input": {
+          "title": "user_input",
+          "type": "boolean",
+          "options": {
+            "grid_columns": 12,
+            "format": "select2",
+            "inputAttributes": {
+              "class": "text-primary form-control"
+            },
+            "infoText": "User Input -- A bool value indicating if the user will provide the ration or diet formulation they would like to feed to the cattle (true) or not (false)."
+          },
+          "default": false
+        },
+        "formulation_interval": {
+          "title": "formulation_interval",
+          "type": "number",
+          "options": {
+            "grid_columns": 12,
+            "inputAttributes": {
+              "class": "text-primary form-control"
+            },
+            "infoText": "Formulation Interval -- The length of time in days between when the diets are reformulated."
+          },
+          "minimum": 1,
+          "default": 30
+        }
+      },
+      "options": {
+        "infoText": "Ration"
+      }
+    },
+    "pen_information": {
+      "title": "pen_information",
+      "type": "array",
+      "format": "grid",
+      "options": {
+        "inputAttributes": {
+          "class": "text-primary form-control"
+        },
+        "infoText": "Pen Information."
+      },
+      "items": {
+        "title": "pen_information_element",
+        "type": "object",
+        "format": "grid",
+        "properties": {
+          "id": {
+            "title": "id",
+            "type": "number",
+            "options": {
+              "grid_columns": 12,
+              "inputAttributes": {
+                "class": "text-primary form-control"
+              },
+              "infoText": "Pen ID -- The index of the pen."
+            }
+          },
+          "pen_name": {
+            "title": "pen_name",
+            "type": "boolean",
+            "options": {
+              "grid_columns": 12,
+              "format": "select2",
+              "inputAttributes": {
+                "class": "text-primary form-control"
+              },
+              "infoText": "Pen Name -- The name or identifier of a given pen."
+            }
+          },
+          "animal_combination": {
+            "title": "animal_combination",
+            "type": "boolean",
+            "options": {
+              "grid_columns": 12,
+              "format": "select2",
+              "inputAttributes": {
+                "class": "text-primary form-control"
+              },
+              "infoText": "Animal Combination -- The valid combinations of animal types that can be in a pen."
+            }
+          },
+          "vertical_dist_to_milking_parlor": {
+            "title": "vertical_dist_to_milking_parlor",
+            "type": "number",
+            "options": {
+              "grid_columns": 12,
+              "inputAttributes": {
+                "class": "text-primary form-control"
+              },
+              "infoText": "Vertical Distance to Milking Parlor (m) -- The elevation gain (in meters) between the pen and the milking parlor."
+            },
+            "minimum": 0,
+            "default": 0.1
+          },
+          "horizontal_dist_to_milking_parlor": {
+            "title": "horizontal_dist_to_milking_parlor",
+            "type": "number",
+            "options": {
+              "grid_columns": 12,
+              "inputAttributes": {
+                "class": "text-primary form-control"
+              },
+              "infoText": "Horizontal Distance to Milking Parlor (m) -- The distance (in meters) between the pen and the milking parlor."
+            },
+            "minimum": 0,
+            "default": 1.6
+          },
+          "number_of_stalls": {
+            "title": "number_of_stalls",
+            "type": "number",
+            "options": {
+              "grid_columns": 12,
+              "inputAttributes": {
+                "class": "text-primary form-control"
+              },
+              "infoText": "Number of Stalls -- The number of stalls in the pen."
+            },
+            "minimum": 0,
+            "default": 1000
+          },
+          "housing_type": {
+            "title": "housing_type",
+            "type": "boolean",
+            "options": {
+              "grid_columns": 12,
+              "format": "select2",
+              "inputAttributes": {
+                "class": "text-primary form-control"
+              },
+              "infoText": "Housing Type -- The type of barn the pen is in."
+            },
+            "default": "open air barn"
+          },
+          "pen_type": {
+            "title": "pen_type",
+            "type": "boolean",
+            "options": {
+              "grid_columns": 12,
+              "format": "select2",
+              "inputAttributes": {
+                "class": "text-primary form-control"
+              },
+              "infoText": "Pen Type -- The type of stalls the pen has."
+            },
+            "default": "freestall"
+          },
+          "max_stocking_density": {
+            "title": "max_stocking_density",
+            "type": "number",
+            "options": {
+              "grid_columns": 12,
+              "inputAttributes": {
+                "class": "text-primary form-control"
+              },
+              "infoText": "Max Stocking Density -- The maximum ration between the number of animals in the pen and the number of stalls in the pen."
+            },
+            "minimum": 0.5,
+            "maximum": 2,
+            "default": 1.2
+          },
+          "manure_management_scenario_id": {
+            "title": "manure_management_scenario_id",
+            "type": "number",
+            "options": {
+              "grid_columns": 12,
+              "inputAttributes": {
+                "class": "text-primary form-control"
+              },
+              "infoText": "Manure Management Scenario ID -- The ID number of the manure management practices that are used for this pen."
+            },
+            "minimum": 0,
+            "default": 0
+          }
+        }
+      }
+    }
+  }
+}

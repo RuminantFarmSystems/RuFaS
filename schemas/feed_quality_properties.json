@@ -1,0 +1,81 @@
+{
+  "title": "feed_quality_properties",
+  "type": "object",
+  "format": "grid",
+  "properties": {
+    "rufas_id": {
+      "title": "rufas_id",
+      "type": "number",
+      "options": {
+        "grid_columns": 12,
+        "inputAttributes": {
+          "class": "text-primary form-control"
+        },
+        "infoText": "Unique integer identifier for feeds used within the RuFaS model."
+      },
+      "minimum": 1
+    },
+    "quality_id": {
+      "title": "quality_id",
+      "type": "number",
+      "options": {
+        "grid_columns": 12,
+        "inputAttributes": {
+          "class": "text-primary form-control"
+        },
+        "infoText": "Quality ID"
+      },
+      "minimum": 1
+    },
+    "status": {
+      "title": "status",
+      "type": "boolean",
+      "options": {
+        "grid_columns": 12,
+        "format": "select2",
+        "inputAttributes": {
+          "class": "text-primary form-control"
+        },
+        "infoText": "Status"
+      }
+    },
+    "differentiating_nutrient": {
+      "title": "differentiating_nutrient",
+      "type": "boolean",
+      "options": {
+        "grid_columns": 12,
+        "format": "select2",
+        "inputAttributes": {
+          "class": "text-primary form-control"
+        },
+        "infoText": "Differentiating Nutrient"
+      }
+    },
+    "low_percent": {
+      "title": "low_percent",
+      "type": "number",
+      "options": {
+        "grid_columns": 12,
+        "inputAttributes": {
+          "class": "text-primary form-control"
+        },
+        "infoText": "Low Percent"
+      },
+      "minimum": 0,
+      "maximum": 100
+    },
+    "high_percent": {
+      "title": "high_percent",
+      "type": "number",
+      "options": {
+        "grid_columns": 12,
+        "inputAttributes": {
+          "class": "text-primary form-control"
+        },
+        "infoText": "High Percent"
+      },
+      "minimum": 0,
+      "maximum": 100
+    }
+  }
+}

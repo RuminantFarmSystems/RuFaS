@@ -1,0 +1,199 @@
+{
+  "title": "crop_schedule_properties",
+  "type": "object",
+  "format": "grid",
+  "properties": {
+    "crop_schedules": {
+      "title": "crop_schedules",
+      "type": "array",
+      "format": "grid",
+      "options": {
+        "inputAttributes": {
+          "class": "text-primary form-control"
+        },
+        "infoText": "Array of all crop schedules to be executed over the run of the simulation."
+      },
+      "items": {
+        "title": "crop_schedules_element",
+        "type": "object",
+        "format": "grid",
+        "properties": {
+          "crop_species": {
+            "title": "crop_species",
+            "type": "boolean",
+            "options": {
+              "grid_columns": 12,
+              "format": "select2",
+              "inputAttributes": {
+                "class": "text-primary form-control"
+              },
+              "infoText": "Name of the crop being grown."
+            }
+          },
+          "harvest_days": {
+            "title": "harvest_days",
+            "type": "array",
+            "format": "grid",
+            "options": {
+              "inputAttributes": {
+                "class": "text-primary form-control"
+              },
+              "infoText": "Julian day(s) of year to harvest"
+            },
+            "default": [],
+            "items": {
+              "title": "harvest_days_element",
+              "type": "number",
+              "options": {
+                "grid_columns": 12,
+                "inputAttributes": {
+                  "class": "text-primary form-control"
+                }
+              },
+              "minimum": 1,
+              "maximum": 366
+            }
+          },
+          "harvest_years": {
+            "title": "harvest_years",
+            "type": "array",
+            "format": "grid",
+            "options": {
+              "inputAttributes": {
+                "class": "text-primary form-control"
+              },
+              "infoText": "Calendar years in which the harvesting occurs"
+            },
+            "default": [],
+            "items": {
+              "title": "harvest_years_element",
+              "type": "number",
+              "options": {
+                "grid_columns": 12,
+                "inputAttributes": {
+                  "class": "text-primary form-control"
+                }
+              },
+              "minimum": 1
+            }
+          },
+          "harvest_operations": {
+            "title": "harvest_operations",
+            "type": "array",
+            "format": "grid",
+            "options": {
+              "inputAttributes": {
+                "class": "text-primary form-control"
+              },
+              "infoText": "Operation(s) with which this crop will be harvested."
+            },
+            "default": [
+              "default"
+            ],
+            "items": {
+              "title": "harvest_operations_element",
+              "type": "boolean",
+              "options": {
+                "grid_columns": 12,
+                "format": "select2",
+                "inputAttributes": {
+                  "class": "text-primary form-control"
+                }
+              },
+              "default": "default"
+            }
+          },
+          "harvest_type": {
+            "title": "harvest_type",
+            "type": "boolean",
+            "options": {
+              "grid_columns": 12,
+              "format": "select2",
+              "inputAttributes": {
+                "class": "text-primary form-control"
+              },
+              "infoText": "Whether the crop uses scheduled harvests or optimal harvests"
+            },
+            "default": "scheduled"
+          },
+          "planting_days": {
+            "title": "planting_days",
+            "type": "array",
+            "format": "grid",
+            "options": {
+              "inputAttributes": {
+                "class": "text-primary form-control"
+              },
+              "infoText": "Julian day(s) of year to plant"
+            },
+            "default": [],
+            "items": {
+              "title": "planting_days_element",
+              "type": "number",
+              "options": {
+                "grid_columns": 12,
+                "inputAttributes": {
+                  "class": "text-primary form-control"
+                }
+              },
+              "minimum": 1,
+              "maximum": 366
+            }
+          },
+          "planting_years": {
+            "title": "planting_years",
+            "type": "array",
+            "format": "grid",
+            "options": {
+              "inputAttributes": {
+                "class": "text-primary form-control"
+              },
+              "infoText": "Calendar years in which the planting occurs"
+            },
+            "default": [],
+            "items": {
+              "title": "planting_years_element",
+              "type": "number",
+              "options": {
+                "grid_columns": 12,
+                "inputAttributes": {
+                  "class": "text-primary form-control"
+                }
+              },
+              "minimum": 1
+            }
+          },
+          "pattern_repeat": {
+            "title": "pattern_repeat",
+            "type": "number",
+            "options": {
+              "grid_columns": 12,
+              "inputAttributes": {
+                "class": "text-primary form-control"
+              },
+              "infoText": "Number of times that this crop schedule should be repeated."
+            },
+            "minimum": 0,
+            "default": 0
+          },
+          "pattern_skip": {
+            "title": "pattern_skip",
+            "type": "number",
+            "options": {
+              "grid_columns": 12,
+              "inputAttributes": {
+                "class": "text-primary form-control"
+              },
+              "infoText": "Number of years to be skipped between schedule repetitions."
+            },
+            "minimum": 0,
+            "default": 0
+          }
+        },
+        "options": {
+          "infoText": "Contains all the properties necessary to create a CropSchedule object."
+        }
+      }
+    }
+  }
+}

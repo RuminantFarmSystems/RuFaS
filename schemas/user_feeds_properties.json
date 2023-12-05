@@ -1,0 +1,67 @@
+{
+  "title": "user_feeds_properties",
+  "type": "object",
+  "format": "grid",
+  "properties": {
+    "rufas_id": {
+      "title": "rufas_id",
+      "type": "number",
+      "options": {
+        "grid_columns": 12,
+        "inputAttributes": {
+          "class": "text-primary form-control"
+        },
+        "infoText": "Unique integer identifier for feeds used within the RuFaS model."
+      },
+      "minimum": 1
+    },
+    "Name": {
+      "title": "Name",
+      "type": "boolean",
+      "options": {
+        "grid_columns": 12,
+        "format": "select2",
+        "inputAttributes": {
+          "class": "text-primary form-control"
+        },
+        "infoText": "A general common name for the feed as defined within RuFaS."
+      }
+    },
+    "feed_description": {
+      "title": "feed_description",
+      "type": "boolean",
+      "options": {
+        "grid_columns": 12,
+        "format": "select2",
+        "inputAttributes": {
+          "class": "text-primary form-control"
+        },
+        "infoText": "A more specific description of the feed that uniquely distinguishes it from other feeds with a similar or same name."
+      }
+    },
+    "feed_type": {
+      "title": "feed_type",
+      "type": "boolean",
+      "options": {
+        "grid_columns": 12,
+        "format": "select2",
+        "inputAttributes": {
+          "class": "text-primary form-control"
+        },
+        "infoText": "The general type or category of the feed (group)."
+      }
+    },
+    "units": {
+      "title": "units",
+      "type": "boolean",
+      "options": {
+        "grid_columns": 12,
+        "format": "select2",
+        "inputAttributes": {
+          "class": "text-primary form-control"
+        },
+        "infoText": "The unit of measurement used for the feed."
+      }
+    }
+  }
+}

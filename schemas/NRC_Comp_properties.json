@@ -1,0 +1,451 @@
+{
+  "title": "NRC_Comp_properties",
+  "type": "object",
+  "format": "grid",
+  "properties": {
+    "rufas_id": {
+      "title": "rufas_id",
+      "type": "number",
+      "options": {
+        "grid_columns": 12,
+        "inputAttributes": {
+          "class": "text-primary form-control"
+        },
+        "infoText": "Unique integer identifier for feeds used within the RuFaS model."
+      },
+      "minimum": 1
+    },
+    "feed_type": {
+      "title": "feed_type",
+      "type": "boolean",
+      "options": {
+        "grid_columns": 12,
+        "format": "select2",
+        "inputAttributes": {
+          "class": "text-primary form-control"
+        },
+        "infoText": "The general type or category of the feed."
+      }
+    },
+    "DM": {
+      "title": "DM",
+      "type": "number",
+      "options": {
+        "grid_columns": 12,
+        "inputAttributes": {
+          "class": "text-primary form-control"
+        },
+        "infoText": "Dry matter content of the feed (% DM)."
+      },
+      "minimum": 0,
+      "maximum": 100
+    },
+    "CP": {
+      "title": "CP",
+      "type": "number",
+      "options": {
+        "grid_columns": 12,
+        "inputAttributes": {
+          "class": "text-primary form-control"
+        },
+        "infoText": "Crude protein content of the feed (% DM)."
+      },
+      "minimum": 0,
+      "maximum": 288
+    },
+    "NDICP": {
+      "title": "NDICP",
+      "type": "number",
+      "options": {
+        "grid_columns": 12,
+        "inputAttributes": {
+          "class": "text-primary form-control"
+        },
+        "infoText": "Neutral detergent insoluble nitrogen multiplied by 6.25 (% DM)."
+      },
+      "minimum": 0,
+      "maximum": 12,
+      "default": 0
+    },
+    "ADICP": {
+      "title": "ADICP",
+      "type": "number",
+      "options": {
+        "grid_columns": 12,
+        "inputAttributes": {
+          "class": "text-primary form-control"
+        },
+        "infoText": "Acid detergent insoluble nitrogen multiplied by 6.25 (% DM)."
+      },
+      "minimum": 0,
+      "maximum": 8,
+      "default": 0
+    },
+    "EE": {
+      "title": "EE",
+      "type": "number",
+      "options": {
+        "grid_columns": 12,
+        "inputAttributes": {
+          "class": "text-primary form-control"
+        },
+        "infoText": "Ether extract (% DM)."
+      },
+      "minimum": 0,
+      "maximum": 100,
+      "default": 0
+    },
+    "NDF": {
+      "title": "NDF",
+      "type": "number",
+      "options": {
+        "grid_columns": 12,
+        "inputAttributes": {
+          "class": "text-primary form-control"
+        },
+        "infoText": "Neutral detergent fiber (% DM)."
+      },
+      "minimum": 0,
+      "maximum": 85,
+      "default": 0
+    },
+    "ADF": {
+      "title": "ADF",
+      "type": "number",
+      "options": {
+        "grid_columns": 12,
+        "inputAttributes": {
+          "class": "text-primary form-control"
+        },
+        "infoText": "Acid detergent fiber (% DM)"
+      },
+      "minimum": 0,
+      "maximum": 66,
+      "default": 0
+    },
+    "lignin": {
+      "title": "lignin",
+      "type": "number",
+      "options": {
+        "grid_columns": 12,
+        "inputAttributes": {
+          "class": "text-primary form-control"
+        },
+        "infoText": "Acid detergent lignin (% DM)."
+      },
+      "minimum": 0,
+      "maximum": 25,
+      "default": 0
+    },
+    "ash": {
+      "title": "ash",
+      "type": "number",
+      "options": {
+        "grid_columns": 12,
+        "inputAttributes": {
+          "class": "text-primary form-control"
+        },
+        "infoText": "Ash contents (% DM) "
+      },
+      "minimum": 0,
+      "maximum": 100,
+      "default": 0
+    },
+    "non_fiber_carb": {
+      "title": "non_fiber_carb",
+      "type": "number",
+      "options": {
+        "grid_columns": 12,
+        "inputAttributes": {
+          "class": "text-primary form-control"
+        },
+        "infoText": "Non fiber carbohydrates (% DM)."
+      },
+      "minimum": 0,
+      "maximum": 100,
+      "default": 0
+    },
+    "PAF": {
+      "title": "PAF",
+      "type": "number",
+      "options": {
+        "grid_columns": 12,
+        "inputAttributes": {
+          "class": "text-primary form-control"
+        },
+        "infoText": "Processing adjustment factor."
+      },
+      "minimum": 0.87,
+      "maximum": 1.04,
+      "default": 0
+    },
+    "TDN": {
+      "title": "TDN",
+      "type": "number",
+      "options": {
+        "grid_columns": 12,
+        "inputAttributes": {
+          "class": "text-primary form-control"
+        },
+        "infoText": "Total digestible nutrients (% DM)."
+      },
+      "minimum": 0,
+      "maximum": 184,
+      "default": 0
+    },
+    "N_A": {
+      "title": "N_A",
+      "type": "number",
+      "options": {
+        "grid_columns": 12,
+        "inputAttributes": {
+          "class": "text-primary form-control"
+        },
+        "infoText": "Nitrogen Fraction A (% CP)."
+      },
+      "minimum": 0,
+      "maximum": 100,
+      "default": 0
+    },
+    "N_B": {
+      "title": "N_B",
+      "type": "number",
+      "options": {
+        "grid_columns": 12,
+        "inputAttributes": {
+          "class": "text-primary form-control"
+        },
+        "infoText": "Nitrogen Fraction B (% CP)."
+      },
+      "minimum": 0,
+      "maximum": 100,
+      "default": 0
+    },
+    "N_C": {
+      "title": "N_C",
+      "type": "number",
+      "options": {
+        "grid_columns": 12,
+        "inputAttributes": {
+          "class": "text-primary form-control"
+        },
+        "infoText": "Nitrogen Fraction C (% CP)."
+      },
+      "minimum": 0,
+      "maximum": 100,
+      "default": 0
+    },
+    "Kd": {
+      "title": "Kd",
+      "type": "number",
+      "options": {
+        "grid_columns": 12,
+        "inputAttributes": {
+          "class": "text-primary form-control"
+        },
+        "infoText": "Feed degradation rate of B fraction (% h)."
+      },
+      "minimum": 0,
+      "maximum": 30,
+      "default": 0
+    },
+    "dRUP": {
+      "title": "dRUP",
+      "type": "number",
+      "options": {
+        "grid_columns": 12,
+        "inputAttributes": {
+          "class": "text-primary form-control"
+        },
+        "infoText": "Digested rumen undegradable protein (% of RUP)."
+      },
+      "minimum": 0,
+      "maximum": 100,
+      "default": 0
+    },
+    "calcium": {
+      "title": "calcium",
+      "type": "number",
+      "options": {
+        "grid_columns": 12,
+        "inputAttributes": {
+          "class": "text-primary form-control"
+        },
+        "infoText": "Calcium (% DM)."
+      },
+      "minimum": 0,
+      "maximum": 72,
+      "default": 0
+    },
+    "phosphorus": {
+      "title": "phosphorus",
+      "type": "number",
+      "options": {
+        "grid_columns": 12,
+        "inputAttributes": {
+          "class": "text-primary form-control"
+        },
+        "infoText": "Phosphorus (% DM)."
+      },
+      "minimum": 0,
+      "maximum": 32,
+      "default": 0
+    },
+    "magnesium": {
+      "title": "magnesium",
+      "type": "number",
+      "options": {
+        "grid_columns": 12,
+        "inputAttributes": {
+          "class": "text-primary form-control"
+        },
+        "infoText": "Magnesium (% DM)."
+      },
+      "minimum": 0,
+      "maximum": 57,
+      "default": 0
+    },
+    "potassium": {
+      "title": "potassium",
+      "type": "number",
+      "options": {
+        "grid_columns": 12,
+        "inputAttributes": {
+          "class": "text-primary form-control"
+        },
+        "infoText": "Potassium (% DM)."
+      },
+      "minimum": 0,
+      "maximum": 57,
+      "default": 0
+    },
+    "sodium": {
+      "title": "sodium",
+      "type": "number",
+      "options": {
+        "grid_columns": 12,
+        "inputAttributes": {
+          "class": "text-primary form-control"
+        },
+        "infoText": "Sodium (% DM)."
+      },
+      "minimum": 0,
+      "maximum": 40,
+      "default": 0
+    },
+    "chlorine": {
+      "title": "chlorine",
+      "type": "number",
+      "options": {
+        "grid_columns": 12,
+        "inputAttributes": {
+          "class": "text-primary form-control"
+        },
+        "infoText": "Chlorine (% DM)."
+      },
+      "minimum": 0,
+      "maximum": 67,
+      "default": 0
+    },
+    "sulfur": {
+      "title": "sulfur",
+      "type": "number",
+      "options": {
+        "grid_columns": 12,
+        "inputAttributes": {
+          "class": "text-primary form-control"
+        },
+        "infoText": "Sulphur (% DM)."
+      },
+      "minimum": 0,
+      "maximum": 25,
+      "default": 0
+    },
+    "DE": {
+      "title": "DE",
+      "type": "number",
+      "options": {
+        "grid_columns": 12,
+        "inputAttributes": {
+          "class": "text-primary form-control"
+        },
+        "infoText": "Digestible energy (Mcal/kg)."
+      },
+      "minimum": 0,
+      "maximum": 100,
+      "default": 0
+    },
+    "is_fat": {
+      "title": "is_fat",
+      "type": "number",
+      "options": {
+        "grid_columns": 12,
+        "inputAttributes": {
+          "class": "text-primary form-control"
+        },
+        "infoText": "Identifier of fat type feed (0 or 1)."
+      },
+      "minimum": 0,
+      "maximum": 1
+    },
+    "is_wetforage": {
+      "title": "is_wetforage",
+      "type": "number",
+      "options": {
+        "grid_columns": 12,
+        "inputAttributes": {
+          "class": "text-primary form-control"
+        },
+        "infoText": "Identifier of wet forage type feed (0 or 1)."
+      },
+      "minimum": 0,
+      "maximum": 1
+    },
+    "units": {
+      "title": "units",
+      "type": "boolean",
+      "options": {
+        "grid_columns": 12,
+        "format": "select2",
+        "inputAttributes": {
+          "class": "text-primary form-control"
+        },
+        "infoText": ""
+      }
+    },
+    "starch": {
+      "title": "starch",
+      "type": "number",
+      "options": {
+        "grid_columns": 12,
+        "inputAttributes": {
+          "class": "text-primary form-control"
+        },
+        "infoText": "Starch (%)"
+      },
+      "minimum": 0,
+      "maximum": 80,
+      "default": 0
+    },
+    "limit": {
+      "title": "limit",
+      "type": "number",
+      "options": {
+        "grid_columns": 12,
+        "inputAttributes": {
+          "class": "text-primary form-control"
+        }
+      }
+    },
+    "lower_limit": {
+      "title": "lower_limit",
+      "type": "number",
+      "options": {
+        "grid_columns": 12,
+        "inputAttributes": {
+          "class": "text-primary form-control"
+        }
+      }
+    }
+  }
+}
