@@ -1,5 +1,6 @@
 import json
 import pprint
+from pathlib import Path
 from typing import Any, Callable
 import re
 
@@ -164,20 +165,8 @@ class SchemaSetupMethods:
         "object": setup_object_schema
     }
 
-
-# def _setup_schema(title: str, structure: dict[str, Any]) -> dict[str, Any]:
-#     if
-#     schema = {"title": title,
-#               "type": "object",
-#               "format": "grid",
-#               "properties": {}
-#               }
-#     for key in structure.keys():
-#
-#     return schema
-
 def main() -> None:
-    schema_dir_path = 'schemas/'
+    schema_dir_path = Path('schemas/')
     Utility.empty_dir(schema_dir_path, None)
 
     with open("input/metadata/default_metadata.json") as metadata:
@@ -192,7 +181,9 @@ def main() -> None:
             print(f"Key: '{key}' raised exception: {e}")
             continue
 
-        new_schema_file_path = 
+        new_schema_file_name = f"{key}.json"
+        new_schema_file_path = Path.joinpath(schema_dir_path, new_schema_file_name)
+        
 
         print(key)
     pprint.pprint(json.dumps(properties, indent=2))
