@@ -2312,33 +2312,31 @@
         "type": "array",
         "properties": {
           "type": "object",
-          "properties": {
-            "bedding_type": {
-              "type": "string",
-              "description": "Bedding Type -- The material used for bedding pack.",
-              "pattern": "^(Sand|Straw|Sawdust|Manure_solids|Other)$"
-            },
-            "bedding_mass_per_day": {
-              "type": "number"
-            },
-            "bedding_density": {
-              "type": "number"
-            },
-            "bedding_dry_matter_content": {
-              "type": "number"
-            },
-            "bedding_cleaned_fraction": {
-              "type": "number"
-            },
-            "bedding_carbon_fraction": {
-              "type": "number"
-            },
-            "bedding_phosphorus_content": {
-              "type": "number"
-            },
-            "sand_removal_efficiency": {
-              "type": "number"
-            }
+          "bedding_type": {
+            "type": "string",
+            "description": "Bedding Type -- The material used for bedding pack.",
+            "pattern": "^(Sand|Straw|Sawdust|Manure_solids|Other)$"
+          },
+          "bedding_mass_per_day": {
+            "type": "number"
+          },
+          "bedding_density": {
+            "type": "number"
+          },
+          "bedding_dry_matter_content": {
+            "type": "number"
+          },
+          "bedding_cleaned_fraction": {
+            "type": "number"
+          },
+          "bedding_carbon_fraction": {
+            "type": "number"
+          },
+          "bedding_phosphorus_content": {
+            "type": "number"
+          },
+          "sand_removal_efficiency": {
+            "type": "number"
           }
         }
       },
@@ -2346,21 +2344,19 @@
         "type": "array",
         "properties": {
           "type": "object",
-          "properties": {
-            "manure_handler_type": {
-              "type": "string",
-              "description": "Manure Handling Method -- Method for cleaning barn alleyways.",
-              "pattern": "^(flush system|alley scraper|manual scraping|tillage|manual skid steer scraping)$"
-            },
-            "cleaning_water_use_rate": {
-              "type": "number"
-            },
-            "minutes_per_cleaning": {
-              "type": "number"
-            },
-            "cleanings_per_day": {
-              "type": "number"
-            }
+          "manure_handler_type": {
+            "type": "string",
+            "description": "Manure Handling Method -- Method for cleaning barn alleyways.",
+            "pattern": "^(flush system|alley scraper|manual scraping|tillage|manual skid steer scraping)$"
+          },
+          "cleaning_water_use_rate": {
+            "type": "number"
+          },
+          "minutes_per_cleaning": {
+            "type": "number"
+          },
+          "cleanings_per_day": {
+            "type": "number"
           }
         }
       },
@@ -2368,33 +2364,31 @@
         "type": "array",
         "properties": {
           "type": "object",
-          "properties": {
-            "manure_separator_type": {
-              "type": "string",
-              "description": "Manure Separator Type -- The type of solid-liquid separator equipment to separate coarse fibrous solids/sand",
-              "pattern": "^(screw press|sand lane|rotary screen|none|other)$"
-            },
-            "percent_dry_solids": {
-              "type": "number"
-            },
-            "total_solids_removal_efficiency_for_separator": {
-              "type": "number"
-            },
-            "volatile_solids_removal_efficiency_for_separator": {
-              "type": "number"
-            },
-            "nitrogen_removal_efficiency_for_separator": {
-              "type": "number"
-            },
-            "total_ammoniacal_nitrogen_removal_efficiency_for_separator": {
-              "type": "number"
-            },
-            "phosphorus_removal_efficiency_for_separator": {
-              "type": "number"
-            },
-            "potassium_removal_efficiency_for_separator": {
-              "type": "number"
-            }
+          "manure_separator_type": {
+            "type": "string",
+            "description": "Manure Separator Type -- The type of solid-liquid separator equipment to separate coarse fibrous solids/sand",
+            "pattern": "^(screw press|sand lane|rotary screen|none|other)$"
+          },
+          "percent_dry_solids": {
+            "type": "number"
+          },
+          "total_solids_removal_efficiency_for_separator": {
+            "type": "number"
+          },
+          "volatile_solids_removal_efficiency_for_separator": {
+            "type": "number"
+          },
+          "nitrogen_removal_efficiency_for_separator": {
+            "type": "number"
+          },
+          "total_ammoniacal_nitrogen_removal_efficiency_for_separator": {
+            "type": "number"
+          },
+          "phosphorus_removal_efficiency_for_separator": {
+            "type": "number"
+          },
+          "potassium_removal_efficiency_for_separator": {
+            "type": "number"
           }
         }
       },
@@ -2402,36 +2396,34 @@
         "type": "array",
         "properties": {
           "type": "object",
-          "properties": {
-            "manure_treatment_type": {
-              "type": "string",
-              "description": "Manure Treatment Methods -- Select the Manure Treatment Methods.",
-              "pattern": "^(slurry storage underfloor|slurry storage outdoor|open lots|compost bedded pack barn|anaerobic lagoon|anaerobic digestion|other)$"
-            },
-            "total_solids_removal_efficiency_for_treatment": {
-              "type": "number"
-            },
-            "volatile_solids_removal_efficiency_for_treatment": {
-              "type": "number"
-            },
-            "nitrogen_removal_efficiency_for_treatment": {
-              "type": "number"
-            },
-            "total_ammoniacal_nitrogen_removal_efficiency_for_treatment": {
-              "type": "number"
-            },
-            "phosphorus_removal_efficiency_for_treatment": {
-              "type": "number"
-            },
-            "potassium_removal_efficiency_for_treatment": {
-              "type": "number"
-            },
-            "storage_time_period": {
-              "type": "number"
-            },
-            "freeboard_input": {
-              "type": "number"
-            }
+          "manure_treatment_type": {
+            "type": "string",
+            "description": "Manure Treatment Methods -- Select the Manure Treatment Methods.",
+            "pattern": "^(slurry storage underfloor|slurry storage outdoor|open lots|compost bedded pack barn|anaerobic lagoon|anaerobic digestion|other)$"
+          },
+          "total_solids_removal_efficiency_for_treatment": {
+            "type": "number"
+          },
+          "volatile_solids_removal_efficiency_for_treatment": {
+            "type": "number"
+          },
+          "nitrogen_removal_efficiency_for_treatment": {
+            "type": "number"
+          },
+          "total_ammoniacal_nitrogen_removal_efficiency_for_treatment": {
+            "type": "number"
+          },
+          "phosphorus_removal_efficiency_for_treatment": {
+            "type": "number"
+          },
+          "potassium_removal_efficiency_for_treatment": {
+            "type": "number"
+          },
+          "storage_time_period": {
+            "type": "number"
+          },
+          "freeboard_input": {
+            "type": "number"
           }
         }
       }
