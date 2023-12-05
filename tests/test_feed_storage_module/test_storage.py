@@ -75,3 +75,9 @@ def harvested_crop(sample_crop_data: Dict[str, float]) -> HarvestedCrop:
     return HarvestedCrop(category=category, type=crop_type, **sample_crop_data)
 
 
+def test_receive_crop(storage: Storage, harvested_crop: HarvestedCrop):
+    """
+    Test the receive_crop method of the Storage class.
+    """
+    pass
+
