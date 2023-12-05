@@ -22,9 +22,40 @@ class ManureTreatmentDailyOutput(LiquidManurePortionProtocol):
         liquid_manure_phosphorus: Amount of phosphorus excreted in manure, kg.
         liquid_manure_potassium: Amount of potassium in manure, kg.
         daily_final_manure_volume: Final manure volume after treatment, m^3.
-
-        # TODO: Document remaining attributes.
-
+        liquid_manure_daily_volume: Daily volume of manure, m^3.
+        storage_methane: Amount of methane produced the manure treatment process, kg.
+        storage_ammonia: Amount of ammonia produced the manure treatment process, kg.
+        storage_nitrous_oxide: Amount of nitrous oxide produced the manure treatment process, kg.
+        sludge_manure_total_solids: Total amount of solids in the sludge manure, kg.
+        sludge_manure_total_volatile_solids: Total amount of volatile solids in the sludge manure, kg.
+        sludge_manure_nitrogen: Amount of nitrogen in the sludge manure, kg.
+        sludge_manure_phosphorus: Amount of phosphorus in the sludge manure, kg.
+        sludge_manure_potassium: Amount of potassium in the sludge manure, kg.
+        sludge_manure_daily_volume: Daily volume of sludge manure, m^3.
+        solid_manure_total_solids: Total amount of solids in the solid manure, kg.
+        solid_manure_total_volatile_solids: Total amount of volatile solids in the solid manure, kg.
+        solid_manure_nitrogen: Amount of nitrogen in the solid manure, kg.
+        solid_manure_inorganic_nitrogen: Amount of inorganic nitrogen in the solid manure, kg.
+        solid_manure_organic_nitrogen: Amount of organic nitrogen in the solid manure, kg.
+        solid_manure_inorganic_nitrogen_ammonium: Amount of ammonium in the inorganic nitrogen in the solid manure, kg.
+        solid_manure_phosphorus: Amount of phosphorus in the solid manure, kg.
+        solid_manure_water_extractable_inorganic_phosphorus: Amount of water extractable inorganic phosphorus
+            in the solid manure, kg.
+        solid_manure_water_extractable_organic_phosphorus: Amount of water extractable organic phosphorus
+            in the solid manure, kg.
+        solid_manure_non_water_extractable_inorganic_phosphorus: Amount of non-water extractable inorganic phosphorus
+            in the solid manure, kg.
+        solid_manure_non_water_extractable_organic_phosphorus: Amount of non-water extractable organic phosphorus
+            in the solid manure, kg.
+        solid_manure_potassium: Amount of potassium in the solid manure, kg.
+        solid_manure_daily_mass: Daily mass of solid manure, kg.
+        biogas: Amount of biogas produced, m^3.
+        biogas_energy_content: Energy content of biogas, MJ/m^3.
+        methane_generation_volume: Amount of methane generated, m^3.
+        heating_input_energy: Amount of energy input to the heating system, MJ.
+        evaporated_water: Amount of water evaporated, m^3.
+        minimum_digester_volume: Minimum digester volume, m^3.
+        top_cover_volume: Volume of the top cover, m^3.
     """
 
     pen_id: int = -1
@@ -42,6 +73,7 @@ class ManureTreatmentDailyOutput(LiquidManurePortionProtocol):
 
     storage_methane: float = 0.0
     storage_ammonia: float = 0.0
+    storage_nitrous_oxide: float = 0.0
 
     sludge_manure_total_solids: float = 0.0
     sludge_manure_total_volatile_solids: float = 0.0
@@ -49,6 +81,23 @@ class ManureTreatmentDailyOutput(LiquidManurePortionProtocol):
     sludge_manure_phosphorus: float = 0.0
     sludge_manure_potassium: float = 0.0
     sludge_manure_daily_volume: float = 0.0
+
+    solid_manure_total_solids: float = 0.0
+    solid_manure_total_volatile_solids: float = 0.0
+
+    solid_manure_nitrogen: float = 0.0
+    solid_manure_inorganic_nitrogen: float = 0.0
+    solid_manure_organic_nitrogen: float = 0.0
+    solid_manure_inorganic_nitrogen_ammonium: float = 0.0
+
+    solid_manure_phosphorus: float = 0.0
+    solid_manure_water_extractable_inorganic_phosphorus: float = 0.0
+    solid_manure_water_extractable_organic_phosphorus: float = 0.0
+    solid_manure_non_water_extractable_inorganic_phosphorus: float = 0.0
+    solid_manure_non_water_extractable_organic_phosphorus: float = 0.0
+
+    solid_manure_potassium: float = 0.0
+    solid_manure_daily_mass: float = 0.0
 
     biogas: float = 0.0  # biogas production per day (m3/day)
     biogas_energy_content: float = 0.0  # biogas energy content (MJ/m3)
