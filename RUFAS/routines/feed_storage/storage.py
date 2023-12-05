@@ -65,4 +65,21 @@ class Storage:
         """
         pass
 
+    def give_feed(self, amount: float, crop_type: CropType):
+        """
+        Gives out a specified amount of feed of a certain crop type.
+
+        Parameters
+        ----------
+        amount : float
+            The amount of feed to give out.
+        crop_type : CropType
+            The type of crop to give out.
+
+        Returns
+        -------
+        None
+        """
+        pass
+
  
