@@ -55,4 +55,14 @@ class Storage:
         """
         pass
 
+    def process_degradations(self):
+        """
+        Processes the degradations and losses of the stored crops.
+
+        Returns
+        -------
+        None
+        """
+        pass
+
  
