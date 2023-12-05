@@ -1,6 +1,5 @@
 from typing import List
-from harvested_crop import HarvestedCrop
-from harvested_crop import CropType
+from .harvested_crop import HarvestedCrop, CropType
 
 
 class Storage:
