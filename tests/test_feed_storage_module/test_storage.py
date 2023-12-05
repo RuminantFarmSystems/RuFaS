@@ -60,3 +60,18 @@ def storage() -> Storage:
     return Storage()
 
 
+@pytest.fixture
+def harvested_crop(sample_crop_data: Dict[str, float]) -> HarvestedCrop:
+    """
+    Pytest fixture to create a HarvestedCrop instance for testing.
+
+    Returns
+    -------
+    HarvestedCrop
+        An instance of the HarvestedCrop class.
+    """
+    category = CropCategory.SMALL_GRAIN
+    crop_type = CropType.WHEAT
+    return HarvestedCrop(category=category, type=crop_type, **sample_crop_data)
+
+
