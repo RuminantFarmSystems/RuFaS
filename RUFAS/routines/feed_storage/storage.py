@@ -132,3 +132,15 @@ class Storage:
         """
         pass
 
+    def calculate_heat_generated(self):
+        """
+        Calculates the total sensible heat generated.
+
+        Returns
+        -------
+        float
+            The total sensible heat generated in kJ/kg.
+        """
+        pass
+
+ 
