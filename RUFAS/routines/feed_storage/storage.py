@@ -122,4 +122,13 @@ class Storage:
         """
         pass
 
- 
+    def calculate_protein_degradation(self):
+        """
+        Calculates protein degradation.
+
+        Returns
+        -------
+        None
+        """
+        pass
+
