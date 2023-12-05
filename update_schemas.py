@@ -1,11 +1,11 @@
-# import json
-# import pprint
+import json
+import pprint
 from typing import Any, Callable
 import re
 
-PROPERTIES_WITH_SCHEMA = {
-    'crop_schedule': "Crop Specifications"
-}
+from RUFAS.util import Utility
+
+DEFAULT_PROPERTIES_PATH = 'inputs/metadata/default_metadata.json'
 
 
 class SchemaSetupMethods:
@@ -13,7 +13,7 @@ class SchemaSetupMethods:
         pass
 
     @staticmethod
-    def _setup_number_schema(title: str, input_properties: dict[str, Any]) -> dict[str, Any]:
+    def setup_number_schema(title: str, input_properties: dict[str, Any]) -> dict[str, Any]:
         schema = {
             "title": title,
             "type": "number",
@@ -43,7 +43,7 @@ class SchemaSetupMethods:
         return schema
 
     @staticmethod
-    def _setup_bool_schema(title: str, input_properties: dict[str, Any]) -> dict[str, Any]:
+    def setup_bool_schema(title: str, input_properties: dict[str, Any]) -> dict[str, Any]:
         schema = {
             "title": title,
             "type": "boolean",
@@ -66,7 +66,7 @@ class SchemaSetupMethods:
         return schema
 
     @staticmethod
-    def _setup_string_schema(title: str, input_properties: dict[str, Any]) -> dict[str, Any]:
+    def setup_string_schema(title: str, input_properties: dict[str, Any]) -> dict[str, Any]:
         schema = {
             "title": title,
             "type": "string",
@@ -84,7 +84,7 @@ class SchemaSetupMethods:
         if default is not None:
             schema["default"] = default
         if pattern is not None:
-            enum = self._get_enum_of_options(pattern)
+            enum = self._get_list_of_options(pattern)
             schema["enum"] = enum
             schema["format"] = "select2"
         if description is not None:
@@ -93,7 +93,7 @@ class SchemaSetupMethods:
         return schema
 
     @staticmethod
-    def _get_enum_of_options(string: str) -> list[str]:
+    def _get_list_of_options(string: str) -> list[str]:
         pattern = "\\^\\(.*\\)\\$"
         is_valid_pattern = bool(re.match(pattern, string))
         if not is_valid_pattern:
@@ -104,7 +104,7 @@ class SchemaSetupMethods:
         return split_list
 
     @staticmethod
-    def _setup_array_schema(title: str, input_properties: dict[str, Any]) -> dict[str, Any]:
+    def setup_array_schema(title: str, input_properties: dict[str, Any]) -> dict[str, Any]:
         schema = {
             "title": title,
             "type": "array",
@@ -132,7 +132,7 @@ class SchemaSetupMethods:
         return schema
 
     @staticmethod
-    def _setup_object_schema(title: str, input_properties: dict[str, Any]) -> dict[str, Any]:
+    def setup_object_schema(title: str, input_properties: dict[str, Any]) -> dict[str, Any]:
         schema = {
             "title": title,
             "type": "object",
@@ -156,14 +156,12 @@ class SchemaSetupMethods:
 
         return schema
 
-
-
     DATA_TYPE_TO_SCHEMA_SETUP_MAP: dict[str, Callable[[str, dict[str, Any]], dict[str, Any]]] = {
-        "number": _setup_number_schema,
-        "bool": _setup_bool_schema,
-        "string": _setup_bool_schema,
-        "array": _setup_array_schema,
-        "object": _setup_object_schema
+        "number": setup_number_schema,
+        "bool": setup_bool_schema,
+        "string": setup_bool_schema,
+        "array": setup_array_schema,
+        "object": setup_object_schema
     }
 
 
@@ -178,14 +176,27 @@ class SchemaSetupMethods:
 #
 #     return schema
 
-#
-# with open("input/metadata/default_metadata.json") as metadata:
-#     metadata_dict = json.load(metadata)
-#
-# properties = metadata_dict["properties"]
-#
-# for key in properties.keys():
-#     if key in PROPERTIES_WITH_SCHEMA.keys():
-#         new_schema = _setup_schema(PROPERTIES_WITH_SCHEMA[key], properties[key])
-#     print(key)
-# pprint.pprint(json.dumps(properties, indent=4))
+def main() -> None:
+    schema_dir_path = 'schemas/'
+    Utility.empty_dir(schema_dir_path, None)
+
+    with open("input/metadata/default_metadata.json") as metadata:
+        metadata_dict = json.load(metadata)
+
+    properties = metadata_dict["properties"]
+
+    for key in properties.keys():
+        try:
+            new_schema = SchemaSetupMethods.setup_object_schema(key, properties[key])
+        except Exception as e:
+            print(f"Key: '{key}' raised exception: {e}")
+            continue
+
+        new_schema_file_path = 
+
+        print(key)
+    pprint.pprint(json.dumps(properties, indent=2))
+
+
+if __name__ == "__main__":
+    main()
