@@ -1310,7 +1310,7 @@ class AnimalManager:
         return animal_types_in_pen
 
     @classmethod
-    def _get_classes_in_pen(cls, pen: Pen) -> Set[str]:
+    def _determine_classes_in_pen(cls, pen: Pen) -> Set[str]:
         """
         Get the classes of animals in the pen.
 
@@ -1556,7 +1556,7 @@ class AnimalManager:
         self.animal_to_pen_id_map[animal.id] = pen_with_min_stocking_density.id
 
     def collect_manure_excretions_output_data(self, pen: Pen, feed: Feed, manure_excretions_output_data: Dict):
-        pen.classes_in_pen = self._get_classes_in_pen(pen)
+        pen.classes_in_pen = self._determine_classes_in_pen(pen)
         pen.calc_total_manure(
             feed,
             self.methane_model,
