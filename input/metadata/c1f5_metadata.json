@@ -108,7 +108,7 @@
     "weather": {
       "title": "Weather data",
       "description": "Let's turn on the AC",
-      "path": "input/data/weather/swat_weather.csv",
+      "path": "input/data/weather/c1f5_weather.csv",
       "type": "csv",
       "properties": "weather_properties"
     },
