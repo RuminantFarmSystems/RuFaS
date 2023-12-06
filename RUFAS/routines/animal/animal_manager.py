@@ -1940,4 +1940,3 @@ class AnimalManager:
                          HeiferII.stats['num_ai_performed_in_SynchED'])
                         if HeiferII.stats['num_ai_performed_in_SynchED'] > 0 else 0,
                         info_map)
-        

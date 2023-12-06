@@ -829,7 +829,8 @@ def test_get_repro_sub_properties(mocker: MockerFixture, sub_properties: dict):
 
 
 @pytest.mark.parametrize(
-    "days_born, sim_day, breeding_start_day, hormone_schedule, hormone_schedule_exists, repro_sub_protocol, specific_conception_rate",
+    "days_born, sim_day, breeding_start_day, hormone_schedule, hormone_schedule_exists, "
+    "repro_sub_protocol, specific_conception_rate",
     [
         # Scenarios with different conditions on breeding start day
         (100, 100, 100, None, False, "Protocol", 0.6),
