@@ -794,22 +794,22 @@ class InputManager:
         self.__pool = {}
         om.add_log("Clear variable pool", "The pool is emptied.", info_map)
 
-    def _metadata_properties_exists(self, variable_name: str, properties_blob_key: str) -> (bool, str):
+    def _metadata_properties_exists(self, variable_name: str, properties_blob_key: str) -> (bool, KeyError):
         info_map = {"class": self.__class__.__name__,
                     "function": self._metadata_properties_exists.__name__,
                     }
         if not self.__metadata:
             om.add_error("No metadata loaded", "No metadata is loaded to the InputManager.", info_map)
-            return False, "No metadata loaded."
+            return False, KeyError("No metadata loaded.")
         if properties_blob_key not in self.__metadata["properties"]:
             om.add_error("No metadata found", f"No metadata is found for variable '{variable_name}' with given "
                                               f"properties_blob_key {properties_blob_key}.", info_map)
-            return False, f"No metadata is found for variable '{variable_name}' with given properties_blob_key " \
-                          f"{properties_blob_key}. "
+            return False, KeyError(f"No metadata is found for variable '{variable_name}' with given properties_blob_key"
+                                   f" {properties_blob_key}.")
         return True, None
 
     def _add_variable_to_pool(self, variable_name: str, data: Dict[str, Any], properties_blob_key: str,
-                              eager_termination: bool, variable_type: str):
+                              eager_termination: bool, variable_type: str) -> (bool, ValueError):
         info_map = {"class": self.__class__.__name__,
                     "function": self._add_variable_to_pool.__name__,
                     }
@@ -866,13 +866,13 @@ class InputManager:
                          f"added to InputManager pool during runtime.",
                          info_map)
             if eager_termination:
-                raise ValueError(
+                return False, ValueError(
                     f"Variable {variable_name} has invalid components. Only successfully validated components are added"
                     f" to InputManager pool during runtime.")
             else:
-                return False
+                return False, None
         else:
-            return True
+            return True, None
 
     def add_dict_variable_to_pool(self, variable_name: str, data: Dict[str, Any], properties_blob_key: str,
                                   eager_termination: bool) -> bool:
@@ -921,13 +921,22 @@ class InputManager:
                          info_map)
             raise TypeError("Incorrect variable type. Expected types: `data: Dict[str, Any]`.")
 
-        metadata_properties_exists, error = self._metadata_properties_exists(variable_name=variable_name,
-                                                                             properties_blob_key=properties_blob_key)
+        metadata_properties_exists, metadata_error = self._metadata_properties_exists(
+            variable_name=variable_name,
+            properties_blob_key=properties_blob_key)
 
         if not metadata_properties_exists:
-            raise error
+            raise metadata_error
 
-        self._add_variable_to_pool()
+        add_variable_success, add_variable_error = self._add_variable_to_pool(variable_name=variable_name,
+                                                                              data=data,
+                                                                              properties_blob_key=properties_blob_key,
+                                                                              eager_termination=eager_termination,
+                                                                              variable_type='dict')
+        if add_variable_success and add_variable_error:
+            raise add_variable_error
+
+        return add_variable_success
 
     def add_tabular_variable_to_pool(self, variable_name: str, data: Dict[str, List[Any]] | List[Any],
                                      properties_blob_key: str, eager_termination: bool) -> bool:
@@ -978,61 +987,19 @@ class InputManager:
 
         data = {variable_name: data} if isinstance(data, List) else data
 
-        metadata_properties_exists = self._metadata_properties_exists(variable_name=variable_name,
-                                                                      properties_blob_key=properties_blob_key)
+        metadata_properties_exists, metadata_error = self._metadata_properties_exists(
+            variable_name=variable_name,
+            properties_blob_key=properties_blob_key)
 
-        if isinstance(metadata_properties_exists, str) or metadata_properties_exists is not True:
-            raise KeyError(metadata_properties_exists)
+        if not metadata_properties_exists:
+            raise metadata_error
 
-        element_counter = {"valid_elements": 0, "invalid_elements": 0,
-                           "total_elements": 0, "fixed_elements": 0}
-        validated_data = {}
+        add_variable_success, add_variable_error = self._add_variable_to_pool(variable_name=variable_name,
+                                                                              data=data,
+                                                                              properties_blob_key=properties_blob_key,
+                                                                              eager_termination=eager_termination,
+                                                                              variable_type='tabular')
+        if not add_variable_success and add_variable_error:
+            raise add_variable_error
 
-        metadata_properties = self.__metadata["properties"][properties_blob_key]
-        for metadata_property in metadata_properties.keys():
-            element_counter_and_validity = {
-                "fixed_elements": 0, "total_elements": 0, "valid_elements": 0, "invalid_elements": 0,
-                "is_valid": True}
-
-            element_counter_and_validity = self._validate_tabular_element(
-                var_name=metadata_property,
-                properties_blob_key=properties_blob_key,
-                input_data=data,
-                eager_termination=False,
-                element_counter_and_validity=element_counter_and_validity
-            )
-
-            for key in element_counter.keys():
-                element_counter[key] += element_counter_and_validity[key]
-
-            if element_counter_and_validity["is_valid"]:
-                validated_data[metadata_property] = data[metadata_property]
-
-        om.add_log(f"Validation count for variable {variable_name}: total items",
-                   f"{element_counter['total_elements']=}", info_map)
-        om.add_log(f"Validation count for variable {variable_name}: total valid",
-                   f"{element_counter['valid_elements']=}", info_map)
-        om.add_log(f"Validation count for variable {variable_name}: total fixed",
-                   f"{element_counter['fixed_elements']=}", info_map)
-        om.add_log(f"Validation count for variable {variable_name}: total invalid",
-                   f"{element_counter['invalid_elements']=}", info_map)
-
-        if variable_name in self.__pool.keys():
-            om.add_warning("Overwriting existing variable", f"Variable {variable_name} already exists in InputManager "
-                                                            f"pool, overwriting the old value.", info_map)
-
-        self.__pool[variable_name] = validated_data
-
-        if element_counter['invalid_elements'] > 0:
-            om.add_error("Invalid variable",
-                         f"Variable {variable_name} has invalid components. Only successfully validated components are "
-                         f"added to InputManager pool during runtime.",
-                         info_map)
-            if eager_termination:
-                raise ValueError(
-                    f"Variable {variable_name} has invalid components. Only successfully validated components are added"
-                    f" to InputManager pool during runtime.")
-            else:
-                return False
-        else:
-            return True
+        return add_variable_success
