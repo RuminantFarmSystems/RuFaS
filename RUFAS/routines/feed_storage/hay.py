@@ -60,3 +60,11 @@ class ProtectedIndoors(Hay):
 
     pass
 
+
+class ProtectedWrapped(Hay):
+    """
+    Represents protected wrapped hay storage, a subclass of Hay.
+    """
+
+    pass
+
