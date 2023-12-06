@@ -230,7 +230,7 @@
             "type": "string",
             "description": "Heifer Reproductive Program (select one) -- TAI - Timed Artificial Insemination; ED - Estrus Detection; Synch-ED - Combination of ED and TAI",
             "default": "TAI",
-            "pattern": "^(TAI|ED|Synch-ED)$"
+            "pattern": "^(TAI|ED|SynchED)$"
           },
           "cow_repro_method": {
             "type": "string",
@@ -361,9 +361,8 @@
               "default": 400,
               "minimum": 0
             },
-            "heifer_repro_programs": {
+            "heifers": {
               "type": "object",
-              "description": "Heifer Reproductive programs",
               "estrus_detection_rate": {
                 "type": "number",
                 "description": "Estrus Detection Rate -- The % of in-heat animals that would be detected in the ED (Estrus Detection) programs (default is 0.6)",
@@ -371,52 +370,83 @@
                 "minimum": 0,
                 "maximum": 1
               },
-              "estrus_service_rate": {
+              "estrus_conception_rate": {
                 "type": "number",
-                "description": "Estrus Service Rate -- The % of detected in heat animals that would be serviced in the ED (Estrus Detection) programs (default is 1)",
-                "default": 1,
+                "description": "Estrus Conception Rate -- The % of inseminated animals that would be concepted in the ED (Estrus Detection) programs (default is 0.6)",
+                "default": 0.4,
                 "minimum": 0,
                 "maximum": 1
               },
-              "ed_conception_rate": {
+              "repro_sub_protocol": {
+                "type": "string",
+                "pattern": "^(5dCG2P|5dCGP|2P|CP|N/A)$",
+                "default": "5dCG2P"
+              },
+              "repro_sub_properties": {
+                "type": "object",
+                "conception_rate": {
+                  "type": "number",
+                  "description": "Conception Rate -- The conception rate for the heifer reproductive program (default is 0.6)",
+                  "default": 0.6,
+                  "minimum": 0,
+                  "maximum": 1
+                },
+                "estrus_detection_rate": {
+                  "type": "number",
+                  "description": "Estrus Detection Rate -- The % of in-heat animals that would be detected in the ED (Estrus Detection) programs (default is 0.6)",
+                  "default": 0.7,
+                  "minimum": 0,
+                  "maximum": 1
+                }
+              }
+            },
+            "cows": {
+              "type": "object",
+              "estrus_detection_rate": {
                 "type": "number",
-                "description": "ED Conception Rate -- The % of serviced animals that would be concepted in the ED (Estrus Detection) programs (default is 0.6)",
+                "description": "Estrus Detection Rate -- The % of in-heat animals that would be detected in the ED (Estrus Detection) programs (default is 0.6)",
                 "default": 0.6,
                 "minimum": 0,
                 "maximum": 1
               },
-              "heifer_TAI_protocol": {
-                "type": "string",
-                "default": "md5CG2P",
-                "pattern": "^(md5CG2P|md5CGP)$",
-                "description": "Heifer TAI (Timed Artificial Insemination) Protocol (select one) -- The breeding protocol for heifers (md5CG2P or md5CGP)"
-              },
-              "md5CG2P_conception_rate": {
+              "estrus_conception_rate": {
                 "type": "number",
-                "description": "Heifer Conception Rate for md5CG2P Protocol -- The conception rate for md5CG2P protocol in heifer TAI (Timed Artificial Insemination) program (default is 0.6)",
+                "description": "Estrus Conception Rate -- The % of inseminated animals that would be concepted in the ED (Estrus Detection) programs (default is 0.6)",
                 "default": 0.6,
                 "minimum": 0,
                 "maximum": 1
               },
-              "md5CGP_conception_rate": {
-                "type": "number",
-                "description": "Heifer Conception Rate for md5CGP Protocol -- The conception rate for md5CGP protocol in heifer TAI (Timed Artificial Insemination) program",
-                "minimum": 0,
-                "maximum": 1,
-                "default": 0.48
-              },
-              "heifer_synchED_protocol": {
+              "presynch_protocol": {
                 "type": "string",
-                "default": "2P",
-                "pattern": "^(2P|CP)$",
-                "description": "Heifer SynchED Protocol (select one) -- 2P: two injections of PGF (prostaglandin), watch for estrus after each injection with insemination upon heat detection; CP: 7 days CIDR implements, inject PGF upon removal, insemination upon heat detection"
+                "description": "Presynch Protocol -- The preSynch protocol (1st breeding) for cow in TAI (Timed Artificial Insemination) program",
+                "default": "Double OvSynch",
+                "pattern": "^(Double OvSynch|Presynch|G6G)$"
               },
-              "estrus_detection_rate_h_synch": {
-                "type": "number",
-                "description": "ED Rate for SynchED Protocol -- The estrus detection rate of the SynchED protocol.",
-                "minimum": 0,
-                "maximum": 1,
-                "default": 0.7
+              "resynch_protocol": {
+                "type": "string",
+                "description": "Resynch Protocol -- Resynch protocol for cow before/at/after pregnancy check day in the TAI (Timed Artificial Insemination) program",
+                "default": "TAIafterPD",
+                "pattern": "^(TAIafterPD|TAIbeforePD|PGFatPD)$"
+              },
+              "repro_sub_protocol": {
+                "type": "string",
+                "pattern": "^(OvSynch 56|OvSynch 48|CoSynch 72|5d CoSynch)$"
+              },
+              "repro_sub_properties": {
+                "type": "object",
+                "conception_rate": {
+                  "type": "number",
+                  "description": "Conception Rate -- The conception rate for the cow reproductive program (default is 0.6)",
+                  "default": 0.5,
+                  "minimum": 0,
+                  "maximum": 1
+                },
+                "tai_program_start_day": {
+                  "type": "number",
+                  "description": "TAI program start day for ED-TAI protocol -- The TAI program start day for ED-TAI protocol.",
+                  "minimum": 0,
+                  "default": 70
+                }
               }
             },
             "cow_repro_programs": {

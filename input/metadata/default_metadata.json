@@ -380,13 +380,14 @@
               "estrus_conception_rate": {
                 "type": "number",
                 "description": "Estrus Conception Rate -- The % of inseminated animals that would be concepted in the ED (Estrus Detection) programs (default is 0.6)",
-                "default": 0.6,
+                "default": 0.4,
                 "minimum": 0,
                 "maximum": 1
               },
               "repro_sub_protocol": {
                 "type": "string",
-                "pattern": "^(md5CG2P|md5CGP|2P|CP|N/A)$"
+                "pattern": "^(5dCG2P|5dCGP|2P|CP|N/A)$",
+                "default": "5dCG2P"
               },
               "repro_sub_properties": {
                 "type": "object",

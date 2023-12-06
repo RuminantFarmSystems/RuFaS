@@ -2,27 +2,29 @@ from __future__ import annotations
 
 from typing import Literal
 
+from RUFAS.routines.animal.life_cycle.repro_protocol_enums import HeiferReproProtocolEnum
+
 
 class HormoneDeliverySchedule:
     """
     This class contains the hormone delivery schedule for the reproduction protocols that involves
     hormone delivery. The schedule is a dictionary of offset days to a dictionary of events that should
     happen on that day. The events are:
-    - deliver_hormones: a list of hormones to deliver on that day
+    - deliver_hormones: a list of hormones to deliver on that day. The supported hormones are: GnRH, PGF, CIDR.
     - set_ai_day: a boolean indicating whether to set the AI day to that day
     - set_conception_rate: a boolean indicating whether to set the conception rate to that day
 
     The schedule is static and is not meant to be instantiated.
 
     The schedule is based on the following protocols and their subprotocols:
-    - Heifer protocols:
+    - Heifer reproduction protocols and subprotocols:
         - TAI
-            - md5CG2P
-            - md5CGP
+            - 5dCG2P
+            - 5dCGP
         - SynchED
             - 2P
             - CP
-    - Cow protocols:
+    - Cow reproduction protocols and subprotocols:
         - TAI
             - OvSynch 48
             - OvSynch 56
@@ -30,24 +32,24 @@ class HormoneDeliverySchedule:
             - 5d CoSynch
     """
     HEIFER_REPRO_PROTOCOLS = {
-        'md5CG2P': {
-            0: {'deliver_hormones': ['GnRH']},
+        HeiferReproProtocolEnum.TAI_5dCG2P.value: {
+            0: {'deliver_hormones': ['CIDR']},
             5: {'deliver_hormones': ['PGF']},
             6: {'deliver_hormones': ['PGF']},
             8: {'deliver_hormones': ['GnRH']},
             9: {'set_ai_day': True, 'set_conception_rate': True}
         },
-        'md5CGP': {
-            0: {'deliver_hormones': ['GnRH']},
+        HeiferReproProtocolEnum.TAI_5dCGP.value: {
+            0: {'deliver_hormones': ['CIDR']},
             5: {'deliver_hormones': ['PGF']},
             8: {'deliver_hormones': ['GnRH']},
             9: {'set_ai_day': True, 'set_conception_rate': True}
         },
-        '2P': {
+        HeiferReproProtocolEnum.SynchED_2P.value: {
             0: {'deliver_hormones': ['PGF']},
             14: {'deliver_hormones': ['PGF']},
         },
-        'CP': {
+        HeiferReproProtocolEnum.SynchED_CP.value: {
             0: {'deliver_hormones': ['CIDR']},
             7: {'deliver_hormones': ['PGF']},
         }

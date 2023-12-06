@@ -57,8 +57,8 @@ class Cow(HeiferIII):
             args.birth_date: the date of the simulation when the calf was born
             args.daysBorn: age of the animal
             args.tai_method_h: timed-AI protocols used for
-                reproduction programs, three of them: md5CG2P,
-                md5CGP, and user-defined
+                reproduction programs, three of them: 5dCG2P,
+                5dCGP, and user-defined
             args.synch_ed_method_h: synch ed protocols used for
                 reproduction programs, two of them: 2P and CP
             args.repro_program: reproduction program used in cow,

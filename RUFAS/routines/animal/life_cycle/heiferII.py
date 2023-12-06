@@ -25,7 +25,8 @@ from RUFAS.routines.animal.life_cycle import animal_constants as const
 from RUFAS.routines.animal.life_cycle.animal_base import AnimalBase
 from RUFAS.routines.animal.life_cycle.heiferI import HeiferI
 from RUFAS.routines.animal.life_cycle.hormone_delivery_schedule import HormoneDeliverySchedule
-from RUFAS.routines.animal.life_cycle.internal_repro_settings import InternalReproSettings
+from RUFAS.routines.animal.life_cycle.repro_protocol_enums import HeiferReproProtocolEnum
+from RUFAS.routines.animal.life_cycle.repro_protocol_misc import InternalReproSettings, ReproProtocolsValidator
 from RUFAS.routines.animal.manure.growing_heifer_manure_excretion import manure_calculations
 from RUFAS.routines.animal.ration.animal_requirements import AnimalRequirements
 
@@ -48,8 +49,8 @@ class HeiferII(HeiferI):
             args.repro_program: reproduction program used in heifer,
                 three of them: ED, TAI, and synch-ED programs
             args.tai_method_h: timed-AI protocols used for
-                reproduction programs, three of them: md5CG2P,
-                md5CGP, and user-defined
+                reproduction programs, three of them: 5dCG2P,
+                5dCGP, and user-defined
             args.synch_ed_method_h: synch ed protocols used for
                 reproduction programs, two of them: 2P and CP
             (optional: include the following to assign animal information)
@@ -349,11 +350,11 @@ class HeiferII(HeiferI):
 
         # breeding method assign to heifer
         if self.days_born >= self._get_breeding_start_day():
-            if self.repro_program == "ED":
+            if self.repro_program == HeiferReproProtocolEnum.ED.value:
                 self.execute_ed_protocol(sim_day)
-            elif self.repro_program == "TAI":
+            elif self.repro_program == HeiferReproProtocolEnum.TAI.value:
                 self.execute_tai_protocol(sim_day)
-            elif self.repro_program == "SynchED":
+            elif self.repro_program == HeiferReproProtocolEnum.SynchED.value:
                 self.execute_synch_ed_protocol(sim_day)
             else:
                 raise ValueError(f"Invalid heifer repro program: {self.repro_program}")
@@ -744,8 +745,7 @@ class HeiferII(HeiferI):
         """
 
         if self.days_born == self._get_breeding_start_day():
-            self._set_up_hormone_schedule(repro_sub_protocol=self.get_repro_sub_protocol(),
-                                          start_from=self.days_born)
+            self._set_up_hormone_schedule('heifers', self.get_repro_sub_protocol(), self.days_born)
             self._specific_conception_rate = self.get_external_specific_conception_rate()
 
         if self._hormone_schedule:
@@ -796,20 +796,22 @@ class HeiferII(HeiferI):
         """
 
         if self.days_born == self._get_breeding_start_day():
-            self._set_up_hormone_schedule(repro_sub_protocol=self.get_repro_sub_protocol(),
-                                          start_from=self.days_born)
+            self._set_up_hormone_schedule('heifers', self.get_repro_sub_protocol(), self.days_born)
 
         self._handle_synch_ed_hormone_delivery_and_set_estrus_day(sim_day)
 
         if self.days_born == self.estrus_day:
             self._handle_synch_ed_estrus_detection(sim_day)
 
-    def _set_up_hormone_schedule(self, repro_sub_protocol: str, start_from: int) -> None:
+    def _set_up_hormone_schedule(self, animal_category: Literal['heifers', 'cows'],
+                                 repro_sub_protocol: str, start_from: int) -> None:
         """
         Set up the hormone delivery schedule for the heifer. Used in TAI and SynchED protocols.
 
         Parameters
         ----------
+        animal_category : Literal['heifers', 'cows']
+            The animal category to use. Either 'heifers' or 'cows'.
         repro_sub_protocol : str
             The reproduction sub protocol to use.
         start_from : int
@@ -821,10 +823,11 @@ class HeiferII(HeiferI):
         """
 
         self._hormone_schedule = HormoneDeliverySchedule.get_adjusted_schedule(
-            'heifers', repro_sub_protocol, start_from
+            animal_category, repro_sub_protocol, start_from
         )
         if self._hormone_schedule is None:
-            raise Exception(f'No hormone delivery schedule for {repro_sub_protocol}')
+            raise Exception(f'No hormone delivery schedule for {animal_category} - '
+                            f'{repro_sub_protocol}')
 
     def _handle_synch_ed_hormone_delivery_and_set_estrus_day(self, sim_day: int) -> None:
         """
@@ -889,11 +892,11 @@ class HeiferII(HeiferI):
 
         self.log_event(self.days_born, sim_day, const.ESTRUS_NOT_DETECTED_NOTE)
         self.log_event(self.days_born, sim_day, const.TAI_AFTER_ESTRUS_NOT_DETECTED_IN_SYNCH_ED_NOTE)
-        internal_fallback_protocol = InternalReproSettings.HEIFER_REPRO_PROTOCOLS['SynchED'][
-            self.get_repro_sub_protocol()]['when_estrus_not_detected']
+        internal_fallback_protocol = InternalReproSettings.HEIFER_REPRO_PROTOCOLS[
+            HeiferReproProtocolEnum.SynchED.value][self.get_repro_sub_protocol()]['when_estrus_not_detected']
 
         self._set_repro_program(sim_day, internal_fallback_protocol['repro_protocol'])
-        self._set_up_hormone_schedule(internal_fallback_protocol['repro_sub_protocol'], self.days_born)
+        self._set_up_hormone_schedule('heifers', internal_fallback_protocol['repro_sub_protocol'], self.days_born)
         self._specific_conception_rate = internal_fallback_protocol['repro_sub_properties']['conception_rate']
         self._execute_hormone_delivery_schedule(sim_day, self._hormone_schedule)
 
@@ -913,14 +916,17 @@ class HeiferII(HeiferI):
         None
         """
 
-        if repro_program not in ['ED', 'TAI', 'SynchED']:
+        if repro_program not in [HeiferReproProtocolEnum.ED.value, HeiferReproProtocolEnum.TAI.value,
+                                 HeiferReproProtocolEnum.SynchED.value]:
             raise ValueError(f'Invalid repro program: {repro_program}')
 
         if self.repro_program == repro_program:
             return
 
+        self.log_event(self.days_born, sim_day,
+                       f'{const.SETTING_REPRO_PROGRAM_NOTE} from {self.repro_program} '
+                       f'to {repro_program}')
         self.repro_program = repro_program
-        self.log_event(self.days_born, sim_day, f'{const.SETTING_REPRO_PROGRAM_NOTE} to {repro_program}')
 
     def open(self, sim_day: int) -> None:
         """
