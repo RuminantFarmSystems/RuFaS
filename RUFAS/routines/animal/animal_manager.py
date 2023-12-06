@@ -8,7 +8,6 @@ from RUFAS.general_constants import GeneralConstants
 from RUFAS.output_manager import OutputManager
 from RUFAS.routines.animal.animal_grouping_scenarios import AnimalGroupingScenario
 from RUFAS.routines.animal.animal_typed_dicts import InitializationDBSummaryTypedDict
-from RUFAS.routines.animal.animal_types import AnimalType
 from RUFAS.routines.animal.animal_module_constants import AnimalModuleConstants
 from RUFAS.routines.animal.animal_types import AnimalType
 from RUFAS.routines.animal.life_cycle.animal_base import AnimalBase
@@ -1764,7 +1763,7 @@ class AnimalManager:
         )
         self.animal_to_pen_id_map[animal.id] = pen_with_min_stocking_density.id
 
-    def daily_updates(self, feed: Feed, weather: Weather, time: Time):
+    def daily_updates(self, feed: Feed, weather: Weather, time: Time):  # noqa: C901
         """
         Execute the daily routines relating to Animals. All animals are
         updated through the life_cycle_manager's daily_update() method. The
@@ -1812,7 +1811,6 @@ class AnimalManager:
                 self._record_animal_events(self.heiferIIs)
                 self._record_animal_events(self.cows)
                 self._record_heiferIIs_conception_rate()
-
 
             manure_excretions_output_data = {}
             for pen in self.all_pens:
@@ -1942,6 +1940,4 @@ class AnimalManager:
                          HeiferII.stats['num_ai_performed_in_SynchED'])
                         if HeiferII.stats['num_ai_performed_in_SynchED'] > 0 else 0,
                         info_map)
-
-
-
+        
