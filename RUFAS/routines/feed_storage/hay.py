@@ -30,4 +30,14 @@ class Hay(Storage):
         """
         pass
 
-  
+    @property
+    def bale_size(self) -> float:
+        """
+        Return the size (diameter) of the hay bale.
+
+        Returns
+        -------
+        float
+            The diameter of the hay bale in meters.
+        """
+        pass
