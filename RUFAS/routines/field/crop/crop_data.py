@@ -332,7 +332,7 @@ class CropData:
     """Total amount of water the plant took from the soil on the current day (mm). Note that SWAT considers the amount
         of water taken up on any given day to be the actual amount of transpiration on that day."""
     cumulative_water_uptake: float = 0.0
-    """Cumulative sum of water uptaked by the plant (mm)."""
+    """Cumulative sum of water taken up by the plant over the course of its lifetime (mm)."""
 
     # ---- yields
     harvest_efficiency: float = 1.0
@@ -502,6 +502,9 @@ class Corn(CropData):
     optimal_harvest_index: float = 0.50
     min_harvest_index: float = 0.30
     dry_matter_percentage: float = 86.0907
+    """
+    Note: this value comes from Corn grain configuration values.
+    """
     yield_nitrogen_fraction: float = 0.0140
     yield_phosphorus_fraction: float = 0.0016
 
@@ -540,6 +543,9 @@ class CornSilage(CropData):
     optimal_harvest_index: float = 0.90
     min_harvest_index: float = 0.90
     dry_matter_percentage: float = 35.361
+    """
+    Note: this value comes from the Corn silage configuration values.
+    """
     yield_nitrogen_fraction: float = 0.0140
     yield_phosphorus_fraction: float = 0.0016
 
