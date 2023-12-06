@@ -13,7 +13,7 @@
 	"animal_config": {
 		"management_decisions": {
 			"breeding_start_day_h": 380,
-			"heifer_repro_method": "SynchED",
+			"heifer_repro_method": "TAI",
 			"cow_repro_method": "TAI",
 			"semen_type": "conventional",
 			"days_in_preg_when_dry": 218,
@@ -41,7 +41,7 @@
 				"heifers": {
 					"estrus_detection_rate": 0.6,
 					"estrus_conception_rate": 0.4,
-					"repro_sub_protocol": "2P",
+					"repro_sub_protocol": "5dCG2P",
 					"repro_sub_properties": {
 						"conception_rate": 0.6,
 						"estrus_detection_rate": 0.7
