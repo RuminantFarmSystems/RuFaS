@@ -1,10 +1,8 @@
 import pytest
-from mock.mock import MagicMock, call
 from pytest import approx
 from pytest_mock.plugin import MockerFixture
 
 from RUFAS.general_constants import GeneralConstants
-from RUFAS.simulation_engine import SimulationEngine
 from RUFAS.util import Utility
 
 
@@ -60,82 +58,6 @@ def test_is_leap_year():
     pass
 
 
-@pytest.fixture
-def patch_simulation_engine(mocker: MockerFixture) -> SimulationEngine:
-    """Returns a mocked SimulationEngine"""
-    mocker.patch("RUFAS.simulation_engine.SimulationEngine._initialize_simulation")
-
-    sim_eng = SimulationEngine()
-    sim_eng.config = MagicMock()
-    sim_eng.weather = MagicMock()
-    sim_eng.time = MagicMock()
-    sim_eng.state = MagicMock()
-
-    return sim_eng
-
-
-def test_init_simulation_engine(
-    patch_simulation_engine: SimulationEngine, mocker: MockerFixture
-) -> None:
-    """Unit test for function __init__ in file RUFAS/simulation_engine.py"""
-    assert patch_simulation_engine.config is not None
-    assert patch_simulation_engine.weather is not None
-    assert patch_simulation_engine.time is not None
-    assert patch_simulation_engine.state is not None
-    patch_simulation_engine._initialize_simulation.assert_called_once()
-
-
-def test_simulate(
-    patch_simulation_engine: SimulationEngine, mocker: MockerFixture
-) -> None:
-    """Unit test for function simulate in file RUFAS/simulation_engine.py"""
-    patch_for_run_simulation_main_loop = mocker.patch(
-        "RUFAS.simulation_engine.SimulationEngine._run_simulation_main_loop"
-    )
-    sim_eng = patch_simulation_engine
-    sim_eng.simulate()
-    patch_for_run_simulation_main_loop.assert_called_once()
-
-
-def test_run_simulation_main_loop(patch_simulation_engine: SimulationEngine) -> None:
-    """Unit test for function simulate in file RUFAS/simulation_engine.py"""
-    sim_eng = patch_simulation_engine
-    sim_eng.time.end_simulation = MagicMock(side_effect=[False, True])
-    sim_eng._annual_simulation = MagicMock()
-    sim_eng._run_simulation_main_loop()
-    sim_eng.time.end_simulation.assert_has_calls([call(), call()])
-    sim_eng._annual_simulation.assert_called_once()
-
-
-def test_daily_simulation(
-    patch_simulation_engine: SimulationEngine, mocker: MockerFixture
-) -> None:
-    """Unit test for function _daily_simulation in file RUFAS/simulation_engine.py"""
-    mocker.patch("RUFAS.routines.daily_animal_routine")
-    mocker.patch("RUFAS.routines.daily_feed_routine")
-    mocker.patch("RUFAS.simulation_engine.SimulationEngine._advance_time")
-    patch_simulation_engine._daily_simulation()
-    for mocked in mocker._patches_and_mocks:
-        assert mocked[1].call_count == 1
-    patch_simulation_engine.state.field_manager.daily_update_routine.assert_called_once()
-    patch_simulation_engine.time.record_time.assert_called_once()
-    patch_simulation_engine.weather.record_weather.assert_called_once()
-
-
-def test_advance_time(
-    patch_simulation_engine: SimulationEngine, mocker: MockerFixture
-) -> None:
-    """Unit test for function _advance_time in file RUFAS/simulation_engine.py"""
-    mocker.patch("RUFAS.time.Time.to_str")
-    mocker.patch("RUFAS.time.Time.advance")
-    patch_simulation_engine.state.animal_manager.simulation_day = 1
-    patch_simulation_engine._advance_time(False)
-    patch_simulation_engine._advance_time(True)
-    assert patch_simulation_engine.time.advance.call_count == 2
-    assert patch_simulation_engine.time.to_str.call_count == 1
-    assert patch_simulation_engine.state.animal_manager.simulation_day == 3
-
-
 def test_input_prompt():
     """Unit test for function input_prompt in file user_prompt.py"""
     pass
@@ -176,19 +98,19 @@ class DummyNestedClass:
         (DummyNestedClass(42), 0, 2, {"value": {"value": 42}}),
         ({"a": {"b": DummyClass(42)}}, 0, 3, {"a": {"b": {"value": 42}}}),
         (
-            [42, "test", 3.14, True, None, [1, 2, 3], {"a": 1}],
-            0,
-            2,
-            [42, "test", 3.14, True, None, [1, 2, 3], {"a": 1}],
+                [42, "test", 3.14, True, None, [1, 2, 3], {"a": 1}],
+                0,
+                2,
+                [42, "test", 3.14, True, None, [1, 2, 3], {"a": 1}],
         ),
     ],
 )
 def test_make_serializable_recursive(
-    input_obj: object,
-    depth: int,
-    max_depth: int,
-    expected_output: object,
-    mocker: MockerFixture,
+        input_obj: object,
+        depth: int,
+        max_depth: int,
+        expected_output: object,
+        mocker: MockerFixture,
 ) -> None:
     """Unit test for function _make_serializable() in file util.py"""
     # Arrange
