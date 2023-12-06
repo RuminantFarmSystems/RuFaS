@@ -1,4 +1,5 @@
 import pytest
+from pytest_mock import MockFixture
 from unittest.mock import MagicMock
 from RUFAS.routines.field.crop.water_dynamics import WaterDynamics
 from RUFAS.routines.field.crop.crop_data import CropData
@@ -64,17 +65,21 @@ def test_determine_maximum_transpiration(leaf_area_index, potential_evapotrans_a
     (0.45, 0.50, 0.10),  # fractional
     (132.58, 72.01, 635.2),  # arbitrary
 ])
-def test_cycle_water(evap, trans, et_max):
-    """integration test to check that water cycling routines are properly carried out"""
+def test_cycle_water(mocker: MockFixture, evap: float, trans: float, et_max: float) -> None:
+    """Integration test to check that water cycling routines are properly carried out."""
     data = CropData(cumulative_evaporation=0, cumulative_transpiration=0, cumulative_evapotranspiration=0,
-                    cumulative_potential_evapotranspiration=0)
+                    cumulative_potential_evapotranspiration=0, cumulative_water_uptake=10.0)
     water_dyn = WaterDynamics(data)
+    water_deficiency = mocker.patch.object(water_dyn, "_determine_water_deficiency", return_value=0.8)
+
     water_dyn.cycle_water(evap, trans, et_max)
-    expected = [water_dyn.data.cumulative_evaporation, water_dyn.data.cumulative_transpiration,
-                water_dyn.data.cumulative_evapotranspiration, water_dyn.data.cumulative_potential_evapotranspiration,
-                water_dyn.data.water_deficiency]
-    observed = [evap, trans, evap + trans, et_max, WaterDynamics._determine_water_deficiency(evap + trans, et_max)]
-    assert expected == observed
+
+    water_deficiency.assert_called_once_with(10.0, et_max)
+    actual = [water_dyn.data.cumulative_evaporation, water_dyn.data.cumulative_transpiration,
+              water_dyn.data.cumulative_evapotranspiration, water_dyn.data.cumulative_potential_evapotranspiration,
+              water_dyn.data.water_deficiency]
+    expected = [evap, trans, evap + trans, et_max, 0.8]
+    assert actual == expected
 
 
 @pytest.mark.parametrize("evapotranspirative_demand,canopy_water,expected_evaporation,expected_water", [
