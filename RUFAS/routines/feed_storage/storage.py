@@ -39,7 +39,7 @@ class Storage:
         self.stored: List[HarvestedCrop] = []
         self.capacity = float("inf")
 
-    def receive_crop(self, crop: HarvestedCrop):
+    def receive_crop(self, crop: HarvestedCrop) -> None:
         """
         Receives a harvested crop and adds it to the storage.
 
