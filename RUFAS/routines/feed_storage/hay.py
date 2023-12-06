@@ -1,4 +1,4 @@
-from storage import Storage
+from .storage import Storage
 
 
 class Hay(Storage):
