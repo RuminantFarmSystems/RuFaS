@@ -1,14 +1,3 @@
-"""
-RUFAS: Ruminant Farm Systems Model
-File name: heiferIII.py
-Author(s): Manfei Li, mli497@wisc.edu
-           Militsa Sotirova, militsasotirova@gmail.com
-Description: This file updates the heifer form close to calving to calving,
-            replacement from other farms are enter the herd in this stage, and
-            heifers can be sold in this stage. Body weight gain with user input
-            average daily gain, once mature body weight or grow end day reached,
-            grow stop.
-"""
 from RUFAS.output_manager import OutputManager
 from RUFAS.routines.animal.life_cycle.heiferII import HeiferII
 
