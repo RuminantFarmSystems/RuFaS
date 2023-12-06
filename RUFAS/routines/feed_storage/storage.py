@@ -81,7 +81,7 @@ class Storage:
         """
         pass
 
-    def calculate_dry_matter_loss_to_gas(self, dry_matter: float, time_in_silo: int):
+    def calculate_dry_matter_loss_to_gas(self, dry_matter: float, time_in_silo: int) -> float:
         """
         Calculates the dry matter loss to gas.
 
