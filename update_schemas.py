@@ -5,7 +5,7 @@ import re
 
 from RUFAS.util import Utility
 
-PROPERTIES_PATH = 'inputs/metadata/default_metadata.json'
+PROPERTIES_PATH: Path = Path("").joinpath("input", "metadata", "default_metadata.json")
 
 
 class SchemaSetupMethods:
@@ -170,7 +170,7 @@ def main() -> None:
     schema_dir_path = Path('schemas/')
     Utility.empty_dir(schema_dir_path, None)
 
-    with open("input/metadata/default_metadata.json") as metadata:
+    with open(PROPERTIES_PATH) as metadata:
         metadata_dict = json.load(metadata)
 
     properties = metadata_dict["properties"]
