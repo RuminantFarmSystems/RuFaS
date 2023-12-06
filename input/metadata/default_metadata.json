@@ -217,7 +217,7 @@
         "breed": {
           "type": "string",
           "default": "HO",
-          "pattern": "(HO|JE)",
+          "pattern": "^(HO|JE)$",
           "description": "Breed (select one Holstein/Jersey) -- The predominant breed of the herd (Holstein or Jersey)"
         }
       },
@@ -1612,12 +1612,12 @@
       "feed_type": {
         "type": "string",
         "description": "The general type or category of the feed (group).",
-        "pattern": "(Aminoacids|Forage|Conc|Milk|Mineral|Vitamins|Starter)"
+        "pattern": "^(Aminoacids|Forage|Conc|Milk|Mineral|Vitamins|Starter)$"
       },
       "units": {
         "type": "string",
         "description": "The unit of measurement used for the feed.",
-        "pattern": "(kg)"
+        "pattern": "^(kg)$"
       }
     },
     "NRC_Comp_properties": {
@@ -2763,12 +2763,12 @@
       "status": {
         "type": "string",
         "description": "Status",
-        "pattern": "(immature|mid-maturity|mature)"
+        "pattern": "^(immature|mid-maturity|mature)$"
       },
       "differentiating_nutrient": {
         "type": "string",
         "description": "Differentiating Nutrient",
-        "pattern": "(DM|NDF)"
+        "pattern": "^(DM|NDF)$"
       },
       "low_percent": {
         "type": "number",
