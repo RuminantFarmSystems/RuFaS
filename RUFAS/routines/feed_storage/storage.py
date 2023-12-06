@@ -131,7 +131,7 @@ class Storage:
         """
         pass
 
-    def calculate_heat_generated(self):
+    def calculate_heat_generated(self) -> float:
         """
         Calculates the total sensible heat generated.
 
