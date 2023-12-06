@@ -120,6 +120,7 @@ class DefaultManureTreatmentConfigFactory:
     )
 
     COMPOST_BEDDED_PACK_BARN_CONFIG = ManureTreatmentConfig()
+    OPEN_LOTS_CONFIG = ManureTreatmentConfig()
 
     @classmethod
     def get_instance(
@@ -150,5 +151,6 @@ class DefaultManureTreatmentConfigFactory:
                 cls.ANAEROBIC_LAGOON_CONFIG,
             ),
             ManureTreatmentType.COMPOST_BEDDED_PACK_BARN: cls.COMPOST_BEDDED_PACK_BARN_CONFIG,
+            ManureTreatmentType.OPEN_LOTS: cls.OPEN_LOTS_CONFIG,
         }
         return manure_treatment_config_by_type[treatment_type]
