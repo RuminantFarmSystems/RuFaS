@@ -52,3 +52,11 @@ class Hay(Storage):
         """
         pass
 
+
+class ProtectedIndoors(Hay):
+    """
+    Represents protected indoors hay storage, a subclass of Hay.
+    """
+
+    pass
+
