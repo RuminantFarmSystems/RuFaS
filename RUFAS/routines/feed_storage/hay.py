@@ -76,3 +76,10 @@ class ProtectedTarped(Hay):
 
     pass
 
+
+class Unprotected(Hay):
+    """
+    Represents unprotected hay storage, a subclass of Hay.
+    """
+
+    pass
