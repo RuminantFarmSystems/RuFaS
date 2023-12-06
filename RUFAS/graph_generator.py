@@ -109,7 +109,6 @@ class GraphGenerator:
         self,
         filtered_pool: Dict[str, Dict[str, List[Any]]],
         graph_details: Dict[str, str | List[str]],
-        save_path: Path,
         filter_file_name: str,
         graphics_dir: Path,
     ) -> str:
@@ -146,7 +145,7 @@ class GraphGenerator:
             )
             self._customize_graph(fig, graph_details)
             return self._save_graph(
-                graph_details, filter_file_name, save_path, graphics_dir
+                graph_details, filter_file_name, graphics_dir
             )
         except Exception as e:
             raise e
@@ -248,7 +247,6 @@ class GraphGenerator:
         self,
         graph_details: Dict[str, str],
         filter_file_name: str,
-        save_path: Path,
         graphics_dir: Path,
     ) -> str:
         """
@@ -277,7 +275,7 @@ class GraphGenerator:
 
         """
         graph_path = self._generate_graph_path(
-            save_path, graph_details, filter_file_name, graphics_dir
+            graph_details, filter_file_name, graphics_dir
         )
         counter = 1
         while graph_path.exists():
@@ -293,7 +291,6 @@ class GraphGenerator:
 
     def _generate_graph_path(
         self,
-        save_path: Path,
         graph_details: Dict[str, str],
         filter_file_name: str,
         graphics_dir: Path,
@@ -303,8 +300,6 @@ class GraphGenerator:
 
         Parameters
         ----------
-        save_path : Path
-            The base folder path to save the output.
         graph_details : Dict[str, str]
             A dictionary containing details/metadata about the graph.
         filter_file_name : str
@@ -317,18 +312,7 @@ class GraphGenerator:
         Path
             The full path to the output graph file.
 
-        Raises
-        ------
-        Exception
-            Generic exception raised if directory creation fails.
-
         """
-        graph_directory = os.path.join(save_path, graphics_dir)
-        try:
-            Path(graph_directory).mkdir(parents=True, exist_ok=True)
-        except Exception:
-            raise
-
         timestamp: str = datetime.datetime.now().strftime("%d-%b-%Y_%a_%H-%M-%S")
 
         if "title" in graph_details.keys():
@@ -337,5 +321,5 @@ class GraphGenerator:
         else:
             filename = f"{self.metadata_prefix}_{filter_file_name}-{timestamp}.png"
 
-        graph_path = os.path.join(graph_directory, filename)
+        graph_path = os.path.join(graphics_dir, filename)
         return Path(graph_path)
