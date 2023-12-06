@@ -1,0 +1,1044 @@
+{
+  "title": "NASEM_Comp_properties",
+  "type": "object",
+  "format": "grid",
+  "properties": {
+    "rufas_id": {
+      "title": "rufas_id",
+      "type": "number",
+      "options": {
+        "grid_columns": 12,
+        "inputAttributes": {
+          "class": "text-primary form-control"
+        },
+        "infoText": "Unique integer identifier for feeds used within the RuFaS model."
+      },
+      "minimum": 1
+    },
+    "Name": {
+      "title": "Name",
+      "type": "string",
+      "options": {
+        "grid_columns": 12,
+        "inputAttributes": {
+          "class": "text-primary form-control"
+        },
+        "infoText": "Feed Name"
+      }
+    },
+    "Fd_Category": {
+      "title": "Fd_Category",
+      "type": "string",
+      "options": {
+        "grid_columns": 12,
+        "inputAttributes": {
+          "class": "text-primary form-control"
+        },
+        "infoText": "Feed Category."
+      },
+      "enum": [
+        "Animal Protein",
+        "By-Product/Other",
+        "Calf Liquid Feed",
+        "Energy Source",
+        "Fat Supplement",
+        "Fatty Acid Supplement",
+        "Grain Crop Forage",
+        "Grass/Legume Forage",
+        "Pasture",
+        "Plant Protein",
+        "Vitamin/Mineral"
+      ],
+      "format": "select2"
+    },
+    "feed_type": {
+      "title": "feed_type",
+      "type": "string",
+      "options": {
+        "grid_columns": 12,
+        "inputAttributes": {
+          "class": "text-primary form-control"
+        },
+        "infoText": "The general type or category of the feed."
+      },
+      "enum": [
+        "Aminoacids",
+        "Forage",
+        "Conc",
+        "Milk",
+        "Mineral",
+        "Vitamins"
+      ],
+      "format": "select2"
+    },
+    "DM": {
+      "title": "DM",
+      "type": "number",
+      "options": {
+        "grid_columns": 12,
+        "inputAttributes": {
+          "class": "text-primary form-control"
+        },
+        "infoText": "Dry matter content of the feed (% DM)."
+      },
+      "minimum": 0,
+      "maximum": 100
+    },
+    "ash": {
+      "title": "ash",
+      "type": "number",
+      "options": {
+        "grid_columns": 12,
+        "inputAttributes": {
+          "class": "text-primary form-control"
+        },
+        "infoText": "Ash contents (% DM) "
+      },
+      "minimum": 0,
+      "maximum": 100
+    },
+    "CP": {
+      "title": "CP",
+      "type": "number",
+      "options": {
+        "grid_columns": 12,
+        "inputAttributes": {
+          "class": "text-primary form-control"
+        },
+        "infoText": "Crude protein content of the feed (% DM)."
+      },
+      "minimum": 0,
+      "maximum": 288
+    },
+    "N_A": {
+      "title": "N_A",
+      "type": "number",
+      "options": {
+        "grid_columns": 12,
+        "inputAttributes": {
+          "class": "text-primary form-control"
+        },
+        "infoText": "Nitrogen Fraction A (% CP)."
+      },
+      "minimum": 0,
+      "maximum": 100
+    },
+    "N_B": {
+      "title": "N_B",
+      "type": "number",
+      "options": {
+        "grid_columns": 12,
+        "inputAttributes": {
+          "class": "text-primary form-control"
+        },
+        "infoText": "Nitrogen Fraction B (% CP)."
+      },
+      "minimum": 0,
+      "maximum": 100
+    },
+    "N_C": {
+      "title": "N_C",
+      "type": "number",
+      "options": {
+        "grid_columns": 12,
+        "inputAttributes": {
+          "class": "text-primary form-control"
+        },
+        "infoText": "Nitrogen Fraction C (% CP)."
+      },
+      "minimum": 0,
+      "maximum": 100
+    },
+    "Kd": {
+      "title": "Kd",
+      "type": "number",
+      "options": {
+        "grid_columns": 12,
+        "inputAttributes": {
+          "class": "text-primary form-control"
+        },
+        "infoText": "Feed degradation rate of B fraction (% h)."
+      },
+      "minimum": 0,
+      "maximum": 30
+    },
+    "RUP": {
+      "title": "RUP",
+      "type": "number",
+      "options": {
+        "grid_columns": 12,
+        "inputAttributes": {
+          "class": "text-primary form-control"
+        },
+        "infoText": "Rumen undegradable protein (% CP)."
+      },
+      "minimum": 0,
+      "maximum": 100
+    },
+    "dRUP": {
+      "title": "dRUP",
+      "type": "number",
+      "options": {
+        "grid_columns": 12,
+        "inputAttributes": {
+          "class": "text-primary form-control"
+        },
+        "infoText": "Digested rumen undegradable protein (% of RUP)."
+      },
+      "minimum": 0,
+      "maximum": 100
+    },
+    "sol_prot": {
+      "title": "sol_prot",
+      "type": "number",
+      "options": {
+        "grid_columns": 12,
+        "inputAttributes": {
+          "class": "text-primary form-control"
+        },
+        "infoText": "Soluble protein (% CP)."
+      },
+      "minimum": 0,
+      "maximum": 100
+    },
+    "ADICP": {
+      "title": "ADICP",
+      "type": "number",
+      "options": {
+        "grid_columns": 12,
+        "inputAttributes": {
+          "class": "text-primary form-control"
+        },
+        "infoText": "Acid detergent insoluble nitrogen multiplied by 6.25 (% DM)."
+      },
+      "minimum": 0,
+      "maximum": 8,
+      "default": 0
+    },
+    "NDICP": {
+      "title": "NDICP",
+      "type": "number",
+      "options": {
+        "grid_columns": 12,
+        "inputAttributes": {
+          "class": "text-primary form-control"
+        },
+        "infoText": "Neutral detergent insoluble nitrogen multiplied by 6.25 (% DM)."
+      },
+      "minimum": 0,
+      "maximum": 12,
+      "default": 0
+    },
+    "ADF": {
+      "title": "ADF",
+      "type": "number",
+      "options": {
+        "grid_columns": 12,
+        "inputAttributes": {
+          "class": "text-primary form-control"
+        },
+        "infoText": "Acid detergent fiber (% DM)"
+      },
+      "minimum": 0,
+      "maximum": 66,
+      "default": 0
+    },
+    "NDF": {
+      "title": "NDF",
+      "type": "number",
+      "options": {
+        "grid_columns": 12,
+        "inputAttributes": {
+          "class": "text-primary form-control"
+        },
+        "infoText": "Neutral detergent fiber (% DM)."
+      },
+      "minimum": 0,
+      "maximum": 85,
+      "default": 0
+    },
+    "NDF48": {
+      "title": "NDF48",
+      "type": "number",
+      "options": {
+        "grid_columns": 12,
+        "inputAttributes": {
+          "class": "text-primary form-control"
+        },
+        "infoText": "In vitro 48-hour digestibility (% NDF)."
+      },
+      "minimum": 0,
+      "maximum": 89,
+      "default": 0
+    },
+    "lignin": {
+      "title": "lignin",
+      "type": "number",
+      "options": {
+        "grid_columns": 12,
+        "inputAttributes": {
+          "class": "text-primary form-control"
+        },
+        "infoText": "Acid detergent lignin (% DM)."
+      },
+      "minimum": 0,
+      "maximum": 25,
+      "default": 0
+    },
+    "starch": {
+      "title": "starch",
+      "type": "number",
+      "options": {
+        "grid_columns": 12,
+        "inputAttributes": {
+          "class": "text-primary form-control"
+        },
+        "infoText": "Starch (%)."
+      },
+      "minimum": 0,
+      "maximum": 80,
+      "default": 0
+    },
+    "WSC": {
+      "title": "WSC",
+      "type": "number",
+      "options": {
+        "grid_columns": 12,
+        "inputAttributes": {
+          "class": "text-primary form-control"
+        },
+        "infoText": "Water soluble carbohydrates (% DM)."
+      },
+      "minimum": 0,
+      "maximum": 100,
+      "default": 0
+    },
+    "FA": {
+      "title": "FA",
+      "type": "number",
+      "options": {
+        "grid_columns": 12,
+        "inputAttributes": {
+          "class": "text-primary form-control"
+        },
+        "infoText": "Fatty acids (% DM)."
+      },
+      "minimum": 0,
+      "maximum": 100,
+      "default": 0
+    },
+    "EE": {
+      "title": "EE",
+      "type": "number",
+      "options": {
+        "grid_columns": 12,
+        "inputAttributes": {
+          "class": "text-primary form-control"
+        },
+        "infoText": "Ether extract (% DM)."
+      },
+      "minimum": 0,
+      "maximum": 100,
+      "default": 0
+    },
+    "DE_Base": {
+      "title": "DE_Base",
+      "type": "number",
+      "options": {
+        "grid_columns": 12,
+        "inputAttributes": {
+          "class": "text-primary form-control"
+        },
+        "infoText": "Digestible energy standard (Mcal/kg)."
+      },
+      "minimum": 0,
+      "maximum": 100,
+      "default": 0
+    },
+    "calcium": {
+      "title": "calcium",
+      "type": "number",
+      "options": {
+        "grid_columns": 12,
+        "inputAttributes": {
+          "class": "text-primary form-control"
+        },
+        "infoText": "Calcium (% DM)."
+      },
+      "minimum": 0,
+      "maximum": 72,
+      "default": 0
+    },
+    "phosphorus": {
+      "title": "phosphorus",
+      "type": "number",
+      "options": {
+        "grid_columns": 12,
+        "inputAttributes": {
+          "class": "text-primary form-control"
+        },
+        "infoText": "Phosphorus (% DM)."
+      },
+      "minimum": 0,
+      "maximum": 32,
+      "default": 0
+    },
+    "magnesium": {
+      "title": "magnesium",
+      "type": "number",
+      "options": {
+        "grid_columns": 12,
+        "inputAttributes": {
+          "class": "text-primary form-control"
+        },
+        "infoText": "Magnesium (% DM)."
+      },
+      "minimum": 0,
+      "maximum": 57,
+      "default": 0
+    },
+    "potassium": {
+      "title": "potassium",
+      "type": "number",
+      "options": {
+        "grid_columns": 12,
+        "inputAttributes": {
+          "class": "text-primary form-control"
+        },
+        "infoText": "Potassium (% DM)."
+      },
+      "minimum": 0,
+      "maximum": 57,
+      "default": 0
+    },
+    "sodium": {
+      "title": "sodium",
+      "type": "number",
+      "options": {
+        "grid_columns": 12,
+        "inputAttributes": {
+          "class": "text-primary form-control"
+        },
+        "infoText": "Sodium (% DM)."
+      },
+      "minimum": 0,
+      "maximum": 40,
+      "default": 0
+    },
+    "chlorine": {
+      "title": "chlorine",
+      "type": "number",
+      "options": {
+        "grid_columns": 12,
+        "inputAttributes": {
+          "class": "text-primary form-control"
+        },
+        "infoText": "Chlorine (% DM)."
+      },
+      "minimum": 0,
+      "maximum": 67,
+      "default": 0
+    },
+    "sulfur": {
+      "title": "sulfur",
+      "type": "number",
+      "options": {
+        "grid_columns": 12,
+        "inputAttributes": {
+          "class": "text-primary form-control"
+        },
+        "infoText": "Sulphur (% DM)."
+      },
+      "minimum": 0,
+      "maximum": 25,
+      "default": 0
+    },
+    "copper": {
+      "title": "copper",
+      "type": "number",
+      "options": {
+        "grid_columns": 12,
+        "inputAttributes": {
+          "class": "text-primary form-control"
+        }
+      }
+    },
+    "iron": {
+      "title": "iron",
+      "type": "number",
+      "options": {
+        "grid_columns": 12,
+        "inputAttributes": {
+          "class": "text-primary form-control"
+        }
+      }
+    },
+    "manganese": {
+      "title": "manganese",
+      "type": "number",
+      "options": {
+        "grid_columns": 12,
+        "inputAttributes": {
+          "class": "text-primary form-control"
+        }
+      }
+    },
+    "zinc": {
+      "title": "zinc",
+      "type": "number",
+      "options": {
+        "grid_columns": 12,
+        "inputAttributes": {
+          "class": "text-primary form-control"
+        }
+      }
+    },
+    "molibdenum": {
+      "title": "molibdenum",
+      "type": "number",
+      "options": {
+        "grid_columns": 12,
+        "inputAttributes": {
+          "class": "text-primary form-control"
+        }
+      }
+    },
+    "chromium": {
+      "title": "chromium",
+      "type": "number",
+      "options": {
+        "grid_columns": 12,
+        "inputAttributes": {
+          "class": "text-primary form-control"
+        }
+      }
+    },
+    "cobalt": {
+      "title": "cobalt",
+      "type": "number",
+      "options": {
+        "grid_columns": 12,
+        "inputAttributes": {
+          "class": "text-primary form-control"
+        }
+      }
+    },
+    "iodine": {
+      "title": "iodine",
+      "type": "number",
+      "options": {
+        "grid_columns": 12,
+        "inputAttributes": {
+          "class": "text-primary form-control"
+        }
+      }
+    },
+    "selenium": {
+      "title": "selenium",
+      "type": "number",
+      "options": {
+        "grid_columns": 12,
+        "inputAttributes": {
+          "class": "text-primary form-control"
+        }
+      }
+    },
+    "arginine": {
+      "title": "arginine",
+      "type": "number",
+      "options": {
+        "grid_columns": 12,
+        "inputAttributes": {
+          "class": "text-primary form-control"
+        }
+      }
+    },
+    "histidine": {
+      "title": "histidine",
+      "type": "number",
+      "options": {
+        "grid_columns": 12,
+        "inputAttributes": {
+          "class": "text-primary form-control"
+        }
+      }
+    },
+    "isoleucine": {
+      "title": "isoleucine",
+      "type": "number",
+      "options": {
+        "grid_columns": 12,
+        "inputAttributes": {
+          "class": "text-primary form-control"
+        }
+      }
+    },
+    "leucine": {
+      "title": "leucine",
+      "type": "number",
+      "options": {
+        "grid_columns": 12,
+        "inputAttributes": {
+          "class": "text-primary form-control"
+        }
+      }
+    },
+    "lysine": {
+      "title": "lysine",
+      "type": "number",
+      "options": {
+        "grid_columns": 12,
+        "inputAttributes": {
+          "class": "text-primary form-control"
+        }
+      }
+    },
+    "methionine": {
+      "title": "methionine",
+      "type": "number",
+      "options": {
+        "grid_columns": 12,
+        "inputAttributes": {
+          "class": "text-primary form-control"
+        }
+      }
+    },
+    "phenylalanine": {
+      "title": "phenylalanine",
+      "type": "number",
+      "options": {
+        "grid_columns": 12,
+        "inputAttributes": {
+          "class": "text-primary form-control"
+        }
+      }
+    },
+    "threonine": {
+      "title": "threonine",
+      "type": "number",
+      "options": {
+        "grid_columns": 12,
+        "inputAttributes": {
+          "class": "text-primary form-control"
+        }
+      }
+    },
+    "triptophan": {
+      "title": "triptophan",
+      "type": "number",
+      "options": {
+        "grid_columns": 12,
+        "inputAttributes": {
+          "class": "text-primary form-control"
+        }
+      }
+    },
+    "valine": {
+      "title": "valine",
+      "type": "number",
+      "options": {
+        "grid_columns": 12,
+        "inputAttributes": {
+          "class": "text-primary form-control"
+        }
+      }
+    },
+    "C120_FA": {
+      "title": "C120_FA",
+      "type": "number",
+      "options": {
+        "grid_columns": 12,
+        "inputAttributes": {
+          "class": "text-primary form-control"
+        }
+      }
+    },
+    "C140_FA": {
+      "title": "C140_FA",
+      "type": "number",
+      "options": {
+        "grid_columns": 12,
+        "inputAttributes": {
+          "class": "text-primary form-control"
+        }
+      }
+    },
+    "C160_FA": {
+      "title": "C160_FA",
+      "type": "number",
+      "options": {
+        "grid_columns": 12,
+        "inputAttributes": {
+          "class": "text-primary form-control"
+        }
+      }
+    },
+    "C161_FA": {
+      "title": "C161_FA",
+      "type": "number",
+      "options": {
+        "grid_columns": 12,
+        "inputAttributes": {
+          "class": "text-primary form-control"
+        }
+      }
+    },
+    "C180_FA": {
+      "title": "C180_FA",
+      "type": "number",
+      "options": {
+        "grid_columns": 12,
+        "inputAttributes": {
+          "class": "text-primary form-control"
+        }
+      }
+    },
+    "C181t_FA": {
+      "title": "C181t_FA",
+      "type": "number",
+      "options": {
+        "grid_columns": 12,
+        "inputAttributes": {
+          "class": "text-primary form-control"
+        }
+      }
+    },
+    "C181c_FA": {
+      "title": "C181c_FA",
+      "type": "number",
+      "options": {
+        "grid_columns": 12,
+        "inputAttributes": {
+          "class": "text-primary form-control"
+        }
+      }
+    },
+    "C182_FA": {
+      "title": "C182_FA",
+      "type": "number",
+      "options": {
+        "grid_columns": 12,
+        "inputAttributes": {
+          "class": "text-primary form-control"
+        }
+      }
+    },
+    "C183_FA": {
+      "title": "C183_FA",
+      "type": "number",
+      "options": {
+        "grid_columns": 12,
+        "inputAttributes": {
+          "class": "text-primary form-control"
+        }
+      }
+    },
+    "otherFA_FA": {
+      "title": "otherFA_FA",
+      "type": "number",
+      "options": {
+        "grid_columns": 12,
+        "inputAttributes": {
+          "class": "text-primary form-control"
+        }
+      }
+    },
+    "NPN_source": {
+      "title": "NPN_source",
+      "type": "number",
+      "options": {
+        "grid_columns": 12,
+        "inputAttributes": {
+          "class": "text-primary form-control"
+        }
+      }
+    },
+    "starch_digested": {
+      "title": "starch_digested",
+      "type": "number",
+      "options": {
+        "grid_columns": 12,
+        "inputAttributes": {
+          "class": "text-primary form-control"
+        }
+      }
+    },
+    "FA_dig": {
+      "title": "FA_dig",
+      "type": "number",
+      "options": {
+        "grid_columns": 12,
+        "inputAttributes": {
+          "class": "text-primary form-control"
+        }
+      }
+    },
+    "P_inorg": {
+      "title": "P_inorg",
+      "type": "number",
+      "options": {
+        "grid_columns": 12,
+        "inputAttributes": {
+          "class": "text-primary form-control"
+        }
+      }
+    },
+    "P_org": {
+      "title": "P_org",
+      "type": "number",
+      "options": {
+        "grid_columns": 12,
+        "inputAttributes": {
+          "class": "text-primary form-control"
+        }
+      }
+    },
+    "B_Carotene": {
+      "title": "B_Carotene",
+      "type": "number",
+      "options": {
+        "grid_columns": 12,
+        "inputAttributes": {
+          "class": "text-primary form-control"
+        }
+      }
+    },
+    "biotin": {
+      "title": "biotin",
+      "type": "number",
+      "options": {
+        "grid_columns": 12,
+        "inputAttributes": {
+          "class": "text-primary form-control"
+        }
+      }
+    },
+    "choline": {
+      "title": "choline",
+      "type": "number",
+      "options": {
+        "grid_columns": 12,
+        "inputAttributes": {
+          "class": "text-primary form-control"
+        }
+      }
+    },
+    "niacin": {
+      "title": "niacin",
+      "type": "number",
+      "options": {
+        "grid_columns": 12,
+        "inputAttributes": {
+          "class": "text-primary form-control"
+        }
+      }
+    },
+    "Vit_A": {
+      "title": "Vit_A",
+      "type": "number",
+      "options": {
+        "grid_columns": 12,
+        "inputAttributes": {
+          "class": "text-primary form-control"
+        }
+      }
+    },
+    "Vit_D": {
+      "title": "Vit_D",
+      "type": "number",
+      "options": {
+        "grid_columns": 12,
+        "inputAttributes": {
+          "class": "text-primary form-control"
+        }
+      }
+    },
+    "Vit_E": {
+      "title": "Vit_E",
+      "type": "number",
+      "options": {
+        "grid_columns": 12,
+        "inputAttributes": {
+          "class": "text-primary form-control"
+        }
+      }
+    },
+    "Abs_calcium": {
+      "title": "Abs_calcium",
+      "type": "number",
+      "options": {
+        "grid_columns": 12,
+        "inputAttributes": {
+          "class": "text-primary form-control"
+        }
+      }
+    },
+    "Abs_phosphorus": {
+      "title": "Abs_phosphorus",
+      "type": "number",
+      "options": {
+        "grid_columns": 12,
+        "inputAttributes": {
+          "class": "text-primary form-control"
+        }
+      }
+    },
+    "Abs_sodium": {
+      "title": "Abs_sodium",
+      "type": "number",
+      "options": {
+        "grid_columns": 12,
+        "inputAttributes": {
+          "class": "text-primary form-control"
+        }
+      }
+    },
+    "Abs_chloride": {
+      "title": "Abs_chloride",
+      "type": "number",
+      "options": {
+        "grid_columns": 12,
+        "inputAttributes": {
+          "class": "text-primary form-control"
+        }
+      }
+    },
+    "Abs_potassium": {
+      "title": "Abs_potassium",
+      "type": "number",
+      "options": {
+        "grid_columns": 12,
+        "inputAttributes": {
+          "class": "text-primary form-control"
+        }
+      }
+    },
+    "Abs_copper": {
+      "title": "Abs_copper",
+      "type": "number",
+      "options": {
+        "grid_columns": 12,
+        "inputAttributes": {
+          "class": "text-primary form-control"
+        }
+      }
+    },
+    "Abs_iron": {
+      "title": "Abs_iron",
+      "type": "number",
+      "options": {
+        "grid_columns": 12,
+        "inputAttributes": {
+          "class": "text-primary form-control"
+        }
+      }
+    },
+    "Abs_magnesium": {
+      "title": "Abs_magnesium",
+      "type": "number",
+      "options": {
+        "grid_columns": 12,
+        "inputAttributes": {
+          "class": "text-primary form-control"
+        }
+      }
+    },
+    "Abs_manganesum": {
+      "title": "Abs_manganesum",
+      "type": "number",
+      "options": {
+        "grid_columns": 12,
+        "inputAttributes": {
+          "class": "text-primary form-control"
+        }
+      }
+    },
+    "Abs_zinc": {
+      "title": "Abs_zinc",
+      "type": "number",
+      "options": {
+        "grid_columns": 12,
+        "inputAttributes": {
+          "class": "text-primary form-control"
+        }
+      }
+    },
+    "is_fat": {
+      "title": "is_fat",
+      "type": "number",
+      "options": {
+        "grid_columns": 12,
+        "inputAttributes": {
+          "class": "text-primary form-control"
+        },
+        "infoText": "Identifier of fat type feed (0 or 1)."
+      },
+      "minimum": 0,
+      "maximum": 1
+    },
+    "is_wetforage": {
+      "title": "is_wetforage",
+      "type": "number",
+      "options": {
+        "grid_columns": 12,
+        "inputAttributes": {
+          "class": "text-primary form-control"
+        },
+        "infoText": "Identifier of wet forage type feed (0 or 1)."
+      },
+      "minimum": 0,
+      "maximum": 1
+    },
+    "units": {
+      "title": "units",
+      "type": "string",
+      "options": {
+        "grid_columns": 12,
+        "inputAttributes": {
+          "class": "text-primary form-control"
+        },
+        "infoText": ""
+      }
+    },
+    "limit": {
+      "title": "limit",
+      "type": "number",
+      "options": {
+        "grid_columns": 12,
+        "inputAttributes": {
+          "class": "text-primary form-control"
+        }
+      }
+    },
+    "lower_limit": {
+      "title": "lower_limit",
+      "type": "number",
+      "options": {
+        "grid_columns": 12,
+        "inputAttributes": {
+          "class": "text-primary form-control"
+        }
+      }
+    },
+    "TDN": {
+      "title": "TDN",
+      "type": "number",
+      "options": {
+        "grid_columns": 12,
+        "inputAttributes": {
+          "class": "text-primary form-control"
+        }
+      }
+    },
+    "DE": {
+      "title": "DE",
+      "type": "number",
+      "options": {
+        "grid_columns": 12,
+        "inputAttributes": {
+          "class": "text-primary form-control"
+        }
+      }
+    }
+  }
+}

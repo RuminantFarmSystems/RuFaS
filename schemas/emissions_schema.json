@@ -1,0 +1,46 @@
+{
+  "title": "emissions_properties",
+  "type": "object",
+  "format": "grid",
+  "properties": {
+    "alfalfa_tillage_emissions": {
+      "title": "alfalfa_tillage_emissions",
+      "type": "number",
+      "options": {
+        "grid_columns": 12,
+        "inputAttributes": {
+          "class": "text-primary form-control"
+        },
+        "infoText": "The amount of total tonnes CO2-eq generated from alfalfa tillage"
+      },
+      "minimum": 0,
+      "default": 500
+    },
+    "corn_grain_tillage_emissions": {
+      "title": "corn_grain_tillage_emissions",
+      "type": "number",
+      "options": {
+        "grid_columns": 12,
+        "inputAttributes": {
+          "class": "text-primary form-control"
+        },
+        "infoText": "The amount of total tonnes CO2-eq generated from corn grain tillage"
+      },
+      "minimum": 0,
+      "default": 300
+    },
+    "corn_silage_tillage_emissions": {
+      "title": "corn_silage_tillage_emissions",
+      "type": "number",
+      "options": {
+        "grid_columns": 12,
+        "inputAttributes": {
+          "class": "text-primary form-control"
+        },
+        "infoText": "The amount of total tonnes CO2-eq generated from corn silage tillage"
+      },
+      "minimum": 0,
+      "default": 400
+    }
+  }
+}
