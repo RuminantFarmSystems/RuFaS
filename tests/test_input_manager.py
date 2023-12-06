@@ -1,9 +1,3 @@
-"""
-RUFAS: Ruminant Farm Systems Model
-File name: test_input_manager.py
-Description: Implements test cases for Input Manager
-Author(s): Niko Tomlinson, ndt2@cornell.edu; Allister Liu, al25632@cornell.edu; Michael Richards, mr2372@cornell.edu
-"""
 from functools import reduce
 import json
 from typing import Any, Callable, Dict

@@ -167,3 +167,13 @@ class GasEmissionConstants:
     """
     Default proportion of carbon available in bedding, (unitless, [0, 1]). Default is set to 0.35.
     """
+
+    NITROUS_OXIDE_COEFFICIENT_IN_OPEN_LOTS = 0.02
+    """
+    Nitrous oxide coefficient used for calculating nitrogen loss in an open lot (unitless).
+    """
+
+    AMMONIA_EMISSION_COEFFICIENT_IN_OPEN_LOTS = 0.36
+    """
+    Ammonia emission coefficient used for calculating nitrogen loss in an open lot (unitless).
+    """

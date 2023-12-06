@@ -1,16 +1,3 @@
-"""
-RUFAS: Ruminant Farm Systems Model
-File name: heiferII.py
-Author(s): Manfei Li, mli497@wisc.edu
-            Militsa Sotirova, militsasotirova@gmail.com
-Description: This file updates the heifer form breeding to close to calving.
-            Body weight gain with user input average daily gain,
-            once mature body weight or grow end day reached, grow stop.
-            Reproduction program could be chosen from the ED, TAI,
-            Synch-ED projects, reference:
-            http://www.dcrcouncil.org/wp-content/uploads/2018/12/Dairy-Heifer-Protocol-Sheet-Updated-2018.pdf
-            Preg check follows AI for three times.
-"""
 from __future__ import annotations
 
 import collections
@@ -26,7 +13,7 @@ from RUFAS.routines.animal.life_cycle.animal_base import AnimalBase
 from RUFAS.routines.animal.life_cycle.heiferI import HeiferI
 from RUFAS.routines.animal.life_cycle.hormone_delivery_schedule import HormoneDeliverySchedule
 from RUFAS.routines.animal.life_cycle.repro_protocol_enums import HeiferReproProtocolEnum
-from RUFAS.routines.animal.life_cycle.repro_protocol_misc import InternalReproSettings, ReproProtocolsValidator
+from RUFAS.routines.animal.life_cycle.repro_protocol_misc import InternalReproSettings
 from RUFAS.routines.animal.manure.growing_heifer_manure_excretion import manure_calculations
 from RUFAS.routines.animal.ration.animal_requirements import AnimalRequirements
 

@@ -534,7 +534,7 @@ class OutputManager(object):
         except Exception as e:
             raise e
 
-    def _generate_file_name(self, base_name: str, extension: str = "json") -> str:
+    def _generate_file_name(self, base_name: str, extension: str) -> str:
         """
         Returns a file name using the given base_name and timestamp.
         """
@@ -750,9 +750,10 @@ class OutputManager(object):
         self,
         save_path: Path,
         filters_dir_path: Path,
-        exclude_info_maps: bool = False,
-        produce_graphics: bool = True,
-        graphics_dir: Path = Path(""),
+        exclude_info_maps: bool,
+        produce_graphics: bool,
+        graphics_dir: Path,
+        csv_dir: Path
     ) -> None:
         """
         Reads a text file containing a list of keys and filters the variables pool by those keys.
@@ -769,11 +770,14 @@ class OutputManager(object):
         exclude_info_maps : bool
             Flag for whether or not the user wants to include info_maps data in their results files.
 
-        produce_graphics: bool, optional
+        produce_graphics: bool
             Flag for whether or not the user wants to produce graphs at after the simulation.
 
-        graphics_dir : Path, optional
+        graphics_dir : Path
             The directory for saving graphics.
+
+        csv_dir : Path
+            The directory for saving csvs.
         """
         info_map = {
             "class": self.__class__.__name__,
@@ -840,6 +844,7 @@ class OutputManager(object):
                         produce_graphics,
                         filter_content,
                         graphics_dir,
+                        csv_dir
                     )
             report_file_path = os.path.join(
                 save_path,
@@ -855,6 +860,7 @@ class OutputManager(object):
         produce_graphics: bool,
         filter_content: Dict[str, str | int],
         graphics_dir: Path,
+        csv_dir: Path
     ) -> None:
         """
         Checks the prefix of the filter_file to determine the format for saving. It then delegates the
@@ -871,16 +877,19 @@ class OutputManager(object):
             )
             self._dict_to_file_json(filtered_pool, file_path)
         elif filter_file.startswith(self.__supported_filter_types_prefixes["csv"]):
-            csv_directory = os.path.join(save_path, "CSVs", "om")
-            self._save_variables_to_csv_files(filtered_pool, filter_file, csv_directory)
+            self.create_directory(csv_dir)
+            variable_csv_file_path = os.path.join(
+                csv_dir, self._generate_file_name(f"saved_variables_{filter_file}", "csv")
+            )
+            self._dict_to_file_csv(filtered_pool, variable_csv_file_path)
         elif filter_file.startswith(self.__supported_filter_types_prefixes["graph"]):
+            self.create_directory(graphics_dir)
             if produce_graphics:
                 try:
                     graph_generator = GraphGenerator(self.__metadata_prefix)
                     graph_generator.generate_graph(
                         filtered_pool,
                         filter_content,
-                        save_path,
                         filter_file,
                         graphics_dir,
                     )
@@ -893,39 +902,12 @@ class OutputManager(object):
                     info_map,
                 )
 
-    def _save_variables_to_csv_files(
-        self, data_dict: Dict[str, Any], filter_name: str, path: str
-    ) -> None:
-        """
-        Saves the data_dict into a single CSV file in the specified path. If the directory at the given path
-        does not exist, it is created.
-
-        Parameters
-        ----------
-        data_dict : Dict[str, Any]
-            The dictionary to be saved
-        filter_name : str
-            Name of the filter that is being used for selecting data for the CSV.
-        path : str
-            Path to the output directory for the OutputManager.
-
-        """
-        try:
-            Path(path).mkdir(parents=True, exist_ok=True)
-        except Exception:
-            raise
-
-        variable_csv_file_path = os.path.join(
-            path, self._generate_file_name(f"saved_variables_{filter_name}", "csv")
-        )
-        self._dict_to_file_csv(data_dict, variable_csv_file_path)
-
     @deprecated(
         reason="""This function is still in the code base but it is not used. We want to keep it for debugging purposes
         when save_results() is not working.""",
         version="MVP",
     )
-    def dump_variables(self, path: str, exclude_info_maps: bool = False) -> None:
+    def dump_variables(self, path: str, exclude_info_maps: bool) -> None:
         """
         Dumps variables_pool into a json file in the given path to a directory.
 
@@ -972,7 +954,7 @@ class OutputManager(object):
         self,
         path: str,
         exclude_info_maps: bool,
-        format_option: str = "verbose",
+        format_option: str,
     ) -> None:
         """
         Dumps names of all variables added to variables_pool along with the caller class
@@ -1060,8 +1042,8 @@ class OutputManager(object):
     def dump_all_nondata_pools(
         self,
         path: str,
-        exclude_info_maps: bool = False,
-        format_option: str = "verbose",
+        exclude_info_maps: bool,
+        format_option: str,
     ) -> None:
         """
         Dumps all non-data pools into the given path to a directory.
@@ -1118,3 +1100,67 @@ class OutputManager(object):
         except json.JSONDecodeError as e:
             self.add_error("JSON parsing error", str(e), info_map)
             raise
+
+    def clear_output_dir(self, vars_file_path: Path, output_dir: Path) -> None:
+        """Clears the output directory if vars_file_path not in output directory.
+
+        Parameters
+        ----------
+        vars_file_path : Path
+            Path to file used to load Output Manager vars pool.
+        output_dir : Path
+            The directory for saving output.
+        """
+        info_map = {
+            "class": self.__class__.__name__,
+            "function": self.clear_output_dir.__name__,
+        }
+        is_file_found_in_dir = self.is_file_in_dir(output_dir, vars_file_path)
+        if is_file_found_in_dir:
+            self.add_error("Can't clear output directory", f"{vars_file_path} in output directory.", info_map)
+        else:
+            keep_list = [".keep", "output_filters"]
+            Utility.empty_dir(output_dir, keep=keep_list)
+            self.add_log("Output directory successfully cleared",
+                         "Provided variables-file path was not in output directory.", info_map)
+
+    def is_file_in_dir(self, dir_path: Path, file_path: Path) -> bool:
+        """Checks if a file path is in the provided directory.
+
+        Parameters
+        ----------
+        dir_path : Path
+            Path to the directory to be checked.
+        file_path : Path
+            Path to file to be checked.
+        """
+        if file_path is None:
+            return False
+        file_path = file_path.resolve()
+        directory_path = dir_path.resolve()
+
+        return directory_path == file_path or directory_path in file_path.parents
+
+    def create_directory(self, path: Path) -> None:
+        """
+        Creates a dir from the provided path if it does not already exist.
+
+        Parameters
+        ----------
+        path : Path
+            The path where the directory will be created if it does not already exist.
+        """
+        info_map = {"class": self.__class__.__name__,
+                    "function": self.create_directory.__name__}
+        self.add_log("Attempting to create a new directory.",
+                     f"Attempting to create a new directory at {path}.",
+                     info_map)
+        try:
+            path.mkdir(parents=True, exist_ok=True)
+            self.add_log("Directory successfully created.",
+                         f"Created a new directory at {path}.",
+                         info_map)
+        except PermissionError as e:
+            self.add_error("Permission Error", f"{path=}; Exception: {str(e)}", info_map)
+        except Exception as e:
+            self.add_error("mkdir failure", f"{path=}; Exception: {str(e)}", info_map)

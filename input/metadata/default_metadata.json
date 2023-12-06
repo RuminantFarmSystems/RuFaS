@@ -2324,7 +2324,7 @@
           "manure_handler": {
             "type": "string",
             "description": "Manure Handling Method -- Method for cleaning barn alleyways.",
-            "pattern": "^(flush system|alley scraper|manual scraping|tillage|manual skid steer scraping)$"
+            "pattern": "^(flush system|alley scraper|manual scraping|tillage|manual skid steer scraping|harrowing)$"
           },
           "manure_separator": {
             "type": "string",
@@ -2732,6 +2732,11 @@
         "description": "Number of days that make up the irrigation interval.\nUnits: days.",
         "minimum": 0,
         "default": 0
+      },
+      "supplement_manure_nutrient_deficiencies": {
+        "type": "bool",
+        "description": "Determines if nutrient deficient manure applications are supplemented with chemical fertilizer.",
+        "default": false
       }
     },
     "weather_properties": {
