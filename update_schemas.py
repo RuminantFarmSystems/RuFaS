@@ -178,7 +178,8 @@ def main() -> None:
             print(f"Key: '{key}' raised exception: {str(e)}")
             continue
 
-        new_schema_file_name = f"{key}.json"
+        schema_name = key.replace("properties", "schema")
+        new_schema_file_name = f"{schema_name}.json"
         new_schema_file_path = Path.joinpath(schema_dir_path, new_schema_file_name)
         print(new_schema_file_path)
 
