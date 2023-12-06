@@ -142,7 +142,7 @@ class Storage:
         """
         pass
 
-    def calculate_bale_density(self, initial_dry_matter: float):
+    def calculate_bale_density(self, initial_dry_matter: float) -> float:
         """
         Calculates the density of a bale.
 
