@@ -156,7 +156,7 @@ class SchemaSetupMethods:
     DATA_TYPE_TO_SCHEMA_SETUP_MAP: dict[str, Callable[[str, dict[str, Any]], dict[str, Any]]] = {
         "number": setup_number_schema,
         "bool": setup_bool_schema,
-        "string": setup_bool_schema,
+        "string": setup_string_schema,
         "array": setup_array_schema,
         "object": setup_object_schema
     }
