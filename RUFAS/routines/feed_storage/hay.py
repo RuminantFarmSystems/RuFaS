@@ -68,3 +68,11 @@ class ProtectedWrapped(Hay):
 
     pass
 
+
+class ProtectedTarped(Hay):
+    """
+    Represents protected tarped hay storage, a subclass of Hay.
+    """
+
+    pass
+
