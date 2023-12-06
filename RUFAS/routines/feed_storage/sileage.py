@@ -1,17 +1,17 @@
 from .storage import Storage
-from typing import Optional, Union
+from typing import Optional
 
 
-class Silage(Storage):
+class Sileage(Storage):
     """
-    Class representing the Silage storage type, inheriting from Storage.
+    Class representing the Sileage storage type, inheriting from Storage.
 
     Methods are placeholders as per the design document and are to be implemented.
     """
 
     def calculate_protein_loss(self):
         """
-        Placeholder method to calculate protein loss specific to Silage.
+        Placeholder method to calculate protein loss specific to Sileage.
 
         Returns
         -------
@@ -23,7 +23,7 @@ class Silage(Storage):
         self, dry_matter: float, time_in_silo: int
     ) -> float:
         """
-        Calculates the dry matter loss to gas, specific to Silage.
+        Calculates the dry matter loss to gas, specific to Sileage.
 
         Parameters
         ----------
@@ -35,7 +35,7 @@ class Silage(Storage):
         Returns
         -------
         float
-            The amount of dry matter lost to gas, specific to Silage.
+            The amount of dry matter lost to gas, specific to Sileage.
         """
         pass
 
@@ -43,7 +43,7 @@ class Silage(Storage):
         self, dry_matter: float, estimated_maximum_effluent: float, time_in_silo: int
     ) -> float:
         """
-        Calculates the dry matter loss to effluent, specific to Silage.
+        Calculates the dry matter loss to effluent, specific to Sileage.
 
         Parameters
         ----------
@@ -57,17 +57,15 @@ class Silage(Storage):
         Returns
         -------
         float
-            The amount of dry matter lost to effluent, specific to Silage.
+            The amount of dry matter lost to effluent, specific to Sileage.
         """
         pass
 
 
-class Bunker(Silage):
+class Bunker(Sileage):
     """
-    Class representing the Bunker type of Silage storage.
+    Class representing the Bunker type of Sileage storage.
     """
-
-    bunker_size: Union[str, None] = None
 
     def __init__(self, bunker_size: Optional[str] = None):
         """
@@ -82,12 +80,10 @@ class Bunker(Silage):
         self.bunker_size = bunker_size
 
 
-class Pile(Silage):
+class Pile(Sileage):
     """
-    Class representing the Pile type of Silage storage.
+    Class representing the Pile type of Sileage storage.
     """
-
-    pile_size: Union[str, None] = None  
 
     def __init__(self, pile_size: Optional[str] = None):
         """
@@ -102,12 +98,10 @@ class Pile(Silage):
         self.pile_size = pile_size
 
 
-class Bag(Silage):
+class Bag(Sileage):
     """
-    Class representing the Bag type of Silage storage.
+    Class representing the Bag type of Sileage storage.
     """
-
-    bag_size: Union[int, None] = None 
 
     def __init__(self, bag_size: Optional[int] = None):
         """
