@@ -17,10 +17,9 @@
     },
     "Name": {
       "title": "Name",
-      "type": "boolean",
+      "type": "string",
       "options": {
         "grid_columns": 12,
-        "format": "select2",
         "inputAttributes": {
           "class": "text-primary form-control"
         },
@@ -29,10 +28,9 @@
     },
     "feed_description": {
       "title": "feed_description",
-      "type": "boolean",
+      "type": "string",
       "options": {
         "grid_columns": 12,
-        "format": "select2",
         "inputAttributes": {
           "class": "text-primary form-control"
         },
@@ -41,27 +39,39 @@
     },
     "feed_type": {
       "title": "feed_type",
-      "type": "boolean",
+      "type": "string",
       "options": {
         "grid_columns": 12,
-        "format": "select2",
         "inputAttributes": {
           "class": "text-primary form-control"
         },
         "infoText": "The general type or category of the feed (group)."
-      }
+      },
+      "enum": [
+        "Aminoacids",
+        "Forage",
+        "Conc",
+        "Milk",
+        "Mineral",
+        "Vitamins",
+        "Starter"
+      ],
+      "format": "select2"
     },
     "units": {
       "title": "units",
-      "type": "boolean",
+      "type": "string",
       "options": {
         "grid_columns": 12,
-        "format": "select2",
         "inputAttributes": {
           "class": "text-primary form-control"
         },
         "infoText": "The unit of measurement used for the feed."
-      }
+      },
+      "enum": [
+        "kg"
+      ],
+      "format": "select2"
     }
   }
 }

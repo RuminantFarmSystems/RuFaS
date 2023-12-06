@@ -113,16 +113,20 @@
         },
         "breed": {
           "title": "breed",
-          "type": "boolean",
+          "type": "string",
           "options": {
             "grid_columns": 12,
-            "format": "select2",
             "inputAttributes": {
               "class": "text-primary form-control"
             },
             "infoText": "Breed (select one Holstein/Jersey) -- The predominant breed of the herd (Holstein or Jersey)"
           },
-          "default": "HO"
+          "default": "HO",
+          "enum": [
+            "HO",
+            "JE"
+          ],
+          "format": "select2"
         }
       },
       "options": {
@@ -154,42 +158,56 @@
             },
             "heifer_repro_method": {
               "title": "heifer_repro_method",
-              "type": "boolean",
+              "type": "string",
               "options": {
                 "grid_columns": 12,
-                "format": "select2",
                 "inputAttributes": {
                   "class": "text-primary form-control"
                 },
                 "infoText": "Heifer Reproductive Program (select one) -- TAI - Timed Artificial Insemination; ED - Estrus Detection; Synch-ED - Combination of ED and TAI"
               },
-              "default": "TAI"
+              "default": "TAI",
+              "enum": [
+                "TAI",
+                "ED",
+                "Synch-ED"
+              ],
+              "format": "select2"
             },
             "cow_repro_method": {
               "title": "cow_repro_method",
-              "type": "boolean",
+              "type": "string",
               "options": {
                 "grid_columns": 12,
-                "format": "select2",
                 "inputAttributes": {
                   "class": "text-primary form-control"
                 },
                 "infoText": "Cow Reproductive Program (select one) -- TAI - Timed Artificial Insemination; ED - Estrus Detection; ED-TAI -Combination of ED and TAI"
               },
-              "default": "TAI"
+              "default": "TAI",
+              "enum": [
+                "TAI",
+                "ED",
+                "ED-TAI"
+              ],
+              "format": "select2"
             },
             "semen_type": {
               "title": "semen_type",
-              "type": "boolean",
+              "type": "string",
               "options": {
                 "grid_columns": 12,
-                "format": "select2",
                 "inputAttributes": {
                   "class": "text-primary form-control"
                 },
                 "infoText": "The semen type that makes up a majority of the farm's breedings"
               },
-              "default": "conventional"
+              "default": "conventional",
+              "enum": [
+                "sexed",
+                "conventional"
+              ],
+              "format": "select2"
             },
             "days_in_preg_when_dry": {
               "title": "days_in_preg_when_dry",
@@ -341,16 +359,20 @@
                 },
                 "milk_type": {
                   "title": "milk_type",
-                  "type": "boolean",
+                  "type": "string",
                   "options": {
                     "grid_columns": 12,
-                    "format": "select2",
                     "inputAttributes": {
                       "class": "text-primary form-control"
                     },
                     "infoText": "Milk Type (select one) -- The type of milk that is used to feed calves (Whole or Replacer)"
                   },
-                  "default": "whole"
+                  "default": "whole",
+                  "enum": [
+                    "whole",
+                    "replacer"
+                  ],
+                  "format": "select2"
                 }
               },
               "options": {
@@ -490,16 +512,20 @@
                     },
                     "heifer_TAI_protocol": {
                       "title": "heifer_TAI_protocol",
-                      "type": "boolean",
+                      "type": "string",
                       "options": {
                         "grid_columns": 12,
-                        "format": "select2",
                         "inputAttributes": {
                           "class": "text-primary form-control"
                         },
                         "infoText": "Heifer TAI (Timed Artificial Insemination) Protocol (select one) -- The breeding protocol for heifers (md5CG2P or md5CGP)"
                       },
-                      "default": "md5CG2P"
+                      "default": "md5CG2P",
+                      "enum": [
+                        "md5CG2P",
+                        "md5CGP"
+                      ],
+                      "format": "select2"
                     },
                     "md5CG2P_conception_rate": {
                       "title": "md5CG2P_conception_rate",
@@ -531,16 +557,20 @@
                     },
                     "heifer_synchED_protocol": {
                       "title": "heifer_synchED_protocol",
-                      "type": "boolean",
+                      "type": "string",
                       "options": {
                         "grid_columns": 12,
-                        "format": "select2",
                         "inputAttributes": {
                           "class": "text-primary form-control"
                         },
                         "infoText": "Heifer SynchED Protocol (select one) -- 2P: two injections of PGF (prostaglandin), watch for estrus after each injection with insemination upon heat detection; CP: 7 days CIDR implements, inject PGF upon removal, insemination upon heat detection"
                       },
-                      "default": "2P"
+                      "default": "2P",
+                      "enum": [
+                        "2P",
+                        "CP"
+                      ],
+                      "format": "select2"
                     },
                     "estrus_detection_rate_h_synch": {
                       "title": "estrus_detection_rate_h_synch",
@@ -610,29 +640,40 @@
                     },
                     "cow_presynch_protocol": {
                       "title": "cow_presynch_protocol",
-                      "type": "boolean",
+                      "type": "string",
                       "options": {
                         "grid_columns": 12,
-                        "format": "select2",
                         "inputAttributes": {
                           "class": "text-primary form-control"
                         },
                         "infoText": "Cow Presynch Protocol -- The preSynch protocol (1st breeding) for cow in TAI (Timed Artificial Insemination) program"
                       },
-                      "default": "Double OvSynch"
+                      "default": "Double OvSynch",
+                      "enum": [
+                        "Double OvSynch",
+                        "Presynch",
+                        "G6G"
+                      ],
+                      "format": "select2"
                     },
                     "cow_TAI_protocol": {
                       "title": "cow_TAI_protocol",
-                      "type": "boolean",
+                      "type": "string",
                       "options": {
                         "grid_columns": 12,
-                        "format": "select2",
                         "inputAttributes": {
                           "class": "text-primary form-control"
                         },
                         "infoText": "Cow TAI (Timed Artificial Insemination) Protocol -- The timed AI protocol for cows in the TAI (Timed Artificial Insemination) program"
                       },
-                      "default": "OvSynch 56"
+                      "default": "OvSynch 56",
+                      "enum": [
+                        "OvSynch 56",
+                        "OvSynch 48",
+                        "CoSynch 72",
+                        "5d CoSynch"
+                      ],
+                      "format": "select2"
                     },
                     "ovsynch56_conception_rate": {
                       "title": "ovsynch56_conception_rate",
@@ -692,16 +733,21 @@
                     },
                     "cow_resynch_protocol": {
                       "title": "cow_resynch_protocol",
-                      "type": "boolean",
+                      "type": "string",
                       "options": {
                         "grid_columns": 12,
-                        "format": "select2",
                         "inputAttributes": {
                           "class": "text-primary form-control"
                         },
                         "infoText": "Cow Resynch Protocol -- Resynch protocol for cow before/at/after pregnancy check day in the TAI (Timed Artificial Insemination) program"
                       },
-                      "default": "TAIafterPD"
+                      "default": "TAIafterPD",
+                      "enum": [
+                        "TAIafterPD",
+                        "TAIbeforePD",
+                        "PGFatPD"
+                      ],
+                      "format": "select2"
                     },
                     "tai_program_start_day": {
                       "title": "tai_program_start_day",
@@ -1527,16 +1573,23 @@
       "properties": {
         "methane_mitigation_method": {
           "title": "methane_mitigation_method",
-          "type": "boolean",
+          "type": "string",
           "options": {
             "grid_columns": 12,
-            "format": "select2",
             "inputAttributes": {
               "class": "text-primary form-control"
             },
             "infoText": "Methane Mitigation Method -- The type of enteric methane mitigation supplement that is fed to the lactating dairy cattle"
           },
-          "default": "None"
+          "default": "None",
+          "enum": [
+            "None",
+            "3-NOP",
+            "monensin",
+            "essential_oils",
+            "seaweed"
+          ],
+          "format": "select2"
         },
         "methane_mitigation_additive_amount": {
           "title": "methane_mitigation_additive_amount",
@@ -1612,16 +1665,21 @@
     },
     "housing": {
       "title": "housing",
-      "type": "boolean",
+      "type": "string",
       "options": {
         "grid_columns": 12,
-        "format": "select2",
         "inputAttributes": {
           "class": "text-primary form-control"
         },
         "infoText": "Housing -- The type of housing management for the herd."
       },
-      "default": "barn"
+      "default": "barn",
+      "enum": [
+        "barn",
+        "3-pasture",
+        "drylot"
+      ],
+      "format": "select2"
     },
     "pasture_concentrate": {
       "title": "pasture_concentrate",
@@ -1638,16 +1696,21 @@
     },
     "methane_model": {
       "title": "methane_model",
-      "type": "boolean",
+      "type": "string",
       "options": {
         "grid_columns": 12,
-        "format": "select2",
         "inputAttributes": {
           "class": "text-primary form-control"
         },
         "infoText": "Methane Model -- The method used to estimate enteric methane emissions."
       },
-      "default": "IPCC"
+      "default": "IPCC",
+      "enum": [
+        "Mills",
+        "3-Mutian",
+        "IPCC"
+      ],
+      "format": "select2"
     },
     "ration": {
       "title": "ration",
@@ -1713,10 +1776,9 @@
           },
           "pen_name": {
             "title": "pen_name",
-            "type": "boolean",
+            "type": "string",
             "options": {
               "grid_columns": 12,
-              "format": "select2",
               "inputAttributes": {
                 "class": "text-primary form-control"
               },
@@ -1725,15 +1787,21 @@
           },
           "animal_combination": {
             "title": "animal_combination",
-            "type": "boolean",
+            "type": "string",
             "options": {
               "grid_columns": 12,
-              "format": "select2",
               "inputAttributes": {
                 "class": "text-primary form-control"
               },
               "infoText": "Animal Combination -- The valid combinations of animal types that can be in a pen."
-            }
+            },
+            "enum": [
+              "CALF",
+              "GROWING",
+              "CLOSE_UP",
+              "LAC_COW"
+            ],
+            "format": "select2"
           },
           "vertical_dist_to_milking_parlor": {
             "title": "vertical_dist_to_milking_parlor",
@@ -1776,29 +1844,37 @@
           },
           "housing_type": {
             "title": "housing_type",
-            "type": "boolean",
+            "type": "string",
             "options": {
               "grid_columns": 12,
-              "format": "select2",
               "inputAttributes": {
                 "class": "text-primary form-control"
               },
               "infoText": "Housing Type -- The type of barn the pen is in."
             },
-            "default": "open air barn"
+            "default": "open air barn",
+            "enum": [
+              "open air barn"
+            ],
+            "format": "select2"
           },
           "pen_type": {
             "title": "pen_type",
-            "type": "boolean",
+            "type": "string",
             "options": {
               "grid_columns": 12,
-              "format": "select2",
               "inputAttributes": {
                 "class": "text-primary form-control"
               },
               "infoText": "Pen Type -- The type of stalls the pen has."
             },
-            "default": "freestall"
+            "default": "freestall",
+            "enum": [
+              "freestall",
+              "tilestall",
+              "drylot"
+            ],
+            "format": "select2"
           },
           "max_stocking_density": {
             "title": "max_stocking_density",

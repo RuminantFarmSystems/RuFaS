@@ -20,15 +20,31 @@
         "properties": {
           "crop_species": {
             "title": "crop_species",
-            "type": "boolean",
+            "type": "string",
             "options": {
               "grid_columns": 12,
-              "format": "select2",
               "inputAttributes": {
                 "class": "text-primary form-control"
               },
               "infoText": "Name of the crop being grown."
-            }
+            },
+            "enum": [
+              "generic",
+              "corn",
+              "silage_corn",
+              "spring_wheat",
+              "winter_wheat",
+              "cereal_rye",
+              "spring_barley",
+              "fall_oats",
+              "tall_fescue",
+              "alfalfa",
+              "soybean",
+              "sugar_beet",
+              "potato",
+              "triticale"
+            ],
+            "format": "select2"
           },
           "harvest_days": {
             "title": "harvest_days",
@@ -92,29 +108,37 @@
             ],
             "items": {
               "title": "harvest_operations_element",
-              "type": "boolean",
+              "type": "string",
               "options": {
                 "grid_columns": 12,
-                "format": "select2",
                 "inputAttributes": {
                   "class": "text-primary form-control"
                 }
               },
-              "default": "default"
+              "default": "default",
+              "enum": [
+                "default",
+                "no_kill"
+              ],
+              "format": "select2"
             }
           },
           "harvest_type": {
             "title": "harvest_type",
-            "type": "boolean",
+            "type": "string",
             "options": {
               "grid_columns": 12,
-              "format": "select2",
               "inputAttributes": {
                 "class": "text-primary form-control"
               },
               "infoText": "Whether the crop uses scheduled harvests or optimal harvests"
             },
-            "default": "scheduled"
+            "default": "scheduled",
+            "enum": [
+              "scheduled",
+              "optimal"
+            ],
+            "format": "select2"
           },
           "planting_days": {
             "title": "planting_days",

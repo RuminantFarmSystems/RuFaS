@@ -17,10 +17,9 @@
     },
     "Name": {
       "title": "Name",
-      "type": "boolean",
+      "type": "string",
       "options": {
         "grid_columns": 12,
-        "format": "select2",
         "inputAttributes": {
           "class": "text-primary form-control"
         },
@@ -29,27 +28,48 @@
     },
     "Fd_Category": {
       "title": "Fd_Category",
-      "type": "boolean",
+      "type": "string",
       "options": {
         "grid_columns": 12,
-        "format": "select2",
         "inputAttributes": {
           "class": "text-primary form-control"
         },
         "infoText": "Feed Category."
-      }
+      },
+      "enum": [
+        "Animal Protein",
+        "By-Product/Other",
+        "Calf Liquid Feed",
+        "Energy Source",
+        "Fat Supplement",
+        "Fatty Acid Supplement",
+        "Grain Crop Forage",
+        "Grass/Legume Forage",
+        "Pasture",
+        "Plant Protein",
+        "Vitamin/Mineral"
+      ],
+      "format": "select2"
     },
     "feed_type": {
       "title": "feed_type",
-      "type": "boolean",
+      "type": "string",
       "options": {
         "grid_columns": 12,
-        "format": "select2",
         "inputAttributes": {
           "class": "text-primary form-control"
         },
         "infoText": "The general type or category of the feed."
-      }
+      },
+      "enum": [
+        "Aminoacids",
+        "Forage",
+        "Conc",
+        "Milk",
+        "Mineral",
+        "Vitamins"
+      ],
+      "format": "select2"
     },
     "DM": {
       "title": "DM",
@@ -971,10 +991,9 @@
     },
     "units": {
       "title": "units",
-      "type": "boolean",
+      "type": "string",
       "options": {
         "grid_columns": 12,
-        "format": "select2",
         "inputAttributes": {
           "class": "text-primary form-control"
         },

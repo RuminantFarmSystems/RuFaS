@@ -32,51 +32,82 @@
           },
           "bedding_type": {
             "title": "bedding_type",
-            "type": "boolean",
+            "type": "string",
             "options": {
               "grid_columns": 12,
-              "format": "select2",
               "inputAttributes": {
                 "class": "text-primary form-control"
               },
               "infoText": "Bedding Type -- The material used for bedding pack."
-            }
+            },
+            "enum": [
+              "Sand",
+              "Straw",
+              "Sawdust",
+              "Manure_solids",
+              "Other"
+            ],
+            "format": "select2"
           },
           "manure_handler": {
             "title": "manure_handler",
-            "type": "boolean",
+            "type": "string",
             "options": {
               "grid_columns": 12,
-              "format": "select2",
               "inputAttributes": {
                 "class": "text-primary form-control"
               },
               "infoText": "Manure Handling Method -- Method for cleaning barn alleyways."
-            }
+            },
+            "enum": [
+              "flush system",
+              "alley scraper",
+              "manual scraping",
+              "tillage",
+              "manual skid steer scraping",
+              "harrowing"
+            ],
+            "format": "select2"
           },
           "manure_separator": {
             "title": "manure_separator",
-            "type": "boolean",
+            "type": "string",
             "options": {
               "grid_columns": 12,
-              "format": "select2",
               "inputAttributes": {
                 "class": "text-primary form-control"
               },
               "infoText": "Manure Separator Type -- The type of solid-liquid separator equipment to separate coarse fibrous solids/sand"
-            }
+            },
+            "enum": [
+              "screw press",
+              "sand lane",
+              "rotary screen",
+              "none",
+              "other"
+            ],
+            "format": "select2"
           },
           "manure_treatment_methods": {
             "title": "manure_treatment_methods",
-            "type": "boolean",
+            "type": "string",
             "options": {
               "grid_columns": 12,
-              "format": "select2",
               "inputAttributes": {
                 "class": "text-primary form-control"
               },
               "infoText": "Manure Treatment Methods -- Select the Manure Treatment Methods."
-            }
+            },
+            "enum": [
+              "slurry storage underfloor",
+              "slurry storage outdoor",
+              "open lots",
+              "compost bedded pack barn",
+              "anaerobic lagoon",
+              "anaerobic digestion",
+              "other"
+            ],
+            "format": "select2"
           }
         }
       }
@@ -97,15 +128,22 @@
         "properties": {
           "bedding_type": {
             "title": "bedding_type",
-            "type": "boolean",
+            "type": "string",
             "options": {
               "grid_columns": 12,
-              "format": "select2",
               "inputAttributes": {
                 "class": "text-primary form-control"
               },
               "infoText": "Bedding Type -- The material used for bedding pack."
-            }
+            },
+            "enum": [
+              "Sand",
+              "Straw",
+              "Sawdust",
+              "Manure_solids",
+              "Other"
+            ],
+            "format": "select2"
           },
           "bedding_mass_per_day": {
             "title": "bedding_mass_per_day",
@@ -196,15 +234,22 @@
         "properties": {
           "manure_handler_type": {
             "title": "manure_handler_type",
-            "type": "boolean",
+            "type": "string",
             "options": {
               "grid_columns": 12,
-              "format": "select2",
               "inputAttributes": {
                 "class": "text-primary form-control"
               },
               "infoText": "Manure Handling Method -- Method for cleaning barn alleyways."
-            }
+            },
+            "enum": [
+              "flush system",
+              "alley scraper",
+              "manual scraping",
+              "tillage",
+              "manual skid steer scraping"
+            ],
+            "format": "select2"
           },
           "cleaning_water_use_rate": {
             "title": "cleaning_water_use_rate",
@@ -255,15 +300,22 @@
         "properties": {
           "manure_separator_type": {
             "title": "manure_separator_type",
-            "type": "boolean",
+            "type": "string",
             "options": {
               "grid_columns": 12,
-              "format": "select2",
               "inputAttributes": {
                 "class": "text-primary form-control"
               },
               "infoText": "Manure Separator Type -- The type of solid-liquid separator equipment to separate coarse fibrous solids/sand"
-            }
+            },
+            "enum": [
+              "screw press",
+              "sand lane",
+              "rotary screen",
+              "none",
+              "other"
+            ],
+            "format": "select2"
           },
           "percent_dry_solids": {
             "title": "percent_dry_solids",
@@ -354,15 +406,24 @@
         "properties": {
           "manure_treatment_type": {
             "title": "manure_treatment_type",
-            "type": "boolean",
+            "type": "string",
             "options": {
               "grid_columns": 12,
-              "format": "select2",
               "inputAttributes": {
                 "class": "text-primary form-control"
               },
               "infoText": "Manure Treatment Methods -- Select the Manure Treatment Methods."
-            }
+            },
+            "enum": [
+              "slurry storage underfloor",
+              "slurry storage outdoor",
+              "open lots",
+              "compost bedded pack barn",
+              "anaerobic lagoon",
+              "anaerobic digestion",
+              "other"
+            ],
+            "format": "select2"
           },
           "total_solids_removal_efficiency_for_treatment": {
             "title": "total_solids_removal_efficiency_for_treatment",

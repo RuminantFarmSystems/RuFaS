@@ -179,42 +179,69 @@
         "properties": {
           "storage_type": {
             "title": "storage_type",
-            "type": "boolean",
+            "type": "string",
             "options": {
               "grid_columns": 12,
-              "format": "select2",
               "inputAttributes": {
                 "class": "text-primary form-control"
               },
               "infoText": "Storage Type -- The type of storage unit used. This only applies to farm grown forage feeds"
             },
-            "default": "Bunker Silo"
+            "default": "Bunker Silo",
+            "enum": [
+              "8' Diameter Bag",
+              "10' Diameter Bag",
+              "12' Diameter Bag",
+              "14' Diameter Bag",
+              "Upright Silo - Traditional",
+              "Upright Silo - Oxygen-Excluding",
+              "Bunker Silo",
+              "Pile",
+              "Wrapped Bale",
+              "Bale - Covered",
+              "Bale - Uncovered",
+              "Bin"
+            ],
+            "format": "select2"
           },
           "moisture": {
             "title": "moisture",
-            "type": "boolean",
+            "type": "string",
             "options": {
               "grid_columns": 12,
-              "format": "select2",
               "inputAttributes": {
                 "class": "text-primary form-control"
               },
               "infoText": "Moisture -- The management practices used that determine the dry matter content of the preserved feed."
             },
-            "default": "Wilted"
+            "default": "Wilted",
+            "enum": [
+              "Direct Cut",
+              "Wilted",
+              "Baleage",
+              "Haylage",
+              "Moist Hay",
+              "Dry Hay"
+            ],
+            "format": "select2"
           },
           "additive": {
             "title": "additive",
-            "type": "boolean",
+            "type": "string",
             "options": {
               "grid_columns": 12,
-              "format": "select2",
               "inputAttributes": {
                 "class": "text-primary form-control"
               },
               "infoText": "Additive -- Type of additive added to the forage material before ensiling."
             },
-            "default": "preservative"
+            "default": "preservative",
+            "enum": [
+              "preservative",
+              "nutrient additive",
+              "absorbant"
+            ],
+            "format": "select2"
           },
           "package_density": {
             "title": "package_density",
@@ -232,16 +259,21 @@
           },
           "inoculation": {
             "title": "inoculation",
-            "type": "boolean",
+            "type": "string",
             "options": {
               "grid_columns": 12,
-              "format": "select2",
               "inputAttributes": {
                 "class": "text-primary form-control"
               },
               "infoText": "Inoculation"
             },
-            "default": "None"
+            "default": "None",
+            "enum": [
+              "None",
+              "heterofermentative",
+              "homofermentative"
+            ],
+            "format": "select2"
           },
           "ventilation": {
             "title": "ventilation",

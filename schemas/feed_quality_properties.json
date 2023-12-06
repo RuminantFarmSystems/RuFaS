@@ -29,27 +29,36 @@
     },
     "status": {
       "title": "status",
-      "type": "boolean",
+      "type": "string",
       "options": {
         "grid_columns": 12,
-        "format": "select2",
         "inputAttributes": {
           "class": "text-primary form-control"
         },
         "infoText": "Status"
-      }
+      },
+      "enum": [
+        "immature",
+        "mid-maturity",
+        "mature"
+      ],
+      "format": "select2"
     },
     "differentiating_nutrient": {
       "title": "differentiating_nutrient",
-      "type": "boolean",
+      "type": "string",
       "options": {
         "grid_columns": 12,
-        "format": "select2",
         "inputAttributes": {
           "class": "text-primary form-control"
         },
         "infoText": "Differentiating Nutrient"
-      }
+      },
+      "enum": [
+        "DM",
+        "NDF"
+      ],
+      "format": "select2"
     },
     "low_percent": {
       "title": "low_percent",

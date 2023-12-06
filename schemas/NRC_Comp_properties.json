@@ -17,15 +17,25 @@
     },
     "feed_type": {
       "title": "feed_type",
-      "type": "boolean",
+      "type": "string",
       "options": {
         "grid_columns": 12,
-        "format": "select2",
         "inputAttributes": {
           "class": "text-primary form-control"
         },
         "infoText": "The general type or category of the feed."
-      }
+      },
+      "enum": [
+        "Aminoacids",
+        "Forage",
+        "Conc",
+        "Milk",
+        "Mineral",
+        "Vitamins",
+        "Starter",
+        "No"
+      ],
+      "format": "select2"
     },
     "DM": {
       "title": "DM",
@@ -403,10 +413,9 @@
     },
     "units": {
       "title": "units",
-      "type": "boolean",
+      "type": "string",
       "options": {
         "grid_columns": 12,
-        "format": "select2",
         "inputAttributes": {
           "class": "text-primary form-control"
         },

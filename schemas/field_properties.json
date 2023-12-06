@@ -5,10 +5,9 @@
   "properties": {
     "soil_specification": {
       "title": "soil_specification",
-      "type": "boolean",
+      "type": "string",
       "options": {
         "grid_columns": 12,
-        "format": "select2",
         "inputAttributes": {
           "class": "text-primary form-control"
         },
@@ -17,10 +16,9 @@
     },
     "crop_specification": {
       "title": "crop_specification",
-      "type": "boolean",
+      "type": "string",
       "options": {
         "grid_columns": 12,
-        "format": "select2",
         "inputAttributes": {
           "class": "text-primary form-control"
         },
@@ -29,10 +27,9 @@
     },
     "fertilizer_management_specification": {
       "title": "fertilizer_management_specification",
-      "type": "boolean",
+      "type": "string",
       "options": {
         "grid_columns": 12,
-        "format": "select2",
         "inputAttributes": {
           "class": "text-primary form-control"
         },
@@ -41,10 +38,9 @@
     },
     "manure_management_specification": {
       "title": "manure_management_specification",
-      "type": "boolean",
+      "type": "string",
       "options": {
         "grid_columns": 12,
-        "format": "select2",
         "inputAttributes": {
           "class": "text-primary form-control"
         },
@@ -53,10 +49,9 @@
     },
     "tillage_management_specification": {
       "title": "tillage_management_specification",
-      "type": "boolean",
+      "type": "string",
       "options": {
         "grid_columns": 12,
-        "format": "select2",
         "inputAttributes": {
           "class": "text-primary form-control"
         },
