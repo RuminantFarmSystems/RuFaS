@@ -17,3 +17,17 @@ class Hay(Storage):
     calculate_protein_loss():
         Calculates the protein loss in the hay.
     """
+
+    @property
+    def bale_density(self) -> float:
+        """
+        Calculate and return the density of the hay bale.
+
+        Returns
+        -------
+        float
+            The density of the hay bale.
+        """
+        pass
+
+  
