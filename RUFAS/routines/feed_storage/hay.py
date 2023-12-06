@@ -41,3 +41,14 @@ class Hay(Storage):
             The diameter of the hay bale in meters.
         """
         pass
+
+    def calculate_protein_loss(self):
+        """
+        Calculates the protein loss in the hay.
+
+        Returns
+        -------
+        None
+        """
+        pass
+
