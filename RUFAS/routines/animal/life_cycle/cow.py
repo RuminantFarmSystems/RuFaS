@@ -1,21 +1,3 @@
-"""
-RUFAS: Ruminant Farm Systems Model
-File name: cow.py
-Author(s): Manfei Li, mli497@wisc.edu
-        Militsa Sotirova, militsasotirova@gmail.com
-Description: This file updates the cow form first calving to leaving the herd.
-            Temp: Dry matter intake is calculated by body weight and FCM
-            production. Reproduction program could be chosen from the ED, TAI,
-            ED-TAI projects, reference:
-            http://www.dcrcouncil.org/wp-content/uploads/2019/04/Dairy-Cow-Protocol-Sheet-Updated-2018.pdf
-            Preg check follows AI for three times.
-            Daily milk production is based on breed and parity specific
-            lactation curve model (Wood's and Milkbot) parameters.
-            Health culling including 4 components: #TODO death, repro, production, and health,
-                health culling for 6 reasons: Lameness, Injury, Mastitis,
-                Disease, Udder, and Unknown
-"""
-
 import math
 import numpy as np
 from scipy.stats import truncnorm

@@ -1,4 +1,3 @@
-
 """This module defines the various Event classes and helper functions
 
 Events are simple classes that will facilitate scheduling of different management operations. At their core, they

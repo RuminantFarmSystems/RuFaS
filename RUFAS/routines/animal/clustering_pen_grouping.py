@@ -1,18 +1,3 @@
-################################################################################
-"""
-RUFAS: Ruminant Farm Systems Model
-File name: clustering_pen_grouping.py
-Description: This file's main function is grouping(list, pens) (line 44) which
-    returns a Dictionary of lists of cows, with the key being the pen those cows
-    are assigned to based on nutritional requirements. This function is called
-    in animal_manager.py for each ration cycle if there are more than 7 pens
-    in the input (>=2 pens for lactating cows). Based on algorithm developed by
-    Jorge Barrientos (jab924@cornell.edu).
-Author(s): Chris VanKerkhove, cjv47@cornell.edu
-"""
-import math
-
-################################################################################
 import pandas as pd
 import numpy as np
 import math
@@ -35,7 +20,7 @@ def norm(x):
         return x
 
 
-def percentile_list(l):
+def percentile_list(original_list):
     """
         Helper function that returns a list of percentiles corresponding
         to its matching value in the original list.
@@ -44,9 +29,9 @@ def percentile_list(l):
             l: a list of values
     """
     perc_list = []
-    for e in l:
-        x = percentileofscore(l, e)
-        perc_list.append(x / 100)
+    for value in original_list:
+        percentile = percentileofscore(original_list, value)
+        perc_list.append(percentile / 100)
     return perc_list
 
 
