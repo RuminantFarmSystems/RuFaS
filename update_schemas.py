@@ -5,7 +5,7 @@ import re
 
 from RUFAS.util import Utility
 
-DEFAULT_PROPERTIES_PATH = 'inputs/metadata/default_metadata.json'
+PROPERTIES_PATH = 'inputs/metadata/default_metadata.json'
 
 
 class SchemaSetupMethods:
@@ -79,12 +79,16 @@ class SchemaSetupMethods:
 
         if default is not None:
             schema["default"] = default
-        if pattern is not None:
-            enum = SchemaSetupMethods._get_list_of_options(pattern)
-            schema["enum"] = enum
-            schema["format"] = "select2"
         if description is not None:
             schema["options"]["infoText"] = description
+        if pattern is not None:
+            try:
+                enum = SchemaSetupMethods._get_list_of_options(pattern)
+            except ValueError as e:
+                print(e)
+                return schema
+            schema["enum"] = enum
+            schema["format"] = "select2"
 
         return schema
 
@@ -93,7 +97,7 @@ class SchemaSetupMethods:
         pattern = "\\^\\(.*\\)\\$"
         is_valid_pattern = bool(re.match(pattern, string))
         if not is_valid_pattern:
-            raise ValueError(f"'{string}' is not a valid pattern. Cannot create schema")
+            raise ValueError(f"'{string}' is not a valid pattern. Cannot create list of valid options.")
 
         unsplit_list = string[2:-2]
         split_list = unsplit_list.split("|")
