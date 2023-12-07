@@ -889,21 +889,25 @@ class OutputManager(object):
                     graph_generator = GraphGenerator(self.__metadata_prefix)
                     prepared_data, log_pool = graph_generator.prepare_plot_data(filtered_pool,
                                                                                 filter_content.get("variables"))
+                    error_count = 0
                     for log in log_pool:
-                        print(log)
-                        # if log["name"] == 
-                        #     if log_key == "log_name":
-                        #         self.add_log(log_pool["log_name"][index], log_value[index], log_pool["info_map"])
-                        #     elif log_key == "error_name":
-                        #         self.add_error(log_pool["error_name"][index], log_value[index], log_pool["info_map"])
-                        #     else:
-                        #         self.add_warning(log_pool["warning_name"][index], log_value[index], log_pool["info_map"])
-                    graph_generator.generate_graph(
-                        prepared_data,
-                        filter_content,
-                        filter_file,
-                        graphics_dir,
-                    )
+                        if "error" in log:
+                            self.add_error(log["error"], log["message"], log["info_map"])
+                            error_count += 1
+                        elif "log" in log:
+                            self.add_log(log["log"], log["message"], log["info_map"])
+                        elif "warning" in log:
+                            self.add_warning(log["warning"], log["message"], log["info_map"])
+                    if error_count > 0:
+                        self.add_error("Unable to graph data set",
+                                       "See log for errors raised in preparing data for graphing.", info_map)
+                    else:
+                        graph_generator.generate_graph(
+                            prepared_data,
+                            filter_content,
+                            filter_file,
+                            graphics_dir,
+                        )
                 except Exception as e:
                     self.add_error("graph generation exception", str(e), info_map)
             else:

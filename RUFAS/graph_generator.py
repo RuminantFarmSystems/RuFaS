@@ -154,7 +154,7 @@ class GraphGenerator:
 
     def prepare_plot_data(self, filtered_pool: Dict[str, Dict[str, List[Any]]],
                           selected_variables: Optional[List[str]] = None
-                          ) -> Tuple[Dict[str, List[int | float]], Dict[str, List[str]]]:
+                          ) -> Tuple[Dict[str, List[int | float]], List[Dict[str, str | Dict[str, str]]]]:
         """Extracts the values from the filtered_pool data and converts them a dictionary
         that graph_generator can more readily handle.
 
@@ -168,9 +168,9 @@ class GraphGenerator:
 
         Returns
         -------
-        tuple(Dict[str, List[int | float]], Dict[str, List[str]])
+        Tuple[Dict[str, List[int | float]], List[Dict[str, str | Dict[str, str]]]]
             A tuple containing the formatted data that can more readily be plotted by
-            graph_generator and the logs to be reported to OutputManager.
+            graph_generator and the logs, warnings, and errors to be reported to OutputManager.
         """
         info_map = {
             "class": self.__class__.__name__,
@@ -183,36 +183,36 @@ class GraphGenerator:
             is_data_in_dict = isinstance(values[0], dict)
             if is_data_in_dict:
                 if not selected_variables:
-                    error = {}
-                    error["error"] = f"Can't plot data set for {filtered_pool[key]}."
-                    error["message"] = f"No selected variables for {filtered_pool[key]}. "
-                    error["info_map"] = info_map
+                    error = {"error": "Can't plot data set", "message": f"No selected variables for {key}.",
+                             "info_map": info_map}
                     log_pool.append(error)
-                    # yield prepared_pool, log_pool
+                    break
                 else:
                     data_dict = Utility.convert_list_of_dicts_to_dict_of_lists(values)
                     for selected_variable in selected_variables:
                         if selected_variable in data_dict:
                             prepared_pool.setdefault(selected_variable, []).extend(data_dict[selected_variable])
-                            log = {}
-                            log["log"] = "Successfully added data to prepared_pool for graphing."
-                            log["message"] = f"Data for {data_dict[selected_variable]} added to prepared_pool."
-                            log["info_map"] = info_map
+                            log = {"log": "Successfully added data to prepared_pool",
+                                   "message": f"Data for {selected_variable} added to prepared_pool.",
+                                   "info_map": info_map}
                             log_pool.append(log)
+                        else:
+                            warning = {"warning": f"{selected_variable} not a valid key in provided data",
+                                       "message": f"{selected_variable} won't be graphed.",
+                                       "info_map": info_map}
+                            log_pool.append(warning)
             else:
                 if selected_variables:
                     prepared_pool[selected_variables[index]] = values
-                    log = {}
-                    log["log"] = "Successfully added data to prepared_pool for graphing."
-                    log["message"] = f"Data for {selected_variables[index]} added to prepared_pool."
-                    log["info_map"] = info_map
+                    log = {"log": "Successfully added data to prepared_pool",
+                                  "message": f"Data for {selected_variables[index]} added.",
+                                  "info_map": info_map}
                     log_pool.append(log)
                 else:
                     prepared_pool[key] = values
-                    log = {}
-                    log["log"] = "Successfully added data to prepared_pool for graphing."
-                    log["message"] = f"Data for {key} added to prepared_pool."
-                    log["info_map"] = info_map
+                    log = {"log": "Successfully added data to prepared_pool",
+                                  "message": f"Data for {key} added.",
+                                  "info_map": info_map}
                     log_pool.append(log)
 
         return prepared_pool, log_pool
