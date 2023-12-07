@@ -1,19 +1,3 @@
-"""
-RUFAS: Ruminant Farm Systems Model
-File name: animal_manager.py
-
-Description: The class which manages all of the animal routines and keeps track of
-    all animals and pens. All operations are as described in the Animal Module
-    Information Flow document on Basecamp (such as daily animal updates and
-    pen allocation). Method calls cascade through from the animal manager
-    class to pen to each individual animal in that pen. The life cycle of each animal
-    is controlled by an instance of the LifeCycleManager class, and this instance
-    updates the animals daily.
-
-Author(s): Militsa Sotirova, militsasotirova@gmail.com
-           Chris VanKerkhove, cjv47@cornell.edu
-           Joseph Merhi, jm2257@cornell.edu
-"""
 import collections
 import math
 from statistics import mean
@@ -189,7 +173,7 @@ class AnimalManager:
         self.methane_mitigation_method = data["methane_mitigation"]["methane_mitigation_method"]
         self.methane_mitigation_additive_amount = data["methane_mitigation"]["methane_mitigation_additive_amount"]
 
-        self.init_pens(data["pen_information"], data["manure_management_scenarios"])
+        self.init_pens(data['pen_information'], data['manure_management_scenarios'])
 
         if self.simulate_animals:
             self.init_animals(config, data["herd_information"])
@@ -1256,10 +1240,10 @@ class AnimalManager:
                 ration_per_animal = {}
                 ration_vals = {}
 
-                while "status" not in ration_per_animal or ration_per_animal["status"].lower() != "optimal":
+                while 'status' not in ration_per_animal or ration_per_animal['status'].lower() != 'optimal':
                     if pen.animal_combination == Pen.AnimalCombination.CALF:
                         ration_per_animal = CalfRationManager.optimize()
-                        ration_vals = {"ME_total": 0}
+                        ration_vals = {'ME_total': 0}
                     else:
                         ration_per_animal, ration_vals = RationManager.formulate_ration(
                             pen, pen_specific_feed_data, self.ANIMAL_GROUPING_SCENARIO
@@ -1324,7 +1308,7 @@ class AnimalManager:
         return animal_types_in_pen
 
     @classmethod
-    def _get_classes_in_pen(cls, pen: Pen) -> Set[str]:
+    def _determine_classes_in_pen(cls, pen: Pen) -> Set[str]:
         """
         Get the classes of animals in the pen.
 
@@ -1584,7 +1568,7 @@ class AnimalManager:
         self.animal_to_pen_id_map[animal.id] = pen_with_min_stocking_density.id
 
     def collect_manure_excretions_output_data(self, pen: Pen, feed: Feed, manure_excretions_output_data: Dict):
-        pen.classes_in_pen = self._get_classes_in_pen(pen)
+        pen.classes_in_pen = self._determine_classes_in_pen(pen)
         pen.calc_total_manure(
             feed,
             self.methane_model,
@@ -1651,6 +1635,21 @@ class AnimalManager:
                 pen.call_p_rqmts()
                 pen.daily_p_update()  # Average phosphorus concentration per pen
             AnimalReporter.report_animal_module_manure(manure_excretions_output_data)
+# =======
+#                 self.collect_manure_excretions_output_data(pen, feed, manure_excretions_output_data)
+#             self.calc_p_rqmts()
+#             self.daily_p_update()  # Average phosphorus concentration per pen
+#             for output_data_dict in manure_excretions_output_data.values():
+#                 for manure_property, manure_value in output_data_dict["manure"].items():
+#                     info_map = {
+#                         "class": self.__class__.__name__,
+#                         "function": self.daily_updates.__name__,
+#                     }
+#                     om.add_variable(
+#                         f'{output_data_dict["prefix"]}_{str(manure_property)}', manure_value, info_map=info_map
+#                     )
+
+# >>>>>>> main
             self._update_phosphorus_concentrations()  # Average phosphorus concentration per animal type
             self.record_pen_history()
 

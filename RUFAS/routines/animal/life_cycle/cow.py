@@ -1,21 +1,3 @@
-"""
-RUFAS: Ruminant Farm Systems Model
-File name: cow.py
-Author(s): Manfei Li, mli497@wisc.edu
-        Militsa Sotirova, militsasotirova@gmail.com
-Description: This file updates the cow form first calving to leaving the herd.
-            Temp: Dry matter intake is calculated by body weight and FCM
-            production. Reproduction program could be chosen from the ED, TAI,
-            ED-TAI projects, reference:
-            http://www.dcrcouncil.org/wp-content/uploads/2019/04/Dairy-Cow-Protocol-Sheet-Updated-2018.pdf
-            Preg check follows AI for three times.
-            Daily milk production is based on breed and parity specific
-            lactation curve model (Wood's and Milkbot) parameters.
-            Health culling including 4 components: #TODO death, repro, production, and health,
-                health culling for 6 reasons: Lameness, Injury, Mastitis,
-                Disease, Udder, and Unknown
-"""
-
 import math
 import numpy as np
 from scipy.stats import truncnorm
@@ -97,9 +79,9 @@ class Cow(HeiferIII):
         # current hard-coded values necessary for nutrient requirement
         # calculations
         self.BCS = 3.5  # body condition score
-        self.CP_milk = 3.2
-        self.lactose_milk = 4.85
-        self.mPrt = 3.5  # milk protein
+        self.CP_milk = AnimalModuleConstants.MILK_CRUDE_PROTEIN
+        self.lactose_milk = AnimalModuleConstants.MILK_LACTOSE
+        self.mPrt = AnimalModuleConstants.MILK_TRUE_PROTEIN
 
         self.DVD = 0  # daily vertical distance, km
         self.DHD = 0  # daily horizontal distance, km
@@ -113,6 +95,11 @@ class Cow(HeiferIII):
         self.milking = False
         self.days_in_milk = 0
         self.estimated_daily_milk_produced = 0
+        # Milk production as estimated from the lactation curve, kg/day.
+        self.milk_fat_kg = 0
+        # Milk fat content estimate, kg/day.
+        self.milk_protein_kg = 0
+        # Milk protein content estimate, kg/day.
         self.milk_production_reduction = 0.0
         self.latest_milk_production_305days = 0.0
         self.single_acc_milk_prod = 0
@@ -122,6 +109,7 @@ class Cow(HeiferIII):
         self.repro_program = args['repro_program']
         self.first_ai = False
         self.fat_percent = 0
+
         # TAI params
         self.presynch_method = args['presynch_method']
         self.tai_method_c = args['tai_method_c']
@@ -287,6 +275,24 @@ class Cow(HeiferIII):
             MilkProductionHistory(sim_day, self.days_in_milk, self.estimated_daily_milk_produced, self.days_born)
         )
 
+    def calculate_fat_percent(self, days_in_milk: int):
+        """
+        Calculates fat percent of milk.
+
+        Note that this equation produces 0.0 if days_in_milk is set to one,
+        so we've implemented a minimum days_in_milk value of 2.
+
+        Parameters
+        ----------
+        days_in_milk : int
+            Number of days in milk.
+        """
+        if days_in_milk == 1:
+            days_in_milk = 2
+        fat_percent = 12.86 * days_in_milk ** (-1.081) * math.exp(
+                0.0926 * (math.log(days_in_milk)) ** 2) * (math.log(days_in_milk) ** 1.107)
+        return fat_percent
+
     @staticmethod
     def determine_param_value(mean, std):
         """
@@ -340,21 +346,29 @@ class Cow(HeiferIII):
 
         if self.milking:
             self.estimated_daily_milk_produced = max(0.0, estimated_daily_milk_produced)
+            self.lactose_milk = AnimalModuleConstants.MILK_LACTOSE
+            self.CP_milk = AnimalModuleConstants.MILK_CRUDE_PROTEIN
+            self.mPrt = AnimalModuleConstants.MILK_TRUE_PROTEIN
         else:
             self.estimated_daily_milk_produced = 0.0
+            self.lactose_milk = 0.0
+            self.CP_milk = 0.0
+            self.mPrt = 0.0
         self.single_acc_milk_prod += estimated_daily_milk_produced
 
         # calculate fat percent in milk and fat corrected milk production
         if self.milking:
-            fat_percent = 12.86 * self.days_in_milk ** (-1.081) * math.exp(
-                0.0926 * (math.log(self.days_in_milk)) ** 2) * \
-                (math.log(self.days_in_milk) ** 1.107)
+            self.fat_percent = self.calculate_fat_percent(self.days_in_milk)
             daily_fat_correct_milk_production = \
                 0.4 * estimated_daily_milk_produced + \
-                0.15 * fat_percent * estimated_daily_milk_produced
+                0.15 * self.fat_percent * estimated_daily_milk_produced
+            self.milk_fat_kg = self.fat_percent*estimated_daily_milk_produced
+            self.milk_protein_kg = self.mPrt * self.estimated_daily_milk_produced
         else:
-            fat_percent = 0
-            daily_fat_correct_milk_production = 0
+            self.fat_percent = 0.0
+            daily_fat_correct_milk_production = 0.0
+            self.milk_fat_kg = 0.0
+            self.milk_protein_kg = 0.0
 
         self.daily_growth = self.get_bw_change(calving_interval)
 
@@ -363,7 +377,7 @@ class Cow(HeiferIII):
         # if not self.milking:
         # 	self.daily_growth = self.body_weight - prev_weight
 
-        return self.estimated_daily_milk_produced, fat_percent, \
+        return self.estimated_daily_milk_produced, self.fat_percent, \
             daily_fat_correct_milk_production
 
     def calc_manure_excretion(self, feed, methane_model, methane_mitigation_method, methane_mitigation_additive_amount,
@@ -624,7 +638,6 @@ class Cow(HeiferIII):
             else:
                 raise ValueError(f'Invalid cow repro program: {self.repro_program}')
 
-        self.fat_percent = fat_percent
         if not self.do_not_breed:
             self.preg_update(sim_day)
         cull_stage = self.cull_update(sim_day)

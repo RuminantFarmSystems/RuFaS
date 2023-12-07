@@ -1,9 +1,3 @@
-"""
-RUFAS: Ruminant Farm Systems Model
-File name: test_pen.py
-Description: Implements test cases for the Pen class
-Author(s): Pooya Hekmati, sh2235@cornell.edu, Anchey Peng, ap724@cornell.edu
-"""
 from __future__ import annotations
 
 from statistics import mean
