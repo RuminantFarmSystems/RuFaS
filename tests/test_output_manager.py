@@ -1753,7 +1753,7 @@ def test_route_save_functions_csv(
     )
     variable_csv_file_path = mock_output_manager._generate_file_name("saved_variables_csv_file", "csv")
     mock_output_manager._dict_to_file_csv.assert_called_once_with(
-        {"key": {"var": "value"}}, os.path.join("output/CSVs/", variable_csv_file_path)
+        {"key": {"var": "value"}}, os.path.join("output", "CSVs", variable_csv_file_path)
     )
     # Restore original method
     mock_output_manager._dict_to_file_csv = (
