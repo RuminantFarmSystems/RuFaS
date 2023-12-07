@@ -267,13 +267,13 @@ class Cow(HeiferIII):
         if len(self.milk_production_history) > 0 and self.milk_production_history[-1].simulation_day == sim_day:
             del self.milk_production_history[-1]
 
-        if self.days_in_milk == 305 and len(self.milk_production_history) > 305:
-            milk_history = [day.milk_production for day in self.milk_production_history[-305:]]
-            self.latest_milk_production_305days = np.sum(milk_history)
-
         self.milk_production_history.append(
             MilkProductionHistory(sim_day, self.days_in_milk, self.estimated_daily_milk_produced, self.days_born)
         )
+
+        if self.days_in_milk == 305 and len(self.milk_production_history) > 305:
+            milk_history = [day.milk_production for day in self.milk_production_history[-305:]]
+            self.latest_milk_production_305days = np.sum(milk_history)
 
     def calculate_fat_percent(self, days_in_milk: int):
         """
