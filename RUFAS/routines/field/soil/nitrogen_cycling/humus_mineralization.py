@@ -84,8 +84,8 @@ class HumusMineralization:
 
         """
         rate_constant = 10 ** -5
-        amount_transferred = rate_constant * active_organic_nitrogen * \
-            ((1 / FRACTION_OF_HUMIC_NITROGEN_IN_ACTIVE_POOL) - 1) - stable_organic_nitrogen
+        amount_transferred = rate_constant * (active_organic_nitrogen *
+                             ((1 / FRACTION_OF_HUMIC_NITROGEN_IN_ACTIVE_POOL) - 1) - stable_organic_nitrogen)
 
         if amount_transferred > 0:
             amount_transferred = min(active_organic_nitrogen, amount_transferred)
