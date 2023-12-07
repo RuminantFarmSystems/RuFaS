@@ -90,7 +90,7 @@ class AnimalReporter:
 
             om.add_variable("milk_data_at_milk_update", milk_data_update, info_map)
 
-    def report_ration_interval_data(animal_manager, feed) -> None:
+    def report_ration_interval_data(animal_manager, feed, simulation_day: int) -> None:
         """
         For each pen, adds ration per animal and other supply reports, to output manager.
 
@@ -98,10 +98,10 @@ class AnimalReporter:
         ----------
         animal_manager : AnimalManager
             Instance of class AnimalManager.
-
         feed : Feed
             Instance of class Feed.
-
+        simulation_day : int
+            Day of simulation.
         """
         for pen in animal_manager.all_pens:
             nutrient_amount = pen.ration_nutrient_amount
@@ -120,6 +120,7 @@ class AnimalReporter:
                 "class": "AnimalManager",
                 "function": "_calc_ration_at_interval",
                 "number_animals_in_pen": len(pen.animals_in_pen),
+                "simulation_day": simulation_day
             }
             om.add_variable(
                 f"ration_nutrient_amount_pen_{pen.id}_{pen.animal_combination.name}",
@@ -251,7 +252,7 @@ class AnimalReporter:
         # om.add_variable("calf_num", life_cycle_manager.calf_num, info_map)
         # om.add_variable("heiferI_num", life_cycle_manager.heiferI_num, info_map)
         # om.add_variable("heiferII_num", life_cycle_manager.heiferII_num, info_map)
-        # om.add_variable("heiferIII_num", life_cycle_manager.heiferII_num, info_map)
+        # om.add_variable("heiferIII_num", life_cycle_manager.heiferIII_num, info_map)
         # om.add_variable("cow_num", life_cycle_manager.cow_num, info_map)
         om.add_variable("sold_heiferIII_oversupply_num", life_cycle_manager.sold_heiferIII_oversupply_num, info_map)
         om.add_variable("bought_heifer_num", life_cycle_manager.bought_heifer_num, info_map)
@@ -266,6 +267,8 @@ class AnimalReporter:
         om.add_variable("preg_check_num_h", life_cycle_manager.preg_check_num_h, info_map)
         om.add_variable("sold_calf_num", life_cycle_manager.sold_calf_num, info_map)
         om.add_variable("daily_milk_production", life_cycle_manager.daily_milk_production, info_map)
+        om.add_variable("herd_milk_fat_percent", life_cycle_manager.herd_milk_fat_percent, info_map)
+        om.add_variable("herd_milk_protein_percent", life_cycle_manager.herd_milk_protein_percent, info_map)
         om.add_variable("open_cow_num", life_cycle_manager.open_cow_num, info_map)
         om.add_variable("vwp_cow_num", life_cycle_manager.vwp_cow_num, info_map)
         om.add_variable("preg_cow_num", life_cycle_manager.preg_cow_num, info_map)

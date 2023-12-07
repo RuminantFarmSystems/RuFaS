@@ -1659,7 +1659,7 @@ class AnimalManager:
                 self.clear_pens()
                 self.allocate_animals_to_pens()
                 self._calc_ration_at_interval(feed)  # per pen
-                AnimalReporter.report_ration_interval_data(self, feed)
+                AnimalReporter.report_ration_interval_data(self, feed, self.simulation_day)
                 self.calc_avg_growth()  # per pen
                 for pen in self.all_pens:
                     if pen.animal_combination.name == "LAC_COW":

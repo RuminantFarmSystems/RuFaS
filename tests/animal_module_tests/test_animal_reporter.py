@@ -182,7 +182,7 @@ def test_report_ration_interval_data(animal_manager_fixture, mocker: MockerFixtu
         return_value="ration_supply_report",
     )
 
-    AnimalReporter.report_ration_interval_data(animal_manager_fixture, feed)
+    AnimalReporter.report_ration_interval_data(animal_manager_fixture, feed, 1)
 
     for i in range(1, 2):
         assert om.variables_pool[f"AnimalManager._calc_ration_at_interval.ration_nutrient_amount_pen_{i}_combo{i}"][
