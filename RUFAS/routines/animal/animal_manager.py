@@ -1624,7 +1624,7 @@ class AnimalManager:
 
             manure_excretions_output_data = {}
             for pen in self.all_pens:
-                pen.classes_in_pen = self._get_classes_in_pen(pen)
+                pen.classes_in_pen = self._determine_classes_in_pen(pen)
                 pen.calc_total_manure(
                     feed,
                     self.methane_model,
