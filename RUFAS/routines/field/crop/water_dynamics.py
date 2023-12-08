@@ -9,12 +9,21 @@ class WaterDynamics:
         self.data = crop_data or CropData()  # initialize with defaults, if not given
 
     def cycle_water(self, evaporation: float, transpiration: float, potential_evapotranspiration: float) -> None:
-        """executes the daily cycling of water between the plants, soil, and environment
+        """
+        Executes the daily cycling of water between the plants, soil, and environment.
 
-        Args:
-            evaporation: evaporation on a given day in mm
-            transpiration: transpiration on a given day in mm
-            potential_evapotranspiration: potential evapotranspiration on a given day in mm
+        Parameters
+        ----------
+        evaporation : float
+            Evaporation on a given day (mm).
+        transpiration : float
+            Transpiration on a given day (mm).
+        potential_evapotranspiration:
+            Potential evapotranspiration on a given day (mm).
+
+        Notes
+        -----
+        This method updates cumulative sums that are used to keep the water deficiency factor updated.
 
         """
         self.data.cumulative_evaporation += evaporation
@@ -23,7 +32,8 @@ class WaterDynamics:
         self.data.cumulative_evapotranspiration += \
             self._determine_evapotranspiration(self.data.cumulative_evaporation,
                                                self.data.cumulative_transpiration)
-        self.data.water_deficiency = self._determine_water_deficiency(self.data.cumulative_evapotranspiration,
+
+        self.data.water_deficiency = self._determine_water_deficiency(self.data.cumulative_water_uptake,
                                                                       self.data.cumulative_potential_evapotranspiration)
 
     def evaporate_from_canopy(self, potential_evapotranspiration: float) -> float:
@@ -128,7 +138,3 @@ class WaterDynamics:
             return 100 * (cumulative_evapotranspiration / cumulative_potential_evapotranspiration)
         else:
             return 0
-
-    # TODO: Further functions water files need to be translated (into soil methods?) - GitHub Issue #303
-    #    RUFAS/routines/field/crop/transpiration.py
-    #    No water uptake yet?
