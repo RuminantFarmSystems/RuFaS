@@ -623,6 +623,7 @@ def output_manager_original_method_states(
         "clear_output_dir": mock_output_manager.clear_output_dir,
         "is_file_in_dir": mock_output_manager.is_file_in_dir,
         "create_directory": mock_output_manager.create_directory,
+        "_route_graph_generator_logs": mock_output_manager._route_graph_generator_logs,
     }
 
 
@@ -1755,7 +1756,7 @@ def test_route_save_functions_csv(
     mock_output_manager._dict_to_file_csv.assert_called_once_with(
         {"key": {"var": "value"}}, os.path.join("output", "CSVs", variable_csv_file_path)
     )
-    # Restore original method
+# Restore original method
     mock_output_manager._dict_to_file_csv = (
         output_manager_original_method_states["_dict_to_file_csv"]
     )
@@ -1798,61 +1799,69 @@ def test_route_save_functions_graph(
     with patch(
         "RUFAS.graph_generator.GraphGenerator.generate_graph"
     ) as mock_generate_graph:
-        mock_output_manager.add_warning = MagicMock()
-        mock_output_manager.add_error = MagicMock()
-        graph_data = {"filters": ".*", "other keys": "other values"}
-        mock_output_manager._route_save_functions(
-            "graph_file",
-            "save_path",
-            {"key": [1, 2, 3, 4]},
-            False,
-            graph_data,
-            Path("graphics_dir"),
-            "csvs_dir"
-        )
-        mock_generate_graph.assert_not_called()
-        mock_output_manager.add_warning.assert_called_once_with(
-            "No Graphics",
-            "Graphic generation is disabled, skipping filter_file='graph_file'",
-            {"class": "OutputManager", "function": "_route_save_functions"},
-        )
+        with patch("RUFAS.output_manager.GraphGenerator.prepare_plot_data") as prepare_plot_data:
+            mock_output_manager.add_warning = MagicMock()
+            mock_output_manager.add_error = MagicMock()
+            mock_output_manager._route_graph_generator_logs = MagicMock(return_value=True)
+            graph_data = {"filters": ".*", "other keys": "other values"}
+            dummy_prepared_data = {"key": [1, 2, 3, 4]}
+            dummy_log = ['dummy_log']
+            prepare_plot_data.return_value = dummy_prepared_data, dummy_log
+            mock_output_manager._route_save_functions(
+                "graph_file",
+                "save_path",
+                {"key": [1, 2, 3, 4]},
+                False,
+                graph_data,
+                Path("graphics_dir"),
+                Path("csvs_dir")
+            )
+            mock_generate_graph.assert_not_called()
+            mock_output_manager.add_warning.assert_called_once_with(
+                "No Graphics",
+                "Graphic generation is disabled, skipping filter_file='graph_file'",
+                {"class": "OutputManager", "function": "_route_save_functions"},
+            )
+            prepare_plot_data.assert_not_called()
 
-        mock_output_manager._route_save_functions(
-            "graph_file",
-            "save_path",
-            {"key": [1, 2, 3, 4]},
-            True,
-            graph_data,
-            Path("graphics_dir"),
-            "csvs_dir"
-        )
-        mock_output_manager.add_warning.assert_called_once_with(
-            "No Graphics",
-            "Graphic generation is disabled, skipping filter_file='graph_file'",
-            {"class": "OutputManager", "function": "_route_save_functions"},
-        )
-        mock_generate_graph.assert_called_once_with(
-            {"key": [1, 2, 3, 4]},
-            graph_data,
-            "graph_file",
-            Path("graphics_dir"),
-        )
+            mock_output_manager._route_save_functions(
+                "graph_file",
+                "save_path",
+                {"key": [1, 2, 3, 4]},
+                True,
+                graph_data,
+                Path("graphics_dir"),
+                Path("csvs_dir")
+            )
+            mock_output_manager.add_warning.assert_called_once_with(
+                "No Graphics",
+                "Graphic generation is disabled, skipping filter_file='graph_file'",
+                {"class": "OutputManager", "function": "_route_save_functions"},
+            )
+            prepare_plot_data.assert_called_once_with({"key": [1, 2, 3, 4]}, graph_data)
+            mock_generate_graph.assert_called_once_with(
+                dummy_prepared_data,
+                graph_data,
+                "graph_file",
+                Path("graphics_dir"),
+            )
 
-        mock_generate_graph.side_effect = Exception("test exception")
-        mock_output_manager._route_save_functions(
-            "graph_file",
-            "save_path",
-            {"key": [1, 2, 3, 4]},
-            True,
-            graph_data,
-            Path("graphics_dir"),
-            "csvs_dir"
-        )
-        mock_output_manager.add_error.assert_called_with(
-            "graph generation exception",
-            "test exception",
-            {"class": "OutputManager", "function": "_route_save_functions"},
-        )
+            mock_generate_graph.side_effect = Exception("test exception")
+            mock_output_manager._route_save_functions(
+                "graph_file",
+                "save_path",
+                {"key": [1, 2, 3, 4]},
+                True,
+                graph_data,
+                Path("graphics_dir"),
+                "csvs_dir"
+            )
+            mock_output_manager.add_error.assert_called_with(
+                "graph generation exception",
+                "test exception",
+                {"class": "OutputManager", "function": "_route_save_functions"},
+            )
+            prepare_plot_data.assert_called_with({"key": [1, 2, 3, 4]}, graph_data)
 
     mock_output_manager._route_save_functions = output_manager_original_method_states[
         "_route_save_functions"
