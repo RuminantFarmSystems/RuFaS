@@ -1064,7 +1064,7 @@ class Field:
         for crop in self.crops:
             if crop.data.in_growing_season:
                 crop.water_uptake.uptake_water(self.soil.data)
-                crop.water_dynamics.cycle_water(actual_evaporation, crop.data.total_water_uptake,
+                crop.water_dynamics.cycle_water(actual_evaporation, crop.data.water_uptake,
                                                 full_evapotranspirative_demand)
             else:
                 crop.data.cumulative_evaporation = 0.0
