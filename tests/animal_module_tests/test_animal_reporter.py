@@ -3,10 +3,10 @@ from pytest_mock import MockerFixture
 
 # from pytest_lazyfixture import lazy_fixture
 
-from RUFAS.routines.animal.animal_reporter import AnimalReporter
+from RUFAS.routines.animal.animal_module_reporter import AnimalModuleReporter
 from RUFAS.routines.animal.animal_manager import AnimalManager
 
-# from RUFAS.routines.animal.animal_reporter import om
+# from RUFAS.routines.animal.animal_module_reporter import om
 from RUFAS.output_manager import OutputManager
 
 
@@ -58,7 +58,7 @@ def test___init__():
 
 def test_report_daily_animal_population(mocker: MockerFixture):
     """Unit test for function report_daily_animal_population in file
-    routines/animal/ration/animal_reporter.py"""
+    routines/animal/ration/animal_module_reporter.py"""
     mocker.patch("RUFAS.routines.animal.animal_manager.AnimalManager.__init__", return_value=None)
     animal_manager = AnimalManager(
         data=mocker.MagicMock(),
@@ -93,7 +93,7 @@ def test_report_daily_animal_population(mocker: MockerFixture):
         cow.is_lactating = True
     animal_manager.cows[0].is_lactating = False
     om.variables_pool = {}
-    AnimalReporter.report_daily_animal_population(animal_manager)
+    AnimalModuleReporter.report_daily_animal_population(animal_manager)
 
     report_daily_animal_total = om.variables_pool["AnimalManager.daily_updates.num_animals"]["values"]
     assert report_daily_animal_total == [
@@ -113,7 +113,7 @@ def test_report_daily_animal_population(mocker: MockerFixture):
 
 def test_report_milk(mocker: MockerFixture):
     """Unit test for function report_milk in file
-    routines/animal/ration/animal_reporter.py"""
+    routines/animal/ration/animal_module_reporter.py"""
     test_milk_data_update = {
         "days_in_milk": 1,
         "estimated_daily_milk_produced": 2,
@@ -140,7 +140,7 @@ def test_report_milk(mocker: MockerFixture):
         animal.id = test_milk_data_update["cow_id"]
         animal.pen_history[-1].pen = test_milk_data_update["pen_id"]
     # act
-    AnimalReporter.report_milk(pen, simulation_day)
+    AnimalModuleReporter.report_milk(pen, simulation_day)
     # assert
     assert om.variables_pool["Cow.milking_update.milk_data_at_milk_update"]["values"] == [
         test_milk_data_update,
@@ -151,7 +151,7 @@ def test_report_milk(mocker: MockerFixture):
 
 def test_report_ration_interval_data(animal_manager_fixture, mocker: MockerFixture):
     """Unit test for function report_ration_interval_data in file
-    routines/animal/ration/animal_reporter.py"""
+    routines/animal/ration/animal_module_reporter.py"""
     test_data = {
         "ration_nutrient_amount": {"dummy1": 100},
         "ration_nutrient_conc": {"dummy2": 200},
@@ -182,7 +182,7 @@ def test_report_ration_interval_data(animal_manager_fixture, mocker: MockerFixtu
         return_value="ration_supply_report",
     )
 
-    AnimalReporter.report_ration_interval_data(animal_manager_fixture, feed, 1)
+    AnimalModuleReporter.report_ration_interval_data(animal_manager_fixture, feed, 1)
 
     for i in range(1, 2):
         assert om.variables_pool[f"AnimalManager._calc_ration_at_interval.ration_nutrient_amount_pen_{i}_combo{i}"][
@@ -208,7 +208,7 @@ def test_report_ration_interval_data(animal_manager_fixture, mocker: MockerFixtu
 
 def test_report_daily_ration(animal_manager_fixture, mocker: MockerFixture):
     """Unit test for function report_daily_ration in file
-    routines/animal/ration/animal_reporter.py"""
+    routines/animal/ration/animal_module_reporter.py"""
     test_data = {
         "ration_per_animal": {"dummy3": 300, "status": 1, "objective": 2},
         "formatted_ration_1": {"dry_matter_intake_total": 300, "dummy3": 300},
@@ -225,10 +225,10 @@ def test_report_daily_ration(animal_manager_fixture, mocker: MockerFixture):
     animal_manager_fixture.all_pens = [pen1, pen2]
     for pen in animal_manager_fixture.all_pens:
         pen.ration_per_animal = test_data["ration_per_animal"]
-    AnimalReporter.report_daily_ration(animal_manager_fixture)
+    AnimalModuleReporter.report_daily_ration(animal_manager_fixture)
 
     for i in range(1, 2):
-        assert om.variables_pool[f"AnimalReporter.report_daily_ration.ration_daily_feed_totals_for_pen_{i}_combo{i}"][
+        assert om.variables_pool[f"AnimalModuleReporter.report_daily_ration.ration_daily_feed_totals_for_pen_{i}_combo{i}"][
             "values"
         ] == [test_data[f"formatted_ration_{i}"]]
 
@@ -237,7 +237,7 @@ def test_report_animal_module_manure():
     test_output_dict = {"prefix": "dummy", "manure": {"property1": 100, "property2": 200}}
     test_dict = {"example": test_output_dict}
 
-    AnimalReporter.report_animal_module_manure(test_dict)
+    AnimalModuleReporter.report_animal_module_manure(test_dict)
 
     for i in range(1, 2):
         assert om.variables_pool[f"AnimalManager.daily_updates.dummy_property{i}"]["values"] == [100 * i]
@@ -249,7 +249,7 @@ def test_report_pen_manure(mocker: MockerFixture):
     dummy_pen.animal_combination._name_ = "dummy_name"
     dummy_pen.manure = {"dummy_dict": 100}
 
-    AnimalReporter.report_pen_manure(dummy_pen)
+    AnimalModuleReporter.report_pen_manure(dummy_pen)
 
     assert om.variables_pool["pen.calc_manure.pen_manure_data"]["values"] == [dummy_pen.manure]
 
@@ -295,7 +295,7 @@ def test_report_life_cycle_manager_data(mocker: MockerFixture):
     sim_day = 42
 
     # act
-    AnimalReporter.report_life_cycle_manager_data(life_cycle_manager, sim_day)
+    AnimalModuleReporter.report_life_cycle_manager_data(life_cycle_manager, sim_day)
 
     # assert
     for key, value in keydict.items():
@@ -345,12 +345,12 @@ def test_report_sold_animal_information(mocker: MockerFixture):
     animal_manager.life_cycle_manager.sold_and_died_cows = [sold_animals[2]]
 
     # act
-    AnimalReporter.report_sold_animal_information(animal_manager)
+    AnimalModuleReporter.report_sold_animal_information(animal_manager)
 
     # assert
     for key in sold_report_expected.keys():
         assert (
-            om.variables_pool[f"AnimalReporter.report_sold_animal_information.{key}"]["values"]
+            om.variables_pool[f"AnimalModuleReporter.report_sold_animal_information.{key}"]["values"]
             == sold_report_expected[key]
         )
 
@@ -364,7 +364,7 @@ def test_report_305d_milk(mocker: MockerFixture):
     animal_manager.cows[1].latest_milk_production_305days = 200
 
     # act
-    AnimalReporter.report_305d_milk(animal_manager)
+    AnimalModuleReporter.report_305d_milk(animal_manager)
 
     # assert it's 150
     assert om.variables_pool["cow.update_milk_production_history.milk_production_305days_herd_mean"]["values"] == [
@@ -373,7 +373,7 @@ def test_report_305d_milk(mocker: MockerFixture):
 
     animal_manager.cows[0].latest_milk_production_305days = 0.0
     # re assert other case, different average
-    AnimalReporter.report_305d_milk(animal_manager)
+    AnimalModuleReporter.report_305d_milk(animal_manager)
 
     # assert it's 150
     assert om.variables_pool["cow.update_milk_production_history.milk_production_305days_herd_mean"]["values"] == [
@@ -387,19 +387,19 @@ def test_report_daily_reports(mocker: MockerFixture):
     animal_manager.all_pens = [mocker.MagicMock(), mocker.MagicMock()]
     animal_manager.all_pens[0].animal_combination.name = "LAC_COW"
 
-    patch_for_report_daily_animal_population = mocker.patch.object(AnimalReporter, "report_daily_animal_population")
+    patch_for_report_daily_animal_population = mocker.patch.object(AnimalModuleReporter, "report_daily_animal_population")
     patch_for_report_life_cycle_manager_data = mocker.patch.object(
-        AnimalReporter, "report_life_cycle_manager_data", return_value=""
+        AnimalModuleReporter, "report_life_cycle_manager_data", return_value=""
     )
-    patch_for_report_report_daily_ration = mocker.patch.object(AnimalReporter, "report_daily_ration", return_value="")
-    patch_for_report_305d_milk = mocker.patch.object(AnimalReporter, "report_305d_milk", return_value="")
+    patch_for_report_report_daily_ration = mocker.patch.object(AnimalModuleReporter, "report_daily_ration", return_value="")
+    patch_for_report_305d_milk = mocker.patch.object(AnimalModuleReporter, "report_305d_milk", return_value="")
     patch_for_report_pen_manure_properties = mocker.patch.object(
-        AnimalReporter, "report_pen_manure_properties", return_value=""
+        AnimalModuleReporter, "report_pen_manure_properties", return_value=""
     )
-    patch_for_report_milk = mocker.patch.object(AnimalReporter, "report_milk", return_value="")
+    patch_for_report_milk = mocker.patch.object(AnimalModuleReporter, "report_milk", return_value="")
 
     # act
-    AnimalReporter.report_daily_reports(animal_manager)
+    AnimalModuleReporter.report_daily_reports(animal_manager)
 
     # assert
     patch_for_report_daily_animal_population.assert_called_once_with(animal_manager)
@@ -415,11 +415,11 @@ def test_report_daily_reports(mocker: MockerFixture):
 def test_report_end_of_simulation(mocker: MockerFixture):
     animal_manager = mocker.MagicMock()
     patch_for_plan_animal_allocation = mocker.patch.object(
-        AnimalReporter, "report_sold_animal_information", return_value=""
+        AnimalModuleReporter, "report_sold_animal_information", return_value=""
     )
 
     # act
-    AnimalReporter.report_end_of_simulation(animal_manager)
+    AnimalModuleReporter.report_end_of_simulation(animal_manager)
 
     # assert
     assert patch_for_plan_animal_allocation.call_count == 1

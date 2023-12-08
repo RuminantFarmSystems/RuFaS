@@ -18,7 +18,7 @@ from RUFAS.routines.animal.manure.general_manure import AnimalManureExcretions
 om = OutputManager()
 
 
-class AnimalReporter:
+class AnimalModuleReporter:
     def report_daily_animal_population(animal_manager) -> None:
         """
         Adds daily totals for animal types to output manager.
@@ -166,7 +166,7 @@ class AnimalReporter:
 
         """
         info_map = {
-            "class": "AnimalReporter",
+            "class": "AnimalModuleReporter",
             "function": "report_daily_ration",
         }
         for pen in animal_manager.all_pens:
@@ -327,7 +327,7 @@ class AnimalReporter:
         )
 
         info_map = {
-            "class": "AnimalReporter",
+            "class": "AnimalModuleReporter",
             "function": "report_sold_animal_information",
         }
         for animal in sold_animals:
@@ -381,14 +381,14 @@ class AnimalReporter:
         animal_manager : AnimalManager
             Instance of AnimalManager class.
         """
-        AnimalReporter.report_daily_animal_population(animal_manager)
-        AnimalReporter.report_life_cycle_manager_data(animal_manager.life_cycle_manager, animal_manager.simulation_day)
-        AnimalReporter.report_daily_ration(animal_manager)
-        AnimalReporter.report_305d_milk(animal_manager)
+        AnimalModuleReporter.report_daily_animal_population(animal_manager)
+        AnimalModuleReporter.report_life_cycle_manager_data(animal_manager.life_cycle_manager, animal_manager.simulation_day)
+        AnimalModuleReporter.report_daily_ration(animal_manager)
+        AnimalModuleReporter.report_305d_milk(animal_manager)
         for pen in animal_manager.all_pens:
-            AnimalReporter.report_pen_manure_properties(pen)
+            AnimalModuleReporter.report_pen_manure_properties(pen)
             if pen.animal_combination.name == "LAC_COW":
-                AnimalReporter.report_milk(pen, animal_manager.simulation_day)
+                AnimalModuleReporter.report_milk(pen, animal_manager.simulation_day)
 
     def report_end_of_simulation(animal_manager) -> None:
         """
@@ -399,4 +399,4 @@ class AnimalReporter:
         animal_manager : AnimalManager
             Instance of AnimalManager class.
         """
-        AnimalReporter.report_sold_animal_information(animal_manager)
+        AnimalModuleReporter.report_sold_animal_information(animal_manager)

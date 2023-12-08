@@ -24,7 +24,7 @@ from RUFAS.routines.feed.feed import Feed
 from RUFAS.routines.animal.ration.calf_ration import CalfRationManager
 from RUFAS.routines.animal.ration.ration_driver import RationReporter
 from RUFAS.routines.animal.ration.ration_driver import RationManager
-from RUFAS.routines.animal.animal_reporter import AnimalReporter
+from RUFAS.routines.animal.animal_module_reporter import AnimalModuleReporter
 
 from RUFAS.routines.animal.ration import user_defined_ration as udr
 
@@ -1634,7 +1634,7 @@ class AnimalManager:
                 )
                 pen.call_p_rqmts()
                 pen.daily_p_update()  # Average phosphorus concentration per pen
-            AnimalReporter.report_animal_module_manure(manure_excretions_output_data)
+            AnimalModuleReporter.report_animal_module_manure(manure_excretions_output_data)
 # =======
 #                 self.collect_manure_excretions_output_data(pen, feed, manure_excretions_output_data)
 #             self.calc_p_rqmts()
@@ -1659,7 +1659,7 @@ class AnimalManager:
                 self.clear_pens()
                 self.allocate_animals_to_pens()
                 self._calc_ration_at_interval(feed)  # per pen
-                AnimalReporter.report_ration_interval_data(self, feed, self.simulation_day)
+                AnimalModuleReporter.report_ration_interval_data(self, feed, self.simulation_day)
                 self.calc_avg_growth()  # per pen
                 for pen in self.all_pens:
                     if pen.animal_combination.name == "LAC_COW":
@@ -1667,4 +1667,4 @@ class AnimalManager:
                             animal.update_milk_production_history(self.simulation_day)
 
             self.life_cycle_manager.daily_milk_production = self.sum_daily_milk(self.cows)
-            AnimalReporter.report_daily_reports(self)
+            AnimalModuleReporter.report_daily_reports(self)
