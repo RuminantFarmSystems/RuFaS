@@ -141,12 +141,12 @@ def test_determine_harvest_index(harvest, heat_frac, water_def):
         assert data.harvest_index == CropManagement._adjust_harvest_index(potential, 0.5, water_def)
 
 
-@pytest.mark.parametrize("harvest_op,field_name,field_size,year,day,soil_data", [
-    (HarvestOperation.HARVEST, "test_1", 1.8, 1995, 200, SoilData(field_size=1.3)),
-    (HarvestOperation.HARVEST_NOKILL, "test_2", 4.5, 2010, 150, SoilData(field_size=2.4))
+@pytest.mark.parametrize("harvest_op,field_name,field_size,year,day,soil_data, killed", [
+    (HarvestOperation.HARVEST, "test_1", 1.8, 1995, 200, SoilData(field_size=1.3), True),
+    (HarvestOperation.HARVEST_NOKILL, "test_2", 4.5, 2010, 150, SoilData(field_size=2.4), False)
 ])
 def test_manage_harvest(harvest_op: HarvestOperation, field_name: str, field_size: float, year: int, day: int,
-                        soil_data: SoilData) -> None:
+                        soil_data: SoilData, killed: bool) -> None:
     """ensure that crops are harvested properly, dependent on their operation specs"""
     # Setup
     crop = CropManagement()
@@ -171,7 +171,7 @@ def test_manage_harvest(harvest_op: HarvestOperation, field_name: str, field_siz
         crop.kill.assert_not_called()
 
     crop._record_yield.assert_called_once_with(field_name, field_size, year, day)
-    crop._transfer_residue.assert_called_once_with(soil_data)
+    crop._transfer_residue.assert_called_once_with(soil_data, killed)
 
 
 @pytest.mark.parametrize("efficiency,harvest,override,should_fail", [
@@ -189,7 +189,7 @@ def test_cut_crop(efficiency: float, harvest: float, override: bool, should_fail
     # setup
     data = CropData(harvest_index=harvest, biomass=100, leaf_area_index=2.3, accumulated_heat_units=1.1,
                     optimal_nitrogen_fraction=0.09, optimal_phosphorus_fraction=0.02,
-                    yield_nitrogen_fraction=0.12, yield_phosphorus_fraction=0.0092, above_ground_biomass=0.37)
+                    yield_nitrogen_fraction=0.12, yield_phosphorus_fraction=0.0092, above_ground_biomass=75.0)
     if override:
         data.user_harvest_index = harvest
     crop = CropManagement(data)
@@ -213,20 +213,22 @@ def test_cut_crop(efficiency: float, harvest: float, override: bool, should_fail
         assert data.biomass == 100 - cut_biomass
         assert data.leaf_area_index == 2.3 * (1 - (cut_biomass / 100))
         assert data.accumulated_heat_units == 1.1 * (1 - (cut_biomass / 100))
-        collected = cut_biomass * efficiency
-        residue = cut_biomass * (1 - efficiency)
+        collected_fresh_yield = cut_biomass * efficiency
+        collected_dry_matter_yield = collected_fresh_yield * (crop.data.dry_matter_percentage / 100)
+        residue = cut_biomass * (1 - efficiency) * (crop.data.dry_matter_percentage / 100)
         crop._recalculate_biomass_distribution.assert_called_once()
-        assert data.yield_collected == collected
+        assert data.wet_yield_collected == collected_fresh_yield
+        assert data.dry_matter_yield_collected == collected_dry_matter_yield
         assert data.yield_residue == residue
 
         if override:
-            assert data.yield_nitrogen == collected * 0.09
-            assert data.yield_phosphorus == collected * 0.02
+            assert data.yield_nitrogen == collected_fresh_yield * 0.09
+            assert data.yield_phosphorus == collected_fresh_yield * 0.02
             assert data.residue_nitrogen == residue * 0.09
             assert data.residue_phosphorus == residue * 0.02
         else:
-            assert data.yield_nitrogen == collected * 0.12
-            assert data.yield_phosphorus == collected * 0.0092
+            assert data.yield_nitrogen == collected_fresh_yield * 0.12
+            assert data.yield_phosphorus == collected_fresh_yield * 0.0092
             assert data.residue_nitrogen == residue * 0.12
             assert data.residue_phosphorus == residue * 0.0092
 
@@ -253,14 +255,14 @@ def test_recalculate_biomass_distribution(roots_harvested: bool, cut_biomass: fl
     assert crop.root_fraction == expected_root_fraction
 
 
-@pytest.mark.parametrize("field_name,field_size,species,year,day,mass,nitrogen,phosphorus", [
-    ("field_1", 1.8, "alfalfa", 1993, 200, 100, 12.5, 5),
-    ("field_2", 2.33, "corn", 1998, 216, 1500, 188, 24.5),
-    ("field_2", 2.33, "corn", 1999, 218, 1550, 172, 22.3),
-    ("field_3", 0.98, "soybeans", 2003, 245, 1200, 199, 89.3)
+@pytest.mark.parametrize("field_name,field_size,species,year,day,mass,dry_mass,nitrogen,phosphorus", [
+    ("field_1", 1.8, "alfalfa", 1993, 200, 100, 90, 12.5, 5),
+    ("field_2", 2.33, "corn", 1998, 216, 1500, 1200, 188, 24.5),
+    ("field_2", 2.33, "corn", 1999, 218, 1550, 350, 172, 22.3),
+    ("field_3", 0.98, "soybeans", 2003, 245, 1200, 800, 199, 89.3)
 ])
 def test_record_yield(field_name: str, field_size: float, species: str, year: int, day: int, mass: float,
-                      nitrogen: float, phosphorus: float) -> None:
+                      dry_mass: float, nitrogen: float, phosphorus: float) -> None:
     """Tests that harvest yields are correctly recorded to the OutputManager."""
     crop_manager = CropManagement()
 
@@ -268,7 +270,8 @@ def test_record_yield(field_name: str, field_size: float, species: str, year: in
     crop_manager.data.planting_day = 100
     crop_manager.data.planting_year = 1995
     crop_manager.data.species = species
-    crop_manager.data.yield_collected = mass
+    crop_manager.data.wet_yield_collected = mass
+    crop_manager.data.dry_matter_yield_collected = dry_mass
     crop_manager.data.yield_nitrogen = nitrogen
     crop_manager.data.yield_phosphorus = phosphorus
 
@@ -276,29 +279,36 @@ def test_record_yield(field_name: str, field_size: float, species: str, year: in
 
     expected_info_map = {"prefix": f"field='{field_name}'", "field_size": field_size,
                          "species": f"'{species}'"}
-    expected_value = {"crop": crop_manager.data.name, "yield": mass, "nitrogen": nitrogen, "phosphorus": phosphorus,
-                      "planting_date": {"year": 1995, "day": 100}, "harvest_date": {"year": year, "day": day}}
+    expected_value = {"crop": crop_manager.data.name, "wet_yield": mass, "dry_yield": dry_mass, "nitrogen": nitrogen,
+                      "phosphorus": phosphorus, "planting_date": {"year": 1995, "day": 100},
+                      "harvest_date": {"year": year, "day": day}}
 
     actual = om.variables_pool[f"field='{field_name}'.harvest_yield"]
     assert actual['info_maps'].__contains__(expected_info_map)
     assert actual['values'].__contains__(expected_value)
 
 
-@pytest.mark.parametrize("residue,nitrogen", [
-    (100, 22),
-    (0, 0),
-    (200.23, 45.66)
-])
-def test_transfer_residue(residue: float, nitrogen: float) -> None:
+@pytest.mark.parametrize(
+    "root_biomass,residue,nitrogen,killed,expected_root_depth,expected_surface_residue,expected_root_residue", [
+        (150, 150, 22, True, 100, 0.0, 150.0),
+        (100, 150, 22, True, 100, 50, 100),
+        (100, 150, 22, False, 0, 150, 0)
+    ])
+def test_transfer_residue(root_biomass: float, residue: float, nitrogen: float, killed: bool,
+                          expected_root_depth: float, expected_surface_residue: float,
+                          expected_root_residue: float) -> None:
     """Tests that residue and associated nutrients from harvests and not collected are properly transferred to the
         soil."""
     soil_data = SoilData(field_size=1)
-    soil_data.plant_surface_residue = 0
     soil_data.soil_layers[0].fresh_organic_nitrogen_content = 0
-    crop_data = CropData(yield_residue=residue, yield_nitrogen=nitrogen)
+    crop_data = CropData(yield_residue=residue, residue_nitrogen=nitrogen)
+    crop_data.root_depth = 100.0
+    crop_data.root_biomass = root_biomass
     crop_manage = CropManagement(crop_data)
 
-    crop_manage._transfer_residue(soil_data)
+    crop_manage._transfer_residue(soil_data, killed)
 
-    assert soil_data.plant_surface_residue == residue
+    assert soil_data.plant_surface_residue == expected_surface_residue
+    assert soil_data.plant_root_residue == expected_root_residue
+    assert soil_data.crop_root_depth == expected_root_depth
     assert soil_data.soil_layers[0].fresh_organic_nitrogen_content == nitrogen

@@ -234,7 +234,8 @@ class InputManager:
 
         return filtered_input_data
 
-    def _validate_input_type_dynamic(self, variable_properties: Dict[str, Any], var_name: str, input_data_value: Any):
+    def _validate_input_type_dynamic(self, variable_properties: Dict[str, Any], var_name: str, input_data_value: Any,
+                                     properties_blob_key: str) -> bool:
         """
         Validates the input data value based on its specified dynamic type.
 
@@ -248,6 +249,9 @@ class InputManager:
 
         input_data_value : Any
             The input data value to be validated.
+
+        properties_blob_key : str
+            The metadata properties section keyword for the data input file being checked.
 
         Returns
         -------
@@ -292,7 +296,7 @@ class InputManager:
             raise KeyError(
                 f"Invalid type {var_type}: Element must be type {data_type_to_validator_map.keys()}"
             )
-        return validator(variable_properties, var_name, input_data_value)
+        return validator(variable_properties, var_name, input_data_value, properties_blob_key)
 
     def _validate_csv_element(self, var_name: str, properties_blob_key: str, input_data: Dict[str, Any],
                               eager_termination: bool, element_counter_and_validity: Dict[str, int | bool]
@@ -337,11 +341,12 @@ class InputManager:
 
         for element_num in range(len(variable)):
             element_counter_and_validity["total_elements"] += 1
-            is_valid = self._validate_input_type_dynamic(variable_properties, var_name, variable[element_num])
+            is_valid = self._validate_input_type_dynamic(variable_properties, var_name, variable[element_num],
+                                                         properties_blob_key)
             if is_valid:
                 element_counter_and_validity["valid_elements"] += 1
             else:
-                is_fixed = self._fix_data(variable_properties, [var_name, element_num], input_data)
+                is_fixed = self._fix_data(variable_properties, [var_name, element_num], input_data, properties_blob_key)
                 if is_fixed:
                     element_counter_and_validity["fixed_elements"] += 1
                 else:
@@ -436,31 +441,37 @@ class InputManager:
                              info_map)
                 input_data_value = None
 
-            is_valid = self._validate_input_type_dynamic(variable_properties, var_name, input_data_value)
+            is_valid = self._validate_input_type_dynamic(variable_properties, var_name, input_data_value,
+                                                         properties_blob_key)
 
             element_counter_and_validity["total_elements"] += 1
             if is_valid:
                 element_counter_and_validity["valid_elements"] += 1
                 return element_counter_and_validity
             else:
-                is_fixed = self._fix_data(variable_properties, element_hierarchy, input_data)
+                is_fixed = self._fix_data(variable_properties, element_hierarchy, input_data, properties_blob_key)
                 if is_fixed:
                     element_counter_and_validity["fixed_elements"] += 1
                 else:
                     om.add_warning("Validation: invalid unfixable element found",
-                                   f"{var_name} was invalid and could not be fixed", info_map)
+                                   f"Variable: '{var_name}' was invalid and could not be fixed", info_map)
                     element_counter_and_validity["invalid_elements"] += 1
                     element_counter_and_validity["is_valid"] = False
                 return element_counter_and_validity
 
-    def _array_type_validator(self, variable_properties: Dict[str, Any], var_name: str, input_data_value: list) -> bool:
+    def _array_type_validator(self, variable_properties: Dict[str, Any], var_name: str, input_data_value: list,
+                              properties_blob_key: str) -> bool:
         """Validates an input data element of type array."""
         info_map = {"class": self.__class__.__name__,
                     "function": self._array_type_validator.__name__,
                     }
+        properties_violation_message = f"Violates properties defined in metadata properties section" \
+                                       f" '{properties_blob_key}'."
         if type(input_data_value) is not list:
-            warning_string = "Validation: array is not a list."
-            om.add_warning(warning_string, f"{var_name=}", info_map)
+            warning_string = "Validation: array is not a list"
+            warning_message = f"Variable: '{var_name}' is type: {type(input_data_value)}. " \
+                              f"{properties_violation_message}"
+            om.add_warning(warning_string, warning_message, info_map)
             return False
 
         maximum_length = variable_properties.get("maximum_length")
@@ -468,60 +479,79 @@ class InputManager:
         if minimum_length is not None:
             is_in_range = variable_properties["minimum_length"] <= len(input_data_value)
             if not is_in_range:
-                warning_string = f"Validation: array length less than {minimum_length}."
-                om.add_warning(warning_string, f"{var_name=}", info_map)
+                warning_name = "Validation: array length less than minimum"
+                warning_message = f"Variable: '{var_name}' has length: {len(input_data_value)}, less than minimum " \
+                                  f"length: {minimum_length}. {properties_violation_message}"
+                om.add_warning(warning_name, warning_message, info_map)
                 return False
         if maximum_length is not None:
             is_in_range = len(input_data_value) <= variable_properties["maximum_length"]
             if not is_in_range:
-                warning_string = f"Validation: array length more than {maximum_length}."
-                om.add_warning(warning_string, f"{var_name=}", info_map)
+                warning_name = "Validation: array length greater than maximum"
+                warning_message = f"Variable: '{var_name}' has length: {len(input_data_value)}, greater than " \
+                                  f"maximum length: {maximum_length}. {properties_violation_message}"
+                om.add_warning(warning_name, warning_message, info_map)
                 return False
         return True
 
     def _num_type_validator(self, variable_properties: Dict[str, Any], var_name: str,
-                            input_data_value: Union[int, float]) -> bool:
+                            input_data_value: Union[int, float], properties_blob_key: str) -> bool:
         """Validates an input data number element."""
         info_map = {"class": self.__class__.__name__,
                     "function": self._num_type_validator.__name__,
                     }
         minimum_value = variable_properties.get("minimum")
         maximum_value = variable_properties.get("maximum")
+        properties_violation_message = f"Violates properties defined in metadata properties section" \
+                                       f" '{properties_blob_key}'."
         if type(input_data_value) is not float and type(input_data_value) is not int:
-            warning_string = "Validation: value is not a number."
-            om.add_warning(warning_string, f"{var_name=}", info_map)
+            warning_string = "Validation: value is not a number"
+            warning_message = f"Variable: '{var_name}' has value: {input_data_value}, is type: " \
+                              f"{type(input_data_value)}. {properties_violation_message}"
+            om.add_warning(warning_string, warning_message, info_map)
             return False
         if minimum_value is not None:
             is_in_range = minimum_value <= input_data_value
             if not is_in_range:
-                warning_string = f"Validation: value less than {minimum_value: .2f}."
-                om.add_warning(warning_string, f"{var_name=}", info_map)
+                warning_name = "Validation: value less than minimum"
+                warning_message = f"Variable: '{var_name}' has value: {input_data_value}, less than minimum value: " \
+                                  f"{minimum_value: .2f}. {properties_violation_message}"
+                om.add_warning(warning_name, warning_message, info_map)
                 return False
         if maximum_value is not None:
             is_in_range = input_data_value <= maximum_value
             if not is_in_range:
-                warning_string = f"Validation: value greater than {maximum_value: .2f}."
-                om.add_warning(warning_string, f"{var_name=}", info_map)
+                warning_name = "Validation: value greater than maximum"
+                warning_string = f"Variable: '{var_name}' has value: {input_data_value}, greater than maximum value: " \
+                                 f"{maximum_value: .2f}. {properties_violation_message}"
+                om.add_warning(warning_name, warning_string, info_map)
                 return False
 
         return True
 
-    def _string_type_validator(self, variable_properties: Dict[str, Any], var_name: str, input_data_value: str) -> bool:
+    def _string_type_validator(self, variable_properties: Dict[str, Any], var_name: str, input_data_value: str,
+                               properties_blob_key: str) -> bool:
         """Validates an input data string element."""
         info_map = {"class": self.__class__.__name__,
                     "function": self._string_type_validator.__name__,
                     }
+        properties_violation_message = f"Violates properties defined in metadata properties section" \
+                                       f" '{properties_blob_key}'."
         if type(input_data_value) is not str:
-            warning_string = "Validation: string variable is not a string."
-            om.add_warning(warning_string, f"{var_name=}", info_map)
+            warning_name = "Validation: string variable is not a string"
+            warning_message = f"Variable: '{var_name}' has value: {input_data_value}, is type: " \
+                              f"{type(input_data_value)}. {properties_violation_message}"
+            om.add_warning(warning_name, warning_message, info_map)
             return False
 
         pattern_check = variable_properties.get("pattern")
         if pattern_check is not None:
             is_valid_string = bool(re.match(pattern_check, input_data_value))
             if not is_valid_string:
-                warning_string = f"Validation: string variable must match pattern {variable_properties['pattern']}."
-                om.add_warning(warning_string, f"{var_name=}", info_map)
+                warning_name = "Validation: string variable does not match pattern"
+                warning_message = f"Variable: '{var_name}' has value: '{input_data_value}', does not match pattern: " \
+                                  f"{pattern_check}. {properties_violation_message}"
+                om.add_warning(warning_name, warning_message, info_map)
                 return False
 
         minimum_length = variable_properties.get("minimum_length")
@@ -529,24 +559,41 @@ class InputManager:
         if minimum_length is not None:
             is_valid_string = variable_properties["minimum_length"] <= len(input_data_value)
             if not is_valid_string:
-                warning_string = f"Validation: string length less than {minimum_length}."
-                om.add_warning(warning_string, f"{var_name=}", info_map)
+                warning_name = "Validation: string length less than minimum"
+                warning_message = f"Variable: '{var_name}' has value: '{input_data_value}', length is less than " \
+                                  f"minimum length: {minimum_length}. {properties_violation_message}"
+                om.add_warning(warning_name, warning_message, info_map)
                 return False
         if maximum_length is not None:
             is_valid_string = len(input_data_value) <= variable_properties["maximum_length"]
             if not is_valid_string:
-                warning_string = f"Validation: string length more than {maximum_length}."
-                om.add_warning(warning_string, f"{var_name=}", info_map)
+                warning_name = "Validation: string length greater than maximum"
+                warning_message = f"Variable: '{var_name}' has value: '{input_data_value}', length is greater than " \
+                                  f"maximum length: {maximum_length}. {properties_violation_message}"
+                om.add_warning(warning_name, warning_message, info_map)
                 return False
 
         return True
 
-    def _bool_type_validator(self, variable_properties: Dict[str, Any], var_name: str, input_data_value: bool) -> bool:
+    def _bool_type_validator(self, variable_properties: Dict[str, Any], var_name: str, input_data_value: bool,
+                             properties_blob_key: str) -> bool:
         """Validates an input data bool element."""
+        info_map = {"class": self.__class__.__name__,
+                    "function": self._bool_type_validator.__name__,
+                    }
+        properties_violation_message = f"Violates properties defined in metadata properties section" \
+                                       f" '{properties_blob_key}'."
+        if type(input_data_value) is not bool:
+            warning_name = "Validation: bool variable is not a bool"
+            warning_message = f"Variable: '{var_name}' has value: '{input_data_value}', is type: " \
+                              f"'{type(input_data_value)}'. {properties_violation_message}"
+            om.add_warning(warning_name, warning_message, info_map)
+            return False
+
         return input_data_value in (True, False)
 
     def _fix_data(self, variable_properties: Dict[str, Any], element_hierarchy: List[Union[str, int]],
-                  input_data: Dict[str, Any]) -> bool:
+                  input_data: Dict[str, Any], properties_blob_key: str) -> bool:
         """
         Attempt to fix the invalid data.
 
@@ -561,6 +608,9 @@ class InputManager:
         input_data: dict[str, Any]
             A buffer dictionary that holds the input data for validation and fixing.
 
+        properties_blob_key : str
+            The metadata properties section keyword for the data input file being checked.
+
         Returns
         -------
         bool
@@ -570,18 +620,31 @@ class InputManager:
                     "function": self._fix_data.__name__,
                     }
 
-        if 'default' not in variable_properties.keys():
-            om.add_error("Validation: invalid data not able to be fixed: ", f"{element_hierarchy[-1]}", info_map)
-            return False
         variable_parent = reduce(lambda d, key: d[key], element_hierarchy[:-1],
                                  input_data)
+
+        element_path = ".".join([str(element) for element in element_hierarchy])
+        properties_violation_message = f"Violates properties defined in metadata properties section" \
+                                       f" '{properties_blob_key}'."
+        if 'default' not in variable_properties.keys():
+            error_message = f"Variable: '{element_path}' has invalid value: {variable_parent[element_hierarchy[-1]]}" \
+                            f", and cannot be changed to a default value. {properties_violation_message}"
+            om.add_error("Validation: invalid data not able to be fixed", error_message, info_map)
+            return False
+
+        original_invalid_value = variable_parent[element_hierarchy[-1]]
+        warning_message = f"Variable: '{element_path}' has value: {original_invalid_value}. " \
+                          f"{properties_violation_message}"
         om.add_warning("Validation: invalid data found",
-                       f"{element_hierarchy[-1]}: {variable_parent[element_hierarchy[-1]]}",
+                       warning_message,
                        info_map)
+
         variable_parent[element_hierarchy[-1]] = variable_properties['default']
-        om.add_warning("Validation: data fixed",
-                       f"Invalid data fixed: {element_hierarchy[-1]} => {variable_properties['default']}",
-                       info_map)
+
+        warning_message = f"Invalid data fixed: '{element_path}' value changed from {original_invalid_value} to " \
+                          f"{variable_properties['default']}. Fix enabled by default value specified in " \
+                          f"'{properties_blob_key}'."
+        om.add_warning("Validation: data fixed", warning_message, info_map)
         return True
 
     def get_data(self, data_address: str) -> Any:

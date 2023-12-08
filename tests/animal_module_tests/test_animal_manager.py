@@ -1,10 +1,3 @@
-"""
-RUFAS: Ruminant Farm Systems Model
-File name: test_animal_manager.py
-Description: Implements test cases for the AnimalManager class
-Author(s): Pooya Hekmati, sh2235@cornell.edu, Anchey Peng, ap724@cornell.edu
-"""
-
 from typing import Any
 from typing import List, Dict, Union
 from mock import MagicMock, patch
@@ -20,8 +13,12 @@ from RUFAS.routines.animal.life_cycle.heiferI import HeiferI
 from RUFAS.routines.animal.life_cycle.heiferII import HeiferII
 from RUFAS.routines.animal.life_cycle.heiferIII import HeiferIII
 from RUFAS.routines.animal.pen import Pen
+from RUFAS.routines.animal.ration.ration_driver import RationReporter
 from RUFAS.routines.feed.feed import Feed
+from RUFAS.output_manager import OutputManager
 from RUFAS.input_manager import InputManager
+
+om = OutputManager()
 
 
 def create_mock_object_list(attribute_dicts: List[Dict[str, Any]]) -> List[MagicMock]:
@@ -305,11 +302,6 @@ def animal_manager_with_mock_pens(animal_manager: AnimalManager,
     return animal_manager
 
 
-def test_daily_animal_routine():
-    """Unit test for function daily_animal_routine in file routines/animal/animal_manager.py"""
-    pass
-
-
 def test_get_animal_config():
     """Unit test for function get_animal_config in file routines/animal/animal_manager.py"""
     pass
@@ -317,12 +309,11 @@ def test_get_animal_config():
 
 def test_init_pens(input_manager: InputManager, animal_manager: AnimalManager,
                    mock_pen_data: Dict[str, Dict[str, Union[str, float, int]]],
-                   mock_herd_data: Dict[str, Union[str, int, bool]],
                    mock_manure_management_scenarios: Dict[str, List[Dict[str, Union[str, int]]]],
                    ) -> None:
     """Unit test for function init_pens in file routines/animal/animal_manager.py"""
     # Act
-    animal_manager.init_pens(mock_pen_data, mock_herd_data, mock_manure_management_scenarios)
+    animal_manager.init_pens(mock_pen_data, mock_manure_management_scenarios)
 
     actual = len(animal_manager.all_pens)
     expected = 4
@@ -348,8 +339,8 @@ def test_init_animals(animal_manager: AnimalManager, mocker: MockerFixture):
 
 def test_print_animal_num_warnings(animal_manager: AnimalManager):
     """Unit test for function _print_animal_num_warnings in file routines/animal/animal_manager.py"""
-    with patch("RUFAS.output_manager.OutputManager.add_log") as add_log, \
-            patch("RUFAS.output_manager.OutputManager.add_warning") as add_warning:
+    with patch.object(om, "add_log") as add_log, \
+            patch.object(om, "add_warning") as add_warning:
 
         animal_keys = {"calf_num", "heiferI_num", "heiferII_num", "heiferIII_num_springers", "cow_num"}
         herd_data = {
@@ -1056,16 +1047,6 @@ def test_end_ration_interval():
     pass
 
 
-def test_annual_reset():
-    """Unit test for function annual_reset in file routines/animal/animal_manager.py"""
-    pass
-
-
-def test_generate_animal_output():
-    """Unit test for function generate_animal_output in file routines/animal/animal_manager.py"""
-    pass
-
-
 def test_get_life_cycle_output():
     """Unit test for function get_life_cycle_output in file routines/animal/animal_manager.py"""
     pass
@@ -1591,8 +1572,8 @@ def test_daily_updates(is_end_ration_interval: bool, mocker: MockerFixture) -> N
     mock_animal_manager.all_pens = mock_all_pens
 
     mock_classes_in_pen = mocker.MagicMock()
-    patch_for_get_classes_in_pen = mocker.patch.object(
-        AnimalManager, '_get_classes_in_pen', return_value=mock_classes_in_pen)
+    patch_for_determine_classes_in_pen = mocker.patch.object(
+        AnimalManager, '_determine_classes_in_pen', return_value=mock_classes_in_pen)
 
     patch_for_calc_nutrient_rqmts = mocker.patch.object(
         AnimalManager, 'calc_nutrient_rqmts', return_value=None)
@@ -1604,6 +1585,10 @@ def test_daily_updates(is_end_ration_interval: bool, mocker: MockerFixture) -> N
         AnimalManager, '_calc_ration_at_interval', return_value=None)
     patch_for_calc_avg_growth = mocker.patch.object(
         AnimalManager, 'calc_avg_growth', return_value=None)
+    mock_manure_excretions_output_data = {}
+    patch_for_report_ration_supply = mocker.patch.object(
+        RationReporter, 'report_ration_supply', return_value=None
+    )
 
     sum_daily_milk = 1000.0
     patch_for_sum_daily_milk = mocker.patch.object(
@@ -1616,6 +1601,7 @@ def test_daily_updates(is_end_ration_interval: bool, mocker: MockerFixture) -> N
     assert patch_for_end_ration_interval.call_count == 2
     if is_end_ration_interval:
         patch_for_reset_milk_production_reduction.assert_called()
+        patch_for_report_ration_supply.assert_called()
 
     mock_weather.get_current_day_conditions.assert_called_with(mock_time)
 
@@ -1636,12 +1622,13 @@ def test_daily_updates(is_end_ration_interval: bool, mocker: MockerFixture) -> N
     patch_for_handle_newly_added_animals.assert_called_once_with(
         list(mock_animals_added) + list(mock_calves_born), mock_feed, temp)
 
-    patch_for_get_classes_in_pen.assert_has_calls([mocker.call(mock_pen) for mock_pen in mock_all_pens])
+    patch_for_determine_classes_in_pen.assert_has_calls([mocker.call(mock_pen) for mock_pen in mock_all_pens])
 
     for mock_pen in mock_all_pens:
         mock_pen.calc_total_manure.assert_called_once_with(mock_feed, mock_methane_model,
                                                            mock_methane_mitigation_method,
-                                                           mock_methane_mitigation_additive_amount)
+                                                           mock_methane_mitigation_additive_amount,
+                                                           mock_manure_excretions_output_data)
         mock_pen.call_p_rqmts.assert_called_once()
         mock_pen.daily_p_update.assert_called_once()
 
@@ -1663,3 +1650,27 @@ def test_daily_updates(is_end_ration_interval: bool, mocker: MockerFixture) -> N
 
     patch_for_sum_daily_milk.assert_called_once_with(mock_cows)
     assert mock_animal_manager.life_cycle_manager.daily_milk_production == sum_daily_milk
+
+
+def test_collect_manure_excretions_output_data(mocker: MockerFixture):
+    pen = mocker.MagicMock()
+    pen.calc_total_manure = mocker.MagicMock()
+
+    feed = mocker.MagicMock()
+    manure_excretions_output_data = mocker.MagicMock()
+
+    animal_manager = mocker.MagicMock()
+    animal_manager._determine_classes_in_pen = mocker.MagicMock()
+    animal_manager.methane_model = mocker.MagicMock()
+    animal_manager.methane_mitigation_method = mocker.MagicMock()
+    animal_manager.methane_mitigation_additive_amount = mocker.MagicMock()
+
+    # act
+    AnimalManager.collect_manure_excretions_output_data(animal_manager, pen, feed, manure_excretions_output_data)
+
+    # assert
+    animal_manager._determine_classes_in_pen.assert_called_once_with(pen)
+    pen.calc_total_manure.assert_called_once_with(feed, animal_manager.methane_model,
+                                                  animal_manager.methane_mitigation_method,
+                                                  animal_manager.methane_mitigation_additive_amount,
+                                                  manure_excretions_output_data)

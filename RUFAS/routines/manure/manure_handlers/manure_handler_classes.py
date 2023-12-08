@@ -1,13 +1,3 @@
-"""
-RUFAS: Ruminant Farm Systems Model
-
-File name: manure_handler_classes.py
-
-Description:
-
-Author(s):  William Donovan, wmdonovan@wisc.edu
-            Yunus Mohammed, ymm26@cornell.edu
-"""
 from __future__ import annotations
 
 from dataclasses import dataclass
@@ -36,6 +26,7 @@ class ManureHandlerType(DefaultEnum):
     MANUAL_SCRAPING = "manual scraping"
     ALLEY_SCRAPER = "alley scraper"
     TILLAGE = "tillage"
+    HARROWING = "harrowing"
     DEFAULT = FLUSH_SYSTEM
 
 
@@ -150,9 +141,9 @@ class BaseManureHandler:
             cleaning_water_volume=self.calc_cleaning_water_volume_in_main_barn(
                 pen.num_animals),
             total_bedding_volume=bedding.calc_total_bedding_volume(
-                pen.num_animals),
+                pen.num_animals) if bedding is not None else 0.0,
             total_bedding_mass=bedding.calc_total_bedding_mass(
-                pen.num_animals),
+                pen.num_animals) if bedding is not None else 0.0,
             total_water_volume_in_milking_parlor=(
                 self.milking_parlor.calc_total_water_volume_used_in_milking_parlor(
                     pen.num_lactating_cows
@@ -181,9 +172,9 @@ class BaseManureHandler:
 class FlushSystem(BaseManureHandler):
     """A class that handles calculations related to a flush system.
 
-    Attributes:
-        All inherited from BaseManureHandler.
-
+    Attributes
+    ----------
+    All inherited from BaseManureHandler.
     """
 
     pass
@@ -192,9 +183,9 @@ class FlushSystem(BaseManureHandler):
 class ManualScraping(BaseManureHandler):
     """A class that handles calculations related to manual scraping.
 
-    Attributes:
-        All inherited from BaseManureHandler.
-
+    Attributes
+    ----------
+    All inherited from BaseManureHandler.
     """
 
     pass
@@ -203,9 +194,9 @@ class ManualScraping(BaseManureHandler):
 class AlleyScraper(BaseManureHandler):
     """A class that handles calculations related to an alley scraper.
 
-    Attributes:
-        All inherited from BaseManureHandler.
-
+    Attributes
+    ----------
+    All inherited from BaseManureHandler.
     """
 
     pass
@@ -214,8 +205,20 @@ class AlleyScraper(BaseManureHandler):
 class Tillage(BaseManureHandler):
     """A class that handles calculations related to tillage.
 
-    Attributes:
-        All inherited from BaseManureHandler.
+    Attributes
+    ----------
+    All inherited from BaseManureHandler.
+    """
+
+    pass
+
+
+class Harrowing(BaseManureHandler):
+    """A class that handles calculations related to harrowing.
+
+    Attributes
+    ----------
+    All inherited from BaseManureHandler.
 
     """
 
@@ -226,12 +229,16 @@ class Tillage(BaseManureHandler):
 class ManureHandlerConfig:
     """Class for storing the configuration of a manure handler.
 
-    Attributes:
-        cleaning_water_use_rate: Amount of cleaning water used per animal per day, L.
-        minutes_per_cleaning: Number of minutes needed per animal per cleaning, minutes.
-        cleanings_per_day: Number of cleanings per day.
-        daily_tillage_frequency: Number of times per day that compost bedding is tilled.
-
+    Attributes
+    ----------
+    cleaning_water_use_rate : float
+        Amount of cleaning water used per animal per day, L.
+    minutes_per_cleaning : int
+        Number of minutes needed per animal per cleaning, minutes.
+    cleanings_per_day : int
+        Number of cleanings per day.
+    daily_tillage_frequency : int
+        Number of times per day that compost bedding is tilled.
     """
 
     cleaning_water_use_rate: float = 0.0
@@ -255,10 +262,13 @@ class DefaultManureHandlerConfigFactory:
     TILLAGE_CONFIG = ManureHandlerConfig(
         daily_tillage_frequency=1,
     )
+    HARROWING_CONFIG = ManureHandlerConfig(
+        daily_tillage_frequency=0,
+    )
 
     @classmethod
     def get_instance(
-        cls, manure_handler_type: ManureHandlerType
+            cls, manure_handler_type: ManureHandlerType
     ) -> ManureHandlerConfig:
         """Return a default manure handler configuration for the given manure handler type.
 
@@ -274,6 +284,7 @@ class DefaultManureHandlerConfigFactory:
             ManureHandlerType.MANUAL_SCRAPING: cls.MANUAL_SCRAPING_CONFIG,
             ManureHandlerType.ALLEY_SCRAPER: cls.ALLEY_SCRAPER_CONFIG,
             ManureHandlerType.TILLAGE: cls.TILLAGE_CONFIG,
+            ManureHandlerType.HARROWING: cls.HARROWING_CONFIG,
         }
 
         manure_handler_config = manure_handler_config_by_type[manure_handler_type]
@@ -286,11 +297,11 @@ class ManureHandlerFactory:
 
     @classmethod
     def get_instance(
-        cls,
-        manure_handler_type_name: str,
-        weather: Weather,
-        time: Time,
-        custom_manure_handler_config: Optional[ManureHandlerConfig] = None,
+            cls,
+            manure_handler_type_name: str,
+            weather: Weather,
+            time: Time,
+            custom_manure_handler_config: Optional[ManureHandlerConfig] = None,
     ) -> BaseManureHandler:
         """Returns an instance of a specific subtype of BaseManureHandler.
 
@@ -312,6 +323,7 @@ class ManureHandlerFactory:
             ManureHandlerType.ALLEY_SCRAPER: AlleyScraper,
             ManureHandlerType.MANUAL_SCRAPING: ManualScraping,
             ManureHandlerType.TILLAGE: Tillage,
+            ManureHandlerType.HARROWING: Harrowing,
         }
 
         manure_handler_type = ManureHandlerType.get_type(manure_handler_type_name)

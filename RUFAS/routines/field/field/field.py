@@ -17,6 +17,7 @@ from RUFAS.routines.field.manager.events import TillageEvent
 from RUFAS.output_manager import OutputManager
 from RUFAS.routines.manure.manure_manager import ManureManager
 from RUFAS.routines.manure.manure_nutrients.nutrient_request import NutrientRequest
+from RUFAS.time import Time
 from copy import copy
 
 """
@@ -149,7 +150,7 @@ class Field:
 
         self._check_crop_planting_schedule(time)
 
-        self._check_crop_harvest_schedule(time)
+        self._check_crop_harvest_schedule(time, current_conditions)
 
         self._remove_dead_crops()
         self._reset_crop_field_coverage_fractions()
@@ -387,10 +388,15 @@ class Field:
         also checks for invalid application depths and surface remainder fractions. If invalid values are found, they
         are corrected, an error is logged to the OutputManager, and execution continues with the new values.
 
+        If the manure supplied by the Manure module does not meet or exceed the requested nutrients amounts, then either
+        a) a warning will be raised to the OutputManager that the manure supplied was nutrient deficient, or b) an
+        optimized chemical fertilizer application will be created and executed to supplement the nutrient deficiencies.
+        This behavior is regulated by the `supplement_manure_nutrient_deficiencies` attribute of the `FieldData` class.
+
         """
+        info_map = {"class": self.__class__.__name__, "function": self._execute_manure_application.__name__,
+                    "prefix": f"field='{self.field_data.name}'", "date": {"year": year, "day": day}}
         if requested_nitrogen == requested_phosphorus == 0.0:
-            info_map = {"class": self.__class__.__name__, "function": self._execute_manure_application.__name__,
-                        "prefix": f"field='{self.field_data.name}'", "date": {"year": year, "day": day}}
             log_message = "Tried to apply manure with no nitrogen or phosphorus requested."
             om.add_log("manure_application_log", log_message, info_map)
             return
@@ -451,9 +457,18 @@ class Field:
 
         unmet_nitrogen_demand = max(0.0, requested_nitrogen - supplied_nitrogen)
         unmet_phosphorus_demand = max(0.0, requested_phosphorus - supplied_phosphorus)
+
         if unmet_nitrogen_demand == 0.0 and unmet_phosphorus_demand == 0.0:
             return
-        elif unmet_nitrogen_demand > 0.0 and unmet_phosphorus_demand == 0.0:
+
+        if not self.field_data.supplement_manure_nutrient_deficiencies:
+            warning_name = "Nutrient deficient manure application"
+            warning_message = f"Manure nitrogen deficient by {unmet_nitrogen_demand} kg, manure phosphorus " \
+                              f"deficient by {unmet_phosphorus_demand} kg."
+            om.add_warning(warning_name, warning_message, info_map)
+            return
+
+        if unmet_nitrogen_demand > 0.0 and unmet_phosphorus_demand == 0.0:
             optimal_mix = self.ONLY_NITROGEN_MIX
         else:
             optimal_mix = self._determine_optimal_fertilizer_mix(unmet_nitrogen_demand, unmet_phosphorus_demand,
@@ -599,7 +614,7 @@ class Field:
                                              event.application_depth, event.surface_remainder_fraction, event.year,
                                              event.day)
 
-    def _check_crop_harvest_schedule(self, time) -> None:
+    def _check_crop_harvest_schedule(self, time: Time, current_conditions: CurrentDayConditions) -> None:
         """
         Checks for all crops for potential harvests that may happen on the current day.
 
@@ -607,6 +622,8 @@ class Field:
         ----------
         time : Time
             Time object containing the current day and year of the simulation.
+        current_conditions : CurrentDayConditions
+            CurrentDayConditions object containing the current weather conditions of the simulated day.
 
         Notes
         -----
@@ -616,14 +633,19 @@ class Field:
         """
         self.harvest_events, todays_harvest_events = self._filter_events(self.harvest_events, time)
         for event in todays_harvest_events:
-            self._harvest_crop(event.crop_reference, event.operation, time)
+            self._harvest_crop(event.crop_reference, event.operation, time, current_conditions)
 
-        self._harvest_heat_scheduled_crops()
+        self._harvest_heat_scheduled_crops(current_conditions.rainfall)
 
-    def _harvest_heat_scheduled_crops(self) -> None:
+    def _harvest_heat_scheduled_crops(self, rainfall: float) -> None:
         """
         Checks if any of the active plants in the field are harvested based on their heat schedule, and if so harvests
         them if they meet the heat threshold.
+
+        Parameters
+        ----------
+        rainfall : float
+            Amount of rainfall on the current day (mm).
 
         References
         ----------
@@ -635,6 +657,7 @@ class Field:
                                              crop.data.heat_fraction >= crop.data.harvest_heat_fraction
             if execute_heat_scheduled_harvest:
                 crop.crop_management.manage_harvest(HarvestOperation.HARVEST_NOKILL)
+                self.soil.carbon_cycling.residue_partition.add_residue_to_pools(rainfall)
 
     @staticmethod
     def _filter_events(all_events: List[Event], time) -> Tuple[List[Event], List[Event]]:
@@ -752,7 +775,8 @@ class Field:
                  "date": {"year": year, "day": day}}
         om.add_variable("crop_planting", value, info_map)
 
-    def _harvest_crop(self, crop_reference: str, harvest_operation: str, time) -> None:
+    def _harvest_crop(self, crop_reference: str, harvest_operation: str, time: Time,
+                      current_conditions: CurrentDayConditions) -> None:
         """
         Performs the specified crop operation on the specified crop.
 
@@ -764,6 +788,8 @@ class Field:
             Name of the harvest operation to be performed on the referenced crop.
         time : Time
             Object containing the current day and year of the simulation.
+        current_conditions : CurrentDayConditions
+            Object containing the conditions of the current simulated day.
 
         Notes
         -----
@@ -790,6 +816,7 @@ class Field:
             crop.crop_management.manage_harvest(harvest_operation_enum, self.field_data.name,
                                                 self.field_data.field_size, time.calendar_year, time.day,
                                                 self.soil.data)
+            self.soil.carbon_cycling.residue_partition.add_residue_to_pools(current_conditions.rainfall)
 
     def _remove_dead_crops(self) -> None:
         """
@@ -1037,7 +1064,7 @@ class Field:
         for crop in self.crops:
             if crop.data.in_growing_season:
                 crop.water_uptake.uptake_water(self.soil.data)
-                crop.water_dynamics.cycle_water(actual_evaporation, crop.data.total_water_uptake,
+                crop.water_dynamics.cycle_water(actual_evaporation, crop.data.water_uptake,
                                                 full_evapotranspirative_demand)
             else:
                 crop.data.cumulative_evaporation = 0.0
@@ -1339,3 +1366,5 @@ class Field:
                     "prefix": f"field='{self.field_data.name}'", "date": {"year": year, "day": day},
                     "field_size": self.field_data.field_size, "units": "mm"}
         om.add_variable("field_watering", watering_amount, info_map)
+
+    # </editor-fold>
