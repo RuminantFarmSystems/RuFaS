@@ -15,23 +15,23 @@ class Storage:
 
     Methods
     -------
-    receive_crop(crop: HarvestedCrop):
+    receive_crop(crop: HarvestedCrop)
         Receives a harvested crop and adds it to the storage.
-    process_degradations():
+    process_degradations()
         Processes the degradations and losses of the stored crops.
-    give_feed(amount: float, crop_type: str):
+    give_feed(amount: float, crop_type: str)
         Gives out a specified amount of feed of a certain crop type.
-    calculate_dry_matter_loss_to_gas(dry_matter: float, time_in_silo: int):
+    calculate_dry_matter_loss_to_gas(dry_matter: float, time_in_silo: int)
         Calculates the dry matter loss to gas.
-    calculate_dry_matter_loss_to_effluent(dry_matter: float, estimated_maximum_effluent: float, time_in_silo: int):
+    calculate_dry_matter_loss_to_effluent(dry_matter: float, estimated_maximum_effluent: float, time_in_silo: int)
         Calculates the dry matter loss to effluent.
-    calculate_protein_degradation():
+    calculate_protein_degradation()
         Calculates protein degradation.
-    calculate_heat_generated():
+    calculate_heat_generated()
         Calculates the total sensible heat generated.
-    calculate_bale_density(initial_dry_matter: float):
+    calculate_bale_density(initial_dry_matter: float)
         Calculates the density of a bale.
-    recalculate_nutrient_fractions():
+    recalculate_nutrient_fractions()
         Recalculates the relative nutrient concentrations after dry matter loss.
     """
 
@@ -39,7 +39,7 @@ class Storage:
         self.stored: List[HarvestedCrop] = []
         self.capacity = float("inf")
 
-    def receive_crop(self, crop: HarvestedCrop):
+    def receive_crop(self, crop: HarvestedCrop) -> None:
         """
         Receives a harvested crop and adds it to the storage.
 
@@ -81,7 +81,7 @@ class Storage:
         """
         pass
 
-    def calculate_dry_matter_loss_to_gas(self, dry_matter: float, time_in_silo: int):
+    def calculate_dry_matter_loss_to_gas(self, dry_matter: float, time_in_silo: int) -> float:
         """
         Calculates the dry matter loss to gas.
 
@@ -131,7 +131,7 @@ class Storage:
         """
         pass
 
-    def calculate_heat_generated(self):
+    def calculate_heat_generated(self) -> float:
         """
         Calculates the total sensible heat generated.
 
@@ -142,7 +142,7 @@ class Storage:
         """
         pass
 
-    def calculate_bale_density(self, initial_dry_matter: float):
+    def calculate_bale_density(self, initial_dry_matter: float) -> float:
         """
         Calculates the density of a bale.
 
