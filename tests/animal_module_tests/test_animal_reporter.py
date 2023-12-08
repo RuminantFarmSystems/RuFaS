@@ -1,14 +1,10 @@
 import pytest
 from pytest_mock import MockerFixture
 
-# from pytest_lazyfixture import lazy_fixture
-
 from RUFAS.routines.animal.animal_module_reporter import AnimalModuleReporter
 from RUFAS.routines.animal.animal_manager import AnimalManager
 
-# from RUFAS.routines.animal.animal_module_reporter import om
 from RUFAS.output_manager import OutputManager
-
 
 om = OutputManager()
 

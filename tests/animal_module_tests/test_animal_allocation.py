@@ -563,5 +563,4 @@ def test_set_animal_grouping_scenario(mocker: MockerFixture):
     animal_manager.set_animal_grouping_scenario(scenario)
 
     # assert
-
     assert animal_manager.ANIMAL_GROUPING_SCENARIO == scenario

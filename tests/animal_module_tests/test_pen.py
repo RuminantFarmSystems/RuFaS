@@ -598,7 +598,6 @@ def test_calc_total_manure(mocker: MockerFixture, is_populated: bool,
         'RUFAS.routines.animal.pen.add_animal_manure_excretions',
         return_value=mock_pen_manure
     )
-    # patch_for_add_variable = mocker.patch('RUFAS.routines.animal.pen.OutputManager.add_variable')
     patch_for_get_default_animal_manure_excretions = mocker.patch(
         'RUFAS.routines.animal.pen.get_default_animal_manure_excretions',
         return_value=mock_pen_manure
@@ -618,15 +617,8 @@ def test_calc_total_manure(mocker: MockerFixture, is_populated: bool,
                 mocker.call(mock_pen_manure, animal.manure_excretion)
             ])
         assert patch_for_update_animal_manure_excretion_data.call_count == len(animals_in_pen)
-        # assert patch_for_add_variable.call_count == len(mock_pen_manure)
-        # for prop, value in pen.manure.items():
-        #     patch_for_add_variable.assert_has_calls([
-        #         mocker.call(f'pen_{pen.id}_daily_{prop}', value,
-        #                     info_map={'class': 'Pen', 'function': 'calc_total_manure'})
-        #     ])
     else:
         patch_for_get_default_animal_manure_excretions.assert_not_called()
         patch_for_calc_animal_manure_excretion.assert_not_called()
         patch_for_add_animal_manure_excretions.assert_not_called()
         patch_for_update_animal_manure_excretion_data.assert_not_called()
-        # patch_for_add_variable.assert_not_called()

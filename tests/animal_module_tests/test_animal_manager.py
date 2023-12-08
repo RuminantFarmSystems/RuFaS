@@ -1586,7 +1586,6 @@ def test_daily_updates(is_end_ration_interval: bool, mocker: MockerFixture) -> N
     patch_for_calc_avg_growth = mocker.patch.object(
         AnimalManager, 'calc_avg_growth', return_value=None)
     mock_manure_excretions_output_data = {}
-
     patch_for_report_ration_supply = mocker.patch.object(
         RationReporter, 'report_ration_supply', return_value=None
     )
@@ -1661,7 +1660,6 @@ def test_collect_manure_excretions_output_data(mocker: MockerFixture):
     manure_excretions_output_data = mocker.MagicMock()
 
     animal_manager = mocker.MagicMock()
-
     animal_manager._determine_classes_in_pen = mocker.MagicMock()
     animal_manager.methane_model = mocker.MagicMock()
     animal_manager.methane_mitigation_method = mocker.MagicMock()
@@ -1671,7 +1669,6 @@ def test_collect_manure_excretions_output_data(mocker: MockerFixture):
     AnimalManager.collect_manure_excretions_output_data(animal_manager, pen, feed, manure_excretions_output_data)
 
     # assert
-
     animal_manager._determine_classes_in_pen.assert_called_once_with(pen)
     pen.calc_total_manure.assert_called_once_with(feed, animal_manager.methane_model,
                                                   animal_manager.methane_mitigation_method,
