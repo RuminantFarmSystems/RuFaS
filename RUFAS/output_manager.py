@@ -907,6 +907,20 @@ class OutputManager(object):
                 )
 
     def _route_graph_generator_logs(self, log_pool: List[Dict[str, str | Dict[str, str]]]) -> bool:
+        """Takes logs from Graph Generator and routes them to the appropriate pools in
+        Output Manager
+
+        Parameters
+        ----------
+        log_pool : List[Dict[str, str  |  Dict[str, str]]]
+            A list of log, warning, and error dictionaries containing all the components needed
+            to log the information to the appropriate pool.
+
+        Returns
+        -------
+        bool
+            A flag indiciating whether Graph Generator should graph the prepared pool data.
+        """
         error_count = 0
         for log in log_pool:
             if "error" in log:
