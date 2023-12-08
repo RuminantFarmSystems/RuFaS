@@ -888,20 +888,9 @@ class OutputManager(object):
                 try:
                     graph_generator = GraphGenerator(self.__metadata_prefix)
                     prepared_data, log_pool = graph_generator.prepare_plot_data(filtered_pool,
-                                                                                filter_content.get("variables"))
-                    error_count = 0
-                    for log in log_pool:
-                        if "error" in log:
-                            self.add_error(log["error"], log["message"], log["info_map"])
-                            error_count += 1
-                        elif "log" in log:
-                            self.add_log(log["log"], log["message"], log["info_map"])
-                        elif "warning" in log:
-                            self.add_warning(log["warning"], log["message"], log["info_map"])
-                    if error_count > 0:
-                        self.add_error("Unable to graph data set",
-                                       "See log for errors raised in preparing data for graphing.", info_map)
-                    else:
+                                                                                filter_content)
+                    is_graphable = self._route_graph_generator_logs(log_pool)
+                    if is_graphable:
                         graph_generator.generate_graph(
                             prepared_data,
                             filter_content,
@@ -916,6 +905,19 @@ class OutputManager(object):
                     f"Graphic generation is disabled, skipping {filter_file=}",
                     info_map,
                 )
+
+    def _route_graph_generator_logs(self, log_pool: List[Dict[str, str | Dict[str, str]]]) -> bool:
+        error_count = 0
+        for log in log_pool:
+            if "error" in log:
+                self.add_error(log["error"], log["message"], log["info_map"])
+                error_count += 1
+            elif "log" in log:
+                self.add_log(log["log"], log["message"], log["info_map"])
+            elif "warning" in log:
+                self.add_warning(log["warning"], log["message"], log["info_map"])
+
+        return error_count == 0
 
     @deprecated(
         reason="""This function is still in the code base but it is not used. We want to keep it for debugging purposes

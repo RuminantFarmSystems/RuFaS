@@ -141,7 +141,6 @@ class GraphGenerator:
         """
         try:
             fig, _ = plt.subplots()
-            # prepared_data = self._prepare_plot_data(filtered_pool, graph_details.get("variables"))
             self._draw_graph(
                 graph_details["type"], filtered_pool, filtered_pool.keys()
             )
@@ -153,18 +152,18 @@ class GraphGenerator:
             raise e
 
     def prepare_plot_data(self, filtered_pool: Dict[str, Dict[str, List[Any]]],
-                          selected_variables: Optional[List[str]] = None
+                          graph_details: Dict[str, str | List[str]],
                           ) -> Tuple[Dict[str, List[int | float]], List[Dict[str, str | Dict[str, str]]]]:
         """Extracts the values from the filtered_pool data and converts them a dictionary
-        that graph_generator can more readily handle.
+        that graph_generator can more readily handle and records logs, warnings, and errors for
+        Output Manager to log.
 
         Parameters
         ----------
         filtered_pool : Dict[str, pool_element_type]
             The filtered pool of variables that the user wants to graph.
-        selected_variables : Optional[List[str]]
-            If it is present and the data is a list of dicts,
-            it selects the variables to be plotted.
+        graph_details: Dict[str, str]
+            A dictionary containing details/metadata about the graph.
 
         Returns
         -------
@@ -176,6 +175,8 @@ class GraphGenerator:
             "class": self.__class__.__name__,
             "function": self.prepare_plot_data.__name__,
         }
+        selected_variables = graph_details.get("variables")
+        title = graph_details.get("title")
         log_pool = []
         prepared_pool = {}
         for index, key in enumerate(filtered_pool.keys()):
@@ -183,34 +184,41 @@ class GraphGenerator:
             is_data_in_dict = isinstance(values[0], dict)
             if is_data_in_dict:
                 if not selected_variables:
-                    error = {"error": "Can't plot data set", "message": f"No selected variables for {key}.",
+                    error = {"error": f"Can't plot {title} data set", "message": f"No selected variables for {key}.",
                              "info_map": info_map}
                     log_pool.append(error)
                     break
                 else:
                     data_dict = Utility.convert_list_of_dicts_to_dict_of_lists(values)
+                    selected_variables_in_data = 0
                     for selected_variable in selected_variables:
                         if selected_variable in data_dict:
                             prepared_pool.setdefault(selected_variable, []).extend(data_dict[selected_variable])
-                            log = {"log": "Successfully added data to prepared_pool",
+                            log = {"log": f"Successfully added {title} data to prepared_pool",
                                    "message": f"Data for {selected_variable} added to prepared_pool.",
                                    "info_map": info_map}
                             log_pool.append(log)
+                            selected_variables_in_data += 1
                         else:
                             warning = {"warning": f"{selected_variable} not a valid key in provided data",
                                        "message": f"{selected_variable} won't be graphed.",
                                        "info_map": info_map}
                             log_pool.append(warning)
+                    if selected_variables_in_data == 0:
+                        error = {"error": f"Can't plot {title} data set",
+                                 "message": "No filter-file variables found in data provided.",
+                                 "info_map": info_map}
+                        log_pool.append(error)
             else:
                 if selected_variables:
                     prepared_pool[selected_variables[index]] = values
-                    log = {"log": "Successfully added data to prepared_pool",
+                    log = {"log": f"Successfully added {title} data to prepared_pool",
                                   "message": f"Data for {selected_variables[index]} added.",
                                   "info_map": info_map}
                     log_pool.append(log)
                 else:
                     prepared_pool[key] = values
-                    log = {"log": "Successfully added data to prepared_pool",
+                    log = {"log": f"Successfully added {title} data to prepared_pool",
                                   "message": f"Data for {key} added.",
                                   "info_map": info_map}
                     log_pool.append(log)
