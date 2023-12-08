@@ -5,7 +5,7 @@ import pytest
 from pytest import approx
 from pytest_mock import MockerFixture
 
-from RUFAS.routines import AnimalManager
+from RUFAS.routines.animal.animal_manager import AnimalManager
 from RUFAS.routines.animal.animal_module_constants import AnimalModuleConstants
 from RUFAS.routines.animal.life_cycle.cow import Cow
 from RUFAS.routines.animal.pen import Pen
@@ -503,6 +503,7 @@ def test_allocate_animals_to_pens(mocker: MockerFixture) -> None:
         feed=mocker.MagicMock(),
         weather=mocker.MagicMock(),
         time=mocker.MagicMock(),
+
     )
     animal_manager.calves = calves
     animal_manager.heiferIs = heiferIs
@@ -510,6 +511,7 @@ def test_allocate_animals_to_pens(mocker: MockerFixture) -> None:
     animal_manager.heiferIIIs = heiferIIIs
     animal_manager.cows = cows
     animal_manager.all_pens = mock_pens
+    animal_manager.ANIMAL_GROUPING_SCENARIO = mocker.MagicMock()
 
     patch_for_sort_animals_before_allocation = mocker.patch.object(
         AnimalManager,
@@ -517,14 +519,15 @@ def test_allocate_animals_to_pens(mocker: MockerFixture) -> None:
         return_value=None
     )
 
-    mocker.patch('RUFAS.routines.animal.animal_manager.AnimalManager.ANIMAL_GROUPING_SCENARIO.find_animal_combination',
-                 side_effect=lambda animal: Pen.AnimalCombination.CALF
-                 if animal in calves
-                 else Pen.AnimalCombination.GROWING
-                 if animal in heiferIs + heiferIIs
-                 else Pen.AnimalCombination.CLOSE_UP
-                 if animal in heiferIIIs + dry_cows
-                 else Pen.AnimalCombination.LAC_COW)
+    animal_manager.ANIMAL_GROUPING_SCENARIO.find_animal_combination = mocker.MagicMock(
+        'animal_manager.ANIMAL_GROUPING_SCENARIO.find_animal_combination',
+        side_effect=lambda animal: Pen.AnimalCombination.CALF
+        if animal in calves
+        else Pen.AnimalCombination.GROWING
+        if animal in heiferIs + heiferIIs
+        else Pen.AnimalCombination.CLOSE_UP
+        if animal in heiferIIIs + dry_cows
+        else Pen.AnimalCombination.LAC_COW)
 
     # Act
     animal_manager.allocate_animals_to_pens()
@@ -540,3 +543,24 @@ def test_allocate_animals_to_pens(mocker: MockerFixture) -> None:
     assert patch_for_allocate_animals_to_pens_helper.call_count == len(animals_by_combination)
     patch_for_fully_update_animal_to_pen_id_map.assert_called_once()
     patch_for_sort_animals_before_allocation.assert_called_once()
+
+
+def test_set_animal_grouping_scenario(mocker: MockerFixture):
+    """Unit test for function set_animal_grouping_scenario() in file animal_manager.py."""
+    scenario = mocker.MagicMock()
+    mocker.patch(
+        'RUFAS.routines.animal.animal_manager.AnimalManager.__init__',
+        return_value=None
+    )
+    animal_manager = AnimalManager(
+        data=mocker.MagicMock(),
+        config=mocker.MagicMock(),
+        feed=mocker.MagicMock(),
+        weather=mocker.MagicMock(),
+        time=mocker.MagicMock(),
+        )
+    # act
+    animal_manager.set_animal_grouping_scenario(scenario)
+
+    # assert
+    assert animal_manager.ANIMAL_GROUPING_SCENARIO == scenario
