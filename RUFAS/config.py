@@ -1,3 +1,6 @@
+from typing import Dict
+
+
 def is_leap_year(year):
     """
     Description:
@@ -18,8 +21,7 @@ def is_leap_year(year):
 
 
 class Config:
-
-    def __init__(self, data):
+    def __init__(self, data: Dict[str, int | bool | str]):
         """
         Description:
             Object containing configuration information of the simulation
@@ -31,19 +33,21 @@ class Config:
 
         # gets a start/end date in the format year:julian-day. That way the program
         # can start in the middle of the year
-        self.start_full_date = data['start_date'].split(':')
-        self.end_full_date = data['end_date'].split(':')
+        self.start_full_date = data["start_date"].split(":")
+        self.end_full_date = data["end_date"].split(":")
         self.start_year = int(self.start_full_date[0])
         self.end_year = int(self.end_full_date[0])
         self.start_day = int(self.start_full_date[1])
         self.end_day = int(self.end_full_date[1])
 
         # set seed attributes
-        self.set_seed = data['set_seed']
-        self.seed = data['random_seed']
+        self.set_seed = data["set_seed"]
+        self.seed = data["random_seed"]
 
         # TODO: remove conditional once all json files have simulate_animals field
-        self.simulate_animals = data['simulate_animals'] if 'simulate_animals' in data else True
+        self.simulate_animals = (
+            data["simulate_animals"] if "simulate_animals" in data else True
+        )
 
         year_length = 365
         leap_year_length = 366
@@ -56,15 +60,13 @@ class Config:
         self.years = []
 
         for year in range(self.start_year, self.end_year + 1):
-
             if year == self.start_year == self.end_year:
                 days = [None for _ in range(1, self.start_day)]
                 days += [_ for _ in range(self.start_day, self.end_day + 1)]
             elif year == self.start_year:
                 days = [None for _ in range(1, self.start_day)]
                 if is_leap_year(year):
-                    days += (_ for _ in range(self.start_day,
-                                              leap_year_length + 1))
+                    days += (_ for _ in range(self.start_day, leap_year_length + 1))
                 else:
                     days += (_ for _ in range(self.start_day, year_length + 1))
             elif year == self.end_year:
