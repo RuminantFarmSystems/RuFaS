@@ -1046,11 +1046,11 @@ def test_cycle_water(field_size: float, rainfall: float, runoff: float, high_wat
         soil = Soil(soil_data)
         crop_data_1 = CropData(field_proportion=crop_1_proportion, max_transpiration=44.1, cumulative_evaporation=105.5,
                                cumulative_transpiration=205.1, cumulative_potential_evapotranspiration=400.19,
-                               total_water_uptake=3.5)
+                               water_uptake=3.5)
         crop_1 = Crop(crop_data_1)
         crop_data_2 = CropData(field_proportion=crop_2_proportion, max_transpiration=39.5, cumulative_evaporation=112.4,
                                cumulative_transpiration=219.2, cumulative_potential_evapotranspiration=480.1,
-                               total_water_uptake=3.25)
+                               water_uptake=3.25)
         crop_2 = Crop(crop_data_2)
         current_conditions = CurrentDayConditions(incoming_light=light, min_air_temperature=min_temp,
                                                   precipitation=rainfall, max_air_temperature=max_temp,
