@@ -361,6 +361,9 @@ def test_add_error(
     mock_output_manager._handle_log_output = output_manager_original_method_states[
         "_handle_log_output"
     ]
+    mock_output_manager.add_error = output_manager_original_method_states[
+        "add_error"
+    ]
 
 
 @pytest.mark.parametrize(
@@ -410,6 +413,9 @@ def test_add_warning(
     ]
     mock_output_manager._handle_log_output = output_manager_original_method_states[
         "_handle_log_output"
+    ]
+    mock_output_manager.add_warning = output_manager_original_method_states[
+        "add_warning"
     ]
 
 
@@ -461,6 +467,9 @@ def test_add_log(
     ]
     mock_output_manager._handle_log_output = output_manager_original_method_states[
         "_handle_log_output"
+    ]
+    mock_output_manager.add_log = output_manager_original_method_states[
+        "add_log"
     ]
 
 
@@ -1869,7 +1878,64 @@ def test_route_save_functions_graph(
     mock_output_manager.add_warning = output_manager_original_method_states[
         "add_warning"
     ]
-    mock_output_manager.add_error = output_manager_original_method_states["add_error"]
+    mock_output_manager.add_error = output_manager_original_method_states[
+        "add_error"
+    ]
+    mock_output_manager._route_graph_generator_logs = output_manager_original_method_states[
+        "_route_graph_generator_logs"
+    ]
+
+
+@pytest.mark.parametrize("log_pool, expected_result, expected_calls", [
+    (
+        [
+            {"log": "info_log", "message": "Info message",
+             "info_map": {"class": "GraphGenerator", "function": "prepare_plot_data"}},
+            {"warning": "warning_type",
+             "message": "Warning message",
+             "info_map": {"class": "GraphGenerator", "function": "prepare_plot_data"}}
+        ],
+        True,
+        {"add_error": 0, "add_log": 1, "add_warning": 1}
+    ),
+    (
+        [
+            {"error": "error_type", "message": "Error message",
+             "info_map": {"class": "GraphGenerator", "function": "prepare_plot_data"}},
+            {"log": "info_log", "message": "Info message",
+             "info_map": {"class": "GraphGenerator", "function": "prepare_plot_data"}}
+        ],
+        False,
+        {"add_error": 1, "add_log": 1, "add_warning": 0}
+    ),
+])
+def test_route_graph_generator_logs(mock_output_manager: OutputManager,
+                                    output_manager_original_method_states: Dict[str, Callable],
+                                    log_pool, expected_result, expected_calls):
+    mock_output_manager.add_error = MagicMock()
+    mock_output_manager.add_log = MagicMock()
+    mock_output_manager.add_warning = MagicMock()
+
+    result = mock_output_manager._route_graph_generator_logs(log_pool)
+
+    assert result == expected_result
+
+    assert mock_output_manager.add_error.call_count == expected_calls["add_error"]
+    assert mock_output_manager.add_log.call_count == expected_calls["add_log"]
+    assert mock_output_manager.add_warning.call_count == expected_calls["add_warning"]
+
+    mock_output_manager.add_log = output_manager_original_method_states[
+        "add_log"
+    ]
+    mock_output_manager.add_warning = output_manager_original_method_states[
+        "add_warning"
+    ]
+    mock_output_manager.add_error = output_manager_original_method_states[
+        "add_error"
+    ]
+    mock_output_manager._route_graph_generator_logs = output_manager_original_method_states[
+        "_route_graph_generator_logs"
+    ]
 
 
 def test_load_variables_pool_from_file_valid_path(
