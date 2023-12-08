@@ -1,18 +1,7 @@
-# TODO remove the below if not necessary in final typing
-# from typing import List
 import numpy as np
 
 from RUFAS.output_manager import OutputManager
 from RUFAS.routines.animal.ration.ration_driver import RationReporter
-
-# TODO remove the below if not necessary in final typing
-# from RUFAS.routines.animal.life_cycle.heiferII import HeiferII
-# from RUFAS.routines.animal.life_cycle.heiferIII import HeiferIII
-# from RUFAS.routines.animal.life_cycle.cow import Cow
-
-# TODO remove the below if can't resolve circular imports!
-# from RUFAS.routines.animal.pen import Pen
-# from RUFAS.routines.animal.animal_manager import AnimalManager
 from RUFAS.routines.animal.manure.general_manure import AnimalManureExcretions
 
 om = OutputManager()
@@ -249,11 +238,6 @@ class AnimalModuleReporter:
             Day of simulation.
         """
         info_map = {"class": "LifeCycleManager", "function": "daily_update"}
-        # om.add_variable("calf_num", life_cycle_manager.calf_num, info_map)
-        # om.add_variable("heiferI_num", life_cycle_manager.heiferI_num, info_map)
-        # om.add_variable("heiferII_num", life_cycle_manager.heiferII_num, info_map)
-        # om.add_variable("heiferIII_num", life_cycle_manager.heiferIII_num, info_map)
-        # om.add_variable("cow_num", life_cycle_manager.cow_num, info_map)
         om.add_variable("sold_heiferIII_oversupply_num", life_cycle_manager.sold_heiferIII_oversupply_num, info_map)
         om.add_variable("bought_heifer_num", life_cycle_manager.bought_heifer_num, info_map)
         om.add_variable("sold_heiferII_num", life_cycle_manager.sold_heiferII_num, info_map)
@@ -382,7 +366,8 @@ class AnimalModuleReporter:
             Instance of AnimalManager class.
         """
         AnimalModuleReporter.report_daily_animal_population(animal_manager)
-        AnimalModuleReporter.report_life_cycle_manager_data(animal_manager.life_cycle_manager, animal_manager.simulation_day)
+        AnimalModuleReporter.report_life_cycle_manager_data(animal_manager.life_cycle_manager,
+                                                            animal_manager.simulation_day)
         AnimalModuleReporter.report_daily_ration(animal_manager)
         AnimalModuleReporter.report_305d_milk(animal_manager)
         for pen in animal_manager.all_pens:

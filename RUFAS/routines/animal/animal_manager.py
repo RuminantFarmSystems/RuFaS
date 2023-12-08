@@ -1624,32 +1624,11 @@ class AnimalManager:
 
             manure_excretions_output_data = {}
             for pen in self.all_pens:
-                pen.classes_in_pen = self._determine_classes_in_pen(pen)
-                pen.calc_total_manure(
-                    feed,
-                    self.methane_model,
-                    self.methane_mitigation_method,
-                    self.methane_mitigation_additive_amount,
-                    manure_excretions_output_data,
-                )
-                pen.call_p_rqmts()
-                pen.daily_p_update()  # Average phosphorus concentration per pen
+                self.collect_manure_excretions_output_data(pen, feed, manure_excretions_output_data)
+            self.calc_p_rqmts()
+            self.daily_p_update()  # Average phosphorus concentration per pen
             AnimalModuleReporter.report_animal_module_manure(manure_excretions_output_data)
-# =======
-#                 self.collect_manure_excretions_output_data(pen, feed, manure_excretions_output_data)
-#             self.calc_p_rqmts()
-#             self.daily_p_update()  # Average phosphorus concentration per pen
-#             for output_data_dict in manure_excretions_output_data.values():
-#                 for manure_property, manure_value in output_data_dict["manure"].items():
-#                     info_map = {
-#                         "class": self.__class__.__name__,
-#                         "function": self.daily_updates.__name__,
-#                     }
-#                     om.add_variable(
-#                         f'{output_data_dict["prefix"]}_{str(manure_property)}', manure_value, info_map=info_map
-#                     )
 
-# >>>>>>> main
             self._update_phosphorus_concentrations()  # Average phosphorus concentration per animal type
             self.record_pen_history()
 
