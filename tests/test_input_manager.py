@@ -2382,6 +2382,7 @@ def test_add_tabular_variable_to_pool(variable_name: str,
                                       properties_blob_key: str,
                                       mock_input_manager: InputManager,
                                       input_manager_original_method_states: Dict[str, Callable]) -> None:
+    """Test for InputManager.add_tabular_variable_to_pool() for valid data"""
     mock_input_manager._metadata_properties_exists = MagicMock(return_value=(True, None))
     mock_input_manager._add_variable_to_pool = MagicMock(return_value=(True, None))
 
@@ -2424,6 +2425,7 @@ def test_add_tabular_variable_to_pool_type_error(variable_name: str,
                                                  properties_blob_key: str,
                                                  mock_input_manager: InputManager,
                                                  input_manager_original_method_states: Dict[str, Callable]) -> None:
+    """Test for InputManager.add_tabular_variable_to_pool() for incorrect data type is received"""
     mock_input_manager._metadata_properties_exists = MagicMock(return_value=(True, None))
     mock_input_manager._add_variable_to_pool = MagicMock(return_value=(True, None))
 
@@ -2459,6 +2461,7 @@ def test_add_tabular_variable_to_pool_metadata_error(variable_name: str,
                                                      properties_blob_key: str,
                                                      mock_input_manager: InputManager,
                                                      input_manager_original_method_states: Dict[str, Callable]) -> None:
+    """Test for InputManager.add_tabular_variable_to_pool() when no metadata is loaded"""
     mock_input_manager._metadata_properties_exists = MagicMock(return_value=(False, KeyError()))
     mock_input_manager._add_variable_to_pool = MagicMock(return_value=(True, None))
 
@@ -2496,6 +2499,7 @@ def test_add_tabular_variable_to_pool_invalid_data(variable_name: str,
                                                    properties_blob_key: str,
                                                    mock_input_manager: InputManager,
                                                    input_manager_original_method_states: Dict[str, Callable]) -> None:
+    """Test for InputManager.add_tabular_variable_to_pool() for invalid data and eager_termination set to False"""
     mock_input_manager._metadata_properties_exists = MagicMock(return_value=(True, None))
     mock_input_manager._add_variable_to_pool = MagicMock(return_value=(False, None))
 
@@ -2541,6 +2545,7 @@ def test_add_tabular_variable_to_pool_invalid_data_eager_termination(variable_na
                                                                      mock_input_manager: InputManager,
                                                                      input_manager_original_method_states: Dict[
                                                                          str, Callable]) -> None:
+    """Test for InputManager.add_tabular_variable_to_pool() for invalid data and eager_termination set to True"""
     mock_input_manager._metadata_properties_exists = MagicMock(return_value=(True, None))
     mock_input_manager._add_variable_to_pool = MagicMock(return_value=(False, ValueError()))
 
