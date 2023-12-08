@@ -2,7 +2,6 @@ from functools import reduce
 import json
 from typing import Any, Callable, Dict, List
 
-import mock
 from mock import MagicMock, Mock, mock_open, patch
 import pandas as pd
 import pytest
