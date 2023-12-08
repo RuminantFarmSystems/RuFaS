@@ -228,7 +228,8 @@ def test_report_daily_ration(animal_manager_fixture, mocker: MockerFixture):
     AnimalModuleReporter.report_daily_ration(animal_manager_fixture)
 
     for i in range(1, 2):
-        assert om.variables_pool[f"AnimalModuleReporter.report_daily_ration.ration_daily_feed_totals_for_pen_{i}_combo{i}"][
+        assert om.variables_pool[
+            f"AnimalModuleReporter.report_daily_ration.ration_daily_feed_totals_for_pen_{i}_combo{i}"][
             "values"
         ] == [test_data[f"formatted_ration_{i}"]]
 
@@ -387,11 +388,13 @@ def test_report_daily_reports(mocker: MockerFixture):
     animal_manager.all_pens = [mocker.MagicMock(), mocker.MagicMock()]
     animal_manager.all_pens[0].animal_combination.name = "LAC_COW"
 
-    patch_for_report_daily_animal_population = mocker.patch.object(AnimalModuleReporter, "report_daily_animal_population")
+    patch_for_report_daily_animal_population = mocker.patch.object(AnimalModuleReporter,
+                                                                   "report_daily_animal_population")
     patch_for_report_life_cycle_manager_data = mocker.patch.object(
         AnimalModuleReporter, "report_life_cycle_manager_data", return_value=""
     )
-    patch_for_report_report_daily_ration = mocker.patch.object(AnimalModuleReporter, "report_daily_ration", return_value="")
+    patch_for_report_report_daily_ration = mocker.patch.object(AnimalModuleReporter, "report_daily_ration",
+                                                               return_value="")
     patch_for_report_305d_milk = mocker.patch.object(AnimalModuleReporter, "report_305d_milk", return_value="")
     patch_for_report_pen_manure_properties = mocker.patch.object(
         AnimalModuleReporter, "report_pen_manure_properties", return_value=""
