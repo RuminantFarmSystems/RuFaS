@@ -8,7 +8,25 @@ from RUFAS.util import Utility
 PROPERTIES_PATH: Path = Path("").joinpath("input", "metadata", "default_metadata.json")
 
 
-class SchemaSetupMethods:
+class SchemaManager:
+    """
+    This class provides a suite of methods for automatically updating the JSON schemas for the Data Collection App based
+    on the properties contained in the metadata.
+
+    Methods
+    -------
+    setup_number_schema(title, input_properties)
+        Creates the JSON editor schema for a 'number' type.
+    setup_bool_schema(title, input_properties)
+        Creates the JSON editor schema for a 'bool' type.
+    setup_string_schema(title, input_properties)
+        Creates the JSON editor schema for a 'string' type.
+    setup_array_schema(title, input_properties)
+        Creates the JSON editor schema for an 'array' type.
+    setup_object_schema(title, input_properties)
+        Creates the JSON editor schema for an 'object' type.
+
+    """
 
     @staticmethod
     def setup_number_schema(title: str, input_properties: dict[str, Any]) -> dict[str, Any]:
@@ -83,7 +101,7 @@ class SchemaSetupMethods:
             schema["options"]["infoText"] = description
         if pattern is not None:
             try:
-                enum = SchemaSetupMethods._get_list_of_options(pattern)
+                enum = SchemaManager._get_list_of_options(pattern)
             except ValueError as e:
                 print(e)
                 return schema
@@ -124,7 +142,7 @@ class SchemaSetupMethods:
             schema["options"]["infoText"] = description
 
         element_properties = input_properties["properties"]
-        element_schema_creator = SchemaSetupMethods.DATA_TYPE_TO_SCHEMA_SETUP_MAP[element_properties["type"]]
+        element_schema_creator = SchemaManager.DATA_TYPE_TO_SCHEMA_SETUP_MAP[element_properties["type"]]
         element_title = title + "_element"
         element_property_dictionary = element_schema_creator(element_title, element_properties)
         schema["items"] = element_property_dictionary
@@ -151,7 +169,7 @@ class SchemaSetupMethods:
         keys = [key for key in input_properties.keys() if key != "type" and key != "description" and key != "default"]
         for key in keys:
             sub_property = input_properties[key]
-            schema_setup_method = SchemaSetupMethods.DATA_TYPE_TO_SCHEMA_SETUP_MAP[sub_property["type"]]
+            schema_setup_method = SchemaManager.DATA_TYPE_TO_SCHEMA_SETUP_MAP[sub_property["type"]]
             sub_property_schema = schema_setup_method(key, sub_property)
             schema["properties"][key] = sub_property_schema
 
@@ -167,8 +185,10 @@ class SchemaSetupMethods:
 
 
 def main() -> None:
-    schema_dir_path = Path('schemas/')
-    Utility.empty_dir(schema_dir_path, None)
+    """Routine that will update the """
+    schema_dir_path = Path("output").joinpath("schemas")
+    keep_list = [".keep"]
+    Utility.empty_dir(schema_dir_path, keep_list)
 
     with open(PROPERTIES_PATH) as metadata:
         metadata_dict = json.load(metadata)
@@ -177,7 +197,7 @@ def main() -> None:
 
     for key in properties.keys():
         try:
-            new_schema = SchemaSetupMethods.setup_object_schema(key, properties[key])
+            new_schema = SchemaManager.setup_object_schema(key, properties[key])
         except Exception as e:
             print(f"Key: '{key}' raised exception: {str(e)}")
             continue
