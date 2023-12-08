@@ -362,12 +362,17 @@ class ManureApplication:
         """
         nitrates_added = (dry_matter_mass * inorganic_nitrogen_fraction * (1 - ammonium_fraction)) / field_size
         ammonium_added = (dry_matter_mass * inorganic_nitrogen_fraction * ammonium_fraction) / field_size
-        organic_nitrogen_added = (dry_matter_mass * organic_nitrogen_fraction * 0.5) / field_size
+        active_fraction_of_organic_nitrogen = 0.9286
+        active_organic_nitrogen_added = (dry_matter_mass * organic_nitrogen_fraction *
+                                         active_fraction_of_organic_nitrogen) / field_size
+        stable_organic_nitrogen_added = (dry_matter_mass * organic_nitrogen_fraction *
+                                         (1.0 - active_organic_nitrogen_added)) / field_size
+
 
         self.data.soil_layers[layer_index].nitrate_content += nitrates_added
         self.data.soil_layers[layer_index].ammonium_content += ammonium_added
-        self.data.soil_layers[layer_index].fresh_organic_nitrogen_content += organic_nitrogen_added
-        self.data.soil_layers[layer_index].active_organic_nitrogen_content += organic_nitrogen_added
+        self.data.soil_layers[layer_index].stable_organic_nitrogen_content += stable_organic_nitrogen_added
+        self.data.soil_layers[layer_index].active_organic_nitrogen_content += active_organic_nitrogen_added
 
     def _apply_subsurface_manure(self, total_phosphorus_mass: float,
                                  water_extractable_inorganic_phosphorus_fraction: float,
