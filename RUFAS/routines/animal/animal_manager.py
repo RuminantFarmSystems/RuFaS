@@ -1404,7 +1404,6 @@ class AnimalManager:
         """
         animal_class_names = ["calves", "heiferIs", "heiferIIs", "heiferIIIs", "cows"]
 
-        # Reasons for removal: graduated, sold, culled
         removed_animals = set()
         for animal_type_name in animal_class_names:
             removed_animals.update(
@@ -1626,20 +1625,20 @@ class AnimalManager:
             for pen in self.all_pens:
                 self.collect_manure_excretions_output_data(pen, feed, manure_excretions_output_data)
             self.calc_p_rqmts()
-            self.daily_p_update()  # Average phosphorus concentration per pen
+            self.daily_p_update()
             AnimalModuleReporter.report_animal_module_manure(manure_excretions_output_data)
 
-            self._update_phosphorus_concentrations()  # Average phosphorus concentration per animal type
+            self._update_phosphorus_concentrations()
             self.record_pen_history()
 
             if self.end_ration_interval():
                 self.reset_milk_production_reduction()
-                self.calc_nutrient_rqmts(feed, current_temperature)  # per animal
+                self.calc_nutrient_rqmts(feed, current_temperature)
                 self.clear_pens()
                 self.allocate_animals_to_pens()
-                self._calc_ration_at_interval(feed)  # per pen
+                self._calc_ration_at_interval(feed)
                 AnimalModuleReporter.report_ration_interval_data(self, feed, self.simulation_day)
-                self.calc_avg_growth()  # per pen
+                self.calc_avg_growth()
                 for pen in self.all_pens:
                     if pen.animal_combination.name == "LAC_COW":
                         for animal in pen.animals_in_pen:
