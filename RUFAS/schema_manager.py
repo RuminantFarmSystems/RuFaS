@@ -5,6 +5,7 @@ import re
 
 from RUFAS.util import Utility
 
+
 class SchemaManager:
     """
     This class provides a suite of methods for automatically updating the JSON schemas for the Data Collection App based
@@ -180,7 +181,9 @@ class SchemaManager:
         "object": setup_object_schema
     }
 
+
 PROPERTIES_PATH: Path = Path("").joinpath("input", "metadata", "default_metadata.json")
+
 
 def main() -> None:
     """Routine that will update the """
