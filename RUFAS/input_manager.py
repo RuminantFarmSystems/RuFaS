@@ -877,19 +877,17 @@ class InputManager:
     def add_dict_variable_to_pool(self, variable_name: str, data: Dict[str, Any], properties_blob_key: str,
                                   eager_termination: bool) -> bool:
         """
-        Adds a variable to the InputManager's pool after validating it against metadata.
+        Adds a dictionary variable to the InputManager's pool after validating it against metadata.
 
         This function takes in a variable along with its name and a key to access its validation metadata.
         It validates the data against the provided metadata and adds the data to the InputManager pool if it is valid.
 
-        The function logs the count of total, valid, fixed, and invalid elements of the variable during validation.
-
         Parameters
         ----------
         variable_name: str
-            The name of the variable to be added.
+            The name of the dictionary variable to be added.
         data : Dict[str, Any]
-            The data of the variable, structured as a dictionary or a list.
+            The data of the variable, structured as a dictionary.
         properties_blob_key : str
             A key used to locate the metadata for validation of the variable.
         eager_termination : bool
@@ -904,11 +902,11 @@ class InputManager:
 
         Raises
         -------
+        TypeError
+            If `data` is not the expected type of Dict[str, Any].
         KeyError
             If no metadata is loaded in InputManager.__metadata; or if no metadata property can be found with the given
             `properties_blob_key`.
-        TypeError
-            If `data` is not the expected type of Dict[str, Any].
         ValueError
             If eager_termination is True and the variable failed validation.
         """
@@ -921,20 +919,22 @@ class InputManager:
                          info_map)
             raise TypeError("Incorrect variable type. Expected types: `data: Dict[str, Any]`.")
 
-        metadata_properties_exists, metadata_error = self._metadata_properties_exists(
+        metadata_properties_exists, metadata_key_error = self._metadata_properties_exists(
             variable_name=variable_name,
             properties_blob_key=properties_blob_key)
 
         if not metadata_properties_exists:
-            raise metadata_error
+            raise metadata_key_error
 
-        add_variable_success, add_variable_error = self._add_variable_to_pool(variable_name=variable_name,
-                                                                              data=data,
-                                                                              properties_blob_key=properties_blob_key,
-                                                                              eager_termination=eager_termination,
-                                                                              variable_type='dict')
-        if add_variable_success and add_variable_error:
-            raise add_variable_error
+        add_variable_success, add_variable_value_error = self._add_variable_to_pool(
+            variable_name=variable_name,
+            data=data,
+            properties_blob_key=properties_blob_key,
+            eager_termination=eager_termination,
+            variable_type='dict')
+
+        if not add_variable_success and add_variable_value_error:
+            raise add_variable_value_error
 
         return add_variable_success
 
@@ -946,8 +946,6 @@ class InputManager:
         This function takes in a variable along with its name and a key to access its validation metadata.
         It validates the data against the provided metadata and adds the data to the InputManager pool if it is valid.
 
-        The function logs the count of total, valid, fixed, and invalid elements of the variable during validation.
-
         Parameters
         ----------
         variable_name: str
@@ -957,7 +955,7 @@ class InputManager:
         properties_blob_key : str
             A key used to locate the metadata for validation of the variable.
         eager_termination : bool
-            If True, raises a RuntimeError when the variable is invalid.
+            If True, raises a ValueError when the variable is invalid.
             If False, the function returns False without raising an error.
 
         Returns
@@ -968,11 +966,11 @@ class InputManager:
 
         Raises
         -------
+        TypeError
+            If `data` is not the expected type of Dict[str, List[Any]] | List[Any].
         KeyError
             If no metadata is loaded in InputManager.__metadata; or if no metadata property can be found with the given
             `properties_blob_key`.
-        TypeError
-            If `data` is not the expected type of Dict[str, List[Any]] | List[Any].
         ValueError
             If eager_termination is True and the variable failed validation.
         """
@@ -987,19 +985,21 @@ class InputManager:
 
         data = {variable_name: data} if isinstance(data, List) else data
 
-        metadata_properties_exists, metadata_error = self._metadata_properties_exists(
+        metadata_properties_exists, metadata_key_error = self._metadata_properties_exists(
             variable_name=variable_name,
             properties_blob_key=properties_blob_key)
 
         if not metadata_properties_exists:
-            raise metadata_error
+            raise metadata_key_error
 
-        add_variable_success, add_variable_error = self._add_variable_to_pool(variable_name=variable_name,
-                                                                              data=data,
-                                                                              properties_blob_key=properties_blob_key,
-                                                                              eager_termination=eager_termination,
-                                                                              variable_type='tabular')
-        if not add_variable_success and add_variable_error:
-            raise add_variable_error
+        add_variable_success, add_variable_value_error = self._add_variable_to_pool(
+            variable_name=variable_name,
+            data=data,
+            properties_blob_key=properties_blob_key,
+            eager_termination=eager_termination,
+            variable_type='tabular')
+
+        if not add_variable_success and add_variable_value_error:
+            raise add_variable_value_error
 
         return add_variable_success
