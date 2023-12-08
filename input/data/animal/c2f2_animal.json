@@ -39,7 +39,7 @@
 				"prefresh_day":30,
                 "calving_interval":395,
                 "heifer_repro_programs": {
-                    "estrus_detection_rate":0.6,
+                    "estrus_detection_rate":0.9,
                     "estrus_service_rate":1.0,
                     "ed_conception_rate":0.55,
                     "heifer_TAI_protocol": "ED",
