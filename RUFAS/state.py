@@ -53,7 +53,6 @@ class State:
             Resets all annual variables that require reset
         """
         self.field_manager.annual_update_routine()
-        self.animal_manager.annual_reset()
 
     def annual_mass_balance(self, time):
         pass
