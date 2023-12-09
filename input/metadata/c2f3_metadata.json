@@ -108,7 +108,7 @@
     "weather": {
       "title": "Weather data",
       "description": "Let's turn on the AC",
-      "path": "input/data/weather/ADD FARM-SPECIFIC WEATHER FILE.csv",
+      "path": "input/data/weather/c2f3_weather.csv",
       "type": "csv",
       "properties": "weather_properties"
     },
