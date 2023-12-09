@@ -4,6 +4,7 @@ from statistics import mean
 from typing import Any, Dict, Tuple, List, Set, Union
 
 from RUFAS.general_constants import GeneralConstants
+from RUFAS.routines.animal.animal_typed_dicts import InitialHerdSummaryTypedDict
 from RUFAS.time import Time
 from RUFAS.weather import Weather
 from RUFAS.output_manager import OutputManager
@@ -1138,7 +1139,7 @@ class AnimalManager:
             or self.simulation_day == 0
         )
 
-    def get_initial_herd_summary(self) -> InitializationDBSummaryTypedDict:
+    def get_initial_herd_summary(self) -> InitialHerdSummaryTypedDict:
         """
         Returns: a dictionary which is the summary of the initial herd
         """
