@@ -1,5 +1,6 @@
 <!-- This is a Git Issue Template following the Urgency-Status-Intention-Request (USIR) pattern.
-     Please fill in all the sections as described below. -->
+     Please fill in as many details as you can.
+-->
 
 ## Urgency Level
 <!-- Indicate the urgency level of this issue -->
@@ -11,36 +12,68 @@
 - [ ] Unsure: the urgency level has not been or cannot be assessed at this time 
 
 ## Status
-<!-- Describe the current status of the problem or context. -->
+<!-- Describe the current status of the problem or context.
 
 - What is the current behavior?
-- Which branch are you working on?
+- Which branch are you working on (if any)?
 - Relevant logs and/or screenshots:
 
+-->
+
+
+
+
+
 ## Intention
-<!-- Explain what you are trying to achieve. -->
+<!-- Explain what you are trying to achieve.
 
 - What is the expected outcome?
 - Why is this change necessary?
 
+-->
+
+
+
+
+
 ## Request
-<!-- Detail the request. If possible, please be specific about what change you are proposing. -->
+<!-- Detail the request. If possible, please be specific about what change you are proposing.
 
 - Describe the change or feature you are proposing.
 - If applicable, provide examples.
 
+-->
+
+
+
+
+
 <!-- Please provide any additional information below. -->
 
-## Updates
-<!-- Keep this section updated with all the progress and communications regarding the issue. -->
+#### Updates
+<!-- Keep this section updated with all the progress and communications regarding the issue. 
 
 - [ ] In progress (assigned to @username)
 - [ ] Fix proposed/pull request submitted
 - [ ] Postponed till a later date
 - [ ] Closed
 
-## Additional Information
+-->
+
+
+
+
+
+#### Additional Information
+
+<!--
 
 - Anything else you would like to share?
+
+-->
+
+
+
+
 
 <!-- End of USIR Git Issue Template -->
