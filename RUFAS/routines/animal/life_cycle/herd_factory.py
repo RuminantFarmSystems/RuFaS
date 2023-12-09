@@ -8,7 +8,7 @@ from tqdm import tqdm
 
 from RUFAS.input_manager import InputManager
 from RUFAS.output_manager import OutputManager
-from RUFAS.routines import AnimalManager, Feed
+from RUFAS.routines.animal.animal_manager import AnimalManager, Feed
 from RUFAS.routines.animal.animal_typed_dicts import AnimalBaseInitArgsTypedDict
 from RUFAS.routines.animal.life_cycle.animal_base import AnimalBase
 from RUFAS.routines.animal.life_cycle.animal_population import AnimalPopulation
@@ -251,6 +251,8 @@ class HerdFactory:
             self.pre_animal_population = self._initialize_herd_from_data()
 
         self.post_animal_population = self._random_sample_with_replacement()
-        im.add_variable_to_pool(variable_name="runtime_animal_population", data=self.post_animal_population.__repr__(),
-                                properties_blob_key="animal_population_properties", eager_termination=False)
+        im.add_dict_variable_to_pool(variable_name="runtime_animal_population",
+                                     data=self.post_animal_population.__repr__(),
+                                     properties_blob_key="animal_population_properties",
+                                     eager_termination=False)
 
