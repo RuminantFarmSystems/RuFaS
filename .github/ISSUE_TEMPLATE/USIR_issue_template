@@ -3,11 +3,12 @@
 
 ## Urgency Level
 <!-- Indicate the urgency level of this issue -->
-- [ ] Critical: a critical feature is not working
+- [ ] Urgent: a critical feature or fix is needed
 - [ ] High: the issue significantly impacts the user experience
 - [ ] Medium: the issue affects functionality but has a workaround
 - [ ] Low: the issue doesn't have a significant immediate impact
-- [ ] Unsure: I am unsure how to classify the urgency level
+- [ ] Wishful: the issue should not be prioritized over any others
+- [ ] Unsure: the urgency level has not been or cannot be assessed at this time 
 
 ## Status
 <!-- Describe the current status of the problem or context. -->
