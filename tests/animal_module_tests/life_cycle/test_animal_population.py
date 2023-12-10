@@ -4,7 +4,7 @@ from typing import List, Type
 
 import mock
 import pytest
-from mock.mock import MagicMock, patch
+from mock.mock import MagicMock
 
 from RUFAS.routines.animal.life_cycle.animal_population import AnimalPopulation
 from RUFAS.routines.animal.life_cycle.calf import Calf
@@ -94,7 +94,6 @@ def test_get_animals(num_calf: int,
 
 class MockAnimals:
     def __init__(self, num_animal: int, animal_type: Type, starting_id: int = 0) -> None:
-        random.seed(42)
         self.num_animal = num_animal
         self.animal_type = animal_type
 

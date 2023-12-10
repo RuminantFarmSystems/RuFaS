@@ -51,6 +51,7 @@ class HerdFactory:
                                                        current_animal_id=0)
 
     def _calves_update(self) -> None:
+        remaining_calves: List[Calf] = []
         for calf in self.pre_animal_population.calves:
             wean_day = calf.update(0)
             if wean_day:
@@ -59,9 +60,12 @@ class HerdFactory:
 
                 heiferI = HeiferI(args)
                 self.pre_animal_population.heiferIs.append(heiferI)
-                self.pre_animal_population.calves.remove(calf)
+            else:
+                remaining_calves.append(calf)
+        self.pre_animal_population.calves = remaining_calves
 
     def _heiferIs_update(self) -> None:
+        remaining_heiferIs: List[HeiferI] = []
         for heiferI in self.pre_animal_population.heiferIs:
             second_stage = heiferI.update(0)
             if second_stage:
@@ -74,28 +78,35 @@ class HerdFactory:
 
                 heiferII = HeiferII(args)
                 self.pre_animal_population.heiferIIs.append(heiferII)
-                self.pre_animal_population.heiferIs.remove(heiferI)
+            else:
+                remaining_heiferIs.append(heiferI)
+        self.pre_animal_population.heiferIs = remaining_heiferIs
 
     def _heiferIIs_update(self):
+        remaining_heiferIIs: List[HeiferII] = []
         for heiferII in self.pre_animal_population.heiferIIs:
             cull_stage, third_stage = heiferII.update(0)
             if cull_stage:
-                self.pre_animal_population.heiferIIs.remove(heiferII)
+                continue
             if third_stage:
                 args = heiferII.get_heiferII_values()
                 args.update(id=self.pre_animal_population.next_id())
 
                 heiferIII = HeiferIII(args)
                 self.pre_animal_population.heiferIIIs.append(heiferIII)
-                self.pre_animal_population.heiferIIs.remove(heiferII)
+            else:
+                remaining_heiferIIs.append(heiferII)
+        self.pre_animal_population.heiferIIs = remaining_heiferIIs
 
     def _heiferIIIs_update(self, day: int) -> None:
+        remaining_heiferIIIs: List[HeiferIII] = []
         for heiferIII in self.pre_animal_population.heiferIIIs:
             cow_stage = heiferIII.update(0)
             if cow_stage:
                 args = heiferIII.get_heiferIII_values()
 
                 args.update(id=self.pre_animal_population.next_id())
+                # HARD CODED?
                 args.update(repro_program='TAI')
                 args.update(presynch_method='PreSynch')
                 args.update(tai_method_c='OvSynch 56')
@@ -103,19 +114,25 @@ class HerdFactory:
 
                 cow = Cow(args)
 
+                # APPENDING THE SAME COW TO BE IN BOTH COW AND REPLACEMENT?
                 self.pre_animal_population.cows.append(cow)
                 if day >= 3000:
                     args.update(id=self.pre_animal_population.next_id())
                     replacement_cow = Cow(args)
                     self.pre_animal_population.replacement.append(replacement_cow)
+            else:
+                remaining_heiferIIIs.append(heiferIII)
 
-                self.pre_animal_population.heiferIIIs.remove(heiferIII)
+        self.pre_animal_population.heiferIIIs = remaining_heiferIIIs
 
     def _cows_update(self):
+        remaining_cows: List[Cow] = []
         for cow in self.pre_animal_population.cows:
             _, _, _, culled, new_born = cow.update(0, self.CI)
             if culled or cow.calves > 4:
-                self.pre_animal_population.cows.remove(cow)
+                continue
+            else:
+                remaining_cows.append(cow)
             if new_born:
                 args = AnimalBaseInitArgsTypedDict(id=self.pre_animal_population.next_id(),
                                                    breed=self.breed,
@@ -130,6 +147,7 @@ class HerdFactory:
                 calf = Calf(args)
                 if not (calf.culled or calf.sold):
                     self.pre_animal_population.calves.append(calf)
+        self.pre_animal_population.cows = remaining_cows
 
     def _generate_animals(self) -> AnimalPopulation:
         for _ in range(self.initial_animal_num):
