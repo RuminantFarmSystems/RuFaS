@@ -130,8 +130,8 @@ def test_get_adjusted_schedule(animal_category: str, protocol_name: str, start_d
 
 
 @pytest.mark.parametrize(
-    "protocol, sub_protocol, expected_result", [
-        (HeiferReproProtocolEnum.SynchED.value, HeiferReproProtocolEnum.SynchED_2P.value, {
+    "sub_protocol, expected_result", [
+        (HeiferReproProtocolEnum.SynchED_2P.value, {
             'repro_protocol': HeiferReproProtocolEnum.TAI.value,
             'repro_sub_protocol': HeiferReproProtocolEnum.TAI_5dCG2P.value,
             'repro_sub_properties': {
@@ -139,7 +139,7 @@ def test_get_adjusted_schedule(animal_category: str, protocol_name: str, start_d
             }
         }),
 
-        (HeiferReproProtocolEnum.SynchED.value, HeiferReproProtocolEnum.SynchED_CP.value, {
+        (HeiferReproProtocolEnum.SynchED_CP.value, {
             'repro_protocol': HeiferReproProtocolEnum.TAI.value,
             'repro_sub_protocol': HeiferReproProtocolEnum.TAI_5dCG2P.value,
             'repro_sub_properties': {
@@ -147,7 +147,7 @@ def test_get_adjusted_schedule(animal_category: str, protocol_name: str, start_d
             }
         })
     ])
-def test_heifer_repro_protocols_when_estrus_not_detected(protocol: str, sub_protocol: str,
+def test_heifer_repro_protocols_when_estrus_not_detected(sub_protocol: str,
                                                          expected_result: dict[str, Any]) -> None:
     """
     Unit test for the sub-attributes of the HEIFER_REPRO_PROTOCOLS attribute of
@@ -155,7 +155,7 @@ def test_heifer_repro_protocols_when_estrus_not_detected(protocol: str, sub_prot
     """
 
     # Act and assert
-    assert InternalReproSettings.HEIFER_REPRO_PROTOCOLS[protocol][sub_protocol]['when_estrus_not_detected'] \
+    assert InternalReproSettings.HEIFER_REPRO_PROTOCOLS[sub_protocol]['when_estrus_not_detected'] \
            == expected_result
 
 

@@ -281,7 +281,9 @@ def test_convert_heiferI_to_heiferII(mocker: MockerFixture) -> None:
 
     heifer_repro_method = 'TAI'
     dummy_repro_sub_protocol = 'dummy'
-    mocker.patch('RUFAS.routines.animal.life_cycle.life_cycle.HeiferII.get_repro_sub_protocol',
+    mocker.patch('RUFAS.routines.animal.life_cycle.life_cycle.HeiferII.get_user_defined_repro_protocol',
+                 return_value=heifer_repro_method)
+    mocker.patch('RUFAS.routines.animal.life_cycle.life_cycle.HeiferII.get_user_defined_repro_sub_protocol',
                  return_value=dummy_repro_sub_protocol)
     animal_base_config = {
         "heifer_repro_method": heifer_repro_method,
@@ -297,7 +299,7 @@ def test_convert_heiferI_to_heiferII(mocker: MockerFixture) -> None:
         }),
         mocker.call(repro_program=heifer_repro_method),
         mocker.call(tai_method_h=dummy_repro_sub_protocol),
-        mocker.call(synch_ed_method_h=dummy_repro_sub_protocol)
+        mocker.call(synch_ed_method_h='')
     ]
 
     assert len(heiferIIs) == 1

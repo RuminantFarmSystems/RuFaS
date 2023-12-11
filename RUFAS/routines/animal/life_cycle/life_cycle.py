@@ -19,6 +19,7 @@ from RUFAS.routines.animal.life_cycle.cow import Cow
 from RUFAS.routines.animal.life_cycle.heiferI import HeiferI
 from RUFAS.routines.animal.life_cycle.heiferII import HeiferII
 from RUFAS.routines.animal.life_cycle.heiferIII import HeiferIII
+from RUFAS.routines.animal.life_cycle.repro_protocol_enums import HeiferReproProtocolEnum
 from RUFAS.util import Utility
 
 # GenericAnimal is a placeholder/generic type that represents any of the five classes listed in the union.
@@ -536,10 +537,16 @@ class LifeCycleManager:
             'body_weight_history': heiferI.body_weight_history,
             'pen_history': heiferI.pen_history
         })
-        heiferI_vals.update(repro_program=AnimalBase.config['heifer_repro_method'])
-        # TODO: Currently both tai_method_h and synch_ed_method_h are set to the same value.
-        heiferI_vals.update(tai_method_h=HeiferII.get_repro_sub_protocol())
-        heiferI_vals.update(synch_ed_method_h=HeiferII.get_repro_sub_protocol())
+        heiferI_vals.update(repro_program=HeiferII.get_user_defined_repro_protocol())
+        if HeiferII.get_user_defined_repro_protocol() == HeiferReproProtocolEnum.TAI.value:
+            heiferI_vals.update(tai_method_h=HeiferII.get_user_defined_repro_sub_protocol())
+            heiferI_vals.update(synch_ed_method_h='')
+        elif HeiferII.get_user_defined_repro_protocol() == HeiferReproProtocolEnum.SynchED.value:
+            heiferI_vals.update(tai_method_h='')
+            heiferI_vals.update(synch_ed_method_h=HeiferII.get_user_defined_repro_sub_protocol())
+        else:
+            heiferI_vals.update(tai_method_h='')
+            heiferI_vals.update(synch_ed_method_h='')
         new_heiferII = HeiferII(heiferI_vals)
         heiferIIs.append(new_heiferII)
 

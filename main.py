@@ -308,13 +308,13 @@ def execute_simulations(
         )
 
         HerdCompositionGraphGenerator.generate_herd_composition_graph(
-            Path(__file__).parent / 'output/CSVs/om/',
+            Path(__file__).parent / 'output/CSVs/',
             Path(__file__).parent / 'output/graphics/',
             'life_cycle_daily_updates'
         )
 
         HerdCompositionGraphGenerator.generate_cow_parity_composition_graph(
-            Path(__file__).parent / 'output/CSVs/om/',
+            Path(__file__).parent / 'output/CSVs',
             Path(__file__).parent / 'output/graphics/',
             'life_cycle_daily_updates'
         )
