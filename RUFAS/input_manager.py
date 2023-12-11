@@ -831,7 +831,7 @@ class InputManager:
         return True, None
 
     def _add_variable_to_pool(self, variable_name: str, data: Dict[str, Any], properties_blob_key: str,
-                              eager_termination: bool, variable_type: str) -> (bool, ValueError):
+                              eager_termination: bool, variable_type: str) -> (bool, ValueError | None):
         """
             Adds a variable to the pool after validating its data against specified metadata properties.
 
