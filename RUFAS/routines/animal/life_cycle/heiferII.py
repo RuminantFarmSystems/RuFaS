@@ -86,7 +86,7 @@ class HeiferII(HeiferI):
         self.abortion_day = None
         self.p_gest_for_calf = 0
         self._hormone_schedule = None
-        self._specific_conception_rate = 0.0
+        self._TAI_conception_rate = 0.0
 
     def get_bw_change(self):
         """
@@ -152,7 +152,7 @@ class HeiferII(HeiferI):
         self.p_gest_for_calf = 0
         self.calf_birth_weight = 0
         self._hormone_schedule = None
-        self._specific_conception_rate = 0.0
+        self._TAI_conception_rate = 0.0
 
     def assign_heiferII_values(self, args):
         """
@@ -335,6 +335,10 @@ class HeiferII(HeiferI):
             self.body_weight = self.mature_body_weight
             self.events.add_event(self.days_born, sim_day, const.MATURE_BODY_WEIGHT_REGULAR)
 
+        if self.repro_program != HeiferII.get_user_defined_repro_protocol():
+            if self.days_born < self._get_breeding_start_day() or not self.is_pregnant:
+                self._set_repro_program(sim_day, HeiferII.get_user_defined_repro_protocol())  # type: ignore
+
         # breeding method assign to heifer
         if self.days_born >= self._get_breeding_start_day():
             if self.repro_program == HeiferReproProtocolEnum.ED.value:
@@ -487,20 +491,49 @@ class HeiferII(HeiferI):
             The general estrus detection rate for heifers.
         """
 
-        return HeiferII.get_repro_data('estrus_detection_rate')
+        return HeiferII.get_user_defined_repro_data('estrus_detection_rate')
 
     @staticmethod
-    def get_specific_estrus_detection_rate() -> float:
+    def _get_user_defined_synch_ed_estrus_detection_rate() -> float:
         """
-        Get the specific estrus detection rate for heifers.
+        Get the user-defined estrus detection rate for heifers used in the SynchED protocol.
 
         Returns
         -------
         float
-            The specific estrus detection rate for heifers.
+            The user-defined estrus detection rate for heifers used in the SynchED protocol.
         """
 
-        return HeiferII.get_repro_sub_properties()['estrus_detection_rate']
+        return HeiferII.get_user_defined_repro_sub_properties()['estrus_detection_rate']
+
+    @staticmethod
+    def _get_default_synch_ed_estrus_detection_rate() -> float:
+        """
+        Get the default estrus detection rate for heifers used in the SynchED protocol.
+
+        Returns
+        -------
+        float
+            The default estrus detection rate for heifers used in the SynchED protocol.
+        """
+
+        return InternalReproSettings.HEIFER_REPRO_PROTOCOLS[
+            HeiferReproProtocolEnum.SynchED.value]['default_sub_properties']['estrus_detection_rate']
+
+    def _get_user_defined_or_default_synch_ed_estrus_detection_rate(self) -> float:
+        """
+        Get the estrus detection rate for heifers used in the SynchED protocol.
+
+        Returns
+        -------
+        float
+            The estrus detection rate for heifers used in the SynchED protocol.
+        """
+
+        if self.get_user_defined_repro_protocol() == HeiferReproProtocolEnum.SynchED.value:
+            return self._get_user_defined_synch_ed_estrus_detection_rate()
+        else:
+            return self._get_default_synch_ed_estrus_detection_rate()
 
     @staticmethod
     def get_general_conception_rate() -> float:
@@ -513,20 +546,55 @@ class HeiferII(HeiferI):
             The general conception rate for heifers.
         """
 
-        return HeiferII.get_repro_data('estrus_conception_rate')
+        return HeiferII.get_user_defined_repro_data('estrus_conception_rate')
 
     @staticmethod
-    def get_external_specific_conception_rate() -> float:
+    def _get_user_defined_TAI_conception_rate() -> float:
         """
-        Get the specific conception rate for heifers defined by the user.
+        Get the user-defined conception rate for heifers used in TAI protocols.
+
+        This is to contrast with the estrus conception rate used in the ED protocol.
 
         Returns
         -------
         float
-            The specific conception rate for heifers.
+            The specific conception rate for heifers used in the TAI protocol.
         """
 
-        return HeiferII.get_repro_sub_properties()['conception_rate']
+        return HeiferII.get_user_defined_repro_sub_properties()['conception_rate']
+
+    @staticmethod
+    def _get_default_TAI_conception_rate() -> float:
+        """
+        Get the default conception rate for heifers used in TAI protocols.
+
+        This is to contrast with the estrus conception rate used in the ED protocol.
+
+        Returns
+        -------
+        float
+            The default conception rate for heifers used in the TAI protocol.
+        """
+
+        return InternalReproSettings.HEIFER_REPRO_PROTOCOLS[
+            HeiferReproProtocolEnum.TAI.value]['default_sub_properties']['conception_rate']
+
+    def _get_user_defined_or_default_TAI_conception_rate(self) -> float:
+        """
+        Get the conception rate for heifers used in TAI protocols.
+
+        This is to contrast with the estrus conception rate used in the ED protocol.
+
+        Returns
+        -------
+        float
+            The conception rate for heifers used in the TAI protocol.
+        """
+
+        if self.get_user_defined_repro_protocol() == HeiferReproProtocolEnum.TAI.value:
+            return self._get_user_defined_TAI_conception_rate()
+        else:
+            return self._get_default_TAI_conception_rate()
 
     def _detect_estrus(self, detection_rate: float) -> bool:
         """
@@ -657,7 +725,7 @@ class HeiferII(HeiferI):
                 self.ai_day = self.days_born
                 self.log_event(self.days_born, sim_day, f'{const.AI_DAY_SCHEDULED_NOTE} on day {self.ai_day}')
             if actions.get('set_conception_rate', False):
-                self.conception_rate = self._specific_conception_rate
+                self.conception_rate = self._TAI_conception_rate
             del schedule[self.days_born]
 
     @staticmethod
@@ -674,9 +742,9 @@ class HeiferII(HeiferI):
         return AnimalBase.config['breeding_start_day_h']
 
     @staticmethod
-    def get_repro_data(attribute: str) -> Any:
+    def get_user_defined_repro_data(attribute: str) -> Any:
         """
-        Get the reproduction data for heifers.
+        Get the reproduction data for heifers defined by the user.
 
         Parameters
         ----------
@@ -692,30 +760,83 @@ class HeiferII(HeiferI):
         return AnimalBase.config['heifers'][attribute]
 
     @staticmethod
-    def get_repro_sub_protocol() -> str:
+    def get_user_defined_repro_protocol() -> str:
         """
-        Get the reproduction sub protocol for heifers.
+        Get the reproduction protocol for heifers defined by the user.
 
         Returns
         -------
         str
-            The reproduction sub protocol for heifers.
+            The reproduction protocol for heifers defined by the user.
         """
 
-        return HeiferII.get_repro_data('repro_sub_protocol')
+        return AnimalBase.config['heifer_repro_method']
 
     @staticmethod
-    def get_repro_sub_properties() -> dict:
+    def get_user_defined_repro_sub_protocol() -> str:
         """
-        Get the reproduction sub properties for heifers.
+        Get the reproduction sub protocol for heifers defined by the user.
+
+        Returns
+        -------
+        str
+            The reproduction sub protocol for heifers defined by the user.
+        """
+
+        return HeiferII.get_user_defined_repro_data('repro_sub_protocol')
+
+    @staticmethod
+    def _get_default_repro_sub_protocol(protocol: str) -> str:
+        """
+        Get the default reproduction sub protocol for heifers for a given reproduction protocol.
+
+        This is defined in the InternalReproSettings class.
+
+        Parameters
+        ----------
+        protocol : str
+            The reproduction protocol to get the default sub protocol for.
+
+        Returns
+        -------
+        str
+            The default reproduction sub protocol for heifers for the given reproduction protocol.
+        """
+
+        return InternalReproSettings.HEIFER_REPRO_PROTOCOLS[protocol]['default_sub_protocol']
+
+    def _get_repro_sub_protocol(self) -> str:
+        """
+        Get the reproduction sub protocol for the heifer.
+
+        When the current reproduction protocol is the same as the user-defined protocol, the
+        user-defined sub protocol is used. Otherwise, the default sub protocol for the current
+        reproduction protocol is used.
+
+        Returns
+        -------
+        str
+            The reproduction sub protocol for the heifer.
+        """
+
+        if self.repro_program == HeiferII.get_user_defined_repro_protocol():
+            repro_sub_protocol = HeiferII.get_user_defined_repro_sub_protocol()
+        else:
+            repro_sub_protocol = self._get_default_repro_sub_protocol(self.repro_program)
+        return repro_sub_protocol
+
+    @staticmethod
+    def get_user_defined_repro_sub_properties() -> dict:
+        """
+        Get the reproduction sub properties for heifers defined by the user.
 
         Returns
         -------
         dict
-            The reproduction sub properties for heifers.
+            The reproduction sub properties for heifers defined by the user.
         """
 
-        return HeiferII.get_repro_data('repro_sub_properties')
+        return HeiferII.get_user_defined_repro_data('repro_sub_properties')
 
     def execute_tai_protocol(self, sim_day: int) -> None:
         """
@@ -732,8 +853,8 @@ class HeiferII(HeiferI):
         """
 
         if self.days_born == self._get_breeding_start_day():
-            self._set_up_hormone_schedule('heifers', self.get_repro_sub_protocol(), self.days_born)
-            self._specific_conception_rate = self.get_external_specific_conception_rate()
+            self._set_up_hormone_schedule('heifers', self._get_repro_sub_protocol(), self.days_born)
+            self._TAI_conception_rate = self._get_user_defined_or_default_TAI_conception_rate()
 
         if self._hormone_schedule:
             self._execute_hormone_delivery_schedule(sim_day, self._hormone_schedule)
@@ -783,7 +904,7 @@ class HeiferII(HeiferI):
         """
 
         if self.days_born == self._get_breeding_start_day():
-            self._set_up_hormone_schedule('heifers', self.get_repro_sub_protocol(), self.days_born)
+            self._set_up_hormone_schedule('heifers', self._get_repro_sub_protocol(), self.days_born)
 
         self._handle_synch_ed_hormone_delivery_and_set_estrus_day(sim_day)
 
@@ -832,9 +953,9 @@ class HeiferII(HeiferI):
         None
         """
 
-        if len(self._hormone_schedule) > 0:
+        if self._hormone_schedule:
             self._execute_hormone_delivery_schedule(sim_day, self._hormone_schedule)
-            if len(self._hormone_schedule) == 0:
+            if not self._hormone_schedule:
                 self._simulate_synch_ed_estrus(self.days_born, sim_day, const.ESTRUS_DAY_SCHEDULED_NOTE)
 
     def _handle_synch_ed_estrus_detection(self, sim_day: int) -> None:
@@ -854,10 +975,10 @@ class HeiferII(HeiferI):
         """
 
         self.log_event(self.days_born, sim_day, const.ESTRUS_OCCURRED_NOTE)
-        is_estrus_detected = self._detect_estrus(self.get_specific_estrus_detection_rate())
+        is_estrus_detected = self._detect_estrus(self._get_user_defined_or_default_synch_ed_estrus_detection_rate())
         if is_estrus_detected:
             self.log_event(self.days_born, sim_day, const.ESTRUS_DETECTED_NOTE)
-            self.conception_rate = self.get_external_specific_conception_rate()
+            self.conception_rate = self._get_user_defined_TAI_conception_rate()
             self.ai_day = self.days_born + 1
             self.log_event(self.days_born, sim_day, f'{const.AI_DAY_SCHEDULED_NOTE} on day {self.ai_day}')
         else:
@@ -880,11 +1001,11 @@ class HeiferII(HeiferI):
         self.log_event(self.days_born, sim_day, const.ESTRUS_NOT_DETECTED_NOTE)
         self.log_event(self.days_born, sim_day, const.TAI_AFTER_ESTRUS_NOT_DETECTED_IN_SYNCH_ED_NOTE)
         internal_fallback_protocol = InternalReproSettings.HEIFER_REPRO_PROTOCOLS[
-            HeiferReproProtocolEnum.SynchED.value][self.get_repro_sub_protocol()]['when_estrus_not_detected']
+            self._get_repro_sub_protocol()]['when_estrus_not_detected']
 
         self._set_repro_program(sim_day, internal_fallback_protocol['repro_protocol'])
         self._set_up_hormone_schedule('heifers', internal_fallback_protocol['repro_sub_protocol'], self.days_born)
-        self._specific_conception_rate = internal_fallback_protocol['repro_sub_properties']['conception_rate']
+        self._TAI_conception_rate = internal_fallback_protocol['repro_sub_properties']['conception_rate']
         self._execute_hormone_delivery_schedule(sim_day, self._hormone_schedule)
 
     def _set_repro_program(self, sim_day: int, repro_program: Literal['ED', 'TAI', 'SynchED']) -> None:

@@ -1223,7 +1223,7 @@ class Cow(HeiferIII):
         return AnimalBase.config['std_estrus_cycle_cow']
 
     @staticmethod
-    def get_repro_data(attribute: str) -> Any:
+    def get_user_defined_repro_data(attribute: str) -> Any:
         """
         Get the reproduction data for cows.
 

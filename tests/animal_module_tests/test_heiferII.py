@@ -356,7 +356,7 @@ def test_get_general_estrus_detection_rate(mocker: MockerFixture, mocked_estrus_
     """
 
     # Arrange
-    patch_for_get_repro_data = mocker.patch.object(HeiferII, 'get_repro_data',
+    patch_for_get_repro_data = mocker.patch.object(HeiferII, 'get_user_defined_repro_data',
                                                    return_value=mocked_estrus_detection_rate)
 
     # Act
@@ -386,17 +386,17 @@ def test_get_general_estrus_detection_rate(mocker: MockerFixture, mocked_estrus_
 def test_get_specific_estrus_detection_rate(mocker: MockerFixture, mocked_estrus_detection_rate: float,
                                             expected_estrus_detection_rate: float) -> None:
     """
-    Unit test for get_specific_estrus_detection_rate() static method of HeiferII class in heiferII.py file.
+    Unit test for _get_user_defined_synch_ed_estrus_detection_rate() static method of HeiferII class in heiferII.py file.
     """
 
     # Arrange
     mock_repro_sub_properties = {'estrus_detection_rate': mocked_estrus_detection_rate}
     patch_for_get_repro_sub_properties = \
-        mocker.patch.object(HeiferII, 'get_repro_sub_properties',
+        mocker.patch.object(HeiferII, 'get_user_defined_repro_sub_properties',
                             return_value=mock_repro_sub_properties)
 
     # Act
-    result = HeiferII.get_specific_estrus_detection_rate()
+    result = HeiferII._get_user_defined_synch_ed_estrus_detection_rate()
 
     # Assert
     assert result == expected_estrus_detection_rate
@@ -426,7 +426,7 @@ def test_get_general_conception_rate(mocker: MockerFixture, mocked_conception_ra
     """
 
     # Arrange
-    patch_for_get_repro_data = mocker.patch.object(HeiferII, 'get_repro_data',
+    patch_for_get_repro_data = mocker.patch.object(HeiferII, 'get_user_defined_repro_data',
                                                    return_value=mocked_conception_rate)
 
     # Act
@@ -456,16 +456,16 @@ def test_get_general_conception_rate(mocker: MockerFixture, mocked_conception_ra
 def test_get_specific_conception_rate(mocker: MockerFixture, mocked_conception_rate: float,
                                       expected_conception_rate: float) -> None:
     """
-    Unit test for get_external_specific_conception_rate() static method of HeiferII class in heiferII.py file.
+    Unit test for _get_user_defined_TAI_conception_rate() static method of HeiferII class in heiferII.py file.
     """
 
     # Arrange
     mock_repro_sub_properties = {'conception_rate': mocked_conception_rate}
-    patch_for_get_repro_sub_properties = mocker.patch.object(HeiferII, 'get_repro_sub_properties',
+    patch_for_get_repro_sub_properties = mocker.patch.object(HeiferII, 'get_user_defined_repro_sub_properties',
                                                              return_value=mock_repro_sub_properties)
 
     # Act
-    result = HeiferII.get_external_specific_conception_rate()
+    result = HeiferII._get_user_defined_TAI_conception_rate()
 
     # Assert
     assert result == expected_conception_rate
@@ -667,7 +667,7 @@ def test_deliver_hormones(mocker: MockerFixture, hormones: list[str], delivery_d
 
 
 @pytest.mark.parametrize(
-    "days_born, sim_day, schedule, specific_conception_rate, "
+    "days_born, sim_day, schedule, TAI_conception_rate, "
     "expected_ai_day, expected_conception_rate",
     [
         # Test delivering hormones and setting AI day and conception rate
@@ -692,7 +692,7 @@ def test_deliver_hormones(mocker: MockerFixture, hormones: list[str], delivery_d
     ]
 )
 def test_execute_hormone_delivery_schedule(mocker: MockerFixture, days_born: int, sim_day: int,
-                                           schedule: dict[int, dict], specific_conception_rate: float,
+                                           schedule: dict[int, dict], TAI_conception_rate: float,
                                            expected_ai_day: int, expected_conception_rate: float) -> None:
     """
     Unit test for _execute_hormone_delivery_schedule() method of HeiferII class in heiferII.py file.
@@ -702,7 +702,7 @@ def test_execute_hormone_delivery_schedule(mocker: MockerFixture, days_born: int
     mocker.patch.object(HeiferII, '__init__', return_value=None)
     heifer = HeiferII(mocker.MagicMock())
     heifer.days_born = days_born
-    heifer._specific_conception_rate = specific_conception_rate
+    heifer._TAI_conception_rate = TAI_conception_rate
     patch_for_deliver_hormones = mocker.patch.object(heifer, '_deliver_hormones', return_value=None)
     patch_for_log_event = mocker.patch.object(heifer, 'log_event', return_value=None)
 
@@ -762,7 +762,7 @@ def test_get_breeding_start_day(mocker: MockerFixture, breeding_start_day_config
 def test_get_repro_data(mocker: MockerFixture, attribute: str,
                         heifer_data: dict, expected_value: Any):
     """
-    Unit test for get_repro_data() static method of HeiferII class in heiferII.py file.
+    Unit test for get_user_defined_repro_data() static method of HeiferII class in heiferII.py file.
     """
 
     # Arrange
@@ -772,9 +772,9 @@ def test_get_repro_data(mocker: MockerFixture, attribute: str,
     # Act and Assert
     if expected_value == KeyError:
         with pytest.raises(KeyError):
-            HeiferII.get_repro_data(attribute)
+            HeiferII.get_user_defined_repro_data(attribute)
     else:
-        result = HeiferII.get_repro_data(attribute)
+        result = HeiferII.get_user_defined_repro_data(attribute)
         assert result == expected_value
 
 
@@ -790,14 +790,14 @@ def test_get_repro_data(mocker: MockerFixture, attribute: str,
 )
 def test_get_repro_sub_protocol(mocker: MockerFixture, sub_protocol_value: str):
     """
-    Unit test for get_repro_sub_protocol() static method of HeiferII class in heiferII.py file.
+    Unit test for get_user_defined_repro_sub_protocol() static method of HeiferII class in heiferII.py file.
     """
 
     # Arrange
-    mocker.patch.object(HeiferII, 'get_repro_data', return_value=sub_protocol_value)
+    mocker.patch.object(HeiferII, 'get_user_defined_repro_data', return_value=sub_protocol_value)
 
     # Act
-    result = HeiferII.get_repro_sub_protocol()
+    result = HeiferII.get_user_defined_repro_sub_protocol()
 
     # Assert
     assert result == sub_protocol_value
@@ -815,14 +815,14 @@ def test_get_repro_sub_protocol(mocker: MockerFixture, sub_protocol_value: str):
 )
 def test_get_repro_sub_properties(mocker: MockerFixture, sub_properties: dict):
     """
-    Unit test for get_repro_sub_properties() static method of HeiferII class.
+    Unit test for get_user_defined_repro_sub_properties() static method of HeiferII class.
     """
 
     # Arrange
-    mocker.patch.object(HeiferII, 'get_repro_data', return_value=sub_properties)
+    mocker.patch.object(HeiferII, 'get_user_defined_repro_data', return_value=sub_properties)
 
     # Act
-    result = HeiferII.get_repro_sub_properties()
+    result = HeiferII.get_user_defined_repro_sub_properties()
 
     # Assert
     assert result == sub_properties
@@ -858,11 +858,12 @@ def test_execute_tai_protocol(mocker: MockerFixture, days_born: int, sim_day: in
     patch_for_set_up_hormone_schedule = mocker.patch.object(heifer, '_set_up_hormone_schedule', return_value=None)
     patch_for_execute_hormone_schedule = mocker.patch.object(heifer, '_execute_hormone_delivery_schedule',
                                                              return_value=None)
-    patch_for_get_repro_sub_protocol = mocker.patch.object(HeiferII, 'get_repro_sub_protocol',
+    patch_for_get_repro_sub_protocol = mocker.patch.object(HeiferII, '_get_repro_sub_protocol',
                                                            return_value=repro_sub_protocol)
-    patch_for_get_external_specific_conception_rate = mocker.patch.object(HeiferII,
-                                                                          'get_external_specific_conception_rate',
-                                                                          return_value=specific_conception_rate)
+    patch_for_get_TAI_conception_rate = mocker.patch.object(
+        HeiferII,
+        '_get_user_defined_or_default_TAI_conception_rate',
+        return_value=specific_conception_rate)
     mocker.patch.object(HeiferII, '_get_breeding_start_day', return_value=breeding_start_day)
 
     # Act
@@ -872,8 +873,8 @@ def test_execute_tai_protocol(mocker: MockerFixture, days_born: int, sim_day: in
     if days_born == breeding_start_day:
         patch_for_set_up_hormone_schedule.assert_called_once_with('heifers', repro_sub_protocol, days_born)
         patch_for_get_repro_sub_protocol.assert_called_once()
-        patch_for_get_external_specific_conception_rate.assert_called_once()
-        assert heifer._specific_conception_rate == specific_conception_rate
+        patch_for_get_TAI_conception_rate.assert_called_once()
+        assert heifer._TAI_conception_rate == specific_conception_rate
     if hormone_schedule_exists:
         patch_for_execute_hormone_schedule.assert_called_once_with(sim_day, hormone_schedule)
     else:
@@ -911,7 +912,7 @@ def test_execute_synch_ed_protocol(mocker: MockerFixture, days_born: int, sim_da
     patch_for_handle_estrus_detection = mocker.patch.object(heifer, '_handle_synch_ed_estrus_detection',
                                                             return_value=None)
     mocker.patch.object(HeiferII, '_get_breeding_start_day', return_value=breeding_start_day)
-    mocker.patch.object(HeiferII, 'get_repro_sub_protocol')
+    mocker.patch.object(HeiferII, '_get_repro_sub_protocol')
 
     # Act
     heifer.execute_synch_ed_protocol(sim_day)
@@ -1040,8 +1041,9 @@ def test_handle_synch_ed_estrus_detection(mocker: MockerFixture, days_born: int,
     heifer.days_born = days_born
     patch_for_log_event = mocker.patch.object(heifer, 'log_event', return_value=None)
     patch_for_detect_estrus = mocker.patch.object(heifer, '_detect_estrus', return_value=estrus_detected)
-    mocker.patch.object(HeiferII, 'get_specific_estrus_detection_rate', return_value=specific_estrus_detection_rate)
-    mocker.patch.object(HeiferII, 'get_external_specific_conception_rate',
+    mocker.patch.object(HeiferII, '_get_user_defined_or_default_synch_ed_estrus_detection_rate',
+                        return_value=specific_estrus_detection_rate)
+    mocker.patch.object(HeiferII, '_get_user_defined_TAI_conception_rate',
                         return_value=external_specific_conception_rate)
     patch_for_handle_estrus_not_detected = mocker.patch.object(heifer, '_handle_estrus_not_detected_in_synch_ed',
                                                                return_value=None)
@@ -1062,7 +1064,7 @@ def test_handle_synch_ed_estrus_detection(mocker: MockerFixture, days_born: int,
 
 
 @pytest.mark.parametrize(
-    "days_born, sim_day, specific_conception_rate, expected_ai_day, internal_fallback_protocol",
+    "days_born, sim_day, TAI_conception_rate, expected_ai_day, internal_fallback_protocol",
     [
         # Normal cases
         (120, 120, 0.6, 121,
@@ -1081,7 +1083,7 @@ def test_handle_synch_ed_estrus_detection(mocker: MockerFixture, days_born: int,
     ]
 )
 def test_handle_estrus_not_detected_in_synch_ed(mocker: MockerFixture, days_born: int, sim_day: int,
-                                                specific_conception_rate: float, expected_ai_day: int,
+                                                TAI_conception_rate: float, expected_ai_day: int,
                                                 internal_fallback_protocol: dict) -> None:
     """
     Unit test for _handle_estrus_not_detected_in_synch_ed() method of HeiferII class.
@@ -1097,21 +1099,24 @@ def test_handle_estrus_not_detected_in_synch_ed(mocker: MockerFixture, days_born
     patch_for_set_up_hormone_schedule = mocker.patch.object(heifer, '_set_up_hormone_schedule', return_value=None)
     patch_for_execute_hormone_schedule = mocker.patch.object(heifer, '_execute_hormone_delivery_schedule',
                                                              return_value=None)
-    mocker.patch.object(HeiferII, 'get_repro_sub_protocol',
+    mocker.patch.object(HeiferII, '_get_repro_sub_protocol',
                         return_value=internal_fallback_protocol['repro_sub_protocol'])
     mocker.patch.object(InternalReproSettings, 'HEIFER_REPRO_PROTOCOLS',
-                        {'SynchED': {internal_fallback_protocol['repro_sub_protocol']: {
-                            'when_estrus_not_detected': internal_fallback_protocol}}})
+                        {internal_fallback_protocol['repro_sub_protocol']: {
+                            'when_estrus_not_detected': internal_fallback_protocol}})
 
     # Act
     heifer._handle_estrus_not_detected_in_synch_ed(sim_day)
 
     # Assert
-    patch_for_log_event.assert_any_call(days_born, sim_day, const.TAI_AFTER_ESTRUS_NOT_DETECTED_IN_SYNCH_ED_NOTE)
+    patch_for_log_event.assert_has_calls([
+        mocker.call(days_born, sim_day, const.ESTRUS_NOT_DETECTED_NOTE),
+        mocker.call(days_born, sim_day, const.TAI_AFTER_ESTRUS_NOT_DETECTED_IN_SYNCH_ED_NOTE)
+    ])
     patch_for_set_repro_program.assert_called_with(sim_day, internal_fallback_protocol['repro_protocol'])
     patch_for_set_up_hormone_schedule.assert_called_with('heifers', internal_fallback_protocol['repro_sub_protocol'],
                                                          days_born)
-    assert heifer._specific_conception_rate == internal_fallback_protocol['repro_sub_properties']['conception_rate']
+    assert heifer._TAI_conception_rate == internal_fallback_protocol['repro_sub_properties']['conception_rate']
     patch_for_execute_hormone_schedule.assert_called_with(sim_day, heifer._hormone_schedule)
 
 
