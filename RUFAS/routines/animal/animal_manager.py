@@ -1,6 +1,5 @@
 import collections
 import math
-import random
 from statistics import mean
 from typing import Any, Dict, Tuple, List, Set, Union
 
@@ -25,32 +24,11 @@ from RUFAS.routines.feed.feed import Feed
 from RUFAS.routines.animal.ration.calf_ration import CalfRationManager
 from RUFAS.routines.animal.ration.ration_driver import RationReporter
 from RUFAS.routines.animal.ration.ration_driver import RationManager
+from RUFAS.routines.animal.animal_module_reporter import AnimalModuleReporter
 
 from RUFAS.routines.animal.ration import user_defined_ration as udr
 
 om = OutputManager()
-
-
-def daily_animal_routine(animal_manager, feed: Feed, weather: Weather, time: Time):
-    """
-    Executes daily routines relating to Animals. This method is called every day
-    in the simulation and calls @animal_manager's daily_updates() method
-    with @feed and @time as arguments. [Note that currently, @weather and
-    @ time are not used in animal updates.]
-
-    Parameters
-    ----------
-    animal_manager : AnimalManager
-        instance of the AnimalManager class
-    feed : Feed
-        instance of the Feed class
-    weather : Weather
-        instance of the Weather class
-    time : Time
-        instance of the Time class
-    """
-
-    animal_manager.daily_updates(feed, weather, time)
 
 
 class AnimalManager:
@@ -69,10 +47,6 @@ class AnimalManager:
         Pen.AnimalCombination.GROWING_AND_CLOSE_UP:
         AnimalModuleConstants.DEFAULT_NUM_STALLS_FOR_GROWING_AND_CLOSE_UP_PEN,
     }
-
-    ANIMAL_GROUPING_SCENARIO = AnimalGroupingScenario.CALF__GROWING__CLOSE_UP__LACCOW
-
-    # ANIMAL_GROUPING_SCENARIO = AnimalGroupingScenario.CALF__GROWING_AND_CLOSE_UP__LACCOW
 
     @classmethod
     def set_animal_grouping_scenario(cls, scenario: AnimalGroupingScenario) -> None:
@@ -158,6 +132,9 @@ class AnimalManager:
         # dictionary: key is animal ID, value is the pen ID that animal is in
         self.animal_to_pen_id_map = {}
 
+        # alternative option: AnimalGroupingScenario.CALF__GROWING_AND_CLOSE_UP__LACCOW
+        self.set_animal_grouping_scenario(AnimalGroupingScenario.CALF__GROWING__CLOSE_UP__LACCOW)
+
         # dictionary for keeping track of what animal types each pen is holding
         # (value of the dictionaries are lists of pen objects)
         self.pens_by_animal_combination = {
@@ -196,7 +173,7 @@ class AnimalManager:
         self.methane_mitigation_method = data["methane_mitigation"]["methane_mitigation_method"]
         self.methane_mitigation_additive_amount = data["methane_mitigation"]["methane_mitigation_additive_amount"]
 
-        self.init_pens(data["pen_information"], data["herd_information"], data["manure_management_scenarios"])
+        self.init_pens(data['pen_information'], data['manure_management_scenarios'])
 
         if self.simulate_animals:
             self.init_animals(config, data["herd_information"])
@@ -217,8 +194,7 @@ class AnimalManager:
             Cow: self.cows,
         }
 
-    def init_pens(self, all_pen_data: list, herd_data: Dict[str, Any],
-                  manure_management_scenarios: Dict[str, Any]) -> None:
+    def init_pens(self, all_pen_data: list, manure_management_scenarios: Dict[str, Any]) -> None:
         """
         Populates the list of pens with the information from the input json file.
 
@@ -226,8 +202,6 @@ class AnimalManager:
         ----------
         all_pen_data: list[dict[str, Any]]
             List containing information about the pens.
-        herd_data: Dict[str, Any]
-            Dictionary containing information about the herd.
         manure_management_scenarios : Dict[str, Any]
             Dictionary containing information about the manure management scenarios.
 
@@ -291,7 +265,13 @@ class AnimalManager:
 
         """
 
-        animal_keys = {"calf_num", "heiferI_num", "heiferII_num", "heiferIII_num_springers", "cow_num"}
+        animal_keys = {
+            "calf_num",
+            "heiferI_num",
+            "heiferII_num",
+            "heiferIII_num_springers",
+            "cow_num",
+        }
 
         info_map = {
             "class": self.__class__.__name__,
@@ -339,21 +319,21 @@ class AnimalManager:
         # milking parlor
         # avg_VD_parlor, avg_HD_parlor = self.avg_pen_dist()
         current_conditions = weather.get_current_day_conditions(time)
-        temp = current_conditions.mean_air_temperature
+        current_temperature = current_conditions.mean_air_temperature
         for calf in self.calves:
-            calf.calc_nutrient_rqmts(feed, temp)
+            calf.calc_nutrient_rqmts(feed, current_temperature)
             calf.p_animal = 0.0072 * calf.body_weight * 1000
 
         for heiferI in self.heiferIs:
-            heiferI.set_nutrient_rqmts(temp, self.ANIMAL_GROUPING_SCENARIO)
+            heiferI.set_nutrient_rqmts(current_temperature, self.ANIMAL_GROUPING_SCENARIO)
             heiferI.p_animal = 0.0072 * heiferI.body_weight * 1000
 
         for heiferII in self.heiferIIs:
-            heiferII.set_nutrient_rqmts(temp, self.ANIMAL_GROUPING_SCENARIO)
+            heiferII.set_nutrient_rqmts(current_temperature, self.ANIMAL_GROUPING_SCENARIO)
             heiferII.p_animal = 0.0072 * heiferII.body_weight * 1000
 
         for heiferIII in self.heiferIIIs:
-            heiferIII.set_nutrient_rqmts(temp, self.ANIMAL_GROUPING_SCENARIO)
+            heiferIII.set_nutrient_rqmts(current_temperature, self.ANIMAL_GROUPING_SCENARIO)
             heiferIII.p_animal = 0.0072 * heiferIII.body_weight * 1000
 
         for cow in self.cows:
@@ -509,7 +489,7 @@ class AnimalManager:
         animals_removed: List[AnimalBase],
         calves_born: List[Calf],
         feed: Feed,
-        temp: float,
+        current_temperature: float,
     ) -> None:
         """
         Updates the dictionary that maps animal IDs to the ID of the pen they are housed in when
@@ -525,7 +505,7 @@ class AnimalManager:
             list of Calf objects that have been added to the herd
         feed : Feed
             an instance of the Feed class defined in feed.py
-        temp : float
+        current_temperature : float
             the temperature on the current day
 
         """
@@ -590,7 +570,7 @@ class AnimalManager:
 
             self.animal_to_pen_id_map[animal.id] = pen_for_insert.id
             self.all_pens[pen_for_insert.id].set_up_new_animal(
-                animal, animal_p_conc, feed, temp, original_pen_populations[pen_for_insert.id]
+                animal, animal_p_conc, feed, current_temperature, original_pen_populations[pen_for_insert.id]
             )
 
         self.calculate_pen_rations(original_pen_populations)
@@ -1037,7 +1017,13 @@ class AnimalManager:
         self._sort_animals_before_allocation()
         self.pens_by_animal_combination = self._group_pens_by_animal_combination(self.all_pens)
         animals_by_combination = collections.defaultdict(list)
-        for animal in [*self.calves, *self.heiferIs, *self.heiferIIs, *self.heiferIIIs, *self.cows]:
+        for animal in [
+            *self.calves,
+            *self.heiferIs,
+            *self.heiferIIs,
+            *self.heiferIIIs,
+            *self.cows,
+        ]:
             animal_combination = self.ANIMAL_GROUPING_SCENARIO.find_animal_combination(animal)
             animals_by_combination[animal_combination].append(animal)
 
@@ -1175,182 +1161,6 @@ class AnimalManager:
             or self.simulation_day == 0
         )
 
-    def annual_reset(self) -> None:
-        pass
-
-    def generate_animal_output(self, animal_type: str, index: int):
-        """
-        Returns the information (ID, breed, birthday, breeding method,
-        semen used, pen history, bodyweight history, milk production history,
-        event history) of the animal at the index of the respective
-        animal_type list.
-
-        Parameters
-        ----------
-        animal_type : str
-            One of 'calf', 'heiferI', 'heiferII',
-            'heiferIII', 'cow', 'sold_heifer', or 'culled cow'
-        index : int
-            the index of the animal in the respective animal_type list
-            whose information will be returned
-
-        Returns
-        -------
-        Dict with an animal of animal_type's information. Not
-            all information is available for each animal_type.
-
-        """
-        is_cow = False
-        is_heifer_repr = False  # True if animal is heiferII or heiferIII
-
-        if animal_type == "calf":
-            animal = self.calves[index]
-        elif animal_type == "heiferI":
-            animal = self.heiferIs[index]
-        elif animal_type == "heiferII":
-            animal = self.heiferIIs[index]
-            is_heifer_repr = True
-        elif animal_type == "heiferIII":
-            animal = self.heiferIIIs[index]
-            is_heifer_repr = True
-        elif animal_type == "cow":
-            animal = self.cows[index]
-            is_cow = True
-        elif animal_type == "sold_heifer":
-            animal = self.life_cycle_manager.sold_heifers[index]
-            is_heifer_repr = True
-        else:  # animal_type == 'culled_cow':
-            animal = self.life_cycle_manager.culled_cows[index]
-            is_cow = True
-
-        CI_avg = None
-        if is_cow:
-            if len(animal.CI_history) == 0:
-                CI_avg = 0
-            else:
-                CI_avg = sum(animal.CI_history) / len(animal.CI_history)
-
-        return (
-            animal,
-            is_cow,
-            {
-                "ID": animal.id,
-                "breed": animal.breed,
-                "birthday": animal.birth_date,
-                "repro_program": None if not is_cow else animal.repro_program,
-                "tai_method_h": None if not is_heifer_repr else animal.tai_method_h,
-                "synch_ed_method_h": None if not is_heifer_repr else animal.synch_ed_method_h,
-                "presynch_method": None if not is_cow else animal.presynch_method,
-                "tai_method_c": None if not is_cow else animal.tai_method_c,
-                "resynch_method": None if not is_cow else animal.resynch_method,
-                "semen_used": animal.semen_used,
-                "pen_history": [pen_hist.__dict__ for pen_hist in animal.pen_history],
-                "event_history": animal.events.events,
-                "CI_avg": CI_avg,
-            },
-        )
-
-    def get_life_cycle_output(
-        self, num_animals: int
-    ) -> Tuple[List[Tuple[AnimalBase, str, bool]], Dict[str, Dict | int]]:
-        """
-        Returns the life cycle output on an individual level, which is the
-        information of some of each type of animal as well as some animal
-        statistics.
-
-        Parameters
-        ----------
-        num_animals: int
-            the number of each type of animal (calves, heiferIs, heiferIIs, heiferIIIs, cows, sold_heifers, and
-            culled_cows) for which information will be collected and returned. If num_animals is larger than the minimum
-            length of the animal lists, then num_animals will be set to the minimum length of the animal lists.
-
-        Returns : Tuple[List[Tuple[AnimalBase, str, bool]], Dict[str, Dict | int]]
-            A list of animals, and a dictionary which contains the individual life cycle output.
-
-        """
-        minimum_num = min(
-            len(self.calves),
-            len(self.heiferIs),
-            len(self.heiferIIs),
-            len(self.heiferIIIs),
-            len(self.cows),
-            len(self.life_cycle_manager.sold_heifers),
-            len(self.life_cycle_manager.culled_cows),
-        )
-
-        info_map = {
-            "class": self.__class__.__name__,
-            "function": self.get_life_cycle_output.__name__,
-            "num_animals": num_animals,
-            "minimum_num": minimum_num,
-        }
-
-        if num_animals > minimum_num:
-            om.add_warning(
-                "invalid_animal_list_size",
-                f"The smallest animal list is of size {minimum_num}"
-                + f" so {num_animals} of each animal class cannot be"
-                + f" in the life cycle output. Only {minimum_num} of"
-                + " each animal type will be in the life cycle output.",
-                info_map,
-            )
-            num_animals = minimum_num
-
-        output = {
-            "calves": {},
-            "heiferIs": {},
-            "heiferIIs": {},
-            "heiferIIIs": {},
-            "cows": {},
-            "sold_heifers": {},
-            "culled_cows": {},
-            "num_calves_sold": 0,
-            "num_sold_heifers": 0,
-            "num_cows_culled": 0,
-        }
-        animals = []
-        indices = random.sample(range(len(self.calves)), num_animals)
-        for i in indices:
-            animal, is_cow, output["calves"][i] = self.generate_animal_output("calf", i)
-            animals.append((animal, "calf", is_cow))
-
-        indices = random.sample(range(len(self.heiferIs)), num_animals)
-        for i in indices:
-            animal, is_cow, output["heiferIs"][i] = self.generate_animal_output("heiferI", i)
-            animals.append((animal, "heiferI", is_cow))
-
-        indices = random.sample(range(len(self.heiferIIs)), num_animals)
-        for i in indices:
-            animal, is_cow, output["heiferIIs"][i] = self.generate_animal_output("heiferII", i)
-            animals.append((animal, "heiferII", is_cow))
-
-        indices = random.sample(range(len(self.heiferIIIs)), num_animals)
-        for i in indices:
-            animal, is_cow, output["heiferIIIs"][i] = self.generate_animal_output("heiferIII", i)
-            animals.append((animal, "heiferIII", is_cow))
-
-        indices = random.sample(range(len(self.cows)), num_animals)
-        for i in indices:
-            animal, is_cow, output["cows"][i] = self.generate_animal_output("cow", i)
-            animals.append((animal, "cow", is_cow))
-
-        indices = random.sample(range(len(self.life_cycle_manager.sold_heifers)), num_animals)
-        for i in indices:
-            animal, is_cow, output["sold_heifers"][i] = self.generate_animal_output("sold_heifer", i)
-            animals.append((animal, "sold_heifer", is_cow))
-
-        indices = random.sample(range(len(self.life_cycle_manager.culled_cows)), num_animals)
-        for i in indices:
-            animal, is_cow, output["culled_cows"][i] = self.generate_animal_output("culled_cow", i)
-            animals.append((animal, "culled_cow", is_cow))
-
-        output["num_calves_sold"] = self.life_cycle_manager.sold_calf_num
-        output["num_sold_heifers"] = len(self.life_cycle_manager.sold_heifers)
-        output["num_cows_culled"] = len(self.life_cycle_manager.culled_cows)
-
-        return animals, output
-
     def get_initialize_db_summary(self) -> InitializationDBSummaryTypedDict:
         """
 
@@ -1430,20 +1240,14 @@ class AnimalManager:
                 ration_per_animal = {}
                 ration_vals = {}
 
-                counter = 1
-                while "status" not in ration_per_animal or ration_per_animal["status"].lower() != "optimal":
+                while 'status' not in ration_per_animal or ration_per_animal['status'].lower() != 'optimal':
                     if pen.animal_combination == Pen.AnimalCombination.CALF:
                         ration_per_animal = CalfRationManager.optimize()
-                        ration_vals = {"ME_total": 0}
-
+                        ration_vals = {'ME_total': 0}
                     else:
                         ration_per_animal, ration_vals = RationManager.formulate_ration(
                             pen, pen_specific_feed_data, self.ANIMAL_GROUPING_SCENARIO
                         )
-
-                    counter += 1
-                    if counter > 50:
-                        raise Exception("Too many attempts at optimizing ration.")
 
                 # recording ration nutrition information in pen
                 nutrient_amount, nutrient_conc = RationReporter.report_ration(ration_per_animal, feed.available_feeds)
@@ -1470,21 +1274,6 @@ class AnimalManager:
 
                 pen.ration = ration_per_pen
                 pen.ration_per_animal = ration_per_animal  # Important
-
-                info_map = {
-                    "class": self.__class__.__name__,
-                    "function": self._calc_ration_at_interval.__name__,
-                    f"number_animals_in_pen_{pen.id}": len(pen.animals_in_pen),
-                }
-                om.add_variable(f"ration_nutrient_amount_pen_{pen.id}", nutrient_amount, info_map)
-                om.add_variable(f"MEdiet_pen_{pen.id}", pen.MEdiet, info_map)
-                om.add_variable(f"avg_rqmts_pen_{pen.id}", pen.avg_nutrient_rqmts, info_map)
-                om.add_variable(f"ration_per_animal_for_pen_{pen.id}", pen.ration_per_animal, info_map)
-                if pen.animal_combination != Pen.AnimalCombination.CALF:
-                    ration_supply_report = RationReporter.report_ration_supply(
-                        ration_per_animal, feed.available_feeds, ration_report, pen.avg_nutrient_rqmts["avg_BW"]
-                    )
-                    om.add_variable(f"ration_supply_report_for_pen_{pen.id}", ration_supply_report, info_map)
 
     @classmethod
     def _get_animal_types_in_pen(cls, pen: Pen) -> Set[AnimalType]:
@@ -1519,7 +1308,7 @@ class AnimalManager:
         return animal_types_in_pen
 
     @classmethod
-    def _get_classes_in_pen(cls, pen: Pen) -> Set[str]:
+    def _determine_classes_in_pen(cls, pen: Pen) -> Set[str]:
         """
         Get the classes of animals in the pen.
 
@@ -1570,15 +1359,23 @@ class AnimalManager:
             "cows": set(self.cows),
             "animal_combination_by_id": {},
         }
-        for animal in [*self.calves, *self.heiferIs, *self.heiferIIs, *self.heiferIIIs, *self.cows]:
+        for animal in [
+            *self.calves,
+            *self.heiferIs,
+            *self.heiferIIs,
+            *self.heiferIIIs,
+            *self.cows,
+        ]:
             snapshot["animal_combination_by_id"][animal.id] = self.ANIMAL_GROUPING_SCENARIO.find_animal_combination(
                 animal
             )
         return snapshot
 
-    def _handle_removed_animals_after_update(self,
-                                             animals_snapshot_before_update: Dict[str, set | Dict],
-                                             animals_snapshot_after_update: Dict[str, set | Dict]) -> None:
+    def _handle_removed_animals_after_update(
+        self,
+        animals_snapshot_before_update: Dict[str, set | Dict],
+        animals_snapshot_after_update: Dict[str, set | Dict],
+    ) -> None:
         """
         Dict[str, Dict[Union[Calf | HeiferI | HeiferII | HeiferIII]]]
         Identifies and handles animals that were present prior to the update, but not afterwards.
@@ -1607,7 +1404,6 @@ class AnimalManager:
         """
         animal_class_names = ["calves", "heiferIs", "heiferIIs", "heiferIIIs", "cows"]
 
-        # Reasons for removal: graduated, sold, culled
         removed_animals = set()
         for animal_type_name in animal_class_names:
             removed_animals.update(
@@ -1618,7 +1414,11 @@ class AnimalManager:
             self._remove_animal_from_pen_and_id_map(animal)
 
     def _handle_animals_with_unchanged_class_and_changed_combination(
-        self, animals_snapshot_before_update: Dict, animals_snapshot_after_update: Dict, feed: Feed, temp: float
+        self,
+        animals_snapshot_before_update: Dict[str, set | Dict],
+        animals_snapshot_after_update: Dict[str, set | Dict],
+        feed: Feed,
+        current_temperature: float,
     ):
         """
         Handle animals that didn't change their classes but changed their animal combination.
@@ -1641,7 +1441,7 @@ class AnimalManager:
             structure as animals_snapshot_before_update.
         feed : Feed
             Instance of the Feed class.
-        temp : float
+        current_temperature : float
             Current temperature.
 
         Returns
@@ -1667,12 +1467,14 @@ class AnimalManager:
 
         for animal in animals_with_unchanged_class_and_changed_combination:
             self._remove_animal_from_pen_and_id_map(animal)
-            self._add_animal_to_pen_and_id_map(animal, feed, temp)
+            self._add_animal_to_pen_and_id_map(animal, feed, current_temperature)
 
     def _handle_graduated_animals(
-        self, animals_snapshot_before_update: Dict[str, set | Dict],
+        self,
+        animals_snapshot_before_update: Dict[str, set | Dict],
         animals_snapshot_after_update: Dict[str, set | Dict],
-        feed: Feed, temp: float
+        feed: Feed,
+        current_temperature: float,
     ) -> None:
         """
         Finds animals that have graduated (moved from one class to another), moves them between pens,
@@ -1689,7 +1491,7 @@ class AnimalManager:
             structure as animals_snapshot_before_update.
         feed : Feed
             instance of the Feed class defined in feed.py.
-        temp : float
+        current_temperature : float
             The temperature on the current day.
 
         """
@@ -1699,10 +1501,10 @@ class AnimalManager:
                 animals_snapshot_after_update[animal_class_name] - animals_snapshot_before_update[animal_class_name]
             )
         for animal in graduated_animals:
-            self._add_animal_to_pen_and_id_map(animal, feed, temp)
+            self._add_animal_to_pen_and_id_map(animal, feed, current_temperature)
 
     def _handle_newly_added_animals(
-        self, new_animals: List[Union[Calf, HeiferI, HeiferII, HeiferIII, Cow]], feed: Feed, temp: float
+        self, new_animals: List[Union[Calf, HeiferI, HeiferII, HeiferIII, Cow]], feed: Feed, current_temperature: float
     ) -> None:
         """
         For all new animals, adds animal to a pen, and updates the pen id map.
@@ -1713,12 +1515,12 @@ class AnimalManager:
             One of the possible animal types.
         feed : Feed
             instance of the Feed class defined in feed.py.
-        temp : float
+        current_temperature : float
             The temperature on the current day.
 
         """
         for animal in new_animals:
-            self._add_animal_to_pen_and_id_map(animal, feed, temp)
+            self._add_animal_to_pen_and_id_map(animal, feed, current_temperature)
             self.animals_by_type[type(animal)].append(animal)
 
     def _remove_animal_from_pen_and_id_map(self, animal: Union[Calf, HeiferI, HeiferII, HeiferIII, Cow]) -> None:
@@ -1736,7 +1538,7 @@ class AnimalManager:
         del self.animal_to_pen_id_map[animal.id]
 
     def _add_animal_to_pen_and_id_map(
-        self, animal: Union[Calf, HeiferI, HeiferII, HeiferIII, Cow], feed: Feed, temp: float
+        self, animal: Union[Calf, HeiferI, HeiferII, HeiferIII, Cow], feed: Feed, current_temperature: float
     ) -> None:
         """
         Adds animal to pen with lowest stocking density, and updates the pen id map accordingly.
@@ -1747,7 +1549,7 @@ class AnimalManager:
             One of the possible animal types.
         feed : Feed
             instance of the Feed class defined in feed.py.
-        temp : float
+        current_temperature : float
             The temperature on the current day.
 
         """
@@ -1759,10 +1561,20 @@ class AnimalManager:
             animal,
             self.ANIMAL_GROUPING_SCENARIO,
             feed,
-            temp,
+            current_temperature,
             self.phosphorus_concentration_by_animal_class[type(animal)],
         )
         self.animal_to_pen_id_map[animal.id] = pen_with_min_stocking_density.id
+
+    def collect_manure_excretions_output_data(self, pen: Pen, feed: Feed, manure_excretions_output_data: Dict):
+        pen.classes_in_pen = self._determine_classes_in_pen(pen)
+        pen.calc_total_manure(
+            feed,
+            self.methane_model,
+            self.methane_mitigation_method,
+            self.methane_mitigation_additive_amount,
+            manure_excretions_output_data,
+        )
 
     def daily_updates(self, feed: Feed, weather: Weather, time: Time):
         """
@@ -1789,7 +1601,7 @@ class AnimalManager:
             if self.end_ration_interval():
                 self.reset_milk_production_reduction()
             current_conditions = weather.get_current_day_conditions(time)
-            temp = current_conditions.mean_air_temperature
+            current_temperature = current_conditions.mean_air_temperature
             animals_snapshot_before_update = self._get_animals_snapshot()
 
             animals_added, animals_removed, calves_born, *rest = self.life_cycle_manager.daily_update(
@@ -1800,63 +1612,37 @@ class AnimalManager:
 
             self._handle_removed_animals_after_update(animals_snapshot_before_update, animals_snapshot_after_update)
             self._handle_animals_with_unchanged_class_and_changed_combination(
-                animals_snapshot_before_update, animals_snapshot_after_update, feed, temp
+                animals_snapshot_before_update, animals_snapshot_after_update, feed, current_temperature
             )
 
-            self._handle_graduated_animals(animals_snapshot_before_update, animals_snapshot_after_update, feed, temp)
-
-            self._handle_newly_added_animals([*animals_added, *calves_born], feed, temp)
-
-            info_map = {"class": self.__class__.__name__, "function": self.daily_updates.__name__}
-            om.add_variable("sim_day", self.simulation_day, info_map)
-            om.add_variable(
-                "num_animals",
-                len(self.calves) + len(self.heiferIs) + len(self.heiferIIs) + len(self.heiferIIIs) + len(self.cows),
-                info_map,
+            self._handle_graduated_animals(
+                animals_snapshot_before_update, animals_snapshot_after_update, feed, current_temperature
             )
-            om.add_variable("num_calves", len(self.calves), info_map)
-            om.add_variable("num_heiferIs", len(self.heiferIs), info_map)
-            om.add_variable("num_heiferIIs", len(self.heiferIIs), info_map)
-            om.add_variable("num_heiferIIIs", len(self.heiferIIIs), info_map)
-            om.add_variable("num_lactating_cows", len([cow for cow in self.cows if cow.is_lactating]), info_map)
-            om.add_variable("num_dry_cows", len([cow for cow in self.cows if not cow.is_lactating]), info_map)
+
+            self._handle_newly_added_animals([*animals_added, *calves_born], feed, current_temperature)
 
             manure_excretions_output_data = {}
             for pen in self.all_pens:
-                pen.classes_in_pen = self._get_classes_in_pen(pen)
-                pen.calc_total_manure(
-                    feed,
-                    self.methane_model,
-                    self.methane_mitigation_method,
-                    self.methane_mitigation_additive_amount,
-                    manure_excretions_output_data,
-                )
-                pen.call_p_rqmts()
-                pen.daily_p_update()  # Average phosphorus concentration per pen
+                self.collect_manure_excretions_output_data(pen, feed, manure_excretions_output_data)
+            self.calc_p_rqmts()
+            self.daily_p_update()
+            AnimalModuleReporter.report_animal_module_manure(manure_excretions_output_data)
 
-            for output_data_dict in manure_excretions_output_data.values():
-                for manure_property, manure_value in output_data_dict["manure"].items():
-                    info_map = {
-                        "class": self.__class__.__name__,
-                        "function": self.daily_updates.__name__,
-                    }
-                    om.add_variable(
-                        f'{output_data_dict["prefix"]}_{str(manure_property)}', manure_value, info_map=info_map
-                    )
-
-            self._update_phosphorus_concentrations()  # Average phosphorus concentration per animal type
+            self._update_phosphorus_concentrations()
             self.record_pen_history()
 
             if self.end_ration_interval():
                 self.reset_milk_production_reduction()
-                self.calc_nutrient_rqmts(feed, temp)  # per animal
+                self.calc_nutrient_rqmts(feed, current_temperature)
                 self.clear_pens()
                 self.allocate_animals_to_pens()
-                self._calc_ration_at_interval(feed)  # per pen
-                self.calc_avg_growth()  # per pen
+                self._calc_ration_at_interval(feed)
+                AnimalModuleReporter.report_ration_interval_data(self, feed, self.simulation_day)
+                self.calc_avg_growth()
                 for pen in self.all_pens:
                     if pen.animal_combination.name == "LAC_COW":
                         for animal in pen.animals_in_pen:
                             animal.update_milk_production_history(self.simulation_day)
 
             self.life_cycle_manager.daily_milk_production = self.sum_daily_milk(self.cows)
+            AnimalModuleReporter.report_daily_reports(self)
