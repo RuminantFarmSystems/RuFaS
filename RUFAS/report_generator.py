@@ -205,7 +205,7 @@ class ReportGenerator:
             ]
 
             if horizontal_aggregator:
-                if filter_content.get("horizontal_first", True):
+                if filter_content.get("horizontal_first", False):
                     return [vertical_aggregator(horizontally_aggregated)]
                 return [horizontal_aggregator(vertically_aggregated)]
             else:
