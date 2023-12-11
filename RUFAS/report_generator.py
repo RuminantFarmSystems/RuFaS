@@ -177,8 +177,6 @@ class ReportGenerator:
                 f"filter {filter_content.get('filters')} in {filter_content.get('name')} led to empty report data."
             )
 
-        number_of_elements = len(report_data[next(iter(report_data))])
-
         horizontal_agg_key = filter_content.get("horizontal_aggregation")
         horizontal_aggregator = AGGREGATION_FUNCTIONS.get(horizontal_agg_key)
 
@@ -187,6 +185,7 @@ class ReportGenerator:
 
         if horizontal_aggregator:
             loop_list = filter_content.get("horizontal_order", report_data.keys())
+            number_of_elements = len(report_data[next(iter(report_data))])
             try:
                 horizontally_aggregated = [
                     horizontal_aggregator([report_data[key][i] for key in loop_list])
