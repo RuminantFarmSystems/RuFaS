@@ -203,16 +203,15 @@ class ReportGenerator:
                 for _, data_series in report_data.items()
             ]
 
-        if horizontal_aggregator and vertical_aggregator:
-            if filter_content.get("horizontal_first", True):
-                return [vertical_aggregator(horizontally_aggregated)]
-            return [horizontal_aggregator(vertically_aggregated)]
+            if horizontal_aggregator:
+                if filter_content.get("horizontal_first", True):
+                    return [vertical_aggregator(horizontally_aggregated)]
+                return [horizontal_aggregator(vertically_aggregated)]
+            else:
+                return vertically_aggregated
 
         if horizontal_aggregator:
             return horizontally_aggregated
-
-        if vertical_aggregator:
-            return vertically_aggregated
 
         raise ValueError(
             f"Didn't find `horizontal_aggregation` or `vertical_aggregation` in {filter_content.get('name')}."
