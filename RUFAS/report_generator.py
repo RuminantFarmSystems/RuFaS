@@ -196,6 +196,8 @@ class ReportGenerator:
                 raise KeyError(
                     f"{e.args[0]} not found in filtered pool. Check the `horizontal_order` entry in the filter file."
                 )
+            if not vertical_aggregator:
+                return horizontally_aggregated
 
         if vertical_aggregator:
             vertically_aggregated = [
@@ -209,9 +211,6 @@ class ReportGenerator:
                 return [horizontal_aggregator(vertically_aggregated)]
             else:
                 return vertically_aggregated
-
-        if horizontal_aggregator:
-            return horizontally_aggregated
 
         raise ValueError(
             f"Didn't find `horizontal_aggregation` or `vertical_aggregation` in {filter_content.get('name')}."
