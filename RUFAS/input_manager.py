@@ -193,7 +193,6 @@ class InputManager:
                 valid_elements_counter += element_counter_and_validity["valid_elements"]
                 total_elements_counter += element_counter_and_validity["total_elements"]
                 if element_counter_and_validity["is_valid"]:
-                    # ISSUE #1014 !!!
                     self.__pool[file_blob_key] = filtered_input_data
                 else:
                     if not eager_termination:
