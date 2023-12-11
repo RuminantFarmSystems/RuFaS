@@ -506,6 +506,58 @@ class SoilData:
         return nitrates_sum
 
     @property
+    def profile_ammonium_total(self) -> float:
+        """
+        Calculate and return the total amount of nitrates in the soil.
+
+        Returns
+        -------
+        float
+            The total amount of ammonium in the soil (kg / ha).
+
+        """
+        return sum(self.get_vectorized_layer_attribute("ammonium_content"))
+
+    @property
+    def profile_active_organic_nitrogen_total(self) -> float:
+        """
+        Calculate and return the total amount of active organic nitrogen in the soil.
+
+        Returns
+        -------
+        float
+            The total amount of active organic nitrogen in the soil (kg / ha).
+
+        """
+        return sum(self.get_vectorized_layer_attribute("active_organic_nitrogen_content"))
+
+    @property
+    def profile_stable_organic_nitrogen_total(self) -> float:
+        """
+        Calculate and return the total amount of stable organic nitrogen in the soil.
+
+        Returns
+        -------
+        float
+            The total amount of stable organic nitrogen in the soil (kg / ha).
+
+        """
+        return sum(self.get_vectorized_layer_attribute("stable_organic_nitrogen_content"))
+
+    @property
+    def profile_fresh_organic_nitrogen_total(self) -> float:
+        """
+        Calculate and return the total amount of fresh organic nitrogen in the soil.
+
+        Returns
+        -------
+        float
+            The total amount of fresh organic nitrogen in the soil (kg / ha).
+
+        """
+        return sum(self.get_vectorized_layer_attribute("fresh_organic_nitrogen_content"))
+
+    @property
     def cover_factor(self) -> float:
         """
         Returns the cover factor based on the cover type for determining phosphorus absorption by soil
