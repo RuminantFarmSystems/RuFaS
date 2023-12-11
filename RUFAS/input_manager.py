@@ -793,7 +793,7 @@ class InputManager:
         self.__pool = {}
         om.add_log("Clear variable pool", "The pool is emptied.", info_map)
 
-    def _metadata_properties_exists(self, variable_name: str, properties_blob_key: str) -> (bool, KeyError):
+    def _metadata_properties_exists(self, variable_name: str, properties_blob_key: str) -> (bool, KeyError | None):
         """
             Checks if specific properties exist in the metadata for a given variable.
 
