@@ -204,7 +204,7 @@ class ReportGenerator:
                 for _, data_series in report_data.items()
             ]
             if not horizontal_aggregator:
-                return vertical_aggregator
+                return vertically_aggregated
 
             if filter_content.get("horizontal_first", False):
                 return [vertical_aggregator(horizontally_aggregated)]
