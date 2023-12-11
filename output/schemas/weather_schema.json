@@ -1,0 +1,105 @@
+{
+  "title": "weather_properties",
+  "type": "object",
+  "format": "grid",
+  "properties": {
+    "year": {
+      "title": "year",
+      "type": "number",
+      "options": {
+        "grid_columns": 12,
+        "inputAttributes": {
+          "class": "text-primary form-control"
+        },
+        "infoText": "Year."
+      },
+      "minimum": 1900
+    },
+    "jday": {
+      "title": "jday",
+      "type": "number",
+      "options": {
+        "grid_columns": 12,
+        "inputAttributes": {
+          "class": "text-primary form-control"
+        },
+        "infoText": "Julian day of the year."
+      },
+      "minimum": 0,
+      "maximum": 366
+    },
+    "precip": {
+      "title": "precip",
+      "type": "number",
+      "options": {
+        "grid_columns": 12,
+        "inputAttributes": {
+          "class": "text-primary form-control"
+        },
+        "infoText": "Amount of precipitation (mm H2O)."
+      },
+      "minimum": 0,
+      "default": 0
+    },
+    "high": {
+      "title": "high",
+      "type": "number",
+      "options": {
+        "grid_columns": 12,
+        "inputAttributes": {
+          "class": "text-primary form-control"
+        },
+        "infoText": "The maximum air temperature of the day (\u00b0C)."
+      },
+      "default": 21
+    },
+    "low": {
+      "title": "low",
+      "type": "number",
+      "options": {
+        "grid_columns": 12,
+        "inputAttributes": {
+          "class": "text-primary form-control"
+        },
+        "infoText": "The minimum air temperature of the day (\u00b0C)."
+      },
+      "default": 0
+    },
+    "avg": {
+      "title": "avg",
+      "type": "number",
+      "options": {
+        "grid_columns": 12,
+        "inputAttributes": {
+          "class": "text-primary form-control"
+        },
+        "infoText": "The average air temperature of the day (\u00b0C)."
+      },
+      "default": 0
+    },
+    "Hday": {
+      "title": "Hday",
+      "type": "number",
+      "options": {
+        "grid_columns": 12,
+        "inputAttributes": {
+          "class": "text-primary form-control"
+        },
+        "infoText": "The solar radiation of the day (MJ m^-2)."
+      },
+      "default": 0
+    },
+    "irrigation": {
+      "title": "irrigation",
+      "type": "number",
+      "options": {
+        "grid_columns": 12,
+        "inputAttributes": {
+          "class": "text-primary form-control"
+        },
+        "infoText": "Irrigation (mm H2O)."
+      },
+      "default": 0
+    }
+  }
+}
