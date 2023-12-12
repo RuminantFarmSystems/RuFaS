@@ -103,6 +103,7 @@ class Cow(HeiferIII):
         self.milk_protein_kg = 0
         # Milk protein content estimate, kg/day.
         self.milk_production_reduction = 0.0
+        self.latest_milk_production_305days = 0.0
         self.single_acc_milk_prod = 0
         self.future_cull_date = 0
         self.future_death_date = 0
@@ -324,12 +325,24 @@ class Cow(HeiferIII):
         Updates the animal's milk production history by appending a
         MilkProductionHistory object to the list.
 
-        Args:
+        If milk production history has already been updated for the day,
+        the most recent entry is deleted before appending the latest values.
+        Once a cow reaches 305 days in milk, latest_milk_production_305days is updated.
+
+        Parameter
+        ---------
             sim_day: simulation day
         """
+        if len(self.milk_production_history) > 0 and self.milk_production_history[-1].simulation_day == sim_day:
+            del self.milk_production_history[-1]
 
-        self.milk_production_history.append(MilkProductionHistory(sim_day, self.days_in_milk,
-                                                                  self.estimated_daily_milk_produced, self.days_born))
+        self.milk_production_history.append(
+            MilkProductionHistory(sim_day, self.days_in_milk, self.estimated_daily_milk_produced, self.days_born)
+        )
+
+        if self.days_in_milk == 305 and len(self.milk_production_history) > 305:
+            milk_history = [day.milk_production for day in self.milk_production_history[-305:]]
+            self.latest_milk_production_305days = np.sum(milk_history)
 
     def calculate_fat_percent(self, days_in_milk: int):
         """
@@ -384,6 +397,7 @@ class Cow(HeiferIII):
             self.events.add_event(self.days_born, sim_day, const.DRY)
             self.days_in_milk = 0
             self.estimated_daily_milk_produced = 0
+            self.latest_milk_production_305days = 0.0
             return 0, 0, 0
 
         if self.milking:
@@ -428,22 +442,6 @@ class Cow(HeiferIII):
         self.daily_growth = self.get_bw_change(calving_interval)
 
         self.body_weight += self.daily_growth
-
-        info_map = {"class": self.__class__.__name__,
-                    "function": self.milking_update.__name__,
-                    "simulation_day": sim_day
-                    }
-
-        if sim_day > 0:
-            om.add_variable("sim_day", sim_day, info_map)
-            om.add_variable("days_in_milk", self.days_in_milk, info_map)
-            om.add_variable("estimated_daily_milk_produced", self.estimated_daily_milk_produced, info_map)
-            om.add_variable("milk_fat", self.fat_percent, info_map)
-            om.add_variable("milk_protein", self.mPrt, info_map)
-            om.add_variable("milk_lactose", self.lactose_milk, info_map)
-            om.add_variable("lactating", self.milking, info_map)
-            om.add_variable("cow_id", self.id, info_map)
-            om.add_variable("parity", self.calves, info_map)
 
         # if not self.milking:
         # 	self.daily_growth = self.body_weight - prev_weight
