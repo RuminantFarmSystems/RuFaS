@@ -53,6 +53,8 @@ class AlfalfaSilage(Alfalfa):
         Fraction of crop biomass that is harvested in water-stressed growing conditions (unitless).
     dry_matter_percentage: float, default=42.883
         Percentage of harvested crop biomass that is dry matter (unitless).
+    lignin_dry_matter_percentage: float, default=7.419
+        Percentage of dry matter yield that is lignin (unitless).
     yield_nitrogen_fraction: float, default=0.0327536
         Fraction of dry matter crop yield that is nitrogen (unitless).
     yield_phosphorus_fraction: float default=0.00351
@@ -62,12 +64,13 @@ class AlfalfaSilage(Alfalfa):
     optimal_harvest_index: float = 0.90
     min_harvest_index: float = 0.40
     dry_matter_percentage: float = 42.883
+    lignin_dry_matter_percentage: float = 7.419
     yield_nitrogen_fraction: float = 0.0327536
     yield_phosphorus_fraction: float = 0.00351
 
 
 @dataclass(kw_only=True)
-class AlfalfaBaleage(Alfalfa):
+class AlfalfaBaleage(AlfalfaSilage):
     """
     Crop data class with yield-related properties for Alfalfa baleage.
 
@@ -79,6 +82,8 @@ class AlfalfaBaleage(Alfalfa):
         Fraction of crop biomass that is harvested in water-stressed growing conditions (unitless).
     dry_matter_percentage: float, default=42.883
         Percentage of harvested crop biomass that is dry matter (unitless).
+    lignin_dry_matter_percentage: float, default=7.419
+        Percentage of dry matter yield that is lignin (unitless).
     yield_nitrogen_fraction: float, default=0.0327536
         Fraction of dry matter crop yield that is nitrogen (unitless).
     yield_phosphorus_fraction: float default=0.00351
@@ -89,11 +94,6 @@ class AlfalfaBaleage(Alfalfa):
     Alfalfa baleage currently has the same harvest and quality properties as Alfalfa silage.
 
     """
-    optimal_harvest_index: float = 0.90
-    min_harvest_index: float = 0.40
-    dry_matter_percentage: float = 42.883
-    yield_nitrogen_fraction: float = 0.0327536
-    yield_phosphorus_fraction: float = 0.00351
 
 
 @dataclass(kw_only=True)
@@ -109,6 +109,8 @@ class AlfalfaHay(Alfalfa):
         Fraction of crop biomass that is harvested in water-stressed growing conditions (unitless).
     dry_matter_percentage: float, default=42.883
         Percentage of harvested crop biomass that is dry matter (unitless).
+    lignin_dry_matter_percentage: float, default=6.643
+        Percentage of dry matter yield that is lignin (unitless).
     yield_nitrogen_fraction: float, default=0.0250
         Fraction of dry matter crop yield that is nitrogen (unitless).
     yield_phosphorus_fraction: float default=0.00282
@@ -122,6 +124,7 @@ class AlfalfaHay(Alfalfa):
     optimal_harvest_index: float = 0.85
     min_harvest_index: float = 0.35
     dry_matter_percentage: float = 88.136
+    lignin_dry_matter_percentage: float = 6.643
     yield_nitrogen_fraction: float = 0.033192
     yield_phosphorus_fraction: float = 0.00282
 

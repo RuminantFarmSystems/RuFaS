@@ -51,6 +51,8 @@ class CornGrain(Corn):
         Fraction of crop biomass that is harvested in water-stressed growing conditions (unitless).
     dry_matter_percentage: float, default=86.0907
         Percentage of harvested crop biomass that is dry matter (unitless).
+    lignin_dry_matter_percentage: float, default=1.37
+        Percentage of dry matter yield that is lignin (unitless).
     yield_nitrogen_fraction: float, default=0.0140
         Fraction of dry matter crop yield that is nitrogen (unitless).
     yield_phosphorus_fraction: float default=0.00309
@@ -60,6 +62,7 @@ class CornGrain(Corn):
     optimal_harvest_index: float = 0.60
     min_harvest_index: float = 0.40
     dry_matter_percentage: float = 86.0907
+    lignin_dry_matter_percentage: float = 1.37
     yield_nitrogen_fraction: float = 0.0140
     yield_phosphorus_fraction: float = 0.00309
 
@@ -77,6 +80,8 @@ class CornSilage(Corn):
         Fraction of crop biomass that is harvested in water-stressed growing conditions (unitless).
     dry_matter_percentage: float, default=35.361
         Percentage of harvested crop biomass that is dry matter (unitless).
+    lignin_dry_matter_percentage: float, default=3.054
+        Percentage of dry matter yield that is lignin (unitless).
     yield_nitrogen_fraction: float, default=0.0140
         Fraction of dry matter crop yield that is nitrogen (unitless).
     yield_phosphorus_fraction: float default=0.00232
@@ -86,5 +91,6 @@ class CornSilage(Corn):
     optimal_harvest_index: float = 0.90
     min_harvest_index: float = 0.68
     dry_matter_percentage: float = 35.361
+    lignin_dry_matter_percentage: float = 3.054
     yield_nitrogen_fraction: float = 0.0140
     yield_phosphorus_fraction: float = 0.00232
