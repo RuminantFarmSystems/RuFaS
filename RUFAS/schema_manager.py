@@ -101,7 +101,7 @@ class SchemaManager:
             try:
                 enum = SchemaManager._get_list_of_options(pattern)
             except ValueError as e:
-                print(e)
+                print(str(e))
                 return schema
             schema["enum"] = enum
             schema["format"] = "select2"
