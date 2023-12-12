@@ -865,7 +865,8 @@ class InputManager:
             - The boolean is True if the variable is successfully added, False otherwise.
             - ValueError if invalid data is encountered and eager_termination is True,
               otherwise None.
-            """
+
+        """
         info_map = {"class": self.__class__.__name__,
                     "function": self._add_variable_to_pool.__name__,
                     }
