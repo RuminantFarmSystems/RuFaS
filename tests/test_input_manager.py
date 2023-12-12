@@ -2230,23 +2230,22 @@ def test_add_dict_variable_to_pool_type_error(variable_name: str,
 
     with patch("RUFAS.output_manager.OutputManager.add_error") as mock_om_add_error:
         with pytest.raises(TypeError):
-            result = mock_input_manager.add_dict_variable_to_pool(
+            mock_input_manager.add_dict_variable_to_pool(
                 variable_name=variable_name,
                 data=data,
                 properties_blob_key=properties_blob_key,
                 eager_termination=False
             )
 
-            assert result is None
-            assert mock_om_add_error.call_count == 1
-            mock_input_manager._metadata_properties_exists.assert_not_called()
-            mock_input_manager._add_variable_to_pool.assert_not_called()
+        assert mock_om_add_error.call_count == 1
+        mock_input_manager._metadata_properties_exists.assert_not_called()
+        mock_input_manager._add_variable_to_pool.assert_not_called()
 
-            mock_input_manager.add_dict_variable_to_pool = \
-                input_manager_original_method_states["add_dict_variable_to_pool"]
-            mock_input_manager._metadata_properties_exists = \
-                input_manager_original_method_states["_metadata_properties_exists"]
-            mock_input_manager._add_variable_to_pool = input_manager_original_method_states["_add_variable_to_pool"]
+        mock_input_manager.add_dict_variable_to_pool = \
+            input_manager_original_method_states["add_dict_variable_to_pool"]
+        mock_input_manager._metadata_properties_exists = \
+            input_manager_original_method_states["_metadata_properties_exists"]
+        mock_input_manager._add_variable_to_pool = input_manager_original_method_states["_add_variable_to_pool"]
 
 
 @pytest.mark.parametrize('variable_name, data, properties_blob_key', [
