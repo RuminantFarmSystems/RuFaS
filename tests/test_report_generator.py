@@ -86,6 +86,7 @@ def test_generate_report_vertical_then_horizontal(
     }
     assert report_generator.generate_report(sample_filtered_pool, filter_content) == {'ver_hor_agg': [18.0]}
 
+
 def test_generate_report_horizontal_then_vertical(
     report_generator: ReportGenerator,
     sample_filtered_pool: Dict[str, Dict[str, List[Dict[str, int]]]],
@@ -96,7 +97,7 @@ def test_generate_report_horizontal_then_vertical(
         "vertical_aggregation": "average",
         "horizontal_first": True,
     }
-    assert report_generator.generate_report(sample_filtered_pool, filter_content) == [9]
+    assert report_generator.generate_report(sample_filtered_pool, filter_content) == {'hor_ver_agg': [9.0]}
 
 
 def test_generate_report_only_horizontal(
