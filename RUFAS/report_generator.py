@@ -137,7 +137,7 @@ class ReportGenerator:
         self,
         filtered_pool: Dict[str, Dict[str, List[Any]]],
         filter_content: Dict[str, str | int | List[str]],
-    ) -> List[float]:
+    ) -> Dict[str, List[float]]:
         """
         Generates a report based on filtered data and aggregation criteria.
 
@@ -155,16 +155,13 @@ class ReportGenerator:
 
         Returns
         -------
-        List[float]
-            The aggregated report data as a list.
+        Dict[str, List[float]]
+            The sliced and aggregated data.
 
         Raises
         ------
         ValueError
             If the report data is empty or if the necessary aggregation keys are not found in filter_content.
-        KeyError
-            If a key specified in the `horizontal_order` of `filter_content` is not found in the `report_data`.
-            This usually indicates a mismatch between the expected structure of `filtered_pool` and its actual content.
         """
         report_data = self._prepare_report_data(
             filtered_pool,
@@ -196,7 +193,7 @@ class ReportGenerator:
                     f"{e.args[0]} not found in filtered pool. Check the `horizontal_order` entry in the filter file."
                 )
             if not vertical_aggregator:
-                return horizontally_aggregated
+                return {"hor_agg": horizontally_aggregated}
 
         if vertical_aggregator:
             vertically_aggregated = [
@@ -204,15 +201,13 @@ class ReportGenerator:
                 for _, data_series in report_data.items()
             ]
             if not horizontal_aggregator:
-                return vertically_aggregated
+                return {"ver_agg": vertically_aggregated}
 
             if filter_content.get("horizontal_first", False):
-                return [vertical_aggregator(horizontally_aggregated)]
-            return [horizontal_aggregator(vertically_aggregated)]
+                return {"hor_ver_agg": [vertical_aggregator(horizontally_aggregated)]}
+            return {"ver_hor_agg": [horizontal_aggregator(vertically_aggregated)]}
 
-        raise ValueError(
-            f"Didn't find `horizontal_aggregation` or `vertical_aggregation` in {filter_content.get('name')}."
-        )
+        return report_data
 
     def _prepare_report_data(
         self,
