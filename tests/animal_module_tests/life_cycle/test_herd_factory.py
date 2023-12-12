@@ -1,9 +1,14 @@
+import datetime
+from pathlib import Path
 from unittest.mock import patch
 
 import mock
 import pytest
+from freezegun import freeze_time
 from pytest_mock import MockerFixture
 
+from RUFAS.routines import Feed
+from RUFAS.routines.animal.animal_manager import AnimalManager
 from RUFAS.routines.animal.animal_typed_dicts import AnimalBaseInitArgsTypedDict
 from RUFAS.routines.animal.life_cycle.animal_base import AnimalBase
 from RUFAS.routines.animal.life_cycle.herd_factory import HerdFactory
@@ -1118,10 +1123,389 @@ def test_random_sample_with_replacement_by_type_calf(pre_num: int,
                                                      post_num: int,
                                                      mock_herd_factory: HerdFactory,
                                                      mocker: MockerFixture) -> None:
-    mock_pre_calves = []
-    mock_animal_base_init_args_typed_dict = mock.MagicMock(auto_spec=AnimalBaseInitArgsTypedDict)
     mocker.patch("tests.animal_module_tests.life_cycle.test_herd_factory.Calf.__init__", return_value=None)
-    mock_pre_calves = [Calf(args=mock_animal_base_init_args_typed_dict) for _ in range(pre_num)]
+    mock_animal_base_init_args_typed_dict = mock.MagicMock(auto_spec=AnimalBaseInitArgsTypedDict)
+    mock_pre_animals = [Calf(args=mock_animal_base_init_args_typed_dict) for _ in range(pre_num)]
 
     mock_pre_animal_population = mock.MagicMock(auto_spec=AnimalPopulation)
-    mock_pre_animal_population.calves = []
+    mock_pre_animal_population.calves = mock_pre_animals
+    mock_herd_factory.pre_animal_population = mock_pre_animal_population
+
+    mock_post_animal_population = mock.MagicMock(auto_spec=AnimalPopulation)
+    mock_post_animal_population_next_id_list = list(range(post_num))
+    mock_post_animal_population.next_id = mocker.patch.object(mock_post_animal_population, 'next_id',
+                                                              side_effct=mock_post_animal_population_next_id_list)
+    mock_herd_factory.post_animal_population = mock_post_animal_population
+
+    mock_random_choices = mock.MagicMock(return_value=[0] * post_num)
+    mocker.patch("random.choices", mock_random_choices)
+
+    mock_deepcopy = mock.MagicMock()
+    mocker.patch("copy.deepcopy", mock_deepcopy)
+
+    mock_im_get_data = mocker.patch("RUFAS.input_manager.InputManager.get_data", return_value=post_num)
+
+    result = mock_herd_factory._random_sample_with_replacement_by_type('calf')
+
+    mock_im_get_data.assert_called_once_with("animal.herd_information.calf_num")
+    mock_random_choices.assert_called_once_with(list(range(pre_num)), k=post_num)
+    assert mock_deepcopy.call_count == post_num
+    assert len(result) == post_num
+
+
+@pytest.mark.parametrize("pre_num, post_num", [
+    (0, 0),
+    (1, 0),
+    (44, 0),
+    (1, 1),
+    (1, 44),
+    (44, 1),
+    (44, 44),
+
+])
+def test_random_sample_with_replacement_by_type_heiferI(pre_num: int,
+                                                        post_num: int,
+                                                        mock_herd_factory: HerdFactory,
+                                                        mocker: MockerFixture) -> None:
+    mocker.patch("tests.animal_module_tests.life_cycle.test_herd_factory.HeiferI.__init__", return_value=None)
+    mock_animal_base_init_args_typed_dict = mock.MagicMock(auto_spec=AnimalBaseInitArgsTypedDict)
+    mock_pre_animals = [HeiferI(args=mock_animal_base_init_args_typed_dict) for _ in range(pre_num)]
+
+    mock_pre_animal_population = mock.MagicMock(auto_spec=AnimalPopulation)
+    mock_pre_animal_population.heiferIs = mock_pre_animals
+    mock_herd_factory.pre_animal_population = mock_pre_animal_population
+
+    mock_post_animal_population = mock.MagicMock(auto_spec=AnimalPopulation)
+    mock_post_animal_population_next_id_list = list(range(post_num))
+    mock_post_animal_population.next_id = mocker.patch.object(mock_post_animal_population, 'next_id',
+                                                              side_effct=mock_post_animal_population_next_id_list)
+    mock_herd_factory.post_animal_population = mock_post_animal_population
+
+    mock_random_choices = mock.MagicMock(return_value=[0] * post_num)
+    mocker.patch("random.choices", mock_random_choices)
+
+    mock_deepcopy = mock.MagicMock()
+    mocker.patch("copy.deepcopy", mock_deepcopy)
+
+    mock_im_get_data = mocker.patch("RUFAS.input_manager.InputManager.get_data", return_value=post_num)
+
+    result = mock_herd_factory._random_sample_with_replacement_by_type('heiferI')
+
+    mock_im_get_data.assert_called_once_with("animal.herd_information.heiferI_num")
+    mock_random_choices.assert_called_once_with(list(range(pre_num)), k=post_num)
+    assert mock_deepcopy.call_count == post_num
+    assert len(result) == post_num
+
+
+@pytest.mark.parametrize("pre_num, post_num", [
+    (0, 0),
+    (1, 0),
+    (38, 0),
+    (1, 1),
+    (1, 38),
+    (38, 1),
+    (38, 38),
+
+])
+def test_random_sample_with_replacement_by_type_heiferII(pre_num: int,
+                                                         post_num: int,
+                                                         mock_herd_factory: HerdFactory,
+                                                         mocker: MockerFixture) -> None:
+    mocker.patch("tests.animal_module_tests.life_cycle.test_herd_factory.HeiferII.__init__", return_value=None)
+    mock_animal_base_init_args_typed_dict = mock.MagicMock(auto_spec=AnimalBaseInitArgsTypedDict)
+    mock_pre_animals = [HeiferII(args=mock_animal_base_init_args_typed_dict) for _ in range(pre_num)]
+
+    mock_pre_animal_population = mock.MagicMock(auto_spec=AnimalPopulation)
+    mock_pre_animal_population.heiferIIs = mock_pre_animals
+    mock_herd_factory.pre_animal_population = mock_pre_animal_population
+
+    mock_post_animal_population = mock.MagicMock(auto_spec=AnimalPopulation)
+    mock_post_animal_population_next_id_list = list(range(post_num))
+    mock_post_animal_population.next_id = mocker.patch.object(mock_post_animal_population, 'next_id',
+                                                              side_effct=mock_post_animal_population_next_id_list)
+    mock_herd_factory.post_animal_population = mock_post_animal_population
+
+    mock_random_choices = mock.MagicMock(return_value=[0] * post_num)
+    mocker.patch("random.choices", mock_random_choices)
+
+    mock_deepcopy = mock.MagicMock()
+    mocker.patch("copy.deepcopy", mock_deepcopy)
+
+    mock_im_get_data = mocker.patch("RUFAS.input_manager.InputManager.get_data", return_value=post_num)
+
+    result = mock_herd_factory._random_sample_with_replacement_by_type('heiferII')
+
+    mock_im_get_data.assert_called_once_with("animal.herd_information.heiferII_num")
+    mock_random_choices.assert_called_once_with(list(range(pre_num)), k=post_num)
+    assert mock_deepcopy.call_count == post_num
+    assert len(result) == post_num
+
+
+@pytest.mark.parametrize("pre_num, post_num", [
+    (0, 0),
+    (1, 0),
+    (5, 0),
+    (1, 1),
+    (1, 5),
+    (5, 1),
+    (5, 5),
+
+])
+def test_random_sample_with_replacement_by_type_heiferIII(pre_num: int,
+                                                          post_num: int,
+                                                          mock_herd_factory: HerdFactory,
+                                                          mocker: MockerFixture) -> None:
+    mocker.patch("tests.animal_module_tests.life_cycle.test_herd_factory.HeiferIII.__init__", return_value=None)
+    mock_animal_base_init_args_typed_dict = mock.MagicMock(auto_spec=AnimalBaseInitArgsTypedDict)
+    mock_pre_animals = [HeiferIII(args=mock_animal_base_init_args_typed_dict) for _ in range(pre_num)]
+
+    mock_pre_animal_population = mock.MagicMock(auto_spec=AnimalPopulation)
+    mock_pre_animal_population.heiferIIIs = mock_pre_animals
+    mock_herd_factory.pre_animal_population = mock_pre_animal_population
+
+    mock_post_animal_population = mock.MagicMock(auto_spec=AnimalPopulation)
+    mock_post_animal_population_next_id_list = list(range(post_num))
+    mock_post_animal_population.next_id = mocker.patch.object(mock_post_animal_population, 'next_id',
+                                                              side_effct=mock_post_animal_population_next_id_list)
+    mock_herd_factory.post_animal_population = mock_post_animal_population
+
+    mock_random_choices = mock.MagicMock(return_value=[0] * post_num)
+    mocker.patch("random.choices", mock_random_choices)
+
+    mock_deepcopy = mock.MagicMock()
+    mocker.patch("copy.deepcopy", mock_deepcopy)
+
+    mock_im_get_data = mocker.patch("RUFAS.input_manager.InputManager.get_data", return_value=post_num)
+
+    result = mock_herd_factory._random_sample_with_replacement_by_type('heiferIII')
+
+    mock_im_get_data.assert_called_once_with("animal.herd_information.heiferIII_num_springers")
+    mock_random_choices.assert_called_once_with(list(range(pre_num)), k=post_num)
+    assert mock_deepcopy.call_count == post_num
+    assert len(result) == post_num
+
+
+@pytest.mark.parametrize("pre_num, post_num", [
+    (0, 0),
+    (1, 0),
+    (100, 0),
+    (1, 1),
+    (1, 100),
+    (100, 1),
+    (100, 100),
+
+])
+def test_random_sample_with_replacement_by_type_cow(pre_num: int,
+                                                    post_num: int,
+                                                    mock_herd_factory: HerdFactory,
+                                                    mocker: MockerFixture) -> None:
+    mocker.patch("tests.animal_module_tests.life_cycle.test_herd_factory.Cow.__init__", return_value=None)
+    mock_animal_base_init_args_typed_dict = mock.MagicMock(auto_spec=AnimalBaseInitArgsTypedDict)
+    mock_pre_animals = [Cow(args=mock_animal_base_init_args_typed_dict) for _ in range(pre_num)]
+
+    mock_pre_animal_population = mock.MagicMock(auto_spec=AnimalPopulation)
+    mock_pre_animal_population.cows = mock_pre_animals
+    mock_herd_factory.pre_animal_population = mock_pre_animal_population
+
+    mock_post_animal_population = mock.MagicMock(auto_spec=AnimalPopulation)
+    mock_post_animal_population_next_id_list = list(range(post_num))
+    mock_post_animal_population.next_id = mocker.patch.object(mock_post_animal_population, 'next_id',
+                                                              side_effct=mock_post_animal_population_next_id_list)
+    mock_herd_factory.post_animal_population = mock_post_animal_population
+
+    mock_random_choices = mock.MagicMock(return_value=[0] * post_num)
+    mocker.patch("random.choices", mock_random_choices)
+
+    mock_deepcopy = mock.MagicMock()
+    mocker.patch("copy.deepcopy", mock_deepcopy)
+
+    mock_im_get_data = mocker.patch("RUFAS.input_manager.InputManager.get_data", return_value=post_num)
+
+    result = mock_herd_factory._random_sample_with_replacement_by_type('cow')
+
+    mock_im_get_data.assert_called_once_with("animal.herd_information.cow_num")
+    mock_random_choices.assert_called_once_with(list(range(pre_num)), k=post_num)
+    assert mock_deepcopy.call_count == post_num
+    assert len(result) == post_num
+
+
+@pytest.mark.parametrize("pre_num, post_num", [
+    (0, 0),
+    (1, 0),
+    (100, 0),
+    (1, 1),
+    (1, 100),
+    (100, 1),
+    (100, 100),
+
+])
+def test_random_sample_with_replacement_by_type_replacement(pre_num: int,
+                                                            post_num: int,
+                                                            mock_herd_factory: HerdFactory,
+                                                            mocker: MockerFixture) -> None:
+    mocker.patch("tests.animal_module_tests.life_cycle.test_herd_factory.Cow.__init__", return_value=None)
+    mock_animal_base_init_args_typed_dict = mock.MagicMock(auto_spec=AnimalBaseInitArgsTypedDict)
+    mock_pre_animals = [Cow(args=mock_animal_base_init_args_typed_dict) for _ in range(pre_num)]
+
+    mock_pre_animal_population = mock.MagicMock(auto_spec=AnimalPopulation)
+    mock_pre_animal_population.replacement = mock_pre_animals
+    mock_herd_factory.pre_animal_population = mock_pre_animal_population
+
+    mock_post_animal_population = mock.MagicMock(auto_spec=AnimalPopulation)
+    mock_post_animal_population_next_id_list = list(range(post_num))
+    mock_post_animal_population.next_id = mocker.patch.object(mock_post_animal_population, 'next_id',
+                                                              side_effct=mock_post_animal_population_next_id_list)
+    mock_herd_factory.post_animal_population = mock_post_animal_population
+
+    mock_random_choices = mock.MagicMock(return_value=[0] * post_num)
+    mocker.patch("random.choices", mock_random_choices)
+
+    mock_deepcopy = mock.MagicMock()
+    mocker.patch("copy.deepcopy", mock_deepcopy)
+
+    mock_im_get_data = mocker.patch("RUFAS.input_manager.InputManager.get_data", return_value=post_num)
+
+    result = mock_herd_factory._random_sample_with_replacement_by_type('replacement')
+
+    mock_im_get_data.assert_called_once_with("animal.herd_information.replace_num")
+    mock_random_choices.assert_called_once_with(list(range(pre_num)), k=post_num)
+    assert mock_deepcopy.call_count == post_num
+    assert len(result) == post_num
+
+
+def test_initialize_herd_init_herd_true_save_animals_true(mock_herd_factory: HerdFactory,
+                                                          mocker: MockerFixture) -> None:
+    mock_im_get_data = mocker.patch("RUFAS.input_manager.InputManager.get_data")
+    mock_im_add_dict_variable_to_pool = mocker.patch("RUFAS.input_manager.InputManager.add_dict_variable_to_pool")
+
+    mock_om_dict_to_file_json = mocker.patch("RUFAS.output_manager.OutputManager.dict_to_file_json")
+
+    mock_animal_manager_get_animal_config = \
+        mocker.patch("RUFAS.routines.animal.animal_manager.AnimalManager.get_animal_config")
+
+    mock_feed = mock.MagicMock(auto_spec=Feed)
+    mock_feed.nutrient_rqmts = "NASEM"
+    mocker.patch("RUFAS.routines.animal.life_cycle.herd_factory.Feed", return_value=mock_feed)
+
+    mock_animal_base_set_config = mocker.patch("RUFAS.routines.animal.life_cycle.animal_base.AnimalBase.set_config")
+    mock_animal_base_set_nutrient_list = \
+        mocker.patch("RUFAS.routines.animal.life_cycle.animal_base.AnimalBase.set_nutrient_list")
+
+    mock_herd_factory.init_herd = True
+    mock_herd_factory.save_animals = True
+    mock_herd_factory.save_animals_path = Path("dummy_path")
+
+    mock_herd_factory._generate_animals = mock.MagicMock()
+    mock_herd_factory._initialize_herd_from_data = mock.MagicMock()
+    mock_herd_factory._random_sample_with_replacement = mock.MagicMock()
+
+    dummy_time_str = "2023-12-12 13:34:42"
+    with freeze_time(dummy_time_str):
+        mock_herd_factory.initialize_herd()
+        dummy_time_str_strf = datetime.datetime.now().strftime("%d-%b-%Y_%a_%H-%M-%S")
+
+    expected_save_path = Path.joinpath(Path("dummy_path"), f"animal_population-{dummy_time_str_strf}.json")
+
+    assert mock_im_get_data.call_count == 2
+    mock_animal_manager_get_animal_config.assert_called_once()
+    mock_animal_base_set_config.assert_called_once()
+    mock_animal_base_set_nutrient_list.assert_called_once_with("NASEM")
+
+    mock_herd_factory._generate_animals.assert_called_once()
+    mock_herd_factory._initialize_herd_from_data.assert_not_called()
+    mock_herd_factory._random_sample_with_replacement.assert_called_once()
+
+    mock_om_dict_to_file_json.assert_called_once_with(mock_herd_factory.pre_animal_population.__repr__(),
+                                                      expected_save_path)
+    mock_im_add_dict_variable_to_pool.assert_called_once_with(variable_name="runtime_animal_population",
+                                                              data=mock_herd_factory.post_animal_population.__repr__(),
+                                                              properties_blob_key="animal_population_properties",
+                                                              eager_termination=False)
+
+
+def test_initialize_herd_init_herd_true_save_animals_false(mock_herd_factory: HerdFactory,
+                                                           mocker: MockerFixture) -> None:
+    mock_im_get_data = mocker.patch("RUFAS.input_manager.InputManager.get_data")
+    mock_im_add_dict_variable_to_pool = mocker.patch("RUFAS.input_manager.InputManager.add_dict_variable_to_pool")
+
+    mock_om_dict_to_file_json = mocker.patch("RUFAS.output_manager.OutputManager.dict_to_file_json")
+
+    mock_animal_manager_get_animal_config = \
+        mocker.patch("RUFAS.routines.animal.animal_manager.AnimalManager.get_animal_config")
+
+    mock_feed = mock.MagicMock(auto_spec=Feed)
+    mock_feed.nutrient_rqmts = "NASEM"
+    mocker.patch("RUFAS.routines.animal.life_cycle.herd_factory.Feed", return_value=mock_feed)
+
+    mock_animal_base_set_config = mocker.patch("RUFAS.routines.animal.life_cycle.animal_base.AnimalBase.set_config")
+    mock_animal_base_set_nutrient_list = \
+        mocker.patch("RUFAS.routines.animal.life_cycle.animal_base.AnimalBase.set_nutrient_list")
+
+    mock_herd_factory.init_herd = True
+    mock_herd_factory.save_animals = False
+    mock_herd_factory.save_animals_path = Path("dummy_path")
+
+    mock_herd_factory._generate_animals = mock.MagicMock()
+    mock_herd_factory._initialize_herd_from_data = mock.MagicMock()
+    mock_herd_factory._random_sample_with_replacement = mock.MagicMock()
+
+    mock_herd_factory.initialize_herd()
+
+    assert mock_im_get_data.call_count == 2
+    mock_animal_manager_get_animal_config.assert_called_once()
+    mock_animal_base_set_config.assert_called_once()
+    mock_animal_base_set_nutrient_list.assert_called_once_with("NASEM")
+
+    mock_herd_factory._generate_animals.assert_called_once()
+    mock_herd_factory._initialize_herd_from_data.assert_not_called()
+    mock_herd_factory._random_sample_with_replacement.assert_called_once()
+
+    mock_om_dict_to_file_json.assert_not_called()
+    mock_im_add_dict_variable_to_pool.assert_called_once_with(variable_name="runtime_animal_population",
+                                                              data=mock_herd_factory.post_animal_population.__repr__(),
+                                                              properties_blob_key="animal_population_properties",
+                                                              eager_termination=False)
+
+
+def test_initialize_herd_init_herd_false(mock_herd_factory: HerdFactory,
+                                         mocker: MockerFixture) -> None:
+    mock_im_get_data = mocker.patch("RUFAS.input_manager.InputManager.get_data")
+    mock_im_add_dict_variable_to_pool = mocker.patch("RUFAS.input_manager.InputManager.add_dict_variable_to_pool")
+
+    mock_om_dict_to_file_json = mocker.patch("RUFAS.output_manager.OutputManager.dict_to_file_json")
+
+    mock_animal_manager_get_animal_config = \
+        mocker.patch("RUFAS.routines.animal.animal_manager.AnimalManager.get_animal_config")
+
+    mock_feed = mock.MagicMock(auto_spec=Feed)
+    mock_feed.nutrient_rqmts = "NASEM"
+    mocker.patch("RUFAS.routines.animal.life_cycle.herd_factory.Feed", return_value=mock_feed)
+
+    mock_animal_base_set_config = mocker.patch("RUFAS.routines.animal.life_cycle.animal_base.AnimalBase.set_config")
+    mock_animal_base_set_nutrient_list = \
+        mocker.patch("RUFAS.routines.animal.life_cycle.animal_base.AnimalBase.set_nutrient_list")
+
+    mock_herd_factory.init_herd = False
+    mock_herd_factory.save_animals = False
+    mock_herd_factory.save_animals_path = Path("dummy_path")
+
+    mock_herd_factory._generate_animals = mock.MagicMock()
+    mock_herd_factory._initialize_herd_from_data = mock.MagicMock()
+    mock_herd_factory._random_sample_with_replacement = mock.MagicMock()
+
+    mock_herd_factory.initialize_herd()
+
+    assert mock_im_get_data.call_count == 2
+    mock_animal_manager_get_animal_config.assert_called_once()
+    mock_animal_base_set_config.assert_called_once()
+    mock_animal_base_set_nutrient_list.assert_called_once_with("NASEM")
+
+    mock_herd_factory._generate_animals.assert_not_called()
+    mock_herd_factory._initialize_herd_from_data.assert_called_once()
+    mock_herd_factory._random_sample_with_replacement.assert_called_once()
+
+    mock_om_dict_to_file_json.assert_not_called()
+    mock_im_add_dict_variable_to_pool.assert_called_once_with(variable_name="runtime_animal_population",
+                                                              data=mock_herd_factory.post_animal_population.__repr__(),
+                                                              properties_blob_key="animal_population_properties",
+                                                              eager_termination=False)
