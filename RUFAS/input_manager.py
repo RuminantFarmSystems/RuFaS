@@ -820,7 +820,8 @@ class InputManager:
             - The boolean is True if the properties exist, False otherwise.
             - KeyError if the metadata is not loaded or the properties are not found,
               otherwise None.
-            """
+        
+        """
         info_map = {"class": self.__class__.__name__,
                     "function": self._metadata_properties_exists.__name__,
                     }
