@@ -213,10 +213,6 @@ def test_generate_report_with_valid_horizontal_order(
         "horizontal_first": True,
     }
     filter_content["horizontal_order"] = ["a", "b"]
-    assert report_generator.generate_report(sample_filtered_pool, filter_content) == [
-        2.9583333333333335
-    ]
+    assert report_generator.generate_report(sample_filtered_pool, filter_content) == {"hor_ver_agg":[        2.9583333333333335 ]}
     filter_content["horizontal_order"] = ["b", "a"]
-    assert report_generator.generate_report(sample_filtered_pool, filter_content) == [
-        5.676190476190476
-    ]
+    assert report_generator.generate_report(sample_filtered_pool, filter_content) == {"hor_ver_agg":[ 5.676190476190476    ]}
