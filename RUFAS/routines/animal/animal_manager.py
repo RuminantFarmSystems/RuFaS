@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import collections
 import math
 from statistics import mean
@@ -1651,7 +1653,6 @@ class AnimalManager:
                             animal.update_milk_production_history(self.simulation_day)
 
             self.life_cycle_manager.daily_milk_production = self.sum_daily_milk(self.cows)
-
             AnimalModuleReporter.report_daily_reports(self)
 
     def _record_animal_events(self, animals: list[Calf, HeiferI, HeiferII, HeiferIII, Cow]) -> None:
