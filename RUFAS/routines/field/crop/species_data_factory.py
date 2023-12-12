@@ -1,26 +1,37 @@
 from enum import Enum
 import dataclasses
-from RUFAS.routines.field.crop.crop_data import CropData, Corn, Alfalfa, CerealRye, FallOats, Potato, Soybean
-from RUFAS.routines.field.crop.crop_data import SpringBarley, SpringWheat, SugarBeet, TallFescue, Triticale
-from RUFAS.routines.field.crop.crop_data import WinterWheat
+from RUFAS.routines.field.crop.crop_data import CropData
+from RUFAS.routines.field.crop.crop_configurations.alfalfa import AlfalfaHay, AlfalfaSilage, AlfalfaBaleage
+from RUFAS.routines.field.crop.crop_configurations.cereal_rye import (
+    CerealRyeHay, CerealRyeGrain, CerealRyeSilage, CerealRyeBaleage
+)
+from RUFAS.routines.field.crop.crop_configurations.corn import CornGrain, CornSilage
+from RUFAS.routines.field.crop.crop_configurations.soybean import SoybeanHay, SoybeanGrain
+from RUFAS.routines.field.crop.crop_configurations.tall_fescue import TallFescueHay, TallFescueSilage, TallFescueBaleage
+from RUFAS.routines.field.crop.crop_configurations.triticale import (
+    TriticaleHay, TriticaleGrain, TriticaleSilage, TriticaleBaleage
+)
+from RUFAS.routines.field.crop.crop_configurations.winter_wheat import (
+    WinterWheatHay, WinterWheatGrain, WinterWheatSilage, WinterWheatBaleage
+)
 
 
 class CropSpecies(Enum):
     """Enum of all the crop types supported by RUFAS"""
-    GENERIC = "generic"  # generic crop
-    CORN = "corn"
+    ALFALFA = "alfalfa"
+
+    CORN_GRAIN = "corn_grain"
+    CORN_SILAGE = "corn_silage"
     SPRING_WHEAT = "spring_wheat"
     WINTER_WHEAT = "winter_wheat"
     CEREAL_RYE = "cereal_rye"
     SPRING_BARLEY = "spring_barley"
     FALL_OATS = "fall_oats"
     TALL_FESCUE = "tall_fescue"
-    ALFALFA = "alfalfa"
     SOYBEAN = "soybean"
     SUGAR_BEET = "sugar_beet"
     POTATO = "potato"
     TRITICALE = "triticale"
-    CORN_SILAGE = "corn_silage"
 
 
 class CropSpeciesDataFactory:
