@@ -147,7 +147,7 @@ def test_species_factory_defaults():
                               "min_harvest_index": 0.98}),
     ("cereal_rye_hay", {"biomass": 100}),  # change attribute declared only in CropData
     ("cereal_rye_grain", {"name": "fancy barley",  # custom new variety/subspecies
-                       "plant_code": "FBAR", "scientific_name": "Hordeum vulgare regalis"}),
+                          "plant_code": "FBAR", "scientific_name": "Hordeum vulgare regalis"}),
     ("tall_fescue_hay", {"plant_category": PlantCategory("perennial")}),  # perennial version of tall fescue
     ("tall_fescue_silage", {"is_nitrogen_fixer": True}),  # magical nitrogen-fixing grass (egads!)
     ("alfalfa_baleage", {"yield_nitrogen_fraction": 0.03}),  # this alfalfa has increased nitrogen in harvest

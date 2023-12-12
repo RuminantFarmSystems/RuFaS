@@ -41,6 +41,7 @@ class CropSpecies(Enum):
     WINTER_WHEAT_SILAGE = "winter_wheat_silage"
     WINTER_WHEAT_BALEAGE = "winter_wheat_baleage"
 
+
 class CropSpeciesDataFactory:
     @staticmethod
     def create_species_data(species: CropSpecies = CropSpecies("corn_grain"), **kwargs) -> CropData:
