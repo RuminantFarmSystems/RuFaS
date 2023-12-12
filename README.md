@@ -1,6 +1,7 @@
 [![Testing](https://github.com/RuminantFarmSystems/MASM/actions/workflows/testing_pytest.yml/badge.svg)](https://github.com/RuminantFarmSystems/MASM/actions/workflows/testing_pytest.yml)
 [![Linting](https://github.com/RuminantFarmSystems/MASM/actions/workflows/lint_flake8.yml/badge.svg)](https://github.com/RuminantFarmSystems/MASM/actions/workflows/lint_flake8.yml)
-[![Coverage](https://img.shields.io/badge/coverage-91%25-green)](https://github.com/RuminantFarmSystems/MASM/actions/workflows/coverage_pytest-cov.yml)
+[![Coverage](https://img.shields.io/badge/coverage-92%25-green)](https://github.com/RuminantFarmSystems/MASM/actions/workflows/coverage_pytest-cov.yml)
+
 # Vision
 To support research and sustainable decision-making in ruminant animal production through a state-of-art, open-source modeling environment that is continuously adapting as technology and scientific knowledge advance.
 
@@ -73,7 +74,7 @@ Revisit the Animal Module design – Refactoring -- Animal Ration formulation|Jo
 Revisit the Animal Module design – Refactoring -- Animal Life Cycle|Yijing, Simon, Anchey|Design phase|P0
 Deprecate the output handler, add missing functionalities, and reports to OM|Niko, Allister||P0
 Go through the entire codebase and ensure IM is the only way we are receiving input data|Allister, Niko||P0|[IM Integration tracking](https://docs.google.com/spreadsheets/d/1k8J6MelPrsrz6Tv4fQNAG-kLSN7oQTQOCEy3I6F0IqU/edit?usp=sharing)
-Revert soil profile properties and rewrite soil profile inputs|Ed||P1|[#773](https://github.com/RuminantFarmSystems/MASM/issues/773)
+Revert soil profile properties and rewrite soil profile inputs|Ed|Completed|P1|[#773](https://github.com/RuminantFarmSystems/MASM/issues/773)
 
 SMEs:
 |Title|Owner|Status|Priority|Remarks|
@@ -92,13 +93,13 @@ Dev Team:
 |--|--|--|--|--|
 Redesign and implement the Feed storage module|Pooya, Kevin, Kristan||P1
 Refactor Animal Module -- Animal Manager|Joe||P0
-Rewrite and clean field input files in the `input/` directory|Ed, Matthew||P1|[#769](https://github.com/RuminantFarmSystems/MASM/issues/769) 
+Rewrite and clean field input files in the `input/` directory|Ed, Matthew|Completed|P1|[#769](https://github.com/RuminantFarmSystems/MASM/issues/769) 
 
 SMEs:
 |Title|Owner|Status|Priority|Remarks|
 |--|--|--|--|--|
 Complete Cohort 1 Pilot testing|Kristan, Haowen, Kat||P0
-Complete evaluation of soil hydrology|Ed, Jenn, Matthew|In progress|P0|[#766](https://github.com/RuminantFarmSystems/MASM/issues/766)
+Complete evaluation of soil hydrology|Ed, Jenn, Matthew|Completed|P0|[#766](https://github.com/RuminantFarmSystems/MASM/issues/766)
 
 ## Milestone 3: Dec 31th
 [GitHub Milestone](https://github.com/RuminantFarmSystems/MASM/milestone/6)

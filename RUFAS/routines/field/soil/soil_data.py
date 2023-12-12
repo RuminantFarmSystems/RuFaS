@@ -84,7 +84,7 @@ class SoilData:
     """average slope of the subbasin expressed as rise over run (meters / meters)"""
     moisture_condition_parameter: Optional[float] = None
     """curve number value adjusted for moisture content (unitless) (SWAT 2:1.1.11)"""
-    accumulated_runoff: Optional[float] = None
+    accumulated_runoff: float = 0.0
     """Amount of rainfall discharged as runoff on the current day (mm)."""
     infiltrated_water: float = 0.0
     """Amount of water that infiltrated the soil profile on the day (mm)."""
@@ -161,7 +161,7 @@ class SoilData:
     """
     recalcitrant_phosphorus_pool: float = 0
     """Amount of phosphorus available for soil adsorption and leaching via runoff after the first rainfall event (kg)"""
-    runoff_phosphorus_pool: float = 0
+    runoff_fertilizer_phosphorus: float = 0.0
     """Amount of solubilized phosphorus that has been leached off the field by runoff (kg)"""
     days_since_application: int = 0
     """Number of days since phosphorus was applied to field via fertilizer"""
@@ -187,6 +187,10 @@ class SoilData:
     """Amount of stable inorganic phosphorus on the field that was applied by machine (kg)"""
     machine_stable_organic_phosphorus: float = 0
     """Amount of stable organic phosphorus on the field that was applied by machine (kg)"""
+    machine_organic_phosphorus_runoff: float = 0.0
+    """Amount of organic phosphorus from machine-applied manure dissolved in and removed by runoff (kg)."""
+    machine_inorganic_phosphorus_runoff: float = 0.0
+    """Amount of inorganic phosphorus from machine-applied manure dissolved in and removed by runoff (kg)."""
 
     grazing_manure_dry_mass: float = 0
     """The dry weight equivalent of manure mass on the field that was applied by grazers (kg)"""
@@ -206,13 +210,20 @@ class SoilData:
     """Amount of stable inorganic phosphorus on the field that was applied by grazing (kg)"""
     grazing_stable_organic_phosphorus: float = 0
     """Amount of stable organic phosphorus on the field that was applied by grazing (kg)"""
+    grazing_organic_phosphorus_runoff: float = 0.0
+    """Amount of organic phosphorus from grazing manure dissolved in and removed by runoff (kg)."""
+    grazing_inorganic_phosphorus_runoff: float = 0.0
+    """Amount of inorganic phosphorus from grazing manure dissolved in and removed by runoff (kg)."""
+
+    soil_phosphorus_runoff: float = 0.0
+    """Amount of phosphorus removed from surface soil layer by runoff (kg / ha)."""
 
     # ---- Residue partition (Carbon Cycling)
     plant_surface_residue = 0
     """plant residue on the surface of the soil (kg/ha)"""
     plant_root_residue = 0
     """plant residue below the surface of the soil (kg/ha)"""
-    plant_residue_lignin_composition: float = 0
+    plant_residue_lignin_composition: float = 0.17
     """lignin fraction of plant residue (unitless)"""
     plant_lignin_nitrogen_ratio: float = 0
     """plant lignin to nitrogen ratio (unitless)"""
@@ -220,6 +231,10 @@ class SoilData:
     """plant residue fraction that is metabolic (unitless)"""
     total_residue: float = 0
     """total amount of soil residue ever added to the field"""  # TODO: needed?
+    crop_root_depth: float = 0
+    """Root depth of the crop harvested (mm)"""
+    crop_yield_nitrogen: float = 0
+    """nitrogen contained in the harvested yield (kg/ha)"""
     @property
     def all_residue(self) -> float:  # TODO: not currently used.
         """amount of total plant residue, above and below-ground, on the field (kg/ha)"""
@@ -534,3 +549,19 @@ class SoilData:
             return 0.40
         else:
             return 0.075
+
+    @property
+    def profile_carbon_emissions(self) -> float:
+        """
+        Calculates the total amount of CO2 respirated from the soil profile.
+
+        Returns
+        -------
+        float
+            Total amount of CO2 emitted from carbon decomposition in the soil profile (kg/ha).
+
+        """
+        emissions_from_active = sum(self.get_vectorized_layer_attribute('active_carbon_to_slow_loss'))
+        emissions_from_slow = sum(self.get_vectorized_layer_attribute('slow_carbon_co2_lost_amount'))
+        emissions_from_passive = sum(self.get_vectorized_layer_attribute('passive_carbon_co2_lost_amount'))
+        return emissions_from_active + emissions_from_slow + emissions_from_passive

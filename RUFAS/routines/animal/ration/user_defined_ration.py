@@ -1,11 +1,3 @@
-"""
-RUFAS: Ruminant Farm Systems Model
-File name: user_defined_ration.py
-Description: Tools for accessing and providing user-defined ration  variables
-    Main class used to read JSON as singleton, return ration percentages where needed
-Author: Joseph C. Waddell, jw2574@cornell.edu
-"""
-
 from typing import Dict
 
 
@@ -26,7 +18,7 @@ class UserDefinedRationManager(object):
         if UserDefinedRationManager.__instance is None:
             UserDefinedRationManager.__instance = self
 
-            self.udr_or_not = None
+            self.is_udr = None
 
             self.calf_ration = []
             self.growing_ration = []
@@ -36,16 +28,15 @@ class UserDefinedRationManager(object):
             self.tolerance = []
             self.milk_reduction_maximum = []
 
-    def ration_to_use(animal_combination, available_feeds: Dict) -> Dict:
+    @staticmethod
+    def ration_to_use(animal_combination) -> Dict:
         """
         Function outputs the dictionary for a given animal combination from the UserDefinedRationManager class
 
         Parameters
         ----------
-        pen_animal_combo : Pen.AnimalCombination
+        animal_combination : Pen.AnimalCombination
             AnimalCombination in the given pen
-        available_feeds : Dict
-            available feeds dictionary from the Feed class object
 
         Returns
         -------
@@ -65,6 +56,7 @@ class UserDefinedRationManager(object):
             ration_percents = udrm.calf_ration
         return ration_percents
 
+    @staticmethod
     def make_ration_from_user_values(ration_percents: Dict, available_feeds, req) -> Dict:
         """
         Generate ration dict from user ration percents input,

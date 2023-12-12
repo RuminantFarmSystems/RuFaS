@@ -1,9 +1,3 @@
-"""
-RUFAS: Ruminant Farm Systems Model
-File name: test_pen.py
-Description: Implements test cases for the Pen class
-Author(s): Pooya Hekmati, sh2235@cornell.edu, Anchey Peng, ap724@cornell.edu
-"""
 from __future__ import annotations
 
 from statistics import mean
@@ -224,7 +218,7 @@ def test_reset_manure(pen: Pen) -> None:
         phosphorus=0.0,
         phosphorus_fraction=0.0,
         potassium=0.0,
-        methane=0.0
+        enteric_methane_g=0.0
     )
 
     pen.reset_manure()
@@ -508,9 +502,6 @@ def test_update_animal_manure_excretion_data(mocker: MockerFixture,
 
     """
     # Arrange
-    mocker.patch('RUFAS.routines.animal.pen.Pen.__init__', return_value=None)
-    pen = Pen()  # type: ignore
-    pen.manure = initial_pen_manure
     is_prefix_in_dict = prefix in initial_dict  # Need to save this check before update
     initial_animal_manure = initial_dict[prefix]['manure'] if is_prefix_in_dict else ''
     mock_animal = mocker.MagicMock()
@@ -521,11 +512,10 @@ def test_update_animal_manure_excretion_data(mocker: MockerFixture,
     )
 
     # Act
-    pen._update_animal_manure_excretion_data(initial_dict, prefix, default_manure, mock_animal)  # type: ignore
+    Pen._update_animal_manure_excretion_data(initial_dict, prefix, default_manure, mock_animal)  # type: ignore
 
     # Assert
     assert initial_dict == expected_dict
-    assert pen.manure == expected_manure
 
     if is_prefix_in_dict:
         patch_for_add_animal_manure_excretions.assert_has_calls(
@@ -535,10 +525,6 @@ def test_update_animal_manure_excretion_data(mocker: MockerFixture,
         patch_for_add_animal_manure_excretions.assert_has_calls(
             [mocker.call(default_manure, animal_manure_excretion)]
         )
-
-    patch_for_add_animal_manure_excretions.assert_has_calls(
-        [mocker.call(initial_pen_manure, animal_manure_excretion)]
-    )
 
 
 @pytest.mark.parametrize(
@@ -594,38 +580,45 @@ def test_calc_total_manure(mocker: MockerFixture, is_populated: bool,
     pen.id = 'mock_pen_id'
     pen.manure = mock_pen_manure
     type(pen).is_populated = mocker.PropertyMock(return_value=is_populated)
+    for animal in animals_in_pen:
+        animal.manure_excretion = MagicMock(spec=AnimalManureExcretions)
     pen.animals_in_pen = animals_in_pen
     feed = MagicMock(spec='Feed')
     methane_model = mocker.MagicMock()
     methane_mitigation_method = mocker.MagicMock()
     methane_mitigation_additive_amount = mocker.MagicMock()
+    manure_excretions_output_data = mocker.MagicMock()
     mock_prefixes = [mocker.MagicMock() for _ in range(len(animals_in_pen))]
     mock_animal_manure_excretions = [mocker.MagicMock() for _ in range(len(animals_in_pen))]
     patch_for_calc_animal_manure_excretion = mocker.patch.object(pen, '_calc_animal_manure_excretion',
                                                                  side_effect=zip(mock_prefixes,
                                                                                  mock_animal_manure_excretions))
     patch_for_update_animal_manure_excretion_data = mocker.patch.object(pen, '_update_animal_manure_excretion_data')
-    patch_for_add_variable = mocker.patch('RUFAS.routines.animal.pen.OutputManager.add_variable')
+    patch_for_add_animal_manure_excretions = mocker.patch(
+        'RUFAS.routines.animal.pen.add_animal_manure_excretions',
+        return_value=mock_pen_manure
+    )
     patch_for_get_default_animal_manure_excretions = mocker.patch(
         'RUFAS.routines.animal.pen.get_default_animal_manure_excretions',
         return_value=mock_pen_manure
     )
 
     # Act
-    pen.calc_total_manure(feed, methane_model, methane_mitigation_method, methane_mitigation_additive_amount)
+    pen.calc_total_manure(feed, methane_model, methane_mitigation_method, methane_mitigation_additive_amount,
+                          manure_excretions_output_data)
 
-    # Assert
     if is_populated:
         patch_for_get_default_animal_manure_excretions.assert_called_once()
         for animal in animals_in_pen:
             patch_for_calc_animal_manure_excretion.assert_has_calls([
                 mocker.call(animal, feed, methane_model, methane_mitigation_method, methane_mitigation_additive_amount)
             ])
+            patch_for_add_animal_manure_excretions.assert_has_calls([
+                mocker.call(mock_pen_manure, animal.manure_excretion)
+            ])
         assert patch_for_update_animal_manure_excretion_data.call_count == len(animals_in_pen)
-        if mock_pen_manure:
-            print(f'pen.manure: {pen.manure}')
-            for prop, value in mock_pen_manure.items():
-                patch_for_add_variable.assert_has_calls([
-                    mocker.call(f'pen_{pen.id}_daily_{prop}', value,
-                                info_map={'class': 'Pen', 'function': 'calc_total_manure'})
-                ])
+    else:
+        patch_for_get_default_animal_manure_excretions.assert_not_called()
+        patch_for_calc_animal_manure_excretion.assert_not_called()
+        patch_for_add_animal_manure_excretions.assert_not_called()
+        patch_for_update_animal_manure_excretion_data.assert_not_called()

@@ -1,12 +1,3 @@
-"""
-RUFAS: Ruminant Farm Systems Model
-File name: pen_manure.py
-
-Description: A data model that represents the manure data extracted from
-the Animal Manager module.
-
-"""
-
 from __future__ import annotations
 
 from dataclasses import dataclass, fields
@@ -78,7 +69,7 @@ class PenManure:
     potassium: float = 0.0
     """Amount of potassium in manure (kg)."""
 
-    methane: float = 0.0
+    enteric_methane_kg: float = 0.0
     """Amount of methane emission (kg/day)."""
 
     def __post_init__(self):
@@ -154,5 +145,5 @@ class PenManure:
             phosphorus=animal_manure["phosphorus"] * GeneralConstants.GRAMS_TO_KG,
             phosphorus_fraction=animal_manure["phosphorus_fraction"] / num_animals,
             potassium=animal_manure["potassium"] * GeneralConstants.GRAMS_TO_KG,
-            methane=animal_manure["methane"] * GeneralConstants.GRAMS_TO_KG,
+            enteric_methane_kg=animal_manure["enteric_methane_g"] * GeneralConstants.GRAMS_TO_KG,
         )
