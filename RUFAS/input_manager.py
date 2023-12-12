@@ -912,11 +912,12 @@ class InputManager:
         om.add_log(f"Validation count for variable {variable_name}: total invalid",
                    f"{element_counter['invalid_elements']=}", info_map)
 
-        if variable_name in self.__pool.keys():
-            om.add_warning("Overwriting existing variable", f"Variable {variable_name} already exists in InputManager "
-                                                            f"pool, overwriting the old value.", info_map)
+        if validated_data:
+            if variable_name in self.__pool.keys():
+                om.add_warning("Overwriting existing variable", f"Variable {variable_name} already exists in InputManager "
+                                                                f"pool, overwriting the old value.", info_map)
 
-        self.__pool[variable_name] = validated_data
+            self.__pool[variable_name] = validated_data
 
         if element_counter['invalid_elements'] > 0:
             om.add_error("Invalid variable",
@@ -989,7 +990,7 @@ class InputManager:
             data=data,
             properties_blob_key=properties_blob_key,
             eager_termination=eager_termination,
-            variable_type='dict')
+            is_dict_variable=True)
 
         if not add_variable_success and add_variable_value_error:
             raise add_variable_value_error
@@ -1055,7 +1056,7 @@ class InputManager:
             data=data,
             properties_blob_key=properties_blob_key,
             eager_termination=eager_termination,
-            variable_type='tabular')
+            is_dict_variable=False)
 
         if not add_variable_success and add_variable_value_error:
             raise add_variable_value_error
