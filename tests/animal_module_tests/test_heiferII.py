@@ -383,10 +383,11 @@ def test_get_general_estrus_detection_rate(mocker: MockerFixture, mocked_estrus_
         (1.0, 1.0),
     ]
 )
-def test_get_specific_estrus_detection_rate(mocker: MockerFixture, mocked_estrus_detection_rate: float,
-                                            expected_estrus_detection_rate: float) -> None:
+def test_get_user_defined_synch_ed_estrus_detection_rate(mocker: MockerFixture, mocked_estrus_detection_rate: float,
+                                                         expected_estrus_detection_rate: float) -> None:
     """
-    Unit test for _get_user_defined_synch_ed_estrus_detection_rate() static method of HeiferII class in heiferII.py file.
+    Unit test for _get_user_defined_synch_ed_estrus_detection_rate() static method of HeiferII class in
+    heiferII.py file.
     """
 
     # Arrange
