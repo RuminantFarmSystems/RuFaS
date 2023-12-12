@@ -835,8 +835,8 @@ def test_generate_animals_calf_sold(initial_animal_num: int,
     assert len(result.calves) == 0
 
 
-def test_init_calf_from_data(mock_herd_factory,
-                             mocker: MockerFixture, ) -> None:
+def test_init_calf_from_data(mock_herd_factory: HerdFactory,
+                             mocker: MockerFixture) -> None:
     dummy_animal_id = 31415
     dummy_animal_data = {"dummy": "data"}
 
@@ -876,8 +876,8 @@ def test_init_calf_from_data(mock_herd_factory,
     assert result == mock_calf
 
 
-def test_init_heiferI_from_data(mock_herd_factory,
-                                mocker: MockerFixture, ) -> None:
+def test_init_heiferI_from_data(mock_herd_factory: HerdFactory,
+                                mocker: MockerFixture) -> None:
     dummy_animal_id = 31415
     dummy_animal_data = {"dummy": "data"}
 
@@ -903,7 +903,7 @@ def test_init_heiferI_from_data(mock_herd_factory,
     mock_herd_factory.pre_animal_population = mock_pre_animal_population
 
     result = mock_herd_factory._init_animal_from_data(animal_type='heiferI',
-                                             animal_data=dummy_animal_data)
+                                                      animal_data=dummy_animal_data)
 
     dummy_animal_data.update(id=dummy_animal_id)
 
@@ -916,8 +916,8 @@ def test_init_heiferI_from_data(mock_herd_factory,
     assert result == mock_heiferI
 
 
-def test_init_heiferII_from_data(mock_herd_factory,
-                                mocker: MockerFixture, ) -> None:
+def test_init_heiferII_from_data(mock_herd_factory: HerdFactory,
+                                 mocker: MockerFixture) -> None:
     dummy_animal_id = 31415
     dummy_animal_data = {"dummy": "data"}
 
@@ -943,7 +943,7 @@ def test_init_heiferII_from_data(mock_herd_factory,
     mock_herd_factory.pre_animal_population = mock_pre_animal_population
 
     result = mock_herd_factory._init_animal_from_data(animal_type='heiferII',
-                                             animal_data=dummy_animal_data)
+                                                      animal_data=dummy_animal_data)
 
     dummy_animal_data.update(id=dummy_animal_id)
 
@@ -956,8 +956,8 @@ def test_init_heiferII_from_data(mock_herd_factory,
     assert result == mock_heiferII
 
 
-def test_init_heiferIII_from_data(mock_herd_factory,
-                                mocker: MockerFixture, ) -> None:
+def test_init_heiferIII_from_data(mock_herd_factory: HerdFactory,
+                                  mocker: MockerFixture) -> None:
     dummy_animal_id = 31415
     dummy_animal_data = {"dummy": "data"}
 
@@ -983,7 +983,7 @@ def test_init_heiferIII_from_data(mock_herd_factory,
     mock_herd_factory.pre_animal_population = mock_pre_animal_population
 
     result = mock_herd_factory._init_animal_from_data(animal_type='heiferIII',
-                                             animal_data=dummy_animal_data)
+                                                      animal_data=dummy_animal_data)
 
     dummy_animal_data.update(id=dummy_animal_id)
 
@@ -996,8 +996,8 @@ def test_init_heiferIII_from_data(mock_herd_factory,
     assert result == mock_heiferIII
 
 
-def test_init_cow_from_data(mock_herd_factory,
-                                mocker: MockerFixture, ) -> None:
+def test_init_cow_from_data(mock_herd_factory: HerdFactory,
+                            mocker: MockerFixture) -> None:
     dummy_animal_id = 31415
     dummy_animal_data = {"dummy": "data"}
 
@@ -1023,7 +1023,7 @@ def test_init_cow_from_data(mock_herd_factory,
     mock_herd_factory.pre_animal_population = mock_pre_animal_population
 
     result = mock_herd_factory._init_animal_from_data(animal_type='cow',
-                                             animal_data=dummy_animal_data)
+                                                      animal_data=dummy_animal_data)
 
     dummy_animal_data.update(id=dummy_animal_id)
 
@@ -1036,4 +1036,72 @@ def test_init_cow_from_data(mock_herd_factory,
     assert result == mock_cow
 
 
-# def test_initialize_herd_from_data()
+@pytest.mark.parametrize("num_calf, num_heiferI, num_heiferII, num_heiferIII, num_cow, num_replacement", [
+    (1, 1, 1, 1, 1, 1),
+    (0, 0, 0, 0, 0, 0),
+    (8, 44, 38, 5, 100, 500)
+])
+def test_initialize_herd_from_data(num_calf: int,
+                                   num_heiferI: int,
+                                   num_heiferII: int,
+                                   num_heiferIII: int,
+                                   num_cow: int,
+                                   num_replacement: int,
+                                   mock_herd_factory: HerdFactory,
+                                   mocker: MockerFixture) -> None:
+    mock_im_get_data = mocker.patch("RUFAS.input_manager.InputManager.get_data",
+                                    return_value={
+                                        "calves": [{"dummy_calf"}] * num_calf,
+                                        "heiferIs": [{"dummy_heiferI"}] * num_heiferI,
+                                        "heiferIIs": [{"dummy_heiferII"}] * num_heiferII,
+                                        "heiferIIIs": [{"dummy_heiferIII"}] * num_heiferIII,
+                                        "cows": [{"dummy_cow"}] * num_cow,
+                                        "replacement": [{"dummy_replacement"}] * num_replacement
+                                    })
+
+    mock_herd_factory._init_animal_from_data = mock.MagicMock(return_value=None)
+    mock_pre_animal_population = mock.MagicMock(auto_spec=AnimalPopulation)
+    mock_pre_animal_population.current_animal_id = 0
+    mock_herd_factory.pre_animal_population = mock_pre_animal_population
+
+    mock_animal_population_init = mocker.patch("RUFAS.routines.animal.life_cycle.herd_factory.AnimalPopulation",
+                                               return_value=None)
+
+    mock_herd_factory._initialize_herd_from_data()
+
+    expected_init_animal_from_data_call_count = num_calf + num_heiferI + num_heiferII + num_heiferIII + num_cow + \
+                                                num_replacement
+    expected_init_animal_from_data_call_args_list = [(("calf", {"dummy_calf"}),)] * num_calf + \
+                                                    [(("heiferI", {"dummy_heiferI"}),)] * num_heiferI + \
+                                                    [(("heiferII", {"dummy_heiferII"}),)] * num_heiferII + \
+                                                    [(("heiferIII", {"dummy_heiferIII"}),)] * num_heiferIII + \
+                                                    [(("cow", {"dummy_cow"}),)] * num_cow + \
+                                                    [(("replacement", {"dummy_replacement"}),)] * num_replacement
+
+    mock_im_get_data.assert_called_once_with("animal_population")
+    assert mock_herd_factory._init_animal_from_data.call_count == expected_init_animal_from_data_call_count
+    assert mock_herd_factory._init_animal_from_data.call_args_list == expected_init_animal_from_data_call_args_list
+    mock_animal_population_init.assert_called_once()
+
+
+def test_random_sample_with_replacement(mock_herd_factory: HerdFactory,
+                                        mocker: MockerFixture) -> None:
+    mock_herd_factory._random_sample_with_replacement_by_type = mock.MagicMock(return_value=None)
+
+    mock_post_animal_population = mock.MagicMock(auto_spec=AnimalPopulation)
+    mock_post_animal_population.current_animal_id = 0
+    mock_herd_factory.post_animal_population = mock_post_animal_population
+
+    mock_im_get_data = mocker.patch("RUFAS.input_manager.InputManager.get_data", return_value=None)
+
+    mock_animal_population_init = mocker.patch("RUFAS.routines.animal.life_cycle.herd_factory.AnimalPopulation",
+                                               return_value=None)
+
+    mock_herd_factory._random_sample_with_replacement()
+
+    expected_random_sample_with_replacement_by_type_call_args_list = ["calf", "heiferI", "heiferII",
+                                                                      "heiferIII", "cow", "replacement"]
+
+    assert mock_herd_factory._random_sample_with_replacement_by_type.call_count == 6
+    # assert mock_herd_factory._random_sample_with_replacement_by_type.call_args_list == \
+    #        expected_random_sample_with_replacement_by_type_call_args_list
