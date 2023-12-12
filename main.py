@@ -10,7 +10,6 @@ import argparse
 from pathlib import Path
 import sys
 from typing import List
-from RUFAS.graph_herd_composition import HerdCompositionGraphGenerator
 from RUFAS.scenario_manager import METADATA_PATHS, MetadataPaths
 from RUFAS.simulation_engine import SimulationEngine
 from RUFAS.input_manager import InputManager
@@ -305,18 +304,6 @@ def execute_simulations(
         )
         output_manager.dump_all_nondata_pools(
             output_dir, exclude_info_maps, format_option
-        )
-
-        HerdCompositionGraphGenerator.generate_herd_composition_graph(
-            Path(__file__).parent / 'output/CSVs/',
-            Path(__file__).parent / 'output/graphics/',
-            'life_cycle_daily_updates'
-        )
-
-        HerdCompositionGraphGenerator.generate_cow_parity_composition_graph(
-            Path(__file__).parent / 'output/CSVs',
-            Path(__file__).parent / 'output/graphics/',
-            'life_cycle_daily_updates'
         )
 
 

@@ -405,6 +405,78 @@ def test_get_user_defined_synch_ed_estrus_detection_rate(mocker: MockerFixture, 
 
 
 @pytest.mark.parametrize(
+    "mocked_estrus_detection_rate, expected_estrus_detection_rate",
+    [
+        # Normal case
+        (0.4, 0.4),
+
+        # Higher estrus detection rate
+        (0.8, 0.8),
+
+        # Zero estrus detection rate
+        (0.0, 0.0),
+
+        # 100% estrus detection rate
+        (1.0, 1.0),
+    ]
+)
+def test_get_default_synch_ed_estrus_detection_rate(mocker: MockerFixture,
+                                                    mocked_estrus_detection_rate: float,
+                                                    expected_estrus_detection_rate: float) -> None:
+    """
+    Unit test for _get_default_synch_ed_estrus_detection_rate() static method of HeiferII class in heiferII.py file.
+    """
+
+    # Arrange
+    mocked_heifer_repro_protocols = {
+        HeiferReproProtocolEnum.SynchED.value: {
+            'default_sub_properties': {
+                'estrus_detection_rate': mocked_estrus_detection_rate
+            }
+        }
+    }
+    mocker.patch.object(InternalReproSettings, 'HEIFER_REPRO_PROTOCOLS', mocked_heifer_repro_protocols)
+
+    # Act
+    result = HeiferII._get_default_synch_ed_estrus_detection_rate()
+
+    # Assert
+    assert result == expected_estrus_detection_rate
+
+
+@pytest.mark.parametrize(
+    "repro_protocol, user_defined_rate, default_rate, expected_rate",
+    [
+        # Test case where the user-defined protocol is SynchED and a specific rate is returned
+        (HeiferReproProtocolEnum.SynchED.value, 0.6, 0.5, 0.6),
+
+        # Test case where the user-defined protocol is not SynchED and the default rate is returned
+        ('OtherProtocol', 0.6, 0.4, 0.4),
+    ]
+)
+def test_get_user_defined_or_default_synch_ed_estrus_detection_rate(
+        mocker: MockerFixture, repro_protocol: str,
+        user_defined_rate: float, default_rate: float, expected_rate: float) -> None:
+    """
+    Unit test for _get_user_defined_or_default_synch_ed_estrus_detection_rate() static method of HeiferII class in
+    heiferII.py file.
+    """
+
+    # Arrange
+    mocker.patch.object(HeiferII, '__init__', return_value=None)
+    heifer = HeiferII(mocker.MagicMock())
+    mocker.patch.object(heifer, 'get_user_defined_repro_protocol', return_value=repro_protocol)
+    mocker.patch.object(HeiferII, '_get_user_defined_synch_ed_estrus_detection_rate', return_value=user_defined_rate)
+    mocker.patch.object(HeiferII, '_get_default_synch_ed_estrus_detection_rate', return_value=default_rate)
+
+    # Act
+    result = heifer._get_user_defined_or_default_synch_ed_estrus_detection_rate()
+
+    # Assert
+    assert result == expected_rate
+
+
+@pytest.mark.parametrize(
     "mocked_conception_rate, expected_conception_rate",
     [
         # Normal case
@@ -454,8 +526,8 @@ def test_get_general_conception_rate(mocker: MockerFixture, mocked_conception_ra
         (1.0, 1.0),
     ]
 )
-def test_get_specific_conception_rate(mocker: MockerFixture, mocked_conception_rate: float,
-                                      expected_conception_rate: float) -> None:
+def test_get_user_defined_TAI_conception_rate(mocker: MockerFixture, mocked_conception_rate: float,
+                                              expected_conception_rate: float) -> None:
     """
     Unit test for _get_user_defined_TAI_conception_rate() static method of HeiferII class in heiferII.py file.
     """
@@ -471,6 +543,76 @@ def test_get_specific_conception_rate(mocker: MockerFixture, mocked_conception_r
     # Assert
     assert result == expected_conception_rate
     patch_for_get_repro_sub_properties.assert_called_once()
+
+
+@pytest.mark.parametrize(
+    "mocked_conception_rate, expected_conception_rate",
+    [
+        # Normal case
+        (0.3, 0.3),
+
+        # Higher TAI conception rate
+        (0.5, 0.5),
+
+        # Zero TAI conception rate
+        (0.0, 0.0),
+
+        # 100% TAI conception rate
+        (1.0, 1.0),
+    ]
+)
+def test_get_default_TAI_conception_rate(mocker: MockerFixture, mocked_conception_rate: float,
+                                         expected_conception_rate: float) -> None:
+    """
+    Unit test for _get_default_TAI_conception_rate() static method of HeiferII class in heiferII.py file.
+    """
+
+    # Arrange
+    mocked_heifer_repro_protocols = {
+        HeiferReproProtocolEnum.TAI.value: {
+            'default_sub_properties': {
+                'conception_rate': mocked_conception_rate
+            }
+        }
+    }
+    mocker.patch.object(InternalReproSettings, 'HEIFER_REPRO_PROTOCOLS', mocked_heifer_repro_protocols)
+
+    # Act
+    result = HeiferII._get_default_TAI_conception_rate()
+
+    # Assert
+    assert result == expected_conception_rate
+
+
+@pytest.mark.parametrize(
+    "repro_protocol, user_defined_rate, default_rate, expected_rate",
+    [
+        # Test case where the user-defined protocol is TAI and a specific rate is returned
+        (HeiferReproProtocolEnum.TAI.value, 0.55, 0.45, 0.55),
+
+        # Case where the user-defined protocol is not TAI and the default rate is returned
+        ('OtherProtocol', 0.55, 0.45, 0.45),
+    ]
+)
+def test_get_user_defined_or_default_TAI_conception_rate(mocker: MockerFixture,
+                                                         repro_protocol: str, user_defined_rate: float,
+                                                         default_rate: float, expected_rate: float) -> None:
+    """
+    Unit test for _get_user_defined_or_default_TAI_conception_rate() static method of HeiferII class in heiferII.py
+    """
+
+    # Arrange
+    mocker.patch.object(HeiferII, '__init__', return_value=None)
+    heifer = HeiferII(mocker.MagicMock())
+    mocker.patch.object(heifer, 'get_user_defined_repro_protocol', return_value=repro_protocol)
+    mocker.patch.object(HeiferII, '_get_user_defined_TAI_conception_rate', return_value=user_defined_rate)
+    mocker.patch.object(HeiferII, '_get_default_TAI_conception_rate', return_value=default_rate)
+
+    # Act
+    result = heifer._get_user_defined_or_default_TAI_conception_rate()
+
+    # Assert
+    assert result == expected_rate
 
 
 @pytest.mark.parametrize(
@@ -760,8 +902,8 @@ def test_get_breeding_start_day(mocker: MockerFixture, breeding_start_day_config
         ('invalid_attribute', {'estrus_cycle_length': 21}, KeyError),
     ]
 )
-def test_get_repro_data(mocker: MockerFixture, attribute: str,
-                        heifer_data: dict, expected_value: Any):
+def test_get_user_defined_repro_data(mocker: MockerFixture, attribute: str,
+                                     heifer_data: dict, expected_value: Any) -> None:
     """
     Unit test for get_user_defined_repro_data() static method of HeiferII class in heiferII.py file.
     """
@@ -780,6 +922,33 @@ def test_get_repro_data(mocker: MockerFixture, attribute: str,
 
 
 @pytest.mark.parametrize(
+    "mocked_repro_protocol, expected_repro_protocol",
+    [
+        # Normal cases
+        ("ED", "ED"),
+        ("TAI", "TAI"),
+        ("SynchED", "SynchED"),
+        ("OtherProtocol", "OtherProtocol"),
+    ]
+)
+def test_get_user_defined_repro_protocol(mocker: MockerFixture, mocked_repro_protocol: str,
+                                         expected_repro_protocol: str) -> None:
+    """
+    Unit test for get_user_defined_repro_protocol() static method of HeiferII class in heiferII.py file.
+    """
+
+    # Arrange
+    mocked_config = {'heifer_repro_method': mocked_repro_protocol}
+    mocker.patch.object(AnimalBase, 'config', mocked_config)
+
+    # Act
+    result = HeiferII.get_user_defined_repro_protocol()
+
+    # Assert
+    assert result == expected_repro_protocol
+
+
+@pytest.mark.parametrize(
     "sub_protocol_value",
     [
         # Normal cases
@@ -789,7 +958,7 @@ def test_get_repro_data(mocker: MockerFixture, attribute: str,
         HeiferReproProtocolEnum.SynchED_CP
     ]
 )
-def test_get_repro_sub_protocol(mocker: MockerFixture, sub_protocol_value: str):
+def test_get_user_defined_repro_sub_protocol(mocker: MockerFixture, sub_protocol_value: str) -> None:
     """
     Unit test for get_user_defined_repro_sub_protocol() static method of HeiferII class in heiferII.py file.
     """
@@ -805,6 +974,63 @@ def test_get_repro_sub_protocol(mocker: MockerFixture, sub_protocol_value: str):
 
 
 @pytest.mark.parametrize(
+    "protocol, mocked_default_sub_protocol, expected_sub_protocol",
+    [
+        # Normal cases
+        ("TAI", "TAI_SubProtocol1", "TAI_SubProtocol1"),
+        ("SynchED", "SynchED_SubProtocol1", "SynchED_SubProtocol1"),
+        ("OtherProtocol", "OtherSubProtocol1", "OtherSubProtocol1"),
+    ]
+)
+def test_get_default_repro_sub_protocol(mocker, protocol, mocked_default_sub_protocol, expected_sub_protocol):
+    """
+    Unit test for _get_default_repro_sub_protocol() static method.
+    """
+
+    # Arrange
+    mocked_repro_protocols = {
+        protocol: {
+            'default_sub_protocol': mocked_default_sub_protocol
+        }
+    }
+    mocker.patch.object(InternalReproSettings, 'HEIFER_REPRO_PROTOCOLS', mocked_repro_protocols)
+
+    # Act
+    result = HeiferII._get_default_repro_sub_protocol(protocol)
+
+    # Assert
+    assert result == expected_sub_protocol
+
+
+@pytest.mark.parametrize(
+    "current_program, user_defined_program, user_defined_sub_protocol, default_sub_protocol, expected_sub_protocol",
+    [
+        # Test case where current and user-defined programs match
+        ("TAI", "TAI", "TAI_UserDefinedSub", "TAI_DefaultSub", "TAI_UserDefinedSub"),
+
+        # Test case where current and user-defined programs do not match
+        ("TAI", "SynchED", "SynchED_UserDefinedSub", "TAI_DefaultSub", "TAI_DefaultSub"),
+    ]
+)
+def test_get_user_defined_or_default_repro_sub_protocol(
+        mocker: MockerFixture, current_program: str, user_defined_program: str,
+        user_defined_sub_protocol: str, default_sub_protocol: str, expected_sub_protocol: str) -> None:
+    # Arrange
+    mocker.patch.object(HeiferII, '__init__', return_value=None)
+    heifer = HeiferII(mocker.MagicMock())
+    heifer.repro_program = current_program
+    mocker.patch.object(HeiferII, 'get_user_defined_repro_protocol', return_value=user_defined_program)
+    mocker.patch.object(HeiferII, 'get_user_defined_repro_sub_protocol', return_value=user_defined_sub_protocol)
+    mocker.patch.object(HeiferII, '_get_default_repro_sub_protocol', return_value=default_sub_protocol)
+
+    # Act
+    result = heifer._get_user_defined_or_default_repro_sub_protocol()
+
+    # Assert
+    assert result == expected_sub_protocol
+
+
+@pytest.mark.parametrize(
     "sub_properties",
     [
         # Normal case
@@ -814,7 +1040,7 @@ def test_get_repro_sub_protocol(mocker: MockerFixture, sub_protocol_value: str):
         {},
     ]
 )
-def test_get_repro_sub_properties(mocker: MockerFixture, sub_properties: dict):
+def test_get_user_defined_repro_sub_properties(mocker: MockerFixture, sub_properties: dict):
     """
     Unit test for get_user_defined_repro_sub_properties() static method of HeiferII class.
     """
@@ -859,7 +1085,7 @@ def test_execute_tai_protocol(mocker: MockerFixture, days_born: int, sim_day: in
     patch_for_set_up_hormone_schedule = mocker.patch.object(heifer, '_set_up_hormone_schedule', return_value=None)
     patch_for_execute_hormone_schedule = mocker.patch.object(heifer, '_execute_hormone_delivery_schedule',
                                                              return_value=None)
-    patch_for_get_repro_sub_protocol = mocker.patch.object(HeiferII, '_get_repro_sub_protocol',
+    patch_for_get_repro_sub_protocol = mocker.patch.object(HeiferII, '_get_user_defined_or_default_repro_sub_protocol',
                                                            return_value=repro_sub_protocol)
     patch_for_get_TAI_conception_rate = mocker.patch.object(
         HeiferII,
@@ -913,7 +1139,7 @@ def test_execute_synch_ed_protocol(mocker: MockerFixture, days_born: int, sim_da
     patch_for_handle_estrus_detection = mocker.patch.object(heifer, '_handle_synch_ed_estrus_detection',
                                                             return_value=None)
     mocker.patch.object(HeiferII, '_get_breeding_start_day', return_value=breeding_start_day)
-    mocker.patch.object(HeiferII, '_get_repro_sub_protocol')
+    mocker.patch.object(HeiferII, '_get_user_defined_or_default_repro_sub_protocol')
 
     # Act
     heifer.execute_synch_ed_protocol(sim_day)
@@ -1100,7 +1326,7 @@ def test_handle_estrus_not_detected_in_synch_ed(mocker: MockerFixture, days_born
     patch_for_set_up_hormone_schedule = mocker.patch.object(heifer, '_set_up_hormone_schedule', return_value=None)
     patch_for_execute_hormone_schedule = mocker.patch.object(heifer, '_execute_hormone_delivery_schedule',
                                                              return_value=None)
-    mocker.patch.object(HeiferII, '_get_repro_sub_protocol',
+    mocker.patch.object(HeiferII, '_get_user_defined_or_default_repro_sub_protocol',
                         return_value=internal_fallback_protocol['repro_sub_protocol'])
     mocker.patch.object(InternalReproSettings, 'HEIFER_REPRO_PROTOCOLS',
                         {internal_fallback_protocol['repro_sub_protocol']: {

@@ -272,8 +272,6 @@ def test_execute_simulations(
     mock_simulator = mocker.MagicMock(auto_spec=SimulationEngine)
     mock_simulator.simulate.return_value = None
     mocker.patch("main.SimulationEngine", return_value=mock_simulator)
-    mocker.patch("main.HerdCompositionGraphGenerator.generate_herd_composition_graph", return_value=None)
-    mocker.patch("main.HerdCompositionGraphGenerator.generate_cow_parity_composition_graph", return_value=None)
     output_dir = Path("output/")
     filters_dir = Path("output/output_filters/")
     csv_dir = Path("output/CSVs/")

@@ -336,7 +336,8 @@ class HeiferII(HeiferI):
             self.events.add_event(self.days_born, sim_day, const.MATURE_BODY_WEIGHT_REGULAR)
 
         if self.repro_program != HeiferII.get_user_defined_repro_protocol():
-            self._set_repro_program(sim_day, HeiferII.get_user_defined_repro_protocol())  # type: ignore
+            if self.days_born <= self._get_breeding_start_day():
+                self._set_repro_program(sim_day, HeiferII.get_user_defined_repro_protocol())  # type: ignore
 
         # breeding method assign to heifer
         if self.days_born >= self._get_breeding_start_day():
@@ -359,10 +360,10 @@ class HeiferII(HeiferI):
             if self.days_in_preg == self.gestation_length - AnimalBase.config["prefresh_day"]:
                 self.days_born -= 1  # will be increment again in next stage
                 third_stage = True
-                self.events.add_event(self.days_born, sim_day, const.HEIFERII_TO_III)
+                self.log_event(self.days_born, sim_day, const.HEIFERII_TO_III)
         # cull heifer for reproduction reason
         if self.days_in_preg == 0 and self.days_born > AnimalBase.config["heifer_repro_cull_time"]:
-            self.events.add_event(self.days_born, sim_day, const.HEIFER_REPRO_CULL)
+            self.log_event(self.days_born, sim_day, const.HEIFER_REPRO_CULL)
             cull_stage = True
 
         return cull_stage, third_stage
@@ -804,7 +805,7 @@ class HeiferII(HeiferI):
 
         return InternalReproSettings.HEIFER_REPRO_PROTOCOLS[protocol]['default_sub_protocol']
 
-    def _get_repro_sub_protocol(self) -> str:
+    def _get_user_defined_or_default_repro_sub_protocol(self) -> str:
         """
         Get the reproduction sub protocol for the heifer.
 
@@ -852,7 +853,7 @@ class HeiferII(HeiferI):
         """
 
         if self.days_born == self._get_breeding_start_day():
-            self._set_up_hormone_schedule('heifers', self._get_repro_sub_protocol(), self.days_born)
+            self._set_up_hormone_schedule('heifers', self._get_user_defined_or_default_repro_sub_protocol(), self.days_born)
             self._TAI_conception_rate = self._get_user_defined_or_default_TAI_conception_rate()
 
         if self._hormone_schedule:
@@ -903,7 +904,7 @@ class HeiferII(HeiferI):
         """
 
         if self.days_born == self._get_breeding_start_day():
-            self._set_up_hormone_schedule('heifers', self._get_repro_sub_protocol(), self.days_born)
+            self._set_up_hormone_schedule('heifers', self._get_user_defined_or_default_repro_sub_protocol(), self.days_born)
 
         self._handle_synch_ed_hormone_delivery_and_set_estrus_day(sim_day)
 
@@ -1000,7 +1001,7 @@ class HeiferII(HeiferI):
         self.log_event(self.days_born, sim_day, const.ESTRUS_NOT_DETECTED_NOTE)
         self.log_event(self.days_born, sim_day, const.TAI_AFTER_ESTRUS_NOT_DETECTED_IN_SYNCH_ED_NOTE)
         internal_fallback_protocol = InternalReproSettings.HEIFER_REPRO_PROTOCOLS[
-            self._get_repro_sub_protocol()]['when_estrus_not_detected']
+            self._get_user_defined_or_default_repro_sub_protocol()]['when_estrus_not_detected']
 
         self._set_repro_program(sim_day, internal_fallback_protocol['repro_protocol'])
         self._set_up_hormone_schedule('heifers', internal_fallback_protocol['repro_sub_protocol'], self.days_born)
@@ -1050,7 +1051,7 @@ class HeiferII(HeiferI):
         """
 
         self.log_event(self.abortion_day, sim_day, const.REBREEDING_NOTE)
-        self._set_repro_program(sim_day, 'ED')
+        self._set_repro_program(sim_day, HeiferReproProtocolEnum.ED.value)
         self._simulate_estrus(self.abortion_day, sim_day, const.ESTRUS_DAY_SCHEDULED_NOTE)
 
     @property

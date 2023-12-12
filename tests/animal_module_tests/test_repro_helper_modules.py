@@ -130,6 +130,33 @@ def test_get_adjusted_schedule(animal_category: str, protocol_name: str, start_d
 
 
 @pytest.mark.parametrize(
+    "protocol, expected_result",
+    [
+        (HeiferReproProtocolEnum.TAI.value, {
+            'default_sub_protocol': HeiferReproProtocolEnum.TAI_5dCG2P.value,
+            'default_sub_properties': {
+                'conception_rate': 0.5
+            }
+        }),
+        (HeiferReproProtocolEnum.SynchED.value, {
+            'default_sub_protocol': HeiferReproProtocolEnum.SynchED_2P.value,
+            'default_sub_properties': {
+                'estrus_detection_rate': 0.7
+            }
+        })
+    ]
+)
+def test_heifer_repro_protocols_default_values(protocol: str, expected_result: dict[str, Any]) -> None:
+    """
+    Unit test for the default sub-protocol and properties of the TAI and SynchED protocols
+    in the HEIFER_REPRO_PROTOCOLS attribute of the InternalReproSettings class.
+    """
+
+    # Act and assert
+    assert InternalReproSettings.HEIFER_REPRO_PROTOCOLS[protocol] == expected_result
+
+
+@pytest.mark.parametrize(
     "sub_protocol, expected_result", [
         (HeiferReproProtocolEnum.SynchED_2P.value, {
             'repro_protocol': HeiferReproProtocolEnum.TAI.value,
@@ -147,8 +174,8 @@ def test_get_adjusted_schedule(animal_category: str, protocol_name: str, start_d
             }
         })
     ])
-def test_heifer_repro_protocols_when_estrus_not_detected(sub_protocol: str,
-                                                         expected_result: dict[str, Any]) -> None:
+def test_heifer_synch_ed_sub_protocols_when_estrus_not_detected(sub_protocol: str,
+                                                                expected_result: dict[str, Any]) -> None:
     """
     Unit test for the sub-attributes of the HEIFER_REPRO_PROTOCOLS attribute of
     the InternalReproSettings class when estrus is not detected.

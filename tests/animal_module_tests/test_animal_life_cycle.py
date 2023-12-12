@@ -262,48 +262,62 @@ def test_evaluate_calves_for_weaning(mocker: MockerFixture, life_cycle_manager: 
     assert life_cycle_manager.avg_mature_body_weight == approx(mature_body_weight)
 
 
-def test_convert_heiferI_to_heiferII(mocker: MockerFixture) -> None:
-    """Unit test for function _convert_heiferI_to_heiferII in file life_cycle.py"""
+@pytest.mark.parametrize(
+    "heifer_repro_method, dummy_repro_sub_protocol, tai_method_h_value, synch_ed_method_h_value",
+    [
+        # TAI case
+        ('TAI', 'dummy_tai', 'dummy_tai', ''),
+
+        # SynchED case
+        ('SynchED', 'dummy_synch_ed', '', 'dummy_synch_ed'),
+
+        # Other case
+        ('Other', '', '', '')
+    ]
+)
+def test_convert_heiferI_to_heiferII(mocker: MockerFixture, heifer_repro_method: str,
+                                     dummy_repro_sub_protocol: str, tai_method_h_value: str,
+                                     synch_ed_method_h_value: str) -> None:
+    """
+    Unit test for _convert_heiferI_to_heiferII() static method in file life_cycle.py
+    """
+
+    # Arrange
     heiferI_body_weight_history = [30.0, 40.0]
     heiferI_pen_history = [mocker.MagicMock(autospec=Pen) for _ in range(2)]
 
     mock_heiferI = mocker.MagicMock(autospec=HeiferI)
     mock_heiferI.body_weight_history = heiferI_body_weight_history
     mock_heiferI.pen_history = heiferI_pen_history
-
     mock_heiferI_vals = mocker.MagicMock(autospec=Dict)
     mock_heiferI.get_heiferI_values.return_value = mock_heiferI_vals
 
     heiferIIs: List[HeiferII] = []
     mock_new_heiferII = mocker.MagicMock(autospec=HeiferII)
-    mocker.patch('RUFAS.routines.animal.life_cycle.life_cycle.HeiferII',
-                 return_value=mock_new_heiferII)
-
-    heifer_repro_method = 'TAI'
-    dummy_repro_sub_protocol = 'dummy'
+    mocker.patch('RUFAS.routines.animal.life_cycle.life_cycle.HeiferII', return_value=mock_new_heiferII)
     mocker.patch('RUFAS.routines.animal.life_cycle.life_cycle.HeiferII.get_user_defined_repro_protocol',
                  return_value=heifer_repro_method)
     mocker.patch('RUFAS.routines.animal.life_cycle.life_cycle.HeiferII.get_user_defined_repro_sub_protocol',
                  return_value=dummy_repro_sub_protocol)
-    animal_base_config = {
-        "heifer_repro_method": heifer_repro_method,
-    }
-    mocker.patch('RUFAS.routines.animal.life_cycle.life_cycle.AnimalBase.config', animal_base_config)
 
+    # Act
     LifeCycleManager._convert_heiferI_to_heiferII(mock_heiferI, heiferIIs)
 
-    assert mock_heiferI_vals.update.mock_calls == [
-        mocker.call({
-            'body_weight_history': heiferI_body_weight_history,
-            'pen_history': heiferI_pen_history
-        }),
-        mocker.call(repro_program=heifer_repro_method),
-        mocker.call(tai_method_h=dummy_repro_sub_protocol),
-        mocker.call(synch_ed_method_h='')
-    ]
+    # Assert
+    basic_update_call = mocker.call(
+        {'body_weight_history': heiferI_body_weight_history, 'pen_history': heiferI_pen_history})
+    repro_program_update_call = mocker.call(repro_program=heifer_repro_method)
+    tai_method_update_call = mocker.call(tai_method_h=tai_method_h_value)
+    synch_ed_method_update_call = mocker.call(synch_ed_method_h=synch_ed_method_h_value)
 
+    expected_mock_calls = [basic_update_call,
+                           repro_program_update_call,
+                           tai_method_update_call,
+                           synch_ed_method_update_call]
+
+    assert mock_heiferI_vals.update.mock_calls == expected_mock_calls
     assert len(heiferIIs) == 1
-    assert heiferIIs[0] == mock_new_heiferII  # check identity
+    assert heiferIIs[0] == mock_new_heiferII
 
 
 def test_evaluate_heiferIs_for_transitioning_to_heiferIIs(mocker: MockerFixture,
