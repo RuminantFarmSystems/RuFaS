@@ -108,12 +108,7 @@ def test_generate_report_only_horizontal(
         "variables": ["a", "b"],
         "horizontal_aggregation": "sum",
     }
-    assert report_generator.generate_report(sample_filtered_pool, filter_content) == [
-        3,
-        7,
-        11,
-        15,
-    ]
+    assert report_generator.generate_report(sample_filtered_pool, filter_content) == {'hor_agg': [3, 7, 11, 15]}
 
 
 def test_generate_report_only_vertical(
