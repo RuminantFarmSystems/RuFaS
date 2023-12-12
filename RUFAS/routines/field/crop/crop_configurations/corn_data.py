@@ -53,15 +53,15 @@ class CornGrain(Corn):
         Percentage of harvested crop biomass that is dry matter (unitless).
     yield_nitrogen_fraction: float, default=0.0140
         Fraction of dry matter crop yield that is nitrogen (unitless).
-    yield_phosphorus_fraction: float default=0.0016
-        Fraction of wet crop yield that is phosphorus (unitless).
+    yield_phosphorus_fraction: float default=0.00309
+        Fraction of dry matter crop yield that is phosphorus (unitless).
 
     """
     optimal_harvest_index: float = 0.60
     min_harvest_index: float = 0.40
     dry_matter_percentage: float = 86.0907
     yield_nitrogen_fraction: float = 0.0140
-    yield_phosphorus_fraction: float = 0.0016
+    yield_phosphorus_fraction: float = 0.00309
 
 
 @dataclass(kw_only=True)
@@ -79,7 +79,7 @@ class CornSilage(Corn):
         Percentage of harvested crop biomass that is dry matter (unitless).
     yield_nitrogen_fraction: float, default=0.0140
         Fraction of dry matter crop yield that is nitrogen (unitless).
-    yield_phosphorus_fraction: float default=0.0016
+    yield_phosphorus_fraction: float default=0.00232
         Fraction of wet crop yield that is phosphorus (unitless).
 
     """
@@ -87,4 +87,4 @@ class CornSilage(Corn):
     min_harvest_index: float = 0.68
     dry_matter_percentage: float = 35.361
     yield_nitrogen_fraction: float = 0.0140
-    yield_phosphorus_fraction: float = 0.0016
+    yield_phosphorus_fraction: float = 0.00232

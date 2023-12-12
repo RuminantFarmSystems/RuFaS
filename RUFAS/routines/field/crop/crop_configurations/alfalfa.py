@@ -55,7 +55,7 @@ class AlfalfaSilage(Alfalfa):
         Percentage of harvested crop biomass that is dry matter (unitless).
     yield_nitrogen_fraction: float, default=0.0327536
         Fraction of dry matter crop yield that is nitrogen (unitless).
-    yield_phosphorus_fraction: float default=0.0035
+    yield_phosphorus_fraction: float default=0.00351
         Fraction of wet crop yield that is phosphorus (unitless).
 
     """
@@ -63,7 +63,7 @@ class AlfalfaSilage(Alfalfa):
     min_harvest_index: float = 0.40
     dry_matter_percentage: float = 42.883
     yield_nitrogen_fraction: float = 0.0327536
-    yield_phosphorus_fraction: float = 0.0035
+    yield_phosphorus_fraction: float = 0.00351
 
 
 @dataclass(kw_only=True)
@@ -81,7 +81,7 @@ class AlfalfaBaleage(Alfalfa):
         Percentage of harvested crop biomass that is dry matter (unitless).
     yield_nitrogen_fraction: float, default=0.0327536
         Fraction of dry matter crop yield that is nitrogen (unitless).
-    yield_phosphorus_fraction: float default=0.0035
+    yield_phosphorus_fraction: float default=0.00351
         Fraction of wet crop yield that is phosphorus (unitless).
 
     Notes
@@ -93,7 +93,7 @@ class AlfalfaBaleage(Alfalfa):
     min_harvest_index: float = 0.40
     dry_matter_percentage: float = 42.883
     yield_nitrogen_fraction: float = 0.0327536
-    yield_phosphorus_fraction: float = 0.0035
+    yield_phosphorus_fraction: float = 0.00351
 
 
 @dataclass(kw_only=True)
@@ -111,7 +111,7 @@ class AlfalfaHay(Alfalfa):
         Percentage of harvested crop biomass that is dry matter (unitless).
     yield_nitrogen_fraction: float, default=0.0250
         Fraction of dry matter crop yield that is nitrogen (unitless).
-    yield_phosphorus_fraction: float default=0.0035
+    yield_phosphorus_fraction: float default=0.00282
         Fraction of wet crop yield that is phosphorus (unitless).
 
     Notes
@@ -123,5 +123,5 @@ class AlfalfaHay(Alfalfa):
     min_harvest_index: float = 0.35
     dry_matter_percentage: float = 88.136
     yield_nitrogen_fraction: float = 0.033192
-    yield_phosphorus_fraction: float = 0.0035
+    yield_phosphorus_fraction: float = 0.00282
 
