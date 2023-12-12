@@ -5,6 +5,7 @@ from typing import Any
 
 from RUFAS.schema_manager import SchemaManager
 
+
 @pytest.mark.parametrize("pattern,expected", [
     ("^(kg)$", ["kg"]),
     ("^(default|no_kill)$", ["default", "no_kill"]),
