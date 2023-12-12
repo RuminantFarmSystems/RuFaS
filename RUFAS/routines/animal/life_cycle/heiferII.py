@@ -303,7 +303,7 @@ class HeiferII(HeiferI):
         # requirement of P from the ration (g) (A.1B-D.E.7)
         self.p_req = p_absorb / 0.664
 
-    def update(self, sim_day):
+    def update(self, sim_day):  # C901: noqa
         """
         Controls heifer's grow with average daily gain based on user's input
         until breeding start day. Here is the place to change growth rate with
