@@ -46,6 +46,14 @@ RUFAS.routines.animal.animal\_module\_constants module
    :undoc-members:
    :show-inheritance:
 
+RUFAS.routines.animal.animal\_module\_reporter module
+-----------------------------------------------------
+
+.. automodule:: RUFAS.routines.animal.animal_module_reporter
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 RUFAS.routines.animal.animal\_typed\_dicts module
 -------------------------------------------------
 

@@ -12,6 +12,22 @@ RUFAS.routines.feed\_storage.harvested\_crop module
    :undoc-members:
    :show-inheritance:
 
+RUFAS.routines.feed\_storage.hay module
+---------------------------------------
+
+.. automodule:: RUFAS.routines.feed_storage.hay
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+RUFAS.routines.feed\_storage.storage module
+-------------------------------------------
+
+.. automodule:: RUFAS.routines.feed_storage.storage
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 Module contents
 ---------------
 

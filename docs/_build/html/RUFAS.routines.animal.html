@@ -605,11 +605,6 @@ to pens, etc). Stores a list of all animals and pens in the simulation as
 well as an instance of the LifeCycleManager class in order to update the
 animals’ life cycles.</p>
 <dl class="py attribute">
-<dt class="sig sig-object py" id="RUFAS.routines.animal.animal_manager.AnimalManager.ANIMAL_GROUPING_SCENARIO">
-<span class="sig-name descname"><span class="pre">ANIMAL_GROUPING_SCENARIO</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{AnimalCombination.CALF:</span> <span class="pre">[AnimalType.CALF],</span> <span class="pre">AnimalCombination.CLOSE_UP:</span> <span class="pre">[AnimalType.HEIFER_III,</span> <span class="pre">AnimalType.DRY_COW],</span> <span class="pre">AnimalCombination.GROWING:</span> <span class="pre">[AnimalType.HEIFER_I,</span> <span class="pre">AnimalType.HEIFER_II],</span> <span class="pre">AnimalCombination.LAC_COW:</span> <span class="pre">[AnimalType.LAC_COW]}</span></em><a class="headerlink" href="#RUFAS.routines.animal.animal_manager.AnimalManager.ANIMAL_GROUPING_SCENARIO" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
 <dt class="sig sig-object py" id="RUFAS.routines.animal.animal_manager.AnimalManager.DEFAULT_NUM_STALLS_BY_COMBINATION">
 <span class="sig-name descname"><span class="pre">DEFAULT_NUM_STALLS_BY_COMBINATION</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{AnimalCombination.CALF:</span> <span class="pre">110,</span> <span class="pre">AnimalCombination.CLOSE_UP:</span> <span class="pre">200,</span> <span class="pre">AnimalCombination.GROWING:</span> <span class="pre">800,</span> <span class="pre">AnimalCombination.GROWING_AND_CLOSE_UP:</span> <span class="pre">500,</span> <span class="pre">AnimalCombination.LAC_COW:</span> <span class="pre">850}</span></em><a class="headerlink" href="#RUFAS.routines.animal.animal_manager.AnimalManager.DEFAULT_NUM_STALLS_BY_COMBINATION" title="Link to this definition"></a></dt>
 <dd></dd></dl>
@@ -629,11 +624,6 @@ ensuring that the animal density of each pen matches the overall density as clos
 <dl class="py property">
 <dt class="sig sig-object py" id="RUFAS.routines.animal.animal_manager.AnimalManager.animals_by_type">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">animals_by_type</span></span><a class="headerlink" href="#RUFAS.routines.animal.animal_manager.AnimalManager.animals_by_type" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="RUFAS.routines.animal.animal_manager.AnimalManager.annual_reset">
-<span class="sig-name descname"><span class="pre">annual_reset</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.routines.animal.animal_manager.AnimalManager.annual_reset" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
@@ -720,6 +710,11 @@ routines that happen every ration interval.</p>
 </dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.animal.animal_manager.AnimalManager.collect_manure_excretions_output_data">
+<span class="sig-name descname"><span class="pre">collect_manure_excretions_output_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pen</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#RUFAS.routines.animal.pen.Pen" title="RUFAS.routines.animal.pen.Pen"><span class="pre">Pen</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">feed</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.routines.feed.html#RUFAS.routines.feed.feed.Feed" title="RUFAS.routines.feed.feed.Feed"><span class="pre">Feed</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">manure_excretions_output_data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.animal.animal_manager.AnimalManager.collect_manure_excretions_output_data" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="RUFAS.routines.animal.animal_manager.AnimalManager.daily_p_update">
 <span class="sig-name descname"><span class="pre">daily_p_update</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.routines.animal.animal_manager.AnimalManager.daily_p_update" title="Link to this definition"></a></dt>
 <dd><p>Calls each pen’s method to calculate each animal’s daily phosphorus
@@ -728,7 +723,7 @@ update. This method is called daily.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="RUFAS.routines.animal.animal_manager.AnimalManager.daily_update_id_map">
-<span class="sig-name descname"><span class="pre">daily_update_id_map</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">animals_added</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="RUFAS.routines.animal.life_cycle.html#RUFAS.routines.animal.life_cycle.animal_base.AnimalBase" title="RUFAS.routines.animal.life_cycle.animal_base.AnimalBase"><span class="pre">AnimalBase</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">animals_removed</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="RUFAS.routines.animal.life_cycle.html#RUFAS.routines.animal.life_cycle.animal_base.AnimalBase" title="RUFAS.routines.animal.life_cycle.animal_base.AnimalBase"><span class="pre">AnimalBase</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">calves_born</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="RUFAS.routines.animal.life_cycle.html#RUFAS.routines.animal.life_cycle.calf.Calf" title="RUFAS.routines.animal.life_cycle.calf.Calf"><span class="pre">Calf</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">feed</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.routines.feed.html#RUFAS.routines.feed.feed.Feed" title="RUFAS.routines.feed.feed.Feed"><span class="pre">Feed</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">temp</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.routines.animal.animal_manager.AnimalManager.daily_update_id_map" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">daily_update_id_map</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">animals_added</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="RUFAS.routines.animal.life_cycle.html#RUFAS.routines.animal.life_cycle.animal_base.AnimalBase" title="RUFAS.routines.animal.life_cycle.animal_base.AnimalBase"><span class="pre">AnimalBase</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">animals_removed</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="RUFAS.routines.animal.life_cycle.html#RUFAS.routines.animal.life_cycle.animal_base.AnimalBase" title="RUFAS.routines.animal.life_cycle.animal_base.AnimalBase"><span class="pre">AnimalBase</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">calves_born</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="RUFAS.routines.animal.life_cycle.html#RUFAS.routines.animal.life_cycle.calf.Calf" title="RUFAS.routines.animal.life_cycle.calf.Calf"><span class="pre">Calf</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">feed</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.routines.feed.html#RUFAS.routines.feed.feed.Feed" title="RUFAS.routines.feed.feed.Feed"><span class="pre">Feed</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">current_temperature</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.routines.animal.animal_manager.AnimalManager.daily_update_id_map" title="Link to this definition"></a></dt>
 <dd><p>Updates the dictionary that maps animal IDs to the ID of the pen they are housed in when
 new animals are born or purchased and when animals leave the herd due to death or culling</p>
 <section id="id8">
@@ -742,7 +737,7 @@ new animals are born or purchased and when animals leave the herd due to death o
 </dd>
 <dt>feed<span class="classifier">Feed</span></dt><dd><p>an instance of the Feed class defined in feed.py</p>
 </dd>
-<dt>temp<span class="classifier">float</span></dt><dd><p>the temperature on the current day</p>
+<dt>current_temperature<span class="classifier">float</span></dt><dd><p>the temperature on the current day</p>
 </dd>
 </dl>
 </section>
@@ -836,33 +831,6 @@ pen history for that type using the update_pen_history() method.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="RUFAS.routines.animal.animal_manager.AnimalManager.generate_animal_output">
-<span class="sig-name descname"><span class="pre">generate_animal_output</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">animal_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">index</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.animal.animal_manager.AnimalManager.generate_animal_output" title="Link to this definition"></a></dt>
-<dd><p>Returns the information (ID, breed, birthday, breeding method,
-semen used, pen history, bodyweight history, milk production history,
-event history) of the animal at the index of the respective
-animal_type list.</p>
-<section id="id13">
-<h3>Parameters<a class="headerlink" href="#id13" title="Link to this heading"></a></h3>
-<dl class="simple">
-<dt>animal_type<span class="classifier">str</span></dt><dd><p>One of ‘calf’, ‘heiferI’, ‘heiferII’,
-‘heiferIII’, ‘cow’, ‘sold_heifer’, or ‘culled cow’</p>
-</dd>
-<dt>index<span class="classifier">int</span></dt><dd><p>the index of the animal in the respective animal_type list
-whose information will be returned</p>
-</dd>
-</dl>
-</section>
-<section id="id14">
-<h3>Returns<a class="headerlink" href="#id14" title="Link to this heading"></a></h3>
-<dl class="simple">
-<dt>Dict with an animal of animal_type’s information. Not</dt><dd><p>all information is available for each animal_type.</p>
-</dd>
-</dl>
-</section>
-</dd></dl>
-
-<dl class="py method">
 <dt class="sig sig-object py" id="RUFAS.routines.animal.animal_manager.AnimalManager.get_animal_config">
 <em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_animal_config</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.animal.animal_manager.AnimalManager.get_animal_config" title="Link to this definition"></a></dt>
 <dd></dd></dl>
@@ -870,29 +838,10 @@ whose information will be returned</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="RUFAS.routines.animal.animal_manager.AnimalManager.get_initialize_db_summary">
 <span class="sig-name descname"><span class="pre">get_initialize_db_summary</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#RUFAS.routines.animal.animal_typed_dicts.InitializationDBSummaryTypedDict" title="RUFAS.routines.animal.animal_typed_dicts.InitializationDBSummaryTypedDict"><span class="pre">InitializationDBSummaryTypedDict</span></a></span></span><a class="headerlink" href="#RUFAS.routines.animal.animal_manager.AnimalManager.get_initialize_db_summary" title="Link to this definition"></a></dt>
-<dd><section id="id15">
-<h3>Returns<a class="headerlink" href="#id15" title="Link to this heading"></a></h3>
+<dd><section id="id13">
+<h3>Returns<a class="headerlink" href="#id13" title="Link to this heading"></a></h3>
 <dl class="simple">
 <dt>InitializationDBSummaryTypedDict</dt><dd><p>a dictionary which is the summary of the animal initialization database</p>
-</dd>
-</dl>
-</section>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="RUFAS.routines.animal.animal_manager.AnimalManager.get_life_cycle_output">
-<span class="sig-name descname"><span class="pre">get_life_cycle_output</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_animals</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="RUFAS.routines.animal.life_cycle.html#RUFAS.routines.animal.life_cycle.animal_base.AnimalBase" title="RUFAS.routines.animal.life_cycle.animal_base.AnimalBase"><span class="pre">AnimalBase</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">bool</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Dict</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#RUFAS.routines.animal.animal_manager.AnimalManager.get_life_cycle_output" title="Link to this definition"></a></dt>
-<dd><p>Returns the life cycle output on an individual level, which is the
-information of some of each type of animal as well as some animal
-statistics.</p>
-<section id="id16">
-<h3>Parameters<a class="headerlink" href="#id16" title="Link to this heading"></a></h3>
-<dl class="simple">
-<dt>num_animals: int</dt><dd><p>the number of each type of animal (calves, heiferIs, heiferIIs, heiferIIIs, cows, sold_heifers, and
-culled_cows) for which information will be collected and returned. If num_animals is larger than the minimum
-length of the animal lists, then num_animals will be set to the minimum length of the animal lists.</p>
-</dd>
-<dt>Returns<span class="classifier">Tuple[List[Tuple[AnimalBase, str, bool]], Dict[str, Dict | int]]</span></dt><dd><p>A list of animals, and a dictionary which contains the individual life cycle output.</p>
 </dd>
 </dl>
 </section>
@@ -907,8 +856,8 @@ heiferIII’s, and cows (the desired amounts of each is specified by
 &#64;data), then calls life_cycle_manager’s initialize_herd() with those
 numbers to create instances of the animals. The nutrient requirements
 are calculated and the animals are allocated to pens.</p>
-<section id="id17">
-<h3>Parameters<a class="headerlink" href="#id17" title="Link to this heading"></a></h3>
+<section id="id14">
+<h3>Parameters<a class="headerlink" href="#id14" title="Link to this heading"></a></h3>
 <dl class="simple">
 <dt>config<span class="classifier">Config</span></dt><dd><p>an instance of the Config class contains model configuration information</p>
 </dd>
@@ -925,8 +874,8 @@ are calculated and the animals are allocated to pens.</p>
 simulation for initial pen allocation. For the nutrient requirements
 of cows, the average walking distance of all the pens initialized
 is used.</p>
-<section id="id18">
-<h3>Parameters<a class="headerlink" href="#id18" title="Link to this heading"></a></h3>
+<section id="id15">
+<h3>Parameters<a class="headerlink" href="#id15" title="Link to this heading"></a></h3>
 <dl class="simple">
 <dt>feed<span class="classifier">Feed</span></dt><dd><p>an instance of the Feed class defined in feed.py</p>
 </dd>
@@ -940,14 +889,12 @@ is used.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="RUFAS.routines.animal.animal_manager.AnimalManager.init_pens">
-<span class="sig-name descname"><span class="pre">init_pens</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">all_pen_data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">herd_data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">manure_management_scenarios</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.routines.animal.animal_manager.AnimalManager.init_pens" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">init_pens</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">all_pen_data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">manure_management_scenarios</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.routines.animal.animal_manager.AnimalManager.init_pens" title="Link to this definition"></a></dt>
 <dd><p>Populates the list of pens with the information from the input json file.</p>
-<section id="id19">
-<h3>Parameters<a class="headerlink" href="#id19" title="Link to this heading"></a></h3>
+<section id="id16">
+<h3>Parameters<a class="headerlink" href="#id16" title="Link to this heading"></a></h3>
 <dl class="simple">
 <dt>all_pen_data: list[dict[str, Any]]</dt><dd><p>List containing information about the pens.</p>
-</dd>
-<dt>herd_data: Dict[str, Any]</dt><dd><p>Dictionary containing information about the herd.</p>
 </dd>
 <dt>manure_management_scenarios<span class="classifier">Dict[str, Any]</span></dt><dd><p>Dictionary containing information about the manure management scenarios.</p>
 </dd>
@@ -988,8 +935,8 @@ and won’t be ignored.</p>
 This would use up the animal count more quickly, so the later the allocation, the fewer animals are left
 to allocate. Depending on the dynamics between the given numbers, some pens may end up with a very low density.</p>
 </section>
-<section id="id20">
-<h3>Parameters<a class="headerlink" href="#id20" title="Link to this heading"></a></h3>
+<section id="id17">
+<h3>Parameters<a class="headerlink" href="#id17" title="Link to this heading"></a></h3>
 <dl class="simple">
 <dt>num_animals<span class="classifier">int</span></dt><dd><p>The total number of animals to allocate. Must be a non-negative integer and not be greater than the
 total number of spaces.</p>
@@ -998,16 +945,16 @@ total number of spaces.</p>
 </dd>
 </dl>
 </section>
-<section id="id21">
-<h3>Returns<a class="headerlink" href="#id21" title="Link to this heading"></a></h3>
+<section id="id18">
+<h3>Returns<a class="headerlink" href="#id18" title="Link to this heading"></a></h3>
 <dl class="simple">
 <dt>List[int]</dt><dd><p>A list of integers representing the allocation of animals in each pen. Each integer will be less than or
 equal to <cite>math.ceil(overall_density * max_spaces_in_pens[i])]</cite>.</p>
 </dd>
 </dl>
 </section>
-<section id="id22">
-<h3>Raises<a class="headerlink" href="#id22" title="Link to this heading"></a></h3>
+<section id="id19">
+<h3>Raises<a class="headerlink" href="#id19" title="Link to this heading"></a></h3>
 <dl class="simple">
 <dt>ValueError</dt><dd><p>If the number of animals is greater than the total number of spaces.</p>
 </dd>
@@ -1041,8 +988,8 @@ equal to <cite>math.ceil(overall_density * max_spaces_in_pens[i])]</cite>.</p>
 <span class="sig-name descname"><span class="pre">remove_animals_from_herd</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">animals_removed</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="RUFAS.routines.animal.life_cycle.html#RUFAS.routines.animal.life_cycle.animal_base.AnimalBase" title="RUFAS.routines.animal.life_cycle.animal_base.AnimalBase"><span class="pre">AnimalBase</span></a><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.routines.animal.animal_manager.AnimalManager.remove_animals_from_herd" title="Link to this definition"></a></dt>
 <dd><p>Deletes the IDs of animals from animal_to_pen_id_map dictionary when the animal
 was removed from the herd; updates the relevant pen’s stocking density.</p>
-<section id="id23">
-<h3>Parameters<a class="headerlink" href="#id23" title="Link to this heading"></a></h3>
+<section id="id20">
+<h3>Parameters<a class="headerlink" href="#id20" title="Link to this heading"></a></h3>
 <dl class="simple">
 <dt>animals_removed<span class="classifier">List[AnimalBase]</span></dt><dd><p>list of animal objects that are to be removed from the herd</p>
 </dd>
@@ -1064,15 +1011,15 @@ was removed from the herd; updates the relevant pen’s stocking density.</p>
 <dt class="sig sig-object py" id="RUFAS.routines.animal.animal_manager.AnimalManager.set_animal_grouping_scenario">
 <em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">set_animal_grouping_scenario</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">scenario</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#RUFAS.routines.animal.animal_grouping_scenarios.AnimalGroupingScenario" title="RUFAS.routines.animal.animal_grouping_scenarios.AnimalGroupingScenario"><span class="pre">AnimalGroupingScenario</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.routines.animal.animal_manager.AnimalManager.set_animal_grouping_scenario" title="Link to this definition"></a></dt>
 <dd><p>Sets the animal grouping scenario to the given scenario.</p>
-<section id="id24">
-<h3>Parameters<a class="headerlink" href="#id24" title="Link to this heading"></a></h3>
+<section id="id21">
+<h3>Parameters<a class="headerlink" href="#id21" title="Link to this heading"></a></h3>
 <dl class="simple">
 <dt>scenario<span class="classifier">AnimalGroupingScenario</span></dt><dd><p>The scenario to set the animal grouping scenario to.</p>
 </dd>
 </dl>
 </section>
-<section id="id25">
-<h3>Returns<a class="headerlink" href="#id25" title="Link to this heading"></a></h3>
+<section id="id22">
+<h3>Returns<a class="headerlink" href="#id22" title="Link to this heading"></a></h3>
 <p>None</p>
 </section>
 </dd></dl>
@@ -1081,15 +1028,15 @@ was removed from the herd; updates the relevant pen’s stocking density.</p>
 <dt class="sig sig-object py" id="RUFAS.routines.animal.animal_manager.AnimalManager.sum_daily_milk">
 <span class="sig-name descname"><span class="pre">sum_daily_milk</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cows</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="RUFAS.routines.animal.life_cycle.html#RUFAS.routines.animal.life_cycle.cow.Cow" title="RUFAS.routines.animal.life_cycle.cow.Cow"><span class="pre">Cow</span></a><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.routines.animal.animal_manager.AnimalManager.sum_daily_milk" title="Link to this definition"></a></dt>
 <dd><p>sums the daily milk production across all cows</p>
-<section id="id26">
-<h3>Parameters<a class="headerlink" href="#id26" title="Link to this heading"></a></h3>
+<section id="id23">
+<h3>Parameters<a class="headerlink" href="#id23" title="Link to this heading"></a></h3>
 <dl class="simple">
 <dt>cows: List</dt><dd><p>List of cows in the animal manager class.</p>
 </dd>
 </dl>
 </section>
-<section id="id27">
-<h3>Returns<a class="headerlink" href="#id27" title="Link to this heading"></a></h3>
+<section id="id24">
+<h3>Returns<a class="headerlink" href="#id24" title="Link to this heading"></a></h3>
 <p>float: The total milk produced in the herd (kg milk/day)</p>
 </section>
 </dd></dl>
@@ -1100,8 +1047,8 @@ was removed from the herd; updates the relevant pen’s stocking density.</p>
 <dd><p>Creates a list containing the original pen populations of a simulated
 farm before any updates are made to pens. The original pens’ information
 would get lost as animals get added.</p>
-<section id="id28">
-<h3>Returns<a class="headerlink" href="#id28" title="Link to this heading"></a></h3>
+<section id="id25">
+<h3>Returns<a class="headerlink" href="#id25" title="Link to this heading"></a></h3>
 <dl class="simple">
 <dt>a list of the populations of each pen on the farm prior to</dt><dd><p>any additions due to daily pen updates</p>
 </dd>
@@ -1109,28 +1056,6 @@ would get lost as animals get added.</p>
 </section>
 </dd></dl>
 
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="RUFAS.routines.animal.animal_manager.daily_animal_routine">
-<span class="sig-prename descclassname"><span class="pre">RUFAS.routines.animal.animal_manager.</span></span><span class="sig-name descname"><span class="pre">daily_animal_routine</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">animal_manager</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">feed</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.routines.feed.html#RUFAS.routines.feed.feed.Feed" title="RUFAS.routines.feed.feed.Feed"><span class="pre">Feed</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">weather</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.html#RUFAS.weather.Weather" title="RUFAS.weather.Weather"><span class="pre">Weather</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.html#RUFAS.time.Time" title="RUFAS.time.Time"><span class="pre">Time</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.animal.animal_manager.daily_animal_routine" title="Link to this definition"></a></dt>
-<dd><p>Executes daily routines relating to Animals. This method is called every day
-in the simulation and calls &#64;animal_manager’s daily_updates() method
-with &#64;feed and &#64;time as arguments. [Note that currently, &#64;weather and
-&#64; time are not used in animal updates.]</p>
-<section id="id29">
-<h3>Parameters<a class="headerlink" href="#id29" title="Link to this heading"></a></h3>
-<dl class="simple">
-<dt>animal_manager<span class="classifier">AnimalManager</span></dt><dd><p>instance of the AnimalManager class</p>
-</dd>
-<dt>feed<span class="classifier">Feed</span></dt><dd><p>instance of the Feed class</p>
-</dd>
-<dt>weather<span class="classifier">Weather</span></dt><dd><p>instance of the Weather class</p>
-</dd>
-<dt>time<span class="classifier">Time</span></dt><dd><p>instance of the Time class</p>
-</dd>
-</dl>
-</section>
 </dd></dl>
 
 </section>
@@ -1322,6 +1247,177 @@ calculating the mitigation effects of monensin.</p>
 <dt class="sig sig-object py" id="RUFAS.routines.animal.animal_module_constants.AnimalModuleConstants.VERTICAL_DIST_TO_MILKING_PARLOR">
 <span class="sig-name descname"><span class="pre">VERTICAL_DIST_TO_MILKING_PARLOR</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.1</span></em><a class="headerlink" href="#RUFAS.routines.animal.animal_module_constants.AnimalModuleConstants.VERTICAL_DIST_TO_MILKING_PARLOR" title="Link to this definition"></a></dt>
 <dd><p>The default vertical distance from the animal pens to the milking parlor.</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-RUFAS.routines.animal.animal_module_reporter">
+<span id="rufas-routines-animal-animal-module-reporter-module"></span><h2>RUFAS.routines.animal.animal_module_reporter module<a class="headerlink" href="#module-RUFAS.routines.animal.animal_module_reporter" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="RUFAS.routines.animal.animal_module_reporter.AnimalModuleReporter">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">RUFAS.routines.animal.animal_module_reporter.</span></span><span class="sig-name descname"><span class="pre">AnimalModuleReporter</span></span><a class="headerlink" href="#RUFAS.routines.animal.animal_module_reporter.AnimalModuleReporter" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.animal.animal_module_reporter.AnimalModuleReporter.report_305d_milk">
+<span class="sig-name descname"><span class="pre">report_305d_milk</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.animal.animal_module_reporter.AnimalModuleReporter.report_305d_milk" title="Link to this definition"></a></dt>
+<dd><p>Adds herd mean of latest_milk_production_305days to output manager,
+though only for lactating cows with nonzero values.</p>
+<section id="id26">
+<h3>Parameters<a class="headerlink" href="#id26" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>animal_manager<span class="classifier">AnimalManager</span></dt><dd><p>Instance of Animalmanager class.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.animal.animal_module_reporter.AnimalModuleReporter.report_animal_module_manure">
+<span class="sig-name descname"><span class="pre">report_animal_module_manure</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.routines.animal.animal_module_reporter.AnimalModuleReporter.report_animal_module_manure" title="Link to this definition"></a></dt>
+<dd><p>Generate detailed report of manure properties in the Animal Module.</p>
+<section id="id27">
+<h3>Parameters<a class="headerlink" href="#id27" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>manure_excretions_output_data<span class="classifier">dict[str, dict[str | AnimalManureExcretions]]</span></dt><dd><p>Dictionary mapping prefixes to animal manure data.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.animal.animal_module_reporter.AnimalModuleReporter.report_daily_animal_population">
+<span class="sig-name descname"><span class="pre">report_daily_animal_population</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.routines.animal.animal_module_reporter.AnimalModuleReporter.report_daily_animal_population" title="Link to this definition"></a></dt>
+<dd><p>Adds daily totals for animal types to output manager.</p>
+<section id="id28">
+<h3>Parameters<a class="headerlink" href="#id28" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>animal_manager<span class="classifier">AnimalManager</span></dt><dd><p>Instance of AnimalManager</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.animal.animal_module_reporter.AnimalModuleReporter.report_daily_ration">
+<span class="sig-name descname"><span class="pre">report_daily_ration</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.routines.animal.animal_module_reporter.AnimalModuleReporter.report_daily_ration" title="Link to this definition"></a></dt>
+<dd><p>Adds ration totals as fed to each pen to output manager.</p>
+<section id="id29">
+<h3>Parameters<a class="headerlink" href="#id29" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>animal_manager<span class="classifier">AnimalManager</span></dt><dd><p>Instance of AnimalManager class.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.animal.animal_module_reporter.AnimalModuleReporter.report_daily_reports">
+<span class="sig-name descname"><span class="pre">report_daily_reports</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.animal.animal_module_reporter.AnimalModuleReporter.report_daily_reports" title="Link to this definition"></a></dt>
+<dd><p>Calls all reporter methods that should happen at the end of each day.</p>
+<section id="id30">
+<h3>Parameters<a class="headerlink" href="#id30" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>animal_manager<span class="classifier">AnimalManager</span></dt><dd><p>Instance of AnimalManager class.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.animal.animal_module_reporter.AnimalModuleReporter.report_end_of_simulation">
+<span class="sig-name descname"><span class="pre">report_end_of_simulation</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.routines.animal.animal_module_reporter.AnimalModuleReporter.report_end_of_simulation" title="Link to this definition"></a></dt>
+<dd><p>Calls all reporter methods that should happen at the end of the simulation.</p>
+<section id="id31">
+<h3>Parameters<a class="headerlink" href="#id31" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>animal_manager<span class="classifier">AnimalManager</span></dt><dd><p>Instance of AnimalManager class.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.animal.animal_module_reporter.AnimalModuleReporter.report_life_cycle_manager_data">
+<span class="sig-name descname"><span class="pre">report_life_cycle_manager_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sim_day</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.routines.animal.animal_module_reporter.AnimalModuleReporter.report_life_cycle_manager_data" title="Link to this definition"></a></dt>
+<dd><p>Adds daily life cycle data to output manager.</p>
+<dl class="simple">
+<dt>life_cycle_manager<span class="classifier">LifeCycleManager</span></dt><dd><p>Active instance of LifeCycleManager.</p>
+</dd>
+<dt>sim_day<span class="classifier">int</span></dt><dd><p>Day of simulation.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.animal.animal_module_reporter.AnimalModuleReporter.report_milk">
+<span class="sig-name descname"><span class="pre">report_milk</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">simulation_day</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.routines.animal.animal_module_reporter.AnimalModuleReporter.report_milk" title="Link to this definition"></a></dt>
+<dd><p>Adds milk information for all cows in pen to output manager.</p>
+<section id="id32">
+<h3>Parameters<a class="headerlink" href="#id32" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>pen<span class="classifier">Pen</span></dt><dd><p>Individual Pen.</p>
+</dd>
+<dt>simulation_day<span class="classifier">int</span></dt><dd><p>Day of simulation.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.animal.animal_module_reporter.AnimalModuleReporter.report_pen_manure">
+<span class="sig-name descname"><span class="pre">report_pen_manure</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.routines.animal.animal_module_reporter.AnimalModuleReporter.report_pen_manure" title="Link to this definition"></a></dt>
+<dd><p>Adds pen manure data to output manager.</p>
+<section id="id33">
+<h3>Parameters<a class="headerlink" href="#id33" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>pen<span class="classifier">Pen</span></dt><dd><p>Current pen.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.animal.animal_module_reporter.AnimalModuleReporter.report_pen_manure_properties">
+<span class="sig-name descname"><span class="pre">report_pen_manure_properties</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.routines.animal.animal_module_reporter.AnimalModuleReporter.report_pen_manure_properties" title="Link to this definition"></a></dt>
+<dd><p>Adds pen manure properties to output manager.</p>
+<section id="id34">
+<h3>Parameters<a class="headerlink" href="#id34" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>pen<span class="classifier">Pen</span></dt><dd><p>Current pen.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.animal.animal_module_reporter.AnimalModuleReporter.report_ration_interval_data">
+<span class="sig-name descname"><span class="pre">report_ration_interval_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">feed</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">simulation_day</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.routines.animal.animal_module_reporter.AnimalModuleReporter.report_ration_interval_data" title="Link to this definition"></a></dt>
+<dd><p>For each pen, adds ration per animal and other supply reports, to output manager.</p>
+<section id="id35">
+<h3>Parameters<a class="headerlink" href="#id35" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>animal_manager<span class="classifier">AnimalManager</span></dt><dd><p>Instance of class AnimalManager.</p>
+</dd>
+<dt>feed<span class="classifier">Feed</span></dt><dd><p>Instance of class Feed.</p>
+</dd>
+<dt>simulation_day<span class="classifier">int</span></dt><dd><p>Day of simulation.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.animal.animal_module_reporter.AnimalModuleReporter.report_sold_animal_information">
+<span class="sig-name descname"><span class="pre">report_sold_animal_information</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.routines.animal.animal_module_reporter.AnimalModuleReporter.report_sold_animal_information" title="Link to this definition"></a></dt>
+<dd><p>Adds a dictionary of sold animal information to the output manager.</p>
+<section id="id36">
+<h3>Parameters<a class="headerlink" href="#id36" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>animal_manager<span class="classifier">AnimalManager</span></dt><dd><p>Instance of Class AnimalManager.</p>
+</dd>
+</dl>
+</section>
 </dd></dl>
 
 </dd></dl>
@@ -2498,8 +2594,8 @@ Used for (lactating cow) ration formulation</p>
 <dt class="sig sig-object py" id="RUFAS.routines.animal.pen.Pen.add_animal">
 <span class="sig-name descname"><span class="pre">add_animal</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">animal</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">animal_grouping_scenario</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">feed</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">temp</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">phosphorus_concentration</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.routines.animal.pen.Pen.add_animal" title="Link to this definition"></a></dt>
 <dd><p>Add an animal to the pen and adjust the ration accordingly.</p>
-<section id="id30">
-<h4>Parameters<a class="headerlink" href="#id30" title="Link to this heading"></a></h4>
+<section id="id37">
+<h4>Parameters<a class="headerlink" href="#id37" title="Link to this heading"></a></h4>
 <dl class="simple">
 <dt>animal<span class="classifier">Union[Calf, HeiferI, HeiferII, HeiferIII, Cow]</span></dt><dd><p>The animal to be added to the pen.</p>
 </dd>
@@ -2509,8 +2605,8 @@ feed
 temp
 phosphorus_concentration : float</p>
 </section>
-<section id="id31">
-<h4>Returns<a class="headerlink" href="#id31" title="Link to this heading"></a></h4>
+<section id="id38">
+<h4>Returns<a class="headerlink" href="#id38" title="Link to this heading"></a></h4>
 <p>None</p>
 </section>
 </dd></dl>
@@ -2519,8 +2615,8 @@ phosphorus_concentration : float</p>
 <dt class="sig sig-object py" id="RUFAS.routines.animal.pen.Pen.add_new_animals">
 <span class="sig-name descname"><span class="pre">add_new_animals</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">new_animals</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="RUFAS.routines.animal.life_cycle.html#RUFAS.routines.animal.life_cycle.calf.Calf" title="RUFAS.routines.animal.life_cycle.calf.Calf"><span class="pre">Calf</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="RUFAS.routines.animal.life_cycle.html#RUFAS.routines.animal.life_cycle.heiferI.HeiferI" title="RUFAS.routines.animal.life_cycle.heiferI.HeiferI"><span class="pre">HeiferI</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="RUFAS.routines.animal.life_cycle.html#RUFAS.routines.animal.life_cycle.heiferII.HeiferII" title="RUFAS.routines.animal.life_cycle.heiferII.HeiferII"><span class="pre">HeiferII</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="RUFAS.routines.animal.life_cycle.html#RUFAS.routines.animal.life_cycle.heiferIII.HeiferIII" title="RUFAS.routines.animal.life_cycle.heiferIII.HeiferIII"><span class="pre">HeiferIII</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="RUFAS.routines.animal.life_cycle.html#RUFAS.routines.animal.life_cycle.cow.Cow" title="RUFAS.routines.animal.life_cycle.cow.Cow"><span class="pre">Cow</span></a><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.routines.animal.pen.Pen.add_new_animals" title="Link to this definition"></a></dt>
 <dd><p>Adds all animals in new_animals to the pen.</p>
-<section id="id32">
-<h4>Parameters<a class="headerlink" href="#id32" title="Link to this heading"></a></h4>
+<section id="id39">
+<h4>Parameters<a class="headerlink" href="#id39" title="Link to this heading"></a></h4>
 <blockquote>
 <div><dl class="simple">
 <dt>new_animals: List[Calf | Cow | HeiferI | HeiferII | HeiferIII]</dt><dd><p>list of new animals to be added to the pen</p>
@@ -2544,10 +2640,10 @@ phosphorus_concentration : float</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="RUFAS.routines.animal.pen.Pen.calc_manure">
-<span class="sig-name descname"><span class="pre">calc_manure</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">feed</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.routines.feed.html#RUFAS.routines.feed.feed.Feed" title="RUFAS.routines.feed.feed.Feed"><span class="pre">Feed</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">methane_model</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.animal.pen.Pen.calc_manure" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">calc_manure</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">feed</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">methane_model</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.animal.pen.Pen.calc_manure" title="Link to this definition"></a></dt>
 <dd><p>Calculate the manure excretion of the animals in the pen.</p>
-<section id="id33">
-<h4>Parameters<a class="headerlink" href="#id33" title="Link to this heading"></a></h4>
+<section id="id40">
+<h4>Parameters<a class="headerlink" href="#id40" title="Link to this heading"></a></h4>
 <dl class="simple">
 <dt>feed: Feed</dt><dd><p>An object of the Feed class containing information about the feed.</p>
 </dd>
@@ -2561,8 +2657,8 @@ phosphorus_concentration : float</p>
 <dt class="sig sig-object py" id="RUFAS.routines.animal.pen.Pen.calc_total_manure">
 <span class="sig-name descname"><span class="pre">calc_total_manure</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">feed</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">methane_model</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">methane_mitigation_method</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">methane_mitigation_additive_amount</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">manure_excretions_output_data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="RUFAS.routines.animal.manure.html#RUFAS.routines.animal.manure.general_manure.AnimalManureExcretions" title="RUFAS.routines.animal.manure.general_manure.AnimalManureExcretions"><span class="pre">AnimalManureExcretions</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.routines.animal.pen.Pen.calc_total_manure" title="Link to this definition"></a></dt>
 <dd><p>Calculate the total manure excreted by all animals in the pen.</p>
-<section id="id34">
-<h4>Parameters<a class="headerlink" href="#id34" title="Link to this heading"></a></h4>
+<section id="id41">
+<h4>Parameters<a class="headerlink" href="#id41" title="Link to this heading"></a></h4>
 <dl class="simple">
 <dt>feed: Feed</dt><dd><p>An object of the Feed class that stores the feed information managed by the farm</p>
 </dd>
@@ -2579,8 +2675,8 @@ between 16 and 36 mg/kg DMI.</p>
 </dd>
 </dl>
 </section>
-<section id="id35">
-<h4>Returns<a class="headerlink" href="#id35" title="Link to this heading"></a></h4>
+<section id="id42">
+<h4>Returns<a class="headerlink" href="#id42" title="Link to this heading"></a></h4>
 <p>None</p>
 </section>
 </dd></dl>
@@ -2606,8 +2702,8 @@ between 16 and 36 mg/kg DMI.</p>
 <dt class="sig sig-object py" id="RUFAS.routines.animal.pen.Pen.current_stocking_density">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">current_stocking_density</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#RUFAS.routines.animal.pen.Pen.current_stocking_density" title="Link to this definition"></a></dt>
 <dd><p>Return the current stocking density of the pen.</p>
-<section id="id36">
-<h4>Returns<a class="headerlink" href="#id36" title="Link to this heading"></a></h4>
+<section id="id43">
+<h4>Returns<a class="headerlink" href="#id43" title="Link to this heading"></a></h4>
 <dl class="simple">
 <dt>float</dt><dd><p>the current stocking density of the pen.</p>
 </dd>
@@ -2625,8 +2721,8 @@ between 16 and 36 mg/kg DMI.</p>
 <dt class="sig sig-object py" id="RUFAS.routines.animal.pen.Pen.is_populated">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">is_populated</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><a class="headerlink" href="#RUFAS.routines.animal.pen.Pen.is_populated" title="Link to this definition"></a></dt>
 <dd><p>Returns whether the pen is populated.</p>
-<section id="id37">
-<h4>Returns<a class="headerlink" href="#id37" title="Link to this heading"></a></h4>
+<section id="id44">
+<h4>Returns<a class="headerlink" href="#id44" title="Link to this heading"></a></h4>
 <dl class="simple">
 <dt>bool</dt><dd><p>True if the pen is populated, False otherwise.</p>
 </dd>
@@ -2638,15 +2734,15 @@ between 16 and 36 mg/kg DMI.</p>
 <dt class="sig sig-object py" id="RUFAS.routines.animal.pen.Pen.remove_animal">
 <span class="sig-name descname"><span class="pre">remove_animal</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">animal_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.routines.animal.pen.Pen.remove_animal" title="Link to this definition"></a></dt>
 <dd><p>Remove an animal from the pen by its id and adjust the ration accordingly.</p>
-<section id="id38">
-<h4>Parameters<a class="headerlink" href="#id38" title="Link to this heading"></a></h4>
+<section id="id45">
+<h4>Parameters<a class="headerlink" href="#id45" title="Link to this heading"></a></h4>
 <dl class="simple">
 <dt>animal_id<span class="classifier">int</span></dt><dd><p>The id of the animal to be removed from the pen.</p>
 </dd>
 </dl>
 </section>
-<section id="id39">
-<h4>Returns<a class="headerlink" href="#id39" title="Link to this heading"></a></h4>
+<section id="id46">
+<h4>Returns<a class="headerlink" href="#id46" title="Link to this heading"></a></h4>
 <p>None</p>
 </section>
 </dd></dl>
@@ -2655,14 +2751,14 @@ between 16 and 36 mg/kg DMI.</p>
 <dt class="sig sig-object py" id="RUFAS.routines.animal.pen.Pen.remove_animals_by_ids">
 <span class="sig-name descname"><span class="pre">remove_animals_by_ids</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">animal_ids</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.routines.animal.pen.Pen.remove_animals_by_ids" title="Link to this definition"></a></dt>
 <dd><p>Removes animals from the pen by their ids.</p>
-<section id="id40">
-<h4>Notes<a class="headerlink" href="#id40" title="Link to this heading"></a></h4>
+<section id="id47">
+<h4>Notes<a class="headerlink" href="#id47" title="Link to this heading"></a></h4>
 <p>Because this method takes O(n) time, it is recommended that the caller of this method
 should prepare a list of animal ids to be removed from the pen first, and then call this
 method with that list once.</p>
 </section>
-<section id="id41">
-<h4>Parameters<a class="headerlink" href="#id41" title="Link to this heading"></a></h4>
+<section id="id48">
+<h4>Parameters<a class="headerlink" href="#id48" title="Link to this heading"></a></h4>
 <dl class="simple">
 <dt>animal_ids<span class="classifier">List[int]</span></dt><dd><p>List of animals that match the given ids to be removed from the pen.</p>
 </dd>
@@ -2679,8 +2775,8 @@ method with that list once.</p>
 <dt class="sig sig-object py" id="RUFAS.routines.animal.pen.Pen.set_avg_nutrient_rqmts">
 <span class="sig-name descname"><span class="pre">set_avg_nutrient_rqmts</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">avg_nutrient_rqmts</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.routines.animal.pen.Pen.set_avg_nutrient_rqmts" title="Link to this definition"></a></dt>
 <dd><p>Sets the pen’s average nutrient requirements</p>
-<section id="id42">
-<h4>Parameters<a class="headerlink" href="#id42" title="Link to this heading"></a></h4>
+<section id="id49">
+<h4>Parameters<a class="headerlink" href="#id49" title="Link to this heading"></a></h4>
 <dl class="simple">
 <dt>avg_nutrient_rqmts: Dict[str, float]</dt><dd><p>The new average nutrient requirements</p>
 </dd>
@@ -2692,8 +2788,8 @@ method with that list once.</p>
 <dt class="sig sig-object py" id="RUFAS.routines.animal.pen.Pen.set_milk_avgs">
 <span class="sig-name descname"><span class="pre">set_milk_avgs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">avg_milk</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">avg_CP_milk</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">avg_milk_production_reduction</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.routines.animal.pen.Pen.set_milk_avgs" title="Link to this definition"></a></dt>
 <dd><p>Sets the pen’s average milk and average CP milk</p>
-<section id="id43">
-<h4>Parameters<a class="headerlink" href="#id43" title="Link to this heading"></a></h4>
+<section id="id50">
+<h4>Parameters<a class="headerlink" href="#id50" title="Link to this heading"></a></h4>
 <dl class="simple">
 <dt>avg_milk: float</dt><dd><p>The new average nutrient requirements</p>
 </dd>
@@ -2741,8 +2837,8 @@ based on the animal type(s) that are currently in the pen.</p>
 <dt class="sig sig-object py" id="RUFAS.routines.animal.pen.Pen.update_animal_combination">
 <span class="sig-name descname"><span class="pre">update_animal_combination</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">animal_combination</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#RUFAS.routines.animal.pen.Pen.AnimalCombination" title="RUFAS.routines.animal.pen.Pen.AnimalCombination"><span class="pre">AnimalCombination</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.routines.animal.pen.Pen.update_animal_combination" title="Link to this definition"></a></dt>
 <dd><p>Sets the pen’s animal combination to animal_combination</p>
-<section id="id44">
-<h4>Parameters<a class="headerlink" href="#id44" title="Link to this heading"></a></h4>
+<section id="id51">
+<h4>Parameters<a class="headerlink" href="#id51" title="Link to this heading"></a></h4>
 <blockquote>
 <div><dl class="simple">
 <dt>animal_combination: AnimalCombination</dt><dd><p>the new AnimalCombination</p>
@@ -2756,8 +2852,8 @@ based on the animal type(s) that are currently in the pen.</p>
 <dt class="sig sig-object py" id="RUFAS.routines.animal.pen.Pen.update_animals">
 <span class="sig-name descname"><span class="pre">update_animals</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">new_animals</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">animal_combination</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#RUFAS.routines.animal.pen.Pen.AnimalCombination" title="RUFAS.routines.animal.pen.Pen.AnimalCombination"><span class="pre">AnimalCombination</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.routines.animal.pen.Pen.update_animals" title="Link to this definition"></a></dt>
 <dd><p>Calls functions that will add new animals to the pen and update associated attributes.</p>
-<section id="id45">
-<h4>Parameters<a class="headerlink" href="#id45" title="Link to this heading"></a></h4>
+<section id="id52">
+<h4>Parameters<a class="headerlink" href="#id52" title="Link to this heading"></a></h4>
 <blockquote>
 <div><dl class="simple">
 <dt>new_animals: List[Calf | Cow | HeiferI | HeiferII | HeiferIII]</dt><dd><p>list of new animals to be added to the pen</p>

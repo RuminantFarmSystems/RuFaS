@@ -1102,10 +1102,15 @@ new_born: True if a calf is born</p>
 <span class="sig-name descname"><span class="pre">update_milk_production_history</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sim_day</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.animal.life_cycle.cow.Cow.update_milk_production_history" title="Link to this definition"></a></dt>
 <dd><p>Updates the animal’s milk production history by appending a
 MilkProductionHistory object to the list.</p>
-<dl class="simple">
-<dt>Args:</dt><dd><p>sim_day: simulation day</p>
-</dd>
-</dl>
+<p>If milk production history has already been updated for the day,
+the most recent entry is deleted before appending the latest values.
+Once a cow reaches 305 days in milk, latest_milk_production_305days is updated.</p>
+<section id="parameter">
+<h3>Parameter<a class="headerlink" href="#parameter" title="Link to this heading"></a></h3>
+<blockquote>
+<div><p>sim_day: simulation day</p>
+</div></blockquote>
+</section>
 </dd></dl>
 
 </dd></dl>

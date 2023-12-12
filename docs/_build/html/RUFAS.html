@@ -170,6 +170,7 @@
 <li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#module-RUFAS.routines.animal.animal_grouping_scenarios">RUFAS.routines.animal.animal_grouping_scenarios module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#module-RUFAS.routines.animal.animal_manager">RUFAS.routines.animal.animal_manager module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#module-RUFAS.routines.animal.animal_module_constants">RUFAS.routines.animal.animal_module_constants module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#module-RUFAS.routines.animal.animal_module_reporter">RUFAS.routines.animal.animal_module_reporter module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#module-RUFAS.routines.animal.animal_typed_dicts">RUFAS.routines.animal.animal_typed_dicts module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#module-RUFAS.routines.animal.animal_types">RUFAS.routines.animal.animal_types module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#module-RUFAS.routines.animal.clustering_pen_grouping">RUFAS.routines.animal.clustering_pen_grouping module</a></li>
@@ -190,6 +191,8 @@
 <li class="toctree-l3"><a class="reference internal" href="RUFAS.routines.feed_storage.html">RUFAS.routines.feed_storage package</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.feed_storage.html#submodules">Submodules</a></li>
 <li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.feed_storage.html#module-RUFAS.routines.feed_storage.harvested_crop">RUFAS.routines.feed_storage.harvested_crop module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.feed_storage.html#module-RUFAS.routines.feed_storage.hay">RUFAS.routines.feed_storage.hay module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.feed_storage.html#module-RUFAS.routines.feed_storage.storage">RUFAS.routines.feed_storage.storage module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.feed_storage.html#module-RUFAS.routines.feed_storage">Module contents</a></li>
 </ul>
 </li>
@@ -222,7 +225,7 @@
 <span id="rufas-config-module"></span><h2>RUFAS.config module<a class="headerlink" href="#module-RUFAS.config" title="Link to this heading"></a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="RUFAS.config.Config">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">RUFAS.config.</span></span><span class="sig-name descname"><span class="pre">Config</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.config.Config" title="Link to this definition"></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">RUFAS.config.</span></span><span class="sig-name descname"><span class="pre">Config</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">bool</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.config.Config" title="Link to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <dl class="py method">
 <dt class="sig sig-object py" id="RUFAS.config.Config.calc_sim_length">
@@ -1342,7 +1345,7 @@ use the ARL_metadata.json file and save its output files with the “ARL_scenari
 <span id="rufas-time-module"></span><h2>RUFAS.time module<a class="headerlink" href="#module-RUFAS.time" title="Link to this heading"></a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="RUFAS.time.Time">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">RUFAS.time.</span></span><span class="sig-name descname"><span class="pre">Time</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.time.Time" title="Link to this definition"></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">RUFAS.time.</span></span><span class="sig-name descname"><span class="pre">Time</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#RUFAS.config.Config" title="RUFAS.config.Config"><span class="pre">Config</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.time.Time" title="Link to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <dl class="py method">
 <dt class="sig sig-object py" id="RUFAS.time.Time.advance">

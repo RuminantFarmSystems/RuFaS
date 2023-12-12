@@ -1,6 +1,14 @@
 tests.animal\_module\_tests package
 ===================================
 
+Subpackages
+-----------
+
+.. toctree::
+   :maxdepth: 4
+
+   tests.animal_module_tests.ration
+
 Submodules
 ----------
 
@@ -40,6 +48,14 @@ tests.animal\_module\_tests.test\_animal\_manager module
 --------------------------------------------------------
 
 .. automodule:: tests.animal_module_tests.test_animal_manager
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+tests.animal\_module\_tests.test\_animal\_reporter module
+---------------------------------------------------------
+
+.. automodule:: tests.animal_module_tests.test_animal_reporter
    :members:
    :undoc-members:
    :show-inheritance:
