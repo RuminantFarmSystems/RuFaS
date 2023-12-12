@@ -336,8 +336,7 @@ class HeiferII(HeiferI):
             self.events.add_event(self.days_born, sim_day, const.MATURE_BODY_WEIGHT_REGULAR)
 
         if self.repro_program != HeiferII.get_user_defined_repro_protocol():
-            if self.days_born < self._get_breeding_start_day() or not self.is_pregnant:
-                self._set_repro_program(sim_day, HeiferII.get_user_defined_repro_protocol())  # type: ignore
+            self._set_repro_program(sim_day, HeiferII.get_user_defined_repro_protocol())  # type: ignore
 
         # breeding method assign to heifer
         if self.days_born >= self._get_breeding_start_day():

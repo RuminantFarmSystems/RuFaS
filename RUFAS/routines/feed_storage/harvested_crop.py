@@ -1,5 +1,6 @@
 from dataclasses import dataclass
 from enum import Enum
+from RUFAS.time import Time
 
 
 class CropCategory(Enum):
@@ -71,6 +72,10 @@ class HarvestedCrop:
         The category of the crop (enum).
     type : CropType
         The type of the crop (enum), a subdivision of crop category.
+    harvest_time : Time
+         The time at which the crop was harvested
+    storage_time : Time
+         The time at which the crop was stored
     fresh_mass : float
         The fresh mass of the crop in kg.
     dry_matter_percentage : float
@@ -102,6 +107,8 @@ class HarvestedCrop:
 
     category: CropCategory
     type: CropType
+    harvest_time: Time
+    storage_time: Time
     fresh_mass: float
     dry_matter_percentage: float
     dry_matter_digestibility: float
