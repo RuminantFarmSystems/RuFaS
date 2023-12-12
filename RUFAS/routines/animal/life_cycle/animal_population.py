@@ -11,6 +11,29 @@ from RUFAS.routines.animal.life_cycle.heiferIII import HeiferIII
 
 @dataclass(kw_only=True)
 class AnimalPopulation:
+    """
+    A data class representing the population of animals in a herd.
+
+    Attributes
+    ----------
+    calves : List[Calf]
+        A list of Calf instances in the herd.
+    heiferIs : List[HeiferI]
+        A list of HeiferI (stage I heifers) instances in the herd.
+    heiferIIs : List[HeiferII]
+        A list of HeiferII (stage II heifers) instances in the herd.
+    heiferIIIs : List[HeiferIII]
+        A list of HeiferIII (stage III heifers) instances in the herd.
+    cows : List[Cow]
+        A list of Cow instances in the herd.
+    replacement : List[Cow]
+        A list of replacement Cow instances in the herd.
+    current_animal_id : int, optional
+        The highest ID number among all animals in the herd. Default is 0.
+    order_by_random : bool, optional
+        A flag to indicate whether the animals should be ordered randomly.
+        Default is True.
+    """
     calves: List[Calf]
     heiferIs: List[HeiferI]
     heiferIIs: List[HeiferII]
@@ -22,12 +45,14 @@ class AnimalPopulation:
     order_by_random: bool = True
 
     def __post_init__(self):
+        """Post init function to find the max id of all animals, and set the current_animal_id"""
         ids = [i.id for i in self.calves] + [i.id for i in self.heiferIs] + [i.id for i in self.heiferIIs] + \
               [i.id for i in self.heiferIIIs] + [i.id for i in self.cows] + [i.id for i in self.replacement]
         if ids:
             self.current_animal_id = max(ids)
 
     def __repr__(self):
+        """Dictionary representation of the AnimalPopulation object"""
         return {
             "calves": [calf.get_calf_values() for calf in self.calves],
             "heiferIs": [heiferI.get_heiferI_values() for heiferI in self.heiferIs],
@@ -51,10 +76,7 @@ class AnimalPopulation:
 
     def get_calves(self):
         """
-        Retrieve a list of Calf instances up to the specified number and breed.
-
-        Initializes Calf instances through a separate initialization method if the current count is insufficient and
-        optionally shuffles the list if `order_by_random` is set to True.
+        Retrieve a list of Calf instances.
 
         Returns:
         --------
@@ -67,10 +89,7 @@ class AnimalPopulation:
 
     def get_heiferIs(self):
         """
-        Retrieve a list of HeiferI instances up to the specified number and breed.
-
-        Initializes HeiferI instances through a separate initialization method if the current count is insufficient and
-        optionally shuffles the list if `order_by_random` is set to True.
+        Retrieve a list of HeiferI instances.
 
         Returns:
         --------
@@ -84,10 +103,7 @@ class AnimalPopulation:
 
     def get_heiferIIs(self):
         """
-        Retrieve a list of HeiferII instances up to the specified number and breed.
-
-        Initializes HeiferII instances through a separate initialization method if the current count is insufficient and
-        optionally shuffles the list if `order_by_random` is set to True.
+        Retrieve a list of HeiferII instances.
 
         Returns:
         --------
@@ -101,10 +117,7 @@ class AnimalPopulation:
 
     def get_heiferIIIs(self):
         """
-        Retrieve a list of HeiferIII instances up to the specified number and breed.
-
-        Initializes HeiferIII instances through a separate initialization method if the current count is insufficient
-        and optionally shuffles the list if `order_by_random` is set to True.
+        Retrieve a list of HeiferIII instances.
 
         Returns:
         --------
@@ -117,10 +130,7 @@ class AnimalPopulation:
 
     def get_cows(self):
         """
-        Retrieve a list of Cow instances up to the specified number and breed.
-
-        Initializes Cow instances through a separate initialization method if the current count is insufficient and
-        optionally shuffles the list if `order_by_random` is set to True.
+        Retrieve a list of Cow instances.
 
         Returns:
         --------
@@ -133,10 +143,7 @@ class AnimalPopulation:
 
     def get_replacement_cows(self):
         """
-        Retrieve a list of replacement Cow instances up to the specified number and breed.
-
-        Initializes replacement cows through a separate initialization method if the current count is insufficient and
-        optionally shuffles the list if `order_by_random` is set to True.
+        Retrieve a list of replacement Cow instances.
 
         Returns:
         --------
@@ -149,6 +156,8 @@ class AnimalPopulation:
 
     def get_herd_summary(self) -> Dict[str, int | float]:
         """
+        Returns a dictionary containing herd summary information
+
         Returns:
         --------
         Dict[str, int | float]
