@@ -84,10 +84,7 @@ def test_generate_report_vertical_then_horizontal(
         "vertical_aggregation": "sum",
         "horizontal_first": False,
     }
-    assert report_generator.generate_report(sample_filtered_pool, filter_content) == [
-        18
-    ]
-
+    assert report_generator.generate_report(sample_filtered_pool, filter_content) == {'ver_hor_agg': [18.0]}
 
 def test_generate_report_horizontal_then_vertical(
     report_generator: ReportGenerator,
