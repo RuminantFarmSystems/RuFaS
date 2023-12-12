@@ -119,10 +119,7 @@ def test_generate_report_only_vertical(
         "variables": ["a", "b"],
         "vertical_aggregation": "average",
     }
-    assert report_generator.generate_report(sample_filtered_pool, filter_content) == [
-        4,
-        5,
-    ]
+    assert report_generator.generate_report(sample_filtered_pool, filter_content) == {'ver_agg': [4.0, 5.0]}
 
 
 def test_generate_report_no_aggregation(
