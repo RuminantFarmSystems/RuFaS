@@ -23,9 +23,44 @@ om = OutputManager()
 
 
 class HerdFactory:
+    """
+    Class to initialize herd for simulation.
+
+    Attributes
+    ----------
+    breed : str
+        The breed of the animals in the simulation, retrieved from input data.
+    CI : int
+        Calving interval from the animal configuration, retrieved from input data.
+    initial_animal_num : int
+        The initial number of animals in the simulation, retrieved from input data.
+    simulation_days : int
+        The number of days the simulation will run to generate herd, retrieved from input data.
+    pre_animal_population : AnimalPopulation
+        An instance of AnimalPopulation representing the animal population
+        before random sampling with replacement.
+    post_animal_population : AnimalPopulation
+        An instance of AnimalPopulation representing the animal population
+        after random sampling with replacement.
+    """
 
     def __init__(self, init_herd: bool = False, save_animals: bool = False, save_animals_path: Path = Path("output/"))\
             -> None:
+        """
+        Initializes HerdFactory.
+
+        Parameters
+        ----------
+        init_herd : bool, optional
+            A flag to indicate whether to initialize through simulation or from input data.
+            Default is False.
+        save_animals : bool
+            Indicates whether to save the generated animals to JSON files.
+            Default is False.
+        save_animals_path : Path
+            The directory path where the animal data JSON files will be saved if
+            save_animals is True. Default is "output/".
+        """
         self.init_herd = init_herd
         self.save_animals = save_animals
         self.save_animals_path = save_animals_path
@@ -51,6 +86,7 @@ class HerdFactory:
                                                        current_animal_id=0)
 
     def _calves_update(self) -> None:
+        """Calves update for generating herd simulation"""
         remaining_calves: List[Calf] = []
         for calf in self.pre_animal_population.calves:
             wean_day = calf.update(0)
@@ -65,6 +101,7 @@ class HerdFactory:
         self.pre_animal_population.calves = remaining_calves
 
     def _heiferIs_update(self) -> None:
+        """heiferIs update for generating herd simulation"""
         remaining_heiferIs: List[HeiferI] = []
         for heiferI in self.pre_animal_population.heiferIs:
             second_stage = heiferI.update(0)
@@ -83,6 +120,7 @@ class HerdFactory:
         self.pre_animal_population.heiferIs = remaining_heiferIs
 
     def _heiferIIs_update(self):
+        """HeiferIIs update for generating herd simulation"""
         remaining_heiferIIs: List[HeiferII] = []
         for heiferII in self.pre_animal_population.heiferIIs:
             cull_stage, third_stage = heiferII.update(0)
@@ -99,6 +137,7 @@ class HerdFactory:
         self.pre_animal_population.heiferIIs = remaining_heiferIIs
 
     def _heiferIIIs_update(self, day: int) -> None:
+        """HeiferIIIs update for generating herd simulation"""
         remaining_heiferIIIs: List[HeiferIII] = []
         for heiferIII in self.pre_animal_population.heiferIIIs:
             cow_stage = heiferIII.update(0)
@@ -106,7 +145,6 @@ class HerdFactory:
                 args = heiferIII.get_heiferIII_values()
 
                 args.update(id=self.pre_animal_population.next_id())
-                # HARD CODED?
                 args.update(repro_program='TAI')
                 args.update(presynch_method='PreSynch')
                 args.update(tai_method_c='OvSynch 56')
@@ -114,7 +152,6 @@ class HerdFactory:
 
                 cow = Cow(args)
 
-                # APPENDING THE SAME COW TO BE IN BOTH COW AND REPLACEMENT?
                 self.pre_animal_population.cows.append(cow)
                 if day >= 3000:
                     args.update(id=self.pre_animal_population.next_id())
@@ -126,6 +163,7 @@ class HerdFactory:
         self.pre_animal_population.heiferIIIs = remaining_heiferIIIs
 
     def _cows_update(self):
+        """Cows update for generating herd simulation"""
         remaining_cows: List[Cow] = []
         for cow in self.pre_animal_population.cows:
             _, _, _, culled, new_born = cow.update(0, self.CI)
@@ -150,6 +188,7 @@ class HerdFactory:
         self.pre_animal_population.cows = remaining_cows
 
     def _generate_animals(self) -> AnimalPopulation:
+        """Function to generate an AnimalPopulation object through simulation"""
         for _ in range(self.initial_animal_num):
             args = AnimalBaseInitArgsTypedDict(id=self.pre_animal_population.next_id(),
                                                breed=self.breed,
@@ -172,6 +211,7 @@ class HerdFactory:
 
     def _init_animal_from_data(self, animal_type: str, animal_data: Dict[str, Any]) -> (Calf | HeiferI | HeiferII |
                                                                                         HeiferIII | Cow):
+        """Function to initialize an animal object from input data"""
         ANIMAL_CLASSES: Dict[str, Type] = {
             "calf": Calf,
             "heiferI": HeiferI,
@@ -188,6 +228,7 @@ class HerdFactory:
         return ANIMAL_CLASSES[animal_type](animal_data)
 
     def _initialize_herd_from_data(self) -> AnimalPopulation:
+        """Function to initialize an AnimalPopulation object from input data"""
         herd_data = im.get_data("animal_population")
         calves = list(map(self._init_animal_from_data, ["calf"] * len(herd_data["calves"]), herd_data["calves"]))
         heiferIs = list(map(self._init_animal_from_data, ["heiferI"] * len(herd_data["heiferIs"]),
@@ -209,6 +250,7 @@ class HerdFactory:
                                 current_animal_id=self.pre_animal_population.current_animal_id)
 
     def _random_sample_with_replacement(self) -> AnimalPopulation:
+        """Function to randomly sample the herd with replacement"""
         post_calves: List[Calf] = self._random_sample_with_replacement_by_type("calf")
         post_heiferIs: List[HeiferI] = self._random_sample_with_replacement_by_type("heiferI")
         post_heiferIIs: List[HeiferII] = self._random_sample_with_replacement_by_type("heiferII")
@@ -227,6 +269,7 @@ class HerdFactory:
 
     def _random_sample_with_replacement_by_type(self, animal_type: str) -> \
             (List[Calf] | List[HeiferI] | List[HeiferII] | List[HeiferIII] | List[Cow]):
+        """Function to randomly sample a specific animal type with replacement"""
         PRE_ANIMAL_DATA: Dict[str, (List[Calf] | List[HeiferI] | List[HeiferII] | List[HeiferIII] | List[Cow])] = {
             "calf": self.pre_animal_population.calves,
             "heiferI": self.pre_animal_population.heiferIs,
@@ -257,6 +300,11 @@ class HerdFactory:
         return post_animals
 
     def initialize_herd(self) -> None:
+        """
+        Initialize an AnimalPopulation object for simulation, either from input data or generate from simulation. This
+        function also optionally saves the generated herd data into a JSON file.
+        The initialized herd with be randomly sampled with replacement, and added to the InputManager pool.
+        """
         AnimalBase.set_config(AnimalManager.get_animal_config(im.get_data("animal.animal_config")))
         AnimalBase.set_nutrient_list(Feed(im.get_data("feed")).nutrient_rqmts)
         if self.init_herd:
