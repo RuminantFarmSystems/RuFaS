@@ -112,7 +112,7 @@ class GraphGenerator:
         graph_details: Dict[str, str | List[str]],
         filter_file_name: str,
         graphics_dir: Path,
-    ) -> str:
+    ) -> List[Dict[str, str | Dict[str, str]]]:
         """
         Generate a graph based on filtered data and graph details.
 
@@ -131,8 +131,9 @@ class GraphGenerator:
 
         Returns
         -------
-        str
-            The path to the saved graph.
+        log_pool : List[Dict[str, str | Dict[str, str]]]
+            A list of log, warning, and error dictionaries containing all the components needed
+            to log the information to the appropriate pool.
 
         Raises
         ------
@@ -141,19 +142,27 @@ class GraphGenerator:
         """
         try:
             fig, _ = plt.subplots()
+            prepared_data, log_pool = self._prepare_plot_data(filtered_pool, graph_details)
+
+            error_found = any("error" in log for log in log_pool)
+            if error_found:
+                return log_pool
+
             self._draw_graph(
-                graph_details["type"], filtered_pool, filtered_pool.keys()
+                graph_details["type"], prepared_data, prepared_data.keys()
             )
             self._customize_graph(fig, graph_details)
-            return self._save_graph(
+            self._save_graph(
                 graph_details, filter_file_name, graphics_dir
             )
+
+            return log_pool
         except Exception as e:
             raise e
 
-    def prepare_plot_data(self, filtered_pool: Dict[str, Dict[str, List[Any]]],
-                          graph_details: Dict[str, str | List[str]],
-                          ) -> Tuple[Dict[str, List[int | float]], List[Dict[str, str | Dict[str, str]]]]:
+    def _prepare_plot_data(self, filtered_pool: Dict[str, Dict[str, List[Any]]],
+                           graph_details: Dict[str, str | List[str]],
+                           ) -> Tuple[Dict[str, List[int | float]], List[Dict[str, str | Dict[str, str]]]]:
         """Extracts the values from the filtered_pool data and converts them a dictionary
         that graph_generator can more readily handle and records logs, warnings, and errors for
         Output Manager to log.
@@ -173,55 +182,41 @@ class GraphGenerator:
         """
         info_map = {
             "class": self.__class__.__name__,
-            "function": self.prepare_plot_data.__name__,
+            "function": self._prepare_plot_data.__name__,
         }
         selected_variables = graph_details.get("variables")
         title = graph_details.get("title")
-        log_pool = []
-        prepared_pool = {}
-        for index, key in enumerate(filtered_pool.keys()):
+        log_pool: List[Dict[str, str] | Dict[str, str]] = []
+        prepared_pool: Dict[str, List[int | float]] = {}
+        for key in filtered_pool.keys():
             values: List[Any] = filtered_pool[key]["values"]
             is_data_in_dict = isinstance(values[0], dict)
             if is_data_in_dict:
                 if not selected_variables:
-                    error = {"error": f"Can't plot {title} data set", "message": f"No selected variables for {key}.",
-                             "info_map": info_map}
-                    log_pool.append(error)
-                    break
-                else:
-                    data_dict = Utility.convert_list_of_dicts_to_dict_of_lists(values)
-                    selected_variables_in_data = 0
-                    for selected_variable in selected_variables:
-                        if selected_variable in data_dict:
-                            prepared_pool.setdefault(selected_variable, []).extend(data_dict[selected_variable])
-                            log = {"log": f"Successfully added {title} data to prepared_pool",
-                                   "message": f"Data for {selected_variable} added to prepared_pool.",
-                                   "info_map": info_map}
-                            log_pool.append(log)
-                            selected_variables_in_data += 1
-                        else:
-                            warning = {"warning": f"{selected_variable} not a valid key in provided data",
-                                       "message": f"{selected_variable} won't be graphed.",
-                                       "info_map": info_map}
-                            log_pool.append(warning)
-                    if selected_variables_in_data == 0:
-                        error = {"error": f"Can't plot {title} data set",
-                                 "message": "No filter-file variables found in data provided.",
-                                 "info_map": info_map}
-                        log_pool.append(error)
+                    log_pool.append({"error": f"Can't plot {title} data set",
+                                     "message": f"No selected variables for {key}.",
+                                     "info_map": info_map})
+                data_dict = Utility.convert_list_of_dicts_to_dict_of_lists(values)
+                for selected_variable in selected_variables:
+                    is_variable_in_data = selected_variable in data_dict
+                    if not is_variable_in_data:
+                        log_pool.append({"warning": f"{selected_variable} not a valid key in provided data",
+                                         "message": f"{selected_variable} won't be graphed.",
+                                         "info_map": info_map})
+                    else:
+                        prepared_pool.setdefault(selected_variable, []).extend(data_dict[selected_variable])
+                        log_pool.append({"log": f"Successfully added {title} data to prepared_pool",
+                                         "message": f"Data for {selected_variable} added to prepared_pool.",
+                                         "info_map": info_map})
+                if all(selected_variable not in data_dict for selected_variable in selected_variables):
+                    log_pool.append({"error": f"Can't plot {title} data set",
+                                     "message": "No filter-file variables found in data provided.",
+                                     "info_map": info_map})
             else:
-                if selected_variables:
-                    prepared_pool[selected_variables[index]] = values
-                    log = {"log": f"Successfully added {title} data to prepared_pool",
-                                  "message": f"Data for {selected_variables[index]} added.",
-                                  "info_map": info_map}
-                    log_pool.append(log)
-                else:
-                    prepared_pool[key] = values
-                    log = {"log": f"Successfully added {title} data to prepared_pool",
-                                  "message": f"Data for {key} added.",
-                                  "info_map": info_map}
-                    log_pool.append(log)
+                prepared_pool[key] = values
+                log_pool.append({"log": f"Successfully added {title} data to prepared_pool",
+                                 "message": f"Data for {key} added.",
+                                 "info_map": info_map})
 
         return prepared_pool, log_pool
 

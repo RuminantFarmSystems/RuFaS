@@ -291,5 +291,5 @@ def test_prepare_plot_data(graph_generator: GraphGenerator,
                            graph_details: Dict[str, str | List[str]],
                            expected_result: Dict[str, List[int | float]],
                            ) -> None:
-    result = graph_generator.prepare_plot_data(filtered_pool, graph_details)
+    result = graph_generator._prepare_plot_data(filtered_pool, graph_details)
     assert result == expected_result

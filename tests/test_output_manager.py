@@ -1808,7 +1808,7 @@ def test_route_save_functions_graph(
     with patch(
         "RUFAS.graph_generator.GraphGenerator.generate_graph"
     ) as mock_generate_graph:
-        with patch("RUFAS.output_manager.GraphGenerator.prepare_plot_data") as prepare_plot_data:
+        with patch("RUFAS.output_manager.GraphGenerator._prepare_plot_data") as prepare_plot_data:
             mock_output_manager.add_warning = MagicMock()
             mock_output_manager.add_error = MagicMock()
             mock_output_manager._route_graph_generator_logs = MagicMock(return_value=True)

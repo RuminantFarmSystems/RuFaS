@@ -887,16 +887,13 @@ class OutputManager(object):
             if produce_graphics:
                 try:
                     graph_generator = GraphGenerator(self.__metadata_prefix)
-                    prepared_data, log_pool = graph_generator.prepare_plot_data(filtered_pool,
-                                                                                filter_content)
-                    is_graphable = self._route_graph_generator_logs(log_pool)
-                    if is_graphable:
-                        graph_generator.generate_graph(
-                            prepared_data,
-                            filter_content,
-                            filter_file,
-                            graphics_dir,
-                        )
+                    log_pool = graph_generator.generate_graph(
+                                filtered_pool,
+                                filter_content,
+                                filter_file,
+                                graphics_dir,
+                                )
+                    self._route_logs(log_pool)
                 except Exception as e:
                     self.add_error("graph generation exception", str(e), info_map)
             else:
@@ -906,32 +903,23 @@ class OutputManager(object):
                     info_map,
                 )
 
-    def _route_graph_generator_logs(self, log_pool: List[Dict[str, str | Dict[str, str]]]) -> bool:
-        """Takes logs from Graph Generator and routes them to the appropriate pools in
-        Output Manager
+    def _route_logs(self, log_pool: List[Dict[str, str | Dict[str, str]]]) -> None:
+        """Takes logs from other classes and routes them to the appropriate pools in
+        Output Manager.
 
         Parameters
         ----------
-        log_pool : List[Dict[str, str  |  Dict[str, str]]]
+        log_pool : List[Dict[str, str | Dict[str, str]]]
             A list of log, warning, and error dictionaries containing all the components needed
             to log the information to the appropriate pool.
-
-        Returns
-        -------
-        bool
-            A flag indiciating whether Graph Generator should graph the prepared pool data.
         """
-        error_count = 0
         for log in log_pool:
             if "error" in log:
                 self.add_error(log["error"], log["message"], log["info_map"])
-                error_count += 1
             elif "log" in log:
                 self.add_log(log["log"], log["message"], log["info_map"])
             elif "warning" in log:
                 self.add_warning(log["warning"], log["message"], log["info_map"])
-
-        return error_count == 0
 
     @deprecated(
         reason="""This function is still in the code base but it is not used. We want to keep it for debugging purposes
