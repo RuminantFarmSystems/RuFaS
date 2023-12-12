@@ -188,3 +188,44 @@ def test_setup_array_schema(title: str, properties: dict[str, Any], schema: dict
     actual = SchemaManager.setup_array_schema(title, properties)
 
     assert actual == schema
+
+
+@pytest.mark.parametrize("title,properties,schema", [
+    ("life_cycle", {
+        "type": "object",
+        "description": "",
+        "still_birth_rate": {
+          "type": "number",
+          "description": "Stillbirth rate",
+          "minimum": 0,
+          "maximum": 1
+        }
+     }, {
+            "title": "life_cycle",
+            "type": "object",
+            "format": "grid",
+            "options": {
+                "infoText": ""
+            },
+            "properties": {
+                "still_birth_rate": {
+                    "title": "still_birth_rate",
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 1,
+                    "options": {
+                        "grid_columns": 12,
+                        "infoText": "Stillbirth rate",
+                        "inputAttributes": {
+                            "class": "text-primary form-control",
+                        }
+                    }
+                }
+            }
+        })
+])
+def test_setup_object_schema(title: str, properties: dict[str, Any], schema: dict[str, Any]) -> None:
+    """Tests that object schema are setup correctly."""
+    actual = SchemaManager.setup_object_schema(title, properties)
+
+    assert actual == schema
