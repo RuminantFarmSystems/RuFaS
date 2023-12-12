@@ -820,7 +820,6 @@ class InputManager:
             - The boolean is True if the properties exist, False otherwise.
             - KeyError if the metadata is not loaded or the properties are not found,
               otherwise None.
-        
         """
         info_map = {"class": self.__class__.__name__,
                     "function": self._metadata_properties_exists.__name__,
@@ -914,8 +913,9 @@ class InputManager:
 
         if validated_data:
             if variable_name in self.__pool.keys():
-                om.add_warning("Overwriting existing variable", f"Variable {variable_name} already exists in InputManager "
-                                                                f"pool, overwriting the old value.", info_map)
+                om.add_warning("Overwriting existing variable", f"Variable {variable_name} already exists in "
+                                                                f"InputManager pool, overwriting the old value.",
+                               info_map)
 
             self.__pool[variable_name] = validated_data
 
