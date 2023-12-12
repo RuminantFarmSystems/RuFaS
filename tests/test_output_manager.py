@@ -632,7 +632,7 @@ def output_manager_original_method_states(
         "clear_output_dir": mock_output_manager.clear_output_dir,
         "is_file_in_dir": mock_output_manager.is_file_in_dir,
         "create_directory": mock_output_manager.create_directory,
-        "_route_graph_generator_logs": mock_output_manager._route_graph_generator_logs,
+        "_route_logs": mock_output_manager._route_logs,
     }
 
 
@@ -1808,69 +1808,65 @@ def test_route_save_functions_graph(
     with patch(
         "RUFAS.graph_generator.GraphGenerator.generate_graph"
     ) as mock_generate_graph:
-        with patch("RUFAS.output_manager.GraphGenerator._prepare_plot_data") as prepare_plot_data:
-            mock_output_manager.add_warning = MagicMock()
-            mock_output_manager.add_error = MagicMock()
-            mock_output_manager._route_graph_generator_logs = MagicMock(return_value=True)
-            graph_data = {"filters": ".*", "other keys": "other values"}
-            dummy_prepared_data = {"key": [1, 2, 3, 4]}
-            dummy_log = ['dummy_log']
-            prepare_plot_data.return_value = dummy_prepared_data, dummy_log
-            mock_output_manager._route_save_functions(
-                "graph_file",
-                "save_path",
-                {"key": [1, 2, 3, 4]},
-                False,
-                graph_data,
-                Path("graphics_dir"),
-                Path("csvs_dir")
-            )
-            mock_generate_graph.assert_not_called()
-            mock_output_manager.add_warning.assert_called_once_with(
-                "No Graphics",
-                "Graphic generation is disabled, skipping filter_file='graph_file'",
-                {"class": "OutputManager", "function": "_route_save_functions"},
-            )
-            prepare_plot_data.assert_not_called()
+        dummy_log = ['dummy_log']
+        mock_generate_graph.return_value = dummy_log
+        mock_output_manager.add_warning = MagicMock()
+        mock_output_manager.add_error = MagicMock()
+        mock_output_manager._route_logs = MagicMock(return_value=True)
+        graph_data = {"filters": ".*", "other keys": "other values"}
+        mock_output_manager._route_save_functions(
+            "graph_file",
+            "save_path",
+            {"key": [1, 2, 3, 4]},
+            False,
+            graph_data,
+            Path("graphics_dir"),
+            Path("csvs_dir")
+        )
+        mock_generate_graph.assert_not_called()
+        mock_output_manager.add_warning.assert_called_once_with(
+            "No Graphics",
+            "Graphic generation is disabled, skipping filter_file='graph_file'",
+            {"class": "OutputManager", "function": "_route_save_functions"},
+        )
 
-            mock_output_manager._route_save_functions(
-                "graph_file",
-                "save_path",
-                {"key": [1, 2, 3, 4]},
-                True,
-                graph_data,
-                Path("graphics_dir"),
-                Path("csvs_dir")
-            )
-            mock_output_manager.add_warning.assert_called_once_with(
-                "No Graphics",
-                "Graphic generation is disabled, skipping filter_file='graph_file'",
-                {"class": "OutputManager", "function": "_route_save_functions"},
-            )
-            prepare_plot_data.assert_called_once_with({"key": [1, 2, 3, 4]}, graph_data)
-            mock_generate_graph.assert_called_once_with(
-                dummy_prepared_data,
-                graph_data,
-                "graph_file",
-                Path("graphics_dir"),
-            )
+        mock_output_manager._route_save_functions(
+            "graph_file",
+            "save_path",
+            {"key": [1, 2, 3, 4]},
+            True,
+            graph_data,
+            Path("graphics_dir"),
+            Path("csvs_dir")
+        )
+        mock_output_manager.add_warning.assert_called_once_with(
+            "No Graphics",
+            "Graphic generation is disabled, skipping filter_file='graph_file'",
+            {"class": "OutputManager", "function": "_route_save_functions"},
+        )
 
-            mock_generate_graph.side_effect = Exception("test exception")
-            mock_output_manager._route_save_functions(
-                "graph_file",
-                "save_path",
-                {"key": [1, 2, 3, 4]},
-                True,
-                graph_data,
-                Path("graphics_dir"),
-                "csvs_dir"
-            )
-            mock_output_manager.add_error.assert_called_with(
-                "graph generation exception",
-                "test exception",
-                {"class": "OutputManager", "function": "_route_save_functions"},
-            )
-            prepare_plot_data.assert_called_with({"key": [1, 2, 3, 4]}, graph_data)
+        mock_generate_graph.assert_called_once_with(
+            {"key": [1, 2, 3, 4]},
+            graph_data,
+            "graph_file",
+            Path("graphics_dir"),
+        )
+
+        mock_generate_graph.side_effect = Exception("test exception")
+        mock_output_manager._route_save_functions(
+            "graph_file",
+            "save_path",
+            {"key": [1, 2, 3, 4]},
+            True,
+            graph_data,
+            Path("graphics_dir"),
+            "csvs_dir"
+        )
+        mock_output_manager.add_error.assert_called_with(
+            "graph generation exception",
+            "test exception",
+            {"class": "OutputManager", "function": "_route_save_functions"},
+        )
 
     mock_output_manager._route_save_functions = output_manager_original_method_states[
         "_route_save_functions"
@@ -1881,12 +1877,12 @@ def test_route_save_functions_graph(
     mock_output_manager.add_error = output_manager_original_method_states[
         "add_error"
     ]
-    mock_output_manager._route_graph_generator_logs = output_manager_original_method_states[
-        "_route_graph_generator_logs"
+    mock_output_manager._route_logs = output_manager_original_method_states[
+        "_route_logs"
     ]
 
 
-@pytest.mark.parametrize("log_pool, expected_result, expected_calls", [
+@pytest.mark.parametrize("log_pool, expected_calls", [
     (
         [
             {"log": "info_log", "message": "Info message",
@@ -1895,7 +1891,6 @@ def test_route_save_functions_graph(
              "message": "Warning message",
              "info_map": {"class": "GraphGenerator", "function": "prepare_plot_data"}}
         ],
-        True,
         {"add_error": 0, "add_log": 1, "add_warning": 1}
     ),
     (
@@ -1905,20 +1900,17 @@ def test_route_save_functions_graph(
             {"log": "info_log", "message": "Info message",
              "info_map": {"class": "GraphGenerator", "function": "prepare_plot_data"}}
         ],
-        False,
         {"add_error": 1, "add_log": 1, "add_warning": 0}
     ),
 ])
-def test_route_graph_generator_logs(mock_output_manager: OutputManager,
-                                    output_manager_original_method_states: Dict[str, Callable],
-                                    log_pool, expected_result, expected_calls):
+def test_route_logs(mock_output_manager: OutputManager,
+                    output_manager_original_method_states: Dict[str, Callable],
+                    log_pool, expected_calls):
     mock_output_manager.add_error = MagicMock()
     mock_output_manager.add_log = MagicMock()
     mock_output_manager.add_warning = MagicMock()
 
-    result = mock_output_manager._route_graph_generator_logs(log_pool)
-
-    assert result == expected_result
+    mock_output_manager._route_logs(log_pool)
 
     assert mock_output_manager.add_error.call_count == expected_calls["add_error"]
     assert mock_output_manager.add_log.call_count == expected_calls["add_log"]
@@ -1933,8 +1925,8 @@ def test_route_graph_generator_logs(mock_output_manager: OutputManager,
     mock_output_manager.add_error = output_manager_original_method_states[
         "add_error"
     ]
-    mock_output_manager._route_graph_generator_logs = output_manager_original_method_states[
-        "_route_graph_generator_logs"
+    mock_output_manager._route_logs = output_manager_original_method_states[
+        "_route_logs"
     ]
 
 
