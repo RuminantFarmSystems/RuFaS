@@ -160,8 +160,9 @@ class ReportGenerator:
 
         Raises
         ------
-        ValueError
-            If the report data is empty or if the necessary aggregation keys are not found in filter_content.
+        KeyError
+            If a key specified in the `horizontal_order` of `filter_content` is not found in the `report_data`.
+            This usually indicates a mismatch between the expected structure of `filtered_pool` and its actual content.
         """
         report_data = self._prepare_report_data(
             filtered_pool,

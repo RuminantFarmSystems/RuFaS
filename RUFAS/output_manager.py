@@ -833,7 +833,7 @@ class OutputManager(object):
                                 if column_name not in reports.keys()
                                 else f"{column_name} {self._get_timestamp(True)}"
                             ] = {"values": value}
-                    except (ValueError, KeyError) as e:
+                    except KeyError as e:
                         self.add_error("report generation error", str(e), info_map)
                 else:
                     self._route_save_functions(
