@@ -152,4 +152,3 @@ class WinterWheatHay(WinterWheat):
     lignin_dry_matter_percentage: float = 4.905
     yield_nitrogen_fraction: float = 0.0158032
     yield_phosphorus_fraction: float = 0.00233
-

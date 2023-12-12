@@ -127,4 +127,3 @@ class AlfalfaHay(Alfalfa):
     lignin_dry_matter_percentage: float = 6.643
     yield_nitrogen_fraction: float = 0.033192
     yield_phosphorus_fraction: float = 0.00282
-

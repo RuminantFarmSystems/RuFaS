@@ -5,6 +5,7 @@ from RUFAS.routines.field.crop.crop_data import (
     PlantCategory
 )
 
+
 @dataclass(kw_only=True)
 class Triticale(CropData):
     """
