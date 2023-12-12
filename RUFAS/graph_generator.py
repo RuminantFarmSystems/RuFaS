@@ -141,13 +141,13 @@ class GraphGenerator:
             Generic exception raised by utility functions.
         """
         try:
-            fig, _ = plt.subplots()
             prepared_data, log_pool = self._prepare_plot_data(filtered_pool, graph_details)
 
             error_found = any("error" in log for log in log_pool)
             if error_found:
                 return log_pool
 
+            fig, _ = plt.subplots()
             self._draw_graph(
                 graph_details["type"], prepared_data, prepared_data.keys()
             )
@@ -165,7 +165,7 @@ class GraphGenerator:
                            ) -> Tuple[Dict[str, List[int | float]], List[Dict[str, str | Dict[str, str]]]]:
         """Extracts the values from the filtered_pool data and converts them a dictionary
         that graph_generator can more readily handle and records logs, warnings, and errors for
-        Output Manager to log.
+        Output Manager.
 
         Parameters
         ----------
