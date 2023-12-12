@@ -129,8 +129,7 @@ def test_generate_report_no_aggregation(
     filter_content = {
         "variables": ["a", "b"],
     }
-    with pytest.raises(ValueError):
-        report_generator.generate_report(sample_filtered_pool, filter_content)
+    assert report_generator.generate_report(sample_filtered_pool, filter_content) == {"a":[1,3,5,7],"b":[2,4,6,8]}
 
 
 def test_generate_report_invalid_empty_data(report_generator: ReportGenerator) -> None:
