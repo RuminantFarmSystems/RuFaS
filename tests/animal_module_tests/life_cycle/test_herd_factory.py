@@ -1099,9 +1099,29 @@ def test_random_sample_with_replacement(mock_herd_factory: HerdFactory,
 
     mock_herd_factory._random_sample_with_replacement()
 
-    expected_random_sample_with_replacement_by_type_call_args_list = ["calf", "heiferI", "heiferII",
-                                                                      "heiferIII", "cow", "replacement"]
-
     assert mock_herd_factory._random_sample_with_replacement_by_type.call_count == 6
-    # assert mock_herd_factory._random_sample_with_replacement_by_type.call_args_list == \
-    #        expected_random_sample_with_replacement_by_type_call_args_list
+    assert mock_animal_population_init.call_count == 1
+    mock_im_get_data.assert_called_once_with("config.set_seed")
+
+
+@pytest.mark.parametrize("pre_num, post_num", [
+    (0, 0),
+    (1, 0),
+    (8, 0),
+    (1, 1),
+    (1, 8),
+    (8, 1),
+    (8, 8),
+
+])
+def test_random_sample_with_replacement_by_type_calf(pre_num: int,
+                                                     post_num: int,
+                                                     mock_herd_factory: HerdFactory,
+                                                     mocker: MockerFixture) -> None:
+    mock_pre_calves = []
+    mock_animal_base_init_args_typed_dict = mock.MagicMock(auto_spec=AnimalBaseInitArgsTypedDict)
+    mocker.patch("tests.animal_module_tests.life_cycle.test_herd_factory.Calf.__init__", return_value=None)
+    mock_pre_calves = [Calf(args=mock_animal_base_init_args_typed_dict) for _ in range(pre_num)]
+
+    mock_pre_animal_population = mock.MagicMock(auto_spec=AnimalPopulation)
+    mock_pre_animal_population.calves = []
