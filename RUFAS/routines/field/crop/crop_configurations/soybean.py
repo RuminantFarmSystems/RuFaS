@@ -59,6 +59,9 @@ class SoybeanGrain(Soybean):
         Fraction of wet crop yield that is phosphorus (unitless).
 
     """
+    species: str = "soybean_grain"
+    name: str = "soybean grain"
+
     optimal_harvest_index: float = 0.35
     min_harvest_index: float = 0.26
     dry_matter_percentage: float = 89.105
@@ -88,6 +91,9 @@ class SoybeanHay(Soybean):
         Fraction of wet crop yield that is phosphorus (unitless).
 
     """
+    species: str = "soybean_hay"
+    name: str = "soybean hay"
+
     optimal_harvest_index: float = 0.90
     min_harvest_index: float = 0.54
     dry_matter_percentage: float = 91.578

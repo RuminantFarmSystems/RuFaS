@@ -61,6 +61,9 @@ class AlfalfaSilage(Alfalfa):
         Fraction of wet crop yield that is phosphorus (unitless).
 
     """
+    species: str = "alfalfa_silage"
+    name: str = "alfalfa silage"
+
     optimal_harvest_index: float = 0.90
     min_harvest_index: float = 0.40
     dry_matter_percentage: float = 42.883
@@ -94,6 +97,8 @@ class AlfalfaBaleage(AlfalfaSilage):
     Alfalfa baleage currently has the same harvest and quality properties as Alfalfa silage.
 
     """
+    species: str = "alfalfa_baleage"
+    name: str = "alfalfa baleage"
 
 
 @dataclass(kw_only=True)
@@ -121,6 +126,9 @@ class AlfalfaHay(Alfalfa):
     Alfalfa baleage currently has the same harvest and quality properties as Alfalfa silage.
 
     """
+    species: str = "alfalfa_hay"
+    name: str = "alfalfa hay"
+
     optimal_harvest_index: float = 0.85
     min_harvest_index: float = 0.35
     dry_matter_percentage: float = 88.136

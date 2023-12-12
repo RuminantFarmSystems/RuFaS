@@ -59,6 +59,9 @@ class CornGrain(Corn):
         Fraction of dry matter crop yield that is phosphorus (unitless).
 
     """
+    species: str = "corn_grain"
+    name: str = "corn grain"
+
     optimal_harvest_index: float = 0.60
     min_harvest_index: float = 0.40
     dry_matter_percentage: float = 86.0907
@@ -88,6 +91,9 @@ class CornSilage(Corn):
         Fraction of wet crop yield that is phosphorus (unitless).
 
     """
+    species: str = "corn_silage"
+    name: str = "corn silage"
+
     optimal_harvest_index: float = 0.90
     min_harvest_index: float = 0.68
     dry_matter_percentage: float = 35.361

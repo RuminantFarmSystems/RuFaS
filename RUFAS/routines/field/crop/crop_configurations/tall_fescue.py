@@ -59,6 +59,9 @@ class TallFescueSilage(TallFescue):
         Fraction of wet crop yield that is phosphorus (unitless).
 
     """
+    species: str = "tall_fescue_silage"
+    name: str = "tall_fescue silage"
+
     optimal_harvest_index: float = 0.90
     min_harvest_index: float = 0.4
     dry_matter_percentage: float = 39.612
@@ -92,6 +95,8 @@ class TallFescueBaleage(TallFescueSilage):
     Tall fescue baleage currently has the same harvest and quality properties as Tall Fescue silage.
 
     """
+    species: str = "tall_fescue_baleage"
+    name: str = "tall_fescue baleage"
 
 
 @dataclass(kw_only=True)
@@ -115,6 +120,9 @@ class TallFescueHay(TallFescue):
         Fraction of wet crop yield that is phosphorus (unitless).
 
     """
+    species: str = "tall_fescue_hay"
+    name: str = "tall_fescue hay"
+
     optimal_harvest_index: float = 0.85
     min_harvest_index: float = 0.37
     dry_matter_percentage: float = 88.331

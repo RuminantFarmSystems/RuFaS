@@ -66,6 +66,9 @@ class TriticaleGrain(Triticale):
         Fraction of wet crop yield that is phosphorus (unitless).
 
     """
+    species: str = "triticale_grain"
+    name: str = "triticale grain"
+
     optimal_harvest_index: float = 0.3
     min_harvest_index: float = 0.2
     dry_matter_percentage: float = 88.374
@@ -95,6 +98,9 @@ class TriticaleSilage(Triticale):
         Fraction of wet crop yield that is phosphorus (unitless).
 
     """
+    species: str = "triticale_silage"
+    name: str = "triticale silage"
+
     optimal_harvest_index: float = 0.9
     min_harvest_index: float = 0.7
     dry_matter_percentage: float = 33.281
@@ -128,6 +134,8 @@ class TriticaleBaleage(TriticaleSilage):
     Triticale baleage currently has the same harvest and quality properties as Triticale silage.
 
     """
+    species: str = "triticale_baleage"
+    name: str = "triticale baleage"
 
 
 @dataclass(kw_only=True)
@@ -151,6 +159,9 @@ class TriticaleHay(Triticale):
         Fraction of wet crop yield that is phosphorus (unitless).
 
     """
+    species: str = "triticale_hay"
+    name: str = "triticale hay"
+
     optimal_harvest_index: float = 0.85
     min_harvest_index: float = 0.65
     dry_matter_percentage: float = 91.019

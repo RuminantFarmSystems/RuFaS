@@ -61,6 +61,9 @@ class CerealRyeGrain(CerealRye):
         Fraction of dry matter crop yield that is phosphorus (unitless).
 
     """
+    species: str = "cereal_rye_grain"
+    name: str = "cereal_rye grain"
+
     optimal_harvest_index: float = 0.3
     min_harvest_index: float = 0.20
     dry_matter_percentage: float = 85.962
@@ -90,6 +93,9 @@ class CerealRyeSilage(CerealRye):
         Fraction of dry matter crop yield that is phosphorus (unitless).
 
     """
+    species: str = "cereal_rye_silage"
+    name: str = "cereal_rye silage"
+
     optimal_harvest_index: float = 0.90
     min_harvest_index: float = 0.68
     dry_matter_percentage: float = 34.881
@@ -123,6 +129,8 @@ class CerealRyeBaleage(CerealRyeSilage):
     Cereal rye baleage has the same harvest parameters as cereal rye silage.
 
     """
+    species: str = "cereal_rye_baleage"
+    name: str = "cereal_rye baleage"
 
 
 @dataclass(kw_only=True)
@@ -146,6 +154,9 @@ class CerealRyeHay(CropData):
         Fraction of dry matter crop yield that is phosphorus (unitless).
 
     """
+    species: str = "cereal_rye_hay"
+    name: str = "cereal_rye hay"
+
     optimal_harvest_index: float = 0.85
     min_harvest_index: float = 0.64
     dry_matter_percentage: float = 92.705

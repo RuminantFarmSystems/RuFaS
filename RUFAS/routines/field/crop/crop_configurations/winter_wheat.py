@@ -61,6 +61,9 @@ class WinterWheatGrain(WinterWheat):
         Fraction of wet crop yield that is phosphorus (unitless).
 
     """
+    species: str = "winter_wheat_grain"
+    name: str = "winter_wheat grain"
+
     optimal_harvest_index: float = 0.5
     min_harvest_index: float = 0.25
     dry_matter_percentage: float = 85.689
@@ -90,6 +93,9 @@ class WinterWheatSilage(WinterWheat):
         Fraction of wet crop yield that is phosphorus (unitless).
 
     """
+    species: str = "winter_wheat_silage"
+    name: str = "winter_wheat silage"
+
     optimal_harvest_index: float = 0.9
     min_harvest_index: float = 0.6
     dry_matter_percentage: float = 34.801
@@ -123,6 +129,8 @@ class WinterWheatBaleage(WinterWheatSilage):
     Winter Wheat baleage currently has the same harvest and quality properties as Winter Wheat silage.
 
     """
+    species: str = "winter_wheat_baleage"
+    name: str = "winter_wheat baleage"
 
 
 @dataclass(kw_only=True)
@@ -146,6 +154,9 @@ class WinterWheatHay(WinterWheat):
         Fraction of wet crop yield that is phosphorus (unitless).
 
     """
+    species: str = "winter_wheat_hay"
+    name: str = "winter_wheat hay"
+
     optimal_harvest_index: float = 0.85
     min_harvest_index: float = 0.55
     dry_matter_percentage: float = 90.592
