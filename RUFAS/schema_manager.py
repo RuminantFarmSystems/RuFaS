@@ -62,7 +62,6 @@ class SchemaManager:
             "format": "checkbox",
             "options": {
                 "grid_columns": 12,
-                "format": "select2",
                 "inputAttributes": {
                     "class": "text-primary form-control"
                 }

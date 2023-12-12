@@ -133,9 +133,9 @@ def test_setup_number_schema(title: str, properties: dict[str, Any], schema: dic
             "title": "ventilation",
             "type": "boolean",
             "default": True,
+            "format": "checkbox",
             "options": {
                 "grid_columns": 12,
-                "format": "select2",
                 "infoText": "Ventilation -- True if the storage unit has appropriate ventilation.",
                 "inputAttributes": {
                     "class": "text-primary form-control",
