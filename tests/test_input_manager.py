@@ -1898,8 +1898,8 @@ def test_metadata_properties_exists_no_metadata(mock_input_manager: InputManager
         properties_blob_key="mock_properties_blob_key")
 
     assert result is False
-    assert isinstance(returned_error, KeyError)
-    assert str(returned_error) == "'No metadata loaded.'"
+    assert isinstance(returned_error, ValueError)
+    assert str(returned_error) == "No metadata loaded."
 
 
 @pytest.mark.parametrize('variable_name, properties_blob_key', [
@@ -1947,38 +1947,38 @@ def mock_metadata_for_add_variable_to_pool(mocker: MockerFixture) -> Dict[str, D
     }
 
 
-@pytest.mark.parametrize('variable_name, data, properties_blob_key, starting_im_pool, variable_type', [
+@pytest.mark.parametrize('variable_name, data, properties_blob_key, starting_im_pool, is_dict_variable', [
     ("dict_data",
      {"int": 0, "str": "", "float": 0.0, "int_array": [0, 1, 2], "float_array": [0.0, 1.1, 2.2],
-      "str_arr": ["example_str1", "example_str2", "example_str3"]}, "dict_data", {}, "dict"),
-    ("array_of_int_data", {"array_of_int_data": [0, 1, 2]}, "array_of_int_data", {}, "tabular"),
-    ("array_of_float_data", {"array_of_float_data": [0.0, 1.1, 2.2]}, "array_of_float_data", {}, "tabular"),
+      "str_arr": ["example_str1", "example_str2", "example_str3"]}, "dict_data", {}, True),
+    ("array_of_int_data", {"array_of_int_data": [0, 1, 2]}, "array_of_int_data", {}, False),
+    ("array_of_float_data", {"array_of_float_data": [0.0, 1.1, 2.2]}, "array_of_float_data", {}, False),
     ("array_of_str_data", {"array_of_str_data": ["example_str1", "example_str2", "example_str3"]}, "array_of_str_data",
-     {}, "tabular"),
-    ("array_of_dict_data", {"array_of_dict_data": [{"a": 0}, {"b": 1}, {"c": 2}]}, "array_of_dict_data", {}, "tabular"),
+     {}, False),
+    ("array_of_dict_data", {"array_of_dict_data": [{"a": 0}, {"b": 1}, {"c": 2}]}, "array_of_dict_data", {}, False),
     ("dict_of_array_data", {"array1": [1, 2, 3], "array2": ["a", "b", "c"], "array3": [0.0, 1.1, 2.2]},
-     "dict_of_array_data", {}, "tabular"),
+     "dict_of_array_data", {}, False),
     ("dict_data",
      {"int": 0, "str": "", "float": 0.0, "int_array": [0, 1, 2], "float_array": [0.0, 1.1, 2.2],
       "str_arr": ["example_str1", "example_str2", "example_str3"]}, "dict_data",
-     {"dict_data": {"1": 1}}, "dict"),
+     {"dict_data": {"1": 1}}, True),
     ("array_of_int_data", {"array_of_int_data": [0, 1, 2]}, "array_of_int_data", {"array_of_int_data": [-1, 0, 1]},
-     "tabular"),
+     False),
     ("array_of_float_data", {"array_of_float_data": [0.0, 1.1, 2.2]}, "array_of_float_data",
      {"array_of_float_data": [-1.0, 0.0, 1.0]},
-     "tabular"),
+     False),
     ("array_of_str_data", {"array_of_str_data": ["example_str1", "example_str2", "example_str3"]}, "array_of_str_data",
-     {"array_of_str_data": ["a", "b", "c"]}, "tabular"),
+     {"array_of_str_data": ["a", "b", "c"]}, False),
     ("array_of_dict_data", {"array_of_dict_data": [{"a": 0}, {"b": 1}, {"c": 2}]}, "array_of_dict_data",
-     {"array_of_dict_data": [{"A": -1}, {"B": 0}, {"C": 1}]}, "tabular"),
+     {"array_of_dict_data": [{"A": -1}, {"B": 0}, {"C": 1}]}, False),
     ("dict_of_array_data", {"array1": [1, 2, 3], "array2": ["a", "b", "c"], "array3": [0.0, 1.1, 2.2]},
-     "dict_of_array_data", {"dict_of_array_data": {"a": [1, 2, 3]}}, "tabular"),
+     "dict_of_array_data", {"dict_of_array_data": {"a": [1, 2, 3]}}, False),
 ])
 def test_add_variable_to_pool_valid(variable_name: str,
                                     data: Any,
                                     properties_blob_key: str,
                                     starting_im_pool: Dict[str, Any],
-                                    variable_type: str,
+                                    is_dict_variable: bool,
                                     mock_input_manager: InputManager,
                                     mock_metadata_for_add_variable_to_pool: Dict[str, Dict[str, Any]],
                                     input_manager_original_method_states: Dict[str, Callable]) -> None:
@@ -2006,7 +2006,7 @@ def test_add_variable_to_pool_valid(variable_name: str,
                     data=data,
                     properties_blob_key=properties_blob_key,
                     eager_termination=False,
-                    variable_type=variable_type)
+                    is_dict_variable=is_dict_variable)
 
     assert result is True
     assert returned_error is None
@@ -2021,38 +2021,38 @@ def test_add_variable_to_pool_valid(variable_name: str,
     mock_input_manager._validate_tabular_element = input_manager_original_method_states["_validate_tabular_element"]
 
 
-@pytest.mark.parametrize('variable_name, data, properties_blob_key, starting_im_pool, variable_type', [
+@pytest.mark.parametrize('variable_name, data, properties_blob_key, starting_im_pool, is_dict_variable', [
     ("dict_data",
      {"int": 0, "str": "", "float": 0.0, "int_array": [0, 1, 2], "float_array": [0.0, 1.1, 2.2],
-      "str_arr": ["example_str1", "example_str2", "example_str3"]}, "dict_data", {}, "dict"),
-    ("array_of_int_data", {"array_of_int_data": [0, 1, 2]}, "array_of_int_data", {}, "tabular"),
-    ("array_of_float_data", {"array_of_float_data": [0.0, 1.1, 2.2]}, "array_of_float_data", {}, "tabular"),
+      "str_arr": ["example_str1", "example_str2", "example_str3"]}, "dict_data", {}, True),
+    ("array_of_int_data", {"array_of_int_data": [0, 1, 2]}, "array_of_int_data", {}, False),
+    ("array_of_float_data", {"array_of_float_data": [0.0, 1.1, 2.2]}, "array_of_float_data", {}, False),
     ("array_of_str_data", {"array_of_str_data": ["example_str1", "example_str2", "example_str3"]}, "array_of_str_data",
-     {}, "tabular"),
-    ("array_of_dict_data", {"array_of_dict_data": [{"a": 0}, {"b": 1}, {"c": 2}]}, "array_of_dict_data", {}, "tabular"),
+     {}, False),
+    ("array_of_dict_data", {"array_of_dict_data": [{"a": 0}, {"b": 1}, {"c": 2}]}, "array_of_dict_data", {}, False),
     ("dict_of_array_data", {"array1": [1, 2, 3], "array2": ["a", "b", "c"], "array3": [0.0, 1.1, 2.2]},
-     "dict_of_array_data", {}, "tabular"),
+     "dict_of_array_data", {}, False),
     ("dict_data",
      {"int": 0, "str": "", "float": 0.0, "int_array": [0, 1, 2], "float_array": [0.0, 1.1, 2.2],
       "str_arr": ["example_str1", "example_str2", "example_str3"]}, "dict_data",
-     {"dict_data": {"1": 1}}, "dict"),
+     {"dict_data": {"1": 1}}, True),
     ("array_of_int_data", {"array_of_int_data": [0, 1, 2]}, "array_of_int_data", {"array_of_int_data": [-1, 0, 1]},
-     "tabular"),
+     False),
     ("array_of_float_data", {"array_of_float_data": [0.0, 1.1, 2.2]}, "array_of_float_data",
      {"array_of_float_data": [-1.0, 0.0, 1.0]},
-     "tabular"),
+     False),
     ("array_of_str_data", {"array_of_str_data": ["example_str1", "example_str2", "example_str3"]}, "array_of_str_data",
-     {"array_of_str_data": ["a", "b", "c"]}, "tabular"),
+     {"array_of_str_data": ["a", "b", "c"]}, False),
     ("array_of_dict_data", {"array_of_dict_data": [{"a": 0}, {"b": 1}, {"c": 2}]}, "array_of_dict_data",
-     {"array_of_dict_data": [{"A": -1}, {"B": 0}, {"C": 1}]}, "tabular"),
+     {"array_of_dict_data": [{"A": -1}, {"B": 0}, {"C": 1}]}, False),
     ("dict_of_array_data", {"array1": [1, 2, 3], "array2": ["a", "b", "c"], "array3": [0.0, 1.1, 2.2]},
-     "dict_of_array_data", {"dict_of_array_data": {"a": [1, 2, 3]}}, "tabular"),
+     "dict_of_array_data", {"dict_of_array_data": {"a": [1, 2, 3]}}, False),
 ])
 def test_add_variable_to_pool_invalid(variable_name: str,
                                       data: Any,
                                       properties_blob_key: str,
                                       starting_im_pool: Dict[str, Any],
-                                      variable_type: str,
+                                      is_dict_variable: bool,
                                       mock_input_manager: InputManager,
                                       mock_metadata_for_add_variable_to_pool: Dict[str, Dict[str, Any]],
                                       input_manager_original_method_states: Dict[str, Callable]) -> None:
@@ -2081,7 +2081,7 @@ def test_add_variable_to_pool_invalid(variable_name: str,
                     data=data,
                     properties_blob_key=properties_blob_key,
                     eager_termination=False,
-                    variable_type=variable_type)
+                    is_dict_variable=is_dict_variable)
 
     assert result is False
     assert returned_error is None
@@ -2099,38 +2099,36 @@ def test_add_variable_to_pool_invalid(variable_name: str,
     mock_input_manager._validate_tabular_element = input_manager_original_method_states["_validate_tabular_element"]
 
 
-@pytest.mark.parametrize('variable_name, data, properties_blob_key, starting_im_pool, variable_type', [
+@pytest.mark.parametrize('variable_name, data, properties_blob_key, starting_im_pool, is_dict_variable', [
     ("dict_data",
      {"int": 0, "str": "", "float": 0.0, "int_array": [0, 1, 2], "float_array": [0.0, 1.1, 2.2],
-      "str_arr": ["example_str1", "example_str2", "example_str3"]}, "dict_data", {}, "dict"),
-    ("array_of_int_data", {"array_of_int_data": [0, 1, 2]}, "array_of_int_data", {}, "tabular"),
-    ("array_of_float_data", {"array_of_float_data": [0.0, 1.1, 2.2]}, "array_of_float_data", {}, "tabular"),
+      "str_arr": ["example_str1", "example_str2", "example_str3"]}, "dict_data", {}, True),
+    ("array_of_int_data", {"array_of_int_data": [0, 1, 2]}, "array_of_int_data", {}, False),
+    ("array_of_float_data", {"array_of_float_data": [0.0, 1.1, 2.2]}, "array_of_float_data", {}, False),
     ("array_of_str_data", {"array_of_str_data": ["example_str1", "example_str2", "example_str3"]}, "array_of_str_data",
-     {}, "tabular"),
-    ("array_of_dict_data", {"array_of_dict_data": [{"a": 0}, {"b": 1}, {"c": 2}]}, "array_of_dict_data", {}, "tabular"),
+     {}, False),
+    ("array_of_dict_data", {"array_of_dict_data": [{"a": 0}, {"b": 1}, {"c": 2}]}, "array_of_dict_data", {}, False),
     ("dict_of_array_data", {"array1": [1, 2, 3], "array2": ["a", "b", "c"], "array3": [0.0, 1.1, 2.2]},
-     "dict_of_array_data", {}, "tabular"),
+     "dict_of_array_data", {}, False),
     ("dict_data",
      {"int": 0, "str": "", "float": 0.0, "int_array": [0, 1, 2], "float_array": [0.0, 1.1, 2.2],
-      "str_arr": ["example_str1", "example_str2", "example_str3"]}, "dict_data",
-     {"dict_data": {"1": 1}}, "dict"),
+      "str_arr": ["example_str1", "example_str2", "example_str3"]}, "dict_data", {"dict_data": {"1": 1}}, True),
     ("array_of_int_data", {"array_of_int_data": [0, 1, 2]}, "array_of_int_data", {"array_of_int_data": [-1, 0, 1]},
-     "tabular"),
+     False),
     ("array_of_float_data", {"array_of_float_data": [0.0, 1.1, 2.2]}, "array_of_float_data",
-     {"array_of_float_data": [-1.0, 0.0, 1.0]},
-     "tabular"),
+     {"array_of_float_data": [-1.0, 0.0, 1.0]}, False),
     ("array_of_str_data", {"array_of_str_data": ["example_str1", "example_str2", "example_str3"]}, "array_of_str_data",
-     {"array_of_str_data": ["a", "b", "c"]}, "tabular"),
+     {"array_of_str_data": ["a", "b", "c"]}, False),
     ("array_of_dict_data", {"array_of_dict_data": [{"a": 0}, {"b": 1}, {"c": 2}]}, "array_of_dict_data",
-     {"array_of_dict_data": [{"A": -1}, {"B": 0}, {"C": 1}]}, "tabular"),
+     {"array_of_dict_data": [{"A": -1}, {"B": 0}, {"C": 1}]}, False),
     ("dict_of_array_data", {"array1": [1, 2, 3], "array2": ["a", "b", "c"], "array3": [0.0, 1.1, 2.2]},
-     "dict_of_array_data", {"dict_of_array_data": {"a": [1, 2, 3]}}, "tabular"),
+     "dict_of_array_data", {"dict_of_array_data": {"a": [1, 2, 3]}}, False),
 ])
 def test_add_variable_to_pool_eager_termination(variable_name: str,
                                                 data: Any,
                                                 properties_blob_key: str,
                                                 starting_im_pool: Dict[str, Any],
-                                                variable_type: str,
+                                                is_dict_variable: bool,
                                                 mock_input_manager: InputManager,
                                                 mock_metadata_for_add_variable_to_pool: Dict[str, Dict[str, Any]],
                                                 input_manager_original_method_states: Dict[str, Callable]) -> None:
@@ -2159,7 +2157,7 @@ def test_add_variable_to_pool_eager_termination(variable_name: str,
                     data=data,
                     properties_blob_key=properties_blob_key,
                     eager_termination=True,
-                    variable_type=variable_type)
+                    is_dict_variable=is_dict_variable)
 
     assert result is False
     assert isinstance(returned_error, ValueError)

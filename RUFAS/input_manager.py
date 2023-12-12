@@ -793,36 +793,40 @@ class InputManager:
         self.__pool = {}
         om.add_log("Clear variable pool", "The pool is emptied.", info_map)
 
-    def _metadata_properties_exists(self, variable_name: str, properties_blob_key: str) -> (bool, KeyError | None):
+    def _metadata_properties_exists(self, variable_name: str, properties_blob_key: str) -> (bool,
+                                                                                            KeyError | ValueError |
+                                                                                            None):
         """
-            Checks if specific properties exist in the metadata for a given variable.
+        Checks if specific properties exist in the metadata for a given variable.
 
-            This function is designed to verify the existence of specified properties
-            within the metadata of a particular variable. It returns a boolean indicating
-            the existence of the properties, and a KeyError in case of missing metadata
-            or properties.
+        Notes
+        -----
+        This function is designed to verify the existence of specified properties
+        within the metadata of a particular variable. It returns a boolean indicating
+        the existence of the properties, and a KeyError in case of missing metadata
+        or properties.
 
-            Parameters
-            ----------
-            variable_name : str
-                The name of the variable for which the metadata is to be checked.
-            properties_blob_key : str
-                The key representing the specific properties blob in the metadata to check.
+        Parameters
+        ----------
+        variable_name : str
+            The name of the variable for which the metadata is to be checked.
+        properties_blob_key : str
+            The key representing the specific properties blob in the metadata to check.
 
-            Returns
-            -------
-            tuple
-                A tuple containing a boolean and an exception:
-                - The boolean is True if the properties exist, False otherwise.
-                - KeyError if the metadata is not loaded or the properties are not found,
-                  otherwise None.
+        Returns
+        -------
+        tuple
+            A tuple containing a boolean and an exception:
+            - The boolean is True if the properties exist, False otherwise.
+            - KeyError if the metadata is not loaded or the properties are not found,
+              otherwise None.
             """
         info_map = {"class": self.__class__.__name__,
                     "function": self._metadata_properties_exists.__name__,
                     }
         if not self.__metadata:
             om.add_error("No metadata loaded", "No metadata is loaded to the InputManager.", info_map)
-            return False, KeyError("No metadata loaded.")
+            return False, ValueError("No metadata loaded.")
         if properties_blob_key not in self.__metadata["properties"]:
             om.add_error("No metadata found", f"No metadata is found for variable '{variable_name}' with given "
                                               f"properties_blob_key {properties_blob_key}.", info_map)
@@ -831,34 +835,36 @@ class InputManager:
         return True, None
 
     def _add_variable_to_pool(self, variable_name: str, data: Dict[str, Any], properties_blob_key: str,
-                              eager_termination: bool, variable_type: str) -> (bool, ValueError | None):
+                              eager_termination: bool, is_dict_variable : bool) -> (bool, ValueError | None):
         """
-            Adds a variable to the pool after validating its data against specified metadata properties.
+        Adds a variable to the pool after validating its data against specified metadata properties.
 
-            This function processes and validates the input data for a variable based on
-            its metadata properties. It then adds the validated data to a pool. The function
-            also provides an option for eager termination in case of invalid data.
+        Notes
+        -----
+        This function processes and validates the input data for a variable based on
+        its metadata properties. It then adds the validated data to a pool. The function
+        also provides an option for eager termination in case of invalid data.
 
-            Parameters
-            ----------
-            variable_name : str
-                The name of the variable to be added to the pool.
-            data : Dict[str, Any]
-                The data associated with the variable that needs validation and addition to the pool.
-            properties_blob_key : str
-                The key in the metadata properties against which the data is validated.
-            eager_termination : bool
-                Flag indicating whether the function should return early in case of invalid data.
-            variable_type : str
-                The type of the variable (e.g., 'dict', 'tabular') to determine the validation method.
+        Parameters
+        ----------
+        variable_name : str
+            The name of the variable to be added to the pool.
+        data : Dict[str, Any]
+            The data associated with the variable that needs validation and addition to the pool.
+        properties_blob_key : str
+            The key in the metadata properties against which the data is validated.
+        eager_termination : bool
+            Flag indicating whether the function should return early in case of invalid data.
+        is_dict_variable : bool
+            Weather the variable is a dictionary variable (rather than tabular).
 
-            Returns
-            -------
-            tuple
-                A tuple containing a boolean and an exception:
-                - The boolean is True if the variable is successfully added, False otherwise.
-                - ValueError if invalid data is encountered and eager_termination is True,
-                  otherwise None.
+        Returns
+        -------
+        tuple
+            A tuple containing a boolean and an exception:
+            - The boolean is True if the variable is successfully added, False otherwise.
+            - ValueError if invalid data is encountered and eager_termination is True,
+              otherwise None.
             """
         info_map = {"class": self.__class__.__name__,
                     "function": self._add_variable_to_pool.__name__,
@@ -872,20 +878,20 @@ class InputManager:
             element_counter_and_validity = {
                 "fixed_elements": 0, "total_elements": 0, "valid_elements": 0, "invalid_elements": 0,
                 "is_valid": True}
-            if variable_type == 'dict':
+            if is_dict_variable:
                 element_counter_and_validity = self._validate_dict_element(
                     element_hierarchy=[metadata_property],
                     properties_blob_key=properties_blob_key,
                     input_data=data,
-                    eager_termination=False,
+                    eager_termination=eager_termination,
                     element_counter_and_validity=element_counter_and_validity
                 )
-            elif variable_type == 'tabular':
+            else:
                 element_counter_and_validity = self._validate_tabular_element(
                     var_name=metadata_property,
                     properties_blob_key=properties_blob_key,
                     input_data=data,
-                    eager_termination=False,
+                    eager_termination=eager_termination,
                     element_counter_and_validity=element_counter_and_validity
                 )
 
@@ -969,12 +975,12 @@ class InputManager:
                          info_map)
             raise TypeError("Incorrect variable type. Expected types: `data: Dict[str, Any]`.")
 
-        metadata_properties_exists, metadata_key_error = self._metadata_properties_exists(
+        metadata_properties_exists, metadata_error = self._metadata_properties_exists(
             variable_name=variable_name,
             properties_blob_key=properties_blob_key)
 
         if not metadata_properties_exists:
-            raise metadata_key_error
+            raise metadata_error
 
         add_variable_success, add_variable_value_error = self._add_variable_to_pool(
             variable_name=variable_name,
@@ -1035,12 +1041,12 @@ class InputManager:
 
         data = {variable_name: data} if isinstance(data, List) else data
 
-        metadata_properties_exists, metadata_key_error = self._metadata_properties_exists(
+        metadata_properties_exists, metadata_error = self._metadata_properties_exists(
             variable_name=variable_name,
             properties_blob_key=properties_blob_key)
 
         if not metadata_properties_exists:
-            raise metadata_key_error
+            raise metadata_error
 
         add_variable_success, add_variable_value_error = self._add_variable_to_pool(
             variable_name=variable_name,
