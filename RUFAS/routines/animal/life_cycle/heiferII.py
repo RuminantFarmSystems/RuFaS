@@ -303,7 +303,7 @@ class HeiferII(HeiferI):
         # requirement of P from the ration (g) (A.1B-D.E.7)
         self.p_req = p_absorb / 0.664
 
-    def update(self, sim_day):  # flake8: noqa: C901
+    def update(self, sim_day):  # noqa: C901
         """
         Controls heifer's grow with average daily gain based on user's input
         until breeding start day. Here is the place to change growth rate with
@@ -313,6 +313,8 @@ class HeiferII(HeiferI):
         replacement stage determined based on gestion length and user input of
         replacement time. Culling for reproduction problem occur when heifer
         doesn't get pregnant for a long time.
+
+        # TODO: Refactor this method. Git issue #1038.
 
         Returns:
             cull_stage: culling for reproduction failure
@@ -853,7 +855,8 @@ class HeiferII(HeiferI):
         """
 
         if self.days_born == self._get_breeding_start_day():
-            self._set_up_hormone_schedule('heifers', self._get_user_defined_or_default_repro_sub_protocol(), self.days_born)
+            self._set_up_hormone_schedule('heifers', self._get_user_defined_or_default_repro_sub_protocol(),
+                                          self.days_born)
             self._TAI_conception_rate = self._get_user_defined_or_default_TAI_conception_rate()
 
         if self._hormone_schedule:
