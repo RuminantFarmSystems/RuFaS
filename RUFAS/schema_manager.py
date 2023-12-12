@@ -59,6 +59,7 @@ class SchemaManager:
         schema = {
             "title": title,
             "type": "boolean",
+            "format": "checkbox",
             "options": {
                 "grid_columns": 12,
                 "format": "select2",
@@ -164,7 +165,9 @@ class SchemaManager:
             schema["options"] = {}
             schema["options"]["infoText"] = description
 
-        keys = [key for key in input_properties.keys() if key != "type" and key != "description" and key != "default"]
+        ignored_keys = ["type", "description", "default"]
+        keys = [key for key in input_properties.keys() if key not in ignored_keys]
+
         for key in keys:
             sub_property = input_properties[key]
             schema_setup_method = SchemaManager.DATA_TYPE_TO_SCHEMA_SETUP_MAP[sub_property["type"]]
