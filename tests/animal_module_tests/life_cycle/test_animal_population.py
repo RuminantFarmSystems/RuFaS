@@ -16,6 +16,7 @@ from RUFAS.routines.animal.life_cycle.heiferIII import HeiferIII
 
 @pytest.fixture
 def mock_animal_population() -> AnimalPopulation:
+    """InputManager fixture"""
     return AnimalPopulation(calves=[],
                             heiferIs=[],
                             heiferIIs=[],
@@ -31,6 +32,7 @@ def mock_animal_population() -> AnimalPopulation:
     sys.maxsize
 ])
 def test_next_id(starting_animal_id: int, mock_animal_population: AnimalPopulation) -> None:
+    """Unit test for next_id()"""
     mock_animal_population.current_animal_id = starting_animal_id
 
     expected_id = starting_animal_id + 1
@@ -52,6 +54,7 @@ def test_get_animals(num_calf: int,
                      num_cow: int,
                      num_replacement: int,
                      mock_animal_population: AnimalPopulation) -> None:
+    """Unit test for get_animals()"""
     calves: List[Calf] = [mock.MagicMock(auto_spec=Calf)] * num_calf
     heiferIs: List[HeiferI] = [mock.MagicMock(auto_spec=HeiferI)] * num_heiferI
     heiferIIs: List[HeiferII] = [mock.MagicMock(auto_spec=HeiferII)] * num_heiferII
@@ -167,6 +170,7 @@ def test_get_herd_summary(num_calf: int,
                           num_cow: int,
                           num_replacement: int,
                           mock_animal_population: AnimalPopulation) -> None:
+    """Unit test for get_herd_summary()"""
     mock_calves = MockAnimals(num_animal=num_calf, animal_type=Calf, starting_id=0)
     mock_animal_population.calves = mock_calves.animals
 
@@ -225,6 +229,7 @@ def test_repr(num_calf: int,
               num_cow: int,
               num_replacement: int,
               mock_animal_population: AnimalPopulation) -> None:
+    """Unit test for __repr__()"""
     mock_calves = MockAnimals(num_animal=num_calf, animal_type=Calf, starting_id=0)
 
     mock_heiferIs = MockAnimals(num_animal=num_heiferI, animal_type=HeiferI, starting_id=mock_calves.current_max_id + 1)
@@ -271,6 +276,7 @@ def test_post_init(num_calf: int,
                    num_heiferIII: int,
                    num_cow: int,
                    num_replacement: int) -> None:
+    """Unit test for __post_init__()"""
     mock_calves = MockAnimals(num_animal=num_calf, animal_type=Calf, starting_id=0)
 
     mock_heiferIs = MockAnimals(num_animal=num_heiferI, animal_type=HeiferI, starting_id=mock_calves.current_max_id + 1)
