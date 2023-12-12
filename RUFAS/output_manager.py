@@ -1,5 +1,3 @@
-# !/usr/bin/env python3
-
 from copy import deepcopy
 from enum import Enum
 from pathlib import Path
