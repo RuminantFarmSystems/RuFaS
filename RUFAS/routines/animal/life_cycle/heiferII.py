@@ -303,7 +303,7 @@ class HeiferII(HeiferI):
         # requirement of P from the ration (g) (A.1B-D.E.7)
         self.p_req = p_absorb / 0.664
 
-    def update(self, sim_day):  # C901: noqa
+    def update(self, sim_day):  # flake8: noqa: C901
         """
         Controls heifer's grow with average daily gain based on user's input
         until breeding start day. Here is the place to change growth rate with
@@ -904,7 +904,8 @@ class HeiferII(HeiferI):
         """
 
         if self.days_born == self._get_breeding_start_day():
-            self._set_up_hormone_schedule('heifers', self._get_user_defined_or_default_repro_sub_protocol(), self.days_born)
+            self._set_up_hormone_schedule('heifers', self._get_user_defined_or_default_repro_sub_protocol(),
+                                          self.days_born)
 
         self._handle_synch_ed_hormone_delivery_and_set_estrus_day(sim_day)
 
