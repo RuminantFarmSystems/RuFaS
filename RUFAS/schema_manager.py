@@ -186,7 +186,7 @@ PROPERTIES_PATH: Path = Path("").joinpath("input", "metadata", "default_metadata
 
 
 def main() -> None:
-    """Routine that will update the """
+    """Routine that will update schemas for the Data Collection App."""
     schema_dir_path = Path("output").joinpath("schemas")
     keep_list = [".keep"]
     Utility.empty_dir(schema_dir_path, keep_list)
