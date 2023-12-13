@@ -87,6 +87,14 @@ tests.test\_report\_generator module
    :undoc-members:
    :show-inheritance:
 
+tests.test\_simulation\_engine module
+-------------------------------------
+
+.. automodule:: tests.test_simulation_engine
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 tests.test\_time module
 -----------------------
 
