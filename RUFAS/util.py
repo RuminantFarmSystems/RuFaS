@@ -1,4 +1,5 @@
 import json
+import re
 import shutil
 import sys
 from pathlib import Path
@@ -349,3 +350,35 @@ class Utility:
         for month, day_count in enumerate(cumulative_days_in_months):
             if day <= day_count:
                 return month + 1
+
+    @staticmethod
+    def filter_pool(data_pool: Dict[Any, Any], filter_patterns: List[str], filter_by_exclusion: bool) -> Dict[Any, Any]:
+        """
+        Returns a filtered data pool based on either inclusion or exclusion.
+
+        Parameters
+        ----------
+        data_pool : Dict[Any, Any]
+            The pool to be filtered.
+        filter_patterns : List[str]
+            A list of patterns by which to filter the pool.
+        filter_by_exclusion : bool
+            A flag indicating whether the data pool should be filtered by exclusion
+            or inclusion.
+
+        Returns
+        -------
+        Dict[Any, Any]
+            The filtered data pool.
+        """
+        if filter_by_exclusion:
+            return {
+                key: data_pool[key]
+                for key in data_pool.keys()
+                if not any(re.search(pattern, key) for pattern in filter_patterns)
+            }
+        return {
+                key: data_pool[key]
+                for key in data_pool.keys()
+                if any(re.search(pattern, key) for pattern in filter_patterns)
+            }

@@ -9,7 +9,6 @@ import datetime
 import json
 import os
 import pandas as pd
-import re
 from deprecated.sphinx import deprecated
 
 from RUFAS.util import Utility
@@ -723,21 +722,12 @@ class OutputManager(object):
                 f"{input_file_name} has exclude-keyword '{exclude_keyword}' at"
                 f" position {exclude_keyword_location}. Performing filtering by exclusion."
             )
-            filter_pattern_matches = {
-                key: self.variables_pool[key]
-                for key in self.variables_pool.keys()
-                if not any(re.match(pattern, key) for pattern in filter_patterns)
-            }
         else:
             filter_vars_msg = (
                 f"{input_file_name} does NOT contain exclude-keyword '{exclude_keyword}'"
                 f" at position {exclude_keyword_location}. Performing filtering by inclusion."
             )
-            filter_pattern_matches = {
-                key: self.variables_pool[key]
-                for key in self.variables_pool.keys()
-                if any(re.match(pattern, key) for pattern in filter_patterns)
-            }
+        filter_pattern_matches = Utility.filter_pool(self.variables_pool, filter_patterns, filter_by_exclusion)
         self.add_log("filtering_log", filter_vars_msg, info_map)
         filter_log_count_msg = (
             f"There were {len(filter_pattern_matches)} matches for the {len(filter_patterns)}"
