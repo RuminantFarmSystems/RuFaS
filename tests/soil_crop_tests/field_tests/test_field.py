@@ -53,6 +53,7 @@ def test_manage_field() -> None:
     mocked_time = MagicMock(Time)
     mocked_weather = MagicMock(CurrentDayConditions)
     setattr(mocked_weather, "daylength", 12)
+    setattr(mocked_weather, "rainfall", 3.0)
 
     field.manage_field(mocked_time, mocked_weather)
 
@@ -60,7 +61,7 @@ def test_manage_field() -> None:
     field._check_manure_application_schedule.assert_called_once_with(mocked_time)
     field._check_tillage_schedule.assert_called_once_with(mocked_time)
     field._execute_daily_processes.assert_called_once_with(mocked_weather, mocked_time)
-    field._assess_dormancy.assert_called_once_with(12)
+    field._assess_dormancy.assert_called_once_with(12, 3.0)
     field._check_crop_planting_schedule.assert_called_once_with(mocked_time)
     field._check_crop_harvest_schedule.assert_called_once_with(mocked_time, mocked_weather)
     field._remove_dead_crops.assert_called_once()
@@ -491,15 +492,19 @@ def test_start_dormancy(daylength: float, threshold_daylength: float) -> None:
     field = Field(manure_manager=MagicMock(ManureManager))
     field.field_data.dormancy_threshold_daylength = threshold_daylength
     field.crops = [crop]
+    rainfall = 10.3
 
     with patch("RUFAS.routines.field.crop.dormancy.Dormancy.enter_dormancy", new_callable=MagicMock) as dormancy, \
             patch("RUFAS.routines.field.crop.biomass_allocation.BiomassAllocation.partition_biomass",
-                  new_callable=MagicMock) as biomass:
-        field._assess_dormancy(daylength)
+                  new_callable=MagicMock) as biomass, \
+            patch("RUFAS.routines.field.soil.carbon_cycling.residue_partition.ResiduePartition.add_residue_to_pools") \
+            as add_residue:
+        field._assess_dormancy(daylength, rainfall)
 
     if daylength <= threshold_daylength:
         assert dormancy.call_count == 1
         assert biomass.call_count == 1
+        assert add_residue.call_count == 1
     else:
         dormancy.assert_not_called()
         biomass.assert_not_called()
