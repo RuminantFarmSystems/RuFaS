@@ -25,6 +25,22 @@ class SimulationEngine:
     The SimulationEngine class is responsible for orchestrating the entire simulation
     process for RuFaS. It manages the simulation's lifecycle, advancing time, executing daily
     and annual routines, and logging simulation progress.
+
+    Attributes
+    ----------
+    config : Config
+        The simulation configuration object that contains the simulation parameters.
+    weather : Weather
+        The weather object that contains the weather data.
+    time : Time
+        The time object that contains methods for accessing and manipulating the simulation time.
+    state : State
+        The state object that contains information about the current state of the simulation.
+
+    Methods
+    -------
+    simulate()
+        Execute the simulation process.
     """
 
     def __init__(self) -> None:
@@ -113,11 +129,11 @@ class SimulationEngine:
         Shows a rotating char on console to confirm simulation is alive.
 
         Parameters
-        ----
+        ----------
         day : int
             day of year
-        update_interval : int
-            the interval at which the char symbol is updated. Default is 50.
+        update_interval : int, optional, default=50
+            the interval at which the char symbol is updated. Default is 50 days.
         """
 
         chars = ['-', '\\', '|', '/']
