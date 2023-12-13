@@ -220,22 +220,16 @@
 <li class="toctree-l3"><a class="reference internal" href="#module-tests.test_misc">tests.test_misc module</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#tests.test_misc.DummyClass"><code class="docutils literal notranslate"><span class="pre">DummyClass</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#tests.test_misc.DummyNestedClass"><code class="docutils literal notranslate"><span class="pre">DummyNestedClass</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#tests.test_misc.patch_simulation_engine"><code class="docutils literal notranslate"><span class="pre">patch_simulation_engine()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#tests.test_misc.test_advance"><code class="docutils literal notranslate"><span class="pre">test_advance()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#tests.test_misc.test_advance_time"><code class="docutils literal notranslate"><span class="pre">test_advance_time()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#tests.test_misc.test_annual_mass_balance"><code class="docutils literal notranslate"><span class="pre">test_annual_mass_balance()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#tests.test_misc.test_annual_reset"><code class="docutils literal notranslate"><span class="pre">test_annual_reset()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#tests.test_misc.test_calc_sim_length"><code class="docutils literal notranslate"><span class="pre">test_calc_sim_length()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#tests.test_misc.test_daily_simulation"><code class="docutils literal notranslate"><span class="pre">test_daily_simulation()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#tests.test_misc.test_end_simulation"><code class="docutils literal notranslate"><span class="pre">test_end_simulation()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#tests.test_misc.test_end_year"><code class="docutils literal notranslate"><span class="pre">test_end_year()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#tests.test_misc.test_general_constants"><code class="docutils literal notranslate"><span class="pre">test_general_constants()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#tests.test_misc.test_init_simulation_engine"><code class="docutils literal notranslate"><span class="pre">test_init_simulation_engine()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#tests.test_misc.test_input_prompt"><code class="docutils literal notranslate"><span class="pre">test_input_prompt()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#tests.test_misc.test_is_leap_year"><code class="docutils literal notranslate"><span class="pre">test_is_leap_year()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#tests.test_misc.test_make_serializable_recursive"><code class="docutils literal notranslate"><span class="pre">test_make_serializable_recursive()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#tests.test_misc.test_run_simulation_main_loop"><code class="docutils literal notranslate"><span class="pre">test_run_simulation_main_loop()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#tests.test_misc.test_simulate"><code class="docutils literal notranslate"><span class="pre">test_simulate()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#tests.test_misc.test_to_str"><code class="docutils literal notranslate"><span class="pre">test_to_str()</span></code></a></li>
 </ul>
 </li>
@@ -326,6 +320,19 @@
 <li class="toctree-l4"><a class="reference internal" href="#tests.test_report_generator.test_sd_aggregator"><code class="docutils literal notranslate"><span class="pre">test_sd_aggregator()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#tests.test_report_generator.test_subtraction_aggregator"><code class="docutils literal notranslate"><span class="pre">test_subtraction_aggregator()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#tests.test_report_generator.test_sum_aggregator"><code class="docutils literal notranslate"><span class="pre">test_sum_aggregator()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#module-tests.test_simulation_engine">tests.test_simulation_engine module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#tests.test_simulation_engine.test_advance_time"><code class="docutils literal notranslate"><span class="pre">test_advance_time()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#tests.test_simulation_engine.test_annual_simulation"><code class="docutils literal notranslate"><span class="pre">test_annual_simulation()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#tests.test_simulation_engine.test_daily_simulation"><code class="docutils literal notranslate"><span class="pre">test_daily_simulation()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#tests.test_simulation_engine.test_initialize_simulation"><code class="docutils literal notranslate"><span class="pre">test_initialize_simulation()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#tests.test_simulation_engine.test_run_post_annual_routines"><code class="docutils literal notranslate"><span class="pre">test_run_post_annual_routines()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#tests.test_simulation_engine.test_run_pre_annual_routines"><code class="docutils literal notranslate"><span class="pre">test_run_pre_annual_routines()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#tests.test_simulation_engine.test_run_simulation_main_loop"><code class="docutils literal notranslate"><span class="pre">test_run_simulation_main_loop()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#tests.test_simulation_engine.test_simulate"><code class="docutils literal notranslate"><span class="pre">test_simulate()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#tests.test_simulation_engine.test_simulation_engine_init"><code class="docutils literal notranslate"><span class="pre">test_simulation_engine_init()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#tests.test_simulation_engine.test_visualize_sim_progress"><code class="docutils literal notranslate"><span class="pre">test_visualize_sim_progress()</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="#module-tests.test_time">tests.test_time module</a><ul>
@@ -2099,21 +2106,9 @@ _validate_json_element in file input_manager.py</p>
 </dd></dl>
 
 <dl class="py function">
-<dt class="sig sig-object py" id="tests.test_misc.patch_simulation_engine">
-<span class="sig-prename descclassname"><span class="pre">tests.test_misc.</span></span><span class="sig-name descname"><span class="pre">patch_simulation_engine</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mocker</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">MockerFixture</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="RUFAS.html#RUFAS.simulation_engine.SimulationEngine" title="RUFAS.simulation_engine.SimulationEngine"><span class="pre">SimulationEngine</span></a></span></span><a class="headerlink" href="#tests.test_misc.patch_simulation_engine" title="Link to this definition"></a></dt>
-<dd><p>Returns a mocked SimulationEngine</p>
-</dd></dl>
-
-<dl class="py function">
 <dt class="sig sig-object py" id="tests.test_misc.test_advance">
 <span class="sig-prename descclassname"><span class="pre">tests.test_misc.</span></span><span class="sig-name descname"><span class="pre">test_advance</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#tests.test_misc.test_advance" title="Link to this definition"></a></dt>
 <dd><p>Unit test for function advance in classes</p>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="tests.test_misc.test_advance_time">
-<span class="sig-prename descclassname"><span class="pre">tests.test_misc.</span></span><span class="sig-name descname"><span class="pre">test_advance_time</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">patch_simulation_engine</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.html#RUFAS.simulation_engine.SimulationEngine" title="RUFAS.simulation_engine.SimulationEngine"><span class="pre">SimulationEngine</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">mocker</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">MockerFixture</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#tests.test_misc.test_advance_time" title="Link to this definition"></a></dt>
-<dd><p>Unit test for function _advance_time in file RUFAS/simulation_engine.py</p>
 </dd></dl>
 
 <dl class="py function">
@@ -2135,12 +2130,6 @@ _validate_json_element in file input_manager.py</p>
 </dd></dl>
 
 <dl class="py function">
-<dt class="sig sig-object py" id="tests.test_misc.test_daily_simulation">
-<span class="sig-prename descclassname"><span class="pre">tests.test_misc.</span></span><span class="sig-name descname"><span class="pre">test_daily_simulation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">patch_simulation_engine</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.html#RUFAS.simulation_engine.SimulationEngine" title="RUFAS.simulation_engine.SimulationEngine"><span class="pre">SimulationEngine</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">mocker</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">MockerFixture</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#tests.test_misc.test_daily_simulation" title="Link to this definition"></a></dt>
-<dd><p>Unit test for function _daily_simulation in file RUFAS/simulation_engine.py</p>
-</dd></dl>
-
-<dl class="py function">
 <dt class="sig sig-object py" id="tests.test_misc.test_end_simulation">
 <span class="sig-prename descclassname"><span class="pre">tests.test_misc.</span></span><span class="sig-name descname"><span class="pre">test_end_simulation</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#tests.test_misc.test_end_simulation" title="Link to this definition"></a></dt>
 <dd><p>Unit test for function end_simulation in classes</p>
@@ -2159,12 +2148,6 @@ _validate_json_element in file input_manager.py</p>
 </dd></dl>
 
 <dl class="py function">
-<dt class="sig sig-object py" id="tests.test_misc.test_init_simulation_engine">
-<span class="sig-prename descclassname"><span class="pre">tests.test_misc.</span></span><span class="sig-name descname"><span class="pre">test_init_simulation_engine</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">patch_simulation_engine</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.html#RUFAS.simulation_engine.SimulationEngine" title="RUFAS.simulation_engine.SimulationEngine"><span class="pre">SimulationEngine</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">mocker</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">MockerFixture</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#tests.test_misc.test_init_simulation_engine" title="Link to this definition"></a></dt>
-<dd><p>Unit test for function __init__ in file RUFAS/simulation_engine.py</p>
-</dd></dl>
-
-<dl class="py function">
 <dt class="sig sig-object py" id="tests.test_misc.test_input_prompt">
 <span class="sig-prename descclassname"><span class="pre">tests.test_misc.</span></span><span class="sig-name descname"><span class="pre">test_input_prompt</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#tests.test_misc.test_input_prompt" title="Link to this definition"></a></dt>
 <dd><p>Unit test for function input_prompt in file user_prompt.py</p>
@@ -2180,18 +2163,6 @@ _validate_json_element in file input_manager.py</p>
 <dt class="sig sig-object py" id="tests.test_misc.test_make_serializable_recursive">
 <span class="sig-prename descclassname"><span class="pre">tests.test_misc.</span></span><span class="sig-name descname"><span class="pre">test_make_serializable_recursive</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_obj</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">object</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">depth</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_depth</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">expected_output</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">object</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mocker</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">MockerFixture</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#tests.test_misc.test_make_serializable_recursive" title="Link to this definition"></a></dt>
 <dd><p>Unit test for function _make_serializable() in file util.py</p>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="tests.test_misc.test_run_simulation_main_loop">
-<span class="sig-prename descclassname"><span class="pre">tests.test_misc.</span></span><span class="sig-name descname"><span class="pre">test_run_simulation_main_loop</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">patch_simulation_engine</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.html#RUFAS.simulation_engine.SimulationEngine" title="RUFAS.simulation_engine.SimulationEngine"><span class="pre">SimulationEngine</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#tests.test_misc.test_run_simulation_main_loop" title="Link to this definition"></a></dt>
-<dd><p>Unit test for function simulate in file RUFAS/simulation_engine.py</p>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="tests.test_misc.test_simulate">
-<span class="sig-prename descclassname"><span class="pre">tests.test_misc.</span></span><span class="sig-name descname"><span class="pre">test_simulate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">patch_simulation_engine</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.html#RUFAS.simulation_engine.SimulationEngine" title="RUFAS.simulation_engine.SimulationEngine"><span class="pre">SimulationEngine</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">mocker</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">MockerFixture</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#tests.test_misc.test_simulate" title="Link to this definition"></a></dt>
-<dd><p>Unit test for function simulate in file RUFAS/simulation_engine.py</p>
 </dd></dl>
 
 <dl class="py function">
@@ -2687,6 +2658,69 @@ function _filter_variables_pool in output_manager.py</p>
 <dt class="sig sig-object py" id="tests.test_report_generator.test_sum_aggregator">
 <span class="sig-prename descclassname"><span class="pre">tests.test_report_generator.</span></span><span class="sig-name descname"><span class="pre">test_sum_aggregator</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#tests.test_report_generator.test_sum_aggregator" title="Link to this definition"></a></dt>
 <dd></dd></dl>
+
+</section>
+<section id="module-tests.test_simulation_engine">
+<span id="tests-test-simulation-engine-module"></span><h2>tests.test_simulation_engine module<a class="headerlink" href="#module-tests.test_simulation_engine" title="Link to this heading"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="tests.test_simulation_engine.test_advance_time">
+<span class="sig-prename descclassname"><span class="pre">tests.test_simulation_engine.</span></span><span class="sig-name descname"><span class="pre">test_advance_time</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mocker</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">MockerFixture</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">print_day</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">initial_simulation_day</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">to_str_return_value</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">expected_simulation_day</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#tests.test_simulation_engine.test_advance_time" title="Link to this definition"></a></dt>
+<dd><p>Unit test for function _advance_time in file RUFAS/simulation_engine.py</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tests.test_simulation_engine.test_annual_simulation">
+<span class="sig-prename descclassname"><span class="pre">tests.test_simulation_engine.</span></span><span class="sig-name descname"><span class="pre">test_annual_simulation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mocker</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">MockerFixture</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end_year_side_effect</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">expected_day_count</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#tests.test_simulation_engine.test_annual_simulation" title="Link to this definition"></a></dt>
+<dd><p>Unit test for function _annual_simulation in file RUFAS/simulation_engine.py</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tests.test_simulation_engine.test_daily_simulation">
+<span class="sig-prename descclassname"><span class="pre">tests.test_simulation_engine.</span></span><span class="sig-name descname"><span class="pre">test_daily_simulation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mocker</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">MockerFixture</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#tests.test_simulation_engine.test_daily_simulation" title="Link to this definition"></a></dt>
+<dd><p>Unit test for function _daily_simulation in file RUFAS/simulation_engine.py</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tests.test_simulation_engine.test_initialize_simulation">
+<span class="sig-prename descclassname"><span class="pre">tests.test_simulation_engine.</span></span><span class="sig-name descname"><span class="pre">test_initialize_simulation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mocker</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">MockerFixture</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#tests.test_simulation_engine.test_initialize_simulation" title="Link to this definition"></a></dt>
+<dd><p>Unit test for function _initialize_simulation in file RUFAS/simulation_engine.py</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tests.test_simulation_engine.test_run_post_annual_routines">
+<span class="sig-prename descclassname"><span class="pre">tests.test_simulation_engine.</span></span><span class="sig-name descname"><span class="pre">test_run_post_annual_routines</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mocker</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">MockerFixture</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#tests.test_simulation_engine.test_run_post_annual_routines" title="Link to this definition"></a></dt>
+<dd><p>Unit test for function _run_post_annual_routines in file RUFAS/simulation_engine.py</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tests.test_simulation_engine.test_run_pre_annual_routines">
+<span class="sig-prename descclassname"><span class="pre">tests.test_simulation_engine.</span></span><span class="sig-name descname"><span class="pre">test_run_pre_annual_routines</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mocker</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">MockerFixture</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#tests.test_simulation_engine.test_run_pre_annual_routines" title="Link to this definition"></a></dt>
+<dd><p>Unit test for function _run_pre_annual_routines in file RUFAS/simulation_engine.py</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tests.test_simulation_engine.test_run_simulation_main_loop">
+<span class="sig-prename descclassname"><span class="pre">tests.test_simulation_engine.</span></span><span class="sig-name descname"><span class="pre">test_run_simulation_main_loop</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mocker</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">MockerFixture</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end_simulation_side_effect</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">expected_iterations</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#tests.test_simulation_engine.test_run_simulation_main_loop" title="Link to this definition"></a></dt>
+<dd><p>Unit test for function _run_simulation_main_loop in file RUFAS/simulation_engine.py</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tests.test_simulation_engine.test_simulate">
+<span class="sig-prename descclassname"><span class="pre">tests.test_simulation_engine.</span></span><span class="sig-name descname"><span class="pre">test_simulate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mocker</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">MockerFixture</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end_time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#tests.test_simulation_engine.test_simulate" title="Link to this definition"></a></dt>
+<dd><p>Unit test for function simulate in file RUFAS/simulation_engine.py</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tests.test_simulation_engine.test_simulation_engine_init">
+<span class="sig-prename descclassname"><span class="pre">tests.test_simulation_engine.</span></span><span class="sig-name descname"><span class="pre">test_simulation_engine_init</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mocker</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">MockerFixture</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#tests.test_simulation_engine.test_simulation_engine_init" title="Link to this definition"></a></dt>
+<dd><p>Unit test for the __init__ method in the SimulationEngine class.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tests.test_simulation_engine.test_visualize_sim_progress">
+<span class="sig-prename descclassname"><span class="pre">tests.test_simulation_engine.</span></span><span class="sig-name descname"><span class="pre">test_visualize_sim_progress</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mocker</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">MockerFixture</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">day</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">update_interval</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">expected_output</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">should_write</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#tests.test_simulation_engine.test_visualize_sim_progress" title="Link to this definition"></a></dt>
+<dd><p>Unit test for function _visualize_sim_progress in file RUFAS/simulation_engine.py</p>
+</dd></dl>
 
 </section>
 <section id="module-tests.test_time">
