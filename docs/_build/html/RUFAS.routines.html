@@ -1,27 +1,28 @@
 <!DOCTYPE html>
-<html class="writer-html5" lang="en" >
+<html class="writer-html5" lang="en" data-content_root="./">
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>RUFAS.routines package &mdash; Ruminant Farm Simulation (RuFaS)  documentation</title>
-      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=19f00094" />
+
+  
   <!--[if lt IE 9]>
     <script src="_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
-        <script src="_static/jquery.js"></script>
-        <script src="_static/underscore.js"></script>
-        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
-        <script src="_static/doctools.js"></script>
-        <script src="_static/sphinx_highlight.js"></script>
+        <script src="_static/jquery.js?v=5d32c60e"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="_static/documentation_options.js?v=5929fcd5"></script>
+        <script src="_static/doctools.js?v=888ff710"></script>
+        <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="RUFAS.routines.animal package" href="RUFAS.routines.animal.html" />
-    <link rel="prev" title="RUFAS.output_handler.reports package" href="RUFAS.output_handler.reports.html" /> 
+    <link rel="prev" title="RUFAS package" href="RUFAS.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -29,11 +30,15 @@
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-            <a href="index.html" class="icon icon-home"> Ruminant Farm Simulation (RuFaS)
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            Ruminant Farm Simulation (RuFaS)
           </a>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" />
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
     <input type="hidden" name="check_keywords" value="yes" />
     <input type="hidden" name="area" value="default" />
   </form>
@@ -44,23 +49,27 @@
 <li class="toctree-l1 current"><a class="reference internal" href="modules.html">GitHub</a><ul class="current">
 <li class="toctree-l2 current"><a class="reference internal" href="RUFAS.html">RUFAS package</a><ul class="current">
 <li class="toctree-l3 current"><a class="reference internal" href="RUFAS.html#subpackages">Subpackages</a><ul class="current">
-<li class="toctree-l4"><a class="reference internal" href="RUFAS.output_handler.html">RUFAS.output_handler package</a></li>
 <li class="toctree-l4 current"><a class="current reference internal" href="#">RUFAS.routines package</a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="RUFAS.html#submodules">Submodules</a></li>
-<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.classes">RUFAS.classes module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.database_reader">RUFAS.database_reader module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.config">RUFAS.config module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.current_day_conditions">RUFAS.current_day_conditions module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.errors">RUFAS.errors module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.general_constants">RUFAS.general_constants module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.graph_generator">RUFAS.graph_generator module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.input_manager">RUFAS.input_manager module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.output_manager">RUFAS.output_manager module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.report_generator">RUFAS.report_generator module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.scenario_manager">RUFAS.scenario_manager module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.simulation_engine">RUFAS.simulation_engine module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.user_prompt">RUFAS.user_prompt module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.state">RUFAS.state module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.time">RUFAS.time module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.util">RUFAS.util module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.weather">RUFAS.weather module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS">Module contents</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="fileReader.html">fileReader module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="main.html">main module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="setup.html">setup module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="tests.html">tests package</a></li>
@@ -81,7 +90,7 @@
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a href="index.html" class="icon icon-home"></a></li>
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
           <li class="breadcrumb-item"><a href="modules.html">GitHub</a></li>
           <li class="breadcrumb-item"><a href="RUFAS.html">RUFAS package</a></li>
       <li class="breadcrumb-item active">RUFAS.routines package</li>
@@ -95,42 +104,371 @@
            <div itemprop="articleBody">
              
   <section id="rufas-routines-package">
-<h1>RUFAS.routines package<a class="headerlink" href="#rufas-routines-package" title="Permalink to this heading"></a></h1>
+<h1>RUFAS.routines package<a class="headerlink" href="#rufas-routines-package" title="Link to this heading"></a></h1>
 <section id="subpackages">
-<h2>Subpackages<a class="headerlink" href="#subpackages" title="Permalink to this heading"></a></h2>
+<h2>Subpackages<a class="headerlink" href="#subpackages" title="Link to this heading"></a></h2>
 <div class="toctree-wrapper compound">
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="RUFAS.routines.animal.html">RUFAS.routines.animal package</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="RUFAS.routines.animal.html#submodules">Submodules</a></li>
-<li class="toctree-l2"><a class="reference internal" href="RUFAS.routines.animal.html#module-RUFAS.routines.animal.animal_management">RUFAS.routines.animal.animal_management module</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_management.AnimalManagement"><code class="docutils literal notranslate"><span class="pre">AnimalManager</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_management.AnimalManagement.allocate_all_pens"><code class="docutils literal notranslate"><span class="pre">AnimalManager.allocate_all_pens()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_management.AnimalManagement.annual_reset"><code class="docutils literal notranslate"><span class="pre">AnimalManager.annual_reset()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_management.AnimalManagement.avg_pen_dist"><code class="docutils literal notranslate"><span class="pre">AnimalManager.avg_pen_dist()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_management.AnimalManagement.calc_all_p_conc"><code class="docutils literal notranslate"><span class="pre">AnimalManager.calc_all_p_conc()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_management.AnimalManagement.calc_avg_growth"><code class="docutils literal notranslate"><span class="pre">AnimalManager.calc_avg_growth()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_management.AnimalManagement.calc_manure_excretion"><code class="docutils literal notranslate"><span class="pre">AnimalManager.calc_manure_excretion()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_management.AnimalManagement.calc_nutrient_rqmts"><code class="docutils literal notranslate"><span class="pre">AnimalManager.calc_nutrient_rqmts()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_management.AnimalManagement.calc_p_rqmts"><code class="docutils literal notranslate"><span class="pre">AnimalManager.calc_p_rqmts()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_management.AnimalManagement.calc_ration"><code class="docutils literal notranslate"><span class="pre">AnimalManager.calc_ration()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_management.AnimalManagement.clear_pens"><code class="docutils literal notranslate"><span class="pre">AnimalManager.clear_pens()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_management.AnimalManagement.daily_p_update"><code class="docutils literal notranslate"><span class="pre">AnimalManager.daily_p_update()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_management.AnimalManagement.daily_update_id_pen"><code class="docutils literal notranslate"><span class="pre">AnimalManager.daily_update_id_pen()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_management.AnimalManagement.daily_updates"><code class="docutils literal notranslate"><span class="pre">AnimalManager.daily_updates()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_management.AnimalManagement.end_ration_interval"><code class="docutils literal notranslate"><span class="pre">AnimalManager.end_ration_interval()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_management.AnimalManagement.fully_update_id_pen"><code class="docutils literal notranslate"><span class="pre">AnimalManager.fully_update_id_pen()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_management.AnimalManagement.gather_cow_class_history"><code class="docutils literal notranslate"><span class="pre">AnimalManager.gather_cow_class_history()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_management.AnimalManagement.generate_animal_output"><code class="docutils literal notranslate"><span class="pre">AnimalManager.generate_animal_output()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_management.AnimalManagement.get_animal_config"><code class="docutils literal notranslate"><span class="pre">AnimalManager.get_animal_config()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_management.AnimalManagement.get_initialize_db_summary"><code class="docutils literal notranslate"><span class="pre">AnimalManager.get_initialize_db_summary()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_management.AnimalManagement.get_life_cycle_output"><code class="docutils literal notranslate"><span class="pre">AnimalManager.get_life_cycle_output()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_management.AnimalManagement.init_animals"><code class="docutils literal notranslate"><span class="pre">AnimalManager.init_animals()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_management.AnimalManagement.init_nutrient_rqmts"><code class="docutils literal notranslate"><span class="pre">AnimalManager.init_nutrient_rqmts()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_management.AnimalManagement.init_pens"><code class="docutils literal notranslate"><span class="pre">AnimalManager.init_pens()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_management.AnimalManagement.record_pen_history"><code class="docutils literal notranslate"><span class="pre">AnimalManager.record_pen_history()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="RUFAS.routines.animal.html#subpackages">Subpackages</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.routines.animal.life_cycle.html">RUFAS.routines.animal.life_cycle package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.life_cycle.html#submodules">Submodules</a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.life_cycle.html#module-RUFAS.routines.animal.life_cycle.animal_base">RUFAS.routines.animal.life_cycle.animal_base module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.life_cycle.html#module-RUFAS.routines.animal.life_cycle.animal_constants">RUFAS.routines.animal.life_cycle.animal_constants module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.life_cycle.html#module-RUFAS.routines.animal.life_cycle.animal_events">RUFAS.routines.animal.life_cycle.animal_events module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.life_cycle.html#module-RUFAS.routines.animal.life_cycle.animal_initialization">RUFAS.routines.animal.life_cycle.animal_initialization module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.life_cycle.html#module-RUFAS.routines.animal.life_cycle.body_weight_history">RUFAS.routines.animal.life_cycle.body_weight_history module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.life_cycle.html#module-RUFAS.routines.animal.life_cycle.calf">RUFAS.routines.animal.life_cycle.calf module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.life_cycle.html#module-RUFAS.routines.animal.life_cycle.cow">RUFAS.routines.animal.life_cycle.cow module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.life_cycle.html#module-RUFAS.routines.animal.life_cycle.heiferI">RUFAS.routines.animal.life_cycle.heiferI module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.life_cycle.html#module-RUFAS.routines.animal.life_cycle.heiferII">RUFAS.routines.animal.life_cycle.heiferII module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.life_cycle.html#module-RUFAS.routines.animal.life_cycle.heiferIII">RUFAS.routines.animal.life_cycle.heiferIII module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.life_cycle.html#module-RUFAS.routines.animal.life_cycle.life_cycle">RUFAS.routines.animal.life_cycle.life_cycle module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.life_cycle.html#module-RUFAS.routines.animal.life_cycle.pen_history">RUFAS.routines.animal.life_cycle.pen_history module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.life_cycle.html#module-RUFAS.routines.animal.life_cycle">Module contents</a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_management.daily_animal_routine"><code class="docutils literal notranslate"><span class="pre">daily_animal_routine()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.routines.animal.manure.html">RUFAS.routines.animal.manure package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.manure.html#submodules">Submodules</a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.manure.html#module-RUFAS.routines.animal.manure.calf_manure_excretion">RUFAS.routines.animal.manure.calf_manure_excretion module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.manure.html#module-RUFAS.routines.animal.manure.dry_cow_manure_excretion">RUFAS.routines.animal.manure.dry_cow_manure_excretion module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.manure.html#module-RUFAS.routines.animal.manure.general_manure">RUFAS.routines.animal.manure.general_manure module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.manure.html#module-RUFAS.routines.animal.manure.growing_heifer_manure_excretion">RUFAS.routines.animal.manure.growing_heifer_manure_excretion module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.manure.html#module-RUFAS.routines.animal.manure.lactating_cow_manure_excretion">RUFAS.routines.animal.manure.lactating_cow_manure_excretion module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.manure.html#module-RUFAS.routines.animal.manure.methane_mitigation">RUFAS.routines.animal.manure.methane_mitigation module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.manure.html#module-RUFAS.routines.animal.manure">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.routines.animal.ration.html">RUFAS.routines.animal.ration package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.ration.html#submodules">Submodules</a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.ration.html#module-RUFAS.routines.animal.ration.animal_requirements">RUFAS.routines.animal.ration.animal_requirements module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.ration.html#module-RUFAS.routines.animal.ration.calf_ration">RUFAS.routines.animal.ration.calf_ration module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.ration.html#module-RUFAS.routines.animal.ration.ration_config">RUFAS.routines.animal.ration.ration_config module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.ration.html#module-RUFAS.routines.animal.ration.ration_driver">RUFAS.routines.animal.ration.ration_driver module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.ration.html#module-RUFAS.routines.animal.ration.ration_optimizer">RUFAS.routines.animal.ration.ration_optimizer module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.ration.html#module-RUFAS.routines.animal.ration.user_defined_ration">RUFAS.routines.animal.ration.user_defined_ration module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.ration.html#module-RUFAS.routines.animal.ration">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="RUFAS.routines.animal.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="RUFAS.routines.animal.html#module-RUFAS.routines.animal.animal_combinations">RUFAS.routines.animal.animal_combinations module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="RUFAS.routines.animal.html#module-RUFAS.routines.animal.animal_grouping_scenarios">RUFAS.routines.animal.animal_grouping_scenarios module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_grouping_scenarios.AnimalGroupingScenario"><code class="docutils literal notranslate"><span class="pre">AnimalGroupingScenario</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_grouping_scenarios.AnimalGroupingScenario.CALF__GROWING_AND_CLOSE_UP__LACCOW"><code class="docutils literal notranslate"><span class="pre">AnimalGroupingScenario.CALF__GROWING_AND_CLOSE_UP__LACCOW</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_grouping_scenarios.AnimalGroupingScenario.CALF__GROWING__CLOSE_UP__LACCOW"><code class="docutils literal notranslate"><span class="pre">AnimalGroupingScenario.CALF__GROWING__CLOSE_UP__LACCOW</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_grouping_scenarios.AnimalGroupingScenario.find_animal_combination"><code class="docutils literal notranslate"><span class="pre">AnimalGroupingScenario.find_animal_combination()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_grouping_scenarios.AnimalGroupingScenario.get_animal_type"><code class="docutils literal notranslate"><span class="pre">AnimalGroupingScenario.get_animal_type()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="RUFAS.routines.animal.html#module-RUFAS.routines.animal.animal_manager">RUFAS.routines.animal.animal_manager module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_manager.AnimalManager"><code class="docutils literal notranslate"><span class="pre">AnimalManager</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_manager.AnimalManager.DEFAULT_NUM_STALLS_BY_COMBINATION"><code class="docutils literal notranslate"><span class="pre">AnimalManager.DEFAULT_NUM_STALLS_BY_COMBINATION</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_manager.AnimalManager.allocate_animals_to_pens"><code class="docutils literal notranslate"><span class="pre">AnimalManager.allocate_animals_to_pens()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_manager.AnimalManager.animals_by_type"><code class="docutils literal notranslate"><span class="pre">AnimalManager.animals_by_type</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_manager.AnimalManager.avg_pen_dist"><code class="docutils literal notranslate"><span class="pre">AnimalManager.avg_pen_dist()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_manager.AnimalManager.calc_avg_growth"><code class="docutils literal notranslate"><span class="pre">AnimalManager.calc_avg_growth()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_manager.AnimalManager.calc_manure_excretion"><code class="docutils literal notranslate"><span class="pre">AnimalManager.calc_manure_excretion()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_manager.AnimalManager.calc_nutrient_rqmts"><code class="docutils literal notranslate"><span class="pre">AnimalManager.calc_nutrient_rqmts()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_manager.AnimalManager.calc_p_rqmts"><code class="docutils literal notranslate"><span class="pre">AnimalManager.calc_p_rqmts()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_manager.AnimalManager.calculate_pen_rations"><code class="docutils literal notranslate"><span class="pre">AnimalManager.calculate_pen_rations()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_manager.AnimalManager.clear_pens"><code class="docutils literal notranslate"><span class="pre">AnimalManager.clear_pens()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_manager.AnimalManager.collect_manure_excretions_output_data"><code class="docutils literal notranslate"><span class="pre">AnimalManager.collect_manure_excretions_output_data()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_manager.AnimalManager.daily_p_update"><code class="docutils literal notranslate"><span class="pre">AnimalManager.daily_p_update()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_manager.AnimalManager.daily_update_id_map"><code class="docutils literal notranslate"><span class="pre">AnimalManager.daily_update_id_map()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_manager.AnimalManager.daily_updates"><code class="docutils literal notranslate"><span class="pre">AnimalManager.daily_updates()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_manager.AnimalManager.end_ration_interval"><code class="docutils literal notranslate"><span class="pre">AnimalManager.end_ration_interval()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_manager.AnimalManager.execute_allocation_plan"><code class="docutils literal notranslate"><span class="pre">AnimalManager.execute_allocation_plan()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_manager.AnimalManager.fully_update_animal_to_pen_id_map"><code class="docutils literal notranslate"><span class="pre">AnimalManager.fully_update_animal_to_pen_id_map()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_manager.AnimalManager.gather_pen_history"><code class="docutils literal notranslate"><span class="pre">AnimalManager.gather_pen_history()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_manager.AnimalManager.get_animal_config"><code class="docutils literal notranslate"><span class="pre">AnimalManager.get_animal_config()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_manager.AnimalManager.get_initialize_db_summary"><code class="docutils literal notranslate"><span class="pre">AnimalManager.get_initialize_db_summary()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_manager.AnimalManager.init_animals"><code class="docutils literal notranslate"><span class="pre">AnimalManager.init_animals()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_manager.AnimalManager.init_nutrient_rqmts"><code class="docutils literal notranslate"><span class="pre">AnimalManager.init_nutrient_rqmts()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_manager.AnimalManager.init_pens"><code class="docutils literal notranslate"><span class="pre">AnimalManager.init_pens()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_manager.AnimalManager.plan_animal_allocation"><code class="docutils literal notranslate"><span class="pre">AnimalManager.plan_animal_allocation()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_manager.AnimalManager.record_pen_history"><code class="docutils literal notranslate"><span class="pre">AnimalManager.record_pen_history()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_manager.AnimalManager.remove_animals_from_herd"><code class="docutils literal notranslate"><span class="pre">AnimalManager.remove_animals_from_herd()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_manager.AnimalManager.reset_milk_production_reduction"><code class="docutils literal notranslate"><span class="pre">AnimalManager.reset_milk_production_reduction()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_manager.AnimalManager.set_animal_grouping_scenario"><code class="docutils literal notranslate"><span class="pre">AnimalManager.set_animal_grouping_scenario()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_manager.AnimalManager.sum_daily_milk"><code class="docutils literal notranslate"><span class="pre">AnimalManager.sum_daily_milk()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_manager.AnimalManager.track_former_pen_population"><code class="docutils literal notranslate"><span class="pre">AnimalManager.track_former_pen_population()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="RUFAS.routines.animal.html#module-RUFAS.routines.animal.animal_module_constants">RUFAS.routines.animal.animal_module_constants module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_module_constants.AnimalModuleConstants"><code class="docutils literal notranslate"><span class="pre">AnimalModuleConstants</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_module_constants.AnimalModuleConstants.DAILY_MILK_VARIATION_MEAN"><code class="docutils literal notranslate"><span class="pre">AnimalModuleConstants.DAILY_MILK_VARIATION_MEAN</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_module_constants.AnimalModuleConstants.DAILY_MILK_VARIATION_STD_DEV"><code class="docutils literal notranslate"><span class="pre">AnimalModuleConstants.DAILY_MILK_VARIATION_STD_DEV</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_module_constants.AnimalModuleConstants.DEFAULT_BEDDING_TYPE"><code class="docutils literal notranslate"><span class="pre">AnimalModuleConstants.DEFAULT_BEDDING_TYPE</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_module_constants.AnimalModuleConstants.DEFAULT_HOUSING_TYPE"><code class="docutils literal notranslate"><span class="pre">AnimalModuleConstants.DEFAULT_HOUSING_TYPE</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_module_constants.AnimalModuleConstants.DEFAULT_MANURE_HANDLER"><code class="docutils literal notranslate"><span class="pre">AnimalModuleConstants.DEFAULT_MANURE_HANDLER</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_module_constants.AnimalModuleConstants.DEFAULT_MANURE_SEPARATOR"><code class="docutils literal notranslate"><span class="pre">AnimalModuleConstants.DEFAULT_MANURE_SEPARATOR</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_module_constants.AnimalModuleConstants.DEFAULT_MANURE_STORAGE"><code class="docutils literal notranslate"><span class="pre">AnimalModuleConstants.DEFAULT_MANURE_STORAGE</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_module_constants.AnimalModuleConstants.DEFAULT_MAX_STOCKING_DENSITY"><code class="docutils literal notranslate"><span class="pre">AnimalModuleConstants.DEFAULT_MAX_STOCKING_DENSITY</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_module_constants.AnimalModuleConstants.DEFAULT_NUM_STALLS"><code class="docutils literal notranslate"><span class="pre">AnimalModuleConstants.DEFAULT_NUM_STALLS</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_module_constants.AnimalModuleConstants.DEFAULT_NUM_STALLS_FOR_CALF_PEN"><code class="docutils literal notranslate"><span class="pre">AnimalModuleConstants.DEFAULT_NUM_STALLS_FOR_CALF_PEN</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_module_constants.AnimalModuleConstants.DEFAULT_NUM_STALLS_FOR_CLOSE_UP_PEN"><code class="docutils literal notranslate"><span class="pre">AnimalModuleConstants.DEFAULT_NUM_STALLS_FOR_CLOSE_UP_PEN</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_module_constants.AnimalModuleConstants.DEFAULT_NUM_STALLS_FOR_GROWING_AND_CLOSE_UP_PEN"><code class="docutils literal notranslate"><span class="pre">AnimalModuleConstants.DEFAULT_NUM_STALLS_FOR_GROWING_AND_CLOSE_UP_PEN</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_module_constants.AnimalModuleConstants.DEFAULT_NUM_STALLS_FOR_GROWING_PEN"><code class="docutils literal notranslate"><span class="pre">AnimalModuleConstants.DEFAULT_NUM_STALLS_FOR_GROWING_PEN</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_module_constants.AnimalModuleConstants.DEFAULT_NUM_STALLS_FOR_LAC_COW_PEN"><code class="docutils literal notranslate"><span class="pre">AnimalModuleConstants.DEFAULT_NUM_STALLS_FOR_LAC_COW_PEN</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_module_constants.AnimalModuleConstants.DEFAULT_PEN_TYPE"><code class="docutils literal notranslate"><span class="pre">AnimalModuleConstants.DEFAULT_PEN_TYPE</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_module_constants.AnimalModuleConstants.DMI_CONSTRAINT_PERCENT"><code class="docutils literal notranslate"><span class="pre">AnimalModuleConstants.DMI_CONSTRAINT_PERCENT</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_module_constants.AnimalModuleConstants.HORIZONTAL_DIST_TO_MILKING_PARLOR"><code class="docutils literal notranslate"><span class="pre">AnimalModuleConstants.HORIZONTAL_DIST_TO_MILKING_PARLOR</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_module_constants.AnimalModuleConstants.MILK_CRUDE_PROTEIN"><code class="docutils literal notranslate"><span class="pre">AnimalModuleConstants.MILK_CRUDE_PROTEIN</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_module_constants.AnimalModuleConstants.MILK_LACTOSE"><code class="docutils literal notranslate"><span class="pre">AnimalModuleConstants.MILK_LACTOSE</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_module_constants.AnimalModuleConstants.MILK_REDUCTION_KG"><code class="docutils literal notranslate"><span class="pre">AnimalModuleConstants.MILK_REDUCTION_KG</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_module_constants.AnimalModuleConstants.MILK_TRUE_PROTEIN"><code class="docutils literal notranslate"><span class="pre">AnimalModuleConstants.MILK_TRUE_PROTEIN</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_module_constants.AnimalModuleConstants.MINIMUM_CALCIUM"><code class="docutils literal notranslate"><span class="pre">AnimalModuleConstants.MINIMUM_CALCIUM</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_module_constants.AnimalModuleConstants.MINIMUM_DMI"><code class="docutils literal notranslate"><span class="pre">AnimalModuleConstants.MINIMUM_DMI</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_module_constants.AnimalModuleConstants.MINIMUM_DMI_PERCENTAGE"><code class="docutils literal notranslate"><span class="pre">AnimalModuleConstants.MINIMUM_DMI_PERCENTAGE</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_module_constants.AnimalModuleConstants.MINIMUM_PHOSPHORUS"><code class="docutils literal notranslate"><span class="pre">AnimalModuleConstants.MINIMUM_PHOSPHORUS</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_module_constants.AnimalModuleConstants.MONENSIN_CP_LOWER_BOUND"><code class="docutils literal notranslate"><span class="pre">AnimalModuleConstants.MONENSIN_CP_LOWER_BOUND</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_module_constants.AnimalModuleConstants.MONENSIN_CP_UPPER_BOUND"><code class="docutils literal notranslate"><span class="pre">AnimalModuleConstants.MONENSIN_CP_UPPER_BOUND</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_module_constants.AnimalModuleConstants.URINE_UREA_NITROGEN_CONCENTRATION_LOWER_BOUND"><code class="docutils literal notranslate"><span class="pre">AnimalModuleConstants.URINE_UREA_NITROGEN_CONCENTRATION_LOWER_BOUND</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_module_constants.AnimalModuleConstants.URINE_UREA_NITROGEN_CONCENTRATION_UPPER_BOUND"><code class="docutils literal notranslate"><span class="pre">AnimalModuleConstants.URINE_UREA_NITROGEN_CONCENTRATION_UPPER_BOUND</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_module_constants.AnimalModuleConstants.VERTICAL_DIST_TO_MILKING_PARLOR"><code class="docutils literal notranslate"><span class="pre">AnimalModuleConstants.VERTICAL_DIST_TO_MILKING_PARLOR</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="RUFAS.routines.animal.html#module-RUFAS.routines.animal.animal_module_reporter">RUFAS.routines.animal.animal_module_reporter module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_module_reporter.AnimalModuleReporter"><code class="docutils literal notranslate"><span class="pre">AnimalModuleReporter</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_module_reporter.AnimalModuleReporter.report_305d_milk"><code class="docutils literal notranslate"><span class="pre">AnimalModuleReporter.report_305d_milk()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_module_reporter.AnimalModuleReporter.report_animal_module_manure"><code class="docutils literal notranslate"><span class="pre">AnimalModuleReporter.report_animal_module_manure()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_module_reporter.AnimalModuleReporter.report_daily_animal_population"><code class="docutils literal notranslate"><span class="pre">AnimalModuleReporter.report_daily_animal_population()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_module_reporter.AnimalModuleReporter.report_daily_ration"><code class="docutils literal notranslate"><span class="pre">AnimalModuleReporter.report_daily_ration()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_module_reporter.AnimalModuleReporter.report_daily_reports"><code class="docutils literal notranslate"><span class="pre">AnimalModuleReporter.report_daily_reports()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_module_reporter.AnimalModuleReporter.report_end_of_simulation"><code class="docutils literal notranslate"><span class="pre">AnimalModuleReporter.report_end_of_simulation()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_module_reporter.AnimalModuleReporter.report_life_cycle_manager_data"><code class="docutils literal notranslate"><span class="pre">AnimalModuleReporter.report_life_cycle_manager_data()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_module_reporter.AnimalModuleReporter.report_milk"><code class="docutils literal notranslate"><span class="pre">AnimalModuleReporter.report_milk()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_module_reporter.AnimalModuleReporter.report_pen_manure"><code class="docutils literal notranslate"><span class="pre">AnimalModuleReporter.report_pen_manure()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_module_reporter.AnimalModuleReporter.report_pen_manure_properties"><code class="docutils literal notranslate"><span class="pre">AnimalModuleReporter.report_pen_manure_properties()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_module_reporter.AnimalModuleReporter.report_ration_interval_data"><code class="docutils literal notranslate"><span class="pre">AnimalModuleReporter.report_ration_interval_data()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_module_reporter.AnimalModuleReporter.report_sold_animal_information"><code class="docutils literal notranslate"><span class="pre">AnimalModuleReporter.report_sold_animal_information()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="RUFAS.routines.animal.html#module-RUFAS.routines.animal.animal_typed_dicts">RUFAS.routines.animal.animal_typed_dicts module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_typed_dicts.AnimalBaseInitArgsTypedDict"><code class="docutils literal notranslate"><span class="pre">AnimalBaseInitArgsTypedDict</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_typed_dicts.AnimalBaseInitArgsTypedDict.birth_date"><code class="docutils literal notranslate"><span class="pre">AnimalBaseInitArgsTypedDict.birth_date</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_typed_dicts.AnimalBaseInitArgsTypedDict.birth_weight"><code class="docutils literal notranslate"><span class="pre">AnimalBaseInitArgsTypedDict.birth_weight</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_typed_dicts.AnimalBaseInitArgsTypedDict.body_weight_history"><code class="docutils literal notranslate"><span class="pre">AnimalBaseInitArgsTypedDict.body_weight_history</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_typed_dicts.AnimalBaseInitArgsTypedDict.breed"><code class="docutils literal notranslate"><span class="pre">AnimalBaseInitArgsTypedDict.breed</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_typed_dicts.AnimalBaseInitArgsTypedDict.calf_birth_weight"><code class="docutils literal notranslate"><span class="pre">AnimalBaseInitArgsTypedDict.calf_birth_weight</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_typed_dicts.AnimalBaseInitArgsTypedDict.conceptus_weight"><code class="docutils literal notranslate"><span class="pre">AnimalBaseInitArgsTypedDict.conceptus_weight</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_typed_dicts.AnimalBaseInitArgsTypedDict.days_born"><code class="docutils literal notranslate"><span class="pre">AnimalBaseInitArgsTypedDict.days_born</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_typed_dicts.AnimalBaseInitArgsTypedDict.id"><code class="docutils literal notranslate"><span class="pre">AnimalBaseInitArgsTypedDict.id</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_typed_dicts.AnimalBaseInitArgsTypedDict.p_init"><code class="docutils literal notranslate"><span class="pre">AnimalBaseInitArgsTypedDict.p_init</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_typed_dicts.AnimalBaseInitArgsTypedDict.pen_history"><code class="docutils literal notranslate"><span class="pre">AnimalBaseInitArgsTypedDict.pen_history</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_typed_dicts.AnimalConfigTypedDict"><code class="docutils literal notranslate"><span class="pre">AnimalConfigTypedDict</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_typed_dicts.AnimalConfigTypedDict.ED_related"><code class="docutils literal notranslate"><span class="pre">AnimalConfigTypedDict.ED_related</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_typed_dicts.AnimalConfigTypedDict.TAI_conception_rate_h"><code class="docutils literal notranslate"><span class="pre">AnimalConfigTypedDict.TAI_conception_rate_h</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_typed_dicts.AnimalConfigTypedDict.TAI_related"><code class="docutils literal notranslate"><span class="pre">AnimalConfigTypedDict.TAI_related</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_typed_dicts.AnimalConfigTypedDict.avg_estrus_cycle_after_pgf"><code class="docutils literal notranslate"><span class="pre">AnimalConfigTypedDict.avg_estrus_cycle_after_pgf</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_typed_dicts.AnimalConfigTypedDict.avg_estrus_cycle_cow"><code class="docutils literal notranslate"><span class="pre">AnimalConfigTypedDict.avg_estrus_cycle_cow</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_typed_dicts.AnimalConfigTypedDict.avg_estrus_cycle_heifer"><code class="docutils literal notranslate"><span class="pre">AnimalConfigTypedDict.avg_estrus_cycle_heifer</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_typed_dicts.AnimalConfigTypedDict.avg_estrus_cycle_return"><code class="docutils literal notranslate"><span class="pre">AnimalConfigTypedDict.avg_estrus_cycle_return</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_typed_dicts.AnimalConfigTypedDict.avg_gestation_len"><code class="docutils literal notranslate"><span class="pre">AnimalConfigTypedDict.avg_gestation_len</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_typed_dicts.AnimalConfigTypedDict.birth_weight_avg_ho"><code class="docutils literal notranslate"><span class="pre">AnimalConfigTypedDict.birth_weight_avg_ho</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_typed_dicts.AnimalConfigTypedDict.birth_weight_avg_je"><code class="docutils literal notranslate"><span class="pre">AnimalConfigTypedDict.birth_weight_avg_je</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_typed_dicts.AnimalConfigTypedDict.birth_weight_std_ho"><code class="docutils literal notranslate"><span class="pre">AnimalConfigTypedDict.birth_weight_std_ho</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_typed_dicts.AnimalConfigTypedDict.birth_weight_std_je"><code class="docutils literal notranslate"><span class="pre">AnimalConfigTypedDict.birth_weight_std_je</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_typed_dicts.AnimalConfigTypedDict.breeding_start_day_h"><code class="docutils literal notranslate"><span class="pre">AnimalConfigTypedDict.breeding_start_day_h</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_typed_dicts.AnimalConfigTypedDict.calving_interval"><code class="docutils literal notranslate"><span class="pre">AnimalConfigTypedDict.calving_interval</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_typed_dicts.AnimalConfigTypedDict.conception_rate_decrease"><code class="docutils literal notranslate"><span class="pre">AnimalConfigTypedDict.conception_rate_decrease</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_typed_dicts.AnimalConfigTypedDict.cosynch5d_conception_rate"><code class="docutils literal notranslate"><span class="pre">AnimalConfigTypedDict.cosynch5d_conception_rate</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_typed_dicts.AnimalConfigTypedDict.cosynch72_conception_rate"><code class="docutils literal notranslate"><span class="pre">AnimalConfigTypedDict.cosynch72_conception_rate</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_typed_dicts.AnimalConfigTypedDict.cow_TAI_protocol"><code class="docutils literal notranslate"><span class="pre">AnimalConfigTypedDict.cow_TAI_protocol</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_typed_dicts.AnimalConfigTypedDict.cow_presynch_protocol"><code class="docutils literal notranslate"><span class="pre">AnimalConfigTypedDict.cow_presynch_protocol</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_typed_dicts.AnimalConfigTypedDict.cow_repro_method"><code class="docutils literal notranslate"><span class="pre">AnimalConfigTypedDict.cow_repro_method</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_typed_dicts.AnimalConfigTypedDict.cow_resynch_protocol"><code class="docutils literal notranslate"><span class="pre">AnimalConfigTypedDict.cow_resynch_protocol</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_typed_dicts.AnimalConfigTypedDict.cow_times_milked_per_day"><code class="docutils literal notranslate"><span class="pre">AnimalConfigTypedDict.cow_times_milked_per_day</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_typed_dicts.AnimalConfigTypedDict.cow_user_defined_tai_cr"><code class="docutils literal notranslate"><span class="pre">AnimalConfigTypedDict.cow_user_defined_tai_cr</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_typed_dicts.AnimalConfigTypedDict.cull_day_count"><code class="docutils literal notranslate"><span class="pre">AnimalConfigTypedDict.cull_day_count</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_typed_dicts.AnimalConfigTypedDict.cull_milk_production"><code class="docutils literal notranslate"><span class="pre">AnimalConfigTypedDict.cull_milk_production</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_typed_dicts.AnimalConfigTypedDict.days_in_preg_when_dry"><code class="docutils literal notranslate"><span class="pre">AnimalConfigTypedDict.days_in_preg_when_dry</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_typed_dicts.AnimalConfigTypedDict.death_cull_prob"><code class="docutils literal notranslate"><span class="pre">AnimalConfigTypedDict.death_cull_prob</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_typed_dicts.AnimalConfigTypedDict.disease_cull_prob"><code class="docutils literal notranslate"><span class="pre">AnimalConfigTypedDict.disease_cull_prob</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_typed_dicts.AnimalConfigTypedDict.do_not_breed_time"><code class="docutils literal notranslate"><span class="pre">AnimalConfigTypedDict.do_not_breed_time</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_typed_dicts.AnimalConfigTypedDict.estrus_conception_rate"><code class="docutils literal notranslate"><span class="pre">AnimalConfigTypedDict.estrus_conception_rate</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_typed_dicts.AnimalConfigTypedDict.estrus_conception_rate_h"><code class="docutils literal notranslate"><span class="pre">AnimalConfigTypedDict.estrus_conception_rate_h</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_typed_dicts.AnimalConfigTypedDict.estrus_detection_rate"><code class="docutils literal notranslate"><span class="pre">AnimalConfigTypedDict.estrus_detection_rate</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_typed_dicts.AnimalConfigTypedDict.estrus_detection_rate_h"><code class="docutils literal notranslate"><span class="pre">AnimalConfigTypedDict.estrus_detection_rate_h</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_typed_dicts.AnimalConfigTypedDict.estrus_detection_rate_h_synch"><code class="docutils literal notranslate"><span class="pre">AnimalConfigTypedDict.estrus_detection_rate_h_synch</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_typed_dicts.AnimalConfigTypedDict.estrus_insemination_rate"><code class="docutils literal notranslate"><span class="pre">AnimalConfigTypedDict.estrus_insemination_rate</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_typed_dicts.AnimalConfigTypedDict.estrus_insemination_rate_h"><code class="docutils literal notranslate"><span class="pre">AnimalConfigTypedDict.estrus_insemination_rate_h</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_typed_dicts.AnimalConfigTypedDict.feet_leg_cull_prob"><code class="docutils literal notranslate"><span class="pre">AnimalConfigTypedDict.feet_leg_cull_prob</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_typed_dicts.AnimalConfigTypedDict.heifer_TAI_protocol"><code class="docutils literal notranslate"><span class="pre">AnimalConfigTypedDict.heifer_TAI_protocol</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_typed_dicts.AnimalConfigTypedDict.heifer_repro_cull_time"><code class="docutils literal notranslate"><span class="pre">AnimalConfigTypedDict.heifer_repro_cull_time</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_typed_dicts.AnimalConfigTypedDict.heifer_repro_method"><code class="docutils literal notranslate"><span class="pre">AnimalConfigTypedDict.heifer_repro_method</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_typed_dicts.AnimalConfigTypedDict.heifer_synchED_protocol"><code class="docutils literal notranslate"><span class="pre">AnimalConfigTypedDict.heifer_synchED_protocol</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_typed_dicts.AnimalConfigTypedDict.heifer_user_defined_tai_cr"><code class="docutils literal notranslate"><span class="pre">AnimalConfigTypedDict.heifer_user_defined_tai_cr</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_typed_dicts.AnimalConfigTypedDict.injury_cull_prob"><code class="docutils literal notranslate"><span class="pre">AnimalConfigTypedDict.injury_cull_prob</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_typed_dicts.AnimalConfigTypedDict.keep_female_calf_rate"><code class="docutils literal notranslate"><span class="pre">AnimalConfigTypedDict.keep_female_calf_rate</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_typed_dicts.AnimalConfigTypedDict.lactation_curve"><code class="docutils literal notranslate"><span class="pre">AnimalConfigTypedDict.lactation_curve</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_typed_dicts.AnimalConfigTypedDict.male_calf_rate_conventional_semen"><code class="docutils literal notranslate"><span class="pre">AnimalConfigTypedDict.male_calf_rate_conventional_semen</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_typed_dicts.AnimalConfigTypedDict.male_calf_rate_sexed_semen"><code class="docutils literal notranslate"><span class="pre">AnimalConfigTypedDict.male_calf_rate_sexed_semen</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_typed_dicts.AnimalConfigTypedDict.mastitis_cull_prob"><code class="docutils literal notranslate"><span class="pre">AnimalConfigTypedDict.mastitis_cull_prob</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_typed_dicts.AnimalConfigTypedDict.mature_body_weight_avg"><code class="docutils literal notranslate"><span class="pre">AnimalConfigTypedDict.mature_body_weight_avg</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_typed_dicts.AnimalConfigTypedDict.mature_body_weight_std"><code class="docutils literal notranslate"><span class="pre">AnimalConfigTypedDict.mature_body_weight_std</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_typed_dicts.AnimalConfigTypedDict.md5CG2P_conception_rate"><code class="docutils literal notranslate"><span class="pre">AnimalConfigTypedDict.md5CG2P_conception_rate</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_typed_dicts.AnimalConfigTypedDict.md5CGP_conception_rate"><code class="docutils literal notranslate"><span class="pre">AnimalConfigTypedDict.md5CGP_conception_rate</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_typed_dicts.AnimalConfigTypedDict.milk_type"><code class="docutils literal notranslate"><span class="pre">AnimalConfigTypedDict.milk_type</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_typed_dicts.AnimalConfigTypedDict.ovsynch48_conception_rate"><code class="docutils literal notranslate"><span class="pre">AnimalConfigTypedDict.ovsynch48_conception_rate</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_typed_dicts.AnimalConfigTypedDict.ovsynch56_conception_rate"><code class="docutils literal notranslate"><span class="pre">AnimalConfigTypedDict.ovsynch56_conception_rate</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_typed_dicts.AnimalConfigTypedDict.parity_cull_prob"><code class="docutils literal notranslate"><span class="pre">AnimalConfigTypedDict.parity_cull_prob</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_typed_dicts.AnimalConfigTypedDict.parity_death_prob"><code class="docutils literal notranslate"><span class="pre">AnimalConfigTypedDict.parity_death_prob</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_typed_dicts.AnimalConfigTypedDict.prefresh_day"><code class="docutils literal notranslate"><span class="pre">AnimalConfigTypedDict.prefresh_day</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_typed_dicts.AnimalConfigTypedDict.preg_check_day_1"><code class="docutils literal notranslate"><span class="pre">AnimalConfigTypedDict.preg_check_day_1</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_typed_dicts.AnimalConfigTypedDict.preg_check_day_2"><code class="docutils literal notranslate"><span class="pre">AnimalConfigTypedDict.preg_check_day_2</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_typed_dicts.AnimalConfigTypedDict.preg_check_day_3"><code class="docutils literal notranslate"><span class="pre">AnimalConfigTypedDict.preg_check_day_3</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_typed_dicts.AnimalConfigTypedDict.preg_loss_rate_1"><code class="docutils literal notranslate"><span class="pre">AnimalConfigTypedDict.preg_loss_rate_1</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_typed_dicts.AnimalConfigTypedDict.preg_loss_rate_2"><code class="docutils literal notranslate"><span class="pre">AnimalConfigTypedDict.preg_loss_rate_2</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_typed_dicts.AnimalConfigTypedDict.preg_loss_rate_3"><code class="docutils literal notranslate"><span class="pre">AnimalConfigTypedDict.preg_loss_rate_3</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_typed_dicts.AnimalConfigTypedDict.repro_cull_time"><code class="docutils literal notranslate"><span class="pre">AnimalConfigTypedDict.repro_cull_time</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_typed_dicts.AnimalConfigTypedDict.semen_type"><code class="docutils literal notranslate"><span class="pre">AnimalConfigTypedDict.semen_type</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_typed_dicts.AnimalConfigTypedDict.std_estrus_cycle_after_pgf"><code class="docutils literal notranslate"><span class="pre">AnimalConfigTypedDict.std_estrus_cycle_after_pgf</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_typed_dicts.AnimalConfigTypedDict.std_estrus_cycle_cow"><code class="docutils literal notranslate"><span class="pre">AnimalConfigTypedDict.std_estrus_cycle_cow</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_typed_dicts.AnimalConfigTypedDict.std_estrus_cycle_heifer"><code class="docutils literal notranslate"><span class="pre">AnimalConfigTypedDict.std_estrus_cycle_heifer</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_typed_dicts.AnimalConfigTypedDict.std_estrus_cycle_return"><code class="docutils literal notranslate"><span class="pre">AnimalConfigTypedDict.std_estrus_cycle_return</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_typed_dicts.AnimalConfigTypedDict.std_gestation_len"><code class="docutils literal notranslate"><span class="pre">AnimalConfigTypedDict.std_gestation_len</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_typed_dicts.AnimalConfigTypedDict.still_birth_rate"><code class="docutils literal notranslate"><span class="pre">AnimalConfigTypedDict.still_birth_rate</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_typed_dicts.AnimalConfigTypedDict.tai_program_start_day"><code class="docutils literal notranslate"><span class="pre">AnimalConfigTypedDict.tai_program_start_day</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_typed_dicts.AnimalConfigTypedDict.target_heifer_preg_day"><code class="docutils literal notranslate"><span class="pre">AnimalConfigTypedDict.target_heifer_preg_day</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_typed_dicts.AnimalConfigTypedDict.udder_cull_prob"><code class="docutils literal notranslate"><span class="pre">AnimalConfigTypedDict.udder_cull_prob</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_typed_dicts.AnimalConfigTypedDict.unknown_cull_prob"><code class="docutils literal notranslate"><span class="pre">AnimalConfigTypedDict.unknown_cull_prob</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_typed_dicts.AnimalConfigTypedDict.use_input_calving_interval"><code class="docutils literal notranslate"><span class="pre">AnimalConfigTypedDict.use_input_calving_interval</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_typed_dicts.AnimalConfigTypedDict.user_define_tai_length"><code class="docutils literal notranslate"><span class="pre">AnimalConfigTypedDict.user_define_tai_length</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_typed_dicts.AnimalConfigTypedDict.voluntary_waiting_period"><code class="docutils literal notranslate"><span class="pre">AnimalConfigTypedDict.voluntary_waiting_period</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_typed_dicts.AnimalConfigTypedDict.wean_day"><code class="docutils literal notranslate"><span class="pre">AnimalConfigTypedDict.wean_day</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_typed_dicts.AnimalConfigTypedDict.wean_length"><code class="docutils literal notranslate"><span class="pre">AnimalConfigTypedDict.wean_length</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_typed_dicts.AnimalConfigTypedDict.wood_l"><code class="docutils literal notranslate"><span class="pre">AnimalConfigTypedDict.wood_l</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_typed_dicts.AnimalConfigTypedDict.wood_l_std"><code class="docutils literal notranslate"><span class="pre">AnimalConfigTypedDict.wood_l_std</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_typed_dicts.AnimalConfigTypedDict.wood_m"><code class="docutils literal notranslate"><span class="pre">AnimalConfigTypedDict.wood_m</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_typed_dicts.AnimalConfigTypedDict.wood_m_std"><code class="docutils literal notranslate"><span class="pre">AnimalConfigTypedDict.wood_m_std</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_typed_dicts.AnimalConfigTypedDict.wood_n"><code class="docutils literal notranslate"><span class="pre">AnimalConfigTypedDict.wood_n</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_typed_dicts.AnimalConfigTypedDict.wood_n_std"><code class="docutils literal notranslate"><span class="pre">AnimalConfigTypedDict.wood_n_std</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_typed_dicts.CalfValuesTypedDict"><code class="docutils literal notranslate"><span class="pre">CalfValuesTypedDict</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_typed_dicts.CalfValuesTypedDict.birth_date"><code class="docutils literal notranslate"><span class="pre">CalfValuesTypedDict.birth_date</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_typed_dicts.CalfValuesTypedDict.birth_weight"><code class="docutils literal notranslate"><span class="pre">CalfValuesTypedDict.birth_weight</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_typed_dicts.CalfValuesTypedDict.body_weight"><code class="docutils literal notranslate"><span class="pre">CalfValuesTypedDict.body_weight</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_typed_dicts.CalfValuesTypedDict.breed"><code class="docutils literal notranslate"><span class="pre">CalfValuesTypedDict.breed</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_typed_dicts.CalfValuesTypedDict.days_born"><code class="docutils literal notranslate"><span class="pre">CalfValuesTypedDict.days_born</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_typed_dicts.CalfValuesTypedDict.events"><code class="docutils literal notranslate"><span class="pre">CalfValuesTypedDict.events</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_typed_dicts.CalfValuesTypedDict.id"><code class="docutils literal notranslate"><span class="pre">CalfValuesTypedDict.id</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_typed_dicts.CalfValuesTypedDict.mature_body_weight"><code class="docutils literal notranslate"><span class="pre">CalfValuesTypedDict.mature_body_weight</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_typed_dicts.CalfValuesTypedDict.p_init"><code class="docutils literal notranslate"><span class="pre">CalfValuesTypedDict.p_init</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_typed_dicts.CalfValuesTypedDict.wean_weight"><code class="docutils literal notranslate"><span class="pre">CalfValuesTypedDict.wean_weight</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_typed_dicts.HeiferIIValuesTypedDict"><code class="docutils literal notranslate"><span class="pre">HeiferIIValuesTypedDict</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_typed_dicts.HeiferIIValuesTypedDict.abortion_day"><code class="docutils literal notranslate"><span class="pre">HeiferIIValuesTypedDict.abortion_day</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_typed_dicts.HeiferIIValuesTypedDict.ai_day"><code class="docutils literal notranslate"><span class="pre">HeiferIIValuesTypedDict.ai_day</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_typed_dicts.HeiferIIValuesTypedDict.birth_date"><code class="docutils literal notranslate"><span class="pre">HeiferIIValuesTypedDict.birth_date</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_typed_dicts.HeiferIIValuesTypedDict.birth_weight"><code class="docutils literal notranslate"><span class="pre">HeiferIIValuesTypedDict.birth_weight</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_typed_dicts.HeiferIIValuesTypedDict.body_weight"><code class="docutils literal notranslate"><span class="pre">HeiferIIValuesTypedDict.body_weight</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_typed_dicts.HeiferIIValuesTypedDict.breed"><code class="docutils literal notranslate"><span class="pre">HeiferIIValuesTypedDict.breed</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_typed_dicts.HeiferIIValuesTypedDict.calf_birth_weight"><code class="docutils literal notranslate"><span class="pre">HeiferIIValuesTypedDict.calf_birth_weight</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_typed_dicts.HeiferIIValuesTypedDict.conception_rate"><code class="docutils literal notranslate"><span class="pre">HeiferIIValuesTypedDict.conception_rate</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_typed_dicts.HeiferIIValuesTypedDict.days_born"><code class="docutils literal notranslate"><span class="pre">HeiferIIValuesTypedDict.days_born</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_typed_dicts.HeiferIIValuesTypedDict.days_in_preg"><code class="docutils literal notranslate"><span class="pre">HeiferIIValuesTypedDict.days_in_preg</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_typed_dicts.HeiferIIValuesTypedDict.estrus_count"><code class="docutils literal notranslate"><span class="pre">HeiferIIValuesTypedDict.estrus_count</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_typed_dicts.HeiferIIValuesTypedDict.estrus_day"><code class="docutils literal notranslate"><span class="pre">HeiferIIValuesTypedDict.estrus_day</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_typed_dicts.HeiferIIValuesTypedDict.events"><code class="docutils literal notranslate"><span class="pre">HeiferIIValuesTypedDict.events</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_typed_dicts.HeiferIIValuesTypedDict.gestation_length"><code class="docutils literal notranslate"><span class="pre">HeiferIIValuesTypedDict.gestation_length</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_typed_dicts.HeiferIIValuesTypedDict.id"><code class="docutils literal notranslate"><span class="pre">HeiferIIValuesTypedDict.id</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_typed_dicts.HeiferIIValuesTypedDict.mature_body_weight"><code class="docutils literal notranslate"><span class="pre">HeiferIIValuesTypedDict.mature_body_weight</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_typed_dicts.HeiferIIValuesTypedDict.p_gest_for_calf"><code class="docutils literal notranslate"><span class="pre">HeiferIIValuesTypedDict.p_gest_for_calf</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_typed_dicts.HeiferIIValuesTypedDict.repro_program"><code class="docutils literal notranslate"><span class="pre">HeiferIIValuesTypedDict.repro_program</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_typed_dicts.HeiferIIValuesTypedDict.synch_ed_estrus_day"><code class="docutils literal notranslate"><span class="pre">HeiferIIValuesTypedDict.synch_ed_estrus_day</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_typed_dicts.HeiferIIValuesTypedDict.synch_ed_method_h"><code class="docutils literal notranslate"><span class="pre">HeiferIIValuesTypedDict.synch_ed_method_h</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_typed_dicts.HeiferIIValuesTypedDict.synch_ed_program_start_day_h"><code class="docutils literal notranslate"><span class="pre">HeiferIIValuesTypedDict.synch_ed_program_start_day_h</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_typed_dicts.HeiferIIValuesTypedDict.synch_ed_stop_day"><code class="docutils literal notranslate"><span class="pre">HeiferIIValuesTypedDict.synch_ed_stop_day</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_typed_dicts.HeiferIIValuesTypedDict.tai_method_h"><code class="docutils literal notranslate"><span class="pre">HeiferIIValuesTypedDict.tai_method_h</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_typed_dicts.HeiferIIValuesTypedDict.tai_program_start_day_h"><code class="docutils literal notranslate"><span class="pre">HeiferIIValuesTypedDict.tai_program_start_day_h</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_typed_dicts.HeiferIIValuesTypedDict.wean_weight"><code class="docutils literal notranslate"><span class="pre">HeiferIIValuesTypedDict.wean_weight</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_typed_dicts.HeiferIValuesTypedDict"><code class="docutils literal notranslate"><span class="pre">HeiferIValuesTypedDict</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_typed_dicts.HeiferIValuesTypedDict.birth_date"><code class="docutils literal notranslate"><span class="pre">HeiferIValuesTypedDict.birth_date</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_typed_dicts.HeiferIValuesTypedDict.birth_weight"><code class="docutils literal notranslate"><span class="pre">HeiferIValuesTypedDict.birth_weight</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_typed_dicts.HeiferIValuesTypedDict.body_weight"><code class="docutils literal notranslate"><span class="pre">HeiferIValuesTypedDict.body_weight</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_typed_dicts.HeiferIValuesTypedDict.breed"><code class="docutils literal notranslate"><span class="pre">HeiferIValuesTypedDict.breed</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_typed_dicts.HeiferIValuesTypedDict.days_born"><code class="docutils literal notranslate"><span class="pre">HeiferIValuesTypedDict.days_born</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_typed_dicts.HeiferIValuesTypedDict.events"><code class="docutils literal notranslate"><span class="pre">HeiferIValuesTypedDict.events</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_typed_dicts.HeiferIValuesTypedDict.id"><code class="docutils literal notranslate"><span class="pre">HeiferIValuesTypedDict.id</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_typed_dicts.HeiferIValuesTypedDict.mature_body_weight"><code class="docutils literal notranslate"><span class="pre">HeiferIValuesTypedDict.mature_body_weight</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_typed_dicts.HeiferIValuesTypedDict.wean_weight"><code class="docutils literal notranslate"><span class="pre">HeiferIValuesTypedDict.wean_weight</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_typed_dicts.HerdInfoTypedDict"><code class="docutils literal notranslate"><span class="pre">HerdInfoTypedDict</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_typed_dicts.HerdInfoTypedDict.breed"><code class="docutils literal notranslate"><span class="pre">HerdInfoTypedDict.breed</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_typed_dicts.HerdInfoTypedDict.calf_num"><code class="docutils literal notranslate"><span class="pre">HerdInfoTypedDict.calf_num</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_typed_dicts.HerdInfoTypedDict.cow_num"><code class="docutils literal notranslate"><span class="pre">HerdInfoTypedDict.cow_num</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_typed_dicts.HerdInfoTypedDict.heiferIII_num"><code class="docutils literal notranslate"><span class="pre">HerdInfoTypedDict.heiferIII_num</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_typed_dicts.HerdInfoTypedDict.heiferII_num"><code class="docutils literal notranslate"><span class="pre">HerdInfoTypedDict.heiferII_num</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_typed_dicts.HerdInfoTypedDict.heiferI_num"><code class="docutils literal notranslate"><span class="pre">HerdInfoTypedDict.heiferI_num</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_typed_dicts.HerdInfoTypedDict.herd_init"><code class="docutils literal notranslate"><span class="pre">HerdInfoTypedDict.herd_init</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_typed_dicts.HerdInfoTypedDict.herd_num"><code class="docutils literal notranslate"><span class="pre">HerdInfoTypedDict.herd_num</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_typed_dicts.HerdInfoTypedDict.replace_num"><code class="docutils literal notranslate"><span class="pre">HerdInfoTypedDict.replace_num</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_typed_dicts.InitializationDBSummaryTypedDict"><code class="docutils literal notranslate"><span class="pre">InitializationDBSummaryTypedDict</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_typed_dicts.InitializationDBSummaryTypedDict.avg_calf_age"><code class="docutils literal notranslate"><span class="pre">InitializationDBSummaryTypedDict.avg_calf_age</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_typed_dicts.InitializationDBSummaryTypedDict.avg_cow_age"><code class="docutils literal notranslate"><span class="pre">InitializationDBSummaryTypedDict.avg_cow_age</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_typed_dicts.InitializationDBSummaryTypedDict.avg_heiferIII_age"><code class="docutils literal notranslate"><span class="pre">InitializationDBSummaryTypedDict.avg_heiferIII_age</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_typed_dicts.InitializationDBSummaryTypedDict.avg_heiferII_age"><code class="docutils literal notranslate"><span class="pre">InitializationDBSummaryTypedDict.avg_heiferII_age</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_typed_dicts.InitializationDBSummaryTypedDict.avg_heiferI_age"><code class="docutils literal notranslate"><span class="pre">InitializationDBSummaryTypedDict.avg_heiferI_age</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_typed_dicts.InitializationDBSummaryTypedDict.avg_replacement_age"><code class="docutils literal notranslate"><span class="pre">InitializationDBSummaryTypedDict.avg_replacement_age</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_typed_dicts.InitializationDBSummaryTypedDict.cow_avg_CI"><code class="docutils literal notranslate"><span class="pre">InitializationDBSummaryTypedDict.cow_avg_CI</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_typed_dicts.InitializationDBSummaryTypedDict.cow_avg_days_in_milk"><code class="docutils literal notranslate"><span class="pre">InitializationDBSummaryTypedDict.cow_avg_days_in_milk</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_typed_dicts.InitializationDBSummaryTypedDict.cow_avg_days_in_preg"><code class="docutils literal notranslate"><span class="pre">InitializationDBSummaryTypedDict.cow_avg_days_in_preg</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_typed_dicts.InitializationDBSummaryTypedDict.cow_avg_parity"><code class="docutils literal notranslate"><span class="pre">InitializationDBSummaryTypedDict.cow_avg_parity</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_typed_dicts.InitializationDBSummaryTypedDict.num_calf"><code class="docutils literal notranslate"><span class="pre">InitializationDBSummaryTypedDict.num_calf</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_typed_dicts.InitializationDBSummaryTypedDict.num_cow"><code class="docutils literal notranslate"><span class="pre">InitializationDBSummaryTypedDict.num_cow</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_typed_dicts.InitializationDBSummaryTypedDict.num_heiferI"><code class="docutils literal notranslate"><span class="pre">InitializationDBSummaryTypedDict.num_heiferI</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_typed_dicts.InitializationDBSummaryTypedDict.num_heiferII"><code class="docutils literal notranslate"><span class="pre">InitializationDBSummaryTypedDict.num_heiferII</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_typed_dicts.InitializationDBSummaryTypedDict.num_heiferIII"><code class="docutils literal notranslate"><span class="pre">InitializationDBSummaryTypedDict.num_heiferIII</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_typed_dicts.InitializationDBSummaryTypedDict.num_replacement"><code class="docutils literal notranslate"><span class="pre">InitializationDBSummaryTypedDict.num_replacement</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_typed_dicts.PenTypedDict"><code class="docutils literal notranslate"><span class="pre">PenTypedDict</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_typed_dicts.PenTypedDict.animal_combination"><code class="docutils literal notranslate"><span class="pre">PenTypedDict.animal_combination</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_typed_dicts.PenTypedDict.bedding_type"><code class="docutils literal notranslate"><span class="pre">PenTypedDict.bedding_type</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_typed_dicts.PenTypedDict.horizontal_dist_to_milking_parlor"><code class="docutils literal notranslate"><span class="pre">PenTypedDict.horizontal_dist_to_milking_parlor</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_typed_dicts.PenTypedDict.housing_type"><code class="docutils literal notranslate"><span class="pre">PenTypedDict.housing_type</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_typed_dicts.PenTypedDict.id"><code class="docutils literal notranslate"><span class="pre">PenTypedDict.id</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_typed_dicts.PenTypedDict.manure_handling"><code class="docutils literal notranslate"><span class="pre">PenTypedDict.manure_handling</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_typed_dicts.PenTypedDict.manure_separator"><code class="docutils literal notranslate"><span class="pre">PenTypedDict.manure_separator</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_typed_dicts.PenTypedDict.manure_storage"><code class="docutils literal notranslate"><span class="pre">PenTypedDict.manure_storage</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_typed_dicts.PenTypedDict.max_stocking_density"><code class="docutils literal notranslate"><span class="pre">PenTypedDict.max_stocking_density</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_typed_dicts.PenTypedDict.number_of_stalls"><code class="docutils literal notranslate"><span class="pre">PenTypedDict.number_of_stalls</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_typed_dicts.PenTypedDict.pen_type"><code class="docutils literal notranslate"><span class="pre">PenTypedDict.pen_type</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_typed_dicts.PenTypedDict.vertical_dist_to_milking_parlor"><code class="docutils literal notranslate"><span class="pre">PenTypedDict.vertical_dist_to_milking_parlor</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="RUFAS.routines.animal.html#module-RUFAS.routines.animal.animal_types">RUFAS.routines.animal.animal_types module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_types.AnimalType"><code class="docutils literal notranslate"><span class="pre">AnimalType</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_types.AnimalType.CALF"><code class="docutils literal notranslate"><span class="pre">AnimalType.CALF</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_types.AnimalType.DRY_COW"><code class="docutils literal notranslate"><span class="pre">AnimalType.DRY_COW</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_types.AnimalType.HEIFER_I"><code class="docutils literal notranslate"><span class="pre">AnimalType.HEIFER_I</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_types.AnimalType.HEIFER_II"><code class="docutils literal notranslate"><span class="pre">AnimalType.HEIFER_II</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_types.AnimalType.HEIFER_III"><code class="docutils literal notranslate"><span class="pre">AnimalType.HEIFER_III</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_types.AnimalType.LAC_COW"><code class="docutils literal notranslate"><span class="pre">AnimalType.LAC_COW</span></code></a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="RUFAS.routines.animal.html#module-RUFAS.routines.animal.clustering_pen_grouping">RUFAS.routines.animal.clustering_pen_grouping module</a><ul>
@@ -142,22 +480,30 @@
 <li class="toctree-l2"><a class="reference internal" href="RUFAS.routines.animal.html#module-RUFAS.routines.animal.pen">RUFAS.routines.animal.pen module</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.pen.Pen"><code class="docutils literal notranslate"><span class="pre">Pen</span></code></a><ul>
 <li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.pen.Pen.AnimalCombination"><code class="docutils literal notranslate"><span class="pre">Pen.AnimalCombination</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.pen.Pen.add_animal"><code class="docutils literal notranslate"><span class="pre">Pen.add_animal()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.pen.Pen.add_new_animals"><code class="docutils literal notranslate"><span class="pre">Pen.add_new_animals()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.pen.Pen.calc_avg_growth"><code class="docutils literal notranslate"><span class="pre">Pen.calc_avg_growth()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.pen.Pen.calc_daily_walking_dist"><code class="docutils literal notranslate"><span class="pre">Pen.calc_daily_walking_dist()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.pen.Pen.calc_manure"><code class="docutils literal notranslate"><span class="pre">Pen.calc_manure()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.pen.Pen.calc_ration"><code class="docutils literal notranslate"><span class="pre">Pen.calc_ration()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.pen.Pen.calc_total_manure"><code class="docutils literal notranslate"><span class="pre">Pen.calc_total_manure()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.pen.Pen.call_p_rqmts"><code class="docutils literal notranslate"><span class="pre">Pen.call_p_rqmts()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.pen.Pen.clear"><code class="docutils literal notranslate"><span class="pre">Pen.clear()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.pen.Pen.current_pen_ration"><code class="docutils literal notranslate"><span class="pre">Pen.current_pen_ration</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.pen.Pen.current_stocking_density"><code class="docutils literal notranslate"><span class="pre">Pen.current_stocking_density</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.pen.Pen.daily_p_update"><code class="docutils literal notranslate"><span class="pre">Pen.daily_p_update()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.pen.Pen.get_id"><code class="docutils literal notranslate"><span class="pre">Pen.get_id()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.pen.Pen.get_pen_type"><code class="docutils literal notranslate"><span class="pre">Pen.get_pen_type()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.pen.Pen.is_populated"><code class="docutils literal notranslate"><span class="pre">Pen.is_populated</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.pen.Pen.remove_animal"><code class="docutils literal notranslate"><span class="pre">Pen.remove_animal()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.pen.Pen.remove_animals_by_ids"><code class="docutils literal notranslate"><span class="pre">Pen.remove_animals_by_ids()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.pen.Pen.reset_manure"><code class="docutils literal notranslate"><span class="pre">Pen.reset_manure()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.pen.Pen.set_avg_nutrient_rqmts"><code class="docutils literal notranslate"><span class="pre">Pen.set_avg_nutrient_rqmts()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.pen.Pen.set_id"><code class="docutils literal notranslate"><span class="pre">Pen.set_id()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.pen.Pen.set_milk_avgs"><code class="docutils literal notranslate"><span class="pre">Pen.set_milk_avgs()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.pen.Pen.set_up_new_animal"><code class="docutils literal notranslate"><span class="pre">Pen.set_up_new_animal()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.pen.Pen.subset_class_feeds"><code class="docutils literal notranslate"><span class="pre">Pen.subset_class_feeds()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.pen.Pen.update_animal_combination"><code class="docutils literal notranslate"><span class="pre">Pen.update_animal_combination()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.pen.Pen.update_animals"><code class="docutils literal notranslate"><span class="pre">Pen.update_animals()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.pen.Pen.update_classes_in_pen"><code class="docutils literal notranslate"><span class="pre">Pen.update_classes_in_pen()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.pen.Pen.update_pen_populated"><code class="docutils literal notranslate"><span class="pre">Pen.update_pen_populated()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.pen.Pen.update_stocking_density"><code class="docutils literal notranslate"><span class="pre">Pen.update_stocking_density()</span></code></a></li>
 </ul>
 </li>
 </ul>
@@ -215,6 +561,7 @@
 <li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.feed.html#RUFAS.routines.feed.feed_typed_dicts.PurchasedFeedTypedDict.purchased_feeds"><code class="docutils literal notranslate"><span class="pre">PurchasedFeedTypedDict.purchased_feeds</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.feed.html#RUFAS.routines.feed.feed_typed_dicts.PurchasedFeedTypedDict.purchased_feeds_costs"><code class="docutils literal notranslate"><span class="pre">PurchasedFeedTypedDict.purchased_feeds_costs</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.feed.html#RUFAS.routines.feed.feed_typed_dicts.PurchasedFeedTypedDict.storage_options"><code class="docutils literal notranslate"><span class="pre">PurchasedFeedTypedDict.storage_options</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.feed.html#RUFAS.routines.feed.feed_typed_dicts.PurchasedFeedTypedDict.user_defined_ration_percentages"><code class="docutils literal notranslate"><span class="pre">PurchasedFeedTypedDict.user_defined_ration_percentages</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="RUFAS.routines.feed.html#RUFAS.routines.feed.feed_typed_dicts.StorageOption"><code class="docutils literal notranslate"><span class="pre">StorageOption</span></code></a><ul>
@@ -246,60 +593,152 @@
 <li class="toctree-l2"><a class="reference internal" href="RUFAS.routines.feed.html#module-RUFAS.routines.feed">Module contents</a></li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="RUFAS.routines.feed_storage.html">RUFAS.routines.feed_storage package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="RUFAS.routines.feed_storage.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="RUFAS.routines.feed_storage.html#module-RUFAS.routines.feed_storage.harvested_crop">RUFAS.routines.feed_storage.harvested_crop module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.routines.feed_storage.html#RUFAS.routines.feed_storage.harvested_crop.CropCategory"><code class="docutils literal notranslate"><span class="pre">CropCategory</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.feed_storage.html#RUFAS.routines.feed_storage.harvested_crop.CropCategory.ALFALFA"><code class="docutils literal notranslate"><span class="pre">CropCategory.ALFALFA</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.feed_storage.html#RUFAS.routines.feed_storage.harvested_crop.CropCategory.CORN"><code class="docutils literal notranslate"><span class="pre">CropCategory.CORN</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.feed_storage.html#RUFAS.routines.feed_storage.harvested_crop.CropCategory.GRASS"><code class="docutils literal notranslate"><span class="pre">CropCategory.GRASS</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.feed_storage.html#RUFAS.routines.feed_storage.harvested_crop.CropCategory.SMALL_GRAIN"><code class="docutils literal notranslate"><span class="pre">CropCategory.SMALL_GRAIN</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.feed_storage.html#RUFAS.routines.feed_storage.harvested_crop.CropCategory.SOY"><code class="docutils literal notranslate"><span class="pre">CropCategory.SOY</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.routines.feed_storage.html#RUFAS.routines.feed_storage.harvested_crop.CropType"><code class="docutils literal notranslate"><span class="pre">CropType</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.feed_storage.html#RUFAS.routines.feed_storage.harvested_crop.CropType.ALFALFA"><code class="docutils literal notranslate"><span class="pre">CropType.ALFALFA</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.feed_storage.html#RUFAS.routines.feed_storage.harvested_crop.CropType.FINE_FESCUE"><code class="docutils literal notranslate"><span class="pre">CropType.FINE_FESCUE</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.feed_storage.html#RUFAS.routines.feed_storage.harvested_crop.CropType.FORAGE"><code class="docutils literal notranslate"><span class="pre">CropType.FORAGE</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.feed_storage.html#RUFAS.routines.feed_storage.harvested_crop.CropType.GRAIN"><code class="docutils literal notranslate"><span class="pre">CropType.GRAIN</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.feed_storage.html#RUFAS.routines.feed_storage.harvested_crop.CropType.HIGH_MOISTURE"><code class="docutils literal notranslate"><span class="pre">CropType.HIGH_MOISTURE</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.feed_storage.html#RUFAS.routines.feed_storage.harvested_crop.CropType.MEADOW_FESCUE"><code class="docutils literal notranslate"><span class="pre">CropType.MEADOW_FESCUE</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.feed_storage.html#RUFAS.routines.feed_storage.harvested_crop.CropType.OAT"><code class="docutils literal notranslate"><span class="pre">CropType.OAT</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.feed_storage.html#RUFAS.routines.feed_storage.harvested_crop.CropType.ORCHARDGRASS"><code class="docutils literal notranslate"><span class="pre">CropType.ORCHARDGRASS</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.feed_storage.html#RUFAS.routines.feed_storage.harvested_crop.CropType.RICE"><code class="docutils literal notranslate"><span class="pre">CropType.RICE</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.feed_storage.html#RUFAS.routines.feed_storage.harvested_crop.CropType.RYE"><code class="docutils literal notranslate"><span class="pre">CropType.RYE</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.feed_storage.html#RUFAS.routines.feed_storage.harvested_crop.CropType.RYEGRASS"><code class="docutils literal notranslate"><span class="pre">CropType.RYEGRASS</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.feed_storage.html#RUFAS.routines.feed_storage.harvested_crop.CropType.SILAGE"><code class="docutils literal notranslate"><span class="pre">CropType.SILAGE</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.feed_storage.html#RUFAS.routines.feed_storage.harvested_crop.CropType.TALL_FESCUE"><code class="docutils literal notranslate"><span class="pre">CropType.TALL_FESCUE</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.feed_storage.html#RUFAS.routines.feed_storage.harvested_crop.CropType.WHEAT"><code class="docutils literal notranslate"><span class="pre">CropType.WHEAT</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.feed_storage.html#RUFAS.routines.feed_storage.harvested_crop.CropType.WHOLE_PLANT"><code class="docutils literal notranslate"><span class="pre">CropType.WHOLE_PLANT</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.routines.feed_storage.html#RUFAS.routines.feed_storage.harvested_crop.HarvestedCrop"><code class="docutils literal notranslate"><span class="pre">HarvestedCrop</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.feed_storage.html#RUFAS.routines.feed_storage.harvested_crop.HarvestedCrop.adf"><code class="docutils literal notranslate"><span class="pre">HarvestedCrop.adf</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.feed_storage.html#RUFAS.routines.feed_storage.harvested_crop.HarvestedCrop.ash"><code class="docutils literal notranslate"><span class="pre">HarvestedCrop.ash</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.feed_storage.html#RUFAS.routines.feed_storage.harvested_crop.HarvestedCrop.category"><code class="docutils literal notranslate"><span class="pre">HarvestedCrop.category</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.feed_storage.html#RUFAS.routines.feed_storage.harvested_crop.HarvestedCrop.crude_protein_percent"><code class="docutils literal notranslate"><span class="pre">HarvestedCrop.crude_protein_percent</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.feed_storage.html#RUFAS.routines.feed_storage.harvested_crop.HarvestedCrop.dry_matter_digestibility"><code class="docutils literal notranslate"><span class="pre">HarvestedCrop.dry_matter_digestibility</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.feed_storage.html#RUFAS.routines.feed_storage.harvested_crop.HarvestedCrop.dry_matter_percentage"><code class="docutils literal notranslate"><span class="pre">HarvestedCrop.dry_matter_percentage</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.feed_storage.html#RUFAS.routines.feed_storage.harvested_crop.HarvestedCrop.fresh_mass"><code class="docutils literal notranslate"><span class="pre">HarvestedCrop.fresh_mass</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.feed_storage.html#RUFAS.routines.feed_storage.harvested_crop.HarvestedCrop.harvest_time"><code class="docutils literal notranslate"><span class="pre">HarvestedCrop.harvest_time</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.feed_storage.html#RUFAS.routines.feed_storage.harvested_crop.HarvestedCrop.lignin"><code class="docutils literal notranslate"><span class="pre">HarvestedCrop.lignin</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.feed_storage.html#RUFAS.routines.feed_storage.harvested_crop.HarvestedCrop.ndf"><code class="docutils literal notranslate"><span class="pre">HarvestedCrop.ndf</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.feed_storage.html#RUFAS.routines.feed_storage.harvested_crop.HarvestedCrop.non_protein_nitrogen"><code class="docutils literal notranslate"><span class="pre">HarvestedCrop.non_protein_nitrogen</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.feed_storage.html#RUFAS.routines.feed_storage.harvested_crop.HarvestedCrop.starch"><code class="docutils literal notranslate"><span class="pre">HarvestedCrop.starch</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.feed_storage.html#RUFAS.routines.feed_storage.harvested_crop.HarvestedCrop.storage_time"><code class="docutils literal notranslate"><span class="pre">HarvestedCrop.storage_time</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.feed_storage.html#RUFAS.routines.feed_storage.harvested_crop.HarvestedCrop.sugar"><code class="docutils literal notranslate"><span class="pre">HarvestedCrop.sugar</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.feed_storage.html#RUFAS.routines.feed_storage.harvested_crop.HarvestedCrop.type"><code class="docutils literal notranslate"><span class="pre">HarvestedCrop.type</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="RUFAS.routines.feed_storage.html#module-RUFAS.routines.feed_storage.hay">RUFAS.routines.feed_storage.hay module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.routines.feed_storage.html#RUFAS.routines.feed_storage.hay.Hay"><code class="docutils literal notranslate"><span class="pre">Hay</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.feed_storage.html#RUFAS.routines.feed_storage.hay.Hay.bale_density"><code class="docutils literal notranslate"><span class="pre">Hay.bale_density</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.feed_storage.html#RUFAS.routines.feed_storage.hay.Hay.bale_size"><code class="docutils literal notranslate"><span class="pre">Hay.bale_size</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.feed_storage.html#RUFAS.routines.feed_storage.hay.Hay.calculate_protein_loss"><code class="docutils literal notranslate"><span class="pre">Hay.calculate_protein_loss()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.routines.feed_storage.html#RUFAS.routines.feed_storage.hay.ProtectedIndoors"><code class="docutils literal notranslate"><span class="pre">ProtectedIndoors</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.routines.feed_storage.html#RUFAS.routines.feed_storage.hay.ProtectedTarped"><code class="docutils literal notranslate"><span class="pre">ProtectedTarped</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.routines.feed_storage.html#RUFAS.routines.feed_storage.hay.ProtectedWrapped"><code class="docutils literal notranslate"><span class="pre">ProtectedWrapped</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.routines.feed_storage.html#RUFAS.routines.feed_storage.hay.Unprotected"><code class="docutils literal notranslate"><span class="pre">Unprotected</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="RUFAS.routines.feed_storage.html#module-RUFAS.routines.feed_storage.storage">RUFAS.routines.feed_storage.storage module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.routines.feed_storage.html#RUFAS.routines.feed_storage.storage.Storage"><code class="docutils literal notranslate"><span class="pre">Storage</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.feed_storage.html#RUFAS.routines.feed_storage.storage.Storage.calculate_bale_density"><code class="docutils literal notranslate"><span class="pre">Storage.calculate_bale_density()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.feed_storage.html#RUFAS.routines.feed_storage.storage.Storage.calculate_dry_matter_loss_to_effluent"><code class="docutils literal notranslate"><span class="pre">Storage.calculate_dry_matter_loss_to_effluent()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.feed_storage.html#RUFAS.routines.feed_storage.storage.Storage.calculate_dry_matter_loss_to_gas"><code class="docutils literal notranslate"><span class="pre">Storage.calculate_dry_matter_loss_to_gas()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.feed_storage.html#RUFAS.routines.feed_storage.storage.Storage.calculate_heat_generated"><code class="docutils literal notranslate"><span class="pre">Storage.calculate_heat_generated()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.feed_storage.html#RUFAS.routines.feed_storage.storage.Storage.calculate_protein_degradation"><code class="docutils literal notranslate"><span class="pre">Storage.calculate_protein_degradation()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.feed_storage.html#RUFAS.routines.feed_storage.storage.Storage.give_feed"><code class="docutils literal notranslate"><span class="pre">Storage.give_feed()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.feed_storage.html#RUFAS.routines.feed_storage.storage.Storage.process_degradations"><code class="docutils literal notranslate"><span class="pre">Storage.process_degradations()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.feed_storage.html#RUFAS.routines.feed_storage.storage.Storage.recalculate_nutrient_fractions"><code class="docutils literal notranslate"><span class="pre">Storage.recalculate_nutrient_fractions()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.feed_storage.html#RUFAS.routines.feed_storage.storage.Storage.receive_crop"><code class="docutils literal notranslate"><span class="pre">Storage.receive_crop()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="RUFAS.routines.feed_storage.html#module-RUFAS.routines.feed_storage">Module contents</a></li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="RUFAS.routines.field.html">RUFAS.routines.field package</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="RUFAS.routines.field.html#subpackages">Subpackages</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="RUFAS.routines.field.crop.html">RUFAS.routines.field.crop package</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.field.crop.html#subpackages">Subpackages</a></li>
 <li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.field.crop.html#submodules">Submodules</a></li>
-<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.field.crop.html#module-RUFAS.routines.field.crop.biomass">RUFAS.routines.field.crop.biomass module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.field.crop.html#module-RUFAS.routines.field.crop.biomass_allocation">RUFAS.routines.field.crop.biomass_allocation module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.field.crop.html#module-RUFAS.routines.field.crop.crop">RUFAS.routines.field.crop.crop module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.field.crop.html#module-RUFAS.routines.field.crop.crop_data">RUFAS.routines.field.crop.crop_data module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.field.crop.html#module-RUFAS.routines.field.crop.crop_management">RUFAS.routines.field.crop.crop_management module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.field.crop.html#module-RUFAS.routines.field.crop.dormancy">RUFAS.routines.field.crop.dormancy module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.field.crop.html#module-RUFAS.routines.field.crop.growth_constraints">RUFAS.routines.field.crop.growth_constraints module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.field.crop.html#module-RUFAS.routines.field.crop.harvest_operations">RUFAS.routines.field.crop.harvest_operations module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.field.crop.html#module-RUFAS.routines.field.crop.heat_units">RUFAS.routines.field.crop.heat_units module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.field.crop.html#module-RUFAS.routines.field.crop.leaf_area_index">RUFAS.routines.field.crop.leaf_area_index module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.field.crop.html#module-RUFAS.routines.field.crop.nitrogen_fixation">RUFAS.routines.field.crop.nitrogen_fixation module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.field.crop.html#module-RUFAS.routines.field.crop.nitrogen_uptake">RUFAS.routines.field.crop.nitrogen_uptake module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.field.crop.html#module-RUFAS.routines.field.crop.phosphorus_uptake">RUFAS.routines.field.crop.phosphorus_uptake module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.field.crop.html#module-RUFAS.routines.field.crop.nitrogen_incorporation">RUFAS.routines.field.crop.nitrogen_incorporation module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.field.crop.html#module-RUFAS.routines.field.crop.phosphorus_incorporation">RUFAS.routines.field.crop.phosphorus_incorporation module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.field.crop.html#module-RUFAS.routines.field.crop.root_development">RUFAS.routines.field.crop.root_development module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.field.crop.html#module-RUFAS.routines.field.crop.transpiration">RUFAS.routines.field.crop.transpiration module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.field.crop.html#module-RUFAS.routines.field.crop.yields">RUFAS.routines.field.crop.yields module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.field.crop.html#module-RUFAS.routines.field.crop.species_data_factory">RUFAS.routines.field.crop.species_data_factory module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.field.crop.html#module-RUFAS.routines.field.crop.water_dynamics">RUFAS.routines.field.crop.water_dynamics module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.field.crop.html#module-RUFAS.routines.field.crop.water_uptake">RUFAS.routines.field.crop.water_uptake module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.field.crop.html#module-RUFAS.routines.field.crop">Module contents</a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="RUFAS.routines.field.field_management.html">RUFAS.routines.field.field_management package</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.field.field_management.html#submodules">Submodules</a></li>
-<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.field.field_management.html#module-RUFAS.routines.field.field_management.fertilizer_application">RUFAS.routines.field.field_management.fertilizer_application module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.field.field_management.html#module-RUFAS.routines.field.field_management.field_management">RUFAS.routines.field.field_management.field_management module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.field.field_management.html#module-RUFAS.routines.field.field_management.manure_application">RUFAS.routines.field.field_management.manure_application module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.field.field_management.html#module-RUFAS.routines.field.field_management.tillage_application">RUFAS.routines.field.field_management.tillage_application module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.field.field_management.html#module-RUFAS.routines.field.field_management">Module contents</a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.routines.field.field.html">RUFAS.routines.field.field package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.field.field.html#submodules">Submodules</a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.field.field.html#module-RUFAS.routines.field.field.fertilizer_application">RUFAS.routines.field.field.fertilizer_application module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.field.field.html#module-RUFAS.routines.field.field.field">RUFAS.routines.field.field.field module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.field.field.html#module-RUFAS.routines.field.field.field_data">RUFAS.routines.field.field.field_data module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.field.field.html#module-RUFAS.routines.field.field.manure_application">RUFAS.routines.field.field.manure_application module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.field.field.html#module-RUFAS.routines.field.field.tillage_application">RUFAS.routines.field.field.tillage_application module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.field.field.html#module-RUFAS.routines.field.field">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.routines.field.manager.html">RUFAS.routines.field.manager package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.field.manager.html#submodules">Submodules</a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.field.manager.html#module-RUFAS.routines.field.manager.crop_schedule">RUFAS.routines.field.manager.crop_schedule module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.field.manager.html#module-RUFAS.routines.field.manager.events">RUFAS.routines.field.manager.events module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.field.manager.html#module-RUFAS.routines.field.manager.fertilizer_schedule">RUFAS.routines.field.manager.fertilizer_schedule module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.field.manager.html#module-RUFAS.routines.field.manager.field_manager">RUFAS.routines.field.manager.field_manager module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.field.manager.html#module-RUFAS.routines.field.manager.manure_schedule">RUFAS.routines.field.manager.manure_schedule module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.field.manager.html#module-RUFAS.routines.field.manager.output_gatherer">RUFAS.routines.field.manager.output_gatherer module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.field.manager.html#module-RUFAS.routines.field.manager.schedule">RUFAS.routines.field.manager.schedule module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.field.manager.html#module-RUFAS.routines.field.manager.tillage_schedule">RUFAS.routines.field.manager.tillage_schedule module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.field.manager.html#module-RUFAS.routines.field.manager">Module contents</a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="RUFAS.routines.field.soil.html">RUFAS.routines.field.soil package</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.field.soil.html#subpackages">Subpackages</a></li>
 <li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.field.soil.html#submodules">Submodules</a></li>
-<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.field.soil.html#module-RUFAS.routines.field.soil.evapotranspiration">RUFAS.routines.field.soil.evapotranspiration module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.field.soil.html#module-RUFAS.routines.field.soil.evaporation">RUFAS.routines.field.soil.evaporation module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.field.soil.html#module-RUFAS.routines.field.soil.infiltration">RUFAS.routines.field.soil.infiltration module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.field.soil.html#module-RUFAS.routines.field.soil.layer_data">RUFAS.routines.field.soil.layer_data module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.field.soil.html#module-RUFAS.routines.field.soil.percolation">RUFAS.routines.field.soil.percolation module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.field.soil.html#module-RUFAS.routines.field.soil.snow">RUFAS.routines.field.soil.snow module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.field.soil.html#module-RUFAS.routines.field.soil.soil">RUFAS.routines.field.soil.soil module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.field.soil.html#module-RUFAS.routines.field.soil.soil_config_factory">RUFAS.routines.field.soil.soil_config_factory module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.field.soil.html#module-RUFAS.routines.field.soil.soil_data">RUFAS.routines.field.soil.soil_data module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.field.soil.html#module-RUFAS.routines.field.soil.soil_erosion">RUFAS.routines.field.soil.soil_erosion module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.field.soil.html#module-RUFAS.routines.field.soil.soil_temp">RUFAS.routines.field.soil.soil_temp module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.field.soil.html#module-RUFAS.routines.field.soil.soil_water">RUFAS.routines.field.soil.soil_water module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.field.soil.html#module-RUFAS.routines.field.soil">Module contents</a></li>
 </ul>
 </li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="RUFAS.routines.field.html#submodules">Submodules</a></li>
-<li class="toctree-l2"><a class="reference internal" href="RUFAS.routines.field.html#module-RUFAS.routines.field.field">RUFAS.routines.field.field module</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="RUFAS.routines.field.html#RUFAS.routines.field.field.Field"><code class="docutils literal notranslate"><span class="pre">Field</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="RUFAS.routines.field.html#RUFAS.routines.field.field.Fields"><code class="docutils literal notranslate"><span class="pre">Fields</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.field.html#RUFAS.routines.field.field.Fields.annual_reset"><code class="docutils literal notranslate"><span class="pre">Fields.annual_reset()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.field.html#RUFAS.routines.field.field.Fields.summarize_annual_variables"><code class="docutils literal notranslate"><span class="pre">Fields.summarize_annual_variables()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.field.html#RUFAS.routines.field.field.Fields.summarize_fields"><code class="docutils literal notranslate"><span class="pre">Fields.summarize_fields()</span></code></a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="RUFAS.routines.field.html#RUFAS.routines.field.field.annual_fields_routine"><code class="docutils literal notranslate"><span class="pre">annual_fields_routine()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="RUFAS.routines.field.html#RUFAS.routines.field.field.daily_fields_routine"><code class="docutils literal notranslate"><span class="pre">daily_fields_routine()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="RUFAS.routines.field.html#module-RUFAS.routines.field.crop_and_soil_constants">RUFAS.routines.field.crop_and_soil_constants module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.routines.field.html#RUFAS.routines.field.crop_and_soil_constants.FRACTION_OF_HUMIC_NITROGEN_IN_ACTIVE_POOL"><code class="docutils literal notranslate"><span class="pre">FRACTION_OF_HUMIC_NITROGEN_IN_ACTIVE_POOL</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="RUFAS.routines.field.html#module-RUFAS.routines.field">Module contents</a></li>
@@ -307,17 +746,25 @@
 </li>
 <li class="toctree-l1"><a class="reference internal" href="RUFAS.routines.manure.html">RUFAS.routines.manure package</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="RUFAS.routines.manure.html#subpackages">Subpackages</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.routines.manure.IO_helpers.html">RUFAS.routines.manure.IO_helpers package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.IO_helpers.html#submodules">Submodules</a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.IO_helpers.html#module-RUFAS.routines.manure.IO_helpers.manure_manager_config_handler">RUFAS.routines.manure.IO_helpers.manure_manager_config_handler module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.IO_helpers.html#module-RUFAS.routines.manure.IO_helpers.manure_module_output_manager_helper">RUFAS.routines.manure.IO_helpers.manure_module_output_manager_helper module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.IO_helpers.html#module-RUFAS.routines.manure.IO_helpers">Module contents</a></li>
+</ul>
+</li>
 <li class="toctree-l3"><a class="reference internal" href="RUFAS.routines.manure.beddings.html">RUFAS.routines.manure.beddings package</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.beddings.html#submodules">Submodules</a></li>
 <li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.beddings.html#module-RUFAS.routines.manure.beddings.bedding_classes">RUFAS.routines.manure.beddings.bedding_classes module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.beddings.html#module-RUFAS.routines.manure.beddings">Module contents</a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="RUFAS.routines.manure.constants.html">RUFAS.routines.manure.constants package</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.constants.html#submodules">Submodules</a></li>
-<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.constants.html#module-RUFAS.routines.manure.constants.gas_emission_constants">RUFAS.routines.manure.constants.gas_emission_constants module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.constants.html#module-RUFAS.routines.manure.constants.manure_constants">RUFAS.routines.manure.constants.manure_constants module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.constants.html#module-RUFAS.routines.manure.constants">Module contents</a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.routines.manure.constants_and_units.html">RUFAS.routines.manure.constants_and_units package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.constants_and_units.html#submodules">Submodules</a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.constants_and_units.html#module-RUFAS.routines.manure.constants_and_units.gas_emission_constants">RUFAS.routines.manure.constants_and_units.gas_emission_constants module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.constants_and_units.html#module-RUFAS.routines.manure.constants_and_units.manure_constants">RUFAS.routines.manure.constants_and_units.manure_constants module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.constants_and_units.html#module-RUFAS.routines.manure.constants_and_units.units">RUFAS.routines.manure.constants_and_units.units module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.constants_and_units.html#module-RUFAS.routines.manure.constants_and_units">Module contents</a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="RUFAS.routines.manure.default_enum.html">RUFAS.routines.manure.default_enum package</a><ul>
@@ -328,7 +775,7 @@
 </li>
 <li class="toctree-l3"><a class="reference internal" href="RUFAS.routines.manure.gas_emissions.html">RUFAS.routines.manure.gas_emissions package</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.gas_emissions.html#submodules">Submodules</a></li>
-<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.gas_emissions.html#module-RUFAS.routines.manure.gas_emissions.gas_emissions">RUFAS.routines.manure.gas_emissions.gas_emissions module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.gas_emissions.html#module-RUFAS.routines.manure.gas_emissions.calculator">RUFAS.routines.manure.gas_emissions.calculator module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.gas_emissions.html#module-RUFAS.routines.manure.gas_emissions">Module contents</a></li>
 </ul>
 </li>
@@ -338,6 +785,15 @@
 <li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.manure_handlers.html#module-RUFAS.routines.manure.manure_handlers.manure_handler_daily_output">RUFAS.routines.manure.manure_handlers.manure_handler_daily_output module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.manure_handlers.html#module-RUFAS.routines.manure.manure_handlers.milking_parlor">RUFAS.routines.manure.manure_handlers.milking_parlor module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.manure_handlers.html#module-RUFAS.routines.manure.manure_handlers">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.routines.manure.manure_nutrients.html">RUFAS.routines.manure.manure_nutrients package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.manure_nutrients.html#submodules">Submodules</a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.manure_nutrients.html#module-RUFAS.routines.manure.manure_nutrients.manure_nutrient_manager">RUFAS.routines.manure.manure_nutrients.manure_nutrient_manager module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.manure_nutrients.html#module-RUFAS.routines.manure.manure_nutrients.manure_nutrients">RUFAS.routines.manure.manure_nutrients.manure_nutrients module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.manure_nutrients.html#module-RUFAS.routines.manure.manure_nutrients.nutrient_request">RUFAS.routines.manure.manure_nutrients.nutrient_request module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.manure_nutrients.html#module-RUFAS.routines.manure.manure_nutrients.nutrient_request_results">RUFAS.routines.manure.manure_nutrients.nutrient_request_results module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.manure_nutrients.html#module-RUFAS.routines.manure.manure_nutrients">Module contents</a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="RUFAS.routines.manure.manure_separators.html">RUFAS.routines.manure.manure_separators package</a><ul>
@@ -353,23 +809,25 @@
 <li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.manure_treatments.html#module-RUFAS.routines.manure.manure_treatments.anaerobic_digestion_and_lagoon">RUFAS.routines.manure.manure_treatments.anaerobic_digestion_and_lagoon module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.manure_treatments.html#module-RUFAS.routines.manure.manure_treatments.anaerobic_lagoon">RUFAS.routines.manure.manure_treatments.anaerobic_lagoon module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.manure_treatments.html#module-RUFAS.routines.manure.manure_treatments.base_manure_treatment">RUFAS.routines.manure.manure_treatments.base_manure_treatment module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.manure_treatments.html#module-RUFAS.routines.manure.manure_treatments.compost_bedded_pack_barn">RUFAS.routines.manure.manure_treatments.compost_bedded_pack_barn module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.manure_treatments.html#module-RUFAS.routines.manure.manure_treatments.manure_treatment_configs">RUFAS.routines.manure.manure_treatments.manure_treatment_configs module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.manure_treatments.html#module-RUFAS.routines.manure.manure_treatments.manure_treatment_daily_output">RUFAS.routines.manure.manure_treatments.manure_treatment_daily_output module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.manure_treatments.html#module-RUFAS.routines.manure.manure_treatments.manure_treatment_factory">RUFAS.routines.manure.manure_treatments.manure_treatment_factory module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.manure_treatments.html#module-RUFAS.routines.manure.manure_treatments.manure_treatment_types">RUFAS.routines.manure.manure_treatments.manure_treatment_types module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.manure_treatments.html#module-RUFAS.routines.manure.manure_treatments.manure_types">RUFAS.routines.manure.manure_treatments.manure_types module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.manure_treatments.html#module-RUFAS.routines.manure.manure_treatments.open_lots">RUFAS.routines.manure.manure_treatments.open_lots module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.manure_treatments.html#module-RUFAS.routines.manure.manure_treatments.slurry_storage_outdoor">RUFAS.routines.manure.manure_treatments.slurry_storage_outdoor module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.manure_treatments.html#module-RUFAS.routines.manure.manure_treatments.slurry_storage_underfloor">RUFAS.routines.manure.manure_treatments.slurry_storage_underfloor module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.manure_treatments.html#module-RUFAS.routines.manure.manure_treatments">Module contents</a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="RUFAS.routines.manure.pen.html">RUFAS.routines.manure.pen package</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.pen.html#submodules">Submodules</a></li>
-<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.pen.html#module-RUFAS.routines.manure.pen.manure_management_pen">RUFAS.routines.manure.pen.manure_management_pen module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.pen.html#module-RUFAS.routines.manure.pen">Module contents</a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="RUFAS.routines.manure.pen_manure.html">RUFAS.routines.manure.pen_manure package</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.pen_manure.html#submodules">Submodules</a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.pen_manure.html#module-RUFAS.routines.manure.pen_manure.manure_manager_pen">RUFAS.routines.manure.pen_manure.manure_manager_pen module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.pen_manure.html#module-RUFAS.routines.manure.pen_manure.pen_manure">RUFAS.routines.manure.pen_manure.pen_manure module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.pen_manure.html#module-RUFAS.routines.manure.pen_manure">Module contents</a></li>
 </ul>
@@ -390,70 +848,24 @@
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="RUFAS.routines.manure.html#submodules">Submodules</a></li>
-<li class="toctree-l2"><a class="reference internal" href="RUFAS.routines.manure.html#module-RUFAS.routines.manure.manure_management">RUFAS.routines.manure.manure_management module</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="RUFAS.routines.manure.html#RUFAS.routines.manure.manure_management.ManureManagement"><code class="docutils literal notranslate"><span class="pre">ManureManager</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.html#RUFAS.routines.manure.manure_management.ManureManagement.all_data"><code class="docutils literal notranslate"><span class="pre">ManureManager.all_data</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.html#RUFAS.routines.manure.manure_management.ManureManagement.update"><code class="docutils literal notranslate"><span class="pre">ManureManager.update()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="RUFAS.routines.manure.html#module-RUFAS.routines.manure.manure_manager">RUFAS.routines.manure.manure_manager module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.routines.manure.html#RUFAS.routines.manure.manure_manager.ManureManager"><code class="docutils literal notranslate"><span class="pre">ManureManager</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.html#RUFAS.routines.manure.manure_manager.ManureManager.daily_update"><code class="docutils literal notranslate"><span class="pre">ManureManager.daily_update()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.html#RUFAS.routines.manure.manure_manager.ManureManager.data"><code class="docutils literal notranslate"><span class="pre">ManureManager.data</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.html#RUFAS.routines.manure.manure_manager.ManureManager.request_nutrients"><code class="docutils literal notranslate"><span class="pre">ManureManager.request_nutrients()</span></code></a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="RUFAS.routines.manure.html#RUFAS.routines.manure.manure_management.simulate_daily_manure_management"><code class="docutils literal notranslate"><span class="pre">simulate_daily_manure_management()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.routines.manure.html#RUFAS.routines.manure.manure_manager.simulate_daily_manure_manager"><code class="docutils literal notranslate"><span class="pre">simulate_daily_manure_manager()</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="RUFAS.routines.manure.html#module-RUFAS.routines.manure">Module contents</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="RUFAS.routines.manure_storage.html">RUFAS.routines.manure_storage package</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="RUFAS.routines.manure_storage.html#submodules">Submodules</a></li>
-<li class="toctree-l2"><a class="reference internal" href="RUFAS.routines.manure_storage.html#module-RUFAS.routines.manure_storage.manure_emissions">RUFAS.routines.manure_storage.manure_emissions module</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="RUFAS.routines.manure_storage.html#RUFAS.routines.manure_storage.manure_emissions.WIP_WOP_frac"><code class="docutils literal notranslate"><span class="pre">WIP_WOP_frac()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="RUFAS.routines.manure_storage.html#RUFAS.routines.manure_storage.manure_emissions.methane"><code class="docutils literal notranslate"><span class="pre">methane()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="RUFAS.routines.manure_storage.html#RUFAS.routines.manure_storage.manure_emissions.update_all"><code class="docutils literal notranslate"><span class="pre">update_all()</span></code></a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="RUFAS.routines.manure_storage.html#module-RUFAS.routines.manure_storage.manure_handling">RUFAS.routines.manure_storage.manure_handling module</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="RUFAS.routines.manure_storage.html#RUFAS.routines.manure_storage.manure_handling.CH4"><code class="docutils literal notranslate"><span class="pre">CH4()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="RUFAS.routines.manure_storage.html#RUFAS.routines.manure_storage.manure_handling.K_loss"><code class="docutils literal notranslate"><span class="pre">K_loss()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="RUFAS.routines.manure_storage.html#RUFAS.routines.manure_storage.manure_handling.N_loss"><code class="docutils literal notranslate"><span class="pre">N_loss()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="RUFAS.routines.manure_storage.html#RUFAS.routines.manure_storage.manure_handling.P_loss"><code class="docutils literal notranslate"><span class="pre">P_loss()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="RUFAS.routines.manure_storage.html#RUFAS.routines.manure_storage.manure_handling.WIP_WOP"><code class="docutils literal notranslate"><span class="pre">WIP_WOP()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="RUFAS.routines.manure_storage.html#RUFAS.routines.manure_storage.manure_handling.flush_water"><code class="docutils literal notranslate"><span class="pre">flush_water()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="RUFAS.routines.manure_storage.html#RUFAS.routines.manure_storage.manure_handling.solids"><code class="docutils literal notranslate"><span class="pre">solids()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="RUFAS.routines.manure_storage.html#RUFAS.routines.manure_storage.manure_handling.update_all"><code class="docutils literal notranslate"><span class="pre">update_all()</span></code></a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="RUFAS.routines.manure_storage.html#module-RUFAS.routines.manure_storage.manure_separator">RUFAS.routines.manure_storage.manure_separator module</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="RUFAS.routines.manure_storage.html#RUFAS.routines.manure_storage.manure_separator.effluent_liquid"><code class="docutils literal notranslate"><span class="pre">effluent_liquid()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="RUFAS.routines.manure_storage.html#RUFAS.routines.manure_storage.manure_separator.effluent_solid"><code class="docutils literal notranslate"><span class="pre">effluent_solid()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="RUFAS.routines.manure_storage.html#RUFAS.routines.manure_storage.manure_separator.update_all"><code class="docutils literal notranslate"><span class="pre">update_all()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="RUFAS.routines.manure_storage.html#RUFAS.routines.manure_storage.manure_separator.update_storage"><code class="docutils literal notranslate"><span class="pre">update_storage()</span></code></a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="RUFAS.routines.manure_storage.html#module-RUFAS.routines.manure_storage.manure_storage">RUFAS.routines.manure_storage.manure_storage module</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="RUFAS.routines.manure_storage.html#RUFAS.routines.manure_storage.manure_storage.ManureStorage"><code class="docutils literal notranslate"><span class="pre">ManureStorage</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure_storage.html#RUFAS.routines.manure_storage.manure_storage.ManureStorage.Pen"><code class="docutils literal notranslate"><span class="pre">ManureStorage.Pen</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure_storage.html#RUFAS.routines.manure_storage.manure_storage.ManureStorage.Separator"><code class="docutils literal notranslate"><span class="pre">ManureStorage.Separator</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure_storage.html#RUFAS.routines.manure_storage.manure_storage.ManureStorage.Storage"><code class="docutils literal notranslate"><span class="pre">ManureStorage.Storage</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure_storage.html#RUFAS.routines.manure_storage.manure_storage.ManureStorage.annual_mass_balance"><code class="docutils literal notranslate"><span class="pre">ManureStorage.annual_mass_balance()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure_storage.html#RUFAS.routines.manure_storage.manure_storage.ManureStorage.annual_reset"><code class="docutils literal notranslate"><span class="pre">ManureStorage.annual_reset()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure_storage.html#RUFAS.routines.manure_storage.manure_storage.ManureStorage.initialize_pens"><code class="docutils literal notranslate"><span class="pre">ManureStorage.initialize_pens()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure_storage.html#RUFAS.routines.manure_storage.manure_storage.ManureStorage.initialize_separators"><code class="docutils literal notranslate"><span class="pre">ManureStorage.initialize_separators()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure_storage.html#RUFAS.routines.manure_storage.manure_storage.ManureStorage.initialize_storage"><code class="docutils literal notranslate"><span class="pre">ManureStorage.initialize_storage()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure_storage.html#RUFAS.routines.manure_storage.manure_storage.ManureStorage.reset_daily_variables"><code class="docutils literal notranslate"><span class="pre">ManureStorage.reset_daily_variables()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure_storage.html#RUFAS.routines.manure_storage.manure_storage.ManureStorage.summarize_annual_variables"><code class="docutils literal notranslate"><span class="pre">ManureStorage.summarize_annual_variables()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure_storage.html#RUFAS.routines.manure_storage.manure_storage.ManureStorage.summarize_manure_storage"><code class="docutils literal notranslate"><span class="pre">ManureStorage.summarize_manure_storage()</span></code></a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="RUFAS.routines.manure_storage.html#RUFAS.routines.manure_storage.manure_storage.daily_manure_storage_routine"><code class="docutils literal notranslate"><span class="pre">daily_manure_storage_routine()</span></code></a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="RUFAS.routines.manure_storage.html#module-RUFAS.routines.manure_storage">Module contents</a></li>
 </ul>
 </li>
 </ul>
 </div>
 </section>
 <section id="module-RUFAS.routines">
-<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-RUFAS.routines" title="Permalink to this heading"></a></h2>
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-RUFAS.routines" title="Link to this heading"></a></h2>
 </section>
 </section>
 
@@ -461,7 +873,7 @@
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="RUFAS.output_handler.reports.html" class="btn btn-neutral float-left" title="RUFAS.output_handler.reports package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="RUFAS.html" class="btn btn-neutral float-left" title="RUFAS package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
         <a href="RUFAS.routines.animal.html" class="btn btn-neutral float-right" title="RUFAS.routines.animal package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
