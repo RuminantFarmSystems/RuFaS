@@ -3,7 +3,7 @@ import os
 from pathlib import Path
 import re
 import json
-from typing import Any, Callable, Dict, List
+from typing import Any, Callable, Dict, List, Optional, Type
 from mock import mock_open, patch
 
 import pytest
@@ -12,6 +12,7 @@ from pytest import raises
 from pytest_mock.plugin import MockerFixture
 
 from RUFAS.output_manager import LogVerbosity, OutputManager
+from RUFAS.report_generator import ReportGenerator
 
 
 def test_get_prefix() -> None:
@@ -2037,3 +2038,145 @@ def test_log_verbosity_enum_values() -> None:
     assert LogVerbosity.ERRORS.value == "errors"
     assert LogVerbosity.WARNINGS.value == "warnings"
     assert LogVerbosity.LOGS.value == "logs"
+
+
+@pytest.mark.parametrize(
+    "references, reports, expected_exception, expected_message",
+    [
+        # All references are present
+        (["ref1", "ref2"], {"ref1": {}, "ref2": {}}, None, None),
+
+        # One reference is missing
+        (["ref1", "ref2"], {"ref1": {}}, KeyError, "Missing referenced reports: ref2"),
+
+        # Multiple references are missing
+        (["ref1", "ref2", "ref3"], {"ref1": {}}, KeyError, "Missing referenced reports: ref2, ref3"),
+
+        # Reports dictionary is empty
+        (["ref1"], {}, KeyError, "Missing referenced reports: ref1"),
+    ]
+)
+def test_check_for_missing_references(references: List[str],
+                                      reports: Dict[str, Dict[str, Any]],
+                                      expected_exception: Optional[Exception],
+                                      expected_message: Optional[str]) -> None:
+    """
+    Unit test for _check_for_missing_references static method in OutputManager class.
+    """
+
+    if expected_exception:
+        # Act and assert
+        with pytest.raises(expected_exception) as excinfo:  # type: ignore
+            OutputManager._check_for_missing_references(references, reports)
+        assert expected_message in str(excinfo.value)
+    else:
+        # Act
+        OutputManager._check_for_missing_references(references, reports)
+
+
+@pytest.mark.parametrize(
+    "filter_content, reports, expected_name, timestamp_return_value",
+    [
+        # Case when the name is not in reports
+        ({"name": "report1"}, {}, "report1", "2023-01-01"),
+
+        # Case when the name is in reports and a timestamp is appended
+        ({"name": "report1"}, {"report1": {}}, "report1 2023-01-01", "2023-01-01"),
+
+        # Case when the name is not provided in filter_content
+        ({}, {}, "untitled_2023-01-01", "2023-01-01"),
+    ]
+)
+def test_generate_unique_report_name(mocker: MockerFixture,
+                                     filter_content: Dict[str, str],
+                                     reports: Dict[str, Dict[str, Any]],
+                                     expected_name: str,
+                                     timestamp_return_value: str
+                                     ) -> None:
+    """
+    Unit test for _generate_unique_report_name method in OutputManager class.
+    """
+
+    # Arrange
+    om = OutputManager()
+    mocker.patch.object(om, '_get_timestamp', return_value=timestamp_return_value)
+
+    # Act
+    result = om._generate_unique_report_name(filter_content, reports)
+
+    # Assert
+    assert result == expected_name
+
+
+@pytest.mark.parametrize(
+    "filter_content, filtered_pool, reports,"
+    "expected_exception, expected_report_key, expected_report_value, expected_calls",
+    [
+        # Standard report case
+        (
+                {"name": "standard_report", "filters": ["some_filter"]},
+                {"some_data_key": [1, 2, 3]},
+                {},
+                None,
+                "standard_report",
+                {"values": "mocked_report"},
+                {"generate_report": 1, "generate_derived_report": 0}
+        ),
+
+        # Derived report case
+        (
+                {"name": "derived_report", "references": ["ref1", "ref2"]},
+                None,
+                {"ref1": {"values": [1, 2, 3]}, "ref2": {"values": [4, 5, 6]}},
+                None,
+                "derived_report",
+                {"values": "mocked_derived_report"},
+                {"generate_report": 0, "generate_derived_report": 1}
+        ),
+
+        # Error case (e.g., missing reference)
+        (
+                {"name": "error_report", "references": ["missing_ref"]},
+                None,
+                {"ref1": {"values": [1, 2, 3]}},
+                KeyError,
+                None,
+                None,
+                {"generate_report": 0, "generate_derived_report": 0}
+        ),
+    ]
+)
+def test_handle_report_generation(mocker: MockerFixture,
+                                  filter_content: Dict[str, Any],
+                                  filtered_pool: Optional[Dict[str, Any]],
+                                  reports: Dict[str, Dict[str, List[Any]]],
+                                  expected_exception: Optional[Type[BaseException]],
+                                  expected_report_key: Optional[str],
+                                  expected_report_value: Optional[Dict[str, List[Any]]],
+                                  expected_calls: Dict[str, int]
+                                  ) -> None:
+    """
+    Unit test for _handle_report_generation method in OutputManager class.
+    """
+
+    # Arrange
+    om = OutputManager()
+    patch_for_add_log = mocker.patch.object(om, 'add_log')
+    patch_for_add_error = mocker.patch.object(om, 'add_error')
+    patch_for_generate_report = mocker.patch("RUFAS.output_manager.ReportGenerator.generate_report",
+                                             return_value="mocked_report")
+    patch_for_generate_derived_report = mocker.patch.object(ReportGenerator,
+                                                            "generate_derived_report",
+                                                            return_value="mocked_derived_report")
+
+    # Act
+    om._handle_report_generation(filter_content, filtered_pool, {}, reports)
+
+    # Assert
+    assert reports.get(expected_report_key) == expected_report_value
+    assert patch_for_add_log.call_count == 1
+    assert patch_for_generate_report.call_count == expected_calls["generate_report"]
+    assert patch_for_generate_derived_report.call_count == expected_calls["generate_derived_report"]
+
+    if expected_exception:
+        assert patch_for_add_error.call_count == 1

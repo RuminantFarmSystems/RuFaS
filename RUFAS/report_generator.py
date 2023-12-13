@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from typing import Dict, List, Any, Callable
 from RUFAS.util import Utility
 
@@ -217,6 +219,42 @@ class ReportGenerator:
         raise ValueError(
             f"Didn't find `horizontal_aggregation` or `vertical_aggregation` in {filter_content.get('name')}."
         )
+
+    @staticmethod
+    def generate_derived_report(referenced_data: List[List[float]], config: Dict[str, Any]) -> List[float]:
+        """
+        Generates a derived report based on referenced data and aggregation criteria.
+
+        Parameters
+        ----------
+        referenced_data : List[List[float]]
+            A list of lists, where each sublist contains the data of a referenced report.
+
+        config : Dict[str, Any]
+            A dictionary containing the configuration for the derived report,
+            including the aggregation type.
+
+        Returns
+        -------
+        List[float]
+            The aggregated report data as a list.
+
+        Raises
+        ------
+        ValueError
+            If the aggregation type is not supported or referenced data is invalid.
+        """
+
+        aggregation_type = config.get("horizontal_aggregation")
+        aggregator = AGGREGATION_FUNCTIONS.get(aggregation_type)
+
+        if not aggregator:
+            raise ValueError(f"Unsupported aggregation type: {aggregation_type}")
+
+        # For the current PR, we assume all lists are of the same length
+        aggregated_data = [aggregator(values) for values in zip(*referenced_data)]  # type: ignore
+
+        return aggregated_data
 
     def _prepare_report_data(
         self,

@@ -1,4 +1,5 @@
 # !/usr/bin/env python3
+from __future__ import annotations
 
 from copy import deepcopy
 from enum import Enum
@@ -798,44 +799,30 @@ class OutputManager(object):
                 info_map["filter_content"] = filter_content
                 if (
                     not isinstance(filter_content, dict)
-                    or "filters" not in filter_content.keys()
+                    or ("filters" not in filter_content.keys() and "references" not in filter_content.keys())
                 ):
                     self.add_error(
                         "Parsing error",
                         f"Could not parse {filter_content.get('name')=} in {filter_file=},\
-                            it has to have JSON blobs and have `filters` entry.",
+                            it has to have JSON blobs and have `filters` entry."
+                        f"The `filters` can only be skipped if `references` entry is present "
+                        f"and the purpose is to generate a derived report.",
                         info_map,
                     )
                     continue
-                filtered_pool = self._filter_variables_pool(
-                    filter_content["filters"], filter_file
-                )
+
+                filtered_pool = {}
+                if "filters" in filter_content.keys():
+                    filtered_pool = self._filter_variables_pool(
+                        filter_content["filters"], filter_file
+                    )
                 if exclude_info_maps:
                     filtered_pool = self._exclude_info_maps(filtered_pool)
 
                 if filter_file.startswith(
                     self.__supported_filter_types_prefixes["report"]
                 ):
-                    self.add_log(
-                        "init_report_generation", "Report Generation Started", info_map
-                    )
-                    report_generator = ReportGenerator()
-                    try:
-                        report_name = filter_content.get(
-                            "name", f"untitled_{self._get_timestamp(True)}"
-                        )
-                        reports[
-                            report_name
-                            if report_name not in reports.keys()
-                            else f"{report_name} {self._get_timestamp(True)}"
-                        ] = {
-                            "values": report_generator.generate_report(
-                                filtered_pool,
-                                filter_content,
-                            )
-                        }
-                    except (ValueError, KeyError) as e:
-                        self.add_error("report generation error", str(e), info_map)
+                    self._handle_report_generation(filter_content, filtered_pool, info_map, reports)
                 else:
                     self._route_save_functions(
                         filter_file,
@@ -851,6 +838,103 @@ class OutputManager(object):
                 self._generate_file_name(f"report_{filter_file}", "csv"),
             )
             self._dict_to_file_csv(reports, report_file_path)
+
+    def _handle_report_generation(self,
+                                  filter_content: Dict[str, Any],
+                                  filtered_pool: Dict[str, Any] | None,
+                                  info_map: Dict[str, Any],
+                                  reports: Dict[str, Dict[str, List[Any]]]) -> None:
+        """
+        Handles the generation of individual and derived reports based on the provided filter content.
+
+        This method determines whether to generate a standard report (using 'filtered_pool') or
+        a derived report (using 'references'). It then invokes the appropriate method of the
+        ReportGenerator to create the report and stores the result in the 'reports' dictionary.
+
+        Parameters
+        ----------
+        filter_content : Dict[str, Any]
+            A dictionary containing the configuration for the report, including details
+            such as 'name', 'filters', 'references', and aggregation instructions.
+
+        filtered_pool : Optional[Dict[str, Any]]
+            The data pool from which standard reports are to be generated. This parameter
+            is used for standard reports and is None for derived reports.
+
+        info_map : Dict[str, Any]
+            A dictionary containing logging information such as the class and function names.
+
+        reports : Dict[str, Dict[str, List[Any]]]
+            A dictionary to store the generated reports, keyed by their names.
+
+        Raises
+        ------
+        ValueError, KeyError
+            If there is an error in report generation, such as missing data or invalid configuration.
+        """
+
+        self.add_log("init_report_generation", "Report Generation Started", info_map)
+        report_generator = ReportGenerator()
+        try:
+            report_name = self._generate_unique_report_name(filter_content, reports)
+
+            if "references" in filter_content.keys():
+                self._check_for_missing_references(filter_content["references"], reports)
+                referenced_data = [reports[ref]["values"] for ref in filter_content["references"]]
+                report_data = ReportGenerator.generate_derived_report(referenced_data, filter_content)
+            else:
+                report_data = report_generator.generate_report(filtered_pool, filter_content)
+
+            reports[report_name] = {"values": report_data}
+
+        except (ValueError, KeyError) as e:
+            self.add_error("report generation error", str(e), info_map)
+
+    def _generate_unique_report_name(self, filter_content: Dict[str, Any], reports: Dict[str, Any]) -> str:
+        """
+        Generates a unique name for the report.
+
+        Parameters
+        ----------
+        filter_content : Dict[str, Any]
+            The filter content for the report.
+        reports : Dict[str, Any]
+            The dictionary of reports to check against.
+
+        Returns
+        -------
+        str
+            The unique name for the report.
+        """
+
+        base_name = filter_content.get("name", f"untitled_{self._get_timestamp(True)}")
+
+        if base_name in reports:
+            base_name = f"{base_name} {self._get_timestamp(True)}"
+
+        return base_name
+
+    @staticmethod
+    def _check_for_missing_references(references: List[str], reports: Dict[str, Any]) -> None:
+        """
+        Checks if all the referenced reports are present.
+
+        Parameters
+        ----------
+        references : List[str]
+            The list of references to check.
+        reports : Dict[str, Any]
+            The dictionary of reports to check against.
+
+        Raises
+        ------
+        KeyError
+            If any of the references are missing.
+        """
+
+        missing_references = [ref for ref in references if ref not in reports]
+        if missing_references:
+            raise KeyError(f"Missing referenced reports: {', '.join(missing_references)}")
 
     def _route_save_functions(
         self,
