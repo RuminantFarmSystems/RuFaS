@@ -277,7 +277,7 @@ def test_filter_events(events: List[Event], year: int, day: int, expected_remain
 
 
 @pytest.mark.parametrize("crop_reference,heat_scheduled,custom_crop_specs,is_supported,year,day", [
-    ("corn", False, None, True, 1990, 120),
+    ("corn_silage", False, None, True, 1990, 120),
     ("custom_alfalfa", False, {"custom_alfalfa": {"species": "alfalfa", "minimum_temperature": 3.0}}, False, 1992, 115),
     ("alien_crop", True, {"custom_corn": {"species": "corn", "is_nitrogen_fixer": True},
                           "alien_crop": {"species": "halo_alien_corn", "minimum_temperature": -60}}, False, 2000, 110)
@@ -506,8 +506,8 @@ def test_start_dormancy(daylength: float, threshold_daylength: float) -> None:
 
 
 @pytest.mark.parametrize("species,specs", [
-    ("corn", {}),  # no additional arguments
-    ("alfalfa", {"minimum_temperature": -2.1, "id": 123})  # supported species, with alteration
+    ("corn_grain", {}),  # no additional arguments
+    ("alfalfa_hay", {"minimum_temperature": -2.1, "id": 123})  # supported species, with alteration
 ])
 def test_make_supported_crop(species: str, specs: dict):
     """ensure that supported crops are properly created."""
@@ -520,7 +520,7 @@ def test_make_supported_crop(species: str, specs: dict):
     if len(specs) > 0:
         assert "altered" in crop.data.name
     else:
-        assert "default" in crop.data.name
+        assert "altered" not in crop.data.name
 
     # failing cases
     with pytest.raises(Exception):
