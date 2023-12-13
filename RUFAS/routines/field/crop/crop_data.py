@@ -357,6 +357,11 @@ class CropData:
     Percentage of fresh yield that is dry matter (unitless).
     Note: this value is the default for Sorghum harvested as a grain.
     """
+    lignin_dry_matter_percentage: float = 1.518
+    """
+    Percentage of dry matter yield that is lignin (unitless).
+    Note: this value is the default for Sorghum harvested as a grain.
+    """
     dry_down_fraction: float = 0.2
     """proportion of plant biomass that is lost to dry-down (unitless; [0, 1])"""
     optimal_phosphorus_fraction: float = 0.073
