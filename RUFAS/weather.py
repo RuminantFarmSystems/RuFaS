@@ -273,4 +273,3 @@ class Weather:
         first_field_key = field_input_keys[0]
         latitude = im.get_data(f"{first_field_key}.abs_latitude")["abs_latitude"]
         return latitude
-
