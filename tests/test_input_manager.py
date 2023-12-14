@@ -1862,7 +1862,7 @@ def test_get_data_by_properties_no_data(mock_input_manager: InputManager,
         "key_4": {"properties": "target_properties"},
         "key_5": {"properties": "target_properties"},
      }, 0, ["key_3", "key_4", "key_5"]
-    ),
+     ),
     ({
         "key_1": {"properties": "target_properties"},
         "key_2": {"not_the_properties": "value"},
@@ -1870,13 +1870,13 @@ def test_get_data_by_properties_no_data(mock_input_manager: InputManager,
         "key_4": {"properties": "properties_4"},
         "key_5": {"properties": "properties_5"}
      }, 1, ["key_1", "key_3"]
-    ),
+     ),
     ({
         "key_1": {"not_the_properties": "value"},
         "key_2": {"not_the_properties": "value"},
         "key_3": {"not_the_properties": "value"}
      }, 3, []
-    ),
+     ),
     ({}, 0, [])
 ])
 def test_get_data_keys_by_properties(data: dict[str, dict[str, str]], error_count: int, expected_keys: list[str],
