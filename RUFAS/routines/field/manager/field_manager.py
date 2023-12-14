@@ -25,7 +25,7 @@ im = InputManager()
 class FieldManager:
     def __init__(self, manure_manager: ManureManager):
         self.fields: List[Field] = []
-        fields = im.get_data_keys_by_property("field_properties")
+        fields = im.get_data_keys_by_properties("field_properties")
         for field in fields:
             new_field = self._setup_field(field, manure_manager)
             self.fields.append(new_field)

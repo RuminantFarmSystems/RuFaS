@@ -780,7 +780,7 @@ class InputManager:
             raise KeyError(f"Data not found: Cannot find \"{metadata_address}\", "
                            f"\"{parent_address}\" does not have attribute \"{invalid_key}\".")
 
-    def get_data_keys_by_property(self, target_property: str) -> list[str]:
+    def get_data_keys_by_properties(self, target_property: str) -> list[str]:
         """
         Retrieves list of keys that point to data which have specified properties.
 
@@ -803,7 +803,7 @@ class InputManager:
 
         info_map = {
             "class": self.__class__.__name__,
-            "function": self.get_data_keys_by_property.__name__,
+            "function": self.get_data_keys_by_properties.__name__,
         }
 
         try:
