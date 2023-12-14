@@ -158,8 +158,8 @@ class AnimalPopulation:
         """
         Returns a dictionary containing herd summary information
 
-        Returns:
-        --------
+        Returns
+        -------
         Dict[str, int | float]
             A dictionary which stores the summary of the initialization
         """
