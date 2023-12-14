@@ -226,7 +226,7 @@ class AnimalManager:
 
             self.all_pens.append(pen)
 
-    def init_animals(self, herd_data: Dict[str, Any]):
+    def init_animals(self, herd_data: Dict[str, Any]) -> None:
         """
         Populates the list of animals with the information from the
         input JSON file: constructs the calves, heiferI's, heiferII's,
