@@ -47,7 +47,7 @@ def input_manager_original_method_states(
         "_validate_input_type_dynamic": mock_input_manager._validate_input_type_dynamic,
         "_validate_tabular_element": mock_input_manager._validate_tabular_element,
         "flush_pool": mock_input_manager.flush_pool,
-        "_metadata_properties_exists": mock_input_manager._metadata_properties_exists,
+        "_metadata_properties_exist": mock_input_manager._metadata_properties_exist,
         "_add_variable_to_pool": mock_input_manager._add_variable_to_pool,
         "add_dict_variable_to_pool": mock_input_manager.add_dict_variable_to_pool,
         "add_tabular_variable_to_pool": mock_input_manager.add_tabular_variable_to_pool
@@ -1878,28 +1878,24 @@ def test_flush_pool(mock_input_manager: InputManager) -> None:
     "properties1",
     "properties2"
 ])
-def test_metadata_properties_exists(properties_blob_key: str,
-                                    mock_input_manager: InputManager,
-                                    mock_metadata: Dict[str, Dict[str, Any]]) -> None:
+def test_metadata_properties_exist(properties_blob_key: str,
+                                   mock_input_manager: InputManager,
+                                   mock_metadata: Dict[str, Dict[str, Any]]) -> None:
     mock_input_manager._InputManager__metadata = mock_metadata
 
-    result, returned_error = mock_input_manager._metadata_properties_exists(variable_name="mock_variable",
-                                                                            properties_blob_key=properties_blob_key)
+    result = mock_input_manager._metadata_properties_exist(variable_name="mock_variable",
+                                                           properties_blob_key=properties_blob_key)
 
     assert result is True
-    assert returned_error is None
 
 
-def test_metadata_properties_exists_no_metadata(mock_input_manager: InputManager) -> None:
+def test_metadata_properties_exist_no_metadata(mock_input_manager: InputManager) -> None:
     mock_input_manager._InputManager__metadata = {}
 
-    result, returned_error = mock_input_manager._metadata_properties_exists(
-        variable_name="mock_variable",
-        properties_blob_key="mock_properties_blob_key")
-
-    assert result is False
-    assert isinstance(returned_error, ValueError)
-    assert str(returned_error) == "No metadata loaded."
+    with pytest.raises(ValueError):
+        mock_input_manager._metadata_properties_exist(
+            variable_name="mock_variable",
+            properties_blob_key="mock_properties_blob_key")
 
 
 @pytest.mark.parametrize('variable_name, properties_blob_key', [
@@ -1912,18 +1908,14 @@ def test_metadata_properties_exists_invalid_properties_blob_key(variable_name: s
                                                                 mock_metadata: Dict[str, Dict[str, Any]]) -> None:
     mock_input_manager._InputManager__metadata = mock_metadata
 
-    result, returned_error = mock_input_manager._metadata_properties_exists(
-        variable_name=variable_name,
-        properties_blob_key=properties_blob_key)
-
-    assert result is False
-    assert isinstance(returned_error, KeyError)
-    assert str(returned_error) == f'"No metadata is found for variable \'{variable_name}\' with given ' \
-                                  f'properties_blob_key {properties_blob_key}."'
+    with pytest.raises(KeyError):
+        mock_input_manager._metadata_properties_exist(
+            variable_name=variable_name,
+            properties_blob_key=properties_blob_key)
 
 
 @pytest.fixture
-def mock_metadata_for_add_variable_to_pool(mocker: MockerFixture) -> Dict[str, Dict[str, Any]]:
+def mock_metadata_for_add_variable_to_pool() -> Dict[str, Dict[str, Any]]:
     return {
         "files": {
             "file1": {"type": "json", "path": "path/to/json/file1.json", "properties": "properties1"},
@@ -2001,15 +1993,14 @@ def test_add_variable_to_pool_valid(variable_name: str,
     with patch("RUFAS.output_manager.OutputManager.add_log") as mock_om_add_log:
         with patch("RUFAS.output_manager.OutputManager.add_warning") as mock_om_add_warning:
             with patch("RUFAS.output_manager.OutputManager.add_error") as mock_om_add_error:
-                result, returned_error = mock_input_manager._add_variable_to_pool(
+                result = mock_input_manager._add_variable_to_pool(
                     variable_name=variable_name,
                     data=data,
                     properties_blob_key=properties_blob_key,
                     eager_termination=False,
-                    is_dict_variable=is_dict_variable)
+                    is_variable_dict=is_dict_variable)
 
     assert result is True
-    assert returned_error is None
     assert mock_om_add_log.call_count == 4
     assert mock_om_add_warning.call_count == expected_add_warning_count
     assert mock_om_add_error.call_count == 0
@@ -2074,15 +2065,14 @@ def test_add_variable_to_pool_invalid(variable_name: str,
     with patch("RUFAS.output_manager.OutputManager.add_log") as mock_om_add_log:
         with patch("RUFAS.output_manager.OutputManager.add_warning") as mock_om_add_warning:
             with patch("RUFAS.output_manager.OutputManager.add_error") as mock_om_add_error:
-                result, returned_error = mock_input_manager._add_variable_to_pool(
+                result = mock_input_manager._add_variable_to_pool(
                     variable_name=variable_name,
                     data=data,
                     properties_blob_key=properties_blob_key,
                     eager_termination=False,
-                    is_dict_variable=is_dict_variable)
+                    is_variable_dict=is_dict_variable)
 
     assert result is False
-    assert returned_error is None
     assert mock_om_add_log.call_count == 4
     assert mock_om_add_warning.call_count == 0
     assert mock_om_add_error.call_count == 1
@@ -2148,17 +2138,14 @@ def test_add_variable_to_pool_eager_termination(variable_name: str,
     with patch("RUFAS.output_manager.OutputManager.add_log") as mock_om_add_log:
         with patch("RUFAS.output_manager.OutputManager.add_warning") as mock_om_add_warning:
             with patch("RUFAS.output_manager.OutputManager.add_error") as mock_om_add_error:
-                result, returned_error = mock_input_manager._add_variable_to_pool(
-                    variable_name=variable_name,
-                    data=data,
-                    properties_blob_key=properties_blob_key,
-                    eager_termination=True,
-                    is_dict_variable=is_dict_variable)
+                with pytest.raises(ValueError):
+                    mock_input_manager._add_variable_to_pool(
+                        variable_name=variable_name,
+                        data=data,
+                        properties_blob_key=properties_blob_key,
+                        eager_termination=True,
+                        is_variable_dict=is_dict_variable)
 
-    assert result is False
-    assert isinstance(returned_error, ValueError)
-    assert str(returned_error) == f'Variable {variable_name} has invalid components. Only successfully validated ' \
-                                  f'components are added to InputManager pool during runtime.'
     assert mock_om_add_log.call_count == 4
     assert mock_om_add_warning.call_count == 0
     assert mock_om_add_error.call_count == 1
@@ -2166,7 +2153,6 @@ def test_add_variable_to_pool_eager_termination(variable_name: str,
     if starting_im_pool:
         assert starting_im_pool[variable_name] == mock_input_manager.get_data(variable_name)
     else:
-        print("hi")
         assert variable_name not in mock_input_manager._InputManager__pool
     mock_input_manager._add_variable_to_pool = input_manager_original_method_states["_add_variable_to_pool"]
     mock_input_manager._validate_dict_element = input_manager_original_method_states["_validate_dict_element"]
@@ -2183,8 +2169,8 @@ def test_add_dict_variable_to_pool(variable_name: str,
                                    properties_blob_key: str,
                                    mock_input_manager: InputManager,
                                    input_manager_original_method_states: Dict[str, Callable]) -> None:
-    mock_input_manager._metadata_properties_exists = MagicMock(return_value=(True, None))
-    mock_input_manager._add_variable_to_pool = MagicMock(return_value=(True, None))
+    mock_input_manager._metadata_properties_exist = MagicMock(return_value=True)
+    mock_input_manager._add_variable_to_pool = MagicMock(return_value=True)
 
     with patch("RUFAS.output_manager.OutputManager.add_error") as mock_om_add_error:
         result = mock_input_manager.add_dict_variable_to_pool(
@@ -2196,7 +2182,7 @@ def test_add_dict_variable_to_pool(variable_name: str,
 
     assert result is True
     assert mock_om_add_error.call_count == 0
-    mock_input_manager._metadata_properties_exists.assert_called_once_with(
+    mock_input_manager._metadata_properties_exist.assert_called_once_with(
         variable_name=variable_name,
         properties_blob_key=properties_blob_key)
     mock_input_manager._add_variable_to_pool.assert_called_once_with(
@@ -2204,11 +2190,11 @@ def test_add_dict_variable_to_pool(variable_name: str,
         data=data,
         properties_blob_key=properties_blob_key,
         eager_termination=False,
-        is_dict_variable=True
+        is_variable_dict=True
     )
 
     mock_input_manager.add_dict_variable_to_pool = input_manager_original_method_states["add_dict_variable_to_pool"]
-    mock_input_manager._metadata_properties_exists = input_manager_original_method_states["_metadata_properties_exists"]
+    mock_input_manager._metadata_properties_exist = input_manager_original_method_states["_metadata_properties_exist"]
     mock_input_manager._add_variable_to_pool = input_manager_original_method_states["_add_variable_to_pool"]
 
 
@@ -2222,8 +2208,8 @@ def test_add_dict_variable_to_pool_type_error(variable_name: str,
                                               properties_blob_key: str,
                                               mock_input_manager: InputManager,
                                               input_manager_original_method_states: Dict[str, Callable]) -> None:
-    mock_input_manager._metadata_properties_exists = MagicMock(return_value=(True, None))
-    mock_input_manager._add_variable_to_pool = MagicMock(return_value=(True, None))
+    mock_input_manager._metadata_properties_exist = MagicMock(return_value=True)
+    mock_input_manager._add_variable_to_pool = MagicMock(return_value=True)
 
     with patch("RUFAS.output_manager.OutputManager.add_error") as mock_om_add_error:
         with pytest.raises(TypeError):
@@ -2235,48 +2221,13 @@ def test_add_dict_variable_to_pool_type_error(variable_name: str,
             )
 
         assert mock_om_add_error.call_count == 1
-        mock_input_manager._metadata_properties_exists.assert_not_called()
+        mock_input_manager._metadata_properties_exist.assert_not_called()
         mock_input_manager._add_variable_to_pool.assert_not_called()
 
         mock_input_manager.add_dict_variable_to_pool = \
             input_manager_original_method_states["add_dict_variable_to_pool"]
-        mock_input_manager._metadata_properties_exists = \
-            input_manager_original_method_states["_metadata_properties_exists"]
-        mock_input_manager._add_variable_to_pool = input_manager_original_method_states["_add_variable_to_pool"]
-
-
-@pytest.mark.parametrize('variable_name, data, properties_blob_key', [
-    ("var1", {}, "key1"),
-    ("var2", {"a": 1}, "key2"),
-    ("var3", {"a": "A", "b": 2, "c": True}, "key3"),
-])
-def test_add_dict_variable_to_pool_metadata_error(variable_name: str,
-                                                  data: Dict[str, Any],
-                                                  properties_blob_key: str,
-                                                  mock_input_manager: InputManager,
-                                                  input_manager_original_method_states: Dict[str, Callable]) -> None:
-    mock_input_manager._metadata_properties_exists = MagicMock(return_value=(False, KeyError()))
-    mock_input_manager._add_variable_to_pool = MagicMock(return_value=(True, None))
-
-    with patch("RUFAS.output_manager.OutputManager.add_error") as mock_om_add_error:
-        with pytest.raises(KeyError):
-            mock_input_manager.add_dict_variable_to_pool(
-                variable_name=variable_name,
-                data=data,
-                properties_blob_key=properties_blob_key,
-                eager_termination=False
-            )
-
-        assert mock_om_add_error.call_count == 0
-        mock_input_manager._metadata_properties_exists.assert_called_once_with(
-            variable_name=variable_name,
-            properties_blob_key=properties_blob_key)
-        mock_input_manager._add_variable_to_pool.assert_not_called()
-
-        mock_input_manager.add_dict_variable_to_pool = \
-            input_manager_original_method_states["add_dict_variable_to_pool"]
-        mock_input_manager._metadata_properties_exists = \
-            input_manager_original_method_states["_metadata_properties_exists"]
+        mock_input_manager._metadata_properties_exist = \
+            input_manager_original_method_states["_metadata_properties_exist"]
         mock_input_manager._add_variable_to_pool = input_manager_original_method_states["_add_variable_to_pool"]
 
 
@@ -2290,8 +2241,8 @@ def test_add_dict_variable_to_pool_invalid_data(variable_name: str,
                                                 properties_blob_key: str,
                                                 mock_input_manager: InputManager,
                                                 input_manager_original_method_states: Dict[str, Callable]) -> None:
-    mock_input_manager._metadata_properties_exists = MagicMock(return_value=(True, None))
-    mock_input_manager._add_variable_to_pool = MagicMock(return_value=(False, None))
+    mock_input_manager._metadata_properties_exist = MagicMock(return_value=True)
+    mock_input_manager._add_variable_to_pool = MagicMock(return_value=False)
 
     with patch("RUFAS.output_manager.OutputManager.add_error") as mock_om_add_error:
         result = mock_input_manager.add_dict_variable_to_pool(
@@ -2303,7 +2254,7 @@ def test_add_dict_variable_to_pool_invalid_data(variable_name: str,
 
         assert result is False
         assert mock_om_add_error.call_count == 0
-        mock_input_manager._metadata_properties_exists.assert_called_once_with(
+        mock_input_manager._metadata_properties_exist.assert_called_once_with(
             variable_name=variable_name,
             properties_blob_key=properties_blob_key)
         mock_input_manager._add_variable_to_pool.assert_called_once_with(
@@ -2311,56 +2262,15 @@ def test_add_dict_variable_to_pool_invalid_data(variable_name: str,
             data=data,
             properties_blob_key=properties_blob_key,
             eager_termination=False,
-            is_dict_variable=True
+            is_variable_dict=True
         )
 
         mock_input_manager.add_dict_variable_to_pool = \
             input_manager_original_method_states["add_dict_variable_to_pool"]
-        mock_input_manager._metadata_properties_exists = \
-            input_manager_original_method_states["_metadata_properties_exists"]
+        mock_input_manager._metadata_properties_exist = \
+            input_manager_original_method_states["_metadata_properties_exist"]
         mock_input_manager._add_variable_to_pool = input_manager_original_method_states["_add_variable_to_pool"]
 
-
-@pytest.mark.parametrize('variable_name, data, properties_blob_key', [
-    ("var1", {}, "key1"),
-    ("var2", {"a": 1}, "key2"),
-    ("var3", {"a": "A", "b": 2, "c": True}, "key3"),
-])
-def test_add_dict_variable_to_pool_invalid_data_eager_termination(variable_name: str,
-                                                                  data: Dict[str, Any],
-                                                                  properties_blob_key: str,
-                                                                  mock_input_manager: InputManager,
-                                                                  input_manager_original_method_states: Dict[
-                                                                      str, Callable]) -> None:
-    mock_input_manager._metadata_properties_exists = MagicMock(return_value=(True, None))
-    mock_input_manager._add_variable_to_pool = MagicMock(return_value=(False, ValueError()))
-
-    with patch("RUFAS.output_manager.OutputManager.add_error") as mock_om_add_error:
-        with pytest.raises(ValueError):
-            mock_input_manager.add_dict_variable_to_pool(
-                variable_name=variable_name,
-                data=data,
-                properties_blob_key=properties_blob_key,
-                eager_termination=True
-            )
-
-        assert mock_om_add_error.call_count == 0
-        mock_input_manager._metadata_properties_exists.assert_called_once_with(
-            variable_name=variable_name,
-            properties_blob_key=properties_blob_key)
-        mock_input_manager._add_variable_to_pool.assert_called_once_with(
-            variable_name=variable_name,
-            data=data,
-            properties_blob_key=properties_blob_key,
-            eager_termination=True,
-            is_dict_variable=True
-        )
-
-        mock_input_manager.add_dict_variable_to_pool = \
-            input_manager_original_method_states["add_dict_variable_to_pool"]
-        mock_input_manager._metadata_properties_exists = \
-            input_manager_original_method_states["_metadata_properties_exists"]
-        mock_input_manager._add_variable_to_pool = input_manager_original_method_states["_add_variable_to_pool"]
 
 
 @pytest.mark.parametrize('variable_name, data, properties_blob_key', [
@@ -2375,8 +2285,8 @@ def test_add_tabular_variable_to_pool(variable_name: str,
                                       mock_input_manager: InputManager,
                                       input_manager_original_method_states: Dict[str, Callable]) -> None:
     """Test for InputManager.add_tabular_variable_to_pool() for valid data"""
-    mock_input_manager._metadata_properties_exists = MagicMock(return_value=(True, None))
-    mock_input_manager._add_variable_to_pool = MagicMock(return_value=(True, None))
+    mock_input_manager._metadata_properties_exist = MagicMock(return_value=True)
+    mock_input_manager._add_variable_to_pool = MagicMock(return_value=True)
 
     expected_data_for_add_variable_to_pool = {variable_name: data} if isinstance(data, List) else data
 
@@ -2390,7 +2300,7 @@ def test_add_tabular_variable_to_pool(variable_name: str,
 
     assert result is True
     assert mock_om_add_error.call_count == 0
-    mock_input_manager._metadata_properties_exists.assert_called_once_with(
+    mock_input_manager._metadata_properties_exist.assert_called_once_with(
         variable_name=variable_name,
         properties_blob_key=properties_blob_key)
     mock_input_manager._add_variable_to_pool.assert_called_once_with(
@@ -2398,12 +2308,12 @@ def test_add_tabular_variable_to_pool(variable_name: str,
         data=expected_data_for_add_variable_to_pool,
         properties_blob_key=properties_blob_key,
         eager_termination=False,
-        is_dict_variable=False
+        is_variable_dict=False
     )
 
     mock_input_manager.add_tabular_variable_to_pool = \
         input_manager_original_method_states["add_tabular_variable_to_pool"]
-    mock_input_manager._metadata_properties_exists = input_manager_original_method_states["_metadata_properties_exists"]
+    mock_input_manager._metadata_properties_exist = input_manager_original_method_states["_metadata_properties_exist"]
     mock_input_manager._add_variable_to_pool = input_manager_original_method_states["_add_variable_to_pool"]
 
 
@@ -2418,8 +2328,8 @@ def test_add_tabular_variable_to_pool_type_error(variable_name: str,
                                                  mock_input_manager: InputManager,
                                                  input_manager_original_method_states: Dict[str, Callable]) -> None:
     """Test for InputManager.add_tabular_variable_to_pool() for incorrect data type is received"""
-    mock_input_manager._metadata_properties_exists = MagicMock(return_value=(True, None))
-    mock_input_manager._add_variable_to_pool = MagicMock(return_value=(True, None))
+    mock_input_manager._metadata_properties_exist = MagicMock(return_value=True)
+    mock_input_manager._add_variable_to_pool = MagicMock(return_value=True)
 
     with patch("RUFAS.output_manager.OutputManager.add_error") as mock_om_add_error:
         with pytest.raises(TypeError):
@@ -2431,50 +2341,13 @@ def test_add_tabular_variable_to_pool_type_error(variable_name: str,
             )
 
         assert mock_om_add_error.call_count == 1
-        mock_input_manager._metadata_properties_exists.assert_not_called()
+        mock_input_manager._metadata_properties_exist.assert_not_called()
         mock_input_manager._add_variable_to_pool.assert_not_called()
 
         mock_input_manager.add_tabular_variable_to_pool = \
             input_manager_original_method_states["add_tabular_variable_to_pool"]
-        mock_input_manager._metadata_properties_exists = \
-            input_manager_original_method_states["_metadata_properties_exists"]
-        mock_input_manager._add_variable_to_pool = input_manager_original_method_states["_add_variable_to_pool"]
-
-
-@pytest.mark.parametrize('variable_name, data, properties_blob_key', [
-    ("var1", [1, 2, 3], "key1"),
-    ("var2", ["a", "b", "c"], "key2"),
-    ("var3", [0.0, 1.1, 2.2], "key3"),
-    ("var4", {"a": [1, 2, 3], "b": ["a", "b", "c"], "c": [0.0, 1.1, 2.2]}, "key4")
-])
-def test_add_tabular_variable_to_pool_metadata_error(variable_name: str,
-                                                     data: Dict[str, List[Any]] | List[Any],
-                                                     properties_blob_key: str,
-                                                     mock_input_manager: InputManager,
-                                                     input_manager_original_method_states: Dict[str, Callable]) -> None:
-    """Test for InputManager.add_tabular_variable_to_pool() when no metadata is loaded"""
-    mock_input_manager._metadata_properties_exists = MagicMock(return_value=(False, KeyError()))
-    mock_input_manager._add_variable_to_pool = MagicMock(return_value=(True, None))
-
-    with patch("RUFAS.output_manager.OutputManager.add_error") as mock_om_add_error:
-        with pytest.raises(KeyError):
-            mock_input_manager.add_tabular_variable_to_pool(
-                variable_name=variable_name,
-                data=data,
-                properties_blob_key=properties_blob_key,
-                eager_termination=False
-            )
-
-        assert mock_om_add_error.call_count == 0
-        mock_input_manager._metadata_properties_exists.assert_called_once_with(
-            variable_name=variable_name,
-            properties_blob_key=properties_blob_key)
-        mock_input_manager._add_variable_to_pool.assert_not_called()
-
-        mock_input_manager.add_tabular_variable_to_pool = \
-            input_manager_original_method_states["add_tabular_variable_to_pool"]
-        mock_input_manager._metadata_properties_exists = \
-            input_manager_original_method_states["_metadata_properties_exists"]
+        mock_input_manager._metadata_properties_exist = \
+            input_manager_original_method_states["_metadata_properties_exist"]
         mock_input_manager._add_variable_to_pool = input_manager_original_method_states["_add_variable_to_pool"]
 
 
@@ -2490,8 +2363,8 @@ def test_add_tabular_variable_to_pool_invalid_data(variable_name: str,
                                                    mock_input_manager: InputManager,
                                                    input_manager_original_method_states: Dict[str, Callable]) -> None:
     """Test for InputManager.add_tabular_variable_to_pool() for invalid data and eager_termination set to False"""
-    mock_input_manager._metadata_properties_exists = MagicMock(return_value=(True, None))
-    mock_input_manager._add_variable_to_pool = MagicMock(return_value=(False, None))
+    mock_input_manager._metadata_properties_exist = MagicMock(return_value=True)
+    mock_input_manager._add_variable_to_pool = MagicMock(return_value=False)
 
     expected_data_for_add_variable_to_pool = {variable_name: data} if isinstance(data, List) else data
 
@@ -2505,7 +2378,7 @@ def test_add_tabular_variable_to_pool_invalid_data(variable_name: str,
 
         assert result is False
         assert mock_om_add_error.call_count == 0
-        mock_input_manager._metadata_properties_exists.assert_called_once_with(
+        mock_input_manager._metadata_properties_exist.assert_called_once_with(
             variable_name=variable_name,
             properties_blob_key=properties_blob_key)
         mock_input_manager._add_variable_to_pool.assert_called_once_with(
@@ -2513,57 +2386,11 @@ def test_add_tabular_variable_to_pool_invalid_data(variable_name: str,
             data=expected_data_for_add_variable_to_pool,
             properties_blob_key=properties_blob_key,
             eager_termination=False,
-            is_dict_variable=False
+            is_variable_dict=False
         )
 
         mock_input_manager.add_tabular_variable_to_pool = \
             input_manager_original_method_states["add_tabular_variable_to_pool"]
-        mock_input_manager._metadata_properties_exists = \
-            input_manager_original_method_states["_metadata_properties_exists"]
-        mock_input_manager._add_variable_to_pool = input_manager_original_method_states["_add_variable_to_pool"]
-
-
-@pytest.mark.parametrize('variable_name, data, properties_blob_key', [
-    ("var1", [1, 2, 3], "key1"),
-    ("var2", ["a", "b", "c"], "key2"),
-    ("var3", [0.0, 1.1, 2.2], "key3"),
-    ("var4", {"a": [1, 2, 3], "b": ["a", "b", "c"], "c": [0.0, 1.1, 2.2]}, "key4")
-])
-def test_add_tabular_variable_to_pool_invalid_data_eager_termination(variable_name: str,
-                                                                     data: Dict[str, List[Any]] | List[Any],
-                                                                     properties_blob_key: str,
-                                                                     mock_input_manager: InputManager,
-                                                                     input_manager_original_method_states: Dict[
-                                                                         str, Callable]) -> None:
-    """Test for InputManager.add_tabular_variable_to_pool() for invalid data and eager_termination set to True"""
-    mock_input_manager._metadata_properties_exists = MagicMock(return_value=(True, None))
-    mock_input_manager._add_variable_to_pool = MagicMock(return_value=(False, ValueError()))
-
-    expected_data_for_add_variable_to_pool = {variable_name: data} if isinstance(data, List) else data
-
-    with patch("RUFAS.output_manager.OutputManager.add_error") as mock_om_add_error:
-        with pytest.raises(ValueError):
-            mock_input_manager.add_tabular_variable_to_pool(
-                variable_name=variable_name,
-                data=data,
-                properties_blob_key=properties_blob_key,
-                eager_termination=True
-            )
-
-        assert mock_om_add_error.call_count == 0
-        mock_input_manager._metadata_properties_exists.assert_called_once_with(
-            variable_name=variable_name,
-            properties_blob_key=properties_blob_key)
-        mock_input_manager._add_variable_to_pool.assert_called_once_with(
-            variable_name=variable_name,
-            data=expected_data_for_add_variable_to_pool,
-            properties_blob_key=properties_blob_key,
-            eager_termination=True,
-            is_dict_variable=False
-        )
-
-        mock_input_manager.add_tabular_variable_to_pool = \
-            input_manager_original_method_states["add_tabular_variable_to_pool"]
-        mock_input_manager._metadata_properties_exists = \
-            input_manager_original_method_states["_metadata_properties_exists"]
+        mock_input_manager._metadata_properties_exist = \
+            input_manager_original_method_states["_metadata_properties_exist"]
         mock_input_manager._add_variable_to_pool = input_manager_original_method_states["_add_variable_to_pool"]
