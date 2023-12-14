@@ -72,7 +72,6 @@
 </li>
 <li class="toctree-l2"><a class="reference internal" href="main.html">main module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="setup.html">setup module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="tests.html">tests package</a></li>
 </ul>
 </li>
 </ul>
@@ -186,6 +185,13 @@
 <dt class="sig sig-object py" id="RUFAS.routines.field.soil.carbon_cycling.residue_partition.ResiduePartition.add_residue_to_pools">
 <span class="sig-name descname"><span class="pre">add_residue_to_pools</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rainfall</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.routines.field.soil.carbon_cycling.residue_partition.ResiduePartition.add_residue_to_pools" title="Link to this definition"></a></dt>
 <dd><p>Adds residue to pools.</p>
+<section id="id1">
+<h3>Parameters<a class="headerlink" href="#id1" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>rainfall<span class="classifier">float</span></dt><dd><p>Amount of rainfall on the current day (mm).</p>
+</dd>
+</dl>
+</section>
 </dd></dl>
 
 <dl class="py method">
@@ -194,8 +200,8 @@
 <dd><p>Main routine to updates attributes by using static methods, this method should only be called (by the field/
 field manager) on the day that a cut, harvest, or kill operation occurs and should be called after that
 operation.</p>
-<section id="id1">
-<h3>Parameters<a class="headerlink" href="#id1" title="Link to this heading"></a></h3>
+<section id="id2">
+<h3>Parameters<a class="headerlink" href="#id2" title="Link to this heading"></a></h3>
 <dl class="simple">
 <dt>rainfall: float</dt><dd><p>amount of rain (mm)</p>
 </dd>
