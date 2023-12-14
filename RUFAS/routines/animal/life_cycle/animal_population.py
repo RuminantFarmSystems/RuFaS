@@ -141,12 +141,12 @@ class AnimalPopulation:
             shuffle(self.cows)
         return self.cows
 
-    def get_replacement_cows(self):
+    def get_replacement_cows(self) -> List[Cow]:
         """
         Retrieve a list of replacement Cow instances.
 
-        Returns:
-        --------
+        Returns
+        -------
         List[Cow]
             A list of replacement Cow instances.
         """
