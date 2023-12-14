@@ -780,19 +780,19 @@ class InputManager:
             raise KeyError(f"Data not found: Cannot find \"{metadata_address}\", "
                            f"\"{parent_address}\" does not have attribute \"{invalid_key}\".")
 
-    def get_data_keys_by_properties(self, target_property: str) -> list[str]:
+    def get_data_keys_by_properties(self, target_properties: str) -> list[str]:
         """
         Retrieves list of keys that point to data which have specified properties.
 
         Parameters
         ----------
-        target_property : str
-            The property that returned keys should have.
+        target_properties : str
+            The name of the property that is being searched for.
 
         Returns
         -------
         list[str]
-            List of keys that points to data in the Input Manager which follow the specified property.
+            List of keys that point to data in the Input Manager which adhere to the target property.
 
         Notes
         -----
@@ -816,14 +816,14 @@ class InputManager:
 
         for key, data in input_data.items():
             try:
-                property_reference = data["properties"]
+                properties = data["properties"]
             except KeyError:
                 error_name = "Data does not have properties."
                 error_message = f"{key} in metadata does not contain 'properties' value."
                 om.add_error(error_name, error_message, info_map)
                 continue
 
-            if property_reference == target_property:
+            if properties == target_properties:
                 data_keys.append(key)
 
         return data_keys

@@ -43,7 +43,7 @@ def input_manager_original_method_states(
         "_fix_data": mock_input_manager._fix_data,
         "get_data": mock_input_manager.get_data,
         "get_metadata": mock_input_manager.get_metadata,
-        "get_data_keys_by_property": mock_input_manager.get_data_keys_by_properties,
+        "get_data_keys_by_properties": mock_input_manager.get_data_keys_by_properties,
         "_validate_input_type_dynamic": mock_input_manager._validate_input_type_dynamic,
         "_validate_csv_element": mock_input_manager._validate_csv_element,
     }
