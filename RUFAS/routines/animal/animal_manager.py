@@ -1155,7 +1155,10 @@ class AnimalManager:
 
     def get_initial_herd_summary(self) -> InitialHerdSummaryTypedDict:
         """
-        Returns: a dictionary which is the summary of the initial herd
+        Returns
+        -------
+        dict
+            A dictionary which is the summary of the initial herd.
         """
         return self.life_cycle_manager.initial_herd_summary
 
