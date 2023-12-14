@@ -300,7 +300,7 @@ def initialize_herd(
 
     output_manager.add_log(
         "Herd initialization start",
-        f"Initializing herd data...\n",
+        "Initializing herd data...\n",
         info_map
     )
     herd_factory = HerdFactory(
@@ -310,13 +310,13 @@ def initialize_herd(
     herd_factory.initialize_herd()
     output_manager.add_log(
         "Herd initialization complete",
-        f"Herd data initialized.\n",
+        "Herd data initialized.\n",
         info_map
     )
 
     if terminate_simulation_post_herd_generation:
         output_manager.add_log("Herd generation only",
-                               f"***Only generating herd data, no simulation will follow.***",
+                               "***Only generating herd data, no simulation will follow.***",
                                info_map)
 
 

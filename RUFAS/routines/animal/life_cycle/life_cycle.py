@@ -851,7 +851,7 @@ class LifeCycleManager:
     def _handle_new_born(self, sim_day: int, cow: Cow, calves_born: List[Calf]) -> None:
         args = {
             'id': self.animal_population.next_id(),
-            'breed': 'HO',  # THIS IS HARD-CODED?
+            'breed': 'HO',
             'birth_date': sim_day,
             'days_born': 0,
             'p_init': cow.p_gest_for_calf,
