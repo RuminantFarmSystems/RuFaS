@@ -1,11 +1,12 @@
 import os
 import datetime
 from pathlib import Path
-from typing import Dict, List, Any, Callable, Optional
+from typing import Dict, List, Any, Callable, Optional, Tuple
 
 import matplotlib
 import matplotlib.pyplot as plt
 from matplotlib.figure import Axes, Figure
+
 from RUFAS.util import Utility
 
 """
@@ -111,7 +112,7 @@ class GraphGenerator:
         graph_details: Dict[str, str | List[str]],
         filter_file_name: str,
         graphics_dir: Path,
-    ) -> str:
+    ) -> List[Dict[str, str | Dict[str, str]]]:
         """
         Generate a graph based on filtered data and graph details.
 
@@ -130,8 +131,9 @@ class GraphGenerator:
 
         Returns
         -------
-        str
-            The path to the saved graph.
+        log_pool : List[Dict[str, str | Dict[str, str]]]
+            A list of log, warning, and error dictionaries containing all the components needed
+            to log the information to the appropriate pool.
 
         Raises
         ------
@@ -139,21 +141,90 @@ class GraphGenerator:
             Generic exception raised by utility functions.
         """
         try:
+            prepared_data, log_pool = self._prepare_plot_data(filtered_pool, graph_details)
+
+            error_found = any("error" in log for log in log_pool)
+            if error_found:
+                return log_pool
+
             fig, _ = plt.subplots()
             self._draw_graph(
-                graph_details["type"], filtered_pool, graph_details.get("variables")
+                graph_details["type"], prepared_data, prepared_data.keys()
             )
             self._customize_graph(fig, graph_details)
-            return self._save_graph(
+            self._save_graph(
                 graph_details, filter_file_name, graphics_dir
             )
+
+            return log_pool
         except Exception as e:
             raise e
+
+    def _prepare_plot_data(self, filtered_pool: Dict[str, Dict[str, List[Any]]],
+                           graph_details: Dict[str, str | List[str]],
+                           ) -> Tuple[Dict[str, List[int | float]], List[Dict[str, str | Dict[str, str]]]]:
+        """Extracts the values from the filtered_pool data and converts them a dictionary
+        that graph_generator can more readily handle and records logs, warnings, and errors for
+        Output Manager.
+
+        Parameters
+        ----------
+        filtered_pool : Dict[str, pool_element_type]
+            The filtered pool of variables that the user wants to graph.
+        graph_details: Dict[str, str]
+            A dictionary containing details/metadata about the graph.
+
+        Returns
+        -------
+        Tuple[Dict[str, List[int | float]], List[Dict[str, str | Dict[str, str]]]]
+            A tuple containing the formatted data that can more readily be plotted by
+            graph_generator and the logs, warnings, and errors to be reported to OutputManager.
+        """
+        info_map = {
+            "class": self.__class__.__name__,
+            "function": self._prepare_plot_data.__name__,
+        }
+        selected_variables = graph_details.get("variables")
+        title = graph_details.get("title")
+        log_pool: List[Dict[str, str] | Dict[str, str]] = []
+        prepared_pool: Dict[str, List[int | float]] = {}
+        for key in filtered_pool.keys():
+            values: List[Any] = filtered_pool[key]["values"]
+            is_data_in_dict = isinstance(values[0], dict)
+            if is_data_in_dict:
+                if not selected_variables:
+                    log_pool.append({"error": f"Can't plot {title} data set",
+                                     "message": f"No selected variables for {key}.",
+                                     "info_map": info_map})
+                    break
+                data_dict = Utility.convert_list_of_dicts_to_dict_of_lists(values)
+                for selected_variable in selected_variables:
+                    is_variable_in_data = selected_variable in data_dict
+                    if not is_variable_in_data:
+                        log_pool.append({"warning": f"{selected_variable} not a valid key in provided data",
+                                         "message": f"{selected_variable} won't be graphed.",
+                                         "info_map": info_map})
+                    else:
+                        prepared_pool.setdefault(selected_variable, []).extend(data_dict[selected_variable])
+                        log_pool.append({"log": f"Successfully added {title} data to prepared_pool",
+                                         "message": f"Data for {selected_variable} added to prepared_pool.",
+                                         "info_map": info_map})
+                if all(selected_variable not in data_dict for selected_variable in selected_variables):
+                    log_pool.append({"error": f"Can't plot {title} data set",
+                                     "message": "No filter-file variables found in data provided.",
+                                     "info_map": info_map})
+            else:
+                prepared_pool[key] = values
+                log_pool.append({"log": f"Successfully added {title} data to prepared_pool",
+                                 "message": f"Data for {key} added.",
+                                 "info_map": info_map})
+
+        return prepared_pool, log_pool
 
     def _draw_graph(
         self,
         graph_type: str,
-        data: Dict[str, Dict[str, List[Any]] | Dict[str, List[Dict[str, List[Any]]]]],
+        data: Dict[str, List[int | float]],
         selected_variables: Optional[List[str]] = None,
     ) -> None:
         """
@@ -163,7 +234,7 @@ class GraphGenerator:
         ----------
         graph_type : str
             The type of graph to draw.
-        data : Dict[str, Dict[str, List[Any]] | Dict[str, List[Dict[str, List[Any]]]]]
+        data : Dict[str, List[int | float]]
             The data to use for plotting.
         selected_variables : Optional[List[str]]
             If it is present and the data is a list of dicts,
@@ -172,56 +243,17 @@ class GraphGenerator:
         Raises
         ------
         ValueError
-            if graph_type is not found in MATPLOTLIB_PLOT_FUNCTIONS
-        TypeError
-            if data is Dict[str, List[Dict[str, List[Any]]]]] and selected_variables is None
+            if graph_type is not found in MATPLOTLIB_PLOT_FUNCTIONS.
         """
         if graph_type not in MATPLOTLIB_PLOT_FUNCTIONS:
             raise ValueError(f"Unsupported graph type: {graph_type}")
-
         plot_function = MATPLOTLIB_PLOT_FUNCTIONS[graph_type]
-        for key in data.keys():
-            values: List[Any] = data[key]["values"]
-            is_data_in_dict = isinstance(values[0], dict)
-
-            if is_data_in_dict:
-                if selected_variables is None:
-                    raise TypeError(
-                        "Can't plot dictionary, use 'variables' arg to select items from data"
-                    )
-                data_dict = Utility.convert_list_of_dicts_to_dict_of_lists(values)
-                if graph_type in TUPLE_BASED_FUNCTIONS:
-                    self._handle_tuple_based_plot(
-                        data_dict, selected_variables, plot_function
-                    )
-                else:
-                    for variable in selected_variables:
-                        plot_function(data_dict[variable])
-            else:
-                plot_function(values)
-
-    def _handle_tuple_based_plot(
-        self,
-        data_dict: Dict[str, List[float | int]],
-        selected_variables: List[str],
-        plot_function: FUNCTION_TYPE,
-    ) -> None:
-        """
-        Plot selected variables from data organized as a tuple.
-
-        Parameters
-        ----------
-        data_dict : Dict[str, List[float | int]]
-            Dictionary of variable data.
-        selected_variables : List[str]
-            List of variables to plot.
-        plot_function : Callable[..., None]
-            Matplotlib function for plotting.
-
-        Returns: None
-        """
-        values_tuple = tuple(data_dict[variable] for variable in selected_variables)
-        plot_function(list(range(len(values_tuple[0]))), values_tuple)
+        if graph_type in TUPLE_BASED_FUNCTIONS:
+            values_tuple = tuple(data[variable] for variable in selected_variables)
+            plot_function(list(range(len(values_tuple[0]))), values_tuple)
+        else:
+            for value in data.values():
+                plot_function(value)
 
     def _customize_graph(
         self, fig: Figure, customization_details: Dict[str, Any]
