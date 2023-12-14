@@ -831,9 +831,11 @@ class InputManager:
             raise ValueError("No metadata loaded.")
         if properties_blob_key not in self.__metadata["properties"]:
             om.add_error("No metadata found", f"No metadata is found for variable '{variable_name}' with given "
-                                              f"properties_blob_key {properties_blob_key}.", info_map)
+                                              f"properties_blob_key {properties_blob_key}. Consider adding variable "
+                                              f"information and properties to the metadata.", info_map)
             raise KeyError(f"No metadata is found for variable '{variable_name}' with given properties_blob_key"
-                           f" {properties_blob_key}.")
+                           f" {properties_blob_key}. Consider adding variable information and properties to the "
+                           f"metadata.")
         return True
 
     def _add_variable_to_pool(self, variable_name: str, data: Dict[str, Any], properties_blob_key: str,
