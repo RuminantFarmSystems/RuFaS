@@ -27,15 +27,15 @@ def test_field_manager_init(field_blob_names) -> None:
     """Tests that FieldManager init method runs correctly."""
     mocked_manure_manager = MagicMock(ManureManager)
     expected_field_setup_calls = [call(field_name, mocked_manure_manager) for field_name in field_blob_names]
-    with patch("RUFAS.input_manager.InputManager.get_data_keys_by_property",
-               return_value=field_blob_names) as patched_data_keys_by_property, \
+    with patch("RUFAS.input_manager.InputManager.get_data_keys_by_properties",
+               return_value=field_blob_names) as patched_data_keys_by_properties, \
             patch("RUFAS.routines.field.manager.field_manager.FieldManager._setup_field",
                   return_value=MagicMock(Field)) as patched_field_setup:
         field_manager = FieldManager(mocked_manure_manager)
 
         assert len(field_manager.fields) == len(field_blob_names)
         assert len(field_manager.output_gatherer.fields) == len(field_blob_names)
-        patched_data_keys_by_property.assert_called_once()
+        patched_data_keys_by_properties.assert_called_once()
         if len(field_blob_names) > 0:
             patched_field_setup.assert_has_calls(expected_field_setup_calls)
         else:
@@ -78,7 +78,7 @@ def test_daily_update_routine(fields: List[Field], mock_weather: Weather,
 
     mocked_manure_manager = MagicMock(ManureManager)
     mock_weather.get_current_day_conditions = MagicMock(return_value=MagicMock(CurrentDayConditions))
-    with patch("RUFAS.input_manager.InputManager.get_data_keys_by_property", return_value=[]):
+    with patch("RUFAS.input_manager.InputManager.get_data_keys_by_properties", return_value=[]):
         fm = FieldManager(mocked_manure_manager)
 
         fm.fields = fields
@@ -104,7 +104,7 @@ def test_annual_update_routine(fields: List[Field]):
     for field in fields:
         field.perform_annual_reset = MagicMock()
     mocked_field_manager = MagicMock(ManureManager)
-    with patch("RUFAS.input_manager.InputManager.get_data_keys_by_property", return_value=[]):
+    with patch("RUFAS.input_manager.InputManager.get_data_keys_by_properties", return_value=[]):
         fm = FieldManager(mocked_field_manager)
         fm.fields = fields
         fm.output_gatherer.send_annual_variables = MagicMock()

@@ -52,6 +52,7 @@ def mock_weather(mocker: MockerFixture) -> Weather:
     mock_weather._Weather__precipitation = [[1.4, 2.4, 3.4]]
     mock_weather._Weather__irrigation = [[1.5, 2.5, 3.5]]
     mock_weather._Weather__mean_annual_temperature = 15.0
+    mock_weather._Weather__latitude = 43.0723
 
     return mock_weather
 
@@ -61,7 +62,8 @@ def weather_original_method_states(mock_weather: Weather) -> dict[str, Callable]
     """Fixture to store unmocked methods of Weather."""
     return {
         "_calculate_average_annual_temperature": mock_weather._calculate_average_annual_temperature,
-        "get_current_day_conditions": mock_weather.get_current_day_conditions
+        "get_current_day_conditions": mock_weather.get_current_day_conditions,
+        "_get_latitude": mock_weather._get_latitude()
     }
 
 
@@ -90,14 +92,15 @@ def mock_time() -> Time:
     return mock_time
 
 
-def test_annual_average_temperature_recording(mock_weather_input: dict,
-                                              mock_config: Config) -> None:
-    """Tests that the annual average temperature is recorded correctly to the OutputManager when Weather is created."""
+def test_weather_init(mock_weather_input: dict, mock_config: Config) -> None:
+    """Tests that subroutines are called appropriately when Weather instance in initialized."""
     with patch("RUFAS.weather.Weather._calculate_average_annual_temperature") as avg, \
-            patch("RUFAS.output_manager.OutputManager.add_variable") as add:
+            patch("RUFAS.output_manager.OutputManager.add_variable") as add, \
+            patch("RUFAS.weather.Weather._get_latitude") as latitude:
         Weather(mock_weather_input, mock_config)
         avg.assert_called_once()
         add.assert_called_once()
+        latitude.assert_called_once()
 
 
 @pytest.mark.parametrize("avg_daily_temperatures,expected", [
@@ -163,3 +166,23 @@ def test_record_weather(mock_weather: Weather, mock_current_day_conditions: Curr
         mock_weather.record_weather(mock_time)
         assert mock_current_day_conditions.call_count == 1
         assert add_var.call_count == 9
+
+
+@pytest.mark.parametrize("field_keys,field_data,expected_latitude", [
+    (["field_1", "field_2"], {"abs_latitude": 34.1}, 34.1),
+    ([], None, 43.0723)
+])
+def test_get_latitude(field_keys: list[str], field_data: dict[str, float], expected_latitude: float,
+                      mock_weather: Weather) -> None:
+    """Test that Weather correctly gets a latitude from Input Manager or uses the default."""
+    with patch("RUFAS.input_manager.InputManager.get_data_keys_by_properties", return_value=field_keys) as keys, \
+            patch("RUFAS.input_manager.InputManager.get_data", return_value=field_data) as data:
+        actual = mock_weather._get_latitude()
+
+    keys.assert_called_once_with("field_properties")
+    if field_data:
+        expected_data_address = f"{field_keys[0]}.abs_latitude"
+        data.assert_called_once_with(expected_data_address)
+    else:
+        data.assert_not_called()
+    assert actual == expected_latitude
