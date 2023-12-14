@@ -1,6 +1,14 @@
 RUFAS.routines.field.crop package
 =================================
 
+Subpackages
+-----------
+
+.. toctree::
+   :maxdepth: 4
+
+   RUFAS.routines.field.crop.crop_configurations
+
 Submodules
 ----------
 
