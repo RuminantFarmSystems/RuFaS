@@ -1702,7 +1702,7 @@ def test_save_results_report_generation(
             )
 
         # test for exception handling
-        mock_report_generator.generate_report.side_effect = ValueError()
+        mock_report_generator.generate_report.side_effect = KeyError()
         mock_output_manager.save_results(
             "save_path",
             "filters_path",
@@ -1753,7 +1753,7 @@ def test_route_save_functions_csv(
     )
     variable_csv_file_path = mock_output_manager._generate_file_name("saved_variables_csv_file", "csv")
     mock_output_manager._dict_to_file_csv.assert_called_once_with(
-        {"key": {"var": "value"}}, os.path.join("output/CSVs/", variable_csv_file_path)
+        {"key": {"var": "value"}}, os.path.join("output", "CSVs", variable_csv_file_path)
     )
     # Restore original method
     mock_output_manager._dict_to_file_csv = (
