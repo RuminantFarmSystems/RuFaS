@@ -1137,8 +1137,9 @@ def test_initialize_herd_from_data(num_calf: int,
 
     mock_herd_factory._initialize_herd_from_data()
 
-    expected_init_animal_from_data_call_count = num_calf + num_heiferI + num_heiferII + num_heiferIII + num_cow + \
-                                                num_replacement
+    expected_init_animal_from_data_call_count = sum([num_calf, num_heiferI, num_heiferII, num_heiferIII, num_cow,
+                                                     num_replacement])
+
     expected_init_animal_from_data_call_args_list = [(("calf", {"dummy_calf"}),)] * num_calf + \
                                                     [(("heiferI", {"dummy_heiferI"}),)] * num_heiferI + \
                                                     [(("heiferII", {"dummy_heiferII"}),)] * num_heiferII + \
@@ -1533,7 +1534,6 @@ def test_initialize_herd_init_herd_true_save_animals_true(mock_herd_factory: Her
     mock_output_manager.dict_to_file_json = output_manager_original_method_states["dict_to_file_json"]
 
 
-
 def test_initialize_herd_init_herd_true_save_animals_false(mock_herd_factory: HerdFactory,
                                                            mock_input_manager: InputManager,
                                                            mock_output_manager: OutputManager,
@@ -1577,10 +1577,11 @@ def test_initialize_herd_init_herd_true_save_animals_false(mock_herd_factory: He
     mock_herd_factory._random_sample_with_replacement.assert_called_once()
 
     mock_output_manager.dict_to_file_json.assert_not_called()
-    mock_input_manager.add_dict_variable_to_pool.assert_called_once_with(variable_name="runtime_animal_population",
-                                                              data=mock_herd_factory.post_animal_population.__repr__(),
-                                                              properties_blob_key="animal_population_properties",
-                                                              eager_termination=False)
+    mock_input_manager.add_dict_variable_to_pool.assert_called_once_with(
+        variable_name="runtime_animal_population",
+        data=mock_herd_factory.post_animal_population.__repr__(),
+        properties_blob_key="animal_population_properties",
+        eager_termination=False)
 
     mock_input_manager.get_data = input_manager_original_method_states["get_data"]
     mock_input_manager.add_dict_variable_to_pool = input_manager_original_method_states["add_dict_variable_to_pool"]
@@ -1598,7 +1599,6 @@ def test_initialize_herd_init_herd_false(mock_herd_factory: HerdFactory,
     mock_input_manager.add_dict_variable_to_pool = mock.MagicMock()
 
     mock_output_manager.dict_to_file_json = mock.MagicMock()
-
 
     mock_animal_manager_get_animal_config = \
         mocker.patch("RUFAS.routines.animal.animal_manager.AnimalManager.get_animal_config")
@@ -1631,10 +1631,11 @@ def test_initialize_herd_init_herd_false(mock_herd_factory: HerdFactory,
     mock_herd_factory._random_sample_with_replacement.assert_called_once()
 
     mock_output_manager.dict_to_file_json.assert_not_called()
-    mock_input_manager.add_dict_variable_to_pool.assert_called_once_with(variable_name="runtime_animal_population",
-                                                              data=mock_herd_factory.post_animal_population.__repr__(),
-                                                              properties_blob_key="animal_population_properties",
-                                                              eager_termination=False)
+    mock_input_manager.add_dict_variable_to_pool.assert_called_once_with(
+        variable_name="runtime_animal_population",
+        data=mock_herd_factory.post_animal_population.__repr__(),
+        properties_blob_key="animal_population_properties",
+        eager_termination=False)
 
     mock_input_manager.get_data = input_manager_original_method_states["get_data"]
     mock_input_manager.add_dict_variable_to_pool = input_manager_original_method_states["add_dict_variable_to_pool"]

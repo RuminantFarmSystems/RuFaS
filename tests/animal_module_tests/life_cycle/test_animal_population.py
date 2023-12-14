@@ -265,6 +265,7 @@ def test_repr(num_calf: int,
 
     assert actual == expected
 
+
 @pytest.mark.parametrize("num_calf, num_heiferI, num_heiferII, num_heiferIII, num_cow, num_replacement", [
     (1, 1, 1, 1, 1, 1),
     (0, 0, 0, 0, 0, 0),

@@ -8,7 +8,6 @@ from typing import Type
 from typing import TypeVar
 from typing import Union
 
-from RUFAS.config import Config
 from RUFAS.input_manager import InputManager
 from RUFAS.output_manager import OutputManager
 from RUFAS.routines.animal.animal_typed_dicts import AnimalConfigTypedDict, HerdInfoTypedDict, \

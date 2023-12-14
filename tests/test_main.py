@@ -313,6 +313,7 @@ def test_initialize_herd(
     assert mock_herd_factory.initialize_herd.call_count == 1
     assert mock_output_manager.add_log.call_count == add_log_count
 
+
 @pytest.mark.parametrize(
     "produce_graphics, exlclude_info_maps, is_data_valid, terminate_simulation_post_herd_generation, "
     "initialize_herd_call_count, simulate_call_count, add_error_call_count, format_option",

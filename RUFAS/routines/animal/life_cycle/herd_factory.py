@@ -321,4 +321,3 @@ class HerdFactory:
                                      data=self.post_animal_population.__repr__(),
                                      properties_blob_key="animal_population_properties",
                                      eager_termination=False)
-

@@ -135,122 +135,126 @@ def test_annual_update_routine(fields: List[Field]):
 
 
 @pytest.mark.parametrize("fertilizer_schedule_data,expected_available_mixes,expected_schedule", [
-    ({
-         "available_fertilizer_mixes": [
-             {
-                 "name": "0_0_60",
-                 "N": 0.0,
-                 "P": 0.0,
-                 "K": 0.6
-             },
-             {
-                 "name": "6_10_20",
-                 "N": 0.0672511,
-                 "P": 0.112085,
-                 "K": 0.22417
-             },
-             {
-                 "name": "5_4_27",
-                 "N": 0.0560426,
-                 "P": 0.0493175,
-                 "K": 0.2790919
-             },
-             {
-                 "name": "5_6_40",
-                 "N": 0.0560426,
-                 "P": 0.06904443,
-                 "K": 0.39
-             },
-             {
-                 "name": "82_0_0",
-                 "N": 0.82,
-                 "P": 0.0,
-                 "K": 0.0
-             }
-         ],
-         "mix_names": ["6_10_20", "6_10_20", "5_4_27", "5_6_40", "5_6_40", "5_6_40", "5_6_40"],
-         "years": [1993, 1996, 2001, 2005, 2009, 2013, 2017],
-         "days": [103, 103, 103, 103, 103, 103, 103],
-         "nitrogen_masses": [6.72511, 6.72511, 5.60426, 5.60426, 5.6, 5.60426, 5.60426],
-         "phosphorus_masses": [11.2085, 11.2085, 4.93175, 6.904443, 6.72511, 6.904443, 6.904443],
-         "potassium_masses": [22.417, 22.417, 27.90919, 39.072871, 39.072871, 39.072871, 39.072871],
-         "application_depths": [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
-         "surface_remainder_fractions": [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0],
-         "pattern_repeat": 0,
-         "pattern_skip": 0
-     }, {
-         "0_0_60": {
-             "N": 0.0,
-             "P": 0.0,
-             "K": 0.6
-         },
-         "6_10_20": {
+    (
+            {
+                "available_fertilizer_mixes": [
+                    {
+                        "name": "0_0_60",
+                        "N": 0.0,
+                        "P": 0.0,
+                        "K": 0.6
+                    },
+                    {
+                        "name": "6_10_20",
+                        "N": 0.0672511,
+                        "P": 0.112085,
+                        "K": 0.22417
+                    },
+                    {
+                        "name": "5_4_27",
+                        "N": 0.0560426,
+                        "P": 0.0493175,
+                        "K": 0.2790919
+                    },
+                    {
+                        "name": "5_6_40",
+                        "N": 0.0560426,
+                        "P": 0.06904443,
+                        "K": 0.39
+                    },
+                    {
+                        "name": "82_0_0",
+                        "N": 0.82,
+                        "P": 0.0,
+                        "K": 0.0
+                    }
+                ],
+                "mix_names": ["6_10_20", "6_10_20", "5_4_27", "5_6_40", "5_6_40", "5_6_40", "5_6_40"],
+                "years": [1993, 1996, 2001, 2005, 2009, 2013, 2017],
+                "days": [103, 103, 103, 103, 103, 103, 103],
+                "nitrogen_masses": [6.72511, 6.72511, 5.60426, 5.60426, 5.6, 5.60426, 5.60426],
+                "phosphorus_masses": [11.2085, 11.2085, 4.93175, 6.904443, 6.72511, 6.904443, 6.904443],
+                "potassium_masses": [22.417, 22.417, 27.90919, 39.072871, 39.072871, 39.072871, 39.072871],
+                "application_depths": [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
+                "surface_remainder_fractions": [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0],
+                "pattern_repeat": 0,
+                "pattern_skip": 0
+            },
+            {
+                "0_0_60": {
+                    "N": 0.0,
+                    "P": 0.0,
+                    "K": 0.6
+                },
+                "6_10_20": {
 
-             "N": 0.0672511,
-             "P": 0.112085,
-             "K": 0.22417
-         },
-         "5_4_27": {
-             "N": 0.0560426,
-             "P": 0.0493175,
-             "K": 0.2790919
-         },
-         "5_6_40": {
-             "N": 0.0560426,
-             "P": 0.06904443,
-             "K": 0.39
-         },
-         "82_0_0": {
-             "N": 0.82,
-             "P": 0.0,
-             "K": 0.0
-         }
-     }, FertilizerSchedule(name="fertilizer_schedule",
-                           mix_names=["6_10_20", "6_10_20", "5_4_27", "5_6_40", "5_6_40", "5_6_40", "5_6_40"],
-                           years=[1993, 1996, 2001, 2005, 2009, 2013, 2017],
-                           days=[103, 103, 103, 103, 103, 103, 103],
-                           nitrogen_masses=[6.72511, 6.72511, 5.60426, 5.60426, 5.6, 5.60426, 5.60426],
-                           phosphorus_masses=[11.2085, 11.2085, 4.93175, 6.904443, 6.72511, 6.904443, 6.904443],
-                           application_depths=[0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
-                           surface_remainder_fractions=[1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0],
-                           pattern_repeat=0,
-                           pattern_skip=0)
+                    "N": 0.0672511,
+                    "P": 0.112085,
+                    "K": 0.22417
+                },
+                "5_4_27": {
+                    "N": 0.0560426,
+                    "P": 0.0493175,
+                    "K": 0.2790919
+                },
+                "5_6_40": {
+                    "N": 0.0560426,
+                    "P": 0.06904443,
+                    "K": 0.39
+                },
+                "82_0_0": {
+                    "N": 0.82,
+                    "P": 0.0,
+                    "K": 0.0
+                }
+            },
+            FertilizerSchedule(name="fertilizer_schedule",
+                               mix_names=["6_10_20", "6_10_20", "5_4_27", "5_6_40", "5_6_40", "5_6_40", "5_6_40"],
+                               years=[1993, 1996, 2001, 2005, 2009, 2013, 2017],
+                               days=[103, 103, 103, 103, 103, 103, 103],
+                               nitrogen_masses=[6.72511, 6.72511, 5.60426, 5.60426, 5.6, 5.60426, 5.60426],
+                               phosphorus_masses=[11.2085, 11.2085, 4.93175, 6.904443, 6.72511, 6.904443, 6.904443],
+                               application_depths=[0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
+                               surface_remainder_fractions=[1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0],
+                               pattern_repeat=0,
+                               pattern_skip=0)
     ),
-    ({
-         "available_fertilizer_mixes": [
-             {
-                 "name": "barnyard_fert",
-                 "N": 0.4,
-                 "P": 0.2,
-                 "K": 0.1
-             }
-         ],
-         "mix_names": ["barnyard_fert"],
-         "years": [2010],
-         "days": [200],
-         "nitrogen_masses": [1000],
-         "phosphorus_masses": [5],
-         "potassium_masses": [400],
-         "application_depths": [0.0],
-         "surface_remainder_fractions": [1.0],
-         "pattern_repeat": 0,
-         "pattern_skip": 0
-     }, {
-         "barnyard_fert": {
-             "N": 0.4,
-             "P": 0.2,
-             "K": 0.1
-         }
-     }, FertilizerSchedule(name="fertilizer_schedule",
-                           mix_names=["barnyard_fert"],
-                           years=[2010],
-                           days=[200],
-                           nitrogen_masses=[1000],
-                           phosphorus_masses=[5],
-                           application_depths=[0.0],
-                           surface_remainder_fractions=[1.0],
-                           pattern_repeat=0,
-                           pattern_skip=0)
+    (
+            {
+                "available_fertilizer_mixes": [
+                    {
+                        "name": "barnyard_fert",
+                        "N": 0.4,
+                        "P": 0.2,
+                        "K": 0.1
+                    }
+                ],
+                "mix_names": ["barnyard_fert"],
+                "years": [2010],
+                "days": [200],
+                "nitrogen_masses": [1000],
+                "phosphorus_masses": [5],
+                "potassium_masses": [400],
+                "application_depths": [0.0],
+                "surface_remainder_fractions": [1.0],
+                "pattern_repeat": 0,
+                "pattern_skip": 0
+            }, {
+                "barnyard_fert": {
+                    "N": 0.4,
+                    "P": 0.2,
+                    "K": 0.1
+                }
+            }, FertilizerSchedule(name="fertilizer_schedule",
+                                  mix_names=["barnyard_fert"],
+                                  years=[2010],
+                                  days=[200],
+                                  nitrogen_masses=[1000],
+                                  phosphorus_masses=[5],
+                                  application_depths=[0.0],
+                                  surface_remainder_fractions=[1.0],
+                                  pattern_repeat=0,
+                                  pattern_skip=0)
     )
 ])
 def test_setup_fertilizer_schedule(fertilizer_schedule_data: Dict, expected_available_mixes: Dict,
@@ -898,7 +902,7 @@ def test_setup_field(field_name: str, field_config: Dict, mock_input_manager: In
     mock_input_manager.get_data = mock.MagicMock(return_value=field_config)
 
     with patch("RUFAS.routines.field.manager.field_manager.FieldManager._setup_fertilizer_schedule",
-                  new_callable=MagicMock, return_value=({}, mocked_fertilizer_schedule)) as patched_fertilizer_setup, \
+               new_callable=MagicMock, return_value=({}, mocked_fertilizer_schedule)) as patched_fertilizer_setup, \
             patch("RUFAS.routines.field.manager.field_manager.FieldManager._setup_manure_schedule",
                   new_callable=MagicMock, return_value=mocked_manure_schedule) as patched_manure_setup, \
             patch("RUFAS.routines.field.manager.field_manager.FieldManager._setup_tillage_schedule",

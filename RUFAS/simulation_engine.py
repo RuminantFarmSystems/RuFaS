@@ -43,7 +43,6 @@ class SimulationEngine:
         Execute the simulation process.
     """
 
-
     def __init__(self) -> None:
         """
         Initializes the simulation engine.

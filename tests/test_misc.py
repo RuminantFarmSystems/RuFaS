@@ -2,7 +2,6 @@ import pytest
 from pytest import approx
 from pytest_mock.plugin import MockerFixture
 
-from RUFAS.config import Config
 from RUFAS.general_constants import GeneralConstants
 from RUFAS.util import Utility
 

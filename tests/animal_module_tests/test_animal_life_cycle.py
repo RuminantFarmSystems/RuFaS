@@ -8,7 +8,6 @@ from pytest import approx
 from pytest import fixture
 from pytest_mock import MockerFixture
 
-from RUFAS.config import Config
 from RUFAS.input_manager import InputManager
 from RUFAS.routines.animal.animal_typed_dicts import AnimalConfigTypedDict, HerdInfoTypedDict
 from RUFAS.routines.animal.life_cycle import animal_constants
@@ -129,7 +128,6 @@ def test_initialize_herd(mocker: MockerFixture, life_cycle_manager: LifeCycleMan
                                                      replace_num=5000,
                                                      herd_num=1000,
                                                      breed=breed)
-
 
     mock_input_manager = InputManager()
     patch_im_getdata = mocker.patch.object(mock_input_manager, 'get_data', return_value={
