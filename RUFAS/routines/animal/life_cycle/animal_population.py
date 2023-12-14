@@ -78,8 +78,8 @@ class AnimalPopulation:
         """
         Retrieve a list of Calf instances.
 
-        Returns:
-        --------
+        Returns
+        -------
         List[Calf]
             A list of Calf instances.
         """
