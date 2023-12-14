@@ -857,7 +857,7 @@ class InputManager:
             The key in the metadata properties against which the data is validated.
         eager_termination : bool
             Flag indicating whether the function should return early in case of invalid data.
-        is_dict_variable : bool
+        is_variable_dict : bool
             Weather the variable is a dictionary variable (rather than tabular).
 
         Returns
