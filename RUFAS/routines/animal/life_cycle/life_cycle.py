@@ -177,7 +177,6 @@ class LifeCycleManager:
         ----------
         herd_data : HerdInfoTypedDict
             The data for the herd to be initialized
-            User input indicating whether to terminate the simulation after herd generation.
 
         Returns
         -------
