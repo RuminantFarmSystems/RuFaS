@@ -20,7 +20,7 @@ def test_determine_intra_organic_mineralization(active: float, stable: float) ->
     """Tests that the amount of nitrogen determined to be transferred from the active organic to stable organic pool are
         calculated correctly."""
     observed = HumusMineralization._determine_intra_organic_mineralization(active, stable)
-    expect = (10 ** (-5)) * active * ((1 / FRACTION_OF_HUMIC_NITROGEN_IN_ACTIVE_POOL) - 1) - stable
+    expect = (10 ** (-5)) * (active * ((1 / FRACTION_OF_HUMIC_NITROGEN_IN_ACTIVE_POOL) - 1) - stable)
     if expect > 0:
         expect = min(active, expect)
     elif expect < 0:

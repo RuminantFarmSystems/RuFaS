@@ -43,6 +43,7 @@ class Denitrification:
         denitrified, then removing that amount from the nitrate pool and adding it to denitrification emissions tracker.
 
         """
+        self.data.set_vectorized_layer_attribute("nitrous_oxide_emissions", [0.0] * len(self.data.soil_layers))
         for layer in self.data.soil_layers:
             nutrient_is_below_threshold = layer.nutrient_cycling_water_factor < \
                                           layer.denitrification_threshold_water_content
@@ -55,6 +56,7 @@ class Denitrification:
                                                                         layer.nutrient_cycling_temp_factor,
                                                                         layer.soil_overall_carbon_fraction * 100)
             layer.nitrate_content -= nitrified_nitrates
+            layer.nitrous_oxide_emissions = nitrified_nitrates
             layer.annual_denitrified_nitrogen_total += nitrified_nitrates
 
     @staticmethod

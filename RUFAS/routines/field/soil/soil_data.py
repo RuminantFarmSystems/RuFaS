@@ -218,6 +218,18 @@ class SoilData:
     soil_phosphorus_runoff: float = 0.0
     """Amount of phosphorus removed from surface soil layer by runoff (kg / ha)."""
 
+    # ---- Surface Nitrogen ----
+    nitrate_runoff: float = 0.0
+    """Amount of nitrate removed from the soil surface by runoff (kg / ha)."""
+    ammonium_runoff: float = 0.0
+    """Amount of ammonium removed from the soil surface by runoff (kg / ha)."""
+    eroded_fresh_organic_nitrogen: float = 0.0
+    """Amount of fresh organic nitrogen removed from the soil surface by eroded sediment (kg / ha)."""
+    eroded_stable_organic_nitrogen: float = 0.0
+    """Amount of stable organic nitrogen removed from the soil surface by eroded sediment (kg / ha)."""
+    eroded_active_organic_nitrogen: float = 0.0
+    """Amount of active organic nitrogen removed from the soil surface by eroded sediment (kg / ha)."""
+
     # ---- Residue partition (Carbon Cycling)
     plant_surface_residue = 0
     """plant residue on the surface of the soil (kg/ha)"""
@@ -492,6 +504,58 @@ class SoilData:
         for layer in self.soil_layers:
             nitrates_sum += layer.nitrate_content
         return nitrates_sum
+
+    @property
+    def profile_ammonium_total(self) -> float:
+        """
+        Calculate and return the total amount of nitrates in the soil.
+
+        Returns
+        -------
+        float
+            The total amount of ammonium in the soil (kg / ha).
+
+        """
+        return sum(self.get_vectorized_layer_attribute("ammonium_content"))
+
+    @property
+    def profile_active_organic_nitrogen_total(self) -> float:
+        """
+        Calculate and return the total amount of active organic nitrogen in the soil.
+
+        Returns
+        -------
+        float
+            The total amount of active organic nitrogen in the soil (kg / ha).
+
+        """
+        return sum(self.get_vectorized_layer_attribute("active_organic_nitrogen_content"))
+
+    @property
+    def profile_stable_organic_nitrogen_total(self) -> float:
+        """
+        Calculate and return the total amount of stable organic nitrogen in the soil.
+
+        Returns
+        -------
+        float
+            The total amount of stable organic nitrogen in the soil (kg / ha).
+
+        """
+        return sum(self.get_vectorized_layer_attribute("stable_organic_nitrogen_content"))
+
+    @property
+    def profile_fresh_organic_nitrogen_total(self) -> float:
+        """
+        Calculate and return the total amount of fresh organic nitrogen in the soil.
+
+        Returns
+        -------
+        float
+            The total amount of fresh organic nitrogen in the soil (kg / ha).
+
+        """
+        return sum(self.get_vectorized_layer_attribute("fresh_organic_nitrogen_content"))
 
     @property
     def cover_factor(self) -> float:
