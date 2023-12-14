@@ -991,7 +991,7 @@
           "crop_species": {
             "type": "string",
             "description": "Name of the crop being grown.",
-            "pattern": "^(generic|corn|silage_corn|spring_wheat|winter_wheat|cereal_rye|spring_barley|fall_oats|tall_fescue|alfalfa|soybean|sugar_beet|potato|triticale)$"
+            "pattern": "^(alfalfa_hay|alfalfa_silage|alfalfa_baleage|cereal_rye_hay|cereal_rye_grain|cereal_rye_silage|cereal_rye_baleage|corn_grain|corn_silage|soybean_hay|soybean_grain|tall_fescue_hay|tall_fescue_silage|tall_fescue_baleage|triticale_hay|triticale_grain|triticale_silage|triticale_baleage|winter_wheat_hay|winter_wheat_grain|winter_wheat_silage|winter_wheat_baleage)$"
           },
           "harvest_days": {
             "type": "array",
@@ -2301,7 +2301,7 @@
           "manure_handler": {
             "type": "string",
             "description": "Manure Handling Method -- Method for cleaning barn alleyways.",
-            "pattern": "^(flush system|alley scraper|manual scraping|tillage|manual skid steer scraping)$"
+            "pattern": "^(flush system|alley scraper|manual scraping|tillage|manual skid steer scraping|harrowing)$"
           },
           "manure_separator": {
             "type": "string",
