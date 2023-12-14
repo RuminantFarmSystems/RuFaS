@@ -251,10 +251,49 @@ class ReportGenerator:
         if not aggregator:
             raise ValueError(f"Unsupported aggregation type: {aggregation_type}")
 
-        # For the current PR, we assume all lists are of the same length
+        ReportGenerator._apply_padding(referenced_data, config.get("padding", {}))
+
         aggregated_data = [aggregator(values) for values in zip(*referenced_data)]  # type: ignore
 
         return aggregated_data
+
+    @staticmethod
+    def _apply_padding(referenced_data: List[List[float]], padding_config: Dict[str, Any]) -> None:
+        """
+        Applies padding to the referenced data based on the provided padding configuration.
+
+        Parameters
+        ----------
+        referenced_data : List[List[float]]
+            The list of lists to which padding needs to be applied.
+        padding_config : Dict[str, Any]
+            Configuration for padding, including method and custom value if applicable.
+        """
+
+        padding_method = padding_config.get("method", "none")
+        if padding_method == "none":
+            return
+
+        max_length = max((len(lst) for lst in referenced_data), default=0)
+
+        for lst in referenced_data:
+            padding_length = max_length - len(lst)
+
+            if padding_method == "zero":
+                lst.extend([0] * padding_length)
+            elif padding_method == "last_value":
+                padding_element = lst[-1] if lst else 0
+                lst.extend([padding_element] * padding_length)
+            elif padding_method == "null":
+                lst.extend([None] * padding_length)
+            elif padding_method == "custom":
+                lst.extend([padding_config.get("value", 0)] * padding_length)
+
+        # if padding_method == "cycle":
+        #     for lst in referenced_data:
+        #         if lst:
+        #             lst.extend(lst * ((max_length - 1) // len(lst)))
+        #             lst.extend(lst[:max_length - len(lst)])
 
     def _prepare_report_data(
         self,
