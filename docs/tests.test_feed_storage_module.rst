@@ -20,6 +20,14 @@ tests.test\_feed\_storage\_module.test\_hay module
    :undoc-members:
    :show-inheritance:
 
+tests.test\_feed\_storage\_module.test\_sileage module
+------------------------------------------------------
+
+.. automodule:: tests.test_feed_storage_module.test_sileage
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 tests.test\_feed\_storage\_module.test\_storage module
 ------------------------------------------------------
 
