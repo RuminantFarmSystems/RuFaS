@@ -46,8 +46,8 @@ class AnimalPopulation:
 
     def __post_init__(self):
         """Post init function to find the max id of all animals, and set the current_animal_id"""
-        ids = [i.id for i in self.calves] + [i.id for i in self.heiferIs] + [i.id for i in self.heiferIIs] + \
-              [i.id for i in self.heiferIIIs] + [i.id for i in self.cows] + [i.id for i in self.replacement]
+        ids = [i.id for i in self.calves + self.heiferIs + self.heiferIIs + self.heiferIIIs + self.cows + 
+               self.replacement]
         if ids:
             self.current_animal_id = max(ids)
 
