@@ -66,8 +66,8 @@ class AnimalPopulation:
        """
        Increment and return the next unique identifier for an animal.
 
-       Returns:
-       --------
+       Returns
+       -------
        int
            The next unique animal_id.
        """
