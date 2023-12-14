@@ -306,12 +306,15 @@ class ManureApplication:
         self.data.machine_manure_moisture_factor = new_vals.get("new_moisture_factor")
         self.data.machine_manure_field_coverage = new_vals.get("new_field_coverage")
 
-        top_layer_mass = surface_retention * surface_dry_matter_mass
+        top_layer_proportion = self.data.soil_layers[0].layer_thickness / self.data.soil_layers[1].bottom_depth
+        second_layer_proportion = (1 - top_layer_proportion)
+
+        top_layer_mass = top_layer_proportion * surface_dry_matter_mass
         top_layer_inorganic_nitrogen_fraction = surface_retention * inorganic_nitrogen_fraction
         top_layer_organic_nitrogen_fraction = surface_retention * organic_nitrogen_fraction
         self._add_nitrogen_to_soil_layer(0, top_layer_mass, top_layer_inorganic_nitrogen_fraction, ammonium_fraction,
                                          top_layer_organic_nitrogen_fraction, field_size)
-        second_layer_mass = soil_infiltration * surface_dry_matter_mass
+        second_layer_mass = second_layer_proportion * surface_dry_matter_mass
         second_layer_inorganic_nitrogen_fraction = soil_infiltration * inorganic_nitrogen_fraction
         second_layer_organic_nitrogen_fraction = soil_infiltration * organic_nitrogen_fraction
         self._add_nitrogen_to_soil_layer(1, second_layer_mass, second_layer_inorganic_nitrogen_fraction,
