@@ -51,15 +51,13 @@ class HerdFactory:
 
         Parameters
         ----------
-        init_herd : bool, optional
+        init_herd : bool, default=False
             A flag to indicate whether to initialize through simulation or from input data.
-            Default is False.
-        save_animals : bool
+        save_animals : bool, default=False
             Indicates whether to save the generated animals to JSON files.
-            Default is False.
-        save_animals_path : Path
+        save_animals_path : Path, default=Path("output/")
             The directory path where the animal data JSON files will be saved if
-            save_animals is True. Default is "output/".
+            save_animals is True.
         """
         self.init_herd = init_herd
         self.save_animals = save_animals
