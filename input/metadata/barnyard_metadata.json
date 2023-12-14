@@ -10,7 +10,7 @@
     "animal": {
       "title": "Animal data",
       "description": "Moo Moo!",
-      "path": "input/data/animal/no_animal.json",
+      "path": "input/data/animal/default_animal.json",
       "type": "json",
       "properties": "animal_properties"
   },
@@ -80,14 +80,14 @@
     "fertilizer_schedule": {
       "title": "Fertilizer schedule.",
       "description": "Barnyard fertilizer application schedule.",
-      "path": "input/data/fertilizer_schedule/barnyard_scheduled_fertilizer_schedule.json",
+      "path": "input/data/fertilizer_schedule/no_fertilizer.json",
       "type": "json",
       "properties": "fertilizer_schedule_properties"
     },
     "manure_schedule": {
       "title": "Manure schedule.",
       "description": "Barnyard manure application schedule.",
-      "path": "input/data/manure_schedule/barnyard_scheduled_manure_schedule.json",
+      "path": "others/barnyard/barnyard_experimental_manure_aggregated_no_phos.json",
       "type": "json",
       "properties": "manure_schedule_properties"
     },
