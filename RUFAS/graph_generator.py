@@ -196,6 +196,7 @@ class GraphGenerator:
                     log_pool.append({"error": f"Can't plot {title} data set",
                                      "message": f"No selected variables for {key}.",
                                      "info_map": info_map})
+                    break
                 data_dict = Utility.convert_list_of_dicts_to_dict_of_lists(values)
                 for selected_variable in selected_variables:
                     is_variable_in_data = selected_variable in data_dict
