@@ -312,7 +312,7 @@ class HerdFactory:
             if self.save_animals:
                 timestamp: str = datetime.datetime.now().strftime("%d-%b-%Y_%a_%H-%M-%S")
                 save_path = Path.joinpath(self.save_animals_path, f"animal_population-{timestamp}.json")
-                om.dict_to_file_json(self.pre_animal_population.__repr__(), save_path)
+                om.dict_to_file_json(self.pre_animal_population.__repr__(), save_path, minify_output_file=True)
         else:
             self.pre_animal_population = self._initialize_herd_from_data()
 
