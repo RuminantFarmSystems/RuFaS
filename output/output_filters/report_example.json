@@ -3,7 +3,8 @@
     {
       "name": "Last 6 Month's HeiferI Population",
       "filters": [
-        "AnimalManager.daily_updates.num_heiferIs"
+        "AnimalManager.daily_updates.num_heiferIs",
+        "AnimalManager.daily_updates.num_heiferIIs"
       ],
       "vertical_aggregation": "sum",
       "slice_start": -180
@@ -31,7 +32,10 @@
         "Last 6 Month's HeiferI Population",
         "Last 6 Month's HeiferII Population",
         "Last 6 Month's HeiferIII Population"
-      ]
+      ],
+      "padding": {
+        "method": "zero"
+      }
     }
   ]
 }
