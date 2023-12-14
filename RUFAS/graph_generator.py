@@ -197,6 +197,8 @@ class GraphGenerator:
                                      "message": f"No selected variables for {key}.",
                                      "info_map": info_map})
                 data_dict = Utility.convert_list_of_dicts_to_dict_of_lists(values)
+                filtered_data = Utility.filter_pool(data_dict, selected_variables, False)
+                prepared_pool.update(filtered_data)
                 for selected_variable in selected_variables:
                     is_variable_in_data = selected_variable in data_dict
                     if not is_variable_in_data:
@@ -204,7 +206,6 @@ class GraphGenerator:
                                          "message": f"{selected_variable} won't be graphed.",
                                          "info_map": info_map})
                     else:
-                        prepared_pool.setdefault(selected_variable, []).extend(data_dict[selected_variable])
                         log_pool.append({"log": f"Successfully added {title} data to prepared_pool",
                                          "message": f"Data for {selected_variable} added to prepared_pool.",
                                          "info_map": info_map})
