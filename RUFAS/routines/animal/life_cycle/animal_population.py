@@ -28,11 +28,11 @@ class AnimalPopulation:
         A list of Cow instances in the herd.
     replacement : List[Cow]
         A list of replacement Cow instances in the herd.
-    current_animal_id : int, optional
-        The highest ID number among all animals in the herd. Default is 0.
-    order_by_random : bool, optional
+    current_animal_id : int, default=0
+        The highest ID number among all animals in the herd.
+    order_by_random : bool, default=0
         A flag to indicate whether the animals should be ordered randomly.
-        Default is True.
+
     """
     calves: List[Calf]
     heiferIs: List[HeiferI]
@@ -46,8 +46,8 @@ class AnimalPopulation:
 
     def __post_init__(self):
         """Post init function to find the max id of all animals, and set the current_animal_id"""
-        ids = [i.id for i in self.calves] + [i.id for i in self.heiferIs] + [i.id for i in self.heiferIIs] + \
-              [i.id for i in self.heiferIIIs] + [i.id for i in self.cows] + [i.id for i in self.replacement]
+        ids = [i.id for i in self.calves + self.heiferIs + self.heiferIIs + self.heiferIIIs + self.cows + 
+               self.replacement]
         if ids:
             self.current_animal_id = max(ids)
 
@@ -62,24 +62,24 @@ class AnimalPopulation:
             "replacement": [replacement.get_replacement_values() for replacement in self.replacement]
         }
 
-    def next_id(self):
-        """
+    def next_id(self) -> int:
+       """
        Increment and return the next unique identifier for an animal.
 
-       Returns:
-       --------
+       Returns
+       -------
        int
            The next unique animal_id.
        """
         self.current_animal_id += 1
         return self.current_animal_id
 
-    def get_calves(self):
+    def get_calves(self) -> List[Calf]:
         """
         Retrieve a list of Calf instances.
 
-        Returns:
-        --------
+        Returns
+        -------
         List[Calf]
             A list of Calf instances.
         """
@@ -87,12 +87,12 @@ class AnimalPopulation:
             shuffle(self.calves)
         return self.calves
 
-    def get_heiferIs(self):
+    def get_heiferIs(self) -> List[HeiferIs]:
         """
         Retrieve a list of HeiferI instances.
 
-        Returns:
-        --------
+        Returns
+        -------
         List[HeiferI]
             A list of HeiferI instances.
         """
@@ -101,12 +101,12 @@ class AnimalPopulation:
 
         return self.heiferIs
 
-    def get_heiferIIs(self):
+    def get_heiferIIs(self) -> List[HeiferIIs]:
         """
         Retrieve a list of HeiferII instances.
 
-        Returns:
-        --------
+        Returns
+        -------
         List[HeiferII]
             A list of HeiferII instances.
         """
@@ -115,12 +115,12 @@ class AnimalPopulation:
 
         return self.heiferIIs
 
-    def get_heiferIIIs(self):
+    def get_heiferIIIs(self) -> List[HeiferIII]:
         """
         Retrieve a list of HeiferIII instances.
 
-        Returns:
-        --------
+        Returns
+        -------
         List[HeiferIII]
             A list of HeiferIII instances.
         """
@@ -128,12 +128,12 @@ class AnimalPopulation:
             shuffle(self.heiferIIIs)
         return self.heiferIIIs
 
-    def get_cows(self):
+    def get_cows(self) -> List[Cow]:
         """
         Retrieve a list of Cow instances.
 
-        Returns:
-        --------
+        Returns
+        -------
         List[Cow]
             A list of Cow instances.
         """
@@ -141,12 +141,12 @@ class AnimalPopulation:
             shuffle(self.cows)
         return self.cows
 
-    def get_replacement_cows(self):
+    def get_replacement_cows(self) -> List[Cow]:
         """
         Retrieve a list of replacement Cow instances.
 
-        Returns:
-        --------
+        Returns
+        -------
         List[Cow]
             A list of replacement Cow instances.
         """
@@ -158,8 +158,8 @@ class AnimalPopulation:
         """
         Returns a dictionary containing herd summary information
 
-        Returns:
-        --------
+        Returns
+        -------
         Dict[str, int | float]
             A dictionary which stores the summary of the initialization
         """

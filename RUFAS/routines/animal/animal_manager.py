@@ -86,6 +86,7 @@ class AnimalManager:
         of LifeCycleManager class and sets up the animal environment.
 
         Parameters
+        ----------
         data : Dict
             dictionary with animal information from the input JSON file
         config : Config
@@ -225,7 +226,7 @@ class AnimalManager:
 
             self.all_pens.append(pen)
 
-    def init_animals(self, herd_data: Dict[str, Any]):
+    def init_animals(self, herd_data: Dict[str, Any]) -> None:
         """
         Populates the list of animals with the information from the
         input JSON file: constructs the calves, heiferI's, heiferII's,
@@ -1154,7 +1155,10 @@ class AnimalManager:
 
     def get_initial_herd_summary(self) -> InitialHerdSummaryTypedDict:
         """
-        Returns: a dictionary which is the summary of the initial herd
+        Returns
+        -------
+        dict
+            A dictionary which is the summary of the initial herd.
         """
         return self.life_cycle_manager.initial_herd_summary
 
