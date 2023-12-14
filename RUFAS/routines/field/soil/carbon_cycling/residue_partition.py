@@ -32,6 +32,12 @@ class ResiduePartition:
     def add_residue_to_pools(self, rainfall: float) -> None:
         """
         Adds residue to pools.
+
+        Parameters
+        ----------
+        rainfall : float
+            Amount of rainfall on the current day (mm).
+
         """
         self.data.plant_residue_lignin_composition = self._determine_plant_residue_lignin_composition(
             self.data.plant_residue_lignin_composition, rainfall)

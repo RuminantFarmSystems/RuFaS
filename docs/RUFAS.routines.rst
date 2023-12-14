@@ -9,9 +9,9 @@ Subpackages
 
    RUFAS.routines.animal
    RUFAS.routines.feed
+   RUFAS.routines.feed_storage
    RUFAS.routines.field
    RUFAS.routines.manure
-   RUFAS.routines.manure_storage
 
 Module contents
 ---------------
