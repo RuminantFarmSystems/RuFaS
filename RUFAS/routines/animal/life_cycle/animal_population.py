@@ -62,7 +62,7 @@ class AnimalPopulation:
             "replacement": [replacement.get_replacement_values() for replacement in self.replacement]
         }
 
-    def next_id(self):
+    def next_id(self) -> int:
        """
        Increment and return the next unique identifier for an animal.
 
