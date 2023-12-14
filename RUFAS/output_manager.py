@@ -400,8 +400,8 @@ class OutputManager(object):
         The file is saved with no indentation.
 
         If you want to save time and space, limit the maximum depth of the
-        serialized dictionary using the max_depth parameter.
-
+        serialized dictionary using the max_depth parameter. You can also set the
+        `minify_output_file` flag to True to minimize the output JSON file size.
         """
         info_map = {
             "class": self.__class__.__name__,
