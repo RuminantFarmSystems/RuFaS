@@ -43,6 +43,7 @@ def input_manager_original_method_states(
         "_fix_data": mock_input_manager._fix_data,
         "get_data": mock_input_manager.get_data,
         "get_metadata": mock_input_manager.get_metadata,
+        "get_data_keys_by_property": mock_input_manager.get_data_keys_by_properties,
         "_validate_input_type_dynamic": mock_input_manager._validate_input_type_dynamic,
         "_validate_csv_element": mock_input_manager._validate_csv_element,
     }
@@ -307,8 +308,8 @@ def test_populate_pool_raises_keyerror(mock_input_manager: InputManager,
             with pytest.raises(KeyError):
                 mock_input_manager._populate_pool(eager_termination=True)
 
-                assert add_log.call_count == 0
-                assert add_warning.call_count == 0
+            assert add_log.call_count == 0
+            assert add_warning.call_count == 0
 
     mock_input_manager._populate_pool = \
         input_manager_original_method_states["_populate_pool"]
@@ -1837,6 +1838,60 @@ def test_get_metadata_raises_exception(dummy_metadata_path: str,
                                 f"\"{expected_error_parent_address}\" does not have attribute " \
                                 f"\"{expected_error_invalid_key}\"."
         assert add_error.call_count == expected_warning_call_count
+
+
+def test_get_data_by_properties_no_data(mock_input_manager: InputManager,
+                                        input_manager_original_method_states: Dict[str, Callable]) -> None:
+    """Tests that error is handled properly when get_metadata() raises KeyError."""
+    mock_input_manager.get_metadata = MagicMock(side_effect=KeyError)
+
+    with patch("RUFAS.output_manager.OutputManager.add_error") as add_error:
+        actual = mock_input_manager.get_data_keys_by_properties("dummy_property")
+
+    assert add_error.call_count == 1
+    assert actual == []
+
+    mock_input_manager.get_metadata = input_manager_original_method_states["get_metadata"]
+
+
+@pytest.mark.parametrize("data,error_count,expected_keys", [
+    ({
+        "key_1": {"properties": "properties_1"},
+        "key_2": {"properties": "properties_2"},
+        "key_3": {"properties": "target_properties"},
+        "key_4": {"properties": "target_properties"},
+        "key_5": {"properties": "target_properties"},
+     }, 0, ["key_3", "key_4", "key_5"]
+     ),
+    ({
+        "key_1": {"properties": "target_properties"},
+        "key_2": {"not_the_properties": "value"},
+        "key_3": {"properties": "target_properties"},
+        "key_4": {"properties": "properties_4"},
+        "key_5": {"properties": "properties_5"}
+     }, 1, ["key_1", "key_3"]
+     ),
+    ({
+        "key_1": {"not_the_properties": "value"},
+        "key_2": {"not_the_properties": "value"},
+        "key_3": {"not_the_properties": "value"}
+     }, 3, []
+     ),
+    ({}, 0, [])
+])
+def test_get_data_keys_by_properties(data: dict[str, dict[str, str]], error_count: int, expected_keys: list[str],
+                                     mock_input_manager: InputManager,
+                                     input_manager_original_method_states: Dict[str, Callable]) -> None:
+    """Test that Input Manager gets data keys by properties correctly."""
+    mock_input_manager.get_metadata = MagicMock(return_value=data)
+
+    with patch("RUFAS.output_manager.OutputManager.add_error") as add_error:
+        actual = mock_input_manager.get_data_keys_by_properties("target_properties")
+
+    assert add_error.call_count == error_count
+    assert actual == expected_keys
+
+    mock_input_manager.get_metadata = input_manager_original_method_states["get_metadata"]
 
 
 def test_flush_pool(mock_input_manager: InputManager) -> None:
