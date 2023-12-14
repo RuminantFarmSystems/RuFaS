@@ -105,8 +105,8 @@ class AnimalPopulation:
         """
         Retrieve a list of HeiferII instances.
 
-        Returns:
-        --------
+        Returns
+        -------
         List[HeiferII]
             A list of HeiferII instances.
         """
