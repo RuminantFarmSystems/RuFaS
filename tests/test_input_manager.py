@@ -2272,7 +2272,6 @@ def test_add_dict_variable_to_pool_invalid_data(variable_name: str,
         mock_input_manager._add_variable_to_pool = input_manager_original_method_states["_add_variable_to_pool"]
 
 
-
 @pytest.mark.parametrize('variable_name, data, properties_blob_key', [
     ("var1", [1, 2, 3], "key1"),
     ("var2", ["a", "b", "c"], "key2"),
