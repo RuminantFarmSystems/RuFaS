@@ -63,7 +63,7 @@ class AnimalPopulation:
         }
 
     def next_id(self):
-        """
+       """
        Increment and return the next unique identifier for an animal.
 
        Returns:
