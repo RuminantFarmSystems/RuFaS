@@ -128,12 +128,12 @@ class AnimalPopulation:
             shuffle(self.heiferIIIs)
         return self.heiferIIIs
 
-    def get_cows(self):
+    def get_cows(self) -> List[Cow]:
         """
         Retrieve a list of Cow instances.
 
-        Returns:
-        --------
+        Returns
+        -------
         List[Cow]
             A list of Cow instances.
         """
