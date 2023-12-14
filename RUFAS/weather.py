@@ -3,9 +3,11 @@ import numpy as np
 from RUFAS.config import Config
 from RUFAS.current_day_conditions import CurrentDayConditions
 from RUFAS.output_manager import OutputManager
+from RUFAS.input_manager import InputManager
 from RUFAS.time import Time
 from RUFAS.util import Utility
 
+im = InputManager()
 om = OutputManager()
 
 
@@ -89,6 +91,7 @@ class Weather:
         self.__radiation = []
         self.__irrigation = []
         self.__mean_annual_temperature: float = None
+        self.__latitude: float = self._get_latitude()
 
         year_length = config.year_length
         leap_year_length = config.leap_year_length
@@ -172,8 +175,7 @@ class Weather:
         year = time.year
         day = time.day
         month = Utility.day_to_month_conversion(day, time.calendar_year)
-        # 0.752 as radian is hard-coded to Madison,WI
-        daylength = CurrentDayConditions.determine_daylength(day, 43.0723, month)
+        daylength = CurrentDayConditions.determine_daylength(day, self.__latitude, month)
         try:
             current_conditions = CurrentDayConditions(
                 incoming_light=self.__radiation[year - 1][day - 1],
@@ -241,3 +243,34 @@ class Weather:
 
         """
         return np.mean(np.array(daily_average_temperatures))
+
+    @staticmethod
+    def _get_latitude() -> float:
+        """
+        Retrieves (one of) the latitudes stored in the InputManager.
+
+        Returns
+        -------
+        float
+            The latitude of the location that is being simulated (degrees).
+
+        Notes
+        -----
+        If no field files have been specified for this simulation, then the latitude defaults to 43.0723 degrees (the
+        latitude of Madison, WI).
+
+        This method will use the latitude from the first field input key that is returned to it by the Input Manager.
+
+        As of writing this, only the absolute is stored in field input files, so simulations of farms in the southern
+        hemisphere will use incorrect daylength values.
+
+        """
+        field_input_keys = im.get_data_keys_by_properties("field_properties")
+
+        if not field_input_keys:
+            return 43.0723
+
+        first_field_key = field_input_keys[0]
+        latitude = im.get_data(f"{first_field_key}.abs_latitude")
+        return latitude
+
