@@ -86,6 +86,7 @@ class AnimalManager:
         of LifeCycleManager class and sets up the animal environment.
 
         Parameters
+        ----------
         data : Dict
             dictionary with animal information from the input JSON file
         config : Config
