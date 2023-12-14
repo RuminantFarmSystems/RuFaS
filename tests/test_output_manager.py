@@ -1712,7 +1712,7 @@ def test_save_results_report_generation(
             )
 
         # test for exception handling
-        mock_report_generator.generate_report.side_effect = ValueError()
+        mock_report_generator.generate_report.side_effect = KeyError()
         mock_output_manager.save_results(
             "save_path",
             "filters_path",
