@@ -1,4 +1,4 @@
-from typing import Dict, List, Any
+from typing import Dict, List, Any, Optional, Type
 import pytest
 from RUFAS.report_generator import (
     average_aggregator,
@@ -53,7 +53,7 @@ def test_subtraction_aggregator():
 class MockUtility:
     @staticmethod
     def convert_list_of_dicts_to_dict_of_lists(
-        data: List[Dict[str, Any]]
+            data: List[Dict[str, Any]]
     ) -> Dict[str, List[Any]]:
         return {k: [dic[k] for dic in data] for k in data[0]}
 
@@ -75,8 +75,8 @@ def sample_filtered_pool() -> Dict[str, Dict[str, List[Dict[str, int]]]]:
 
 
 def test_generate_report_vertical_then_horizontal(
-    report_generator: ReportGenerator,
-    sample_filtered_pool: Dict[str, Dict[str, List[Dict[str, int]]]],
+        report_generator: ReportGenerator,
+        sample_filtered_pool: Dict[str, Dict[str, List[Dict[str, int]]]],
 ):
     filter_content = {
         "variables": ["a", "b"],
@@ -90,8 +90,8 @@ def test_generate_report_vertical_then_horizontal(
 
 
 def test_generate_report_horizontal_then_vertical(
-    report_generator: ReportGenerator,
-    sample_filtered_pool: Dict[str, Dict[str, List[Dict[str, int]]]],
+        report_generator: ReportGenerator,
+        sample_filtered_pool: Dict[str, Dict[str, List[Dict[str, int]]]],
 ):
     filter_content = {
         "variables": ["a", "b"],
@@ -103,8 +103,8 @@ def test_generate_report_horizontal_then_vertical(
 
 
 def test_generate_report_only_horizontal(
-    report_generator: ReportGenerator,
-    sample_filtered_pool: Dict[str, Dict[str, List[Dict[str, int]]]],
+        report_generator: ReportGenerator,
+        sample_filtered_pool: Dict[str, Dict[str, List[Dict[str, int]]]],
 ):
     filter_content = {
         "variables": ["a", "b"],
@@ -119,8 +119,8 @@ def test_generate_report_only_horizontal(
 
 
 def test_generate_report_only_vertical(
-    report_generator: ReportGenerator,
-    sample_filtered_pool: Dict[str, Dict[str, List[Dict[str, int]]]],
+        report_generator: ReportGenerator,
+        sample_filtered_pool: Dict[str, Dict[str, List[Dict[str, int]]]],
 ):
     filter_content = {
         "variables": ["a", "b"],
@@ -133,8 +133,8 @@ def test_generate_report_only_vertical(
 
 
 def test_generate_report_no_aggregation(
-    report_generator: ReportGenerator,
-    sample_filtered_pool: Dict[str, Dict[str, List[Dict[str, int]]]],
+        report_generator: ReportGenerator,
+        sample_filtered_pool: Dict[str, Dict[str, List[Dict[str, int]]]],
 ):
     filter_content = {
         "variables": ["a", "b"],
@@ -166,8 +166,8 @@ def test_prepare_report_data_valid_list(report_generator: ReportGenerator) -> No
 
 
 def test_prepare_report_data_valid_dict(
-    report_generator: ReportGenerator,
-    sample_filtered_pool: Dict[str, Dict[str, List[Dict[str, int]]]],
+        report_generator: ReportGenerator,
+        sample_filtered_pool: Dict[str, Dict[str, List[Dict[str, int]]]],
 ) -> None:
     actual = report_generator._prepare_report_data(
         sample_filtered_pool, ["a", "b"], 1, 3
@@ -177,16 +177,16 @@ def test_prepare_report_data_valid_dict(
 
 
 def test_prepare_report_data_invalid_no_variables(
-    report_generator: ReportGenerator,
-    sample_filtered_pool: Dict[str, Dict[str, List[Dict[str, int]]]],
+        report_generator: ReportGenerator,
+        sample_filtered_pool: Dict[str, Dict[str, List[Dict[str, int]]]],
 ) -> None:
     with pytest.raises(KeyError):
         report_generator._prepare_report_data(sample_filtered_pool, None, 0, 0)
 
 
 def test_prepare_report_data_aggregate_values(
-    report_generator: ReportGenerator,
-    sample_filtered_pool: Dict[str, Dict[str, List[Dict[str, int]]]],
+        report_generator: ReportGenerator,
+        sample_filtered_pool: Dict[str, Dict[str, List[Dict[str, int]]]],
 ) -> None:
     actual = report_generator._prepare_report_data(
         sample_filtered_pool, ["a", "b"], 0, None
@@ -199,8 +199,8 @@ def test_prepare_report_data_aggregate_values(
 
 
 def test_generate_report_with_invalid_horizontal_order(
-    report_generator: ReportGenerator,
-    sample_filtered_pool: Dict[str, Dict[str, List[Dict[str, int]]]],
+        report_generator: ReportGenerator,
+        sample_filtered_pool: Dict[str, Dict[str, List[Dict[str, int]]]],
 ):
     filter_content = {
         "variables": ["a", "b"],
@@ -214,8 +214,8 @@ def test_generate_report_with_invalid_horizontal_order(
 
 
 def test_generate_report_with_valid_horizontal_order(
-    report_generator: ReportGenerator,
-    sample_filtered_pool: Dict[str, Dict[str, List[Dict[str, int]]]],
+        report_generator: ReportGenerator,
+        sample_filtered_pool: Dict[str, Dict[str, List[Dict[str, int]]]],
 ):
     filter_content = {
         "variables": ["a", "b"],
@@ -231,3 +231,56 @@ def test_generate_report_with_valid_horizontal_order(
     assert report_generator.generate_report(sample_filtered_pool, filter_content) == [
         5.676190476190476
     ]
+
+
+@pytest.mark.parametrize(
+    "referenced_data, config, expected_result, expected_exception",
+    [
+        # Valid case with sum aggregator
+        (
+                [[1, 2, 3], [4, 5, 6]],
+                {"horizontal_aggregation": "sum"},
+                [5, 7, 9],
+                None
+        ),
+
+        # Valid case with average aggregator
+        (
+                [[2, 4, 6], [1, 3, 5]],
+                {"horizontal_aggregation": "average"},
+                [1.5, 3.5, 5.5],
+                None
+        ),
+
+        # Invalid case with unsupported aggregation type
+        (
+                [[1, 2], [3, 4]],
+                {"horizontal_aggregation": "unsupported_aggregator"},
+                None,
+                ValueError
+        ),
+
+        # Case with empty referenced_data
+        (
+                [],
+                {"horizontal_aggregation": "sum"},
+                [],
+                None
+        ),
+    ]
+)
+def test_generate_derived_report(referenced_data: List[List[float]],
+                                 config: Dict[str, Any],
+                                 expected_result: Optional[List[float]],
+                                 expected_exception: Optional[Type[BaseException]]
+                                 ) -> None:
+    """
+    Unit test for generate_derived_report() static method in report_generator.py file.
+    """
+
+    if expected_exception:
+        with pytest.raises(expected_exception):
+            ReportGenerator.generate_derived_report(referenced_data, config)
+    else:
+        result = ReportGenerator.generate_derived_report(referenced_data, config)
+        assert result == expected_result
