@@ -550,25 +550,28 @@ def test_parse_gnu_args(mocker: MockerFixture) -> None:
         mocker.call(
             "-I",
             "--init_herd",
-            help="Initialize herd with simulation",
+            help="Select this flag if you want to initialize the herd by generating a herd population through "
+                 "simulation.",
             action="store_true",
         ),
         mocker.call(
             "-s",
             "--save_animals",
-            help="Save animals to CSV files",
+            help="If the '--init_herd' flag is selected, choose this flag if you want to save the generated herd data "
+                 "into a JSON file.",
             action="store_true",
         ),
         mocker.call(
             "-S",
             "--save_animals_dir",
-            help="The directory for the output animal population JSON file",
+            help="If '--save_animals' flag is selected, use this flag to specify the directory to save the output "
+                 "animal population JSON file.",
             default="output/",
         ),
         mocker.call(
             "-t",
             "--terminate_simulation_post_herd_generation",
-            help="Save generated animals to CSV files",
+            help="Select this flag if you only want to generate a herd, not continuing the simulation afterwards.",
             action="store_true",
         ),
     ]

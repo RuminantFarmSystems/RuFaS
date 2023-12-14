@@ -161,9 +161,12 @@ class SimulationEngine:
 
         data_config = im.get_data('config')
         data_weather = im.get_data('weather')
-        self.weather = Weather(data_weather, self.config)
+        self.config = Config(data_config)
 
+        if self.config.set_seed:
+            random.seed(self.config.seed)
+            numpy.random.seed(self.config.seed)
+
+        self.weather = Weather(data_weather, self.config)
         self.time = Time(self.config)
-        self.state = State(self.config,
-                           self.weather,
-                           self.time)
+        self.state = State(self.config, self.weather, self.time)

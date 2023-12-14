@@ -375,7 +375,7 @@ class OutputManager(object):
         """
         return f"{caller_class}.{caller_function}"
 
-    def dict_to_file_json(self, data_dict: Dict[str, Any], path: str) -> None:
+    def dict_to_file_json(self, data_dict: Dict[str, Any], path: str, minify_output_file: bool = False) -> None:
         """Saves a dictionary into a JSON file
 
         Parameters
@@ -385,6 +385,9 @@ class OutputManager(object):
 
         path : str
             The path to the file to be saved
+
+        minify_output_file : bool
+            Boolean flag indicating whether to minify the output JSON file.
 
         Raises
         ------
@@ -409,11 +412,18 @@ class OutputManager(object):
         self.add_log("save_dict_file_try", f"Attempting to save to {path}.", info_map)
         try:
             with open(path, "w") as json_file:
-                json.dump(
-                    Utility.make_serializable(data_dict, max_depth=3),
-                    json_file,
-                    indent=0,
-                )
+                if minify_output_file:
+                    json.dump(
+                        Utility.make_serializable(data_dict, max_depth=3),
+                        json_file,
+                        separators=(",", ":")
+                    )
+                else:
+                    json.dump(
+                        Utility.make_serializable(data_dict, max_depth=3),
+                        json_file,
+                        indent=0,
+                    )
                 self.add_log(
                     "save_dict_file_success", f"Successfully saved to {path}.", info_map
                 )

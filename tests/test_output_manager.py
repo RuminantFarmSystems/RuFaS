@@ -235,6 +235,25 @@ def test_dict_to_file_json(mock_output_manager: OutputManager) -> None:
     assert written_data == json.dumps(data, indent=0)
 
 
+def test_dict_to_file_json_minify_output(mock_output_manager: OutputManager) -> None:
+    """Unit test for the function dict_to_file_json in the file output_manager.py"""
+
+    data = {
+        "var1": {"values": [1], "info_maps": [{"map1": "value1"}, {"map1": "value2"}]},
+        "var2": {
+            "values": [{"v1": 1, "v2": 1}, {"v1": 2, "v2": 2}],
+            "info_maps": [{"map1": "value1"}, {"map1": "value2"}],
+        },
+    }
+
+    open_mock = mock_open()
+    with patch("builtins.open", open_mock):
+        mock_output_manager.dict_to_file_json(data, "test", minify_output_file=True)
+
+    written_data = "".join(call[1][0] for call in open_mock().write.mock_calls)
+    assert written_data == json.dumps(data, separators=(",", ":"))
+
+
 def test_dict_to_file_json_exception(mock_output_manager: OutputManager) -> None:
     """Test file opening failure for dict_to_file_json() in the file output_manager.py"""
     open_mock = mock_open()
