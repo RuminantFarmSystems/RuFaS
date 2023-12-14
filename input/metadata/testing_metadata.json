@@ -2317,7 +2317,7 @@
           "manure_handler": {
             "type": "string",
             "description": "Manure Handling Method -- Method for cleaning barn alleyways.",
-            "pattern": "^(flush system|alley scraper|manual scraping|tillage|manual skid steer scraping)$"
+            "pattern": "^(flush system|alley scraper|manual scraping|tillage|manual skid steer scraping|harrowing)$"
           },
           "manure_separator": {
             "type": "string",

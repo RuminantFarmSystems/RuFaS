@@ -3,8 +3,10 @@ from enum import Enum
 
 class HeiferReproProtocolEnum(Enum):
     """
-    This enum class lists the heifer reproduction protocols.
+    This enum class lists the options for different heifer reproduction protocols.
 
+    Notes
+    -----
     This list includes both the protocols and their sub-protocols if they have any. The names of
     the sub-protocols are prefixed with the name of the protocol they belong to.
 

@@ -1198,12 +1198,12 @@ class Cow(HeiferIII):
     @property
     def get_avg_estrus_cycle(self):
         """
-        Get the literature value for the average estrus cycle length for cows.
+        Get the literature value for the average estrus cycle length for cows (days).
 
         Returns
         -------
         float
-            The average estrus cycle length for cows
+            The average estrus cycle length for cows (days).
         """
 
         return AnimalBase.config['avg_estrus_cycle_cow']
@@ -1211,12 +1211,12 @@ class Cow(HeiferIII):
     @property
     def get_std_estrus_cycle(self):
         """
-        Get the literature value for the standard deviation of the estrus cycle length for cows.
+        Get the literature value for the standard deviation of the estrus cycle length for cows (days).
 
         Returns
         -------
         float
-            The standard deviation of the estrus cycle length for cows
+            The standard deviation of the estrus cycle length for cows (days).
         """
 
         return AnimalBase.config['std_estrus_cycle_cow']
@@ -1236,10 +1236,18 @@ class Cow(HeiferIII):
         Any
             The value of the attribute in the reproduction data.
 
+        Raises
+        ------
+        KeyError
+            If the attribute is not found in the reproduction data.
         """
+
+        if attribute not in AnimalBase.config['cows']:
+            raise KeyError(f'Invalid cow repro config attribute: {attribute}')
+
         return AnimalBase.config['cows'][attribute]
 
-    # Note: Not used yet. Will revisit next.
+    # Note: Not used yet. Will revisit during cow repro refactor.
     def _handle_successful_conception(self, sim_day: int) -> None:
         """
         Handle a successful conception event.
@@ -1260,7 +1268,7 @@ class Cow(HeiferIII):
             last_time_given_birth = self.events.get_most_recent_date(const.NEW_BIRTH)
             self.calving_to_preg_time = self.days_born - last_time_given_birth
 
-    # Note: Not used yet. Will revisit next.
+    # Note: Not used yet. Will revisit during cow repro refactor.
     def _handle_failed_conception(self, sim_day: int) -> None:
         """
         Handle a failed conception event.
@@ -1280,7 +1288,7 @@ class Cow(HeiferIII):
         if self.repro_program in ['ED'] or self.resynch_method in ['TAIafterPD', 'PGFatPD']:
             self._simulate_estrus(self.estrus_day, sim_day, const.ESTRUS_AFTER_AI_NOTE)
 
-    # Note: Not implemented yet. Will revisit next.
+    # Note: Not implemented yet. Will revisit during cow repro refactor.
     def _handle_preg_check(self, preg_check_config: dict[str, int | str], sim_day: int):
         pass
 

@@ -21,6 +21,26 @@ om = OutputManager()
 
 
 class HeiferII(HeiferI):
+    """
+    This class represents the attributes and activities that are characteristic of
+    heifers in the second stage of their life cycle.
+
+    Class Attributes
+    ----------------
+    stats : collections.defaultdict[str, int]
+        A dictionary that stores statistics about all the heiferIIs instances that have been created.
+        Currently, the following statistics are being tracked:
+        - `num_ai_performed`: The number of times AI was performed across all heiferIIs.
+        - `num_successful_conceptions`: The number of successful conceptions out of all AI performed.
+        - `num_ai_performed_in_ED`: The number of times AI was performed in the ED protocol.
+        - `num_successful_conceptions_in_ED`: The number of successful conceptions out of all AI performed in the ED.
+        - `num_ai_performed_in_TAI`: The number of times AI was performed in the TAI protocol.
+        - `num_successful_conceptions_in_TAI`: The number of successful conceptions out of all AI performed in the TAI.
+        - `num_ai_performed_in_SynchED`: The number of times AI was performed in the SynchED protocol.
+        - `num_successful_conceptions_in_SynchED`: The number of successful conceptions out of all AI performed
+        in the SynchED.
+    """
+
     stats = collections.defaultdict(int)
 
     def __init__(self, args):
@@ -399,8 +419,6 @@ class HeiferII(HeiferI):
         """
         Compare a randomized rate to a reference rate.
 
-        If the randomized rate is less than the reference rate, return True. Otherwise, return False.
-
         Parameters
         ----------
         reference_rate : float
@@ -433,12 +451,12 @@ class HeiferII(HeiferI):
     @staticmethod
     def get_avg_estrus_cycle() -> int:
         """
-        Get the average estrus cycle length for heifers.
+        Get the average estrus cycle length for heifers (days).
 
         Returns
         -------
         int
-            The average estrus cycle length for heifers.
+            The average estrus cycle length for heifers (days).
         """
 
         return AnimalBase.config['avg_estrus_cycle_heifer']
@@ -446,12 +464,12 @@ class HeiferII(HeiferI):
     @staticmethod
     def get_std_estrus_cycle() -> float:
         """
-        Get the standard deviation of the estrus cycle length for heifers.
+        Get the standard deviation of the estrus cycle length for heifers (days).
 
         Returns
         -------
         float
-            The standard deviation of the estrus cycle length for heifers.
+            The standard deviation of the estrus cycle length for heifers (days).
         """
 
         return AnimalBase.config['std_estrus_cycle_heifer']
@@ -459,12 +477,12 @@ class HeiferII(HeiferI):
     @staticmethod
     def get_avg_estrus_cycle_after_pgf() -> int:
         """
-        Get the average estrus cycle length for heifers and cows after PGF.
+        Get the average estrus cycle length for heifers and cows after PGF (days).
 
         Returns
         -------
         int
-            The average estrus cycle length for heifers and cows after PGF.
+            The average estrus cycle length for heifers and cows after PGF (days).
         """
 
         return AnimalBase.config['avg_estrus_cycle_after_pgf']
@@ -472,12 +490,12 @@ class HeiferII(HeiferI):
     @staticmethod
     def get_std_estrus_cycle_after_pgf() -> float:
         """
-        Get the standard deviation of the estrus cycle length for heifers and cows after PGF.
+        Get the standard deviation of the estrus cycle length for heifers and cows after PGF (days).
 
         Returns
         -------
         float
-            The standard deviation of the estrus cycle length for heifers and cows after PGF.
+            The standard deviation of the estrus cycle length for heifers and cows after PGF (days).
         """
 
         return AnimalBase.config['std_estrus_cycle_after_pgf']
@@ -570,6 +588,8 @@ class HeiferII(HeiferI):
         """
         Get the default conception rate for heifers used in TAI protocols.
 
+        Notes
+        -----
         This is to contrast with the estrus conception rate used in the ED protocol.
 
         Returns
@@ -643,6 +663,8 @@ class HeiferII(HeiferI):
         """
         Handle estrus detection in the ED protocol.
 
+        Notes
+        -----
         The two main differences between how estrus detection is handled in the ED protocol and the
         SynchED protocol are:
         1. The estrus detection rate and conception rate are different.
@@ -757,7 +779,15 @@ class HeiferII(HeiferI):
         -------
         Any
             The value of the attribute.
+
+        Raises
+        ------
+        KeyError
+            If the attribute is not a valid attribute.
         """
+
+        if attribute not in AnimalBase.config['heifers']:
+            raise KeyError(f'Invalid heifer repro config attribute: {attribute}')
 
         return AnimalBase.config['heifers'][attribute]
 
@@ -790,9 +820,12 @@ class HeiferII(HeiferI):
     @staticmethod
     def _get_default_repro_sub_protocol(protocol: str) -> str:
         """
-        Get the default reproduction sub protocol for heifers for a given reproduction protocol.
+        Get the default reproduction sub-protocol for heifers for a given reproduction protocol.
 
-        This is defined in the InternalReproSettings class.
+        Notes
+        -----
+        The default reproduction sub-protocol for heifers is defined in the InternalReproSettings
+        class.
 
         Parameters
         ----------
@@ -811,14 +844,16 @@ class HeiferII(HeiferI):
         """
         Get the reproduction sub protocol for the heifer.
 
+        Notes
+        -----
         When the current reproduction protocol is the same as the user-defined protocol, the
-        user-defined sub protocol is used. Otherwise, the default sub protocol for the current
+        user-defined sub-protocol is used. Otherwise, the default sub-protocol for the current
         reproduction protocol is used.
 
         Returns
         -------
         str
-            The reproduction sub protocol for the heifer.
+            The reproduction sub-protocol for the heifer.
         """
 
         if self.repro_program == HeiferII.get_user_defined_repro_protocol():
@@ -865,6 +900,16 @@ class HeiferII(HeiferI):
     def _simulate_synch_ed_estrus(self, start_day: int, sim_day: int, estrus_note: str) -> None:
         """
         Calculate and set the next estrus day for the heifers in the SynchED program.
+
+        Notes
+        -----
+        To calculate the next estrus day, a random estrus cycle length is generated from a
+        truncated normal distribution. The mean and standard deviation of the distribution are
+        determined by the user-defined or default average and standard deviation of the estrus
+        cycle length after PGF. The maximum estrus cycle length is 14 days. If the generated
+        estrus cycle length is greater than or equal to 14 days, the estrus cycle length is set
+        to 13 days. The next estrus day is calculated by adding the generated estrus cycle length
+        to the start day.
 
         Parameters
         ----------
@@ -1044,6 +1089,8 @@ class HeiferII(HeiferI):
         """
         Open heifer after abortion or pregnancy loss.
 
+        Notes
+        -----
         Regardless of the reproduction program used for the first breeding, the rebreeding
         program is estrus detection (ED). The new estrus day will be the abortion day plus
         the estrus cycle length.
@@ -1101,6 +1148,8 @@ class HeiferII(HeiferI):
         """
         Increment the performed AI counts across all heifers.
 
+        Notes
+        -----
         The following counts are incremented:
         - num_ai_performed: the total number of AIs performed
         - num_ai_performed_in_ED: the number of AIs performed in the ED protocol
@@ -1181,10 +1230,12 @@ class HeiferII(HeiferI):
     @staticmethod
     def _calculate_gestation_length() -> int:
         """
-        Calculate the gestation length of the heifer.
+        Calculate the gestation length of the heifer (days).
 
         Returns
         -------
+        int
+            The gestation length of the heifer (days).
 
         """
         return int(truncnorm.rvs(-const.STDI, const.STDI,

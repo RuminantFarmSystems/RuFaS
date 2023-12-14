@@ -34,7 +34,6 @@ output/*
 output/graphics/*
 !output/output_filters/
 output/output_filters/*
-!output/output_filters/csv_life_cycle_daily_updates.txt
 
 # ignore project files
 *.sublime-project

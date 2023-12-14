@@ -7,16 +7,22 @@ from RUFAS.routines.animal.life_cycle.repro_protocol_enums import HeiferReproPro
 
 class HormoneDeliverySchedule:
     """
-    This class contains the hormone delivery schedule for the reproduction protocols that involves
-    hormone delivery. The schedule is a dictionary of offset days to a dictionary of events that should
+    This class contains the hormone delivery schedule for the reproduction protocols that involves hormone delivery.
+
+    Notes
+    -----
+    The schedule is a dictionary of offset days to a dictionary of events that should
     happen on that day. The events are:
+
     - deliver_hormones: a list of hormones to deliver on that day. The supported hormones are: GnRH, PGF, CIDR.
+
     - set_ai_day: a boolean indicating whether to set the AI day to that day
+
     - set_conception_rate: a boolean indicating whether to set the conception rate to that day
 
-    The schedule is static and is not meant to be instantiated.
+    The schedule is static and is not meant to be instantiated. It is based on the following protocols and their
+    subprotocols:
 
-    The schedule is based on the following protocols and their subprotocols:
     - Heifer reproduction protocols and subprotocols:
         - TAI
             - 5dCG2P
@@ -31,6 +37,7 @@ class HormoneDeliverySchedule:
             - CoSynch 72
             - 5d CoSynch
     """
+
     HEIFER_REPRO_PROTOCOLS = {
         HeiferReproProtocolEnum.TAI_5dCG2P.value: {
             0: {'deliver_hormones': ['CIDR']},

@@ -409,7 +409,6 @@ def test_parse_gnu_args(mocker: MockerFixture) -> None:
             "--exclude_info_maps",
             help="Exclude info_maps from the output",
             action="store_true",
-            default=True
         ),
         mocker.call(
             "-o",
