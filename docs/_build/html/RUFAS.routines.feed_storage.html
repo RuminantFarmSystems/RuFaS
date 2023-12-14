@@ -109,6 +109,67 @@
 <section id="submodules">
 <h2>Submodules<a class="headerlink" href="#submodules" title="Link to this heading"></a></h2>
 </section>
+<section id="module-RUFAS.routines.feed_storage.baleage">
+<span id="rufas-routines-feed-storage-baleage-module"></span><h2>RUFAS.routines.feed_storage.baleage module<a class="headerlink" href="#module-RUFAS.routines.feed_storage.baleage" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="RUFAS.routines.feed_storage.baleage.Baleage">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">RUFAS.routines.feed_storage.baleage.</span></span><span class="sig-name descname"><span class="pre">Baleage</span></span><a class="headerlink" href="#RUFAS.routines.feed_storage.baleage.Baleage" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#RUFAS.routines.feed_storage.storage.Storage" title="RUFAS.routines.feed_storage.storage.Storage"><code class="xref py py-class docutils literal notranslate"><span class="pre">Storage</span></code></a></p>
+<p>Class representing Baleage storage, a subclass of Storage.</p>
+<section id="attributes">
+<h3>Attributes<a class="headerlink" href="#attributes" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>bale_density<span class="classifier">float</span></dt><dd><p>Density of the bale, calculated based on the dry matter.</p>
+</dd>
+</dl>
+</section>
+<section id="methods">
+<h3>Methods<a class="headerlink" href="#methods" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>calculate_protein_loss():</dt><dd><p>Calculates the protein loss specific to Baleage storage.</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.feed_storage.baleage.Baleage.calculate_protein_loss">
+<span class="sig-name descname"><span class="pre">calculate_protein_loss</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.routines.feed_storage.baleage.Baleage.calculate_protein_loss" title="Link to this definition"></a></dt>
+<dd><p>Calculate the protein loss specific to Baleage storage.</p>
+<section id="returns">
+<h4>Returns<a class="headerlink" href="#returns" title="Link to this heading"></a></h4>
+<p>None</p>
+</section>
+</dd></dl>
+
+</section>
+</dd></dl>
+
+</section>
+<section id="module-RUFAS.routines.feed_storage.grain">
+<span id="rufas-routines-feed-storage-grain-module"></span><h2>RUFAS.routines.feed_storage.grain module<a class="headerlink" href="#module-RUFAS.routines.feed_storage.grain" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="RUFAS.routines.feed_storage.grain.Dry">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">RUFAS.routines.feed_storage.grain.</span></span><span class="sig-name descname"><span class="pre">Dry</span></span><a class="headerlink" href="#RUFAS.routines.feed_storage.grain.Dry" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#RUFAS.routines.feed_storage.grain.Grain" title="RUFAS.routines.feed_storage.grain.Grain"><code class="xref py py-class docutils literal notranslate"><span class="pre">Grain</span></code></a></p>
+<p>Represents dry grain storage and manages its specific attributes and behaviors.</p>
+<p>Inherits from Grain.</p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="RUFAS.routines.feed_storage.grain.Grain">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">RUFAS.routines.feed_storage.grain.</span></span><span class="sig-name descname"><span class="pre">Grain</span></span><a class="headerlink" href="#RUFAS.routines.feed_storage.grain.Grain" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#RUFAS.routines.feed_storage.storage.Storage" title="RUFAS.routines.feed_storage.storage.Storage"><code class="xref py py-class docutils literal notranslate"><span class="pre">Storage</span></code></a></p>
+<p>Represents grain storage and manages its specific attributes and behaviors.</p>
+<p>Inherits from Storage.</p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="RUFAS.routines.feed_storage.grain.HighMoisture">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">RUFAS.routines.feed_storage.grain.</span></span><span class="sig-name descname"><span class="pre">HighMoisture</span></span><a class="headerlink" href="#RUFAS.routines.feed_storage.grain.HighMoisture" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#RUFAS.routines.feed_storage.grain.Grain" title="RUFAS.routines.feed_storage.grain.Grain"><code class="xref py py-class docutils literal notranslate"><span class="pre">Grain</span></code></a></p>
+<p>Represents high-moisture grain storage and manages its specific attributes and behaviors.</p>
+<p>Inherits from Grain.</p>
+</dd></dl>
+
+</section>
 <section id="module-RUFAS.routines.feed_storage.harvested_crop">
 <span id="rufas-routines-feed-storage-harvested-crop-module"></span><h2>RUFAS.routines.feed_storage.harvested_crop module<a class="headerlink" href="#module-RUFAS.routines.feed_storage.harvested_crop" title="Link to this heading"></a></h2>
 <dl class="py class">
@@ -256,8 +317,8 @@ MEADOW_FESCUE: Type of Grass.</p>
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">RUFAS.routines.feed_storage.harvested_crop.</span></span><span class="sig-name descname"><span class="pre">HarvestedCrop</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">category</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#RUFAS.routines.feed_storage.harvested_crop.CropCategory" title="RUFAS.routines.feed_storage.harvested_crop.CropCategory"><span class="pre">CropCategory</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#RUFAS.routines.feed_storage.harvested_crop.CropType" title="RUFAS.routines.feed_storage.harvested_crop.CropType"><span class="pre">CropType</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">harvest_time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.html#RUFAS.time.Time" title="RUFAS.time.Time"><span class="pre">Time</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">storage_time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.html#RUFAS.time.Time" title="RUFAS.time.Time"><span class="pre">Time</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">fresh_mass</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dry_matter_percentage</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dry_matter_digestibility</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">crude_protein_percent</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">non_protein_nitrogen</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">starch</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">adf</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ndf</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lignin</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sugar</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ash</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.feed_storage.harvested_crop.HarvestedCrop" title="Link to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>A class to represent a harvested crop with its attributes.</p>
-<section id="attributes">
-<h3>Attributes<a class="headerlink" href="#attributes" title="Link to this heading"></a></h3>
+<section id="id1">
+<h3>Attributes<a class="headerlink" href="#id1" title="Link to this heading"></a></h3>
 <dl class="simple">
 <dt>category<span class="classifier">CropCategory</span></dt><dd><p>The category of the crop (enum).</p>
 </dd>
@@ -291,8 +352,8 @@ MEADOW_FESCUE: Type of Grass.</p>
 </dd>
 </dl>
 </section>
-<section id="methods">
-<h3>Methods<a class="headerlink" href="#methods" title="Link to this heading"></a></h3>
+<section id="id2">
+<h3>Methods<a class="headerlink" href="#id2" title="Link to this heading"></a></h3>
 <dl class="simple">
 <dt>__post_init__():</dt><dd><p>Validates the category and type relationship.</p>
 </dd>
@@ -383,8 +444,8 @@ MEADOW_FESCUE: Type of Grass.</p>
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">RUFAS.routines.feed_storage.hay.</span></span><span class="sig-name descname"><span class="pre">Hay</span></span><a class="headerlink" href="#RUFAS.routines.feed_storage.hay.Hay" title="Link to this definition"></a></dt>
 <dd><p>Bases: <a class="reference internal" href="#RUFAS.routines.feed_storage.storage.Storage" title="RUFAS.routines.feed_storage.storage.Storage"><code class="xref py py-class docutils literal notranslate"><span class="pre">Storage</span></code></a></p>
 <p>Represents a Hay storage subclass of Storage.</p>
-<section id="id1">
-<h3>Attributes<a class="headerlink" href="#id1" title="Link to this heading"></a></h3>
+<section id="id3">
+<h3>Attributes<a class="headerlink" href="#id3" title="Link to this heading"></a></h3>
 <dl class="simple">
 <dt>bale_density<span class="classifier">float</span></dt><dd><p>Density of the hay bale calculated based on its moisture content.</p>
 </dd>
@@ -392,8 +453,8 @@ MEADOW_FESCUE: Type of Grass.</p>
 </dd>
 </dl>
 </section>
-<section id="id2">
-<h3>Methods<a class="headerlink" href="#id2" title="Link to this heading"></a></h3>
+<section id="id4">
+<h3>Methods<a class="headerlink" href="#id4" title="Link to this heading"></a></h3>
 <dl class="simple">
 <dt>calculate_protein_loss():</dt><dd><p>Calculates the protein loss in the hay.</p>
 </dd>
@@ -402,8 +463,8 @@ MEADOW_FESCUE: Type of Grass.</p>
 <dt class="sig sig-object py" id="RUFAS.routines.feed_storage.hay.Hay.bale_density">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">bale_density</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#RUFAS.routines.feed_storage.hay.Hay.bale_density" title="Link to this definition"></a></dt>
 <dd><p>Calculate and return the density of the hay bale.</p>
-<section id="returns">
-<h4>Returns<a class="headerlink" href="#returns" title="Link to this heading"></a></h4>
+<section id="id5">
+<h4>Returns<a class="headerlink" href="#id5" title="Link to this heading"></a></h4>
 <dl class="simple">
 <dt>float</dt><dd><p>The density of the hay bale.</p>
 </dd>
@@ -415,8 +476,8 @@ MEADOW_FESCUE: Type of Grass.</p>
 <dt class="sig sig-object py" id="RUFAS.routines.feed_storage.hay.Hay.bale_size">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">bale_size</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#RUFAS.routines.feed_storage.hay.Hay.bale_size" title="Link to this definition"></a></dt>
 <dd><p>Return the size (diameter) of the hay bale.</p>
-<section id="id3">
-<h4>Returns<a class="headerlink" href="#id3" title="Link to this heading"></a></h4>
+<section id="id6">
+<h4>Returns<a class="headerlink" href="#id6" title="Link to this heading"></a></h4>
 <dl class="simple">
 <dt>float</dt><dd><p>The diameter of the hay bale in meters.</p>
 </dd>
@@ -428,8 +489,8 @@ MEADOW_FESCUE: Type of Grass.</p>
 <dt class="sig sig-object py" id="RUFAS.routines.feed_storage.hay.Hay.calculate_protein_loss">
 <span class="sig-name descname"><span class="pre">calculate_protein_loss</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.feed_storage.hay.Hay.calculate_protein_loss" title="Link to this definition"></a></dt>
 <dd><p>Calculates the protein loss in the hay.</p>
-<section id="id4">
-<h4>Returns<a class="headerlink" href="#id4" title="Link to this heading"></a></h4>
+<section id="id7">
+<h4>Returns<a class="headerlink" href="#id7" title="Link to this heading"></a></h4>
 <p>None</p>
 </section>
 </dd></dl>
@@ -466,6 +527,94 @@ MEADOW_FESCUE: Type of Grass.</p>
 </dd></dl>
 
 </section>
+<section id="module-RUFAS.routines.feed_storage.sileage">
+<span id="rufas-routines-feed-storage-sileage-module"></span><h2>RUFAS.routines.feed_storage.sileage module<a class="headerlink" href="#module-RUFAS.routines.feed_storage.sileage" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="RUFAS.routines.feed_storage.sileage.Bag">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">RUFAS.routines.feed_storage.sileage.</span></span><span class="sig-name descname"><span class="pre">Bag</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bag_size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.feed_storage.sileage.Bag" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#RUFAS.routines.feed_storage.sileage.Sileage" title="RUFAS.routines.feed_storage.sileage.Sileage"><code class="xref py py-class docutils literal notranslate"><span class="pre">Sileage</span></code></a></p>
+<p>Class representing the Bag type of Sileage storage.</p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="RUFAS.routines.feed_storage.sileage.Bunker">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">RUFAS.routines.feed_storage.sileage.</span></span><span class="sig-name descname"><span class="pre">Bunker</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bunker_size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.feed_storage.sileage.Bunker" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#RUFAS.routines.feed_storage.sileage.Sileage" title="RUFAS.routines.feed_storage.sileage.Sileage"><code class="xref py py-class docutils literal notranslate"><span class="pre">Sileage</span></code></a></p>
+<p>Class representing the Bunker type of Sileage storage.</p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="RUFAS.routines.feed_storage.sileage.Pile">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">RUFAS.routines.feed_storage.sileage.</span></span><span class="sig-name descname"><span class="pre">Pile</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pile_size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.feed_storage.sileage.Pile" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#RUFAS.routines.feed_storage.sileage.Sileage" title="RUFAS.routines.feed_storage.sileage.Sileage"><code class="xref py py-class docutils literal notranslate"><span class="pre">Sileage</span></code></a></p>
+<p>Class representing the Pile type of Sileage storage.</p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="RUFAS.routines.feed_storage.sileage.Sileage">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">RUFAS.routines.feed_storage.sileage.</span></span><span class="sig-name descname"><span class="pre">Sileage</span></span><a class="headerlink" href="#RUFAS.routines.feed_storage.sileage.Sileage" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#RUFAS.routines.feed_storage.storage.Storage" title="RUFAS.routines.feed_storage.storage.Storage"><code class="xref py py-class docutils literal notranslate"><span class="pre">Storage</span></code></a></p>
+<p>Class representing the Sileage storage type, inheriting from Storage.</p>
+<p>Methods are placeholders as per the design document and are to be implemented.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.feed_storage.sileage.Sileage.calculate_dry_matter_loss_to_effluent">
+<span class="sig-name descname"><span class="pre">calculate_dry_matter_loss_to_effluent</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dry_matter</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">estimated_maximum_effluent</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time_in_silo</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.routines.feed_storage.sileage.Sileage.calculate_dry_matter_loss_to_effluent" title="Link to this definition"></a></dt>
+<dd><p>Calculates the dry matter loss to effluent, specific to Sileage.</p>
+<section id="parameters">
+<h3>Parameters<a class="headerlink" href="#parameters" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>dry_matter<span class="classifier">float</span></dt><dd><p>The amount of dry matter.</p>
+</dd>
+<dt>estimated_maximum_effluent<span class="classifier">float</span></dt><dd><p>The estimated maximum effluent.</p>
+</dd>
+<dt>time_in_silo<span class="classifier">int</span></dt><dd><p>Time in days the crop has been in the silo.</p>
+</dd>
+</dl>
+</section>
+<section id="id8">
+<h3>Returns<a class="headerlink" href="#id8" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>float</dt><dd><p>The amount of dry matter lost to effluent, specific to Sileage.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.feed_storage.sileage.Sileage.calculate_dry_matter_loss_to_gas">
+<span class="sig-name descname"><span class="pre">calculate_dry_matter_loss_to_gas</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dry_matter</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time_in_silo</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.routines.feed_storage.sileage.Sileage.calculate_dry_matter_loss_to_gas" title="Link to this definition"></a></dt>
+<dd><p>Calculates the dry matter loss to gas, specific to Sileage.</p>
+<section id="id9">
+<h3>Parameters<a class="headerlink" href="#id9" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>dry_matter<span class="classifier">float</span></dt><dd><p>The amount of dry matter.</p>
+</dd>
+<dt>time_in_silo<span class="classifier">int</span></dt><dd><p>Time in days the crop has been in the silo.</p>
+</dd>
+</dl>
+</section>
+<section id="id10">
+<h3>Returns<a class="headerlink" href="#id10" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>float</dt><dd><p>The amount of dry matter lost to gas, specific to Sileage.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.feed_storage.sileage.Sileage.calculate_protein_loss">
+<span class="sig-name descname"><span class="pre">calculate_protein_loss</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.feed_storage.sileage.Sileage.calculate_protein_loss" title="Link to this definition"></a></dt>
+<dd><p>Placeholder method to calculate protein loss specific to Sileage.</p>
+<section id="id11">
+<h3>Returns<a class="headerlink" href="#id11" title="Link to this heading"></a></h3>
+<p>None</p>
+</section>
+</dd></dl>
+
+</dd></dl>
+
+</section>
 <section id="module-RUFAS.routines.feed_storage.storage">
 <span id="rufas-routines-feed-storage-storage-module"></span><h2>RUFAS.routines.feed_storage.storage module<a class="headerlink" href="#module-RUFAS.routines.feed_storage.storage" title="Link to this heading"></a></h2>
 <dl class="py class">
@@ -473,8 +622,8 @@ MEADOW_FESCUE: Type of Grass.</p>
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">RUFAS.routines.feed_storage.storage.</span></span><span class="sig-name descname"><span class="pre">Storage</span></span><a class="headerlink" href="#RUFAS.routines.feed_storage.storage.Storage" title="Link to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>Abstract class representing a general storage structure.</p>
-<section id="id5">
-<h3>Attributes<a class="headerlink" href="#id5" title="Link to this heading"></a></h3>
+<section id="id12">
+<h3>Attributes<a class="headerlink" href="#id12" title="Link to this heading"></a></h3>
 <dl class="simple">
 <dt>stored<span class="classifier">List[HarvestedCrop]</span></dt><dd><p>A list of HarvestedCrop objects representing the crops stored.</p>
 </dd>
@@ -482,8 +631,8 @@ MEADOW_FESCUE: Type of Grass.</p>
 </dd>
 </dl>
 </section>
-<section id="id6">
-<h3>Methods<a class="headerlink" href="#id6" title="Link to this heading"></a></h3>
+<section id="id13">
+<h3>Methods<a class="headerlink" href="#id13" title="Link to this heading"></a></h3>
 <dl class="simple">
 <dt>receive_crop(crop: HarvestedCrop)</dt><dd><p>Receives a harvested crop and adds it to the storage.</p>
 </dd>
@@ -508,15 +657,15 @@ MEADOW_FESCUE: Type of Grass.</p>
 <dt class="sig sig-object py" id="RUFAS.routines.feed_storage.storage.Storage.calculate_bale_density">
 <span class="sig-name descname"><span class="pre">calculate_bale_density</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">initial_dry_matter</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.routines.feed_storage.storage.Storage.calculate_bale_density" title="Link to this definition"></a></dt>
 <dd><p>Calculates the density of a bale.</p>
-<section id="parameters">
-<h4>Parameters<a class="headerlink" href="#parameters" title="Link to this heading"></a></h4>
+<section id="id14">
+<h4>Parameters<a class="headerlink" href="#id14" title="Link to this heading"></a></h4>
 <dl class="simple">
 <dt>initial_dry_matter<span class="classifier">float</span></dt><dd><p>The initial dry matter of the bale.</p>
 </dd>
 </dl>
 </section>
-<section id="id7">
-<h4>Returns<a class="headerlink" href="#id7" title="Link to this heading"></a></h4>
+<section id="id15">
+<h4>Returns<a class="headerlink" href="#id15" title="Link to this heading"></a></h4>
 <dl class="simple">
 <dt>float</dt><dd><p>The density of the bale.</p>
 </dd>
@@ -528,8 +677,8 @@ MEADOW_FESCUE: Type of Grass.</p>
 <dt class="sig sig-object py" id="RUFAS.routines.feed_storage.storage.Storage.calculate_dry_matter_loss_to_effluent">
 <span class="sig-name descname"><span class="pre">calculate_dry_matter_loss_to_effluent</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dry_matter</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">estimated_maximum_effluent</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time_in_silo</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.feed_storage.storage.Storage.calculate_dry_matter_loss_to_effluent" title="Link to this definition"></a></dt>
 <dd><p>Calculates the dry matter loss to effluent.</p>
-<section id="id8">
-<h4>Parameters<a class="headerlink" href="#id8" title="Link to this heading"></a></h4>
+<section id="id16">
+<h4>Parameters<a class="headerlink" href="#id16" title="Link to this heading"></a></h4>
 <dl class="simple">
 <dt>dry_matter<span class="classifier">float</span></dt><dd><p>The amount of dry matter.</p>
 </dd>
@@ -539,8 +688,8 @@ MEADOW_FESCUE: Type of Grass.</p>
 </dd>
 </dl>
 </section>
-<section id="id9">
-<h4>Returns<a class="headerlink" href="#id9" title="Link to this heading"></a></h4>
+<section id="id17">
+<h4>Returns<a class="headerlink" href="#id17" title="Link to this heading"></a></h4>
 <dl class="simple">
 <dt>float</dt><dd><p>The amount of dry matter lost to effluent.</p>
 </dd>
@@ -552,8 +701,8 @@ MEADOW_FESCUE: Type of Grass.</p>
 <dt class="sig sig-object py" id="RUFAS.routines.feed_storage.storage.Storage.calculate_dry_matter_loss_to_gas">
 <span class="sig-name descname"><span class="pre">calculate_dry_matter_loss_to_gas</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dry_matter</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time_in_silo</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.routines.feed_storage.storage.Storage.calculate_dry_matter_loss_to_gas" title="Link to this definition"></a></dt>
 <dd><p>Calculates the dry matter loss to gas.</p>
-<section id="id10">
-<h4>Parameters<a class="headerlink" href="#id10" title="Link to this heading"></a></h4>
+<section id="id18">
+<h4>Parameters<a class="headerlink" href="#id18" title="Link to this heading"></a></h4>
 <dl class="simple">
 <dt>dry_matter<span class="classifier">float</span></dt><dd><p>The amount of dry matter.</p>
 </dd>
@@ -561,8 +710,8 @@ MEADOW_FESCUE: Type of Grass.</p>
 </dd>
 </dl>
 </section>
-<section id="id11">
-<h4>Returns<a class="headerlink" href="#id11" title="Link to this heading"></a></h4>
+<section id="id19">
+<h4>Returns<a class="headerlink" href="#id19" title="Link to this heading"></a></h4>
 <dl class="simple">
 <dt>float</dt><dd><p>The amount of dry matter lost to gas.</p>
 </dd>
@@ -574,8 +723,8 @@ MEADOW_FESCUE: Type of Grass.</p>
 <dt class="sig sig-object py" id="RUFAS.routines.feed_storage.storage.Storage.calculate_heat_generated">
 <span class="sig-name descname"><span class="pre">calculate_heat_generated</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.routines.feed_storage.storage.Storage.calculate_heat_generated" title="Link to this definition"></a></dt>
 <dd><p>Calculates the total sensible heat generated.</p>
-<section id="id12">
-<h4>Returns<a class="headerlink" href="#id12" title="Link to this heading"></a></h4>
+<section id="id20">
+<h4>Returns<a class="headerlink" href="#id20" title="Link to this heading"></a></h4>
 <dl class="simple">
 <dt>float</dt><dd><p>The total sensible heat generated in kJ/kg.</p>
 </dd>
@@ -587,8 +736,8 @@ MEADOW_FESCUE: Type of Grass.</p>
 <dt class="sig sig-object py" id="RUFAS.routines.feed_storage.storage.Storage.calculate_protein_degradation">
 <span class="sig-name descname"><span class="pre">calculate_protein_degradation</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.feed_storage.storage.Storage.calculate_protein_degradation" title="Link to this definition"></a></dt>
 <dd><p>Calculates protein degradation.</p>
-<section id="id13">
-<h4>Returns<a class="headerlink" href="#id13" title="Link to this heading"></a></h4>
+<section id="id21">
+<h4>Returns<a class="headerlink" href="#id21" title="Link to this heading"></a></h4>
 <p>None</p>
 </section>
 </dd></dl>
@@ -597,8 +746,8 @@ MEADOW_FESCUE: Type of Grass.</p>
 <dt class="sig sig-object py" id="RUFAS.routines.feed_storage.storage.Storage.give_feed">
 <span class="sig-name descname"><span class="pre">give_feed</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">amount</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">crop_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#RUFAS.routines.feed_storage.harvested_crop.CropType" title="RUFAS.routines.feed_storage.harvested_crop.CropType"><span class="pre">CropType</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.feed_storage.storage.Storage.give_feed" title="Link to this definition"></a></dt>
 <dd><p>Gives out a specified amount of feed of a certain crop type.</p>
-<section id="id14">
-<h4>Parameters<a class="headerlink" href="#id14" title="Link to this heading"></a></h4>
+<section id="id22">
+<h4>Parameters<a class="headerlink" href="#id22" title="Link to this heading"></a></h4>
 <dl class="simple">
 <dt>amount<span class="classifier">float</span></dt><dd><p>The amount of feed to give out.</p>
 </dd>
@@ -606,8 +755,8 @@ MEADOW_FESCUE: Type of Grass.</p>
 </dd>
 </dl>
 </section>
-<section id="id15">
-<h4>Returns<a class="headerlink" href="#id15" title="Link to this heading"></a></h4>
+<section id="id23">
+<h4>Returns<a class="headerlink" href="#id23" title="Link to this heading"></a></h4>
 <p>None</p>
 </section>
 </dd></dl>
@@ -616,8 +765,8 @@ MEADOW_FESCUE: Type of Grass.</p>
 <dt class="sig sig-object py" id="RUFAS.routines.feed_storage.storage.Storage.process_degradations">
 <span class="sig-name descname"><span class="pre">process_degradations</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.feed_storage.storage.Storage.process_degradations" title="Link to this definition"></a></dt>
 <dd><p>Processes the degradations and losses of the stored crops.</p>
-<section id="id16">
-<h4>Returns<a class="headerlink" href="#id16" title="Link to this heading"></a></h4>
+<section id="id24">
+<h4>Returns<a class="headerlink" href="#id24" title="Link to this heading"></a></h4>
 <p>None</p>
 </section>
 </dd></dl>
@@ -626,8 +775,8 @@ MEADOW_FESCUE: Type of Grass.</p>
 <dt class="sig sig-object py" id="RUFAS.routines.feed_storage.storage.Storage.recalculate_nutrient_fractions">
 <span class="sig-name descname"><span class="pre">recalculate_nutrient_fractions</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.feed_storage.storage.Storage.recalculate_nutrient_fractions" title="Link to this definition"></a></dt>
 <dd><p>Recalculates the relative nutrient concentrations after dry matter loss.</p>
-<section id="id17">
-<h4>Returns<a class="headerlink" href="#id17" title="Link to this heading"></a></h4>
+<section id="id25">
+<h4>Returns<a class="headerlink" href="#id25" title="Link to this heading"></a></h4>
 <p>None</p>
 </section>
 </dd></dl>
@@ -636,15 +785,15 @@ MEADOW_FESCUE: Type of Grass.</p>
 <dt class="sig sig-object py" id="RUFAS.routines.feed_storage.storage.Storage.receive_crop">
 <span class="sig-name descname"><span class="pre">receive_crop</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">crop</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#RUFAS.routines.feed_storage.harvested_crop.HarvestedCrop" title="RUFAS.routines.feed_storage.harvested_crop.HarvestedCrop"><span class="pre">HarvestedCrop</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.routines.feed_storage.storage.Storage.receive_crop" title="Link to this definition"></a></dt>
 <dd><p>Receives a harvested crop and adds it to the storage.</p>
-<section id="id18">
-<h4>Parameters<a class="headerlink" href="#id18" title="Link to this heading"></a></h4>
+<section id="id26">
+<h4>Parameters<a class="headerlink" href="#id26" title="Link to this heading"></a></h4>
 <dl class="simple">
 <dt>crop<span class="classifier">HarvestedCrop</span></dt><dd><p>The harvested crop to be added to the storage.</p>
 </dd>
 </dl>
 </section>
-<section id="id19">
-<h4>Returns<a class="headerlink" href="#id19" title="Link to this heading"></a></h4>
+<section id="id27">
+<h4>Returns<a class="headerlink" href="#id27" title="Link to this heading"></a></h4>
 <p>None</p>
 </section>
 </dd></dl>
