@@ -27,7 +27,7 @@ jobs:
     - name: Remove Existing .rst Files (excluding index.rst and modules.rst)
       run: find docs -maxdepth 1 -type f -name '*.rst' ! -name 'index.rst' ! -name 'modules.rst' -exec rm -f {} \;
     - name: Generate Sphinx Documentation with sphinx-apidoc
-      run: sphinx-apidoc -o docs .
+      run: sphinx-apidoc -o docs . tests/
     - name: Build HTML from Sphinx
       run: |
         cd docs
