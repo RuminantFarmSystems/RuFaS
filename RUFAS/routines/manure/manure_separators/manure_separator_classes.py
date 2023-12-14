@@ -275,7 +275,7 @@ class DefaultManureSeparatorConfigFactory:
         total_solids_removal_efficiency_for_separator=0.35,
         volatile_solids_removal_efficiency_for_separator=0.40,
         nitrogen_removal_efficiency_for_separator=0.3,
-        total_ammoniacal_nitrogen_removal_efficiency_for_separator=0.15,
+        total_ammoniacal_nitrogen_removal_efficiency_for_separator=0.15,  # TODO: Check this value, maybe too high
         phosphorus_removal_efficiency_for_separator=0.4,
         potassium_removal_efficiency_for_separator=0.15,
     )
@@ -284,7 +284,7 @@ class DefaultManureSeparatorConfigFactory:
         total_solids_removal_efficiency_for_separator=0.25,
         volatile_solids_removal_efficiency_for_separator=0.30,
         nitrogen_removal_efficiency_for_separator=0.3,
-        total_ammoniacal_nitrogen_removal_efficiency_for_separator=0.10,
+        total_ammoniacal_nitrogen_removal_efficiency_for_separator=0.10,  # TODO: Check this value, maybe too high
         phosphorus_removal_efficiency_for_separator=0.2,
         potassium_removal_efficiency_for_separator=0.23,
     )

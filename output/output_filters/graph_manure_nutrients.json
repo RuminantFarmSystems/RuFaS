@@ -1,0 +1,38 @@
+{
+  "multiple": [
+    {
+      "type": "plot",
+      "filters": [
+        "ManureNutrients.nitrogen",
+        "ManureNutrients.phosphorus",
+        "ManureNutrients.potassium"
+      ],
+      "title": "Manure Nutrients Nitrogen, Phosphorus, and Potassium (kg)",
+      "legend": [
+        "N",
+        "P",
+        "K"
+      ]
+    },
+    {
+      "type": "plot",
+      "filters": [
+        "ManureNutrients.dry_matter"
+      ],
+      "title": "Manure Nutrients Dry Matter (kg)",
+      "legend": [
+        "Dry Matter"
+      ]
+    },
+    {
+      "type": "plot",
+      "filters": [
+        "ManureNutrients.total_manure_mass"
+      ],
+      "title": "Manure Nutrients Total Manure Mass (kg)",
+      "legend": [
+        "Total Manure Mass"
+      ]
+    }
+  ]
+}

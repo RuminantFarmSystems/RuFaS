@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import os
 import datetime
 from pathlib import Path
@@ -140,6 +142,8 @@ class GraphGenerator:
         """
         try:
             fig, _ = plt.subplots()
+            filtered_pool = {k: filtered_pool[k] for k in graph_details["filters"]
+                             if k in filtered_pool.keys()}
             self._draw_graph(
                 graph_details["type"], filtered_pool, graph_details.get("variables")
             )

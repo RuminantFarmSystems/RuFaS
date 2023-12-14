@@ -1,0 +1,38 @@
+{
+  "multiple": [
+    {
+      "type": "plot",
+      "filters": [
+        "SlurryManureNutrients.nitrogen",
+        "SlurryManureNutrients.phosphorus",
+        "SlurryManureNutrients.potassium"
+      ],
+      "title": "Slurry Manure Nutrients Nitrogen, Phosphorus, and Potassium (kg)",
+      "legend": [
+        "N",
+        "P",
+        "K"
+      ]
+    },
+    {
+      "type": "plot",
+      "filters": [
+        "SlurryManureNutrients.dry_matter"
+      ],
+      "title": "Slurry Manure Nutrients Dry Matter (kg)",
+      "legend": [
+        "Dry Matter"
+      ]
+    },
+    {
+      "type": "plot",
+      "filters": [
+        "SlurryManureNutrients.total_manure_mass"
+      ],
+      "title": "Slurry Manure Nutrients Total Manure Mass (kg)",
+      "legend": [
+        "Total Manure Mass"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,38 @@
+{
+  "multiple": [
+    {
+      "type": "plot",
+      "filters": [
+        "SolidManureNutrients.nitrogen",
+        "SolidManureNutrients.phosphorus",
+        "SolidManureNutrients.potassium"
+      ],
+      "title": "Solid Manure Nutrients Nitrogen, Phosphorus, and Potassium (kg)",
+      "legend": [
+        "N",
+        "P",
+        "K"
+      ]
+    },
+    {
+      "type": "plot",
+      "filters": [
+        "SolidManureNutrients.dry_matter"
+      ],
+      "title": "Solid Manure Nutrients Dry Matter (kg)",
+      "legend": [
+        "Dry Matter"
+      ]
+    },
+    {
+      "type": "plot",
+      "filters": [
+        "SolidManureNutrients.total_manure_mass"
+      ],
+      "title": "Solid Manure Nutrients Total Manure Mass (kg)",
+      "legend": [
+        "Total Manure Mass"
+      ]
+    }
+  ]
+}

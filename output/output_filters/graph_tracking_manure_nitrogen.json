@@ -1,0 +1,44 @@
+{
+  "multiple": [
+    {
+      "type": "plot",
+      "filters": [
+        "AnimalModuleInputToManureModule_Pen_3.manure_total_ammoniacal_nitrogen",
+        "AnimalModuleInputToManureModule_Pen_3.urine_total_ammoniacal_nitrogen",
+        "AnimalModuleInputToManureModule_Pen_3.urine_nitrogen",
+        "AnimalModuleInputToManureModule_Pen_3.nitrogen"
+      ],
+      "title": "Pen 3 Nitrogen Values At the Start of Manure Module (kg)",
+      "legend": [
+        "Manure Total Ammoniacal Nitrogen",
+        "Urine Total Ammoniacal Nitrogen",
+        "Urine Nitrogen",
+        "Nitrogen"
+      ]
+    },
+    {
+      "type": "plot",
+      "filters": [
+        "ManureHandlerDailyOutput_Pen_3.liquid_manure_total_ammoniacal_nitrogen",
+        "ManureHandlerDailyOutput_Pen_3.liquid_manure_nitrogen"
+      ],
+      "title": "Pen 3 Nitrogen Values After Manure Handling (kg)",
+      "legend": [
+        "Manure Handler Liquid Manure Total Ammoniacal Nitrogen",
+        "Manure Handler Liquid Manure Nitrogen"
+      ]
+    },
+    {
+      "type": "plot",
+      "filters": [
+        "ManureTreatmentDailyOutput_Pen_3.liquid_manure_total_ammoniacal_nitrogen",
+        "ManureTreatmentDailyOutput_Pen_3.liquid_manure_nitrogen"
+      ],
+      "title": "Pen 3 Nitrogen Values After Manure Treatment (kg)",
+      "legend": [
+        "Manure Treatment Liquid Manure Total Ammoniacal Nitrogen",
+        "Manure Treatment Liquid Manure Nitrogen"
+      ]
+    }
+  ]
+}

@@ -76,13 +76,6 @@ class PenManure:
         """Performs any necessary unit conversion after initialization."""
         self.manure_volume = self.manure_mass / ManureConstants.MANURE_DENSITY
 
-        # Zero out any negative field
-        # TODO: This is a temporary fix. Need to find out why negative values are being generated
-        # from the animal module. Later, we should raise an exception if a negative value is found.
-        for fld in fields(self):
-            if getattr(self, fld.name) < 0:
-                setattr(self, fld.name, 0)
-
     @classmethod
     def get_instance(
         cls, animal_manure: AnimalManureExcretions, num_animals: int
@@ -120,9 +113,8 @@ class PenManure:
             urea=animal_manure["urea"] / num_animals,
             urine=animal_manure["urine"],
             urine_nitrogen=animal_manure["urine_nitrogen"],
-            urine_total_ammoniacal_nitrogen=animal_manure["urine_nitrogen"]
-            * ManureConstants.URINE_TAN_FACTOR,
-            manure_total_ammoniacal_nitrogen=total_ammoniacal_nitrogen,
+            urine_total_ammoniacal_nitrogen=animal_manure["urine_nitrogen"] * ManureConstants.URINE_TAN_FACTOR,
+            manure_total_ammoniacal_nitrogen=total_ammoniacal_nitrogen / num_animals,
             nitrogen=animal_manure["manure_nitrogen"],
             manure_mass=manure_mass,
             total_solids=animal_manure["total_solids"],
