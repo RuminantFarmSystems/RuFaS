@@ -227,8 +227,8 @@ def test_cut_crop(efficiency: float, harvest: float, override: bool, should_fail
             assert data.residue_nitrogen == residue * 0.09
             assert data.residue_phosphorus == residue * 0.02
         else:
-            assert data.yield_nitrogen == collected_fresh_yield * 0.12
-            assert data.yield_phosphorus == collected_fresh_yield * 0.0092
+            assert data.yield_nitrogen == collected_dry_matter_yield * 0.12
+            assert data.yield_phosphorus == collected_dry_matter_yield * 0.0092
             assert data.residue_nitrogen == residue * 0.12
             assert data.residue_phosphorus == residue * 0.0092
 
@@ -290,8 +290,8 @@ def test_record_yield(field_name: str, field_size: float, species: str, year: in
 
 @pytest.mark.parametrize(
     "root_biomass,residue,nitrogen,killed,expected_root_depth,expected_surface_residue,expected_root_residue", [
-        (150, 150, 22, True, 100, 0.0, 150.0),
-        (100, 150, 22, True, 100, 50, 100),
+        (150, 150, 22, True, 100, 0.0, 120.0),
+        (100, 150, 22, True, 100, 50, 80.0),
         (100, 150, 22, False, 0, 150, 0)
     ])
 def test_transfer_residue(root_biomass: float, residue: float, nitrogen: float, killed: bool,
@@ -301,7 +301,7 @@ def test_transfer_residue(root_biomass: float, residue: float, nitrogen: float, 
         soil."""
     soil_data = SoilData(field_size=1)
     soil_data.soil_layers[0].fresh_organic_nitrogen_content = 0
-    crop_data = CropData(yield_residue=residue, residue_nitrogen=nitrogen)
+    crop_data = CropData(yield_residue=residue, residue_nitrogen=nitrogen, dry_matter_percentage=80.0)
     crop_data.root_depth = 100.0
     crop_data.root_biomass = root_biomass
     crop_manage = CropManagement(crop_data)
