@@ -101,7 +101,7 @@ class AnimalPopulation:
 
         return self.heiferIs
 
-    def get_heiferIIs(self):
+    def get_heiferIIs(self) -> List[HeiferIIs]:
         """
         Retrieve a list of HeiferII instances.
 
