@@ -87,7 +87,7 @@ class AnimalPopulation:
             shuffle(self.calves)
         return self.calves
 
-    def get_heiferIs(self):
+    def get_heiferIs(self) -> List[HeiferIs]:
         """
         Retrieve a list of HeiferI instances.
 
