@@ -74,7 +74,7 @@ class AnimalPopulation:
         self.current_animal_id += 1
         return self.current_animal_id
 
-    def get_calves(self):
+    def get_calves(self) -> List[Calf]:
         """
         Retrieve a list of Calf instances.
 
