@@ -500,8 +500,7 @@ class HeiferII(HeiferI):
 
         return AnimalBase.config['std_estrus_cycle_after_pgf']
 
-    @staticmethod
-    def get_general_estrus_detection_rate() -> float:
+    def get_general_estrus_detection_rate(self) -> float:
         """
         Get the general estrus detection rate for heifers.
 
@@ -511,7 +510,7 @@ class HeiferII(HeiferI):
             The general estrus detection rate for heifers.
         """
 
-        return HeiferII.get_user_defined_repro_data('estrus_detection_rate')
+        return self.get_user_defined_repro_data('estrus_detection_rate')
 
     @staticmethod
     def _get_user_defined_synch_ed_estrus_detection_rate() -> float:
@@ -555,8 +554,7 @@ class HeiferII(HeiferI):
         else:
             return self._get_default_synch_ed_estrus_detection_rate()
 
-    @staticmethod
-    def get_general_conception_rate() -> float:
+    def get_general_conception_rate(self) -> float:
         """
         Get the general conception rate for heifers.
 
@@ -566,7 +564,7 @@ class HeiferII(HeiferI):
             The general conception rate for heifers.
         """
 
-        return HeiferII.get_user_defined_repro_data('estrus_conception_rate')
+        return self.get_user_defined_repro_data('estrus_conception_rate')
 
     @staticmethod
     def _get_user_defined_TAI_conception_rate() -> float:

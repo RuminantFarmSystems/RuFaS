@@ -145,7 +145,7 @@ def test_generate_graph_success(graph_generator: GraphGenerator) -> None:
     graph_generator._customize_graph = MagicMock()
     graph_generator._save_graph = MagicMock(return_value="graph path")
     filtered_pool = {}
-    graph_details = {"type": "plot", "variables": ["var1", "var2"]}
+    graph_details = {"type": "plot", "variables": ["var1", "var2"], "filters": []}
     filter_file_name = "filter_file"
     graphics_dir = Path("graphs")
     assert "graph path" == graph_generator.generate_graph(
