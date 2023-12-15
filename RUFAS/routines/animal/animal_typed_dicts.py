@@ -8,11 +8,10 @@ class HerdInfoTypedDict(TypedDict):
     calf_num: int
     heiferI_num: int
     heiferII_num: int
-    heiferIII_num: int
+    heiferIII_num_springers: int
     cow_num: int
     replace_num: int
     herd_num: int
-    herd_init: bool
     breed: str
 
 
@@ -210,7 +209,7 @@ class AnimalConfigTypedDict(TypedDict):
     still_birth_rate: float
 
 
-class InitializationDBSummaryTypedDict(TypedDict):
+class InitialHerdSummaryTypedDict(TypedDict):
     num_calf: int
     num_heiferI: int
     num_heiferII: int
