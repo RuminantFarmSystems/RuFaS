@@ -976,6 +976,39 @@ Returns None if the request cannot be fulfilled.</p>
 </section>
 </dd></dl>
 
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_manager.ManureManager.request_nutrients_by_manure_type">
+<span class="sig-name descname"><span class="pre">request_nutrients_by_manure_type</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">manure_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.routines.manure.manure_treatments.html#RUFAS.routines.manure.manure_treatments.manure_types.ManureType" title="RUFAS.routines.manure.manure_treatments.manure_types.ManureType"><span class="pre">ManureType</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">request</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.routines.manure.manure_nutrients.html#RUFAS.routines.manure.manure_nutrients.nutrient_request.NutrientRequest" title="RUFAS.routines.manure.manure_nutrients.nutrient_request.NutrientRequest"><span class="pre">NutrientRequest</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="RUFAS.routines.manure.manure_nutrients.html#RUFAS.routines.manure.manure_nutrients.nutrient_request_results.NutrientRequestResults" title="RUFAS.routines.manure.manure_nutrients.nutrient_request_results.NutrientRequestResults"><span class="pre">NutrientRequestResults</span></a></span></span><a class="headerlink" href="#RUFAS.routines.manure.manure_manager.ManureManager.request_nutrients_by_manure_type" title="Link to this definition"></a></dt>
+<dd><p>Handle the request for specific nutrients from the crop and soil module by manure type.</p>
+<section id="id3">
+<h3>Parameters<a class="headerlink" href="#id3" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>manure_type<span class="classifier">ManureType</span></dt><dd><p>The type of manure. The possible values are specified in the definition of
+the enum class <code class="xref py py-class docutils literal notranslate"><span class="pre">ManureType</span></code>.</p>
+</dd>
+<dt>request<span class="classifier">NutrientRequest</span></dt><dd><p>The specific nutrient request, including quantities of nitrogen and phosphorus.</p>
+</dd>
+</dl>
+</section>
+<section id="id4">
+<h3>Returns<a class="headerlink" href="#id4" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>NutrientRequestResults | None</dt><dd><p>The results of the nutrient request, detailed in a <cite>NutrientRequestResults</cite> object, which includes
+the amount of nitrogen, phosphorus, total manure mass, dry matter, and others that
+can be provided to fulfill the request.
+Returns None if the request cannot be fulfilled.</p>
+</dd>
+</dl>
+</section>
+<section id="raises">
+<h3>Raises<a class="headerlink" href="#raises" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>KeyError</dt><dd><p>If the given manure type is invalid.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
 </dd></dl>
 
 <dl class="py function">
@@ -985,8 +1018,8 @@ Returns None if the request cannot be fulfilled.</p>
 <p>There is no strict reason why this function is needed. It is simply to make the code
 in the SimulationEngine more readable. It is OK to remove this function and call the
 daily_update method directly from the SimulationEngine.</p>
-<section id="id3">
-<h3>Parameters<a class="headerlink" href="#id3" title="Link to this heading"></a></h3>
+<section id="id5">
+<h3>Parameters<a class="headerlink" href="#id5" title="Link to this heading"></a></h3>
 <dl class="simple">
 <dt>manure_manager<span class="classifier">ManureManager</span></dt><dd><p>A reference to the ManureManager object stored in the SimulationEngine.</p>
 </dd>

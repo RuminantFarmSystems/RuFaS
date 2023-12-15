@@ -358,22 +358,40 @@ This parameter should be set to 0 if this function is called for a non-cow anima
 </dd></dl>
 
 <dl class="py function">
-<dt class="sig sig-object py" id="RUFAS.routines.animal.manure.general_manure.get_default_animal_manure_excretions">
-<span class="sig-prename descclassname"><span class="pre">RUFAS.routines.animal.manure.general_manure.</span></span><span class="sig-name descname"><span class="pre">get_default_animal_manure_excretions</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#RUFAS.routines.animal.manure.general_manure.AnimalManureExcretions" title="RUFAS.routines.animal.manure.general_manure.AnimalManureExcretions"><span class="pre">AnimalManureExcretions</span></a></span></span><a class="headerlink" href="#RUFAS.routines.animal.manure.general_manure.get_default_animal_manure_excretions" title="Link to this definition"></a></dt>
-<dd><p>Get a default AnimalManureExcretions object.</p>
+<dt class="sig sig-object py" id="RUFAS.routines.animal.manure.general_manure.convert_negative_values_in_animal_manure_excretions">
+<span class="sig-prename descclassname"><span class="pre">RUFAS.routines.animal.manure.general_manure.</span></span><span class="sig-name descname"><span class="pre">convert_negative_values_in_animal_manure_excretions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">manure:</span> <span class="pre">~RUFAS.routines.animal.manure.general_manure.AnimalManureExcretions,</span> <span class="pre">to:</span> <span class="pre">~typing.Callable[[float],</span> <span class="pre">float]</span> <span class="pre">=</span> <span class="pre">&lt;function</span> <span class="pre">&lt;lambda&gt;&gt;</span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#RUFAS.routines.animal.manure.general_manure.AnimalManureExcretions" title="RUFAS.routines.animal.manure.general_manure.AnimalManureExcretions"><span class="pre">AnimalManureExcretions</span></a></span></span><a class="headerlink" href="#RUFAS.routines.animal.manure.general_manure.convert_negative_values_in_animal_manure_excretions" title="Link to this definition"></a></dt>
+<dd><p>Convert negative values in an AnimalManureExcretions object to a given value.</p>
 <section id="id7">
-<h3>Returns<a class="headerlink" href="#id7" title="Link to this heading"></a></h3>
+<h3>Parameters<a class="headerlink" href="#id7" title="Link to this heading"></a></h3>
 <dl class="simple">
-<dt>AnimalManureExcretions</dt><dd><p>Default AnimalManureExcretions object.</p>
+<dt>manure<span class="classifier">AnimalManureExcretions</span></dt><dd><p>AnimalManureExcretions object to convert.</p>
+</dd>
+<dt>to<span class="classifier">Callable[[float], float], optional, default=lambda x: 0.0</span></dt><dd><p>Function that takes a float and returns a float. This function is applied to negative values in the
+AnimalManureExcretions object. The default function converts negative values to 0.0.</p>
+</dd>
+</dl>
+</section>
+<section id="id8">
+<h3>Returns<a class="headerlink" href="#id8" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>AnimalManureExcretions</dt><dd><p>AnimalManureExcretions object with negative values converted to values returned by the to function.</p>
 </dd>
 </dl>
 </section>
 </dd></dl>
 
 <dl class="py function">
-<dt class="sig sig-object py" id="RUFAS.routines.animal.manure.general_manure.scalar_mult_animal_manure_excretions">
-<span class="sig-prename descclassname"><span class="pre">RUFAS.routines.animal.manure.general_manure.</span></span><span class="sig-name descname"><span class="pre">scalar_mult_animal_manure_excretions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">manure</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#RUFAS.routines.animal.manure.general_manure.AnimalManureExcretions" title="RUFAS.routines.animal.manure.general_manure.AnimalManureExcretions"><span class="pre">AnimalManureExcretions</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">scalar</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#RUFAS.routines.animal.manure.general_manure.AnimalManureExcretions" title="RUFAS.routines.animal.manure.general_manure.AnimalManureExcretions"><span class="pre">AnimalManureExcretions</span></a></span></span><a class="headerlink" href="#RUFAS.routines.animal.manure.general_manure.scalar_mult_animal_manure_excretions" title="Link to this definition"></a></dt>
-<dd></dd></dl>
+<dt class="sig sig-object py" id="RUFAS.routines.animal.manure.general_manure.get_default_animal_manure_excretions">
+<span class="sig-prename descclassname"><span class="pre">RUFAS.routines.animal.manure.general_manure.</span></span><span class="sig-name descname"><span class="pre">get_default_animal_manure_excretions</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#RUFAS.routines.animal.manure.general_manure.AnimalManureExcretions" title="RUFAS.routines.animal.manure.general_manure.AnimalManureExcretions"><span class="pre">AnimalManureExcretions</span></a></span></span><a class="headerlink" href="#RUFAS.routines.animal.manure.general_manure.get_default_animal_manure_excretions" title="Link to this definition"></a></dt>
+<dd><p>Get a default AnimalManureExcretions object.</p>
+<section id="id9">
+<h3>Returns<a class="headerlink" href="#id9" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>AnimalManureExcretions</dt><dd><p>Default AnimalManureExcretions object.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
 
 </section>
 <section id="module-RUFAS.routines.animal.manure.growing_heifer_manure_excretion">
@@ -382,8 +400,8 @@ This parameter should be set to 0 if this function is called for a non-cow anima
 <dt class="sig sig-object py" id="RUFAS.routines.animal.manure.growing_heifer_manure_excretion.manure_calculations">
 <span class="sig-prename descclassname"><span class="pre">RUFAS.routines.animal.manure.growing_heifer_manure_excretion.</span></span><span class="sig-name descname"><span class="pre">manure_calculations</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ration_formulation</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">feed</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">body_weight</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fecal_phosphorus</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">urine_phosphorus_required</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">methane_model</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#RUFAS.routines.animal.manure.general_manure.AnimalManureExcretions" title="RUFAS.routines.animal.manure.general_manure.AnimalManureExcretions"><span class="pre">AnimalManureExcretions</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#RUFAS.routines.animal.manure.growing_heifer_manure_excretion.manure_calculations" title="Link to this definition"></a></dt>
 <dd><p>Calculates the manure excretion values for a growing heifer with information from the ration formulation.</p>
-<section id="id8">
-<h3>Parameters<a class="headerlink" href="#id8" title="Link to this heading"></a></h3>
+<section id="id10">
+<h3>Parameters<a class="headerlink" href="#id10" title="Link to this heading"></a></h3>
 <dl class="simple">
 <dt>ration_formulation<span class="classifier">Dict[str, float]</span></dt><dd><p>Dictionary that stores the calculated ration.</p>
 </dd>
@@ -399,8 +417,8 @@ This parameter should be set to 0 if this function is called for a non-cow anima
 </dd>
 </dl>
 </section>
-<section id="id9">
-<h3>Returns<a class="headerlink" href="#id9" title="Link to this heading"></a></h3>
+<section id="id11">
+<h3>Returns<a class="headerlink" href="#id11" title="Link to this heading"></a></h3>
 <dl class="simple">
 <dt>float</dt><dd><p>Total amount of phosphorus excreted by the given animal, g.</p>
 </dd>
@@ -420,8 +438,8 @@ This parameter should be set to 0 if this function is called for a non-cow anima
 <dt class="sig sig-object py" id="RUFAS.routines.animal.manure.lactating_cow_manure_excretion.manure_calculations">
 <span class="sig-prename descclassname"><span class="pre">RUFAS.routines.animal.manure.lactating_cow_manure_excretion.</span></span><span class="sig-name descname"><span class="pre">manure_calculations</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ration_formulation</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">feed</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">body_weight</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">days_in_milk</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">milk_protein</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">daily_milk_production</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fecal_phosphorus</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">urine_phosphorus_required</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">methane_model</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">methane_mitigation_method</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">methane_mitigation_additive_amount</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">milk_fat</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metabolizable_energy_intake</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#RUFAS.routines.animal.manure.general_manure.AnimalManureExcretions" title="RUFAS.routines.animal.manure.general_manure.AnimalManureExcretions"><span class="pre">AnimalManureExcretions</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#RUFAS.routines.animal.manure.lactating_cow_manure_excretion.manure_calculations" title="Link to this definition"></a></dt>
 <dd><p>Calculates the manure excretion values for a cow with information from the ration formulation.</p>
-<section id="id10">
-<h3>Parameters<a class="headerlink" href="#id10" title="Link to this heading"></a></h3>
+<section id="id12">
+<h3>Parameters<a class="headerlink" href="#id12" title="Link to this heading"></a></h3>
 <dl class="simple">
 <dt>ration_formulation<span class="classifier">Dict[str, float]</span></dt><dd><p>Dictionary that stores the calculated ration.</p>
 </dd>
@@ -447,8 +465,8 @@ This parameter should be set to 0 if this function is called for a non-cow anima
 </dd>
 </dl>
 </section>
-<section id="id11">
-<h3>Returns<a class="headerlink" href="#id11" title="Link to this heading"></a></h3>
+<section id="id13">
+<h3>Returns<a class="headerlink" href="#id13" title="Link to this heading"></a></h3>
 <dl class="simple">
 <dt>float</dt><dd><p>Total amount of phosphorus excreted by the given animal, g.</p>
 </dd>
@@ -465,8 +483,8 @@ This parameter should be set to 0 if this function is called for a non-cow anima
 <dt class="sig sig-object py" id="RUFAS.routines.animal.manure.lactating_cow_manure_excretion.methane_mitigation">
 <span class="sig-prename descclassname"><span class="pre">RUFAS.routines.animal.manure.lactating_cow_manure_excretion.</span></span><span class="sig-name descname"><span class="pre">methane_mitigation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">NDF_concentration</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">EE_concentration</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">starch_concentration</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">CP_concentration</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">methane_mitigation_method</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">methane_mitigation_additive_amount</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.routines.animal.manure.lactating_cow_manure_excretion.methane_mitigation" title="Link to this definition"></a></dt>
 <dd><p>Calculates reduction in methane yield (%) due to addition of certain methane mitigation feed additive.</p>
-<section id="id12">
-<h3>Parameters<a class="headerlink" href="#id12" title="Link to this heading"></a></h3>
+<section id="id14">
+<h3>Parameters<a class="headerlink" href="#id14" title="Link to this heading"></a></h3>
 <dl class="simple">
 <dt>NDF_concentration<span class="classifier">float</span></dt><dd><p>Concentration of neutral detergent fiber (NDF) in the ration.</p>
 </dd>
@@ -485,8 +503,8 @@ between 40 and 100 mg/kg DMI, while that for monensin is between 16 and 36 mg/kg
 </dd>
 </dl>
 </section>
-<section id="id13">
-<h3>Returns<a class="headerlink" href="#id13" title="Link to this heading"></a></h3>
+<section id="id15">
+<h3>Returns<a class="headerlink" href="#id15" title="Link to this heading"></a></h3>
 <dl class="simple">
 <dt>float</dt><dd><p>Reduction in methane yield (methane production/DMI), %.</p>
 </dd>
@@ -506,8 +524,8 @@ between 40 and 100 mg/kg DMI, while that for monensin is between 16 and 36 mg/kg
 <dt class="sig sig-object py" id="RUFAS.routines.animal.manure.methane_mitigation.EssentialOils.calculate">
 <span class="sig-name descname"><span class="pre">calculate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nutrient_concentrations</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">additive_amount</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.routines.animal.manure.methane_mitigation.EssentialOils.calculate" title="Link to this definition"></a></dt>
 <dd><p>Calculate the reduction in methane yield for the Essential Oils method.</p>
-<section id="id14">
-<h3>Parameters<a class="headerlink" href="#id14" title="Link to this heading"></a></h3>
+<section id="id16">
+<h3>Parameters<a class="headerlink" href="#id16" title="Link to this heading"></a></h3>
 <dl class="simple">
 <dt>nutrient_concentrations<span class="classifier">dict</span></dt><dd><p>A dictionary containing nutrient concentrations.</p>
 </dd>
@@ -515,8 +533,8 @@ between 40 and 100 mg/kg DMI, while that for monensin is between 16 and 36 mg/kg
 </dd>
 </dl>
 </section>
-<section id="id15">
-<h3>Returns<a class="headerlink" href="#id15" title="Link to this heading"></a></h3>
+<section id="id17">
+<h3>Returns<a class="headerlink" href="#id17" title="Link to this heading"></a></h3>
 <dl class="simple">
 <dt>float</dt><dd><p>The reduction in methane yield. This implementation always returns 0.0.</p>
 </dd>
@@ -536,8 +554,8 @@ between 40 and 100 mg/kg DMI, while that for monensin is between 16 and 36 mg/kg
 <em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">calculate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nutrient_concentrations</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">additive_amount</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.routines.animal.manure.methane_mitigation.MethaneMitigationMethod.calculate" title="Link to this definition"></a></dt>
 <dd><p>Calculate the reduction in methane yield.</p>
 <p>This is a placeholder and should be overridden by subclasses.</p>
-<section id="id16">
-<h3>Parameters<a class="headerlink" href="#id16" title="Link to this heading"></a></h3>
+<section id="id18">
+<h3>Parameters<a class="headerlink" href="#id18" title="Link to this heading"></a></h3>
 <dl class="simple">
 <dt>nutrient_concentrations<span class="classifier">dict</span></dt><dd><p>A dictionary containing nutrient concentrations.</p>
 </dd>
@@ -545,8 +563,8 @@ between 40 and 100 mg/kg DMI, while that for monensin is between 16 and 36 mg/kg
 </dd>
 </dl>
 </section>
-<section id="id17">
-<h3>Returns<a class="headerlink" href="#id17" title="Link to this heading"></a></h3>
+<section id="id19">
+<h3>Returns<a class="headerlink" href="#id19" title="Link to this heading"></a></h3>
 <dl class="simple">
 <dt>float</dt><dd><p>The reduction in methane yield.</p>
 </dd>
@@ -565,8 +583,8 @@ between 40 and 100 mg/kg DMI, while that for monensin is between 16 and 36 mg/kg
 <dt class="sig sig-object py" id="RUFAS.routines.animal.manure.methane_mitigation.MethaneMitigationMethodManager.calculate_methane_mitigation">
 <em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">calculate_methane_mitigation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nutrient_concentrations</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">methane_mitigation_method</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">methane_mitigation_additive_amount</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.routines.animal.manure.methane_mitigation.MethaneMitigationMethodManager.calculate_methane_mitigation" title="Link to this definition"></a></dt>
 <dd><p>Calculate the reduction in methane yield for a given mitigation method.</p>
-<section id="id18">
-<h3>Parameters<a class="headerlink" href="#id18" title="Link to this heading"></a></h3>
+<section id="id20">
+<h3>Parameters<a class="headerlink" href="#id20" title="Link to this heading"></a></h3>
 <dl class="simple">
 <dt>nutrient_concentrations<span class="classifier">dict</span></dt><dd><p>A dictionary containing nutrient concentrations.</p>
 </dd>
@@ -577,8 +595,8 @@ between 40 and 100 mg/kg DMI, while that for monensin is between 16 and 36 mg/kg
 </dd>
 </dl>
 </section>
-<section id="id19">
-<h3>Returns<a class="headerlink" href="#id19" title="Link to this heading"></a></h3>
+<section id="id21">
+<h3>Returns<a class="headerlink" href="#id21" title="Link to this heading"></a></h3>
 <dl class="simple">
 <dt>float</dt><dd><p>The reduction in methane yield.</p>
 </dd>
@@ -604,8 +622,8 @@ between 40 and 100 mg/kg DMI, while that for monensin is between 16 and 36 mg/kg
 <dt class="sig sig-object py" id="RUFAS.routines.animal.manure.methane_mitigation.Monensin.calculate">
 <span class="sig-name descname"><span class="pre">calculate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nutrient_concentrations</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">additive_amount</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.routines.animal.manure.methane_mitigation.Monensin.calculate" title="Link to this definition"></a></dt>
 <dd><p>Calculate the reduction in methane yield for the Monensin method.</p>
-<section id="id20">
-<h3>Parameters<a class="headerlink" href="#id20" title="Link to this heading"></a></h3>
+<section id="id22">
+<h3>Parameters<a class="headerlink" href="#id22" title="Link to this heading"></a></h3>
 <dl class="simple">
 <dt>nutrient_concentrations<span class="classifier">dict</span></dt><dd><p>A dictionary containing nutrient concentrations.</p>
 </dd>
@@ -613,8 +631,8 @@ between 40 and 100 mg/kg DMI, while that for monensin is between 16 and 36 mg/kg
 </dd>
 </dl>
 </section>
-<section id="id21">
-<h3>Returns<a class="headerlink" href="#id21" title="Link to this heading"></a></h3>
+<section id="id23">
+<h3>Returns<a class="headerlink" href="#id23" title="Link to this heading"></a></h3>
 <dl class="simple">
 <dt>float</dt><dd><p>The reduction in methane yield.</p>
 </dd>
@@ -633,8 +651,8 @@ between 40 and 100 mg/kg DMI, while that for monensin is between 16 and 36 mg/kg
 <dt class="sig sig-object py" id="RUFAS.routines.animal.manure.methane_mitigation.NOP.calculate">
 <span class="sig-name descname"><span class="pre">calculate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nutrient_concentrations</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">additive_amount</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.routines.animal.manure.methane_mitigation.NOP.calculate" title="Link to this definition"></a></dt>
 <dd><p>Calculate the reduction in methane yield for the 3-NOP method.</p>
-<section id="id22">
-<h3>Parameters<a class="headerlink" href="#id22" title="Link to this heading"></a></h3>
+<section id="id24">
+<h3>Parameters<a class="headerlink" href="#id24" title="Link to this heading"></a></h3>
 <dl class="simple">
 <dt>nutrient_concentrations<span class="classifier">dict</span></dt><dd><p>A dictionary containing nutrient concentrations.</p>
 </dd>
@@ -642,8 +660,8 @@ between 40 and 100 mg/kg DMI, while that for monensin is between 16 and 36 mg/kg
 </dd>
 </dl>
 </section>
-<section id="id23">
-<h3>Returns<a class="headerlink" href="#id23" title="Link to this heading"></a></h3>
+<section id="id25">
+<h3>Returns<a class="headerlink" href="#id25" title="Link to this heading"></a></h3>
 <dl class="simple">
 <dt>float</dt><dd><p>The reduction in methane yield.</p>
 </dd>
@@ -662,8 +680,8 @@ between 40 and 100 mg/kg DMI, while that for monensin is between 16 and 36 mg/kg
 <dt class="sig sig-object py" id="RUFAS.routines.animal.manure.methane_mitigation.Seaweed.calculate">
 <span class="sig-name descname"><span class="pre">calculate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nutrient_concentrations</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">additive_amount</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.routines.animal.manure.methane_mitigation.Seaweed.calculate" title="Link to this definition"></a></dt>
 <dd><p>Calculate the reduction in methane yield for the Seaweed method.</p>
-<section id="id24">
-<h3>Parameters<a class="headerlink" href="#id24" title="Link to this heading"></a></h3>
+<section id="id26">
+<h3>Parameters<a class="headerlink" href="#id26" title="Link to this heading"></a></h3>
 <dl class="simple">
 <dt>nutrient_concentrations<span class="classifier">dict</span></dt><dd><p>A dictionary containing nutrient concentrations.</p>
 </dd>
@@ -671,8 +689,8 @@ between 40 and 100 mg/kg DMI, while that for monensin is between 16 and 36 mg/kg
 </dd>
 </dl>
 </section>
-<section id="id25">
-<h3>Returns<a class="headerlink" href="#id25" title="Link to this heading"></a></h3>
+<section id="id27">
+<h3>Returns<a class="headerlink" href="#id27" title="Link to this heading"></a></h3>
 <dl class="simple">
 <dt>float</dt><dd><p>The reduction in methane yield. This implementation always returns 0.0.</p>
 </dd>
