@@ -637,7 +637,9 @@ class LayerData:
         This factor is lower bounded at 0.05
 
         """
-        return max(0.05, self.water_content / self.field_capacity_content)
+        lower_bounded = max(0.05, self.water_content / self.field_capacity_content)
+        upper_bounded = min(1.0, lower_bounded)
+        return upper_bounded
 
     @property
     def available_water_capacity(self):

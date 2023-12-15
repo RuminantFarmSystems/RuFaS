@@ -45,9 +45,7 @@ class NitrificationVolatilization:
                 continue
 
             temp_factor = self._calculate_nitrification_volatilization_temp_factor(layer.temperature)
-            water_factor = self._calculate_nitrification_soil_water_factor(layer.water_content,
-                                                                           layer.wilting_point_content,
-                                                                           layer.field_capacity_content)
+            water_factor = layer.nutrient_cycling_water_factor
             depth_factor = self._calculate_volatilization_depth_factor(layer.depth_of_layer_center)
 
             nitrification_regulator = self._calculate_nitrification_regulator(temp_factor, water_factor)
@@ -87,12 +85,19 @@ class NitrificationVolatilization:
         float
             The nitrification/volatilization temperature factor of the current layer of soil (unitless)
 
+        Notes
+        -----
+        SWAT does not explicitly say that this temperature factor should be upper-bounded at 1.0, but after discussion
+        with Pete Vadas it came to light that this factor needs to have an upper bound.
+
         References
         ----------
         SWAT Theoretical documentation eqn. 3:1.3.1
 
         """
-        return 0.41 * ((temperature - 5) / 10)
+        unbounded_factor =  0.41 * ((temperature - 5) / 10)
+        bounded_factor = min(1.0, unbounded_factor)
+        return bounded_factor
 
     @staticmethod
     def _calculate_nitrification_soil_water_factor(water_content: float, wilting_point: float,
@@ -112,6 +117,11 @@ class NitrificationVolatilization:
         -------
         float
             The nitrification soil water factor (unitless)
+
+        Notes
+        -----
+        The SWAT documentation for this equation appears to be misaligned with its implementation, see the file nitvol.f
+        (https://bitbucket.org/blacklandgrasslandmodels/swat_development/src/master/nitvol.f).
 
         References
         ----------
