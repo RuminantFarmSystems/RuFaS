@@ -475,13 +475,13 @@ def mock_ration_config() -> MagicMock:
     ration_config.TDN_list = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0]
     ration_config.DE_list = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0]
     ration_config.EE_list = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0]
-    ration_config.is_fat_list = [1, 1, 1, 0, 0, 0]
+    ration_config.is_fat_list = [True, True, True, False, False, False]
     ration_config.BW = 9.0
     ration_config.calcium_list = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0]
     ration_config.phosphorus_list = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0]
     ration_config.NDF_list = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0]
     ration_config.feed_type_list = ["Forage", "Conc", "Mineral", "Forage", "Conc", "Mineral"]
-    ration_config.is_wetforage_list = [1, 1, 1, 0, 0, 0]
+    ration_config.is_wetforage_list = [True, True, True, False, False, False]
     ration_config.Kd_list = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0]
     ration_config.N_A_list = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0]
     ration_config.N_B_list = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0]
@@ -520,13 +520,13 @@ def mock_random_ration_config() -> MagicMock:
     ration_config.TDN_list = [2.976, 0.19, 3.855, 4.415, 3.181, 4.065]
     ration_config.DE_list = [1.374, 4.783, 2.642, 4.42, 2.522, 2.397]
     ration_config.EE_list = [4.314, 4.227, 3.704, 4.897, 0.49, 1.59]
-    ration_config.is_fat_list = [0, 1, 1, 1, 1, 0]
+    ration_config.is_fat_list = [False, True, True, True, True, False]
     ration_config.BW = 2.227
     ration_config.calcium_list = [3.79, 4.242, 4.276, 0.676, 2.767, 0.907]
     ration_config.phosphorus_list = [3.275, 4.759, 0.653, 1.942, 0.914, 3.964]
     ration_config.NDF_list = [2.548, 2.382, 3.086, 4.709, 0.145, 3.554]
     ration_config.feed_type_list = ["Forage", "Conc", "Conc", "Conc", "Forage", "Mineral"]
-    ration_config.is_wetforage_list = [0, 1, 0, 0, 1, 1]
+    ration_config.is_wetforage_list = [False, True, False, False, True, True]
     ration_config.Kd_list = [2.548, 2.382, 3.086, 4.709, 0.145, 3.554]
     ration_config.N_A_list = [3.262, 2.552, 3.456, 2.377, 3.992, 4.561]
     ration_config.N_B_list = [3.453, 0.098, 2.109, 1.191, 4.602, 1.85]
@@ -578,12 +578,12 @@ def mock_available_feeds() -> dict:
     available_feeds["TDN"] = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0]
     available_feeds["DE"] = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0]
     available_feeds["EE"] = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0]
-    available_feeds["is_fat"] = [1, 1, 1, 0, 0, 0]
+    available_feeds["is_fat"] = [True, True, True, False, False, False]
     available_feeds["calcium"] = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0]
     available_feeds["phosphorus"] = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0]
     available_feeds["NDF"] = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0]
     available_feeds["type"] = ["Forage", "Conc", "Mineral", "Forage", "Conc", "Mineral"]
-    available_feeds["is_wetforage"] = [1, 1, 1, 0, 0, 0]
+    available_feeds["is_wetforage"] = [True, True, True, False, False, False]
     available_feeds["Kd"] = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0]
     available_feeds["N_A"] = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0]
     available_feeds["N_B"] = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0]
@@ -2814,12 +2814,12 @@ def test_feed_nutrients():
             "TDN": 1,
             "DE": 1,
             "EE": 1,
-            "is_fat": 1,
+            "is_fat": True,
             "calcium": 1,
             "phosphorus": 1,
             "NDF": 1,
             "feed_type": 1,
-            "is_wetforage": 1,
+            "is_wetforage": True,
             "Kd": 1,
             "N_A": 1,
             "N_B": 1,
@@ -2832,12 +2832,12 @@ def test_feed_nutrients():
             "TDN": 2,
             "DE": 2,
             "EE": 2,
-            "is_fat": 2,
+            "is_fat": False,
             "calcium": 2,
             "phosphorus": 2,
             "NDF": 2,
             "feed_type": 2,
-            "is_wetforage": 2,
+            "is_wetforage": False,
             "Kd": 2,
             "N_A": 2,
             "N_B": 2,
@@ -2854,17 +2854,18 @@ def test_feed_nutrients():
     assert available_feeds.lactating_cow_limit == [1, 3]
     assert available_feeds.dry_cow_limit == [2, 3]
     assert available_feeds.CP == [1, 2]
+
+    assert available_feeds.is_fat == [True, False]
+    assert available_feeds.is_wetforage == [True, False]
     keylist = [
         "feed_id",
         "TDN",
         "DE",
         "EE",
-        "is_fat",
         "calcium",
         "phosphorus",
         "NDF",
         "type",
-        "is_wetforage",
         "Kd",
         "N_A",
         "N_B",
@@ -3055,8 +3056,8 @@ def test_get_feed_data_from_feed_ids() -> None:
     available_feeds.dRUP = [0, 0, 0, 0]
     available_feeds.dry_cow_limit = [100, 100, 100, 100]
     available_feeds.feed_key = ["136", "139", "155", "157"]
-    available_feeds.is_fat = [0, 0, 0, None]
-    available_feeds.is_wetforage = [0, 0, 0, None]
+    available_feeds.is_fat = [False, False, False, None]
+    available_feeds.is_wetforage = [False, False, False, None]
     available_feeds.lactating_cow_limit = [100, 100, 100, 100]
     available_feeds.phosphorus = [19.3, 0, 0.75, 0.45]
     available_feeds.price = [0.1, 0.05, 0.82, 0.44]
@@ -3090,8 +3091,8 @@ def test_get_feed_data_from_feed_ids() -> None:
         "dRUP": [0, 0],
         "dry_cow_limit": [100, 100],
         "feed_key": ["155", "157"],
-        "is_fat": [0, None],
-        "is_wetforage": [0, None],
+        "is_fat": [False, None],
+        "is_wetforage": [False, None],
         "lactating_cow_limit": [100, 100],
         "phosphorus": [0.75, 0.45],
         "price": [0.82, 0.44],
@@ -3234,8 +3235,8 @@ def test_get_DE(
     "kg_fed,feed_item_info,ration_report,body_weight,expected",
     [
         (0, {"feed_type": "Mineral"}, "dummy_variable", "dummy_variable", 0.0),
-        (1, {"feed_type": "Mineral", "is_fat": 1, "DE": 1}, "dummy_variable", "dummy_variable", 0.0),
-        (1, {"feed_type": "not_mineral", "is_fat": 1, "DE": 1}, "dummy_variable", "dummy_variable", 1.0),
+        (1, {"feed_type": "Mineral", "is_fat": True, "DE": 1}, "dummy_variable", "dummy_variable", 0.0),
+        (1, {"feed_type": "not_mineral", "is_fat": True, "DE": 1}, "dummy_variable", "dummy_variable", 1.0),
         (1, {"feed_type": "not_mineral", "is_fat": "dummy", "EE": 4}, "dummy_variable", "dummy_variable", 1.5746),
         (1, {"feed_type": "not_mineral", "is_fat": "dummy", "EE": 1}, "dummy_variable", "dummy_variable", 1.57),
     ],
@@ -3253,8 +3254,8 @@ def test_get_ME(
     "kg_fed,feed_item_info,ration_report,body_weight,expected",
     [
         (0, {"is_fat": "dummy"}, "dummy_variable", "dummy_variable", 0.0),
-        (1, {"is_fat": 1}, "dummy_variable", "dummy_variable", 1.6),
-        (1, {"is_fat": 0}, "dummy_variable", "dummy_variable", 1.152),
+        (1, {"is_fat": True}, "dummy_variable", "dummy_variable", 1.6),
+        (1, {"is_fat": False}, "dummy_variable", "dummy_variable", 1.152),
     ],
 )
 def test_get_NE_maintenance_and_activity(
@@ -3271,10 +3272,10 @@ def test_get_NE_maintenance_and_activity(
     [
         (1, {"feed_type": "Mineral", "is_fat": "dummy"}, "dummy_variable", "dummy_variable", 0.0),
         (0, {"feed_type": "Mineral", "is_fat": "dummy"}, "dummy_variable", "dummy_variable", 0.0),
-        (1, {"feed_type": "dummy", "is_fat": 1}, "dummy_variable", "dummy_variable", 1.6),
-        (1, {"feed_type": "dummy", "is_fat": 0, "EE": 4}, "dummy_variable", "dummy_variable", 1.21996),
-        (1, {"feed_type": "dummy", "is_fat": 0, "EE": 1}, "dummy_variable", "dummy_variable", 1.216),
-        (0, {"feed_type": "dummy", "is_fat": 0, "EE": 1}, "dummy_variable", "dummy_variable", 0.0),
+        (1, {"feed_type": "dummy", "is_fat": True}, "dummy_variable", "dummy_variable", 1.6),
+        (1, {"feed_type": "dummy", "is_fat": False, "EE": 4}, "dummy_variable", "dummy_variable", 1.21996),
+        (1, {"feed_type": "dummy", "is_fat": False, "EE": 1}, "dummy_variable", "dummy_variable", 1.216),
+        (0, {"feed_type": "dummy", "is_fat": False, "EE": 1}, "dummy_variable", "dummy_variable", 0.0),
     ],
 )
 def test_get_NE_lactation(
@@ -3291,10 +3292,10 @@ def test_get_NE_lactation(
     "kg_fed,feed_item_info,ration_report,body_weight,expected",
     [
         (0, {"feed_type": "Mineral", "is_fat": "dummy"}, "dummy_variable", "dummy_variable", 0.000),
-        (0, {"feed_type": "dummy", "is_fat": 1}, "dummy_variable", "dummy_variable", 0.0),
-        (1, {"feed_type": "Mineral", "is_fat": 1}, "dummy_variable", "dummy_variable", 0.0),
-        (1, {"feed_type": "dummy", "is_fat": 1}, "dummy_variable", "dummy_variable", 1.1),
-        (1, {"feed_type": "dummy", "is_fat": 0}, "dummy_variable", "dummy_variable", 0.5916),
+        (0, {"feed_type": "dummy", "is_fat": True}, "dummy_variable", "dummy_variable", 0.0),
+        (1, {"feed_type": "Mineral", "is_fat": True}, "dummy_variable", "dummy_variable", 0.0),
+        (1, {"feed_type": "dummy", "is_fat": True}, "dummy_variable", "dummy_variable", 1.1),
+        (1, {"feed_type": "dummy", "is_fat": False}, "dummy_variable", "dummy_variable", 0.5916),
     ],
 )
 def test_get_NE_growth(
@@ -3394,22 +3395,23 @@ def test_get_metabolizable_protein(mocker: MockerFixture) -> None:
     feed_path_a1 = {"1": {"feed_type": "Conc", "Kd": 1, "N_A": 1, "N_B": 1, "CP": 1, "dRUP": 1}}
     feed_path_a2 = {"2": {"feed_type": "Conc", "Kd": -100, "N_A": 1, "N_B": 1, "CP": 1, "dRUP": 1}}
     feed_path_b1 = {
-        "3": {"feed_type": "Forage", "Kd": 1, "N_A": 1, "N_B": 1, "CP": 1, "dRUP": 1, "is_wetforage": 0, "NDF": 1}
+        "3": {"feed_type": "Forage", "Kd": 1, "N_A": 1, "N_B": 1, "CP": 1, "dRUP": 1, "is_wetforage": False, "NDF": 1}
     }
     feed_path_b2 = {
-        "4": {"feed_type": "Forage", "Kd": -100, "N_A": 1, "N_B": 1, "CP": 1, "dRUP": 1, "is_wetforage": 0, "NDF": 1}
+        "4": {"feed_type": "Forage", "Kd": -100, "N_A": 1, "N_B": 1, "CP": 1, "dRUP": 1, "is_wetforage": False,
+              "NDF": 1}
     }
     feed_path_c1 = {
-        "5": {"feed_type": "Forage", "Kd": 1, "N_A": 1, "N_B": 1, "CP": 1, "dRUP": 1, "is_wetforage": 1, "NDF": 1}
+        "5": {"feed_type": "Forage", "Kd": 1, "N_A": 1, "N_B": 1, "CP": 1, "dRUP": 1, "is_wetforage": True, "NDF": 1}
     }
     feed_path_c2 = {
-        "6": {"feed_type": "Forage", "Kd": -100, "N_A": 1, "N_B": 1, "CP": 1, "dRUP": 1, "is_wetforage": 1, "NDF": 1}
+        "6": {"feed_type": "Forage", "Kd": -100, "N_A": 1, "N_B": 1, "CP": 1, "dRUP": 1, "is_wetforage": True, "NDF": 1}
     }
     feed_path_d1 = {
-        "7": {"feed_type": "Dummy", "Kd": 1, "N_A": 1, "N_B": 1, "CP": 1, "dRUP": 1, "is_wetforage": 0, "NDF": 1}
+        "7": {"feed_type": "Dummy", "Kd": 1, "N_A": 1, "N_B": 1, "CP": 1, "dRUP": 1, "is_wetforage": False, "NDF": 1}
     }
     feed_path_d2 = {
-        "8": {"feed_type": "Dummy", "Kd": -100, "N_A": 1, "N_B": 1, "CP": 1, "dRUP": 1, "is_wetforage": 0, "NDF": 1}
+        "8": {"feed_type": "Dummy", "Kd": -100, "N_A": 1, "N_B": 1, "CP": 1, "dRUP": 1, "is_wetforage": False, "NDF": 1}
     }
     available_feeds = (
         feed_path_a1
