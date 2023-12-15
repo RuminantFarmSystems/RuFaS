@@ -626,7 +626,8 @@ class LayerData:
 
     @property
     def nutrient_cycling_water_factor(self) -> float:
-        """The nutrient cycling water factor (unitless)
+        """
+        The nutrient cycling water factor (unitless).
 
         References
         ----------
@@ -634,12 +635,11 @@ class LayerData:
 
         Notes
         -----
-        This factor is lower bounded at 0.05
+        This factor is lower bounded at 0.05.
 
         """
         lower_bounded = max(0.05, self.water_content / self.field_capacity_content)
-        upper_bounded = min(1.0, lower_bounded)
-        return upper_bounded
+        return lower_bounded
 
     @property
     def available_water_capacity(self):

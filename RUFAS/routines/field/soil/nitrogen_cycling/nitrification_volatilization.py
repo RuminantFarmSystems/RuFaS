@@ -34,6 +34,10 @@ class NitrificationVolatilization:
         """
         Conducts the nitrification and volatilization of ammonium within the soil profile on a daily basis.
 
+        Notes
+        -----
+        This method uses the `nutrient_cycling_water_factor` calculated by :class:`LayerData`.
+
         References
         ----------
         SWAT Theoretical documentation section 3:1.3
@@ -46,6 +50,7 @@ class NitrificationVolatilization:
 
             temp_factor = self._calculate_nitrification_volatilization_temp_factor(layer.temperature)
             water_factor = layer.nutrient_cycling_water_factor
+
             depth_factor = self._calculate_volatilization_depth_factor(layer.depth_of_layer_center)
 
             nitrification_regulator = self._calculate_nitrification_regulator(temp_factor, water_factor)
@@ -102,7 +107,8 @@ class NitrificationVolatilization:
     @staticmethod
     def _calculate_nitrification_soil_water_factor(water_content: float, wilting_point: float,
                                                    field_capacity: float) -> float:
-        """Calculates the soil water factor for nitrification.
+        """
+        Calculates the soil water factor for nitrification.
 
         Parameters
         ----------
