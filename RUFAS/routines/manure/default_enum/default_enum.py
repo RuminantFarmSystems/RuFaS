@@ -31,7 +31,7 @@ class DefaultEnum(Enum):
             if member.name.upper() == lookup_name.strip().upper():
                 return member
             elif (
-                type(member.value) == str
+                type(member.value) is str
                 and member.value.upper() == lookup_name.strip().upper()
             ):
                 return member
