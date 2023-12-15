@@ -167,7 +167,7 @@ class RationOptimizer:
         for i in range(len(ration_config.DEact_list)):
             if ration_config.feed_type_list[i] == 'Mineral':
                 ration_config.MEact_list.append(0)
-            elif ration_config.is_fat_list[i] == 1:
+            elif ration_config.is_fat_list[i] is True:
                 ration_config.MEact_list.append(ration_config.DE_list[i])
             elif ration_config.EE_list[i] >= 3:
                 ration_config.MEact_list.append(1.01 * ration_config.DEact_list[i] - 0.45 + 0.0046 *
@@ -178,7 +178,7 @@ class RationOptimizer:
         # Actual net energy for maintenance of feed i, Mcal/kg
         ration_config.NEm_act_list = []
         for i in range(len(ration_config.MEact_list)):
-            if ration_config.is_fat_list[i] == 1:
+            if ration_config.is_fat_list[i] is True:
                 ration_config.NEm_act_list.append(0.8 * ration_config.MEact_list[i])
             else:
                 ration_config.NEm_act_list.append(1.37 * ration_config.MEact_list[i] - 0.138 *
@@ -191,7 +191,7 @@ class RationOptimizer:
         for i in range(len(ration_config.MEact_list)):
             if ration_config.feed_type_list[i] == 'Mineral':
                 ration_config.NElact_list.append(0)
-            elif ration_config.is_fat_list[i] == 1:
+            elif ration_config.is_fat_list[i] is True:
                 ration_config.NElact_list.append(0.8 * ration_config.DEact_list[i])
             elif ration_config.EE_list[i] >= 3:
                 ration_config.NElact_list.append(0.703 * ration_config.MEact_list[i] - 0.19 +
@@ -206,7 +206,7 @@ class RationOptimizer:
         for i in range(len(ration_config.MEact_list)):
             if ration_config.feed_type_list[i] == 'Mineral':
                 ration_config.NEgact_list.append(0)
-            elif ration_config.is_fat_list[i] == 1:
+            elif ration_config.is_fat_list[i] is True:
                 ration_config.NEgact_list.append(0.55 * ration_config.MEact_list[i])
             else:
                 ration_config.NEgact_list.append(1.42 * ration_config.MEact_list[i] - 0.174 *
@@ -278,7 +278,7 @@ class RationOptimizer:
             for i in range(len(ration_config.DEact_list)):
                 if ration_config.feed_type_list[i] == 'Mineral':
                     ration_config.MEact_list.append(0)
-                elif ration_config.is_fat_list[i] == 1:
+                elif ration_config.is_fat_list[i] is True:
                     ration_config.MEact_list.append(ration_config.DE_list[i])
                 elif ration_config.EE_list[i] >= 3:
                     ration_config.MEact_list.append(1.01 * ration_config.DEact_list[i] - 0.45 + 0.0046 *
@@ -290,7 +290,7 @@ class RationOptimizer:
         if not ration_config.NEm_act_list:
             ration_config.NEm_act_list = []
             for i in range(len(ration_config.MEact_list)):
-                if ration_config.is_fat_list[i] == 1:
+                if ration_config.is_fat_list[i] is True:
                     ration_config.NEm_act_list.append(0.8 * ration_config.MEact_list[i])
                 else:
                     ration_config.NEm_act_list.append(1.37 * ration_config.MEact_list[i] - 0.138 *
@@ -327,7 +327,7 @@ class RationOptimizer:
             for i in range(len(ration_config.MEact_list)):
                 if ration_config.feed_type_list[i] == 'Mineral':
                     ration_config.NElact_list.append(0)
-                elif ration_config.is_fat_list[i] == 1:
+                elif ration_config.is_fat_list[i] is True:
                     ration_config.NElact_list.append(0.8 * ration_config.DEact_list[i])
                 elif ration_config.EE_list[i] >= 3:
                     ration_config.NElact_list.append(0.703 * ration_config.MEact_list[i] - 0.19 + (
@@ -365,7 +365,7 @@ class RationOptimizer:
             for i in range(len(ration_config.MEact_list)):
                 if ration_config.feed_type_list[i] == 'Mineral':
                     ration_config.NEgact_list.append(0)
-                elif ration_config.is_fat_list[i] == 1:
+                elif ration_config.is_fat_list[i] is True:
                     ration_config.NEgact_list.append(0.55 * ration_config.MEact_list[i])
                 else:
                     ration_config.NEgact_list.append(1.42 * ration_config.MEact_list[i] - 0.174 *
@@ -486,10 +486,10 @@ class RationOptimizer:
         for i in range(len(ration_config.feed_type_list)):
             if ration_config.feed_type_list[i] == 'Conc':
                 Kp.append(2.904 + 1.375 * (DMI / ration_config.BW) * 100 - 0.02 * PercentConc)
-            elif ration_config.feed_type_list[i] == 'Forage' and ration_config.is_wetforage_list[i] == 0:
+            elif ration_config.feed_type_list[i] == 'Forage' and ration_config.is_wetforage_list[i] is False:
                 Kp.append(3.362 + 0.479 * (DMI / ration_config.BW) * 100 - 0.017 *
                           ration_config.NDF_list[i] - 0.007 * PercentConc)
-            elif ration_config.is_wetforage_list[i] == 1:
+            elif ration_config.is_wetforage_list[i] is True:
                 Kp.append(3.054 + 0.614 * (DMI / ration_config.BW) * 100)
             else:
                 Kp.append(0)
