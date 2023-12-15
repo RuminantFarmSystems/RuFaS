@@ -943,6 +943,8 @@ class InputManager:
         """
         Adds a dictionary variable to the InputManager's pool after validating it against metadata.
 
+        Notes
+        -----
         This function takes in a variable along with its name and a key to access its validation metadata.
         It validates the data against the provided metadata and adds the data to the InputManager pool if it is valid.
 
@@ -955,8 +957,8 @@ class InputManager:
         properties_blob_key : str
             A key used to locate the metadata for validation of the variable.
         eager_termination : bool
-            If True, raises a RuntimeError when the variable is invalid.
-            If False, the function returns False without raising an error.
+            If True, a RuntimeError will be raised from _add_variable_to_pool() when the variable is invalid.
+            If False, the function returns False.
 
         Returns
         -------
@@ -996,6 +998,8 @@ class InputManager:
         """
         Adds a tabular variable to the InputManager's pool after validating it against metadata.
 
+        Notes
+        -----
         This function takes in a variable along with its name and a key to access its validation metadata.
         It validates the data against the provided metadata and adds the data to the InputManager pool if it is valid.
 
@@ -1008,8 +1012,8 @@ class InputManager:
         properties_blob_key : str
             A key used to locate the metadata for validation of the variable.
         eager_termination : bool
-            If True, raises a ValueError when the variable is invalid.
-            If False, the function returns False without raising an error.
+            If True, a RuntimeError will be raised from _add_variable_to_pool() when the variable is invalid.
+            If False, the function returns False.
 
         Returns
         -------
