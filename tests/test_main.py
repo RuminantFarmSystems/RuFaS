@@ -424,6 +424,93 @@ def test_execute_simulations(
 
 
 @pytest.mark.parametrize(
+    "produce_graphics, exlclude_info_maps, is_data_valid, terminate_simulation_post_herd_generation, "
+    "initialize_herd_call_count, format_option",
+    [
+        (False, False, True, False, 2, "verbose"),
+        (False, True, True, False, 2, "inline"),
+        (True, False, True, False, 2, "verbose"),
+        (True, True, True, False, 2, "basic"),
+
+        (False, False, True, True, 2, "verbose"),
+        (False, True, True, True, 2, "inline"),
+        (True, False, True, True, 2, "verbose"),
+        (True, True, True, True, 2, "basic"),
+    ],
+)
+def test_execute_simulations_raises_exception(
+        mocker: MockerFixture,
+        produce_graphics: bool,
+        exlclude_info_maps: bool,
+        is_data_valid: bool,
+        terminate_simulation_post_herd_generation: bool,
+        initialize_herd_call_count: int,
+        format_option: str,
+) -> None:
+    """Checks that execute_simulations() calls the correct functions in the correct order"""
+    # Arrange
+    mock_output_manager = mocker.MagicMock(auto_spec=OutputManager)
+    mock_input_manager = mocker.MagicMock(auto_spec=InputManager)
+    mock_config = mocker.MagicMock(auto_spec=Config)
+    mock_output_manager.flush_pools.return_value = None
+    mock_input_manager.flush_pool.return_value = None
+    mock_output_manager.dump_all_nondata_pools.return_value = None
+    mock_output_manager.save_results.return_value = None
+    mocker.patch("main.OutputManager", return_value=mock_output_manager)
+    mocker.patch("main.InputManager", return_value=mock_input_manager)
+    mocker.patch("main.Config", return_value=mock_config)
+    metadata_file_path1 = Path("metadata_file1.json")
+    metadata_file_path2 = Path("metadata_file2.json")
+    metadata_prefix1 = "dummy_prefix1"
+    metadata_prefix2 = "dummy_prefix2"
+    metadata_file_list = [
+        {"prefix": metadata_prefix1, "path": metadata_file_path1},
+        {"prefix": metadata_prefix2, "path": metadata_file_path2},
+    ]
+    mock_input_manager.start_data_processing.return_value = is_data_valid
+
+    patch_initialize_herd = patch("main.initialize_herd", side_effct=Exception)
+
+    mock_simulator = mocker.MagicMock(auto_spec=SimulationEngine)
+    mock_simulator.simulate.return_value = None
+    mocker.patch("main.SimulationEngine", return_value=mock_simulator)
+    output_dir = Path("output/")
+    filters_dir = Path("output/output_filters/")
+    csv_dir = Path("output/CSVs/")
+    graphics_dir = Path("")
+    verbose = LogVerbosity("none")
+
+    # Act
+    with pytest.raises(Exception):
+        execute_simulations(
+            metadata_files=metadata_file_list,
+            exclude_info_maps=exlclude_info_maps,
+            produce_graphics=produce_graphics,
+            graphics_dir=graphics_dir,
+            format_option=format_option,
+            verbose=verbose,
+            output_dir=output_dir,
+            filters_dir=filters_dir,
+            csv_dir=csv_dir,
+            init_herd=False,
+            save_animals=False,
+            save_animals_dir=Path("output/"),
+            terminate_simulation_post_herd_generation=terminate_simulation_post_herd_generation
+        )
+
+    # Assert
+    assert mock_simulator.simulate.call_count == 0
+    assert mock_output_manager.add_error.call_count == 0
+    assert mock_output_manager.flush_pools.call_count == 1
+    assert mock_input_manager.flush_pool.call_count == 1
+    assert mock_output_manager.dump_all_nondata_pools.call_count == 1
+    assert mock_output_manager.dump_all_nondata_pools.call_args_list == [
+        mocker.call(path=output_dir, exclude_info_maps=exlclude_info_maps, format_option=format_option)
+    ]
+    assert mock_output_manager.save_results.call_count == 0
+
+
+@pytest.mark.parametrize(
     "vars_file_path, exclude_info_maps, format_option, produce_graphics, graphics_dir, clear_output",
     [
         ("", True, "verbose", True, Path(""), True),

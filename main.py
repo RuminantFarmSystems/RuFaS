@@ -391,11 +391,16 @@ def execute_simulations(
                 "Validation complete", "Data is valid. \nSimulating...\n", info_map
             )
             simulation_config = Config(input_manager.get_data("config"))
-            initialize_herd(simulation_config=simulation_config,
-                            init_herd=init_herd,
-                            save_animals=save_animals,
-                            save_animals_dir=save_animals_dir,
-                            terminate_simulation_post_herd_generation=terminate_simulation_post_herd_generation)
+            try:
+                initialize_herd(simulation_config=simulation_config,
+                                init_herd=init_herd,
+                                save_animals=save_animals,
+                                save_animals_dir=save_animals_dir,
+                                terminate_simulation_post_herd_generation=terminate_simulation_post_herd_generation)
+            except Exception as e:
+                output_manager.dump_all_nondata_pools(path=output_dir, exclude_info_maps=exclude_info_maps,
+                                                      format_option=format_option)
+                raise e
 
             if not terminate_simulation_post_herd_generation:
                 simulator = SimulationEngine()
