@@ -49,9 +49,9 @@ class FeedEmissionsManager:
     def _get_county_code(self, latitude: float, longitude: float) -> int:
         endpoint = "https://geo.fcc.gov/api/census/block/find?"
         query_parameters = f"latitude={latitude}&longitude={longitude}&format=json"
-        full_call = endpoint + query_parameters
+        call = endpoint + query_parameters
 
-        with request.urlopen(full_call) as response:
+        with request.urlopen(call) as response:
             answer = response.read()
         answer = json.load(answer)
 
