@@ -10,7 +10,7 @@ from RUFAS.output_manager import OutputManager
 from RUFAS.routines.animal.animal_grouping_scenarios import AnimalGroupingScenario
 from RUFAS.routines.animal.animal_module_constants import AnimalModuleConstants
 from RUFAS.routines.animal.animal_module_reporter import AnimalModuleReporter
-from RUFAS.routines.animal.animal_typed_dicts import InitializationDBSummaryTypedDict
+from RUFAS.routines.animal.animal_typed_dicts import InitialHerdSummaryTypedDict
 from RUFAS.routines.animal.animal_types import AnimalType
 from RUFAS.routines.animal.life_cycle.animal_base import AnimalBase
 from RUFAS.routines.animal.life_cycle.calf import Calf
@@ -98,7 +98,6 @@ class AnimalManager:
             instance of the Weather class
         time : Time
             instance of the Time class
-
         """
 
         # simulation length, days
@@ -177,7 +176,7 @@ class AnimalManager:
         self.init_pens(data['pen_information'], data['manure_management_scenarios'])
 
         if self.simulate_animals:
-            self.init_animals(config, data["herd_information"])
+            self.init_animals(data['herd_information'])
 
             self.init_nutrient_rqmts(weather, time, feed)
 
@@ -228,7 +227,7 @@ class AnimalManager:
 
             self.all_pens.append(pen)
 
-    def init_animals(self, config, herd_data: Dict[str, Any]) -> None:
+    def init_animals(self, herd_data: Dict[str, Any]) -> None:
         """
         Populates the list of animals with the information from the
         input JSON file: constructs the calves, heiferI's, heiferII's,
@@ -239,19 +238,12 @@ class AnimalManager:
 
         Parameters
         ----------
-        config : Config
-            an instance of the Config class contains model configuration information
-        herd_data : Dict[str, Any]
-            dictionary containing information about the herd
+        herd_data: Dict[str, Any]
+            A dictionary containing information about the herd.
         """
 
-        (
-            self.calves,
-            self.heiferIs,
-            self.heiferIIs,
-            self.heiferIIIs,
-            self.cows,
-        ) = self.life_cycle_manager.initialize_herd(config, herd_data)
+        self.calves, self.heiferIs, self.heiferIIs, self.heiferIIIs, self.cows \
+            = self.life_cycle_manager.initialize_herd(herd_data)
 
     def _print_animal_num_warnings(self, herd_data: Dict[str, Any]) -> None:
         """
@@ -1162,16 +1154,14 @@ class AnimalManager:
                 or self.simulation_day == 0
         )
 
-    def get_initialize_db_summary(self) -> InitializationDBSummaryTypedDict:
+    def get_initial_herd_summary(self) -> InitialHerdSummaryTypedDict:
         """
-
         Returns
         -------
-        InitializationDBSummaryTypedDict
-            a dictionary which is the summary of the animal initialization database
-
+        dict
+            A dictionary which is the summary of the initial herd.
         """
-        return self.life_cycle_manager.initialize_db_summary
+        return self.life_cycle_manager.initial_herd_summary
 
     @classmethod
     def _calc_phosphorus_concentration(cls, animals: List[Calf | HeiferI | HeiferII | HeiferIII | Cow]) -> float:
