@@ -34,28 +34,39 @@
 				"milk_type": "whole"
 			},
 			"repro": {
-				"ED_related":{
-					"estrus_detection_rate": 0.4,
-					"estrus_service_rate": 0.9,
-					"ed_conception_rate": 0.4,
-					"heifer_synchED_protocol": "2P"
+				"heifers": {
+					"estrus_detection_rate": 0.6,
+					"estrus_conception_rate": 0.4,
+					"repro_sub_protocol": "5dCG2P",
+					"repro_sub_properties": {
+						"conception_rate": 0.6,
+						"estrus_detection_rate": 0.7
+					}
 				},
-				"TAI_related":{
-					"heifer_TAI_protocol": "5dCG2P",
-					"md5CG2P_conception_rate": 0.6,
-					"md5CGP_conception_rate": 0.48,
-					"heifer_user_defined_tai_cr": 0.0,
-					"cow_presynch_protocol": "Double OvSynch",
-					"user_defined_presynch_length": 0,
-					"cow_TAI_protocol": "OvSynch 56",
-					"ovsynch56_conception_rate": 0.55,
-					"ovsynch48_conception_rate": 0.4,
-					"cosynch72_conception_rate": 0.4,
-					"cosynch5d_conception_rate": 0.4,
-					"cow_user_defined_tai_cr": 0.0,
-					"cow_resynch_protocol": "TAIafterPD",
-					"user_define_tai_length": 0
+				"cows": {
+					"estrus_detection_rate": 0.6,
+					"estrus_conception_rate": 0.6,
+					"presynch_protocol": "Double OvSynch",
+                    "resynch_protocol": "TAIafterPD",
+                    "repro_sub_protocol": "OvSynch 56",
+					"repro_sub_properties": {
+						"conception_rate": 0.5,
+						"tai_program_start_day": 70
+					}
 				},
+                "cow_repro_programs": {
+                    "estrus_detection_rate": 0.6,
+                    "estrus_service_rate": 1,
+                    "ed_conception_rate": 0.6,
+                    "cow_presynch_protocol": "Double OvSynch",
+                    "cow_TAI_protocol": "OvSynch 56",
+                    "ovsynch56_conception_rate": 0.6,
+                    "ovsynch48_conception_rate": 0.6,
+					"cosynch72_conception_rate": 0.6,
+                    "cosynch5d_conception_rate": 0.6,
+                    "cow_resynch_protocol": "TAIafterPD",
+                    "tai_program_start_day": 72
+                },
 				"voluntary_waiting_period": 45,
 				"tai_program_start_day": 72,
 				"conception_rate_decrease": 0.026,

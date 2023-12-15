@@ -10,7 +10,6 @@ import argparse
 from pathlib import Path
 import sys
 from typing import List
-
 from RUFAS.scenario_manager import METADATA_PATHS, MetadataPaths
 from RUFAS.simulation_engine import SimulationEngine
 from RUFAS.input_manager import InputManager

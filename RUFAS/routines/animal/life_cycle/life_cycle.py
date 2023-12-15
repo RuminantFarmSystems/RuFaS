@@ -19,6 +19,7 @@ from RUFAS.routines.animal.life_cycle.cow import Cow
 from RUFAS.routines.animal.life_cycle.heiferI import HeiferI
 from RUFAS.routines.animal.life_cycle.heiferII import HeiferII
 from RUFAS.routines.animal.life_cycle.heiferIII import HeiferIII
+from RUFAS.routines.animal.life_cycle.repro_protocol_enums import HeiferReproProtocolEnum
 from RUFAS.util import Utility
 
 # GenericAnimal is a placeholder/generic type that represents any of the five classes listed in the union.
@@ -471,9 +472,16 @@ class LifeCycleManager:
             'body_weight_history': heiferI.body_weight_history,
             'pen_history': heiferI.pen_history
         })
-        heiferI_vals.update(repro_program=AnimalBase.config['heifer_repro_method'])
-        heiferI_vals.update(tai_method_h=AnimalBase.config['heifer_repro_programs']['heifer_TAI_protocol'])
-        heiferI_vals.update(synch_ed_method_h=AnimalBase.config['heifer_repro_programs']['heifer_synchED_protocol'])
+        heiferI_vals.update(repro_program=HeiferII.get_user_defined_repro_protocol())
+        if HeiferII.get_user_defined_repro_protocol() == HeiferReproProtocolEnum.TAI.value:
+            heiferI_vals.update(tai_method_h=HeiferII.get_user_defined_repro_sub_protocol())
+            heiferI_vals.update(synch_ed_method_h='')
+        elif HeiferII.get_user_defined_repro_protocol() == HeiferReproProtocolEnum.SynchED.value:
+            heiferI_vals.update(tai_method_h='')
+            heiferI_vals.update(synch_ed_method_h=HeiferII.get_user_defined_repro_sub_protocol())
+        else:
+            heiferI_vals.update(tai_method_h='')
+            heiferI_vals.update(synch_ed_method_h='')
         new_heiferII = HeiferII(heiferI_vals)
         heiferIIs.append(new_heiferII)
 
@@ -621,9 +629,9 @@ class LifeCycleManager:
             'calf_birth_weight': heiferIII.calf_birth_weight
         })
         args.update(repro_program=AnimalBase.config['cow_repro_method'])
-        args.update(presynch_method=AnimalBase.config["cow_repro_programs"]['cow_presynch_protocol'])
-        args.update(tai_method_c=AnimalBase.config["cow_repro_programs"]['cow_TAI_protocol'])
-        args.update(resynch_method=AnimalBase.config["cow_repro_programs"]['cow_resynch_protocol'])
+        args.update(presynch_method=AnimalBase.config['cows']['presynch_protocol'])
+        args.update(tai_method_c=AnimalBase.config['cows']['repro_sub_protocol'])
+        args.update(resynch_method=AnimalBase.config['cows']['resynch_protocol'])
         new_cow = Cow(args)
         if len(cows) > 0:
             new_cow.milk_production_reduction = cows[0].milk_production_reduction
