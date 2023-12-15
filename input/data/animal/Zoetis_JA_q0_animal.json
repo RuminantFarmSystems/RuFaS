@@ -50,7 +50,7 @@
                     "estrus_detection_rate_h_synch": 0.7
                 },
                 "cow_repro_programs": {
-                    "estrus_detection_rate": 0.42,
+                    "estrus_detection_rate": 0.6,
                     "estrus_service_rate": 1,
                     "ed_conception_rate": 0.42,
                     "cow_presynch_protocol": "PreSynch",

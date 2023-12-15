@@ -1,9 +1,9 @@
 {
 	"herd_information": {
-		"calf_num": 77,
-		"heiferI_num": 378,
-		"heiferII_num": 354,
-		"heiferIII_num_springers": 35,
+		"calf_num": 46,
+		"heiferI_num": 274,
+		"heiferII_num": 206,
+		"heiferIII_num_springers": 23,
 		"cow_num": 1000,
 		"replace_num": 5000,
 		"herd_num": 1000,
@@ -12,9 +12,9 @@
 	},
 	"animal_config": {
 		"management_decisions": {
-			"breeding_start_day_h": 395,
+			"breeding_start_day_h": 374,
 			"heifer_repro_method": "ED",
-			"cow_repro_method": "TAI",
+			"cow_repro_method": "ED-TAI",
 			"semen_type": "conventional",
 			"days_in_preg_when_dry": 224,
 			"heifer_repro_cull_time": 621,
@@ -26,21 +26,21 @@
 		"farm_level": {
 			"calf": {
 				"male_calf_rate_sexed_semen": 0.1,
-				"male_calf_rate_conventional_semen": 0.43,
-				"keep_female_calf_rate": 0.956810631,
+				"male_calf_rate_conventional_semen": 0.77,
+				"keep_female_calf_rate": 1,
 				"wean_day": 60,
 				"wean_length": 7,
 				"milk_type": "whole"
 			},
 			"repro": {
-                "voluntary_waiting_period": 80,
+                "voluntary_waiting_period": 68,
 				"conception_rate_decrease": 0,
                 "avg_gestation_len": 279,
 				"std_gestation_len": 1.4,
 				"prefresh_day": 21,
-                "calving_interval": 398,
+                "calving_interval": 395,
                 "heifer_repro_programs": {
-                    "estrus_detection_rate": 0.6,
+                    "estrus_detection_rate": 0.95,
                     "estrus_service_rate": 1,
                     "ed_conception_rate": 0.59,
                     "heifer_TAI_protocol": "md5CG2P",
@@ -52,7 +52,7 @@
                 "cow_repro_programs": {
                     "estrus_detection_rate": 0.6,
                     "estrus_service_rate": 1,
-                    "ed_conception_rate": 0.6,
+                    "ed_conception_rate": 0.45,
                     "cow_presynch_protocol": "PreSynch",
                     "cow_TAI_protocol": "OvSynch 56",
                     "ovsynch56_conception_rate": 0.45,
@@ -60,7 +60,7 @@
 					"cosynch72_conception_rate": 0.6,
                     "cosynch5d_conception_rate": 0.6,
                     "cow_resynch_protocol": "TAIafterPD",
-                    "tai_program_start_day": 70
+                    "tai_program_start_day": 75
                 }
 			},
 			"bodyweight": {
@@ -99,8 +99,8 @@
 				"wood_n_std": [[3.77e-5, 5.82e-5, 5.54e-5], [6.60e-5, 6.69e-5, 6.53e-5]]
 			},
 			"culling": {
-				"parity_death_prob": [0.02,0.03,0.02,0.01],
-				"parity_cull_prob": [0.11, 0.16, 0.24, 0.36],
+				"parity_death_prob": [0.02,0.03,0.02,0.02],
+				"parity_cull_prob": [0.11, 0.16, 0.24, 0.21],
 				"injury_cull_prob": [0, 0.08, 0.18, 0.28, 0.38, 0.47, 0.56, 0.64, 0.71, 0.78, 0.85, 0.90, 0.95, 1],
  				"death_cull_prob": [0, 0.18, 0.32, 0.42, 0.48, 0.54, 0.60, 0.65, 0.70, 0.77, 0.83, 0.89, 0.95, 1],
 				"cull_day_count": [0, 5, 15, 45, 90, 135, 180, 225, 270, 330, 380, 430, 480, 530],
@@ -126,7 +126,7 @@
 	},
 	"housing": "barn",
 	"pasture_concentrate": 0,
-	"methane_model": "IPCC",
+	"methane_model": "3-Mutian",
 	"ration": {
 		"user_input": false,
 		"formulation_interval": 30
