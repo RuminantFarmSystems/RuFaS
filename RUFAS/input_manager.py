@@ -787,7 +787,7 @@ class InputManager:
         Parameters
         ----------
         target_properties : str
-            The name of the property that is being searched for.
+            The name of the properties group that is being searched for.
 
         Returns
         -------
