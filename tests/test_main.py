@@ -469,7 +469,7 @@ def test_execute_simulations_raises_exception(
     ]
     mock_input_manager.start_data_processing.return_value = is_data_valid
 
-    patch_initialize_herd = patch("main.initialize_herd", side_effct=Exception)
+    patch("main.initialize_herd", side_effct=Exception)
 
     mock_simulator = mocker.MagicMock(auto_spec=SimulationEngine)
     mock_simulator.simulate.return_value = None
