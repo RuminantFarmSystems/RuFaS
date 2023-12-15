@@ -7,24 +7,23 @@ Subpackages
 .. toctree::
    :maxdepth: 4
 
-   RUFAS.output_handler
    RUFAS.routines
 
 Submodules
 ----------
 
-RUFAS.classes module
---------------------
+RUFAS.config module
+-------------------
 
-.. automodule:: RUFAS.classes
+.. automodule:: RUFAS.config
    :members:
    :undoc-members:
    :show-inheritance:
 
-RUFAS.database\_reader module
------------------------------
+RUFAS.current\_day\_conditions module
+-------------------------------------
 
-.. automodule:: RUFAS.database_reader
+.. automodule:: RUFAS.current_day_conditions
    :members:
    :undoc-members:
    :show-inheritance:
@@ -45,10 +44,42 @@ RUFAS.general\_constants module
    :undoc-members:
    :show-inheritance:
 
+RUFAS.graph\_generator module
+-----------------------------
+
+.. automodule:: RUFAS.graph_generator
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+RUFAS.input\_manager module
+---------------------------
+
+.. automodule:: RUFAS.input_manager
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 RUFAS.output\_manager module
 ----------------------------
 
 .. automodule:: RUFAS.output_manager
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+RUFAS.report\_generator module
+------------------------------
+
+.. automodule:: RUFAS.report_generator
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+RUFAS.scenario\_manager module
+------------------------------
+
+.. automodule:: RUFAS.scenario_manager
    :members:
    :undoc-members:
    :show-inheritance:
@@ -61,10 +92,18 @@ RUFAS.simulation\_engine module
    :undoc-members:
    :show-inheritance:
 
-RUFAS.user\_prompt module
--------------------------
+RUFAS.state module
+------------------
 
-.. automodule:: RUFAS.user_prompt
+.. automodule:: RUFAS.state
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+RUFAS.time module
+-----------------
+
+.. automodule:: RUFAS.time
    :members:
    :undoc-members:
    :show-inheritance:
@@ -73,6 +112,14 @@ RUFAS.util module
 -----------------
 
 .. automodule:: RUFAS.util
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+RUFAS.weather module
+--------------------
+
+.. automodule:: RUFAS.weather
    :members:
    :undoc-members:
    :show-inheritance:
