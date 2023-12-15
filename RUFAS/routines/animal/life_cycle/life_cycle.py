@@ -217,7 +217,8 @@ class LifeCycleManager:
 
         Parameters
         ----------
-            animal_type: The type of animal to get.
+        animal_type : Type[GenericAnimal]
+            The type of animal to get.
 
         Returns
         -------
