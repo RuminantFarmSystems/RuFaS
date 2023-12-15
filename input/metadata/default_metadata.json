@@ -528,13 +528,13 @@
             "birth_weight_avg_ho": {
               "type": "number",
               "description": "Average Holstein Birth Weight (kg/head) -- The average birthweight for Holstein cows",
-              "default": 43.9,
+              "default": 42.9,
               "minimum": 0
             },
             "birth_weight_std_ho": {
               "type": "number",
               "description": "Holstein Birth Weight Standard Deviation (kg/head) -- The standard deviation of birthweight for Holstein cows",
-              "default": 1,
+              "default": 6,
               "minimum": 0
             },
             "birth_weight_avg_je": {
@@ -898,7 +898,7 @@
         "type": "string",
         "description": "Housing Type (select one) -- The type of housing management for the herd",
         "default": "barn",
-        "pattern": "^(barn|3-pasture|drylot)$"
+        "pattern": "^(barn|pasture|drylot)$"
       },
       "pasture_concentrate": {
         "description": "Pasture Concentrate Fed (kg/head/day) -- Amount of concentrate provided to lactating cows each day if animals are housed on pasture",
@@ -910,7 +910,7 @@
         "description": "Methane Model (select one) -- The method used to estimate enteric methane emissions for lactating cows",
         "type": "string",
         "default": "IPCC",
-        "pattern": "^(Mills|3-Mutian|IPCC)$"
+        "pattern": "^(Mills|Mutian|IPCC)$"
       },
       "ration": {
         "type": "object",
@@ -955,7 +955,7 @@
             "description": "Horizontal Distance to Milking Parlor (m) -- The distance (in meters) between the pen and the milking parlor",
             "type": "number",
             "minimum": 0,
-            "default": 1.6
+            "default": 10
           },
           "number_of_stalls": {
             "description": "Number of Stalls -- The number of stalls in the pen",
