@@ -566,10 +566,13 @@ NOTE: This class is not multi-thread safe!!!</p>
 <dt class="sig sig-object py" id="RUFAS.input_manager.InputManager.add_dict_variable_to_pool">
 <span class="sig-name descname"><span class="pre">add_dict_variable_to_pool</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">variable_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">properties_blob_key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eager_termination</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="headerlink" href="#RUFAS.input_manager.InputManager.add_dict_variable_to_pool" title="Link to this definition"></a></dt>
 <dd><p>Adds a dictionary variable to the InputManager’s pool after validating it against metadata.</p>
+<section id="id6">
+<h3>Notes<a class="headerlink" href="#id6" title="Link to this heading"></a></h3>
 <p>This function takes in a variable along with its name and a key to access its validation metadata.
 It validates the data against the provided metadata and adds the data to the InputManager pool if it is valid.</p>
-<section id="id6">
-<h3>Parameters<a class="headerlink" href="#id6" title="Link to this heading"></a></h3>
+</section>
+<section id="id7">
+<h3>Parameters<a class="headerlink" href="#id7" title="Link to this heading"></a></h3>
 <dl class="simple">
 <dt>variable_name: str</dt><dd><p>The name of the dictionary variable to be added.</p>
 </dd>
@@ -577,21 +580,21 @@ It validates the data against the provided metadata and adds the data to the Inp
 </dd>
 <dt>properties_blob_key<span class="classifier">str</span></dt><dd><p>A key used to locate the metadata for validation of the variable.</p>
 </dd>
-<dt>eager_termination<span class="classifier">bool</span></dt><dd><p>If True, raises a RuntimeError when the variable is invalid.
-If False, the function returns False without raising an error.</p>
+<dt>eager_termination<span class="classifier">bool</span></dt><dd><p>If True, a ValueError will be raised from _add_variable_to_pool() when the variable is invalid.
+If False, the function returns False.</p>
 </dd>
 </dl>
 </section>
-<section id="id7">
-<h3>Returns<a class="headerlink" href="#id7" title="Link to this heading"></a></h3>
+<section id="id8">
+<h3>Returns<a class="headerlink" href="#id8" title="Link to this heading"></a></h3>
 <dl class="simple">
 <dt>bool</dt><dd><p>True if the variable is successfully validated and added to the pool.
 False if the variable is invalid and not added to the pool.</p>
 </dd>
 </dl>
 </section>
-<section id="id8">
-<h3>Raises<a class="headerlink" href="#id8" title="Link to this heading"></a></h3>
+<section id="id9">
+<h3>Raises<a class="headerlink" href="#id9" title="Link to this heading"></a></h3>
 <dl class="simple">
 <dt>TypeError</dt><dd><p>If <cite>data</cite> is not the expected type of Dict[str, Any].</p>
 </dd>
@@ -603,10 +606,13 @@ False if the variable is invalid and not added to the pool.</p>
 <dt class="sig sig-object py" id="RUFAS.input_manager.InputManager.add_tabular_variable_to_pool">
 <span class="sig-name descname"><span class="pre">add_tabular_variable_to_pool</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">variable_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">properties_blob_key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eager_termination</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="headerlink" href="#RUFAS.input_manager.InputManager.add_tabular_variable_to_pool" title="Link to this definition"></a></dt>
 <dd><p>Adds a tabular variable to the InputManager’s pool after validating it against metadata.</p>
+<section id="id10">
+<h3>Notes<a class="headerlink" href="#id10" title="Link to this heading"></a></h3>
 <p>This function takes in a variable along with its name and a key to access its validation metadata.
 It validates the data against the provided metadata and adds the data to the InputManager pool if it is valid.</p>
-<section id="id9">
-<h3>Parameters<a class="headerlink" href="#id9" title="Link to this heading"></a></h3>
+</section>
+<section id="id11">
+<h3>Parameters<a class="headerlink" href="#id11" title="Link to this heading"></a></h3>
 <dl class="simple">
 <dt>variable_name: str</dt><dd><p>The name of the variable to be added.</p>
 </dd>
@@ -614,21 +620,21 @@ It validates the data against the provided metadata and adds the data to the Inp
 </dd>
 <dt>properties_blob_key<span class="classifier">str</span></dt><dd><p>A key used to locate the metadata for validation of the variable.</p>
 </dd>
-<dt>eager_termination<span class="classifier">bool</span></dt><dd><p>If True, raises a ValueError when the variable is invalid.
-If False, the function returns False without raising an error.</p>
+<dt>eager_termination<span class="classifier">bool</span></dt><dd><p>If True, a ValueError will be raised from _add_variable_to_pool() when the variable is invalid.
+If False, the function returns False.</p>
 </dd>
 </dl>
 </section>
-<section id="id10">
-<h3>Returns<a class="headerlink" href="#id10" title="Link to this heading"></a></h3>
+<section id="id12">
+<h3>Returns<a class="headerlink" href="#id12" title="Link to this heading"></a></h3>
 <dl class="simple">
 <dt>bool</dt><dd><p>True if the variable is successfully validated and added to the pool.
 False if the variable is invalid and not added to the pool.</p>
 </dd>
 </dl>
 </section>
-<section id="id11">
-<h3>Raises<a class="headerlink" href="#id11" title="Link to this heading"></a></h3>
+<section id="id13">
+<h3>Raises<a class="headerlink" href="#id13" title="Link to this heading"></a></h3>
 <dl class="simple">
 <dt>TypeError</dt><dd><p>If <cite>data</cite> is not the expected type of Dict[str, List[Any]] | List[Any].</p>
 </dd>
@@ -646,22 +652,22 @@ False if the variable is invalid and not added to the pool.</p>
 <dt class="sig sig-object py" id="RUFAS.input_manager.InputManager.get_data">
 <span class="sig-name descname"><span class="pre">get_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data_address</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Any</span></span></span><a class="headerlink" href="#RUFAS.input_manager.InputManager.get_data" title="Link to this definition"></a></dt>
 <dd><p>Get the requested data from the pool.</p>
-<section id="id12">
-<h3>Parameters<a class="headerlink" href="#id12" title="Link to this heading"></a></h3>
+<section id="id14">
+<h3>Parameters<a class="headerlink" href="#id14" title="Link to this heading"></a></h3>
 <dl class="simple">
 <dt>data_address<span class="classifier">str</span></dt><dd><p>The address of the requested data.</p>
 </dd>
 </dl>
 </section>
-<section id="id13">
-<h3>Returns<a class="headerlink" href="#id13" title="Link to this heading"></a></h3>
+<section id="id15">
+<h3>Returns<a class="headerlink" href="#id15" title="Link to this heading"></a></h3>
 <dl class="simple">
 <dt>Any</dt><dd><p>The requested data if found.</p>
 </dd>
 </dl>
 </section>
-<section id="id14">
-<h3>Raises<a class="headerlink" href="#id14" title="Link to this heading"></a></h3>
+<section id="id16">
+<h3>Raises<a class="headerlink" href="#id16" title="Link to this heading"></a></h3>
 <dl class="simple">
 <dt>KeyError</dt><dd><p>If the requested data is not found.</p>
 </dd>
@@ -743,8 +749,8 @@ Reference: SWAT Input .SOL - SOL_ALB”,</p>
 <dt class="sig sig-object py" id="RUFAS.input_manager.InputManager.start_data_processing">
 <span class="sig-name descname"><span class="pre">start_data_processing</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">metadata_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eager_termination</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="headerlink" href="#RUFAS.input_manager.InputManager.start_data_processing" title="Link to this definition"></a></dt>
 <dd><p>Starts the pipeline for organizing metadata and input data processing.</p>
-<section id="id15">
-<h3>Parameters<a class="headerlink" href="#id15" title="Link to this heading"></a></h3>
+<section id="id17">
+<h3>Parameters<a class="headerlink" href="#id17" title="Link to this heading"></a></h3>
 <dl class="simple">
 <dt>metadata_path<span class="classifier">str</span></dt><dd><p>File path to the metadata.</p>
 </dd>
@@ -753,8 +759,8 @@ If False, the process will be terminated after going through and validating the 
 </dd>
 </dl>
 </section>
-<section id="id16">
-<h3>Returns<a class="headerlink" href="#id16" title="Link to this heading"></a></h3>
+<section id="id18">
+<h3>Returns<a class="headerlink" href="#id18" title="Link to this heading"></a></h3>
 <dl class="simple">
 <dt>bool</dt><dd><p>True if data is valid, otherwise False.</p>
 </dd>
@@ -772,8 +778,8 @@ If False, the process will be terminated after going through and validating the 
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">RUFAS.output_manager.</span></span><span class="sig-name descname"><span class="pre">LogVerbosity</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.output_manager.LogVerbosity" title="Link to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Enum</span></code></p>
 <p>The different types of logs printed by Output Manager. Set by the <cite>verbose</cite> gnu arg in main.py.</p>
-<section id="id17">
-<h3>Notes<a class="headerlink" href="#id17" title="Link to this heading"></a></h3>
+<section id="id19">
+<h3>Notes<a class="headerlink" href="#id19" title="Link to this heading"></a></h3>
 <p>NONE is the default setting.
 Selecting NONE will tell OutputManager not to print out anything during a simulation.
 Selecting ERRORS will tell OutputManager to print out all errors added during a simulation.
@@ -812,8 +818,8 @@ output channels from the pools once the simulation is done.</p>
 <p>OutputManager is singleton, i.e., only one instance of it can exist. After
 the first instance is created, future calls to the constructor method
 returns the first instance. Also, the initializer method only works once.</p>
-<section id="id18">
-<h3>Attributes<a class="headerlink" href="#id18" title="Link to this heading"></a></h3>
+<section id="id20">
+<h3>Attributes<a class="headerlink" href="#id20" title="Link to this heading"></a></h3>
 <dl class="simple">
 <dt>variables_pool<span class="classifier">Dict[str, Dict[str, List[Dict[str, Any]]]</span></dt><dd><p>Contains variables reported to the output manager</p>
 </dd>
@@ -828,8 +834,8 @@ returns the first instance. Also, the initializer method only works once.</p>
 <dt class="sig sig-object py" id="RUFAS.output_manager.OutputManager.add_error">
 <span class="sig-name descname"><span class="pre">add_error</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">msg</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">info_map</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.output_manager.OutputManager.add_error" title="Link to this definition"></a></dt>
 <dd><p>Adds an error message to the pool of errors.</p>
-<section id="id19">
-<h4>Parameters<a class="headerlink" href="#id19" title="Link to this heading"></a></h4>
+<section id="id21">
+<h4>Parameters<a class="headerlink" href="#id21" title="Link to this heading"></a></h4>
 <dl class="simple">
 <dt>name<span class="classifier">str</span></dt><dd><p>The name of the error</p>
 </dd>
@@ -856,8 +862,8 @@ Has no effect on manual prefix overrides.</p>
 <dt class="sig sig-object py" id="RUFAS.output_manager.OutputManager.add_log">
 <span class="sig-name descname"><span class="pre">add_log</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">msg</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">info_map</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.output_manager.OutputManager.add_log" title="Link to this definition"></a></dt>
 <dd><p>Adds a log message to the pool of logs.</p>
-<section id="id20">
-<h4>Parameters<a class="headerlink" href="#id20" title="Link to this heading"></a></h4>
+<section id="id22">
+<h4>Parameters<a class="headerlink" href="#id22" title="Link to this heading"></a></h4>
 <dl class="simple">
 <dt>name<span class="classifier">str</span></dt><dd><p>The name of the log</p>
 </dd>
@@ -884,8 +890,8 @@ Has no effect on manual prefix overrides.</p>
 <dt class="sig sig-object py" id="RUFAS.output_manager.OutputManager.add_variable">
 <span class="sig-name descname"><span class="pre">add_variable</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">info_map</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.output_manager.OutputManager.add_variable" title="Link to this definition"></a></dt>
 <dd><p>Adds a variable to the pool.</p>
-<section id="id21">
-<h4>Parameters<a class="headerlink" href="#id21" title="Link to this heading"></a></h4>
+<section id="id23">
+<h4>Parameters<a class="headerlink" href="#id23" title="Link to this heading"></a></h4>
 <dl class="simple">
 <dt>name<span class="classifier">str</span></dt><dd><p>The name of the variable</p>
 </dd>
@@ -912,8 +918,8 @@ Has no effect on manual prefix overrides.</p>
 <dt class="sig sig-object py" id="RUFAS.output_manager.OutputManager.add_warning">
 <span class="sig-name descname"><span class="pre">add_warning</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">msg</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">info_map</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.output_manager.OutputManager.add_warning" title="Link to this definition"></a></dt>
 <dd><p>Adds a warning message to the pool of warnings.</p>
-<section id="id22">
-<h4>Parameters<a class="headerlink" href="#id22" title="Link to this heading"></a></h4>
+<section id="id24">
+<h4>Parameters<a class="headerlink" href="#id24" title="Link to this heading"></a></h4>
 <dl class="simple">
 <dt>name<span class="classifier">str</span></dt><dd><p>The name of the warning</p>
 </dd>
@@ -940,8 +946,8 @@ Has no effect on manual prefix overrides.</p>
 <dt class="sig sig-object py" id="RUFAS.output_manager.OutputManager.clear_output_dir">
 <span class="sig-name descname"><span class="pre">clear_output_dir</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">vars_file_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_dir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.output_manager.OutputManager.clear_output_dir" title="Link to this definition"></a></dt>
 <dd><p>Clears the output directory if vars_file_path not in output directory.</p>
-<section id="id23">
-<h4>Parameters<a class="headerlink" href="#id23" title="Link to this heading"></a></h4>
+<section id="id25">
+<h4>Parameters<a class="headerlink" href="#id25" title="Link to this heading"></a></h4>
 <dl class="simple">
 <dt>vars_file_path<span class="classifier">Path</span></dt><dd><p>Path to file used to load Output Manager vars pool.</p>
 </dd>
@@ -955,8 +961,8 @@ Has no effect on manual prefix overrides.</p>
 <dt class="sig sig-object py" id="RUFAS.output_manager.OutputManager.create_directory">
 <span class="sig-name descname"><span class="pre">create_directory</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.output_manager.OutputManager.create_directory" title="Link to this definition"></a></dt>
 <dd><p>Creates a dir from the provided path if it does not already exist.</p>
-<section id="id24">
-<h4>Parameters<a class="headerlink" href="#id24" title="Link to this heading"></a></h4>
+<section id="id26">
+<h4>Parameters<a class="headerlink" href="#id26" title="Link to this heading"></a></h4>
 <dl class="simple">
 <dt>path<span class="classifier">Path</span></dt><dd><p>The path where the directory will be created if it does not already exist.</p>
 </dd>
@@ -987,8 +993,8 @@ Has no effect on manual prefix overrides.</p>
 <span class="sig-name descname"><span class="pre">dump_variable_names_and_contexts</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">exclude_info_maps</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">format_option</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.output_manager.OutputManager.dump_variable_names_and_contexts" title="Link to this definition"></a></dt>
 <dd><p>Dumps names of all variables added to variables_pool along with the caller class
 and function contextual information into a txt file in the given path to a directory.</p>
-<section id="id25">
-<h4>Parameters<a class="headerlink" href="#id25" title="Link to this heading"></a></h4>
+<section id="id27">
+<h4>Parameters<a class="headerlink" href="#id27" title="Link to this heading"></a></h4>
 <dl class="simple">
 <dt>path<span class="classifier">str</span></dt><dd><p>The path to the file to be dumped to.</p>
 </dd>
@@ -998,8 +1004,8 @@ and function contextual information into a txt file in the given path to a direc
 </dd>
 </dl>
 </section>
-<section id="id26">
-<h4>Examples<a class="headerlink" href="#id26" title="Link to this heading"></a></h4>
+<section id="id28">
+<h4>Examples<a class="headerlink" href="#id28" title="Link to this heading"></a></h4>
 <p>For the different format options available:</p>
 <dl class="simple">
 <dt>format_option: str = “basic” - Excludes information about whether data is from info_maps but has the same</dt><dd><p>format as output CSV column headers.</p>
@@ -1032,8 +1038,8 @@ class_name.function_name.variable_name.info_maps: variable4_name</p>
 <dt class="sig sig-object py" id="RUFAS.output_manager.OutputManager.dump_variables">
 <span class="sig-name descname"><span class="pre">dump_variables</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">exclude_info_maps</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.output_manager.OutputManager.dump_variables" title="Link to this definition"></a></dt>
 <dd><p>Dumps variables_pool into a json file in the given path to a directory.</p>
-<section id="id27">
-<h4>Parameters<a class="headerlink" href="#id27" title="Link to this heading"></a></h4>
+<section id="id29">
+<h4>Parameters<a class="headerlink" href="#id29" title="Link to this heading"></a></h4>
 <dl class="simple">
 <dt>path<span class="classifier">str</span></dt><dd><p>Path to the directory where the file will be saved.</p>
 </dd>
@@ -1069,8 +1075,8 @@ want to keep it for debugging purposes
 <dt class="sig sig-object py" id="RUFAS.output_manager.OutputManager.is_file_in_dir">
 <span class="sig-name descname"><span class="pre">is_file_in_dir</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dir_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="headerlink" href="#RUFAS.output_manager.OutputManager.is_file_in_dir" title="Link to this definition"></a></dt>
 <dd><p>Checks if a file path is in the provided directory.</p>
-<section id="id28">
-<h4>Parameters<a class="headerlink" href="#id28" title="Link to this heading"></a></h4>
+<section id="id30">
+<h4>Parameters<a class="headerlink" href="#id30" title="Link to this heading"></a></h4>
 <dl class="simple">
 <dt>dir_path<span class="classifier">Path</span></dt><dd><p>Path to the directory to be checked.</p>
 </dd>
@@ -1084,15 +1090,15 @@ want to keep it for debugging purposes
 <dt class="sig sig-object py" id="RUFAS.output_manager.OutputManager.load_variables_pool_from_file">
 <span class="sig-name descname"><span class="pre">load_variables_pool_from_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.output_manager.OutputManager.load_variables_pool_from_file" title="Link to this definition"></a></dt>
 <dd><p>Loads the Output Manager variables pool from file path provided by user.</p>
-<section id="id29">
-<h4>Parameters<a class="headerlink" href="#id29" title="Link to this heading"></a></h4>
+<section id="id31">
+<h4>Parameters<a class="headerlink" href="#id31" title="Link to this heading"></a></h4>
 <dl class="simple">
 <dt>file_path<span class="classifier">Path</span></dt><dd><p>The path to the file to be loaded to the variables pool.</p>
 </dd>
 </dl>
 </section>
-<section id="id30">
-<h4>Raises<a class="headerlink" href="#id30" title="Link to this heading"></a></h4>
+<section id="id32">
+<h4>Raises<a class="headerlink" href="#id32" title="Link to this heading"></a></h4>
 <dl class="simple">
 <dt>Exception</dt><dd><p>If an error occurs while opening or reading the user-provided file path.</p>
 </dd>
@@ -1111,8 +1117,8 @@ want to keep it for debugging purposes
 <span class="sig-name descname"><span class="pre">save_results</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">save_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filters_dir_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">exclude_info_maps</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">produce_graphics</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">graphics_dir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">csv_dir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.output_manager.OutputManager.save_results" title="Link to this definition"></a></dt>
 <dd><p>Reads a text file containing a list of keys and filters the variables pool by those keys.
 Saves resulting data pool to a json file in the given path to a directory.</p>
-<section id="id31">
-<h4>Parameters<a class="headerlink" href="#id31" title="Link to this heading"></a></h4>
+<section id="id33">
+<h4>Parameters<a class="headerlink" href="#id33" title="Link to this heading"></a></h4>
 <dl class="simple">
 <dt>save_path<span class="classifier">Path</span></dt><dd><p>Path to the directory where the file will be saved.</p>
 </dd>
@@ -1158,8 +1164,8 @@ Saves resulting data pool to a json file in the given path to a directory.</p>
 <dd><p>Generates a report based on filtered data and aggregation criteria.</p>
 <p>This method processes filtered data and performs specified horizontal and/or vertical aggregations
 based on the instructions provided in filter_content.</p>
-<section id="id32">
-<h3>Parameters<a class="headerlink" href="#id32" title="Link to this heading"></a></h3>
+<section id="id34">
+<h3>Parameters<a class="headerlink" href="#id34" title="Link to this heading"></a></h3>
 <dl class="simple">
 <dt>filtered_pool<span class="classifier">Dict[str, Dict[str, List[Any]]]</span></dt><dd><p>The data pool from which the report is to be generated, structured as a dictionary.
 Has the same structure of OutputManager’s variables pool.</p>
@@ -1168,15 +1174,15 @@ Has the same structure of OutputManager’s variables pool.</p>
 </dd>
 </dl>
 </section>
-<section id="id33">
-<h3>Returns<a class="headerlink" href="#id33" title="Link to this heading"></a></h3>
+<section id="id35">
+<h3>Returns<a class="headerlink" href="#id35" title="Link to this heading"></a></h3>
 <dl class="simple">
 <dt>Dict[str, List[float]]</dt><dd><p>The sliced and aggregated data.</p>
 </dd>
 </dl>
 </section>
-<section id="id34">
-<h3>Raises<a class="headerlink" href="#id34" title="Link to this heading"></a></h3>
+<section id="id36">
+<h3>Raises<a class="headerlink" href="#id36" title="Link to this heading"></a></h3>
 <dl class="simple">
 <dt>ValueError</dt><dd><p>If the report data is empty or if the necessary aggregation keys are not found in filter_content.</p>
 </dd>
@@ -1193,15 +1199,15 @@ This usually indicates a mismatch between the expected structure of <cite>filter
 <dt class="sig sig-object py" id="RUFAS.report_generator.average_aggregator">
 <span class="sig-prename descclassname"><span class="pre">RUFAS.report_generator.</span></span><span class="sig-name descname"><span class="pre">average_aggregator</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.report_generator.average_aggregator" title="Link to this definition"></a></dt>
 <dd><p>Calculates the average of a list of numbers.</p>
-<section id="id35">
-<h3>Parameters<a class="headerlink" href="#id35" title="Link to this heading"></a></h3>
+<section id="id37">
+<h3>Parameters<a class="headerlink" href="#id37" title="Link to this heading"></a></h3>
 <dl class="simple">
 <dt>data<span class="classifier">List[float]</span></dt><dd><p>A list of numbers whose average is to be calculated.</p>
 </dd>
 </dl>
 </section>
-<section id="id36">
-<h3>Returns<a class="headerlink" href="#id36" title="Link to this heading"></a></h3>
+<section id="id38">
+<h3>Returns<a class="headerlink" href="#id38" title="Link to this heading"></a></h3>
 <dl class="simple">
 <dt>float</dt><dd><p>The average of the input numbers.</p>
 </dd>
@@ -1213,15 +1219,15 @@ This usually indicates a mismatch between the expected structure of <cite>filter
 <dt class="sig sig-object py" id="RUFAS.report_generator.division_aggregator">
 <span class="sig-prename descclassname"><span class="pre">RUFAS.report_generator.</span></span><span class="sig-name descname"><span class="pre">division_aggregator</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.report_generator.division_aggregator" title="Link to this definition"></a></dt>
 <dd><p>Divides the first number in the list by each of the subsequent numbers.</p>
-<section id="id37">
-<h3>Parameters<a class="headerlink" href="#id37" title="Link to this heading"></a></h3>
+<section id="id39">
+<h3>Parameters<a class="headerlink" href="#id39" title="Link to this heading"></a></h3>
 <dl class="simple">
 <dt>data<span class="classifier">List[float]</span></dt><dd><p>A list of numbers for the division operation.</p>
 </dd>
 </dl>
 </section>
-<section id="id38">
-<h3>Returns<a class="headerlink" href="#id38" title="Link to this heading"></a></h3>
+<section id="id40">
+<h3>Returns<a class="headerlink" href="#id40" title="Link to this heading"></a></h3>
 <dl class="simple">
 <dt>float</dt><dd><p>The result of dividing the first number by each subsequent number.
 Returns None if the list is empty or has only one element.</p>
@@ -1234,15 +1240,15 @@ Returns None if the list is empty or has only one element.</p>
 <dt class="sig sig-object py" id="RUFAS.report_generator.product_aggregator">
 <span class="sig-prename descclassname"><span class="pre">RUFAS.report_generator.</span></span><span class="sig-name descname"><span class="pre">product_aggregator</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.report_generator.product_aggregator" title="Link to this definition"></a></dt>
 <dd><p>Returns the product of a list of numbers.</p>
-<section id="id39">
-<h3>Parameters<a class="headerlink" href="#id39" title="Link to this heading"></a></h3>
+<section id="id41">
+<h3>Parameters<a class="headerlink" href="#id41" title="Link to this heading"></a></h3>
 <dl class="simple">
 <dt>data<span class="classifier">List[float]</span></dt><dd><p>A list of numbers whose product is to be calculated.</p>
 </dd>
 </dl>
 </section>
-<section id="id40">
-<h3>Returns<a class="headerlink" href="#id40" title="Link to this heading"></a></h3>
+<section id="id42">
+<h3>Returns<a class="headerlink" href="#id42" title="Link to this heading"></a></h3>
 <dl class="simple">
 <dt>float</dt><dd><p>The product of the input numbers. Returns 1 for an empty list.</p>
 </dd>
@@ -1254,15 +1260,15 @@ Returns None if the list is empty or has only one element.</p>
 <dt class="sig sig-object py" id="RUFAS.report_generator.sd_aggregator">
 <span class="sig-prename descclassname"><span class="pre">RUFAS.report_generator.</span></span><span class="sig-name descname"><span class="pre">sd_aggregator</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.report_generator.sd_aggregator" title="Link to this definition"></a></dt>
 <dd><p>Calculates the standard deviation of a list of numbers.</p>
-<section id="id41">
-<h3>Parameters<a class="headerlink" href="#id41" title="Link to this heading"></a></h3>
+<section id="id43">
+<h3>Parameters<a class="headerlink" href="#id43" title="Link to this heading"></a></h3>
 <dl class="simple">
 <dt>data<span class="classifier">List[float]</span></dt><dd><p>A list of numbers whose standard deviation is to be calculated.</p>
 </dd>
 </dl>
 </section>
-<section id="id42">
-<h3>Returns<a class="headerlink" href="#id42" title="Link to this heading"></a></h3>
+<section id="id44">
+<h3>Returns<a class="headerlink" href="#id44" title="Link to this heading"></a></h3>
 <dl class="simple">
 <dt>float</dt><dd><p>The standard deviation of the input numbers.</p>
 </dd>
@@ -1274,15 +1280,15 @@ Returns None if the list is empty or has only one element.</p>
 <dt class="sig sig-object py" id="RUFAS.report_generator.subtraction_aggregator">
 <span class="sig-prename descclassname"><span class="pre">RUFAS.report_generator.</span></span><span class="sig-name descname"><span class="pre">subtraction_aggregator</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.report_generator.subtraction_aggregator" title="Link to this definition"></a></dt>
 <dd><p>Subtracts each subsequent number in the list from the first number.</p>
-<section id="id43">
-<h3>Parameters<a class="headerlink" href="#id43" title="Link to this heading"></a></h3>
+<section id="id45">
+<h3>Parameters<a class="headerlink" href="#id45" title="Link to this heading"></a></h3>
 <dl class="simple">
 <dt>data<span class="classifier">List[float]</span></dt><dd><p>A list of numbers for the subtraction operation.</p>
 </dd>
 </dl>
 </section>
-<section id="id44">
-<h3>Returns<a class="headerlink" href="#id44" title="Link to this heading"></a></h3>
+<section id="id46">
+<h3>Returns<a class="headerlink" href="#id46" title="Link to this heading"></a></h3>
 <dl class="simple">
 <dt>float</dt><dd><p>The result of subtracting each subsequent number from the first number.
 Returns None if the list is empty or has only one element.</p>
@@ -1295,15 +1301,15 @@ Returns None if the list is empty or has only one element.</p>
 <dt class="sig sig-object py" id="RUFAS.report_generator.sum_aggregator">
 <span class="sig-prename descclassname"><span class="pre">RUFAS.report_generator.</span></span><span class="sig-name descname"><span class="pre">sum_aggregator</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.report_generator.sum_aggregator" title="Link to this definition"></a></dt>
 <dd><p>Returns the sum of a list of numbers.</p>
-<section id="id45">
-<h3>Parameters<a class="headerlink" href="#id45" title="Link to this heading"></a></h3>
+<section id="id47">
+<h3>Parameters<a class="headerlink" href="#id47" title="Link to this heading"></a></h3>
 <dl class="simple">
 <dt>data<span class="classifier">List[float]</span></dt><dd><p>A list of numbers whose sum is to be calculated.</p>
 </dd>
 </dl>
 </section>
-<section id="id46">
-<h3>Returns<a class="headerlink" href="#id46" title="Link to this heading"></a></h3>
+<section id="id48">
+<h3>Returns<a class="headerlink" href="#id48" title="Link to this heading"></a></h3>
 <dl class="simple">
 <dt>float</dt><dd><p>The sum of the input numbers.</p>
 </dd>
@@ -1322,8 +1328,8 @@ Returns None if the list is empty or has only one element.</p>
 prefix(es) the user wants to use to designate the output files from this simulation.</p>
 <p>main.py will import the METADATA_PATHS variable and class and use it to provide execute_simulations() with
 the list of metadata files and prefixes that they want to be used to run simulations.</p>
-<section id="id47">
-<h3>Attributes<a class="headerlink" href="#id47" title="Link to this heading"></a></h3>
+<section id="id49">
+<h3>Attributes<a class="headerlink" href="#id49" title="Link to this heading"></a></h3>
 <dl class="simple">
 <dt>prefix<span class="classifier">str</span></dt><dd><p>The prefix specifying the metadata file used to run the scenario. Will be used to
 generate a name for each of the output files for the scenario run with this metadata path.</p>
@@ -1332,8 +1338,8 @@ generate a name for each of the output files for the scenario run with this meta
 </dd>
 </dl>
 </section>
-<section id="id48">
-<h3>Examples<a class="headerlink" href="#id48" title="Link to this heading"></a></h3>
+<section id="id50">
+<h3>Examples<a class="headerlink" href="#id50" title="Link to this heading"></a></h3>
 <dl>
 <dt>Single simulation:</dt><dd><dl>
 <dt>METADATA_PATHS: List[MetadataPaths] = [{“prefix”: “default_scenario”,</dt><dd><blockquote>
@@ -1388,8 +1394,8 @@ use the ARL_metadata.json file and save its output files with the “ARL_scenari
 <p>The SimulationEngine class is responsible for orchestrating the entire simulation
 process for RuFaS. It manages the simulation’s lifecycle, advancing time, executing daily
 and annual routines, and logging simulation progress.</p>
-<section id="id49">
-<h3>Attributes<a class="headerlink" href="#id49" title="Link to this heading"></a></h3>
+<section id="id51">
+<h3>Attributes<a class="headerlink" href="#id51" title="Link to this heading"></a></h3>
 <dl class="simple">
 <dt>config<span class="classifier">Config</span></dt><dd><p>The simulation configuration object that contains the simulation parameters.</p>
 </dd>
@@ -1522,14 +1528,14 @@ Automatically detects end of months and years</p>
 <em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">calc_average</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_values</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cur_avg</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">new_value</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#RUFAS.util.Utility.calc_average" title="Link to this definition"></a></dt>
 <dd><p>Calculate the new average given the number of values,
 the current average, and the new value.</p>
-<section id="id50">
-<h3>Parameters<a class="headerlink" href="#id50" title="Link to this heading"></a></h3>
+<section id="id52">
+<h3>Parameters<a class="headerlink" href="#id52" title="Link to this heading"></a></h3>
 <p>num_values: number of values for the current average
 cur_avg: the current average value
 new_value: the new value to be averaged</p>
 </section>
-<section id="id51">
-<h3>Returns<a class="headerlink" href="#id51" title="Link to this heading"></a></h3>
+<section id="id53">
+<h3>Returns<a class="headerlink" href="#id53" title="Link to this heading"></a></h3>
 <p>new_num_values: the new number of values for the new average
 new_avg: the new average value calculated</p>
 </section>
@@ -1539,15 +1545,15 @@ new_avg: the new average value calculated</p>
 <dt class="sig sig-object py" id="RUFAS.util.Utility.convert_list_of_dicts_to_dict_of_lists">
 <em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">convert_list_of_dicts_to_dict_of_lists</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">list_of_dicts</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#RUFAS.util.Utility.convert_list_of_dicts_to_dict_of_lists" title="Link to this definition"></a></dt>
 <dd><p>Convert a list of dictionaries into a dictionary of lists.</p>
-<section id="id52">
-<h3>Parameters<a class="headerlink" href="#id52" title="Link to this heading"></a></h3>
+<section id="id54">
+<h3>Parameters<a class="headerlink" href="#id54" title="Link to this heading"></a></h3>
 <dl class="simple">
 <dt>list_of_dicts<span class="classifier">List[Dict[str, Any]]</span></dt><dd><p>A list of dictionaries with string keys and integer values.</p>
 </dd>
 </dl>
 </section>
-<section id="id53">
-<h3>Returns<a class="headerlink" href="#id53" title="Link to this heading"></a></h3>
+<section id="id55">
+<h3>Returns<a class="headerlink" href="#id55" title="Link to this heading"></a></h3>
 <dl class="simple">
 <dt>Dict[str, List[Any]]</dt><dd><p>A dictionary where keys are unique keys from input dictionaries,
 and values are lists of corresponding values from input dictionaries.</p>
@@ -1560,8 +1566,8 @@ and values are lists of corresponding values from input dictionaries.</p>
 <dt class="sig sig-object py" id="RUFAS.util.Utility.day_to_month_conversion">
 <em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">day_to_month_conversion</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">day</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">calendar_year</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">int</span></span></span><a class="headerlink" href="#RUFAS.util.Utility.day_to_month_conversion" title="Link to this definition"></a></dt>
 <dd><p>Converts the julian day into the corresponding month of the current calendar year.</p>
-<section id="id54">
-<h3>Parameters<a class="headerlink" href="#id54" title="Link to this heading"></a></h3>
+<section id="id56">
+<h3>Parameters<a class="headerlink" href="#id56" title="Link to this heading"></a></h3>
 <dl class="simple">
 <dt>day<span class="classifier">int</span></dt><dd><p>Current julian day of the simulation.</p>
 </dd>
@@ -1569,15 +1575,15 @@ and values are lists of corresponding values from input dictionaries.</p>
 </dd>
 </dl>
 </section>
-<section id="id55">
-<h3>Returns<a class="headerlink" href="#id55" title="Link to this heading"></a></h3>
+<section id="id57">
+<h3>Returns<a class="headerlink" href="#id57" title="Link to this heading"></a></h3>
 <dl class="simple">
 <dt>int</dt><dd><p>The corresponding month of the year (1 for January, 2 for February, etc.).</p>
 </dd>
 </dl>
 </section>
-<section id="id56">
-<h3>Notes<a class="headerlink" href="#id56" title="Link to this heading"></a></h3>
+<section id="id58">
+<h3>Notes<a class="headerlink" href="#id58" title="Link to this heading"></a></h3>
 <p>The calendar year is specified so it can be determined if it is a leap year.</p>
 </section>
 </dd></dl>
@@ -1586,8 +1592,8 @@ and values are lists of corresponding values from input dictionaries.</p>
 <dt class="sig sig-object py" id="RUFAS.util.Utility.empty_dir">
 <em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">empty_dir</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dir_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">keep</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.util.Utility.empty_dir" title="Link to this definition"></a></dt>
 <dd><p>Empties the given directory, except for the files or subdirectories in the keep list.</p>
-<section id="id57">
-<h3>Parameters<a class="headerlink" href="#id57" title="Link to this heading"></a></h3>
+<section id="id59">
+<h3>Parameters<a class="headerlink" href="#id59" title="Link to this heading"></a></h3>
 <dl class="simple">
 <dt>dir_path<span class="classifier">Path</span></dt><dd><p>The path to the directory to be emptied.</p>
 </dd>
@@ -1595,8 +1601,8 @@ and values are lists of corresponding values from input dictionaries.</p>
 </dd>
 </dl>
 </section>
-<section id="id58">
-<h3>Returns<a class="headerlink" href="#id58" title="Link to this heading"></a></h3>
+<section id="id60">
+<h3>Returns<a class="headerlink" href="#id60" title="Link to this heading"></a></h3>
 <p>None</p>
 </section>
 </dd></dl>
@@ -1607,8 +1613,8 @@ and values are lists of corresponding values from input dictionaries.</p>
 <dd><p>Gets the base directory as reference for all relative paths.</p>
 <p>Unfrozen application - gets the project directory
 Frozen application - gets the executable directory</p>
-<section id="id59">
-<h3>Returns<a class="headerlink" href="#id59" title="Link to this heading"></a></h3>
+<section id="id61">
+<h3>Returns<a class="headerlink" href="#id61" title="Link to this heading"></a></h3>
 <p>Path: The reference directory for all paths in the program.</p>
 </section>
 </dd></dl>
@@ -1617,8 +1623,8 @@ Frozen application - gets the executable directory</p>
 <dt class="sig sig-object py" id="RUFAS.util.Utility.make_serializable">
 <em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">make_serializable</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obj</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_depth</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.util.Utility.make_serializable" title="Link to this definition"></a></dt>
 <dd><p>Converts the given object into a serializable object.</p>
-<section id="id60">
-<h3>Parameters<a class="headerlink" href="#id60" title="Link to this heading"></a></h3>
+<section id="id62">
+<h3>Parameters<a class="headerlink" href="#id62" title="Link to this heading"></a></h3>
 <dl class="simple">
 <dt>obj</dt><dd><p>The object to be serialized.</p>
 </dd>
@@ -1626,8 +1632,8 @@ Frozen application - gets the executable directory</p>
 </dd>
 </dl>
 </section>
-<section id="id61">
-<h3>Returns<a class="headerlink" href="#id61" title="Link to this heading"></a></h3>
+<section id="id63">
+<h3>Returns<a class="headerlink" href="#id63" title="Link to this heading"></a></h3>
 <p>A serializable object.</p>
 </section>
 </dd></dl>
@@ -1636,12 +1642,12 @@ Frozen application - gets the executable directory</p>
 <dt class="sig sig-object py" id="RUFAS.util.Utility.percent_calculator">
 <em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">percent_calculator</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">denominator</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Callable</span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#RUFAS.util.Utility.percent_calculator" title="Link to this definition"></a></dt>
 <dd><p>Return a percent calculator closure that already stores the value of the given denominator.</p>
-<section id="id62">
-<h3>Parameters<a class="headerlink" href="#id62" title="Link to this heading"></a></h3>
+<section id="id64">
+<h3>Parameters<a class="headerlink" href="#id64" title="Link to this heading"></a></h3>
 <p>denominator: the denominator to</p>
 </section>
-<section id="id63">
-<h3>Returns<a class="headerlink" href="#id63" title="Link to this heading"></a></h3>
+<section id="id65">
+<h3>Returns<a class="headerlink" href="#id65" title="Link to this heading"></a></h3>
 <p>A closure function that already stores the denominator internally
 so the user only needs to pass in the numerator.</p>
 </section>
@@ -1655,19 +1661,19 @@ so the user only needs to pass in the numerator.</p>
 information into dictionaries used to instantiate simulation objects.</p>
 </dd>
 </dl>
-<section id="id64">
-<h3>Parameters<a class="headerlink" href="#id64" title="Link to this heading"></a></h3>
+<section id="id66">
+<h3>Parameters<a class="headerlink" href="#id66" title="Link to this heading"></a></h3>
 <p>file_path (Path): Path to the input json file</p>
 </section>
-<section id="id65">
-<h3>Raises<a class="headerlink" href="#id65" title="Link to this heading"></a></h3>
+<section id="id67">
+<h3>Raises<a class="headerlink" href="#id67" title="Link to this heading"></a></h3>
 <dl class="simple">
 <dt>InvalidJSONFileError: If the json file at the given path does not</dt><dd><p>conform with the format required</p>
 </dd>
 </dl>
 </section>
-<section id="id66">
-<h3>Returns<a class="headerlink" href="#id66" title="Link to this heading"></a></h3>
+<section id="id68">
+<h3>Returns<a class="headerlink" href="#id68" title="Link to this heading"></a></h3>
 <p>data: the data read from the json file</p>
 </section>
 </dd></dl>
@@ -1677,13 +1683,13 @@ information into dictionaries used to instantiate simulation objects.</p>
 <em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">remove_items_from_list_by_indices</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">arr</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">removed_idx</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.util.Utility.remove_items_from_list_by_indices" title="Link to this definition"></a></dt>
 <dd><p>Remove items from a list given a list of indices.
 The operation is done in-place.</p>
-<section id="id67">
-<h3>Parameters<a class="headerlink" href="#id67" title="Link to this heading"></a></h3>
+<section id="id69">
+<h3>Parameters<a class="headerlink" href="#id69" title="Link to this heading"></a></h3>
 <p>arr: a list of items
 removed_idx: a list that contains indices of the items to be removed</p>
 </section>
-<section id="id68">
-<h3>Returns<a class="headerlink" href="#id68" title="Link to this heading"></a></h3>
+<section id="id70">
+<h3>Returns<a class="headerlink" href="#id70" title="Link to this heading"></a></h3>
 <p>None</p>
 </section>
 </dd></dl>
@@ -1698,8 +1704,8 @@ removed_idx: a list that contains indices of the items to be removed</p>
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">RUFAS.weather.</span></span><span class="sig-name descname"><span class="pre">Weather</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">weather_file</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#RUFAS.config.Config" title="RUFAS.config.Config"><span class="pre">Config</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.weather.Weather" title="Link to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>The <cite>Weather</cite> class manages all weather data used to run a single simulation.</p>
-<section id="id69">
-<h3>Attributes<a class="headerlink" href="#id69" title="Link to this heading"></a></h3>
+<section id="id71">
+<h3>Attributes<a class="headerlink" href="#id71" title="Link to this heading"></a></h3>
 <dl class="simple">
 <dt>__precipitation<span class="classifier">list</span></dt><dd><p>Amounts of precipitation that fall on given days (mm).</p>
 </dd>
@@ -1717,30 +1723,30 @@ removed_idx: a list that contains indices of the items to be removed</p>
 </dd>
 </dl>
 </section>
-<section id="id70">
-<h3>Notes<a class="headerlink" href="#id70" title="Link to this heading"></a></h3>
+<section id="id72">
+<h3>Notes<a class="headerlink" href="#id72" title="Link to this heading"></a></h3>
 <p>All attributes besides the mean annual temperature are held as two-dimensional arrays, with the first array being
 the year, and the second being the day.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="RUFAS.weather.Weather.get_current_day_conditions">
 <span class="sig-name descname"><span class="pre">get_current_day_conditions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#RUFAS.time.Time" title="RUFAS.time.Time"><span class="pre">Time</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#RUFAS.current_day_conditions.CurrentDayConditions" title="RUFAS.current_day_conditions.CurrentDayConditions"><span class="pre">CurrentDayConditions</span></a></span></span><a class="headerlink" href="#RUFAS.weather.Weather.get_current_day_conditions" title="Link to this definition"></a></dt>
 <dd><p>Creates a CurrentDayConditions object containing all the weather conditions on the current day.</p>
-<section id="id71">
-<h4>Parameters<a class="headerlink" href="#id71" title="Link to this heading"></a></h4>
+<section id="id73">
+<h4>Parameters<a class="headerlink" href="#id73" title="Link to this heading"></a></h4>
 <dl class="simple">
 <dt>time: Time</dt><dd><p>Time object containing the current time of the simulation.</p>
 </dd>
 </dl>
 </section>
-<section id="id72">
-<h4>Returns<a class="headerlink" href="#id72" title="Link to this heading"></a></h4>
+<section id="id74">
+<h4>Returns<a class="headerlink" href="#id74" title="Link to this heading"></a></h4>
 <dl class="simple">
 <dt>CurrentDayConditions</dt><dd><p>CurrentDayConditions instance including all the weather conditions of the specified date.</p>
 </dd>
 </dl>
 </section>
-<section id="id73">
-<h4>Raises<a class="headerlink" href="#id73" title="Link to this heading"></a></h4>
+<section id="id75">
+<h4>Raises<a class="headerlink" href="#id75" title="Link to this heading"></a></h4>
 <dl class="simple">
 <dt>IndexError</dt><dd><p>While attempting to collect weather conditions that are not contained in the Weather object.</p>
 </dd>
@@ -1752,8 +1758,8 @@ the year, and the second being the day.</p>
 <dt class="sig sig-object py" id="RUFAS.weather.Weather.record_weather">
 <span class="sig-name descname"><span class="pre">record_weather</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#RUFAS.time.Time" title="RUFAS.time.Time"><span class="pre">Time</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.weather.Weather.record_weather" title="Link to this definition"></a></dt>
 <dd><p>Records the current weather conditions in the OutputManager.</p>
-<section id="id74">
-<h4>Parameters<a class="headerlink" href="#id74" title="Link to this heading"></a></h4>
+<section id="id76">
+<h4>Parameters<a class="headerlink" href="#id76" title="Link to this heading"></a></h4>
 <dl class="simple">
 <dt>time: Time</dt><dd><p>Time object containing the current time of the simulation.</p>
 </dd>
