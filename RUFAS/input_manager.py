@@ -7,8 +7,7 @@ import re
 
 import pandas as pd
 from RUFAS.output_manager import OutputManager
-from typing import Any, Dict, List, Union
-
+from typing import Any, Dict, List, Union, Callable
 
 om = OutputManager()
 
@@ -159,8 +158,8 @@ class InputManager:
         total_elements_counter = 0
         fixed_elements_counter = 0
 
-        data_type_to_loader_map = {"json": self._load_data_from_json,
-                                   "csv": self._load_data_from_csv}
+        data_type_to_loader_map: Dict[str, Callable] = {"json": self._load_data_from_json,
+                                                        "csv": self._load_data_from_csv}
 
         for file_blob_key, file_details in self.__metadata["files"].items():
             file_path = file_details["path"]
@@ -180,13 +179,15 @@ class InputManager:
                 element_counter_and_validity = {"fixed_elements": 0, "total_elements": 0, "valid_elements": 0,
                                                 "invalid_elements": 0, "is_valid": True}
                 if file_type == "json":
-                    element_counter_and_validity = self._validate_json_element([metadata_property], properties_blob_key,
+                    element_counter_and_validity = self._validate_dict_element([metadata_property], properties_blob_key,
                                                                                filtered_input_data, eager_termination,
                                                                                element_counter_and_validity)
                 if file_type == "csv":
-                    element_counter_and_validity = self._validate_csv_element(metadata_property, properties_blob_key,
-                                                                              filtered_input_data, eager_termination,
-                                                                              element_counter_and_validity)
+                    element_counter_and_validity = self._validate_tabular_element(metadata_property,
+                                                                                  properties_blob_key,
+                                                                                  filtered_input_data,
+                                                                                  eager_termination,
+                                                                                  element_counter_and_validity)
 
                 fixed_elements_counter += element_counter_and_validity["fixed_elements"]
                 valid_elements_counter += element_counter_and_validity["valid_elements"]
@@ -298,9 +299,9 @@ class InputManager:
             )
         return validator(variable_properties, var_name, input_data_value, properties_blob_key)
 
-    def _validate_csv_element(self, var_name: str, properties_blob_key: str, input_data: Dict[str, Any],
-                              eager_termination: bool, element_counter_and_validity: Dict[str, int | bool]
-                              ) -> Dict[str, int | bool]:
+    def _validate_tabular_element(self, var_name: str, properties_blob_key: str, input_data: Dict[str, Any],
+                                  eager_termination: bool, element_counter_and_validity: Dict[str, int | bool]
+                                  ) -> Dict[str, int | bool]:
         """
         Receives data loaded from csv input file and the validates each row element in the csv column it's sent.
         It attempts to fix any invalid elements and tracks the number of valid, invalid, fixed,
@@ -333,7 +334,7 @@ class InputManager:
             which is True if the data is valid, False otherwise.
         """
         info_map = {"class": self.__class__.__name__,
-                    "function": self._validate_csv_element.__name__,
+                    "function": self._validate_tabular_element.__name__,
                     }
         variable = input_data[var_name]
         variable_properties = reduce(lambda d, key: d[key], [var_name],
@@ -359,7 +360,7 @@ class InputManager:
 
         return element_counter_and_validity
 
-    def _validate_json_element(self, element_hierarchy: List[str], properties_blob_key: str,   # noqa
+    def _validate_dict_element(self, element_hierarchy: List[str], properties_blob_key: str,  # noqa
                                input_data: Dict[str, Any], eager_termination: bool,
                                element_counter_and_validity: Dict[str, int | bool], ) -> dict:
         """
@@ -396,7 +397,7 @@ class InputManager:
 
         """
         info_map = {"class": self.__class__.__name__,
-                    "function": self._validate_json_element.__name__,
+                    "function": self._validate_dict_element.__name__,
                     }
         try:
             variable_properties = reduce(lambda d, key: d[key], element_hierarchy,
@@ -414,7 +415,7 @@ class InputManager:
             for nested_key in variable_properties.keys():
                 if nested_key not in variable_properties_to_ignore:
                     element_hierarchy.append(nested_key)
-                    element_counter_and_validity = self._validate_json_element(element_hierarchy, properties_blob_key,
+                    element_counter_and_validity = self._validate_dict_element(element_hierarchy, properties_blob_key,
                                                                                input_data, eager_termination,
                                                                                element_counter_and_validity)
                     is_child_valid = element_counter_and_validity["is_valid"]
@@ -708,7 +709,8 @@ class InputManager:
             parent_address = str(data_address.split("." + invalid_key)[0])
 
             om.add_error("Validation: data not found:", f"Cannot find \"{data_address}\", "
-                         f"\"{parent_address}\" does not have attribute \"{invalid_key}\".",
+                                                        f"\"{parent_address}\" does not have attribute "
+                                                        f"\"{invalid_key}\".",
                          info_map)
 
             raise KeyError(f"Data not found: Cannot find \"{data_address}\", "
@@ -774,7 +776,8 @@ class InputManager:
             parent_address = ".".join(element_hierarchy[:-1])
 
             om.add_error("Validation: data not found:", f"Cannot find \"{metadata_address}\", "
-                         f"\"{parent_address}\" does not have attribute \"{invalid_key}\".",
+                                                        f"\"{parent_address}\" does not have attribute "
+                                                        f"\"{invalid_key}\".",
                          info_map)
 
             raise KeyError(f"Data not found: Cannot find \"{metadata_address}\", "
@@ -789,3 +792,260 @@ class InputManager:
                     }
         self.__pool = {}
         om.add_log("Clear variable pool", "The pool is emptied.", info_map)
+
+    def _metadata_properties_exist(self, variable_name: str, properties_blob_key: str) -> bool:
+        """
+        Checks if specific properties exist in the metadata for a given variable.
+
+        Notes
+        -----
+        This function is designed to verify the existence of specified properties
+        within the metadata of a particular variable. It returns a boolean indicating
+        the existence of the properties, and a KeyError in case of missing metadata
+        or properties.
+
+        Parameters
+        ----------
+        variable_name : str
+            The name of the variable for which the metadata is to be checked.
+        properties_blob_key : str
+            The key representing the specific properties blob in the metadata to check.
+
+        Returns
+        -------
+        bool
+            True if the properties exist, False otherwise.
+
+        Raises
+        -------
+        ValueError
+            If no metadata is loaded in InputManager.__metadata.
+        KeyError
+            If no metadata properties can be found with the given `properties_blob_key`.
+        """
+        info_map = {"class": self.__class__.__name__,
+                    "function": self._metadata_properties_exist.__name__,
+                    }
+        if not self.__metadata:
+            om.add_error("No metadata loaded", "No metadata is loaded to the InputManager.", info_map)
+            raise ValueError("No metadata loaded.")
+        if properties_blob_key not in self.__metadata["properties"]:
+            om.add_error("No metadata found", f"No metadata is found for variable '{variable_name}' with given "
+                                              f"properties_blob_key {properties_blob_key}. Consider adding variable "
+                                              f"information and properties to the metadata.", info_map)
+            raise KeyError(f"No metadata is found for variable '{variable_name}' with given properties_blob_key"
+                           f" {properties_blob_key}. Consider adding variable information and properties to the "
+                           f"metadata.")
+        return True
+
+    def _add_variable_to_pool(self, variable_name: str, data: Dict[str, Any], properties_blob_key: str,
+                              eager_termination: bool, is_variable_dict: bool) -> bool:
+        """
+        Adds a variable to the pool after validating its data against specified metadata properties.
+
+        Notes
+        -----
+        This function processes and validates the input data for a variable based on
+        its metadata properties. It then adds the validated data to a pool. The function
+        also provides an option for eager termination in case of invalid data.
+
+        Parameters
+        ----------
+        variable_name : str
+            The name of the variable to be added to the pool.
+        data : Dict[str, Any]
+            The data associated with the variable that needs validation and addition to the pool.
+        properties_blob_key : str
+            The key in the metadata properties against which the data is validated.
+        eager_termination : bool
+            Flag indicating whether the function should return early in case of invalid data.
+        is_variable_dict : bool
+            Weather the variable is a dictionary variable (rather than tabular).
+
+        Returns
+        -------
+        bool
+             True if the variable is successfully added, False otherwise.
+
+        Raises
+        -------
+        ValueError
+            If eager_termination is True and the variable failed validation.
+        """
+        info_map = {"class": self.__class__.__name__,
+                    "function": self._add_variable_to_pool.__name__,
+                    }
+        element_counter = {"valid_elements": 0, "invalid_elements": 0,
+                           "total_elements": 0, "fixed_elements": 0}
+        validated_data = {}
+
+        metadata_properties = self.__metadata["properties"][properties_blob_key]
+        for metadata_property in metadata_properties.keys():
+            element_counter_and_validity = {
+                "fixed_elements": 0, "total_elements": 0, "valid_elements": 0, "invalid_elements": 0,
+                "is_valid": True}
+            if is_variable_dict:
+                element_counter_and_validity = self._validate_dict_element(
+                    element_hierarchy=[metadata_property],
+                    properties_blob_key=properties_blob_key,
+                    input_data=data,
+                    eager_termination=eager_termination,
+                    element_counter_and_validity=element_counter_and_validity
+                )
+            else:
+                element_counter_and_validity = self._validate_tabular_element(
+                    var_name=metadata_property,
+                    properties_blob_key=properties_blob_key,
+                    input_data=data,
+                    eager_termination=eager_termination,
+                    element_counter_and_validity=element_counter_and_validity
+                )
+
+            for key in element_counter.keys():
+                element_counter[key] += element_counter_and_validity[key]
+
+            if element_counter_and_validity["is_valid"]:
+                validated_data[metadata_property] = data[metadata_property]
+
+        om.add_log(f"Validation count for variable {variable_name}: total items",
+                   f"{element_counter['total_elements']=}", info_map)
+        om.add_log(f"Validation count for variable {variable_name}: total valid",
+                   f"{element_counter['valid_elements']=}", info_map)
+        om.add_log(f"Validation count for variable {variable_name}: total fixed",
+                   f"{element_counter['fixed_elements']=}", info_map)
+        om.add_log(f"Validation count for variable {variable_name}: total invalid",
+                   f"{element_counter['invalid_elements']=}", info_map)
+
+        if validated_data:
+            if variable_name in self.__pool.keys():
+                om.add_warning("Overwriting existing variable", f"Variable {variable_name} already exists in "
+                                                                f"InputManager pool, overwriting the old value.",
+                               info_map)
+
+            self.__pool[variable_name] = validated_data
+
+        if element_counter['invalid_elements'] > 0:
+            om.add_error("Invalid variable",
+                         f"Variable {variable_name} has invalid components. Only successfully validated components are "
+                         f"added to InputManager pool during runtime.",
+                         info_map)
+            if eager_termination:
+                raise ValueError(
+                    f"Variable {variable_name} has invalid components. Only successfully validated components are added"
+                    f" to InputManager pool during runtime.")
+            else:
+                return False
+        else:
+            return True
+
+    def add_dict_variable_to_pool(self, variable_name: str, data: Dict[str, Any], properties_blob_key: str,
+                                  eager_termination: bool) -> bool:
+        """
+        Adds a dictionary variable to the InputManager's pool after validating it against metadata.
+
+        Notes
+        -----
+        This function takes in a variable along with its name and a key to access its validation metadata.
+        It validates the data against the provided metadata and adds the data to the InputManager pool if it is valid.
+
+        Parameters
+        ----------
+        variable_name: str
+            The name of the dictionary variable to be added.
+        data : Dict[str, Any]
+            The data of the variable, structured as a dictionary.
+        properties_blob_key : str
+            A key used to locate the metadata for validation of the variable.
+        eager_termination : bool
+            If True, a ValueError will be raised from _add_variable_to_pool() when the variable is invalid.
+            If False, the function returns False.
+
+        Returns
+        -------
+        bool
+            True if the variable is successfully validated and added to the pool.
+            False if the variable is invalid and not added to the pool.
+
+        Raises
+        -------
+        TypeError
+            If `data` is not the expected type of Dict[str, Any].
+        """
+        info_map = {"class": self.__class__.__name__,
+                    "function": self.add_dict_variable_to_pool.__name__,
+                    }
+        if not (isinstance(data, Dict)):
+            om.add_error("Incorrect variable type", f"Variable {variable_name} has type {type(data)}, does not match "
+                                                    f"the expected type of `Dict[str, Any]`.",
+                         info_map)
+            raise TypeError("Incorrect variable type. Expected types: `data: Dict[str, Any]`.")
+
+        metadata_properties_exist = self._metadata_properties_exist(
+            variable_name=variable_name,
+            properties_blob_key=properties_blob_key)
+
+        if metadata_properties_exist:
+            add_variable_success = self._add_variable_to_pool(
+                variable_name=variable_name,
+                data=data,
+                properties_blob_key=properties_blob_key,
+                eager_termination=eager_termination,
+                is_variable_dict=True)
+            return add_variable_success
+
+    def add_tabular_variable_to_pool(self, variable_name: str, data: Dict[str, List[Any]] | List[Any],
+                                     properties_blob_key: str, eager_termination: bool) -> bool:
+        """
+        Adds a tabular variable to the InputManager's pool after validating it against metadata.
+
+        Notes
+        -----
+        This function takes in a variable along with its name and a key to access its validation metadata.
+        It validates the data against the provided metadata and adds the data to the InputManager pool if it is valid.
+
+        Parameters
+        ----------
+        variable_name: str
+            The name of the variable to be added.
+        data : Dict[str, List[Any]] | List[Any]
+            The data of the tabular variable, structured as a dictionary of lists or a list.
+        properties_blob_key : str
+            A key used to locate the metadata for validation of the variable.
+        eager_termination : bool
+            If True, a ValueError will be raised from _add_variable_to_pool() when the variable is invalid.
+            If False, the function returns False.
+
+        Returns
+        -------
+        bool
+            True if the variable is successfully validated and added to the pool.
+            False if the variable is invalid and not added to the pool.
+
+        Raises
+        -------
+        TypeError
+            If `data` is not the expected type of Dict[str, List[Any]] | List[Any].
+        """
+        info_map = {"class": self.__class__.__name__,
+                    "function": self.add_tabular_variable_to_pool.__name__,
+                    }
+        if not (isinstance(data, Dict) or isinstance(data, List)):
+            om.add_error("Incorrect variable type", f"Variable {variable_name} has type {type(data)}, does not match "
+                                                    f"the expected type of `Dict[str, List[Any]] | List[Any]`.",
+                         info_map)
+            raise TypeError("Incorrect variable type. Expected types: `data: Dict[str, List[Any]] | List[Any]`.")
+
+        data = {variable_name: data} if isinstance(data, List) else data
+
+        metadata_properties_exist = self._metadata_properties_exist(
+            variable_name=variable_name,
+            properties_blob_key=properties_blob_key)
+
+        if metadata_properties_exist:
+            add_variable_success = self._add_variable_to_pool(
+                variable_name=variable_name,
+                data=data,
+                properties_blob_key=properties_blob_key,
+                eager_termination=eager_termination,
+                is_variable_dict=False)
+            return add_variable_success
