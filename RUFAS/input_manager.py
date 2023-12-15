@@ -792,7 +792,8 @@ class InputManager:
         Returns
         -------
         list[str]
-            List of keys that point to data in the Input Manager which adhere to the target property.
+            List of keys which point to data within the Input Manager's data pool that adhere to the target metadata
+            properties.
 
         Notes
         -----
