@@ -957,7 +957,7 @@ class InputManager:
         properties_blob_key : str
             A key used to locate the metadata for validation of the variable.
         eager_termination : bool
-            If True, a RuntimeError will be raised from _add_variable_to_pool() when the variable is invalid.
+            If True, a ValueError will be raised from _add_variable_to_pool() when the variable is invalid.
             If False, the function returns False.
 
         Returns
@@ -1012,7 +1012,7 @@ class InputManager:
         properties_blob_key : str
             A key used to locate the metadata for validation of the variable.
         eager_termination : bool
-            If True, a RuntimeError will be raised from _add_variable_to_pool() when the variable is invalid.
+            If True, a ValueError will be raised from _add_variable_to_pool() when the variable is invalid.
             If False, the function returns False.
 
         Returns
