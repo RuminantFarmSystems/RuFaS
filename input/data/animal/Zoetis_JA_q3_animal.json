@@ -126,7 +126,7 @@
 	},
 	"housing": "barn",
 	"pasture_concentrate": 0,
-	"methane_model": "3-Mutian",
+	"methane_model": "IPCC",
 	"ration": {
 		"user_input": false,
 		"formulation_interval": 30
