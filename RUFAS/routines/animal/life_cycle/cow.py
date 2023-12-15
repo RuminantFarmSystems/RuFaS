@@ -1,4 +1,8 @@
+from __future__ import annotations
+
 import math
+from typing import Any
+
 import numpy as np
 from scipy.stats import truncnorm
 
@@ -36,8 +40,8 @@ class Cow(HeiferIII):
             args.birth_date: the date of the simulation when the calf was born
             args.daysBorn: age of the animal
             args.tai_method_h: timed-AI protocols used for
-                reproduction programs, three of them: md5CG2P,
-                md5CGP, and user-defined
+                reproduction programs, three of them: 5dCG2P,
+                5dCGP, and user-defined
             args.synch_ed_method_h: synch ed protocols used for
                 reproduction programs, two of them: 2P and CP
             args.repro_program: reproduction program used in cow,
@@ -101,6 +105,7 @@ class Cow(HeiferIII):
         self.milk_protein_kg = 0
         # Milk protein content estimate, kg/day.
         self.milk_production_reduction = 0.0
+        self.latest_milk_production_305days = 0.0
         self.single_acc_milk_prod = 0
         self.future_cull_date = 0
         self.future_death_date = 0
@@ -139,20 +144,6 @@ class Cow(HeiferIII):
             self.CI = args['calving_interval']
             self.set_parity_index()
             self.set_lactation_curve_params()
-
-    @property
-    def is_pregnant(self):
-        """
-        Check if the cow is pregnant.
-
-        Returns
-        -------
-        bool
-            True if the cow is pregnant, False otherwise.
-
-        """
-
-        return self.days_in_preg > 0
 
     @property
     def is_lactating(self):
@@ -255,12 +246,24 @@ class Cow(HeiferIII):
         Updates the animal's milk production history by appending a
         MilkProductionHistory object to the list.
 
-        Args:
+        If milk production history has already been updated for the day,
+        the most recent entry is deleted before appending the latest values.
+        Once a cow reaches 305 days in milk, latest_milk_production_305days is updated.
+
+        Parameter
+        ---------
             sim_day: simulation day
         """
+        if len(self.milk_production_history) > 0 and self.milk_production_history[-1].simulation_day == sim_day:
+            del self.milk_production_history[-1]
 
-        self.milk_production_history.append(MilkProductionHistory(sim_day, self.days_in_milk,
-                                                                  self.estimated_daily_milk_produced, self.days_born))
+        self.milk_production_history.append(
+            MilkProductionHistory(sim_day, self.days_in_milk, self.estimated_daily_milk_produced, self.days_born)
+        )
+
+        if self.days_in_milk == 305 and len(self.milk_production_history) > 305:
+            milk_history = [day.milk_production for day in self.milk_production_history[-305:]]
+            self.latest_milk_production_305days = np.sum(milk_history)
 
     def calculate_fat_percent(self, days_in_milk: int):
         """
@@ -315,6 +318,7 @@ class Cow(HeiferIII):
             self.events.add_event(self.days_born, sim_day, const.DRY)
             self.days_in_milk = 0
             self.estimated_daily_milk_produced = 0
+            self.latest_milk_production_305days = 0.0
             return 0, 0, 0
 
         if self.milking:
@@ -359,21 +363,6 @@ class Cow(HeiferIII):
         self.daily_growth = self.get_bw_change(calving_interval)
 
         self.body_weight += self.daily_growth
-
-        info_map = {"class": self.__class__.__name__,
-                    "function": self.milking_update.__name__,
-                    "simulation_day": sim_day
-                    }
-
-        om.add_variable("sim_day", sim_day, info_map)
-        om.add_variable("days_in_milk", self.days_in_milk, info_map)
-        om.add_variable("estimated_daily_milk_produced", self.estimated_daily_milk_produced, info_map)
-        om.add_variable("milk_fat", self.fat_percent, info_map)
-        om.add_variable("milk_protein", self.mPrt, info_map)
-        om.add_variable("milk_lactose", self.lactose_milk, info_map)
-        om.add_variable("lactating", self.milking, info_map)
-        om.add_variable("cow_id", self.id, info_map)
-        om.add_variable("parity", self.calves, info_map)
 
         # if not self.milking:
         # 	self.daily_growth = self.body_weight - prev_weight
@@ -731,7 +720,7 @@ class Cow(HeiferIII):
                         AnimalBase.config['cow_repro_programs']['estrus_detection_rate']:
                     # Estrus detected
                     self.events.add_event(
-                        self.days_born, sim_day, const.ESTRUS_DETECTED)
+                        self.days_born, sim_day, const.ESTRUS_DETECTED_NOTE)
                     estrus_service_rand = random()
                     if estrus_service_rand < \
                             AnimalBase.config['cow_repro_programs']['estrus_service_rate']:
@@ -997,7 +986,7 @@ class Cow(HeiferIII):
                         AnimalBase.config['cow_repro_programs']['estrus_detection_rate']:
                     # Estrus detected
                     self.events.add_event(
-                        self.days_born, sim_day, const.ESTRUS_DETECTED)
+                        self.days_born, sim_day, const.ESTRUS_DETECTED_NOTE)
                     estrus_service_rand = random()
                     if estrus_service_rand < \
                             AnimalBase.config['cow_repro_programs']['estrus_service_rate']:
@@ -1205,6 +1194,103 @@ class Cow(HeiferIII):
                     self.days_born, sim_day, const.DO_NOT_BREED)
                 self.do_not_breed = True
             return True
+
+    @property
+    def get_avg_estrus_cycle(self):
+        """
+        Get the literature value for the average estrus cycle length for cows (days).
+
+        Returns
+        -------
+        float
+            The average estrus cycle length for cows (days).
+        """
+
+        return AnimalBase.config['avg_estrus_cycle_cow']
+
+    @property
+    def get_std_estrus_cycle(self):
+        """
+        Get the literature value for the standard deviation of the estrus cycle length for cows (days).
+
+        Returns
+        -------
+        float
+            The standard deviation of the estrus cycle length for cows (days).
+        """
+
+        return AnimalBase.config['std_estrus_cycle_cow']
+
+    @staticmethod
+    def get_user_defined_repro_data(attribute: str) -> Any:
+        """
+        Get the reproduction data for cows.
+
+        Parameters
+        ----------
+        attribute : str
+            The name of the attribute to get from the reproduction data.
+
+        Returns
+        -------
+        Any
+            The value of the attribute in the reproduction data.
+
+        Raises
+        ------
+        KeyError
+            If the attribute is not found in the reproduction data.
+        """
+
+        if attribute not in AnimalBase.config['cows']:
+            raise KeyError(f'Invalid cow repro config attribute: {attribute}')
+
+        return AnimalBase.config['cows'][attribute]
+
+    # Note: Not used yet. Will revisit during cow repro refactor.
+    def _handle_successful_conception(self, sim_day: int) -> None:
+        """
+        Handle a successful conception event.
+
+        Parameters
+        ----------
+        sim_day : int
+            The current simulation day.
+
+        Returns
+        -------
+        None
+        """
+
+        self.log_event(self.days_born, sim_day, const.COW_PREG)
+        self._initialize_pregnancy_parameters()
+        if self.calves > 0:
+            last_time_given_birth = self.events.get_most_recent_date(const.NEW_BIRTH)
+            self.calving_to_preg_time = self.days_born - last_time_given_birth
+
+    # Note: Not used yet. Will revisit during cow repro refactor.
+    def _handle_failed_conception(self, sim_day: int) -> None:
+        """
+        Handle a failed conception event.
+
+        Parameters
+        ----------
+        sim_day : int
+            The current simulation day.
+
+        Returns
+        -------
+        None
+        """
+
+        self.log_event(self.days_born, sim_day, const.COW_NOT_PREG)
+        self.open_stage = True
+        if self.repro_program in ['ED'] or self.resynch_method in ['TAIafterPD', 'PGFatPD']:
+            self._simulate_estrus(self.estrus_day, sim_day, const.ESTRUS_AFTER_AI_NOTE)
+
+    # Note: Not implemented yet. Will revisit during cow repro refactor.
+    def _handle_preg_check(self, preg_check_config: dict[str, int | str], sim_day: int):
+        pass
 
     # Cull methods
     def cull_update(self, sim_day):

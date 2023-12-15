@@ -232,7 +232,7 @@ def test_dict_to_file_json(mock_output_manager: OutputManager) -> None:
         mock_output_manager._dict_to_file_json(data, "test")
 
     written_data = "".join(call[1][0] for call in open_mock().write.mock_calls)
-    assert written_data == json.dumps(data, indent=0)
+    assert written_data == json.dumps(data, indent=2)
 
 
 def test_dict_to_file_json_exception(mock_output_manager: OutputManager) -> None:
@@ -1702,7 +1702,7 @@ def test_save_results_report_generation(
             )
 
         # test for exception handling
-        mock_report_generator.generate_report.side_effect = ValueError()
+        mock_report_generator.generate_report.side_effect = KeyError()
         mock_output_manager.save_results(
             "save_path",
             "filters_path",
@@ -1753,7 +1753,7 @@ def test_route_save_functions_csv(
     )
     variable_csv_file_path = mock_output_manager._generate_file_name("saved_variables_csv_file", "csv")
     mock_output_manager._dict_to_file_csv.assert_called_once_with(
-        {"key": {"var": "value"}}, os.path.join("output/CSVs/", variable_csv_file_path)
+        {"key": {"var": "value"}}, os.path.join("output", "CSVs", variable_csv_file_path)
     )
     # Restore original method
     mock_output_manager._dict_to_file_csv = (
