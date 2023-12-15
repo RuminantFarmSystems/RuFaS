@@ -34,6 +34,9 @@ output/*
 output/graphics/*
 !output/output_filters/
 output/output_filters/*
+!output/output_filters/graph_herd_composition.json
+!output/output_filters/json_animal_events_for_heiferIIs.txt
+!output/output_filters/json_animal_events_for_cows.txt
 
 # ignore project files
 *.sublime-project

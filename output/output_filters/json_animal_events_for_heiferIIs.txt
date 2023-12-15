@@ -16,3 +16,4 @@ AnimalManager._record_heiferIIs_conception_rate.heiferII_num_successful_concepti
 AnimalManager._record_heiferIIs_conception_rate.heiferII_SynchED_conception_rate
 
 .*HeiferII_.*_last_day
+.*Cow_.*_last_day
