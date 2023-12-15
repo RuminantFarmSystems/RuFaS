@@ -158,6 +158,26 @@ class MockAnimals:
         return dummy_animal
 
 
+@pytest.mark.parametrize("data", [
+    ([1, 1, 1, 1, 1, 1]),
+    ([0, 0, 0, 0, 0, 0]),
+    ([-1, -2, -3, -4, -5, -6, -7, -8]),
+    ([-5, -3, -1, 1, 9, 8]),
+    ([8, 44, 38, 5, 100, 500]),
+    ([0.0, 0.0, 0.0]),
+    ([1.1, 2.2, 3.3, 4.4, 5.5, 6.6, 7.7, 8.8, 9.9]),
+    ([-1.1, -2.2, -3.3]),
+    ([-9.9, -345.4, -13, 1436, 495.324]),
+    ([])
+])
+def test_average(data: List[int | float], mock_animal_population: AnimalPopulation) -> None:
+    expected_result = sum(data) / len(data) if len(data) else 0
+
+    actual_result = mock_animal_population._average(data=data)
+
+    assert actual_result == expected_result
+
+
 @pytest.mark.parametrize("num_calf, num_heiferI, num_heiferII, num_heiferIII, num_cow, num_replacement", [
     (1, 1, 1, 1, 1, 1),
     (0, 0, 0, 0, 0, 0),
