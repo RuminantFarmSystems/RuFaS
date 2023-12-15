@@ -24,17 +24,14 @@ from RUFAS.routines.animal.ration import ration_driver as ration_driver
 from RUFAS.routines.animal.ration import user_defined_ration as udr
 from RUFAS.routines.animal.ration.calf_ration import CalfRationManager
 from RUFAS.routines.animal.ration.ration_driver import RationManager
-<<<<<<< HEAD
 from RUFAS.routines.animal.animal_module_reporter import AnimalModuleReporter
 from RUFAS.routines.animal.feed_emissions_manager import FeedEmissionsManager
 
 from RUFAS.routines.animal.ration import user_defined_ration as udr
-=======
 from RUFAS.routines.animal.ration.ration_driver import RationReporter
 from RUFAS.routines.feed.feed import Feed
 from RUFAS.time import Time
 from RUFAS.weather import Weather
->>>>>>> 2d3d94629c7780fe8d3568471043670043e97759
 
 om = OutputManager()
 
