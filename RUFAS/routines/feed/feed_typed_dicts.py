@@ -42,4 +42,4 @@ class PurchasedFeedTypedDict(TypedDict):
 
     storage_options: Dict[str, StorageOption]
 
-    user_defined_ration_percentages: Dict[str,float]
+    user_defined_ration_percentages: Dict[str, float]

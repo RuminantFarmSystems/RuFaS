@@ -9,9 +9,22 @@ INSEMINATED_W_BASE = "inseminated with "
 BREEDING_START = "breeding start"
 DO_NOT_BREED = "mark as do not breed"
 
-# estrus occurred
-ESTRUS_DETECTED = "estrus detected"
+ESTRUS_DETECTED_NOTE = "estrus detected"
+ESTRUS_NOT_DETECTED_NOTE = "estrus not detected"
 BASIC_ESTRUS_NOTE = "estrus"
+
+# When days born == estrus day
+ESTRUS_OCCURRED_NOTE = "estrus occurred"
+
+# When simulate_estrus() is called
+ESTRUS_DAY_SCHEDULED_NOTE = "estrus day scheduled"
+
+AI_DAY_SCHEDULED_NOTE = "AI day scheduled"
+AI_PERFORMED_NOTE = "AI performed"
+TAI_AFTER_ESTRUS_NOT_DETECTED_IN_SYNCH_ED_NOTE = "TAI after estrus not detected in SynchED"
+REBREEDING_NOTE = "rebreeding start"
+SETTING_REPRO_PROGRAM_NOTE = "setting repro program"
+
 ESTRUS_AFTER_AI_NOTE = "estrus after AI"
 ESTRUS_AFTER_ABORTION_NOTE = "estrus after abortion"
 FIRST_ESTRUS_NOTE = "first estrus"
@@ -24,14 +37,12 @@ INJECT_GNRH = "inject GnRH"
 INJECT_PGF = "inject PGF"
 
 # heifer repro
-ESTRUS_OCCURRED = "estrus"
 INJECT_CIDR = "inject CIDR"
 
 # presynch protocols
 PRESYNCH_END = "Presynch ended"
 DOUBLE_OVSYNCH_END = "Double OvSynch ended"
 C6G_END = "G6G ended"
-
 
 # pregnancy
 HEIFER_PREG = "heifer pregnant"
