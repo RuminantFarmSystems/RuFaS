@@ -554,7 +554,7 @@ class RationReporter:
 
         if feed_item_info["feed_type"] == "Mineral":
             ME_item = 0.0
-        elif feed_item_info["is_fat"] == 1:
+        elif feed_item_info["is_fat"] is True:
             ME_item = feed_item_info["DE"] if feed_item_info["DE"] != -1 else feed_item_info["DE_Base"]
         elif feed_item_info["EE"] >= 3:
             ME_item = 1.01 * DE_act - 0.45 + 0.0046 * (feed_item_info["EE"] - 3)
@@ -586,7 +586,7 @@ class RationReporter:
 
         """
         ME_item = RationReporter.get_ME(kg_fed, feed_item_info, ration_report, body_weight)
-        if feed_item_info["is_fat"] == 1:
+        if feed_item_info["is_fat"] is True:
             NEm_item = 0.8 * ME_item
         else:
             NEm_item = 1.37 * ME_item - 0.138 * ME_item ** 2 + 0.0105 * ME_item ** 3 - 1.12
@@ -618,7 +618,7 @@ class RationReporter:
         ME_item = RationReporter.get_ME(kg_fed, feed_item_info, ration_report, body_weight)
         if feed_item_info["feed_type"] == "Mineral":
             NE_lactation_item = 0.0
-        elif feed_item_info["is_fat"] == 1:
+        elif feed_item_info["is_fat"] is True:
             NE_lactation_item = 0.8 * DE_act
         elif feed_item_info["EE"] >= 3:
             NE_lactation_item = 0.703 * ME_item - 0.19 + ((0.097 * ME_item + 0.19) / 97) * (feed_item_info["EE"] - 3)
@@ -651,7 +651,7 @@ class RationReporter:
         ME_item = RationReporter.get_ME(kg_fed, feed_item_info, ration_report, body_weight)
         if feed_item_info["feed_type"] == "Mineral":
             NE_growth = 0.0
-        elif feed_item_info["is_fat"] == 1:
+        elif feed_item_info["is_fat"] is True:
             NE_growth = 0.55 * ME_item
         else:
             NE_growth = 1.42 * ME_item - 0.174 * ME_item ** 2 + 0.0122 * ME_item ** 3 - 1.65
@@ -843,14 +843,14 @@ class RationReporter:
             # KP calcs
             if feed_item_info["feed_type"] == "Conc":
                 Kp.append(2.904 + 1.375 * (DMI_estimate / body_weight) * 100 - 0.02 * DMI_conc_percentage)
-            elif feed_item_info["feed_type"] == "Forage" and feed_item_info["is_wetforage"] == 0:
+            elif feed_item_info["feed_type"] == "Forage" and feed_item_info["is_wetforage"] is False:
                 Kp.append(
                     3.362
                     + 0.479 * (DMI_estimate / body_weight) * 100
                     - 0.017 * feed_item_info["NDF"]
                     - 0.007 * DMI_conc_percentage
                 )
-            elif feed_item_info["is_wetforage"] == 1:
+            elif feed_item_info["is_wetforage"] is True:
                 Kp.append(3.054 + 0.614 * (DMI_estimate / body_weight) * 100)
             else:
                 Kp.append(0)
