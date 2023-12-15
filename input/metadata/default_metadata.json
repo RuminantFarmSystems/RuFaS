@@ -437,7 +437,9 @@
               },
               "repro_sub_protocol": {
                 "type": "string",
-                "pattern": "^(OvSynch 56|OvSynch 48|CoSynch 72|5d CoSynch)$"
+                "description": "Sub-protocol for cow reproductive program",
+                "pattern": "^(OvSynch 48|OvSynch 56|CoSynch 72|5d CoSynch)$",
+                "default": "OvSynch 56"
               },
               "repro_sub_properties": {
                 "type": "object",

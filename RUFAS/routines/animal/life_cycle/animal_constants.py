@@ -29,7 +29,7 @@ ESTRUS_AFTER_AI_NOTE = "estrus after AI"
 ESTRUS_AFTER_ABORTION_NOTE = "estrus after abortion"
 FIRST_ESTRUS_NOTE = "first estrus"
 ESTRUS_AFTER_CALVING_NOTE = "1st estrus after calving"
-ESTRUS_BEFORE_VWP_NOTE = "estrus occurred before vwp"
+ESTRUS_BEFORE_VWP_NOTE = "estrus occurred before the end of voluntary waiting period"
 ESTRUS_AFTER_PGF_NOTE = "estrus after PGF"
 
 # TAI injections

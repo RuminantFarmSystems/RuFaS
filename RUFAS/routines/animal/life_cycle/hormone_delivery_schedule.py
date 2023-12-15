@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import Literal
 
-from RUFAS.routines.animal.life_cycle.repro_protocol_enums import HeiferReproProtocolEnum
+from RUFAS.routines.animal.life_cycle.repro_protocol_enums import HeiferReproProtocolEnum, CowReproProtocolEnum
 
 
 class HormoneDeliverySchedule:
@@ -63,27 +63,27 @@ class HormoneDeliverySchedule:
     }
 
     COW_REPRO_PROTOCOLS = {
-        'OvSynch 48': {
+        CowReproProtocolEnum.TAI_OvSynch_48.value: {
             0: {'deliver_hormones': ['GnRH']},
             7: {'deliver_hormones': ['PGF']},
             9: {'deliver_hormones': ['GnRH']},
             10: {'deliver_hormones': ['GnRH']},
             11: {'set_ai_day': True, 'set_conception_rate': True}
         },
-        'OvSynch 56': {
+        CowReproProtocolEnum.TAI_OvSynch_56.value: {
             0: {'deliver_hormones': ['GnRH']},
             7: {'deliver_hormones': ['PGF']},
             9: {'deliver_hormones': ['GnRH']},
             10: {'deliver_hormones': ['GnRH']},
             11: {'set_ai_day': True, 'set_conception_rate': True}
         },
-        'CoSynch 72': {
+        CowReproProtocolEnum.TAI_CoSynch_72.value: {
             0: {'deliver_hormones': ['GnRH']},
             7: {'deliver_hormones': ['PGF']},
             10: {'deliver_hormones': ['GnRH']},
             11: {'set_ai_day': True, 'set_conception_rate': True}
         },
-        '5d CoSynch': {
+        CowReproProtocolEnum.TAI_5d_CoSynch.value: {
             0: {'deliver_hormones': ['GnRH']},
             5: {'deliver_hormones': ['PGF']},
             6: {'deliver_hormones': ['PGF']},
