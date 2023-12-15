@@ -108,8 +108,8 @@ class HerdFactory:
 
                 args.update(id=self.pre_animal_population.next_id())
                 args.update(repro_program=AnimalBase.config['heifer_repro_method'])
-                args.update(tai_method_h=AnimalBase.config['heifer_repro_programs']['heifer_TAI_protocol'])
-                args.update(synch_ed_method_h=AnimalBase.config['heifer_repro_programs']['heifer_synchED_protocol'])
+                args.update(tai_method_h=AnimalBase.config['heifers']['repro_sub_protocol'])
+                args.update(synch_ed_method_h=AnimalBase.config['heifers']['repro_sub_protocol'])
 
                 heiferII = HeiferII(args)
                 self.pre_animal_population.heiferIIs.append(heiferII)
@@ -315,7 +315,6 @@ class HerdFactory:
             self.pre_animal_population = self._initialize_herd_from_data()
 
         self.post_animal_population = self._random_sample_with_replacement()
-        print(self.post_animal_population.get_herd_summary())
         im.add_dict_variable_to_pool(variable_name="runtime_animal_population",
                                      data=self.post_animal_population.__repr__(),
                                      properties_blob_key="animal_population_properties",
