@@ -1,7 +1,5 @@
-from typing import Dict
 from typing import List
 from typing import TypedDict
-from typing import Union
 from typing_extensions import NotRequired
 
 
@@ -136,20 +134,11 @@ class AnimalConfigTypedDict(TypedDict):
     milk_type: str
 
     # farm level -> repro -> ED_related
-    estrus_detection_rate_h: float
-    estrus_insemination_rate_h: float
-    estrus_conception_rate_h: float
-    estrus_detection_rate_h_synch: float
-    heifer_synchED_protocol: str
     estrus_detection_rate: float
     estrus_insemination_rate: float
     estrus_conception_rate: float
 
     # farm level -> repro -> TAI_related
-    heifer_TAI_protocol: str
-    TAI_conception_rate_h: float
-    md5CG2P_conception_rate: float
-    md5CGP_conception_rate: float
     heifer_user_defined_tai_cr: float
     cow_presynch_protocol: str
     cow_TAI_protocol: str
@@ -161,9 +150,6 @@ class AnimalConfigTypedDict(TypedDict):
     cow_resynch_protocol: str
     user_define_tai_length: int
     tai_program_start_day: int
-
-    ED_related: Dict[str, Union[float, str]]
-    TAI_related: Dict[str, Union[float, str]]
 
     # remaining attributes in farm level -> repro
     voluntary_waiting_period: int

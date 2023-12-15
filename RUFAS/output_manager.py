@@ -420,7 +420,7 @@ class OutputManager(object):
                     json.dump(
                         Utility.make_serializable(data_dict, max_depth=3),
                         json_file,
-                        indent=0,
+                        indent=2,
                     )
                 self.add_log(
                     "save_dict_file_success", f"Successfully saved to {path}.", info_map
