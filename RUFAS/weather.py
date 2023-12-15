@@ -261,8 +261,8 @@ class Weather:
 
         This method will use the latitude from the first field input key that is returned to it by the Input Manager.
 
-        As of writing this, only the absolute is stored in field input files, so simulations of farms in the southern
-        hemisphere will use incorrect daylength values.
+        As of writing this, only the absolute latitude is stored in field input files, so simulations of farms in the
+        southern hemisphere will use incorrect daylength values.
 
         """
         field_input_keys = im.get_data_keys_by_properties("field_properties")
@@ -271,5 +271,5 @@ class Weather:
             return 43.0723
 
         first_field_key = field_input_keys[0]
-        latitude = im.get_data(f"{first_field_key}.abs_latitude")["abs_latitude"]
+        latitude = im.get_data(f"{first_field_key}.absolute_latitude")
         return latitude
