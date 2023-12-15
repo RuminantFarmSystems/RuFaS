@@ -25,6 +25,7 @@ from RUFAS.routines.animal.ration.calf_ration import CalfRationManager
 from RUFAS.routines.animal.ration.ration_driver import RationReporter
 from RUFAS.routines.animal.ration.ration_driver import RationManager
 from RUFAS.routines.animal.animal_module_reporter import AnimalModuleReporter
+from RUFAS.routines.animal.feed_emissions_manager import FeedEmissionsManager
 
 from RUFAS.routines.animal.ration import user_defined_ration as udr
 
@@ -183,6 +184,8 @@ class AnimalManager:
             self.allocate_animals_to_pens()
 
         self._print_animal_num_warnings(data["herd_information"])
+
+        self.feed_emissions_manager = FeedEmissionsManager()
 
     @property
     def animals_by_type(self):
