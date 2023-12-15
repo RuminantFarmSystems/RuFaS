@@ -214,10 +214,12 @@ class LifeCycleManager:
     def _get_animals(self, animal_type: Type[GenericAnimal]) -> List[GenericAnimal]:
         """Gets a list of animals of a given type.
 
-        Args:
+        Parameters
+        ----------
             animal_type: The type of animal to get.
 
-        Returns:
+        Returns
+        -------
             A list of animals of the given type.
 
         """

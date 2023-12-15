@@ -46,7 +46,7 @@ class AnimalPopulation:
 
     def __post_init__(self):
         """Post init function to find the max id of all animals, and set the current_animal_id"""
-        ids = [i.id for i in self.calves + self.heiferIs + self.heiferIIs + self.heiferIIIs + self.cows + 
+        ids = [i.id for i in self.calves + self.heiferIs + self.heiferIIs + self.heiferIIIs + self.cows +
                self.replacement]
         if ids:
             self.current_animal_id = max(ids)
@@ -63,13 +63,13 @@ class AnimalPopulation:
         }
 
     def next_id(self) -> int:
-       """
-       Increment and return the next unique identifier for an animal.
+        """
+        Increment and return the next unique identifier for an animal.
 
-       Returns
-       -------
-       int
-           The next unique animal_id.
+        Returns
+        -------
+        int
+            The next unique animal_id.
        """
         self.current_animal_id += 1
         return self.current_animal_id
@@ -87,7 +87,7 @@ class AnimalPopulation:
             shuffle(self.calves)
         return self.calves
 
-    def get_heiferIs(self) -> List[HeiferIs]:
+    def get_heiferIs(self) -> List[HeiferI]:
         """
         Retrieve a list of HeiferI instances.
 
@@ -101,7 +101,7 @@ class AnimalPopulation:
 
         return self.heiferIs
 
-    def get_heiferIIs(self) -> List[HeiferIIs]:
+    def get_heiferIIs(self) -> List[HeiferII]:
         """
         Retrieve a list of HeiferII instances.
 
@@ -154,6 +154,23 @@ class AnimalPopulation:
             shuffle(self.replacement)
         return self.replacement
 
+    @staticmethod
+    def _average(data: List[int | float]) -> float:
+        """
+        A custom get-average function for the given data. Returns 0 for an empty list.
+
+        Parameters
+        ----------
+        data :  List[int | float]
+            The input data.
+
+        Returns
+        -------
+        float
+            The average of the given data, or 0 for an empty data list.
+        """
+        return sum(data) / len(data) if len(data) else 0
+
     def get_herd_summary(self) -> Dict[str, int | float]:
         """
         Returns a dictionary containing herd summary information
@@ -170,19 +187,17 @@ class AnimalPopulation:
         num_cow = len(self.cows)
         num_replacement = len(self.replacement)
 
-        avg_calf_age = sum(calf.days_born for calf in self.calves) / num_calf if num_calf else 0
-        avg_heiferI_age = sum(heiferI.days_born for heiferI in self.heiferIs) / num_heiferI if num_heiferI else 0
-        avg_heiferII_age = sum(heiferII.days_born for heiferII in self.heiferIIs) / num_heiferII if num_heiferII else 0
-        avg_heiferIII_age = sum(heiferIII.days_born for heiferIII in self.heiferIIIs) / num_heiferIII if num_heiferIII \
-            else 0
-        avg_cow_age = sum(cow.days_born for cow in self.cows) / num_cow if num_cow else 0
-        avg_replacement_age = sum(replacement.days_born for replacement in self.replacement) / num_replacement if \
-            num_replacement else 0
+        avg_calf_age = self._average([calf.days_born for calf in self.calves])
+        avg_heiferI_age = self._average([heiferI.days_born for heiferI in self.heiferIs])
+        avg_heiferII_age = self._average([heiferII.days_born for heiferII in self.heiferIIs])
+        avg_heiferIII_age = self._average([heiferIII.days_born for heiferIII in self.heiferIIIs])
+        avg_cow_age = self._average([cow.days_born for cow in self.cows])
+        avg_replacement_age = self._average([replacement.days_born for replacement in self.replacement])
 
-        cow_avg_days_in_preg = sum(cow.days_in_preg for cow in self.cows) / num_cow if num_cow else 0
-        cow_avg_days_in_milk = sum(cow.days_in_milk for cow in self.cows) / num_cow if num_cow else 0
-        cow_avg_parity = sum(cow.calves for cow in self.cows) / num_cow if num_cow else 0
-        cow_avg_CI = sum(cow.CI for cow in self.cows) / num_cow if num_cow else 0
+        cow_avg_days_in_preg = self._average([cow.days_in_preg for cow in self.cows])
+        cow_avg_days_in_milk = self._average([cow.days_in_milk for cow in self.cows])
+        cow_avg_parity = self._average([cow.calves for cow in self.cows])
+        cow_avg_CI = self._average([cow.CI for cow in self.cows])
 
         summary = {
             'num_calf': num_calf,

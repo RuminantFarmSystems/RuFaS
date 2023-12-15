@@ -261,10 +261,6 @@ def initialize_herd(
     """
     Initializes a herd based on the provided simulation configuration.
 
-    This function is responsible for setting up the initial state of the herd
-    based on the given configuration. It can also save the initialized herd data
-    to a specified directory.
-
     Parameters
     ----------
     simulation_config : Config
@@ -284,6 +280,10 @@ def initialize_herd(
 
     Notes
     -----
+    This function is responsible for setting up the initial state of the herd
+    based on the given configuration. It can also save the initialized herd data
+    to a specified directory.
+
     The function utilizes an `OutputManager` for logging various stages and events
     during the initialization process. It also respects the seed settings
     provided in the simulation configuration for consistent results.
