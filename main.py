@@ -11,7 +11,6 @@ from pathlib import Path
 import sys
 import random
 from typing import List
-
 import numpy
 
 from RUFAS.config import Config

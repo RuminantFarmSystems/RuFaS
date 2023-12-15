@@ -1,32 +1,33 @@
+from __future__ import annotations
+
 import collections
 import math
 from statistics import mean
 from typing import Any, Dict, Tuple, List, Set, Union
 
 from RUFAS.general_constants import GeneralConstants
-from RUFAS.routines.animal.animal_typed_dicts import InitialHerdSummaryTypedDict
-from RUFAS.time import Time
-from RUFAS.weather import Weather
 from RUFAS.output_manager import OutputManager
 from RUFAS.routines.animal.animal_grouping_scenarios import AnimalGroupingScenario
-from RUFAS.routines.animal.animal_types import AnimalType
 from RUFAS.routines.animal.animal_module_constants import AnimalModuleConstants
+from RUFAS.routines.animal.animal_module_reporter import AnimalModuleReporter
+from RUFAS.routines.animal.animal_typed_dicts import InitialHerdSummaryTypedDict
+from RUFAS.routines.animal.animal_types import AnimalType
 from RUFAS.routines.animal.life_cycle.animal_base import AnimalBase
+from RUFAS.routines.animal.life_cycle.calf import Calf
 from RUFAS.routines.animal.life_cycle.cow import Cow
 from RUFAS.routines.animal.life_cycle.heiferI import HeiferI
 from RUFAS.routines.animal.life_cycle.heiferII import HeiferII
 from RUFAS.routines.animal.life_cycle.heiferIII import HeiferIII
 from RUFAS.routines.animal.life_cycle.life_cycle import LifeCycleManager
-from RUFAS.routines.animal.life_cycle.calf import Calf
 from RUFAS.routines.animal.pen import Pen
 from RUFAS.routines.animal.ration import ration_driver as ration_driver
-from RUFAS.routines.feed.feed import Feed
-from RUFAS.routines.animal.ration.calf_ration import CalfRationManager
-from RUFAS.routines.animal.ration.ration_driver import RationReporter
-from RUFAS.routines.animal.ration.ration_driver import RationManager
-from RUFAS.routines.animal.animal_module_reporter import AnimalModuleReporter
-
 from RUFAS.routines.animal.ration import user_defined_ration as udr
+from RUFAS.routines.animal.ration.calf_ration import CalfRationManager
+from RUFAS.routines.animal.ration.ration_driver import RationManager
+from RUFAS.routines.animal.ration.ration_driver import RationReporter
+from RUFAS.routines.feed.feed import Feed
+from RUFAS.time import Time
+from RUFAS.weather import Weather
 
 om = OutputManager()
 
@@ -45,7 +46,7 @@ class AnimalManager:
         Pen.AnimalCombination.CLOSE_UP: AnimalModuleConstants.DEFAULT_NUM_STALLS_FOR_CLOSE_UP_PEN,
         Pen.AnimalCombination.LAC_COW: AnimalModuleConstants.DEFAULT_NUM_STALLS_FOR_LAC_COW_PEN,
         Pen.AnimalCombination.GROWING_AND_CLOSE_UP:
-        AnimalModuleConstants.DEFAULT_NUM_STALLS_FOR_GROWING_AND_CLOSE_UP_PEN,
+            AnimalModuleConstants.DEFAULT_NUM_STALLS_FOR_GROWING_AND_CLOSE_UP_PEN,
     }
 
     @classmethod
@@ -476,12 +477,12 @@ class AnimalManager:
                     pen.ration[key] = (pen.ration[key] / prior_pen_populations[index]) * len(pen.animals_in_pen)
 
     def daily_update_id_map(
-        self,
-        animals_added: List[AnimalBase],
-        animals_removed: List[AnimalBase],
-        calves_born: List[Calf],
-        feed: Feed,
-        current_temperature: float,
+            self,
+            animals_added: List[AnimalBase],
+            animals_removed: List[AnimalBase],
+            calves_born: List[Calf],
+            feed: Feed,
+            current_temperature: float,
     ) -> None:
         """
         Updates the dictionary that maps animal IDs to the ID of the pen they are housed in when
@@ -690,7 +691,7 @@ class AnimalManager:
 
     @classmethod
     def _create_default_pen(
-        cls, pen_id: int, animal_combination: Pen.AnimalCombination, num_stalls: int, max_stocking_density: float
+            cls, pen_id: int, animal_combination: Pen.AnimalCombination, num_stalls: int, max_stocking_density: float
     ) -> Pen:
         """
         Create a default Pen object with the given parameters.
@@ -742,7 +743,7 @@ class AnimalManager:
         )
 
     def _create_default_pens_for_potential_space_shortage(
-        self, num_animals: int, pens: List[Pen], animal_combination: Pen.AnimalCombination, start_pen_id=0
+            self, num_animals: int, pens: List[Pen], animal_combination: Pen.AnimalCombination, start_pen_id=0
     ) -> List[Pen]:
         """
         Create a list of default pens to accommodate potential animal space shortage.
@@ -827,7 +828,7 @@ class AnimalManager:
 
     @classmethod
     def _allocate_animals_to_pens_helper(
-        cls, animals: List[Union[Calf, HeiferI, HeiferII, HeiferIII, Cow]], pens: List[Pen]
+            cls, animals: List[Union[Calf, HeiferI, HeiferII, HeiferIII, Cow]], pens: List[Pen]
     ) -> None:
         """
         Allocate animals to pens based on overall density while preventing overcrowding.
@@ -864,10 +865,10 @@ class AnimalManager:
 
     @classmethod
     def execute_allocation_plan(
-        cls,
-        allocation_plan: List[int],
-        animals: List[Union[Calf, HeiferI, HeiferII, HeiferIII, Cow]],
-        animal_pens: List[Pen],
+            cls,
+            allocation_plan: List[int],
+            animals: List[Union[Calf, HeiferI, HeiferII, HeiferIII, Cow]],
+            animal_pens: List[Pen],
     ) -> None:
         """
         Execute an allocation plan to distribute animals into pens according to the given plan.
@@ -1113,7 +1114,7 @@ class AnimalManager:
 
     def record_pen_history(self) -> None:
         """
-        Records the pen history of all of the animals.
+        Records the pen history of all the animals.
         """
         self.gather_pen_history(self.calves)
         self.gather_pen_history(self.heiferIs)
@@ -1148,9 +1149,9 @@ class AnimalManager:
                 0 (False) otherwise.
         """
         return (
-            self.simulation_day % self.formulation_interval == 1
-            or self.formulation_interval == 1
-            or self.simulation_day == 0
+                self.simulation_day % self.formulation_interval == 1
+                or self.formulation_interval == 1
+                or self.simulation_day == 0
         )
 
     def get_initial_herd_summary(self) -> InitialHerdSummaryTypedDict:
@@ -1362,9 +1363,9 @@ class AnimalManager:
         return snapshot
 
     def _handle_removed_animals_after_update(
-        self,
-        animals_snapshot_before_update: Dict[str, set | Dict],
-        animals_snapshot_after_update: Dict[str, set | Dict],
+            self,
+            animals_snapshot_before_update: Dict[str, set | Dict],
+            animals_snapshot_after_update: Dict[str, set | Dict],
     ) -> None:
         """
         Dict[str, Dict[Union[Calf | HeiferI | HeiferII | HeiferIII]]]
@@ -1404,11 +1405,11 @@ class AnimalManager:
             self._remove_animal_from_pen_and_id_map(animal)
 
     def _handle_animals_with_unchanged_class_and_changed_combination(
-        self,
-        animals_snapshot_before_update: Dict[str, set | Dict],
-        animals_snapshot_after_update: Dict[str, set | Dict],
-        feed: Feed,
-        current_temperature: float,
+            self,
+            animals_snapshot_before_update: Dict[str, set | Dict],
+            animals_snapshot_after_update: Dict[str, set | Dict],
+            feed: Feed,
+            current_temperature: float,
     ):
         """
         Handle animals that didn't change their classes but changed their animal combination.
@@ -1450,8 +1451,8 @@ class AnimalManager:
         animals_with_unchanged_class_and_changed_combination = set()
         for animal in animals_with_unchanged_class:
             if (
-                animals_snapshot_before_update["animal_combination_by_id"][animal.id]
-                != animals_snapshot_after_update["animal_combination_by_id"][animal.id]
+                    animals_snapshot_before_update["animal_combination_by_id"][animal.id]
+                    != animals_snapshot_after_update["animal_combination_by_id"][animal.id]
             ):
                 animals_with_unchanged_class_and_changed_combination.add(animal)
 
@@ -1460,11 +1461,11 @@ class AnimalManager:
             self._add_animal_to_pen_and_id_map(animal, feed, current_temperature)
 
     def _handle_graduated_animals(
-        self,
-        animals_snapshot_before_update: Dict[str, set | Dict],
-        animals_snapshot_after_update: Dict[str, set | Dict],
-        feed: Feed,
-        current_temperature: float,
+            self,
+            animals_snapshot_before_update: Dict[str, set | Dict],
+            animals_snapshot_after_update: Dict[str, set | Dict],
+            feed: Feed,
+            current_temperature: float,
     ) -> None:
         """
         Finds animals that have graduated (moved from one class to another), moves them between pens,
@@ -1494,7 +1495,8 @@ class AnimalManager:
             self._add_animal_to_pen_and_id_map(animal, feed, current_temperature)
 
     def _handle_newly_added_animals(
-        self, new_animals: List[Union[Calf, HeiferI, HeiferII, HeiferIII, Cow]], feed: Feed, current_temperature: float
+            self, new_animals: List[Union[Calf, HeiferI, HeiferII, HeiferIII, Cow]], feed: Feed,
+            current_temperature: float
     ) -> None:
         """
         For all new animals, adds animal to a pen, and updates the pen id map.
@@ -1528,7 +1530,7 @@ class AnimalManager:
         del self.animal_to_pen_id_map[animal.id]
 
     def _add_animal_to_pen_and_id_map(
-        self, animal: Union[Calf, HeiferI, HeiferII, HeiferIII, Cow], feed: Feed, current_temperature: float
+            self, animal: Union[Calf, HeiferI, HeiferII, HeiferIII, Cow], feed: Feed, current_temperature: float
     ) -> None:
         """
         Adds animal to pen with lowest stocking density, and updates the pen id map accordingly.
@@ -1611,6 +1613,12 @@ class AnimalManager:
 
             self._handle_newly_added_animals([*animals_added, *calves_born], feed, current_temperature)
 
+            self._record_animal_counts()
+            if time.is_last_day_of_simulation:
+                self._record_animal_events(self.heiferIIs)
+                self._record_animal_events(self.cows)
+                self._record_heiferIIs_conception_rate()
+
             manure_excretions_output_data = {}
             for pen in self.all_pens:
                 self.collect_manure_excretions_output_data(pen, feed, manure_excretions_output_data)
@@ -1636,3 +1644,86 @@ class AnimalManager:
 
             self.life_cycle_manager.daily_milk_production = self.sum_daily_milk(self.cows)
             AnimalModuleReporter.report_daily_reports(self)
+
+    def _record_animal_events(self, animals: list[Calf, HeiferI, HeiferII, HeiferIII, Cow]) -> None:
+        """
+        Record the events of the animals.
+
+        Parameters
+        ----------
+        animals : list[Calf, HeiferI, HeiferII, HeiferIII, Cow]
+            A list of animals.
+
+        Returns
+        -------
+        None
+        """
+
+        info_map = {"class": self.__class__.__name__, "function": self._record_animal_events.__name__}
+        for animal in animals:
+            om.add_variable(f'{animal.__class__.__name__}_{animal.id}_last_day',
+                            animal.events,
+                            info_map)
+
+    def _record_animal_counts(self) -> None:
+        """
+        Record the number of animals in each animal class.
+
+        Returns
+        -------
+        None
+        """
+
+        info_map = {"class": self.__class__.__name__, "function": self._record_animal_counts.__name__}
+        om.add_variable('sim_day', self.simulation_day, info_map)
+        om.add_variable('num_animals', len(self.calves) + len(self.heiferIs) + len(self.heiferIIs) +
+                        len(self.heiferIIIs) + len(self.cows), info_map)
+        om.add_variable('num_calves', len(self.calves), info_map)
+        om.add_variable('num_heiferIs', len(self.heiferIs), info_map)
+        om.add_variable('num_heiferIIs', len(self.heiferIIs), info_map)
+        om.add_variable('num_heiferIIIs', len(self.heiferIIIs), info_map)
+        om.add_variable('num_lactating_cows', len([cow for cow in self.cows if cow.is_lactating]), info_map)
+        om.add_variable('num_dry_cows', len([cow for cow in self.cows if not cow.is_lactating]), info_map)
+        om.add_variable('num_cows', len(self.cows), info_map)
+        om.add_variable('num_cow_parity_1', self.life_cycle_manager.num_cow_for_parity['1'], info_map)
+        om.add_variable('num_cow_parity_2', self.life_cycle_manager.num_cow_for_parity['2'], info_map)
+        om.add_variable('num_cow_parity_3', self.life_cycle_manager.num_cow_for_parity['3'], info_map)
+        om.add_variable('num_cow_parity_3+', self.life_cycle_manager.num_cow_for_parity['greater_than_3'], info_map)
+
+    def _record_heiferIIs_conception_rate(self):
+        """
+        Record the conception rate of heiferIIs.
+
+        Returns
+        -------
+        None
+        """
+
+        info_map = {"class": self.__class__.__name__, "function": self._record_heiferIIs_conception_rate.__name__}
+        om.add_variable('heiferII_total_num_ai_performed', HeiferII.stats['num_ai_performed'], info_map)
+        om.add_variable('heiferII_total_num_successful_conceptions',
+                        HeiferII.stats['num_successful_conceptions'], info_map)
+        heiferII_overall_conception_rate = (HeiferII.stats['num_successful_conceptions'] / HeiferII.stats[
+            'num_ai_performed']) if HeiferII.stats['num_ai_performed'] > 0 else 0
+        om.add_variable('heiferII_overall_conception_rate', heiferII_overall_conception_rate, info_map)
+
+        om.add_variable('heiferII_num_ai_performed_in_ED', HeiferII.stats['num_ai_performed_in_ED'], info_map)
+        om.add_variable('heiferII_num_successful_conceptions_in_ED',
+                        HeiferII.stats['num_successful_conceptions_in_ED'], info_map)
+        ed_conception_rate = (HeiferII.stats['num_successful_conceptions_in_ED'] / HeiferII.stats[
+            'num_ai_performed_in_ED']) if HeiferII.stats['num_ai_performed_in_ED'] > 0 else 0
+        om.add_variable('heiferII_ED_conception_rate', ed_conception_rate, info_map)
+
+        om.add_variable('heiferII_num_ai_performed_in_TAI', HeiferII.stats['num_ai_performed_in_TAI'], info_map)
+        om.add_variable('heiferII_num_successful_conceptions_in_TAI',
+                        HeiferII.stats['num_successful_conceptions_in_TAI'], info_map)
+        tai_conception_rate = (HeiferII.stats['num_successful_conceptions_in_TAI'] / HeiferII.stats[
+            'num_ai_performed_in_TAI']) if HeiferII.stats['num_ai_performed_in_TAI'] > 0 else 0
+        om.add_variable('heiferII_TAI_conception_rate', tai_conception_rate, info_map)
+
+        om.add_variable('heiferII_num_ai_performed_in_SynchED', HeiferII.stats['num_ai_performed_in_SynchED'], info_map)
+        om.add_variable('heiferII_num_successful_conceptions_in_SynchED',
+                        HeiferII.stats['num_successful_conceptions_in_SynchED'], info_map)
+        synch_ed_conception_rate = (HeiferII.stats['num_successful_conceptions_in_SynchED'] / HeiferII.stats[
+            'num_ai_performed_in_SynchED']) if HeiferII.stats['num_ai_performed_in_SynchED'] > 0 else 0
+        om.add_variable('heiferII_SynchED_conception_rate', synch_ed_conception_rate, info_map)

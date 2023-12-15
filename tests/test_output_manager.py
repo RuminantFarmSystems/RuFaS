@@ -232,7 +232,7 @@ def test_dict_to_file_json(mock_output_manager: OutputManager) -> None:
         mock_output_manager.dict_to_file_json(data, "test")
 
     written_data = "".join(call[1][0] for call in open_mock().write.mock_calls)
-    assert written_data == json.dumps(data, indent=0)
+    assert written_data == json.dumps(data, indent=2)
 
 
 def test_dict_to_file_json_minify_output(mock_output_manager: OutputManager) -> None:
