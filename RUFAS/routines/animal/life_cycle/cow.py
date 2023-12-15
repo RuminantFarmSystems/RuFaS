@@ -591,10 +591,10 @@ class Cow(HeiferIII):
         if not self.do_not_breed:
             if self.repro_program == CowReproProtocolEnum.ED.value:
                 self.execute_ed_protocol(sim_day)
-            elif self.repro_program == 'ED-TAI':
+            elif self.repro_program == CowReproProtocolEnum.ED_TAI.value:
                 self.ed_tai_update(sim_day)
             elif self.repro_program == CowReproProtocolEnum.TAI.value:
-                if self.days_in_milk >= AnimalBase.config['voluntary_waiting_period']:
+                if self.days_in_milk >= self._get_voluntary_waiting_period():
                     self.tai_update(sim_day)
             else:
                 raise ValueError(f'Invalid cow repro program: {self.repro_program}')
@@ -694,7 +694,7 @@ class Cow(HeiferIII):
 
         """
 
-        return 1 <= self.days_in_milk <= self.get_voluntary_waiting_period()
+        return 1 <= self.days_in_milk <= self._get_voluntary_waiting_period()
 
     def execute_ed_protocol(self, sim_day: int) -> None:
         """
@@ -711,7 +711,7 @@ class Cow(HeiferIII):
         """
 
         if self.days_born == self.estrus_day:
-            if self.is_in_voluntary_waiting_period():
+            if 1 <= self.days_in_milk <= self._get_voluntary_waiting_period():
                 self.log_event(self.estrus_day, sim_day, const.ESTRUS_BEFORE_VWP_NOTE)
                 self._simulate_estrus(self.estrus_day, sim_day, const.ESTRUS_DAY_SCHEDULED_NOTE)
             elif self.is_breedable():
@@ -949,6 +949,29 @@ class Cow(HeiferIII):
             self.d5CoSynch_update(sim_day)
         else:
             raise ValueError(f'Invalid cow tai program: {self.tai_method_c}')
+
+    def execute_tai_protocol(self, sim_day: int) -> None:
+        """
+        Execute the timed artificial insemination protocol.
+
+        Parameters
+        ----------
+        sim_day : int
+            The current simulation day.
+
+        Returns
+        -------
+        None
+        """
+
+        if self.days_in_milk == self._get_voluntary_waiting_period():
+            # TODO: Incorporate presynch protocol
+            self._set_up_hormone_schedule('cows', self.get_user_defined_repro_sub_protocol(),
+                                          self.days_born)
+            self._TAI_conception_rate = self._get_user_defined_TAI_conception_rate()
+
+        if self._hormone_schedule:
+            self._execute_hormone_delivery_schedule(sim_day, self._hormone_schedule)
 
     # ED-TAI methods
     def ed_tai_update(self, sim_day):  # noqa
@@ -1206,7 +1229,7 @@ class Cow(HeiferIII):
         return AnimalBase.config['std_estrus_cycle_cow']
 
     @staticmethod
-    def get_voluntary_waiting_period() -> int:
+    def _get_voluntary_waiting_period() -> int:
         """
         Get the literature value for the voluntary waiting period for cows (days).
 
@@ -1217,6 +1240,19 @@ class Cow(HeiferIII):
         """
 
         return AnimalBase.config['voluntary_waiting_period']
+
+    @staticmethod
+    def _get_tai_program_start_day() -> int:
+        """
+        Get the TAI program start day for cows (days) defined by the user.
+
+        Returns
+        -------
+        int
+            The TAI program start day for cows (days) defined by the user.
+        """
+
+        return Cow.get_user_defined_repro_sub_properties()['tai_program_start_day']
 
     @staticmethod
     def get_user_defined_repro_data(attribute: str) -> Any:
@@ -1243,6 +1279,86 @@ class Cow(HeiferIII):
             raise KeyError(f'Invalid cow repro config attribute: {attribute}')
 
         return AnimalBase.config['cows'][attribute]
+
+    @staticmethod
+    def get_user_defined_repro_protocol() -> str:
+        """
+        Get the reproduction protocol for heifers defined by the user.
+
+        Returns
+        -------
+        str
+            The reproduction protocol for heifers defined by the user.
+        """
+
+        return AnimalBase.config['cow_repro_method']
+
+    @staticmethod
+    def get_user_defined_repro_sub_protocol() -> str:
+        """
+        Get the reproduction sub protocol for cows defined by the user.
+
+        Returns
+        -------
+        str
+            The reproduction sub protocol for cows defined by the user.
+        """
+
+        return Cow.get_user_defined_repro_data('repro_sub_protocol')
+
+    @staticmethod
+    def get_user_defined_repro_sub_properties() -> dict:
+        """
+        Get the reproduction sub properties for heifers defined by the user.
+
+        Returns
+        -------
+        dict
+            The reproduction sub properties for heifers defined by the user.
+        """
+
+        return Cow.get_user_defined_repro_data('repro_sub_properties')
+
+    @staticmethod
+    def get_user_defined_presynch_protocol() -> str:
+        """
+        Get the presynch protocol for cows defined by the user.
+
+        Returns
+        -------
+        str
+            The presynch protocol for cows defined by the user.
+        """
+
+        return Cow.get_user_defined_repro_data('presynch_protocol')
+
+    @staticmethod
+    def get_user_defined_resynch_protocol() -> str:
+        """
+        Get the resynch protocol for cows defined by the user.
+
+        Returns
+        -------
+        str
+            The resynch protocol for cows defined by the user.
+        """
+
+        return Cow.get_user_defined_repro_data('resynch_protocol')
+
+    @staticmethod
+    def _get_user_defined_TAI_conception_rate() -> float:
+        """
+        Get the user-defined conception rate for cows used in the TAI protocol.
+
+        This is to contrast with the estrus conception rate used in the ED protocol.
+
+        Returns
+        -------
+        float
+            The specific conception rate for cows used in the TAI protocol.
+        """
+
+        return Cow.get_user_defined_repro_sub_properties()['conception_rate']
 
     # Note: Not used yet. Will revisit during cow repro refactor.
     def _handle_successful_conception(self, sim_day: int) -> None:

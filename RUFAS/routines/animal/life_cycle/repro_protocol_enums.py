@@ -68,6 +68,10 @@ class CowReproProtocolEnum(Enum):
     TAI = 'TAI'
     ED_TAI = 'ED-TAI'
 
+    PreSynch_PreSynch = 'PreSynch'
+    PreSynch_DoubleOvSynch = 'Double OvSynch'
+    PreSynch_G6G = 'G6G'
+
     TAI_OvSynch_48 = 'OvSynch 48'
     TAI_OvSynch_56 = 'OvSynch 56'
     TAI_CoSynch_72 = 'CoSynch 72'
