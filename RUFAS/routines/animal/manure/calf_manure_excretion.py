@@ -1,7 +1,8 @@
 from typing import Tuple
 
 from RUFAS.general_constants import GeneralConstants
-from RUFAS.routines.animal.manure.general_manure import AnimalManureExcretions
+from RUFAS.routines.animal.manure.general_manure import AnimalManureExcretions, \
+    convert_negative_values_in_animal_manure_excretions
 from RUFAS.routines.animal.manure.general_manure import calculate_phosphorus_excretion_values
 from RUFAS.routines.animal.ration.ration_driver import RationReporter
 
@@ -107,5 +108,8 @@ def manure_calculations(ration_formulation,
         potassium=0,
         enteric_methane_g=methane_emission
     )
+
+    manure_excretion_values = convert_negative_values_in_animal_manure_excretions(
+        manure_excretion_values, to=abs)
 
     return total_phosphorus_excreted, manure_excretion_values

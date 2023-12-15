@@ -1,4 +1,4 @@
-from typing import Tuple
+from typing import Tuple, Callable
 from typing import TypedDict
 
 from RUFAS.general_constants import GeneralConstants
@@ -112,15 +112,33 @@ def add_animal_manure_excretions(first: AnimalManureExcretions, second: AnimalMa
 
     data = {}
     for key in first:
-        data[key] = first[key] + second[key]
+        data[key] = first[key] + second[key]  # type: ignore
     return AnimalManureExcretions(**data)
 
 
-def scalar_mult_animal_manure_excretions(manure: AnimalManureExcretions, scalar: float) \
-        -> AnimalManureExcretions:
+def convert_negative_values_in_animal_manure_excretions(manure: AnimalManureExcretions,
+                                                        to: Callable[[float], float] = lambda x: 0.0
+                                                        ) -> AnimalManureExcretions:
+    """
+    Convert negative values in an AnimalManureExcretions object to a given value.
+
+    Parameters
+    ----------
+    manure : AnimalManureExcretions
+        AnimalManureExcretions object to convert.
+    to : Callable[[float], float], optional, default=lambda x: 0.0
+        Function that takes a float and returns a float. This function is applied to negative values in the
+        AnimalManureExcretions object. The default function converts negative values to 0.0.
+
+    Returns
+    -------
+    AnimalManureExcretions
+        AnimalManureExcretions object with negative values converted to values returned by the to function.
+    """
+
     data = {}
     for key in manure:
-        data[key] = manure[key] * scalar
+        data[key] = max(manure[key], to(manure[key]))  # type: ignore
     return AnimalManureExcretions(**data)
 
 

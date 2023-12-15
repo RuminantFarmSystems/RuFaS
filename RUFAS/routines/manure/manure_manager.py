@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import typing
+import random
 from typing import Dict
 from typing import Optional
 from typing import Tuple
@@ -114,6 +115,12 @@ class ManureManager:
         )
         self._daily_output_per_pen = []
         self._manure_nutrient_manager = ManureNutrientManager()
+        self._manure_nutrient_manager_by_manure_type = {
+            ManureType.SLURRY: ManureNutrientManager(),
+            ManureType.LIQUID: ManureNutrientManager(),
+            ManureType.SOLID: ManureNutrientManager(),
+        }
+
         self._configure_manure_manager_components(animal_manager)
 
     @property
@@ -228,6 +235,70 @@ class ManureManager:
                 "prefix": "ManureNutrients",
             }
         )
+
+        ManureModuleOutputManagerHelper.add_dataclass_object(
+            self._manure_nutrient_manager_by_manure_type[ManureType.SLURRY].values,
+            info_maps={
+                "class": self.__class__.__name__,
+                "function": self.daily_update.__name__,
+                "prefix": "SlurryManureNutrients",
+            }
+        )
+
+        ManureModuleOutputManagerHelper.add_dataclass_object(
+            self._manure_nutrient_manager_by_manure_type[ManureType.LIQUID].values,
+            info_maps={
+                "class": self.__class__.__name__,
+                "function": self.daily_update.__name__,
+                "prefix": "LiquidManureNutrients",
+            }
+        )
+
+        ManureModuleOutputManagerHelper.add_dataclass_object(
+            self._manure_nutrient_manager_by_manure_type[ManureType.SOLID].values,
+            info_maps={
+                "class": self.__class__.__name__,
+                "function": self.daily_update.__name__,
+                "prefix": "SolidManureNutrients",
+            }
+        )
+
+        # Simulate random nutrient requests
+        random_integer = random.randint(1, 30)
+        if random_integer % 3 == 0:
+            request = NutrientRequest(
+                nitrogen=(self._manure_nutrient_manager_by_manure_type[ManureType.LIQUID].values.nitrogen *
+                          random.random()),
+                phosphorus=(self._manure_nutrient_manager_by_manure_type[ManureType.LIQUID].values.phosphorus *
+                            random.random()),
+            )
+            request_results = self.request_nutrients_by_manure_type(ManureType.LIQUID, request)
+            # self._manure_nutrient_manager._remove_nutrients(request_results)
+            # self.request_nutrients(request)
+        elif random_integer % 5 == 0:
+            request = NutrientRequest(
+                nitrogen=(self._manure_nutrient_manager_by_manure_type[ManureType.SLURRY].values.nitrogen *
+                          random.random()),
+                phosphorus=(self._manure_nutrient_manager_by_manure_type[ManureType.SLURRY].values.phosphorus *
+                            random.random()),
+            )
+            request_results = self.request_nutrients_by_manure_type(ManureType.SLURRY, request)
+            # self._manure_nutrient_manager._remove_nutrients(request_results)
+            # self.request_nutrients(request)
+        # elif random_integer % 7 == 0:
+        #     request = NutrientRequest(
+        #         nitrogen=(self._manure_nutrient_manager_by_manure_type[ManureType.SOLID].values.nitrogen *
+        #                   random.random()),
+        #         phosphorus=(self._manure_nutrient_manager_by_manure_type[ManureType.SOLID].values.phosphorus *
+        #                     random.random()),
+        #     )
+        #     request_results = self.request_nutrients_by_manure_type(ManureType.SOLID, request)
+        #     # self._manure_nutrient_manager._remove_nutrients(request_results)
+        #     # self.request_nutrients(request)
+
+        # The difficulty is if we support both a general request and a specific request,
+        # If we make a general request, we don't know yet how to decide which manure pool to get the
+        # nutrients from.
 
     @staticmethod
     def _get_manure_type(treatment_type: ManureTreatmentType) -> ManureType:
@@ -352,6 +423,43 @@ class ManureManager:
             )
         )
 
+        # TODO: Check whether we should look up the manure type from the current manure management system
+        # and then add the nutrients to the corresponding manure nutrient manager.
+        # For example, a slurry storage can produce both liquid and sludge manure.
+
+        self._manure_nutrient_manager_by_manure_type[ManureType.SLURRY].add_nutrients(
+            ManureNutrients(
+                nitrogen=manure_treatment_daily_output.sludge_manure_nitrogen,
+                phosphorus=manure_treatment_daily_output.sludge_manure_phosphorus,
+                potassium=manure_treatment_daily_output.sludge_manure_potassium,
+                dry_matter=manure_treatment_daily_output.sludge_manure_total_solids,
+                total_manure_mass=(manure_treatment_daily_output.sludge_manure_daily_volume
+                                   * self._get_manure_density_by_type(ManureType.SLURRY)),
+            )
+        )
+
+        self._manure_nutrient_manager_by_manure_type[ManureType.LIQUID].add_nutrients(
+            ManureNutrients(
+                nitrogen=manure_treatment_daily_output.liquid_manure_nitrogen,
+                phosphorus=manure_treatment_daily_output.liquid_manure_phosphorus,
+                potassium=manure_treatment_daily_output.liquid_manure_potassium,
+                dry_matter=manure_treatment_daily_output.liquid_manure_total_solids,
+                total_manure_mass=(manure_treatment_daily_output.liquid_manure_daily_volume
+                                   * self._get_manure_density_by_type(ManureType.LIQUID)),
+            )
+        )
+
+        self._manure_nutrient_manager_by_manure_type[ManureType.SOLID].add_nutrients(
+            ManureNutrients(
+                nitrogen=manure_treatment_daily_output.solid_manure_nitrogen,
+                phosphorus=manure_treatment_daily_output.solid_manure_phosphorus,
+                potassium=manure_treatment_daily_output.solid_manure_potassium,
+                dry_matter=manure_treatment_daily_output.solid_manure_total_solids,
+                total_manure_mass=manure_treatment_daily_output.solid_manure_daily_mass,
+            )
+        )
+
+# remove
     def request_nutrients(self, request: NutrientRequest) -> NutrientRequestResults:
         """
         Handle the request for specific nutrients from the crop and soil module.
@@ -379,9 +487,43 @@ class ManureManager:
             the amount of nitrogen, phosphorus, total manure mass, dry matter, and others that
             can be provided to fulfill the request.
             Returns None if the request cannot be fulfilled.
-
         """
+
         return self._manure_nutrient_manager.request_nutrients(request)
+
+    def request_nutrients_by_manure_type(self,
+                                         manure_type: ManureType,
+                                         request: NutrientRequest,
+                                         ) -> NutrientRequestResults:
+        """
+        Handle the request for specific nutrients from the crop and soil module by manure type.
+
+        Parameters
+        ----------
+        manure_type : ManureType
+            The type of manure. The possible values are specified in the definition of
+            the enum class :class:`ManureType`.
+        request : NutrientRequest
+            The specific nutrient request, including quantities of nitrogen and phosphorus.
+
+        Returns
+        -------
+        NutrientRequestResults | None
+            The results of the nutrient request, detailed in a `NutrientRequestResults` object, which includes
+            the amount of nitrogen, phosphorus, total manure mass, dry matter, and others that
+            can be provided to fulfill the request.
+            Returns None if the request cannot be fulfilled.
+
+        Raises
+        ------
+        KeyError
+            If the given manure type is invalid.
+        """
+
+        if manure_type not in self._manure_nutrient_manager_by_manure_type:
+            raise KeyError(f"Invalid manure type: {manure_type}")
+
+        return self._manure_nutrient_manager_by_manure_type[manure_type].request_nutrients(request)
 
     def _pen_daily_update(self, simulation_day: int, pen) -> None:
         """

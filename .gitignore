@@ -34,6 +34,11 @@ output/*
 output/graphics/*
 !output/output_filters/
 output/output_filters/*
+!output/output_filters/graph_manure_nutrients.json
+!output/output_filters/graph_tracking_manure_nitrogen.json
+!output/output_filters/graph_liquid_manure_nutrients.json
+!output/output_filters/graph_solid_manure_nutrients.json
+!output/output_filters/graph_slurry_manure_nutrients.json
 
 # ignore project files
 *.sublime-project

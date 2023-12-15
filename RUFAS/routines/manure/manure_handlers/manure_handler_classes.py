@@ -122,11 +122,7 @@ class BaseManureHandler:
             pen_id=pen.id,
             manure_urea=pen.manure.urea,
             liquid_manure_total_ammoniacal_nitrogen=(
-                max(
-                    0.0,
-                    pen.manure.manure_total_ammoniacal_nitrogen
-                    - housing_ammonia_emission,
-                )
+                max(0.0, pen.manure.manure_total_ammoniacal_nitrogen - (housing_ammonia_emission * 14.0 / 17.0))
             ),
             liquid_manure_nitrogen=pen.manure.nitrogen,
             liquid_manure_total_solids=pen.manure.total_solids,
