@@ -70,7 +70,7 @@ class AnimalPopulation:
         -------
         int
             The next unique animal_id.
-       """
+        """
         self.current_animal_id += 1
         return self.current_animal_id
 
