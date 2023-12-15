@@ -10,6 +10,10 @@
 		"herd_init": false,
 		"breed": "HO"
 	},
+	"herd_initialization": {
+		"initial_animal_num": 10000,
+		"simulation_days": 5000
+	},
 	"animal_config": {
 		"management_decisions": {
 			"breeding_start_day_h": 360,
@@ -20,7 +24,7 @@
 			"lactation_curve": "wood",
 			"heifer_repro_cull_time": 650,
 			"repro_cull_time": 300,
-			"do_not_breed_time" : 300,
+			"do_not_breed_time": 300,
 			"cull_milk_production": 22,
 			"cow_times_milked_per_day": 1
 		},
@@ -47,26 +51,26 @@
 					"estrus_detection_rate": 0.6,
 					"estrus_conception_rate": 0.6,
 					"presynch_protocol": "Double OvSynch",
-                    "resynch_protocol": "TAIafterPD",
-                    "repro_sub_protocol": "OvSynch 56",
+					"resynch_protocol": "TAIafterPD",
+					"repro_sub_protocol": "OvSynch 56",
 					"repro_sub_properties": {
 						"conception_rate": 0.5,
 						"tai_program_start_day": 70
 					}
 				},
-                "cow_repro_programs": {
-                    "estrus_detection_rate": 0.6,
-                    "estrus_service_rate": 1,
-                    "ed_conception_rate": 0.6,
-                    "cow_presynch_protocol": "Double OvSynch",
-                    "cow_TAI_protocol": "OvSynch 56",
-                    "ovsynch56_conception_rate": 0.6,
-                    "ovsynch48_conception_rate": 0.6,
+				"cow_repro_programs": {
+					"estrus_detection_rate": 0.6,
+					"estrus_service_rate": 1,
+					"ed_conception_rate": 0.6,
+					"cow_presynch_protocol": "Double OvSynch",
+					"cow_TAI_protocol": "OvSynch 56",
+					"ovsynch56_conception_rate": 0.6,
+					"ovsynch48_conception_rate": 0.6,
 					"cosynch72_conception_rate": 0.6,
-                    "cosynch5d_conception_rate": 0.6,
-                    "cow_resynch_protocol": "TAIafterPD",
-                    "tai_program_start_day": 72
-                },
+					"cosynch5d_conception_rate": 0.6,
+					"cow_resynch_protocol": "TAIafterPD",
+					"tai_program_start_day": 72
+				},
 				"voluntary_waiting_period": 45,
 				"tai_program_start_day": 72,
 				"conception_rate_decrease": 0.026,
@@ -81,8 +85,8 @@
 				"birth_weight_std_je": 0.9,
 				"target_heifer_preg_day": 420,
 				"mature_body_weight_avg": 740.1,
-        		"mature_body_weight_std": 73.5
-			}		
+				"mature_body_weight_std": 73.5
+			}
 		},
 		"from_literature": {
 			"repro": {
