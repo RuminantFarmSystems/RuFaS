@@ -24,4 +24,4 @@ if [ -z "$changed_files" ]; then
     exit 0
 fi
 
-flake8 "$changed_files"
+flake8 $changed_files
