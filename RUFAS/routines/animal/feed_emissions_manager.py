@@ -1,5 +1,4 @@
-import json
-import urllib.request as request
+import requests
 
 from RUFAS.input_manager import InputManager
 from RUFAS.output_manager import OutputManager
@@ -51,9 +50,8 @@ class FeedEmissionsManager:
         query_parameters = f"latitude={latitude}&longitude={longitude}&format=json"
         call = endpoint + query_parameters
 
-        with request.urlopen(call) as response:
-            answer = response.read()
-        answer = json.load(answer)
+        response = requests.get(call)
+        answer = response.json()
 
         if answer["status"] != "OK":
             info_map = {
