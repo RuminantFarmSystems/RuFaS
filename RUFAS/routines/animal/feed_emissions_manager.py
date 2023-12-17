@@ -70,7 +70,6 @@ class FeedEmissionsManager:
         emissions_dict["feed_emissions_total"] = total_emissions
         return emissions_dict
 
-
     def _get_geographic_coordinates(self) -> (float, float):
         info_map = {
             "class": self.__class__.__name__,
