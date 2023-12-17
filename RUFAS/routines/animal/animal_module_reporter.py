@@ -3,6 +3,7 @@ import numpy as np
 from RUFAS.output_manager import OutputManager
 from RUFAS.routines.animal.ration.ration_driver import RationReporter
 from RUFAS.routines.animal.manure.general_manure import AnimalManureExcretions
+from RUFAS.routines.animal.feed_emissions_manager import FeedEmissionsManager
 
 om = OutputManager()
 
@@ -168,11 +169,42 @@ class AnimalModuleReporter:
                 if key != "status" and key != "objective":
                     ration_total[key] = pen.ration_per_animal[key] * len(pen.animals_in_pen)
                     ration_total["dry_matter_intake_total"] += ration_total[key]
+            AnimalModuleReporter.report_daily_feed_emissions(ration_total, pen.id, pen.animal_combination.name,
+                                                             animal_manager.feed_emissions_manager)
             om.add_variable(
                 f"ration_daily_feed_totals_for_pen_{pen.id}_{pen.animal_combination.name}",
                 ration_total,
                 info_map,
             )
+
+    def report_daily_feed_emissions(ration_total: dict[str, float], pen_id: int, pen_animal_name: str,
+                                    feed_emissions_manager: FeedEmissionsManager) -> None:
+        """
+        Adds emissions totals from purchased feeds on a pen / feed basis.
+
+        Parameters
+        ----------
+        ration_total : dict[str, float]
+           Total amounts of dry matter per feed type fed to the pen.
+        pen_id : int
+            The unique number identifying a pen.
+        pen_animal_name : str
+            The name of the animal combination in a pen.
+        feed_emissions_manager : FeedEmissionsManager
+            The Feed Emissions Manager for the Animal Manager.
+
+        """
+        info_map = {
+            "class": "AnimalModuleReporter",
+            "function": "report_daily_feed_emissions",
+        }
+
+        daily_feed_emissions = feed_emissions_manager.create_daily_purchased_feed_emissions_report(ration_total)
+        om.add_variable(
+            f"ration_daily_feed_emissions_totals_for_pen_{pen_id}_{pen_animal_name}",
+            daily_feed_emissions,
+            info_map
+        )
 
     def report_animal_module_manure(
         manure_excretions_output_data: dict[str, dict[str | AnimalManureExcretions]],

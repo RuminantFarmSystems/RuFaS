@@ -26,6 +26,8 @@ class FeedEmissionsManager:
         self.feed_emissions: dict[str, float] = self._setup_feed_emissions()
         om.add_variable("purchased_feed_emissions", self.feed_emissions, info_map)
 
+        self.missing_feed_ids: list[str] = []
+
     def create_daily_purchased_feed_emissions_report(self, daily_feed_totals: dict[str, float]) -> dict[str, float]:
         """
         Reports the total emissions from the feeds given to a pen.
@@ -41,9 +43,27 @@ class FeedEmissionsManager:
             Maps the feed type to the amount of emissions generated in producing and delivering it (kg).
 
         """
+        info_map = {
+            "class": self.__class__.__name__,
+            "function": self.create_daily_purchased_feed_emissions_report.__name__
+        }
+
         total_emissions = 0.0
         emissions_dict = {}
+
         for feed_id, amount_fed in daily_feed_totals.items():
+            if feed_id == "dry_matter_intake_total":
+                continue
+            if feed_id in self.missing_feed_ids:
+                continue
+            elif feed_id not in self.feed_emissions.keys():
+                om.add_warning(
+                    "Purchased Feed Emissions Warning",
+                    f"Missing purchased feed emissions data for RuFaS feed {feed_id}.",
+                    info_map
+                )
+                self.missing_feed_ids.append(feed_id)
+                continue
             emissions = amount_fed * self.feed_emissions[feed_id]
             total_emissions += emissions
             emissions_dict[feed_id] = emissions
