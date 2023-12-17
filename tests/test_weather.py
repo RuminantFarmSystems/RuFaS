@@ -169,10 +169,10 @@ def test_record_weather(mock_weather: Weather, mock_current_day_conditions: Curr
 
 
 @pytest.mark.parametrize("field_keys,field_data,expected_latitude", [
-    (["field_1", "field_2"], {"abs_latitude": 34.1}, 34.1),
+    (["field_1", "field_2"], 34.1, 34.1),
     ([], None, 43.0723)
 ])
-def test_get_latitude(field_keys: list[str], field_data: dict[str, float], expected_latitude: float,
+def test_get_latitude(field_keys: list[str], field_data: float, expected_latitude: float,
                       mock_weather: Weather) -> None:
     """Test that Weather correctly gets a latitude from Input Manager or uses the default."""
     with patch("RUFAS.input_manager.InputManager.get_data_keys_by_properties", return_value=field_keys) as keys, \
@@ -181,7 +181,7 @@ def test_get_latitude(field_keys: list[str], field_data: dict[str, float], expec
 
     keys.assert_called_once_with("field_properties")
     if field_data:
-        expected_data_address = f"{field_keys[0]}.abs_latitude"
+        expected_data_address = f"{field_keys[0]}.absolute_latitude"
         data.assert_called_once_with(expected_data_address)
     else:
         data.assert_not_called()
