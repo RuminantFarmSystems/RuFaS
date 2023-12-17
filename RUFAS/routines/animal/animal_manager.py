@@ -3,7 +3,7 @@ from __future__ import annotations
 import collections
 import math
 from statistics import mean
-from typing import Any, Dict, Tuple, List, Set, Union
+from typing import Any, Dict, Tuple, List, Set, Union, Optional
 
 from RUFAS.general_constants import GeneralConstants
 from RUFAS.output_manager import OutputManager
@@ -82,7 +82,8 @@ class AnimalManager:
         config.update(data["from_literature"]["life_cycle"])
         return config
 
-    def __init__(self, data, config, feed: Feed, weather: Weather, time: Time):
+    def __init__(self, data, config, feed: Feed, weather: Weather, time: Time,
+                 feed_emissions_manager: FeedEmissionsManager = None):
         """
         Initializes the pens and animals in the simulation with data from the
         JSON file by calling init_pens() and init_animals(). Creates instance
@@ -100,6 +101,9 @@ class AnimalManager:
             instance of the Weather class
         time : Time
             instance of the Time class
+        feed_emissions_manager : FeedEmissionsManager, default=None
+            Instance of the FeedEmissionsManager class.
+
         """
 
         # simulation length, days
@@ -186,7 +190,7 @@ class AnimalManager:
 
         self._print_animal_num_warnings(data["herd_information"])
 
-        self.feed_emissions_manager = FeedEmissionsManager()
+        self.feed_emissions_manager: Optional[FeedEmissionsManager] = feed_emissions_manager or FeedEmissionsManager()
 
     @property
     def animals_by_type(self):

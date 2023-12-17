@@ -3,7 +3,6 @@ import numpy as np
 from RUFAS.output_manager import OutputManager
 from RUFAS.routines.animal.ration.ration_driver import RationReporter
 from RUFAS.routines.animal.manure.general_manure import AnimalManureExcretions
-from RUFAS.routines.animal.feed_emissions_manager import FeedEmissionsManager
 
 om = OutputManager()
 
@@ -170,7 +169,7 @@ class AnimalModuleReporter:
                     ration_total[key] = pen.ration_per_animal[key] * len(pen.animals_in_pen)
                     ration_total["dry_matter_intake_total"] += ration_total[key]
             AnimalModuleReporter.report_daily_feed_emissions(ration_total, pen.id, pen.animal_combination.name,
-                                                             animal_manager.feed_emissions_manager)
+                                                             animal_manager)
             om.add_variable(
                 f"ration_daily_feed_totals_for_pen_{pen.id}_{pen.animal_combination.name}",
                 ration_total,
@@ -178,7 +177,7 @@ class AnimalModuleReporter:
             )
 
     def report_daily_feed_emissions(ration_total: dict[str, float], pen_id: int, pen_animal_name: str,
-                                    feed_emissions_manager: FeedEmissionsManager) -> None:
+                                    animal_manager) -> None:
         """
         Adds emissions totals from purchased feeds on a pen / feed basis.
 
@@ -199,7 +198,8 @@ class AnimalModuleReporter:
             "function": "report_daily_feed_emissions",
         }
 
-        daily_feed_emissions = feed_emissions_manager.create_daily_purchased_feed_emissions_report(ration_total)
+        daily_feed_emissions = animal_manager.feed_emissions_manager.\
+            create_daily_purchased_feed_emissions_report(ration_total)
         om.add_variable(
             f"ration_daily_feed_emissions_totals_for_pen_{pen_id}_{pen_animal_name}",
             daily_feed_emissions,

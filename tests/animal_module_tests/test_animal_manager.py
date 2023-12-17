@@ -15,6 +15,7 @@ from RUFAS.routines.animal.life_cycle.heiferIII import HeiferIII
 from RUFAS.routines.animal.pen import Pen
 from RUFAS.routines.animal.ration.ration_driver import RationReporter
 from RUFAS.routines.feed.feed import Feed
+from RUFAS.routines.animal.feed_emissions_manager import FeedEmissionsManager
 from RUFAS.output_manager import OutputManager
 from RUFAS.input_manager import InputManager
 
@@ -282,10 +283,10 @@ def animal_manager(input_manager: InputManager, mock_im_pool: Dict[str, Dict[str
     feed = MagicMock()
     weather = MagicMock()
     time = MagicMock()
+    feed_emissions_manager = MagicMock()
 
     input_manager._InputManager__pool = mock_im_pool
-    animal_manager = AnimalManager(data, config, feed, weather, time)
-
+    animal_manager = AnimalManager(data, config, feed, weather, time, feed_emissions_manager)
     init_pens_patch.stop()
     init_animals_patch.stop()
     init_nutrient_rqmts_patch.stop()
@@ -1507,11 +1508,15 @@ def test_daily_updates(is_end_ration_interval: bool, mocker: MockerFixture) -> N
     mock_time = mocker.MagicMock()
     mock_time.year = 2023
     mock_time.day = 1
+    mock_feed_emissions_manager = MagicMock(FeedEmissionsManager)
+
+    mocker.patch('RUFAS.routines.animal.animal_module_reporter.AnimalModuleReporter.report_daily_feed_emissions',
+                 return_value=None)
 
     mocker.patch('RUFAS.routines.animal.animal_manager.AnimalManager.__init__', return_value=None)
     mock_animal_manager = AnimalManager(data=mocker.MagicMock(), config=mocker.MagicMock(),
                                         feed=mock_feed, weather=mock_weather,
-                                        time=mock_time)
+                                        time=mock_time, feed_emissions_manager=mock_feed_emissions_manager)
 
     mock_animal_manager.simulate_animals = True
     mock_animal_manager.simulation_day = 90
