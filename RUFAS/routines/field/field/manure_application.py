@@ -260,8 +260,6 @@ class ManureApplication:
         the Fortran code was sent to the RuFaS team.
 
         """
-        # TODO: evaluate how to best apply subsurface liquid manure, it is likely more complicated than how this method
-        #   accomplishes it - issue #713
         surface_dry_matter_mass = dry_matter_mass * surface_remainder_fraction
         wet_rate = self._determine_wet_rate_factor(surface_dry_matter_mass, dry_matter_fraction, field_coverage,
                                                    field_size)
@@ -282,7 +280,6 @@ class ManureApplication:
         self.data.machine_stable_organic_phosphorus += total_phosphorus_mass * \
             stable_organic_phosphorus_fraction * surface_retention * surface_remainder_fraction
 
-        # TODO: put infiltrated organic phosphorus into corresponding soil pools - issue #444
         mass_to_add_to_labile_P = total_phosphorus_mass * water_extractable_inorganic_phosphorus_fraction * \
             soil_infiltration
         mass_to_add_to_labile_P += total_phosphorus_mass * water_extractable_organic_phosphorus_fraction * \
@@ -353,21 +350,29 @@ class ManureApplication:
         References
         ----------
         SWAT Theoretical documentation section 6:1.7
+        pseudocode_field_management [FM.4.D.1]
 
         Notes
         -----
         This method allows nitrogen to be added to any soil layer in the profile by specifying the index of that layer.
         The top soil layer will always be at index 0.
 
+        Instead of partitioning organic nitrogen between the fresh and active pools, it is partitioned between the
+        stable and active pools. Refer to the pseudocode for this.
+
         """
         nitrates_added = (dry_matter_mass * inorganic_nitrogen_fraction * (1 - ammonium_fraction)) / field_size
         ammonium_added = (dry_matter_mass * inorganic_nitrogen_fraction * ammonium_fraction) / field_size
-        organic_nitrogen_added = (dry_matter_mass * organic_nitrogen_fraction * 0.5) / field_size
+        active_fraction_of_organic_nitrogen = 0.9286
+        active_organic_nitrogen_added = (dry_matter_mass * organic_nitrogen_fraction *
+                                         active_fraction_of_organic_nitrogen) / field_size
+        stable_organic_nitrogen_added = (dry_matter_mass * organic_nitrogen_fraction *
+                                         (1.0 - active_fraction_of_organic_nitrogen)) / field_size
 
         self.data.soil_layers[layer_index].nitrate_content += nitrates_added
         self.data.soil_layers[layer_index].ammonium_content += ammonium_added
-        self.data.soil_layers[layer_index].fresh_organic_nitrogen_content += organic_nitrogen_added
-        self.data.soil_layers[layer_index].active_organic_nitrogen_content += organic_nitrogen_added
+        self.data.soil_layers[layer_index].stable_organic_nitrogen_content += stable_organic_nitrogen_added
+        self.data.soil_layers[layer_index].active_organic_nitrogen_content += active_organic_nitrogen_added
 
     def _apply_subsurface_manure(self, total_phosphorus_mass: float,
                                  water_extractable_inorganic_phosphorus_fraction: float,
