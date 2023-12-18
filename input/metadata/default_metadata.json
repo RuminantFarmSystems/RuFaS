@@ -44,7 +44,7 @@
     },
     "purchased_feeds_emissions": {
       "title": "Emissions from purchased feeds",
-      "description": "",
+      "description": "Specifies how much emissions are associated with purchased feed types.",
       "path": "input/data/EEE/usable_feeds_emissions.csv",
       "type": "csv",
       "properties": "feed_emissions_properties"
