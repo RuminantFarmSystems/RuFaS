@@ -1,0 +1,40 @@
+{
+  "multiple": [
+    {
+      "type": "plot",
+      "filters": [
+        "AnimalManager._record_animal_counts.num_animals",
+        "AnimalManager._record_animal_counts.num_calves",
+        "AnimalManager._record_animal_counts.num_heiferIIs",
+        "AnimalManager._record_animal_counts.num_lactating_cows",
+        "AnimalManager._record_animal_counts.num_dry_cows"
+      ],
+      "title": "Herd Composition",
+      "legend": [
+        "Total Animals",
+        "Calves",
+        "Heifer II",
+        "Lactating Cows",
+        "Dry Cows"
+      ]
+    },
+    {
+      "type": "plot",
+      "filters": [
+        "AnimalManager._record_animal_counts.num_cows",
+        "AnimalManager._record_animal_counts.num_cow_parity_1",
+        "AnimalManager._record_animal_counts.num_cow_parity_2",
+        "AnimalManager._record_animal_counts.num_cow_parity_3",
+        "AnimalManager._record_animal_counts.num_cow_parity_3+"
+      ],
+      "title": "Cow Parity",
+      "legend": [
+        "Total Cows",
+        "Parity 1",
+        "Parity 2",
+        "Parity 3",
+        "Parity 3+"
+      ]
+    }
+  ]
+}
