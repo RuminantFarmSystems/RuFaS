@@ -13,5 +13,4 @@ class ManureType(Enum):
     """
 
     LIQUID = "liquid"
-    SLURRY = "slurry"
     SOLID = "solid"
