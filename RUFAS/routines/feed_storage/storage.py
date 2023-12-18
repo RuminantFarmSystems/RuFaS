@@ -64,7 +64,14 @@ class Storage:
         -------
         None
         """
-        pass
+        if self.stored_mass + crop.fresh_mass > self.capacity:
+            raise Exception(
+                f"Adding {crop.fresh_mass} to currently stored ({self.stored_mass})\
+                    exceeds the storage capacity ({self.capacity})"
+            )
+        storage_crop = copy.deepcopy(crop)
+        storage_crop.storage_time = time
+        self.stored.append(storage_crop)
 
     def process_degradations(self):
         """
