@@ -262,6 +262,8 @@ class LayerData:
     """Fresh organic nitrogen content of this soil layer (kg / ha)
         Note: all layers except the top layer are initialized with 0 fresh organic nitrogen."""
 
+    nitrous_oxide_emissions: float = 0.0
+    """Amount of nitrous oxide emitted from this soil layer on the current day (kg / ha)."""
     annual_denitrified_nitrogen_total: float = 0
     """Cumulative total amount of nitrates that have denitrified in a year (kg / ha)"""
 
@@ -283,8 +285,17 @@ class LayerData:
     """Exchange factor that accounts for the soil's cation exchange capacity, default = 0.15 (unitless)
         Reference: SWAT Theoretical documentation eqn. 3:1.3.5"""
 
+    volatilized_ammonium_emissions: float = 0.0
+    """Amount of ammonium that volatilized out of the soil layer on the current day (kg / ha)."""
     annual_volatilized_ammonium_total: float = 0
     """Cumulative total of ammonium volatilized in this year (kg / ha)"""
+
+    percolated_nitrates: float = 0.0
+    """Amount of nitrates removed from the soil layer by water percolating out (kg / ha)."""
+    percolated_ammonium: float = 0.0
+    """Amount of ammonium removed from the soil layer by water percolating out (kg / ha)."""
+    percolated_active_organic_nitrogen: float = 0.0
+    """Amount of active organic nitrogen removed from the soil layer by water percolating out (kg / ha)."""
 
     # --- Carbon cycling
     soil_overall_carbon_fraction: Optional[float] = None
@@ -615,7 +626,8 @@ class LayerData:
 
     @property
     def nutrient_cycling_water_factor(self) -> float:
-        """The nutrient cycling water factor (unitless)
+        """
+        The nutrient cycling water factor (unitless).
 
         References
         ----------
@@ -623,10 +635,11 @@ class LayerData:
 
         Notes
         -----
-        This factor is lower bounded at 0.05
+        This factor is lower bounded at 0.05.
 
         """
-        return max(0.05, self.water_content / self.field_capacity_content)
+        lower_bounded = max(0.05, self.water_content / self.field_capacity_content)
+        return lower_bounded
 
     @property
     def available_water_capacity(self):
