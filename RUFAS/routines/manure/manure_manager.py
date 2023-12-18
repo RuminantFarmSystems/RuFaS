@@ -279,7 +279,6 @@ class ManureManager:
         """
 
         manure_density_by_manure_type = {
-            ManureType.SLURRY: ManureConstants.SLURRY_MANURE_DENSITY,
             ManureType.LIQUID: ManureConstants.LIQUID_MANURE_DENSITY,
             ManureType.SOLID: ManureConstants.SOLID_MANURE_DENSITY,
         }
@@ -305,50 +304,78 @@ class ManureManager:
         None
         """
 
-        nitrogen = max(
-            manure_treatment_daily_output.liquid_manure_nitrogen
-            + manure_treatment_daily_output.sludge_manure_nitrogen
-            + manure_treatment_daily_output.solid_manure_nitrogen,
-            0.0
-        )
+        liquid_manure_nitrogen = max(manure_treatment_daily_output.liquid_manure_nitrogen, 0.0)
+        solid_manure_nitrogen = max(manure_treatment_daily_output.solid_manure_nitrogen, 0.0)
+        # sludge_manure_nitrogen = max(manure_treatment_daily_output.sludge_manure_nitrogen, 0.0)
+        # nitrogen = max(
+        #     manure_treatment_daily_output.liquid_manure_nitrogen
+        #     + manure_treatment_daily_output.sludge_manure_nitrogen
+        #     + manure_treatment_daily_output.solid_manure_nitrogen,
+        #     0.0
+        # )
 
-        phosphorus = max(
-            manure_treatment_daily_output.liquid_manure_phosphorus
-            + manure_treatment_daily_output.sludge_manure_phosphorus
-            + manure_treatment_daily_output.solid_manure_phosphorus,
-            0.0
-        )
+        liquid_manure_phosphorus = max(manure_treatment_daily_output.liquid_manure_phosphorus, 0.0)
+        solid_manure_phosphorus = max(manure_treatment_daily_output.solid_manure_phosphorus, 0.0)
+        # sludge_manure_phosphorus = max(manure_treatment_daily_output.sludge_manure_phosphorus, 0.0)
 
-        potassium = max(
-            manure_treatment_daily_output.liquid_manure_potassium
-            + manure_treatment_daily_output.sludge_manure_potassium
-            + manure_treatment_daily_output.solid_manure_potassium,
-            0.0,
-        )
+        # phosphorus = max(
+        #     manure_treatment_daily_output.liquid_manure_phosphorus
+        #     + manure_treatment_daily_output.sludge_manure_phosphorus
+        #     + manure_treatment_daily_output.solid_manure_phosphorus,
+        #     0.0
+        # )
 
-        dry_matter = max(
-            manure_treatment_daily_output.liquid_manure_total_solids
-            + manure_treatment_daily_output.sludge_manure_total_solids
-            + manure_treatment_daily_output.solid_manure_total_solids,
-            0.0,
-        )
+        liquid_manure_potassium = max(manure_treatment_daily_output.liquid_manure_potassium, 0.0)
+        solid_manure_potassium = max(manure_treatment_daily_output.solid_manure_potassium, 0.0)
+        # sludge_manure_potassium = max(manure_treatment_daily_output.sludge_manure_potassium, 0.0)
+        # potassium = max(
+        #     manure_treatment_daily_output.liquid_manure_potassium
+        #     + manure_treatment_daily_output.sludge_manure_potassium
+        #     + manure_treatment_daily_output.solid_manure_potassium,
+        #     0.0,
+        # )
 
-        total_manure_mass = max(
-            manure_treatment_daily_output.liquid_manure_daily_volume
-            * self._get_manure_density_by_type(ManureType.LIQUID)
-            + manure_treatment_daily_output.sludge_manure_daily_volume
-            * self._get_manure_density_by_type(ManureType.SLURRY)
-            + manure_treatment_daily_output.solid_manure_daily_mass,
-            0.0
+        liquid_manure_total_solids = max(manure_treatment_daily_output.liquid_manure_total_solids, 0.0)
+        solid_manure_total_solids = max(manure_treatment_daily_output.solid_manure_total_solids, 0.0)
+        # sludge_manure_total_solids = max(manure_treatment_daily_output.sludge_manure_total_solids, 0.0)
+        # dry_matter = max(
+        #     manure_treatment_daily_output.liquid_manure_total_solids
+        #     + manure_treatment_daily_output.sludge_manure_total_solids
+        #     + manure_treatment_daily_output.solid_manure_total_solids,
+        #     0.0,
+        # )
+
+        liquid_total_manure_mass = max((manure_treatment_daily_output.liquid_manure_daily_volume *
+                                        self._get_manure_density_by_type(ManureType.LIQUID)), 0.0)
+        solid_total_manure_mass = max(manure_treatment_daily_output.solid_manure_daily_mass, 0.0)
+
+        # total_manure_mass = max(
+        #     manure_treatment_daily_output.liquid_manure_daily_volume
+        #     * self._get_manure_density_by_type(ManureType.LIQUID)
+        #     + manure_treatment_daily_output.sludge_manure_daily_volume
+        #     * self._get_manure_density_by_type(ManureType.SLURRY)
+        #     + manure_treatment_daily_output.solid_manure_daily_mass,
+        #     0.0
+        # )
+
+        # will it work to just add nutrients separately like this? Do we need a separate ManureNutrients class type for each ManureType?
+        self._manure_nutrient_manager.add_nutrients(
+            ManureNutrients(
+                nitrogen=liquid_manure_nitrogen,
+                phosphorus=liquid_manure_phosphorus,
+                potassium=liquid_manure_potassium,
+                dry_matter=liquid_manure_total_solids,
+                total_manure_mass=liquid_total_manure_mass,
+            )
         )
 
         self._manure_nutrient_manager.add_nutrients(
             ManureNutrients(
-                nitrogen=nitrogen,
-                phosphorus=phosphorus,
-                potassium=potassium,
-                dry_matter=dry_matter,
-                total_manure_mass=total_manure_mass,
+                nitrogen=solid_manure_nitrogen,
+                phosphorus=solid_manure_phosphorus,
+                potassium=solid_manure_potassium,
+                dry_matter=solid_manure_total_solids,
+                total_manure_mass=solid_total_manure_mass,
             )
         )
 

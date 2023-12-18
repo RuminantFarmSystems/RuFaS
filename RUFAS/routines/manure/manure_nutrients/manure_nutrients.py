@@ -2,6 +2,8 @@ from __future__ import annotations
 
 from dataclasses import dataclass, fields
 
+from RUFAS.routines.manure.manure_treatments.manure_types import ManureType
+
 
 @dataclass(kw_only=True, frozen=True)
 class ManureNutrients:
@@ -22,6 +24,9 @@ class ManureNutrients:
     total_manure_mass: float = 0.0
     """Amount of accumulated manure mass derived from the manure module, kg."""
 
+    manure_type: ManureType
+    """Type of manure."""
+
     def __post_init__(self):
         """
         Validate the dataclass fields.
@@ -33,8 +38,13 @@ class ManureNutrients:
 
         """
         for field in fields(self):
-            if getattr(self, field.name) < 0:
-                raise ValueError(f"Field {field.name} must be non-negative.")
+            value = getattr(self, field.name)
+            if value != "manure_type":
+                if value < 0:
+                    raise ValueError(f"Field {field.name} must be non-negative.")
+            else:
+                if not isinstance(value, ManureType):
+                    raise ValueError(f"Field {field.name} must be an instance of ManureType.")
 
     @property
     def dry_matter_fraction(self) -> float:
