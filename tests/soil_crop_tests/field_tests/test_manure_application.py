@@ -294,8 +294,8 @@ def test_apply_subsurface_manure(total_phosphorus: float, wip_frac: float, wop_f
 
 
 @pytest.mark.parametrize("index,mass,inorganic_frac,ammonium_frac,organic_frac,field_size,expected", [
-    (0, 100, 0.3, 0.5, 0.08, 1.6, [15, 15, 4]),
-    (1, 44, 0.41, 0.35, 0.075, 2.2, [11.726, 6.314, 1.65]),
+    (0, 100, 0.3, 0.5, 0.08, 1.6, [15, 15, 8.0]),
+    (1, 44, 0.41, 0.35, 0.075, 2.2, [11.726, 6.314, 3.3]),
     (3, 50, 0.0, 0.0, 0.0, 1.3, [0, 0, 0])
 ])
 def test_add_nitrogen_to_soil_layer(index: int, mass: float, inorganic_frac: float, ammonium_frac: float,
@@ -304,18 +304,20 @@ def test_add_nitrogen_to_soil_layer(index: int, mass: float, inorganic_frac: flo
     man_app = ManureApplication(field_size=field_size)
     man_app.data.soil_layers[index].nitrate_content = 5
     man_app.data.soil_layers[index].ammonium_content = 5
-    man_app.data.soil_layers[index].fresh_organic_nitrogen_content = 5
+    man_app.data.soil_layers[index].stable_organic_nitrogen_content = 5
     man_app.data.soil_layers[index].active_organic_nitrogen_content = 5
 
     man_app._add_nitrogen_to_soil_layer(index, mass, inorganic_frac, ammonium_frac, organic_frac, field_size)
 
+    active_fraction_of_organic_nitrogen = 0.9286
     expected_nitrates = 5 + (expected[0] / field_size)
     expected_ammonium = 5 + (expected[1] / field_size)
-    expected_organic = 5 + (expected[2] / field_size)
+    expected_organic_stable = 5 + (expected[2] * (1 - active_fraction_of_organic_nitrogen) / field_size)
+    expected_organic_active = 5 + (expected[2] * active_fraction_of_organic_nitrogen / field_size)
     assert pytest.approx(man_app.data.soil_layers[index].nitrate_content) == expected_nitrates
     assert man_app.data.soil_layers[index].ammonium_content == expected_ammonium
-    assert man_app.data.soil_layers[index].fresh_organic_nitrogen_content == expected_organic
-    assert man_app.data.soil_layers[index].active_organic_nitrogen_content == expected_organic
+    assert man_app.data.soil_layers[index].stable_organic_nitrogen_content == expected_organic_stable
+    assert man_app.data.soil_layers[index].active_organic_nitrogen_content == expected_organic_active
 
 
 # ---- Main routine tests
