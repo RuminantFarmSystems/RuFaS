@@ -31,13 +31,18 @@ class HumusMineralization:
         self.data = soil_data or SoilData(field_size=field_size)
 
     def mineralize_organic_nitrogen(self) -> None:
-        """Iterates through each layer in the soil profile, transfers nitrogen between active and stable organic
-        nitrogen pools, and between the active organic and nitrate pools.
+        """
+        Iterates through each layer in the soil profile, transfers nitrogen between active and stable organic nitrogen
+        pools, and between the active organic and ammonium pools.
 
         Notes
         -----
         Mineralization and decomposition can only occur if the soil temperature is greater than 0 degrees C (see first
         paragraph on page 188 of SWAT Theoretical documentation).
+
+        SWAT has the active organic nitrogen mineralize directly into the nitrate pool, this method instead mineralizes
+        it into the ammonium pool. This is more realistic, and helps to make sure that ammonia volatilization is allowed
+        to happen fully.
 
         """
         for layer in self.data.soil_layers:
@@ -49,11 +54,11 @@ class HumusMineralization:
             layer.active_organic_nitrogen_content -= active_to_stable_mineralized_nitrogen
             layer.stable_organic_nitrogen_content += active_to_stable_mineralized_nitrogen
 
-            active_to_nitrate_mineralized_nitrogen = self._determine_organic_to_nitrate_mineralization(
+            active_to_ammonium_mineralized_nitrogen = self._determine_organic_to_nitrate_mineralization(
                 layer.active_organic_nitrogen_content, layer.nutrient_cycling_temp_factor,
                 layer.nutrient_cycling_water_factor, layer.humus_mineralization_rate_factor)
-            layer.active_organic_nitrogen_content -= active_to_nitrate_mineralized_nitrogen
-            layer.ammonium_content += active_to_nitrate_mineralized_nitrogen
+            layer.active_organic_nitrogen_content -= active_to_ammonium_mineralized_nitrogen
+            layer.ammonium_content += active_to_ammonium_mineralized_nitrogen
 
     # --- Static methods ---
     @staticmethod
@@ -82,11 +87,14 @@ class HumusMineralization:
         When the amount determined to be transferred is negative, it indicates that nitrogen is being transferred from
         the stable pool to the active pool.
 
+        The SWAT documentation does not correctly specify this equation, there is a missing pair of parentheses. This
+        change was identified in the course of evaluating the nitrogen cycling module, and verified by checking the
+        results.
+
         """
         rate_constant = 10 ** -5
-        amount_transferred = rate_constant * (active_organic_nitrogen *
-                                              ((1 / FRACTION_OF_HUMIC_NITROGEN_IN_ACTIVE_POOL) - 1)
-                                              - stable_organic_nitrogen)
+        amount_transferred = rate_constant * \
+            (active_organic_nitrogen * ((1 / FRACTION_OF_HUMIC_NITROGEN_IN_ACTIVE_POOL) - 1) - stable_organic_nitrogen)
 
         if amount_transferred > 0:
             amount_transferred = min(active_organic_nitrogen, amount_transferred)
