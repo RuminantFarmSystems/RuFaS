@@ -1,5 +1,8 @@
 from typing import List
-from .harvested_crop import HarvestedCrop, CropType
+from RUFAS.config import Config
+from RUFAS.time import Time
+from .enums import CropType
+from .harvested_crop import HarvestedCrop
 
 
 class Storage:
@@ -15,7 +18,7 @@ class Storage:
 
     Methods
     -------
-    receive_crop(crop: HarvestedCrop)
+    receive_crop(crop: HarvestedCrop, time: Time)
         Receives a harvested crop and adds it to the storage.
     process_degradations()
         Processes the degradations and losses of the stored crops.
@@ -39,7 +42,7 @@ class Storage:
         self.stored: List[HarvestedCrop] = []
         self.capacity = float("inf")
 
-    def receive_crop(self, crop: HarvestedCrop) -> None:
+    def receive_crop(self, crop: HarvestedCrop, time: Time) -> None:
         """
         Receives a harvested crop and adds it to the storage.
 
@@ -47,6 +50,8 @@ class Storage:
         ----------
         crop : HarvestedCrop
             The harvested crop to be added to the storage.
+        time : Time
+            An instance of the Time class, needed to set storage time.
 
         Returns
         -------
@@ -81,7 +86,9 @@ class Storage:
         """
         pass
 
-    def calculate_dry_matter_loss_to_gas(self, dry_matter: float, time_in_silo: int) -> float:
+    def calculate_dry_matter_loss_to_gas(
+        self, dry_matter: float, time_in_silo: int
+    ) -> float:
         """
         Calculates the dry matter loss to gas.
 
