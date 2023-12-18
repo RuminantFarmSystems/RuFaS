@@ -100,7 +100,7 @@ class NitrificationVolatilization:
         SWAT Theoretical documentation eqn. 3:1.3.1
 
         """
-        unbounded_factor =  0.41 * ((temperature - 5) / 10)
+        unbounded_factor = 0.41 * ((temperature - 5) / 10)
         bounded_factor = min(1.0, unbounded_factor)
         return bounded_factor
 

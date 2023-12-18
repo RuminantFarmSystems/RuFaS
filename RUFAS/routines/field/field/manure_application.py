@@ -371,7 +371,6 @@ class ManureApplication:
         stable_organic_nitrogen_added = (dry_matter_mass * organic_nitrogen_fraction *
                                          (1.0 - active_fraction_of_organic_nitrogen)) / field_size
 
-
         self.data.soil_layers[layer_index].nitrate_content += nitrates_added
         self.data.soil_layers[layer_index].ammonium_content += ammonium_added
         self.data.soil_layers[layer_index].stable_organic_nitrogen_content += stable_organic_nitrogen_added
