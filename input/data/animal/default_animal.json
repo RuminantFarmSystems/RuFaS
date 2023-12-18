@@ -10,6 +10,10 @@
 		"herd_init": false,
 		"breed": "HO"
 	},
+	"herd_initialization": {
+		"initial_animal_num": 10000,
+		"simulation_days": 5000
+	},
 	"animal_config": {
 		"management_decisions": {
 			"breeding_start_day_h": 380,
