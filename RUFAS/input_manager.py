@@ -798,6 +798,33 @@ class InputManager:
             List of keys which point to data within the Input Manager's data pool that adhere to the target metadata
             properties.
 
+        Examples
+        --------
+        If the metadata looked like the following:
+        ```
+        {
+            "files": {
+                "field_1": {
+                    "properties": "field_properties",
+                    ...
+                },
+                "soil_1": {
+                    "properties": "soil_profile_properties",
+                    ...
+                },
+                "field_2": {
+                    "properties": "field_properties",
+                    ...
+                },
+                ...
+            },
+            "properties": {...},
+            ...
+        }
+        ```
+        The the call `get_data_keys_by_properties("field_properties")` would be expected to return the list
+        `["field_1", "field_2"]`.
+
         Notes
         -----
         If no keys have the specified property, the method returns an empty list.
