@@ -508,11 +508,12 @@ class Field:
 
         """
         info_map = {"class": self.__class__.__name__, "function": self._record_manure_application.__name__,
-                    "prefix": f"field='{self.field_data.name}'", "field_size": self.field_data.field_size}
+                    "prefix": f"field='{self.field_data.name}'", "date": {"day": day, "year": year},
+                    "field_size": self.field_data.field_size}
         value = {"dry_matter_mass": dry_matter_mass, "dry_matter_fraction": dry_matter_fraction,
                  "field_coverage": field_coverage, "application_depth": application_depth,
                  "surface_remainder_fraction": surface_remainder_fraction, "nitrogen": nitrogen,
-                 "phosphorus": phosphorus, "potassium": potassium, "day": day, "year": year}
+                 "phosphorus": phosphorus, "potassium": potassium}
         om.add_variable("manure_application", value, info_map)
 
     def _record_nutrient_application_error(self, application_depth: float, surface_remainder_fraction: Optional[float],
