@@ -104,8 +104,9 @@ class PurchasedFeedEmissionsEstimator:
         endpoint = "https://geo.fcc.gov/api/census/block/find"
         params = {"latitude": latitude, "longitude": longitude, "format": "json"}
 
-        attempts = 3
-        for attempt_count in range(attempts):
+        max_attempts = 3
+        for attempt_count in range(max_attempts):
+
             om.add_log(
                 "Feed Emissions API Call",
                 f"Calling the FCC's FIPS County Code API, attempt: {attempt_count}",
@@ -116,13 +117,15 @@ class PurchasedFeedEmissionsEstimator:
                 answer = response.json()
                 om.add_log(
                     "Successful Feed Emissions API Call",
-                    f"Got successful response from the FCC's FIPS County Code API on attempt: {attempt_count}",
+                    f"Got successful response from the FCC's FIPS County Code API on {attempt_count=}",
+
                     info_map
                 )
                 return int(answer["County"]["FIPS"])
             om.add_error(
                 "Error Feed Emissions API Call",
-                f"FCC's FIPS County Code API attempt: {attempt_count} failed with status code: {response.status_code}.",
+                f"FCC's FIPS County Code API {attempt_count=} failed with {response.status_code=}.",
+
                 info_map
             )
 
