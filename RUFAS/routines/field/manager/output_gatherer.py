@@ -110,7 +110,22 @@ class OutputGatherer:
             om.add_variable("grazing_inorganic_phosphorus_runoff", field.soil.data.grazing_inorganic_phosphorus_runoff,
                             info_map)
             om.add_variable("soil_phosphorus_runoff", field.soil.data.soil_phosphorus_runoff, info_map)
+            om.add_variable("nitrate_runoff", field.soil.data.nitrate_runoff, info_map)
+            om.add_variable("ammonium_runoff", field.soil.data.ammonium_runoff, info_map)
+            om.add_variable("eroded_fresh_organic_nitrogen", field.soil.data.eroded_fresh_organic_nitrogen, info_map)
+            om.add_variable("eroded_stable_organic_nitrogen", field.soil.data.eroded_stable_organic_nitrogen, info_map)
+            om.add_variable("eroded_active_organic_nitrogen", field.soil.data.eroded_active_organic_nitrogen, info_map)
+
             om.add_variable("profile_carbon_emissions", field.soil.data.profile_carbon_emissions, info_map)
+            om.add_variable("profile_nitrates_total", field.soil.data.profile_nitrates_total, info_map)
+            om.add_variable("profile_ammonium_total", field.soil.data.profile_ammonium_total, info_map)
+            om.add_variable("profile_active_organic_nitrogen_total",
+                            field.soil.data.profile_active_organic_nitrogen_total, info_map)
+            om.add_variable("profile_stable_organic_nitrogen_total",
+                            field.soil.data.profile_stable_organic_nitrogen_total, info_map)
+            om.add_variable("profile_fresh_organic_nitrogen_total",
+                            field.soil.data.profile_fresh_organic_nitrogen_total, info_map)
+
             # Adding vadose zone layer data
             info_map["prefix"] = "field='" + field.field_data.name + "',vadose_zone_layer"
             om.add_variable("active_organic_nitrogen_content",
@@ -214,6 +229,12 @@ class OutputGatherer:
                 om.add_variable("active_organic_nitrogen_content", layer.active_organic_nitrogen_content, info_map)
                 om.add_variable("stable_organic_nitrogen_content", layer.stable_organic_nitrogen_content, info_map)
                 om.add_variable("fresh_organic_nitrogen_content", layer.fresh_organic_nitrogen_content, info_map)
+                om.add_variable("nitrous_oxide_emissions", layer.nitrous_oxide_emissions, info_map)
+                om.add_variable("volatilized_ammonium_emissions", layer.volatilized_ammonium_emissions, info_map)
+                om.add_variable("percolated_nitrates", layer.percolated_nitrates, info_map)
+                om.add_variable("percolated_ammonium", layer.percolated_ammonium, info_map)
+                om.add_variable("percolated_active_organic_nitrogen", layer.percolated_active_organic_nitrogen,
+                                info_map)
 
             for crop in field.crops:
                 info_map["prefix"] = f"field='{field.field_data.name}',crop='{crop.data.name}'," \
