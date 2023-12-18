@@ -202,7 +202,7 @@ class AnimalModuleReporter:
         daily_feed_emissions = animal_manager.feed_emissions_manager.\
             create_daily_purchased_feed_emissions_report(ration_total)
         om.add_variable(
-            f"ration_daily_feed_emissions_totals_for_pen_{pen_id}_{pen_animal_name}",
+            f"pen_{pen_id}_animal_{pen_animal_name}_feed_emissions",
             daily_feed_emissions,
             info_map
         )
