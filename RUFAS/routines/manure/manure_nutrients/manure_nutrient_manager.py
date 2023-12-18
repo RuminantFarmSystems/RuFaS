@@ -68,11 +68,13 @@ class ManureNutrientManager:
         -------
         NutrientRequestResults | None
             The results of the nutrient request, detailed in a `NutrientRequestResults` object, which includes
-            the amount of nitrogen, phosphorus, total manure mass, dry matter, and others that can be provided
-            to fulfill the request. Returns None if the request cannot be fulfilled.
+            the amount of nitrogen, phosphorus, total manure mass, dry matter, and others that can be provided to fulfill the request.
+            Returns None if the request cannot be fulfilled.
 
         """
+        print(f"request is {request}")
         eval_results = self._evaluate_nutrient_request(request)
+        print(f"eval_results is {eval_results}")
         if eval_results is not None:
             self._remove_nutrients(eval_results)
         return eval_results
@@ -107,15 +109,20 @@ class ManureNutrientManager:
         projected_manure_mass = self._select_projected_manure_mass(
             [nitrogen_derived_manure_mass, phosphorus_derived_manure_mass]
         )
+        print(f"request projected_manure_mass is {projected_manure_mass}")
+        print(f"total manure mass is {self._nutrients.total_manure_mass}")
 
         if math.isclose(projected_manure_mass, 0.0, abs_tol=1e-6):
+            print("unable to fulfill manure request")
             # Unable to fulfill request
             return None
         elif projected_manure_mass <= self._nutrients.total_manure_mass:
+            print("able to fulfill manure request")
             # Able to fulfill the whole request
             return self._create_nutrient_request_results(projected_manure_mass)
         else:
             # Partially fulfillable, return everything we have left
+            print("able to fulfill partial manure request")
             return self._create_nutrient_request_results(
                 self._nutrients.total_manure_mass
             )
@@ -125,8 +132,7 @@ class ManureNutrientManager:
             request_nutrient: float, nutrient_composition: float
     ) -> float:
         """
-        Calculate the projected manure mass based on the nutrient requested and the nutrient's composition
-        in the manure.
+        Calculate the projected manure mass based on the nutrient requested and the nutrient's composition in the manure.
 
         The projected manure mass is calculated by dividing the nutrient request by the nutrient composition.
         This represents the total manure mass needed to fulfill the nutrient request.
@@ -261,6 +267,7 @@ class ManureNutrientManager:
             if getattr(self._nutrients, attr) < getattr(results, attr):
                 raise ValueError(f"Remove more nutrients than available: {attr}")
 
+        print(f"removing {results.total_manure_mass}")
         self._nutrients -= ManureNutrients(
             nitrogen=results.nitrogen,
             phosphorus=results.phosphorus,

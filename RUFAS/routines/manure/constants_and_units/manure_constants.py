@@ -24,9 +24,6 @@ class ManureConstants:
     LIQUID_MANURE_DENSITY = 990.0
     """The density of liquid manure (kg/:math:`m^3`)."""
 
-    SLURRY_MANURE_DENSITY = 1400
-    """The density of slurry manure (kg/:math:`m^3`)."""
-
     SOLID_MANURE_DENSITY = 1250
     """The density of solid manure (kg/:math:`m^3`)."""
 

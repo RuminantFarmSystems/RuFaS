@@ -59,7 +59,8 @@ class NutrientRequestResults:
 
         for field in fractional_fields:
             if not 0.0 <= getattr(self, field.name) <= 1.0:
-                raise ValueError(f"{field.name} must be between 0 and 1.")
+                value = getattr(self, field.name)
+                raise ValueError(f"{field.name} must be between 0 and 1 and is {value}.")
 
         for field in non_fractional_fields:
             if getattr(self, field.name) < 0.0:

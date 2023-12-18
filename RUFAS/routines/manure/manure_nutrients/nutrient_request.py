@@ -29,4 +29,6 @@ class NutrientRequest:
         if any(getattr(self, field.name) > 0.0 for field in fields(self)):
             return
         else:
+            print(f"nitrogen is {self.nitrogen}")
+            print(f"phos is {self.phosphorus}")
             raise ValueError("At least one nutrient must be requested and positive.")

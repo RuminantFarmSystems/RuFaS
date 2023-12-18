@@ -49,6 +49,11 @@ class ManureNutrients:
         """
         if self.total_manure_mass == 0.0:
             return 0.0
+        print(f"dry matter is {self.dry_matter}")
+        print(f"total manure mass is {self.total_manure_mass}")
+        dry_matter_fraction = self.dry_matter / self.total_manure_mass
+        print(f"dry matter fraction is {dry_matter_fraction}")
+
         return self.dry_matter / self.total_manure_mass
 
     @property
