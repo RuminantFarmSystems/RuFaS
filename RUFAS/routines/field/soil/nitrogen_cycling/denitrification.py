@@ -45,12 +45,9 @@ class Denitrification:
         """
         self.data.set_vectorized_layer_attribute("nitrous_oxide_emissions", [0.0] * len(self.data.soil_layers))
         for layer in self.data.soil_layers:
-            nutrient_is_below_threshold = layer.nutrient_cycling_water_factor < \
-                                          layer.denitrification_threshold_water_content
-            if nutrient_is_below_threshold:
+            if layer.water_content < layer.field_capacity_content:
                 continue
 
-            # TODO: check that soil_overall_carbon_fraction is being used correctly in this context - issue #475
             nitrified_nitrates = self._calculate_denitrification_amount(layer.nitrate_content,
                                                                         layer.denitrification_rate_coefficient,
                                                                         layer.nutrient_cycling_temp_factor,
