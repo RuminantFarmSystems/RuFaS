@@ -1,23 +1,24 @@
 from __future__ import annotations
 
+import collections
 import math
+from random import random
 from typing import Dict, Any
 
 import numpy as np
 from scipy.stats import truncnorm
 
-from RUFAS.routines.animal.animal_module_constants import AnimalModuleConstants
-from RUFAS.routines.animal.life_cycle.heiferIII import HeiferIII
-from RUFAS.routines.animal.life_cycle.animal_base import AnimalBase
 from RUFAS.output_manager import OutputManager
+from RUFAS.routines.animal.animal_module_constants import AnimalModuleConstants
+from RUFAS.routines.animal.life_cycle import animal_constants as const
+from RUFAS.routines.animal.life_cycle.animal_base import AnimalBase
+from RUFAS.routines.animal.life_cycle.heiferIII import HeiferIII
 from RUFAS.routines.animal.life_cycle.repro_protocol_enums import CowReproProtocolEnum
-from RUFAS.routines.animal.manure.lactating_cow_manure_excretion import \
-    manure_calculations as lactating_manure_calculations
 from RUFAS.routines.animal.manure.dry_cow_manure_excretion import \
     manure_calculations as dry_manure_calculations
+from RUFAS.routines.animal.manure.lactating_cow_manure_excretion import \
+    manure_calculations as lactating_manure_calculations
 from RUFAS.routines.animal.ration.animal_requirements import AnimalRequirements
-from random import random
-from RUFAS.routines.animal.life_cycle import animal_constants as const
 
 om = OutputManager()
 
@@ -31,6 +32,8 @@ class MilkProductionHistory:
 
 
 class Cow(HeiferIII):
+    stats = collections.defaultdict(int)
+
     def __init__(self, args):
         """
         Description:
@@ -121,6 +124,10 @@ class Cow(HeiferIII):
         self.presynch_program_start_day = 0
         self.tai_program_start_day_c = 0
         self.resynch_method = args['resynch_method']
+
+        self._is_in_presynch_period = False
+        self._is_in_tai_period = False
+        self._num_conception_rate_decreases = 0
 
         self.wood_l = 0
         self.wood_m = 0
@@ -655,19 +662,27 @@ class Cow(HeiferIII):
         self.update_body_weight_history(sim_day)
         self.update_milk_production_history(sim_day)
 
-        if not self.do_not_breed:
+        if self.is_breedable():
+            if self.repro_program not in [CowReproProtocolEnum.ED.value,
+                                          CowReproProtocolEnum.TAI.value,
+                                          CowReproProtocolEnum.ED_TAI.value]:
+                raise ValueError(f'Invalid cow repro program: {self.repro_program}')
+
             if self.repro_program == CowReproProtocolEnum.ED.value:
                 self.execute_ed_protocol(sim_day)
             elif self.repro_program == CowReproProtocolEnum.ED_TAI.value:
                 self.ed_tai_update(sim_day)
             elif self.repro_program == CowReproProtocolEnum.TAI.value:
+                # self.execute_tai_protocol(sim_day)
                 if self.days_in_milk >= self._get_voluntary_waiting_period():
                     self.tai_update(sim_day)
-            else:
-                raise ValueError(f'Invalid cow repro program: {self.repro_program}')
 
-        if not self.do_not_breed:
+            if self.days_born == self.ai_day:
+                self.conception_rate = self.adjust_conception()
+                self._perform_ai(sim_day)
+
             self.preg_update(sim_day)
+
         cull_stage = self.cull_update(sim_day)
 
         return estimated_daily_milk_produced, fat_percent, daily_fat_correct_milk_production, cull_stage, new_born
@@ -749,19 +764,6 @@ class Cow(HeiferIII):
         """
 
         return not self.do_not_breed
-
-    def is_in_voluntary_waiting_period(self) -> bool:
-        """
-        Check if the cow is in the voluntary waiting period.
-
-        Returns
-        -------
-        bool
-            True if the cow is in the voluntary waiting period, False otherwise.
-
-        """
-
-        return 1 <= self.days_in_milk <= self._get_voluntary_waiting_period()
 
     def execute_ed_protocol(self, sim_day: int) -> None:
         """
@@ -1017,6 +1019,76 @@ class Cow(HeiferIII):
         else:
             raise ValueError(f'Invalid cow tai program: {self.tai_method_c}')
 
+    def _execute_hormone_delivery_schedule(self, sim_day: int, schedule: dict[int, dict]) -> None:
+        """
+        Execute a hormone delivery schedule.
+
+        Parameters
+        ----------
+        sim_day : int
+            The current day of the entire simulation.
+        schedule : dict[int, dict]
+            A dictionary of days and actions to perform on those days.
+
+        Returns
+        -------
+        None
+        """
+
+        super()._execute_hormone_delivery_schedule(sim_day, schedule)
+
+        actions = schedule.get(self.days_born)
+        if actions is not None:
+            if actions.get('set_presynch_start', False):
+                self.presynch_method = self.get_user_defined_presynch_protocol()
+                self._is_in_presynch_period = True
+                del actions['set_presynch_start']
+            if actions.get('set_presynch_end', False):
+                self.log_event(self.days_born, sim_day, const.PRESYNCH_END)
+                self._is_in_presynch_period = False
+                del actions['set_presynch_end']
+            if actions.get('set_tai_start', False):
+                self._is_in_tai_period = True
+                del actions['set_tai_start']
+            if actions.get('set_tai_end', False):
+                self._is_in_tai_period = False
+                del actions['set_tai_end']
+            if actions.get('decrease_conception_rate', False):
+                self._num_conception_rate_decreases += 1
+                del actions['decrease_conception_rate']
+            if actions.get('set_tai_program', False):
+                self._is_in_tai_period = True
+                del actions['set_tai_program']
+            if actions.get('simulate_estrus_after_pgf', False):
+                self._simulate_estrus_after_pgf(self.days_born, sim_day, const.ESTRUS_AFTER_PGF_NOTE)
+                del actions['simulate_estrus_after_pgf']
+            if not actions:
+                del schedule[self.days_born]
+
+    def _simulate_estrus_after_pgf(self, start_day: int, sim_day: int, estrus_note: str) -> None:
+        """
+        Calculate and set the next estrus day for the animal after a PGF injection.
+
+        Parameters
+        ----------
+        start_day : int
+            The start day plus the estrus cycle length is the day of the next estrus.
+        sim_day : int
+            The current day of the entire simulation.
+        estrus_note : str
+            A note that describes the reason for simulating estrus.
+
+        Returns
+        -------
+        None
+        """
+
+        estrus_cycle = truncnorm.rvs(-const.STDI, const.STDI,
+                                     self.get_avg_estrus_cycle_after_pgf(),
+                                     self.get_std_estrus_cycle_after_pgf())
+        self.estrus_day = int(start_day + abs(estrus_cycle))
+        self.log_event(self.days_born, sim_day, f'{estrus_note} on day {self.estrus_day}')
+
     def execute_tai_protocol(self, sim_day: int) -> None:
         """
         Execute the timed artificial insemination protocol.
@@ -1031,17 +1103,159 @@ class Cow(HeiferIII):
         None
         """
 
-        if self.days_in_milk == self._get_voluntary_waiting_period():
-            # TODO: Incorporate presynch protocol
+        if self._should_set_up_hormone_delivery_for_presynch():
+            self._set_up_hormone_schedule('cows', self.get_user_defined_presynch_protocol(),
+                                          self.days_born)
+
+        if self._should_set_up_hormone_delivery_for_tai():
             self._set_up_hormone_schedule('cows', self.get_user_defined_repro_sub_protocol(),
                                           self.days_born)
-            self._TAI_conception_rate = self._get_user_defined_TAI_conception_rate()
+            self._TAI_conception_rate = (self._get_user_defined_TAI_conception_rate() -
+                                         (self._num_conception_rate_decreases * self._get_conception_rate_decrease()))
 
         if self._hormone_schedule:
             self._execute_hormone_delivery_schedule(sim_day, self._hormone_schedule)
 
+    def _should_set_up_hormone_delivery_for_presynch(self) -> bool:
+        """
+        Check if the cow should set up hormone delivery for presynch.
+
+        Returns
+        -------
+        bool
+            True if the cow should set up hormone delivery for presynch, False otherwise.
+        """
+
+        if self.days_in_milk != self._get_voluntary_waiting_period():
+            return False
+
+        if self._hormone_schedule:
+            return False
+
+        return self._is_in_presynch_period
+
+    def _should_set_up_hormone_delivery_for_tai(self) -> bool:
+        """
+        Check if the cow should set up hormone delivery for timed artificial insemination.
+
+        Returns
+        -------
+        bool
+            True if the cow should set up hormone delivery for timed artificial insemination, False otherwise.
+        """
+
+        if self.days_in_milk < self._get_user_defined_tai_program_start_day():
+            return False
+
+        if self._is_in_presynch_period:
+            return False
+
+        if self._hormone_schedule:
+            return False
+
+        return self._is_in_tai_period
+
+    def _increment_ai_counts(self) -> None:
+        """
+        Increment the performed AI counts across all cows.
+
+        Notes
+        -----
+        The following counts are incremented:
+        - num_ai_performed: the total number of AIs performed
+        - num_ai_performed_in_ED: the number of AIs performed in the ED protocol
+        - num_ai_performed_in_TAI: the number of AIs performed in the TAI protocol
+
+        Note that a cow can go through multiple breeding programs in its lifetime.
+
+        Returns
+        -------
+        None
+        """
+
+        self.stats['num_ai_performed'] += 1
+        self.stats['num_ai_performed_in_ED'] += 1 \
+            if self.repro_program == CowReproProtocolEnum.ED.value else 0
+        self.stats['num_ai_performed_in_TAI'] += 1 \
+            if self.repro_program == CowReproProtocolEnum.TAI.value else 0
+
+    def _increment_successful_conceptions(self) -> None:
+        """
+        Increment the successful conception counts across all heifers.
+
+        The following counts are incremented:
+        - num_successful_conceptions: the total number of successful conceptions
+        - num_successful_conceptions_in_ED: the number of successful conceptions in the ED protocol
+        - num_successful_conceptions_in_TAI: the number of successful conceptions in the TAI protocol
+
+        Note that a cow can go through multiple breeding programs in its lifetime.
+
+        Returns
+        -------
+        None
+        """
+
+        self.stats['num_successful_conceptions'] += 1
+        self.stats['num_successful_conceptions_in_ED'] += 1 \
+            if self.repro_program == CowReproProtocolEnum.ED.value else 0
+        self.stats['num_successful_conceptions_in_TAI'] += 1 \
+            if self.repro_program == CowReproProtocolEnum.TAI.value else 0
+
     # ED-TAI methods
     def ed_tai_update(self, sim_day):  # noqa
+        """
+        Update ED-TAI method, perform estrus detection before the TAI program
+        Args:
+            sim_day: the simulation day
+        """
+        # if on estrus day, start detecting estrus
+        if self.days_born == self.estrus_day and \
+                self.days_in_milk < AnimalBase.config['cow_repro_programs']['tai_program_start_day']:
+            self.estrus_count += 1
+
+            if 1 <= self.days_in_milk <= AnimalBase.config['voluntary_waiting_period']:
+                self.later_estrus(sim_day)
+            else:
+                estrus_detection_rand = random()
+                if estrus_detection_rand < \
+                        AnimalBase.config['cow_repro_programs']['estrus_detection_rate']:
+                    # Estrus detected
+                    self.events.add_event(
+                        self.days_born, sim_day, const.ESTRUS_DETECTED_NOTE)
+                    estrus_service_rand = random()
+                    if estrus_service_rand < \
+                            AnimalBase.config['cow_repro_programs']['estrus_service_rate']:
+                        # serviced
+                        self.ai_day = self.estrus_day + 1
+                        self.conception_rate = \
+                            AnimalBase.config['cow_repro_programs']['ed_conception_rate']
+                    else:
+                        self.return_estrus(sim_day)
+                else:
+                    self.return_estrus(sim_day)
+
+        if self.milking:
+            self.ED_days += 1
+
+        if self.days_in_milk == AnimalBase.config['cow_repro_programs']['tai_program_start_day'] and \
+                self.ai_day == 0:
+            self.estrus_day = 0
+            self.determine_tai_program_day(self.days_born)
+
+        if self.days_in_milk == AnimalBase.config['cow_repro_programs']['tai_program_start_day'] and \
+                self.ai_day == 0:
+            if self.tai_method_c == 'OvSynch 56':
+                self.OvSynch56_update(sim_day)
+            elif self.tai_method_c == 'OvSynch 48':
+                self.OvSynch48_update(sim_day)
+            elif self.tai_method_c == 'CoSynch 72':
+                self.CoSynch72_update(sim_day)
+            elif self.tai_method_c == '5d CoSynch':
+                self.d5CoSynch_update(sim_day)
+            else:
+                raise ValueError(f'Invalid cow tai program: {self.tai_method_c}')
+
+    def execute_ed_tai_protocol(self, sim_day):  # noqa
         """
         Update ED-TAI method, perform estrus detection before the TAI program
         Args:
@@ -1125,23 +1339,6 @@ class Cow(HeiferIII):
         else:
             raise ValueError(f'Invalid cow resynch method: {self.resynch_method}')
 
-    # Preg methods
-    def open(self, sim_day):
-        """
-        Assign breeding method for open cows after spot open at preg check
-        three methods can be assigned: ED, TAI, ED-TAI
-        Args:
-            sim_day: the simulation day
-        """
-        if self.repro_program == 'ED':
-            self.after_abortion_estrus(sim_day)
-        elif self.repro_program == 'TAI':
-            self.tai_program_day_after_preg_check(sim_day)
-        elif self.repro_program == 'ED-TAI':
-            self.resynch_ed_tai(sim_day)
-        else:
-            raise ValueError(f'Invalid cow repro program: {self.repro_program}')
-
     def adjust_conception(self):
         """
         Adjust conception rate based on the parity of the cow
@@ -1153,121 +1350,141 @@ class Cow(HeiferIII):
         else:
             return self.conception_rate - 0.1
 
-    def preg_update(self, sim_day):  # noqa
+    def _handle_successful_conception(self, sim_day: int) -> None:
         """
-        Update AI for cows reach ai day, inseminate the cow with specific semen
-        type. By comparing with conception rate, if conception success,
-        gestation length determined
-        for preg check 1, confirm the conception
-        for preg check 2 and 3, confirm pregnancy,
-            there are chances of preg loss in each period of time
-            between preg checks
-        Args:
-            sim_day: the simulation day
+        Handle a successful conception event.
+
+        Parameters
+        ----------
+        sim_day : int
+            The current simulation day.
+
+        Returns
+        -------
+        None
         """
+
+        self.log_event(self.days_born, sim_day, const.COW_PREG)
+        self.days_in_preg = 1
+        self.gestation_length = self._calculate_gestation_length()
+        self.calf_birth_weight = self._calculate_calf_birth_weight(self.breed)
+        if self.calves > 0:
+            last_time_given_birth = self.events.get_most_recent_date(const.NEW_BIRTH)
+            assert last_time_given_birth != -1
+            self.calving_to_preg_time = self.days_born - last_time_given_birth
+
+    def _handle_failed_conception(self, sim_day: int) -> None:
+        """
+        Handle a failed conception event.
+
+        Parameters
+        ----------
+        sim_day : int
+            The current simulation day.
+
+        Returns
+        -------
+        None
+        """
+
+        self.log_event(self.days_born, sim_day, const.COW_NOT_PREG)
+
+        if self.repro_program == CowReproProtocolEnum.ED.value:
+            self._simulate_estrus(self.days_born, sim_day, const.ESTRUS_DAY_SCHEDULED_NOTE)
+        # if self.repro_program in ['ED'] or self.resynch_method in ['TAIafterPD', 'PGFatPD']:
+        #     self._simulate_estrus(self.estrus_day, sim_day, const.ESTRUS_DAY_SCHEDULED_NOTE)
+
+    def preg_update(self, sim_day: int) -> None:
         if self.days_in_preg > 0:
             self.days_in_preg += 1
 
-        if self.days_born == self.ai_day:
-            self.events.add_event(
-                self.days_born, sim_day,
-                const.INSEMINATED_W_BASE + AnimalBase.config['semen_type'])
-            self.semen_num += 1
-            self.AI_times += 1
-            conception_rand = random()
-            if conception_rand < self.adjust_conception():
-                self.days_in_preg = 1
-                if self.calves != 0:
-                    last_time_given_birth = \
-                        self.events.get_most_recent_date(const.NEW_BIRTH)
-                    self.calving_to_preg_time = self.days_born - last_time_given_birth
-                self.gestation_length = int(truncnorm.rvs(-const.STDI, const.STDI,
-                                                          AnimalBase.config['avg_gestation_len'],
-                                                          AnimalBase.config['std_gestation_len']))
-                # generate calf birth weight
-                if self.breed == 'HO':
-                    self.calf_birth_weight = truncnorm.rvs(-const.STDI, const.STDI,
-                                                           AnimalBase.config['birth_weight_avg_ho'],
-                                                           AnimalBase.config['birth_weight_std_ho'])
-                elif self.breed == 'JE':
-                    self.calf_birth_weight = truncnorm.rvs(-const.STDI, const.STDI,
-                                                           AnimalBase.config['birth_weight_avg_je'],
-                                                           AnimalBase.config['birth_weight_std_je'])
-                else:
-                    raise ValueError(f'Invalid cow breed: {self.breed}')
+        preg_check_configs = [
+            {
+                "day": AnimalBase.config["cow_preg_check_day_1"],
+                "loss_rate": AnimalBase.config["cow_preg_loss_rate_1"],
+                "on_preg_loss": const.PREG_LOSS_BEFORE_1,
+                "on_preg": const.PREG_CHECK_1_PREG,
+                "on_not_preg": const.PREG_CHECK_1_NOT_PREG,
+            },
+            {
+                "day": AnimalBase.config["cow_preg_check_day_2"],
+                "loss_rate": AnimalBase.config["cow_preg_loss_rate_2"],
+                "on_preg_loss": const.PREG_LOSS_BTWN_1_AND_2,
+                "on_preg": const.PREG_CHECK_2_PREG,
+            },
+            {
+                "day": AnimalBase.config["cow_preg_check_day_3"],
+                "loss_rate": AnimalBase.config["cow_preg_loss_rate_3"],
+                "on_preg_loss": const.PREG_LOSS_BTWN_2_AND_3,
+                "on_preg": const.PREG_CHECK_3_PREG,
+            }
+        ]
 
-                self.events.add_event(self.days_born, sim_day, const.COW_PREG)
-            else:
-                if self.repro_program in ['ED', 'ED-TAI']:
-                    self.ai_day = 0
-                    self.after_ai_estrus(sim_day)
-                self.events.add_event(
-                    self.days_born, sim_day, const.COW_NOT_PREG)
-        elif self.days_born == self.ai_day + \
-                AnimalBase.config['preg_check_day_1']:
-            self.preg_diagnoses += 1
-            if self.days_in_preg > 0:
-                preg_loss_rand = random()
-                if preg_loss_rand > AnimalBase.config['preg_loss_rate_1']:
-                    self.events.add_event(
-                        self.days_born, sim_day, const.PREG_CHECK_1_PREG)
-                else:
-                    self.days_in_preg = 0
-                    self.abortion_day = self.days_born
-                    self.open(sim_day)
-                    self.body_weight -= self.conceptus_weight
-                    self.conceptus_weight = 0
-                    self.calf_birth_weight = 0
-                    self.p_gest_for_calf = 0
-                    self.events.add_event(
-                        self.days_born, sim_day, const.PREG_LOSS_BEFORE_1)
-            else:
-                self.abortion_day = self.days_born
-                self.open(sim_day)
-                self.events.add_event(
-                    self.days_born, sim_day, const.PREG_CHECK_1_NOT_PREG)
-        elif self.days_born == self.ai_day + \
-                AnimalBase.config['preg_check_day_2']:
-            self.preg_diagnoses += 1
-            preg_loss_rand = random()
-            if preg_loss_rand > AnimalBase.config['preg_loss_rate_2']:
-                self.events.add_event(
-                    self.days_born, sim_day, const.PREG_CHECK_2_PREG)
-            else:
-                self.days_in_preg = 0
-                self.abortion_day = self.days_born
-                self.open(sim_day)
-                self.body_weight -= self.conceptus_weight
-                self.conceptus_weight = 0
-                self.calf_birth_weight = 0
-                self.p_gest_for_calf = 0
-                self.events.add_event(
-                    self.days_born, sim_day, const.PREG_LOSS_BTWN_1_AND_2)
-        elif self.days_born == self.ai_day + \
-                AnimalBase.config['preg_check_day_3']:
-            self.preg_diagnoses += 1
-            preg_loss_rand = random()
-            if preg_loss_rand > AnimalBase.config['preg_loss_rate_3']:
-                self.events.add_event(
-                    self.days_born, sim_day, const.PREG_CHECK_3_PREG)
-            else:
-                self.days_in_preg = 0
-                self.abortion_day = self.days_born
-                self.open(sim_day)
-                self.body_weight -= self.conceptus_weight
-                self.conceptus_weight = 0
-                self.calf_birth_weight = 0
-                self.p_gest_for_calf = 0
-                self.events.add_event(
-                    self.days_born, sim_day, const.PREG_LOSS_BTWN_2_AND_3)
-        if self.days_in_preg == 0 and self.days_in_milk > \
-                AnimalBase.config['do_not_breed_time']:
-            # only add to events if it is the first time this occurs
-            if not self.do_not_breed:
-                self.events.add_event(
-                    self.days_born, sim_day, const.DO_NOT_BREED)
+        for preg_check_config in preg_check_configs:
+            if self.days_born == self.ai_day + preg_check_config["day"]:
+                self._handle_preg_check(preg_check_config, sim_day)
+
+        if not self.is_pregnant and self.days_in_milk > self._get_do_not_breed_time():
+            if self.is_breedable():
+                self.log_event(self.days_born, sim_day, const.DO_NOT_BREED)
                 self.do_not_breed = True
-            return True
+
+    def open(self, sim_day: int) -> None:
+        """
+        Open cow after abortion or pregnancy loss.
+
+        Parameters
+        ----------
+        sim_day : int
+            The current day of the entire simulation.
+        """
+
+        self.log_event(self.abortion_day, sim_day, const.REBREEDING_NOTE)
+
+        if self.repro_program == CowReproProtocolEnum.ED.value:
+            self._simulate_estrus(self.estrus_day, sim_day, const.ESTRUS_DAY_SCHEDULED_NOTE)
+        elif self.repro_program in [CowReproProtocolEnum.TAI.value, CowReproProtocolEnum.ED_TAI.value]:
+            self._set_up_hormone_schedule('cows', self.get_user_defined_resynch_protocol(),
+                                          self.days_born)
+        else:
+            raise ValueError(f'Invalid cow repro program: {self.repro_program}')
+
+    def _handle_tai_resynch(self, sim_day: int) -> None:
+        self._set_up_hormone_schedule('cows', self.get_user_defined_resynch_protocol(),
+                                      self.days_born)
+        if self.resynch_method == 'TAIafterPD':
+            self._TAI_conception_rate -= self._get_conception_rate_decrease()
+            self._set_up_hormone_schedule('cows', self.get_user_defined_resynch_protocol(),
+                                          self.days_born)
+        elif self.resynch_method == 'TAIbeforePD':
+            self.tai_program_start_day_c = self.abortion_day - 6
+            self.conception_rate -= \
+                AnimalBase.config['conception_rate_decrease']
+            if self.tai_method_c in ['OvSynch 56', 'OvSynch 48', 'CoSynch 72']:
+                self.events.add_event(
+                    self.tai_program_start_day_c, sim_day, const.INJECT_GNRH)
+                self.GnRH_injections = self.GnRH_injections + 1
+        elif self.resynch_method == 'PGFatPD':
+            self.events.add_event(self.days_born, sim_day, const.INJECT_PGF)
+            self.PGF_injections = self.PGF_injections + 1
+            self.tai_program_start_day_c = self.abortion_day + 8
+            self.conception_rate -= \
+                AnimalBase.config['conception_rate_decrease']
+        else:
+            raise ValueError(f'Invalid resynch method: {self.resynch_method}')
+
+    @staticmethod
+    def _get_do_not_breed_time() -> int:
+        """
+        Get the user-defined value for the do-not-breed time for cows (days).
+
+        Returns
+        -------
+        int
+            The do not breed time for cows (days).
+        """
+
+        return AnimalBase.config['do_not_breed_time']
 
     @staticmethod
     def get_avg_estrus_cycle() -> int:
@@ -1309,7 +1526,7 @@ class Cow(HeiferIII):
         return AnimalBase.config['voluntary_waiting_period']
 
     @staticmethod
-    def _get_tai_program_start_day() -> int:
+    def _get_user_defined_tai_program_start_day() -> int:
         """
         Get the TAI program start day for cows (days) defined by the user.
 
@@ -1320,6 +1537,19 @@ class Cow(HeiferIII):
         """
 
         return Cow.get_user_defined_repro_sub_properties()['tai_program_start_day']
+
+    @staticmethod
+    def _get_conception_rate_decrease() -> float:
+        """
+        Get the conception rate decrease for cows defined by the user.
+
+        Returns
+        -------
+        float
+            The conception rate decrease for cows defined by the user.
+        """
+
+        return Cow.get_user_defined_repro_data('conception_rate_decrease')
 
     @staticmethod
     def get_user_defined_repro_data(attribute: str) -> Any:
@@ -1426,47 +1656,6 @@ class Cow(HeiferIII):
         """
 
         return Cow.get_user_defined_repro_sub_properties()['conception_rate']
-
-    # Note: Not used yet. Will revisit during cow repro refactor.
-    def _handle_successful_conception(self, sim_day: int) -> None:
-        """
-        Handle a successful conception event.
-
-        Parameters
-        ----------
-        sim_day : int
-            The current simulation day.
-
-        Returns
-        -------
-        None
-        """
-
-        self.log_event(self.days_born, sim_day, const.COW_PREG)
-        self._initialize_pregnancy_parameters()
-        if self.calves > 0:
-            last_time_given_birth = self.events.get_most_recent_date(const.NEW_BIRTH)
-            self.calving_to_preg_time = self.days_born - last_time_given_birth
-
-    # Note: Not used yet. Will revisit during cow repro refactor.
-    def _handle_failed_conception(self, sim_day: int) -> None:
-        """
-        Handle a failed conception event.
-
-        Parameters
-        ----------
-        sim_day : int
-            The current simulation day.
-
-        Returns
-        -------
-        None
-        """
-
-        self.log_event(self.days_born, sim_day, const.COW_NOT_PREG)
-        self.open_stage = True
-        if self.repro_program in ['ED'] or self.resynch_method in ['TAIafterPD', 'PGFatPD']:
-            self._simulate_estrus(self.estrus_day, sim_day, const.ESTRUS_AFTER_AI_NOTE)
 
     # Note: Not implemented yet. Will revisit during cow repro refactor.
     def _handle_preg_check(self, preg_check_config: dict[str, int | str], sim_day: int):

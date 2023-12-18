@@ -443,34 +443,34 @@
               },
               "presynch_protocol": {
                 "type": "string",
-                "description": "Presynch Protocol -- The preSynch protocol (1st breeding) for cow in TAI (Timed Artificial Insemination) program",
+                "description": "Presynch Protocol -- The preSynch protocol (1st breeding) for cow in TAI (Timed Artificial Insemination) program. This ONLY applies to the TAI repro protocol.",
                 "default": "Double OvSynch",
-                "pattern": "^(Double OvSynch|Presynch|G6G)$"
+                "pattern": "^(Double OvSynch|Presynch|G6G|N/A)$"
               },
               "resynch_protocol": {
                 "type": "string",
                 "description": "Resynch Protocol -- Resynch protocol for cow before/at/after pregnancy check day in the TAI (Timed Artificial Insemination) program",
                 "default": "TAIafterPD",
-                "pattern": "^(TAIafterPD|TAIbeforePD|PGFatPD)$"
+                "pattern": "^(TAIafterPD|TAIbeforePD|PGFatPD|N/A)$"
               },
               "repro_sub_protocol": {
                 "type": "string",
-                "description": "Sub-protocol for cow reproductive program",
-                "pattern": "^(OvSynch 48|OvSynch 56|CoSynch 72|5d CoSynch)$",
+                "description": "Sub-protocol for cow reproductive program. This ONLY applies to the TAI repro protocol.",
+                "pattern": "^(OvSynch 48|OvSynch 56|CoSynch 72|5d CoSynch|N/A)$",
                 "default": "OvSynch 56"
               },
               "repro_sub_properties": {
                 "type": "object",
                 "conception_rate": {
                   "type": "number",
-                  "description": "Conception Rate -- The conception rate for the cow reproductive program (default is 0.6)",
+                  "description": "Conception Rate -- The conception rate for the cow reproductive program (default is 0.6). This ONLY applies to the TAI repro protocol.",
                   "default": 0.5,
                   "minimum": 0,
                   "maximum": 1
                 },
                 "tai_program_start_day": {
                   "type": "number",
-                  "description": "TAI program start day for ED-TAI protocol -- The TAI program start day for ED-TAI protocol.",
+                  "description": "TAI program start day for TAI and ED-TAI repro protocols.",
                   "minimum": 0,
                   "default": 70
                 }
@@ -609,37 +609,76 @@
             "description": "Literature Repro Values",
             "preg_check_day_1": {
               "type": "number",
-              "description": "Pregnancy Check Day 1 (days) -- Days since last insemination to check whether the animal is pregnant or not for the first time (default is 32).",
+              "description": "Pregnancy Check Day 1 (days) -- Days since last insemination to check whether the heifer is pregnant or not for the first time (default is 32).",
               "default": 32,
               "minimum": 1
             },
             "preg_loss_rate_1": {
               "type": "number",
-              "description": "Pregnancy Loss Rate 1 -- The % of cows that abort their pregnancy before the 1st pregnancy check (default is 0.02)",
+              "description": "Pregnancy Loss Rate 1 -- The % of heifers that abort their pregnancy before the 1st pregnancy check (default is 0.02)",
               "default": 0.02,
               "minimum": 0,
               "maximum": 1
             },
             "preg_check_day_2": {
               "type": "number",
-              "description": "Pregnancy Check Day 2 (days) --  Days since last insemination to check whether the animal is pregnant or not for the second time if the animal pass the first pregnancy check (default is 60).",
+              "description": "Pregnancy Check Day 2 (days) --  Days since last insemination to check whether the heifer is pregnant or not for the second time if the animal pass the first pregnancy check (default is 60).",
               "default": 60,
               "minimum": 0
             },
             "preg_loss_rate_2": {
               "type": "number",
-              "description": "Pregnancy Loss Rate 2 -- % of cows that abort their pregnancy between the 1st and 2nd pregnancy check (default is 0.096)",
+              "description": "Pregnancy Loss Rate 2 -- % of heifers that abort their pregnancy between the 1st and 2nd pregnancy check (default is 0.096)",
               "default": 0.096,
               "minimum": 0,
               "maximum": 0.1
             },
             "preg_check_day_3": {
               "type": "number",
-              "description": "Pregnancy Check Day 3 (days) -- Days since last insemination to check whether the animal is pregnant or not for the third time if the animal passes the second pregnancy check (default is 200).",
+              "description": "Pregnancy Check Day 3 (days) -- Days since last insemination to check whether the heifer is pregnant or not for the third time if the animal passes the second pregnancy check (default is 200).",
               "default": 200,
               "minimum": 0
             },
             "preg_loss_rate_3": {
+              "type": "number",
+              "description": "Pregnancy Loss Rate 3 -- The % of heifers that abort their pregnancy between the 2nd and 3rd pregnancy check (default is 0.017)",
+              "default": 0.017,
+              "minimum": 0,
+              "maximum": 0.1
+            },
+            "cow_preg_check_day_1": {
+              "type": "number",
+              "description": "Pregnancy Check Day 1 (days) -- Days since last insemination to check whether the cow is pregnant or not for the first time (default is 32).",
+              "default": 32,
+              "minimum": 1
+            },
+            "cow_preg_loss_rate_1": {
+              "type": "number",
+              "description": "Pregnancy Loss Rate 1 -- The % of cows that abort their pregnancy before the 1st pregnancy check (default is 0.02)",
+              "default": 0.02,
+              "minimum": 0,
+              "maximum": 1
+            },
+            "cow_preg_check_day_2": {
+              "type": "number",
+              "description": "Pregnancy Check Day 2 (days) --  Days since last insemination to check whether the cow is pregnant or not for the second time if the animal pass the first pregnancy check (default is 60).",
+              "default": 60,
+              "minimum": 0
+            },
+            "cow_preg_loss_rate_2": {
+              "type": "number",
+              "description": "Pregnancy Loss Rate 2 -- % of cows that abort their pregnancy between the 1st and 2nd pregnancy check (default is 0.096)",
+              "default": 0.096,
+              "minimum": 0,
+              "maximum": 0.1
+            },
+            "cow_preg_check_day_3": {
+              "type": "number",
+              "description": "Pregnancy Check Day 3 (days) -- Days since last insemination to check whether the cow is pregnant or not for the third time if the animal passes the second pregnancy check (default is 200).",
+              "default": 200,
+              "minimum": 0
+            },
+            "cow_preg_loss_rate_3": {
               "type": "number",
               "description": "Pregnancy Loss Rate 3 -- The % of cows that abort their pregnancy between the 2nd and 3rd pregnancy check (default is 0.017)",
               "default": 0.017,

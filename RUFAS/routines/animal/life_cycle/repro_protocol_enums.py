@@ -77,3 +77,7 @@ class CowReproProtocolEnum(Enum):
     TAI_CoSynch_72 = 'CoSynch 72'
     TAI_5d_CoSynch = '5d CoSynch'
 
+    ReSynch_TAIbeforePD = 'TAIbeforePD'
+    ReSynch_TAIafterPD = 'TAIafterPD'
+    ReSynch_PGFatPD = 'PGFatPD'
+
