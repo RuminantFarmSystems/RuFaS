@@ -395,7 +395,7 @@ class Field:
 
         """
         info_map = {"class": self.__class__.__name__, "function": self._execute_manure_application.__name__,
-                    "prefix": f"field='{self.field_data.name}'", "date": {"year": year, "day": day}}
+                    "prefix": f"field='{self.field_data.name}'", "date": {"day": day, "year": year}}
         if requested_nitrogen == requested_phosphorus == 0.0:
             log_message = "Tried to apply manure with no nitrogen or phosphorus requested."
             om.add_log("manure_application_log", log_message, info_map)
