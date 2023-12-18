@@ -356,11 +356,13 @@ def test_get_general_estrus_detection_rate(mocker: MockerFixture, mocked_estrus_
     """
 
     # Arrange
+    mocker.patch.object(HeiferII, '__init__', return_value=None)
+    heiferII = HeiferII(mocker.MagicMock())
     patch_for_get_repro_data = mocker.patch.object(HeiferII, 'get_user_defined_repro_data',
                                                    return_value=mocked_estrus_detection_rate)
 
     # Act
-    result = HeiferII.get_general_estrus_detection_rate()
+    result = heiferII.get_general_estrus_detection_rate()
 
     # Assert
     assert result == expected_estrus_detection_rate
@@ -499,11 +501,13 @@ def test_get_general_conception_rate(mocker: MockerFixture, mocked_conception_ra
     """
 
     # Arrange
+    mocker.patch.object(HeiferII, '__init__', return_value=None)
+    heiferII = HeiferII(mocker.MagicMock())
     patch_for_get_repro_data = mocker.patch.object(HeiferII, 'get_user_defined_repro_data',
                                                    return_value=mocked_conception_rate)
 
     # Act
-    result = HeiferII.get_general_conception_rate()
+    result = heiferII.get_general_conception_rate()
 
     # Assert
     assert result == expected_conception_rate
