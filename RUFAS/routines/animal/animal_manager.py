@@ -23,7 +23,7 @@ from RUFAS.routines.animal.pen import Pen
 from RUFAS.routines.animal.ration import ration_driver as ration_driver
 from RUFAS.routines.animal.ration.calf_ration import CalfRationManager
 from RUFAS.routines.animal.ration.ration_driver import RationManager
-from RUFAS.routines.animal.feed_emissions_manager import FeedEmissionsManager
+from RUFAS.routines.animal.purchased_feed_emissions_estimator import PurchasedFeedEmissionsEstimator
 
 from RUFAS.routines.animal.ration import user_defined_ration as udr
 from RUFAS.routines.animal.ration.ration_driver import RationReporter
@@ -83,7 +83,7 @@ class AnimalManager:
         return config
 
     def __init__(self, data, config, feed: Feed, weather: Weather, time: Time,
-                 feed_emissions_manager: FeedEmissionsManager = None):
+                 feed_emissions_estimator: PurchasedFeedEmissionsEstimator = None):
         """
         Initializes the pens and animals in the simulation with data from the
         JSON file by calling init_pens() and init_animals(). Creates instance
@@ -101,8 +101,8 @@ class AnimalManager:
             instance of the Weather class
         time : Time
             instance of the Time class
-        feed_emissions_manager : FeedEmissionsManager, default=None
-            Instance of the FeedEmissionsManager class.
+        feed_emissions_estimator : PurchasedFeedEmissionsEstimator, default=None
+            Instance of the PurchasedFeedEmissionsEstimator class.
 
         """
 
@@ -190,7 +190,8 @@ class AnimalManager:
 
         self._print_animal_num_warnings(data["herd_information"])
 
-        self.feed_emissions_manager: Optional[FeedEmissionsManager] = feed_emissions_manager or FeedEmissionsManager()
+        self.feeds_emissions_estimator: Optional[PurchasedFeedEmissionsEstimator] = \
+            feed_emissions_estimator or PurchasedFeedEmissionsEstimator()
 
     @property
     def animals_by_type(self):

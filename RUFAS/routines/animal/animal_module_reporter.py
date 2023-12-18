@@ -1,5 +1,3 @@
-import pdb
-
 import numpy as np
 
 from RUFAS.output_manager import OutputManager
@@ -191,15 +189,15 @@ class AnimalModuleReporter:
             The unique number identifying a pen.
         pen_animal_name : str
             The name of the animal combination in a pen.
-        feed_emissions_manager : FeedEmissionsManager
-            The Feed Emissions Manager for the Animal Manager.
+        animal_manager : AnimalManager
+            The AnimalManager instance being reported.
 
         """
         info_map = {
             "class": AnimalModuleReporter.__name__,
             "function": AnimalModuleReporter.report_daily_feed_emissions.__name__,
         }
-        daily_feed_emissions = animal_manager.feed_emissions_manager.\
+        daily_feed_emissions = animal_manager.feeds_emissions_estimator.\
             create_daily_purchased_feed_emissions_report(ration_total)
         om.add_variable(
             f"pen_{pen_id}_animal_{pen_animal_name}_feed_emissions",

@@ -9,20 +9,20 @@ om = OutputManager()
 
 class PurchasedFeedEmissionsEstimator:
 
-
     def __init__(self):
         latitude, longitude = self._get_geographic_coordinates()
 
+        dane_county_wi_FIPS_county_code = 55025
         try:
-            self.county_code = self._get_county_code(latitude, longitude)
+            self.FIPS_county_code = self._get_county_code(latitude, longitude)
         except requests.exceptions.RequestException:
-            self.county_code = 55025
+            self.FIPS_county_code = dane_county_wi_FIPS_county_code
 
         info_map = {
             "class": self.__class__.__name__,
             "function": self.__init__.__name__
         }
-        om.add_variable("FIPS_code", self.county_code, info_map)
+        om.add_variable("FIPS_county_code", self.FIPS_county_code, info_map)
 
         self.feed_emissions: dict[str, float] = self._setup_feed_emissions()
         om.add_variable("purchased_feed_emissions", self.feed_emissions, info_map)
@@ -49,8 +49,7 @@ class PurchasedFeedEmissionsEstimator:
             "function": self.create_daily_purchased_feed_emissions_report.__name__
         }
 
-        emissions_per_feed_id={"feed_emissions_total": 0}
-
+        emissions_per_feed_id = {"feed_emissions_total": 0}
 
         for feed_id, amount_fed in daily_feed_totals.items():
             if feed_id == "dry_matter_intake_total":
@@ -58,20 +57,17 @@ class PurchasedFeedEmissionsEstimator:
             if feed_id in self.missing_feed_ids:
                 continue
             if feed_id not in self.feed_emissions.keys():
-
                 om.add_warning(
                     "Missing Purchased Feed Emissions",
-
                     f"Missing purchased feed emissions data for RuFaS feed {feed_id}.",
                     info_map
                 )
                 self.missing_feed_ids.append(feed_id)
                 continue
             emissions = amount_fed * self.feed_emissions[feed_id]
-            emissions_per_feed_id["feed_emissions_total"]+= emissions
+            emissions_per_feed_id["feed_emissions_total"] += emissions
             emissions_per_feed_id[feed_id] = emissions
         return emissions_per_feed_id
-
 
     def _get_geographic_coordinates(self) -> (float, float):
         info_map = {
@@ -93,42 +89,45 @@ class PurchasedFeedEmissionsEstimator:
 
         latitude = im.get_data(f"{field_keys[0]}.absolute_latitude")
 
-        longitude = im.get_data( f"{field_keys[0]}.longitude")
+        longitude = im.get_data(f"{field_keys[0]}.longitude")
 
         longitude = abs(longitude) * -1
 
         return latitude, longitude
 
     def _get_county_code(self, latitude: float, longitude: float) -> int:
+        info_map = {
+            "class": self.__class__,
+            "function": self._get_county_code.__name__
+        }
+
         endpoint = "https://geo.fcc.gov/api/census/block/find"
         params = {"latitude": latitude, "longitude": longitude, "format": "json"}
 
-        responses = []
-        for _ in range(3):
+        retries = 3
+        for tries_count in range(retries):
+            om.add_log(
+                "Feed Emissions API Call",
+                f"Calling the FCC's FIPS County Code API, try: {tries_count}",
+                info_map
+            )
             response = requests.get(endpoint, params=params)
             if response.status_code == 200:
                 answer = response.json()
                 return int(answer["County"]["FIPS"])
-            responses.append(response)
-        else:
-            info_map = {
-                "class": self.__class__,
-                "function": self._get_county_code.__name__
-            }
-            error_name = "Bad API responses"
-            error_message = f"Responses: {responses}"
-            om.add_error(error_name, error_message, info_map)
-            raise requests.exceptions.RequestException(
-                f"Bad API response: {[response.text for response in responses]}"
+            om.add_error(
+                "Error Feed Emissions API Call",
+                f"FCC's FIPS County Code API try: {tries_count} failed with status code: {response.status_code}.",
+                info_map
             )
 
     def _setup_feed_emissions(self) -> dict[str, float]:
         feed_emissions_data = im.get_data("purchased_feeds_emissions")
 
         county_codes = feed_emissions_data["county_code"]
-        emissions_index = county_codes.index(self.county_code)
+        emissions_index = county_codes.index(self.FIPS_county_code)
 
-        feed_keys = [key for key in feed_emissions_data.keys() if key != "county_code"]
+        feed_keys = [key for key in feed_emissions_data.keys() if key != "FIPS_county_code"]
         feed_emissions_dict = {key: feed_emissions_data[key][emissions_index] for key in feed_keys}
 
         return feed_emissions_dict
