@@ -858,13 +858,19 @@ def test_execute_manure_application_with_invalid_args(depth: float, remainder: f
                                                       expected_remainder: float, invalid_combination: bool) -> None:
     """Tests that the manure application executor raises errors and runs correctly when invalid arguments are passed."""
     mocked_manure_manager = MagicMock(ManureManager)
-    mocked_manure_manager.request_nutrients = MagicMock(return_value=NutrientRequestResults(nitrogen=50.0,
-                                                                                            phosphorus=50.0,
-                                                                                            total_manure_mass=150.0,
-                                                                                            dry_matter=100.0,
-                                                                                            dry_matter_fraction=0.66))
+    supplied_nutrients = NutrientRequestResults(
+        nitrogen=50.0,
+        phosphorus=50.0,
+        total_manure_mass=150.0,
+        dry_matter=100.0,
+        dry_matter_fraction=0.66
+    )
+    mocked_manure_manager.request_nutrients = MagicMock(return_value=supplied_nutrients)
     field = Field(field_data=FieldData(name="test", field_size=1.89), manure_manager=mocked_manure_manager)
     field.soil.data.soil_layers[-1].bottom_depth = 950.0
+    expected_total_inorganic_fraction = 0.15  # equal to (50.0 / 100.0) * 0.3
+    expected_total_organic_fraction = 0.35  # equal to (50.0 / 100.0) * 0.7
+
     with patch("RUFAS.routines.field.field.field.Field._record_nutrient_application_error",
                new_callable=MagicMock) as patched_error, \
             patch("RUFAS.routines.field.field.manure_application.ManureApplication.apply_machine_manure",
@@ -890,9 +896,9 @@ def test_execute_manure_application_with_invalid_args(depth: float, remainder: f
             application_depth=expected_depth,
             surface_remainder_fraction=expected_remainder,
             field_size=1.89,
-            inorganic_nitrogen_fraction=0.3,
-            ammonium_fraction=0.3,
-            organic_nitrogen_fraction=0.2,
+            inorganic_nitrogen_fraction=expected_total_inorganic_fraction,
+            ammonium_fraction=supplied_nutrients.ammonium_nitrogen_fraction,
+            organic_nitrogen_fraction=expected_total_organic_fraction,
             water_extractable_inorganic_phosphorus_fraction=0.5)
         patched_recorder.assert_called_once_with(dry_matter_mass=100.0,
                                                  dry_matter_fraction=0.66,
