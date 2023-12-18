@@ -1,3 +1,5 @@
+import pdb
+
 import numpy as np
 
 from RUFAS.output_manager import OutputManager
@@ -194,10 +196,9 @@ class AnimalModuleReporter:
 
         """
         info_map = {
-            "class": "AnimalModuleReporter",
-            "function": "report_daily_feed_emissions",
+            "class": AnimalModuleReporter.__name__,
+            "function": AnimalModuleReporter.report_daily_feed_emissions.__name__,
         }
-
         daily_feed_emissions = animal_manager.feed_emissions_manager.\
             create_daily_purchased_feed_emissions_report(ration_total)
         om.add_variable(

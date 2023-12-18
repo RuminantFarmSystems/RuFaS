@@ -76,8 +76,8 @@ class FeedEmissionsManager:
             "function": self._get_geographic_coordinates.__name__
         }
 
-        latitude = 43.073
-        longitude = -89.401
+        madison_wi_latitude = 43.073
+        madison_wi_longitude = -89.401
 
         field_keys: list[str] = im.get_data_keys_by_properties("field_properties")
 
@@ -86,7 +86,7 @@ class FeedEmissionsManager:
             warning_message = "Could not obtain feed emissions geographic attributes, defaulting to Madison, WI."
             om.add_warning(warning_name, warning_message, info_map)
 
-            return {"latitude": latitude, "longitude": longitude}
+            return {"latitude": madison_wi_latitude, "longitude": madison_wi_longitude}
 
         field_key = field_keys[0]
 
@@ -108,7 +108,7 @@ class FeedEmissionsManager:
             response = requests.get(endpoint, params=params)
             if response.status_code == 200:
                 answer = response.json()
-                break
+                return int(answer["County"]["FIPS"])
             responses.append(response)
         else:
             info_map = {
@@ -121,9 +121,6 @@ class FeedEmissionsManager:
             raise requests.exceptions.RequestException(
                 f"Bad API response: {[response.text for response in responses]}"
             )
-
-        county_code = int(answer["County"]["FIPS"])
-        return county_code
 
     def _setup_feed_emissions(self) -> dict[str, float]:
         feed_emissions_data = im.get_data("purchased_feeds_emissions")
