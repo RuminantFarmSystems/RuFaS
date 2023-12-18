@@ -144,12 +144,15 @@ denitrified, then removing that amount from the nitrate pool and adding it to de
 <dl class="py method">
 <dt class="sig sig-object py" id="RUFAS.routines.field.soil.nitrogen_cycling.humus_mineralization.HumusMineralization.mineralize_organic_nitrogen">
 <span class="sig-name descname"><span class="pre">mineralize_organic_nitrogen</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.routines.field.soil.nitrogen_cycling.humus_mineralization.HumusMineralization.mineralize_organic_nitrogen" title="Link to this definition"></a></dt>
-<dd><p>Iterates through each layer in the soil profile, transfers nitrogen between active and stable organic
-nitrogen pools, and between the active organic and nitrate pools.</p>
+<dd><p>Iterates through each layer in the soil profile, transfers nitrogen between active and stable organic nitrogen
+pools, and between the active organic and ammonium pools.</p>
 <section id="id1">
 <h3>Notes<a class="headerlink" href="#id1" title="Link to this heading"></a></h3>
 <p>Mineralization and decomposition can only occur if the soil temperature is greater than 0 degrees C (see first
 paragraph on page 188 of SWAT Theoretical documentation).</p>
+<p>SWAT has the active organic nitrogen mineralize directly into the nitrate pool, this method instead mineralizes
+it into the ammonium pool. This is more realistic, and helps to make sure that ammonia volatilization is allowed
+to happen fully.</p>
 </section>
 </dd></dl>
 
