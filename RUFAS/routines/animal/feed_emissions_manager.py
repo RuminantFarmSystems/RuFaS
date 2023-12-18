@@ -106,7 +106,6 @@ class FeedEmissionsManager:
         responses = []
         for _ in range(3):
             response = requests.get(endpoint, params=params)
-            print("Try!")
             if response.status_code == 200:
                 answer = response.json()
                 break
