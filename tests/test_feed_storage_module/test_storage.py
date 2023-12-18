@@ -76,10 +76,19 @@ def harvested_crop(sample_crop_data: Dict[str, float]) -> HarvestedCrop:
 
 
 def test_receive_crop(storage: Storage, harvested_crop: HarvestedCrop):
-    """
-    Test the receive_crop method of the Storage class.
-    """
-    pass
+    # Initially, storage should be empty
+    assert len(storage.stored) == 0
+
+    # Add a crop and check if it's stored
+    storage.receive_crop(harvested_crop, harvested_crop.harvest_time)
+    assert len(storage.stored) == 1
+    assert storage.stored[0].fresh_mass == 100.0
+
+    # Test exceeding capacity
+    storage.capacity = 100.0  # Set a finite capacity
+    with pytest.raises(Exception) as excinfo:
+        storage.receive_crop(harvested_crop, harvested_crop.harvest_time)
+    assert "exceeds the storage capacity" in str(excinfo.value)
 
 
 def test_process_degradations(storage: Storage):
