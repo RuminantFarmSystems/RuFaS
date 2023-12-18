@@ -17,13 +17,13 @@ class NutrientRequestResults:
     total_manure_mass: float = 0.0
     """Total amount of manure that can be fulfilled (kg). Default to 0."""
 
-    organic_nitrogen_fraction: float = 0.4
+    organic_nitrogen_fraction: float = 0.7
     """Fraction of nitrogen that is present in organic form, between 0 and 1 (unitless). Default to 0.4."""
 
-    inorganic_nitrogen_fraction: float = 0.6
+    inorganic_nitrogen_fraction: float = 0.3
     """Fraction of nitrogen that is present in inorganic form, between 0 and 1 (unitless). Default to 0.6."""
 
-    ammonium_nitrogen_fraction: float = 0.3
+    ammonium_nitrogen_fraction: float = 1.0
     """Fraction of `inorganic` nitrogen that is present in ammonium form, between 0 and 1 (unitless). Default to 0.3."""
 
     organic_phosphorus_fraction: float = 0.5
