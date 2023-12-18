@@ -40,7 +40,7 @@ class Storage:
         Recalculates the relative nutrient concentrations after dry matter loss.
     """
 
-    def __init__(self, capacity: Optional[float]):
+    def __init__(self, capacity: Optional[float] = None):
         self.stored: List[HarvestedCrop] = []
         self.capacity = capacity or float("inf")
 
