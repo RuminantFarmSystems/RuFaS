@@ -260,8 +260,6 @@ class ManureApplication:
         the Fortran code was sent to the RuFaS team.
 
         """
-        # TODO: evaluate how to best apply subsurface liquid manure, it is likely more complicated than how this method
-        #   accomplishes it - issue #713
         surface_dry_matter_mass = dry_matter_mass * surface_remainder_fraction
         wet_rate = self._determine_wet_rate_factor(surface_dry_matter_mass, dry_matter_fraction, field_coverage,
                                                    field_size)
@@ -282,7 +280,6 @@ class ManureApplication:
         self.data.machine_stable_organic_phosphorus += total_phosphorus_mass * \
             stable_organic_phosphorus_fraction * surface_retention * surface_remainder_fraction
 
-        # TODO: put infiltrated organic phosphorus into corresponding soil pools - issue #444
         mass_to_add_to_labile_P = total_phosphorus_mass * water_extractable_inorganic_phosphorus_fraction * \
             soil_infiltration
         mass_to_add_to_labile_P += total_phosphorus_mass * water_extractable_organic_phosphorus_fraction * \
@@ -306,15 +303,12 @@ class ManureApplication:
         self.data.machine_manure_moisture_factor = new_vals.get("new_moisture_factor")
         self.data.machine_manure_field_coverage = new_vals.get("new_field_coverage")
 
-        top_layer_proportion = self.data.soil_layers[0].layer_thickness / self.data.soil_layers[1].bottom_depth
-        second_layer_proportion = (1 - top_layer_proportion)
-
-        top_layer_mass = top_layer_proportion * surface_dry_matter_mass
+        top_layer_mass = surface_retention * surface_dry_matter_mass
         top_layer_inorganic_nitrogen_fraction = surface_retention * inorganic_nitrogen_fraction
         top_layer_organic_nitrogen_fraction = surface_retention * organic_nitrogen_fraction
         self._add_nitrogen_to_soil_layer(0, top_layer_mass, top_layer_inorganic_nitrogen_fraction, ammonium_fraction,
                                          top_layer_organic_nitrogen_fraction, field_size)
-        second_layer_mass = second_layer_proportion * surface_dry_matter_mass
+        second_layer_mass = soil_infiltration * surface_dry_matter_mass
         second_layer_inorganic_nitrogen_fraction = soil_infiltration * inorganic_nitrogen_fraction
         second_layer_organic_nitrogen_fraction = soil_infiltration * organic_nitrogen_fraction
         self._add_nitrogen_to_soil_layer(1, second_layer_mass, second_layer_inorganic_nitrogen_fraction,
@@ -356,11 +350,15 @@ class ManureApplication:
         References
         ----------
         SWAT Theoretical documentation section 6:1.7
+        pseudocode_field_management [FM.4.D.1]
 
         Notes
         -----
         This method allows nitrogen to be added to any soil layer in the profile by specifying the index of that layer.
         The top soil layer will always be at index 0.
+
+        Instead of partitioning organic nitrogen between the fresh and active pools, it is partitioned between the
+        stable and active pools. Refer to the pseudocode for this.
 
         """
         nitrates_added = (dry_matter_mass * inorganic_nitrogen_fraction * (1 - ammonium_fraction)) / field_size
