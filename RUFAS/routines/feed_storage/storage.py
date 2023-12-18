@@ -1,5 +1,5 @@
-from typing import List
-from RUFAS.config import Config
+import copy
+from typing import List, Optional
 from RUFAS.time import Time
 from .enums import CropType
 from .harvested_crop import HarvestedCrop
@@ -18,6 +18,8 @@ class Storage:
 
     Methods
     -------
+    stored_mass()
+        The total mass (kg) of currently stored crops
     receive_crop(crop: HarvestedCrop, time: Time)
         Receives a harvested crop and adds it to the storage.
     process_degradations()
@@ -38,9 +40,14 @@ class Storage:
         Recalculates the relative nutrient concentrations after dry matter loss.
     """
 
-    def __init__(self):
+    def __init__(self, capacity: Optional[float]):
         self.stored: List[HarvestedCrop] = []
-        self.capacity = float("inf")
+        self.capacity = capacity or float("inf")
+
+    @property
+    def stored_mass(self) -> float:
+        """The total mass (kg) of currently stored crops"""
+        return sum(crop.fresh_mass for crop in self.stored)
 
     def receive_crop(self, crop: HarvestedCrop, time: Time) -> None:
         """
