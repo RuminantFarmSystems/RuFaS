@@ -7,7 +7,8 @@ im = InputManager()
 om = OutputManager()
 
 
-class FeedEmissionsManager:
+class PurchasedFeedEmissionsEstimator:
+
 
     def __init__(self):
         latitude, longitude = self._get_geographic_coordinates()
@@ -48,27 +49,29 @@ class FeedEmissionsManager:
             "function": self.create_daily_purchased_feed_emissions_report.__name__
         }
 
-        total_emissions = 0.0
-        emissions_dict = {}
+        emissions_per_feed_id={"feed_emissions_total": 0}
+
 
         for feed_id, amount_fed in daily_feed_totals.items():
             if feed_id == "dry_matter_intake_total":
                 continue
             if feed_id in self.missing_feed_ids:
                 continue
-            elif feed_id not in self.feed_emissions.keys():
+            if feed_id not in self.feed_emissions.keys():
+
                 om.add_warning(
-                    "Purchased Feed Emissions Warning",
+                    "Missing Purchased Feed Emissions",
+
                     f"Missing purchased feed emissions data for RuFaS feed {feed_id}.",
                     info_map
                 )
                 self.missing_feed_ids.append(feed_id)
                 continue
             emissions = amount_fed * self.feed_emissions[feed_id]
-            total_emissions += emissions
-            emissions_dict[feed_id] = emissions
-        emissions_dict["feed_emissions_total"] = total_emissions
-        return emissions_dict
+            emissions_per_feed_id["feed_emissions_total"]+= emissions
+            emissions_per_feed_id[feed_id] = emissions
+        return emissions_per_feed_id
+
 
     def _get_geographic_coordinates(self) -> (float, float):
         info_map = {
@@ -88,13 +91,10 @@ class FeedEmissionsManager:
 
             return {"latitude": latitude, "longitude": longitude}
 
-        field_key = field_keys[0]
+        latitude = im.get_data(f"{field_keys[0]}.absolute_latitude")
 
-        latitude_data_address = f"{field_key}.absolute_latitude"
-        latitude = im.get_data(latitude_data_address)
+        longitude = im.get_data( f"{field_keys[0]}.longitude")
 
-        longitude_data_address = f"{field_key}.longitude"
-        longitude = im.get_data(longitude_data_address)
         longitude = abs(longitude) * -1
 
         return latitude, longitude
