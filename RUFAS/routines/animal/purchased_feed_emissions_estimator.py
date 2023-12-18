@@ -122,6 +122,22 @@ class PurchasedFeedEmissionsEstimator:
             )
 
     def _setup_feed_emissions(self) -> dict[str, float]:
+        """
+        Setups up the table mapping CO2 emissions to purchased feeds types.
+
+        Returns
+        -------
+        dict[str, float]
+            Dictionary mapping the RuFaS feed ID to the amount of CO2 emissions in kg per kg's of dry matter feed.
+
+        Notes
+        -----
+        This method works by:
+        - Grabbing the table that maps all available FIPS county codes to purchased feeds emissions information.
+        - Finding the row (index) which contains the desired FIPS county information.
+        - Grabbing the information for each available feed ID from the row found in the previous step.
+
+        """
         feed_emissions_data = im.get_data("purchased_feeds_emissions")
 
         county_codes = feed_emissions_data["county_code"]
