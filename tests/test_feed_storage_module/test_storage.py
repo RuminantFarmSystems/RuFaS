@@ -75,6 +75,13 @@ def harvested_crop(sample_crop_data: Dict[str, float]) -> HarvestedCrop:
     return HarvestedCrop(category=category, type=crop_type, **sample_crop_data)
 
 
+def test_stored_mass(storage: Storage, harvested_crop: HarvestedCrop):
+    assert storage.stored_mass == 0.0  # Initially empty
+    storage.receive_crop(harvested_crop, harvested_crop.harvest_time)
+    storage.receive_crop(harvested_crop, harvested_crop.harvest_time)
+    assert storage.stored_mass == 200.0  # After adding a crop
+
+
 def test_receive_crop(storage: Storage, harvested_crop: HarvestedCrop):
     # Initially, storage should be empty
     assert len(storage.stored) == 0
