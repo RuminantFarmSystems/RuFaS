@@ -35,12 +35,12 @@ class FeedEmissionsManager:
         Parameters
         ----------
         daily_feed_totals : dict[str, float]
-            Maps the feed type to the amount of feed given to the pen (kg dry matter).
+            Maps the feed type to the amount of feed given to the pen (feed ID, kg dry matter).
 
         Returns
         -------
         dict[str, float]
-            Maps the feed type to the amount of emissions generated in producing and delivering it (kg).
+            Maps the feed type to the amount of emissions generated in producing and delivering it (feed ID, kg).
 
         """
         info_map = {
