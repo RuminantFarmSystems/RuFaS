@@ -639,6 +639,7 @@ class LayerData:
 
         """
         lower_bounded = max(0.05, self.water_content / self.field_capacity_content)
+        upper_bounded = min(1.0, lower_bounded)
         return lower_bounded
 
     @property
