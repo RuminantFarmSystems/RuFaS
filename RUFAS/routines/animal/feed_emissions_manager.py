@@ -103,18 +103,25 @@ class FeedEmissionsManager:
         endpoint = "https://geo.fcc.gov/api/census/block/find"
         params = {"latitude": latitude, "longitude": longitude, "format": "json"}
 
-        response = requests.get(endpoint, params=params)
-        if response.status_code != 200:
+        responses = []
+        for _ in range(3):
+            response = requests.get(endpoint, params=params)
+            print("Try!")
+            if response.status_code == 200:
+                answer = response.json()
+                break
+            responses.append(response)
+        else:
             info_map = {
                 "class": self.__class__,
                 "function": self._get_county_code.__name__
             }
-            error_name = "Bad API response"
-            error_message = f"Response: {response}"
+            error_name = "Bad API responses"
+            error_message = f"Responses: {responses}"
             om.add_error(error_name, error_message, info_map)
-            raise requests.exceptions.RequestException(f"Bad API response: {response.text}")
-
-        answer = response.json()
+            raise requests.exceptions.RequestException(
+                f"Bad API response: {[response.text for response in responses]}"
+            )
 
         county_code = int(answer["County"]["FIPS"])
         return county_code
