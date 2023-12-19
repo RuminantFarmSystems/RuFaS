@@ -74,7 +74,7 @@ class PenManure:
 
     def __post_init__(self):
         """Performs any necessary unit conversion after initialization."""
-        self.manure_volume = self.manure_mass / ManureConstants.MANURE_DENSITY
+        self.manure_volume = self.manure_mass / ManureConstants.SLURRY_MANURE_DENSITY
 
         # Zero out any negative field
         # TODO: This is a temporary fix. Need to find out why negative values are being generated
@@ -106,16 +106,17 @@ class PenManure:
         """
         manure_mass = animal_manure["manure_mass"]  # kg
         manure_volume = (
-            manure_mass / ManureConstants.MANURE_DENSITY
+            manure_mass / ManureConstants.SLURRY_MANURE_DENSITY
         ) * GeneralConstants.CUBIC_METERS_TO_LITERS  # L
         total_ammoniacal_nitrogen = (
-            animal_manure["total_ammoniacal_nitrogen_concentration"]  # g/L
+                (animal_manure["total_ammoniacal_nitrogen_concentration"]/num_animals)  # g/L
             * manure_volume  # L
         ) * GeneralConstants.GRAMS_TO_KG  # kg
 
         if num_animals == 0:
             return cls()
-
+        #urine_total_ammoniacal_nitrogen = animal_manure["urine_nitrogen"]*ManureConstants.URINE_TAN_FACTOR
+       # print(urine_total_ammoniacal_nitrogen)
         return cls(
             urea=animal_manure["urea"] / num_animals,
             urine=animal_manure["urine"],

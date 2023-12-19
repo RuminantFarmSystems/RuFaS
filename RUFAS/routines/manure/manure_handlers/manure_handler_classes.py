@@ -7,6 +7,8 @@ from typing import Type
 
 from RUFAS.time import Time
 from RUFAS.weather import Weather
+from RUFAS.general_constants import GeneralConstants
+from RUFAS.routines.manure.constants_and_units.manure_constants import ManureConstants
 from RUFAS.routines.manure.beddings.bedding_classes import BaseBedding
 from RUFAS.routines.manure.default_enum.default_enum import DefaultEnum
 from RUFAS.routines.manure.gas_emissions.calculator import (
@@ -112,8 +114,8 @@ class BaseManureHandler:
         housing_ammonia_emission = GasEmissionsCalculator.housing_ammonia_emission(
             num_animals=pen.num_animals,
             barn_area_per_animal=pen.barn_area_from_pen_type,  # m^2/animal
-            urine_total_ammoniacal_nitrogen=pen.manure.urine_total_ammoniacal_nitrogen,  # kg
-            urine=pen.manure.urine,  # kg
+            manure_total_ammoniacal_nitrogen=pen.manure.manure_total_ammoniacal_nitrogen,  # kg
+            manure=pen.manure.manure_mass,  # kg
             temp=self._get_current_day_average_temperature_in_celsius(),
         )
 
@@ -125,10 +127,11 @@ class BaseManureHandler:
                 max(
                     0.0,
                     pen.manure.manure_total_ammoniacal_nitrogen
-                    - housing_ammonia_emission,
+                    - (housing_ammonia_emission*GeneralConstants.AMMONIA_TO_AMMONIA_NITROGEN),
                 )
             ),
-            liquid_manure_nitrogen=pen.manure.nitrogen,
+            liquid_manure_nitrogen=(pen.manure.nitrogen -
+                                    (housing_ammonia_emission*GeneralConstants.AMMONIA_TO_AMMONIA_NITROGEN)),
             liquid_manure_total_solids=pen.manure.total_solids,
             manure_degradable_volatile_solids=pen.manure.degradable_volatile_solids,
             manure_non_degradable_volatile_solids=pen.manure.non_degradable_volatile_solids,
@@ -164,7 +167,8 @@ class BaseManureHandler:
             Volume of cleaning water needed for the given pen, L.
 
         """
-        cleaning_water_volume = num_animals * self.config.cleaning_water_use_rate
+        cleaning_water_volume = (num_animals * self.config.cleaning_water_use_rate
+                                 * (1-ManureConstants.WATER_RECYCLING_FRACTION))
 
         return cleaning_water_volume
 
@@ -239,13 +243,15 @@ class ManureHandlerConfig:
         Number of cleanings per day.
     daily_tillage_frequency : int
         Number of times per day that compost bedding is tilled.
+    pen_cleaning_water_recycling_fraction: float
+        fraction of water used for pen cleaning that comes from recycled waste water
     """
 
     cleaning_water_use_rate: float = 0.0
     minutes_per_cleaning: int = 8
     cleanings_per_day: int = 2
     daily_tillage_frequency: int = 0
-
+    #pen_cleaning_water_recycling_fraction: float = ManureConstants.WATER_RECYCLING_FRACTION
 
 class DefaultManureHandlerConfigFactory:
     """Class for creating default manure handler configurations."""

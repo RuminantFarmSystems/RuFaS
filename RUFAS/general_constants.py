@@ -42,6 +42,7 @@ class GeneralConstants:
     # Biochemistry-related
     PROTEIN_TO_NITROGEN = 0.16
     NITROGEN_TO_PROTEIN = 6.25
+    AMMONIA_TO_AMMONIA_NITROGEN = 14/17
 
     # Earth related data
     EARTH_ANGULAR_VELOCITY = 0.2618

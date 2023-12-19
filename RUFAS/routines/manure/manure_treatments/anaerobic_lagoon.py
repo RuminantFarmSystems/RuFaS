@@ -127,7 +127,6 @@ class AnaerobicLagoon(BaseManureTreatment):
         """
         manure_total_ammoniacal_nitrogen = max(
             daily_output.liquid_manure_total_ammoniacal_nitrogen
-            + self._current_pen.manure.urine_total_ammoniacal_nitrogen
             - self._manure_handler_daily_output.housing_ammonia,
             0.0,
         )

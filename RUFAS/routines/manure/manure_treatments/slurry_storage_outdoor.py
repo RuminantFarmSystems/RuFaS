@@ -3,7 +3,7 @@ from __future__ import annotations
 from typing import Tuple
 
 import math
-
+from RUFAS.general_constants import GeneralConstants
 from RUFAS.routines.manure.constants_and_units.manure_constants import ManureConstants
 from RUFAS.routines.manure.gas_emissions.calculator import (
     GasEmissionsCalculator,
@@ -221,6 +221,7 @@ class SlurryStorageOutdoor(BaseManureTreatment):
         barn_area: float,
         accumulated_manure_volume: float,
         accumulated_manure_total_ammoniacal_nitrogen: float,
+        accumulated_manure_total_solids: float
     ) -> Tuple[float, float]:
         """Calculates the ammonia emission from the outdoor slurry storage treatment system.
 
@@ -229,6 +230,7 @@ class SlurryStorageOutdoor(BaseManureTreatment):
             barn_area: The area of the barn per animal, m^2/animal.
             accumulated_manure_volume: The accumulated manure volume in the treatment system, m^3.
             accumulated_manure_total_ammoniacal_nitrogen: The accumulated TAN in the treatment system, kg.
+            accumulated_manure_total_solids: The accumulated total solids in the treatment system, kg.
 
         Returns:
             ammonia_loss: ammonia emission from the outdoor slurry storage, kg.
@@ -236,18 +238,17 @@ class SlurryStorageOutdoor(BaseManureTreatment):
             in the treatment system after the ammonia emission is calculated, kg.
 
         """
-        ammonia_loss = GasEmissionsCalculator.ammonia_emission(
+        ammonia_loss = GasEmissionsCalculator.storage_ammonia_emission(
             num_animals=num_animals,
-            barn_area=barn_area,
-            mass=accumulated_manure_volume
-            * ManureConstants.MANURE_DENSITY
-            / num_animals,
-            total_ammoniacal_nitrogen=accumulated_manure_total_ammoniacal_nitrogen
-            / num_animals,
-            temperature_celsius=self._get_current_day_average_temperature_celsius(),
+            manure_total_ammoniacal_nitrogen=accumulated_manure_total_ammoniacal_nitrogen,
+            manure_volume=accumulated_manure_volume,
+            manure_density=ManureConstants.SLURRY_MANURE_DENSITY,
+            total_solids= accumulated_manure_total_solids,
+            temp=self._get_current_day_average_temperature_celsius(),
         )
+
         new_accumulated_liquid_manure_total_ammoniacal_nitrogen = max(
-            accumulated_manure_total_ammoniacal_nitrogen - ammonia_loss, 0.0
+            accumulated_manure_total_ammoniacal_nitrogen - ammonia_loss*GeneralConstants.AMMONIA_TO_AMMONIA_NITROGEN, 0.0
         )
         return ammonia_loss, new_accumulated_liquid_manure_total_ammoniacal_nitrogen
 
@@ -286,6 +287,7 @@ class SlurryStorageOutdoor(BaseManureTreatment):
             accumulated_manure_total_ammoniacal_nitrogen=(
                 self._accumulated_output.liquid_manure_total_ammoniacal_nitrogen
             ),
+            accumulated_manure_total_solids=self._accumulated_output.liquid_manure_total_solids
         )
         daily_output.storage_ammonia = ammonia_loss
         self._accumulated_output.storage_ammonia += ammonia_loss

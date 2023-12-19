@@ -21,13 +21,13 @@ class ManureConstants:
     MANURE_SOLIDS_BEDDING_DENSITY = 400.0
     """The density of manure solids bedding (kg/:math:`m^3`)."""
 
-    LIQUID_MANURE_DENSITY = 990.0
+    LIQUID_MANURE_DENSITY = 1000
     """The density of liquid manure (kg/:math:`m^3`)."""
 
-    SLURRY_MANURE_DENSITY = 1400
+    SLURRY_MANURE_DENSITY = 990
     """The density of slurry manure (kg/:math:`m^3`)."""
 
-    SOLID_MANURE_DENSITY = 1250
+    SOLID_MANURE_DENSITY = 700
     """The density of solid manure (kg/:math:`m^3`)."""
 
     DEFAULT_CARBON_FRACTION_AVAILABLE_IN_MANURE = 0.5
@@ -55,4 +55,8 @@ class ManureConstants:
     """
     The fraction of inorganic nitrogen in compost bedding that is ammonium (unitless, [0, 1]).
     Default is set to 0.5.
+    """
+    WATER_RECYCLING_FRACTION = 0.98
+    """
+    The fraction of water used to clean pens that comes from recycled waste water instead of fresh water
     """

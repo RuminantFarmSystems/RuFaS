@@ -131,14 +131,12 @@ def manure_calculations(ration_formulation,
                    - 0.412 * CP_concentration
                    - 0.074 * dry_matter_concentration
                    - 0.0057 * days_in_milk)
-
     # Total Solids, kg [A.3E.A.2]
     # The amount of fecal solids is assumed to be equivalent to the amount of total solids
     fecal_solids = (-0.576
                     + 0.370 * dry_matter_intake
                     - 0.075 * CP_concentration
                     + 0.059 * ADF_concentration)
-
     # Total urine, kg [A.3E.A.3]
     urine = (-7.742
              + 0.388 * dry_matter_intake

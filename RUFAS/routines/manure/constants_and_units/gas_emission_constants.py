@@ -127,10 +127,10 @@ class GasEmissionConstants:
     LIQUID_MANURE_HSC = 4.1
     """Housing specific constant for liquid manure (s/m)."""
 
-    SOLID_MANURE_THRESHOLD = 8.0
+    SOLID_MANURE_THRESHOLD = 0.08
     """Dry matter threshold for classifying solid and semi-solid manure (unitless)."""
 
-    SLURRY_MANURE_THRESHOLD = 5.0
+    SLURRY_MANURE_THRESHOLD = 0.05
     """Dry matter threshold for classifying slurry manure (unitless)."""
 
     DEFAULT_STORAGE_AREA_PER_ANIMAL = 1.0
