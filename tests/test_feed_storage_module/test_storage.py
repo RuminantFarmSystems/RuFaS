@@ -76,6 +76,7 @@ def harvested_crop(sample_crop_data: Dict[str, float]) -> HarvestedCrop:
 
 
 def test_stored_mass(storage: Storage, harvested_crop: HarvestedCrop):
+    storage.acceptable_crops = [CropCategory.SMALL_GRAIN]
     assert storage.stored_mass == 0.0  # Initially empty
     storage.receive_crop(harvested_crop, harvested_crop.harvest_time)
     storage.receive_crop(harvested_crop, harvested_crop.harvest_time)
@@ -83,6 +84,7 @@ def test_stored_mass(storage: Storage, harvested_crop: HarvestedCrop):
 
 
 def test_receive_crop(storage: Storage, harvested_crop: HarvestedCrop):
+    storage.acceptable_crops = [CropCategory.SMALL_GRAIN]
     # Initially, storage should be empty
     assert len(storage.stored) == 0
 
@@ -96,6 +98,14 @@ def test_receive_crop(storage: Storage, harvested_crop: HarvestedCrop):
     with pytest.raises(Exception) as excinfo:
         storage.receive_crop(harvested_crop, harvested_crop.harvest_time)
     assert "exceeds the storage capacity" in str(excinfo.value)
+
+
+def test_successful_receive_crop(storage: Storage, harvested_crop: HarvestedCrop):
+    storage.acceptable_crops = [CropCategory.SMALL_GRAIN]
+    storage.receive_crop(harvested_crop, harvested_crop.harvest_time)
+    assert len(storage.stored) == 1
+    assert storage.stored[0].fresh_mass == harvested_crop.fresh_mass
+    assert storage.stored[0].storage_time == harvested_crop.harvest_time
 
 
 def test_process_degradations(storage: Storage):
