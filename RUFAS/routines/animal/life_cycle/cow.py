@@ -1225,7 +1225,8 @@ class Cow(HeiferIII):
             CowReproProtocolEnum.ReSynch_TAIafterPD.value: self._handle_tai_after_preg_check,
             CowReproProtocolEnum.ReSynch_PGFatPD.value: self._handle_pgf_injection_at_preg_check
         }
-        pass
+        protocol = self.get_user_defined_resynch_protocol()
+        resynch_protocols[protocol](sim_day)
 
     def _handle_tai_after_preg_check(self, sim_day: int) -> None:
         pass
