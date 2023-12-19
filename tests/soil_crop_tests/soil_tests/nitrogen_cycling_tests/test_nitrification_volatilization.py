@@ -7,17 +7,16 @@ from RUFAS.routines.field.soil.soil_data import SoilData
 
 
 # --- Static method tests ---
-@pytest.mark.parametrize("temp", [
-    20,
-    31.493,
-    14.334,
-    5.0193
+@pytest.mark.parametrize("temp,expected", [
+    (20, 0.615),
+    (31.493, 1.0),
+    (14.334, 0.382_694),
+    (5.0193, 0.000_791_3)
 ])
-def test_calculate_nitrification_volatilization_temp_factor(temp: float) -> None:
+def test_calculate_nitrification_volatilization_temp_factor(temp: float, expected: float) -> None:
     """Tests that the temperature factor used by the nitrification volatilization module is calculated correctly."""
     observed = NitrificationVolatilization._calculate_nitrification_volatilization_temp_factor(temp)
-    expected = 0.41 * (temp - 5) / 10
-    assert observed == expected
+    assert pytest.approx(observed) == expected
 
 
 @pytest.mark.parametrize("water,wilting,field", [
@@ -119,7 +118,8 @@ def test_do_daily_nitrification_and_volatilization() -> None:
     with patch.multiple("RUFAS.routines.field.soil.layer_data.LayerData",
                         wilting_point_content=PropertyMock(return_value=2.33),
                         field_capacity_content=PropertyMock(return_value=5.77),
-                        depth_of_layer_center=PropertyMock(return_value=57.89)):
+                        depth_of_layer_center=PropertyMock(return_value=57.89),
+                        nutrient_cycling_water_factor=PropertyMock(return_value=0.75)):
         data = SoilData(field_size=1.8)
         incorp = NitrificationVolatilization(data)
         incorp.data.set_vectorized_layer_attribute("temperature", [18, 4, 18, 18])
@@ -142,8 +142,6 @@ def test_do_daily_nitrification_and_volatilization() -> None:
 
         temp_factor_calls = [call(18)] * 3
         incorp._calculate_nitrification_volatilization_temp_factor.assert_has_calls(temp_factor_calls)
-        water_factor_calls = [call(3.67, 2.33, 5.77)] * 3
-        incorp._calculate_nitrification_soil_water_factor.assert_has_calls(water_factor_calls)
         depth_factor_calls = [call(57.89)] * 3
         incorp._calculate_volatilization_depth_factor.assert_has_calls(depth_factor_calls)
         nitrification_regulator_calls = [call(0.8, 0.75)] * 3
@@ -159,6 +157,7 @@ def test_do_daily_nitrification_and_volatilization() -> None:
 
         assert incorp.data.soil_layers[0].ammonium_content == 18.5
         assert incorp.data.soil_layers[0].nitrate_content == 28.25
+        assert incorp.data.soil_layers[0].volatilized_ammonium_emissions == 3.25
         assert incorp.data.soil_layers[0].annual_volatilized_ammonium_total == 3.25
 
         assert incorp.data.soil_layers[1].ammonium_content == 25
@@ -168,4 +167,5 @@ def test_do_daily_nitrification_and_volatilization() -> None:
         for layer in incorp.data.soil_layers[2:]:
             assert layer.ammonium_content == 18.5
             assert layer.nitrate_content == 28.25
+            assert layer.volatilized_ammonium_emissions == 3.25
             assert layer.annual_volatilized_ammonium_total == 3.25
