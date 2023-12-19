@@ -176,6 +176,13 @@
         "default": "NASEM",
         "pattern": "^(NASEM|NRC)$",
         "description": "The nutrient standard to use for feed."
+      },
+      "FIPS_county_code": {
+        "type": "number",
+        "minimum": 1000,
+        "maximum": 56045,
+        "default": null,
+        "description": "Unique 5-digit code that represents a specific U.S. county."
       }
     },
     "animal_properties": {
