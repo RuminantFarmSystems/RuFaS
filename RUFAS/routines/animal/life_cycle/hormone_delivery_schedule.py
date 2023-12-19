@@ -1,8 +1,9 @@
 from __future__ import annotations
 
+import copy
 from typing import Literal
 
-from RUFAS.routines.animal.life_cycle.repro_protocol_enums import HeiferReproProtocolEnum
+from RUFAS.routines.animal.life_cycle.repro_protocol_enums import HeiferReproProtocolEnum, CowReproProtocolEnum
 
 
 class HormoneDeliverySchedule:
@@ -63,32 +64,90 @@ class HormoneDeliverySchedule:
     }
 
     COW_REPRO_PROTOCOLS = {
-        'OvSynch 48': {
+        CowReproProtocolEnum.PreSynch_PreSynch.value: {
+            0: {'deliver_hormones': ['PGF']},
+            14: {'deliver_hormones': ['PGF']},
+            25: {
+                'set_presynch_end': True,
+                'set_tai_start': True,
+            },
+        },
+        CowReproProtocolEnum.PreSynch_DoubleOvSynch.value: {
+            0: {'deliver_hormones': ['GnRH']},
+            7: {'deliver_hormones': ['PGF']},
+            10: {'deliver_hormones': ['GnRH']},
+            16: {
+                'set_presynch_end': True,
+                'set_tai_start': True,
+            },
+        },
+        CowReproProtocolEnum.PreSynch_G6G.value: {
+            0: {'deliver_hormones': ['PGF']},
+            2: {'deliver_hormones': ['GnRH']},
+            8: {
+                'set_presynch_end': True,
+                'set_tai_start': True,
+            },
+        },
+
+        CowReproProtocolEnum.TAI_OvSynch_48.value: {
             0: {'deliver_hormones': ['GnRH']},
             7: {'deliver_hormones': ['PGF']},
             9: {'deliver_hormones': ['GnRH']},
             10: {'deliver_hormones': ['GnRH']},
-            11: {'set_ai_day': True, 'set_conception_rate': True}
+            11: {
+                'set_ai_day': True,
+                'set_conception_rate': True,
+                'set_tai_end': True
+            }
         },
-        'OvSynch 56': {
+        CowReproProtocolEnum.TAI_OvSynch_56.value: {
             0: {'deliver_hormones': ['GnRH']},
             7: {'deliver_hormones': ['PGF']},
             9: {'deliver_hormones': ['GnRH']},
             10: {'deliver_hormones': ['GnRH']},
-            11: {'set_ai_day': True, 'set_conception_rate': True}
+            11: {
+                'set_ai_day': True,
+                'set_conception_rate': True,
+                'set_tai_end': True
+            }
         },
-        'CoSynch 72': {
+        CowReproProtocolEnum.TAI_CoSynch_72.value: {
             0: {'deliver_hormones': ['GnRH']},
             7: {'deliver_hormones': ['PGF']},
             10: {'deliver_hormones': ['GnRH']},
-            11: {'set_ai_day': True, 'set_conception_rate': True}
+            11: {
+                'set_ai_day': True,
+                'set_conception_rate': True,
+                'set_tai_end': True
+            }
         },
-        '5d CoSynch': {
+        CowReproProtocolEnum.TAI_5d_CoSynch.value: {
             0: {'deliver_hormones': ['GnRH']},
             5: {'deliver_hormones': ['PGF']},
             6: {'deliver_hormones': ['PGF']},
             8: {'deliver_hormones': ['GnRH']},
-            9: {'set_ai_day': True, 'set_conception_rate': True}
+            9: {
+                'set_ai_day': True,
+                'set_conception_rate': True,
+                'set_tai_end': True
+            }
+        },
+
+        # Counting from abortion day
+        CowReproProtocolEnum.ReSynch_TAIafterPD.value: {
+            0: {
+                'decrease_conception_rate': True,
+                'set_up_tai_protocol': True
+            }
+        },
+        CowReproProtocolEnum.ReSynch_PGFatPD.value: {
+            0: {
+                'deliver_hormones': ['PGF'],
+                'decrease_conception_rate': True,
+                'simulate_estrus_after_pgf': True
+            },
+            7: {'set_up_tai_protocol': True},
         },
     }
 
@@ -124,7 +183,7 @@ class HormoneDeliverySchedule:
         if protocol_name not in protocols:
             return None
 
-        return protocols[protocol_name]
+        return copy.deepcopy(protocols[protocol_name])
 
     @staticmethod
     def get_adjusted_schedule(animal_category: Literal['heifers', 'cows'],
