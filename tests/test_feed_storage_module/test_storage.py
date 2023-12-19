@@ -83,23 +83,6 @@ def test_stored_mass(storage: Storage, harvested_crop: HarvestedCrop):
     assert storage.stored_mass == 200.0  # After adding a crop
 
 
-def test_receive_crop(storage: Storage, harvested_crop: HarvestedCrop):
-    storage.acceptable_crops = [CropCategory.SMALL_GRAIN]
-    # Initially, storage should be empty
-    assert len(storage.stored) == 0
-
-    # Add a crop and check if it's stored
-    storage.receive_crop(harvested_crop, harvested_crop.harvest_time)
-    assert len(storage.stored) == 1
-    assert storage.stored[0].fresh_mass == 100.0
-
-    # Test exceeding capacity
-    storage.capacity = 100.0  # Set a finite capacity
-    with pytest.raises(Exception) as excinfo:
-        storage.receive_crop(harvested_crop, harvested_crop.harvest_time)
-    assert "exceeds the storage capacity" in str(excinfo.value)
-
-
 def test_successful_receive_crop(storage: Storage, harvested_crop: HarvestedCrop):
     storage.acceptable_crops = [CropCategory.SMALL_GRAIN]
     storage.receive_crop(harvested_crop, harvested_crop.harvest_time)
