@@ -1,5 +1,7 @@
 from dataclasses import dataclass, fields
 
+from RUFAS.routines.manure.manure_treatments.manure_types import ManureType
+
 
 @dataclass(kw_only=True, frozen=True)
 class NutrientRequest:
@@ -10,6 +12,8 @@ class NutrientRequest:
 
     phosphorus: float = 0.0
     """Amount of manure phosphorus requested, kg."""
+
+    manure_type: ManureType
 
     def __post_init__(self) -> None:
         """
@@ -23,10 +27,15 @@ class NutrientRequest:
 
         """
         for field in fields(self):
-            if getattr(self, field.name) < 0:
-                raise ValueError(f"Field {field.name} must be non-negative.")
+            value = getattr(self, field.name)
+            if value != "manure_type":
+                if value < 0:
+                    raise ValueError(f"Field {field.name} must be non-negative.")
+            else:
+                if not isinstance(value, ManureType):
+                    raise ValueError(f"Field {field.name} must be an instance of ManureType.")
 
-        if any(getattr(self, field.name) > 0.0 for field in fields(self)):
+        if any(isinstance(getattr(self, field.name), float) > 0.0 for field in fields(self)):
             return
         else:
             raise ValueError("At least one nutrient must be requested and positive.")

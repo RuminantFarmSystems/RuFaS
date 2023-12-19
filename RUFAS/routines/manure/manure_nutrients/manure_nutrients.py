@@ -108,18 +108,23 @@ class ManureNutrients:
         Raises
         ------
         TypeError
-            If the other object is not a ManureNutrients object.
+            - If the other object is not a ManureNutrients object.
+            - If the other object is not the same manure_type as the self.
 
         """
         if not isinstance(other, ManureNutrients):
             raise TypeError(f"Cannot add {type(self)} to {type(other)}.")
 
-        return ManureNutrients(
-            **{
-                f.name: getattr(self, f.name) + getattr(other, f.name)
-                for f in fields(self)
-            }
-        )
+        if self.manure_type != other.manure_type:
+            raise TypeError(f"Cannot add {self.manure_type} nutrients to {other.manure_type} nutrients.")
+
+        summed_attributes = {}
+        for f in fields(self):
+            if f.name != 'manure_type':
+                summed_attributes[f.name] = getattr(self, f.name) + getattr(other, f.name)
+        summed_attributes['manure_type'] = self.manure_type
+
+        return ManureNutrients(**summed_attributes)
 
     def __mul__(self, scalar: int | float) -> ManureNutrients:
         """
@@ -149,9 +154,13 @@ class ManureNutrients:
         if scalar < 0.0:
             raise ValueError(f"Cannot multiply {type(self)} by a negative scalar.")
 
-        return ManureNutrients(
-            **{f.name: getattr(self, f.name) * scalar for f in fields(self)}
-        )
+        multiplied_attributes = {}
+        for f in fields(self):
+            if f.name != 'manure_type':
+                multiplied_attributes[f.name] = getattr(self, f.name) * scalar
+        multiplied_attributes['manure_type'] = self.manure_type
+
+        return ManureNutrients(**multiplied_attributes)
 
     def __sub__(self, other: ManureNutrients) -> ManureNutrients:
         """
@@ -170,18 +179,23 @@ class ManureNutrients:
         Raises
         ------
         TypeError
-            If the other object is not a ManureNutrients object.
+            - If the other object is not a ManureNutrients object.
+            - If the other object is not the same manure_type as the self.
 
         """
         if not isinstance(other, ManureNutrients):
             raise TypeError(f"Cannot subtract {type(self)} from {type(other)}.")
 
-        return ManureNutrients(
-            **{
-                f.name: getattr(self, f.name) - getattr(other, f.name)
-                for f in fields(self)
-            }
-        )
+        if self.manure_type != other.manure_type:
+            raise ValueError(f"Cannot subtract {other.manure_type} nutrients from {self.manure_type} nutrients.")
+
+        subtracted_attributes = {}
+        for f in fields(self):
+            if f.name != "manure_type":
+                subtracted_attributes[f.name] = getattr(self, f.name) - getattr(other, f.name)
+        subtracted_attributes["manure_type"] = self.manure_type
+
+        return ManureNutrients(**subtracted_attributes)
 
     def __rmul__(self, scalar: int | float) -> ManureNutrients:
         """

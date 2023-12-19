@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import math
+from RUFAS.routines.manure.manure_treatments.manure_types import ManureType
 
 from RUFAS.routines.manure.manure_nutrients.manure_nutrients import ManureNutrients
 from RUFAS.routines.manure.manure_nutrients.nutrient_request import NutrientRequest
@@ -13,12 +14,19 @@ class ManureNutrientManager:
     def __init__(self):
         """Initialize the manure nutrient manager."""
 
-        self._nutrients = ManureNutrients()
+        self._nutrients_by_manure_type = {
+            ManureNutrients(manure_type=ManureType.LIQUID),
+            ManureNutrients(manure_type=ManureType.SOLID),
+        }
 
-    @property
-    def values(self) -> ManureNutrients:
+    def get_values(self, manure_type: ManureType) -> ManureNutrients:
         """
         Get the current nutrient values stored in the manager.
+
+        Parameters
+        ----------
+        manure_type : ManureType
+            The type of manure.
 
         Returns
         -------
@@ -26,23 +34,37 @@ class ManureNutrientManager:
             The current nutrient values stored in the manager.
 
         """
-        return self._nutrients
+        return self._nutrients_by_manure_type.get(manure_type)
 
     def add_nutrients(self, nutrients: ManureNutrients) -> None:
         """
-        Add nutrients to the manager from the manure module.
+        Add or update nutrients to the manager from the manure module.
 
         Parameters
         ----------
         nutrients : ManureNutrients
-            The nutrients to be added to the manager.
+            The nutrients to be added to or updated in the manager.
 
         Returns
         -------
         None
 
         """
-        self._nutrients += nutrients
+        current_nutrients = self._nutrients_by_manure_type.get(nutrients.manure_type)
+
+        if current_nutrients:
+            updated_nutrients = ManureNutrients(
+                nitrogen=current_nutrients.nitrogen + nutrients.nitrogen,
+                phosphorus=current_nutrients.phosphorus + nutrients.phosphorus,
+                potassium=current_nutrients.potassium + nutrients.potassium,
+                dry_matter=current_nutrients.dry_matter + nutrients.dry_matter,
+                total_manure_mass=current_nutrients.total_manure_mass + nutrients.total_manure_mass,
+                manure_type=nutrients.manure_type
+            )
+        else:
+            updated_nutrients = nutrients
+
+        self._nutrients_by_type[nutrients.manure_type] = updated_nutrients
 
     def request_nutrients(
             self, request: NutrientRequest
