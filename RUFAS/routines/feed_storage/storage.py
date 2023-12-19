@@ -1,7 +1,7 @@
 import copy
 from typing import List, Optional
 from RUFAS.time import Time
-from .enums import CropType
+from .enums import CropCategory, CropType
 from .harvested_crop import HarvestedCrop
 
 
@@ -42,6 +42,7 @@ class Storage:
 
     def __init__(self, capacity: Optional[float] = None):
         self.stored: List[HarvestedCrop] = []
+        self.acceptable_crops: List[CropCategory] = []
         self.capacity = capacity or float("inf")
 
     @property

@@ -1,4 +1,5 @@
 from .storage import Storage
+from .enums import CropCategory
 
 
 class Baleage(Storage):
@@ -18,6 +19,11 @@ class Baleage(Storage):
 
     def __init__(self):
         super().__init__()
+        self.acceptable_crops = [
+            CropCategory.ALFALFA,
+            CropCategory.GRASS,
+            CropCategory.SMALL_GRAIN,
+        ]
         self.bale_density: float = 0
 
     def calculate_protein_loss(self) -> None:
