@@ -28,14 +28,18 @@ class NutrientRequest:
         """
         for field in fields(self):
             value = getattr(self, field.name)
-            if value != "manure_type":
+            if field.name != "manure_type":
                 if value < 0:
                     raise ValueError(f"Field {field.name} must be non-negative.")
             else:
                 if not isinstance(value, ManureType):
                     raise ValueError(f"Field {field.name} must be an instance of ManureType.")
 
-        if any(isinstance(getattr(self, field.name), float) > 0.0 for field in fields(self)):
+        if any(isinstance(getattr(self, field.name), (int, float)) and getattr(self, field.name) > 0.0 for field in fields(self)):
             return
         else:
+            for field in fields(self):
+                value = getattr(self, field.name)
+                print(value)
+                print(field.name)
             raise ValueError("At least one nutrient must be requested and positive.")

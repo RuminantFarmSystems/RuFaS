@@ -221,7 +221,15 @@ class ManureManager:
             self._pen_daily_update(animal_manager.simulation_day, pen)
 
         ManureModuleOutputManagerHelper.add_dataclass_object(
-            self._manure_nutrient_manager.values,
+            self._manure_nutrient_manager.get_values(ManureType.LIQUID),
+            info_maps={
+                "class": self.__class__.__name__,
+                "function": self.daily_update.__name__,
+                "prefix": "ManureNutrients",
+            }
+        )
+        ManureModuleOutputManagerHelper.add_dataclass_object(
+            self._manure_nutrient_manager.get_values(ManureType.SOLID),
             info_maps={
                 "class": self.__class__.__name__,
                 "function": self.daily_update.__name__,
@@ -359,7 +367,6 @@ class ManureManager:
         #     0.0
         # )
 
-        # will it work to just add nutrients separately like this? Do we need a separate ManureNutrients class type for each ManureType?
         self._manure_nutrient_manager.add_nutrients(
             ManureNutrients(
                 nitrogen=liquid_manure_nitrogen,
@@ -367,6 +374,7 @@ class ManureManager:
                 potassium=liquid_manure_potassium,
                 dry_matter=liquid_manure_total_solids,
                 total_manure_mass=liquid_total_manure_mass,
+                manure_type=ManureType.LIQUID,
             )
         )
 
@@ -377,6 +385,7 @@ class ManureManager:
                 potassium=solid_manure_potassium,
                 dry_matter=solid_manure_total_solids,
                 total_manure_mass=solid_total_manure_mass,
+                manure_type=ManureType.SOLID,
             )
         )
 

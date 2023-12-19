@@ -39,7 +39,7 @@ class ManureNutrients:
         """
         for field in fields(self):
             value = getattr(self, field.name)
-            if value != "manure_type":
+            if field.name != "manure_type":
                 if value < 0:
                     raise ValueError(f"Field {field.name} must be non-negative.")
             else:
