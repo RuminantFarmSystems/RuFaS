@@ -976,7 +976,6 @@ class HeiferII(HeiferI):
         self.estrus_day = int(start_day + abs(estrus_cycle))
         self.log_event(self.days_born, sim_day, f'{estrus_note} on day {self.estrus_day}')
 
-    
     def execute_synch_ed_protocol(self, sim_day: int) -> None:
         """
         Execute the SynchED protocol.
