@@ -69,12 +69,12 @@ class Storage:
 
         Raises
         ------
-            NotImplementedError
-                If the storage's acceptable crops is not populated.
-            ValueError
-                If the crop's category is not compatible with the storage.
-            Exception
-                If adding the crop exceeds the storage's capacity.
+        NotImplementedError
+            If the storage's acceptable crops is not populated.
+        ValueError
+            If the crop's category is not compatible with the storage.
+        Exception
+            If adding the crop exceeds the storage's capacity.
 
         """
         if not self.acceptable_crops:
