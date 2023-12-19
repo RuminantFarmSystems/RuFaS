@@ -40,9 +40,22 @@ INJECT_PGF = "inject PGF"
 INJECT_CIDR = "inject CIDR"
 
 # presynch protocols
+PRESYNCH_PERIOD_START = "Presynch period started"
+PRESYNCH_PERIOD_END = "Presynch period ended"
 PRESYNCH_END = "Presynch ended"
 DOUBLE_OVSYNCH_END = "Double OvSynch ended"
 C6G_END = "G6G ended"
+TAI_PERIOD_START = "TAI period started"
+TAI_PERIOD_END = "TAI period ended"
+
+# ReSynch protocols
+SETTING_UP_RESYNCH_TAI_IN_ADVANCE = "setting up resynch TAI in advance"
+DISCONTINUE_RESYNCH_TAI = "discontinued resynch TAI protocol after first preg check confirmed"
+DECREASE_CONCEPTION_RATE = "decrease TAI conception rate"
+
+# Conception outcomes
+SUCCESSFUL_CONCEPTION = "successful conception"
+FAILED_CONCEPTION = "failed conception"
 
 # pregnancy
 HEIFER_PREG = "heifer pregnant"

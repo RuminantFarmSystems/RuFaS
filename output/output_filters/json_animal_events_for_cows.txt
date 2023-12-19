@@ -1,1 +1,1 @@
-.*Cow_.*_last_day
+.*Cow_.*_day.*

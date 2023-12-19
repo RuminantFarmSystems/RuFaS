@@ -445,7 +445,7 @@
                 "type": "string",
                 "description": "Presynch Protocol -- The preSynch protocol (1st breeding) for cow in TAI (Timed Artificial Insemination) program. This ONLY applies to the TAI repro protocol.",
                 "default": "Double OvSynch",
-                "pattern": "^(Double OvSynch|Presynch|G6G|N/A)$"
+                "pattern": "^(Double OvSynch|PreSynch|G6G|N/A)$"
               },
               "resynch_protocol": {
                 "type": "string",
