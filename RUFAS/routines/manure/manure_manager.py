@@ -250,14 +250,15 @@ class ManureManager:
 
         """
         manure_type_by_treatment_type = {
-            ManureTreatmentType.SLURRY_STORAGE_OUTDOOR: ManureType.SLURRY,
-            ManureTreatmentType.SLURRY_STORAGE_UNDERFLOOR: ManureType.SLURRY,
+            ManureTreatmentType.SLURRY_STORAGE_OUTDOOR: ManureType.LIQUID,
+            ManureTreatmentType.SLURRY_STORAGE_UNDERFLOOR: ManureType.LIQUID,
             ManureTreatmentType.ANAEROBIC_LAGOON: ManureType.LIQUID,
             ManureTreatmentType.ANAEROBIC_DIGESTION_AND_LAGOON: ManureType.LIQUID,
             ManureTreatmentType.ANAEROBIC_DIGESTION: ManureType.LIQUID,
             ManureTreatmentType.ANAEROBIC_DIGESTION_AND_LAGOON_WITH_SPLIT: ManureType.LIQUID,
             ManureTreatmentType.COMPOST_BEDDED_PACK_BARN: ManureType.SOLID,
             ManureTreatmentType.OPEN_LOTS: ManureType.SOLID,
+            ManureTreatmentType.SEPARATED_SOLIDS_STORAGE: ManureType.SOLID,
         }
         return manure_type_by_treatment_type[treatment_type]
 
