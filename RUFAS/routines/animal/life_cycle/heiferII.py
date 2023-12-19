@@ -500,8 +500,7 @@ class HeiferII(HeiferI):
 
         return AnimalBase.config['std_estrus_cycle_after_pgf']
 
-    @staticmethod
-    def get_general_estrus_detection_rate() -> float:
+    def get_general_estrus_detection_rate(self) -> float:
         """
         Get the general estrus detection rate for heifers.
 
@@ -511,7 +510,7 @@ class HeiferII(HeiferI):
             The general estrus detection rate for heifers.
         """
 
-        return HeiferII.get_user_defined_repro_data('estrus_detection_rate')
+        return self.get_user_defined_repro_data('estrus_detection_rate')
 
     @staticmethod
     def _get_user_defined_synch_ed_estrus_detection_rate() -> float:
@@ -555,8 +554,7 @@ class HeiferII(HeiferI):
         else:
             return self._get_default_synch_ed_estrus_detection_rate()
 
-    @staticmethod
-    def get_general_conception_rate() -> float:
+    def get_general_conception_rate(self) -> float:
         """
         Get the general conception rate for heifers.
 
@@ -566,7 +564,7 @@ class HeiferII(HeiferI):
             The general conception rate for heifers.
         """
 
-        return HeiferII.get_user_defined_repro_data('estrus_conception_rate')
+        return self.get_user_defined_repro_data('estrus_conception_rate')
 
     @staticmethod
     def _get_user_defined_TAI_conception_rate() -> float:
@@ -745,12 +743,16 @@ class HeiferII(HeiferI):
         if actions is not None:
             if actions.get('deliver_hormones') is not None:
                 self._deliver_hormones(actions['deliver_hormones'], self.days_born, sim_day)
+                del actions['deliver_hormones']
             if actions.get('set_ai_day', False):
                 self.ai_day = self.days_born
                 self.log_event(self.days_born, sim_day, f'{const.AI_DAY_SCHEDULED_NOTE} on day {self.ai_day}')
+                del actions['set_ai_day']
             if actions.get('set_conception_rate', False):
                 self.conception_rate = self._TAI_conception_rate
-            del schedule[self.days_born]
+                del actions['set_conception_rate']
+            if not actions:
+                del schedule[self.days_born]
 
     @staticmethod
     def _get_breeding_start_day() -> int:
@@ -1164,10 +1166,10 @@ class HeiferII(HeiferI):
         None
         """
 
-        HeiferII.stats['num_ai_performed'] += 1
-        HeiferII.stats['num_ai_performed_in_ED'] += 1 if self.repro_program == 'ED' else 0
-        HeiferII.stats['num_ai_performed_in_TAI'] += 1 if self.repro_program == 'TAI' else 0
-        HeiferII.stats['num_ai_performed_in_SynchED'] += 1 if self.repro_program == 'SynchED' else 0
+        self.stats['num_ai_performed'] += 1
+        self.stats['num_ai_performed_in_ED'] += 1 if self.repro_program == 'ED' else 0
+        self.stats['num_ai_performed_in_TAI'] += 1 if self.repro_program == 'TAI' else 0
+        self.stats['num_ai_performed_in_SynchED'] += 1 if self.repro_program == 'SynchED' else 0
 
     def _increment_successful_conceptions(self) -> None:
         """
@@ -1187,10 +1189,10 @@ class HeiferII(HeiferI):
         None
         """
 
-        HeiferII.stats['num_successful_conceptions'] += 1
-        HeiferII.stats['num_successful_conceptions_in_ED'] += 1 if self.repro_program == 'ED' else 0
-        HeiferII.stats['num_successful_conceptions_in_TAI'] += 1 if self.repro_program == 'TAI' else 0
-        HeiferII.stats['num_successful_conceptions_in_SynchED'] += 1 if self.repro_program == 'SynchED' else 0
+        self.stats['num_successful_conceptions'] += 1
+        self.stats['num_successful_conceptions_in_ED'] += 1 if self.repro_program == 'ED' else 0
+        self.stats['num_successful_conceptions_in_TAI'] += 1 if self.repro_program == 'TAI' else 0
+        self.stats['num_successful_conceptions_in_SynchED'] += 1 if self.repro_program == 'SynchED' else 0
 
     def _handle_successful_conception(self, sim_day: int):
         """
@@ -1224,7 +1226,7 @@ class HeiferII(HeiferI):
         """
 
         self.log_event(self.days_born, sim_day, const.HEIFER_NOT_PREG)
-        self._set_repro_program(sim_day, 'ED')
+        self._set_repro_program(sim_day, HeiferReproProtocolEnum.ED.value)
         self._simulate_estrus(self.days_born, sim_day, const.ESTRUS_DAY_SCHEDULED_NOTE)
 
     @staticmethod
