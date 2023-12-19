@@ -22,8 +22,7 @@ def hay() -> Hay:
     return Hay()
 
 
-def test_acceptable_crops():
-    hay = Hay()
+def test_acceptable_crops(hay: Hay):
     assert hay.acceptable_crops == [
         CropCategory.ALFALFA,
         CropCategory.GRASS,

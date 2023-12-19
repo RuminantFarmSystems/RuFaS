@@ -8,8 +8,7 @@ def sileage() -> Sileage:
     return Sileage()
 
 
-def test_acceptable_crops():
-    sileage = Sileage()
+def test_acceptable_crops(sileage: Sileage):
     assert sileage.acceptable_crops == [
         CropCategory.ALFALFA,
         CropCategory.CORN,
