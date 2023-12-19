@@ -6,6 +6,7 @@ from RUFAS.routines.feed_storage.hay import (
     ProtectedTarped,
     Unprotected,
 )
+from RUFAS.routines.feed_storage.enums import CropCategory
 
 
 @pytest.fixture
@@ -19,6 +20,15 @@ def hay() -> Hay:
         An instance of the Hay class.
     """
     return Hay()
+
+
+def test_acceptable_crops():
+    hay = Hay()
+    assert hay.acceptable_crops == [
+        CropCategory.ALFALFA,
+        CropCategory.GRASS,
+        CropCategory.SMALL_GRAIN,
+    ]
 
 
 def test_bale_density(hay: Hay):
