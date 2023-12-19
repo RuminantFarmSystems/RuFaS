@@ -24,22 +24,38 @@ class CropType(Enum):
     """
     Enum for subdivisions of Crop Categories.
 
-    Attributes:
-        WHEAT: Type of Small Grain.
-        RYE: Type of Small Grain.
-        OAT: Type of Small Grain.
-        RICE: Type of Small Grain.
-        HIGH_MOISTURE: Type of Corn.
-        SILAGE: Type of Corn.
-        WHOLE_PLANT: Type of Corn.
-        GRAIN: Type of Corn or Soy.
-        FORAGE: Type of Soy.
-        ALFALFA: Type of Alfalfa.
-        RYEGRASS: Type of Grass.
-        ORCHARDGRASS: Type of Grass.
-        FINE_FESCUE: Type of Grass.
-        TALL_FESCUE: Type of Grass.
-        MEADOW_FESCUE: Type of Grass.
+    Attributes
+    ----------
+    WHEAT : str
+        Type of Small Grain.
+    RYE : str
+        Type of Small Grain.
+    OAT : str
+        Type of Small Grain.
+    RICE : str
+        Type of Small Grain.
+    HIGH_MOISTURE : str
+        Type of Corn.
+    SILAGE : str
+        Type of Corn.
+    WHOLE_PLANT : str
+        Type of Corn.
+    GRAIN : str
+        Type of Corn or Soy.
+    FORAGE : str
+        Type of Soy.
+    ALFALFA : str
+        Type of Alfalfa.
+    RYEGRASS : str
+        Type of Grass.
+    ORCHARDGRASS : str
+        Type of Grass.
+    FINE_FESCUE : str
+        Type of Grass.
+    TALL_FESCUE : str
+        Type of Grass.
+    MEADOW_FESCUE : str
+        Type of Grass.
     """
 
     WHEAT = "Wheat"
