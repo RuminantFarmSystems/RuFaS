@@ -11,6 +11,8 @@ from typing import Any, Dict, List, Union, Callable
 
 om = OutputManager()
 
+PATH_TO_INPUTS = "files"
+
 
 class InputManager:
     """
@@ -785,12 +787,12 @@ class InputManager:
 
     def get_data_keys_by_properties(self, target_properties: str) -> list[str]:
         """
-        Retrieves list of keys that point to data which have specified properties.
+        Retrieves the list of metadata keys that point to data which have the target_properties.
 
         Parameters
         ----------
         target_properties : str
-            The name of the properties group that is being searched for.
+            The name of the metadata properties group that is being searched for.
 
         Returns
         -------
@@ -838,7 +840,7 @@ class InputManager:
         }
 
         try:
-            input_data = self.get_metadata("files")
+            input_data = self.get_metadata(PATH_TO_INPUTS)
         except KeyError:
             error_name = "Cannot find data"
             error_message = "Could not find input metadata."
