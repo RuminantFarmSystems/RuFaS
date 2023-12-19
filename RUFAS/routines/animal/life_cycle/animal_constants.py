@@ -31,6 +31,8 @@ FIRST_ESTRUS_NOTE = "first estrus"
 ESTRUS_AFTER_CALVING_NOTE = "1st estrus after calving"
 ESTRUS_BEFORE_VWP_NOTE = "estrus occurred before the end of voluntary waiting period"
 ESTRUS_AFTER_PGF_NOTE = "estrus after PGF"
+SIMULATE_ESTRUS_AFTER_PGF_NOTE = "simulating estrus after PGF"
+ESTRUS_NOT_DETECTED_BETWEEN_VWP_AND_TAI_START_DAY_NOTE = "estrus not detected between VWP and TAI start day"
 
 # TAI injections
 INJECT_GNRH = "inject GnRH"
@@ -49,7 +51,7 @@ TAI_PERIOD_START = "TAI period started"
 TAI_PERIOD_END = "TAI period ended"
 
 # ReSynch protocols
-SETTING_UP_RESYNCH_TAI_IN_ADVANCE = "setting up resynch TAI in advance"
+SETTING_UP_RESYNCH_TAI_NOTE = "setting up resynch TAI protocol"
 DISCONTINUE_RESYNCH_TAI = "discontinued resynch TAI protocol after first preg check confirmed"
 DECREASE_CONCEPTION_RATE = "decrease TAI conception rate"
 

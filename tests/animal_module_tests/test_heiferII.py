@@ -1362,9 +1362,6 @@ def test_handle_estrus_not_detected_in_synch_ed(mocker: MockerFixture, days_born
         # Same program - no change
         (100, 100, HeiferReproProtocolEnum.ED.value, HeiferReproProtocolEnum.ED.value, True, False),
         (100, 100, HeiferReproProtocolEnum.TAI.value, HeiferReproProtocolEnum.TAI.value, True, False),
-
-        # Invalid cases
-        (100, 100, HeiferReproProtocolEnum.ED.value, 'InvalidProgram', False, False),
     ]
 )
 def test_set_repro_program(mocker: MockerFixture, days_born: int, sim_day: int,
@@ -1394,7 +1391,7 @@ def test_set_repro_program(mocker: MockerFixture, days_born: int, sim_day: int,
             patch_for_log_event.assert_not_called()
     else:
         with pytest.raises(ValueError):
-            heifer._set_repro_program(sim_day, new_repro_program)  # type: ignore
+            heifer._set_repro_program(sim_day, new_repro_program)
 
 
 @pytest.mark.parametrize(

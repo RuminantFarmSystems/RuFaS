@@ -12,7 +12,7 @@ from RUFAS.routines.animal.life_cycle import animal_constants as const
 from RUFAS.routines.animal.life_cycle.animal_base import AnimalBase
 from RUFAS.routines.animal.life_cycle.heiferI import HeiferI
 from RUFAS.routines.animal.life_cycle.hormone_delivery_schedule import HormoneDeliverySchedule
-from RUFAS.routines.animal.life_cycle.repro_protocol_enums import HeiferReproProtocolEnum
+from RUFAS.routines.animal.life_cycle.repro_protocol_enums import HeiferReproProtocolEnum, CowReproProtocolEnum
 from RUFAS.routines.animal.life_cycle.repro_protocol_misc import InternalReproSettings
 from RUFAS.routines.animal.manure.growing_heifer_manure_excretion import manure_calculations
 from RUFAS.routines.animal.ration.animal_requirements import AnimalRequirements
@@ -359,7 +359,7 @@ class HeiferII(HeiferI):
 
         if self.repro_program != HeiferII.get_user_defined_repro_protocol():
             if self.days_born <= self._get_breeding_start_day():
-                self._set_repro_program(sim_day, HeiferII.get_user_defined_repro_protocol())  # type: ignore
+                self._set_repro_program(sim_day, HeiferII.get_user_defined_repro_protocol())
 
         # breeding method assign to heifer
         if self.days_born >= self._get_breeding_start_day():
@@ -936,6 +936,47 @@ class HeiferII(HeiferI):
         self.estrus_day = int(start_day + abs(estrus_cycle))
         self.log_event(self.days_born, sim_day, f'{estrus_note} on day {self.estrus_day}')
 
+    def _simulate_estrus_after_pgf(self, start_day: int, sim_day: int, estrus_note: str,
+                                   max_cycle_length: int) -> None:
+        """
+        Calculate and set the next estrus day for the animals after PGF injection.
+
+        Notes
+        -----
+        To calculate the next estrus day, a random estrus cycle length is generated from a
+        truncated normal distribution. The mean and standard deviation of the distribution are
+        determined by the user-defined or default average and standard deviation of the estrus
+        cycle length after PGF. The maximum estrus cycle length depends on the provided parameter.
+        If the generated estrus cycle length is greater than or equal to the maximum cycle length,
+        the estrus cycle length is set to one day before maximum estrus cycle length. 
+        The next estrus day is calculated by adding the generated estrus cycle length
+        to the start day.
+
+        Parameters
+        ----------
+        start_day : int
+            The start day plus the estrus cycle length is the day of the next estrus.
+        sim_day : int
+            The current day of the entire simulation.
+        estrus_note : str
+            A note that describes the reason for simulating estrus.
+        max_cycle_length : int
+            The maximum estrus cycle length.
+
+        Returns
+        -------
+        None
+        """
+
+        estrus_cycle = truncnorm.rvs(-const.STDI, const.STDI,
+                                     self.get_avg_estrus_cycle_after_pgf(),
+                                     self.get_std_estrus_cycle_after_pgf())
+        if abs(estrus_cycle) >= max_cycle_length:
+            estrus_cycle = max_cycle_length - 1
+        self.estrus_day = int(start_day + abs(estrus_cycle))
+        self.log_event(self.days_born, sim_day, f'{estrus_note} on day {self.estrus_day}')
+
+    
     def execute_synch_ed_protocol(self, sim_day: int) -> None:
         """
         Execute the SynchED protocol.
@@ -1059,7 +1100,7 @@ class HeiferII(HeiferI):
         self._TAI_conception_rate = internal_fallback_protocol['repro_sub_properties']['conception_rate']
         self._execute_hormone_delivery_schedule(sim_day, self._hormone_schedule)
 
-    def _set_repro_program(self, sim_day: int, repro_program: Literal['ED', 'TAI', 'SynchED']) -> None:
+    def _set_repro_program(self, sim_day: int, repro_program: str) -> None:
         """
         Set the reproduction program for the heifer.
 
@@ -1067,7 +1108,7 @@ class HeiferII(HeiferI):
         ----------
         sim_day : int
             The current day of the entire simulation.
-        repro_program : Literal['ED', 'TAI', 'SynchED']
+        repro_program : str
             The reproduction program to set.
 
         Returns
@@ -1075,7 +1116,8 @@ class HeiferII(HeiferI):
         None
         """
 
-        if repro_program not in [HeiferReproProtocolEnum.ED.value, HeiferReproProtocolEnum.TAI.value,
+        if repro_program not in [HeiferReproProtocolEnum.ED.value,
+                                 HeiferReproProtocolEnum.TAI.value,
                                  HeiferReproProtocolEnum.SynchED.value]:
             raise ValueError(f'Invalid repro program: {repro_program}')
 
