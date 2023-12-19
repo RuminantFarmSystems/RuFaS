@@ -108,6 +108,15 @@ def test_successful_receive_crop(storage: Storage, harvested_crop: HarvestedCrop
     assert storage.stored[0].storage_time == harvested_crop.harvest_time
 
 
+def test_receive_crop_exceeds_capacity(storage: Storage, harvested_crop: HarvestedCrop):
+    storage.acceptable_crops = [CropCategory.SMALL_GRAIN]
+    storage.capacity = 50.0  # Set a smaller capacity
+    with pytest.raises(Exception) as excinfo:
+        storage.receive_crop(harvested_crop, harvested_crop.harvest_time)
+    assert "exceeds the storage capacity" in str(excinfo.value)
+
+
+
 def test_process_degradations(storage: Storage):
     """
     Test the process_degradations method of the Storage class.
