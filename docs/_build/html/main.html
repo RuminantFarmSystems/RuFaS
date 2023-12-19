@@ -1,27 +1,28 @@
 <!DOCTYPE html>
-<html class="writer-html5" lang="en" >
+<html class="writer-html5" lang="en" data-content_root="./">
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>main module &mdash; Ruminant Farm Simulation (RuFaS)  documentation</title>
-      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=19f00094" />
+
+  
   <!--[if lt IE 9]>
     <script src="_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
-        <script src="_static/jquery.js"></script>
-        <script src="_static/underscore.js"></script>
-        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
-        <script src="_static/doctools.js"></script>
-        <script src="_static/sphinx_highlight.js"></script>
+        <script src="_static/jquery.js?v=5d32c60e"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="_static/documentation_options.js?v=5929fcd5"></script>
+        <script src="_static/doctools.js?v=888ff710"></script>
+        <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="setup module" href="setup.html" />
-    <link rel="prev" title="fileReader module" href="fileReader.html" /> 
+    <link rel="prev" title="RUFAS.routines.manure.reception_pits package" href="RUFAS.routines.manure.reception_pits.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -29,11 +30,15 @@
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-            <a href="index.html" class="icon icon-home"> Ruminant Farm Simulation (RuFaS)
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            Ruminant Farm Simulation (RuFaS)
           </a>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" />
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
     <input type="hidden" name="check_keywords" value="yes" />
     <input type="hidden" name="area" value="default" />
   </form>
@@ -43,16 +48,17 @@
 <ul class="current">
 <li class="toctree-l1 current"><a class="reference internal" href="modules.html">GitHub</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="RUFAS.html">RUFAS package</a></li>
-<li class="toctree-l2"><a class="reference internal" href="fileReader.html">fileReader module</a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">main module</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#main.execute_simulations_from_files"><code class="docutils literal notranslate"><span class="pre">execute_simulations_from_files()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#main.CaseInsensitiveArgumentAction"><code class="docutils literal notranslate"><span class="pre">CaseInsensitiveArgumentAction</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#main.execute_simulations"><code class="docutils literal notranslate"><span class="pre">execute_simulations()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#main.main"><code class="docutils literal notranslate"><span class="pre">main()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#main.parse_gnu_args"><code class="docutils literal notranslate"><span class="pre">parse_gnu_args()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#main.run_load_vars_pool"><code class="docutils literal notranslate"><span class="pre">run_load_vars_pool()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#main.run_rufas"><code class="docutils literal notranslate"><span class="pre">run_rufas()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="#main.set_global_variables"><code class="docutils literal notranslate"><span class="pre">set_global_variables()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#main.run_validation"><code class="docutils literal notranslate"><span class="pre">run_validation()</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="setup.html">setup module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="tests.html">tests package</a></li>
 </ul>
 </li>
 </ul>
@@ -70,7 +76,7 @@
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a href="index.html" class="icon icon-home"></a></li>
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
           <li class="breadcrumb-item"><a href="modules.html">GitHub</a></li>
       <li class="breadcrumb-item active">main module</li>
       <li class="wy-breadcrumbs-aside">
@@ -83,33 +89,139 @@
            <div itemprop="articleBody">
              
   <section id="module-main">
-<span id="main-module"></span><h1>main module<a class="headerlink" href="#module-main" title="Permalink to this heading"></a></h1>
+<span id="main-module"></span><h1>main module<a class="headerlink" href="#module-main" title="Link to this heading"></a></h1>
 <p>This file serves as a main entry point to RuFaS.</p>
 <p>The main function run_rufas() will execute the model simulation(s). It accepts a path to the location of the input
 file(s) or, if this input is not given, it will run in interactive mode and accept input from the user.</p>
-<dl class="py function">
-<dt class="sig sig-object py" id="main.execute_simulations_from_files">
-<span class="sig-prename descclassname"><span class="pre">main.</span></span><span class="sig-name descname"><span class="pre">execute_simulations_from_files</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">files</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Path</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#main.execute_simulations_from_files" title="Permalink to this definition"></a></dt>
-<dd><p>execute simulations for each file</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="main.CaseInsensitiveArgumentAction">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">main.</span></span><span class="sig-name descname"><span class="pre">CaseInsensitiveArgumentAction</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">option_strings</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dest</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nargs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">const</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">default</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">choices</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">required</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">help</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metavar</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#main.CaseInsensitiveArgumentAction" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Action</span></code></p>
 </dd></dl>
 
 <dl class="py function">
+<dt class="sig sig-object py" id="main.execute_simulations">
+<span class="sig-prename descclassname"><span class="pre">main.</span></span><span class="sig-name descname"><span class="pre">execute_simulations</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">metadata_files</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="RUFAS.html#RUFAS.scenario_manager.MetadataPaths" title="RUFAS.scenario_manager.MetadataPaths"><span class="pre">MetadataPaths</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">exclude_info_maps</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">produce_graphics</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">graphics_dir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">format_option</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.html#RUFAS.output_manager.LogVerbosity" title="RUFAS.output_manager.LogVerbosity"><span class="pre">LogVerbosity</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_dir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filters_dir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">csv_dir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#main.execute_simulations" title="Link to this definition"></a></dt>
+<dd><p>Instantiates I/O Managers and processes the metadata files provided by the user to run the simulation.</p>
+<section id="parameters">
+<h2>Parameters<a class="headerlink" href="#parameters" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>metadata_files<span class="classifier">List[MetadataPaths]</span></dt><dd><p>A list of custom TypedDict objects including the specified prefix for the save_results output file
+and the path to the metadata file.</p>
+</dd>
+<dt>exclude_info_maps<span class="classifier">bool</span></dt><dd><p>Flag for whether or not the user wants to inlcude info_maps data in their results files.</p>
+</dd>
+<dt>produce_graphics: bool</dt><dd><p>Flag for whether or not the user wants to produce graphs at after the simulation.</p>
+</dd>
+<dt>graphics_dir<span class="classifier">Path</span></dt><dd><p>The directory for saving graphics.</p>
+</dd>
+<dt>format_option<span class="classifier">str</span></dt><dd><p>The formatting option for select output files.</p>
+</dd>
+<dt>verbose<span class="classifier">LogVerbosity</span></dt><dd><p>The verbose option set by the user.</p>
+</dd>
+<dt>output_dir<span class="classifier">Path</span></dt><dd><p>The directory for saving output.</p>
+</dd>
+<dt>filters_dir<span class="classifier">Path</span></dt><dd><p>The directory for the files containing the keys for filtering.</p>
+</dd>
+<dt>csv_dir<span class="classifier">Path</span></dt><dd><p>The directory for the csv output files to be saved.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="main.main">
+<span class="sig-prename descclassname"><span class="pre">main.</span></span><span class="sig-name descname"><span class="pre">main</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#main.main" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
 <dt class="sig sig-object py" id="main.parse_gnu_args">
-<span class="sig-prename descclassname"><span class="pre">main.</span></span><span class="sig-name descname"><span class="pre">parse_gnu_args</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#main.parse_gnu_args" title="Permalink to this definition"></a></dt>
-<dd><p>parse command line options, if applicable</p>
+<span class="sig-prename descclassname"><span class="pre">main.</span></span><span class="sig-name descname"><span class="pre">parse_gnu_args</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Namespace</span></span></span><a class="headerlink" href="#main.parse_gnu_args" title="Link to this definition"></a></dt>
+<dd><p>Parse command line options, if applicable</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="main.run_load_vars_pool">
+<span class="sig-prename descclassname"><span class="pre">main.</span></span><span class="sig-name descname"><span class="pre">run_load_vars_pool</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">vars_file_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">exclude_info_maps</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">format_option</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">produce_graphics</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">graphics_dir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">clear_output</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_dir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filters_dir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">csv_dir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#main.run_load_vars_pool" title="Link to this definition"></a></dt>
+<dd><p>Instantiates Output Manager and triggers loading of the variables pool from the provided file path
+for post-processing.</p>
+<section id="id1">
+<h2>Parameters<a class="headerlink" href="#id1" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>vars_file_path<span class="classifier">Path</span></dt><dd><p>The path to the json file to load into Output Manager variables pool for processing.</p>
+</dd>
+<dt>exclude_info_maps<span class="classifier">bool</span></dt><dd><p>Flag for whether or not the user wants to inlcude info_maps data in their results files.</p>
+</dd>
+<dt>produce_graphics<span class="classifier">bool</span></dt><dd><p>Flag for whether or not the user wants to produce graphs at after the simulation.</p>
+</dd>
+<dt>graphics_dir<span class="classifier">Path</span></dt><dd><p>The directory for saving graphics.</p>
+</dd>
+<dt>clear_output<span class="classifier">bool</span></dt><dd><p>Flag for whether or not the user wants to clear the output directory.</p>
+</dd>
+<dt>output_dir<span class="classifier">Path</span></dt><dd><p>The directory for saving output.</p>
+</dd>
+<dt>filters_dir<span class="classifier">Path</span></dt><dd><p>The directory for the files containing the keys for filtering.</p>
+</dd>
+<dt>csv_dir<span class="classifier">Path</span></dt><dd><p>The directory for the csv output files to be saved.</p>
+</dd>
+</dl>
+</section>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="main.run_rufas">
-<span class="sig-prename descclassname"><span class="pre">main.</span></span><span class="sig-name descname"><span class="pre">run_rufas</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">make_graphs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#main.run_rufas" title="Permalink to this definition"></a></dt>
-<dd><p>main function to run RuFaS, with options. If input_path is not provided, the interactive user prompt is
-triggered.</p>
+<span class="sig-prename descclassname"><span class="pre">main.</span></span><span class="sig-name descname"><span class="pre">run_rufas</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">load_pool</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">produce_graphics</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">format_option</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.html#RUFAS.output_manager.LogVerbosity" title="RUFAS.output_manager.LogVerbosity"><span class="pre">LogVerbosity</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">clear_output</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">exclude_info_maps</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">only_run_validation</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">graphics_dir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vars_file_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_dir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filters_dir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">csv_dir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#main.run_rufas" title="Link to this definition"></a></dt>
+<dd><p>Main function to run RuFaS, with options.</p>
+<section id="id2">
+<h2>Parameters<a class="headerlink" href="#id2" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>load_pool<span class="classifier">bool</span></dt><dd><p>Flag to load json file into Output Manager variables pool for processing.</p>
+</dd>
+<dt>produce_graphics<span class="classifier">bool</span></dt><dd><p>Produce graphics after simulation.</p>
+</dd>
+<dt>format_option<span class="classifier">str</span></dt><dd><p>Format for variable_names.txt output file.</p>
+</dd>
+<dt>verbose<span class="classifier">bool</span></dt><dd><p>Print progress messages while simulation is running.</p>
+</dd>
+<dt>clear_output<span class="classifier">bool</span></dt><dd><p>Clear output directory before running the simulation.</p>
+</dd>
+<dt>exclude_info_maps<span class="classifier">bool</span></dt><dd><p>Exclude info_maps from the output.</p>
+</dd>
+<dt>only_run_validation<span class="classifier">bool</span></dt><dd><p>Validate input data and don’t run a simulation.</p>
+</dd>
+<dt>graphics_dir<span class="classifier">Path</span></dt><dd><p>The directory for saving graphics.</p>
+</dd>
+<dt>vars_file_path<span class="classifier">Path</span></dt><dd><p>The path to the json file to load into Output Manager variables pool for processing.</p>
+</dd>
+<dt>output_dir<span class="classifier">Path</span></dt><dd><p>The directory for saving output.</p>
+</dd>
+<dt>filters_dir<span class="classifier">Path</span></dt><dd><p>The directory for the files containing the keys for filtering.</p>
+</dd>
+<dt>csv_dir<span class="classifier">Path</span></dt><dd><p>The directory for the csv output files to be saved.</p>
+</dd>
+</dl>
+</section>
 </dd></dl>
 
 <dl class="py function">
-<dt class="sig sig-object py" id="main.set_global_variables">
-<span class="sig-prename descclassname"><span class="pre">main.</span></span><span class="sig-name descname"><span class="pre">set_global_variables</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">make_graphs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#main.set_global_variables" title="Permalink to this definition"></a></dt>
-<dd><p>sets values of global variables in config/global_variables.py</p>
+<dt class="sig sig-object py" id="main.run_validation">
+<span class="sig-prename descclassname"><span class="pre">main.</span></span><span class="sig-name descname"><span class="pre">run_validation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">metadata_files</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Path</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">exclude_info_maps</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">format_option</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.html#RUFAS.output_manager.LogVerbosity" title="RUFAS.output_manager.LogVerbosity"><span class="pre">LogVerbosity</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_dir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#main.run_validation" title="Link to this definition"></a></dt>
+<dd><p>Instantiates I/O Managers and triggers validation of input data.</p>
+<section id="id3">
+<h2>Parameters<a class="headerlink" href="#id3" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>metadata_files<span class="classifier">List[Path]</span></dt><dd><p>The list of Paths to the metadata files the user entered with which to run the simulation.</p>
+</dd>
+<dt>exclude_info_maps<span class="classifier">bool</span></dt><dd><p>Flag for whether or not the user wants to inlcude info_maps data in their results files.</p>
+</dd>
+<dt>format_option<span class="classifier">str</span></dt><dd><p>The formatting option for select output files.</p>
+</dd>
+<dt>verbose<span class="classifier">LogVerbosity</span></dt><dd><p>The verbose option set by the user.</p>
+</dd>
+<dt>output_dir<span class="classifier">Path</span></dt><dd><p>The directory for saving output.</p>
+</dd>
+</dl>
+</section>
 </dd></dl>
 
 </section>
@@ -118,7 +230,7 @@ triggered.</p>
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="fileReader.html" class="btn btn-neutral float-left" title="fileReader module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="RUFAS.routines.manure.reception_pits.html" class="btn btn-neutral float-left" title="RUFAS.routines.manure.reception_pits package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
         <a href="setup.html" class="btn btn-neutral float-right" title="setup module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
