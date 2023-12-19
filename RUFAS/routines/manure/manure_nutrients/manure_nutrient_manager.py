@@ -15,8 +15,8 @@ class ManureNutrientManager:
         """Initialize the manure nutrient manager."""
 
         self._nutrients_by_manure_type = {
-            ManureNutrients(manure_type=ManureType.LIQUID),
-            ManureNutrients(manure_type=ManureType.SOLID),
+            ManureType.LIQUID: ManureNutrients(manure_type=ManureType.LIQUID),
+            ManureType.SOLID: ManureNutrients(manure_type=ManureType.SOLID),
         }
 
     def get_values(self, manure_type: ManureType) -> ManureNutrients:
@@ -96,7 +96,7 @@ class ManureNutrientManager:
         """
         eval_results = self._evaluate_nutrient_request(request)
         if eval_results is not None:
-            self._remove_nutrients(eval_results)
+            self._remove_nutrients(eval_results, request.manure_type)
         return eval_results
 
     def _evaluate_nutrient_request(
@@ -139,7 +139,7 @@ class ManureNutrientManager:
         else:
             # Partially fulfillable, return everything we have left
             return self._create_nutrient_request_results(
-                self._nutrients.total_manure_mass
+                self._nutrients_by_manure_type[request.manure_type].total_manure_mass
             )
 
     @staticmethod
@@ -260,7 +260,7 @@ class ManureNutrientManager:
             dry_matter_fraction=self._nutrients.dry_matter_fraction,
         )
 
-    def _remove_nutrients(self, results: NutrientRequestResults) -> None:
+    def _remove_nutrients(self, results: NutrientRequestResults, manure_type: ManureType) -> None:
         """
         Remove nutrients from the manager based on the results of a nutrient request.
 
@@ -283,9 +283,25 @@ class ManureNutrientManager:
             if getattr(self._nutrients, attr) < getattr(results, attr):
                 raise ValueError(f"Remove more nutrients than available: {attr}")
 
-        self._nutrients -= ManureNutrients(
-            nitrogen=results.nitrogen,
-            phosphorus=results.phosphorus,
-            total_manure_mass=results.total_manure_mass,
-            dry_matter=results.dry_matter,
-        )
+        # self._nutrients -= ManureNutrients(
+        #     nitrogen=results.nitrogen,
+        #     phosphorus=results.phosphorus,
+        #     total_manure_mass=results.total_manure_mass,
+        #     dry_matter=results.dry_matter,
+        # )
+
+        current_nutrients = self._nutrients_by_manure_type.get(manure_type)
+
+        if not current_nutrients:
+            raise ValueError(f"No manure of type {manure_type} in system currently.")
+        else:
+            updated_nutrients = ManureNutrients(
+                nitrogen=current_nutrients.nitrogen - results.nitrogen,
+                phosphorus=current_nutrients.phosphorus - results.phosphorus,
+                potassium=current_nutrients.potassium - results.potassium,
+                dry_matter=current_nutrients.dry_matter - results.dry_matter,
+                total_manure_mass=current_nutrients.total_manure_mass - results.total_manure_mass,
+                manure_type=manure_type
+            )
+
+        self._nutrients_by_type[manure_type] = updated_nutrients
