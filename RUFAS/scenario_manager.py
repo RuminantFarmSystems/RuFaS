@@ -46,8 +46,8 @@ class MetadataPaths(TypedDict):
     path: Path
 
 
-METADATA_PATHS: List[MetadataPaths] = [{"prefix": "run1_q0_ptbranch_14Dec",
+METADATA_PATHS: List[MetadataPaths] = [{"prefix": "mutian_q0_ptbranch_15Dec",
                                         "path": Path('input/metadata/Zoetis_JA_q0_metadata.json')},
-                                        {"prefix": "run2_q0_ptbranch_14Dec",
-                                        "path": Path('input/metadata/Zoetis_JA_q0_metadata.json')},
+                                        {"prefix": "mutian_q3_ptbranch_15Dec",
+                                        "path": Path('input/metadata/Zoetis_JA_q3_metadata.json')},
                                        ]
