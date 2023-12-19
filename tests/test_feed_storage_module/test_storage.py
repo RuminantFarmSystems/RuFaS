@@ -116,6 +116,17 @@ def test_receive_crop_exceeds_capacity(storage: Storage, harvested_crop: Harvest
     assert "exceeds the storage capacity" in str(excinfo.value)
 
 
+def test_receive_unacceptable_crop(
+    storage: Storage, sample_crop_data: Dict[str, float]
+):
+    storage.acceptable_crops = [CropCategory.ALFALFA]
+    incompatible_crop = HarvestedCrop(
+        category=CropCategory.SMALL_GRAIN, type=CropType.WHEAT, **sample_crop_data
+    )
+    with pytest.raises(ValueError):
+        storage.receive_crop(incompatible_crop, incompatible_crop.harvest_time)
+
+
 
 def test_process_degradations(storage: Storage):
     """
