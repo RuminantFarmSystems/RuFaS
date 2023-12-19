@@ -127,6 +127,15 @@ def test_receive_unacceptable_crop(
         storage.receive_crop(incompatible_crop, incompatible_crop.harvest_time)
 
 
+def test_receive_crop_without_acceptable_crops(
+    storage: Storage, harvested_crop: HarvestedCrop
+):
+    storage.acceptable_crops = []
+
+    with pytest.raises(NotImplementedError) as excinfo:
+        storage.receive_crop(harvested_crop, harvested_crop.harvest_time)
+    assert "Storage.acceptable_crops is not populated" in str(excinfo.value)
+
 
 def test_process_degradations(storage: Storage):
     """
