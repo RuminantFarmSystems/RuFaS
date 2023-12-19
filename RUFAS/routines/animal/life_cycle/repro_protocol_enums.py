@@ -80,4 +80,3 @@ class CowReproProtocolEnum(Enum):
     ReSynch_TAIbeforePD = 'TAIbeforePD'
     ReSynch_TAIafterPD = 'TAIafterPD'
     ReSynch_PGFatPD = 'PGFatPD'
-
