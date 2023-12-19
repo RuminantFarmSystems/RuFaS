@@ -47,7 +47,6 @@ class SimulationEngine:
         """
         Initializes the simulation engine.
         """
-
         self._initialize_simulation()
 
     def simulate(self) -> None:
