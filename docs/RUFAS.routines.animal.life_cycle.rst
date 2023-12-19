@@ -28,10 +28,10 @@ RUFAS.routines.animal.life\_cycle.animal\_events module
    :undoc-members:
    :show-inheritance:
 
-RUFAS.routines.animal.life\_cycle.animal\_initialization module
----------------------------------------------------------------
+RUFAS.routines.animal.life\_cycle.animal\_population module
+-----------------------------------------------------------
 
-.. automodule:: RUFAS.routines.animal.life_cycle.animal_initialization
+.. automodule:: RUFAS.routines.animal.life_cycle.animal_population
    :members:
    :undoc-members:
    :show-inheritance:
@@ -80,6 +80,14 @@ RUFAS.routines.animal.life\_cycle.heiferIII module
 --------------------------------------------------
 
 .. automodule:: RUFAS.routines.animal.life_cycle.heiferIII
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+RUFAS.routines.animal.life\_cycle.herd\_factory module
+------------------------------------------------------
+
+.. automodule:: RUFAS.routines.animal.life_cycle.herd_factory
    :members:
    :undoc-members:
    :show-inheritance:
