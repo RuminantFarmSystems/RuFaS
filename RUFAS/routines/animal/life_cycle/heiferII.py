@@ -948,7 +948,7 @@ class HeiferII(HeiferI):
         determined by the user-defined or default average and standard deviation of the estrus
         cycle length after PGF. The maximum estrus cycle length depends on the provided parameter.
         If the generated estrus cycle length is greater than or equal to the maximum cycle length,
-        the estrus cycle length is set to one day before maximum estrus cycle length. 
+        the estrus cycle length is set to one day before maximum estrus cycle length.
         The next estrus day is calculated by adding the generated estrus cycle length
         to the start day.
 
