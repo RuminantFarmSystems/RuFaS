@@ -783,6 +783,82 @@ class InputManager:
             raise KeyError(f"Data not found: Cannot find \"{metadata_address}\", "
                            f"\"{parent_address}\" does not have attribute \"{invalid_key}\".")
 
+    def get_data_keys_by_properties(self, target_properties: str) -> list[str]:
+        """
+        Retrieves the list of metadata keys that point to data which have the target_properties.
+
+        Parameters
+        ----------
+        target_properties : str
+            The name of the metadata properties group that is being searched for.
+
+        Returns
+        -------
+        list[str]
+            List of keys which point to data within the Input Manager's data pool that adhere to the target metadata
+            properties.
+
+        Examples
+        --------
+        If the metadata looked like the following:
+        ```
+        {
+            "files": {
+                "field_1": {
+                    "properties": "field_properties",
+                    ...
+                },
+                "soil_1": {
+                    "properties": "soil_profile_properties",
+                    ...
+                },
+                "field_2": {
+                    "properties": "field_properties",
+                    ...
+                },
+                ...
+            },
+            "properties": {...},
+            ...
+        }
+        ```
+        The the call `get_data_keys_by_properties("field_properties")` would be expected to return the list
+        `["field_1", "field_2"]`.
+
+        Notes
+        -----
+        If no keys have the specified property, the method returns an empty list.
+
+        """
+        data_keys = []
+
+        info_map = {
+            "class": self.__class__.__name__,
+            "function": self.get_data_keys_by_properties.__name__,
+        }
+
+        try:
+            input_data = self.get_metadata("files")
+        except KeyError:
+            error_name = "Cannot find data"
+            error_message = "Could not find input metadata."
+            om.add_error(error_name, error_message, info_map)
+            return data_keys
+
+        for key, data in input_data.items():
+            try:
+                properties = data["properties"]
+            except KeyError:
+                error_name = "Data does not have properties."
+                error_message = f"{key} in metadata does not contain 'properties' value."
+                om.add_error(error_name, error_message, info_map)
+                continue
+
+            if properties == target_properties:
+                data_keys.append(key)
+
+        return data_keys
+
     def flush_pool(self) -> None:
         """
         Clear the variable pool.
