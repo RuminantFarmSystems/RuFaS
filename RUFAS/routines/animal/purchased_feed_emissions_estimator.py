@@ -6,17 +6,28 @@ from RUFAS.output_manager import OutputManager
 im = InputManager()
 om = OutputManager()
 
+# The default county to be simulated by RuFaS is Dane County, WI.
+DEFAULT_FIPS_COUNTY_CODE = 55025
+
 
 class PurchasedFeedEmissionsEstimator:
 
     def __init__(self):
-        latitude, longitude = self._get_geographic_coordinates()
+        info_map = {
+            "class": self.__class__.__name__,
+            "function": self.__init__.__name__
+        }
 
-        dane_county_wi_FIPS_county_code = 55025
         try:
-            self.FIPS_county_code = self._get_county_code(latitude, longitude)
-        except requests.exceptions.RequestException:
-            self.FIPS_county_code = dane_county_wi_FIPS_county_code
+            self.FIPS_county_code = self._get_county_code()
+        except requests.exceptions.RequestException or ValueError:
+            om.add_warning(
+                "Purchased Feed Emissions Estimator could not get valid simulation location.",
+                f"Simulated location for calculating purchased feed emissions is being set to "
+                f"{DEFAULT_FIPS_COUNTY_CODE=}.",
+                info_map
+            )
+            self.FIPS_county_code = DEFAULT_FIPS_COUNTY_CODE
 
         info_map = {
             "class": self.__class__.__name__,
@@ -69,37 +80,32 @@ class PurchasedFeedEmissionsEstimator:
             emissions_per_feed_id[feed_id] = emissions
         return emissions_per_feed_id
 
-    def _get_geographic_coordinates(self) -> (float, float):
-        info_map = {
-            "class": self.__class__.__name__,
-            "function": self._get_geographic_coordinates.__name__
-        }
-
-        madison_wi_latitude = 43.073
-        madison_wi_longitude = -89.401
-
-        field_keys: list[str] = im.get_data_keys_by_properties("field_properties")
-
-        if not field_keys:
-            warning_name = "Default Feed Emissions data"
-            warning_message = "Could not obtain feed emissions geographic attributes, defaulting to Madison, WI."
-            om.add_warning(warning_name, warning_message, info_map)
-
-            return {"latitude": madison_wi_latitude, "longitude": madison_wi_longitude}
-
-        latitude = im.get_data(f"{field_keys[0]}.absolute_latitude")
-
-        longitude = im.get_data(f"{field_keys[0]}.longitude")
-
-        longitude = abs(longitude) * -1
-
-        return latitude, longitude
-
-    def _get_county_code(self, latitude: float, longitude: float) -> int:
+    def _get_county_code(self) -> int:
         info_map = {
             "class": self.__class__,
             "function": self._get_county_code.__name__
         }
+
+        county_code_from_input = im.get_data("config.FIPS_county_code")
+        if county_code_from_input is not None:
+            return county_code_from_input
+
+        om.add_warning(
+            "Feed Emissions Estimator found invalid data.",
+            "FIPS county code pulled from the Input Manager's pool was null.",
+            info_map
+        )
+
+        location = self._get_geographic_coordinates()
+        if not location:
+            om.add_warning(
+                "Using default FIPS county code",
+                f"Could not find simulated location coordinates, defaulting to {DEFAULT_FIPS_COUNTY_CODE=}.",
+                info_map
+            )
+
+        latitude = location[0]
+        longitude = location[1]
 
         endpoint = "https://geo.fcc.gov/api/census/block/find"
         params = {"latitude": latitude, "longitude": longitude, "format": "json"}
@@ -115,26 +121,47 @@ class PurchasedFeedEmissionsEstimator:
             response = requests.get(endpoint, params=params)
             if response.status_code == 200:
                 answer = response.json()
+                returned_FIPS_code = answer["County"]["FIPS"]
+
+                if returned_FIPS_code is None:
+                    om.add_error(
+                        "Null value returned by Feed Emissions API Call",
+                        "Received a null value in a successful response from the FCC's FIPS County Code API.",
+                        info_map
+                    )
+                    raise ValueError("Null value returned by FCC's API.")
+
                 om.add_log(
                     "Successful Feed Emissions API Call",
                     f"Got successful response from the FCC's FIPS County Code API on {attempt_count=}",
-
                     info_map
                 )
-                return int(answer["County"]["FIPS"])
+                return int(returned_FIPS_code)
             om.add_error(
                 "Error Feed Emissions API Call",
                 f"FCC's FIPS County Code API {attempt_count=} failed with {response.status_code=}.",
-
                 info_map
             )
 
         om.add_error(
             "All Feed Emissions API Calls Failed",
-            f"Tried calling the FCC's FIPS county code API, all {attempts} failed.",
+            f"Tried calling the FCC's FIPS county code API, all {max_attempts} failed.",
             info_map
         )
         raise requests.exceptions.RequestException("Could not obtain FIPS county code from FCC API.")
+
+    @staticmethod
+    def _get_geographic_coordinates() -> (float, float) or None:
+        field_keys: list[str] = im.get_data_keys_by_properties("field_properties")
+
+        if not field_keys:
+            return None
+
+        latitude = im.get_data(f"{field_keys[0]}.absolute_latitude")
+
+        longitude = im.get_data(f"{field_keys[0]}.longitude")
+
+        return latitude, longitude
 
     def _setup_feed_emissions(self) -> dict[str, float]:
         """
