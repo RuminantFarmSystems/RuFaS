@@ -11,10 +11,12 @@ class Storage:
 
     Attributes
     ----------
-    stored : List[HarvestedCrop]
-        A list of HarvestedCrop objects representing the crops stored.
+    acceptable_crops : List[CropCategory]
+        The list of crop categories that this storage can recieve.
     capacity : float
         The maximum capacity of the storage, currently set to infinity.
+    stored : List[HarvestedCrop]
+        A list of HarvestedCrop objects representing the crops stored.
 
     Methods
     -------
@@ -41,9 +43,9 @@ class Storage:
     """
 
     def __init__(self, capacity: Optional[float] = None):
-        self.stored: List[HarvestedCrop] = []
         self.acceptable_crops: List[CropCategory] = []
         self.capacity = capacity or float("inf")
+        self.stored: List[HarvestedCrop] = []
 
     @property
     def stored_mass(self) -> float:
@@ -64,7 +66,26 @@ class Storage:
         Returns
         -------
         None
+
+        Raises
+        ------
+            NotImplementedError
+                If the storage's acceptable crops is not populated.
+            ValueError
+                If the crop's category is not compatible with the storage.
+            Exception
+                If adding the crop exceeds the storage's capacity.
+
         """
+        if not self.acceptable_crops:
+            raise NotImplementedError(
+                "Storage.acceptable_crops is not populated, consider populating it in the child class."
+            )
+        if crop.category not in self.acceptable_crops:
+            raise ValueError(
+                f"Can't recieve the crop, the compatible crop categories are {self.acceptable_crops=},\
+                    {crop.category} is not one of them."
+            )
         if self.stored_mass + crop.fresh_mass > self.capacity:
             raise Exception(
                 f"Adding {crop.fresh_mass} to currently stored ({self.stored_mass})\
