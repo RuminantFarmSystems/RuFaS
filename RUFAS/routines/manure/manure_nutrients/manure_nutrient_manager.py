@@ -45,7 +45,7 @@ class ManureNutrientManager:
         self._nutrients += nutrients
 
     def request_nutrients(
-        self, request: NutrientRequest
+            self, request: NutrientRequest
     ) -> NutrientRequestResults | None:
         """
         Handle the request for specific nutrients from the crop and soil module.
@@ -55,9 +55,9 @@ class ManureNutrientManager:
         and checks against the nutrients available in the manager.
 
         If the request can be fulfilled either partially or wholly, the corresponding amount of nutrients
-        is subtracted from the manager's internal bookkeeping. The method then returns the results of the nutrient request,
-        which detail the amounts of nutrients that can be provided to fulfill the request. If the request
-        cannot be fulfilled at all, the method will return None.
+        is subtracted from the manager's internal bookkeeping. The method then returns the results of the
+        nutrient request, which detail the amounts of nutrients that can be provided to fulfill the request.
+        If the request cannot be fulfilled at all, the method will return None.
 
         Parameters
         ----------
@@ -68,8 +68,8 @@ class ManureNutrientManager:
         -------
         NutrientRequestResults | None
             The results of the nutrient request, detailed in a `NutrientRequestResults` object, which includes
-            the amount of nitrogen, phosphorus, total manure mass, dry matter, and others that can be provided to fulfill the request.
-            Returns None if the request cannot be fulfilled.
+            the amount of nitrogen, phosphorus, total manure mass, dry matter, and others that can be provided
+            to fulfill the request. Returns None if the request cannot be fulfilled.
 
         """
         eval_results = self._evaluate_nutrient_request(request)
@@ -78,7 +78,7 @@ class ManureNutrientManager:
         return eval_results
 
     def _evaluate_nutrient_request(
-        self, request: NutrientRequest
+            self, request: NutrientRequest
     ) -> NutrientRequestResults | None:
         """
         Evaluate a nutrient request. The method calculates the projected manure mass
@@ -122,10 +122,11 @@ class ManureNutrientManager:
 
     @staticmethod
     def _calculate_projected_manure_mass(
-        request_nutrient: float, nutrient_composition: float
+            request_nutrient: float, nutrient_composition: float
     ) -> float:
         """
-        Calculate the projected manure mass based on the nutrient requested and the nutrient's composition in the manure.
+        Calculate the projected manure mass based on the nutrient requested and the nutrient's composition
+        in the manure.
 
         The projected manure mass is calculated by dividing the nutrient request by the nutrient composition.
         This represents the total manure mass needed to fulfill the nutrient request.
@@ -198,7 +199,7 @@ class ManureNutrientManager:
         return min_positive if min_positive != math.inf else 0.0
 
     def _create_nutrient_request_results(
-        self, projected_manure_mass: float
+            self, projected_manure_mass: float
     ) -> NutrientRequestResults:
         """
         Create a NutrientRequestResults object based on the given projected manure mass.
