@@ -121,10 +121,10 @@ class ManureNutrientManager:
 
         """
         nitrogen_derived_manure_mass = self._calculate_projected_manure_mass(
-            request.nitrogen, self._nutrients.nitrogen_composition
+            request.nitrogen, self._nutrients_by_manure_type[request.manure_type].nitrogen_composition
         )
         phosphorus_derived_manure_mass = self._calculate_projected_manure_mass(
-            request.phosphorus, self._nutrients.phosphorus_composition
+            request.phosphorus, self._nutrients_by_manure_type[request.manure_type].phosphorus_composition
         )
         projected_manure_mass = self._select_projected_manure_mass(
             [nitrogen_derived_manure_mass, phosphorus_derived_manure_mass]
@@ -133,7 +133,7 @@ class ManureNutrientManager:
         if math.isclose(projected_manure_mass, 0.0, abs_tol=1e-6):
             # Unable to fulfill request
             return None
-        elif projected_manure_mass <= self._nutrients.total_manure_mass:
+        elif projected_manure_mass <= self._nutrients_by_manure_type[request.manure_type].total_manure_mass:
             # Able to fulfill the whole request
             return self._create_nutrient_request_results(projected_manure_mass)
         else:
