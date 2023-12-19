@@ -133,22 +133,6 @@ class HormoneDeliverySchedule:
                 'set_tai_end': True
             }
         },
-
-        # Counting from abortion day
-        CowReproProtocolEnum.ReSynch_TAIafterPD.value: {
-            0: {
-                'decrease_conception_rate': True,
-                'set_up_tai_protocol': True
-            }
-        },
-        CowReproProtocolEnum.ReSynch_PGFatPD.value: {
-            0: {
-                'deliver_hormones': ['PGF'],
-                'decrease_conception_rate': True,
-                'simulate_estrus_after_pgf': True
-            },
-            7: {'set_up_tai_protocol': True},
-        },
     }
 
     @staticmethod
