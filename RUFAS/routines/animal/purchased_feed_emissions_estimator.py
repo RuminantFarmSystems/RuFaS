@@ -70,7 +70,7 @@ class PurchasedFeedEmissionsEstimator:
             if feed_id not in self.feed_emissions.keys():
                 om.add_warning(
                     "Missing Purchased Feed Emissions",
-                    f"Missing purchased feed emissions data for RuFaS feed {feed_id}.",
+                    f"Missing data for RuFaS feed {feed_id}, omitting from purchased feed emissions estimation.",
                     info_map
                 )
                 self.missing_feed_ids.append(feed_id)
@@ -82,7 +82,7 @@ class PurchasedFeedEmissionsEstimator:
 
     def _get_county_code(self) -> int:
         info_map = {
-            "class": self.__class__,
+            "class": self.__class__.__name__,
             "function": self._get_county_code.__name__
         }
 
@@ -90,19 +90,20 @@ class PurchasedFeedEmissionsEstimator:
         if county_code_from_input is not None:
             return county_code_from_input
 
-        om.add_warning(
-            "Feed Emissions Estimator found invalid data.",
-            "FIPS county code pulled from the Input Manager's pool was null.",
+        om.add_log(
+            "Feed Emissions Estimator found null FIPS county code in Input Manager.",
+            "Attempting to find FIPS code using simulation location.",
             info_map
         )
 
         location = self._get_geographic_coordinates()
         if not location:
             om.add_warning(
-                "Using default FIPS county code",
-                f"Could not find simulated location coordinates, defaulting to {DEFAULT_FIPS_COUNTY_CODE=}.",
+                "Feed Emissions Estimator could not find simulated location.",
+                f"Defaulting to {DEFAULT_FIPS_COUNTY_CODE=}.",
                 info_map
             )
+            raise ValueError("Could not find simulated location.")
 
         latitude = location[0]
         longitude = location[1]
@@ -110,9 +111,11 @@ class PurchasedFeedEmissionsEstimator:
         endpoint = "https://geo.fcc.gov/api/census/block/find"
         params = {"latitude": latitude, "longitude": longitude, "format": "json"}
 
+        info_map["API_endpoint"] = endpoint
+        info_map["API_call_parameters"] = params
+
         max_attempts = 3
         for attempt_count in range(max_attempts):
-
             om.add_log(
                 "Feed Emissions API Call",
                 f"Calling the FCC's FIPS County Code API, attempt: {attempt_count}",
