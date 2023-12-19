@@ -17,8 +17,8 @@ class Baleage(Storage):
         Calculates the protein loss specific to Baleage storage.
     """
 
-    def __init__(self):
-        super().__init__()
+    def __init__(self, capacity: float = float("inf")):
+        super().__init__(capacity)
         self.acceptable_crops = [
             CropCategory.ALFALFA,
             CropCategory.GRASS,

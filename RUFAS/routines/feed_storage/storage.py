@@ -1,5 +1,5 @@
 import copy
-from typing import List, Optional
+from typing import List
 from RUFAS.time import Time
 from .enums import CropCategory, CropType
 from .harvested_crop import HarvestedCrop
@@ -42,9 +42,9 @@ class Storage:
         Recalculates the relative nutrient concentrations after dry matter loss.
     """
 
-    def __init__(self, capacity: Optional[float] = None):
+    def __init__(self, capacity: float = float("inf")):
         self.acceptable_crops: List[CropCategory] = []
-        self.capacity = capacity or float("inf")
+        self.capacity = capacity
         self.stored: List[HarvestedCrop] = []
 
     @property
