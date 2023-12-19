@@ -2,6 +2,7 @@
 [![Linting](https://github.com/RuminantFarmSystems/MASM/actions/workflows/lint_flake8.yml/badge.svg)](https://github.com/RuminantFarmSystems/MASM/actions/workflows/lint_flake8.yml)
 [![Coverage](https://img.shields.io/badge/coverage-92%25-green)](https://github.com/RuminantFarmSystems/MASM/actions/workflows/coverage_pytest-cov.yml)
 
+
 # Vision
 To support research and sustainable decision-making in ruminant animal production through a state-of-art, open-source modeling environment that is continuously adapting as technology and scientific knowledge advance.
 
