@@ -11,6 +11,8 @@ from typing import Any, Dict, List, Union, Callable
 
 om = OutputManager()
 
+PATH_TO_INPUTS = "files"
+
 
 class InputManager:
     """
@@ -838,7 +840,7 @@ class InputManager:
         }
 
         try:
-            input_data = self.get_metadata("files")
+            input_data = self.get_metadata(PATH_TO_INPUTS)
         except KeyError:
             error_name = "Cannot find data"
             error_message = "Could not find input metadata."
