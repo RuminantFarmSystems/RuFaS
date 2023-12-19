@@ -56,7 +56,6 @@ class LeachingRunoffErosion:
         References
         ----------
         pseudocode_soil [S.4.C.2] (determines what the runoff extraction coefficient will be for nitrates and ammonium)
-        TODO: find literature source for these values, issue #495
 
         Notes
         -----

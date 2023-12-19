@@ -210,14 +210,19 @@ def test_erode_nitrogen(nitrates: float, ammonium: float, fresh: float, active: 
         incorp._calculate_inorganic_nitrogen_loss.assert_has_calls(inorganic_loss_calls)
         incorp._calculate_eroded_organic_nitrogen.assert_has_calls(eroded_organic_nitrogen_calls)
         assert incorp.data.soil_layers[0].nitrate_content == nitrates - 45
+        assert incorp.data.nitrate_runoff == 45
         assert incorp.data.annual_runoff_nitrates_total == 45 * field_size
         assert incorp.data.soil_layers[0].ammonium_content == ammonium - 45
+        assert incorp.data.ammonium_runoff == 45
         assert incorp.data.annual_runoff_ammonium_total == 45 * field_size
         assert incorp.data.soil_layers[0].fresh_organic_nitrogen_content == fresh - 3
+        assert incorp.data.eroded_fresh_organic_nitrogen == 3
         assert incorp.data.annual_eroded_fresh_organic_nitrogen_total == 3 * field_size
         assert incorp.data.soil_layers[0].stable_organic_nitrogen_content == stable - 3
+        assert incorp.data.eroded_stable_organic_nitrogen == 3
         assert incorp.data.annual_eroded_stable_organic_nitrogen_total == 3 * field_size
         assert incorp.data.soil_layers[0].active_organic_nitrogen_content == active - 3
+        assert incorp.data.eroded_active_organic_nitrogen == 3
         assert incorp.data.annual_eroded_active_organic_nitrogen_total == 3 * field_size
 
 
@@ -245,22 +250,34 @@ def test_leach_nitrogen() -> None:
         LeachingRunoffErosion._calculate_nitrogen_lost_to_leaching.assert_has_calls(all_nitrogen_lost_calls)
         soil_layers = incorp.data.soil_layers + [incorp.data.vadose_zone_layer]
         for index in range(len(soil_layers)):
-            if index == 0 or index == 2:
+            if index in [0, 2]:
                 assert soil_layers[index].nitrate_content == 30
                 assert soil_layers[index].ammonium_content == 25
                 assert soil_layers[index].active_organic_nitrogen_content == 5
+                assert soil_layers[index].percolated_nitrates == 10
+                assert soil_layers[index].percolated_ammonium == 10
+                assert soil_layers[index].percolated_active_organic_nitrogen == 10
             elif index == 1:
                 assert soil_layers[index].nitrate_content == 50
                 assert soil_layers[index].ammonium_content == 45
                 assert soil_layers[index].active_organic_nitrogen_content == 25
+                assert soil_layers[index].percolated_nitrates == 0.0
+                assert soil_layers[index].percolated_ammonium == 0.0
+                assert soil_layers[index].percolated_active_organic_nitrogen == 0.0
             elif index == 3:
                 assert soil_layers[index].nitrate_content == 40
                 assert soil_layers[index].ammonium_content == 35
                 assert soil_layers[index].active_organic_nitrogen_content == 15
+                assert soil_layers[index].percolated_nitrates == 10
+                assert soil_layers[index].percolated_ammonium == 10
+                assert soil_layers[index].percolated_active_organic_nitrogen == 10
             else:
                 assert soil_layers[index].nitrate_content == 10
                 assert soil_layers[index].ammonium_content == 10
                 assert soil_layers[index].active_organic_nitrogen_content == 10
+                assert soil_layers[index].percolated_nitrates == 0.0
+                assert soil_layers[index].percolated_ammonium == 0.0
+                assert soil_layers[index].percolated_active_organic_nitrogen == 0.0
 
 
 def test_leach_and_erode_nitrogen() -> None:
