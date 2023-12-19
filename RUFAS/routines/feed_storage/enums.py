@@ -5,12 +5,18 @@ class CropCategory(Enum):
     """
     Enum for Crop Categories.
 
-    Attributes:
-        SMALL_GRAIN: Represents small grain crops.
-        CORN: Represents corn crops.
-        SOY: Represents soy crops.
-        GRASS: Represents grass crops.
-        ALFALFA: Represents alfalfa crops.
+    Attributes
+    ----------
+    SMALL_GRAIN : str
+        Represents small grain crops.
+    CORN : str
+        Represents corn crops.
+    SOY : str
+        Represents soy crops.
+    GRASS : str
+        Represents grass crops.
+    ALFALFA : str
+        Represents alfalfa crops.
     """
 
     SMALL_GRAIN = "Small grain"
