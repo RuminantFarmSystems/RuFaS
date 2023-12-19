@@ -785,12 +785,12 @@ class InputManager:
 
     def get_data_keys_by_properties(self, target_properties: str) -> list[str]:
         """
-        Retrieves list of keys that point to data which have specified properties.
+        Retrieves the list of metadata keys that point to data which have the target_properties.
 
         Parameters
         ----------
         target_properties : str
-            The name of the properties group that is being searched for.
+            The name of the metadata properties group that is being searched for.
 
         Returns
         -------
