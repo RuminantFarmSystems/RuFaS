@@ -1,4 +1,5 @@
 from .storage import Storage
+from .enums import CropCategory
 
 
 class Hay(Storage):
@@ -17,6 +18,14 @@ class Hay(Storage):
     calculate_protein_loss():
         Calculates the protein loss in the hay.
     """
+
+    def __init__(self, capacity: float = float("inf")):
+        super().__init__(capacity)
+        self.acceptable_crops = [
+            CropCategory.ALFALFA,
+            CropCategory.GRASS,
+            CropCategory.SMALL_GRAIN,
+        ]
 
     @property
     def bale_density(self) -> float:
