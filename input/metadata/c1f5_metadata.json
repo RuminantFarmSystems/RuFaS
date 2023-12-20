@@ -14,7 +14,7 @@
       "type": "json",
       "properties": "animal_properties"
     },
-"animal_population": {
+    "animal_population": {
       "title": "Animal population data",
       "description": "Moo Moo!",
       "path": "input/data/animal/animal_population.json",
@@ -41,6 +41,13 @@
       "path": "input/data/EEE/default_emissions.csv",
       "type": "csv",
       "properties": "emissions_properties"
+    },
+    "purchased_feeds_emissions": {
+      "title": "Emissions from purchased feeds",
+      "description": "Specifies how much emissions are associated with purchased feed types.",
+      "path": "input/data/EEE/usable_feeds_emissions.csv",
+      "type": "csv",
+      "properties": "feed_emissions_properties"
     },
     "feed": {
       "title": "Feed data",
@@ -169,6 +176,13 @@
         "default": "NASEM",
         "pattern": "^(NASEM|NRC)$",
         "description": "The nutrient standard to use for feed."
+      },
+      "FIPS_county_code": {
+        "type": "number",
+        "minimum": 1000,
+        "maximum": 56045,
+        "default": null,
+        "description": "Unique 5-digit code that represents a specific U.S. county."
       }
     },
     "animal_properties": {
@@ -211,7 +225,7 @@
           "default": 100,
           "minimum": 0
         },
-                "replace_num": {
+        "replace_num": {
           "type": "number",
           "default": 5000,
           "minimum": 0
@@ -223,7 +237,7 @@
           "description": "Breed (select one Holstein/Jersey) -- The predominant breed of the herd (Holstein or Jersey)"
         }
       },
-"herd_initialization": {
+      "herd_initialization": {
         "type": "object",
         "description": "Animal generation related inputs",
         "initial_animal_num": {
@@ -388,7 +402,7 @@
             },
             "heifers": {
               "type": "object",
-                            "estrus_detection_rate": {
+              "estrus_detection_rate": {
                 "type": "number",
                 "description": "Estrus Detection Rate -- The % of in-heat animals that would be detected in the ED (Estrus Detection) programs (default is 0.6)",
                 "default": 0.6,
@@ -410,22 +424,22 @@
               "repro_sub_properties": {
                 "type": "object",
                 "conception_rate": {
-                "type": "number",
-                "description": "Conception Rate -- The conception rate for the heifer reproductive program (default is 0.6)",
-                "default": 0.6,
-                "minimum": 0,
-                "maximum": 1
-              },
-              "estrus_detection_rate": {
-                "type": "number",
-                "description": "Estrus Detection Rate -- The % of in-heat animals that would be detected in the ED (Estrus Detection) programs (default is 0.6)",
+                  "type": "number",
+                  "description": "Conception Rate -- The conception rate for the heifer reproductive program (default is 0.6)",
+                  "default": 0.6,
+                  "minimum": 0,
+                  "maximum": 1
+                },
+                "estrus_detection_rate": {
+                  "type": "number",
+                  "description": "Estrus Detection Rate -- The % of in-heat animals that would be detected in the ED (Estrus Detection) programs (default is 0.6)",
                   "default": 0.7,
                   "minimum": 0,
                   "maximum": 1
                 }
               }
             },
-              "cows": {
+            "cows": {
               "type": "object",
               "estrus_detection_rate": {
                 "type": "number",
@@ -437,7 +451,7 @@
               "estrus_conception_rate": {
                 "type": "number",
                 "description": "Estrus Conception Rate -- The % of inseminated animals that would be concepted in the ED (Estrus Detection) programs (default is 0.6)",
-"default": 0.6,
+                "default": 0.6,
                 "minimum": 0,
                 "maximum": 1
               },
@@ -460,11 +474,11 @@
               "repro_sub_properties": {
                 "type": "object",
                 "conception_rate": {
-                "type": "number",
-                "description": "Conception Rate -- The conception rate for the cow reproductive program (default is 0.6)",
-"default": 0.5,
-                "minimum": 0,
-                "maximum": 1
+                  "type": "number",
+                  "description": "Conception Rate -- The conception rate for the cow reproductive program (default is 0.6)",
+                  "default": 0.5,
+                  "minimum": 0,
+                  "maximum": 1
                 },
                 "tai_program_start_day": {
                   "type": "number",
@@ -1021,7 +1035,7 @@
         }
       }
     },
-"animal_population_properties": {
+    "animal_population_properties": {
       "calves": {
         "type": "array",
         "description": "calves data",
@@ -2090,6 +2104,92 @@
         "default": 400
       }
     },
+    "feed_emissions_properties": {
+      "county_code": {
+        "type": "number",
+        "minimum": 1000
+      },
+      "108": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "107": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "110": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "18": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "23": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "44": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "51": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "50": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "52": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "95": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "94": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "100": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "104": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "176": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "91": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "301": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "302": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "303": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "304": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "305": {
+        "type": "number",
+        "minimum": 0.0
+      }
+    },
     "feed_properties": {
       "calf_feeds": {
         "type": "array",
@@ -2973,7 +3073,7 @@
         "description": ""
       },
       "TDN": {
-"type": "number",
+        "type": "number",
         "description": ""
       },
       "DE": {
@@ -3408,7 +3508,7 @@
         "description": "Number of days that make up the irrigation interval.\nUnits: days.",
         "minimum": 0,
         "default": 0
-},
+      },
       "supplement_manure_nutrient_deficiencies": {
         "type": "bool",
         "description": "Determines if nutrient deficient manure applications are supplemented with chemical fertilizer.",
@@ -3496,4 +3596,3 @@
   },
   "cross-validation": {}
 }
-
