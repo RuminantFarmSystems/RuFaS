@@ -45,7 +45,7 @@
 "feed": {
       "title": "Feed data",
       "description": "Those cows need to eat!",
-      "path": "input/data/feed/FARMES23_Great Lakes_default test.json",
+      "path": "input/data/feed/FARMES23_Great Lakes_default.json",
       "type": "json",
       "properties": "feed_properties"
     },
@@ -940,7 +940,7 @@
         "description": "Methane Model -- The method used to estimate enteric methane emissions.",
         "type": "string",
         "default": "IPCC",
-        "pattern": "^(Mills|3-Mutian|IPCC)$"
+        "pattern": "^(Mills|Mutian|IPCC)$"
       },
       "ration": {
         "type": "object",
