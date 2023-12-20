@@ -146,7 +146,7 @@ class Field:
         # ... Other ...
 
         # --- Crop Management ---
-        self._assess_dormancy(current_conditions.daylength)
+        self._assess_dormancy(current_conditions.daylength, current_conditions.rainfall)
 
         self._check_crop_planting_schedule(time)
 
@@ -909,7 +909,7 @@ class Field:
         crop_data = CropData(**specs)
         return Crop(crop_data)
 
-    def _assess_dormancy(self, daylength: float) -> None:
+    def _assess_dormancy(self, daylength: float, rainfall: float) -> None:
         """
         Transition all crops to dormancy if they are capable of going dormant.
 
@@ -917,9 +917,11 @@ class Field:
         ----------
         daylength : float
             Length of time from sunup to sundown on the current day (hours).
+        rainfall : float
+            Amount of rain that fell on the current day (mm).
 
-        Details
-        -------
+        Notes
+        -----
         If the length of the current day is at or below the dormancy threshold length, all crops that can go dormant
         should be put into dormancy. If the length is greater than the threshold length, all crops should be brought out
         of dormancy.
@@ -928,8 +930,9 @@ class Field:
 
         if daylength <= self.field_data.dormancy_threshold_daylength:
             for crop in self.crops:
-                crop.dormancy.enter_dormancy()
+                crop.dormancy.enter_dormancy(self.soil.data)
                 crop.biomass_allocation.partition_biomass()
+                self.soil.carbon_cycling.residue_partition.add_residue_to_pools(rainfall)
         else:
             for crop in self.crops:
                 crop.data.is_dormant = False

@@ -1,6 +1,9 @@
 import pytest
+from unittest.mock import MagicMock
+
 from RUFAS.routines.field.crop.dormancy import Dormancy
 from RUFAS.routines.field.crop.crop_data import CropData, PlantCategory
+from RUFAS.routines.field.soil.soil_data import SoilData
 
 
 # --- Static function tests ---
@@ -57,7 +60,9 @@ def test_go_into_dormancy(biomass: float, residue: float, lai: float, min_lai: f
     pre_leaf_area_index = incorp.data.leaf_area_index
     pre_dormant = incorp.data.is_dormant
 
-    incorp.enter_dormancy()
+    soil_data = MagicMock(SoilData)
+
+    incorp.enter_dormancy(soil_data)
 
     if incorp.data.plant_category == PlantCategory.WARM_ANNUAL_LEGUME or \
             incorp.data.plant_category == PlantCategory.WARM_ANNUAL:
@@ -73,6 +78,15 @@ def test_go_into_dormancy(biomass: float, residue: float, lai: float, min_lai: f
         if incorp.data.plant_category == PlantCategory.PERENNIAL or \
                 incorp.data.plant_category == PlantCategory.PERENNIAL_LEGUME or \
                 incorp.data.plant_category == PlantCategory.TREE:
-            assert incorp.data.biomass == (biomass * (1 - loss_frac))
-            assert incorp.data.yield_residue == (residue + (biomass * loss_frac))
-            assert incorp.data.leaf_area_index == min(lai, min_lai)
+            expected_post_dormancy_biomass = (biomass * (1 - loss_frac))
+            expected_post_dormancy_residue = (biomass - expected_post_dormancy_biomass) * \
+                                             (incorp.data.dry_matter_percentage / 100)
+            expected_nitrogen = expected_post_dormancy_residue * incorp.data.yield_nitrogen_fraction
+            expected_leaf_area_index = min(lai, min_lai)
+
+            assert incorp.data.biomass == expected_post_dormancy_biomass
+            assert incorp.data.leaf_area_index == expected_leaf_area_index
+
+            assert soil_data.crop_yield_nitrogen == expected_nitrogen
+            assert soil_data.plant_surface_residue == expected_post_dormancy_residue
+            assert soil_data.plant_residue_lignin_composition == incorp.data.lignin_dry_matter_percentage / 100
