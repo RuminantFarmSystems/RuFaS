@@ -14,6 +14,7 @@ class NutrientRequest:
     """Amount of manure phosphorus requested, kg."""
 
     manure_type: ManureType
+    """The type of manure."""
 
     def __post_init__(self) -> None:
         """
@@ -22,8 +23,8 @@ class NutrientRequest:
         Raises:
             ValueError
                 If any field is negative.
-            ValueError
                 If no fields are positive.
+                If the manure type provided is not a valid ManureType.
 
         """
         for field in fields(self):

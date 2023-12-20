@@ -21,7 +21,7 @@ class ManureNutrientManager:
 
     def get_values(self, manure_type: ManureType) -> ManureNutrients:
         """
-        Get the current nutrient values stored in the manager.
+        Get the current nutrient values stored in the manager by manure type.
 
         Parameters
         ----------
@@ -31,14 +31,14 @@ class ManureNutrientManager:
         Returns
         -------
         ManureNutrients
-            The current nutrient values stored in the manager.
+            The current nutrient values stored in the manager for the provided ManureType.
 
         """
         return self._nutrients_by_manure_type.get(manure_type)
 
     def add_nutrients(self, nutrients: ManureNutrients) -> None:
         """
-        Add or update nutrients to the manager from the manure module.
+        Add or update nutrients to the manager from the manure module by manure type.
 
         Parameters
         ----------
@@ -73,18 +73,18 @@ class ManureNutrientManager:
         Handle the request for specific nutrients from the crop and soil module.
 
         This method evaluates the nutrient request made by considering both nitrogen and phosphorus
-        quantities desired. It calculates the projected manure mass that would satisfy the request
-        and checks against the nutrients available in the manager.
+        quantities desired for the specified manure type. It calculates the projected manure mass that
+        would satisfy the request and checks against the nutrients available in the manager.
 
         If the request can be fulfilled either partially or wholly, the corresponding amount of nutrients
-        is subtracted from the manager's internal bookkeeping. The method then returns the results of the
-        nutrient request, which detail the amounts of nutrients that can be provided to fulfill the request.
-        If the request cannot be fulfilled at all, the method will return None.
+        is subtracted from the manager's internal bookkeeping for the manure type. The method then returns
+        the results of the nutrient request, which detail the amounts of nutrients that can be provided to
+        fulfill the request. If the request cannot be fulfilled at all, the method will return None.
 
         Parameters
         ----------
         request : NutrientRequest
-            The specific nutrient request, including quantities of nitrogen and phosphorus.
+            The specific nutrient request, including quantities of nitrogen and phosphorus and manure type.
 
         Returns
         -------
@@ -104,8 +104,8 @@ class ManureNutrientManager:
     ) -> NutrientRequestResults | None:
         """
         Evaluate a nutrient request. The method calculates the projected manure mass
-        based on the request for nitrogen and phosphorus. It then checks if the
-        projected manure mass can be fulfilled by the available nutrients in the manager.
+        based on the request for nitrogen and phosphorus for a specific manure type. It then checks if the
+        projected manure mass can be fulfilled by the available nutrients for that manure type in the manager.
 
         Parameters
         ----------
@@ -224,7 +224,7 @@ class ManureNutrientManager:
             self, projected_manure_mass: float, manure_type: ManureType
     ) -> NutrientRequestResults:
         """
-        Create a NutrientRequestResults object based on the given projected manure mass.
+        Create a NutrientRequestResults object based on the given projected manure mass and manure type.
 
         Note that this method does not check if what is currently available in the manager is enough
         to fulfill the projected manure mass. It simply creates a NutrientRequestResults object
@@ -262,7 +262,7 @@ class ManureNutrientManager:
 
     def _remove_nutrients(self, results: NutrientRequestResults, manure_type: ManureType) -> None:
         """
-        Remove nutrients from the manager based on the results of a nutrient request.
+        Remove nutrients from the manager based on the results of a nutrient request by manure type.
 
         Parameters
         ----------

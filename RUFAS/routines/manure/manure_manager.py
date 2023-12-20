@@ -299,7 +299,7 @@ class ManureManager:
             manure_treatment_daily_output: ManureTreatmentDailyOutput,
     ) -> None:
         """
-        Add the nutrients in the manure produced by a given pen to the manure nutrient manager.
+        Add the nutrients in the manure to the manure nutrient manager by manure type.
 
         Parameters
         ----------

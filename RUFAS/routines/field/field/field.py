@@ -541,7 +541,7 @@ class Field:
         and if None, then it is the latter.
 
         """
-        info_map = {"class": self.__class__.__name__, "function": self._execute_manure_application.__name__,
+        info_map = {"class": self.__class__.__name__, "function": self._record_nutrient_application_error.__name__,
                     "prefix": f"field='{self.field_data.name}'", "date": {"year": year, "day": day}}
         if surface_remainder_fraction is not None:
             error_message = f"Invalid application depth ({application_depth}) and surface remainder fraction " \

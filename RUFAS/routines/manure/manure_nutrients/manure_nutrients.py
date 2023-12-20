@@ -34,7 +34,8 @@ class ManureNutrients:
         Raises
         ------
         ValueError
-            If any field is negative.
+            If any numerical field is negative.
+            If manure type is not a valid ManureType.
 
         """
         for field in fields(self):
@@ -108,8 +109,8 @@ class ManureNutrients:
         Raises
         ------
         TypeError
-            - If the other object is not a ManureNutrients object.
-            - If the other object is not the same manure_type as the self.
+            If the other object is not a ManureNutrients object.
+            If the other object is not the same ManureType as the self.
 
         """
         if not isinstance(other, ManureNutrients):
@@ -179,8 +180,8 @@ class ManureNutrients:
         Raises
         ------
         TypeError
-            - If the other object is not a ManureNutrients object.
-            - If the other object is not the same manure_type as the self.
+            If the other object is not a ManureNutrients object.
+            If the other object is not the same ManureType as the self.
 
         """
         if not isinstance(other, ManureNutrients):

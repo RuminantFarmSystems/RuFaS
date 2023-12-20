@@ -7,7 +7,6 @@ class ManureType(Enum):
 
     The Enum class contains the following members:
     LIQUID: Represents liquid manure.
-    SLURRY: Represents manure in a semi-liquid, slurry state.
     SOLID: Represents manure in solid form.
 
     """
