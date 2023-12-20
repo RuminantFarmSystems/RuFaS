@@ -44,11 +44,11 @@
 				"calving_interval": 486,
 				"heifers": {
 					"estrus_detection_rate": 0.9,
-					"estrus_conception_rate": 0.4,
+					"estrus_conception_rate": 0.6,
 					"repro_sub_protocol": "5dCG2P",
                     "repro_sub_properties": {
             "conception_rate": 0.6,
-                    "estrus_detection_rate": 0.7
+                    "estrus_detection_rate": 0.9
           }
         },
         "cows": {
@@ -58,7 +58,7 @@
           "resynch_protocol": "TAIafterPD",
                     "repro_sub_protocol": "OvSynch 56",
           "repro_sub_properties": {
-            "conception_rate": 0.5,
+            "conception_rate": 0.38,
             "tai_program_start_day": 70
           }
 				},
@@ -74,7 +74,7 @@
 					"cosynch5d_conception_rate": 0.4,
 					"cow_user_defined_tai_cr": 0.0,
 					"cow_resynch_protocol": "TAIafterPD",
-					"tai_program_start_day": 72
+					"tai_program_start_day": 0
 				}
 			},
 			"bodyweight": {
@@ -154,7 +154,7 @@
 			"number_of_stalls": 500,
 			"housing_type": "open air barn",
 			"pen_type": "freestall",
-			"max_stocking_density": 1.2,
+			"max_stocking_density": 2,
 			"manure_management_scenario_id": 0
 		},
 		{
@@ -166,7 +166,7 @@
 			"number_of_stalls": 1200,
 			"housing_type": "open air barn",
 			"pen_type": "freestall",
-			"max_stocking_density": 1.4,
+			"max_stocking_density": 2,
 			"manure_management_scenario_id": 0
 		},
 		{
@@ -178,7 +178,7 @@
 			"number_of_stalls": 500,
 			"housing_type": "open air barn",
 			"pen_type": "freestall",
-			"max_stocking_density": 1.2,
+			"max_stocking_density": 2,
 			"manure_management_scenario_id": 0
 		},
 		{
@@ -190,7 +190,7 @@
 			"number_of_stalls": 800,
 			"housing_type": "open air barn",
 			"pen_type": "freestall",
-			"max_stocking_density": 1.4,
+			"max_stocking_density": 2,
 			"manure_management_scenario_id": 1
 
 		},
@@ -203,7 +203,7 @@
 			"number_of_stalls": 800,
 			"housing_type": "open air barn",
 			"pen_type": "freestall",
-			"max_stocking_density": 1.4,
+			"max_stocking_density": 2,
 			"manure_management_scenario_id":1
 
 		}

@@ -16,7 +16,7 @@
   },
 	"animal_config": {
 		"management_decisions": {
-			"breeding_start_day_h": 395,
+			"breeding_start_day_h": 374,
 			"heifer_repro_method": "ED",
 			"cow_repro_method": "ED",
 			"semen_type": "conventional",
@@ -48,7 +48,7 @@
                     "repro_sub_protocol": "5dCG2P",
                     "repro_sub_properties": {
             "conception_rate": 0.6,
-                    "estrus_detection_rate": 0.7
+                    "estrus_detection_rate": 0.9
           }
                 },
                 "cows": {
@@ -59,7 +59,7 @@
           "repro_sub_protocol": "OvSynch 56",
                     "repro_sub_properties": {
             "conception_rate": 0.5,
-                    "tai_program_start_day": 70
+                    "tai_program_start_day": 0
 }
         },
         "cow_repro_programs": {
@@ -68,12 +68,12 @@
           "ed_conception_rate": 0.45,
           "cow_presynch_protocol": "Double OvSynch",
           "cow_TAI_protocol": "OvSynch 56",
-          "ovsynch56_conception_rate": 0.6,
-          "ovsynch48_conception_rate": 0.6,
-          "cosynch72_conception_rate": 0.6,
-          "cosynch5d_conception_rate": 0.6,
+          "ovsynch56_conception_rate": 0.45,
+          "ovsynch48_conception_rate": 0.45,
+          "cosynch72_conception_rate": 0.45,
+          "cosynch5d_conception_rate": 0.45,
           "cow_resynch_protocol": "TAIafterPD",
-          "tai_program_start_day": 72
+          "tai_program_start_day": 0
                 }
 			},
 			"bodyweight": {
