@@ -301,7 +301,8 @@ def test_select_projected_manure_mass_exceptions(projected_manure_masses: list[f
                                                 manure_type=ManureType.SOLID)),
     ]
 )
-def test_create_nutrient_request_results(projected_manure_mass: float, manure_type: ManureType, nutrients: ManureNutrients) -> None:
+def test_create_nutrient_request_results(projected_manure_mass: float, manure_type: ManureType,
+                                         nutrients: ManureNutrients) -> None:
     """
     Unit test for the _create_nutrient_request_results() method of the ManureNutrientManager class in the
     manure_nutrient_manager.py file.
