@@ -304,15 +304,11 @@ class ManureApplication:
         self.data.machine_manure_field_coverage = new_vals.get("new_field_coverage")
 
         top_layer_mass = surface_retention * surface_dry_matter_mass
-        top_layer_inorganic_nitrogen_fraction = surface_retention * inorganic_nitrogen_fraction
-        top_layer_organic_nitrogen_fraction = surface_retention * organic_nitrogen_fraction
-        self._add_nitrogen_to_soil_layer(0, top_layer_mass, top_layer_inorganic_nitrogen_fraction, ammonium_fraction,
-                                         top_layer_organic_nitrogen_fraction, field_size)
+        self._add_nitrogen_to_soil_layer(0, top_layer_mass, inorganic_nitrogen_fraction, ammonium_fraction,
+                                         organic_nitrogen_fraction, field_size)
         second_layer_mass = soil_infiltration * surface_dry_matter_mass
-        second_layer_inorganic_nitrogen_fraction = soil_infiltration * inorganic_nitrogen_fraction
-        second_layer_organic_nitrogen_fraction = soil_infiltration * organic_nitrogen_fraction
-        self._add_nitrogen_to_soil_layer(1, second_layer_mass, second_layer_inorganic_nitrogen_fraction,
-                                         ammonium_fraction, second_layer_organic_nitrogen_fraction, field_size)
+        self._add_nitrogen_to_soil_layer(1, second_layer_mass, inorganic_nitrogen_fraction,
+                                         ammonium_fraction, organic_nitrogen_fraction, field_size)
 
         is_not_subsurface_application = application_depth == 0.0 and surface_remainder_fraction == 1.0
         if is_not_subsurface_application:
