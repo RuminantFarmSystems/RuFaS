@@ -1454,7 +1454,7 @@ def test__open():
 
 
 def test__adjust_conception():
-    """Unit test for function _adjust_conception in file routines/animal/life_cycle/cow.py"""
+    """Unit test for function _reduce_conception_rate_based_on_parity in file routines/animal/life_cycle/cow.py"""
     pass
 
 

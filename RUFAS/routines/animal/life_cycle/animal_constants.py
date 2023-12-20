@@ -29,8 +29,10 @@ ESTRUS_AFTER_AI_NOTE = "estrus after AI"
 ESTRUS_AFTER_ABORTION_NOTE = "estrus after abortion"
 FIRST_ESTRUS_NOTE = "first estrus"
 ESTRUS_AFTER_CALVING_NOTE = "1st estrus after calving"
-ESTRUS_BEFORE_VWP_NOTE = "estrus occurred before vwp"
+ESTRUS_BEFORE_VWP_NOTE = "estrus occurred before the end of voluntary waiting period"
 ESTRUS_AFTER_PGF_NOTE = "estrus after PGF"
+SIMULATE_ESTRUS_AFTER_PGF_NOTE = "simulating estrus after PGF"
+ESTRUS_NOT_DETECTED_BETWEEN_VWP_AND_TAI_START_DAY_NOTE = "estrus not detected between VWP and TAI start day"
 
 # TAI injections
 INJECT_GNRH = "inject GnRH"
@@ -40,9 +42,22 @@ INJECT_PGF = "inject PGF"
 INJECT_CIDR = "inject CIDR"
 
 # presynch protocols
+PRESYNCH_PERIOD_START = "Presynch period started"
+PRESYNCH_PERIOD_END = "Presynch period ended"
 PRESYNCH_END = "Presynch ended"
 DOUBLE_OVSYNCH_END = "Double OvSynch ended"
 C6G_END = "G6G ended"
+TAI_PERIOD_START = "TAI period started"
+TAI_PERIOD_END = "TAI period ended"
+
+# ReSynch protocols
+SETTING_UP_RESYNCH_TAI_NOTE = "setting up resynch TAI protocol"
+DISCONTINUE_RESYNCH_TAI = "discontinued resynch TAI protocol after first preg check confirmed"
+DECREASE_CONCEPTION_RATE = "decrease TAI conception rate"
+
+# Conception outcomes
+SUCCESSFUL_CONCEPTION = "successful conception"
+FAILED_CONCEPTION = "failed conception"
 
 # pregnancy
 HEIFER_PREG = "heifer pregnant"

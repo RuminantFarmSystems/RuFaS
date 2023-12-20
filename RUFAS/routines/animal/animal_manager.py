@@ -1623,9 +1623,9 @@ class AnimalManager:
             self._handle_newly_added_animals([*animals_added, *calves_born], feed, current_temperature)
 
             self._record_animal_counts()
-            if time.is_last_day_of_simulation:
-                self._record_animal_events(self.heiferIIs)
+            if self.simulation_day >= 365 and self.simulation_day % 100 == 0:
                 self._record_animal_events(self.cows)
+                self._record_animal_events(self.heiferIIs)
                 self._record_heiferIIs_conception_rate()
 
             manure_excretions_output_data = {}
@@ -1670,7 +1670,7 @@ class AnimalManager:
 
         info_map = {"class": self.__class__.__name__, "function": self._record_animal_events.__name__}
         for animal in animals:
-            om.add_variable(f'{animal.__class__.__name__}_{animal.id}_last_day',
+            om.add_variable(f'{animal.__class__.__name__}_{animal.id}_day_{self.simulation_day}',
                             animal.events,
                             info_map)
 

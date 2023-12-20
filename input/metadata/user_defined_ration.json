@@ -457,112 +457,37 @@
               },
               "presynch_protocol": {
                 "type": "string",
-                "description": "Presynch Protocol -- The preSynch protocol (1st breeding) for cow in TAI (Timed Artificial Insemination) program",
+                "description": "Presynch Protocol -- The preSynch protocol (1st breeding) for cow in TAI (Timed Artificial Insemination) program. This ONLY applies to the TAI repro protocol.",
                 "default": "Double OvSynch",
-                "pattern": "^(Double OvSynch|Presynch|G6G)$"
+                "pattern": "^(Double OvSynch|PreSynch|G6G|N/A)$"
               },
               "resynch_protocol": {
                 "type": "string",
                 "description": "Resynch Protocol -- Resynch protocol for cow before/at/after pregnancy check day in the TAI (Timed Artificial Insemination) program",
                 "default": "TAIafterPD",
-                "pattern": "^(TAIafterPD|TAIbeforePD|PGFatPD)$"
+                "pattern": "^(TAIafterPD|TAIbeforePD|PGFatPD|N/A)$"
               },
               "repro_sub_protocol": {
                 "type": "string",
-                "pattern": "^(OvSynch 56|OvSynch 48|CoSynch 72|5d CoSynch)$"
+                "description": "Sub-protocol for cow reproductive program. This ONLY applies to the TAI repro protocol.",
+                "pattern": "^(OvSynch 48|OvSynch 56|CoSynch 72|5d CoSynch|N/A)$",
+                "default": "OvSynch 56"
               },
               "repro_sub_properties": {
                 "type": "object",
                 "conception_rate": {
                   "type": "number",
-                  "description": "Conception Rate -- The conception rate for the cow reproductive program (default is 0.6)",
+                  "description": "Conception Rate -- The conception rate for the cow reproductive program (default is 0.6). This ONLY applies to the TAI repro protocol.",
                   "default": 0.5,
                   "minimum": 0,
                   "maximum": 1
                 },
                 "tai_program_start_day": {
                   "type": "number",
-                  "description": "TAI program start day for ED-TAI protocol -- The TAI program start day for ED-TAI protocol.",
+                  "description": "TAI program start day for TAI and ED-TAI repro protocols.",
                   "minimum": 0,
                   "default": 70
                 }
-              }
-            },
-            "cow_repro_programs": {
-              "type": "object",
-              "description": "Cow Reproductive programs",
-              "estrus_detection_rate": {
-                "type": "number",
-                "description": "Estrus Detection Rate -- The % of in-heat animals that would be detected in the ED (Estrus Detection) programs (default is 0.6)",
-                "default": 0.6,
-                "minimum": 0,
-                "maximum": 1
-              },
-              "estrus_service_rate": {
-                "type": "number",
-                "description": "Estrus Service Rate -- The % of detected in heat animals that would be serviced in the ED (Estrus Detection) programs (default is 1)",
-                "default": 1,
-                "minimum": 0,
-                "maximum": 1
-              },
-              "ed_conception_rate": {
-                "type": "number",
-                "description": "ED Conception Rate -- The % of serviced animals that would be concepted in the ED (Estrus Detection) programs (default is 0.6)",
-                "default": 0.6,
-                "minimum": 0,
-                "maximum": 1
-              },
-              "cow_presynch_protocol": {
-                "type": "string",
-                "description": "Cow Presynch Protocol -- The preSynch protocol (1st breeding) for cow in TAI (Timed Artificial Insemination) program",
-                "default": "Double OvSynch",
-                "pattern": "^(Double OvSynch|Presynch|G6G)$"
-              },
-              "cow_TAI_protocol": {
-                "type": "string",
-                "description": "Cow TAI (Timed Artificial Insemination) Protocol -- The timed AI protocol for cows in the TAI (Timed Artificial Insemination) program",
-                "default": "OvSynch 56",
-                "pattern": "^(OvSynch 56|OvSynch 48|CoSynch 72|5d CoSynch)$"
-              },
-              "ovsynch56_conception_rate": {
-                "type": "number",
-                "description": "OvSynch56 Conception Rate -- The conception rate for OvSynch56 protocol (pre-breeding GnRH shot given 56hrs post prostaglandin) in cow TAI (Timed Artificial Insemination) program (default is 0.6)",
-                "default": 0.6,
-                "minimum": 0,
-                "maximum": 1
-              },
-              "ovsynch48_conception_rate": {
-                "type": "number",
-                "description": "OvSynch48 Conception Rate -- The conception rate for OvSynch 48 protocol (pre-breeding GnRH shot given 48hrs post prostaglandin) in cow TAI (Timed Artificial Insemination) program",
-                "minimum": 0,
-                "maximum": 1,
-                "default": 0.6
-              },
-              "cosynch72_conception_rate": {
-                "type": "number",
-                "description": "CoSynch72 Conception Rate -- The conception rate for CoSynch 72 protocol in cow TAI (Timed Artificial Insemination) program",
-                "minimum": 0,
-                "maximum": 1,
-                "default": 0.6
-              },
-              "cosynch5d_conception_rate": {
-                "type": "number",
-                "description": "5d CoSynch Conception Rate -- The conception rate for 5d CoSynch protocol in cow TAI (Timed Artificial Insemination) program",
-                "minimum": 0,
-                "maximum": 1,
-                "default": 0.6
-              },
-              "cow_resynch_protocol": {
-                "type": "string",
-                "description": "Cow Resynch Protocol -- Resynch protocol for cow before/at/after pregnancy check day in the TAI (Timed Artificial Insemination) program",
-                "default": "TAIafterPD",
-                "pattern": "^(TAIafterPD|TAIbeforePD|PGFatPD)$"
-              },
-              "tai_program_start_day": {
-                "type": "number",
-                "description": "TAI program start day for ED-TAI protocol -- The TAI program start day for ED-TAI protocol.",
-                "minimum": 0,
-                "default": 72
               }
             }
           },
