@@ -283,13 +283,6 @@ class ManureNutrientManager:
             if getattr(self._nutrients_by_manure_type[manure_type], attr) < getattr(results, attr):
                 raise ValueError(f"Remove more nutrients than available: {attr}")
 
-        # self._nutrients -= ManureNutrients(
-        #     nitrogen=results.nitrogen,
-        #     phosphorus=results.phosphorus,
-        #     total_manure_mass=results.total_manure_mass,
-        #     dry_matter=results.dry_matter,
-        # )
-
         current_nutrients = self._nutrients_by_manure_type.get(manure_type)
 
         if not current_nutrients:
