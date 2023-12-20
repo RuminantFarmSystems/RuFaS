@@ -42,6 +42,13 @@
       "type": "csv",
       "properties": "emissions_properties"
     },
+"purchased_feeds_emissions": {
+      "title": "Emissions from purchased feeds",
+      "description": "Specifies how much emissions are associated with purchased feed types.",
+      "path": "input/data/EEE/usable_feeds_emissions.csv",
+      "type": "csv",
+      "properties": "feed_emissions_properties"
+    },
 "feed": {
       "title": "Feed data",
       "description": "Those cows need to eat!",
@@ -169,6 +176,13 @@
         "default": "NASEM",
         "pattern": "^(NASEM|NRC)$",
         "description": "The nutrient standard to use for feed."
+},
+      "FIPS_county_code": {
+        "type": "number",
+        "minimum": 1000,
+        "maximum": 56045,
+        "default": null,
+        "description": "Unique 5-digit code that represents a specific U.S. county."
       }
     },
     "animal_properties": {
@@ -2088,6 +2102,92 @@
         "description": "The amount of total tonnes CO2-eq generated from corn silage tillage",
         "minimum": 0,
         "default": 400
+      }
+    },
+"feed_emissions_properties": {
+      "county_code": {
+        "type": "number",
+        "minimum": 1000
+      },
+      "108": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "107": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "110": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "18": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "23": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "44": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "51": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "50": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "52": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "95": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "94": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "100": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "104": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "176": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "91": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "301": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "302": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "303": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "304": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "305": {
+        "type": "number",
+        "minimum": 0.0
       }
     },
     "feed_properties": {
