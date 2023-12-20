@@ -707,8 +707,8 @@ def test_manure_manager_daily_update(mocker: MockFixture) -> None:
 @pytest.mark.parametrize(
     'treatment_type, expected_manure_type',
     [
-        (ManureTreatmentType.SLURRY_STORAGE_OUTDOOR, ManureType.SLURRY),
-        (ManureTreatmentType.SLURRY_STORAGE_UNDERFLOOR, ManureType.SLURRY),
+        (ManureTreatmentType.SLURRY_STORAGE_OUTDOOR, ManureType.LIQUID),
+        (ManureTreatmentType.SLURRY_STORAGE_UNDERFLOOR, ManureType.LIQUID),
         (ManureTreatmentType.ANAEROBIC_LAGOON, ManureType.LIQUID),
         (ManureTreatmentType.ANAEROBIC_DIGESTION_AND_LAGOON, ManureType.LIQUID),
         (ManureTreatmentType.ANAEROBIC_DIGESTION, ManureType.LIQUID),
@@ -731,7 +731,6 @@ def test_get_manure_type(treatment_type: ManureTreatmentType, expected_manure_ty
 @pytest.mark.parametrize(
     "manure_type, expected_density",
     [
-        (ManureType.SLURRY, ManureConstants.SLURRY_MANURE_DENSITY),
         (ManureType.LIQUID, ManureConstants.LIQUID_MANURE_DENSITY),
         (ManureType.SOLID, ManureConstants.SOLID_MANURE_DENSITY),
     ]
@@ -797,10 +796,9 @@ def test_add_manure_nutrients(mocker: MockFixture) -> None:
     # Assert
     patch_get_manure_density.assert_has_calls([
         mocker.call(ManureType.LIQUID),
-        mocker.call(ManureType.SLURRY),
     ])
-    mock_manure_nutrient_manager.add_nutrients.assert_called_once_with(mock_manure_nutrients)
-    patch_manure_nutrients_init.assert_called_once_with(
+    mock_manure_nutrient_manager.add_nutrients.assert_called_with(mock_manure_nutrients)
+    patch_manure_nutrients_init.assert_called_with(
         nitrogen=max(mock_manure_treatment_daily_output.liquid_manure_nitrogen
                      + mock_manure_treatment_daily_output.sludge_manure_nitrogen
                      + mock_manure_treatment_daily_output.solid_manure_nitrogen, 0.0),

@@ -316,56 +316,22 @@ class ManureManager:
         liquid_manure_nitrogen = max(manure_treatment_daily_output.liquid_manure_nitrogen, 0.0)
         solid_manure_nitrogen = max(manure_treatment_daily_output.solid_manure_nitrogen, 0.0)
         # sludge_manure_nitrogen = max(manure_treatment_daily_output.sludge_manure_nitrogen, 0.0)
-        # nitrogen = max(
-        #     manure_treatment_daily_output.liquid_manure_nitrogen
-        #     + manure_treatment_daily_output.sludge_manure_nitrogen
-        #     + manure_treatment_daily_output.solid_manure_nitrogen,
-        #     0.0
-        # )
 
         liquid_manure_phosphorus = max(manure_treatment_daily_output.liquid_manure_phosphorus, 0.0)
         solid_manure_phosphorus = max(manure_treatment_daily_output.solid_manure_phosphorus, 0.0)
         # sludge_manure_phosphorus = max(manure_treatment_daily_output.sludge_manure_phosphorus, 0.0)
 
-        # phosphorus = max(
-        #     manure_treatment_daily_output.liquid_manure_phosphorus
-        #     + manure_treatment_daily_output.sludge_manure_phosphorus
-        #     + manure_treatment_daily_output.solid_manure_phosphorus,
-        #     0.0
-        # )
-
         liquid_manure_potassium = max(manure_treatment_daily_output.liquid_manure_potassium, 0.0)
         solid_manure_potassium = max(manure_treatment_daily_output.solid_manure_potassium, 0.0)
         # sludge_manure_potassium = max(manure_treatment_daily_output.sludge_manure_potassium, 0.0)
-        # potassium = max(
-        #     manure_treatment_daily_output.liquid_manure_potassium
-        #     + manure_treatment_daily_output.sludge_manure_potassium
-        #     + manure_treatment_daily_output.solid_manure_potassium,
-        #     0.0,
-        # )
 
         liquid_manure_total_solids = max(manure_treatment_daily_output.liquid_manure_total_solids, 0.0)
         solid_manure_total_solids = max(manure_treatment_daily_output.solid_manure_total_solids, 0.0)
         # sludge_manure_total_solids = max(manure_treatment_daily_output.sludge_manure_total_solids, 0.0)
-        # dry_matter = max(
-        #     manure_treatment_daily_output.liquid_manure_total_solids
-        #     + manure_treatment_daily_output.sludge_manure_total_solids
-        #     + manure_treatment_daily_output.solid_manure_total_solids,
-        #     0.0,
-        # )
 
         liquid_total_manure_mass = max((manure_treatment_daily_output.liquid_manure_daily_volume *
                                         self._get_manure_density_by_type(ManureType.LIQUID)), 0.0)
         solid_total_manure_mass = max(manure_treatment_daily_output.solid_manure_daily_mass, 0.0)
-
-        # total_manure_mass = max(
-        #     manure_treatment_daily_output.liquid_manure_daily_volume
-        #     * self._get_manure_density_by_type(ManureType.LIQUID)
-        #     + manure_treatment_daily_output.sludge_manure_daily_volume
-        #     * self._get_manure_density_by_type(ManureType.SLURRY)
-        #     + manure_treatment_daily_output.solid_manure_daily_mass,
-        #     0.0
-        # )
 
         self._manure_nutrient_manager.add_nutrients(
             ManureNutrients(

@@ -4,6 +4,7 @@ import re
 
 import pytest
 from pytest_mock import MockerFixture
+from RUFAS.routines.manure.manure_treatments.manure_types import ManureType
 
 from RUFAS.routines.manure.manure_nutrients.manure_nutrient_manager import ManureNutrientManager
 from RUFAS.routines.manure.manure_nutrients.manure_nutrients import ManureNutrients
@@ -77,16 +78,19 @@ def test_request_nutrients(mocker: MockerFixture, eval_return: NutrientRequestRe
     'projected_manure_mass, current_nutrient_values, expected_no_results',
     [
         # Scenario when there is no projected manure mass
-        (0, ManureNutrients(), True),
+        (0, ManureNutrients(manure_type=ManureType.SOLID), True),
 
         # Scenario when projected manure mass is greater than the total manure mass
-        (10, ManureNutrients(nitrogen=2, phosphorus=2, total_manure_mass=5, dry_matter=1), False),
+        (10, ManureNutrients(nitrogen=2, phosphorus=2, total_manure_mass=5, dry_matter=1,
+                             manure_type=ManureType.SOLID), False),
 
         # Scenario when projected manure mass is less than the total manure mass
-        (2, ManureNutrients(nitrogen=1, phosphorus=1, total_manure_mass=3, dry_matter=1), False),
+        (2, ManureNutrients(nitrogen=1, phosphorus=1, total_manure_mass=3, dry_matter=1,
+                            manure_type=ManureType.LIQUID), False),
 
         # Scenario when projected manure mass is equal to the total manure mass
-        (5, ManureNutrients(nitrogen=2, phosphorus=2, total_manure_mass=5, dry_matter=1), False)
+        (5, ManureNutrients(nitrogen=2, phosphorus=2, total_manure_mass=5, dry_matter=1,
+                            manure_type=ManureType.LIQUID), False)
     ]
 )
 def test_evaluate_nutrient_request(mocker: MockerFixture, projected_manure_mass: float,
@@ -264,22 +268,28 @@ def test_select_projected_manure_mass_exceptions(projected_manure_masses: list[f
     'projected_manure_mass, nutrients',
     [
         # Scenario when projected manure mass is zero
-        (0.0, ManureNutrients(nitrogen=1, phosphorus=1, total_manure_mass=2, dry_matter=1)),
+        (0.0, ManureNutrients(nitrogen=1, phosphorus=1, total_manure_mass=2, dry_matter=1,
+                              manure_type=ManureType.LIQUID)),
 
         # Scenario when projected manure mass is very small
-        (1e-8, ManureNutrients(nitrogen=1, phosphorus=1, total_manure_mass=2, dry_matter=1)),
+        (1e-8, ManureNutrients(nitrogen=1, phosphorus=1, total_manure_mass=2, dry_matter=1,
+                               manure_type=ManureType.LIQUID)),
 
         # Scenario when projected manure mass is large
-        (1e6, ManureNutrients(nitrogen=1, phosphorus=1, total_manure_mass=2, dry_matter=1)),
+        (1e6, ManureNutrients(nitrogen=1, phosphorus=1, total_manure_mass=2, dry_matter=1,
+                              manure_type=ManureType.LIQUID)),
 
         # Scenario when nutrient compositions are zero
-        (2.0, ManureNutrients(nitrogen=0, phosphorus=0, total_manure_mass=0, dry_matter=0)),
+        (2.0, ManureNutrients(nitrogen=0, phosphorus=0, total_manure_mass=0, dry_matter=0,
+                              manure_type=ManureType.LIQUID)),
 
         # Scenario when nutrient values are large
-        (2.0, ManureNutrients(nitrogen=1e6, phosphorus=1e6, total_manure_mass=1e6, dry_matter=1e6)),
+        (2.0, ManureNutrients(nitrogen=1e6, phosphorus=1e6, total_manure_mass=1e6, dry_matter=1e6,
+                              manure_type=ManureType.SOLID)),
 
         # Normal scenario when projected manure mass is > 0
-        (2.0, ManureNutrients(nitrogen=1, phosphorus=2, total_manure_mass=4, dry_matter=1)),
+        (2.0, ManureNutrients(nitrogen=1, phosphorus=2, total_manure_mass=4, dry_matter=1,
+                              manure_type=ManureType.SOLID)),
     ]
 )
 def test_create_nutrient_request_results(projected_manure_mass: float, nutrients: ManureNutrients) -> None:
@@ -310,7 +320,8 @@ def test_create_nutrient_request_results(projected_manure_mass: float, nutrients
     'projected_manure_mass, nutrients, expected_exception, expected_error_msg',
     [
         # Scenario when projected manure mass is negative
-        (-2.0, ManureNutrients(), ValueError, 'Projected manure mass cannot be negative: -2.0'),
+        (-2.0, ManureNutrients(manure_type=ManureType.LIQUID), ValueError,
+         'Projected manure mass cannot be negative: -2.0'),
     ]
 )
 def test_create_nutrient_request_results_exceptions(projected_manure_mass: float, nutrients: ManureNutrients,
@@ -337,19 +348,19 @@ def test_create_nutrient_request_results_exceptions(projected_manure_mass: float
     'initial_nutrients, nutrients_to_remove, expected_nutrients',
     [
         # Scenario when removing zero nutrients
-        (ManureNutrients(nitrogen=1, phosphorus=2, total_manure_mass=3, dry_matter=1),
+        (ManureNutrients(nitrogen=1, phosphorus=2, total_manure_mass=3, dry_matter=1, manure_type=ManureType.SOLID),
          NutrientRequestResults(nitrogen=0, phosphorus=0, total_manure_mass=0, dry_matter=0, dry_matter_fraction=0.5),
-         ManureNutrients(nitrogen=1, phosphorus=2, total_manure_mass=3, dry_matter=1)),
+         ManureNutrients(nitrogen=1, phosphorus=2, total_manure_mass=3, dry_matter=1, manure_type=ManureType.SOLID)),
 
         # Scenario when removing some nutrients
-        (ManureNutrients(nitrogen=5, phosphorus=10, total_manure_mass=15, dry_matter=5),
+        (ManureNutrients(nitrogen=5, phosphorus=10, total_manure_mass=15, dry_matter=5, manure_type=ManureType.LIQUID),
          NutrientRequestResults(nitrogen=1, phosphorus=2, total_manure_mass=3, dry_matter=1, dry_matter_fraction=0.5),
-         ManureNutrients(nitrogen=4, phosphorus=8, total_manure_mass=12, dry_matter=4)),
+         ManureNutrients(nitrogen=4, phosphorus=8, total_manure_mass=12, dry_matter=4, manure_type=ManureType.LIQUID)),
 
         # Scenario when removing all nutrients
-        (ManureNutrients(nitrogen=1, phosphorus=2, total_manure_mass=3, dry_matter=1),
+        (ManureNutrients(nitrogen=1, phosphorus=2, total_manure_mass=3, dry_matter=1, manure_type=ManureType.LIQUID),
          NutrientRequestResults(nitrogen=1, phosphorus=2, total_manure_mass=3, dry_matter=1, dry_matter_fraction=0.5),
-         ManureNutrients(nitrogen=0, phosphorus=0, total_manure_mass=0, dry_matter=0)),
+         ManureNutrients(nitrogen=0, phosphorus=0, total_manure_mass=0, dry_matter=0, manure_type=ManureType.LIQUID)),
     ]
 )
 def test_remove_nutrients(initial_nutrients: ManureNutrients, nutrients_to_remove: NutrientRequestResults,
@@ -376,16 +387,16 @@ def test_remove_nutrients(initial_nutrients: ManureNutrients, nutrients_to_remov
 @pytest.mark.parametrize(
     'initial_nutrients, nutrients_to_remove, exceeding_nutrient_type',
     [
-        (ManureNutrients(nitrogen=1, phosphorus=2, total_manure_mass=3, dry_matter=1),
+        (ManureNutrients(nitrogen=1, phosphorus=2, total_manure_mass=3, dry_matter=1, manure_type=ManureType.LIQUID),
          NutrientRequestResults(nitrogen=2, phosphorus=2, total_manure_mass=3, dry_matter=1, dry_matter_fraction=0.5),
          'nitrogen'),
-        (ManureNutrients(nitrogen=1, phosphorus=2, total_manure_mass=3, dry_matter=1),
+        (ManureNutrients(nitrogen=1, phosphorus=2, total_manure_mass=3, dry_matter=1, manure_type=ManureType.LIQUID),
          NutrientRequestResults(nitrogen=1, phosphorus=3, total_manure_mass=3, dry_matter=1, dry_matter_fraction=0.5),
          'phosphorus'),
-        (ManureNutrients(nitrogen=1, phosphorus=2, total_manure_mass=3, dry_matter=1),
+        (ManureNutrients(nitrogen=1, phosphorus=2, total_manure_mass=3, dry_matter=1, manure_type=ManureType.SOLID),
          NutrientRequestResults(nitrogen=1, phosphorus=2, total_manure_mass=4, dry_matter=1, dry_matter_fraction=0.5),
          'total_manure_mass'),
-        (ManureNutrients(nitrogen=1, phosphorus=2, total_manure_mass=3, dry_matter=1),
+        (ManureNutrients(nitrogen=1, phosphorus=2, total_manure_mass=3, dry_matter=1, manure_type=ManureType.SOLID),
          NutrientRequestResults(nitrogen=1, phosphorus=2, total_manure_mass=3, dry_matter=2, dry_matter_fraction=0.5),
          'dry_matter'),
     ]
