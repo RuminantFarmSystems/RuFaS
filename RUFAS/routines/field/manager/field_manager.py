@@ -1,4 +1,5 @@
 from RUFAS.input_manager import InputManager
+from RUFAS.output_manager import OutputManager
 from RUFAS.routines.field.field.field import Field
 from RUFAS.routines.field.field.field_data import FieldData
 from RUFAS.routines.field.soil.soil import Soil
@@ -20,12 +21,25 @@ the `SimulationEngine` for executing daily and annual routines in the field modu
 """
 
 im = InputManager()
+om = OutputManager()
 
 
 class FieldManager:
     def __init__(self, manure_manager: ManureManager):
+        info_map = {
+            "class": self.__class__.__name__,
+            "function": self.__init__.__name__
+        }
+
         self.fields: List[Field] = []
         fields = im.get_data_keys_by_properties("field_properties")
+        if not fields:
+            om.add_warning(
+                "No field input files.",
+                "No fields will be simulated.",
+                info_map
+            )
+
         for field in fields:
             new_field = self._setup_field(field, manure_manager)
             self.fields.append(new_field)

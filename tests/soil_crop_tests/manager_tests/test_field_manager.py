@@ -1,6 +1,7 @@
 import mock
 
 from RUFAS.input_manager import InputManager
+from RUFAS.output_manager import OutputManager
 from RUFAS.routines.field.manager.field_manager import FieldManager
 from RUFAS.routines.field.manager.crop_schedule import CropSchedule
 from RUFAS.current_day_conditions import CurrentDayConditions
@@ -20,6 +21,8 @@ import pytest
 from pytest_mock.plugin import MockerFixture
 from typing import List, Dict, Callable
 from unittest.mock import MagicMock, patch, call
+
+om = OutputManager()
 
 
 @pytest.fixture
@@ -50,7 +53,8 @@ def test_field_manager_init(field_blob_names) -> None:
     with patch("RUFAS.input_manager.InputManager.get_data_keys_by_properties",
                return_value=field_blob_names) as patched_data_keys_by_properties, \
             patch("RUFAS.routines.field.manager.field_manager.FieldManager._setup_field",
-                  return_value=MagicMock(Field)) as patched_field_setup:
+                  return_value=MagicMock(Field)) as patched_field_setup, \
+            patch.object(om, "add_warning") as warning:
         field_manager = FieldManager(mocked_manure_manager)
 
         assert len(field_manager.fields) == len(field_blob_names)
@@ -58,8 +62,10 @@ def test_field_manager_init(field_blob_names) -> None:
         patched_data_keys_by_properties.assert_called_once()
         if len(field_blob_names) > 0:
             patched_field_setup.assert_has_calls(expected_field_setup_calls)
+            warning.assert_not_called()
         else:
             patched_field_setup.assert_not_called()
+            warning.assert_called_once()
 
 
 @pytest.fixture
