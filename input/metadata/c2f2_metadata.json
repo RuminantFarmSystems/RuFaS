@@ -28,13 +28,6 @@
       "type": "json",
       "properties": "crop_schedule_properties"
     },
-    "feed": {
-      "title": "Feed data",
-      "description": "Those cows need to eat!",
-      "path": "input/data/feed/c2f2_feed.json",
-      "type": "json",
-      "properties": "feed_properties"
-    },
     "economy": {
       "title": "Economy data",
       "description": "Time is money!",
@@ -55,6 +48,13 @@
       "path": "input/data/EEE/usable_feeds_emissions.csv",
       "type": "csv",
       "properties": "feed_emissions_properties"
+    },
+    "feed": {
+      "title": "Feed data",
+      "description": "Those cows need to eat!",
+      "path": "input/data/feed/c2f2_feed.json",
+      "type": "json",
+      "properties": "feed_properties"
     },
     "NRC_Comp": {
       "title": "NRC Comp data",
