@@ -1,6 +1,7 @@
 import mock
 
 from RUFAS.input_manager import InputManager
+from RUFAS.output_manager import OutputManager
 from RUFAS.routines.field.manager.field_manager import FieldManager
 from RUFAS.routines.field.manager.crop_schedule import CropSchedule
 from RUFAS.current_day_conditions import CurrentDayConditions
@@ -20,6 +21,8 @@ import pytest
 from pytest_mock.plugin import MockerFixture
 from typing import List, Dict, Callable
 from unittest.mock import MagicMock, patch, call
+
+om = OutputManager()
 
 
 @pytest.fixture
@@ -47,19 +50,22 @@ def test_field_manager_init(field_blob_names) -> None:
     """Tests that FieldManager init method runs correctly."""
     mocked_manure_manager = MagicMock(ManureManager)
     expected_field_setup_calls = [call(field_name, mocked_manure_manager) for field_name in field_blob_names]
-    with patch("RUFAS.routines.field.manager.field_manager.FieldManager._get_field_blob_names",
-               return_value=field_blob_names) as patched_field_blob_names, \
+    with patch("RUFAS.input_manager.InputManager.get_data_keys_by_properties",
+               return_value=field_blob_names) as patched_data_keys_by_properties, \
             patch("RUFAS.routines.field.manager.field_manager.FieldManager._setup_field",
-                  return_value=MagicMock(Field)) as patched_field_setup:
+                  return_value=MagicMock(Field)) as patched_field_setup, \
+            patch.object(om, "add_warning") as warning:
         field_manager = FieldManager(mocked_manure_manager)
 
         assert len(field_manager.fields) == len(field_blob_names)
         assert len(field_manager.output_gatherer.fields) == len(field_blob_names)
-        patched_field_blob_names.assert_called_once()
+        patched_data_keys_by_properties.assert_called_once()
         if len(field_blob_names) > 0:
             patched_field_setup.assert_has_calls(expected_field_setup_calls)
+            warning.assert_not_called()
         else:
             patched_field_setup.assert_not_called()
+            warning.assert_called_once()
 
 
 @pytest.fixture
@@ -98,7 +104,7 @@ def test_daily_update_routine(fields: List[Field], mock_weather: Weather,
 
     mocked_manure_manager = MagicMock(ManureManager)
     mock_weather.get_current_day_conditions = MagicMock(return_value=MagicMock(CurrentDayConditions))
-    with patch("RUFAS.routines.field.manager.field_manager.FieldManager._get_field_blob_names", return_value=[]):
+    with patch("RUFAS.input_manager.InputManager.get_data_keys_by_properties", return_value=[]):
         fm = FieldManager(mocked_manure_manager)
 
         fm.fields = fields
@@ -124,7 +130,7 @@ def test_annual_update_routine(fields: List[Field]):
     for field in fields:
         field.perform_annual_reset = MagicMock()
     mocked_field_manager = MagicMock(ManureManager)
-    with patch("RUFAS.routines.field.manager.field_manager.FieldManager._get_field_blob_names", return_value=[]):
+    with patch("RUFAS.input_manager.InputManager.get_data_keys_by_properties", return_value=[]):
         fm = FieldManager(mocked_field_manager)
         fm.fields = fields
         fm.output_gatherer.send_annual_variables = MagicMock()
@@ -801,57 +807,6 @@ def test_setup_soil_error(soil_configuration: dict, error_message: str, mock_inp
     assert str(e.value) == error_message
 
     mock_input_manager.get_data = input_manager_original_method_states["get_data"]
-
-
-@pytest.mark.parametrize("blobs,expected", [
-    ({
-         "tillage_schedule": {
-             "properties": "tillage_schedule_properties"
-         },
-         "field": {
-             "properties": "field_properties"
-         },
-         "weather": {
-             "properties": "weather_properties"
-         }}, ["field"]),
-    ({
-         "tillage_schedule": {
-             "properties": "tillage_schedule_properties"
-         },
-         "field_1": {
-             "properties": "field_properties"
-         },
-         "field_2": {
-             "properties": "field_properties"
-         }}, ["field_1", "field_2"]),
-    ({
-         "tillage_schedule": {
-             "properties": "tillage_schedule_properties"
-         },
-         "weather": {
-             "properties": "weather_properties"
-         }}, []),
-    ({}, [])
-])
-def test_get_field_blob_names(blobs: Dict[str, Dict[str, str]], expected: List[str]) -> None:
-    """Tests that all field blob names are correctly pulled from the InputManager."""
-    with patch("RUFAS.input_manager.InputManager.get_metadata", return_value=blobs):
-        actual = FieldManager._get_field_blob_names()
-        assert actual == expected
-
-
-def test_get_field_blob_names_error() -> None:
-    """Tests that exceptions are correctly raised when metadata does not contain expected values."""
-    with patch("RUFAS.input_manager.InputManager.get_metadata", side_effect=KeyError), \
-            pytest.raises(KeyError) as e:
-        FieldManager._get_field_blob_names()
-    assert str(e.value) == '"Could not find \'files\' section of metadata."'
-
-    with patch("RUFAS.input_manager.InputManager.get_metadata",
-               return_value={"dummy_blob": {"title": "Title", "description": "Described"}}), \
-            pytest.raises(KeyError) as e:
-        FieldManager._get_field_blob_names()
-    assert str(e.value) == '"dummy_blob in metadata did not contain \'properties\' value."'
 
 
 @pytest.mark.parametrize("field_name,field_config", [
