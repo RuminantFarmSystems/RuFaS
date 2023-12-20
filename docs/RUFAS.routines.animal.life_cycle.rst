@@ -28,10 +28,10 @@ RUFAS.routines.animal.life\_cycle.animal\_events module
    :undoc-members:
    :show-inheritance:
 
-RUFAS.routines.animal.life\_cycle.animal\_initialization module
----------------------------------------------------------------
+RUFAS.routines.animal.life\_cycle.animal\_population module
+-----------------------------------------------------------
 
-.. automodule:: RUFAS.routines.animal.life_cycle.animal_initialization
+.. automodule:: RUFAS.routines.animal.life_cycle.animal_population
    :members:
    :undoc-members:
    :show-inheritance:
@@ -84,6 +84,22 @@ RUFAS.routines.animal.life\_cycle.heiferIII module
    :undoc-members:
    :show-inheritance:
 
+RUFAS.routines.animal.life\_cycle.herd\_factory module
+------------------------------------------------------
+
+.. automodule:: RUFAS.routines.animal.life_cycle.herd_factory
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+RUFAS.routines.animal.life\_cycle.hormone\_delivery\_schedule module
+--------------------------------------------------------------------
+
+.. automodule:: RUFAS.routines.animal.life_cycle.hormone_delivery_schedule
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 RUFAS.routines.animal.life\_cycle.life\_cycle module
 ----------------------------------------------------
 
@@ -96,6 +112,22 @@ RUFAS.routines.animal.life\_cycle.pen\_history module
 -----------------------------------------------------
 
 .. automodule:: RUFAS.routines.animal.life_cycle.pen_history
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+RUFAS.routines.animal.life\_cycle.repro\_protocol\_enums module
+---------------------------------------------------------------
+
+.. automodule:: RUFAS.routines.animal.life_cycle.repro_protocol_enums
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+RUFAS.routines.animal.life\_cycle.repro\_protocol\_misc module
+--------------------------------------------------------------
+
+.. automodule:: RUFAS.routines.animal.life_cycle.repro_protocol_misc
    :members:
    :undoc-members:
    :show-inheritance:
