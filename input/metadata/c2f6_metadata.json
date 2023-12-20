@@ -10,7 +10,7 @@
     "animal": {
       "title": "Animal data",
       "description": "Moo Moo!",
-      "path": "input/data/animal/CREATE FILE FROM TEMPLATE.json",
+      "path": "input/data/animal/default_animal.json",
       "type": "json",
       "properties": "animal_properties"
     },
@@ -45,7 +45,7 @@
     "feed": {
       "title": "Feed data",
       "description": "Those cows need to eat!",
-      "path": "input/data/feed/CREATE FILE FROM TEMPLATE.json",
+      "path": "input/data/feed/c2f2_feed.json",
       "type": "json",
       "properties": "feed_properties"
     },
@@ -66,7 +66,7 @@
     "manure_management": {
       "title": "Manure data",
       "description": "You thought it's a waste, but those crops need to eat as well",
-      "path": "input/data/manure/CREATE FILE FROM TEMPLATE.json",
+      "path": "input/data/manure/manure_management.json",
       "type": "json",
       "properties": "manure_management_properties"
     },
@@ -115,7 +115,7 @@
     "weather": {
       "title": "Weather data",
       "description": "Let's turn on the AC",
-      "path": "input/data/weather/ADD FARM-SPECIFIC WEATHER FILE.csv",
+      "path": "input/data/weather/c2f6_weather.csv",
       "type": "csv",
       "properties": "weather_properties"
     },
