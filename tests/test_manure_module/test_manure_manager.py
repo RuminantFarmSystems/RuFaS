@@ -1,3 +1,4 @@
+from mock import call
 import pytest
 from pytest_mock import MockFixture
 
@@ -798,24 +799,26 @@ def test_add_manure_nutrients(mocker: MockFixture) -> None:
         mocker.call(ManureType.LIQUID),
     ])
     mock_manure_nutrient_manager.add_nutrients.assert_called_with(mock_manure_nutrients)
-    patch_manure_nutrients_init.assert_called_with(
-        nitrogen=max(mock_manure_treatment_daily_output.liquid_manure_nitrogen
-                     + mock_manure_treatment_daily_output.sludge_manure_nitrogen
-                     + mock_manure_treatment_daily_output.solid_manure_nitrogen, 0.0),
-        phosphorus=max(mock_manure_treatment_daily_output.liquid_manure_phosphorus
-                       + mock_manure_treatment_daily_output.sludge_manure_phosphorus
-                       + mock_manure_treatment_daily_output.solid_manure_phosphorus, 0.0),
-        potassium=max(mock_manure_treatment_daily_output.liquid_manure_potassium
-                      + mock_manure_treatment_daily_output.sludge_manure_potassium
-                      + mock_manure_treatment_daily_output.solid_manure_potassium, 0.0),
-        dry_matter=max(mock_manure_treatment_daily_output.liquid_manure_total_solids
-                       + mock_manure_treatment_daily_output.sludge_manure_total_solids
-                       + mock_manure_treatment_daily_output.solid_manure_total_solids, 0.0),
-        total_manure_mass=max((mock_manure_treatment_daily_output.liquid_manure_daily_volume
-                               + mock_manure_treatment_daily_output.sludge_manure_daily_volume
-                               ) * mock_manure_density
-                              + mock_manure_treatment_daily_output.solid_manure_daily_mass, 0.0)
-    )
+    expected_calls = [
+        call(
+            nitrogen=max(mock_manure_treatment_daily_output.liquid_manure_nitrogen, 0.0),
+            phosphorus=max(mock_manure_treatment_daily_output.liquid_manure_phosphorus, 0.0),
+            potassium=max(mock_manure_treatment_daily_output.liquid_manure_potassium, 0.0),
+            dry_matter=max(mock_manure_treatment_daily_output.liquid_manure_total_solids, 0.0),
+            total_manure_mass=max(mock_manure_treatment_daily_output.liquid_manure_daily_volume * mock_manure_density,
+                                  0.0),
+            manure_type=ManureType.LIQUID,
+        ),
+        call(
+            nitrogen=max(mock_manure_treatment_daily_output.solid_manure_nitrogen, 0.0),
+            phosphorus=max(mock_manure_treatment_daily_output.solid_manure_phosphorus, 0.0),
+            potassium=max(mock_manure_treatment_daily_output.solid_manure_potassium, 0.0),
+            dry_matter=max(mock_manure_treatment_daily_output.solid_manure_total_solids, 0.0),
+            total_manure_mass=max(mock_manure_treatment_daily_output.solid_manure_daily_mass, 0.0),
+            manure_type=ManureType.SOLID,
+        )
+    ]
+    patch_manure_nutrients_init.assert_has_calls(expected_calls)
 
 
 def test_request_nutrients(mocker: MockFixture) -> None:
