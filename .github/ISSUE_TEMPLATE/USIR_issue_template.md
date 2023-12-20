@@ -15,7 +15,6 @@
 <!-- Describe the current status of the problem or context.
 
 - What is the current behavior?
-- Which branch are you working on (if any)?
 - Relevant logs and/or screenshots:
 
 -->
