@@ -883,7 +883,7 @@ class OutputManager(object):
                 referenced_data = [reports[ref]["values"] for ref in filter_content["references"]]
                 report_data = ReportGenerator.generate_derived_report(referenced_data, filter_content)
             else:
-                report_data = report_generator.generate_report(filtered_pool, filter_content)
+                report_data = report_generator.generate_aggregate_report(filtered_pool, filter_content)
 
             reports[report_name] = {"values": report_data}
 

@@ -4,6 +4,7 @@
       "name": "Last 6 Month's HeiferI Population",
       "filters": [
         "AnimalManager.daily_updates.num_heiferIs",
+        "AnimalManager.daily_updates.num_heiferIIIs",
         "AnimalManager.daily_updates.num_heiferIIs"
       ],
       "vertical_aggregation": "sum",
@@ -12,7 +13,8 @@
     {
       "name": "Last 6 Month's HeiferII Population",
       "filters": [
-        "AnimalManager.daily_updates.num_heiferIIs"
+        "AnimalManager.daily_updates.num_heiferIIs",
+        "AnimalManager.daily_updates.num_heiferIIIs"
       ],
       "vertical_aggregation": "sum",
       "slice_start": -180
@@ -26,15 +28,17 @@
       "slice_start": -180
     },
     {
-      "name": "Total Heifer Population (Last 6 Months)",
+      "name": "Some random name",
       "horizontal_aggregation": "sum",
+      "vertical_aggregation": "sum",
+      "horizontal_first": false,
       "references": [
         "Last 6 Month's HeiferI Population",
         "Last 6 Month's HeiferII Population",
         "Last 6 Month's HeiferIII Population"
       ],
       "padding": {
-        "method": "zero"
+        "method": "one"
       }
     }
   ]

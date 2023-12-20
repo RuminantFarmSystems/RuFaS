@@ -1680,7 +1680,7 @@ def test_save_results_report_generation(
 
     with patch("RUFAS.output_manager.ReportGenerator") as mock_report_generator_class:
         mock_report_generator = mock_report_generator_class.return_value
-        mock_report_generator.generate_report = MagicMock()
+        mock_report_generator.generate_aggregate_report = MagicMock()
 
         # Act
         mock_output_manager.save_results(
@@ -1703,7 +1703,7 @@ def test_save_results_report_generation(
             )
 
         # test for exception handling
-        mock_report_generator.generate_report.side_effect = ValueError()
+        mock_report_generator.generate_aggregate_report.side_effect = ValueError()
         mock_output_manager.save_results(
             "save_path",
             "filters_path",
@@ -2163,7 +2163,7 @@ def test_handle_report_generation(mocker: MockerFixture,
     om = OutputManager()
     patch_for_add_log = mocker.patch.object(om, 'add_log')
     patch_for_add_error = mocker.patch.object(om, 'add_error')
-    patch_for_generate_report = mocker.patch("RUFAS.output_manager.ReportGenerator.generate_report",
+    patch_for_generate_report = mocker.patch("RUFAS.output_manager.ReportGenerator.generate_aggregate_report",
                                              return_value="mocked_report")
     patch_for_generate_derived_report = mocker.patch.object(ReportGenerator,
                                                             "generate_derived_report",

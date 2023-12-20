@@ -1,5 +1,7 @@
 from typing import Dict, List, Any, Optional, Type
+
 import pytest
+
 from RUFAS.report_generator import (
     average_aggregator,
     division_aggregator,
@@ -284,3 +286,71 @@ def test_generate_derived_report(referenced_data: List[List[float]],
     else:
         result = ReportGenerator.generate_derived_report(referenced_data, config)
         assert result == expected_result
+
+
+@pytest.mark.parametrize(
+    "input_list, target_length, pad_value, expected", [
+        # Normal cases
+        ([1, 2, 3], 5, 0, [1, 2, 3, 0, 0]),
+
+        # Padding an empty list
+        ([], 3, 'a', ['a', 'a', 'a']),
+
+        # No padding needed (list already at target length)
+        ([1, 2], 2, 9, [1, 2]),
+
+        # Padding with None
+        ([1], 3, None, [1, None, None]),
+
+        # List longer than target length (no padding)
+        ([1, 2, 3], 1, 0, [1, 2, 3]),
+
+        # empty list, zero length
+        ([], 0, 0, []),
+    ])
+def test_pad_list_with_value(input_list: List[Any],
+                             target_length: int,
+                             pad_value: Any,
+                             expected: List[Any]
+                             ) -> None:
+    """
+    Unit test for _pad_list_with_value() static method in report_generator.py file.
+    """
+
+    # Act
+    ReportGenerator._pad_list_with_value(input_list, target_length, pad_value)
+
+    # Assert
+    assert input_list == expected
+
+
+@pytest.mark.parametrize(
+    "input_list, target_length, expected", [
+        # Normal case: padding required
+        ([1, 2], 5, [1, 2, 1, 2, 1]),
+
+        # List already at target length
+        ([1, 2, 3], 3, [1, 2, 3]),
+
+        # List longer than target length: no padding
+        ([1, 2, 3], 2, [1, 2, 3]),
+
+        # Empty list
+        ([], 4, []),
+
+        # Padding to zero length
+        ([1, 2], 0, [1, 2]),
+
+        # Cycling multiple times
+        ([1, 2, 3], 10, [1, 2, 3, 1, 2, 3, 1, 2, 3, 1])
+    ])
+def test_pad_list_with_cycle(input_list: List[float], target_length: int, expected: List[float]) -> None:
+    """
+    Unit test for _pad_list_with_cycle() static method in report_generator.py file.
+    """
+
+    # Act
+    ReportGenerator._pad_list_with_cycle(input_list, target_length)
+
+    # Assert
+    assert input_list == expected
