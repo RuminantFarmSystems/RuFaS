@@ -36,7 +36,9 @@ class NitrificationVolatilization:
 
         Notes
         -----
-        This method uses the `nutrient_cycling_water_factor` calculated by :class:`LayerData`.
+        This method uses the `nutrient_cycling_water_factor` calculated by :class:`LayerData`, instead of the water
+        factor that SWAT specifies for use in calculating denitrification/volatilization (see SWAT Theoretical
+        documentation eqn. 3:1.3.2, 3).
 
         References
         ----------
