@@ -1,4 +1,5 @@
 from RUFAS.input_manager import InputManager
+from RUFAS.output_manager import OutputManager
 from RUFAS.routines.field.field.field import Field
 from RUFAS.routines.field.field.field_data import FieldData
 from RUFAS.routines.field.soil.soil import Soil
@@ -20,12 +21,25 @@ the `SimulationEngine` for executing daily and annual routines in the field modu
 """
 
 im = InputManager()
+om = OutputManager()
 
 
 class FieldManager:
     def __init__(self, manure_manager: ManureManager):
+        info_map = {
+            "class": self.__class__.__name__,
+            "function": self.__init__.__name__
+        }
+
         self.fields: List[Field] = []
-        fields = FieldManager._get_field_blob_names()
+        fields = im.get_data_keys_by_properties("field_properties")
+        if not fields:
+            om.add_warning(
+                "No field input files.",
+                "No fields will be simulated.",
+                info_map
+            )
+
         for field in fields:
             new_field = self._setup_field(field, manure_manager)
             self.fields.append(new_field)
@@ -61,35 +75,6 @@ class FieldManager:
         self.output_gatherer.send_annual_variables()
         for field in self.fields:
             field.perform_annual_reset()
-
-    @staticmethod
-    def _get_field_blob_names() -> List[str]:
-        """
-        Gets the names of each blob in the metadata that conforms to the field properties.
-
-        Returns
-        -------
-        List[str]
-            List of blob names that contain field configurations.
-
-        """
-        field_blob_names = []
-
-        try:
-            blobs = im.get_metadata("files")
-        except KeyError:
-            raise KeyError("Could not find 'files' section of metadata.")
-
-        for blob_name, blob_values in blobs.items():
-            try:
-                blob_property = blob_values["properties"]
-            except KeyError:
-                raise KeyError(f"{blob_name} in metadata did not contain 'properties' value.")
-
-            if blob_property == "field_properties":
-                field_blob_names.append(blob_name)
-
-        return field_blob_names
 
     @staticmethod
     def _setup_field(field_name: str, manure_manager: ManureManager) -> Field:
