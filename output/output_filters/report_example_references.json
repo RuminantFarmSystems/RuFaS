@@ -8,6 +8,8 @@
         "AnimalManager.daily_updates.num_heiferIIs"
       ],
       "vertical_aggregation": "sum",
+      "vertical_constant": 10,
+      "vertical_scalar_operation": "product",
       "slice_start": -180
     },
     {
