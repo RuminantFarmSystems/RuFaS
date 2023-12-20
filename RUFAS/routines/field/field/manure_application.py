@@ -9,6 +9,9 @@ This module contains all necessary methods for adding new applications for manur
 SurPhos model.
 """
 
+# This fraction was used in the evaluation of RuFaS Soil Nitrogen cycling, and was validated empirically.
+ACTIVE_FRACTION_OF_ORGANIC_NITROGEN = 0.9286
+
 
 class ManureApplication:
 
@@ -359,11 +362,10 @@ class ManureApplication:
         """
         nitrates_added = (dry_matter_mass * inorganic_nitrogen_fraction * (1 - ammonium_fraction)) / field_size
         ammonium_added = (dry_matter_mass * inorganic_nitrogen_fraction * ammonium_fraction) / field_size
-        active_fraction_of_organic_nitrogen = 0.9286
         active_organic_nitrogen_added = (dry_matter_mass * organic_nitrogen_fraction *
-                                         active_fraction_of_organic_nitrogen) / field_size
+                                         ACTIVE_FRACTION_OF_ORGANIC_NITROGEN) / field_size
         stable_organic_nitrogen_added = (dry_matter_mass * organic_nitrogen_fraction *
-                                         (1.0 - active_fraction_of_organic_nitrogen)) / field_size
+                                         (1.0 - ACTIVE_FRACTION_OF_ORGANIC_NITROGEN)) / field_size
 
         self.data.soil_layers[layer_index].nitrate_content += nitrates_added
         self.data.soil_layers[layer_index].ammonium_content += ammonium_added
