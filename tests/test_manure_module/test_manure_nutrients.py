@@ -57,6 +57,8 @@ def test_manure_nutrients_init(manure_type: ManureType, nitrogen: float, phospho
          {"nitrogen": 1.0, "phosphorus": 2.0, "potassium": 3.0, "dry_matter": -4.0, "total_manure_mass": 5.0}),
         (ManureType.SOLID,
          {"nitrogen": 1.0, "phosphorus": 2.0, "potassium": 3.0, "dry_matter": 4.0, "total_manure_mass": -5.0}),
+        ("",
+         {"nitrogen": 1.0, "phosphorus": 2.0, "potassium": 3.0, "dry_matter": 4.0, "total_manure_mass": -5.0}),
     ],
 )
 def test_manure_nutrients_invalid_init(manure_type: ManureType, nutrient_values: dict[str, float]) -> None:
