@@ -1877,41 +1877,39 @@ def test_get_data_by_properties_no_data(mock_input_manager: InputManager,
     mock_input_manager.get_metadata = input_manager_original_method_states["get_metadata"]
 
 
-@pytest.mark.parametrize("data,error_count,expected_keys", [
+@pytest.mark.parametrize("data,expected_keys", [
     ({
         "key_1": {"properties": "properties_1"},
         "key_2": {"properties": "properties_2"},
         "key_3": {"properties": "target_properties"},
         "key_4": {"properties": "target_properties"},
         "key_5": {"properties": "target_properties"},
-     }, 0, ["key_3", "key_4", "key_5"]
+     }, ["key_3", "key_4", "key_5"]
      ),
     ({
         "key_1": {"properties": "target_properties"},
-        "key_2": {"not_the_properties": "value"},
+        "key_2": {"properties": "value"},
         "key_3": {"properties": "target_properties"},
         "key_4": {"properties": "properties_4"},
         "key_5": {"properties": "properties_5"}
-     }, 1, ["key_1", "key_3"]
+     }, ["key_1", "key_3"]
      ),
     ({
-        "key_1": {"not_the_properties": "value"},
-        "key_2": {"not_the_properties": "value"},
-        "key_3": {"not_the_properties": "value"}
-     }, 3, []
+        "key_1": {"properties": "value"},
+        "key_2": {"properties": "value"},
+        "key_3": {"properties": "value"}
+     }, []
      ),
-    ({}, 0, [])
+    ({}, [])
 ])
-def test_get_data_keys_by_properties(data: dict[str, dict[str, str]], error_count: int, expected_keys: list[str],
+def test_get_data_keys_by_properties(data: dict[str, dict[str, str]], expected_keys: list[str],
                                      mock_input_manager: InputManager,
                                      input_manager_original_method_states: Dict[str, Callable]) -> None:
     """Test that Input Manager gets data keys by properties correctly."""
     mock_input_manager.get_metadata = MagicMock(return_value=data)
 
-    with patch("RUFAS.output_manager.OutputManager.add_error") as add_error:
-        actual = mock_input_manager.get_data_keys_by_properties("target_properties")
+    actual = mock_input_manager.get_data_keys_by_properties("target_properties")
 
-    assert add_error.call_count == error_count
     assert actual == expected_keys
 
     mock_input_manager.get_metadata = input_manager_original_method_states["get_metadata"]

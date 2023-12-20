@@ -11,7 +11,7 @@ from typing import Any, Dict, List, Union, Callable
 
 om = OutputManager()
 
-PATH_TO_INPUTS = "files"
+ADDRESS_TO_INPUTS = "files"
 
 
 class InputManager:
@@ -840,24 +840,14 @@ class InputManager:
         }
 
         try:
-            input_data = self.get_metadata(PATH_TO_INPUTS)
+            input_data = self.get_metadata(ADDRESS_TO_INPUTS)
         except KeyError:
             error_name = "Cannot find data"
             error_message = "Could not find input metadata."
             om.add_error(error_name, error_message, info_map)
             return data_keys
 
-        for key, data in input_data.items():
-            try:
-                properties = data["properties"]
-            except KeyError:
-                error_name = "Data does not have properties."
-                error_message = f"{key} in metadata does not contain 'properties' value."
-                om.add_error(error_name, error_message, info_map)
-                continue
-
-            if properties == target_properties:
-                data_keys.append(key)
+        data_keys = [key for key, data in input_data.items() if data.get('properties') == target_properties]
 
         return data_keys
 

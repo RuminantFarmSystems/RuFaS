@@ -265,9 +265,19 @@ class Weather:
         southern hemisphere will use incorrect daylength values.
 
         """
+        info_map = {
+            "class": Weather.__name__,
+            "function": Weather._get_latitude.__name__
+        }
+
         field_input_keys = im.get_data_keys_by_properties("field_properties")
 
         if not field_input_keys:
+            om.add_warning(
+                "No location data provided to Weather.",
+                "Defaulting to latitude 43.0723 (location of Madison, WI).",
+                info_map
+            )
             return 43.0723
 
         first_field_key = field_input_keys[0]

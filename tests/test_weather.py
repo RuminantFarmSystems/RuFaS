@@ -7,6 +7,9 @@ from RUFAS.config import Config
 from RUFAS.current_day_conditions import CurrentDayConditions
 from RUFAS.time import Time
 from RUFAS.weather import Weather
+from RUFAS.output_manager import OutputManager
+
+om = OutputManager()
 
 
 @pytest.fixture
@@ -176,13 +179,16 @@ def test_get_latitude(field_keys: list[str], field_data: float, expected_latitud
                       mock_weather: Weather) -> None:
     """Test that Weather correctly gets a latitude from Input Manager or uses the default."""
     with patch("RUFAS.input_manager.InputManager.get_data_keys_by_properties", return_value=field_keys) as keys, \
-            patch("RUFAS.input_manager.InputManager.get_data", return_value=field_data) as data:
+            patch("RUFAS.input_manager.InputManager.get_data", return_value=field_data) as data, \
+            patch.object(om, "add_warning") as warning:
         actual = mock_weather._get_latitude()
 
-    keys.assert_called_once_with("field_properties")
-    if field_data:
-        expected_data_address = f"{field_keys[0]}.absolute_latitude"
-        data.assert_called_once_with(expected_data_address)
-    else:
-        data.assert_not_called()
-    assert actual == expected_latitude
+        keys.assert_called_once_with("field_properties")
+        if field_data:
+            expected_data_address = f"{field_keys[0]}.absolute_latitude"
+            data.assert_called_once_with(expected_data_address)
+            warning.assert_not_called()
+        else:
+            data.assert_not_called()
+            warning.assert_called_once()
+        assert actual == expected_latitude
