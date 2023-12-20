@@ -220,11 +220,9 @@ def test_apply_liquid_machine_manure(dry_mass: float, dry_frac: float, phosphoru
     expect_active = phosphorus_mass * (1 - (weiP_frac + 0.05)) * 0.25 * 0.5 * remainder
 
     expected_mass = expect_surface_dry_mass * 0.5
-    expected_inorganic_frac = inorganic_frac * 0.5
-    expected_organic_frac = organic_frac * 0.5
     expected_nitrogen_calls = [
-        call(0, expected_mass, expected_inorganic_frac, ammonium_frac, expected_organic_frac, area),
-        call(1, expected_mass, expected_inorganic_frac, ammonium_frac, expected_organic_frac, area)]
+        call(0, expected_mass, inorganic_frac, ammonium_frac, organic_frac, area),
+        call(1, expected_mass, inorganic_frac, ammonium_frac, organic_frac, area)]
     expected_subsurface_frac = 1.0 - remainder
 
     incorp._determine_wet_rate_factor.assert_called_once_with(expect_surface_dry_mass, dry_frac, coverage, area)
