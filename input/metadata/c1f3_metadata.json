@@ -954,7 +954,7 @@
         "description": "Methane Model -- The method used to estimate enteric methane emissions.",
         "type": "string",
         "default": "IPCC",
-        "pattern": "^(Mills|3-Mutian|IPCC)$"
+        "pattern": "^(Mills|Mutian|IPCC)$"
       },
       "ration": {
         "type": "object",
