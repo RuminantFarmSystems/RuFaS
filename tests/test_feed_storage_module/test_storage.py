@@ -75,11 +75,49 @@ def harvested_crop(sample_crop_data: Dict[str, float]) -> HarvestedCrop:
     return HarvestedCrop(category=category, type=crop_type, **sample_crop_data)
 
 
-def test_receive_crop(storage: Storage, harvested_crop: HarvestedCrop):
-    """
-    Test the receive_crop method of the Storage class.
-    """
-    pass
+def test_stored_mass(storage: Storage, harvested_crop: HarvestedCrop):
+    storage.acceptable_crops = [CropCategory.SMALL_GRAIN]
+    assert storage.stored_mass == 0.0  # Initially empty
+    storage.receive_crop(harvested_crop, harvested_crop.harvest_time)
+    storage.receive_crop(harvested_crop, harvested_crop.harvest_time)
+    assert storage.stored_mass == 200.0  # After adding a crop
+
+
+def test_successful_receive_crop(storage: Storage, harvested_crop: HarvestedCrop):
+    storage.acceptable_crops = [CropCategory.SMALL_GRAIN]
+    storage.receive_crop(harvested_crop, harvested_crop.harvest_time)
+    assert len(storage.stored) == 1
+    assert storage.stored[0].fresh_mass == harvested_crop.fresh_mass
+    assert storage.stored[0].storage_time == harvested_crop.harvest_time
+
+
+def test_receive_crop_exceeds_capacity(storage: Storage, harvested_crop: HarvestedCrop):
+    storage.acceptable_crops = [CropCategory.SMALL_GRAIN]
+    storage.capacity = 50.0  # Set a smaller capacity
+    with pytest.raises(Exception) as excinfo:
+        storage.receive_crop(harvested_crop, harvested_crop.harvest_time)
+    assert "exceeds the storage capacity" in str(excinfo.value)
+
+
+def test_receive_unacceptable_crop(
+    storage: Storage, sample_crop_data: Dict[str, float]
+):
+    storage.acceptable_crops = [CropCategory.ALFALFA]
+    incompatible_crop = HarvestedCrop(
+        category=CropCategory.SMALL_GRAIN, type=CropType.WHEAT, **sample_crop_data
+    )
+    with pytest.raises(ValueError):
+        storage.receive_crop(incompatible_crop, incompatible_crop.harvest_time)
+
+
+def test_receive_crop_without_acceptable_crops(
+    storage: Storage, harvested_crop: HarvestedCrop
+):
+    storage.acceptable_crops = []
+
+    with pytest.raises(NotImplementedError) as excinfo:
+        storage.receive_crop(harvested_crop, harvested_crop.harvest_time)
+    assert "Storage.acceptable_crops is not populated" in str(excinfo.value)
 
 
 def test_process_degradations(storage: Storage):
