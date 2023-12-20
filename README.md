@@ -2,8 +2,9 @@
 [![Linting](https://github.com/RuminantFarmSystems/MASM/actions/workflows/lint_flake8.yml/badge.svg)](https://github.com/RuminantFarmSystems/MASM/actions/workflows/lint_flake8.yml)
 [![Coverage](https://img.shields.io/badge/coverage-93%25-green)](https://github.com/RuminantFarmSystems/MASM/actions/workflows/coverage_pytest-cov.yml)
 
+
 # Vision
-To support research and sustainable decision-making in ruminant animal production through a state-of-art, open-source modeling environment that is continuously adapting as technology and scientific knowledge advance.
+To support research and sustainable decision-making in ruminant animal production through a state-of-the-art, open-source modeling environment that is continuously adapting as technology and scientific knowledge advance.
 
 # Mission
 To build an integrated, whole-farm model that simulates milk, meat, and crop production, greenhouse gas emissions, water quality impacts, soil health, and other sustainability outcomes of ruminant farms. We strive to achieve the highest standards for prediction accuracy, code structure and clarity, documentation, and accessibility. Through continuous learning and improvement of our methods and algorithms, we are creating an open and inclusive platform for scientific collaboration. 
@@ -19,7 +20,7 @@ When decision-making is difficult and doubtful, we use these as our North Star t
 N/A
 
 # Definitions for Priority Levels
-- **P0 (Priority 0):** These are the 🔥 "fire-breathing dragon" tasks! They are critical and need immediate attention. Team members should don their hero capes 🦸‍♂️🦸‍♀️ and charge into action on P0 tasks. However, if someone finds themselves in a knightly standstill while battling these dragons 🐉, they can embark on a noble quest to tackle lower-priority tasks while working to rescue the damsel in distress (unblocking the higher priority task).
+- **P0 (Priority 0):** These are the 🔥 "fire-breathing dragon" tasks! They are critical and need immediate attention. Team members should don their hero capes 🦸‍♂️🦸‍♀️ and charge into action on P0 tasks. However, if someone finds themselves in a knightly standstill while battling these dragons 🐉, they can embark on a noble quest to tackle lower-priority tasks while working to rescue the damsel in distress (unblocking the higher-priority task).
 
 - **P1 (Priority 1):** Think of these as the trusty steed tasks 🐎. They're important and require attention once the dragons (P0) are vanquished. Knights of the project realm should prioritize P0 tasks but, if they encounter a moat or a drawbridge on their way, they can hop on their trusty steed 🏇 and joust with P1 tasks, all while working on strategies to lower the drawbridge (resolve blockers).
 
