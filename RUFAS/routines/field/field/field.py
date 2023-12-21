@@ -372,6 +372,8 @@ class Field:
             Mass of nitrogen requested to be in this manure application (kg)
         requested_phosphorus : float
             Mass of phosphorus requested to be in this manure application (kg)
+        requested_manure_type : ManureType
+            The type of manure for which the application request will be made.
         field_coverage : float
             Fraction of the field this manure is applied to (unitless)
         application_depth : float
@@ -402,7 +404,11 @@ class Field:
             om.add_log("manure_application_log", log_message, info_map)
             return
 
-        requested_manure_type = ManureType.LIQUID
+        if requested_manure_type is None:
+            log_message = "Tried to request manure with no manure type specified."
+            om.add_log("manure_application_log", log_message, info_map)
+            return
+
         nutrient_request = NutrientRequest(nitrogen=requested_nitrogen, phosphorus=requested_phosphorus,
                                            manure_type=requested_manure_type)
 
