@@ -230,6 +230,7 @@ class OutputGatherer:
                 om.add_variable("stable_organic_nitrogen_content", layer.stable_organic_nitrogen_content, info_map)
                 om.add_variable("fresh_organic_nitrogen_content", layer.fresh_organic_nitrogen_content, info_map)
                 om.add_variable("nitrous_oxide_emissions", layer.nitrous_oxide_emissions, info_map)
+                om.add_variable("denitrification_rate_coefficient", layer.denitrification_rate_coefficient, info_map)
                 om.add_variable("volatilized_ammonium_emissions", layer.volatilized_ammonium_emissions, info_map)
                 om.add_variable("percolated_nitrates", layer.percolated_nitrates, info_map)
                 om.add_variable("percolated_ammonium", layer.percolated_ammonium, info_map)
