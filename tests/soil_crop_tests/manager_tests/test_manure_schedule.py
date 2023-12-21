@@ -42,7 +42,9 @@ def test_determine_if_all_non_negative_values(values: List[Union[int, float]], e
          " '[120, 140]' days, '[20, 20, 20]' nitrogen masses, '[15, 10, 20]' phosphorus masses, '[0.8, 0.9]' field"
          " coverage fractions, '[0.0, 0.0, 0.0]' application depths, '[<ManureType.LIQUID: 'liquid'>, "
          "<ManureType.LIQUID: 'liquid'>, <ManureType.LIQUID: 'liquid'>]' manure types and '[1.0, 1.0, 1.0]' surface"
-         " remainder fractions.")
+         " remainder fractions."),
+        ("test_9", [1990], [100], [15], [15], ["ManureType.INVALID"], [0.75], [0.0], [1.0],
+         "'test_9': expected all manure types to be valid ManureTypes, received '['ManureType.INVALID']'.")
     ])
 def test_validate_manure_parameters(name: str, years: List[int], days: List[int], nitrogen: List[float],
                                     phosphorus: List[float], manure_type: ManureType, field_coverage: List[float],
