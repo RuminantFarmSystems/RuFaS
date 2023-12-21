@@ -119,10 +119,9 @@ class ManureNutrients:
         if self.manure_type != other.manure_type:
             raise TypeError(f"Cannot add {self.manure_type} nutrients to {other.manure_type} nutrients.")
 
-        summed_attributes = {}
-        for f in fields(self):
-            if f.name != 'manure_type':
-                summed_attributes[f.name] = getattr(self, f.name) + getattr(other, f.name)
+        summed_attributes = {
+            f.name: getattr(self, f.name) + getattr(other, f.name) for f in fields(self) if f.name != "manure_type"
+        }
         summed_attributes['manure_type'] = self.manure_type
 
         return ManureNutrients(**summed_attributes)
