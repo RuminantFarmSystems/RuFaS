@@ -195,6 +195,7 @@ class ManureEvent(Event):
         if isinstance(other, ManureEvent):
             return super().__eq__(other) and other.nitrogen_mass == self.nitrogen_mass \
                 and other.phosphorus_mass == self.phosphorus_mass \
+                and other.manure_type == self.manure_type \
                 and other.field_coverage == self.field_coverage \
                 and other.application_depth == self.application_depth \
                 and other.surface_remainder_fraction == self.surface_remainder_fraction
@@ -202,8 +203,8 @@ class ManureEvent(Event):
 
     def __hash__(self):
         """Overrides the hash method for ManureEvent objects."""
-        return hash((self.year, self.day, self.nitrogen_mass, self.phosphorus_mass, self.field_coverage,
-                     self.application_depth, self.surface_remainder_fraction))
+        return hash((self.year, self.day, self.nitrogen_mass, self.phosphorus_mass, self.manure_type,
+                     self.field_coverage, self.application_depth, self.surface_remainder_fraction))
 
 
 class FertilizerEvent(Event):
