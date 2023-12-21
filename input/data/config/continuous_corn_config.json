@@ -4,5 +4,6 @@
     "random_seed": 0,
     "set_seed": false,
     "simulate_animals": false,
-    "nutrient_standard": "NASEM"
+    "nutrient_standard": "NASEM",
+    "FIPS_county_code": 55021
 }
