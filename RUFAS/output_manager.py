@@ -880,10 +880,10 @@ class OutputManager(object):
 
             if "references" in filter_content.keys():
                 self._check_for_missing_references(filter_content["references"], reports)
-                referenced_data = [reports[ref]["values"] for ref in filter_content["references"]]
-                report_data = ReportGenerator.generate_derived_report(referenced_data, filter_content)
-            else:
-                report_data = report_generator.generate_aggregate_report(filtered_pool, filter_content)
+                reference_data = {ref: reports[ref] for ref in filter_content["references"]}
+                filtered_pool.update(reference_data)
+
+            report_data = report_generator.generate_aggregate_report(filtered_pool, filter_content)
 
             reports[report_name] = {"values": report_data}
 

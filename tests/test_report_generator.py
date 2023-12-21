@@ -1,6 +1,9 @@
-from typing import Dict, List, Any, Optional, Type
+from __future__ import annotations
+
+from typing import Dict, List, Any, Callable
 
 import pytest
+from pytest_mock import MockerFixture
 
 from RUFAS.report_generator import (
     average_aggregator,
@@ -10,6 +13,12 @@ from RUFAS.report_generator import (
     sum_aggregator,
     subtraction_aggregator,
     ReportGenerator,
+    average_aggregator_with_scalar_op,
+    division_aggregator_with_scalar_op,
+    product_aggregator_with_scalar_op,
+    sd_aggregator_with_scalar_op,
+    sum_aggregator_with_scalar_op,
+    AGGREGATION_FUNCTIONS_WITH_SCALAR_OP,
 )
 
 
@@ -236,59 +245,6 @@ def test_generate_report_with_valid_horizontal_order(
 
 
 @pytest.mark.parametrize(
-    "referenced_data, config, expected_result, expected_exception",
-    [
-        # Valid case with sum aggregator
-        (
-                [[1, 2, 3], [4, 5, 6]],
-                {"horizontal_aggregation": "sum"},
-                [5, 7, 9],
-                None
-        ),
-
-        # Valid case with average aggregator
-        (
-                [[2, 4, 6], [1, 3, 5]],
-                {"horizontal_aggregation": "average"},
-                [1.5, 3.5, 5.5],
-                None
-        ),
-
-        # Invalid case with unsupported aggregation type
-        (
-                [[1, 2], [3, 4]],
-                {"horizontal_aggregation": "unsupported_aggregator"},
-                None,
-                ValueError
-        ),
-
-        # Case with empty referenced_data
-        (
-                [],
-                {"horizontal_aggregation": "sum"},
-                [],
-                None
-        ),
-    ]
-)
-def test_generate_derived_report(referenced_data: List[List[float]],
-                                 config: Dict[str, Any],
-                                 expected_result: Optional[List[float]],
-                                 expected_exception: Optional[Type[BaseException]]
-                                 ) -> None:
-    """
-    Unit test for generate_derived_report() static method in report_generator.py file.
-    """
-
-    if expected_exception:
-        with pytest.raises(expected_exception):
-            ReportGenerator.generate_derived_report(referenced_data, config)
-    else:
-        result = ReportGenerator.generate_derived_report(referenced_data, config)
-        assert result == expected_result
-
-
-@pytest.mark.parametrize(
     "input_list, target_length, pad_value, expected", [
         # Normal cases
         ([1, 2, 3], 5, 0, [1, 2, 3, 0, 0]),
@@ -354,3 +310,280 @@ def test_pad_list_with_cycle(input_list: List[float], target_length: int, expect
 
     # Assert
     assert input_list == expected
+
+
+@pytest.mark.parametrize(
+    "input_data, padding_config, expected", [
+        # No padding ('none' method)
+        ([[1, 2], [1, 2, 3]], {"method": "none"}, [[1, 2], [1, 2, 3]]),
+
+        # Padding with a custom value
+        ([[1], [1, 2]], {"method": "custom", "value": 0}, [[1, 0], [1, 2]]),
+
+        # Padding with cycle
+        ([[1], [1, 2]], {"method": "cycle"}, [[1, 1], [1, 2]]),
+
+        # First element padding
+        ([[1, 2], [3]], {"method": "first"}, [[1, 2], [3, 3]]),
+
+        # Last element padding
+        ([[1, 2], [3]], {"method": "last"}, [[1, 2], [3, 3]]),
+
+        # Average padding
+        ([[1, 2], [3, 4, 5]], {"method": "avg"}, [[1, 2, 1.5], [3, 4, 5]]),
+
+        # Minimum value padding
+        ([[1, 2], [3, 4, 5]], {"method": "min"}, [[1, 2, 1], [3, 4, 5]]),
+
+        # Maximum value padding
+        ([[1, 2], [3, 4, 5]], {"method": "max"}, [[1, 2, 2], [3, 4, 5]]),
+
+        # Zero padding
+        ([[1, 2], [3]], {"method": "zero"}, [[1, 2], [3, 0]]),
+
+        # One padding
+        ([[1, 2], [3]], {"method": "one"}, [[1, 2], [3, 1]]),
+
+        # Null padding
+        ([[1, 2], [3]], {"method": "null"}, [[1, 2], [3, None]]),
+
+        # Empty list
+        ([[], [1, 2]], {"method": "first"}, [[None, None], [1, 2]]),
+
+        # All lists already at max length
+        ([[1, 2], [3, 4]], {"method": "first"}, [[1, 2], [3, 4]]),
+    ])
+def test_apply_padding(input_data: List[List[float]], padding_config: Dict[str, Any],
+                       expected: List[List[float]]) -> None:
+    """
+    Unit test for _apply_padding() static method in report_generator.py file.
+    """
+
+    # Act
+    ReportGenerator._apply_padding(input_data, padding_config)
+
+    # Assert
+    assert input_data == expected
+
+
+@pytest.mark.parametrize(
+    "report_data, aggregator, scalar, operation, expected", [
+        # Tests with sum aggregator and addition operation
+        ({"a": [1, 2], "b": [3, 4]}, sum_aggregator_with_scalar_op, 10, "sum", [23, 27]),
+        ({"a": [1, 2], "b": [3, 4]}, sum_aggregator_with_scalar_op, 5, "subtraction", [-7, -3]),
+
+        # Tests with product aggregator and multiply operation
+        ({"a": [1, 2], "b": [3, 4]}, product_aggregator_with_scalar_op, 2, "product", [8, 48]),
+        ({"a": [1, 2], "b": [3, 4]}, product_aggregator_with_scalar_op, 2, "division", [0.5, 3.0]),
+
+        # Tests with empty data
+        ({"a": [], "b": []}, sum_aggregator_with_scalar_op, 0, "sum", [0, 0]),
+
+        # Tests with None values in data
+        ({"a": [1, None], "b": [None, 4]}, sum_aggregator_with_scalar_op, 5, "sum", [6, 9]),
+
+        # Tests with average aggregator
+        ({"a": [1, 2, 3], "b": [4, 5, 6]}, average_aggregator_with_scalar_op, 10, "sum", [12.0, 15.0]),
+        ({"a": [10, 20], "b": [30, 40]}, average_aggregator_with_scalar_op, 5, "product", [75.0, 175.0]),
+
+        # Tests with division aggregator
+        ({"a": [8, 4], "b": [2, 1]}, division_aggregator_with_scalar_op, 2, "exponent", [4.0, 4.0]),
+        ({"a": [100, 50], "b": [25, 10]}, division_aggregator_with_scalar_op, 10, "subtraction", [2.25, None]),
+
+        # Tests with standard deviation aggregator
+        ({"a": [10, 12, 23, 23], "b": [17, 15, 22, 20]}, sd_aggregator_with_scalar_op, 2, "sum",
+         [6.041522986797286, 2.692582403567252]),
+        ({"a": [10, 12, 23, 23], "b": [17, 15, 22, 20]}, sd_aggregator_with_scalar_op, 2, "division",
+         [3.020761493398643, 1.346291201783626]),
+    ])
+def test_apply_vertical_aggregation(report_data: Dict[str, List[float]],
+                                    aggregator: Callable[[List[float], float, str], float],
+                                    scalar: float, operation: str, expected: List[float]) -> None:
+    """
+    Unit test for _apply_vertical_aggregation() static method in report_generator.py file.
+    """
+
+    # Act
+    result = ReportGenerator._apply_vertical_aggregation(report_data, aggregator, scalar, operation)
+
+    # Assert
+    assert result == expected
+
+
+@pytest.mark.parametrize(
+    "report_data, loop_list, aggregator, scalar, operation, expected", [
+        # Tests with sum aggregation
+        ({"a": [1, 2], "b": [3, 4]}, ['a', 'b'], sum_aggregator_with_scalar_op, 10, "sum", [24, 26]),
+        ({"a": [1, 2], "b": [3, 4]}, ['a', 'b'], sum_aggregator_with_scalar_op, 5, "subtraction", [-6, -4]),
+
+        # Tests with product aggregation
+        ({"a": [1, 2], "b": [3, 4]}, ['a', 'b'], product_aggregator_with_scalar_op, 2, "product", [12, 32]),
+        ({"a": [1, 2], "b": [3, 4]}, ['a', 'b'], product_aggregator_with_scalar_op, 2, "division", [0.75, 2.0]),
+
+        # Tests with average aggregation
+        ({"a": [1, 3], "b": [2, 4]}, ['a', 'b'], average_aggregator_with_scalar_op, 5, "sum", [6.5, 8.5]),
+        ({"a": [1, 3], "b": [2, 4]}, ['a', 'b'], average_aggregator_with_scalar_op, 5, "subtraction", [-3.5, -1.5]),
+
+        # Tests with division aggregation
+        ({"a": [8, 16], "b": [4, 2]}, ['a', 'b'], division_aggregator_with_scalar_op, 2, "division", [2.0, 8.0]),
+        ({"a": [8, 16], "b": [4, 2]}, ['a', 'b'], division_aggregator_with_scalar_op, 2, "exponent", [4.0, 64.0]),
+
+        # Tests with standard deviation aggregation
+        ({"a": [10, 10], "b": [20, 20]}, ['a', 'b'], sd_aggregator_with_scalar_op, 5, "subtraction",
+         [5.0, 5.0]),
+        ({"a": [10, 10], "b": [20, 20]}, ['a', 'b'], sd_aggregator_with_scalar_op, 5, "division",
+         [1.0, 1.0]),
+
+        # Tests with division by zero
+        ({"a": [1, 2], "b": [0, 0]}, ['a', 'b'], division_aggregator_with_scalar_op, 0, "division", [None, None]),
+
+        # Exponent operation with product aggregator
+        ({"a": [2, 3], "b": [4, 5]}, ['a', 'b'], product_aggregator_with_scalar_op, 2, "exponent", [64, 225]),
+    ])
+def test_apply_horizontal_aggregation(report_data: Dict[str, List[float]], loop_list: List[str],
+                                      aggregator: Callable[[List[float], float, str], float], scalar: float,
+                                      operation: str, expected: List[float]) -> None:
+    """
+    Unit test for _apply_horizontal_aggregation() static method in report_generator.py file.
+    """
+
+    # Act
+    result = ReportGenerator._apply_horizontal_aggregation(report_data, loop_list, aggregator, scalar, operation)
+
+    # Assert
+    assert result == expected
+
+
+@pytest.mark.parametrize(
+    "report_data, filter_content, expected_result, expected_call", [
+        # Valid horizontal aggregation with sum
+        (
+                {"a": [1, 2], "b": [3, 4]},
+                {
+                    "horizontal_aggregation": "sum",
+                    "horizontal_order": ["a", "b"],
+                    "horizontal_constant": 10,
+                    "horizontal_scalar_operation": "sum"
+                },
+                [24, 26],
+                True
+        ),
+        # No horizontal aggregation specified
+        (
+                {"a": [1, 2], "b": [3, 4]},
+                {},  # No horizontal aggregation key
+                None,
+                False
+        ),
+        # Unsupported horizontal aggregation type
+        (
+                {"a": [1, 2]},
+                {"horizontal_aggregation": "unsupported"},
+                ValueError,
+                False
+        ),
+    ]
+)
+def test_process_horizontal_aggregation(report_data: Dict[str, List[float]],
+                                        filter_content: Dict[str, Any],
+                                        expected_result: Any,
+                                        expected_call: bool,
+                                        mocker: MockerFixture) -> None:
+    """
+    Unit test for the _process_horizontal_aggregation method of ReportGenerator in report_generator.py file.
+    """
+
+    # Arrange
+    patch_for_apply_horizontal_agg = mocker.patch.object(
+        ReportGenerator,
+        '_apply_horizontal_aggregation',
+        return_value=expected_result if not isinstance(expected_result, Exception) else None
+    )
+
+    rg = ReportGenerator()
+
+    # Act and assert
+    if expected_result is ValueError:
+        with pytest.raises(ValueError):
+            rg._process_horizontal_aggregation(report_data, filter_content)
+    else:
+        result = rg._process_horizontal_aggregation(report_data, filter_content)
+
+        assert result == expected_result
+
+        if expected_call:
+            patch_for_apply_horizontal_agg.assert_called_once_with(
+                report_data,
+                filter_content.get("horizontal_order", report_data.keys()),
+                AGGREGATION_FUNCTIONS_WITH_SCALAR_OP[filter_content["horizontal_aggregation"]],
+                filter_content.get("horizontal_constant", 1),
+                filter_content.get("horizontal_scalar_operation", "product")
+            )
+        else:
+            patch_for_apply_horizontal_agg.assert_not_called()
+
+
+@pytest.mark.parametrize(
+    "report_data, filter_content, expected_result, expected_call", [
+        # Valid vertical aggregation with sum
+        (
+                {"a": [1, 2], "b": [3, 4]},
+                {
+                    "vertical_aggregation": "sum",
+                    "vertical_order": ["a", "b"],
+                    "vertical_constant": 10,
+                    "vertical_scalar_operation": "sum"
+                },
+                [24, 26],
+                True
+        ),
+        # No vertical aggregation specified
+        (
+                {"a": [1, 2], "b": [3, 4]},
+                {},
+                None,
+                False
+        ),
+        # Unsupported vertical aggregation type
+        (
+                {"a": [1, 2]},
+                {"vertical_aggregation": "unsupported"},
+                ValueError,
+                False
+        ),
+    ]
+)
+def test_process_vertical_aggregation(report_data: Dict[str, List[float]],
+                                      filter_content: Dict[str, Any],
+                                      expected_result: List[float] | None | ValueError,
+                                      expected_call: bool,
+                                      mocker: MockerFixture) -> None:
+    """
+    Unit test for the _process_vertical_aggregation method of ReportGenerator in report_generator.py file.
+    """
+
+    # Arrange
+    mock_apply_agg = mocker.patch.object(
+        ReportGenerator,
+        '_apply_vertical_aggregation',
+        return_value=expected_result if not isinstance(expected_result, Exception) else None
+    )
+    rg = ReportGenerator()
+
+    # Act and assert
+    if expected_result is ValueError:
+        with pytest.raises(ValueError):
+            rg._process_vertical_aggregation(report_data, filter_content)
+    else:
+        result = rg._process_vertical_aggregation(report_data, filter_content)
+        assert result == expected_result
+
+        if expected_call:
+            mock_apply_agg.assert_called_once_with(
+                report_data,
+                AGGREGATION_FUNCTIONS_WITH_SCALAR_OP[filter_content["vertical_aggregation"]],
+                filter_content.get("vertical_constant", 1),
+                filter_content.get("vertical_scalar_operation", "product")
+            )
+        else:
+            mock_apply_agg.assert_not_called()

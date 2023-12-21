@@ -1,0 +1,59 @@
+{
+  "multiple": [
+    {
+      "name": "Last Year's Average Daily Milk Production",
+      "filters": [
+        "LifeCycleManager.daily_update.daily_milk_production"
+      ],
+      "vertical_aggregation": "average",
+      "slice_start": -365
+    },
+    {
+      "name": "Last Year's Average Cow Body Weight (lbs)",
+      "filters": [
+        "LifeCycleManager.daily_update.avg_cow_body_weight"
+      ],
+      "vertical_aggregation": "average",
+      "vertical_constant": 2.20462,
+      "vertical_scalar_operation": "product",
+      "slice_start": -365
+    },
+    {
+      "name": "Last Year's Average Number of Milking Cows",
+      "filters": [
+        "LifeCycleManager.daily_update.milking_cow_num"
+      ],
+      "vertical_aggregation": "average",
+      "slice_start": -365
+    },
+    {
+      "name": "Last Year's Milk Production per Cow",
+      "references": [
+        "Last Year's Average Daily Milk Production",
+        "Last Year's Average Number of Milking Cows"
+      ],
+      "horizontal_aggregation": "division"
+    },
+    {
+      "name": "Last 6 Month's Heifer Population Growth",
+      "filters": [
+        "AnimalManager.daily_updates.num_heiferIs",
+        "AnimalManager.daily_updates.num_heiferIIs",
+        "AnimalManager.daily_updates.num_heiferIIIs"
+      ],
+      "vertical_aggregation": "sum",
+      "horizontal_aggregation": "sum",
+      "horizontal_first": true,
+      "slice_start": -180
+    },
+    {
+      "name": "90 to 30 days ago Methane Emission from Lactating Cows",
+      "filters": [
+        "AnimalManager.daily_updates.daily_aggregate_lactating_cow_enteric_methane_g"
+      ],
+      "vertical_aggregation": "sum",
+      "slice_start": -90,
+      "slice_end": -30
+    }
+  ]
+}
