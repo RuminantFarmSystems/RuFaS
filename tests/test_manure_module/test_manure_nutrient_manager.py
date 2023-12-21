@@ -21,8 +21,8 @@ def test_add_nutrients(manure_type: ManureType) -> None:
     Unit test for the add_nutrients() method of the ManureNutrientManager class
     in the manure_nutrient_manager.py file.
 
-    This test verifies that the add_nutrients() method adds a ManureNutrients object
-    to the internal data of a ManureNutrientManager object.
+    This test verifies that the add_nutrients() method adds ManureNutrients objects
+    to the internal data of a ManureNutrientManager object by manure type.
 
     """
     # Arrange
@@ -308,7 +308,7 @@ def test_create_nutrient_request_results(projected_manure_mass: float, manure_ty
     manure_nutrient_manager.py file.
 
     This test verifies that the _create_nutrient_request_results() method correctly creates a NutrientRequestResults
-    object based on the projected manure mass.
+    object based on the projected manure mass and manure type.
 
     """
     # Arrange
@@ -382,7 +382,7 @@ def test_remove_nutrients(manure_type: ManureType, initial_nutrients: ManureNutr
     Unit test for the _remove_nutrients() method of the ManureNutrientManager class.
 
     This test verifies that the _remove_nutrients() method correctly removes the specified amount of nutrients
-    from the manager.
+    from the manager by manure_type.
 
     """
 

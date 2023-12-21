@@ -20,7 +20,8 @@ def test_manure_nutrients_init(manure_type: ManureType, nitrogen: float, phospho
     """
     Unit test for the ManureNutrients class in manure_nutrients.py.
 
-    Test the initialization of the ManureNutrients dataclass and properties that compute manure composition.
+    Test the initialization of the ManureNutrients dataclass and properties that compute manure composition
+    for each manure type.
 
     """
     # Act
