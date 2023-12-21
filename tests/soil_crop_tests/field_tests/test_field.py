@@ -140,18 +140,24 @@ def test_check_fertilizer_application_schedule(events: List[FertilizerEvent], re
 
 
 @pytest.mark.parametrize("events,remaining_events,current_events", [
-    ([ManureEvent(1991, 120, 100, 20, 0.8, 0.0, 1.0), ManureEvent(1992, 120, 100, 20, 0.8, 0.0, 1.0),
-      ManureEvent(1993, 120, 100, 20, 0.8, 0.0, 1.0)],
-     [ManureEvent(1992, 120, 100, 20, 0.8, 0.0, 1.0), ManureEvent(1993, 120, 100, 20, 0.8, 0.0, 1.0)],
-     [ManureEvent(1991, 120, 100, 20, 0.8, 0.0, 1.0)]),
-    ([ManureEvent(1991, 125, 100, 20, 0.8, 0.0, 1.0), ManureEvent(1992, 125, 100, 20, 0.8, 0.0, 1.0),
-      ManureEvent(1993, 125, 100, 20, 0.8, 0.0, 1.0)],
-     [ManureEvent(1991, 125, 100, 20, 0.8, 0.0, 1.0), ManureEvent(1992, 125, 100, 20, 0.8, 0.0, 1.0),
-      ManureEvent(1993, 125, 100, 20, 0.8, 0.0, 1.0)], []),
-    ([ManureEvent(1991, 120, 100, 20, 0.8, 0.0, 1.0), ManureEvent(1991, 120, 90, 20, 0.8, 0.0, 1.0),
-      ManureEvent(1991, 120, 80, 40, 0.8, 0.0, 1.0)], [],
-     [ManureEvent(1991, 120, 100, 20, 0.8, 0.0, 1.0), ManureEvent(1991, 120, 90, 20, 0.8, 0.0, 1.0),
-      ManureEvent(1991, 120, 80, 40, 0.8, 0.0, 1.0)])
+    ([ManureEvent(1991, 120, 100, 20, ManureType.LIQUID, 0.8, 0.0, 1.0),
+      ManureEvent(1992, 120, 100, 20, ManureType.LIQUID, 0.8, 0.0, 1.0),
+      ManureEvent(1993, 120, 100, 20, ManureType.LIQUID, 0.8, 0.0, 1.0)],
+     [ManureEvent(1992, 120, 100, 20, ManureType.LIQUID, 0.8, 0.0, 1.0),
+      ManureEvent(1993, 120, 100, 20, ManureType.LIQUID, 0.8, 0.0, 1.0)],
+     [ManureEvent(1991, 120, 100, 20, ManureType.LIQUID, 0.8, 0.0, 1.0)]),
+    ([ManureEvent(1991, 125, 100, 20, ManureType.LIQUID, 0.8, 0.0, 1.0),
+      ManureEvent(1992, 125, 100, 20, ManureType.LIQUID, 0.8, 0.0, 1.0),
+      ManureEvent(1993, 125, 100, 20, ManureType.LIQUID, 0.8, 0.0, 1.0)],
+     [ManureEvent(1991, 125, 100, 20, ManureType.LIQUID, 0.8, 0.0, 1.0),
+      ManureEvent(1992, 125, 100, 20, ManureType.LIQUID, 0.8, 0.0, 1.0),
+      ManureEvent(1993, 125, 100, 20, ManureType.LIQUID, 0.8, 0.0, 1.0)], []),
+    ([ManureEvent(1991, 120, 100, 20, ManureType.LIQUID, 0.8, 0.0, 1.0),
+      ManureEvent(1991, 120, 90, 20, ManureType.LIQUID, 0.8, 0.0, 1.0),
+      ManureEvent(1991, 120, 80, 40, ManureType.LIQUID, 0.8, 0.0, 1.0)], [],
+     [ManureEvent(1991, 120, 100, 20, ManureType.LIQUID, 0.8, 0.0, 1.0),
+      ManureEvent(1991, 120, 90, 20, ManureType.LIQUID, 0.8, 0.0, 1.0),
+      ManureEvent(1991, 120, 80, 40, ManureType.LIQUID, 0.8, 0.0, 1.0)])
 ])
 def test_check_manure_application_schedule(events: List[ManureEvent], remaining_events: List[ManureEvent],
                                            current_events: List[ManureEvent]) -> None:
