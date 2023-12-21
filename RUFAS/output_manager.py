@@ -373,7 +373,7 @@ class OutputManager(object):
         """
         return f"{caller_class}.{caller_function}"
 
-    def _dict_to_file_json(self, data_dict: Dict[str, Any], path: str) -> None:
+    def dict_to_file_json(self, data_dict: Dict[str, Any], path: str, minify_output_file: bool = False) -> None:
         """Saves a dictionary into a JSON file
 
         Parameters
@@ -383,6 +383,9 @@ class OutputManager(object):
 
         path : str
             The path to the file to be saved
+
+        minify_output_file : bool
+            Boolean flag indicating whether to minify the output JSON file.
 
         Raises
         ------
@@ -397,21 +400,28 @@ class OutputManager(object):
         The file is saved with no indentation.
 
         If you want to save time and space, limit the maximum depth of the
-        serialized dictionary using the max_depth parameter.
-
+        serialized dictionary using the max_depth parameter. You can also set the
+        `minify_output_file` flag to True to minimize the output JSON file size.
         """
         info_map = {
             "class": self.__class__.__name__,
-            "function": self._dict_to_file_json.__name__,
+            "function": self.dict_to_file_json.__name__,
         }
         self.add_log("save_dict_file_try", f"Attempting to save to {path}.", info_map)
         try:
             with open(path, "w") as json_file:
-                json.dump(
-                    Utility.make_serializable(data_dict, max_depth=3),
-                    json_file,
-                    indent=0,
-                )
+                if minify_output_file:
+                    json.dump(
+                        Utility.make_serializable(data_dict, max_depth=3),
+                        json_file,
+                        separators=(",", ":")
+                    )
+                else:
+                    json.dump(
+                        Utility.make_serializable(data_dict, max_depth=3),
+                        json_file,
+                        indent=2,
+                    )
                 self.add_log(
                     "save_dict_file_success", f"Successfully saved to {path}.", info_map
                 )
@@ -874,7 +884,7 @@ class OutputManager(object):
                 save_path,
                 self._generate_file_name(f"saved_variables_{filter_file}", "json"),
             )
-            self._dict_to_file_json(filtered_pool, file_path)
+            self.dict_to_file_json(filtered_pool, file_path)
         elif filter_file.startswith(self.__supported_filter_types_prefixes["csv"]):
             self.create_directory(csv_dir)
             variable_csv_file_path = os.path.join(
@@ -946,28 +956,28 @@ class OutputManager(object):
         json_file_path = os.path.join(
             path, self._generate_file_name("all_variables", "json")
         )
-        self._dict_to_file_json(pool, json_file_path)
+        self.dict_to_file_json(pool, json_file_path)
 
     def dump_logs(self, path: str) -> None:
         """
         Dumps logs_pool into a json file in the given path to a directory.
         """
         file_path = os.path.join(path, self._generate_file_name("logs", "json"))
-        self._dict_to_file_json(self.logs_pool, file_path)
+        self.dict_to_file_json(self.logs_pool, file_path)
 
     def dump_warnings(self, path: str) -> None:
         """
         Dumps warnings_pool into a json file in the given path to a directory.
         """
         file_path = os.path.join(path, self._generate_file_name("warnings", "json"))
-        self._dict_to_file_json(self.warnings_pool, file_path)
+        self.dict_to_file_json(self.warnings_pool, file_path)
 
     def dump_errors(self, path: str) -> None:
         """
         Dumps errors_pool into a json file in the given path to a directory.
         """
         file_path = os.path.join(path, self._generate_file_name("errors", "json"))
-        self._dict_to_file_json(self.errors_pool, file_path)
+        self.dict_to_file_json(self.errors_pool, file_path)
 
     def dump_variable_names_and_contexts(  # noqa: C901
         self,

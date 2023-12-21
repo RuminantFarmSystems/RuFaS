@@ -168,11 +168,42 @@ class AnimalModuleReporter:
                 if key != "status" and key != "objective":
                     ration_total[key] = pen.ration_per_animal[key] * len(pen.animals_in_pen)
                     ration_total["dry_matter_intake_total"] += ration_total[key]
+            AnimalModuleReporter.report_daily_feed_emissions(ration_total, pen.id, pen.animal_combination.name,
+                                                             animal_manager)
             om.add_variable(
                 f"ration_daily_feed_totals_for_pen_{pen.id}_{pen.animal_combination.name}",
                 ration_total,
                 info_map,
             )
+
+    def report_daily_feed_emissions(ration_total: dict[str, float], pen_id: int, pen_animal_name: str,
+                                    animal_manager) -> None:
+        """
+        Adds emissions totals from purchased feeds on a pen / feed basis.
+
+        Parameters
+        ----------
+        ration_total : dict[str, float]
+           Total amounts of dry matter per feed type fed to the pen.
+        pen_id : int
+            The unique number identifying a pen.
+        pen_animal_name : str
+            The name of the animal combination in a pen.
+        animal_manager : AnimalManager
+            The AnimalManager instance being reported.
+
+        """
+        info_map = {
+            "class": AnimalModuleReporter.__name__,
+            "function": AnimalModuleReporter.report_daily_feed_emissions.__name__,
+        }
+        daily_feed_emissions = animal_manager.feeds_emissions_estimator.\
+            create_daily_purchased_feed_emissions_report(ration_total)
+        om.add_variable(
+            f"pen_{pen_id}_animal_{pen_animal_name}_feed_emissions",
+            daily_feed_emissions,
+            info_map
+        )
 
     def report_animal_module_manure(
         manure_excretions_output_data: dict[str, dict[str | AnimalManureExcretions]],
