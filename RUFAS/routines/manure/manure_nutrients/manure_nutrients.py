@@ -185,10 +185,10 @@ class ManureNutrients:
 
         """
         if not isinstance(other, ManureNutrients):
-            raise TypeError(f"Cannot subtract {type(self)} from {type(other)}.")
+            raise TypeError(f"Cannot subtract {type(other)} from {type(self)}.")
 
         if self.manure_type != other.manure_type:
-            raise ValueError(f"Cannot subtract {other.manure_type} nutrients from {self.manure_type} nutrients.")
+            raise TypeError(f"Cannot subtract {other.manure_type} nutrients from {self.manure_type} nutrients.")
 
         subtracted_attributes = {}
         for f in fields(self):

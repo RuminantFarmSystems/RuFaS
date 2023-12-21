@@ -58,10 +58,10 @@ def test_manure_nutrients_init(manure_type: ManureType, nitrogen: float, phospho
         (ManureType.SOLID,
          {"nitrogen": 1.0, "phosphorus": 2.0, "potassium": 3.0, "dry_matter": 4.0, "total_manure_mass": -5.0}),
         ("",
-         {"nitrogen": 1.0, "phosphorus": 2.0, "potassium": 3.0, "dry_matter": 4.0, "total_manure_mass": -5.0}),
+         {"nitrogen": 1.0, "phosphorus": 2.0, "potassium": 3.0, "dry_matter": 4.0, "total_manure_mass": 5.0}),
     ],
 )
-def test_manure_nutrients_invalid_init(manure_type: ManureType, nutrient_values: dict[str, float]) -> None:
+def test_manure_nutrients_invalid_init(manure_type: ManureType | str, nutrient_values: dict[str, float]) -> None:
     """
     Unit test for the __post_init__ method in the ManureNutrients class in manure_nutrients.py.
 
@@ -74,6 +74,9 @@ def test_manure_nutrients_invalid_init(manure_type: ManureType, nutrient_values:
             with pytest.raises(ValueError, match=f'Field {key} must be non-negative.'):
                 ManureNutrients(**nutrient_values, manure_type=manure_type)
             break
+    if not manure_type:
+        with pytest.raises(ValueError, match="Field manure_type must be an instance of ManureType."):
+            ManureNutrients(**nutrient_values, manure_type=manure_type)
 
 
 def test_manure_nutrients_add_subtract() -> None:
@@ -119,6 +122,53 @@ def test_manure_nutrients_add_subtract() -> None:
     assert nutrients_subtracted.potassium == pytest.approx(1.0)
     assert nutrients_subtracted.dry_matter == pytest.approx(1.0)
     assert nutrients_subtracted.total_manure_mass == pytest.approx(1.0)
+
+
+@pytest.mark.parametrize(
+    "manure_type_nutrients, manure_type_nutrients2",
+    [
+        (ManureType.LIQUID, ManureType.SOLID),
+    ],
+)
+def test_manure_nutrients_add_subtract_raises_errors(manure_type_nutrients: ManureType,
+                                                     manure_type_nutrients2: ManureType) -> None:
+    """
+    Unit test for the addition and subtraction operations (__add__, __sub__)
+    in the ManureNutrients class in manure_nutrients.py raising errors.
+
+    """
+    # Arrange
+    nutrients = ManureNutrients(
+        nitrogen=1.0,
+        phosphorus=2.0,
+        potassium=3.0,
+        dry_matter=4.0,
+        total_manure_mass=5.0,
+        manure_type=manure_type_nutrients,
+    )
+
+    nutrients2 = ManureNutrients(
+        nitrogen=2.0,
+        phosphorus=3.0,
+        potassium=4.0,
+        dry_matter=5.0,
+        total_manure_mass=6.0,
+        manure_type=manure_type_nutrients2,
+    )
+
+    # Act
+    with pytest.raises(TypeError, match=f"Cannot add {nutrients.manure_type} "
+                                        f"nutrients to {nutrients2.manure_type} nutrients."):
+        nutrients + nutrients2
+    with pytest.raises(TypeError, match=f"Cannot subtract {nutrients.manure_type} "
+                                        f"nutrients from {nutrients2.manure_type} nutrients."):
+        nutrients2 - nutrients
+
+    nutrients2 = "dummy_invalid_nutrients"
+    with pytest.raises(TypeError, match=f"Cannot add {type(nutrients)} to {type(nutrients2)}."):
+        nutrients + nutrients2
+    with pytest.raises(TypeError, match=f"Cannot subtract {type(nutrients2)} from {type(nutrients)}."):
+        nutrients - nutrients2
 
 
 @pytest.mark.parametrize("multiplier", [0, 2, 3.5, 1e10, -1, None])
