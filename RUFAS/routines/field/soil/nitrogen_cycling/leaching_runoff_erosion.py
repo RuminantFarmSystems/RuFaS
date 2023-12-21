@@ -3,12 +3,19 @@ from math import exp, log
 
 from RUFAS.routines.field.soil.soil_data import SoilData
 from RUFAS.routines.field.soil.layer_data import LayerData
+from RUFAS.output_manager import OutputManager
 
 
 """
 This module handles the movement and loss of nitrogen due to erosion and leaching within the soil profile, and is based
 on SWAT sections 4:2.1, 2
 """
+
+om = OutputManager()
+
+NITRATE_LEACHING_COEFFICIENT = 0.05
+NITRATE_RUNOFF_COEFFICIENT = 0.01
+AMMONIUM_RUNOFF_COEFFICIENT = 0.2
 
 
 class LeachingRunoffErosion:
@@ -70,13 +77,20 @@ class LeachingRunoffErosion:
         self.data.eroded_stable_organic_nitrogen = 0.0
         self.data.eroded_active_organic_nitrogen = 0.0
 
+        info_map = {
+            "class": self.__class__.__name__,
+            "function": self._erode_nitrogen.__name__
+        }
+        om.add_variable("NITRATE_RUNOFF_COEFFICIENT", NITRATE_RUNOFF_COEFFICIENT, info_map)
+        om.add_variable("AMMONIUM_RUNOFF_COEFFICIENT", AMMONIUM_RUNOFF_COEFFICIENT, info_map)
+
         if self.data.accumulated_runoff > 0.0:
             nitrates_lost_to_runoff = self._calculate_inorganic_nitrogen_loss(
                 self.data.soil_layers[0].nitrate_content, self.data.soil_layers[0].water_content,
-                self.data.soil_layers[0].saturation_content, self.data.accumulated_runoff, 0.1)
+                self.data.soil_layers[0].saturation_content, self.data.accumulated_runoff, NITRATE_RUNOFF_COEFFICIENT)
             ammonium_lost_to_runoff = self._calculate_inorganic_nitrogen_loss(
                 self.data.soil_layers[0].ammonium_content, self.data.soil_layers[0].water_content,
-                self.data.soil_layers[0].saturation_content, self.data.accumulated_runoff, 1.0)
+                self.data.soil_layers[0].saturation_content, self.data.accumulated_runoff, AMMONIUM_RUNOFF_COEFFICIENT)
 
             self.data.soil_layers[0].nitrate_content -= nitrates_lost_to_runoff
             self.data.nitrate_runoff = nitrates_lost_to_runoff
@@ -134,6 +148,14 @@ class LeachingRunoffErosion:
         self.data.set_vectorized_layer_attribute("percolated_active_organic_nitrogen",
                                                  [0.0] * len(self.data.soil_layers))
 
+        nitrate_extraction_coefficient = 1 / NITRATE_LEACHING_COEFFICIENT
+
+        info_map = {
+            "class": self.__class__.__name__,
+            "function": self._leach_nitrogen.__name__
+        }
+        om.add_variable("NITRATE_LEACHING_COEFFICIENT", NITRATE_LEACHING_COEFFICIENT, info_map)
+
         percolated_nitrogen = []
         for layer in self.data.soil_layers:
             if layer.percolated_water == 0.0:
@@ -144,8 +166,6 @@ class LeachingRunoffErosion:
                 }
                 percolated_nitrogen.append(nitrogen_percolated_to_next_layer)
                 continue
-
-            nitrate_extraction_coefficient = 1.0 if layer.top_depth == 0 else 2.5
 
             nitrates_lost = self._calculate_nitrogen_lost_to_leaching(
                 layer.nitrate_content, layer.field_capacity_content, layer.percolated_water,
