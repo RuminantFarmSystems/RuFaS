@@ -135,6 +135,22 @@
     0.80,
     0.80
   ],
+  "manure_types": [
+    "liquid",
+    "liquid",
+    "liquid",
+    "liquid",
+    "liquid",
+    "liquid",
+    "liquid",
+    "liquid",
+    "liquid",
+    "liquid",
+    "liquid",
+    "liquid",
+    "liquid",
+    "liquid"
+  ],
   "pattern_repeat": 0,
   "pattern_skip": 0
 }
