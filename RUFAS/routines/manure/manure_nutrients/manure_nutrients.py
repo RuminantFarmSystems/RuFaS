@@ -189,10 +189,9 @@ class ManureNutrients:
         if self.manure_type != other.manure_type:
             raise TypeError(f"Cannot subtract {other.manure_type} nutrients from {self.manure_type} nutrients.")
 
-        subtracted_attributes = {}
-        for f in fields(self):
-            if f.name != "manure_type":
-                subtracted_attributes[f.name] = getattr(self, f.name) - getattr(other, f.name)
+        subtracted_attributes = {
+            f.name: getattr(self, f.name) - getattr(other, f.name) for f in fields(self) if f.name != "manure_type"
+        }
         subtracted_attributes["manure_type"] = self.manure_type
 
         return ManureNutrients(**subtracted_attributes)
