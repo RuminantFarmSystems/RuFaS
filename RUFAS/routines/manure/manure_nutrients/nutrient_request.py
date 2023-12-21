@@ -20,21 +20,20 @@ class NutrientRequest:
         """
         Validate the dataclass fields.
 
-        Raises:
-            ValueError
-                If any field is negative.
-                If no fields are positive.
-                If the manure type provided is not a valid ManureType.
+        Raises
+        ------
+        ValueError
+            If any field is negative.
+            If no fields are positive.
+            If the manure type provided is not a valid ManureType.
 
         """
         for field in fields(self):
             value = getattr(self, field.name)
-            if field.name != "manure_type":
-                if value < 0:
-                    raise ValueError(f"Field {field.name} must be non-negative.")
-            else:
-                if field.name == "manure_type" and not isinstance(value, ManureType):
-                    raise ValueError(f"Field {field.name} must be an instance of ManureType.")
+            if field.name != "manure_type" and value < 0:
+                raise ValueError(f"Field {field.name} must be non-negative.")
+            if field.name == "manure_type" and not isinstance(value, ManureType):
+                raise ValueError(f"Field {field.name} must be an instance of ManureType.")
 
         if any(isinstance(getattr(self, field.name), (int, float)) and getattr(self, field.name) > 0.0
                for field in fields(self)):
