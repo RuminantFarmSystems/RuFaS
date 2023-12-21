@@ -1,4 +1,5 @@
 from typing import List, Optional, Union
+from RUFAS.routines.manure.manure_treatments.manure_types import ManureType
 
 from RUFAS.routines.field.manager.schedule import Schedule
 from RUFAS.routines.field.manager.events import ManureEvent
@@ -12,7 +13,7 @@ a field.
 class ManureSchedule(Schedule):
 
     def __init__(self, name: str, years: List[int], days: List[int], nitrogen_masses: List[float],
-                 phosphorus_masses: List[float], field_coverages: List[float],
+                 phosphorus_masses: List[float], manure_types: List[ManureType], field_coverages: List[float],
                  application_depths: Optional[List[float]] = None,
                  surface_remainder_fractions: Optional[List[float]] = None, pattern_skip: int = 0,
                  pattern_repeat: int = 0):
@@ -31,6 +32,8 @@ class ManureSchedule(Schedule):
             Minimum mass(s) of nitrogen that should be contained in manure applications (kg)
         phosphorus_masses : List[float]
             Minimum mass(s) of phosphorus that should be contained in manure applications (kg)
+        manure_types : List[ManureType]
+            The types of manure for which the application request will be made.
         field_coverages : List[float]
             Fraction(s) of the field covered by manure applications (unitless)
         application_depths : List[float], default=None
@@ -52,6 +55,7 @@ class ManureSchedule(Schedule):
 
         self.nitrogen_masses = self._elongate_list(nitrogen_masses, len(years))
         self.phosphorus_masses = self._elongate_list(phosphorus_masses, len(years))
+        self.manure_types = self._elongate_list(manure_types, len(years))
         self.field_coverages = self._elongate_list(field_coverages, len(years))
 
         if application_depths is None:
@@ -74,19 +78,13 @@ class ManureSchedule(Schedule):
         ------
         ValueError
             If not all manure application years are valid.
-        ValueError
             If not all manure application days are valid.
-        ValueError
             If not all manure nitrogen masses are valid.
-        ValueError
             If not all manure phosphorus masses are valid.
-        ValueError
+            If not all manure types are valid.
             If not all field coverage fractions are valid.
-        ValueError
             If not all manure application depths are valid.
-        ValueError
             If not all manure surface retention fractions are valid.
-        ValueError
             If not all manure application parameters have the same length.
 
         """
@@ -111,6 +109,11 @@ class ManureSchedule(Schedule):
             raise ValueError(error_header + f"expected all phosphorus masses to be >= 0, received "
                                             f"'{self.phosphorus_masses}'.")
 
+        valid_manure_types = all(isinstance(manure_type, ManureType) for manure_type in self.manure_types)
+        if not valid_manure_types:
+            raise ValueError(error_header + f"expected all manure types to be valid ManureTypes, received "
+                                            f"'{self.manure_types}'.")
+
         valid_coverage_fractions = all(0.0 <= fraction <= 1.0 for fraction in self.field_coverages)
         if not valid_coverage_fractions:
             raise ValueError(error_header + f"expected all field coverage fractions to be in the range [0.0, 1.0], "
@@ -128,14 +131,15 @@ class ManureSchedule(Schedule):
 
         equal_manure_application_parameters = len(self.years) == len(self.days) == len(self.nitrogen_masses) \
             == len(self.nitrogen_masses) == len(self.phosphorus_masses) == len(self.application_depths) \
-            == len(self.surface_remainder_fractions)
+            == len(self.surface_remainder_fractions) == len(self.manure_types)
         if not equal_manure_application_parameters:
             raise ValueError(error_header + f"expected equal number of manure application parameters, received "
                                             f"'{self.years}' years, '{self.days}' days, '{self.nitrogen_masses}' "
                                             f"nitrogen masses, '{self.phosphorus_masses}' phosphorus masses, "
                                             f"'{self.field_coverages}' field coverage fractions, "
-                                            f"'{self.application_depths}' application depths, and "
-                                            f"'{self.surface_remainder_fractions}' surface remainder fractions.")
+                                            f"'{self.application_depths}' application depths, '{self.manure_types}' "
+                                            f"manure types and '{self.surface_remainder_fractions}' surface "
+                                            f"remainder fractions.")
 
     def generate_manure_events(self) -> List[ManureEvent]:
         """
@@ -151,18 +155,19 @@ class ManureSchedule(Schedule):
         all_days = self.days * (self.pattern_repeat + 1)
         all_nitrogen_masses = self.nitrogen_masses * (self.pattern_repeat + 1)
         all_phosphorus_masses = self.phosphorus_masses * (self.pattern_repeat + 1)
+        all_manure_types = self.manure_types * (self.pattern_repeat + 1)
         all_field_coverages = self.field_coverages * (self.pattern_repeat + 1)
         all_application_depths = self.application_depths * (self.pattern_repeat + 1)
         all_surface_remainder_fractions = self.surface_remainder_fractions * (self.pattern_repeat + 1)
         all_manure_application_events = list(zip(all_years, all_days, all_nitrogen_masses, all_phosphorus_masses,
-                                                 all_field_coverages, all_application_depths,
+                                                 all_manure_types, all_field_coverages, all_application_depths,
                                                  all_surface_remainder_fractions))
 
         manure_application_events = []
         for event in all_manure_application_events:
             new_event = ManureEvent(year=event[0], day=event[1], nitrogen_mass=event[2], phosphorus_mass=event[3],
-                                    field_coverage=event[4], application_depth=event[5],
-                                    surface_remainder_fraction=event[6])
+                                    manure_type=event[4], field_coverage=event[5], application_depth=event[6],
+                                    surface_remainder_fraction=event[7])
             manure_application_events.append(new_event)
         return manure_application_events
 

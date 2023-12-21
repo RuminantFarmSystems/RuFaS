@@ -9,6 +9,9 @@ presently growing in a field will be harvested.
 """
 
 
+from RUFAS.routines.manure.manure_treatments.manure_types import ManureType
+
+
 class Event:
     def __init__(self, year: int = 1, day: int = 120):
         """Creates a new Event instance.
@@ -153,8 +156,8 @@ class TillageEvent(Event):
 
 
 class ManureEvent(Event):
-    def __init__(self, year: int, day: int, nitrogen_mass: float, phosphorus_mass: float, field_coverage: float,
-                 application_depth: float, surface_remainder_fraction: float):
+    def __init__(self, year: int, day: int, nitrogen_mass: float, phosphorus_mass: float, manure_type: ManureType,
+                 field_coverage: float, application_depth: float, surface_remainder_fraction: float):
         """
         Creates a new ManureEvent instance, which defines how manure much manure such be requested and applied to a
         field.
@@ -169,6 +172,8 @@ class ManureEvent(Event):
             Minimum mass of nitrogen that should be contained in this manure application (kg)
         phosphorus_mass : float
             Minimum mass of phosphorus that should be contained in this manure application (kg)
+        manure_type : ManureType
+            The type of manure for which the application request will be made.
         field_coverage : float
             Fraction of the field covered by this manure application (unitless)
         application_depth : float
@@ -180,6 +185,7 @@ class ManureEvent(Event):
         super().__init__(year=year, day=day)
         self.nitrogen_mass = nitrogen_mass
         self.phosphorus_mass = phosphorus_mass
+        self.manure_type = manure_type
         self.field_coverage = field_coverage
         self.application_depth = application_depth
         self.surface_remainder_fraction = surface_remainder_fraction
