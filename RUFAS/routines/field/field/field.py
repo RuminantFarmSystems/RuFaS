@@ -404,11 +404,6 @@ class Field:
             om.add_log("manure_application_log", log_message, info_map)
             return
 
-        if requested_manure_type is None:
-            log_message = "Tried to request manure with no manure type specified."
-            om.add_log("manure_application_log", log_message, info_map)
-            return
-
         nutrient_request = NutrientRequest(nitrogen=requested_nitrogen, phosphorus=requested_phosphorus,
                                            manure_type=requested_manure_type)
 
