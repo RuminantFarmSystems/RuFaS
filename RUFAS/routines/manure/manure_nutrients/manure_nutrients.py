@@ -180,6 +180,8 @@ class ManureNutrients:
         TypeError
             If the other object is not a ManureNutrients object.
             If the other object is not the same ManureType as the self.
+        ValueError
+            If amount of any nutrient other object wants to subtract is greater than what is available in self.
 
         """
         if not isinstance(other, ManureNutrients):
@@ -188,9 +190,14 @@ class ManureNutrients:
         if self.manure_type != other.manure_type:
             raise TypeError(f"Cannot subtract {other.manure_type} nutrients from {self.manure_type} nutrients.")
 
-        subtracted_attributes = {
-            f.name: getattr(self, f.name) - getattr(other, f.name) for f in fields(self) if f.name != "manure_type"
-        }
+        subtracted_attributes = {}
+        for f in fields(self):
+            if f.name != "manure_type":
+                self_value = getattr(self, f.name)
+                other_value = getattr(other, f.name)
+                if other_value > self_value:
+                    raise ValueError(f"The amount of {f.name} in other object is greater than what is available.")
+                subtracted_attributes[f.name] = self_value - other_value
         subtracted_attributes["manure_type"] = self.manure_type
 
         return ManureNutrients(**subtracted_attributes)

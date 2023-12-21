@@ -126,13 +126,19 @@ def test_manure_nutrients_add_subtract() -> None:
 
 
 @pytest.mark.parametrize(
-    "manure_type_nutrients, manure_type_nutrients2",
+    "manure_type_nutrients, manure_type_nutrients2, nitrogen, nitrogen2, phosphorus, phosphorus2,"
+    "nutrient_to_subtract",
     [
-        (ManureType.LIQUID, ManureType.SOLID),
+        (ManureType.LIQUID, ManureType.SOLID, 1.0, 2.0, 2.0, 3.0, "nitrogen"),
+        (ManureType.LIQUID, ManureType.LIQUID, 2.0, 1.0, 2.0, 3.0, "nitrogen"),
+        (ManureType.LIQUID, ManureType.LIQUID, 1.0, 2.0, 3.0, 2.0, "phosphorus"),
     ],
 )
 def test_manure_nutrients_add_subtract_raises_errors(manure_type_nutrients: ManureType,
-                                                     manure_type_nutrients2: ManureType) -> None:
+                                                     manure_type_nutrients2: ManureType,
+                                                     nitrogen: float, nitrogen2: float,
+                                                     phosphorus: float, phosphorus2: float,
+                                                     nutrient_to_subtract: str) -> None:
     """
     Unit test for the addition and subtraction operations (__add__, __sub__)
     in the ManureNutrients class in manure_nutrients.py raising errors.
@@ -140,8 +146,8 @@ def test_manure_nutrients_add_subtract_raises_errors(manure_type_nutrients: Manu
     """
     # Arrange
     nutrients = ManureNutrients(
-        nitrogen=1.0,
-        phosphorus=2.0,
+        nitrogen=nitrogen,
+        phosphorus=phosphorus,
         potassium=3.0,
         dry_matter=4.0,
         total_manure_mass=5.0,
@@ -149,8 +155,8 @@ def test_manure_nutrients_add_subtract_raises_errors(manure_type_nutrients: Manu
     )
 
     nutrients2 = ManureNutrients(
-        nitrogen=2.0,
-        phosphorus=3.0,
+        nitrogen=nitrogen2,
+        phosphorus=phosphorus2,
         potassium=4.0,
         dry_matter=5.0,
         total_manure_mass=6.0,
@@ -158,18 +164,23 @@ def test_manure_nutrients_add_subtract_raises_errors(manure_type_nutrients: Manu
     )
 
     # Act
-    with pytest.raises(TypeError, match=f"Cannot add {nutrients.manure_type} "
-                                        f"nutrients to {nutrients2.manure_type} nutrients."):
-        nutrients + nutrients2
-    with pytest.raises(TypeError, match=f"Cannot subtract {nutrients.manure_type} "
-                                        f"nutrients from {nutrients2.manure_type} nutrients."):
-        nutrients2 - nutrients
+    if nutrients.manure_type != nutrients2.manure_type:
+        with pytest.raises(TypeError, match=f"Cannot add {nutrients.manure_type} "
+                                            f"nutrients to {nutrients2.manure_type} nutrients."):
+            nutrients + nutrients2
+        with pytest.raises(TypeError, match=f"Cannot subtract {nutrients.manure_type} "
+                                            f"nutrients from {nutrients2.manure_type} nutrients."):
+            nutrients2 - nutrients
 
-    nutrients2 = "dummy_invalid_nutrients"
-    with pytest.raises(TypeError, match=f"Cannot add {type(nutrients)} to {type(nutrients2)}."):
-        nutrients + nutrients2
-    with pytest.raises(TypeError, match=f"Cannot subtract {type(nutrients2)} from {type(nutrients)}."):
-        nutrients - nutrients2
+        nutrients2 = "dummy_invalid_nutrients"
+        with pytest.raises(TypeError, match=f"Cannot add {type(nutrients)} to {type(nutrients2)}."):
+            nutrients + nutrients2
+        with pytest.raises(TypeError, match=f"Cannot subtract {type(nutrients2)} from {type(nutrients)}."):
+            nutrients - nutrients2
+    else:
+        with pytest.raises(ValueError, match=f"The amount of {nutrient_to_subtract} in other "
+                                             f"object is greater than what is available."):
+            nutrients2 - nutrients
 
 
 @pytest.mark.parametrize("multiplier", [0, 2, 3.5, 1e10, -1, None])
