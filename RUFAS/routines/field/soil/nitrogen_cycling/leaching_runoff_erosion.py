@@ -14,9 +14,8 @@ on SWAT sections 4:2.1, 2
 om = OutputManager()
 
 NITRATE_LEACHING_COEFFICIENT = 0.05
-NITRATE_RUNOFF_COEFFICIENT = 0.01
-AMMONIUM_RUNOFF_COEFFICIENT = 0.2
-
+NITRATE_RUNOFF_COEFFICIENT = 0.1
+AMMONIUM_RUNOFF_COEFFICIENT = 1.0
 
 class LeachingRunoffErosion:
 
@@ -76,13 +75,6 @@ class LeachingRunoffErosion:
         self.data.eroded_fresh_organic_nitrogen = 0.0
         self.data.eroded_stable_organic_nitrogen = 0.0
         self.data.eroded_active_organic_nitrogen = 0.0
-
-        info_map = {
-            "class": self.__class__.__name__,
-            "function": self._erode_nitrogen.__name__
-        }
-        om.add_variable("NITRATE_RUNOFF_COEFFICIENT", NITRATE_RUNOFF_COEFFICIENT, info_map)
-        om.add_variable("AMMONIUM_RUNOFF_COEFFICIENT", AMMONIUM_RUNOFF_COEFFICIENT, info_map)
 
         if self.data.accumulated_runoff > 0.0:
             nitrates_lost_to_runoff = self._calculate_inorganic_nitrogen_loss(
@@ -149,12 +141,6 @@ class LeachingRunoffErosion:
                                                  [0.0] * len(self.data.soil_layers))
 
         nitrate_extraction_coefficient = 1 / NITRATE_LEACHING_COEFFICIENT
-
-        info_map = {
-            "class": self.__class__.__name__,
-            "function": self._leach_nitrogen.__name__
-        }
-        om.add_variable("NITRATE_LEACHING_COEFFICIENT", NITRATE_LEACHING_COEFFICIENT, info_map)
 
         percolated_nitrogen = []
         for layer in self.data.soil_layers:
