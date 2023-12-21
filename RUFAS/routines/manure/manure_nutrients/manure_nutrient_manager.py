@@ -52,17 +52,14 @@ class ManureNutrientManager:
         """
         current_nutrients = self._nutrients_by_manure_type.get(nutrients.manure_type)
 
-        if current_nutrients:
-            updated_nutrients = ManureNutrients(
-                nitrogen=current_nutrients.nitrogen + nutrients.nitrogen,
-                phosphorus=current_nutrients.phosphorus + nutrients.phosphorus,
-                potassium=current_nutrients.potassium + nutrients.potassium,
-                dry_matter=current_nutrients.dry_matter + nutrients.dry_matter,
-                total_manure_mass=current_nutrients.total_manure_mass + nutrients.total_manure_mass,
-                manure_type=nutrients.manure_type
-            )
-        else:
-            updated_nutrients = nutrients
+        updated_nutrients = ManureNutrients(
+            nitrogen=current_nutrients.nitrogen + nutrients.nitrogen,
+            phosphorus=current_nutrients.phosphorus + nutrients.phosphorus,
+            potassium=current_nutrients.potassium + nutrients.potassium,
+            dry_matter=current_nutrients.dry_matter + nutrients.dry_matter,
+            total_manure_mass=current_nutrients.total_manure_mass + nutrients.total_manure_mass,
+            manure_type=nutrients.manure_type
+        )
 
         self._nutrients_by_manure_type[nutrients.manure_type] = updated_nutrients
 
