@@ -47,5 +47,5 @@ class MetadataPaths(TypedDict):
 
 
 METADATA_PATHS: List[MetadataPaths] = [{"prefix": "barnyard",
-                                        "path": Path('input/metadata/barnyard_metadata.json')},
+                                        "path": Path('others/barnyard/barnyard_metadata.json')},
                                        ]
