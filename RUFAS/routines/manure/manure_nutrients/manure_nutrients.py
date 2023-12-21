@@ -154,10 +154,9 @@ class ManureNutrients:
         if scalar < 0.0:
             raise ValueError(f"Cannot multiply {type(self)} by a negative scalar.")
 
-        multiplied_attributes = {}
-        for f in fields(self):
-            if f.name != 'manure_type':
-                multiplied_attributes[f.name] = getattr(self, f.name) * scalar
+        multiplied_attributes = {
+            f.name: getattr(self, f.name) * scalar for f in fields(self) if f.name != "manure_type"
+        }
         multiplied_attributes['manure_type'] = self.manure_type
 
         return ManureNutrients(**multiplied_attributes)

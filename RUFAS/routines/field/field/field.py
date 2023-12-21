@@ -401,7 +401,7 @@ class Field:
             om.add_log("manure_application_log", log_message, info_map)
             return
 
-        # TODO add manure type into request - addressed by issue #1044 
+        # TODO add manure type into request - addressed by issue #1044
         requested_manure_type = ManureType.LIQUID
         nutrient_request = NutrientRequest(nitrogen=requested_nitrogen, phosphorus=requested_phosphorus,
                                            manure_type=requested_manure_type)
