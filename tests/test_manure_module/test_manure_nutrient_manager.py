@@ -261,63 +261,6 @@ def test_select_projected_manure_mass_exceptions(projected_manure_masses: list[f
 
 
 @pytest.mark.parametrize(
-    'projected_manure_mass, nutrients, expected_result',
-    [
-        # Scenario when projected manure mass is zero (within tolerance)
-        (0.0, ManureNutrients(nitrogen=1, phosphorus=1, total_manure_mass=2, dry_matter=1),
-         NutrientRequestResults()),
-
-        # Normal scenario when projected manure mass is > 0
-        (2.0, ManureNutrients(nitrogen=1, phosphorus=2, total_manure_mass=4, dry_matter=1),
-         NutrientRequestResults(nitrogen=0.5, phosphorus=1.0, total_manure_mass=2.0, dry_matter=0.5,
-                                dry_matter_fraction=0.25))
-    ]
-)
-def test_create_nutrient_request_results(projected_manure_mass: float, nutrients: ManureNutrients,
-                                         expected_result: NutrientRequestResults) -> None:
-    """
-    Unit test for the method _create_nutrient_request_results() of the ManureNutrientManager class.
-
-    This test verifies that the _create_nutrient_request_results() method correctly creates a NutrientRequestResults
-    object based on the projected manure mass.
-
-    """
-    # Act
-    manager = ManureNutrientManager()
-    manager.add_nutrients(nutrients)
-
-    # Assert
-    actual_result = manager._create_nutrient_request_results(projected_manure_mass)
-    assert actual_result == expected_result
-
-
-@pytest.mark.parametrize(
-    'projected_manure_mass, nutrients, expected_exception, expected_error_msg',
-    [
-        # Scenario when projected manure mass is negative
-        (-2.0, ManureNutrients(), ValueError, 'Projected manure mass cannot be negative: -2.0')
-    ]
-)
-def test_create_nutrient_request_results_exceptions(projected_manure_mass: float, nutrients: ManureNutrients,
-                                                    expected_exception: type[Exception],
-                                                    expected_error_msg: str) -> None:
-    """
-    Unit test for the method _create_nutrient_request_results() of the ManureNutrientManager class.
-
-    This test verifies that the _create_nutrient_request_results() method raises appropriate exceptions
-    with correct messages for negative values.
-
-    """
-    # Act
-    manager = ManureNutrientManager()
-    manager.add_nutrients(nutrients)
-
-    # Assert
-    with pytest.raises(expected_exception, match=expected_error_msg):
-        manager._create_nutrient_request_results(projected_manure_mass)
-
-
-@pytest.mark.parametrize(
     'projected_manure_mass, nutrients',
     [
         # Scenario when projected manure mass is zero
@@ -374,7 +317,8 @@ def test_create_nutrient_request_results_exceptions(projected_manure_mass: float
                                                     expected_exception: type[Exception],
                                                     expected_error_msg: str) -> None:
     """
-    Test the _create_nutrient_request_results() method of the ManureNutrientManager class for expected exception scenarios.
+    Test the _create_nutrient_request_results() method of the ManureNutrientManager class for expected
+    exception scenarios.
 
     This test verifies that the _create_nutrient_request_results() method raises appropriate exceptions
     with correct messages for negative values.
@@ -450,8 +394,8 @@ def test_remove_nutrients_exceptions(initial_nutrients, nutrients_to_remove, exc
     """
     Unit test for the _remove_nutrients() method of the ManureNutrientManager class in exception scenarios.
 
-    This test verifies that the _remove_nutrients() method raises appropriate exceptions when trying to remove more nutrients
-    than available in the manager.
+    This test verifies that the _remove_nutrients() method raises appropriate exceptions when trying to remove
+    more nutrients than available in the manager.
 
     """
     # Arrange
