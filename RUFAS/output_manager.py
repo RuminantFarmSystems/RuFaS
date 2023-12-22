@@ -131,11 +131,7 @@ class OutputManager(object):
         # having them increases the final file size.
         reduced_info_map = {
             k: info_map[k]
-            for k in info_map.keys()
-                     - {
-                         "class",
-                         "function",
-                     }
+            for k in info_map.keys() - {"class", "function"}
         }
         pool[key]["info_maps"].append(reduced_info_map)
 
