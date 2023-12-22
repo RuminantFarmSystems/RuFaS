@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Dict, List, Any, Callable
+from typing import Dict, List, Any
 
 import pytest
 from pytest_mock import MockerFixture
