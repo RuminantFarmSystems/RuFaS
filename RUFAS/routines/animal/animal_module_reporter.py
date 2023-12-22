@@ -431,6 +431,7 @@ class AnimalModuleReporter:
             om.add_variable("animal_id", animal.id, info_map)
             om.add_variable("animal_type", animal.__class__.__name__, info_map)
             om.add_variable("body_weight", animal.body_weight, info_map)
+            om.add_variable("sold_day", animal.sold_at_day, info_map)
 
             if hasattr(animal, "cull_reason"):
                 om.add_variable("cull_reason", animal.cull_reason, info_map)
