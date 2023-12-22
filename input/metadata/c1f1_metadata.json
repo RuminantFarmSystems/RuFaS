@@ -3,14 +3,14 @@
     "config": {
       "title": "Config Data",
       "description": "Configuration Information",
-      "path": "input/data/config/pilot_testing_config.json",
+      "path": "input/data/config/c1f1_config.json",
       "type": "json",
       "properties": "config_properties"
     },
     "animal": {
       "title": "Animal data",
       "description": "Moo Moo!",
-      "path": "input/data/animal/c1f1_animal_reduced.json",
+      "path": "input/data/animal/c1f1_animal.json",
       "type": "json",
       "properties": "animal_properties"
     },
@@ -45,7 +45,7 @@
     "purchased_feeds_emissions": {
       "title": "Emissions from purchased feeds",
       "description": "Specifies how much emissions are associated with purchased feed types.",
-      "path": "input/data/EEE/usable_feeds_emissions.csv",
+      "path": "input/data/EEE/cohort1_feeds_emissions.csv",
       "type": "csv",
       "properties": "feed_emissions_properties"
     },
@@ -2109,6 +2109,22 @@
         "type": "number",
         "minimum": 1000
       },
+      "4":{
+        "type": "number",
+        "minimum": 0.0
+      },
+      "25":{
+        "type": "number",
+        "minimum": 0.0
+      },
+      "31":{
+        "type": "number",
+        "minimum": 0.0
+      },
+      "36":{
+        "type": "number",
+        "minimum": 0.0
+      },
       "108": {
         "type": "number",
         "minimum": 0.0
@@ -2133,15 +2149,31 @@
         "type": "number",
         "minimum": 0.0
       },
+      "50":{
+        "type": "number",
+        "minimum": 0.0
+      },
       "51": {
         "type": "number",
         "minimum": 0.0
       },
-      "50": {
+      "52": {
         "type": "number",
         "minimum": 0.0
       },
-      "52": {
+      "58": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "60":{
+        "type": "number",
+        "minimum": 0.0
+      },
+      "66":{
+        "type": "number",
+        "minimum": 0.0
+      },
+      "79":{
         "type": "number",
         "minimum": 0.0
       },
@@ -2153,7 +2185,7 @@
         "type": "number",
         "minimum": 0.0
       },
-      "100": {
+      "97":{
         "type": "number",
         "minimum": 0.0
       },
@@ -2161,7 +2193,55 @@
         "type": "number",
         "minimum": 0.0
       },
-      "176": {
+      "119":{
+        "type": "number",
+        "minimum": 0.0
+      },
+      "120":{
+        "type": "number",
+        "minimum": 0.0
+      },
+      "144":{
+        "type": "number",
+        "minimum": 0.0
+      },
+      "154":{
+        "type": "number",
+        "minimum": 0.0
+      },
+      "155":{
+        "type": "number",
+        "minimum": 0.0
+      },
+      "163":{
+        "type": "number",
+        "minimum": 0.0
+      },
+      "167":{
+        "type": "number",
+        "minimum": 0.0
+      },
+      "200":{
+        "type": "number",
+        "minimum": 0.0
+      },
+      "216":{
+        "type": "number",
+        "minimum": 0.0
+      },
+      "230":{
+        "type": "number",
+        "minimum": 0.0
+      },
+      "233":{
+        "type": "number",
+        "minimum": 0.0
+      },
+      "236":{
+        "type": "number",
+        "minimum": 0.0
+      },
+      "248":{
         "type": "number",
         "minimum": 0.0
       },
@@ -2186,6 +2266,10 @@
         "minimum": 0.0
       },
       "305": {
+        "type": "number",
+        "minimum": 0.0
+      },
+      "306":{
         "type": "number",
         "minimum": 0.0
       }
