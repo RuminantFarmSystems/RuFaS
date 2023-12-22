@@ -43,11 +43,11 @@
     "purchased_feeds": [
       {
         "purchased_feed": 202,
-        "purchased_feed_cost": 1.0 
+        "purchased_feed_cost": 0.01 
       },
       {
         "purchased_feed": 216,
-        "purchased_feed_cost": 1.0
+        "purchased_feed_cost": 0.5
       },
       {
         "purchased_feed": 44,
@@ -99,7 +99,7 @@
       },
       {
         "purchased_feed": 210,
-        "purchased_feed_cost": 1.0
+        "purchased_feed_cost": 0.1
       },
       {
         "purchased_feed": 164,
