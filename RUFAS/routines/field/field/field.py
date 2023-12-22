@@ -369,7 +369,7 @@ class Field:
             nitrogen=nutrient_request.nitrogen,
             phosphorus=nutrient_request.phosphorus,
             total_manure_mass=total_manure_mass,
-            dry_matter_amount=dry_matter_amount,
+            dry_matter=dry_matter_amount,
             dry_matter_fraction=dry_matter_fraction
         )
         return evaluation_request

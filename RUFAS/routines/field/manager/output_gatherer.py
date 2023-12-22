@@ -116,6 +116,7 @@ class OutputGatherer:
             om.add_variable("eroded_stable_organic_nitrogen", field.soil.data.eroded_stable_organic_nitrogen, info_map)
             om.add_variable("eroded_active_organic_nitrogen", field.soil.data.eroded_active_organic_nitrogen, info_map)
 
+            om.add_variable("profile_carbon_total", field.soil.data.profile_carbon_total, info_map)
             om.add_variable("profile_carbon_emissions", field.soil.data.profile_carbon_emissions, info_map)
             om.add_variable("profile_nitrates_total", field.soil.data.profile_nitrates_total, info_map)
             om.add_variable("profile_ammonium_total", field.soil.data.profile_ammonium_total, info_map)
