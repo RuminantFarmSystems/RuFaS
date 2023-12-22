@@ -256,8 +256,8 @@ class TillageApplication:
 
         """
         info_map = {"class": self.__class__.__name__, "function": self._record_tillage.__name__,
-                    "prefix": f"field='{self.field_data.name}'", "date": {"year": year, "day": day},
+                    "prefix": f"field='{self.field_data.name}'",
                     "field_size": {self.field_data.field_size}}
         value = {"tillage_depth": tillage_depth, "incorporation_fraction": incorporation_fraction,
-                 "mixing_fraction": mixing_fraction}
+                 "mixing_fraction": mixing_fraction, "year": year, "day": day}
         om.add_variable("tillage_record", value, info_map)

@@ -1,4 +1,5 @@
 import math
+import pdb
 
 from RUFAS.routines.field.crop.crop import Crop
 from RUFAS.routines.field.crop.crop_data import CropData
@@ -17,6 +18,7 @@ from RUFAS.routines.field.manager.events import TillageEvent
 from RUFAS.output_manager import OutputManager
 from RUFAS.routines.manure.manure_manager import ManureManager
 from RUFAS.routines.manure.manure_nutrients.nutrient_request import NutrientRequest
+from RUFAS.routines.manure.manure_nutrients.nutrient_request_results import NutrientRequestResults
 from RUFAS.time import Time
 from copy import copy
 
@@ -351,12 +353,26 @@ class Field:
 
         """
         info_map = {"class": self.__class__.__name__, "function": self._record_fertilizer_application.__name__,
-                    "prefix": f"field='{self.field_data.name}'", "date": {"year": year, "day": day},
+                    "prefix": f"field='{self.field_data.name}'",
                     "mix_name": mix_name, "field_size": self.field_data.field_size}
         value = {"mass": total_mass, "nitrogen": nitrogen_mass, "phosphorus": phosphorus_mass,
                  "potassium": potassium_mass, "application_depth": application_depth,
-                 "surface_remainder_fraction": surface_remainder_fraction}
+                 "surface_remainder_fraction": surface_remainder_fraction, "year": year, "day": day}
         om.add_variable("fertilizer_application", value, info_map)
+
+    @staticmethod
+    def _construct_evaluation_manure_application(nutrient_request: NutrientRequest) -> NutrientRequestResults:
+        dry_matter_fraction = 0.05
+        total_manure_mass = nutrient_request.nitrogen * 479.999_883
+        dry_matter_amount = total_manure_mass * dry_matter_fraction
+        evaluation_request = NutrientRequestResults(
+            nitrogen=nutrient_request.nitrogen,
+            phosphorus=nutrient_request.phosphorus,
+            total_manure_mass=total_manure_mass,
+            dry_matter=dry_matter_amount,
+            dry_matter_fraction=dry_matter_fraction
+        )
+        return evaluation_request
 
     def _execute_manure_application(self, requested_nitrogen: float, requested_phosphorus: float, field_coverage: float,
                                     application_depth: float, surface_remainder_fraction: float, year: int,
@@ -403,7 +419,8 @@ class Field:
 
         nutrient_request = NutrientRequest(nitrogen=requested_nitrogen, phosphorus=requested_phosphorus)
 
-        manure_supplied = self.manure_manager.request_nutrients(nutrient_request)
+        # manure_supplied = self.manure_manager.request_nutrients(nutrient_request)
+        manure_supplied = self._construct_evaluation_manure_application(nutrient_request)
 
         if manure_supplied is not None:
             supplied_nitrogen = manure_supplied.nitrogen

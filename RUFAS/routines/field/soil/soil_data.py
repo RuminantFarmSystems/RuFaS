@@ -615,6 +615,20 @@ class SoilData:
             return 0.075
 
     @property
+    def profile_carbon_total(self) -> float:
+        carbon_pools = [
+            "metabolic_litter_amount",
+            "structural_litter_amount",
+            "active_carbon_amount",
+            "slow_carbon_amount",
+            "passive_carbon_amount"
+        ]
+        carbon_total = 0.0
+        for pool in carbon_pools:
+            carbon_total += sum(self.get_vectorized_layer_attribute(pool))
+        return carbon_total
+
+    @property
     def profile_carbon_emissions(self) -> float:
         """
         Calculates the total amount of CO2 respirated from the soil profile.

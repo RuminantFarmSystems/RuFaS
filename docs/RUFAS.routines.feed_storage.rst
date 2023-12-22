@@ -12,6 +12,14 @@ RUFAS.routines.feed\_storage.baleage module
    :undoc-members:
    :show-inheritance:
 
+RUFAS.routines.feed\_storage.enums module
+-----------------------------------------
+
+.. automodule:: RUFAS.routines.feed_storage.enums
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 RUFAS.routines.feed\_storage.grain module
 -----------------------------------------
 

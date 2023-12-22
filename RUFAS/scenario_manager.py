@@ -47,5 +47,23 @@ class MetadataPaths(TypedDict):
 
 
 METADATA_PATHS: List[MetadataPaths] = [{"prefix": "con_corn_i",
-                                        "path": Path('input/metadata/con_corn_i_metadata.json')}
+                                        "path": Path('input/metadata/con_corn_i_metadata.json')},
+                                       {"prefix": "con_corn_ii",
+                                        "path": Path('input/metadata/con_corn_ii_metadata.json')},
+                                       {"prefix": "con_corn_iii",
+                                        "path": Path('input/metadata/con_corn_iii_metadata.json')},
+                                       {"prefix": "con_corn_iv",
+                                        "path": Path('input/metadata/con_corn_iv_metadata.json')},
+                                       {"prefix": "con_corn_v",
+                                        "path": Path('input/metadata/con_corn_v_metadata.json')},
+                                       {"prefix": "con_corn_vi",
+                                        "path": Path('input/metadata/con_corn_vi_metadata.json')},
+                                       {"prefix": "con_corn_vii",
+                                        "path": Path('input/metadata/con_corn_vii_metadata.json')},
+                                       {"prefix": "con_corn_viii",
+                                        "path": Path('input/metadata/con_corn_viii_metadata.json')},
+                                       {"prefix": "con_corn_ix",
+                                        "path": Path('input/metadata/con_corn_ix_metadata.json')},
+                                       {"prefix": "con_corn_x",
+                                        "path": Path('input/metadata/con_corn_x_metadata.json')},
                                        ]
