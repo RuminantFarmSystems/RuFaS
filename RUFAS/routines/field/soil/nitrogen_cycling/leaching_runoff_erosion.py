@@ -131,9 +131,6 @@ class LeachingRunoffErosion:
         iterating through the soil profile a second time and adding the leached nitrogen into the appropriate layer. The
         bottom soil layer leaches into the vadose zone.
 
-        The leaching extraction coefficient is 1.0 except when leaching from the nitrate pool in all non-top soil
-        layers, in which case it is 2.5.
-
         """
         self.data.set_vectorized_layer_attribute("percolated_nitrates", [0.0] * len(self.data.soil_layers))
         self.data.set_vectorized_layer_attribute("percolated_ammonium", [0.0] * len(self.data.soil_layers))
