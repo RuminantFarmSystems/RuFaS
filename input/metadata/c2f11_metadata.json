@@ -10,11 +10,11 @@
     "animal": {
       "title": "Animal data",
       "description": "Moo Moo!",
-      "path": "input/data/animal/c1f1_animal_reduced.json",
+      "path": "input/data/animal/c2f11_animal.json",
       "type": "json",
       "properties": "animal_properties"
     },
-    "animal_population": {
+"animal_population": {
       "title": "Animal population data",
       "description": "Moo Moo!",
       "path": "input/data/animal/animal_population.json",
@@ -28,7 +28,7 @@
       "type": "json",
       "properties": "crop_schedule_properties"
     },
-    "economy": {
+"economy": {
       "title": "Economy data",
       "description": "Time is money!",
       "path": "input/data/EEE/default_costs.csv",
@@ -42,7 +42,7 @@
       "type": "csv",
       "properties": "emissions_properties"
     },
-    "purchased_feeds_emissions": {
+"purchased_feeds_emissions": {
       "title": "Emissions from purchased feeds",
       "description": "Specifies how much emissions are associated with purchased feed types.",
       "path": "input/data/EEE/usable_feeds_emissions.csv",
@@ -52,7 +52,7 @@
     "feed": {
       "title": "Feed data",
       "description": "Those cows need to eat!",
-      "path": "input/data/feed/c1f1_feed.json",
+      "path": "input/data/feed/c2f11_feed.json",
       "type": "json",
       "properties": "feed_properties"
     },
@@ -73,7 +73,7 @@
     "manure_management": {
       "title": "Manure data",
       "description": "You thought it's a waste, but those crops need to eat as well",
-      "path": "input/data/manure/c1f1_manure_management.json",
+      "path": "input/data/manure/c2f11_manure_management.json",
       "type": "json",
       "properties": "manure_management_properties"
     },
@@ -122,7 +122,7 @@
     "weather": {
       "title": "Weather data",
       "description": "Let's turn on the AC",
-      "path": "input/data/weather/c1f1_weather.csv",
+      "path": "input/data/weather/c2f11_weather.csv",
       "type": "csv",
       "properties": "weather_properties"
     },
@@ -176,7 +176,7 @@
         "default": "NASEM",
         "pattern": "^(NASEM|NRC)$",
         "description": "The nutrient standard to use for feed."
-      },
+},
       "FIPS_county_code": {
         "type": "number",
         "minimum": 1000,
@@ -225,7 +225,7 @@
           "default": 100,
           "minimum": 0
         },
-        "replace_num": {
+                "replace_num": {
           "type": "number",
           "default": 5000,
           "minimum": 0
@@ -237,7 +237,7 @@
           "description": "Breed (select one Holstein/Jersey) -- The predominant breed of the herd (Holstein or Jersey)"
         }
       },
-      "herd_initialization": {
+"herd_initialization": {
         "type": "object",
         "description": "Animal generation related inputs",
         "initial_animal_num": {
@@ -424,22 +424,22 @@
               "repro_sub_properties": {
                 "type": "object",
                 "conception_rate": {
-                  "type": "number",
-                  "description": "Conception Rate -- The conception rate for the heifer reproductive program (default is 0.6)",
-                  "default": 0.6,
-                  "minimum": 0,
-                  "maximum": 1
-                },
-                "estrus_detection_rate": {
-                  "type": "number",
-                  "description": "Estrus Detection Rate -- The % of in-heat animals that would be detected in the ED (Estrus Detection) programs (default is 0.6)",
+                "type": "number",
+                "description": "Conception Rate -- The conception rate for the heifer reproductive program (default is 0.6)",
+                "default": 0.6,
+                "minimum": 0,
+                "maximum": 1
+              },
+              "estrus_detection_rate": {
+                "type": "number",
+                "description": "Estrus Detection Rate -- The % of in-heat animals that would be detected in the ED (Estrus Detection) programs (default is 0.6)",
                   "default": 0.7,
                   "minimum": 0,
                   "maximum": 1
                 }
               }
             },
-            "cows": {
+              "cows": {
               "type": "object",
               "estrus_detection_rate": {
                 "type": "number",
@@ -474,11 +474,11 @@
               "repro_sub_properties": {
                 "type": "object",
                 "conception_rate": {
-                  "type": "number",
-                  "description": "Conception Rate -- The conception rate for the cow reproductive program (default is 0.6)",
-                  "default": 0.5,
-                  "minimum": 0,
-                  "maximum": 1
+                "type": "number",
+                "description": "Conception Rate -- The conception rate for the cow reproductive program (default is 0.6)",
+                "default": 0.5,
+                "minimum": 0,
+                "maximum": 1
                 },
                 "tai_program_start_day": {
                   "type": "number",
@@ -954,7 +954,7 @@
         "description": "Methane Model -- The method used to estimate enteric methane emissions.",
         "type": "string",
         "default": "IPCC",
-        "pattern": "^(Mills|Mutian|IPCC)$"
+        "pattern": "^(Mills|3-Mutian|IPCC)$"
       },
       "ration": {
         "type": "object",
@@ -1035,7 +1035,7 @@
         }
       }
     },
-    "animal_population_properties": {
+"animal_population_properties": {
       "calves": {
         "type": "array",
         "description": "calves data",
@@ -2058,7 +2058,7 @@
         "default": 0
       }
     },
-    "economic_properties": {
+"economic_properties": {
       "diesel_cost_gal": {
         "description": "cost of diesel per gallon",
         "type": "number",
@@ -2104,7 +2104,7 @@
         "default": 400
       }
     },
-    "feed_emissions_properties": {
+"feed_emissions_properties": {
       "county_code": {
         "type": "number",
         "minimum": 1000
@@ -3073,7 +3073,7 @@
         "description": ""
       },
       "TDN": {
-        "type": "number",
+"type": "number",
         "description": ""
       },
       "DE": {
@@ -3508,7 +3508,7 @@
         "description": "Number of days that make up the irrigation interval.\nUnits: days.",
         "minimum": 0,
         "default": 0
-      },
+},
       "supplement_manure_nutrient_deficiencies": {
         "type": "bool",
         "description": "Determines if nutrient deficient manure applications are supplemented with chemical fertilizer.",
@@ -3596,3 +3596,4 @@
   },
   "cross-validation": {}
 }
+
