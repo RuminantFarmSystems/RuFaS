@@ -18,7 +18,7 @@ IF EXIST ".\.changed_files.txt" (del .\.changed_files.txt)
 IF EXIST ".\.changed_python_files.txt" (del .\.changed_python_files.txt)
 
 REM Get the list of files changed in this branch.
-FOR /F "tokens=*" %%G IN ('git diff --name-only %BASEBRANCHHEAD%') DO (
+FOR /F "tokens=*" %%G IN ('git diff --name-only --diff-filter=AM %BASEBRANCHHEAD%') DO (
     echo %%G>> .\.changed_files.txt
 )
 

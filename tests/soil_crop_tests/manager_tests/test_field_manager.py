@@ -1,3 +1,7 @@
+import mock
+
+from RUFAS.input_manager import InputManager
+from RUFAS.output_manager import OutputManager
 from RUFAS.routines.field.manager.field_manager import FieldManager
 from RUFAS.routines.field.manager.crop_schedule import CropSchedule
 from RUFAS.current_day_conditions import CurrentDayConditions
@@ -18,6 +22,25 @@ from pytest_mock.plugin import MockerFixture
 from typing import List, Dict, Callable
 from unittest.mock import MagicMock, patch, call
 
+om = OutputManager()
+
+
+@pytest.fixture
+def mock_input_manager(mocker: MockerFixture) -> InputManager:
+    """Returns an uninitialized InputManager object"""
+    return InputManager()
+
+
+@pytest.fixture
+def input_manager_original_method_states(
+        mock_input_manager: InputManager,
+) -> Dict[str, Callable]:
+    """Fixture to store original methods of InputManager"""
+    return {
+        "get_data": mock_input_manager.get_data,
+        "add_dict_variable_to_pool": mock_input_manager.add_dict_variable_to_pool
+    }
+
 
 @pytest.mark.parametrize("field_blob_names", [
     [],
@@ -27,19 +50,22 @@ def test_field_manager_init(field_blob_names) -> None:
     """Tests that FieldManager init method runs correctly."""
     mocked_manure_manager = MagicMock(ManureManager)
     expected_field_setup_calls = [call(field_name, mocked_manure_manager) for field_name in field_blob_names]
-    with patch("RUFAS.routines.field.manager.field_manager.FieldManager._get_field_blob_names",
-               return_value=field_blob_names) as patched_field_blob_names, \
+    with patch("RUFAS.input_manager.InputManager.get_data_keys_by_properties",
+               return_value=field_blob_names) as patched_data_keys_by_properties, \
             patch("RUFAS.routines.field.manager.field_manager.FieldManager._setup_field",
-                  return_value=MagicMock(Field)) as patched_field_setup:
+                  return_value=MagicMock(Field)) as patched_field_setup, \
+            patch.object(om, "add_warning") as warning:
         field_manager = FieldManager(mocked_manure_manager)
 
         assert len(field_manager.fields) == len(field_blob_names)
         assert len(field_manager.output_gatherer.fields) == len(field_blob_names)
-        patched_field_blob_names.assert_called_once()
+        patched_data_keys_by_properties.assert_called_once()
         if len(field_blob_names) > 0:
             patched_field_setup.assert_has_calls(expected_field_setup_calls)
+            warning.assert_not_called()
         else:
             patched_field_setup.assert_not_called()
+            warning.assert_called_once()
 
 
 @pytest.fixture
@@ -78,7 +104,7 @@ def test_daily_update_routine(fields: List[Field], mock_weather: Weather,
 
     mocked_manure_manager = MagicMock(ManureManager)
     mock_weather.get_current_day_conditions = MagicMock(return_value=MagicMock(CurrentDayConditions))
-    with patch("RUFAS.routines.field.manager.field_manager.FieldManager._get_field_blob_names", return_value=[]):
+    with patch("RUFAS.input_manager.InputManager.get_data_keys_by_properties", return_value=[]):
         fm = FieldManager(mocked_manure_manager)
 
         fm.fields = fields
@@ -104,7 +130,7 @@ def test_annual_update_routine(fields: List[Field]):
     for field in fields:
         field.perform_annual_reset = MagicMock()
     mocked_field_manager = MagicMock(ManureManager)
-    with patch("RUFAS.routines.field.manager.field_manager.FieldManager._get_field_blob_names", return_value=[]):
+    with patch("RUFAS.input_manager.InputManager.get_data_keys_by_properties", return_value=[]):
         fm = FieldManager(mocked_field_manager)
         fm.fields = fields
         fm.output_gatherer.send_annual_variables = MagicMock()
@@ -115,132 +141,140 @@ def test_annual_update_routine(fields: List[Field]):
 
 
 @pytest.mark.parametrize("fertilizer_schedule_data,expected_available_mixes,expected_schedule", [
-    ({
-         "available_fertilizer_mixes": [
-             {
-                 "name": "0_0_60",
-                 "N": 0.0,
-                 "P": 0.0,
-                 "K": 0.6
-             },
-             {
-                 "name": "6_10_20",
-                 "N": 0.0672511,
-                 "P": 0.112085,
-                 "K": 0.22417
-             },
-             {
-                 "name": "5_4_27",
-                 "N": 0.0560426,
-                 "P": 0.0493175,
-                 "K": 0.2790919
-             },
-             {
-                 "name": "5_6_40",
-                 "N": 0.0560426,
-                 "P": 0.06904443,
-                 "K": 0.39
-             },
-             {
-                 "name": "82_0_0",
-                 "N": 0.82,
-                 "P": 0.0,
-                 "K": 0.0
-             }
-         ],
-         "mix_names": ["6_10_20", "6_10_20", "5_4_27", "5_6_40", "5_6_40", "5_6_40", "5_6_40"],
-         "years": [1993, 1996, 2001, 2005, 2009, 2013, 2017],
-         "days": [103, 103, 103, 103, 103, 103, 103],
-         "nitrogen_masses": [6.72511, 6.72511, 5.60426, 5.60426, 5.6, 5.60426, 5.60426],
-         "phosphorus_masses": [11.2085, 11.2085, 4.93175, 6.904443, 6.72511, 6.904443, 6.904443],
-         "potassium_masses": [22.417, 22.417, 27.90919, 39.072871, 39.072871, 39.072871, 39.072871],
-         "application_depths": [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
-         "surface_remainder_fractions": [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0],
-         "pattern_repeat": 0,
-         "pattern_skip": 0
-     }, {
-         "0_0_60": {
-             "N": 0.0,
-             "P": 0.0,
-             "K": 0.6
-         },
-         "6_10_20": {
+    (
+            {
+                "available_fertilizer_mixes": [
+                    {
+                        "name": "0_0_60",
+                        "N": 0.0,
+                        "P": 0.0,
+                        "K": 0.6
+                    },
+                    {
+                        "name": "6_10_20",
+                        "N": 0.0672511,
+                        "P": 0.112085,
+                        "K": 0.22417
+                    },
+                    {
+                        "name": "5_4_27",
+                        "N": 0.0560426,
+                        "P": 0.0493175,
+                        "K": 0.2790919
+                    },
+                    {
+                        "name": "5_6_40",
+                        "N": 0.0560426,
+                        "P": 0.06904443,
+                        "K": 0.39
+                    },
+                    {
+                        "name": "82_0_0",
+                        "N": 0.82,
+                        "P": 0.0,
+                        "K": 0.0
+                    }
+                ],
+                "mix_names": ["6_10_20", "6_10_20", "5_4_27", "5_6_40", "5_6_40", "5_6_40", "5_6_40"],
+                "years": [1993, 1996, 2001, 2005, 2009, 2013, 2017],
+                "days": [103, 103, 103, 103, 103, 103, 103],
+                "nitrogen_masses": [6.72511, 6.72511, 5.60426, 5.60426, 5.6, 5.60426, 5.60426],
+                "phosphorus_masses": [11.2085, 11.2085, 4.93175, 6.904443, 6.72511, 6.904443, 6.904443],
+                "potassium_masses": [22.417, 22.417, 27.90919, 39.072871, 39.072871, 39.072871, 39.072871],
+                "application_depths": [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
+                "surface_remainder_fractions": [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0],
+                "pattern_repeat": 0,
+                "pattern_skip": 0
+            },
+            {
+                "0_0_60": {
+                    "N": 0.0,
+                    "P": 0.0,
+                    "K": 0.6
+                },
+                "6_10_20": {
 
-             "N": 0.0672511,
-             "P": 0.112085,
-             "K": 0.22417
-         },
-         "5_4_27": {
-             "N": 0.0560426,
-             "P": 0.0493175,
-             "K": 0.2790919
-         },
-         "5_6_40": {
-             "N": 0.0560426,
-             "P": 0.06904443,
-             "K": 0.39
-         },
-         "82_0_0": {
-             "N": 0.82,
-             "P": 0.0,
-             "K": 0.0
-         }
-     }, FertilizerSchedule(name="fertilizer_schedule",
-                           mix_names=["6_10_20", "6_10_20", "5_4_27", "5_6_40", "5_6_40", "5_6_40", "5_6_40"],
-                           years=[1993, 1996, 2001, 2005, 2009, 2013, 2017],
-                           days=[103, 103, 103, 103, 103, 103, 103],
-                           nitrogen_masses=[6.72511, 6.72511, 5.60426, 5.60426, 5.6, 5.60426, 5.60426],
-                           phosphorus_masses=[11.2085, 11.2085, 4.93175, 6.904443, 6.72511, 6.904443, 6.904443],
-                           application_depths=[0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
-                           surface_remainder_fractions=[1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0],
-                           pattern_repeat=0,
-                           pattern_skip=0)
-     ),
-    ({
-         "available_fertilizer_mixes": [
-             {
-                 "name": "barnyard_fert",
-                 "N": 0.4,
-                 "P": 0.2,
-                 "K": 0.1
-             }
-         ],
-         "mix_names": ["barnyard_fert"],
-         "years": [2010],
-         "days": [200],
-         "nitrogen_masses": [1000],
-         "phosphorus_masses": [5],
-         "potassium_masses": [400],
-         "application_depths": [0.0],
-         "surface_remainder_fractions": [1.0],
-         "pattern_repeat": 0,
-         "pattern_skip": 0
-     }, {
-         "barnyard_fert": {
-             "N": 0.4,
-             "P": 0.2,
-             "K": 0.1
-         }
-     }, FertilizerSchedule(name="fertilizer_schedule",
-                           mix_names=["barnyard_fert"],
-                           years=[2010],
-                           days=[200],
-                           nitrogen_masses=[1000],
-                           phosphorus_masses=[5],
-                           application_depths=[0.0],
-                           surface_remainder_fractions=[1.0],
-                           pattern_repeat=0,
-                           pattern_skip=0)
-     )
+                    "N": 0.0672511,
+                    "P": 0.112085,
+                    "K": 0.22417
+                },
+                "5_4_27": {
+                    "N": 0.0560426,
+                    "P": 0.0493175,
+                    "K": 0.2790919
+                },
+                "5_6_40": {
+                    "N": 0.0560426,
+                    "P": 0.06904443,
+                    "K": 0.39
+                },
+                "82_0_0": {
+                    "N": 0.82,
+                    "P": 0.0,
+                    "K": 0.0
+                }
+            },
+            FertilizerSchedule(name="fertilizer_schedule",
+                               mix_names=["6_10_20", "6_10_20", "5_4_27", "5_6_40", "5_6_40", "5_6_40", "5_6_40"],
+                               years=[1993, 1996, 2001, 2005, 2009, 2013, 2017],
+                               days=[103, 103, 103, 103, 103, 103, 103],
+                               nitrogen_masses=[6.72511, 6.72511, 5.60426, 5.60426, 5.6, 5.60426, 5.60426],
+                               phosphorus_masses=[11.2085, 11.2085, 4.93175, 6.904443, 6.72511, 6.904443, 6.904443],
+                               application_depths=[0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
+                               surface_remainder_fractions=[1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0],
+                               pattern_repeat=0,
+                               pattern_skip=0)
+    ),
+    (
+            {
+                "available_fertilizer_mixes": [
+                    {
+                        "name": "barnyard_fert",
+                        "N": 0.4,
+                        "P": 0.2,
+                        "K": 0.1
+                    }
+                ],
+                "mix_names": ["barnyard_fert"],
+                "years": [2010],
+                "days": [200],
+                "nitrogen_masses": [1000],
+                "phosphorus_masses": [5],
+                "potassium_masses": [400],
+                "application_depths": [0.0],
+                "surface_remainder_fractions": [1.0],
+                "pattern_repeat": 0,
+                "pattern_skip": 0
+            }, {
+                "barnyard_fert": {
+                    "N": 0.4,
+                    "P": 0.2,
+                    "K": 0.1
+                }
+            }, FertilizerSchedule(name="fertilizer_schedule",
+                                  mix_names=["barnyard_fert"],
+                                  years=[2010],
+                                  days=[200],
+                                  nitrogen_masses=[1000],
+                                  phosphorus_masses=[5],
+                                  application_depths=[0.0],
+                                  surface_remainder_fractions=[1.0],
+                                  pattern_repeat=0,
+                                  pattern_skip=0)
+    )
 ])
 def test_setup_fertilizer_schedule(fertilizer_schedule_data: Dict, expected_available_mixes: Dict,
-                                   expected_schedule: FertilizerSchedule) -> None:
+                                   expected_schedule: FertilizerSchedule, mock_input_manager: InputManager,
+                                   input_manager_original_method_states: Dict[str, Callable]) -> None:
     """Tests that fertilizer schedules and available fertilizer mixes are correctly setup."""
-    with patch("RUFAS.input_manager.InputManager.get_data", return_value=fertilizer_schedule_data) as patched_get_data:
-        actual_available_mixes, actual_schedule = FieldManager._setup_fertilizer_schedule("test_fert_schedule")
-        assert actual_available_mixes == expected_available_mixes
-        assert actual_schedule.generate_fertilizer_events() == expected_schedule.generate_fertilizer_events()
-        patched_get_data.assert_called_once_with("test_fert_schedule")
+    mock_input_manager.get_data = mock.MagicMock(return_value=fertilizer_schedule_data)
+
+    actual_available_mixes, actual_schedule = FieldManager._setup_fertilizer_schedule("test_fert_schedule")
+    assert actual_available_mixes == expected_available_mixes
+    assert actual_schedule.generate_fertilizer_events() == expected_schedule.generate_fertilizer_events()
+    mock_input_manager.get_data.assert_called_once_with("test_fert_schedule")
+
+    mock_input_manager.get_data = input_manager_original_method_states["get_data"]
 
 
 @pytest.mark.parametrize("manure_schedule_data,expected_manure_schedule", [
@@ -284,12 +318,17 @@ def test_setup_fertilizer_schedule(fertilizer_schedule_data: Dict, expected_avai
                        phosphorus_masses=[500], field_coverages=[0.95], application_depths=[0.0],
                        surface_remainder_fractions=[1.0], pattern_repeat=8, pattern_skip=0))
 ])
-def test_setup_manure_schedule(manure_schedule_data: Dict, expected_manure_schedule: ManureSchedule) -> None:
+def test_setup_manure_schedule(manure_schedule_data: Dict, expected_manure_schedule: ManureSchedule,
+                               mock_input_manager: InputManager,
+                               input_manager_original_method_states: Dict[str, Callable]
+                               ) -> None:
     """Tests that ManureSchedules are correctly initialized with data from the InputManager."""
-    with patch("RUFAS.input_manager.InputManager.get_data", return_value=manure_schedule_data) as patched_get_data:
-        actual_manure_schedule = FieldManager._setup_manure_schedule("test_manure_schedule")
-        assert actual_manure_schedule.generate_manure_events() == expected_manure_schedule.generate_manure_events()
-        patched_get_data.assert_called_once_with("test_manure_schedule")
+    mock_input_manager.get_data = mock.MagicMock(return_value=manure_schedule_data)
+    actual_manure_schedule = FieldManager._setup_manure_schedule("test_manure_schedule")
+    assert actual_manure_schedule.generate_manure_events() == expected_manure_schedule.generate_manure_events()
+    mock_input_manager.get_data.assert_called_once_with("test_manure_schedule")
+
+    mock_input_manager.get_data = input_manager_original_method_states["get_data"]
 
 
 @pytest.mark.parametrize("tillage_schedule_data,expected_tillage_schedule", [
@@ -339,12 +378,17 @@ def test_setup_manure_schedule(manure_schedule_data: Dict, expected_manure_sched
         pattern_skip=0,
         pattern_repeat=0))
 ])
-def test_setup_tillage_schedule(tillage_schedule_data: Dict, expected_tillage_schedule: TillageSchedule) -> None:
+def test_setup_tillage_schedule(tillage_schedule_data: Dict, expected_tillage_schedule: TillageSchedule,
+                                mock_input_manager: InputManager,
+                                input_manager_original_method_states: Dict[str, Callable]
+                                ) -> None:
     """Tests that TillageSchedules are correctly initialized with data from the InputManager."""
-    with patch("RUFAS.input_manager.InputManager.get_data", return_value=tillage_schedule_data) as patched_get_data:
-        actual_tillage_schedule = FieldManager._setup_tillage_schedule("test_tillage_schedule")
-        assert actual_tillage_schedule.generate_tillage_events() == expected_tillage_schedule.generate_tillage_events()
-        patched_get_data.assert_called_once_with("test_tillage_schedule")
+    mock_input_manager.get_data = mock.MagicMock(return_value=tillage_schedule_data)
+    actual_tillage_schedule = FieldManager._setup_tillage_schedule("test_tillage_schedule")
+    assert actual_tillage_schedule.generate_tillage_events() == expected_tillage_schedule.generate_tillage_events()
+    mock_input_manager.get_data.assert_called_once_with("test_tillage_schedule")
+
+    mock_input_manager.get_data = input_manager_original_method_states["get_data"]
 
 
 @pytest.mark.parametrize("crop_schedule_config,expected", [
@@ -388,14 +432,19 @@ def test_setup_tillage_schedule(tillage_schedule_data: Dict, expected_tillage_sc
                       use_heat_scheduling=False, pattern_repeat=0)
          ])
 ])
-def test_crop_schedule_setup(crop_schedule_config: Dict, expected: List[CropSchedule]) -> None:
+def test_crop_schedule_setup(crop_schedule_config: Dict, expected: List[CropSchedule],
+                             mock_input_manager: InputManager,
+                             input_manager_original_method_states: Dict[str, Callable]
+                             ) -> None:
     """Tests that crop schedules are created correctly from the crop schedule configuration passed to it."""
-    with patch("RUFAS.input_manager.InputManager.get_data", return_value=crop_schedule_config) as patched_get_data:
-        actual = FieldManager._setup_crop_schedules("test_crop_schedule")
-        for index in range(len(expected)):
-            assert actual[index].generate_planting_events() == expected[index].generate_planting_events()
-            assert actual[index].generate_harvest_events() == expected[index].generate_harvest_events()
-        patched_get_data.assert_called_once_with("test_crop_schedule.crop_schedules")
+    mock_input_manager.get_data = mock.MagicMock(return_value=crop_schedule_config)
+    actual = FieldManager._setup_crop_schedules("test_crop_schedule")
+    for index in range(len(expected)):
+        assert actual[index].generate_planting_events() == expected[index].generate_planting_events()
+        assert actual[index].generate_harvest_events() == expected[index].generate_harvest_events()
+    mock_input_manager.get_data.assert_called_once_with("test_crop_schedule.crop_schedules")
+
+    mock_input_manager.get_data = input_manager_original_method_states["get_data"]
 
 
 @pytest.mark.parametrize("field_size,top,residue,config,expected", [
@@ -708,18 +757,21 @@ def test_setup_soil_layer_error(config: Dict) -> None:
             ]
     }
 ])
-def test_setup_soil(soil_configuration: Dict) -> None:
+def test_setup_soil(soil_configuration: Dict, mock_input_manager: InputManager,
+                    input_manager_original_method_states: Dict[str, Callable]) -> None:
     """Tests that Soil profiles are setup correctly with data from the InputManager."""
-    with patch("RUFAS.input_manager.InputManager.get_data", return_value=soil_configuration) as patched_get_data:
-        actual_soil = FieldManager._setup_soil("test_soil_setup", 1.0)
-        assert actual_soil.data.second_moisture_condition_parameter == \
-               soil_configuration.get("second_moisture_condition_parameter")
-        assert actual_soil.data.average_subbasin_slope == soil_configuration.get("average_subbasin_slope")
-        assert actual_soil.data.slope_length == soil_configuration.get("slope_length")
-        assert actual_soil.data.manning == soil_configuration.get("manning_roughness_coefficient")
-        assert actual_soil.data.albedo == soil_configuration.get("albedo")
-        assert len(actual_soil.data.soil_layers) == len(soil_configuration.get("soil_layers")) + 1
-        patched_get_data.assert_called_once_with("test_soil_setup")
+    mock_input_manager.get_data = mock.MagicMock(return_value=soil_configuration)
+    actual_soil = FieldManager._setup_soil("test_soil_setup", 1.0)
+    assert actual_soil.data.second_moisture_condition_parameter == \
+           soil_configuration.get("second_moisture_condition_parameter")
+    assert actual_soil.data.average_subbasin_slope == soil_configuration.get("average_subbasin_slope")
+    assert actual_soil.data.slope_length == soil_configuration.get("slope_length")
+    assert actual_soil.data.manning == soil_configuration.get("manning_roughness_coefficient")
+    assert actual_soil.data.albedo == soil_configuration.get("albedo")
+    assert len(actual_soil.data.soil_layers) == len(soil_configuration.get("soil_layers")) + 1
+    mock_input_manager.get_data.assert_called_once_with("test_soil_setup")
+
+    mock_input_manager.get_data = input_manager_original_method_states["get_data"]
 
 
 @pytest.mark.parametrize("soil_configuration,error_message", [
@@ -745,63 +797,16 @@ def test_setup_soil(soil_configuration: Dict) -> None:
          "soil_layers": None
      }, "Configuration for soil layers must be provided.")
 ])
-def test_setup_soil_error(soil_configuration: dict, error_message: str) -> None:
+def test_setup_soil_error(soil_configuration: dict, error_message: str, mock_input_manager: InputManager,
+                          input_manager_original_method_states: Dict[str, Callable]) -> None:
     """Tests that errors are raised correctly when invalid soil configurations are passed."""
-    with pytest.raises(ValueError) as e, \
-            patch("RUFAS.input_manager.InputManager.get_data", return_value=soil_configuration):
+    mock_input_manager.get_data = mock.MagicMock(return_value=soil_configuration)
+
+    with pytest.raises(ValueError) as e:
         FieldManager._setup_soil("soil_config", 1.3)
     assert str(e.value) == error_message
 
-
-@pytest.mark.parametrize("blobs,expected", [
-    ({
-         "tillage_schedule": {
-             "properties": "tillage_schedule_properties"
-         },
-         "field": {
-             "properties": "field_properties"
-         },
-         "weather": {
-             "properties": "weather_properties"
-         }}, ["field"]),
-    ({
-         "tillage_schedule": {
-             "properties": "tillage_schedule_properties"
-         },
-         "field_1": {
-             "properties": "field_properties"
-         },
-         "field_2": {
-             "properties": "field_properties"
-         }}, ["field_1", "field_2"]),
-    ({
-         "tillage_schedule": {
-             "properties": "tillage_schedule_properties"
-         },
-         "weather": {
-             "properties": "weather_properties"
-         }}, []),
-    ({}, [])
-])
-def test_get_field_blob_names(blobs: Dict[str, Dict[str, str]], expected: List[str]) -> None:
-    """Tests that all field blob names are correctly pulled from the InputManager."""
-    with patch("RUFAS.input_manager.InputManager.get_metadata", return_value=blobs):
-        actual = FieldManager._get_field_blob_names()
-        assert actual == expected
-
-
-def test_get_field_blob_names_error() -> None:
-    """Tests that exceptions are correctly raised when metadata does not contain expected values."""
-    with patch("RUFAS.input_manager.InputManager.get_metadata", side_effect=KeyError), \
-            pytest.raises(KeyError) as e:
-        FieldManager._get_field_blob_names()
-    assert str(e.value) == '"Could not find \'files\' section of metadata."'
-
-    with patch("RUFAS.input_manager.InputManager.get_metadata",
-               return_value={"dummy_blob": {"title": "Title", "description": "Described"}}), \
-            pytest.raises(KeyError) as e:
-        FieldManager._get_field_blob_names()
-    assert str(e.value) == '"dummy_blob in metadata did not contain \'properties\' value."'
+    mock_input_manager.get_data = input_manager_original_method_states["get_data"]
 
 
 @pytest.mark.parametrize("field_name,field_config", [
@@ -836,7 +841,8 @@ def test_get_field_blob_names_error() -> None:
         "supplement_manure_nutrient_deficiencies": False
     })
 ])
-def test_setup_field(field_name: str, field_config: Dict) -> None:
+def test_setup_field(field_name: str, field_config: Dict, mock_input_manager: InputManager,
+                     input_manager_original_method_states: Dict[str, Callable]) -> None:
     """Tests that a Field instance is correctly initialized with a given input configuration."""
     mocked_manure_manager = MagicMock(ManureManager)
     mocked_fertilizer_schedule = MagicMock(FertilizerSchedule)
@@ -848,9 +854,10 @@ def test_setup_field(field_name: str, field_config: Dict) -> None:
     mocked_soil_data = MagicMock(SoilData)
     mocked_soil_profile.data = mocked_soil_data
 
-    with patch("RUFAS.input_manager.InputManager.get_data", return_value=field_config) as patched_get_data, \
-            patch("RUFAS.routines.field.manager.field_manager.FieldManager._setup_fertilizer_schedule",
-                  new_callable=MagicMock, return_value=({}, mocked_fertilizer_schedule)) as patched_fertilizer_setup, \
+    mock_input_manager.get_data = mock.MagicMock(return_value=field_config)
+
+    with patch("RUFAS.routines.field.manager.field_manager.FieldManager._setup_fertilizer_schedule",
+               new_callable=MagicMock, return_value=({}, mocked_fertilizer_schedule)) as patched_fertilizer_setup, \
             patch("RUFAS.routines.field.manager.field_manager.FieldManager._setup_manure_schedule",
                   new_callable=MagicMock, return_value=mocked_manure_schedule) as patched_manure_setup, \
             patch("RUFAS.routines.field.manager.field_manager.FieldManager._setup_tillage_schedule",
@@ -878,10 +885,12 @@ def test_setup_field(field_name: str, field_config: Dict) -> None:
         }
         assert new_field.manure_manager == mocked_manure_manager
 
-        patched_get_data.assert_called_once_with(field_name)
+        mock_input_manager.get_data.assert_called_once_with(field_name)
         patched_fertilizer_setup.assert_called_once_with(field_config.get("fertilizer_management_specification"))
         patched_manure_setup.assert_called_once_with(field_config.get("manure_management_specification"))
         patched_tillage_setup.assert_called_once_with(field_config.get("tillage_management_specification"))
         patched_crop_schedules.assert_called_once_with(field_config.get("crop_specification"))
         patched_soil_setup.assert_called_once_with(field_config.get("soil_specification"),
                                                    field_config.get("field_size"))
+
+        mock_input_manager.get_data = input_manager_original_method_states["get_data"]

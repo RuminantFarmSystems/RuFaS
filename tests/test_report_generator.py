@@ -90,9 +90,9 @@ def test_generate_report_vertical_then_horizontal(
         "vertical_aggregation": "sum",
         "horizontal_first": False,
     }
-    assert report_generator.generate_report(sample_filtered_pool, filter_content) == [
-        18
-    ]
+    assert report_generator.generate_report(sample_filtered_pool, filter_content) == {
+        "ver_hor_agg": [18.0]
+    }
 
 
 def test_generate_report_horizontal_then_vertical(
@@ -105,7 +105,9 @@ def test_generate_report_horizontal_then_vertical(
         "vertical_aggregation": "average",
         "horizontal_first": True,
     }
-    assert report_generator.generate_report(sample_filtered_pool, filter_content) == [9]
+    assert report_generator.generate_report(sample_filtered_pool, filter_content) == {
+        "hor_ver_agg": [9.0]
+    }
 
 
 def test_generate_report_only_horizontal(
@@ -116,12 +118,9 @@ def test_generate_report_only_horizontal(
         "variables": ["a", "b"],
         "horizontal_aggregation": "sum",
     }
-    assert report_generator.generate_report(sample_filtered_pool, filter_content) == [
-        3,
-        7,
-        11,
-        15,
-    ]
+    assert report_generator.generate_report(sample_filtered_pool, filter_content) == {
+        "hor_agg": [3, 7, 11, 15]
+    }
 
 
 def test_generate_report_only_vertical(
@@ -132,10 +131,9 @@ def test_generate_report_only_vertical(
         "variables": ["a", "b"],
         "vertical_aggregation": "average",
     }
-    assert report_generator.generate_report(sample_filtered_pool, filter_content) == [
-        4,
-        5,
-    ]
+    assert report_generator.generate_report(sample_filtered_pool, filter_content) == {
+        "ver_agg": [4.0, 5.0]
+    }
 
 
 def test_generate_report_no_aggregation(
@@ -145,8 +143,10 @@ def test_generate_report_no_aggregation(
     filter_content = {
         "variables": ["a", "b"],
     }
-    with pytest.raises(ValueError):
-        report_generator.generate_report(sample_filtered_pool, filter_content)
+    assert report_generator.generate_report(sample_filtered_pool, filter_content) == {
+        "a": [1, 3, 5, 7],
+        "b": [2, 4, 6, 8],
+    }
 
 
 def test_generate_report_invalid_empty_data(report_generator: ReportGenerator) -> None:
@@ -230,13 +230,12 @@ def test_generate_report_with_valid_horizontal_order(
         "horizontal_first": True,
     }
     filter_content["horizontal_order"] = ["a", "b"]
-    assert report_generator.generate_report(sample_filtered_pool, filter_content) == [
-        2.9583333333333335
-    ]
+    assert report_generator.generate_report(sample_filtered_pool, filter_content) == {
+        "hor_ver_agg": [2.9583333333333335]
+    }
     filter_content["horizontal_order"] = ["b", "a"]
-    assert report_generator.generate_report(sample_filtered_pool, filter_content) == [
-        5.676190476190476
-    ]
+    assert report_generator.generate_report(sample_filtered_pool, filter_content) == \
+           {'hor_ver_agg': [5.676190476190476]}
 
 
 @pytest.mark.parametrize(
