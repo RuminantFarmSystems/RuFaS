@@ -1982,7 +1982,7 @@
         "default": [],
         "properties": {
           "type": "string",
-          "pattern": "(liquid|solid)"
+          "pattern": "^(liquid|solid)$"
         }
       },
       "pattern_repeat": {
