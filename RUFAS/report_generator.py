@@ -587,5 +587,3 @@ class ReportGenerator:
             if constant.get("name") in report_data:
                 raise ValueError(f"Constant name {constant.get('name')} already exists in report data.")
             report_data[constant.get("name")] = [constant.get("value")] * max_length
-
-
