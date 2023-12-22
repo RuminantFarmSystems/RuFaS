@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Dict, List, Any, Callable, Optional
+from typing import Dict, List, Any, Callable
 
 from RUFAS.util import Utility
 
@@ -125,223 +125,13 @@ def subtraction_aggregator(data: List[float]) -> float:
     return result
 
 
-SimpleFunc = Callable[[List[float]], float]
-ScalarFunc = Callable[[List[float], float, str], float]
-
-AGGREGATION_FUNCTIONS: Dict[str, SimpleFunc] = {
+AGGREGATION_FUNCTIONS: Dict[str, Callable[[List[float]], float]] = {
     "average": average_aggregator,
     "division": division_aggregator,
     "product": product_aggregator,
     "SD": sd_aggregator,
     "sum": sum_aggregator,
     "subtraction": subtraction_aggregator,
-}
-
-
-def apply_scalar_operation(value: float, constant: float, operation: str) -> float:
-    """
-    Applies a scalar operation to a value and a constant.
-
-    Parameters
-    ----------
-    value : float
-        The value to which the scalar operation is to be applied.
-    constant : float
-        The constant to be used in the scalar operation.
-    operation : str
-        The scalar operation to be applied.
-
-    Returns
-    -------
-    float
-        The result of the scalar operation.
-    """
-
-    if operation == "sum":
-        return value + constant
-    if operation == "subtraction":
-        return value - constant
-    if operation == "product":
-        return value * constant
-    if operation == "division":
-        return value / constant
-    if operation == "exponent":
-        return value ** constant
-    raise ValueError(f"Unsupported scalar operation: {operation}")
-
-
-def average_aggregator_with_scalar_op(data: List[float], scalar: float = 1,
-                                      operation: str = "product") -> float:
-    """
-    Returns the average of a list of numbers after applying a scalar operation to each number.
-
-    Parameters
-    ----------
-    data : List[float]
-        A list of numbers whose average is to be calculated.
-    scalar : float
-        A constant to be used in the scalar operation.
-    operation : str
-        The scalar operation to be applied.
-
-    Returns
-    -------
-    float
-        The average of the input numbers after applying the scalar operation.
-    """
-
-    if not data:
-        return 0
-
-    return sum(apply_scalar_operation(value, scalar, operation) for value in data) / len(data)
-
-
-def division_aggregator_with_scalar_op(data: List[float], scalar: float = 1,
-                                       operation: str = "product") -> Optional[float]:
-    """
-    Returns the result of dividing the first number in the list by the product of the remaining numbers
-    after applying a scalar operation to each number. Returns None for division by zero or if list length is less than 2.
-
-    Parameters
-    ----------
-    data : List[float]
-        A list of numbers for the division operation.
-    scalar : float
-        A constant to be used in the scalar operation.
-    operation : str
-        The scalar operation to be applied.
-
-    Returns
-    -------
-    Optional[float]
-        The result of the division operation, or None if division by zero occurs or list length is less than 2.
-    """
-
-    if len(data) < 2 or 0 in data[1:]:
-        return None
-
-    numerator = apply_scalar_operation(data[0], scalar, operation)
-    denominator = product_aggregator_with_scalar_op(data[1:], scalar, operation)
-
-    if denominator == 0:
-        return None
-
-    return numerator / denominator
-
-
-def product_aggregator_with_scalar_op(data: List[float], scalar: float = 1,
-                                      operation: str = "product") -> float:
-    """
-    Returns the product of a list of numbers after applying a scalar operation to each number.
-
-    Parameters
-    ----------
-    data : List[float]
-        A list of numbers whose product is to be calculated.
-    scalar : float
-        A constant to be used in the scalar operation.
-    operation : str
-        The scalar operation to be applied.
-
-    Returns
-    -------
-    float
-        The product of the input numbers after applying the scalar operation.
-    """
-
-    product = 1
-    for num in data:
-        product *= apply_scalar_operation(num, scalar, operation)
-    return product
-
-
-def sd_aggregator_with_scalar_op(data: List[float], scalar: float = 1,
-                                 operation: str = "product") -> float:
-    """
-    Returns the standard deviation of a list of numbers after applying a scalar operation to each number.
-
-    Parameters
-    ----------
-    data : List[float]
-        A list of numbers whose standard deviation is to be calculated.
-    scalar : float
-        A constant to be used in the scalar operation.
-    operation : str
-        The scalar operation to be applied.
-
-    Returns
-    -------
-    float
-        The standard deviation of the input numbers after applying the scalar operation.
-    """
-
-    if not data:
-        return 0
-
-    mean = average_aggregator_with_scalar_op(data, scalar, operation)
-    return (sum((apply_scalar_operation(x, scalar, operation) - mean) ** 2 for x in data) / len(data)) ** 0.5
-
-
-def sum_aggregator_with_scalar_op(data: List[float], scalar: float = 0,
-                                  operation: str = "add") -> float:
-    """
-    Returns the sum of a list of numbers after applying a scalar operation to each number.
-
-    Parameters
-    ----------
-    data : List[float]
-        A list of numbers whose sum is to be calculated.
-    scalar : float
-        A constant to be used in the scalar operation.
-    operation : str
-        The scalar operation to be applied.
-
-    Returns
-    -------
-    float
-        The sum of the input numbers after applying the scalar operation.
-    """
-
-    return sum(apply_scalar_operation(value, scalar, operation) for value in data)
-
-
-def subtraction_aggregator_with_scalar_op(data: List[float], scalar: float = 0,
-                                          operation: str = "subtract") -> float:
-    """
-    Returns the result of subtracting the product of the remaining numbers from the first number
-    after applying a scalar operation to each number. Returns None if list length is less than 2.
-
-    Parameters
-    ----------
-    data : List[float]
-        A list of numbers for the subtraction operation.
-    scalar : float
-        A constant to be used in the scalar operation.
-    operation : str
-        The scalar operation to be applied.
-
-    Returns
-    -------
-    float
-        The result of the subtraction operation, or None if list length is less than 2.
-    """
-
-    if len(data) < 2:
-        return None
-
-    result = apply_scalar_operation(data[0], scalar, operation)
-    for num in data[1:]:
-        result -= apply_scalar_operation(num, scalar, operation)
-    return result
-
-
-AGGREGATION_FUNCTIONS_WITH_SCALAR_OP: Dict[str, ScalarFunc] = {
-    "average": average_aggregator_with_scalar_op,
-    "division": division_aggregator_with_scalar_op,
-    "product": product_aggregator_with_scalar_op,
-    "SD": sd_aggregator_with_scalar_op,
-    "sum": sum_aggregator_with_scalar_op,
-    "subtraction": subtraction_aggregator_with_scalar_op,
 }
 
 PADDING_METHODS = {
@@ -442,7 +232,68 @@ class ReportGenerator:
             f"Didn't find `horizontal_aggregation` or `vertical_aggregation` in {filter_content.get('name')}."
         )
 
-    def generate_aggregate_report(self, filtered_pool: Dict[str, Dict[str, List[Any]]],
+    def _prepare_report_data(
+            self,
+            filtered_pool: Dict[str, Dict[str, List[Any]]],
+            selected_variables: List[str],
+            slice_start: int,
+            slice_end: int,
+    ) -> Dict[str, List[Any]]:
+        """
+        Processes and structures a filtered data pool for report generation.
+
+        This method organizes data from a filtered pool based on selected variables and slicing parameters.
+        It caters to different data structures within the pool, ensuring data is formatted appropriately
+        for report inclusion.
+
+        Parameters
+        ----------
+        filtered_pool : Dict[str, pool_element_type]
+            The filtered data pool with each key mapping to its respective data element.
+
+        selected_variables : List[str]
+            Variables to be included from the filtered pool.
+
+        slice_start : int
+            Starting index for slicing data elements.
+
+        slice_end : int
+            Ending index for slicing.
+
+        Returns
+        -------
+        Dict[str, List[Any]]
+            Processed data suitable for report generation, keyed by selected variables.
+
+        Raises
+        ------
+        KeyError
+            If selected_variables is None and the data within the pool requires variable selection.
+        """
+        report_data: Dict[str, List[Any]] = {}
+        for key in filtered_pool.keys():
+            is_data_in_dict = isinstance(filtered_pool[key]["values"][0], dict)
+            if is_data_in_dict and selected_variables is None:
+                raise KeyError(
+                    "Can't generate report, use 'variables' arg to select items from data"
+                )
+            if is_data_in_dict:
+                temp_data = Utility.convert_list_of_dicts_to_dict_of_lists(
+                    filtered_pool[key]["values"][slice_start:slice_end]
+                )
+                for temp_key, temp_values in temp_data.items():
+                    if temp_key not in selected_variables:
+                        continue
+                    if temp_key in report_data:
+                        report_data[temp_key].extend(temp_values)
+                    else:
+                        report_data[temp_key] = temp_values
+            else:
+                report_data[key] = filtered_pool[key]["values"][slice_start:slice_end]
+        return report_data
+
+    @staticmethod
+    def generate_aggregate_report(filtered_pool: Dict[str, Dict[str, List[Any]]],
                                   filter_content: Dict[str, Any]) -> List[float]:
         """
         Generates a report based on filtered data and aggregation criteria, including scalar operations and constants.
@@ -460,252 +311,55 @@ class ReportGenerator:
             The aggregated report data as a list.
         """
 
-        report_data = self._prepare_report_data(
-            filtered_pool,
-            selected_variables=filter_content.get("variables"),
-            slice_start=filter_content.get("slice_start", 0),
-            slice_end=filter_content.get("slice_end"),
-        )
+        report_data = ReportGenerator._prepare_report_data_with_constants(filtered_pool, filter_content)
         if not report_data:
-            raise ValueError(f"No data to aggregate from the filtered pool.")
+            raise ValueError(
+                f"filter {filter_content.get('filters')} in {filter_content.get('name')} led to empty report data."
+            )
 
-        self._apply_padding_if_specified(report_data, filter_content)
-
-        horizontal_results = self._process_horizontal_aggregation(report_data, filter_content)
-        vertical_results = self._process_vertical_aggregation(report_data, filter_content)
-
-        return self._finalize_aggregation(horizontal_results, vertical_results, filter_content)
-
-    @staticmethod
-    def _apply_padding_if_specified(report_data: Dict[str, List[float]],
-                                    filter_content: Dict[str, Any]) -> None:
-        """
-        Checks if padding is specified in filter_content and apply it to report_data if so.
-
-        Parameters
-        ----------
-        report_data : Dict[str, List[float]]
-            The data pool to be aggregated, structured as a dictionary of lists.
-        filter_content : Dict[str, Any]
-            A dictionary containing filter criteria, aggregation instructions, and scalar operation details.
-
-        Returns
-        -------
-        None
-        """
-
-        padding_config = filter_content.get("padding", {})
-        if padding_config:
-            ReportGenerator._apply_padding(report_data.values(), padding_config)
-
-    def _process_horizontal_aggregation(self, report_data: Dict[str, List[float]],
-                                        filter_content: Dict[str, Any]) -> List[float] | None:
-        """
-        Checks if horizontal aggregation is specified in filter_content and apply it to report_data if so.
-
-        Parameters
-        ----------
-        report_data : Dict[str, List[float]]
-            The data pool to be aggregated, structured as a dictionary of lists.
-        filter_content : Dict[str, Any]
-            A dictionary containing filter criteria, aggregation instructions, and scalar operation details.
-
-        Returns
-        -------
-        List[float] | None
-            The horizontally aggregated data as a list.
-
-        Raises
-        ------
-        ValueError
-            If the horizontal aggregation type specified in filter_content is not supported.
-        """
+        ReportGenerator._apply_padding(report_data.values(), filter_content.get("padding", {}))
 
         horizontal_agg_key = filter_content.get("horizontal_aggregation")
-        if not horizontal_agg_key:
-            return None
-
-        horizontal_aggregator = AGGREGATION_FUNCTIONS_WITH_SCALAR_OP.get(horizontal_agg_key)
-        if not horizontal_aggregator:
+        if horizontal_agg_key and horizontal_agg_key not in AGGREGATION_FUNCTIONS:
             raise ValueError(f"Unsupported horizontal aggregation type: {horizontal_agg_key}")
 
-        loop_list = filter_content.get("horizontal_order", report_data.keys())
-        return self._apply_horizontal_aggregation(
-            report_data, loop_list, horizontal_aggregator,
-            filter_content.get("horizontal_constant", 1),
-            filter_content.get("horizontal_scalar_operation", "product")
-        )
-
-    def _process_vertical_aggregation(self, report_data: Dict[str, List[float]],
-                                      filter_content: Dict[str, Any]) -> List[float] | None:
-        """
-        Checks if vertical aggregation is specified in filter_content and perform it if so.
-
-        Parameters
-        ----------
-        report_data : Dict[str, List[float]]
-            The data pool to be aggregated, structured as a dictionary of lists.
-        filter_content : Dict[str, Any]
-            A dictionary containing filter criteria, aggregation instructions, and scalar operation details.
-
-        Returns
-        -------
-        List[float] | None
-            The vertically aggregated data as a list.
-
-        Raises
-        ------
-        ValueError
-            If the vertical aggregation type specified in filter_content is not supported.
-        """
-
         vertical_agg_key = filter_content.get("vertical_aggregation")
-        if not vertical_agg_key:
-            return None
-
-        vertical_aggregator = AGGREGATION_FUNCTIONS_WITH_SCALAR_OP.get(vertical_agg_key)
-        if not vertical_aggregator:
+        if vertical_agg_key and vertical_agg_key not in AGGREGATION_FUNCTIONS:
             raise ValueError(f"Unsupported vertical aggregation type: {vertical_agg_key}")
 
-        return self._apply_vertical_aggregation(
-            report_data, vertical_aggregator,
-            filter_content.get("vertical_constant", 1),
-            filter_content.get("vertical_scalar_operation", "product")
-        )
+        horizontally_aggregated = None
+        vertically_aggregated = None
+        horizontal_aggregator = None
+        vertical_aggregator = None
 
-    @staticmethod
-    def _finalize_aggregation(horizontal_results: List[float] | None,
-                              vertical_results: List[float] | None,
-                              filter_content: Dict[str, Any]) -> List[float]:
-        """
-        Finalizes aggregation by applying the appropriate aggregation function to the horizontal and vertical results.
+        if horizontal_agg_key:
+            horizontal_aggregator = AGGREGATION_FUNCTIONS.get(horizontal_agg_key)
+            loop_list = filter_content.get("horizontal_order", report_data.keys())
+            horizontally_aggregated = ReportGenerator._apply_horizontal_aggregation(report_data, loop_list,
+                                                                                    horizontal_aggregator)
 
-        Parameters
-        ----------
-        horizontal_results : List[float] | None
-            The results of horizontal aggregation.
-        vertical_results : List[float] | None
-            The results of vertical aggregation.
-        filter_content : Dict[str, Any]
-            A dictionary containing filter criteria, aggregation instructions, and scalar operation details.
+        if vertical_agg_key:
+            vertical_aggregator = AGGREGATION_FUNCTIONS.get(vertical_agg_key)
+            vertically_aggregated = ReportGenerator._apply_vertical_aggregation(report_data, vertical_aggregator)
 
-        Returns
-        -------
-        List[float]
-            The aggregated report data as a list.
-
-        Raises
-        ------
-        ValueError
-            If no valid aggregation type is found in filter_content.
-        """
-
-        if horizontal_results is not None and vertical_results is not None:
+        if horizontal_agg_key and vertical_agg_key:
             horizontal_first = filter_content.get("horizontal_first", True)
-            horizontal_aggregator = AGGREGATION_FUNCTIONS_WITH_SCALAR_OP.get(
-                filter_content.get("horizontal_aggregation"))
-            vertical_aggregator = AGGREGATION_FUNCTIONS_WITH_SCALAR_OP.get(
-                filter_content.get("vertical_aggregation"))
             if horizontal_first:
-                return [vertical_aggregator(horizontal_results, filter_content.get("vertical_constant", 1),
-                                            filter_content.get("vertical_scalar_operation", "product"))]
-            else:
-                return [horizontal_aggregator(vertical_results, filter_content.get("horizontal_constant", 1),
-                                              filter_content.get("horizontal_scalar_operation", "product"))]
+                return [vertical_aggregator(horizontally_aggregated)]
+            return [horizontal_aggregator(vertically_aggregated)]
 
-        if horizontal_results is not None:
-            return horizontal_results
+        if horizontal_agg_key:
+            return horizontally_aggregated
 
-        if vertical_results is not None:
-            return vertical_results
+        if vertical_agg_key:
+            return vertically_aggregated
 
-        raise ValueError("No valid aggregation type found in filter_content.")
-
-    # def generate_aggregate_report2(
-    #         self,
-    #         filtered_pool: Dict[str, Dict[str, List[Any]]],
-    #         filter_content: Dict[str, Any]
-    # ) -> List[float]:
-    #     """
-    #     Generates a report based on filtered data and aggregation criteria, including scalar operations and constants.
-    #
-    #     Parameters
-    #     ----------
-    #     filtered_pool : Dict[str, Dict[str, List[Any]]]
-    #         The data pool from which the report is to be generated, structured as a dictionary.
-    #     filter_content : Dict[str, Any]
-    #         A dictionary containing filter criteria, aggregation instructions, and scalar operation details.
-    #
-    #     Returns
-    #     -------
-    #     List[float]
-    #         The aggregated report data as a list.
-    #     """
-    #
-    #     report_data = self._prepare_report_data(
-    #         filtered_pool,
-    #         selected_variables=filter_content.get("variables"),
-    #         slice_start=filter_content.get("slice_start", 0),
-    #         slice_end=filter_content.get("slice_end"),
-    #     )
-    #     if not report_data:
-    #         raise ValueError(
-    #             f"filter {filter_content.get('filters')} in {filter_content.get('name')} led to empty report data."
-    #         )
-    #
-    #     padding_config = filter_content.get("padding", {})
-    #     if padding_config:
-    #         ReportGenerator._apply_padding(report_data.values(), padding_config)
-    #
-    #     horizontal_scalar = filter_content.get("horizontal_constant", 1)
-    #     horizontal_operation = filter_content.get("horizontal_scalar_operation", "product")
-    #     vertical_scalar = filter_content.get("vertical_constant", 1)
-    #     vertical_operation = filter_content.get("vertical_scalar_operation", "product")
-    #
-    #     horizontal_agg_key = filter_content.get("horizontal_aggregation")
-    #     vertical_agg_key = filter_content.get("vertical_aggregation")
-    #
-    #     horizontally_aggregated = None
-    #     vertically_aggregated = None
-    #     horizontal_aggregator = None
-    #     vertical_aggregator = None
-    #
-    #     if horizontal_agg_key:
-    #         horizontal_aggregator = AGGREGATION_FUNCTIONS_WITH_SCALAR_OP.get(horizontal_agg_key)
-    #         if not horizontal_aggregator:
-    #             raise ValueError(f"Unsupported horizontal aggregation type: {horizontal_agg_key}")
-    #
-    #         loop_list = filter_content.get("horizontal_order", report_data.keys())
-    #         horizontally_aggregated = self._apply_horizontal_aggregation(
-    #             report_data, loop_list, horizontal_aggregator, horizontal_scalar, horizontal_operation)
-    #
-    #     if vertical_agg_key:
-    #         vertical_aggregator = AGGREGATION_FUNCTIONS_WITH_SCALAR_OP.get(vertical_agg_key)
-    #         if not vertical_aggregator:
-    #             raise ValueError(f"Unsupported vertical aggregation type: {vertical_agg_key}")
-    #
-    #         vertically_aggregated = self._apply_vertical_aggregation(
-    #             report_data, vertical_aggregator, vertical_scalar, vertical_operation)
-    #
-    #     if horizontal_agg_key and vertical_agg_key:
-    #         horizontal_first = filter_content.get("horizontal_first", True)
-    #         if horizontal_first:
-    #             return [vertical_aggregator(horizontally_aggregated, vertical_scalar, vertical_operation)]
-    #         return [horizontal_aggregator(vertically_aggregated, horizontal_scalar, horizontal_operation)]
-    #
-    #     if horizontal_agg_key:
-    #         return horizontally_aggregated
-    #
-    #     if vertical_agg_key:
-    #         return vertically_aggregated
-    #
-    #     raise ValueError(
-    #         f"Didn't find `horizontal_aggregation` or `vertical_aggregation` in {filter_content.get('name')}.")
+        raise ValueError(
+            f"Didn't find `horizontal_aggregation` or `vertical_aggregation` in {filter_content.get('name')}.")
 
     @staticmethod
     def _apply_horizontal_aggregation(report_data: Dict[str, List[float]], loop_list: List[str],
-                                      aggregator: Callable[[List[float], float, str], float],
-                                      scalar: float, operation: str) -> List[float]:
+                                      aggregator: Callable[[List[float]], float]) -> List[float]:
         """
         Performs horizontal aggregation on report data using a specified aggregator function.
 
@@ -717,29 +371,32 @@ class ReportGenerator:
             List of keys indicating the order in which to aggregate data.
         aggregator : Callable[[List[float], float, str], float]
             The aggregation function to be used.
-        scalar : float
-            A constant to be used in the scalar operation.
-        operation : str
-            The scalar operation to be applied.
 
         Returns
         -------
         List[float]
             The horizontally aggregated data as a list.
+
+        Raises
+        ------
+        ValueError
+            If the data to be aggregated has different lengths.
         """
 
-        number_of_elements = len(report_data[next(iter(report_data))])
+        lengths = [len(report_data[key]) for key in loop_list]
+        if len(set(lengths)) != 1:
+            raise ValueError("Can't aggregate data with different lengths")
+        max_length = max(lengths)
         aggregated_data = []
-        for i in range(number_of_elements):
+        for i in range(max_length):
             temp_data = [report_data[key][i] for key in loop_list]
             filtered_temp_data = list(filter(None.__ne__, temp_data))
-            aggregated_data.append(aggregator(filtered_temp_data, scalar, operation))
+            aggregated_data.append(aggregator(filtered_temp_data))
         return aggregated_data
 
     @staticmethod
     def _apply_vertical_aggregation(report_data: Dict[str, List[float]],
-                                    aggregator: ScalarFunc,
-                                    scalar: float, operation: str) -> List[float]:
+                                    aggregator: Callable[[List[float]], float]) -> List[float]:
         """
         Performs vertical aggregation on report data using a specified aggregator function.
 
@@ -749,10 +406,6 @@ class ReportGenerator:
             The data pool to be aggregated, structured as a dictionary of lists.
         aggregator : Callable[[List[float], float, str], float]
             The aggregation function to be used.
-        scalar : float
-            A constant to be used in the scalar operation.
-        operation : str
-            The scalar operation to be applied.
 
         Returns
         -------
@@ -763,7 +416,7 @@ class ReportGenerator:
         aggregated_data = []
         for _, data in report_data.items():
             filtered_data = list(filter(None.__ne__, data))
-            aggregated_data.append(aggregator(filtered_data, scalar, operation))
+            aggregated_data.append(aggregator(filtered_data))
         return aggregated_data
 
     @staticmethod
@@ -841,13 +494,9 @@ class ReportGenerator:
         remaining_elements = length - len(lst)
         lst.extend(lst[:remaining_elements])
 
-    def _prepare_report_data(
-            self,
-            filtered_pool: Dict[str, Dict[str, List[Any]]],
-            selected_variables: List[str],
-            slice_start: int,
-            slice_end: int,
-    ) -> Dict[str, List[Any]]:
+    @staticmethod
+    def _prepare_report_data_with_constants(filtered_pool: Dict[str, Dict[str, List[Any]]],
+                                            filter_content: Dict[str, Any]) -> Dict[str, List[Any]]:
         """
         Processes and structures a filtered data pool for report generation.
 
@@ -860,14 +509,8 @@ class ReportGenerator:
         filtered_pool : Dict[str, pool_element_type]
             The filtered data pool with each key mapping to its respective data element.
 
-        selected_variables : List[str]
-            Variables to be included from the filtered pool.
-
-        slice_start : int
-            Starting index for slicing data elements.
-
-        slice_end : int
-            Ending index for slicing.
+        filter_content : Dict[str, Any]
+            A dictionary containing filter criteria, aggregation instructions, and scalar operation details.
 
         Returns
         -------
@@ -879,7 +522,12 @@ class ReportGenerator:
         KeyError
             If selected_variables is None and the data within the pool requires variable selection.
         """
+
+        selected_variables = filter_content.get("variables")
+        slice_start = filter_content.get("slice_start", 0)
+        slice_end = filter_content.get("slice_end")
         report_data: Dict[str, List[Any]] = {}
+
         for key in filtered_pool.keys():
             is_data_in_dict = isinstance(filtered_pool[key]["values"][0], dict)
             if is_data_in_dict and selected_variables is None:
@@ -899,4 +547,51 @@ class ReportGenerator:
                         report_data[temp_key] = temp_values
             else:
                 report_data[key] = filtered_pool[key]["values"][slice_start:slice_end]
+
+        ReportGenerator._add_constants_data(report_data, filter_content)
+
         return report_data
+
+    @staticmethod
+    def _add_constants_data(report_data: Dict[str, List[Any]],
+                            filter_content: Dict[str, Any]) -> None:
+        """
+        Add constants to the report data.
+
+        Notes
+        -----
+        An example of a configuration for constants:
+            "constants": [
+                {
+                  "name": "Kilograms to Pounds",
+                  "value": 2.20462
+                },
+                {
+                  "name": "Pounds to Dollars",
+                  "value": 10
+                }
+            ]
+
+        Parameters
+        ----------
+        report_data : Dict[str, List[Any]]
+            The data to which constants need to be added.
+        filter_content : Dict[str, Any]
+            A dictionary containing filter criteria, aggregation instructions, and scalar operation details.
+
+        Returns
+        -------
+        None
+        """
+
+        constant_config = filter_content.get("constants")
+        if not constant_config:
+            return
+
+        max_length = max([len(lst) for lst in report_data.values()])
+        for constant in constant_config:
+            if constant.get("name") in report_data:
+                raise ValueError(f"Constant name {constant.get('name')} already exists in report data.")
+            report_data[constant.get("name")] = [constant.get("value")] * max_length
+
+

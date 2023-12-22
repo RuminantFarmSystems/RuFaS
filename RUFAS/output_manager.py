@@ -116,11 +116,11 @@ class OutputManager(object):
         return {"info_maps": info_maps, "values": values}
 
     def _add_to_pool(
-        self,
-        pool: Dict[str, pool_element_type],
-        key: str,
-        value: Any,
-        info_map: Dict[str, Any],
+            self,
+            pool: Dict[str, pool_element_type],
+            key: str,
+            value: Any,
+            info_map: Dict[str, Any],
     ) -> None:
         """Adds value and info map at key in the given pool."""
         key_not_exists_in_pool = pool.get(key) is None
@@ -132,10 +132,10 @@ class OutputManager(object):
         reduced_info_map = {
             k: info_map[k]
             for k in info_map.keys()
-            - {
-                "class",
-                "function",
-            }
+                     - {
+                         "class",
+                         "function",
+                     }
         }
         pool[key]["info_maps"].append(reduced_info_map)
 
@@ -259,7 +259,7 @@ class OutputManager(object):
         self._handle_log_output(name, msg, info_map, LogVerbosity.ERRORS)
 
     def _handle_log_output(
-        self, name: str, msg: str, info_map: Dict[str, Any], log_level: LogVerbosity
+            self, name: str, msg: str, info_map: Dict[str, Any], log_level: LogVerbosity
     ) -> None:
         """Formats log output based on log_level.
 
@@ -349,7 +349,7 @@ class OutputManager(object):
             prefix = info_map.get("prefix") + "."
         elif not info_map.get("suppress_prefix", False):
             prefix = (
-                self._get_prefix(info_map.get("class"), info_map.get("function")) + "."
+                    self._get_prefix(info_map.get("class"), info_map.get("function")) + "."
             )
 
         suffix = (
@@ -422,7 +422,7 @@ class OutputManager(object):
             raise e
 
     def _dict_to_csv_column_list(
-        self, variable_name: str, data_dict: Dict[str, List[Any]]
+            self, variable_name: str, data_dict: Dict[str, List[Any]]
     ) -> List[pd.Series]:
         """Turns a dictionary to a list of csv columns.
 
@@ -543,7 +543,7 @@ class OutputManager(object):
         return f"{self.__metadata_prefix}_{base_name}_{timestamp}.{extension}"
 
     def _exclude_info_maps(
-        self, pool: Dict[str, pool_element_type]
+            self, pool: Dict[str, pool_element_type]
     ) -> Dict[str, pool_element_type]:
         """Makes a copy of the given pool and removes info_maps from it.
 
@@ -577,8 +577,8 @@ class OutputManager(object):
             for filename in all_files:
                 if filename.endswith(".txt") or filename.endswith(".json"):
                     for (
-                        _,
-                        supported_prefix,
+                            _,
+                            supported_prefix,
                     ) in self.__supported_filter_types_prefixes.items():
                         if filename.startswith(supported_prefix):
                             break
@@ -682,7 +682,7 @@ class OutputManager(object):
             raise
 
     def _filter_variables_pool(
-        self, filter_patterns: List[str], input_file_name: Optional[str]
+            self, filter_patterns: List[str], input_file_name: Optional[str]
     ) -> Dict[str, pool_element_type]:
         """
         Returns a filtered variables pool based on either inclusion or exclusion.
@@ -716,8 +716,8 @@ class OutputManager(object):
         exclude_keyword_location = 0
         exclude_keyword = "exclude"
         filter_by_exclusion = (
-            filter_patterns
-            and filter_patterns[exclude_keyword_location] == exclude_keyword
+                filter_patterns
+                and filter_patterns[exclude_keyword_location] == exclude_keyword
         )
         if filter_by_exclusion:
             filter_vars_msg = (
@@ -748,13 +748,13 @@ class OutputManager(object):
         return filter_pattern_matches
 
     def save_results(
-        self,
-        save_path: Path,
-        filters_dir_path: Path,
-        exclude_info_maps: bool,
-        produce_graphics: bool,
-        graphics_dir: Path,
-        csv_dir: Path
+            self,
+            save_path: Path,
+            filters_dir_path: Path,
+            exclude_info_maps: bool,
+            produce_graphics: bool,
+            graphics_dir: Path,
+            csv_dir: Path
     ) -> None:
         """
         Reads a text file containing a list of keys and filters the variables pool by those keys.
@@ -798,8 +798,8 @@ class OutputManager(object):
             for filter_content in filter_contents:
                 info_map["filter_content"] = filter_content
                 if (
-                    not isinstance(filter_content, dict)
-                    or ("filters" not in filter_content.keys() and "references" not in filter_content.keys())
+                        not isinstance(filter_content, dict)
+                        or ("filters" not in filter_content.keys() and "cross_references" not in filter_content.keys())
                 ):
                     self.add_error(
                         "Parsing error",
@@ -820,7 +820,7 @@ class OutputManager(object):
                     filtered_pool = self._exclude_info_maps(filtered_pool)
 
                 if filter_file.startswith(
-                    self.__supported_filter_types_prefixes["report"]
+                        self.__supported_filter_types_prefixes["report"]
                 ):
                     self._handle_report_generation(filter_content, filtered_pool, info_map, reports)
                 else:
@@ -845,11 +845,7 @@ class OutputManager(object):
                                   info_map: Dict[str, Any],
                                   reports: Dict[str, Dict[str, List[Any]]]) -> None:
         """
-        Handles the generation of individual and derived reports based on the provided filter content.
-
-        This method determines whether to generate a standard report (using 'filtered_pool') or
-        a derived report (using 'references'). It then invokes the appropriate method of the
-        ReportGenerator to create the report and stores the result in the 'reports' dictionary.
+        Handles the generation of reports based on the provided filter content.
 
         Parameters
         ----------
@@ -858,8 +854,7 @@ class OutputManager(object):
             such as 'name', 'filters', 'references', and aggregation instructions.
 
         filtered_pool : Optional[Dict[str, Any]]
-            The data pool from which standard reports are to be generated. This parameter
-            is used for standard reports and is None for derived reports.
+            The data pool from which reports are generated.
 
         info_map : Dict[str, Any]
             A dictionary containing logging information such as the class and function names.
@@ -878,9 +873,9 @@ class OutputManager(object):
         try:
             report_name = self._generate_unique_report_name(filter_content, reports)
 
-            if "references" in filter_content.keys():
-                self._check_for_missing_references(filter_content["references"], reports)
-                reference_data = {ref: reports[ref] for ref in filter_content["references"]}
+            if "cross_references" in filter_content.keys():
+                self._check_for_missing_references(filter_content["cross_references"], reports)
+                reference_data = {ref: reports[ref] for ref in filter_content["cross_references"]}
                 filtered_pool.update(reference_data)
 
             report_data = report_generator.generate_aggregate_report(filtered_pool, filter_content)
@@ -937,14 +932,14 @@ class OutputManager(object):
             raise KeyError(f"Missing referenced reports: {', '.join(missing_references)}")
 
     def _route_save_functions(
-        self,
-        filter_file: str,
-        save_path: Path,
-        filtered_pool: Dict[str, pool_element_type],
-        produce_graphics: bool,
-        filter_content: Dict[str, str | int],
-        graphics_dir: Path,
-        csv_dir: Path
+            self,
+            filter_file: str,
+            save_path: Path,
+            filtered_pool: Dict[str, pool_element_type],
+            produce_graphics: bool,
+            filter_content: Dict[str, str | int],
+            graphics_dir: Path,
+            csv_dir: Path
     ) -> None:
         """
         Checks the prefix of the filter_file to determine the format for saving. It then delegates the
@@ -1035,10 +1030,10 @@ class OutputManager(object):
         self._dict_to_file_json(self.errors_pool, file_path)
 
     def dump_variable_names_and_contexts(  # noqa: C901
-        self,
-        path: str,
-        exclude_info_maps: bool,
-        format_option: str,
+            self,
+            path: str,
+            exclude_info_maps: bool,
+            format_option: str,
     ) -> None:
         """
         Dumps names of all variables added to variables_pool along with the caller class
@@ -1124,10 +1119,10 @@ class OutputManager(object):
         self._list_to_file_txt(var_list, file_path)
 
     def dump_all_nondata_pools(
-        self,
-        path: str,
-        exclude_info_maps: bool,
-        format_option: str,
+            self,
+            path: str,
+            exclude_info_maps: bool,
+            format_option: str,
     ) -> None:
         """
         Dumps all non-data pools into the given path to a directory.

@@ -1,21 +1,42 @@
 {
   "multiple": [
     {
-      "name": "Last Year's Average Daily Milk Production",
-      "filters": [
-        "LifeCycleManager.daily_update.daily_milk_production"
-      ],
-      "vertical_aggregation": "average",
-      "slice_start": -365
-    },
-    {
       "name": "Last Year's Average Cow Body Weight (lbs)",
       "filters": [
         "LifeCycleManager.daily_update.avg_cow_body_weight"
       ],
+      "constants": [
+        {
+          "name": "Kilograms to Pounds",
+          "value": 2.20462
+        },
+        {
+          "name": "Some Adjustment Factor",
+          "value": 0.90
+        }
+      ],
+      "horizontal_aggregation": "product",
+      "horizontal_order": [
+        "LifeCycleManager.daily_update.avg_cow_body_weight",
+        "Kilograms to Pounds",
+        "Some Adjustment Factor"
+      ],
+      "slice_start": -365
+    },
+    {
+      "name": "Last Year's Average Daily Milk Production (gallons)",
+      "filters": [
+        "LifeCycleManager.daily_update.daily_milk_production"
+      ],
+      "constants": [
+        {
+          "name": "Liters to Gallons",
+          "value": 0.264172
+        }
+      ],
+      "horizontal_aggregation": "product",
+      "horizontal_first": true,
       "vertical_aggregation": "average",
-      "vertical_constant": 2.20462,
-      "vertical_scalar_operation": "product",
       "slice_start": -365
     },
     {
@@ -27,9 +48,9 @@
       "slice_start": -365
     },
     {
-      "name": "Last Year's Milk Production per Cow",
-      "references": [
-        "Last Year's Average Daily Milk Production",
+      "name": "Last Year's Milk Production per Cow (gallons)",
+      "cross_references": [
+        "Last Year's Average Daily Milk Production (gallons)",
         "Last Year's Average Number of Milking Cows"
       ],
       "horizontal_aggregation": "division"
@@ -43,7 +64,7 @@
       ],
       "vertical_aggregation": "sum",
       "horizontal_aggregation": "sum",
-      "horizontal_first": true,
+      "horizontal_first": false,
       "slice_start": -180
     },
     {
