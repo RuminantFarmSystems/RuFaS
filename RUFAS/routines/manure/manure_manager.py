@@ -225,7 +225,7 @@ class ManureManager:
             info_maps={
                 "class": self.__class__.__name__,
                 "function": self.daily_update.__name__,
-                "prefix": "ManureNutrients",
+                "prefix": "ManureNutrientsLiquid",
             }
         )
         ManureModuleOutputManagerHelper.add_dataclass_object(
@@ -233,7 +233,7 @@ class ManureManager:
             info_maps={
                 "class": self.__class__.__name__,
                 "function": self.daily_update.__name__,
-                "prefix": "ManureNutrients",
+                "prefix": "ManureNutrientsSolid",
             }
         )
 
