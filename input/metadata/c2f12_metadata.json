@@ -3,14 +3,14 @@
     "config": {
       "title": "Config Data",
       "description": "Configuration Information for farm 12",
-      "path": "input/data/config/cohort2_farm12_config.json",
+      "path": "input/data/config/pilot_testing_config.json",
       "type": "json",
       "properties": "config_properties"
     },
     "animal": {
       "title": "Animal data",
       "description": "Moo Moo!",
-      "path": "input/data/animal/cohort2_farm12_animal.json",
+      "path": "input/data/animal/c2f12_animal.json",
       "type": "json",
       "properties": "animal_properties"
     },
@@ -73,7 +73,7 @@
     "manure_management": {
       "title": "Manure data",
       "description": "You thought it's a waste, but those crops need to eat as well",
-      "path": "input/data/manure/cohort2_farm12_manure_management.json",
+      "path": "input/data/manure/c2f12_manure_management.json",
       "type": "json",
       "properties": "manure_management_properties"
     },
