@@ -52,7 +52,7 @@
     "feed": {
       "title": "Feed data",
       "description": "Those cows need to eat!",
-      "path": "input/data/feed/feed_NE_Diet_15.json",
+      "path": "input/data/feed/c2f12_feed.json",
       "type": "json",
       "properties": "feed_properties"
     },
