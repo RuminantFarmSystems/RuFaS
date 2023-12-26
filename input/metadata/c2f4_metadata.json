@@ -3,14 +3,14 @@
     "config": {
       "title": "Config Data",
       "description": "Configuration Information for farm 4",
-      "path": "input/data/config/cohort2_farm4_config.json",
+      "path": "input/data/config/pilot_testing_config.json",
       "type": "json",
       "properties": "config_properties"
     },
     "animal": {
       "title": "Animal data",
       "description": "The animal information for farm 4",
-      "path": "input/data/animal/cohort2_farm4_animal.json",
+      "path": "input/data/animal/c2f4_animal.json",
       "type": "json",
       "properties": "animal_properties"
     },
@@ -52,7 +52,7 @@
     "feed": {
       "title": "Feed data",
       "description": "Diet Information for farm 4",
-      "path": "input/data/feed/cohort2_farm4_diet.json",
+      "path": "input/data/feed/c2f4_feed.json",
       "type": "json",
       "properties": "feed_properties"
     },
@@ -73,7 +73,7 @@
     "manure_management": {
       "title": "Manure data",
       "description": "Manure information for farm 4",
-      "path": "input/data/manure/cohort2_farm4_manure_management.json",
+      "path": "input/data/manure/c2f4_manure_management.json",
       "type": "json",
       "properties": "manure_management_properties"
     },
