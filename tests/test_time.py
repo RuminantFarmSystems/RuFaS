@@ -9,15 +9,22 @@ from RUFAS.time import Time
 def mock_config() -> Config:
     config = MagicMock(Config)
     setattr(config, "start_year", 1999)
-    setattr(config, "years", [[1]])
+    setattr(config, "years", [[None, 1]])
     setattr(config, "leap_year_length", 366)
     setattr(config, "year_length", 365)
     return config
 
 
-def test_time_initialization() -> None:
+def test_time_initialization(mock_config: Config) -> None:
     """Tests that Time instances are created correctly."""
-    pass
+    time = Time(mock_config)
+    assert time.start_year == 1999 and time.calendar_year == 1999
+    assert time.leap_year_length == 366
+    assert time.year_length == 365
+    assert time.day == 1
+    assert time.index == 0
+    assert time.year == 1
+    assert time.years == [[None, 1]]
 
 
 def test_to_str() -> None:

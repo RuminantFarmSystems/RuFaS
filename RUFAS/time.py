@@ -17,11 +17,11 @@ class Time:
 
         calendar_year: int = config.start_year
         # number of years
-        years: List[int] = config.years
+        years: list[list[int]] = config.years
 
         self.start_year: int = calendar_year
         self.calendar_year: int = calendar_year
-        self.years: List[int] = years
+        self.years: list[list[int]] = years
         self.year: int = 1  # current year
         self.leap_year_length: int = config.leap_year_length
         self.year_length: int = config.year_length
