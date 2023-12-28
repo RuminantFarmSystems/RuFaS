@@ -1,4 +1,5 @@
 from .storage import Storage
+from .enums import CropCategory
 from typing import Optional
 
 
@@ -8,6 +9,15 @@ class Sileage(Storage):
 
     Methods are placeholders as per the design document and are to be implemented.
     """
+
+    def __init__(self, capacity: float = float("inf")):
+        super().__init__(capacity)
+        self.acceptable_crops = [
+            CropCategory.ALFALFA,
+            CropCategory.CORN,
+            CropCategory.GRASS,
+            CropCategory.SMALL_GRAIN,
+        ]
 
     def calculate_protein_loss(self):
         """
