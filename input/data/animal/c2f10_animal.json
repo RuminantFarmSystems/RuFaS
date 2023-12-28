@@ -5,7 +5,7 @@
 		"heiferII_num":1747,
 		"heiferIII_num_springers":230,
 		"cow_num":3500,
-		"replace_num"14000,
+		"replace_num":14000,
 		"herd_num":3500,
 		"herd_init": false,
 		"breed": "JE"
