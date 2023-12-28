@@ -1,37 +1,37 @@
 {
   "herd_information": {
-    "calf_num": 8,
-    "heiferI_num": 44,
-    "heiferII_num": 38,
-    "heiferIII_num_springers": 5,
-    "cow_num": 100,
-    "replace_num": 500,
-    "herd_num": 100,
+    "calf_num": 656,
+    "heiferI_num": 3609,
+    "heiferII_num": 3117,
+    "heiferIII_num_springers": 410,
+    "cow_num": 8202,
+    "replace_num": 41010,
+    "herd_num": 8202,
     "herd_init": false,
     "breed": "HO"
   },
   "herd_initialization": {
-    "initial_animal_num": 10000,
+    "initial_animal_num": 820200,
     "simulation_days": 5000
   },
   "animal_config": {
     "management_decisions": {
-      "breeding_start_day_h": 380,
-      "heifer_repro_method": "TAI",
-      "cow_repro_method": "TAI",
-      "semen_type": "conventional",
-      "days_in_preg_when_dry": 218,
-      "heifer_repro_cull_time": 500,
-      "do_not_breed_time": 185,
-      "cull_milk_production": 30,
-      "cow_times_milked_per_day": 3
+      "breeding_start_day_h": 359,
+      "heifer_repro_method": "SynchED",
+      "cow_repro_method": "ED-TAI",
+      "semen_type": "sexed",
+      "days_in_preg_when_dry": 200,
+      "heifer_repro_cull_time": 480,
+      "do_not_breed_time": 250,
+      "cull_milk_production": 31.7,
+      "cow_times_milked_per_day": 2
     },
     "farm_level": {
       "calf": {
-        "male_calf_rate_sexed_semen": 0.1,
+        "male_calf_rate_sexed_semen": 0.66,
         "male_calf_rate_conventional_semen": 0.53,
         "keep_female_calf_rate": 1,
-        "wean_day": 60,
+        "wean_day": 75,
         "wean_length": 7,
         "milk_type": "whole"
       },
@@ -43,23 +43,23 @@
         "prefresh_day": 30,
         "calving_interval": 400,
         "heifers": {
-          "estrus_detection_rate": 0.6,
+          "estrus_detection_rate": 0.9,
           "estrus_conception_rate": 0.4,
           "repro_sub_protocol": "5dCG2P",
           "repro_sub_properties": {
             "conception_rate": 0.6,
-            "estrus_detection_rate": 0.7
+            "estrus_detection_rate": 0.9
           }
         },
         "cows": {
-          "estrus_detection_rate": 0.6,
-          "estrus_conception_rate": 0.6,
-          "presynch_protocol": "Double OvSynch",
+          "estrus_detection_rate": 0.71,
+          "estrus_conception_rate": 0.41,
+          "presynch_protocol": "Presynch",
           "resynch_protocol": "TAIafterPD",
           "repro_sub_protocol": "OvSynch 56",
           "repro_sub_properties": {
-            "conception_rate": 0.5,
-            "tai_program_start_day": 70
+            "conception_rate": 0.38,
+            "tai_program_start_day": 55
           }
         },
         "cow_repro_programs": {
@@ -124,7 +124,7 @@
         "mastitis_cull_prob": [0, 0.06, 0.12, 0.19, 0.30, 0.43, 0.56, 0.68, 0.78, 0.85, 0.90, 0.94, 0.97, 1]
       },
       "life_cycle": {
-        "still_birth_rate": 0.065
+        "still_birth_rate": 0.025
       }
     }
   },
@@ -140,7 +140,7 @@
   "pasture_concentrate": 0,
   "methane_model": "IPCC",
   "ration": {
-    "user_input": false,
+    "user_input": true,
     "formulation_interval": 30
   },
   "pen_information": [
@@ -150,9 +150,9 @@
       "animal_combination": "CALF",
       "vertical_dist_to_milking_parlor": 0.1,
       "horizontal_dist_to_milking_parlor": 1.6,
-      "number_of_stalls": 110,
+      "number_of_stalls": 11000,
       "housing_type": "open air barn",
-      "pen_type": "freestall",
+      "pen_type": "drylot",
       "max_stocking_density": 1.2,
       "manure_management_scenario_id": 0
     },
@@ -162,11 +162,11 @@
       "animal_combination": "GROWING",
       "vertical_dist_to_milking_parlor": 0.1,
       "horizontal_dist_to_milking_parlor": 1.6,
-      "number_of_stalls": 800,
+      "number_of_stalls": 80000,
       "housing_type": "open air barn",
-      "pen_type": "freestall",
+      "pen_type": "drylot",
       "max_stocking_density": 1.2,
-      "manure_management_scenario_id": 1
+      "manure_management_scenario_id": 0
     },
     {
       "id": 2,
@@ -174,11 +174,11 @@
       "animal_combination": "CLOSE_UP",
       "vertical_dist_to_milking_parlor": 0.1,
       "horizontal_dist_to_milking_parlor": 1.6,
-      "number_of_stalls": 200,
+      "number_of_stalls": 20000,
       "housing_type": "open air barn",
-      "pen_type": "tiestall",
+      "pen_type": "drylot",
       "max_stocking_density": 1.2,
-      "manure_management_scenario_id": 2
+      "manure_management_scenario_id": 0
     },
     {
       "id": 3,
@@ -186,11 +186,23 @@
       "animal_combination": "LAC_COW",
       "vertical_dist_to_milking_parlor": 0.1,
       "horizontal_dist_to_milking_parlor": 1.6,
-      "number_of_stalls": 1000,
+      "number_of_stalls": 100000,
       "housing_type": "open air barn",
-      "pen_type": "tiestall",
+      "pen_type": "drylot",
       "max_stocking_density": 1.2,
-      "manure_management_scenario_id": 4
+      "manure_management_scenario_id": 0
+    }, 
+    {
+      "id": 4,
+      "pen_name": "",
+      "animal_combination": "LAC_COW",
+      "vertical_dist_to_milking_parlor": 0.1,
+      "horizontal_dist_to_milking_parlor": 1.6,
+      "number_of_stalls": 100000,
+      "housing_type": "open air barn",
+      "pen_type": "drylot",
+      "max_stocking_density": 1.2,
+      "manure_management_scenario_id": 1
     }
   ]
 }
