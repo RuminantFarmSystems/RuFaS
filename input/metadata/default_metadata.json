@@ -472,7 +472,7 @@
                 "type": "string",
                 "description": "Cow Presynch Protocol (optional; select one) -- The optional preSynch protocol (1st breeding) for cows in the TAI (Timed Artificial Insemination) protocol",
                 "default": "Double OvSynch",
-                "pattern": "^(Double OvSynch|Presynch|G6G)$"
+                "pattern": "^(Double OvSynch|PreSynch|G6G)$"
               },
               "cow_TAI_protocol": {
                 "type": "string",
