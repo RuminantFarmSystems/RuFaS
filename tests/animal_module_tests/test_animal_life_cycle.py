@@ -23,6 +23,10 @@ from RUFAS.routines.animal.life_cycle.heiferIII import HeiferIII
 from RUFAS.routines.animal.life_cycle.life_cycle import GenericAnimal
 from RUFAS.routines.animal.life_cycle.life_cycle import LifeCycleManager
 from RUFAS.routines.animal.pen import Pen
+from RUFAS.routines.animal.animal_types import AnimalType
+from RUFAS.routines.animal.ration.animal_requirements import AnimalRequirements
+from RUFAS.routines.feed.feed import Feed
+from RUFAS.routines.animal.life_cycle.animal_base import AnimalBase
 
 
 @fixture
@@ -1192,7 +1196,7 @@ def test_calc_cull_reason_stats_percent(mocker: MockerFixture, life_cycle_manage
     for cull_reason in life_cycle_manager.cull_reason_stats_percent:
         if cow_herd_exit_num > 0:
             assert life_cycle_manager.cull_reason_stats_percent[cull_reason] == \
-                   approx(life_cycle_manager.cull_reason_stats[cull_reason] * 100.0 / cow_herd_exit_num)
+                approx(life_cycle_manager.cull_reason_stats[cull_reason] * 100.0 / cow_herd_exit_num)
         elif cow_herd_exit_num == 0:
             assert life_cycle_manager.cull_reason_stats_percent[cull_reason] == approx(0.0)
 
@@ -1223,7 +1227,7 @@ def test_calc_percent_cow_per_parity(mocker: MockerFixture, life_cycle_manager: 
     for parity in life_cycle_manager.num_cow_for_parity:
         if cow_num > 0:
             assert life_cycle_manager.percent_cow_for_parity[parity] == \
-                   approx(life_cycle_manager.num_cow_for_parity[parity] * 100.0 / cow_num)
+                approx(life_cycle_manager.num_cow_for_parity[parity] * 100.0 / cow_num)
         elif cow_num == 0:
             assert life_cycle_manager.percent_cow_for_parity[parity] == approx(0.0)
 
@@ -1445,3 +1449,112 @@ def test_reset_daily_stats(life_cycle_manager: LifeCycleManager) -> None:
     assert life_cycle_manager.avg_heifer_culling_age == approx(0.0)
     assert life_cycle_manager.avg_cow_culling_age == approx(0.0)
     assert life_cycle_manager.avg_mature_body_weight == approx(0.0)
+
+
+def test_heiferI(mocker: MockerFixture) -> None:
+    """Unit tests for all the functions in class HeiferI in file life_cycle.py."""
+
+    heiferI = mocker.MagicMock(autospec=HeiferI)
+    mocker.patch('RUFAS.routines.animal.life_cycle.heiferI.HeiferI.__init__', return_value=heiferI)
+    heiferI.body_weight = 1000.0
+    heiferI.mature_body_weight = 1200.0
+    heiferI.daily_growth = 1.0
+    heiferI.days_born = 300
+    temp = 30
+    animal_grouping_scenario = AnimalType.HEIFER_I
+    nutrient_conc = {'dm': 0.0, 'NDF': 4.5, 'TDM': 7.8}
+    req = mocker.MagicMock(autospec=AnimalRequirements)
+    animal_req = mocker.patch.object(
+        AnimalRequirements, 'calc_rqmts', return_value=req
+    )
+    heifer_repro_method = 'TAI'
+    heifer_TAI_protocol = 'd5CG2P'
+    heifer_synchedED_protocol = '2P'
+    nutrient_standard = 'NRC'
+    animal_base_config = {
+        "heifer_repro_method": heifer_repro_method,
+        "target_heifer_preg_day": 300,
+        "breeding_start_day_h": 400,
+        "heifer_repro_programs": {
+            "heifer_TAI_protocol": heifer_TAI_protocol,
+            "heifer_synchED_protocol": heifer_synchedED_protocol
+        },
+        "nutrient_standard": nutrient_standard
+    }
+    mocker.patch('RUFAS.routines.animal.life_cycle.life_cycle.AnimalBase.config', animal_base_config)
+
+    # testing set_nutrient_rqmts()
+    HeiferI.set_nutrient_rqmts(heiferI, temp, animal_grouping_scenario, nutrient_conc)
+    animal_req.assert_called() == True
+
+    # testing calc_manure_excretion()
+    feed = mocker.MagicMock(autospec=Feed)
+    patch_base_manure = mocker.patch.object(
+        HeiferI, 'calc_base_manure', return_value=heiferI
+    )
+    HeiferI.calc_base_manure(heiferI, feed, "methane_model")
+    patch_base_manure.assert_called()
+
+    # testing phosphorus_rqmts()
+    heiferI.p_maint_feces = 10
+    heiferI.p_req = 0
+    HeiferI.phosphorus_rqmts(heiferI, 10)
+    p_urine = 0.000002 * heiferI.body_weight * 1000
+
+    heiferI.p_growth = (
+        (0.0012 + 0.004635 * (heiferI.mature_body_weight**0.22) * (heiferI.body_weight ** (-0.22)))
+        * heiferI.daily_growth
+        / 0.96
+        * 1000
+    )
+    p_absorb = p_urine + heiferI.p_maint_feces + heiferI.p_growth
+    p_req = p_absorb / 0.664
+    assert heiferI.p_maint_feces == 8
+    assert heiferI.p_req == p_req
+
+    # testing get_non_preg_bw_change()
+    weight = HeiferI.get_non_preg_bw_change(heiferI)
+    calc_weight = 0.55 * 0.96 * heiferI.mature_body_weight - 0.96 * heiferI.body_weight  # divisor == 1
+    assert weight == calc_weight
+
+
+def test_update_heiferI(mocker: MockerFixture) -> None:
+    # testing update() function in HeiferI class
+    heiferI = mocker.MagicMock(autospec=HeiferI)
+    mocker.patch('RUFAS.routines.animal.life_cycle.heiferI.HeiferI.__init__', return_value=heiferI)
+    heiferI.body_weight = 1000.0
+    heiferI.mature_body_weight = 1200.0
+    heiferI.daily_growth = 1.0
+    heiferI.days_born = 399
+    heifer_repro_method = 'TAI'
+    heifer_TAI_protocol = 'd5CG2P'
+    heifer_synchedED_protocol = '2P'
+    nutrient_standard = 'NRC'
+    animal_base_config = {
+        "heifer_repro_method": heifer_repro_method,
+        "target_heifer_preg_day": 399,
+        "breeding_start_day_h": 400,
+        "heifer_repro_programs": {
+            "heifer_TAI_protocol": heifer_TAI_protocol,
+            "heifer_synchED_protocol": heifer_synchedED_protocol
+        },
+        "nutrient_standard": nutrient_standard
+    }
+    mocker.patch('RUFAS.routines.animal.life_cycle.life_cycle.AnimalBase.config', animal_base_config)
+    heiferI.update_body_weight_history = mocker.MagicMock()
+    heiferI.get_non_preg_bw_change = mocker.MagicMock()
+
+    # act
+    sim_day = 400
+    updated_val = HeiferI.update(heiferI, sim_day)
+    heiferI.update_body_weight_history.assert_called()
+    heiferI.get_non_preg_bw_change.assert_called()
+    assert updated_val == True
+    assert heiferI.days_born == 399
+
+    heiferI.days_born = 398
+    updated_val = HeiferI.update(heiferI, sim_day)
+    assert updated_val == False
+    assert heiferI.days_born == 399
+    heiferI.update_body_weight_history.assert_called()
+    heiferI.get_non_preg_bw_change.assert_called()

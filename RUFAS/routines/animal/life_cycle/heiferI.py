@@ -55,7 +55,7 @@ class HeiferI(Calf):
         animal_requirements = req.calc_rqmts(body_weight=self.body_weight,
                                              mature_body_weight=self.mature_body_weight,
                                              day_of_pregnancy=None,
-                                             animal_type=animal_grouping_scenario.get_animal_type(self),
+                                             animal_type=animal_grouping_scenario,
                                              body_condition_score_5=3,
                                              previous_temperature=temp,
                                              average_daily_gain_heifer=self.daily_growth,
@@ -96,7 +96,7 @@ class HeiferI(Calf):
         # amount of P required for endogenous losses (g) (A.1A-D.E.1)
         self.p_maint_feces = 0.0008 * DMI * 1000
 
-        # amount pf P required for urine production (g) (A.1A-F.E.2)
+        # amount of P required for urine production (g) (A.1A-F.E.2)
         p_urine = 0.000002 * self.body_weight * 1000
 
         # absorbed P retained for growth (g) (A.1A-F.E.3)
