@@ -14,4 +14,5 @@ class ManureTreatmentType(DefaultEnum):
     )
     COMPOST_BEDDED_PACK_BARN = "compost bedded pack barn"
     OPEN_LOTS = "open lots"
+    SEPARATED_SOLIDS_STORAGE = "separated solids storage"
     DEFAULT = SLURRY_STORAGE_UNDERFLOOR
