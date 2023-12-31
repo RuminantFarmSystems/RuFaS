@@ -52,7 +52,7 @@
     "feed": {
       "title": "Feed data",
       "description": "Those cows need to eat!",
-      "path": "input/data/feed/CREATE FILE FROM TEMPLATE.json",
+      "path": "input/data/feed/c2f23_feed.json",
       "type": "json",
       "properties": "feed_properties"
     },
@@ -122,7 +122,7 @@
     "weather": {
       "title": "Weather data",
       "description": "Let's turn on the AC",
-      "path": "input/data/weather/ADD FARM-SPECIFIC WEATHER FILE.csv",
+      "path": "input/data/weather/c2f23_weather.csv",
       "type": "csv",
       "properties": "weather_properties"
     },
