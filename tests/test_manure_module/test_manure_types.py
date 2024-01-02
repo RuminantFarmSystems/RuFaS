@@ -11,5 +11,4 @@ def test_enum_ManureType() -> None:
     """
     # Assert
     assert ManureType.LIQUID == ManureType('liquid')
-    assert ManureType.SLURRY == ManureType('slurry')
     assert ManureType.SOLID == ManureType('solid')
