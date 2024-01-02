@@ -1733,12 +1733,12 @@
             "description": "Operation(s) with which this crop will be harvested.",
             "minimum_length": 1,
             "default": [
-              "default"
+              "harvest"
             ],
             "properties": {
               "type": "string",
-              "pattern": "^(default|no_kill)$",
-              "default": "default"
+              "pattern": "^(harvest|harvest_no_kill|kill)$",
+              "default": "harvest"
             }
           },
           "harvest_type": {

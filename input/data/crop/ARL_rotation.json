@@ -8,7 +8,7 @@
             "planting_days": [113],
             "harvest_years": [1989],
             "harvest_days": [305],
-            "harvest_operations": ["default"],
+            "harvest_operations": ["harvest"],
             "harvest_type": "scheduled",
             "planting_order": "1st",
             "extracted": true
@@ -22,7 +22,7 @@
             "planting_days": [113],
             "harvest_years": [1990, 1991, 1992],
             "harvest_days": [237],
-            "harvest_operations": ["default"],
+            "harvest_operations": ["harvest"],
             "harvest_type": "optimal",
             "planting_order": "1st",
             "extracted": true
@@ -35,7 +35,7 @@
             "planting_days": [121],
             "harvest_years": [1993],
             "harvest_days": [305],
-            "harvest_operations": ["default"],
+            "harvest_operations": ["harvest"],
             "harvest_type": "scheduled",
             "planting_order": "1st",
             "extracted": true
@@ -49,7 +49,7 @@
             "planting_days": [108],
             "harvest_years": [1994, 1995, 1996],
             "harvest_days": [302],
-            "harvest_operations": ["default"],
+            "harvest_operations": ["harvest"],
             "harvest_type": "optimal",
             "planting_order": "1st",
             "extracted": true
@@ -62,7 +62,7 @@
             "planting_days": [115],
             "harvest_years": [1997],
             "harvest_days": [305],
-            "harvest_operations": ["default"],
+            "harvest_operations": ["harvest"],
             "harvest_type": "optimal",
             "planting_order": "1st",
             "extracted": true
@@ -76,7 +76,7 @@
             "planting_days": [105],
             "harvest_years": [1998, 1999, 2000],
             "harvest_days": [250],
-            "harvest_operations": ["default"],
+            "harvest_operations": ["harvest"],
             "harvest_type": "optimal",
             "planting_order": "1st",
             "extracted": true
@@ -90,7 +90,7 @@
             "planting_days": [121],
             "harvest_years": [2001],
             "harvest_days": [288],
-            "harvest_operations": ["default"],
+            "harvest_operations": ["harvest"],
             "harvest_type": "scheduled",
             "planting_order": "1st",
             "extracted": true
@@ -104,7 +104,7 @@
             "planting_days": [98],
             "harvest_years": [2002, 2003, 2004],
             "harvest_days": [253],
-            "harvest_operations": ["default"],
+            "harvest_operations": ["harvest"],
             "harvest_type": "optimal",
             "planting_order": "1st",
             "extracted": true
@@ -118,7 +118,7 @@
             "planting_days": [120],
             "harvest_years": [2005],
             "harvest_days": [293],
-            "harvest_operations": ["default"],
+            "harvest_operations": ["harvest"],
             "harvest_type": "scheduled",
             "planting_order": "1st",
             "extracted": true
@@ -131,7 +131,7 @@
             "planting_days": [97],
             "harvest_years": [2006, 2007, 2008],
             "harvest_days": [256],
-            "harvest_operations": ["default"],
+            "harvest_operations": ["harvest"],
             "harvest_type": "optimal",
             "planting_order": "1st",
             "extracted": true
@@ -145,7 +145,7 @@
             "planting_days": [168],
             "harvest_years": [2009],
             "harvest_days": [281],
-            "harvest_operations": ["default"],
+            "harvest_operations": ["harvest"],
             "harvest_type": "scheduled",
             "planting_order": "1st",
             "extracted": true
@@ -158,7 +158,7 @@
             "planting_days": [89],
             "harvest_years": [2010, 2011, 2012],
             "harvest_days": [179],
-            "harvest_operations": ["default"],
+            "harvest_operations": ["harvest"],
             "harvest_type": "optimal",
             "planting_order": "1st",
             "extracted": true
@@ -171,7 +171,7 @@
             "planting_days": [127],
             "harvest_years": [2013],
             "harvest_days": [298],
-            "harvest_operations": ["default"],
+            "harvest_operations": ["harvest"],
             "harvest_type": "scheduled",
             "planting_order": "1st",
             "extracted": true
@@ -184,7 +184,7 @@
             "planting_days": [89],
             "harvest_years": [2014, 2015, 2016],
             "harvest_days": [179],
-            "harvest_operations": ["default"],
+            "harvest_operations": ["harvest"],
             "harvest_type": "optimal",
             "planting_order": "1st",
             "extracted": true
@@ -197,7 +197,7 @@
             "planting_days": [125],
             "harvest_years": [2017],
             "harvest_days": [300],
-            "harvest_operations": ["default"],
+            "harvest_operations": ["harvest"],
             "harvest_type": "scheduled",
             "planting_order": "1st",
             "extracted": true
@@ -210,7 +210,7 @@
             "planting_days": [120],
             "harvest_years": [2018, 2019],
             "harvest_days": [180],
-            "harvest_operations": ["default"],
+            "harvest_operations": ["harvest"],
             "harvest_type": "optimal",
             "planting_order": "1st",
             "extracted": true
