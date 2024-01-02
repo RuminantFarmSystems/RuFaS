@@ -2,6 +2,7 @@ from math import exp
 from typing import List, Dict
 from unittest.mock import MagicMock, PropertyMock, patch, call
 import pytest
+from RUFAS.routines.manure.manure_treatments.manure_types import ManureType
 from RUFAS.routines.field.crop.crop import Crop
 from RUFAS.routines.field.crop.crop_data import CropData
 from RUFAS.routines.field.crop.harvest_operations import HarvestOperation
@@ -732,23 +733,26 @@ def test_record_fertilizer_application(mix_name: str, total_mass: float, nitroge
                                                      inorganic_nitrogen_fraction=0.7, ammonium_nitrogen_fraction=0.25,
                                                      organic_phosphorus_fraction=0.5,
                                                      inorganic_phosphorus_fraction=0.5),
-                              NutrientRequest(nitrogen=75.0, phosphorus=75.0), 25.0, 25.0),
+                              NutrientRequest(nitrogen=75.0, phosphorus=75.0, manure_type=ManureType.LIQUID),
+                              25.0, 25.0),
                              (100.0, 0.0, 0.88, 120.0, 0.7, 2003, 200, True, True, True,
                               NutrientRequestResults(nitrogen=50.0, phosphorus=50.0, dry_matter=250.0,
                                                      dry_matter_fraction=0.33, organic_nitrogen_fraction=0.3,
                                                      inorganic_nitrogen_fraction=0.7, ammonium_nitrogen_fraction=0.25,
                                                      organic_phosphorus_fraction=0.4,
                                                      inorganic_phosphorus_fraction=0.6),
-                              NutrientRequest(nitrogen=100.0, phosphorus=0.0), 50.0, 0.0),
+                              NutrientRequest(nitrogen=100.0, phosphorus=0.0, manure_type=ManureType.LIQUID),
+                              50.0, 0.0),
                              (50.0, 50.0, 0.91, 200.0, 0.45, 1998, 155, True, False, False,
                               NutrientRequestResults(nitrogen=50.0, phosphorus=50.0, dry_matter=250.0,
                                                      dry_matter_fraction=0.33, organic_nitrogen_fraction=0.3,
                                                      inorganic_nitrogen_fraction=0.7, ammonium_nitrogen_fraction=0.25,
                                                      organic_phosphorus_fraction=0.544,
                                                      inorganic_phosphorus_fraction=0.456),
-                              NutrientRequest(nitrogen=50.0, phosphorus=50.0), 0.0, 0.0),
+                              NutrientRequest(nitrogen=50.0, phosphorus=50.0, manure_type=ManureType.LIQUID), 0.0, 0.0),
                              (65.0, 40.0, 0.77, 75.0, 0.78, 1999, 160, True, True, False, None,
-                              NutrientRequest(nitrogen=65.0, phosphorus=40.0), 65.0, 40.0),
+                              NutrientRequest(nitrogen=65.0, phosphorus=40.0, manure_type=ManureType.LIQUID),
+                              65.0, 40.0),
                              (0, 0, 0.5, 0.0, 1.0, 1996, 155, True, False, False, None, None, 0.0, 0.0),
                              (75.0, 50.0, 0.7, 0.0, 1.0, 2010, 120, False, True, True,
                               NutrientRequestResults(nitrogen=50.0, phosphorus=50.0, dry_matter=250.0,
@@ -756,14 +760,16 @@ def test_record_fertilizer_application(mix_name: str, total_mass: float, nitroge
                                                      inorganic_nitrogen_fraction=0.7, ammonium_nitrogen_fraction=0.25,
                                                      organic_phosphorus_fraction=0.544,
                                                      inorganic_phosphorus_fraction=0.456),
-                              NutrientRequest(nitrogen=75.0, phosphorus=50.0), 25.0, 0.0),
+                              NutrientRequest(nitrogen=75.0, phosphorus=50.0, manure_type=ManureType.LIQUID),
+                              25.0, 0.0),
                              (50.0, 50.0, 0.7, 0.0, 1.0, 2010, 120, False, False, False,
                               NutrientRequestResults(nitrogen=50.0, phosphorus=50.0, dry_matter=250.0,
                                                      dry_matter_fraction=0.33, organic_nitrogen_fraction=0.3,
                                                      inorganic_nitrogen_fraction=0.7, ammonium_nitrogen_fraction=0.25,
                                                      organic_phosphorus_fraction=0.544,
                                                      inorganic_phosphorus_fraction=0.456),
-                              NutrientRequest(nitrogen=50.0, phosphorus=50.0), 50.0, 0.0),
+                              NutrientRequest(nitrogen=50.0, phosphorus=50.0, manure_type=ManureType.LIQUID),
+                              50.0, 0.0),
                          ])
 def test_execute_manure_application(nitrogen: float, phosphorus: float, coverage: float, depth: float, remainder: float,
                                     year: int, day: int, supplement: bool, fertilizer_applied: bool,
@@ -887,7 +893,8 @@ def test_execute_manure_application_with_invalid_args(depth: float, remainder: f
             patched_error.assert_called_once_with(depth, remainder, "manure_application_error", 2000, 133)
         else:
             patched_error.assert_called_once_with(depth, None, "manure_application_error", 2000, 133)
-        mocked_manure_manager.request_nutrients.assert_called_once_with(NutrientRequest(nitrogen=50.0, phosphorus=50.0))
+        mocked_manure_manager.request_nutrients.assert_called_once_with(NutrientRequest(nitrogen=50.0, phosphorus=50.0,
+                                                                                        manure_type=ManureType.LIQUID))
         patched_manure_applicator.assert_called_once_with(
             dry_matter_mass=100.0,
             dry_matter_fraction=0.66,
