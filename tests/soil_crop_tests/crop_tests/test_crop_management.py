@@ -143,8 +143,8 @@ def test_determine_harvest_index(harvest, heat_frac, water_def):
 
 @pytest.mark.parametrize("harvest_op,field_name,field_size,year,day,soil_data,killed", [
     (HarvestOperation.HARVEST_KILL, "test_1", 1.8, 1995, 200, SoilData(field_size=1.3), True),
-    (HarvestOperation.HARVEST_NO_KILL, "test_2", 4.5, 2010, 150, SoilData(field_size=2.4), False),
-    (HarvestOperation.KILL_NO_HARVEST, "test_3", 2.2, 2024, 200, SoilData(field_size=1.1), True)
+    (HarvestOperation.HARVEST_ONLY, "test_2", 4.5, 2010, 150, SoilData(field_size=2.4), False),
+    (HarvestOperation.KILL_ONLY, "test_3", 2.2, 2024, 200, SoilData(field_size=1.1), True)
 ])
 def test_manage_harvest(harvest_op: HarvestOperation, field_name: str, field_size: float, year: int, day: int,
                         soil_data: SoilData, killed: bool) -> None:
@@ -167,11 +167,11 @@ def test_manage_harvest(harvest_op: HarvestOperation, field_name: str, field_siz
         crop.cut_crop.assert_called_once()
         crop.kill.assert_called_once()
 
-    if harvest_op == HarvestOperation.HARVEST_NO_KILL:
+    if harvest_op == HarvestOperation.HARVEST_ONLY:
         crop.cut_crop.assert_called_once()
         crop.kill.assert_not_called()
 
-    if harvest_op == HarvestOperation.KILL_NO_HARVEST:
+    if harvest_op == HarvestOperation.KILL_ONLY:
         crop.cut_crop.assert_not_called()
         crop.kill.assert_called_once()
 

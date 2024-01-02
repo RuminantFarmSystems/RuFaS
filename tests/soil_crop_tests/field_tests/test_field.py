@@ -248,7 +248,7 @@ def test_harvest_heat_scheduled_crops(crop_num: int, heat_scheduled: List[bool],
 
     for index in range(len(crops)):
         if expected_harvested[index]:
-            crops[index].crop_management.manage_harvest.assert_called_once_with(HarvestOperation.HARVEST_NO_KILL)
+            crops[index].crop_management.manage_harvest.assert_called_once_with(HarvestOperation.HARVEST_ONLY)
         else:
             crops[index].crop_management.manage_harvest.assert_not_called()
     assert add_residue.call_count == expected_harvest_count
@@ -362,8 +362,8 @@ def test_plant_crop_error(field_name: str, crop_reference: str, custom_crop_spec
 
 @pytest.mark.parametrize("crop_reference,harvest_op,field_name,field_size,rainfall", [
     ("test_1", HarvestOperation.HARVEST_KILL, "field_1", 1.4, 0.0),
-    ("test_2", HarvestOperation.HARVEST_NO_KILL, "field_2", 2.33, 10.3),
-    ("test_3", HarvestOperation.KILL_NO_HARVEST, "field_3", 0.85, 0.5),
+    ("test_2", HarvestOperation.HARVEST_ONLY, "field_2", 2.33, 10.3),
+    ("test_3", HarvestOperation.KILL_ONLY, "field_3", 0.85, 0.5),
 ])
 def test_harvest_crop(crop_reference: str, harvest_op: HarvestOperation, field_name: str, field_size: float,
                       rainfall: float) -> None:

@@ -57,10 +57,10 @@ class CropManagement:
             self.kill()
             is_killed = True
 
-        if harvest_op == HarvestOperation.HARVEST_NO_KILL:
+        if harvest_op == HarvestOperation.HARVEST_ONLY:
             self.cut_crop(collected_fraction=self.data.harvest_efficiency)
 
-        if harvest_op == HarvestOperation.KILL_NO_HARVEST:
+        if harvest_op == HarvestOperation.KILL_ONLY:
             self.kill()
             is_killed = True
 

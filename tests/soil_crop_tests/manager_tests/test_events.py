@@ -3,6 +3,7 @@ from unittest.mock import MagicMock
 
 from RUFAS.routines.field.manager.events import Event, PlantingEvent, HarvestEvent, TillageEvent, ManureEvent, \
     FertilizerEvent
+from RUFAS.routines.field.crop.harvest_operations import HarvestOperation
 
 
 @pytest.mark.parametrize("year,day,current_year,current_day,expected", [
@@ -87,7 +88,7 @@ def test_harvest_event_equality(harvest_event1, harvest_event2, expected: bool) 
 
 
 @pytest.mark.parametrize("harvest_event,expected", [
-    (HarvestEvent(crop_reference="corn", year=1, day=20), hash((1, 20, "corn", "default")))
+    (HarvestEvent(crop_reference="corn", year=1, day=20), hash((1, 20, "corn", HarvestOperation.HARVEST_KILL)))
 ])
 def test_harvest_event_hash(harvest_event: HarvestEvent, expected: float) -> None:
     """Tests that hash returns correctly for HarvestEvent objects."""
