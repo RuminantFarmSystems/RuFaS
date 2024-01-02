@@ -60,6 +60,8 @@ class CropSchedule(Schedule):
 
         self._validate_pattern_parameters()
 
+        self.planting_skip = self.harvest_years[-1] - self.planting_years[-1]
+
     def _validate_planting_parameters(self) -> None:
         """
         Checks fields that dictate planting for correctness, otherwise raises errors.
@@ -137,7 +139,11 @@ class CropSchedule(Schedule):
             List of all planting events that will happen for this crop schedule.
 
         """
-        all_planting_years = self._repeat_pattern(self.planting_years, self.pattern_skip, self.pattern_repeat)
+        all_planting_years = self._repeat_pattern(
+            self.planting_years,
+            self.pattern_skip + self.planting_skip,
+            self.pattern_repeat
+        )
         all_planting_days = self.planting_days * (self.pattern_repeat + 1)
         all_planting_dates = list(zip(all_planting_years, all_planting_days))
 

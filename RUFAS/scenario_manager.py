@@ -46,7 +46,9 @@ class MetadataPaths(TypedDict):
     path: Path
 
 
-METADATA_PATHS: List[MetadataPaths] = [{"prefix": "con_corn_i",
+METADATA_PATHS: List[MetadataPaths] = [{"prefix": "corn_alfalfa",
+                                        "path": Path('input/metadata/corn_alfalfa_eval_metadata.json')},
+                                       {"prefix": "con_corn_i",
                                         "path": Path('input/metadata/con_corn_i_metadata.json')},
                                        {"prefix": "con_corn_ii",
                                         "path": Path('input/metadata/con_corn_ii_metadata.json')},

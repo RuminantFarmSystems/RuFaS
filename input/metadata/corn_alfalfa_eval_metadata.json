@@ -3,7 +3,7 @@
     "config": {
       "title": "Config Data",
       "description": "Configuration Information",
-      "path": "input/data/config/con_corn_config.json",
+      "path": "input/data/config/corn_alfalfa_config.json",
       "type": "json",
       "properties": "config_properties"
     },
@@ -30,8 +30,8 @@
     },
     "crop": {
       "title": "Crop data",
-      "description": "Continuous corn for 25 years.",
-      "path": "input/data/crop/continuous_corn_25_year.json",
+      "description": "Four rotations of 4 year alfalfa silage, 3 year corn silage.",
+      "path": "input/data/crop/corn_alfalfa_rotation_28year.json",
       "type": "json",
       "properties": "crop_schedule_properties"
     },
@@ -87,21 +87,21 @@
     "fertilizer_schedule": {
       "title": "Fertilizer schedule.",
       "description": "Fertilizer is like butter, you can never have too much.",
-      "path": "input/data/fertilizer_schedule/continuous_corn_25_year_fert.json",
+      "path": "input/data/fertilizer_schedule/corn_alfalfa_28year_fertilizer_schedule.json",
       "type": "json",
       "properties": "fertilizer_schedule_properties"
     },
     "manure_schedule": {
       "title": "Manure schedule.",
       "description": "Crappier than having 7:45 am classes Monday - Friday.",
-      "path": "input/data/manure_schedule/no_manure.json",
+      "path": "input/data/manure_schedule/corn_alfalfa_28year_manure_schedule.json",
       "type": "json",
       "properties": "manure_schedule_properties"
     },
     "tillage_schedule": {
       "title": "Tillage schedule.",
       "description": "Requires the will to till.",
-      "path": "input/data/tillage_schedule/continuous_corn_25_year_conserv_till.json",
+      "path": "input/data/tillage_schedule/corn_alfalfa_28year_tillage_schedule.json",
       "type": "json",
       "properties": "tillage_schedule_properties"
     },
