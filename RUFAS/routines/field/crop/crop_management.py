@@ -52,13 +52,17 @@ class CropManagement:
         is_killed = False
         self.determine_harvest_index()
 
-        if harvest_op == HarvestOperation.HARVEST:
+        if harvest_op == HarvestOperation.HARVEST_KILL:
             self.cut_crop(collected_fraction=self.data.harvest_efficiency)
             self.kill()
             is_killed = True
 
-        if harvest_op == HarvestOperation.HARVEST_NOKILL:
+        if harvest_op == HarvestOperation.HARVEST_NO_KILL:
             self.cut_crop(collected_fraction=self.data.harvest_efficiency)
+
+        if harvest_op == HarvestOperation.KILL_NO_HARVEST:
+            self.kill()
+            is_killed = True
 
         self._record_yield(field_name, field_size, year, day)
         self._transfer_residue(soil_data, is_killed)
