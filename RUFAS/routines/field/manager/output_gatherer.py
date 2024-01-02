@@ -2,11 +2,6 @@ from typing import List
 
 from RUFAS.output_manager import OutputManager
 from RUFAS.routines.field.field.field import Field
-from RUFAS.routines.field.soil.nitrogen_cycling.leaching_runoff_erosion import (
-    NITRATE_LEACHING_COEFFICIENT,
-    NITRATE_RUNOFF_COEFFICIENT,
-    AMMONIUM_RUNOFF_COEFFICIENT
-)
 
 om = OutputManager()
 
@@ -28,10 +23,6 @@ class OutputGatherer:
             om.add_variable("days_into_watering_interval", field.field_data.days_into_watering_interval, info_map)
 
             # ----------------------------adding soil data
-            om.add_variable("NITRATE_RUNOFF_COEFFICIENT", NITRATE_RUNOFF_COEFFICIENT, info_map)
-            om.add_variable("AMMONIUM_RUNOFF_COEFFICIENT", AMMONIUM_RUNOFF_COEFFICIENT, info_map)
-            om.add_variable("NITRATE_LEACHING_COEFFICIENT", NITRATE_LEACHING_COEFFICIENT, info_map)
-
             om.add_variable("water_evaporated", field.soil.data.water_evaporated,
                             info_map)
             om.add_variable("eroded_sediment", field.soil.data.eroded_sediment, info_map)
