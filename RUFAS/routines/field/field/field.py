@@ -1,5 +1,5 @@
 import math
-
+from RUFAS.routines.manure.manure_treatments.manure_types import ManureType
 from RUFAS.routines.field.crop.crop import Crop
 from RUFAS.routines.field.crop.crop_data import CropData
 from RUFAS.routines.field.crop.species_data_factory import CropSpecies, CropSpeciesDataFactory
@@ -401,7 +401,10 @@ class Field:
             om.add_log("manure_application_log", log_message, info_map)
             return
 
-        nutrient_request = NutrientRequest(nitrogen=requested_nitrogen, phosphorus=requested_phosphorus)
+        # TODO add manure type into request - addressed by issue #1044
+        requested_manure_type = ManureType.LIQUID
+        nutrient_request = NutrientRequest(nitrogen=requested_nitrogen, phosphorus=requested_phosphorus,
+                                           manure_type=requested_manure_type)
 
         manure_supplied = self.manure_manager.request_nutrients(nutrient_request)
 
@@ -538,7 +541,7 @@ class Field:
         and if None, then it is the latter.
 
         """
-        info_map = {"class": self.__class__.__name__, "function": self._execute_manure_application.__name__,
+        info_map = {"class": self.__class__.__name__, "function": self._record_nutrient_application_error.__name__,
                     "prefix": f"field='{self.field_data.name}'", "date": {"year": year, "day": day}}
         if surface_remainder_fraction is not None:
             error_message = f"Invalid application depth ({application_depth}) and surface remainder fraction " \
