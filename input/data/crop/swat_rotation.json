@@ -6,7 +6,7 @@
             "planting_days": [121],
             "harvest_years": [2010],
             "harvest_days": [319],
-            "harvest_operations": ["default"],
+            "harvest_operations": ["harvest"],
             "harvest_type": "scheduled",
             "pattern_repeat": 3,
             "pattern_skip": 0,
