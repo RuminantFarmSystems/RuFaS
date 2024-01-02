@@ -1740,11 +1740,11 @@
             "description": "Operation(s) with which this crop will be harvested.",
             "minimum_length": 1,
             "default": [
-              "harvest"
+              "harvest_kill"
             ],
             "properties": {
               "type": "string",
-              "pattern": "^(harvest|harvest_no_kill|kill)$",
+              "pattern": "^(harvest_kill|harvest_only|kill_only)$",
               "default": "harvest"
             }
           },
