@@ -1,0 +1,275 @@
+{
+    "calf_feeds": [
+      44,
+      119,
+      216,
+      187,
+      202
+    ],
+    "growing_feeds": [
+      89,
+      31,
+      44,
+      135,
+      110,
+      301,
+      200,
+
+    ],
+    "close_up_feeds": [
+      107,
+      110,
+      40,
+      51,
+      200,
+      301,
+      119
+
+    ],
+    "lac_cow_feeds": [
+      107,
+      135,
+      40,
+      110,
+      187,
+      51,
+      40,
+      167,
+      31,
+      79,
+      301
+    ],
+    "purchased_feeds": [
+      {
+        "purchased_feed": 44,
+        "purchased_feed_cost": 0.5
+      },
+      {
+        "purchased_feed": 119,
+        "purchased_feed_cost": 0.1
+      },
+      {
+        "purchased_feed": 216,
+        "purchased_feed_cost": 0.5
+      },
+      {
+        "purchased_feed": 187,
+        "purchased_feed_cost": 0.01
+      },
+      {
+        "purchased_feed": 202,
+        "purchased_feed_cost": 0.01
+      },
+      {
+        "purchased_feed": 89,
+        "purchased_feed_cost": 0.01
+      },
+      {
+        "purchased_feed": 31,
+        "purchased_feed_cost": 0.5
+      },
+      {
+        "purchased_feed": 135,
+        "purchased_feed_cost": 0.1
+      },
+      {
+        "purchased_feed": 110,
+        "purchased_feed_cost": 0.01
+      },
+      {
+        "purchased_feed": 301,
+        "purchased_feed_cost": 1.0
+      },
+      {
+        "purchased_feed": 200,
+        "purchased_feed_cost": 0.01
+      },
+      {
+        "purchased_feed": Add here the herb,
+        "purchased_feed_cost": 
+      },
+      {
+        "purchased_feed": 107,
+        "purchased_feed_cost": 0.01
+      },
+      {
+        "purchased_feed": 40,
+        "purchased_feed_cost": 0.5
+      },
+      {
+        "purchased_feed": 51,
+        "purchased_feed_cost": 0.01 
+      },
+      {
+        "purchased_feed": 167,
+        "purchased_feed_cost": 0.5
+      },
+      {
+        "purchased_feed": 79,
+        "purchased_feed_cost": 1.0 
+      }
+    ],
+    "farm_grown_feeds": [
+    ],
+    "storage_options": [
+      {
+        "storage_type": "bunker",
+        "moisture": "direct_cut",
+        "additive": "preservative",
+        "packing_density": 14,
+        "inoculation": "heterofermentative",
+        "bunk_type": "open_floor",
+        "ventilation": true,
+        "removal_rate": 6,
+        "initial_dry_matter": 0
+      },
+      {
+        "storage_type": "bunker",
+        "moisture": "direct_cut",
+        "additive": "preservative",
+        "packing_density": 14,
+        "inoculation": "heterofermentative",
+        "bunk_type": "open_floor",
+        "ventilation": true,
+        "removal_rate": 6,
+        "initial_dry_matter": 0
+      }
+    ],
+    "user_defined_ration_percentages": {
+      "calf": [
+        {
+          "feed_type": 44,
+          "ration_percentage": 28.9
+        },
+        {
+          "feed_type": 119,
+          "ration_percentage": 5.8
+        }
+        ,
+        {
+          "feed_type": 216,
+          "ration_percentage": 37.9
+        },
+        {
+          "feed_type": 187,
+          "ration_percentage": 3.5
+        },
+        {
+          "feed_type": 202,
+          "ration_percentage": 23.9
+        }
+      ],
+      "growing": [
+        {
+          "feed_type": 89,
+          "ration_percentage": 28.5
+        },
+        {
+          "feed_type": 31,
+          "ration_percentage": 5.8
+        },
+        {
+          "feed_type": 44,
+          "ration_percentage": 12.9
+        },
+        {
+          "feed_type": 135,
+          "ration_percentage": 13.9
+        },
+        {
+          "feed_type": 110,
+          "ration_percentage": 18.1
+        },
+        {
+          "feed_type": 301,
+          "ration_percentage": 1.3
+        },
+        {
+          "feed_type": 200,
+          "ration_percentage": 9.7
+        },
+        {
+          "feed_type": herb,
+          "ration_percentage": 9.7
+        }
+      ],
+      "close_up": [
+        {
+          "feed_type": 107,
+          "ration_percentage": 24.1
+        },
+        {
+          "feed_type": 110,
+          "ration_percentage": 10.1
+        },
+        {
+          "feed_type": 44,
+          "ration_percentage": 9.6
+        },
+        {
+          "feed_type": 51,
+          "ration_percentage": 37.3 
+        },
+        {
+          "feed_type": 200,
+          "ration_percentage": 12.3
+        },
+        {
+          "feed_type": 301,
+          "ration_percentage": 2.2
+        },
+        {
+          "feed_type": 119,
+          "ration_percentage": 4.4
+        }
+      ],
+      "lac_cow": [
+        {
+          "feed_type": 107,
+          "ration_percentage": 1.9
+        },
+        {
+          "feed_type": 135,
+          "ration_percentage": 2.3
+        },
+        {
+          "feed_type": 40,
+          "ration_percentage": 20.1
+        },
+        {
+          "feed_type": 110,
+          "ration_percentage": 16.3
+        },
+        {
+          "feed_type": 187,
+          "ration_percentage": 0.8
+        },
+        {
+          "feed_type": 51,
+          "ration_percentage": 22.7
+        },
+        {
+          "feed_type": 40,
+          "ration_percentage": 15.7
+        },
+        {
+          "feed_type": 167,
+          "ration_percentage": 0.5
+        },
+        {
+          "feed_type": 31,
+          "ration_percentage": 13.8
+        },
+        {
+          "feed_type": 79,
+          "ration_percentage": 0.9
+        },
+        {
+          "feed_type": 301,
+          "ration_percentage": 5.0
+        }
+      ],
+      "tolerance": 0.1,
+      "milk_reduction_maximum": 0.0
+    }
+  }
