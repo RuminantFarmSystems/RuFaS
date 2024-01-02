@@ -133,6 +133,4 @@ def test_generate_harvest_events(years: List[int], days: List[int], harvest_ops:
     crop_sched = CropSchedule("test_name", "test", [1], [120], years, days, harvest_ops, heat_scheduled, skip,
                               repeat)
     actual = crop_sched.generate_harvest_events()
-    print([(op.day, op.year) for op in actual])
-    print([(op.day, op.year) for op in expected])
     assert actual == expected
