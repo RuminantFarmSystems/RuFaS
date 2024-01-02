@@ -1210,7 +1210,7 @@ def test_calc_cull_reason_stats_percent(mocker: MockerFixture, life_cycle_manage
     for cull_reason in life_cycle_manager.cull_reason_stats_percent:
         if cow_herd_exit_num > 0:
             assert life_cycle_manager.cull_reason_stats_percent[cull_reason] == \
-                   approx(life_cycle_manager.cull_reason_stats[cull_reason] * 100.0 / cow_herd_exit_num)
+                approx(life_cycle_manager.cull_reason_stats[cull_reason] * 100.0 / cow_herd_exit_num)
         elif cow_herd_exit_num == 0:
             assert life_cycle_manager.cull_reason_stats_percent[cull_reason] == approx(0.0)
 
@@ -1241,7 +1241,7 @@ def test_calc_percent_cow_per_parity(mocker: MockerFixture, life_cycle_manager: 
     for parity in life_cycle_manager.num_cow_for_parity:
         if cow_num > 0:
             assert life_cycle_manager.percent_cow_for_parity[parity] == \
-                   approx(life_cycle_manager.num_cow_for_parity[parity] * 100.0 / cow_num)
+                approx(life_cycle_manager.num_cow_for_parity[parity] * 100.0 / cow_num)
         elif cow_num == 0:
             assert life_cycle_manager.percent_cow_for_parity[parity] == approx(0.0)
 
@@ -1463,3 +1463,9 @@ def test_reset_daily_stats(life_cycle_manager: LifeCycleManager) -> None:
     assert life_cycle_manager.avg_heifer_culling_age == approx(0.0)
     assert life_cycle_manager.avg_cow_culling_age == approx(0.0)
     assert life_cycle_manager.avg_mature_body_weight == approx(0.0)
+
+
+def test_calf(mocker: MockerFixture) -> None:
+    calf = mocker.MagicMock(autospec=Calf)
+    mocker.patch('RUFAS.routines.animal.life_cycle.life_cycle.Calf',
+                 return_value=calf)
