@@ -659,7 +659,7 @@ class Field:
             execute_heat_scheduled_harvest = crop.data.use_heat_scheduling and \
                                              crop.data.heat_fraction >= crop.data.harvest_heat_fraction
             if execute_heat_scheduled_harvest:
-                crop.crop_management.manage_harvest(HarvestOperation.HARVEST_NOKILL)
+                crop.crop_management.manage_harvest(HarvestOperation.HARVEST_NO_KILL)
                 self.soil.carbon_cycling.residue_partition.add_residue_to_pools(rainfall)
 
     @staticmethod
