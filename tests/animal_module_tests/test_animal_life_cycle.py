@@ -26,7 +26,6 @@ from RUFAS.routines.animal.pen import Pen
 from RUFAS.routines.animal.animal_types import AnimalType
 from RUFAS.routines.animal.ration.animal_requirements import AnimalRequirements
 from RUFAS.routines.feed.feed import Feed
-from RUFAS.routines.animal.life_cycle.animal_base import AnimalBase
 
 
 @fixture
