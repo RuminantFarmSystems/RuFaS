@@ -3,12 +3,21 @@ from enum import Enum
 
 from .harvested_crop import HarvestedCrop
 from .storage import Storage
-from .enums import CropType
+from .enums import CropType, CropCategory
 
 from .baleage import Baleage
-from .grain import Dry, HighMoisture
-from .hay import ProtectedIndoors, ProtectedTarped, ProtectedWrapped, Unprotected
-from .sileage import Bag, Bunker, Pile
+from .grain import Grain, Dry, HighMoisture
+from .hay import Hay, ProtectedIndoors, ProtectedTarped, ProtectedWrapped, Unprotected
+from .sileage import Sileage, Bag, Bunker, Pile
+
+# Defines the compatilibty between Crop Categories and Storage Types.
+CROP_TO_STORAGE_MAPPING: Dict[CropCategory, List[Storage]] = {
+    CropCategory.SMALL_GRAIN: [Hay, Grain, Sileage, Baleage],
+    CropCategory.CORN: [Grain, Sileage],
+    CropCategory.SOY: [Grain],
+    CropCategory.ALFALFA: [Hay, Sileage, Baleage],
+    CropCategory.GRASS: [Hay, Sileage, Baleage],
+}
 
 
 class StorageType(Enum):
@@ -58,7 +67,20 @@ class FeedManager:
         ValueError
             If the crop type is not compatible with the storage type.
         """
-        pass
+        compatible_storage_classes = CROP_TO_STORAGE_MAPPING[harvested_crop.category]
+        is_crop_compatible_with_storage = any(
+            issubclass(storage_type.value, storage_class)
+            for storage_class in compatible_storage_classes
+        )
+
+        if not is_crop_compatible_with_storage:
+            compatible_storage_names = [
+                cls.__name__ for cls in compatible_storage_classes
+            ]
+            raise ValueError(
+                f"Crop of category '{harvested_crop.category}' is not compatible with storage type '{storage_type}'. "
+                f"Compatible storage types are: {', '.join(compatible_storage_names)}"
+            )
 
     def process_degradations(self):
         """
