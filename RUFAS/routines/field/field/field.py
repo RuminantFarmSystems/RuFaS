@@ -1,6 +1,6 @@
 import math
-import pdb
 
+from RUFAS.routines.manure.manure_treatments.manure_types import ManureType
 from RUFAS.routines.field.crop.crop import Crop
 from RUFAS.routines.field.crop.crop_data import CropData
 from RUFAS.routines.field.crop.species_data_factory import CropSpecies, CropSpeciesDataFactory
@@ -374,7 +374,8 @@ class Field:
         )
         return evaluation_request
 
-    def _execute_manure_application(self, requested_nitrogen: float, requested_phosphorus: float, field_coverage: float,
+    def _execute_manure_application(self, requested_nitrogen: float, requested_phosphorus: float,
+                                    requested_manure_type: ManureType, field_coverage: float,
                                     application_depth: float, surface_remainder_fraction: float, year: int,
                                     day: int) -> None:
         """
@@ -387,6 +388,8 @@ class Field:
             Mass of nitrogen requested to be in this manure application (kg)
         requested_phosphorus : float
             Mass of phosphorus requested to be in this manure application (kg)
+        requested_manure_type : ManureType
+            The type of manure for which the application request will be made.
         field_coverage : float
             Fraction of the field this manure is applied to (unitless)
         application_depth : float
@@ -417,7 +420,8 @@ class Field:
             om.add_log("manure_application_log", log_message, info_map)
             return
 
-        nutrient_request = NutrientRequest(nitrogen=requested_nitrogen, phosphorus=requested_phosphorus)
+        nutrient_request = NutrientRequest(nitrogen=requested_nitrogen, phosphorus=requested_phosphorus,
+                                           manure_type=requested_manure_type)
 
         # manure_supplied = self.manure_manager.request_nutrients(nutrient_request)
         manure_supplied = self._construct_evaluation_manure_application(nutrient_request)
@@ -554,7 +558,7 @@ class Field:
         and if None, then it is the latter.
 
         """
-        info_map = {"class": self.__class__.__name__, "function": self._execute_manure_application.__name__,
+        info_map = {"class": self.__class__.__name__, "function": self._record_nutrient_application_error.__name__,
                     "prefix": f"field='{self.field_data.name}'", "date": {"year": year, "day": day}}
         if surface_remainder_fraction is not None:
             error_message = f"Invalid application depth ({application_depth}) and surface remainder fraction " \
@@ -626,9 +630,9 @@ class Field:
         """
         self.manure_events, todays_manure_events = self._filter_events(self.manure_events, time)
         for event in todays_manure_events:
-            self._execute_manure_application(event.nitrogen_mass, event.phosphorus_mass, event.field_coverage,
-                                             event.application_depth, event.surface_remainder_fraction, event.year,
-                                             event.day)
+            self._execute_manure_application(event.nitrogen_mass, event.phosphorus_mass, event.manure_type,
+                                             event.field_coverage, event.application_depth,
+                                             event.surface_remainder_fraction, event.year, event.day)
 
     def _check_crop_harvest_schedule(self, time: Time, current_conditions: CurrentDayConditions) -> None:
         """
@@ -672,7 +676,7 @@ class Field:
             execute_heat_scheduled_harvest = crop.data.use_heat_scheduling and \
                                              crop.data.heat_fraction >= crop.data.harvest_heat_fraction
             if execute_heat_scheduled_harvest:
-                crop.crop_management.manage_harvest(HarvestOperation.HARVEST_NOKILL)
+                crop.crop_management.manage_harvest(HarvestOperation.HARVEST_ONLY)
                 self.soil.carbon_cycling.residue_partition.add_residue_to_pools(rainfall)
 
     @staticmethod
@@ -800,8 +804,8 @@ class Field:
         ----------
         crop_reference : str
             Name used to get the specifications for the crop to be harvested.
-        harvest_operation : str
-            Name of the harvest operation to be performed on the referenced crop.
+        harvest_operation : HarvestOperation
+            Harvest operation to be performed on the referenced crop.
         time : Time
             Object containing the current day and year of the simulation.
         current_conditions : CurrentDayConditions
@@ -828,8 +832,7 @@ class Field:
             om.add_warning("harvest_warning", "No crop found to be harvested by a HarvestEvent.", info_map)
 
         for crop in crops_to_be_harvested:
-            harvest_operation_enum = HarvestOperation(harvest_operation)
-            crop.crop_management.manage_harvest(harvest_operation_enum, self.field_data.name,
+            crop.crop_management.manage_harvest(harvest_operation, self.field_data.name,
                                                 self.field_data.field_size, time.calendar_year, time.day,
                                                 self.soil.data)
             self.soil.carbon_cycling.residue_partition.add_residue_to_pools(current_conditions.rainfall)

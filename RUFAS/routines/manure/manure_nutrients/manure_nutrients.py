@@ -2,6 +2,8 @@ from __future__ import annotations
 
 from dataclasses import dataclass, fields
 
+from RUFAS.routines.manure.manure_treatments.manure_types import ManureType
+
 
 @dataclass(kw_only=True, frozen=True)
 class ManureNutrients:
@@ -22,6 +24,9 @@ class ManureNutrients:
     total_manure_mass: float = 0.0
     """Amount of accumulated manure mass derived from the manure module, kg."""
 
+    manure_type: ManureType
+    """Type of manure."""
+
     def __post_init__(self):
         """
         Validate the dataclass fields.
@@ -29,12 +34,18 @@ class ManureNutrients:
         Raises
         ------
         ValueError
-            If any field is negative.
+            If any numerical field is negative.
+            If manure type is not a valid ManureType.
 
         """
         for field in fields(self):
-            if getattr(self, field.name) < 0:
-                raise ValueError(f"Field {field.name} must be non-negative.")
+            value = getattr(self, field.name)
+            if field.name != "manure_type":
+                if value < 0:
+                    raise ValueError(f"Field {field.name} must be non-negative.")
+            else:
+                if not isinstance(value, ManureType):
+                    raise ValueError(f"Field {field.name} must be an instance of ManureType.")
 
     @property
     def dry_matter_fraction(self) -> float:
@@ -99,17 +110,22 @@ class ManureNutrients:
         ------
         TypeError
             If the other object is not a ManureNutrients object.
+            If the other object is not the same ManureType as the self.
 
         """
         if not isinstance(other, ManureNutrients):
             raise TypeError(f"Cannot add {type(self)} to {type(other)}.")
 
-        return ManureNutrients(
-            **{
-                f.name: getattr(self, f.name) + getattr(other, f.name)
-                for f in fields(self)
-            }
-        )
+        if self.manure_type != other.manure_type:
+            raise TypeError(f"Cannot add {self.manure_type} nutrients to {other.manure_type} nutrients.")
+
+        summed_attributes = {
+            field.name: getattr(self, field.name) + getattr(other, field.name)
+            for field in fields(self) if field.name != "manure_type"
+        }
+        summed_attributes['manure_type'] = self.manure_type
+
+        return ManureNutrients(**summed_attributes)
 
     def __mul__(self, scalar: int | float) -> ManureNutrients:
         """
@@ -139,9 +155,12 @@ class ManureNutrients:
         if scalar < 0.0:
             raise ValueError(f"Cannot multiply {type(self)} by a negative scalar.")
 
-        return ManureNutrients(
-            **{f.name: getattr(self, f.name) * scalar for f in fields(self)}
-        )
+        multiplied_attributes = {
+            field.name: getattr(self, field.name) * scalar for field in fields(self) if field.name != "manure_type"
+        }
+        multiplied_attributes['manure_type'] = self.manure_type
+
+        return ManureNutrients(**multiplied_attributes)
 
     def __sub__(self, other: ManureNutrients) -> ManureNutrients:
         """
@@ -161,17 +180,28 @@ class ManureNutrients:
         ------
         TypeError
             If the other object is not a ManureNutrients object.
+            If the other object is not the same ManureType as the self.
+        ValueError
+            If amount of any nutrient other object wants to subtract is greater than what is available in self.
 
         """
         if not isinstance(other, ManureNutrients):
-            raise TypeError(f"Cannot subtract {type(self)} from {type(other)}.")
+            raise TypeError(f"Cannot subtract {type(other)} from {type(self)}.")
 
-        return ManureNutrients(
-            **{
-                f.name: getattr(self, f.name) - getattr(other, f.name)
-                for f in fields(self)
-            }
-        )
+        if self.manure_type != other.manure_type:
+            raise TypeError(f"Cannot subtract {other.manure_type} nutrients from {self.manure_type} nutrients.")
+
+        subtracted_attributes = {}
+        for field in fields(self):
+            if field.name != "manure_type":
+                self_value = getattr(self, field.name)
+                other_value = getattr(other, field.name)
+                if other_value > self_value:
+                    raise ValueError(f"The amount of {field.name} in other object is greater than what is available.")
+                subtracted_attributes[field.name] = self_value - other_value
+        subtracted_attributes["manure_type"] = self.manure_type
+
+        return ManureNutrients(**subtracted_attributes)
 
     def __rmul__(self, scalar: int | float) -> ManureNutrients:
         """

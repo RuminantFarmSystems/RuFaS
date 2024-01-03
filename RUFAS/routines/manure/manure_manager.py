@@ -221,11 +221,19 @@ class ManureManager:
             self._pen_daily_update(animal_manager.simulation_day, pen)
 
         ManureModuleOutputManagerHelper.add_dataclass_object(
-            self._manure_nutrient_manager.values,
+            self._manure_nutrient_manager.get_values(ManureType.LIQUID),
             info_maps={
                 "class": self.__class__.__name__,
                 "function": self.daily_update.__name__,
-                "prefix": "ManureNutrients",
+                "prefix": "ManureNutrientsLiquid",
+            }
+        )
+        ManureModuleOutputManagerHelper.add_dataclass_object(
+            self._manure_nutrient_manager.get_values(ManureType.SOLID),
+            info_maps={
+                "class": self.__class__.__name__,
+                "function": self.daily_update.__name__,
+                "prefix": "ManureNutrientsSolid",
             }
         )
 
@@ -250,14 +258,15 @@ class ManureManager:
 
         """
         manure_type_by_treatment_type = {
-            ManureTreatmentType.SLURRY_STORAGE_OUTDOOR: ManureType.SLURRY,
-            ManureTreatmentType.SLURRY_STORAGE_UNDERFLOOR: ManureType.SLURRY,
+            ManureTreatmentType.SLURRY_STORAGE_OUTDOOR: ManureType.LIQUID,
+            ManureTreatmentType.SLURRY_STORAGE_UNDERFLOOR: ManureType.LIQUID,
             ManureTreatmentType.ANAEROBIC_LAGOON: ManureType.LIQUID,
             ManureTreatmentType.ANAEROBIC_DIGESTION_AND_LAGOON: ManureType.LIQUID,
             ManureTreatmentType.ANAEROBIC_DIGESTION: ManureType.LIQUID,
             ManureTreatmentType.ANAEROBIC_DIGESTION_AND_LAGOON_WITH_SPLIT: ManureType.LIQUID,
             ManureTreatmentType.COMPOST_BEDDED_PACK_BARN: ManureType.SOLID,
             ManureTreatmentType.OPEN_LOTS: ManureType.SOLID,
+            ManureTreatmentType.SEPARATED_SOLIDS_STORAGE: ManureType.SOLID,
         }
         return manure_type_by_treatment_type[treatment_type]
 
@@ -279,7 +288,6 @@ class ManureManager:
         """
 
         manure_density_by_manure_type = {
-            ManureType.SLURRY: ManureConstants.SLURRY_MANURE_DENSITY,
             ManureType.LIQUID: ManureConstants.LIQUID_MANURE_DENSITY,
             ManureType.SOLID: ManureConstants.SOLID_MANURE_DENSITY,
         }
@@ -291,7 +299,7 @@ class ManureManager:
             manure_treatment_daily_output: ManureTreatmentDailyOutput,
     ) -> None:
         """
-        Add the nutrients in the manure produced by a given pen to the manure nutrient manager.
+        Add the nutrients in the manure to the manure nutrient manager by manure type.
 
         Parameters
         ----------
@@ -305,50 +313,36 @@ class ManureManager:
         None
         """
 
-        nitrogen = max(
-            manure_treatment_daily_output.liquid_manure_nitrogen
-            + manure_treatment_daily_output.sludge_manure_nitrogen
-            + manure_treatment_daily_output.solid_manure_nitrogen,
-            0.0
-        )
-
-        phosphorus = max(
-            manure_treatment_daily_output.liquid_manure_phosphorus
-            + manure_treatment_daily_output.sludge_manure_phosphorus
-            + manure_treatment_daily_output.solid_manure_phosphorus,
-            0.0
-        )
-
-        potassium = max(
-            manure_treatment_daily_output.liquid_manure_potassium
-            + manure_treatment_daily_output.sludge_manure_potassium
-            + manure_treatment_daily_output.solid_manure_potassium,
-            0.0,
-        )
-
-        dry_matter = max(
-            manure_treatment_daily_output.liquid_manure_total_solids
-            + manure_treatment_daily_output.sludge_manure_total_solids
-            + manure_treatment_daily_output.solid_manure_total_solids,
-            0.0,
-        )
-
-        total_manure_mass = max(
-            manure_treatment_daily_output.liquid_manure_daily_volume
-            * self._get_manure_density_by_type(ManureType.LIQUID)
-            + manure_treatment_daily_output.sludge_manure_daily_volume
-            * self._get_manure_density_by_type(ManureType.SLURRY)
-            + manure_treatment_daily_output.solid_manure_daily_mass,
-            0.0
-        )
-
+        liquid_manure_nitrogen = max(manure_treatment_daily_output.liquid_manure_nitrogen, 0.0)
+        liquid_manure_phosphorus = max(manure_treatment_daily_output.liquid_manure_phosphorus, 0.0)
+        liquid_manure_potassium = max(manure_treatment_daily_output.liquid_manure_potassium, 0.0)
+        liquid_manure_total_solids = max(manure_treatment_daily_output.liquid_manure_total_solids, 0.0)
+        liquid_total_manure_mass = max((manure_treatment_daily_output.liquid_manure_daily_volume *
+                                        self._get_manure_density_by_type(ManureType.LIQUID)), 0.0)
         self._manure_nutrient_manager.add_nutrients(
             ManureNutrients(
-                nitrogen=nitrogen,
-                phosphorus=phosphorus,
-                potassium=potassium,
-                dry_matter=dry_matter,
-                total_manure_mass=total_manure_mass,
+                nitrogen=liquid_manure_nitrogen,
+                phosphorus=liquid_manure_phosphorus,
+                potassium=liquid_manure_potassium,
+                dry_matter=liquid_manure_total_solids,
+                total_manure_mass=liquid_total_manure_mass,
+                manure_type=ManureType.LIQUID,
+            )
+        )
+
+        solid_manure_phosphorus = max(manure_treatment_daily_output.solid_manure_phosphorus, 0.0)
+        solid_manure_nitrogen = max(manure_treatment_daily_output.solid_manure_nitrogen, 0.0)
+        solid_manure_potassium = max(manure_treatment_daily_output.solid_manure_potassium, 0.0)
+        solid_manure_total_solids = max(manure_treatment_daily_output.solid_manure_total_solids, 0.0)
+        solid_total_manure_mass = max(manure_treatment_daily_output.solid_manure_daily_mass, 0.0)
+        self._manure_nutrient_manager.add_nutrients(
+            ManureNutrients(
+                nitrogen=solid_manure_nitrogen,
+                phosphorus=solid_manure_phosphorus,
+                potassium=solid_manure_potassium,
+                dry_matter=solid_manure_total_solids,
+                total_manure_mass=solid_total_manure_mass,
+                manure_type=ManureType.SOLID,
             )
         )
 
