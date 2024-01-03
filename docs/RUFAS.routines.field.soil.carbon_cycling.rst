@@ -12,26 +12,26 @@ RUFAS.routines.field.soil.carbon\_cycling.carbon\_cycle module
    :undoc-members:
    :show-inheritance:
 
-RUFAS.routines.field.soil.carbon\_cycling.decomp\_factors module
-----------------------------------------------------------------
+RUFAS.routines.field.soil.carbon\_cycling.decomposition module
+--------------------------------------------------------------
 
-.. automodule:: RUFAS.routines.field.soil.carbon_cycling.decomp_factors
+.. automodule:: RUFAS.routines.field.soil.carbon_cycling.decomposition
    :members:
    :undoc-members:
    :show-inheritance:
 
-RUFAS.routines.field.soil.carbon\_cycling.pool\_gas\_partitioning module
-------------------------------------------------------------------------
+RUFAS.routines.field.soil.carbon\_cycling.pool\_gas\_partition module
+---------------------------------------------------------------------
 
-.. automodule:: RUFAS.routines.field.soil.carbon_cycling.pool_gas_partitioning
+.. automodule:: RUFAS.routines.field.soil.carbon_cycling.pool_gas_partition
    :members:
    :undoc-members:
    :show-inheritance:
 
-RUFAS.routines.field.soil.carbon\_cycling.residue\_partitioning module
-----------------------------------------------------------------------
+RUFAS.routines.field.soil.carbon\_cycling.residue\_partition module
+-------------------------------------------------------------------
 
-.. automodule:: RUFAS.routines.field.soil.carbon_cycling.residue_partitioning
+.. automodule:: RUFAS.routines.field.soil.carbon_cycling.residue_partition
    :members:
    :undoc-members:
    :show-inheritance:

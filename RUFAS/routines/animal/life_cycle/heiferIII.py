@@ -1,14 +1,3 @@
-"""
-RUFAS: Ruminant Farm Systems Model
-File name: heiferIII.py
-Author(s): Manfei Li, mli497@wisc.edu
-           Militsa Sotirova, militsasotirova@gmail.com
-Description: This file updates the heifer form close to calving to calving,
-            replacement from other farms are enter the herd in this stage, and
-            heifers can be sold in this stage. Body weight gain with user input
-            average daily gain, once mature body weight or grow end day reached,
-            grow stop.
-"""
 from RUFAS.output_manager import OutputManager
 from RUFAS.routines.animal.life_cycle.heiferII import HeiferII
 
@@ -34,8 +23,8 @@ class HeiferIII(HeiferII):
             args.repro_program: reproduction program used in heifer,
                 three of them: ED, TAI, and synch-ED programs
             args.tai_method_h: timed-AI protocols used for
-                reproduction programs, three of them: md5CG2P,
-                md5CGP, and user-defined
+                reproduction programs, three of them: 5dCG2P,
+                5dCGP, and user-defined
             args.synch_ed_method_h: synch ed protocols used for
                 reproduction programs, two of them: 2P and CP
             (optional: include the following to assign cow information)
