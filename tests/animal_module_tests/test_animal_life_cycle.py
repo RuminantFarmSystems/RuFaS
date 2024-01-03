@@ -1479,7 +1479,7 @@ def test_heiferI(mocker: MockerFixture) -> None:
     heiferI.days_born = 300
     temp = 30
     animal_grouping_scenario = AnimalType.HEIFER_I
-    nutrient_conc = {'dm': 0.0, 'NDF': 4.5, 'TDM': 7.8}
+    nutrient_conc = {'dm': 0.0, 'NDF': 4.5, 'TDN': 7.8}
     req = mocker.MagicMock(autospec=AnimalRequirements)
     animal_req = mocker.patch.object(
         AnimalRequirements, 'calc_rqmts', return_value=req
@@ -1503,14 +1503,16 @@ def test_heiferI(mocker: MockerFixture) -> None:
     # testing set_nutrient_rqmts()
     HeiferI.set_nutrient_rqmts(heiferI, temp, animal_grouping_scenario, nutrient_conc)
     animal_req.assert_called()
+    nutrient_conc = {'dm': 7.0, 'NDF': 4.5, 'TDN': 7.8}
+    HeiferI.set_nutrient_rqmts(heiferI, temp, animal_grouping_scenario, nutrient_conc, 0.0, 0.0)
+    animal_req.assert_called()
 
     # testing calc_manure_excretion()
     feed = mocker.MagicMock(autospec=Feed)
-    patch_base_manure = mocker.patch.object(
-        HeiferI, 'calc_base_manure', return_value=heiferI
-    )
-    HeiferI.calc_base_manure(heiferI, feed, "methane_model")
-    patch_base_manure.assert_called()
+    mock_numI = (mocker.MagicMock(autospec=int), mocker.MagicMock(autospec=int))
+    heiferI.calc_base_manure.return_value = mock_numI
+    HeiferI.calc_manure_excretion(heiferI, feed, "methane_model")
+    heiferI.calc_base_manure.assert_called()
 
     # testing phosphorus_rqmts()
     heiferI.p_maint_feces = 10
@@ -1533,6 +1535,12 @@ def test_heiferI(mocker: MockerFixture) -> None:
     weight = HeiferI.get_non_preg_bw_change(heiferI)
     calc_weight = 0.55 * 0.96 * heiferI.mature_body_weight - 0.96 * heiferI.body_weight  # divisor == 1
     assert weight == calc_weight
+
+    # testing get_heiferI_values()
+    heiferI_vals = mocker.MagicMock(autospec=Dict)
+    heiferI.get_calf_values.return_value = heiferI_vals
+    vals = HeiferI.get_heiferI_values(heiferI)
+    assert heiferI_vals == vals
 
 
 def test_update_heiferI(mocker: MockerFixture) -> None:
