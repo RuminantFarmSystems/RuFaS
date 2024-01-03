@@ -110,6 +110,7 @@ class PenManure:
         ) * GeneralConstants.CUBIC_METERS_TO_LITERS  # L
         total_ammoniacal_nitrogen = (
             animal_manure["total_ammoniacal_nitrogen_concentration"]  # g/L
+            / num_animals
             * manure_volume  # L
         ) * GeneralConstants.GRAMS_TO_KG  # kg
 

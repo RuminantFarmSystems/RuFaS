@@ -116,7 +116,8 @@ def test_pen_manure_init() -> None:
     )
     num_animals = 2
     expected_total_ammoniacal_nitrogen = (
-            total_ammoniacal_nitrogen_concentration *
+            total_ammoniacal_nitrogen_concentration
+            / num_animals *
             manure_mass * GeneralConstants.KG_TO_GRAMS /
             ManureConstants.MANURE_DENSITY
     ) * GeneralConstants.GRAMS_TO_KG
