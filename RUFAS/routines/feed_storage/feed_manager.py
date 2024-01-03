@@ -5,37 +5,14 @@ from .storage import Storage
 from .enums import CropType
 
 from .baleage import Baleage
-from .hay import ProtectedIndoors, ProtectedTarped, ProtectedWrapped, Unprotected
 from .grain import Dry, HighMoisture
+from .hay import ProtectedIndoors, ProtectedTarped, ProtectedWrapped, Unprotected
 from .sileage import Bag, Bunker, Pile
 
 
 class StorageType(Enum):
     """
-    Enumeration of storage types.
-
-    Attributes
-    ----------
-    PROTECTED_INDOORS : str
-        Represents a type of hay storage.
-    PROTECTED_WRAPPED : str
-        Represents a type of hay storage.
-    PROTECTED_TARPED : str
-        Represents a type of hay storage.
-    UNPROTECTED : str
-        Represents a type of hay storage.
-    BALEAGE : str
-        Represents a type of baleage storage.
-    DRY : str
-        Represents a type of grain storage.
-    HIGH_MOISTURE : str
-        Represents a type of grain storage.
-    BUNKER : str
-        Represents a type of silage storage.
-    PILE : str
-        Represents a type of silage storage.
-    BAG : str
-        Represents a type of silage storage.
+    Maps each storage type to its respective class.
     """
 
     PROTECTED_INDOORS = ProtectedIndoors
