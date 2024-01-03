@@ -897,12 +897,13 @@ class OutputManager(object):
             if produce_graphics:
                 try:
                     graph_generator = GraphGenerator(self.__metadata_prefix)
-                    graph_generator.generate_graph(
-                        filtered_pool,
-                        filter_content,
-                        filter_file,
-                        graphics_dir,
-                    )
+                    log_pool = graph_generator.generate_graph(
+                                filtered_pool,
+                                filter_content,
+                                filter_file,
+                                graphics_dir,
+                                )
+                    self._route_logs(log_pool)
                 except Exception as e:
                     self.add_error("graph generation exception", str(e), info_map)
             else:
@@ -911,6 +912,24 @@ class OutputManager(object):
                     f"Graphic generation is disabled, skipping {filter_file=}",
                     info_map,
                 )
+
+    def _route_logs(self, log_pool: List[Dict[str, str | Dict[str, str]]]) -> None:
+        """Takes logs from other classes and routes them to the appropriate pools in
+        Output Manager.
+
+        Parameters
+        ----------
+        log_pool : List[Dict[str, str | Dict[str, str]]]
+            A list of log, warning, and error dictionaries containing all the components needed
+            to log the information to the appropriate pool.
+        """
+        for log in log_pool:
+            if "error" in log:
+                self.add_error(log["error"], log["message"], log["info_map"])
+            elif "log" in log:
+                self.add_log(log["log"], log["message"], log["info_map"])
+            elif "warning" in log:
+                self.add_warning(log["warning"], log["message"], log["info_map"])
 
     @deprecated(
         reason="""This function is still in the code base but it is not used. We want to keep it for debugging purposes
