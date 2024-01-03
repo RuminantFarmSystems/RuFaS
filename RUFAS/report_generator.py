@@ -137,7 +137,7 @@ class ReportGenerator:
         self,
         filtered_pool: Dict[str, Dict[str, List[Any]]],
         filter_content: Dict[str, str | int | List[str]],
-    ) -> List[float]:
+    ) -> Dict[str, List[float]]:
         """
         Generates a report based on filtered data and aggregation criteria.
 
@@ -155,8 +155,8 @@ class ReportGenerator:
 
         Returns
         -------
-        List[float]
-            The aggregated report data as a list.
+        Dict[str, List[float]]
+            The sliced and aggregated data.
 
         Raises
         ------
@@ -177,8 +177,6 @@ class ReportGenerator:
                 f"filter {filter_content.get('filters')} in {filter_content.get('name')} led to empty report data."
             )
 
-        number_of_elements = len(report_data[next(iter(report_data))])
-
         horizontal_agg_key = filter_content.get("horizontal_aggregation")
         horizontal_aggregator = AGGREGATION_FUNCTIONS.get(horizontal_agg_key)
 
@@ -187,6 +185,7 @@ class ReportGenerator:
 
         if horizontal_aggregator:
             loop_list = filter_content.get("horizontal_order", report_data.keys())
+            number_of_elements = len(report_data[next(iter(report_data))])
             try:
                 horizontally_aggregated = [
                     horizontal_aggregator([report_data[key][i] for key in loop_list])
@@ -196,27 +195,22 @@ class ReportGenerator:
                 raise KeyError(
                     f"{e.args[0]} not found in filtered pool. Check the `horizontal_order` entry in the filter file."
                 )
+            if not vertical_aggregator:
+                return {"hor_agg": horizontally_aggregated}
 
         if vertical_aggregator:
             vertically_aggregated = [
                 vertical_aggregator(data_series)
                 for _, data_series in report_data.items()
             ]
+            if not horizontal_aggregator:
+                return {"ver_agg": vertically_aggregated}
 
-        if horizontal_aggregator and vertical_aggregator:
-            if filter_content.get("horizontal_first", True):
-                return [vertical_aggregator(horizontally_aggregated)]
-            return [horizontal_aggregator(vertically_aggregated)]
+            if filter_content.get("horizontal_first", False):
+                return {"hor_ver_agg": [vertical_aggregator(horizontally_aggregated)]}
+            return {"ver_hor_agg": [horizontal_aggregator(vertically_aggregated)]}
 
-        if horizontal_aggregator:
-            return horizontally_aggregated
-
-        if vertical_aggregator:
-            return vertically_aggregated
-
-        raise ValueError(
-            f"Didn't find `horizontal_aggregation` or `vertical_aggregation` in {filter_content.get('name')}."
-        )
+        return report_data
 
     def _prepare_report_data(
         self,

@@ -180,8 +180,8 @@ class CropManagement:
             self.data.residue_nitrogen = self.data.optimal_nitrogen_fraction * self.data.yield_residue
             self.data.residue_phosphorus = self.data.optimal_phosphorus_fraction * self.data.yield_residue
         else:
-            self.data.yield_nitrogen = self.data.yield_nitrogen_fraction * self.data.wet_yield_collected
-            self.data.yield_phosphorus = self.data.yield_phosphorus_fraction * self.data.wet_yield_collected
+            self.data.yield_nitrogen = self.data.yield_nitrogen_fraction * self.data.dry_matter_yield_collected
+            self.data.yield_phosphorus = self.data.yield_phosphorus_fraction * self.data.dry_matter_yield_collected
             self.data.residue_nitrogen = self.data.yield_nitrogen_fraction * self.data.yield_residue
             self.data.residue_phosphorus = self.data.yield_phosphorus_fraction * self.data.yield_residue
 
@@ -261,10 +261,11 @@ class CropManagement:
 
         """
         soil_data.crop_yield_nitrogen = self.data.residue_nitrogen
-        soil_data.plant_residue_lignin_composition = 0.17
+        soil_data.plant_residue_lignin_composition = self.data.lignin_dry_matter_percentage / 100
+        dry_matter_root_biomass = self.data.root_biomass * (self.data.dry_matter_percentage / 100)
         if killed:
             soil_data.plant_surface_residue = self.data.yield_residue - self.data.root_biomass
-            soil_data.plant_root_residue = self.data.root_biomass
+            soil_data.plant_root_residue = dry_matter_root_biomass
             soil_data.crop_root_depth = self.data.root_depth
         else:
             soil_data.plant_surface_residue = self.data.yield_residue

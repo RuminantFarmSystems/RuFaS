@@ -1,7 +1,7 @@
 {
     "crop_schedules": [
         {
-            "crop_species": "corn",
+            "crop_species": "corn_grain",
             "planting_years": [1989],
             "pattern_repeat": 0,
             "pattern_skip": 0,
@@ -15,7 +15,7 @@
 
         },
         {
-            "crop_species": "alfalfa",
+            "crop_species": "alfalfa_hay",
             "planting_years": [1990, 1991, 1992],
             "pattern_repeat": 0,
             "pattern_skip": 0,
@@ -28,7 +28,7 @@
             "extracted": true
         },
         {
-            "crop_species": "corn",
+            "crop_species": "corn_grain",
             "planting_years": [1993],
             "pattern_repeat": 0,
             "pattern_skip": 0,
@@ -42,7 +42,7 @@
 
         },
         {
-            "crop_species": "alfalfa",
+            "crop_species": "alfalfa_hay",
             "planting_years": [1994, 1995, 1996],
             "pattern_repeat": 0,
             "pattern_skip": 0,
@@ -55,7 +55,7 @@
             "extracted": true
         },
         {
-            "crop_species": "corn",
+            "crop_species": "corn_grain",
             "planting_years": [1997],
             "pattern_repeat": 0,
             "pattern_skip": 0,
@@ -69,7 +69,7 @@
 
         },
         {
-            "crop_species": "alfalfa",
+            "crop_species": "alfalfa_hay",
             "planting_years": [1998, 1999, 2000],
             "pattern_repeat": 0,
             "pattern_skip": 0,
@@ -83,7 +83,7 @@
 
         },
         {
-            "crop_species": "corn",
+            "crop_species": "corn_grain",
             "planting_years": [2001],
             "pattern_repeat": 0,
             "pattern_skip": 0,
@@ -97,7 +97,7 @@
 
         },
         {
-            "crop_species": "alfalfa",
+            "crop_species": "alfalfa_hay",
             "planting_years": [2002, 2003, 2004],
             "pattern_repeat": 0,
             "pattern_skip": 0,
@@ -111,7 +111,7 @@
 
         },
         {
-            "crop_species": "corn",
+            "crop_species": "corn_grain",
             "planting_years": [2005],
             "pattern_repeat": 0,
             "pattern_skip": 0,
@@ -124,7 +124,7 @@
             "extracted": true
         },
         {
-            "crop_species": "alfalfa",
+            "crop_species": "alfalfa_hay",
             "planting_years": [2006, 2007, 2008],
             "pattern_repeat": 0,
             "pattern_skip": 0,
@@ -138,7 +138,7 @@
 
         },
         {
-            "crop_species": "corn",
+            "crop_species": "corn_grain",
             "planting_years": [2009],
             "pattern_repeat": 0,
             "pattern_skip": 0,
@@ -151,7 +151,7 @@
             "extracted": true
         },
         {
-            "crop_species": "alfalfa",
+            "crop_species": "alfalfa_hay",
             "planting_years": [2010, 2011, 2012],
             "pattern_repeat": 0,
             "pattern_skip": 0,
@@ -164,7 +164,7 @@
             "extracted": true
         },
         {
-            "crop_species": "corn",
+            "crop_species": "corn_grain",
             "planting_years": [2013],
             "pattern_repeat": 0,
             "pattern_skip": 0,
@@ -177,7 +177,7 @@
             "extracted": true
         },
         {
-            "crop_species": "alfalfa",
+            "crop_species": "alfalfa_hay",
             "planting_years": [2014, 2015, 2016],
             "pattern_repeat": 0,
             "pattern_skip": 0,
@@ -190,7 +190,7 @@
             "extracted": true
         },
         {
-            "crop_species": "corn",
+            "crop_species": "corn_grain",
             "planting_years": [2017],
             "pattern_repeat": 0,
             "pattern_skip": 0,
@@ -203,7 +203,7 @@
             "extracted": true
         },
         {
-            "crop_species": "alfalfa",
+            "crop_species": "alfalfa_hay",
             "planting_years": [2018, 2019],
             "pattern_repeat": 0,
             "pattern_skip": 0,
