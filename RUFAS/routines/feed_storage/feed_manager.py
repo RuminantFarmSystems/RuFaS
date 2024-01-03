@@ -1,7 +1,53 @@
 from typing import List, Dict, Union
+from enum import Enum
 from .harvested_crop import HarvestedCrop
 from .storage import Storage
-from .enums import CropType, StorageType
+from .enums import CropType
+
+from .baleage import Baleage
+from .hay import ProtectedIndoors, ProtectedTarped, ProtectedWrapped, Unprotected
+from .grain import Dry, HighMoisture
+from .sileage import Bag, Bunker, Pile
+
+
+class StorageType(Enum):
+    """
+    Enumeration of storage types.
+
+    Attributes
+    ----------
+    PROTECTED_INDOORS : str
+        Represents a type of hay storage.
+    PROTECTED_WRAPPED : str
+        Represents a type of hay storage.
+    PROTECTED_TARPED : str
+        Represents a type of hay storage.
+    UNPROTECTED : str
+        Represents a type of hay storage.
+    BALEAGE : str
+        Represents a type of baleage storage.
+    DRY : str
+        Represents a type of grain storage.
+    HIGH_MOISTURE : str
+        Represents a type of grain storage.
+    BUNKER : str
+        Represents a type of silage storage.
+    PILE : str
+        Represents a type of silage storage.
+    BAG : str
+        Represents a type of silage storage.
+    """
+
+    PROTECTED_INDOORS = ProtectedIndoors
+    PROTECTED_WRAPPED = ProtectedWrapped
+    PROTECTED_TARPED = ProtectedTarped
+    UNPROTECTED = Unprotected
+    BALEAGE = Baleage
+    DRY = Dry
+    HIGH_MOISTURE = HighMoisture
+    BUNKER = Bunker
+    PILE = Pile
+    BAG = Bag
 
 
 class FeedManager:

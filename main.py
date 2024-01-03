@@ -536,4 +536,6 @@ def parse_gnu_args() -> argparse.Namespace:
 
 
 if __name__ == "__main__":
-    main()
+    # main()
+    from RUFAS.routines.feed_storage.feed_manager import test_me
+    test_me()
