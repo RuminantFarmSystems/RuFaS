@@ -1,5 +1,6 @@
 from typing import List, Dict, Union
 from enum import Enum
+
 from .harvested_crop import HarvestedCrop
 from .storage import Storage
 from .enums import CropType
@@ -39,7 +40,7 @@ class FeedManager:
     """
 
     def __init__(self):
-        self.active_storages: List[Storage] = []
+        self.active_storages: Dict[StorageType, Storage] = {}
 
     def receive_crop(self, harvested_crop: HarvestedCrop, storage_type: StorageType):
         """
@@ -63,7 +64,7 @@ class FeedManager:
         """
         Processes the degradation of all stored feeds over time.
         """
-        for storage in self.active_storages:
+        for _, storage in self.active_storages.items():
             storage.process_degradations()
 
     def give_feed(self, amount: float, crop_type: CropType) -> float:
@@ -103,4 +104,5 @@ class FeedManager:
         pass
 
     def purchase_feed(self) -> None:
+        """The purchase feed logic is currently in the Animal Module. We will move it to here."""
         pass
