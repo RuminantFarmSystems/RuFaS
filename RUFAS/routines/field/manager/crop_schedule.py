@@ -1,7 +1,7 @@
 from typing import List
 
 from RUFAS.routines.field.manager.schedule import Schedule
-from RUFAS.routines.field.crop.harvest_operations import FINAL_HARVEST_OPERATIONS
+from RUFAS.routines.field.crop.harvest_operations import HarvestOperation, FINAL_HARVEST_OPERATIONS
 from RUFAS.routines.field.manager.events import PlantingEvent, HarvestEvent
 
 """
@@ -52,7 +52,13 @@ class CropSchedule(Schedule):
 
         self.harvest_years = harvest_years
         self.harvest_days = self._elongate_list(harvest_days, len(harvest_years))
-        self.harvest_operations = self._elongate_list(harvest_operations, len(harvest_years))
+
+        harvest_operations_enum_list = [HarvestOperation(operation) for operation in harvest_operations]
+
+        self.harvest_operations = self._elongate_list(
+            harvest_operations_enum_list,
+            len(harvest_years)
+        )
 
         self._validate_harvest_parameters()
 

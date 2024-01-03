@@ -8,6 +8,11 @@ method will be used when harvesting a crop, and a `crop_reference` attribute, wh
 presently growing in a field will be harvested.
 """
 
+from RUFAS.routines.field.crop.harvest_operations import HarvestOperation
+
+
+from RUFAS.routines.manure.manure_treatments.manure_types import ManureType
+
 
 class Event:
     def __init__(self, year: int = 1, day: int = 120):
@@ -90,7 +95,13 @@ class PlantingEvent(Event):
 
 
 class HarvestEvent(Event):
-    def __init__(self, crop_reference: str, year: int = 1, day: int = 240, operation: str = "default"):
+    def __init__(
+        self,
+        crop_reference: str,
+        year: int = 1,
+        day: int = 240,
+        operation: HarvestOperation = HarvestOperation.HARVEST_KILL
+    ):
         """Creates a new HarvestEvent instance, which is a child of the Event class.
 
         A HarvestEvent object determines when (and how) a harvest operation should occur for a crop.
@@ -99,8 +110,8 @@ class HarvestEvent(Event):
         ----------
         crop_reference : str
             Name of the crop to be harvested.
-        operation : str, default="default"
-            the name of an accepted harvest operation (see HarvestOperation)
+        operation : HarvestOperation, default=HarvestOperation.HARVEST_KILL
+            A harvest operation from the Harvest Operations enum.
 
         """
         super().__init__(year=year, day=day)
@@ -153,8 +164,8 @@ class TillageEvent(Event):
 
 
 class ManureEvent(Event):
-    def __init__(self, year: int, day: int, nitrogen_mass: float, phosphorus_mass: float, field_coverage: float,
-                 application_depth: float, surface_remainder_fraction: float):
+    def __init__(self, year: int, day: int, nitrogen_mass: float, phosphorus_mass: float, manure_type: ManureType,
+                 field_coverage: float, application_depth: float, surface_remainder_fraction: float):
         """
         Creates a new ManureEvent instance, which defines how manure much manure such be requested and applied to a
         field.
@@ -169,6 +180,8 @@ class ManureEvent(Event):
             Minimum mass of nitrogen that should be contained in this manure application (kg)
         phosphorus_mass : float
             Minimum mass of phosphorus that should be contained in this manure application (kg)
+        manure_type : ManureType
+            The type of manure for which the application request will be made.
         field_coverage : float
             Fraction of the field covered by this manure application (unitless)
         application_depth : float
@@ -180,6 +193,7 @@ class ManureEvent(Event):
         super().__init__(year=year, day=day)
         self.nitrogen_mass = nitrogen_mass
         self.phosphorus_mass = phosphorus_mass
+        self.manure_type = manure_type
         self.field_coverage = field_coverage
         self.application_depth = application_depth
         self.surface_remainder_fraction = surface_remainder_fraction
@@ -189,6 +203,7 @@ class ManureEvent(Event):
         if isinstance(other, ManureEvent):
             return super().__eq__(other) and other.nitrogen_mass == self.nitrogen_mass \
                 and other.phosphorus_mass == self.phosphorus_mass \
+                and other.manure_type == self.manure_type \
                 and other.field_coverage == self.field_coverage \
                 and other.application_depth == self.application_depth \
                 and other.surface_remainder_fraction == self.surface_remainder_fraction
@@ -196,8 +211,8 @@ class ManureEvent(Event):
 
     def __hash__(self):
         """Overrides the hash method for ManureEvent objects."""
-        return hash((self.year, self.day, self.nitrogen_mass, self.phosphorus_mass, self.field_coverage,
-                     self.application_depth, self.surface_remainder_fraction))
+        return hash((self.year, self.day, self.nitrogen_mass, self.phosphorus_mass, self.manure_type,
+                     self.field_coverage, self.application_depth, self.surface_remainder_fraction))
 
 
 class FertilizerEvent(Event):

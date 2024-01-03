@@ -7,6 +7,7 @@
     "coverage_fractions": [0.3],
     "application_depths": [0],
     "surface_remainder_fractions": [1],
+    "manure_types": ["liquid"],
     "pattern_repeat": 0,
     "pattern_skip": 0
 }
