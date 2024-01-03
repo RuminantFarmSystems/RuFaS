@@ -1544,17 +1544,11 @@ def test_update_heiferI(mocker: MockerFixture) -> None:
     heiferI.daily_growth = 1.0
     heiferI.days_born = 399
     heifer_repro_method = 'TAI'
-    heifer_TAI_protocol = 'd5CG2P'
-    heifer_synchedED_protocol = '2P'
     nutrient_standard = 'NRC'
     animal_base_config = {
         "heifer_repro_method": heifer_repro_method,
         "target_heifer_preg_day": 399,
         "breeding_start_day_h": 400,
-        "heifer_repro_programs": {
-            "heifer_TAI_protocol": heifer_TAI_protocol,
-            "heifer_synchED_protocol": heifer_synchedED_protocol
-        },
         "nutrient_standard": nutrient_standard
     }
     mocker.patch('RUFAS.routines.animal.life_cycle.life_cycle.AnimalBase.config', animal_base_config)
