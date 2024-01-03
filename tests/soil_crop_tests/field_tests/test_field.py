@@ -254,7 +254,7 @@ def test_harvest_heat_scheduled_crops(crop_num: int, heat_scheduled: List[bool],
 
     for index in range(len(crops)):
         if expected_harvested[index]:
-            crops[index].crop_management.manage_harvest.assert_called_once_with(HarvestOperation.HARVEST_NOKILL)
+            crops[index].crop_management.manage_harvest.assert_called_once_with(HarvestOperation.HARVEST_ONLY)
         else:
             crops[index].crop_management.manage_harvest.assert_not_called()
     assert add_residue.call_count == expected_harvest_count
@@ -366,12 +366,13 @@ def test_plant_crop_error(field_name: str, crop_reference: str, custom_crop_spec
     assert expected in str(e.value)
 
 
-@pytest.mark.parametrize("crop_reference,harvest_op,field_name,field_size,rainfall,expected_operation", [
-    ("test_1", "default", "field_1", 1.4, 0.0, HarvestOperation.HARVEST),
-    ("test_2", "no_kill", "field_2", 2.33, 10.3, HarvestOperation.HARVEST_NOKILL),
+@pytest.mark.parametrize("crop_reference,harvest_op,field_name,field_size,rainfall", [
+    ("test_1", HarvestOperation.HARVEST_KILL, "field_1", 1.4, 0.0),
+    ("test_2", HarvestOperation.HARVEST_ONLY, "field_2", 2.33, 10.3),
+    ("test_3", HarvestOperation.KILL_ONLY, "field_3", 0.85, 0.5),
 ])
-def test_harvest_crop(crop_reference: str, harvest_op: str, field_name: str, field_size: float, rainfall: float,
-                      expected_operation: HarvestOperation) -> None:
+def test_harvest_crop(crop_reference: str, harvest_op: HarvestOperation, field_name: str, field_size: float,
+                      rainfall: float) -> None:
     """Tests that crops are harvested correctly."""
     harvest_crop = Crop()
     harvest_crop.data.id = crop_reference
@@ -397,7 +398,7 @@ def test_harvest_crop(crop_reference: str, harvest_op: str, field_name: str, fie
         if crop.data.id == "not this crop":
             crop.crop_management.manage_harvest.assert_not_called()
         else:
-            crop.crop_management.manage_harvest.assert_called_once_with(expected_operation, field_name, field_size,
+            crop.crop_management.manage_harvest.assert_called_once_with(harvest_op, field_name, field_size,
                                                                         1995, 100, field.soil.data)
     assert add_residue.call_count == 1
 
@@ -427,11 +428,11 @@ def test_harvest_crop_warnings(crops: List[Crop], expected_info_map: Dict, expec
 
         with patch.object(field.soil.carbon_cycling.residue_partition, "add_residue_to_pools", new_callable=MagicMock) \
                 as add_residue:
-            field._harvest_crop("test", "default", mocked_time, mock_conditions)
+            field._harvest_crop("test", HarvestOperation.HARVEST_KILL, mocked_time, mock_conditions)
 
         for crop in crops:
-            crop.crop_management.manage_harvest.assert_called_once_with(HarvestOperation.HARVEST, "test", 1.0, 2000,
-                                                                        200, field.soil.data)
+            crop.crop_management.manage_harvest.assert_called_once_with(HarvestOperation.HARVEST_KILL, "test", 1.0,
+                                                                        2000, 200, field.soil.data)
         assert add_residue.call_count == len(crops)
         actual = om.warnings_pool["field_name:'test'.harvest_warning"]
         assert actual['info_maps'].__contains__(expected_info_map)
