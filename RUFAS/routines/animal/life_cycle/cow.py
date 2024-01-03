@@ -125,6 +125,7 @@ class Cow(HeiferIII):
         self.resynch_method = args['resynch_method']
 
         self._is_in_presynch_period = False
+        self._presynch_last_day = 0
         self._is_in_tai_period = False
         self._num_conception_rate_decreases = 0
         self._is_estrus_after_pgf_simulated = False
@@ -838,7 +839,7 @@ class Cow(HeiferIII):
         if self._hormone_schedule:
             return False
 
-        return self._is_in_presynch_period
+        return self._is_in_presynch_period and self.days_born != self._presynch_last_day + 1
 
     def _should_set_up_hormone_delivery_for_tai(self) -> bool:
         """
@@ -852,6 +853,9 @@ class Cow(HeiferIII):
 
         if self._hormone_schedule:
             return False
+
+        if not self._is_in_presynch_period and self.days_in_milk == self.get_voluntary_waiting_period():
+            return True
 
         return self._is_in_tai_period
 

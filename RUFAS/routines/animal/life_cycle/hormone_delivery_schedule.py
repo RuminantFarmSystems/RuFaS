@@ -67,35 +67,28 @@ class HormoneDeliverySchedule:
         CowReproProtocolEnum.PreSynch_PreSynch.value: {
             0: {'deliver_hormones': ['PGF']},
             14: {'deliver_hormones': ['PGF']},
-            25: {
-                'set_presynch_end': True,
-                'set_tai_start': True,
-            },
+            25: {'set_presynch_end': True},
+            26: {'set_tai_start': True}
         },
         CowReproProtocolEnum.PreSynch_DoubleOvSynch.value: {
             0: {'deliver_hormones': ['GnRH']},
             7: {'deliver_hormones': ['PGF']},
             10: {'deliver_hormones': ['GnRH']},
-            16: {
-                'set_presynch_end': True,
-                'set_tai_start': True,
-            },
+            16: {'set_presynch_end': True},
+            17: {'set_tai_start': True},
         },
         CowReproProtocolEnum.PreSynch_G6G.value: {
             0: {'deliver_hormones': ['PGF']},
             2: {'deliver_hormones': ['GnRH']},
-            8: {
-                'set_presynch_end': True,
-                'set_tai_start': True,
-            },
+            8: {'set_presynch_end': True},
+            9: {'set_tai_start': True}
         },
 
         CowReproProtocolEnum.TAI_OvSynch_48.value: {
             0: {'deliver_hormones': ['GnRH']},
             7: {'deliver_hormones': ['PGF']},
             9: {'deliver_hormones': ['GnRH']},
-            10: {'deliver_hormones': ['GnRH']},
-            11: {
+            10: {
                 'set_ai_day': True,
                 'set_conception_rate': True,
                 'set_tai_end': True
@@ -105,8 +98,7 @@ class HormoneDeliverySchedule:
             0: {'deliver_hormones': ['GnRH']},
             7: {'deliver_hormones': ['PGF']},
             9: {'deliver_hormones': ['GnRH']},
-            10: {'deliver_hormones': ['GnRH']},
-            11: {
+            10: {
                 'set_ai_day': True,
                 'set_conception_rate': True,
                 'set_tai_end': True
@@ -115,8 +107,8 @@ class HormoneDeliverySchedule:
         CowReproProtocolEnum.TAI_CoSynch_72.value: {
             0: {'deliver_hormones': ['GnRH']},
             7: {'deliver_hormones': ['PGF']},
-            10: {'deliver_hormones': ['GnRH']},
-            11: {
+            10: {
+                'deliver_hormones': ['GnRH'],
                 'set_ai_day': True,
                 'set_conception_rate': True,
                 'set_tai_end': True
@@ -126,8 +118,8 @@ class HormoneDeliverySchedule:
             0: {'deliver_hormones': ['GnRH']},
             5: {'deliver_hormones': ['PGF']},
             6: {'deliver_hormones': ['PGF']},
-            8: {'deliver_hormones': ['GnRH']},
-            9: {
+            8: {
+                'deliver_hormones': ['GnRH'],
                 'set_ai_day': True,
                 'set_conception_rate': True,
                 'set_tai_end': True
