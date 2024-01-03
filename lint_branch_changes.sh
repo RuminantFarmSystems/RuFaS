@@ -16,7 +16,7 @@ else
     base_branch=$1
 fi
 
-changed_files=$(git diff --name-only $(git merge-base ${base_branch} HEAD) | grep -E '\.py$')
+changed_files=$(git diff --name-only --diff-filter=AM "$(git merge-base ${base_branch} HEAD)" | grep -E '\.py$')
 
 if [ -z "$changed_files" ]; then
     # Exit if there are no Python files to lint

@@ -1,19 +1,3 @@
-"""
-RUFAS: Ruminant Farm Systems Model
-----------------------------------
-
-File Name: animal_base.py
-
-Authors:
-    - Manfei Li: mli497@wisc.edu
-    - Militsa Sotirova: militsasotrirova@gmail.com
-    - Tayler Hansen: tlhansen@cornell.edu
-
-Description:
-    This file initializes common parameters including ID, breed, birth date,
-    and age for all animals to be identified.
-"""
-
 from RUFAS.routines.animal.animal_typed_dicts import AnimalBaseInitArgsTypedDict
 from RUFAS.routines.animal.life_cycle.animal_events import AnimalEvents
 from RUFAS.routines.animal.life_cycle.body_weight_history import BodyWeightHistory
@@ -34,7 +18,7 @@ class AnimalBase:
     @staticmethod
     def set_config(config):
         AnimalBase.config = config
-        AnimalBase.config['nutrient_standard'] = im.get_data("config.nutrient_standard")
+        AnimalBase.config["nutrient_standard"] = im.get_data("config.nutrient_standard")
 
     def __init__(self, args: AnimalBaseInitArgsTypedDict):
         """
@@ -51,11 +35,11 @@ class AnimalBase:
                         args.mature_body_weight: the mature body weight of the animal
                         args.events: events of the animal
         """
-        self.id = args['id']
-        self.breed = args['breed']
-        self.birth_date = args['birth_date']
-        self.days_born = args['days_born']
-        self.semen_used = self.config['semen_type']
+        self.id = args["id"]
+        self.breed = args["breed"]
+        self.birth_date = args["birth_date"]
+        self.days_born = args["days_born"]
+        self.semen_used = self.config["semen_type"]
         self.culled = False
         self.do_not_breed = False
         self.body_weight_history = []
@@ -66,7 +50,7 @@ class AnimalBase:
         self.set_default_nutrient_rqmts()
         self.dry_matter_intake = 0
         self.manure_excretion = {}
-        self.ration_formulation = {'objective': 0.00}
+        self.ration_formulation = {"objective": 0.00}
         self.DMIest = 0
         self.DBW = 0
         self.p_animal = 0
@@ -85,20 +69,21 @@ class AnimalBase:
         self.conceptus_weight = 0
         self.calf_birth_weight = 0
         self.tissue_changed = 0
-        if 'body_weight_history' in args:
-            self.body_weight_history = args['body_weight_history']
-            self.pen_history = args['pen_history']
-        if 'conceptus_weight' in args:
-            self.conceptus_weight = args['conceptus_weight']
-        if 'calf_birth_weight' in args:
-            self.calf_birth_weight = args['calf_birth_weight']
+        self.sold_at_day: int = None
+        if "body_weight_history" in args:
+            self.body_weight_history = args["body_weight_history"]
+            self.pen_history = args["pen_history"]
+        if "conceptus_weight" in args:
+            self.conceptus_weight = args["conceptus_weight"]
+        if "calf_birth_weight" in args:
+            self.calf_birth_weight = args["calf_birth_weight"]
 
     def set_default_nutrient_rqmts(self):
         """
         Sets the default nutrient requirement values to be 0.
         """
         for key in self.nutrients:
-            self.nutrient_rqmts[key] = {'op': '', 'val': 0}
+            self.nutrient_rqmts[key] = {"op": "", "val": 0}
 
     def set_ration(self, ration, DMI):
         """
@@ -140,7 +125,12 @@ class AnimalBase:
             self.dP_reserves = 0
 
         # amount of P in the animal (A.1G.A.3)
-        self.p_animal = self.p_animal + self.p_gest + self.p_growth + (self.dP_reserves - dP_reserves_prev)
+        self.p_animal = (
+            self.p_animal
+            + self.p_gest
+            + self.p_growth
+            + (self.dP_reserves - dP_reserves_prev)
+        )
 
     def calc_base_manure(self):
         """
@@ -160,10 +150,14 @@ class AnimalBase:
         # amount of P excreted by an animal (g) (A.1G.B.2)
         if self.dP_reserves == 0 and self.p_intake >= self.p_req:
             p_feces_excrt = self.p_intake - self.p_req + self.p_maint_feces
-        elif self.dP_reserves < 0 and self.p_intake >= self.p_req and \
-                self.p_excess >= (-1) * self.dP_reserves / 0.7:
-            p_feces_excrt = self.p_intake - self.p_req + self.p_maint_feces + \
-                            self.dP_reserves / 0.7
+        elif (
+            self.dP_reserves < 0
+            and self.p_intake >= self.p_req
+            and self.p_excess >= (-1) * self.dP_reserves / 0.7
+        ):
+            p_feces_excrt = (
+                self.p_intake - self.p_req + self.p_maint_feces + self.dP_reserves / 0.7
+            )
         else:
             p_feces_excrt = self.p_maint_feces
 
@@ -188,11 +182,11 @@ class AnimalBase:
             curr_day: the current simulation day
             classes_in_pen: the classes in the animal's current pen
         """
-        last_pen = self.pen_history[-1].pen if len(
-            self.pen_history) > 0 else None
+        last_pen = self.pen_history[-1].pen if len(self.pen_history) > 0 else None
         if last_pen is None or last_pen != curr_pen:
-            self.pen_history.append(PenHistory(curr_day, curr_day, curr_pen,
-                                               list(classes_in_pen)))
+            self.pen_history.append(
+                PenHistory(curr_day, curr_day, curr_pen, list(classes_in_pen))
+            )
         else:  # last_pen == curr_pen
             self.pen_history[-1].end_date = curr_day
             self.pen_history[-1].classes_in_pen = list(classes_in_pen)
@@ -205,6 +199,6 @@ class AnimalBase:
         Args:
             sim_day: simulation day
         """
-        self.body_weight_history.append(BodyWeightHistory(sim_day,
-                                                          self.days_born,
-                                                          self.body_weight))
+        self.body_weight_history.append(
+            BodyWeightHistory(sim_day, self.days_born, self.body_weight)
+        )

@@ -1,4 +1,3 @@
-
 """This module defines the various Event classes and helper functions
 
 Events are simple classes that will facilitate scheduling of different management operations. At their core, they
@@ -8,6 +7,9 @@ operation. For example, the `HarvestEvent` contains the `operation` attribute, w
 method will be used when harvesting a crop, and a `crop_reference` attribute, which specifies which crop that is
 presently growing in a field will be harvested.
 """
+
+
+from RUFAS.routines.manure.manure_treatments.manure_types import ManureType
 
 
 class Event:
@@ -154,8 +156,8 @@ class TillageEvent(Event):
 
 
 class ManureEvent(Event):
-    def __init__(self, year: int, day: int, nitrogen_mass: float, phosphorus_mass: float, field_coverage: float,
-                 application_depth: float, surface_remainder_fraction: float):
+    def __init__(self, year: int, day: int, nitrogen_mass: float, phosphorus_mass: float, manure_type: ManureType,
+                 field_coverage: float, application_depth: float, surface_remainder_fraction: float):
         """
         Creates a new ManureEvent instance, which defines how manure much manure such be requested and applied to a
         field.
@@ -170,6 +172,8 @@ class ManureEvent(Event):
             Minimum mass of nitrogen that should be contained in this manure application (kg)
         phosphorus_mass : float
             Minimum mass of phosphorus that should be contained in this manure application (kg)
+        manure_type : ManureType
+            The type of manure for which the application request will be made.
         field_coverage : float
             Fraction of the field covered by this manure application (unitless)
         application_depth : float
@@ -181,6 +185,7 @@ class ManureEvent(Event):
         super().__init__(year=year, day=day)
         self.nitrogen_mass = nitrogen_mass
         self.phosphorus_mass = phosphorus_mass
+        self.manure_type = manure_type
         self.field_coverage = field_coverage
         self.application_depth = application_depth
         self.surface_remainder_fraction = surface_remainder_fraction
@@ -190,6 +195,7 @@ class ManureEvent(Event):
         if isinstance(other, ManureEvent):
             return super().__eq__(other) and other.nitrogen_mass == self.nitrogen_mass \
                 and other.phosphorus_mass == self.phosphorus_mass \
+                and other.manure_type == self.manure_type \
                 and other.field_coverage == self.field_coverage \
                 and other.application_depth == self.application_depth \
                 and other.surface_remainder_fraction == self.surface_remainder_fraction
@@ -197,8 +203,8 @@ class ManureEvent(Event):
 
     def __hash__(self):
         """Overrides the hash method for ManureEvent objects."""
-        return hash((self.year, self.day, self.nitrogen_mass, self.phosphorus_mass, self.field_coverage,
-                     self.application_depth, self.surface_remainder_fraction))
+        return hash((self.year, self.day, self.nitrogen_mass, self.phosphorus_mass, self.manure_type,
+                     self.field_coverage, self.application_depth, self.surface_remainder_fraction))
 
 
 class FertilizerEvent(Event):
