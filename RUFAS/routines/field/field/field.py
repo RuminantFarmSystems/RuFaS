@@ -358,7 +358,8 @@ class Field:
                  "surface_remainder_fraction": surface_remainder_fraction}
         om.add_variable("fertilizer_application", value, info_map)
 
-    def _execute_manure_application(self, requested_nitrogen: float, requested_phosphorus: float, field_coverage: float,
+    def _execute_manure_application(self, requested_nitrogen: float, requested_phosphorus: float,
+                                    requested_manure_type: ManureType, field_coverage: float,
                                     application_depth: float, surface_remainder_fraction: float, year: int,
                                     day: int) -> None:
         """
@@ -371,6 +372,8 @@ class Field:
             Mass of nitrogen requested to be in this manure application (kg)
         requested_phosphorus : float
             Mass of phosphorus requested to be in this manure application (kg)
+        requested_manure_type : ManureType
+            The type of manure for which the application request will be made.
         field_coverage : float
             Fraction of the field this manure is applied to (unitless)
         application_depth : float
@@ -401,8 +404,6 @@ class Field:
             om.add_log("manure_application_log", log_message, info_map)
             return
 
-        # TODO add manure type into request - addressed by issue #1044
-        requested_manure_type = ManureType.LIQUID
         nutrient_request = NutrientRequest(nitrogen=requested_nitrogen, phosphorus=requested_phosphorus,
                                            manure_type=requested_manure_type)
 
@@ -613,9 +614,9 @@ class Field:
         """
         self.manure_events, todays_manure_events = self._filter_events(self.manure_events, time)
         for event in todays_manure_events:
-            self._execute_manure_application(event.nitrogen_mass, event.phosphorus_mass, event.field_coverage,
-                                             event.application_depth, event.surface_remainder_fraction, event.year,
-                                             event.day)
+            self._execute_manure_application(event.nitrogen_mass, event.phosphorus_mass, event.manure_type,
+                                             event.field_coverage, event.application_depth,
+                                             event.surface_remainder_fraction, event.year, event.day)
 
     def _check_crop_harvest_schedule(self, time: Time, current_conditions: CurrentDayConditions) -> None:
         """
