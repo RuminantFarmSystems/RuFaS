@@ -1,6 +1,6 @@
 from typing import List, Dict, Union
 from enum import Enum
-
+from RUFAS.time import Time
 from .harvested_crop import HarvestedCrop
 from .storage import Storage
 from .enums import CropType, CropCategory
@@ -51,7 +51,12 @@ class FeedManager:
     def __init__(self):
         self.active_storages: Dict[StorageType, Storage] = {}
 
-    def receive_crop(self, harvested_crop: HarvestedCrop, storage_type: StorageType):
+    def receive_crop(
+        self,
+        harvested_crop: HarvestedCrop,
+        storage_type: StorageType,
+        storage_time: Time,
+    ):
         """
         Receives a harvested crop and assigns it to a storage unit.
 
@@ -61,26 +66,30 @@ class FeedManager:
             The harvested crop to be stored.
         storage_type : StorageType
             The type of storage to use for this crop.
+        storage_time : Time
+            The time at which the crop is stored.
 
         Raises
         ------
         ValueError
             If the crop type is not compatible with the storage type.
         """
-        compatible_storage_classes = CROP_TO_STORAGE_MAPPING[harvested_crop.category]
+        compatible_storage_classes = CROP_TO_STORAGE_MAPPING.get(harvested_crop.category, [])
         is_crop_compatible_with_storage = any(
             issubclass(storage_type.value, storage_class)
             for storage_class in compatible_storage_classes
         )
 
         if not is_crop_compatible_with_storage:
-            compatible_storage_names = [
-                cls.__name__ for cls in compatible_storage_classes
-            ]
             raise ValueError(
                 f"Crop of category '{harvested_crop.category}' is not compatible with storage type '{storage_type}'. "
-                f"Compatible storage types are: {', '.join(compatible_storage_names)}"
+                f"Compatible storage types are: {', '.join([cls.__name__ for cls in compatible_storage_classes])}"
             )
+
+        if storage_type not in self.active_storages:
+            self.active_storages[storage_type] = storage_type.value()
+
+        self.active_storages[storage_type].receive_crop(HarvestedCrop, storage_time)
 
     def process_degradations(self):
         """
