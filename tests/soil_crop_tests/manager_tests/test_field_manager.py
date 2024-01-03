@@ -7,6 +7,7 @@ from RUFAS.routines.field.manager.crop_schedule import CropSchedule
 from RUFAS.current_day_conditions import CurrentDayConditions
 from RUFAS.routines.field.manager.fertilizer_schedule import FertilizerSchedule
 from RUFAS.routines.field.manager.manure_schedule import ManureSchedule
+from RUFAS.routines.manure.manure_treatments.manure_types import ManureType
 from RUFAS.routines.field.manager.tillage_schedule import TillageSchedule
 from RUFAS.routines.field.field.field_data import FieldData
 from RUFAS.routines.field.field.field import Field
@@ -284,6 +285,10 @@ def test_setup_fertilizer_schedule(fertilizer_schedule_data: Dict, expected_avai
          "nitrogen_masses": [266, 266, 201, 207, 230, 279, 214, 244, 320, 169, 355, 163, 245, 66, 275],
          "phosphorus_masses": [70, 70, 45, 36, 37, 50, 31, 48, 53, 20, 60, 29, 43, 30, 54],
          "potassium_masses": [188, 188, 211, 164, 183, 198, 112, 156, 227, 167, 270, 128, 192, 86, 178],
+         "manure_types": [ManureType.LIQUID, ManureType.LIQUID, ManureType.LIQUID, ManureType.LIQUID,
+                          ManureType.LIQUID, ManureType.LIQUID, ManureType.LIQUID, ManureType.LIQUID,
+                          ManureType.LIQUID, ManureType.LIQUID, ManureType.LIQUID, ManureType.LIQUID,
+                          ManureType.LIQUID, ManureType.LIQUID, ManureType.LIQUID],
          "coverage_fractions": [0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1],
          "application_depths": [150.0, 150.0, 150.0, 150.0, 150.0, 150.0, 150.0, 150.0, 150.0, 150.0, 150.0, 150.0,
                                 150.0, 150.0, 150.0],
@@ -296,6 +301,10 @@ def test_setup_fertilizer_schedule(fertilizer_schedule_data: Dict, expected_avai
                        days=[113, 335, 311, 311, 310, 315, 316, 316, 314, 310, 327, 304, 324, 280, 318],
                        nitrogen_masses=[266, 266, 201, 207, 230, 279, 214, 244, 320, 169, 355, 163, 245, 66, 275],
                        phosphorus_masses=[70, 70, 45, 36, 37, 50, 31, 48, 53, 20, 60, 29, 43, 30, 54],
+                       manure_types=[ManureType.LIQUID, ManureType.LIQUID, ManureType.LIQUID, ManureType.LIQUID,
+                                     ManureType.LIQUID, ManureType.LIQUID, ManureType.LIQUID, ManureType.LIQUID,
+                                     ManureType.LIQUID, ManureType.LIQUID, ManureType.LIQUID, ManureType.LIQUID,
+                                     ManureType.LIQUID, ManureType.LIQUID, ManureType.LIQUID],
                        field_coverages=[0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1],
                        application_depths=[150.0, 150.0, 150.0, 150.0, 150.0, 150.0, 150.0, 150.0, 150.0, 150.0, 150.0,
                                            150.0, 150.0, 150.0, 150.0],
@@ -308,6 +317,8 @@ def test_setup_fertilizer_schedule(fertilizer_schedule_data: Dict, expected_avai
          "days": [200, 200, 200, 200, 200, 200, 200, 200, 200],
          "nitrogen_masses": [1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000],
          "phosphorus_masses": [500, 500, 500, 500, 500, 500, 500, 500, 500],
+         "manure_types": [ManureType.LIQUID, ManureType.LIQUID, ManureType.LIQUID, ManureType.LIQUID, ManureType.LIQUID,
+                          ManureType.LIQUID, ManureType.LIQUID, ManureType.LIQUID, ManureType.LIQUID],
          "potassium_masses": [0.0],
          "coverage_fractions": [0.95, 0.95, 0.95, 0.95, 0.95, 0.95, 0.95, 0.95, 0.95],
          "application_depths": [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
@@ -315,8 +326,8 @@ def test_setup_fertilizer_schedule(fertilizer_schedule_data: Dict, expected_avai
          "pattern_repeat": 0,
          "pattern_skip": 0
      }, ManureSchedule(name="manure_schedule", years=[2008], days=[200], nitrogen_masses=[1000],
-                       phosphorus_masses=[500], field_coverages=[0.95], application_depths=[0.0],
-                       surface_remainder_fractions=[1.0], pattern_repeat=8, pattern_skip=0))
+                       phosphorus_masses=[500], manure_types=[ManureType.LIQUID], field_coverages=[0.95],
+                       application_depths=[0.0], surface_remainder_fractions=[1.0], pattern_repeat=8, pattern_skip=0))
 ])
 def test_setup_manure_schedule(manure_schedule_data: Dict, expected_manure_schedule: ManureSchedule,
                                mock_input_manager: InputManager,
@@ -400,35 +411,39 @@ def test_setup_tillage_schedule(tillage_schedule_data: Dict, expected_tillage_sc
           "planting_days": [121],
           "harvest_years": [2009],
           "harvest_days": [319],
-          "harvest_operations": ["default"],
+          "harvest_operations": ["harvest_kill"],
           "harvest_type": "scheduled"}
      ], [CropSchedule(name="crop_schedule_0", crop_reference="corn", planting_years=[2009], planting_days=[121],
-                      harvest_years=[2009], harvest_days=[319], harvest_operations=["default"],
+                      harvest_years=[2009], harvest_days=[319], harvest_operations=["harvest_kill"],
                       use_heat_scheduling=False, pattern_repeat=1)]),
     ([
          {"crop_species": "corn", "planting_years": [2010], "pattern_repeat": 0, "pattern_skip": 1,
-          "planting_days": [121], "harvest_years": [2010], "harvest_days": [319], "harvest_operations": ["default"],
-          "harvest_type": "optimal", "planting_order": "1st", "extracted": True},
+          "planting_days": [121], "harvest_years": [2010], "harvest_days": [319],
+          "harvest_operations": ["harvest_kill"], "harvest_type": "optimal", "planting_order": "1st",
+          "extracted": True},
          {"crop_species": "corn", "planting_years": [2011], "pattern_repeat": 0, "pattern_skip": 3,
-          "planting_days": [121], "harvest_years": [2011], "harvest_days": [319], "harvest_operations": ["default"],
-          "harvest_type": "scheduled", "planting_order": "1st", "extracted": True},
+          "planting_days": [121], "harvest_years": [2011], "harvest_days": [319],
+          "harvest_operations": ["harvest_kill"], "harvest_type": "scheduled", "planting_order": "1st",
+          "extracted": True},
          {"crop_species": "corn", "planting_years": [2012], "pattern_repeat": 0, "pattern_skip": 0,
-          "planting_days": [121], "harvest_years": [2012], "harvest_days": [319], "harvest_operations": ["default"],
-          "harvest_type": "optimal", "planting_order": "1st", "extracted": True},
+          "planting_days": [121], "harvest_years": [2012], "harvest_days": [319],
+          "harvest_operations": ["harvest_kill"], "harvest_type": "optimal", "planting_order": "1st",
+          "extracted": True},
          {"crop_species": "corn", "planting_years": [2013], "pattern_repeat": 0, "pattern_skip": 2,
-          "planting_days": [121], "harvest_years": [2013], "harvest_days": [319], "harvest_operations": ["default"],
-          "harvest_type": "scheduled", "planting_order": "1st", "extracted": True}
+          "planting_days": [121], "harvest_years": [2013], "harvest_days": [319],
+          "harvest_operations": ["harvest_kill"], "harvest_type": "scheduled", "planting_order": "1st",
+          "extracted": True}
      ], [CropSchedule(name="crop_schedule_0", crop_reference="corn", planting_years=[2010], planting_days=[121],
-                      harvest_years=[2010], harvest_days=[319], harvest_operations=["default"],
+                      harvest_years=[2010], harvest_days=[319], harvest_operations=["harvest_kill"],
                       use_heat_scheduling=True, pattern_repeat=0),
          CropSchedule(name="crop_schedule_1", crop_reference="corn", planting_years=[2011], planting_days=[121],
-                      harvest_years=[2011], harvest_days=[319], harvest_operations=["default"],
+                      harvest_years=[2011], harvest_days=[319], harvest_operations=["harvest_kill"],
                       use_heat_scheduling=False, pattern_repeat=0),
          CropSchedule(name="crop_schedule_2", crop_reference="corn", planting_years=[2012], planting_days=[121],
-                      harvest_years=[2012], harvest_days=[319], harvest_operations=["default"],
+                      harvest_years=[2012], harvest_days=[319], harvest_operations=["harvest_kill"],
                       use_heat_scheduling=True, pattern_repeat=0),
          CropSchedule(name="crop_schedule_3", crop_reference="corn", planting_years=[2013], planting_days=[121],
-                      harvest_years=[2013], harvest_days=[319], harvest_operations=["default"],
+                      harvest_years=[2013], harvest_days=[319], harvest_operations=["harvest_kill"],
                       use_heat_scheduling=False, pattern_repeat=0)
          ])
 ])

@@ -7,6 +7,7 @@ from RUFAS.routines.field.soil.soil_data import SoilData
 from RUFAS.routines.field.soil.layer_data import LayerData
 from RUFAS.routines.field.manager.crop_schedule import CropSchedule
 from RUFAS.routines.manure.manure_manager import ManureManager
+from RUFAS.routines.manure.manure_treatments.manure_types import ManureType
 from RUFAS.weather import Weather
 from RUFAS.time import Time
 from RUFAS.routines.field.manager.output_gatherer import OutputGatherer
@@ -196,12 +197,15 @@ class FieldManager:
 
         """
         manure_schedule_data = im.get_data(manure_schedule)
+        manure_type_strings = manure_schedule_data.get("manure_types")
+        manure_types = [ManureType(manure_type_string) for manure_type_string in manure_type_strings]
         manure_schedule_instance = ManureSchedule(
             name="manure_schedule",
             years=manure_schedule_data.get("years"),
             days=manure_schedule_data.get("days"),
             nitrogen_masses=manure_schedule_data.get("nitrogen_masses"),
             phosphorus_masses=manure_schedule_data.get("phosphorus_masses"),
+            manure_types=manure_types,
             field_coverages=manure_schedule_data.get("coverage_fractions"),
             application_depths=manure_schedule_data.get("application_depths"),
             surface_remainder_fractions=manure_schedule_data.get("surface_remainder_fractions"),
