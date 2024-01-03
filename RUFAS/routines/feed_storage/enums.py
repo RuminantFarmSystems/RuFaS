@@ -79,3 +79,25 @@ class CropType(Enum):
     FINE_FESCUE = "Fine Fescue"
     TALL_FESCUE = "Tall Fescue"
     MEADOW_FESCUE = "Meadow Fescue"
+
+
+class StorageType(Enum):
+    """
+    Enumeration of storage types.
+
+    Attributes
+    ----------
+    HAY : str
+        Represents hay storage.
+    GRAIN : str
+        Represents grain storage.
+    SILAGE : str
+         Represents hay storage.
+    BALEAGE : str
+         Represents baleage storage.
+    """
+
+    HAY = "Hay"
+    GRAIN = "Grain"
+    SILAGE = "Silage"
+    BALEAGE = "Baleage"
