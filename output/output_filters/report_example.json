@@ -51,7 +51,7 @@
       "name": "Last Year's Average Daily Milk Production per Cow (gallons)",
       "cross_references": [
         "Last Year's Average Daily Milk Production (gallons)",
-        "Last Year's Average Number of Milking Cows"
+        "Last Year's Average Daily Number of Milking Cows"
       ],
       "horizontal_aggregation": "division"
     },
