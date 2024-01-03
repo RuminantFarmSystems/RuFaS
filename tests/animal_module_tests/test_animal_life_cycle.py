@@ -1549,12 +1549,12 @@ def test_update_heiferI(mocker: MockerFixture) -> None:
     updated_val = HeiferI.update(heiferI, sim_day)
     heiferI.update_body_weight_history.assert_called()
     heiferI.get_non_preg_bw_change.assert_called()
-    assert updated_val == True
+    assert updated_val
     assert heiferI.days_born == 399
 
     heiferI.days_born = 398
     updated_val = HeiferI.update(heiferI, sim_day)
-    assert updated_val == False
+    assert not updated_val
     assert heiferI.days_born == 399
     heiferI.update_body_weight_history.assert_called()
     heiferI.get_non_preg_bw_change.assert_called()
