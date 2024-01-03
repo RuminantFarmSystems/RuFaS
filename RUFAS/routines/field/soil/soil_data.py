@@ -499,11 +499,9 @@ class SoilData:
         -------
         float
             The total amount of nitrates in the soil (kg per hectare).
+
         """
-        nitrates_sum = 0
-        for layer in self.soil_layers:
-            nitrates_sum += layer.nitrate_content
-        return nitrates_sum
+        return sum(self.get_vectorized_layer_attribute("nitrate_content"))
 
     @property
     def profile_ammonium_total(self) -> float:
