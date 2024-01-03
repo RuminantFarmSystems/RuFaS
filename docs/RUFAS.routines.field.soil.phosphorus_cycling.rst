@@ -4,34 +4,18 @@ RUFAS.routines.field.soil.phosphorus\_cycling package
 Submodules
 ----------
 
-RUFAS.routines.field.soil.phosphorus\_cycling.P\_mineralization module
-----------------------------------------------------------------------
+RUFAS.routines.field.soil.phosphorus\_cycling.fertilizer module
+---------------------------------------------------------------
 
-.. automodule:: RUFAS.routines.field.soil.phosphorus_cycling.P_mineralization
+.. automodule:: RUFAS.routines.field.soil.phosphorus_cycling.fertilizer
    :members:
    :undoc-members:
    :show-inheritance:
 
-RUFAS.routines.field.soil.phosphorus\_cycling.erosion module
-------------------------------------------------------------
+RUFAS.routines.field.soil.phosphorus\_cycling.manure module
+-----------------------------------------------------------
 
-.. automodule:: RUFAS.routines.field.soil.phosphorus_cycling.erosion
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-RUFAS.routines.field.soil.phosphorus\_cycling.fert\_leach module
-----------------------------------------------------------------
-
-.. automodule:: RUFAS.routines.field.soil.phosphorus_cycling.fert_leach
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-RUFAS.routines.field.soil.phosphorus\_cycling.manure\_leach module
-------------------------------------------------------------------
-
-.. automodule:: RUFAS.routines.field.soil.phosphorus_cycling.manure_leach
+.. automodule:: RUFAS.routines.field.soil.phosphorus_cycling.manure
    :members:
    :undoc-members:
    :show-inheritance:
@@ -44,10 +28,18 @@ RUFAS.routines.field.soil.phosphorus\_cycling.phosphorus\_cycling module
    :undoc-members:
    :show-inheritance:
 
-RUFAS.routines.field.soil.phosphorus\_cycling.soluble\_P module
----------------------------------------------------------------
+RUFAS.routines.field.soil.phosphorus\_cycling.phosphorus\_mineralization module
+-------------------------------------------------------------------------------
 
-.. automodule:: RUFAS.routines.field.soil.phosphorus_cycling.soluble_P
+.. automodule:: RUFAS.routines.field.soil.phosphorus_cycling.phosphorus_mineralization
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+RUFAS.routines.field.soil.phosphorus\_cycling.soluble\_phosphorus module
+------------------------------------------------------------------------
+
+.. automodule:: RUFAS.routines.field.soil.phosphorus_cycling.soluble_phosphorus
    :members:
    :undoc-members:
    :show-inheritance:

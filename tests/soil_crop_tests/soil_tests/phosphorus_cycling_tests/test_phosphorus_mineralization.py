@@ -8,20 +8,19 @@ from RUFAS.routines.field.soil.phosphorus_cycling.phosphorus_mineralization impo
 
 
 # --- Static method tests ---
-@pytest.mark.parametrize("old_parameter,current_parameter", [
-    (0.05, 0.05),
-    (0.7, 0.7),
-    (0.05, 0.7),
-    (0.7, 0.05),
-    (0.1344, 0.3345),
-    (0.687, 0.512)
+@pytest.mark.parametrize("old_parameter,current_parameter,expected", [
+    (0.05, 0.05, 0.05),
+    (0.7, 0.7, 0.7),
+    (0.05, 0.7, 0.05178082),
+    (0.7, 0.05, 0.69821917),
+    (0.1344, 0.3345, 0.13494821),
+    (0.687, 0.512, 0.686520547)
 ])
-def test_recompute_mean_phosphorus_sorption_parameter(old_parameter: float, current_parameter: float) -> None:
+def test_recompute_mean_phosphorus_sorption_parameter(old_parameter: float, current_parameter: float,
+                                                      expected: float) -> None:
     """Tests that the mean phosphorus sorption parameter is re-averaged correctly."""
     observed = PhosphorusMineralization._recompute_mean_phosphorus_sorption_parameter(old_parameter, current_parameter)
-    expected = (old_parameter * 29 + current_parameter) / 30
-    expected = max(0.05, min(0.7, expected))
-    assert observed == expected
+    assert pytest.approx(observed) == expected
 
 
 @pytest.mark.parametrize("labile,active,sorption_parameter", [

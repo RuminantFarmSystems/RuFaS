@@ -1,11 +1,9 @@
 {
     "start_date": "2009:244",
     "end_date": "2016:243",
-    "graphic_dir": "output/graphics/",
-    "output_dir": "output/",
-    "csv_dir": "output/CSVs",
     "random_seed": 0,
     "set_seed": false,
     "simulate_animals": false,
-    "nutrient_standard": "NASEM"
+    "nutrient_standard": "NASEM",
+    "FIPS_county_code": 55073
 }

@@ -1,27 +1,29 @@
 <!DOCTYPE html>
-<html class="writer-html5" lang="en" >
+<html class="writer-html5" lang="en" data-content_root="./">
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>RUFAS.routines.manure.beddings package &mdash; Ruminant Farm Simulation (RuFaS)  documentation</title>
-      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=19f00094" />
+
+  
   <!--[if lt IE 9]>
     <script src="_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
-        <script src="_static/jquery.js"></script>
-        <script src="_static/underscore.js"></script>
-        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
-        <script src="_static/doctools.js"></script>
-        <script src="_static/sphinx_highlight.js"></script>
+        <script src="_static/jquery.js?v=5d32c60e"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="_static/documentation_options.js?v=5929fcd5"></script>
+        <script src="_static/doctools.js?v=888ff710"></script>
+        <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="RUFAS.routines.manure.constants package" href="RUFAS.routines.manure.constants.html" />
-    <link rel="prev" title="RUFAS.routines.manure package" href="RUFAS.routines.manure.html" /> 
+    <link rel="next" title="RUFAS.routines.manure.constants_and_units package" href="RUFAS.routines.manure.constants_and_units.html" />
+    <link rel="prev" title="RUFAS.routines.manure.IO_helpers package" href="RUFAS.routines.manure.IO_helpers.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -29,11 +31,15 @@
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-            <a href="index.html" class="icon icon-home"> Ruminant Farm Simulation (RuFaS)
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            Ruminant Farm Simulation (RuFaS)
           </a>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" />
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
     <input type="hidden" name="check_keywords" value="yes" />
     <input type="hidden" name="area" value="default" />
   </form>
@@ -44,26 +50,29 @@
 <li class="toctree-l1 current"><a class="reference internal" href="modules.html">GitHub</a><ul class="current">
 <li class="toctree-l2 current"><a class="reference internal" href="RUFAS.html">RUFAS package</a><ul class="current">
 <li class="toctree-l3 current"><a class="reference internal" href="RUFAS.html#subpackages">Subpackages</a><ul class="current">
-<li class="toctree-l4"><a class="reference internal" href="RUFAS.output_handler.html">RUFAS.output_handler package</a></li>
 <li class="toctree-l4 current"><a class="reference internal" href="RUFAS.routines.html">RUFAS.routines package</a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="RUFAS.html#submodules">Submodules</a></li>
-<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.classes">RUFAS.classes module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.database_reader">RUFAS.database_reader module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.config">RUFAS.config module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.current_day_conditions">RUFAS.current_day_conditions module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.errors">RUFAS.errors module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.general_constants">RUFAS.general_constants module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.graph_generator">RUFAS.graph_generator module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.input_manager">RUFAS.input_manager module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.output_manager">RUFAS.output_manager module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.report_generator">RUFAS.report_generator module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.scenario_manager">RUFAS.scenario_manager module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.simulation_engine">RUFAS.simulation_engine module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.user_prompt">RUFAS.user_prompt module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.state">RUFAS.state module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.time">RUFAS.time module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.util">RUFAS.util module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.weather">RUFAS.weather module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS">Module contents</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="fileReader.html">fileReader module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="main.html">main module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="setup.html">setup module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="tests.html">tests package</a></li>
 </ul>
 </li>
 </ul>
@@ -81,7 +90,7 @@
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a href="index.html" class="icon icon-home"></a></li>
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
           <li class="breadcrumb-item"><a href="modules.html">GitHub</a></li>
           <li class="breadcrumb-item"><a href="RUFAS.html">RUFAS package</a></li>
           <li class="breadcrumb-item"><a href="RUFAS.routines.html">RUFAS.routines package</a></li>
@@ -97,271 +106,430 @@
            <div itemprop="articleBody">
              
   <section id="rufas-routines-manure-beddings-package">
-<h1>RUFAS.routines.manure.beddings package<a class="headerlink" href="#rufas-routines-manure-beddings-package" title="Permalink to this heading"></a></h1>
+<h1>RUFAS.routines.manure.beddings package<a class="headerlink" href="#rufas-routines-manure-beddings-package" title="Link to this heading"></a></h1>
 <section id="submodules">
-<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this heading"></a></h2>
+<h2>Submodules<a class="headerlink" href="#submodules" title="Link to this heading"></a></h2>
 </section>
 <section id="module-RUFAS.routines.manure.beddings.bedding_classes">
-<span id="rufas-routines-manure-beddings-bedding-classes-module"></span><h2>RUFAS.routines.manure.beddings.bedding_classes module<a class="headerlink" href="#module-RUFAS.routines.manure.beddings.bedding_classes" title="Permalink to this heading"></a></h2>
+<span id="rufas-routines-manure-beddings-bedding-classes-module"></span><h2>RUFAS.routines.manure.beddings.bedding_classes module<a class="headerlink" href="#module-RUFAS.routines.manure.beddings.bedding_classes" title="Link to this heading"></a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="RUFAS.routines.manure.beddings.bedding_classes.BaseBedding">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">RUFAS.routines.manure.beddings.bedding_classes.</span></span><span class="sig-name descname"><span class="pre">BaseBedding</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bedding_config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#RUFAS.routines.manure.beddings.bedding_classes.BeddingConfig" title="RUFAS.routines.manure.beddings.bedding_classes.BeddingConfig"><span class="pre">BeddingConfig</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.manure.beddings.bedding_classes.BaseBedding" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">RUFAS.routines.manure.beddings.bedding_classes.</span></span><span class="sig-name descname"><span class="pre">BaseBedding</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bedding_config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#RUFAS.routines.manure.beddings.bedding_classes.BeddingConfig" title="RUFAS.routines.manure.beddings.bedding_classes.BeddingConfig"><span class="pre">BeddingConfig</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.manure.beddings.bedding_classes.BaseBedding" title="Link to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ABC</span></code></p>
-<p>Base class for all bedding types.</p>
+<p>Abstract base class for all bedding types.</p>
+<p>This class provides a base for all bedding types. It initializes with a configuration of bedding
+attributes and includes methods for calculating various bedding properties.</p>
+<section id="attributes">
+<h3>Attributes<a class="headerlink" href="#attributes" title="Link to this heading"></a></h3>
 <dl class="simple">
-<dt>Attributes:</dt><dd><p>bedding_mass_per_day: Amount of bedding needed for each animal per day, kg/animal/day.
-bedding_density: Density of the bedding, kg/m^3.
-bedding_dry_matter_content: Dry matter content of the bedding, [0.7 - 1.0].
-bedding_cleaned_fraction: Fraction of bedding removed from the barn [0.7 - 1.0].
-bedding_type: Type of bedding.</p>
+<dt>bedding_mass_per_day<span class="classifier">float</span></dt><dd><p>Quantity of bedding required per animal per day (kg/animal/day).</p>
+</dd>
+<dt>bedding_density<span class="classifier">float</span></dt><dd><p>Density of the bedding (kg/<span class="math notranslate nohighlight">\(m^3\)</span>).</p>
+</dd>
+<dt>bedding_dry_matter_content<span class="classifier">float</span></dt><dd><p>Dry matter content in the bedding (unitless). Value should be in the range [0.7 - 1.0].</p>
+</dd>
+<dt>bedding_cleaned_fraction<span class="classifier">float</span></dt><dd><p>Fraction of bedding that is removed from the barn (unitless). Value should be in the range [0.7 - 1.0].</p>
+</dd>
+<dt>bedding_carbon_fraction<span class="classifier">float</span></dt><dd><p>Fraction of bedding that is composed of carbon (unitless). Value should be in the range [0.0 - 1.0].</p>
+</dd>
+<dt>bedding_phosphorus_content<span class="classifier">float</span></dt><dd><p>Quantity of phosphorus in the bedding (kg).</p>
+</dd>
+<dt>bedding_type<span class="classifier">str</span></dt><dd><p>Type of bedding as a string.</p>
 </dd>
 </dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="RUFAS.routines.manure.beddings.bedding_classes.BaseBedding.calc_total_bedding_dry_solids">
-<span class="sig-name descname"><span class="pre">calc_total_bedding_dry_solids</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_animals</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.routines.manure.beddings.bedding_classes.BaseBedding.calc_total_bedding_dry_solids" title="Permalink to this definition"></a></dt>
-<dd><p>Returns the total amount of dry solids in the bedding.</p>
+<span class="sig-name descname"><span class="pre">calc_total_bedding_dry_solids</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_animals</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.routines.manure.beddings.bedding_classes.BaseBedding.calc_total_bedding_dry_solids" title="Link to this definition"></a></dt>
+<dd><p>Calculate the total amount of dry solids in the bedding.</p>
+<section id="parameters">
+<h4>Parameters<a class="headerlink" href="#parameters" title="Link to this heading"></a></h4>
 <dl class="simple">
-<dt>Args:</dt><dd><p>num_animals: Number of animals in the pen.</p>
-</dd>
-<dt>Returns:</dt><dd><p>Total amount of dry solids in the bedding, kg/day.</p>
+<dt>num_animals<span class="classifier">int</span></dt><dd><p>The number of animals in the pen.</p>
 </dd>
 </dl>
+</section>
+<section id="returns">
+<h4>Returns<a class="headerlink" href="#returns" title="Link to this heading"></a></h4>
+<dl class="simple">
+<dt>float</dt><dd><p>The total amount of dry solids in the bedding (kg/day).</p>
+</dd>
+</dl>
+</section>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="RUFAS.routines.manure.beddings.bedding_classes.BaseBedding.calc_total_bedding_mass">
-<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">calc_total_bedding_mass</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_animals</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.routines.manure.beddings.bedding_classes.BaseBedding.calc_total_bedding_mass" title="Permalink to this definition"></a></dt>
-<dd><p>Returns the total amount of bedding needed for all animals in the given pen.</p>
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">calc_total_bedding_mass</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_animals</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.routines.manure.beddings.bedding_classes.BaseBedding.calc_total_bedding_mass" title="Link to this definition"></a></dt>
+<dd><p>Abstract method to calculate the total amount of bedding needed for all animals.</p>
+<section id="id1">
+<h4>Parameters<a class="headerlink" href="#id1" title="Link to this heading"></a></h4>
 <dl class="simple">
-<dt>Args:</dt><dd><p>num_animals: Number of animals in the pen.</p>
-</dd>
-<dt>Returns:</dt><dd><p>Total amount of bedding needed for all animals in the given pen, kg/day.</p>
+<dt>num_animals<span class="classifier">int</span></dt><dd><p>The number of animals in the pen.</p>
 </dd>
 </dl>
+</section>
+<section id="id2">
+<h4>Returns<a class="headerlink" href="#id2" title="Link to this heading"></a></h4>
+<dl class="simple">
+<dt>float</dt><dd><p>The total amount of bedding needed for all animals (kg/day).</p>
+</dd>
+</dl>
+</section>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="RUFAS.routines.manure.beddings.bedding_classes.BaseBedding.calc_total_bedding_volume">
-<span class="sig-name descname"><span class="pre">calc_total_bedding_volume</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_animals</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.routines.manure.beddings.bedding_classes.BaseBedding.calc_total_bedding_volume" title="Permalink to this definition"></a></dt>
-<dd><p>Return the total volume of bedding needed for all animals in the given pen.</p>
+<span class="sig-name descname"><span class="pre">calc_total_bedding_volume</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_animals</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.routines.manure.beddings.bedding_classes.BaseBedding.calc_total_bedding_volume" title="Link to this definition"></a></dt>
+<dd><p>Calculate the total volume of bedding needed for all animals.</p>
+<section id="id3">
+<h4>Parameters<a class="headerlink" href="#id3" title="Link to this heading"></a></h4>
 <dl class="simple">
-<dt>Args:</dt><dd><p>num_animals: Number of animals in the pen.</p>
-</dd>
-<dt>Returns:</dt><dd><p>Total volume of bedding needed for all animals in the given pen, m^3/day.</p>
+<dt>num_animals<span class="classifier">int</span></dt><dd><p>The number of animals in the pen.</p>
 </dd>
 </dl>
+</section>
+<section id="id4">
+<h4>Returns<a class="headerlink" href="#id4" title="Link to this heading"></a></h4>
+<dl class="simple">
+<dt>float</dt><dd><p>The total volume of bedding needed for all animals (<span class="math notranslate nohighlight">\(m^3\)</span>/day).</p>
+</dd>
+</dl>
+</section>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="RUFAS.routines.manure.beddings.bedding_classes.BaseBedding.calc_total_bedding_washed">
-<span class="sig-name descname"><span class="pre">calc_total_bedding_washed</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_animals</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.routines.manure.beddings.bedding_classes.BaseBedding.calc_total_bedding_washed" title="Permalink to this definition"></a></dt>
-<dd><p>Returns the total amount of bedding that is washed away.</p>
+<span class="sig-name descname"><span class="pre">calc_total_bedding_washed</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_animals</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.routines.manure.beddings.bedding_classes.BaseBedding.calc_total_bedding_washed" title="Link to this definition"></a></dt>
+<dd><p>Calculate the total amount of bedding that is washed away.</p>
+<section id="id5">
+<h4>Parameters<a class="headerlink" href="#id5" title="Link to this heading"></a></h4>
 <dl class="simple">
-<dt>Args:</dt><dd><p>num_animals: Number of animals in the pen.</p>
-</dd>
-<dt>Returns:</dt><dd><p>Total amount of bedding that is washed away, kg/animal/day.</p>
+<dt>num_animals<span class="classifier">int</span></dt><dd><p>The number of animals in the pen.</p>
 </dd>
 </dl>
+</section>
+<section id="id6">
+<h4>Returns<a class="headerlink" href="#id6" title="Link to this heading"></a></h4>
+<dl class="simple">
+<dt>float</dt><dd><p>The total amount of bedding that is washed away (kg/animal/day).</p>
+</dd>
+</dl>
+</section>
 </dd></dl>
 
+</section>
 </dd></dl>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="RUFAS.routines.manure.beddings.bedding_classes.BaseOrganicBedding">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">RUFAS.routines.manure.beddings.bedding_classes.</span></span><span class="sig-name descname"><span class="pre">BaseOrganicBedding</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bedding_config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#RUFAS.routines.manure.beddings.bedding_classes.BeddingConfig" title="RUFAS.routines.manure.beddings.bedding_classes.BeddingConfig"><span class="pre">BeddingConfig</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.manure.beddings.bedding_classes.BaseOrganicBedding" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">RUFAS.routines.manure.beddings.bedding_classes.</span></span><span class="sig-name descname"><span class="pre">BaseOrganicBedding</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bedding_config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#RUFAS.routines.manure.beddings.bedding_classes.BeddingConfig" title="RUFAS.routines.manure.beddings.bedding_classes.BeddingConfig"><span class="pre">BeddingConfig</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.manure.beddings.bedding_classes.BaseOrganicBedding" title="Link to this definition"></a></dt>
 <dd><p>Bases: <a class="reference internal" href="#RUFAS.routines.manure.beddings.bedding_classes.BaseBedding" title="RUFAS.routines.manure.beddings.bedding_classes.BaseBedding"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseBedding</span></code></a></p>
-<p>Base class for all organic bedding types.</p>
+<p>Abstract base class for all organic bedding types.</p>
+<p>This class extends the BaseBedding class and provides a method to calculate the total
+amount of bedding needed for all animals in a pen.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="RUFAS.routines.manure.beddings.bedding_classes.BaseOrganicBedding.calc_total_bedding_mass">
-<span class="sig-name descname"><span class="pre">calc_total_bedding_mass</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_animals</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.routines.manure.beddings.bedding_classes.BaseOrganicBedding.calc_total_bedding_mass" title="Permalink to this definition"></a></dt>
-<dd><p>Returns the total amount of bedding needed for all animals in the given pen.</p>
+<span class="sig-name descname"><span class="pre">calc_total_bedding_mass</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_animals</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.routines.manure.beddings.bedding_classes.BaseOrganicBedding.calc_total_bedding_mass" title="Link to this definition"></a></dt>
+<dd><p>Calculate the total amount of bedding needed for all animals in the given pen.</p>
+<section id="id7">
+<h3>Parameters<a class="headerlink" href="#id7" title="Link to this heading"></a></h3>
 <dl class="simple">
-<dt>Args:</dt><dd><p>num_animals: Number of animals in the pen.</p>
-</dd>
-<dt>Returns:</dt><dd><p>Total amount of bedding needed for all animals in the given pen, kg/day.</p>
+<dt>num_animals<span class="classifier">int</span></dt><dd><p>The number of animals in the pen.</p>
 </dd>
 </dl>
+</section>
+<section id="id8">
+<h3>Returns<a class="headerlink" href="#id8" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>float</dt><dd><p>Total amount of bedding needed for all animals in the given pen (kg/day).</p>
+</dd>
+</dl>
+</section>
 </dd></dl>
 
 </dd></dl>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="RUFAS.routines.manure.beddings.bedding_classes.BeddingConfig">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">RUFAS.routines.manure.beddings.bedding_classes.</span></span><span class="sig-name descname"><span class="pre">BeddingConfig</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bedding_mass_per_day</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bedding_density</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bedding_dry_matter_content</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bedding_cleaned_fraction</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bedding_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#RUFAS.routines.manure.beddings.bedding_classes.BeddingType" title="RUFAS.routines.manure.beddings.bedding_classes.BeddingType"><span class="pre">BeddingType</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">sand_removal_efficiency</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.manure.beddings.bedding_classes.BeddingConfig" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">RUFAS.routines.manure.beddings.bedding_classes.</span></span><span class="sig-name descname"><span class="pre">BeddingConfig</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bedding_mass_per_day</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="s"><span class="pre">'float'</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bedding_density</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="s"><span class="pre">'float'</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bedding_dry_matter_content</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="s"><span class="pre">'float'</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bedding_cleaned_fraction</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="s"><span class="pre">'float'</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bedding_carbon_fraction</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="s"><span class="pre">'float'</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bedding_phosphorus_content</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="s"><span class="pre">'float'</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bedding_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="s"><span class="pre">'BeddingType'</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sand_removal_efficiency</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="s"><span class="pre">'float'</span></span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.manure.beddings.bedding_classes.BeddingConfig" title="Link to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<p>Class for storing the configuration of a bedding.</p>
-<dl class="simple">
-<dt>Attributes:</dt><dd><p>bedding_mass_per_day: Amount of bedding needed for each animal per day, kg/animal/day.
-bedding_density: Density of the bedding, kg/m^3.
-bedding_dry_matter_content: Dry matter content of the bedding as a fraction of the total mass, [0.7, 1.0],
-dimensionless.
-bedding_cleaned_fraction: Percent of the bedding that is washed away, [0.7, 1.0], dimensionless.
-sand_removal_efficiency: Efficiency of removing sand from the bedding, [0.7, 1.0], dimensionless.</p>
-</dd>
-</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.beddings.bedding_classes.BeddingConfig.bedding_carbon_fraction">
+<span class="sig-name descname"><span class="pre">bedding_carbon_fraction</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#RUFAS.routines.manure.beddings.bedding_classes.BeddingConfig.bedding_carbon_fraction" title="Link to this definition"></a></dt>
+<dd><p>Fraction of bedding that is composed of carbon (unitless).
+Value should be in the range <span class="math notranslate nohighlight">\([0.0 - 1.0]\)</span>.</p>
+</dd></dl>
+
 <dl class="py attribute">
 <dt class="sig sig-object py" id="RUFAS.routines.manure.beddings.bedding_classes.BeddingConfig.bedding_cleaned_fraction">
-<span class="sig-name descname"><span class="pre">bedding_cleaned_fraction</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#RUFAS.routines.manure.beddings.bedding_classes.BeddingConfig.bedding_cleaned_fraction" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<span class="sig-name descname"><span class="pre">bedding_cleaned_fraction</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#RUFAS.routines.manure.beddings.bedding_classes.BeddingConfig.bedding_cleaned_fraction" title="Link to this definition"></a></dt>
+<dd><p>Fraction of bedding that is removed from the barn (unitless).
+Value should be in the range <span class="math notranslate nohighlight">\([0.7 - 1.0]\)</span>.</p>
+</dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="RUFAS.routines.manure.beddings.bedding_classes.BeddingConfig.bedding_density">
-<span class="sig-name descname"><span class="pre">bedding_density</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#RUFAS.routines.manure.beddings.bedding_classes.BeddingConfig.bedding_density" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<span class="sig-name descname"><span class="pre">bedding_density</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#RUFAS.routines.manure.beddings.bedding_classes.BeddingConfig.bedding_density" title="Link to this definition"></a></dt>
+<dd><p>Density of the bedding (<span class="math notranslate nohighlight">\(kg/m^3\)</span>).</p>
+</dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="RUFAS.routines.manure.beddings.bedding_classes.BeddingConfig.bedding_dry_matter_content">
-<span class="sig-name descname"><span class="pre">bedding_dry_matter_content</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#RUFAS.routines.manure.beddings.bedding_classes.BeddingConfig.bedding_dry_matter_content" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<span class="sig-name descname"><span class="pre">bedding_dry_matter_content</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#RUFAS.routines.manure.beddings.bedding_classes.BeddingConfig.bedding_dry_matter_content" title="Link to this definition"></a></dt>
+<dd><p>Dry matter content in the bedding (unitless).
+Value should be in the range <span class="math notranslate nohighlight">\([0.7 - 1.0]\)</span>.</p>
+</dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="RUFAS.routines.manure.beddings.bedding_classes.BeddingConfig.bedding_mass_per_day">
-<span class="sig-name descname"><span class="pre">bedding_mass_per_day</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#RUFAS.routines.manure.beddings.bedding_classes.BeddingConfig.bedding_mass_per_day" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<span class="sig-name descname"><span class="pre">bedding_mass_per_day</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#RUFAS.routines.manure.beddings.bedding_classes.BeddingConfig.bedding_mass_per_day" title="Link to this definition"></a></dt>
+<dd><p>Quantity of bedding required per animal per day (<span class="math notranslate nohighlight">\(kg/animal/day\)</span>).</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.beddings.bedding_classes.BeddingConfig.bedding_phosphorus_content">
+<span class="sig-name descname"><span class="pre">bedding_phosphorus_content</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#RUFAS.routines.manure.beddings.bedding_classes.BeddingConfig.bedding_phosphorus_content" title="Link to this definition"></a></dt>
+<dd><p>Quantity of phosphorus in the bedding (kg).</p>
+</dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="RUFAS.routines.manure.beddings.bedding_classes.BeddingConfig.bedding_type">
-<span class="sig-name descname"><span class="pre">bedding_type</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#RUFAS.routines.manure.beddings.bedding_classes.BeddingType" title="RUFAS.routines.manure.beddings.bedding_classes.BeddingType"><span class="pre">BeddingType</span></a></em><a class="headerlink" href="#RUFAS.routines.manure.beddings.bedding_classes.BeddingConfig.bedding_type" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<span class="sig-name descname"><span class="pre">bedding_type</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#RUFAS.routines.manure.beddings.bedding_classes.BeddingType" title="RUFAS.routines.manure.beddings.bedding_classes.BeddingType"><span class="pre">BeddingType</span></a></em><a class="headerlink" href="#RUFAS.routines.manure.beddings.bedding_classes.BeddingConfig.bedding_type" title="Link to this definition"></a></dt>
+<dd><p>Type of bedding.</p>
+</dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="RUFAS.routines.manure.beddings.bedding_classes.BeddingConfig.sand_removal_efficiency">
-<span class="sig-name descname"><span class="pre">sand_removal_efficiency</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.0</span></em><a class="headerlink" href="#RUFAS.routines.manure.beddings.bedding_classes.BeddingConfig.sand_removal_efficiency" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<span class="sig-name descname"><span class="pre">sand_removal_efficiency</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#RUFAS.routines.manure.beddings.bedding_classes.BeddingConfig.sand_removal_efficiency" title="Link to this definition"></a></dt>
+<dd><p>Efficiency of removing sand from the bedding (unitless).
+Value should be in the range <span class="math notranslate nohighlight">\([0.7 - 1.0]\)</span>.</p>
+</dd></dl>
 
 </dd></dl>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="RUFAS.routines.manure.beddings.bedding_classes.BeddingFactory">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">RUFAS.routines.manure.beddings.bedding_classes.</span></span><span class="sig-name descname"><span class="pre">BeddingFactory</span></span><a class="headerlink" href="#RUFAS.routines.manure.beddings.bedding_classes.BeddingFactory" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">RUFAS.routines.manure.beddings.bedding_classes.</span></span><span class="sig-name descname"><span class="pre">BeddingFactory</span></span><a class="headerlink" href="#RUFAS.routines.manure.beddings.bedding_classes.BeddingFactory" title="Link to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<p>Class for creating bedding objects.</p>
+<p>A factory class for creating bedding objects.</p>
+<p>This class leverages the Factory design pattern to instantiate bedding objects of different types.
+Based on the bedding type provided, it either uses the default configuration or a custom configuration,
+if provided.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="RUFAS.routines.manure.beddings.bedding_classes.BeddingFactory.get_instance">
-<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_instance</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bedding_type_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">custom_bedding_config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#RUFAS.routines.manure.beddings.bedding_classes.BeddingConfig" title="RUFAS.routines.manure.beddings.bedding_classes.BeddingConfig"><span class="pre">BeddingConfig</span></a><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#RUFAS.routines.manure.beddings.bedding_classes.BaseBedding" title="RUFAS.routines.manure.beddings.bedding_classes.BaseBedding"><span class="pre">BaseBedding</span></a></span></span><a class="headerlink" href="#RUFAS.routines.manure.beddings.bedding_classes.BeddingFactory.get_instance" title="Permalink to this definition"></a></dt>
-<dd><p>Return the bedding object for the given bedding type name.</p>
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_instance</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bedding_type_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">custom_bedding_config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#RUFAS.routines.manure.beddings.bedding_classes.BeddingConfig" title="RUFAS.routines.manure.beddings.bedding_classes.BeddingConfig"><span class="pre">BeddingConfig</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#RUFAS.routines.manure.beddings.bedding_classes.BaseBedding" title="RUFAS.routines.manure.beddings.bedding_classes.BaseBedding"><span class="pre">BaseBedding</span></a></span></span><a class="headerlink" href="#RUFAS.routines.manure.beddings.bedding_classes.BeddingFactory.get_instance" title="Link to this definition"></a></dt>
+<dd><p>Create a bedding object of the specified type.</p>
+<p>If a custom bedding configuration is provided, it is used to create the bedding object. Otherwise,
+the default configuration for the bedding type is used.</p>
+<section id="id9">
+<h3>Parameters<a class="headerlink" href="#id9" title="Link to this heading"></a></h3>
 <dl class="simple">
-<dt>Args:</dt><dd><p>bedding_type_name: Name of the bedding type.
-custom_bedding_config: Custom configuration of the bedding, if any.</p>
+<dt>bedding_type_name<span class="classifier">str</span></dt><dd><p>Name of the bedding type.</p>
 </dd>
-<dt>Returns:</dt><dd><p>Bedding object for the given bedding type name.</p>
+<dt>custom_bedding_config<span class="classifier">Optional[BeddingConfig], default is None</span></dt><dd><p>Custom configuration of the bedding, if any.</p>
 </dd>
 </dl>
+</section>
+<section id="id10">
+<h3>Returns<a class="headerlink" href="#id10" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>BaseBedding</dt><dd><p>Bedding object of the specified type.</p>
+</dd>
+</dl>
+</section>
 </dd></dl>
 
 </dd></dl>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="RUFAS.routines.manure.beddings.bedding_classes.BeddingType">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">RUFAS.routines.manure.beddings.bedding_classes.</span></span><span class="sig-name descname"><span class="pre">BeddingType</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.manure.beddings.bedding_classes.BeddingType" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">RUFAS.routines.manure.beddings.bedding_classes.</span></span><span class="sig-name descname"><span class="pre">BeddingType</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.manure.beddings.bedding_classes.BeddingType" title="Link to this definition"></a></dt>
 <dd><p>Bases: <a class="reference internal" href="RUFAS.routines.manure.default_enum.html#RUFAS.routines.manure.default_enum.default_enum.DefaultEnum" title="RUFAS.routines.manure.default_enum.default_enum.DefaultEnum"><code class="xref py py-class docutils literal notranslate"><span class="pre">DefaultEnum</span></code></a></p>
-<p>Enumerates the different types of bedding.</p>
+<p>Enumerate the different types of bedding.</p>
+<p>This class, derived from the <cite>DefaultEnum</cite> base class, provides a set of predefined constants
+that represent different types of bedding such as sawdust, straw, and sand. The default type is sand.</p>
+<section id="id11">
+<h3>Attributes<a class="headerlink" href="#id11" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>SAWDUST<span class="classifier">str</span></dt><dd><p>Represent the ‘sawdust’ type of bedding.</p>
+</dd>
+<dt>CBPB_SAWDUST<span class="classifier">str</span></dt><dd><p>Represent the ‘CBPB sawdust’ type of bedding.</p>
+</dd>
+<dt>MANURE_SOLIDS<span class="classifier">str</span></dt><dd><p>Represent the ‘manure solids’ type of bedding.</p>
+</dd>
+<dt>STRAW<span class="classifier">str</span></dt><dd><p>Represent the ‘straw’ type of bedding.</p>
+</dd>
+<dt>SAND<span class="classifier">str</span></dt><dd><p>Represent the ‘sand’ type of bedding.</p>
+</dd>
+<dt>DEFAULT<span class="classifier">str</span></dt><dd><p>The default type of bedding is ‘sand’ if none is specified.</p>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.beddings.bedding_classes.BeddingType.CBPB_SAWDUST">
+<span class="sig-name descname"><span class="pre">CBPB_SAWDUST</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'CBPB</span> <span class="pre">sawdust'</span></em><a class="headerlink" href="#RUFAS.routines.manure.beddings.bedding_classes.BeddingType.CBPB_SAWDUST" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
 <dl class="py attribute">
 <dt class="sig sig-object py" id="RUFAS.routines.manure.beddings.bedding_classes.BeddingType.DEFAULT">
-<span class="sig-name descname"><span class="pre">DEFAULT</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'sand'</span></em><a class="headerlink" href="#RUFAS.routines.manure.beddings.bedding_classes.BeddingType.DEFAULT" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">DEFAULT</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'sand'</span></em><a class="headerlink" href="#RUFAS.routines.manure.beddings.bedding_classes.BeddingType.DEFAULT" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="RUFAS.routines.manure.beddings.bedding_classes.BeddingType.MANURE_SOLIDS">
-<span class="sig-name descname"><span class="pre">MANURE_SOLIDS</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'manure</span> <span class="pre">solids'</span></em><a class="headerlink" href="#RUFAS.routines.manure.beddings.bedding_classes.BeddingType.MANURE_SOLIDS" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">MANURE_SOLIDS</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'manure</span> <span class="pre">solids'</span></em><a class="headerlink" href="#RUFAS.routines.manure.beddings.bedding_classes.BeddingType.MANURE_SOLIDS" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="RUFAS.routines.manure.beddings.bedding_classes.BeddingType.SAND">
-<span class="sig-name descname"><span class="pre">SAND</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'sand'</span></em><a class="headerlink" href="#RUFAS.routines.manure.beddings.bedding_classes.BeddingType.SAND" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">SAND</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'sand'</span></em><a class="headerlink" href="#RUFAS.routines.manure.beddings.bedding_classes.BeddingType.SAND" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="RUFAS.routines.manure.beddings.bedding_classes.BeddingType.SAWDUST">
-<span class="sig-name descname"><span class="pre">SAWDUST</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'sawdust'</span></em><a class="headerlink" href="#RUFAS.routines.manure.beddings.bedding_classes.BeddingType.SAWDUST" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">SAWDUST</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'sawdust'</span></em><a class="headerlink" href="#RUFAS.routines.manure.beddings.bedding_classes.BeddingType.SAWDUST" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.beddings.bedding_classes.BeddingType.STRAW">
+<span class="sig-name descname"><span class="pre">STRAW</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'straw'</span></em><a class="headerlink" href="#RUFAS.routines.manure.beddings.bedding_classes.BeddingType.STRAW" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</section>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.beddings.bedding_classes.CBPBSawdustBedding">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">RUFAS.routines.manure.beddings.bedding_classes.</span></span><span class="sig-name descname"><span class="pre">CBPBSawdustBedding</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bedding_config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#RUFAS.routines.manure.beddings.bedding_classes.BeddingConfig" title="RUFAS.routines.manure.beddings.bedding_classes.BeddingConfig"><span class="pre">BeddingConfig</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.manure.beddings.bedding_classes.CBPBSawdustBedding" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#RUFAS.routines.manure.beddings.bedding_classes.BaseOrganicBedding" title="RUFAS.routines.manure.beddings.bedding_classes.BaseOrganicBedding"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseOrganicBedding</span></code></a></p>
+<p>A concrete class representing sawdust bedding type for compost bedded pack barns.</p>
+<p>All attributes and methods are inherited from BaseOrganicBedding.</p>
 </dd></dl>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="RUFAS.routines.manure.beddings.bedding_classes.DefaultBeddingConfigFactory">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">RUFAS.routines.manure.beddings.bedding_classes.</span></span><span class="sig-name descname"><span class="pre">DefaultBeddingConfigFactory</span></span><a class="headerlink" href="#RUFAS.routines.manure.beddings.bedding_classes.DefaultBeddingConfigFactory" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">RUFAS.routines.manure.beddings.bedding_classes.</span></span><span class="sig-name descname"><span class="pre">DefaultBeddingConfigFactory</span></span><a class="headerlink" href="#RUFAS.routines.manure.beddings.bedding_classes.DefaultBeddingConfigFactory" title="Link to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<p>Class for creating default bedding configurations.</p>
+<p>Factory class for creating default bedding configurations.</p>
+<p>This class contains predefined configurations for different types of beddings. It offers a method to retrieve
+these predefined configurations based on the bedding type.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.beddings.bedding_classes.DefaultBeddingConfigFactory.CBPB_SAWDUST_BEDDING_CONFIG">
+<span class="sig-name descname"><span class="pre">CBPB_SAWDUST_BEDDING_CONFIG</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">BeddingConfig(bedding_mass_per_day=12,</span> <span class="pre">bedding_density=350.0,</span> <span class="pre">bedding_dry_matter_content=0.9,</span> <span class="pre">bedding_cleaned_fraction=1.0,</span> <span class="pre">bedding_carbon_fraction=0.35,</span> <span class="pre">bedding_phosphorus_content=0.0,</span> <span class="pre">bedding_type=&lt;BeddingType.CBPB_SAWDUST:</span> <span class="pre">'CBPB</span> <span class="pre">sawdust'&gt;,</span> <span class="pre">sand_removal_efficiency=0.0)</span></em><a class="headerlink" href="#RUFAS.routines.manure.beddings.bedding_classes.DefaultBeddingConfigFactory.CBPB_SAWDUST_BEDDING_CONFIG" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
 <dl class="py attribute">
 <dt class="sig sig-object py" id="RUFAS.routines.manure.beddings.bedding_classes.DefaultBeddingConfigFactory.MANURE_SOLIDS_BEDDING_CONFIG">
-<span class="sig-name descname"><span class="pre">MANURE_SOLIDS_BEDDING_CONFIG</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">BeddingConfig(bedding_mass_per_day=2.5,</span> <span class="pre">bedding_density=400.0,</span> <span class="pre">bedding_dry_matter_content=0.9,</span> <span class="pre">bedding_cleaned_fraction=1.0,</span> <span class="pre">bedding_type=&lt;BeddingType.MANURE_SOLIDS:</span> <span class="pre">'manure</span> <span class="pre">solids'&gt;,</span> <span class="pre">sand_removal_efficiency=0.0)</span></em><a class="headerlink" href="#RUFAS.routines.manure.beddings.bedding_classes.DefaultBeddingConfigFactory.MANURE_SOLIDS_BEDDING_CONFIG" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">MANURE_SOLIDS_BEDDING_CONFIG</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">BeddingConfig(bedding_mass_per_day=2.5,</span> <span class="pre">bedding_density=400.0,</span> <span class="pre">bedding_dry_matter_content=0.9,</span> <span class="pre">bedding_cleaned_fraction=1.0,</span> <span class="pre">bedding_carbon_fraction=0.0,</span> <span class="pre">bedding_phosphorus_content=0.0,</span> <span class="pre">bedding_type=&lt;BeddingType.MANURE_SOLIDS:</span> <span class="pre">'manure</span> <span class="pre">solids'&gt;,</span> <span class="pre">sand_removal_efficiency=0.0)</span></em><a class="headerlink" href="#RUFAS.routines.manure.beddings.bedding_classes.DefaultBeddingConfigFactory.MANURE_SOLIDS_BEDDING_CONFIG" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="RUFAS.routines.manure.beddings.bedding_classes.DefaultBeddingConfigFactory.SAND_BEDDING_CONFIG">
-<span class="sig-name descname"><span class="pre">SAND_BEDDING_CONFIG</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">BeddingConfig(bedding_mass_per_day=25.0,</span> <span class="pre">bedding_density=1500.0,</span> <span class="pre">bedding_dry_matter_content=0.9,</span> <span class="pre">bedding_cleaned_fraction=1.0,</span> <span class="pre">bedding_type=&lt;BeddingType.SAND:</span> <span class="pre">'sand'&gt;,</span> <span class="pre">sand_removal_efficiency=1.0)</span></em><a class="headerlink" href="#RUFAS.routines.manure.beddings.bedding_classes.DefaultBeddingConfigFactory.SAND_BEDDING_CONFIG" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">SAND_BEDDING_CONFIG</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">BeddingConfig(bedding_mass_per_day=25.0,</span> <span class="pre">bedding_density=1500.0,</span> <span class="pre">bedding_dry_matter_content=0.9,</span> <span class="pre">bedding_cleaned_fraction=1.0,</span> <span class="pre">bedding_carbon_fraction=0.0,</span> <span class="pre">bedding_phosphorus_content=0.0,</span> <span class="pre">bedding_type=&lt;BeddingType.SAND:</span> <span class="pre">'sand'&gt;,</span> <span class="pre">sand_removal_efficiency=1.0)</span></em><a class="headerlink" href="#RUFAS.routines.manure.beddings.bedding_classes.DefaultBeddingConfigFactory.SAND_BEDDING_CONFIG" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="RUFAS.routines.manure.beddings.bedding_classes.DefaultBeddingConfigFactory.SAWDUST_BEDDING_CONFIG">
-<span class="sig-name descname"><span class="pre">SAWDUST_BEDDING_CONFIG</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">BeddingConfig(bedding_mass_per_day=1.97,</span> <span class="pre">bedding_density=250.0,</span> <span class="pre">bedding_dry_matter_content=0.9,</span> <span class="pre">bedding_cleaned_fraction=1.0,</span> <span class="pre">bedding_type=&lt;BeddingType.SAWDUST:</span> <span class="pre">'sawdust'&gt;,</span> <span class="pre">sand_removal_efficiency=0.0)</span></em><a class="headerlink" href="#RUFAS.routines.manure.beddings.bedding_classes.DefaultBeddingConfigFactory.SAWDUST_BEDDING_CONFIG" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">SAWDUST_BEDDING_CONFIG</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">BeddingConfig(bedding_mass_per_day=1.97,</span> <span class="pre">bedding_density=250.0,</span> <span class="pre">bedding_dry_matter_content=0.9,</span> <span class="pre">bedding_cleaned_fraction=1.0,</span> <span class="pre">bedding_carbon_fraction=0.0,</span> <span class="pre">bedding_phosphorus_content=0.0,</span> <span class="pre">bedding_type=&lt;BeddingType.SAWDUST:</span> <span class="pre">'sawdust'&gt;,</span> <span class="pre">sand_removal_efficiency=0.0)</span></em><a class="headerlink" href="#RUFAS.routines.manure.beddings.bedding_classes.DefaultBeddingConfigFactory.SAWDUST_BEDDING_CONFIG" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.beddings.bedding_classes.DefaultBeddingConfigFactory.STRAW_BEDDING_CONFIG">
+<span class="sig-name descname"><span class="pre">STRAW_BEDDING_CONFIG</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">BeddingConfig(bedding_mass_per_day=1.97,</span> <span class="pre">bedding_density=100.0,</span> <span class="pre">bedding_dry_matter_content=0.9,</span> <span class="pre">bedding_cleaned_fraction=1.0,</span> <span class="pre">bedding_carbon_fraction=0.35,</span> <span class="pre">bedding_phosphorus_content=0.0,</span> <span class="pre">bedding_type=&lt;BeddingType.STRAW:</span> <span class="pre">'straw'&gt;,</span> <span class="pre">sand_removal_efficiency=0.0)</span></em><a class="headerlink" href="#RUFAS.routines.manure.beddings.bedding_classes.DefaultBeddingConfigFactory.STRAW_BEDDING_CONFIG" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="RUFAS.routines.manure.beddings.bedding_classes.DefaultBeddingConfigFactory.get_instance">
-<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_instance</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bedding_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#RUFAS.routines.manure.beddings.bedding_classes.BeddingType" title="RUFAS.routines.manure.beddings.bedding_classes.BeddingType"><span class="pre">BeddingType</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#RUFAS.routines.manure.beddings.bedding_classes.BeddingConfig" title="RUFAS.routines.manure.beddings.bedding_classes.BeddingConfig"><span class="pre">BeddingConfig</span></a></span></span><a class="headerlink" href="#RUFAS.routines.manure.beddings.bedding_classes.DefaultBeddingConfigFactory.get_instance" title="Permalink to this definition"></a></dt>
-<dd><p>Return the default bedding configuration for the given bedding type.</p>
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_instance</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bedding_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#RUFAS.routines.manure.beddings.bedding_classes.BeddingType" title="RUFAS.routines.manure.beddings.bedding_classes.BeddingType"><span class="pre">BeddingType</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#RUFAS.routines.manure.beddings.bedding_classes.BeddingConfig" title="RUFAS.routines.manure.beddings.bedding_classes.BeddingConfig"><span class="pre">BeddingConfig</span></a></span></span><a class="headerlink" href="#RUFAS.routines.manure.beddings.bedding_classes.DefaultBeddingConfigFactory.get_instance" title="Link to this definition"></a></dt>
+<dd><p>Fetch the default bedding configuration for the given bedding type.</p>
+<section id="id12">
+<h3>Parameters<a class="headerlink" href="#id12" title="Link to this heading"></a></h3>
 <dl class="simple">
-<dt>Args:</dt><dd><p>bedding_type: Type of bedding.</p>
-</dd>
-<dt>Returns:</dt><dd><p>Default bedding configuration for the given bedding type.</p>
+<dt>bedding_type<span class="classifier">BeddingType</span></dt><dd><p>Type of the bedding.</p>
 </dd>
 </dl>
+</section>
+<section id="id13">
+<h3>Returns<a class="headerlink" href="#id13" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>BeddingConfig</dt><dd><p>Default bedding configuration for the given bedding type.</p>
+</dd>
+</dl>
+</section>
+<section id="raises">
+<h3>Raises<a class="headerlink" href="#raises" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>ValueError</dt><dd><p>If the given bedding type is invalid.</p>
+</dd>
+</dl>
+</section>
 </dd></dl>
 
 </dd></dl>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="RUFAS.routines.manure.beddings.bedding_classes.ManureSolidsBedding">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">RUFAS.routines.manure.beddings.bedding_classes.</span></span><span class="sig-name descname"><span class="pre">ManureSolidsBedding</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bedding_config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#RUFAS.routines.manure.beddings.bedding_classes.BeddingConfig" title="RUFAS.routines.manure.beddings.bedding_classes.BeddingConfig"><span class="pre">BeddingConfig</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.manure.beddings.bedding_classes.ManureSolidsBedding" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">RUFAS.routines.manure.beddings.bedding_classes.</span></span><span class="sig-name descname"><span class="pre">ManureSolidsBedding</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bedding_config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#RUFAS.routines.manure.beddings.bedding_classes.BeddingConfig" title="RUFAS.routines.manure.beddings.bedding_classes.BeddingConfig"><span class="pre">BeddingConfig</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.manure.beddings.bedding_classes.ManureSolidsBedding" title="Link to this definition"></a></dt>
 <dd><p>Bases: <a class="reference internal" href="#RUFAS.routines.manure.beddings.bedding_classes.BaseOrganicBedding" title="RUFAS.routines.manure.beddings.bedding_classes.BaseOrganicBedding"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseOrganicBedding</span></code></a></p>
-<p>Class for manure solids bedding.</p>
-<dl class="simple">
-<dt>Attributes:</dt><dd><p>Inherited from BaseOrganicBedding.</p>
-</dd>
-</dl>
+<p>A concrete class representing manure solids bedding.</p>
+<p>All attributes and methods are inherited from BaseOrganicBedding.</p>
 </dd></dl>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="RUFAS.routines.manure.beddings.bedding_classes.SandBedding">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">RUFAS.routines.manure.beddings.bedding_classes.</span></span><span class="sig-name descname"><span class="pre">SandBedding</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bedding_config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#RUFAS.routines.manure.beddings.bedding_classes.BeddingConfig" title="RUFAS.routines.manure.beddings.bedding_classes.BeddingConfig"><span class="pre">BeddingConfig</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.manure.beddings.bedding_classes.SandBedding" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">RUFAS.routines.manure.beddings.bedding_classes.</span></span><span class="sig-name descname"><span class="pre">SandBedding</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bedding_config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#RUFAS.routines.manure.beddings.bedding_classes.BeddingConfig" title="RUFAS.routines.manure.beddings.bedding_classes.BeddingConfig"><span class="pre">BeddingConfig</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.manure.beddings.bedding_classes.SandBedding" title="Link to this definition"></a></dt>
 <dd><p>Bases: <a class="reference internal" href="#RUFAS.routines.manure.beddings.bedding_classes.BaseBedding" title="RUFAS.routines.manure.beddings.bedding_classes.BaseBedding"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseBedding</span></code></a></p>
-<p>Class for sand bedding.</p>
+<p>A concrete class representing sand bedding.</p>
+<p>In addition to the attributes inherited from the parent classes, this class also includes
+sand_removal_efficiency.</p>
+<section id="id14">
+<h3>Attributes<a class="headerlink" href="#id14" title="Link to this heading"></a></h3>
 <dl class="simple">
-<dt>Attributes:</dt><dd><p>All inherited attributes from the parent classes.
-In addition:
-sand_removal_efficiency: Efficiency of removing sand from the bedding, [0.0, 1.0], unitless.</p>
+<dt>sand_removal_efficiency<span class="classifier">float</span></dt><dd><p>Efficiency of removing sand from the bedding (unitless). Range: [0.0, 1.0].</p>
 </dd>
 </dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="RUFAS.routines.manure.beddings.bedding_classes.SandBedding.calc_total_bedding_mass">
-<span class="sig-name descname"><span class="pre">calc_total_bedding_mass</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_animals</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.routines.manure.beddings.bedding_classes.SandBedding.calc_total_bedding_mass" title="Permalink to this definition"></a></dt>
-<dd><p>Returns the total amount of bedding needed for all animals in the given pen.</p>
+<span class="sig-name descname"><span class="pre">calc_total_bedding_mass</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_animals</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.routines.manure.beddings.bedding_classes.SandBedding.calc_total_bedding_mass" title="Link to this definition"></a></dt>
+<dd><p>Calculate the total amount of bedding needed for all animals in the given pen.</p>
+<p>The total mass is adjusted by the efficiency of sand removal.</p>
+<section id="id15">
+<h4>Parameters<a class="headerlink" href="#id15" title="Link to this heading"></a></h4>
 <dl class="simple">
-<dt>Args:</dt><dd><p>num_animals: Number of animals in the pen.</p>
-</dd>
-<dt>Returns:</dt><dd><p>Total amount of bedding needed for all animals in the given pen, kg/day.</p>
+<dt>num_animals<span class="classifier">int</span></dt><dd><p>The number of animals in the pen.</p>
 </dd>
 </dl>
+</section>
+<section id="id16">
+<h4>Returns<a class="headerlink" href="#id16" title="Link to this heading"></a></h4>
+<dl class="simple">
+<dt>float</dt><dd><p>Total amount of bedding needed for all animals in the given pen (kg/day).</p>
+</dd>
+</dl>
+</section>
 </dd></dl>
 
+</section>
 </dd></dl>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="RUFAS.routines.manure.beddings.bedding_classes.SawdustBedding">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">RUFAS.routines.manure.beddings.bedding_classes.</span></span><span class="sig-name descname"><span class="pre">SawdustBedding</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bedding_config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#RUFAS.routines.manure.beddings.bedding_classes.BeddingConfig" title="RUFAS.routines.manure.beddings.bedding_classes.BeddingConfig"><span class="pre">BeddingConfig</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.manure.beddings.bedding_classes.SawdustBedding" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">RUFAS.routines.manure.beddings.bedding_classes.</span></span><span class="sig-name descname"><span class="pre">SawdustBedding</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bedding_config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#RUFAS.routines.manure.beddings.bedding_classes.BeddingConfig" title="RUFAS.routines.manure.beddings.bedding_classes.BeddingConfig"><span class="pre">BeddingConfig</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.manure.beddings.bedding_classes.SawdustBedding" title="Link to this definition"></a></dt>
 <dd><p>Bases: <a class="reference internal" href="#RUFAS.routines.manure.beddings.bedding_classes.BaseOrganicBedding" title="RUFAS.routines.manure.beddings.bedding_classes.BaseOrganicBedding"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseOrganicBedding</span></code></a></p>
-<p>Class for sawdust bedding.</p>
-<dl class="simple">
-<dt>Attributes:</dt><dd><p>Inherited from BaseOrganicBedding.</p>
-</dd>
-</dl>
+<p>A concrete class representing sawdust bedding.</p>
+<p>All attributes and methods are inherited from BaseOrganicBedding.</p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.beddings.bedding_classes.StrawBedding">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">RUFAS.routines.manure.beddings.bedding_classes.</span></span><span class="sig-name descname"><span class="pre">StrawBedding</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bedding_config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#RUFAS.routines.manure.beddings.bedding_classes.BeddingConfig" title="RUFAS.routines.manure.beddings.bedding_classes.BeddingConfig"><span class="pre">BeddingConfig</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.manure.beddings.bedding_classes.StrawBedding" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#RUFAS.routines.manure.beddings.bedding_classes.BaseOrganicBedding" title="RUFAS.routines.manure.beddings.bedding_classes.BaseOrganicBedding"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseOrganicBedding</span></code></a></p>
+<p>A concrete class representing straw bedding.</p>
+<p>All attributes and methods are inherited from BaseOrganicBedding.</p>
 </dd></dl>
 
 </section>
 <section id="module-RUFAS.routines.manure.beddings">
-<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-RUFAS.routines.manure.beddings" title="Permalink to this heading"></a></h2>
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-RUFAS.routines.manure.beddings" title="Link to this heading"></a></h2>
 </section>
 </section>
 
@@ -369,8 +537,8 @@ sand_removal_efficiency: Efficiency of removing sand from the bedding, [0.0, 1.0
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="RUFAS.routines.manure.html" class="btn btn-neutral float-left" title="RUFAS.routines.manure package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="RUFAS.routines.manure.constants.html" class="btn btn-neutral float-right" title="RUFAS.routines.manure.constants package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="RUFAS.routines.manure.IO_helpers.html" class="btn btn-neutral float-left" title="RUFAS.routines.manure.IO_helpers package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="RUFAS.routines.manure.constants_and_units.html" class="btn btn-neutral float-right" title="RUFAS.routines.manure.constants_and_units package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>

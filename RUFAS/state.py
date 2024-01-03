@@ -1,16 +1,19 @@
+from RUFAS.config import Config
 from RUFAS.input_manager import InputManager
 from RUFAS.output_manager import OutputManager
 from RUFAS.routines import Feed
 from RUFAS.routines.animal.animal_manager import AnimalManager
 from RUFAS.routines.manure.manure_manager import ManureManager
 from RUFAS.routines.field.manager.field_manager import FieldManager
+from RUFAS.time import Time
+from RUFAS.weather import Weather
 
 im = InputManager()
 om = OutputManager()
 
 
 class State:
-    def __init__(self, config, weather, time):
+    def __init__(self, config: Config, weather: Weather, time: Time):
         """
         Description:
             Contains information about the current state of the farm.
@@ -25,12 +28,14 @@ class State:
             DO NOT store immediate operands or values that do not NEED to be accessed in
             the future or in an output report in the state object.
 
-        Args:
-            config: instance of the Config class containing information necessary
-                to initialize the state
-            weather: weather data from IM
-            time: instance of the Time class containing information necessary to
-                initialize the state
+        Parameters
+        ----------
+        config: Config
+            Instance of the Config class containing information necessary to initialize the state.
+        weather: Weather
+            Instance of Weather class containing weather data from InputManager.
+        time: Time
+            Instance of the Time class containing information necessary to initialize the state.
         """
         feed_class_config = im.get_data("feed")
         self.feed = Feed(feed_class_config)
@@ -48,7 +53,6 @@ class State:
             Resets all annual variables that require reset
         """
         self.field_manager.annual_update_routine()
-        self.animal_manager.annual_reset()
 
     def annual_mass_balance(self, time):
         pass

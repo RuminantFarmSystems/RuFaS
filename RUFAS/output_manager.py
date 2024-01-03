@@ -1,5 +1,3 @@
-# !/usr/bin/env python3
-
 from copy import deepcopy
 from enum import Enum
 from pathlib import Path
@@ -14,6 +12,7 @@ from deprecated.sphinx import deprecated
 
 from RUFAS.util import Utility
 from RUFAS.graph_generator import GraphGenerator
+from RUFAS.report_generator import ReportGenerator
 
 
 class LogVerbosity(Enum):
@@ -95,6 +94,7 @@ class OutputManager(object):
                 "csv": "csv_",
                 "graph": "graph_",
                 "json": "json_",
+                "report": "report_",
             }
             self.__log_verbose: LogVerbosity = LogVerbosity("none")
             self.add_log(
@@ -278,7 +278,7 @@ class OutputManager(object):
             LogVerbosity.LOGS: "\33[92m",
         }
         if log_level <= self.__log_verbose:
-            log_format = "{color}[{timestamp}][{log_level}][{metadata_prefix}] {name}: {message}{color_reset}\n"
+            log_format = "{color}[{timestamp}][{log_level}][{metadata_prefix}] {name}. {message}{color_reset}\n"
             formatted_msg = log_format.format(
                 timestamp=info_map["timestamp"],
                 color=colors[log_level],
@@ -373,7 +373,7 @@ class OutputManager(object):
         """
         return f"{caller_class}.{caller_function}"
 
-    def _dict_to_file_json(self, data_dict: Dict[str, Any], path: str) -> None:
+    def dict_to_file_json(self, data_dict: Dict[str, Any], path: str, minify_output_file: bool = False) -> None:
         """Saves a dictionary into a JSON file
 
         Parameters
@@ -383,6 +383,9 @@ class OutputManager(object):
 
         path : str
             The path to the file to be saved
+
+        minify_output_file : bool
+            Boolean flag indicating whether to minify the output JSON file.
 
         Raises
         ------
@@ -397,21 +400,28 @@ class OutputManager(object):
         The file is saved with no indentation.
 
         If you want to save time and space, limit the maximum depth of the
-        serialized dictionary using the max_depth parameter.
-
+        serialized dictionary using the max_depth parameter. You can also set the
+        `minify_output_file` flag to True to minimize the output JSON file size.
         """
         info_map = {
             "class": self.__class__.__name__,
-            "function": self._dict_to_file_json.__name__,
+            "function": self.dict_to_file_json.__name__,
         }
         self.add_log("save_dict_file_try", f"Attempting to save to {path}.", info_map)
         try:
             with open(path, "w") as json_file:
-                json.dump(
-                    Utility.make_serializable(data_dict, max_depth=3),
-                    json_file,
-                    indent=0,
-                )
+                if minify_output_file:
+                    json.dump(
+                        Utility.make_serializable(data_dict, max_depth=3),
+                        json_file,
+                        separators=(",", ":")
+                    )
+                else:
+                    json.dump(
+                        Utility.make_serializable(data_dict, max_depth=3),
+                        json_file,
+                        indent=2,
+                    )
                 self.add_log(
                     "save_dict_file_success", f"Successfully saved to {path}.", info_map
                 )
@@ -491,8 +501,7 @@ class OutputManager(object):
             return
 
         csv_columns = []
-        for variable_name in data_dict.keys():
-            variable_data = data_dict[variable_name]
+        for variable_name, variable_data in data_dict.items():
             csv_column_data = self._dict_to_csv_column_list(
                 variable_name, variable_data
             )
@@ -533,7 +542,7 @@ class OutputManager(object):
         except Exception as e:
             raise e
 
-    def _generate_file_name(self, base_name: str, extension: str = "json") -> str:
+    def _generate_file_name(self, base_name: str, extension: str) -> str:
         """
         Returns a file name using the given base_name and timestamp.
         """
@@ -557,11 +566,11 @@ class OutputManager(object):
                 value.pop("info_maps")
         return pool_copy
 
-    def _list_txt_and_json_files_in_dir(self, dir_path: str) -> List[str]:
-        """Returns the list of txt and json files in the given path"""
+    def _list_filter_files_in_dir(self, dir_path: str) -> List[str]:
+        """Returns the list of supported filter files in the given path"""
         info_map = {
             "class": self.__class__.__name__,
-            "function": self._list_txt_and_json_files_in_dir.__name__,
+            "function": self._list_filter_files_in_dir.__name__,
         }
         self.add_log(
             "search_path_for_filenames_try",
@@ -574,18 +583,31 @@ class OutputManager(object):
             all_files = os.listdir(dir_path)
             for filename in all_files:
                 if filename.endswith(".txt") or filename.endswith(".json"):
+                    for (
+                        _,
+                        supported_prefix,
+                    ) in self.__supported_filter_types_prefixes.items():
+                        if filename.startswith(supported_prefix):
+                            break
+                    else:
+                        self.add_warning(
+                            "invalid filter file prefix",
+                            f"{filename} prefix is not in {list(self.__supported_filter_types_prefixes.values())}",
+                            info_map,
+                        )
+                        continue
                     filter_files.append(filename)
             self.add_log(
                 "search_path_for_filenames_success",
                 f"Successfully searched in {dir_path}"
-                f" and found {len(filter_files)} text files.",
+                f" and found {len(filter_files)} filter files.",
                 info_map,
             )
             return filter_files
         else:
             raise NotADirectoryError("The specified path must be a directory")
 
-    def _load_filter_file_content(self, path: str) -> Dict[str, str]:
+    def _load_filter_file_content(self, path: str) -> List[Dict[str, str | int]]:
         """
         Loads and processes the content of a filter file from the specified path.
 
@@ -596,8 +618,9 @@ class OutputManager(object):
 
         Returns
         -------
-        Dict[str, str]
-            A dictionary containing the loaded filter content, with keys and values depending on the file type.
+        List[Dict[str, str|int]]
+            A list of dictionaries, each containing the loaded filter content,
+            with keys and values depending on the file type.
 
         Raises
         ------
@@ -632,10 +655,18 @@ class OutputManager(object):
         try:
             with open(path) as filter_file:
                 if path.endswith(".json"):
-                    result = json.load(filter_file)
+                    json_content = json.load(filter_file)
+                    if "multiple" in json_content.keys():
+                        result = json_content["multiple"]
+                    else:
+                        result = [json_content]
                 elif path.endswith(".txt"):
-                    list_of_elements = filter_file.read().splitlines()
-                    result = {"filters": list_of_elements}
+                    list_of_elements = [
+                        element
+                        for element in filter_file.read().splitlines()
+                        if element
+                    ]
+                    result = [{"filters": list_of_elements}]
                 else:
                     raise Exception(
                         "Unsupported file format; only json and txt are supported."
@@ -718,18 +749,19 @@ class OutputManager(object):
         self.add_log("filtering_log", filter_vars_msg, info_map)
         filter_log_count_msg = (
             f"There were {len(filter_pattern_matches)} matches for the {len(filter_patterns)}"
-            f" filter patterns in the {input_file_name} file."
+            f" filter pattern(s) in the {input_file_name} file."
         )
         self.add_log("num_filter_pattern_matches", filter_log_count_msg, info_map)
         return filter_pattern_matches
 
-    def save_variables(
+    def save_results(
         self,
         save_path: Path,
-        dir_path: Path,
-        exclude_info_maps: bool = False,
-        produce_graphics: bool = True,
-        graphics_dir: Path = Path(""),
+        filters_dir_path: Path,
+        exclude_info_maps: bool,
+        produce_graphics: bool,
+        graphics_dir: Path,
+        csv_dir: Path,
     ) -> None:
         """
         Reads a text file containing a list of keys and filters the variables pool by those keys.
@@ -740,115 +772,171 @@ class OutputManager(object):
         save_path : Path
             Path to the directory where the file will be saved.
 
-        dir_path : Path
+        filters_dir_path : Path
             Path of the directory containing the files containing the keys for filtering.
 
         exclude_info_maps : bool
             Flag for whether or not the user wants to include info_maps data in their results files.
 
-        produce_graphics: bool, optional
+        produce_graphics: bool
             Flag for whether or not the user wants to produce graphs at after the simulation.
 
-        graphics_dir : Path, optional
+        graphics_dir : Path
             The directory for saving graphics.
+
+        csv_dir : Path
+            The directory for saving csvs.
         """
         info_map = {
             "class": self.__class__.__name__,
-            "function": self.save_variables.__name__,
+            "function": self.save_results.__name__,
         }
         self.add_log(
             "exclude_info_maps",
             f"exclude_info_maps flag set to {exclude_info_maps}",
             info_map,
         )
-        graph_generator = GraphGenerator()
-        list_of_filter_files = self._list_txt_and_json_files_in_dir(dir_path)
+        list_of_filter_files = self._list_filter_files_in_dir(filters_dir_path)
         for filter_file in list_of_filter_files:
-            input_path = os.path.join(dir_path, filter_file)
-            filter_content = self._load_filter_file_content(input_path)
-            if "filters" not in filter_content.keys():
-                self.add_error(
-                    "Missing filters entry",
-                    f"'filters' does not exist in {filter_file}",
-                    info_map,
-                )
-                continue
-            filtered_pool = self._filter_variables_pool(
-                filter_content["filters"], filter_file
-            )
-            if exclude_info_maps:
-                filtered_pool = self._exclude_info_maps(filtered_pool)
-
-            if filter_file.startswith(self.__supported_filter_types_prefixes["json"]):
-                file_path = os.path.join(
-                    save_path,
-                    self._generate_file_name(f"saved_variables_{filter_file}", "json"),
-                )
-                self._dict_to_file_json(filtered_pool, file_path)
-            elif filter_file.startswith(self.__supported_filter_types_prefixes["csv"]):
-                csv_directory = os.path.join(save_path, "CSVs", "om")
-                self._save_variables_to_csv_files(
-                    filtered_pool, filter_file, csv_directory
-                )
-            elif filter_file.startswith(
-                self.__supported_filter_types_prefixes["graph"]
-            ):
-                if produce_graphics:
-                    try:
-                        graph_generator.generate_graph(
-                            filtered_pool,
-                            filter_content,
-                            save_path,
-                            filter_file,
-                            graphics_dir,
-                        )
-                    except Exception as e:
-                        self.add_error("graph generation exception", str(e), info_map)
-                else:
-                    self.add_warning(
-                        "No Graphics",
-                        f"Graphic generation is disabled, skipping {filter_file=}",
+            info_map["filter file"] = filter_file
+            input_path = os.path.join(filters_dir_path, filter_file)
+            filter_contents = self._load_filter_file_content(input_path)
+            reports: Dict[str: Dict[str: List[Any]]] = {}
+            for filter_content in filter_contents:
+                info_map["filter_content"] = filter_content
+                if (
+                    not isinstance(filter_content, dict)
+                    or "filters" not in filter_content.keys()
+                ):
+                    self.add_error(
+                        "Parsing error",
+                        f"Could not parse {filter_content.get('name')=} in {filter_file=},\
+                            it has to have JSON blobs and have `filters` entry.",
                         info_map,
                     )
+                    continue
+                filtered_pool = self._filter_variables_pool(
+                    filter_content["filters"], filter_file
+                )
+                if exclude_info_maps:
+                    filtered_pool = self._exclude_info_maps(filtered_pool)
+
+                if filter_file.startswith(
+                    self.__supported_filter_types_prefixes["report"]
+                ):
+                    self.add_log(
+                        "init_report_generation", "Report Generation Started", info_map
+                    )
+                    report_generator = ReportGenerator()
+                    try:
+                        report_name = filter_content.get(
+                            "name", f"untitled_{self._get_timestamp(True)}"
+                        )
+                        report = report_generator.generate_report(
+                            filtered_pool,
+                            filter_content,
+                        )
+                        for key, value in report.items():
+                            column_name = f"{report_name}_{key}"
+                            reports[
+                                column_name
+                                if column_name not in reports.keys()
+                                else f"{column_name} {self._get_timestamp(True)}"
+                            ] = {"values": value}
+                    except (KeyError, ValueError) as e:
+                        self.add_error("report generation error", str(e), info_map)
+                else:
+                    self._route_save_functions(
+                        filter_file,
+                        save_path,
+                        filtered_pool,
+                        produce_graphics,
+                        filter_content,
+                        graphics_dir,
+                        csv_dir,
+                    )
+            report_file_path = os.path.join(
+                save_path,
+                self._generate_file_name(f"report_{filter_file}", "csv"),
+            )
+            self._dict_to_file_csv(reports, report_file_path)
+
+    def _route_save_functions(
+        self,
+        filter_file: str,
+        save_path: Path,
+        filtered_pool: Dict[str, pool_element_type],
+        produce_graphics: bool,
+        filter_content: Dict[str, str | int],
+        graphics_dir: Path,
+        csv_dir: Path,
+    ) -> None:
+        """
+        Checks the prefix of the filter_file to determine the format for saving. It then delegates the
+        saving process to the corresponding function to handle specific formats such as JSON, CSV, or graphical output.
+        """
+        info_map = {
+            "class": self.__class__.__name__,
+            "function": self._route_save_functions.__name__,
+        }
+        if filter_file.startswith(self.__supported_filter_types_prefixes["json"]):
+            file_path = os.path.join(
+                save_path,
+                self._generate_file_name(f"saved_variables_{filter_file}", "json"),
+            )
+            self.dict_to_file_json(filtered_pool, file_path)
+        elif filter_file.startswith(self.__supported_filter_types_prefixes["csv"]):
+            self.create_directory(csv_dir)
+            variable_csv_file_path = os.path.join(
+                csv_dir,
+                self._generate_file_name(f"saved_variables_{filter_file}", "csv"),
+            )
+            self._dict_to_file_csv(filtered_pool, variable_csv_file_path)
+        elif filter_file.startswith(self.__supported_filter_types_prefixes["graph"]):
+            self.create_directory(graphics_dir)
+            if produce_graphics:
+                try:
+                    graph_generator = GraphGenerator(self.__metadata_prefix)
+                    log_pool = graph_generator.generate_graph(
+                                filtered_pool,
+                                filter_content,
+                                filter_file,
+                                graphics_dir,
+                                )
+                    self._route_logs(log_pool)
+                except Exception as e:
+                    self.add_error("graph generation exception", str(e), info_map)
             else:
                 self.add_warning(
-                    "invalid filter file prefix",
-                    f"{filter_file} prefix is not in {list(self.__supported_filter_types_prefixes.values())}",
+                    "No Graphics",
+                    f"Graphic generation is disabled, skipping {filter_file=}",
                     info_map,
                 )
 
-    def _save_variables_to_csv_files(
-        self, data_dict: Dict[str, Any], filter_name: str, path: str
-    ) -> None:
-        """
-        Saves the variables_pool into one csv file per variable in the given path to a directory.
+    def _route_logs(self, log_pool: List[Dict[str, str | Dict[str, str]]]) -> None:
+        """Takes logs from other classes and routes them to the appropriate pools in
+        Output Manager.
 
         Parameters
         ----------
-        data_dict : Dict[str, Any]
-            The dictionary to be saved
-        filter_name : str
-            Name of the filter that is being used for selecting data for the CSV.
-        path : str
-            Path to the output directory for the OutputManager.
-
+        log_pool : List[Dict[str, str | Dict[str, str]]]
+            A list of log, warning, and error dictionaries containing all the components needed
+            to log the information to the appropriate pool.
         """
-        try:
-            Path(path).mkdir(parents=True, exist_ok=True)
-        except Exception as e:
-            raise e
-
-        variable_csv_file_path = os.path.join(
-            path, self._generate_file_name(f"saved_variables_{filter_name}", "csv")
-        )
-        self._dict_to_file_csv(data_dict, variable_csv_file_path)
+        for log in log_pool:
+            if "error" in log:
+                self.add_error(log["error"], log["message"], log["info_map"])
+            elif "log" in log:
+                self.add_log(log["log"], log["message"], log["info_map"])
+            elif "warning" in log:
+                self.add_warning(log["warning"], log["message"], log["info_map"])
 
     @deprecated(
         reason="""This function is still in the code base but it is not used. We want to keep it for debugging purposes
-        when save_variables() is not working.""",
+        when save_results() is not working.""",
         version="MVP",
     )
-    def dump_variables(self, path: str, exclude_info_maps: bool = False) -> None:
+    def dump_variables(self, path: str, exclude_info_maps: bool) -> None:
         """
         Dumps variables_pool into a json file in the given path to a directory.
 
@@ -868,34 +956,34 @@ class OutputManager(object):
         json_file_path = os.path.join(
             path, self._generate_file_name("all_variables", "json")
         )
-        self._dict_to_file_json(pool, json_file_path)
+        self.dict_to_file_json(pool, json_file_path)
 
     def dump_logs(self, path: str) -> None:
         """
         Dumps logs_pool into a json file in the given path to a directory.
         """
         file_path = os.path.join(path, self._generate_file_name("logs", "json"))
-        self._dict_to_file_json(self.logs_pool, file_path)
+        self.dict_to_file_json(self.logs_pool, file_path)
 
     def dump_warnings(self, path: str) -> None:
         """
         Dumps warnings_pool into a json file in the given path to a directory.
         """
         file_path = os.path.join(path, self._generate_file_name("warnings", "json"))
-        self._dict_to_file_json(self.warnings_pool, file_path)
+        self.dict_to_file_json(self.warnings_pool, file_path)
 
     def dump_errors(self, path: str) -> None:
         """
         Dumps errors_pool into a json file in the given path to a directory.
         """
         file_path = os.path.join(path, self._generate_file_name("errors", "json"))
-        self._dict_to_file_json(self.errors_pool, file_path)
+        self.dict_to_file_json(self.errors_pool, file_path)
 
     def dump_variable_names_and_contexts(  # noqa: C901
         self,
         path: str,
         exclude_info_maps: bool,
-        format_option: str = "verbose",
+        format_option: str,
     ) -> None:
         """
         Dumps names of all variables added to variables_pool along with the caller class
@@ -983,8 +1071,8 @@ class OutputManager(object):
     def dump_all_nondata_pools(
         self,
         path: str,
-        exclude_info_maps: bool = False,
-        format_option: str = "verbose",
+        exclude_info_maps: bool,
+        format_option: str,
     ) -> None:
         """
         Dumps all non-data pools into the given path to a directory.
@@ -1002,3 +1090,121 @@ class OutputManager(object):
         self.warnings_pool: Dict[str, OutputManager.pool_element_type] = {}
         self.errors_pool: Dict[str, OutputManager.pool_element_type] = {}
         self.logs_pool: Dict[str, OutputManager.pool_element_type] = {}
+
+    def load_variables_pool_from_file(self, file_path: Path) -> None:
+        """Loads the Output Manager variables pool from file path provided by user.
+
+        Parameters
+        ----------
+        file_path : Path
+            The path to the file to be loaded to the variables pool.
+
+        Raises
+        ------
+        Exception
+            If an error occurs while opening or reading the user-provided file path.
+        """
+        info_map = {
+            "class": self.__class__.__name__,
+            "function": self.load_variables_pool_from_file.__name__,
+        }
+        self.add_log(
+            "open_json_file", f"Attempting to open {str(file_path)}.", info_map
+        )
+        try:
+            with open(file_path) as file:
+                self.variables_pool = json.load(file)
+                self.add_log(
+                    "load_data_successful",
+                    f"Successfully loaded data from {str(file_path)}.",
+                    info_map,
+                )
+        except FileNotFoundError:
+            self.add_error(
+                "File not found",
+                f"The file '{str(file_path)}' does not exist.",
+                info_map,
+            )
+            raise
+        except json.JSONDecodeError as e:
+            self.add_error("JSON parsing error", str(e), info_map)
+            raise
+
+    def clear_output_dir(self, vars_file_path: Path, output_dir: Path) -> None:
+        """Clears the output directory if vars_file_path not in output directory.
+
+        Parameters
+        ----------
+        vars_file_path : Path
+            Path to file used to load Output Manager vars pool.
+        output_dir : Path
+            The directory for saving output.
+        """
+        info_map = {
+            "class": self.__class__.__name__,
+            "function": self.clear_output_dir.__name__,
+        }
+        is_file_found_in_dir = self.is_file_in_dir(output_dir, vars_file_path)
+        if is_file_found_in_dir:
+            self.add_error(
+                "Can't clear output directory",
+                f"{vars_file_path} in output directory.",
+                info_map,
+            )
+        else:
+            keep_list = [".keep", "output_filters"]
+            Utility.empty_dir(output_dir, keep=keep_list)
+            self.add_log(
+                "Output directory successfully cleared",
+                "Provided variables-file path was not in output directory.",
+                info_map,
+            )
+
+    def is_file_in_dir(self, dir_path: Path, file_path: Path) -> bool:
+        """Checks if a file path is in the provided directory.
+
+        Parameters
+        ----------
+        dir_path : Path
+            Path to the directory to be checked.
+        file_path : Path
+            Path to file to be checked.
+        """
+        if file_path is None:
+            return False
+        file_path = file_path.resolve()
+        directory_path = dir_path.resolve()
+
+        return directory_path == file_path or directory_path in file_path.parents
+
+    def create_directory(self, path: Path) -> None:
+        """
+        Creates a dir from the provided path if it does not already exist.
+
+        Parameters
+        ----------
+        path : Path
+            The path where the directory will be created if it does not already exist.
+        """
+        info_map = {
+            "class": self.__class__.__name__,
+            "function": self.create_directory.__name__,
+        }
+        self.add_log(
+            "Attempting to create a new directory.",
+            f"Attempting to create a new directory at {path}.",
+            info_map,
+        )
+        try:
+            path.mkdir(parents=True, exist_ok=True)
+            self.add_log(
+                "Directory successfully created.",
+                f"Created a new directory at {path}.",
+                info_map,
+            )
+        except PermissionError as e:
+            self.add_error(
+                "Permission Error", f"{path=}; Exception: {str(e)}", info_map
+            )
+        except Exception as e:
+            self.add_error("mkdir failure", f"{path=}; Exception: {str(e)}", info_map)

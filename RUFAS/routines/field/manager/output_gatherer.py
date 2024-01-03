@@ -44,8 +44,8 @@ class OutputGatherer:
             om.add_variable("recalcitrant_phosphorus_pool",
                             field.soil.data.recalcitrant_phosphorus_pool,
                             info_map)
-            om.add_variable("runoff_phosphorus_pool",
-                            field.soil.data.runoff_phosphorus_pool,
+            om.add_variable("runoff_fertilizer_phosphorus",
+                            field.soil.data.runoff_fertilizer_phosphorus,
                             info_map)
             om.add_variable("days_since_application",
                             field.soil.data.days_since_application,
@@ -77,6 +77,10 @@ class OutputGatherer:
             om.add_variable("machine_stable_organic_phosphorus",
                             field.soil.data.machine_stable_organic_phosphorus,
                             info_map)
+            om.add_variable("machine_organic_phosphorus_runoff", field.soil.data.machine_organic_phosphorus_runoff,
+                            info_map)
+            om.add_variable("machine_inorganic_phosphorus_runoff", field.soil.data.machine_inorganic_phosphorus_runoff,
+                            info_map)
             om.add_variable("grazing_manure_dry_mass",
                             field.soil.data.grazing_manure_dry_mass,
                             info_map)
@@ -101,6 +105,12 @@ class OutputGatherer:
             om.add_variable("grazing_stable_organic_phosphorus",
                             field.soil.data.grazing_stable_organic_phosphorus,
                             info_map)
+            om.add_variable("grazing_organic_phosphorus_runoff", field.soil.data.grazing_organic_phosphorus_runoff,
+                            info_map)
+            om.add_variable("grazing_inorganic_phosphorus_runoff", field.soil.data.grazing_inorganic_phosphorus_runoff,
+                            info_map)
+            om.add_variable("soil_phosphorus_runoff", field.soil.data.soil_phosphorus_runoff, info_map)
+            om.add_variable("profile_carbon_emissions", field.soil.data.profile_carbon_emissions, info_map)
             # Adding vadose zone layer data
             info_map["prefix"] = "field='" + field.field_data.name + "',vadose_zone_layer"
             om.add_variable("active_organic_nitrogen_content",
@@ -138,6 +148,8 @@ class OutputGatherer:
                                 layer.plant_metabolic_active_carbon_remaining, info_map)
                 om.add_variable("plant_structural_active_carbon_usage", layer.plant_structural_active_carbon_usage,
                                 info_map)
+                om.add_variable("metabolic_litter_amount", layer.metabolic_litter_amount, info_map)
+                om.add_variable("structural_litter_amount", layer.structural_litter_amount, info_map)
                 om.add_variable("plant_structural_active_carbon_remaining",
                                 layer.plant_structural_active_carbon_remaining, info_map)
                 om.add_variable("plant_structural_slow_carbon_usage", layer.plant_structural_slow_carbon_usage,
@@ -168,6 +180,7 @@ class OutputGatherer:
                                 info_map)
                 om.add_variable("active_carbon_amount", layer.active_carbon_amount, info_map)
                 om.add_variable("slow_carbon_amount", layer.slow_carbon_amount, info_map)
+                om.add_variable("passive_carbon_amount", layer.passive_carbon_amount, info_map)
                 om.add_variable("slow_carbon_decomposition_amount", layer.slow_carbon_decomposition_amount,
                                 info_map)
                 om.add_variable("passive_carbon_decomposition_amount", layer.passive_carbon_decomposition_amount,
@@ -195,6 +208,7 @@ class OutputGatherer:
                                 info_map)
                 om.add_variable("labile_inorganic_unbalanced_counter", layer.labile_inorganic_unbalanced_counter,
                                 info_map)
+                om.add_variable("percolated_phosphorus", layer.percolated_phosphorus, info_map)
                 om.add_variable("nitrate_content", layer.nitrate_content, info_map)
                 om.add_variable("ammonium_content", layer.ammonium_content, info_map)
                 om.add_variable("active_organic_nitrogen_content", layer.active_organic_nitrogen_content, info_map)
@@ -233,11 +247,12 @@ class OutputGatherer:
                 om.add_variable("cumulative_evaporation", crop.data.cumulative_evaporation, info_map)
                 om.add_variable("cumulative_transpiration", crop.data.cumulative_transpiration, info_map)
                 om.add_variable("cumulative_evapotranspiration", crop.data.cumulative_evapotranspiration, info_map)
+                om.add_variable("water_deficiency", crop.data.water_deficiency, info_map)
                 om.add_variable("max_transpiration", crop.data.max_transpiration, info_map)
                 om.add_variable("canopy_water", crop.data.canopy_water, info_map)
                 om.add_variable("cut_biomass", crop.data.cut_biomass, info_map)
-                om.add_variable("yield_collected", crop.data.yield_collected, info_map)
-                om.add_variable("yield_residue", crop.data.yield_residue, info_map)
+                om.add_variable("wet_yield_collected", crop.data.wet_yield_collected, info_map)
+                om.add_variable("dry_matter_yield_residue", crop.data.yield_residue, info_map)
                 om.add_variable("yield_nitrogen", crop.data.yield_nitrogen, info_map)
                 om.add_variable("yield_phosphorus", crop.data.yield_phosphorus, info_map)
                 om.add_variable("residue_nitrogen", crop.data.residue_nitrogen, info_map)

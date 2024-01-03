@@ -1,12 +1,12 @@
 {
     "crop_schedules": [
         {
-            "crop_species": "corn",
+            "crop_species": "corn_silage",
             "planting_years": [1989],
             "planting_days": [113],
             "harvest_years": [1989],
             "harvest_days": [305],
-            "harvest_operations": ["default"],
+            "harvest_operations": ["harvest_kill"],
             "harvest_type": "scheduled",
             "pattern_repeat": 7,
             "pattern_skip": 0,

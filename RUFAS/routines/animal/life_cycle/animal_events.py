@@ -1,19 +1,3 @@
-"""
-RUFAS: Ruminant Farm Systems Model
-----------------------------------
-
-File name: animal_events.py
-
-Authors:
-    - Manfei Li, mli497@wisc.edu
-    - Militsa Sotirova, militsasotirova@gmail.com
-
-Description:
-    This file initializes life events with the age of the animal when the
-    event happens and the description of the event.
-"""
-
-
 class AnimalEvents:
     """
     A class to represent animal events in a farm simulation.
@@ -26,6 +10,9 @@ class AnimalEvents:
     events : dict[int, list[str]]
         A dictionary containing the events indexed by the animal's age in days. The values
         are lists of descriptions for the events on that day.
+    _memo : set[str]
+        A set containing the descriptions of all events that have been looked up in the
+        events dictionary. This is used to speed up the re-lookup of events.
     """
 
     def __init__(self) -> None:
@@ -33,6 +20,7 @@ class AnimalEvents:
         Initialize a new AnimalEvents object.
         """
         self.events: dict[int, list[str]] = {}
+        self._memo: set[str] = set()
 
     def init_from_string(self, events_str: str) -> None:
         """
@@ -79,17 +67,19 @@ class AnimalEvents:
 
     def get_most_recent_date(self, event_description: str) -> int:
         """
-        Returns the most recent age at which the event_description happened
+        Return the most recent age at which the event_description happened
 
-                Args
-                ----
-                        event_description: the event to be searched
+        Parameters
+        ----------
+        event_description : str
+            The description of the event to search for.
 
-                Returns
-                -------
-                        the most recent age at which event_description happened,
-                         -1 if not found.
+        Returns
+        -------
+        int
+            The most recent age at which the event_description happened, -1 if not found.
         """
+
         dates = list(self.events.keys())
         for i in range(-1, -len(dates) - 1, -1):
             if event_description in self.events[dates[i]]:

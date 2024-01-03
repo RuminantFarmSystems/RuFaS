@@ -51,21 +51,20 @@ class CropManagement:
         """
         self.determine_harvest_index()
 
-        if harvest_op == HarvestOperation.HARVEST:
+        if harvest_op == HarvestOperation.HARVEST_KILL:
             self.cut_crop(collected_fraction=self.data.harvest_efficiency)
             self.kill()
 
-        if harvest_op == HarvestOperation.HARVEST_NOKILL:
+        if harvest_op == HarvestOperation.HARVEST_ONLY:
             self.cut_crop(collected_fraction=self.data.harvest_efficiency)
 
-        self._record_yield(field_name, field_size, year, day)
-        self._transfer_residue(soil_data)
+        if harvest_op == HarvestOperation.KILL_ONLY:
+            self.kill()
 
-    # TODO: implement grazing feature - issue #590
+        self._record_yield(field_name, field_size, year, day)
+        self._transfer_residue(soil_data, not self.data.is_alive)
 
     # ---- Sub Methods ----
-    # TODO: implement management practice for dry-down and collecting cut yields that have been left in the field - #353
-
     def kill(self) -> None:
         """kills the plant, preventing it from growing, and converts all biomass to residue
 
@@ -119,7 +118,7 @@ class CropManagement:
 
         References
         ----------
-        SWAT Theoretical documentation section 5:2.4
+        SWAT Theoretical documentation section 5:2.4 and section 6:1.2
 
         Raises
         ------
@@ -154,10 +153,9 @@ class CropManagement:
                 f"Expected collected_fraction to be between 0 and 1 (inclusive), received '{collected_fraction}'."
             )
 
-        # Biomass removed from plant
         roots_harvested = self.data.harvest_index > 1.0
         if not roots_harvested:
-            self.data.cut_biomass = self.data.above_ground_biomass * self.data.harvest_index  # SWAT 5:2.4.2
+            self.data.cut_biomass = self.data.above_ground_biomass * self.data.harvest_index
         else:
             self.data.cut_biomass = self.determine_biomass_cut_from_whole_plant(self.data.biomass,
                                                                                 self.data.harvest_index)
@@ -165,26 +163,24 @@ class CropManagement:
         self.data.biomass -= self.data.cut_biomass
         self._recalculate_biomass_distribution(roots_harvested)
 
-        # Reset some growth parameters (SWAT 6:1.2)
         self.data.leaf_area_index = self.data.leaf_area_index * (1 - fraction_cut)
         self.data.accumulated_heat_units = self.data.accumulated_heat_units * (1 - fraction_cut)
 
-        # Biomass collected as yield, and its nutrient content
-        self.data.yield_collected = self.data.cut_biomass * collected_fraction  # SWAT 5:3.3.4
-        if self.data.do_harvest_index_override:
-            self.data.yield_nitrogen = self.data.optimal_nitrogen_fraction * self.data.yield_collected  # SWAT 5:2.4.7
-            self.data.yield_phosphorus = self.data.optimal_phosphorus_fraction * \
-                self.data.yield_collected  # SWAT 5:2.4.8
-        else:
-            self.data.yield_nitrogen = self.data.yield_nitrogen_fraction * self.data.yield_collected  # SWAT 5:2.4.5
-            self.data.yield_phosphorus = self.data.yield_phosphorus_fraction * self.data.yield_collected  # SWAT 5:2.4.6
+        self.data.wet_yield_collected = self.data.cut_biomass * collected_fraction
+        self.data.dry_matter_yield_collected = self.data.wet_yield_collected * (self.data.dry_matter_percentage / 100)
 
-        # Uncollected biomass and nutrients
-        self.data.yield_residue = self.data.cut_biomass * (1 - collected_fraction)  # SWAT 5:3.3.5
+        self.data.yield_residue = \
+            self.data.cut_biomass * (1 - collected_fraction) * (self.data.dry_matter_percentage / 100)
+
         if self.data.do_harvest_index_override:
+            self.data.yield_nitrogen = self.data.optimal_nitrogen_fraction * self.data.wet_yield_collected
+            self.data.yield_phosphorus = self.data.optimal_phosphorus_fraction * \
+                self.data.wet_yield_collected
             self.data.residue_nitrogen = self.data.optimal_nitrogen_fraction * self.data.yield_residue
             self.data.residue_phosphorus = self.data.optimal_phosphorus_fraction * self.data.yield_residue
         else:
+            self.data.yield_nitrogen = self.data.yield_nitrogen_fraction * self.data.dry_matter_yield_collected
+            self.data.yield_phosphorus = self.data.yield_phosphorus_fraction * self.data.dry_matter_yield_collected
             self.data.residue_nitrogen = self.data.yield_nitrogen_fraction * self.data.yield_residue
             self.data.residue_phosphorus = self.data.yield_phosphorus_fraction * self.data.yield_residue
 
@@ -232,19 +228,20 @@ class CropManagement:
             Julian day on which this harvest occurred.
 
         """
-        mass_harvested = self.data.yield_collected
+        wet_yield_collected = self.data.wet_yield_collected
+        dry_yield_collected = self.data.dry_matter_yield_collected
         nitrogen_harvested = self.data.yield_nitrogen
         phosphorus_harvested = self.data.yield_phosphorus
         info_map = {"class": self.__class__.__name__, "function": self._record_yield.__name__,
                     "prefix": f"field='{field_name}'", "field_size": field_size,
                     "species": f"'{self.data.species}'"}
-        value = {"crop": self.data.name, "yield": mass_harvested, "nitrogen": nitrogen_harvested,
-                 "phosphorus": phosphorus_harvested,
+        value = {"crop": self.data.name, "wet_yield": wet_yield_collected, "dry_yield": dry_yield_collected,
+                 "nitrogen": nitrogen_harvested, "phosphorus": phosphorus_harvested,
                  "planting_date": {"year": self.data.planting_year, "day": self.data.planting_day},
                  "harvest_date": {"year": year, "day": day}}
         om.add_variable("harvest_yield", value, info_map)
 
-    def _transfer_residue(self, soil_data: SoilData) -> None:
+    def _transfer_residue(self, soil_data: SoilData, killed: bool) -> None:
         """
         Transfers residue from harvest to SoilData that tracks how that residue is degraded and assimilated into the
         soil.
@@ -253,10 +250,28 @@ class CropManagement:
         ----------
         soil_data : SoilData
             Object that tracks the attributes of the soil profile that contains this crop.
+        killed : bool
+            Indicates whether the crop was killed by the harvest.
+
+        Notes
+        -----
+        If a crop is harvested but not killed, then there is only residue added to the surface. If it is harvested and
+        killed, then both surface and root residue is added to the soil profile.
 
         """
-        soil_data.plant_surface_residue += self.data.yield_residue
-        soil_data.soil_layers[0].fresh_organic_nitrogen_content += self.data.yield_nitrogen
+        soil_data.crop_yield_nitrogen = self.data.residue_nitrogen
+        soil_data.plant_residue_lignin_composition = self.data.lignin_dry_matter_percentage / 100
+        dry_matter_root_biomass = self.data.root_biomass * (self.data.dry_matter_percentage / 100)
+        if killed:
+            soil_data.plant_surface_residue = self.data.yield_residue - self.data.root_biomass
+            soil_data.plant_root_residue = dry_matter_root_biomass
+            soil_data.crop_root_depth = self.data.root_depth
+        else:
+            soil_data.plant_surface_residue = self.data.yield_residue
+            soil_data.plant_root_residue = 0
+            soil_data.crop_root_depth = 0
+
+        soil_data.soil_layers[0].fresh_organic_nitrogen_content += self.data.residue_nitrogen
 
     # ---- Harvest Scheduling ----
 
