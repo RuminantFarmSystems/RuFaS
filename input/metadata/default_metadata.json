@@ -586,13 +586,13 @@
             "birth_weight_avg_je": {
               "type": "number",
               "description": "Average Jersey Birth Weight (kg/head) -- The average birthweight for Jersey cows",
-              "default": 35,
+              "default": 25.2,
               "minimum": 0
             },
             "birth_weight_std_je": {
               "type": "number",
               "description": "Jersey Birth Weight Standard Deviation (kg/head) -- The standard deviation of birthweight for Jersey cows",
-              "default": 1,
+              "default": 4.4,
               "minimum": 0
             },
             "target_heifer_preg_day": {
@@ -793,7 +793,7 @@
           },
           "culling": {
             "type": "object",
-            "description": "",
+            "description": "Probabilities for removal from the herd for specific reason",
             "parity_death_prob": {
               "type": "array",
               "description": "Death Probability, by Parity",
