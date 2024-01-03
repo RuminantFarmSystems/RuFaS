@@ -1503,7 +1503,7 @@ def test_heiferI(mocker: MockerFixture) -> None:
 
     # testing set_nutrient_rqmts()
     HeiferI.set_nutrient_rqmts(heiferI, temp, animal_grouping_scenario, nutrient_conc)
-    animal_req.assert_called() == True
+    animal_req.assert_called()
 
     # testing calc_manure_excretion()
     feed = mocker.MagicMock(autospec=Feed)
