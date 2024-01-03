@@ -660,7 +660,7 @@ class Field:
             execute_heat_scheduled_harvest = crop.data.use_heat_scheduling and \
                                              crop.data.heat_fraction >= crop.data.harvest_heat_fraction
             if execute_heat_scheduled_harvest:
-                crop.crop_management.manage_harvest(HarvestOperation.HARVEST_NOKILL)
+                crop.crop_management.manage_harvest(HarvestOperation.HARVEST_ONLY)
                 self.soil.carbon_cycling.residue_partition.add_residue_to_pools(rainfall)
 
     @staticmethod
@@ -788,8 +788,8 @@ class Field:
         ----------
         crop_reference : str
             Name used to get the specifications for the crop to be harvested.
-        harvest_operation : str
-            Name of the harvest operation to be performed on the referenced crop.
+        harvest_operation : HarvestOperation
+            Harvest operation to be performed on the referenced crop.
         time : Time
             Object containing the current day and year of the simulation.
         current_conditions : CurrentDayConditions
@@ -816,8 +816,7 @@ class Field:
             om.add_warning("harvest_warning", "No crop found to be harvested by a HarvestEvent.", info_map)
 
         for crop in crops_to_be_harvested:
-            harvest_operation_enum = HarvestOperation(harvest_operation)
-            crop.crop_management.manage_harvest(harvest_operation_enum, self.field_data.name,
+            crop.crop_management.manage_harvest(harvest_operation, self.field_data.name,
                                                 self.field_data.field_size, time.calendar_year, time.day,
                                                 self.soil.data)
             self.soil.carbon_cycling.residue_partition.add_residue_to_pools(current_conditions.rainfall)

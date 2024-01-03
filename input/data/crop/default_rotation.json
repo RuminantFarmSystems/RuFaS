@@ -11,7 +11,7 @@
       2012
     ],
     "harvest_operations": [
-      "default"
+      "harvest_kill"
     ],
     "harvest_type": [
       "optimal"
@@ -36,7 +36,7 @@
       2013
     ],
     "harvest_operations": [
-      "default"
+      "harvest_kill"
     ],
     "harvest_type": [
       "scheduled"
