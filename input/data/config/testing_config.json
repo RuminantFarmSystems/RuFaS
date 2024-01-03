@@ -3,7 +3,6 @@
   "end_date" : "1998:365",
   "set_seed": false,
   "random_seed": 0,
-  "simulate_animals": false,
   "nutrient_standard": "NASEM",
   "FIPS_county_code": 55025
 }

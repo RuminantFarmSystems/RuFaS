@@ -166,11 +166,6 @@
         "description": "Whether or not to set random seed",
         "default": true
       },
-      "simulate_animals": {
-        "type": "bool",
-        "description": "Whether or not to simulate animals during the simulation",
-        "default": true
-      },
       "nutrient_standard": {
         "type": "string",
         "default": "NASEM",
