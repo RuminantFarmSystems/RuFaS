@@ -16,7 +16,7 @@
     },
     "animal_population": {
       "title": "Animal population data",
-      "description": "Moo Moo!",
+      "description": "The configuration file for the animal population parameters.",
       "path": "input/data/animal/animal_population.json",
       "type": "json",
       "properties": "animal_population_properties"
@@ -71,8 +71,8 @@
       "properties": "NASEM_Comp_properties"
     },
     "manure_management": {
-      "title": "The configuration file for the manure module.",
-      "description": "You thought it's a waste, but those crops need to eat as well",
+      "title": "Manure data",
+      "description": "The configuration file for the manure module.",
       "path": "input/data/manure/manure_management.json",
       "type": "json",
       "properties": "manure_management_properties"

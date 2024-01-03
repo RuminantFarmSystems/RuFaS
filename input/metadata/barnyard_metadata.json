@@ -2,21 +2,21 @@
   "files": {
     "config": {
       "title": "Config Data",
-      "description": "Configuration Information",
+      "description": "The configuration file for the simulation.",
       "path": "input/data/config/barnyard_config.json",
       "type": "json",
       "properties": "config_properties"
     },
     "animal": {
       "title": "Animal data",
-      "description": "Moo Moo!",
+      "description": "The configuration file for the animal module.",
       "path": "input/data/animal/no_animal.json",
       "type": "json",
       "properties": "animal_properties"
     },
     "animal_population": {
       "title": "Animal population data",
-      "description": "Moo Moo!",
+      "description": "The configuration file for the animal population parameters.",
       "path": "input/data/animal/animal_population.json",
       "type": "json",
       "properties": "animal_population_properties"
@@ -30,14 +30,14 @@
     },
     "economy": {
       "title": "Economy data",
-      "description": "Time is money!",
+      "description": "The configuration file for the EEE module that is related to costs.",
       "path": "input/data/EEE/default_costs.csv",
       "type": "csv",
       "properties": "economic_properties"
     },
     "emission": {
       "title": "Emissions data",
-      "description": "Let's think about global warming",
+      "description": "The configuration file for the EEE module that is related to emissions.",
       "path": "input/data/EEE/default_emissions.csv",
       "type": "csv",
       "properties": "emissions_properties"
@@ -51,7 +51,7 @@
     },
     "feed": {
       "title": "Feed data",
-      "description": "Those cows need to eat!",
+      "description": "The configuration file for the feed module.",
       "path": "input/data/feed/purchased_feed.json",
       "type": "json",
       "properties": "feed_properties"
@@ -72,7 +72,7 @@
     },
     "manure_management": {
       "title": "Manure data",
-      "description": "You thought it's a waste, but those crops need to eat as well",
+      "description": "The configuration file for the manure module.",
       "path": "input/data/manure/manure_management.json",
       "type": "json",
       "properties": "manure_management_properties"
@@ -128,14 +128,14 @@
     },
     "weather": {
       "title": "Weather data",
-      "description": "Let's turn on the AC",
+      "description": "The configuration file for the weather module.",
       "path": "input/data/weather/barnyard_weather.csv",
       "type": "csv",
       "properties": "weather_properties"
     },
     "feed_quality": {
       "title": "Feed Quality",
-      "description": "Hows the feed!",
+      "description": "The configuration file for the feed quality module.",
       "path": "input/data/feed/feed_quality.csv",
       "type": "csv",
       "properties": "feed_quality_properties"
@@ -198,7 +198,7 @@
         "description": "Herd Demographics",
         "calf_num": {
           "type": "number",
-          "description": "Number of Calves (head) -- The average number of pre-weaned calves (default is ~8% of herd number)",
+          "description": "Number of Calves (head) -- The initial number of pre-weaned calves",
           "default": 8,
           "minimum": 0
         },
@@ -222,7 +222,7 @@
         },
         "cow_num": {
           "type": "number",
-          "description": "Number of Cows (head) -- The initial number of dry and lactating cows (all parities, default is ~51% of herd number).",
+          "description": "Number of Cows (head) -- The initial number of dry and lactating cows.",
           "default": 100,
           "minimum": 0
         },
