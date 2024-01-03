@@ -140,18 +140,24 @@ def test_check_fertilizer_application_schedule(events: List[FertilizerEvent], re
 
 
 @pytest.mark.parametrize("events,remaining_events,current_events", [
-    ([ManureEvent(1991, 120, 100, 20, 0.8, 0.0, 1.0), ManureEvent(1992, 120, 100, 20, 0.8, 0.0, 1.0),
-      ManureEvent(1993, 120, 100, 20, 0.8, 0.0, 1.0)],
-     [ManureEvent(1992, 120, 100, 20, 0.8, 0.0, 1.0), ManureEvent(1993, 120, 100, 20, 0.8, 0.0, 1.0)],
-     [ManureEvent(1991, 120, 100, 20, 0.8, 0.0, 1.0)]),
-    ([ManureEvent(1991, 125, 100, 20, 0.8, 0.0, 1.0), ManureEvent(1992, 125, 100, 20, 0.8, 0.0, 1.0),
-      ManureEvent(1993, 125, 100, 20, 0.8, 0.0, 1.0)],
-     [ManureEvent(1991, 125, 100, 20, 0.8, 0.0, 1.0), ManureEvent(1992, 125, 100, 20, 0.8, 0.0, 1.0),
-      ManureEvent(1993, 125, 100, 20, 0.8, 0.0, 1.0)], []),
-    ([ManureEvent(1991, 120, 100, 20, 0.8, 0.0, 1.0), ManureEvent(1991, 120, 90, 20, 0.8, 0.0, 1.0),
-      ManureEvent(1991, 120, 80, 40, 0.8, 0.0, 1.0)], [],
-     [ManureEvent(1991, 120, 100, 20, 0.8, 0.0, 1.0), ManureEvent(1991, 120, 90, 20, 0.8, 0.0, 1.0),
-      ManureEvent(1991, 120, 80, 40, 0.8, 0.0, 1.0)])
+    ([ManureEvent(1991, 120, 100, 20, ManureType.LIQUID, 0.8, 0.0, 1.0),
+      ManureEvent(1992, 120, 100, 20, ManureType.LIQUID, 0.8, 0.0, 1.0),
+      ManureEvent(1993, 120, 100, 20, ManureType.LIQUID, 0.8, 0.0, 1.0)],
+     [ManureEvent(1992, 120, 100, 20, ManureType.LIQUID, 0.8, 0.0, 1.0),
+      ManureEvent(1993, 120, 100, 20, ManureType.LIQUID, 0.8, 0.0, 1.0)],
+     [ManureEvent(1991, 120, 100, 20, ManureType.LIQUID, 0.8, 0.0, 1.0)]),
+    ([ManureEvent(1991, 125, 100, 20, ManureType.LIQUID, 0.8, 0.0, 1.0),
+      ManureEvent(1992, 125, 100, 20, ManureType.LIQUID, 0.8, 0.0, 1.0),
+      ManureEvent(1993, 125, 100, 20, ManureType.LIQUID, 0.8, 0.0, 1.0)],
+     [ManureEvent(1991, 125, 100, 20, ManureType.LIQUID, 0.8, 0.0, 1.0),
+      ManureEvent(1992, 125, 100, 20, ManureType.LIQUID, 0.8, 0.0, 1.0),
+      ManureEvent(1993, 125, 100, 20, ManureType.LIQUID, 0.8, 0.0, 1.0)], []),
+    ([ManureEvent(1991, 120, 100, 20, ManureType.LIQUID, 0.8, 0.0, 1.0),
+      ManureEvent(1991, 120, 90, 20, ManureType.LIQUID, 0.8, 0.0, 1.0),
+      ManureEvent(1991, 120, 80, 40, ManureType.LIQUID, 0.8, 0.0, 1.0)], [],
+     [ManureEvent(1991, 120, 100, 20, ManureType.LIQUID, 0.8, 0.0, 1.0),
+      ManureEvent(1991, 120, 90, 20, ManureType.LIQUID, 0.8, 0.0, 1.0),
+      ManureEvent(1991, 120, 80, 40, ManureType.LIQUID, 0.8, 0.0, 1.0)])
 ])
 def test_check_manure_application_schedule(events: List[ManureEvent], remaining_events: List[ManureEvent],
                                            current_events: List[ManureEvent]) -> None:
@@ -167,9 +173,9 @@ def test_check_manure_application_schedule(events: List[ManureEvent], remaining_
 
     expected_execution_calls = []
     for event in current_events:
-        expected_execution_calls.append(call(event.nitrogen_mass, event.phosphorus_mass, event.field_coverage,
-                                             event.application_depth, event.surface_remainder_fraction, event.year,
-                                             event.day))
+        expected_execution_calls.append(call(event.nitrogen_mass, event.phosphorus_mass, event.manure_type,
+                                             event.field_coverage, event.application_depth,
+                                             event.surface_remainder_fraction, event.year, event.day))
     field._filter_events.assert_called_once_with(events, mocked_time)
     assert field.manure_events == remaining_events
     field._execute_manure_application.assert_has_calls(expected_execution_calls)
@@ -725,10 +731,10 @@ def test_record_fertilizer_application(mix_name: str, total_mass: float, nitroge
     assert actual["values"].__contains__(expected_value)
 
 
-@pytest.mark.parametrize("nitrogen,phosphorus,coverage,depth,remainder,year,day,supplement,fertilizer_applied,"
-                         "only_nitrogen_unmet,supplied_manure,expected_request,expected_unmet_nitrogen,"
-                         "expected_unmet_phosphorus", [
-                             (75.0, 75.0, 0.9, 0.0, 1.0, 1993, 175, True, True, False,
+@pytest.mark.parametrize("nitrogen,phosphorus,coverage,manure_type,depth,remainder,year,day,supplement,"
+                         "fertilizer_applied,only_nitrogen_unmet,supplied_manure,expected_request,"
+                         "expected_unmet_nitrogen,expected_unmet_phosphorus", [
+                             (75.0, 75.0, 0.9, ManureType.LIQUID, 0.0, 1.0, 1993, 175, True, True, False,
                               NutrientRequestResults(nitrogen=50.0, phosphorus=50.0, dry_matter=250.0,
                                                      dry_matter_fraction=0.33, organic_nitrogen_fraction=0.3,
                                                      inorganic_nitrogen_fraction=0.7, ammonium_nitrogen_fraction=0.25,
@@ -736,7 +742,7 @@ def test_record_fertilizer_application(mix_name: str, total_mass: float, nitroge
                                                      inorganic_phosphorus_fraction=0.5),
                               NutrientRequest(nitrogen=75.0, phosphorus=75.0, manure_type=ManureType.LIQUID),
                               25.0, 25.0),
-                             (100.0, 0.0, 0.88, 120.0, 0.7, 2003, 200, True, True, True,
+                             (100.0, 0.0, 0.88, ManureType.LIQUID, 120.0, 0.7, 2003, 200, True, True, True,
                               NutrientRequestResults(nitrogen=50.0, phosphorus=50.0, dry_matter=250.0,
                                                      dry_matter_fraction=0.33, organic_nitrogen_fraction=0.3,
                                                      inorganic_nitrogen_fraction=0.7, ammonium_nitrogen_fraction=0.25,
@@ -744,18 +750,19 @@ def test_record_fertilizer_application(mix_name: str, total_mass: float, nitroge
                                                      inorganic_phosphorus_fraction=0.6),
                               NutrientRequest(nitrogen=100.0, phosphorus=0.0, manure_type=ManureType.LIQUID),
                               50.0, 0.0),
-                             (50.0, 50.0, 0.91, 200.0, 0.45, 1998, 155, True, False, False,
+                             (50.0, 50.0, 0.91, ManureType.LIQUID, 200.0, 0.45, 1998, 155, True, False, False,
                               NutrientRequestResults(nitrogen=50.0, phosphorus=50.0, dry_matter=250.0,
                                                      dry_matter_fraction=0.33, organic_nitrogen_fraction=0.3,
                                                      inorganic_nitrogen_fraction=0.7, ammonium_nitrogen_fraction=0.25,
                                                      organic_phosphorus_fraction=0.544,
                                                      inorganic_phosphorus_fraction=0.456),
                               NutrientRequest(nitrogen=50.0, phosphorus=50.0, manure_type=ManureType.LIQUID), 0.0, 0.0),
-                             (65.0, 40.0, 0.77, 75.0, 0.78, 1999, 160, True, True, False, None,
+                             (65.0, 40.0, 0.77, ManureType.LIQUID, 75.0, 0.78, 1999, 160, True, True, False, None,
                               NutrientRequest(nitrogen=65.0, phosphorus=40.0, manure_type=ManureType.LIQUID),
                               65.0, 40.0),
-                             (0, 0, 0.5, 0.0, 1.0, 1996, 155, True, False, False, None, None, 0.0, 0.0),
-                             (75.0, 50.0, 0.7, 0.0, 1.0, 2010, 120, False, True, True,
+                             (0, 0, 0.5, 0.0, ManureType.LIQUID, 1.0, 1996, 155, True, False, False, None, None, 0.0,
+                              0.0),
+                             (75.0, 50.0, 0.7, ManureType.LIQUID, 0.0, 1.0, 2010, 120, False, True, True,
                               NutrientRequestResults(nitrogen=50.0, phosphorus=50.0, dry_matter=250.0,
                                                      dry_matter_fraction=0.33, organic_nitrogen_fraction=0.3,
                                                      inorganic_nitrogen_fraction=0.7, ammonium_nitrogen_fraction=0.25,
@@ -763,7 +770,7 @@ def test_record_fertilizer_application(mix_name: str, total_mass: float, nitroge
                                                      inorganic_phosphorus_fraction=0.456),
                               NutrientRequest(nitrogen=75.0, phosphorus=50.0, manure_type=ManureType.LIQUID),
                               25.0, 0.0),
-                             (50.0, 50.0, 0.7, 0.0, 1.0, 2010, 120, False, False, False,
+                             (50.0, 50.0, 0.7, ManureType.LIQUID, 0.0, 1.0, 2010, 120, False, False, False,
                               NutrientRequestResults(nitrogen=50.0, phosphorus=50.0, dry_matter=250.0,
                                                      dry_matter_fraction=0.33, organic_nitrogen_fraction=0.3,
                                                      inorganic_nitrogen_fraction=0.7, ammonium_nitrogen_fraction=0.25,
@@ -772,11 +779,11 @@ def test_record_fertilizer_application(mix_name: str, total_mass: float, nitroge
                               NutrientRequest(nitrogen=50.0, phosphorus=50.0, manure_type=ManureType.LIQUID),
                               50.0, 0.0),
                          ])
-def test_execute_manure_application(nitrogen: float, phosphorus: float, coverage: float, depth: float, remainder: float,
-                                    year: int, day: int, supplement: bool, fertilizer_applied: bool,
-                                    only_nitrogen_unmet: bool, supplied_manure: NutrientRequestResults,
-                                    expected_request: NutrientRequest, expected_unmet_nitrogen: float,
-                                    expected_unmet_phosphorus: float) -> None:
+def test_execute_manure_application(nitrogen: float, phosphorus: float, manure_type: ManureType, coverage: float,
+                                    depth: float, remainder: float, year: int, day: int, supplement: bool,
+                                    fertilizer_applied: bool, only_nitrogen_unmet: bool,
+                                    supplied_manure: NutrientRequestResults, expected_request: NutrientRequest,
+                                    expected_unmet_nitrogen: float, expected_unmet_phosphorus: float) -> None:
     """Tests that manure is applied to the soil correctly."""
     mocked_manure_manager = MagicMock(ManureManager)
     mocked_manure_manager.request_nutrients = MagicMock(return_value=supplied_manure)
@@ -789,7 +796,7 @@ def test_execute_manure_application(nitrogen: float, phosphorus: float, coverage
 
     with patch.object(om, "add_log") as log, \
             patch.object(om, "add_warning") as warn:
-        field._execute_manure_application(nitrogen, phosphorus, coverage, depth, remainder, year, day)
+        field._execute_manure_application(nitrogen, phosphorus, manure_type, coverage, depth, remainder, year, day)
 
         if nitrogen == phosphorus == 0.0:
             log.assert_called_once()
@@ -882,7 +889,7 @@ def test_execute_manure_application_with_invalid_args(depth: float, remainder: f
                   new_callable=MagicMock, return_value="26_4_24") as patched_optimizer, \
             patch("RUFAS.routines.field.field.field.Field._execute_fertilizer_application",
                   new_callable=MagicMock) as patched_fertilizer_applicator:
-        field._execute_manure_application(50.0, 50.0, 0.8, depth, remainder, 2000, 133)
+        field._execute_manure_application(50.0, 50.0, ManureType.LIQUID, 0.8, depth, remainder, 2000, 133)
 
         if invalid_combination:
             patched_error.assert_called_once_with(depth, remainder, "manure_application_error", 2000, 133)

@@ -1983,6 +1983,15 @@
           "maximum": 1.0
         }
       },
+      "manure_types": {
+        "type": "array",
+        "description": "The type of manure which will be requested for the application.",
+        "default": [],
+        "properties": {
+          "type": "string",
+          "pattern": "^(liquid|solid)$"
+        }
+      },
       "pattern_repeat": {
         "type": "number",
         "description": "Number of times that this manure application schedule should be repeated.",
