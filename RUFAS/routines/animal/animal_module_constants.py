@@ -69,6 +69,15 @@ class AnimalModuleConstants:
     DAILY_MILK_VARIATION_STD_DEV = 1.0
     """Standard deviation of the daily milk production variation from the estimated milk production, kg/day"""
 
+    MILK_CRUDE_PROTEIN = 3.2
+    """Milk crude protein content, percentage."""
+
+    MILK_LACTOSE = 4.85
+    """Milk lactose content, percentage."""
+
+    MILK_TRUE_PROTEIN = 3.5
+    """Milk true protein content, percentage."""
+
     DMI_CONSTRAINT_PERCENT = 0.20
     """The +/- percentage of DMI estimated allowed for ration formulation"""
 

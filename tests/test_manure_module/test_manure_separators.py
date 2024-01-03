@@ -317,7 +317,7 @@ def test_manure_separator_factory_get_instance(manure_separator_type_name: str,
 
     # Assert
     patch_for_manure_separator_get_type.assert_called_once_with(manure_separator_type_name)
-    assert type(manure_separator) == expected_manure_separator_class
+    assert type(manure_separator) is expected_manure_separator_class
     assert manure_separator.config == expected_manure_separator_config
     if not custom_manure_separator_config:
         patch_for_default_manure_separator_config_factory_get_instance.assert_called_once_with(

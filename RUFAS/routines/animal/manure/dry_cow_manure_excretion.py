@@ -1,11 +1,3 @@
-"""
-RUFAS: Ruminant Farm Systems Model
-File name: dry_cow_manure_excretion.py
-Description: Determines manure excretion with information from the ration
-    formulation, outputs used by the manure module.
-Author(s): Militsa Sotirova, militsasotirova@gmail.com
-           Joseph Merhi, jm2257@cornell.edu
-"""
 import math
 from typing import Tuple
 
@@ -61,12 +53,12 @@ def manure_calculations(ration_formulation,
     nutrient_amounts, nutrient_concentrations = RationReporter.report_ration(
         ration_formulation, feed.available_feeds)
     dry_matter_intake = nutrient_amounts['dm']
-    ash_diet_content = nutrient_amounts['ash']
+    # ash_diet_content = nutrient_amounts['ash']
     CP_concentration = nutrient_concentrations['CP']
     potassium_concentration = nutrient_concentrations['potassium']
-    ASH_concentration = nutrient_concentrations["ash"]  # TODO: Unused
+    ASH_concentration = nutrient_concentrations["ash"]
     NDF_concentration = nutrient_concentrations['NDF']
-    EE_concentration = nutrient_concentrations["EE"]  # TODO: Unused
+    EE_concentration = nutrient_concentrations["EE"]
     ADF_concentration = nutrient_concentrations['ADF']
     starch_concentration = nutrient_concentrations['starch']
     # Soluble residue
@@ -127,7 +119,7 @@ def manure_calculations(ration_formulation,
                       ) * GeneralConstants.GRAMS_TO_KG
 
     # Nitrogen excretion in feces, kg [A.3B.B.3]
-    fecal_nitrogen = manure_nitrogen - urine_nitrogen  # TODO: Unused
+    # fecal_nitrogen = manure_nitrogen - urine_nitrogen
 
     # Urinary N concentration, g N/kg [A.3G.B.1]
     urinary_nitrogen_concentration = (
@@ -193,7 +185,7 @@ def manure_calculations(ration_formulation,
         phosphorus=manure_phosphorus_excreted,
         phosphorus_fraction=manure_phosphorus_fraction,
         potassium=potassium,
-        methane=methane_emission
+        enteric_methane_g=methane_emission
     )
 
     return total_phosphorus_excreted, manure_excretion_values

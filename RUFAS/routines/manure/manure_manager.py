@@ -1,11 +1,3 @@
-"""
-RUFAS: Ruminant Farm Systems Model
-File name: manure_manager.py
-
-Author(s):  William Donovan, wmdonovan@wisc.edu
-            Yunus Mohammed, ymm26@cornell.edu
-            Sadman Chowdhury, skc86@cornell.edu
-"""
 from __future__ import annotations
 
 import typing
@@ -14,12 +6,15 @@ from typing import Optional
 from typing import Tuple
 
 from RUFAS.routines.animal.animal_manager import AnimalManager
-from RUFAS.routines.manure.beddings.bedding_classes import BaseBedding
-from RUFAS.routines.manure.beddings.bedding_classes import BeddingFactory
-from RUFAS.routines.manure.constants_and_units.manure_constants import ManureConstants
 from RUFAS.routines.manure.IO_helpers.manure_manager_config_handler import (
     ManureManagerConfigHandler,
 )
+from RUFAS.routines.manure.IO_helpers.manure_module_output_manager_helper import (
+    ManureModuleOutputManagerHelper,
+)
+from RUFAS.routines.manure.beddings.bedding_classes import BaseBedding
+from RUFAS.routines.manure.beddings.bedding_classes import BeddingFactory
+from RUFAS.routines.manure.constants_and_units.manure_constants import ManureConstants
 from RUFAS.routines.manure.manure_handlers.manure_handler_classes import (
     BaseManureHandler,
 )
@@ -62,9 +57,6 @@ from RUFAS.routines.manure.manure_treatments.manure_treatment_types import (
     ManureTreatmentType,
 )
 from RUFAS.routines.manure.manure_treatments.manure_types import ManureType
-from RUFAS.routines.manure.IO_helpers.manure_module_output_manager_helper import (
-    ManureModuleOutputManagerHelper,
-)
 from RUFAS.routines.manure.pen_manure.manure_manager_pen import ManureManagerPen
 from RUFAS.routines.manure.reception_pits.reception_pit import ReceptionPit
 from RUFAS.routines.manure.reception_pits.reception_pit_daily_output import (
@@ -91,7 +83,7 @@ class ManureManager:
     """
 
     def __init__(
-        self, animal_manager: AnimalManager, weather, time, manure_manager_config
+            self, animal_manager: AnimalManager, weather, time, manure_manager_config
     ):
         """Initializes a ManureManager object by setting up the appropriate manure
         manager components as specified by the data in the animal_manager object.
@@ -150,7 +142,7 @@ class ManureManager:
         return self._daily_output_per_pen
 
     def _configure_manure_manager_components(
-        self, animal_manager: AnimalManager
+            self, animal_manager: AnimalManager
     ) -> None:
         """Configures the manure manager components for each animal pen.
 
@@ -228,6 +220,23 @@ class ManureManager:
         for pen in animal_manager.all_pens:
             self._pen_daily_update(animal_manager.simulation_day, pen)
 
+        ManureModuleOutputManagerHelper.add_dataclass_object(
+            self._manure_nutrient_manager.get_values(ManureType.LIQUID),
+            info_maps={
+                "class": self.__class__.__name__,
+                "function": self.daily_update.__name__,
+                "prefix": "ManureNutrientsLiquid",
+            }
+        )
+        ManureModuleOutputManagerHelper.add_dataclass_object(
+            self._manure_nutrient_manager.get_values(ManureType.SOLID),
+            info_maps={
+                "class": self.__class__.__name__,
+                "function": self.daily_update.__name__,
+                "prefix": "ManureNutrientsSolid",
+            }
+        )
+
     @staticmethod
     def _get_manure_type(treatment_type: ManureTreatmentType) -> ManureType:
         """
@@ -249,52 +258,48 @@ class ManureManager:
 
         """
         manure_type_by_treatment_type = {
-            ManureTreatmentType.SLURRY_STORAGE_OUTDOOR: ManureType.SLURRY,
-            ManureTreatmentType.SLURRY_STORAGE_UNDERFLOOR: ManureType.SLURRY,
+            ManureTreatmentType.SLURRY_STORAGE_OUTDOOR: ManureType.LIQUID,
+            ManureTreatmentType.SLURRY_STORAGE_UNDERFLOOR: ManureType.LIQUID,
             ManureTreatmentType.ANAEROBIC_LAGOON: ManureType.LIQUID,
             ManureTreatmentType.ANAEROBIC_DIGESTION_AND_LAGOON: ManureType.LIQUID,
             ManureTreatmentType.ANAEROBIC_DIGESTION: ManureType.LIQUID,
             ManureTreatmentType.ANAEROBIC_DIGESTION_AND_LAGOON_WITH_SPLIT: ManureType.LIQUID,
             ManureTreatmentType.COMPOST_BEDDED_PACK_BARN: ManureType.SOLID,
+            ManureTreatmentType.OPEN_LOTS: ManureType.SOLID,
+            ManureTreatmentType.SEPARATED_SOLIDS_STORAGE: ManureType.SOLID,
         }
         return manure_type_by_treatment_type[treatment_type]
 
     @staticmethod
-    def _get_manure_density(pen: ManureManagerPen) -> float:
+    def _get_manure_density_by_type(manure_type: ManureType) -> float:
         """
-        Look up the density of manure produced by a given pen.
-        This method determines the manure density based on the type of manure treatment system of a given pen.
-        Each manure type (SLURRY, LIQUID, SOLID) has a predefined density, which is specified in the class :class:`ManureConstants`.
+        Look up the density of manure based on the given type. The specific density values are
+        specified in the class :class:`ManureConstants`.
 
         Parameters
         ----------
-        pen : ManureManagerPen
-            An instance of the ManureManagerPen class representing a specific pen.
-            The pen object should have a manure_treatment attribute that indicates the type of manure treatment system.
+        manure_type : ManureType
+            The type of manure.
 
         Returns
         -------
         float
-            The density of manure produced by the given pen, in units consistent with the densities
-            defined in ManureConstants. This value depends on the type of manure treatment system of the pen.
-
+            The density of manure based on the given type.
         """
-        treatment_type = ManureTreatmentType.get_type(pen.manure_treatment)
-        manure_type = ManureManager._get_manure_type(treatment_type)
+
         manure_density_by_manure_type = {
-            ManureType.SLURRY: ManureConstants.SLURRY_MANURE_DENSITY,
             ManureType.LIQUID: ManureConstants.LIQUID_MANURE_DENSITY,
             ManureType.SOLID: ManureConstants.SOLID_MANURE_DENSITY,
         }
         return manure_density_by_manure_type[manure_type]
 
     def _add_manure_nutrients(
-        self,
-        pen: ManureManagerPen,
-        manure_treatment_daily_output: ManureTreatmentDailyOutput,
+            self,
+            pen: ManureManagerPen,
+            manure_treatment_daily_output: ManureTreatmentDailyOutput,
     ) -> None:
         """
-        Add the nutrients in the manure produced by a given pen to the manure nutrient manager.
+        Add the nutrients in the manure to the manure nutrient manager by manure type.
 
         Parameters
         ----------
@@ -306,20 +311,38 @@ class ManureManager:
         Returns
         -------
         None
-
         """
-        # TODO: With the introduction of different manure types, we should rename attributes in ManureTreatmentDailyOutput
-        # to make it more generic and not specific to any manure type.
+
+        liquid_manure_nitrogen = max(manure_treatment_daily_output.liquid_manure_nitrogen, 0.0)
+        liquid_manure_phosphorus = max(manure_treatment_daily_output.liquid_manure_phosphorus, 0.0)
+        liquid_manure_potassium = max(manure_treatment_daily_output.liquid_manure_potassium, 0.0)
+        liquid_manure_total_solids = max(manure_treatment_daily_output.liquid_manure_total_solids, 0.0)
+        liquid_total_manure_mass = max((manure_treatment_daily_output.liquid_manure_daily_volume *
+                                        self._get_manure_density_by_type(ManureType.LIQUID)), 0.0)
         self._manure_nutrient_manager.add_nutrients(
             ManureNutrients(
-                nitrogen=manure_treatment_daily_output.liquid_manure_nitrogen,
-                phosphorus=manure_treatment_daily_output.liquid_manure_phosphorus,
-                potassium=manure_treatment_daily_output.liquid_manure_potassium,
-                dry_matter=manure_treatment_daily_output.liquid_manure_total_solids,
-                total_manure_mass=(
-                    manure_treatment_daily_output.liquid_manure_daily_volume
-                    * self._get_manure_density(pen)
-                ),
+                nitrogen=liquid_manure_nitrogen,
+                phosphorus=liquid_manure_phosphorus,
+                potassium=liquid_manure_potassium,
+                dry_matter=liquid_manure_total_solids,
+                total_manure_mass=liquid_total_manure_mass,
+                manure_type=ManureType.LIQUID,
+            )
+        )
+
+        solid_manure_phosphorus = max(manure_treatment_daily_output.solid_manure_phosphorus, 0.0)
+        solid_manure_nitrogen = max(manure_treatment_daily_output.solid_manure_nitrogen, 0.0)
+        solid_manure_potassium = max(manure_treatment_daily_output.solid_manure_potassium, 0.0)
+        solid_manure_total_solids = max(manure_treatment_daily_output.solid_manure_total_solids, 0.0)
+        solid_total_manure_mass = max(manure_treatment_daily_output.solid_manure_daily_mass, 0.0)
+        self._manure_nutrient_manager.add_nutrients(
+            ManureNutrients(
+                nitrogen=solid_manure_nitrogen,
+                phosphorus=solid_manure_phosphorus,
+                potassium=solid_manure_potassium,
+                dry_matter=solid_manure_total_solids,
+                total_manure_mass=solid_total_manure_mass,
+                manure_type=ManureType.SOLID,
             )
         )
 
@@ -331,9 +354,9 @@ class ManureManager:
         and checks against the nutrients available in the manager.
 
         If the request can be fulfilled either partially or wholly, the corresponding amount of nutrients
-        is subtracted from the manager's internal bookkeeping. The method then returns the results of the nutrient request,
-        which detail the amounts of nutrients that can be provided to fulfill the request. If the request
-        cannot be fulfilled at all, the method will return None.
+        is subtracted from the manager's internal bookkeeping. The method then returns the results of
+        the nutrient request, which detail the amounts of nutrients that can be provided to fulfill the request.
+        If the request cannot be fulfilled at all, the method will return None.
 
         Notes
         -----
@@ -347,7 +370,8 @@ class ManureManager:
         -------
         NutrientRequestResults | None
             The results of the nutrient request, detailed in a `NutrientRequestResults` object, which includes
-            the amount of nitrogen, phosphorus, total manure mass, dry matter, and others that can be provided to fulfill the request.
+            the amount of nitrogen, phosphorus, total manure mass, dry matter, and others that
+            can be provided to fulfill the request.
             Returns None if the request cannot be fulfilled.
 
         """
@@ -391,9 +415,7 @@ class ManureManager:
         )
 
         manure_handler_daily_output_prefix = {
-            "prefix": manure_handler_daily_output.__class__.__name__
-            + "_Pen_"
-            + str(mm_pen.id)
+            "prefix": manure_handler_daily_output.__class__.__name__ + "_Pen_" + str(mm_pen.id)
         }
         ManureModuleOutputManagerHelper.add_dataclass_object(
             manure_handler_daily_output,
@@ -408,9 +430,7 @@ class ManureManager:
         )
 
         reception_pit_daily_output_prefix = {
-            "prefix": reception_pit_daily_output.__class__.__name__
-            + "_Pen_"
-            + str(mm_pen.id)
+            "prefix": reception_pit_daily_output.__class__.__name__ + "_Pen_" + str(mm_pen.id)
         }
         ManureModuleOutputManagerHelper.add_dataclass_object(
             reception_pit_daily_output,
@@ -433,9 +453,9 @@ class ManureManager:
         if anaerobic_digestion_daily_output:
             anaerobic_digestion_daily_output_prefix = {
                 "prefix": "AnaerobicDigestion_"
-                + anaerobic_digestion_daily_output.__class__.__name__
-                + "_Pen_"
-                + str(mm_pen.id)
+                          + anaerobic_digestion_daily_output.__class__.__name__
+                          + "_Pen_"
+                          + str(mm_pen.id)
             }
             ManureModuleOutputManagerHelper.add_dataclass_object(
                 anaerobic_digestion_daily_output,
@@ -444,9 +464,7 @@ class ManureManager:
             )
         if manure_separator_daily_output:
             manure_separator_daily_output_prefix = {
-                "prefix": manure_separator_daily_output.__class__.__name__
-                + "_Pen_"
-                + str(mm_pen.id)
+                "prefix": manure_separator_daily_output.__class__.__name__ + "_Pen_" + str(mm_pen.id)
             }
             ManureModuleOutputManagerHelper.add_dataclass_object(
                 manure_separator_daily_output,
@@ -455,9 +473,7 @@ class ManureManager:
             )
 
         manure_treatment_daily_output_prefix = {
-            "prefix": manure_treatment_daily_output.__class__.__name__
-            + "_Pen_"
-            + str(mm_pen.id)
+            "prefix": manure_treatment_daily_output.__class__.__name__ + "_Pen_" + str(mm_pen.id)
         }
         ManureModuleOutputManagerHelper.add_dataclass_object(
             manure_treatment_daily_output,
@@ -467,9 +483,9 @@ class ManureManager:
 
         accumulated_manure_treatment_output_prefix = {
             "prefix": "Accumulated_"
-            + manure_treatment_daily_output.__class__.__name__
-            + "_Pen_"
-            + str(mm_pen.id)
+                      + manure_treatment_daily_output.__class__.__name__
+                      + "_Pen_"
+                      + str(mm_pen.id)
         }
         ManureModuleOutputManagerHelper.add_dataclass_object(
             manure_treatment_accumulated_output,
@@ -494,11 +510,11 @@ class ManureManager:
         self._daily_output_per_pen.append(daily_output_data)
 
     def _pen_daily_update_for_separator_and_treatment(
-        self,
-        simulation_day: int,
-        pen: ManureManagerPen,
-        manure_handler_daily_output: ManureHandlerDailyOutput,
-        reception_pit_daily_output: ReceptionPitDailyOutput,
+            self,
+            simulation_day: int,
+            pen: ManureManagerPen,
+            manure_handler_daily_output: ManureHandlerDailyOutput,
+            reception_pit_daily_output: ReceptionPitDailyOutput,
     ) -> Tuple[
         Optional[ManureTreatmentDailyOutput],
         Optional[ManureSeparatorDailyOutput],
@@ -538,9 +554,9 @@ class ManureManager:
                 manure_handler_daily_output=manure_handler_daily_output,
                 reception_pit_daily_output=reception_pit_daily_output,
             )
-            manure_separator_daily_output = results[0]
-            manure_treatment_daily_output = results[1]
-            manure_treatment_accumulated_output = results[2]
+            manure_separator_daily_output = results[0]  # type: ignore
+            manure_treatment_daily_output = results[1]  # type: ignore
+            manure_treatment_accumulated_output = results[2]  # type: ignore
 
         return (
             anaerobic_digestion_daily_output,
@@ -551,7 +567,7 @@ class ManureManager:
 
     @classmethod
     def _is_compound_anaerobic_manure_treatment(
-        cls, manure_treatment_name: str
+            cls, manure_treatment_name: str
     ) -> bool:
         """Returns True if the manure treatment is a compound anaerobic manure treatment, False otherwise.
 
@@ -574,11 +590,11 @@ class ManureManager:
         return manure_treatment_type in compound_anaerobic_manure_treatment_types
 
     def _handle_daily_update_for_compound_anaerobic_manure_treatment(
-        self,
-        simulation_day: int,
-        pen: ManureManagerPen,
-        manure_handler_daily_output: ManureHandlerDailyOutput,
-        reception_pit_daily_output: ReceptionPitDailyOutput,
+            self,
+            simulation_day: int,
+            pen: ManureManagerPen,
+            manure_handler_daily_output: ManureHandlerDailyOutput,
+            reception_pit_daily_output: ReceptionPitDailyOutput,
     ) -> Tuple[
         ManureTreatmentDailyOutput,
         Optional[ManureSeparatorDailyOutput],
@@ -600,7 +616,8 @@ class ManureManager:
 
         Returns
         -------
-        Tuple[ManureTreatmentDailyOutput, Optional[ManureSeparatorDailyOutput], ManureTreatmentDailyOutput, ManureTreatmentDailyOutput]
+        Tuple[ManureTreatmentDailyOutput, Optional[ManureSeparatorDailyOutput],
+        ManureTreatmentDailyOutput, ManureTreatmentDailyOutput]
             The daily output of the anaerobic digestion,
             the daily output of the manure separator,
             the daily output of the anaerobic lagoon, and
@@ -638,11 +655,11 @@ class ManureManager:
         )
 
     def _handle_daily_update_for_simple_manure_treatment(
-        self,
-        simulation_day: int,
-        pen: ManureManagerPen,
-        manure_handler_daily_output: ManureHandlerDailyOutput,
-        reception_pit_daily_output: ReceptionPitDailyOutput,
+            self,
+            simulation_day: int,
+            pen: ManureManagerPen,
+            manure_handler_daily_output: ManureHandlerDailyOutput,
+            reception_pit_daily_output: ReceptionPitDailyOutput,
     ) -> Tuple[
         Optional[ManureSeparatorDailyOutput],
         ManureTreatmentDailyOutput,
@@ -679,8 +696,7 @@ class ManureManager:
 
         manure_treatment_daily_output = self.manure_treatments[pen.id].daily_update(
             manure_handler_daily_output=manure_handler_daily_output,
-            manure_treatment_daily_input=manure_separator_daily_output
-            or reception_pit_daily_output,
+            manure_treatment_daily_input=manure_separator_daily_output or reception_pit_daily_output,
             pen=pen,
             sim_day=simulation_day,
         )
@@ -697,7 +713,7 @@ class ManureManager:
 
 
 def simulate_daily_manure_manager(
-    manure_manager: ManureManager, animal_manager: AnimalManager
+        manure_manager: ManureManager, animal_manager: AnimalManager
 ) -> None:
     """A wrapper function for the daily_update method of the ManureManager class.
 

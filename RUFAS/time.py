@@ -1,10 +1,12 @@
+from typing import List
 from RUFAS.output_manager import OutputManager
+from RUFAS.config import Config
 
 om = OutputManager()
 
 
 class Time:
-    def __init__(self, config):
+    def __init__(self, config: Config):
         """
         Description:
             This object is responsible for creating and tracking time in the simulation.
@@ -13,16 +15,16 @@ class Time:
                 to initialize time
         """
 
-        calendar_year = config.start_year
+        calendar_year: int = config.start_year
         # number of years
-        years = config.years
+        years: List[int] = config.years
 
-        self.start_year = calendar_year
-        self.calendar_year = calendar_year
-        self.years = years
-        self.year = 1  # current year
-        self.leap_year_length = config.leap_year_length
-        self.year_length = config.year_length
+        self.start_year: int = calendar_year
+        self.calendar_year: int = calendar_year
+        self.years: List[int] = years
+        self.year: int = 1  # current year
+        self.leap_year_length: int = config.leap_year_length
+        self.year_length: int = config.year_length
 
         # finds the first non-null day of the first year
         for i in range(0, len(self.years[0])):
@@ -90,7 +92,11 @@ class Time:
         """
         Records the current day, simulated year, and calendar year of the simulation in the OutputManager.
         """
-        info_map = {"class": self.__class__.__name__, "function": self.record_time.__name__, "prefix": "Time"}
+        info_map = {
+            "class": self.__class__.__name__,
+            "function": self.record_time.__name__,
+            "prefix": "Time",
+        }
         om.add_variable("day", self.day, info_map)
         om.add_variable("year", self.year, info_map)
         om.add_variable("calendar_year", self.calendar_year, info_map)

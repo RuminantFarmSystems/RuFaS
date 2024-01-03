@@ -1,11 +1,3 @@
-"""
-RUFAS: Ruminant Farm Systems Model
-File name: calf_manure_excretion.py
-Description: Determines manure excretion with information from the ration
-    formulation, outputs used by the manure module.
-Author(s): Militsa Sotirova, militsasotirova@gmail.com
-           Joseph Merhi, jm2257@cornell.edu
-"""
 from typing import Tuple
 
 from RUFAS.general_constants import GeneralConstants
@@ -97,7 +89,7 @@ def manure_calculations(ration_formulation,
 
     manure_excretion_values = AnimalManureExcretions(
         urea=9.52,  # 0.340 mol/L TODO: Implement with correct equation
-        urine=2,
+        urine=urine,
         # TODO: Implement with correct equation
         total_ammoniacal_nitrogen_concentration=0.14,
         urine_nitrogen=urine_nitrogen,
@@ -113,7 +105,7 @@ def manure_calculations(ration_formulation,
         phosphorus=manure_phosphorus_excreted,
         phosphorus_fraction=manure_phosphorus_fraction,
         potassium=0,
-        methane=methane_emission
+        enteric_methane_g=methane_emission
     )
 
     return total_phosphorus_excreted, manure_excretion_values

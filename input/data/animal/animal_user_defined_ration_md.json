@@ -7,9 +7,12 @@
 		"cow_num": 1000,
 		"replace_num": 5000,
 		"herd_num": 1000,
-		"herd_init": false,
 		"breed": "HO"
 	},
+        "herd_initialization": {
+          "initial_animal_num": 10000,
+          "simulation_days": 5000
+        },
 	"animal_config": {
 		"management_decisions": {
 			"breeding_start_day_h": 380,
@@ -39,16 +42,26 @@
 				"std_gestation_len": 6,
 				"prefresh_day": 30,
                 "calving_interval": 400,
-                "heifer_repro_programs": {
-                    "estrus_detection_rate": 0.6,
-                    "estrus_service_rate": 1,
-                    "ed_conception_rate": 0.6,
-                    "heifer_TAI_protocol": "md5CG2P",
-                    "md5CG2P_conception_rate": 0.6,
-                    "md5CGP_conception_rate": 0.48,
-                    "heifer_synchED_protocol": "2P",
-                    "estrus_detection_rate_h_synch": 0.7
-                },
+				"heifers": {
+					"estrus_detection_rate": 0.6,
+					"estrus_conception_rate": 0.4,
+					"repro_sub_protocol": "5dCG2P",
+					"repro_sub_properties": {
+						"conception_rate": 0.6,
+						"estrus_detection_rate": 0.7
+					}
+				},
+				"cows": {
+					"estrus_detection_rate": 0.6,
+					"estrus_conception_rate": 0.6,
+					"presynch_protocol": "Double OvSynch",
+                    "resynch_protocol": "TAIafterPD",
+                    "repro_sub_protocol": "OvSynch 56",
+					"repro_sub_properties": {
+						"conception_rate": 0.5,
+						"tai_program_start_day": 70
+					}
+				},
                 "cow_repro_programs": {
                     "estrus_detection_rate": 0.6,
                     "estrus_service_rate": 1,
@@ -83,6 +96,8 @@
 				"preg_loss_rate_3": 0.017,
 				"avg_estrus_cycle_return": 23,
 				"std_estrus_cycle_return": 6,
+				"avg_estrus_cycle_heifer": 21,
+				"std_estrus_cycle_heifer": 2.5,
 				"avg_estrus_cycle_cow": 21,
 				"std_estrus_cycle_cow": 4,
 				"avg_estrus_cycle_after_pgf": 5,
