@@ -817,7 +817,7 @@ class OutputManager(object):
                     )
                     continue
 
-                filtered_pool = {}
+                filtered_pool:  Dict[str, Dict[str, List[Any]]] = {}
                 if "filters" in filter_content.keys():
                     filtered_pool = self._filter_variables_pool(
                         filter_content["filters"], filter_file
@@ -847,19 +847,35 @@ class OutputManager(object):
 
     def _handle_report_generation(self,
                                   filter_content: Dict[str, Any],
-                                  filtered_pool: Dict[str, Any] | None,
+                                  filtered_pool: Dict[str, Dict[str, List[Any]]],
                                   info_map: Dict[str, Any],
                                   reports: Dict[str, Dict[str, List[Any]]]) -> None:
         """
         Handles the generation of reports based on the provided filter content.
 
+        Notes
+        -----
+        If the report name is not unique, the timestamp is appended to the name to make it unique.
+
+        Any errors that occur during report generation are logged and the report is skipped.
+
+        The following are a few examples of errors that can occur during report generation:
+        - There are no data points to aggregate.
+
+        - There are any cross-references that are missing.
+
+        - Neither horizontal nor vertical aggregation is specified.
+
+        - The aggregation type is not supported. The supported aggregation types are: sum, average, product,
+        subtraction, division, SD (standard deviation).
+
         Parameters
         ----------
         filter_content : Dict[str, Any]
             A dictionary containing the configuration for the report, including details
-            such as 'name', 'filters', 'references', and aggregation instructions.
+            such as 'name', 'filters', 'cross_references', and aggregation instructions.
 
-        filtered_pool : Optional[Dict[str, Any]]
+        filtered_pool : Dict[str, Dict[str, List[Any]]]
             The data pool from which reports are generated.
 
         info_map : Dict[str, Any]
@@ -867,11 +883,6 @@ class OutputManager(object):
 
         reports : Dict[str, Dict[str, List[Any]]]
             A dictionary to store the generated reports, keyed by their names.
-
-        Raises
-        ------
-        ValueError, KeyError
-            If there is an error in report generation, such as missing data or invalid configuration.
         """
 
         self.add_log("init_report_generation", "Report Generation Started", info_map)
@@ -881,8 +892,8 @@ class OutputManager(object):
 
             if "cross_references" in filter_content.keys():
                 self._check_for_missing_references(filter_content["cross_references"], reports)
-                reference_data = {ref: reports[ref] for ref in filter_content["cross_references"]}
-                filtered_pool.update(reference_data)
+                cross_reference_data = {ref: reports[ref] for ref in filter_content["cross_references"]}
+                filtered_pool.update(cross_reference_data)
 
             report_data = report_generator.generate_aggregate_report(filtered_pool, filter_content)
 

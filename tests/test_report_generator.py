@@ -239,128 +239,6 @@ def test_generate_report_with_valid_horizontal_order(
 
 
 @pytest.mark.parametrize(
-    "input_list, target_length, pad_value, expected", [
-        # Normal cases
-        ([1, 2, 3], 5, 0, [1, 2, 3, 0, 0]),
-
-        # Padding an empty list
-        ([], 3, 'a', ['a', 'a', 'a']),
-
-        # No padding needed (list already at target length)
-        ([1, 2], 2, 9, [1, 2]),
-
-        # Padding with None
-        ([1], 3, None, [1, None, None]),
-
-        # List longer than target length (no padding)
-        ([1, 2, 3], 1, 0, [1, 2, 3]),
-
-        # empty list, zero length
-        ([], 0, 0, []),
-    ])
-def test_pad_list_with_value(input_list: List[Any],
-                             target_length: int,
-                             pad_value: Any,
-                             expected: List[Any]
-                             ) -> None:
-    """
-    Unit test for _pad_list_with_value() static method in report_generator.py file.
-    """
-
-    # Act
-    ReportGenerator._pad_list_with_value(input_list, target_length, pad_value)
-
-    # Assert
-    assert input_list == expected
-
-
-@pytest.mark.parametrize(
-    "input_list, target_length, expected", [
-        # Normal case: padding required
-        ([1, 2], 5, [1, 2, 1, 2, 1]),
-
-        # List already at target length
-        ([1, 2, 3], 3, [1, 2, 3]),
-
-        # List longer than target length: no padding
-        ([1, 2, 3], 2, [1, 2, 3]),
-
-        # Empty list
-        ([], 4, []),
-
-        # Padding to zero length
-        ([1, 2], 0, [1, 2]),
-
-        # Cycling multiple times
-        ([1, 2, 3], 10, [1, 2, 3, 1, 2, 3, 1, 2, 3, 1])
-    ])
-def test_pad_list_with_cycle(input_list: List[float], target_length: int, expected: List[float]) -> None:
-    """
-    Unit test for _pad_list_with_cycle() static method in report_generator.py file.
-    """
-
-    # Act
-    ReportGenerator._pad_list_with_cycle(input_list, target_length)
-
-    # Assert
-    assert input_list == expected
-
-
-@pytest.mark.parametrize(
-    "input_data, padding_config, expected", [
-        # No padding ('none' method)
-        ([[1, 2], [1, 2, 3]], {"method": "none"}, [[1, 2], [1, 2, 3]]),
-
-        # Padding with a custom value
-        ([[1], [1, 2]], {"method": "custom", "value": 0}, [[1, 0], [1, 2]]),
-
-        # Padding with cycle
-        ([[1], [1, 2]], {"method": "cycle"}, [[1, 1], [1, 2]]),
-
-        # First element padding
-        ([[1, 2], [3]], {"method": "first"}, [[1, 2], [3, 3]]),
-
-        # Last element padding
-        ([[1, 2], [3]], {"method": "last"}, [[1, 2], [3, 3]]),
-
-        # Average padding
-        ([[1, 2], [3, 4, 5]], {"method": "avg"}, [[1, 2, 1.5], [3, 4, 5]]),
-
-        # Minimum value padding
-        ([[1, 2], [3, 4, 5]], {"method": "min"}, [[1, 2, 1], [3, 4, 5]]),
-
-        # Maximum value padding
-        ([[1, 2], [3, 4, 5]], {"method": "max"}, [[1, 2, 2], [3, 4, 5]]),
-
-        # Zero padding
-        ([[1, 2], [3]], {"method": "zero"}, [[1, 2], [3, 0]]),
-
-        # One padding
-        ([[1, 2], [3]], {"method": "one"}, [[1, 2], [3, 1]]),
-
-        # Null padding
-        ([[1, 2], [3]], {"method": "null"}, [[1, 2], [3, None]]),
-
-        # Empty list
-        ([[], [1, 2]], {"method": "first"}, [[None, None], [1, 2]]),
-
-        # All lists already at max length
-        ([[1, 2], [3, 4]], {"method": "first"}, [[1, 2], [3, 4]]),
-    ])
-def test_apply_padding(input_data: List[List[float]], padding_config: Dict[str, Any],
-                       expected: List[List[float]]) -> None:
-    """
-    Unit test for _apply_padding() static method in report_generator.py file.
-    """
-
-    # Act
-    ReportGenerator._apply_padding(input_data, padding_config)
-
-    # Assert
-    assert input_data == expected
-
-
-@pytest.mark.parametrize(
     "report_data, aggregator_key, expected", [
         # Tests with sum aggregator
         ({"a": [1, 2], "b": [3, 4]}, "sum", [3, 7]),
@@ -708,19 +586,6 @@ def test_add_constants_data(report_data: Dict[str, List[Any]],
                 [5, 7],
                 None
         ),
-
-        # Use padding when lists have different lengths
-        (
-                {"var1": {"values": [1]}, "var2": {"values": [3, 4]}},
-                {
-                    "name": "Report",
-                    "padding": {"method": "one"},
-                    "horizontal_aggregation": "sum",
-                },
-                {"var1": [1], "var2": [3, 4]},
-                [5, 7],
-                None
-        ),
     ]
 )
 def test_generate_aggregate_report(filtered_pool: Dict[str, Dict[str, List[Any]]],
@@ -735,7 +600,6 @@ def test_generate_aggregate_report(filtered_pool: Dict[str, Dict[str, List[Any]]
 
     # Arrange
     mocker.patch.object(ReportGenerator, '_prepare_report_data_with_constants', return_value=mock_prep_data)
-    patch_for_apply_padding = mocker.patch.object(ReportGenerator, '_apply_padding', return_value=None)
     mocker.patch.object(ReportGenerator, '_apply_horizontal_aggregation', return_value=[5, 7])
     mocker.patch.object(ReportGenerator, '_apply_vertical_aggregation', return_value=[3.5])
 
@@ -746,6 +610,3 @@ def test_generate_aggregate_report(filtered_pool: Dict[str, Dict[str, List[Any]]
     else:
         result = ReportGenerator.generate_aggregate_report(filtered_pool, filter_content)
         assert result == expected_result
-        if filter_content.get("padding"):
-            assert list(patch_for_apply_padding.call_args[0][0]) == list(mock_prep_data.values())
-            assert patch_for_apply_padding.call_args[0][1] == filter_content["padding"]

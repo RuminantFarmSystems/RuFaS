@@ -134,17 +134,6 @@ AGGREGATION_FUNCTIONS: Dict[str, Callable[[List[float]], float]] = {
     "subtraction": subtraction_aggregator,
 }
 
-PADDING_METHODS = {
-    "first": lambda lst: lst[0] if lst else None,
-    "last": lambda lst: lst[-1] if lst else None,
-    "avg": average_aggregator,
-    "min": min,
-    "max": max,
-    "zero": lambda _: 0,
-    "one": lambda _: 1,
-    "null": lambda _: None,
-}
-
 
 class ReportGenerator:
     def generate_report(
@@ -303,6 +292,16 @@ class ReportGenerator:
         -------
         List[float]
             The aggregated report data as a list.
+
+        Raises
+        ------
+        ValueError
+            This type of error is raised in the following cases:
+                If the report data is empty.
+                If the type of aggregation is not supported. The supported types are: sum, average, product,
+                    subtraction, division, SD.
+                If there are no horizontal or vertical aggregation keys in the filter content.
+
         """
 
         report_data = ReportGenerator._prepare_report_data_with_constants(filtered_pool, filter_content)
@@ -310,8 +309,6 @@ class ReportGenerator:
             raise ValueError(
                 f"filter {filter_content.get('filters')} in {filter_content.get('name')} led to empty report data."
             )
-
-        ReportGenerator._apply_padding(report_data.values(), filter_content.get("padding", {}))
 
         horizontal_agg_key = filter_content.get("horizontal_aggregation")
         if horizontal_agg_key and horizontal_agg_key not in AGGREGATION_FUNCTIONS:
@@ -412,81 +409,6 @@ class ReportGenerator:
             filtered_data = list(filter(None.__ne__, data))
             aggregated_data.append(aggregator(filtered_data))
         return aggregated_data
-
-    @staticmethod
-    def _apply_padding(data: List[List[float]], padding_config: Dict[str, Any]) -> None:
-        """
-        Applies padding to the referenced data based on the provided padding configuration.
-
-        Parameters
-        ----------
-        data : List[List[float]]
-            The list of lists to which padding needs to be applied.
-        padding_config : Dict[str, Any]
-            Configuration for padding, including method and custom value if applicable.
-        """
-
-        padding_method = padding_config.get("method", "none")
-        if padding_method == "none":
-            return
-
-        max_length = max([len(lst) for lst in data])
-        for lst in data:
-            if padding_method in PADDING_METHODS:
-                ReportGenerator._pad_list_with_value(lst, max_length, PADDING_METHODS[padding_method](lst))
-            elif padding_method == "custom":
-                ReportGenerator._pad_list_with_value(lst, max_length, padding_config.get("value", None))
-            elif padding_method == "cycle":
-                ReportGenerator._pad_list_with_cycle(lst, max_length)
-
-    @staticmethod
-    def _pad_list_with_value(lst: List[float], length: int, value: float | None) -> None:
-        """
-        Pads a list with a specified value until it reaches the specified length.
-
-        Parameters
-        ----------
-        lst : List[float]
-            The list to be padded.
-        length : int
-            The length to which the list should be padded.
-        value : float | None
-            The value to be used for padding.
-
-        Returns
-        -------
-        None
-        """
-
-        lst_to_extend = [value] * (length - len(lst))
-        lst.extend(lst_to_extend)
-
-    @staticmethod
-    def _pad_list_with_cycle(lst: List[float], length: int) -> None:
-        """
-        Pads a list by cycling its elements until it reaches the specified length.
-
-        Parameters
-        ----------
-        lst : List[float]
-            The list to be padded.
-        length : int
-            The length to which the list should be padded.
-
-        Returns
-        -------
-        None
-        """
-
-        current_length = len(lst)
-        if current_length == 0 or current_length >= length:
-            return
-
-        full_repeats = (length - current_length) // current_length
-        lst.extend(lst * full_repeats)
-
-        remaining_elements = length - len(lst)
-        lst.extend(lst[:remaining_elements])
 
     @staticmethod
     def _prepare_report_data_with_constants(filtered_pool: Dict[str, Dict[str, List[Any]]],
