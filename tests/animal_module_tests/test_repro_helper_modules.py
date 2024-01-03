@@ -30,8 +30,7 @@ from RUFAS.routines.animal.life_cycle.repro_protocol_misc import InternalReproSe
         0: {'deliver_hormones': ['GnRH']},
         7: {'deliver_hormones': ['PGF']},
         9: {'deliver_hormones': ['GnRH']},
-        10: {'deliver_hormones': ['GnRH']},
-        11: {
+        10: {
             'set_ai_day': True,
             'set_conception_rate': True,
             'set_tai_end': True
@@ -41,8 +40,7 @@ from RUFAS.routines.animal.life_cycle.repro_protocol_misc import InternalReproSe
         0: {'deliver_hormones': ['GnRH']},
         7: {'deliver_hormones': ['PGF']},
         9: {'deliver_hormones': ['GnRH']},
-        10: {'deliver_hormones': ['GnRH']},
-        11: {
+        10: {
             'set_ai_day': True,
             'set_conception_rate': True,
             'set_tai_end': True
@@ -51,8 +49,8 @@ from RUFAS.routines.animal.life_cycle.repro_protocol_misc import InternalReproSe
     ('cows', CowReproProtocolEnum.TAI_CoSynch_72.value, {
         0: {'deliver_hormones': ['GnRH']},
         7: {'deliver_hormones': ['PGF']},
-        10: {'deliver_hormones': ['GnRH']},
-        11: {
+        10: {
+            'deliver_hormones': ['GnRH'],
             'set_ai_day': True,
             'set_conception_rate': True,
             'set_tai_end': True
@@ -62,8 +60,8 @@ from RUFAS.routines.animal.life_cycle.repro_protocol_misc import InternalReproSe
         0: {'deliver_hormones': ['GnRH']},
         5: {'deliver_hormones': ['PGF']},
         6: {'deliver_hormones': ['PGF']},
-        8: {'deliver_hormones': ['GnRH']},
-        9: {
+        8: {
+            'deliver_hormones': ['GnRH'],
             'set_ai_day': True,
             'set_conception_rate': True,
             'set_tai_end': True
@@ -106,28 +104,34 @@ def test_get_schedule(animal_category: str, protocol_name: str, expected: dict |
         2: {'deliver_hormones': ['GnRH']},
         9: {'deliver_hormones': ['PGF']},
         11: {'deliver_hormones': ['GnRH']},
-        12: {'deliver_hormones': ['GnRH']},
-        13: {'set_ai_day': True, 'set_conception_rate': True, 'set_tai_end': True}
+        12: {'set_ai_day': True, 'set_conception_rate': True, 'set_tai_end': True}
     }),
     ('cows', CowReproProtocolEnum.TAI_OvSynch_56.value, 2, {
         2: {'deliver_hormones': ['GnRH']},
         9: {'deliver_hormones': ['PGF']},
         11: {'deliver_hormones': ['GnRH']},
-        12: {'deliver_hormones': ['GnRH']},
-        13: {'set_ai_day': True, 'set_conception_rate': True, 'set_tai_end': True}
+        12: {'set_ai_day': True, 'set_conception_rate': True, 'set_tai_end': True}
     }),
     ('cows', CowReproProtocolEnum.TAI_CoSynch_72.value, 2, {
         2: {'deliver_hormones': ['GnRH']},
         9: {'deliver_hormones': ['PGF']},
-        12: {'deliver_hormones': ['GnRH']},
-        13: {'set_ai_day': True, 'set_conception_rate': True, 'set_tai_end': True}
+        12: {
+            'deliver_hormones': ['GnRH'],
+            'set_ai_day': True,
+            'set_conception_rate': True,
+            'set_tai_end': True
+        }
     }),
     ('cows', CowReproProtocolEnum.TAI_5d_CoSynch.value, 2, {
         2: {'deliver_hormones': ['GnRH']},
         7: {'deliver_hormones': ['PGF']},
         8: {'deliver_hormones': ['PGF']},
-        10: {'deliver_hormones': ['GnRH']},
-        11: {'set_ai_day': True, 'set_conception_rate': True, 'set_tai_end': True}
+        10: {
+            'deliver_hormones': ['GnRH'],
+            'set_ai_day': True,
+            'set_conception_rate': True,
+            'set_tai_end': True
+        }
     }),
 
     # Invalid cases

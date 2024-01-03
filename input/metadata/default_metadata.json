@@ -443,33 +443,33 @@
               "type": "object",
               "estrus_detection_rate": {
                 "type": "number",
-                "description": "Estrus Detection Rate -- The % of in-heat animals that would be detected in the ED (Estrus Detection) programs (default is 0.6)",
+                "description": "The percentage of in-heat animals that would be detected in the ED (Estrus Detection) programs (default is 0.6)",
                 "default": 0.6,
                 "minimum": 0,
                 "maximum": 1
               },
               "estrus_conception_rate": {
                 "type": "number",
-                "description": "Estrus Conception Rate -- The % of inseminated animals that would be concepted in the ED (Estrus Detection) programs (default is 0.6)",
+                "description": "The percentage of inseminated animals that would be concepted in the ED (Estrus Detection) program (default is 0.6)",
                 "default": 0.6,
                 "minimum": 0,
                 "maximum": 1
               },
               "presynch_protocol": {
                 "type": "string",
-                "description": "Presynch Protocol -- The preSynch protocol (1st breeding) for cow in TAI (Timed Artificial Insemination) program. This ONLY applies to the TAI repro protocol.",
+                "description": "The presynch protocol (1st breeding) for cow in TAI (Timed Artificial Insemination) program. This ONLY applies to the TAI repro protocol.",
                 "default": "Double OvSynch",
                 "pattern": "^(Double OvSynch|PreSynch|G6G|N/A)$"
               },
               "resynch_protocol": {
                 "type": "string",
-                "description": "Resynch Protocol -- Resynch protocol for cow before/at/after pregnancy check day in the TAI (Timed Artificial Insemination) program",
+                "description": "Resynch protocol for cow before/at/after first pregnancy check day in the TAI and ED-TAI repro protocols.",
                 "default": "TAIafterPD",
                 "pattern": "^(TAIafterPD|TAIbeforePD|PGFatPD|N/A)$"
               },
               "repro_sub_protocol": {
                 "type": "string",
-                "description": "Sub-protocol for cow reproductive program. This ONLY applies to the TAI repro protocol.",
+                "description": "Cow's TAI procedure to be used in both TAI and ED-TAI repro protocols.",
                 "pattern": "^(OvSynch 48|OvSynch 56|CoSynch 72|5d CoSynch|N/A)$",
                 "default": "OvSynch 56"
               },
@@ -477,8 +477,8 @@
                 "type": "object",
                 "conception_rate": {
                   "type": "number",
-                  "description": "Conception Rate -- The conception rate for the cow reproductive program (default is 0.6). This ONLY applies to the TAI repro protocol.",
-                  "default": 0.5,
+                  "description": "The conception rate for cow's TAI program used in TAI and ED-TAI repro protocols (default is 0.6).",
+                  "default": 0.6,
                   "minimum": 0,
                   "maximum": 1
                 },
@@ -3074,7 +3074,7 @@
           "manure_treatment_methods": {
             "type": "string",
             "description": "Manure Treatment Methods -- Select the Manure Treatment Methods.",
-            "pattern": "^(slurry storage underfloor|slurry storage outdoor|open lots|compost bedded pack barn|anaerobic lagoon|anaerobic digestion|other)$"
+            "pattern": "^(slurry storage underfloor|slurry storage outdoor|open lots|compost bedded pack barn|anaerobic lagoon|anaerobic digestion and lagoon|other)$"
           }
         }
       },
