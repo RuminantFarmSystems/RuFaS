@@ -8,7 +8,7 @@
             "planting_days": [105],
             "harvest_years": [1980, 1980, 1980, 1981, 1981, 1981, 1981, 1982, 1982, 1982, 1982, 1983, 1983, 1983, 1983],
             "harvest_days": [166, 198, 230, 149, 181, 213, 245, 149, 181, 213, 245, 149, 181, 213, 245],
-            "harvest_operations": ["no_kill", "no_kill", "no_kill", "no_kill", "no_kill", "no_kill", "no_kill", "no_kill", "no_kill", "no_kill", "no_kill", "no_kill", "no_kill",  "no_kill", "default"],
+            "harvest_operations": ["harvest_only", "harvest_only", "harvest_only", "harvest_only", "harvest_only", "harvest_only", "harvest_only", "harvest_only", "harvest_only", "harvest_only", "harvest_only", "harvest_only", "harvest_only",  "harvest_only", "harvest_kill"],
             "harvest_type": "scheduled"
         },
         {
@@ -19,7 +19,7 @@
             "planting_days": [135],
             "harvest_years": [1984, 1985, 1986],
             "harvest_days": [258],
-            "harvest_operations": ["default"],
+            "harvest_operations": ["harvest_kill"],
             "harvest_type": "scheduled"
         }
     ]
