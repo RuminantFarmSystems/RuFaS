@@ -3,7 +3,7 @@ import os
 import re
 from copy import deepcopy
 from pathlib import Path
-from typing import Any, Callable, Dict, List, Optional, Type
+from typing import Any, Callable, Dict, List
 
 import pytest
 from mock import mock_open, patch
@@ -12,7 +12,6 @@ from pytest import raises
 from pytest_mock.plugin import MockerFixture
 
 from RUFAS.output_manager import LogVerbosity, OutputManager
-from RUFAS.report_generator import ReportGenerator
 
 
 def test_get_prefix() -> None:
@@ -1709,7 +1708,7 @@ def test_save_results_report_generation(
 
     with patch("RUFAS.output_manager.ReportGenerator") as mock_report_generator_class:
         mock_report_generator = mock_report_generator_class.return_value
-        mock_report_generator.generate_aggregate_report = MagicMock()
+        mock_report_generator.handle_report_generation = MagicMock()
 
         # Act
         mock_output_manager.save_results(
@@ -1732,7 +1731,7 @@ def test_save_results_report_generation(
             )
 
         # test for exception handling
-        mock_report_generator.generate_aggregate_report.side_effect = ValueError()
+        mock_report_generator.handle_report_generation.side_effect = ValueError()
         mock_output_manager.save_results(
             "save_path",
             "filters_path",
@@ -1785,7 +1784,7 @@ def test_route_save_functions_csv(
     mock_output_manager._dict_to_file_csv.assert_called_once_with(
         {"key": {"var": "value"}}, os.path.join("output", "CSVs", variable_csv_file_path)
     )
-# Restore original method
+    # Restore original method
     mock_output_manager._dict_to_file_csv = (
         output_manager_original_method_states["_dict_to_file_csv"]
     )
@@ -1904,23 +1903,23 @@ def test_route_save_functions_graph(
 
 @pytest.mark.parametrize("log_pool, expected_calls", [
     (
-        [
-            {"log": "info_log", "message": "Info message",
-             "info_map": {"class": "GraphGenerator", "function": "prepare_plot_data"}},
-            {"warning": "warning_type",
-             "message": "Warning message",
-             "info_map": {"class": "GraphGenerator", "function": "prepare_plot_data"}}
-        ],
-        {"add_error": 0, "add_log": 1, "add_warning": 1}
+            [
+                {"log": "info_log", "message": "Info message",
+                 "info_map": {"class": "GraphGenerator", "function": "prepare_plot_data"}},
+                {"warning": "warning_type",
+                 "message": "Warning message",
+                 "info_map": {"class": "GraphGenerator", "function": "prepare_plot_data"}}
+            ],
+            {"add_error": 0, "add_log": 1, "add_warning": 1}
     ),
     (
-        [
-            {"error": "error_type", "message": "Error message",
-             "info_map": {"class": "GraphGenerator", "function": "prepare_plot_data"}},
-            {"log": "info_log", "message": "Info message",
-             "info_map": {"class": "GraphGenerator", "function": "prepare_plot_data"}}
-        ],
-        {"add_error": 1, "add_log": 1, "add_warning": 0}
+            [
+                {"error": "error_type", "message": "Error message",
+                 "info_map": {"class": "GraphGenerator", "function": "prepare_plot_data"}},
+                {"log": "info_log", "message": "Info message",
+                 "info_map": {"class": "GraphGenerator", "function": "prepare_plot_data"}}
+            ],
+            {"add_error": 1, "add_log": 1, "add_warning": 0}
     ),
 ])
 def test_route_logs(mock_output_manager: OutputManager,
@@ -2126,138 +2125,3 @@ def test_log_verbosity_enum_values() -> None:
     assert LogVerbosity.LOGS.value == "logs"
 
 
-@pytest.mark.parametrize(
-    "references, reports, expected_exception, expected_message",
-    [
-        # All references are present
-        (["ref1", "ref2"], {"ref1": {}, "ref2": {}}, None, None),
-
-        # One reference is missing
-        (["ref1", "ref2"], {"ref1": {}}, KeyError, "Missing referenced reports: ref2"),
-
-        # Multiple references are missing
-        (["ref1", "ref2", "ref3"], {"ref1": {}}, KeyError, "Missing referenced reports: ref2, ref3"),
-
-        # Reports dictionary is empty
-        (["ref1"], {}, KeyError, "Missing referenced reports: ref1"),
-    ]
-)
-def test_check_for_missing_references(references: List[str],
-                                      reports: Dict[str, Dict[str, Any]],
-                                      expected_exception: Optional[Exception],
-                                      expected_message: Optional[str]) -> None:
-    """
-    Unit test for _check_for_missing_references static method in OutputManager class.
-    """
-
-    if expected_exception:
-        # Act and assert
-        with pytest.raises(expected_exception) as excinfo:  # type: ignore
-            OutputManager._check_for_missing_references(references, reports)
-        assert expected_message in str(excinfo.value)
-    else:
-        # Act
-        OutputManager._check_for_missing_references(references, reports)
-
-
-@pytest.mark.parametrize(
-    "filter_content, reports, expected_name, timestamp_return_value",
-    [
-        # Case when the name is not in reports
-        ({"name": "report1"}, {}, "report1", "2023-01-01"),
-
-        # Case when the name is in reports and a timestamp is appended
-        ({"name": "report1"}, {"report1": {}}, "report1 2023-01-01", "2023-01-01"),
-
-        # Case when the name is not provided in filter_content
-        ({}, {}, "untitled_2023-01-01", "2023-01-01"),
-    ]
-)
-def test_generate_unique_report_name(mocker: MockerFixture,
-                                     filter_content: Dict[str, str],
-                                     reports: Dict[str, Dict[str, Any]],
-                                     expected_name: str,
-                                     timestamp_return_value: str
-                                     ) -> None:
-    """
-    Unit test for _generate_unique_report_name method in OutputManager class.
-    """
-
-    # Arrange
-    om = OutputManager()
-    mocker.patch.object(om, '_get_timestamp', return_value=timestamp_return_value)
-
-    # Act
-    result = om._generate_unique_report_name(filter_content, reports)
-
-    # Assert
-    assert result == expected_name
-
-
-@pytest.mark.parametrize(
-    "filter_content, filtered_pool, reports, expected_exception, expected_report_key, expected_report_value",
-    [
-        # Standard report case
-        (
-                {"name": "standard_report", "filters": ["some_filter"]},
-                {"some_data_key": [1, 2, 3]},
-                {},
-                None,
-                "standard_report",
-                {"values": "mocked_report"},
-        ),
-
-        # Case with cross-references
-        (
-                {
-                    "name": "report_with_references",
-                    "filters": ["some_filter"],
-                    "cross_references": ["ref1"]
-                },
-                {"some_data_key": [1, 2, 3]},
-                {"ref1": {"values": [4, 5, 6]}},
-                None,
-                "report_with_references",
-                {"values": "mocked_report"},
-        ),
-
-        # Error case during report generation
-        (
-                {"name": "error_report", "cross_references": ["missing_ref"]},
-                None,
-                {"ref": {"values": [1, 2, 3]}},
-                KeyError,
-                None,
-                None,
-        ),
-    ]
-)
-def test_handle_report_generation(filter_content: Dict[str, Any],
-                                  filtered_pool: Dict[str, Any],
-                                  reports: Dict[str, Dict[str, List[Any]]],
-                                  expected_exception: Optional[Type[BaseException]],
-                                  expected_report_key: Optional[str],
-                                  expected_report_value: Optional[Dict[str, List[Any]]],
-                                  mocker
-                                  ) -> None:
-    """
-    Unit test for the _handle_report_generation method in OutputManager class in output_manager.py.
-    """
-
-    # Arrange
-    om = OutputManager()
-    mocker.patch.object(om, 'add_log')
-    patch_for_add_error = mocker.patch.object(om, 'add_error')
-    mocker.patch.object(om, '_generate_unique_report_name', side_effect=lambda x, y: x.get("name", "untitled"))
-    mocker.patch.object(ReportGenerator, 'generate_aggregate_report', return_value="mocked_report")
-    mocker.patch.object(om, '_check_for_missing_references',
-                        side_effect=expected_exception if expected_exception else None)
-
-    # Act
-    om._handle_report_generation(filter_content, filtered_pool, {}, reports)
-
-    # Assert
-    if expected_exception:
-        patch_for_add_error.assert_called_once()
-    else:
-        assert reports.get(expected_report_key) == expected_report_value

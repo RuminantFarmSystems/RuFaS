@@ -136,6 +136,13 @@ AGGREGATION_FUNCTIONS: Dict[str, Callable[[List[float]], float]] = {
 
 
 class ReportGenerator:
+
+    def __init__(self):
+        self.reports: Dict[str, Dict[str, List[Any]]] = {}
+
+    def clear_reports(self):
+        self.reports = {}
+
     def generate_report(
             self,
             filtered_pool: Dict[str, Dict[str, List[Any]]],
@@ -275,9 +282,81 @@ class ReportGenerator:
                 report_data[key] = filtered_pool[key]["values"][slice_start:slice_end]
         return report_data
 
+    def handle_report_generation(self,
+                                 filter_content: Dict[str, Any],
+                                 filtered_pool: Dict[str, Dict[str, List[Any]]],
+                                 ) -> None:
+        """
+        Generates a single report based on filtered data and aggregation criteria.
+
+        Parameters
+        ----------
+        filter_content : Dict[str, Any]
+            A dictionary containing the configuration for the report, including details
+            such as 'name', 'filters', 'cross_references', and aggregation instructions.
+
+        filtered_pool : Dict[str, Dict[str, List[Any]]]
+            The data pool from which reports are generated.
+        """
+
+        report_name = self._generate_unique_report_name(filter_content)
+
+        if "cross_references" in filter_content.keys():
+            self._check_for_missing_references(filter_content["cross_references"])
+            cross_reference_data = {ref: self.reports[ref] for ref in filter_content["cross_references"]}
+            filtered_pool.update(cross_reference_data)
+
+        report_data = self._generate_single_report(filtered_pool, filter_content)
+
+        self.reports[report_name] = {"values": report_data}
+
+    def _generate_unique_report_name(self, filter_content: Dict[str, Any]) -> str:
+        """
+        Generates a unique name for the report based on the filter content.
+
+        Parameters
+        ----------
+        filter_content : Dict[str, Any]
+            The filter content for the report.
+
+        Returns
+        -------
+        str
+            If there is no `name` key in the filter content, the name is set to `untitled_<timestamp>`.
+            If the name is already present in the list of previously generated reports, the timestamp is appended
+            to the name to make it unique.
+            Otherwise, the name is set to the value of the `name` key in the filter content.
+        """
+
+        base_name = filter_content.get("name", f"untitled_{Utility.get_timestamp(True)}")
+
+        if base_name in self.reports:
+            base_name = f"{base_name} {Utility.get_timestamp(True)}"
+
+        return base_name
+
+    def _check_for_missing_references(self, references: List[str]) -> None:
+        """
+        Checks if all the referenced reports are present.
+
+        Parameters
+        ----------
+        references : List[str]
+            The list of report references to check.
+
+        Raises
+        ------
+        KeyError
+            If any of the report references are missing.
+        """
+
+        missing_references = [ref for ref in references if ref not in self.reports]
+        if missing_references:
+            raise KeyError(f"Missing referenced reports: {', '.join(missing_references)}")
+
     @staticmethod
-    def generate_aggregate_report(filtered_pool: Dict[str, Dict[str, List[Any]]],
-                                  filter_content: Dict[str, Any]) -> List[float]:
+    def _generate_single_report(filtered_pool: Dict[str, Dict[str, List[Any]]],
+                                filter_content: Dict[str, Any]) -> List[float]:
         """
         Generates a report based on filtered data and aggregation criteria, including scalar operations and constants.
 
