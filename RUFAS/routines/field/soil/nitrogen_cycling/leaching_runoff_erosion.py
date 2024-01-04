@@ -10,6 +10,12 @@ This module handles the movement and loss of nitrogen due to erosion and leachin
 on SWAT sections 4:2.1, 2
 """
 
+NITRATE_RUNOFF_COEFFICIENT = 10e-5
+AMMONIUM_RUNOFF_COEFFICIENT = 30e-3
+NITRATE_PERCOLATION_COEFFICIENT = 55e-5
+AMMONIUM_PERCOLATION_COEFFICIENT = 55e-4
+ACTIVE_ORGANIC_NITROGEN_PERCOLATION_COEFFICIENT = 30e-5
+
 
 class LeachingRunoffErosion:
 
@@ -66,12 +72,10 @@ class LeachingRunoffErosion:
 
         """
         if self.data.accumulated_runoff > 0.0:
-            nitrates_lost_to_runoff = self._calculate_inorganic_nitrogen_loss(
-                self.data.soil_layers[0].nitrate_content, self.data.soil_layers[0].water_content,
-                self.data.soil_layers[0].saturation_content, self.data.accumulated_runoff, 0.1)
-            ammonium_lost_to_runoff = self._calculate_inorganic_nitrogen_loss(
-                self.data.soil_layers[0].ammonium_content, self.data.soil_layers[0].water_content,
-                self.data.soil_layers[0].saturation_content, self.data.accumulated_runoff, 1.0)
+            nitrates_lost_to_runoff = self._calculate_nitrogen_removed_by_water(
+                self.data.soil_layers[0].nitrate_content, self.data.accumulated_runoff, NITRATE_RUNOFF_COEFFICIENT)
+            ammonium_lost_to_runoff = self._calculate_nitrogen_removed_by_water(
+                self.data.soil_layers[0].ammonium_content, self.data.accumulated_runoff, AMMONIUM_RUNOFF_COEFFICIENT)
 
             self.data.soil_layers[0].nitrate_content -= nitrates_lost_to_runoff
             self.data.annual_runoff_nitrates_total += nitrates_lost_to_runoff * field_size
@@ -100,7 +104,8 @@ class LeachingRunoffErosion:
             self.data.annual_eroded_active_organic_nitrogen_total += active_organic_nitrogen_lost * field_size
 
     def _leach_nitrogen(self) -> None:
-        """Removes leached nitrogen from each soil layer, then adds the leached nitrogen to the next layer.
+        """
+        Removes leached nitrogen from each soil layer, then adds the leached nitrogen to the next layer.
 
         References
         ----------
@@ -115,9 +120,6 @@ class LeachingRunoffErosion:
         iterating through the soil profile a second time and adding the leached nitrogen into the appropriate layer. The
         bottom soil layer leaches into the vadose zone.
 
-        The leaching extraction coefficient is 1.0 except when leaching from the nitrate pool in all non-top soil
-        layers, in which case it is 2.5.
-
         """
         percolated_nitrogen = []
         for layer in self.data.soil_layers:
@@ -130,19 +132,21 @@ class LeachingRunoffErosion:
                 percolated_nitrogen.append(nitrogen_percolated_to_next_layer)
                 continue
 
-            nitrate_extraction_coefficient = 1.0 if layer.top_depth == 0 else 2.5
-
-            nitrates_lost = self._calculate_nitrogen_lost_to_leaching(
-                layer.nitrate_content, layer.field_capacity_content, layer.percolated_water,
-                nitrate_extraction_coefficient, False)
-            ammonium_lost = self._calculate_nitrogen_lost_to_leaching(
-                layer.ammonium_content, layer.field_capacity_content, layer.percolated_water, 1.0, False)
-            active_organic_nitrogen_lost = self._calculate_nitrogen_lost_to_leaching(
-                layer.active_organic_nitrogen_content, layer.field_capacity_content, layer.percolated_water, 1.0, True)
+            nitrates_lost = self._calculate_nitrogen_removed_by_water(layer.nitrate_content, layer.percolated_water,
+                                                                      NITRATE_PERCOLATION_COEFFICIENT)
+            ammonium_lost = self._calculate_nitrogen_removed_by_water(layer.ammonium_content, layer.percolated_water,
+                                                                      AMMONIUM_PERCOLATION_COEFFICIENT)
+            active_organic_nitrogen_lost = self._calculate_nitrogen_removed_by_water(
+                layer.active_organic_nitrogen_content, layer.percolated_water,
+                ACTIVE_ORGANIC_NITROGEN_PERCOLATION_COEFFICIENT)
 
             layer.nitrate_content -= nitrates_lost
             layer.ammonium_content -= ammonium_lost
             layer.active_organic_nitrogen_content -= active_organic_nitrogen_lost
+
+            layer.percolated_nitrates = nitrates_lost
+            layer.percolated_ammonium = ammonium_lost
+            layer.percolated_active_organic_nitrogen = active_organic_nitrogen_lost
 
             nitrogen_percolated_to_next_layer = {
                 "nitrates": nitrates_lost,
@@ -223,43 +227,6 @@ class LeachingRunoffErosion:
         1.0 for ammonium runoff.
         """
         return nitrogen_concentration * runoff * runoff_extraction_coef
-
-    @staticmethod
-    def _calculate_inorganic_nitrogen_loss(nitrogen_content: float, water_content: float, saturation_content: float,
-                                           runoff: float, runoff_extraction_coefficient: float) -> float:
-        """Calculates the amount of nitrogen lost from the given pool due to runoff.
-
-        Parameters
-        ----------
-        nitrogen_content : float
-            Amount of inorganic nitrogen in the top soil layer (kg / ha)
-        water_content : float
-            Water content of the top soil layer (mm)
-        saturation_content : float
-            Amount of water in the top soil layer when saturated (mm)
-        runoff : float
-            Amount of precipitation than left the field through runoff on the current day (mm)
-        runoff_extraction_coefficient : float
-            Coefficient of extraction for runoff (unitless)
-
-        Returns
-        -------
-        float
-            The amount of inorganic nitrogen lost from the top layer of soil on the current day (kg / ha)
-
-        Notes
-        -----
-        Precipitation that runs off the field only effects the top soil layer, so this method should only ever be used
-        to calculate nitrogen lost from the top soil layer.
-
-        """
-        water_sum = water_content + runoff
-        nitrogen_concentration = LeachingRunoffErosion._determine_nitrogen_concentration(nitrogen_content, water_sum,
-                                                                                         saturation_content)
-        nitrogen_lost_to_runoff = LeachingRunoffErosion._determine_nitrogen_runoff_amount(nitrogen_concentration,
-                                                                                          runoff,
-                                                                                          runoff_extraction_coefficient)
-        return min(nitrogen_content, nitrogen_lost_to_runoff)
 
     @staticmethod
     def _determine_erosion_nitrogen_loss_content(nitrogen_erosion_concentration: float,
@@ -450,43 +417,29 @@ class LeachingRunoffErosion:
         return adjusted_concentration * percolation_amount
 
     @staticmethod
-    def _calculate_nitrogen_lost_to_leaching(nitrogen_content: float, field_capacity_content: float,
-                                             percolation_amount: float, leaching_extraction_coefficient: float,
-                                             is_active_organic_nitrogen: bool) -> float:
-        """Calculates how much nitrogen is lost from the given pool on the current day.
+    def _calculate_nitrogen_removed_by_water(
+            nitrogen_content: float,
+            water_amount: float,
+            extraction_coefficient: float,
+    ) -> float:
+        """
+        Calculates how much nitrogen is lost from the given pool on the current day.
 
         Parameters
         ----------
         nitrogen_content : float
-            The content of nitrogen in the given pool in the current layer of soil (kg / ha)
-        field_capacity_content : float
-            Amount of water in this soil layer when at field capacity (mm)
-        percolation_amount : float
-            Amount of water that percolated out of the current soil layer on this day (mm)
-        leaching_extraction_coefficient : float
-            Coefficient for adjusting the amount leached based on depth (unitless)
-        is_active_organic_nitrogen  : bool
-            Status indicating whether the pool being leached from is the active organic nitrogen pool or not
+            The content of nitrogen in the given pool in the current layer of soil (kg / ha).
+        water_amount : float
+            Amount of water that percolated out of the current soil layer on this day (mm).
+        extraction_coefficient : float
+            Coefficient for adjusting the amount leached based on the pool leached from (mm ^ -1).
 
         Returns
         -------
         float
             The amount of nitrogen that leaches out of the current pool and into the next lowest layer on the current
-            day (kg / ha)
-
-        Notes
-        -----
-        Only the concentration of active organic nitrogen gets adjusted, which necessitates the need for the parameter
-        indicating whether the pool being leached from is the active organic pool.
+            day (kg / ha).
 
         """
-        nitrogen_concentration = LeachingRunoffErosion._determine_nitrogen_percolation_water_concentration(
-            nitrogen_content, field_capacity_content, percolation_amount)
-
-        if is_active_organic_nitrogen:
-            nitrogen_concentration = LeachingRunoffErosion._adjust_active_organic_nitrogen_concentration(
-                nitrogen_concentration)
-
-        nitrogen_lost = LeachingRunoffErosion._determine_leached_nitrogen(nitrogen_concentration, percolation_amount,
-                                                                          leaching_extraction_coefficient)
-        return min(nitrogen_content, nitrogen_lost)
+        nitrogen_leached = nitrogen_content * extraction_coefficient * water_amount
+        return min(nitrogen_content, nitrogen_leached)

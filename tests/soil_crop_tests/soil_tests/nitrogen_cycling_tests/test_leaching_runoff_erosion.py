@@ -161,8 +161,7 @@ def test_calculate_nitrogen_lost_to_leaching(nitrogen_content: float, field_capa
     LeachingRunoffErosion._adjust_active_organic_nitrogen_concentration = MagicMock(return_value=30)
     LeachingRunoffErosion._determine_leached_nitrogen = MagicMock(return_value=18)
 
-    observed = LeachingRunoffErosion._calculate_nitrogen_lost_to_leaching(nitrogen_content, field_capacity, percolation,
-                                                                          extraction_coefficient, is_active)
+    observed = LeachingRunoffErosion._calculate_nitrogen_removed_by_water(nitrogen_content, field_capacity, percolation)
 
     LeachingRunoffErosion._determine_nitrogen_percolation_water_concentration.assert_called_once_with(nitrogen_content,
                                                                                                       field_capacity,
@@ -233,7 +232,7 @@ def test_leach_nitrogen() -> None:
         incorp.data.set_vectorized_layer_attribute("active_organic_nitrogen_content", [15] * 4)
         incorp.data.set_vectorized_layer_attribute("percolated_water", [3.5, 0, 3.5, 3.5])
 
-        LeachingRunoffErosion._calculate_nitrogen_lost_to_leaching = MagicMock(return_value=10)
+        LeachingRunoffErosion._calculate_nitrogen_removed_by_water = MagicMock(return_value=10)
 
         incorp._leach_nitrogen()
 
@@ -242,7 +241,7 @@ def test_leach_nitrogen() -> None:
         lower_layer_nitrogen_lost_calls = [call(40, 6.8, 3.5, 2.5, False), call(35, 6.8, 3.5, 1.0, False),
                                            call(15, 6.8, 3.5, 1.0, True)] * 2
         all_nitrogen_lost_calls = top_layer_nitrogen_lost_calls + lower_layer_nitrogen_lost_calls
-        LeachingRunoffErosion._calculate_nitrogen_lost_to_leaching.assert_has_calls(all_nitrogen_lost_calls)
+        LeachingRunoffErosion._calculate_nitrogen_removed_by_water.assert_has_calls(all_nitrogen_lost_calls)
         soil_layers = incorp.data.soil_layers + [incorp.data.vadose_zone_layer]
         for index in range(len(soil_layers)):
             if index == 0 or index == 2:
