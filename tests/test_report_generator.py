@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Dict, List, Any
+from typing import Dict, List, Any, Optional, Type
 
 import pytest
 from pytest_mock import MockerFixture
@@ -588,14 +588,14 @@ def test_add_constants_data(report_data: Dict[str, List[Any]],
         ),
     ]
 )
-def test_generate_aggregate_report(filtered_pool: Dict[str, Dict[str, List[Any]]],
-                                   filter_content: Dict[str, Any],
-                                   mock_prep_data: Dict[str, List[Any]],
-                                   expected_result: List[Any],
-                                   expected_exception: Exception,
-                                   mocker: MockerFixture) -> None:
+def test_generate_single_report(filtered_pool: Dict[str, Dict[str, List[Any]]],
+                                filter_content: Dict[str, Any],
+                                mock_prep_data: Dict[str, List[Any]],
+                                expected_result: List[Any],
+                                expected_exception: Exception,
+                                mocker: MockerFixture) -> None:
     """
-    Unit test for the generate_aggregate_report() method of ReportGenerator class in report_generator.py file.
+    Unit test for the _generate_single_report() method of ReportGenerator class in report_generator.py file.
     """
 
     # Arrange
@@ -606,7 +606,151 @@ def test_generate_aggregate_report(filtered_pool: Dict[str, Dict[str, List[Any]]
     # Act and assert
     if expected_exception:
         with pytest.raises(expected_exception):
-            ReportGenerator.generate_aggregate_report(filtered_pool, filter_content)
+            ReportGenerator._generate_single_report(filtered_pool, filter_content)
     else:
-        result = ReportGenerator.generate_aggregate_report(filtered_pool, filter_content)
+        result = ReportGenerator._generate_single_report(filtered_pool, filter_content)
         assert result == expected_result
+
+
+@pytest.mark.parametrize(
+    "references, reports, expected_exception, expected_message",
+    [
+        # All references are present
+        (["ref1", "ref2"], {"ref1": {}, "ref2": {}}, None, None),
+
+        # One reference is missing
+        (["ref1", "ref2"], {"ref1": {}}, KeyError, "Missing referenced reports: ref2"),
+
+        # Multiple references are missing
+        (["ref1", "ref2", "ref3"], {"ref1": {}}, KeyError, "Missing referenced reports: ref2, ref3"),
+
+        # Reports dictionary is empty
+        (["ref1"], {}, KeyError, "Missing referenced reports: ref1"),
+    ]
+)
+def test_check_for_missing_references(mocker: MockerFixture,
+                                      references: List[str],
+                                      reports: Dict[str, Dict[str, Any]],
+                                      expected_exception: Optional[Exception],
+                                      expected_message: Optional[str]) -> None:
+    """
+    Unit test for _check_for_missing_references static method in report_generator.py file.
+    """
+
+    # Arrange
+    mocker.patch('RUFAS.report_generator.ReportGenerator.__init__', return_value=None)
+    report_generator = ReportGenerator()
+    report_generator.reports = reports
+
+    if expected_exception:
+        # Act and assert
+        with pytest.raises(expected_exception) as excinfo:  # type: ignore
+            report_generator._check_for_missing_references(references)
+        assert expected_message in str(excinfo.value)
+    else:
+        # Act
+        report_generator._check_for_missing_references(references)
+
+
+@pytest.mark.parametrize(
+    "filter_content, reports, expected_name, timestamp_return_value",
+    [
+        # Case when the name is not in reports
+        ({"name": "report1"}, {}, "report1", "2023-01-01"),
+
+        # Case when the name is in reports and a timestamp is appended
+        ({"name": "report1"}, {"report1": {}}, "report1 2023-01-01", "2023-01-01"),
+
+        # Case when the name is not provided in filter_content
+        ({}, {}, "untitled_2023-01-01", "2023-01-01"),
+    ]
+)
+def test_generate_unique_report_name(mocker: MockerFixture,
+                                     filter_content: Dict[str, str],
+                                     reports: Dict[str, Dict[str, Any]],
+                                     expected_name: str,
+                                     timestamp_return_value: str
+                                     ) -> None:
+    """
+    Unit test for _generate_unique_report_name method in report_generator.py file.
+    """
+
+    # Arrange
+    mocker.patch('RUFAS.report_generator.ReportGenerator.__init__', return_value=None)
+    report_generator = ReportGenerator()
+    report_generator.reports = reports
+    mocker.patch('RUFAS.util.Utility.get_timestamp', return_value=timestamp_return_value)
+
+    # Act
+    result = report_generator._generate_unique_report_name(filter_content)
+
+    # Assert
+    assert result == expected_name
+
+
+@pytest.mark.parametrize(
+    "filter_content, filtered_pool, reports, expected_exception, expected_report_key, expected_report_value",
+    [
+        # Standard report case
+        (
+                {"name": "standard_report", "filters": ["some_filter"]},
+                {"some_data_key": [1, 2, 3]},
+                {},
+                None,
+                "standard_report",
+                {"values": "mocked_report"},
+        ),
+
+        # Case with cross-references
+        (
+                {
+                    "name": "report_with_references",
+                    "filters": ["some_filter"],
+                    "cross_references": ["ref1"]
+                },
+                {"some_data_key": [1, 2, 3]},
+                {"ref1": {"values": [4, 5, 6]}},
+                None,
+                "report_with_references",
+                {"values": "mocked_report"},
+        ),
+
+        # Case with missing cross-references
+        (
+                {"name": "error_report", "cross_references": ["missing_ref"]},
+                None,
+                {"ref": {"values": [1, 2, 3]}},
+                KeyError,
+                None,
+                None,
+        ),
+    ]
+)
+def test_handle_report_generation(filter_content: Dict[str, Any],
+                                  filtered_pool: Dict[str, Any],
+                                  reports: Dict[str, Dict[str, List[Any]]],
+                                  expected_exception: Optional[Type[BaseException]],
+                                  expected_report_key: Optional[str],
+                                  expected_report_value: Optional[Dict[str, List[Any]]],
+                                  mocker: MockerFixture,
+                                  ) -> None:
+    """
+    Unit test for the _handle_report_generation method in OutputManager class in output_manager.py.
+    """
+
+    # Arrange
+    mocker.patch('RUFAS.report_generator.ReportGenerator.__init__', return_value=None)
+    report_generator = ReportGenerator()
+    report_generator.reports = reports
+    mocker.patch.object(report_generator, '_generate_unique_report_name',
+                        side_effect=lambda x: x.get("name", "untitled"))
+    mocker.patch.object(report_generator, '_generate_single_report', return_value="mocked_report")
+    mocker.patch.object(report_generator, '_check_for_missing_references',
+                        side_effect=expected_exception if expected_exception else None)
+
+    if expected_exception:
+        with pytest.raises(expected_exception):
+            report_generator.handle_report_generation(filter_content, filtered_pool)
+    else:
+        report_generator.handle_report_generation(filter_content, filtered_pool)
+        assert report_generator.reports.get(expected_report_key) == expected_report_value

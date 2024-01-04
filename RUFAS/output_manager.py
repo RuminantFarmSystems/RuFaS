@@ -796,11 +796,15 @@ class OutputManager(object):
             info_map,
         )
         list_of_filter_files = self._list_filter_files_in_dir(filters_dir_path)
+        report_generator = ReportGenerator()
         for filter_file in list_of_filter_files:
             info_map["filter file"] = filter_file
             input_path = os.path.join(filters_dir_path, filter_file)
             filter_contents = self._load_filter_file_content(input_path)
-            reports: Dict[str: Dict[str: List[Any]]] = {}
+            report_generator.clear_reports()
+            self.add_log("init_report_generation",
+                         f"Generating report(s) for file: {filter_file}",
+                         info_map)
             for filter_content in filter_contents:
                 info_map["filter_content"] = filter_content
                 if (
@@ -828,7 +832,10 @@ class OutputManager(object):
                 if filter_file.startswith(
                         self.__supported_filter_types_prefixes["report"]
                 ):
-                    self._handle_report_generation(filter_content, filtered_pool, info_map, reports)
+                    try:
+                        report_generator.handle_report_generation(filter_content, filtered_pool)
+                    except (ValueError, KeyError) as e:
+                        self.add_error("report_generation_error", str(e), info_map)
                 else:
                     self._route_save_functions(
                         filter_file,
@@ -843,110 +850,7 @@ class OutputManager(object):
                 save_path,
                 self._generate_file_name(f"report_{filter_file}", "csv"),
             )
-            self._dict_to_file_csv(reports, report_file_path)
-
-    def _handle_report_generation(self,
-                                  filter_content: Dict[str, Any],
-                                  filtered_pool: Dict[str, Dict[str, List[Any]]],
-                                  info_map: Dict[str, Any],
-                                  reports: Dict[str, Dict[str, List[Any]]]) -> None:
-        """
-        Handles the generation of reports based on the provided filter content.
-
-        Notes
-        -----
-        If the report name is not unique, the timestamp is appended to the name to make it unique.
-
-        Any errors that occur during report generation are logged and the report is skipped.
-
-        The following are a few examples of errors that can occur during report generation:
-        - There are no data points to aggregate.
-
-        - There are any cross-references that are missing.
-
-        - Neither horizontal nor vertical aggregation is specified.
-
-        - The aggregation type is not supported. The supported aggregation types are: sum, average, product,
-        subtraction, division, SD (standard deviation).
-
-        Parameters
-        ----------
-        filter_content : Dict[str, Any]
-            A dictionary containing the configuration for the report, including details
-            such as 'name', 'filters', 'cross_references', and aggregation instructions.
-
-        filtered_pool : Dict[str, Dict[str, List[Any]]]
-            The data pool from which reports are generated.
-
-        info_map : Dict[str, Any]
-            A dictionary containing logging information such as the class and function names.
-
-        reports : Dict[str, Dict[str, List[Any]]]
-            A dictionary to store the generated reports, keyed by their names.
-        """
-
-        self.add_log("init_report_generation", "Report Generation Started", info_map)
-        report_generator = ReportGenerator()
-        try:
-            report_name = self._generate_unique_report_name(filter_content, reports)
-
-            if "cross_references" in filter_content.keys():
-                self._check_for_missing_references(filter_content["cross_references"], reports)
-                cross_reference_data = {ref: reports[ref] for ref in filter_content["cross_references"]}
-                filtered_pool.update(cross_reference_data)
-
-            report_data = report_generator.generate_aggregate_report(filtered_pool, filter_content)
-
-            reports[report_name] = {"values": report_data}
-
-        except (ValueError, KeyError) as e:
-            self.add_error("report generation error", str(e), info_map)
-
-    def _generate_unique_report_name(self, filter_content: Dict[str, Any], reports: Dict[str, Any]) -> str:
-        """
-        Generates a unique name for the report.
-
-        Parameters
-        ----------
-        filter_content : Dict[str, Any]
-            The filter content for the report.
-        reports : Dict[str, Any]
-            The dictionary of reports to check against.
-
-        Returns
-        -------
-        str
-            The unique name for the report.
-        """
-
-        base_name = filter_content.get("name", f"untitled_{self._get_timestamp(True)}")
-
-        if base_name in reports:
-            base_name = f"{base_name} {self._get_timestamp(True)}"
-
-        return base_name
-
-    @staticmethod
-    def _check_for_missing_references(references: List[str], reports: Dict[str, Any]) -> None:
-        """
-        Checks if all the referenced reports are present.
-
-        Parameters
-        ----------
-        references : List[str]
-            The list of references to check.
-        reports : Dict[str, Any]
-            The dictionary of reports to check against.
-
-        Raises
-        ------
-        KeyError
-            If any of the references are missing.
-        """
-
-        missing_references = [ref for ref in references if ref not in reports]
-        if missing_references:
-            raise KeyError(f"Missing referenced reports: {', '.join(missing_references)}")
+            self._dict_to_file_csv(report_generator.reports, report_file_path)
 
     def _route_save_functions(
             self,
