@@ -748,9 +748,43 @@ def test_handle_report_generation(filter_content: Dict[str, Any],
     mocker.patch.object(report_generator, '_check_for_missing_references',
                         side_effect=expected_exception if expected_exception else None)
 
+    # Act and assert
     if expected_exception:
         with pytest.raises(expected_exception):
             report_generator.handle_report_generation(filter_content, filtered_pool)
     else:
         report_generator.handle_report_generation(filter_content, filtered_pool)
         assert report_generator.reports.get(expected_report_key) == expected_report_value
+
+
+def test_report_generator_init() -> None:
+    """
+    Unit test for the __init__ method of ReportGenerator class in report_generator.py file.
+    """
+
+    # Arrange
+    expected_reports = {}
+
+    # Act
+    report_generator = ReportGenerator()
+
+    # Assert
+    assert report_generator.reports == expected_reports
+
+
+def test_clear_reports() -> None:
+    """
+    Unit test for the clear_reports method of ReportGenerator class in report_generator.py file.
+    """
+
+    # Arrange
+    report_generator = ReportGenerator()
+    report_generator.reports = {"report1": {}, "report2": {}}
+
+    # Act
+    report_generator.clear_reports()
+
+    # Assert
+    assert report_generator.reports == {}
+
+

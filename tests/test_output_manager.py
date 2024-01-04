@@ -2123,5 +2123,3 @@ def test_log_verbosity_enum_values() -> None:
     assert LogVerbosity.ERRORS.value == "errors"
     assert LogVerbosity.WARNINGS.value == "warnings"
     assert LogVerbosity.LOGS.value == "logs"
-
-
