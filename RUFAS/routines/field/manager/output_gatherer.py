@@ -253,6 +253,7 @@ class OutputGatherer:
                 om.add_variable("nitrogen_stress", crop.data.nitrogen_stress, info_map)
                 om.add_variable("phosphorus_stress", crop.data.phosphorus_stress, info_map)
                 om.add_variable("accumulated_heat_units", crop.data.accumulated_heat_units, info_map)
+                om.add_variable("heat_fraction", crop.data.heat_fraction, info_map)
                 om.add_variable("is_growing", crop.data.is_growing, info_map)
                 om.add_variable("is_dormant", crop.data.is_dormant, info_map)
                 om.add_variable("leaf_area_index", crop.data.leaf_area_index, info_map)
