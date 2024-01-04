@@ -1740,12 +1740,12 @@
             "description": "Operation(s) with which this crop will be harvested.",
             "minimum_length": 1,
             "default": [
-              "default"
+              "harvest_kill"
             ],
             "properties": {
               "type": "string",
-              "pattern": "^(default|no_kill)$",
-              "default": "default"
+              "pattern": "^(harvest_kill|harvest_only|kill_only)$",
+              "default": "harvest"
             }
           },
           "harvest_type": {
@@ -1981,6 +1981,15 @@
           "type": "number",
           "minimum": 0.0,
           "maximum": 1.0
+        }
+      },
+      "manure_types": {
+        "type": "array",
+        "description": "The type of manure which will be requested for the application.",
+        "default": [],
+        "properties": {
+          "type": "string",
+          "pattern": "^(liquid|solid)$"
         }
       },
       "pattern_repeat": {
