@@ -786,5 +786,3 @@ def test_clear_reports() -> None:
 
     # Assert
     assert report_generator.reports == {}
-
-
