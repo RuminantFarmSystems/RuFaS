@@ -112,8 +112,8 @@ class BaseManureHandler:
         housing_ammonia_emission = GasEmissionsCalculator.housing_ammonia_emission(
             num_animals=pen.num_animals,
             barn_area_per_animal=pen.barn_area_from_pen_type,  # m^2/animal
-            urine_total_ammoniacal_nitrogen=pen.manure.urine_total_ammoniacal_nitrogen,  # kg
-            urine=pen.manure.urine,  # kg
+            manure_total_ammoniacal_nitrogen=pen.manure.manure_total_ammoniacal_nitrogen,  # kg
+            manure=pen.manure.manure_mass,  # kg
             temp=self._get_current_day_average_temperature_in_celsius(),
         )
 
