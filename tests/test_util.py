@@ -2,7 +2,6 @@ import re
 
 import pytest
 from pytest import approx, raises
-from pytest_mock import MockerFixture
 
 from RUFAS.util import Utility
 
