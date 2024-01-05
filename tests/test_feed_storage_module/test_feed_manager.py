@@ -71,7 +71,7 @@ def test_receive_crop_error(feed_manager: FeedManager, harvested_crop: Harvested
     assert "is not compatible with storage type" in str(excinfo.value)
 
 
-def test_query_with_specific_crops(
+def test_query_available_feeds_by_crop_type_with_specific_crops(
     feed_manager: FeedManager, sample_crop_data: Dict[str, float]  # noqa F811
 ):
     feed_manager.receive_crop(
@@ -94,10 +94,12 @@ def test_query_with_specific_crops(
     )
     queryable_crops = [CropType.ALFALFA]
     result = feed_manager.query_available_feeds_by_crop_type(queryable_crops)
-    assert result == {CropType.ALFALFA: 200.0}
+    assert result == [
+        {"category": CropCategory.ALFALFA, "type": CropType.ALFALFA, "amount": 200.0}
+    ]
 
 
-def test_query_with_all_crops(
+def test_query_available_feeds_by_crop_type_with_all_crops(
     feed_manager: FeedManager, sample_crop_data: Dict[str, float]  # noqa F811
 ):
     feed_manager.receive_crop(
@@ -119,4 +121,7 @@ def test_query_with_all_crops(
         storage_type=StorageType.BUNKER,
     )
     result = feed_manager.query_available_feeds_by_crop_type()
-    assert result == {CropType.ALFALFA: 200.0, CropType.WHOLE_PLANT: 100.0}
+    assert result == [
+        {"category": CropCategory.ALFALFA, "type": CropType.ALFALFA, "amount": 200.0},
+        {"category": CropCategory.CORN, "type": CropType.WHOLE_PLANT, "amount": 100.0},
+    ]
