@@ -74,24 +74,32 @@ def test_receive_crop_error(feed_manager: FeedManager, harvested_crop: Harvested
 def populate_storage(
     feed_manager: FeedManager, sample_crop_data: Dict[str, float]  # noqa F811
 ) -> None:
-    feed_manager.receive_crop(
-        harvested_crop=HarvestedCrop(
-            category=CropCategory.ALFALFA, type=CropType.ALFALFA, **sample_crop_data
-        ),
-        storage_type=StorageType.PROTECTED_INDOORS,
-    )
-    feed_manager.receive_crop(
-        harvested_crop=HarvestedCrop(
-            category=CropCategory.ALFALFA, type=CropType.ALFALFA, **sample_crop_data
-        ),
-        storage_type=StorageType.PILE,
-    )
-    feed_manager.receive_crop(
-        harvested_crop=HarvestedCrop(
-            category=CropCategory.CORN, type=CropType.WHOLE_PLANT, **sample_crop_data
-        ),
-        storage_type=StorageType.BUNKER,
-    )
+    to_be_stored = [
+        {
+            "crop_category": CropCategory.ALFALFA,
+            "crop_type": CropType.ALFALFA,
+            "storage_type": StorageType.PROTECTED_INDOORS,
+        },
+        {
+            "crop_category": CropCategory.ALFALFA,
+            "crop_type": CropType.ALFALFA,
+            "storage_type": StorageType.PILE,
+        },
+        {
+            "crop_category": CropCategory.CORN,
+            "crop_type": CropType.WHOLE_PLANT,
+            "storage_type": StorageType.BUNKER,
+        },
+    ]
+    for storable in to_be_stored:
+        feed_manager.receive_crop(
+            harvested_crop=HarvestedCrop(
+                category=storable["crop_category"],
+                type=storable["crop_type"],
+                **sample_crop_data
+            ),
+            storage_type=storable["storage_type"],
+        )
 
 
 def test_query_available_feeds_by_crop_type_with_specific_crops(
