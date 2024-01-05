@@ -1,6 +1,5 @@
 import json
 import os
-import re
 from copy import deepcopy
 from pathlib import Path
 from typing import Any, Callable, Dict, List
@@ -12,7 +11,6 @@ from pytest import raises
 from pytest_mock.plugin import MockerFixture
 
 from RUFAS.output_manager import LogVerbosity, OutputManager
-from RUFAS.util import Utility
 
 
 def test_get_prefix() -> None:
