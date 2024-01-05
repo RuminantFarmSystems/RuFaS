@@ -1,21 +1,21 @@
 # !/usr/bin/env python3
 from __future__ import annotations
 
+import json
+import os
+import re
+import sys
 from copy import deepcopy
 from enum import Enum
 from pathlib import Path
-import sys
 from typing import Any, Dict, List, Optional, Union
-import datetime
-import json
-import os
+
 import pandas as pd
-import re
 from deprecated.sphinx import deprecated
 
-from RUFAS.util import Utility
 from RUFAS.graph_generator import GraphGenerator
 from RUFAS.report_generator import ReportGenerator
+from RUFAS.util import Utility
 
 
 class LogVerbosity(Enum):
