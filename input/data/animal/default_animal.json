@@ -55,7 +55,7 @@
 					"estrus_detection_rate": 0.65,
 					"estrus_conception_rate": 0.6,
 					"presynch_protocol": "Double OvSynch",
-                    "resynch_protocol": "TAIbeforePD",
+                    "resynch_protocol": "TAIafterPD",
                     "repro_sub_protocol": "OvSynch 56",
 					"repro_sub_properties": {
 						"conception_rate": 0.5,

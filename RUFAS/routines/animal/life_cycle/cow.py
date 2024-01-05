@@ -12,7 +12,7 @@ from RUFAS.routines.animal.animal_module_constants import AnimalModuleConstants
 from RUFAS.routines.animal.life_cycle import animal_constants as const
 from RUFAS.routines.animal.life_cycle.animal_base import AnimalBase
 from RUFAS.routines.animal.life_cycle.heiferIII import HeiferIII
-from RUFAS.routines.animal.life_cycle.repro_protocol_enums import CowReproProtocolEnum
+from RUFAS.routines.animal.life_cycle.repro_protocol_enums import CowReproProtocolEnum, CowReproStateEnum
 from RUFAS.routines.animal.manure.dry_cow_manure_excretion import \
     manure_calculations as dry_manure_calculations
 from RUFAS.routines.animal.manure.lactating_cow_manure_excretion import \
@@ -129,6 +129,7 @@ class Cow(HeiferIII):
         self._is_in_tai_period = False
         self._num_conception_rate_decreases = 0
         self._is_estrus_after_pgf_simulated = False
+        self._current_repro_states: set[CowReproStateEnum] = set()
 
         self.wood_l = 0
         self.wood_m = 0
@@ -680,13 +681,11 @@ class Cow(HeiferIII):
             if self.repro_program == CowReproProtocolEnum.ED_TAI.value:
                 self.execute_ed_tai_protocol(sim_day)
 
-            if self.repro_program == CowReproProtocolEnum.TAI.value or self._is_in_tai_period:
+            if self.repro_program == CowReproProtocolEnum.TAI.value or self._is_in_tai():
                 self.execute_tai_protocol(sim_day)
 
             if self.days_born == self.ai_day:
-                self.conception_rate -= self._num_conception_rate_decreases * self.get_conception_rate_decrease()
-                self.conception_rate = self._reduce_conception_rate_based_on_parity()
-                self.conception_rate = max(0.0, self.conception_rate)
+                self._calculate_conception_rate_on_ai_day()
                 self._perform_ai(sim_day)
 
             self.preg_update(sim_day)
@@ -694,6 +693,11 @@ class Cow(HeiferIII):
         cull_stage = self.cull_update(sim_day)
 
         return estimated_daily_milk_produced, fat_percent, daily_fat_correct_milk_production, cull_stage, new_born
+
+    def _calculate_conception_rate_on_ai_day(self) -> None:
+        self.conception_rate -= self._num_conception_rate_decreases * self.get_conception_rate_decrease()
+        self.conception_rate = self._reduce_conception_rate_based_on_parity(self.calves, self.conception_rate)
+        self.conception_rate = max(0.0, self.conception_rate)
 
     def is_breedable(self) -> bool:
         """
@@ -758,22 +762,77 @@ class Cow(HeiferIII):
                 self.log_event(self.days_born, sim_day,
                                f'{const.PRESYNCH_PERIOD_END}: {self.get_user_defined_presynch_protocol()}')
                 self._is_in_presynch_period = False
+                self._exit_presynch()
                 del actions['set_presynch_end']
 
             if actions.get('set_tai_start', False):
                 self.log_event(self.days_born, sim_day,
                                f'{const.TAI_PERIOD_START}: {self.get_user_defined_repro_sub_protocol()}')
-                self._set_is_in_tai_period_flag()
+                # self._set_is_in_tai_period_flag()
+                self._enter_tai()
                 del actions['set_tai_start']
 
             if actions.get('set_tai_end', False):
                 self.log_event(self.days_born, sim_day,
                                f'{const.TAI_PERIOD_END}: {self.get_user_defined_repro_sub_protocol()}')
                 self._reset_is_in_tai_period_flag()
+                self._exit_tai()
                 del actions['set_tai_end']
 
             if not actions:
                 del schedule[self.days_born]
+
+    def _reset_repro_states(self) -> None:
+        self._current_repro_states = set()
+
+    def _update_repro_states(self, state: CowReproStateEnum, enter: bool) -> None:
+        if enter:
+            if state in self._current_repro_states:
+                raise Exception(f'Cow is already in {state} state.')
+            self._current_repro_states.add(state)
+        else:
+            if state not in self._current_repro_states:
+                raise Exception(f'Cow is not in {state} state to exit.')
+            self._current_repro_states.remove(state)
+
+    def _is_in_repro_state(self, state: CowReproStateEnum) -> bool:
+        return state in self._current_repro_states
+
+    def _enter_presynch(self) -> None:
+        self._update_repro_states(CowReproStateEnum.IN_PRESYNCH, enter=True)
+
+    def _exit_presynch(self) -> None:
+        self._update_repro_states(CowReproStateEnum.IN_PRESYNCH, enter=False)
+
+    def _is_in_presynch(self) -> bool:
+        return self._is_in_repro_state(CowReproStateEnum.IN_PRESYNCH)
+
+    def _enter_tai(self, *args, **kwargs) -> None:
+        self._update_repro_states(CowReproStateEnum.IN_TAI, enter=True)
+
+    def _exit_tai(self) -> None:
+        self._update_repro_states(CowReproStateEnum.IN_TAI, enter=False)
+
+    def _is_in_tai(self) -> bool:
+        return self._is_in_repro_state(CowReproStateEnum.IN_TAI)
+
+    def _enter_estrus_detection(self) -> None:
+        self._update_repro_states(CowReproStateEnum.IN_ED, enter=True)
+
+    def _exit_estrus_detection(self) -> None:
+        self._update_repro_states(CowReproStateEnum.IN_ED, enter=False)
+
+    def _set_estrus_detected(self) -> None:
+        self._update_repro_states(CowReproStateEnum.ESTRUS_DETECTED, enter=True)
+
+    def _reset_estrus_detected(self) -> None:
+        self._update_repro_states(CowReproStateEnum.ESTRUS_DETECTED, enter=False)
+
+    def _has_estrus_detected(self) -> bool:
+        return self._is_in_repro_state(CowReproStateEnum.ESTRUS_DETECTED)
+
+    def _is_in_estrus_detection(self) -> bool:
+        return self._is_in_repro_state(CowReproStateEnum.IN_ED)
 
     def execute_tai_protocol(self, sim_day: int) -> None:
         """
@@ -803,13 +862,12 @@ class Cow(HeiferIII):
         if self._hormone_schedule:
             self._execute_hormone_delivery_schedule(sim_day, self._hormone_schedule)
 
-        # Remove the following if PGFatPD and TAIafterPD resynch protocols not supported under TAI protocol
         if self.repro_program == CowReproProtocolEnum.TAI.value and self.days_born == self.estrus_day:
             if self._is_estrus_after_pgf_simulated:  # Resynch: PGFatPD
                 self._is_estrus_after_pgf_simulated = False
                 self._handle_estrus_detection(sim_day,
                                               on_estrus_detected=self._handle_estrus_detected,
-                                              on_estrus_not_detected=self._set_is_in_tai_period_flag)
+                                              on_estrus_not_detected=self._enter_tai)
             elif self._is_estrus_between_ai_day_and_first_preg_check_day():  # Resynch: TAIafterPD
                 self._handle_generic_estrus_detection(sim_day)
 
@@ -827,19 +885,21 @@ class Cow(HeiferIII):
             return False
 
         if self.get_user_defined_presynch_protocol() not in [
-            CowReproProtocolEnum.PreSynch_PreSynch.value,
-            CowReproProtocolEnum.PreSynch_DoubleOvSynch.value,
-            CowReproProtocolEnum.PreSynch_G6G.value,
+            CowReproProtocolEnum.Presynch_Presynch.value,
+            CowReproProtocolEnum.Presynch_DoubleOvSynch.value,
+            CowReproProtocolEnum.Presynch_G6G.value,
         ]:
             return False
 
         if self.days_in_milk == self.get_voluntary_waiting_period():
-            self._is_in_presynch_period = True
+            # self._is_in_presynch_period = True
+            self._enter_presynch()
 
         if self._hormone_schedule:
             return False
 
-        return self._is_in_presynch_period and self.days_born != self._presynch_last_day + 1
+        # return self._is_in_presynch_period and self.days_born != self._presynch_last_day + 1
+        return self._is_in_presynch()
 
     def _should_set_up_hormone_delivery_for_tai(self) -> bool:
         """
@@ -854,10 +914,16 @@ class Cow(HeiferIII):
         if self._hormone_schedule:
             return False
 
-        if not self._is_in_presynch_period and self.days_in_milk == self.get_voluntary_waiting_period():
-            return True
+        # if not self._is_in_presynch_period and self.days_in_milk == self.get_voluntary_waiting_period():
+        #     return True
 
-        return self._is_in_tai_period
+        if not self._is_in_presynch() and self.days_in_milk == self.get_voluntary_waiting_period():
+            # return True
+            self._enter_tai()
+
+        return self._is_in_tai()
+
+        # return self._is_in_tai_period
 
     def _increment_ai_counts(self) -> None:
         """
@@ -933,6 +999,13 @@ class Cow(HeiferIII):
         None
         """
 
+        if self._is_days_in_milk_within_voluntary_waiting_period():
+            return
+        elif self._is_days_in_milk_before_tai_start_day():
+            self._monitor_estrus(sim_day)
+        elif self._is_days_in_milk_on_or_after_tai_start_day() and not self._has_estrus_detected():
+            self._handle_estrus_not_detected_before_tai_start_day(sim_day)
+
         if self.days_born == self.estrus_day:
             self.estrus_count += 1
 
@@ -940,19 +1013,19 @@ class Cow(HeiferIII):
                 self._is_estrus_after_pgf_simulated = False
                 self._handle_estrus_detection(sim_day,
                                               on_estrus_detected=self._handle_estrus_detected,
-                                              on_estrus_not_detected=self._set_is_in_tai_period_flag)
+                                              on_estrus_not_detected=self._enter_tai)
 
             elif self._is_estrus_between_ai_day_and_first_preg_check_day():
                 self._handle_generic_estrus_detection(sim_day)
 
-            elif self._is_estrus_in_voluntary_waiting_period():
-                self._handle_estrus_in_voluntary_waiting_period(sim_day)
-
-            elif self._is_estrus_between_end_of_voluntary_waiting_period_and_tai_start_day():
-                self._handle_generic_estrus_detection(sim_day)
-
-            else:
-                self._handle_estrus_not_detected_before_tai_start_day(sim_day)
+            # elif self._is_estrus_in_voluntary_waiting_period():
+            #     self._handle_estrus_in_voluntary_waiting_period(sim_day)
+            #
+            # elif self._is_days_in_milk_before_tai_start_day():
+            #     self._handle_generic_estrus_detection(sim_day)
+            #
+            # else:
+            #     self._handle_estrus_not_detected_before_tai_start_day(sim_day)
 
     def _set_is_in_tai_period_flag(self, *args, **kwargs) -> None:
         """
@@ -976,6 +1049,18 @@ class Cow(HeiferIII):
 
         self._is_in_tai_period = False
 
+    def _is_days_in_milk_within_voluntary_waiting_period(self) -> bool:
+        """
+        Check if the cow's days in milk is within the voluntary waiting period.
+
+        Returns
+        -------
+        bool
+            True if the cow is within the voluntary waiting period, False otherwise.
+        """
+
+        return self.days_in_milk <= self.get_voluntary_waiting_period()
+
     def _is_estrus_in_voluntary_waiting_period(self) -> bool:
         """
         Check if the cow is in the voluntary waiting period.
@@ -988,17 +1073,29 @@ class Cow(HeiferIII):
 
         return 1 <= self.days_in_milk <= self.get_voluntary_waiting_period()
 
-    def _is_estrus_between_end_of_voluntary_waiting_period_and_tai_start_day(self) -> bool:
+    def _is_days_in_milk_before_tai_start_day(self) -> bool:
         """
-        Check if the cow is between the end of the voluntary waiting period and the TAI start day.
+        Check if the cow's days in milk is between the end of the voluntary waiting period and the TAI start day.
 
         Returns
         -------
         bool
-            True if the cow is between the end of the voluntary waiting period and the TAI start day, False otherwise.
+            True if the cow's days in milk is between the end of the voluntary waiting period and the TAI start day, False otherwise.
         """
 
         return self.get_voluntary_waiting_period() < self.days_in_milk < self.get_user_defined_tai_program_start_day()
+
+    def _is_days_in_milk_on_or_after_tai_start_day(self) -> bool:
+        """
+        Check if the cow's days in milk is past the TAI start day.
+
+        Returns
+        -------
+        bool
+            True if the cow's days in milk is past the TAI start day, False otherwise.
+        """
+
+        return self.days_in_milk >= self.get_user_defined_tai_program_start_day()
 
     def _is_estrus_between_ai_day_and_first_preg_check_day(self) -> bool:
         """
@@ -1030,6 +1127,15 @@ class Cow(HeiferIII):
         self._simulate_estrus(self.estrus_day, sim_day, const.ESTRUS_DAY_SCHEDULED_NOTE,
                               self.get_avg_estrus_cycle(), self.get_std_estrus_cycle())
 
+    def _monitor_estrus(self, sim_day: int) -> None:
+        if self._has_estrus_detected():
+            return
+        is_estrus_detected = self._detect_estrus(self.get_general_estrus_detection_rate())
+        if is_estrus_detected:
+            self.log_event(self.days_born, sim_day, const.ESTRUS_DETECTED_NOTE)
+            self._handle_estrus_detected(sim_day)
+            self._set_estrus_detected()
+
     def _handle_estrus_not_detected_before_tai_start_day(self, sim_day: int) -> None:
         """
         Initiate the TAI protocol if estrus is not detected before the TAI start day.
@@ -1047,16 +1153,25 @@ class Cow(HeiferIII):
         if self.do_not_breed:
             return
 
-        if self._is_in_tai_period:
+        if self._is_in_tai():
             return
 
-        self.log_event(self.estrus_day, sim_day,
+        self.log_event(self.days_born, sim_day,
                        const.ESTRUS_NOT_DETECTED_BETWEEN_VWP_AND_TAI_START_DAY_NOTE)
-        self._set_is_in_tai_period_flag()
 
-    def _reduce_conception_rate_based_on_parity(self) -> float:
+        self._enter_tai()
+
+    @staticmethod
+    def _reduce_conception_rate_based_on_parity(calves: int, conception_rate: float) -> float:
         """
         Adjust conception rate based on the parity of the cow
+
+        Parameters
+        ----------
+        calves : int
+            The number of calves the cow has had.
+        conception_rate : float
+            The conception rate to adjust.
 
         Returns
         -------
@@ -1064,12 +1179,12 @@ class Cow(HeiferIII):
             The adjusted conception rate.
         """
 
-        if self.calves <= 1:
-            return self.conception_rate
-        elif self.calves == 2:
-            return self.conception_rate - 0.05
+        if calves <= 1:
+            return conception_rate
+        elif calves == 2:
+            return conception_rate - 0.05
         else:
-            return self.conception_rate - 0.1
+            return conception_rate - 0.1
 
     def _handle_successful_conception(self, sim_day: int) -> None:
         """
@@ -1093,7 +1208,7 @@ class Cow(HeiferIII):
         if self.calves > 0:
             last_time_given_birth = self.events.get_most_recent_date(const.NEW_BIRTH)
             self.calving_to_preg_time = self.days_born - last_time_given_birth
-        if self.get_user_defined_resynch_protocol() == CowReproProtocolEnum.ReSynch_TAIbeforePD.value:
+        if self.get_user_defined_resynch_protocol() == CowReproProtocolEnum.Resynch_TAIbeforePD.value:
             self._set_up_tai_resynch(sim_day)
 
     def _handle_failed_conception(self, sim_day: int) -> None:
@@ -1114,11 +1229,11 @@ class Cow(HeiferIII):
         self.log_event(self.days_born, sim_day, const.COW_NOT_PREG)
 
         if self.repro_program == CowReproProtocolEnum.ED.value or \
-                self.get_user_defined_resynch_protocol() in [CowReproProtocolEnum.ReSynch_TAIafterPD.value,
-                                                             CowReproProtocolEnum.ReSynch_PGFatPD.value]:
+                self.get_user_defined_resynch_protocol() in [CowReproProtocolEnum.Resynch_TAIafterPD.value,
+                                                             CowReproProtocolEnum.Resynch_PGFatPD.value]:
             self._simulate_estrus(self.days_born, sim_day, const.ESTRUS_DAY_SCHEDULED_NOTE,
                                   self.get_avg_estrus_cycle(), self.get_std_estrus_cycle())
-        elif self.get_user_defined_resynch_protocol() == CowReproProtocolEnum.ReSynch_TAIbeforePD.value:
+        elif self.get_user_defined_resynch_protocol() == CowReproProtocolEnum.Resynch_TAIbeforePD.value:
             self._set_up_tai_resynch(sim_day)
             self._num_conception_rate_decreases += 1
 
@@ -1190,7 +1305,7 @@ class Cow(HeiferIII):
                 self._terminate_pregnancy(preg_check_config["on_preg_loss"], sim_day)
             else:
                 self.log_event(self.days_born, sim_day, preg_check_config["on_preg"])
-                if self._is_in_tai_period:
+                if self._is_in_tai():
                     self._discontinue_tai_resynch(sim_day)
         elif "on_not_preg" in preg_check_config:
             self.log_event(self.days_born, sim_day, preg_check_config["on_not_preg"])
@@ -1213,17 +1328,19 @@ class Cow(HeiferIII):
             self._simulate_estrus(self.estrus_day, sim_day, const.ESTRUS_DAY_SCHEDULED_NOTE,
                                   self.get_avg_estrus_cycle(), self.get_std_estrus_cycle())
 
-        elif self.get_user_defined_resynch_protocol() == CowReproProtocolEnum.ReSynch_TAIbeforePD.value:
+        elif self.get_user_defined_resynch_protocol() == CowReproProtocolEnum.Resynch_TAIbeforePD.value:
+
             # This check is needed to prevent setting up TAI again after first pregnancy check failed
             # In TAIBeforePD, the TAI protocol is set up in advance regardless of the outcome of the insemination.
-            if not self._is_in_tai_period:
+            # if not self._is_in_tai_period:
+            if not self._is_in_tai():
                 self._set_up_tai_resynch(sim_day)
                 self._num_conception_rate_decreases += 1
 
-        elif self.get_user_defined_resynch_protocol() == CowReproProtocolEnum.ReSynch_TAIafterPD.value:
-            self._set_is_in_tai_period_flag(sim_day)
+        elif self.get_user_defined_resynch_protocol() == CowReproProtocolEnum.Resynch_TAIafterPD.value:
+            self._enter_tai()
 
-        elif self.get_user_defined_resynch_protocol() == CowReproProtocolEnum.ReSynch_PGFatPD.value:
+        elif self.get_user_defined_resynch_protocol() == CowReproProtocolEnum.Resynch_PGFatPD.value:
             single_pgf_injection_schedule = {self.days_born: {'deliver_hormone': ['PGF']}}
             self._execute_hormone_delivery_schedule(sim_day, single_pgf_injection_schedule)
             self._simulate_estrus(self.days_born, sim_day, const.SIMULATE_ESTRUS_AFTER_PGF_NOTE,
@@ -1260,7 +1377,7 @@ class Cow(HeiferIII):
         hormone_schedule_start_day = self.days_born + self.get_first_preg_check_day() - days_before_first_preg_check
         self._set_up_hormone_schedule('cows', self.get_user_defined_repro_sub_protocol(),
                                       hormone_schedule_start_day)
-        self._set_is_in_tai_period_flag()
+        self._enter_tai()
         self.log_event(self.days_born, sim_day,
                        f'{const.SETTING_UP_RESYNCH_TAI_NOTE}: {self.get_user_defined_repro_sub_protocol()}')
 
@@ -1278,7 +1395,8 @@ class Cow(HeiferIII):
         None
         """
 
-        self._reset_is_in_tai_period_flag()
+        # self._reset_is_in_tai_period_flag()
+        self._exit_tai()
         self._hormone_schedule = {}
         self.log_event(self.days_born, sim_day,
                        f'{const.DISCONTINUE_RESYNCH_TAI}: {self.get_user_defined_repro_sub_protocol()}')

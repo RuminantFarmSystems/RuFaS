@@ -64,20 +64,20 @@ class HormoneDeliverySchedule:
     }
 
     COW_REPRO_PROTOCOLS = {
-        CowReproProtocolEnum.PreSynch_PreSynch.value: {
+        CowReproProtocolEnum.Presynch_Presynch.value: {
             0: {'deliver_hormones': ['PGF']},
             14: {'deliver_hormones': ['PGF']},
             25: {'set_presynch_end': True},
             26: {'set_tai_start': True}
         },
-        CowReproProtocolEnum.PreSynch_DoubleOvSynch.value: {
+        CowReproProtocolEnum.Presynch_DoubleOvSynch.value: {
             0: {'deliver_hormones': ['GnRH']},
             7: {'deliver_hormones': ['PGF']},
             10: {'deliver_hormones': ['GnRH']},
             16: {'set_presynch_end': True},
             17: {'set_tai_start': True},
         },
-        CowReproProtocolEnum.PreSynch_G6G.value: {
+        CowReproProtocolEnum.Presynch_G6G.value: {
             0: {'deliver_hormones': ['PGF']},
             2: {'deliver_hormones': ['GnRH']},
             8: {'set_presynch_end': True},
