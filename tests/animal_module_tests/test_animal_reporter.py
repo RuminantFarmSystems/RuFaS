@@ -419,7 +419,7 @@ def test_report_end_of_simulation(mocker: MockerFixture):
     )
 
     # act
-    AnimalModuleReporter.report_end_of_simulation(animal_manager)
+    AnimalModuleReporter.report_end_of_simulation(animal_manager, 100)
 
     # assert
     assert patch_for_plan_animal_allocation.call_count == 1

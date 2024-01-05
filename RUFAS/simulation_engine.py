@@ -47,6 +47,7 @@ class SimulationEngine:
         """
         Initializes the simulation engine.
         """
+        self.day_counter: int = 0
         self._initialize_simulation()
 
     def simulate(self) -> None:
@@ -60,13 +61,23 @@ class SimulationEngine:
         }
         t_start_sim = timer.time()
         self._run_simulation_main_loop()
-        routines.animal.animal_module_reporter.AnimalModuleReporter.report_end_of_simulation(self.state.animal_manager)
+        routines.animal.animal_module_reporter.AnimalModuleReporter.report_end_of_simulation(
+            self.state.animal_manager, self.day_counter
+        )
         t_end_sim = timer.time()
 
         sys.stdout.write("\nSimulation Successful\n\n")
         total_simulation_time = t_end_sim - t_start_sim
         total_simulation_time_log = f"Total simulation time is: {total_simulation_time}"
         om.add_log("total_simulation_time", total_simulation_time_log, info_map)
+        om.add_variable(
+            "day_counter_final_value",
+            self.day_counter,
+            {
+                "class": self.__class__.__name__,
+                "function": self.simulate.__name__,
+            },
+        )
 
     def _run_simulation_main_loop(self) -> None:
         """
@@ -78,12 +89,17 @@ class SimulationEngine:
 
     def _daily_simulation(self) -> None:
         """Executes the daily simulation routines."""
+        self.day_counter += 1
         self.state.animal_manager.daily_updates(
-            self.state.feed, self.weather, self.time)
+            self.state.feed, self.weather, self.time
+        )
         simulate_daily_manure_manager(
-            self.state.manure_manager, self.state.animal_manager)
+            self.state.manure_manager, self.state.animal_manager
+        )
         self.state.field_manager.daily_update_routine(self.weather, self.time)
-        routines.daily_feed_routine(self.state.feed, self.state.field_manager, self.state.animal_manager)
+        routines.daily_feed_routine(
+            self.state.feed, self.state.field_manager, self.state.animal_manager
+        )
 
         self.time.record_time()
         self.weather.record_weather(self.time)
@@ -102,9 +118,7 @@ class SimulationEngine:
         }
         if print_day:
             simulating_day_log = f"simulating day: {self.time.to_str()}"
-            om.add_log("simulation_day",
-                       simulating_day_log,
-                       info_map)
+            om.add_log("simulation_day", simulating_day_log, info_map)
         self.time.advance()
         self.state.animal_manager.simulation_day += 1
 
@@ -136,7 +150,7 @@ class SimulationEngine:
             the interval at which the char symbol is updated. Default is 50 days.
         """
 
-        chars = ['-', '\\', '|', '/']
+        chars = ["-", "\\", "|", "/"]
         if day % update_interval == 0:
             sys.stdout.write("\b")
             sys.stdout.write(chars[(day // update_interval) % len(chars)])
@@ -158,8 +172,8 @@ class SimulationEngine:
         Instantiates the simulation object by requesting data from the Input Manager.
         """
 
-        data_config = im.get_data('config')
-        data_weather = im.get_data('weather')
+        data_config = im.get_data("config")
+        data_weather = im.get_data("weather")
         self.config = Config(data_config)
 
         if self.config.set_seed:
