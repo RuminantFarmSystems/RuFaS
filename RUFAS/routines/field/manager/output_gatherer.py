@@ -245,6 +245,7 @@ class OutputGatherer:
                 om.add_variable("usable_light", crop.data.usable_light, info_map)
                 om.add_variable("biomass_growth_max", crop.data.biomass_growth_max, info_map)
                 om.add_variable("biomass_growth", crop.data.biomass_growth, info_map)
+                om.add_variable("growth_factor", crop.data.growth_factor, info_map)
                 om.add_variable("above_ground_biomass", crop.data.above_ground_biomass, info_map)
                 om.add_variable("root_biomass", crop.data.root_biomass, info_map)
                 om.add_variable("water_uptake", crop.data.water_uptake, info_map)
