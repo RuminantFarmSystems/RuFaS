@@ -36,6 +36,9 @@ class StorageType(Enum):
     BAG = Bag
 
 
+QUERY_RESULT_DATA_TYPE = Dict[str, CropCategory | CropType | float]
+
+
 class FeedManager:
     """
     Manages the feed storage, handling crop reception, purchasing, degradation processing, feed distribution,
@@ -49,6 +52,15 @@ class FeedManager:
 
     def __init__(self):
         self.active_storages: Dict[StorageType, Storage] = {}
+
+    def _query_result_factory(
+        self, crop_category: CropCategory, crop_type: CropType, amount: float
+    ) -> QUERY_RESULT_DATA_TYPE:
+        return {
+            "category": crop_category,
+            "type": crop_type,
+            "amount": amount,
+        }
 
     def receive_crop(
         self,
@@ -116,7 +128,7 @@ class FeedManager:
 
     def query_available_feeds_by_crop_type(
         self, queryable_crops: List[CropType] = None
-    ) -> Dict[CropType, float]:
+    ) -> List[QUERY_RESULT_DATA_TYPE]:
         """
         Queries the available amount of feed in storage.
 
@@ -127,21 +139,29 @@ class FeedManager:
 
         Returns
         -------
-        Dict[CropType, float]
+        List[QUERY_RESULT_DATA_TYPE]
             The amount of available feed, either as a total or for a specific crop type.
         """
         query_all = queryable_crops is None
-        available_feeds: Dict[CropType, float] = {}
+        results: List[QUERY_RESULT_DATA_TYPE] = []
 
         for storage in self.active_storages.values():
             for stored_crop in storage.stored:
                 if query_all or stored_crop.type in queryable_crops:
-                    if stored_crop.type not in available_feeds:
-                        available_feeds[stored_crop.type] = 0
+                    for previous_result in results:
+                        if stored_crop.type == previous_result["type"]:
+                            previous_result["amount"] += stored_crop.fresh_mass
+                            break
+                    else:
+                        results.append(
+                            self._query_result_factory(
+                                stored_crop.category,
+                                stored_crop.type,
+                                stored_crop.fresh_mass,
+                            )
+                        )
 
-                    available_feeds[stored_crop.type] += stored_crop.fresh_mass
-
-        return available_feeds
+        return results
 
     def purchase_feed(self) -> None:
         """The purchase feed logic is currently in the Animal Module. We will move it to here."""
