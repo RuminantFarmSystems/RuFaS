@@ -68,15 +68,27 @@ class CowReproProtocolEnum(Enum):
     TAI = 'TAI'
     ED_TAI = 'ED-TAI'
 
-    PreSynch_PreSynch = 'PreSynch'
-    PreSynch_DoubleOvSynch = 'Double OvSynch'
-    PreSynch_G6G = 'G6G'
+    Presynch_Presynch = 'Presynch'
+    Presynch_DoubleOvSynch = 'Double OvSynch'
+    Presynch_G6G = 'G6G'
 
     TAI_OvSynch_48 = 'OvSynch 48'
     TAI_OvSynch_56 = 'OvSynch 56'
     TAI_CoSynch_72 = 'CoSynch 72'
     TAI_5d_CoSynch = '5d CoSynch'
 
-    ReSynch_TAIbeforePD = 'TAIbeforePD'
-    ReSynch_TAIafterPD = 'TAIafterPD'
-    ReSynch_PGFatPD = 'PGFatPD'
+    Resynch_TAIbeforePD = 'TAIbeforePD'
+    Resynch_TAIafterPD = 'TAIafterPD'
+    Resynch_PGFatPD = 'PGFatPD'
+
+
+class CowReproStateEnum(Enum):
+    """
+    This enum class lists the options for different cow reproduction states.
+    """
+
+    WAITING = 'waiting'
+    IN_PRESYNCH = 'in presynch'
+    IN_TAI = 'in TAI'
+    IN_ED = 'in estrus detection'
+    ESTRUS_DETECTED = 'estrus detected'
