@@ -114,7 +114,7 @@ class FeedManager:
         """
         pass
 
-    def query_available_feeds(
+    def query_available_feeds_by_crop_type(
         self, queryable_crops: List[CropType] = None
     ) -> Dict[CropType, float]:
         """
