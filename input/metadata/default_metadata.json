@@ -191,25 +191,25 @@
         "description": "Herd Demographics",
         "calf_num": {
           "type": "number",
-          "description": "Calves (head) -- The initial number of pre-weaned calves",
+          "description": "Number of Calves (head) -- The initial number of pre-weaned calves",
           "default": 8,
           "minimum": 0
         },
         "heiferI_num": {
           "type": "number",
-          "description": "HefierI's (head) -- The initial number of heifers that are weaned but not yet bred",
+          "description": "Number of HefierI's (head) -- The initial number of heifers that are weaned but not yet bred",
           "default": 44,
           "minimum": 0
         },
         "heiferII_num": {
           "type": "number",
-          "description": "HefierII's (head) -- The initial number of heifers that are either eligible for breeding (based on user-inputted Breeding Start Day for heifers), or in early pregnancy",
+          "description": "Number of HefierII's (head) -- The initial number of heifers that are either eligible for breeding (based on user-inputted Breeding Start Day for heifers), or in early pregnancy",
           "default": 38,
           "minimum": 0
         },
         "heiferIII_num_springers": {
           "type": "number",
-          "description": "HefierIII's (head) -- The initial number of close-up heifers (heifers within the user-defined close-up period, i.e. Prefresh Day)",
+          "description": "Number of HefierIII's (head) -- The initial number of close-up heifers (heifers within the user-defined close-up period, i.e. Prefresh Day)",
           "default": 5,
           "minimum": 0
         },
@@ -235,7 +235,7 @@
           "type": "string",
           "default": "HO",
           "pattern": "(HO|JE)",
-          "description": "Breed (HO/JE) -- The predominant breed of the herd (Holstein or Jersey)"
+          "description": "Breed (select one) -- The predominant breed of the herd (Holstein or Jersey)"
         }
       },
       "herd_initialization": {
@@ -262,7 +262,7 @@
           "description": "General Management",
           "breeding_start_day_h": {
             "type": "number",
-            "description": "Breeding Start Day - Heifers (days) -- Days old when a heifer would be eligible for breeding",
+            "description": "Heifer Breeding Start Day (days) -- Days old when a heifer would be eligible for breeding",
             "default": 380,
             "minimum": 0
           },
@@ -280,9 +280,10 @@
           },
           "semen_type": {
             "type": "string",
+            "description": "Semen type (select one) -- The semen type (sexed or conventional) that makes up a majority of the farm's breedings",
             "default": "conventional",
-            "pattern": "^(sexed|conventional)$",
-            "description": "Semen type (sexed or conventional) -- The semen type that makes up a majority of the farm's breedings"
+            "pattern": "^(sexed|conventional)$"
+        
           },
           "days_in_preg_when_dry": {
             "type": "number",
@@ -406,15 +407,15 @@
               "description": "Heifer Reproduction Protocols",
               "estrus_detection_rate": {
                 "type": "number",
-                "description": "Estrus Detection Rate (percent) -- The percentage of total animals in estrus that are detected in the ED (Estrus Detection) protocol",
+                "description": "Estrus Detection Rate (percent) -- The percentage of total heifers in estrus that are detected in the ED (Estrus Detection) protocol",
                 "default": 0.6,
                 "minimum": 0,
                 "maximum": 1
               },
               "estrus_conception_rate": {
                 "type": "number",
-                "description": "Estrus Service Rate (percent) -- The percentage of animals detected in estrus that then would be serviced in the ED (Estrus Detection) and SynchED protocols",
-                "default": 1,
+                "description": "Estrus Conception Rate (percent) -- The percentage of inseminated heifers that become pregnant in the ED (Estrus Detection) and SynchED protocols",
+                "default": 0.9,
                 "minimum": 0,
                 "maximum": 1
               },
@@ -562,7 +563,7 @@
               },
               "tai_program_start_day": {
                 "type": "number",
-                "description": "TAI protocol start day for ED-TAI protocol (day) --",
+                "description": "TAI protocol start day for ED-TAI protocol (day)",
                 "minimum": 0,
                 "default": 72
               }
@@ -573,25 +574,25 @@
             "description": "Bodyweight",
             "birth_weight_avg_ho": {
               "type": "number",
-              "description": "Average Holstein Birth Weight (kg/head) -- The average birthweight for Holstein cows",
+              "description": "Average Holstein Birth Weight (kg/head)",
               "default": 42.9,
               "minimum": 0
             },
             "birth_weight_std_ho": {
               "type": "number",
-              "description": "Holstein Birth Weight Standard Deviation (kg/head) -- The standard deviation of birthweight for Holstein cows",
+              "description": "Holstein Birth Weight Standard Deviation (kg/head)",
               "default": 6,
               "minimum": 0
             },
             "birth_weight_avg_je": {
               "type": "number",
-              "description": "Average Jersey Birth Weight (kg/head) -- The average birthweight for Jersey cows",
+              "description": "Average Jersey Birth Weight (kg/head)",
               "default": 25.2,
               "minimum": 0
             },
             "birth_weight_std_je": {
               "type": "number",
-              "description": "Jersey Birth Weight Standard Deviation (kg/head) -- The standard deviation of birthweight for Jersey cows",
+              "description": "Jersey Birth Weight Standard Deviation (kg/head)",
               "default": 4.4,
               "minimum": 0
             },
@@ -623,7 +624,7 @@
             "description": "Literature Repro Values",
             "preg_check_day_1": {
               "type": "number",
-              "description": "Pregnancy Check Days, Check 1 (days) -- Days in pregnancy at the 1st pregnancy check",
+              "description": "Pregnancy Check Days, Check 1 (days) -- Days since last insemination at the 1st pregnancy check",
               "default": 32,
               "minimum": 1
             },
@@ -636,7 +637,7 @@
             },
             "preg_check_day_2": {
               "type": "number",
-              "description": "Pregnancy Check Days, Check 2 (days) --  Days in pregnancy at the second pregnancy check, for cows confirmed pregnant at 1st pregnancy check",
+              "description": "Pregnancy Check Days, Check 2 (days) --  Days since last insemination at the second pregnancy check, for cows confirmed pregnant at 1st pregnancy check",
               "default": 60,
               "minimum": 0
             },
@@ -649,7 +650,7 @@
             },
             "preg_check_day_3": {
               "type": "number",
-              "description": "Pregnancy Check Day, Check 3 (days) -- Days in pregnancy at the third pregnancy check, for cows confirmed pregnant at 2nd pregnancy check",
+              "description": "Pregnancy Check Day, Check 3 (days) -- Days since last insemination at the third pregnancy check, for cows confirmed pregnant at 2nd pregnancy check",
               "default": 200,
               "minimum": 0
             },
@@ -662,37 +663,37 @@
             },
             "avg_estrus_cycle_return": {
               "type": "number",
-              "description": "Average Estruos Cycle Return (days) -- Average days between calving and first estruos cycle after calving",
+              "description": "Average Estrous Cycle Return (days) -- Average days between calving and first estrous cycle after calving",
               "minimum": 1,
               "default": 23
             },
             "std_estrus_cycle_return": {
               "type": "number",
-              "description": "Estruos Cycle Return Standard Deviation (days)",
+              "description": "Estrous Cycle Return Standard Deviation (days)",
               "minimum": 1,
               "default": 6
             },
             "avg_estrus_cycle_heifer": {
               "type": "number",
-              "description": "Heifer Estruous Cycle Length (days) -- Average length of estruos cycle for heifers",
+              "description": "Heifer Estrous Cycle Length (days) -- Average length of estrous cycle for heifers",
               "minimum": 1,
               "default": 21
             },
             "std_estrus_cycle_heifer": {
               "type": "number",
-              "description": "Heifer Estruous Cycle Length Standard Deviation (days)",
+              "description": "Heifer Estous Cycle Length Standard Deviation (days)",
               "minimum": 1,
               "default": 2.5
             },
             "avg_estrus_cycle_cow": {
               "type": "number",
-              "description": "Cow Estruous Cycle Length (days) -- Average length of estruos cycle for cows",
+              "description": "Cow Estrous Cycle Length (days) -- Average length of estrous cycle for cows",
               "minimum": 1,
               "default": 21
             },
             "std_estrus_cycle_cow": {
               "type": "number",
-              "description": "Cow Estruous Cycle Length Standard Deviation (days)",
+              "description": "Cow Estrous Cycle Length Standard Deviation (days)",
               "minimum": 1,
               "default": 4
             },
@@ -799,7 +800,7 @@
               "description": "Death Probability, by Parity",
               "properties": {
                 "type": "number",
-                "description": "Death Probability, by Parity -- The probability of death for cows of a single parity (first lactation, second lactation, etc.); a separate entry should be included for 1st, 2nd, 3rd, and 4th+ parities (4 entries total)",
+                "description": "Death Probability, by Parity Group -- The probability of death for cows of a single parity group (first lactation, second lactation, etc.); a separate entry should be included for 1st, 2nd, 3rd, and 4th+ parities (4 entries total)",
                 "minimum": 0,
                 "maximum": 1
               }
@@ -893,7 +894,8 @@
               "type": "number",
               "description": "Rate of stillbirths (percent)",
               "minimum": 0,
-              "maximum": 1
+              "maximum": 1,
+              "default": 0.065
             }
           }
         }
@@ -1022,7 +1024,7 @@
             "default": "freestall"
           },
           "max_stocking_density": {
-            "description": "Max Stocking Density -- The maximum stocking density of the pen (ratio of the number of animals in the pen to the number of stalls in the pen)",
+            "description": "Maximum Stocking Density -- The maximum ratio of the number of animals in the pen to the number of stalls in the pen",
             "type": "number",
             "minimum": 0.5,
             "maximum": 2,
@@ -2410,7 +2412,7 @@
         },
         "milk_reduction_maximum": {
           "type": "number",
-          "description": "Milk Reduction Maximum -- Allowable amount of milk reduction (kg)",
+          "description": "Milk Reduction Maximum -- Allowable amount of milk reduction (kg) when dietary nutrient supply cannot meet animal requirements",
           "minimum": 0,
           "maximum": 50
         }
