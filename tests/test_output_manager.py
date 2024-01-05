@@ -603,7 +603,6 @@ def output_manager_original_method_states(
         "_filter_variables_pool": mock_output_manager._filter_variables_pool,
         "_generate_file_name": mock_output_manager._generate_file_name,
         "_generate_key": mock_output_manager._generate_key,
-        "_get_timestamp": mock_output_manager._get_timestamp,
         "_handle_log_output": mock_output_manager._handle_log_output,
         "set_metadata_prefix": mock_output_manager.set_metadata_prefix,
         "set_log_verbose": mock_output_manager.set_log_verbose,
