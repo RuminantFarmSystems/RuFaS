@@ -12,11 +12,11 @@ from .sileage import Sileage, Bag, Bunker, Pile
 
 # Defines the compatilibty between Crop Categories and Storage Types.
 CROP_TO_STORAGE_MAPPING: Dict[CropCategory, List[Storage]] = {
-    CropCategory.SMALL_GRAIN: [Hay, Grain, Sileage, Baleage],
-    CropCategory.CORN: [Grain, Sileage],
-    CropCategory.SOY: [Grain],
     CropCategory.ALFALFA: [Hay, Sileage, Baleage],
+    CropCategory.CORN: [Grain, Sileage],
     CropCategory.GRASS: [Hay, Sileage, Baleage],
+    CropCategory.SMALL_GRAIN: [Hay, Grain, Sileage, Baleage],
+    CropCategory.SOY: [Grain],
 }
 
 
@@ -74,7 +74,9 @@ class FeedManager:
         ValueError
             If the crop type is not compatible with the storage type.
         """
-        compatible_storage_classes = CROP_TO_STORAGE_MAPPING.get(harvested_crop.category, [])
+        compatible_storage_classes = CROP_TO_STORAGE_MAPPING.get(
+            harvested_crop.category, []
+        )
         is_crop_compatible_with_storage = any(
             issubclass(storage_type.value, storage_class)
             for storage_class in compatible_storage_classes
