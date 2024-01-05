@@ -689,19 +689,22 @@ def test_generate_unique_report_name(mocker: MockerFixture,
 
 
 @pytest.mark.parametrize(
-    "filter_content, filtered_pool, reports, expected_exception, expected_report_key, expected_report_value",
+    "filter_content, filtered_pool, reports, reference_exception, generate_single_report_exception,"
+    "expected_report_key, expected_report_value, expected_log_messages",
     [
-        # Standard report case
+        # Standard report generation
         (
                 {"name": "standard_report", "filters": ["some_filter"]},
                 {"some_data_key": [1, 2, 3]},
                 {},
                 None,
+                None,
                 "standard_report",
                 {"values": "mocked_report"},
+                ["Start generating report: standard_report"]
         ),
 
-        # Case with cross-references
+        # Report with cross-references
         (
                 {
                     "name": "report_with_references",
@@ -711,31 +714,51 @@ def test_generate_unique_report_name(mocker: MockerFixture,
                 {"some_data_key": [1, 2, 3]},
                 {"ref1": {"values": [4, 5, 6]}},
                 None,
+                None,
                 "report_with_references",
                 {"values": "mocked_report"},
+                ["Start generating report: report_with_references"]
         ),
 
-        # Case with missing cross-references
+        # Report generation with missing cross-references
         (
                 {"name": "error_report", "cross_references": ["missing_ref"]},
-                None,
+                {},
                 {"ref": {"values": [1, 2, 3]}},
                 KeyError,
                 None,
                 None,
+                None,
+                ["Start generating report: error_report",
+                 "Error generating report: error_report: "]
+        ),
+
+        # Report generation with error in _generate_single_report
+        (
+                {"name": "error_report", "filters": ["some_filter"]},
+                {"some_data_key": [1, 2, 3]},
+                {},
+                None,
+                ValueError,
+                None,
+                None,
+                ["Start generating report: error_report",
+                 "Error generating report: error_report: "]
         ),
     ]
 )
 def test_handle_report_generation(filter_content: Dict[str, Any],
                                   filtered_pool: Dict[str, Any],
                                   reports: Dict[str, Dict[str, List[Any]]],
-                                  expected_exception: Optional[Type[BaseException]],
+                                  reference_exception: Optional[Type[BaseException]],
+                                  generate_single_report_exception: Optional[Type[BaseException]],
                                   expected_report_key: Optional[str],
                                   expected_report_value: Optional[Dict[str, List[Any]]],
+                                  expected_log_messages: List[str],
                                   mocker: MockerFixture,
                                   ) -> None:
     """
-    Unit test for the _handle_report_generation method in OutputManager class in output_manager.py.
+    Unit test for the handle_report_generation method in the ReportGenerator class.
     """
 
     # Arrange
@@ -744,17 +767,27 @@ def test_handle_report_generation(filter_content: Dict[str, Any],
     report_generator.reports = reports
     mocker.patch.object(report_generator, '_generate_unique_report_name',
                         side_effect=lambda x: x.get("name", "untitled"))
-    mocker.patch.object(report_generator, '_generate_single_report', return_value="mocked_report")
+    # mocker.patch.object(report_generator, '_generate_single_report',
+    #                     return_value="mocked_report")
     mocker.patch.object(report_generator, '_check_for_missing_references',
-                        side_effect=expected_exception if expected_exception else None)
-
-    # Act and assert
-    if expected_exception:
-        with pytest.raises(expected_exception):
-            report_generator.handle_report_generation(filter_content, filtered_pool)
+                        side_effect=reference_exception if reference_exception else None)
+    if generate_single_report_exception:
+        mocker.patch.object(report_generator, '_generate_single_report',
+                            side_effect=generate_single_report_exception)
     else:
-        report_generator.handle_report_generation(filter_content, filtered_pool)
+        mocker.patch.object(report_generator, '_generate_single_report',
+                            return_value="mocked_report")
+
+    # Act
+    event_logs = report_generator.handle_report_generation(filter_content, filtered_pool)
+
+    # Assert
+    if not reference_exception and not generate_single_report_exception:
         assert report_generator.reports.get(expected_report_key) == expected_report_value
+
+    log_messages = [log["message"] for log in event_logs]
+    for expected_message in expected_log_messages:
+        assert expected_message in log_messages
 
 
 def test_report_generator_init() -> None:

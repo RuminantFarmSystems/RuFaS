@@ -12,6 +12,7 @@ from pytest import raises
 from pytest_mock.plugin import MockerFixture
 
 from RUFAS.output_manager import LogVerbosity, OutputManager
+from RUFAS.util import Utility
 
 
 def test_get_prefix() -> None:
@@ -313,34 +314,15 @@ def test_generate_key(mocker: MockerFixture) -> None:
     assert key == "dummy_prefix.key_name.dummy_suffix"
 
 
-def test_get_timestamp(mocker: MockerFixture) -> None:
-    """Unit test for the function _get_timestamp in file output_manager.py"""
-    om = OutputManager()
-    # match 28-Jun-2023_Wed_15-48-21.406585
-    timestamp_with_millis_pattern = (
-        r"\d{2}-[A-Za-z]{3}-\d{4}_[A-Za-z]{3}_\d{2}-\d{2}-\d{2}\.\d{6}"
-    )
-    # match 28-Jun-2023_Wed_15-48-21
-    timestamp_without_millis_pattern = (
-        r"\d{2}-[A-Za-z]{3}-\d{4}_[A-Za-z]{3}_\d{2}-\d{2}-\d{2}"
-    )
-
-    assert re.match(
-        timestamp_with_millis_pattern, om._get_timestamp(include_millis=True)
-    )
-    assert re.match(
-        timestamp_without_millis_pattern, om._get_timestamp(include_millis=False)
-    )
-
-
 @pytest.mark.parametrize(
-    "log_verobse",
+    "log_verbose",
     [LogVerbosity.NONE, LogVerbosity.ERRORS, LogVerbosity.WARNINGS, LogVerbosity.LOGS],
 )
 def test_add_error(
         mock_output_manager: OutputManager,
         output_manager_original_method_states: Dict[str, Callable],
-        log_verobse: LogVerbosity,
+        log_verbose: LogVerbosity,
+        mocker: MockerFixture,
 ) -> None:
     """Unit test for function add_error in file output_manager.py"""
     key = "dummy_key"
@@ -351,8 +333,9 @@ def test_add_error(
     metadata_prefix = "dummy_prefix"
     mock_output_manager._generate_key = MagicMock(return_value=key)
     mock_output_manager._add_to_pool = MagicMock()
-    mock_output_manager._get_timestamp = MagicMock(return_value=timestamp)
-    mock_output_manager.set_log_verbose(log_verobse)
+    # mock_output_manager._get_timestamp = MagicMock(return_value=timestamp)
+    mocker.patch('RUFAS.output_manager.Utility.get_timestamp', return_value=timestamp)
+    mock_output_manager.set_log_verbose(log_verbose)
     mock_output_manager.set_metadata_prefix(metadata_prefix)
     mock_output_manager._handle_log_output = MagicMock()
 
@@ -374,9 +357,6 @@ def test_add_error(
     mock_output_manager._add_to_pool = output_manager_original_method_states[
         "_add_to_pool"
     ]
-    mock_output_manager._get_timestamp = output_manager_original_method_states[
-        "_get_timestamp"
-    ]
     mock_output_manager._handle_log_output = output_manager_original_method_states[
         "_handle_log_output"
     ]
@@ -386,13 +366,14 @@ def test_add_error(
 
 
 @pytest.mark.parametrize(
-    "log_verobse",
+    "log_verbose",
     [LogVerbosity.NONE, LogVerbosity.ERRORS, LogVerbosity.WARNINGS, LogVerbosity.LOGS],
 )
 def test_add_warning(
         mock_output_manager: OutputManager,
         output_manager_original_method_states: Dict[str, Callable],
-        log_verobse: LogVerbosity,
+        log_verbose: LogVerbosity,
+        mocker: MockerFixture,
 ) -> None:
     """Unit test for function add_warning in file output_manager.py"""
     key = "dummy_key"
@@ -403,8 +384,8 @@ def test_add_warning(
     metadata_prefix = "dummy_prefix"
     mock_output_manager._generate_key = MagicMock(return_value=key)
     mock_output_manager._add_to_pool = MagicMock()
-    mock_output_manager._get_timestamp = MagicMock(return_value=timestamp)
-    mock_output_manager.set_log_verbose(log_verobse)
+    mocker.patch('RUFAS.output_manager.Utility.get_timestamp', return_value=timestamp)
+    mock_output_manager.set_log_verbose(log_verbose)
     mock_output_manager.set_metadata_prefix(metadata_prefix)
     mock_output_manager._handle_log_output = MagicMock()
 
@@ -427,9 +408,6 @@ def test_add_warning(
     mock_output_manager._add_to_pool = output_manager_original_method_states[
         "_add_to_pool"
     ]
-    mock_output_manager._get_timestamp = output_manager_original_method_states[
-        "_get_timestamp"
-    ]
     mock_output_manager._handle_log_output = output_manager_original_method_states[
         "_handle_log_output"
     ]
@@ -439,13 +417,14 @@ def test_add_warning(
 
 
 @pytest.mark.parametrize(
-    "log_verobse",
+    "log_verbose",
     [LogVerbosity.NONE, LogVerbosity.ERRORS, LogVerbosity.WARNINGS, LogVerbosity.LOGS],
 )
 def test_add_log(
         mock_output_manager: OutputManager,
         output_manager_original_method_states: Dict[str, Callable],
-        log_verobse: LogVerbosity,
+        log_verbose: LogVerbosity,
+        mocker: MockerFixture,
 ) -> None:
     """Unit test for function add_log in file output_manager.py"""
     key = "dummy_key"
@@ -456,8 +435,8 @@ def test_add_log(
     metadata_prefix = "dummy_prefix"
     mock_output_manager._generate_key = MagicMock(return_value=key)
     mock_output_manager._add_to_pool = MagicMock()
-    mock_output_manager._get_timestamp = MagicMock(return_value=timestamp)
-    mock_output_manager.set_log_verbose(log_verobse)
+    mocker.patch('RUFAS.output_manager.Utility.get_timestamp', return_value=timestamp)
+    mock_output_manager.set_log_verbose(log_verbose)
     mock_output_manager.set_metadata_prefix(metadata_prefix)
     mock_output_manager._handle_log_output = MagicMock()
 
@@ -480,9 +459,6 @@ def test_add_log(
     ]
     mock_output_manager._add_to_pool = output_manager_original_method_states[
         "_add_to_pool"
-    ]
-    mock_output_manager._get_timestamp = output_manager_original_method_states[
-        "_get_timestamp"
     ]
     mock_output_manager._handle_log_output = output_manager_original_method_states[
         "_handle_log_output"
@@ -705,7 +681,7 @@ def test_generate_file_name(mocker: MockerFixture) -> None:
     om = OutputManager()
     om._OutputManager__metadata_prefix = metadata_prefix
 
-    with patch.object(om, "_get_timestamp") as mock_method:
+    with patch('RUFAS.output_manager.Utility.get_timestamp') as mock_method:
         mock_method.return_value = timestamp
         assert (
                 om._generate_file_name(base_name, extension)
@@ -1689,6 +1665,7 @@ def test_save_results_report_generation(
         produce_graphics: bool,
         filter_content: List[Dict[str, str]],
         is_faulty: bool,
+        mocker: MockerFixture,
 ) -> None:
     # Arrange
     mock_output_manager.variables_pool = {}
@@ -1705,6 +1682,7 @@ def test_save_results_report_generation(
     mock_output_manager._exclude_info_maps = MagicMock(return_value={})
     mock_output_manager._dict_to_file_csv = MagicMock()
     mock_output_manager.add_error = MagicMock()
+    mocker.patch.object(mock_output_manager, '_route_logs', return_value=None)
 
     with patch("RUFAS.output_manager.ReportGenerator") as mock_report_generator_class:
         mock_report_generator = mock_report_generator_class.return_value
@@ -1729,20 +1707,6 @@ def test_save_results_report_generation(
             assert mock_output_manager._dict_to_file_csv.call_count == len(
                 mock_output_manager._list_filter_files_in_dir.return_value
             )
-
-        # test for exception handling
-        mock_report_generator.handle_report_generation.side_effect = ValueError()
-        mock_output_manager.save_results(
-            "save_path",
-            "filters_path",
-            exclude_info_maps,
-            produce_graphics,
-            "graphics_dir",
-            "csv_dir"
-        )
-        assert mock_output_manager.add_error.call_count == len(
-            mock_output_manager._list_filter_files_in_dir.return_value
-        ) + is_faulty * len(mock_output_manager._list_filter_files_in_dir.return_value)
 
     # Restore original method states
     mock_output_manager.save_results = output_manager_original_method_states[

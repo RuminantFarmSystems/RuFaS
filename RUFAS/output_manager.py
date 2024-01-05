@@ -191,7 +191,7 @@ class OutputManager(object):
         info_map["suffix"] : str, optional
             If present, gets appended to the key
         """
-        info_map["timestamp"] = self._get_timestamp(include_millis=True)
+        info_map["timestamp"] = Utility.get_timestamp(include_millis=True)
         key = self._generate_key(name, info_map)
         self._add_to_pool(self.logs_pool, key, msg, info_map)
         self._handle_log_output(name, msg, info_map, LogVerbosity.LOGS)
@@ -220,7 +220,7 @@ class OutputManager(object):
         info_map["suffix"] : str, optional
             If present, gets appended to the key
         """
-        info_map["timestamp"] = self._get_timestamp(include_millis=True)
+        info_map["timestamp"] = Utility.get_timestamp(include_millis=True)
         key = self._generate_key(name, info_map)
         self._add_to_pool(self.warnings_pool, key, msg, info_map)
         self._handle_log_output(name, msg, info_map, LogVerbosity.WARNINGS)
@@ -249,7 +249,7 @@ class OutputManager(object):
         info_map["suffix"] : str, optional
             If present, gets appended to the key
         """
-        info_map["timestamp"] = self._get_timestamp(include_millis=True)
+        info_map["timestamp"] = Utility.get_timestamp(include_millis=True)
         key = self._generate_key(name, info_map)
         self._add_to_pool(self.errors_pool, key, msg, info_map)
         self._handle_log_output(name, msg, info_map, LogVerbosity.ERRORS)
@@ -545,7 +545,7 @@ class OutputManager(object):
         """
         Returns a file name using the given base_name and timestamp.
         """
-        timestamp: str = self._get_timestamp(include_millis=False)
+        timestamp: str = Utility.get_timestamp(include_millis=False)
         return f"{self.__metadata_prefix}_{base_name}_{timestamp}.{extension}"
 
     def _exclude_info_maps(
@@ -801,7 +801,6 @@ class OutputManager(object):
             info_map["filter file"] = filter_file
             input_path = os.path.join(filters_dir_path, filter_file)
             filter_contents = self._load_filter_file_content(input_path)
-            report_generator.clear_reports()
             self.add_log("init_report_generation",
                          f"Generating report(s) for file: {filter_file}",
                          info_map)
@@ -832,10 +831,8 @@ class OutputManager(object):
                 if filter_file.startswith(
                         self.__supported_filter_types_prefixes["report"]
                 ):
-                    try:
-                        report_generator.handle_report_generation(filter_content, filtered_pool)
-                    except (ValueError, KeyError) as e:
-                        self.add_error("report_generation_error", str(e), info_map)
+                    log_pool = report_generator.handle_report_generation(filter_content, filtered_pool)
+                    self._route_logs(log_pool)
                 else:
                     self._route_save_functions(
                         filter_file,
@@ -850,7 +847,9 @@ class OutputManager(object):
                 save_path,
                 self._generate_file_name(f"report_{filter_file}", "csv"),
             )
-            self._dict_to_file_csv(report_generator.reports, report_file_path)
+            if report_generator.reports:
+                self._dict_to_file_csv(report_generator.reports, report_file_path)
+                report_generator.clear_reports()
 
     def _route_save_functions(
             self,

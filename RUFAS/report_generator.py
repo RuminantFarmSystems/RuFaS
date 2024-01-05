@@ -300,7 +300,7 @@ class ReportGenerator:
     def handle_report_generation(self,
                                  filter_content: Dict[str, Any],
                                  filtered_pool: Dict[str, Dict[str, List[Any]]],
-                                 ) -> None:
+                                 ) -> List[Dict[str, str | Dict[str, str]]]:
         """
         Generates a single report based on filtered data and aggregation criteria.
 
@@ -312,18 +312,47 @@ class ReportGenerator:
 
         filtered_pool : Dict[str, Dict[str, List[Any]]]
             The data pool from which reports are generated.
+
+        Returns
+        -------
+        List[Dict[str, str | Dict[str, str]]]
+            A list of log events.
         """
+
+        event_logs: List[Dict[str, str | Dict[str, str]]] = []
+        info_map = {
+            "class": self.__class__.__name__,
+            "function": self.handle_report_generation.__name__,
+        }
 
         report_name = self._generate_unique_report_name(filter_content)
 
-        if "cross_references" in filter_content.keys():
-            self._check_for_missing_references(filter_content["cross_references"])
-            cross_reference_data = {ref: self.reports[ref] for ref in filter_content["cross_references"]}
-            filtered_pool.update(cross_reference_data)
+        init_event = {
+            "log": "start_generate_report",
+            "message": f"Start generating report: {report_name}",
+            "info_map": info_map,
+        }
+        event_logs.append(init_event)
+        data = dict(filtered_pool)
 
-        report_data = self._generate_single_report(filtered_pool, filter_content)
+        try:
+            if "cross_references" in filter_content.keys():
+                self._check_for_missing_references(filter_content["cross_references"])
+                cross_reference_data = {ref: self.reports[ref] for ref in filter_content["cross_references"]}
+                data.update(cross_reference_data)
 
-        self.reports[report_name] = {"values": report_data}
+            report_data = self._generate_single_report(data, filter_content)
+
+            self.reports[report_name] = {"values": report_data}
+        except (KeyError, ValueError) as e:
+            error_event = {
+                "error": "report_generation_error",
+                "message": f"Error generating report: {report_name}: {e}",
+                "info_map": info_map,
+            }
+            event_logs.append(error_event)
+
+        return event_logs
 
     def _generate_unique_report_name(self, filter_content: Dict[str, Any]) -> str:
         """
