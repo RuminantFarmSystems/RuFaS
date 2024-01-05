@@ -1,6 +1,5 @@
 from typing import List, Dict, Union
 from enum import Enum
-from RUFAS.time import Time
 from .harvested_crop import HarvestedCrop
 from .storage import Storage
 from .enums import CropType, CropCategory
@@ -55,7 +54,6 @@ class FeedManager:
         self,
         harvested_crop: HarvestedCrop,
         storage_type: StorageType,
-        storage_time: Time,
     ):
         """
         Receives a harvested crop and assigns it to a storage unit.
@@ -66,8 +64,6 @@ class FeedManager:
             The harvested crop to be stored.
         storage_type : StorageType
             The type of storage to use for this crop.
-        storage_time : Time
-            The time at which the crop is stored.
 
         Raises
         ------
@@ -91,7 +87,7 @@ class FeedManager:
         if storage_type not in self.active_storages:
             self.active_storages[storage_type] = storage_type.value()
 
-        self.active_storages[storage_type].receive_crop(HarvestedCrop, storage_time)
+        self.active_storages[storage_type].receive_crop(HarvestedCrop)
 
     def process_degradations(self):
         """
