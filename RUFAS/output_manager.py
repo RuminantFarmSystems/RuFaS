@@ -793,7 +793,7 @@ class OutputManager(object):
                     )
                     continue
 
-                filtered_pool:  Dict[str, Dict[str, List[Any]]] = {}
+                filtered_pool:  Dict[str, OutputManager.pool_element_type] = {}
                 if "filters" in filter_content.keys():
                     filtered_pool = self._filter_variables_pool(
                         filter_content["filters"], filter_file
