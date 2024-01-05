@@ -3,45 +3,7 @@ import pytest
 from RUFAS.routines.feed_storage.storage import Storage
 from RUFAS.routines.feed_storage.harvested_crop import HarvestedCrop
 from RUFAS.routines.feed_storage.enums import CropCategory, CropType
-from RUFAS.time import Time
-from RUFAS.config import Config
-
-
-@pytest.fixture
-def sample_crop_data() -> Dict[str, float]:
-    return {
-        "harvest_time": Time(
-            Config(
-                {
-                    "start_date": "1:1",
-                    "end_date": "1:10",
-                    "set_seed": False,
-                    "random_seed": 42,
-                }
-            )
-        ),
-        "storage_time": Time(
-            Config(
-                {
-                    "start_date": "1:1",
-                    "end_date": "1:10",
-                    "set_seed": False,
-                    "random_seed": 42,
-                }
-            )
-        ),
-        "fresh_mass": 100.0,
-        "dry_matter_percentage": 50.0,
-        "dry_matter_digestibility": 70.0,
-        "crude_protein_percent": 10.0,
-        "non_protein_nitrogen": 5.0,
-        "starch": 30.0,
-        "adf": 7.0,
-        "ndf": 15.0,
-        "lignin": 3.0,
-        "sugar": 20.0,
-        "ash": 6.0,
-    }
+from .sample_crop_data import sample_crop_data  # noqa F401
 
 
 @pytest.fixture
@@ -58,7 +20,7 @@ def storage() -> Storage:
 
 
 @pytest.fixture
-def harvested_crop(sample_crop_data: Dict[str, float]) -> HarvestedCrop:
+def harvested_crop(sample_crop_data: Dict[str, float]) -> HarvestedCrop:  # noqa F811
     """
     Pytest fixture to create a HarvestedCrop instance for testing.
 
