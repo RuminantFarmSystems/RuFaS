@@ -60,7 +60,7 @@ def test_receive_crop_exceeds_capacity(storage: Storage, harvested_crop: Harvest
 
 
 def test_receive_unacceptable_crop(
-    storage: Storage, sample_crop_data: Dict[str, float]
+    storage: Storage, sample_crop_data: Dict[str, float]  # noqa F811
 ):
     storage.acceptable_crops = [CropCategory.ALFALFA]
     incompatible_crop = HarvestedCrop(
