@@ -87,7 +87,7 @@ class FeedManager:
         if storage_type not in self.active_storages:
             self.active_storages[storage_type] = storage_type.value()
 
-        self.active_storages[storage_type].receive_crop(HarvestedCrop)
+        self.active_storages[storage_type].receive_crop(harvested_crop)
 
     def process_degradations(self):
         """
