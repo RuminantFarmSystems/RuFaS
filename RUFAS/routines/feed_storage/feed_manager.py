@@ -1,4 +1,4 @@
-from typing import List, Dict, Union
+from typing import List, Dict
 from enum import Enum
 from .harvested_crop import HarvestedCrop
 from .storage import Storage
@@ -115,22 +115,33 @@ class FeedManager:
         pass
 
     def query_available_feeds(
-        self, crop_type: CropType = None
-    ) -> Union[Dict[CropType, float], float]:
+        self, queryable_crops: List[CropType] = None
+    ) -> Dict[CropType, float]:
         """
         Queries the available amount of feed in storage.
 
         Parameters
         ----------
-        crop_type : CropType, optional
-            The type of crop to query (default is None, which queries all types).
+        queryable_crops : List[CropType], optional
+            The types of crop to query (default is None, which queries all types).
 
         Returns
         -------
-        Union[Dict[CropType, float], float]
+        Dict[CropType, float]
             The amount of available feed, either as a total or for a specific crop type.
         """
-        pass
+        query_all = queryable_crops is None
+        available_feeds: Dict[CropType, float] = {}
+
+        for storage in self.active_storages.values():
+            for stored_crop in storage.stored:
+                if query_all or stored_crop.type in queryable_crops:
+                    if stored_crop.type not in available_feeds:
+                        available_feeds[stored_crop.type] = 0
+
+                    available_feeds[stored_crop.type] += stored_crop.fresh_mass
+
+        return available_feeds
 
     def purchase_feed(self) -> None:
         """The purchase feed logic is currently in the Animal Module. We will move it to here."""
