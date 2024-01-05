@@ -1,10 +1,7 @@
 from typing import Dict
 import pytest
-from RUFAS.routines.feed_storage.harvested_crop import (
-    HarvestedCrop,
-    CropCategory,
-    CropType,
-)
+from RUFAS.routines.feed_storage.harvested_crop import HarvestedCrop
+from RUFAS.routines.feed_storage.enums import CropCategory, CropType
 from RUFAS.time import Time
 from RUFAS.config import Config
 
