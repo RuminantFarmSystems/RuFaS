@@ -224,4 +224,3 @@ def test_get_timestamp() -> None:
     assert re.match(
         timestamp_without_millis_pattern, Utility.get_timestamp(include_millis=False)
     )
-
