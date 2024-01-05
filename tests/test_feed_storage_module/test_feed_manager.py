@@ -72,3 +72,29 @@ def test_receive_crop_error(
             storage_type=incompatible_storage,
         )
     assert "is not compatible with storage type" in str(excinfo.value)
+
+
+def test_query_with_specific_crops(
+    feed_manager: FeedManager, sample_crop_data: Dict[str, float]  # noqa F811
+):
+    feed_manager.receive_crop(
+        harvested_crop=HarvestedCrop(
+            category=CropCategory.ALFALFA, type=CropType.ALFALFA, **sample_crop_data
+        ),
+        storage_type=StorageType.PROTECTED_INDOORS,
+    )
+    feed_manager.receive_crop(
+        harvested_crop=HarvestedCrop(
+            category=CropCategory.ALFALFA, type=CropType.ALFALFA, **sample_crop_data
+        ),
+        storage_type=StorageType.PILE,
+    )
+    feed_manager.receive_crop(
+        harvested_crop=HarvestedCrop(
+            category=CropCategory.CORN, type=CropType.WHOLE_PLANT, **sample_crop_data
+        ),
+        storage_type=StorageType.BUNKER,
+    )
+    queryable_crops = [CropType.ALFALFA]
+    result = feed_manager.query_available_feeds(queryable_crops)
+    assert result == {CropType.ALFALFA: 200.0}
