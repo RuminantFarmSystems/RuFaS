@@ -28,44 +28,46 @@
         51,
         79,
         46,
-        110
+        110,
+        301,
+        302
     ],
     "purchased_feeds": [
       {
         "purchased_feed": 202,
-        "purchased_feed_cost": 0.1
+        "purchased_feed_cost": 0.01
       },
       {
         "purchased_feed": 216,
-        "purchased_feed_cost": 0.1
+        "purchased_feed_cost": 0.5
       },
       {
         "purchased_feed": 44,
-        "purchased_feed_cost": 0.1
+        "purchased_feed_cost": 0.5
       },
       {
         "purchased_feed": 50,
-        "purchased_feed_cost": 0.1
+        "purchased_feed_cost": 0.01
       },
       {
         "purchased_feed": 95,
-        "purchased_feed_cost": 0.1
+        "purchased_feed_cost": 0.01
       },
       {
         "purchased_feed": 104,
-        "purchased_feed_cost": 0.1
+        "purchased_feed_cost": 0.01
       },
       {
         "purchased_feed": 110,
-        "purchased_feed_cost": 0.1
+        "purchased_feed_cost": 0.01
       },
       {
         "purchased_feed": 301,
-        "purchased_feed_cost": 0.1
+        "purchased_feed_cost": 1.0
       },
       {
         "purchased_feed": 302,
-        "purchased_feed_cost": 0.1
+        "purchased_feed_cost": 1.0
       },
       {
         "purchased_feed": 210,
@@ -73,15 +75,15 @@
       },
       {
         "purchased_feed": 167,
-        "purchased_feed_cost": 0.1
+        "purchased_feed_cost": 0.5
       },
       {
         "purchased_feed": 36,
-        "purchased_feed_cost": 0.1
+        "purchased_feed_cost": 0.5
       },
       {
         "purchased_feed": 51,
-        "purchased_feed_cost": 0.1
+        "purchased_feed_cost": 0.01
       },
       {
         "purchased_feed": 79,
@@ -89,7 +91,7 @@
       },
       {
         "purchased_feed": 46,
-        "purchased_feed_cost": 0.1
+        "purchased_feed_cost": 0.5
       }
     ],
     "farm_grown_feeds": [
@@ -217,6 +219,14 @@
         {
           "feed_type": 110,
           "ration_percentage": 13.3
+        },
+        {
+          "feed_type": 301,
+          "ration_percentage": 0.2
+        },
+        {
+          "feed_type": 302,
+          "ration_percentage": 0.2
         }
       ],
       "tolerance": 0.1,
