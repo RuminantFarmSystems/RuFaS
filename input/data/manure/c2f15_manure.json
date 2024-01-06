@@ -10,24 +10,10 @@
       },
       {
         "scenario_id": 1,
-        "bedding_type": "sawdust",
-        "manure_handler": "manual scraping",
-        "manure_separator": "none",
-        "manure_treatment": "none"
-      },
-      {
-        "scenario_id": 2,
         "bedding_type": "sand",
         "manure_handler": "manual scraping",
         "manure_separator": "none",
-        "manure_treatment": "none"
-      },
-      {
-        "scenario_id": 3,
-        "bedding_type": "sand",
-        "manure_handler": "manual scraping",
-        "manure_separator": "none",
-        "manure_treatment": "none"
+        "manure_treatment": "other"
       }
     ],
     "bedding_configs": [

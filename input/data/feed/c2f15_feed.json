@@ -35,6 +35,10 @@
         "purchased_feed_cost": 0.5
       },
       {
+        "purchased_feed": 216,
+        "purchased_feed_cost": 0.5
+      },
+      {
         "purchased_feed": 144,
         "purchased_feed_cost": 0.01 
       },
@@ -68,24 +72,24 @@
     "storage_options": [
       {
         "storage_type": "bunker",
-        "moisture": "direct_cut",
+        "moisture": "Wilted",
         "additive": "preservative",
-        "packing_density": 14,
-        "inoculation": "heterofermentative",
+        "packing_density": 560,
+        "inoculation": "None",
         "bunk_type": "open_floor",
         "ventilation": true,
-        "removal_rate": 6,
+        "removal_rate": 0.1,
         "initial_dry_matter": 0
       },
       {
-        "storage_type": "bunker",
-        "moisture": "direct_cut",
+        "storage_type": "Upright Silo - Traditional",
+        "moisture": "Haylage",
         "additive": "preservative",
-        "packing_density": 14,
-        "inoculation": "heterofermentative",
+        "packing_density": 400,
+        "inoculation": "None",
         "bunk_type": "open_floor",
         "ventilation": true,
-        "removal_rate": 6,
+        "removal_rate": 0.5,
         "initial_dry_matter": 0
       }
     ],
