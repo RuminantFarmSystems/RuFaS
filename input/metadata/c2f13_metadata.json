@@ -73,7 +73,7 @@
     "manure_management": {
       "title": "Manure data",
       "description": "You thought it's a waste, but those crops need to eat as well",
-      "path": "input/data/manure/manure_management.json",
+      "path": "input/data/manure/c2f13_manure.json",
       "type": "json",
       "properties": "manure_management_properties"
     },

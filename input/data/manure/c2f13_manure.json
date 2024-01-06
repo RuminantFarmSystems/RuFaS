@@ -2,31 +2,17 @@
     "manure_management_scenarios": [
       {
         "scenario_id": 0,
-        "bedding_type": "",
-        "manure_handler": "",
-        "manure_separator": "",
-        "manure_treatment": ""
+        "bedding_type": "Manure_solids",
+        "manure_handler": "flush system",
+        "manure_separator": "rotary screen",
+        "manure_treatment": "anaerobic lagoon"
       },
       {
         "scenario_id": 1,
-        "bedding_type": "",
-        "manure_handler": "",
-        "manure_separator": "",
-        "manure_treatment": ""
-      },
-      {
-        "scenario_id": 2,
-        "bedding_type": "",
-        "manure_handler": "",
-        "manure_separator": "",
-        "manure_treatment": ""
-      },
-      {
-        "scenario_id": 3,
-        "bedding_type": "",
-        "manure_handler": "",
-        "manure_separator": "",
-        "manure_treatment": ""
+        "bedding_type": "Straw",
+        "manure_handler": "manual skid steer scraping",
+        "manure_separator": "none",
+        "manure_treatment": "other"
       }
     ],
     "bedding_configs": [
