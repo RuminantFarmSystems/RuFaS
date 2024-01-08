@@ -1529,8 +1529,8 @@ def test_calf(mocker: MockerFixture) -> None:
     Calf.assign_calf_values(calf, mock_args)
 
     # assert
-    assert calf.culled == False
-    assert calf.sold == False
+    assert not calf.culled
+    assert not calf.sold
     assert calf.gender == "female"
     calf.events.init_from_string.assert_called()
 
