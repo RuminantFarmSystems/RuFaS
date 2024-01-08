@@ -145,3 +145,8 @@ def test_query_available_feeds_specific_storage_types(
     assert results[0]["category"] == CropCategory.CORN
     assert results[0]["amount"] == 200.0
 
+
+def test_query_available_feeds_empty_storage(feed_manager: FeedManager) -> None:
+    results = feed_manager.query_available_feeds()
+    assert len(results) == 0
+
