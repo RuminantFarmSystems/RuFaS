@@ -45,7 +45,7 @@ class NitrificationVolatilization:
         SWAT Theoretical documentation section 3:1.3
 
         """
-        self.data.set_vectorized_layer_attribute("volatilized_ammonium_emissions", [0.0] * len(self.data.soil_layers))
+        self.data.set_vectorized_layer_attribute("ammonia_emissions", [0.0] * len(self.data.soil_layers))
         for layer in self.data.soil_layers:
             if layer.temperature <= 5:
                 continue
@@ -74,8 +74,8 @@ class NitrificationVolatilization:
 
             layer.ammonium_content -= total_ammonium_lost
             layer.nitrate_content += nitrified_ammonium
-            layer.volatilized_ammonium_emissions = volatilized_ammonium
-            layer.annual_volatilized_ammonium_total += volatilized_ammonium
+            layer.ammonia_emissions = volatilized_ammonium
+            layer.annual_ammonia_emissions_total += volatilized_ammonium
 
     # --- Static methods ---
     @staticmethod
@@ -102,9 +102,7 @@ class NitrificationVolatilization:
         SWAT Theoretical documentation eqn. 3:1.3.1
 
         """
-        unbounded_factor = 0.41 * ((temperature - 5) / 10)
-        bounded_factor = min(1.0, unbounded_factor)
-        return bounded_factor
+        return min(1.0, 0.41 * ((temperature - 5) / 10))
 
     @staticmethod
     def _calculate_nitrification_soil_water_factor(water_content: float, wilting_point: float,
