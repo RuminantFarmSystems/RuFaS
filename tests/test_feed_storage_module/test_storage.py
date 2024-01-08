@@ -1,9 +1,8 @@
-from typing import Dict
 import pytest
 from RUFAS.routines.feed_storage.storage import Storage
 from RUFAS.routines.feed_storage.harvested_crop import HarvestedCrop
 from RUFAS.routines.feed_storage.enums import CropCategory, CropType
-from .sample_crop_data import sample_crop_data  # noqa F401
+from .sample_crop_data import sample_crop_data
 
 
 @pytest.fixture
@@ -20,7 +19,7 @@ def storage() -> Storage:
 
 
 @pytest.fixture
-def harvested_crop(sample_crop_data: Dict[str, float]) -> HarvestedCrop:  # noqa F811
+def harvested_crop() -> HarvestedCrop:
     """
     Pytest fixture to create a HarvestedCrop instance for testing.
 
@@ -59,9 +58,7 @@ def test_receive_crop_exceeds_capacity(storage: Storage, harvested_crop: Harvest
     assert "exceeds the storage capacity" in str(excinfo.value)
 
 
-def test_receive_unacceptable_crop(
-    storage: Storage, sample_crop_data: Dict[str, float]  # noqa F811
-):
+def test_receive_unacceptable_crop(storage: Storage):
     storage.acceptable_crops = [CropCategory.ALFALFA]
     incompatible_crop = HarvestedCrop(
         category=CropCategory.SMALL_GRAIN, type=CropType.WHEAT, **sample_crop_data

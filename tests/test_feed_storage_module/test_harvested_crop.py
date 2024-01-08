@@ -1,8 +1,7 @@
-from typing import Dict
 import pytest
 from RUFAS.routines.feed_storage.harvested_crop import HarvestedCrop
 from RUFAS.routines.feed_storage.enums import CropCategory, CropType
-from .sample_crop_data import sample_crop_data  # noqa F401
+from .sample_crop_data import sample_crop_data
 
 
 @pytest.mark.parametrize(
@@ -26,11 +25,7 @@ from .sample_crop_data import sample_crop_data  # noqa F401
         (CropCategory.GRASS, CropType.MEADOW_FESCUE),
     ],
 )
-def test_valid_category_type_combinations(
-    category: CropCategory,
-    crop_type: CropType,
-    sample_crop_data: Dict[str, float],  # noqa F811
-):
+def test_valid_category_type_combinations(category: CropCategory, crop_type: CropType):
     try:
         HarvestedCrop(category=category, type=crop_type, **sample_crop_data)
     except ValueError:
@@ -47,15 +42,13 @@ def test_valid_category_type_combinations(
     ],
 )
 def test_invalid_category_type_combinations(
-    category: CropCategory,
-    crop_type: CropType,
-    sample_crop_data: Dict[str, float],  # noqa F811
+    category: CropCategory, crop_type: CropType
 ):
     with pytest.raises(ValueError):
         HarvestedCrop(category=category, type=crop_type, **sample_crop_data)
 
 
-def test_attributes(sample_crop_data: Dict[str, float]):  # noqa F811
+def test_attributes():
     crop = HarvestedCrop(
         category=CropCategory.SMALL_GRAIN, type=CropType.WHEAT, **sample_crop_data
     )

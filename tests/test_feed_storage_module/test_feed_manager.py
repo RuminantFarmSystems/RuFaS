@@ -1,14 +1,13 @@
-from typing import Dict
 import pytest
 from RUFAS.routines.feed_storage.feed_manager import FeedManager, StorageType
 from RUFAS.routines.feed_storage.harvested_crop import HarvestedCrop
 from RUFAS.routines.feed_storage.enums import CropCategory, CropType
 
-from .sample_crop_data import sample_crop_data  # noqa F401
+from .sample_crop_data import sample_crop_data
 
 
 @pytest.fixture
-def harvested_crop(sample_crop_data: Dict[str, float]) -> HarvestedCrop:  # noqa F811
+def harvested_crop() -> HarvestedCrop:
     """
     Pytest fixture to create a HarvestedCrop instance for testing.
 
