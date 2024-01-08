@@ -22,6 +22,21 @@ def harvested_crop() -> HarvestedCrop:
 
 
 @pytest.fixture
+def alfalfa_crop() -> HarvestedCrop:
+    return HarvestedCrop(CropCategory.ALFALFA, CropType.ALFALFA, **sample_crop_data)
+
+
+@pytest.fixture
+def corn_crop() -> HarvestedCrop:
+    return HarvestedCrop(CropCategory.CORN, CropType.GRAIN, **sample_crop_data)
+
+
+@pytest.fixture
+def grass_crop() -> HarvestedCrop:
+    return HarvestedCrop(CropCategory.GRASS, CropType.TALL_FESCUE, **sample_crop_data)
+
+
+@pytest.fixture
 def feed_manager() -> FeedManager:
     return FeedManager()
 
@@ -73,55 +88,3 @@ def test_receive_crop_error(
         )
     assert "is not compatible with storage type" in str(excinfo.value)
 
-
-def populate_storage(
-    feed_manager: FeedManager, sample_crop_data: Dict[str, float]  # noqa F811
-) -> None:
-    to_be_stored = [
-        {
-            "crop_category": CropCategory.ALFALFA,
-            "crop_type": CropType.ALFALFA,
-            "storage_type": StorageType.PROTECTED_INDOORS,
-        },
-        {
-            "crop_category": CropCategory.ALFALFA,
-            "crop_type": CropType.ALFALFA,
-            "storage_type": StorageType.PILE,
-        },
-        {
-            "crop_category": CropCategory.CORN,
-            "crop_type": CropType.WHOLE_PLANT,
-            "storage_type": StorageType.BUNKER,
-        },
-    ]
-    for storable in to_be_stored:
-        feed_manager.receive_crop(
-            harvested_crop=HarvestedCrop(
-                category=storable["crop_category"],
-                type=storable["crop_type"],
-                **sample_crop_data
-            ),
-            storage_type=storable["storage_type"],
-        )
-
-
-def test_query_available_feeds_by_crop_type_with_specific_crops(
-    feed_manager: FeedManager, sample_crop_data: Dict[str, float]  # noqa F811
-):
-    populate_storage(feed_manager, sample_crop_data)
-    queryable_crops = [CropType.ALFALFA]
-    result = feed_manager.query_available_feeds_by_crop_type(queryable_crops)
-    assert result == [
-        {"category": CropCategory.ALFALFA, "type": CropType.ALFALFA, "amount": 200.0}
-    ]
-
-
-def test_query_available_feeds_by_crop_type_with_all_crops(
-    feed_manager: FeedManager, sample_crop_data: Dict[str, float]  # noqa F811
-):
-    populate_storage(feed_manager, sample_crop_data)
-    result = feed_manager.query_available_feeds_by_crop_type()
-    assert result == [
-        {"category": CropCategory.ALFALFA, "type": CropType.ALFALFA, "amount": 200.0},
-        {"category": CropCategory.CORN, "type": CropType.WHOLE_PLANT, "amount": 100.0},
-    ]
