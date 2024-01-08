@@ -141,20 +141,21 @@ def test_manure_handler_config() -> None:
 @pytest.mark.parametrize(
     'manure_handler_type, expected_cleaning_water_use_rate, '
     'expected_minutes_per_cleaning, expected_cleanings_per_day, '
-    'expected_daily_tillage_frequency',
+    'expected_daily_tillage_frequency, expected_cleaning_water_recycle_fraction',
     [
-        (ManureHandlerType.FLUSH_SYSTEM, 757.0, 8, 2, 0),
-        (ManureHandlerType.MANUAL_SCRAPING, 10.0, 8, 2, 0),
-        (ManureHandlerType.ALLEY_SCRAPER, 10.0, 8, 2, 0),
-        (ManureHandlerType.TILLAGE, 0.0, 8, 2, 1),
-        (ManureHandlerType.HARROWING, 0.0, 8, 2, 0)
+        (ManureHandlerType.FLUSH_SYSTEM, 757.0, 8, 2, 0, 0.8),
+        (ManureHandlerType.MANUAL_SCRAPING, 10.0, 8, 2, 0, 0.1),
+        (ManureHandlerType.ALLEY_SCRAPER, 10.0, 8, 2, 0, 0.1),
+        (ManureHandlerType.TILLAGE, 0.0, 8, 2, 1, 0.0),
+        (ManureHandlerType.HARROWING, 0.0, 8, 2, 0, 0.0)
     ]
 )
 def test_default_manure_handler_config_factory_get_instance(manure_handler_type: ManureHandlerType,
                                                             expected_cleaning_water_use_rate: float,
                                                             expected_minutes_per_cleaning: int,
                                                             expected_cleanings_per_day: int,
-                                                            expected_daily_tillage_frequency: int
+                                                            expected_daily_tillage_frequency: int,
+                                                            expected_cleaning_water_recycle_fraction: float,
                                                             ) -> None:
     """Unit test for get_instance() of class DefaultManureHandlerConfigFactory"""
 
@@ -166,6 +167,7 @@ def test_default_manure_handler_config_factory_get_instance(manure_handler_type:
     assert manure_handler_config.minutes_per_cleaning == expected_minutes_per_cleaning
     assert manure_handler_config.cleanings_per_day == expected_cleanings_per_day
     assert manure_handler_config.daily_tillage_frequency == expected_daily_tillage_frequency
+    assert manure_handler_config.cleaning_water_recycle_fraction == approx(expected_cleaning_water_recycle_fraction)
 
 
 # Test ManureHandlerType
