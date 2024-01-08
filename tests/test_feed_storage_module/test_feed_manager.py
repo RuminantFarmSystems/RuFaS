@@ -150,3 +150,14 @@ def test_query_available_feeds_empty_storage(feed_manager: FeedManager) -> None:
     results = feed_manager.query_available_feeds()
     assert len(results) == 0
 
+
+def test_query_available_feeds_non_existing_crop_types(
+    feed_manager: FeedManager, alfalfa_crop: HarvestedCrop, corn_crop: HarvestedCrop
+) -> None:
+    feed_manager.receive_crop(alfalfa_crop, StorageType.PROTECTED_INDOORS)
+    feed_manager.receive_crop(corn_crop, StorageType.DRY)
+    feed_manager.receive_crop(corn_crop, StorageType.DRY)
+    feed_manager.receive_crop(corn_crop, StorageType.BUNKER)
+    results = feed_manager.query_available_feeds(query_crop_types=[CropType.RICE])
+    assert len(results) == 0
+
