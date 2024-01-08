@@ -98,13 +98,13 @@ def test_send_daily_variables(runoff_values: List[float],
 
 
 @pytest.mark.parametrize("annual_irrigation_water_use_total, annual_soil_evaporation_total,"
-                         "annual_denitrified_nitrogen_total, initial_water_content,"
+                         "annual_nitrous_oxide_emissions_total, initial_water_content,"
                          "initial_nitrates_total", [
                             ([1.3, 2.4, 1.22], [1.5, 2.4, 3.8], [1.2, 7.7, 9.24, 1.31], [2, 3, 4],
                              [4.2, 5.3, 6.5])])
 def test_send_annual_variables(annual_irrigation_water_use_total: List[float],
                                annual_soil_evaporation_total: List[float],
-                               annual_denitrified_nitrogen_total: List[float],
+                               annual_nitrous_oxide_emissions_total: List[float],
                                initial_water_content: List[float],
                                initial_nitrates_total: List[float]) -> None:
     """Tests that annual variables were sent correctly through OutputManager"""
@@ -137,9 +137,9 @@ def test_send_annual_variables(annual_irrigation_water_use_total: List[float],
             field_2.soil.data.initial_nitrates_total = initial_nitrates_total[i]
 
             for index, layer in enumerate(field_1.soil.data.soil_layers):
-                layer.annual_denitrified_nitrogen_total = annual_denitrified_nitrogen_total[index]
+                layer.annual_nitrous_oxide_emissions_total = annual_nitrous_oxide_emissions_total[index]
             for index, layer in enumerate(field_2.soil.data.soil_layers):
-                layer.annual_denitrified_nitrogen_total = annual_denitrified_nitrogen_total[index]
+                layer.annual_nitrous_oxide_emissions_total = annual_nitrous_oxide_emissions_total[index]
             og.send_annual_variables()
     print(om.variables_pool)
     pool = om.variables_pool
@@ -167,20 +167,20 @@ def test_send_annual_variables(annual_irrigation_water_use_total: List[float],
     assert pool["field='name 2'.annual_soil_evaporation_total"]['values'] == [1.5, 2.4, 3.8]
 
     # Testing layer data
-    assert len(pool["field='name 1',layer_index='0'.annual_denitrified_nitrogen_total"]['info_maps']) == 3
-    assert len(pool["field='name 1',layer_index='1'.annual_denitrified_nitrogen_total"]['info_maps']) == 3
-    assert len(pool["field='name 1',layer_index='2'.annual_denitrified_nitrogen_total"]['info_maps']) == 3
-    assert len(pool["field='name 1',layer_index='3'.annual_denitrified_nitrogen_total"]['info_maps']) == 3
-    assert len(pool["field='name 2',layer_index='0'.annual_denitrified_nitrogen_total"]['info_maps']) == 3
-    assert len(pool["field='name 2',layer_index='1'.annual_denitrified_nitrogen_total"]['info_maps']) == 3
-    assert len(pool["field='name 2',layer_index='2'.annual_denitrified_nitrogen_total"]['info_maps']) == 3
-    assert len(pool["field='name 2',layer_index='3'.annual_denitrified_nitrogen_total"]['info_maps']) == 3
+    assert len(pool["field='name 1',layer_index='0'.annual_nitrous_oxide_emissions_total"]['info_maps']) == 3
+    assert len(pool["field='name 1',layer_index='1'.annual_nitrous_oxide_emissions_total"]['info_maps']) == 3
+    assert len(pool["field='name 1',layer_index='2'.annual_nitrous_oxide_emissions_total"]['info_maps']) == 3
+    assert len(pool["field='name 1',layer_index='3'.annual_nitrous_oxide_emissions_total"]['info_maps']) == 3
+    assert len(pool["field='name 2',layer_index='0'.annual_nitrous_oxide_emissions_total"]['info_maps']) == 3
+    assert len(pool["field='name 2',layer_index='1'.annual_nitrous_oxide_emissions_total"]['info_maps']) == 3
+    assert len(pool["field='name 2',layer_index='2'.annual_nitrous_oxide_emissions_total"]['info_maps']) == 3
+    assert len(pool["field='name 2',layer_index='3'.annual_nitrous_oxide_emissions_total"]['info_maps']) == 3
 
-    assert pool["field='name 1',layer_index='0'.annual_denitrified_nitrogen_total"]['values'] == [1.2, 1.2, 1.2]
-    assert pool["field='name 1',layer_index='1'.annual_denitrified_nitrogen_total"]['values'] == [7.7, 7.7, 7.7]
-    assert pool["field='name 1',layer_index='2'.annual_denitrified_nitrogen_total"]['values'] == [9.24, 9.24, 9.24]
-    assert pool["field='name 1',layer_index='3'.annual_denitrified_nitrogen_total"]['values'] == [1.31, 1.31, 1.31]
-    assert pool["field='name 2',layer_index='0'.annual_denitrified_nitrogen_total"]['values'] == [1.2, 1.2, 1.2]
-    assert pool["field='name 2',layer_index='1'.annual_denitrified_nitrogen_total"]['values'] == [7.7, 7.7, 7.7]
-    assert pool["field='name 2',layer_index='2'.annual_denitrified_nitrogen_total"]['values'] == [9.24, 9.24, 9.24]
-    assert pool["field='name 2',layer_index='3'.annual_denitrified_nitrogen_total"]['values'] == [1.31, 1.31, 1.31]
+    assert pool["field='name 1',layer_index='0'.annual_nitrous_oxide_emissions_total"]['values'] == [1.2, 1.2, 1.2]
+    assert pool["field='name 1',layer_index='1'.annual_nitrous_oxide_emissions_total"]['values'] == [7.7, 7.7, 7.7]
+    assert pool["field='name 1',layer_index='2'.annual_nitrous_oxide_emissions_total"]['values'] == [9.24, 9.24, 9.24]
+    assert pool["field='name 1',layer_index='3'.annual_nitrous_oxide_emissions_total"]['values'] == [1.31, 1.31, 1.31]
+    assert pool["field='name 2',layer_index='0'.annual_nitrous_oxide_emissions_total"]['values'] == [1.2, 1.2, 1.2]
+    assert pool["field='name 2',layer_index='1'.annual_nitrous_oxide_emissions_total"]['values'] == [7.7, 7.7, 7.7]
+    assert pool["field='name 2',layer_index='2'.annual_nitrous_oxide_emissions_total"]['values'] == [9.24, 9.24, 9.24]
+    assert pool["field='name 2',layer_index='3'.annual_nitrous_oxide_emissions_total"]['values'] == [1.31, 1.31, 1.31]

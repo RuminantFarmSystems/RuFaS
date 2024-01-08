@@ -45,7 +45,7 @@ class NitrificationVolatilization:
         SWAT Theoretical documentation section 3:1.3
 
         """
-        self.data.set_vectorized_layer_attribute("volatilized_ammonium_emissions", [0.0] * len(self.data.soil_layers))
+        self.data.set_vectorized_layer_attribute("ammonia_emissions", [0.0] * len(self.data.soil_layers))
         for layer in self.data.soil_layers:
             if layer.temperature <= 5:
                 continue
@@ -74,7 +74,7 @@ class NitrificationVolatilization:
 
             layer.ammonium_content -= total_ammonium_lost
             layer.nitrate_content += nitrified_ammonium
-            layer.volatilized_ammonium_emissions = volatilized_ammonium
+            layer.ammonia_emissions = volatilized_ammonium
             layer.annual_volatilized_ammonium_total += volatilized_ammonium
 
     # --- Static methods ---

@@ -55,7 +55,7 @@ def test_denitrify() -> None:
         for index in [0, 2, 3]:
             assert incorp.data.soil_layers[index].nitrate_content == 20
             assert incorp.data.soil_layers[index].nitrous_oxide_emissions == 15
-            assert incorp.data.soil_layers[index].annual_denitrified_nitrogen_total == 15
+            assert incorp.data.soil_layers[index].annual_nitrous_oxide_emissions_total == 15
         assert incorp.data.soil_layers[1].nitrate_content == 35
         assert incorp.data.soil_layers[1].nitrous_oxide_emissions == 0.0
-        assert incorp.data.soil_layers[1].annual_denitrified_nitrogen_total == 0
+        assert incorp.data.soil_layers[1].annual_nitrous_oxide_emissions_total == 0

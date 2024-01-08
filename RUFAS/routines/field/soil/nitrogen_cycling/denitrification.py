@@ -56,7 +56,7 @@ class Denitrification:
                                                                         layer.soil_overall_carbon_fraction * 100)
             layer.nitrate_content -= nitrified_nitrates
             layer.nitrous_oxide_emissions = nitrified_nitrates
-            layer.annual_denitrified_nitrogen_total += nitrified_nitrates
+            layer.annual_nitrous_oxide_emissions_total += nitrified_nitrates
 
     @staticmethod
     def _calculate_denitrification_amount(nitrate_content: float, denitrification_rate_coefficient: float,
