@@ -3175,6 +3175,11 @@
             },
             "cleanings_per_day": {
               "type": "number"
+            },
+            "cleaning_water_recycle_fraction": {
+              "type": "number",
+              "minimum": 0.0,
+              "maximum": 1.0
             }
           }
         }
