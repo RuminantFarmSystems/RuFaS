@@ -3,7 +3,7 @@ from RUFAS.routines.feed_storage.feed_manager import FeedManager, StorageType
 from RUFAS.routines.feed_storage.harvested_crop import HarvestedCrop
 from RUFAS.routines.feed_storage.enums import CropCategory, CropType
 
-from .sample_crop_data import sample_crop_data
+from .sample_crop_data import sample_crop_data, sample_crop_data_no_mass
 
 
 @pytest.fixture
@@ -23,17 +23,17 @@ def harvested_crop() -> HarvestedCrop:
 
 @pytest.fixture
 def alfalfa_crop() -> HarvestedCrop:
-    return HarvestedCrop(CropCategory.ALFALFA, CropType.ALFALFA, **sample_crop_data)
+    return HarvestedCrop(CropCategory.ALFALFA, CropType.ALFALFA, **sample_crop_data_no_mass, fresh_mass=50)
 
 
 @pytest.fixture
 def corn_crop() -> HarvestedCrop:
-    return HarvestedCrop(CropCategory.CORN, CropType.GRAIN, **sample_crop_data)
+    return HarvestedCrop(CropCategory.CORN, CropType.GRAIN, **sample_crop_data_no_mass, fresh_mass=150)
 
 
 @pytest.fixture
 def grass_crop() -> HarvestedCrop:
-    return HarvestedCrop(CropCategory.GRASS, CropType.TALL_FESCUE, **sample_crop_data)
+    return HarvestedCrop(CropCategory.GRASS, CropType.TALL_FESCUE, **sample_crop_data_no_mass, fresh_mass=100)
 
 
 @pytest.fixture
@@ -101,7 +101,7 @@ def test_query_available_feeds_no_parameters(
     assert results[1]["type"] == CropType.GRAIN
     assert results[0]["category"] == CropCategory.ALFALFA
     assert results[1]["category"] == CropCategory.CORN
-    assert sum(result["amount"] for result in results) == 300.0
+    assert sum(result["amount"] for result in results) == 350.0
 
 
 def test_query_available_feeds_specific_crop_types(
@@ -114,7 +114,7 @@ def test_query_available_feeds_specific_crop_types(
     assert len(results) == 1
     assert results[0]["type"] == CropType.GRAIN
     assert results[0]["category"] == CropCategory.CORN
-    assert results[0]["amount"] == 200.0
+    assert results[0]["amount"] == 300.0
 
 
 def test_query_available_feeds_specific_crop_categories(
@@ -129,7 +129,7 @@ def test_query_available_feeds_specific_crop_categories(
     assert len(results) == 1
     assert results[0]["type"] == CropType.GRAIN
     assert results[0]["category"] == CropCategory.CORN
-    assert results[0]["amount"] == 200.0
+    assert results[0]["amount"] == 300.0
 
 
 def test_query_available_feeds_specific_storage_types(
@@ -143,7 +143,7 @@ def test_query_available_feeds_specific_storage_types(
     assert len(results) == 1
     assert results[0]["type"] == CropType.GRAIN
     assert results[0]["category"] == CropCategory.CORN
-    assert results[0]["amount"] == 200.0
+    assert results[0]["amount"] == 300.0
 
 
 def test_query_available_feeds_empty_storage(feed_manager: FeedManager) -> None:
@@ -181,4 +181,4 @@ def test_query_available_feeds_combinations(
     assert len(results) == 1
     assert results[0]["type"] == CropType.GRAIN
     assert results[0]["category"] == CropCategory.CORN
-    assert results[0]["amount"] == 200.0
+    assert results[0]["amount"] == 300.0
