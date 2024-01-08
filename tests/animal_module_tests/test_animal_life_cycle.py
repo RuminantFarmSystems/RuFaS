@@ -1468,11 +1468,6 @@ def test_reset_daily_stats(life_cycle_manager: LifeCycleManager) -> None:
     assert life_cycle_manager.avg_mature_body_weight == approx(0.0)
 
 
-# @fixture
-# def calf(mocker: MockerFixture) -> Calf:
-#     return Calf(mocker.MagicMock())
-
-
 @pytest.mark.parametrize(
     'semen_type, conventional_semen, sexed_semen, birth_rate, female_calf_rate',
     [
