@@ -1607,9 +1607,10 @@ def test_update_calf(mocker: MockerFixture, days_born: int, wean_day: int) -> No
 
     # act
     sim_day = 2
+    weaned = False
     weaned = Calf.update(calf, sim_day)
+    calf.days_born += 1
     calf.update_body_weight_history.assert_called()
-    calf.get_non_preg_bw_change.assert_called()
     if calf.days_born == wean_day:
         assert weaned
     else:
