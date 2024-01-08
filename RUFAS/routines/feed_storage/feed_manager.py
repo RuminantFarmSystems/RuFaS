@@ -126,40 +126,65 @@ class FeedManager:
         """
         pass
 
-    def query_available_feeds_by_crop_type(
-        self, queryable_crops: List[CropType] = None
+    def query_available_feeds(
+        self,
+        query_crop_types: List[CropType] | None = None,
+        query_crop_categories: List[CropCategory] | None = None,
+        query_storage_types: List[StorageType] | None = None,
     ) -> List[QUERY_RESULT_DATA_TYPE]:
         """
         Queries the available amount of feed in storage.
 
         Parameters
         ----------
-        queryable_crops : List[CropType], optional
+        query_crop_types : List[CropType], optional
             The types of crop to query (default is None, which queries all types).
+        query_crop_categories : List[CropCategory], optional
+            The categories of crop to query (default is None, which queries all categories).
+        query_storage_types : List[StorageType], optional
+            The types of storage to query (default is None, which queries all types).
 
         Returns
         -------
         List[QUERY_RESULT_DATA_TYPE]
             The amount of available feed, either as a total or for a specific crop type.
         """
-        query_all = queryable_crops is None
+        query_all_crop_types = query_crop_types is None
+        query_all_crop_categories = query_crop_categories is None
+        query_all_storage_types = query_storage_types is None
         results: List[QUERY_RESULT_DATA_TYPE] = []
 
-        for storage in self.active_storages.values():
+        for storage_type, storage in self.active_storages.items():
+            is_storage_queryable = (
+                query_all_storage_types or storage_type in query_storage_types
+            )
+            if not is_storage_queryable:
+                continue
             for stored_crop in storage.stored:
-                if query_all or stored_crop.type in queryable_crops:
-                    for previous_result in results:
-                        if stored_crop.type == previous_result["type"]:
-                            previous_result["amount"] += stored_crop.fresh_mass
-                            break
-                    else:
-                        results.append(
-                            self._query_result_factory(
-                                stored_crop.category,
-                                stored_crop.type,
-                                stored_crop.fresh_mass,
-                            )
+                is_crop_type_queryable = (
+                    query_all_crop_types or stored_crop.type in query_crop_types
+                )
+                is_crop_category_queryable = (
+                    query_all_crop_categories
+                    or stored_crop.category in query_crop_categories
+                )
+                if not (is_crop_type_queryable and is_crop_category_queryable):
+                    continue
+                for previous_result in results:
+                    if (
+                        stored_crop.type == previous_result["type"]
+                        and stored_crop.category == previous_result["category"]
+                    ):
+                        previous_result["amount"] += stored_crop.fresh_mass
+                        break
+                else:
+                    results.append(
+                        self._query_result_factory(
+                            stored_crop.category,
+                            stored_crop.type,
+                            stored_crop.fresh_mass,
                         )
+                    )
 
         return results
 
