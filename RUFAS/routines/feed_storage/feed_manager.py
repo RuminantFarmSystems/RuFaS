@@ -43,8 +43,8 @@ class FeedManager:
 
     Attributes
     ----------
-    active_storages : List[Storage]
-        List of active storage units in the simulation.
+    Dict[StorageType, Storage]
+        Containts the list of active storage units in the simulation and their mapping from StorageType(Enum).
     """
 
     def __init__(self):
@@ -54,7 +54,7 @@ class FeedManager:
         self,
         harvested_crop: HarvestedCrop,
         storage_type: StorageType,
-    ):
+    ) -> None:
         """
         Receives a harvested crop and assigns it to a storage unit.
 
@@ -89,7 +89,7 @@ class FeedManager:
 
         self.active_storages[storage_type].receive_crop(harvested_crop)
 
-    def process_degradations(self):
+    def process_degradations(self) -> None:
         """
         Processes the degradation of all stored feeds over time.
         """
