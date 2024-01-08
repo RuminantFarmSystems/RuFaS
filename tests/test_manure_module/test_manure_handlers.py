@@ -426,3 +426,48 @@ def test_manure_handler_daily_update(mocker: MockerFixture) -> None:
         total_water_volume_in_milking_parlor * GeneralConstants.LITERS_TO_CUBIC_METERS)
     assert manure_handler_daily_output.tempC == approx(current_day_avg_tempC)
     assert patch_for_get_current_day_avg_tempC.call_count == 4
+
+
+def test_manure_handler_daily_update_zero_animals(mocker: MockerFixture) -> None:
+    """
+    Unit test for daily_update() of class BaseManureHandler in file manure_handler_classes.py
+
+    This test verifies that the daily update returns a default ManureHandlerDailyOutput object
+    if there are no animals in the pen.
+    """
+    mock_manure = mocker.MagicMock(autospec=PenManure)
+    mock_pen = mocker.MagicMock(autospec=ManureManagerPen)
+    mock_pen.num_animals = 0
+    mock_pen.manure = mock_manure
+
+    mock_bedding = mocker.MagicMock(autospec=BaseBedding)
+
+    mock_manure_handler = BaseManureHandler(weather=mocker.MagicMock(),
+                                            time=mocker.MagicMock(),
+                                            manure_handler_config=mocker.MagicMock(auto_spec=ManureHandlerConfig))
+
+    manure_handler_daily_output = mock_manure_handler.daily_update(
+        pen=mock_pen,
+        bedding=mock_bedding,
+        sim_day=-1
+    )
+
+    assert manure_handler_daily_output.simulation_day == -1
+    assert manure_handler_daily_output.pen_id == -1
+    assert manure_handler_daily_output.manure_urea == approx(0.0)
+    assert manure_handler_daily_output.liquid_manure_total_ammoniacal_nitrogen == (approx(0.0))
+    assert manure_handler_daily_output.liquid_manure_nitrogen == approx(0.0)
+    assert manure_handler_daily_output.liquid_manure_total_solids == approx(0.0)
+    assert manure_handler_daily_output.manure_degradable_volatile_solids == approx(0.0)
+    assert manure_handler_daily_output.manure_non_degradable_volatile_solids == approx(0.0)
+    assert manure_handler_daily_output.liquid_manure_phosphorus == approx(0.0)
+    assert manure_handler_daily_output.liquid_manure_potassium == approx(0.0)
+    assert manure_handler_daily_output.housing_methane == approx(0.0)
+    assert manure_handler_daily_output.housing_carbon_dioxide == approx(0.0)
+    assert manure_handler_daily_output.housing_ammonia == approx(0.0)
+    assert manure_handler_daily_output.manure_volume == approx(0.0)
+    assert manure_handler_daily_output.cleaning_water_volume == approx(0.0)
+    assert manure_handler_daily_output.total_bedding_volume == approx(0.0)
+    assert manure_handler_daily_output.total_bedding_mass == approx(0.0)
+    assert manure_handler_daily_output.total_water_volume_in_milking_parlor == approx(0.0)
+    assert manure_handler_daily_output.tempC == approx(0.0)
