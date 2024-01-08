@@ -75,7 +75,7 @@ class NitrificationVolatilization:
             layer.ammonium_content -= total_ammonium_lost
             layer.nitrate_content += nitrified_ammonium
             layer.ammonia_emissions = volatilized_ammonium
-            layer.annual_volatilized_ammonium_total += volatilized_ammonium
+            layer.annual_ammonia_emissions_total += volatilized_ammonium
 
     # --- Static methods ---
     @staticmethod
