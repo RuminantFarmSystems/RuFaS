@@ -1,24 +1,27 @@
 import pytest
 from typing import List, Dict
 
+from RUFAS.routines.field.crop.harvest_operations import HarvestOperation
 from RUFAS.routines.field.manager.crop_schedule import CropSchedule
 from RUFAS.routines.field.manager.events import PlantingEvent, HarvestEvent
 
 
 @pytest.mark.parametrize("name,crop_ref,plant_years,plant_days,harvest_years,harvest_days,harvest_ops,heat_sched,"
                          "pat_skip,pat_repeat,expected", [
-                             ("test_1", "corn", [1990, 1991], [120], [1990, 1991], [255, 255], ["default", "default"],
-                              False, 2, 3, {"plant_years": [1990, 1991], "plant_days": [120, 120],
-                                            "harvest_years": [1990, 1991], "harvest_days": [255, 255],
-                                            "harvest_ops": ["default", "default"]}),
+                             ("test_1", "corn", [1990, 1991], [120], [1990, 1991], [255, 255],
+                              ["harvest_kill", "harvest_kill"], False, 2, 3,
+                              {"plant_years": [1990, 1991], "plant_days": [120, 120], "harvest_years": [1990, 1991],
+                               "harvest_days": [255, 255],
+                               "harvest_ops": [HarvestOperation.HARVEST_KILL, HarvestOperation.HARVEST_KILL]}),
                              ("test_2", "beans", [1990, 1991, 1992], [120, 121, 121], [1990, 1991, 1992],
-                              [255, 255, 260], ["no_kill", "no_kill", "default"], True, 2, 3,
+                              [255, 255, 260], ["harvest_only", "harvest_only", "harvest_kill"], True, 2, 3,
                               {"plant_years": [1990, 1991, 1992], "plant_days": [120, 121, 121],
                                "harvest_years": [1990, 1991, 1992], "harvest_days": [255, 255, 260],
-                               "harvest_ops": ["no_kill", "no_kill", "default"]}),
-                             ("test_3", "greens", [1999], [130], [2000], [220], ["default"], False, 0, 10,
+                               "harvest_ops": [HarvestOperation.HARVEST_ONLY, HarvestOperation.HARVEST_ONLY,
+                                               HarvestOperation.HARVEST_KILL]}),
+                             ("test_3", "greens", [1999], [130], [2000], [220], ["harvest_kill"], False, 0, 10,
                               {"plant_years": [1999], "plant_days": [130], "harvest_years": [2000],
-                               "harvest_days": [220], "harvest_ops": ["default"]})
+                               "harvest_days": [220], "harvest_ops": [HarvestOperation.HARVEST_KILL]})
                          ])
 def test_crop_schedule_init(name: str, crop_ref: str, plant_years: List[int], plant_days: List[int],
                             harvest_years: List[int], harvest_days: List[int], harvest_ops: List[str],
@@ -49,26 +52,24 @@ def test_crop_schedule_init(name: str, crop_ref: str, plant_years: List[int], pl
 def test_validate_planting_parameters(name: str, years: List[int], days: List[int], expected: str) -> None:
     """Tests that the errors are raised properly when crop planting parameters are invalid."""
     with pytest.raises(ValueError) as e:
-        test = CropSchedule(name, "test_crop", years, days, [2000], [240], ["default"], False, 1, 1)
+        test = CropSchedule(name, "test_crop", years, days, [2000], [240], ["harvest_kill"], False, 1, 1)
         test._validate_planting_parameters()
     assert str(e.value) == expected
 
 
 @pytest.mark.parametrize("name,years,days,operations,expected", [
-    ("test_1", [1996, 1993], [200], ["default"], "'test_1': expected all harvest years to be > 0 and in non-descending "
-                                                 "order, received '[1996, 1993]'."),
-    ("test_2", [1999, 2000], [200, 0], ["default"], "'test_2': expected all harvest days to be in range [1, 366], "
-                                                    "received '[200, 0]'."),
-    ("test_3", [1998, 1999, 2000], [200, 200], ["no_kill", "default"], "'test_3': expected number of values for harvest"
-                                                                       " years, days, and operations to be equal, "
-                                                                       "received '[1998, 1999, 2000]' years, "
-                                                                       "'[200, 200]' days, and '['no_kill', "
-                                                                       "'default']' operations."),
-    ("test_4", [1998, 1999, 1999], [200, 200, 240], ["no_kill", "default", "no_kill"], "'test_4': expected the final "
-                                                                                       "harvest operation to be the "
-                                                                                       "only one that kills the crop, "
-                                                                                       "received '['no_kill', "
-                                                                                       "'default', 'no_kill']'.")
+    ("test_1", [1996, 1993], [200], ["harvest_kill"],
+     "'test_1': expected all harvest years to be > 0 and in non-descending order, received '[1996, 1993]'."),
+    ("test_2", [1999, 2000], [200, 0], ["harvest_kill"],
+     "'test_2': expected all harvest days to be in range [1, 366], received '[200, 0]'."),
+    ("test_3", [1998, 1999, 2000], [200, 200], ["harvest_only", "harvest_kill"],
+     "'test_3': expected number of values for harvest years, days, and operations to be equal, received "
+     "'[1998, 1999, 2000]' years, '[200, 200]' days, and '[<HarvestOperation.HARVEST_ONLY: 'harvest_only'>, "
+     "<HarvestOperation.HARVEST_KILL: 'harvest_kill'>]' operations."),
+    ("test_4", [1998, 1999, 1999], [200, 200, 240], ["harvest_only", "harvest_kill", "harvest_only"],
+     "'test_4': expected the final harvest operation to be the only one that kills the crop, received "
+     "'[<HarvestOperation.HARVEST_ONLY: 'harvest_only'>, <HarvestOperation.HARVEST_KILL: 'harvest_kill'>, "
+     "<HarvestOperation.HARVEST_ONLY: 'harvest_only'>]'.")
 ])
 def test_validate_harvest_parameters(name: str, years: List[int], days: List[int], operations: List[str],
                                      expected: str) -> None:
@@ -99,26 +100,32 @@ def test_validate_harvest_parameters(name: str, years: List[int], days: List[int
 def test_generate_planting_events(years: List[int], days: List[int], heat_scheduled: bool, skip: int,
                                   repeat: int, expected: List[PlantingEvent]) -> None:
     """Tests that planting events are correctly generated by CropSchedule objects."""
-    crop_sched = CropSchedule("test_name", "test_crop", years, days, [1], [240], ["default"], heat_scheduled, skip,
+    crop_sched = CropSchedule("test_name", "test_crop", years, days, [1], [240], ["harvest_kill"], heat_scheduled, skip,
                               repeat)
     actual = crop_sched.generate_planting_events()
     assert actual == expected
 
 
 @pytest.mark.parametrize("years,days,harvest_ops,heat_scheduled,skip,repeat,expected", [
-    ([1, 2, 6], [245, 245, 240], ["no_kill", "no_kill", "default"], False, 1, 1,
-     [HarvestEvent("test", 1, 245, "no_kill"), HarvestEvent("test", 2, 245, "no_kill"),
-      HarvestEvent("test", 6, 240, "default"), HarvestEvent("test", 8, 245, "no_kill"),
-      HarvestEvent("test", 9, 245, "no_kill"), HarvestEvent("test", 13, 240, "default")]),
-    ([1, 1], [200, 260], ["no_kill", "default"], False, 2, 2, [HarvestEvent("test", 1, 200, "no_kill"),
-                                                               HarvestEvent("test", 1, 260, "default"),
-                                                               HarvestEvent("test", 4, 200, "no_kill"),
-                                                               HarvestEvent("test", 4, 260, "default"),
-                                                               HarvestEvent("test", 7, 200, "no_kill"),
-                                                               HarvestEvent("test", 7, 260, "default")]),
-    ([1, 2, 3], [240, 240, 240], ["no_kill", "no_kill", "default"], True, 1, 2,
-     [HarvestEvent("test", 3, 240, "default"), HarvestEvent("test", 7, 240, "default"),
-      HarvestEvent("test", 11, 240, "default")])
+    ([1, 2, 6], [245, 245, 240], ["harvest_only", "harvest_only", "harvest_kill"], False, 1, 1,
+     [HarvestEvent("test", 1, 245, HarvestOperation.HARVEST_ONLY),
+      HarvestEvent("test", 2, 245, HarvestOperation.HARVEST_ONLY),
+      HarvestEvent("test", 6, 240, HarvestOperation.HARVEST_KILL),
+      HarvestEvent("test", 8, 245, HarvestOperation.HARVEST_ONLY),
+      HarvestEvent("test", 9, 245, HarvestOperation.HARVEST_ONLY),
+      HarvestEvent("test", 13, 240, HarvestOperation.HARVEST_KILL)]),
+    ([1, 1], [200, 260], ["harvest_only", "harvest_kill"], False, 2, 2,
+     [HarvestEvent("test", 1, 200, HarvestOperation.HARVEST_ONLY),
+      HarvestEvent("test", 1, 260, HarvestOperation.HARVEST_KILL),
+      HarvestEvent("test", 4, 200, HarvestOperation.HARVEST_ONLY),
+      HarvestEvent("test", 4, 260, HarvestOperation.HARVEST_KILL),
+      HarvestEvent("test", 7, 200, HarvestOperation.HARVEST_ONLY),
+      HarvestEvent("test", 7, 260, HarvestOperation.HARVEST_KILL)]),
+    ([1, 2, 3], [240, 240, 240], ["harvest_only", "harvest_only", "harvest_kill"], True, 1, 2,
+     [HarvestEvent("test", 3, 240, HarvestOperation.HARVEST_KILL),
+      HarvestEvent("test", 7, 240, HarvestOperation.HARVEST_KILL),
+      HarvestEvent("test", 11, 240, HarvestOperation.HARVEST_KILL),
+      ])
 ])
 def test_generate_harvest_events(years: List[int], days: List[int], harvest_ops: List[str], heat_scheduled: bool,
                                  skip: int, repeat: int, expected: List[HarvestEvent]) -> None:

@@ -143,8 +143,8 @@ class GraphGenerator:
         try:
             prepared_data, log_pool = self._prepare_plot_data(filtered_pool, graph_details)
 
-            error_found = any("error" in log for log in log_pool)
-            if error_found:
+            found_errors = any("error" in log for log in log_pool)
+            if found_errors:
                 return log_pool
 
             fig, _ = plt.subplots()
@@ -210,7 +210,9 @@ class GraphGenerator:
                         log_pool.append({"log": f"Successfully added {title} data to prepared_pool",
                                          "message": f"Data for {selected_variable} added to prepared_pool.",
                                          "info_map": info_map})
-                if all(selected_variable not in data_dict for selected_variable in selected_variables):
+                data_dict_has_zero_selected_vars = all(selected_variable not in data_dict for
+                                                       selected_variable in selected_variables)
+                if data_dict_has_zero_selected_vars:
                     log_pool.append({"error": f"Can't plot {title} data set",
                                      "message": "No filter-file variables found in data provided.",
                                      "info_map": info_map})
@@ -251,7 +253,8 @@ class GraphGenerator:
         plot_function = MATPLOTLIB_PLOT_FUNCTIONS[graph_type]
         if graph_type in TUPLE_BASED_FUNCTIONS:
             values_tuple = tuple(data[variable] for variable in selected_variables)
-            plot_function(list(range(len(values_tuple[0]))), values_tuple)
+            indices_list = list(range(len(values_tuple[0])))
+            plot_function(indices_list, values_tuple)
         else:
             for value in data.values():
                 plot_function(value)
