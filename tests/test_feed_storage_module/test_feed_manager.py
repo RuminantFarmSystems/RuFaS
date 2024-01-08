@@ -131,3 +131,17 @@ def test_query_available_feeds_specific_crop_categories(
     assert results[0]["category"] == CropCategory.CORN
     assert results[0]["amount"] == 200.0
 
+
+def test_query_available_feeds_specific_storage_types(
+    feed_manager: FeedManager, alfalfa_crop: HarvestedCrop, corn_crop: HarvestedCrop
+) -> None:
+    feed_manager.receive_crop(alfalfa_crop, StorageType.PROTECTED_INDOORS)
+    feed_manager.receive_crop(corn_crop, StorageType.DRY)
+    feed_manager.receive_crop(corn_crop, StorageType.DRY)
+    feed_manager.receive_crop(corn_crop, StorageType.BUNKER)
+    results = feed_manager.query_available_feeds(query_storage_types=[StorageType.DRY])
+    assert len(results) == 1
+    assert results[0]["type"] == CropType.GRAIN
+    assert results[0]["category"] == CropCategory.CORN
+    assert results[0]["amount"] == 200.0
+
