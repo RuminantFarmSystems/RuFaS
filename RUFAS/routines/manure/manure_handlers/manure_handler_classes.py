@@ -33,24 +33,33 @@ class ManureHandlerType(DefaultEnum):
 class BaseManureHandler:
     """Base class for all manure handlers.
 
-    Attributes:
-        weather: A Weather object.
-        time: A Time object.
-        config: A ManureHandlerConfig object that specifies default data specific to the choice of
-            manure handler.
-        milking_parlor: A MilkingParlor object that handles relevant calculations
-            related to the time lactating cows spent there.
+    Attributes
+    ----------
+    weather : Weather
+        A Weather object.
+    time : Time
+        A Time object.
+    config : ManureHandlerConfig
+        A ManureHandlerConfig object that specifies default data specific to the choice of
+        manure handler.
+    milking_parlor : MilkingParlor
+        A MilkingParlor object that handles relevant calculations
+        related to the time lactating cows spent there.
 
     """
 
     def __init__(self, weather: Weather, time: Time, manure_handler_config: ManureHandlerConfig):
         """Initialize a BaseManureHandler object.
 
-        Args:
-            weather: A Weather object.
-            time: A Time object.
-            manure_handler_config: A ManureHandlerInitData object that specifies default data
-                specific to the choice of manure handler.
+        Parameters
+        ----------
+        weather : Weather
+            A Weather object.
+        time : Time
+            A Time object.
+        manure_handler_config : ManureHandlerConfig
+            A ManureHandlerInitData object that specifies default data
+            specific to the choice of manure handler.
         """
 
         self.weather = weather
@@ -61,8 +70,9 @@ class BaseManureHandler:
     def _get_current_day_average_temperature_in_celsius(self) -> float:
         """Gets the average temperature of the day, in Celsius.
 
-        Returns:
-            The average temperature of the day, in Celsius.
+        Returns
+        -------
+        The average temperature of the day, in Celsius.
         """
         current_conditions = self.weather.get_current_day_conditions(self.time)
         avg_temp = current_conditions.mean_air_temperature
@@ -85,6 +95,7 @@ class BaseManureHandler:
             A BaseBedding object that specifies the type of bedding use or None if no bedding is used.
         sim_day : int
             The current simulation day.
+
         Returns
         -------
         ManureHandlerDailyOutput
@@ -157,14 +168,18 @@ class BaseManureHandler:
     def calc_cleaning_water_volume_in_main_barn(self, num_animals: int) -> float:
         """Calculate the volume of cleaning water needed for all the animals in pen.
 
-        Args:
-            num_animals: The number of animals in the pen.
+        Attributes
+        ----------
+        num_animals : int
+            The number of animals in the pen.
 
-        Returns:
-            Volume of cleaning water needed for the given pen, L.
+        Returns
+        -------
+        Volume of cleaning water needed for the given pen, L.
 
         """
-        cleaning_water_volume = num_animals * self.config.cleaning_water_use_rate
+        cleaning_water_volume = (num_animals * self.config.cleaning_water_use_rate *
+                                 (1-self.cleaning_water_recycle_fraction))
 
         return cleaning_water_volume
 
@@ -239,12 +254,15 @@ class ManureHandlerConfig:
         Number of cleanings per day.
     daily_tillage_frequency : int
         Number of times per day that compost bedding is tilled.
+    cleaning_water_recycle_fraction : float
+        Fraction of water that is not recycled.
     """
 
     cleaning_water_use_rate: float = 0.0
     minutes_per_cleaning: int = 8
     cleanings_per_day: int = 2
     daily_tillage_frequency: int = 0
+    cleaning_water_recycle_fraction: float = 0.0
 
 
 class DefaultManureHandlerConfigFactory:
@@ -252,12 +270,15 @@ class DefaultManureHandlerConfigFactory:
 
     FLUSH_SYSTEM_CONFIG = ManureHandlerConfig(
         cleaning_water_use_rate=757.0,
+        cleaning_water_recycle_fraction=0.80,
     )
     MANUAL_SCRAPING_CONFIG = ManureHandlerConfig(
         cleaning_water_use_rate=10.0,
+        cleaning_water_recycle_fraction=0.10,
     )
     ALLEY_SCRAPER_CONFIG = ManureHandlerConfig(
         cleaning_water_use_rate=10.0,
+        cleaning_water_recycle_fraction=0.10,
     )
     TILLAGE_CONFIG = ManureHandlerConfig(
         daily_tillage_frequency=1,
@@ -272,11 +293,14 @@ class DefaultManureHandlerConfigFactory:
     ) -> ManureHandlerConfig:
         """Return a default manure handler configuration for the given manure handler type.
 
-        Args:
-            manure_handler_type: The type of manure handler.
+        Parameters
+        ----------
+        manure_handler_type : ManureHandlerType
+            The type of manure handler.
 
-        Returns:
-            A default ManureHandlerConfig object for the given manure handler type.
+        Returns
+        -------
+        A default ManureHandlerConfig object for the given manure handler type.
         """
 
         manure_handler_config_by_type = {
@@ -305,15 +329,20 @@ class ManureHandlerFactory:
     ) -> BaseManureHandler:
         """Returns an instance of a specific subtype of BaseManureHandler.
 
-        Args:
-            manure_handler_type_name: A string that specifies the type of manure handler.
-            weather: A Weather object.
-            time: A Time object.
-            custom_manure_handler_config: A ManureHandlerConfig object that contains
-                custom initialization data.
+        Parameters
+        ----------
+        manure_handler_type_name : str
+            A string that specifies the type of manure handler.
+        weather : Weather
+            A Weather object.
+        time : Time
+            A Time object.
+        custom_manure_handler_config : ManureHandlerConfig
+            A ManureHandlerConfig object that contains custom initialization data.
 
-        Returns:
-            A new instance of a BaseManureHandler subtype.
+        Returns
+        -------
+        A new instance of a BaseManureHandler subtype.
 
         """
         manure_handler_class_by_type: Dict[
