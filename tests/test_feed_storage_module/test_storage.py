@@ -33,7 +33,7 @@ def harvested_crop() -> HarvestedCrop:
     return HarvestedCrop(category=category, type=crop_type, **sample_crop_data)
 
 
-def test_stored_mass(storage: Storage, harvested_crop: HarvestedCrop):
+def test_stored_mass(storage: Storage, harvested_crop: HarvestedCrop) -> None:
     storage.acceptable_crops = [CropCategory.SMALL_GRAIN]
     assert storage.stored_mass == 0.0  # Initially empty
     storage.receive_crop(harvested_crop)
@@ -41,7 +41,9 @@ def test_stored_mass(storage: Storage, harvested_crop: HarvestedCrop):
     assert storage.stored_mass == 200.0  # After adding a crop
 
 
-def test_successful_receive_crop(storage: Storage, harvested_crop: HarvestedCrop):
+def test_successful_receive_crop(
+    storage: Storage, harvested_crop: HarvestedCrop
+) -> None:
     storage.acceptable_crops = [CropCategory.SMALL_GRAIN]
     storage.receive_crop(harvested_crop)
     assert len(storage.stored) == 1
@@ -50,7 +52,9 @@ def test_successful_receive_crop(storage: Storage, harvested_crop: HarvestedCrop
     assert storage.stored[0].storage_time.year == harvested_crop.storage_time.year
 
 
-def test_receive_crop_exceeds_capacity(storage: Storage, harvested_crop: HarvestedCrop):
+def test_receive_crop_exceeds_capacity(
+    storage: Storage, harvested_crop: HarvestedCrop
+) -> None:
     storage.acceptable_crops = [CropCategory.SMALL_GRAIN]
     storage.capacity = 50.0  # Set a smaller capacity
     with pytest.raises(Exception) as excinfo:
@@ -58,7 +62,7 @@ def test_receive_crop_exceeds_capacity(storage: Storage, harvested_crop: Harvest
     assert "exceeds the storage capacity" in str(excinfo.value)
 
 
-def test_receive_unacceptable_crop(storage: Storage):
+def test_receive_unacceptable_crop(storage: Storage) -> None:
     storage.acceptable_crops = [CropCategory.ALFALFA]
     incompatible_crop = HarvestedCrop(
         category=CropCategory.SMALL_GRAIN, type=CropType.WHEAT, **sample_crop_data
@@ -69,7 +73,7 @@ def test_receive_unacceptable_crop(storage: Storage):
 
 def test_receive_crop_without_acceptable_crops(
     storage: Storage, harvested_crop: HarvestedCrop
-):
+) -> None:
     storage.acceptable_crops = []
 
     with pytest.raises(NotImplementedError) as excinfo:
@@ -77,28 +81,28 @@ def test_receive_crop_without_acceptable_crops(
     assert "Storage.acceptable_crops is not populated" in str(excinfo.value)
 
 
-def test_process_degradations(storage: Storage):
+def test_process_degradations(storage: Storage) -> None:
     """
     Test the process_degradations method of the Storage class.
     """
     pass
 
 
-def test_give_feed(storage: Storage):
+def test_give_feed(storage: Storage) -> None:
     """
     Test the give_feed method of the Storage class.
     """
     pass
 
 
-def test_calculate_dry_matter_loss_to_gas(storage: Storage):
+def test_calculate_dry_matter_loss_to_gas(storage: Storage) -> None:
     """
     Test the calculate_dry_matter_loss_to_gas method of the Storage class.
     """
     pass
 
 
-def test_calculate_dry_matter_loss_to_effluent(storage: Storage):
+def test_calculate_dry_matter_loss_to_effluent(storage: Storage) -> None:
     """
     Test the calculate_dry_matter_loss_to_effluent method of the Storage class.
     """

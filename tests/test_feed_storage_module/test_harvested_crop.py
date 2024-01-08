@@ -25,7 +25,9 @@ from .sample_crop_data import sample_crop_data
         (CropCategory.GRASS, CropType.MEADOW_FESCUE),
     ],
 )
-def test_valid_category_type_combinations(category: CropCategory, crop_type: CropType):
+def test_valid_category_type_combinations(
+    category: CropCategory, crop_type: CropType
+) -> None:
     try:
         HarvestedCrop(category=category, type=crop_type, **sample_crop_data)
     except ValueError:
@@ -43,12 +45,12 @@ def test_valid_category_type_combinations(category: CropCategory, crop_type: Cro
 )
 def test_invalid_category_type_combinations(
     category: CropCategory, crop_type: CropType
-):
+) -> None:
     with pytest.raises(ValueError):
         HarvestedCrop(category=category, type=crop_type, **sample_crop_data)
 
 
-def test_attributes():
+def test_attributes() -> None:
     crop = HarvestedCrop(
         category=CropCategory.SMALL_GRAIN, type=CropType.WHEAT, **sample_crop_data
     )

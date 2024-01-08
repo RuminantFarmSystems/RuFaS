@@ -22,11 +22,13 @@ def harvested_crop() -> HarvestedCrop:
 
 
 @pytest.fixture
-def feed_manager():
+def feed_manager() -> FeedManager:
     return FeedManager()
 
 
-def test_receive_crop_success(feed_manager: FeedManager, harvested_crop: HarvestedCrop):
+def test_receive_crop_success(
+    feed_manager: FeedManager, harvested_crop: HarvestedCrop
+) -> None:
     try:
         feed_manager.receive_crop(
             harvested_crop=harvested_crop,
@@ -38,7 +40,7 @@ def test_receive_crop_success(feed_manager: FeedManager, harvested_crop: Harvest
 
 def test_receive_crop_multiple(
     feed_manager: FeedManager, harvested_crop: HarvestedCrop
-):
+) -> None:
     try:
         feed_manager.receive_crop(
             harvested_crop=harvested_crop,
@@ -60,7 +62,9 @@ def test_receive_crop_multiple(
         pytest.fail("Unexpected ValueError raised")
 
 
-def test_receive_crop_error(feed_manager: FeedManager, harvested_crop: HarvestedCrop):
+def test_receive_crop_error(
+    feed_manager: FeedManager, harvested_crop: HarvestedCrop
+) -> None:
     incompatible_storage = StorageType.PROTECTED_WRAPPED
     with pytest.raises(ValueError) as excinfo:
         feed_manager.receive_crop(
