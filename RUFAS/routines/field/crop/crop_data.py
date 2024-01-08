@@ -85,7 +85,7 @@ class CropData:
     """the fraction of potential heat units that denotes the optimal growth stage for harvest"""
     is_harvest_day: bool = False
     """Status indicating if today is the day on which harvest operations should occur for this plant"""
-    next_harvest_operation: HarvestOperation = HarvestOperation.HARVEST
+    next_harvest_operation: HarvestOperation = HarvestOperation.HARVEST_KILL
     """the specific harvest operation to be executed next for this plant"""
 
     # SWAT Table A-3
