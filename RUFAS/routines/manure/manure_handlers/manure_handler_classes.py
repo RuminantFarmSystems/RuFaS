@@ -179,7 +179,7 @@ class BaseManureHandler:
 
         """
         cleaning_water_volume = (num_animals * self.config.cleaning_water_use_rate *
-                                 (1-self.cleaning_water_recycle_fraction))
+                                 (1-self.config.cleaning_water_recycle_fraction))
 
         return cleaning_water_volume
 

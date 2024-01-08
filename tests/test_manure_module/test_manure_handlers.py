@@ -116,13 +116,15 @@ def test_manure_handler_config() -> None:
     minutes_per_cleaning = 10
     cleanings_per_day = 3
     daily_tillage_frequency = 1
+    cleaning_water_recycle_fraction = 0.1
 
     # Act
     manure_handler_config = ManureHandlerConfig(
         cleaning_water_use_rate=cleaning_water_use_rate,
         minutes_per_cleaning=minutes_per_cleaning,
         cleanings_per_day=cleanings_per_day,
-        daily_tillage_frequency=daily_tillage_frequency
+        daily_tillage_frequency=daily_tillage_frequency,
+        cleaning_water_recycle_fraction=cleaning_water_recycle_fraction
     )
 
     # Assert
@@ -130,6 +132,7 @@ def test_manure_handler_config() -> None:
     assert manure_handler_config.minutes_per_cleaning == minutes_per_cleaning
     assert manure_handler_config.cleanings_per_day == cleanings_per_day
     assert manure_handler_config.daily_tillage_frequency == daily_tillage_frequency
+    assert manure_handler_config.cleaning_water_recycle_fraction == approx(cleaning_water_recycle_fraction)
 
 
 # Test DefaultManureHandlerConfigFactory
@@ -264,9 +267,12 @@ def test_calc_cleaning_water_volume_in_main_barn(mocker: MockerFixture) -> None:
     # Arrange
     num_animals = 100
     cleaning_water_use_rate = 20.0
-    expected_cleaning_water_volume_in_main_barn = num_animals * cleaning_water_use_rate
+    cleaning_water_recycle_fraction = 0.75
+    expected_cleaning_water_volume_in_main_barn = (num_animals * cleaning_water_use_rate *
+                                                   (1-cleaning_water_recycle_fraction))
     mock_manure_handler_config = mocker.MagicMock(auto_spec=ManureHandlerConfig)
     mock_manure_handler_config.cleaning_water_use_rate = cleaning_water_use_rate
+    mock_manure_handler_config.cleaning_water_recycle_fraction = cleaning_water_recycle_fraction
     mock_manure_handler = BaseManureHandler(weather=mocker.MagicMock(),
                                             time=mocker.MagicMock(),
                                             manure_handler_config=mock_manure_handler_config)
