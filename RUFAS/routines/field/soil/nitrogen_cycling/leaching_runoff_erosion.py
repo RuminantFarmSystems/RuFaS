@@ -11,8 +11,8 @@ This module handles the movement and loss of nitrogen due to erosion and leachin
 on SWAT sections 4:2.1, 2
 """
 
-NITRATE_RUNOFF_COEFFICIENT = 1.0
-AMMONIUM_RUNOFF_COEFFICIENT = 10
+NITRATE_RUNOFF_COEFFICIENT = 0.01
+AMMONIUM_RUNOFF_COEFFICIENT = 0.01
 NITRATE_PERCOLATION_COEFFICIENT = 10e-8
 AMMONIUM_PERCOLATION_COEFFICIENT = 10e-6
 ACTIVE_ORGANIC_NITROGEN_PERCOLATION_COEFFICIENT = 10e-10
@@ -477,7 +477,7 @@ class LeachingRunoffErosion:
         -------
         float
             The amount of nitrogen that leaches out of the current pool and into the next lowest layer on the current
-            day (mg / kg).
+            day (kg / ha).
 
         """
         water_amount_in_liters = \
