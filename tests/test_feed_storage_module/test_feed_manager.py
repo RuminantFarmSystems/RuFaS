@@ -88,3 +88,18 @@ def test_receive_crop_error(
         )
     assert "is not compatible with storage type" in str(excinfo.value)
 
+
+def test_query_available_feeds_no_parameters(
+    feed_manager: FeedManager, alfalfa_crop: HarvestedCrop, corn_crop: HarvestedCrop
+) -> None:
+    feed_manager.receive_crop(alfalfa_crop, StorageType.PROTECTED_INDOORS)
+    feed_manager.receive_crop(corn_crop, StorageType.DRY)
+    feed_manager.receive_crop(corn_crop, StorageType.DRY)
+    results = feed_manager.query_available_feeds()
+    assert len(results) == 2
+    assert results[0]["type"] == CropType.ALFALFA
+    assert results[1]["type"] == CropType.GRAIN
+    assert results[0]["category"] == CropCategory.ALFALFA
+    assert results[1]["category"] == CropCategory.CORN
+    assert sum(result["amount"] for result in results) == 300.0
+
