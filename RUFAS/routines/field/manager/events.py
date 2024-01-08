@@ -8,6 +8,8 @@ method will be used when harvesting a crop, and a `crop_reference` attribute, wh
 presently growing in a field will be harvested.
 """
 
+from RUFAS.routines.field.crop.harvest_operations import HarvestOperation
+
 
 from RUFAS.routines.manure.manure_treatments.manure_types import ManureType
 
@@ -93,7 +95,13 @@ class PlantingEvent(Event):
 
 
 class HarvestEvent(Event):
-    def __init__(self, crop_reference: str, year: int = 1, day: int = 240, operation: str = "default"):
+    def __init__(
+        self,
+        crop_reference: str,
+        year: int = 1,
+        day: int = 240,
+        operation: HarvestOperation = HarvestOperation.HARVEST_KILL
+    ):
         """Creates a new HarvestEvent instance, which is a child of the Event class.
 
         A HarvestEvent object determines when (and how) a harvest operation should occur for a crop.
@@ -102,8 +110,8 @@ class HarvestEvent(Event):
         ----------
         crop_reference : str
             Name of the crop to be harvested.
-        operation : str, default="default"
-            the name of an accepted harvest operation (see HarvestOperation)
+        operation : HarvestOperation, default=HarvestOperation.HARVEST_KILL
+            A harvest operation from the Harvest Operations enum.
 
         """
         super().__init__(year=year, day=day)
