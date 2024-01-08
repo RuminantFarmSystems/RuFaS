@@ -157,15 +157,15 @@ def test_do_daily_nitrification_and_volatilization() -> None:
 
         assert incorp.data.soil_layers[0].ammonium_content == 18.5
         assert incorp.data.soil_layers[0].nitrate_content == 28.25
-        assert incorp.data.soil_layers[0].volatilized_ammonium_emissions == 3.25
-        assert incorp.data.soil_layers[0].annual_volatilized_ammonium_total == 3.25
+        assert incorp.data.soil_layers[0].ammonia_emissions == 3.25
+        assert incorp.data.soil_layers[0].annual_ammonia_emissions_total == 3.25
 
         assert incorp.data.soil_layers[1].ammonium_content == 25
         assert incorp.data.soil_layers[1].nitrate_content == 25
-        assert incorp.data.soil_layers[1].annual_volatilized_ammonium_total == 0
+        assert incorp.data.soil_layers[1].annual_ammonia_emissions_total == 0
 
         for layer in incorp.data.soil_layers[2:]:
             assert layer.ammonium_content == 18.5
             assert layer.nitrate_content == 28.25
-            assert layer.volatilized_ammonium_emissions == 3.25
-            assert layer.annual_volatilized_ammonium_total == 3.25
+            assert layer.ammonia_emissions == 3.25
+            assert layer.annual_ammonia_emissions_total == 3.25
