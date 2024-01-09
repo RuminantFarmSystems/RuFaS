@@ -1,5 +1,6 @@
 from dataclasses import dataclass
 
+from RUFAS.routines.feed_storage.enums import CropCategory, CropType
 from RUFAS.routines.field.crop.crop_data import (
     CropData,
     PlantCategory
@@ -15,6 +16,8 @@ class Corn(CropData):
     scientific_name: str = "Zea mays"
     plant_category: PlantCategory = PlantCategory("warm_annual")
     is_nitrogen_fixer: bool = False
+
+    crop_category: CropCategory = CropCategory.CORN
 
     minimum_temperature: float = 8.0
     optimal_temperature: float = 25.0
@@ -62,6 +65,8 @@ class CornGrain(Corn):
     species: str = "corn_grain"
     name: str = "corn grain"
 
+    crop_type: CropType = CropType.GRAIN
+
     optimal_harvest_index: float = 0.60
     min_harvest_index: float = 0.40
     dry_matter_percentage: float = 86.0907
@@ -93,6 +98,8 @@ class CornSilage(Corn):
     """
     species: str = "corn_silage"
     name: str = "corn silage"
+
+    crop_type: CropType = CropType.SILAGE
 
     optimal_harvest_index: float = 0.90
     min_harvest_index: float = 0.68

@@ -2,6 +2,7 @@ from enum import Enum
 from dataclasses import dataclass
 from typing import Optional, List, Any
 
+from RUFAS.routines.feed_storage.enums import CropCategory, CropType
 from RUFAS.routines.field.crop.harvest_operations import HarvestOperation
 
 
@@ -68,6 +69,11 @@ class CropData:
     """the proportion of the field that this crop occupies. Should be 1 when this is the only crop in the field"""
     is_alive: bool = True
     """is the crop currently alive in the field?"""
+
+    crop_category: CropCategory = CropCategory.SMALL_GRAIN
+    """Broad category into which this crop type falls."""
+    crop_type: CropType = CropType.GRAIN
+    """Sub type of this crop."""
 
     # Management variables
     planting_year: int = 0
