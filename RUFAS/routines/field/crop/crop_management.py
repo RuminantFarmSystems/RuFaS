@@ -75,7 +75,9 @@ class CropManagement:
             annual plants.
         """
         self.data.is_alive = False
-        self.data.yield_residue += self.data.biomass
+        self.data.yield_residue = self.data.biomass * self.data.dry_matter_percentage / 100
+        self.data.residue_nitrogen = self.data.yield_residue * self.data.yield_nitrogen_fraction
+        self.data.residue_phosphorus = self.data.yield_residue * self.data.yield_phosphorus_fraction
 
     def determine_harvest_index(self):
         """sets the crop's harvest index
@@ -237,6 +239,7 @@ class CropManagement:
                     "species": f"'{self.data.species}'"}
         value = {"crop": self.data.name, "wet_yield": wet_yield_collected, "dry_yield": dry_yield_collected,
                  "nitrogen": nitrogen_harvested, "phosphorus": phosphorus_harvested,
+                 "yield_residue": self.data.yield_residue,
                  "planting_date": {"year": self.data.planting_year, "day": self.data.planting_day},
                  "harvest_date": {"year": year, "day": day}}
         om.add_variable("harvest_yield", value, info_map)
@@ -266,12 +269,44 @@ class CropManagement:
             soil_data.plant_surface_residue = self.data.yield_residue - self.data.root_biomass
             soil_data.plant_root_residue = dry_matter_root_biomass
             soil_data.crop_root_depth = self.data.root_depth
+            self._distribute_residue_nutrients(soil_data, dry_matter_root_biomass,)
         else:
             soil_data.plant_surface_residue = self.data.yield_residue
             soil_data.plant_root_residue = 0
             soil_data.crop_root_depth = 0
+            soil_data.soil_layers[0].fresh_organic_nitrogen_content += self.data.residue_nitrogen
+            soil_data.soil_layers[0].fresh_organic_phosphorus_content += self.data.residue_phosphorus
 
-        soil_data.soil_layers[0].fresh_organic_nitrogen_content += self.data.residue_nitrogen
+    def _distribute_residue_nutrients(
+            self,
+            soil_data: SoilData,
+            root_residue_mass: float,
+    ) -> None:
+        """
+        Distributes nutrients from plant residue into the soil profile.
+
+        Parameters
+        ----------
+        soil_data : SoilData
+            Object that tracks the attributes of the soil profile that contains this crop.
+        root_residue_mass : float
+            Dry matter mass of residue that is roots (kg / ha).
+
+        """
+        surface_fraction = (self.data.yield_residue - root_residue_mass) / self.data.yield_residue
+        soil_data.soil_layers[0].fresh_organic_nitrogen_content += self.data.residue_nitrogen * surface_fraction
+        soil_data.soil_layers[0].fresh_organic_phosphorus_content += self.data.residue_phosphorus * surface_fraction
+
+        subsurface_nitrogen = self.data.residue_nitrogen * (1 - surface_fraction)
+        subsurface_phosphorus = self.data.residue_phosphorus * (1 - surface_fraction)
+        for layer in soil_data.soil_layers:
+            layer_fraction = \
+                (layer.bottom_depth - layer.top_depth) / self.data.root_depth \
+                    if layer.bottom_depth <= self.data.root_depth \
+                    else max(0.0, (self.data.root_depth - layer.top_depth) / self.data.root_depth)
+            layer.fresh_organic_nitrogen_content += subsurface_nitrogen * layer_fraction
+            layer.fresh_organic_phosphorus_content += subsurface_phosphorus * layer_fraction
+
 
     # ---- Harvest Scheduling ----
 
