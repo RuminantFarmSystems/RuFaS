@@ -645,9 +645,9 @@ class Field:
         for event in todays_harvest_events:
             self._harvest_crop(event.crop_reference, event.operation, time, current_conditions)
 
-        self._harvest_heat_scheduled_crops(current_conditions.rainfall)
+        self._harvest_heat_scheduled_crops(current_conditions.rainfall, time)
 
-    def _harvest_heat_scheduled_crops(self, rainfall: float) -> None:
+    def _harvest_heat_scheduled_crops(self, rainfall: float, time: Time) -> None:
         """
         Checks if any of the active plants in the field are harvested based on their heat schedule, and if so harvests
         them if they meet the heat threshold.
@@ -666,7 +666,7 @@ class Field:
             execute_heat_scheduled_harvest = crop.data.use_heat_scheduling and \
                                              crop.data.heat_fraction >= crop.data.harvest_heat_fraction
             if execute_heat_scheduled_harvest:
-                crop.crop_management.manage_harvest(HarvestOperation.HARVEST_ONLY)
+                crop.crop_management.manage_harvest(HarvestOperation.HARVEST_ONLY, time)
                 self.soil.carbon_cycling.residue_partition.add_residue_to_pools(rainfall)
 
     @staticmethod
@@ -823,8 +823,7 @@ class Field:
 
         for crop in crops_to_be_harvested:
             crop.crop_management.manage_harvest(harvest_operation, self.field_data.name,
-                                                self.field_data.field_size, time.calendar_year, time.day,
-                                                self.soil.data)
+                                                self.field_data.field_size, time, self.soil.data, self.feed_manager)
             self.soil.carbon_cycling.residue_partition.add_residue_to_pools(current_conditions.rainfall)
 
     def _remove_dead_crops(self) -> None:
