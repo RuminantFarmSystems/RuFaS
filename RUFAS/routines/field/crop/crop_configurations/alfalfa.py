@@ -1,5 +1,6 @@
 from dataclasses import dataclass
 
+from RUFAS.routines.feed_storage.enums import CropCategory, CropType
 from RUFAS.routines.field.crop.crop_data import (
     CropData,
     PlantCategory
@@ -17,6 +18,9 @@ class Alfalfa(CropData):
     scientific_name: str = "Medicago sativa"
     plant_category: PlantCategory = PlantCategory("perennial_legume")
     is_nitrogen_fixer: bool = True
+
+    crop_category: CropCategory = CropCategory.ALFALFA
+    crop_type: CropType = CropType.ALFALFA
 
     minimum_temperature: float = 4.0
     optimal_temperature: float = 25.0
@@ -99,7 +103,6 @@ class AlfalfaBaleage(AlfalfaSilage):
     """
     species: str = "alfalfa_baleage"
     name: str = "alfalfa baleage"
-
 
 @dataclass(kw_only=True)
 class AlfalfaHay(Alfalfa):

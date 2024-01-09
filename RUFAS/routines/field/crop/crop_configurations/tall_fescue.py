@@ -1,5 +1,6 @@
 from dataclasses import dataclass
 
+from RUFAS.routines.feed_storage.enums import CropCategory, CropType
 from RUFAS.routines.field.crop.crop_data import (
     CropData,
     PlantCategory
@@ -15,6 +16,9 @@ class TallFescue(CropData):
     scientific_name: str = "Festuca arundinaceae"
     plant_category: PlantCategory = PlantCategory("perennial")
     is_nitrogen_fixer: bool = False
+
+    crop_category: CropCategory = CropCategory.GRASS
+    crop_type: CropType = CropType.TALL_FESCUE
 
     minimum_temperature: float = 0.0
     optimal_temperature: float = 15.0
