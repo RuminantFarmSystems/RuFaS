@@ -197,19 +197,19 @@
         },
         "heiferI_num": {
           "type": "number",
-          "description": "Number of HefierI's (head) -- The initial number of heifers that are weaned but not yet bred",
+          "description": "Number of HeiferI's (head) -- The initial number of heifers that are weaned but not yet bred",
           "default": 44,
           "minimum": 0
         },
         "heiferII_num": {
           "type": "number",
-          "description": "Number of HefierII's (head) -- The initial number of heifers that are either eligible for breeding (based on user-inputted Breeding Start Day for heifers), or in early pregnancy",
+          "description": "Number of HeiferII's (head) -- The initial number of heifers that are either eligible for breeding (based on user-inputted Breeding Start Day for heifers), or in early pregnancy",
           "default": 38,
           "minimum": 0
         },
         "heiferIII_num_springers": {
           "type": "number",
-          "description": "Number of HefierIII's (head) -- The initial number of close-up heifers (heifers within the user-defined close-up period, i.e. Prefresh Day)",
+          "description": "Number of HeiferIII's (head) -- The initial number of close-up heifers (heifers within the user-defined close-up period, i.e. Prefresh Day)",
           "default": 5,
           "minimum": 0
         },
@@ -262,7 +262,7 @@
           "description": "General Management",
           "breeding_start_day_h": {
             "type": "number",
-            "description": "Heifer Breeding Start Day (days) -- Days old when a heifer would be eligible for breeding",
+            "description": "Heifer Breeding Start Day (days) -- Days old when RuFaS initiates estrus protocol (first cycle to occur ~21 days later)",
             "default": 380,
             "minimum": 0
           },
@@ -367,7 +367,7 @@
             "description": "Repro Management",
             "voluntary_waiting_period": {
               "type": "number",
-              "description": "Voluntary Waiting Period (days) -- If TAI (Timed Artificial Insemination) protocol is chosen for cows, voluntary waiting period (VPW) is days after parturition at which the 1st hormonal injection is made. If ED (Estrus Detection) or ED-TAI (combination of Estrus Detection and TAI) is chosen for cows, VWP is days after parturition when estrus begins to be monitored.",
+              "description": "Voluntary Waiting Period (days) -- If TAI (Timed Artificial Insemination) protocol is chosen for cows, voluntary waiting period (VPW) is days after parturition at which the 1st hormonal injection is made. If ED (Estrus Detection) or ED-TAI (combination of Estrus Detection and TAI) is chosen for cows, VWP is days after parturition when a cow is eligible to be bred during estrus",
               "default": 50,
               "minimum": 0
             },
@@ -563,7 +563,7 @@
               },
               "tai_program_start_day": {
                 "type": "number",
-                "description": "TAI protocol start day for ED-TAI protocol (day)",
+                "description": "TAI protocol start day for the Ovsynch portion of the ED-TAI protocol (day)",
                 "minimum": 0,
                 "default": 72
               }
