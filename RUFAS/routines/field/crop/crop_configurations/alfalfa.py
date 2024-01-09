@@ -21,6 +21,8 @@ class Alfalfa(CropData):
     minimum_temperature: float = 4.0
     optimal_temperature: float = 25.0
 
+    potential_heat_units: float = 400.0
+
     max_leaf_area_index: float = 4.0
     first_heat_fraction_point: float = 0.15
     first_leaf_fraction_point: float = 0.01

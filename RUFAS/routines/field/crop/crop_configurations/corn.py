@@ -19,6 +19,8 @@ class Corn(CropData):
     minimum_temperature: float = 8.0
     optimal_temperature: float = 25.0
 
+    potential_heat_units: float = 1150
+
     max_leaf_area_index: float = 3.0
     first_heat_fraction_point: float = 0.15
     first_leaf_fraction_point: float = 0.05
