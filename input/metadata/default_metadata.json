@@ -681,7 +681,7 @@
             },
             "std_estrus_cycle_heifer": {
               "type": "number",
-              "description": "Heifer Estous Cycle Length Standard Deviation (days)",
+              "description": "Heifer Estrous Cycle Length Standard Deviation (days)",
               "minimum": 1,
               "default": 2.5
             },
