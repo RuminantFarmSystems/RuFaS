@@ -1022,7 +1022,6 @@ class LifeCycleManager:
             new_calf.events.add_event(
                 new_calf.days_born, sim_day, animal_constants.ENTER_HERD
             )
-            # calves.append(new_calf)
             calves_born.append(new_calf)
         if new_calf.sold:
             self.sold_calf_num += 1
