@@ -2,7 +2,7 @@ from math import exp
 from typing import Optional
 from RUFAS.routines.feed_storage.feed_manager import FeedManager
 from RUFAS.routines.feed_storage.harvested_crop import HarvestedCrop
-from RUFAS.routines.field.crop.crop_data import CropData
+from RUFAS.routines.field.crop.crop_data import CropData, DEFAULT_CROP_QUALITIES
 from RUFAS.routines.field.crop.harvest_operations import HarvestOperation
 from RUFAS.routines.field.soil.soil_data import SoilData
 from RUFAS.time import Time
@@ -61,20 +61,12 @@ class CropManagement:
         """
         self.determine_harvest_index()
 
-        # harvested_crop = None
-
-        if harvest_op == HarvestOperation.HARVEST_KILL:
+        if harvest_op == HarvestOperation.HARVEST_KILL or HarvestOperation.HARVEST_ONLY:
             self.cut_crop(collected_fraction=self.data.harvest_efficiency)
+            self._store_harvested_crop(time, field_size, feed_manager)
+
+        if harvest_op == HarvestOperation.KILL_ONLY or HarvestOperation.HARVEST_KILL:
             self.kill()
-
-        if harvest_op == HarvestOperation.HARVEST_ONLY:
-            self.cut_crop(collected_fraction=self.data.harvest_efficiency)
-
-        if harvest_op == HarvestOperation.KILL_ONLY:
-            self.kill()
-
-        # if harvested_crop:
-            # feed_manager.receive_crop(harvested_crop=harvested_crop, storage_type=self.data.storage_type)
 
         self._record_yield(field_name, field_size, time.calendar_year, time.day)
         self._transfer_residue(soil_data, not self.data.is_alive)
@@ -122,7 +114,7 @@ class CropManagement:
         #   The dry down method is not currently used
         self.data.above_ground_biomass -= (self.data.above_ground_biomass * self.data.dry_down_fraction)
 
-    def cut_crop(self, collected_fraction: float = 0) -> HarvestedCrop:
+    def cut_crop(self, collected_fraction: float = 0) -> None:
         """
         Performs a cut operation on the crop and, optionally, collects yield.
 
@@ -226,6 +218,45 @@ class CropManagement:
             self.data.root_biomass -= root_biomass_removed
             self.data.above_ground_biomass = 0.0
             self.data.root_fraction = 1.0
+
+    def _store_harvested_crop(self, time: Time, field_size: float, feed_manager: FeedManager) -> None:
+        """
+        Compiles the details of a harvest of this crop into a HarvestCrop instance.
+
+        Parameters
+        ----------
+        time : Time
+            Time instance containing the current time of the simulation.
+        field_size: float
+            Size of the field from which this crop was harvested (ha).
+        feed_manager: FeedManager
+            Instance of the FeedManager which will receive the harvested crop.
+
+        Returns
+        -------
+        HarvestedCrop
+            HarvestedCrop instance containing all the details of this harvest event.
+
+        """
+        harvested_crop = HarvestedCrop(
+            category=self.data.crop_category,
+            type=self.data.crop_type,
+            harvest_time=time,
+            storage_time=time,
+            fresh_mass=self.data.wet_yield_collected * field_size,
+            dry_matter_percentage=self.data.dry_matter_percentage,
+            dry_matter_digestibility=DEFAULT_CROP_QUALITIES.get("dry_matter_digestibility"),
+            crude_protein_percent=DEFAULT_CROP_QUALITIES.get("crude_protein_percent"),
+            non_protein_nitrogen=DEFAULT_CROP_QUALITIES.get("non_protein_nitrogen"),
+            starch=DEFAULT_CROP_QUALITIES.get("starch"),
+            adf=DEFAULT_CROP_QUALITIES.get("adf"),
+            ndf=DEFAULT_CROP_QUALITIES.get("ndf"),
+            sugar=DEFAULT_CROP_QUALITIES.get("sugar"),
+            lignin=self.data.lignin_dry_matter_percentage,
+            ash=DEFAULT_CROP_QUALITIES.get("ash"),
+        )
+        feed_manager.receive_crop(harvested_crop, self.data.storage_type)
+
 
     def _record_yield(self, field_name: str, field_size: float, year: int, day: int) -> None:
         """

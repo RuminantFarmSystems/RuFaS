@@ -19,6 +19,7 @@ class Soybean(CropData):
     is_nitrogen_fixer: bool = True
 
     crop_category: CropCategory = CropCategory.SOY
+    storage_type: StorageType = StorageType.DRY
 
     minimum_temperature: float = 10.0
     optimal_temperature: float = 25.0
@@ -67,7 +68,6 @@ class SoybeanGrain(Soybean):
     name: str = "soybean grain"
 
     crop_type: CropType = CropType.GRAIN
-    storage_type: StorageType = StorageType.DRY
 
     optimal_harvest_index: float = 0.35
     min_harvest_index: float = 0.26
@@ -102,7 +102,6 @@ class SoybeanHay(Soybean):
     name: str = "soybean hay"
 
     crop_type: CropType = CropType.FORAGE
-    storage_type: StorageType = StorageType.PROTECTED_TARPED
 
     optimal_harvest_index: float = 0.90
     min_harvest_index: float = 0.54
