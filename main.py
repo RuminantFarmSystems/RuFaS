@@ -10,6 +10,7 @@ import argparse
 from pathlib import Path
 import sys
 import random
+import traceback
 from typing import List
 import numpy
 
@@ -27,24 +28,39 @@ def main():
         load_pool = True
     else:
         load_pool = False
-    run_rufas(
-        load_pool,
-        produce_graphics=not cmd_arguments.no_graphics,
-        format_option=cmd_arguments.format_option,
-        verbose=LogVerbosity(cmd_arguments.verbose),
-        clear_output=cmd_arguments.clear_output,
-        exclude_info_maps=cmd_arguments.exclude_info_maps,
-        only_run_validation=cmd_arguments.only_run_validation,
-        graphics_dir=Path(cmd_arguments.graphics_dir),
-        vars_file_path=Path(cmd_arguments.load_pool),
-        output_dir=Path(cmd_arguments.output_dir),
-        filters_dir=Path(cmd_arguments.filters_dir),
-        csv_dir=Path(cmd_arguments.csv_dir),
-        init_herd=cmd_arguments.init_herd,
-        save_animals=cmd_arguments.save_animals,
-        save_animals_dir=Path(cmd_arguments.save_animals_dir),
-        terminate_simulation_post_herd_generation=cmd_arguments.terminate_simulation_post_herd_generation
-    )
+    try:
+        run_rufas(
+            load_pool,
+            produce_graphics=not cmd_arguments.no_graphics,
+            format_option=cmd_arguments.format_option,
+            verbose=LogVerbosity(cmd_arguments.verbose),
+            clear_output=cmd_arguments.clear_output,
+            exclude_info_maps=cmd_arguments.exclude_info_maps,
+            only_run_validation=cmd_arguments.only_run_validation,
+            graphics_dir=Path(cmd_arguments.graphics_dir),
+            vars_file_path=Path(cmd_arguments.load_pool),
+            output_dir=Path(cmd_arguments.output_dir),
+            filters_dir=Path(cmd_arguments.filters_dir),
+            csv_dir=Path(cmd_arguments.csv_dir),
+            init_herd=cmd_arguments.init_herd,
+            save_animals=cmd_arguments.save_animals,
+            save_animals_dir=Path(cmd_arguments.save_animals_dir),
+            terminate_simulation_post_herd_generation=cmd_arguments.terminate_simulation_post_herd_generation
+        )
+    except Exception as e:
+        info_map = {"class": "No caller class",
+                    "function": main.__name__,
+                    }
+        output_manager = OutputManager()
+        error_message = "This terminal error occurred during runtime. "
+        error_message += traceback.format_exc()
+        output_manager.add_error(f"Dumping all logs from main.py because of error '{e}'",
+                                 error_message,
+                                 info_map)
+        output_manager.dump_all_nondata_pools(
+            Path(cmd_arguments.output_dir), cmd_arguments.exclude_info_maps, cmd_arguments.format_option
+        )
+        sys.stdout.write("Unexpected early termination of the simulation. Please see logs for details.")
 
 
 def run_rufas(
