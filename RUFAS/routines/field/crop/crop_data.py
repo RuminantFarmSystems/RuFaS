@@ -3,6 +3,7 @@ from dataclasses import dataclass
 from typing import Optional, List, Any
 
 from RUFAS.routines.feed_storage.enums import CropCategory, CropType
+from RUFAS.routines.feed_storage.feed_manager import StorageType
 from RUFAS.routines.field.crop.harvest_operations import HarvestOperation
 
 
@@ -16,6 +17,17 @@ class PlantCategory(Enum):
     PERENNIAL = "perennial"
     TREE = "tree"
 
+
+DEFAULT_CROP_QUALITIES = {
+    "dry_matter_digestibility": 40.0,
+    "crude_protein_percent": 15.0,
+    "non_protein_nitrogen": 13.0,
+    "starch": 5.0,
+    "adf": 10.0,
+    "ndf": 6.0,
+    "sugar": 10.0,
+    "ash": 2.0
+}
 
 @dataclass(kw_only=True)
 class CropData:
@@ -74,6 +86,8 @@ class CropData:
     """Broad category into which this crop type falls."""
     crop_type: CropType = CropType.GRAIN
     """Sub type of this crop."""
+    storage_type: StorageType = StorageType.DRY
+    """The method of storage that will be used for this crop when harvested."""
 
     # Management variables
     planting_year: int = 0
