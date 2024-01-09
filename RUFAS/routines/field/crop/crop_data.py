@@ -29,6 +29,7 @@ DEFAULT_CROP_QUALITIES = {
     "ash": 2.0
 }
 
+
 @dataclass(kw_only=True)
 class CropData:
     """

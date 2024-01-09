@@ -257,7 +257,6 @@ class CropManagement:
         )
         feed_manager.receive_crop(harvested_crop, self.data.storage_type)
 
-
     def _record_yield(self, field_name: str, field_size: float, year: int, day: int) -> None:
         """
         Records the mass and nutrients collected in an individual harvest and sends them to the OutputManager.
