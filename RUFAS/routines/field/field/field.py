@@ -1,4 +1,6 @@
 import math
+from RUFAS.routines.feed_storage.feed_manager import FeedManager
+from RUFAS.routines.feed_storage.harvested_crop import HarvestedCrop
 from RUFAS.routines.manure.manure_treatments.manure_types import ManureType
 from RUFAS.routines.field.crop.crop import Crop
 from RUFAS.routines.field.crop.crop_data import CropData
@@ -39,7 +41,8 @@ class Field:
                  fertilizer_events: Optional[List[FertilizerEvent]] = None,
                  fertilizer_mixes: Optional[Dict[str, Dict[str, float]]] = None,
                  manure_events: Optional[List[ManureEvent]] = None,
-                 manure_manager: Optional[ManureManager] = None):
+                 manure_manager: Optional[ManureManager] = None,
+                 feed_manager: Optional[FeedManager] = None):
         """
         Initialize the related data fields that this module will work with, or create one if none provided.
 
@@ -113,6 +116,9 @@ class Field:
 
         self.manure_manager: ManureManager = manure_manager
         """:class:`ManureManager` instance from which manure is requested for application to the field."""
+
+        self.feed_manager: FeedManager = feed_manager or FeedManager()
+        """:class:`FeedManager` instance which receives harvested crops."""
 
     def manage_field(self, time, current_conditions: CurrentDayConditions) -> None:
         """
