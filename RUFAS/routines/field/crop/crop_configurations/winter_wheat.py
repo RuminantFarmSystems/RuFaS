@@ -1,6 +1,7 @@
 from dataclasses import dataclass
 
 from RUFAS.routines.feed_storage.enums import CropCategory, CropType
+from RUFAS.routines.feed_storage.feed_manager import StorageType
 from RUFAS.routines.field.crop.crop_data import (
     CropData,
     PlantCategory
@@ -68,6 +69,8 @@ class WinterWheatGrain(WinterWheat):
     species: str = "winter_wheat_grain"
     name: str = "winter_wheat grain"
 
+    storage_type: StorageType = StorageType.DRY
+
     optimal_harvest_index: float = 0.5
     min_harvest_index: float = 0.25
     dry_matter_percentage: float = 85.689
@@ -99,6 +102,8 @@ class WinterWheatSilage(WinterWheat):
     """
     species: str = "winter_wheat_silage"
     name: str = "winter_wheat silage"
+
+    storage_type: StorageType = StorageType.BUNKER
 
     optimal_harvest_index: float = 0.9
     min_harvest_index: float = 0.6
@@ -136,6 +141,7 @@ class WinterWheatBaleage(WinterWheatSilage):
     species: str = "winter_wheat_baleage"
     name: str = "winter_wheat baleage"
 
+    storage_type: StorageType = StorageType.BALEAGE
 
 @dataclass(kw_only=True)
 class WinterWheatHay(WinterWheat):
@@ -160,6 +166,8 @@ class WinterWheatHay(WinterWheat):
     """
     species: str = "winter_wheat_hay"
     name: str = "winter_wheat hay"
+
+    storage_type: StorageType = StorageType.PROTECTED_TARPED
 
     optimal_harvest_index: float = 0.85
     min_harvest_index: float = 0.55

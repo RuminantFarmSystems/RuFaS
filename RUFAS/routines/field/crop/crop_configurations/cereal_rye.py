@@ -1,6 +1,7 @@
 from dataclasses import dataclass
 
 from RUFAS.routines.feed_storage.enums import CropCategory, CropType
+from RUFAS.routines.feed_storage.feed_manager import StorageType
 from RUFAS.routines.field.crop.crop_data import (
     CropData,
     PlantCategory
@@ -68,6 +69,8 @@ class CerealRyeGrain(CerealRye):
     species: str = "cereal_rye_grain"
     name: str = "cereal_rye grain"
 
+    storage_type: StorageType = StorageType.DRY
+
     optimal_harvest_index: float = 0.3
     min_harvest_index: float = 0.20
     dry_matter_percentage: float = 85.962
@@ -99,6 +102,8 @@ class CerealRyeSilage(CerealRye):
     """
     species: str = "cereal_rye_silage"
     name: str = "cereal_rye silage"
+
+    storage_type: StorageType = StorageType.BUNKER
 
     optimal_harvest_index: float = 0.90
     min_harvest_index: float = 0.68
@@ -136,6 +141,8 @@ class CerealRyeBaleage(CerealRyeSilage):
     species: str = "cereal_rye_baleage"
     name: str = "cereal_rye baleage"
 
+    storage_type: StorageType = StorageType.BALEAGE
+
 
 @dataclass(kw_only=True)
 class CerealRyeHay(CropData):
@@ -160,6 +167,8 @@ class CerealRyeHay(CropData):
     """
     species: str = "cereal_rye_hay"
     name: str = "cereal_rye hay"
+
+    storage_type: StorageType = StorageType.PROTECTED_TARPED
 
     optimal_harvest_index: float = 0.85
     min_harvest_index: float = 0.64

@@ -1,6 +1,7 @@
 from dataclasses import dataclass
 
 from RUFAS.routines.feed_storage.enums import CropCategory, CropType
+from RUFAS.routines.feed_storage.feed_manager import StorageType
 from RUFAS.routines.field.crop.crop_data import (
     CropData,
     PlantCategory
@@ -66,6 +67,7 @@ class SoybeanGrain(Soybean):
     name: str = "soybean grain"
 
     crop_type: CropType = CropType.GRAIN
+    storage_type: StorageType = StorageType.DRY
 
     optimal_harvest_index: float = 0.35
     min_harvest_index: float = 0.26
@@ -100,6 +102,7 @@ class SoybeanHay(Soybean):
     name: str = "soybean hay"
 
     crop_type: CropType = CropType.FORAGE
+    storage_type: StorageType = StorageType.PROTECTED_TARPED
 
     optimal_harvest_index: float = 0.90
     min_harvest_index: float = 0.54

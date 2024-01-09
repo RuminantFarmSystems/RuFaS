@@ -1,6 +1,7 @@
 from dataclasses import dataclass
 
 from RUFAS.routines.feed_storage.enums import CropCategory, CropType
+from RUFAS.routines.feed_storage.feed_manager import StorageType
 from RUFAS.routines.field.crop.crop_data import (
     CropData,
     PlantCategory
@@ -66,6 +67,8 @@ class TallFescueSilage(TallFescue):
     species: str = "tall_fescue_silage"
     name: str = "tall_fescue silage"
 
+    storage_type: StorageType = StorageType.BUNKER
+
     optimal_harvest_index: float = 0.90
     min_harvest_index: float = 0.4
     dry_matter_percentage: float = 39.612
@@ -102,6 +105,8 @@ class TallFescueBaleage(TallFescueSilage):
     species: str = "tall_fescue_baleage"
     name: str = "tall_fescue baleage"
 
+    storage_type: StorageType = StorageType.BALEAGE
+
 
 @dataclass(kw_only=True)
 class TallFescueHay(TallFescue):
@@ -126,6 +131,8 @@ class TallFescueHay(TallFescue):
     """
     species: str = "tall_fescue_hay"
     name: str = "tall_fescue hay"
+
+    storage_type: StorageType = StorageType.PROTECTED_TARPED
 
     optimal_harvest_index: float = 0.85
     min_harvest_index: float = 0.37

@@ -1,6 +1,7 @@
 from dataclasses import dataclass
 
 from RUFAS.routines.feed_storage.enums import CropCategory, CropType
+from RUFAS.routines.feed_storage.feed_manager import StorageType
 from RUFAS.routines.field.crop.crop_data import (
     CropData,
     PlantCategory
@@ -73,6 +74,8 @@ class TriticaleGrain(Triticale):
     species: str = "triticale_grain"
     name: str = "triticale grain"
 
+    storage_type: StorageType = StorageType.DRY
+
     optimal_harvest_index: float = 0.3
     min_harvest_index: float = 0.2
     dry_matter_percentage: float = 88.374
@@ -104,6 +107,8 @@ class TriticaleSilage(Triticale):
     """
     species: str = "triticale_silage"
     name: str = "triticale silage"
+
+    storage_type: StorageType = StorageType.BUNKER
 
     optimal_harvest_index: float = 0.9
     min_harvest_index: float = 0.7
@@ -141,6 +146,8 @@ class TriticaleBaleage(TriticaleSilage):
     species: str = "triticale_baleage"
     name: str = "triticale baleage"
 
+    storage_type: StorageType = StorageType.BALEAGE
+
 
 @dataclass(kw_only=True)
 class TriticaleHay(Triticale):
@@ -165,6 +172,8 @@ class TriticaleHay(Triticale):
     """
     species: str = "triticale_hay"
     name: str = "triticale hay"
+
+    storage_type: StorageType = StorageType.PROTECTED_TARPED
 
     optimal_harvest_index: float = 0.85
     min_harvest_index: float = 0.65
