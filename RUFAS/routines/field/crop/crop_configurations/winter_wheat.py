@@ -143,6 +143,7 @@ class WinterWheatBaleage(WinterWheatSilage):
 
     storage_type: StorageType = StorageType.BALEAGE
 
+
 @dataclass(kw_only=True)
 class WinterWheatHay(WinterWheat):
     """

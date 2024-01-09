@@ -109,6 +109,7 @@ class AlfalfaBaleage(AlfalfaSilage):
 
     storage_type: StorageType = StorageType.BALEAGE
 
+
 @dataclass(kw_only=True)
 class AlfalfaHay(Alfalfa):
     """
