@@ -143,10 +143,10 @@ class HerdFactory:
                 args = heiferIII.get_heiferIII_values()
 
                 args.update(id=self.pre_animal_population.next_id())
-                args.update(repro_program='TAI')
-                args.update(presynch_method='PreSynch')
-                args.update(tai_method_c='OvSynch 56')
-                args.update(resynch_method='TAIafterPD')
+                args.update(repro_program=AnimalBase.config["cow_repro_method"])
+                args.update(presynch_method=AnimalBase.config["cows"]["presynch_protocol"])
+                args.update(tai_method_c=AnimalBase.config["cows"]["repro_sub_protocol"])
+                args.update(resynch_method=AnimalBase.config["cows"]["resynch_protocol"])
 
                 cow = Cow(args)
 
