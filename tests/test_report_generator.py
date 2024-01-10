@@ -379,7 +379,7 @@ def test_apply_horizontal_aggregation(report_data: Dict[str, List[float]],
 def test_prepare_report_data_with_constants(filtered_pool: Dict[str, Dict[str, List[Any]]],
                                             filter_content: Dict[str, Any],
                                             expected_result: Dict[str, List[Any]],
-                                            expected_exception: Exception,
+                                            expected_exception: Type[Exception],
                                             mocker: MockerFixture):
     """
     Unit test for the _prepare_report_data_with_constants method of ReportGenerator class in report_generator.py file.
@@ -401,72 +401,75 @@ def test_prepare_report_data_with_constants(filtered_pool: Dict[str, Dict[str, L
 
 
 @pytest.mark.parametrize(
-    "report_data, filter_content, expected_report_data, expected_exception", [
-        # Case with constants added successfully
+    "report_data, filter_content, expected_report_data, expected_exception",
+    [
+        # Valid case with a valid constant
         (
-                {"a": [1, 2, 3]},
+                {"existing_data": [1, 2, 3]},
                 {
-                    "constants": [
-                        {"name": "Kilograms to Pounds", "value": 2.20462},
-                        {"name": "Pounds to Dollars", "value": 10}
-                    ]
+                    "constants": {
+                        "Constant1": 10
+                    }
                 },
                 {
-                    "a": [1, 2, 3],
-                    "Kilograms to Pounds": [2.20462, 2.20462, 2.20462],
-                    "Pounds to Dollars": [10, 10, 10]
+                    "existing_data": [1, 2, 3],
+                    "Constant1": [10, 10, 10],
+                },
+                None),
+
+        # Valid case with existing data of different lengths
+        (
+                {
+                    "col1": [1, 2, 3],
+                    "col2": [4, 5, 6, 7]
+                },
+                {
+                    "constants": {
+                        "Constant1": 10
+                    }
+                },
+                {
+                    "col1": [1, 2, 3],
+                    "col2": [4, 5, 6, 7],
+                    "Constant1": [10, 10, 10, 10]
                 },
                 None
         ),
 
-        # Case with report data containing lists of different lengths
+        # Valid case with no constants
         (
-                {"a": [1, 2, 3], "b": [1, 2, 3, 4]},
-                {
-                    "constants": [
-                        {"name": "Kilograms to Pounds", "value": 2.20462},
-                        {"name": "Pounds to Dollars", "value": 10}
-                    ]
-                },
-                {
-                    "a": [1, 2, 3],
-                    "b": [1, 2, 3, 4],
-                    "Kilograms to Pounds": [2.20462, 2.20462, 2.20462, 2.20462],
-                    "Pounds to Dollars": [10, 10, 10, 10]
-                },
-                None
-        ),
-
-        # Case where no constants are specified
-        (
-                {"a": [1, 2, 3]},
+                {"existing_data": [1, 2, 3]},
                 {},
-                {"a": [1, 2, 3]},
+                {
+                    "existing_data": [1, 2, 3]
+                },
                 None
         ),
 
-        # Case with a constant name that already exists in report data
+        # Error case with a constant name that already exists in report_data
         (
-                {"a": [1, 2, 3], "Kilograms to Pounds": [1, 1, 1]},
                 {
-                    "constants": [
-                        {"name": "Kilograms to Pounds", "value": 2.20462}
-                    ]
+                    "Constant1": [5, 5, 5]
+                },
+                {
+                    "constants": {
+                        "Constant1": 10
+                    }
                 },
                 None,
                 ValueError
         ),
-    ]
-)
-def test_add_constants_data(report_data: Dict[str, List[Any]],
-                            filter_content: Dict[str, Any],
-                            expected_report_data: Dict[str, List[Any]],
-                            expected_exception: Exception) -> None:
+    ])
+def test_add_constants_data(
+        report_data: Dict[str, List[Any]],
+        filter_content: Dict[str, Any],
+        expected_report_data: Dict[str, List[Any]],
+        expected_exception: Type[Exception]
+) -> None:
     """
-    Unit test for the _add_constants_data method of ReportGenerator class in report_generator.py file.
+    Unit test for the _add_constants_data static method in report_generator.py file.
     """
 
-    # Act and assert
     if expected_exception:
         with pytest.raises(expected_exception):
             ReportGenerator._add_constants_data(report_data, filter_content)
@@ -476,8 +479,93 @@ def test_add_constants_data(report_data: Dict[str, List[Any]],
 
 
 @pytest.mark.parametrize(
-    "filtered_pool, filter_content, mock_prep_data, expected_result, expected_exception", [
-        # Case with valid horizontal and vertical aggregations
+    "report_data, constant_config, expected_exception",
+    [
+        # Valid case with valid constants
+        (
+                {},
+                {
+                    "Constant1": 10,
+                    "Constant2": 20.5
+                },
+                None
+        ),
+
+        # Error case with repeated constant name
+        (
+                {
+                    "Constant1": [5, 5, 5]
+                },
+                {
+                    "Constant1": 10
+                },
+                ValueError),
+
+        # Error case with constant name None
+        (
+                {},
+                {
+                    None: 10
+                },
+                ValueError
+        ),
+
+        # Error case with constant value None
+        (
+                {},
+                {
+                    "Constant1": None
+                },
+                ValueError
+        ),
+
+        # Error case with constant name not a string
+        (
+                {},
+                {
+                    123: 10
+                },
+                ValueError
+        ),
+
+        # Error case with constant value not a number
+        (
+                {},
+                {
+                    "Constant1": "not_a_number"
+                },
+                ValueError
+        ),
+
+        # Error case with an empty constant name
+        (
+                {},
+                {
+                    "": 10
+                },
+                ValueError
+        ),
+    ])
+def test_validate_constants(
+        report_data: Dict[str, List[Any]],
+        constant_config: Dict[str, Any],
+        expected_exception: Type[Exception],
+) -> None:
+    """
+    Unit test for the _validate_constants static method in report_generator.py file.
+    """
+
+    if expected_exception:
+        with pytest.raises(expected_exception):
+            ReportGenerator._validate_constants(report_data, constant_config)
+    else:
+        ReportGenerator._validate_constants(report_data, constant_config)
+
+
+@pytest.mark.parametrize(
+    "filtered_pool, filter_content, mock_prep_data,"
+    "expected_result, expected_exception", [
+        # Case with valid horizontal and vertical aggregations, with horizontal_first = True
         (
                 {"var1": {"values": [1, 2]}, "var2": {"values": [3, 4]}},
                 {
@@ -488,29 +576,35 @@ def test_add_constants_data(report_data: Dict[str, List[Any]],
                     "horizontal_first": True
                 },
                 {"var1": [1, 2], "var2": [3, 4]},
-                [6.0],
+                {'hor_ver_agg': [6.0]},
                 None
         ),
 
-        # Case with unsupported horizontal aggregation type
+        # Case with valid horizontal and vertical aggregations, with horizontal_first = False
         (
-                {"var1": {"values": [1, 2]}},
+                {"var1": {"values": [1, 2]}, "var2": {"values": [3, 4]}},
                 {
                     "name": "Report",
-                    "horizontal_aggregation": "unsupported"
+                    "horizontal_aggregation": "sum",
+                    "vertical_aggregation": "average",
+                    "horizontal_order": ["var1", "var2"],
+                    "horizontal_first": False
                 },
-                {"var1": [1, 2]},
-                None,
-                ValueError
+                {"var1": [1, 2], "var2": [3, 4]},
+                {'ver_hor_agg': [3.5]},
+                None
         ),
 
         # Case with no aggregation specified
         (
-                {"var1": {"values": [1, 2]}},
+                {"var1": {"values": [1, 2]},
+                 "var2": {"values": [3, 4]}},
                 {"name": "Report"},
-                {"var1": [1, 2]},
-                None,
-                ValueError
+                {"var1": [1, 2],
+                 "var2": [3, 4]},
+                {"var1": [1, 2],
+                 "var2": [3, 4]},
+                None
         ),
 
         # Case where report_data is empty after preparing with constants
@@ -534,7 +628,7 @@ def test_add_constants_data(report_data: Dict[str, List[Any]],
                     "horizontal_order": ["var1", "var2"]
                 },
                 {"var1": [1, 2], "var2": [3, 4]},
-                [5, 7],
+                {'hor_agg': [5, 7]},
                 None
         ),
 
@@ -546,7 +640,7 @@ def test_add_constants_data(report_data: Dict[str, List[Any]],
                     "vertical_aggregation": "average"
                 },
                 {"var1": [1, 3], "var2": [2, 4]},
-                [3.5],
+                {'ver_agg': [3.5]},
                 None
         ),
 
@@ -583,7 +677,7 @@ def test_add_constants_data(report_data: Dict[str, List[Any]],
                     "horizontal_order": ["var1", "var2"]
                 },
                 {"var1": [1, 2], "var2": [3, 4]},
-                [5, 7],
+                {'hor_agg': [5, 7]},
                 None
         ),
     ]
@@ -653,24 +747,28 @@ def test_check_for_missing_references(mocker: MockerFixture,
 
 
 @pytest.mark.parametrize(
-    "filter_content, reports, expected_name, timestamp_return_value",
+    "report_name, reports, expected_name, timestamp_return_value",
     [
         # Case when the name is not in reports
-        ({"name": "report1"}, {}, "report1", "2023-01-01"),
+        ("report1", {}, "report1", "2023-01-01"),
 
         # Case when the name is in reports and a timestamp is appended
-        ({"name": "report1"}, {"report1": {}}, "report1 2023-01-01", "2023-01-01"),
+        ("report1", {"report1": {}}, "report1 2023-01-01", "2023-01-01"),
 
-        # Case when the name is not provided in filter_content
-        ({}, {}, "untitled_2023-01-01", "2023-01-01"),
+        # Case when the name is None
+        (None, {}, "untitled_2023-01-01", "2023-01-01"),
+
+        # Case when the name is empty
+        ("", {}, "untitled_2023-01-01", "2023-01-01"),
     ]
 )
-def test_generate_unique_report_name(mocker: MockerFixture,
-                                     filter_content: Dict[str, str],
-                                     reports: Dict[str, Dict[str, Any]],
-                                     expected_name: str,
-                                     timestamp_return_value: str
-                                     ) -> None:
+def test_generate_unique_report_name(
+        mocker: MockerFixture,
+        report_name: str,
+        reports: Dict[str, Dict[str, Any]],
+        expected_name: str,
+        timestamp_return_value: str
+):
     """
     Unit test for _generate_unique_report_name method in report_generator.py file.
     """
@@ -682,7 +780,7 @@ def test_generate_unique_report_name(mocker: MockerFixture,
     mocker.patch('RUFAS.util.Utility.get_timestamp', return_value=timestamp_return_value)
 
     # Act
-    result = report_generator._generate_unique_report_name(filter_content)
+    result = report_generator._generate_unique_report_name(report_name)
 
     # Assert
     assert result == expected_name
@@ -690,17 +788,16 @@ def test_generate_unique_report_name(mocker: MockerFixture,
 
 @pytest.mark.parametrize(
     "filter_content, filtered_pool, reports, reference_exception, generate_single_report_exception,"
-    "expected_report_key, expected_report_value, expected_log_messages",
+    "expected_report_columns, expected_log_messages",
     [
         # Standard report generation
         (
                 {"name": "standard_report", "filters": ["some_filter"]},
-                {"some_data_key": [1, 2, 3]},
+                {"some_filter": [1, 2, 3]},
                 {},
                 None,
                 None,
-                "standard_report",
-                {"values": "mocked_report"},
+                {"standard_report_some_filter": {"values": [1, 2, 3]}},
                 ["Start generating report: standard_report"]
         ),
 
@@ -711,12 +808,14 @@ def test_generate_unique_report_name(mocker: MockerFixture,
                     "filters": ["some_filter"],
                     "cross_references": ["ref1"]
                 },
-                {"some_data_key": [1, 2, 3]},
+                {"some_filter": [1, 2, 3]},
                 {"ref1": {"values": [4, 5, 6]}},
                 None,
                 None,
-                "report_with_references",
-                {"values": "mocked_report"},
+                {
+                    "ref1": {"values": [4, 5, 6]},
+                    "report_with_references_some_filter": {"values": [1, 2, 3]},
+                    "report_with_references_ref1": {"values": [4, 5, 6]}},
                 ["Start generating report: report_with_references"]
         ),
 
@@ -728,9 +827,8 @@ def test_generate_unique_report_name(mocker: MockerFixture,
                 KeyError,
                 None,
                 None,
-                None,
                 ["Start generating report: error_report",
-                 "Error generating report: error_report: "]
+                 "Error generating report (error_report) => KeyError: "]
         ),
 
         # Report generation with error in _generate_single_report
@@ -741,22 +839,21 @@ def test_generate_unique_report_name(mocker: MockerFixture,
                 None,
                 ValueError,
                 None,
-                None,
                 ["Start generating report: error_report",
-                 "Error generating report: error_report: "]
+                 "Error generating report (error_report) => ValueError: "]
         ),
     ]
 )
-def test_handle_report_generation(filter_content: Dict[str, Any],
-                                  filtered_pool: Dict[str, Any],
-                                  reports: Dict[str, Dict[str, List[Any]]],
-                                  reference_exception: Optional[Type[BaseException]],
-                                  generate_single_report_exception: Optional[Type[BaseException]],
-                                  expected_report_key: Optional[str],
-                                  expected_report_value: Optional[Dict[str, List[Any]]],
-                                  expected_log_messages: List[str],
-                                  mocker: MockerFixture,
-                                  ) -> None:
+def test_handle_report_generation(
+        filter_content: Dict[str, Any],
+        filtered_pool: Dict[str, Any],
+        reports: Dict[str, Dict[str, List[Any]]],
+        reference_exception: Optional[Type[BaseException]],
+        generate_single_report_exception: Optional[Type[BaseException]],
+        expected_report_columns: Dict[str, List[Any]],
+        expected_log_messages: List[str],
+        mocker: MockerFixture,
+) -> None:
     """
     Unit test for the handle_report_generation method in the ReportGenerator class.
     """
@@ -766,24 +863,24 @@ def test_handle_report_generation(filter_content: Dict[str, Any],
     report_generator = ReportGenerator()
     report_generator.reports = reports
     mocker.patch.object(report_generator, '_generate_unique_report_name',
-                        side_effect=lambda x: x.get("name", "untitled"))
-    # mocker.patch.object(report_generator, '_generate_single_report',
-    #                     return_value="mocked_report")
+                        side_effect=lambda name: name)
     mocker.patch.object(report_generator, '_check_for_missing_references',
                         side_effect=reference_exception if reference_exception else None)
     if generate_single_report_exception:
         mocker.patch.object(report_generator, '_generate_single_report',
                             side_effect=generate_single_report_exception)
-    else:
+    elif not reference_exception:
         mocker.patch.object(report_generator, '_generate_single_report',
-                            return_value="mocked_report")
+                            return_value={fltr: filtered_pool[fltr] for fltr in filter_content["filters"]} |
+                                         {ref: reports[ref]["values"]
+                                          for ref in filter_content.get("cross_references", [])})
 
     # Act
     event_logs = report_generator.handle_report_generation(filter_content, filtered_pool)
 
     # Assert
     if not reference_exception and not generate_single_report_exception:
-        assert report_generator.reports.get(expected_report_key) == expected_report_value
+        assert report_generator.reports == expected_report_columns
 
     log_messages = [log["message"] for log in event_logs]
     for expected_message in expected_log_messages:
