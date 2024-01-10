@@ -352,13 +352,13 @@ class Utility:
                 return month + 1
 
     @staticmethod
-    def filter_pool(data_pool: Dict[Any, Any], filter_patterns: List[str], filter_by_exclusion: bool) -> Dict[Any, Any]:
+    def filter_pool(data_pool: Dict[str, Any], filter_patterns: List[str], filter_by_exclusion: bool) -> Dict[Any, Any]:
         """
         Returns a filtered data pool based on either inclusion or exclusion.
 
         Parameters
         ----------
-        data_pool : Dict[Any, Any]
+        data_pool : Dict[str, Any]
             The pool to be filtered.
         filter_patterns : List[str]
             A list of patterns by which to filter the pool.
@@ -368,7 +368,7 @@ class Utility:
 
         Returns
         -------
-        Dict[Any, Any]
+        Dict[str, Any]
             The filtered data pool.
         """
         if filter_by_exclusion:
