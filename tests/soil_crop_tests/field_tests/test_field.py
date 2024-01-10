@@ -872,13 +872,19 @@ def test_execute_manure_application_with_invalid_args(depth: float, remainder: f
                                                       expected_remainder: float, invalid_combination: bool) -> None:
     """Tests that the manure application executor raises errors and runs correctly when invalid arguments are passed."""
     mocked_manure_manager = MagicMock(ManureManager)
-    mocked_manure_manager.request_nutrients = MagicMock(return_value=NutrientRequestResults(nitrogen=50.0,
-                                                                                            phosphorus=50.0,
-                                                                                            total_manure_mass=150.0,
-                                                                                            dry_matter=100.0,
-                                                                                            dry_matter_fraction=0.66))
+    supplied_nutrients = NutrientRequestResults(
+        nitrogen=50.0,
+        phosphorus=50.0,
+        total_manure_mass=150.0,
+        dry_matter=100.0,
+        dry_matter_fraction=0.66
+    )
+    mocked_manure_manager.request_nutrients = MagicMock(return_value=supplied_nutrients)
     field = Field(field_data=FieldData(name="test", field_size=1.89), manure_manager=mocked_manure_manager)
     field.soil.data.soil_layers[-1].bottom_depth = 950.0
+    expected_total_inorganic_fraction = 0.15  # equal to (50.0 / 100.0) * 0.3
+    expected_total_organic_fraction = 0.35  # equal to (50.0 / 100.0) * 0.7
+
     with patch("RUFAS.routines.field.field.field.Field._record_nutrient_application_error",
                new_callable=MagicMock) as patched_error, \
             patch("RUFAS.routines.field.field.manure_application.ManureApplication.apply_machine_manure",
@@ -905,9 +911,9 @@ def test_execute_manure_application_with_invalid_args(depth: float, remainder: f
             application_depth=expected_depth,
             surface_remainder_fraction=expected_remainder,
             field_size=1.89,
-            inorganic_nitrogen_fraction=0.3,
-            ammonium_fraction=0.3,
-            organic_nitrogen_fraction=0.2,
+            inorganic_nitrogen_fraction=expected_total_inorganic_fraction,
+            ammonium_fraction=supplied_nutrients.ammonium_nitrogen_fraction,
+            organic_nitrogen_fraction=expected_total_organic_fraction,
             water_extractable_inorganic_phosphorus_fraction=0.5)
         patched_recorder.assert_called_once_with(dry_matter_mass=100.0,
                                                  dry_matter_fraction=0.66,
@@ -926,20 +932,20 @@ def test_execute_manure_application_with_invalid_args(depth: float, remainder: f
 @pytest.mark.parametrize("field_name,field_size,dry_mass,dry_fraction,coverage,nitrogen,phosphorus,depth,remainder,"
                          "year,day,expected_info,expected_values,potassium", [
                              ("test_1", 1.3, 100, 0.1, 0.8, 10, 15, 0.0, 1.0, 1991, 75,
-                              {"prefix": "field='test_1'", "date": {"year": 1991, "day": 75}, "field_size": 1.3},
+                              {"prefix": "field='test_1'", "field_size": 1.3},
                               {"dry_matter_mass": 100, "dry_matter_fraction": 0.1, "application_depth": 0.0,
                                "surface_remainder_fraction": 1.0, "field_coverage": 0.8, "nitrogen": 10,
-                               "phosphorus": 15, "potassium": 12.5}, 12.5),
+                               "phosphorus": 15, "potassium": 12.5, "year": 1991, "day": 75}, 12.5),
                              ("test_2", 2.4, 144.6, 0.3, 0.92, 40, 43.1, 45.0, 0.85, 1994, 200,
-                              {"prefix": "field='test_2'", "date": {"year": 1994, "day": 200}, "field_size": 2.4},
+                              {"prefix": "field='test_2'", "field_size": 2.4},
                               {"dry_matter_mass": 144.6, "dry_matter_fraction": 0.3, "application_depth": 45.0,
                                "surface_remainder_fraction": 0.85, "field_coverage": 0.92, "nitrogen": 40,
-                               "phosphorus": 43.1, "potassium": 14.55}, 14.55),
+                               "phosphorus": 43.1, "potassium": 14.55, "year": 1994, "day": 200}, 14.55),
                              ("test_3", 0.66, 266.5, 0.44, 0.95, 100.5, 78.0, 120.0, 0.7, 2009, 150,
-                              {"prefix": "field='test_3'", "date": {"year": 2009, "day": 150}, "field_size": 0.66},
+                              {"prefix": "field='test_3'", "field_size": 0.66},
                               {"dry_matter_mass": 266.5, "dry_matter_fraction": 0.44, "application_depth": 120.0,
-                               "surface_remainder_fraction": 0.7, "field_coverage": 0.95,
-                               "nitrogen": 100.5, "phosphorus": 78.0, "potassium": None}, None)
+                               "surface_remainder_fraction": 0.7, "field_coverage": 0.95, "year": 2009, "day": 150,
+                               "nitrogen": 100.5, "phosphorus": 78.0, "potassium": None, }, None)
                          ])
 def test_record_manure_application(field_name: str, field_size: float, dry_mass: float, dry_fraction: float,
                                    coverage: float, nitrogen: float, phosphorus: float, depth: float, remainder: float,
