@@ -664,7 +664,14 @@ class Field:
             execute_heat_scheduled_harvest = crop.data.use_heat_scheduling and \
                                              crop.data.heat_fraction >= crop.data.harvest_heat_fraction
             if execute_heat_scheduled_harvest:
-                crop.crop_management.manage_harvest(HarvestOperation.HARVEST_ONLY, time)
+                crop.crop_management.manage_harvest(
+                    HarvestOperation.HARVEST_ONLY,
+                    self.field_data.name,
+                    self.field_data.field_size,
+                    time,
+                    self.soil.data,
+                    self.feed_manager
+                )
                 self.soil.carbon_cycling.residue_partition.add_residue_to_pools(rainfall)
 
     @staticmethod
@@ -783,7 +790,7 @@ class Field:
                  "date": {"year": year, "day": day}}
         om.add_variable("crop_planting", value, info_map)
 
-    def _harvest_crop(self, crop_reference: str, harvest_operation: str, time: Time,
+    def _harvest_crop(self, crop_reference: str, harvest_operation: HarvestOperation, time: Time,
                       current_conditions: CurrentDayConditions) -> None:
         """
         Performs the specified crop operation on the specified crop.

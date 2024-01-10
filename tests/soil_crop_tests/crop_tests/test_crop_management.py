@@ -1,5 +1,4 @@
 import pytest
-from pytest_mock import MockerFixture
 from mock.mock import MagicMock, patch, PropertyMock
 from RUFAS.config import Config
 from RUFAS.time import Time
