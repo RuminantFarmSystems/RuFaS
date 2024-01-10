@@ -9,6 +9,9 @@ from RUFAS.output_manager import OutputManager
 
 om = OutputManager()
 
+@pytest.fixture
+
+
 
 # ---- Test Static Functions ----
 @pytest.mark.parametrize("heatfrac,optimal_index", [
@@ -155,6 +158,7 @@ def test_manage_harvest(harvest_op: HarvestOperation, field_name: str, field_siz
     with patch.object(crop, "determine_harvest_index") as harvest_index, \
             patch.object(crop, "kill", wraps=crop.kill) as kill, \
             patch.object(crop, "cut_crop") as cut_crop, \
+            patch.object(crop, "_store_harvested_crop") as store_crop, \
             patch.object(crop, "_record_yield") as record_yield, \
             patch.object(crop, "_transfer_residue") as transfer_residue:
         crop.manage_harvest(harvest_op, field_name, field_size, year, day, soil_data)
@@ -164,14 +168,17 @@ def test_manage_harvest(harvest_op: HarvestOperation, field_name: str, field_siz
         if harvest_op == HarvestOperation.HARVEST_KILL:
             cut_crop.assert_called_once()
             kill.assert_called_once()
+            store_crop.assert_called_once()
 
         if harvest_op == HarvestOperation.HARVEST_ONLY:
             cut_crop.assert_called_once()
             kill.assert_not_called()
+            store_crop.assert_called_once()
 
         if harvest_op == HarvestOperation.KILL_ONLY:
             cut_crop.assert_not_called()
             kill.assert_called_once()
+            store_crop.assert_not_called()
 
         record_yield.assert_called_once_with(field_name, field_size, year, day)
         transfer_residue.assert_called_once_with(soil_data, killed)
