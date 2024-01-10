@@ -3,8 +3,10 @@ from mock.mock import MagicMock, patch, PropertyMock
 from RUFAS.config import Config
 from RUFAS.time import Time
 from RUFAS.routines.feed_storage.feed_manager import FeedManager
+from RUFAS.routines.feed_storage.harvested_crop import HarvestedCrop
 from RUFAS.routines.field.crop.crop_management import CropManagement
-from RUFAS.routines.field.crop.crop_data import CropData
+from RUFAS.routines.field.crop.crop_data import CropData, DEFAULT_CROP_QUALITIES
+from RUFAS.routines.field.crop.crop_configurations.alfalfa import AlfalfaSilage
 from math import exp
 from RUFAS.routines.field.crop.harvest_operations import HarvestOperation
 from RUFAS.routines.field.soil.soil_data import SoilData
@@ -27,6 +29,11 @@ def mock_time() -> Time:
 @pytest.fixture
 def mock_feed_manager() -> FeedManager:
     return FeedManager()
+
+
+@pytest.fixture
+def mock_alfalfa_silage_data() -> AlfalfaSilage:
+    return AlfalfaSilage()
 
 
 # ---- Test Static Functions ----
@@ -279,6 +286,44 @@ def test_recalculate_biomass_distribution(roots_harvested: bool, cut_biomass: fl
     assert crop.above_ground_biomass == expected_surface_biomass
     assert crop.root_biomass == expected_root_biomass
     assert crop.root_fraction == expected_root_fraction
+
+
+@pytest.mark.parametrize("field_size,wet_yield_collected,expected_fresh_mass", [
+    (1.0, 2000.0, 2000.0),
+    (2.0, 1500.0, 3000.0),
+])
+def test_store_harvested_crop(
+        mock_time: Time,
+        mock_feed_manager: FeedManager,
+        mock_alfalfa_silage_data: AlfalfaSilage,
+        field_size: float,
+        wet_yield_collected: float,
+        expected_fresh_mass: float,
+) -> None:
+    mock_alfalfa_silage_data.wet_yield_collected = wet_yield_collected
+    crop_management = CropManagement(crop_data=mock_alfalfa_silage_data)
+    expected_harvest_crop = HarvestedCrop(
+        category=mock_alfalfa_silage_data.crop_category,
+        type=mock_alfalfa_silage_data.crop_type,
+        harvest_time=mock_time,
+        storage_time=mock_time,
+        fresh_mass=expected_fresh_mass,
+        dry_matter_percentage=mock_alfalfa_silage_data.dry_matter_percentage,
+        dry_matter_digestibility=DEFAULT_CROP_QUALITIES.get("dry_matter_digestibility"),
+        crude_protein_percent=DEFAULT_CROP_QUALITIES.get("crude_protein_percent"),
+        non_protein_nitrogen=DEFAULT_CROP_QUALITIES.get("non_protein_nitrogen"),
+        starch=DEFAULT_CROP_QUALITIES.get("starch"),
+        adf=DEFAULT_CROP_QUALITIES.get("adf"),
+        ndf=DEFAULT_CROP_QUALITIES.get("ndf"),
+        sugar=DEFAULT_CROP_QUALITIES.get("sugar"),
+        lignin=mock_alfalfa_silage_data.lignin_dry_matter_percentage,
+        ash=DEFAULT_CROP_QUALITIES.get("ash"),
+    )
+
+    with patch.object(mock_feed_manager, "receive_crop") as receive_crop:
+        crop_management._store_harvested_crop(mock_time, field_size, mock_feed_manager)
+
+        receive_crop.assert_called_once_with(expected_harvest_crop, mock_alfalfa_silage_data.storage_type)
 
 
 @pytest.mark.parametrize("field_name,field_size,species,year,day,mass,dry_mass,nitrogen,phosphorus", [
