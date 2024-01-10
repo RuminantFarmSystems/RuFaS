@@ -221,7 +221,7 @@ class CropManagement:
 
     def _store_harvested_crop(self, time: Time, field_size: float, feed_manager: FeedManager) -> None:
         """
-        Compiles the details of a harvest of this crop into a HarvestCrop instance.
+        Compiles the details of a harvest of this crop into a HarvestedCrop instance.
 
         Parameters
         ----------
