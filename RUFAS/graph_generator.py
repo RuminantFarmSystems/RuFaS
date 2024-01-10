@@ -199,23 +199,17 @@ class GraphGenerator:
                     break
                 data_dict = Utility.convert_list_of_dicts_to_dict_of_lists(values)
                 filtered_data = Utility.filter_pool(data_dict, selected_variables, False)
-                prepared_pool.update(filtered_data)
-                for selected_variable in selected_variables:
-                    is_variable_in_data = selected_variable in data_dict
-                    if not is_variable_in_data:
-                        log_pool.append({"warning": f"{selected_variable} not a valid key in provided data",
-                                         "message": f"{selected_variable} won't be graphed.",
-                                         "info_map": info_map})
-                    else:
-                        log_pool.append({"log": f"Successfully added {title} data to prepared_pool",
-                                         "message": f"Data for {selected_variable} added to prepared_pool.",
-                                         "info_map": info_map})
-                data_dict_has_zero_selected_vars = all(selected_variable not in data_dict for
-                                                       selected_variable in selected_variables)
-                if data_dict_has_zero_selected_vars:
+                if not filtered_data:
                     log_pool.append({"error": f"Can't plot {title} data set",
                                      "message": "No filter-file variables found in data provided.",
                                      "info_map": info_map})
+                else:
+                    for filtered_key, filtered_value in filtered_data.items():
+                        if filtered_key in prepared_pool:
+                            prepared_pool[filtered_key].extend(filtered_value)
+                        else:
+                            prepared_pool[filtered_key] = filtered_value
+                    # prepared_pool.update(filtered_data)
             else:
                 prepared_pool[key] = values
                 log_pool.append({"log": f"Successfully added {title} data to prepared_pool",
