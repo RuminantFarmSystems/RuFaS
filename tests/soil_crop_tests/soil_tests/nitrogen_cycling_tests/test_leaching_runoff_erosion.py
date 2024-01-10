@@ -44,7 +44,7 @@ def test_determine_enrichment_ratio(daily_soil_lost: float) -> None:
     (5.223, 1.4, 31, 2.5, 0.76)
 ])
 def test_calculate_eroded_organic_nitrogen(nitrogen: float, density: float, depth: float, area: float,
-                                           sediment: float) -> float:
+                                           sediment: float) -> None:
     """Tests that the amount of organic nitrogen lost to eroded sediment is calculated correctly."""
     LayerData.determine_soil_nutrient_concentration = MagicMock(return_value=26)
     LeachingRunoffErosion._determine_enrichment_ratio = MagicMock(return_value=2.5)
@@ -60,32 +60,35 @@ def test_calculate_eroded_organic_nitrogen(nitrogen: float, density: float, dept
     assert observed == expected_lost_nitrogen
 
 
-@pytest.mark.parametrize("nitrogen_content,field_capacity,percolation,extraction_coefficient,is_active", [
-    (35, 10.33, 3.11, 1.0, False),
-    (14.5, 6.75, 1.22, 2.5, True),
-    (22.45, 8.332, 2.45, 2.5, False)
+@pytest.mark.parametrize("nitrogen,water,coefficient,bulk_density,thickness,field_size,expected", [
+    (35, 10.33, 1.8, 1.2, 20.0, 1.3, 5.0),
+    (14.5, 6.75, 1.22, 1.9, 150.0, 2.9, 5.0),
+    (3.5, 8.332, 0.005, 1.1, 70.0, 3.5, 3.5)
 ])
-def test_calculate_nitrogen_lost_to_leaching(nitrogen_content: float, field_capacity: float, percolation: float,
-                                             extraction_coefficient: float, is_active: bool) -> None:
-    """Tests that the correct amount of nitrogen is determined to be leached out of a soil layer."""
-    LeachingRunoffErosion._determine_nitrogen_percolation_water_concentration = MagicMock(return_value=46)
-    LeachingRunoffErosion._adjust_active_organic_nitrogen_concentration = MagicMock(return_value=30)
-    LeachingRunoffErosion._determine_leached_nitrogen = MagicMock(return_value=18)
+def test_calculate_nitrogen_removed_by_water(
+        nitrogen: float,
+        water: float,
+        coefficient: float,
+        bulk_density: float,
+        thickness: float,
+        field_size: float,
+        expected: float,
+) -> None:
+    """Tests that the correct amount of nitrogen is determined to be removed from a soil layer."""
+    n_concentration = 12.0
+    n_density = 5.0
+    expected_water_in_liters = water * field_size * 1e4
+    expected_conc_lost = n_concentration * expected_water_in_liters * coefficient
 
-    observed = LeachingRunoffErosion._calculate_nitrogen_removed_by_water(nitrogen_content, field_capacity, percolation)
+    with patch.object(LayerData, "determine_soil_nutrient_concentration", return_value=n_concentration) as conc, \
+            patch.object(LayerData, "determine_soil_nutrient_area_density", return_value=n_density) as density:
+        actual = LeachingRunoffErosion._calculate_nitrogen_removed_by_water(
+            nitrogen, water, coefficient, bulk_density, thickness, field_size
+        )
 
-    LeachingRunoffErosion._determine_nitrogen_percolation_water_concentration.assert_called_once_with(nitrogen_content,
-                                                                                                      field_capacity,
-                                                                                                      percolation)
-    if is_active:
-        LeachingRunoffErosion._adjust_active_organic_nitrogen_concentration.assert_called_once_with(46)
-        LeachingRunoffErosion._determine_leached_nitrogen.assert_called_once_with(30, percolation,
-                                                                                  extraction_coefficient)
-    else:
-        LeachingRunoffErosion._adjust_active_organic_nitrogen_concentration.assert_not_called()
-        LeachingRunoffErosion._determine_leached_nitrogen.assert_called_once_with(46, percolation,
-                                                                                  extraction_coefficient)
-    assert observed == min(nitrogen_content, 18)
+        assert actual == expected
+        conc.assert_called_once_with(nitrogen, bulk_density, thickness, field_size)
+        density.assert_called_once_with(pytest.approx(expected_conc_lost), bulk_density, thickness, field_size)
 
 
 @pytest.mark.parametrize("nitrates,ammonium,fresh,active,stable,field_size", [
