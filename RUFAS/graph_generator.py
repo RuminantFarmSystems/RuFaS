@@ -209,7 +209,6 @@ class GraphGenerator:
                             prepared_pool[filtered_key].extend(filtered_value)
                         else:
                             prepared_pool[filtered_key] = filtered_value
-                    # prepared_pool.update(filtered_data)
             else:
                 prepared_pool[key] = values
                 log_pool.append({"log": f"Successfully added {title} data to prepared_pool",
