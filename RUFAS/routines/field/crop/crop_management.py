@@ -237,6 +237,10 @@ class CropManagement:
         HarvestedCrop
             HarvestedCrop instance containing all the details of this harvest event.
 
+        Notes
+        -----
+        It is assumed that the wet yield is recorded in kg / ha for crops, but stored in the FeedManager as kg.
+
         """
         harvested_crop = HarvestedCrop(
             category=self.data.crop_category,
