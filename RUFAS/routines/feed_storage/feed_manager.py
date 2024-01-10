@@ -137,12 +137,12 @@ class FeedManager:
 
         Parameters
         ----------
-        query_crop_types : List[CropType], optional
-            The types of crop to query (default is None, which queries all types).
-        query_crop_categories : List[CropCategory], optional
-            The categories of crop to query (default is None, which queries all categories).
-        query_storage_types : List[StorageType], optional
-            The types of storage to query (default is None, which queries all types).
+        query_crop_types : List[CropType], optional, default=None
+            The types of crop to query (if None, all crop types are queried).
+        query_crop_categories : List[CropCategory], optional, default=None
+            The categories of crop to query (if None, all crop categories are queried).
+        query_storage_types : List[StorageType], optional, default=None
+            The types of storage to query (if None, all storages types are queried).
 
         Returns
         -------
