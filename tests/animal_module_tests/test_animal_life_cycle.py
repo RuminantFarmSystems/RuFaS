@@ -1512,7 +1512,7 @@ def test_calf_init_values(mocker: MockerFixture, semen_type: str, conventional_s
     assert calf.body_weight == mock_args["body_weight"]
 
 
-def test_calf(mocker: MockerFixture) -> None:
+def test_calf_assign_values(mocker: MockerFixture) -> None:
     # testing assign_calf_values
     calf = mocker.MagicMock(autospec=Calf)
     mocker.patch('RUFAS.routines.animal.life_cycle.life_cycle.Calf',
@@ -1529,7 +1529,11 @@ def test_calf(mocker: MockerFixture) -> None:
     assert calf.gender == "female"
     calf.events.init_from_string.assert_called()
 
-    # testing get_calf_values
+
+def test_calf_get_values(mocker: MockerFixture) -> None:
+    calf = mocker.MagicMock(autospec=Calf)
+    mocker.patch('RUFAS.routines.animal.life_cycle.life_cycle.Calf',
+                 return_value=calf)
     vals = Calf.get_calf_values(calf)
 
     assert vals["id"] == calf.id
@@ -1542,7 +1546,11 @@ def test_calf(mocker: MockerFixture) -> None:
     assert vals["mature_body_weight"] == calf.mature_body_weight
     assert vals["events"] == str(calf.events)
 
-    # testing calc_nutrient_reqs
+
+def test_calf_calc_nutrient_reqs(mocker: MockerFixture) -> None:
+    calf = mocker.MagicMock(autospec=Calf)
+    mocker.patch('RUFAS.routines.animal.life_cycle.life_cycle.Calf',
+                 return_value=calf)
     ration = mocker.MagicMock(autospec=CalfRationManager)
     calc_req = mocker.patch.object(CalfRationManager, 'calc_requirements', return_value=ration)
     calc_intake = mocker.patch.object(CalfRationManager, 'calc_intake', return_value=ration)
@@ -1561,14 +1569,24 @@ def test_calf(mocker: MockerFixture) -> None:
     calc_intake.assert_called_once_with(calf, feed, wean_day, wean_length, milk_type)
     calc_req.assert_called_once_with(calf, feed, temp, calf.animal_intake)
 
+
+def test_calf_calc_manure_excretion(mocker: MockerFixture) -> None:
     # test calc_manure_excretion
+    calf = mocker.MagicMock(autospec=Calf)
+    mocker.patch('RUFAS.routines.animal.life_cycle.life_cycle.Calf',
+                 return_value=calf)
+    feed = mocker.MagicMock(autospec=Feed)
     patch_base_manure = mocker.patch.object(
         Calf, 'calc_base_manure', return_value=calf
     )
     Calf.calc_base_manure(calf, feed, "methane_model")
     patch_base_manure.assert_called()
 
-    # test phosphorus_rqmts
+
+def test_calf_phosphorus_rqmts(mocker: MockerFixture) -> None:
+    calf = mocker.MagicMock(autospec=Calf)
+    mocker.patch('RUFAS.routines.animal.life_cycle.life_cycle.Calf',
+                 return_value=calf)
     calf.p_maint_feces = 10
     calf.p_req = 0
     Calf.phosphorus_rqmts(calf, 10)
