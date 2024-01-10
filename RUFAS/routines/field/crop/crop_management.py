@@ -61,11 +61,11 @@ class CropManagement:
         """
         self.determine_harvest_index()
 
-        if harvest_op == HarvestOperation.HARVEST_KILL or HarvestOperation.HARVEST_ONLY:
+        if harvest_op in (HarvestOperation.HARVEST_KILL, HarvestOperation.HARVEST_ONLY):
             self.cut_crop(collected_fraction=self.data.harvest_efficiency)
             self._store_harvested_crop(time, field_size, feed_manager)
 
-        if harvest_op == HarvestOperation.KILL_ONLY or HarvestOperation.HARVEST_KILL:
+        if harvest_op in (HarvestOperation.KILL_ONLY, HarvestOperation.HARVEST_KILL):
             self.kill()
 
         self._record_yield(field_name, field_size, time.calendar_year, time.day)

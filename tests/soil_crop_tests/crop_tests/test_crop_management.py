@@ -1,5 +1,9 @@
 import pytest
+from pytest_mock import MockerFixture
 from mock.mock import MagicMock, patch, PropertyMock
+from RUFAS.config import Config
+from RUFAS.time import Time
+from RUFAS.routines.feed_storage.feed_manager import FeedManager
 from RUFAS.routines.field.crop.crop_management import CropManagement
 from RUFAS.routines.field.crop.crop_data import CropData
 from math import exp
@@ -10,7 +14,19 @@ from RUFAS.output_manager import OutputManager
 om = OutputManager()
 
 @pytest.fixture
+def mock_time(mocker: MockerFixture) -> Time:
+    config = Config({
+        "start_date": "1:1",
+        "end_date": "1:10",
+        "set_seed": False,
+        "random_seed": 42,
+    })
+    return Time(config)
 
+
+@pytest.fixture
+def mock_feed_manager() -> FeedManager:
+    return FeedManager()
 
 
 # ---- Test Static Functions ----
@@ -144,12 +160,12 @@ def test_determine_harvest_index(harvest, heat_frac, water_def):
         assert data.harvest_index == CropManagement._adjust_harvest_index(potential, 0.5, water_def)
 
 
-@pytest.mark.parametrize("harvest_op,field_name,field_size,year,day,soil_data,killed", [
-    (HarvestOperation.HARVEST_KILL, "test_1", 1.8, 1995, 200, SoilData(field_size=1.3), True),
-    (HarvestOperation.HARVEST_ONLY, "test_2", 4.5, 2010, 150, SoilData(field_size=2.4), False),
-    (HarvestOperation.KILL_ONLY, "test_3", 2.2, 2024, 200, SoilData(field_size=1.1), True)
+@pytest.mark.parametrize("harvest_op,field_name,field_size,soil_data,killed", [
+    (HarvestOperation.HARVEST_KILL, "test_1", 1.8, SoilData(field_size=1.8), True),
+    (HarvestOperation.HARVEST_ONLY, "test_2", 4.5, SoilData(field_size=4.5), False),
+    (HarvestOperation.KILL_ONLY, "test_3", 2.2, SoilData(field_size=2.5), True)
 ])
-def test_manage_harvest(harvest_op: HarvestOperation, field_name: str, field_size: float, year: int, day: int,
+def test_manage_harvest(mock_time: Time, mock_feed_manager: FeedManager, harvest_op: HarvestOperation, field_name: str, field_size: float,
                         soil_data: SoilData, killed: bool) -> None:
     """ensure that crops are harvested properly, dependent on their operation specs"""
     crop = CropManagement()
@@ -161,7 +177,7 @@ def test_manage_harvest(harvest_op: HarvestOperation, field_name: str, field_siz
             patch.object(crop, "_store_harvested_crop") as store_crop, \
             patch.object(crop, "_record_yield") as record_yield, \
             patch.object(crop, "_transfer_residue") as transfer_residue:
-        crop.manage_harvest(harvest_op, field_name, field_size, year, day, soil_data)
+        crop.manage_harvest(harvest_op, field_name, field_size, mock_time, soil_data, mock_feed_manager)
 
         harvest_index.assert_called_once()
         # Method specific (one for each op type)
@@ -180,7 +196,7 @@ def test_manage_harvest(harvest_op: HarvestOperation, field_name: str, field_siz
             kill.assert_called_once()
             store_crop.assert_not_called()
 
-        record_yield.assert_called_once_with(field_name, field_size, year, day)
+        record_yield.assert_called_once_with(field_name, field_size, mock_time.year, mock_time.day)
         transfer_residue.assert_called_once_with(soil_data, killed)
 
 
