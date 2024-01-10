@@ -12,6 +12,7 @@ from RUFAS.output_manager import OutputManager
 
 om = OutputManager()
 
+
 @pytest.fixture
 def mock_time() -> Time:
     config = Config({
@@ -164,8 +165,8 @@ def test_determine_harvest_index(harvest, heat_frac, water_def):
     (HarvestOperation.HARVEST_ONLY, "test_2", 4.5, SoilData(field_size=4.5), False),
     (HarvestOperation.KILL_ONLY, "test_3", 2.2, SoilData(field_size=2.5), True)
 ])
-def test_manage_harvest(mock_time: Time, mock_feed_manager: FeedManager, harvest_op: HarvestOperation, field_name: str, field_size: float,
-                        soil_data: SoilData, killed: bool) -> None:
+def test_manage_harvest(mock_time: Time, mock_feed_manager: FeedManager, harvest_op: HarvestOperation, field_name: str,
+                        field_size: float, soil_data: SoilData, killed: bool) -> None:
     """ensure that crops are harvested properly, dependent on their operation specs"""
     crop = CropManagement()
     crop.data.yield_residue = 100.0

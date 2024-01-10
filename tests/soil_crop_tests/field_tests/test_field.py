@@ -50,6 +50,7 @@ def mock_field_data() -> FieldData:
         field_size=1.5,
     )
 
+
 @pytest.mark.parametrize("manure_manager,should_fail", [
     (MagicMock(ManureManager), False),
     (None, True)
