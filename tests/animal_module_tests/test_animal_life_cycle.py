@@ -23,9 +23,9 @@ from RUFAS.routines.animal.life_cycle.heiferIII import HeiferIII
 from RUFAS.routines.animal.life_cycle.life_cycle import GenericAnimal
 from RUFAS.routines.animal.life_cycle.life_cycle import LifeCycleManager
 from RUFAS.routines.animal.pen import Pen
-from RUFAS.routines.animal.animal_types import AnimalType
 from RUFAS.routines.animal.ration.animal_requirements import AnimalRequirements
 from RUFAS.routines.feed.feed import Feed
+from RUFAS.routines.animal.animal_grouping_scenarios import AnimalGroupingScenario
 
 
 @fixture
@@ -1468,17 +1468,12 @@ def test_reset_daily_stats(life_cycle_manager: LifeCycleManager) -> None:
     assert life_cycle_manager.avg_mature_body_weight == approx(0.0)
 
 
-def test_heiferI(mocker: MockerFixture) -> None:
+def test_set_nutrient_rqmts(mocker: MockerFixture) -> None:
     """Unit tests for all the functions in class HeiferI in file life_cycle.py."""
-
     heiferI = mocker.MagicMock(autospec=HeiferI)
     mocker.patch('RUFAS.routines.animal.life_cycle.heiferI.HeiferI.__init__', return_value=heiferI)
-    heiferI.body_weight = 1000.0
-    heiferI.mature_body_weight = 1200.0
-    heiferI.daily_growth = 1.0
-    heiferI.days_born = 300
     temp = 30
-    animal_grouping_scenario = AnimalType.HEIFER_I
+    animal_grouping_scenario = mocker.MagicMock(autospec=AnimalGroupingScenario)
     nutrient_conc = {'dm': 0.0, 'NDF': 4.5, 'TDN': 7.8}
     req = mocker.MagicMock(autospec=AnimalRequirements)
     animal_req = mocker.patch.object(
@@ -1500,21 +1495,30 @@ def test_heiferI(mocker: MockerFixture) -> None:
     }
     mocker.patch('RUFAS.routines.animal.life_cycle.life_cycle.AnimalBase.config', animal_base_config)
 
-    # testing set_nutrient_rqmts()
     HeiferI.set_nutrient_rqmts(heiferI, temp, animal_grouping_scenario, nutrient_conc)
     animal_req.assert_called()
     nutrient_conc = {'dm': 7.0, 'NDF': 4.5, 'TDN': 7.8}
     HeiferI.set_nutrient_rqmts(heiferI, temp, animal_grouping_scenario, nutrient_conc, 0.0, 0.0)
     animal_req.assert_called()
 
-    # testing calc_manure_excretion()
+
+def test_heiferI_calc_manure_excretion(mocker: MockerFixture) -> None:
+    heiferI = mocker.MagicMock(autospec=HeiferI)
+    mocker.patch('RUFAS.routines.animal.life_cycle.heiferI.HeiferI.__init__', return_value=heiferI)
+    heiferI.body_weight = 1000.0
+    heiferI.mature_body_weight = 1200.0
+    heiferI.daily_growth = 1.0
+    heiferI.days_born = 300
     feed = mocker.MagicMock(autospec=Feed)
     mock_numI = (mocker.MagicMock(autospec=int), mocker.MagicMock(autospec=int))
     heiferI.calc_base_manure.return_value = mock_numI
     HeiferI.calc_manure_excretion(heiferI, feed, "methane_model")
     heiferI.calc_base_manure.assert_called()
 
-    # testing phosphorus_rqmts()
+
+def test_heiferI_phosphorus_rqmts(mocker: MockerFixture) -> None:
+    heiferI = mocker.MagicMock(autospec=HeiferI)
+    mocker.patch('RUFAS.routines.animal.life_cycle.heiferI.HeiferI.__init__', return_value=heiferI)
     heiferI.p_maint_feces = 10
     heiferI.p_req = 0
     HeiferI.phosphorus_rqmts(heiferI, 10)
@@ -1531,12 +1535,35 @@ def test_heiferI(mocker: MockerFixture) -> None:
     assert heiferI.p_maint_feces == 8
     assert heiferI.p_req == p_req
 
-    # testing get_non_preg_bw_change()
+
+def test_heiferI_get_non_preg_bw_change(mocker: MockerFixture) -> None:
+    heiferI = mocker.MagicMock(autospec=HeiferI)
+    heiferI.body_weight = 1000.0
+    heiferI.mature_body_weight = 1200.0
+    heiferI.daily_growth = 1.0
+    heiferI.days_born = 300
+    heifer_repro_method = 'TAI'
+    heifer_TAI_protocol = 'd5CG2P'
+    heifer_synchedED_protocol = '2P'
+    nutrient_standard = 'NRC'
+    animal_base_config = {
+        "heifer_repro_method": heifer_repro_method,
+        "target_heifer_preg_day": 300,
+        "breeding_start_day_h": 400,
+        "heifer_repro_programs": {
+            "heifer_TAI_protocol": heifer_TAI_protocol,
+            "heifer_synchED_protocol": heifer_synchedED_protocol
+        },
+        "nutrient_standard": nutrient_standard
+    }
+    mocker.patch('RUFAS.routines.animal.life_cycle.life_cycle.AnimalBase.config', animal_base_config)
     weight = HeiferI.get_non_preg_bw_change(heiferI)
     calc_weight = 0.55 * 0.96 * heiferI.mature_body_weight - 0.96 * heiferI.body_weight  # divisor == 1
     assert weight == calc_weight
 
-    # testing get_heiferI_values()
+
+def test_heiferI_get_heiferI_values(mocker: MockerFixture) -> None:
+    heiferI = mocker.MagicMock(autospec=HeiferI)
     heiferI_vals = mocker.MagicMock(autospec=Dict)
     heiferI.get_calf_values.return_value = heiferI_vals
     vals = HeiferI.get_heiferI_values(heiferI)

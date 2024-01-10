@@ -55,7 +55,7 @@ class HeiferI(Calf):
         animal_requirements = req.calc_rqmts(body_weight=self.body_weight,
                                              mature_body_weight=self.mature_body_weight,
                                              day_of_pregnancy=None,
-                                             animal_type=animal_grouping_scenario,
+                                             animal_type=animal_grouping_scenario.get_animal_type(self),
                                              body_condition_score_5=3,
                                              previous_temperature=temp,
                                              average_daily_gain_heifer=self.daily_growth,
