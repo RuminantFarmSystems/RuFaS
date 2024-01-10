@@ -702,7 +702,7 @@ class ReportGenerator:
                 raise ValueError(f"Constant name {name} must be a string.")
 
             if len(name) == 0:
-                raise ValueError(f"Constant name cannot be empty.")
+                raise ValueError("Constant name cannot be empty.")
 
             if not isinstance(value, (int, float)):
                 raise ValueError(f"Constant value {value} must be a number.")
