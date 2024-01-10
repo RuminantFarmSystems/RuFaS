@@ -255,7 +255,7 @@ class ManureHandlerConfig:
     daily_tillage_frequency : int
         Number of times per day that compost bedding is tilled.
     cleaning_water_recycle_fraction : float
-        Fraction of water that is not recycled.
+        Fraction of cleaning water that is from recycled (not fresh) water sources.
     """
 
     cleaning_water_use_rate: float = 0.0

@@ -3189,6 +3189,7 @@
             },
             "cleaning_water_recycle_fraction": {
               "type": "number",
+              "description": "Fraction of cleaning water that is from recycled (not fresh) water sources.",
               "minimum": 0.0,
               "maximum": 1.0
             }
