@@ -14,7 +14,7 @@ from RUFAS.output_manager import OutputManager
 om = OutputManager()
 
 @pytest.fixture
-def mock_time(mocker: MockerFixture) -> Time:
+def mock_time() -> Time:
     config = Config({
         "start_date": "1:1",
         "end_date": "1:10",
