@@ -60,7 +60,7 @@ def main():
         output_manager.dump_all_nondata_pools(
             Path(cmd_arguments.output_dir), cmd_arguments.exclude_info_maps, cmd_arguments.format_option
         )
-        sys.stdout.write("Unexpected early termination of the simulation. Please see logs for details.")
+        sys.stdout.write("Unexpected early termination of the simulation. Please see logs for details.\n")
 
 
 def run_rufas(
