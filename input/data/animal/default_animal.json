@@ -7,7 +7,6 @@
     "cow_num": 100,
     "replace_num": 500,
     "herd_num": 100,
-    "herd_init": false,
     "breed": "HO"
   },
   "herd_initialization": {
