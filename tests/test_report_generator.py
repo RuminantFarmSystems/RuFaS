@@ -596,12 +596,15 @@ def test_extract_and_check_aggregation_keys(
     Unit test for _extract_and_check_aggregation_keys() method in report_generator.py file.
     """
 
+    # Arrange
+    report_generator = ReportGenerator()
+
     # Act and assert
     if expected_exception:
         with pytest.raises(expected_exception):
-            ReportGenerator._extract_and_check_aggregation_keys(filter_content)
+            report_generator._extract_and_check_aggregation_keys(filter_content)
     else:
-        horizontal_key, vertical_key = ReportGenerator._extract_and_check_aggregation_keys(filter_content)
+        horizontal_key, vertical_key = report_generator._extract_and_check_aggregation_keys(filter_content)
         assert horizontal_key == expected_horizontal
         assert vertical_key == expected_vertical
 
