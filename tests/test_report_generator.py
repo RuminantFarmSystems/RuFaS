@@ -315,11 +315,15 @@ def test_add_constants_data(
     Unit test for the _add_constants_data static method in report_generator.py file.
     """
 
+    # Arrange
+    report_generator = ReportGenerator()
+
+    # Act and assert
     if expected_exception:
         with pytest.raises(expected_exception):
-            ReportGenerator._add_constants_data(report_data, filter_content)
+            report_generator._add_constants_data(report_data, filter_content)
     else:
-        ReportGenerator._add_constants_data(report_data, filter_content)
+        report_generator._add_constants_data(report_data, filter_content)
         assert report_data == expected_report_data
 
 
