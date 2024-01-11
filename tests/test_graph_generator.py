@@ -322,12 +322,12 @@ def test_prepare_plot_data(graph_generator: GraphGenerator,
     [
         ({"type": "bar", "title": "Valid Graph"}, 0, None),
         ({"invalid_key": "value", "title": "Invalid Graph"}, 1, "Invalid filter file key invalid_key"),
-        ({"type": "stackplot", "invalid_key": "value"}, 1, "Invalid filter file key invalid_key"),
+        ({"type": "stackplot", "filter": ["a", "b"], "invalid_key": "value"}, 2, "Invalid filter file key filter"),
     ])
 def test_validate_graph_filter(graph_generator: GraphGenerator, graph_details: Dict[str, str], expected_length: int,
                                expected_message: str):
     result = graph_generator._validate_graph_filter(graph_details)
-    assert len(result) == expected_length, f"Expected {expected_length} errors, got {len(result)}"
+    assert len(result) == expected_length
 
     if expected_length > 0:
-        assert expected_message in result[0]["message"], f"Expected error message '{expected_message}' not found"
+        assert expected_message in result[0]["message"]
