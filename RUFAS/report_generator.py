@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from typing import Dict, List, Any, Callable
 
 from RUFAS.util import Utility
@@ -156,148 +154,9 @@ class ReportGenerator:
         None
         """
 
-        self.reports = {}
+        self.reports: Dict[str, Dict[str, List[Any]]] = {}
 
     def generate_report(
-            self,
-            filtered_pool: Dict[str, Dict[str, List[Any]]],
-            filter_content: Dict[str, str | int | List[str]],
-    ) -> Dict[str, List[float]]:
-        """
-        Generates a report based on filtered data and aggregation criteria.
-
-        This method processes filtered data and performs specified horizontal and/or vertical aggregations
-        based on the instructions provided in filter_content.
-
-        Parameters
-        ----------
-        filtered_pool : Dict[str, Dict[str, List[Any]]]
-            The data pool from which the report is to be generated, structured as a dictionary.
-            Has the same structure of OutputManager's variables pool.
-
-        filter_content : Dict[str, str | int | List[str]]
-            A dictionary containing filter criteria and aggregation instructions.
-
-        Returns
-        -------
-        Dict[str, List[float]]
-            The sliced and aggregated data.
-
-        Raises
-        ------
-        ValueError
-            If the report data is empty or if the necessary aggregation keys are not found in filter_content.
-        KeyError
-            If a key specified in the `horizontal_order` of `filter_content` is not found in the `report_data`.
-            This usually indicates a mismatch between the expected structure of `filtered_pool` and its actual content.
-        """
-        report_data = self._prepare_report_data(
-            filtered_pool,
-            selected_variables=filter_content.get("variables"),
-            slice_start=filter_content.get("slice_start", 0),
-            slice_end=filter_content.get("slice_end"),
-        )
-        if not report_data:
-            raise ValueError(
-                f"filter {filter_content.get('filters')} in {filter_content.get('name')} led to empty report data."
-            )
-
-        horizontal_agg_key = filter_content.get("horizontal_aggregation")
-        horizontal_aggregator = AGGREGATION_FUNCTIONS.get(horizontal_agg_key)
-
-        vertical_agg_key = filter_content.get("vertical_aggregation")
-        vertical_aggregator = AGGREGATION_FUNCTIONS.get(vertical_agg_key)
-
-        if horizontal_aggregator:
-            loop_list = filter_content.get("horizontal_order", report_data.keys())
-            number_of_elements = len(report_data[next(iter(report_data))])
-            try:
-                horizontally_aggregated = [
-                    horizontal_aggregator([report_data[key][i] for key in loop_list])
-                    for i in range(number_of_elements)
-                ]
-            except KeyError as e:
-                raise KeyError(
-                    f"{e.args[0]} not found in filtered pool. Check the `horizontal_order` entry in the filter file."
-                )
-            if not vertical_aggregator:
-                return {"hor_agg": horizontally_aggregated}
-
-        if vertical_aggregator:
-            vertically_aggregated = [
-                vertical_aggregator(data_series)
-                for _, data_series in report_data.items()
-            ]
-            if not horizontal_aggregator:
-                return {"ver_agg": vertically_aggregated}
-
-            if filter_content.get("horizontal_first", False):
-                return {"hor_ver_agg": [vertical_aggregator(horizontally_aggregated)]}
-            return {"ver_hor_agg": [horizontal_aggregator(vertically_aggregated)]}
-
-        return report_data
-
-    def _prepare_report_data(
-            self,
-            filtered_pool: Dict[str, Dict[str, List[Any]]],
-            selected_variables: List[str],
-            slice_start: int,
-            slice_end: int,
-    ) -> Dict[str, List[Any]]:
-        """
-        Processes and structures a filtered data pool for report generation.
-
-        This method organizes data from a filtered pool based on selected variables and slicing parameters.
-        It caters to different data structures within the pool, ensuring data is formatted appropriately
-        for report inclusion.
-
-        Parameters
-        ----------
-        filtered_pool : Dict[str, pool_element_type]
-            The filtered data pool with each key mapping to its respective data element.
-
-        selected_variables : List[str]
-            Variables to be included from the filtered pool.
-
-        slice_start : int
-            Starting index for slicing data elements.
-
-        slice_end : int
-            Ending index for slicing.
-
-        Returns
-        -------
-        Dict[str, List[Any]]
-            Processed data suitable for report generation, keyed by selected variables.
-
-        Raises
-        ------
-        KeyError
-            If selected_variables is None and the data within the pool requires variable selection.
-        """
-        report_data: Dict[str, List[Any]] = {}
-        for key in filtered_pool.keys():
-            is_data_in_dict = isinstance(filtered_pool[key]["values"][0], dict)
-            if is_data_in_dict and selected_variables is None:
-                raise KeyError(
-                    "Can't generate report, use 'variables' arg to select items from data"
-                )
-            if is_data_in_dict:
-                temp_data = Utility.convert_list_of_dicts_to_dict_of_lists(
-                    filtered_pool[key]["values"][slice_start:slice_end]
-                )
-                for temp_key, temp_values in temp_data.items():
-                    if temp_key not in selected_variables:
-                        continue
-                    if temp_key in report_data:
-                        report_data[temp_key].extend(temp_values)
-                    else:
-                        report_data[temp_key] = temp_values
-            else:
-                report_data[key] = filtered_pool[key]["values"][slice_start:slice_end]
-        return report_data
-
-    def handle_report_generation(
             self,
             filter_content: Dict[str, Any],
             filtered_pool: Dict[str, Dict[str, List[Any]]],
@@ -323,7 +182,7 @@ class ReportGenerator:
         event_logs: List[Dict[str, str | Dict[str, str]]] = []
         info_map = {
             "class": self.__class__.__name__,
-            "function": self.handle_report_generation.__name__,
+            "function": self.generate_report.__name__,
         }
 
         report_name = self._generate_unique_report_name(filter_content.get("name"))
@@ -367,10 +226,11 @@ class ReportGenerator:
         Notes
         -----
         The rules for generating the name are as follows:
-        1. If the report name is None or empty, the name is set to `untitled_<timestamp>`.
-        2. If the name is already present in the list of previously generated reports, the timestamp is appended
+        1. If the report name is None, the name is set to `untitled_<timestamp>`.
+        2. If the name is not a string, it is converted to a string.
+        3. If the name is already present in the list of previously generated reports, the timestamp is appended
             to the name to make it unique.
-        3. Otherwise, return the report name as is.
+        4. Otherwise, return the report name as is.
 
         Parameters
         ----------
@@ -413,8 +273,8 @@ class ReportGenerator:
         if missing_references:
             raise KeyError(f"Missing referenced reports: {', '.join(missing_references)}")
 
-    @staticmethod
     def _generate_single_report(
+            self,
             filtered_pool: Dict[str, Dict[str, List[Any]]],
             filter_content: Dict[str, Any]
     ) -> Dict[str, List[Any]]:
@@ -447,7 +307,12 @@ class ReportGenerator:
         """
 
         try:
-            report_data = ReportGenerator._prepare_report_data_with_constants(filtered_pool, filter_content)
+            horizontal_agg_key, vertical_agg_key = self._validate_aggregation_keys(filter_content)
+        except ValueError as e:
+            raise ValueError(f"Error validating aggregation keys => {e}")
+
+        try:
+            report_data = self._prepare_report_data_with_constants(filtered_pool, filter_content)
         except ValueError as e:
             raise ValueError(f"Error preparing report data => {e}")
 
@@ -456,31 +321,27 @@ class ReportGenerator:
                 f"filter {filter_content.get('filters')} in {filter_content.get('name')} led to empty report data."
             )
 
-        try:
-            horizontal_agg_key, vertical_agg_key = ReportGenerator._validate_aggregation_keys(filter_content)
-        except ValueError as e:
-            raise ValueError(f"Error validating aggregation keys => {e}")
-
         horizontally_aggregated = None
         vertically_aggregated = None
 
         if horizontal_agg_key:
             horizontal_aggregator = AGGREGATION_FUNCTIONS.get(horizontal_agg_key)
             loop_list = filter_content.get("horizontal_order", report_data.keys())
-            horizontally_aggregated = ReportGenerator._apply_horizontal_aggregation(report_data, loop_list,
-                                                                                    horizontal_aggregator)
+            horizontally_aggregated = self._apply_horizontal_aggregation(report_data, loop_list,
+                                                                         horizontal_aggregator)
 
         if vertical_agg_key:
             vertical_aggregator = AGGREGATION_FUNCTIONS.get(vertical_agg_key)
-            vertically_aggregated = ReportGenerator._apply_vertical_aggregation(report_data, vertical_aggregator)
+            vertically_aggregated = self._apply_vertical_aggregation(report_data, vertical_aggregator)
 
-        aggregate_report = ReportGenerator._package_report_data(horizontally_aggregated, vertically_aggregated,
-                                                                filter_content)
+        aggregate_report = self._combine_aggregate_report_data(horizontally_aggregated,
+                                                               vertically_aggregated,
+                                                               filter_content)
 
         return aggregate_report if aggregate_report else report_data
 
-    @staticmethod
-    def _package_report_data(
+    def _combine_aggregate_report_data(
+            self,
             horizontally_aggregated: List[float] | None,
             vertically_aggregated: List[float] | None,
             filter_content: Dict[str, Any]
@@ -525,8 +386,10 @@ class ReportGenerator:
 
         return None
 
-    @staticmethod
-    def _validate_aggregation_keys(filter_content: Dict[str, Any]) -> tuple[str | None, str | None]:
+    def _validate_aggregation_keys(
+            self,
+            filter_content: Dict[str, Any]
+    ) -> tuple[str | None, str | None]:
         """
         Validates the horizontal and vertical aggregation keys in the filter content.
 
@@ -557,9 +420,10 @@ class ReportGenerator:
 
         return horizontal_agg_key, vertical_agg_key
 
-    @staticmethod
-    def _apply_horizontal_aggregation(report_data: Dict[str, List[float]], loop_list: List[str],
-                                      aggregator: Callable[[List[float]], float]) -> List[float]:
+    def _apply_horizontal_aggregation(
+            self,
+            report_data: Dict[str, List[float]], loop_list: List[str],
+            aggregator: Callable[[List[float]], float]) -> List[float]:
         """
         Performs horizontal aggregation on report data using a specified aggregator function.
 
@@ -587,16 +451,17 @@ class ReportGenerator:
         if len(set(lengths)) != 1:
             raise ValueError("Can't aggregate data with different lengths")
         max_length = max(lengths)
-        aggregated_data = []
+        aggregated_data: List[float] = []
         for i in range(max_length):
             temp_data = [report_data[key][i] for key in loop_list]
-            filtered_temp_data = list(filter(None.__ne__, temp_data))
-            aggregated_data.append(aggregator(filtered_temp_data))
+            non_null_data_points = list(filter(None.__ne__, temp_data))
+            aggregated_data.append(aggregator(non_null_data_points))
         return aggregated_data
 
-    @staticmethod
-    def _apply_vertical_aggregation(report_data: Dict[str, List[float]],
-                                    aggregator: Callable[[List[float]], float]) -> List[float]:
+    def _apply_vertical_aggregation(
+            self,
+            report_data: Dict[str, List[float]],
+            aggregator: Callable[[List[float]], float]) -> List[float]:
         """
         Performs vertical aggregation on report data using a specified aggregator function.
 
@@ -619,9 +484,10 @@ class ReportGenerator:
             aggregated_data.append(aggregator(filtered_data))
         return aggregated_data
 
-    @staticmethod
-    def _prepare_report_data_with_constants(filtered_pool: Dict[str, Dict[str, List[Any]]],
-                                            filter_content: Dict[str, Any]) -> Dict[str, List[Any]]:
+    def _prepare_report_data_with_constants(
+            self,
+            filtered_pool: Dict[str, Dict[str, List[Any]]],
+            filter_content: Dict[str, Any]) -> Dict[str, List[Any]]:
         """
         Processes and structures a filtered data pool for report generation.
 
@@ -684,8 +550,8 @@ class ReportGenerator:
 
         return report_data
 
-    @staticmethod
     def _add_constants_data(
+            self,
             report_data: Dict[str, List[Any]],
             filter_content: Dict[str, Any]) -> None:
         """
@@ -729,8 +595,8 @@ class ReportGenerator:
         for name, value in constant_config.items():
             report_data[name] = [value] * max_length
 
-    @staticmethod
     def _validate_constants(
+            self,
             report_data: Dict[str, List[Any]],
             constant_config: Dict[str, int | float]
     ) -> None:
