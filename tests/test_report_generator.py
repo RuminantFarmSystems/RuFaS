@@ -535,27 +535,29 @@ def test_validate_constants(
         ),
     ]
 )
-def test_generate_single_report(filtered_pool: Dict[str, Dict[str, List[Any]]],
-                                filter_content: Dict[str, Any],
-                                mock_prep_data: Dict[str, List[Any]],
-                                expected_result: List[Any],
-                                expected_exception: Type[Exception],
-                                mocker: MockerFixture) -> None:
+def test_generate_report_data(
+        filtered_pool: Dict[str, Dict[str, List[Any]]],
+        filter_content: Dict[str, Any],
+        mock_prep_data: Dict[str, List[Any]],
+        expected_result: List[Any],
+        expected_exception: Type[Exception],
+        mocker: MockerFixture) -> None:
     """
-    Unit test for the _generate_single_report() method of ReportGenerator class in report_generator.py file.
+    Unit test for the _generate_report_data() method of ReportGenerator class in report_generator.py file.
     """
 
     # Arrange
-    mocker.patch.object(ReportGenerator, '_prepare_report_data_with_constants', return_value=mock_prep_data)
-    mocker.patch.object(ReportGenerator, '_apply_horizontal_aggregation', return_value=[5, 7])
-    mocker.patch.object(ReportGenerator, '_apply_vertical_aggregation', return_value=[3.5])
+    report_generator = ReportGenerator()
+    mocker.patch.object(report_generator, '_prepare_report_data_with_constants', return_value=mock_prep_data)
+    mocker.patch.object(report_generator, '_apply_horizontal_aggregation', return_value=[5, 7])
+    mocker.patch.object(report_generator, '_apply_vertical_aggregation', return_value=[3.5])
 
     # Act and assert
     if expected_exception:
         with pytest.raises(expected_exception):
-            ReportGenerator._generate_single_report(filtered_pool, filter_content)
+            report_generator._generate_report_data(filtered_pool, filter_content)
     else:
-        result = ReportGenerator._generate_single_report(filtered_pool, filter_content)
+        result = report_generator._generate_report_data(filtered_pool, filter_content)
         assert result == expected_result
 
 
@@ -642,7 +644,8 @@ def test_combine_aggregate_report_data(
     """
 
     # Act
-    result = ReportGenerator._combine_aggregate_report_data(horizontally_aggregated, vertically_aggregated, filter_content)
+    result = ReportGenerator._combine_aggregate_report_data(horizontally_aggregated, vertically_aggregated,
+                                                            filter_content)
 
     # Assert
     assert result == expected
@@ -787,7 +790,7 @@ def test_ensure_unique_report_name_with_timestamp(
                  "Error generating report (error_report) => KeyError: "]
         ),
 
-        # Report generation with error in _generate_single_report
+        # Report generation with error in _generate_report_data
         (
                 {"name": "error_report", "filters": ["some_filter"]},
                 {"some_data_key": [1, 2, 3]},
@@ -823,10 +826,10 @@ def test_generate_report(
     mocker.patch.object(report_generator, '_check_for_missing_references',
                         side_effect=reference_exception if reference_exception else None)
     if generate_single_report_exception:
-        mocker.patch.object(report_generator, '_generate_single_report',
+        mocker.patch.object(report_generator, '_generate_report_data',
                             side_effect=generate_single_report_exception)
     elif not reference_exception:
-        mocker.patch.object(report_generator, '_generate_single_report',
+        mocker.patch.object(report_generator, '_generate_report_data',
                             return_value={fltr: filtered_pool[fltr] for fltr in filter_content["filters"]} |
                                          {ref: reports[ref]["values"]
                                           for ref in filter_content.get("cross_references", [])})
