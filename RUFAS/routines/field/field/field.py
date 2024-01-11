@@ -33,15 +33,20 @@ om = OutputManager()
 
 class Field:
 
-    def __init__(self, field_data: Optional[FieldData] = None, soil: Optional[Soil] = None,
-                 plantings: Optional[List[PlantingEvent]] = None, harvestings: Optional[List[HarvestEvent]] = None,
-                 custom_crop_specifications: Optional[Dict[str, Dict]] = None,
-                 tillage_events: Optional[List[TillageEvent]] = None,
-                 fertilizer_events: Optional[List[FertilizerEvent]] = None,
-                 fertilizer_mixes: Optional[Dict[str, Dict[str, float]]] = None,
-                 manure_events: Optional[List[ManureEvent]] = None,
-                 manure_manager: Optional[ManureManager] = None,
-                 feed_manager: Optional[FeedManager] = None):
+    def __init__(
+            self,
+            field_data: Optional[FieldData] = None,
+            soil: Optional[Soil] = None,
+            plantings: Optional[List[PlantingEvent]] = None,
+            harvestings: Optional[List[HarvestEvent]] = None,
+            custom_crop_specifications: Optional[Dict[str, Dict]] = None,
+            tillage_events: Optional[List[TillageEvent]] = None,
+            fertilizer_events: Optional[List[FertilizerEvent]] = None,
+            fertilizer_mixes: Optional[Dict[str, Dict[str, float]]] = None,
+            manure_events: Optional[List[ManureEvent]] = None,
+            manure_manager: Optional[ManureManager] = None,
+            feed_manager: Optional[FeedManager] = None,
+    ):
         """
         Initialize the related data fields that this module will work with, or create one if none provided.
 
@@ -110,11 +115,30 @@ class Field:
         self.manure_events: List[ManureEvent] = manure_events or []
         """List of all manure applications that will be applied to this field."""
 
+        info_map = {
+            "class": self.__class__.__name__,
+            "function": self.__init__.__name__
+        }
+
         if manure_manager is None:
+            om.add_error(
+                "field_initialization_error",
+                f"Attempted initialization of Field {self.field_data.name=} with no Manure Manager, failing to "
+                f"initialize.",
+                info_map
+            )
             raise ValueError("Manure manager cannot be None.")
 
         self.manure_manager: ManureManager = manure_manager
         """:class:`ManureManager` instance from which manure is requested for application to the field."""
+
+        if feed_manager is None:
+            om.add_error(
+                "field_initialization_error",
+                f"Attempted initialization of Field {self.field_data.name=} with no Feed Manager, initializing a "
+                f"FeedManager to use.",
+                info_map
+            )
 
         self.feed_manager: FeedManager = feed_manager or FeedManager()
         """:class:`FeedManager` instance which receives harvested crops."""
