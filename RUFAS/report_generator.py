@@ -307,7 +307,7 @@ class ReportGenerator:
         """
 
         try:
-            horizontal_agg_key, vertical_agg_key = self._validate_aggregation_keys(filter_content)
+            horizontal_agg_key, vertical_agg_key = self._extract_and_check_aggregation_keys(filter_content)
         except ValueError:
             raise
 
@@ -347,7 +347,7 @@ class ReportGenerator:
             filter_content: Dict[str, Any]
     ) -> Dict[str, List[float]] | None:
         """
-        Packages the horizontally and vertically aggregated data into a dictionary.
+        Combines horizontally and vertically aggregated data based on specified aggregation criteria from filter_content.
 
         Parameters
         ----------
@@ -386,28 +386,31 @@ class ReportGenerator:
 
         return None
 
-    def _validate_aggregation_keys(
+    def _extract_and_check_aggregation_keys(
             self,
             filter_content: Dict[str, Any]
     ) -> tuple[str | None, str | None]:
         """
-        Validates the horizontal and vertical aggregation keys in the filter content.
+        Extracts horizontal and vertical aggregation keys from the filter content and validates them against
+        supported aggregation types.
 
         Parameters
         ----------
         filter_content : Dict[str, Any]
             A dictionary containing filter criteria, aggregation instructions, and scalar operation details.
+            It should include keys for 'horizontal_aggregation' and 'vertical_aggregation' if applicable.
 
         Returns
         -------
         tuple[str | None, str | None]
-            The horizontal and vertical aggregation keys.
+            A tuple containing the horizontal and vertical aggregation keys, respectively.
+            Returns None for each key if it is not specified or if it is not among the supported types.
 
         Raises
         ------
         ValueError
-            If the type of horizontal or vertical aggregation is not supported. The supported types are:
-            sum, average, product, subtraction, division, SD.
+            Raised if the specified horizontal or vertical aggregation type is not supported.
+            Supported types are defined in the AGGREGATION_FUNCTIONS dictionary.
         """
 
         horizontal_agg_key = filter_content.get("horizontal_aggregation")
