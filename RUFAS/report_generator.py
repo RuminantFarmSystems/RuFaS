@@ -547,7 +547,7 @@ class ReportGenerator:
                 report_data[key] = filtered_pool[key]["values"][slice_start:slice_end]
 
         try:
-            ReportGenerator._add_constants_data(report_data, filter_content)
+            self._add_constants_data(report_data, filter_content)
         except ValueError:
             raise
 
@@ -590,7 +590,7 @@ class ReportGenerator:
             return
 
         try:
-            ReportGenerator._validate_constants(report_data, constant_config)
+            self._validate_constants(report_data, constant_config)
         except ValueError:
             raise
 
