@@ -3445,7 +3445,7 @@
             "description": "Controls the rate of denitrification.\nUnitless.\nReference: SWAT Input .BSN - CDN.",
             "minimum": 0.0,
             "maximum": 3.0,
-            "default": 0.05
+            "default": 0.01
           },
           "denitrification_threshold_water_content": {
             "type": "number",
