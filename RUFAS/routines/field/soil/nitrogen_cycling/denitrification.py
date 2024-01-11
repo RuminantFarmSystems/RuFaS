@@ -50,14 +50,13 @@ class Denitrification:
             if nutrient_is_below_threshold:
                 continue
 
-            # TODO: check that soil_overall_carbon_fraction is being used correctly in this context - issue #475
             nitrified_nitrates = self._calculate_denitrification_amount(layer.nitrate_content,
                                                                         layer.denitrification_rate_coefficient,
                                                                         layer.nutrient_cycling_temp_factor,
                                                                         layer.soil_overall_carbon_fraction * 100)
             layer.nitrate_content -= nitrified_nitrates
             layer.nitrous_oxide_emissions = nitrified_nitrates
-            layer.annual_denitrified_nitrogen_total += nitrified_nitrates
+            layer.annual_nitrous_oxide_emissions_total += nitrified_nitrates
 
     @staticmethod
     def _calculate_denitrification_amount(nitrate_content: float, denitrification_rate_coefficient: float,

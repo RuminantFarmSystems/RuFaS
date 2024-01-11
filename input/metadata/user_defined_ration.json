@@ -191,42 +191,43 @@
         "description": "Herd Demographics",
         "calf_num": {
           "type": "number",
-          "description": "Number of Calves (head) -- The average number of pre-weaned calves (default is ~8% of herd number)",
+          "description": "Number of Calves (head) -- The initial number of pre-weaned calves",
           "default": 8,
           "minimum": 0
         },
         "heiferI_num": {
           "type": "number",
-          "description": "Number of HeiferIs (head) -- HeiferI is the number of youngstock post-weaning and before breeding",
+          "description": "Number of HeiferI's (head) -- The initial number of heifers that are weaned but not yet bred",
           "default": 44,
           "minimum": 0
         },
         "heiferII_num": {
           "type": "number",
-          "description": "Number of HeiferIIs (head) -- HeiferII is the number of heifers eligible for breeding and in early pregnancy",
+          "description": "Number of HeiferII's (head) -- The initial number of heifers that are either eligible for breeding (based on user-inputted Breeding Start Day for heifers), or in early pregnancy",
           "default": 38,
           "minimum": 0
         },
         "heiferIII_num_springers": {
           "type": "number",
-          "description": "Number of HeiferIIIs (head) -- HeiferIII is the number of close-up heifers",
+          "description": "Number of HeiferIII's (head) -- The initial number of close-up heifers (heifers within the user-defined close-up period, i.e. Prefresh Day)",
           "default": 5,
           "minimum": 0
         },
         "cow_num": {
           "type": "number",
-          "description": "Number of Cows (head) -- The initial number of dry and lactating cows (all parities, default is ~51% of herd number).",
+          "description": "Number of Cows (head) -- The initial number of dry and lactating cows",
           "default": 100,
           "minimum": 0
         },
         "herd_num": {
           "type": "number",
-          "description": "Herd Number (head) -- The target number of dry and lactating cows on farm.",
+          "description": "Herd Number (head) -- The target number of dry and lactating cows on the farm",
           "default": 100,
           "minimum": 0
         },
         "replace_num": {
           "type": "number",
+          "description": "Replacements (head) -- Number of replacement animals available in the replacement market",
           "default": 5000,
           "minimum": 0
         },
@@ -234,7 +235,7 @@
           "type": "string",
           "default": "HO",
           "pattern": "(HO|JE)",
-          "description": "Breed (select one Holstein/Jersey) -- The predominant breed of the herd (Holstein or Jersey)"
+          "description": "Breed (select one) -- The predominant breed of the herd (Holstein or Jersey)"
         }
       },
       "herd_initialization": {
@@ -261,55 +262,56 @@
           "description": "General Management",
           "breeding_start_day_h": {
             "type": "number",
-            "description": "Breeding Start Day - Heifers (days) -- Days old when a heifer would be eligible for breeding (days)",
+            "description": "Heifer Breeding Start Day (days) -- Days old when RuFaS initiates estrus protocol (first cycle to occur ~21 days later)",
             "default": 380,
             "minimum": 0
           },
           "heifer_repro_method": {
             "type": "string",
-            "description": "Heifer Reproductive Program (select one) -- TAI - Timed Artificial Insemination; ED - Estrus Detection; Synch-ED - Combination of ED and TAI",
+            "description": "Heifer Reproduction Protocol (select one) -- TAI - Timed Artificial Insemination; ED - Estrus Detection; Synch-ED - Synchronized Estrus Detection",
             "default": "TAI",
             "pattern": "^(TAI|ED|SynchED)$"
           },
           "cow_repro_method": {
             "type": "string",
-            "description": "Cow Reproductive Program (select one) -- TAI - Timed Artificial Insemination; ED - Estrus Detection; ED-TAI -Combination of ED and TAI",
+            "description": "Cow Reproduction Protocol (select one) -- TAI - Timed Artificial Insemination; ED - Estrus Detection; ED-TAI - Combination of ED and TAI",
             "default": "TAI",
             "pattern": "^(TAI|ED|ED-TAI)$"
           },
           "semen_type": {
             "type": "string",
+            "description": "Semen type (select one) -- The semen type (sexed or conventional) that makes up a majority of the farm's breedings",
             "default": "conventional",
-            "pattern": "^(sexed|conventional)$",
-            "description": "The semen type that makes up a majority of the farm's breedings"
+            "pattern": "^(sexed|conventional)$"
+        
           },
           "days_in_preg_when_dry": {
             "type": "number",
-            "description": "Days In Pregnancy When Dry (days) -- The average day in pregnancy when a cow is dried off (default is 218)",
+            "description": "Days In Pregnancy When Dry (days) -- The average days in pregnancy of cows at dry-off",
             "default": 218,
             "minimum": 0
           },
           "heifer_repro_cull_time": {
             "type": "number",
-            "description": "Heifer Reproductive Cull Time (days) -- Days old when a heifer would be culled for unsuccessful in breeding (default is 500)",
+            "description": "Heifer Reproduction Cull Time (days) -- Days old when a heifer would be culled for failure to become pregnant",
             "default": 500,
             "minimum": 0
           },
           "do_not_breed_time": {
             "type": "number",
-            "description": "Do Not Breed Time (days) -- The breeding period (days) for cows before reproductive programs stop if they fail to get pregnant (days)",
+            "description": "Cow Do Not Breed Time (days) -- The length of the breeding period after parturition for cows after which reproduction protocols stop if they fail to get pregnant",
             "default": 185,
             "minimum": 0
           },
           "cull_milk_production": {
             "type": "number",
-            "description": "Cull Milk Production (kg/d) -- Minimum daily milk production for do-not breed cow to be culled (default is 30 kg/d)",
+            "description": "Cull Milk Production (kg/d) -- Milk production threshold at which 'do not breed' cows are culled if they fall below",
             "default": 30,
             "minimum": 0
           },
           "cow_times_milked_per_day": {
             "type": "number",
-            "description": "Number of Times Cows Milked (per day) -- The average or most common number of times the cows are milked, whole numbers 1-3",
+            "description": "Number of Milkings (per day) -- The average or most common number of times cows are milked per day (1, 2, or 3 times daily)",
             "default": 3,
             "minimum": 0
           }
@@ -322,34 +324,34 @@
             "description": "Calf Management",
             "male_calf_rate_sexed_semen": {
               "type": "number",
-              "description": "Male Calf Rate - Sexed Semen -- The rate of male calves when using sexed semen (default is 0.1)",
+              "description": "Male Calf Rate, Sexed Semen (percent) -- The rate of male calves when using sexed semen",
               "default": 0.1,
               "minimum": 0,
               "maximum": 1
             },
             "male_calf_rate_conventional_semen": {
               "type": "number",
-              "description": "Male Calf Rate - Conventional Semen -- The rate of male calves when using conventional semen (default is 0.53)",
+              "description": "Male Calf Rate, Conventional Semen (percent) -- The rate of male calves when using conventional semen",
               "default": 0.53,
               "minimum": 0,
               "maximum": 1
             },
             "keep_female_calf_rate": {
               "type": "number",
-              "description": "Female Calf Rate -- The rate female calves are kept and raised on-farm (default is 1)",
+              "description": "Female Calf Retention Rate (percent) -- The percentage of female calves kept and raised on-farm",
               "default": 1,
               "minimum": 0,
               "maximum": 1
             },
             "wean_day": {
               "type": "number",
-              "description": "Wean Day (days) -- Days the calf is fully weaned from milk or milk replace (default is 60",
+              "description": "Wean Day (days) -- The days of age at which calves are fully weaned from milk or milk replacer",
               "default": 60,
               "minimum": 0
             },
             "wean_length": {
               "type": "number",
-              "description": "Wean Length (days) -- Days weaning (default is 7)",
+              "description": "Wean Length (days) -- Length of the weaning process",
               "default": 7,
               "minimum": 0
             },
@@ -365,54 +367,55 @@
             "description": "Repro Management",
             "voluntary_waiting_period": {
               "type": "number",
-              "description": "Voluntary Waiting Period (days) -- If 'TAI' (Timed Artificial Insemination) is chosen for cow, it is days after parturition when the 1st hormonal injection is made in TAI programs. If 'ED' or 'ED-TAI' is chosen for cow, it is days after parturition when estrus is started to be monitored.",
+              "description": "Voluntary Waiting Period (days) -- If TAI (Timed Artificial Insemination) protocol is chosen for cows, voluntary waiting period (VPW) is days after parturition at which the 1st hormonal injection is made. If ED (Estrus Detection) or ED-TAI (combination of Estrus Detection and TAI) is chosen for cows, VWP is days after parturition when a cow is eligible to be bred during estrus",
               "default": 50,
               "minimum": 0
             },
             "conception_rate_decrease": {
               "type": "number",
-              "description": "Conception Rate Decrease -- the decrease of the conception rate for later breeding (default is 0.026)",
+              "description": "Conception Rate Decrease (percent) -- The percent decrease in conception rate of each breeding after the first breeding",
               "default": 0.026,
               "minimum": 0,
               "maximum": 0.1
             },
             "avg_gestation_len": {
               "type": "number",
-              "description": "Average Gestation Length (days) -- average length of gestations (default is 278)",
+              "description": "Average Gestation Length (days) -- Average length of gestation",
               "default": 278,
               "minimum": 0
             },
             "std_gestation_len": {
               "type": "number",
-              "description": "Gestation Length Standard Deviation (days) -- standard deviation of gestation length (default is 6)",
+              "description": "Gestation Length Standard Deviation (days) -- Standard deviation of gestation length",
               "default": 6,
               "minimum": 0
             },
             "prefresh_day": {
               "type": "number",
-              "description": "Prefresh Day (days) -- length of period of the transition before calving (default is 30)",
+              "description": "Prefresh Day -- days prior to calving at which pregnant animals enter the close-up period (i.e., the length of the close-up period)",
               "default": 30,
               "minimum": 0
             },
             "calving_interval": {
               "type": "number",
-              "description": "Calving Interval (days) -- current average calving interval (days), used for initial bodyweight adjustment and other calculations",
+              "description": "Calving Interval (days) -- Current average calving interval, used for initial bodyweight adjustment and other calculations",
               "default": 400,
               "minimum": 0
             },
             "heifers": {
               "type": "object",
+              "description": "Heifer Reproduction Protocols",
               "estrus_detection_rate": {
                 "type": "number",
-                "description": "Estrus Detection Rate -- The % of in-heat animals that would be detected in the ED (Estrus Detection) programs (default is 0.6)",
+                "description": "Estrus Detection Rate (percent) -- The percentage of total heifers in estrus that are detected in the ED (Estrus Detection) protocol",
                 "default": 0.6,
                 "minimum": 0,
                 "maximum": 1
               },
               "estrus_conception_rate": {
                 "type": "number",
-                "description": "Estrus Conception Rate -- The % of inseminated animals that would be concepted in the ED (Estrus Detection) programs (default is 0.6)",
-                "default": 0.4,
+                "description": "Estrus Conception Rate (percent) -- The percentage of inseminated heifers that become pregnant in the ED (Estrus Detection) and SynchED protocols",
+                "default": 0.9,
                 "minimum": 0,
                 "maximum": 1
               },
@@ -490,77 +493,77 @@
             },
             "cow_repro_programs": {
               "type": "object",
-              "description": "Cow Reproductive programs",
+              "description": "Cow Reproduction Protocols",
               "estrus_detection_rate": {
                 "type": "number",
-                "description": "Estrus Detection Rate -- The % of in-heat animals that would be detected in the ED (Estrus Detection) programs (default is 0.6)",
+                "description": "Estrus Detection Rate (percent) -- The percentage of total animals in estrus that are detected in the ED (Estrus Detection) protocol",
                 "default": 0.6,
                 "minimum": 0,
                 "maximum": 1
               },
               "estrus_service_rate": {
                 "type": "number",
-                "description": "Estrus Service Rate -- The % of detected in heat animals that would be serviced in the ED (Estrus Detection) programs (default is 1)",
+                "description": "Estrus Service Rate (percent) -- The percentage of animals detected in estrus that then would be serviced in the ED (Estrus Detection) protocol",
                 "default": 1,
                 "minimum": 0,
                 "maximum": 1
               },
               "ed_conception_rate": {
                 "type": "number",
-                "description": "ED Conception Rate -- The % of serviced animals that would be concepted in the ED (Estrus Detection) programs (default is 0.6)",
+                "description": "ED Conception Rate (percent) -- The percentage of serviced animals that become pregnant in the ED (Estrus Detection) protocol ",
                 "default": 0.6,
                 "minimum": 0,
                 "maximum": 1
               },
               "cow_presynch_protocol": {
                 "type": "string",
-                "description": "Cow Presynch Protocol -- The preSynch protocol (1st breeding) for cow in TAI (Timed Artificial Insemination) program",
+                "description": "Cow Presynch Protocol (optional; select one) -- The optional preSynch protocol (1st breeding) for cows in the TAI (Timed Artificial Insemination) protocol",
                 "default": "Double OvSynch",
-                "pattern": "^(Double OvSynch|Presynch|G6G)$"
+                "pattern": "^(Double OvSynch|PreSynch|G6G)$"
               },
               "cow_TAI_protocol": {
                 "type": "string",
-                "description": "Cow TAI (Timed Artificial Insemination) Protocol -- The timed AI protocol for cows in the TAI (Timed Artificial Insemination) program",
+                "description": "Cow TAI (Timed Artificial Insemination) Protocol (select one) -- The timed AI (Timed Artificial Insemination) protocol for cows",
                 "default": "OvSynch 56",
                 "pattern": "^(OvSynch 56|OvSynch 48|CoSynch 72|5d CoSynch)$"
               },
               "ovsynch56_conception_rate": {
                 "type": "number",
-                "description": "OvSynch56 Conception Rate -- The conception rate for OvSynch56 protocol (pre-breeding GnRH shot given 56hrs post prostaglandin) in cow TAI (Timed Artificial Insemination) program (default is 0.6)",
+                "description": "OvSynch56 Conception Rate (percent) -- The conception rate for cows in the OvSynch56 (pre-breeding GnRH shot given 56hrs post prostaglandin) TAI (Timed Artificial Insemination) protocol",
                 "default": 0.6,
                 "minimum": 0,
                 "maximum": 1
               },
               "ovsynch48_conception_rate": {
                 "type": "number",
-                "description": "OvSynch48 Conception Rate -- The conception rate for OvSynch 48 protocol (pre-breeding GnRH shot given 48hrs post prostaglandin) in cow TAI (Timed Artificial Insemination) program",
+                "description": "OvSynch48 Conception Rate (percent) -- The conception rate for cows in the OvSynch 48 (pre-breeding GnRH shot given 48hrs post prostaglandin) TAI (Timed Artificial Insemination) protocol",
                 "minimum": 0,
                 "maximum": 1,
                 "default": 0.6
               },
               "cosynch72_conception_rate": {
                 "type": "number",
-                "description": "CoSynch72 Conception Rate -- The conception rate for CoSynch 72 protocol in cow TAI (Timed Artificial Insemination) program",
+                "description": "CoSynch72 Conception Rate (percent) -- The conception rate for cows in the CoSynch 72 TAI (Timed Artificial Insemination) protocol",
                 "minimum": 0,
                 "maximum": 1,
                 "default": 0.6
               },
               "cosynch5d_conception_rate": {
                 "type": "number",
-                "description": "5d CoSynch Conception Rate -- The conception rate for 5d CoSynch protocol in cow TAI (Timed Artificial Insemination) program",
+                "description": "5d CoSynch Conception Rate (percent) -- The conception rate for cows in the 5d CoSynch TAI (Timed Artificial Insemination) protocol",
                 "minimum": 0,
                 "maximum": 1,
                 "default": 0.6
               },
               "cow_resynch_protocol": {
                 "type": "string",
-                "description": "Cow Resynch Protocol -- Resynch protocol for cow before/at/after pregnancy check day in the TAI (Timed Artificial Insemination) program",
+                "description": "Cow Resynch Protocol (select one) -- Resynch protocol for cows before/at/after pregnancy check day in the TAI (Timed Artificial Insemination) protocol",
                 "default": "TAIafterPD",
                 "pattern": "^(TAIafterPD|TAIbeforePD|PGFatPD)$"
               },
               "tai_program_start_day": {
                 "type": "number",
-                "description": "TAI program start day for ED-TAI protocol -- The TAI program start day for ED-TAI protocol.",
+                "description": "TAI protocol start day for the Ovsynch portion of the ED-TAI protocol (day)",
                 "minimum": 0,
                 "default": 72
               }
@@ -571,43 +574,43 @@
             "description": "Bodyweight",
             "birth_weight_avg_ho": {
               "type": "number",
-              "description": "Average Holstein Birth Weight (kg/head) -- The average birthweight for Holstein cows (default is 43.9)",
-              "default": 43.9,
+              "description": "Average Holstein Birth Weight (kg/head)",
+              "default": 42.9,
               "minimum": 0
             },
             "birth_weight_std_ho": {
               "type": "number",
-              "description": "Holstein Birth Weight Standard Deviation (kg/head) -- The standard deviation birthweight for Holstein cows (default is 1)",
-              "default": 1,
+              "description": "Holstein Birth Weight Standard Deviation (kg/head)",
+              "default": 6,
               "minimum": 0
             },
             "birth_weight_avg_je": {
               "type": "number",
-              "description": "Average Jersey Birth Weight (kg/head) -- The average birthweight for Jersey cows (default is 35)",
-              "default": 35,
+              "description": "Average Jersey Birth Weight (kg/head)",
+              "default": 25.2,
               "minimum": 0
             },
             "birth_weight_std_je": {
               "type": "number",
-              "description": "Jersey Birth Weight Standard Deviation (kg/head) -- The standard deviation birthweight for Jersey cows (default is 1)",
-              "default": 1,
+              "description": "Jersey Birth Weight Standard Deviation (kg/head)",
+              "default": 4.4,
               "minimum": 0
             },
             "target_heifer_preg_day": {
               "type": "number",
-              "description": "Target Heifer Pregnancy Day (days) -- The target pregnant age in days for heifers - for adjusting heifer body weight (default is 420)",
+              "description": "Target Heifer Pregnancy Day (days) -- The target age (in days) for heifers to become pregnant - for adjusting heifer body weight",
               "default": 420,
               "minimum": 0
             },
             "mature_body_weight_avg": {
               "type": "number",
-              "description": "Average Mature Body Weight (kg/head) -- The average mature body weight of cows (default is 740.1)",
+              "description": "Average Mature Body Weight (kg/head) -- The average mature body weight of cows",
               "default": 740.1,
               "minimum": 0
             },
             "mature_body_weight_std": {
               "type": "number",
-              "description": "Mature Body Weight Standard Deviation (kg/head) -- The standard deviation of mature body weight of cows (default is 73.5)",
+              "description": "Mature Body Weight Standard Deviation (kg/head) -- The standard deviation of mature body weight of cows",
               "default": 73.5,
               "minimum": 0
             }
@@ -621,88 +624,88 @@
             "description": "Literature Repro Values",
             "preg_check_day_1": {
               "type": "number",
-              "description": "Pregnancy Check Day 1 (days) -- Days since last insemination to check whether the animal is pregnant or not for the first time (default is 32).",
+              "description": "Pregnancy Check Days, Check 1 (days) -- Days since last insemination at the 1st pregnancy check",
               "default": 32,
               "minimum": 1
             },
             "preg_loss_rate_1": {
               "type": "number",
-              "description": "Pregnancy Loss Rate 1 -- The % of cows that abort their pregnancy before the 1st pregnancy check (default is 0.02)",
+              "description": "Pregnancy Loss Rate 1 (percent) -- The percentage of cows that abort their pregnancy before the 1st pregnancy check",
               "default": 0.02,
               "minimum": 0,
               "maximum": 1
             },
             "preg_check_day_2": {
               "type": "number",
-              "description": "Pregnancy Check Day 2 (days) --  Days since last insemination to check whether the animal is pregnant or not for the second time if the animal pass the first pregnancy check (default is 60).",
+              "description": "Pregnancy Check Days, Check 2 (days) --  Days since last insemination at the second pregnancy check, for cows confirmed pregnant at 1st pregnancy check",
               "default": 60,
               "minimum": 0
             },
             "preg_loss_rate_2": {
               "type": "number",
-              "description": "Pregnancy Loss Rate 2 -- % of cows that abort their pregnancy between the 1st and 2nd pregnancy check (default is 0.096)",
+              "description": "Pregnancy Loss Rate, Check 2 (percent) -- The percentage of cows that abort their pregnancy between the 1st and 2nd pregnancy checks",
               "default": 0.096,
               "minimum": 0,
               "maximum": 0.1
             },
             "preg_check_day_3": {
               "type": "number",
-              "description": "Pregnancy Check Day 3 (days) -- Days since last insemination to check whether the animal is pregnant or not for the third time if the animal passes the second pregnancy check (default is 200).",
+              "description": "Pregnancy Check Day, Check 3 (days) -- Days since last insemination at the third pregnancy check, for cows confirmed pregnant at 2nd pregnancy check",
               "default": 200,
               "minimum": 0
             },
             "preg_loss_rate_3": {
               "type": "number",
-              "description": "Pregnancy Loss Rate 3 -- The % of cows that abort their pregnancy between the 2nd and 3rd pregnancy check (default is 0.017)",
+              "description": "Pregnancy Loss Rate, Check 3 (percent) -- The percentage of cows that abort their pregnancy between the 2nd and 3rd pregnancy checks",
               "default": 0.017,
               "minimum": 0,
               "maximum": 0.1
             },
             "avg_estrus_cycle_return": {
               "type": "number",
-              "description": "Average days between calving and first estrus after calving (default is 23).",
+              "description": "Average Estrous Cycle Return (days) -- Average days between calving and first estrous cycle after calving",
               "minimum": 1,
               "default": 23
             },
             "std_estrus_cycle_return": {
               "type": "number",
-              "description": "Standard deviation of days between calving and first estrus after calving (default is 6).",
+              "description": "Estrous Cycle Return Standard Deviation (days)",
               "minimum": 1,
               "default": 6
             },
             "avg_estrus_cycle_heifer": {
               "type": "number",
-              "description": "Average length of estrus cycle for heifers (default is 21).",
+              "description": "Heifer Estrous Cycle Length (days) -- Average length of estrous cycle for heifers",
               "minimum": 1,
               "default": 21
             },
             "std_estrus_cycle_heifer": {
               "type": "number",
-              "description": "Standard deviation of the length of estrus cycle for heifers (default is 2.5).",
+              "description": "Heifer Estrous Cycle Length Standard Deviation (days)",
               "minimum": 1,
               "default": 2.5
             },
             "avg_estrus_cycle_cow": {
               "type": "number",
-              "description": "Average length of estrus cycle for cows (default is 21).",
+              "description": "Cow Estrous Cycle Length (days) -- Average length of estrous cycle for cows",
               "minimum": 1,
               "default": 21
             },
             "std_estrus_cycle_cow": {
               "type": "number",
-              "description": "Standard deviation of the length of estrus cycle for cows (default is 4).",
+              "description": "Cow Estrous Cycle Length Standard Deviation (days)",
               "minimum": 1,
               "default": 4
             },
             "avg_estrus_cycle_after_pgf": {
               "type": "number",
-              "description": "Average days between the injection of PGF and the occurrence of estrus in the ‘PGFatPD’ resynch protocol (default is 5).",
+              "description": "Average Estrous Cycle days after PGF (days) -- Average days between the injection of PGF and the occurrence of estrus in the PGFatPD resynch protocol",
               "minimum": 1,
               "default": 5
             },
             "std_estrus_cycle_after_pgf": {
               "type": "number",
-              "description": "Standard deviation of days between the injection of PGF and the occurrence of estrus in the ‘PGFatPD’ resynch protocol (default is 2).",
+              "description": "Estrous Cycle days after PGF Standard Deviation (days) -- Standard deviation of days between the injection of PGF and the occurrence of estrus in the PGFatPD resynch protocol",
               "minimum": 1,
               "default": 2
             }
@@ -791,30 +794,30 @@
           },
           "culling": {
             "type": "object",
-            "description": "",
+            "description": "Probabilities for removal from the herd for specific reason",
             "parity_death_prob": {
               "type": "array",
-              "description": "Death rate for first, second, third, and later lactations",
+              "description": "Death Probability, by Parity",
               "properties": {
                 "type": "number",
-                "description": "Death rate for first, second, third, and later lactations",
+                "description": "Death Probability, by Parity Group -- The probability of death for cows of a single parity group (first lactation, second lactation, etc.); a separate entry should be included for 1st, 2nd, 3rd, and 4th+ parities (4 entries total)",
                 "minimum": 0,
                 "maximum": 1
               }
             },
             "parity_cull_prob": {
               "type": "array",
-              "description": "Culling rate for first, second, third, and later lactations",
+              "description": "Cull Probability, by Parity",
               "properties": {
                 "type": "number",
-                "description": "Culling rate for first, second, third, and later lactations",
+                "description": "Cull Probability, by Parity -- The probability of culling for cows of a single parity (first lactation, second lactation, etc.); a separate entry should be included for 1st, 2nd, 3rd, and 4th+ parities (4 entries total)",
                 "minimum": 0,
                 "maximum": 1
               }
             },
             "mastitis_cull_prob": {
               "type": "array",
-              "description": "Culling rate for mastitis",
+              "description": "Culling probability for mastitis",
               "properties": {
                 "type": "number",
                 "minimum": 0,
@@ -823,7 +826,7 @@
             },
             "udder_cull_prob": {
               "type": "array",
-              "description": "Culling rate for udder reasons",
+              "description": "Culling probability for udder reasons",
               "properties": {
                 "type": "number",
                 "minimum": 0,
@@ -832,7 +835,7 @@
             },
             "feet_leg_cull_prob": {
               "type": "array",
-              "description": "Culling rate for feet and leg reasons",
+              "description": "Culling probability for feet and leg reasons",
               "properties": {
                 "type": "number",
                 "minimum": 0,
@@ -841,7 +844,7 @@
             },
             "unknown_cull_prob": {
               "type": "array",
-              "description": "Culling rate for unknown reasons",
+              "description": "Culling probability for unknown reasons",
               "properties": {
                 "type": "number",
                 "minimum": 0,
@@ -850,7 +853,7 @@
             },
             "disease_cull_prob": {
               "type": "array",
-              "description": "Culling rate for disease",
+              "description": "Culling probability for disease",
               "properties": {
                 "type": "number",
                 "minimum": 0,
@@ -859,7 +862,7 @@
             },
             "injury_cull_prob": {
               "type": "array",
-              "description": "Culling rate for injury",
+              "description": "Culling probability for injury",
               "properties": {
                 "type": "number",
                 "minimum": 0,
@@ -868,7 +871,7 @@
             },
             "death_cull_prob": {
               "type": "array",
-              "description": "Culling rate for death",
+              "description": "Culling probability for death",
               "properties": {
                 "type": "number",
                 "minimum": 0,
@@ -889,9 +892,10 @@
             "description": "",
             "still_birth_rate": {
               "type": "number",
-              "description": "Stillbirth rate",
+              "description": "Rate of stillbirths (percent)",
               "minimum": 0,
-              "maximum": 1
+              "maximum": 1,
+              "default": 0.065
             }
           }
         }
@@ -901,7 +905,7 @@
         "description": "Methane Mitigation",
         "methane_mitigation_method": {
           "type": "string",
-          "description": "Methane Mitigation Method -- The type of enteric methane mitigation supplement that is fed to the lactating dairy cattle",
+          "description": "Methane Mitigation Method (select one) -- The type of enteric methane mitigation supplement that is fed to the lactating cows. Note that default values given are not implemented unless the specific supplement is selected here",
           "default": "None",
           "pattern": "^(None|3-NOP|monensin|essential_oils|seaweed)$"
         },
@@ -911,28 +915,28 @@
         },
         "3-NOP_additive_amount": {
           "type": "number",
-          "description": "3-NOP Additive Amount (mg/kg DMI) -- The dosage of the 3-NOP mitigation additive (mg/kg DMI)",
+          "description": "3-NOP Additive Amount (mg/kg DMI) -- The dosage of the 3-NOP mitigation additive",
           "minimum": 40,
           "maximum": 100,
           "default": 70
         },
         "monensin_additive_amount": {
           "type": "number",
-          "description": "Monensin Additive Amount (mg/kg DMI) -- The dosage of the monensin mitigation additive (mg/kg DMI)",
+          "description": "Monensin Additive Amount (mg/kg DMI) -- The dosage of the monensin mitigation additive",
           "minimum": 20,
           "maximum": 36,
           "default": 24
         },
         "essential_oils_additive_amount": {
           "type": "number",
-          "description": "Essential Oils Additive Amount (mg/kg DMI) -- The dosage of the essential oils mitigation additive (mg/kg DMI)",
+          "description": "Essential Oils Additive Amount (mg/kg DMI) -- The dosage of the essential oils mitigation additive",
           "minimum": 0,
           "maximum": 100,
           "default": 0
         },
         "seaweed_additive_amount": {
           "type": "number",
-          "description": "Seaweed Additive Amount (mg/kg DMI) -- The dosage of the seaweed mitigation additive (mg/kg DMI)",
+          "description": "Seaweed Additive Amount (mg/kg DMI) -- The dosage of seaweed mitigation additive",
           "minimum": 0,
           "maximum": 100,
           "default": 0
@@ -940,21 +944,21 @@
       },
       "housing": {
         "type": "string",
-        "description": "Housing -- The type of housing management for the herd.",
+        "description": "Housing Type (select one) -- The type of housing management for the herd",
         "default": "barn",
-        "pattern": "^(barn|3-pasture|drylot)$"
+        "pattern": "^(barn|pasture|drylot)$"
       },
       "pasture_concentrate": {
-        "description": "Pasture Concentration -- Amount of concentrate supplementation provided if animals are housed on pasture. (kg)",
+        "description": "Pasture Concentrate Fed (kg/head/day) -- Amount of concentrate provided to lactating cows each day if animals are housed on pasture",
         "type": "number",
         "minimum": 0,
         "default": 0
       },
       "methane_model": {
-        "description": "Methane Model -- The method used to estimate enteric methane emissions.",
+        "description": "Methane Model (select one) -- The method used to estimate enteric methane emissions for lactating cows",
         "type": "string",
         "default": "IPCC",
-        "pattern": "^(Mills|3-Mutian|IPCC)$"
+        "pattern": "^(Mills|Mutian|IPCC)$"
       },
       "ration": {
         "type": "object",
@@ -965,69 +969,69 @@
           "default": false
         },
         "formulation_interval": {
-          "description": "Formulation Interval -- The length of time in days between when the diets are reformulated.",
+          "description": "Formulation Interval (days) -- The length of time in days between when the diets are reformulated",
           "type": "number",
           "minimum": 1,
           "default": 30
         }
       },
-      "pen_information": {
+       "pen_information": {
         "type": "array",
-        "description": "Pen Information.",
+        "description": "Pen Information",
         "properties": {
           "type": "object",
           "id": {
-            "description": "Pen ID -- The index of the pen.",
+            "description": "Pen ID -- The index of the pen",
             "type": "number"
           },
           "pen_name": {
-            "description": "Pen Name -- The name or identifier of a given pen.",
+            "description": "Pen Name -- The name or identifier of a given pen",
             "type": "string"
           },
           "animal_combination": {
-            "description": "Animal Combination -- The valid combinations of animal types that can be in a pen.",
+            "description": "Animal Combination (select one) -- The valid combinations of animal types that can be in a pen. CALF = Calves; GROWING = HeiferI's and HeiferII's; CLOSE_UP = HeiferIII's and Dry Cows; LAC_COWS = Lactating Cows",
             "type": "string",
             "pattern": "^(CALF|GROWING|CLOSE_UP|LAC_COW)$"
           },
           "vertical_dist_to_milking_parlor": {
-            "description": "Vertical Distance to Milking Parlor (m) -- The elevation gain (in meters) between the pen and the milking parlor.",
+            "description": "Vertical Distance to Milking Parlor (m) -- The elevation gain (in meters) between the pen and the milking parlor",
             "type": "number",
             "minimum": 0,
             "default": 0.1
           },
           "horizontal_dist_to_milking_parlor": {
-            "description": "Horizontal Distance to Milking Parlor (m) -- The distance (in meters) between the pen and the milking parlor.",
+            "description": "Horizontal Distance to Milking Parlor (m) -- The distance (in meters) between the pen and the milking parlor",
             "type": "number",
             "minimum": 0,
-            "default": 1.6
+            "default": 10
           },
           "number_of_stalls": {
-            "description": "Number of Stalls -- The number of stalls in the pen.",
+            "description": "Number of Stalls -- The number of stalls in the pen",
             "type": "number",
             "minimum": 0,
             "default": 1000
           },
           "housing_type": {
-            "description": "Housing Type -- The type of barn the pen is in.",
+            "description": "Housing Type (select one) -- The type of barn the pen is in",
             "type": "string",
             "pattern": "^(open air barn)$",
             "default": "open air barn"
           },
           "pen_type": {
-            "description": "Pen Type -- The type of stalls the pen has.",
+            "description": "Pen Type select one) -- The type of stalls the pen has",
             "type": "string",
-            "pattern": "^(freestall|tilestall|drylot)$",
+            "pattern": "^{freestall|tiestall|drylot}$",
             "default": "freestall"
           },
           "max_stocking_density": {
-            "description": "Max Stocking Density -- The maximum ration between the number of animals in the pen and the number of stalls in the pen.",
+            "description": "Maximum Stocking Density -- The maximum ratio of the number of animals in the pen to the number of stalls in the pen",
             "type": "number",
             "minimum": 0.5,
             "maximum": 2,
             "default": 1.2
           },
           "manure_management_scenario_id": {
-            "description": "Manure Management Scenario ID -- The ID number of the manure management practices that are used for this pen.",
+            "description": "Manure Management Scenario ID (number) -- The ID number of the manure management practices that are used for this pen (scenarios are defined in manure management schema)",
             "type": "number",
             "minimum": 0,
             "default": 0
@@ -2408,7 +2412,7 @@
         },
         "milk_reduction_maximum": {
           "type": "number",
-          "description": "Milk Reduction Percent -- Allowable amount of milk reduction (kg)",
+          "description": "Milk Reduction Maximum -- Allowable amount of milk reduction (kg) when dietary nutrient supply cannot meet animal requirements",
           "minimum": 0,
           "maximum": 50
         }
@@ -3175,6 +3179,12 @@
             },
             "cleanings_per_day": {
               "type": "number"
+            },
+            "cleaning_water_recycle_fraction": {
+              "type": "number",
+              "description": "Fraction of cleaning water that is from recycled (not fresh) water sources.",
+              "minimum": 0.0,
+              "maximum": 1.0
             }
           }
         }
@@ -3436,7 +3446,7 @@
             "description": "Controls the rate of denitrification.\nUnitless.\nReference: SWAT Input .BSN - CDN.",
             "minimum": 0.0,
             "maximum": 3.0,
-            "default": 1.4
+            "default": 0.05
           },
           "denitrification_threshold_water_content": {
             "type": "number",

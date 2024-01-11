@@ -1826,7 +1826,7 @@ def test_route_save_functions_graph(
 ) -> None:
     with patch(
         "RUFAS.graph_generator.GraphGenerator.generate_graph"
-    ) as mock_generate_graph:
+    ) as mock_generate_graph, patch.object(mock_output_manager, 'create_directory') as mock_create_directory:
         dummy_log = ['dummy_log']
         mock_generate_graph.return_value = dummy_log
         mock_output_manager.add_warning = MagicMock()
@@ -1843,6 +1843,7 @@ def test_route_save_functions_graph(
             Path("csvs_dir")
         )
         mock_generate_graph.assert_not_called()
+        mock_create_directory.assert_called_with(Path("graphics_dir"))
         mock_output_manager.add_warning.assert_called_once_with(
             "No Graphics",
             "Graphic generation is disabled, skipping filter_file='graph_file'",
@@ -2046,8 +2047,10 @@ def test_create_directory_successful(mock_output_manager: OutputManager,
     """Checks create_directory function successfully creates a dir in output_manager.py"""
     mock_output_manager.add_log = MagicMock()
     mock_output_manager.add_error = MagicMock()
-    mock_path = "new/dir/to/create"
-    mock_output_manager.create_directory(Path(mock_path))
+    with patch.object(Path, "mkdir") as mock_mkdir:
+        test_path = Path("/test/directory")
+        mock_output_manager.create_directory(test_path)
+    mock_mkdir.assert_called_once_with(parents=True, exist_ok=True)
     assert mock_output_manager.add_log.call_count == 2
     assert mock_output_manager.add_error.call_count == 0
 

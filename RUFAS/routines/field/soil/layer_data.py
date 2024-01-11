@@ -264,7 +264,7 @@ class LayerData:
 
     nitrous_oxide_emissions: float = 0.0
     """Amount of nitrous oxide emitted from this soil layer on the current day (kg / ha)."""
-    annual_denitrified_nitrogen_total: float = 0
+    annual_nitrous_oxide_emissions_total: float = 0.0
     """Cumulative total amount of nitrates that have denitrified in a year (kg / ha)"""
 
     humus_mineralization_rate_factor: float = 0.0003
@@ -285,9 +285,9 @@ class LayerData:
     """Exchange factor that accounts for the soil's cation exchange capacity, default = 0.15 (unitless)
         Reference: SWAT Theoretical documentation eqn. 3:1.3.5"""
 
-    volatilized_ammonium_emissions: float = 0.0
+    ammonia_emissions: float = 0.0
     """Amount of ammonium that volatilized out of the soil layer on the current day (kg / ha)."""
-    annual_volatilized_ammonium_total: float = 0
+    annual_ammonia_emissions_total: float = 0.0
     """Cumulative total of ammonium volatilized in this year (kg / ha)"""
 
     percolated_nitrates: float = 0.0
@@ -638,8 +638,7 @@ class LayerData:
         This factor is lower bounded at 0.05.
 
         """
-        lower_bounded = max(0.05, self.water_content / self.field_capacity_content)
-        return lower_bounded
+        return max(0.05, self.water_content / self.field_capacity_content)
 
     @property
     def available_water_capacity(self):
@@ -726,5 +725,5 @@ class LayerData:
     def do_annual_reset(self):
         self.annual_carbon_CO2_lost = 0
         self.annual_decomposition_carbon_CO2_lost = 0
-        self.annual_denitrified_nitrogen_total = 0
+        self.annual_nitrous_oxide_emissions_total = 0
         self.annual_volatilized_ammonium_total = 0
