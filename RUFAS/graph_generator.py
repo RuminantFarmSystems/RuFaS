@@ -189,7 +189,8 @@ class GraphGenerator:
         for filter_key in graph_details.keys():
             if filter_key not in valid_graph_filter_keys:
                 graph_filter_validation_logs.append({"error": f"Can't plot {graph_details.get('title')} data set",
-                                                     "message": f"Invalid filter file key {filter_key}.",
+                                                     "message": f"Invalid filter file key '{filter_key}'. "
+                                                     f"Please see wiki for full list of valid filter keys.",
                                                      "info_map": info_map})
         return graph_filter_validation_logs
 
