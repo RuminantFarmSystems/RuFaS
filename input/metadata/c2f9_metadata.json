@@ -10,7 +10,7 @@
     "animal": {
       "title": "Animal data",
       "description": "Moo Moo!",
-      "path": "input/data/animal/CREATE FILE FROM TEMPLATE.json",
+      "path": "input/data/animal/c2f9_animal.json",
       "type": "json",
       "properties": "animal_properties"
     },
@@ -73,7 +73,7 @@
     "manure_management": {
       "title": "Manure data",
       "description": "You thought it's a waste, but those crops need to eat as well",
-      "path": "input/data/manure/CREATE FILE FROM TEMPLATE.json",
+      "path": "input/data/manure/c2f9_manure_management.json",
       "type": "json",
       "properties": "manure_management_properties"
     },
