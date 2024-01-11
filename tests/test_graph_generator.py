@@ -321,8 +321,10 @@ def test_prepare_plot_data(graph_generator: GraphGenerator,
     "graph_details, expected_length, expected_message",
     [
         ({"type": "bar", "title": "Valid Graph"}, 0, None),
-        ({"invalid_key": "value", "title": "Invalid Graph"}, 1, "Invalid filter file key invalid_key"),
-        ({"type": "stackplot", "filter": ["a", "b"], "invalid_key": "value"}, 2, "Invalid filter file key filter"),
+        ({"invalid_key": "value", "title": "Invalid Graph"}, 1,
+         "Invalid filter file key 'invalid_key'. Please see wiki for full list of valid filter keys."),
+        ({"type": "stackplot", "filter": ["a", "b"], "invalid_key": "value"}, 2,
+         "Invalid filter file key 'filter'. Please see wiki for full list of valid filter keys."),
     ])
 def test_validate_graph_filter(graph_generator: GraphGenerator, graph_details: Dict[str, str], expected_length: int,
                                expected_message: str):
