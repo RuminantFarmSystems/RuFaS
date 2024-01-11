@@ -308,13 +308,13 @@ class ReportGenerator:
 
         try:
             horizontal_agg_key, vertical_agg_key = self._validate_aggregation_keys(filter_content)
-        except ValueError as e:
-            raise ValueError(f"Error validating aggregation keys => {e}")
+        except ValueError:
+            raise
 
         try:
             report_data = self._prepare_report_data_with_constants(filtered_pool, filter_content)
-        except ValueError as e:
-            raise ValueError(f"Error preparing report data => {e}")
+        except ValueError:
+            raise
 
         if not report_data:
             raise ValueError(
@@ -545,8 +545,8 @@ class ReportGenerator:
 
         try:
             ReportGenerator._add_constants_data(report_data, filter_content)
-        except ValueError as e:
-            raise ValueError(f"Error adding constants => {e}")
+        except ValueError:
+            raise
 
         return report_data
 
@@ -588,8 +588,8 @@ class ReportGenerator:
 
         try:
             ReportGenerator._validate_constants(report_data, constant_config)
-        except ValueError as e:
-            raise ValueError(f"Error validating constants => {e}")
+        except ValueError:
+            raise
 
         max_length = max([len(lst) for lst in report_data.values()])
         for name, value in constant_config.items():
