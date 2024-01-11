@@ -127,7 +127,7 @@ def test_generate_graph_error_found(graph_generator: GraphGenerator) -> None:
     graph_generator._customize_graph = MagicMock()
     graph_generator._save_graph = MagicMock(return_value="graph path")
     filtered_pool = {"var1": [1, 2, 3]}
-    mock_log_pool = {"error": "mock_error_message"}
+    mock_log_pool = [{"error": "mock_error_message"}]
     mock_prepare_plot_data_return = (filtered_pool, mock_log_pool)
     graph_generator._prepare_plot_data = MagicMock(return_value=mock_prepare_plot_data_return)
     graph_details = {"type": "plot", "variables": ["var1", "var2"]}
@@ -146,7 +146,7 @@ def test_generate_graph_success(graph_generator: GraphGenerator) -> None:
     graph_generator._customize_graph = MagicMock()
     graph_generator._save_graph = MagicMock(return_value="graph path")
     filtered_pool = {"var1": [1, 2, 3]}
-    mock_log_pool = {"log": "mock_log_message"}
+    mock_log_pool = [{"log": "mock_log_message"}]
     mock_prepare_plot_data_return = (filtered_pool, mock_log_pool)
     graph_generator._prepare_plot_data = MagicMock(return_value=mock_prepare_plot_data_return)
     graph_details = {"type": "plot", "variables": ["var1", "var2"]}
@@ -315,3 +315,19 @@ def test_prepare_plot_data(graph_generator: GraphGenerator,
                            ) -> None:
     result = graph_generator._prepare_plot_data(filtered_pool, graph_details)
     assert result == expected_result
+
+
+@pytest.mark.parametrize(
+    "graph_details, expected_length, expected_message",
+    [
+        ({"type": "bar", "title": "Valid Graph"}, 0, None),
+        ({"invalid_key": "value", "title": "Invalid Graph"}, 1, "Invalid filter file key invalid_key"),
+        ({"type": "stackplot", "invalid_key": "value"}, 1, "Invalid filter file key invalid_key"),
+    ])
+def test_validate_graph_filter(graph_generator: GraphGenerator, graph_details: Dict[str, str], expected_length: int,
+                               expected_message: str):
+    result = graph_generator._validate_graph_filter(graph_details)
+    assert len(result) == expected_length, f"Expected {expected_length} errors, got {len(result)}"
+
+    if expected_length > 0:
+        assert expected_message in result[0]["message"], f"Expected error message '{expected_message}' not found"

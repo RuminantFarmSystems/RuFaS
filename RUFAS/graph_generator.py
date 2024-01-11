@@ -141,9 +141,11 @@ class GraphGenerator:
             Generic exception raised by utility functions.
         """
         try:
+            graph_filter_validation_logs = self._validate_graph_filter(graph_details)
             prepared_data, log_pool = self._prepare_plot_data(filtered_pool, graph_details)
+            all_logs = log_pool + graph_filter_validation_logs
 
-            found_errors = any("error" in log for log in log_pool)
+            found_errors = any("error" in log for log in all_logs)
             if found_errors:
                 return log_pool
 
@@ -160,9 +162,40 @@ class GraphGenerator:
         except Exception as e:
             raise e
 
+    def _validate_graph_filter(self, graph_details: Dict[str, str | List[str]]
+                               ) -> List[Dict[str, str] | Dict[str, Any]]:
+        """Ensures all the filter keys are valid and if not, raise an error and report them back to Output Manager.
+
+        Parameters
+        ----------
+        graph_details : Dict[str, str  |  List[str]]
+            A dictionary containing details/metadata about the graph.
+
+        Returns
+        -------
+        List[Dict[str, str] | Dict[str, Any]]
+            The logs, warnings, and errors to be reported to OutputManager.
+        """
+        valid_graph_filter_keys = ["type", "filters", "variables", "title", "legend", "align_labels", "aspect",
+                                   "canvas", "constrained_layout", "dpi", "edgecolor", "facecolor", "figheight",
+                                   "figsize", "figwidth", "frameon", "grid", "snap", "subplot_adjust", "tight_layout",
+                                   "title", "transform", "xlabel", "xticklabels", "xticks", "xlim", "ylabel",
+                                   "yticklabels", "yticks", "ylim", "yscale", "xscale", "zorder"]
+        graph_filter_validation_logs: List[Dict[str, str] | Dict[str, Any]] = []
+        info_map = {
+            "class": self.__class__.__name__,
+            "function": self._validate_graph_filter.__name__,
+        }
+        for filter_key in graph_details.keys():
+            if filter_key not in valid_graph_filter_keys:
+                graph_filter_validation_logs.append({"error": f"Can't plot {graph_details.get('title')} data set",
+                                                     "message": f"Invalid filter file key {filter_key}.",
+                                                     "info_map": info_map})
+        return graph_filter_validation_logs
+
     def _prepare_plot_data(self, filtered_pool: Dict[str, Dict[str, List[Any]]],
                            graph_details: Dict[str, str | List[str]],
-                           ) -> Tuple[Dict[str, List[int | float]], List[Dict[str, str | Dict[str, str]]]]:
+                           ) -> Tuple[Dict[str, List[int | float]], List[Dict[str, str | Dict[str, Any]]]]:
         """Extracts the values from the filtered_pool data and converts them a dictionary
         that graph_generator can more readily handle and records logs, warnings, and errors for
         Output Manager.
@@ -186,7 +219,7 @@ class GraphGenerator:
         }
         selected_variables = graph_details.get("variables")
         title = graph_details.get("title")
-        log_pool: List[Dict[str, str] | Dict[str, str]] = []
+        log_pool: List[Dict[str, str] | Dict[str, Any]] = []
         prepared_pool: Dict[str, List[int | float]] = {}
         for key in filtered_pool.keys():
             values: List[Any] = filtered_pool[key]["values"]
