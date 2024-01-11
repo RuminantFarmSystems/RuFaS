@@ -42,13 +42,13 @@
                 "avg_gestation_len": 279,
 				"std_gestation_len": 1.4,
 				"prefresh_day": 21,
-                "calving_interval": 395,
+                "calving_interval": 398,
                 "heifers": {
                     "estrus_detection_rate": 0.95,
                     "estrus_conception_rate": 0.59,
                     "repro_sub_protocol": "5dCG2P",
                     "repro_sub_properties": {
-            "conception_rate": 0.6,
+            "conception_rate": 0.59,
                     "estrus_detection_rate": 0.95
           }
         },
@@ -59,7 +59,7 @@
           "resynch_protocol": "TAIafterPD",
                     "repro_sub_protocol": "OvSynch 56",
           "repro_sub_properties": {
-            "conception_rate": 0.5,
+            "conception_rate": 0.45,
             "tai_program_start_day": 70
           }
                 },
@@ -70,9 +70,9 @@
                     "cow_presynch_protocol": "PreSynch",
                     "cow_TAI_protocol": "OvSynch 56",
                     "ovsynch56_conception_rate": 0.45,
-                    "ovsynch48_conception_rate": 0.6,
-					"cosynch72_conception_rate": 0.6,
-                    "cosynch5d_conception_rate": 0.6,
+                    "ovsynch48_conception_rate": 0.45,
+					"cosynch72_conception_rate": 0.45,
+                    "cosynch5d_conception_rate": 0.45,
                     "cow_resynch_protocol": "TAIafterPD",
                     "tai_program_start_day": 75
                 }

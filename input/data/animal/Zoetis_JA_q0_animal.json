@@ -48,8 +48,8 @@
                     "estrus_conception_rate": 0.56,
                     "repro_sub_protocol": "5dCG2P",
                     "repro_sub_properties": {
-            "conception_rate": 0.6,
-                    "estrus_detection_rate": 0.7
+            "conception_rate": 0.56,
+                    "estrus_detection_rate": 0.95
           }
         },
         "cows": {
@@ -59,7 +59,7 @@
           "resynch_protocol": "TAIafterPD",
                     "repro_sub_protocol": "OvSynch 56",
           "repro_sub_properties": {
-            "conception_rate": 0.5,
+            "conception_rate": 0.42,
             "tai_program_start_day": 70
           }
                 },
