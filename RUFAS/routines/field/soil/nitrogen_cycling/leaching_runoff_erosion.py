@@ -11,6 +11,15 @@ This module handles the movement and loss of nitrogen due to erosion and leachin
 on SWAT sections 4:2.1, 2
 """
 
+"""
+These coefficients were determined empirically by calibrating RuFaS with data from an experiment conducted by Pete Vadas
+and J. Mark Powell at the USDA.
+
+Reference:
+Vadas, P. A., & Powell, J. M. (2019). Nutrient mass balance and fate in dairy cattle lots with different surface
+materials. Transactions of the ASABE, 62(1), 131–138. https://doi.org/10.13031/trans.12901 
+
+"""
 NITRATE_RUNOFF_COEFFICIENT = 1e-8
 AMMONIUM_RUNOFF_COEFFICIENT = 8e-6
 NITRATE_PERCOLATION_COEFFICIENT = 6e-8
@@ -63,8 +72,7 @@ class LeachingRunoffErosion:
         Notes
         -----
         This method only removes nitrogen from the top soil layer. Inorganic nitrogen is removed by runoff, while
-        organic nitrogen is removed by sediment erosion. When determining the amounts of nitrates and ammonium lost to
-        runoff, 0.1 is used as the runoff extraction coefficient for nitrates and 1.0 for ammonium.
+        organic nitrogen is removed by sediment erosion.
 
         """
         surface_layer = self.data.soil_layers[0]
@@ -125,11 +133,6 @@ class LeachingRunoffErosion:
         ----------
         field_size : float
             Size of the field in which nitrogen is being leached (ha).
-
-        References
-        ----------
-        pseudocode_soil [S.4.C.8] (determines what the leaching extraction coefficient will be for each pool/layer)
-        TODO: find literature source for these values, issue #495
 
         Notes
         -----
@@ -317,6 +320,16 @@ class LeachingRunoffErosion:
         float
             The amount of nitrogen that leaches out of the current pool and into the next lowest layer on the current
             day (kg / ha).
+
+        Notes
+        -----
+        This method for calculating nitrogen loss due to water movement is very simplistic and is applied to loss
+        through different pathways, including leaching (nitrogen removed by water percolating through a soil layer) and
+        runoff (nitrogen removed by water running off a soil profile). This approach multiplies the amount of nitrogen
+        in the pool that is experiencing loss by the amount of water that is removing the nitrogen, and then multiplies
+        that product by an empirical factor to compute the actual amount of nitrogen loss. This approach has been
+        successfully applied in modelling nutrient loss for other nutrients, principally phosphorus in Pete Vadas'
+        SurPhos model.
 
         """
         water_amount_in_liters = \
