@@ -345,7 +345,8 @@ class ReportGenerator:
             report_data = self._generate_single_report(data, filter_content)
 
             for col, values in report_data.items():
-                column_name = self._generate_unique_report_name(f"{report_name}_{col}")
+                column_name = self._generate_unique_report_name(f"{report_name}_{col}"
+                                                                if len(report_name) > 0 else col)
                 self.reports[column_name] = {"values": values}
 
         except (KeyError, ValueError) as e:
@@ -382,11 +383,14 @@ class ReportGenerator:
             The unique name for the report.
         """
 
-        if not report_name or not isinstance(report_name, str) or len(report_name) == 0:
-            return f"untitled_{Utility.get_timestamp(True)}"
+        if report_name is None:
+            report_name = f"untitled_{Utility.get_timestamp(True)}"
+
+        if not isinstance(report_name, str):
+            report_name = str(report_name)
 
         if report_name in self.reports:
-            report_name = f"{report_name} {Utility.get_timestamp(True)}"
+            report_name = f"{report_name}_{Utility.get_timestamp(True)}"
 
         return report_name
 

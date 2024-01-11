@@ -1,6 +1,10 @@
 {
   "multiple": [
     {
+      "name": "",
+      "filters": ["Time\\..*"]
+    },
+    {
       "name": "Last Year's Average Cow Body Weight (kg)",
       "filters": [
         "LifeCycleManager.daily_update.avg_cow_body_weight"

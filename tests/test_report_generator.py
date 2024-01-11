@@ -842,13 +842,16 @@ def test_check_for_missing_references(mocker: MockerFixture,
         ("report1", {}, "report1", "2023-01-01"),
 
         # Case when the name is in reports and a timestamp is appended
-        ("report1", {"report1": {}}, "report1 2023-01-01", "2023-01-01"),
+        ("report1", {"report1": {}}, "report1_2023-01-01", "2023-01-01"),
 
         # Case when the name is None
         (None, {}, "untitled_2023-01-01", "2023-01-01"),
 
+        # Case when the name is not of type str
+        (123, {}, "123", "2023-01-01"),
+
         # Case when the name is empty
-        ("", {}, "untitled_2023-01-01", "2023-01-01"),
+        ("", {}, "", "2023-01-01"),
     ]
 )
 def test_generate_unique_report_name(
@@ -888,6 +891,17 @@ def test_generate_unique_report_name(
                 None,
                 {"standard_report_some_filter": {"values": [1, 2, 3]}},
                 ["Start generating report: standard_report"]
+        ),
+
+        # Report with name as an empty string
+        (
+                {"name": "", "filters": ["some_filter"]},
+                {"some_filter": [1, 2, 3]},
+                {},
+                None,
+                None,
+                {"some_filter": {"values": [1, 2, 3]}},
+                ["Start generating report: "]
         ),
 
         # Report with cross-references
