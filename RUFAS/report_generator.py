@@ -201,7 +201,7 @@ class ReportGenerator:
                 cross_reference_data = {ref: self.reports[ref] for ref in filter_content["cross_references"]}
                 data_shallow_copy.update(cross_reference_data)
 
-            report_data = self._generate_single_report(data_shallow_copy, filter_content)
+            report_data = self._generate_report_data(data_shallow_copy, filter_content)
 
             for col, values in report_data.items():
                 column_name = self._ensure_unique_report_name_with_timestamp(f"{report_name}_{col}"
@@ -273,7 +273,7 @@ class ReportGenerator:
         if missing_references:
             raise KeyError(f"Missing referenced reports: {', '.join(missing_references)}")
 
-    def _generate_single_report(
+    def _generate_report_data(
             self,
             filtered_pool: Dict[str, Dict[str, List[Any]]],
             filter_content: Dict[str, Any]
