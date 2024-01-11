@@ -185,7 +185,7 @@ class ReportGenerator:
             "function": self.generate_report.__name__,
         }
 
-        report_name = self._generate_unique_report_name(filter_content.get("name"))
+        report_name = self._ensure_unique_report_name_with_timestamp(filter_content.get("name"))
 
         init_event = {
             "log": "start_generate_report",
@@ -193,18 +193,18 @@ class ReportGenerator:
             "info_map": info_map,
         }
         event_logs.append(init_event)
-        data = dict(filtered_pool)
+        data_shallow_copy = dict(filtered_pool)
 
         try:
             if "cross_references" in filter_content.keys():
                 self._check_for_missing_references(filter_content["cross_references"])
                 cross_reference_data = {ref: self.reports[ref] for ref in filter_content["cross_references"]}
-                data.update(cross_reference_data)
+                data_shallow_copy.update(cross_reference_data)
 
-            report_data = self._generate_single_report(data, filter_content)
+            report_data = self._generate_single_report(data_shallow_copy, filter_content)
 
             for col, values in report_data.items():
-                column_name = self._generate_unique_report_name(f"{report_name}_{col}"
+                column_name = self._ensure_unique_report_name_with_timestamp(f"{report_name}_{col}"
                                                                 if len(report_name) > 0 else col)
                 self.reports[column_name] = {"values": values}
 
@@ -219,7 +219,7 @@ class ReportGenerator:
 
         return event_logs
 
-    def _generate_unique_report_name(self, report_name: str | None) -> str:
+    def _ensure_unique_report_name_with_timestamp(self, report_name: str | None) -> str:
         """
         Make the given report name unique, if it is not, by appending a timestamp to it.
 
@@ -256,7 +256,7 @@ class ReportGenerator:
 
     def _check_for_missing_references(self, references: List[str]) -> None:
         """
-        Checks if all the referenced reports are present.
+        Checks if all the referenced reports are present in the list of previously generated reports.
 
         Parameters
         ----------
