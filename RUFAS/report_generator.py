@@ -205,7 +205,7 @@ class ReportGenerator:
 
             for col, values in report_data.items():
                 column_name = self._ensure_unique_report_name_with_timestamp(f"{report_name}_{col}"
-                                                                if len(report_name) > 0 else col)
+                                                                             if len(report_name) > 0 else col)
                 self.reports[column_name] = {"values": values}
 
         except (KeyError, ValueError) as e:
@@ -347,7 +347,8 @@ class ReportGenerator:
             filter_content: Dict[str, Any]
     ) -> Dict[str, List[float]] | None:
         """
-        Combines horizontally and vertically aggregated data based on specified aggregation criteria from filter_content.
+        Combines horizontally and vertically aggregated data based on specified aggregation criteria
+        from filter_content.
 
         Parameters
         ----------
