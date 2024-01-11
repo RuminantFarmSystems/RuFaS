@@ -741,6 +741,7 @@ def test_validate_aggregation_keys(
     Unit test for _validate_aggregation_keys() method in report_generator.py file.
     """
 
+    # Act and assert
     if expected_exception:
         with pytest.raises(expected_exception):
             ReportGenerator._validate_aggregation_keys(filter_content)
@@ -748,6 +749,50 @@ def test_validate_aggregation_keys(
         horizontal_key, vertical_key = ReportGenerator._validate_aggregation_keys(filter_content)
         assert horizontal_key == expected_horizontal
         assert vertical_key == expected_vertical
+
+
+@pytest.mark.parametrize(
+    "horizontally_aggregated, vertically_aggregated, filter_content, expected",
+    [
+        # Test case with both horizontal and vertical aggregation, horizontal first
+        ([1, 2, 3], [4, 5, 6],
+         {"horizontal_aggregation": "sum", "vertical_aggregation": "sum", "horizontal_first": True},
+         {"hor_ver_agg": [sum([1, 2, 3])]}),
+
+        # Test case with both horizontal and vertical aggregation, vertical first
+        ([1, 2, 3], [4, 5, 6],
+         {"horizontal_aggregation": "sum", "vertical_aggregation": "sum", "horizontal_first": False},
+         {"ver_hor_agg": [sum([4, 5, 6])]}),
+
+        # Test case with only horizontal aggregation
+        ([1, 2, 3], None,
+         {"horizontal_aggregation": "sum"},
+         {"hor_agg": [1, 2, 3]}),
+
+        # Test case with only vertical aggregation
+        (None, [4, 5, 6],
+         {"vertical_aggregation": "sum"},
+         {"ver_agg": [4, 5, 6]}),
+
+        # Test case with no aggregation
+        (None, None, {}, None),
+    ]
+)
+def test_package_report_data(
+        horizontally_aggregated: List[int | float] | None,
+        vertically_aggregated: List[int | float] | None,
+        filter_content: Dict[str, Any],
+        expected: Dict[str, List[int | float]] | None
+) -> None:
+    """
+    Unit test for _package_report_data() method in report_generator.py file.
+    """
+
+    # Act
+    result = ReportGenerator._package_report_data(horizontally_aggregated, vertically_aggregated, filter_content)
+
+    # Assert
+    assert result == expected
 
 
 @pytest.mark.parametrize(
