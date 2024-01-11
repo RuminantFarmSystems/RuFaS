@@ -118,9 +118,10 @@ def test_apply_vertical_aggregation(report_data: Dict[str, List[float]],
 
     # Arrange
     aggregator = AGGREGATION_FUNCTIONS[aggregator_key]
+    report_generator = ReportGenerator()
 
     # Act
-    result = ReportGenerator._apply_vertical_aggregation(report_data, aggregator)
+    result = report_generator._apply_vertical_aggregation(report_data, aggregator)
 
     # Assert
     assert result == expected
@@ -159,7 +160,7 @@ def test_apply_horizontal_aggregation(report_data: Dict[str, List[float]],
                                       loop_list: List[str],
                                       aggregator_key: str,
                                       expected: List[float],
-                                      expected_exception: Exception
+                                      expected_exception: Type[Exception]
                                       ) -> None:
     """
     Unit test for _apply_horizontal_aggregation() static method in report_generator.py file.
@@ -167,13 +168,14 @@ def test_apply_horizontal_aggregation(report_data: Dict[str, List[float]],
 
     # Arrange
     aggregator = AGGREGATION_FUNCTIONS[aggregator_key]
+    report_generator = ReportGenerator()
 
     # Act and assert
     if expected_exception:
         with pytest.raises(expected_exception):
-            ReportGenerator._apply_horizontal_aggregation(report_data, loop_list, aggregator)
+            report_generator._apply_horizontal_aggregation(report_data, loop_list, aggregator)
     else:
-        result = ReportGenerator._apply_horizontal_aggregation(report_data, loop_list, aggregator)
+        result = report_generator._apply_horizontal_aggregation(report_data, loop_list, aggregator)
         assert result == expected
 
 
