@@ -159,7 +159,7 @@ def test_prepare_report_data_valid_list(report_generator: ReportGenerator) -> No
         "data1": {"values": [1, 2, 3, 4]},
         "data2": {"values": [5, 6, 7, 8]},
     }
-    assert report_generator._prepare_report_data(filtered_pool, None, 1, 3) == {
+    assert report_generator._prepare_report_data(filtered_pool, None, 1, 3, False) == {
         "data1": [2, 3],
         "data2": [6, 7],
     }
@@ -170,7 +170,7 @@ def test_prepare_report_data_valid_dict(
     sample_filtered_pool: Dict[str, Dict[str, List[Dict[str, int]]]],
 ) -> None:
     actual = report_generator._prepare_report_data(
-        sample_filtered_pool, ["a", "b"], 1, 3
+        sample_filtered_pool, ["a", "b"], 1, 3, False
     )
     expected = {"a": [3, 7], "b": [4, 8]}
     assert actual == expected
@@ -181,7 +181,7 @@ def test_prepare_report_data_invalid_no_variables(
     sample_filtered_pool: Dict[str, Dict[str, List[Dict[str, int]]]],
 ) -> None:
     with pytest.raises(KeyError):
-        report_generator._prepare_report_data(sample_filtered_pool, None, 0, 0)
+        report_generator._prepare_report_data(sample_filtered_pool, None, 0, 0, False)
 
 
 def test_prepare_report_data_aggregate_values(
@@ -189,7 +189,7 @@ def test_prepare_report_data_aggregate_values(
     sample_filtered_pool: Dict[str, Dict[str, List[Dict[str, int]]]],
 ) -> None:
     actual = report_generator._prepare_report_data(
-        sample_filtered_pool, ["a", "b"], 0, None
+        sample_filtered_pool, ["a", "b"], 0, None, False
     )
     expected = {
         "a": [1, 3, 5, 7],

@@ -188,6 +188,7 @@ class GraphGenerator:
         title = graph_details.get("title")
         log_pool: List[Dict[str, str] | Dict[str, str]] = []
         prepared_pool: Dict[str, List[int | float]] = {}
+        filter_by_exclusion = graph_details.get("filter_by_exclusion", False)
         for key in filtered_pool.keys():
             values: List[Any] = filtered_pool[key]["values"]
             is_data_in_dict = isinstance(values[0], dict)
@@ -198,7 +199,7 @@ class GraphGenerator:
                                      "info_map": info_map})
                     break
                 data_dict = Utility.convert_list_of_dicts_to_dict_of_lists(values)
-                filtered_data = Utility.filter_pool(data_dict, selected_variables, False)
+                filtered_data = Utility.filter_pool(data_dict, selected_variables, filter_by_exclusion)
                 if not filtered_data:
                     log_pool.append({"error": f"Can't plot {title} data set",
                                      "message": "No filter-file variables found in data provided.",

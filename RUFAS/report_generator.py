@@ -171,6 +171,7 @@ class ReportGenerator:
             selected_variables=filter_content.get("variables"),
             slice_start=filter_content.get("slice_start", 0),
             slice_end=filter_content.get("slice_end"),
+            filter_by_exclusion=filter_content.get("filter_by_exclusion", False),
         )
         if not report_data:
             raise ValueError(
@@ -218,6 +219,7 @@ class ReportGenerator:
         selected_variables: List[str],
         slice_start: int,
         slice_end: int,
+        filter_by_exclusion: bool
     ) -> Dict[str, List[Any]]:
         """
         Processes and structures a filtered data pool for report generation.
@@ -240,6 +242,9 @@ class ReportGenerator:
         slice_end : int
             Ending index for slicing.
 
+        filter_by_exclusion : bool
+            Flag for whether filtering of the filtered_pool should be done by exclusion.
+
         Returns
         -------
         Dict[str, List[Any]]
@@ -261,7 +266,7 @@ class ReportGenerator:
                 temp_data = Utility.convert_list_of_dicts_to_dict_of_lists(
                     filtered_pool[key]["values"][slice_start:slice_end]
                 )
-                filtered_data = Utility.filter_pool(temp_data, selected_variables, False)
+                filtered_data = Utility.filter_pool(temp_data, selected_variables, filter_by_exclusion)
                 for filtered_key, filtered_value in filtered_data.items():
                     if filtered_key in report_data:
                         report_data[filtered_key].extend(filtered_value)

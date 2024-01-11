@@ -202,3 +202,15 @@ def test_convert_list_of_dicts_to_dict_of_lists_empty_keys():
     expected_result = {"a": [1], "b": [2, 4], "": [3]}
     result = Utility.convert_list_of_dicts_to_dict_of_lists(input_data)
     assert result == expected_result
+
+
+@pytest.mark.parametrize("data_pool, filter_patterns, filter_by_exclusion, expected_result", [
+    ({"var1": 1, "var2": 2, "var3": 3}, ["var1", "var2"], False, {"var1": 1, "var2": 2}),
+    ({"var1": 1, "var2": 2, "var3": 3}, ["var1", "var2"], True, {"var3": 3}),
+    ({"var1": 1, "var2": 2, "var3": 3}, ["var4"], False, {}),
+    ({"var1": 1, "var2": 2, "var3": 3}, ["var4"], True, {"var1": 1, "var2": 2, "var3": 3}),
+    ({}, ["var1"], False, {}),
+    ({"var1": 1, "var2": 2, "var3": 3}, [], False, {}),
+])
+def test_filter_pool(data_pool, filter_patterns, filter_by_exclusion, expected_result):
+    assert Utility.filter_pool(data_pool, filter_patterns, filter_by_exclusion) == expected_result
