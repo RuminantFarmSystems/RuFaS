@@ -65,12 +65,6 @@ class LeachingRunoffErosion:
         runoff, 0.1 is used as the runoff extraction coefficient for nitrates and 1.0 for ammonium.
 
         """
-        self.data.nitrate_runoff = 0.0
-        self.data.ammonium_runoff = 0.0
-        self.data.eroded_fresh_organic_nitrogen = 0.0
-        self.data.eroded_stable_organic_nitrogen = 0.0
-        self.data.eroded_active_organic_nitrogen = 0.0
-
         if self.data.accumulated_runoff > 0.0:
             nitrates_lost_to_runoff = self._calculate_inorganic_nitrogen_loss(
                 self.data.soil_layers[0].nitrate_content, self.data.soil_layers[0].water_content,
@@ -80,11 +74,9 @@ class LeachingRunoffErosion:
                 self.data.soil_layers[0].saturation_content, self.data.accumulated_runoff, 1.0)
 
             self.data.soil_layers[0].nitrate_content -= nitrates_lost_to_runoff
-            self.data.nitrate_runoff = nitrates_lost_to_runoff
             self.data.annual_runoff_nitrates_total += nitrates_lost_to_runoff * field_size
 
             self.data.soil_layers[0].ammonium_content -= ammonium_lost_to_runoff
-            self.data.ammonium_runoff = ammonium_lost_to_runoff
             self.data.annual_runoff_ammonium_total += ammonium_lost_to_runoff * field_size
 
         if self.data.eroded_sediment > 0.0:
@@ -99,15 +91,12 @@ class LeachingRunoffErosion:
                 self.data.soil_layers[0].layer_thickness, field_size, self.data.eroded_sediment)
 
             self.data.soil_layers[0].fresh_organic_nitrogen_content -= fresh_organic_nitrogen_lost
-            self.data.eroded_fresh_organic_nitrogen = fresh_organic_nitrogen_lost
             self.data.annual_eroded_fresh_organic_nitrogen_total += fresh_organic_nitrogen_lost * field_size
 
             self.data.soil_layers[0].stable_organic_nitrogen_content -= stable_organic_nitrogen_lost
-            self.data.eroded_stable_organic_nitrogen = stable_organic_nitrogen_lost
             self.data.annual_eroded_stable_organic_nitrogen_total += stable_organic_nitrogen_lost * field_size
 
             self.data.soil_layers[0].active_organic_nitrogen_content -= active_organic_nitrogen_lost
-            self.data.eroded_active_organic_nitrogen = active_organic_nitrogen_lost
             self.data.annual_eroded_active_organic_nitrogen_total += active_organic_nitrogen_lost * field_size
 
     def _leach_nitrogen(self) -> None:
@@ -130,11 +119,6 @@ class LeachingRunoffErosion:
         layers, in which case it is 2.5.
 
         """
-        self.data.set_vectorized_layer_attribute("percolated_nitrates", [0.0] * len(self.data.soil_layers))
-        self.data.set_vectorized_layer_attribute("percolated_ammonium", [0.0] * len(self.data.soil_layers))
-        self.data.set_vectorized_layer_attribute("percolated_active_organic_nitrogen",
-                                                 [0.0] * len(self.data.soil_layers))
-
         percolated_nitrogen = []
         for layer in self.data.soil_layers:
             if layer.percolated_water == 0.0:
@@ -159,10 +143,6 @@ class LeachingRunoffErosion:
             layer.nitrate_content -= nitrates_lost
             layer.ammonium_content -= ammonium_lost
             layer.active_organic_nitrogen_content -= active_organic_nitrogen_lost
-
-            layer.percolated_nitrates = nitrates_lost
-            layer.percolated_ammonium = ammonium_lost
-            layer.percolated_active_organic_nitrogen = active_organic_nitrogen_lost
 
             nitrogen_percolated_to_next_layer = {
                 "nitrates": nitrates_lost,
