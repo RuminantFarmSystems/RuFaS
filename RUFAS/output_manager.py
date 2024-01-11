@@ -735,8 +735,11 @@ class OutputManager(object):
             csv_dir: Path
     ) -> None:
         """
-        Reads a text file containing a list of keys and filters the variables pool by those keys.
-        Saves resulting data pool to a json file in the given path to a directory.
+        Parses the filter files in the given directory and saves the results to the given path.
+
+        Notes
+        -----
+        The filter files can be used to generate different output formats such as JSON, CSV, and graphical output.
 
         Parameters
         ----------
@@ -773,9 +776,12 @@ class OutputManager(object):
             info_map["filter file"] = filter_file
             input_path = os.path.join(filters_dir_path, filter_file)
             filter_contents = self._load_filter_file_content(input_path)
-            self.add_log("init_report_generation",
-                         f"Generating report(s) for file: {filter_file}",
-                         info_map)
+            if filter_file.startswith(
+                    self.__supported_filter_types_prefixes["report"]
+            ):
+                self.add_log("init_report_generation",
+                             f"Generating report(s) for file: {filter_file}",
+                             info_map)
             for filter_content in filter_contents:
                 info_map["filter_content"] = filter_content
                 if (
@@ -803,7 +809,7 @@ class OutputManager(object):
                 if filter_file.startswith(
                         self.__supported_filter_types_prefixes["report"]
                 ):
-                    log_pool = report_generator.handle_report_generation(filter_content, filtered_pool)
+                    log_pool = report_generator.generate_report(filter_content, filtered_pool)
                     self._route_logs(log_pool)
                 else:
                     self._route_save_functions(
