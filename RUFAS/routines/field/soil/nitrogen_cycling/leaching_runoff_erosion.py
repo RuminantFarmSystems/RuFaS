@@ -17,7 +17,7 @@ and J. Mark Powell at the USDA.
 
 Reference:
 Vadas, P. A., & Powell, J. M. (2019). Nutrient mass balance and fate in dairy cattle lots with different surface
-materials. Transactions of the ASABE, 62(1), 131–138. https://doi.org/10.13031/trans.12901 
+materials. Transactions of the ASABE, 62(1), 131–138. https://doi.org/10.13031/trans.12901
 
 """
 NITRATE_RUNOFF_COEFFICIENT = 1e-8
