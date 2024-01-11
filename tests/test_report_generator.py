@@ -686,7 +686,7 @@ def test_generate_single_report(filtered_pool: Dict[str, Dict[str, List[Any]]],
                                 filter_content: Dict[str, Any],
                                 mock_prep_data: Dict[str, List[Any]],
                                 expected_result: List[Any],
-                                expected_exception: Exception,
+                                expected_exception: Type[Exception],
                                 mocker: MockerFixture) -> None:
     """
     Unit test for the _generate_single_report() method of ReportGenerator class in report_generator.py file.
@@ -704,6 +704,50 @@ def test_generate_single_report(filtered_pool: Dict[str, Dict[str, List[Any]]],
     else:
         result = ReportGenerator._generate_single_report(filtered_pool, filter_content)
         assert result == expected_result
+
+
+@pytest.mark.parametrize(
+    "filter_content, expected_horizontal, expected_vertical, expected_exception",
+    [
+        # Test with valid horizontal and vertical keys
+        ({"horizontal_aggregation": "sum", "vertical_aggregation": "average"}, "sum", "average", None),
+
+        # Test with valid horizontal key and no vertical key
+        ({"horizontal_aggregation": "product"}, "product", None, None),
+
+        # Test with no horizontal key and valid vertical key
+        ({"vertical_aggregation": "division"}, None, "division", None),
+
+        # Test with unsupported horizontal key
+        ({"horizontal_aggregation": "unsupported_key", "vertical_aggregation": "sum"}, None, None, ValueError),
+
+        # Test with unsupported vertical key
+        ({"horizontal_aggregation": "sum", "vertical_aggregation": "unsupported_key"}, None, None, ValueError),
+
+        # Test with both keys unsupported
+        ({"horizontal_aggregation": "unsupported_h", "vertical_aggregation": "unsupported_v"}, None, None, ValueError),
+
+        # Test with empty filter content
+        ({}, None, None, None),
+    ]
+)
+def test_validate_aggregation_keys(
+        filter_content: Dict[str, Any],
+        expected_horizontal: str | None,
+        expected_vertical: str | None,
+        expected_exception: Type[Exception]
+):
+    """
+    Unit test for _validate_aggregation_keys() method in report_generator.py file.
+    """
+
+    if expected_exception:
+        with pytest.raises(expected_exception):
+            ReportGenerator._validate_aggregation_keys(filter_content)
+    else:
+        horizontal_key, vertical_key = ReportGenerator._validate_aggregation_keys(filter_content)
+        assert horizontal_key == expected_horizontal
+        assert vertical_key == expected_vertical
 
 
 @pytest.mark.parametrize(

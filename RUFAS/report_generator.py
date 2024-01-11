@@ -439,9 +439,7 @@ class ReportGenerator:
         ValueError
             If there is an error preparing the report data.
             If the report data is empty.
-            If the type of aggregation is not supported. The supported types are: sum, average, product,
-                subtraction, division, SD.
-            If there are no horizontal or vertical aggregation keys in the filter content.
+            If the type of horizontal or vertical aggregation is not supported.
         """
 
         try:
@@ -454,13 +452,10 @@ class ReportGenerator:
                 f"filter {filter_content.get('filters')} in {filter_content.get('name')} led to empty report data."
             )
 
-        horizontal_agg_key = filter_content.get("horizontal_aggregation")
-        if horizontal_agg_key and horizontal_agg_key not in AGGREGATION_FUNCTIONS:
-            raise ValueError(f"Unsupported horizontal aggregation type: {horizontal_agg_key}")
-
-        vertical_agg_key = filter_content.get("vertical_aggregation")
-        if vertical_agg_key and vertical_agg_key not in AGGREGATION_FUNCTIONS:
-            raise ValueError(f"Unsupported vertical aggregation type: {vertical_agg_key}")
+        try:
+            horizontal_agg_key, vertical_agg_key = ReportGenerator._validate_aggregation_keys(filter_content)
+        except ValueError as e:
+            raise ValueError(f"Error validating aggregation keys => {e}")
 
         horizontally_aggregated = None
         vertically_aggregated = None
@@ -490,6 +485,38 @@ class ReportGenerator:
             return {"ver_agg": vertically_aggregated}
 
         return report_data
+
+    @staticmethod
+    def _validate_aggregation_keys(filter_content: Dict[str, Any]) -> tuple[str | None, str | None]:
+        """
+        Validates the horizontal and vertical aggregation keys in the filter content.
+
+        Parameters
+        ----------
+        filter_content : Dict[str, Any]
+            A dictionary containing filter criteria, aggregation instructions, and scalar operation details.
+
+        Returns
+        -------
+        tuple[str | None, str | None]
+            The horizontal and vertical aggregation keys.
+
+        Raises
+        ------
+        ValueError
+            If the type of horizontal or vertical aggregation is not supported. The supported types are:
+            sum, average, product, subtraction, division, SD.
+        """
+
+        horizontal_agg_key = filter_content.get("horizontal_aggregation")
+        if horizontal_agg_key and horizontal_agg_key not in AGGREGATION_FUNCTIONS:
+            raise ValueError(f"Unsupported horizontal aggregation type: {horizontal_agg_key}")
+
+        vertical_agg_key = filter_content.get("vertical_aggregation")
+        if vertical_agg_key and vertical_agg_key not in AGGREGATION_FUNCTIONS:
+            raise ValueError(f"Unsupported vertical aggregation type: {vertical_agg_key}")
+
+        return horizontal_agg_key, vertical_agg_key
 
     @staticmethod
     def _apply_horizontal_aggregation(report_data: Dict[str, List[float]], loop_list: List[str],
