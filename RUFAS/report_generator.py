@@ -459,8 +459,6 @@ class ReportGenerator:
 
         horizontally_aggregated = None
         vertically_aggregated = None
-        horizontal_aggregator = None
-        vertical_aggregator = None
 
         if horizontal_agg_key:
             horizontal_aggregator = AGGREGATION_FUNCTIONS.get(horizontal_agg_key)
@@ -472,11 +470,48 @@ class ReportGenerator:
             vertical_aggregator = AGGREGATION_FUNCTIONS.get(vertical_agg_key)
             vertically_aggregated = ReportGenerator._apply_vertical_aggregation(report_data, vertical_aggregator)
 
+        aggregate_report = ReportGenerator._package_report_data(horizontally_aggregated, vertically_aggregated,
+                                                                filter_content)
+
+        return aggregate_report if aggregate_report else report_data
+
+    @staticmethod
+    def _package_report_data(
+            horizontally_aggregated: List[float] | None,
+            vertically_aggregated: List[float] | None,
+            filter_content: Dict[str, Any]
+    ) -> Dict[str, List[float]] | None:
+        """
+        Packages the horizontally and vertically aggregated data into a dictionary.
+
+        Parameters
+        ----------
+        horizontally_aggregated : List[float] | None
+            The horizontally aggregated data.
+        vertically_aggregated : List[float] | None
+            The vertically aggregated data.
+        filter_content : Dict[str, Any]
+            A dictionary containing filter criteria, aggregation instructions, and scalar operation details.
+
+        Returns
+        -------
+        Dict[str, List[float]] | None
+            If no aggregation is specified, returns None.
+            If both horizontal and vertical aggregations are specified, the returned dictionary will have one key
+                that is either "hor_ver_agg" or "ver_hor_agg" depending on the value of the "horizontal_first" key
+                in the filter content.
+            If only horizontal aggregation is specified, the returned dictionary will have one key "hor_agg".
+            If only vertical aggregation is specified, the returned dictionary will have one key "ver_agg".
+        """
+
+        horizontal_agg_key = filter_content.get("horizontal_aggregation")
+        vertical_agg_key = filter_content.get("vertical_aggregation")
+
         if horizontal_agg_key and vertical_agg_key:
             horizontal_first = filter_content.get("horizontal_first", True)
-            if horizontal_first:
-                return {"hor_ver_agg": [vertical_aggregator(horizontally_aggregated)]}
-            return {"ver_hor_agg": [horizontal_aggregator(vertically_aggregated)]}
+            aggregator = AGGREGATION_FUNCTIONS[vertical_agg_key if horizontal_first else horizontal_agg_key]
+            aggregated_data = horizontally_aggregated if horizontal_first else vertically_aggregated
+            return {f"{'hor_ver' if horizontal_first else 'ver_hor'}_agg": [aggregator(aggregated_data)]}
 
         if horizontal_agg_key:
             return {"hor_agg": horizontally_aggregated}
@@ -484,7 +519,7 @@ class ReportGenerator:
         if vertical_agg_key:
             return {"ver_agg": vertically_aggregated}
 
-        return report_data
+        return None
 
     @staticmethod
     def _validate_aggregation_keys(filter_content: Dict[str, Any]) -> tuple[str | None, str | None]:
