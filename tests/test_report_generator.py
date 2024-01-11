@@ -651,7 +651,7 @@ def test_combine_aggregate_report_data(
 
     # Act
     result = report_generator._combine_aggregate_report_data(horizontally_aggregated, vertically_aggregated,
-                                                            filter_content)
+                                                             filter_content)
 
     # Assert
     assert result == expected
