@@ -230,17 +230,18 @@ def test_prepare_report_data_with_constants(filtered_pool: Dict[str, Dict[str, L
     """
 
     # Arrange
+    report_generator = ReportGenerator()
     mocker.patch('RUFAS.report_generator.Utility.convert_list_of_dicts_to_dict_of_lists',
                  side_effect=lambda x: {k: [d[k] for d in x] for k in x[0]})
-    mocker.patch.object(ReportGenerator, '_add_constants_data',
+    mocker.patch.object(report_generator, '_add_constants_data',
                         side_effect=lambda report_data, _: report_data.update({"name": "value"}))
 
     # Act and assert
     if expected_exception:
         with pytest.raises(expected_exception):
-            ReportGenerator._prepare_report_data_with_constants(filtered_pool, filter_content)
+            report_generator._prepare_report_data_with_constants(filtered_pool, filter_content)
     else:
-        result = ReportGenerator._prepare_report_data_with_constants(filtered_pool, filter_content)
+        result = report_generator._prepare_report_data_with_constants(filtered_pool, filter_content)
         assert result == expected_result
 
 
