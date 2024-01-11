@@ -404,11 +404,15 @@ def test_validate_constants(
     Unit test for the _validate_constants static method in report_generator.py file.
     """
 
+    # Arrange
+    report_generator = ReportGenerator()
+
+    # Act and assert
     if expected_exception:
         with pytest.raises(expected_exception):
-            ReportGenerator._validate_constants(report_data, constant_config)
+            report_generator._validate_constants(report_data, constant_config)
     else:
-        ReportGenerator._validate_constants(report_data, constant_config)
+        report_generator._validate_constants(report_data, constant_config)
 
 
 @pytest.mark.parametrize(
