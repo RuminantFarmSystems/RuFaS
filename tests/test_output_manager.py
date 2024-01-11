@@ -1683,7 +1683,7 @@ def test_save_results_report_generation(
 
     with patch("RUFAS.output_manager.ReportGenerator") as mock_report_generator_class:
         mock_report_generator = mock_report_generator_class.return_value
-        mock_report_generator.handle_report_generation = MagicMock()
+        mock_report_generator.generate_report = MagicMock()
 
         # Act
         mock_output_manager.save_results(
