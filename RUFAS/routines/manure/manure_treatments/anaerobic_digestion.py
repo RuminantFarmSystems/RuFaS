@@ -65,6 +65,7 @@ class AnaerobicDigestion(BaseManureTreatment):
             The daily output from anaerobic digestion.
 
         """
+        daily_input = self._current_manure_treatment_daily_input
         daily_output = self._initialize_daily_output_during_update(
             self._current_manure_treatment_daily_input
         )

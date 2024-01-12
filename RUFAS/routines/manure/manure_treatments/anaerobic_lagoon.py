@@ -151,6 +151,7 @@ class AnaerobicLagoon(BaseManureTreatment):
             The daily output variables for the anaerobic lagoon.
 
         """
+        daily_input = self._current_manure_treatment_daily_input
         daily_output = self._initialize_daily_output_during_update(
             self._current_manure_treatment_daily_input
         )
