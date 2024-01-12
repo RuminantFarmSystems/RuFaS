@@ -246,9 +246,6 @@ class ReportGenerator:
         if report_name is None:
             report_name = f"untitled_{Utility.get_timestamp(True)}"
 
-        if not isinstance(report_name, str):
-            report_name = str(report_name)
-
         if report_name in self.reports:
             report_name = f"{report_name}_{Utility.get_timestamp(True)}"
 
@@ -308,10 +305,6 @@ class ReportGenerator:
 
         try:
             horizontal_agg_key, vertical_agg_key = self._extract_and_check_aggregation_keys(filter_content)
-        except ValueError:
-            raise
-
-        try:
             report_data = self._prepare_report_data_with_constants(filtered_pool, filter_content)
         except ValueError:
             raise
