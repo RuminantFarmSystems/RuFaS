@@ -51,18 +51,22 @@ def mock_field_data() -> FieldData:
     )
 
 
-@pytest.mark.parametrize("manure_manager,should_fail", [
-    (MagicMock(ManureManager), False),
-    (None, True)
+@pytest.mark.parametrize("manure_manager,feed_manager,should_fail,error_count", [
+    (MagicMock(ManureManager), MagicMock(FeedManager), False, 0),
+    (None, MagicMock(FeedManager), True, 1),
+    (MagicMock(ManureManager), None, False, 1)
 ])
-def test_init(manure_manager: ManureManager, should_fail: bool) -> None:
+def test_init(manure_manager: ManureManager, feed_manager: FeedManager, should_fail: bool, error_count: int) -> None:
     """Tests that Field initialization fails when passed invalid parameters."""
-    if should_fail:
-        with pytest.raises(ValueError, match="Manure manager cannot be None."):
-            Field(manure_manager=manure_manager)
-    else:
-        Field(manure_manager=manure_manager)
-        assert True
+    with patch("RUFAS.output_manager.OutputManager.add_error") as add_error:
+        if should_fail:
+            with pytest.raises(ValueError, match="Manure manager cannot be None."):
+                Field(manure_manager=manure_manager, feed_manager=feed_manager)
+        else:
+            Field(manure_manager=manure_manager, feed_manager=feed_manager)
+            assert True
+
+        assert add_error.call_count == error_count
 
 
 def test_manage_field() -> None:
