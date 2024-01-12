@@ -478,10 +478,10 @@ class ReportGenerator:
             The vertically aggregated data as a list.
         """
 
-        aggregated_data = []
+        aggregated_data: List[float] = []
         for _, data in report_data.items():
-            filtered_data = list(filter(None.__ne__, data))
-            aggregated_data.append(aggregator(filtered_data))
+            non_null_data_points = list(filter(None.__ne__, data))
+            aggregated_data.append(aggregator(non_null_data_points))
         return aggregated_data
 
     def _prepare_report_data_with_constants(
