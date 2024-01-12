@@ -164,17 +164,19 @@ class GraphGenerator:
 
     def _validate_graph_filter(self, graph_details: Dict[str, str | List[str]]
                                ) -> List[Dict[str, str] | Dict[str, Any]]:
-        """Ensures all the filter keys are valid and if not, raise an error and report them back to Output Manager.
+        """
+        Ensures all the filter keys are valid and if not, raise an error and report them back to Output Manager.
 
         Parameters
         ----------
-        graph_details : Dict[str, str  |  List[str]]
+        graph_details : Dict[str, str | List[str]]
             A dictionary containing details/metadata about the graph.
 
         Returns
         -------
         List[Dict[str, str] | Dict[str, Any]]
             The logs, warnings, and errors to be reported to OutputManager.
+        
         """
         valid_graph_filter_keys = ["type", "filters", "variables", "title", "legend", "align_labels", "aspect",
                                    "canvas", "constrained_layout", "dpi", "edgecolor", "facecolor", "figheight",
