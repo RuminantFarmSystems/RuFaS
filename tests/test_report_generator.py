@@ -233,7 +233,7 @@ def test_prepare_report_data_with_constants(filtered_pool: Dict[str, Dict[str, L
     report_generator = ReportGenerator()
     mocker.patch('RUFAS.report_generator.Utility.convert_list_of_dicts_to_dict_of_lists',
                  side_effect=lambda x: {k: [d[k] for d in x] for k in x[0]})
-    mocker.patch.object(report_generator, '_add_constants_data',
+    mocker.patch.object(report_generator, '_add_constants_to_report_data',
                         side_effect=lambda report_data, _: report_data.update({"name": "value"}))
 
     # Act and assert
@@ -305,14 +305,14 @@ def test_prepare_report_data_with_constants(filtered_pool: Dict[str, Dict[str, L
                 ValueError
         ),
     ])
-def test_add_constants_data(
+def test_add_constants_to_report_data(
         report_data: Dict[str, List[Any]],
         filter_content: Dict[str, Any],
         expected_report_data: Dict[str, List[Any]],
         expected_exception: Type[Exception]
 ) -> None:
     """
-    Unit test for the _add_constants_data static method in report_generator.py file.
+    Unit test for the _add_constants_to_report_data static method in report_generator.py file.
     """
 
     # Arrange
@@ -321,9 +321,9 @@ def test_add_constants_data(
     # Act and assert
     if expected_exception:
         with pytest.raises(expected_exception):
-            report_generator._add_constants_data(report_data, filter_content)
+            report_generator._add_constants_to_report_data(report_data, filter_content)
     else:
-        report_generator._add_constants_data(report_data, filter_content)
+        report_generator._add_constants_to_report_data(report_data, filter_content)
         assert report_data == expected_report_data
 
 

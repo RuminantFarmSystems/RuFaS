@@ -544,13 +544,13 @@ class ReportGenerator:
                 report_data[key] = filtered_pool[key]["values"][slice_start:slice_end]
 
         try:
-            self._add_constants_data(report_data, filter_content)
+            self._add_constants_to_report_data(report_data, filter_content)
         except ValueError:
             raise
 
         return report_data
 
-    def _add_constants_data(
+    def _add_constants_to_report_data(
             self,
             report_data: Dict[str, List[Any]],
             filter_content: Dict[str, Any]) -> None:
