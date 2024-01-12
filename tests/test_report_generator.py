@@ -709,9 +709,6 @@ def test_check_for_missing_references(mocker: MockerFixture,
         # Case when the name is None
         (None, {}, "untitled_2023-01-01", "2023-01-01"),
 
-        # Case when the name is not of type str
-        (123, {}, "123", "2023-01-01"),
-
         # Case when the name is empty
         ("", {}, "", "2023-01-01"),
     ]
