@@ -187,12 +187,12 @@ class ReportGenerator:
 
         report_name = self._ensure_unique_report_name_with_timestamp(filter_content.get("name"))
 
-        init_event = {
+        init_event_log = {
             "log": "start_generate_report",
             "message": f"Start generating report: {report_name}",
             "info_map": info_map,
         }
-        event_logs.append(init_event)
+        event_logs.append(init_event_log)
         data_shallow_copy = dict(filtered_pool)
 
         try:
@@ -210,12 +210,12 @@ class ReportGenerator:
 
         except (KeyError, ValueError) as e:
             error_type = e.__class__.__name__
-            error_event = {
+            error_event_log = {
                 "error": "report_generation_error",
                 "message": f"Error generating report ({report_name}) => {error_type}: {e}",
                 "info_map": info_map,
             }
-            event_logs.append(error_event)
+            event_logs.append(error_event_log)
 
         return event_logs
 
@@ -321,6 +321,9 @@ class ReportGenerator:
                 f"filter {filter_content.get('filters')} in {filter_content.get('name')} led to empty report data."
             )
 
+        if not horizontal_agg_key and not vertical_agg_key:
+            return report_data
+
         horizontally_aggregated = None
         vertically_aggregated = None
 
@@ -338,7 +341,7 @@ class ReportGenerator:
                                                                vertically_aggregated,
                                                                filter_content)
 
-        return aggregate_report if aggregate_report else report_data
+        return aggregate_report
 
     def _combine_aggregate_report_data(
             self,
