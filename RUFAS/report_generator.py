@@ -162,7 +162,7 @@ class ReportGenerator:
             filtered_pool: Dict[str, Dict[str, List[Any]]],
     ) -> List[Dict[str, str | Dict[str, str]]]:
         """
-        Generates an individual report specified by the given filter content.
+        Generates a report specified by the given filter content.
 
         Parameters
         ----------
