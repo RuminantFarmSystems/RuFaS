@@ -1,5 +1,7 @@
 from dataclasses import dataclass
 
+from RUFAS.routines.feed_storage.enums import CropCategory, CropType
+from RUFAS.routines.feed_storage.feed_manager import StorageType
 from RUFAS.routines.field.crop.crop_data import (
     CropData,
     PlantCategory
@@ -15,6 +17,9 @@ class Soybean(CropData):
     scientific_name: str = "Glycine max"
     plant_category: PlantCategory = PlantCategory("warm_annual_legume")
     is_nitrogen_fixer: bool = True
+
+    crop_category: CropCategory = CropCategory.SOY
+    storage_type: StorageType = StorageType.DRY
 
     minimum_temperature: float = 10.0
     optimal_temperature: float = 25.0
@@ -64,6 +69,8 @@ class SoybeanGrain(Soybean):
     species: str = "soybean_grain"
     name: str = "soybean grain"
 
+    crop_type: CropType = CropType.GRAIN
+
     optimal_harvest_index: float = 0.35
     min_harvest_index: float = 0.26
     dry_matter_percentage: float = 89.105
@@ -95,6 +102,8 @@ class SoybeanHay(Soybean):
     """
     species: str = "soybean_hay"
     name: str = "soybean hay"
+
+    crop_type: CropType = CropType.FORAGE
 
     optimal_harvest_index: float = 0.90
     min_harvest_index: float = 0.54
