@@ -162,7 +162,7 @@ class ReportGenerator:
             filtered_pool: Dict[str, Dict[str, List[Any]]],
     ) -> List[Dict[str, str | Dict[str, str]]]:
         """
-        Generates a single report based on filtered data and aggregation criteria.
+        Generates an individual report specified by the given filter content.
 
         Parameters
         ----------
@@ -185,34 +185,35 @@ class ReportGenerator:
             "function": self.generate_report.__name__,
         }
 
-        report_name = self._ensure_unique_report_name_with_timestamp(filter_content.get("name"))
+        individual_report_name = self._ensure_unique_report_name_with_timestamp(filter_content.get("name"))
 
         init_event_log = {
-            "log": "start_generate_report",
-            "message": f"Start generating report: {report_name}",
+            "log": "start_generate_single_report",
+            "message": f"Start generating individual report: {individual_report_name}",
             "info_map": info_map,
         }
         event_logs.append(init_event_log)
-        data_shallow_copy = dict(filtered_pool)
 
         try:
             if "cross_references" in filter_content.keys():
                 self._check_for_missing_references(filter_content["cross_references"])
                 cross_reference_data = {ref: self.reports[ref] for ref in filter_content["cross_references"]}
-                data_shallow_copy.update(cross_reference_data)
-
-            report_data = self._generate_report_data(data_shallow_copy, filter_content)
+                cross_reference_data.update(filtered_pool)
+                report_data = self._perform_aggregations(cross_reference_data, filter_content)
+            else:
+                report_data = self._perform_aggregations(filtered_pool, filter_content)
 
             for col, values in report_data.items():
-                column_name = self._ensure_unique_report_name_with_timestamp(f"{report_name}_{col}"
-                                                                             if len(report_name) > 0 else col)
+                column_name = self._ensure_unique_report_name_with_timestamp(
+                    f"{individual_report_name}_{col}"
+                    if len(individual_report_name) > 0 else col)
                 self.reports[column_name] = {"values": values}
 
         except (KeyError, ValueError) as e:
             error_type = e.__class__.__name__
             error_event_log = {
                 "error": "report_generation_error",
-                "message": f"Error generating report ({report_name}) => {error_type}: {e}",
+                "message": f"Error generating the individual report ({individual_report_name}) => {error_type}: {e}",
                 "info_map": info_map,
             }
             event_logs.append(error_event_log)
@@ -270,7 +271,7 @@ class ReportGenerator:
         if missing_references:
             raise KeyError(f"Missing referenced reports: {', '.join(missing_references)}")
 
-    def _generate_report_data(
+    def _perform_aggregations(
             self,
             filtered_pool: Dict[str, Dict[str, List[Any]]],
             filter_content: Dict[str, Any]

@@ -535,7 +535,7 @@ def test_validate_constants(
         ),
     ]
 )
-def test_generate_report_data(
+def test_perform_aggregations(
         filtered_pool: Dict[str, Dict[str, List[Any]]],
         filter_content: Dict[str, Any],
         mock_prep_data: Dict[str, List[Any]],
@@ -543,7 +543,7 @@ def test_generate_report_data(
         expected_exception: Type[Exception],
         mocker: MockerFixture) -> None:
     """
-    Unit test for the _generate_report_data() method of ReportGenerator class in report_generator.py file.
+    Unit test for the _perform_aggregations() method of ReportGenerator class in report_generator.py file.
     """
 
     # Arrange
@@ -555,9 +555,9 @@ def test_generate_report_data(
     # Act and assert
     if expected_exception:
         with pytest.raises(expected_exception):
-            report_generator._generate_report_data(filtered_pool, filter_content)
+            report_generator._perform_aggregations(filtered_pool, filter_content)
     else:
-        result = report_generator._generate_report_data(filtered_pool, filter_content)
+        result = report_generator._perform_aggregations(filtered_pool, filter_content)
         assert result == expected_result
 
 
@@ -738,8 +738,8 @@ def test_ensure_unique_report_name_with_timestamp(
 
 
 @pytest.mark.parametrize(
-    "filter_content, filtered_pool, reports, reference_exception, generate_single_report_exception,"
-    "expected_report_columns, expected_log_messages",
+    "filter_content, filtered_pool, reports, reference_exception, "
+    "perform_aggregations_exception, expected_report_columns, expected_log_messages",
     [
         # Standard report generation
         (
@@ -749,7 +749,7 @@ def test_ensure_unique_report_name_with_timestamp(
                 None,
                 None,
                 {"standard_report_some_filter": {"values": [1, 2, 3]}},
-                ["Start generating report: standard_report"]
+                ["Start generating individual report: standard_report"]
         ),
 
         # Report with name as an empty string
@@ -760,7 +760,7 @@ def test_ensure_unique_report_name_with_timestamp(
                 None,
                 None,
                 {"some_filter": {"values": [1, 2, 3]}},
-                ["Start generating report: "]
+                ["Start generating individual report: "]
         ),
 
         # Report with cross-references
@@ -778,7 +778,7 @@ def test_ensure_unique_report_name_with_timestamp(
                     "ref1": {"values": [4, 5, 6]},
                     "report_with_references_some_filter": {"values": [1, 2, 3]},
                     "report_with_references_ref1": {"values": [4, 5, 6]}},
-                ["Start generating report: report_with_references"]
+                ["Start generating individual report: report_with_references"]
         ),
 
         # Report generation with missing cross-references
@@ -789,11 +789,11 @@ def test_ensure_unique_report_name_with_timestamp(
                 KeyError,
                 None,
                 None,
-                ["Start generating report: error_report",
-                 "Error generating report (error_report) => KeyError: "]
+                ["Start generating individual report: error_report",
+                 "Error generating the individual report (error_report) => KeyError: "]
         ),
 
-        # Report generation with error in _generate_report_data
+        # Report generation with error in _perform_aggregations
         (
                 {"name": "error_report", "filters": ["some_filter"]},
                 {"some_data_key": [1, 2, 3]},
@@ -801,8 +801,8 @@ def test_ensure_unique_report_name_with_timestamp(
                 None,
                 ValueError,
                 None,
-                ["Start generating report: error_report",
-                 "Error generating report (error_report) => ValueError: "]
+                ["Start generating individual report: error_report",
+                 "Error generating the individual report (error_report) => ValueError: "]
         ),
     ]
 )
@@ -811,7 +811,7 @@ def test_generate_report(
         filtered_pool: Dict[str, Any],
         reports: Dict[str, Dict[str, List[Any]]],
         reference_exception: Optional[Type[BaseException]],
-        generate_single_report_exception: Optional[Type[BaseException]],
+        perform_aggregations_exception: Optional[Type[BaseException]],
         expected_report_columns: Dict[str, List[Any]],
         expected_log_messages: List[str],
         mocker: MockerFixture,
@@ -828,11 +828,11 @@ def test_generate_report(
                         side_effect=lambda name: name)
     mocker.patch.object(report_generator, '_check_for_missing_references',
                         side_effect=reference_exception if reference_exception else None)
-    if generate_single_report_exception:
-        mocker.patch.object(report_generator, '_generate_report_data',
-                            side_effect=generate_single_report_exception)
+    if perform_aggregations_exception:
+        mocker.patch.object(report_generator, '_perform_aggregations',
+                            side_effect=perform_aggregations_exception)
     elif not reference_exception:
-        mocker.patch.object(report_generator, '_generate_report_data',
+        mocker.patch.object(report_generator, '_perform_aggregations',
                             return_value={fltr: filtered_pool[fltr] for fltr in filter_content["filters"]} |
                                          {ref: reports[ref]["values"]
                                           for ref in filter_content.get("cross_references", [])})
@@ -841,7 +841,7 @@ def test_generate_report(
     event_logs = report_generator.generate_report(filter_content, filtered_pool)
 
     # Assert
-    if not reference_exception and not generate_single_report_exception:
+    if not reference_exception and not perform_aggregations_exception:
         assert report_generator.reports == expected_report_columns
 
     log_messages = [log["message"] for log in event_logs]
