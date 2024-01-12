@@ -162,8 +162,8 @@ Develop a set of standard scenarios for end-to-end testing|||P1
 
 [Pseudocode Guidelines](https://docs.google.com/document/d/1e5gM7fuT06iQYDKvwUAB-jVaLjw3iZizXAdSnOEDco0/edit?usp=sharing)
 
+[2024 Fixathon tasks alive](https://docs.google.com/spreadsheets/d/1rtbnWAw9wA1GoD7VHE0VNrXzasaj2-2dquInr0ZjAeY/edit?usp=sharing)
+
 [2023 Fixathon End tasks](https://docs.google.com/spreadsheets/d/1PcxDMAKYupDahtYiIpTKMMTjL4rbGa5ntiKf5ZuHHvU/edit?usp=sharing)
 
-[2023 Fixathon tasks alive](https://docs.google.com/spreadsheets/d/13_DoP4uFIsXjFKOcJhG25ys3dOL4wPp1rT-0Xu_fUyA/edit?usp=sharing)
-
-[2022 Fixathon tasks](https://docs.google.com/spreadsheets/d/1SnY3c4vBXrD9ybHoswJW28FrkG4DWx4fyvotIXA85BM/edit?usp=sharing)
+[2022 Fixathon End tasks](https://docs.google.com/spreadsheets/d/1SnY3c4vBXrD9ybHoswJW28FrkG4DWx4fyvotIXA85BM/edit?usp=sharing)
