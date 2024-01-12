@@ -152,9 +152,9 @@ class AnaerobicLagoon(BaseManureTreatment):
 
         """
         daily_input = self._current_manure_treatment_daily_input
-        daily_output = self._initialize_daily_output_during_update(
-            self._current_manure_treatment_daily_input
-        )
+        daily_output = self._initialize_daily_output_during_update(daily_input)
+        self._accumulate_daily_output(daily_output)
+
         adjusted_daily_final_manure_volume = self._adjust_final_manure_volume(
             daily_output.daily_final_manure_volume
         )
