@@ -594,17 +594,20 @@ class ReportGenerator:
 
     def _validate_constants(
             self,
-            report_data: Dict[str, List[Any]],
+            existing_reports: Dict[str, List[Any]],
             constants_config: Dict[str, int | float]
     ) -> None:
         """
-        Validate each name-value pair in the constants config dictionary before adding
-        each constant as a column to the report data.
+        Validates the names and values of the constants in the constants_config.
+
+        This method checks that each constant's name is not None, a non-empty string, and
+        is unique compared to the names of all the existing reports. It also verifies that
+        each constant's value is a number (int or float) and not None.
 
         Parameters
         ----------
-        report_data : Dict[str, List[Any]]
-            The existing report data.
+        existing_reports : Dict[str, List[Any]]
+            The dictionary containing the names and values of the reports that have already been generated.
         constants_config : Dict[str, int | float]
             A dictionary containing the names and values of the constants to be added to the report data.
 
@@ -619,7 +622,7 @@ class ReportGenerator:
         """
 
         for name, value in constants_config.items():
-            if name in report_data:
+            if name in existing_reports:
                 raise ValueError(f"Constant name {name} already exists in report data.")
 
             if name is None:
