@@ -58,7 +58,7 @@ def mock_field_data() -> FieldData:
 ])
 def test_init(manure_manager: ManureManager, feed_manager: FeedManager, should_fail: bool, error_count: int) -> None:
     """Tests that Field initialization fails when passed invalid parameters."""
-    with patch("RUFAS.output_manager.OutputManager.add_error") as add_error:
+    with patch.object(om, "add_error") as add_error:
         if should_fail:
             with pytest.raises(ValueError, match="Manure manager cannot be None."):
                 Field(manure_manager=manure_manager, feed_manager=feed_manager)
