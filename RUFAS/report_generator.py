@@ -572,27 +572,23 @@ class ReportGenerator:
         filter_content : Dict[str, Any]
             A dictionary containing filter criteria, aggregation instructions, and scalar operation details.
 
-        Returns
-        -------
-        None
-
         Raises
         ------
         ValueError
             If the name or value of any constant is not valid.
         """
 
-        constant_config = filter_content.get("constants")
-        if not constant_config:
+        constants_config = filter_content.get("constants")
+        if not constants_config:
             return
 
         try:
-            self._validate_constants(report_data, constant_config)
+            self._validate_constants(report_data, constants_config)
         except ValueError:
             raise
 
         max_length = max([len(lst) for lst in report_data.values()])
-        for name, value in constant_config.items():
+        for name, value in constants_config.items():
             report_data[name] = [value] * max_length
 
     def _validate_constants(
