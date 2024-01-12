@@ -1,5 +1,6 @@
 import math
 
+from RUFAS.routines.feed_storage.feed_manager import FeedManager
 from RUFAS.routines.manure.manure_treatments.manure_types import ManureType
 from RUFAS.routines.field.crop.crop import Crop
 from RUFAS.routines.field.crop.crop_data import CropData
@@ -34,14 +35,20 @@ om = OutputManager()
 
 class Field:
 
-    def __init__(self, field_data: Optional[FieldData] = None, soil: Optional[Soil] = None,
-                 plantings: Optional[List[PlantingEvent]] = None, harvestings: Optional[List[HarvestEvent]] = None,
-                 custom_crop_specifications: Optional[Dict[str, Dict]] = None,
-                 tillage_events: Optional[List[TillageEvent]] = None,
-                 fertilizer_events: Optional[List[FertilizerEvent]] = None,
-                 fertilizer_mixes: Optional[Dict[str, Dict[str, float]]] = None,
-                 manure_events: Optional[List[ManureEvent]] = None,
-                 manure_manager: Optional[ManureManager] = None):
+    def __init__(
+            self,
+            field_data: Optional[FieldData] = None,
+            soil: Optional[Soil] = None,
+            plantings: Optional[List[PlantingEvent]] = None,
+            harvestings: Optional[List[HarvestEvent]] = None,
+            custom_crop_specifications: Optional[Dict[str, Dict]] = None,
+            tillage_events: Optional[List[TillageEvent]] = None,
+            fertilizer_events: Optional[List[FertilizerEvent]] = None,
+            fertilizer_mixes: Optional[Dict[str, Dict[str, float]]] = None,
+            manure_events: Optional[List[ManureEvent]] = None,
+            manure_manager: Optional[ManureManager] = None,
+            feed_manager: Optional[FeedManager] = None,
+    ):
         """
         Initialize the related data fields that this module will work with, or create one if none provided.
 
@@ -110,11 +117,33 @@ class Field:
         self.manure_events: List[ManureEvent] = manure_events or []
         """List of all manure applications that will be applied to this field."""
 
+        info_map = {
+            "class": self.__class__.__name__,
+            "function": self.__init__.__name__
+        }
+
         if manure_manager is None:
+            om.add_error(
+                "field_initialization_error",
+                f"Attempted initialization of Field {self.field_data.name=} with no Manure Manager, failing to "
+                f"initialize.",
+                info_map
+            )
             raise ValueError("Manure manager cannot be None.")
 
         self.manure_manager: ManureManager = manure_manager
         """:class:`ManureManager` instance from which manure is requested for application to the field."""
+
+        if feed_manager is None:
+            om.add_error(
+                "field_initialization_error",
+                f"Attempted initialization of Field {self.field_data.name=} with no Feed Manager, initializing a "
+                f"FeedManager to use.",
+                info_map
+            )
+
+        self.feed_manager: FeedManager = feed_manager or FeedManager()
+        """:class:`FeedManager` instance which receives harvested crops."""
 
     def manage_field(self, time, current_conditions: CurrentDayConditions) -> None:
         """
@@ -655,9 +684,9 @@ class Field:
         for event in todays_harvest_events:
             self._harvest_crop(event.crop_reference, event.operation, time, current_conditions)
 
-        self._harvest_heat_scheduled_crops(current_conditions.rainfall)
+        self._harvest_heat_scheduled_crops(current_conditions.rainfall, time)
 
-    def _harvest_heat_scheduled_crops(self, rainfall: float) -> None:
+    def _harvest_heat_scheduled_crops(self, rainfall: float, time: Time) -> None:
         """
         Checks if any of the active plants in the field are harvested based on their heat schedule, and if so harvests
         them if they meet the heat threshold.
@@ -676,7 +705,14 @@ class Field:
             execute_heat_scheduled_harvest = crop.data.use_heat_scheduling and \
                                              crop.data.heat_fraction >= crop.data.harvest_heat_fraction
             if execute_heat_scheduled_harvest:
-                crop.crop_management.manage_harvest(HarvestOperation.HARVEST_ONLY)
+                crop.crop_management.manage_harvest(
+                    HarvestOperation.HARVEST_ONLY,
+                    self.field_data.name,
+                    self.field_data.field_size,
+                    time,
+                    self.soil.data,
+                    self.feed_manager
+                )
                 self.soil.carbon_cycling.residue_partition.add_residue_to_pools(rainfall)
 
     @staticmethod
@@ -795,7 +831,7 @@ class Field:
                  "date": {"year": year, "day": day}}
         om.add_variable("crop_planting", value, info_map)
 
-    def _harvest_crop(self, crop_reference: str, harvest_operation: str, time: Time,
+    def _harvest_crop(self, crop_reference: str, harvest_operation: HarvestOperation, time: Time,
                       current_conditions: CurrentDayConditions) -> None:
         """
         Performs the specified crop operation on the specified crop.
@@ -833,8 +869,7 @@ class Field:
 
         for crop in crops_to_be_harvested:
             crop.crop_management.manage_harvest(harvest_operation, self.field_data.name,
-                                                self.field_data.field_size, time.calendar_year, time.day,
-                                                self.soil.data)
+                                                self.field_data.field_size, time, self.soil.data, self.feed_manager)
             self.soil.carbon_cycling.residue_partition.add_residue_to_pools(current_conditions.rainfall)
 
     def _remove_dead_crops(self) -> None:

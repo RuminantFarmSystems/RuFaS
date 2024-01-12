@@ -1,5 +1,7 @@
 from dataclasses import dataclass
 
+from RUFAS.routines.feed_storage.enums import CropCategory, CropType
+from RUFAS.routines.feed_storage.feed_manager import StorageType
 from RUFAS.routines.field.crop.crop_data import (
     CropData,
     PlantCategory
@@ -17,6 +19,9 @@ class Alfalfa(CropData):
     scientific_name: str = "Medicago sativa"
     plant_category: PlantCategory = PlantCategory("perennial_legume")
     is_nitrogen_fixer: bool = True
+
+    crop_category: CropCategory = CropCategory.ALFALFA
+    crop_type: CropType = CropType.ALFALFA
 
     minimum_temperature: float = 4.0
     optimal_temperature: float = 25.0
@@ -66,6 +71,8 @@ class AlfalfaSilage(Alfalfa):
     species: str = "alfalfa_silage"
     name: str = "alfalfa silage"
 
+    storage_type: StorageType = StorageType.BUNKER
+
     optimal_harvest_index: float = 0.90
     min_harvest_index: float = 0.40
     dry_matter_percentage: float = 42.883
@@ -102,6 +109,8 @@ class AlfalfaBaleage(AlfalfaSilage):
     species: str = "alfalfa_baleage"
     name: str = "alfalfa baleage"
 
+    storage_type: StorageType = StorageType.BALEAGE
+
 
 @dataclass(kw_only=True)
 class AlfalfaHay(Alfalfa):
@@ -130,6 +139,8 @@ class AlfalfaHay(Alfalfa):
     """
     species: str = "alfalfa_hay"
     name: str = "alfalfa hay"
+
+    storage_type: StorageType = StorageType.PROTECTED_TARPED
 
     optimal_harvest_index: float = 0.85
     min_harvest_index: float = 0.35
