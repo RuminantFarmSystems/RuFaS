@@ -220,6 +220,7 @@ class OutputGatherer:
                                 info_map)
                 om.add_variable("stable_inorganic_phosphorus_content", layer.stable_inorganic_phosphorus_content,
                                 info_map)
+                om.add_variable("fresh_organic_phosphorus_content", layer.fresh_organic_phosphorus_content, info_map)
                 om.add_variable("active_inorganic_unbalanced_counter", layer.active_inorganic_unbalanced_counter,
                                 info_map)
                 om.add_variable("labile_inorganic_unbalanced_counter", layer.labile_inorganic_unbalanced_counter,
