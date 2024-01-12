@@ -28,7 +28,7 @@ class LeafAreaIndex:
         if self.data.is_in_senescence:  # senescence
             self.data.leaf_area_index = self._determine_senescent_leaf_area_index(self.data.heat_fraction,
                                                                                   self.data.senescent_heat_fraction,
-                                                                                  self.data.optimal_leaf_area_fraction)
+                                                                                  self.data.max_leaf_area_index)
         else:  # normal growth
             self.check_previous_leaf_area_values()
             self.data.optimal_leaf_area_change = self._determine_max_leaf_area_change(
@@ -156,15 +156,13 @@ class LeafAreaIndex:
 
     @staticmethod
     def _determine_senescent_leaf_area_index(heat_fraction: float, senescent_heat_fraction: float,
-                                             optimal_leaf_area_fraction: float) -> float:
+                                             max_leaf_area_fraction: float) -> float:
         """calculates a plant's leaf area index during senescence
-
-        replaces method calc_senescent_leaf_area_index
 
         Args:
             heat_fraction: the current fraction of potential heat units
             senescent_heat_fraction: the fraction of potential heat units at which senescence begins
-            optimal_leaf_area_fraction: the optimal leaf area fraction for the plant
+            max_leaf_area_fraction: the maximum leaf area fraction for the plant
 
         Returns: the plant's leaf area index
 
@@ -175,7 +173,7 @@ class LeafAreaIndex:
         else:
             prop = (1 - heat_fraction) / (1 - senescent_heat_fraction)
 
-        return max(prop * optimal_leaf_area_fraction, 0)
+        return max(prop * max_leaf_area_fraction, 0)
 
     @staticmethod
     def _calc_shape_log(heat_fraction: float, leaf_area_fraction: float) -> float:
