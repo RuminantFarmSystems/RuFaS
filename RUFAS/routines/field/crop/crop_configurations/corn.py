@@ -106,8 +106,10 @@ class CornSilage(Corn):
     crop_type: CropType = CropType.SILAGE
     storage_type: StorageType = StorageType.BUNKER
 
+    max_leaf_area_index: float = 4.0
+
     optimal_harvest_index: float = 0.90
-    min_harvest_index: float = 0.68
+    min_harvest_index: float = 0.90
     dry_matter_percentage: float = 35.361
     lignin_dry_matter_percentage: float = 3.054
     yield_nitrogen_fraction: float = 0.0140
