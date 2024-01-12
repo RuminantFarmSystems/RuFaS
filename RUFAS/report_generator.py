@@ -277,7 +277,7 @@ class ReportGenerator:
             filter_content: Dict[str, Any]
     ) -> Dict[str, List[Any]]:
         """
-        Generates a report based on filtered data and aggregation criteria, including scalar operations and constants.
+        Fetches aggregation keys from the filter content and applies aggregation to the data.
 
         Parameters
         ----------
