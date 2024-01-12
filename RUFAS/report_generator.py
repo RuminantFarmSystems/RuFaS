@@ -188,7 +188,7 @@ class ReportGenerator:
         individual_report_name = self._ensure_unique_report_name_with_timestamp(filter_content.get("name"))
 
         init_event_log = {
-            "log": "start_generate_single_report",
+            "log": "start_generate_individual_report",
             "message": f"Start generating individual report: {individual_report_name}",
             "info_map": info_map,
         }

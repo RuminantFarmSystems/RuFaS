@@ -780,7 +780,7 @@ class OutputManager(object):
                     self.__supported_filter_types_prefixes["report"]
             ):
                 self.add_log("init_report_generation",
-                             f"Generating report(s) for file: {filter_file}",
+                             f"Generating report for file: {filter_file}",
                              info_map)
             for filter_content in filter_contents:
                 info_map["filter_content"] = filter_content
