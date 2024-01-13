@@ -82,13 +82,18 @@ class CowReproProtocolEnum(Enum):
     Resynch_PGFatPD = 'PGFatPD'
 
 
-class CowReproStateEnum(Enum):
+class ReproStateEnum(Enum):
     """
-    This enum class lists the options for different cow reproduction states.
+    This enum class lists the options for different reproduction states.
     """
 
-    WAITING = 'waiting'
+    NONE = 'none'
+    WAITING_FULL_ED_CYCLE = 'waiting for full estrus cycle'
+    WAITING_SHORT_ED_CYCLE = 'waiting for short estrus cycle'
+    WAITING_ED_DAILY = 'waiting for estrus daily'
     IN_PRESYNCH = 'in presynch'
     IN_TAI = 'in TAI'
-    IN_ED = 'in estrus detection'
     ESTRUS_DETECTED = 'estrus detected'
+    AFTER_AI = 'after AI'
+    FRESH = 'fresh'
+    PREGNANT = 'pregnant'
