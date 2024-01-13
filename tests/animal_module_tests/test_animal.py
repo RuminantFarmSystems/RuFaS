@@ -1453,11 +1453,6 @@ def test__open():
     pass
 
 
-def test__adjust_conception():
-    """Unit test for function _reduce_conception_rate_based_on_parity in file routines/animal/life_cycle/cow.py"""
-    pass
-
-
 def test__preg_update():
     """Unit test for function _preg_update in file routines/animal/life_cycle/cow.py"""
     pass

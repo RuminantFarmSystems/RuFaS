@@ -700,9 +700,12 @@ class Cow(HeiferIII):
         return estimated_daily_milk_produced, fat_percent, daily_fat_correct_milk_production, cull_stage, new_born
 
     def _calculate_conception_rate_on_ai_day(self) -> None:
-        if self.get_conception_rate_decrease_flag():
+        if self.should_decrease_conception_rate_in_rebreeding():
             self.conception_rate -= self._num_conception_rate_decreases * self.get_conception_rate_decrease()
-            self.conception_rate = self._reduce_conception_rate_based_on_parity(self.calves, self.conception_rate)
+
+        if self.should_decrease_conception_rate_by_parity():
+            self.conception_rate = self._decrease_conception_rate_by_parity(self.calves, self.conception_rate)
+
         self.conception_rate = max(0.0, self.conception_rate)
 
     def is_breedable(self) -> bool:
@@ -1033,7 +1036,7 @@ class Cow(HeiferIII):
             self._log_repro_states(sim_day)
 
     @staticmethod
-    def _reduce_conception_rate_based_on_parity(calves: int, conception_rate: float) -> float:
+    def _decrease_conception_rate_by_parity(calves: int, conception_rate: float) -> float:
         """
         Adjust conception rate based on the parity of the cow
 
@@ -1589,17 +1592,11 @@ class Cow(HeiferIII):
 
         return Cow.get_user_defined_repro_sub_properties()['conception_rate']
 
-    def get_conception_rate_decrease_flag(self) -> bool:
-        """
-        Get the user-defined flag for whether to decrease the conception rate for cows.
-
-        Returns
-        -------
-        bool
-            True if the conception rate should be decreased, False otherwise.
-        """
-
+    def should_decrease_conception_rate_in_rebreeding(self) -> bool:
         return AnimalBase.config['decrease_conception_rate_in_rebreeding']
+
+    def should_decrease_conception_rate_by_parity(self) -> bool:
+        return AnimalBase.config['decrease_conception_rate_by_parity']
 
     # Cull methods
     def cull_update(self, sim_day):
