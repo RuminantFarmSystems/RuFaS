@@ -733,10 +733,6 @@ class Cow(HeiferIII):
         ----------
         sim_day : int
             The current simulation day.
-
-        Returns
-        -------
-        None
         """
 
         if self.days_in_milk <= self.get_voluntary_waiting_period():
@@ -782,10 +778,6 @@ class Cow(HeiferIII):
         ----------
         sim_day : int
             The current simulation day.
-
-        Returns
-        -------
-        None
         """
 
         if self._repro_state_manager.is_in(ReproStateEnum.IN_TAI):
@@ -804,10 +796,6 @@ class Cow(HeiferIII):
         Parameters
         ----------
         sim_day : int
-
-        Returns
-        -------
-        None
         """
 
         self._repro_state_manager.enter(ReproStateEnum.WAITING_FULL_ED_CYCLE, keep_existing=True)
@@ -825,10 +813,6 @@ class Cow(HeiferIII):
             The current day of the entire simulation.
         schedule : dict[int, dict]
             A dictionary of days and actions to perform on those days.
-
-        Returns
-        -------
-        None
         """
 
         super()._execute_hormone_delivery_schedule(sim_day, schedule)
@@ -867,10 +851,6 @@ class Cow(HeiferIII):
         ----------
         sim_day : int
             The current simulation day.
-
-        Returns
-        -------
-        None
         """
 
         if self.days_in_milk < self.get_voluntary_waiting_period():
@@ -956,10 +936,6 @@ class Cow(HeiferIII):
         - num_ai_performed_in_ED: the number of AIs performed in the ED protocol
         - num_ai_performed_in_TAI: the number of AIs performed in the TAI protocol
         - num_ai_performed_in_ED_TAI: the number of AIs performed in the ED-TAI protocol
-
-        Returns
-        -------
-        None
         """
 
         self.stats['num_ai_performed'] += 1
@@ -979,10 +955,6 @@ class Cow(HeiferIII):
         - num_successful_conceptions_in_ED: the number of successful conceptions in the ED protocol
         - num_successful_conceptions_in_TAI: the number of successful conceptions in the TAI protocol
         - num_successful_conceptions_in_ED_TAI: the number of successful conceptions in the ED-TAI protocol
-
-        Returns
-        -------
-        None
         """
 
         self.stats['num_successful_conceptions'] += 1
@@ -1023,10 +995,6 @@ class Cow(HeiferIII):
         ----------
         sim_day : int
             The current simulation day.
-
-        Returns
-        -------
-        None
         """
 
         if self._repro_state_manager.is_in(ReproStateEnum.WAITING_ED_DAILY):
@@ -1068,10 +1036,6 @@ class Cow(HeiferIII):
         ----------
         sim_day : int
             The current simulation day.
-
-        Returns
-        -------
-        None
         """
 
         self.log_event(self.days_born, sim_day, const.SUCCESSFUL_CONCEPTION)
@@ -1097,10 +1061,6 @@ class Cow(HeiferIII):
         ----------
         sim_day : int
             The current simulation day.
-
-        Returns
-        -------
-        None
         """
 
         self.log_event(self.days_born, sim_day, f'{const.FAILED_CONCEPTION} at rate {self.conception_rate}')
@@ -1155,10 +1115,6 @@ class Cow(HeiferIII):
     def _check_if_breedable(self, sim_day: int) -> None:
         """
         Reset the cow's breedability status.
-
-        Returns
-        -------
-        None
         """
 
         if not self.is_pregnant and self.days_in_milk > self.get_do_not_breed_time():
@@ -1176,10 +1132,6 @@ class Cow(HeiferIII):
             A dictionary of pregnancy check configuration values.
         sim_day : int
             The current day of the entire simulation.
-
-        Returns
-        -------
-        None
         """
 
         self.preg_diagnoses += 1
@@ -1285,10 +1237,6 @@ class Cow(HeiferIII):
             The current day of the entire simulation.
         repro_program : str
             The reproduction program to set.
-
-        Returns
-        -------
-        None
         """
 
         if repro_program not in [CowReproProtocolEnum.ED.value,
