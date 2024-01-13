@@ -18,11 +18,11 @@
 		"management_decisions": {
 			"breeding_start_day_h": 380,
 			"heifer_repro_method": "TAI",
-			"cow_repro_method": "TAI",
+			"cow_repro_method": "ED",
 			"semen_type": "conventional",
 			"days_in_preg_when_dry": 218,
 			"heifer_repro_cull_time": 500,
-			"do_not_breed_time": 250,
+			"do_not_breed_time": 185,
 			"cull_milk_production": 30,
 			"cow_times_milked_per_day": 3
 		},
