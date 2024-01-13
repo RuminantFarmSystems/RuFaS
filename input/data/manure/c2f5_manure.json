@@ -13,20 +13,6 @@
       "manure_handler": "flush",
       "manure_separator": "rotary screen",
       "manure_treatment": "anaerobic lagoon"
-    },
-    {
-      "scenario_id": 2,
-      "bedding_type": "",
-      "manure_handler": "",
-      "manure_separator": "",
-      "manure_treatment": ""
-    },
-    {
-      "scenario_id": 3,
-      "bedding_type": "",
-      "manure_handler": "",
-      "manure_separator": "",
-      "manure_treatment": ""
     }
   ],
   "bedding_configs": [

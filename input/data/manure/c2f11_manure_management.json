@@ -20,13 +20,6 @@
       "manure_handler": "manual skid steer scraping",
       "manure_separator": "none",
       "manure_treatment": "other"
-    },
-    {
-      "scenario_id": 3,
-      "bedding_type": "",
-      "manure_handler": "",
-      "manure_separator": "",
-      "manure_treatment": ""
     }
   ],
   "bedding_configs": [

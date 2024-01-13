@@ -36,27 +36,6 @@
     247
   ],
   "purchased_feeds": [
-    51,
-    45,
-    66,
-    31,
-    107,
-    111,
-    120,
-    169,
-    166,
-    240,
-    230,
-    247,
-    44,
-    50,
-    95,
-    104,
-    110,
-    301,
-    302,
-    202,
-    216,
     {
       "purchased_feed":51,
       "purchased_feed_cost":0.1
@@ -198,7 +177,7 @@
   ],
   "storage_options": [
     {
-      "storage_type": "silobags,
+      "storage_type": "silobags",
       "moisture": "haylage",
       "additive": "none",
       "packing_density": 14,
@@ -227,7 +206,7 @@
             },
             {
                 "feed_type": 216,
-                "ration_percentage": 50,}
+                "ration_percentage": 50}
           ],
               "growing": [
             {

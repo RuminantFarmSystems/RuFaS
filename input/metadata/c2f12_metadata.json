@@ -2,7 +2,7 @@
   "files": {
     "config": {
       "title": "Config Data",
-      "description": "Configuration Information for farm 12",
+      "description": "Configuration Information",
       "path": "input/data/config/pilot_testing_config.json",
       "type": "json",
       "properties": "config_properties"
