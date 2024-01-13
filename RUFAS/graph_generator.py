@@ -147,7 +147,7 @@ class GraphGenerator:
 
             found_errors = any("error" in log for log in all_logs)
             if found_errors:
-                return log_pool
+                return all_logs
 
             fig, _ = plt.subplots()
             self._draw_graph(
@@ -158,7 +158,7 @@ class GraphGenerator:
                 graph_details, filter_file_name, graphics_dir
             )
 
-            return log_pool
+            return all_logs
         except Exception as e:
             raise e
 
@@ -184,16 +184,16 @@ class GraphGenerator:
                                    "title", "transform", "xlabel", "xticklabels", "xticks", "xlim", "ylabel",
                                    "yticklabels", "yticks", "ylim", "yscale", "xscale", "zorder"]
         graph_filter_validation_logs: List[Dict[str, str] | Dict[str, Any]] = []
-        info_map = {
-            "class": self.__class__.__name__,
-            "function": self._validate_graph_filter.__name__,
-        }
-        for filter_key in graph_details.keys():
-            if filter_key not in valid_graph_filter_keys:
-                graph_filter_validation_logs.append({"error": f"Can't plot {graph_details.get('title')} data set",
-                                                     "message": f"Invalid filter file key '{filter_key}'. "
-                                                     f"Please see wiki for full list of valid filter keys.",
-                                                     "info_map": info_map})
+        # info_map = {
+        #     "class": self.__class__.__name__,
+        #     "function": self._validate_graph_filter.__name__,
+        # }
+        # for filter_key in graph_details.keys():
+        #     if filter_key not in valid_graph_filter_keys:
+        #         graph_filter_validation_logs.append({"error": f"Can't plot {graph_details.get('title')} data set",
+        #                                              "message": f"Invalid filter file key '{filter_key}'. "
+        #                                              f"Please see wiki for full list of valid filter keys.",
+        #                                              "info_map": info_map})
         return graph_filter_validation_logs
 
     def _prepare_plot_data(self, filtered_pool: Dict[str, Dict[str, List[Any]]],
