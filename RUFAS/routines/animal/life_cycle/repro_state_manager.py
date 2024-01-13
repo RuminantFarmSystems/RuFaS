@@ -141,3 +141,14 @@ class ReproStateManager:
 
         return self._states == {ReproStateEnum.NONE}
 
+    def __str__(self) -> str:
+        """
+        String representation of the current reproductive states.
+
+        Returns
+        -------
+        str
+            A string representation of the current reproductive states.
+        """
+
+        return str(self._states)
