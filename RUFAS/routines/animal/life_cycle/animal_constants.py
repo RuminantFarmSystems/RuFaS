@@ -24,6 +24,7 @@ AI_PERFORMED_NOTE = "AI performed"
 TAI_AFTER_ESTRUS_NOT_DETECTED_IN_SYNCH_ED_NOTE = "TAI after estrus not detected in SynchED"
 REBREEDING_NOTE = "rebreeding start"
 SETTING_REPRO_PROGRAM_NOTE = "setting repro program"
+CURRENT_REPRO_STATE_NOTE = "current repro state"
 
 ESTRUS_AFTER_AI_NOTE = "estrus after AI"
 ESTRUS_AFTER_ABORTION_NOTE = "estrus after abortion"
@@ -51,8 +52,8 @@ TAI_PERIOD_START = "TAI period started"
 TAI_PERIOD_END = "TAI period ended"
 
 # ReSynch protocols
-SETTING_UP_RESYNCH_TAI_NOTE = "setting up resynch TAI protocol"
-DISCONTINUE_RESYNCH_TAI = "discontinued resynch TAI protocol after first preg check confirmed"
+SETTING_UP_TAI_IN_ADVANCE_NOTE = "setting up TAI protocol in advance"
+DISCONTINUE_RESYNCH_TAI_NOTE = "discontinued resynch TAI protocol after first preg check confirmed"
 DECREASE_CONCEPTION_RATE = "decrease TAI conception rate"
 
 # Conception outcomes
