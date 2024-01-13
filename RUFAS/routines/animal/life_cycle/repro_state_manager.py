@@ -151,4 +151,4 @@ class ReproStateManager:
             A string representation of the current reproductive states.
         """
 
-        return str(self._states)
+        return ', '.join([state.value for state in self._states])

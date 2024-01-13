@@ -24,7 +24,6 @@ AI_PERFORMED_NOTE = "AI performed"
 TAI_AFTER_ESTRUS_NOT_DETECTED_IN_SYNCH_ED_NOTE = "TAI after estrus not detected in SynchED"
 REBREEDING_NOTE = "rebreeding start"
 SETTING_REPRO_PROGRAM_NOTE = "setting repro program"
-CURRENT_REPRO_STATE_NOTE = "current repro state"
 
 ESTRUS_AFTER_AI_NOTE = "estrus after AI"
 ESTRUS_AFTER_ABORTION_NOTE = "estrus after abortion"

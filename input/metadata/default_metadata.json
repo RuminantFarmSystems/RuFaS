@@ -376,6 +376,16 @@
               "minimum": 0,
               "maximum": 0.1
             },
+            "decrease_conception_rate_in_rebreeding": {
+              "type": "bool",
+              "description": "Decrease Conception Rate in Rebreeding -- whether or not to decrease the conception rate in rebreeding (default is false)",
+              "default": false
+            },
+            "decrease_conception_rate_by_parity": {
+              "type": "bool",
+              "description": "Decrease Conception Rate by Parity -- whether or not to decrease the conception rate by parity (default is false)",
+              "default": false
+            },
             "avg_gestation_len": {
               "type": "number",
               "description": "Average Gestation Length (days) -- average length of gestations (default is 278)",
@@ -579,45 +589,6 @@
             "preg_loss_rate_3": {
               "type": "number",
               "description": "Pregnancy Loss Rate 3 -- The % of heifers that abort their pregnancy between the 2nd and 3rd pregnancy check (default is 0.017)",
-              "default": 0.017,
-              "minimum": 0,
-              "maximum": 0.1
-            },
-            "cow_preg_check_day_1": {
-              "type": "number",
-              "description": "Pregnancy Check Day 1 (days) -- Days since last insemination to check whether the cow is pregnant or not for the first time (default is 32).",
-              "default": 32,
-              "minimum": 1
-            },
-            "cow_preg_loss_rate_1": {
-              "type": "number",
-              "description": "Pregnancy Loss Rate 1 -- The % of cows that abort their pregnancy before the 1st pregnancy check (default is 0.02)",
-              "default": 0.02,
-              "minimum": 0,
-              "maximum": 1
-            },
-            "cow_preg_check_day_2": {
-              "type": "number",
-              "description": "Pregnancy Check Day 2 (days) --  Days since last insemination to check whether the cow is pregnant or not for the second time if the animal pass the first pregnancy check (default is 60).",
-              "default": 60,
-              "minimum": 0
-            },
-            "cow_preg_loss_rate_2": {
-              "type": "number",
-              "description": "Pregnancy Loss Rate 2 -- % of cows that abort their pregnancy between the 1st and 2nd pregnancy check (default is 0.096)",
-              "default": 0.096,
-              "minimum": 0,
-              "maximum": 0.1
-            },
-            "cow_preg_check_day_3": {
-              "type": "number",
-              "description": "Pregnancy Check Day 3 (days) -- Days since last insemination to check whether the cow is pregnant or not for the third time if the animal passes the second pregnancy check (default is 200).",
-              "default": 200,
-              "minimum": 0
-            },
-            "cow_preg_loss_rate_3": {
-              "type": "number",
-              "description": "Pregnancy Loss Rate 3 -- The % of cows that abort their pregnancy between the 2nd and 3rd pregnancy check (default is 0.017)",
               "default": 0.017,
               "minimum": 0,
               "maximum": 0.1
