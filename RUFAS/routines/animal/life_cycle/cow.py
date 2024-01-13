@@ -699,8 +699,9 @@ class Cow(HeiferIII):
         return estimated_daily_milk_produced, fat_percent, daily_fat_correct_milk_production, cull_stage, new_born
 
     def _calculate_conception_rate_on_ai_day(self) -> None:
-        # self.conception_rate -= self._num_conception_rate_decreases * self.get_conception_rate_decrease()
-        # self.conception_rate = self._reduce_conception_rate_based_on_parity(self.calves, self.conception_rate)
+        if self.get_conception_rate_decrease_flag():
+            self.conception_rate -= self._num_conception_rate_decreases * self.get_conception_rate_decrease()
+            self.conception_rate = self._reduce_conception_rate_based_on_parity(self.calves, self.conception_rate)
         self.conception_rate = max(0.0, self.conception_rate)
 
     def is_breedable(self) -> bool:
@@ -868,7 +869,7 @@ class Cow(HeiferIII):
         if self._should_set_up_hormone_delivery_for_tai():
             self._set_up_hormone_schedule('cows', self.get_user_defined_repro_sub_protocol(),
                                           self.days_born)
-            self._TAI_conception_rate = self._get_user_defined_TAI_conception_rate()
+            self._TAI_conception_rate = self.get_user_defined_TAI_conception_rate()
 
         if self._hormone_schedule:
             self._execute_hormone_delivery_schedule(sim_day, self._hormone_schedule)
@@ -1079,19 +1080,18 @@ class Cow(HeiferIII):
         self.log_event(self.days_born, sim_day, f'{const.FAILED_CONCEPTION} at rate {self.conception_rate}')
         self.log_event(self.days_born, sim_day, const.COW_NOT_PREG)
 
-        if self.repro_program == CowReproProtocolEnum.ED.value:
-            self._repro_state_manager.enter(ReproStateEnum.WAITING_FULL_ED_CYCLE)
-            self._simulate_estrus(self.days_born, sim_day, const.ESTRUS_DAY_SCHEDULED_NOTE,
-                                  self.get_avg_estrus_cycle(), self.get_std_estrus_cycle())
-
-        if self.repro_program == CowReproProtocolEnum.ED_TAI.value:
+        if self.repro_program in [CowReproProtocolEnum.ED.value, CowReproProtocolEnum.ED_TAI.value]:
             self._repro_state_manager.enter(ReproStateEnum.WAITING_FULL_ED_CYCLE)
             self._simulate_estrus(self.days_born, sim_day, const.ESTRUS_DAY_SCHEDULED_NOTE,
                                   self.get_avg_estrus_cycle(), self.get_std_estrus_cycle())
 
         if self.get_user_defined_resynch_protocol() == CowReproProtocolEnum.Resynch_TAIbeforePD.value:
             self._setup_tai_in_advance(sim_day)
-            self._repro_state_manager.enter(ReproStateEnum.IN_TAI, keep_existing=True)
+            if self.repro_program == CowReproProtocolEnum.ED_TAI.value:
+                # We want to keep the ED protocol running at the same time as the TAI protocol
+                self._repro_state_manager.enter(ReproStateEnum.IN_TAI, keep_existing=True)
+            elif self.repro_program == CowReproProtocolEnum.TAI.value:
+                self._repro_state_manager.enter(ReproStateEnum.IN_TAI)
 
     def preg_update(self, sim_day: int) -> None:
         if self.days_in_preg > 0:
@@ -1186,10 +1186,6 @@ class Cow(HeiferIII):
                                   self.get_avg_estrus_cycle(), self.get_std_estrus_cycle())
             return
 
-        if self.repro_program == CowReproProtocolEnum.TAI.value:
-            self._repro_state_manager.enter(ReproStateEnum.IN_TAI)
-            return
-
         if self.get_user_defined_resynch_protocol() == CowReproProtocolEnum.Resynch_TAIafterPD.value:
             self._repro_state_manager.enter(ReproStateEnum.IN_TAI)
 
@@ -1200,7 +1196,7 @@ class Cow(HeiferIII):
             if self._repro_state_manager.is_in_default_state():
                 self._repro_state_manager.enter(ReproStateEnum.IN_TAI)
 
-            # Discard the next scheduled estrus day.
+            # Stop estrus detection if any.
             # This was scheduled sometime between after AI and before first preg check.
             if self._repro_state_manager.is_in(ReproStateEnum.WAITING_FULL_ED_CYCLE):
                 self._repro_state_manager.exit(ReproStateEnum.WAITING_FULL_ED_CYCLE)
@@ -1546,7 +1542,7 @@ class Cow(HeiferIII):
         return Cow.get_user_defined_repro_data('resynch_protocol')
 
     @staticmethod
-    def _get_user_defined_TAI_conception_rate() -> float:
+    def get_user_defined_TAI_conception_rate() -> float:
         """
         Get the user-defined conception rate for cows used in the TAI protocol.
 
@@ -1559,6 +1555,18 @@ class Cow(HeiferIII):
         """
 
         return Cow.get_user_defined_repro_sub_properties()['conception_rate']
+
+    def get_conception_rate_decrease_flag(self) -> bool:
+        """
+        Get the user-defined flag for whether to decrease the conception rate for cows.
+
+        Returns
+        -------
+        bool
+            True if the conception rate should be decreased, False otherwise.
+        """
+
+        return AnimalBase.config['decrease_conception_rate_in_rebreeding']
 
     # Cull methods
     def cull_update(self, sim_day):

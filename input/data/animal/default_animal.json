@@ -18,11 +18,11 @@
 		"management_decisions": {
 			"breeding_start_day_h": 380,
 			"heifer_repro_method": "TAI",
-			"cow_repro_method": "ED-TAI",
+			"cow_repro_method": "TAI",
 			"semen_type": "conventional",
 			"days_in_preg_when_dry": 218,
 			"heifer_repro_cull_time": 500,
-			"do_not_breed_time": 185,
+			"do_not_breed_time": 250,
 			"cull_milk_production": 30,
 			"cow_times_milked_per_day": 3
 		},
@@ -38,6 +38,7 @@
 			"repro": {
                 "voluntary_waiting_period": 50,
 				"conception_rate_decrease": 0.026,
+				"decrease_conception_rate_in_rebreeding": false,
                 "avg_gestation_len": 278,
 				"std_gestation_len": 6,
 				"prefresh_day": 30,
@@ -55,7 +56,7 @@
 					"estrus_detection_rate": 0.65,
 					"estrus_conception_rate": 0.6,
 					"presynch_protocol": "Double OvSynch",
-                    "resynch_protocol": "TAIbeforePD",
+                    "resynch_protocol": "TAIafterPD",
                     "repro_sub_protocol": "OvSynch 56",
 					"repro_sub_properties": {
 						"conception_rate": 0.5,
