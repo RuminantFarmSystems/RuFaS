@@ -735,7 +735,7 @@ class Cow(HeiferIII):
             The current simulation day.
         """
 
-        if self.days_in_milk <= self.get_voluntary_waiting_period():
+        if 1 <= self.days_in_milk <= self.get_voluntary_waiting_period():
             if self._repro_state_manager.is_in_default_state():
                 self._repro_state_manager.enter(ReproStateEnum.FRESH)
                 self._log_repro_states(sim_day)
@@ -743,7 +743,7 @@ class Cow(HeiferIII):
                 self.log_event(self.estrus_day, sim_day, const.ESTRUS_BEFORE_VWP_NOTE)
                 self._simulate_estrus(self.estrus_day, sim_day, const.ESTRUS_DAY_SCHEDULED_NOTE,
                                       self.get_avg_estrus_cycle(), self.get_std_estrus_cycle())
-        else:
+        elif self.days_in_milk > self.get_voluntary_waiting_period():
             if self._repro_state_manager.is_in(ReproStateEnum.FRESH):
                 self._repro_state_manager.enter(ReproStateEnum.WAITING_FULL_ED_CYCLE)
                 self._log_repro_states(sim_day)
@@ -830,6 +830,10 @@ class Cow(HeiferIII):
                                f'{const.TAI_PERIOD_START}: {self.get_user_defined_repro_sub_protocol()}')
                 self._repro_state_manager.enter(ReproStateEnum.IN_TAI)
                 self._log_repro_states(sim_day)
+                self._set_up_hormone_schedule('cows', self.get_user_defined_repro_sub_protocol(),
+                                              self.days_born)
+                self._TAI_conception_rate = self.get_user_defined_TAI_conception_rate()
+                self._execute_hormone_delivery_schedule(sim_day, self._hormone_schedule)
                 del actions['set_tai_start']
 
             if actions.get('set_tai_end', False):
@@ -851,25 +855,25 @@ class Cow(HeiferIII):
             The current simulation day.
         """
 
-        if self.days_in_milk < self.get_voluntary_waiting_period():
+        if 1 <= self.days_in_milk < self.get_voluntary_waiting_period():
             if self._repro_state_manager.is_in_default_state():
                 self._repro_state_manager.enter(ReproStateEnum.FRESH)
                 self._log_repro_states(sim_day)
             return
+        elif self.days_in_milk >= self.get_voluntary_waiting_period():
+            if self._should_set_up_hormone_delivery_for_presynch():
+                self._set_up_hormone_schedule('cows', self.get_user_defined_presynch_protocol(),
+                                              self.days_born)
+                self.log_event(self.days_born, sim_day,
+                               f'{const.PRESYNCH_PERIOD_START}: {self.get_user_defined_presynch_protocol()}')
 
-        if self._should_set_up_hormone_delivery_for_presynch():
-            self._set_up_hormone_schedule('cows', self.get_user_defined_presynch_protocol(),
-                                          self.days_born)
-            self.log_event(self.days_born, sim_day,
-                           f'{const.PRESYNCH_PERIOD_START}: {self.get_user_defined_presynch_protocol()}')
+            if self._should_set_up_hormone_delivery_for_tai():
+                self._set_up_hormone_schedule('cows', self.get_user_defined_repro_sub_protocol(),
+                                              self.days_born)
+                self._TAI_conception_rate = self.get_user_defined_TAI_conception_rate()
 
-        if self._should_set_up_hormone_delivery_for_tai():
-            self._set_up_hormone_schedule('cows', self.get_user_defined_repro_sub_protocol(),
-                                          self.days_born)
-            self._TAI_conception_rate = self.get_user_defined_TAI_conception_rate()
-
-        if self._hormone_schedule:
-            self._execute_hormone_delivery_schedule(sim_day, self._hormone_schedule)
+            if self._hormone_schedule:
+                self._execute_hormone_delivery_schedule(sim_day, self._hormone_schedule)
 
     def _should_set_up_hormone_delivery_for_presynch(self) -> bool:
         """
@@ -891,7 +895,7 @@ class Cow(HeiferIII):
         ]:
             return False
 
-        if (self._repro_state_manager.is_in_default_state() and
+        if (self._repro_state_manager.is_in(ReproStateEnum.FRESH) and
                 self.days_in_milk == self.get_voluntary_waiting_period()):
             self._repro_state_manager.enter(ReproStateEnum.IN_PRESYNCH)
             self._log_repro_states(self.days_born)
@@ -915,7 +919,7 @@ class Cow(HeiferIII):
         if self._hormone_schedule:
             return False
 
-        if (self._repro_state_manager.is_in_default_state()
+        if (self._repro_state_manager.is_in(ReproStateEnum.FRESH)
                 and self.days_in_milk == self.get_voluntary_waiting_period()):
             self._repro_state_manager.enter(ReproStateEnum.IN_TAI)
             self._log_repro_states(self.days_born)
@@ -964,18 +968,18 @@ class Cow(HeiferIII):
             if self.repro_program == CowReproProtocolEnum.ED_TAI.value else 0
 
     def execute_ed_tai_protocol(self, sim_day: int) -> None:
-        if self.days_in_milk <= self.get_voluntary_waiting_period():
+        if 1 <= self.days_in_milk <= self.get_voluntary_waiting_period():
             if self._repro_state_manager.is_in_default_state():
                 self._repro_state_manager.enter(ReproStateEnum.FRESH)
                 self._log_repro_states(sim_day)
 
-        elif self.days_in_milk < self.get_user_defined_tai_program_start_day():
+        elif self.get_voluntary_waiting_period() < self.days_in_milk < self.get_user_defined_tai_program_start_day():
             if self._repro_state_manager.is_in(ReproStateEnum.FRESH):
                 self._repro_state_manager.enter(ReproStateEnum.WAITING_ED_DAILY)
                 self._log_repro_states(sim_day)
             self._monitor_estrus_daily(sim_day)
 
-        else:
+        elif self.days_in_milk >= self.get_user_defined_tai_program_start_day():
             self._handle_estrus_not_detected_before_tai_start_day(sim_day)
 
     def _monitor_estrus_daily(self, sim_day: int) -> None:
@@ -1183,7 +1187,7 @@ class Cow(HeiferIII):
                 self._log_repro_states(sim_day)
 
             # Stop estrus detection if any.
-            # This was scheduled sometime between after AI and before first preg check.
+            # This would have been scheduled sometime between performing AI and first preg check.
             if self._repro_state_manager.is_in(ReproStateEnum.WAITING_FULL_ED_CYCLE):
                 self._repro_state_manager.exit(ReproStateEnum.WAITING_FULL_ED_CYCLE)
 
