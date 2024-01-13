@@ -142,7 +142,7 @@
 	"pasture_concentrate": 0,
 	"methane_model": "Mutian",
 	"ration": {
-		"user_input": false,
+		"user_input": true,
 		"formulation_interval": 30
 	},
 	"pen_information": [
