@@ -1304,8 +1304,7 @@ class Cow(HeiferIII):
                        f'to {repro_program}')
         self.repro_program = repro_program
 
-    @staticmethod
-    def get_first_preg_check_day() -> int:
+    def get_first_preg_check_day(self) -> int:
         """
         Get the first pregnancy check day (days).
 
@@ -1315,10 +1314,9 @@ class Cow(HeiferIII):
             The first pregnancy check day (days).
         """
 
-        return AnimalBase.config['cow_preg_check_day_1']
+        return AnimalBase.config['preg_check_day_1']
 
-    @staticmethod
-    def get_second_preg_check_day() -> int:
+    def get_second_preg_check_day(self) -> int:
         """
         Get the second pregnancy check day (days).
 
@@ -1328,10 +1326,9 @@ class Cow(HeiferIII):
             The second pregnancy check day (days).
         """
 
-        return AnimalBase.config['cow_preg_check_day_2']
+        return AnimalBase.config['preg_check_day_2']
 
-    @staticmethod
-    def get_third_preg_check_day() -> int:
+    def get_third_preg_check_day(self) -> int:
         """
         Get the third pregnancy check day (days).
 
@@ -1341,10 +1338,9 @@ class Cow(HeiferIII):
             The third pregnancy check day (days).
         """
 
-        return AnimalBase.config['cow_preg_check_day_3']
+        return AnimalBase.config['preg_check_day_3']
 
-    @staticmethod
-    def get_first_preg_check_loss_rate() -> float:
+    def get_first_preg_check_loss_rate(self) -> float:
         """
         Get the first pregnancy check loss rate.
 
@@ -1354,10 +1350,9 @@ class Cow(HeiferIII):
             The first pregnancy check loss rate.
         """
 
-        return AnimalBase.config['cow_preg_loss_rate_1']
+        return AnimalBase.config['preg_loss_rate_1']
 
-    @staticmethod
-    def get_second_preg_check_loss_rate() -> float:
+    def get_second_preg_check_loss_rate(self) -> float:
         """
         Get the second pregnancy check loss rate.
 
@@ -1367,10 +1362,9 @@ class Cow(HeiferIII):
             The second pregnancy check loss rate.
         """
 
-        return AnimalBase.config['cow_preg_loss_rate_2']
+        return AnimalBase.config['preg_loss_rate_2']
 
-    @staticmethod
-    def get_third_preg_check_loss_rate() -> float:
+    def get_third_preg_check_loss_rate(self) -> float:
         """
         Get the third pregnancy check loss rate.
 
@@ -1380,7 +1374,7 @@ class Cow(HeiferIII):
             The third pregnancy check loss rate.
         """
 
-        return AnimalBase.config['cow_preg_loss_rate_3']
+        return AnimalBase.config['preg_loss_rate_3']
 
     @staticmethod
     def get_do_not_breed_time() -> int:

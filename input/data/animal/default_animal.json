@@ -84,13 +84,6 @@
 				"preg_check_day_3": 200,
 				"preg_loss_rate_3": 0.017,
 
-				"cow_preg_check_day_1": 32,
-				"cow_preg_loss_rate_1": 0.02,
-				"cow_preg_check_day_2": 60,
-				"cow_preg_loss_rate_2": 0.096,
-				"cow_preg_check_day_3": 200,
-				"cow_preg_loss_rate_3": 0.017,
-
 				"avg_estrus_cycle_return": 23,
 				"std_estrus_cycle_return": 6,
 				"avg_estrus_cycle_heifer": 21,
