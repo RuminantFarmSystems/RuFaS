@@ -719,10 +719,14 @@ class HeiferII(HeiferI):
         self.log_event(self.days_born, sim_day, const.ESTRUS_OCCURRED_NOTE)
         is_estrus_detected = self._detect_estrus(self.get_general_estrus_detection_rate())
         if is_estrus_detected:
-            self.log_event(self.days_born, sim_day, const.ESTRUS_DETECTED_NOTE)
+            self.log_event(self.days_born, sim_day,
+                           f'{const.ESTRUS_DETECTED_NOTE}, '
+                           f'with estrus detection rate at {self.get_general_estrus_detection_rate()}')
             on_estrus_detected(sim_day)
         else:
-            self.log_event(self.days_born, sim_day, const.ESTRUS_NOT_DETECTED_NOTE)
+            self.log_event(self.days_born, sim_day,
+                           f'{const.ESTRUS_NOT_DETECTED_NOTE}, '
+                           f'with estrus detection rate at {self.get_general_estrus_detection_rate()}')
             on_estrus_not_detected(sim_day)
 
     def _handle_estrus_detected(self, sim_day: int) -> None:

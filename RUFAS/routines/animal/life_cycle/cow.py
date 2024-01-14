@@ -784,9 +784,33 @@ class Cow(HeiferIII):
 
         self._repro_state_manager.enter(ReproStateEnum.ESTRUS_DETECTED)
         self._log_repro_states(sim_day)
-        self.conception_rate = self.get_general_conception_rate()
+        self.conception_rate = self.get_estrus_conception_rate()
         self.ai_day = self.days_born + 1
         self.log_event(self.days_born, sim_day, f'{const.AI_DAY_SCHEDULED_NOTE} on day {self.ai_day}')
+
+    def get_general_estrus_detection_rate(self) -> float:
+        """
+        Get the estrus detection rate for cows.
+
+        Returns
+        -------
+        float
+            The estrus detection rate for cows.
+        """
+
+        return im.get_data('animal.animal_config.farm_level.repro.cows.estrus_detection_rate')
+
+    def get_estrus_conception_rate(self) -> float:
+        """
+        Get the estrus conception rate for cows.
+
+        Returns
+        -------
+        float
+            The estrus conception rate.
+        """
+
+        return im.get_data('animal.animal_config.farm_level.repro.cows.estrus_conception_rate')
 
     def _simulate_full_estrus_cycle(self, sim_day: int) -> None:
         """
@@ -1040,8 +1064,8 @@ class Cow(HeiferIII):
             The current simulation day.
         """
 
-        self.log_event(self.days_born, sim_day, f'{const.SUCCESSFUL_CONCEPTION},'
-                                                f' current conception rate = {self.conception_rate}')
+        self.log_event(self.days_born, sim_day, f'{const.SUCCESSFUL_CONCEPTION}, '
+                                                f'with conception rate at {self.conception_rate}')
         self.log_event(self.days_born, sim_day, const.COW_PREG)
         self.days_in_preg = 1
         self._repro_state_manager.enter(ReproStateEnum.PREGNANT)
@@ -1067,7 +1091,7 @@ class Cow(HeiferIII):
         """
 
         self.log_event(self.days_born, sim_day, f'{const.FAILED_CONCEPTION}, '
-                                                f'current conception rate = {self.conception_rate}')
+                                                f'with conception rate at {self.conception_rate}')
         self.log_event(self.days_born, sim_day, const.COW_NOT_PREG)
 
         if self.repro_program in [CowReproProtocolEnum.ED.value, CowReproProtocolEnum.ED_TAI.value]:
