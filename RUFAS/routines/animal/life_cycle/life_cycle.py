@@ -790,7 +790,7 @@ class LifeCycleManager:
             self.milking_cow_num, self.avg_days_in_milk = \
                 Utility.calc_average(self.milking_cow_num, self.avg_days_in_milk, cow.days_in_milk)
 
-            if cow.days_in_milk < self.animal_config['voluntary_waiting_period']:
+            if cow.days_in_milk < self.animal_config['program_start_day']:
                 self.vwp_cow_num += 1
         else:
             self.dry_cow_num += 1
