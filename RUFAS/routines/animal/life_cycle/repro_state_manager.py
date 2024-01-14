@@ -45,7 +45,7 @@ class ReproStateManager:
             A set of initial reproductive states to start with. If None, initializes with {ReproStateEnum.NONE}.
         """
 
-        self._states = initial_states if initial_states is not None else {ReproStateEnum.NONE}
+        self._states: set[ReproStateEnum] = initial_states if initial_states is not None else {ReproStateEnum.NONE}
 
     def enter(self, state: ReproStateEnum, keep_existing: bool = False) -> None:
         """
@@ -71,12 +71,13 @@ class ReproStateManager:
 
         if state is ReproStateEnum.NONE:
             self._states = {ReproStateEnum.NONE}
-        else:
-            if not keep_existing or self._states == {ReproStateEnum.NONE}:
-                self._states.clear()
-            if state in self._states:
-                raise ValueError(f'Attempting to re-enter the same state: {state}')
-            self._states.add(state)
+            return
+
+        if not keep_existing or self._states == {ReproStateEnum.NONE}:
+            self._states.clear()
+        if state in self._states:
+            raise ValueError(f'Attempting to re-enter the same state: {state}')
+        self._states.add(state)
 
     def exit(self, state: ReproStateEnum) -> None:
         """
