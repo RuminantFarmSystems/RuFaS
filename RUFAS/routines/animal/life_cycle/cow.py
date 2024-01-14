@@ -7,6 +7,7 @@ from typing import Dict, Any
 
 import numpy as np
 
+from RUFAS.input_manager import InputManager
 from RUFAS.output_manager import OutputManager
 from RUFAS.routines.animal.animal_module_constants import AnimalModuleConstants
 from RUFAS.routines.animal.life_cycle import animal_constants as const
@@ -21,6 +22,7 @@ from RUFAS.routines.animal.manure.lactating_cow_manure_excretion import \
 from RUFAS.routines.animal.ration.animal_requirements import AnimalRequirements
 
 om = OutputManager()
+im = InputManager()
 
 
 class MilkProductionHistory:
@@ -125,9 +127,8 @@ class Cow(HeiferIII):
         self.tai_program_start_day_c = 0
         self.resynch_method = args['resynch_method']
 
-        self._num_conception_rate_decreases = 0
-        self._current_repro_states: set[ReproStateEnum] = {ReproStateEnum.NONE}
-        self._repro_state_manager = ReproStateManager()
+        self._num_conception_rate_decreases: int = 0
+        self._repro_state_manager: ReproStateManager = ReproStateManager()
 
         self.wood_l = 0
         self.wood_m = 0
@@ -735,7 +736,7 @@ class Cow(HeiferIII):
             The current simulation day.
         """
 
-        if 1 <= self.days_in_milk <= self.get_voluntary_waiting_period():
+        if 1 <= self.days_in_milk <= self.get_program_start_day():
             if self._repro_state_manager.is_in_default_state():
                 self._repro_state_manager.enter(ReproStateEnum.FRESH)
                 self._log_repro_states(sim_day)
@@ -743,7 +744,7 @@ class Cow(HeiferIII):
                 self.log_event(self.estrus_day, sim_day, const.ESTRUS_BEFORE_VWP_NOTE)
                 self._simulate_estrus(self.estrus_day, sim_day, const.ESTRUS_DAY_SCHEDULED_NOTE,
                                       self.get_avg_estrus_cycle(), self.get_std_estrus_cycle())
-        elif self.days_in_milk > self.get_voluntary_waiting_period():
+        elif self.days_in_milk > self.get_program_start_day():
             if self._repro_state_manager.is_in(ReproStateEnum.FRESH):
                 self._repro_state_manager.enter(ReproStateEnum.WAITING_FULL_ED_CYCLE)
                 self._log_repro_states(sim_day)
@@ -855,12 +856,12 @@ class Cow(HeiferIII):
             The current simulation day.
         """
 
-        if 1 <= self.days_in_milk < self.get_voluntary_waiting_period():
+        if 1 <= self.days_in_milk < self.get_program_start_day():
             if self._repro_state_manager.is_in_default_state():
                 self._repro_state_manager.enter(ReproStateEnum.FRESH)
                 self._log_repro_states(sim_day)
             return
-        elif self.days_in_milk >= self.get_voluntary_waiting_period():
+        elif self.days_in_milk >= self.get_program_start_day():
             if self._should_set_up_hormone_delivery_for_presynch():
                 self._set_up_hormone_schedule('cows', self.get_user_defined_presynch_protocol(),
                                               self.days_born)
@@ -896,7 +897,7 @@ class Cow(HeiferIII):
             return False
 
         if (self._repro_state_manager.is_in(ReproStateEnum.FRESH) and
-                self.days_in_milk == self.get_voluntary_waiting_period()):
+                self.days_in_milk == self.get_program_start_day()):
             self._repro_state_manager.enter(ReproStateEnum.IN_PRESYNCH)
             self._log_repro_states(self.days_born)
             return True
@@ -920,7 +921,7 @@ class Cow(HeiferIII):
             return False
 
         if (self._repro_state_manager.is_in(ReproStateEnum.FRESH)
-                and self.days_in_milk == self.get_voluntary_waiting_period()):
+                and self.days_in_milk == self.get_program_start_day()):
             self._repro_state_manager.enter(ReproStateEnum.IN_TAI)
             self._log_repro_states(self.days_born)
             return True
@@ -968,12 +969,12 @@ class Cow(HeiferIII):
             if self.repro_program == CowReproProtocolEnum.ED_TAI.value else 0
 
     def execute_ed_tai_protocol(self, sim_day: int) -> None:
-        if 1 <= self.days_in_milk <= self.get_voluntary_waiting_period():
+        if 1 <= self.days_in_milk <= self.get_program_start_day():
             if self._repro_state_manager.is_in_default_state():
                 self._repro_state_manager.enter(ReproStateEnum.FRESH)
                 self._log_repro_states(sim_day)
 
-        elif self.get_voluntary_waiting_period() < self.days_in_milk < self.get_user_defined_tai_program_start_day():
+        elif self.get_program_start_day() < self.days_in_milk < self.get_user_defined_tai_program_start_day():
             if self._repro_state_manager.is_in(ReproStateEnum.FRESH):
                 self._repro_state_manager.enter(ReproStateEnum.WAITING_ED_DAILY)
                 self._log_repro_states(sim_day)
@@ -1005,8 +1006,7 @@ class Cow(HeiferIII):
             self._repro_state_manager.enter(ReproStateEnum.IN_TAI)
             self._log_repro_states(sim_day)
 
-    @staticmethod
-    def _decrease_conception_rate_by_parity(calves: int, conception_rate: float) -> float:
+    def _decrease_conception_rate_by_parity(self, calves: int, conception_rate: float) -> float:
         """
         Adjust conception rate based on the parity of the cow
 
@@ -1265,7 +1265,7 @@ class Cow(HeiferIII):
             The first pregnancy check day (days).
         """
 
-        return AnimalBase.config['preg_check_day_1']
+        return im.get_data('animal.animal_config.from_literature.repro.preg_check_day_1')
 
     def get_second_preg_check_day(self) -> int:
         """
@@ -1277,7 +1277,7 @@ class Cow(HeiferIII):
             The second pregnancy check day (days).
         """
 
-        return AnimalBase.config['preg_check_day_2']
+        return im.get_data('animal.animal_config.from_literature.repro.preg_check_day_2')
 
     def get_third_preg_check_day(self) -> int:
         """
@@ -1289,7 +1289,7 @@ class Cow(HeiferIII):
             The third pregnancy check day (days).
         """
 
-        return AnimalBase.config['preg_check_day_3']
+        return im.get_data('animal.animal_config.from_literature.repro.preg_check_day_3')
 
     def get_first_preg_check_loss_rate(self) -> float:
         """
@@ -1301,7 +1301,7 @@ class Cow(HeiferIII):
             The first pregnancy check loss rate.
         """
 
-        return AnimalBase.config['preg_loss_rate_1']
+        return im.get_data('animal.animal_config.from_literature.repro.preg_loss_rate_1')
 
     def get_second_preg_check_loss_rate(self) -> float:
         """
@@ -1313,7 +1313,7 @@ class Cow(HeiferIII):
             The second pregnancy check loss rate.
         """
 
-        return AnimalBase.config['preg_loss_rate_2']
+        return im.get_data('animal.animal_config.from_literature.repro.preg_loss_rate_2')
 
     def get_third_preg_check_loss_rate(self) -> float:
         """
@@ -1325,10 +1325,9 @@ class Cow(HeiferIII):
             The third pregnancy check loss rate.
         """
 
-        return AnimalBase.config['preg_loss_rate_3']
+        return im.get_data('animal.animal_config.from_literature.repro.preg_loss_rate_3')
 
-    @staticmethod
-    def get_do_not_breed_time() -> int:
+    def get_do_not_breed_time(self) -> int:
         """
         Get the user-defined value for the do-not-breed time for cows (days).
 
@@ -1338,10 +1337,9 @@ class Cow(HeiferIII):
             The do not breed time for cows (days).
         """
 
-        return AnimalBase.config['do_not_breed_time']
+        return im.get_data('animal.animal_config.management_decisions.do_not_breed_time')
 
-    @staticmethod
-    def get_avg_estrus_cycle() -> int:
+    def get_avg_estrus_cycle(self) -> int:
         """
         Get the literature value for the average estrus cycle length for cows (days).
 
@@ -1351,10 +1349,9 @@ class Cow(HeiferIII):
             The average estrus cycle length for cows (days).
         """
 
-        return AnimalBase.config['avg_estrus_cycle_cow']
+        return im.get_data('animal.animal_config.from_literature.repro.avg_estrus_cycle_cow')
 
-    @staticmethod
-    def get_std_estrus_cycle() -> float:
+    def get_std_estrus_cycle(self) -> float:
         """
         Get the literature value for the standard deviation of the estrus cycle length for cows (days).
 
@@ -1364,10 +1361,9 @@ class Cow(HeiferIII):
             The standard deviation of the estrus cycle length for cows (days).
         """
 
-        return AnimalBase.config['std_estrus_cycle_cow']
+        return im.get_data('animal.animal_config.from_literature.repro.std_estrus_cycle_cow')
 
-    @staticmethod
-    def get_avg_estrus_cycle_return() -> int:
+    def get_avg_estrus_cycle_return(self) -> int:
         """
         Get the literature value for the average return estrus cycle length for cows (days).
 
@@ -1377,10 +1373,9 @@ class Cow(HeiferIII):
             The average return estrus cycle length for cows (days).
         """
 
-        return AnimalBase.config['avg_estrus_cycle_return']
+        return im.get_data('animal.animal_config.from_literature.repro.avg_estrus_cycle_return')
 
-    @staticmethod
-    def get_std_estrus_cycle_return() -> float:
+    def get_std_estrus_cycle_return(self) -> float:
         """
         Get the literature value for the standard deviation of the return estrus cycle length for cows (days).
 
@@ -1390,23 +1385,12 @@ class Cow(HeiferIII):
             The standard deviation of the return estrus cycle length for cows (days).
         """
 
-        return AnimalBase.config['std_estrus_cycle_return']
+        return im.get_data('animal.animal_config.from_literature.repro.std_estrus_cycle_return')
 
-    @staticmethod
-    def get_voluntary_waiting_period() -> int:
-        """
-        Get the literature value for the voluntary waiting period for cows (days).
+    def get_program_start_day(self) -> int:
+        return im.get_data('animal.animal_config.farm_level.repro.program_start_day')
 
-        Returns
-        -------
-        int
-            The voluntary waiting period for cows (days).
-        """
-
-        return AnimalBase.config['voluntary_waiting_period']
-
-    @staticmethod
-    def get_user_defined_tai_program_start_day() -> int:
+    def get_user_defined_tai_program_start_day(self) -> int:
         """
         Get the TAI program start day for cows (days) defined by the user.
 
@@ -1416,10 +1400,9 @@ class Cow(HeiferIII):
             The TAI program start day for cows (days) defined by the user.
         """
 
-        return Cow.get_user_defined_repro_sub_properties()['tai_program_start_day']
+        return im.get_data('animal.animal_config.farm_level.repro.cows.repro_sub_properties.tai_program_start_day')
 
-    @staticmethod
-    def get_conception_rate_decrease() -> float:
+    def get_conception_rate_decrease(self) -> float:
         """
         Get the conception rate decrease for cows defined by the user.
 
@@ -1429,51 +1412,27 @@ class Cow(HeiferIII):
             The conception rate decrease for cows defined by the user.
         """
 
-        return AnimalBase.config['conception_rate_decrease']
+        return im.get_data('animal.animal_config.farm_level.repro.conception_rate_decrease')
 
-    @staticmethod
-    def get_user_defined_repro_data(attribute: str) -> Any:
+    def get_user_defined_repro_protocol(self) -> str:
         """
-        Get the reproduction data for cows.
-
-        Parameters
-        ----------
-        attribute : str
-            The name of the attribute to get from the reproduction data.
-
-        Returns
-        -------
-        Any
-            The value of the attribute in the reproduction data.
-
-        Raises
-        ------
-        KeyError
-            If the attribute is not found in the reproduction data.
-        """
-
-        if attribute not in AnimalBase.config['cows']:
-            raise KeyError(f'Invalid cow repro config attribute: {attribute}')
-
-        return AnimalBase.config['cows'][attribute]
-
-    @staticmethod
-    def get_user_defined_repro_protocol() -> str:
-        """
-        Get the reproduction protocol for heifers defined by the user.
+        Get the reproduction protocol for cows defined by the user.
 
         Returns
         -------
         str
-            The reproduction protocol for heifers defined by the user.
+            The reproduction protocol for cows defined by the user.
         """
 
-        return AnimalBase.config['cow_repro_method']
+        return im.get_data('animal.animal_config.management_decisions.cow_repro_method')
 
-    @staticmethod
-    def get_user_defined_repro_sub_protocol() -> str:
+    def get_user_defined_repro_sub_protocol(self) -> str:
         """
         Get the reproduction sub protocol for cows defined by the user.
+
+        Notes
+        -----
+        This is the TAI program that is used in either TAI or ED-TAI protocols.
 
         Returns
         -------
@@ -1481,23 +1440,9 @@ class Cow(HeiferIII):
             The reproduction sub protocol for cows defined by the user.
         """
 
-        return Cow.get_user_defined_repro_data('repro_sub_protocol')
+        return im.get_data('animal.animal_config.farm_level.repro.cows.repro_sub_protocol')
 
-    @staticmethod
-    def get_user_defined_repro_sub_properties() -> dict:
-        """
-        Get the reproduction sub properties for heifers defined by the user.
-
-        Returns
-        -------
-        dict
-            The reproduction sub properties for heifers defined by the user.
-        """
-
-        return Cow.get_user_defined_repro_data('repro_sub_properties')
-
-    @staticmethod
-    def get_user_defined_presynch_protocol() -> str:
+    def get_user_defined_presynch_protocol(self) -> str:
         """
         Get the presynch protocol for cows defined by the user.
 
@@ -1507,10 +1452,9 @@ class Cow(HeiferIII):
             The presynch protocol for cows defined by the user.
         """
 
-        return Cow.get_user_defined_repro_data('presynch_protocol')
+        return im.get_data('animal.animal_config.farm_level.repro.cows.presynch_protocol')
 
-    @staticmethod
-    def get_user_defined_resynch_protocol() -> str:
+    def get_user_defined_resynch_protocol(self) -> str:
         """
         Get the resynch protocol for cows defined by the user.
 
@@ -1520,10 +1464,9 @@ class Cow(HeiferIII):
             The resynch protocol for cows defined by the user.
         """
 
-        return Cow.get_user_defined_repro_data('resynch_protocol')
+        return im.get_data('animal.animal_config.farm_level.repro.cows.resynch_protocol')
 
-    @staticmethod
-    def get_user_defined_TAI_conception_rate() -> float:
+    def get_user_defined_TAI_conception_rate(self) -> float:
         """
         Get the user-defined conception rate for cows used in the TAI protocol.
 
@@ -1535,13 +1478,13 @@ class Cow(HeiferIII):
             The specific conception rate for cows used in the TAI protocol.
         """
 
-        return Cow.get_user_defined_repro_sub_properties()['conception_rate']
+        return im.get_data('animal.animal_config.farm_level.repro.cows.repro_sub_properties.conception_rate')
 
     def should_decrease_conception_rate_in_rebreeding(self) -> bool:
-        return AnimalBase.config['decrease_conception_rate_in_rebreeding']
+        return im.get_data('animal.animal_config.farm_level.repro.decrease_conception_rate_in_rebreeding')
 
     def should_decrease_conception_rate_by_parity(self) -> bool:
-        return AnimalBase.config['decrease_conception_rate_by_parity']
+        return im.get_data('animal.animal_config.farm_level.repro.decrease_conception_rate_by_parity')
 
     # Cull methods
     def cull_update(self, sim_day):
