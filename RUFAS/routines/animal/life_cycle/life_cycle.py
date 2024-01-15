@@ -637,7 +637,7 @@ class LifeCycleManager:
         })
         args.update(repro_program=AnimalBase.config['cow_repro_method'])
         args.update(presynch_method=AnimalBase.config['cows']['presynch_protocol'])
-        args.update(tai_method_c=AnimalBase.config['cows']['repro_sub_protocol'])
+        args.update(tai_method_c=AnimalBase.config['cows']['tai_program'])
         args.update(resynch_method=AnimalBase.config['cows']['resynch_protocol'])
         new_cow = Cow(args)
         if len(cows) > 0:

@@ -31,8 +31,8 @@ class ReproStateManager:
         Check if a specific reproductive state is currently active.
     reset() -> None
         Clear all current states and revert the state manager to having only the NONE state.
-    is_in_default_state() -> bool
-        Check if the current state is the default (NONE) state.
+    is_in_empty_state() -> bool
+        Check if the current state is in the empty state (NONE).
     """
 
     def __init__(self, initial_states: set[ReproStateEnum] | None = None) -> None:
@@ -130,9 +130,9 @@ class ReproStateManager:
 
         self._states = {ReproStateEnum.NONE}
 
-    def is_in_default_state(self) -> bool:
+    def is_in_empty_state(self) -> bool:
         """
-        Check if the current state is the default (NONE) state.
+        Check if the current state is in the empty state (NONE).
 
         Returns
         -------

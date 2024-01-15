@@ -96,3 +96,8 @@ UNKNOWN_CULL = "culled for unknown"
 STDI = 2
 
 # DEFAULTS
+# The number of days to start a TAI program before the first preg check, used in TAIbeforePD resynch protocol
+DAYS_BEFORE_FIRST_PREG_CHECK_TO_START_TAI = 6
+
+# Maximum estrus cycle length when a PGF injection is given after a failed preg check, used in PGFatPD resynch protocol
+MAX_ESTRUS_CYCLE_LENGTH_PGF_AT_PREG_CHECK = 7

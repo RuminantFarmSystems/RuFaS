@@ -554,7 +554,7 @@ def test_move_heiferIII_to_cow_stage(mocker: MockerFixture) -> None:
         "cow_repro_method": cow_repro_method,
         "cows": {
             "presynch_protocol": cow_presynch_protocol,
-            "repro_sub_protocol": cow_TAI_protocol,
+            "tai_program": cow_TAI_protocol,
             "resynch_protocol": cow_resynch_protocol
         }
     }
@@ -903,7 +903,7 @@ def test_handle_cow_milking(mocker: MockerFixture,
     life_cycle_manager.avg_days_in_milk = 7
     life_cycle_manager.vwp_cow_num = 2
     life_cycle_manager.animal_config = {
-        'voluntary_waiting_period': 9,
+        'program_start_day': 9,
     }
     life_cycle_manager.dry_cow_num = 5
 

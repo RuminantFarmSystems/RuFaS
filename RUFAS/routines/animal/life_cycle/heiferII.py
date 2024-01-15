@@ -576,7 +576,7 @@ class HeiferII(HeiferI):
         return self.get_user_defined_repro_data('estrus_conception_rate')
 
     @staticmethod
-    def get_user_defined_TAI_conception_rate() -> float:
+    def get_user_defined_tai_conception_rate() -> float:
         """
         Get the user-defined conception rate for heifers used in TAI protocols.
 
@@ -621,7 +621,7 @@ class HeiferII(HeiferI):
         """
 
         if self.get_user_defined_repro_protocol() == HeiferReproProtocolEnum.TAI.value:
-            return self.get_user_defined_TAI_conception_rate()
+            return self.get_user_defined_tai_conception_rate()
         else:
             return self._get_default_TAI_conception_rate()
 
@@ -1072,7 +1072,7 @@ class HeiferII(HeiferI):
         is_estrus_detected = self._detect_estrus(self._get_user_defined_or_default_synch_ed_estrus_detection_rate())
         if is_estrus_detected:
             self.log_event(self.days_born, sim_day, const.ESTRUS_DETECTED_NOTE)
-            self.conception_rate = self.get_user_defined_TAI_conception_rate()
+            self.conception_rate = self.get_user_defined_tai_conception_rate()
             self.ai_day = self.days_born + 1
             self.log_event(self.days_born, sim_day, f'{const.AI_DAY_SCHEDULED_NOTE} on day {self.ai_day}')
         else:

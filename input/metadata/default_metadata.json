@@ -477,13 +477,13 @@
                 "default": "TAIafterPD",
                 "pattern": "^(TAIafterPD|TAIbeforePD|PGFatPD|N/A)$"
               },
-              "repro_sub_protocol": {
+              "tai_program": {
                 "type": "string",
-                "description": "Cow's TAI procedure to be used in both TAI and ED-TAI repro protocols.",
+                "description": "Cow's TAI program to be used in both TAI and ED-TAI repro protocols.",
                 "pattern": "^(OvSynch 48|OvSynch 56|CoSynch 72|5d CoSynch|N/A)$",
                 "default": "OvSynch 56"
               },
-              "repro_sub_properties": {
+              "tai_program_properties": {
                 "type": "object",
                 "conception_rate": {
                   "type": "number",

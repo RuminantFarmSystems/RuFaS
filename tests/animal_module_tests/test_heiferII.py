@@ -467,10 +467,10 @@ def test_get_general_conception_rate(mocker: MockerFixture, mocked_conception_ra
         (1.0, 1.0),
     ]
 )
-def test_get_user_defined_TAI_conception_rate(mocker: MockerFixture, mocked_conception_rate: float,
+def test_get_user_defined_tai_conception_rate(mocker: MockerFixture, mocked_conception_rate: float,
                                               expected_conception_rate: float) -> None:
     """
-    Unit test for get_user_defined_TAI_conception_rate() static method of HeiferII class in heiferII.py file.
+    Unit test for get_user_defined_tai_conception_rate() static method of HeiferII class in heiferII.py file.
     """
 
     # Arrange
@@ -479,7 +479,7 @@ def test_get_user_defined_TAI_conception_rate(mocker: MockerFixture, mocked_conc
                                                              return_value=mock_repro_sub_properties)
 
     # Act
-    result = HeiferII.get_user_defined_TAI_conception_rate()
+    result = HeiferII.get_user_defined_tai_conception_rate()
 
     # Assert
     assert result == expected_conception_rate
@@ -546,7 +546,7 @@ def test_get_user_defined_or_default_TAI_conception_rate(mocker: MockerFixture,
     mocker.patch.object(HeiferII, '__init__', return_value=None)
     heifer = HeiferII(mocker.MagicMock())
     mocker.patch.object(heifer, 'get_user_defined_repro_protocol', return_value=repro_protocol)
-    mocker.patch.object(HeiferII, 'get_user_defined_TAI_conception_rate', return_value=user_defined_rate)
+    mocker.patch.object(HeiferII, 'get_user_defined_tai_conception_rate', return_value=user_defined_rate)
     mocker.patch.object(HeiferII, '_get_default_TAI_conception_rate', return_value=default_rate)
 
     # Act
@@ -1178,7 +1178,7 @@ def test_handle_synch_ed_estrus_detection(mocker: MockerFixture, days_born: int,
     patch_for_detect_estrus = mocker.patch.object(heifer, '_detect_estrus', return_value=estrus_detected)
     mocker.patch.object(HeiferII, '_get_user_defined_or_default_synch_ed_estrus_detection_rate',
                         return_value=specific_estrus_detection_rate)
-    mocker.patch.object(HeiferII, 'get_user_defined_TAI_conception_rate',
+    mocker.patch.object(HeiferII, 'get_user_defined_tai_conception_rate',
                         return_value=external_specific_conception_rate)
     patch_for_handle_estrus_not_detected = mocker.patch.object(heifer, '_handle_estrus_not_detected_in_synch_ed',
                                                                return_value=None)

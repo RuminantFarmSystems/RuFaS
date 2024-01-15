@@ -58,8 +58,8 @@
 					"estrus_conception_rate": 0.6,
 					"presynch_protocol": "Double OvSynch",
                     "resynch_protocol": "TAIbeforePD",
-                    "repro_sub_protocol": "OvSynch 56",
-					"repro_sub_properties": {
+                    "tai_program": "OvSynch 56",
+					"tai_program_properties": {
 						"conception_rate": 0.6,
 						"tai_program_start_day": 70
 					}
