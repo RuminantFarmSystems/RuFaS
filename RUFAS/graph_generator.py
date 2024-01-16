@@ -179,7 +179,7 @@ class GraphGenerator:
 
         """
         required_graph_filter_keys = ["type", "filters", "variables"]
-        optional_graph_filter_keys = FIGURE_SETTERS.keys() + AXES_SETTERS.keys()
+        optional_graph_filter_keys = list(FIGURE_SETTERS.keys()) + list(AXES_SETTERS.keys())
         graph_filter_validation_logs: List[Dict[str, str] | Dict[str, Any]] = []
         info_map = {
             "class": self.__class__.__name__,
@@ -187,7 +187,7 @@ class GraphGenerator:
         }
         for required_key in required_graph_filter_keys:
             if required_key not in graph_details.keys():
-                graph_filter_validation_logs.append({"error": f"Can't plot{ graph_details.get('title')} data set",
+                graph_filter_validation_logs.append({"error": f"Can't plot {graph_details.get('title')} data set",
                                                      "message": f"Required key '{required_key}' not in your graph "
                                                      "filter file. ",
                                                      "info_map": info_map})
