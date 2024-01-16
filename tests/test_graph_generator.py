@@ -149,7 +149,7 @@ def test_generate_graph_success(graph_generator: GraphGenerator) -> None:
     mock_log_pool = {"log": "mock_log_message"}
     mock_prepare_plot_data_return = (filtered_pool, mock_log_pool)
     graph_generator._prepare_plot_data = MagicMock(return_value=mock_prepare_plot_data_return)
-    graph_details = {"type": "plot", "variables": ["var1", "var2"]}
+    graph_details = {"type": "plot", "filters": ["var1", "var2"]}
     filter_file_name = "filter_file"
     graphics_dir = Path("graphs")
     assert mock_log_pool == graph_generator.generate_graph(
