@@ -145,7 +145,7 @@ class RationOptimizer:
         # [A.Cow.E.2]-[A.Heifer.E.2]
         # The amount of intake needed to meet the maintenance requirement, dimensionless
         if TotalTDN < (0.035 * ration_config.BW ** 0.75):
-            DMI_to_maint = 1
+            DMI_to_maint = 1 #TODO GET THIS LINE COVERED
         else:
             DMI_to_maint = (TotalTDN / (0.035 * somatic_BW ** 0.75))
         # [A.Cow.E.3]-[A.Heifer.E.3]
@@ -153,7 +153,7 @@ class RationOptimizer:
         if TDNconc < 60:
             Discount = 1
         else:
-            Discount = (TDNconc - ((0.18 * TDNconc - 10.3) * (DMI_to_maint - 1))) / TDNconc
+            Discount = (TDNconc - ((0.18 * TDNconc - 10.3) * (DMI_to_maint - 1))) / TDNconc #TODO GET THIS LINE COVERED
         ration_config.Discount = Discount
         # [A.Cow.E.4]-[A.Heifer.E.4]
         # Actual TDN content of feed i, %
@@ -173,7 +173,7 @@ class RationOptimizer:
                 ration_config.MEact_list.append(1.01 * ration_config.DEact_list[i] - 0.45 + 0.0046 *
                                                 (ration_config.EE_list[i] - 3))
             else:
-                ration_config.MEact_list.append(1.01 * ration_config.DEact_list[i] - 0.45)
+                ration_config.MEact_list.append(1.01 * ration_config.DEact_list[i] - 0.45) #TODO GET THIS LINE COVERED
         # [A.Cow.E.8]-[A.Heifer.E.8]
         # Actual net energy for maintenance of feed i, Mcal/kg
         ration_config.NEm_act_list = []
@@ -198,7 +198,7 @@ class RationOptimizer:
                                                  ((0.097 * ration_config.MEact_list[i] +
                                                    0.19) / 97) * (ration_config.EE_list[i] - 3))
             else:
-                ration_config.NElact_list.append(0.703 * ration_config.MEact_list[i] - 0.19)
+                ration_config.NElact_list.append(0.703 * ration_config.MEact_list[i] - 0.19) #TODO GET THIS LINE COVERED
 
         # Actual net energy for growth of feed i, Mcal/kg
         ration_config.NEgact_list = []
@@ -251,12 +251,12 @@ class RationOptimizer:
         if dry_matter_intake != 0:
             TDNconc = (TotalTDN / dry_matter_intake) * 100
         else:
-            TDNconc = 0
+            TDNconc = 0#TODO GET THIS LINE COVERED
         SBW = ration_config.BW * 0.96
         # [A.Cow.E.2]-[A.Heifer.E.2]
         # The amount of intake needed to meet the maintenance requirement, dimensionless
         if TotalTDN < (0.035 * ration_config.BW ** 0.75):
-            DMI_to_maint = 1
+            DMI_to_maint = 1#TODO GET THIS LINE COVERED
         else:
             DMI_to_maint = (TotalTDN / (0.035 * SBW ** 0.75))
         # [A.Cow.E.3]-[A.Heifer.E.3]
@@ -264,7 +264,7 @@ class RationOptimizer:
         if TDNconc < 60:
             ration_config.Discount = 1
         else:
-            ration_config.Discount = (TDNconc - ((0.18 * TDNconc - 10.3) * (DMI_to_maint - 1))) / TDNconc
+            ration_config.Discount = (TDNconc - ((0.18 * TDNconc - 10.3) * (DMI_to_maint - 1))) / TDNconc#TODO GET THIS LINE COVERED
         # [A.Cow.E.4]-[A.Heifer.E.4]
         # Actual TDN content of feed i, %
         ration_config.TDNact_list = np.multiply(ration_config.TDN_list, ration_config.Discount)
@@ -274,7 +274,7 @@ class RationOptimizer:
         # [A.Cow.E.6]-[A.Heifer.E.6]
         # Actual metabolizable energy of feed i, Mcal/kg
         if not ration_config.MEact_list:
-            ration_config.MEact_list = []
+            ration_config.MEact_list = []#TODO GET THIS WHOLE CHUNK COVERED
             for i in range(len(ration_config.DEact_list)):
                 if ration_config.feed_type_list[i] == 'Mineral':
                     ration_config.MEact_list.append(0)
@@ -288,7 +288,7 @@ class RationOptimizer:
         # [A.Cow.E.8]-[A.Heifer.E.8]
         # Actual net energy for maintenance of feed i, Mcal/kg
         if not ration_config.NEm_act_list:
-            ration_config.NEm_act_list = []
+            ration_config.NEm_act_list = []#TODO GET THIS CHUNK COVERED
             for i in range(len(ration_config.MEact_list)):
                 if ration_config.is_fat_list[i] is True:
                     ration_config.NEm_act_list.append(0.8 * ration_config.MEact_list[i])
@@ -322,7 +322,7 @@ class RationOptimizer:
         """
         # Actual net energy for lactation of feed i, Mcal/kg
         if not ration_config.NElact_list:
-            ration_config.NElact_list = []
+            ration_config.NElact_list = []#TODO GET THIS CHUNKO COVERED
             # [A.Cow.E.7]-[A.Heifer.E.7]
             for i in range(len(ration_config.MEact_list)):
                 if ration_config.feed_type_list[i] == 'Mineral':
@@ -360,7 +360,7 @@ class RationOptimizer:
         """
         # Actual net energy for growth of feed i, Mcal/kg
         if not ration_config.NEgact_list:
-            ration_config.NEgact_list = []
+            ration_config.NEgact_list = []#TODO GET THIS CHUNKO COVERED
             # [A.Cow.E.9]-[A.Heifer.E.9]
             for i in range(len(ration_config.MEact_list)):
                 if ration_config.feed_type_list[i] == 'Mineral':
@@ -404,7 +404,7 @@ class RationOptimizer:
             elif ration_config.feed_type_list[i] == 'Mineral':
                 ration_config.dCa_list.append(.95)
             else:
-                ration_config.dCa_list.append(0)
+                ration_config.dCa_list.append(0)#TODO GET THIS LINE COVERED
         # [A.Cow.E.16]-[A.Heifer.E.16]
         return (sum(np.multiply(decision_vector, np.multiply(np.multiply(ration_config.calcium_list, 0.01),
                                                              ration_config.dCa_list))) - (
@@ -479,7 +479,7 @@ class RationOptimizer:
         if DMI != 0:
             PercentConc = (sum(np.multiply(decision_vector, ration_config.is_conc_list)) / DMI) * 100
         else:
-            PercentConc = 0
+            PercentConc = 0#TODO GET THIS LINE COVERED
         # [A.Cow.E.10]-[A.Heifer.E.10]
         # Protein passage rate of feed i (%/h)
         Kp = []
@@ -502,7 +502,7 @@ class RationOptimizer:
                                               (ration_config.N_B_list[i] / 100) * ration_config.CP_list[i] +
                                               (ration_config.N_A_list[i] / 100) * ration_config.CP_list[i])
             else:
-                ration_config.RDP_list.append(0)
+                ration_config.RDP_list.append(0)#TODO GET THIS LINE COVERED
         # [A.Cow.E.12]-[A.Cow.E.12]
         # Rumen undegradable protein of feed i (% of DM)
         ration_config.RUP_list = []
@@ -802,8 +802,8 @@ class RationOptimizer:
             feed_limit_list = self.triple_values_in_list(available_feeds['lactating_cow_limit'])
             lactating = True
         else:
-            feed_limit_list = self.triple_values_in_list(available_feeds['dry_cow_limit'])
-            lactating = False
+            feed_limit_list = self.triple_values_in_list(available_feeds['dry_cow_limit'])#TODO GET THIS LINE COVERED
+            lactating = False#TODO GET THIS LINE COVERED
         ration_config = RationConfig(price_list, requirements.NEmaint_requirement, requirements.NEa_requirement,
                                      requirements.NEpreg_requirement, requirements.NEl_requirement,
                                      requirements.NEg_requirement, requirements.MP_requirement,
@@ -819,7 +819,7 @@ class RationOptimizer:
             try:
                 solution = self.optimize(animal_combination, available_feeds, ration_config)
             except Exception as e:  # noqa
-                i -= 1
+                i -= 1#TODO GET THIS CHUNKO COVERED
                 info_map = {"class": "RationOptimizer", "function": self.attempt_optimization.__name__, }
                 om.add_error('SLSQP error', 'whoops', info_map)
             finally:
@@ -828,12 +828,12 @@ class RationOptimizer:
             # this case should not be called, but is in place to not crash the
             # simulation if bounds error is not resolved
             if count > 30:
-                solution = None
+                solution = None#TODO GET THIS LINE COVERED
                 break
 
         # retrieving MEact from diet
         if solution is None:
-            ration_vals = None
+            ration_vals = None#TODO GET THIS LINE COVERED
             ration_config = None
         else:
             ration_vals = self.get_ration_vals(solution.x, ration_config)
