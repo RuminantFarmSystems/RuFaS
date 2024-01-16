@@ -25,10 +25,14 @@ class LeafAreaIndex:
 
         self.data.canopy_height = self.determine_canopy_height(self.data.max_canopy_height,
                                                                self.data.optimal_leaf_area_fraction)
-        if self.data.is_in_senescence:  # senescence
+        if self.data.is_in_senescence and not self.data.is_perennial:  # senescence
             self.data.leaf_area_index = self._determine_senescent_leaf_area_index(self.data.heat_fraction,
                                                                                   self.data.senescent_heat_fraction,
                                                                                   self.data.max_leaf_area_index)
+
+        elif self.data.is_in_senescence and self.data.is_perennial:
+            self.shift_leaf_area_time()
+            return
         else:  # normal growth
             self.check_previous_leaf_area_values()
             self.data.optimal_leaf_area_change = self._determine_max_leaf_area_change(
