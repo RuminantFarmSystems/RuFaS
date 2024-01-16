@@ -1746,4 +1746,3 @@ class AnimalManager:
         cow_overall_conception_rate = (Cow.stats['num_successful_conceptions'] /
                                        Cow.stats['num_ai_performed']) if Cow.stats['num_ai_performed'] > 0 else 0
         om.add_variable('cow_overall_conception_rate', cow_overall_conception_rate, info_map)
-
