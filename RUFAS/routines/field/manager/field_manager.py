@@ -14,6 +14,7 @@ from RUFAS.routines.field.manager.output_gatherer import OutputGatherer
 from RUFAS.routines.field.manager.fertilizer_schedule import FertilizerSchedule
 from RUFAS.routines.field.manager.manure_schedule import ManureSchedule
 from RUFAS.routines.field.manager.tillage_schedule import TillageSchedule
+from RUFAS.routines.feed_storage.feed_manager import FeedManager
 from typing import Dict, List, Tuple
 
 """
@@ -26,7 +27,7 @@ om = OutputManager()
 
 
 class FieldManager:
-    def __init__(self, manure_manager: ManureManager):
+    def __init__(self, manure_manager: ManureManager, feed_manager: FeedManager):
         info_map = {
             "class": self.__class__.__name__,
             "function": self.__init__.__name__
@@ -42,7 +43,7 @@ class FieldManager:
             )
 
         for field in fields:
-            new_field = self._setup_field(field, manure_manager)
+            new_field = self._setup_field(field, manure_manager, feed_manager)
             self.fields.append(new_field)
         self.output_gatherer = OutputGatherer(fields=self.fields)
 
@@ -78,15 +79,17 @@ class FieldManager:
             field.perform_annual_reset()
 
     @staticmethod
-    def _setup_field(field_name: str, manure_manager: ManureManager) -> Field:
+    def _setup_field(field_name: str, manure_manager: ManureManager, feed_manager: FeedManager) -> Field:
         """
 
         Parameters
         ----------
         field_name : str
             The name of the blob in the metadata that contains the configuration for the field to be initialized.
-        manure_manager: ManureManager
+        manure_manager : ManureManager
             Instance of the ManureManager class.
+        feed_manager : FeedManager
+            Instance of the FeedManager class which receives and manages harvested crops.
 
         Returns
         -------
@@ -137,7 +140,7 @@ class FieldManager:
         return Field(field_data=field_data, soil=soil_profile, plantings=all_planting_events,
                      harvestings=all_harvest_events, tillage_events=tillage_events, fertilizer_events=fertilizer_events,
                      fertilizer_mixes=available_fertilizer_mixes, manure_events=manure_events,
-                     manure_manager=manure_manager)
+                     manure_manager=manure_manager, feed_manager=feed_manager)
 
     @staticmethod
     def _setup_fertilizer_schedule(fertilizer_schedule: str) -> Tuple[Dict, FertilizerSchedule]:
