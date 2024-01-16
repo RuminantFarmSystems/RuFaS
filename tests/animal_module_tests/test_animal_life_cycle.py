@@ -903,7 +903,7 @@ def test_handle_cow_milking(mocker: MockerFixture,
     life_cycle_manager.avg_days_in_milk = 7
     life_cycle_manager.vwp_cow_num = 2
     life_cycle_manager.animal_config = {
-        'program_start_day': 9,
+        'voluntary_waiting_period': 9,
     }
     life_cycle_manager.dry_cow_num = 5
 
