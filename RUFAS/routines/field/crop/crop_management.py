@@ -324,7 +324,7 @@ class CropManagement:
             soil_data.plant_root_residue = 0
             soil_data.crop_root_depth = 0
             soil_data.soil_layers[0].fresh_organic_nitrogen_content += self.data.residue_nitrogen
-            soil_data.soil_layers[0].fresh_organic_phosphorus_content += self.data.residue_phosphorus
+            soil_data.soil_layers[0].labile_inorganic_phosphorus_content += self.data.residue_phosphorus
 
     def _distribute_residue_nutrients(
             self,
@@ -344,17 +344,25 @@ class CropManagement:
         """
         surface_fraction = (self.data.yield_residue - root_residue_mass) / self.data.yield_residue
         soil_data.soil_layers[0].fresh_organic_nitrogen_content += self.data.residue_nitrogen * surface_fraction
-        soil_data.soil_layers[0].fresh_organic_phosphorus_content += self.data.residue_phosphorus * surface_fraction
+        soil_data.soil_layers[0].labile_inorganic_phosphorus_content += self.data.residue_phosphorus * surface_fraction
 
         subsurface_nitrogen = self.data.residue_nitrogen * (1 - surface_fraction)
         subsurface_phosphorus = self.data.residue_phosphorus * (1 - surface_fraction)
-        for layer in soil_data.soil_layers:
+
+        surface_layer = soil_data.soil_layers[0]
+        surface_root_fraction = (surface_layer.bottom_depth - surface_layer.top_depth) / self.data.root_depth \
+                    if surface_layer.bottom_depth <= self.data.root_depth \
+                    else max(0.0, (self.data.root_depth - surface_layer.top_depth) / self.data.root_depth)
+        surface_layer.fresh_organic_nitrogen_content += subsurface_nitrogen * surface_root_fraction
+        surface_layer.labile_inorganic_phosphorus_content += subsurface_phosphorus * surface_root_fraction
+
+        for layer in soil_data.soil_layers[1:]:
             layer_fraction = \
                 (layer.bottom_depth - layer.top_depth) / self.data.root_depth \
                     if layer.bottom_depth <= self.data.root_depth \
                     else max(0.0, (self.data.root_depth - layer.top_depth) / self.data.root_depth)
-            layer.fresh_organic_nitrogen_content += subsurface_nitrogen * layer_fraction
-            layer.fresh_organic_phosphorus_content += subsurface_phosphorus * layer_fraction
+            layer.active_organic_nitrogen_content += subsurface_nitrogen * layer_fraction
+            layer.labile_inorganic_phosphorus_content += subsurface_phosphorus * layer_fraction
 
 
     # ---- Harvest Scheduling ----
