@@ -27,13 +27,37 @@
         "AnimalManager._record_animal_counts.num_cow_parity_3",
         "AnimalManager._record_animal_counts.num_cow_parity_4+"
       ],
-      "title": "Cow Parity",
+      "title": "Cow Population by Parity",
       "legend": [
         "Total Cows",
         "Parity 1",
         "Parity 2",
         "Parity 3",
         "Parity 4+"
+      ]
+    },
+    {
+      "type": "plot",
+      "filters": [
+        "AnimalManager._record_culling_stats.num_cows_by_death_cull",
+        "AnimalManager._record_culling_stats.num_cows_by_low_prod_cull",
+        "AnimalManager._record_culling_stats.num_cows_by_lameness_cull",
+        "AnimalManager._record_culling_stats.num_cows_by_injury_cull",
+        "AnimalManager._record_culling_stats.num_cows_by_mastitis_cull",
+        "AnimalManager._record_culling_stats.num_cows_by_disease_cull",
+        "AnimalManager._record_culling_stats.num_cows_by_udder_cull",
+        "AnimalManager._record_culling_stats.num_cows_by_unknown_cull"
+      ],
+      "title": "Culling Cow Stats",
+      "legend": [
+        "Death",
+        "Low Production",
+        "Lameness",
+        "Injury",
+        "Mastitis",
+        "Disease",
+        "Udder",
+        "Unknown"
       ]
     }
   ]

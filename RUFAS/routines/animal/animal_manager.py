@@ -12,6 +12,7 @@ from RUFAS.routines.animal.animal_module_constants import AnimalModuleConstants
 from RUFAS.routines.animal.animal_module_reporter import AnimalModuleReporter
 from RUFAS.routines.animal.animal_typed_dicts import InitialHerdSummaryTypedDict
 from RUFAS.routines.animal.animal_types import AnimalType
+from RUFAS.routines.animal.life_cycle import animal_constants
 from RUFAS.routines.animal.life_cycle.animal_base import AnimalBase
 from RUFAS.routines.animal.life_cycle.calf import Calf
 from RUFAS.routines.animal.life_cycle.cow import Cow
@@ -1623,11 +1624,15 @@ class AnimalManager:
             self._handle_newly_added_animals([*animals_added, *calves_born], feed, current_temperature)
 
             self._record_animal_counts()
+            self._record_culling_stats()
             if self.simulation_day >= 365 and self.simulation_day % 100 == 0:
                 self._record_animal_events(self.cows)
                 self._record_animal_events(self.heiferIIs)
                 self._record_heiferIIs_conception_rate()
                 self._record_cows_conception_rate()
+
+            if time.is_last_day_of_simulation:
+                print()
 
             manure_excretions_output_data = {}
             for pen in self.all_pens:
@@ -1746,3 +1751,50 @@ class AnimalManager:
         cow_overall_conception_rate = (Cow.stats['num_successful_conceptions'] /
                                        Cow.stats['num_ai_performed']) if Cow.stats['num_ai_performed'] > 0 else 0
         om.add_variable('cow_overall_conception_rate', cow_overall_conception_rate, info_map)
+
+    def _record_culling_stats(self) -> None:
+        """
+        Record the culling stats of cows.
+        """
+
+        info_map = {"class": self.__class__.__name__, "function": self._record_culling_stats.__name__}
+        om.add_variable('num_cows_by_death_cull',
+                        self.life_cycle_manager.cull_reason_stats_range[
+                            animal_constants.DEATH_CULL
+                        ],
+                        info_map)
+        om.add_variable('num_cows_by_low_prod_cull',
+                        self.life_cycle_manager.cull_reason_stats_range[
+                            animal_constants.LOW_PROD_CULL
+                        ],
+                        info_map)
+        om.add_variable('num_cows_by_lameness_cull',
+                        self.life_cycle_manager.cull_reason_stats_range[
+                            animal_constants.LAMENESS_CULL
+                        ],
+                        info_map)
+        om.add_variable('num_cows_by_injury_cull',
+                        self.life_cycle_manager.cull_reason_stats_range[
+                            animal_constants.INJURY_CULL
+                        ],
+                        info_map)
+        om.add_variable('num_cows_by_mastitis_cull',
+                        self.life_cycle_manager.cull_reason_stats_range[
+                            animal_constants.MASTITIS_CULL
+                        ],
+                        info_map)
+        om.add_variable('num_cows_by_disease_cull',
+                        self.life_cycle_manager.cull_reason_stats_range[
+                            animal_constants.DISEASE_CULL
+                        ],
+                        info_map)
+        om.add_variable('num_cows_by_udder_cull',
+                        self.life_cycle_manager.cull_reason_stats_range[
+                            animal_constants.UDDER_CULL
+                        ],
+                        info_map)
+        om.add_variable('num_cows_by_unknown_cull',
+                        self.life_cycle_manager.cull_reason_stats_range[
+                            animal_constants.UNKNOWN_CULL
+                        ],
+                        info_map)

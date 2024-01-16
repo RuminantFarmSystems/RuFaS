@@ -912,7 +912,7 @@ class LifeCycleManager:
                 self.milking_cow_num, self.avg_days_in_milk, cow.days_in_milk
             )
 
-            if cow.days_in_milk < self.animal_config['program_start_day']:
+            if cow.days_in_milk < self.animal_config['voluntary_waiting_period']:
                 self.vwp_cow_num += 1
         else:
             self.dry_cow_num += 1

@@ -365,9 +365,9 @@
           "repro": {
             "type": "object",
             "description": "Repro Management",
-            "program_start_day": {
+            "voluntary_waiting_period": {
               "type": "number",
-              "description": "Program Start Day (days) -- If 'TAI' (Timed Artificial Insemination) is chosen for cows, it is the number of days after parturition when the first hormonal injection is made in a presynch program (if present) followed by a TAI program, and if a presynch program is not present, a TAI program will be moved up and start earlier. If 'ED' or 'ED-TAI' is chosen for cows, it is the number of days after parturition when estrus is started to be monitored.",
+              "description": "Voluntary Waiting Period (days) -- If 'TAI' (Timed Artificial Insemination) is chosen for cows, it is the number of days after parturition when the first hormonal injection is made in a presynch program (if present) followed by a TAI program, and if a presynch program is not present, a TAI program will be moved up and start earlier. If 'ED' or 'ED-TAI' is chosen for cows, it is the number of days after parturition when estrus is started to be monitored.",
               "default": 50,
               "minimum": 0
             },

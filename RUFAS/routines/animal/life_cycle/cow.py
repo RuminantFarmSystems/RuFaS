@@ -723,7 +723,7 @@ class Cow(HeiferIII):
             The current simulation day.
         """
 
-        if 1 <= self.days_in_milk <= self.get_program_start_day():
+        if 1 <= self.days_in_milk <= self.get_voluntary_waiting_period():
             if self._repro_state_manager.is_in_empty_state():
                 self._repro_state_manager.enter(ReproStateEnum.FRESH)
                 self._log_repro_states(sim_day)
@@ -731,7 +731,7 @@ class Cow(HeiferIII):
                 self.log_event(self.estrus_day, sim_day, const.ESTRUS_BEFORE_PROGRAM_START_DAY_NOTE)
                 self._simulate_estrus(self.estrus_day, sim_day, const.ESTRUS_DAY_SCHEDULED_NOTE,
                                       self.get_avg_estrus_cycle(), self.get_std_estrus_cycle())
-        elif self.days_in_milk > self.get_program_start_day():
+        elif self.days_in_milk > self.get_voluntary_waiting_period():
             if self._repro_state_manager.is_in(ReproStateEnum.FRESH):
                 self._repro_state_manager.enter(ReproStateEnum.WAITING_FULL_ED_CYCLE)
                 self._log_repro_states(sim_day)
@@ -889,13 +889,13 @@ class Cow(HeiferIII):
             The current simulation day.
         """
 
-        if 1 <= self.days_in_milk < self.get_program_start_day():
+        if 1 <= self.days_in_milk < self.get_voluntary_waiting_period():
             if self._repro_state_manager.is_in_empty_state():
                 self._repro_state_manager.enter(ReproStateEnum.FRESH)
                 self._log_repro_states(sim_day)
             return
 
-        elif self.days_in_milk >= self.get_program_start_day():
+        elif self.days_in_milk >= self.get_voluntary_waiting_period():
             if self._should_set_up_hormone_delivery_for_presynch():
                 self._set_up_hormone_schedule('cows', self.get_user_defined_presynch_protocol(),
                                               self.days_born)
@@ -931,7 +931,7 @@ class Cow(HeiferIII):
             return False
 
         if (self._repro_state_manager.is_in(ReproStateEnum.FRESH) and
-                self.days_in_milk == self.get_program_start_day()):
+                self.days_in_milk == self.get_voluntary_waiting_period()):
             self._repro_state_manager.enter(ReproStateEnum.IN_PRESYNCH)
             self._log_repro_states(self.days_born)
             return True
@@ -955,7 +955,7 @@ class Cow(HeiferIII):
             return False
 
         if (self._repro_state_manager.is_in(ReproStateEnum.FRESH)
-                and self.days_in_milk == self.get_program_start_day()):
+                and self.days_in_milk == self.get_voluntary_waiting_period()):
             self._repro_state_manager.enter(ReproStateEnum.IN_TAI)
             self._log_repro_states(self.days_born)
             return True
@@ -997,12 +997,12 @@ class Cow(HeiferIII):
             The current simulation day.
         """
 
-        if 1 <= self.days_in_milk <= self.get_program_start_day():
+        if 1 <= self.days_in_milk <= self.get_voluntary_waiting_period():
             if self._repro_state_manager.is_in_empty_state():
                 self._repro_state_manager.enter(ReproStateEnum.FRESH)
                 self._log_repro_states(sim_day)
 
-        elif self.get_program_start_day() < self.days_in_milk < self.get_user_defined_tai_program_start_day():
+        elif self.get_voluntary_waiting_period() < self.days_in_milk < self.get_user_defined_tai_program_start_day():
             if self._repro_state_manager.is_in(ReproStateEnum.FRESH):
                 self._repro_state_manager.enter(ReproStateEnum.WAITING_ED_DAILY)
                 self._log_repro_states(sim_day)
@@ -1569,22 +1569,21 @@ class Cow(HeiferIII):
 
         return im.get_data('animal.animal_config.from_literature.repro.std_estrus_cycle_return')
 
-    def get_program_start_day(self) -> int:
+    def get_voluntary_waiting_period(self) -> int:
         """
-        Get the day when the whole reproduction program starts (days).
+        Get the voluntary waiting period for cows (days), used only in the ED and ED-TAI protocols.
 
         Notes
         -----
-        When the cow's days in milk has reached this day, the cow will start going through
-        the reproduction program defined by the user.
+        When the cow's days in milk has reached this day, monitoring for estrus will begin.
 
         Returns
         -------
         int
-            The day when the whole reproduction program starts (days).
+            The voluntary waiting period for cows (days), used only in the ED and ED-TAI protocols.
         """
 
-        return im.get_data('animal.animal_config.farm_level.repro.program_start_day')
+        return im.get_data('animal.animal_config.farm_level.repro.voluntary_waiting_period')
 
     def get_user_defined_tai_program_start_day(self) -> int:
         """
