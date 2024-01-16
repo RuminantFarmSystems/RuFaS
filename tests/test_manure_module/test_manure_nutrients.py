@@ -2,25 +2,26 @@ from __future__ import annotations
 
 import pytest
 from pytest import approx, mark
-
 from RUFAS.routines.manure.manure_nutrients.manure_nutrients import ManureNutrients
+from RUFAS.routines.manure.manure_treatments.manure_types import ManureType
 
 
 @mark.parametrize(
-    "nitrogen, phosphorus, potassium, dry_matter, total_manure_mass, "
+    "manure_type, nitrogen, phosphorus, potassium, dry_matter, total_manure_mass, "
     "expected_dry_matter_fraction, expected_nitrogen_composition, expected_phosphorus_composition",
     [
-        (0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0),  # All attributes are zero
-        (1.0, 2.0, 3.0, 4.0, 5.0, 4.0 / 5.0, 1.0 / 5.0, 2.0 / 5.0),  # All attributes have some values
+        (ManureType.LIQUID, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0),  # All attributes are zero
+        (ManureType.SOLID, 1.0, 2.0, 3.0, 4.0, 5.0, 4.0 / 5.0, 1.0 / 5.0, 2.0 / 5.0),  # All attributes have some values
     ]
 )
-def test_manure_nutrients_init(nitrogen, phosphorus, potassium, dry_matter, total_manure_mass,
-                               expected_dry_matter_fraction, expected_nitrogen_composition,
-                               expected_phosphorus_composition) -> None:
+def test_manure_nutrients_init(manure_type: ManureType, nitrogen: float, phosphorus: float, potassium: float,
+                               dry_matter: float, total_manure_mass: float, expected_dry_matter_fraction: float,
+                               expected_nitrogen_composition: float, expected_phosphorus_composition: float) -> None:
     """
     Unit test for the ManureNutrients class in manure_nutrients.py.
 
-    Test the initialization of the ManureNutrients dataclass and properties that compute manure composition.
+    Test the initialization of the ManureNutrients dataclass and properties that compute manure composition
+    for each manure type.
 
     """
     # Act
@@ -30,6 +31,7 @@ def test_manure_nutrients_init(nitrogen, phosphorus, potassium, dry_matter, tota
         potassium=potassium,
         dry_matter=dry_matter,
         total_manure_mass=total_manure_mass,
+        manure_type=manure_type
     )
 
     # Assert
@@ -44,16 +46,23 @@ def test_manure_nutrients_init(nitrogen, phosphorus, potassium, dry_matter, tota
 
 
 @pytest.mark.parametrize(
-    "nutrient_values",
+    "manure_type, nutrient_values",
     [
-        {"nitrogen": -1.0, "phosphorus": 2.0, "potassium": 3.0, "dry_matter": 4.0, "total_manure_mass": 5.0},
-        {"nitrogen": 1.0, "phosphorus": -2.0, "potassium": 3.0, "dry_matter": 4.0, "total_manure_mass": 5.0},
-        {"nitrogen": 1.0, "phosphorus": 2.0, "potassium": -3.0, "dry_matter": 4.0, "total_manure_mass": 5.0},
-        {"nitrogen": 1.0, "phosphorus": 2.0, "potassium": 3.0, "dry_matter": -4.0, "total_manure_mass": 5.0},
-        {"nitrogen": 1.0, "phosphorus": 2.0, "potassium": 3.0, "dry_matter": 4.0, "total_manure_mass": -5.0},
+        (ManureType.LIQUID,
+         {"nitrogen": -1.0, "phosphorus": 2.0, "potassium": 3.0, "dry_matter": 4.0, "total_manure_mass": 5.0}),
+        (ManureType.LIQUID,
+         {"nitrogen": 1.0, "phosphorus": -2.0, "potassium": 3.0, "dry_matter": 4.0, "total_manure_mass": 5.0}),
+        (ManureType.LIQUID,
+         {"nitrogen": 1.0, "phosphorus": 2.0, "potassium": -3.0, "dry_matter": 4.0, "total_manure_mass": 5.0}),
+        (ManureType.SOLID,
+         {"nitrogen": 1.0, "phosphorus": 2.0, "potassium": 3.0, "dry_matter": -4.0, "total_manure_mass": 5.0}),
+        (ManureType.SOLID,
+         {"nitrogen": 1.0, "phosphorus": 2.0, "potassium": 3.0, "dry_matter": 4.0, "total_manure_mass": -5.0}),
+        ("",
+         {"nitrogen": 1.0, "phosphorus": 2.0, "potassium": 3.0, "dry_matter": 4.0, "total_manure_mass": 5.0}),
     ],
 )
-def test_manure_nutrients_invalid_init(nutrient_values: dict[str, float]) -> None:
+def test_manure_nutrients_invalid_init(manure_type: ManureType | str, nutrient_values: dict[str, float]) -> None:
     """
     Unit test for the __post_init__ method in the ManureNutrients class in manure_nutrients.py.
 
@@ -64,8 +73,11 @@ def test_manure_nutrients_invalid_init(nutrient_values: dict[str, float]) -> Non
     for key in nutrient_values:
         if nutrient_values[key] < 0:
             with pytest.raises(ValueError, match=f'Field {key} must be non-negative.'):
-                ManureNutrients(**nutrient_values)
+                ManureNutrients(**nutrient_values, manure_type=manure_type)
             break
+    if not manure_type:
+        with pytest.raises(ValueError, match="Field manure_type must be an instance of ManureType."):
+            ManureNutrients(**nutrient_values, manure_type=manure_type)
 
 
 def test_manure_nutrients_add_subtract() -> None:
@@ -83,6 +95,7 @@ def test_manure_nutrients_add_subtract() -> None:
         potassium=3.0,
         dry_matter=4.0,
         total_manure_mass=5.0,
+        manure_type=ManureType.LIQUID,
     )
 
     nutrients2 = ManureNutrients(
@@ -91,6 +104,7 @@ def test_manure_nutrients_add_subtract() -> None:
         potassium=4.0,
         dry_matter=5.0,
         total_manure_mass=6.0,
+        manure_type=ManureType.LIQUID,
     )
 
     # Act
@@ -111,6 +125,64 @@ def test_manure_nutrients_add_subtract() -> None:
     assert nutrients_subtracted.total_manure_mass == pytest.approx(1.0)
 
 
+@pytest.mark.parametrize(
+    "manure_type_nutrients, manure_type_nutrients2, nitrogen, nitrogen2, phosphorus, phosphorus2,"
+    "nutrient_to_subtract",
+    [
+        (ManureType.LIQUID, ManureType.SOLID, 1.0, 2.0, 2.0, 3.0, "nitrogen"),
+        (ManureType.LIQUID, ManureType.LIQUID, 2.0, 1.0, 2.0, 3.0, "nitrogen"),
+        (ManureType.LIQUID, ManureType.LIQUID, 1.0, 2.0, 3.0, 2.0, "phosphorus"),
+    ],
+)
+def test_manure_nutrients_add_subtract_raises_errors(manure_type_nutrients: ManureType,
+                                                     manure_type_nutrients2: ManureType,
+                                                     nitrogen: float, nitrogen2: float,
+                                                     phosphorus: float, phosphorus2: float,
+                                                     nutrient_to_subtract: str) -> None:
+    """
+    Unit test for the addition and subtraction operations (__add__, __sub__)
+    in the ManureNutrients class in manure_nutrients.py raising errors.
+
+    """
+    # Arrange
+    nutrients = ManureNutrients(
+        nitrogen=nitrogen,
+        phosphorus=phosphorus,
+        potassium=3.0,
+        dry_matter=4.0,
+        total_manure_mass=5.0,
+        manure_type=manure_type_nutrients,
+    )
+
+    nutrients2 = ManureNutrients(
+        nitrogen=nitrogen2,
+        phosphorus=phosphorus2,
+        potassium=4.0,
+        dry_matter=5.0,
+        total_manure_mass=6.0,
+        manure_type=manure_type_nutrients2,
+    )
+
+    # Act
+    if nutrients.manure_type != nutrients2.manure_type:
+        with pytest.raises(TypeError, match=f"Cannot add {nutrients.manure_type} "
+                                            f"nutrients to {nutrients2.manure_type} nutrients."):
+            nutrients + nutrients2
+        with pytest.raises(TypeError, match=f"Cannot subtract {nutrients.manure_type} "
+                                            f"nutrients from {nutrients2.manure_type} nutrients."):
+            nutrients2 - nutrients
+
+        nutrients2 = "dummy_invalid_nutrients"
+        with pytest.raises(TypeError, match=f"Cannot add {type(nutrients)} to {type(nutrients2)}."):
+            nutrients + nutrients2
+        with pytest.raises(TypeError, match=f"Cannot subtract {type(nutrients2)} from {type(nutrients)}."):
+            nutrients - nutrients2
+    else:
+        with pytest.raises(ValueError, match=f"The amount of {nutrient_to_subtract} in other "
+                                             f"object is greater than what is available."):
+            nutrients2 - nutrients
+
+
 @pytest.mark.parametrize("multiplier", [0, 2, 3.5, 1e10, -1, None])
 def test_manure_nutrients_multiplication(multiplier: int | float | None) -> None:
     """
@@ -128,6 +200,7 @@ def test_manure_nutrients_multiplication(multiplier: int | float | None) -> None
         potassium=3.0,
         dry_matter=4.0,
         total_manure_mass=5.0,
+        manure_type=ManureType.LIQUID,
     )
 
     # Act and Assert

@@ -1,5 +1,7 @@
+import copy
 from typing import List
-from .harvested_crop import HarvestedCrop, CropType
+from .enums import CropCategory, CropType
+from .harvested_crop import HarvestedCrop
 
 
 class Storage:
@@ -8,14 +10,18 @@ class Storage:
 
     Attributes
     ----------
-    stored : List[HarvestedCrop]
-        A list of HarvestedCrop objects representing the crops stored.
+    acceptable_crops : List[CropCategory]
+        The list of crop categories that this storage can recieve.
     capacity : float
         The maximum capacity of the storage, currently set to infinity.
+    stored : List[HarvestedCrop]
+        A list of HarvestedCrop objects representing the crops stored.
 
     Methods
     -------
-    receive_crop(crop: HarvestedCrop)
+    stored_mass()
+        The total mass (kg) of currently stored crops
+    receive_crop(crop: HarvestedCrop, time: Time)
         Receives a harvested crop and adds it to the storage.
     process_degradations()
         Processes the degradations and losses of the stored crops.
@@ -35,9 +41,15 @@ class Storage:
         Recalculates the relative nutrient concentrations after dry matter loss.
     """
 
-    def __init__(self):
+    def __init__(self, capacity: float = float("inf")):
+        self.acceptable_crops: List[CropCategory] = []
+        self.capacity = capacity
         self.stored: List[HarvestedCrop] = []
-        self.capacity = float("inf")
+
+    @property
+    def stored_mass(self) -> float:
+        """The total mass (kg) of currently stored crops"""
+        return sum(crop.fresh_mass for crop in self.stored)
 
     def receive_crop(self, crop: HarvestedCrop) -> None:
         """
@@ -51,8 +63,33 @@ class Storage:
         Returns
         -------
         None
+
+        Raises
+        ------
+        NotImplementedError
+            If the storage's acceptable crops is not populated.
+        ValueError
+            If the crop's category is not compatible with the storage.
+        Exception
+            If adding the crop exceeds the storage's capacity.
+
         """
-        pass
+        if not self.acceptable_crops:
+            raise NotImplementedError(
+                "Storage.acceptable_crops is not populated, consider populating it in the child class."
+            )
+        if crop.category not in self.acceptable_crops:
+            raise ValueError(
+                f"Can't recieve the crop, the compatible crop categories are {self.acceptable_crops=},\
+                    {crop.category} is not one of them."
+            )
+        if self.stored_mass + crop.fresh_mass > self.capacity:
+            raise Exception(
+                f"Adding {crop.fresh_mass} to currently stored ({self.stored_mass})\
+                    exceeds the storage capacity ({self.capacity})"
+            )
+        storage_crop = copy.deepcopy(crop)
+        self.stored.append(storage_crop)
 
     def process_degradations(self):
         """
@@ -81,7 +118,9 @@ class Storage:
         """
         pass
 
-    def calculate_dry_matter_loss_to_gas(self, dry_matter: float, time_in_silo: int) -> float:
+    def calculate_dry_matter_loss_to_gas(
+        self, dry_matter: float, time_in_silo: int
+    ) -> float:
         """
         Calculates the dry matter loss to gas.
 
