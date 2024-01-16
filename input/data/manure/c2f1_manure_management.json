@@ -146,7 +146,7 @@
       "hydraulic_retention_time": 365,
       "sludge_accumulation_period": 10.0,
       "sludge_accumulation_volume_fraction": 0.00251,
-      "storage_time_period": 365,
+      "storage_time_period": 182.5,
       "freeboard_input": 0.3048
     },
     {
