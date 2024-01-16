@@ -178,8 +178,8 @@ class GraphGenerator:
             The logs, warnings, and errors to be reported to OutputManager.
 
         """
-        required_graph_filter_keys = ["type", "filters", "variables"]
-        optional_graph_filter_keys = list(FIGURE_SETTERS.keys()) + list(AXES_SETTERS.keys())
+        required_graph_filter_keys = ["type", "filters"]
+        optional_graph_filter_keys = list(FIGURE_SETTERS.keys()) + list(AXES_SETTERS.keys()) + ["variables"]
         graph_filter_validation_logs: List[Dict[str, str] | Dict[str, Any]] = []
         info_map = {
             "class": self.__class__.__name__,
