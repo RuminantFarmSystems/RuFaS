@@ -1930,10 +1930,20 @@ def test_get_ration_vals():
 def test_total_energy(ration_config, expected, decision_vector) -> None:
     """Unit test for function total_energy in file routines/animal/ration/ration_optimizer.py"""
     ration_optimizer = RationOptimizer()
-
     actual = ration_optimizer.total_energy(decision_vector, ration_config)
-
     assert actual == pytest.approx(expected)
+
+
+@pytest.mark.parametrize(
+    "ration_config, expected",
+    [(lazy_fixture("mock_ration_config"), -15), (lazy_fixture("mock_random_ration_config"), -11.375)],
+)
+def test_total_energy_no_dry_matter_intake(ration_config, expected) -> None:
+    """Unit test for function total_energy in file routines/animal/ration/ration_optimizer.py"""
+    ration_optimizer = RationOptimizer()
+    decision_vector = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+    actual = ration_optimizer.total_energy(decision_vector, ration_config)
+    assert actual == expected
 
 
 def test_attempt_optimization(mocker: MockerFixture, mock_ration_config: MagicMock, mock_available_feeds: dict) -> None:
