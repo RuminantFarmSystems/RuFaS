@@ -316,7 +316,7 @@ class CropManagement:
         soil_data.plant_residue_lignin_composition = self.data.lignin_dry_matter_percentage / 100
         dry_matter_root_biomass = self.data.root_biomass * (self.data.dry_matter_percentage / 100)
         if killed:
-            soil_data.plant_surface_residue = self.data.yield_residue - self.data.root_biomass
+            soil_data.plant_surface_residue = self.data.yield_residue - dry_matter_root_biomass
             soil_data.plant_root_residue = dry_matter_root_biomass
             soil_data.crop_root_depth = self.data.root_depth
             self._distribute_residue_nutrients(soil_data, dry_matter_root_biomass,)
