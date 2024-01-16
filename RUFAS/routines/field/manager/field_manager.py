@@ -1,4 +1,5 @@
 from RUFAS.input_manager import InputManager
+from RUFAS.output_manager import OutputManager
 from RUFAS.routines.field.field.field import Field
 from RUFAS.routines.field.field.field_data import FieldData
 from RUFAS.routines.field.soil.soil import Soil
@@ -6,12 +7,14 @@ from RUFAS.routines.field.soil.soil_data import SoilData
 from RUFAS.routines.field.soil.layer_data import LayerData
 from RUFAS.routines.field.manager.crop_schedule import CropSchedule
 from RUFAS.routines.manure.manure_manager import ManureManager
+from RUFAS.routines.manure.manure_treatments.manure_types import ManureType
 from RUFAS.weather import Weather
 from RUFAS.time import Time
 from RUFAS.routines.field.manager.output_gatherer import OutputGatherer
 from RUFAS.routines.field.manager.fertilizer_schedule import FertilizerSchedule
 from RUFAS.routines.field.manager.manure_schedule import ManureSchedule
 from RUFAS.routines.field.manager.tillage_schedule import TillageSchedule
+from RUFAS.routines.feed_storage.feed_manager import FeedManager
 from typing import Dict, List, Tuple
 
 """
@@ -20,14 +23,27 @@ the `SimulationEngine` for executing daily and annual routines in the field modu
 """
 
 im = InputManager()
+om = OutputManager()
 
 
 class FieldManager:
-    def __init__(self, manure_manager: ManureManager):
+    def __init__(self, manure_manager: ManureManager, feed_manager: FeedManager):
+        info_map = {
+            "class": self.__class__.__name__,
+            "function": self.__init__.__name__
+        }
+
         self.fields: List[Field] = []
-        fields = FieldManager._get_field_blob_names()
+        fields = im.get_data_keys_by_properties("field_properties")
+        if not fields:
+            om.add_warning(
+                "No field input files.",
+                "No fields will be simulated.",
+                info_map
+            )
+
         for field in fields:
-            new_field = self._setup_field(field, manure_manager)
+            new_field = self._setup_field(field, manure_manager, feed_manager)
             self.fields.append(new_field)
         self.output_gatherer = OutputGatherer(fields=self.fields)
 
@@ -63,44 +79,17 @@ class FieldManager:
             field.perform_annual_reset()
 
     @staticmethod
-    def _get_field_blob_names() -> List[str]:
-        """
-        Gets the names of each blob in the metadata that conforms to the field properties.
-
-        Returns
-        -------
-        List[str]
-            List of blob names that contain field configurations.
-
-        """
-        field_blob_names = []
-
-        try:
-            blobs = im.get_metadata("files")
-        except KeyError:
-            raise KeyError("Could not find 'files' section of metadata.")
-
-        for blob_name, blob_values in blobs.items():
-            try:
-                blob_property = blob_values["properties"]
-            except KeyError:
-                raise KeyError(f"{blob_name} in metadata did not contain 'properties' value.")
-
-            if blob_property == "field_properties":
-                field_blob_names.append(blob_name)
-
-        return field_blob_names
-
-    @staticmethod
-    def _setup_field(field_name: str, manure_manager: ManureManager) -> Field:
+    def _setup_field(field_name: str, manure_manager: ManureManager, feed_manager: FeedManager) -> Field:
         """
 
         Parameters
         ----------
         field_name : str
             The name of the blob in the metadata that contains the configuration for the field to be initialized.
-        manure_manager: ManureManager
+        manure_manager : ManureManager
             Instance of the ManureManager class.
+        feed_manager : FeedManager
+            Instance of the FeedManager class which receives and manages harvested crops.
 
         Returns
         -------
@@ -151,7 +140,7 @@ class FieldManager:
         return Field(field_data=field_data, soil=soil_profile, plantings=all_planting_events,
                      harvestings=all_harvest_events, tillage_events=tillage_events, fertilizer_events=fertilizer_events,
                      fertilizer_mixes=available_fertilizer_mixes, manure_events=manure_events,
-                     manure_manager=manure_manager)
+                     manure_manager=manure_manager, feed_manager=feed_manager)
 
     @staticmethod
     def _setup_fertilizer_schedule(fertilizer_schedule: str) -> Tuple[Dict, FertilizerSchedule]:
@@ -211,12 +200,15 @@ class FieldManager:
 
         """
         manure_schedule_data = im.get_data(manure_schedule)
+        manure_type_strings = manure_schedule_data.get("manure_types")
+        manure_types = [ManureType(manure_type_string) for manure_type_string in manure_type_strings]
         manure_schedule_instance = ManureSchedule(
             name="manure_schedule",
             years=manure_schedule_data.get("years"),
             days=manure_schedule_data.get("days"),
             nitrogen_masses=manure_schedule_data.get("nitrogen_masses"),
             phosphorus_masses=manure_schedule_data.get("phosphorus_masses"),
+            manure_types=manure_types,
             field_coverages=manure_schedule_data.get("coverage_fractions"),
             application_depths=manure_schedule_data.get("application_depths"),
             surface_remainder_fractions=manure_schedule_data.get("surface_remainder_fractions"),

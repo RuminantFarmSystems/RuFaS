@@ -1,7 +1,7 @@
 {"crop_schedules":
   [
   {
-    "crop_species": "alfalfa",
+    "crop_species": "alfalfa_hay",
     "harvest_days": [
       179
     ],
@@ -11,7 +11,7 @@
       2012
     ],
     "harvest_operations": [
-      "default"
+      "harvest_kill"
     ],
     "harvest_type": [
       "optimal"
@@ -28,7 +28,7 @@
     "pattern_skip": 0
   },
   {
-    "crop_species": "corn",
+    "crop_species": "corn_grain",
     "harvest_days": [
       298
     ],
@@ -36,7 +36,7 @@
       2013
     ],
     "harvest_operations": [
-      "default"
+      "harvest_kill"
     ],
     "harvest_type": [
       "scheduled"

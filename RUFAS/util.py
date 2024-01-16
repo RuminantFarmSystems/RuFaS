@@ -1,3 +1,4 @@
+import datetime
 import json
 import shutil
 import sys
@@ -349,3 +350,32 @@ class Utility:
         for month, day_count in enumerate(cumulative_days_in_months):
             if day <= day_count:
                 return month + 1
+
+    @staticmethod
+    def get_timestamp(include_millis: bool = False) -> str:
+        """
+        Produces the current system time as a timestamp string.
+
+        Parameters
+        ----------
+        include_millis : bool
+            If True, adds milliseconds to the timestamp.
+
+        Returns
+        -------
+        str
+            The current time's timestamp string.
+
+        Example
+        --------
+        >>> Utility.get_timestamp(include_millis=True)
+        28-Jun-2023_Wed_15-48-21.406585
+        >>> Utility.get_timestamp(include_millis=False)
+        28-Jun-2023_Wed_15-48-21
+        """
+
+        base_timestamp_str: str = "%d-%b-%Y_%a_%H-%M-%S"
+        timestamp_format_string: str = (
+            f"{base_timestamp_str}.%f" if include_millis else base_timestamp_str
+        )
+        return datetime.datetime.now().strftime(timestamp_format_string)

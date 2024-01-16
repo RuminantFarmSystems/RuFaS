@@ -221,6 +221,7 @@ def test_report_daily_ration(animal_manager_fixture, mocker: MockerFixture):
     animal_manager_fixture.all_pens = [pen1, pen2]
     for pen in animal_manager_fixture.all_pens:
         pen.ration_per_animal = test_data["ration_per_animal"]
+    mocker.patch("RUFAS.routines.animal.animal_module_reporter.AnimalModuleReporter.report_daily_feed_emissions")
     AnimalModuleReporter.report_daily_ration(animal_manager_fixture)
 
     for i in range(1, 2):
@@ -418,7 +419,7 @@ def test_report_end_of_simulation(mocker: MockerFixture):
     )
 
     # act
-    AnimalModuleReporter.report_end_of_simulation(animal_manager)
+    AnimalModuleReporter.report_end_of_simulation(animal_manager, 100)
 
     # assert
     assert patch_for_plan_animal_allocation.call_count == 1
