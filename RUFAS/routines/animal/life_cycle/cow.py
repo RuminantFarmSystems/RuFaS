@@ -53,7 +53,7 @@ class Cow(HeiferIII):
             args.repro_program: reproduction program used in cow,
                     three of them: ED, TAI, and ED-TAI programs
             args.presynch_method: presynch protocols used for presynch
-                programs, four of them: PreSynch, Double OvSynch, G6G,
+                programs, four of them: Presynch, Double OvSynch, G6G,
                 and user_defined
             args.tai_method_c: timed-AI protocols used for reproduction
                 programs, five of them: OvSynch 56, OvSynch 48, CoSynch 72,
@@ -664,9 +664,7 @@ class Cow(HeiferIII):
         self.update_body_weight_history(sim_day)
         self.update_milk_production_history(sim_day)
 
-        self._check_do_not_breed_time(sim_day)
-
-        if self.is_breedable():
+        if not self.do_not_breed:
             if self.repro_program not in [CowReproProtocolEnum.ED.value,
                                           CowReproProtocolEnum.TAI.value,
                                           CowReproProtocolEnum.ED_TAI.value]:
@@ -696,6 +694,8 @@ class Cow(HeiferIII):
 
             self.preg_update(sim_day)
 
+        self._check_do_not_breed_flag(sim_day)
+
         cull_stage = self.cull_update(sim_day)
 
         return estimated_daily_milk_produced, fat_percent, daily_fat_correct_milk_production, cull_stage, new_born
@@ -708,19 +708,6 @@ class Cow(HeiferIII):
             self.conception_rate = self._decrease_conception_rate_by_parity(self.calves, self.conception_rate)
 
         self.conception_rate = max(0.0, self.conception_rate)
-
-    def is_breedable(self) -> bool:
-        """
-        Check if the cow is breedable.
-
-        Returns
-        -------
-        bool
-            True if the cow is breedable, False otherwise.
-
-        """
-
-        return not self.do_not_breed
 
     def _log_repro_states(self, sim_day: int) -> None:
         self.log_event(self.days_born, sim_day,
@@ -741,7 +728,7 @@ class Cow(HeiferIII):
                 self._repro_state_manager.enter(ReproStateEnum.FRESH)
                 self._log_repro_states(sim_day)
             if self.days_born == self.estrus_day:
-                self.log_event(self.estrus_day, sim_day, const.ESTRUS_BEFORE_VWP_NOTE)
+                self.log_event(self.estrus_day, sim_day, const.ESTRUS_BEFORE_PROGRAM_START_DAY_NOTE)
                 self._simulate_estrus(self.estrus_day, sim_day, const.ESTRUS_DAY_SCHEDULED_NOTE,
                                       self.get_avg_estrus_cycle(), self.get_std_estrus_cycle())
         elif self.days_in_milk > self.get_program_start_day():
@@ -863,11 +850,11 @@ class Cow(HeiferIII):
                                f'{const.TAI_PERIOD_START}: {self.get_user_defined_tai_program()}')
                 self._repro_state_manager.enter(ReproStateEnum.IN_TAI)
                 self._log_repro_states(sim_day)
+                del actions['set_tai_start']
                 self._set_up_hormone_schedule('cows', self.get_user_defined_tai_program(),
                                               self.days_born)
                 self._TAI_conception_rate = self.get_user_defined_tai_conception_rate()
                 self._execute_hormone_delivery_schedule(sim_day, self._hormone_schedule)
-                del actions['set_tai_start']
 
             if actions.get('set_tai_end', False):
                 self.log_event(self.days_born, sim_day,
@@ -937,7 +924,7 @@ class Cow(HeiferIII):
             return False
 
         if self.get_user_defined_presynch_protocol() not in [
-            CowReproProtocolEnum.Presynch_Presynch.value,
+            CowReproProtocolEnum.Presynch_PreSynch.value,
             CowReproProtocolEnum.Presynch_DoubleOvSynch.value,
             CowReproProtocolEnum.Presynch_G6G.value,
         ]:
@@ -978,42 +965,16 @@ class Cow(HeiferIII):
     def _increment_ai_counts(self) -> None:
         """
         Increment the performed AI counts across all cows.
-
-        Notes
-        -----
-        The following counts are incremented:
-        - num_ai_performed: the total number of AIs performed
-        - num_ai_performed_in_ED: the number of AIs performed in the ED protocol
-        - num_ai_performed_in_TAI: the number of AIs performed in the TAI protocol
-        - num_ai_performed_in_ED_TAI: the number of AIs performed in the ED-TAI protocol
         """
 
         self.stats['num_ai_performed'] += 1
-        self.stats['num_ai_performed_in_ED'] += 1 \
-            if self.repro_program == CowReproProtocolEnum.ED.value else 0
-        self.stats['num_ai_performed_in_TAI'] += 1 \
-            if self.repro_program == CowReproProtocolEnum.TAI.value else 0
-        self.stats['num_ai_performed_in_ED_TAI'] += 1 \
-            if self.repro_program == CowReproProtocolEnum.ED_TAI.value else 0
 
     def _increment_successful_conceptions(self) -> None:
         """
         Increment the successful conception counts across all heifers.
-
-        The following counts are incremented:
-        - num_successful_conceptions: the total number of successful conceptions
-        - num_successful_conceptions_in_ED: the number of successful conceptions in the ED protocol
-        - num_successful_conceptions_in_TAI: the number of successful conceptions in the TAI protocol
-        - num_successful_conceptions_in_ED_TAI: the number of successful conceptions in the ED-TAI protocol
         """
 
         self.stats['num_successful_conceptions'] += 1
-        self.stats['num_successful_conceptions_in_ED'] += 1 \
-            if self.repro_program == CowReproProtocolEnum.ED.value else 0
-        self.stats['num_successful_conceptions_in_TAI'] += 1 \
-            if self.repro_program == CowReproProtocolEnum.TAI.value else 0
-        self.stats['num_successful_conceptions_in_ED_TAI'] += 1 \
-            if self.repro_program == CowReproProtocolEnum.ED_TAI.value else 0
 
     def execute_ed_tai_protocol(self, sim_day: int) -> None:
         """
@@ -1244,14 +1205,17 @@ class Cow(HeiferIII):
             if self.days_born == self.ai_day + preg_check_config["day"]:
                 self._handle_preg_check(preg_check_config, sim_day)
 
-    def _check_do_not_breed_time(self, sim_day: int) -> None:
+    def _check_do_not_breed_flag(self, sim_day: int) -> None:
         """
         Check if the cow should still be in the breeding stage and mark her as do-not-breed if necessary.
 
         Notes
         -----
-        If the cow is not pregnant and her days in milk has exceeded the do-not-breed time
-        she will be marked as do-not-breed.
+        If the cow still cannot get pregnant after the do-not-breed time has passed, she will be
+        marked as do-not-breed.
+
+        Important caveat: If even a cow is already pregnant, we cannot mark her as do-not-breed
+        yet because she may still lose the pregnancy.
 
         Parameters
         ----------
@@ -1260,7 +1224,7 @@ class Cow(HeiferIII):
         """
 
         if not self.is_pregnant and self.days_in_milk > self.get_do_not_breed_time():
-            if self.is_breedable():
+            if not self.do_not_breed:
                 self.log_event(self.days_born, sim_day, const.DO_NOT_BREED)
                 self.do_not_breed = True
 
@@ -1468,10 +1432,10 @@ class Cow(HeiferIII):
         if self.repro_program == repro_program:
             return
 
-        self.repro_program = repro_program
         self.log_event(self.days_born, sim_day,
                        f'{const.SETTING_REPRO_PROGRAM_NOTE} from {self.repro_program} '
                        f'to {repro_program}')
+        self.repro_program = repro_program
 
     def get_first_preg_check_day(self) -> int:
         """
@@ -1765,9 +1729,8 @@ class Cow(HeiferIII):
         The reasons are reproduction failure, low production, and health issues
         Returns: not culled
         """
-        if self.do_not_breed and self.days_in_milk > 80 and \
-                self.estimated_daily_milk_produced < \
-                AnimalBase.config['cull_milk_production']:
+        if (self.do_not_breed
+                and self.estimated_daily_milk_produced < AnimalBase.config['cull_milk_production']):
             self.culled = True
             self.events.add_event(self.days_born, sim_day, const.LOW_PROD_CULL)
             self.cull_reason = const.LOW_PROD_CULL

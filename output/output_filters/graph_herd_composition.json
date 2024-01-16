@@ -25,7 +25,7 @@
         "AnimalManager._record_animal_counts.num_cow_parity_1",
         "AnimalManager._record_animal_counts.num_cow_parity_2",
         "AnimalManager._record_animal_counts.num_cow_parity_3",
-        "AnimalManager._record_animal_counts.num_cow_parity_3+"
+        "AnimalManager._record_animal_counts.num_cow_parity_4+"
       ],
       "title": "Cow Parity",
       "legend": [
@@ -33,7 +33,7 @@
         "Parity 1",
         "Parity 2",
         "Parity 3",
-        "Parity 3+"
+        "Parity 4+"
       ]
     }
   ]

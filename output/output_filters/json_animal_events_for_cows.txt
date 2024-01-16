@@ -1,1 +1,4 @@
 .*Cow_.*_day.*
+AnimalManager._record_cows_conception_rate.cow_total_num_ai_performed
+AnimalManager._record_cows_conception_rate.cow_total_num_successful_conceptions
+AnimalManager._record_cows_conception_rate.cow_overall_conception_rate

@@ -64,7 +64,7 @@ class HormoneDeliverySchedule:
     }
 
     COW_REPRO_PROTOCOLS = {
-        CowReproProtocolEnum.Presynch_Presynch.value: {
+        CowReproProtocolEnum.Presynch_PreSynch.value: {
             0: {'deliver_hormones': ['PGF']},
             14: {'deliver_hormones': ['PGF']},
             25: {'set_presynch_end': True},
