@@ -163,7 +163,7 @@ class GraphGenerator:
             raise e
 
     def _validate_graph_filter(self, graph_details: Dict[str, str | List[str]]
-                               ) -> List[Dict[str, str] | Dict[str, Any]]:
+                               ) -> List[Dict[str, str | Dict[str, str]]]:
         """
         Ensures all the filter keys are valid and if not, raises an error and reports them back to Output Manager.
 
@@ -174,13 +174,13 @@ class GraphGenerator:
 
         Returns
         -------
-        List[Dict[str, str] | Dict[str, Any]]
+        List[Dict[str, str | Dict[str, str]]]
             The logs, warnings, and errors to be reported to OutputManager.
 
         """
         required_graph_filter_keys = ["type", "filters"]
         optional_graph_filter_keys = list(FIGURE_SETTERS.keys()) + list(AXES_SETTERS.keys()) + ["variables"]
-        graph_filter_validation_logs: List[Dict[str, str] | Dict[str, Any]] = []
+        graph_filter_validation_logs: List[Dict[str, str | Dict[str, str]]] = []
         info_map = {
             "class": self.__class__.__name__,
             "function": self._validate_graph_filter.__name__,
@@ -207,7 +207,7 @@ class GraphGenerator:
 
     def _prepare_plot_data(self, filtered_pool: Dict[str, Dict[str, List[Any]]],
                            graph_details: Dict[str, str | List[str]],
-                           ) -> Tuple[Dict[str, List[int | float]], List[Dict[str, str | Dict[str, Any]]]]:
+                           ) -> Tuple[Dict[str, List[int | float]], List[Dict[str, str | Dict[str, str]]]]:
         """Extracts the values from the filtered_pool data and converts them a dictionary
         that graph_generator can more readily handle and records logs, warnings, and errors for
         Output Manager.
@@ -231,7 +231,7 @@ class GraphGenerator:
         }
         selected_variables = graph_details.get("variables")
         title = graph_details.get("title")
-        log_pool: List[Dict[str, str] | Dict[str, Any]] = []
+        log_pool: List[Dict[str, str | Dict[str, str]]] = []
         prepared_pool: Dict[str, List[int | float]] = {}
         for key in filtered_pool.keys():
             values: List[Any] = filtered_pool[key]["values"]
