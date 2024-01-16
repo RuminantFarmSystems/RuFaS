@@ -189,7 +189,7 @@ class GraphGenerator:
             if required_key not in graph_details.keys():
                 graph_filter_validation_logs.append({"error": f"Can't plot {graph_details.get('title')} data set",
                                                      "message": f"Required key '{required_key}' not in your graph "
-                                                     "filter file. ",
+                                                     "filter file.",
                                                      "info_map": info_map})
         if graph_filter_validation_logs:
             return graph_filter_validation_logs
