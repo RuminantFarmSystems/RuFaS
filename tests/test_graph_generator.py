@@ -125,6 +125,7 @@ def test_customize_graph_axes_setters(graph_generator: GraphGenerator) -> None:
 def test_generate_graph_error_found(graph_generator: GraphGenerator) -> None:
     graph_generator._draw_graph = MagicMock()
     graph_generator._customize_graph = MagicMock()
+    graph_generator._validate_graph_filter = MagicMock(return_value=[])
     graph_generator._save_graph = MagicMock(return_value="graph path")
     filtered_pool = {"var1": [1, 2, 3]}
     mock_log_pool = [{"error": "mock_error_message"}]
@@ -145,6 +146,7 @@ def test_generate_graph_success(graph_generator: GraphGenerator) -> None:
     graph_generator._draw_graph = MagicMock()
     graph_generator._customize_graph = MagicMock()
     graph_generator._save_graph = MagicMock(return_value="graph path")
+    graph_generator._validate_graph_filter = MagicMock(return_value=[])
     filtered_pool = {"var1": [1, 2, 3]}
     mock_log_pool = [{"log": "mock_log_message"}]
     mock_prepare_plot_data_return = (filtered_pool, mock_log_pool)
@@ -168,6 +170,7 @@ def test_generate_graph_exception(graph_generator: GraphGenerator) -> None:
     graph_generator._draw_graph = MagicMock()
     graph_generator._customize_graph = MagicMock()
     graph_generator._save_graph = MagicMock(side_effect=Exception)
+    graph_generator._validate_graph_filter = MagicMock(return_value=[])
     filtered_pool = {}
     graph_details = {"type": "plot", "variables": ["var1", "var2"]}
     filter_file_name = "filter_file"
@@ -320,11 +323,12 @@ def test_prepare_plot_data(graph_generator: GraphGenerator,
 @pytest.mark.parametrize(
     "graph_details, expected_length, expected_message",
     [
-        ({"type": "bar", "title": "Valid Graph"}, 0, None),
-        ({"invalid_key": "value", "title": "Invalid Graph"}, 1,
-         "Invalid filter file key 'invalid_key'. Please see wiki for full list of valid filter keys."),
-        ({"type": "stackplot", "filter": ["a", "b"], "invalid_key": "value"}, 2,
-         "Invalid filter file key 'filter'. Please see wiki for full list of valid filter keys."),
+        ({"type": "bar", "title": "Valid Graph", "filters": ["a", "b"], "variables": ["a", "b"]}, 0, None),
+        ({"type": "bar", "title": "Valid Graph", "bad_filters": ["a", "b"], "variables": ["a", "b"]}, 1,
+         "Required key 'filters' not in your graph filter file."),
+        ({"type": "bar", "tightle": "Valid Graph", "filters": ["a", "b"], "variables": ["a", "b"]}, 1,
+         "Invalid filter file key 'tightle' does not matchany optional keys. "
+         "Please see Graph Generator wiki for a list of valid filterkeys."),
     ])
 def test_validate_graph_filter(graph_generator: GraphGenerator, graph_details: Dict[str, str], expected_length: int,
                                expected_message: str):
