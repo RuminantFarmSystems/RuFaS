@@ -4,9 +4,9 @@
     "heiferI_num": 354,
     "heiferII_num": 306,
     "heiferIII_num_springers": 40,
-    "cow_num": 940,
-    "replace_num": 4700,
-    "herd_num": 940,
+    "cow_num": 1086,
+    "replace_num": 5430,
+    "herd_num": 1086,
     "herd_init": false,
     "breed": "HO"
   },
@@ -18,7 +18,7 @@
     "management_decisions": {
       "breeding_start_day_h": 464,
       "heifer_repro_method": "SynchED",
-      "cow_repro_method": "ED-TAI",
+      "cow_repro_method": "ED",
       "semen_type": "conventional",
       "days_in_preg_when_dry": 220,
       "heifer_repro_cull_time": 584,
