@@ -1,0 +1,70 @@
+{
+  "multiple": [
+    {
+      "name": "Last Year's Average Cow Body Weight (kg)",
+      "filters": [
+        "LifeCycleManager.daily_update.avg_cow_body_weight"
+      ],
+      "slice_start": -365
+    },
+    {
+      "name": "Last Year's Average Cow Body Weight (lbs)",
+      "filters": [
+        "LifeCycleManager.daily_update.avg_cow_body_weight"
+      ],
+      "constants": {
+        "Kilograms to Pounds": 2.20462,
+        "Some Adjustment Factor": 0.90
+      },
+      "horizontal_aggregation": "product",
+      "horizontal_order": [
+        "LifeCycleManager.daily_update.avg_cow_body_weight",
+        "Kilograms to Pounds",
+        "Some Adjustment Factor"
+      ],
+      "slice_start": -365
+    },
+    {
+      "name": "Last Year's Average Daily Milk Production (gallons)",
+      "filters": [
+        "LifeCycleManager.daily_update.daily_milk_production"
+      ],
+      "constants": {
+        "Liters to Gallons": 0.264172
+      },
+      "horizontal_aggregation": "product",
+      "horizontal_first": true,
+      "vertical_aggregation": "average",
+      "slice_start": -365
+    },
+    {
+      "name": "Last Year's Average Daily Number of Milking Cows",
+      "filters": [
+        "LifeCycleManager.daily_update.milking_cow_num"
+      ],
+      "vertical_aggregation": "average",
+      "slice_start": -365
+    },
+    {
+      "name": "Last Year's Average Daily Milk Production per Cow (gallons)",
+      "cross_references": [
+        "Last Year's Average Daily Milk Production (gallons)_hor_ver_agg",
+        "Last Year's Average Daily Number of Milking Cows_ver_agg"
+      ],
+      "horizontal_aggregation": "division"
+    },
+    {
+      "name": "90 to 30 days ago Methane Emission from Lactating Cows (grams)",
+      "filters": [
+        "AnimalManager.daily_updates.daily_aggregate_lactating_cow_enteric_methane_g"
+      ],
+      "vertical_aggregation": "sum",
+      "slice_start": -90,
+      "slice_end": -30
+    },
+    {
+      "name": "",
+      "filters": ["Time\\..*"]
+    }
+  ]
+}
