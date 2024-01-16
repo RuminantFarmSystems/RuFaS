@@ -289,7 +289,7 @@ class CropManagement:
                     "species": f"'{self.data.species}'"}
         value = {"crop": self.data.name, "wet_yield": wet_yield_collected, "dry_yield": dry_yield_collected,
                  "nitrogen": nitrogen_harvested, "phosphorus": phosphorus_harvested,
-                 "yield_residue": self.data.yield_residue,
+                 "yield_residue": self.data.yield_residue, "harvest_index": self.data.harvest_index,
                  "planting_date": {"year": self.data.planting_year, "day": self.data.planting_day},
                  "harvest_date": {"year": year, "day": day}}
         om.add_variable("harvest_yield", value, info_map)
