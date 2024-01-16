@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 from RUFAS.general_constants import GeneralConstants
-from RUFAS.routines.manure.constants_and_units.manure_constants import ManureConstants
 from RUFAS.routines.manure.gas_emissions.calculator import (
     GasEmissionsCalculator,
 )
@@ -10,9 +9,6 @@ from RUFAS.routines.manure.manure_treatments.base_manure_treatment import (
 )
 from RUFAS.routines.manure.manure_treatments.manure_treatment_daily_output import (
     ManureTreatmentDailyOutput,
-)
-from RUFAS.routines.manure.protocols.liquid_manure_portion_protocol import (
-    LiquidManurePortionProtocol,
 )
 
 
@@ -23,40 +19,6 @@ class AnaerobicDigestion(BaseManureTreatment):
         Same as BaseManureTreatment.
 
     """
-
-    def _calc_daily_sludge_output(
-        self,
-        daily_output: ManureTreatmentDailyOutput,
-        manure_treatment_daily_input: LiquidManurePortionProtocol,
-    ) -> ManureTreatmentDailyOutput:
-        """Calculates the daily sludge output for the current day."""
-        new_daily_output = daily_output.clone()
-        new_daily_output.sludge_manure_total_solids = (
-            manure_treatment_daily_input.liquid_manure_total_solids
-            * self.config.total_solids_removal_efficiency_for_treatment
-        )
-        new_daily_output.sludge_manure_total_volatile_solids = (
-            manure_treatment_daily_input.liquid_manure_total_volatile_solids
-            * self.config.volatile_solids_removal_efficiency_for_treatment
-        )
-        new_daily_output.sludge_manure_nitrogen = (
-            manure_treatment_daily_input.liquid_manure_nitrogen
-            * self.config.nitrogen_removal_efficiency_for_treatment
-        )
-        new_daily_output.sludge_manure_phosphorus = (
-            manure_treatment_daily_input.liquid_manure_phosphorus
-            * self.config.phosphorus_removal_efficiency_for_treatment
-        )
-        new_daily_output.sludge_manure_potassium = (
-            manure_treatment_daily_input.liquid_manure_potassium
-            * self.config.potassium_removal_efficiency_for_treatment
-        )
-        new_daily_output.sludge_manure_daily_volume = (
-            manure_treatment_daily_input.liquid_manure_total_volatile_solids
-            * 0.03
-            / ManureConstants.MANURE_DENSITY
-        )  # TODO: Use constants instead
-        return new_daily_output
 
     def _daily_update_helper(self) -> ManureTreatmentDailyOutput:
         """Updates the daily output from anaerobic digestion.
@@ -69,9 +31,6 @@ class AnaerobicDigestion(BaseManureTreatment):
         daily_output = self._initialize_daily_output_during_update(daily_input)
         self._accumulate_daily_output(daily_output)
 
-        daily_output = self._calc_daily_sludge_output(
-            daily_output, self._current_manure_treatment_daily_input
-        )
         daily_output = self._calc_anaerobic_digestion_daily_output(daily_output)
         self._accumulate_daily_output(daily_output)
         return daily_output

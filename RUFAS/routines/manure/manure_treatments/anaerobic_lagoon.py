@@ -15,9 +15,6 @@ from RUFAS.routines.manure.manure_treatments.manure_treatment_configs import (
 from RUFAS.routines.manure.manure_treatments.manure_treatment_daily_output import (
     ManureTreatmentDailyOutput,
 )
-from RUFAS.routines.manure.protocols.liquid_manure_portion_protocol import (
-    LiquidManurePortionProtocol,
-)
 
 
 class AnaerobicLagoon(BaseManureTreatment):
@@ -31,40 +28,6 @@ class AnaerobicLagoon(BaseManureTreatment):
         self.storage_time_period = self.config.storage_time_period
         self.freeboard_input = self.config.freeboard_input
         self._accumulated_precipitation_volume = 0.0
-
-    def _calc_daily_sludge_output(
-        self,
-        daily_output: ManureTreatmentDailyOutput,
-        manure_treatment_daily_input: LiquidManurePortionProtocol,
-    ) -> ManureTreatmentDailyOutput:
-        """Calculates the daily sludge output for the current day."""
-        new_daily_output = daily_output.clone()
-        new_daily_output.sludge_manure_total_solids = (
-            manure_treatment_daily_input.liquid_manure_total_solids
-            * self.config.total_solids_removal_efficiency_for_treatment
-        )
-        new_daily_output.sludge_manure_total_volatile_solids = (
-            manure_treatment_daily_input.liquid_manure_total_volatile_solids
-            * self.config.volatile_solids_removal_efficiency_for_treatment
-        )
-        new_daily_output.sludge_manure_nitrogen = (
-            manure_treatment_daily_input.liquid_manure_nitrogen
-            * self.config.nitrogen_removal_efficiency_for_treatment
-        )
-        new_daily_output.sludge_manure_phosphorus = (
-            manure_treatment_daily_input.liquid_manure_phosphorus
-            * self.config.phosphorus_removal_efficiency_for_treatment
-        )
-        new_daily_output.sludge_manure_potassium = (
-            manure_treatment_daily_input.liquid_manure_potassium
-            * self.config.potassium_removal_efficiency_for_treatment
-        )
-        new_daily_output.sludge_manure_daily_volume = (
-            manure_treatment_daily_input.liquid_manure_total_volatile_solids
-            * 0.03
-            / ManureConstants.MANURE_DENSITY
-        )  # TODO: Use constants instead
-        return new_daily_output
 
     def _update_methane_emission(
         self, daily_output: ManureTreatmentDailyOutput
@@ -160,9 +123,6 @@ class AnaerobicLagoon(BaseManureTreatment):
         )
         daily_output.set_daily_final_manure_volume(adjusted_daily_final_manure_volume)
 
-        daily_output = self._calc_daily_sludge_output(
-            daily_output, self._current_manure_treatment_daily_input
-        )
         self._accumulated_output = self._adjust_accumulated_output(daily_output)
         self._accumulated_precipitation_volume += self.precipitation_volume
 
