@@ -1971,7 +1971,7 @@ def test_get_ration_vals():
 @pytest.mark.parametrize(
     "ration_config, expected",
     [(lazy_fixture("mock_ration_config"), 13.687246), (lazy_fixture("mock_random_ration_config"), 27.327894),
-     (lazy_fixture("mock_ration_config_alternate"), -15)],
+     (lazy_fixture("mock_ration_config_alternate"), 13.090926280)],
 )
 def test_total_energy(ration_config, expected, decision_vector) -> None:
     """Unit test for function total_energy in file routines/animal/ration/ration_optimizer.py"""
@@ -1983,7 +1983,8 @@ def test_total_energy(ration_config, expected, decision_vector) -> None:
 @pytest.mark.parametrize(
     "ration_config, expected",
     [(lazy_fixture("mock_ration_config"), -15),
-     (lazy_fixture("mock_random_ration_config"), -11.375)],
+     (lazy_fixture("mock_random_ration_config"), -11.375),
+     (lazy_fixture("mock_ration_config_alternate"), -15)],
 )
 def test_total_energy_no_dry_matter_intake(ration_config, expected) -> None:
     """Unit test for function total_energy in file routines/animal/ration/ration_optimizer.py"""
@@ -2089,6 +2090,18 @@ def test_NEmact_constraint(ration_config, expected, decision_vector) -> None:
 
     assert actual == pytest.approx(expected)
 
+
+@pytest.mark.parametrize(
+    "ration_config, expected",
+    [(lazy_fixture("mock_ration_config"), -3.0), (lazy_fixture("mock_random_ration_config"), -5.272)],
+)
+def test_NEmact_constraint_noDMI(ration_config, expected) -> None:
+    """Unit test for function NEmact_constraint in file routines/animal/ration/ration_optimizer.py"""
+    ration_optimizer = RationOptimizer()
+    decision_vector = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+    actual = ration_optimizer.NEmact_constraint(decision_vector, ration_config)
+
+    assert actual == pytest.approx(expected)
 
 @pytest.mark.parametrize(
     "ration_config, expected",
