@@ -11,6 +11,7 @@ DEFAULT_SCHEMA_OUTPUT_PATH: Path = Path("data_collection_app_schemas")
 
 om = OutputManager()
 
+
 class SchemaGenerator:
     """
     This class provides a suite of methods for automatically updating the JSON schemas for the Data Collection App based

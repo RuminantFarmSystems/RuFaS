@@ -705,7 +705,8 @@ def test_parse_gnu_args(mocker: MockerFixture) -> None:
         mocker.call(
             "-gs",
             "--generate-schemas",
-            help="Select this flag to generate input schemas for the data collection app instead of running a simulation.",
+            help="Select this flag to generate input schemas for the data collection app instead of running a "
+                 "simulation.",
             action="store_true",
         )
     ]
