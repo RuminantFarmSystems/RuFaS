@@ -1044,6 +1044,7 @@
         "type": "array",
         "description": "calves data",
         "properties": {
+          "type": "object",
           "id": {
             "type": "number",
             "description": "Unique integer identifier.",
@@ -1094,6 +1095,7 @@
         "type": "array",
         "description": "heiferIs data",
         "properties": {
+        "type": "object",
           "id": {
             "type": "number",
             "description": "Unique integer identifier.",
@@ -1143,6 +1145,7 @@
         "type": "array",
         "description": "heiferIIs data",
         "properties": {
+          "type": "object",
           "id": {
             "type": "number",
             "description": "Unique integer identifier.",
@@ -1273,6 +1276,7 @@
         "type": "array",
         "description": "heiferIIIs data",
         "properties": {
+        "type": "object",
           "id": {
             "type": "number",
             "description": "Unique integer identifier.",
@@ -1403,6 +1407,7 @@
         "type": "array",
         "description": "cows data",
         "properties": {
+          "type": "object",
           "id": {
             "type": "number",
             "description": "Unique integer identifier.",
@@ -1563,6 +1568,7 @@
         "type": "array",
         "description": "replacement cows data",
         "properties": {
+          "type": "object",
           "id": {
             "type": "number",
             "description": "Unique integer identifier.",
@@ -3167,27 +3173,25 @@
         "type": "array",
         "properties": {
           "type": "object",
-          "properties": {
-            "manure_handler_type": {
-              "type": "string",
-              "description": "Manure Handling Method -- Method for cleaning barn alleyways.",
-              "pattern": "^(flush system|alley scraper|manual scraping|tillage|manual skid steer scraping)$"
-            },
-            "cleaning_water_use_rate": {
-              "type": "number"
-            },
-            "minutes_per_cleaning": {
-              "type": "number"
-            },
-            "cleanings_per_day": {
-              "type": "number"
-            },
-            "cleaning_water_recycle_fraction": {
-              "type": "number",
-              "description": "Fraction of cleaning water that is from recycled (not fresh) water sources.",
-              "minimum": 0.0,
-              "maximum": 1.0
-            }
+          "manure_handler_type": {
+            "type": "string",
+            "description": "Manure Handling Method -- Method for cleaning barn alleyways.",
+            "pattern": "^(flush system|alley scraper|manual scraping|tillage|manual skid steer scraping)$"
+          },
+          "cleaning_water_use_rate": {
+            "type": "number"
+          },
+          "minutes_per_cleaning": {
+            "type": "number"
+          },
+          "cleanings_per_day": {
+            "type": "number"
+          },
+          "cleaning_water_recycle_fraction": {
+            "type": "number",
+            "description": "Fraction of cleaning water that is from recycled (not fresh) water sources.",
+            "minimum": 0.0,
+            "maximum": 1.0
           }
         }
       },
