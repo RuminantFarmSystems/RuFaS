@@ -551,93 +551,19 @@ def mock_random_ration_config() -> MagicMock:
 
 
 @pytest.fixture
-def mock_ration_config_alternate_lowTDN() -> MagicMock:
-    ration_config = MagicMock()
-    ration_config.price_list = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0]
-    ration_config.n = 6
-    ration_config.NEmaint_requirement = 1.0
-    ration_config.NEa_requirement = 2.0
-    ration_config.NEpreg_requirement = 3.0
-    ration_config.NEl_requirement = 4.0
-    ration_config.NEg_requirement = 5.0
-    ration_config.MP_requirement = 6.0
-    ration_config.C_requirement = 7.0
-    ration_config.P_requirement = 8.0
-    ration_config.TDN_list = [0.001, 0.001, 0.001, 0.001, 0.001, 0.001]
-    ration_config.DE_list = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0]
-    ration_config.EE_list = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0]
-    ration_config.is_fat_list = [False, True, True, False, False, False]
-    ration_config.BW = 9.0
-    ration_config.calcium_list = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0]
-    ration_config.phosphorus_list = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0]
-    ration_config.NDF_list = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0]
-    ration_config.feed_type_list = ["Forage", "Conc", "Mineral", "Forage", "Conc", "Mineral"]
-    ration_config.is_wetforage_list = [True, True, True, False, False, False]
-    ration_config.Kd_list = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0]
-    ration_config.N_A_list = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0]
-    ration_config.N_B_list = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0]
-    ration_config.CP_list = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0]
-    ration_config.dRUP_list = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0]
-    ration_config.feed_limit_list = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0]
-    ration_config.lactating = True
-    ration_config.DMIest_requirement = 10.0
+def mock_ration_config_alternate_lowTDN(mock_ration_config) -> MagicMock:
+    mock_ration_config.TDN_list = [0.001, 0.001, 0.001, 0.001, 0.001, 0.001]
+    mock_ration_config.is_fat_list = [False, True, True, False, False, False]
 
-    ration_config.NElact_list = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0]
-    ration_config.MEact_list = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0]
-    ration_config.NEgact_list = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0]
-    ration_config.NEm_act_list = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0]
-    ration_config.is_forage_list = [1, 1, 1, 0, 0, 0]
-    ration_config.MPbact = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0]
-    ration_config.RUP_diet = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0]
-    ration_config.dP_list = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0]
-    ration_config.TDNact_list = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0]
-
-    return ration_config
+    return mock_ration_config
 
 
 @pytest.fixture
-def mock_ration_config_alternate_highTDN() -> MagicMock:
-    ration_config = MagicMock()
-    ration_config.price_list = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0]
-    ration_config.n = 6
-    ration_config.NEmaint_requirement = 1.0
-    ration_config.NEa_requirement = 2.0
-    ration_config.NEpreg_requirement = 3.0
-    ration_config.NEl_requirement = 4.0
-    ration_config.NEg_requirement = 5.0
-    ration_config.MP_requirement = 6.0
-    ration_config.C_requirement = 7.0
-    ration_config.P_requirement = 8.0
-    ration_config.TDN_list = [100, 100, 100, 100, 100, 100]
-    ration_config.DE_list = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0]
-    ration_config.EE_list = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0]
-    ration_config.is_fat_list = [False, True, True, False, False, False]
-    ration_config.BW = 9.0
-    ration_config.calcium_list = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0]
-    ration_config.phosphorus_list = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0]
-    ration_config.NDF_list = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0]
-    ration_config.feed_type_list = ["Forage", "Conc", "Mineral", "Forage", "Conc", "Mineral"]
-    ration_config.is_wetforage_list = [True, True, True, False, False, False]
-    ration_config.Kd_list = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0]
-    ration_config.N_A_list = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0]
-    ration_config.N_B_list = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0]
-    ration_config.CP_list = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0]
-    ration_config.dRUP_list = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0]
-    ration_config.feed_limit_list = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0]
-    ration_config.lactating = True
-    ration_config.DMIest_requirement = 10.0
+def mock_ration_config_alternate_highTDN(mock_ration_config) -> MagicMock:
+    mock_ration_config.TDN_list = [100, 100, 100, 100, 100, 100]
+    mock_ration_config.is_fat_list = [False, True, True, False, False, False]
 
-    ration_config.NElact_list = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0]
-    ration_config.MEact_list = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0]
-    ration_config.NEgact_list = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0]
-    ration_config.NEm_act_list = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0]
-    ration_config.is_forage_list = [1, 1, 1, 0, 0, 0]
-    ration_config.MPbact = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0]
-    ration_config.RUP_diet = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0]
-    ration_config.dP_list = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0]
-    ration_config.TDNact_list = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0]
-
-    return ration_config
+    return mock_ration_config
 
 
 @pytest.fixture
@@ -651,6 +577,12 @@ def mock_ration_config_with_no_NElact_list(mock_ration_config) -> MagicMock:
 @pytest.fixture
 def mock_ration_config_with_empty_NEgact_list(mock_ration_config) -> MagicMock:
     mock_ration_config.NEgact_list = None
+    return mock_ration_config
+
+
+@pytest.fixture
+def mock_ration_config_modified_feed_type(mock_ration_config) -> MagicMock:
+    mock_ration_config.feed_type_list = ["something", "something", "something", "something", "something", "something"]
     return mock_ration_config
 
 
@@ -2195,7 +2127,7 @@ def test_NEl_constraint(ration_config, expected, decision_vector) -> None:
     "ration_config, expected",
     [
         (lazy_fixture("mock_ration_config"), 86.0),
-        (lazy_fixture('mock_ration_config_with_empty_NEgact_list'), 16.0),
+        (lazy_fixture('mock_ration_config_with_empty_NEgact_list'), 18.98220),
         (lazy_fixture("mock_random_ration_config"), 63.349999999999994),
     ],
 )
@@ -2210,7 +2142,8 @@ def test_NEgact_constraint(ration_config, expected, decision_vector) -> None:
 
 @pytest.mark.parametrize(
     "ration_config, expected",
-    [(lazy_fixture("mock_ration_config"), 0.6455), (lazy_fixture("mock_random_ration_config"), 0.245465)],
+    [(lazy_fixture("mock_ration_config"), 0.6455), (lazy_fixture("mock_random_ration_config"), 0.245465),
+     (lazy_fixture("mock_ration_config_modified_feed_type"), -0.007)],
 )
 def test_calcium_constraint(ration_config, expected, decision_vector) -> None:
     """Unit test for function calcium_constraint in file routines/animal/ration/ration_optimizer.py"""
@@ -2223,7 +2156,8 @@ def test_calcium_constraint(ration_config, expected, decision_vector) -> None:
 
 @pytest.mark.parametrize(
     "ration_config, expected",
-    [(lazy_fixture("mock_ration_config"), 0.6638), (lazy_fixture("mock_random_ration_config"), 0.374025)],
+    [(lazy_fixture("mock_ration_config"), 0.6638), (lazy_fixture("mock_random_ration_config"), 0.374025),
+     (lazy_fixture("mock_ration_config_modified_feed_type"), -0.008)],
 )
 def test_phosphorus_constraint(ration_config, expected, decision_vector) -> None:
     """Unit test for function phosphorus_constraint in file routines/animal/ration/ration_optimizer.py"""
