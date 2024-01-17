@@ -1979,7 +1979,13 @@
               },
               "infoText": "Pen Type select one) -- The type of stalls the pen has"
             },
-            "default": "freestall"
+            "default": "freestall",
+            "enum": [
+              "freestall",
+              "tiestall",
+              "drylot"
+            ],
+            "format": "select2"
           },
           "max_stocking_density": {
             "title": "max_stocking_density",
