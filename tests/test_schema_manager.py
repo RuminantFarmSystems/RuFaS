@@ -3,7 +3,7 @@ from pytest_mock import MockerFixture
 from unittest.mock import patch
 from typing import Any
 
-from RUFAS.schema_manager import SchemaManager
+from RUFAS.schema_manager import SchemaGenerator
 
 
 @pytest.mark.parametrize("pattern,expected", [
@@ -13,7 +13,7 @@ from RUFAS.schema_manager import SchemaManager
 ])
 def test_get_list_of_options(pattern: str, expected: list[str]) -> None:
     """Tests that list of options are produced correctly from a Regex filter."""
-    actual = SchemaManager._get_list_of_options(pattern)
+    actual = SchemaGenerator._get_list_of_options(pattern)
     assert actual == expected
 
 
@@ -26,7 +26,7 @@ def test_get_list_of_options(pattern: str, expected: list[str]) -> None:
 def test_get_list_of_options_error(pattern: str) -> None:
     """Tests that an incorrectly structured Regex pattern produces an error."""
     with pytest.raises(ValueError):
-        SchemaManager._get_list_of_options(pattern)
+        SchemaGenerator._get_list_of_options(pattern)
 
 
 @pytest.mark.parametrize("title,properties,schema", [
@@ -53,9 +53,9 @@ def test_get_list_of_options_error(pattern: str) -> None:
 def test_setup_string_schema(mocker: MockerFixture, title: str, properties: dict[str, Any],
                              schema: dict[str, Any]) -> None:
     """Tests that setup string schema correctly handles a valid string property."""
-    mocked_get_options = mocker.patch.object(SchemaManager, "_get_list_of_options", return_value=["one", "two"])
+    mocked_get_options = mocker.patch.object(SchemaGenerator, "_get_list_of_options", return_value=["one", "two"])
 
-    actual = SchemaManager.setup_string_schema(title, properties)
+    actual = SchemaGenerator.setup_string_schema(title, properties)
 
     assert mocked_get_options.call_count == 1
     assert actual == schema
@@ -84,11 +84,11 @@ def test_setup_string_schema(mocker: MockerFixture, title: str, properties: dict
 def test_setup_string_schema_value_error(mocked_print, mocker: MockerFixture, title: str, properties: dict[str, Any],
                                          schema: dict[str, Any]) -> None:
     """Tests that setup_string_schema handles value errors appropriately."""
-    mocked_get_options = mocker.patch.object(SchemaManager, "_get_list_of_options", side_effect=ValueError(
+    mocked_get_options = mocker.patch.object(SchemaGenerator, "_get_list_of_options", side_effect=ValueError(
         "'[12][019][0-9]{2}:(?:[1-9]|[1-9][0-9]|[12][0-9]{2}|3[0-5][0-9]|36[0-6])$' is not a valid pattern. Cannot "
         "create list of valid options."))
 
-    actual = SchemaManager.setup_string_schema(title, properties)
+    actual = SchemaGenerator.setup_string_schema(title, properties)
 
     assert mocked_get_options.call_count == 1
     mocked_print.assert_called_once_with("'[12][019][0-9]{2}:(?:[1-9]|[1-9][0-9]|[12][0-9]{2}|3[0-5][0-9]|36[0-6])$' is"
@@ -120,7 +120,7 @@ def test_setup_string_schema_value_error(mocked_print, mocker: MockerFixture, ti
 ])
 def test_setup_number_schema(title: str, properties: dict[str, Any], schema: dict[str, Any]) -> None:
     """Tests that number schema are setup correctly."""
-    actual = SchemaManager.setup_number_schema(title, properties)
+    actual = SchemaGenerator.setup_number_schema(title, properties)
     assert actual == schema
 
 
@@ -145,7 +145,7 @@ def test_setup_number_schema(title: str, properties: dict[str, Any], schema: dic
 ])
 def test_setup_bool_schema(title: str, properties: dict[str, Any], schema: dict[str, Any]) -> None:
     """Tests that boolean schema are setup correctly."""
-    actual = SchemaManager.setup_bool_schema(title, properties)
+    actual = SchemaGenerator.setup_bool_schema(title, properties)
     assert actual == schema
 
 
@@ -186,7 +186,7 @@ def test_setup_bool_schema(title: str, properties: dict[str, Any], schema: dict[
 ])
 def test_setup_array_schema(title: str, properties: dict[str, Any], schema: dict[str, Any]) -> None:
     """Tests that array schema is setup correctly."""
-    actual = SchemaManager.setup_array_schema(title, properties)
+    actual = SchemaGenerator.setup_array_schema(title, properties)
 
     assert actual == schema
 
@@ -227,6 +227,6 @@ def test_setup_array_schema(title: str, properties: dict[str, Any], schema: dict
 ])
 def test_setup_object_schema(title: str, properties: dict[str, Any], schema: dict[str, Any]) -> None:
     """Tests that object schema are setup correctly."""
-    actual = SchemaManager.setup_object_schema(title, properties)
+    actual = SchemaGenerator.setup_object_schema(title, properties)
 
     assert actual == schema

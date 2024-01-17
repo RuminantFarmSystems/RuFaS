@@ -3,10 +3,15 @@ from pathlib import Path
 from typing import Any, Callable
 import re
 
+from RUFAS.output_manager import OutputManager
 from RUFAS.util import Utility
 
+DEFAULT_PROPERTIES_PATH: Path = Path("").joinpath("input", "metadata", "default_metadata.json")
+DEFAULT_SCHEMA_OUTPUT_PATH: Path = Path("data_collection_app_schemas")
 
-class SchemaManager:
+om = OutputManager()
+
+class SchemaGenerator:
     """
     This class provides a suite of methods for automatically updating the JSON schemas for the Data Collection App based
     on the properties contained in the metadata.
@@ -25,6 +30,43 @@ class SchemaManager:
         Creates the JSON editor schema for an 'object' type.
 
     """
+
+    def generate_schemas(self, path_to_properties: str | None, path_to_schema_outputs: str | None) -> None:
+        """Routine that will update schemas for the Data Collection App."""
+        info_map = {
+            "class": self.__class__.__name__,
+            "function": self.generate_schemas.__name__
+        }
+
+        path_to_properties = path_to_properties if path_to_properties else DEFAULT_PROPERTIES_PATH
+
+        log_title = "schema_generator_initialization"
+        log_message = f"Creating new schemas from metadata properties in '{path_to_properties}'."
+        om.add_log(log_title, log_message, info_map)
+
+        schema_output_path = path_to_schema_outputs if path_to_schema_outputs else DEFAULT_SCHEMA_OUTPUT_PATH
+        keep_list = [".keep"]
+        Utility.empty_dir(schema_output_path, keep_list)
+
+        with open(path_to_properties) as metadata:
+            metadata_dict = json.load(metadata)
+
+        properties = metadata_dict["properties"]
+
+        for key in properties.keys():
+            try:
+                new_schema = SchemaGenerator.setup_object_schema(key, properties[key])
+            except Exception as e:
+                print(f"Key: '{key}' raised exception: {str(e)}")
+                continue
+
+            schema_name = key.replace("properties", "schema")
+            new_schema_file_name = f"{schema_name}.json"
+            new_schema_file_path = Path.joinpath(schema_output_path, new_schema_file_name)
+            print(new_schema_file_path)
+
+            with open(new_schema_file_path, "w") as outfile:
+                json.dump(new_schema, outfile, indent=2)
 
     @staticmethod
     def setup_number_schema(title: str, input_properties: dict[str, Any]) -> dict[str, Any]:
@@ -99,7 +141,7 @@ class SchemaManager:
             schema["options"]["infoText"] = description
         if pattern is not None:
             try:
-                enum = SchemaManager._get_list_of_options(pattern)
+                enum = SchemaGenerator._get_list_of_options(pattern)
             except ValueError as e:
                 print(str(e))
                 return schema
@@ -140,7 +182,7 @@ class SchemaManager:
             schema["options"]["infoText"] = description
 
         element_properties = input_properties["properties"]
-        element_schema_creator = SchemaManager.DATA_TYPE_TO_SCHEMA_SETUP_MAP[element_properties["type"]]
+        element_schema_creator = SchemaGenerator.DATA_TYPE_TO_SCHEMA_SETUP_MAP[element_properties["type"]]
         element_title = title + "_element"
         element_property_dictionary = element_schema_creator(element_title, element_properties)
         schema["items"] = element_property_dictionary
@@ -169,7 +211,7 @@ class SchemaManager:
 
         for key in keys:
             sub_property = input_properties[key]
-            schema_setup_method = SchemaManager.DATA_TYPE_TO_SCHEMA_SETUP_MAP[sub_property["type"]]
+            schema_setup_method = SchemaGenerator.DATA_TYPE_TO_SCHEMA_SETUP_MAP[sub_property["type"]]
             sub_property_schema = schema_setup_method(key, sub_property)
             schema["properties"][key] = sub_property_schema
 
@@ -182,37 +224,3 @@ class SchemaManager:
         "array": setup_array_schema,
         "object": setup_object_schema
     }
-
-
-PROPERTIES_PATH: Path = Path("").joinpath("input", "metadata", "default_metadata.json")
-
-
-def main() -> None:
-    """Routine that will update schemas for the Data Collection App."""
-    schema_dir_path = Path("output").joinpath("schemas")
-    keep_list = [".keep"]
-    Utility.empty_dir(schema_dir_path, keep_list)
-
-    with open(PROPERTIES_PATH) as metadata:
-        metadata_dict = json.load(metadata)
-
-    properties = metadata_dict["properties"]
-
-    for key in properties.keys():
-        try:
-            new_schema = SchemaManager.setup_object_schema(key, properties[key])
-        except Exception as e:
-            print(f"Key: '{key}' raised exception: {str(e)}")
-            continue
-
-        schema_name = key.replace("properties", "schema")
-        new_schema_file_name = f"{schema_name}.json"
-        new_schema_file_path = Path.joinpath(schema_dir_path, new_schema_file_name)
-        print(new_schema_file_path)
-
-        with open(new_schema_file_path, "w") as outfile:
-            json.dump(new_schema, outfile, indent=2)
-
-
-if __name__ == "__main__":
-    main()
