@@ -449,7 +449,7 @@ class AnimalModuleReporter:
                 om.add_variable("parity", "NA", info_map)
 
     def report_sold_animal_information_sort_by_sell_day(
-        sold_animals, report_name: str
+        sold_animals, report_name: str, total_days: int
     ) -> None:
         """
         Adds a dictionary of sold animal information to the output manager on daily basis.
@@ -460,7 +460,8 @@ class AnimalModuleReporter:
             Instance of Class AnimalManager.
         report_name : str
             The string to be appended to the variable being reported to the OM.
-
+        total_days : int
+            The total number of days in the simulation
         """
 
         info_map = {
@@ -482,7 +483,9 @@ class AnimalModuleReporter:
             else:
                 daily_sell[animal.sold_at_day] = [animal]
 
-        for day in range(sold_at_day_min, sold_at_day_max + 1):
+        om.add_variable(f"{report_name}_first_sell_event", sold_at_day_min, info_map)
+        om.add_variable(f"{report_name}_last_sell_event", sold_at_day_max, info_map)
+        for day in range(total_days):
             if daily_sell.get(day):
                 sold_count = len(daily_sell[day])
                 sold_weight = sum(
@@ -544,7 +547,7 @@ class AnimalModuleReporter:
             if pen.animal_combination.name == "LAC_COW":
                 AnimalModuleReporter.report_milk(pen, animal_manager.simulation_day)
 
-    def report_end_of_simulation(animal_manager) -> None:
+    def report_end_of_simulation(animal_manager, total_days: int) -> None:
         """
         Calls all reporter methods that should happen at the end of the simulation.
 
@@ -552,14 +555,18 @@ class AnimalModuleReporter:
         ----------
         animal_manager : AnimalManager
             Instance of AnimalManager class.
+        total_days : int
+            The total number of days in the simulation
         """
         AnimalModuleReporter.report_sold_animal_information(animal_manager)
         AnimalModuleReporter.report_sold_animal_information_sort_by_sell_day(
-            animal_manager.life_cycle_manager.sold_heiferIIs, "heiferII"
+            animal_manager.life_cycle_manager.sold_heiferIIs, "heiferII", total_days
         )
         AnimalModuleReporter.report_sold_animal_information_sort_by_sell_day(
-            animal_manager.life_cycle_manager.sold_heiferIIIs, "heiferIII"
+            animal_manager.life_cycle_manager.sold_heiferIIIs, "heiferIII", total_days
         )
         AnimalModuleReporter.report_sold_animal_information_sort_by_sell_day(
-            animal_manager.life_cycle_manager.sold_and_died_cows, "sold_and_died_cows"
+            animal_manager.life_cycle_manager.sold_and_died_cows,
+            "sold_and_died_cows",
+            total_days,
         )

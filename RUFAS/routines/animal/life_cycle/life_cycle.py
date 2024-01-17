@@ -1006,7 +1006,7 @@ class LifeCycleManager:
     def _handle_new_born(self, sim_day: int, cow: Cow, calves_born: List[Calf]) -> None:
         args = {
             "id": self.animal_population.next_id(),
-            "breed": "HO",
+            "breed": im.get_data("animal.herd_information.breed"),
             "birth_date": sim_day,
             "days_born": 0,
             "p_init": cow.p_gest_for_calf,
@@ -1026,7 +1026,6 @@ class LifeCycleManager:
             new_calf.events.add_event(
                 new_calf.days_born, sim_day, animal_constants.ENTER_HERD
             )
-            # calves.append(new_calf)
             calves_born.append(new_calf)
         if new_calf.sold:
             self.sold_calf_num += 1
