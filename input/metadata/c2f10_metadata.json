@@ -45,7 +45,7 @@
     "feed": {
       "title": "Feed data",
       "description": "Those cows need to eat!",
-      "path": "input/data/feed/c2f10_feed.json",
+      "path": "input/data/feed/FARMES23_West_default.json",
       "type": "json",
       "properties": "feed_properties"
     },
