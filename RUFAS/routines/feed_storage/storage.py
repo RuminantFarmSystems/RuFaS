@@ -1,6 +1,5 @@
 import copy
 from typing import List
-from RUFAS.time import Time
 from .enums import CropCategory, CropType
 from .harvested_crop import HarvestedCrop
 
@@ -52,7 +51,7 @@ class Storage:
         """The total mass (kg) of currently stored crops"""
         return sum(crop.fresh_mass for crop in self.stored)
 
-    def receive_crop(self, crop: HarvestedCrop, time: Time) -> None:
+    def receive_crop(self, crop: HarvestedCrop) -> None:
         """
         Receives a harvested crop and adds it to the storage.
 
@@ -60,8 +59,6 @@ class Storage:
         ----------
         crop : HarvestedCrop
             The harvested crop to be added to the storage.
-        time : Time
-            An instance of the Time class, needed to set storage time.
 
         Returns
         -------
@@ -92,7 +89,6 @@ class Storage:
                     exceeds the storage capacity ({self.capacity})"
             )
         storage_crop = copy.deepcopy(crop)
-        storage_crop.storage_time = time
         self.stored.append(storage_crop)
 
     def process_degradations(self):
