@@ -212,6 +212,8 @@ def test_run_rufas(
     )
 
     # Assert
+    mock_output_manager.set_log_verbose.assert_called_once_with(verbose)
+
     if load_pool:
         patch_run_load_vars_pool.assert_called_once_with(
             vars_file_path,

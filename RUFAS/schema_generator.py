@@ -82,7 +82,7 @@ class SchemaGenerator:
             new_schema_file_path = Path.joinpath(schema_output_path, new_schema_file_name)
 
             log_title = "Schema generator writing new schema"
-            log_message = f"Writing new schema in {new_schema}"
+            log_message = f"Writing new schema in {new_schema_file_path}"
             om.add_log(log_title, log_message, info_map)
 
             with open(new_schema_file_path, "w") as outfile:

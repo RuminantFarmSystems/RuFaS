@@ -128,6 +128,7 @@ def run_rufas(
     sys.stdout.write("RuFaS: Ruminant Farm Systems Model 2023\n")
 
     output_manager = OutputManager()
+    output_manager.set_log_verbose(verbose)
     output_manager.create_directory(output_dir)
 
     if load_pool:
@@ -142,10 +143,7 @@ def run_rufas(
     if generate_schemas:
         log_title = "Generating schemas"
         log_message = "Main routine generating new input schemas for the Data Collection App."
-        info_map = {
-            "class": "main",
-            "function": "run_rufas"
-        }
+        info_map = {"class": "main", "function": "run_rufas"}
         output_manager.add_log(log_title, log_message, info_map)
 
         schema_generator = SchemaGenerator()
