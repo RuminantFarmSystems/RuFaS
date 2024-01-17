@@ -446,12 +446,6 @@ def test_init_nutrient_rqmts(mocker: MockerFixture) -> None:
         animals = getattr(mock_animal_manager, animal_type)
         for animal in animals:
             assert getattr(animal, 'p_animal') == target_p_animal
-    # if animal_type == 'calves':
-    #     animal.calc_nutrient_rqmts.assert_called_with(mock_feed, 27)
-    # elif animal_type in ['heiferIs', 'heiferIIs', 'heiferIIIs']:
-    #     animal.set_nutrient_rqmts.assert_called_with(27, None)
-    # elif animal_type == 'cows':
-    #     animal.set_nutrient_rqmts.assert_called_with(None)
 
 
 def test_avg_pen_dist(animal_manager_with_mock_pens: AnimalManager) -> None:
@@ -463,9 +457,32 @@ def test_avg_pen_dist(animal_manager_with_mock_pens: AnimalManager) -> None:
     assert actual == pytest.approx(expected)
 
 
-def test_calc_nutrient_rqmts():
+def test_calc_nutrient_rqmts(mocker: MockerFixture) -> None:
     """Unit test for function calc_nutrient_rqmts in file routines/animal/animal_manager.py"""
-    pass
+    mocker.patch('RUFAS.routines.animal.animal_manager.AnimalManager.__init__', return_value=None)
+    mock_animal_manager = AnimalManager()
+    mock_animal_manager.ANIMAL_GROUPING_SCENARIO = None
+    mock_animal_manager.all_pens = [MagicMock(), MagicMock()]
+    mock_animal_manager.all_pens[0].pen = 0
+    mock_animal_manager.all_pens[1].pen = 1
+    mock_animal_manager.all_pens[-1].ration_nutrient_conc = 1.0
+    mock_animal_manager.all_pens[-1].MEdiet = 2.0
+    mock_animal_manager.all_pens[-1].dry_matter_intake = 3.0
+    mock_animals = [MagicMock(), MagicMock()]
+    for animal in mock_animals:
+        animal.calc_nutrient_rqmts = MagicMock()
+        animal.set_nutrient_rqmts = MagicMock()
+    animal_types = ['calves', 'heiferIs', 'heiferIIs', 'heiferIIIs', 'cows']
+    for animal_type in animal_types:
+        setattr(mock_animal_manager, animal_type, mock_animals)
+    mock_feed = MagicMock()
+
+    # act
+    mock_animal_manager.calc_nutrient_rqmts(mock_feed, current_temperature=27)
+
+    # assert
+    assert 1 == animal.calc_nutrient_rqmts.call_count
+    assert 4 == animal.set_nutrient_rqmts.call_count
 
 
 def test_fully_update_animal_to_pen_id_map():
