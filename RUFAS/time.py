@@ -69,7 +69,7 @@ class Time:
             bool: True if it is the end of a year, False otherwise
         """
 
-        return self.day >= len(self.years[self.year - 1])
+        return self.day > len(self.years[self.year - 1])
 
     def end_simulation(self):
         """

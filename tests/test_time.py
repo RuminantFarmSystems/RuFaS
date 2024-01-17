@@ -45,6 +45,12 @@ def test_advance(mock_config: Config) -> None:
     # second round of advance, move to a new year
     time.advance()
     assert time.index == 2
+    assert time.day == 4
+    assert time.year == 1
+    assert time.calendar_year == 1999
+
+    time.advance()
+    assert time.index == 3
     assert time.day == 1
     assert time.year == 2
     assert time.calendar_year == 2000
@@ -53,6 +59,8 @@ def test_advance(mock_config: Config) -> None:
 def test_end_year(mock_config: Config) -> None:
     """Tests that Time instances correctly determine if it is the end of a year."""
     time = Time(mock_config)
+    assert not time.end_year()
+    time.advance()
     assert not time.end_year()
     time.advance()
     assert time.end_year()
@@ -72,6 +80,9 @@ def test_end_simulation(mock_config: Config) -> None:
 
     # case when year out of range
     time.advance()
+    assert not time.end_simulation()
+
+    time.advance()
     assert time.end_simulation()
 
 
@@ -86,6 +97,7 @@ def test_record_time(mock_config: Config) -> None:
 def test_is_last_day_of_simulation(mock_config: Config) -> None:
     """Tests that Time instances correctly determine if current day is last day of a simulation."""
     time = Time(mock_config)
+    time.advance()
     time.advance()
     time.advance()
     assert time.is_last_day_of_simulation
