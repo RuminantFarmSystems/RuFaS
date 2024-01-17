@@ -19,6 +19,8 @@ class SchemaGenerator:
 
     Methods
     -------
+    generate_schemas(path_to_properties, path_to_schemas)
+        Manages the I/0 and subroutines of creating new schemas.
     setup_number_schema(title, input_properties)
         Creates the JSON editor schema for a 'number' type.
     setup_bool_schema(title, input_properties)
@@ -33,7 +35,19 @@ class SchemaGenerator:
     """
 
     def generate_schemas(self, path_to_properties: str | None, path_to_schema_outputs: str | None) -> None:
-        """Routine that will update schemas for the Data Collection App."""
+        """
+        Produces updated schemas for the Data Collection App.
+
+        Parameters
+        ----------
+        path_to_properties : str | None
+            Path to the metadata properties from which the schemas will be generated. If None, then a default path will
+            be used.
+        path_to_schema_outputs : str | None
+            Path to the location where the schemas should be written to. If None, then the schemas will be put in a
+            default location.
+
+        """
         info_map = {
             "class": self.__class__.__name__,
             "function": self.generate_schemas.__name__
@@ -149,7 +163,6 @@ class SchemaGenerator:
             try:
                 enum = SchemaGenerator._get_list_of_options(pattern)
             except ValueError as e:
-                print(str(e))
                 return schema
             schema["enum"] = enum
             schema["format"] = "select2"
