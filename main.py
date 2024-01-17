@@ -415,6 +415,7 @@ def execute_simulations(
     }
     sys.stdout.write("Simulating...\n")
     output_manager = OutputManager()
+    output_manager.set_log_verbose(verbose)
     input_manager = InputManager()
     for metadata_file in metadata_files:
         input_manager.flush_pool()
