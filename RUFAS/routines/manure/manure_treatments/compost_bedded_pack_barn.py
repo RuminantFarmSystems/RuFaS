@@ -180,6 +180,10 @@ class CompostBeddedPackBarn(BaseManureTreatment):
                 is_bedding_tilled=True,
             ))
 
+        self._accumulated_output.storage_methane -= storage_methane
+        self._accumulated_output.storage_ammonia -= storage_ammonia
+        self._accumulated_output.storage_nitrous_oxidet -= storage_nitrous_oxide
+
         daily_output = ManureTreatmentDailyOutput(
             simulation_day=daily_input.simulation_day,
             pen_id=daily_input.pen_id,
@@ -200,5 +204,4 @@ class CompostBeddedPackBarn(BaseManureTreatment):
             storage_nitrous_oxide=storage_nitrous_oxide,
             solid_manure_daily_mass=solid_manure_mass,
         )
-        self._accumulate_daily_output(daily_output)
         return daily_output

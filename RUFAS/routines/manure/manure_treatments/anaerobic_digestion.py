@@ -29,10 +29,9 @@ class AnaerobicDigestion(BaseManureTreatment):
         """
         daily_input = self._current_manure_treatment_daily_input
         daily_output = self._initialize_daily_output_during_update(daily_input)
-        self._accumulate_daily_output(daily_output)
-
         daily_output = self._calc_anaerobic_digestion_daily_output(daily_output)
         self._accumulate_daily_output(daily_output)
+
         return daily_output
 
     def _calc_anaerobic_digestion_daily_output(
