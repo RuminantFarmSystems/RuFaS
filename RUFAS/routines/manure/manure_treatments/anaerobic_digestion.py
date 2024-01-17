@@ -133,6 +133,7 @@ class AnaerobicDigestion(BaseManureTreatment):
         new_daily_output.biogas_energy_content = biogas_energy_content
         new_daily_output.minimum_digester_volume = minimum_digester_volume
         new_daily_output.top_cover_volume = top_cover_volume
+        new_daily_output.methane_generation_volume = methane_generation_volume
         return new_daily_output
 
     @classmethod
