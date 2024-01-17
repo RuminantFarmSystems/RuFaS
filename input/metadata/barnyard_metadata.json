@@ -290,7 +290,6 @@
             "description": "Semen type (select one) -- The semen type (sexed or conventional) that makes up a majority of the farm's breedings",
             "default": "conventional",
             "pattern": "^(sexed|conventional)$"
-
           },
           "days_in_preg_when_dry": {
             "type": "number",
@@ -1102,7 +1101,7 @@
         "type": "array",
         "description": "heiferIs data",
         "properties": {
-        "type": "object",
+          "type": "object",
           "id": {
             "type": "number",
             "description": "Unique integer identifier.",
@@ -1283,7 +1282,7 @@
         "type": "array",
         "description": "heiferIIIs data",
         "properties": {
-        "type": "object",
+          "type": "object",
           "id": {
             "type": "number",
             "description": "Unique integer identifier.",
