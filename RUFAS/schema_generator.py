@@ -90,6 +90,22 @@ class SchemaGenerator:
 
     @staticmethod
     def setup_number_schema(title: str, input_properties: dict[str, Any]) -> dict[str, Any]:
+        """
+        Creates an input schema for a numerical input.
+
+        Parameters
+        ----------
+        title : str
+            The name of the variable for which this schema is being created.
+        input_properties : dict[str, Any]
+            The properties of the input variable.
+
+        Returns
+        -------
+        dict[str, Any]
+            Dictionary containing the input schema for this variable.
+
+        """
         schema = {
             "title": title,
             "type": "number",
@@ -141,6 +157,22 @@ class SchemaGenerator:
 
     @staticmethod
     def setup_string_schema(title: str, input_properties: dict[str, Any]) -> dict[str, Any]:
+        """
+        Creates an input schema for a string input.
+
+        Parameters
+        ----------
+        title : str
+            The name of the variable for which this schema is being created.
+        input_properties : dict[str, Any]
+            The properties of the input variable.
+
+        Returns
+        -------
+        dict[str, Any]
+            Dictionary containing the input schema for this variable.
+
+        """
         schema = {
             "title": title,
             "type": "string",
@@ -179,18 +211,58 @@ class SchemaGenerator:
         return schema
 
     @staticmethod
-    def _get_list_of_options(string: str) -> list[str]:
-        pattern = "\\^\\(.*\\)\\$"
-        is_valid_pattern = bool(re.match(pattern, string))
-        if not is_valid_pattern:
-            raise ValueError(f"'{string}' is not a valid pattern. Cannot create list of valid options.")
+    def _get_list_of_options(input_pattern: str) -> list[str]:
+        """
+        Gets a list of acceptable string inputs based on the Regex pattern that is used to validate the input.
 
-        unsplit_list = string[2:-2]
+        Parameters
+        ----------
+        input_pattern : str
+            The Regex pattern that is used to determine if a string input is valid or not.
+
+        Returns
+        -------
+        list[str]
+            List of strings that would be valid when checked against the input pattern.
+
+        Raises
+        ------
+        ValueError
+            If the Regex pattern used for validation does not adhere to the format "^(<option 1>|<option 2>|...)$".
+
+        Notes
+        -----
+        When a string input is taken, often it is to select from a preset group of options. This method is designed to
+        derive those options from the Regex pattern that is used to validate it.
+
+        """
+        pattern = "\\^\\(.*\\)\\$"
+        is_valid_pattern = bool(re.match(pattern, input_pattern))
+        if not is_valid_pattern:
+            raise ValueError(f"'{input_pattern}' is not a valid pattern. Cannot create list of valid options.")
+
+        unsplit_list = input_pattern[2:-2]
         split_list = unsplit_list.split("|")
         return split_list
 
     @staticmethod
     def setup_array_schema(title: str, input_properties: dict[str, Any]) -> dict[str, Any]:
+        """
+        Creates an input schema for an array input.
+
+        Parameters
+        ----------
+        title : str
+            The name of the variable for which this schema is being created.
+        input_properties : dict[str, Any]
+            The properties of the input variable.
+
+        Returns
+        -------
+        dict[str, Any]
+            Dictionary containing the input schema for this variable.
+
+        """
         schema = {
             "title": title,
             "type": "array",
@@ -219,6 +291,22 @@ class SchemaGenerator:
 
     @staticmethod
     def setup_object_schema(title: str, input_properties: dict[str, Any]) -> dict[str, Any]:
+        """
+        Creates an input schema for an object input.
+
+        Parameters
+        ----------
+        title : str
+            The name of the variable for which this schema is being created.
+        input_properties : dict[str, Any]
+            The properties of the input variable.
+
+        Returns
+        -------
+        dict[str, Any]
+            Dictionary containing the input schema for this variable.
+
+        """
         schema = {
             "title": title,
             "type": "object",
