@@ -1,0 +1,1736 @@
+{
+  "title": "animal_population_properties",
+  "type": "object",
+  "format": "grid",
+  "properties": {
+    "calves": {
+      "title": "calves",
+      "type": "array",
+      "format": "grid",
+      "options": {
+        "inputAttributes": {
+          "class": "text-primary form-control"
+        },
+        "infoText": "calves data"
+      },
+      "items": {
+        "title": "calves_element",
+        "type": "object",
+        "format": "grid",
+        "properties": {
+          "id": {
+            "title": "id",
+            "type": "number",
+            "options": {
+              "grid_columns": 12,
+              "inputAttributes": {
+                "class": "text-primary form-control"
+              },
+              "infoText": "Unique integer identifier."
+            },
+            "minimum": 1
+          },
+          "breed": {
+            "title": "breed",
+            "type": "string",
+            "options": {
+              "grid_columns": 12,
+              "inputAttributes": {
+                "class": "text-primary form-control"
+              },
+              "infoText": "Breed."
+            },
+            "enum": [
+              "HO",
+              "JE"
+            ],
+            "format": "select2"
+          },
+          "birth_date": {
+            "title": "birth_date",
+            "type": "number",
+            "options": {
+              "grid_columns": 12,
+              "inputAttributes": {
+                "class": "text-primary form-control"
+              },
+              "infoText": "Birth date."
+            },
+            "minimum": 0
+          },
+          "days_born": {
+            "title": "days_born",
+            "type": "number",
+            "options": {
+              "grid_columns": 12,
+              "inputAttributes": {
+                "class": "text-primary form-control"
+              },
+              "infoText": "Days born."
+            },
+            "minimum": 0
+          },
+          "birth_weight": {
+            "title": "birth_weight",
+            "type": "number",
+            "options": {
+              "grid_columns": 12,
+              "inputAttributes": {
+                "class": "text-primary form-control"
+              },
+              "infoText": "Birth weight."
+            },
+            "minimum": 0
+          },
+          "body_weight": {
+            "title": "body_weight",
+            "type": "number",
+            "options": {
+              "grid_columns": 12,
+              "inputAttributes": {
+                "class": "text-primary form-control"
+              },
+              "infoText": "Body weight."
+            },
+            "minimum": 0
+          },
+          "wean_weight": {
+            "title": "wean_weight",
+            "type": "number",
+            "options": {
+              "grid_columns": 12,
+              "inputAttributes": {
+                "class": "text-primary form-control"
+              },
+              "infoText": "Wean weight."
+            },
+            "minimum": 0
+          },
+          "mature_body_weight": {
+            "title": "mature_body_weight",
+            "type": "number",
+            "options": {
+              "grid_columns": 12,
+              "inputAttributes": {
+                "class": "text-primary form-control"
+              },
+              "infoText": "Mature Body weight."
+            },
+            "minimum": 0
+          },
+          "events": {
+            "title": "events",
+            "type": "string",
+            "options": {
+              "grid_columns": 12,
+              "inputAttributes": {
+                "class": "text-primary form-control"
+              }
+            },
+            "default": ""
+          }
+        }
+      }
+    },
+    "heiferIs": {
+      "title": "heiferIs",
+      "type": "array",
+      "format": "grid",
+      "options": {
+        "inputAttributes": {
+          "class": "text-primary form-control"
+        },
+        "infoText": "heiferIs data"
+      },
+      "items": {
+        "title": "heiferIs_element",
+        "type": "object",
+        "format": "grid",
+        "properties": {
+          "id": {
+            "title": "id",
+            "type": "number",
+            "options": {
+              "grid_columns": 12,
+              "inputAttributes": {
+                "class": "text-primary form-control"
+              },
+              "infoText": "Unique integer identifier."
+            },
+            "minimum": 1
+          },
+          "breed": {
+            "title": "breed",
+            "type": "string",
+            "options": {
+              "grid_columns": 12,
+              "inputAttributes": {
+                "class": "text-primary form-control"
+              },
+              "infoText": "Breed."
+            },
+            "enum": [
+              "HO",
+              "JE"
+            ],
+            "format": "select2"
+          },
+          "birth_date": {
+            "title": "birth_date",
+            "type": "number",
+            "options": {
+              "grid_columns": 12,
+              "inputAttributes": {
+                "class": "text-primary form-control"
+              },
+              "infoText": "Birth date."
+            },
+            "minimum": 0
+          },
+          "days_born": {
+            "title": "days_born",
+            "type": "number",
+            "options": {
+              "grid_columns": 12,
+              "inputAttributes": {
+                "class": "text-primary form-control"
+              },
+              "infoText": "Days born."
+            },
+            "minimum": 0
+          },
+          "birth_weight": {
+            "title": "birth_weight",
+            "type": "number",
+            "options": {
+              "grid_columns": 12,
+              "inputAttributes": {
+                "class": "text-primary form-control"
+              },
+              "infoText": "Birth weight."
+            },
+            "minimum": 0
+          },
+          "body_weight": {
+            "title": "body_weight",
+            "type": "number",
+            "options": {
+              "grid_columns": 12,
+              "inputAttributes": {
+                "class": "text-primary form-control"
+              },
+              "infoText": "Body weight."
+            },
+            "minimum": 0
+          },
+          "wean_weight": {
+            "title": "wean_weight",
+            "type": "number",
+            "options": {
+              "grid_columns": 12,
+              "inputAttributes": {
+                "class": "text-primary form-control"
+              },
+              "infoText": "Wean weight."
+            },
+            "minimum": 0
+          },
+          "mature_body_weight": {
+            "title": "mature_body_weight",
+            "type": "number",
+            "options": {
+              "grid_columns": 12,
+              "inputAttributes": {
+                "class": "text-primary form-control"
+              },
+              "infoText": "Mature Body weight."
+            },
+            "minimum": 0
+          },
+          "events": {
+            "title": "events",
+            "type": "string",
+            "options": {
+              "grid_columns": 12,
+              "inputAttributes": {
+                "class": "text-primary form-control"
+              }
+            }
+          }
+        }
+      }
+    },
+    "heiferIIs": {
+      "title": "heiferIIs",
+      "type": "array",
+      "format": "grid",
+      "options": {
+        "inputAttributes": {
+          "class": "text-primary form-control"
+        },
+        "infoText": "heiferIIs data"
+      },
+      "items": {
+        "title": "heiferIIs_element",
+        "type": "object",
+        "format": "grid",
+        "properties": {
+          "id": {
+            "title": "id",
+            "type": "number",
+            "options": {
+              "grid_columns": 12,
+              "inputAttributes": {
+                "class": "text-primary form-control"
+              },
+              "infoText": "Unique integer identifier."
+            },
+            "minimum": 1
+          },
+          "breed": {
+            "title": "breed",
+            "type": "string",
+            "options": {
+              "grid_columns": 12,
+              "inputAttributes": {
+                "class": "text-primary form-control"
+              },
+              "infoText": "Breed."
+            },
+            "enum": [
+              "HO",
+              "JE"
+            ],
+            "format": "select2"
+          },
+          "birth_date": {
+            "title": "birth_date",
+            "type": "number",
+            "options": {
+              "grid_columns": 12,
+              "inputAttributes": {
+                "class": "text-primary form-control"
+              },
+              "infoText": "Birth date."
+            },
+            "minimum": 0
+          },
+          "days_born": {
+            "title": "days_born",
+            "type": "number",
+            "options": {
+              "grid_columns": 12,
+              "inputAttributes": {
+                "class": "text-primary form-control"
+              },
+              "infoText": "Days born."
+            },
+            "minimum": 0
+          },
+          "birth_weight": {
+            "title": "birth_weight",
+            "type": "number",
+            "options": {
+              "grid_columns": 12,
+              "inputAttributes": {
+                "class": "text-primary form-control"
+              },
+              "infoText": "Birth weight."
+            },
+            "minimum": 0
+          },
+          "body_weight": {
+            "title": "body_weight",
+            "type": "number",
+            "options": {
+              "grid_columns": 12,
+              "inputAttributes": {
+                "class": "text-primary form-control"
+              },
+              "infoText": "Body weight."
+            },
+            "minimum": 0
+          },
+          "wean_weight": {
+            "title": "wean_weight",
+            "type": "number",
+            "options": {
+              "grid_columns": 12,
+              "inputAttributes": {
+                "class": "text-primary form-control"
+              },
+              "infoText": "Wean weight."
+            },
+            "minimum": 0
+          },
+          "mature_body_weight": {
+            "title": "mature_body_weight",
+            "type": "number",
+            "options": {
+              "grid_columns": 12,
+              "inputAttributes": {
+                "class": "text-primary form-control"
+              },
+              "infoText": "Mature Body weight."
+            },
+            "minimum": 0
+          },
+          "events": {
+            "title": "events",
+            "type": "string",
+            "options": {
+              "grid_columns": 12,
+              "inputAttributes": {
+                "class": "text-primary form-control"
+              }
+            }
+          },
+          "repro_program": {
+            "title": "repro_program",
+            "type": "string",
+            "options": {
+              "grid_columns": 12,
+              "inputAttributes": {
+                "class": "text-primary form-control"
+              },
+              "infoText": "Heifer Reproduction Program"
+            },
+            "enum": [
+              "TAI",
+              "ED"
+            ],
+            "format": "select2"
+          },
+          "tai_method_h": {
+            "title": "tai_method_h",
+            "type": "string",
+            "options": {
+              "grid_columns": 12,
+              "inputAttributes": {
+                "class": "text-primary form-control"
+              },
+              "infoText": "Reproduction Program"
+            },
+            "enum": [
+              "md5CG2P",
+              "md5CGP"
+            ],
+            "format": "select2"
+          },
+          "synch_ed_method_h": {
+            "title": "synch_ed_method_h",
+            "type": "string",
+            "options": {
+              "grid_columns": 12,
+              "inputAttributes": {
+                "class": "text-primary form-control"
+              },
+              "infoText": "Heifer SynchED Program"
+            },
+            "enum": [
+              "2P",
+              "CP"
+            ],
+            "format": "select2"
+          },
+          "estrus_count": {
+            "title": "estrus_count",
+            "type": "number",
+            "options": {
+              "grid_columns": 12,
+              "inputAttributes": {
+                "class": "text-primary form-control"
+              },
+              "infoText": "Estrus count."
+            },
+            "minimum": 0
+          },
+          "estrus_day": {
+            "title": "estrus_day",
+            "type": "number",
+            "options": {
+              "grid_columns": 12,
+              "inputAttributes": {
+                "class": "text-primary form-control"
+              },
+              "infoText": "Estrus Day."
+            },
+            "minimum": 0
+          },
+          "tai_program_start_day_h": {
+            "title": "tai_program_start_day_h",
+            "type": "number",
+            "options": {
+              "grid_columns": 12,
+              "inputAttributes": {
+                "class": "text-primary form-control"
+              },
+              "infoText": "Heifer TAI Program Start Day."
+            },
+            "minimum": 0
+          },
+          "synch_ed_program_start_day_h": {
+            "title": "synch_ed_program_start_day_h",
+            "type": "number",
+            "options": {
+              "grid_columns": 12,
+              "inputAttributes": {
+                "class": "text-primary form-control"
+              },
+              "infoText": "Heifer SynchED Program Start Day."
+            },
+            "minimum": 0
+          },
+          "synch_ed_estrus_day": {
+            "title": "synch_ed_estrus_day",
+            "type": "number",
+            "options": {
+              "grid_columns": 12,
+              "inputAttributes": {
+                "class": "text-primary form-control"
+              },
+              "infoText": "SynchED Program Estrus Day."
+            },
+            "minimum": 0
+          },
+          "synch_ed_stop_day": {
+            "title": "synch_ed_stop_day",
+            "type": "number",
+            "options": {
+              "grid_columns": 12,
+              "inputAttributes": {
+                "class": "text-primary form-control"
+              },
+              "infoText": "SynchED Program Stop Day."
+            },
+            "minimum": 0
+          },
+          "conception_rate": {
+            "title": "conception_rate",
+            "type": "number",
+            "options": {
+              "grid_columns": 12,
+              "inputAttributes": {
+                "class": "text-primary form-control"
+              },
+              "infoText": "ED Conception Rate - The % of serviced animals that would be concepted in the ED (Estrus Detection) programs (default is 0.6)."
+            },
+            "minimum": 0,
+            "default": 0.6
+          },
+          "ai_day": {
+            "title": "ai_day",
+            "type": "number",
+            "options": {
+              "grid_columns": 12,
+              "inputAttributes": {
+                "class": "text-primary form-control"
+              },
+              "infoText": "AI Day"
+            },
+            "minimum": 0
+          },
+          "abortion_day": {
+            "title": "abortion_day",
+            "type": "number",
+            "options": {
+              "grid_columns": 12,
+              "inputAttributes": {
+                "class": "text-primary form-control"
+              },
+              "infoText": "Abortion Day"
+            },
+            "minimum": 0
+          },
+          "days_in_preg": {
+            "title": "days_in_preg",
+            "type": "number",
+            "options": {
+              "grid_columns": 12,
+              "inputAttributes": {
+                "class": "text-primary form-control"
+              },
+              "infoText": "Days in Pregnancy"
+            },
+            "minimum": 0
+          },
+          "gestation_length": {
+            "title": "gestation_length",
+            "type": "number",
+            "options": {
+              "grid_columns": 12,
+              "inputAttributes": {
+                "class": "text-primary form-control"
+              },
+              "infoText": "Gestation Length"
+            },
+            "minimum": 0
+          },
+          "p_gest_for_calf": {
+            "title": "p_gest_for_calf",
+            "type": "number",
+            "options": {
+              "grid_columns": 12,
+              "inputAttributes": {
+                "class": "text-primary form-control"
+              },
+              "infoText": "Pregnancy Gestation for Calf"
+            },
+            "minimum": 0
+          },
+          "calf_birth_weight": {
+            "title": "calf_birth_weight",
+            "type": "number",
+            "options": {
+              "grid_columns": 12,
+              "inputAttributes": {
+                "class": "text-primary form-control"
+              },
+              "infoText": "Calf Birth weight."
+            },
+            "minimum": 0
+          }
+        }
+      }
+    },
+    "heiferIIIs": {
+      "title": "heiferIIIs",
+      "type": "array",
+      "format": "grid",
+      "options": {
+        "inputAttributes": {
+          "class": "text-primary form-control"
+        },
+        "infoText": "heiferIIIs data"
+      },
+      "items": {
+        "title": "heiferIIIs_element",
+        "type": "object",
+        "format": "grid",
+        "properties": {
+          "id": {
+            "title": "id",
+            "type": "number",
+            "options": {
+              "grid_columns": 12,
+              "inputAttributes": {
+                "class": "text-primary form-control"
+              },
+              "infoText": "Unique integer identifier."
+            },
+            "minimum": 1
+          },
+          "breed": {
+            "title": "breed",
+            "type": "string",
+            "options": {
+              "grid_columns": 12,
+              "inputAttributes": {
+                "class": "text-primary form-control"
+              },
+              "infoText": "Breed."
+            },
+            "enum": [
+              "HO",
+              "JE"
+            ],
+            "format": "select2"
+          },
+          "birth_date": {
+            "title": "birth_date",
+            "type": "number",
+            "options": {
+              "grid_columns": 12,
+              "inputAttributes": {
+                "class": "text-primary form-control"
+              },
+              "infoText": "Birth date."
+            },
+            "minimum": 0
+          },
+          "days_born": {
+            "title": "days_born",
+            "type": "number",
+            "options": {
+              "grid_columns": 12,
+              "inputAttributes": {
+                "class": "text-primary form-control"
+              },
+              "infoText": "Days born."
+            },
+            "minimum": 0
+          },
+          "birth_weight": {
+            "title": "birth_weight",
+            "type": "number",
+            "options": {
+              "grid_columns": 12,
+              "inputAttributes": {
+                "class": "text-primary form-control"
+              },
+              "infoText": "Birth weight."
+            },
+            "minimum": 0
+          },
+          "body_weight": {
+            "title": "body_weight",
+            "type": "number",
+            "options": {
+              "grid_columns": 12,
+              "inputAttributes": {
+                "class": "text-primary form-control"
+              },
+              "infoText": "Body weight."
+            },
+            "minimum": 0
+          },
+          "wean_weight": {
+            "title": "wean_weight",
+            "type": "number",
+            "options": {
+              "grid_columns": 12,
+              "inputAttributes": {
+                "class": "text-primary form-control"
+              },
+              "infoText": "Wean weight."
+            },
+            "minimum": 0
+          },
+          "mature_body_weight": {
+            "title": "mature_body_weight",
+            "type": "number",
+            "options": {
+              "grid_columns": 12,
+              "inputAttributes": {
+                "class": "text-primary form-control"
+              },
+              "infoText": "Mature Body weight."
+            },
+            "minimum": 0
+          },
+          "events": {
+            "title": "events",
+            "type": "string",
+            "options": {
+              "grid_columns": 12,
+              "inputAttributes": {
+                "class": "text-primary form-control"
+              }
+            }
+          },
+          "repro_program": {
+            "title": "repro_program",
+            "type": "string",
+            "options": {
+              "grid_columns": 12,
+              "inputAttributes": {
+                "class": "text-primary form-control"
+              },
+              "infoText": "Reproduction Program"
+            },
+            "enum": [
+              "TAI",
+              "ED"
+            ],
+            "format": "select2"
+          },
+          "tai_method_h": {
+            "title": "tai_method_h",
+            "type": "string",
+            "options": {
+              "grid_columns": 12,
+              "inputAttributes": {
+                "class": "text-primary form-control"
+              },
+              "infoText": "Heifer Reproduction Program"
+            },
+            "enum": [
+              "md5CG2P",
+              "md5CGP"
+            ],
+            "format": "select2"
+          },
+          "synch_ed_method_h": {
+            "title": "synch_ed_method_h",
+            "type": "string",
+            "options": {
+              "grid_columns": 12,
+              "inputAttributes": {
+                "class": "text-primary form-control"
+              },
+              "infoText": "Heifer SynchED Program"
+            },
+            "enum": [
+              "2P",
+              "CP"
+            ],
+            "format": "select2"
+          },
+          "estrus_count": {
+            "title": "estrus_count",
+            "type": "number",
+            "options": {
+              "grid_columns": 12,
+              "inputAttributes": {
+                "class": "text-primary form-control"
+              },
+              "infoText": "Estrus count."
+            },
+            "minimum": 0
+          },
+          "estrus_day": {
+            "title": "estrus_day",
+            "type": "number",
+            "options": {
+              "grid_columns": 12,
+              "inputAttributes": {
+                "class": "text-primary form-control"
+              },
+              "infoText": "Estrus Day."
+            },
+            "minimum": 0
+          },
+          "tai_program_start_day_h": {
+            "title": "tai_program_start_day_h",
+            "type": "number",
+            "options": {
+              "grid_columns": 12,
+              "inputAttributes": {
+                "class": "text-primary form-control"
+              },
+              "infoText": "Heifer TAI Program Start Day."
+            },
+            "minimum": 0
+          },
+          "synch_ed_program_start_day_h": {
+            "title": "synch_ed_program_start_day_h",
+            "type": "number",
+            "options": {
+              "grid_columns": 12,
+              "inputAttributes": {
+                "class": "text-primary form-control"
+              },
+              "infoText": "Heifer SynchED Program Start Day."
+            },
+            "minimum": 0
+          },
+          "synch_ed_estrus_day": {
+            "title": "synch_ed_estrus_day",
+            "type": "number",
+            "options": {
+              "grid_columns": 12,
+              "inputAttributes": {
+                "class": "text-primary form-control"
+              },
+              "infoText": "SynchED Program Estrus Day."
+            },
+            "minimum": 0
+          },
+          "synch_ed_stop_day": {
+            "title": "synch_ed_stop_day",
+            "type": "number",
+            "options": {
+              "grid_columns": 12,
+              "inputAttributes": {
+                "class": "text-primary form-control"
+              },
+              "infoText": "SynchED Program Stop Day."
+            },
+            "minimum": 0
+          },
+          "conception_rate": {
+            "title": "conception_rate",
+            "type": "number",
+            "options": {
+              "grid_columns": 12,
+              "inputAttributes": {
+                "class": "text-primary form-control"
+              },
+              "infoText": "ED Conception Rate - The % of serviced animals that would be concepted in the ED (Estrus Detection) programs (default is 0.6)."
+            },
+            "minimum": 0,
+            "default": 0.6
+          },
+          "ai_day": {
+            "title": "ai_day",
+            "type": "number",
+            "options": {
+              "grid_columns": 12,
+              "inputAttributes": {
+                "class": "text-primary form-control"
+              },
+              "infoText": "AI Day"
+            },
+            "minimum": 0
+          },
+          "abortion_day": {
+            "title": "abortion_day",
+            "type": "number",
+            "options": {
+              "grid_columns": 12,
+              "inputAttributes": {
+                "class": "text-primary form-control"
+              },
+              "infoText": "Abortion Day"
+            },
+            "minimum": 0
+          },
+          "days_in_preg": {
+            "title": "days_in_preg",
+            "type": "number",
+            "options": {
+              "grid_columns": 12,
+              "inputAttributes": {
+                "class": "text-primary form-control"
+              },
+              "infoText": "Days in Pregnancy"
+            },
+            "minimum": 0
+          },
+          "gestation_length": {
+            "title": "gestation_length",
+            "type": "number",
+            "options": {
+              "grid_columns": 12,
+              "inputAttributes": {
+                "class": "text-primary form-control"
+              },
+              "infoText": "Gestation Length"
+            },
+            "minimum": 0
+          },
+          "p_gest_for_calf": {
+            "title": "p_gest_for_calf",
+            "type": "number",
+            "options": {
+              "grid_columns": 12,
+              "inputAttributes": {
+                "class": "text-primary form-control"
+              },
+              "infoText": "Pregnancy Gestation for Calf"
+            },
+            "minimum": 0
+          },
+          "calf_birth_weight": {
+            "title": "calf_birth_weight",
+            "type": "number",
+            "options": {
+              "grid_columns": 12,
+              "inputAttributes": {
+                "class": "text-primary form-control"
+              },
+              "infoText": "Calf Birth weight."
+            },
+            "minimum": 0
+          }
+        }
+      }
+    },
+    "cows": {
+      "title": "cows",
+      "type": "array",
+      "format": "grid",
+      "options": {
+        "inputAttributes": {
+          "class": "text-primary form-control"
+        },
+        "infoText": "cows data"
+      },
+      "items": {
+        "title": "cows_element",
+        "type": "object",
+        "format": "grid",
+        "properties": {
+          "id": {
+            "title": "id",
+            "type": "number",
+            "options": {
+              "grid_columns": 12,
+              "inputAttributes": {
+                "class": "text-primary form-control"
+              },
+              "infoText": "Unique integer identifier."
+            },
+            "minimum": 1
+          },
+          "breed": {
+            "title": "breed",
+            "type": "string",
+            "options": {
+              "grid_columns": 12,
+              "inputAttributes": {
+                "class": "text-primary form-control"
+              },
+              "infoText": "Breed."
+            },
+            "enum": [
+              "HO",
+              "JE"
+            ],
+            "format": "select2"
+          },
+          "birth_date": {
+            "title": "birth_date",
+            "type": "number",
+            "options": {
+              "grid_columns": 12,
+              "inputAttributes": {
+                "class": "text-primary form-control"
+              },
+              "infoText": "Birth date."
+            },
+            "minimum": 0
+          },
+          "days_born": {
+            "title": "days_born",
+            "type": "number",
+            "options": {
+              "grid_columns": 12,
+              "inputAttributes": {
+                "class": "text-primary form-control"
+              },
+              "infoText": "Days born."
+            },
+            "minimum": 0
+          },
+          "birth_weight": {
+            "title": "birth_weight",
+            "type": "number",
+            "options": {
+              "grid_columns": 12,
+              "inputAttributes": {
+                "class": "text-primary form-control"
+              },
+              "infoText": "Birth weight."
+            },
+            "minimum": 0
+          },
+          "body_weight": {
+            "title": "body_weight",
+            "type": "number",
+            "options": {
+              "grid_columns": 12,
+              "inputAttributes": {
+                "class": "text-primary form-control"
+              },
+              "infoText": "Body weight."
+            },
+            "minimum": 0
+          },
+          "wean_weight": {
+            "title": "wean_weight",
+            "type": "number",
+            "options": {
+              "grid_columns": 12,
+              "inputAttributes": {
+                "class": "text-primary form-control"
+              },
+              "infoText": "Wean weight."
+            },
+            "minimum": 0
+          },
+          "mature_body_weight": {
+            "title": "mature_body_weight",
+            "type": "number",
+            "options": {
+              "grid_columns": 12,
+              "inputAttributes": {
+                "class": "text-primary form-control"
+              },
+              "infoText": "Mature Body weight."
+            },
+            "minimum": 0
+          },
+          "events": {
+            "title": "events",
+            "type": "string",
+            "options": {
+              "grid_columns": 12,
+              "inputAttributes": {
+                "class": "text-primary form-control"
+              }
+            }
+          },
+          "repro_program": {
+            "title": "repro_program",
+            "type": "string",
+            "options": {
+              "grid_columns": 12,
+              "inputAttributes": {
+                "class": "text-primary form-control"
+              },
+              "infoText": "Reproduction Program"
+            },
+            "enum": [
+              "TAI",
+              "ED"
+            ],
+            "format": "select2"
+          },
+          "tai_method_h": {
+            "title": "tai_method_h",
+            "type": "string",
+            "options": {
+              "grid_columns": 12,
+              "inputAttributes": {
+                "class": "text-primary form-control"
+              },
+              "infoText": "Heifer Reproduction Program"
+            },
+            "enum": [
+              "md5CG2P",
+              "md5CGP"
+            ],
+            "format": "select2"
+          },
+          "synch_ed_method_h": {
+            "title": "synch_ed_method_h",
+            "type": "string",
+            "options": {
+              "grid_columns": 12,
+              "inputAttributes": {
+                "class": "text-primary form-control"
+              },
+              "infoText": "Heifer SynchED Program"
+            },
+            "enum": [
+              "2P",
+              "CP"
+            ],
+            "format": "select2"
+          },
+          "estrus_count": {
+            "title": "estrus_count",
+            "type": "number",
+            "options": {
+              "grid_columns": 12,
+              "inputAttributes": {
+                "class": "text-primary form-control"
+              },
+              "infoText": "Estrus count."
+            },
+            "minimum": 0
+          },
+          "estrus_day": {
+            "title": "estrus_day",
+            "type": "number",
+            "options": {
+              "grid_columns": 12,
+              "inputAttributes": {
+                "class": "text-primary form-control"
+              },
+              "infoText": "Estrus Day."
+            },
+            "minimum": 0
+          },
+          "tai_program_start_day_h": {
+            "title": "tai_program_start_day_h",
+            "type": "number",
+            "options": {
+              "grid_columns": 12,
+              "inputAttributes": {
+                "class": "text-primary form-control"
+              },
+              "infoText": "Heifer TAI Program Start Day."
+            },
+            "minimum": 0
+          },
+          "synch_ed_program_start_day_h": {
+            "title": "synch_ed_program_start_day_h",
+            "type": "number",
+            "options": {
+              "grid_columns": 12,
+              "inputAttributes": {
+                "class": "text-primary form-control"
+              },
+              "infoText": "Heifer SynchED Program Start Day."
+            },
+            "minimum": 0
+          },
+          "synch_ed_estrus_day": {
+            "title": "synch_ed_estrus_day",
+            "type": "number",
+            "options": {
+              "grid_columns": 12,
+              "inputAttributes": {
+                "class": "text-primary form-control"
+              },
+              "infoText": "SynchED Program Estrus Day."
+            },
+            "minimum": 0
+          },
+          "synch_ed_stop_day": {
+            "title": "synch_ed_stop_day",
+            "type": "number",
+            "options": {
+              "grid_columns": 12,
+              "inputAttributes": {
+                "class": "text-primary form-control"
+              },
+              "infoText": "SynchED Program Stop Day."
+            },
+            "minimum": 0
+          },
+          "conception_rate": {
+            "title": "conception_rate",
+            "type": "number",
+            "options": {
+              "grid_columns": 12,
+              "inputAttributes": {
+                "class": "text-primary form-control"
+              },
+              "infoText": "ED Conception Rate - The % of serviced animals that would be concepted in the ED (Estrus Detection) programs (default is 0.6)."
+            },
+            "minimum": 0,
+            "default": 0.6
+          },
+          "ai_day": {
+            "title": "ai_day",
+            "type": "number",
+            "options": {
+              "grid_columns": 12,
+              "inputAttributes": {
+                "class": "text-primary form-control"
+              },
+              "infoText": "AI Day"
+            },
+            "minimum": 0
+          },
+          "abortion_day": {
+            "title": "abortion_day",
+            "type": "number",
+            "options": {
+              "grid_columns": 12,
+              "inputAttributes": {
+                "class": "text-primary form-control"
+              },
+              "infoText": "Abortion Day"
+            },
+            "minimum": 0
+          },
+          "days_in_preg": {
+            "title": "days_in_preg",
+            "type": "number",
+            "options": {
+              "grid_columns": 12,
+              "inputAttributes": {
+                "class": "text-primary form-control"
+              },
+              "infoText": "Days in Pregnancy"
+            },
+            "minimum": 0
+          },
+          "gestation_length": {
+            "title": "gestation_length",
+            "type": "number",
+            "options": {
+              "grid_columns": 12,
+              "inputAttributes": {
+                "class": "text-primary form-control"
+              },
+              "infoText": "Gestation Length"
+            },
+            "minimum": 0
+          },
+          "p_gest_for_calf": {
+            "title": "p_gest_for_calf",
+            "type": "number",
+            "options": {
+              "grid_columns": 12,
+              "inputAttributes": {
+                "class": "text-primary form-control"
+              },
+              "infoText": "Pregnancy Gestation for Calf"
+            },
+            "minimum": 0
+          },
+          "calf_birth_weight": {
+            "title": "calf_birth_weight",
+            "type": "number",
+            "options": {
+              "grid_columns": 12,
+              "inputAttributes": {
+                "class": "text-primary form-control"
+              },
+              "infoText": "Calf Birth weight."
+            },
+            "minimum": 0
+          },
+          "presynch_method": {
+            "title": "presynch_method",
+            "type": "string",
+            "options": {
+              "grid_columns": 12,
+              "inputAttributes": {
+                "class": "text-primary form-control"
+              },
+              "infoText": "Cow PreSynch Protocol."
+            },
+            "enum": [
+              "PreSynch",
+              "Double OvSynch",
+              "G6G"
+            ],
+            "format": "select2"
+          },
+          "tai_method_c": {
+            "title": "tai_method_c",
+            "type": "string",
+            "options": {
+              "grid_columns": 12,
+              "inputAttributes": {
+                "class": "text-primary form-control"
+              },
+              "infoText": "Reproduction Program"
+            },
+            "enum": [
+              "OvSynch 56",
+              "OvSynch 48",
+              "CoSynch 72",
+              "5d CoSynch"
+            ],
+            "format": "select2"
+          },
+          "resynch_method": {
+            "title": "resynch_method",
+            "type": "string",
+            "options": {
+              "grid_columns": 12,
+              "inputAttributes": {
+                "class": "text-primary form-control"
+              },
+              "infoText": "Cow ReSynch Protocol."
+            },
+            "enum": [
+              "TAIafterPD",
+              "TAIbeforePD",
+              "PGFatPD"
+            ],
+            "format": "select2"
+          },
+          "days_in_milk": {
+            "title": "days_in_milk",
+            "type": "number",
+            "options": {
+              "grid_columns": 12,
+              "inputAttributes": {
+                "class": "text-primary form-control"
+              },
+              "infoText": "Days in Milk"
+            },
+            "minimum": 0
+          },
+          "parity": {
+            "title": "parity",
+            "type": "number",
+            "options": {
+              "grid_columns": 12,
+              "inputAttributes": {
+                "class": "text-primary form-control"
+              },
+              "infoText": "Parity"
+            },
+            "minimum": 0
+          },
+          "calving_interval": {
+            "title": "calving_interval",
+            "type": "number",
+            "options": {
+              "grid_columns": 12,
+              "inputAttributes": {
+                "class": "text-primary form-control"
+              },
+              "infoText": "Calving Interval"
+            },
+            "minimum": 0
+          }
+        }
+      }
+    },
+    "replacement": {
+      "title": "replacement",
+      "type": "array",
+      "format": "grid",
+      "options": {
+        "inputAttributes": {
+          "class": "text-primary form-control"
+        },
+        "infoText": "replacement cows data"
+      },
+      "items": {
+        "title": "replacement_element",
+        "type": "object",
+        "format": "grid",
+        "properties": {
+          "id": {
+            "title": "id",
+            "type": "number",
+            "options": {
+              "grid_columns": 12,
+              "inputAttributes": {
+                "class": "text-primary form-control"
+              },
+              "infoText": "Unique integer identifier."
+            },
+            "minimum": 1
+          },
+          "breed": {
+            "title": "breed",
+            "type": "string",
+            "options": {
+              "grid_columns": 12,
+              "inputAttributes": {
+                "class": "text-primary form-control"
+              },
+              "infoText": "Breed."
+            },
+            "enum": [
+              "HO",
+              "JE"
+            ],
+            "format": "select2"
+          },
+          "birth_date": {
+            "title": "birth_date",
+            "type": "number",
+            "options": {
+              "grid_columns": 12,
+              "inputAttributes": {
+                "class": "text-primary form-control"
+              },
+              "infoText": "Birth date."
+            },
+            "minimum": 0
+          },
+          "days_born": {
+            "title": "days_born",
+            "type": "number",
+            "options": {
+              "grid_columns": 12,
+              "inputAttributes": {
+                "class": "text-primary form-control"
+              },
+              "infoText": "Days born."
+            },
+            "minimum": 0
+          },
+          "birth_weight": {
+            "title": "birth_weight",
+            "type": "number",
+            "options": {
+              "grid_columns": 12,
+              "inputAttributes": {
+                "class": "text-primary form-control"
+              },
+              "infoText": "Birth weight."
+            },
+            "minimum": 0
+          },
+          "body_weight": {
+            "title": "body_weight",
+            "type": "number",
+            "options": {
+              "grid_columns": 12,
+              "inputAttributes": {
+                "class": "text-primary form-control"
+              },
+              "infoText": "Body weight."
+            },
+            "minimum": 0
+          },
+          "wean_weight": {
+            "title": "wean_weight",
+            "type": "number",
+            "options": {
+              "grid_columns": 12,
+              "inputAttributes": {
+                "class": "text-primary form-control"
+              },
+              "infoText": "Wean weight."
+            },
+            "minimum": 0
+          },
+          "mature_body_weight": {
+            "title": "mature_body_weight",
+            "type": "number",
+            "options": {
+              "grid_columns": 12,
+              "inputAttributes": {
+                "class": "text-primary form-control"
+              },
+              "infoText": "Mature Body weight."
+            },
+            "minimum": 0
+          },
+          "events": {
+            "title": "events",
+            "type": "string",
+            "options": {
+              "grid_columns": 12,
+              "inputAttributes": {
+                "class": "text-primary form-control"
+              }
+            }
+          },
+          "repro_program": {
+            "title": "repro_program",
+            "type": "string",
+            "options": {
+              "grid_columns": 12,
+              "inputAttributes": {
+                "class": "text-primary form-control"
+              },
+              "infoText": "Reproduction Program"
+            },
+            "enum": [
+              "TAI",
+              "ED"
+            ],
+            "format": "select2"
+          },
+          "tai_method_h": {
+            "title": "tai_method_h",
+            "type": "string",
+            "options": {
+              "grid_columns": 12,
+              "inputAttributes": {
+                "class": "text-primary form-control"
+              },
+              "infoText": "Heifer Reproduction Program"
+            },
+            "enum": [
+              "md5CG2P",
+              "md5CGP"
+            ],
+            "format": "select2"
+          },
+          "synch_ed_method_h": {
+            "title": "synch_ed_method_h",
+            "type": "string",
+            "options": {
+              "grid_columns": 12,
+              "inputAttributes": {
+                "class": "text-primary form-control"
+              },
+              "infoText": "Heifer SynchED Program"
+            },
+            "enum": [
+              "2P",
+              "CP"
+            ],
+            "format": "select2"
+          },
+          "estrus_count": {
+            "title": "estrus_count",
+            "type": "number",
+            "options": {
+              "grid_columns": 12,
+              "inputAttributes": {
+                "class": "text-primary form-control"
+              },
+              "infoText": "Estrus count."
+            },
+            "minimum": 0
+          },
+          "estrus_day": {
+            "title": "estrus_day",
+            "type": "number",
+            "options": {
+              "grid_columns": 12,
+              "inputAttributes": {
+                "class": "text-primary form-control"
+              },
+              "infoText": "Estrus Day."
+            },
+            "minimum": 0
+          },
+          "tai_program_start_day_h": {
+            "title": "tai_program_start_day_h",
+            "type": "number",
+            "options": {
+              "grid_columns": 12,
+              "inputAttributes": {
+                "class": "text-primary form-control"
+              },
+              "infoText": "Heifer TAI Program Start Day."
+            },
+            "minimum": 0
+          },
+          "synch_ed_program_start_day_h": {
+            "title": "synch_ed_program_start_day_h",
+            "type": "number",
+            "options": {
+              "grid_columns": 12,
+              "inputAttributes": {
+                "class": "text-primary form-control"
+              },
+              "infoText": "Heifer SynchED Program Start Day."
+            },
+            "minimum": 0
+          },
+          "synch_ed_estrus_day": {
+            "title": "synch_ed_estrus_day",
+            "type": "number",
+            "options": {
+              "grid_columns": 12,
+              "inputAttributes": {
+                "class": "text-primary form-control"
+              },
+              "infoText": "SynchED Program Estrus Day."
+            },
+            "minimum": 0
+          },
+          "synch_ed_stop_day": {
+            "title": "synch_ed_stop_day",
+            "type": "number",
+            "options": {
+              "grid_columns": 12,
+              "inputAttributes": {
+                "class": "text-primary form-control"
+              },
+              "infoText": "SynchED Program Stop Day."
+            },
+            "minimum": 0
+          },
+          "conception_rate": {
+            "title": "conception_rate",
+            "type": "number",
+            "options": {
+              "grid_columns": 12,
+              "inputAttributes": {
+                "class": "text-primary form-control"
+              },
+              "infoText": "ED Conception Rate - The % of serviced animals that would be concepted in the ED (Estrus Detection) programs (default is 0.6)."
+            },
+            "minimum": 0,
+            "default": 0.6
+          },
+          "ai_day": {
+            "title": "ai_day",
+            "type": "number",
+            "options": {
+              "grid_columns": 12,
+              "inputAttributes": {
+                "class": "text-primary form-control"
+              },
+              "infoText": "AI Day"
+            },
+            "minimum": 0
+          },
+          "abortion_day": {
+            "title": "abortion_day",
+            "type": "number",
+            "options": {
+              "grid_columns": 12,
+              "inputAttributes": {
+                "class": "text-primary form-control"
+              },
+              "infoText": "Abortion Day"
+            },
+            "minimum": 0
+          },
+          "days_in_preg": {
+            "title": "days_in_preg",
+            "type": "number",
+            "options": {
+              "grid_columns": 12,
+              "inputAttributes": {
+                "class": "text-primary form-control"
+              },
+              "infoText": "Days in Pregnancy"
+            },
+            "minimum": 0
+          },
+          "gestation_length": {
+            "title": "gestation_length",
+            "type": "number",
+            "options": {
+              "grid_columns": 12,
+              "inputAttributes": {
+                "class": "text-primary form-control"
+              },
+              "infoText": "Gestation Length"
+            },
+            "minimum": 0
+          },
+          "p_gest_for_calf": {
+            "title": "p_gest_for_calf",
+            "type": "number",
+            "options": {
+              "grid_columns": 12,
+              "inputAttributes": {
+                "class": "text-primary form-control"
+              },
+              "infoText": "Pregnancy Gestation for Calf"
+            },
+            "minimum": 0
+          },
+          "calf_birth_weight": {
+            "title": "calf_birth_weight",
+            "type": "number",
+            "options": {
+              "grid_columns": 12,
+              "inputAttributes": {
+                "class": "text-primary form-control"
+              },
+              "infoText": "Calf Birth weight."
+            },
+            "minimum": 0
+          },
+          "presynch_method": {
+            "title": "presynch_method",
+            "type": "string",
+            "options": {
+              "grid_columns": 12,
+              "inputAttributes": {
+                "class": "text-primary form-control"
+              },
+              "infoText": "Cow PreSynch Protocol."
+            },
+            "enum": [
+              "PreSynch",
+              "Double OvSynch",
+              "G6G"
+            ],
+            "format": "select2"
+          },
+          "tai_method_c": {
+            "title": "tai_method_c",
+            "type": "string",
+            "options": {
+              "grid_columns": 12,
+              "inputAttributes": {
+                "class": "text-primary form-control"
+              },
+              "infoText": "Reproduction Program"
+            },
+            "enum": [
+              "OvSynch 56",
+              "OvSynch 48",
+              "CoSynch 72",
+              "5d CoSynch"
+            ],
+            "format": "select2"
+          },
+          "resynch_method": {
+            "title": "resynch_method",
+            "type": "string",
+            "options": {
+              "grid_columns": 12,
+              "inputAttributes": {
+                "class": "text-primary form-control"
+              },
+              "infoText": "Cow ReSynch Protocol."
+            },
+            "enum": [
+              "TAIafterPD",
+              "TAIbeforePD",
+              "PGFatPD"
+            ],
+            "format": "select2"
+          }
+        }
+      }
+    }
+  }
+}
