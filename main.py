@@ -158,7 +158,6 @@ def run_rufas(
             "function": "run_rufas"
         }
         output_manager.add_log(log_title, log_message, info_map)
-        return
 
     metadata_files: List[MetadataPaths] = METADATA_PATHS
     if only_run_validation:

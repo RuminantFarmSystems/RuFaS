@@ -33,7 +33,8 @@ from RUFAS.output_manager import OutputManager, LogVerbosity
          False, False),
         (False, True, "basic", LogVerbosity.LOGS, False, False, False, "custom_graphics", "", True, False, "output/",
          False, False),
-        (False, True, "block", LogVerbosity.NONE, True, False, False, "graphics", "", True, True, "output/", False),
+        (False, True, "block", LogVerbosity.NONE, True, False, False, "graphics", "", True, True, "output/", False,
+         False),
         (True, False, "inline", LogVerbosity.WARNINGS, False, False, False, "custom_graphics", "path.json", True, True,
          "output/", True, False),
         (True, True, "verbose", LogVerbosity.LOGS, False, True, False, "graphics", "path.json", False, False, "output/",
@@ -137,7 +138,7 @@ def test_main_exception_handling(mocker: MockerFixture, capsys) -> None:
         ("basic", True, LogVerbosity.WARNINGS, False, True, True, "", False, "", False, False, "output/", False, False),
         ("verbose", True, LogVerbosity.NONE, True, False, True, "", False, "", False, False, "output/", False, False),
         ("block", True, LogVerbosity.LOGS, True, True, False, "", False, "", False, False, "output/", False, False),
-        ("inline", False, LogVerbosity.ERRORS, True, True, True, "", False, "", False, False, "output/", False, False),
+        ("inline", False, LogVerbosity.ERRORS, True, True, True, "", False, "", False, False, "output/", False, True),
         ("basic", False, LogVerbosity.WARNINGS, False, True, True, "", False, "", False, False, "output/", False,
          False),
         ("verbose", False, LogVerbosity.NONE, True, False, True, "", False, "", False, False, "output/", False, False),
@@ -145,7 +146,7 @@ def test_main_exception_handling(mocker: MockerFixture, capsys) -> None:
         ("inline", False, LogVerbosity.ERRORS, False, True, True, "", False, "", False, False, "output/", False, False),
         ("basic", False, LogVerbosity.WARNINGS, True, False, True, "", False, "", False, False, "output/", False,
          False),
-        ("verbose", False, LogVerbosity.NONE, True, True, False, "", False, "", False, False, "output/", False, False),
+        ("verbose", False, LogVerbosity.NONE, True, True, False, "", False, "", False, False, "output/", False, True),
         ("block", False, LogVerbosity.WARNINGS, False, False, True, "", False, "", False, False, "output/", False,
          False),
         ("inline", False, LogVerbosity.LOGS, False, True, False, "", False, "", False, False, "output/", False, False),
@@ -171,6 +172,7 @@ def test_run_rufas(
     save_animals: bool,
     save_animals_dir: str,
     terminate_simulation_post_herd_generation: bool,
+    generate_schemas,
     mocker: MockerFixture,
     capsys,
 ) -> None:
@@ -180,6 +182,7 @@ def test_run_rufas(
     patch_execute_simulations = mocker.patch("main.execute_simulations")
     patch_run_validation = mocker.patch("main.run_validation")
     patch_run_load_vars_pool = mocker.patch("main.run_load_vars_pool")
+    patch_schema_generation = mocker.patch("RUFAS.schema_generator.SchemaGenerator.generate_schemas")
     mock_output_manager = mocker.MagicMock(auto_spec=OutputManager)
     mock_output_manager.clear_output_dir.return_value = None
     mocker.patch("main.OutputManager", return_value=mock_output_manager)
@@ -204,7 +207,8 @@ def test_run_rufas(
         init_herd,
         save_animals,
         save_animals_dir,
-        terminate_simulation_post_herd_generation
+        terminate_simulation_post_herd_generation,
+        generate_schemas,
     )
 
     # Assert
@@ -250,6 +254,11 @@ def test_run_rufas(
         assert mock_output_manager.clear_output_dir.call_count == 1
     else:
         assert mock_output_manager.clear_output_dir.call_count == 0
+
+    if generate_schemas:
+        patch_schema_generation.assert_called_once_with(None, None)
+    else:
+        patch_schema_generation.assert_not_called()
 
     captured = capsys.readouterr()
     expected_message = "RuFaS: Ruminant Farm Systems Model 2023\n"
@@ -597,7 +606,7 @@ def test_parse_gnu_args(mocker: MockerFixture) -> None:
     actual_args = parse_gnu_args()
 
     # Assert
-    assert mock_add_argument.call_count == 15
+    assert mock_add_argument.call_count == 16
     assert mock_add_argument.call_args_list == [
         mocker.call(
             "-f",
@@ -693,6 +702,12 @@ def test_parse_gnu_args(mocker: MockerFixture) -> None:
             help="Select this flag if you only want to generate a herd, not continuing the simulation afterwards.",
             action="store_true",
         ),
+        mocker.call(
+            "-gs",
+            "--generate-schemas",
+            help="Select this flag to generate input schemas for the data collection app instead of running a simulation.",
+            action="store_true",
+        )
     ]
     mock_parse_args.assert_called_once()
     assert actual_args == "test_args"
