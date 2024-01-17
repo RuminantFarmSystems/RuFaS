@@ -41,8 +41,8 @@ class SchemaGenerator:
 
         path_to_properties = path_to_properties if path_to_properties else DEFAULT_PROPERTIES_PATH
 
-        log_title = "schema_generator_initialization"
-        log_message = f"Creating new schemas from metadata properties in '{path_to_properties}'."
+        log_title = "Schema generation starting"
+        log_message = f"Creating new schemas from metadata properties in '{path_to_properties}'"
         om.add_log(log_title, log_message, info_map)
 
         schema_output_path = path_to_schema_outputs if path_to_schema_outputs else DEFAULT_SCHEMA_OUTPUT_PATH
@@ -58,13 +58,18 @@ class SchemaGenerator:
             try:
                 new_schema = SchemaGenerator.setup_object_schema(key, properties[key])
             except Exception as e:
-                print(f"Key: '{key}' raised exception: {str(e)}")
+                error_title = "Schema generator raised exception"
+                error_message = f"Key: '{key}' raised exception: {str(e)}"
+                om.add_error(error_title, error_message, info_map)
                 continue
 
             schema_name = key.replace("properties", "schema")
             new_schema_file_name = f"{schema_name}.json"
             new_schema_file_path = Path.joinpath(schema_output_path, new_schema_file_name)
-            print(new_schema_file_path)
+
+            log_title = "Schema generator writing new schema"
+            log_message = f"Writing new schema in {new_schema}"
+            om.add_log(log_title, log_message, info_map)
 
             with open(new_schema_file_path, "w") as outfile:
                 json.dump(new_schema, outfile, indent=2)
