@@ -575,7 +575,7 @@ def parse_gnu_args() -> argparse.Namespace:
         action="store_true",
     )
     parser.add_argument(
-        "-sc",
+        "-gs",
         "--generate-schemas",
         help="Select this flag to generate input schemas for the data collection app instead of running a simulation.",
         action="store_true",
