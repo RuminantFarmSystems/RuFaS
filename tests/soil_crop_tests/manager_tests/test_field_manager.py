@@ -2,11 +2,13 @@ import mock
 
 from RUFAS.input_manager import InputManager
 from RUFAS.output_manager import OutputManager
+from RUFAS.routines.feed_storage.feed_manager import FeedManager
 from RUFAS.routines.field.manager.field_manager import FieldManager
 from RUFAS.routines.field.manager.crop_schedule import CropSchedule
 from RUFAS.current_day_conditions import CurrentDayConditions
 from RUFAS.routines.field.manager.fertilizer_schedule import FertilizerSchedule
 from RUFAS.routines.field.manager.manure_schedule import ManureSchedule
+from RUFAS.routines.manure.manure_treatments.manure_types import ManureType
 from RUFAS.routines.field.manager.tillage_schedule import TillageSchedule
 from RUFAS.routines.field.field.field_data import FieldData
 from RUFAS.routines.field.field.field import Field
@@ -49,13 +51,18 @@ def input_manager_original_method_states(
 def test_field_manager_init(field_blob_names) -> None:
     """Tests that FieldManager init method runs correctly."""
     mocked_manure_manager = MagicMock(ManureManager)
-    expected_field_setup_calls = [call(field_name, mocked_manure_manager) for field_name in field_blob_names]
+    mocked_feed_manager = MagicMock(FeedManager)
+    expected_field_setup_calls = [
+        call(field_name, mocked_manure_manager, mocked_feed_manager)
+        for field_name
+        in field_blob_names
+    ]
     with patch("RUFAS.input_manager.InputManager.get_data_keys_by_properties",
                return_value=field_blob_names) as patched_data_keys_by_properties, \
             patch("RUFAS.routines.field.manager.field_manager.FieldManager._setup_field",
                   return_value=MagicMock(Field)) as patched_field_setup, \
             patch.object(om, "add_warning") as warning:
-        field_manager = FieldManager(mocked_manure_manager)
+        field_manager = FieldManager(mocked_manure_manager, mocked_feed_manager)
 
         assert len(field_manager.fields) == len(field_blob_names)
         assert len(field_manager.output_gatherer.fields) == len(field_blob_names)
@@ -103,9 +110,10 @@ def test_daily_update_routine(fields: List[Field], mock_weather: Weather,
     setattr(mocked_time, "day", 5)
 
     mocked_manure_manager = MagicMock(ManureManager)
+    mocked_feed_manager = MagicMock(FeedManager)
     mock_weather.get_current_day_conditions = MagicMock(return_value=MagicMock(CurrentDayConditions))
     with patch("RUFAS.input_manager.InputManager.get_data_keys_by_properties", return_value=[]):
-        fm = FieldManager(mocked_manure_manager)
+        fm = FieldManager(mocked_manure_manager, mocked_feed_manager)
 
         fm.fields = fields
         for field in fields:
@@ -129,9 +137,10 @@ def test_annual_update_routine(fields: List[Field]):
     """Tests that the annual routines and it's methods were called and updated correctly"""
     for field in fields:
         field.perform_annual_reset = MagicMock()
-    mocked_field_manager = MagicMock(ManureManager)
+    mocked_manure_manager = MagicMock(ManureManager)
+    mocked_feed_manager = MagicMock(FeedManager)
     with patch("RUFAS.input_manager.InputManager.get_data_keys_by_properties", return_value=[]):
-        fm = FieldManager(mocked_field_manager)
+        fm = FieldManager(mocked_manure_manager, mocked_feed_manager)
         fm.fields = fields
         fm.output_gatherer.send_annual_variables = MagicMock()
         fm.annual_update_routine()
@@ -284,6 +293,10 @@ def test_setup_fertilizer_schedule(fertilizer_schedule_data: Dict, expected_avai
          "nitrogen_masses": [266, 266, 201, 207, 230, 279, 214, 244, 320, 169, 355, 163, 245, 66, 275],
          "phosphorus_masses": [70, 70, 45, 36, 37, 50, 31, 48, 53, 20, 60, 29, 43, 30, 54],
          "potassium_masses": [188, 188, 211, 164, 183, 198, 112, 156, 227, 167, 270, 128, 192, 86, 178],
+         "manure_types": [ManureType.LIQUID, ManureType.LIQUID, ManureType.LIQUID, ManureType.LIQUID,
+                          ManureType.LIQUID, ManureType.LIQUID, ManureType.LIQUID, ManureType.LIQUID,
+                          ManureType.LIQUID, ManureType.LIQUID, ManureType.LIQUID, ManureType.LIQUID,
+                          ManureType.LIQUID, ManureType.LIQUID, ManureType.LIQUID],
          "coverage_fractions": [0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1],
          "application_depths": [150.0, 150.0, 150.0, 150.0, 150.0, 150.0, 150.0, 150.0, 150.0, 150.0, 150.0, 150.0,
                                 150.0, 150.0, 150.0],
@@ -296,6 +309,10 @@ def test_setup_fertilizer_schedule(fertilizer_schedule_data: Dict, expected_avai
                        days=[113, 335, 311, 311, 310, 315, 316, 316, 314, 310, 327, 304, 324, 280, 318],
                        nitrogen_masses=[266, 266, 201, 207, 230, 279, 214, 244, 320, 169, 355, 163, 245, 66, 275],
                        phosphorus_masses=[70, 70, 45, 36, 37, 50, 31, 48, 53, 20, 60, 29, 43, 30, 54],
+                       manure_types=[ManureType.LIQUID, ManureType.LIQUID, ManureType.LIQUID, ManureType.LIQUID,
+                                     ManureType.LIQUID, ManureType.LIQUID, ManureType.LIQUID, ManureType.LIQUID,
+                                     ManureType.LIQUID, ManureType.LIQUID, ManureType.LIQUID, ManureType.LIQUID,
+                                     ManureType.LIQUID, ManureType.LIQUID, ManureType.LIQUID],
                        field_coverages=[0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1],
                        application_depths=[150.0, 150.0, 150.0, 150.0, 150.0, 150.0, 150.0, 150.0, 150.0, 150.0, 150.0,
                                            150.0, 150.0, 150.0, 150.0],
@@ -308,6 +325,8 @@ def test_setup_fertilizer_schedule(fertilizer_schedule_data: Dict, expected_avai
          "days": [200, 200, 200, 200, 200, 200, 200, 200, 200],
          "nitrogen_masses": [1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000],
          "phosphorus_masses": [500, 500, 500, 500, 500, 500, 500, 500, 500],
+         "manure_types": [ManureType.LIQUID, ManureType.LIQUID, ManureType.LIQUID, ManureType.LIQUID, ManureType.LIQUID,
+                          ManureType.LIQUID, ManureType.LIQUID, ManureType.LIQUID, ManureType.LIQUID],
          "potassium_masses": [0.0],
          "coverage_fractions": [0.95, 0.95, 0.95, 0.95, 0.95, 0.95, 0.95, 0.95, 0.95],
          "application_depths": [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
@@ -315,8 +334,8 @@ def test_setup_fertilizer_schedule(fertilizer_schedule_data: Dict, expected_avai
          "pattern_repeat": 0,
          "pattern_skip": 0
      }, ManureSchedule(name="manure_schedule", years=[2008], days=[200], nitrogen_masses=[1000],
-                       phosphorus_masses=[500], field_coverages=[0.95], application_depths=[0.0],
-                       surface_remainder_fractions=[1.0], pattern_repeat=8, pattern_skip=0))
+                       phosphorus_masses=[500], manure_types=[ManureType.LIQUID], field_coverages=[0.95],
+                       application_depths=[0.0], surface_remainder_fractions=[1.0], pattern_repeat=8, pattern_skip=0))
 ])
 def test_setup_manure_schedule(manure_schedule_data: Dict, expected_manure_schedule: ManureSchedule,
                                mock_input_manager: InputManager,
@@ -400,35 +419,39 @@ def test_setup_tillage_schedule(tillage_schedule_data: Dict, expected_tillage_sc
           "planting_days": [121],
           "harvest_years": [2009],
           "harvest_days": [319],
-          "harvest_operations": ["default"],
+          "harvest_operations": ["harvest_kill"],
           "harvest_type": "scheduled"}
      ], [CropSchedule(name="crop_schedule_0", crop_reference="corn", planting_years=[2009], planting_days=[121],
-                      harvest_years=[2009], harvest_days=[319], harvest_operations=["default"],
+                      harvest_years=[2009], harvest_days=[319], harvest_operations=["harvest_kill"],
                       use_heat_scheduling=False, pattern_repeat=1)]),
     ([
          {"crop_species": "corn", "planting_years": [2010], "pattern_repeat": 0, "pattern_skip": 1,
-          "planting_days": [121], "harvest_years": [2010], "harvest_days": [319], "harvest_operations": ["default"],
-          "harvest_type": "optimal", "planting_order": "1st", "extracted": True},
+          "planting_days": [121], "harvest_years": [2010], "harvest_days": [319],
+          "harvest_operations": ["harvest_kill"], "harvest_type": "optimal", "planting_order": "1st",
+          "extracted": True},
          {"crop_species": "corn", "planting_years": [2011], "pattern_repeat": 0, "pattern_skip": 3,
-          "planting_days": [121], "harvest_years": [2011], "harvest_days": [319], "harvest_operations": ["default"],
-          "harvest_type": "scheduled", "planting_order": "1st", "extracted": True},
+          "planting_days": [121], "harvest_years": [2011], "harvest_days": [319],
+          "harvest_operations": ["harvest_kill"], "harvest_type": "scheduled", "planting_order": "1st",
+          "extracted": True},
          {"crop_species": "corn", "planting_years": [2012], "pattern_repeat": 0, "pattern_skip": 0,
-          "planting_days": [121], "harvest_years": [2012], "harvest_days": [319], "harvest_operations": ["default"],
-          "harvest_type": "optimal", "planting_order": "1st", "extracted": True},
+          "planting_days": [121], "harvest_years": [2012], "harvest_days": [319],
+          "harvest_operations": ["harvest_kill"], "harvest_type": "optimal", "planting_order": "1st",
+          "extracted": True},
          {"crop_species": "corn", "planting_years": [2013], "pattern_repeat": 0, "pattern_skip": 2,
-          "planting_days": [121], "harvest_years": [2013], "harvest_days": [319], "harvest_operations": ["default"],
-          "harvest_type": "scheduled", "planting_order": "1st", "extracted": True}
+          "planting_days": [121], "harvest_years": [2013], "harvest_days": [319],
+          "harvest_operations": ["harvest_kill"], "harvest_type": "scheduled", "planting_order": "1st",
+          "extracted": True}
      ], [CropSchedule(name="crop_schedule_0", crop_reference="corn", planting_years=[2010], planting_days=[121],
-                      harvest_years=[2010], harvest_days=[319], harvest_operations=["default"],
+                      harvest_years=[2010], harvest_days=[319], harvest_operations=["harvest_kill"],
                       use_heat_scheduling=True, pattern_repeat=0),
          CropSchedule(name="crop_schedule_1", crop_reference="corn", planting_years=[2011], planting_days=[121],
-                      harvest_years=[2011], harvest_days=[319], harvest_operations=["default"],
+                      harvest_years=[2011], harvest_days=[319], harvest_operations=["harvest_kill"],
                       use_heat_scheduling=False, pattern_repeat=0),
          CropSchedule(name="crop_schedule_2", crop_reference="corn", planting_years=[2012], planting_days=[121],
-                      harvest_years=[2012], harvest_days=[319], harvest_operations=["default"],
+                      harvest_years=[2012], harvest_days=[319], harvest_operations=["harvest_kill"],
                       use_heat_scheduling=True, pattern_repeat=0),
          CropSchedule(name="crop_schedule_3", crop_reference="corn", planting_years=[2013], planting_days=[121],
-                      harvest_years=[2013], harvest_days=[319], harvest_operations=["default"],
+                      harvest_years=[2013], harvest_days=[319], harvest_operations=["harvest_kill"],
                       use_heat_scheduling=False, pattern_repeat=0)
          ])
 ])
@@ -845,6 +868,7 @@ def test_setup_field(field_name: str, field_config: Dict, mock_input_manager: In
                      input_manager_original_method_states: Dict[str, Callable]) -> None:
     """Tests that a Field instance is correctly initialized with a given input configuration."""
     mocked_manure_manager = MagicMock(ManureManager)
+    mocked_feed_manager = MagicMock(FeedManager)
     mocked_fertilizer_schedule = MagicMock(FertilizerSchedule)
     mocked_manure_schedule = MagicMock(ManureSchedule)
     mocked_tillage_schedule = MagicMock(TillageSchedule)
@@ -866,7 +890,7 @@ def test_setup_field(field_name: str, field_config: Dict, mock_input_manager: In
                   new_callable=MagicMock, return_value=mocked_crop_schedules) as patched_crop_schedules, \
             patch("RUFAS.routines.field.manager.field_manager.FieldManager._setup_soil", new_callable=MagicMock,
                   return_value=mocked_soil_profile) as patched_soil_setup:
-        new_field = FieldManager._setup_field(field_name, mocked_manure_manager)
+        new_field = FieldManager._setup_field(field_name, mocked_manure_manager, mocked_feed_manager)
 
         assert new_field.field_data.name == field_name
         assert new_field.field_data.field_size == field_config.get("field_size")

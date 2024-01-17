@@ -19,14 +19,30 @@ When decision-making is difficult and doubtful, we use these as our North Star t
 ## Past
 N/A
 
-# Definitions for Priority Levels
-- **P0 (Priority 0):** These are the 🔥 "fire-breathing dragon" tasks! They are critical and need immediate attention. Team members should don their hero capes 🦸‍♂️🦸‍♀️ and charge into action on P0 tasks. However, if someone finds themselves in a knightly standstill while battling these dragons 🐉, they can embark on a noble quest to tackle lower-priority tasks while working to rescue the damsel in distress (unblocking the higher-priority task).
+# Priority Definitions for Project Tasks
 
-- **P1 (Priority 1):** Think of these as the trusty steed tasks 🐎. They're important and require attention once the dragons (P0) are vanquished. Knights of the project realm should prioritize P0 tasks but, if they encounter a moat or a drawbridge on their way, they can hop on their trusty steed 🏇 and joust with P1 tasks, all while working on strategies to lower the drawbridge (resolve blockers).
+## Individual Task Priorities
 
-- **P2 (Priority 2):** These are the friendly village tasks 🏘️. They're less urgent but still vital to the kingdom. Team members can take a leisurely stroll through the village (work on P2 tasks) when the dragons and drawbridges are at bay. If they happen upon a blocked path, they can enjoy a cup of tea with the villagers ☕ (work on P2 tasks), all while devising clever plans to remove any obstacles in their way.
+1. **Wish:** These are the 🌟 "star-gazing" tasks. They are desirable but not essential. Team members can engage in these tasks as a creative respite or when other higher-priority tasks are not pressing. Imagine these tasks like enjoying a calm night under the stars, dreaming about possibilities.
 
-Remember, in the grand adventure of project work, flexibility and creativity are your allies! 🚀
+2. **Low:** Consider these tasks as the 🍃 "gentle breeze" in the project. They are tasks that need to be done but are not pressing. They can be approached in a relaxed manner, akin to enjoying a leisurely walk in a serene garden.
+
+3. **Medium:** These tasks are the 🛤️ "steady path" of the project. They are important and should be completed in due course. Team members should keep a steady pace on these tasks, ensuring progress is consistent. If not done in a timely manner, these tasks will be escalated to "High."
+
+4. **High:** Think of these tasks as the ⚓ "anchor" of the project. They are very important and should not be delayed. Team members should give these tasks focused attention, understanding their significant impact on the project.
+
+5. **Urgent:** These are the 🚨 "flashing sirens" of the project. They demand immediate attention and swift action. Just like responding to an emergency, these tasks should be addressed with utmost urgency.
+
+## Relative Task Priorities (For Milestones and Larger Work Chunks)
+
+1. **P0 (Priority 0):** The 🔥 "fire-breathing dragon" tasks! Critical and needing immediate attention. Don your hero capes 🦸‍♂️🦸‍♀️ and charge into action. If you're in a knightly standstill, it's noble to embark on a quest to tackle lower-priority tasks while rescuing the damsel in distress (unblocking the higher-priority task).
+
+2. **P1 (Priority 1):** The trusty steed tasks 🐎. Important to address once the dragons (P0) are vanquished. Prioritize P0, but if you encounter a moat or a drawbridge, hop on your steed 🏇 and joust with P1 tasks, strategizing to lower the drawbridge (resolve blockers).
+
+3. **P2 (Priority 2):** The friendly village tasks 🏘️. Less urgent but vital. Take a leisurely stroll (work on P2 tasks) when dragons and drawbridges are at bay. Enjoy a cup of tea with the villagers ☕ (work on P2 tasks), while devising plans to remove obstacles.
+
+Remember, flexibility and creativity are your allies in the grand adventure of project work! 🚀 Each task, whether a solo journey or part of a larger quest, plays a vital role in the epic saga of our project. Approach each with the dedication and spirit they deserve, and together, we will triumph!
+
 
 # 2023 Dev team sprint and on-call schedule
 | Start Date | End Date   | Sprint | On-Call |
@@ -146,8 +162,8 @@ Develop a set of standard scenarios for end-to-end testing|||P1
 
 [Pseudocode Guidelines](https://docs.google.com/document/d/1e5gM7fuT06iQYDKvwUAB-jVaLjw3iZizXAdSnOEDco0/edit?usp=sharing)
 
+[2024 Fixathon tasks alive](https://docs.google.com/spreadsheets/d/1rtbnWAw9wA1GoD7VHE0VNrXzasaj2-2dquInr0ZjAeY/edit?usp=sharing)
+
 [2023 Fixathon End tasks](https://docs.google.com/spreadsheets/d/1PcxDMAKYupDahtYiIpTKMMTjL4rbGa5ntiKf5ZuHHvU/edit?usp=sharing)
 
-[2023 Fixathon tasks alive](https://docs.google.com/spreadsheets/d/13_DoP4uFIsXjFKOcJhG25ys3dOL4wPp1rT-0Xu_fUyA/edit?usp=sharing)
-
-[2022 Fixathon tasks](https://docs.google.com/spreadsheets/d/1SnY3c4vBXrD9ybHoswJW28FrkG4DWx4fyvotIXA85BM/edit?usp=sharing)
+[2022 Fixathon End tasks](https://docs.google.com/spreadsheets/d/1SnY3c4vBXrD9ybHoswJW28FrkG4DWx4fyvotIXA85BM/edit?usp=sharing)
