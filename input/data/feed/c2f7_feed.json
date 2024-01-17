@@ -1,12 +1,12 @@
 {
     "calf_feeds": [
         202,
-        217
+        216
     ],
     "growing_feeds": [
         51,
         99,
-        217
+        216
 
     ],
     "close_up_feeds": [
@@ -28,7 +28,7 @@
         "purchased_feed_cost": 0.1 
       },
       {
-        "purchased_feed": 217,
+        "purchased_feed": 216,
         "purchased_feed_cost": 0.1 
       },
       {
@@ -91,7 +91,7 @@
           "ration_percentage": 50
         },
         {
-          "feed_type": 217,
+          "feed_type": 216,
           "ration_percentage": 50
         }
       ],
@@ -105,7 +105,7 @@
           "ration_percentage": 68.3
         },
         {
-          "feed_type": 217,
+          "feed_type": 216,
           "ration_percentage": 14.2
         }
       ],

@@ -1,38 +1,34 @@
 {
 	"herd_information": {
 		"calf_num":5,
-		"heiferI_num":25,
-		"heiferII_num":22,
-		"heiferIII_num_springers":3,
-		"cow_num":58,
-		"replace_num":290,
-		"herd_num":58,
+		"heiferI_num":28,
+		"heiferII_num":24,
+		"heiferIII_num_springers":4,
+		"cow_num":50,
+		"replace_num":250,
+		"herd_num":50,
 		"herd_init": false,
-		"breed": "HO"
-  },
-  "herd_initialization": {
-    "initial_animal_num": 10000,
-    "simulation_days": 5000
+		"breed": "Holstein"
 	},
 	"animal_config": {
 		"management_decisions": {
-			"breeding_start_day_h":404,
-			"heifer_repro_method": "TAI",
+			"breeding_start_day_h":395,
+			"heifer_repro_method": "ED",
 			"cow_repro_method": "ED",
 			"semen_type": "Conventional",
 			"days_in_preg_when_dry":220,
-			"heifer_repro_cull_time":545,
-			"do_not_breed_time" :225,
-			"cull_milk_production":13.6,
+			"heifer_repro_cull_time":550,
+			"do_not_breed_time" :300,
+			"cull_milk_production":20,
 			"cow_times_milked_per_day":2
 		},
 		"farm_level": {
 			"calf": {
 				"male_calf_rate_sexed_semen":0.1,
-				"male_calf_rate_conventional_semen":0.52,
-				"keep_female_calf_rate":0.95,
-				"wean_day":70,
-				"wean_length":4,
+				"male_calf_rate_conventional_semen":0.53,
+				"keep_female_calf_rate":1,
+				"wean_day":60,
+				"wean_length":3,
 				"milk_type": "whole"
 			},
 			"repro": {
@@ -40,50 +36,40 @@
 				"conception_rate_decrease":0.026,
                 "avg_gestation_len":278,
 				"std_gestation_len":6,
-				"prefresh_day":25,
-                "calving_interval":398,
-                "heifers": {
+				"prefresh_day":30,
+                "calving_interval":395,
+                "heifer_repro_programs": {
                     "estrus_detection_rate":0.9,
-                    "estrus_conception_rate":0.72,
-                    "repro_sub_protocol":"d5CPG",
-          "repro_sub_properties": {
-            "conception_rate":0.72,
-                    "estrus_detection_rate":0.9
-          }
-        },
-                    "cows": {
-          "estrus_detection_rate":0.25,
-                    "estrus_conception_rate":0.55,
-                    "presynch_protocol":"N/A",
-          "resynch_protocol": "TAIafterPD",
-                    "repro_sub_protocol":"OvSynch 56",
-          "repro_sub_properties": {
-            "conception_rate":0.55,
-            "tai_program_start_day":70
-          }
+                    "estrus_service_rate":1.0,
+                    "ed_conception_rate":0.55,
+                    "heifer_TAI_protocol": "ED",
+                    "md5CG2P_conception_rate":0.6,
+                    "md5CGP_conception_rate":0.6,
+                    "heifer_synchED_protocol": "2P",
+                    "estrus_detection_rate_h_synch":0.7
                 },
                 "cow_repro_programs": {
-                    "estrus_detection_rate":0.25,
-                    "estrus_service_rate":0.53,
-                    "ed_conception_rate":0.55,
-                    "cow_presynch_protocol":"N/A",
-                    "cow_TAI_protocol": "ovsynch56",
-                    "ovsynch56_conception_rate":0.55,
-                    "ovsynch48_conception_rate":0.55,
-					"cosynch72_conception_rate":0.55,
-                    "cosynch5d_conception_rate":0.55,
-                    "cow_resynch_protocol": "TAIafterPD",
-                    "tai_program_start_day":70
+                    "estrus_detection_rate":0.6,
+                    "estrus_service_rate":1.0,
+                    "ed_conception_rate":0.38,
+                    "cow_presynch_protocol": "Presynch Ovsynch",
+                    "cow_TAI_protocol": "Ovsynch 56",
+                    "ovsynch56_conception_rate":0.38,
+                    "ovsynch48_conception_rate":0.38,
+					"cosynch72_conception_rate":0.38,
+                    "cosynch5d_conception_rate":0.38,
+                    "cow_resynch_protocol": "Start Ovsynch at Open Check",
+                    "tai_program_start_day":80
                 }
 			},
 			"bodyweight": {
 				"birth_weight_avg_ho":43.9,
-				"birth_weight_std_ho":1.0,
+				"birth_weight_std_ho":1,
 				"birth_weight_avg_je":35.2,
-				"birth_weight_std_je":1.0,
-				"target_heifer_preg_day":425,
-				"mature_body_weight_avg":545.5,
-        		"mature_body_weight_std":54.5
+				"birth_weight_std_je":0.9,
+				"target_heifer_preg_day":420,
+				"mature_body_weight_avg":613.6,
+        		"mature_body_weight_std": 61.3
 			}		
 		},
 		"from_literature": {
@@ -104,12 +90,12 @@
 				"std_estrus_cycle_after_pgf": 2
 			},
 			"milking": {
-				"wood_l": [[16.13, 23.61, 23.81], [14.07, 19.26, 19.21]],
-				"wood_m": [[0.235, 0.227, 0.244], [0.186, 0.173, 0.190]],
-				"wood_n": [[0.0019, 0.0032, 0.0036], [0.0021, 0.0028, 0.0032]],
-				"wood_l_std": [[0.28, 0.54, 0.51], [0.39, 0.49, 0.47]],
-				"wood_m_std": [[0.0046, 0.0064, 0.0060], [0.0076, 0.0071, 0.0069]],
-				"wood_n_std": [[3.77e-5, 5.82e-5, 5.54e-5], [6.60e-5, 6.69e-5, 6.53e-5]]
+				"wood_l": [[], []],
+				"wood_m": [[], []],
+				"wood_n": [[], []],
+				"wood_l_std": [[], []],
+				"wood_m_std": [[], []],
+				"wood_n_std": [[], []]
 			},
 			"culling": {
 				"parity_death_prob": [0.039,0.056,0.085,0.117],
@@ -118,13 +104,14 @@
  				"death_cull_prob": [0, 0.18, 0.32, 0.42, 0.48, 0.54, 0.60, 0.65, 0.70, 0.77, 0.83, 0.89, 0.95, 1],
 				"cull_day_count": [0, 5, 15, 45, 90, 135, 180, 225, 270, 330, 380, 430, 480, 530],
 				"udder_cull_prob": [0, 0.12, 0.24, 0.33, 0.41, 0.48, 0.55, 0.62, 0.68, 0.76, 0.82, 0.89, 0.95, 1],
-				"unknown_cull_prob": [0, 0.05, 0.11, 0.18, 0.27, 0.37, 0.45, 0.54, 0.62, 0.70, 0.77, 0.84, 0.92, 1],
+				"unknown_cull_prob": [0, 0.05, 0.11, 0.18, 0.27, 0.37, 0.45,
+					0.54, 0.62, 0.70, 0.77, 0.84, 0.92, 1],
 				"feet_leg_cull_prob": [0, 0.03, 0.08, 0.16, 0.25, 0.36, 0.48, 0.59, 0.69, 0.78, 0.85, 0.90, 0.95, 1],
 				"disease_cull_prob": [0, 0.04, 0.12, 0.24, 0.34, 0.42, 0.50, 0.57, 0.64, 0.72, 0.81, 0.89, 0.95, 1],
 				"mastitis_cull_prob": [0, 0.06, 0.12, 0.19, 0.30, 0.43, 0.56, 0.68, 0.78, 0.85, 0.90, 0.94, 0.97, 1]
 			},
 			"life_cycle": {
-				"still_birth_rate":0.005
+				"still_birth_rate":0.03
 			}
 		}
 	},
@@ -138,7 +125,7 @@
 	},
 	"housing": "barn",
 	"pasture_concentrate": 0,
-	"methane_model": "Mutian",
+	"methane_model": "3-Mutian",
 	"ration": {
 		"user_input": true,
 		"formulation_interval": 30
@@ -148,24 +135,24 @@
 			"id": 0,
 			"pen_name": "Calves",
 			"animal_combination": "CALF",
-			"vertical_dist_to_milking_parlor":0.0,
-			"horizontal_dist_to_milking_parlor":0.0,
-			"number_of_stalls":7,
-			"housing_type": "tunnel ventilated",
-			"pen_type": "tie stall",
-			"max_stocking_density":1.5,
-			"manure_management_scenario_id":0
+			"vertical_dist_to_milking_parlor":0,
+			"horizontal_dist_to_milking_parlor":0,
+			"number_of_stalls":8,
+			"housing_type": "open air barn",
+			"pen_type": "CPBP",
+			"max_stocking_density":1.2,
+			"manure_management_scenario_id":1
 		},
 		{
 			"id": 1,
-			"pen_name": "Replacements",
+			"pen_name": "Heifers",
 			"animal_combination": "GROWING",
 			"vertical_dist_to_milking_parlor":0.0,
 			"horizontal_dist_to_milking_parlor":0.0,
-			"number_of_stalls":55,
+			"number_of_stalls": 65,
 			"housing_type": "open air barn",
 			"pen_type": "CBPB",
-			"max_stocking_density":1.5,
+			"max_stocking_density":1.2,
 			"manure_management_scenario_id":1
 		},
 		{
@@ -176,21 +163,21 @@
 			"horizontal_dist_to_milking_parlor":0.0,
 			"number_of_stalls":10,
 			"housing_type": "open air barn",
-			"pen_type": "CPBP",
-			"max_stocking_density":1.5,
+			"pen_type": "CBPB",
+			"max_stocking_density":1.2,
 			"manure_management_scenario_id":1
 		},
 		{
 			"id": 3,
-			"pen_name": "Lactating Herd",
+			"pen_name": "Milking cows",
 			"animal_combination": "LAC_COW",
 			"vertical_dist_to_milking_parlor":0.0,
 			"horizontal_dist_to_milking_parlor":0.0,
 			"number_of_stalls":60,
 			"housing_type": "open air barn",
-			"pen_type": "tie stall",
-			"max_stocking_density":1.5,
-			"manure_management_scenario_id":0
+			"pen_type": "Tie stall",
+			"max_stocking_density":1.2,
+			"manure_management_scenario_id":2
 		}
 	]
 }

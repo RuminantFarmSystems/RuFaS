@@ -10,7 +10,7 @@
     "animal": {
       "title": "Animal data",
       "description": "Moo Moo!",
-      "path": "input/data/animal/default_animal.json",
+      "path": "input/data/animal/c2f6_animal.json",
       "type": "json",
       "properties": "animal_properties"
     },

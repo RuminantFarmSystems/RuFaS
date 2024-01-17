@@ -1,14 +1,14 @@
 {
 	"herd_information": {
-		"calf_num": ,
-		"heiferI_num": ,
-		"heiferII_num": ,
-		"heiferIII_num_springers": ,
-		"cow_num": ,
-		"replace_num": ,
-		"herd_num": ,
+		"calf_num": 5,
+		"heiferI_num": 2,
+		"heiferII_num": 10,
+		"heiferIII_num_springers": 8,
+		"cow_num": 489,
+		"replace_num": 2500,
+		"herd_num": 489,
 		"herd_init": false,
-		"breed": ""
+		"breed": "HO"
   },
   "herd_initialization": {
     "initial_animal_num": 10000,
@@ -16,92 +16,92 @@
 	},
 	"animal_config": {
 		"management_decisions": {
-			"breeding_start_day_h": ,
-			"heifer_repro_method": "",
-			"cow_repro_method": "",
-			"semen_type": "",
-			"days_in_preg_when_dry": ,
-			"heifer_repro_cull_time": ,
-			"do_not_breed_time" : ,
-			"cull_milk_production": ,
-			"cow_times_milked_per_day": 
+			"breeding_start_day_h": 380,
+			"heifer_repro_method": "ED",
+			"cow_repro_method": "ED",
+			"semen_type": "sexed",
+			"days_in_preg_when_dry": 220,
+			"heifer_repro_cull_time": 550,
+			"do_not_breed_time" : 200,
+			"cull_milk_production": 22.67,
+			"cow_times_milked_per_day": 2.7
 		},
 		"farm_level": {
 			"calf": {
-				"male_calf_rate_sexed_semen": ,
-				"male_calf_rate_conventional_semen": ,
-				"keep_female_calf_rate": ,
-				"wean_day": ,
-				"wean_length": ,
-				"milk_type": ""
+				"male_calf_rate_sexed_semen": 0.1,
+				"male_calf_rate_conventional_semen": 0.53,
+				"keep_female_calf_rate": 1,
+				"wean_day": 60,
+				"wean_length": 7,
+				"milk_type": "whole"
 			},
 			"repro": {
-                "voluntary_waiting_period": ,
-				"conception_rate_decrease": ,
-                "avg_gestation_len": ,
-				"std_gestation_len": ,
-				"prefresh_day": ,
-                "calving_interval": ,
+                "voluntary_waiting_period": 75,
+				"conception_rate_decrease": 0.026,
+                "avg_gestation_len": 280,
+				"std_gestation_len": 6,
+				"prefresh_day": 21,
+                "calving_interval": 393,
                 "heifers": {
-                    "estrus_detection_rate": ,
-                    "estrus_conception_rate": ,
-                    "repro_sub_protocol": ,
-          "repro_sub_properties": {
-            "conception_rate": ,
-                    "estrus_detection_rate": 
-          }
-        },
-                    "cows": {
-          "estrus_detection_rate": ,
-                    "estrus_conception_rate": ,
-                    "presynch_protocol": ,
-          "resynch_protocol": ,
-                    "repro_sub_protocol": ,
-          "repro_sub_properties": {
-            "conception_rate": ,
-            "tai_program_start_day": 
-          }
+                    "estrus_detection_rate": 0.9,
+                    "estrus_conception_rate": 0.69,
+                    "repro_sub_protocol": "d5CG2P",
+          			"repro_sub_properties": {
+            			"conception_rate": 0.69,
+                    	"estrus_detection_rate": 0.4
+					}
+        		},
+                "cows": {
+          			"estrus_detection_rate": 0.79,
+                    "estrus_conception_rate": 0.44,
+                    "presynch_protocol": "Double OvSynch",
+          			"resynch_protocol": "TAIbeforePD",
+                    "repro_sub_protocol": "OvSynch 56",
+         			"repro_sub_properties": {
+            			"conception_rate": 0.43,
+            			"tai_program_start_day": 50
+          			}
                 },
                 "cow_repro_programs": {
-                    "estrus_detection_rate": ,
-                    "estrus_service_rate": ,
-                    "ed_conception_rate": ,
-                    "cow_presynch_protocol": ,
-                    "cow_TAI_protocol": ,
-                    "ovsynch56_conception_rate": ,
-                    "ovsynch48_conception_rate": ,
-					"cosynch72_conception_rate": ,
-                    "cosynch5d_conception_rate": ,
-                    "cow_resynch_protocol": 
-                    "tai_program_start_day":  
+                    "estrus_detection_rate": 0.79,
+                    "estrus_service_rate": 0.95,
+                    "ed_conception_rate": 0.44,
+                    "cow_presynch_protocol": "Double OvSynch",
+                    "cow_TAI_protocol": "OvSynch 56",
+                    "ovsynch56_conception_rate": 0.43,
+                    "ovsynch48_conception_rate": 0.43,
+					"cosynch72_conception_rate": 0.43,
+                    "cosynch5d_conception_rate": 0.43,
+                    "cow_resynch_protocol":"TAIbeforePD", 
+                    "tai_program_start_day": 50 
                 }
 			},
 			"bodyweight": {
-				"birth_weight_avg_ho": ,
-				"birth_weight_std_ho": ,
-				"birth_weight_avg_je": ,
-				"birth_weight_std_je": ,
-				"target_heifer_preg_day": ,
-				"mature_body_weight_avg": ,
-        		"mature_body_weight_std": 
+				"birth_weight_avg_ho": 43.9,
+				"birth_weight_std_ho": 1,
+				"birth_weight_avg_je": 35,
+				"birth_weight_std_je": 1,
+				"target_heifer_preg_day": 420,
+				"mature_body_weight_avg": 748.4,
+				"mature_body_weight_std": 65.8
 			}		
 		},
 		"from_literature": {
 			"repro": {
-				"preg_check_day_1": ,
-				"preg_loss_rate_1": ,
-				"preg_check_day_2": ,
-				"preg_loss_rate_2": ,
-				"preg_check_day_3": ,
-				"preg_loss_rate_3": ,
-				"avg_estrus_cycle_return": 23,
-				"std_estrus_cycle_return": 6,
-				"avg_estrus_cycle_heifer": 21,
-				"std_estrus_cycle_heifer": 2.5,
-				"avg_estrus_cycle_cow": 21,
-				"std_estrus_cycle_cow": 4,
-				"avg_estrus_cycle_after_pgf": 5,
-				"std_estrus_cycle_after_pgf": 2
+			  "preg_check_day_1": 32,
+			  "preg_loss_rate_1": 0.02,
+			  "preg_check_day_2": 60,
+			  "preg_loss_rate_2": 0.096,
+			  "preg_check_day_3": 200,
+			  "preg_loss_rate_3": 0.017,
+			  "avg_estrus_cycle_return": 23,
+			  "std_estrus_cycle_return": 6,
+			  "avg_estrus_cycle_heifer": 21,
+			  "std_estrus_cycle_heifer": 2.5,
+			  "avg_estrus_cycle_cow": 21,
+			  "std_estrus_cycle_cow": 4,
+			  "avg_estrus_cycle_after_pgf": 5,
+			  "std_estrus_cycle_after_pgf": 2
 			},
 			"milking": {
 				"wood_l": [[16.13, 23.61, 23.81], [14.07, 19.26, 19.21]],
@@ -112,8 +112,8 @@
 				"wood_n_std": [[3.77e-5, 5.82e-5, 5.54e-5], [6.60e-5, 6.69e-5, 6.53e-5]]
 			},
 			"culling": {
-				"parity_death_prob": [],
-				"parity_cull_prob": [],
+				"parity_death_prob": [0.039,0.056,0.085,0.117],
+				"parity_cull_prob": [0.09, 0.11, 0.21, 0.21],
 				"injury_cull_prob": [0, 0.08, 0.18, 0.28, 0.38, 0.47, 0.56, 0.64, 0.71, 0.78, 0.85, 0.90, 0.95, 1],
  				"death_cull_prob": [0, 0.18, 0.32, 0.42, 0.48, 0.54, 0.60, 0.65, 0.70, 0.77, 0.83, 0.89, 0.95, 1],
 				"cull_day_count": [0, 5, 15, 45, 90, 135, 180, 225, 270, 330, 380, 430, 480, 530],
@@ -124,7 +124,7 @@
 				"mastitis_cull_prob": [0, 0.06, 0.12, 0.19, 0.30, 0.43, 0.56, 0.68, 0.78, 0.85, 0.90, 0.94, 0.97, 1]
 			},
 			"life_cycle": {
-				"still_birth_rate": 
+				"still_birth_rate": 0.01
 			}
 		}
 	},
@@ -150,7 +150,7 @@
 			"animal_combination": "CALF",
 			"vertical_dist_to_milking_parlor": 0,
 			"horizontal_dist_to_milking_parlor": 0,
-			"number_of_stalls": 5,
+			"number_of_stalls": 5000,
 			"housing_type": "open air barn",
 			"pen_type": "Tiestall",
 			"max_stocking_density": 1.5,
@@ -162,7 +162,7 @@
 			"animal_combination": "GROWING",
 			"vertical_dist_to_milking_parlor": 0,
 			"horizontal_dist_to_milking_parlor": 0,
-			"number_of_stalls": 20,
+			"number_of_stalls": 2000,
 			"housing_type": "open air barn",
 			"pen_type": "freestall",
 			"max_stocking_density": 1.5,
@@ -174,7 +174,7 @@
 			"animal_combination": "CLOSE_UP",
 			"vertical_dist_to_milking_parlor": 0,
 			"horizontal_dist_to_milking_parlor": 0,
-			"number_of_stalls": 50,
+			"number_of_stalls": 5000,
 			"housing_type": "open air barn",
 			"pen_type": "freestall",
 			"max_stocking_density": 0.8,
@@ -186,7 +186,7 @@
 			"animal_combination": "LAC_COW",
 			"vertical_dist_to_milking_parlor": 0,
 			"horizontal_dist_to_milking_parlor": 0,
-			"number_of_stalls": 500,
+			"number_of_stalls": 5000,
 			"housing_type": "open air barn",
 			"pen_type": "freestall",
 			"max_stocking_density": 1.2,
