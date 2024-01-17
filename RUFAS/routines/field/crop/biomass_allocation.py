@@ -2,11 +2,6 @@ from math import exp
 from typing import Optional
 from RUFAS.routines.field.crop.crop_data import CropData
 
-"""
-This module primarily follows the Biomass Production section of the SWAT model (5:2.1.1)
-and some components from the Crop Yield section (5:2.4)
-"""
-
 
 class BiomassAllocation:
     """
@@ -38,6 +33,7 @@ class BiomassAllocation:
     _determine_below_ground_biomass(root_frac: float, biomass: float) -> float
         Calculates the below ground biomass of a plant.
     """
+
     def __init__(self, crop_data: Optional[CropData] = None):
         self.data = crop_data or CropData()  # initialize with defaults, if not given
 
