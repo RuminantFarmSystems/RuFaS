@@ -396,10 +396,7 @@ def test_print_animal_num_warnings(animal_manager: AnimalManager):
 def test_animals_by_type(mocker: MockerFixture):
     """Unit test for function animals_by_type in file routines/animal/animal_manager.py"""
     mocker.patch('RUFAS.routines.animal.animal_manager.AnimalManager.__init__', return_value=None)
-    mock_animal_manager = AnimalManager(data=mocker.MagicMock(), config=mocker.MagicMock(),
-                                        feed=mocker.MagicMock(), weather=mocker.MagicMock(),
-                                        time=mocker.MagicMock(),
-                                        feed_emissions_estimator=MagicMock(PurchasedFeedEmissionsEstimator))
+    mock_animal_manager = AnimalManager()
     mock_animal_manager.calves = MagicMock()
     mock_animal_manager.heiferIs = MagicMock()
     mock_animal_manager.heiferIIs = MagicMock()
@@ -416,9 +413,53 @@ def test_animals_by_type(mocker: MockerFixture):
     assert actual == expected
 
 
-def test_init_nutrient_rqmts():
+def test_init_nutrient_rqmts(mocker: MockerFixture) -> None:
     """Unit test for function init_nutrient_rqmts in file routines/animal/animal_manager.py"""
-    pass
+    mocker.patch('RUFAS.routines.animal.animal_manager.AnimalManager.__init__', return_value=None)
+    mock_animal_manager = AnimalManager()
+    mock_animal_manager.ANIMAL_GROUPING_SCENARIO = None
+    mock_animal_manager.calves = [MagicMock(), MagicMock()]
+    for animal in mock_animal_manager.calves:
+        animal.body_weight = 100
+        animal.set_nutrient_rqmts = MagicMock(return_value=1.0)
+    mock_animal_manager.heiferIs = [MagicMock(), MagicMock()]
+    for animal in mock_animal_manager.heiferIs:
+        animal.body_weight = 100
+        animal.set_nutrient_rqmts = MagicMock(return_value=1.0)
+    mock_animal_manager.heiferIIs = [MagicMock(), MagicMock()]
+    for animal in mock_animal_manager.heiferIIs:
+        animal.body_weight = 100
+        animal.set_nutrient_rqmts = MagicMock(return_value=1.0)
+    mock_animal_manager.heiferIIIs = [MagicMock(), MagicMock()]
+    for animal in mock_animal_manager.heiferIIIs:
+        animal.body_weight = 100
+        animal.set_nutrient_rqmts = MagicMock(return_value=1.0)
+    mock_animal_manager.cows = [MagicMock(), MagicMock()]
+    for animal in mock_animal_manager.cows:
+        animal.body_weight = 100
+        animal.set_nutrient_rqmts = MagicMock(return_value=1.0)
+    # set up fake animal manager, with multiple animals in all classes
+    # animals need to have body_weight only
+    mock_weather = MagicMock()
+    mock_time = MagicMock()
+    mock_feed = MagicMock()
+    # assert get_current_day_conditions called with time
+    # set the air temp
+
+    # acr e.g. init_nutrient_rqmts(mock_weather, mock_time, mock_feed)
+    mock_animal_manager.init_nutrient_rqmts(mock_weather, mock_time, mock_feed)
+
+    # assert that animal nutrient_rqmts == set_nutrient_rqmts side_effect
+    for animal in mock_animal_manager.calves:
+        assert animal.p_animal == 0.0072 * 100 * 1000
+    for animal in mock_animal_manager.heiferIs:
+        assert animal.p_animal == 0.0072 * 100 * 1000
+    for animal in mock_animal_manager.heiferIIs:
+        assert animal.p_animal == 0.0072 * 100 * 1000
+    for animal in mock_animal_manager.heiferIIIs:
+        assert animal.p_animal == 0.0072 * 100 * 1000
+    for animal in mock_animal_manager.cows:
+        assert animal.p_animal == 0.0072 * 100 * 1000
 
 
 def test_avg_pen_dist(animal_manager_with_mock_pens: AnimalManager) -> None:
