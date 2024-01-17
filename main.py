@@ -17,6 +17,7 @@ import numpy
 from RUFAS.config import Config
 from RUFAS.routines.animal.life_cycle.herd_factory import HerdFactory
 from RUFAS.scenario_manager import METADATA_PATHS, MetadataPaths
+from RUFAS.schema_generator import SchemaGenerator
 from RUFAS.simulation_engine import SimulationEngine
 from RUFAS.input_manager import InputManager
 from RUFAS.output_manager import OutputManager, LogVerbosity
@@ -45,7 +46,8 @@ def main():
             init_herd=cmd_arguments.init_herd,
             save_animals=cmd_arguments.save_animals,
             save_animals_dir=Path(cmd_arguments.save_animals_dir),
-            terminate_simulation_post_herd_generation=cmd_arguments.terminate_simulation_post_herd_generation
+            terminate_simulation_post_herd_generation=cmd_arguments.terminate_simulation_post_herd_generation,
+            generate_schemas=cmd_arguments.generate_schemas,
         )
     except Exception as e:
         info_map = {"class": "No caller class",
@@ -79,7 +81,8 @@ def run_rufas(
         init_herd: bool,
         save_animals: bool,
         save_animals_dir: Path,
-        terminate_simulation_post_herd_generation: bool
+        terminate_simulation_post_herd_generation: bool,
+        generate_schemas: bool,
 ) -> None:
     """
     Main function to run RuFaS, with options.
@@ -118,6 +121,9 @@ def run_rufas(
         User input indicating the save directory for generated animals.
     terminate_simulation_post_herd_generation: bool
         User input indicating whether to terminate the simulation after herd generation.
+    generate_schemas : bool
+        User input indicating if the program should produce input schemas for the Data Collection App and terminate.
+
     """
     sys.stdout.write("RuFaS: Ruminant Farm Systems Model 2023\n")
 
@@ -132,6 +138,27 @@ def run_rufas(
 
     if clear_output:
         output_manager.clear_output_dir(vars_file_path, output_dir)
+
+    if generate_schemas:
+        log_title = "Generating schemas"
+        log_message = "Main routine generating new input schemas for the Data Collection App."
+        info_map = {
+            "class": "main",
+            "function": "run_rufas"
+        }
+        output_manager.add_log(log_title, log_message, info_map)
+
+        schema_generator = SchemaGenerator()
+        schema_generator.generate_schemas(None, None)
+
+        log_title = "Completed schema generation"
+        log_message = "Main routine completed generating new input schemas for the Data Collection App."
+        info_map = {
+            "class": "main",
+            "function": "run_rufas"
+        }
+        output_manager.add_log(log_title, log_message, info_map)
+        return
 
     metadata_files: List[MetadataPaths] = METADATA_PATHS
     if only_run_validation:
@@ -389,7 +416,6 @@ def execute_simulations(
     sys.stdout.write("Simulating...\n")
     output_manager = OutputManager()
     input_manager = InputManager()
-    output_manager.set_log_verbose(verbose)
     for metadata_file in metadata_files:
         input_manager.flush_pool()
         output_manager.flush_pools()
@@ -546,6 +572,12 @@ def parse_gnu_args() -> argparse.Namespace:
         "-t",
         "--terminate_simulation_post_herd_generation",
         help="Select this flag if you only want to generate a herd, not continuing the simulation afterwards.",
+        action="store_true",
+    )
+    parser.add_argument(
+        "-sc",
+        "--generate-schemas",
+        help="Select this flag to generate input schemas for the data collection app instead of running a simulation.",
         action="store_true",
     )
     return parser.parse_args()
