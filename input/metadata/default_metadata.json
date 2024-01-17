@@ -468,39 +468,42 @@
                 "minimum": 0,
                 "maximum": 1
               },
-              "presynch_protocol": {
+              "presynch_program": {
                 "type": "string",
-                "description": "The presynch protocol (1st breeding) for cow in TAI (Timed Artificial Insemination) program. This ONLY applies to the TAI repro protocol.",
+                "description": "The presynch program (1st breeding) for cow in TAI (Timed Artificial Insemination) program. Currently, this is only supported in TAI protocol.",
                 "default": "Double OvSynch",
-                "pattern": "^(Double OvSynch|PreSynch|G6G|N/A)$"
+                "pattern": "^(Double OvSynch|PreSynch|G6G|None)$"
               },
-              "resynch_protocol": {
-                "type": "string",
-                "description": "Resynch protocol for cow before/at/after first pregnancy check day in the TAI and ED-TAI repro protocols.",
-                "default": "TAIafterPD",
-                "pattern": "^(TAIafterPD|TAIbeforePD|PGFatPD|N/A)$"
+              "presynch_program_start_day": {
+                "type": "number",
+                "description": "The presynch program start day is the day of the first hormone injection in a presynch program. It is used in TAI protocol. Currently, this is only supported in TAI protocol. If a presynch program is used in conjunction with an OvSynch program, the start day of the OvSynch program should be after the last day of the presynch program.",
+                "default": 50,
+                "minimum": 0
               },
-              "tai_program": {
+              "ovsynch_program": {
                 "type": "string",
-                "description": "Cow's TAI program to be used in both TAI and ED-TAI repro protocols.",
-                "pattern": "^(OvSynch 48|OvSynch 56|CoSynch 72|5d CoSynch|N/A)$",
+                "description": "Cow's OvSynch program to be used in both TAI and ED-TAI protocols.",
+                "pattern": "^(OvSynch 48|OvSynch 56|CoSynch 72|5d CoSynch|None)$",
                 "default": "OvSynch 56"
               },
-              "tai_program_properties": {
-                "type": "object",
-                "conception_rate": {
-                  "type": "number",
-                  "description": "The conception rate for cow's TAI program used in TAI and ED-TAI repro protocols (default is 0.6).",
-                  "default": 0.6,
-                  "minimum": 0,
-                  "maximum": 1
-                },
-                "tai_program_start_day": {
-                  "type": "number",
-                  "description": "TAI program start day for ED-TAI repro protocol after estrus has not been detected since the program start day.",
-                  "minimum": 0,
-                  "default": 70
-                }
+              "ovsynch_program_start_day": {
+                "type": "number",
+                "description": "OvSynch program start day is the day of the first GnRH injection in an OvSynch program. It is used in both TAI and ED-TAI repro protocols.",
+                "minimum": 0,
+                "default": 70
+              },
+              "ovsynch_program_conception_rate": {
+                "type": "number",
+                "description": "Conception rate for cow's OvSynch program used in both TAI and ED-TAI repro protocols (default is 0.6).",
+                "default": 0.6,
+                "minimum": 0,
+                "maximum": 1
+              },
+              "resynch_program": {
+                "type": "string",
+                "description": "Resynch program for cow before/at/after first pregnancy check day in the TAI and ED-TAI repro protocols.",
+                "default": "TAIafterPD",
+                "pattern": "^(TAIafterPD|TAIbeforePD|PGFatPD|None)$"
               }
             }
           },

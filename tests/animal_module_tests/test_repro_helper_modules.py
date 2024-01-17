@@ -33,7 +33,7 @@ from RUFAS.routines.animal.life_cycle.repro_protocol_misc import InternalReproSe
         10: {
             'set_ai_day': True,
             'set_conception_rate': True,
-            'set_tai_end': True
+            'set_ovsynch_end': True
         }
     }),
     ('cows', CowReproProtocolEnum.TAI_OvSynch_56.value, {
@@ -43,7 +43,7 @@ from RUFAS.routines.animal.life_cycle.repro_protocol_misc import InternalReproSe
         10: {
             'set_ai_day': True,
             'set_conception_rate': True,
-            'set_tai_end': True
+            'set_ovsynch_end': True
         }
     }),
     ('cows', CowReproProtocolEnum.TAI_CoSynch_72.value, {
@@ -53,7 +53,7 @@ from RUFAS.routines.animal.life_cycle.repro_protocol_misc import InternalReproSe
             'deliver_hormones': ['GnRH'],
             'set_ai_day': True,
             'set_conception_rate': True,
-            'set_tai_end': True
+            'set_ovsynch_end': True
         }
     }),
     ('cows', CowReproProtocolEnum.TAI_5d_CoSynch.value, {
@@ -64,7 +64,7 @@ from RUFAS.routines.animal.life_cycle.repro_protocol_misc import InternalReproSe
             'deliver_hormones': ['GnRH'],
             'set_ai_day': True,
             'set_conception_rate': True,
-            'set_tai_end': True
+            'set_ovsynch_end': True
         }
     }),
 
@@ -104,13 +104,13 @@ def test_get_schedule(animal_category: str, protocol_name: str, expected: dict |
         2: {'deliver_hormones': ['GnRH']},
         9: {'deliver_hormones': ['PGF']},
         11: {'deliver_hormones': ['GnRH']},
-        12: {'set_ai_day': True, 'set_conception_rate': True, 'set_tai_end': True}
+        12: {'set_ai_day': True, 'set_conception_rate': True, 'set_ovsynch_end': True}
     }),
     ('cows', CowReproProtocolEnum.TAI_OvSynch_56.value, 2, {
         2: {'deliver_hormones': ['GnRH']},
         9: {'deliver_hormones': ['PGF']},
         11: {'deliver_hormones': ['GnRH']},
-        12: {'set_ai_day': True, 'set_conception_rate': True, 'set_tai_end': True}
+        12: {'set_ai_day': True, 'set_conception_rate': True, 'set_ovsynch_end': True}
     }),
     ('cows', CowReproProtocolEnum.TAI_CoSynch_72.value, 2, {
         2: {'deliver_hormones': ['GnRH']},
@@ -119,7 +119,7 @@ def test_get_schedule(animal_category: str, protocol_name: str, expected: dict |
             'deliver_hormones': ['GnRH'],
             'set_ai_day': True,
             'set_conception_rate': True,
-            'set_tai_end': True
+            'set_ovsynch_end': True
         }
     }),
     ('cows', CowReproProtocolEnum.TAI_5d_CoSynch.value, 2, {
@@ -130,7 +130,7 @@ def test_get_schedule(animal_category: str, protocol_name: str, expected: dict |
             'deliver_hormones': ['GnRH'],
             'set_ai_day': True,
             'set_conception_rate': True,
-            'set_tai_end': True
+            'set_ovsynch_end': True
         }
     }),
 
