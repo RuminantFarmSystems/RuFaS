@@ -1,6 +1,6 @@
 from typing import Any
 from typing import List, Dict, Union
-from mock import MagicMock, patch
+from mock import MagicMock, patch, call
 
 import pytest
 from pytest_mock import MockerFixture
@@ -418,48 +418,40 @@ def test_init_nutrient_rqmts(mocker: MockerFixture) -> None:
     mocker.patch('RUFAS.routines.animal.animal_manager.AnimalManager.__init__', return_value=None)
     mock_animal_manager = AnimalManager()
     mock_animal_manager.ANIMAL_GROUPING_SCENARIO = None
-    mock_animal_manager.calves = [MagicMock(), MagicMock()]
-    for animal in mock_animal_manager.calves:
+    mock_animals = [MagicMock(), MagicMock()]
+    for animal in mock_animals:
         animal.body_weight = 100
-        animal.set_nutrient_rqmts = MagicMock(return_value=1.0)
-    mock_animal_manager.heiferIs = [MagicMock(), MagicMock()]
-    for animal in mock_animal_manager.heiferIs:
-        animal.body_weight = 100
-        animal.set_nutrient_rqmts = MagicMock(return_value=1.0)
-    mock_animal_manager.heiferIIs = [MagicMock(), MagicMock()]
-    for animal in mock_animal_manager.heiferIIs:
-        animal.body_weight = 100
-        animal.set_nutrient_rqmts = MagicMock(return_value=1.0)
-    mock_animal_manager.heiferIIIs = [MagicMock(), MagicMock()]
-    for animal in mock_animal_manager.heiferIIIs:
-        animal.body_weight = 100
-        animal.set_nutrient_rqmts = MagicMock(return_value=1.0)
-    mock_animal_manager.cows = [MagicMock(), MagicMock()]
-    for animal in mock_animal_manager.cows:
-        animal.body_weight = 100
-        animal.set_nutrient_rqmts = MagicMock(return_value=1.0)
-    # set up fake animal manager, with multiple animals in all classes
-    # animals need to have body_weight only
+        animal.calc_nutrient_rqmts = MagicMock()
+        animal.set_nutrient_rqmts = MagicMock()
+    animal_types = ['calves', 'heiferIs', 'heiferIIs', 'heiferIIIs', 'cows']
+    for animal_type in animal_types:
+        setattr(mock_animal_manager, animal_type, mock_animals)
+
     mock_weather = MagicMock()
+    mock_current_conditions = MagicMock()
+    mock_current_conditions.mean_air_temperature = 27
+    mock_weather.get_current_day_conditions.return_value = mock_current_conditions
     mock_time = MagicMock()
     mock_feed = MagicMock()
-    # assert get_current_day_conditions called with time
-    # set the air temp
 
-    # acr e.g. init_nutrient_rqmts(mock_weather, mock_time, mock_feed)
     mock_animal_manager.init_nutrient_rqmts(mock_weather, mock_time, mock_feed)
 
-    # assert that animal nutrient_rqmts == set_nutrient_rqmts side_effect
-    for animal in mock_animal_manager.calves:
-        assert animal.p_animal == 0.0072 * 100 * 1000
-    for animal in mock_animal_manager.heiferIs:
-        assert animal.p_animal == 0.0072 * 100 * 1000
-    for animal in mock_animal_manager.heiferIIs:
-        assert animal.p_animal == 0.0072 * 100 * 1000
-    for animal in mock_animal_manager.heiferIIIs:
-        assert animal.p_animal == 0.0072 * 100 * 1000
-    for animal in mock_animal_manager.cows:
-        assert animal.p_animal == 0.0072 * 100 * 1000
+    mock_weather.get_current_day_conditions.assert_called_once_with(mock_time)
+    assert 1 == animal.calc_nutrient_rqmts.call_count
+    assert 4 == animal.set_nutrient_rqmts.call_count
+    animal.calc_nutrient_rqmts.assert_called_with(mock_feed, 27)
+    animal.set_nutrient_rqmts.assert_has_calls([call(None), call(27, None)], any_order=True)
+    target_p_animal = 0.0072 * 100 * 1000
+    for animal_type in animal_types:
+        animals = getattr(mock_animal_manager, animal_type)
+        for animal in animals:
+            assert getattr(animal, 'p_animal') == target_p_animal
+    # if animal_type == 'calves':
+    #     animal.calc_nutrient_rqmts.assert_called_with(mock_feed, 27)
+    # elif animal_type in ['heiferIs', 'heiferIIs', 'heiferIIIs']:
+    #     animal.set_nutrient_rqmts.assert_called_with(27, None)
+    # elif animal_type == 'cows':
+    #     animal.set_nutrient_rqmts.assert_called_with(None)
 
 
 def test_avg_pen_dist(animal_manager_with_mock_pens: AnimalManager) -> None:
