@@ -3145,8 +3145,6 @@ def test_make_ration_from_user_values(mock_available_feeds: dict) -> None:
     ration_percents = {"1": 50, "2": 50}
     req = RUFAS.routines.animal.ration.animal_requirements.AnimalRequirements()
     req.DMIest_requirement = 10
-    # req.DMIest_requirement = MagicMock(
-    #     side_effect=10)
     actual = UserDefinedRationManager.make_ration_from_user_values(ration_percents, mock_available_feeds, req)
     expected = {'1': 5, '2': 5, '3': 0.0, '4': 0.0, '5': 0.0, '6': 0.0, 'objective': 0.0, 'status': 'Optimal'}
     assert actual == expected
