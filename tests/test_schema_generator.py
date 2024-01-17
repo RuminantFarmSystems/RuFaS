@@ -3,7 +3,7 @@ from pytest_mock import MockerFixture
 from unittest.mock import patch
 from typing import Any
 
-from RUFAS.schema_manager import SchemaGenerator
+from RUFAS.schema_generator import SchemaGenerator
 
 
 @pytest.mark.parametrize("pattern,expected", [
