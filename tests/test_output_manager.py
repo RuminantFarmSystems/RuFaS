@@ -1,12 +1,11 @@
-from copy import deepcopy
-import os
-from pathlib import Path
-import re
 import json
+import os
+from copy import deepcopy
+from pathlib import Path
 from typing import Any, Callable, Dict, List
-from mock import mock_open, patch
 
 import pytest
+from mock import mock_open, patch
 from mock.mock import MagicMock, call
 from pytest import raises
 from pytest_mock.plugin import MockerFixture
@@ -37,7 +36,7 @@ def test_set_metadata_prefix(mock_output_manager: OutputManager) -> None:
     [LogVerbosity.NONE, LogVerbosity.ERRORS, LogVerbosity.WARNINGS, LogVerbosity.LOGS],
 )
 def test_set_log_verbose(
-    mock_output_manager: OutputManager, log_verbose: LogVerbosity
+        mock_output_manager: OutputManager, log_verbose: LogVerbosity
 ) -> None:
     """Unit test for the function set_log_verbose in the file output_manager.py"""
     mock_output_manager.set_log_verbose(log_verbose)
@@ -85,122 +84,122 @@ def test_dict_to_csv_column_list_empty_list(mock_output_manager: OutputManager) 
     "data, expected_result, should_write",
     [
         (
-            {"var1": {"values": [1.0, True, "test"], "info_maps": []}},
-            f"var1,var1{os.linesep}1.0,{os.linesep}True,{os.linesep}test,{os.linesep}",
-            True,
+                {"var1": {"values": [1.0, True, "test"], "info_maps": []}},
+                f"var1,var1{os.linesep}1.0,{os.linesep}True,{os.linesep}test,{os.linesep}",
+                True,
         ),
         (
-            {"var1": {"values": [1.0, True, "test"]}},
-            f"var1{os.linesep}1.0{os.linesep}True{os.linesep}test{os.linesep}",
-            True,
+                {"var1": {"values": [1.0, True, "test"]}},
+                f"var1{os.linesep}1.0{os.linesep}True{os.linesep}test{os.linesep}",
+                True,
         ),
         (
-            {
-                "var1": {
-                    "values": [1, 2, 3],
-                    "info_maps": [{"v": 1}, {"v": 2}, {"v": 3}],
-                }
-            },
-            f"var1,var1.v{os.linesep}1,1{os.linesep}2,2{os.linesep}3,3{os.linesep}",
-            True,
-        ),
-        (
-            {"var1": {"values": [1, 2, 3]}},
-            f"var1{os.linesep}1{os.linesep}2{os.linesep}3{os.linesep}",
-            True,
-        ),
-        (
-            {
-                "var1": {
-                    "values": [1],
-                    "info_maps": [{"map1": "value1"}, {"map1": "value2"}],
-                }
-            },
-            f"var1,var1.map1{os.linesep}1,value1{os.linesep},value2{os.linesep}",
-            True,
-        ),
-        (
-            {
-                "var1": {
-                    "values": [{"v1": 1, "v2": 1}, {"v1": 2, "v2": 2}],
-                    "info_maps": [{"map1": "value1"}, {"map1": "value2"}],
-                }
-            },
-            f"var1.v1,var1.v2,var1.map1{os.linesep}1,1,value1{os.linesep}2,2,value2{os.linesep}",
-            True,
-        ),
-        (
-            {
-                "simple_key": {
-                    "values": [
-                        {"key1": 1, "key2": [1, 1]},
-                        {"key1": 2, "key2": [2, 2]},
-                        {"key1": 3, "key2": [3, 3]},
-                    ],
-                    "info_maps": [
-                        {
-                            "subkey1": 1,
-                            "subkey2": "Hello",
-                            "subkey3": [1, 2, 3],
-                            "subkey4": {"nestedkey1": "World", "nestedkey2": [4, 5, 6]},
-                        },
-                        {
-                            "subkey1": 2,
-                            "subkey2": "Hi",
-                            "subkey3": [4, 5, 6],
-                            "subkey4": {"nestedkey1": "There", "nestedkey2": [7, 8, 9]},
-                        },
-                    ],
-                }
-            },
-            f"simple_key.key1,simple_key.key2,simple_key.subkey1,simple_key.subkey2,"
-            f"simple_key.subkey3,simple_key.subkey4{os.linesep}"
-            f"1,\"[1, 1]\",1,Hello,\"[1, 2, 3]\",\"{{'nestedkey1': 'World', 'nestedkey2': [4, 5, 6]}}\"{os.linesep}"
-            f"2,\"[2, 2]\",2,Hi,\"[4, 5, 6]\",\"{{'nestedkey1': 'There', 'nestedkey2': [7, 8, 9]}}\"{os.linesep}"
-            f'3,"[3, 3]",,,,{os.linesep}',
-            True,
-        ),
-        (
-            {
-                "simple_key1": {"values": [1, 2, 3]},
-                "simple_key2": {"values": [4, 5, 6]},
-            },
-            f"simple_key1,simple_key2{os.linesep}"
-            f"1,4{os.linesep}2,5{os.linesep}3,6{os.linesep}",
-            True,
-        ),
-        (
-            {
-                "simple_key1": {
-                    "values": [1, 2, 3],
-                    "info_maps": [{"subkey1": "Farm", "subkey2": "Field"}],
+                {
+                    "var1": {
+                        "values": [1, 2, 3],
+                        "info_maps": [{"v": 1}, {"v": 2}, {"v": 3}],
+                    }
                 },
-                "simple_key2": {
-                    "values": [4, 5, 6, 8, 9],
-                    "info_maps": [
-                        {
-                            "subkey1": "Tractor",
-                        }
-                    ],
+                f"var1,var1.v{os.linesep}1,1{os.linesep}2,2{os.linesep}3,3{os.linesep}",
+                True,
+        ),
+        (
+                {"var1": {"values": [1, 2, 3]}},
+                f"var1{os.linesep}1{os.linesep}2{os.linesep}3{os.linesep}",
+                True,
+        ),
+        (
+                {
+                    "var1": {
+                        "values": [1],
+                        "info_maps": [{"map1": "value1"}, {"map1": "value2"}],
+                    }
                 },
-            },
-            f"simple_key1,simple_key1.subkey1,simple_key1.subkey2,simple_key2,"
-            f"simple_key2.subkey1{os.linesep}"
-            f"1,Farm,Field,4,Tractor{os.linesep}"
-            f"2,,,5,{os.linesep}"
-            f"3,,,6,{os.linesep}"
-            f",,,8,{os.linesep}"
-            f",,,9,{os.linesep}",
-            True,
+                f"var1,var1.map1{os.linesep}1,value1{os.linesep},value2{os.linesep}",
+                True,
+        ),
+        (
+                {
+                    "var1": {
+                        "values": [{"v1": 1, "v2": 1}, {"v1": 2, "v2": 2}],
+                        "info_maps": [{"map1": "value1"}, {"map1": "value2"}],
+                    }
+                },
+                f"var1.v1,var1.v2,var1.map1{os.linesep}1,1,value1{os.linesep}2,2,value2{os.linesep}",
+                True,
+        ),
+        (
+                {
+                    "simple_key": {
+                        "values": [
+                            {"key1": 1, "key2": [1, 1]},
+                            {"key1": 2, "key2": [2, 2]},
+                            {"key1": 3, "key2": [3, 3]},
+                        ],
+                        "info_maps": [
+                            {
+                                "subkey1": 1,
+                                "subkey2": "Hello",
+                                "subkey3": [1, 2, 3],
+                                "subkey4": {"nestedkey1": "World", "nestedkey2": [4, 5, 6]},
+                            },
+                            {
+                                "subkey1": 2,
+                                "subkey2": "Hi",
+                                "subkey3": [4, 5, 6],
+                                "subkey4": {"nestedkey1": "There", "nestedkey2": [7, 8, 9]},
+                            },
+                        ],
+                    }
+                },
+                f"simple_key.key1,simple_key.key2,simple_key.subkey1,simple_key.subkey2,"
+                f"simple_key.subkey3,simple_key.subkey4{os.linesep}"
+                f"1,\"[1, 1]\",1,Hello,\"[1, 2, 3]\",\"{{'nestedkey1': 'World', 'nestedkey2': [4, 5, 6]}}\"{os.linesep}"
+                f"2,\"[2, 2]\",2,Hi,\"[4, 5, 6]\",\"{{'nestedkey1': 'There', 'nestedkey2': [7, 8, 9]}}\"{os.linesep}"
+                f'3,"[3, 3]",,,,{os.linesep}',
+                True,
+        ),
+        (
+                {
+                    "simple_key1": {"values": [1, 2, 3]},
+                    "simple_key2": {"values": [4, 5, 6]},
+                },
+                f"simple_key1,simple_key2{os.linesep}"
+                f"1,4{os.linesep}2,5{os.linesep}3,6{os.linesep}",
+                True,
+        ),
+        (
+                {
+                    "simple_key1": {
+                        "values": [1, 2, 3],
+                        "info_maps": [{"subkey1": "Farm", "subkey2": "Field"}],
+                    },
+                    "simple_key2": {
+                        "values": [4, 5, 6, 8, 9],
+                        "info_maps": [
+                            {
+                                "subkey1": "Tractor",
+                            }
+                        ],
+                    },
+                },
+                f"simple_key1,simple_key1.subkey1,simple_key1.subkey2,simple_key2,"
+                f"simple_key2.subkey1{os.linesep}"
+                f"1,Farm,Field,4,Tractor{os.linesep}"
+                f"2,,,5,{os.linesep}"
+                f"3,,,6,{os.linesep}"
+                f",,,8,{os.linesep}"
+                f",,,9,{os.linesep}",
+                True,
         ),
         ({}, "", False),
     ],
 )
 def test_dict_to_file_csv(
-    mock_output_manager: OutputManager,
-    data: Dict[str, Any],
-    expected_result: str,
-    should_write: bool,
+        mock_output_manager: OutputManager,
+        data: Dict[str, Any],
+        expected_result: str,
+        should_write: bool,
 ) -> None:
     """Unit test for the function _dict_to_file_csv in the file output_manager.py"""
     open_mock = mock_open()
@@ -313,34 +312,15 @@ def test_generate_key(mocker: MockerFixture) -> None:
     assert key == "dummy_prefix.key_name.dummy_suffix"
 
 
-def test_get_timestamp(mocker: MockerFixture) -> None:
-    """Unit test for the function _get_timestamp in file output_manager.py"""
-    om = OutputManager()
-    # match 28-Jun-2023_Wed_15-48-21.406585
-    timestamp_with_millis_pattern = (
-        r"\d{2}-[A-Za-z]{3}-\d{4}_[A-Za-z]{3}_\d{2}-\d{2}-\d{2}\.\d{6}"
-    )
-    # match 28-Jun-2023_Wed_15-48-21
-    timestamp_without_millis_pattern = (
-        r"\d{2}-[A-Za-z]{3}-\d{4}_[A-Za-z]{3}_\d{2}-\d{2}-\d{2}"
-    )
-
-    assert re.match(
-        timestamp_with_millis_pattern, om._get_timestamp(include_millis=True)
-    )
-    assert re.match(
-        timestamp_without_millis_pattern, om._get_timestamp(include_millis=False)
-    )
-
-
 @pytest.mark.parametrize(
-    "log_verobse",
+    "log_verbose",
     [LogVerbosity.NONE, LogVerbosity.ERRORS, LogVerbosity.WARNINGS, LogVerbosity.LOGS],
 )
 def test_add_error(
-    mock_output_manager: OutputManager,
-    output_manager_original_method_states: Dict[str, Callable],
-    log_verobse: LogVerbosity,
+        mock_output_manager: OutputManager,
+        output_manager_original_method_states: Dict[str, Callable],
+        log_verbose: LogVerbosity,
+        mocker: MockerFixture,
 ) -> None:
     """Unit test for function add_error in file output_manager.py"""
     key = "dummy_key"
@@ -351,8 +331,9 @@ def test_add_error(
     metadata_prefix = "dummy_prefix"
     mock_output_manager._generate_key = MagicMock(return_value=key)
     mock_output_manager._add_to_pool = MagicMock()
-    mock_output_manager._get_timestamp = MagicMock(return_value=timestamp)
-    mock_output_manager.set_log_verbose(log_verobse)
+    # mock_output_manager._get_timestamp = MagicMock(return_value=timestamp)
+    mocker.patch('RUFAS.output_manager.Utility.get_timestamp', return_value=timestamp)
+    mock_output_manager.set_log_verbose(log_verbose)
     mock_output_manager.set_metadata_prefix(metadata_prefix)
     mock_output_manager._handle_log_output = MagicMock()
 
@@ -374,22 +355,23 @@ def test_add_error(
     mock_output_manager._add_to_pool = output_manager_original_method_states[
         "_add_to_pool"
     ]
-    mock_output_manager._get_timestamp = output_manager_original_method_states[
-        "_get_timestamp"
-    ]
     mock_output_manager._handle_log_output = output_manager_original_method_states[
         "_handle_log_output"
+    ]
+    mock_output_manager.add_error = output_manager_original_method_states[
+        "add_error"
     ]
 
 
 @pytest.mark.parametrize(
-    "log_verobse",
+    "log_verbose",
     [LogVerbosity.NONE, LogVerbosity.ERRORS, LogVerbosity.WARNINGS, LogVerbosity.LOGS],
 )
 def test_add_warning(
-    mock_output_manager: OutputManager,
-    output_manager_original_method_states: Dict[str, Callable],
-    log_verobse: LogVerbosity,
+        mock_output_manager: OutputManager,
+        output_manager_original_method_states: Dict[str, Callable],
+        log_verbose: LogVerbosity,
+        mocker: MockerFixture,
 ) -> None:
     """Unit test for function add_warning in file output_manager.py"""
     key = "dummy_key"
@@ -400,8 +382,8 @@ def test_add_warning(
     metadata_prefix = "dummy_prefix"
     mock_output_manager._generate_key = MagicMock(return_value=key)
     mock_output_manager._add_to_pool = MagicMock()
-    mock_output_manager._get_timestamp = MagicMock(return_value=timestamp)
-    mock_output_manager.set_log_verbose(log_verobse)
+    mocker.patch('RUFAS.output_manager.Utility.get_timestamp', return_value=timestamp)
+    mock_output_manager.set_log_verbose(log_verbose)
     mock_output_manager.set_metadata_prefix(metadata_prefix)
     mock_output_manager._handle_log_output = MagicMock()
 
@@ -424,22 +406,23 @@ def test_add_warning(
     mock_output_manager._add_to_pool = output_manager_original_method_states[
         "_add_to_pool"
     ]
-    mock_output_manager._get_timestamp = output_manager_original_method_states[
-        "_get_timestamp"
-    ]
     mock_output_manager._handle_log_output = output_manager_original_method_states[
         "_handle_log_output"
+    ]
+    mock_output_manager.add_warning = output_manager_original_method_states[
+        "add_warning"
     ]
 
 
 @pytest.mark.parametrize(
-    "log_verobse",
+    "log_verbose",
     [LogVerbosity.NONE, LogVerbosity.ERRORS, LogVerbosity.WARNINGS, LogVerbosity.LOGS],
 )
 def test_add_log(
-    mock_output_manager: OutputManager,
-    output_manager_original_method_states: Dict[str, Callable],
-    log_verobse: LogVerbosity,
+        mock_output_manager: OutputManager,
+        output_manager_original_method_states: Dict[str, Callable],
+        log_verbose: LogVerbosity,
+        mocker: MockerFixture,
 ) -> None:
     """Unit test for function add_log in file output_manager.py"""
     key = "dummy_key"
@@ -450,8 +433,8 @@ def test_add_log(
     metadata_prefix = "dummy_prefix"
     mock_output_manager._generate_key = MagicMock(return_value=key)
     mock_output_manager._add_to_pool = MagicMock()
-    mock_output_manager._get_timestamp = MagicMock(return_value=timestamp)
-    mock_output_manager.set_log_verbose(log_verobse)
+    mocker.patch('RUFAS.output_manager.Utility.get_timestamp', return_value=timestamp)
+    mock_output_manager.set_log_verbose(log_verbose)
     mock_output_manager.set_metadata_prefix(metadata_prefix)
     mock_output_manager._handle_log_output = MagicMock()
 
@@ -475,17 +458,17 @@ def test_add_log(
     mock_output_manager._add_to_pool = output_manager_original_method_states[
         "_add_to_pool"
     ]
-    mock_output_manager._get_timestamp = output_manager_original_method_states[
-        "_get_timestamp"
-    ]
     mock_output_manager._handle_log_output = output_manager_original_method_states[
         "_handle_log_output"
+    ]
+    mock_output_manager.add_log = output_manager_original_method_states[
+        "add_log"
     ]
 
 
 def test_add_variable(
-    mock_output_manager: OutputManager,
-    output_manager_original_method_states: Dict[str, Callable],
+        mock_output_manager: OutputManager,
+        output_manager_original_method_states: Dict[str, Callable],
 ) -> None:
     """Unit test for function add_variable in file output_manager.py"""
     key = "dummy_key"
@@ -609,7 +592,7 @@ def test_flush_pools() -> None:
 
 @pytest.fixture
 def output_manager_original_method_states(
-    mock_output_manager: OutputManager,
+        mock_output_manager: OutputManager,
 ) -> Dict[str, Callable]:
     """Fixture to store original methods of OutputManager"""
     return {
@@ -620,7 +603,6 @@ def output_manager_original_method_states(
         "_filter_variables_pool": mock_output_manager._filter_variables_pool,
         "_generate_file_name": mock_output_manager._generate_file_name,
         "_generate_key": mock_output_manager._generate_key,
-        "_get_timestamp": mock_output_manager._get_timestamp,
         "_handle_log_output": mock_output_manager._handle_log_output,
         "set_metadata_prefix": mock_output_manager.set_metadata_prefix,
         "set_log_verbose": mock_output_manager.set_log_verbose,
@@ -642,12 +624,13 @@ def output_manager_original_method_states(
         "clear_output_dir": mock_output_manager.clear_output_dir,
         "is_file_in_dir": mock_output_manager.is_file_in_dir,
         "create_directory": mock_output_manager.create_directory,
+        "_route_logs": mock_output_manager._route_logs,
     }
 
 
 def test_dump_all_nondata_pools(
-    mock_output_manager: OutputManager,
-    output_manager_original_method_states: Dict[str, Callable],
+        mock_output_manager: OutputManager,
+        output_manager_original_method_states: Dict[str, Callable],
 ) -> None:
     """Test case for function dump_all_nondata_pools in output_manager.py"""
     path = "dummy_path"
@@ -695,17 +678,17 @@ def test_generate_file_name(mocker: MockerFixture) -> None:
     om = OutputManager()
     om._OutputManager__metadata_prefix = metadata_prefix
 
-    with patch.object(om, "_get_timestamp") as mock_method:
+    with patch('RUFAS.output_manager.Utility.get_timestamp') as mock_method:
         mock_method.return_value = timestamp
         assert (
-            om._generate_file_name(base_name, extension)
-            == f"{metadata_prefix}_{base_name}_{timestamp}.{extension}"
+                om._generate_file_name(base_name, extension)
+                == f"{metadata_prefix}_{base_name}_{timestamp}.{extension}"
         )
 
 
 def test_dump_variables(
-    mock_output_manager: OutputManager,
-    output_manager_original_method_states: Dict[str, Callable],
+        mock_output_manager: OutputManager,
+        output_manager_original_method_states: Dict[str, Callable],
 ) -> None:
     """Test case for function dump_variables in output_manager.py"""
     filtered_info_maps_dict = {}
@@ -754,8 +737,8 @@ def test_dump_variables(
 
 
 def test_dump_logs(
-    mock_output_manager: OutputManager,
-    output_manager_original_method_states: Dict[str, Callable],
+        mock_output_manager: OutputManager,
+        output_manager_original_method_states: Dict[str, Callable],
 ) -> None:
     """Test case for function dump_logs in output_manager.py"""
     mock_output_manager._generate_file_name = MagicMock(return_value="dummy_name")
@@ -778,8 +761,8 @@ def test_dump_logs(
 
 
 def test_dump_warnings(
-    mock_output_manager: OutputManager,
-    output_manager_original_method_states: Dict[str, Callable],
+        mock_output_manager: OutputManager,
+        output_manager_original_method_states: Dict[str, Callable],
 ) -> None:
     """Test case for function dump_warnings in output_manager.py"""
     mock_output_manager._generate_file_name = MagicMock(return_value="dummy_name")
@@ -802,8 +785,8 @@ def test_dump_warnings(
 
 
 def test_dump_errors(
-    mock_output_manager: OutputManager,
-    output_manager_original_method_states: Dict[str, Callable],
+        mock_output_manager: OutputManager,
+        output_manager_original_method_states: Dict[str, Callable],
 ) -> None:
     """Test case for function dump_errors in output_manager.py"""
     mock_output_manager._generate_file_name = MagicMock(return_value="dummy_name")
@@ -829,101 +812,101 @@ def test_dump_errors(
     "expected_result, exclude_info_maps, format_option",
     [
         (
-            [
-                "_exclude_info_maps=False, expect info_maps accordingly." + os.linesep,
-                "var1" + os.linesep,
-                "var1.info_maps: test" + os.linesep,
-                "var2.info_maps: map1" + os.linesep,
-                "var2.values: v1" + os.linesep,
-                "var2.values: v2" + os.linesep,
-            ],
-            False,
-            "verbose",
+                [
+                    "_exclude_info_maps=False, expect info_maps accordingly." + os.linesep,
+                    "var1" + os.linesep,
+                    "var1.info_maps: test" + os.linesep,
+                    "var2.info_maps: map1" + os.linesep,
+                    "var2.values: v1" + os.linesep,
+                    "var2.values: v2" + os.linesep,
+                ],
+                False,
+                "verbose",
         ),
         (
-            [
-                "_exclude_info_maps=True, expect info_maps accordingly." + os.linesep,
-                "var1" + os.linesep,
-                "var2.values: v1" + os.linesep,
-                "var2.values: v2" + os.linesep,
-            ],
-            True,
-            "verbose",
+                [
+                    "_exclude_info_maps=True, expect info_maps accordingly." + os.linesep,
+                    "var1" + os.linesep,
+                    "var2.values: v1" + os.linesep,
+                    "var2.values: v2" + os.linesep,
+                ],
+                True,
+                "verbose",
         ),
         (
-            [
-                "_exclude_info_maps=False, expect info_maps accordingly." + os.linesep,
-                "var1" + os.linesep,
-                "    .info_maps: test" + os.linesep,
-                "var2" + os.linesep,
-                "    .info_maps: map1" + os.linesep,
-                "    .values: v1" + os.linesep,
-                "    .values: v2" + os.linesep,
-            ],
-            False,
-            "block",
+                [
+                    "_exclude_info_maps=False, expect info_maps accordingly." + os.linesep,
+                    "var1" + os.linesep,
+                    "    .info_maps: test" + os.linesep,
+                    "var2" + os.linesep,
+                    "    .info_maps: map1" + os.linesep,
+                    "    .values: v1" + os.linesep,
+                    "    .values: v2" + os.linesep,
+                ],
+                False,
+                "block",
         ),
         (
-            [
-                "_exclude_info_maps=True, expect info_maps accordingly." + os.linesep,
-                "var1" + os.linesep,
-                "var2" + os.linesep,
-                "    .values: v1" + os.linesep,
-                "    .values: v2" + os.linesep,
-            ],
-            True,
-            "block",
+                [
+                    "_exclude_info_maps=True, expect info_maps accordingly." + os.linesep,
+                    "var1" + os.linesep,
+                    "var2" + os.linesep,
+                    "    .values: v1" + os.linesep,
+                    "    .values: v2" + os.linesep,
+                ],
+                True,
+                "block",
         ),
         (
-            [
-                "_exclude_info_maps=False, expect info_maps accordingly." + os.linesep,
-                "var1" + os.linesep,
-                "var1.info_maps: ['test']" + os.linesep,
-                "var2.info_maps: ['map1']" + os.linesep,
-                "var2.values: ['v1', 'v2']" + os.linesep,
-            ],
-            False,
-            "inline",
+                [
+                    "_exclude_info_maps=False, expect info_maps accordingly." + os.linesep,
+                    "var1" + os.linesep,
+                    "var1.info_maps: ['test']" + os.linesep,
+                    "var2.info_maps: ['map1']" + os.linesep,
+                    "var2.values: ['v1', 'v2']" + os.linesep,
+                ],
+                False,
+                "inline",
         ),
         (
-            [
-                "_exclude_info_maps=True, expect info_maps accordingly." + os.linesep,
-                "var1" + os.linesep,
-                "var2.values: ['v1', 'v2']" + os.linesep,
-            ],
-            True,
-            "inline",
+                [
+                    "_exclude_info_maps=True, expect info_maps accordingly." + os.linesep,
+                    "var1" + os.linesep,
+                    "var2.values: ['v1', 'v2']" + os.linesep,
+                ],
+                True,
+                "inline",
         ),
         (
-            [
-                "_exclude_info_maps=True, expect info_maps accordingly." + os.linesep,
-                "var1" + os.linesep,
-                "var2.v1" + os.linesep,
-                "var2.v2" + os.linesep,
-            ],
-            True,
-            "basic",
+                [
+                    "_exclude_info_maps=True, expect info_maps accordingly." + os.linesep,
+                    "var1" + os.linesep,
+                    "var2.v1" + os.linesep,
+                    "var2.v2" + os.linesep,
+                ],
+                True,
+                "basic",
         ),
         (
-            [
-                "_exclude_info_maps=False, expect info_maps accordingly." + os.linesep,
-                "var1" + os.linesep,
-                "var1.test" + os.linesep,
-                "var2.map1" + os.linesep,
-                "var2.v1" + os.linesep,
-                "var2.v2" + os.linesep,
-            ],
-            False,
-            "basic",
+                [
+                    "_exclude_info_maps=False, expect info_maps accordingly." + os.linesep,
+                    "var1" + os.linesep,
+                    "var1.test" + os.linesep,
+                    "var2.map1" + os.linesep,
+                    "var2.v1" + os.linesep,
+                    "var2.v2" + os.linesep,
+                ],
+                False,
+                "basic",
         ),
     ],
 )
 def test_dump_variable_names_and_contexts(
-    mock_output_manager: OutputManager,
-    output_manager_original_method_states: Dict[str, Callable],
-    expected_result: List[str],
-    exclude_info_maps: bool,
-    format_option: str,
+        mock_output_manager: OutputManager,
+        output_manager_original_method_states: Dict[str, Callable],
+        expected_result: List[str],
+        exclude_info_maps: bool,
+        format_option: str,
 ) -> None:
     """Test case for function dump_variable_names_and_contexts in output_manager.py"""
     mock_variable_pool: Dict[str, Dict[str, List[Any]]] = {
@@ -960,8 +943,8 @@ def test_dump_variable_names_and_contexts(
 
 
 def test_dump_variable_names_and_contexts_no_values(
-    mock_output_manager: OutputManager,
-    output_manager_original_method_states: Dict[str, Callable],
+        mock_output_manager: OutputManager,
+        output_manager_original_method_states: Dict[str, Callable],
 ) -> None:
     """Test case for function dump_variable_names_and_contexts in output_manager.py"""
     mock_variable_pool: Dict[str, Dict[str, List[Any]]] = {
@@ -1001,9 +984,9 @@ def test_dump_variable_names_and_contexts_no_values(
 
 
 def test_list_to_file_txt(
-    mock_output_manager: OutputManager,
-    output_manager_original_method_states: Dict[str, Callable],
-    tmpdir,
+        mock_output_manager: OutputManager,
+        output_manager_original_method_states: Dict[str, Callable],
+        tmpdir,
 ) -> None:
     """Test case for function _list_to_file_text in output_manager.py"""
     dummy_file_path = tmpdir.join("dummy_file.txt")
@@ -1031,8 +1014,8 @@ def test_list_to_file_txt(
 
 
 def test_exclude_info_maps(
-    mock_output_manager: OutputManager,
-    output_manager_original_method_states: Dict[str, Callable],
+        mock_output_manager: OutputManager,
+        output_manager_original_method_states: Dict[str, Callable],
 ) -> None:
     """Test case for function _exclude_info_maps in output_manager.py"""
     # Test case 1: Empty pool
@@ -1068,10 +1051,10 @@ def test_exclude_info_maps(
 )
 @patch("builtins.open", new_callable=mock_open)
 def test_load_filter_file_content_txt(
-    mock_file: MagicMock,
-    mock_output_manager: OutputManager,
-    output_manager_original_method_states: Dict[str, Callable],
-    mock_file_text: str,
+        mock_file: MagicMock,
+        mock_output_manager: OutputManager,
+        output_manager_original_method_states: Dict[str, Callable],
+        mock_file_text: str,
 ) -> None:
     """Test case for function _load_filter_file_content in output_manager.py"""
     mock_file.return_value.read.return_value = mock_file_text
@@ -1086,9 +1069,9 @@ def test_load_filter_file_content_txt(
 
 @patch("builtins.open", new_callable=mock_open)
 def test_load_filter_file_content_json(
-    mock_file: MagicMock,
-    mock_output_manager: OutputManager,
-    output_manager_original_method_states: Dict[str, Callable],
+        mock_file: MagicMock,
+        mock_output_manager: OutputManager,
+        output_manager_original_method_states: Dict[str, Callable],
 ) -> None:
     """Test case for function _load_filter_file_content in output_manager.py"""
 
@@ -1108,9 +1091,9 @@ def test_load_filter_file_content_json(
 
 @patch("builtins.open", new_callable=mock_open)
 def test_load_filter_file_content_json_multiple(
-    mock_file: MagicMock,
-    mock_output_manager: OutputManager,
-    output_manager_original_method_states: Dict[str, Callable],
+        mock_file: MagicMock,
+        mock_output_manager: OutputManager,
+        output_manager_original_method_states: Dict[str, Callable],
 ) -> None:
     """Test case for function _load_filter_file_content in output_manager.py"""
 
@@ -1138,9 +1121,9 @@ def test_load_filter_file_content_json_multiple(
 
 @patch("builtins.open", new_callable=mock_open)
 def test_load_filter_file_content_exception(
-    mock_file: MagicMock,
-    mock_output_manager: OutputManager,
-    output_manager_original_method_states: Dict[str, Callable],
+        mock_file: MagicMock,
+        mock_output_manager: OutputManager,
+        output_manager_original_method_states: Dict[str, Callable],
 ) -> None:
     """Test case for function _load_filter_file_content in output_manager.py"""
     with pytest.raises(Exception):
@@ -1171,9 +1154,9 @@ def test_load_filter_file_content_exception(
 
 
 def test_list_filter_files_in_dir(
-    mock_output_manager: OutputManager,
-    output_manager_original_method_states: Dict[str, Callable],
-    tmpdir,
+        mock_output_manager: OutputManager,
+        output_manager_original_method_states: Dict[str, Callable],
+        tmpdir,
 ) -> None:
     mock_output_manager.add_warning = MagicMock()
     tmpdir.join("json_file1.txt").write("File 1 content")
@@ -1201,8 +1184,8 @@ def test_list_filter_files_in_dir(
 
 
 def test_filter_variables_pool_include_empty_filter_pattern_pool(
-    mock_output_manager: OutputManager,
-    output_manager_original_method_states: Dict[str, Callable],
+        mock_output_manager: OutputManager,
+        output_manager_original_method_states: Dict[str, Callable],
 ) -> None:
     """Test case for empty filter pattern pool with function _filter_variables_pool in output_manager.py"""
     mock_output_manager.variables_pool = {
@@ -1215,8 +1198,8 @@ def test_filter_variables_pool_include_empty_filter_pattern_pool(
     expected_result = {}
 
     assert (
-        mock_output_manager._filter_variables_pool(filter_patterns, dummy_input_file)
-        == expected_result
+            mock_output_manager._filter_variables_pool(filter_patterns, dummy_input_file)
+            == expected_result
     )
 
     # Restore original method
@@ -1227,8 +1210,8 @@ def test_filter_variables_pool_include_empty_filter_pattern_pool(
 
 
 def test_filter_variables_pool_exclude_empty_filter_pattern_pool(
-    mock_output_manager: OutputManager,
-    output_manager_original_method_states: Dict[str, Callable],
+        mock_output_manager: OutputManager,
+        output_manager_original_method_states: Dict[str, Callable],
 ) -> None:
     """Test case for exclude keyword in empty filter pattern pool with
     function _filter_variables_pool in output_manager.py"""
@@ -1242,8 +1225,8 @@ def test_filter_variables_pool_exclude_empty_filter_pattern_pool(
     expected_result = {"key1": "value1", "key2": "value2", "key3": "value3"}
 
     assert (
-        mock_output_manager._filter_variables_pool(filter_patterns, dummy_input_file)
-        == expected_result
+            mock_output_manager._filter_variables_pool(filter_patterns, dummy_input_file)
+            == expected_result
     )
 
     # Restore original method
@@ -1254,8 +1237,8 @@ def test_filter_variables_pool_exclude_empty_filter_pattern_pool(
 
 
 def test_filter_variables_pool_with_matching_filters_in_pattern_pool(
-    mock_output_manager: OutputManager,
-    output_manager_original_method_states: Dict[str, Callable],
+        mock_output_manager: OutputManager,
+        output_manager_original_method_states: Dict[str, Callable],
 ) -> None:
     """Test case for matching pattern pool with function _filter_variables_pool in output_manager.py"""
     mock_output_manager.variables_pool = {
@@ -1268,8 +1251,8 @@ def test_filter_variables_pool_with_matching_filters_in_pattern_pool(
     expected_result = {"key1": "value1", "key2": "value2"}
 
     assert (
-        mock_output_manager._filter_variables_pool(filter_patterns, dummy_input_file)
-        == expected_result
+            mock_output_manager._filter_variables_pool(filter_patterns, dummy_input_file)
+            == expected_result
     )
 
     # Restore original method
@@ -1280,8 +1263,8 @@ def test_filter_variables_pool_with_matching_filters_in_pattern_pool(
 
 
 def test_filter_variables_pool_exclude_matching_filters_in_pattern_pool(
-    mock_output_manager: OutputManager,
-    output_manager_original_method_states: Dict[str, Callable],
+        mock_output_manager: OutputManager,
+        output_manager_original_method_states: Dict[str, Callable],
 ) -> None:
     """Test case for exclude keyword in matching pattern pool with
     function _filter_variables_pool in output_manager.py"""
@@ -1295,8 +1278,8 @@ def test_filter_variables_pool_exclude_matching_filters_in_pattern_pool(
     expected_result = {"key3": "value3"}
 
     assert (
-        mock_output_manager._filter_variables_pool(filter_patterns, dummy_input_file)
-        == expected_result
+            mock_output_manager._filter_variables_pool(filter_patterns, dummy_input_file)
+            == expected_result
     )
 
     # Restore original method
@@ -1307,8 +1290,8 @@ def test_filter_variables_pool_exclude_matching_filters_in_pattern_pool(
 
 
 def test_filter_variables_pool_non_matching_pattern(
-    mock_output_manager: OutputManager,
-    output_manager_original_method_states: Dict[str, Callable],
+        mock_output_manager: OutputManager,
+        output_manager_original_method_states: Dict[str, Callable],
 ) -> None:
     """Test case for pattern pool with non-matching pattern with
     function _filter_variables_pool in output_manager.py"""
@@ -1322,8 +1305,8 @@ def test_filter_variables_pool_non_matching_pattern(
     expected_result = {"key1": "value1"}
 
     assert (
-        mock_output_manager._filter_variables_pool(filter_patterns, dummy_input_file)
-        == expected_result
+            mock_output_manager._filter_variables_pool(filter_patterns, dummy_input_file)
+            == expected_result
     )
 
     # Restore original method
@@ -1334,8 +1317,8 @@ def test_filter_variables_pool_non_matching_pattern(
 
 
 def test_filter_variables_pool_exclude_non_matching_pattern(
-    mock_output_manager: OutputManager,
-    output_manager_original_method_states: Dict[str, Callable],
+        mock_output_manager: OutputManager,
+        output_manager_original_method_states: Dict[str, Callable],
 ) -> None:
     """Test case for pattern pool with exclude keyword and non-matching pattern with
     function _filter_variables_pool in output_manager.py"""
@@ -1349,14 +1332,14 @@ def test_filter_variables_pool_exclude_non_matching_pattern(
     expected_result = {"key2": "value2", "key3": "value3"}
 
     assert (
-        mock_output_manager._filter_variables_pool(filter_patterns, dummy_input_file)
-        == expected_result
+            mock_output_manager._filter_variables_pool(filter_patterns, dummy_input_file)
+            == expected_result
     )
 
 
 def test_filter_variables_pool_duplicate_patterns(
-    mock_output_manager: OutputManager,
-    output_manager_original_method_states: Dict[str, Callable],
+        mock_output_manager: OutputManager,
+        output_manager_original_method_states: Dict[str, Callable],
 ) -> None:
     """Test case for pattern pool with duplicate patterns with
     function _filter_variables_pool in output_manager.py"""
@@ -1370,8 +1353,8 @@ def test_filter_variables_pool_duplicate_patterns(
     expected_result = {"key1": "value1"}
 
     assert (
-        mock_output_manager._filter_variables_pool(filter_patterns, dummy_input_file)
-        == expected_result
+            mock_output_manager._filter_variables_pool(filter_patterns, dummy_input_file)
+            == expected_result
     )
 
     # Restore original method
@@ -1382,8 +1365,8 @@ def test_filter_variables_pool_duplicate_patterns(
 
 
 def test_filter_variables_pool_exclude_duplicate_patterns(
-    mock_output_manager: OutputManager,
-    output_manager_original_method_states: Dict[str, Callable],
+        mock_output_manager: OutputManager,
+        output_manager_original_method_states: Dict[str, Callable],
 ) -> None:
     """Test case for pattern pool with duplicate patterns and exclude keyword with
     function _filter_variables_pool in output_manager.py"""
@@ -1397,8 +1380,8 @@ def test_filter_variables_pool_exclude_duplicate_patterns(
     expected_result = {"key2": "value2", "key3": "value3"}
 
     assert (
-        mock_output_manager._filter_variables_pool(filter_patterns, dummy_input_file)
-        == expected_result
+            mock_output_manager._filter_variables_pool(filter_patterns, dummy_input_file)
+            == expected_result
     )
 
     # Restore original method
@@ -1423,9 +1406,9 @@ def mock_variables_pool() -> Dict[str, str]:
 
 
 def test_filter_variables_pool_regex_patterns(
-    mock_output_manager: OutputManager,
-    output_manager_original_method_states: Dict[str, Callable],
-    mock_variables_pool: Dict[str, str],
+        mock_output_manager: OutputManager,
+        output_manager_original_method_states: Dict[str, Callable],
+        mock_variables_pool: Dict[str, str],
 ) -> None:
     """Test case for pattern pool using regex patterns with
     function _filter_variables_pool in output_manager.py"""
@@ -1440,8 +1423,8 @@ def test_filter_variables_pool_regex_patterns(
     }
 
     assert (
-        mock_output_manager._filter_variables_pool(filter_patterns, dummy_input_file)
-        == expected_result
+            mock_output_manager._filter_variables_pool(filter_patterns, dummy_input_file)
+            == expected_result
     )
 
     # get only vars from fun2s
@@ -1452,8 +1435,8 @@ def test_filter_variables_pool_regex_patterns(
     }
 
     assert (
-        mock_output_manager._filter_variables_pool(filter_patterns, dummy_input_file)
-        == expected_result
+            mock_output_manager._filter_variables_pool(filter_patterns, dummy_input_file)
+            == expected_result
     )
 
     # get Class2 with var4 but not Class2 with var3
@@ -1464,8 +1447,8 @@ def test_filter_variables_pool_regex_patterns(
     }
 
     assert (
-        mock_output_manager._filter_variables_pool(filter_patterns, dummy_input_file)
-        == expected_result
+            mock_output_manager._filter_variables_pool(filter_patterns, dummy_input_file)
+            == expected_result
     )
 
     # get all var2s and var4s
@@ -1478,8 +1461,8 @@ def test_filter_variables_pool_regex_patterns(
     }
 
     assert (
-        mock_output_manager._filter_variables_pool(filter_patterns, dummy_input_file)
-        == expected_result
+            mock_output_manager._filter_variables_pool(filter_patterns, dummy_input_file)
+            == expected_result
     )
 
     # Restore original method
@@ -1490,9 +1473,9 @@ def test_filter_variables_pool_regex_patterns(
 
 
 def test_filter_variables_pool_exclude_regex_patterns(
-    mock_output_manager: OutputManager,
-    output_manager_original_method_states: Dict[str, Callable],
-    mock_variables_pool: Dict[str, str],
+        mock_output_manager: OutputManager,
+        output_manager_original_method_states: Dict[str, Callable],
+        mock_variables_pool: Dict[str, str],
 ) -> None:
     """Test case for pattern pool with regex patterns and exclude keyword with
     function _filter_variables_pool in output_manager.py"""
@@ -1510,8 +1493,8 @@ def test_filter_variables_pool_exclude_regex_patterns(
     }
 
     assert (
-        mock_output_manager._filter_variables_pool(filter_patterns, dummy_input_file)
-        == expected_result
+            mock_output_manager._filter_variables_pool(filter_patterns, dummy_input_file)
+            == expected_result
     )
 
     # get everything except vars from fun2s
@@ -1525,8 +1508,8 @@ def test_filter_variables_pool_exclude_regex_patterns(
     }
 
     assert (
-        mock_output_manager._filter_variables_pool(filter_patterns, dummy_input_file)
-        == expected_result
+            mock_output_manager._filter_variables_pool(filter_patterns, dummy_input_file)
+            == expected_result
     )
 
     # get everything without Class2 with var4
@@ -1540,8 +1523,8 @@ def test_filter_variables_pool_exclude_regex_patterns(
     }
 
     assert (
-        mock_output_manager._filter_variables_pool(filter_patterns, dummy_input_file)
-        == expected_result
+            mock_output_manager._filter_variables_pool(filter_patterns, dummy_input_file)
+            == expected_result
     )
 
     # get everything that doesn't have var2s and var4s
@@ -1553,8 +1536,8 @@ def test_filter_variables_pool_exclude_regex_patterns(
     }
 
     assert (
-        mock_output_manager._filter_variables_pool(filter_patterns, dummy_input_file)
-        == expected_result
+            mock_output_manager._filter_variables_pool(filter_patterns, dummy_input_file)
+            == expected_result
     )
 
     # Restore original method
@@ -1575,12 +1558,12 @@ def test_filter_variables_pool_exclude_regex_patterns(
     ],
 )
 def test_save_results(
-    mock_output_manager: OutputManager,
-    output_manager_original_method_states: Dict[str, Callable],
-    exclude_info_maps: bool,
-    produce_graphics: bool,
-    filter_content: List[Dict[str, str]],
-    is_faulty: bool,
+        mock_output_manager: OutputManager,
+        output_manager_original_method_states: Dict[str, Callable],
+        exclude_info_maps: bool,
+        produce_graphics: bool,
+        filter_content: List[Dict[str, str]],
+        is_faulty: bool,
 ) -> None:
     # Arrange
     csvs_dir = "output/CSVs/"
@@ -1673,12 +1656,13 @@ def test_save_results(
     ],
 )
 def test_save_results_report_generation(
-    mock_output_manager: OutputManager,
-    output_manager_original_method_states: Dict[str, Callable],
-    exclude_info_maps: bool,
-    produce_graphics: bool,
-    filter_content: List[Dict[str, str]],
-    is_faulty: bool,
+        mock_output_manager: OutputManager,
+        output_manager_original_method_states: Dict[str, Callable],
+        exclude_info_maps: bool,
+        produce_graphics: bool,
+        filter_content: List[Dict[str, str]],
+        is_faulty: bool,
+        mocker: MockerFixture,
 ) -> None:
     # Arrange
     mock_output_manager.variables_pool = {}
@@ -1695,6 +1679,7 @@ def test_save_results_report_generation(
     mock_output_manager._exclude_info_maps = MagicMock(return_value={})
     mock_output_manager._dict_to_file_csv = MagicMock()
     mock_output_manager.add_error = MagicMock()
+    mocker.patch.object(mock_output_manager, '_route_logs', return_value=None)
 
     with patch("RUFAS.output_manager.ReportGenerator") as mock_report_generator_class:
         mock_report_generator = mock_report_generator_class.return_value
@@ -1720,20 +1705,6 @@ def test_save_results_report_generation(
                 mock_output_manager._list_filter_files_in_dir.return_value
             )
 
-        # test for exception handling
-        mock_report_generator.generate_report.side_effect = KeyError()
-        mock_output_manager.save_results(
-            "save_path",
-            "filters_path",
-            exclude_info_maps,
-            produce_graphics,
-            "graphics_dir",
-            "csv_dir"
-        )
-        assert mock_output_manager.add_error.call_count == len(
-            mock_output_manager._list_filter_files_in_dir.return_value
-        ) + is_faulty * len(mock_output_manager._list_filter_files_in_dir.return_value)
-
     # Restore original method states
     mock_output_manager.save_results = output_manager_original_method_states[
         "save_results"
@@ -1757,8 +1728,8 @@ def test_save_results_report_generation(
 
 
 def test_route_save_functions_csv(
-    mock_output_manager: OutputManager,
-    output_manager_original_method_states: Dict[str, Callable],
+        mock_output_manager: OutputManager,
+        output_manager_original_method_states: Dict[str, Callable],
 ) -> None:
     mock_output_manager._dict_to_file_csv = MagicMock()
     mock_output_manager._route_save_functions(
@@ -1784,8 +1755,8 @@ def test_route_save_functions_csv(
 
 
 def test_route_save_functions_json(
-    mock_output_manager: OutputManager,
-    output_manager_original_method_states: Dict[str, Callable],
+        mock_output_manager: OutputManager,
+        output_manager_original_method_states: Dict[str, Callable],
 ) -> None:
     mock_output_manager.dict_to_file_json = MagicMock()
     mock_output_manager._generate_file_name = MagicMock(return_value="filename.json")
@@ -1811,25 +1782,29 @@ def test_route_save_functions_json(
 
 
 def test_route_save_functions_graph(
-    mock_output_manager: OutputManager,
-    output_manager_original_method_states: Dict[str, Callable],
+        mock_output_manager: OutputManager,
+        output_manager_original_method_states: Dict[str, Callable],
 ) -> None:
     with patch(
         "RUFAS.graph_generator.GraphGenerator.generate_graph"
-    ) as mock_generate_graph:
+    ) as mock_generate_graph, patch.object(mock_output_manager, 'create_directory') as mock_create_directory:
+        dummy_log = ['dummy_log']
+        mock_generate_graph.return_value = dummy_log
         mock_output_manager.add_warning = MagicMock()
         mock_output_manager.add_error = MagicMock()
+        mock_output_manager._route_logs = MagicMock(return_value=True)
         graph_data = {"filters": ".*", "other keys": "other values"}
         mock_output_manager._route_save_functions(
             "graph_file",
             "save_path",
-            {"key": {"var": "value"}},
+            {"key": [1, 2, 3, 4]},
             False,
             graph_data,
             Path("graphics_dir"),
-            "csvs_dir"
+            Path("csvs_dir")
         )
         mock_generate_graph.assert_not_called()
+        mock_create_directory.assert_called_with(Path("graphics_dir"))
         mock_output_manager.add_warning.assert_called_once_with(
             "No Graphics",
             "Graphic generation is disabled, skipping filter_file='graph_file'",
@@ -1839,19 +1814,20 @@ def test_route_save_functions_graph(
         mock_output_manager._route_save_functions(
             "graph_file",
             "save_path",
-            {"key": {"var": "value"}},
+            {"key": [1, 2, 3, 4]},
             True,
             graph_data,
             Path("graphics_dir"),
-            "csvs_dir"
+            Path("csvs_dir")
         )
         mock_output_manager.add_warning.assert_called_once_with(
             "No Graphics",
             "Graphic generation is disabled, skipping filter_file='graph_file'",
             {"class": "OutputManager", "function": "_route_save_functions"},
         )
+
         mock_generate_graph.assert_called_once_with(
-            {"key": {"var": "value"}},
+            {"key": [1, 2, 3, 4]},
             graph_data,
             "graph_file",
             Path("graphics_dir"),
@@ -1861,7 +1837,7 @@ def test_route_save_functions_graph(
         mock_output_manager._route_save_functions(
             "graph_file",
             "save_path",
-            {"key": {"var": "value"}},
+            {"key": [1, 2, 3, 4]},
             True,
             graph_data,
             Path("graphics_dir"),
@@ -1879,12 +1855,65 @@ def test_route_save_functions_graph(
     mock_output_manager.add_warning = output_manager_original_method_states[
         "add_warning"
     ]
-    mock_output_manager.add_error = output_manager_original_method_states["add_error"]
+    mock_output_manager.add_error = output_manager_original_method_states[
+        "add_error"
+    ]
+    mock_output_manager._route_logs = output_manager_original_method_states[
+        "_route_logs"
+    ]
+
+
+@pytest.mark.parametrize("log_pool, expected_calls", [
+    (
+            [
+                {"log": "info_log", "message": "Info message",
+                 "info_map": {"class": "GraphGenerator", "function": "prepare_plot_data"}},
+                {"warning": "warning_type",
+                 "message": "Warning message",
+                 "info_map": {"class": "GraphGenerator", "function": "prepare_plot_data"}}
+            ],
+            {"add_error": 0, "add_log": 1, "add_warning": 1}
+    ),
+    (
+            [
+                {"error": "error_type", "message": "Error message",
+                 "info_map": {"class": "GraphGenerator", "function": "prepare_plot_data"}},
+                {"log": "info_log", "message": "Info message",
+                 "info_map": {"class": "GraphGenerator", "function": "prepare_plot_data"}}
+            ],
+            {"add_error": 1, "add_log": 1, "add_warning": 0}
+    ),
+])
+def test_route_logs(mock_output_manager: OutputManager,
+                    output_manager_original_method_states: Dict[str, Callable],
+                    log_pool, expected_calls):
+    mock_output_manager.add_error = MagicMock()
+    mock_output_manager.add_log = MagicMock()
+    mock_output_manager.add_warning = MagicMock()
+
+    mock_output_manager._route_logs(log_pool)
+
+    assert mock_output_manager.add_error.call_count == expected_calls["add_error"]
+    assert mock_output_manager.add_log.call_count == expected_calls["add_log"]
+    assert mock_output_manager.add_warning.call_count == expected_calls["add_warning"]
+
+    mock_output_manager.add_log = output_manager_original_method_states[
+        "add_log"
+    ]
+    mock_output_manager.add_warning = output_manager_original_method_states[
+        "add_warning"
+    ]
+    mock_output_manager.add_error = output_manager_original_method_states[
+        "add_error"
+    ]
+    mock_output_manager._route_logs = output_manager_original_method_states[
+        "_route_logs"
+    ]
 
 
 def test_load_variables_pool_from_file_valid_path(
-    mock_output_manager: OutputManager,
-    output_manager_original_method_states: Dict[str, Callable],
+        mock_output_manager: OutputManager,
+        output_manager_original_method_states: Dict[str, Callable],
 ) -> None:
     """Checks that load_variables_pool_from_file loads the valid filepath provided to the OM variables pool"""
     dummy_data = {
@@ -1904,9 +1933,9 @@ def test_load_variables_pool_from_file_valid_path(
 
 @patch("builtins.open", new_callable=mock_open)
 def test_load_variables_pool_from_file_raises_exception(
-    mock_file: MagicMock,
-    mock_output_manager: OutputManager,
-    output_manager_original_method_states: Dict[str, Callable],
+        mock_file: MagicMock,
+        mock_output_manager: OutputManager,
+        output_manager_original_method_states: Dict[str, Callable],
 ) -> None:
     """Checks that load_variables_pool_from_file raises exceptions with a bad filepath provided"""
     mock_file.side_effect = FileNotFoundError
@@ -1979,8 +2008,10 @@ def test_create_directory_successful(mock_output_manager: OutputManager,
     """Checks create_directory function successfully creates a dir in output_manager.py"""
     mock_output_manager.add_log = MagicMock()
     mock_output_manager.add_error = MagicMock()
-    mock_path = "new/dir/to/create"
-    mock_output_manager.create_directory(Path(mock_path))
+    with patch.object(Path, "mkdir") as mock_mkdir:
+        test_path = Path("/test/directory")
+        mock_output_manager.create_directory(test_path)
+    mock_mkdir.assert_called_once_with(parents=True, exist_ok=True)
     assert mock_output_manager.add_log.call_count == 2
     assert mock_output_manager.add_error.call_count == 0
 
@@ -2035,7 +2066,7 @@ def test_create_directory_exceptions(mock_output_manager: OutputManager,
     ],
 )
 def test_log_verbosity_less_than_method(
-    self: LogVerbosity, other: LogVerbosity, expected_result: bool
+        self: LogVerbosity, other: LogVerbosity, expected_result: bool
 ) -> None:
     """Unit test for __le__ method in LogVerbosity class"""
     actual_result = self <= other

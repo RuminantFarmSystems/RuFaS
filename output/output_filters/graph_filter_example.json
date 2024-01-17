@@ -3,17 +3,18 @@
     {
       "type": "plot",
       "filters": [
-        "Pen\\.calc_total_manure\\.daily_aggregate_calf_(degradable|non_degradable)_volatile_solids"
+        "AnimalManager\\.daily_updates\\.daily_aggregate_calf_(degradable|non_degradable)_volatile_solids"
       ],
       "title": "Daily Aggregate Calf Degradable Volatile Solids",
       "legend": ["Degradable Volatile Solids", "Non-degradable Volatile Solids"]
     },
     {
       "type": "stackplot",
-      "filters": ["Cow\\.milking_update\\.milk_data_at_milk_update"],
-      "variables": ["milk_lactose", "milk_protein", "milk_fat"],
-      "title": "Daily Milk Nutritions",
-      "legend": ["lactose", "fat", "protein"]
+      "filters": [
+        "AnimalManager.daily_updates.(num_calves|num_heiferIs|num_heiferIIs|num_heiferIIIs|num_lactating_cows|num_dry_cows)"
+      ],
+      "title": "Herd composition (stackplot)",
+      "legend": ["num_calves","num_heiferIs","num_heiferIIs","num_heiferIIIs","num_lactating_cows","num_dry_cows"]
     }
   ]
 }

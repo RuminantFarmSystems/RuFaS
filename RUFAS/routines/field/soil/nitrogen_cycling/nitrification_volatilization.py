@@ -31,21 +31,28 @@ class NitrificationVolatilization:
         self.data = soil_data or SoilData(field_size=field_size)
 
     def do_daily_nitrification_and_volatilization(self) -> None:
-        """Conducts the nitrification and volatilization of ammonium within the soil profile on a daily basis.
+        """
+        Conducts the nitrification and volatilization of ammonium within the soil profile on a daily basis.
+
+        Notes
+        -----
+        This method uses the `nutrient_cycling_water_factor` calculated by :class:`LayerData`, instead of the water
+        factor that SWAT specifies for use in calculating denitrification/volatilization (see SWAT Theoretical
+        documentation eqn. 3:1.3.2, 3).
 
         References
         ----------
         SWAT Theoretical documentation section 3:1.3
 
         """
+        self.data.set_vectorized_layer_attribute("ammonia_emissions", [0.0] * len(self.data.soil_layers))
         for layer in self.data.soil_layers:
             if layer.temperature <= 5:
                 continue
 
             temp_factor = self._calculate_nitrification_volatilization_temp_factor(layer.temperature)
-            water_factor = self._calculate_nitrification_soil_water_factor(layer.water_content,
-                                                                           layer.wilting_point_content,
-                                                                           layer.field_capacity_content)
+            water_factor = layer.nutrient_cycling_water_factor
+
             depth_factor = self._calculate_volatilization_depth_factor(layer.depth_of_layer_center)
 
             nitrification_regulator = self._calculate_nitrification_regulator(temp_factor, water_factor)
@@ -67,7 +74,8 @@ class NitrificationVolatilization:
 
             layer.ammonium_content -= total_ammonium_lost
             layer.nitrate_content += nitrified_ammonium
-            layer.annual_volatilized_ammonium_total += volatilized_ammonium
+            layer.ammonia_emissions = volatilized_ammonium
+            layer.annual_ammonia_emissions_total += volatilized_ammonium
 
     # --- Static methods ---
     @staticmethod
@@ -84,17 +92,23 @@ class NitrificationVolatilization:
         float
             The nitrification/volatilization temperature factor of the current layer of soil (unitless)
 
+        Notes
+        -----
+        SWAT does not explicitly say that this temperature factor should be upper-bounded at 1.0, but after discussion
+        with Pete Vadas it came to light that this factor needs to have an upper bound.
+
         References
         ----------
         SWAT Theoretical documentation eqn. 3:1.3.1
 
         """
-        return 0.41 * ((temperature - 5) / 10)
+        return min(1.0, 0.41 * ((temperature - 5) / 10))
 
     @staticmethod
     def _calculate_nitrification_soil_water_factor(water_content: float, wilting_point: float,
                                                    field_capacity: float) -> float:
-        """Calculates the soil water factor for nitrification.
+        """
+        Calculates the soil water factor for nitrification.
 
         Parameters
         ----------
@@ -109,6 +123,11 @@ class NitrificationVolatilization:
         -------
         float
             The nitrification soil water factor (unitless)
+
+        Notes
+        -----
+        The SWAT documentation for this equation appears to be misaligned with its implementation, see the file nitvol.f
+        (https://bitbucket.org/blacklandgrasslandmodels/swat_development/src/master/nitvol.f).
 
         References
         ----------
