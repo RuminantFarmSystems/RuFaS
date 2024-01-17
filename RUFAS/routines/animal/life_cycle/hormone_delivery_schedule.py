@@ -68,20 +68,17 @@ class HormoneDeliverySchedule:
             0: {'deliver_hormones': ['PGF']},
             14: {'deliver_hormones': ['PGF']},
             25: {'set_presynch_end': True},
-            26: {'set_tai_start': True}
         },
         CowReproProtocolEnum.Presynch_DoubleOvSynch.value: {
             0: {'deliver_hormones': ['GnRH']},
             7: {'deliver_hormones': ['PGF']},
             10: {'deliver_hormones': ['GnRH']},
             16: {'set_presynch_end': True},
-            17: {'set_tai_start': True},
         },
         CowReproProtocolEnum.Presynch_G6G.value: {
             0: {'deliver_hormones': ['PGF']},
             2: {'deliver_hormones': ['GnRH']},
             8: {'set_presynch_end': True},
-            9: {'set_tai_start': True}
         },
 
         CowReproProtocolEnum.TAI_OvSynch_48.value: {
@@ -91,7 +88,7 @@ class HormoneDeliverySchedule:
             10: {
                 'set_ai_day': True,
                 'set_conception_rate': True,
-                'set_tai_end': True
+                'set_ovsynch_end': True
             }
         },
         CowReproProtocolEnum.TAI_OvSynch_56.value: {
@@ -101,7 +98,7 @@ class HormoneDeliverySchedule:
             10: {
                 'set_ai_day': True,
                 'set_conception_rate': True,
-                'set_tai_end': True
+                'set_ovsynch_end': True
             }
         },
         CowReproProtocolEnum.TAI_CoSynch_72.value: {
@@ -111,7 +108,7 @@ class HormoneDeliverySchedule:
                 'deliver_hormones': ['GnRH'],
                 'set_ai_day': True,
                 'set_conception_rate': True,
-                'set_tai_end': True
+                'set_ovsynch_end': True
             }
         },
         CowReproProtocolEnum.TAI_5d_CoSynch.value: {
@@ -122,7 +119,7 @@ class HormoneDeliverySchedule:
                 'deliver_hormones': ['GnRH'],
                 'set_ai_day': True,
                 'set_conception_rate': True,
-                'set_tai_end': True
+                'set_ovsynch_end': True
             }
         },
     }

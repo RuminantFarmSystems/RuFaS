@@ -729,9 +729,9 @@ class LifeCycleManager:
             'calf_birth_weight': heiferIII.calf_birth_weight
         })
         args.update(repro_program=AnimalBase.config['cow_repro_method'])
-        args.update(presynch_method=AnimalBase.config['cows']['presynch_protocol'])
-        args.update(tai_method_c=AnimalBase.config['cows']['tai_program'])
-        args.update(resynch_method=AnimalBase.config['cows']['resynch_protocol'])
+        args.update(presynch_method=AnimalBase.config['cows']['presynch_program'])
+        args.update(tai_method_c=AnimalBase.config['cows']['ovsynch_program'])
+        args.update(resynch_method=AnimalBase.config['cows']['resynch_program'])
         new_cow = Cow(args)
         if len(cows) > 0:
             new_cow.milk_production_reduction = cows[0].milk_production_reduction

@@ -547,15 +547,15 @@ def test_move_heiferIII_to_cow_stage(mocker: MockerFixture) -> None:
                  return_value=mock_new_cow)
 
     cow_repro_method = 'TAI'
-    cow_presynch_protocol = 'Double OvSynch'
-    cow_TAI_protocol = 'OvSynch 56'
-    cow_resynch_protocol = 'TAIafterPD'
+    cow_presynch_program = 'Double OvSynch'
+    cow_ovsynch_program = 'OvSynch 56'
+    cow_resynch_program = 'TAIafterPD'
     animal_base_config = {
         "cow_repro_method": cow_repro_method,
         "cows": {
-            "presynch_protocol": cow_presynch_protocol,
-            "tai_program": cow_TAI_protocol,
-            "resynch_protocol": cow_resynch_protocol
+            "presynch_program": cow_presynch_program,
+            "ovsynch_program": cow_ovsynch_program,
+            "resynch_program": cow_resynch_program
         }
     }
     mocker.patch('RUFAS.routines.animal.life_cycle.life_cycle.AnimalBase.config', animal_base_config)
@@ -572,9 +572,9 @@ def test_move_heiferIII_to_cow_stage(mocker: MockerFixture) -> None:
             'calf_birth_weight': heiferIII_calf_birth_weight
         }),
         mocker.call(repro_program=cow_repro_method),
-        mocker.call(presynch_method=cow_presynch_protocol),
-        mocker.call(tai_method_c=cow_TAI_protocol),
-        mocker.call(resynch_method=cow_resynch_protocol)
+        mocker.call(presynch_method=cow_presynch_program),
+        mocker.call(tai_method_c=cow_ovsynch_program),
+        mocker.call(resynch_method=cow_resynch_program)
     ]
 
     assert len(cows) == 1

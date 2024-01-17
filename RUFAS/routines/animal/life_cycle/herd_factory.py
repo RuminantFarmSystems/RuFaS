@@ -144,9 +144,9 @@ class HerdFactory:
 
                 args.update(id=self.pre_animal_population.next_id())
                 args.update(repro_program=AnimalBase.config["cow_repro_method"])
-                args.update(presynch_method=AnimalBase.config["cows"]["presynch_protocol"])
-                args.update(tai_method_c=AnimalBase.config["cows"]["tai_program"])
-                args.update(resynch_method=AnimalBase.config["cows"]["resynch_protocol"])
+                args.update(presynch_method=AnimalBase.config["cows"]["presynch_program"])
+                args.update(tai_method_c=AnimalBase.config["cows"]["ovsynch_program"])
+                args.update(resynch_method=AnimalBase.config["cows"]["resynch_program"])
 
                 cow = Cow(args)
 

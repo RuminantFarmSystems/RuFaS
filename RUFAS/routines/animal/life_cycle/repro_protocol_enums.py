@@ -48,22 +48,37 @@ class CowReproProtocolEnum(Enum):
 
     Attributes
     ----------
+    NONE : str
+        The option that represents no other option has been set.
     ED : str
         The estrus detection reproduction protocol.
     TAI : str
         The timed artificial insemination reproduction protocol.
     ED_TAI : str
         The estrus detection followed by timed artificial insemination reproduction protocol.
+    Presynch_PreSynch : str
+        The PreSynch program of the Presynch protocol.
+    Presynch_DoubleOvSynch : str
+        The Double OvSynch program of the Presynch protocol.
+    Presynch_G6G : str
+        The G6G program of the Presynch protocol.
     TAI_OvSynch_48 : str
-        The OvSynch 48 sub-protocol of the TAI protocol.
+        The OvSynch 48 program of the TAI protocol.
     TAI_OvSynch_56 : str
-        The OvSynch 56 sub-protocol of the TAI protocol.
+        The OvSynch 56 program of the TAI protocol.
     TAI_CoSynch_72 : str
-        The CoSynch 72 sub-protocol of the TAI protocol.
+        The CoSynch 72 program of the TAI protocol.
     TAI_5d_CoSynch : str
-        The 5d CoSynch sub-protocol of the TAI protocol.
+        The 5d CoSynch program of the TAI protocol.
+    Resynch_TAIbeforePD : str
+        The TAIbeforePD resynch program used in TAI and ED-TAI protocols.
+    Resynch_TAIafterPD : str
+        The TAIafterPD resynch program used in TAI and ED-TAI protocols.
+    Resynch_PGFatPD : str
+        The PGFatPD resynch program used in TAI and ED-TAI protocols.
     """
 
+    NONE = 'None'
     ED = 'ED'
     TAI = 'TAI'
     ED_TAI = 'ED-TAI'
@@ -85,6 +100,27 @@ class CowReproProtocolEnum(Enum):
 class ReproStateEnum(Enum):
     """
     This enum class lists the options for different reproduction states.
+
+    Attributes
+    ----------
+    NONE : str
+        The state that represents no other state has been set.
+    WAITING_FULL_ED_CYCLE : str
+        The state that represents the animal is waiting for a full estrus cycle.
+    WAITING_SHORT_ED_CYCLE : str
+        The state that represents the animal is waiting for a short estrus cycle.
+    WAITING_ED_DAILY : str
+        The state that represents the animal is waiting for estrus daily.
+    IN_PRESYNCH : str
+        The state that represents the animal is in a presynch program.
+    HAS_DONE_PRESYNCH : str
+        The state that represents the animal has done a presynch program.
+    IN_OVSYNCH : str
+        The state that represents the animal is in an OvSynch program.
+    ESTRUS_DETECTED : str
+        The state that represents that estrus has been detected.
+    AFTER_AI : str
+        The state that represents the animal has just been inseminated.
     """
 
     NONE = 'none'
@@ -92,7 +128,8 @@ class ReproStateEnum(Enum):
     WAITING_SHORT_ED_CYCLE = 'waiting for short estrus cycle'
     WAITING_ED_DAILY = 'waiting for estrus daily'
     IN_PRESYNCH = 'in presynch'
-    IN_TAI = 'in TAI'
+    HAS_DONE_PRESYNCH = 'has done presynch'
+    IN_OVSYNCH = 'in OvSynch'
     ESTRUS_DETECTED = 'estrus detected'
     AFTER_AI = 'after AI'
     FRESH = 'fresh'
