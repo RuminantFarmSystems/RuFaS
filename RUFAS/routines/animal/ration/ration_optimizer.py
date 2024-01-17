@@ -821,7 +821,7 @@ class RationOptimizer:
             except Exception as e:  # noqa
                 i -= 1#TODO GET THIS CHUNKO COVERED
                 info_map = {"class": "RationOptimizer", "function": self.attempt_optimization.__name__, }
-                om.add_error('SLSQP error', 'whoops', info_map)
+                om.add_error('SLSQP error', 'Ration optimization unable to resolve.', info_map)
             finally:
                 i += 1
                 count += 1

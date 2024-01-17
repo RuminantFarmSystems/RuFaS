@@ -2095,6 +2095,45 @@ def test_attempt_optimization(mocker: MockerFixture, mock_ration_config: MagicMo
     )
 
 
+def test_attempt_optimization_raise_exception(mocker: MockerFixture,
+                                              mock_ration_config: MagicMock,
+                                              mock_available_feeds: dict) -> None:
+    """Unit test for function attempt_optimization in file routines/animal/ration/ration_optimizer.py"""
+
+    def mock_triple_values_in_list(x):
+        return x
+
+    mock_RationConfig = mocker.patch("RUFAS.routines.animal.ration.ration_optimizer.RationConfig")
+    mocker.patch("RUFAS.routines.animal.ration.ration_optimizer.RationOptimizer.optimize",
+                 side_effect=OSError)
+    mocker.patch("RUFAS.routines.animal.ration.ration_optimizer.RationOptimizer.get_ration_vals")
+    mocker.patch(
+        "RUFAS.routines.animal.ration.ration_optimizer.RationOptimizer.triple_values_in_list",
+        side_effect=mock_triple_values_in_list,
+    )
+
+    ration_optimizer = RationOptimizer()
+    requirements = MagicMock()
+
+    requirements.NEmaint_requirement = 1.0
+    requirements.NEa_requirement = 2.0
+    requirements.NEpreg_requirement = 3.0
+    requirements.NEl_requirement = 4.0
+    requirements.NEg_requirement = 5.0
+    requirements.MP_requirement = 6.0
+    requirements.C_requirement = 7.0
+    requirements.P_requirement = 8.0
+    requirements.avg_BW = 9.0
+    requirements.DMIest_requirement = 10.0
+
+    animal_combination = "AnimalCombination.LAC_COW"
+
+    ration_optimizer.attempt_optimization(requirements, mock_available_feeds, animal_combination)
+    ration_optimizer.optimize.assert_called_with(
+        animal_combination, mock_available_feeds, mock_RationConfig.return_value
+    )
+
+
 @pytest.mark.parametrize(
     "ration_config, expected",
     [(lazy_fixture("mock_ration_config"), 91.0), (lazy_fixture("mock_random_ration_config"), 52.041)],
