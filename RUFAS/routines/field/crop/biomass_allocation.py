@@ -9,18 +9,62 @@ and some components from the Crop Yield section (5:2.4)
 
 
 class BiomassAllocation:
+    """
+    This module primarily follows the Biomass Production section of the SWAT model (5:2.1.1)
+    and some components from the Crop Yield section (5:2.4)
+
+    Attributes
+    ----------
+    data : CropData
+        The data object used for biomass calculation. Stores information
+        about the plant's growth and environmental factors.
+
+    Methods
+    -------
+    allocate_biomass(light: float)
+        Allocate a plant's accumulated biomass based on the day's light exposure.
+    photosynthesize(light: float)
+        Simulate the photosynthesis process by converting light energy into biomass.
+    partition_biomass()
+        Partitions the accumulated biomass into above and below ground components.
+    _intercept_radiation(radiation: float, extinction: float, lai: float) -> float
+        Calculates the amount of solar radiation intercepted for photosynthesis.
+    _determine_max_accumulation(energy: float, efficiency: float) -> float
+        Determines the upper limit of biomass accumulation in a day.
+    _determine_accumulated_biomass(growth_factor: float, max_growth: float) -> float
+        Calculates the actual biomass accumulated during a day.
+    _determine_above_ground_biomass(root_frac: float, biomass: float) -> float
+        Calculates the above ground biomass of a plant.
+    _determine_below_ground_biomass(root_frac: float, biomass: float) -> float
+        Calculates the below ground biomass of a plant.
+    """
     def __init__(self, crop_data: Optional[CropData] = None):
         self.data = crop_data or CropData()  # initialize with defaults, if not given
 
-    def allocate_biomass(self, light):
-        """allocate a plant's accumulated biomass during the day's growth"""
+    def allocate_biomass(self, light: float):
+        """
+        Allocate a plant's accumulated biomass during the day's growth.
+
+        Parameters
+        ----------
+        light : float
+            light radiation energy (MJ/m).
+
+        Returns
+        -------
+        None
+        """
         self.photosynthesize(light)
         self.partition_biomass()
 
-    def photosynthesize(self, light):
-        """convert the day's incoming light energy into plant biomass
+    def photosynthesize(self, light: float):
+        """
+        Convert the day's incoming light energy into plant biomass.
 
-        Args: total available solar radiation for the day (MJ/m^2)
+        Parameters
+        ----------
+        light : float
+            light radiation energy (MJ/m).
         """
 
         # intercept light
@@ -34,7 +78,13 @@ class BiomassAllocation:
         self.data.biomass += self.data.biomass_growth
 
     def partition_biomass(self):
-        """partition the accumulated biomass into above ground and below grown portions"""
+        """
+        Partition the accumulated biomass into above ground and below ground portions.
+
+        Returns
+        -------
+        None
+        """
         self.data.above_ground_biomass = self._determine_above_ground_biomass(self.data.root_fraction,
                                                                               self.data.biomass)
         self.data.root_biomass = self._determine_below_ground_biomass(self.data.root_fraction, self.data.biomass)
@@ -42,16 +92,21 @@ class BiomassAllocation:
     @staticmethod
     def _intercept_radiation(radiation: float, extinction: float, lai: float) -> float:  # pseudocode: C.9.A.1
         """
-        Description:
-            calculates amount of solar radiation intercepted for photosynthesis during the day
+        Calculate the amount of solar radiation intercepted for photosynthesis during the day.
 
-        Args:
-            radiation: total solar radiation available for the day (MJ m^-2)
-            extinction: the light extinction coefficient
-            lai: current leaf area index of the crop
+        Parameters
+        ----------
+        radiation : float
+            Total solar radiation available for the day (MJ/m^2).
+        extinction : float
+            The light extinction coefficient (unitless).
+        lai : float
+            Current leaf area index of the crop (unitless).
 
-        Returns:
-            intercepted radiation energy (MJ m^-2)
+        Returns
+        -------
+        float
+            Intercepted radiation energy (MJ/m^2).
         """
         intercepted_radiation = 0.5 * radiation * (1 - exp(-1 * extinction * lai))
         return intercepted_radiation
@@ -59,29 +114,40 @@ class BiomassAllocation:
     @staticmethod
     def _determine_max_accumulation(energy: float, efficiency: float) -> float:  # pseudocode: C.9.A.2
         """
-        Description: calculates the upper-limit to biomass accumulation during a day
+        Calculate the upper limit to biomass accumulation during a day.
 
-        Args:
-            efficiency: crop-specific radiation use efficiency (dg/MJ)
-            energy: intercepted energy from solar radiation for the day (MJ m^-2)
+        Parameters
+        ----------
+        energy : float
+            Intercepted energy from solar radiation for the day (MJ/m^2).
+        efficiency : float
+            Crop-specific radiation use efficiency (dg/MJ).
 
-        Returns: the maximum biomass that can be accumulated in a day
+        Returns
+        -------
+        float
+            The maximum biomass that can be accumulated in a day (kg/ha).
         """
         return energy * efficiency
 
     @staticmethod
     def _determine_accumulated_biomass(growth_factor: float, max_growth: float) -> float:  # pseudocode: C.9.A.3
         """
-        Description:
-            Calculates the biomass accumulated during the day
+        Calculate the biomass accumulated during the day.
 
-        Args:
-            growth_factor: the growth factor for the plant, which is a value from 0 to 1.
-            max_growth: the maximum amount of biomass the plant can accumulate in a day
+        Parameters
+        ----------
+        growth_factor : float
+            The growth factor for the plant, which is a value from 0 to 1 (unitless).
+        max_growth : float
+            The maximum amount of biomass the plant can accumulate in a day (kg/ha).
 
-        Returns:
-            a dictionary containing the starting biomass of the plant ("start"), the biomass of the plant at the end
-            of the day ("end"), and the total biomass accumulated ("accumulated biomass")
+        Returns
+        -------
+        dict
+            A dictionary containing the starting biomass of the plant ('start'),
+            the biomass of the plant at the end of the day ('end'), and the total
+            biomass accumulated ('accumulated biomass').
         """
         growth = max_growth * growth_factor
         return growth
@@ -89,26 +155,39 @@ class BiomassAllocation:
     @staticmethod
     def _determine_above_ground_biomass(root_frac: float, biomass: float) -> float:  # pseudocode: C.9.B.1
         """
-        Description: calculates above ground plant biomass.
+        Calculate above ground plant biomass.
 
         SWAT Reference: 5:2.4.4
 
-        Args:
-            root_frac: fraction of biomass stored in roots
-            biomass: the current total biomass of the plant
+        Parameters
+        ----------
+        root_frac : float
+            Fraction of biomass stored in roots (unitless).
+        biomass : float
+            The current total biomass of the plant (kg/ha).
 
-        Returns: above ground biomass
+        Returns
+        -------
+        float
+            Above ground biomass (kg/ha).
         """
         return (1 - root_frac) * biomass
 
     @staticmethod
     def _determine_below_ground_biomass(root_frac: float, biomass: float) -> float:
-        """Description: calculates below ground plant biomass
+        """
+        Calculate below ground plant biomass.
 
-        Args:
-            root_frac: fraction of biomass stored in roots
-            biomass: the current total biomass of the plant
+        Parameters
+        ----------
+        root_frac : float
+            Fraction of biomass stored in roots (unitless).
+        biomass : float
+            The current total biomass of the plant (kg/ha).
 
-        Returns: below ground biomass
+        Returns
+        -------
+        float
+            Below ground biomass (kg/ha).
         """
         return root_frac * biomass
