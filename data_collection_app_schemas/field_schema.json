@@ -1,0 +1,168 @@
+{
+  "title": "field_properties",
+  "type": "object",
+  "format": "grid",
+  "properties": {
+    "soil_specification": {
+      "title": "soil_specification",
+      "type": "string",
+      "options": {
+        "grid_columns": 12,
+        "inputAttributes": {
+          "class": "text-primary form-control"
+        },
+        "infoText": "Name of the metadata blob that contains the data for this field's soil specification."
+      }
+    },
+    "crop_specification": {
+      "title": "crop_specification",
+      "type": "string",
+      "options": {
+        "grid_columns": 12,
+        "inputAttributes": {
+          "class": "text-primary form-control"
+        },
+        "infoText": "Name of the metadata blob that contains the data for this field's crop schedule specification."
+      }
+    },
+    "fertilizer_management_specification": {
+      "title": "fertilizer_management_specification",
+      "type": "string",
+      "options": {
+        "grid_columns": 12,
+        "inputAttributes": {
+          "class": "text-primary form-control"
+        },
+        "infoText": "Name of the metadata blob that contains the data for this field's fertilizer application schedule specification."
+      }
+    },
+    "manure_management_specification": {
+      "title": "manure_management_specification",
+      "type": "string",
+      "options": {
+        "grid_columns": 12,
+        "inputAttributes": {
+          "class": "text-primary form-control"
+        },
+        "infoText": "Name of the metadata blob that contains the data for this field's manure application schedule specification."
+      }
+    },
+    "tillage_management_specification": {
+      "title": "tillage_management_specification",
+      "type": "string",
+      "options": {
+        "grid_columns": 12,
+        "inputAttributes": {
+          "class": "text-primary form-control"
+        },
+        "infoText": "Name of the metadata blob that contains the data for this field's tillage application schedule specification."
+      }
+    },
+    "field_size": {
+      "title": "field_size",
+      "type": "number",
+      "options": {
+        "grid_columns": 12,
+        "inputAttributes": {
+          "class": "text-primary form-control"
+        },
+        "infoText": "Size of the field."
+      },
+      "minimum": 0.0
+    },
+    "absolute_latitude": {
+      "title": "absolute_latitude",
+      "type": "number",
+      "options": {
+        "grid_columns": 12,
+        "inputAttributes": {
+          "class": "text-primary form-control"
+        },
+        "infoText": "The absolute latitude of the center of this field.\nUnits: degrees."
+      },
+      "minimum": 0.0,
+      "maximum": 90.0,
+      "default": 43.5
+    },
+    "longitude": {
+      "title": "longitude",
+      "type": "number",
+      "options": {
+        "grid_columns": 12,
+        "inputAttributes": {
+          "class": "text-primary form-control"
+        },
+        "infoText": "The longitude of the center of this field.\nUnits: degrees."
+      },
+      "minimum": -180.0,
+      "maximum": 180.0,
+      "default": -89.4
+    },
+    "minimum_daylength": {
+      "title": "minimum_daylength",
+      "type": "number",
+      "options": {
+        "grid_columns": 12,
+        "inputAttributes": {
+          "class": "text-primary form-control"
+        },
+        "infoText": "Length of the shortest day of the year for watershed the field is located in.\nUnits: hours."
+      },
+      "minimum": 0.0,
+      "maximum": 24.0,
+      "default": 9.0
+    },
+    "seasonal_high_water_table": {
+      "title": "seasonal_high_water_table",
+      "type": "boolean",
+      "format": "checkbox",
+      "options": {
+        "grid_columns": 12,
+        "inputAttributes": {
+          "class": "text-primary form-control"
+        },
+        "infoText": "True if the HRU that contains the field has a high seasonal water table, false otherwise.\nUnitless.\nReference: SWAT Theoretical documentation section 2:3.2, SWAT Input .HRU - IWATABLE."
+      },
+      "default": false
+    },
+    "watering_amount_in_liters": {
+      "title": "watering_amount_in_liters",
+      "type": "number",
+      "options": {
+        "grid_columns": 12,
+        "inputAttributes": {
+          "class": "text-primary form-control"
+        },
+        "infoText": "Amount of water to be applied as irrigation at the end of a specified interval.\nUnits: liters."
+      },
+      "minimum": 0.0,
+      "default": 0.0
+    },
+    "watering_interval": {
+      "title": "watering_interval",
+      "type": "number",
+      "options": {
+        "grid_columns": 12,
+        "inputAttributes": {
+          "class": "text-primary form-control"
+        },
+        "infoText": "Number of days that make up the irrigation interval.\nUnits: days."
+      },
+      "minimum": 0,
+      "default": 0
+    },
+    "supplement_manure_nutrient_deficiencies": {
+      "title": "supplement_manure_nutrient_deficiencies",
+      "type": "boolean",
+      "format": "checkbox",
+      "options": {
+        "grid_columns": 12,
+        "inputAttributes": {
+          "class": "text-primary form-control"
+        },
+        "infoText": "Determines if nutrient deficient manure applications are supplemented with chemical fertilizer."
+      },
+      "default": false
+    }
+  }
+}

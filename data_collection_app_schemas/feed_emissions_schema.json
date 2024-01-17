@@ -1,0 +1,238 @@
+{
+  "title": "feed_emissions_properties",
+  "type": "object",
+  "format": "grid",
+  "properties": {
+    "county_code": {
+      "title": "county_code",
+      "type": "number",
+      "options": {
+        "grid_columns": 12,
+        "inputAttributes": {
+          "class": "text-primary form-control"
+        }
+      },
+      "minimum": 1000
+    },
+    "108": {
+      "title": "108",
+      "type": "number",
+      "options": {
+        "grid_columns": 12,
+        "inputAttributes": {
+          "class": "text-primary form-control"
+        }
+      },
+      "minimum": 0.0
+    },
+    "107": {
+      "title": "107",
+      "type": "number",
+      "options": {
+        "grid_columns": 12,
+        "inputAttributes": {
+          "class": "text-primary form-control"
+        }
+      },
+      "minimum": 0.0
+    },
+    "110": {
+      "title": "110",
+      "type": "number",
+      "options": {
+        "grid_columns": 12,
+        "inputAttributes": {
+          "class": "text-primary form-control"
+        }
+      },
+      "minimum": 0.0
+    },
+    "18": {
+      "title": "18",
+      "type": "number",
+      "options": {
+        "grid_columns": 12,
+        "inputAttributes": {
+          "class": "text-primary form-control"
+        }
+      },
+      "minimum": 0.0
+    },
+    "23": {
+      "title": "23",
+      "type": "number",
+      "options": {
+        "grid_columns": 12,
+        "inputAttributes": {
+          "class": "text-primary form-control"
+        }
+      },
+      "minimum": 0.0
+    },
+    "44": {
+      "title": "44",
+      "type": "number",
+      "options": {
+        "grid_columns": 12,
+        "inputAttributes": {
+          "class": "text-primary form-control"
+        }
+      },
+      "minimum": 0.0
+    },
+    "51": {
+      "title": "51",
+      "type": "number",
+      "options": {
+        "grid_columns": 12,
+        "inputAttributes": {
+          "class": "text-primary form-control"
+        }
+      },
+      "minimum": 0.0
+    },
+    "50": {
+      "title": "50",
+      "type": "number",
+      "options": {
+        "grid_columns": 12,
+        "inputAttributes": {
+          "class": "text-primary form-control"
+        }
+      },
+      "minimum": 0.0
+    },
+    "52": {
+      "title": "52",
+      "type": "number",
+      "options": {
+        "grid_columns": 12,
+        "inputAttributes": {
+          "class": "text-primary form-control"
+        }
+      },
+      "minimum": 0.0
+    },
+    "95": {
+      "title": "95",
+      "type": "number",
+      "options": {
+        "grid_columns": 12,
+        "inputAttributes": {
+          "class": "text-primary form-control"
+        }
+      },
+      "minimum": 0.0
+    },
+    "94": {
+      "title": "94",
+      "type": "number",
+      "options": {
+        "grid_columns": 12,
+        "inputAttributes": {
+          "class": "text-primary form-control"
+        }
+      },
+      "minimum": 0.0
+    },
+    "100": {
+      "title": "100",
+      "type": "number",
+      "options": {
+        "grid_columns": 12,
+        "inputAttributes": {
+          "class": "text-primary form-control"
+        }
+      },
+      "minimum": 0.0
+    },
+    "104": {
+      "title": "104",
+      "type": "number",
+      "options": {
+        "grid_columns": 12,
+        "inputAttributes": {
+          "class": "text-primary form-control"
+        }
+      },
+      "minimum": 0.0
+    },
+    "176": {
+      "title": "176",
+      "type": "number",
+      "options": {
+        "grid_columns": 12,
+        "inputAttributes": {
+          "class": "text-primary form-control"
+        }
+      },
+      "minimum": 0.0
+    },
+    "91": {
+      "title": "91",
+      "type": "number",
+      "options": {
+        "grid_columns": 12,
+        "inputAttributes": {
+          "class": "text-primary form-control"
+        }
+      },
+      "minimum": 0.0
+    },
+    "301": {
+      "title": "301",
+      "type": "number",
+      "options": {
+        "grid_columns": 12,
+        "inputAttributes": {
+          "class": "text-primary form-control"
+        }
+      },
+      "minimum": 0.0
+    },
+    "302": {
+      "title": "302",
+      "type": "number",
+      "options": {
+        "grid_columns": 12,
+        "inputAttributes": {
+          "class": "text-primary form-control"
+        }
+      },
+      "minimum": 0.0
+    },
+    "303": {
+      "title": "303",
+      "type": "number",
+      "options": {
+        "grid_columns": 12,
+        "inputAttributes": {
+          "class": "text-primary form-control"
+        }
+      },
+      "minimum": 0.0
+    },
+    "304": {
+      "title": "304",
+      "type": "number",
+      "options": {
+        "grid_columns": 12,
+        "inputAttributes": {
+          "class": "text-primary form-control"
+        }
+      },
+      "minimum": 0.0
+    },
+    "305": {
+      "title": "305",
+      "type": "number",
+      "options": {
+        "grid_columns": 12,
+        "inputAttributes": {
+          "class": "text-primary form-control"
+        }
+      },
+      "minimum": 0.0
+    }
+  }
+}

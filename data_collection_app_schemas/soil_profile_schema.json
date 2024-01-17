@@ -1,0 +1,425 @@
+{
+  "title": "soil_profile_properties",
+  "type": "object",
+  "format": "grid",
+  "properties": {
+    "second_moisture_condition_parameter": {
+      "title": "second_moisture_condition_parameter",
+      "type": "number",
+      "options": {
+        "grid_columns": 12,
+        "inputAttributes": {
+          "class": "text-primary form-control"
+        },
+        "infoText": "Curve number parameter for average moisture condition equation.\nUnitless.\nReference: SWAT Input .MGT - CN2."
+      },
+      "minimum": 20,
+      "maximum": 99,
+      "default": 85
+    },
+    "average_subbasin_slope": {
+      "title": "average_subbasin_slope",
+      "type": "number",
+      "options": {
+        "grid_columns": 12,
+        "inputAttributes": {
+          "class": "text-primary form-control"
+        },
+        "infoText": "Slope of the field, measured as rise over run.\nUnits: meters / meters or unitless.\nReference: SWAT Input .HRU - HRU_SLP."
+      },
+      "default": 0.05
+    },
+    "slope_length": {
+      "title": "slope_length",
+      "type": "number",
+      "options": {
+        "grid_columns": 12,
+        "inputAttributes": {
+          "class": "text-primary form-control"
+        },
+        "infoText": "Length of the slope.\nUnits: meters.\nReference: SWAT Input .HRU - SLSUBBSN."
+      },
+      "minimum": 0,
+      "default": 50
+    },
+    "manning_roughness_coefficient": {
+      "title": "manning_roughness_coefficient",
+      "type": "number",
+      "options": {
+        "grid_columns": 12,
+        "inputAttributes": {
+          "class": "text-primary form-control"
+        },
+        "infoText": "Manning's \"n\" value for overland flow.\nUnitless.\nReference: SWAT Input .HRU - OV_N."
+      },
+      "minimum": 0.001,
+      "default": 0.4
+    },
+    "support_practice_factor": {
+      "title": "support_practice_factor",
+      "type": "number",
+      "options": {
+        "grid_columns": 12,
+        "inputAttributes": {
+          "class": "text-primary form-control"
+        },
+        "infoText": "Ratio of soil loss with a specific support practice based on slope characteristics.This value adjusts for terracing, contouring, and stripcropping, and these features are not present in V1, so this value IS NOT used.\nUnitless.\nReference: SWAT Input .MGT - USLE_P."
+      },
+      "default": 0.08
+    },
+    "albedo": {
+      "title": "albedo",
+      "type": "number",
+      "options": {
+        "grid_columns": 12,
+        "inputAttributes": {
+          "class": "text-primary form-control"
+        },
+        "infoText": "Ratio of solar radiation reflected by soil to amount of incident upon it.\nUnitless.\nReference: SWAT Input .SOL - SOL_ALB"
+      },
+      "minimum": 0.0,
+      "maximum": 1.0,
+      "default": 0.16
+    },
+    "initial_residue": {
+      "title": "initial_residue",
+      "type": "number",
+      "options": {
+        "grid_columns": 12,
+        "inputAttributes": {
+          "class": "text-primary form-control"
+        },
+        "infoText": "Amount of residue present on the soil surface at the start of the simulation.\nUnits: kg / ha."
+      },
+      "minimum": 0.0,
+      "default": 0.0
+    },
+    "soil_evaporation_compensation_coefficient": {
+      "title": "soil_evaporation_compensation_coefficient",
+      "type": "number",
+      "options": {
+        "grid_columns": 12,
+        "inputAttributes": {
+          "class": "text-primary form-control"
+        },
+        "infoText": "Modifies depth distribution used to meet soil evaporative demand.\nUnitless.\nReference: SWAT Input .HRU, .BSN - ESCO"
+      },
+      "minimum": 0.01,
+      "maximum": 1.0,
+      "default": 0.95
+    },
+    "soil_layers": {
+      "title": "soil_layers",
+      "type": "array",
+      "format": "grid",
+      "options": {
+        "inputAttributes": {
+          "class": "text-primary form-control"
+        },
+        "infoText": "The soil layers that this profile contains. Each element of the array should be a `soil_layer` object."
+      },
+      "items": {
+        "title": "soil_layers_element",
+        "type": "object",
+        "format": "grid",
+        "properties": {
+          "bottom_depth": {
+            "title": "bottom_depth",
+            "type": "number",
+            "options": {
+              "grid_columns": 12,
+              "inputAttributes": {
+                "class": "text-primary form-control"
+              },
+              "infoText": "Bottom depth of this soil layer.\nUnits: mm."
+            },
+            "minimum": 20
+          },
+          "soil_water_concentration": {
+            "title": "soil_water_concentration",
+            "type": "number",
+            "options": {
+              "grid_columns": 12,
+              "inputAttributes": {
+                "class": "text-primary form-control"
+              },
+              "infoText": "Concentration of water in this layer at the beginning of the simulation.\nUnits: mm water / mm soil."
+            },
+            "minimum": 0.0,
+            "maximum": 0.95,
+            "default": 0.25
+          },
+          "wilting_point_water_concentration": {
+            "title": "wilting_point_water_concentration",
+            "type": "number",
+            "options": {
+              "grid_columns": 12,
+              "inputAttributes": {
+                "class": "text-primary form-control"
+              },
+              "infoText": "Concentration of water in this layer when at field capacity.\nUnits: mm water / mm soil."
+            },
+            "minimum": 0.0,
+            "maximum": 0.95,
+            "default": 0.2
+          },
+          "field_capacity_water_concentration": {
+            "title": "field_capacity_water_concentration",
+            "type": "number",
+            "options": {
+              "grid_columns": 12,
+              "inputAttributes": {
+                "class": "text-primary form-control"
+              },
+              "infoText": "Concentration of water in this layer when at field capacity.\nUnits: mm water / mm soil."
+            },
+            "minimum": 0.0,
+            "maximum": 0.95,
+            "default": 0.3
+          },
+          "saturation_point_water_concentration": {
+            "title": "saturation_point_water_concentration",
+            "type": "number",
+            "options": {
+              "grid_columns": 12,
+              "inputAttributes": {
+                "class": "text-primary form-control"
+              },
+              "infoText": "Concentration of water in a layer when it has become saturated.\nUnits: mm water / mm soil."
+            },
+            "minimum": 0.0,
+            "maximum": 0.95,
+            "default": 0.5
+          },
+          "saturated_hydraulic_conductivity": {
+            "title": "saturated_hydraulic_conductivity",
+            "type": "number",
+            "options": {
+              "grid_columns": 12,
+              "inputAttributes": {
+                "class": "text-primary form-control"
+              },
+              "infoText": "Measure of ease of water movement through the soil.\nUnits: mm / hour.\nReference: SWAT Input .SOL - SOL_K."
+            },
+            "minimum": 0.01,
+            "default": 9.5
+          },
+          "initial_temperature": {
+            "title": "initial_temperature",
+            "type": "number",
+            "options": {
+              "grid_columns": 12,
+              "inputAttributes": {
+                "class": "text-primary form-control"
+              },
+              "infoText": "Temperature of the layer at the beginning of the simulation.\nUnits: degrees Celsius."
+            },
+            "default": 15.05
+          },
+          "bulk_density": {
+            "title": "bulk_density",
+            "type": "number",
+            "options": {
+              "grid_columns": 12,
+              "inputAttributes": {
+                "class": "text-primary form-control"
+              },
+              "infoText": "Ratio of mass of solid particles to total volume of soil.\nUnits: Megagrams / cubic meter or grams / cubic centimeter."
+            },
+            "minimum": 1.1,
+            "maximum": 1.9,
+            "default": 1.4
+          },
+          "percent_organic_carbon_content": {
+            "title": "percent_organic_carbon_content",
+            "type": "number",
+            "options": {
+              "grid_columns": 12,
+              "inputAttributes": {
+                "class": "text-primary form-control"
+              },
+              "infoText": "Percent of soil weight that is organic carbon.\nUnitless.\nReference: SWAT Input .SOL - SOL_CBN."
+            },
+            "minimum": 0.0,
+            "maximum": 100.0,
+            "default": 1.2
+          },
+          "percent_clay_content": {
+            "title": "percent_clay_content",
+            "type": "number",
+            "options": {
+              "grid_columns": 12,
+              "inputAttributes": {
+                "class": "text-primary form-control"
+              },
+              "infoText": "Percent of soil weight that is clay.\nUnitless.\nReference: SWAT Input .SOL - SOL_CLAY."
+            },
+            "minimum": 0.0,
+            "maximum": 100.0,
+            "default": 22.5
+          },
+          "percent_silt_content": {
+            "title": "percent_silt_content",
+            "type": "number",
+            "options": {
+              "grid_columns": 12,
+              "inputAttributes": {
+                "class": "text-primary form-control"
+              },
+              "infoText": "Percent of soil weight that is silt.\nUnitless.\nReference: SWAT Input .SOL - SOL_SILT."
+            },
+            "minimum": 0.0,
+            "maximum": 100.0,
+            "default": 62.5
+          },
+          "percent_sand_content": {
+            "title": "percent_sand_content",
+            "type": "number",
+            "options": {
+              "grid_columns": 12,
+              "inputAttributes": {
+                "class": "text-primary form-control"
+              },
+              "infoText": "Percent of soil weight that is sand.\nUnitless.\nReference: SWAT Input .SOL - SOL_SAND."
+            },
+            "minimum": 0.0,
+            "maximum": 100.0,
+            "default": 12.5
+          },
+          "percent_rock_content": {
+            "title": "percent_rock_content",
+            "type": "number",
+            "options": {
+              "grid_columns": 12,
+              "inputAttributes": {
+                "class": "text-primary form-control"
+              },
+              "infoText": "Percent of soil weight that is rock.\nUnitless.\nReference: SWAT Input .SOL - SOL_ROCK."
+            },
+            "minimum": 0.0,
+            "maximum": 100.0,
+            "default": 1.3
+          },
+          "initial_labile_inorganic_phosphorus_concentration": {
+            "title": "initial_labile_inorganic_phosphorus_concentration",
+            "type": "number",
+            "options": {
+              "grid_columns": 12,
+              "inputAttributes": {
+                "class": "text-primary form-control"
+              },
+              "infoText": "Concentration of labile inorganic phosphorus at the beginning of the simulation.\nUnits: milligrams / kilogram soil."
+            },
+            "minimum": 0.0
+          },
+          "initial_fresh_organic_phosphorus_concentration": {
+            "title": "initial_fresh_organic_phosphorus_concentration",
+            "type": "number",
+            "options": {
+              "grid_columns": 12,
+              "inputAttributes": {
+                "class": "text-primary form-control"
+              },
+              "infoText": "Concentration of fresh organic phosphorus at the beginning of the simulation.\nUnits: milligrams / kilogram soil."
+            },
+            "minimum": 0.0,
+            "default": 0.0
+          },
+          "initial_soil_nitrate_concentration": {
+            "title": "initial_soil_nitrate_concentration",
+            "type": "number",
+            "options": {
+              "grid_columns": 12,
+              "inputAttributes": {
+                "class": "text-primary form-control"
+              },
+              "infoText": "Concentration of nitrate in the layer at the beginning of the simulation.\nUnits: milligrams / kilogram soil."
+            },
+            "minimum": 0.0
+          },
+          "initial_soil_ammonium_concentration": {
+            "title": "initial_soil_ammonium_concentration",
+            "type": "number",
+            "options": {
+              "grid_columns": 12,
+              "inputAttributes": {
+                "class": "text-primary form-control"
+              },
+              "infoText": "Concentration of ammonium in the layer at the beginning of the simulation.\nUnits: milligrams / kilogram soil."
+            },
+            "minimum": 0.0
+          },
+          "humus_mineralization_rate_factor": {
+            "title": "humus_mineralization_rate_factor",
+            "type": "number",
+            "options": {
+              "grid_columns": 12,
+              "inputAttributes": {
+                "class": "text-primary form-control"
+              },
+              "infoText": "Rate factor for humus mineralization of active organic nutrients (N and P).\nUnitless.\nReference: SWAT Input .BSN - CMN."
+            },
+            "minimum": 0.0,
+            "default": 0.0003
+          },
+          "ammonium_volatilization_cation_exchange_factor": {
+            "title": "ammonium_volatilization_cation_exchange_factor",
+            "type": "number",
+            "options": {
+              "grid_columns": 12,
+              "inputAttributes": {
+                "class": "text-primary form-control"
+              },
+              "infoText": "Controls the rate of ammonium volatilization.\nUnitless.\nReference: SWAT Theoretical Documentation eqn. 3:1.3.5."
+            },
+            "minimum": 0.01,
+            "default": 0.45
+          },
+          "denitrification_rate_coefficient": {
+            "title": "denitrification_rate_coefficient",
+            "type": "number",
+            "options": {
+              "grid_columns": 12,
+              "inputAttributes": {
+                "class": "text-primary form-control"
+              },
+              "infoText": "Controls the rate of denitrification.\nUnitless.\nReference: SWAT Input .BSN - CDN."
+            },
+            "minimum": 0.0,
+            "maximum": 3.0,
+            "default": 0.01
+          },
+          "denitrification_threshold_water_content": {
+            "title": "denitrification_threshold_water_content",
+            "type": "number",
+            "options": {
+              "grid_columns": 12,
+              "inputAttributes": {
+                "class": "text-primary form-control"
+              },
+              "infoText": "Fraction of field capacity water content above which denitrification takes place.\nUnitless.\nReference: SWAT Input .BSN - SDNCO"
+            },
+            "minimum": 0.0,
+            "default": 1.3
+          },
+          "residue_fresh_organic_mineralization_rate": {
+            "title": "residue_fresh_organic_mineralization_rate",
+            "type": "number",
+            "options": {
+              "grid_columns": 12,
+              "inputAttributes": {
+                "class": "text-primary form-control"
+              },
+              "infoText": "Fraction of residue that will decompose in a day given optimal conditions.\nUnitless.\nReference SWAT Input: .BSN - RSDCO."
+            },
+            "minimum": 0.0,
+            "default": 0.05
+          }
+        },
+        "options": {
+          "infoText": "This represents a single soil layer."
+        }
+      }
+    }
+  }
+}
