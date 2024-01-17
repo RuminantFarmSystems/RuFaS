@@ -393,6 +393,29 @@ def test_print_animal_num_warnings(animal_manager: AnimalManager):
         assert add_log.call_count == 2
 
 
+def test_animals_by_type(mocker: MockerFixture):
+    """Unit test for function animals_by_type in file routines/animal/animal_manager.py"""
+    mocker.patch('RUFAS.routines.animal.animal_manager.AnimalManager.__init__', return_value=None)
+    mock_animal_manager = AnimalManager(data=mocker.MagicMock(), config=mocker.MagicMock(),
+                                        feed=mocker.MagicMock(), weather=mocker.MagicMock(),
+                                        time=mocker.MagicMock(),
+                                        feed_emissions_estimator=MagicMock(PurchasedFeedEmissionsEstimator))
+    mock_animal_manager.calves = MagicMock()
+    mock_animal_manager.heiferIs = MagicMock()
+    mock_animal_manager.heiferIIs = MagicMock()
+    mock_animal_manager.heiferIIIs = MagicMock()
+    mock_animal_manager.cows = MagicMock()
+    actual = mock_animal_manager.animals_by_type
+    expected = {
+            Calf: mock_animal_manager.calves,
+            HeiferI: mock_animal_manager.heiferIs,
+            HeiferII: mock_animal_manager.heiferIIs,
+            HeiferIII: mock_animal_manager.heiferIIIs,
+            Cow: mock_animal_manager.cows,
+        }
+    assert actual == expected
+
+
 def test_init_nutrient_rqmts():
     """Unit test for function init_nutrient_rqmts in file routines/animal/animal_manager.py"""
     pass
