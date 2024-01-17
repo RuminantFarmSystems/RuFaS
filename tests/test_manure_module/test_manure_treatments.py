@@ -3027,7 +3027,6 @@ def test_calc_anaerobic_digestion_daily_output(mocker: MockFixture) -> None:
     )
 
 
-
 @pytest.mark.parametrize(
     "total_daily_mass",
     [
