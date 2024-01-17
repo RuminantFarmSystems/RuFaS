@@ -185,7 +185,7 @@ class CropData:
     """proportion of plant biomass that is stored below ground in roots (unitless)"""
     usable_light: Optional[float] = None
     """solar radiation captured for photosynthesis during the day (MJ/m^2)"""
-    biomass_growth_max: Optional[float] = None
+    biomass_growth_max: float = 0.0
     """upper-limit of biomass accumulation for the day (kg/ha)"""
     biomass_growth: Optional[float] = None
     """biomass accumulated by the plant during the day (kg/ha)"""
@@ -197,13 +197,13 @@ class CropData:
     """biomass stored in roots (kg/ha)"""
 
     # ---- growth constraints
-    nitrogen: float = 35
+    nitrogen: float = 0.0
     """nitrogen stored in plant biomass (kg/ha)"""
-    optimal_nitrogen: float = 100
+    optimal_nitrogen: float = 0.0
     """optimal amount of nitrogen stored in the plant for the current growth stage (kg/ha)"""
-    phosphorus: float = 20
+    phosphorus: float = 0.0
     """phosphorus stored in plant biomass (kg/ha)"""
-    optimal_phosphorus: float = 80
+    optimal_phosphorus: float = 0.0
     """optimal amount of phosphorus stored in the plant for the current growth stage (kg/ha)"""
     water_stress: float = 0.0
     """water stress for the day (unitless; [0, 1])"""

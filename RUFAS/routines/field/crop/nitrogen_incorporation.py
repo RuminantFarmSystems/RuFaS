@@ -294,7 +294,7 @@ class NitrogenIncorporation:
             shape2: second nitrogen uptake shape parameter
         """
         ndiff = emergence_nutrient_fraction - mature_nutrient_fraction
-        e_term = exp(shape1 + (shape2 * heat_fraction))
+        e_term = exp(shape1 - (shape2 * heat_fraction))
         brackets = 1 - (heat_fraction / (heat_fraction + e_term))
         return (ndiff * brackets) + mature_nutrient_fraction
 
