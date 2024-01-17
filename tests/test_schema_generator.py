@@ -1,6 +1,5 @@
 import pytest
 from pytest_mock import MockerFixture
-from unittest.mock import patch
 from mock import mock_open
 from typing import Any
 
@@ -90,10 +89,10 @@ def test_setup_string_schema(mocker: MockerFixture, title: str, properties: dict
         }
     })
 ])
-@patch('builtins.print')
-def test_setup_string_schema_value_error(mocked_print, mocker: MockerFixture, title: str, properties: dict[str, Any],
+def test_setup_string_schema_value_error(mocker: MockerFixture, title: str, properties: dict[str, Any],
                                          schema: dict[str, Any]) -> None:
     """Tests that setup_string_schema handles value errors appropriately."""
+    mock_add_error = mocker.patch.object(om, "add_error")
     mocked_get_options = mocker.patch.object(SchemaGenerator, "_get_list_of_options", side_effect=ValueError(
         "'[12][019][0-9]{2}:(?:[1-9]|[1-9][0-9]|[12][0-9]{2}|3[0-5][0-9]|36[0-6])$' is not a valid pattern. Cannot "
         "create list of valid options."))
@@ -101,8 +100,12 @@ def test_setup_string_schema_value_error(mocked_print, mocker: MockerFixture, ti
     actual = SchemaGenerator.setup_string_schema(title, properties)
 
     assert mocked_get_options.call_count == 1
-    mocked_print.assert_called_once_with("'[12][019][0-9]{2}:(?:[1-9]|[1-9][0-9]|[12][0-9]{2}|3[0-5][0-9]|36[0-6])$' is"
-                                         " not a valid pattern. Cannot create list of valid options.")
+    mock_add_error.assert_called_once_with(
+        "Schema generation for string input encountered error",
+        "Variable title='start_date' had error: '[12][019][0-9]{2}:(?:[1-9]|[1-9][0-9]|[12][0-9]{2}|3[0-5][0-9]|36[0-6]"
+        ")$' is not a valid pattern. Cannot create list of valid options.",
+        {"class": SchemaGenerator.__name__, "function": SchemaGenerator.setup_string_schema.__name__}
+    )
     assert actual == schema
 
 
@@ -243,8 +246,8 @@ def test_setup_object_schema(title: str, properties: dict[str, Any], schema: dic
 
 
 def test_generate_schema(mocker: MockerFixture) -> None:
-    patch_add_log = mocker.patch("RUFAS.output_manager.OutputManager.add_log")
-    patch_add_error = mocker.patch("RUFAS.output_manager.OutputManager.add_error")
+    patch_add_log = mocker.patch.object(om, "add_log")
+    patch_add_error = mocker.patch.object(om, "add_error")
     patch_open = mocker.patch("builtins.open", mock_open(read_data="some valid json data"))
     patch_object_schema_setup = mocker.patch("RUFAS.schema_generator.SchemaGenerator.setup_object_schema",
                                              result={"new_schema": "yay"})
