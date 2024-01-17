@@ -1,9 +1,19 @@
 import pytest
 from pytest_mock import MockerFixture
 from unittest.mock import patch
+from mock import mock_open
 from typing import Any
 
 from RUFAS.schema_generator import SchemaGenerator
+from RUFAS.output_manager import OutputManager
+
+om = OutputManager()
+
+dummy_properties = {
+    "properties": {
+        "dummy_one": {},
+    }
+}
 
 
 @pytest.mark.parametrize("pattern,expected", [
@@ -230,3 +240,34 @@ def test_setup_object_schema(title: str, properties: dict[str, Any], schema: dic
     actual = SchemaGenerator.setup_object_schema(title, properties)
 
     assert actual == schema
+
+
+def test_generate_schema(mocker: MockerFixture) -> None:
+    patch_add_log = mocker.patch("RUFAS.output_manager.OutputManager.add_log")
+    patch_add_error = mocker.patch("RUFAS.output_manager.OutputManager.add_error")
+    patch_open = mocker.patch("builtins.open", mock_open(read_data="some valid json data"))
+    patch_object_schema_setup = mocker.patch("RUFAS.schema_generator.SchemaGenerator.setup_object_schema",
+                                             result={"new_schema": "yay"})
+    patch_empty_dir = mocker.patch("RUFAS.util.Utility.empty_dir")
+    patch_json_load = mocker.patch("json.load", return_value=dummy_properties)
+    patch_json_dump = mocker.patch("json.dump")
+
+    schema_generator = SchemaGenerator()
+    schema_generator.generate_schemas(None, None)
+
+    assert patch_add_log.call_count == 2
+    assert patch_empty_dir.call_count == 1
+    assert patch_open.call_count == 2
+    assert patch_json_load.call_count == 1
+    assert patch_object_schema_setup.call_count == 1
+    assert patch_add_error.call_count == 0
+    assert patch_json_dump.call_count == 1
+
+    patch_object_schema_setup = mocker.patch("RUFAS.schema_generator.SchemaGenerator.setup_object_schema",
+                                             side_effect=ValueError("Oh no!"))
+
+    schema_generator.generate_schemas(None, None)
+
+    assert patch_object_schema_setup.call_count == 1
+    assert patch_add_error.call_count == 1
+    assert patch_json_dump.call_count == 1

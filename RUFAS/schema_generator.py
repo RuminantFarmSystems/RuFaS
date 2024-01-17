@@ -163,6 +163,15 @@ class SchemaGenerator:
             try:
                 enum = SchemaGenerator._get_list_of_options(pattern)
             except ValueError as e:
+                info_map = {
+                    "class": SchemaGenerator.__name__,
+                    "function": SchemaGenerator.setup_string_schema.__name__
+                }
+                om.add_error(
+                    "Schema generation for string input encountered error",
+                    f"Variable {title=} had error: {str(e)}",
+                    info_map
+                )
                 return schema
             schema["enum"] = enum
             schema["format"] = "select2"
