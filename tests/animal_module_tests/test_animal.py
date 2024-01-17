@@ -587,13 +587,19 @@ def mock_ration_config_modified_feed_type(mock_ration_config) -> MagicMock:
 
 
 @pytest.fixture
+def mock_ration_config_modifiedKd_list(mock_ration_config) -> MagicMock:
+    mock_ration_config.Kd_list = [-1000, -1000, -1000, -1000, -1000, -1000]
+    return mock_ration_config
+
+
+@pytest.fixture
 def decision_vector() -> np.ndarray:
     return np.array([1.0, 2.0, 3.0, 4.0, 5.0, 6.0])
 
 
 @pytest.fixture
 def decision_vector_sum_zero() -> np.ndarray:
-    return np.array([1.0, 2.0, 3.0, -3.0, -2.0 - 1.0])
+    return np.array([1.0, 2.0, 3.0, -3.0, -2.0, - 1.0])
 
 
 @pytest.fixture
@@ -614,7 +620,8 @@ def mock_available_feeds() -> dict:
     available_feeds["N_B"] = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0]
     available_feeds["CP"] = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0]
     available_feeds["dRUP"] = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0]
-    available_feeds["lactating_cow_limit"] = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0]
+    available_feeds["lactating_cow_limit"] = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0],
+    available_feeds["dry_cow_limit"] = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0]
 
     return available_feeds
 
@@ -2045,6 +2052,48 @@ def test_attempt_optimization(mocker: MockerFixture, mock_ration_config: MagicMo
         mock_optimize.return_value.x, mock_RationConfig.return_value
     )
 
+    animal_combination = "AnimalCombination.not_a_lactating_cow"
+
+    ration_optimizer.attempt_optimization(requirements, mock_available_feeds, animal_combination)
+
+    mock_RationConfig.assert_called_with(
+        mock_available_feeds["price"],
+        requirements.NEmaint_requirement,
+        requirements.NEa_requirement,
+        requirements.NEpreg_requirement,
+        requirements.NEl_requirement,
+        requirements.NEg_requirement,
+        requirements.MP_requirement,
+        requirements.Ca_requirement,
+        requirements.P_requirement,
+        mock_available_feeds["TDN"],
+        mock_available_feeds["DE"],
+        mock_available_feeds["EE"],
+        mock_available_feeds["is_fat"],
+        requirements.avg_BW,
+        mock_available_feeds["calcium"],
+        mock_available_feeds["phosphorus"],
+        mock_available_feeds["NDF"],
+        mock_available_feeds["type"],
+        mock_available_feeds["is_wetforage"],
+        mock_available_feeds["Kd"],
+        mock_available_feeds["N_A"],
+        mock_available_feeds["N_B"],
+        mock_available_feeds["CP"],
+        mock_available_feeds["dRUP"],
+        mock_available_feeds["dry_cow_limit"],
+        False,
+        DMIest__requirement=requirements.DMIest_requirement,
+    )
+
+    ration_optimizer.optimize.assert_called_with(
+        animal_combination, mock_available_feeds, mock_RationConfig.return_value
+    )
+
+    ration_optimizer.get_ration_vals.assert_called_with(
+        mock_optimize.return_value.x, mock_RationConfig.return_value
+    )
+
 
 @pytest.mark.parametrize(
     "ration_config, expected",
@@ -2169,14 +2218,17 @@ def test_phosphorus_constraint(ration_config, expected, decision_vector) -> None
 
 
 @pytest.mark.parametrize(
-    "ration_config, expected",
-    [(lazy_fixture("mock_ration_config"), 135.148700), (lazy_fixture("mock_random_ration_config"), 113.147389)],
+    "ration_config, decision_vec, expected",
+    [(lazy_fixture("mock_ration_config"), lazy_fixture("decision_vector"), 135.148700),
+     (lazy_fixture("mock_random_ration_config"), lazy_fixture("decision_vector"), 113.147389),
+     (lazy_fixture("mock_ration_config"), lazy_fixture("decision_vector_sum_zero"),  -11.662807),
+     (lazy_fixture("mock_ration_config_modifiedKd_list"), lazy_fixture("decision_vector_sum_zero"),  -11.6638)],
 )
-def test_protein_constraint(ration_config, expected, decision_vector) -> None:
+def test_protein_constraint(ration_config, decision_vec, expected) -> None:
     """Unit test for function protein_constraint in file routines/animal/ration/ration_optimizer.py"""
     ration_optimizer = RationOptimizer()
 
-    actual = ration_optimizer.protein_constraint(decision_vector, ration_config)
+    actual = ration_optimizer.protein_constraint(decision_vec, ration_config)
 
     assert actual == pytest.approx(expected)
 
