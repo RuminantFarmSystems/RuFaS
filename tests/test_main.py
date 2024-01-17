@@ -27,17 +27,17 @@ from RUFAS.output_manager import OutputManager, LogVerbosity
 @pytest.mark.parametrize(
     "load_pool, no_graphics, format_option, verbose, clear_output, exclude_info_maps, only_run_validation,"
     "graphics_dir, vars_file_path, init_herd, save_animals, save_animals_path,"
-    "terminate_simulation_post_herd_generation",
+    "terminate_simulation_post_herd_generation, generate_schemas",
     [
         (False, False, "verbose", LogVerbosity.ERRORS, True, True, True, "graphics", "", False, False, "output/",
-         False),
+         False, False),
         (False, True, "basic", LogVerbosity.LOGS, False, False, False, "custom_graphics", "", True, False, "output/",
-         False),
+         False, False),
         (False, True, "block", LogVerbosity.NONE, True, False, False, "graphics", "", True, True, "output/", False),
         (True, False, "inline", LogVerbosity.WARNINGS, False, False, False, "custom_graphics", "path.json", True, True,
-         "output/", True),
+         "output/", True, False),
         (True, True, "verbose", LogVerbosity.LOGS, False, True, False, "graphics", "path.json", False, False, "output/",
-         True),
+         True, False),
     ],
 )
 def test_main(
@@ -53,7 +53,8 @@ def test_main(
     init_herd: bool,
     save_animals: bool,
     save_animals_path: str,
-    terminate_simulation_post_herd_generation: bool
+    terminate_simulation_post_herd_generation: bool,
+    generate_schemas: bool,
 ) -> None:
     output_dir = "output/"
     filters_dir = "output/output_filters/"
@@ -74,7 +75,8 @@ def test_main(
             init_herd=init_herd,
             save_animals=save_animals,
             save_animals_dir=save_animals_path,
-            terminate_simulation_post_herd_generation=terminate_simulation_post_herd_generation
+            terminate_simulation_post_herd_generation=terminate_simulation_post_herd_generation,
+            generate_schemas=generate_schemas,
         )
 
         with patch("main.run_rufas") as mock_run_rufas:
@@ -96,7 +98,8 @@ def test_main(
                 init_herd=init_herd,
                 save_animals=save_animals,
                 save_animals_dir=Path(save_animals_path),
-                terminate_simulation_post_herd_generation=terminate_simulation_post_herd_generation
+                terminate_simulation_post_herd_generation=terminate_simulation_post_herd_generation,
+                generate_schemas=generate_schemas,
             )
 
 
@@ -126,27 +129,32 @@ def test_main_exception_handling(mocker: MockerFixture, capsys) -> None:
 @pytest.mark.parametrize(
     "format_option, produce_graphics, verbose, clear_output, exclude_info_maps, only_run_validation,"
     "graphics_dir, load_pool, vars_file_path, init_herd, save_animals, save_animals_dir, "
-    "terminate_simulation_post_herd_generation",
+    "terminate_simulation_post_herd_generation, generate_schemas",
     [
-        ("verbose", True, LogVerbosity.NONE, True, True, True, "", False, "", False, False, "output/", False),
-        ("block", False, LogVerbosity.LOGS, True, True, True, "", False, "", False, False, "output/", False),
-        ("inline", True, LogVerbosity.ERRORS, True, True, True, "", False, "", False, False, "output/", False),
-        ("basic", True, LogVerbosity.WARNINGS, False, True, True, "", False, "", False, False, "output/", False),
-        ("verbose", True, LogVerbosity.NONE, True, False, True, "", False, "", False, False, "output/", False),
-        ("block", True, LogVerbosity.LOGS, True, True, False, "", False, "", False, False, "output/", False),
-        ("inline", False, LogVerbosity.ERRORS, True, True, True, "", False, "", False, False, "output/", False),
-        ("basic", False, LogVerbosity.WARNINGS, False, True, True, "", False, "", False, False, "output/", False),
-        ("verbose", False, LogVerbosity.NONE, True, False, True, "", False, "", False, False, "output/", False),
-        ("block", False, LogVerbosity.LOGS, True, True, False, "", False, "", False, False, "output/", False),
-        ("inline", False, LogVerbosity.ERRORS, False, True, True, "", False, "", False, False, "output/", False),
-        ("basic", False, LogVerbosity.WARNINGS, True, False, True, "", False, "", False, False, "output/", False),
-        ("verbose", False, LogVerbosity.NONE, True, True, False, "", False, "", False, False, "output/", False),
-        ("block", False, LogVerbosity.WARNINGS, False, False, True, "", False, "", False, False, "output/", False),
-        ("inline", False, LogVerbosity.LOGS, False, True, False, "", False, "", False, False, "output/", False),
-        ("basic", False, LogVerbosity.ERRORS, False, False, False, "", False, "", False, False, "output/", False),
-        ("basic", False, LogVerbosity.LOGS, False, False, False, "graphics", False, "", False, False, "output/", False),
-        ("basic", False, LogVerbosity.LOGS, False, False, False, "graphics", True, "path.json", False, False, "output/",
+        ("verbose", True, LogVerbosity.NONE, True, True, True, "", False, "", False, False, "output/", False, False),
+        ("block", False, LogVerbosity.LOGS, True, True, True, "", False, "", False, False, "output/", False, False),
+        ("inline", True, LogVerbosity.ERRORS, True, True, True, "", False, "", False, False, "output/", False, False),
+        ("basic", True, LogVerbosity.WARNINGS, False, True, True, "", False, "", False, False, "output/", False, False),
+        ("verbose", True, LogVerbosity.NONE, True, False, True, "", False, "", False, False, "output/", False, False),
+        ("block", True, LogVerbosity.LOGS, True, True, False, "", False, "", False, False, "output/", False, False),
+        ("inline", False, LogVerbosity.ERRORS, True, True, True, "", False, "", False, False, "output/", False, False),
+        ("basic", False, LogVerbosity.WARNINGS, False, True, True, "", False, "", False, False, "output/", False,
          False),
+        ("verbose", False, LogVerbosity.NONE, True, False, True, "", False, "", False, False, "output/", False, False),
+        ("block", False, LogVerbosity.LOGS, True, True, False, "", False, "", False, False, "output/", False, False),
+        ("inline", False, LogVerbosity.ERRORS, False, True, True, "", False, "", False, False, "output/", False, False),
+        ("basic", False, LogVerbosity.WARNINGS, True, False, True, "", False, "", False, False, "output/", False,
+         False),
+        ("verbose", False, LogVerbosity.NONE, True, True, False, "", False, "", False, False, "output/", False, False),
+        ("block", False, LogVerbosity.WARNINGS, False, False, True, "", False, "", False, False, "output/", False,
+         False),
+        ("inline", False, LogVerbosity.LOGS, False, True, False, "", False, "", False, False, "output/", False, False),
+        ("basic", False, LogVerbosity.ERRORS, False, False, False, "", False, "", False, False, "output/", False,
+         False),
+        ("basic", False, LogVerbosity.LOGS, False, False, False, "graphics", False, "", False, False, "output/", False,
+         False),
+        ("basic", False, LogVerbosity.LOGS, False, False, False, "graphics", True, "path.json", False, False, "output/",
+         False, False),
     ],
 )
 def test_run_rufas(
