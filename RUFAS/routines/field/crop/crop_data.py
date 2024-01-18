@@ -584,39 +584,68 @@ class CropData:
 
     @property
     def in_growing_season(self) -> bool:
-        """Indicates if the plant is in its growing season.
+        """
+        Indicates if the plant is in its growing season.
+
+        Returns
+        -------
+        bool
+            True if the plant is in its growing season, False otherwise.
         """
         return not self.is_mature and not self.is_dormant and self.is_alive and self.is_growing
 
     @property
     def do_harvest_index_override(self) -> bool:
-        """was a user-defined harvest index is given? This triggers a harvest index override"""
+        """
+        Checks if a user-defined harvest index is given, which triggers a harvest index override.
+
+        Returns
+        -------
+        bool
+            True if a user-defined harvest index is given, False otherwise.
+        """
         return self.user_harvest_index is not None
 
     @property
     def is_in_senescence(self) -> bool:
-        """check if the plant is in senescence"""
+        """
+        Check if the plant is in senescence.
+
+        Returns
+        -------
+        bool
+            True if the plant is in senescence, False otherwise.
+        """
         return self.heat_fraction > self.senescent_heat_fraction
 
     @property
     def water_canopy_storage_capacity(self) -> float:
-        """Maximum amount of water that can be held in the canopy (mm).
+        """
+        Calculate the maximum amount of water that can be held in the canopy.
+
+        Returns
+        -------
+        float
+            Maximum water storage capacity of the canopy, measured in millimeters (mm).
 
         References
         ----------
         SWAT Theoretical documentation eqn. 2:2.1.1
-
         """
         return self.max_canopy_water_capacity * (self.leaf_area_index / self.max_leaf_area_index)
 
     @property
     def heat_fraction(self) -> float:
         """
-        Fraction of potential heat units accumulated.
+        Calculate the fraction of potential heat units accumulated by the plant.
+
+        Returns
+        -------
+        float
+            Fraction of potential heat units accumulated. (unitless)
 
         References
         ----------
         SWAT Theoretical documentation section 5:2.1.4
-
         """
         return self.accumulated_heat_units / self.potential_heat_units
