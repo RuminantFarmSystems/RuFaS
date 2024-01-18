@@ -35,6 +35,8 @@ output/graphics/*
 !output/output_filters/
 output/output_filters/*
 !output/output_filters/report_example.json
+!output/output_filters/report_animals_sold.json
+!output/output_filters/report_animals_sold_by_sell_day.json
 
 # ignore project files
 *.sublime-project

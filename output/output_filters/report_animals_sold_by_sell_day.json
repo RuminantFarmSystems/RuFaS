@@ -1,0 +1,6 @@
+{
+  "name": "Animals sold sort by sell day",
+  "filters": [
+    "AnimalModuleReporter.report_sold_animal_information_sort_by_sell_day.*"
+  ]
+}

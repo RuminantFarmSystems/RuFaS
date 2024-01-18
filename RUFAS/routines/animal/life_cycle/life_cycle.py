@@ -77,6 +77,7 @@ class LifeCycleManager:
         self.sold_heiferIIIs: List[HeiferIII] = []
         self.sold_heiferIIs: List[HeiferII] = []
         self.sold_and_died_cows: List[Cow] = []
+        self.sold_calves: List[Calf] = []
 
         self.herd_num = 0
         self.calf_num = 0
@@ -1025,6 +1026,8 @@ class LifeCycleManager:
             calves_born.append(new_calf)
         if new_calf.sold:
             self.sold_calf_num += 1
+            self.sold_calves.append(new_calf)
+            new_calf.sold_at_day = sim_day
 
     def _calculate_herd_percentages(self, total_animal_num: int) -> None:
         """Calculates percentage of each animal class in the herd.

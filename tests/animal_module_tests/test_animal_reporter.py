@@ -5,6 +5,7 @@ from RUFAS.routines.animal.animal_module_reporter import AnimalModuleReporter
 from RUFAS.routines.animal.animal_manager import AnimalManager
 
 from RUFAS.output_manager import OutputManager
+from RUFAS.routines.animal.life_cycle import animal_constants
 
 om = OutputManager()
 
@@ -182,8 +183,8 @@ def test_report_ration_interval_data(animal_manager_fixture, mocker: MockerFixtu
 
     for i in range(1, 2):
         assert om.variables_pool[f"AnimalManager._calc_ration_at_interval.ration_nutrient_amount_pen_{i}_combo{i}"][
-            "values"
-        ] == [test_data["ration_nutrient_amount"]]
+                   "values"
+               ] == [test_data["ration_nutrient_amount"]]
 
         assert om.variables_pool[f"AnimalManager._calc_ration_at_interval.MEdiet_pen_{i}_combo{i}"]["values"] == [
             test_data["MEdiet"]
@@ -194,12 +195,12 @@ def test_report_ration_interval_data(animal_manager_fixture, mocker: MockerFixtu
         ]
 
         assert om.variables_pool[f"AnimalManager._calc_ration_at_interval.ration_per_animal_for_pen_{i}_combo{i}"][
-            "values"
-        ] == [test_data["formatted_ration"]]
+                   "values"
+               ] == [test_data["formatted_ration"]]
 
         assert om.variables_pool[f"AnimalManager._calc_ration_at_interval.ration_supply_report_for_pen_{i}_combo{i}"][
-            "values"
-        ] == ["ration_supply_report"]
+                   "values"
+               ] == ["ration_supply_report"]
 
 
 def test_report_daily_ration(animal_manager_fixture, mocker: MockerFixture):
@@ -226,9 +227,9 @@ def test_report_daily_ration(animal_manager_fixture, mocker: MockerFixture):
 
     for i in range(1, 2):
         assert om.variables_pool[
-            f"AnimalModuleReporter.report_daily_ration.ration_daily_feed_totals_for_pen_{i}_combo{i}"][
-            "values"
-        ] == [test_data[f"formatted_ration_{i}"]]
+                   f"AnimalModuleReporter.report_daily_ration.ration_daily_feed_totals_for_pen_{i}_combo{i}"][
+                   "values"
+               ] == [test_data[f"formatted_ration_{i}"]]
 
 
 def test_report_animal_module_manure():
@@ -308,49 +309,92 @@ def test_report_life_cycle_manager_data(mocker: MockerFixture):
     assert om.variables_pool["LifeCycleManager.daily_update.avg_age_for_calving_greater_than_3"]["values"] == [400]
 
 
-def test_report_sold_animal_information(mocker: MockerFixture):
-    sold_animals = [mocker.MagicMock(), mocker.MagicMock(), mocker.MagicMock()]
-    sold_report = {
-        "id": [1, 2, 3],
-        "cull_reason": ["low1", "low2"],
-        "body_weight": [100, 200, 300],
-        "days_in_milk": [100],
-        "calves": [42],
+# Test cases
+@pytest.mark.parametrize(
+    "animal_id, animal_type, body_weight, sold_at_day, "
+    "cull_reason, days_in_milk, calves",
+    [
+        (1, "Cow", 100, 10, "low production", 150, 2),
+        (1, "Cow", 100, 10, animal_constants.DEATH_CULL, 150, 2),
+        (1, "Cow", 150, None, None, None, None),
+        (2, "Calf", 50, 20, "male", 100, 1),
+        (2, "Calf", 50, None, None, None, None),
+        (3, "HeiferII", 200, 30, "disease", 200, 2),
+        (3, "HeiferII", 200, None, None, None, None),
+        (4, "HeiferIII", 300, 40, "disease", 250, 3),
+        (4, "HeiferIII", 300, None, None, None, None),
+    ]
+)
+def test_report_sold_animal_information(
+        animal_id: int,
+        animal_type: str,
+        body_weight: float,
+        sold_at_day: int,
+        cull_reason: str,
+        days_in_milk: int,
+        calves: int,
+        mocker: MockerFixture
+) -> None:
+    """Unit test for function report_sold_animal_information in file routines/animal/animal_module_reporter.py"""
+    # Arrange
+    mock_animal = mocker.MagicMock()
+    mock_animal.id = animal_id
+    mock_animal.__class__.__name__ = animal_type
+    mock_animal.body_weight = body_weight
+    optional_attrs_dict = {
+        "sold_at_day": sold_at_day,
+        "cull_reason": cull_reason,
+        "days_in_milk": days_in_milk,
+        "calves": calves,
     }
-    sold_report_expected = {
-        "animal_id": [1, 2, 3],
-        "animal_type": ["dummy", "dummy", "dummy"],
-        "cull_reason": ["low1", "low2", "NA"],
-        "body_weight": [100, 200, 300],
-        "days_in_milk": [100, "NA", "NA"],
-        "parity": [42, "NA", "NA"],
-    }
-    animalcount = 0
-    for animal in sold_animals:
-        for key in sold_report.keys():
-            if len(sold_report[key]) > animalcount:
-                setattr(animal, key, sold_report[key][animalcount])
-            else:
-                delattr(animal, key)
-        animalcount += 1
-
-    for animal in sold_animals:
-        animal.__class__.__name__ = "dummy"
+    none_str = "none"
+    for attr, value in optional_attrs_dict.items():
+        if value is not None:
+            setattr(mock_animal, attr, value)
+        else:
+            setattr(mock_animal, attr, none_str)
 
     animal_manager = mocker.MagicMock()
-    animal_manager.life_cycle_manager.sold_heiferIIs = [sold_animals[0]]
-    animal_manager.life_cycle_manager.sold_heiferIIIs = [sold_animals[1]]
-    animal_manager.life_cycle_manager.sold_and_died_cows = [sold_animals[2]]
+    animal_manager.life_cycle_manager.sold_calves = [mock_animal] if animal_type == "Calf" else []
+    animal_manager.life_cycle_manager.sold_heiferIIs = [mock_animal] if animal_type == "HeiferII" else []
+    animal_manager.life_cycle_manager.sold_heiferIIIs = [mock_animal] if animal_type == "HeiferIII" else []
+    animal_manager.life_cycle_manager.sold_and_died_cows = [mock_animal] if animal_type == "Cow" else []
 
-    # act
+    patch_for_add_variable = mocker.patch("RUFAS.routines.animal"
+                                          ".animal_module_reporter.om.add_variable")
+    assert patch_for_add_variable.call_count == 0
+
+    # Act
     AnimalModuleReporter.report_sold_animal_information(animal_manager)
 
-    # assert
-    for key in sold_report_expected.keys():
-        assert (
-            om.variables_pool[f"AnimalModuleReporter.report_sold_animal_information.{key}"]["values"]
-            == sold_report_expected[key]
-        )
+    # Assert
+    if cull_reason == animal_constants.DEATH_CULL:
+        assert patch_for_add_variable.call_count == 0
+        return
+
+    patch_for_add_variable.assert_any_call("animal_id", animal_id, mocker.ANY)
+    patch_for_add_variable.assert_any_call("animal_type", animal_type, mocker.ANY)
+    patch_for_add_variable.assert_any_call("body_weight", body_weight, mocker.ANY)
+
+    if sold_at_day is not None:
+        patch_for_add_variable.assert_any_call("sold_day", sold_at_day, mocker.ANY)
+    else:
+        patch_for_add_variable.assert_any_call("sold_day", none_str, mocker.ANY)
+
+    if cull_reason is not None:
+        patch_for_add_variable.assert_any_call("cull_reason", cull_reason, mocker.ANY)
+    else:
+        patch_for_add_variable.assert_any_call("cull_reason", none_str, mocker.ANY)
+
+    if days_in_milk is not None:
+        patch_for_add_variable.assert_any_call("days_in_milk", days_in_milk, mocker.ANY)
+    else:
+        patch_for_add_variable.assert_any_call("days_in_milk", none_str, mocker.ANY)
+
+    if calves is not None:
+        patch_for_add_variable.assert_any_call("parity", calves, mocker.ANY)
+    else:
+        patch_for_add_variable.assert_any_call("parity", none_str, mocker.ANY)
 
 
 def test_report_305d_milk(mocker: MockerFixture):

@@ -32,6 +32,7 @@ class Calf(AnimalBase):
 
         self.gender = ""
         self.sold = False
+        self.sold_at_day = 0
         self.wean_weight = 0
         self.birth_weight = 0
         self.animal_intake = 0

@@ -1,0 +1,6 @@
+{
+  "name": "Animals sold in the whole simulation",
+  "filters": [
+    "AnimalModuleReporter.report_sold_animal_information.(animal_id|animal_type|body_weight|sold_day|cull_reason|parity|days_in_milk)"
+  ]
+}
