@@ -356,6 +356,7 @@ class LifeCycleManager:
         self.bought_heifer_num = 0
         self.sold_heiferII_num = 0
         self.cow_herd_exit_num = 0
+        self.sold_cow_num = 0
 
         self.calf_percent = 0.0
         self.heiferI_percent = 0.0
