@@ -217,6 +217,7 @@ def run_load_vars_pool(
         output_dir, exclude_info_maps, format_option
     )
 
+
 def execute_schema_generation() -> None:
     """
     Instantiates the SchemaGenerator and uses it to produce new schema.
@@ -233,6 +234,7 @@ def execute_schema_generation() -> None:
     log_title = "Completed schema generation"
     log_message = "Main routine completed generating new input schemas for the Data Collection App."
     output_manager.add_log(log_title, log_message, info_map)
+
 
 def run_validation(
         metadata_files: List[Path],
