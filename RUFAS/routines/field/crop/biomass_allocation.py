@@ -153,8 +153,6 @@ class BiomassAllocation:
         """
         Calculate above ground plant biomass.
 
-        SWAT Reference: 5:2.4.4
-
         Parameters
         ----------
         root_frac : float
@@ -166,6 +164,10 @@ class BiomassAllocation:
         -------
         float
             Above ground biomass (kg/ha).
+
+        References
+        ----------
+        SWAT 5:2.4.4
         """
         return (1 - root_frac) * biomass
 

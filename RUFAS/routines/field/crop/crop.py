@@ -16,62 +16,101 @@ from typing import Optional
 
 
 class Crop:
+    """
+    A class representing a crop, encapsulating various processes and components
+    related to crop growth and development throughout a simulation.
+
+    This class integrates multiple subcomponents that manage different aspects of
+    the crop's lifecycle, including growth constraints, biomass allocation, water
+    dynamics, nutrient incorporation, heat accumulation, and more.
+
+    Parameters
+    ----------
+    crop_data : Optional[CropData], optional
+        A CropData object containing the attributes tracked throughout the simulation.
+        If not provided, default specifications are used.
+
+    Attributes
+    ----------
+    data : CropData
+        Reference to the crop data; tracks all crop variables through the simulation.
+    growth_constraints : GrowthConstraints
+        Process component controlling growth constraints, limits plant growth as a function of stressors.
+    biomass_allocation : BiomassAllocation
+        Process component controlling allocation of plant biomass as a function of growth and photosynthesis.
+    water_dynamics : WaterDynamics
+        Process component controlling plant water dynamics.
+    water_uptake : WaterUptake
+        Process component controlling water uptake from soil.
+    nitrogen_incorporation : NitrogenIncorporation
+        Process component controlling plant nitrogen incorporation, including uptake and fixation.
+    phosphorus_incorporation : PhosphorusIncorporation
+        Process component controlling plant phosphorus uptake and incorporation.
+    heat_units : HeatUnits
+        Process component controlling plant heat accumulation.
+    leaf_area_index : LeafAreaIndex
+        Process component controlling canopy growth, including leaf area index.
+    root_development : RootDevelopment
+        Process component controlling plant root development.
+    crop_management : CropManagement
+        Process component controlling calculation of end-of-season production.
+    dormancy : Dormancy
+        Process component performing dormancy operations.
+
+    Notes
+    -----
+    The `Crop` class is designed to be a central part of a crop growth simulation,
+    integrating data and methods from various subcomponents to simulate the entire
+    lifecycle of a crop.
+    """
     def __init__(self, crop_data: Optional[CropData] = None):
-        """Creates a crop object, from a crop data specification object.
+        """
+        Initialize a Crop object with the specified or default crop data.
 
-        Args:
-            crop_data: a CropData object containing the attributes tracked throughout the simulation
-
-        Details:
-            If crop_data is not given, the default specifications are used.
+        Parameters
+        ----------
+        crop_data : Optional[CropData]
+            The crop data to be used for simulation. If not provided,
+            default specifications are used.
         """
         # Common data object that is updated throughout routines
         self.data = crop_data or CropData()  # defaults if not given
-        """reference to the crop data; tracks all crop variables through the simulation"""
 
         # growth process components
         self.growth_constraints = GrowthConstraints(self.data)
-        """Process component controlling growth constraints, limits plant growth as a function of stressors"""
         self.biomass_allocation = BiomassAllocation(self.data)
-        """Process component controlling allocation of plant biomass as a function of growth and photosynthesis"""
         self.water_dynamics = WaterDynamics(self.data)  # needs soil.evapotranspiration.evapotranspirate() called 1st
-        """Process component controlling plant water dynamics"""
         self.water_uptake = WaterUptake(self.data)
-        """Process component controlling water uptake from soil"""
         self.nitrogen_incorporation = NitrogenIncorporation(self.data)
-        """Process component controlling plant nitrogen incorporation, including uptake and fixation"""
         self.phosphorus_incorporation = PhosphorusIncorporation(self.data)
-        """Process component controlling plant phosphorus uptake and incorporation"""
         self.heat_units = HeatUnits(self.data)  # TODO: rename module and component (e.g., "HeatAccumulation")?
-        """Process component controlling plant heat accumulation"""
         self.leaf_area_index = LeafAreaIndex(self.data)  # TODO: rename module and component (e.g., "CanopyGrowth")?
-        """Process component controlling canopy growth, including leaf area index"""
         self.root_development = RootDevelopment(self.data)
-        """Process component controlling plant root development"""
         self.crop_management = CropManagement(self.data)
-        """Process component controlling calculation of end-of-season production"""
         self.dormancy = Dormancy(self.data)
-        """Process component performing dormancy operations"""
 
     def grow_crop(self, soil_data: SoilData, incoming_light: float,
                   mean_air_temperature: float, min_air_temperature: float,
                   max_air_temperature: float) -> None:
-        """main function for growing the crop on a daily basis
-
-        Args:
-            soil_data: the SoilData object that tracks soil properties.
-
-            incoming_light: incoming light radiation energy (MJ/m)
-
-            mean_air_temperature: average air temperature for the day (C)
-            min_air_temperature: minimum air temperature for the day (C)
-            max_air_temperature: maximum air temperature for the day (C)
-
-        Details: grow_crop is a wrapper function for all the Crop growth
-            process sub-routines. It should be called every day that the crop
-            is alive and growing in the simulation
         """
-        # don't perform growth if the plant can't grow
+        Main function for growing the crop on a daily basis.
+
+        This function acts as a wrapper for all the Crop growth process sub-routines.
+        It should be called every day that the crop is alive and growing in the simulation.
+
+        Parameters
+        ----------
+        soil_data : SoilData
+            The SoilData object that tracks soil properties.
+        incoming_light : float
+            Incoming light radiation energy (MJ/m).
+        mean_air_temperature : float
+            Average air temperature for the day (°C).
+        min_air_temperature : float
+            Minimum air temperature for the day (°C).
+        max_air_temperature : float
+            Maximum air temperature for the day (°C).
+        """
         if self.data.in_growing_season:
             self.heat_units.absorb_heat_units(mean_air_temperature, min_air_temperature, max_air_temperature)
             self.root_development.develop_roots()
