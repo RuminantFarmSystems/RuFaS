@@ -8,14 +8,27 @@ from RUFAS.routines.field.soil.soil_data import SoilData
 from RUFAS.time import Time
 from RUFAS.output_manager import OutputManager
 
-"""
-This module is primarily based upon the "Crop Yield" (5:2.4) and "General Management" (6:1) sections of the SWAT model
-"""
-
 om = OutputManager()
 
 
 class CropManagement:
+    """
+    A class for managing crop operations based on crop data.
+
+    This class is designed to handle various crop management operations using data provided by the `CropData` class.
+    It is primarily based upon the "Crop Yield" (5:2.4) and "General Management" (6:1) sections of the SWAT model.
+
+    Parameters
+    ----------
+    crop_data : Optional[CropData], optional
+        The data class containing crop specifications and tracked attributes.
+        If not provided, default CropData will be used.
+
+    Attributes
+    ----------
+    data : CropData
+        A reference to `crop_data`, on which crop management operations will be conducted.
+    """
     def __init__(self, crop_data: Optional[CropData] = None):
         """Create a crop management object from CropData
 
