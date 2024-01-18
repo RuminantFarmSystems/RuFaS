@@ -306,7 +306,8 @@ class CropData:
     cumulative_water_uptake : float, default 0.0 mm
         Cumulative sum of water taken up by the plant over the course of its lifetime (mm).
     harvest_efficiency : float, default 1.0
-        Efficiency of the harvest operation: the proportion of yield that will be extracted from the field (unitless; [0, 1]).
+        Efficiency of the harvest operation: the proportion of yield that will be extracted from the field
+        (unitless; [0, 1]).
     dry_matter_percentage : float, default 85.689%
         Percentage of fresh yield that is dry matter (unitless).
     lignin_dry_matter_percentage : float, default 1.518%
