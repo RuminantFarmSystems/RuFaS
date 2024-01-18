@@ -722,6 +722,19 @@ class LayerData:
         """
         return (self.percent_silt_content + self.percent_clay_content) / 100
 
+    @property
+    def carbon_emissions(self) -> float:
+        """
+        Calculates the total amount of CO2 respirated from the soil layer.
+
+        Returns
+        -------
+        float
+            Total amount of CO2 emitted from carbon decomposition in this layer. (kg/ha).
+
+        """
+        return self.active_carbon_to_slow_loss + self.slow_carbon_co2_lost_amount + self.passive_carbon_co2_lost_amount
+
     def do_annual_reset(self):
         self.annual_carbon_CO2_lost = 0
         self.annual_decomposition_carbon_CO2_lost = 0
