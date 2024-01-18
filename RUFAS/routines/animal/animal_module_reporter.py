@@ -300,6 +300,9 @@ class AnimalModuleReporter:
             "cow_herd_exit_num", life_cycle_manager.cow_herd_exit_num, info_map
         )
         om.add_variable(
+            "sold_cow_num", life_cycle_manager.sold_cow_num, info_map
+        )
+        om.add_variable(
             "GnRH_injection_num_h", life_cycle_manager.GnRH_injection_num_h, info_map
         )
         om.add_variable(
@@ -559,6 +562,11 @@ class AnimalModuleReporter:
         """
         AnimalModuleReporter.report_sold_animal_information(animal_manager)
         AnimalModuleReporter.report_sold_animal_information_sort_by_sell_day(
+            animal_manager.life_cycle_manager.sold_calves,
+            "sold_calves",
+            total_days,
+        )
+        AnimalModuleReporter.report_sold_animal_information_sort_by_sell_day(
             animal_manager.life_cycle_manager.sold_heiferIIs, "heiferII", total_days
         )
         AnimalModuleReporter.report_sold_animal_information_sort_by_sell_day(
@@ -567,5 +575,10 @@ class AnimalModuleReporter:
         AnimalModuleReporter.report_sold_animal_information_sort_by_sell_day(
             animal_manager.life_cycle_manager.sold_and_died_cows,
             "sold_and_died_cows",
+            total_days,
+        )
+        AnimalModuleReporter.report_sold_animal_information_sort_by_sell_day(
+            animal_manager.life_cycle_manager.sold_cows,
+            "sold_cows",
             total_days,
         )

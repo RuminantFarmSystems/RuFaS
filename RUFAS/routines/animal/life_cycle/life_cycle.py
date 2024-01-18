@@ -74,8 +74,10 @@ class LifeCycleManager:
         self.initial_herd_summary: Optional[InitialHerdSummaryTypedDict] = None
         self.avg_CI = 0.0
 
+        self.sold_calves: List[Calf] = []
         self.sold_heiferIIIs: List[HeiferIII] = []
         self.sold_heiferIIs: List[HeiferII] = []
+        self.sold_cows: List[Cow] = []
         self.sold_and_died_cows: List[Cow] = []
 
         self.herd_num = 0
@@ -90,6 +92,7 @@ class LifeCycleManager:
         self.bought_heifer_num = 0
         self.sold_heiferII_num = 0
         self.cow_herd_exit_num = 0
+        self.sold_cow_num = 0
 
         self.calf_percent = 0.0
         self.heiferI_percent = 0.0
@@ -870,6 +873,9 @@ class LifeCycleManager:
         self.sold_and_died_cows.append(cow)
         self.cull_reason_stats_range[cow.cull_reason] += 1
         self.cull_reason_stats[cow.cull_reason] += 1
+        if cow.cull_reason != animal_constants.DEATH_CULL:
+            self.sold_cows.append(cow)
+            self.sold_cow_num += 1
 
         parity = cow.calves if cow.calves <= 3 else "4+"
         self.parity_culling_stats_range[parity] += 1
@@ -1024,6 +1030,8 @@ class LifeCycleManager:
             )
             calves_born.append(new_calf)
         if new_calf.sold:
+            new_calf.sold_at_day = sim_day
+            self.sold_calves.append(new_calf)
             self.sold_calf_num += 1
 
     def _calculate_herd_percentages(self, total_animal_num: int) -> None:
