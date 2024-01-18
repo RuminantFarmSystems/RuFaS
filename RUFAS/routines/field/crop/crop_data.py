@@ -295,7 +295,8 @@ class CropData:
     potential_water_uptakes : Optional[List[float]], default None
         The maximum amount of water to be potentially taken up by a crop, from each soil layer (mm).
     water_compensation_factor : float, default 0.01
-        Factor that determines the ability of a plant to draw water from deeper layers when demands are not met (unitless).
+        Factor that determines the ability of a plant to draw water from deeper layers when demands are not met
+        (unitless).
     unmet_water_demands : Optional[List[float]], default None
         Cumulative water demands not met by all previous layers (mm).
     actual_water_uptakes : Optional[List[float]], default None
@@ -319,7 +320,8 @@ class CropData:
     potential_harvest_index : Optional[float], default None
         Potential harvest index for a given day (unitless).
     harvest_index : Optional[float], default None
-        Harvest index for a given day; fraction of above-ground plant biomass that is harvestable economic yield (unitless).
+        Harvest index for a given day; fraction of above-ground plant biomass that is harvestable economic yield
+        (unitless).
     cut_biomass : Optional[float], default None
         Total amount of the desired crop product (kg/ha).
     wet_yield_collected : Optional[float], default None
