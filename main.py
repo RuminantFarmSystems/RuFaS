@@ -141,21 +141,7 @@ def run_rufas(
         output_manager.clear_output_dir(vars_file_path, output_dir)
 
     if generate_schemas:
-        log_title = "Generating schemas"
-        log_message = "Main routine generating new input schemas for the Data Collection App."
-        info_map = {"class": "main", "function": "run_rufas"}
-        output_manager.add_log(log_title, log_message, info_map)
-
-        schema_generator = SchemaGenerator()
-        schema_generator.generate_schemas(None, None)
-
-        log_title = "Completed schema generation"
-        log_message = "Main routine completed generating new input schemas for the Data Collection App."
-        info_map = {
-            "class": "main",
-            "function": "run_rufas"
-        }
-        output_manager.add_log(log_title, log_message, info_map)
+        execute_schema_generation()
 
     metadata_files: List[MetadataPaths] = METADATA_PATHS
     if only_run_validation:
@@ -231,6 +217,22 @@ def run_load_vars_pool(
         output_dir, exclude_info_maps, format_option
     )
 
+def execute_schema_generation() -> None:
+    """
+    Instantiates the SchemaGenerator and uses it to produce new schema.
+    """
+    output_manager = OutputManager()
+    log_title = "Generating schemas"
+    log_message = "Main routine generating new input schemas for the Data Collection App."
+    info_map = {"class": "No caller class", "function": execute_schema_generation.__name__}
+    output_manager.add_log(log_title, log_message, info_map)
+
+    schema_generator = SchemaGenerator()
+    schema_generator.generate_schemas(None, None)
+
+    log_title = "Completed schema generation"
+    log_message = "Main routine completed generating new input schemas for the Data Collection App."
+    output_manager.add_log(log_title, log_message, info_map)
 
 def run_validation(
         metadata_files: List[Path],

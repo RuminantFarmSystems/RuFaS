@@ -13,6 +13,7 @@ from main import (
     main,
     parse_gnu_args,
     run_load_vars_pool,
+    execute_schema_generation,
     run_rufas,
     run_validation,
     METADATA_PATHS,
@@ -182,7 +183,7 @@ def test_run_rufas(
     patch_execute_simulations = mocker.patch("main.execute_simulations")
     patch_run_validation = mocker.patch("main.run_validation")
     patch_run_load_vars_pool = mocker.patch("main.run_load_vars_pool")
-    patch_schema_generation = mocker.patch("RUFAS.schema_generator.SchemaGenerator.generate_schemas")
+    patch_schema_generation = mocker.patch("main.execute_schema_generation")
     mock_output_manager = mocker.MagicMock(auto_spec=OutputManager)
     mock_output_manager.clear_output_dir.return_value = None
     mocker.patch("main.OutputManager", return_value=mock_output_manager)
@@ -258,7 +259,7 @@ def test_run_rufas(
         assert mock_output_manager.clear_output_dir.call_count == 0
 
     if generate_schemas:
-        patch_schema_generation.assert_called_once_with(None, None)
+        patch_schema_generation.assert_called_once()
     else:
         patch_schema_generation.assert_not_called()
 
@@ -302,6 +303,18 @@ def test_run_validation(mocker: MockerFixture, is_data_valid: bool) -> None:
     assert mock_output_manager.dump_all_nondata_pools.call_args_list == [
         mocker.call(output_dir, exclude_info_maps, format_option)
     ] * len(metadata_file_list)
+
+
+def test_execute_schema_generation(mocker: MockerFixture) -> None:
+    mock_output_manager = mocker.MagicMock(auto_spec=OutputManager)
+    mock_add_log = mocker.patch.object(mock_output_manager, "add_log")
+    mocker.patch("main.OutputManager", return_value=mock_output_manager)
+    mock_schema_generation = mocker.patch("RUFAS.schema_generator.SchemaGenerator.generate_schemas")
+
+    execute_schema_generation()
+
+    assert mock_add_log.call_count == 2
+    mock_schema_generation.assert_called_once_with(None, None)
 
 
 @pytest.mark.parametrize(
