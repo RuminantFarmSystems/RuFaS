@@ -282,7 +282,7 @@ class SchemaGenerator:
             schema["options"]["infoText"] = description
 
         element_properties = input_properties["properties"]
-        element_schema_creator = SchemaGenerator.DATA_TYPE_TO_SCHEMA_SETUP_MAP[element_properties["type"]]
+        element_schema_creator = DATA_TYPE_TO_SCHEMA_SETUP_MAP[element_properties["type"]]
         element_title = title + "_element"
         element_property_dictionary = element_schema_creator(element_title, element_properties)
         schema["items"] = element_property_dictionary
@@ -327,16 +327,17 @@ class SchemaGenerator:
 
         for key in keys:
             sub_property = input_properties[key]
-            schema_setup_method = SchemaGenerator.DATA_TYPE_TO_SCHEMA_SETUP_MAP[sub_property["type"]]
+            schema_setup_method = DATA_TYPE_TO_SCHEMA_SETUP_MAP[sub_property["type"]]
             sub_property_schema = schema_setup_method(key, sub_property)
             schema["properties"][key] = sub_property_schema
 
         return schema
 
-    DATA_TYPE_TO_SCHEMA_SETUP_MAP: dict[str, Callable[[str, dict[str, Any]], dict[str, Any]]] = {
-        "number": setup_number_schema,
-        "bool": setup_bool_schema,
-        "string": setup_string_schema,
-        "array": setup_array_schema,
-        "object": setup_object_schema
-    }
+
+DATA_TYPE_TO_SCHEMA_SETUP_MAP: dict[str, Callable[[str, dict[str, Any]], dict[str, Any]]] = {
+    "number": SchemaGenerator.setup_number_schema,
+    "bool": SchemaGenerator.setup_bool_schema,
+    "string": SchemaGenerator.setup_string_schema,
+    "array": SchemaGenerator.setup_array_schema,
+    "object": SchemaGenerator.setup_object_schema
+}

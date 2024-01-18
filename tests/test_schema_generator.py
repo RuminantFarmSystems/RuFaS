@@ -1,9 +1,9 @@
 import pytest
 from pytest_mock import MockerFixture
-from mock import mock_open
+from mock import mock_open, MagicMock
 from typing import Any
 
-from RUFAS.schema_generator import SchemaGenerator
+from RUFAS.schema_generator import SchemaGenerator, DATA_TYPE_TO_SCHEMA_SETUP_MAP
 from RUFAS.output_manager import OutputManager
 
 om = OutputManager()
@@ -162,7 +162,7 @@ def test_setup_bool_schema(title: str, properties: dict[str, Any], schema: dict[
     assert actual == schema
 
 
-@pytest.mark.parametrize("title,properties,schema", [
+@pytest.mark.parametrize("title,properties,schema,number_count,bool_count,string_count,object_count,array_count", [
     ("parity_death_prob", {
       "type": "array",
       "description": "Death rate for first, second, third, and later lactations",
@@ -195,16 +195,101 @@ def test_setup_bool_schema(title: str, properties: dict[str, Any], schema: dict[
                 }
             }
         }
-     })
+     }, 1, 0, 0, 0, 0),
+    ("manure_management_scenarios",
+     {
+        "type": "array",
+        "description": "Manure Management Scenarios -- Add as many different manure scenarios as needed",
+        "properties": {
+          "type": "object",
+          "scenario_id": {
+            "type": "number",
+            "description": "Scenario ID -- An identification number for livestock enclosures.",
+            "minimum": 0
+          },
+          "bedding_type": {
+            "type": "string",
+            "description": "Bedding Type -- The material used for bedding pack.",
+            "pattern": "^(Sand|Straw|Sawdust|Manure_solids|Other)$"
+          }
+        }
+     },
+     {
+      "title": "manure_management_scenarios",
+      "type": "array",
+      "format": "grid",
+      "options": {
+        "inputAttributes": {
+          "class": "text-primary form-control"
+        },
+        "infoText": "Manure Management Scenarios -- Add as many different manure scenarios as needed"
+      },
+      "items": {
+        "title": "manure_management_scenarios_element",
+        "type": "object",
+        "format": "grid",
+        "properties": {
+          "scenario_id": {
+            "title": "scenario_id",
+            "type": "number",
+            "options": {
+              "grid_columns": 12,
+              "inputAttributes": {
+                "class": "text-primary form-control"
+              },
+              "infoText": "Scenario ID -- An identification number for livestock enclosures."
+            },
+            "minimum": 0
+          },
+         "bedding_type": {
+            "title": "bedding_type",
+            "type": "string",
+            "options": {
+              "grid_columns": 12,
+              "inputAttributes": {
+                "class": "text-primary form-control"
+              },
+              "infoText": "Bedding Type -- The material used for bedding pack."
+            },
+            "enum": [
+              "Sand",
+              "Straw",
+              "Sawdust",
+              "Manure_solids",
+              "Other"
+            ],
+            "format": "select2"
+        }}}}, 1, 0, 1, 1, 0),
 ])
-def test_setup_array_schema(title: str, properties: dict[str, Any], schema: dict[str, Any]) -> None:
+def test_setup_array_schema(
+        title: str,
+        properties: dict[str, Any],
+        schema: dict[str, Any],
+        number_count: int,
+        bool_count: int,
+        string_count: int,
+        object_count: int,
+        array_count: int,
+) -> None:
     """Tests that array schema is setup correctly."""
-    actual = SchemaGenerator.setup_array_schema(title, properties)
+    schema_generator = SchemaGenerator()
+    DATA_TYPE_TO_SCHEMA_SETUP_MAP["number"] = MagicMock(wraps=schema_generator.setup_number_schema)
+    DATA_TYPE_TO_SCHEMA_SETUP_MAP["bool"] = MagicMock(wraps=schema_generator.setup_bool_schema)
+    DATA_TYPE_TO_SCHEMA_SETUP_MAP["string"] = MagicMock(wraps=schema_generator.setup_string_schema)
+    DATA_TYPE_TO_SCHEMA_SETUP_MAP["object"] = MagicMock(wraps=schema_generator.setup_object_schema)
+    DATA_TYPE_TO_SCHEMA_SETUP_MAP["array"] = MagicMock(wraps=schema_generator.setup_array_schema)
+
+    actual = schema_generator.setup_array_schema(title, properties)
 
     assert actual == schema
+    assert DATA_TYPE_TO_SCHEMA_SETUP_MAP["number"].call_count == number_count
+    assert DATA_TYPE_TO_SCHEMA_SETUP_MAP["bool"].call_count == bool_count
+    assert DATA_TYPE_TO_SCHEMA_SETUP_MAP["string"].call_count == string_count
+    assert DATA_TYPE_TO_SCHEMA_SETUP_MAP["object"].call_count == object_count
+    assert DATA_TYPE_TO_SCHEMA_SETUP_MAP["array"].call_count == array_count
 
 
-@pytest.mark.parametrize("title,properties,schema", [
+@pytest.mark.parametrize("title,properties,schema,number_count,bool_count,string_count,object_count,array_count", [
     ("life_cycle", {
         "type": "object",
         "description": "",
@@ -236,13 +321,89 @@ def test_setup_array_schema(title: str, properties: dict[str, Any], schema: dict
                     }
                 }
             }
-        })
+        }, 1, 0, 0, 0, 0),
+    ("herd_information", {
+        "type": "object",
+        "description": "Herd Demographics",
+        "calf_num": {
+          "type": "number",
+          "description": "Number of Calves (head) -- The initial number of pre-weaned calves",
+          "default": 8,
+          "minimum": 0,
+        },
+        "breed": {
+          "type": "string",
+          "default": "HO",
+          "pattern": "^(HO|JE)$",
+          "description": "Breed (select one Holstein/Jersey) -- The predominant breed of the herd (Holstein or Jersey)"
+        }}, {
+        "title": "herd_information",
+        "type": "object",
+        "format": "grid",
+        "options": {
+            "infoText": "Herd Demographics"
+        },
+          "properties": {
+            "calf_num": {
+              "title": "calf_num",
+              "type": "number",
+              "options": {
+                "grid_columns": 12,
+                "inputAttributes": {
+                  "class": "text-primary form-control"
+                },
+                "infoText": "Number of Calves (head) -- The initial number of pre-weaned calves"
+              },
+              "minimum": 0,
+              "default": 8
+            },
+            "breed": {
+              "title": "breed",
+              "type": "string",
+              "options": {
+                "grid_columns": 12,
+                "inputAttributes": {
+                  "class": "text-primary form-control"
+                },
+                "infoText": "Breed (select one Holstein/Jersey) -- The predominant breed of the herd (Holstein or "
+                            "Jersey)"
+              },
+              "default": "HO",
+              "enum": [
+                "HO",
+                "JE"
+              ],
+              "format": "select2"
+            }
+          }
+        }, 1, 0, 1, 0, 0)
 ])
-def test_setup_object_schema(title: str, properties: dict[str, Any], schema: dict[str, Any]) -> None:
+def test_setup_object_schema(
+        title: str,
+        properties: dict[str, Any],
+        schema: dict[str, Any],
+        number_count: int,
+        bool_count: int,
+        string_count: int,
+        object_count: int,
+        array_count: int,
+) -> None:
     """Tests that object schema are setup correctly."""
+    schema_generator = SchemaGenerator()
+    DATA_TYPE_TO_SCHEMA_SETUP_MAP["number"] = MagicMock(wraps=schema_generator.setup_number_schema)
+    DATA_TYPE_TO_SCHEMA_SETUP_MAP["bool"] = MagicMock(wraps=schema_generator.setup_bool_schema)
+    DATA_TYPE_TO_SCHEMA_SETUP_MAP["string"] = MagicMock(wraps=schema_generator.setup_string_schema)
+    DATA_TYPE_TO_SCHEMA_SETUP_MAP["object"] = MagicMock(wraps=schema_generator.setup_object_schema)
+    DATA_TYPE_TO_SCHEMA_SETUP_MAP["array"] = MagicMock(wraps=schema_generator.setup_array_schema)
+
     actual = SchemaGenerator.setup_object_schema(title, properties)
 
     assert actual == schema
+    assert DATA_TYPE_TO_SCHEMA_SETUP_MAP["number"].call_count == number_count
+    assert DATA_TYPE_TO_SCHEMA_SETUP_MAP["bool"].call_count == bool_count
+    assert DATA_TYPE_TO_SCHEMA_SETUP_MAP["string"].call_count == string_count
+    assert DATA_TYPE_TO_SCHEMA_SETUP_MAP["object"].call_count == object_count
+    assert DATA_TYPE_TO_SCHEMA_SETUP_MAP["array"].call_count == array_count
 
 
 def test_generate_schema(mocker: MockerFixture) -> None:
