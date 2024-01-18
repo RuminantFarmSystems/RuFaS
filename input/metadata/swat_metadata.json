@@ -2,7 +2,7 @@
   "files": {
     "config": {
       "title": "Config Data",
-      "description": "The configuration file for the simulation.",
+      "description": "The configuration file for general simulation parameters.",
       "path": "input/data/config/swat_config.json",
       "type": "json",
       "properties": "config_properties"
@@ -23,7 +23,7 @@
     },
     "crop": {
       "title": "Crop data",
-      "description": "Contains a crop rotation specification.",
+      "description": "The configuration file for crop rotation details.",
       "path": "input/data/crop/swat_rotation.json",
       "type": "json",
       "properties": "crop_schedule_properties"
@@ -128,7 +128,7 @@
     },
     "user_feeds": {
       "title": "User Feed",
-      "description": "Bring the feed!",
+      "description": "The configuration file for user feed input.",
       "path": "input/data/feed/user_feeds.csv",
       "type": "csv",
       "properties": "user_feeds_properties"
@@ -276,7 +276,6 @@
             "description": "Semen type (select one) -- The semen type (sexed or conventional) that makes up a majority of the farm's breedings",
             "default": "conventional",
             "pattern": "^(sexed|conventional)$"
-        
           },
           "days_in_preg_when_dry": {
             "type": "number",
@@ -968,7 +967,7 @@
           "default": 30
         }
       },
-       "pen_information": {
+      "pen_information": {
         "type": "array",
         "description": "Pen Information",
         "properties": {
@@ -2069,7 +2068,7 @@
         "description": "cost of diesel per gallon",
         "type": "number",
         "minimum": 0,
-        "default": 5.00
+        "default": 5.0
       },
       "electricity_cost_kwh": {
         "description": "cost of electricity per kwh",
@@ -3607,4 +3606,3 @@
   },
   "cross-validation": {}
 }
-
