@@ -1022,6 +1022,14 @@ class AvailableFeeds:
                 continue
             for feed_id in sorted(list(feed_ids)):
                 # Get the list index of the feed_id in self.feed_id list.
-                idx = self._feed_id_to_list_idx_dict[int(feed_id)]  # missing 54, 136, 26, 118, 139
-                result[key].append(vals[idx])
+                try:
+                    idx = self._feed_id_to_list_idx_dict[int(feed_id)]  # missing 54, 136, 26, 118, 139
+                    result[key].append(vals[idx])
+                except KeyError:
+                    info_map = {"class": self.__class__.__name__,
+                                "function": self.get_feed_data_from_feed_ids.__name__,
+                                }
+                    om.add_error("KeyError", f"Key {feed_id} not found in AvailableFeeds.",
+                                 info_map)
+                    raise KeyError
         return result
