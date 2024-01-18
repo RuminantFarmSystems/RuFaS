@@ -3,15 +3,34 @@ from typing import Optional
 from RUFAS.routines.field.crop.crop_data import CropData, PlantCategory
 from RUFAS.routines.field.soil.soil_data import SoilData
 
-"""
-This module is based on the "Dormancy" section of SWAT (5:1.2)
-"""
-
-
 class Dormancy:
+    """
+    A class for managing crop dormancy operations.
+
+    This class handles dormancy-related operations for crops based on crop data. It is based on
+    the "Dormancy" section of the SWAT model (5:1.2). The class operates on a `CropData` object,
+    using its attributes to determine and manage the dormancy status of a crop.
+
+    Parameters
+    ----------
+    crop_data : Optional[CropData], optional
+        A `CropData` object containing specifications and attributes for a crop.
+        If not provided, a default `CropData` object is used.
+
+    Attributes
+    ----------
+    data : CropData
+        A reference to the `crop_data` object on which dormancy operations will be conducted.
+    """
     def __init__(self, crop_data: Optional[CropData] = None):
-        """Sets data field to a crop data object on which Dormancy operations will be conducted.
-            Initialized with defaults if none given.
+        """
+        Initialize the Dormancy object with crop data.
+
+        Parameters
+        ----------
+        crop_data : Optional[CropData]
+            The crop data to be used for dormancy operations.
+            If not provided, default specifications are used.
         """
         self.data = crop_data or CropData
 
