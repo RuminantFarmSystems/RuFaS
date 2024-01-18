@@ -155,6 +155,7 @@ class OutputGatherer:
                 om.add_variable("temperature", layer.temperature, info_map)
                 om.add_variable("percolated_water", layer.percolated_water, info_map)
                 om.add_variable("water_content", layer.water_content, info_map)
+                om.add_variable("water_factor", layer.water_factor, info_map)
                 om.add_variable("evaporated_water_content", layer.evaporated_water_content, info_map)
                 om.add_variable("plant_metabolic_active_carbon_usage", layer.plant_metabolic_active_carbon_usage,
                                 info_map)
