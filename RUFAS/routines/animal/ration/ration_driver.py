@@ -1023,7 +1023,7 @@ class AvailableFeeds:
             for feed_id in sorted(list(feed_ids)):
                 # Get the list index of the feed_id in self.feed_id list.
                 try:
-                    idx = self._feed_id_to_list_idx_dict[int(feed_id)]  # missing 54, 136, 26, 118, 139
+                    idx = self._feed_id_to_list_idx_dict[int(feed_id)]
                     result[key].append(vals[idx])
                 except KeyError:
                     info_map = {"class": self.__class__.__name__,
