@@ -244,6 +244,8 @@ class LayerData:
     """soil metabolic carbon amount (kg/ha)"""
     soil_structural_carbon_amount: float = 0.0
     """amount of soil structural carbon decomposed into slow or active carbon (kg/ha)"""
+    soil_structural_to_slow_or_active_rate: float = 0.0
+    """the rate at which below ground structural carbon decomposes into slow or active carbon (unitless)"""
 
     # ---- Nitrogen
     initial_soil_nitrate_concentration: Optional[float] = None
