@@ -17,7 +17,7 @@ class Time:
 
         calendar_year: int = config.start_year
         # number of years
-        years: List[List[int]] = config.years
+       
 
         self.start_year: int = calendar_year
         self.calendar_year: int = calendar_year
