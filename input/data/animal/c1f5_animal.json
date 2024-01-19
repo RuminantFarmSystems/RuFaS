@@ -105,9 +105,9 @@
 				"std_estrus_cycle_after_pgf": 2
 			},
 			"milking": {
-				"wood_l": [[16.19, 21.54, 21.46], [14.07, 19.26, 19.21]],
-				"wood_m": [[0.314, 0.304, 0.328], [0.186, 0.173, 0.190]],
-				"wood_n": [[0.0030, 0.0042, 0.0045], [0.0021, 0.0028, 0.0032]],
+				"wood_l": [[18.61, 26.21, 25.37], [14.07, 19.26, 19.21]],
+				"wood_m": [[0.234, 0.226, 0.253], [0.186, 0.173, 0.190]],
+				"wood_n": [[0.0023, 0.0035, 0.0039], [0.0021, 0.0028, 0.0032]],
 				"wood_l_std": [[0.28, 0.54, 0.51], [0.39, 0.49, 0.47]],
 				"wood_m_std": [[0.0046, 0.0064, 0.0060], [0.0076, 0.0071, 0.0069]],
 				"wood_n_std": [[3.77e-5, 5.82e-5, 5.54e-5], [6.60e-5, 6.69e-5, 6.53e-5]]
@@ -147,7 +147,7 @@
 	"pen_information": [
 		{
 			"id": 0,
-			"pen_name": "",
+			"pen_name": "calf",
 			"animal_combination": "CALF",
 			"vertical_dist_to_milking_parlor": 0.1,
 			"horizontal_dist_to_milking_parlor": 1.6,
@@ -159,7 +159,7 @@
 		},
 		{
 			"id": 1,
-			"pen_name": "",
+			"pen_name": "growing",
 			"animal_combination": "GROWING",
 			"vertical_dist_to_milking_parlor": 0.1,
 			"horizontal_dist_to_milking_parlor": 1.6,
@@ -171,7 +171,7 @@
 		},
 		{
 			"id": 2,
-			"pen_name": "",
+			"pen_name": "closeup",
 			"animal_combination": "CLOSE_UP",
 			"vertical_dist_to_milking_parlor": 0.1,
 			"horizontal_dist_to_milking_parlor": 1.6,
@@ -183,7 +183,7 @@
 		},
 		{
 			"id": 3,
-			"pen_name": "",
+			"pen_name": "lactcow1",
 			"animal_combination": "LAC_COW",
 			"vertical_dist_to_milking_parlor": 0.1,
 			"horizontal_dist_to_milking_parlor": 1.6,
@@ -195,7 +195,7 @@
 		},
 		{
 			"id": 4,
-			"pen_name": "",
+			"pen_name": "lactcow2",
 			"animal_combination": "LAC_COW",
 			"vertical_dist_to_milking_parlor": 0.1,
 			"horizontal_dist_to_milking_parlor": 1.6,
