@@ -2669,8 +2669,6 @@ def test_make_ration_from_solution():
 )
 def test_make_solution_from_fixed_ration(test_ration: Dict, expected: list):
     """Unit test for function make_solution_from_fixed_ration in file routines/animal/ration/ration_driver.py"""
-    # test_ration = {'2' : 3, '4' : 6, 'status' : True, 'objective' : False}
-    # expected = [1, 1, 1, 2, 2, 2]
     result = RationManager.make_solution_from_fixed_ration(test_ration)
     assert result == expected
 
