@@ -83,7 +83,7 @@ class CropManagement:
             annual plants.
         """
         self.data.is_alive = False
-        self.data.yield_residue = self.data.biomass * self.data.dry_matter_percentage / 100
+        self.data.yield_residue = self.data.biomass
         self.data.residue_nitrogen = self.data.yield_residue * self.data.yield_nitrogen_fraction
         self.data.residue_phosphorus = self.data.yield_residue * self.data.yield_phosphorus_fraction
 
@@ -176,11 +176,10 @@ class CropManagement:
         self.data.leaf_area_index = self.data.leaf_area_index * (1 - fraction_cut)
         self.data.accumulated_heat_units = self.data.accumulated_heat_units * (1 - fraction_cut)
 
-        self.data.wet_yield_collected = self.data.cut_biomass * collected_fraction
-        self.data.dry_matter_yield_collected = self.data.wet_yield_collected * (self.data.dry_matter_percentage / 100)
+        self.data.dry_matter_yield_collected = self.data.cut_biomass * collected_fraction
+        self.data.wet_yield_collected = self.data.dry_matter_yield_collected / (self.data.dry_matter_percentage / 100)
 
-        self.data.yield_residue = \
-            self.data.cut_biomass * (1 - collected_fraction) * (self.data.dry_matter_percentage / 100)
+        self.data.yield_residue = self.data.cut_biomass * (1 - collected_fraction)
 
         if self.data.do_harvest_index_override:
             self.data.yield_nitrogen = self.data.optimal_nitrogen_fraction * self.data.wet_yield_collected
@@ -314,7 +313,7 @@ class CropManagement:
         """
         soil_data.crop_yield_nitrogen = self.data.residue_nitrogen
         soil_data.plant_residue_lignin_composition = self.data.lignin_dry_matter_percentage / 100
-        dry_matter_root_biomass = self.data.root_biomass * (self.data.dry_matter_percentage / 100)
+        dry_matter_root_biomass = self.data.root_biomass
         if killed:
             soil_data.plant_surface_residue = self.data.yield_residue - dry_matter_root_biomass
             soil_data.plant_root_residue = dry_matter_root_biomass
