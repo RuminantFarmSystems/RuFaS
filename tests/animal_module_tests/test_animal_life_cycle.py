@@ -14,6 +14,7 @@ from RUFAS.routines.animal.life_cycle import animal_constants
 from RUFAS.routines.animal.life_cycle.animal_constants import ENTER_HERD
 from RUFAS.routines.animal.life_cycle.animal_constants import INIT_HERD
 from RUFAS.routines.animal.life_cycle.animal_constants import LOW_PROD_CULL
+from RUFAS.routines.animal.life_cycle.animal_constants import DEATH_CULL
 from RUFAS.routines.animal.life_cycle.animal_population import AnimalPopulation
 from RUFAS.routines.animal.life_cycle.calf import Calf
 from RUFAS.routines.animal.life_cycle.cow import Cow
@@ -843,7 +844,16 @@ def test_cull_cow(mocker: MockerFixture, life_cycle_manager: LifeCycleManager) -
     assert life_cycle_manager.parity_culling_stats_range[parity] == 1
 
     assert life_cycle_manager.cow_herd_exit_num == 1
+    assert life_cycle_manager.sold_cow_num == 1
     assert life_cycle_manager.avg_cow_culling_age == approx(100.0)
+
+    # modify cow for death cull
+    mock_cow.cull_reason = DEATH_CULL
+    # Act
+    life_cycle_manager._cull_cow(mock_cow)
+    # assert sold remains 1, exits is now 2
+    assert life_cycle_manager.sold_cow_num == 1
+    assert life_cycle_manager.cow_herd_exit_num == 2
 
 
 def test_handle_cow_body_weight_and_parity(mocker: MockerFixture,
