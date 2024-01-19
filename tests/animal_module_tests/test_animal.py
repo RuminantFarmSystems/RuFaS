@@ -25,6 +25,7 @@ import RUFAS.routines.animal.clustering_pen_grouping
 from RUFAS.output_manager import OutputManager
 om = OutputManager()
 
+
 @pytest.fixture
 def cow_a() -> dict:
     cow_a_dict = {
