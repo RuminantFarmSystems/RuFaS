@@ -56,7 +56,7 @@
                     "estrus_conception_rate":0.48,
                     "presynch_protocol":"N/A",
           "resynch_protocol":"PGFatPD",
-                    "repro_sub_protocol":"ovsynch56",
+                    "repro_sub_protocol":"OvSynch 56",
           "repro_sub_properties": {
             "conception_rate":0.48,
             "tai_program_start_day":"N/A"
@@ -67,7 +67,7 @@
                     "estrus_service_rate":0.9,
                     "ed_conception_rate":0.48,
                     "cow_presynch_protocol":"N/A",
-                    "cow_TAI_protocol":"ovsynch56",
+                    "cow_TAI_protocol":"OvSynch 56",
                     "ovsynch56_conception_rate":0.48,
                     "ovsynch48_conception_rate":0.48,
 					"cosynch72_conception_rate": 0.48,
