@@ -368,7 +368,6 @@ class RationReporter:
 
         for key, val in ration.items():
             nutrient_amount["dm"] += val
-            
             if key in available_feeds:
                 for nutr in nutrients:
                     # all values on a 100% dry matter basis
