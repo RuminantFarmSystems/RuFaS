@@ -633,6 +633,7 @@ class Cow(HeiferIII):
         self.days_born += 1
 
         if self.days_in_preg > 0 and self.days_in_preg == self.gestation_length:
+            self._repro_state_manager.reset()
             self.calves += 1
             self.milking = True
             self.days_in_milk = 0
@@ -645,6 +646,7 @@ class Cow(HeiferIII):
                 self.CI_history.append(self.CI)
             self.BW_at_calving = self.body_weight
             self.events.add_event(self.days_born, sim_day, const.NEW_BIRTH)
+            self.log_event(self.days_born, sim_day, f'{const.NUM_CALVES_BORN_NOTE}: {self.calves}')
             self.health_cull_update()
             self.death_update()
             new_born = True
