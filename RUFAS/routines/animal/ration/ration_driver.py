@@ -367,34 +367,29 @@ class RationReporter:
                      'potassium', 'N', 'EE', 'starch', 'TDN', 'DE', 'calcium']
 
         for key, val in ration.items():
-            #print(ration.items())
             nutrient_amount["dm"] += val
-            
-            if key in available_feeds: 
-                for nutr in nutrients:
-                    # all values on a 100% dry matter basis
-                    if nutr == "DM":
-                        #print(key)
-                        #print(available_feeds)
-                        if available_feeds[key][nutr]:
-                            nutrient_amount["as_fed"] += val / (available_feeds[key][nutr] / 100)
-                    elif nutr == "N":
-                        # [A.2.A.2]
-                        if key[:3] in ['172', '181', '202', '216']:
+            for nutr in nutrients:
+                # all values on a 100% dry matter basis
+                if nutr == "DM":
+                    if available_feeds[key][nutr]:
+                        nutrient_amount["as_fed"] += val / (available_feeds[key][nutr] / 100)
+                elif nutr == "N":
+                    # [A.2.A.2]
+                    if key[:3] in ['172', '181', '202', '216']:
 
-                            denom = 6.38
-                        # [A.2.A.1]
-                        else:
-                            denom = 6.25
-                        nutrient_amount[nutr] += (available_feeds[key]["CP"] / (denom * 100)) * val
+                        denom = 6.38
+                    # [A.2.A.1]
                     else:
-                        if nutr == 'DE':
-                            if available_feeds[key]['DE'] != -1:
-                                nutrient_amount[nutr] += val * (available_feeds[key]['DE'] / 100)
-                            else:
-                                nutrient_amount[nutr] += val * (available_feeds[key]['DE_Base'] / 100)
+                        denom = 6.25
+                    nutrient_amount[nutr] += (available_feeds[key]["CP"] / (denom * 100)) * val
+                else:
+                    if nutr == 'DE':
+                        if available_feeds[key]['DE'] != -1:
+                            nutrient_amount[nutr] += val * (available_feeds[key]['DE'] / 100)
                         else:
-                            nutrient_amount[nutr] += val * (available_feeds[key][nutr] / 100)
+                            nutrient_amount[nutr] += val * (available_feeds[key]['DE_Base'] / 100)
+                    else:
+                        nutrient_amount[nutr] += val * (available_feeds[key][nutr] / 100)
 
         dm_amount = nutrient_amount["dm"]
         if dm_amount == 0:
