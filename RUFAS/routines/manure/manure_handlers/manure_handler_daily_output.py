@@ -23,9 +23,9 @@ class ManureHandlerDailyOutput(LiquidManurePortionProtocol):
         liquid_manure_total_volatile_solids: Total amount of volatile solids, kg.
         liquid_manure_phosphorus: Amount of phosphorus excreted in manure, kg.
         liquid_manure_potassium: Amount of potassium in manure, kg.
-        housing_methane: Methane emissions from ..., kg.  # TODO: Fill in.
-        housing_carbon_dioxide: Carbon dioxide emissions from ..., kg.  # TODO: Fill in.
-        housing_ammonia: Ammonia emissions from ..., kg.  # TODO: Fill in.
+        housing_methane: Methane emissions from ..., kg.
+        housing_carbon_dioxide: Carbon dioxide emissions from ..., kg.
+        housing_ammonia: Ammonia emissions from ..., kg.
         manure_volume: Amount of raw manure, m^3.
         cleaning_water_volume: Volume of cleaning water used in main barn, m^3.
         total_bedding_volume: Total amount of bedding needed for all the animals in pen, m^3.
