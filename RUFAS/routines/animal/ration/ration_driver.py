@@ -1029,7 +1029,9 @@ class AvailableFeeds:
                     info_map = {"class": self.__class__.__name__,
                                 "function": self.get_feed_data_from_feed_ids.__name__,
                                 }
-                    om.add_error("KeyError", f"Key {feed_id} not found in AvailableFeeds.",
+                    om.add_error("KeyError", f"Key {feed_id} not found in AvailableFeeds. "
+                                 f"Check that price was set in purchased_feeds in input feed json, "
+                                 f"and that it is included in the specified NRC or NASEM csv.",
                                  info_map)
-                    raise KeyError
+                    raise
         return result
