@@ -1031,6 +1031,7 @@ def test_handle_new_born(mocker: MockerFixture, life_cycle_manager: LifeCycleMan
     # Arrange
     sim_day = 1
     life_cycle_manager.sold_calf_num = sold_calf_num = 0
+    life_cycle_manager.sold_calves = []
     mock_animal_population = mocker.MagicMock(autospec=AnimalPopulation)
     mock_animal_population.next_id.return_value = calf_id = 100
     life_cycle_manager.animal_population = mock_animal_population
@@ -1046,6 +1047,7 @@ def test_handle_new_born(mocker: MockerFixture, life_cycle_manager: LifeCycleMan
     mock_calf.days_born = calf_days_born = 6
     mock_calf.culled = is_calf_culled
     mock_calf.sold = is_calf_sold
+    mock_calf.sold_at_day = 0
     patch_for_mock_calf = mocker.patch('RUFAS.routines.animal.life_cycle.life_cycle.Calf',
                                        return_value=mock_calf)
     calves_born = []
@@ -1075,6 +1077,9 @@ def test_handle_new_born(mocker: MockerFixture, life_cycle_manager: LifeCycleMan
         assert calves_born[0] == mock_calf
     if is_calf_sold:
         assert life_cycle_manager.sold_calf_num == sold_calf_num + 1
+        assert len(life_cycle_manager.sold_calves) == 1
+        assert life_cycle_manager.sold_calves[0] == mock_calf
+        assert mock_calf.sold_at_day == sim_day
 
 
 @pytest.mark.parametrize('cow_calves', [1, 2, 3, 4])
