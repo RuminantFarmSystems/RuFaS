@@ -242,7 +242,7 @@
           "type": "string",
           "default": "HO",
           "pattern": "^(HO|JE)$",
-          "description": "Breed (select one Holstein/Jersey) -- The predominant breed of the herd (Holstein or Jersey)"
+          "description": "Breed (select one) -- The predominant breed of the herd (Holstein or Jersey)"
         }
       },
       "herd_initialization": {
@@ -275,7 +275,7 @@
           },
           "heifer_repro_method": {
             "type": "string",
-            "description": "Heifer Reproduction Protocol (select one) -- TAI - Timed Artificial Insemination; ED - Estrus Detection; Synch-ED - Synchronized Estrus Detection",
+            "description": "Heifer Reproductive Program (select one) -- TAI - Timed Artificial Insemination; ED - Estrus Detection; Synch-ED - Synchronized Estrus Detection",
             "default": "TAI",
             "pattern": "^(TAI|ED|SynchED)$"
           },
@@ -523,7 +523,7 @@
               },
               "cow_presynch_protocol": {
                 "type": "string",
-                "description": "Cow Presynch Protocol (optional; select one) -- The optional preSynch protocol (1st breeding) for cows in the TAI (Timed Artificial Insemination) protocol",
+                "description": "Cow Presynch Protocol -- The optional preSynch protocol (1st breeding) for cow in TAI (Timed Artificial Insemination) program",
                 "default": "Double OvSynch",
                 "pattern": "^(Double OvSynch|PreSynch|G6G)$"
               },

@@ -235,7 +235,7 @@
           "type": "string",
           "default": "HO",
           "pattern": "^(HO|JE)$",
-          "description": "Breed (select one Holstein/Jersey) -- The predominant breed of the herd (Holstein or Jersey)"
+          "description": "Breed (select one) -- The predominant breed of the herd (Holstein or Jersey)"
         }
       },
       "herd_initialization": {
