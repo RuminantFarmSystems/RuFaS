@@ -213,6 +213,7 @@ class OutputGatherer:
                 om.add_variable("soil_active_decompose_carbon", layer.soil_active_decompose_carbon, info_map)
                 om.add_variable("soil_overall_carbon_fraction", layer.soil_overall_carbon_fraction, info_map)
                 om.add_variable("total_soil_carbon_amount", layer.total_soil_carbon_amount, info_map)
+                om.add_variable("carbon_emissions", layer.total_soil_carbon_amount, info_map)
                 om.add_variable("mean_phosphorus_sorption_parameter", layer.mean_phosphorus_sorption_parameter,
                                 info_map)
                 om.add_variable("labile_inorganic_phosphorus_content", layer.labile_inorganic_phosphorus_content,
