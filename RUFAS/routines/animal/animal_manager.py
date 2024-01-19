@@ -1660,7 +1660,7 @@ class AnimalManager:
             self.life_cycle_manager.daily_milk_production = self.sum_daily_milk(self.cows)
             AnimalModuleReporter.report_daily_reports(self)
 
-    def _record_animal_events(self, animals: list[Calf, HeiferI, HeiferII, HeiferIII, Cow]) -> None:
+    def _record_animal_events(self, animals: list[Calf | HeiferI | HeiferII | HeiferIII | Cow]) -> None:
         """
         Record the events of the animals.
 

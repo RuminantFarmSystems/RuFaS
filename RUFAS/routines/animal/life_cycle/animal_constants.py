@@ -2,6 +2,7 @@
 # calf
 WEAN_DAY = "wean day"
 STILL_BIRTH = "still birth happened"
+NUM_CALVES_BORN_NOTE = "number of calves born so far"
 
 # reproduction
 INSEMINATED_W_BASE = "inseminated with "
