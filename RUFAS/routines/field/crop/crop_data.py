@@ -551,8 +551,9 @@ class CropData:
     """
 
     def __post_init__(self):
-        """Initialize all attributes with defaults that depend on other attributes"""
-
+        """
+        Initialize all attributes with defaults that depend on other attributes after the object has been initialized.
+        """
         # Set dormancy loss
         if self.plant_category == PlantCategory.PERENNIAL or self.plant_category == PlantCategory.PERENNIAL_LEGUME:
             self.dormancy_loss_fraction = 0.1
