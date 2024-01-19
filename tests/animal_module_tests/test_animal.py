@@ -551,7 +551,7 @@ def mock_random_ration_config() -> MagicMock:
 
 
 @pytest.fixture
-def mock_ration_config_alternate_lowTDN(mock_ration_config) -> MagicMock:
+def mock_ration_config_alternate_lowTDN(mock_ration_config: MagicMock) -> MagicMock:
     mock_ration_config.TDN_list = [0.001, 0.001, 0.001, 0.001, 0.001, 0.001]
     mock_ration_config.is_fat_list = [False, True, True, False, False, False]
 
@@ -559,7 +559,7 @@ def mock_ration_config_alternate_lowTDN(mock_ration_config) -> MagicMock:
 
 
 @pytest.fixture
-def mock_ration_config_alternate_highTDN(mock_ration_config) -> MagicMock:
+def mock_ration_config_alternate_highTDN(mock_ration_config: MagicMock) -> MagicMock:
     mock_ration_config.TDN_list = [100, 100, 100, 100, 100, 100]
     mock_ration_config.is_fat_list = [False, True, True, False, False, False]
 
@@ -567,7 +567,7 @@ def mock_ration_config_alternate_highTDN(mock_ration_config) -> MagicMock:
 
 
 @pytest.fixture
-def mock_ration_config_with_no_NElact_list(mock_ration_config) -> MagicMock:
+def mock_ration_config_with_no_NElact_list(mock_ration_config: MagicMock) -> MagicMock:
     mock_ration_config.NElact_list = None
     mock_ration_config.EE_list = [1.0, 2.0, 3.0, 4.0, 1.0, 1.0]
 
@@ -575,19 +575,19 @@ def mock_ration_config_with_no_NElact_list(mock_ration_config) -> MagicMock:
 
 
 @pytest.fixture
-def mock_ration_config_with_empty_NEgact_list(mock_ration_config) -> MagicMock:
+def mock_ration_config_with_empty_NEgact_list(mock_ration_config: MagicMock) -> MagicMock:
     mock_ration_config.NEgact_list = None
     return mock_ration_config
 
 
 @pytest.fixture
-def mock_ration_config_modified_feed_type(mock_ration_config) -> MagicMock:
+def mock_ration_config_modified_feed_type(mock_ration_config: MagicMock) -> MagicMock:
     mock_ration_config.feed_type_list = ["something", "something", "something", "something", "something", "something"]
     return mock_ration_config
 
 
 @pytest.fixture
-def mock_ration_config_modifiedKd_list(mock_ration_config) -> MagicMock:
+def mock_ration_config_modifiedKd_list(mock_ration_config: MagicMock) -> MagicMock:
     mock_ration_config.Kd_list = [-1000, -1000, -1000, -1000, -1000, -1000]
     return mock_ration_config
 
