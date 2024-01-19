@@ -605,6 +605,8 @@ def decision_vector_sum_zero() -> np.ndarray:
 @pytest.fixture
 def mock_available_feeds() -> dict:
     available_feeds = dict()
+    available_feeds["feed_key"] = ["1", "2", "3", "4", "5", "6"]
+    available_feeds["feed_id"] = [1, 2, 3, 4, 5, 6]
     available_feeds["price"] = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0]
     available_feeds["TDN"] = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0]
     available_feeds["DE"] = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0]
@@ -3264,7 +3266,7 @@ def mock_user_defined_ration_manager(mocker: MockerFixture) -> UserDefinedRation
 
 
 def test_ration_to_use(mock_user_defined_ration_manager: UserDefinedRationManager):
-    """Unit test for function ration_to_use in file routines/animal/ration/ration_driver.py"""
+    """Unit test for function ration_to_use in file routines/animal/ration/user_defined_ration.py"""
 
     # udrm = MagicMock()
     mock_user_defined_ration_manager.lactating_cow_ration = {"1": 100, "2": 200, "3": 300}
@@ -3292,6 +3294,16 @@ def test_ration_to_use(mock_user_defined_ration_manager: UserDefinedRationManage
     pen_animal_combo.name = "CALF"
     result = UserDefinedRationManager.ration_to_use(pen_animal_combo)
     assert result == {"1": 0.1, "2": 0.2, "3": 0.3}
+
+
+def test_make_ration_from_user_values(mock_available_feeds: dict) -> None:
+    """Unit test for function make_ration_from_user_values in file routines/animal/ration/user_defined_ration.py"""
+    ration_percents = {"1": 50, "2": 50}
+    req = RUFAS.routines.animal.ration.animal_requirements.AnimalRequirements()
+    req.DMIest_requirement = 10
+    actual = UserDefinedRationManager.make_ration_from_user_values(ration_percents, mock_available_feeds, req)
+    expected = {'1': 5, '2': 5, '3': 0.0, '4': 0.0, '5': 0.0, '6': 0.0, 'objective': 0.0, 'status': 'Optimal'}
+    assert actual == expected
 
 
 def test_make_user_bounds(mock_user_defined_ration_manager: UserDefinedRationManager):
