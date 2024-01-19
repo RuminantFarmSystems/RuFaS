@@ -2514,8 +2514,6 @@ def test_calc_rqmts():
     test_requirements.calculate_NASEM_phosphorus_requirements = MagicMock(return_value=2)
     AnimalBase.config["nutrient_standard"] = "NRC"
     test_requirements.AnimalBase = AnimalBase
-    # with patch.object('') as mocked:
-    #     mocked.side
     actual = test_requirements.calc_rqmts(MagicMock(), MagicMock(), MagicMock(), MagicMock())
     expected = {
         "NEmaint_requirement": 1,
