@@ -40,7 +40,7 @@
         "conception_rate_decrease": 0.026,
         "avg_gestation_len": 267,
         "std_gestation_len": 6,
-        "prefresh_day": 60,
+        "prefresh_day": 30,
         "calving_interval": 383,
         "heifers": {
           "estrus_detection_rate": 0.9,
