@@ -3,7 +3,7 @@
     "config": {
       "title": "Config Data",
       "description": "Configuration Information",
-      "path": "input/data/config/pilot_testing_config.json",
+      "path": "input/data/config/c2f22_config.json",
       "type": "json",
       "properties": "config_properties"
     },
@@ -2917,4 +2917,3 @@
   },
   "cross-validation": {}
 }
-
