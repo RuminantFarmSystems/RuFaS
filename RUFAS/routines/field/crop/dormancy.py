@@ -3,6 +3,7 @@ from typing import Optional
 from RUFAS.routines.field.crop.crop_data import CropData, PlantCategory
 from RUFAS.routines.field.soil.soil_data import SoilData
 
+
 class Dormancy:
     """
     A class for managing crop dormancy operations.
@@ -22,6 +23,7 @@ class Dormancy:
     data : CropData
         A reference to the `crop_data` object on which dormancy operations will be conducted.
     """
+
     def __init__(self, crop_data: Optional[CropData] = None):
         """
         Initialize the Dormancy object with crop data.
@@ -66,7 +68,6 @@ class Dormancy:
 
         self.data.is_dormant = True
         if self.data.plant_category == PlantCategory.TREE or self.data.is_perennial:
-
             residue = (self.data.biomass * self.data.dormancy_loss_fraction * (self.data.dry_matter_percentage / 100))
             nitrogen = residue * self.data.yield_nitrogen_fraction
             soil_data.crop_yield_nitrogen = nitrogen

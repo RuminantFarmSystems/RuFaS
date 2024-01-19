@@ -2,22 +2,49 @@ from math import exp
 from typing import Optional
 from RUFAS.routines.field.crop.crop_data import CropData
 
-"""
-This module primarily follows the Growth Constraints section of the SWAT model (5:3.1)
-"""
-
 
 class GrowthConstraints:
-    """crop process class pertaining to growth constraints"""
+    """
+    A class pertaining to growth constraints of crops.
+
+    This class is focused on managing and applying growth constraints to crop processes, as described in the Growth
+    Constraints section of the SWAT model (5:3.1). It uses data from the `CropData` class to assess and apply these
+    constraints.
+
+    Parameters
+    ----------
+    crop_data : Optional[CropData], optional
+        A `CropData` object containing crop specifications and tracked attributes. If not provided,
+        a default `CropData` object is initialized with default values.
+
+    Attributes
+    ----------
+    data : CropData
+        A reference to the `crop_data` object on which the growth constraint operations are conducted.
+    """
+
     def __init__(self, crop_data: Optional[CropData] = None):
+        """
+        Initialize the GrowthConstraints object with crop data.
+
+        Parameters
+        ----------
+        crop_data : Optional[CropData]
+            The crop data to be used for managing growth constraints. If not provided,
+            default specifications are used.
+        """
         self.data = crop_data or CropData()  # initialize with defaults, if not given
 
     def constrain_growth(self, max_transpiration: float, temperature: float) -> None:
-        """ main method; constrains a plant's growth by updating stress and growth factor values
+        """
+        Main method to constrain a plant's growth by updating stress and growth factor values.
 
-        Args:
-            max_transpiration: the maximum amount of transpiration (mm) possible (determined by soil) on this day
-            temperature: the current air temperature (Celsius)
+        Parameters
+        ----------
+        max_transpiration : float
+            The maximum amount of transpiration possible (in mm) on this day, determined by soil conditions.
+        temperature : float
+            The current air temperature in degrees Celsius.
         """
 
         self.data.water_stress = GrowthConstraints._determine_water_stress(self.data.water_uptake, max_transpiration)
@@ -39,17 +66,27 @@ class GrowthConstraints:
     def _determine_growth_factor(water_stress: float, temperature_stress: float, nitrogen_stress: float,
                                  phosphorus_stress: float) -> float:  # pseudocode: C.7.E.1
         """
-        Description: Calculates plant growth factor
+        Calculates the plant growth factor based on various stress parameters.
 
-        Args:
-            water_stress: plant water stress
-            temperature_stress: plant temperature stress
-            nitrogen_stress: plant nitrogen stress
-            phosphorus_stress: plant phosphorus stress
+        Parameters
+        ----------
+        water_stress : float
+            Plant water stress.
+        temperature_stress : float
+            Plant temperature stress.
+        nitrogen_stress : float
+            Plant nitrogen stress.
+        phosphorus_stress : float
+            Plant phosphorus stress.
 
-        SWAT Reference: 5:3.2.3
+        Returns
+        -------
+        float
+            Calculated plant growth factor.
 
-        Returns: plant growth factor
+        References
+        ----------
+        SWAT 5:3.2.3
         """
         return 1.0 - max(water_stress, temperature_stress, nitrogen_stress, phosphorus_stress)
 
@@ -91,14 +128,14 @@ class GrowthConstraints:
         Returns: the plant's temperature stress
         """
 
-        numerator = -0.1054 * (optimal_temp - air_temp)**2
-        double_diff = 2*optimal_temp - min_temp
+        numerator = -0.1054 * (optimal_temp - air_temp) ** 2
+        double_diff = 2 * optimal_temp - min_temp
 
         if min_temp < air_temp <= optimal_temp:
-            stress = 1 - exp(numerator / (air_temp - min_temp)**2)
+            stress = 1 - exp(numerator / (air_temp - min_temp) ** 2)
 
         elif optimal_temp < air_temp <= double_diff:
-            stress = 1 - exp(numerator / (double_diff - min_temp)**2)
+            stress = 1 - exp(numerator / (double_diff - min_temp) ** 2)
 
         else:
             stress = 1

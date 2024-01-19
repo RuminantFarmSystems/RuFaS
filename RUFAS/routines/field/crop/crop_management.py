@@ -430,10 +430,11 @@ class CropManagement:
     @staticmethod
     def determine_biomass_cut_from_whole_plant(biomass: float, harvest_index: float) -> float:
         """
-        Calculates the maximum crop yield at harvest under ideal conditions, applicable when the harvest index is greater than 1.
+        Calculates the maximum crop yield at harvest under ideal conditions, applicable when the harvest index is
+        greater than 1.
 
-        The yield is calculated as a proportion of the above-ground biomass. This method is based on the SWAT model's guidelines
-        for crop yield calculation.
+        The yield is calculated as a proportion of the above-ground biomass. This method is based on the SWAT model's
+        guidelines for crop yield calculation.
 
         Parameters
         ----------
