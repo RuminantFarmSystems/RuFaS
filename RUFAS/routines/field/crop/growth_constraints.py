@@ -93,15 +93,23 @@ class GrowthConstraints:
     @staticmethod
     def _determine_water_stress(water_uptake: float, max_transpiration: float) -> float:  # pseudocode: C.7.A.1
         """
-        Description: Calculates water stress for a given day.
+        Calculates water stress for a given day.
 
-        Args:
-            water_uptake: the water taken up by the plant from the soil
-            max_transpiration: the maximum plant transpiration on a given day
+        Parameters
+        ----------
+        water_uptake : float
+            The water taken up by the plant from the soil (mm).
+        max_transpiration : float
+            The maximum plant transpiration possible on a given day (mm).
 
-        SWAT Reference: 5:3.1.1
+        Returns
+        -------
+        float
+            The calculated water stress of the plant.
 
-        Returns: the plant's water stress
+        References
+        ----------
+        SWAT 5:3.1.1
         """
         if max_transpiration == 0:  # avoid division by zero
             return 0
@@ -116,16 +124,25 @@ class GrowthConstraints:
     def _determine_temperature_stress(air_temp: float, min_temp: float,
                                       optimal_temp: float) -> float:  # pseudocode C.7.B.
         """
-        Description: Calculates temperature stress for a given day.
+        Calculates temperature stress for a given day.
 
-        Args:
-            air_temp: average air temperature (Celsius)
-            min_temp: minimum temperature for plant growth (Celsius)
-            optimal_temp: optimal temperature for plant growth (Celsius)
+        Parameters
+        ----------
+        air_temp : float
+            Average air temperature for the day (Celsius).
+        min_temp : float
+            Minimum temperature for plant growth (Celsius).
+        optimal_temp : float
+            Optimal temperature for plant growth (Celsius).
 
-        SWAT Reference: 5:3.1.2
+        Returns
+        -------
+        float
+            The calculated temperature stress of the plant.
 
-        Returns: the plant's temperature stress
+        References
+        ----------
+        SWAT 5:3.1.2
         """
 
         numerator = -0.1054 * (optimal_temp - air_temp) ** 2
@@ -145,15 +162,23 @@ class GrowthConstraints:
     @staticmethod
     def _determine_nutrient_stress(stored: float, optimal: float) -> float:  # pseudocode C.7.C.2
         """
-        Description: Calculates plant nutrient stress for the day.
+        Calculates plant nutrient stress for the day.
 
-        Args:
-            stored: the mass of the nutrient currently stored in the plant
-            optimal: the optimal mass of the nutrient stored in the plant
+        Parameters
+        ----------
+        stored : float
+            The mass of the nutrient currently stored in the plant (kg/ha).
+        optimal : float
+            The optimal mass of the nutrient that should be stored in the plant for ideal growth (kg/ha).
 
-        SWAT Reference: 5:3.1.3, 5:3.1.4
+        Returns
+        -------
+        float
+            The calculated nutrient stress of the plant.
 
-        Returns: nutrient stress
+        References
+        ----------
+        SWAT 5:3.1.3, 5:3.1.4
         """
         if optimal == 0:
             stress = 0
