@@ -151,7 +151,7 @@
         "bunk_type": "open_floor",
         "ventilation": true,
         "removal_rate": 0.7,
-        "initial_dry_matter": 0
+        "initial_dry_matter": 33
       },
       {
         "storage_type": "Bunker Silo",
@@ -162,7 +162,7 @@
         "bunk_type": "open_floor",
         "ventilation": true,
         "removal_rate": 6,
-        "initial_dry_matter": 0
+        "initial_dry_matter": 35
       },
       {
         "storage_type": "Wrapped Bale",
@@ -173,7 +173,7 @@
         "bunk_type": "open_floor",
         "ventilation": true,
         "removal_rate": 0.5,
-        "initial_dry_matter": 0
+        "initial_dry_matter": 60
       },
       {
         "storage_type": "Bale - Covered",
@@ -184,7 +184,7 @@
         "bunk_type": "open_floor",
         "ventilation": true,
         "removal_rate": 0.5,
-        "initial_dry_matter": 0
+        "initial_dry_matter": 85
       }
     ],
     "user_defined_ration_percentages": {
