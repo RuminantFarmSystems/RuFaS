@@ -1628,11 +1628,11 @@ class AnimalManager:
                 self._record_animal_events(self.cows)
                 self._record_heiferIIs_conception_rate()
 
-            self._update_phosphorus_concentrations()
-            self.record_pen_history()
-
             self.calc_p_rqmts()
             self.daily_p_update()
+            
+            self._update_phosphorus_concentrations()
+            self.record_pen_history()
 
             if self.end_ration_interval():
                 self.reset_milk_production_reduction()
