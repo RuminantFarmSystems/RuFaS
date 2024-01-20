@@ -48,7 +48,6 @@ class AnimalModuleReporter:
             len([cow for cow in animal_manager.cows if not cow.is_lactating]),
             info_map,
         )
-        om.add_variable("num_cows_total", len(animal_manager.cows), info_map)
 
     def report_milk(pen, simulation_day: int) -> None:
         """

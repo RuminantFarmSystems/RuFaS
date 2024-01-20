@@ -455,7 +455,7 @@ class ReportGenerator:
         aggregated_data: List[float] = []
         for i in range(max_length):
             temp_data = [report_data[key][i] for key in loop_list]
-            non_null_data_points = list(filter(lambda x: x is not None, temp_data))
+            non_null_data_points = list(filter(None.__ne__, temp_data))
             aggregated_data.append(aggregator(non_null_data_points))
         return aggregated_data
 
@@ -481,7 +481,7 @@ class ReportGenerator:
 
         aggregated_data: List[float] = []
         for _, data in report_data.items():
-            non_null_data_points = list(filter(lambda x: x is not None, data))
+            non_null_data_points = list(filter(None.__ne__, data))
             aggregated_data.append(aggregator(non_null_data_points))
         return aggregated_data
 

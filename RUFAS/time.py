@@ -17,10 +17,11 @@ class Time:
 
         calendar_year: int = config.start_year
         # number of years
+        years: List[int] = config.years
 
         self.start_year: int = calendar_year
         self.calendar_year: int = calendar_year
-        self.years: List[List[int]] = config.years
+        self.years: List[int] = years
         self.year: int = 1  # current year
         self.leap_year_length: int = config.leap_year_length
         self.year_length: int = config.year_length
@@ -68,6 +69,7 @@ class Time:
             bool: True if it is the end of a year, False otherwise
         """
 
+        # if the day is > the length of the current year, then the year is over
         return self.day > len(self.years[self.year - 1])
 
     def end_simulation(self):
