@@ -1630,7 +1630,6 @@ class AnimalManager:
 
             self.calc_p_rqmts()
             self.daily_p_update()
-            
             self._update_phosphorus_concentrations()
             self.record_pen_history()
 
