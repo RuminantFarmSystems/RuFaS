@@ -1798,3 +1798,7 @@ class AnimalManager:
                             animal_constants.UNKNOWN_CULL
                         ],
                         info_map)
+
+        om.add_variable('total_num_cows_culled',
+                        sum(self.life_cycle_manager.cull_reason_stats_range.values()),
+                        info_map)
