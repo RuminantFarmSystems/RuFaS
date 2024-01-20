@@ -1631,6 +1631,9 @@ class AnimalManager:
             self._update_phosphorus_concentrations()
             self.record_pen_history()
 
+            self.calc_p_rqmts()
+            self.daily_p_update()
+
             if self.end_ration_interval():
                 self.reset_milk_production_reduction()
                 self.calc_nutrient_rqmts(feed, current_temperature)
@@ -1647,8 +1650,6 @@ class AnimalManager:
             manure_excretions_output_data = {}
             for pen in self.all_pens:
                 self.collect_manure_excretions_output_data(pen, feed, manure_excretions_output_data)
-            self.calc_p_rqmts()
-            self.daily_p_update()
             AnimalModuleReporter.report_animal_module_manure(manure_excretions_output_data)
 
             self.life_cycle_manager.daily_milk_production = self.sum_daily_milk(self.cows)
