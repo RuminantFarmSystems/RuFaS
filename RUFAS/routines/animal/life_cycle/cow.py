@@ -653,6 +653,10 @@ class Cow(HeiferIII):
             self.set_parity_index()
             self.set_lactation_curve_params()
 
+            if self.repro_program != self.get_user_defined_repro_protocol():
+                self._set_repro_program(sim_day, self.get_user_defined_repro_protocol())
+                self._repro_state_manager.reset()
+
             # restarting estrus
             if self.repro_program in [CowReproProtocolEnum.ED.value]:
                 self._simulate_estrus(self.days_born, sim_day,
@@ -731,9 +735,9 @@ class Cow(HeiferIII):
             if self._repro_state_manager.is_in_empty_state():
                 self._repro_state_manager.enter(ReproStateEnum.FRESH)
                 self._log_repro_states(sim_day)
-            if self.days_born == self.estrus_day:
+            if self.days_born >= self.estrus_day:
                 self.log_event(self.estrus_day, sim_day, const.ESTRUS_BEFORE_VOLUNTARY_WAITING_PERIOD_NOTE)
-                self._simulate_estrus(self.estrus_day, sim_day, const.ESTRUS_DAY_SCHEDULED_NOTE,
+                self._simulate_estrus(self.days_born, sim_day, const.ESTRUS_DAY_SCHEDULED_NOTE,
                                       self.get_avg_estrus_cycle(), self.get_std_estrus_cycle())
         elif self.days_in_milk > self.get_voluntary_waiting_period():
             if self._repro_state_manager.is_in(ReproStateEnum.FRESH):
@@ -1282,7 +1286,8 @@ class Cow(HeiferIII):
 
         if not self.is_pregnant and self.days_in_milk > self.get_do_not_breed_time():
             if not self.do_not_breed:
-                self.log_event(self.days_born, sim_day, const.DO_NOT_BREED)
+                self.log_event(self.days_born, sim_day,
+                               f'{const.DO_NOT_BREED}, days in milk: {self.days_in_milk}, not pregnant')
                 self.do_not_breed = True
 
     def _handle_preg_check(self, preg_check_config: dict[str, int | str], sim_day: int) -> None:
@@ -1343,6 +1348,13 @@ class Cow(HeiferIII):
         self._num_conception_rate_decreases += 1
 
         if self.repro_program == CowReproProtocolEnum.ED.value:
+            if self.days_born > self.estrus_day:
+                self._repro_state_manager.enter(ReproStateEnum.WAITING_FULL_ED_CYCLE)
+                self._log_repro_states(sim_day)
+                self.log_event(self.days_born, sim_day,
+                               f'days in milk: {self.days_in_milk}')
+                self._simulate_estrus(self.days_born, sim_day, const.ESTRUS_DAY_SCHEDULED_NOTE,
+                                      self.get_avg_estrus_cycle(), self.get_std_estrus_cycle())
             return
 
         # For both TAI and ED-TAI protocols
