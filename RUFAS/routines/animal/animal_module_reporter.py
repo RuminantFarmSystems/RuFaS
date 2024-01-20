@@ -277,6 +277,7 @@ class AnimalModuleReporter:
                 info_map=info_map,
             )
 
+    @staticmethod
     def report_life_cycle_manager_data(life_cycle_manager, sim_day: int) -> None:
         """
         Adds daily life cycle data to output manager.
@@ -498,7 +499,7 @@ class AnimalModuleReporter:
 
         om.add_variable(f"{report_name}_first_sell_event", sold_at_day_min, info_map)
         om.add_variable(f"{report_name}_last_sell_event", sold_at_day_max, info_map)
-        for day in range(total_days):
+        for day in range(1, total_days + 1):
             if daily_sell.get(day):
                 sold_count = len(daily_sell[day])
                 sold_weight = sum(
