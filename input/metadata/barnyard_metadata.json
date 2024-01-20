@@ -3129,7 +3129,7 @@
           "manure_treatment_methods": {
             "type": "string",
             "description": "Manure Treatment Methods -- Select the Manure Treatment Methods.",
-            "pattern": "^(slurry storage underfloor|slurry storage outdoor|open lots|compost bedded pack barn|anaerobic lagoon|anaerobic digestion|other)$"
+            "pattern": "^(slurry storage underfloor|slurry storage outdoor|open lots|compost bedded pack barn|anaerobic lagoon|anaerobic digestion and lagoon|anaerobic digestion and lagoon with separator)$"
           }
         }
       },
@@ -3237,7 +3237,7 @@
             "manure_treatment_type": {
               "type": "string",
               "description": "Manure Treatment Methods -- Select the Manure Treatment Methods.",
-              "pattern": "^(slurry storage underfloor|slurry storage outdoor|open lots|compost bedded pack barn|anaerobic lagoon|anaerobic digestion|other)$"
+              "pattern": "^(slurry storage underfloor|slurry storage outdoor|open lots|compost bedded pack barn|anaerobic lagoon|anaerobic digestion and lagoon|anaerobic digestion and lagoon with separator)$"
             },
             "total_solids_removal_efficiency_for_treatment": {
               "type": "number"
