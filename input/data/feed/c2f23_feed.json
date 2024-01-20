@@ -14,7 +14,7 @@
       110,
       301,
       200,
-
+      99 
     ],
     "close_up_feeds": [
       107,
@@ -85,8 +85,8 @@
         "purchased_feed_cost": 0.01
       },
       {
-        "purchased_feed": Add here the herb,
-        "purchased_feed_cost": 
+        "purchased_feed": 99,
+        "purchased_feed_cost": 0.01 
       },
       {
         "purchased_feed": 107,
@@ -189,7 +189,7 @@
           "ration_percentage": 9.7
         },
         {
-          "feed_type": herb,
+          "feed_type": 99,
           "ration_percentage": 9.7
         }
       ],

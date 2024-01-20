@@ -3,7 +3,7 @@
     "config": {
       "title": "Config Data",
       "description": "Configuration Information for farm 4",
-      "path": "input/data/config/pilot_testing_config.json",
+      "path": "input/data/config/c2f4_config.json",
       "type": "json",
       "properties": "config_properties"
     },
