@@ -157,47 +157,47 @@
       "lac_cow": [
         {
           "feed_type": 92,
-          "ration_percentage": 77.5
+          "ration_percentage": 41.8
         },
         {
           "feed_type": 107,
-          "ration_percentage": 10.0 
+          "ration_percentage": 5.4 
         },
         {
           "feed_type": 46,
-          "ration_percentage": 53.0
+          "ration_percentage": 28.6
         },
         {
           "feed_type": 31,
-          "ration_percentage": 2.0
+          "ration_percentage": 1.0
         },
         {
           "feed_type": 235,
-          "ration_percentage": 4.0
+          "ration_percentage": 2.2
         },
         {
           "feed_type": 240,
-          "ration_percentage": 0.5
+          "ration_percentage": 0.2
         },
         {
           "feed_type": 230,
-          "ration_percentage": 2.0
+          "ration_percentage": 1.0
         },
         {
           "feed_type": 197,
-          "ration_percentage": 34.0
+          "ration_percentage": 18.4
         },
         {
           "feed_type": 79,
-          "ration_percentage": 0.5
+          "ration_percentage": 0.3
         },
         {
           "feed_type": 119,
-          "ration_percentage": 1.25
+          "ration_percentage": 0.7
         },
         {
           "feed_type": 15,
-          "ration_percentage": 1.0 
+          "ration_percentage": 0.5 
         }
       ],
       "tolerance": 0.1,

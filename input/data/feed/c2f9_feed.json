@@ -32,7 +32,6 @@
         164,
         31,
         24,
-        77,
         79,
         167,
         244,
@@ -112,10 +111,6 @@
       {
         "purchased_feed": 24,
         "purchased_feed_cost": 0.5
-      },
-      {
-        "purchased_feed": 77,
-        "purchased_feed_cost": 1.0
       },
       {
         "purchased_feed": 79,
@@ -274,12 +269,8 @@
           "ration_percentage": 8.6
         },
         {
-          "feed_type": 77,
-          "ration_percentage": 0.9
-        },
-        {
           "feed_type": 79,
-          "ration_percentage": 0.4
+          "ration_percentage": 1.3
         },
         {
           "feed_type": 167,
