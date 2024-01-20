@@ -32,7 +32,7 @@
       "scenario_id": 4,
       "bedding_type": "sand",
       "manure_handler": "flush system",
-      "manure_separator": "sand lane manure separation",
+      "manure_separator": "sand lane",
       "manure_treatment": "anaerobic lagoon"
     },
     {
@@ -54,11 +54,11 @@
       "bedding_type": "sawdust",
       "manure_handler": "flush system",
       "manure_separator": "rotary screen",
-      "manure_treatment": "anaerobic digestion and lagoon with split"
+      "manure_treatment": "anaerobic digestion and lagoon with separator"
     },
     {
       "scenario_id": 8,
-      "bedding_type": "CBPB sawdust",
+      "bedding_type": "CBPB_sawdust",
       "manure_handler": "tillage",
       "manure_separator": "none",
       "manure_treatment": "compost bedded pack barn"
@@ -83,7 +83,7 @@
       "sand_removal_efficiency": 0.0
     },
     {
-      "bedding_type": "CBPB sawdust",
+      "bedding_type": "CBPB_sawdust",
       "bedding_mass_per_day": 12,
       "bedding_density": 350.0,
       "bedding_dry_matter_content": 0.9,
