@@ -175,6 +175,7 @@ rufas_id,Name,feed_description,feed_type,units,Comp_location
 174,SUDAN GRASS,"Hay, mature",Forage,kg,----
 175,SUDAN GRASS,"Hay, mid-maturity",Forage,kg,----
 176,SUDAN GRASS,"Silage, mature",Forage,kg,NASEM_only
+176,SUDAN GRASS,"Silage, mature",Forage,kg,NASEM_only
 177,SUDAN GRASS,"Silage, mid-maturity",Forage,kg,----
 178,SUGAR ,Sugar ,Conc,kg,----
 179,SUGARCANE,"Bagasse, hay",Forage,kg,----
@@ -299,9 +300,3 @@ rufas_id,Name,feed_description,feed_type,units,Comp_location
 298,Vit D premix,Vitamins,Vitamins,kg,NASEM_only
 299,Vit E premix,Vitamins,Vitamins,kg,NASEM_only
 300,"VitTM Premix, generic",Vitamins,Vitamins,kg,NASEM_only
-301,Farm ES Mineral Mix,MIneral,Mineral,kg,NASEM_only
-302,Farm ES Midwest BP Blend,Byproduct Mix,Conc,kg,NASEM_only
-303,Farm ES Northeast BP Blend,Byproduct Mix,Conc,kg,NASEM_only
-304,Farm ES South BP Blend,Byproduct Mix,Conc,kg,NASEM_only
-305,Farm ES West BP Blend,Byproduct Mix,Conc,kg,NASEM_only
-306,AMINOPLUS,RUP Additive,Conc,kg,NASEM_only
