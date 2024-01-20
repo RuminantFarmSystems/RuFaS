@@ -58,7 +58,7 @@
     },
     {
       "scenario_id": 8,
-      "bedding_type": "CBPB_sawdust",
+      "bedding_type": "CBPB sawdust",
       "manure_handler": "tillage",
       "manure_separator": "none",
       "manure_treatment": "compost bedded pack barn"
@@ -83,7 +83,7 @@
       "sand_removal_efficiency": 0.0
     },
     {
-      "bedding_type": "CBPB_sawdust",
+      "bedding_type": "CBPB sawdust",
       "bedding_mass_per_day": 12,
       "bedding_density": 350.0,
       "bedding_dry_matter_content": 0.9,
