@@ -127,6 +127,8 @@ class AnimalRequirements:
             List of milk crude protein content of the animals in the pen (%)
         milk_production_reduction: List[float]
             list of milk_production_reduction values for all animals in the pen (kg)
+        calc_method: str
+            The summary statistic to be used (e.g. mean, median, etc)
         """
         if calc_method == "mean":
             # populating the class variables as an average across cows for each requirement
@@ -441,6 +443,15 @@ class AnimalRequirements:
             Average daily temperature of last month, °C
         average_daily_gain_heifer: float, optional
             Average daily gain of a heifer
+        NDF_conc:
+            Concentration (percent value) of a heifer's Neutral Detergent Fiber
+        TDN_conc:
+            Concentration (percent value) of a heifer's Total Digestible Nutrients
+        net_energy_diet_concentration : float
+            Metabolizable energy density of formulated ration
+        days_born : float
+            number of days since birth
+
         Returns
         -------
         Dict[str, float]
@@ -1107,8 +1118,6 @@ class AnimalRequirements:
         ----------
         body_weight : float
             Body weight (kilograms)
-        mature_body_weight : float
-            Mature body weight (kilograms)
         conceptus_weight : float
             Conceptus weight (kilograms)
         day_of_pregnancy : int
@@ -1127,6 +1136,10 @@ class AnimalRequirements:
             Average daily gain (grams per day)
         equivalent_shrunk_body_weight : float
             Equivalent shrunk body weight (kilograms)
+        dry_matter_intake_estimate : float
+            Estimated dry matter intake according to empirical prediction equation within NASEM (2021) (kg/d)
+        TDN_conc:
+            Concentration (percent value) of a heifer's Total Digestible Nutrients
 
         Returns
         -------
@@ -1243,6 +1256,9 @@ class AnimalRequirements:
             True protein contents in milk (%)
         milk_production: float
             Milk yield (kg/d)
+        NDF_conc:
+            Concentration (percent value) of a heifer's Neutral Detergent Fiber
+
 
         Returns
         -------
@@ -1405,6 +1421,8 @@ class AnimalRequirements:
             True protein contents in milk (%)
         milk_production : float
             Milk yield (kg/d)
+        parity : int
+            Parity number (lactation 1, 2.. n)
 
         Returns
         -------
@@ -1534,6 +1552,8 @@ class AnimalRequirements:
             True protein contents in milk (%)
         milk_production: float
             Milk yield (kg/d)
+        parity : int
+            Parity number (lactation 1, 2.. n)
 
         Returns
         -------
@@ -1599,8 +1619,6 @@ class AnimalRequirements:
             Day of pregnancy (days)
         days_in_milk : int
             Days in milk (days)
-        lactating : bool
-            Physiological condition (conditional)
         milk_production : float
             Milk yield (kg/d)
         milk_fat : float
@@ -1689,6 +1707,8 @@ class AnimalRequirements:
             Parity number
         body_condition_score_5 : int
             Body condition score (score; scale from 1 to 5)
+        NDF_conc:
+            Concentration (percent value) of a heifer's Neutral Detergent Fiber
 
         Returns
         -------
