@@ -1783,8 +1783,7 @@ class AnimalRequirements:
         Notes
         -----
         Activity requirement (net_energy_activity) is proportional to body weight and daily walking distance.
-        Grazing system and hilly topography will cos
-        \t additional energy.
+        Grazing system and hilly topography will cost additional energy.
             Grazing is not implemented yet in the current version of code.
 
         References
