@@ -744,7 +744,7 @@ class AnimalRequirements:
     ) -> tuple[float, float, float]:
         """Calculates energy requirement for growth and associated weight gain parameters.
 
-        The estimated energy requirements requirements for growth in megacalories per day,
+        The estimated energy requirements for growth in megacalories per day,
         and average daily gain and estimate of shrunk body weight, in kilograms are calculated according to NRC (2001).
 
         Parameters
