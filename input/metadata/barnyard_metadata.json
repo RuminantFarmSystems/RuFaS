@@ -3124,7 +3124,7 @@
           "manure_separator": {
             "type": "string",
             "description": "Manure Separator Type -- The type of solid-liquid separator equipment to separate coarse fibrous solids/sand",
-            "pattern": "^(screw press|sand lane|rotary screen|none)$"
+            "pattern": "^(screw press|rotary screen|none)$"
           },
           "manure_treatment_methods": {
             "type": "string",
@@ -3203,7 +3203,7 @@
             "manure_separator_type": {
               "type": "string",
               "description": "Manure Separator Type -- The type of solid-liquid separator equipment to separate coarse fibrous solids/sand",
-              "pattern": "^(screw press|sand lane|rotary screen|none)$"
+              "pattern": "^(screw press|rotary screen|none)$"
             },
             "percent_dry_solids": {
               "type": "number"
