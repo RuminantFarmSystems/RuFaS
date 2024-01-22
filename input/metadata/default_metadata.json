@@ -2,42 +2,42 @@
   "files": {
     "config": {
       "title": "Config Data",
-      "description": "Configuration Information",
+      "description": "The configuration file for the simulation.",
       "path": "input/data/config/default_config.json",
       "type": "json",
       "properties": "config_properties"
     },
     "animal": {
       "title": "Animal data",
-      "description": "Moo Moo!",
+      "description": "The configuration file for the animal module.",
       "path": "input/data/animal/default_animal.json",
       "type": "json",
       "properties": "animal_properties"
     },
     "animal_population": {
       "title": "Animal population data",
-      "description": "Moo Moo!",
+      "description": "The configuration file for the animal population parameters.",
       "path": "input/data/animal/animal_population.json",
       "type": "json",
       "properties": "animal_population_properties"
     },
     "crop": {
       "title": "Crop data",
-      "description": "Alfafa is fun!",
+      "description": "The configuration file for crop rotation details.",
       "path": "input/data/crop/default_rotation.json",
       "type": "json",
       "properties": "crop_schedule_properties"
     },
     "economy": {
       "title": "Economy data",
-      "description": "Time is money!",
+      "description": "The configuration file for the EEE module that is related to costs.",
       "path": "input/data/EEE/default_costs.csv",
       "type": "csv",
       "properties": "economic_properties"
     },
     "emission": {
       "title": "Emissions data",
-      "description": "Let's think about global warming",
+      "description": "The configuration file for the EEE module that is related to emissions.",
       "path": "input/data/EEE/default_emissions.csv",
       "type": "csv",
       "properties": "emissions_properties"
@@ -51,7 +51,7 @@
     },
     "feed": {
       "title": "Feed data",
-      "description": "Those cows need to eat!",
+      "description": "The configuration file for the feed module.",
       "path": "input/data/feed/default_feed.json",
       "type": "json",
       "properties": "feed_properties"
@@ -72,42 +72,42 @@
     },
     "manure_management": {
       "title": "Manure data",
-      "description": "You thought it's a waste, but those crops need to eat as well",
+      "description": "The configuration file for the manure module.",
       "path": "input/data/manure/manure_management.json",
       "type": "json",
       "properties": "manure_management_properties"
     },
     "soil_1": {
       "title": "Soil data",
-      "description": "Stop treating soil like dirt!",
+      "description": "The first configuration file for the soil module.",
       "path": "input/data/soil/default_soil.json",
       "type": "json",
       "properties": "soil_profile_properties"
     },
     "soil_2": {
       "title": "Soil data",
-      "description": "Stop treating soil like dirt!",
+      "description": "The second configuration file for the soil module.",
       "path": "input/data/soil/default_soil_2.json",
       "type": "json",
       "properties": "soil_profile_properties"
     },
     "fertilizer_schedule": {
       "title": "Fertilizer schedule.",
-      "description": "Fertilizer is like butter, you can never have too much.",
+      "description": "The configuration file for the fertilizer schedule.",
       "path": "input/data/fertilizer_schedule/default_fertilizer_schedule.json",
       "type": "json",
       "properties": "fertilizer_schedule_properties"
     },
     "manure_schedule": {
       "title": "Manure schedule.",
-      "description": "Crappier than having 7:45 am classes Monday - Friday.",
+      "description": "The configuration file for the manure schedule.",
       "path": "input/data/manure_schedule/default_manure_schedule.json",
       "type": "json",
       "properties": "manure_schedule_properties"
     },
     "tillage_schedule": {
       "title": "Tillage schedule.",
-      "description": "Requires the will to till.",
+      "description": "The configuration file for the tillage schedule.",
       "path": "input/data/tillage_schedule/default_tillage_schedule.json",
       "type": "json",
       "properties": "tillage_schedule_properties"
@@ -121,21 +121,21 @@
     },
     "weather": {
       "title": "Weather data",
-      "description": "Let's turn on the AC",
+      "description": "The configuration file for the weather module.",
       "path": "input/data/weather/barnyard_weather.csv",
       "type": "csv",
       "properties": "weather_properties"
     },
     "feed_quality": {
       "title": "Feed Quality",
-      "description": "Hows the feed!",
+      "description": "The configuration file for the feed quality module.",
       "path": "input/data/feed/feed_quality.csv",
       "type": "csv",
       "properties": "feed_quality_properties"
     },
     "user_feeds": {
       "title": "User Feed",
-      "description": "Bring the feed!",
+      "description": "The configuration file for user feed input.",
       "path": "input/data/feed/user_feeds.csv",
       "type": "csv",
       "properties": "user_feeds_properties"
@@ -215,7 +215,7 @@
         },
         "cow_num": {
           "type": "number",
-          "description": "Number of Cows (head) -- The initial number of dry and lactating cows",
+          "description": "Number of Cows (head) -- The initial number of dry and lactating cows.",
           "default": 100,
           "minimum": 0
         },
@@ -268,7 +268,7 @@
           },
           "heifer_repro_method": {
             "type": "string",
-            "description": "Heifer Reproduction Protocol (select one) -- TAI - Timed Artificial Insemination; ED - Estrus Detection; Synch-ED - Synchronized Estrus Detection",
+            "description": "Heifer Reproductive Program (select one) -- TAI - Timed Artificial Insemination; ED - Estrus Detection; Synch-ED - Synchronized Estrus Detection",
             "default": "TAI",
             "pattern": "^(TAI|ED|SynchED)$"
           },
@@ -283,7 +283,6 @@
             "description": "Semen type (select one) -- The semen type (sexed or conventional) that makes up a majority of the farm's breedings",
             "default": "conventional",
             "pattern": "^(sexed|conventional)$"
-        
           },
           "days_in_preg_when_dry": {
             "type": "number",
@@ -517,7 +516,7 @@
               },
               "cow_presynch_protocol": {
                 "type": "string",
-                "description": "Cow Presynch Protocol (optional; select one) -- The optional preSynch protocol (1st breeding) for cows in the TAI (Timed Artificial Insemination) protocol",
+                "description": "Cow Presynch Protocol -- The optional preSynch protocol (1st breeding) for cow in TAI (Timed Artificial Insemination) program",
                 "default": "Double OvSynch",
                 "pattern": "^(Double OvSynch|PreSynch|G6G)$"
               },
@@ -975,7 +974,7 @@
           "default": 30
         }
       },
-       "pen_information": {
+      "pen_information": {
         "type": "array",
         "description": "Pen Information",
         "properties": {
@@ -2076,7 +2075,7 @@
         "description": "cost of diesel per gallon",
         "type": "number",
         "minimum": 0,
-        "default": 5.00
+        "default": 5.0
       },
       "electricity_cost_kwh": {
         "description": "cost of electricity per kwh",
@@ -3506,21 +3505,20 @@
             "type": "number",
             "description": "Controls the rate of ammonium volatilization.\nUnitless.\nReference: SWAT Theoretical Documentation eqn. 3:1.3.5.",
             "minimum": 0.01,
-            "maximum": 0.30,
-            "default": 0.15
+            "default": 0.45
           },
           "denitrification_rate_coefficient": {
             "type": "number",
             "description": "Controls the rate of denitrification.\nUnitless.\nReference: SWAT Input .BSN - CDN.",
             "minimum": 0.0,
             "maximum": 3.0,
-            "default": 0.05
+            "default": 0.01
           },
           "denitrification_threshold_water_content": {
             "type": "number",
             "description": "Fraction of field capacity water content above which denitrification takes place.\nUnitless.\nReference: SWAT Input .BSN - SDNCO",
             "minimum": 0.0,
-            "default": 1.1
+            "default": 1.3
           },
           "residue_fresh_organic_mineralization_rate": {
             "type": "number",
