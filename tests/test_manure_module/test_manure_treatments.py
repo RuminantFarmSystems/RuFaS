@@ -1261,9 +1261,9 @@ def test_slurry_storage_calc_methane_emission(
         return_value=temperature_celsius,
     )
     expected_methane_loss = 2.0
-    patch_for_calc_methane_emission_for_slurry_storage = mocker.patch(
+    patch_for_calc_methane_emission_from_slurry_storage = mocker.patch(
         "RUFAS.routines.manure.manure_treatments.slurry_storage_underfloor."
-        "GasEmissionsCalculator.methane_emission_for_slurry_storage",
+        "GasEmissionsCalculator.methane_emission_from_slurry_storage",
         return_value=expected_methane_loss,
     )
     expected_new_accumulated_liquid_manure_total_solids = max(
@@ -1280,7 +1280,7 @@ def test_slurry_storage_calc_methane_emission(
 
     # Assert
     patch_for_get_current_day_average_temperature_celsius.assert_called_once()
-    patch_for_calc_methane_emission_for_slurry_storage.assert_called_once_with(
+    patch_for_calc_methane_emission_from_slurry_storage.assert_called_once_with(
         manure_total_solids=accumulated_liquid_manure_total_solids,
         is_enclosed=is_enclosed,
         temperature_celsius=temperature_celsius,
@@ -1974,7 +1974,7 @@ def test_anaerobic_lagoon_update_methane_emission(
     mock_daily_output.liquid_manure_total_volatile_solids = (
         current_liquid_manure_total_volatile_solids
     )
-    patch_for_calc_methane_emission_for_slurry_storage = mocker.patch(
+    patch_for_calc_methane_emission_from_slurry_storage = mocker.patch(
         "RUFAS.routines.manure.manure_treatments.anaerobic_lagoon"
         ".GasEmissionsCalculator.methane_emission_from_slurry_storage",
         return_value=initial_methane_emission,
@@ -1999,7 +1999,7 @@ def test_anaerobic_lagoon_update_methane_emission(
     anaerobic_lagoon._update_methane_emission(mock_daily_output)
 
     # Assert
-    patch_for_calc_methane_emission_for_slurry_storage.assert_called_once_with(
+    patch_for_calc_methane_emission_from_slurry_storage.assert_called_once_with(
         total_volatile_solids=current_liquid_manure_total_volatile_solids,
         temp=mock_temp_value,
     )

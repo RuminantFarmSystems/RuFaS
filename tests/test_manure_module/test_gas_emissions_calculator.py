@@ -14,60 +14,6 @@ from RUFAS.routines.manure.constants_and_units.manure_constants import ManureCon
 from RUFAS.routines.manure.gas_emissions.calculator import GasEmissionsCalculator
 
 
-@pytest.mark.parametrize("is_enclosed", [True, False])
-def test_E_CH4_slurry_storage(is_enclosed: bool, mocker: MockerFixture) -> None:
-    """Tests methane_emission_for_slurry_storage() in calculator.py."""
-
-    # Arrange
-    manure_total_solids = 1000.0
-    tempC = 15.0
-    tempK = 288.15
-    patch_for_convert_tempC_to_tempK = mocker.patch(
-        "RUFAS.routines.manure.gas_emissions.calculator.GasEmissionsCalculator._convert_temperature_celsius_to_kelvin",
-        return_value=tempK,
-    )
-    manure_volatile_solids_fraction = 0.5
-    efficiency_fraction = 0.99
-    degradable_volatile_solids = (
-            GasEmissionConstants.ACHIEVABLE_METHANE_EMISSION
-            / GasEmissionConstants.POTENTIAL_METHANE_YIELD_OF_MANURE
-    )
-    non_degradable_volatile_solids = 1 - degradable_volatile_solids
-    b1 = GasEmissionConstants.DEGRADABLE_VOLATILE_SOLIDS_RATE_CORRECTING_FACTOR
-    b2 = GasEmissionConstants.NON_DEGRADABLE_VOLATILE_SOLIDS_RATE_CORRECTING_FACTOR
-    ex = math.exp(
-        GasEmissionConstants.NATURAL_LOG_ARRHENIUS_CONSTANT
-        - (
-                GasEmissionConstants.ACTIVATION_ENERGY
-                / (GasEmissionConstants.GAS_CONSTANT * tempK)
-        )
-    )
-    expected_E_CH4_open_air = (
-            0.024
-            * manure_total_solids
-            * manure_volatile_solids_fraction
-            * (degradable_volatile_solids * b1 + non_degradable_volatile_solids * b2)
-            * ex
-    )
-    expected_E_CH4_enclosed = expected_E_CH4_open_air * (1 - efficiency_fraction)
-
-    # Act
-    actual = GasEmissionsCalculator.methane_emission_for_slurry_storage(
-        manure_total_solids,
-        is_enclosed,
-        tempC,
-        manure_volatile_solids_fraction,
-        efficiency_fraction,
-    )
-
-    # Assert
-    patch_for_convert_tempC_to_tempK.assert_called_once_with(tempC)
-    if is_enclosed:
-        assert actual == expected_E_CH4_enclosed
-    else:
-        assert actual == expected_E_CH4_open_air
-
-
 def test_mcf() -> None:
     """Tests _methane_conversion_factor() in calculator.py."""
     assert GasEmissionsCalculator._methane_conversion_factor(1.0) == pytest.approx(
@@ -768,7 +714,7 @@ def test_housing_methane_emission(
                 7.7,
                 260.0,
                 ValueError,
-                "Urine total ammoniacal nitrogen must be greater than or equal to 0.",
+                "Manure total ammoniacal nitrogen must be greater than or equal to 0.",
         ),
         (
                 10,
@@ -779,7 +725,7 @@ def test_housing_methane_emission(
                 7.7,
                 260.0,
                 ValueError,
-                "Urine must be greater than or equal to 0.",
+                "Manure must be greater than or equal to 0.",
         ),
     ],
 )
