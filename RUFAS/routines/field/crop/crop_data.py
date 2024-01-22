@@ -301,9 +301,9 @@ class CropData:
         Cumulative water demands not met by all previous layers (mm).
     actual_water_uptakes : Optional[List[float]], default None
         The actual amount of water to be removed from the soil (mm).
-    water_uptake : float, default 0.0 mm
+    water_uptake : float, default 0.0
         Total amount of water the plant took from the soil on the current day (mm).
-    cumulative_water_uptake : float, default 0.0 mm
+    cumulative_water_uptake : float, default 0.0
         Cumulative sum of water taken up by the plant over the course of its lifetime (mm).
     harvest_efficiency : float, default 1.0
         Efficiency of the harvest operation: the proportion of yield that will be extracted from the field
