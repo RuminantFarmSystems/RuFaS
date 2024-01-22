@@ -342,7 +342,7 @@ class CropData:
     dormancy_loss_fraction : Optional[float], default None
         Fraction of biomass the crop loses when it goes dormant (unitless).
     minimum_lai_during_dormancy : Optional[float], default 0.75
-        Minimum leaf area index for plants (perennials and trees only)
+        Minimum leaf area index for plants (perennials and trees only).
 
     """
     # ID variables (SWAT Table A-1 ish)
