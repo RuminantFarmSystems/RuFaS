@@ -33,7 +33,8 @@ ESTRUS_AFTER_CALVING_NOTE = "1st estrus after calving"
 ESTRUS_BEFORE_VOLUNTARY_WAITING_PERIOD_NOTE = "estrus occurred before the end of the voluntary waiting period"
 ESTRUS_AFTER_PGF_NOTE = "estrus after PGF"
 SIMULATE_ESTRUS_AFTER_PGF_NOTE = "simulating estrus after PGF"
-ESTRUS_NOT_DETECTED_BETWEEN_VWP_AND_TAI_START_DAY_NOTE = "estrus not detected between VWP and TAI start day"
+ESTRUS_NOT_DETECTED_BETWEEN_VWP_AND_OVSYNCH_START_DAY_NOTE = "estrus not detected between VWP and OvSynch start day"
+NO_ED_INSTITUTED_BEFORE_OVSYNCH_IN_ED_TAI_NOTE = "No ED instituted before OvSynch in ED-TAI"
 
 # TAI injections
 INJECT_GNRH = "inject GnRH"

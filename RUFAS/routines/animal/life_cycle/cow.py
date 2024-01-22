@@ -1104,9 +1104,15 @@ class Cow(HeiferIII):
 
         if self._repro_state_manager.is_in(ReproStateEnum.WAITING_ED_DAILY):
             self.log_event(self.days_born, sim_day,
-                           const.ESTRUS_NOT_DETECTED_BETWEEN_VWP_AND_TAI_START_DAY_NOTE)
+                           const.ESTRUS_NOT_DETECTED_BETWEEN_VWP_AND_OVSYNCH_START_DAY_NOTE)
             self._repro_state_manager.enter(ReproStateEnum.IN_OVSYNCH)
             self._log_repro_states(sim_day)
+        elif self._repro_state_manager.is_in(ReproStateEnum.FRESH):  # When no ED is instituted
+            self.log_event(self.days_born, sim_day,
+                           const.NO_ED_INSTITUTED_BEFORE_OVSYNCH_IN_ED_TAI_NOTE)
+            self._repro_state_manager.enter(ReproStateEnum.IN_OVSYNCH)
+            self._log_repro_states(sim_day)
+
 
     def _decrease_conception_rate_by_parity(self, calves: int, conception_rate: float) -> float:
         """
