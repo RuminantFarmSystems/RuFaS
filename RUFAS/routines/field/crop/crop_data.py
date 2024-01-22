@@ -256,7 +256,7 @@ class CropData:
         Soil nitrate factor (unitless).
     fixation_stage_factor : Optional[float]
         Growth stage factor for nitrogen-fixing symbiotes
-        near_mature_phosphorus_fraction : float, default 0.3
+    near_mature_phosphorus_fraction : float, default 0.3
         Expected fraction of plant biomass comprised of nitrogen for the plant near maturity (unitless).
     phosphorus_distro_param : float, default 10
         Phosphorus uptake distribution parameter (unitless).
