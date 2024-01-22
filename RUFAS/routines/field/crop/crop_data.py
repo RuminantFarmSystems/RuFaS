@@ -643,7 +643,7 @@ class CropData:
         Returns
         -------
         float
-            Fraction of potential heat units accumulated. (unitless)
+            Fraction of potential heat units accumulated (unitless).
 
         References
         ----------
