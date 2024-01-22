@@ -16,11 +16,11 @@ class BiomassAllocation:
 
     Methods
     -------
-    allocate_biomass(light: float)
+    allocate_biomass(light: float) -> None
         Allocate a plant's accumulated biomass based on the day's light exposure.
-    photosynthesize(light: float)
+    photosynthesize(light: float) -> None
         Simulate the photosynthesis process by converting light energy into biomass.
-    partition_biomass()
+    partition_biomass() -> None
         Partitions the accumulated biomass into above and below ground components.
     _intercept_radiation(radiation: float, extinction: float, lai: float) -> float
         Calculates the amount of solar radiation intercepted for photosynthesis.
