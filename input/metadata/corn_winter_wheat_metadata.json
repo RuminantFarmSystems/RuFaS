@@ -31,7 +31,7 @@
     "crop": {
       "title": "Crop data",
       "description": "Continuous corn for 25 years.",
-      "path": "input/data/crop/corn_winter_wheat.json",
+      "path": "input/data/crop/corn_winter_wheat_cover.json",
       "type": "json",
       "properties": "crop_schedule_properties"
     },
