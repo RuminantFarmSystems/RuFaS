@@ -1036,6 +1036,16 @@ def test_daily_update_id_map(info_dict: dict[Any], animal_manager: AnimalManager
     assert dummy_animal_manager.animal_to_pen_id_map == info_dict['animal_to_pen_id_map_after_daily_update']
 
 
+def test__get_dry_cows():
+    """Unit test for function _get_dry_cows in file routines/animal/animal_manager.py"""
+    mock_cow_list = [MagicMock(), MagicMock(), MagicMock()]
+    for cow in mock_cow_list:
+        cow.is_dry = True
+    assert AnimalManager._get_dry_cows(mock_cow_list) == mock_cow_list
+    mock_cow_list[0].is_dry = False
+    assert AnimalManager._get_dry_cows(mock_cow_list) == mock_cow_list[1:]
+
+
 def test_allocate_all_pens():
     """Unit test for function allocate_all_pens in file routines/animal/animal_manager.py"""
     pass
