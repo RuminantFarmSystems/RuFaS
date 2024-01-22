@@ -3256,6 +3256,74 @@
             },
             "freeboard_input": {
               "type": "number"
+            },
+            "composting_type": {
+              "type": "string",
+              "description": "Composting Type -- The type of composting.",
+              "pattern": "^(intensive windrow|passive windrow|static pile)$",
+              "default": "intensive windrow"
+            },
+            "maximum_methane_producing_capacity": {
+              "type": "number",
+              "description": "Maximum Methane producing capacity for dairy manure (m^3 / kg)",
+              "default": 0.24
+            },
+            "effectiveness_of_microbial_decomposition_rate": {
+              "type": "number",
+              "description": "The effectiveness of microbial decomposition rate (unitless)",
+              "default": 2.37e-3
+            },
+            "decomposition_temperature": {
+              "type": "number",
+              "description": "The decomposition_temperature simulated (degree Celsius)",
+              "default": 60
+            },
+            "first_order_decaying_coefficient": {
+              "type": "number",
+              "description": "The first order decaying coefficient (per day)",
+              "default": 0.1
+            },
+            "last_compost_turning_or_addition": {
+              "type": "number",
+              "description": "The number of days since the last turning or addition event (day)",
+              "default": 1
+            },
+            "lag_time": {
+              "type": "number",
+              "description": "The lag time (day)",
+              "default": 2
+            },
+            "mole_fraction_of_oxygen": {
+              "type": "number",
+              "description": "The mole fraction of oxygen in the air within the windrow (unitless)",
+              "default": 0.15
+            },
+            "half_saturation_constant": {
+              "type": "number",
+              "description": "The half-saturation constant (unitless)",
+              "default": 0.02
+            },
+            "ambient_air_mole_fraction_of_oxygen": {
+              "type": "number",
+              "description": "The mole fraction of oxygen in ambient air (unitless)",
+              "default": 0.21
+            },
+            "proportion_of_carbon_available_in_manure": {
+              "type": "number",
+              "description": "The proportion of carbon available in manure (unitless)",
+              "default": 0.5
+            },
+            "proportion_of_carbon_available_in_bedding": {
+              "type": "number",
+              "description": "The carbon available in the bedding (unitless)",
+              "default": 0.35
+            },
+            "effect_of_moisture_on_microbial_decomposition": {
+              "type": "number",
+              "description": "The effect of moisture on microbial decomposition (unitless)",
+              "default": 0.65,
+              "minimum": 0,
+              "maximum": 0.1
             }
           }
         }

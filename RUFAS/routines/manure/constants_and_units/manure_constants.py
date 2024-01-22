@@ -56,3 +56,8 @@ class ManureConstants:
     The fraction of inorganic nitrogen in compost bedding that is ammonium (unitless, [0, 1]).
     Default is set to 0.5.
     """
+
+    COMPOSTING_N2O_INDIRECT_EMISSION_FACTOR = 0.01
+    """
+    The constant factor for indirect N2O emissions lost due to leaching and NH3.
+    """
