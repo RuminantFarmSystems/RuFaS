@@ -166,10 +166,8 @@ class AnimalModuleReporter:
         }
         for pen in animal_manager.all_pens:
             ration_per_animal = pen.ration_per_animal.copy()
-            if 'status' in ration_per_animal:
-                del ration_per_animal['status']
-            if 'objective' in ration_per_animal:
-                del ration_per_animal["objective"]
+            del ration_per_animal['status']
+            del ration_per_animal["objective"]
             ration_total = {}
             ration_total["dry_matter_intake_total"] = 0
             for key in ration_per_animal.keys():
