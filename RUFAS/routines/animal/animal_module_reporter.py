@@ -5,6 +5,7 @@ import sys
 from RUFAS.output_manager import OutputManager
 from RUFAS.routines.animal.ration.ration_driver import RationReporter
 from RUFAS.routines.animal.manure.general_manure import AnimalManureExcretions
+from RUFAS.routines.animal.animal_combinations import AnimalCombination
 
 om = OutputManager()
 
@@ -66,7 +67,7 @@ class AnimalModuleReporter:
             "function": "milking_update",
         }
 
-        for animal in pen.animals_in_pen:
+        for animal in pen.animals_in_pen.values():
             milk_data_update = {}
             milk_data_update["days_in_milk"] = animal.days_in_milk
             milk_data_update[
@@ -135,7 +136,7 @@ class AnimalModuleReporter:
                 ration_per_animal,
                 info_map,
             )
-            if pen.animal_combination != pen.AnimalCombination.CALF:
+            if pen.animal_combination != AnimalCombination.CALF:
                 ration_supply_report = RationReporter.report_ration_supply(
                     pen.ration_per_animal,
                     feed.available_feeds,

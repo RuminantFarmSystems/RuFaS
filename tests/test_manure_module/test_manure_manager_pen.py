@@ -18,7 +18,7 @@ def test_manure_manager_pen_init(mocker: MockerFixture) -> None:
         mocker.MagicMock(autospec=Cow) for _ in range(expected_num_animals)
     ]
     mock_pen.classes_in_pen = expected_classes_in_pen = {Cow}
-    mock_pen.animal_combination = Pen.AnimalCombination.LAC_COW
+    mock_pen.animal_combination = AnimalCombination.LAC_COW
 
     mock_pen.housing_type = expected_housing_type = "open air barn"
     mock_pen._pen_type = expected_pen_type = "tiestall"
@@ -67,14 +67,14 @@ def test_manure_manager_pen_init(mocker: MockerFixture) -> None:
 @pytest.mark.parametrize(
     "animal_combination, expected_num_lactating_cows",
     [
-        (Pen.AnimalCombination.LAC_COW, 10),
-        (Pen.AnimalCombination.CALF, 0),
-        (Pen.AnimalCombination.GROWING, 0),
+        (AnimalCombination.LAC_COW, 10),
+        (AnimalCombination.CALF, 0),
+        (AnimalCombination.GROWING, 0),
     ],
 )
 def test_count_lactating_cows(
     mocker: MockerFixture,
-    animal_combination: Pen.AnimalCombination,
+    animal_combination: AnimalCombination,
     expected_num_lactating_cows: int,
 ) -> None:
     """Unit test for function count_lactating_cows in file manure_manager_pen.py"""

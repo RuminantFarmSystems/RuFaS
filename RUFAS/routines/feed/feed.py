@@ -63,13 +63,13 @@ class Feed:
         self.purchased_feeds = self.get_quality_specific_purchased_feed_ids(purchased_feeds_list)
 
         self.input_feed_combinations = {
-            Pen.AnimalCombination.CALF: set(self.get_quality_specific_purchased_feed_ids(data['calf_feeds'])),
-            Pen.AnimalCombination.GROWING: set(self.get_quality_specific_purchased_feed_ids(data['growing_feeds'])),
-            Pen.AnimalCombination.CLOSE_UP: set(self.get_quality_specific_purchased_feed_ids(data['close_up_feeds'])),
-            Pen.AnimalCombination.GROWING_AND_CLOSE_UP:
+            AnimalCombination.CALF: set(self.get_quality_specific_purchased_feed_ids(data['calf_feeds'])),
+            AnimalCombination.GROWING: set(self.get_quality_specific_purchased_feed_ids(data['growing_feeds'])),
+            AnimalCombination.CLOSE_UP: set(self.get_quality_specific_purchased_feed_ids(data['close_up_feeds'])),
+            AnimalCombination.GROWING_AND_CLOSE_UP:
                 set(self.get_quality_specific_purchased_feed_ids(data['growing_feeds'])) |
                 set(self.get_quality_specific_purchased_feed_ids(data['close_up_feeds'])),
-            Pen.AnimalCombination.LAC_COW: set(self.get_quality_specific_purchased_feed_ids(data['lac_cow_feeds'])),
+            AnimalCombination.LAC_COW: set(self.get_quality_specific_purchased_feed_ids(data['lac_cow_feeds'])),
         }
 
         self.all_feed_ids = self.get_all_feed_units(purchased_feeds_list, data['farm_grown_feeds'])
@@ -561,10 +561,10 @@ class Feed:
             # [F.2.A.6]
             if 1.1 * storage.req_inv['lactating_cows'] >= storage.DM:
                 storage.DMI_forage_max['lactating_cows'] = storage.DM / \
-                                                           storage.cow_days['lactating_cows']
+                    storage.cow_days['lactating_cows']
             else:
                 storage.DMI_forage_max['lactating_cows'] = 1.1 * \
-                                                           storage.inclusion_rate_est['lactating_cows']
+                    storage.inclusion_rate_est['lactating_cows']
 
         # LOW QUALITY FORAGE
         # Calculating DMI for all EXCEPT Lactating Cows
@@ -610,7 +610,7 @@ class Feed:
                 # booleans to check if new calculated inclusion rate > 0
                 if tot_req_inv_non_lactating_cows == 0:
                     tot_cow_days = sum(storage.cow_days.values()) - \
-                                   storage.cow_days['lactating_cows']
+                        storage.cow_days['lactating_cows']
                     for animal, val in storage.cow_days.items():
                         storage.DMI_forage_max = ((val / tot_cow_days) *
                                                   storage.DM) / val
@@ -637,7 +637,7 @@ class Feed:
                 available_forage = storage.DM - tot_req_inv_non_lactating_cows
                 if storage.cow_days['lactating_cows'] > 0:
                     storage.DMI_forage_max['lactating_cows'] = available_forage \
-                                                               / storage.cow_days['lactating_cows']
+                        / storage.cow_days['lactating_cows']
             # updating inclusion rate estimate until inventory is sufficient to
             # satisfy that newly calculated inclusion rate estimate
             # [F.2.A.8]
@@ -673,7 +673,7 @@ class Feed:
                 available_forage = storage.DM - tot_req_inv_non_lactating_cows
                 if storage.cow_days['lactating_cows'] > 0:
                     storage.DMI_forage_max['lactating_cows'] = available_forage \
-                                                               / storage.cow_days['lactating_cows']
+                        / storage.cow_days['lactating_cows']
 
     def daily_feed_storage(self, fields):  # noqa
         """

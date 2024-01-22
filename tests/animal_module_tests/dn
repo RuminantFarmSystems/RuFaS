@@ -19,6 +19,7 @@ from RUFAS.routines.animal.purchased_feed_emissions_estimator import PurchasedFe
 from RUFAS.output_manager import OutputManager
 from RUFAS.input_manager import InputManager
 from RUFAS.routines.animal.animal_combinations import AnimalCombination
+
 om = OutputManager()
 
 
@@ -45,11 +46,11 @@ def pens_with_mock_animals() -> List[MagicMock]:
     mock_animals_in_pens = [
         {
             "id": 0,
-            "animals_in_pen": {0: mock_animal_1, 1: mock_animal_2}
+            "animals_in_pen": {1: mock_animal_1, 2: mock_animal_2}
         },
         {
             "id": 1,
-            "animals_in_pen": {0: mock_animal_3, 1: mock_animal_4}
+            "animals_in_pen": {1: mock_animal_3, 2: mock_animal_4}
         }
     ]
 
@@ -65,7 +66,7 @@ def mock_pens() -> List[MagicMock]:
             "horizontal_dist_to_parlor": 2.0,
             "stocking_density": 1.075,
             "num_stalls": 200,
-            "animals_in_pen": {0: 100000, 1: 100001}
+            "animals_in_pen": {1: 100000, 0: 100001}
         },
         {
             "id": 1,
@@ -73,7 +74,7 @@ def mock_pens() -> List[MagicMock]:
             "horizontal_dist_to_parlor": 10.0,
             "stocking_density": 1.075,
             "num_stalls": 50,
-            "animals_in_pen": {1: 200000, 2: 200001}
+            "animals_in_pen": {2: 200000, 1: 200001}
         },
         {
             "id": 2,
@@ -81,7 +82,7 @@ def mock_pens() -> List[MagicMock]:
             "horizontal_dist_to_parlor": 8.0,
             "stocking_density": 1.075,
             "num_stalls": 200,
-            "animals_in_pen": {1: 300000, 2: 300001}
+            "animals_in_pen": {2: 300000, 3: 300001}
         },
         {
             "id": 3,
@@ -813,8 +814,8 @@ def setup_dummy_pen(pen_id: int, num_stalls: int, animal_list: List[AnimalBase])
                     dummy_pen_info_dict['manure_separator'], dummy_pen_info_dict['manure_storage'],
                     dummy_pen_info_dict['animal_combination'], dummy_pen_info_dict['max_stocking_density'])
 
-    for animal in animal_list:
-        dummy_pen.animals_in_pen[animal.id] = animal
+    for i, animal in enumerate(animal_list):
+        dummy_pen.animals_in_pen[i] = animal
     dummy_pen.stocking_density = len(animal_list) / num_stalls
 
     return dummy_pen
@@ -860,8 +861,8 @@ def setup_dummy_animal_manager_with_pens(animal_manager: AnimalManager, info_dic
 
         dummy_pen.ration = pen_dict['ration']
 
-        for animal in animal_list:
-            dummy_pen.animals_in_pen[animal.id] = animal
+        for i, animal in enumerate(animal_list):
+            dummy_pen.animals_in_pen[i] = animal
 
         animal_manager.pens_by_animal_combination[pen_dict['pen_animal_combination']].append(dummy_pen)
 
@@ -1571,8 +1572,9 @@ def test_daily_updates(is_end_ration_interval: bool, mocker: MockerFixture) -> N
         mock_pen.animals_in_pen = {}
         for j in range(num_animals_per_pen):
             mock_animal = mocker.MagicMock()
+            mock_id = mocker.MagicMock()
             mock_animal.update_milk_production_history.return_value = None
-            mock_pen.animals_in_pen[mock_animal.id] = mock_animal
+            mock_pen[mock_id] = mock_animal
         mock_all_pens.append(mock_pen)
     mock_animal_manager.all_pens = mock_all_pens
 
