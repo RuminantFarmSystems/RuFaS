@@ -1,0 +1,9 @@
+ManureHandlerDailyOutput_Pen_.*housing_methane.*
+ManureHandlerDailyOutput_Pen_.*housing_ammonia.*
+ManureTreatmentDailyOutput_Pen_.*storage_ammonia.*
+AnaerobicDigestion_ManureTreatmentDailyOutput_Pen_.*.biogas
+AnaerobicDigestion_ManureTreatmentDailyOutput_Pen_.*.biogas_energy_content
+AnaerobicDigestion_ManureTreatmentDailyOutput_Pen_.*.methane_generation_volume
+Accumulated_ManureTreatmentDailyOutput_Pen_.*.biogas
+Accumulated_ManureTreatmentDailyOutput_Pen_.*.biogas_energy_content
+Accumulated_ManureTreatmentDailyOutput_Pen_.*.methane_generation_volume
