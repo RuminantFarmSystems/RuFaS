@@ -485,9 +485,29 @@ def test_calc_nutrient_rqmts(mocker: MockerFixture) -> None:
     assert 4 == animal.set_nutrient_rqmts.call_count
 
 
-def test_fully_update_animal_to_pen_id_map():
+def test_fully_update_animal_to_pen_id_map(mocker: MockerFixture):
     """Unit test for function fully_update_animal_to_pen_id_map in file routines/animal/animal_manager.py"""
-    pass
+    mocker.patch('RUFAS.routines.animal.animal_manager.AnimalManager.__init__', return_value=None)
+    mock_animal_manager = AnimalManager()
+    mock_animal_manager.all_pens = [MagicMock(), MagicMock()]
+    mock_animal_manager.animal_to_pen_id_map = {}
+    mock_animal_manager.all_pens[0].id = 0
+    mock_animal_manager.all_pens[1].id = 1
+    i = 10
+    for pen in mock_animal_manager.all_pens:
+        pen.animals_in_pen = [MagicMock(), MagicMock()]
+        for animal in pen.animals_in_pen:
+            animal.id = i
+            i += 1
+    i = 10
+    for pen in mock_animal_manager.all_pens:
+        for animal in pen.animals_in_pen:
+            assert animal.id == i
+            i += 1
+    # act
+    mock_animal_manager.fully_update_animal_to_pen_id_map()
+    # assert
+    assert mock_animal_manager.animal_to_pen_id_map == {10: 0, 11: 0, 12: 1, 13: 1}
 
 
 def pens_test_data_dict() -> List[dict[Any]]:
