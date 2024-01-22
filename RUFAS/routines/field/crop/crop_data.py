@@ -270,15 +270,15 @@ class CropData:
         Potential phosphorus to be taken up by the plant under ideal circumstances for the current day (kg/ha).
     actual_phosphorus_uptakes : Optional[List[float]], default None
         Actual phosphorus to be taken up by the plant from each soil layer (kg/ha).
-    max_root_depth : float, default 2000 mm
+    max_root_depth : float, default 2000
         Maximum depth of roots in the soil (mm).
-    cumulative_evaporation : float, default 0.0 mm
+    cumulative_evaporation : float, default 0.0
         Total water lost to evaporation by the plant during the growing season (mm).
-    cumulative_transpiration : float, default 0.0 mm
+    cumulative_transpiration : float, default 0.0
         Total water lost to transpiration by the plant during the growing season (mm).
-    cumulative_evapotranspiration : float, default 0.0 mm
+    cumulative_evapotranspiration : float, default 0.0
         Total water lost to evapotranspiration by the plant during the growing season (mm).
-    cumulative_potential_evapotranspiration : float, default 0.0 mm
+    cumulative_potential_evapotranspiration : float, default 0.0
         Total expected maximum water loss by the plant during the growing season (mm).
     water_deficiency : Optional[float], default None
         Water deficiency factor for the plant (unitless).
