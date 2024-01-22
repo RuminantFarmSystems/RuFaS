@@ -32,7 +32,7 @@
       "scenario_id": 4,
       "bedding_type": "sand",
       "manure_handler": "flush system",
-      "manure_separator": "sand lane",
+      "manure_separator": "none",
       "manure_treatment": "anaerobic lagoon"
     },
     {
