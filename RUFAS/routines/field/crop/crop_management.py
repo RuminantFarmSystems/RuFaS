@@ -89,9 +89,12 @@ class CropManagement:
         """
         Kills the plant, preventing it from growing further, and converts all biomass to residue.
 
+        Notes
+        -----
         This operation is based on the SWAT model's guidelines, where a kill operation converts all biomass of
         the plant to residue. It is typically executed after a harvest (when specified) or at the end of the
         growing season for annual plants.
+
         """
         self.data.is_alive = False
         self.data.yield_residue += self.data.biomass
