@@ -1046,6 +1046,16 @@ def test__get_dry_cows():
     assert AnimalManager._get_dry_cows(mock_cow_list) == mock_cow_list[1:]
 
 
+def test__get_lactating_cows():
+    """Unit test for function _get_lactating_cows in file routines/animal/animal_manager.py"""
+    mock_cow_list = [MagicMock(), MagicMock(), MagicMock()]
+    for cow in mock_cow_list:
+        cow.is_lactating = True
+    assert AnimalManager._get_lactating_cows(mock_cow_list) == mock_cow_list
+    mock_cow_list[0].is_lactating = False
+    assert AnimalManager._get_lactating_cows(mock_cow_list) == mock_cow_list[1:]
+
+
 def test_allocate_all_pens():
     """Unit test for function allocate_all_pens in file routines/animal/animal_manager.py"""
     pass
