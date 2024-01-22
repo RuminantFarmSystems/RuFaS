@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import copy
-from enum import Enum
 from typing import List, Dict, Union, Any, Tuple
 
 from RUFAS.output_manager import OutputManager
@@ -14,6 +13,7 @@ from RUFAS.routines.animal.life_cycle.heiferIII import HeiferIII
 from RUFAS.routines.animal.manure.general_manure import AnimalManureExcretions, add_animal_manure_excretions, \
     get_default_animal_manure_excretions
 from RUFAS.routines.animal.ration.animal_requirements import AnimalRequirements
+from RUFAS.routines.animal.animal_combinations import AnimalCombination
 
 om = OutputManager()
 
@@ -78,8 +78,8 @@ class Pen:
     avg_p_animal : float
         The average phosphorus content/mass of the animals in the pen.
 
-    animals_in_pen : animal list
-        The list of all animals in this pen.
+    animals_in_pen : animal id dictionary
+        A dictionary of all animals in this pen that maps animal id to animal object.
 
     classes_in_pen : set
         The set (no repeats) of all the classes to which the animals in the pen belong.
@@ -155,17 +155,6 @@ class Pen:
         Represents the valid animal type combinations in the pen.
     """
 
-    class AnimalCombination(Enum):
-        """
-        Enumeration that represents the valid combinations of animals in a pen.
-        """
-        CALF = 0  # calves
-        GROWING = 1  # heiferIs, heiferIIs
-        CLOSE_UP = 2  # heiferIIIs, dry cows
-        LAC_COW = 3  # lactating cows
-
-        GROWING_AND_CLOSE_UP = 4  # all heifers and dry cows
-
     def __init__(self, pen_id: int, pen_name: str, vertical_dist_to_milking_parlor: float,
                  horizontal_dist_to_milking_parlor: float, number_of_stalls: int, housing_type: str, bedding_type: str,
                  pen_type: str, manure_handling: str, manure_separator: str, manure_storage: str,
@@ -220,7 +209,7 @@ class Pen:
         self.avg_p_animal = 0.0
 
         # TODO: We should use a dictionary to map animal id to animal object.
-        self.animals_in_pen = []
+        self.animals_in_pen = {}
         # TODO: To be removed. Use the property 'is_populated' instead.
         self.populated = False
 
@@ -356,7 +345,8 @@ class Pen:
             new_animals: List[Calf | Cow | HeiferI | HeiferII | HeiferIII]
                 list of new animals to be added to the pen
         """
-        self.animals_in_pen.extend(new_animals)
+        for animal in new_animals:
+            self.animals_in_pen[animal.id] = animal
 
     def update_pen_populated(self) -> None:
         """
@@ -387,7 +377,7 @@ class Pen:
         Updates the classes contained within the pen
         """
         self.classes_in_pen = set()
-        for animal in self.animals_in_pen:
+        for animal in self.animals_in_pen.values():
             life_cycle_stage = type(animal).__name__
             self.classes_in_pen.add(life_cycle_stage)
 
@@ -423,7 +413,7 @@ class Pen:
             Methane model used for calculations.
         """
 
-        for animal in self.animals_in_pen:
+        for animal in self.animals_in_pen.values():
             if type(animal).__name__ == 'Cow':
                 animal.calc_manure_excretion(feed, methane_model, self.MEdiet)
             else:
@@ -436,7 +426,8 @@ class Pen:
         lactating_total = {}
 
         # obtain keys of manure composition calculations
-        first_animal_manure = self.animals_in_pen[0].manure_excretion
+        animals = list(self.animals_in_pen.values())
+        first_animal_manure = animals[0].manure_excretion
         for key in first_animal_manure.keys():
             manure[key] = 0
             calf_total[key] = 0
@@ -447,7 +438,7 @@ class Pen:
         # find sums of manure components for each animal in the pen for
         # total manure in pen and total manure by animal type
         # TODO: Write an accumulator function
-        for animal in self.animals_in_pen:
+        for animal in animals:
             curr_manure = animal.manure_excretion
             if type(animal) == Calf:  # noqa
                 for key in manure.keys():
@@ -491,7 +482,7 @@ class Pen:
             return
 
         total_growth = 0
-        for animal in self.animals_in_pen:
+        for animal in self.animals_in_pen.values():
             total_growth += animal.daily_growth
         self.avg_growth = total_growth / len(self.animals_in_pen)
 
@@ -501,7 +492,7 @@ class Pen:
         Sets the daily walking distance for the cows in the pen (if any).
         """
         if 'Cow' in self.classes_in_pen:
-            for animal in self.animals_in_pen:
+            for animal in self.animals_in_pen.values():
                 if type(animal).__name__ == 'Cow':
                     animal.calc_daily_walking_dist(self.vertical_dist_to_parlor,
                                                    self.horizontal_dist_to_parlor)
@@ -515,7 +506,7 @@ class Pen:
             DMI = self.ration_nutrient_amount['dm']
 
             total_p_req = 0
-            for animal in self.animals_in_pen:
+            for animal in self.animals_in_pen.values():
                 animal.phosphorus_rqmts(DMI)
                 total_p_req += animal.p_req
             self.avg_p_req = total_p_req / len(self.animals_in_pen)
@@ -588,14 +579,14 @@ class Pen:
 
             else:  # feeds and price
                 animal.ration_formulation[key] = self.ration[key] / \
-                                                 num_animals_before_additions
+                    num_animals_before_additions
 
         # set animal's manure to be the average manure of all other
         # animals in pen
         for key in self.manure.keys():
             if len(self.animals_in_pen) > 0:
                 animal.manure_excretion[key] = self.manure[key] / \
-                                               (len(self.animals_in_pen))
+                    (len(self.animals_in_pen))
 
         # since the manure attribute is a total from all animals in the pen,
         # we need to add the current animal's values to the total values for
@@ -627,7 +618,7 @@ class Pen:
 
         animal.p_intake = self.avg_p_intake
 
-        self.animals_in_pen.append(animal)
+        self.animals_in_pen[animal.id] = animal
 
     def remove_animals_by_ids(self, animal_ids: List[int]) -> None:
         """
@@ -648,8 +639,8 @@ class Pen:
         if not animal_ids:
             return
         animal_ids = set(animal_ids)
-        self.animals_in_pen = [
-            animal for animal in self.animals_in_pen if animal.id not in animal_ids]
+        self.animals_in_pen = {animal_id: animal for animal_id,
+                               animal in self.animals_in_pen.items() if animal_id not in animal_ids}
 
     def clear(self):
         """
@@ -658,7 +649,7 @@ class Pen:
         # All other attributes are kept the same so that if a pen becomes empty
         # and animals are to be added to it, there are previous initial values
         # that are non-zero.
-        self.animals_in_pen = []
+        self.animals_in_pen = {}
         self.populated = False
         self.avg_p_animal = 0
 
@@ -745,9 +736,9 @@ class Pen:
     @staticmethod
     def _update_animal_manure_excretion_data(manure_excretions_output_data: dict[
         str, dict[str, str | AnimalManureExcretions]],
-                                             prefix: str,
-                                             manure: AnimalManureExcretions,
-                                             animal: Calf | HeiferI | HeiferII | HeiferIII | Cow) \
+        prefix: str,
+        manure: AnimalManureExcretions,
+        animal: Calf | HeiferI | HeiferII | HeiferIII | Cow) \
             -> None:
         """
         Update the manure excretion dictionaries and the `self.manure` variable.
@@ -806,7 +797,7 @@ class Pen:
 
         self.manure = get_default_animal_manure_excretions()
 
-        for animal in self.animals_in_pen:
+        for animal in self.animals_in_pen.values():
             prefix, manure = self._calc_animal_manure_excretion(animal, feed, methane_model,
                                                                 methane_mitigation_method,
                                                                 methane_mitigation_additive_amount)
@@ -932,7 +923,7 @@ class Pen:
 
         self._set_animal_nutrient_values(
             animal, animal_grouping_scenario, feed, temp, phosphorus_concentration)
-        self.animals_in_pen.append(animal)
+        self.animals_in_pen[animal.id] = animal
         self.ration = self._calc_new_ration(len(self.animals_in_pen))
 
     def remove_animal(self, animal_id: int) -> None:
@@ -949,7 +940,5 @@ class Pen:
         None
 
         """
-
-        self.animals_in_pen = [
-            animal for animal in self.animals_in_pen if animal.id != animal_id]
+        del self.animals_in_pen[animal_id]
         self.ration = self._calc_new_ration(len(self.animals_in_pen))

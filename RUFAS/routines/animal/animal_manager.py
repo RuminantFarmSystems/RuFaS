@@ -30,6 +30,7 @@ from RUFAS.routines.animal.ration.ration_driver import RationReporter
 from RUFAS.routines.feed.feed import Feed
 from RUFAS.time import Time
 from RUFAS.weather import Weather
+from RUFAS.routines.animal.animal_combinations import AnimalCombination
 
 om = OutputManager()
 
@@ -43,11 +44,11 @@ class AnimalManager:
     """
 
     DEFAULT_NUM_STALLS_BY_COMBINATION = {
-        Pen.AnimalCombination.CALF: AnimalModuleConstants.DEFAULT_NUM_STALLS_FOR_CALF_PEN,
-        Pen.AnimalCombination.GROWING: AnimalModuleConstants.DEFAULT_NUM_STALLS_FOR_GROWING_PEN,
-        Pen.AnimalCombination.CLOSE_UP: AnimalModuleConstants.DEFAULT_NUM_STALLS_FOR_CLOSE_UP_PEN,
-        Pen.AnimalCombination.LAC_COW: AnimalModuleConstants.DEFAULT_NUM_STALLS_FOR_LAC_COW_PEN,
-        Pen.AnimalCombination.GROWING_AND_CLOSE_UP:
+        AnimalCombination.CALF: AnimalModuleConstants.DEFAULT_NUM_STALLS_FOR_CALF_PEN,
+        AnimalCombination.GROWING: AnimalModuleConstants.DEFAULT_NUM_STALLS_FOR_GROWING_PEN,
+        AnimalCombination.CLOSE_UP: AnimalModuleConstants.DEFAULT_NUM_STALLS_FOR_CLOSE_UP_PEN,
+        AnimalCombination.LAC_COW: AnimalModuleConstants.DEFAULT_NUM_STALLS_FOR_LAC_COW_PEN,
+        AnimalCombination.GROWING_AND_CLOSE_UP:
             AnimalModuleConstants.DEFAULT_NUM_STALLS_FOR_GROWING_AND_CLOSE_UP_PEN,
     }
 
@@ -144,11 +145,11 @@ class AnimalManager:
         # dictionary for keeping track of what animal types each pen is holding
         # (value of the dictionaries are lists of pen objects)
         self.pens_by_animal_combination = {
-            Pen.AnimalCombination.CALF: [],
-            Pen.AnimalCombination.GROWING: [],
-            Pen.AnimalCombination.CLOSE_UP: [],
-            Pen.AnimalCombination.GROWING_AND_CLOSE_UP: [],
-            Pen.AnimalCombination.LAC_COW: [],
+            AnimalCombination.CALF: [],
+            AnimalCombination.GROWING: [],
+            AnimalCombination.CLOSE_UP: [],
+            AnimalCombination.GROWING_AND_CLOSE_UP: [],
+            AnimalCombination.LAC_COW: [],
         }
 
         # these variables are the P concentrations of each class of animal. They
@@ -219,7 +220,7 @@ class AnimalManager:
         # Initialize pens from all_pen_data
         for pen_data in all_pen_data:
             pen_data["pen_id"] = pen_data.pop("id")
-            pen_data["animal_combination"] = Pen.AnimalCombination[pen_data.pop("animal_combination")]
+            pen_data["animal_combination"] = AnimalCombination[pen_data.pop("animal_combination")]
 
             manure_management_scenario_id = pen_data.pop("manure_management_scenario_id")
             manure_management_scenario = [
@@ -417,7 +418,7 @@ class AnimalManager:
         """
         for pen in self.all_pens:
             if pen.animal_combination.name == "LAC_COW" or pen.animal_combination.name == "CLOSE_UP":
-                for animal in pen.animals_in_pen:
+                for animal in pen.animals_in_pen.values():
                     animal.milk_production_reduction = 0.0
 
     def fully_update_animal_to_pen_id_map(self) -> None:
@@ -427,8 +428,8 @@ class AnimalManager:
         """
         for pen in self.all_pens:
             animals_in_pen = pen.animals_in_pen
-            for animal in animals_in_pen:
-                self.animal_to_pen_id_map[animal.id] = pen.id
+            for animal_id in animals_in_pen:
+                self.animal_to_pen_id_map[animal_id] = pen.id
 
     def remove_animals_from_herd(self, animals_removed: List[AnimalBase]) -> None:
         """
@@ -522,32 +523,32 @@ class AnimalManager:
             "Calf": {
                 "p_conc": self.p_conc["calf"],
                 "animal_list": self.calves,
-                "animal_group": Pen.AnimalCombination.CALF,
+                "animal_group": AnimalCombination.CALF,
             },
             "HeiferI": {
                 "p_conc": self.p_conc["heiferI"],
                 "animal_list": self.heiferIs,
-                "animal_group": Pen.AnimalCombination.GROWING,
+                "animal_group": AnimalCombination.GROWING,
             },
             "HeiferII": {
                 "p_conc": self.p_conc["heiferII"],
                 "animal_list": self.heiferIIs,
-                "animal_group": Pen.AnimalCombination.GROWING,
+                "animal_group": AnimalCombination.GROWING,
             },
             "HeiferIII": {
                 "p_conc": self.p_conc["heiferIII"],
                 "animal_list": self.heiferIIIs,
-                "animal_group": Pen.AnimalCombination.CLOSE_UP,
+                "animal_group": AnimalCombination.CLOSE_UP,
             },
             "Lac_Cow": {
                 "p_conc": self.p_conc["cow"],
                 "animal_list": self.cows,
-                "animal_group": Pen.AnimalCombination.LAC_COW,
+                "animal_group": AnimalCombination.LAC_COW,
             },
             "Dry_Cow": {
                 "p_conc": self.p_conc["cow"],
                 "animal_list": self.cows,
-                "animal_group": Pen.AnimalCombination.CLOSE_UP,
+                "animal_group": AnimalCombination.CLOSE_UP,
             },
         }
 
@@ -618,7 +619,7 @@ class AnimalManager:
         return list(filter(lambda cow: cow.is_lactating, cows))
 
     @classmethod
-    def _group_pens_by_animal_combination(cls, all_pens: List[Pen]) -> Dict[Pen.AnimalCombination, List[Pen]]:
+    def _group_pens_by_animal_combination(cls, all_pens: List[Pen]) -> Dict[AnimalCombination, List[Pen]]:
         """
         Group a list of pens by animal combination.
 
@@ -629,7 +630,7 @@ class AnimalManager:
 
         Returns
         -------
-        Dict[Pen.AnimalCombination, List[Pen]]
+        Dict[AnimalCombination, List[Pen]]
             Dictionary of pens grouped by animal combination.
 
         """
@@ -700,7 +701,7 @@ class AnimalManager:
 
     @classmethod
     def _create_default_pen(
-            cls, pen_id: int, animal_combination: Pen.AnimalCombination, num_stalls: int, max_stocking_density: float
+            cls, pen_id: int, animal_combination: AnimalCombination, num_stalls: int, max_stocking_density: float
     ) -> Pen:
         """
         Create a default Pen object with the given parameters.
@@ -709,7 +710,7 @@ class AnimalManager:
         ----------
         pen_id : int
             The unique identifier for the pen.
-        animal_combination : Pen.AnimalCombination
+        animal_combination : AnimalCombination
             The animal combination for the pen.
         num_stalls : int
             The number of stalls in the pen.
@@ -724,7 +725,7 @@ class AnimalManager:
         Examples
         --------
         >>> pen = AnimalManager._create_default_pen(pen_id=1, \
-        animal_combination=Pen.AnimalCombination.CALF, num_stalls=10, max_stocking_density=1.5)
+        animal_combination=AnimalCombination.CALF, num_stalls=10, max_stocking_density=1.5)
         >>> pen.id
         1
         >>> pen.animal_combination
@@ -752,7 +753,7 @@ class AnimalManager:
         )
 
     def _create_default_pens_for_potential_space_shortage(
-            self, num_animals: int, pens: List[Pen], animal_combination: Pen.AnimalCombination, start_pen_id=0
+            self, num_animals: int, pens: List[Pen], animal_combination: AnimalCombination, start_pen_id=0
     ) -> List[Pen]:
         """
         Create a list of default pens to accommodate potential animal space shortage.
@@ -763,7 +764,7 @@ class AnimalManager:
             The total number of animals to be accommodated.
         pens : List[Pen]
             A list of Pen objects representing the currently available pens.
-        animal_combination : Pen.AnimalCombination
+        animal_combination : AnimalCombination
             The animal combination for the new default pens.
         start_pen_id : int, optional, default=0
             The starting pen ID for the new default pens. The default value is 0.
@@ -1158,9 +1159,9 @@ class AnimalManager:
                 0 (False) otherwise.
         """
         return (
-                self.simulation_day % self.formulation_interval == 1
-                or self.formulation_interval == 1
-                or self.simulation_day == 0
+            self.simulation_day % self.formulation_interval == 1
+            or self.formulation_interval == 1
+            or self.simulation_day == 0
         )
 
     def get_initial_herd_summary(self) -> InitialHerdSummaryTypedDict:
@@ -1241,7 +1242,7 @@ class AnimalManager:
                 ration_vals = {}
 
                 while 'status' not in ration_per_animal or ration_per_animal['status'].lower() != 'optimal':
-                    if pen.animal_combination == Pen.AnimalCombination.CALF:
+                    if pen.animal_combination == AnimalCombination.CALF:
                         ration_per_animal = CalfRationManager.optimize()
                         ration_vals = {'ME_total': 0}
                     else:
@@ -1260,7 +1261,7 @@ class AnimalManager:
                 ration_report["nutrient_amount"] = nutrient_amount
                 ration_report["nutrient_conc"] = nutrient_conc
 
-                for animal in pen.animals_in_pen:
+                for animal in pen.animals_in_pen.values():
                     animal.set_ration(ration_per_animal, nutrient_amount["dm"])
                     animal.set_p_intake(nutrient_amount["phosphorus"], nutrient_conc["phosphorus"])
 
@@ -1301,7 +1302,7 @@ class AnimalManager:
         """
 
         animal_types_in_pen = set()
-        for animal in pen.animals_in_pen:
+        for animal in pen.animals_in_pen.values():
             animal_type = cls.ANIMAL_GROUPING_SCENARIO.get_animal_type(animal)
             animal_types_in_pen.add(animal_type)
 
@@ -1648,7 +1649,7 @@ class AnimalManager:
                 self.calc_avg_growth()
                 for pen in self.all_pens:
                     if pen.animal_combination.name == "LAC_COW":
-                        for animal in pen.animals_in_pen:
+                        for animal in pen.animals_in_pen.values():
                             animal.update_milk_production_history(self.simulation_day)
 
             self.life_cycle_manager.daily_milk_production = self.sum_daily_milk(self.cows)

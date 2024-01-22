@@ -15,6 +15,7 @@ from RUFAS.routines.animal.life_cycle.heiferII import HeiferII
 from RUFAS.routines.animal.life_cycle.heiferIII import HeiferIII
 from RUFAS.routines.animal.manure.general_manure import AnimalManureExcretions
 from RUFAS.routines.animal.pen import Pen
+from RUFAS.routines.animal.animal_combinations import AnimalCombination
 
 
 @pytest.fixture
@@ -30,7 +31,7 @@ def pen() -> Pen:
     manure_handling = "manual_scraping"
     manure_separator = "sedimentation"
     manure_storage = "storage_pit"
-    animal_combination = Pen.AnimalCombination.CALF
+    animal_combination = AnimalCombination.CALF
     max_stocking_density = 1.2
 
     pen = Pen(id_number, pen_name, vert_dist, horiz_dist, num_stalls, housing_type, bedding_type, pen_type,
@@ -140,13 +141,13 @@ def test_update_stocking_density(pen_to_test: Pen, expected_stocking_density: fl
 
 @pytest.mark.parametrize('animal_combination ',
                          [
-                             Pen.AnimalCombination.CALF,
-                             Pen.AnimalCombination.GROWING,
-                             Pen.AnimalCombination.LAC_COW,
-                             Pen.AnimalCombination.CLOSE_UP,
-                             Pen.AnimalCombination.GROWING_AND_CLOSE_UP,
+                             AnimalCombination.CALF,
+                             AnimalCombination.GROWING,
+                             AnimalCombination.LAC_COW,
+                             AnimalCombination.CLOSE_UP,
+                             AnimalCombination.GROWING_AND_CLOSE_UP,
                          ])
-def test_update_animal_combination(pen: Pen, animal_combination: Pen.AnimalCombination):
+def test_update_animal_combination(pen: Pen, animal_combination: AnimalCombination):
     """Unit test for function update_animal_combination in file routines/animal/pen.py"""
     pen.update_animal_combination(animal_combination)
 
@@ -303,18 +304,18 @@ def test_clear(pen: Pen) -> None:
     assert pen.avg_p_animal == 0
 
 
-def feed_allocations() -> Dict[Pen.AnimalCombination, Set[int]]:
+def feed_allocations() -> Dict[AnimalCombination, Set[int]]:
     calf = {155, 156, 157}
     growing = {2, 51, 86, 136}
     close_up = {2, 26, 86, 118, 136, 139}
     lac_cow = {26, 86, 103, 118, 136, 139}
 
     return {
-        Pen.AnimalCombination.CALF: calf,
-        Pen.AnimalCombination.GROWING: growing,
-        Pen.AnimalCombination.CLOSE_UP: close_up,
-        Pen.AnimalCombination.GROWING_AND_CLOSE_UP: growing | close_up,
-        Pen.AnimalCombination.LAC_COW: lac_cow,
+        AnimalCombination.CALF: calf,
+        AnimalCombination.GROWING: growing,
+        AnimalCombination.CLOSE_UP: close_up,
+        AnimalCombination.GROWING_AND_CLOSE_UP: growing | close_up,
+        AnimalCombination.LAC_COW: lac_cow,
     }
 
 
@@ -325,7 +326,7 @@ def dict_to_tuple_list(d: Dict) -> List[Tuple]:
 @pytest.mark.parametrize('test_animal_combination, expected_feed_allocation',
                          dict_to_tuple_list(feed_allocations()))
 def test_subset_class_feeds(pen: Pen,
-                            test_animal_combination: Pen.AnimalCombination,
+                            test_animal_combination: AnimalCombination,
                             expected_feed_allocation: Set[int]) -> None:
     """Unit test for function subset_class_feeds in file routines/animal/pen.py"""
 
@@ -453,36 +454,36 @@ def test_calc_animal_manure_excretion(mocker: MockerFixture,
     [
         # Existing Prefix
         (
-                {'test_prefix': {'prefix': 'nested_test_prefix', 'manure': 'test_manure'}},
-                'test_prefix', 'default_manure', 'initial_manure', 'animal_manure_excretion',
-                {'test_prefix': {'prefix': 'nested_test_prefix', 'manure': 'test_manure_animal_manure_excretion'}},
-                'initial_manure_animal_manure_excretion'
+            {'test_prefix': {'prefix': 'nested_test_prefix', 'manure': 'test_manure'}},
+            'test_prefix', 'default_manure', 'initial_manure', 'animal_manure_excretion',
+            {'test_prefix': {'prefix': 'nested_test_prefix', 'manure': 'test_manure_animal_manure_excretion'}},
+            'initial_manure_animal_manure_excretion'
         ),
 
         # New Prefix
         (
-                {},
-                'new_prefix', 'default_manure', 'initial_manure', 'animal_manure_excretion',
-                {'new_prefix': {'prefix': 'new_prefix', 'manure': 'default_manure_animal_manure_excretion'}},
-                'initial_manure_animal_manure_excretion'
+            {},
+            'new_prefix', 'default_manure', 'initial_manure', 'animal_manure_excretion',
+            {'new_prefix': {'prefix': 'new_prefix', 'manure': 'default_manure_animal_manure_excretion'}},
+            'initial_manure_animal_manure_excretion'
         ),
 
         # Multiple Existing Prefixes
         (
-                {'prefix1': {'prefix': 'prefix1', 'manure': 'manure1'},
-                 'prefix2': {'prefix': 'prefix2', 'manure': 'manure2'}},
-                'prefix1', 'default_manure', 'initial_manure', 'animal_manure_excretion',
-                {'prefix1': {'prefix': 'prefix1', 'manure': 'manure1_animal_manure_excretion'},
-                 'prefix2': {'prefix': 'prefix2', 'manure': 'manure2'}},
-                'initial_manure_animal_manure_excretion'
+            {'prefix1': {'prefix': 'prefix1', 'manure': 'manure1'},
+             'prefix2': {'prefix': 'prefix2', 'manure': 'manure2'}},
+            'prefix1', 'default_manure', 'initial_manure', 'animal_manure_excretion',
+            {'prefix1': {'prefix': 'prefix1', 'manure': 'manure1_animal_manure_excretion'},
+             'prefix2': {'prefix': 'prefix2', 'manure': 'manure2'}},
+            'initial_manure_animal_manure_excretion'
         ),
 
         # Empty Manure for Specific Prefix
         (
-                {'test_prefix': {'prefix': 'nested_test_prefix', 'manure': ''}},
-                'test_prefix', 'default_manure', 'initial_manure', 'animal_manure_excretion',
-                {'test_prefix': {'prefix': 'nested_test_prefix', 'manure': '_animal_manure_excretion'}},
-                'initial_manure_animal_manure_excretion'
+            {'test_prefix': {'prefix': 'nested_test_prefix', 'manure': ''}},
+            'test_prefix', 'default_manure', 'initial_manure', 'animal_manure_excretion',
+            {'test_prefix': {'prefix': 'nested_test_prefix', 'manure': '_animal_manure_excretion'}},
+            'initial_manure_animal_manure_excretion'
         )
     ]
 )
