@@ -205,10 +205,9 @@ class SlurryStorageOutdoor(BaseManureTreatment):
         """
 
         temperature_celsius = self._get_current_day_average_temperature_celsius()
-        methane_loss = GasEmissionsCalculator.methane_emission_for_slurry_storage(
-            manure_total_solids=accumulated_liquid_manure_total_solids,
-            is_enclosed=False,  # This is what differs from the slurry storage underfloor
-            temperature_celsius=temperature_celsius,
+        methane_loss = GasEmissionsCalculator.methane_emission_from_slurry_storage(
+            total_volatile_solids=accumulated_liquid_manure_total_solids,
+            temp=temperature_celsius,
         )
         new_accumulated_liquid_manure_total_solids = max(
             accumulated_liquid_manure_total_solids - methane_loss, 0.0
