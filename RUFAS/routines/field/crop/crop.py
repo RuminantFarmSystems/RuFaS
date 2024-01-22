@@ -73,7 +73,7 @@ class Crop:
         ----------
         crop_data : Optional[CropData]
             The crop data to be used for simulation. If not provided, default specifications are used.
-        
+
         """
         # Common data object that is updated throughout routines
         self.data = crop_data or CropData()  # defaults if not given
@@ -112,7 +112,7 @@ class Crop:
             Minimum air temperature for the day (°C).
         max_air_temperature : float
             Maximum air temperature for the day (°C).
-         
+
         """
         if self.data.in_growing_season:
             self.heat_units.absorb_heat_units(mean_air_temperature, min_air_temperature, max_air_temperature)

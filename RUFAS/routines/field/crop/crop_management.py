@@ -28,9 +28,9 @@ class CropManagement:
     ----------
     data : CropData
         A reference to `crop_data`, on which crop management operations will be conducted.
-        
+
     """
-    
+
     def __init__(self, crop_data: Optional[CropData] = None):
         """
         Parameters
