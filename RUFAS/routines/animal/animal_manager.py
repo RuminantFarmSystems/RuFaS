@@ -418,7 +418,7 @@ class AnimalManager:
         """
         for pen in self.all_pens:
             if pen.animal_combination.name == "LAC_COW" or pen.animal_combination.name == "CLOSE_UP":
-                for animal in pen.animals_in_pen.values():
+                for animal in list(pen.animals_in_pen.values()):
                     animal.milk_production_reduction = 0.0
 
     def fully_update_animal_to_pen_id_map(self) -> None:
@@ -1261,7 +1261,7 @@ class AnimalManager:
                 ration_report["nutrient_amount"] = nutrient_amount
                 ration_report["nutrient_conc"] = nutrient_conc
 
-                for animal in pen.animals_in_pen.values():
+                for animal in list(pen.animals_in_pen.values()):
                     animal.set_ration(ration_per_animal, nutrient_amount["dm"])
                     animal.set_p_intake(nutrient_amount["phosphorus"], nutrient_conc["phosphorus"])
 
@@ -1302,7 +1302,7 @@ class AnimalManager:
         """
 
         animal_types_in_pen = set()
-        for animal in pen.animals_in_pen.values():
+        for animal in list(pen.animals_in_pen.values()):
             animal_type = cls.ANIMAL_GROUPING_SCENARIO.get_animal_type(animal)
             animal_types_in_pen.add(animal_type)
 
@@ -1649,7 +1649,7 @@ class AnimalManager:
                 self.calc_avg_growth()
                 for pen in self.all_pens:
                     if pen.animal_combination.name == "LAC_COW":
-                        for animal in pen.animals_in_pen.values():
+                        for animal in list(pen.animals_in_pen.values()):
                             animal.update_milk_production_history(self.simulation_day)
 
             self.life_cycle_manager.daily_milk_production = self.sum_daily_milk(self.cows)

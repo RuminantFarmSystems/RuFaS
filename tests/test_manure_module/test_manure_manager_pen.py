@@ -5,6 +5,7 @@ from RUFAS.routines.animal.life_cycle.cow import Cow
 from RUFAS.routines.animal.pen import Pen
 from RUFAS.routines.manure.pen_manure.pen_manure import PenManure
 from RUFAS.routines.manure.pen_manure.manure_manager_pen import ManureManagerPen
+from RUFAS.routines.animal.animal_combinations import AnimalCombination
 
 
 def test_manure_manager_pen_init(mocker: MockerFixture) -> None:
@@ -14,9 +15,12 @@ def test_manure_manager_pen_init(mocker: MockerFixture) -> None:
     mock_pen: Pen = mocker.MagicMock(autospec=Pen)
     mock_pen.id = expected_pen_id = 1
     expected_num_animals = 10
-    mock_pen.animals_in_pen = expected_animals_in_pen = [
+    animals = expected_animals_in_pen = [
         mocker.MagicMock(autospec=Cow) for _ in range(expected_num_animals)
     ]
+    mock_pen.animals_in_pen = {}
+    Pen.add_new_animals(mock_pen, animals)
+    print(len(mock_pen.animals_in_pen))
     mock_pen.classes_in_pen = expected_classes_in_pen = {Cow}
     mock_pen.animal_combination = AnimalCombination.LAC_COW
 
@@ -44,7 +48,7 @@ def test_manure_manager_pen_init(mocker: MockerFixture) -> None:
 
     # Assert
     assert pen.id == expected_pen_id
-    assert pen.animals_in_pen == expected_animals_in_pen
+    assert list(pen.animals_in_pen.values()) == expected_animals_in_pen
     assert pen.num_animals == expected_num_animals
     assert pen.classes_in_pen == expected_classes_in_pen
     assert pen.housing_type == expected_housing_type
@@ -58,7 +62,7 @@ def test_manure_manager_pen_init(mocker: MockerFixture) -> None:
     )
     assert pen.manure == expected_pen_manure
     patch_for_count_lactating_cows.assert_called_once_with(
-        mock_pen.animal_combination, mock_pen.animals_in_pen
+        mock_pen.animal_combination, list(mock_pen.animals_in_pen.values())
     )
     assert pen.num_lactating_cows == expected_num_animals
 

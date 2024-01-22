@@ -309,20 +309,21 @@ def test_set_requirements(mocker: MockerFixture):
 
 def test_recalculate_requirements() -> None:
     pen_mock = MagicMock()
-    pen_mock.animals_in_pen = [MagicMock(), MagicMock(), MagicMock(), MagicMock(), MagicMock()]
+    pen_mock.animals_in_pen = {0: MagicMock(), 1: MagicMock(), 2: MagicMock(), 3: MagicMock(), 4: MagicMock()}
+    animal_list = list(pen_mock.animals_in_pen.values())
     for i in range(0, 5):
-        pen_mock.animals_in_pen[i].NEmaint_requirement = i
-        pen_mock.animals_in_pen[i].NEg_requirement = i
-        pen_mock.animals_in_pen[i].NEpreg_requirement = i
-        pen_mock.animals_in_pen[i].NEl_requirement = i
-        pen_mock.animals_in_pen[i].MP_requirement = i
-        pen_mock.animals_in_pen[i].Ca_requirement = i
-        pen_mock.animals_in_pen[i].P_requirement = i
-        pen_mock.animals_in_pen[i].DMIest_requirement = i
-        pen_mock.animals_in_pen[i].body_weight = i
-        pen_mock.animals_in_pen[i].estimated_daily_milk_produced = i
-        pen_mock.animals_in_pen[i].milk_production_reduction = i
-        pen_mock.animals_in_pen[i].CP_milk = i
+        animal_list[i].NEmaint_requirement = i
+        animal_list[i].NEg_requirement = i
+        animal_list[i].NEpreg_requirement = i
+        animal_list[i].NEl_requirement = i
+        animal_list[i].MP_requirement = i
+        animal_list[i].Ca_requirement = i
+        animal_list[i].P_requirement = i
+        animal_list[i].DMIest_requirement = i
+        animal_list[i].body_weight = i
+        animal_list[i].estimated_daily_milk_produced = i
+        animal_list[i].milk_production_reduction = i
+        animal_list[i].CP_milk = i
         pen_mock.animals_in_list[i].calc_daily_walking_dist = MagicMock()
 
     animal_grouping_scenario_mock = MagicMock()
@@ -390,26 +391,27 @@ def test_recalculate_requirements() -> None:
     # Assertions
     requirements_mock.energy_activity_rqmts.assert_called_once()
     assert requirements_list_expected == requirements_lists_actual
-    assert pen_mock.animals_in_pen[-1].DNED_requirement == 2
-    assert pen_mock.animals_in_pen[-1].DMDP_requirement == 1
+    assert animal_list[-1].DNED_requirement == 2
+    assert animal_list[-1].DMDP_requirement == 1
 
 
 def test_use_existing_requirements() -> None:
     pen_mock = MagicMock()
-    pen_mock.animals_in_pen = [MagicMock(), MagicMock()]
+    pen_mock.animals_in_pen = {0: MagicMock(), 1: MagicMock()}
+    animal_list = list(pen_mock.animals_in_pen.values())
     for i in range(0, 2):
-        pen_mock.animals_in_pen[i].NEmaint_requirement = i
-        pen_mock.animals_in_pen[i].NEg_requirement = i
-        pen_mock.animals_in_pen[i].NEpreg_requirement = i
-        pen_mock.animals_in_pen[i].NEl_requirement = i
-        pen_mock.animals_in_pen[i].MP_requirement = i
-        pen_mock.animals_in_pen[i].Ca_requirement = i
-        pen_mock.animals_in_pen[i].P_requirement = i
-        pen_mock.animals_in_pen[i].DMIest_requirement = i
-        pen_mock.animals_in_pen[i].body_weight = i
-        pen_mock.animals_in_pen[i].estimated_daily_milk_produced = i
-        pen_mock.animals_in_pen[i].milk_production_reduction = i
-        pen_mock.animals_in_pen[i].CP_milk = i
+        animal_list[i].NEmaint_requirement = i
+        animal_list[i].NEg_requirement = i
+        animal_list[i].NEpreg_requirement = i
+        animal_list[i].NEl_requirement = i
+        animal_list[i].MP_requirement = i
+        animal_list[i].Ca_requirement = i
+        animal_list[i].P_requirement = i
+        animal_list[i].DMIest_requirement = i
+        animal_list[i].body_weight = i
+        animal_list[i].estimated_daily_milk_produced = i
+        animal_list[i].milk_production_reduction = i
+        animal_list[i].CP_milk = i
         pen_mock.animals_in_list[i].calc_daily_walking_dist = MagicMock()
 
     animal_grouping_scenario_mock = MagicMock()
@@ -2442,10 +2444,11 @@ def test_formulate_ration() -> None:
 def test_calc_milk_average() -> None:
     """Unit test for function calc_milk_average in file routines/animal/ration/ration_driver.py"""
     mockpen = MagicMock()
-    mockpen.animals_in_pen = [MagicMock(), MagicMock(), MagicMock(), MagicMock(), MagicMock()]
+    mockpen.animals_in_pen = {0: MagicMock(), 1: MagicMock(), 2: MagicMock(), 3: MagicMock(), 4: MagicMock()}
     production = [1, 2, 3, 4, 5]
     for i in range(len(production)):
-        mockpen.animals_in_pen[i].estimated_daily_milk_produced = production[i]
+        animal_list = list(mockpen.animals_in_pen.values())
+        animal_list[i].estimated_daily_milk_produced = production[i]
     result = RationManager.calc_milk_average(mockpen)
     assert result == sum(production) / len(production)
 
@@ -2453,15 +2456,16 @@ def test_calc_milk_average() -> None:
 def test_reduce_milk_production() -> None:
     """Unit test for function reduce_milk_production in file routines/animal/ration/ration_driver.py"""
     mockpen = MagicMock()
-    mockpen.animals_in_pen = [MagicMock(), MagicMock(), MagicMock(), MagicMock(), MagicMock()]
+    mockpen.animals_in_pen = {0: MagicMock(), 1: MagicMock(), 2: MagicMock(), 3: MagicMock(), 4: MagicMock()}
     production = [1, 2, 3, 4, 5]
     reduced_predicted = [1, 2, 2, 3, 4]
     # assign production to mocked animals
     for i in range(len(production)):
-        mockpen.animals_in_pen[i].estimated_daily_milk_produced = production[i]
+        animal_list = list(mockpen.animals_in_pen.values())
+        animal_list[i].estimated_daily_milk_produced = production[i]
     # assert all were reduced, but not reaching below 1.0 kg/day
     RationManager.reduce_milk_production(mockpen, 1.0)
-    for i, animal in enumerate(mockpen.animals_in_pen):
+    for i, animal in enumerate(animal_list):
         assert reduced_predicted[i] == animal.estimated_daily_milk_produced
 
 

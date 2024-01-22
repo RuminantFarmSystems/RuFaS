@@ -67,7 +67,7 @@ class AnimalModuleReporter:
             "function": "milking_update",
         }
 
-        for animal in pen.animals_in_pen.values():
+        for animal in list(pen.animals_in_pen.values()):
             milk_data_update = {}
             milk_data_update["days_in_milk"] = animal.days_in_milk
             milk_data_update[

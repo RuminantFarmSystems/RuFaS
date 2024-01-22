@@ -377,7 +377,7 @@ class Pen:
         Updates the classes contained within the pen
         """
         self.classes_in_pen = set()
-        for animal in self.animals_in_pen.values():
+        for animal in list(self.animals_in_pen.values()):
             life_cycle_stage = type(animal).__name__
             self.classes_in_pen.add(life_cycle_stage)
 
@@ -413,7 +413,7 @@ class Pen:
             Methane model used for calculations.
         """
 
-        for animal in self.animals_in_pen.values():
+        for animal in list(self.animals_in_pen.values()):
             if type(animal).__name__ == 'Cow':
                 animal.calc_manure_excretion(feed, methane_model, self.MEdiet)
             else:
@@ -482,7 +482,7 @@ class Pen:
             return
 
         total_growth = 0
-        for animal in self.animals_in_pen.values():
+        for animal in list(self.animals_in_pen.values()):
             total_growth += animal.daily_growth
         self.avg_growth = total_growth / len(self.animals_in_pen)
 
@@ -492,7 +492,7 @@ class Pen:
         Sets the daily walking distance for the cows in the pen (if any).
         """
         if 'Cow' in self.classes_in_pen:
-            for animal in self.animals_in_pen.values():
+            for animal in list(self.animals_in_pen.values()):
                 if type(animal).__name__ == 'Cow':
                     animal.calc_daily_walking_dist(self.vertical_dist_to_parlor,
                                                    self.horizontal_dist_to_parlor)
@@ -506,7 +506,7 @@ class Pen:
             DMI = self.ration_nutrient_amount['dm']
 
             total_p_req = 0
-            for animal in self.animals_in_pen.values():
+            for animal in list(self.animals_in_pen.values()):
                 animal.phosphorus_rqmts(DMI)
                 total_p_req += animal.p_req
             self.avg_p_req = total_p_req / len(self.animals_in_pen)
@@ -797,7 +797,7 @@ class Pen:
 
         self.manure = get_default_animal_manure_excretions()
 
-        for animal in self.animals_in_pen.values():
+        for animal in list(self.animals_in_pen.values()):
             prefix, manure = self._calc_animal_manure_excretion(animal, feed, methane_model,
                                                                 methane_mitigation_method,
                                                                 methane_mitigation_additive_amount)
