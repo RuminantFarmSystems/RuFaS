@@ -1113,7 +1113,6 @@ class Cow(HeiferIII):
             self._repro_state_manager.enter(ReproStateEnum.IN_OVSYNCH)
             self._log_repro_states(sim_day)
 
-
     def _decrease_conception_rate_by_parity(self, calves: int, conception_rate: float) -> float:
         """
         Adjust conception rate based on the parity of the cow.
