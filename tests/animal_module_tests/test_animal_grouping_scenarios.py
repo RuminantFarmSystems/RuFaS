@@ -9,6 +9,7 @@ from RUFAS.routines.animal.life_cycle.calf import Calf
 from RUFAS.routines.animal.life_cycle.heiferI import HeiferI
 from RUFAS.routines.animal.life_cycle.heiferII import HeiferII
 from RUFAS.routines.animal.life_cycle.heiferIII import HeiferIII
+from RUFAS.routines.animal.animal_combinations import AnimalCombination
 
 
 def test_constructor() -> None:

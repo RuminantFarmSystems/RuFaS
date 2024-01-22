@@ -1,11 +1,11 @@
 from . import nitrogen_loss, carbon_loss, protein_degradation
 from .feed_typed_dicts import PurchasedFeedTypedDict
-from ..animal.pen import Pen
 from RUFAS.output_manager import OutputManager
 from typing import Dict, List, Union, Any
 from RUFAS.input_manager import InputManager
 from RUFAS.routines.animal.ration.user_defined_ration import \
     UserDefinedRationManager as UserDefinedRationManager
+from RUFAS.routines.animal.animal_combinations import AnimalCombination
 
 im = InputManager()
 om = OutputManager()
