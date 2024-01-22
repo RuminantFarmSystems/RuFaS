@@ -35,7 +35,6 @@ output/graphics/*
 !output/output_filters/
 output/output_filters/*
 !output/output_filters/report_example.json
-!output/output_filters/csv_manure_emissions.txt
 
 # ignore project files
 *.sublime-project
