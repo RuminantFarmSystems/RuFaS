@@ -286,9 +286,9 @@ class CropData:
         Maximum transpiration on a given day (mm).
     evapotranspiration_weighting_coefficient : float, default 1
         Plant evapotranspiration curve number coefficient (unitless), in the range 0.5 to 2.0 inclusive.
-    canopy_water : float, default 0 mm
+    canopy_water : float, default 0
         Amount of water currently held in the canopy (mm).
-    max_canopy_water_capacity : float, default 0.8 mm
+    max_canopy_water_capacity : float, default 0.8
         Maximum amount of water that can be trapped in the canopy on a given day when fully developed (mm).
     water_distro_parameter : float, default 10
         Water-use distribution parameter governing water-uptake from the soil (unitless).
