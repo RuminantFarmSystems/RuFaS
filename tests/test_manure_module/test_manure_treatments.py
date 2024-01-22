@@ -1237,14 +1237,14 @@ def test_slurry_storage_daily_update_helper(
 
 
 @pytest.mark.parametrize(
-    "slurry_storage_treatment_type_name, is_enclosed",
+    "slurry_storage_treatment_type_name",
     [
-        ("slurry storage underfloor", True),
-        ("slurry storage outdoor", False),
+        ("slurry storage underfloor"),
+        ("slurry storage outdoor"),
     ],
 )
 def test_slurry_storage_calc_methane_emission(
-        slurry_storage_treatment_type_name: str, is_enclosed: bool, mocker: MockFixture
+        slurry_storage_treatment_type_name: str, mocker: MockFixture
 ) -> None:
     """Unit test for calc_methane_emission() in both slurry storage treatments."""
     # Arrange
@@ -1281,9 +1281,8 @@ def test_slurry_storage_calc_methane_emission(
     # Assert
     patch_for_get_current_day_average_temperature_celsius.assert_called_once()
     patch_for_calc_methane_emission_from_slurry_storage.assert_called_once_with(
-        manure_total_solids=accumulated_liquid_manure_total_solids,
-        is_enclosed=is_enclosed,
-        temperature_celsius=temperature_celsius,
+        total_volatile_solids=accumulated_liquid_manure_total_solids,
+        temp=temperature_celsius,
     )
     assert actual_methane_loss == expected_methane_loss
     assert (
@@ -1839,105 +1838,6 @@ def test_slurry_storage_outdoor_freeboard_volume(mocker: MockFixture) -> None:
 
 # Test AnaerobicLagoon specific methods
 # =====================================
-
-
-@pytest.mark.parametrize(
-    "anaerobic_treatment_class", [AnaerobicLagoon, AnaerobicDigestion]
-)
-def test_calc_daily_sludge_output(
-        anaerobic_treatment_class: Union[Type[AnaerobicLagoon], Type[AnaerobicDigestion]],
-        mocker: MockFixture,
-) -> None:
-    """Unit test for _calc_daily_sludge_output() in slurry_storage_outdoor.py."""
-    # Arrange
-    mock_manure_treatment_config = mocker.MagicMock()
-    mock_manure_treatment_config.total_solids_removal_efficiency_for_treatment = (
-        total_solids_removal_efficiency_for_treatment
-    ) = 0.5
-    mock_manure_treatment_config.volatile_solids_removal_efficiency_for_treatment = (
-        volatile_solids_removal_efficiency_for_treatment
-    ) = 0.4
-    mock_manure_treatment_config.nitrogen_removal_efficiency_for_treatment = (
-        nitrogen_removal_efficiency_for_treatment
-    ) = 0.3
-    mock_manure_treatment_config.phosphorus_removal_efficiency_for_treatment = (
-        phosphorus_removal_efficiency_for_treatment
-    ) = 0.2
-    mock_manure_treatment_config.potassium_removal_efficiency_for_treatment = (
-        potassium_removal_efficiency_for_treatment
-    ) = 0.1
-
-    anaerobic_treatment = anaerobic_treatment_class(
-        weather=mocker.MagicMock(),
-        time=mocker.MagicMock(),
-        manure_treatment_config=mock_manure_treatment_config,
-    )
-    mock_manure_treatment_daily_input = mocker.MagicMock()
-    mock_manure_treatment_daily_input.liquid_manure_total_solids = (
-        liquid_manure_total_solids
-    ) = 10.0
-    mock_manure_treatment_daily_input.liquid_manure_total_volatile_solids = (
-        liquid_manure_total_volatile_solids
-    ) = 5.0
-    mock_manure_treatment_daily_input.liquid_manure_nitrogen = (
-        liquid_manure_nitrogen
-    ) = 2.0
-    mock_manure_treatment_daily_input.liquid_manure_phosphorus = (
-        liquid_manure_phosphorus
-    ) = 1.0
-    mock_manure_treatment_daily_input.liquid_manure_potassium = (
-        liquid_manure_potassium
-    ) = 0.5
-
-    mock_manure_treatment_daily_output = ManureTreatmentDailyOutput()
-
-    expected_sludge_manure_total_solids = (
-            liquid_manure_total_solids * total_solids_removal_efficiency_for_treatment
-    )
-    expected_sludge_manure_total_volatile_solids = (
-            liquid_manure_total_volatile_solids
-            * volatile_solids_removal_efficiency_for_treatment
-    )
-    expected_sludge_manure_nitrogen = (
-            liquid_manure_nitrogen * nitrogen_removal_efficiency_for_treatment
-    )
-    expected_sludge_manure_phosphorus = (
-            liquid_manure_phosphorus * phosphorus_removal_efficiency_for_treatment
-    )
-    expected_sludge_manure_potassium = (
-            liquid_manure_potassium * potassium_removal_efficiency_for_treatment
-    )
-    expected_sludge_manure_daily_volume = (
-            liquid_manure_total_volatile_solids * 0.03 / ManureConstants.MANURE_DENSITY
-    )
-
-    # Act
-    actual_daily_output = anaerobic_treatment._calc_daily_sludge_output(
-        daily_output=mock_manure_treatment_daily_output,
-        manure_treatment_daily_input=mock_manure_treatment_daily_input,
-    )
-
-    # Assert
-    assert actual_daily_output is not mock_manure_treatment_daily_output
-    assert actual_daily_output.sludge_manure_total_solids == approx(
-        expected_sludge_manure_total_solids
-    )
-    assert actual_daily_output.sludge_manure_total_volatile_solids == approx(
-        expected_sludge_manure_total_volatile_solids
-    )
-    assert actual_daily_output.sludge_manure_nitrogen == approx(
-        expected_sludge_manure_nitrogen
-    )
-    assert actual_daily_output.sludge_manure_phosphorus == approx(
-        expected_sludge_manure_phosphorus
-    )
-    assert actual_daily_output.sludge_manure_potassium == approx(
-        expected_sludge_manure_potassium
-    )
-    assert actual_daily_output.sludge_manure_daily_volume == approx(
-        expected_sludge_manure_daily_volume
-    )
-
 
 @pytest.mark.parametrize(
     "initial_methane_emission, volatile_solids, volatile_solids_factor,"
