@@ -91,9 +91,6 @@ class Snow:
         ----------
         Equation 1:2.5.2 in SWAT 2009 Theoretical Documentation.
         """
-        info_map = {"class": Snow.__class__.__name__,
-                    "function": Snow._melt_snow.__name__,
-                    }
 
         melt_factor = Snow._melt_factor(soil_data=soil_data, day=day)
         snow_coverage_fraction = soil_data.snow_coverage_fraction
@@ -105,10 +102,6 @@ class Snow:
                                                                    snow_melt_base_temperature)
 
         if snow_melt_amount > soil_data.snow_content:
-            om.add_warning("Snow melt amount is more than snow cover content", f"Current Snow Cover Content: "
-                                                                               f"{soil_data.snow_content}, Calculated "
-                                                                               f"Snow Melt Amount: {snow_melt_amount}",
-                           info_map)
             return soil_data.snow_content
         else:
             return max(snow_melt_amount, 0.0)
