@@ -72,8 +72,8 @@ class Crop:
         Parameters
         ----------
         crop_data : Optional[CropData]
-            The crop data to be used for simulation. If not provided,
-            default specifications are used.
+            The crop data to be used for simulation. If not provided, default specifications are used.
+        
         """
         # Common data object that is updated throughout routines
         self.data = crop_data or CropData()  # defaults if not given
