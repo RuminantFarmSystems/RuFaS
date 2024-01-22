@@ -32,6 +32,7 @@ class CropManagement:
     """
     
     def __init__(self, crop_data: Optional[CropData] = None):
+        """
         Parameters
         ----------
         crop_data: CropData
