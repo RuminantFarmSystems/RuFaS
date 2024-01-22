@@ -62,7 +62,7 @@ class Crop:
     The `Crop` class is designed to be a central part of a crop growth simulation,
     integrating data and methods from various subcomponents to simulate the entire
     lifecycle of a crop.
-    
+
     """
 
     def __init__(self, crop_data: Optional[CropData] = None):
