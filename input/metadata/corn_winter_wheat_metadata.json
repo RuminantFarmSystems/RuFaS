@@ -3,7 +3,7 @@
     "config": {
       "title": "Config Data",
       "description": "Configuration Information",
-      "path": "input/data/config/con_corn_config.json",
+      "path": "input/data/config/corn_cover_crop_config.json",
       "type": "json",
       "properties": "config_properties"
     },
@@ -31,7 +31,7 @@
     "crop": {
       "title": "Crop data",
       "description": "Continuous corn for 25 years.",
-      "path": "input/data/crop/continuous_corn_25_year.json",
+      "path": "input/data/crop/corn_winter_wheat.json",
       "type": "json",
       "properties": "crop_schedule_properties"
     },
@@ -94,7 +94,7 @@
     "manure_schedule": {
       "title": "Manure schedule.",
       "description": "Crappier than having 7:45 am classes Monday - Friday.",
-      "path": "input/data/manure_schedule/no_manure.json",
+      "path": "input/data/manure_schedule/corn_cover_crop_manure.json",
       "type": "json",
       "properties": "manure_schedule_properties"
     },
