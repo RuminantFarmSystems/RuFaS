@@ -1056,8 +1056,13 @@ def test__get_lactating_cows():
     assert AnimalManager._get_lactating_cows(mock_cow_list) == mock_cow_list[1:]
 
 
-def test_allocate_all_pens():
-    """Unit test for function allocate_all_pens in file routines/animal/animal_manager.py"""
+def test__group_pens_by_animal_combination():
+    """Unit test for function _group_pens_by_animal_combination in file routines/animal/animal_manager.py"""
+    pass
+
+
+def test__calc_max_animal_spaces_per_pen():
+    """Unit test for function _calc_max_animal_spaces_per_pen in file routines/animal/animal_manager.py"""
     pass
 
 
