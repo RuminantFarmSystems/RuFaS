@@ -4,7 +4,6 @@ from RUFAS.routines.animal.life_cycle.cow import Cow
 from RUFAS.routines.animal.animal_types import AnimalType
 
 from RUFAS.routines.animal.animal_grouping_scenarios import AnimalGroupingScenario
-from RUFAS.routines.animal.pen import Pen
 from RUFAS.routines.animal.life_cycle.calf import Calf
 from RUFAS.routines.animal.life_cycle.heiferI import HeiferI
 from RUFAS.routines.animal.life_cycle.heiferII import HeiferII
