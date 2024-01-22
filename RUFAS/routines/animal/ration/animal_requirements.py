@@ -444,9 +444,9 @@ class AnimalRequirements:
         average_daily_gain_heifer: float, optional
             Average daily gain of a heifer
         NDF_conc:
-            Concentration (percent value) of a heifer's Neutral Detergent Fiber
+            Concentration (percent value) of Neutral Detergent Fiber in previously fed ration.
         TDN_conc:
-            Concentration (percent value) of a heifer's Total Digestible Nutrients
+            Concentration (percent value) of Total Digestible Nutrients in previously fed ration.
         net_energy_diet_concentration : float
             Metabolizable energy density of formulated ration
         days_born : float
@@ -1139,7 +1139,7 @@ class AnimalRequirements:
         dry_matter_intake_estimate : float
             Estimated dry matter intake according to empirical prediction equation within NASEM (2021) (kg/d)
         TDN_conc:
-            Concentration (percent value) of a heifer's Total Digestible Nutrients
+            Concentration (percent value) of Total Digestible Nutrients in previously fed ration.
 
         Returns
         -------
@@ -1257,7 +1257,7 @@ class AnimalRequirements:
         milk_production: float
             Milk yield (kg/d)
         NDF_conc:
-            Concentration (percent value) of a heifer's Neutral Detergent Fiber
+            Concentration (percent value) of Neutral Detergent Fiber in previously fed ration.
 
 
         Returns
@@ -1708,7 +1708,7 @@ class AnimalRequirements:
         body_condition_score_5 : int
             Body condition score (score; scale from 1 to 5)
         NDF_conc:
-            Concentration (percent value) of a heifer's Neutral Detergent Fiber
+            Concentration (percent value) of Neutral Detergent Fiber in previously fed ration.
 
         Returns
         -------
