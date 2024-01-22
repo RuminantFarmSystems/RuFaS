@@ -1,7 +1,7 @@
 import math
 import numpy as np
 
-from typing import Dict, List, Optional
+from typing import Dict, List
 
 from RUFAS.routines.animal.animal_types import AnimalType
 from RUFAS.general_constants import GeneralConstants
@@ -127,6 +127,8 @@ class AnimalRequirements:
             List of milk crude protein content of the animals in the pen (%)
         milk_production_reduction: List[float]
             list of milk_production_reduction values for all animals in the pen (kg)
+        calc_method: str
+            The summary statistic to be used (e.g. mean, median, etc)
         """
         if calc_method == "mean":
             # populating the class variables as an average across cows for each requirement
@@ -384,21 +386,21 @@ class AnimalRequirements:
         mature_body_weight: float,
         day_of_pregnancy: int,
         animal_type: AnimalType,
-        parity: Optional[int] = 0,
-        calving_interval: Optional[int] = None,
-        milk_true_protein: Optional[float] = 0.0,
-        milk_fat: Optional[float] = 0.0,
-        milk_lactose: Optional[float] = 0.0,
-        milk_production: Optional[float] = 0.0,
-        days_in_milk: Optional[int] = None,
-        lactating: Optional[bool] = False,
-        body_condition_score_5: Optional[int] = 3,
-        previous_temperature: Optional[float] = None,
-        average_daily_gain_heifer: Optional[float] = None,
-        NDF_conc: Optional[float] = 0.3,
-        TDN_conc: Optional[float] = 0.7,
-        net_energy_diet_concentration: Optional[float] = 1.0,
-        days_born: Optional[float] = None
+        parity: int | None = 0,
+        calving_interval: int | None = None,
+        milk_true_protein: float | None = 0.0,
+        milk_fat: float | None = 0.0,
+        milk_lactose: float | None = 0.0,
+        milk_production: float | None = 0.0,
+        days_in_milk: int | None = None,
+        lactating: bool | None = False,
+        body_condition_score_5: int | None = 3,
+        previous_temperature: float | None = None,
+        average_daily_gain_heifer: float | None = None,
+        NDF_conc: float | None = 0.3,
+        TDN_conc: float | None = 0.7,
+        net_energy_diet_concentration: float | None = 1.0,
+        days_born: float | None = None
     ) -> Dict[str, float]:
         """
         Calculates the dietary requirements of a single animal.
@@ -443,6 +445,15 @@ class AnimalRequirements:
             Average daily temperature of last month, °C
         average_daily_gain_heifer: float, optional
             Average daily gain of a heifer
+        NDF_conc:
+            Concentration (percent value) of Neutral Detergent Fiber in previously fed ration.
+        TDN_conc:
+            Concentration (percent value) of Total Digestible Nutrients in previously fed ration.
+        net_energy_diet_concentration : float
+            Metabolizable energy density of formulated ration
+        days_born : float
+            number of days since birth
+
         Returns
         -------
         Dict[str, float]
@@ -602,9 +613,9 @@ class AnimalRequirements:
         self,
         body_weight: float,
         mature_body_weight: float,
-        day_of_pregnancy: Optional[int],
+        day_of_pregnancy: int | None,
         body_condition_score_5: int,
-        previous_temperature: Optional[float],
+        previous_temperature: float | None,
         animal_type: AnimalType,
     ) -> tuple[float, float, float]:
         """Calculates energy requirement for maintenance, conceptus weight, and calf birth weight
@@ -663,8 +674,8 @@ class AnimalRequirements:
         self,
         body_weight: float,
         mature_body_weight: float,
-        day_of_pregnancy: Optional[int],
-        days_in_milk: Optional[int],
+        day_of_pregnancy: int | None,
+        days_in_milk: int | None,
     ) -> tuple[float, float, float]:
         """Calculates energy requirement for maintenance and two measures of uterine weight
 
@@ -730,12 +741,12 @@ class AnimalRequirements:
         conceptus_weight: float,
         animal_type: AnimalType,
         parity: int,
-        calving_interval: Optional[int],
-        average_daily_gain_heifer: Optional[float],
+        calving_interval: int | None,
+        average_daily_gain_heifer: float | None,
     ) -> tuple[float, float, float]:
         """Calculates energy requirement for growth and associated weight gain parameters.
 
-        The estimated energy requirements requirements for growth in megacalories per day,
+        The estimated energy requirements for growth in megacalories per day,
         and average daily gain and estimate of shrunk body weight, in kilograms are calculated according to NRC (2001).
 
         Parameters
@@ -815,10 +826,10 @@ class AnimalRequirements:
         self,
         body_weight: float,
         mature_body_weight: float,
-        average_daily_gain_heifer: Optional[float],
+        average_daily_gain_heifer: float | None,
         animal_type: AnimalType,
         parity: int,
-        calving_interval: Optional[int],
+        calving_interval: int | None,
     ) -> tuple[float, float, float]:
         """Calculates energy requirement for growth, and also growth metrics
 
@@ -886,7 +897,7 @@ class AnimalRequirements:
         return net_energy_growth, average_daily_gain, frame_weight_gain
 
     def calculate_NRC_energy_pregnancy_requirements(
-        self, day_of_pregnancy: Optional[int], calf_birth_weight: float
+        self, day_of_pregnancy: int | None, calf_birth_weight: float
     ) -> float:
         """Calculates energy requirement for pregnancy according to NRC (2001).
 
@@ -933,8 +944,8 @@ class AnimalRequirements:
     def calculate_NASEM_energy_pregnancy_requirements(
         self,
         lactating: bool,
-        day_of_pregnancy: Optional[int],
-        days_in_milk: Optional[int],
+        day_of_pregnancy: int | None,
+        days_in_milk: int | None,
         gravid_uterine_weight: float,
         uterine_weight: float,
     ) -> tuple[float, float]:
@@ -1090,7 +1101,7 @@ class AnimalRequirements:
         self,
         body_weight: float,
         conceptus_weight: float,
-        day_of_pregnancy: Optional[int],
+        day_of_pregnancy: int | None,
         animal_type: AnimalType,
         milk_production: float,
         milk_true_protein: float,
@@ -1099,7 +1110,7 @@ class AnimalRequirements:
         average_daily_gain: float,
         equivalent_shrunk_body_weight: float,
         dry_matter_intake_estimate: float,
-        TDN_conc: Optional[float] = 0.7,
+        TDN_conc: float | None = 0.7,
     ) -> float:
         """Protein requirement for maintenance according to NRC (2001).
 
@@ -1109,8 +1120,6 @@ class AnimalRequirements:
         ----------
         body_weight : float
             Body weight (kilograms)
-        mature_body_weight : float
-            Mature body weight (kilograms)
         conceptus_weight : float
             Conceptus weight (kilograms)
         day_of_pregnancy : int
@@ -1129,6 +1138,10 @@ class AnimalRequirements:
             Average daily gain (grams per day)
         equivalent_shrunk_body_weight : float
             Equivalent shrunk body weight (kilograms)
+        dry_matter_intake_estimate : float
+            Estimated dry matter intake according to empirical prediction equation within NASEM (2021) (kg/d)
+        TDN_conc:
+            Concentration (percent value) of Total Digestible Nutrients in previously fed ration.
 
         Returns
         -------
@@ -1245,6 +1258,9 @@ class AnimalRequirements:
             True protein contents in milk (%)
         milk_production: float
             Milk yield (kg/d)
+        NDF_conc:
+            Concentration (percent value) of Neutral Detergent Fiber in previously fed ration.
+
 
         Returns
         -------
@@ -1298,7 +1314,7 @@ class AnimalRequirements:
         self,
         body_weight: float,
         mature_body_weight: float,
-        day_of_pregnancy: Optional[int],
+        day_of_pregnancy: int | None,
         animal_type: AnimalType,
         average_daily_gain: float,
         milk_production,
@@ -1380,7 +1396,7 @@ class AnimalRequirements:
         self,
         body_weight: float,
         mature_body_weight: float,
-        day_of_pregnancy: Optional[int],
+        day_of_pregnancy: int | None,
         average_daily_gain: float,
         dry_matter_intake_estimate: float,
         milk_true_protein: float,
@@ -1407,6 +1423,8 @@ class AnimalRequirements:
             True protein contents in milk (%)
         milk_production : float
             Milk yield (kg/d)
+        parity : int
+            Parity number (lactation 1, 2.. n)
 
         Returns
         -------
@@ -1444,7 +1462,7 @@ class AnimalRequirements:
         self,
         body_weight: float,
         mature_body_weight: float,
-        day_of_pregnancy: Optional[int],
+        day_of_pregnancy: int | None,
         milk_production: float,
         animal_type: AnimalType,
         average_daily_gain: float,
@@ -1507,7 +1525,7 @@ class AnimalRequirements:
         body_weight: float,
         mature_body_weight: float,
         animal_type: AnimalType,
-        day_of_pregnancy: Optional[int],
+        day_of_pregnancy: int | None,
         average_daily_gain: float,
         dry_matter_intake_estimate: float,
         milk_true_protein: float,
@@ -1536,6 +1554,8 @@ class AnimalRequirements:
             True protein contents in milk (%)
         milk_production: float
             Milk yield (kg/d)
+        parity : int
+            Parity number (lactation 1, 2.. n)
 
         Returns
         -------
@@ -1581,7 +1601,7 @@ class AnimalRequirements:
         animal_type: AnimalType,
         body_weight: float,
         day_of_pregnancy: int,
-        days_in_milk: Optional[int],
+        days_in_milk: int | None,
         milk_production: float,
         milk_fat: float,
         net_energy_diet_concentration: float,
@@ -1601,8 +1621,6 @@ class AnimalRequirements:
             Day of pregnancy (days)
         days_in_milk : int
             Days in milk (days)
-        lactating : bool
-            Physiological condition (conditional)
         milk_production : float
             Milk yield (kg/d)
         milk_fat : float
@@ -1664,7 +1682,7 @@ class AnimalRequirements:
         self,
         body_weight: float,
         mature_body_weight: float,
-        days_in_milk: Optional[int],
+        days_in_milk: int | None,
         lactating: bool,
         net_energy_lactation: float,
         parity: int,
@@ -1691,6 +1709,8 @@ class AnimalRequirements:
             Parity number
         body_condition_score_5 : int
             Body condition score (score; scale from 1 to 5)
+        NDF_conc:
+            Concentration (percent value) of Neutral Detergent Fiber in previously fed ration.
 
         Returns
         -------
@@ -1740,7 +1760,7 @@ class AnimalRequirements:
             AnimalModuleConstants.MINIMUM_DMI,
         )
 
-    def energy_activity_rqmts(self, body_weight: float, housing: str, distance: Optional[float]) -> float:
+    def energy_activity_rqmts(self, body_weight: float, housing: str, distance: float | None) -> float:
         """
         Calculates the net energy for activity requirement portion of the energy
         requirements for animals. This is separate because it must be calculated after
