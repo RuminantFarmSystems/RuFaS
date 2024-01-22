@@ -109,7 +109,7 @@ class RationManager:
         float
             Average running milk
         """
-        total_milk_in_pen = sum(animal.estimated_daily_milk_produced for animal in pen.animals_in_pen.values())
+        total_milk_in_pen = sum(animal.estimated_daily_milk_produced for animal in list(pen.animals_in_pen.values()))
         starting_milk_average = total_milk_in_pen / len(pen.animals_in_pen)
         return starting_milk_average
 
@@ -129,7 +129,7 @@ class RationManager:
 
         """
         running_total_milk = 0.0
-        for animal in pen.animals_in_pen.values():
+        for animal in list(pen.animals_in_pen.values()):
             if animal.estimated_daily_milk_produced - reduction > 1.0:
                 animal.estimated_daily_milk_produced -= reduction
                 animal.milk_production_reduction -= reduction

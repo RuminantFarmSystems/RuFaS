@@ -45,7 +45,7 @@ class ManureManagerPen:
 
         """
         self.id: int = pen.id
-        self.animals_in_pen: dict[int, AnimalBase] = pen.animals_in_pen
+        self.animals_in_pen = pen.animals_in_pen
         self.num_animals = len(pen.animals_in_pen)
         self.classes_in_pen: Set[str] = pen.classes_in_pen
 
@@ -59,19 +59,19 @@ class ManureManagerPen:
 
         self.manure = PenManure.get_instance(pen.manure, self.num_animals)
         self.num_lactating_cows = self.count_lactating_cows(
-            pen.animal_combination, pen.animals_in_pen
+            pen.animal_combination, list(pen.animals_in_pen.values())
         )
 
     @classmethod
     def count_lactating_cows(
-        cls, animal_combination: AnimalCombination, animals_in_pen: dict[int, AnimalBase]
+        cls, animal_combination: AnimalCombination, animals_in_pen: [AnimalBase]
     ) -> int:
         """Counts the number of lactating cows in the pen.
 
         Args:
             animal_combination: An AnimalCombination enum that describes the current
                 animal makeup in this pen.
-            animals_in_pen: A dictionary of animal ids as the key and animal objects as the value in this pen.
+            animals_in_pen: A list of animal objects in this pen.
 
         Returns:
             The number of lactating cows in the pen.
@@ -79,7 +79,7 @@ class ManureManagerPen:
         """
         num_lac_cows = 0
         if animal_combination is AnimalCombination.LAC_COW:
-            for animal in animals_in_pen.values():
+            for animal in animals_in_pen:
                 if type(animal) is Cow:
                     num_lac_cows += 1
         return num_lac_cows

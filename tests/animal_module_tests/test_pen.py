@@ -65,7 +65,9 @@ def mock_animal_list_combined(mock_animal_list, mock_animal_list_ii) -> List[Mag
 
 @pytest.fixture
 def pen_with_animals(pen: Pen, mock_animal_list: List[MagicMock]) -> Pen:
-    pen.animals_in_pen = mock_animal_list
+    for animal in mock_animal_list:
+        pen.animals_in_pen[animal.id] = animal
+    # pen.animals_in_pen = mock_animal_list
 
     return pen
 
@@ -111,8 +113,8 @@ def test_add_new_animals(pen_to_test: Pen, mock_animal_list,
     """Unit test for function add_new_animals in file routines/animal/pen.py"""
 
     pen_to_test.add_new_animals(new_animals)
-
-    assert pen_to_test.animals_in_pen == expected_animals_in_pen
+    pen_values = list(pen_to_test.animals_in_pen.values())
+    assert pen_values == expected_animals_in_pen
 
 
 @pytest.mark.parametrize('pen_to_test, expected_pen_populated',
@@ -262,7 +264,9 @@ def avg_calf_daily_growth_values(calf_daily_growth_values: List[float]) -> float
                          ])
 def test_calc_avg_growth(pen: Pen, pen_animals, pen_populated, expected) -> None:
     """Unit test for function calc_avg_growth in file routines/animal/pen.py"""
-    pen.animals_in_pen = pen_animals
+    for animal in pen_animals:
+        pen.animals_in_pen[animal.id] = animal
+    # pen.animals_in_pen = pen_animals
     pen.populated = pen_populated
     pen.calc_avg_growth()
 
@@ -292,14 +296,14 @@ def test_set_up_new_animal():
 
 def test_clear(pen: Pen) -> None:
     """Unit test for function clear in file routines/animal/pen.py"""
-    calves = [MagicMock()]
+    calves = {0: MagicMock()}
     pen.animals_in_pen = calves
     pen.populated = True
     pen.avg_p_animal = 1.0
 
     pen.clear()
 
-    assert pen.animals_in_pen == []
+    assert pen.animals_in_pen == {}
     assert pen.populated is False
     assert pen.avg_p_animal == 0
 
@@ -528,39 +532,46 @@ def test_update_animal_manure_excretion_data(mocker: MockerFixture,
         )
 
 
+def many_animals() -> dict[int, MagicMock]:
+    animals = {}
+    for i in range(1000):
+        animals[i] = MagicMock(spec=Calf)
+    return animals
+
+
 @pytest.mark.parametrize(
     'is_populated, animals_in_pen, mock_pen_manure',
     [
         # Testing with two distinct animal types and two manure properties
-        (True, [MagicMock(spec=Calf), MagicMock(spec=HeiferI)], {'property1': 'value1', 'property2': 'value2'}),
+        (True, {0: MagicMock(spec=Calf), 1: MagicMock(spec=HeiferI)}, {'property1': 'value1', 'property2': 'value2'}),
 
         # Testing with three distinct animal types (Calf, HeiferI, and Cow) and a single manure property
-        (True, [MagicMock(spec=Calf), MagicMock(spec=HeiferI), MagicMock(spec=Cow)], {'property3': 'value3'}),
+        (True, {0: MagicMock(spec=Calf), 1: MagicMock(spec=HeiferI), 2: MagicMock(spec=Cow)}, {'property3': 'value3'}),
 
         # Testing with an empty pen and no manure properties
-        (False, [], {}),
+        (False, {}, {}),
 
         # Testing with an empty pen but with one manure property
-        (False, [], {'property4': 'value4'}),
+        (False, {}, {'property4': 'value4'}),
 
         # Testing with empty manure dictionary but populated pen
-        (True, [MagicMock(spec=Calf)], {}),
+        (True, {0: MagicMock(spec=Calf)}, {}),
 
         # Testing with a single animal type in pen
-        (True, [MagicMock(spec=Calf)], {'property1': 'value1'}),
+        (True, {0: MagicMock(spec=Calf)}, {'property1': 'value1'}),
 
         # Testing with mixed animal types in the pen
-        (True, [MagicMock(spec=Calf), MagicMock(spec=HeiferI), MagicMock(spec=Cow)],
+        (True, {0: MagicMock(spec=Calf), 1: MagicMock(spec=HeiferI), 2: MagicMock(spec=Cow)},
          {'property1': 'value1', 'property2': 'value2'}),
 
         # Testing with multiple similar animals in the pen
-        (True, [MagicMock(spec=Calf), MagicMock(spec=Calf)], {'property1': 'value1'}),
+        (True, {0: MagicMock(spec=Calf), 1: MagicMock(spec=Calf)}, {'property1': 'value1'}),
 
         # Testing with null or None values within manure properties
-        (True, [MagicMock(spec=Calf)], {'property1': None}),
+        (True, {0: MagicMock(spec=Calf)}, {'property1': None}),
 
         # Testing with a large number of animals
-        (True, [MagicMock(spec=Calf)] * 1000, {'property1': 'value1'})
+        (True, many_animals(), {'property1': 'value1'})
     ]
 )
 def test_calc_total_manure(mocker: MockerFixture, is_populated: bool,
@@ -581,7 +592,7 @@ def test_calc_total_manure(mocker: MockerFixture, is_populated: bool,
     pen.id = 'mock_pen_id'
     pen.manure = mock_pen_manure
     type(pen).is_populated = mocker.PropertyMock(return_value=is_populated)
-    for animal in animals_in_pen:
+    for animal in list(animals_in_pen.values()):
         animal.manure_excretion = MagicMock(spec=AnimalManureExcretions)
     pen.animals_in_pen = animals_in_pen
     feed = MagicMock(spec='Feed')
@@ -610,7 +621,7 @@ def test_calc_total_manure(mocker: MockerFixture, is_populated: bool,
 
     if is_populated:
         patch_for_get_default_animal_manure_excretions.assert_called_once()
-        for animal in animals_in_pen:
+        for animal in list(animals_in_pen.values()):
             patch_for_calc_animal_manure_excretion.assert_has_calls([
                 mocker.call(animal, feed, methane_model, methane_mitigation_method, methane_mitigation_additive_amount)
             ])

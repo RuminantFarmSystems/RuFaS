@@ -124,8 +124,8 @@ def test_report_milk(mocker: MockerFixture):
     }
     simulation_day = test_milk_data_update["simulation_day"]
     pen = mocker.MagicMock()
-    pen.animals_in_pen = [mocker.MagicMock(), mocker.MagicMock(), mocker.MagicMock()]
-    for idx, animal in enumerate(pen.animals_in_pen):
+    pen.animals_in_pen = {0: mocker.MagicMock(), 1: mocker.MagicMock(), 2: mocker.MagicMock()}
+    for idx, animal in enumerate(list(pen.animals_in_pen.values())):
         animal.days_in_milk = test_milk_data_update["days_in_milk"]
         animal.estimated_daily_milk_produced = test_milk_data_update["estimated_daily_milk_produced"]
         animal.mPrt = test_milk_data_update["milk_protein"]
@@ -212,11 +212,11 @@ def test_report_daily_ration(animal_manager_fixture, mocker: MockerFixture):
     }
     pen1 = mocker.MagicMock()
     pen1.id = "1"
-    pen1.animals_in_pen = [mocker.MagicMock()]
+    pen1.animals_in_pen = {0: mocker.MagicMock()}
     pen1.animal_combination.name = "combo1"
     pen2 = mocker.MagicMock()
     pen2.id = "2"
-    pen2.animals_in_pen = [mocker.MagicMock(), mocker.MagicMock()]
+    pen2.animals_in_pen = {0: mocker.MagicMock(), 1: mocker.MagicMock()}
     pen2.animal_combination.name = "combo2"
     animal_manager_fixture.all_pens = [pen1, pen2]
     for pen in animal_manager_fixture.all_pens:

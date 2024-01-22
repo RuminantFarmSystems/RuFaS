@@ -1011,7 +1011,7 @@ def test_reset_milk_production_reduction(pens_with_mock_animals) -> None:
 
     # Set milk_production_reduction to some value
     for pen in pens_with_mock_animals:
-        for animal in pen.animals_in_pen.values():
+        for animal in list(pen.animals_in_pen.values()):
             animal.milk_production_reduction = 100.1
 
     # mock an animal_manager object, but specifically so it returns a list of pens
@@ -1019,7 +1019,7 @@ def test_reset_milk_production_reduction(pens_with_mock_animals) -> None:
     penlist.all_pens = pens_with_mock_animals
     for pen in penlist.all_pens:
         pen.animal_combination.name = "NOT_LAC_COW"
-        for animal in pen.animals_in_pen.values():
+        for animal in list(pen.animals_in_pen.values()):
             assert animal.milk_production_reduction == 100.1
 
     # call the function once on the list of pens
@@ -1027,7 +1027,7 @@ def test_reset_milk_production_reduction(pens_with_mock_animals) -> None:
 
     # then assert that all animals in all pens are still 100.1
     for pen in penlist.all_pens:
-        for animal in pen.animals_in_pen.values():
+        for animal in list(pen.animals_in_pen.values()):
             assert animal.milk_production_reduction == 100.1
 
     # now set that they are LAC_COW
@@ -1039,7 +1039,7 @@ def test_reset_milk_production_reduction(pens_with_mock_animals) -> None:
 
     # then assert that all animals in all pens are now 0.0
     for pen in penlist.all_pens:
-        for animal in pen.animals_in_pen.values():
+        for animal in list(pen.animals_in_pen.values()):
             assert animal.milk_production_reduction == 0.0
 
 
@@ -1649,7 +1649,7 @@ def test_daily_updates(is_end_ration_interval: bool, mocker: MockerFixture) -> N
         patch_for_calc_ration_at_interval.assert_called_once_with(mock_feed)
         patch_for_calc_avg_growth.assert_called_once()
         for mock_pen in mock_all_pens:
-            for mock_animal in mock_pen.animals_in_pen.values():
+            for mock_animal in list(mock_pen.animals_in_pen.values()):
                 mock_animal.update_milk_production_history.assert_called_once_with(
                     mock_animal_manager.simulation_day)
 
