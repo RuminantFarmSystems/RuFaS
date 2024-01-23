@@ -69,6 +69,17 @@ class BaseBedding(ABC):
     bedding_type : str
         Type of bedding as a string.
 
+    Methods
+    -------
+    calc_total_bedding_washed(num_animals: int) -> float
+        Calculates total amount of bedding washed away.
+    calc_total_bedding_mass(num_animals: int) -> float
+        Calculates total amount of bedding needed.
+    calc_total_bedding_volume(num_animals: int) -> float
+        Calculates total volume of bedding needed.
+    calc_total_bedding_dry_solids(num_animals: int) -> float
+        Calculates total dry solids in the bedding.
+
     """
 
     def __init__(self, bedding_config: BeddingConfig) -> None:
@@ -288,16 +299,16 @@ class NoBedding(BaseBedding):
     """
 
     def calc_total_bedding_washed(self, num_animals: int) -> float:
-        return 0.0 * num_animals
+        return 0.0
 
     def calc_total_bedding_mass(self, num_animals: int) -> float:
-        return 0.0 * num_animals
+        return 0.0
 
     def calc_total_bedding_volume(self, num_animals: int) -> float:
-        return 0.0 * num_animals
+        return 0.0
 
     def calc_total_bedding_dry_solids(self, num_animals: int) -> float:
-        return 0.0 * num_animals
+        return 0.0
 
 
 @dataclass
