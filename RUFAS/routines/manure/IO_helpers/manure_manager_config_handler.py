@@ -51,6 +51,8 @@ class ManureManagerConfigHandler:
             manure_manager_config["manure_treatment_configs"]
         )
 
+    # TODO: For the following getters, pass in an enum member instead of a string
+
     def get_custom_bedding_config(
         self, bedding_type_name: str
     ) -> Optional[BeddingConfig]:
