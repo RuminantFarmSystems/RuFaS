@@ -149,7 +149,7 @@ class FieldDataReporter:
 
             # ----------------------------adding layer data
             for index, layer in enumerate(field.soil.data.soil_layers):
-                info_map["suffix"] = "field='" + field.field_data.name + "',layer_index='" + str(index) + "'"
+                info_map["suffix"] = "field='" + field.field_data.name + "',layer='" + str(index) + "'"
 
                 om.add_variable("temperature", layer.temperature, info_map)
                 om.add_variable("percolated_water", layer.percolated_water, info_map)
@@ -337,7 +337,7 @@ class FieldDataReporter:
 
             # ----------------------------adding layer data
             for index, layer in enumerate(field.soil.data.soil_layers):
-                info_map["suffix"] = "field='" + field.field_data.name + "',layer_index='" + str(index) + "'"
+                info_map["suffix"] = "field='" + field.field_data.name + "',layer='" + str(index) + "'"
 
                 om.add_variable("annual_nitrous_oxide_emissions_total", layer.annual_nitrous_oxide_emissions_total,
                                 info_map)
