@@ -517,7 +517,7 @@ class Pen:
         """
         if len(self.animals_in_pen) > 0:
             total_p_animal = 0
-            for animal in self.animals_in_pen:
+            for animal in list(self.animals_in_pen.values()):
                 animal.daily_p_update()
                 total_p_animal += animal.p_animal
             # TODO: Add warning if total_p_animal < 0
