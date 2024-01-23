@@ -21,6 +21,28 @@ class GrowthConstraints:
     ----------
     data : CropData
         A reference to the `crop_data` object on which the growth constraint operations are conducted.
+
+    Methods
+    -------
+    constrain_growth(max_transpiration: float, temperature: float) -> None
+        Constrain a plant's growth by updating stress and growth factor values based on maximum transpiration
+        and current air temperature.
+
+    _determine_growth_factor(water_stress: float, temperature_stress: float, nitrogen_stress: float,
+                             phosphorus_stress: float) -> float
+        Calculate the plant growth factor based on various stress parameters.
+
+    _determine_water_stress(water_uptake: float, max_transpiration: float) -> float
+        Calculate water stress for a given day based on water uptake and maximum transpiration.
+
+    _determine_temperature_stress(air_temp: float, min_temp: float, optimal_temp: float) -> float
+        Calculate temperature stress for a given day based on air temperature, minimum growth temperature,
+        and optimal growth temperature.
+
+    _determine_nutrient_stress(stored: float, optimal: float) -> float
+        Calculate plant nutrient stress for the day based on the amount of nutrient stored and the optimal nutrient
+        amount.
+
     """
 
     def __init__(self, crop_data: Optional[CropData] = None):
