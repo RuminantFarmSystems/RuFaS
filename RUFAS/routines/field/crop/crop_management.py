@@ -104,6 +104,8 @@ class CropManagement:
         """
         Sets the crop's harvest index based on various conditions.
 
+        Notes
+        -----
         If a custom harvest index is provided by the user (harvest index override), that value is used. Otherwise,
         the harvest index is calculated based on the crop's accumulated heat fraction and the crop-specific optimal
         harvest index. The method also adjusts the harvest index based on the crop's water deficiency.
