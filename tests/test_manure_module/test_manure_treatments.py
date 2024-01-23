@@ -2029,10 +2029,6 @@ def test_anaerobic_lagoon_daily_update_helper(mocker: MockFixture) -> None:
         mock_daily_output, "set_daily_final_manure_volume"
     )
 
-    patch_for_calc_daily_sludge_output = mocker.patch.object(
-        anaerobic_lagoon, "_calc_daily_sludge_output", return_value=mock_daily_output
-    )
-
     patch_for_adjust_accumulated_output = mocker.patch.object(
         anaerobic_lagoon, "_adjust_accumulated_output", return_value=mock_daily_output
     )
@@ -2065,9 +2061,6 @@ def test_anaerobic_lagoon_daily_update_helper(mocker: MockFixture) -> None:
     )
     patch_for_set_daily_final_manure_volume.assert_called_once_with(
         adjusted_final_manure_volume
-    )
-    patch_for_calc_daily_sludge_output.assert_called_once_with(
-        mock_daily_output, anaerobic_lagoon._current_manure_treatment_daily_input
     )
     patch_for_adjust_accumulated_output.assert_called_once_with(mock_daily_output)
     patch_for_update_methane_emission.assert_called_once_with(mock_daily_output)
@@ -2766,12 +2759,6 @@ def test_daily_update_helper(mocker: MockFixture) -> None:
         "_initialize_daily_output_during_update",
         return_value=initial_daily_output,
     )
-    daily_output_with_sludge_output = mocker.MagicMock()
-    patch_for_calc_daily_sludge_output = mocker.patch.object(
-        anaerobic_digestion,
-        "_calc_daily_sludge_output",
-        return_value=daily_output_with_sludge_output,
-    )
     complete_daily_output = mocker.MagicMock()
     patch_for_calc_anaerobic_digestion_daily_output = mocker.patch.object(
         anaerobic_digestion,
@@ -2789,11 +2776,8 @@ def test_daily_update_helper(mocker: MockFixture) -> None:
     patch_for_initialize_daily_output_during_update.assert_called_once_with(
         current_manure_treatment_daily_input
     )
-    patch_for_calc_daily_sludge_output.assert_called_once_with(
-        initial_daily_output, current_manure_treatment_daily_input
-    )
     patch_for_calc_anaerobic_digestion_daily_output.assert_called_once_with(
-        daily_output_with_sludge_output
+        initial_daily_output
     )
     patch_for_accumulate_daily_output.assert_called_once_with(complete_daily_output)
     assert actual_daily_output == complete_daily_output
@@ -3363,7 +3347,7 @@ def test_compost_bedded_pack_barn_daily_update_helper(mocker: MockFixture) -> No
     daily_input_mock.liquid_manure_daily_volume = 4
     daily_input_mock.liquid_manure_potassium = 5
     daily_input_mock.liquid_manure_phosphorus = 6
-
+    mock_accumulated_output: ManureTreatmentDailyOutput = mocker.MagicMock()
     mocker.patch("RUFAS.routines.manure.manure_treatments.compost_bedded_pack_barn"
                  ".CompostBeddedPackBarn.__init__",
                  return_value=None)
@@ -3401,6 +3385,7 @@ def test_compost_bedded_pack_barn_daily_update_helper(mocker: MockFixture) -> No
     compost_bedded_pack_barn = CompostBeddedPackBarn(weather_mock, time_mock, manure_treatment_config_mock)
     compost_bedded_pack_barn._current_manure_treatment_daily_input = daily_input_mock
     compost_bedded_pack_barn._manure_handler_daily_output = mocker.MagicMock()
+    compost_bedded_pack_barn._accumulated_output = mock_accumulated_output
     config_mock = mocker.MagicMock()
     config_mock.potassium_removal_efficiency_for_treatment = 0.5
     config_mock.phosphorus_removal_efficiency_for_treatment = 0.5

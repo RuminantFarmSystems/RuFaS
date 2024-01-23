@@ -69,10 +69,6 @@ class AnaerobicDigestionAndLagoon(BaseManureTreatment):
             the anaerobic digestion and lagoon model.
 
         """
-        daily_input = self._current_manure_treatment_daily_input
-        daily_output = self._initialize_daily_output_during_update(daily_input)
-        self._accumulate_daily_output(daily_output)
-
         self.anaerobic_digestion_daily_output = (
             self._create_anaerobic_digestion_daily_output()
         )
