@@ -1,3 +1,4 @@
+import re
 import pytest
 from pytest import approx, raises
 
@@ -202,6 +203,26 @@ def test_convert_list_of_dicts_to_dict_of_lists_empty_keys():
     expected_result = {"a": [1], "b": [2, 4], "": [3]}
     result = Utility.convert_list_of_dicts_to_dict_of_lists(input_data)
     assert result == expected_result
+
+
+def test_get_timestamp() -> None:
+    """Unit test for the function get_timestamp in file util.py"""
+
+    # Arrange
+    timestamp_with_millis_pattern = (
+        r"\d{2}-[A-Za-z]{3}-\d{4}_[A-Za-z]{3}_\d{2}-\d{2}-\d{2}\.\d{6}"
+    )
+    timestamp_without_millis_pattern = (
+        r"\d{2}-[A-Za-z]{3}-\d{4}_[A-Za-z]{3}_\d{2}-\d{2}-\d{2}"
+    )
+
+    # Act & Assert
+    assert re.match(
+        timestamp_with_millis_pattern, Utility.get_timestamp(include_millis=True)
+    )
+    assert re.match(
+        timestamp_without_millis_pattern, Utility.get_timestamp(include_millis=False)
+    )
 
 
 @pytest.mark.parametrize("data_pool, filter_patterns, filter_by_exclusion, expected_result", [
