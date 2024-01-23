@@ -39,7 +39,7 @@ class Composting(BaseManureTreatment):
         manure_volatile_solids = daily_input.liquid_manure_total_volatile_solids
         manure_total_solids = daily_input.liquid_manure_total_solids
 
-        methane_emission = self._calculate_methane_emission(volatile_solid=manure_volatile_solids)
+        methane_emission = self.calc_methane_emission(volatile_solid=manure_volatile_solids)
         carbon_decomposition = self._calculate_carbon_decomposition(total_solid=manure_total_solids)
 
         daily_dry_matter_loss = self._calculate_dry_matter_loss(methane_emission=methane_emission,
@@ -89,13 +89,42 @@ class Composting(BaseManureTreatment):
                                                              info_maps=info_maps)
 
     def calc_methane_emission(self, *args, **kwargs) -> float:
+        """
+        This function calculates the solid manure methane emission of the current day.
+
+        Returns
+        -------
+        float
+            The solid manure methane emission of the current day, kg/day.
+        """
         manure_volatile_solids = self._current_manure_treatment_daily_input.liquid_manure_total_volatile_solids
-        return self._calculate_methane_emission(manure_volatile_solids)
+        maximum_methane_producing_capacity = self.config.maximum_methane_producing_capacity
+        methane_conversion_factor = self._calculate_methane_conversion_factor()
+        return (manure_volatile_solids * 365) * (maximum_methane_producing_capacity * 0.67 * methane_conversion_factor)
 
     def calc_ammonia_emission(self, *args, **kwargs) -> float:
-        return self._calculate_Nitrogen_loss_to_ammonia_emission()
+        """
+        This function calculates the total Nitrogen loss to ammonia emission of the current year.
+
+        Returns
+        -------
+        float
+            The total Nitrogen loss to methane emission of the current year, kg.
+        """
+        N_prior_t = self._current_manure_treatment_daily_input.liquid_manure_nitrogen
+        fraction_Nitrogen_lost_as_ammonia = FRACTION_NITROGEN_LOST_TO_AMMONIA_EMISSION[self.composting_type]
+
+        return fraction_Nitrogen_lost_as_ammonia * N_prior_t
 
     def _calculate_methane_conversion_factor(self) -> float:
+        """
+        This function returns the methane conversion factor depending on the composting type and the temperature.
+
+        Returns
+        -------
+        float
+            The methane conversion factor, unitless.
+        """
         if self.config.composting_type == CompostingType.STATIC_PILE:
             return 0.005
         else:
@@ -107,12 +136,15 @@ class Composting(BaseManureTreatment):
             else:
                 return 0.015
 
-    def _calculate_methane_emission(self, volatile_solid: float) -> float:
-        maximum_methane_producing_capacity = self.config.maximum_methane_producing_capacity
-        methane_conversion_factor = self._calculate_methane_conversion_factor()
-        return (volatile_solid * 365) * (maximum_methane_producing_capacity * 0.67 * methane_conversion_factor)
-
     def _calculate_max_microbial_decomposition_rate(self) -> float:
+        """
+        This function calculates the max microbial decomposition rate of the current day.
+
+        Returns
+        -------
+        float
+            The max microbial decomposition rate of the current day, per day.
+        """
         effectiveness_of_microbial_decomposition_rate = self.config.effectiveness_of_microbial_decomposition_rate
         decomposition_temperature = self.config.decomposition_temperature
 
@@ -120,6 +152,14 @@ class Composting(BaseManureTreatment):
                                                                 (decomposition_temperature - 50))
 
     def _calculate_slow_microbial_decomposition_rate(self) -> float:
+        """
+        This function calculates the slow microbial decomposition rate of the current day.
+
+        Returns
+        -------
+        float
+            The slow microbial decomposition rate of the current day, per day.
+        """
         effectiveness_of_microbial_decomposition_rate = self.config.effectiveness_of_microbial_decomposition_rate
         compost_pile_pack_temperature = self._get_current_day_average_temperature_celsius()
 
@@ -127,6 +167,14 @@ class Composting(BaseManureTreatment):
                                                                 (compost_pile_pack_temperature - 50))
 
     def _calculate_carbon_decomposition_rate(self) -> float:
+        """
+        This function calculates the Carbon decomposition rate of the current day.
+
+        Returns
+        -------
+        float
+            The Carbon decomposition rate of the current day, per day.
+        """
         max_microbial_decomposition_rate = self._calculate_max_microbial_decomposition_rate()
         slow_microbial_decomposition_rate = self._calculate_slow_microbial_decomposition_rate()
 
@@ -138,6 +186,14 @@ class Composting(BaseManureTreatment):
                (math.e ** (decay * (last_turning_or_addition - lag))) * slow_microbial_decomposition_rate
 
     def _calculate_anaerobic_coefficient(self) -> float:
+        """
+        This function calculates the Anaerobic coefficient.
+
+        Returns
+        -------
+        float
+            The Anaerobic coefficient, unitless.
+        """
         o2 = self.config.mole_fraction_of_oxygen
         o2_half_saturation = self.config.half_saturation_constant
         o2_ambient = self.config.ambient_air_mole_fraction_of_oxygen
@@ -146,7 +202,12 @@ class Composting(BaseManureTreatment):
 
     def _calculate_carbon_decomposition(self, total_solid: float) -> float:
         """
-        Calculate total carbon decomposition in kg/day
+        This function calculates the total carbon decomposition of the current day.
+
+        Returns
+        -------
+        float
+            The total carbon decomposition of the current day, kg/day.
         """
         c_manure = self.config.proportion_of_carbon_available_in_manure
         c_bedding = self.config.proportion_of_carbon_available_in_bedding
@@ -162,36 +223,71 @@ class Composting(BaseManureTreatment):
 
     @staticmethod
     def _calculate_dry_matter_loss(methane_emission: float, carbon_decomposition: float) -> float:
+        """
+        This function calculates the total dry matter loss of the current day.
+
+        Returns
+        -------
+        float
+            The total carbon decomposition of the current day, kg/day.
+        """
         return 2 * carbon_decomposition + methane_emission
 
-    def _calculate_Nitrogen_loss_to_ammonia_emission(self) -> float:
-        N_prior_t = self._current_manure_treatment_daily_input.liquid_manure_nitrogen
-        fraction_Nitrogen_lost_as_ammonia = FRACTION_NITROGEN_LOST_TO_AMMONIA_EMISSION[self.composting_type]
-
-        return fraction_Nitrogen_lost_as_ammonia * N_prior_t
-
     def _calculate_Nitrogen_loss_to_leaching(self) -> float:
+        """
+        This function calculates the amount of Nitrogen leached out of the manure-bedding pile of the current year.
+
+        Returns
+        -------
+        float
+            The total Nitrogen loss to Leaching of the current year, kg.
+        """
         N_prior_t = self._current_manure_treatment_daily_input.liquid_manure_nitrogen
         fraction_Nitrogen_lost_as_ammonia = FRACTION_NITROGEN_LOST_TO_LEACHING[self.composting_type]
 
         return fraction_Nitrogen_lost_as_ammonia * N_prior_t
 
     def _calculate_Nitrogen_loss_to_direct_Nitrous_Oxide_Emission(self) -> float:
+        """
+        This function calculates the amount of Nitrogen loss through direct Nitrous Oxide Emission of the current year.
+
+        Returns
+        -------
+        float
+            The total Nitrogen loss through direct Nitrous Oxide Emission of the current year, kg.
+        """
         N_prior_t = self._current_manure_treatment_daily_input.liquid_manure_nitrogen
         fraction_Nitrogen_lost_as_ammonia = FRACTION_NITROGEN_LOST_TO_DIRECT_N2O_EMISSION[self.composting_type]
 
         return fraction_Nitrogen_lost_as_ammonia * N_prior_t * 44 / 28
 
     def _calculate_Nitrogen_loss_to_indirect_Nitrous_Oxide_Emission(self) -> float:
+        """
+        This function calculates the amount of Nitrogen loss through indirect Nitrous Oxide Emission of the current
+        year.
+
+        Returns
+        -------
+        float
+            The total Nitrogen loss through indirect Nitrous Oxide Emission of the current year, kg.
+        """
         Nitrogen_loss_to_leaching = self._calculate_Nitrogen_loss_to_leaching()
-        Nitrogen_loss_to_ammonia_emission = self._calculate_Nitrogen_loss_to_ammonia_emission()
+        Nitrogen_loss_to_ammonia_emission = self.calc_ammonia_emission()
 
         return (Nitrogen_loss_to_leaching +
                 Nitrogen_loss_to_ammonia_emission) * ManureConstants.COMPOSTING_N2O_INDIRECT_EMISSION_FACTOR * 44 / 28
 
     def _calculate_total_Nitrogen_mass(self) -> float:
+        """
+        This function calculates the total mass of Nitrogen in the manure-bedding mix of the current year.
+
+        Returns
+        -------
+        float
+            The total mass of Nitrogen in the manure-bedding mix of the current year, kg.
+        """
         N_prior_t = self._current_manure_treatment_daily_input.liquid_manure_nitrogen
-        Nitrogen_loss_to_ammonia_emission = self._calculate_Nitrogen_loss_to_ammonia_emission()
+        Nitrogen_loss_to_ammonia_emission = self.calc_ammonia_emission()
         Nitrogen_loss_to_leaching = self._calculate_Nitrogen_loss_to_leaching()
         Nitrogen_loss_to_direct_N2O_emission = self._calculate_Nitrogen_loss_to_direct_Nitrous_Oxide_Emission()
         Nitrogen_loss_to_indirect_N2O_emission = self._calculate_Nitrogen_loss_to_indirect_Nitrous_Oxide_Emission()
@@ -201,16 +297,40 @@ class Composting(BaseManureTreatment):
             Nitrogen_loss_to_direct_N2O_emission - Nitrogen_loss_to_indirect_N2O_emission
 
     def _calculate_organic_Nitrogen_mass(self) -> float:
+        """
+        This function calculates the mass of organic Nitrogen in the manure-bedding mix of the current year.
+
+        Returns
+        -------
+        float
+            The mass of organic Nitrogen in the manure-bedding mix of the current year, kg.
+        """
         total_Nitrogen_mass = self._calculate_total_Nitrogen_mass()
 
         return total_Nitrogen_mass * 0.952
 
     def _calculate_inorganic_Nitrogen_mass(self) -> float:
+        """
+        This function calculates the mass of inorganic Nitrogen in the manure-bedding mix of the current year.
+
+        Returns
+        -------
+        float
+            The mass of inorganic Nitrogen in the manure-bedding mix of the current year, kg.
+        """
         total_Nitrogen_mass = self._calculate_total_Nitrogen_mass()
 
         return total_Nitrogen_mass * 0.048
 
     def _calculate_ammonium_mass(self) -> float:
+        """
+        This function calculates the mass of ammonium in the manure-bedding mix of the current year.
+
+        Returns
+        -------
+        float
+            The mass of ammonium in the manure-bedding mix of the current year, kg.
+        """
         inorganic_Nitrogen_mass = self._calculate_inorganic_Nitrogen_mass()
 
         return inorganic_Nitrogen_mass * 0.5

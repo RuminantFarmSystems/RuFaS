@@ -33,10 +33,10 @@ class ManureTreatmentAnnualOutput(LiquidManurePortionProtocol):
         """Adds corresponding attributes between this output and another.
 
         Args:
-            other: ManureTreatmentDailyOutput object to add.
+            other: ManureTreatmentAnnualOutput object to add.
 
         Returns:
-            ManureTreatmentDailyOutput with corresponding attributes summed.
+            ManureTreatmentAnnualOutput with corresponding attributes summed.
 
         """
         if not isinstance(other, ManureTreatmentAnnualOutput):
@@ -50,7 +50,7 @@ class ManureTreatmentAnnualOutput(LiquidManurePortionProtocol):
         """Returns a clone of this object.
 
         Returns:
-            ManureTreatmentDailyOutput object with the same attributes as this object.
+            ManureTreatmentAnnualOutput object with the same attributes as this object.
 
         """
         return ManureTreatmentAnnualOutput(*astuple(self))
