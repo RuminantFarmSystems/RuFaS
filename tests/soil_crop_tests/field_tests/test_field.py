@@ -366,15 +366,15 @@ def test_plant_crop(crop_reference: str, heat_scheduled: bool, custom_crop_specs
 @pytest.mark.parametrize("crop_reference,heat_scheduled,species,year,day,field_name,field_size,expected_info_map,"
                          "expected_value", [
                              ("ref_1", False, "species_1", 1993, 100, "name_1", 1.3,
-                              {"prefix": "field='name_1'", "field_size": 1.3, "species": "species_1"},
+                              {"suffix": "field='name_1'", "field_size": 1.3, "species": "species_1"},
                               {"crop_reference": "ref_1", "heat_scheduled_harvest": False,
                                "date": {"year": 1993, "day": 100}}),
                              ("ref_2", True, "custom_alien_species", 1996, 120, "name_2", 2.55,
-                              {"prefix": "field='name_2'", "field_size": 2.55, "species": "custom_alien_species"},
+                              {"suffix": "field='name_2'", "field_size": 2.55, "species": "custom_alien_species"},
                               {"crop_reference": "ref_2", "heat_scheduled_harvest": True,
                                "date": {"year": 1996, "day": 120}}),
                              ("ref_3", False, "custom_corn", 2008, 122, "name_3", 0.95,
-                              {"prefix": "field='name_3'", "field_size": 0.95, "species": "custom_corn"},
+                              {"suffix": "field='name_3'", "field_size": 0.95, "species": "custom_corn"},
                               {"crop_reference": "ref_3", "heat_scheduled_harvest": False,
                                "date": {"year": 2008, "day": 122}})
                          ])
@@ -384,7 +384,7 @@ def test_record_planting(crop_reference: str, heat_scheduled: bool, species: str
     field = Field(field_data=FieldData(name=field_name, field_size=field_size), manure_manager=MagicMock(ManureManager))
     field._record_planting(crop_reference, heat_scheduled, species, year, day)
 
-    actual = om.variables_pool[f"field='{field_name}'.crop_planting"]
+    actual = om.variables_pool[f"Field._plant_crop.crop_planting.field='{field_name}'"]
     assert actual["info_maps"].__contains__(expected_info_map)
     assert actual["values"].__contains__(expected_value)
 
@@ -459,7 +459,7 @@ def test_harvest_crop_warnings(mock_time: Time, mock_feed_manager: FeedManager, 
     with patch('RUFAS.output_manager.Utility.get_timestamp') as mocked_timestamp:
         timestamp = "00-Jan-1970_Thu_00-00-00"
         expected_info_map = {
-            "prefix": f"field_name:'{mock_field_data.name}'",
+            "suffix": f"field='{mock_field_data.name}'",
             "date": {"day": mock_time.day, "year": mock_time.calendar_year},
             "timestamp": timestamp
         }
@@ -488,7 +488,7 @@ def test_harvest_crop_warnings(mock_time: Time, mock_feed_manager: FeedManager, 
                 mock_feed_manager
             )
         assert add_residue.call_count == len(crops)
-        actual = om.warnings_pool[f"field_name:'{mock_field_data.name}'.harvest_warning"]
+        actual = om.warnings_pool[f"Field._harvest_crop.harvest_warning.field='{mock_field_data.name}'"]
         assert actual['info_maps'].__contains__(expected_info_map)
         assert actual['values'].__contains__(expected_message)
 
@@ -665,10 +665,10 @@ def test_execute_fertilizer_application(mix_name: str, requested_n: float, reque
             field._record_fertilizer_application.assert_called_once_with(mix_name, 100, 20, 15, 10, depth, remainder,
                                                                          year, day)
         else:
-            expected_info_map = {"prefix": "field='test'", "date": {"year": year, "day": day},
+            expected_info_map = {"suffix": "field='test'", "date": {"year": year, "day": day},
                                  "timestamp": "00-Jan-1970_Thu_00-00-00"}
             expected_log_message = "Tried to apply fertilizer with no nitrogen or phosphorus requested."
-            actual = om.logs_pool["field='test'.fertilizer_application_log"]
+            actual = om.logs_pool["Field._execute_fertilizer_application.fertilizer_application_log.field='test'"]
             assert actual["info_maps"].__contains__(expected_info_map)
             assert actual["values"].__contains__(expected_log_message)
             field._formulate_fertilizer_required.assert_not_called()
@@ -776,11 +776,11 @@ def test_record_fertilizer_application(mix_name: str, total_mass: float, nitroge
     field._record_fertilizer_application(mix_name, total_mass, nitrogen_mass, phosphorus_mass, potassium_mass, depth,
                                          remainder, year, day)
 
-    expected_info_map = {"prefix": f"field='{field_name}'", "date": {"year": year, "day": day},
+    expected_info_map = {"suffix": f"field='{field_name}'", "date": {"year": year, "day": day},
                          "mix_name": mix_name, "field_size": field_size}
     expected_value = {"mass": total_mass, "nitrogen": nitrogen_mass, "phosphorus": phosphorus_mass,
                       "potassium": potassium_mass, "application_depth": depth, "surface_remainder_fraction": remainder}
-    actual = om.variables_pool[f"field='{field_name}'.fertilizer_application"]
+    actual = om.variables_pool[f"Field._record_fertilizer_application.fertilizer_application.field='{field_name}'"]
     assert actual["info_maps"].__contains__(expected_info_map)
     assert actual["values"].__contains__(expected_value)
 
@@ -1018,11 +1018,11 @@ def test_record_manure_application(field_name: str, field_size: float, dry_mass:
 
 @pytest.mark.parametrize("depth,remainder,name,year,day,expected_info_map,expected_error_message", [
     (100.0, 1.0, "manure_application_error", 1998, 200,
-     {"prefix": "field='test'", "date": {"year": 1998, "day": 200}, "timestamp": "00-Jan-1970_Thu_00-00-00"},
+     {"suffix": "field='test'", "date": {"year": 1998, "day": 200}, "timestamp": "00-Jan-1970_Thu_00-00-00"},
      "Invalid application depth (100.0) and surface remainder fraction (1.0). Defaulting to application depth of 0.0 "
      "mm and a surface remainder fraction of 1.0."),
     (800.0, None, "fertilizer_application_error", 2005, 100,
-     {"prefix": "field='test'", "date": {"year": 2005, "day": 100}, "timestamp": "00-Jan-1970_Thu_00-00-00"},
+     {"suffix": "field='test'", "date": {"year": 2005, "day": 100}, "timestamp": "00-Jan-1970_Thu_00-00-00"},
      "Invalid application depth (800.0) is lower than the bottom depth of the soil profile, setting the application "
      "depth to be at the bottom of the soil profile.")
 ])
@@ -1035,7 +1035,7 @@ def test_record_nutrient_application_error(depth: float, remainder: float, name:
 
         field._record_nutrient_application_error(depth, remainder, name, year, day)
 
-        expected_error_name = expected_info_map["prefix"] + "." + name
+        expected_error_name = f"Field._record_nutrient_application_error.{name}.{expected_info_map['suffix']}"
         actual = om.errors_pool[expected_error_name]
         assert actual["info_maps"].__contains__(expected_info_map)
         assert actual["values"].__contains__(expected_error_message)
@@ -1502,18 +1502,18 @@ def test_error_field_data_initialization(watering_amount: float, interval: int) 
 
 @pytest.mark.parametrize("field_name,field_size,day,year,watering_amount,expected_info_map,expected_value", [
     ("name_1", 100, 120, 1993, 135.6,
-     {"prefix": "field='name_1'", "date": {"year": 1993, "day": 120}, "field_size": 100, "units": "mm"}, 135.6),
+     {"suffix": "field='name_1'", "date": {"year": 1993, "day": 120}, "field_size": 100, "units": "mm"}, 135.6),
     ("name_2", 14.65, 3, 1996, 1.2,
-     {"prefix": "field='name_2'", "date": {"year": 1996, "day": 3}, "field_size": 14.65, "units": "mm"}, 1.2),
+     {"suffix": "field='name_2'", "date": {"year": 1996, "day": 3}, "field_size": 14.65, "units": "mm"}, 1.2),
     ("name_2", 14.65, 48, 2023, 1.2,
-     {"prefix": "field='name_2'", "date": {"year": 2023, "day": 48}, "field_size": 14.65, "units": "mm"}, 1.2)
+     {"suffix": "field='name_2'", "date": {"year": 2023, "day": 48}, "field_size": 14.65, "units": "mm"}, 1.2)
 ])
 def test_record_field_watering(field_name: str, field_size: float, day: int, year: int, watering_amount: float,
                                expected_info_map: Dict, expected_value: Dict) -> None:
     field = Field(field_data=FieldData(name=field_name, field_size=field_size), manure_manager=MagicMock(ManureManager))
     field._record_field_watering(year=year, day=day, watering_amount=watering_amount)
 
-    actual = om.variables_pool[f"field='{field_name}'.field_watering"]
+    actual = om.variables_pool[f"Field._record_field_watering.field_watering.field='{field_name}'"]
     assert actual["info_maps"].__contains__(expected_info_map)
     assert actual["values"].__contains__(expected_value)
 
