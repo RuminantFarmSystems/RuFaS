@@ -129,6 +129,7 @@ class CropManagement:
 
         This method is used if the crop remains uncut after reaching maturity. It reduces the crop's biomass
         based on species-specific water content, simulating the natural dry-down process.
+
         """
         # TODO: stand in for more sophisticated dry down method - GitHub Issue #162
         #   The dry down method is not currently used
@@ -375,12 +376,6 @@ class CropManagement:
         """
         Calculates the potential harvest index for a plant on a given day.
 
-        Notes
-        -----
-        The harvest index is the ratio of grain to total shoot dry matter. This calculation takes into
-        account the fraction of potential heat units accumulated to date and the species-specific optimal
-        harvest index for the plant at maturity under ideal conditions.
-
         Parameters
         ----------
         heat_fraction : float
@@ -393,9 +388,16 @@ class CropManagement:
         float
             Potential harvest index for the day (unitless).
 
+        Notes
+        -----
+        The harvest index is the ratio of grain to total shoot dry matter. This calculation takes into
+        account the fraction of potential heat units accumulated to date and the species-specific optimal
+        harvest index for the plant at maturity under ideal conditions.
+
         References
         ----------
         SWAT documentation section 5:2.4.1
+
         """
         heat_percent = 100 * heat_fraction
         return optimal_harvest_index * heat_percent / (heat_percent + exp(11.1 - 10 * heat_fraction))
@@ -404,12 +406,6 @@ class CropManagement:
     def _adjust_harvest_index(harvest_index: float, min_harvest_index: float, water_deficiency: float) -> float:
         """
         Calculates the actual harvest index for a given day, adjusted for water deficiency.
-
-        Notes
-        -----
-        The method takes into consideration the minimum harvest index under drought conditions, the potential harvest
-        index for the day, and the water deficiency factor of the plant. If values of min_harvest_index and
-        harvest_index are input below their bounds, they are updated to equal their lower bounds.
 
         Parameters
         ----------
@@ -426,9 +422,16 @@ class CropManagement:
         float
             Actual harvest index for the day, adjusted for water deficiency (unitless).
 
+        Notes
+        -----
+        The method takes into consideration the minimum harvest index under drought conditions, the potential harvest
+        index for the day, and the water deficiency factor of the plant. If values of min_harvest_index and
+        harvest_index are input below their bounds, they are updated to equal their lower bounds.
+
         References
         ----------
         SWAT 5:3.3.1
+
         """
         harvest_index = max(harvest_index, 0)
         harvest_index = max(harvest_index, min_harvest_index)
@@ -443,11 +446,6 @@ class CropManagement:
         Calculates the maximum crop yield at harvest under ideal conditions, applicable when the harvest index is
         greater than 1.
 
-        Notes
-        -----
-        The yield is calculated as a proportion of the above-ground biomass. This method is based on the SWAT model's
-        guidelines for crop yield calculation.
-
         Parameters
         ----------
         biomass : float
@@ -460,8 +458,14 @@ class CropManagement:
         float
             Crop yield, measured in kilograms per hectare (kg/ha).
 
+        Notes
+        -----
+        The yield is calculated as a proportion of the above-ground biomass. This method is based on the SWAT model's
+        guidelines for crop yield calculation.
+
         References
         ----------
         SWAT 5:2.4.3
+
         """
         return biomass * (1 - (1 / (1 + harvest_index)))
