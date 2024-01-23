@@ -22,6 +22,9 @@ from RUFAS.routines.animal.ration.user_defined_ration import UserDefinedRationMa
 
 import RUFAS.routines.animal.clustering_pen_grouping
 
+from RUFAS.output_manager import OutputManager
+om = OutputManager()
+
 
 @pytest.fixture
 def cow_a() -> dict:
@@ -3253,6 +3256,24 @@ def test_get_feed_data_from_feed_ids() -> None:
         "type": ["Milk", "Starter"],
     }
     assert pen_specific_feed_data == expected_pen_specific_feed_data
+
+
+def test_get_feed_data_from_feed_ids_missingID() -> None:
+    """Unit test for function get_feed_data_from_feed_ids in file routines/animal/ration/ration_driver.py"""
+
+    # Arrange
+    feed_ids = {155, 157}
+    available_feeds = AvailableFeeds()
+    available_feeds.feed_id = [136, 139, 155]
+
+    with pytest.raises(KeyError) as e:
+        available_feeds.get_feed_data_from_feed_ids(feed_ids)
+        # Check error message
+        assert "KeyError" in str(e.value)
+        actual = om.errors_pool["KeyError"]
+        assert actual["values"].__contains__("Key 157 not found in AvailableFeeds. \
+                                 Check that price was set in purchased_feeds in input feed json, \
+                                 and that it is included in the specified NRC or NASEM csv.")
 
 
 @pytest.fixture
