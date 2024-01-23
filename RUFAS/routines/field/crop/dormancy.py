@@ -35,6 +35,17 @@ class Dormancy:
         ----------
         soil_data : SoilData
             SoilData instance of the soil profile that this crop is growing in.
+        Methods
+        -------
+        enter_dormancy(soil_data: SoilData) -> None
+            Performs the transition of a crop from active to dormant. Warm Annuals and Warm Annual Legumes do not
+            experience dormancy. Only Trees and Perennials experience biomass loss when entering dormancy.
+
+        find_threshold_daylength(minimum_daylength: float, dormancy_threshold: float) -> float
+            Calculates the threshold daylength for dormancy based on minimum daylength and dormancy threshold.
+
+        find_dormancy_threshold(abs_latitude: float) -> float
+            Calculates the dormancy threshold based on the absolute latitude value.
 
         Notes
         -----
