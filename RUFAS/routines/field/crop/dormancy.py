@@ -25,15 +25,6 @@ class Dormancy:
     """
 
     def __init__(self, crop_data: Optional[CropData] = None):
-        """
-        Initialize the Dormancy object with crop data.
-
-        Parameters
-        ----------
-        crop_data : Optional[CropData]
-            The crop data to be used for dormancy operations.
-            If not provided, default specifications are used.
-        """
         self.data = crop_data or CropData
 
     def enter_dormancy(self, soil_data: SoilData) -> None:
