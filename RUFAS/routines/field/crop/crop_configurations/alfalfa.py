@@ -76,7 +76,7 @@ class AlfalfaSilage(Alfalfa):
         Percentage of dry matter mass that is ash (unitless).
     yield_nitrogen_fraction: float, default=0.0327536
         Fraction of dry matter crop yield that is nitrogen (unitless).
-    yield_phosphorus_fraction: float default=0.00351
+    yield_phosphorus_fraction: float, default=0.00351
         Fraction of wet crop yield that is phosphorus (unitless).
 
     """
@@ -131,7 +131,7 @@ class AlfalfaBaleage(AlfalfaSilage):
         Percentage of dry matter mass that is ash (unitless).
     yield_nitrogen_fraction: float, default=0.0327536
         Fraction of dry matter crop yield that is nitrogen (unitless).
-    yield_phosphorus_fraction: float default=0.00351
+    yield_phosphorus_fraction: float, default=0.00351
         Fraction of wet crop yield that is phosphorus (unitless).
 
     Notes
@@ -176,7 +176,7 @@ class AlfalfaHay(Alfalfa):
         Percentage of dry matter mass that is ash (unitless).
     yield_nitrogen_fraction: float, default=0.0250
         Fraction of dry matter crop yield that is nitrogen (unitless).
-    yield_phosphorus_fraction: float default=0.00282
+    yield_phosphorus_fraction: float, default=0.00282
         Fraction of wet crop yield that is phosphorus (unitless).
 
     Notes

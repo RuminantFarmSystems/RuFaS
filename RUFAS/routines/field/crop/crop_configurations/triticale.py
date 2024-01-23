@@ -81,7 +81,7 @@ class TriticaleGrain(Triticale):
         Percentage of dry matter mass that is ash (unitless).
     yield_nitrogen_fraction: float, default=0.0192848
         Fraction of dry matter crop yield that is nitrogen (unitless).
-    yield_phosphorus_fraction: float default=0.00348
+    yield_phosphorus_fraction: float, default=0.00348
         Fraction of wet crop yield that is phosphorus (unitless).
 
     """

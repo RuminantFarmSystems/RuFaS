@@ -74,7 +74,7 @@ class TallFescueSilage(TallFescue):
         Percentage of dry matter mass that is ash (unitless).
     yield_nitrogen_fraction: float, default=0.0229376
         Fraction of dry matter crop yield that is nitrogen (unitless).
-    yield_phosphorus_fraction: float default=0.00302
+    yield_phosphorus_fraction: float, default=0.00302
         Fraction of wet crop yield that is phosphorus (unitless).
 
     """
@@ -129,7 +129,7 @@ class TallFescueBaleage(TallFescueSilage):
         Percentage of dry matter mass that is ash (unitless).
     yield_nitrogen_fraction: float, default=0.0229376
         Fraction of dry matter crop yield that is nitrogen (unitless).
-    yield_phosphorus_fraction: float default=0.00302
+    yield_phosphorus_fraction: float, default=0.00302
         Fraction of wet crop yield that is phosphorus (unitless).
 
     Notes
@@ -174,7 +174,7 @@ class TallFescueHay(TallFescue):
         Percentage of dry matter mass that is ash (unitless).
     yield_nitrogen_fraction: float, default=0.021248
         Fraction of dry matter crop yield that is nitrogen (unitless).
-    yield_phosphorus_fraction: float default=0.00281
+    yield_phosphorus_fraction: float, default=0.00281
         Fraction of wet crop yield that is phosphorus (unitless).
 
     """

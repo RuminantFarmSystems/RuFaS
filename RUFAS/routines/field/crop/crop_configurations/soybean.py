@@ -74,7 +74,7 @@ class SoybeanGrain(Soybean):
         Percentage of dry matter mass that is ash (unitless).
     yield_nitrogen_fraction: float, default=0.063968
         Fraction of dry matter crop yield that is nitrogen (unitless).
-    yield_phosphorus_fraction: float default=0.00654
+    yield_phosphorus_fraction: float, default=0.00654
         Fraction of wet crop yield that is phosphorus (unitless).
 
     """
