@@ -843,7 +843,7 @@ class Field:
         crops_to_be_harvested = [crop for crop in self.crops if crop.data.id == crop_reference]
 
         info_map = {"class": self.__class__.__name__, "function": self._harvest_crop.__name__,
-                    "suffix": f"field_name:'{self.field_data.name}'",
+                    "suffix": f"field='{self.field_data.name}'",
                     "date": {"day": time.day, "year": time.calendar_year}}
         if len(crops_to_be_harvested) > 1:
             om.add_warning("harvest_warning", "Multiple crops to be harvested by single HarvestEvent.", info_map)
