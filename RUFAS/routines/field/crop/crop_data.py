@@ -27,6 +27,7 @@ class PlantCategory(Enum):
         Represents perennial non-legume plants.
     TREE : str
         Represents tree-type plants.
+
     """
     WARM_ANNUAL_LEGUME = "warm_annual_legume"
     COOL_ANNUAL_LEGUME = "cool_annual_legume"
