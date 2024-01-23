@@ -6,7 +6,7 @@ from RUFAS.routines.field.field.field import Field
 om = OutputManager()
 
 
-class OutputGatherer:
+class FieldDataReporter:
     def __init__(self, fields: List[Field]):
         self.fields = fields
 

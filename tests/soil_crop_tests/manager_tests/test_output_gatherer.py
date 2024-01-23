@@ -3,7 +3,7 @@ from typing import List
 
 from RUFAS.routines.field.field.field import Field
 from RUFAS.routines.field.field.field_data import FieldData
-from RUFAS.routines.field.manager.output_gatherer import OutputGatherer
+from RUFAS.routines.field.manager.output_gatherer import FieldDataReporter
 from RUFAS.routines.field.crop.crop_data import CropData
 from RUFAS.routines.field.crop.crop import Crop
 from RUFAS.routines.field.manager.output_gatherer import om
@@ -33,7 +33,7 @@ def test_send_daily_variables(runoff_values: List[float],
     field_2.crops.append(crop_1)
     field_2.crops.append(crop_2)
 
-    og = OutputGatherer([field_1, field_2])
+    og = FieldDataReporter([field_1, field_2])
     for i in range(3):
         field_1.soil.data.accumulated_runoff = runoff_values[i]
         field_2.soil.data.accumulated_runoff = runoff_values[i]
@@ -122,7 +122,7 @@ def test_send_annual_variables(annual_irrigation_water_use_total: List[float],
     field_2.crops.append(crop_1)
     field_2.crops.append(crop_2)
 
-    og = OutputGatherer([field_1, field_2])
+    og = FieldDataReporter([field_1, field_2])
     for i in range(3):
         with patch.multiple("RUFAS.routines.field.soil.soil_data.SoilData",
                             profile_soil_water_content=PropertyMock(return_value=2),

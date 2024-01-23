@@ -10,7 +10,7 @@ from RUFAS.routines.manure.manure_manager import ManureManager
 from RUFAS.routines.manure.manure_treatments.manure_types import ManureType
 from RUFAS.weather import Weather
 from RUFAS.time import Time
-from RUFAS.routines.field.manager.output_gatherer import OutputGatherer
+from RUFAS.routines.field.manager.output_gatherer import FieldDataReporter
 from RUFAS.routines.field.manager.fertilizer_schedule import FertilizerSchedule
 from RUFAS.routines.field.manager.manure_schedule import ManureSchedule
 from RUFAS.routines.field.manager.tillage_schedule import TillageSchedule
@@ -45,7 +45,7 @@ class FieldManager:
         for field in fields:
             new_field = self._setup_field(field, manure_manager, feed_manager)
             self.fields.append(new_field)
-        self.output_gatherer = OutputGatherer(fields=self.fields)
+        self.output_gatherer = FieldDataReporter(fields=self.fields)
 
     def daily_update_routine(self, weather: Weather, time: Time) -> None:
         """
