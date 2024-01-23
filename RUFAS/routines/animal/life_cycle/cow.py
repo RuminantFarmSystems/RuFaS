@@ -407,7 +407,6 @@ class Cow(HeiferIII):
             self.estimated_daily_milk_produced = max(0.0, estimated_daily_milk_produced)
             self.lactose_milk = AnimalModuleConstants.MILK_LACTOSE
             self.CP_milk = AnimalModuleConstants.MILK_CRUDE_PROTEIN
-            # self.mPrt = AnimalModuleConstants.MILK_TRUE_PROTEIN
             self.mPrt = self.get_user_defined_milk_protein_percent()
         else:
             self.estimated_daily_milk_produced = 0.0
@@ -418,7 +417,6 @@ class Cow(HeiferIII):
 
         # calculate fat percent in milk and fat corrected milk production
         if self.milking:
-            # self.fat_percent = self.calculate_fat_percent(self.days_in_milk)
             self.fat_percent = self.get_user_defined_milk_fat_percent()
             daily_fat_correct_milk_production = \
                 0.4 * estimated_daily_milk_produced + \
