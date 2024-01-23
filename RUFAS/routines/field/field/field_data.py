@@ -57,6 +57,12 @@ class FieldData:
     convert_liters_to_millimeters(liter_amount, field_size)
         Converts an amount in liters to an amount in mm based on the area the liters are distributed over.
 
+    Raises
+    ------
+    ValueError
+        If the watering amount is < 0.
+    ValueError
+        If the watering interval is < 0.
     """
     name: Optional[str] = None
     absolute_latitude: float = 43.5
@@ -84,16 +90,6 @@ class FieldData:
     annual_irrigation_water_use_total: float = 0
 
     def __post_init__(self):
-        """Initialize all attributes in FieldData object that need to be set based on other FieldData attributes.
-
-        Raises
-        ------
-        ValueError
-            If the watering amount is < 0.
-        ValueError
-            If the watering interval is < 0.
-
-        """
         self.dormancy_threshold = Dormancy.find_dormancy_threshold(self.absolute_latitude)
         self.dormancy_threshold_daylength = Dormancy.find_threshold_daylength(self.minimum_daylength,
                                                                               self.dormancy_threshold)

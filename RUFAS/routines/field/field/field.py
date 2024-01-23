@@ -21,18 +21,82 @@ from RUFAS.routines.manure.manure_nutrients.nutrient_request import NutrientRequ
 from RUFAS.time import Time
 from copy import copy
 
-"""
-This is a high-level module that represents and simulates an entire field. It is responsible for executing the daily
-biophysical routines which take place in soil columns and in crops planted in the field. It is also responsible for the
-management of schedules, executing, and reporting of farm management events, including planting and harvesting crops,
-adding manure and fertilizer to the soil, and tilling the soil.
-"""
+
 
 om = OutputManager()
 
 
 class Field:
+    """
+    This is a high-level class that represents and simulates an entire field. It is responsible for executing the daily
+    biophysical routines which take place in soil columns and in crops planted in the field. It is also responsible for the
+    management of schedules, executing, and reporting of farm management events, including planting and harvesting crops,
+    adding manure and fertilizer to the soil, and tilling the soil.
 
+    Parameters
+    ----------
+    field_data : FieldData, default=None
+        FieldData object that will be simulated.
+    soil : Soil, default=None
+        The soil component of the field.
+    plantings : List[PlantingEvent], default=None
+        List of all planting events that will occur over the run of the simulation in this field.
+    harvestings : List[HarvestEvent], default=None
+        List of all harvesting events that will occur over the run of the simulation in the field.
+    custom_crop_specifications : Dict[str, Dict], default=None
+        Dictionary where keys are crop references and values are dictionaries containing crop specifications.
+    tillage_events : List[TillageEvent], default=None
+        List of all tillage events that will occur over the run of the simulation in this field.
+    fertilizer_events : List[FertilizerEvent], default=None
+        List of all fertilizer mixes available for application to this field.
+    fertilizer_mixes : Dict[str, Dict[str, float]], default=None
+        List of all fertilizer mixes available for application to this field.
+    manure_events : List[ManureEvent], default=None
+        Manure application interface.
+    manure_manager : ManureManager, default=None
+        ManureManager Object to be used during simulation
+
+    Attributes
+    ----------
+    field_data : FieldData
+        Reference to the FieldData object
+    soil : Soil
+        Reference to the Soil object
+    crops : List[Crop]
+        Reference to the list of Crop objects
+    planting_events : List[PlantingEvent]
+        Reference to the list of PlantingEvent objects
+    harvest_events : List[HarvestEvent]
+        Reference to the list of HarvestEvent objects
+    custom_crop_specifications : Dict[str, Dict]
+        Reference to the custom crop specifications dictionary.
+    fertilizer_applicator : FertilizerApplication(self.soil)
+        Provides interface for adding fertilizer to the field
+    fertilizer_events : List
+        Reference to the list of FertilizerEvent objects
+    available_fertilizer_mixes : Dict
+        List of all fertilizer mixes available for application to this field. The 100_0_0 and 26_4_24 mixes will
+        always be available as supplements to unfulfilled manure nutrient demands.
+    ONLY_NITROGEN_MIX : str
+        Constant with the name of the fertilizer mix that contains only Nitrogen.
+    tiller : TillageApplication
+        Provides interface to till the field.
+    tillage_events: List[TillageEvent]
+        List of all tillage events that will occur over the run of the simulation in this field.    
+    manure_applicator = ManureApplication
+        List of ManureApplication objects
+    manure_events: List[ManureEvent]
+        List of all manure applications that will be applied to this field
+    manure_manager: ManureManager
+        ManureManager instance from which manure is requested for application to the field.
+    feed_manager: FeedManager
+        FeedManager instance which receives harvested crops.
+
+    Methods
+    -------
+    manage_field(time, current_conditions: CurrentDayConditions) -> None:
+        Main Field routine, runs all subroutines routines based on current attribute configuration.
+    """
     def __init__(
             self,
             field_data: Optional[FieldData] = None,
@@ -47,33 +111,6 @@ class Field:
             manure_manager: Optional[ManureManager] = None,
             feed_manager: Optional[FeedManager] = None,
     ):
-        """
-        Initialize the related data fields that this module will work with, or create one if none provided.
-
-        Parameters
-        ----------
-        field_data : FieldData
-            FieldData object that will be simulated.
-        soil : Soil
-            The soil component of the field.
-        plantings : List[PlantingEvent]
-            List of all planting events that will occur over the run of the simulation in this field.
-        harvestings : List[HarvestEvent]
-            List of all harvesting events that will occur over the run of the simulation in the field.
-        custom_crop_specifications : Dict[str, Dict]
-            Dictionary where keys are crop references and values are dictionaries containing crop specifications.
-        tillage_events : List[TillageEvent]
-            List of all tillage events that will occur over the run of the simulation in this field.
-        fertilizer_events : List[FertilizerEvent]
-            List of all fertilizer mixes available for application to this field.
-        fertilizer_mixes : Dict[str, Dict[str, float]]
-            List of all fertilizer mixes available for application to this field.
-        manure_events : List[ManureEvent]
-            Manure application interface.
-        manure_manager : ManureManager
-            ManureManager Object to be used during simulation
-
-        """
         # field-wide attributes
         self.field_data = field_data or FieldData()
 
@@ -91,30 +128,22 @@ class Field:
 
         # Soil amendment attributes
         self.fertilizer_applicator = FertilizerApplication(self.soil)
-        """Provides interface for adding fertilizer to the field."""
 
         self.fertilizer_events = fertilizer_events or []
 
         self.available_fertilizer_mixes = fertilizer_mixes or {}
         self.available_fertilizer_mixes["100_0_0"] = {"N": 1.0, "P": 0.0, "K": 0.0}
         self.available_fertilizer_mixes["26_4_24"] = {"N": 0.26, "P": 0.04, "K": 0.24}
-        """List of all fertilizer mixes available for application to this field. The 100_0_0 and 26_4_24 mixes will
-            always be available as supplements to unfulfilled manure nutrient demands."""
 
         self.ONLY_NITROGEN_MIX = "100_0_0"
-        """Constant with the name of the fertilizer mix that contains only Nitrogen."""
-
         self.tiller = TillageApplication(self.field_data, self.soil.data)
-        """Provides interface to till the field."""
 
         self.tillage_events: List[TillageEvent] = tillage_events
-        """List of all tillage events that will occur over the run of the simulation in this field."""
 
         self.manure_applicator = ManureApplication(self.soil.data)
 
         self.manure_events: List[ManureEvent] = manure_events or []
-        """List of all manure applications that will be applied to this field."""
-
+        
         info_map = {
             "class": self.__class__.__name__,
             "function": self.__init__.__name__
@@ -130,7 +159,6 @@ class Field:
             raise ValueError("Manure manager cannot be None.")
 
         self.manure_manager: ManureManager = manure_manager
-        """:class:`ManureManager` instance from which manure is requested for application to the field."""
 
         if feed_manager is None:
             om.add_error(
@@ -141,7 +169,6 @@ class Field:
             )
 
         self.feed_manager: FeedManager = feed_manager or FeedManager()
-        """:class:`FeedManager` instance which receives harvested crops."""
 
     def manage_field(self, time, current_conditions: CurrentDayConditions) -> None:
         """

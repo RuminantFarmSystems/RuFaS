@@ -4,21 +4,45 @@ from RUFAS.routines.field.field.field_data import FieldData
 from RUFAS.routines.field.soil.soil_data import SoilData
 from RUFAS.output_manager import OutputManager
 
-"""
-This module contains all necessary methods for executing tillage operations on a field, based on SWAT Theoretical
-documentation section 6:1.6 and the SurPhos plow.f file.
 
-Notes
------
-This module was written to be as flexible as possible, because every attribute on the soil surface and in the soil
-profile gets incorporated and/or mixed with the same logic.
-"""
 
 om = OutputManager()
 
 
 class TillageApplication:
+    """
+    This class contains all necessary methods for executing tillage operations on a field, based on SWAT Theoretical
+    documentation section 6:1.6 and the SurPhos plow.f file.
 
+    Parameters
+    ----------
+    field_data : FieldData, default=None
+        FieldData object that tracks attributes on the soil surface as they are updated by tillage applications.
+    soil_data : SoilData, default=None
+        SoilData object that tracks all attributes of the soil profile as they are updated by tillage applications.
+    field_size : float, default=None
+        Size of the field (ha)
+
+    Attributes
+    ----------
+    field_data : FieldData
+        FieldData object that tracks attributes on the soil surface as they are updated by tillage applications
+    soil_data : SoilData
+        SoilData object that tracks all attributes of the soil profile as they are updated by tillage applications.
+
+    Methods
+    -------
+    till_soil(self, tillage_depth: float, incorporation_fraction: float, mixing_fraction: float, year: int,
+                  day: int) -> None
+        Mixes nutrients, manure/fertilizer mass, and residue from the soil profile and soil surface together in the soil
+        profile.
+
+    Notes
+    -----
+    This class was written to be as flexible as possible, because every attribute on the soil surface and in the soil
+    profile gets incorporated and/or mixed with the same logic.
+    If no SoilData object is provided, one is created with the default configuration based on the field size.
+    """
     def __init__(self, field_data: Optional[FieldData] = None, soil_data: Optional[SoilData] = None,
                  field_size: Optional[float] = None):
         """
