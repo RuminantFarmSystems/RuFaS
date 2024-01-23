@@ -62,7 +62,7 @@ class ManureTreatmentConfig:
     storage_time_period: int = 0
     freeboard_input: float = 0.0
 
-    composting_type: CompostingType = CompostingType.INTENSIVE_WINDROW
+    composting_type: str = "intensive windrow"
     maximum_methane_producing_capacity: float = 0.24
     effectiveness_of_microbial_decomposition_rate: float = 2.37e-3
     decomposition_temperature: float = 60

@@ -1,7 +1,7 @@
-from enum import Enum
+from RUFAS.routines.manure.default_enum.default_enum import DefaultEnum
 
 
-class CompostingType(Enum):
+class CompostingType(DefaultEnum):
     """
     This is an Enum class that represents different types of composting.
 

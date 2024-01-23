@@ -1,34 +1,37 @@
 import math
 from typing import Dict
 
+from RUFAS.routines.manure.IO_helpers.manure_module_output_manager_helper import ManureModuleOutputManagerHelper
 from RUFAS.routines.manure.constants_and_units.manure_constants import ManureConstants
 from RUFAS.routines.manure.manure_treatments.base_manure_treatment import BaseManureTreatment
 from RUFAS.routines.manure.manure_treatments.composting_types import CompostingType
+from RUFAS.routines.manure.manure_treatments.manure_treatment_annual_output import ManureTreatmentAnnualOutput
 from RUFAS.routines.manure.manure_treatments.manure_treatment_configs import ManureTreatmentConfig
 from RUFAS.routines.manure.manure_treatments.manure_treatment_daily_output import ManureTreatmentDailyOutput
 
 FRACTION_NITROGEN_LOST_TO_AMMONIA_EMISSION: Dict[CompostingType, float] = {
-        CompostingType.STATIC_PILE: 0.5,
-        CompostingType.PASSIVE_WINDROW: 0.45,
-        CompostingType.INTENSIVE_WINDROW: 0.5
-    }
+    CompostingType.STATIC_PILE: 0.5,
+    CompostingType.PASSIVE_WINDROW: 0.45,
+    CompostingType.INTENSIVE_WINDROW: 0.5
+}
 
 FRACTION_NITROGEN_LOST_TO_LEACHING: Dict[CompostingType, float] = {
-        CompostingType.STATIC_PILE: 0.06,
-        CompostingType.PASSIVE_WINDROW: 0.04,
-        CompostingType.INTENSIVE_WINDROW: 0.06
-    }
+    CompostingType.STATIC_PILE: 0.06,
+    CompostingType.PASSIVE_WINDROW: 0.04,
+    CompostingType.INTENSIVE_WINDROW: 0.06
+}
 
 FRACTION_NITROGEN_LOST_TO_DIRECT_N2O_EMISSION: Dict[CompostingType, float] = {
-        CompostingType.STATIC_PILE: 0.06,
-        CompostingType.PASSIVE_WINDROW: 0.04,
-        CompostingType.INTENSIVE_WINDROW: 0.06
-    }
+    CompostingType.STATIC_PILE: 0.06,
+    CompostingType.PASSIVE_WINDROW: 0.04,
+    CompostingType.INTENSIVE_WINDROW: 0.06
+}
 
 
 class Composting(BaseManureTreatment):
     def __init__(self, weather, time, manure_treatment_config: ManureTreatmentConfig) -> None:
         super().__init__(weather, time, manure_treatment_config)
+        self.composting_type: CompostingType = CompostingType.get_type(self.config.composting_type)
 
     def _daily_update_helper(self) -> ManureTreatmentDailyOutput:
         daily_input = self._current_manure_treatment_daily_input
@@ -41,24 +44,49 @@ class Composting(BaseManureTreatment):
 
         daily_dry_matter_loss = self._calculate_dry_matter_loss(methane_emission=methane_emission,
                                                                 carbon_decomposition=carbon_decomposition)
+
+        remaining_manure_total_solids = manure_total_solids - daily_dry_matter_loss
+        remaining_manure_mass = remaining_manure_total_solids / 0.12
+
         daily_output = ManureTreatmentDailyOutput(
             simulation_day=daily_input.simulation_day,
             pen_id=daily_input.pen_id,
             storage_methane=methane_emission,
             solid_manure_carbon_decomposition=carbon_decomposition,
-            solid_manure_total_solids=manure_total_solids - daily_dry_matter_loss,
+            solid_manure_total_solids=remaining_manure_total_solids,
+            solid_manure_daily_mass=remaining_manure_mass,
             solid_manure_phosphorus=daily_input.liquid_manure_phosphorus,
             solid_manure_potassium=daily_input.liquid_manure_potassium,
         )
 
         self._accumulate_daily_output(daily_output)
+
+        if self.time.is_last_day_of_year:
+            self.annual_update()
         return daily_output
 
     def annual_update(self) -> None:
+        info_maps = {
+            "class": self.__class__.__name__,
+            "function": self.annual_update.__name__
+        }
+        daily_input = self._current_manure_treatment_daily_input
+
         total_Nitrogen_mass = self._calculate_total_Nitrogen_mass()
         organic_Nitrogen_mass = self._calculate_organic_Nitrogen_mass()
         inorganic_Nitrogen_mass = self._calculate_inorganic_Nitrogen_mass()
         ammonia_mass = self._calculate_ammonium_mass()
+
+        annual_output = ManureTreatmentAnnualOutput(
+            pen_id=daily_input.pen_id,
+            simulation_calendar_year=self.time.calendar_year,
+            solid_manure_nitrogen=total_Nitrogen_mass,
+            solid_manure_inorganic_nitrogen=inorganic_Nitrogen_mass,
+            solid_manure_organic_nitrogen=organic_Nitrogen_mass,
+            solid_manure_inorganic_nitrogen_ammonium=ammonia_mass
+        )
+        ManureModuleOutputManagerHelper.add_dataclass_object(dataclass_object=annual_output,
+                                                             info_maps=info_maps)
 
     def calc_methane_emission(self, *args, **kwargs) -> float:
         manure_volatile_solids = self._current_manure_treatment_daily_input.liquid_manure_total_volatile_solids
@@ -138,28 +166,28 @@ class Composting(BaseManureTreatment):
 
     def _calculate_Nitrogen_loss_to_ammonia_emission(self) -> float:
         N_prior_t = self._current_manure_treatment_daily_input.liquid_manure_nitrogen
-        fraction_Nitrogen_lost_as_ammonia = FRACTION_NITROGEN_LOST_TO_AMMONIA_EMISSION[self.config.composting_type]
+        fraction_Nitrogen_lost_as_ammonia = FRACTION_NITROGEN_LOST_TO_AMMONIA_EMISSION[self.composting_type]
 
         return fraction_Nitrogen_lost_as_ammonia * N_prior_t
 
     def _calculate_Nitrogen_loss_to_leaching(self) -> float:
         N_prior_t = self._current_manure_treatment_daily_input.liquid_manure_nitrogen
-        fraction_Nitrogen_lost_as_ammonia = FRACTION_NITROGEN_LOST_TO_LEACHING[self.config.composting_type]
+        fraction_Nitrogen_lost_as_ammonia = FRACTION_NITROGEN_LOST_TO_LEACHING[self.composting_type]
 
         return fraction_Nitrogen_lost_as_ammonia * N_prior_t
 
     def _calculate_Nitrogen_loss_to_direct_Nitrous_Oxide_Emission(self) -> float:
         N_prior_t = self._current_manure_treatment_daily_input.liquid_manure_nitrogen
-        fraction_Nitrogen_lost_as_ammonia = FRACTION_NITROGEN_LOST_TO_DIRECT_N2O_EMISSION[self.config.composting_type]
+        fraction_Nitrogen_lost_as_ammonia = FRACTION_NITROGEN_LOST_TO_DIRECT_N2O_EMISSION[self.composting_type]
 
-        return fraction_Nitrogen_lost_as_ammonia * N_prior_t * 44/28
+        return fraction_Nitrogen_lost_as_ammonia * N_prior_t * 44 / 28
 
     def _calculate_Nitrogen_loss_to_indirect_Nitrous_Oxide_Emission(self) -> float:
         Nitrogen_loss_to_leaching = self._calculate_Nitrogen_loss_to_leaching()
         Nitrogen_loss_to_ammonia_emission = self._calculate_Nitrogen_loss_to_ammonia_emission()
 
         return (Nitrogen_loss_to_leaching +
-                Nitrogen_loss_to_ammonia_emission) * ManureConstants.COMPOSTING_N2O_INDIRECT_EMISSION_FACTOR * 44/28
+                Nitrogen_loss_to_ammonia_emission) * ManureConstants.COMPOSTING_N2O_INDIRECT_EMISSION_FACTOR * 44 / 28
 
     def _calculate_total_Nitrogen_mass(self) -> float:
         N_prior_t = self._current_manure_treatment_daily_input.liquid_manure_nitrogen
