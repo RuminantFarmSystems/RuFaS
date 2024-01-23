@@ -441,6 +441,8 @@ class CropManagement:
         Calculates the maximum crop yield at harvest under ideal conditions, applicable when the harvest index is
         greater than 1.
 
+        Notes
+        -----
         The yield is calculated as a proportion of the above-ground biomass. This method is based on the SWAT model's
         guidelines for crop yield calculation.
 
