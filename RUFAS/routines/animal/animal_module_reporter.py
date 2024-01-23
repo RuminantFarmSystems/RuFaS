@@ -330,6 +330,12 @@ class AnimalModuleReporter:
             "herd_milk_fat_percent", life_cycle_manager.herd_milk_fat_percent, info_map
         )
         om.add_variable(
+            "herd_milk_fat_kg", life_cycle_manager.herd_milk_fat_kg, info_map
+        )
+        om.add_variable(
+            "herd_milk_protein_kg", life_cycle_manager.herd_milk_protein_kg, info_map
+        )
+        om.add_variable(
             "herd_milk_protein_percent",
             life_cycle_manager.herd_milk_protein_percent,
             info_map,
