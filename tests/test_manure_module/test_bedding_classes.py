@@ -74,7 +74,7 @@ def test_bedding_config_init() -> None:
       0.0),
      (DefaultBeddingConfigFactory.STRAW_BEDDING_CONFIG, 1.97, 100.0, 0.9, 1.0, 0.35, 0.0, BeddingType.STRAW, 0.0),
      (DefaultBeddingConfigFactory.SAND_BEDDING_CONFIG, 25.0, 1500.0, 0.9, 1.0, 0.0, 0.0, BeddingType.SAND, 1.0),
-     (DefaultBeddingConfigFactory.NO_BEDDING_CONFIG, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, BeddingType.NONE, 0.0),
+     (DefaultBeddingConfigFactory.NONE_BEDDING_CONFIG, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, BeddingType.NONE, 0.0),
      ])
 def test_default_bedding_config_values(bedding_config,
                                        expected_bedding_mass_per_day,
@@ -233,7 +233,7 @@ def test_bedding_public_methods(bedding_type_name, bedding_config) -> None:
 
 
 def test_no_bedding_public_methods() -> None:
-    """Tests that the NO_BEDDING_CONFIG public methods behave as expected."""
+    """Tests that the NONE_BEDDING_CONFIG public methods behave as expected."""
     bedding = BeddingFactory.get_instance('none')
 
     assert bedding.calc_total_bedding_mass(10) == 0.0

@@ -420,7 +420,7 @@ class DefaultBeddingConfigFactory:
     )
 
     # Predefined configuration for no bedding
-    NO_BEDDING_CONFIG = BeddingConfig(
+    NONE_BEDDING_CONFIG = BeddingConfig(
         bedding_mass_per_day=0.0,
         bedding_density=0.0,
         bedding_dry_matter_content=0.0,
@@ -458,7 +458,7 @@ class DefaultBeddingConfigFactory:
             BeddingType.MANURE_SOLIDS: cls.MANURE_SOLIDS_BEDDING_CONFIG,
             BeddingType.STRAW: cls.STRAW_BEDDING_CONFIG,
             BeddingType.SAND: cls.SAND_BEDDING_CONFIG,
-            BeddingType.NONE: cls.NO_BEDDING_CONFIG,
+            BeddingType.NONE: cls.NONE_BEDDING_CONFIG,
         }
 
         if bedding_type not in bedding_config_by_type:
