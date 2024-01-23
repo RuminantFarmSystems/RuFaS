@@ -286,18 +286,28 @@ class CropData:
     max_transpiration : Optional[float], default None
         Maximum transpiration on a given day (mm).
     evapotranspiration_weighting_coefficient : float, default 1
-        Plant evapotranspiration curve number coefficient (unitless), in the range 0.5 to 2.0 inclusive.
+        Plant evapotranspiration curve number coefficient (unitless), in the range 0.5 to 2.0 inclusive. Used in SWAT
+        equation 2:1.1.9, definition in .bsn input data description (named CNCOEF there)
     canopy_water : float, default 0
         Amount of water currently held in the canopy (mm).
     max_canopy_water_capacity : float, default 0.8
         Maximum amount of water that can be trapped in the canopy on a given day when fully developed (mm).
+        References: SWAT Theoretical documentation eqn. 2:2.1.1 (see also SWAT Input file .HRU ("CANMX" page 233).
+        Note: this default is super arbitrary. It comes from the paper:
+            'Holder AJ, Rowe R, McNamara NP, Donnison IS, McCalmont JP. Soil & Water Assessment Tool (SWAT) simulated
+            hydrological impacts of land use change from temperate grassland to energy crops: A case study in western
+            UK. GCB Bioenergy. 2019;11:1298–1317.  https ://doi.org/10.1111/gcbb.12628'
+            which cites the following paper that I could not find:
+           'Wang, D., Li, J. S., & Rao, M. J. (2006). Winter wheat canopy interception under sprinkler irrigation.
+            Scientia Agricultura Sinica, 39(9), 1859–1864.'
     water_distro_parameter : float, default 10
         Water-use distribution parameter governing water-uptake from the soil (unitless).
     potential_water_uptakes : Optional[List[float]], default None
         The maximum amount of water to be potentially taken up by a crop, from each soil layer (mm).
     water_compensation_factor : float, default 0.01
         Factor that determines the ability of a plant to draw water from deeper layers when demands are not met
-        (unitless).
+        (unitless). 0 indicates no water can be drawn from deeper than expected and 1 indicates that any and all water
+        can be drawn from deeper layers.
     unmet_water_demands : Optional[List[float]], default None
         Cumulative water demands not met by all previous layers (mm).
     actual_water_uptakes : Optional[List[float]], default None
@@ -310,9 +320,11 @@ class CropData:
         Efficiency of the harvest operation: the proportion of yield that will be extracted from the field
         (unitless; [0, 1]).
     dry_matter_percentage : float, default 85.689
-        Percentage of fresh yield that is dry matter (unitless).
+        Percentage of fresh yield that is dry matter (unitless). This value is the default for Sorghum harvested as a
+        grain.
     lignin_dry_matter_percentage : float, default 1.518
-        Percentage of dry matter yield that is lignin (unitless).
+        Percentage of dry matter yield that is lignin (unitless). This value is the default for Sorghum harvested as a
+        grain.
     dry_down_fraction : float, default 0.2
         Proportion of plant biomass that is lost to dry-down (unitless; [0, 1]).
     optimal_phosphorus_fraction : float, default 0.073
@@ -341,9 +353,14 @@ class CropData:
     residue_phosphorus : Optional[float], default None
         Amount of phosphorus in the residue from this plant (kg/ha).
     dormancy_loss_fraction : Optional[float], default None
-        Fraction of biomass the crop loses when it goes dormant (unitless).
+        Fraction of biomass the crop loses when it goes dormant (unitless). Fraction of biomass the crop loses when it
+        goes dormant. Default 0.1 for perennials, 0.3 for trees.
+        Reference: SWAT Theoretical 5:1.2, and crop.dat BIO_LEAF description
     minimum_lai_during_dormancy : Optional[float], default 0.75
         Minimum leaf area index for plants (perennials and trees only).
+        Note: SWAT Appendix-A section A.1.12 says that the default 0.75 is from pre-2009 versions of SWAT and users are
+        now allowed to modify this value. But it does not provide values for any of the listed plant species and gives
+        no information about how this value can be measured or calculated.
 
     """
     # ID variables (SWAT Table A-1 ish)
@@ -496,25 +513,13 @@ class CropData:
     water_deficiency: Optional[float] = None
     max_transpiration: Optional[float] = None
     evapotranspiration_weighting_coefficient: float = 1
-    """Used in SWAT equation 2:1.1.9, definition in .bsn input data description (named CNCOEF there)"""
     canopy_water: float = 0
     max_canopy_water_capacity: float = 0.8
-    """References: SWAT Theoretical documentation eqn. 2:2.1.1 (see also SWAT Input file .HRU ("CANMX" page 233).
-        Note: this default is super arbitrary. It comes from the paper:
-            'Holder AJ, Rowe R, McNamara NP, Donnison IS, McCalmont JP. Soil & Water Assessment Tool (SWAT) simulated
-            hydrological impacts of land use change from temperate grassland to energy crops: A case study in western
-            UK. GCB Bioenergy. 2019;11:1298–1317.  https ://doi.org/10.1111/gcbb.12628'
-        which cites the following paper that I could not find:
-           'Wang, D., Li, J. S., & Rao, M. J. (2006). Winter wheat canopy interception under sprinkler irrigation.
-            Scientia Agricultura Sinica, 39(9), 1859–1864.'
-    """
 
     # ---- transpiration
     water_distro_parameter: float = 10
     potential_water_uptakes: Optional[List[float]] = None
     water_compensation_factor: float = 0.01
-    """0 indicates no water can be drawn from deeper than expected and 1 indicates that any and all water
-    can be drawn from deeper layers."""
     unmet_water_demands: Optional[List[float]] = None
     actual_water_uptakes: Optional[List[float]] = None
     water_uptake: float = 0.0
@@ -523,9 +528,7 @@ class CropData:
     # ---- yields
     harvest_efficiency: float = 1.0
     dry_matter_percentage: float = 85.689
-    """Note: this value is the default for Sorghum harvested as a grain."""
     lignin_dry_matter_percentage: float = 1.518
-    """Note: this value is the default for Sorghum harvested as a grain."""
     dry_down_fraction: float = 0.2
     optimal_phosphorus_fraction: float = 0.073
     user_harvest_index: Optional[float] = None
@@ -542,14 +545,7 @@ class CropData:
 
     # ---- dormancy
     dormancy_loss_fraction: Optional[float] = None
-    """Fraction of biomass the crop loses when it goes dormant. Default 0.1 for perennials, 0.3 for trees
-        Reference: SWAT Theoretical 5:1.2, and crop.dat BIO_LEAF description"""
     minimum_lai_during_dormancy: Optional[float] = 0.75
-    """
-    Note: SWAT Appendix-A section A.1.12 says that the default 0.75 is from pre-2009 versions of SWAT and users are
-    now allowed to modify this value. But it does not provide values for any of the listed plant species and gives no
-    information about how this value can be measured or calculated.
-    """
 
     def __post_init__(self):
         """
