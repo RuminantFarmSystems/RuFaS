@@ -118,6 +118,10 @@ class HeiferII(HeiferI):
         Returns: the daily body weight change for a heifer
         """
         if self.days_in_preg > 0:
+            if self.gestation_length - self.days_in_preg < 0:
+                print(self.id)
+                print(f'days_in_preg = {self.days_in_preg}')
+                print(f'gestation_length = {self.gestation_length}')
             # BW change due to heifer average daily gain
             divisor = self.gestation_length - self.days_in_preg
             if divisor == 0:
@@ -340,7 +344,10 @@ class HeiferII(HeiferI):
             cull_stage: culling for reproduction failure
             third_stage: move to next stage -- heiferIII stage when time comes
         """
-
+        if self.gestation_length - self.days_in_preg < 0:
+            print(self.id)
+            print(f'days_in_preg = {self.days_in_preg}')
+            print(f'gestation_length = {self.gestation_length}')
         self.update_body_weight_history(sim_day)
         cull_stage = False
         third_stage = False
@@ -377,9 +384,14 @@ class HeiferII(HeiferI):
             elif self.is_pregnant:
                 self.days_in_preg += 1
                 self.preg_update(sim_day)
-
             # prior to calving, heifer move to replacement group (heiferIII)
-            if self.days_in_preg == self.gestation_length - AnimalBase.config["prefresh_day"]:
+            if self.p_req < 0:
+                print('preq bug!')
+            if self.days_in_preg >= self.gestation_length - AnimalBase.config["prefresh_day"]:
+                if self.gestation_length - self.days_in_preg < 0:
+                    print(self.id)
+                    print(f'days_in_preg = {self.days_in_preg}')
+                    print(f'gestation_length = {self.gestation_length}')
                 self.days_born -= 1  # will be increment again in next stage
                 third_stage = True
                 self.log_event(self.days_born, sim_day, const.HEIFERII_TO_III)
