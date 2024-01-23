@@ -313,6 +313,18 @@
             "description": "Number of Milkings (per day) -- The average or most common number of times cows are milked per day (1, 2, or 3 times daily)",
             "default": 3,
             "minimum": 0
+          },
+          "milk_fat_percent": {
+            "type": "number",
+            "description": "Milk Fat Percent (percent) -- The average or most common milk fat percentage in cow milk",
+            "default": 3.5,
+            "minimum": 0
+          },
+          "milk_protein_percent": {
+            "type": "number",
+            "description": "Milk Protein Percent (percent) -- The average or most common milk protein percentage in cow milk",
+            "default": 3.0,
+            "minimum": 0
           }
         },
         "farm_level": {
