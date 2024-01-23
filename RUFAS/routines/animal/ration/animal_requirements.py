@@ -717,7 +717,7 @@ class AnimalRequirements:
             )
             if days_in_milk is None:
                 days_in_milk = 0
-            uterine_weight = ((calf_birth_weight * 0.2288) * math.exp(-0.2 * days_in_milk)) + 0.204
+            uterine_weight = ((calf_birth_weight * 0.2288 - 0.204) * math.exp(-0.2 * days_in_milk)) + 0.204
             net_energy_maintenance = 0.10 * (body_weight - gravid_uterine_weight - uterine_weight) ** 0.75
         return net_energy_maintenance, gravid_uterine_weight, uterine_weight
 
@@ -959,7 +959,7 @@ class AnimalRequirements:
         net_energy_pregnancy : float
             Net energy requirement for pregnancy (Mcal/d)
         gravid_uterine_weight_gain : float
-            Daiy energy Requirement associated to increased gain of reproductive tissues as pregnancy advances (Mcal/d)
+            Daily energy Requirement associated to increased gain of reproductive tissues as pregnancy advances (Mcal/d)
 
         Notes
         -----
