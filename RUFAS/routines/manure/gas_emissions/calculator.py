@@ -226,7 +226,6 @@ class GasEmissionsCalculator:
         )
         return degradable_volatile_solids, non_degradable_volatile_solids
 
-    # TODO: to be removed in the next PR while refactoring slurry storage treatments
     @classmethod
     def methane_emission_for_slurry_storage(
             cls,
@@ -244,8 +243,8 @@ class GasEmissionsCalculator:
             manure_total_solids: Total solids, kg.
             is_enclosed: True if manure storage is enclosed, and False if manure storage is open to air.
             temperature_celsius: temperature in Celsius, C.
-            manure_volatile_solids_fraction: Fraction (0-1) volatile solids. # TODO: review this
-            efficiency_fraction: efficiency of process, unitless. # TODO: review this
+            manure_volatile_solids_fraction: Fraction (0-1) volatile solids.
+            efficiency_fraction: efficiency of process, unitless.
 
         Returns:
             CH4 emissions from storage, kg CH4/day.
@@ -927,7 +926,7 @@ class GasEmissionsCalculator:
             num_animals: int,
             barn_area: float,
             manure_total_ammoniacal_nitrogen: float,
-            manure_mass: float,  # TODO: Decide to use volume or mass
+            manure_mass: float,
             temperature_celsius: float,
             housing_specific_constant=GasEmissionConstants.DEFAULT_HOUSING_SPECIFIC_CONSTANT,
     ) -> float:

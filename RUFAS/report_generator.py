@@ -1,4 +1,5 @@
 from typing import Dict, List, Any, Callable
+
 from RUFAS.util import Utility
 
 
@@ -265,7 +266,6 @@ class ReportGenerator:
         KeyError
             If any of the report references are missing.
         """
-
         missing_references = [ref for ref in references if ref not in self.reports]
         if missing_references:
             raise KeyError(f"Missing referenced reports: {', '.join(missing_references)}")
