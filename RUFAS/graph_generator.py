@@ -159,24 +159,21 @@ class GraphGenerator:
             )
 
             return all_logs
-        except Exception as e:
-            raise e
+        except Exception:
+            raise
 
     def _validate_graph_filter(self, graph_details: Dict[str, str | List[str]]
                                ) -> List[Dict[str, str | Dict[str, str]]]:
         """
         Ensures all the filter keys are valid and if not, raises an error and reports them back to Output Manager.
-
         Parameters
         ----------
         graph_details : Dict[str, str | List[str]]
             A dictionary containing details/metadata about the graph.
-
         Returns
         -------
         List[Dict[str, str | Dict[str, str]]]
             The logs, warnings, and errors to be reported to OutputManager.
-
         """
         required_graph_filter_keys = ["type", "filters"]
         optional_graph_filter_keys = list(FIGURE_SETTERS.keys()) + list(AXES_SETTERS.keys()) + ["variables"]

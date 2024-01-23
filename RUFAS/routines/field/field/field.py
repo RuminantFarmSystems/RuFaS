@@ -226,7 +226,7 @@ class Field:
         """
         if requested_nitrogen == requested_phosphorus == 0.0:
             info_map = {"class": self.__class__.__name__, "function": self._execute_fertilizer_application.__name__,
-                        "prefix": f"field='{self.field_data.name}'", "date": {"year": year, "day": day}}
+                        "suffix": f"field='{self.field_data.name}'", "date": {"year": year, "day": day}}
             log_message = "Tried to apply fertilizer with no nitrogen or phosphorus requested."
             om.add_log("fertilizer_application_log", log_message, info_map)
             return
@@ -382,7 +382,7 @@ class Field:
 
         """
         info_map = {"class": self.__class__.__name__, "function": self._record_fertilizer_application.__name__,
-                    "prefix": f"field='{self.field_data.name}'",
+                    "suffix": f"field='{self.field_data.name}'",
                     "mix_name": mix_name, "field_size": self.field_data.field_size}
         value = {"mass": total_mass, "nitrogen": nitrogen_mass, "phosphorus": phosphorus_mass,
                  "potassium": potassium_mass, "application_depth": application_depth,
@@ -443,7 +443,7 @@ class Field:
 
         """
         info_map = {"class": self.__class__.__name__, "function": self._execute_manure_application.__name__,
-                    "prefix": f"field='{self.field_data.name}'", "date": {"year": year, "day": day}}
+                    "suffix": f"field='{self.field_data.name}'", "date": {"year": year, "day": day}}
         if requested_nitrogen == requested_phosphorus == 0.0:
             log_message = "Tried to apply manure with no nitrogen or phosphorus requested."
             om.add_log("manure_application_log", log_message, info_map)
@@ -588,7 +588,7 @@ class Field:
 
         """
         info_map = {"class": self.__class__.__name__, "function": self._record_nutrient_application_error.__name__,
-                    "prefix": f"field='{self.field_data.name}'", "date": {"year": year, "day": day}}
+                    "suffix": f"field='{self.field_data.name}'", "date": {"year": year, "day": day}}
         if surface_remainder_fraction is not None:
             error_message = f"Invalid application depth ({application_depth}) and surface remainder fraction " \
                             f"({surface_remainder_fraction}). Defaulting to application depth of 0.0 mm and a " \
@@ -825,7 +825,7 @@ class Field:
 
         """
         info_map = {"class": self.__class__.__name__, "function": self._plant_crop.__name__,
-                    "prefix": f"field='{self.field_data.name}'", "field_size": self.field_data.field_size,
+                    "suffix": f"field='{self.field_data.name}'", "field_size": self.field_data.field_size,
                     "species": species}
         value = {"crop_reference": crop_reference, "heat_scheduled_harvest": heat_scheduled_harvest,
                  "date": {"year": year, "day": day}}
@@ -860,7 +860,7 @@ class Field:
         crops_to_be_harvested = [crop for crop in self.crops if crop.data.id == crop_reference]
 
         info_map = {"class": self.__class__.__name__, "function": self._harvest_crop.__name__,
-                    "prefix": f"field_name:'{self.field_data.name}'",
+                    "suffix": f"field='{self.field_data.name}'",
                     "date": {"day": time.day, "year": time.calendar_year}}
         if len(crops_to_be_harvested) > 1:
             om.add_warning("harvest_warning", "Multiple crops to be harvested by single HarvestEvent.", info_map)
@@ -1421,7 +1421,7 @@ class Field:
         None
         """
         info_map = {"class": self.__class__.__name__, "function": self._record_field_watering.__name__,
-                    "prefix": f"field='{self.field_data.name}'", "date": {"year": year, "day": day},
+                    "suffix": f"field='{self.field_data.name}'", "date": {"year": year, "day": day},
                     "field_size": self.field_data.field_size, "units": "mm"}
         om.add_variable("field_watering", watering_amount, info_map)
 
