@@ -20,10 +20,6 @@ class Crop:
     A class representing a crop, encapsulating various processes and components
     related to crop growth and development throughout a simulation.
 
-    This class integrates multiple subcomponents that manage different aspects of
-    the crop's lifecycle, including growth constraints, biomass allocation, water
-    dynamics, nutrient incorporation, heat accumulation, and more.
-
     Parameters
     ----------
     crop_data : Optional[CropData], optional
@@ -59,9 +55,10 @@ class Crop:
 
     Notes
     -----
-    The `Crop` class is designed to be a central part of a crop growth simulation,
-    integrating data and methods from various subcomponents to simulate the entire
-    lifecycle of a crop.
+    This class integrates multiple subcomponents that manage different aspects of the crop's lifecycle,
+    including growth constraints, biomass allocation, water dynamics, nutrient incorporation, heat accumulation,
+    and more. It is designed to be a central part of a crop growth simulation, integrating data and methods from
+    various subcomponents to simulate the entire lifecycle of a crop.
 
     """
 

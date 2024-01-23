@@ -592,6 +592,7 @@ class CropData:
         -------
         bool
             True if the plant is in its growing season, False otherwise.
+
         """
         return not self.is_mature and not self.is_dormant and self.is_alive and self.is_growing
 
@@ -604,6 +605,7 @@ class CropData:
         -------
         bool
             True if a user-defined harvest index is given, False otherwise.
+
         """
         return self.user_harvest_index is not None
 
@@ -616,6 +618,7 @@ class CropData:
         -------
         bool
             True if the plant is in senescence, False otherwise.
+
         """
         return self.heat_fraction > self.senescent_heat_fraction
 
@@ -632,6 +635,7 @@ class CropData:
         References
         ----------
         SWAT Theoretical documentation eqn. 2:2.1.1
+
         """
         return self.max_canopy_water_capacity * (self.leaf_area_index / self.max_leaf_area_index)
 
@@ -648,5 +652,6 @@ class CropData:
         References
         ----------
         SWAT Theoretical documentation section 5:2.1.4
+
         """
         return self.accumulated_heat_units / self.potential_heat_units
