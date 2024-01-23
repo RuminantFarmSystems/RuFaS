@@ -68,7 +68,7 @@
             "inputAttributes": {
               "class": "text-primary form-control"
             },
-            "infoText": "Number of Cows (head) -- The initial number of dry and lactating cows"
+            "infoText": "Number of Cows (head) -- The initial number of dry and lactating cows."
           },
           "minimum": 0,
           "default": 100
@@ -107,7 +107,7 @@
             "inputAttributes": {
               "class": "text-primary form-control"
             },
-            "infoText": "Breed (select one Holstein/Jersey) -- The predominant breed of the herd (Holstein or Jersey)"
+            "infoText": "Breed (select one) -- The predominant breed of the herd (Holstein or Jersey)"
           },
           "default": "HO",
           "enum": [
@@ -188,7 +188,7 @@
                 "inputAttributes": {
                   "class": "text-primary form-control"
                 },
-                "infoText": "Heifer Reproduction Protocol (select one) -- TAI - Timed Artificial Insemination; ED - Estrus Detection; Synch-ED - Synchronized Estrus Detection"
+                "infoText": "Heifer Reproductive Program (select one) -- TAI - Timed Artificial Insemination; ED - Estrus Detection; Synch-ED - Synchronized Estrus Detection"
               },
               "default": "TAI",
               "enum": [
@@ -756,7 +756,7 @@
                         "inputAttributes": {
                           "class": "text-primary form-control"
                         },
-                        "infoText": "Cow Presynch Protocol (optional; select one) -- The optional preSynch protocol (1st breeding) for cows in the TAI (Timed Artificial Insemination) protocol"
+                        "infoText": "Cow Presynch Protocol -- The optional preSynch protocol (1st breeding) for cow in TAI (Timed Artificial Insemination) program"
                       },
                       "default": "Double OvSynch",
                       "enum": [

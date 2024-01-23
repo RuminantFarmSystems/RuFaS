@@ -45,7 +45,7 @@
               "Straw",
               "Sawdust",
               "Manure_solids",
-              "Other"
+              "CBPB sawdust"
             ],
             "format": "select2"
           },
@@ -64,7 +64,6 @@
               "alley scraper",
               "manual scraping",
               "tillage",
-              "manual skid steer scraping",
               "harrowing"
             ],
             "format": "select2"
@@ -81,10 +80,8 @@
             },
             "enum": [
               "screw press",
-              "sand lane",
               "rotary screen",
-              "none",
-              "other"
+              "none"
             ],
             "format": "select2"
           },
@@ -104,8 +101,8 @@
               "open lots",
               "compost bedded pack barn",
               "anaerobic lagoon",
-              "anaerobic digestion",
-              "other"
+              "anaerobic digestion and lagoon",
+              "anaerobic digestion and lagoon with separator"
             ],
             "format": "select2"
           }
@@ -141,7 +138,7 @@
               "Straw",
               "Sawdust",
               "Manure_solids",
-              "Other"
+              "CBPB sawdust"
             ],
             "format": "select2"
           },
@@ -246,8 +243,7 @@
               "flush system",
               "alley scraper",
               "manual scraping",
-              "tillage",
-              "manual skid steer scraping"
+              "tillage"
             ],
             "format": "select2"
           },
@@ -323,10 +319,8 @@
             },
             "enum": [
               "screw press",
-              "sand lane",
               "rotary screen",
-              "none",
-              "other"
+              "none"
             ],
             "format": "select2"
           },
@@ -433,8 +427,8 @@
               "open lots",
               "compost bedded pack barn",
               "anaerobic lagoon",
-              "anaerobic digestion",
-              "other"
+              "anaerobic digestion and lagoon",
+              "anaerobic digestion and lagoon with separator"
             ],
             "format": "select2"
           },
