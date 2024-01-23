@@ -593,6 +593,7 @@ def test_extract_and_check_aggregation_keys(
     """
     Unit test for _extract_and_check_aggregation_keys() method in report_generator.py file.
     """
+
     # Arrange
     report_generator = ReportGenerator()
 
@@ -642,12 +643,14 @@ def test_combine_aggregate_report_data(
     """
     Unit test for _combine_aggregate_report_data() method in report_generator.py file.
     """
+
     # Arrange
     report_generator = ReportGenerator()
 
     # Act
     result = report_generator._combine_aggregate_report_data(horizontally_aggregated, vertically_aggregated,
                                                              filter_content)
+
     # Assert
     assert result == expected
 

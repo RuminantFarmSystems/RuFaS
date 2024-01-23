@@ -357,7 +357,6 @@ class DefaultBeddingConfigFactory:
         sand_removal_efficiency=0.0,
     )
 
-    # TODO: Use correct values for straw bedding.
     # Predefined configuration for Straw Bedding
     STRAW_BEDDING_CONFIG = BeddingConfig(
         bedding_mass_per_day=1.97,

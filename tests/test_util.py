@@ -235,3 +235,4 @@ def test_get_timestamp() -> None:
 ])
 def test_filter_pool(data_pool, filter_patterns, filter_by_exclusion, expected_result):
     assert Utility.filter_pool(data_pool, filter_patterns, filter_by_exclusion) == expected_result
+
