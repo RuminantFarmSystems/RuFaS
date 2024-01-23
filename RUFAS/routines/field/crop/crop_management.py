@@ -403,6 +403,8 @@ class CropManagement:
         """
         Calculates the actual harvest index for a given day, adjusted for water deficiency.
 
+        Notes
+        -----
         The method takes into consideration the minimum harvest index under drought conditions, the potential harvest
         index for the day, and the water deficiency factor of the plant. If values of min_harvest_index and
         harvest_index are input below their bounds, they are updated to equal their lower bounds.
