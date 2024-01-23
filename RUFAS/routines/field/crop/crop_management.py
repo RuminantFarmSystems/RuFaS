@@ -373,6 +373,8 @@ class CropManagement:
         """
         Calculates the potential harvest index for a plant on a given day.
 
+        Notes
+        -----
         The harvest index is the ratio of grain to total shoot dry matter. This calculation takes into
         account the fraction of potential heat units accumulated to date and the species-specific optimal
         harvest index for the plant at maturity under ideal conditions.
