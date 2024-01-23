@@ -24,15 +24,6 @@ class GrowthConstraints:
     """
 
     def __init__(self, crop_data: Optional[CropData] = None):
-        """
-        Initialize the GrowthConstraints object with crop data.
-
-        Parameters
-        ----------
-        crop_data : Optional[CropData]
-            The crop data to be used for managing growth constraints. If not provided,
-            default specifications are used.
-        """
         self.data = crop_data or CropData()  # initialize with defaults, if not given
 
     def constrain_growth(self, max_transpiration: float, temperature: float) -> None:
