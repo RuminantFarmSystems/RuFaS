@@ -10,6 +10,7 @@ from RUFAS.routines.manure.beddings.bedding_classes import DefaultBeddingConfigF
 from RUFAS.routines.manure.beddings.bedding_classes import ManureSolidsBedding
 from RUFAS.routines.manure.beddings.bedding_classes import SandBedding
 from RUFAS.routines.manure.beddings.bedding_classes import SawdustBedding
+from RUFAS.routines.manure.beddings.bedding_classes import NoBedding
 
 
 @pytest.mark.parametrize(
@@ -22,6 +23,7 @@ from RUFAS.routines.manure.beddings.bedding_classes import SawdustBedding
      ('dummy', BeddingType.DEFAULT),
      ('dummy', BeddingType.SAND),
      ('default', BeddingType.SAND),
+     ('none', BeddingType.NONE)
      ])
 def test_bedding_type(bedding_type_name, expected_bedding_type) -> None:
     """Unit test for class BeddingType in file bedding_classes.py"""
@@ -72,6 +74,7 @@ def test_bedding_config_init() -> None:
       0.0),
      (DefaultBeddingConfigFactory.STRAW_BEDDING_CONFIG, 1.97, 100.0, 0.9, 1.0, 0.35, 0.0, BeddingType.STRAW, 0.0),
      (DefaultBeddingConfigFactory.SAND_BEDDING_CONFIG, 25.0, 1500.0, 0.9, 1.0, 0.0, 0.0, BeddingType.SAND, 1.0),
+     (DefaultBeddingConfigFactory.NO_BEDDING_CONFIG, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, BeddingType.NONE, 0.0),
      ])
 def test_default_bedding_config_values(bedding_config,
                                        expected_bedding_mass_per_day,
@@ -149,6 +152,7 @@ def dummy_bedding_config() -> BeddingConfig:
      ('manure solids', ManureSolidsBedding),
      ('straw', StrawBedding),
      ('sand', SandBedding),
+     ('none', NoBedding),
      ])
 def test_bedding_factory_get_instance(bedding_type_name,
                                       expected_bedding,
@@ -226,3 +230,13 @@ def test_bedding_public_methods(bedding_type_name, bedding_config) -> None:
     assert actual_total_bedding_volume == approx(expected_total_bedding_volume)
     assert actual_total_bedding_washed == approx(expected_total_bedding_washed)
     assert actual_total_bedding_dry_solids == approx(expected_total_bedding_dry_solids)
+
+
+def test_no_bedding_public_methods() -> None:
+    """Tests that the NO_BEDDING_CONFIG public methods behave as expected."""
+    bedding = BeddingFactory.get_instance('none')
+
+    assert bedding.calc_total_bedding_mass(10) == 0.0
+    assert bedding.calc_total_bedding_volume(100) == 0.0
+    assert bedding.calc_total_bedding_volume(1) == 0.0
+    assert bedding.calc_total_bedding_dry_solids(-3) == 0.0
