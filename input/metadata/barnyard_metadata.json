@@ -3124,22 +3124,22 @@
           "bedding_type": {
             "type": "string",
             "description": "Bedding Type -- The material used for bedding pack.",
-            "pattern": "^(Sand|Straw|Sawdust|Manure_solids|Other)$"
+            "pattern": "^(Sand|Straw|Sawdust|Manure_solids|CBPB sawdust)$"
           },
           "manure_handler": {
             "type": "string",
             "description": "Manure Handling Method -- Method for cleaning barn alleyways.",
-            "pattern": "^(flush system|alley scraper|manual scraping|tillage|manual skid steer scraping|harrowing)$"
+            "pattern": "^(flush system|alley scraper|manual scraping|tillage|harrowing)$"
           },
           "manure_separator": {
             "type": "string",
             "description": "Manure Separator Type -- The type of solid-liquid separator equipment to separate coarse fibrous solids/sand",
-            "pattern": "^(screw press|sand lane|rotary screen|none|other)$"
+            "pattern": "^(screw press|rotary screen|none)$"
           },
           "manure_treatment_methods": {
             "type": "string",
             "description": "Manure Treatment Methods -- Select the Manure Treatment Methods.",
-            "pattern": "^(slurry storage underfloor|slurry storage outdoor|open lots|compost bedded pack barn|anaerobic lagoon|anaerobic digestion|other)$"
+            "pattern": "^(slurry storage underfloor|slurry storage outdoor|open lots|compost bedded pack barn|anaerobic lagoon|anaerobic digestion and lagoon|anaerobic digestion and lagoon with separator)$"
           }
         }
       },
@@ -3150,7 +3150,7 @@
           "bedding_type": {
             "type": "string",
             "description": "Bedding Type -- The material used for bedding pack.",
-            "pattern": "^(Sand|Straw|Sawdust|Manure_solids|Other)$"
+            "pattern": "^(Sand|Straw|Sawdust|Manure_solids|CBPB sawdust)$"
           },
           "bedding_mass_per_day": {
             "type": "number"
@@ -3182,7 +3182,7 @@
           "manure_handler_type": {
             "type": "string",
             "description": "Manure Handling Method -- Method for cleaning barn alleyways.",
-            "pattern": "^(flush system|alley scraper|manual scraping|tillage|manual skid steer scraping)$"
+            "pattern": "^(flush system|alley scraper|manual scraping|tillage)$"
           },
           "cleaning_water_use_rate": {
             "type": "number"
@@ -3208,7 +3208,7 @@
           "manure_separator_type": {
             "type": "string",
             "description": "Manure Separator Type -- The type of solid-liquid separator equipment to separate coarse fibrous solids/sand",
-            "pattern": "^(screw press|sand lane|rotary screen|none|other)$"
+            "pattern": "^(screw press|rotary screen|none)$"
           },
           "percent_dry_solids": {
             "type": "number"
@@ -3240,7 +3240,7 @@
           "manure_treatment_type": {
             "type": "string",
             "description": "Manure Treatment Methods -- Select the Manure Treatment Methods.",
-            "pattern": "^(slurry storage underfloor|slurry storage outdoor|open lots|compost bedded pack barn|anaerobic lagoon|anaerobic digestion|other)$"
+            "pattern": "^(slurry storage underfloor|slurry storage outdoor|open lots|compost bedded pack barn|anaerobic lagoon|anaerobic digestion and lagoon|anaerobic digestion and lagoon with separator)$"
           },
           "total_solids_removal_efficiency_for_treatment": {
             "type": "number"
