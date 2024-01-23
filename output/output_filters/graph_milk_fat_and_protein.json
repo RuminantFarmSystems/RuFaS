@@ -1,0 +1,28 @@
+{
+  "multiple": [
+    {
+      "type": "plot",
+      "filters": [
+        "LifeCycleManager.daily_update.herd_milk_fat_percent",
+        "LifeCycleManager.daily_update.herd_milk_protein_percent"
+      ],
+      "title": "Herd Milk Fat and Protein (%)",
+      "legend": [
+        "Herd Milk Fat (%)",
+        "Herd Milk Protein (%)"
+      ]
+    },
+    {
+      "type": "plot",
+      "filters": [
+        "LifeCycleManager.daily_update.herd_milk_fat_kg",
+        "LifeCycleManager.daily_update.herd_milk_protein_kg"
+      ],
+      "title": "Herd Milk Fat and Protein (kg)",
+      "legend": [
+        "Herd Milk Fat (kg)",
+        "Herd Milk Protein (kg)"
+      ]
+    }
+  ]
+}
