@@ -521,8 +521,8 @@ class Cow(HeiferIII):
         self.Ca_requirement = animal_requirements['Ca_requirement']
         self.P_requirement = animal_requirements['P_requirement']
         self.DMIest_requirement = animal_requirements['DMIest_requirement']
-        self.DNED_requirement = (animal_requirements['NEmaint_requirement'] + animal_requirements['NEl_requirement']) \
-                                / self.DMIest_requirement
+        self.DNED_requirement = ((animal_requirements['NEmaint_requirement'] + animal_requirements['NEl_requirement'])
+                                 / self.DMIest_requirement)
         self.DMDP_requirement = (animal_requirements['MP_requirement']) / self.DMIest_requirement
 
     def phosphorus_rqmts(self, DMI):
@@ -612,8 +612,7 @@ class Cow(HeiferIII):
                                              0.0148 * self.gestation_length - 2.408) * self.calf_birth_weight
             conceptus_param = conceptus_total_weight ** (
                     1 / 3) / (self.gestation_length - 50)
-            conceptus_growth = 3 * conceptus_param ** 3 * \
-                               (self.days_in_preg - 50) ** 2
+            conceptus_growth = 3 * conceptus_param ** 3 * (self.days_in_preg - 50) ** 2
             self.conceptus_weight += conceptus_growth
         else:
             conceptus_growth = 0
