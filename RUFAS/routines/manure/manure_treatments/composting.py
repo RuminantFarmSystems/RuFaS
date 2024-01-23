@@ -41,14 +41,16 @@ class Composting(BaseManureTreatment):
 
         daily_dry_matter_loss = self._calculate_dry_matter_loss(methane_emission=methane_emission,
                                                                 carbon_decomposition=carbon_decomposition)
-
         daily_output = ManureTreatmentDailyOutput(
             simulation_day=daily_input.simulation_day,
             pen_id=daily_input.pen_id,
             storage_methane=methane_emission,
+            solid_manure_carbon_decomposition=carbon_decomposition,
+            solid_manure_total_solids=manure_total_solids - daily_dry_matter_loss,
             solid_manure_phosphorus=daily_input.liquid_manure_phosphorus,
-            solid_manure_potassium=daily_input.liquid_manure_potassium
+            solid_manure_potassium=daily_input.liquid_manure_potassium,
         )
+
         self._accumulate_daily_output(daily_output)
         return daily_output
 
