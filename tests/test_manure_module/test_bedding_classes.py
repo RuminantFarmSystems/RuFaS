@@ -207,7 +207,7 @@ def test_bedding_factory_get_instance(bedding_type_name,
      ('straw', DefaultBeddingConfigFactory.STRAW_BEDDING_CONFIG),
      ('sand', DefaultBeddingConfigFactory.SAND_BEDDING_CONFIG),
      ])
-def test_bedding_public_methods(bedding_type_name, bedding_config) -> None:
+def test_bedding_public_methods(bedding_type_name: str, bedding_config: BeddingConfig) -> None:
     """Unit test for calc_total_bedding_mass and calc_total_bedding_volume in file bedding_classes.py"""
 
     # Arrange
@@ -216,7 +216,7 @@ def test_bedding_public_methods(bedding_type_name, bedding_config) -> None:
                                    (1 - bedding_config.sand_removal_efficiency))
     expected_total_bedding_volume = expected_total_bedding_mass / bedding_config.bedding_density
     expected_total_bedding_washed = expected_total_bedding_mass * bedding_config.bedding_cleaned_fraction
-    expected_total_bedding_dry_solids = expected_total_bedding_mass / bedding_config.bedding_dry_matter_content
+    expected_total_bedding_dry_solids = expected_total_bedding_mass * bedding_config.bedding_dry_matter_content
 
     # Act
     bedding = BeddingFactory.get_instance(bedding_type_name)
