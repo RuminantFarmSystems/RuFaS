@@ -69,6 +69,13 @@
       "manure_handler": "harrowing",
       "manure_separator": "none",
       "manure_treatment": "open lots"
+    },
+    {
+      "scenario_id": 10,
+      "bedding_type": "none",
+      "manure_handler": "flush system",
+      "manure_separator": "rotary screen",
+      "manure_treatment": "anaerobic digestion and lagoon with two separators"
     }
   ],
   "bedding_configs": [
