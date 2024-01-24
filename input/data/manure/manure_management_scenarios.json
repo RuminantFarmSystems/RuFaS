@@ -18,14 +18,14 @@
       "scenario_id": 2,
       "bedding_type": "sand",
       "manure_handler": "flush system",
-      "manure_separator": "sand lane manure separation",
+      "manure_separator": "none",
       "manure_treatment": "anaerobic digestion and lagoon"
     },
     {
       "scenario_id": 3,
       "bedding_type": "sand",
       "manure_handler": "flush system",
-      "manure_separator": "sand lane manure separation",
+      "manure_separator": "none",
       "manure_treatment": "slurry storage outdoor"
     }
   ],
@@ -86,23 +86,27 @@
       "manure_handler_type": "flush system",
       "cleaning_water_use_rate": 757.0,
       "minutes_per_cleaning": 8,
-      "cleanings_per_day": 2
+      "cleanings_per_day": 2,
+      "cleaning_water_recycle_fraction": 0.80
     },
     {
       "manure_handler_type": "manual scraping",
       "cleaning_water_use_rate": 10.0,
       "minutes_per_cleaning": 8,
-      "cleanings_per_day": 2
+      "cleanings_per_day": 2,
+      "cleaning_water_recycle_fraction": 0.10
     },
     {
       "manure_handler_type": "alley scraper",
       "cleaning_water_use_rate": 10.0,
       "minutes_per_cleaning": 8,
-      "cleanings_per_day": 2
+      "cleanings_per_day": 2,
+      "cleaning_water_recycle_fraction": 0.10
     },
     {
       "manure_handler_type": "tillage",
-      "daily_tillage_frequency": 1
+      "daily_tillage_frequency": 1,
+      "cleaning_water_recycle_fraction": 0.0
     }
   ],
   "manure_separator_configs": [
