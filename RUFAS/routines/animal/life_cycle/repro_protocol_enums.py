@@ -126,6 +126,7 @@ class ReproStateEnum(Enum):
     NONE = 'none'
     WAITING_FULL_ED_CYCLE = 'waiting for full estrus cycle'
     WAITING_SHORT_ED_CYCLE = 'waiting for short estrus cycle'
+    WAITING_FULL_ED_CYCLE_BEFORE_OVSYNCH = 'waiting for full estrus cycle before OvSynch'
     WAITING_ED_DAILY = 'waiting for estrus daily'
     IN_PRESYNCH = 'in presynch'
     HAS_DONE_PRESYNCH = 'has done presynch'
@@ -134,3 +135,4 @@ class ReproStateEnum(Enum):
     AFTER_AI = 'after AI'
     FRESH = 'fresh'
     PREGNANT = 'pregnant'
+    ENTERED_HERD_FROM_INIT = 'entered herd from init'
