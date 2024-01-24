@@ -257,9 +257,12 @@ def test_draw_graph_success_plot(graph_generator: GraphGenerator) -> None:
             {"variable1": {"values": [{"a": 1, "b": 2}, {"a": 3, "b": 4}]},
              "variable2": {"values": [{"a": 5, "b": 6}, {"a": 7, "b": 8}]}},
             {"variables": [], "title": "Test_3"},
-            ({},
-             [{"error": "Can't plot Test_3 data set",
-               "message": "No selected variables for variable1.",
+            ({"a": [1, 3, 5, 7], "b": [2, 4, 6, 8]},
+             [{"warning": "No variables listed in graph filter file",
+               "message": "All variables in data pool supplied will be attempted to be graphed.",
+               "info_map": {"class": "GraphGenerator", "function": "_prepare_plot_data"}},
+              {"warning": "No variables listed in graph filter file",
+               "message": "All variables in data pool supplied will be attempted to be graphed.",
                "info_map": {"class": "GraphGenerator", "function": "_prepare_plot_data"}}]),
         ),
         (
@@ -274,11 +277,11 @@ def test_draw_graph_success_plot(graph_generator: GraphGenerator) -> None:
             {"variables": ["c", "d"], "title": "Test_5"},
             ({},
              [{"error": "Can't plot Test_5 data set",
-               "message": "No filter-file variables found in data provided.",
+               "message": "No variables found in data provided.",
                "info_map": {"class": "GraphGenerator", "function": "_prepare_plot_data"}},
               {"error": "Can't plot Test_5 data set",
-               "message": "No filter-file variables found in data provided.",
-               "info_map": {"class": "GraphGenerator", "function": "_prepare_plot_data"}}])
+               "message": "No variables found in data provided.",
+               "info_map": {"class": "GraphGenerator", "function": "_prepare_plot_data"}}]),
         )
     ],
 )
