@@ -18,9 +18,9 @@ class PlantCategory(Enum):
     TREE = "tree"
 
 
-DEFAULT_CROP_QUALITIES = {
-    "dry_matter_digestibility": 40.0,
-}
+# This is an arbitrary values to be used until a generalized and appropriate solution can be found for setting
+# species-specific dry matter digestibility amounts.
+DEFAULT_DRY_MATTER_DIGESTIBILITY: float = 40.0
 
 
 @dataclass(kw_only=True)
