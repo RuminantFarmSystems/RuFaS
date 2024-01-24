@@ -324,9 +324,9 @@ class LifeCycleManager:
         self.daily_milk_production = sum(
             cow.estimated_daily_milk_produced for cow in cows
         )
-        self.herd_milk_fat_kg = sum(cow.milk_fat_kg for cow in cows)
+        self.herd_milk_fat_kg = sum(cow.milk_fat_kg for cow in cows if cow.milking)
         self.herd_milk_fat_percent = self.herd_milk_fat_kg / self.daily_milk_production
-        self.herd_milk_protein_kg = sum(cow.milk_protein_kg for cow in cows)
+        self.herd_milk_protein_kg = sum(cow.milk_protein_kg for cow in cows if cow.milking)
         self.herd_milk_protein_percent = (
             self.herd_milk_protein_kg / self.daily_milk_production
         )
