@@ -53,3 +53,7 @@ venv/
 .pytest_cache/
 *.bak
 tests/__pycache__/test_user_prompt.cpython-311-pytest-7.2.2.pyc.27508
+
+# Ignore Data Collection App input schemas
+data_collection_app_schemas/*
+!data_collection_app_schemas/.keep
