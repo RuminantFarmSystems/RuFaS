@@ -141,9 +141,7 @@ class BiomassAllocation:
         Returns
         -------
         dict
-            A dictionary containing the starting biomass of the plant ('start'),
-            the biomass of the plant at the end of the day ('end'), and the total
-            biomass accumulated ('accumulated biomass').
+            Biomass accumulated in a day (kg/ha).
         """
         growth = max_growth * growth_factor
         return growth
