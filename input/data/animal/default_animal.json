@@ -61,7 +61,7 @@
           "ovsynch_program": "OvSynch 56",
 					"ovsynch_program_start_day": 66,
 					"ovsynch_program_conception_rate": 0.7,
-          "resynch_program": "PGFatPD"
+          "resynch_program": "TAIafterPD"
 				}
 			},
 			"bodyweight": {

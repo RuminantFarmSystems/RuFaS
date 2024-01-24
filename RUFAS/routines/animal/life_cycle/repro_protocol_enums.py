@@ -109,8 +109,8 @@ class ReproStateEnum(Enum):
         The state that represents the animal is waiting for a full estrus cycle.
     WAITING_SHORT_ED_CYCLE : str
         The state that represents the animal is waiting for a short estrus cycle.
-    WAITING_ED_DAILY : str
-        The state that represents the animal is waiting for estrus daily.
+    WAITING_FULL_ED_CYCLE_BEFORE_OVSYNCH : str
+        The state that represents the animal is waiting for a full estrus cycle before OvSynch, applicable to ED-TAI.
     IN_PRESYNCH : str
         The state that represents the animal is in a presynch program.
     HAS_DONE_PRESYNCH : str
@@ -121,13 +121,18 @@ class ReproStateEnum(Enum):
         The state that represents that estrus has been detected.
     AFTER_AI : str
         The state that represents the animal has just been inseminated.
+    FRESH : str
+        The state that represents the animal is in the fresh state.
+    PREGNANT : str
+        The state that represents the animal is pregnant.
+    ENTER_HERD_FROM_INIT : str
+        The state that represents the animal has just entered the herd through initialization.
     """
 
     NONE = 'none'
     WAITING_FULL_ED_CYCLE = 'waiting for full estrus cycle'
     WAITING_SHORT_ED_CYCLE = 'waiting for short estrus cycle'
     WAITING_FULL_ED_CYCLE_BEFORE_OVSYNCH = 'waiting for full estrus cycle before OvSynch'
-    WAITING_ED_DAILY = 'waiting for estrus daily'
     IN_PRESYNCH = 'in presynch'
     HAS_DONE_PRESYNCH = 'has done presynch'
     IN_OVSYNCH = 'in OvSynch'
@@ -135,4 +140,4 @@ class ReproStateEnum(Enum):
     AFTER_AI = 'after AI'
     FRESH = 'fresh'
     PREGNANT = 'pregnant'
-    ENTERED_HERD_FROM_INIT = 'entered herd from init'
+    ENTER_HERD_FROM_INIT = 'entered herd from init'

@@ -678,7 +678,13 @@ class Cow(HeiferIII):
 
             if self.repro_program != self.get_user_defined_repro_protocol():
                 self._set_repro_program(sim_day, self.get_user_defined_repro_protocol())
-                self._repro_state_manager.reset()
+                self.log_event(self.days_born, sim_day, f'Pre-existing days in milk: {self.days_in_milk}')
+                self.log_event(self.days_born, sim_day, f'Pre-existing days in preg: {self.days_in_preg}')
+                self.log_event(self.days_born, sim_day, f'Pre-existing AI day: {self.ai_day}')
+                self.log_event(self.days_born, sim_day, f'Pre-existing estrus day: {self.estrus_day}')
+                if not self.is_pregnant:
+                    self._repro_state_manager.enter(ReproStateEnum.ENTER_HERD_FROM_INIT)
+                    self._log_repro_states(sim_day)
 
             if self.repro_program == CowReproProtocolEnum.ED_TAI.value:
                 self.execute_ed_tai_protocol(sim_day)
@@ -733,46 +739,66 @@ class Cow(HeiferIII):
         """
 
         if 1 <= self.days_in_milk <= self.get_voluntary_waiting_period():
-            if self._repro_state_manager.is_in_empty_state():
-                self._repro_state_manager.enter(ReproStateEnum.FRESH)
-                self._log_repro_states(sim_day)
-            if self.days_born >= self.estrus_day:
-                self.log_event(self.estrus_day, sim_day, const.ESTRUS_BEFORE_VOLUNTARY_WAITING_PERIOD_NOTE)
+            self._repeat_estrus_simulation_before_vwp(sim_day)
+
+        elif self.days_in_milk > self.get_voluntary_waiting_period():
+            if (self._repro_state_manager.is_in(ReproStateEnum.ENTER_HERD_FROM_INIT)
+                    and self.days_born > self.estrus_day):
                 self._simulate_estrus(self.days_born, sim_day, const.ESTRUS_DAY_SCHEDULED_NOTE,
                                       self.get_avg_estrus_cycle(), self.get_std_estrus_cycle())
-        elif self.days_in_milk > self.get_voluntary_waiting_period():
-            if self._repro_state_manager.is_in(ReproStateEnum.FRESH):
+
+            if self._repro_state_manager.is_in_any({ReproStateEnum.FRESH, ReproStateEnum.ENTER_HERD_FROM_INIT}):
                 self._repro_state_manager.enter(ReproStateEnum.WAITING_FULL_ED_CYCLE)
                 self._log_repro_states(sim_day)
 
-            if (self.days_born == self.estrus_day and
-                    self._repro_state_manager.is_in(ReproStateEnum.WAITING_SHORT_ED_CYCLE)):
-                self._repro_state_manager.exit(ReproStateEnum.WAITING_SHORT_ED_CYCLE)
-                self._handle_estrus_detection(
-                    sim_day,
-                    on_estrus_detected=self._setup_ai_day_after_estrus_detected,
-                    on_estrus_not_detected=lambda _: self._repro_state_manager.enter(ReproStateEnum.IN_OVSYNCH)
-                )
-                if self._repro_state_manager.is_in(ReproStateEnum.IN_OVSYNCH):
-                    self._log_repro_states(sim_day)
+            if self.days_born == self.estrus_day:
+                if self._repro_state_manager.is_in(ReproStateEnum.WAITING_SHORT_ED_CYCLE):
+                    self._repro_state_manager.exit(ReproStateEnum.WAITING_SHORT_ED_CYCLE)
+                    self._handle_estrus_detection(
+                        sim_day,
+                        on_estrus_detected=self._setup_ai_day_after_estrus_detected,
+                        on_estrus_not_detected=lambda _: self._repro_state_manager.enter(ReproStateEnum.IN_OVSYNCH)
+                    )
+                    if self._repro_state_manager.is_in(ReproStateEnum.IN_OVSYNCH):
+                        self._log_repro_states(sim_day)
 
-            elif (self.days_born == self.estrus_day and
-                  self._repro_state_manager.is_in(ReproStateEnum.WAITING_FULL_ED_CYCLE)):
-                self._repro_state_manager.exit(ReproStateEnum.WAITING_FULL_ED_CYCLE)
-                self._handle_estrus_detection(
-                    sim_day,
-                    on_estrus_detected=self._setup_ai_day_after_estrus_detected,
-                    on_estrus_not_detected=self._simulate_full_estrus_cycle
-                )
+                elif self._repro_state_manager.is_in(ReproStateEnum.WAITING_FULL_ED_CYCLE):
+                    self._repro_state_manager.exit(ReproStateEnum.WAITING_FULL_ED_CYCLE)
+                    self._handle_estrus_detection(
+                        sim_day,
+                        on_estrus_detected=self._setup_ai_day_after_estrus_detected,
+                        on_estrus_not_detected=self._simulate_full_estrus_cycle
+                    )
 
-            elif (self.days_born == self.estrus_day and
-                  self._repro_state_manager.is_in(ReproStateEnum.WAITING_FULL_ED_CYCLE_BEFORE_OVSYNCH)):
-                self._repro_state_manager.exit(ReproStateEnum.WAITING_FULL_ED_CYCLE_BEFORE_OVSYNCH)
-                self._handle_estrus_detection(
-                    sim_day,
-                    on_estrus_detected=self._setup_ai_day_after_estrus_detected,
-                    on_estrus_not_detected=self._simulate_full_estrus_cycle
-                )
+                elif self._repro_state_manager.is_in(ReproStateEnum.WAITING_FULL_ED_CYCLE_BEFORE_OVSYNCH):
+                    self._repro_state_manager.exit(ReproStateEnum.WAITING_FULL_ED_CYCLE_BEFORE_OVSYNCH)
+                    self._handle_estrus_detection(
+                        sim_day,
+                        on_estrus_detected=self._setup_ai_day_after_estrus_detected,
+                        on_estrus_not_detected=self._simulate_full_estrus_cycle
+                    )
+
+    def _repeat_estrus_simulation_before_vwp(self, sim_day : int) -> None:
+        """
+        Repeat the estrus simulation before the voluntary waiting period.
+
+        Parameters
+        ----------
+        sim_day : int
+            The current simulation day.
+        """
+        
+        if (self._repro_state_manager.is_in_empty_state()
+                or self._repro_state_manager.is_in(ReproStateEnum.ENTER_HERD_FROM_INIT)):
+            self._repro_state_manager.enter(ReproStateEnum.FRESH)
+            self._log_repro_states(sim_day)
+        if self.days_born == self.estrus_day:
+            self.log_event(self.days_born, sim_day, const.ESTRUS_BEFORE_VOLUNTARY_WAITING_PERIOD_NOTE)
+            self._simulate_estrus(self.days_born, sim_day, const.ESTRUS_DAY_SCHEDULED_NOTE,
+                                  self.get_avg_estrus_cycle(), self.get_std_estrus_cycle())
+        elif self.days_born > self.estrus_day:
+            self._simulate_estrus(self.days_born, sim_day, const.ESTRUS_DAY_SCHEDULED_NOTE,
+                                  self.get_avg_estrus_cycle(), self.get_std_estrus_cycle())
 
     def _setup_ai_day_after_estrus_detected(self, sim_day: int) -> None:
         """
@@ -929,7 +955,8 @@ class Cow(HeiferIII):
             The current simulation day.
         """
 
-        if self._repro_state_manager.is_in_empty_state():
+        if (self._repro_state_manager.is_in_empty_state()
+                or self._repro_state_manager.is_in(ReproStateEnum.ENTER_HERD_FROM_INIT)):
             self._repro_state_manager.enter(ReproStateEnum.FRESH)
             self._log_repro_states(sim_day)
 
@@ -969,14 +996,21 @@ class Cow(HeiferIII):
         ]:
             return False
 
-        if (self._repro_state_manager.is_in(ReproStateEnum.FRESH) and
-                self.days_in_milk == self.get_presynch_program_start_day()):
+        if self._hormone_schedule:
+            return False
+
+        if (self.days_in_milk == self.get_presynch_program_start_day()
+                and self._repro_state_manager.is_in_any({ReproStateEnum.FRESH,
+                                                         ReproStateEnum.ENTER_HERD_FROM_INIT})):
             self._repro_state_manager.enter(ReproStateEnum.IN_PRESYNCH)
             self._log_repro_states(self.days_born)
             return True
 
-        if self._hormone_schedule:
-            return False
+        if (self.days_in_milk > self.get_presynch_program_start_day()
+                and self._repro_state_manager.is_in(ReproStateEnum.ENTER_HERD_FROM_INIT)):
+            self._repro_state_manager.enter(ReproStateEnum.IN_PRESYNCH)
+            self._log_repro_states(self.days_born)
+            return True
 
         return self._repro_state_manager.is_in(ReproStateEnum.IN_PRESYNCH)
 
@@ -1016,15 +1050,17 @@ class Cow(HeiferIII):
             return False
 
         if self.days_in_milk == self.get_ovsynch_program_start_day():
-            if (self._repro_state_manager.is_in(ReproStateEnum.FRESH)
-                    or self._repro_state_manager.is_in(ReproStateEnum.HAS_DONE_PRESYNCH)
-                    or self._repro_state_manager.is_in_empty_state()):
+            if (self._repro_state_manager.is_in_empty_state()
+                    or self._repro_state_manager.is_in_any({ReproStateEnum.ENTER_HERD_FROM_INIT,
+                                                            ReproStateEnum.FRESH,
+                                                            ReproStateEnum.HAS_DONE_PRESYNCH})):
                 self._repro_state_manager.enter(ReproStateEnum.IN_OVSYNCH)
                 self._log_repro_states(self.days_born)
                 return True
 
         if self.days_in_milk > self.get_ovsynch_program_start_day():
-            if self._repro_state_manager.is_in(ReproStateEnum.HAS_DONE_PRESYNCH):
+            if self._repro_state_manager.is_in_any({ReproStateEnum.HAS_DONE_PRESYNCH,
+                                                    ReproStateEnum.ENTER_HERD_FROM_INIT}):
                 self._repro_state_manager.enter(ReproStateEnum.IN_OVSYNCH)
                 self._log_repro_states(self.days_born)
                 return True
@@ -1067,46 +1103,25 @@ class Cow(HeiferIII):
         """
 
         if 1 <= self.days_in_milk <= self.get_voluntary_waiting_period():
-            if self._repro_state_manager.is_in_empty_state():
-                self._repro_state_manager.enter(ReproStateEnum.FRESH)
-                self._log_repro_states(sim_day)
-            if self.days_born >= self.estrus_day:
-                self.log_event(self.estrus_day, sim_day, const.ESTRUS_BEFORE_VOLUNTARY_WAITING_PERIOD_NOTE)
+            self._repeat_estrus_simulation_before_vwp(sim_day)
+
+        elif self.get_voluntary_waiting_period() < self.days_in_milk < self.get_ovsynch_program_start_day():
+            if self._repro_state_manager.is_in(
+                    ReproStateEnum.ENTER_HERD_FROM_INIT) and self.days_born > self.estrus_day:
                 self._simulate_estrus(self.days_born, sim_day, const.ESTRUS_DAY_SCHEDULED_NOTE,
                                       self.get_avg_estrus_cycle(), self.get_std_estrus_cycle())
 
-        elif self.get_voluntary_waiting_period() < self.days_in_milk < self.get_ovsynch_program_start_day():
-            if self._repro_state_manager.is_in(ReproStateEnum.FRESH):
+            if self._repro_state_manager.is_in_any({ReproStateEnum.FRESH,
+                                                    ReproStateEnum.ENTER_HERD_FROM_INIT}):
                 self._repro_state_manager.enter(ReproStateEnum.WAITING_FULL_ED_CYCLE_BEFORE_OVSYNCH)
                 self._log_repro_states(sim_day)
 
         elif self.days_in_milk >= self.get_ovsynch_program_start_day():
-            self._handle_estrus_not_detected_before_tai_start_day(sim_day)
+            self._handle_estrus_not_detected_before_ovsynch_start_day(sim_day)
 
-    def _monitor_estrus_daily(self, sim_day: int) -> None:
+    def _handle_estrus_not_detected_before_ovsynch_start_day(self, sim_day: int) -> None:
         """
-        Simulate estrus detection daily when the cow is in the WAITING_ED_DAILY state.
-
-        Notes
-        -----
-        This method is used in the ED-TAI protocol to monitor estrus daily during the period
-        between the program start day and the TAI program start day.
-
-        Parameters
-        ----------
-        sim_day : int
-            The current simulation day.
-        """
-
-        if not self._repro_state_manager.is_in(ReproStateEnum.WAITING_ED_DAILY):
-            return
-        is_estrus_detected = self._detect_estrus(self.get_general_estrus_detection_rate())
-        if is_estrus_detected:
-            self._setup_ai_day_after_estrus_detected(sim_day)
-
-    def _handle_estrus_not_detected_before_tai_start_day(self, sim_day: int) -> None:
-        """
-        Mark the cow to enter an OvSynch program when estrus has not been detected between the
+        Redirect the cow to enter an OvSynch program when estrus has not been detected between the
         voluntary waiting period and the OvSynch program start day.
 
         Parameters
@@ -1115,13 +1130,18 @@ class Cow(HeiferIII):
             The current simulation day.
         """
 
-        if self._repro_state_manager.is_in(ReproStateEnum.WAITING_FULL_ED_CYCLE_BEFORE_OVSYNCH):
+        if self._repro_state_manager.is_in(ReproStateEnum.ENTER_HERD_FROM_INIT):
+            self._repro_state_manager.enter(ReproStateEnum.IN_OVSYNCH)
+            self._log_repro_states(sim_day)
+
+        elif self._repro_state_manager.is_in(ReproStateEnum.WAITING_FULL_ED_CYCLE_BEFORE_OVSYNCH):
             self.log_event(self.days_born, sim_day,
                            const.ESTRUS_NOT_DETECTED_BETWEEN_VWP_AND_OVSYNCH_START_DAY_NOTE)
             self.log_event(self.days_born, sim_day,
                            const.CANCEL_ESTRUS_DETECTION_NOTE)
             self._repro_state_manager.enter(ReproStateEnum.IN_OVSYNCH)
             self._log_repro_states(sim_day)
+
         elif self._repro_state_manager.is_in(ReproStateEnum.FRESH):  # When no ED is instituted
             self.log_event(self.days_born, sim_day,
                            const.NO_ED_INSTITUTED_BEFORE_OVSYNCH_IN_ED_TAI_NOTE)
@@ -1406,7 +1426,7 @@ class Cow(HeiferIII):
             The current day of the simulation.
         """
 
-        single_pgf_injection_schedule = {self.days_born: {'deliver_hormone': ['PGF']}}
+        single_pgf_injection_schedule = {self.days_born: {'deliver_hormones': ['PGF']}}
         self._execute_hormone_delivery_schedule(sim_day, single_pgf_injection_schedule)
         self._repro_state_manager.enter(ReproStateEnum.WAITING_SHORT_ED_CYCLE)
         self._log_repro_states(sim_day)
@@ -1443,6 +1463,8 @@ class Cow(HeiferIII):
 
         if self._repro_state_manager.is_in(ReproStateEnum.WAITING_FULL_ED_CYCLE):
             self._repro_state_manager.exit(ReproStateEnum.WAITING_FULL_ED_CYCLE)
+            self.log_event(self.days_born, sim_day,
+                           const.CANCEL_ESTRUS_DETECTION_NOTE)
 
     def _schedule_ovsynch_program_in_advance(
             self,
