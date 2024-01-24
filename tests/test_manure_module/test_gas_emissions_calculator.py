@@ -1077,11 +1077,11 @@ def test_storage_ammonia_emission(
         # Test when manure_mass and total_solids are 0
         (0.0, 0.0, GasEmissionConstants.SOLID_AND_SEMI_SOLID_MANURE_HSC, None),
         # Test when dry matter >= SOLID_MANURE_THRESHOLD
-        (1000.0, 1.0, GasEmissionConstants.SOLID_AND_SEMI_SOLID_MANURE_HSC, None),
+        (100.0, 10.0, GasEmissionConstants.SOLID_AND_SEMI_SOLID_MANURE_HSC, None),
         # Test when dry matter >= SLURRY_MANURE_THRESHOLD
-        (10.0, 2.0, GasEmissionConstants.SLURRY_MANURE_HSC, None),
+        (100.0, 7.0, GasEmissionConstants.SLURRY_MANURE_HSC, None),
         # Test when dry matter < SLURRY_MANURE_THRESHOLD (i.e., liquid manure)
-        (10.0, 20.0, GasEmissionConstants.LIQUID_MANURE_HSC, None),
+        (100.0, 4.9, GasEmissionConstants.LIQUID_MANURE_HSC, None),
         # Test when manure_mass < 0
         (-1.0, 20.0, ValueError, "Manure mass must be greater than or equal to 0."),
         # Test when total_solids < 0
