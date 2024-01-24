@@ -168,7 +168,7 @@ class BaseBedding(ABC):
 
         """
         return (
-            self.calc_total_bedding_mass(num_animals) / self.bedding_dry_matter_content
+            self.calc_total_bedding_mass(num_animals) * self.bedding_dry_matter_content
         )
 
 
