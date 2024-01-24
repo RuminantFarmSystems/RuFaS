@@ -61,6 +61,7 @@ def main():
             Path(cmd_arguments.output_dir), cmd_arguments.exclude_info_maps, cmd_arguments.format_option
         )
         sys.stdout.write("Unexpected early termination of the simulation. Please see logs for details.\n")
+        raise e
 
 
 def run_rufas(

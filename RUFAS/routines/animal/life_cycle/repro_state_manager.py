@@ -3,7 +3,7 @@ from RUFAS.routines.animal.life_cycle.repro_protocol_enums import ReproStateEnum
 
 class ReproStateManager:
     """
-    A manager for handling reproductive states of an animal.
+    A class that manages the reproductive states of an animal.
 
     Notes
     -----
@@ -29,6 +29,8 @@ class ReproStateManager:
         Exit an active reproductive state.
     is_in(state: ReproStateEnum) -> bool
         Check if a specific reproductive state is currently active.
+    is_in_any(states: set[ReproStateEnum]) -> bool
+        Check if any of the specified reproductive states are currently active.
     reset() -> None
         Clear all current states and revert the state manager to having only the NONE state.
     is_in_empty_state() -> bool
@@ -122,6 +124,23 @@ class ReproStateManager:
         """
 
         return state in self._states
+
+    def is_in_any(self, states: set[ReproStateEnum]) -> bool:
+        """
+        Check if any of the specified reproductive states are currently active.
+
+        Parameters
+        ----------
+        states : set[ReproStateEnum]
+            The reproductive states to check.
+
+        Returns
+        -------
+        bool
+            True if any of the specified states are active, False otherwise.
+        """
+
+        return bool(self._states & states)
 
     def reset(self) -> None:
         """

@@ -35,6 +35,7 @@ ESTRUS_AFTER_PGF_NOTE = "estrus after PGF"
 SIMULATE_ESTRUS_AFTER_PGF_NOTE = "simulating estrus after PGF"
 ESTRUS_NOT_DETECTED_BETWEEN_VWP_AND_OVSYNCH_START_DAY_NOTE = "estrus not detected between VWP and OvSynch start day"
 NO_ED_INSTITUTED_BEFORE_OVSYNCH_IN_ED_TAI_NOTE = "No ED instituted before OvSynch in ED-TAI"
+CANCEL_ESTRUS_DETECTION_NOTE = "canceled estrus detection"
 
 # TAI injections
 INJECT_GNRH = "inject GnRH"
