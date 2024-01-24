@@ -8,6 +8,12 @@ class BiomassAllocation:
     This module primarily follows the Biomass Production section of the SWAT model (5:2.1.1)
     and some components from the Crop Yield section (5:2.4)
 
+    Parameters
+    ----------
+    crop_data : Optional[CropData]
+        The data object used for biomass calculation. Stores information
+        about the plant's growth and environmental factors.
+
     Attributes
     ----------
     data : CropData
@@ -140,7 +146,7 @@ class BiomassAllocation:
 
         Returns
         -------
-        dict
+        float
             Biomass accumulated in a day (kg/ha).
         """
         growth = max_growth * growth_factor

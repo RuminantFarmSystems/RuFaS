@@ -63,15 +63,6 @@ class Crop:
     """
 
     def __init__(self, crop_data: Optional[CropData] = None):
-        """
-        Initialize a Crop object with the specified or default crop data.
-
-        Parameters
-        ----------
-        crop_data : Optional[CropData]
-            The crop data to be used for simulation. If not provided, default specifications are used.
-
-        """
         # Common data object that is updated throughout routines
         self.data = crop_data or CropData()  # defaults if not given
 
