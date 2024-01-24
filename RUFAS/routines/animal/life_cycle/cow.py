@@ -775,7 +775,7 @@ class Cow(HeiferIII):
                     self._handle_estrus_detection(
                         sim_day,
                         on_estrus_detected=self._setup_ai_day_after_estrus_detected,
-                        on_estrus_not_detected=self._simulate_full_estrus_cycle
+                        on_estrus_not_detected=self._simulate_full_estrus_cycle_before_ovsynch
                     )
 
     def _repeat_estrus_simulation_before_vwp(self, sim_day: int) -> None:
@@ -854,6 +854,28 @@ class Cow(HeiferIII):
         """
 
         self._repro_state_manager.enter(ReproStateEnum.WAITING_FULL_ED_CYCLE, keep_existing=True)
+        self._log_repro_states(sim_day)
+        self._simulate_estrus(self.days_born, sim_day, const.ESTRUS_DAY_SCHEDULED_NOTE,
+                              self.get_avg_estrus_cycle(), self.get_std_estrus_cycle())
+
+    def _simulate_full_estrus_cycle_before_ovsynch(self, sim_day: int) -> None:
+        """
+        Simulate another estrus cycle before the OvSynch program in the ED-TAI protocol.
+
+        Notes
+        -----
+        This method is called when the estrus is not detected on an estrus day during the period
+        between the voluntary waiting period and the start of the OvSynch program. It will schedule
+        the next estrus day and if this day is beyond the OvSynch program start day, the estrus
+        detection process will be canceled and the cow will enter the OvSynch program.
+
+        Parameters
+        ----------
+        sim_day : int
+            The current simulation day.
+        """
+
+        self._repro_state_manager.enter(ReproStateEnum.WAITING_FULL_ED_CYCLE_BEFORE_OVSYNCH)
         self._log_repro_states(sim_day)
         self._simulate_estrus(self.days_born, sim_day, const.ESTRUS_DAY_SCHEDULED_NOTE,
                               self.get_avg_estrus_cycle(), self.get_std_estrus_cycle())
