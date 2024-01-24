@@ -267,6 +267,7 @@ class ManureManagerConfigHandler:
             ] = ManureTreatmentConfig(**json_manure_treatment_config)
 
         # Only do this because we only have one special case
+        # TODO CAN WE ADD THIS AS ANOTHER SPECIAL CASE?
         if (
             ManureTreatmentType.ANAEROBIC_LAGOON in manure_treatment_config_by_type
             and ManureTreatmentType.ANAEROBIC_DIGESTION
@@ -281,7 +282,7 @@ class ManureManagerConfigHandler:
             manure_treatment_config_by_type[
                 ManureTreatmentType.ANAEROBIC_DIGESTION_AND_LAGOON
             ] = manure_treatment_config_by_type[
-                ManureTreatmentType.ANAEROBIC_DIGESTION_AND_LAGOON_WITH_SPLIT
+                ManureTreatmentType.ANAEROBIC_DIGESTION_AND_LAGOON_WITH_SEPARATOR
             ] = combo_config
 
         return manure_treatment_config_by_type

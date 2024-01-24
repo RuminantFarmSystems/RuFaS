@@ -263,7 +263,8 @@ class ManureManager:
             ManureTreatmentType.ANAEROBIC_LAGOON: ManureType.LIQUID,
             ManureTreatmentType.ANAEROBIC_DIGESTION_AND_LAGOON: ManureType.LIQUID,
             ManureTreatmentType.ANAEROBIC_DIGESTION: ManureType.LIQUID,
-            ManureTreatmentType.ANAEROBIC_DIGESTION_AND_LAGOON_WITH_SPLIT: ManureType.LIQUID,
+            ManureTreatmentType.ANAEROBIC_DIGESTION_AND_LAGOON_WITH_SEPARATOR: ManureType.LIQUID,
+            ManureTreatmentType.ANAEROBIC_DIGESTION_AND_LAGOON_WITH_TWO_SEPARATORS: ManureType.LIQUID,
             ManureTreatmentType.COMPOST_BEDDED_PACK_BARN: ManureType.SOLID,
             ManureTreatmentType.OPEN_LOTS: ManureType.SOLID,
             ManureTreatmentType.SEPARATED_SOLIDS_STORAGE: ManureType.SOLID,
@@ -585,7 +586,8 @@ class ManureManager:
         manure_treatment_type = ManureTreatmentType.get_type(manure_treatment_name)
         compound_anaerobic_manure_treatment_types = [
             ManureTreatmentType.ANAEROBIC_DIGESTION_AND_LAGOON,
-            ManureTreatmentType.ANAEROBIC_DIGESTION_AND_LAGOON_WITH_SPLIT,
+            ManureTreatmentType.ANAEROBIC_DIGESTION_AND_LAGOON_WITH_SEPARATOR,
+            ManureTreatmentType.ANAEROBIC_DIGESTION_AND_LAGOON_WITH_TWO_SEPARATORS,
         ]
         return manure_treatment_type in compound_anaerobic_manure_treatment_types
 
