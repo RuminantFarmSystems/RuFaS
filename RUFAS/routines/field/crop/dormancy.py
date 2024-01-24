@@ -8,10 +8,6 @@ class Dormancy:
     """
     A class for managing crop dormancy operations.
 
-    This class handles dormancy-related operations for crops based on crop data. It is based on
-    the "Dormancy" section of the SWAT model (5:1.2). The class operates on a `CropData` object,
-    using its attributes to determine and manage the dormancy status of a crop.
-
     Parameters
     ----------
     crop_data : Optional[CropData], optional
@@ -22,6 +18,12 @@ class Dormancy:
     ----------
     data : CropData
         A reference to the `crop_data` object on which dormancy operations will be conducted.
+
+    Notes
+    -----
+    This method is used if the crop remains uncut after reaching maturity. It reduces the crop's biomass
+    based on species-specific water content, simulating the natural dry-down process.
+
     """
 
     def __init__(self, crop_data: Optional[CropData] = None):

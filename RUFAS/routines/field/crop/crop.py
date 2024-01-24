@@ -85,9 +85,6 @@ class Crop:
         """
         Main function for growing the crop on a daily basis.
 
-        This function acts as a wrapper for all the Crop growth process sub-routines.
-        It should be called every day that the crop is alive and growing in the simulation.
-
         Parameters
         ----------
         soil_data : SoilData
@@ -100,6 +97,11 @@ class Crop:
             Minimum air temperature for the day (°C).
         max_air_temperature : float
             Maximum air temperature for the day (°C).
+
+        Notes
+        -----
+        This function acts as a wrapper for all the Crop growth process sub-routines.
+        It should be called every day that the crop is alive and growing in the simulation.
 
         """
         if self.data.in_growing_season:
