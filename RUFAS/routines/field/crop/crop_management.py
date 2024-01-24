@@ -15,9 +15,6 @@ class CropManagement:
     """
     A class for managing crop operations based on crop data.
 
-    This class is designed to handle various crop management operations using data provided by the `CropData` class.
-    It is primarily based upon the "Crop Yield" (5:2.4) and "General Management" (6:1) sections of the SWAT model.
-
     Parameters
     ----------
     crop_data : Optional[CropData], optional
@@ -28,6 +25,11 @@ class CropManagement:
     ----------
     data : CropData
         A reference to `crop_data`, on which crop management operations will be conducted.
+
+    Notes
+    -----
+    This class is designed to handle various crop management operations using data provided by the `CropData` class.
+    It is primarily based upon the "Crop Yield" (5:2.4) and "General Management" (6:1) sections of the SWAT model.
 
     """
 
@@ -113,10 +115,12 @@ class CropManagement:
                                                                  self.data.min_harvest_index,
                                                                  self.data.water_deficiency)
 
-    def dry_down(self):
+    def dry_down(self) -> None:
         """
         Adjusts crop biomass for water loss during the dry-down process.
 
+        Notes
+        -----
         This method is used if the crop remains uncut after reaching maturity. It reduces the crop's biomass
         based on species-specific water content, simulating the natural dry-down process.
 
