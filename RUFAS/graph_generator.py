@@ -229,7 +229,7 @@ class GraphGenerator:
             "class": self.__class__.__name__,
             "function": self._prepare_plot_data.__name__,
         }
-        selected_variables = graph_details.get("variables", [])
+        selected_variables = graph_details.get("variables")
         title = graph_details.get("title")
         log_pool: List[Dict[str, str | Dict[str, str]]] = []
         prepared_pool: Dict[str, List[int | float]] = {}
@@ -238,12 +238,11 @@ class GraphGenerator:
             values: List[Any] = filtered_pool[key]["values"]
             is_data_in_dict = isinstance(values[0], dict)
             if is_data_in_dict:
-                data_dict = Utility.convert_list_of_dicts_to_dict_of_lists(values)
                 if not selected_variables:
-                    filter_by_exclusion = True
-                    log_pool.append({"warning": "No variables listed in graph filter file",
-                                     "message": "All variables in data pool supplied will be attempted to be graphed.",
+                    log_pool.append({"error": f"Can't plot {title} data set",
+                                     "message": f"No selected variables for {key}.",
                                      "info_map": info_map})
+                data_dict = Utility.convert_list_of_dicts_to_dict_of_lists(values)
                 filtered_data = Utility.filter_pool(data_dict, selected_variables, filter_by_exclusion)
                 non_int_float_keys = [
                     key for key, value in filtered_data.items()
