@@ -32,16 +32,6 @@ class CropManagement:
     """
 
     def __init__(self, crop_data: Optional[CropData] = None):
-        """
-        Parameters
-        ----------
-        crop_data: CropData
-            the data class containing crop specifications and tracked attributes
-
-        Attributes
-        ----------
-        data: a reference to crop_data, on which crop management operations will be conducted
-        """
         self.data = crop_data or CropData()  # initialize with defaults, if not given
 
     # ---- Main Methods ----
