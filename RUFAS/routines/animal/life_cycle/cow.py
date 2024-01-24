@@ -778,7 +778,7 @@ class Cow(HeiferIII):
                         on_estrus_not_detected=self._simulate_full_estrus_cycle
                     )
 
-    def _repeat_estrus_simulation_before_vwp(self, sim_day : int) -> None:
+    def _repeat_estrus_simulation_before_vwp(self, sim_day: int) -> None:
         """
         Repeat the estrus simulation before the voluntary waiting period.
 
@@ -787,7 +787,7 @@ class Cow(HeiferIII):
         sim_day : int
             The current simulation day.
         """
-        
+
         if (self._repro_state_manager.is_in_empty_state()
                 or self._repro_state_manager.is_in(ReproStateEnum.ENTER_HERD_FROM_INIT)):
             self._repro_state_manager.enter(ReproStateEnum.FRESH)
