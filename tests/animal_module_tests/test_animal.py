@@ -399,6 +399,8 @@ def test_recalculate_requirements() -> None:
 
 
 def test_use_existing_requirements() -> None:
+    """Unit test for function use_existing_requirements() in file routines/animal/ration/animal_requirements.py"""
+
     pen_mock = MagicMock()
     pen_mock.animals_in_pen = {0: MagicMock(), 1: MagicMock()}
     animal_list = list(pen_mock.animals_in_pen.values())

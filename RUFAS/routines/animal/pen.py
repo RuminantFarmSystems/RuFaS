@@ -78,7 +78,7 @@ class Pen:
     avg_p_animal : float
         The average phosphorus content/mass of the animals in the pen.
 
-    animals_in_pen : animal id dictionary
+    animals_in_pen : dictionary
         A dictionary of all animals in this pen that maps animal id to animal object.
 
     classes_in_pen : set
@@ -208,7 +208,6 @@ class Pen:
         self.avg_p_req = 0.0
         self.avg_p_animal = 0.0
 
-        # TODO: We should use a dictionary to map animal id to animal object.
         self.animals_in_pen = {}
         # TODO: To be removed. Use the property 'is_populated' instead.
         self.populated = False
