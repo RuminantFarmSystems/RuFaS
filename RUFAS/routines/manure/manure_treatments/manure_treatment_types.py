@@ -12,6 +12,7 @@ class ManureTreatmentType(DefaultEnum):
     ANAEROBIC_DIGESTION_AND_LAGOON_WITH_SPLIT = (
         "anaerobic digestion and lagoon with split"
     )
+    COMPOSTING = "composting"
     COMPOST_BEDDED_PACK_BARN = "compost bedded pack barn"
     OPEN_LOTS = "open lots"
     SEPARATED_SOLIDS_STORAGE = "separated solids storage"

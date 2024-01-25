@@ -3,6 +3,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Union, Tuple
 
+from RUFAS.routines.manure.manure_treatments.composting_types import CompostingType
 from RUFAS.routines.manure.manure_treatments.manure_treatment_types import (
     ManureTreatmentType,
 )
@@ -60,6 +61,20 @@ class ManureTreatmentConfig:
 
     storage_time_period: int = 0
     freeboard_input: float = 0.0
+
+    composting_type: str = "intensive windrow"
+    maximum_methane_producing_capacity: float = 0.24
+    effectiveness_of_microbial_decomposition_rate: float = 2.37e-3
+    decomposition_temperature: float = 60
+    first_order_decaying_coefficient: float = 0.1
+    last_compost_turning_or_addition: int = 1
+    lag_time: int = 2
+    mole_fraction_of_oxygen: float = 0.15
+    half_saturation_constant: float = 0.002
+    ambient_air_mole_fraction_of_oxygen: float = 0.21
+    proportion_of_carbon_available_in_manure: float = 0.5
+    proportion_of_carbon_available_in_bedding: float = 0.35
+    effect_of_moisture_on_microbial_decomposition: float = 0.65
 
 
 class DefaultManureTreatmentConfigFactory:
@@ -121,6 +136,7 @@ class DefaultManureTreatmentConfigFactory:
 
     COMPOST_BEDDED_PACK_BARN_CONFIG = ManureTreatmentConfig()
     OPEN_LOTS_CONFIG = ManureTreatmentConfig()
+    COMPOSTING_CONFIG = ManureTreatmentConfig()
 
     @classmethod
     def get_instance(
@@ -152,5 +168,6 @@ class DefaultManureTreatmentConfigFactory:
             ),
             ManureTreatmentType.COMPOST_BEDDED_PACK_BARN: cls.COMPOST_BEDDED_PACK_BARN_CONFIG,
             ManureTreatmentType.OPEN_LOTS: cls.OPEN_LOTS_CONFIG,
+            ManureTreatmentType.COMPOSTING: cls.COMPOSTING_CONFIG
         }
         return manure_treatment_config_by_type[treatment_type]

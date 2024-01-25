@@ -56,6 +56,7 @@ class ManureTreatmentDailyOutput(LiquidManurePortionProtocol):
         evaporated_water: Amount of water evaporated, m^3.
         minimum_digester_volume: Minimum digester volume, m^3.
         top_cover_volume: Volume of the top cover, m^3.
+        solid_manure_carbon_decomposition: Carbon decomposition, kg.
     """
 
     pen_id: int = -1
@@ -106,6 +107,8 @@ class ManureTreatmentDailyOutput(LiquidManurePortionProtocol):
     evaporated_water: float = 0.0
     minimum_digester_volume: float = 0.0
     top_cover_volume: float = 0.0
+
+    solid_manure_carbon_decomposition: float = 0.0
 
     def __post_init__(self):
         """Ensures that the daily volume is set to the final manure volume."""
