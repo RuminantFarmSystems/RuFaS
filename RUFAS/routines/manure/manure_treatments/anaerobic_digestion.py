@@ -55,7 +55,7 @@ class AnaerobicDigestion(BaseManureTreatment):
             manure_treatment_daily_input.liquid_manure_total_volatile_solids
             * 0.03
             / ManureConstants.MANURE_DENSITY
-        )
+        )  # TODO: Use constants instead
         return new_daily_output
 
     def _daily_update_helper(self) -> ManureTreatmentDailyOutput:
@@ -192,7 +192,7 @@ class AnaerobicDigestion(BaseManureTreatment):
             average_temperature_celsius: Average daily temperature, C.
 
         """
-        return max(average_temperature_celsius, 4.0)
+        return max(average_temperature_celsius, 4.0)  # TODO: Use constants instead
 
     @classmethod
     def _calc_manure_heat_capacity(
@@ -208,6 +208,7 @@ class AnaerobicDigestion(BaseManureTreatment):
             Heat capacity of manure, kJ /kg /C.
 
         """
+        # TODO: Name the constants if you can
         return (
             0.68298
             + 0.025662 * average_temperature_celsius
