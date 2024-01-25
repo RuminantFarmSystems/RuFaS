@@ -10,7 +10,7 @@
     "animal": {
       "title": "Animal data",
       "description": "The configuration file for the animal module.",
-      "path": "input/data/animal/W1_animal.json",
+      "path": "input/data/animal/W2_animal.json",
       "type": "json",
       "properties": "animal_properties"
     },

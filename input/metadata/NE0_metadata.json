@@ -10,7 +10,7 @@
     "animal": {
       "title": "Animal data",
       "description": "The configuration file for the animal module.",
-      "path": "input/data/animal/W1_animal.json",
+      "path": "input/data/animal/NE0_animal.json",
       "type": "json",
       "properties": "animal_properties"
     },
@@ -52,7 +52,7 @@
     "feed": {
       "title": "Feed data",
       "description": "The configuration file for the feed module.",
-      "path": "input/data/feed/feed_W_Diet_15.json",
+      "path": "input/data/feed/feed_NE_Diet_15.json",
       "type": "json",
       "properties": "feed_properties"
     },
