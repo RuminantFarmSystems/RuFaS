@@ -4291,8 +4291,8 @@ def test_composting_calculate_carbon_decomposition(mocker: MockFixture) -> None:
     expected_result = (total_solid * manure_treatment_config_mock.proportion_of_carbon_available_in_manure +
                        manure_handler_daily_output_mock.total_bedding_mass *
                        manure_treatment_config_mock.proportion_of_carbon_available_in_bedding
-                       ) * carbon_decomposition_rate * manure_treatment_config_mock. \
-                          effect_of_moisture_on_microbial_decomposition * anaerobic_coefficient
+                       ) * carbon_decomposition_rate * manure_treatment_config_mock.\
+        effect_of_moisture_on_microbial_decomposition * anaerobic_coefficient
 
     result = composting._calculate_carbon_decomposition(total_solid=total_solid)
 

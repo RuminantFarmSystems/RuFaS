@@ -29,7 +29,97 @@ FRACTION_NITROGEN_LOST_TO_DIRECT_N2O_EMISSION: Dict[CompostingType, float] = {
 
 
 class Composting(BaseManureTreatment):
+    """
+    Class for managing and simulating the composting process of manure treatment.
+
+    This class simulates the composting process by considering various factors like weather,
+    manure characteristics, and composting configurations. It provides methods for daily and
+    annual updates of compost characteristics such as methane emissions, nitrogen content, and
+    carbon decomposition. The calculations are based on standard composting models and
+    environmental factors.
+
+    Attributes
+    ----------
+    weather : Weather
+        The current weather conditions.
+    time : Time
+        The current time information.
+    manure_treatment_config : ManureTreatmentConfig
+        Configuration settings for manure treatment.
+    composting_type : CompostingType
+        The type of composting process being used.
+
+    Methods
+    -------
+    _daily_update_helper() -> ManureTreatmentDailyOutput:
+        Performs daily updates to the compost characteristics, computing methane_emission emission,
+        carbon decomposition and dry matter loss.
+
+    annual_update() -> None:
+        Updates and computes annual metrics: Nitrogen related calculations.
+
+    calc_methane_emission(*args, **kwargs) -> float:
+        Calculates the methane emissions for the current day.
+
+    calc_ammonia_emission(*args, **kwargs) -> float:
+        Calculates the total nitrogen loss to ammonia emission for the current year.
+
+    _calculate_methane_conversion_factor() -> float:
+        Returns the methane conversion factor based on composting type and temperature.
+
+    _calculate_max_microbial_decomposition_rate() -> float:
+        Calculates the maximum microbial decomposition rate for the current day.
+
+    _calculate_slow_microbial_decomposition_rate() -> float:
+        Calculates the slow microbial decomposition rate for the current day.
+
+    _calculate_carbon_decomposition_rate() -> float:
+        Calculates the carbon decomposition rate for the current day.
+
+    _calculate_anaerobic_coefficient() -> float:
+        Calculates the anaerobic coefficient for the composting process.
+
+    _calculate_carbon_decomposition(total_solid: float) -> float:
+        Computes the total carbon decomposition for the current day.
+
+    _calculate_dry_matter_loss(methane_emission: float, carbon_decomposition: float) -> float:
+        Calculates the total dry matter loss for the current day.
+
+    _calculate_Nitrogen_loss_to_leaching() -> float:
+        Computes the nitrogen loss due to leaching for the current year.
+
+    _calculate_Nitrogen_loss_to_direct_Nitrous_Oxide_Emission() -> float:
+        Calculates the nitrogen loss through direct nitrous oxide emission for the current year.
+
+    _calculate_Nitrogen_loss_to_indirect_Nitrous_Oxide_Emission() -> float:
+        Calculates the nitrogen loss through indirect nitrous oxide emission for the current year.
+
+    _calculate_total_Nitrogen_mass() -> float:
+        Computes the total mass of nitrogen in the manure-bedding mix for the current year.
+
+    _calculate_organic_Nitrogen_mass() -> float:
+        Calculates the mass of organic nitrogen in the manure-bedding mix for the current year.
+
+    _calculate_inorganic_Nitrogen_mass() -> float:
+        Calculates the mass of inorganic nitrogen in the manure-bedding mix for the current year.
+
+    _calculate_ammonium_mass() -> float:
+        Computes the mass of ammonium in the manure-bedding mix for the current year.
+    """
     def __init__(self, weather, time, manure_treatment_config: ManureTreatmentConfig) -> None:
+        """
+        Initializes a new instance of the Composting class, setting up the necessary parameters for
+        composting manure treatment based on provided configurations.
+
+        Parameters
+        ----------
+        weather : Weather
+            The current weather conditions.
+        time : Time
+            The current time information.
+        manure_treatment_config : ManureTreatmentConfig
+            Configuration settings for manure treatment.
+        """
         super().__init__(weather, time, manure_treatment_config)
         self.composting_type: CompostingType = CompostingType.get_type(self.config.composting_type)
 
