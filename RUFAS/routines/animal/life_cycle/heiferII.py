@@ -387,11 +387,17 @@ class HeiferII(HeiferI):
             # prior to calving, heifer move to replacement group (heiferIII)
             if self.p_req < 0:
                 print('preq bug!')
-            if self.days_in_preg >= self.gestation_length - AnimalBase.config["prefresh_day"]:
-                if self.gestation_length - self.days_in_preg < 0:
+                print(f'p_req = {self.p_req}')
+                print(f'body_weight = {self.body_weight}')
+                print(f'id = {self.id}')
+            if self.days_in_preg != 0 and self.days_in_preg >= self.gestation_length -\
+                    AnimalBase.config["prefresh_day"]:
+                if self.days_in_preg - (self.gestation_length - AnimalBase.config["prefresh_day"]) < 0:
                     print(self.id)
                     print(f'days_in_preg = {self.days_in_preg}')
                     print(f'gestation_length = {self.gestation_length}')
+                    print(f'prefresh_day = {AnimalBase.config["prefresh_day"]}')
+                    print(f'diff = {self.days_in_preg - self.gestation_length - AnimalBase.config["prefresh_day"]}')
                 self.days_born -= 1  # will be increment again in next stage
                 third_stage = True
                 self.log_event(self.days_born, sim_day, const.HEIFERII_TO_III)
