@@ -66,7 +66,7 @@ class DefaultManureTreatmentConfigFactory:
     """Class for creating default manure treatment configuration data."""
 
     SLURRY_STORAGE_UNDERFLOOR_CONFIG = ManureTreatmentConfig(
-        total_solids_removal_efficiency_for_treatment=0.10,  # Between 10-30%
+        total_solids_removal_efficiency_for_treatment=0.0,  # Previously set between 10-30%
         volatile_solids_removal_efficiency_for_treatment=0.20,  # Between 20-40%
         nitrogen_removal_efficiency_for_treatment=0.10,  # # Between 10-30%
         total_ammoniacal_nitrogen_removal_efficiency_for_treatment=0.45,  # Between 61-80%
@@ -76,7 +76,7 @@ class DefaultManureTreatmentConfigFactory:
     )
 
     SLURRY_STORAGE_OUTDOOR_CONFIG = ManureTreatmentConfig(
-        total_solids_removal_efficiency_for_treatment=0.10,  # Between 10-30%
+        total_solids_removal_efficiency_for_treatment=0.0,  # Previously set between 10-30%
         volatile_solids_removal_efficiency_for_treatment=0.20,  # Between 20-40%
         nitrogen_removal_efficiency_for_treatment=0.10,  # # Between 10-30%
         total_ammoniacal_nitrogen_removal_efficiency_for_treatment=0.45,  # Between 61-80%
@@ -95,7 +95,7 @@ class DefaultManureTreatmentConfigFactory:
         total_ammoniacal_nitrogen_removal_efficiency_for_treatment=0.1,
         hydraulic_retention_time=25,  # 25 -30 days
         sludge_accumulation_period=1.0,  # Sludge accumulation period 1-5 years
-        sludge_accumulation_volume_fraction=0.03,  # Sludge Accumulation volume fraction 2-4% of VS loaded
+        sludge_accumulation_volume_fraction=0.0,  # Previous Sludge Accumulation volume fraction 2-4% of VS loaded
         top_cover_volume_fraction=0.2,  # Should be between 10-30%
         biogas_generation_ratio=0.38,  # 0.23 to 0.39 kg CH4/kg VS
         methane_generation_ratio=0.65,  # 0.5-0.65 according to spreadsheet
@@ -113,7 +113,7 @@ class DefaultManureTreatmentConfigFactory:
         potassium_removal_efficiency_for_treatment=0.2,  # Between 20-30%
         hydraulic_retention_time=365,  # 180 - 365 days
         sludge_accumulation_period=10.0,  # Sludge accumulation period 5-20 years
-        sludge_accumulation_volume_fraction=0.00251,
+        sludge_accumulation_volume_fraction=0.0,
         # Sludge Accumulation volume fraction 0.00274-0.00455 of VS loaded
         storage_time_period=365,
         freeboard_input=0.3048,
