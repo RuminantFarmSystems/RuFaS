@@ -200,8 +200,8 @@ class LeafAreaIndex:
         Returns
         -------
         float
-            The fraction of the plant's maximum leaf area index corresponding to the given fraction of potential heat units,
-            constrained to be bounded at zero.
+            The fraction of the plant's maximum leaf area index corresponding to the given fraction of potential heat
+            units, constrained to be bounded at zero.
 
         Notes
         -----
