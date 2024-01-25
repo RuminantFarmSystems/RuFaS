@@ -435,9 +435,6 @@ class Cow(HeiferIII):
             self.milk_fat_kg = 0.0
             self.milk_protein_kg = 0.0
 
-        if not self.milking and self.milk_fat_kg > 0:
-            raise ValueError('Cow is not milking but has milk fat')
-
         self.daily_growth = self.get_bw_change(calving_interval)
 
         self.body_weight += self.daily_growth
