@@ -323,7 +323,7 @@
           "milk_protein_percent": {
             "type": "number",
             "description": "Milk Protein Percent (percent) -- The average or most common milk protein percentage in cow milk",
-            "default": 3.0,
+            "default": 3.2,
             "minimum": 0
           }
         },

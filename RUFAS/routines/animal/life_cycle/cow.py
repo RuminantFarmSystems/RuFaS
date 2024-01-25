@@ -388,6 +388,12 @@ class Cow(HeiferIII):
             self.days_in_milk = 0
             self.estimated_daily_milk_produced = 0
             self.latest_milk_production_305days = 0.0
+            self.fat_percent = 0.0
+            self.milk_fat_kg = 0.0
+            self.milk_protein_kg = 0.0
+            self.lactose_milk = 0.0
+            self.CP_milk = 0.0
+            self.mPrt = 0.0
             return 0, 0, 0
 
         if self.milking:
@@ -421,13 +427,16 @@ class Cow(HeiferIII):
             daily_fat_correct_milk_production = \
                 0.4 * estimated_daily_milk_produced + \
                 0.15 * self.fat_percent * estimated_daily_milk_produced
-            self.milk_fat_kg = self.fat_percent * estimated_daily_milk_produced
-            self.milk_protein_kg = self.mPrt * self.estimated_daily_milk_produced
+            self.milk_fat_kg = (self.fat_percent / 100) * self.estimated_daily_milk_produced
+            self.milk_protein_kg = (self.mPrt / 100) * self.estimated_daily_milk_produced
         else:
             self.fat_percent = 0.0
             daily_fat_correct_milk_production = 0.0
             self.milk_fat_kg = 0.0
             self.milk_protein_kg = 0.0
+
+        if not self.milking and self.milk_fat_kg > 0:
+            raise ValueError('Cow is not milking but has milk fat')
 
         self.daily_growth = self.get_bw_change(calving_interval)
 

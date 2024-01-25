@@ -25,7 +25,7 @@
       "cull_milk_production": 30,
       "cow_times_milked_per_day": 3,
 	    "milk_fat_percent": 3.6,
-	    "milk_protein_percent": 3.5
+	    "milk_protein_percent": 3.2
     },
     "farm_level": {
       "calf": {
