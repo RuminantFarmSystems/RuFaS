@@ -428,7 +428,7 @@ def test_slurry_storage_underfloor_default_config() -> None:
     # Assert
     assert (
             slurry_storage_underfloor_config.total_solids_removal_efficiency_for_treatment
-            == approx(0.10)
+            == approx(0.0)
     )
     assert (
             slurry_storage_underfloor_config.volatile_solids_removal_efficiency_for_treatment
@@ -463,7 +463,7 @@ def test_slurry_storage_outdoor_default_config() -> None:
     # Assert
     assert (
             slurry_storage_outdoor_config.total_solids_removal_efficiency_for_treatment
-            == approx(0.10)
+            == approx(0.0)
     )
     assert (
             slurry_storage_outdoor_config.volatile_solids_removal_efficiency_for_treatment
@@ -525,7 +525,7 @@ def test_anaerobic_digestion_default_config() -> None:
     assert anaerobic_digestion_config.hydraulic_retention_time == 25
     assert anaerobic_digestion_config.sludge_accumulation_period == 1.0
     assert anaerobic_digestion_config.sludge_accumulation_volume_fraction == approx(
-        0.03
+        0.0
     )
     assert anaerobic_digestion_config.top_cover_volume_fraction == approx(0.2)
     assert anaerobic_digestion_config.biogas_generation_ratio == approx(0.38)
@@ -574,7 +574,7 @@ def test_anaerobic_lagoon_default_config() -> None:
     assert anaerobic_lagoon_config.hydraulic_retention_time == 365
     assert anaerobic_lagoon_config.sludge_accumulation_period == 10.0
     assert anaerobic_lagoon_config.sludge_accumulation_volume_fraction == approx(
-        0.00251
+        0.0
     )
 
     assert anaerobic_lagoon_config.storage_time_period == 365

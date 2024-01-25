@@ -74,7 +74,7 @@ class PenManure:
 
     def __post_init__(self):
         """Performs any necessary unit conversion after initialization."""
-        self.manure_volume = self.manure_mass / ManureConstants.MANURE_DENSITY
+        self.manure_volume = self.manure_mass / ManureConstants.SLURRY_MANURE_DENSITY
 
         for fld in fields(self):
             if getattr(self, fld.name) < 0:
@@ -103,7 +103,7 @@ class PenManure:
         """
         manure_mass = animal_manure["manure_mass"]  # kg
         manure_volume = (
-            manure_mass / ManureConstants.MANURE_DENSITY
+            manure_mass / ManureConstants.SLURRY_MANURE_DENSITY
         ) * GeneralConstants.CUBIC_METERS_TO_LITERS  # L
         total_ammoniacal_nitrogen = (
             animal_manure["total_ammoniacal_nitrogen_concentration"]  # g/L
