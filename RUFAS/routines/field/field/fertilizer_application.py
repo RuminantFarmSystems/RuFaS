@@ -2,8 +2,8 @@ from typing import Optional
 
 from RUFAS.routines.field.soil.soil import Soil
 
-class FertilizerApplication:
 
+class FertilizerApplication:
     """
     This module provides a way for Field to apply fertilizer, based on SWAT Theoretical documentation section (6:1.7)
     This class can be initialized with a Soil object or create one if none is provided
@@ -20,11 +20,11 @@ class FertilizerApplication:
     ----------
     soil: Soil
         Reference to the Soil object to be fertilized.
-    
+
     Methods
     -------
-    apply_fertilizer(phosphorus_applied: float, fertilizer_mass: float, inorganic_nitrogen_fraction: float, 
-                    ammonium_fraction: float, organic_nitrogen_fraction: float, application_depth: float, 
+    apply_fertilizer(phosphorus_applied: float, fertilizer_mass: float, inorganic_nitrogen_fraction: float,
+                    ammonium_fraction: float, organic_nitrogen_fraction: float, application_depth: float,
                     surface_remainder_fraction: float, field_size: float) -> None
         Applies nutrients to the soil through fertilizer.
     generate_depth_factors(application_depth: float, soil_layer_bottom_depths: list[float]) -> list[float]

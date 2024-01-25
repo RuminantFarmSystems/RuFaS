@@ -3,9 +3,6 @@ from typing import Optional, Dict
 from RUFAS.routines.field.field.fertilizer_application import FertilizerApplication
 from RUFAS.routines.field.soil.soil_data import SoilData
 from RUFAS.routines.field.crop_and_soil_constants import KILOGRAMS_TO_GRAMS, SQUARE_CENTIMETERS_TO_HECTARES
-
-
-
 # This fraction was used in the evaluation of RuFaS Soil Nitrogen cycling, and was validated empirically.
 ACTIVE_FRACTION_OF_ORGANIC_NITROGEN = 0.9286
 
@@ -34,7 +31,7 @@ class ManureApplication:
     apply_grazing_manure(dry_matter_mass: float, dry_matter_fraction: float, total_phosphorus_mass: float,
                              inorganic_nitrogen_fraction: float, ammonium_fraction: float,
                              organic_nitrogen_fraction: float, field_size: float) -> None
-        This method takes a new application of machine-applied manure phosphorus and adds it to the existing pool to 
+        This method takes a new application of machine-applied manure phosphorus and adds it to the existing pool to
         be tracked.
     apply_machine_manure(dry_matter_mass: float, dry_matter_fraction: float,
                              total_phosphorus_mass: float, field_coverage: float, application_depth: float,
@@ -46,7 +43,7 @@ class ManureApplication:
         This method takes a new application of machine-applied manure phosphorus and adds it to the existing pool to
         be tracked.
     """
-    
+
     def __init__(self, soil_data: Optional[SoilData] = None, field_size: Optional[float] = None):
         self.data = soil_data or SoilData(field_size=field_size)
 
