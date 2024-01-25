@@ -32,7 +32,7 @@
       "scenario_id": 4,
       "bedding_type": "sand",
       "manure_handler": "flush system",
-      "manure_separator": "sand lane manure separation",
+      "manure_separator": "none",
       "manure_treatment": "anaerobic lagoon"
     },
     {
@@ -54,7 +54,7 @@
       "bedding_type": "sawdust",
       "manure_handler": "flush system",
       "manure_separator": "rotary screen",
-      "manure_treatment": "anaerobic digestion and lagoon with split"
+      "manure_treatment": "anaerobic digestion and lagoon with separator"
     },
     {
       "scenario_id": 8,
@@ -149,6 +149,16 @@
       "bedding_carbon_fraction": 0.0,
       "bedding_phosphorus_content": 0.0,
       "sand_removal_efficiency": 1.0
+    },
+    {
+      "bedding_type": "none",
+      "bedding_mass_per_day": 0.0,
+      "bedding_density": 0.0,
+      "bedding_dry_matter_content": 0.0,
+      "bedding_cleaned_fraction": 0.0,
+      "bedding_carbon_fraction": 0.0,
+      "bedding_phosphorus_content": 0.0,
+      "sand_removal_efficiency": 0.0
     }
   ],
   "manure_handler_configs": [
