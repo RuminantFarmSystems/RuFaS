@@ -227,54 +227,6 @@ class GasEmissionsCalculator:
         return degradable_volatile_solids, non_degradable_volatile_solids
 
     @classmethod
-    def methane_emission_for_slurry_storage(
-            cls,
-            manure_total_solids: float,
-            is_enclosed=False,
-            temperature_celsius=GasEmissionConstants.DEFAULT_SLURRY_STORAGE_TEMPERATURE,
-            manure_volatile_solids_fraction=(
-                    GasEmissionConstants.DEFAULT_VOLATILE_SOLIDS_FRACTION
-            ),
-            efficiency_fraction=0.99,
-    ) -> float:
-        """Calculates methane emissions from manure storage using total solids.
-
-        Args:
-            manure_total_solids: Total solids, kg.
-            is_enclosed: True if manure storage is enclosed, and False if manure storage is open to air.
-            temperature_celsius: temperature in Celsius, C.
-            manure_volatile_solids_fraction: Fraction (0-1) volatile solids.
-            efficiency_fraction: efficiency of process, unitless.
-
-        Returns:
-            CH4 emissions from storage, kg CH4/day.
-
-        """
-        c = 0.024
-        VS_tot = manure_total_solids * manure_volatile_solids_fraction
-
-        constants = GasEmissionConstants
-        b1 = constants.DEGRADABLE_VOLATILE_SOLIDS_RATE_CORRECTING_FACTOR
-        b2 = constants.NON_DEGRADABLE_VOLATILE_SOLIDS_RATE_CORRECTING_FACTOR
-        lnA = constants.NATURAL_LOG_ARRHENIUS_CONSTANT
-        E = constants.ACTIVATION_ENERGY
-        R = constants.GAS_CONSTANT
-        Bo = constants.ACHIEVABLE_METHANE_EMISSION
-        E_CH4_pot = constants.POTENTIAL_METHANE_YIELD_OF_MANURE
-
-        tempK = cls._convert_temperature_celsius_to_kelvin(temperature_celsius)
-        ex = math.exp(lnA - (E / (R * tempK)))
-
-        VSd = Bo / E_CH4_pot
-        VSnd = 1 - VSd
-        E_CH4_open_air = c * VS_tot * (VSd * b1 + VSnd * b2) * ex
-
-        if not is_enclosed:
-            return E_CH4_open_air
-        else:
-            return E_CH4_open_air * (1 - efficiency_fraction)
-
-    @classmethod
     def _modified_hours(cls, hours: float) -> float:
         """
         Calculate modified hours based on the specific conditions.
