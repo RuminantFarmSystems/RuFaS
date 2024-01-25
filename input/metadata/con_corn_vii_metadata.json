@@ -94,7 +94,7 @@
     "manure_schedule": {
       "title": "Manure schedule.",
       "description": "Crappier than having 7:45 am classes Monday - Friday.",
-      "path": "input/data/manure_schedule/continuous_corn_double_manure.json",
+      "path": "input/data/manure_schedule/continuous_corn_double_manure_broadcast.json",
       "type": "json",
       "properties": "manure_schedule_properties"
     },
