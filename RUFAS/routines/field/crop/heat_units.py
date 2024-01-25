@@ -80,11 +80,11 @@ class HeatUnits:
         Notes
         -----
         The method of accumulation depends on the attribute `use_heat_unit_temperature`:
-        - If `use_heat_unit_temperature` is False (default), the method accumulates every degree Celsius above the crop's
-          minimum temperature for growth as heat units, following the SWAT manual.
-        - If `use_heat_unit_temperature` is True, or `air_temperature` is None, an alternative method is used. In this method,
-          the `heat_unit_temperature` attribute is used in place of the average air temperature. The accumulation varies
-          depending on the relationship between the air temperature range and the crop's growth temperature range:
+        - If `use_heat_unit_temperature` is False (default), the method accumulates every degree Celsius above the
+        crop's minimum temperature for growth as heat units, following the SWAT manual.
+        - If `use_heat_unit_temperature` is True, or `air_temperature` is None, an alternative method is used. In this
+        method, the `heat_unit_temperature` attribute is used in place of the average air temperature. The accumulation
+        varies depending on the relationship between the air temperature range and the crop's growth temperature range:
             1. If both min and max air temperatures are higher than the crop's min and max growth temperatures,
                accumulation is greater than the main method.
             2. If both min and max air temperatures are lower than the crop's min and max temperatures,
