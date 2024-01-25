@@ -3,17 +3,30 @@ from typing import List, Optional
 from RUFAS.routines.field.crop.crop_data import CropData
 
 
-"""
-This module is based off of the 'Canopy Cover and Height' section of SWAT (5:2.1.2)
-"""
-
-
 class LeafAreaIndex:
+    """
+    Manages the leaf area index (LAI) for crops, based on the 'Canopy Cover and Height' section of SWAT (5:2.1.2).
+
+    Parameters
+    ----------
+    crop_data : Optional[CropData], optional
+        A `CropData` instance containing crop specifications and attributes. Defaults to a new instance of `CropData` if
+        not provided.
+
+    Attributes
+    ----------
+    data : CropData
+        Reference to the provided `CropData` instance or a new default instance.
+
+    """
     def __init__(self, crop_data: Optional[CropData] = None):
         self.data = crop_data or CropData()  # initialize with defaults, if not given
 
     def grow_canopy(self) -> None:
-        """main leaf area index function"""
+        """
+        main leaf area index function
+
+        """
         self.data._lai_shapes = self._determine_lai_shapes(self.data.first_heat_fraction_point,
                                                            self.data.second_heat_fraction_point,
                                                            self.data.first_leaf_fraction_point,
@@ -42,34 +55,79 @@ class LeafAreaIndex:
         self.shift_leaf_area_time()
 
     def shift_leaf_area_time(self) -> None:
-        """shifts the time window by one step for leaf area attributes"""
+        """
+        Shifts the time window by one step for leaf area attributes.
+
+        Notes
+        -----
+        This method updates the historical record of leaf area indices by shifting the current leaf area index
+        and optimal leaf area fraction to their respective 'previous' attributes. This is typically done to
+        prepare for a new day's growth calculations.
+
+        """
         self.data.previous_leaf_area_index = self.data.leaf_area_index
         self.data.previous_optimal_leaf_area_fraction = self.data.optimal_leaf_area_fraction
 
     def check_previous_leaf_area_values(self) -> None:
-        """check for previous LAI values and set them to 0 if none are present. This function handles the
-        initial time point in the simulation"""
+        """
+        Check for previous LAI values and set them to 0 if none are present.
+
+        Notes
+        -----
+        This function is used to handle the initial time point in the simulation. It ensures that the previous LAI
+        values are initialized to 0 if they haven't been set yet, providing a baseline for the start of the simulation.
+
+        """
         if self.data.previous_optimal_leaf_area_fraction is None:
             self.data.previous_optimal_leaf_area_fraction = 0
         if self.data.previous_leaf_area_index is None:
             self.data.previous_leaf_area_index = 0
 
     def determine_leaf_area_added(self) -> None:
-        """sets actual leaf area added, by adjusting for the plant growth factor
-        SWAT Reference: 5:3.2.2
+        """
+        Sets the actual leaf area added, adjusted for the plant growth factor.
+
+        References
+        ----------
+        SWAT :3.2.2
+
         """
         self.data.leaf_area_added = min(self.data.optimal_leaf_area_change * sqrt(self.data.growth_factor),
                                         self.data.optimal_leaf_area_change)
 
     def add_leaf_area(self) -> None:
-        """add new leaf area to the plant
-        SWAT Reference: 5:2.1.18"""
+        """
+        Adds new leaf area to the plant.
+
+        References
+        ----------
+        SWAT 5:2.1.18
+
+        """
         self.data.leaf_area_index = max(0., self.data.previous_leaf_area_index + self.data.leaf_area_added)
 
     @staticmethod
     def determine_canopy_height(max_canopy_height: float, optimal_leaf_area_fraction: float) -> float:
-        """sets the current height of the canopy, in meters
-        SWAT Reference: 5:2.1.14"""
+        """
+        Sets the current height of the canopy, measured in meters.
+
+        Parameters
+        ----------
+        max_canopy_height : float
+            The maximum height that the canopy can reach (meters).
+        optimal_leaf_area_fraction : float
+            The fraction of the maximum leaf area index corresponding to the current heat fraction (unitless).
+
+        Returns
+        -------
+        float
+            The current height of the canopy (meters).
+
+        References
+        ----------
+        SWAT 5:2.1.14
+
+        """
         if max_canopy_height < 0:
             raise ValueError("max_canopy_height must be greater than 0")
         if not 0 <= optimal_leaf_area_fraction <= 1:
@@ -80,7 +138,24 @@ class LeafAreaIndex:
     def _determine_lai_shapes(first_heat_fraction: float, second_heat_fraction: float,
                               first_leaf_fraction: float, second_leaf_fraction: float) -> List[float]:
         """
-        calculates the shape coefficients for optimal LAI formula
+        Calculates the shape coefficients for the optimal Leaf Area Index (LAI) formula.
+
+        Parameters
+        ----------
+        first_heat_fraction : float
+            Fraction of the growing season corresponding to the first point on the optimal leaf development curve.
+        second_heat_fraction : float
+            Fraction of the growing season corresponding to the second point on the optimal leaf development curve.
+        first_leaf_fraction : float
+            Fraction of maximum leaf area index corresponding to the first point on the optimal leaf development curve.
+        second_leaf_fraction : float
+            Fraction of maximum leaf area index corresponding to the second point on the optimal leaf development curve.
+
+        Returns
+        -------
+        List[float]
+            A list of shape coefficients used in the optimal LAI formula.
+
         """
         if first_heat_fraction <= 0:
             raise ValueError("first_heat_fraction must be greater than 0")
@@ -109,22 +184,33 @@ class LeafAreaIndex:
 
     @staticmethod
     def _determine_optimal_leaf_area_fraction(heat_fraction: float, shape1: float, shape2: float) -> float:
-        """calculates leaf area index fraction, from the optimal leaf area development curve, for the initial period of
-        plant growth
+        """
+        Calculates the leaf area index fraction from the optimal leaf area development curve for the initial period of
+        plant growth.
 
-        Args:
-            heat_fraction: fraction of potential heat units
-            shape1: first shape coefficient
-            shape2: second shape coefficient
+        Parameters
+        ----------
+        heat_fraction : float
+            Fraction of potential heat units accumulated by the plant.
+        shape1 : float
+            The first shape coefficient of the leaf area development curve.
+        shape2 : float
+            The second shape coefficient of the leaf area development curve.
 
-        Returns:
-            fraction of the plant's maximum leaf area index
+        Returns
+        -------
+        float
+            The fraction of the plant's maximum leaf area index corresponding to the given fraction of potential heat units,
+            constrained to be bounded at zero.
 
-        Details: specifically, the calculated value is the 'fraction of the plant's maximum leaf area index
-        corresponding to a given fraction of potential heat units for the plant' (heat_fraction), constrained to be
-        bounded at zero.
+        Notes
+        -----
+        This method is particularly focused on the initial growth period of the plant.
 
-        SWAT Reference: 5:2.1.10
+        References
+        ----------
+        SWAT 5:2.1.10
+
         """
         return max(heat_fraction / (heat_fraction + exp(shape1 - (shape2 * heat_fraction))), 0)
 
@@ -132,24 +218,36 @@ class LeafAreaIndex:
     def _determine_max_leaf_area_change(leaf_area_fraction: float, previous_leaf_area_fraction: float,
                                         max_leaf_area_index: float, previous_leaf_area_index: float) -> float:
         """
-        calculates the maximum leaf area added during the day
+        Calculates the maximum leaf area added during the day.
 
-        replaces method calc_max_leaf_area_change
+        Parameters
+        ----------
+        leaf_area_fraction : float
+            Optimal leaf area fraction for the day (uniteless).
+        previous_leaf_area_fraction : float
+            Previous day's optimal leaf area fraction (uniteless).
+        max_leaf_area_index : float
+            The maximum leaf area index achievable by the plant (uniteless).
+        previous_leaf_area_index : float
+            The previous day's leaf area index (uniteless).
 
-        Args:
-            leaf_area_fraction: optimal leaf area fraction for the day
-            previous_leaf_area_fraction: previous day's optimal leaf area fraction
-            max_leaf_area_index: the maximum leaf area index achievable by the plant
-            previous_leaf_area_index: the previous day's leaf area index
+        Returns
+        -------
+        float
+            The maximum leaf area added during the day.
 
-        Returns:
-            the maximum leaf area added during the day
+        Notes
+        -----
+        Actual leaf area index (LAI) is corrected for growth constraints, so the previous day's optimal leaf area
+        fraction may not be the same as the previous day's LAI divided by the max LAI.
+        This method replaces the 'calc_max_leaf_area_change' method and calculates the potential increase in
+        leaf area index based on current and previous day's leaf area fractions and the maximum leaf area index
+        achievable by the plant.
 
-        Details: because actual leaf area index (LAI) is corrected for growth constraints, the previous
-        day's optimal leaf area fraction may not be the same as the previous day's LAI divided by the
-        max LAI.
+        References
+        ----------
+        SWAT 5:2.1.16
 
-        SWAT Reference: 5:2.1.16
         """
         return (leaf_area_fraction - previous_leaf_area_fraction) * max_leaf_area_index * \
             (1 - exp(5 * (previous_leaf_area_index - max_leaf_area_index)))
@@ -157,18 +255,33 @@ class LeafAreaIndex:
     @staticmethod
     def _determine_senescent_leaf_area_index(heat_fraction: float, senescent_heat_fraction: float,
                                              optimal_leaf_area_fraction: float) -> float:
-        """calculates a plant's leaf area index during senescence
+        """
+        Calculates a plant's leaf area index during senescence.
 
-        replaces method calc_senescent_leaf_area_index
+        Parameters
+        ----------
+        heat_fraction : float
+            The current fraction of potential heat units accumulated by the plant (unitless).
+        senescent_heat_fraction : float
+            The fraction of potential heat units at which senescence begins for the plant (unitless).
+        optimal_leaf_area_fraction : float
+            The optimal leaf area fraction for the plant (unitless).
 
-        Args:
-            heat_fraction: the current fraction of potential heat units
-            senescent_heat_fraction: the fraction of potential heat units at which senescence begins
-            optimal_leaf_area_fraction: the optimal leaf area fraction for the plant
+        Returns
+        -------
+        float
+            The calculated leaf area index of the plant during its senescence phase.
 
-        Returns: the plant's leaf area index
+        Notes
+        -----
+        This method replaces the 'calc_senescent_leaf_area_index' method. It determines the leaf area index
+        for a plant as it undergoes senescence, based on the current heat unit accumulation and the onset of
+        senescence in terms of heat units.
 
-        SWAT Reference: 5:2.1.19
+        References
+        ----------
+        SWAT 5:2.1.19
+
         """
         if senescent_heat_fraction >= 1:
             raise ValueError("Senescent heat fraction must be less than 1")
@@ -179,13 +292,21 @@ class LeafAreaIndex:
 
     @staticmethod
     def _calc_shape_log(heat_fraction: float, leaf_area_fraction: float) -> float:
-        """calculates the log term of LAI shape parameter function
+        """
+        Calculates the logarithmic term of the LAI shape parameter function.
 
-        Args:
-            heat_fraction: fraction of heat units accumulated; must be greater than zero
-            leaf_area_fraction: fraction of max leaf area; must be greater than zero, less than one, and not
-                equal to heat_fraction
+        Parameters
+        ----------
+        heat_fraction : float
+            Fraction of heat units accumulated by the plant; must be greater than zero (unitless).
+        leaf_area_fraction : float
+            Fraction of the plant's maximum leaf area; must be greater than zero, less than one, and not
+            equal to the heat_fraction (unitless).
 
-        Details: used by determine_lai_shapes, where errors are handled
+        Notes
+        -----
+        This function is primarily used by the `determine_lai_shapes` method. Error handling for the input
+        parameters is conducted within `determine_lai_shapes`.
+
         """
         return log((heat_fraction / leaf_area_fraction) - heat_fraction)
