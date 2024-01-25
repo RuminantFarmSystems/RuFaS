@@ -4,8 +4,6 @@ from RUFAS.routines.field.field.field_data import FieldData
 from RUFAS.routines.field.soil.soil_data import SoilData
 from RUFAS.output_manager import OutputManager
 
-
-
 om = OutputManager()
 
 

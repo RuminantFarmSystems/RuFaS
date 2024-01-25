@@ -21,17 +21,15 @@ from RUFAS.routines.manure.manure_nutrients.nutrient_request import NutrientRequ
 from RUFAS.time import Time
 from copy import copy
 
-
-
 om = OutputManager()
 
 
 class Field:
     """
     This is a high-level class that represents and simulates an entire field. It is responsible for executing the daily
-    biophysical routines which take place in soil columns and in crops planted in the field. It is also responsible for the
-    management of schedules, executing, and reporting of farm management events, including planting and harvesting crops,
-    adding manure and fertilizer to the soil, and tilling the soil.
+    biophysical routines which take place in soil columns and in crops planted in the field. It is also responsible for
+    the management of schedules, executing, and reporting of farm management events,
+    including planting and harvesting crops, adding manure and fertilizer to the soil, and tilling the soil.
 
     Parameters
     ----------
@@ -82,7 +80,7 @@ class Field:
     tiller : TillageApplication
         Provides interface to till the field.
     tillage_events: List[TillageEvent]
-        List of all tillage events that will occur over the run of the simulation in this field.    
+        List of all tillage events that will occur over the run of the simulation in this field.
     manure_applicator = ManureApplication
         List of ManureApplication objects
     manure_events: List[ManureEvent]
@@ -143,7 +141,7 @@ class Field:
         self.manure_applicator = ManureApplication(self.soil.data)
 
         self.manure_events: List[ManureEvent] = manure_events or []
-        
+
         info_map = {
             "class": self.__class__.__name__,
             "function": self.__init__.__name__
