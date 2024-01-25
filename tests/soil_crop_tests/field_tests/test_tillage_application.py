@@ -82,18 +82,26 @@ def test_record_tillage(till_depth: float, incorp_frac: float, mix_frac: float, 
     till_app = TillageApplication(field_data=field_data_1)
     till_app.till_soil(till_depth, incorp_frac, mix_frac, year, day)
     pool = om.variables_pool
-    assert len(pool["field='field1'.tillage_record"]['info_maps']) == 1
-    assert pool["field='field1'.tillage_record"]['info_maps'][0]["field_size"] == {1.5}
-    assert pool["field='field1'.tillage_record"]['info_maps'][0]['prefix'] == "field='field1'"
-    assert pool["field='field1'.tillage_record"]['info_maps'][0]['date']['year'] == year
-    assert pool["field='field1'.tillage_record"]['info_maps'][0]['date']['day'] == day
+    assert len(pool["TillageApplication._record_tillage.tillage_record.field='field1'"]['info_maps']) == 1
+    assert pool["TillageApplication._record_tillage.tillage_record.field='field1'"]['info_maps'][0]["field_size"] \
+           == {1.5}
+    assert pool["TillageApplication._record_tillage.tillage_record.field='field1'"]['info_maps'][0]['suffix'] \
+           == "field='field1'"
+    assert pool["TillageApplication._record_tillage.tillage_record.field='field1'"]['info_maps'][0]['date']['year'] \
+           == year
+    assert pool["TillageApplication._record_tillage.tillage_record.field='field1'"]['info_maps'][0]['date']['day'] \
+           == day
     if till_depth > till_app.soil_data.soil_layers[-1].bottom_depth:
-        assert pool["field='field1'.tillage_record"]['values'][0]['tillage_depth'] == \
-               till_app.soil_data.soil_layers[-1].bottom_depth
+        assert pool["TillageApplication._record_tillage.tillage_record.field='field1'"]['values'][0]['tillage_depth'] \
+               == till_app.soil_data.soil_layers[-1].bottom_depth
     else:
-        assert pool["field='field1'.tillage_record"]['values'][0]['tillage_depth'] == till_depth
-    assert pool["field='field1'.tillage_record"]['values'][0]['incorporation_fraction'] == incorp_frac
-    assert pool["field='field1'.tillage_record"]['values'][0]['mixing_fraction'] == mix_frac
+        assert pool["TillageApplication._record_tillage.tillage_record.field='field1'"]['values'][0]['tillage_depth'] \
+               == till_depth
+    assert \
+        pool["TillageApplication._record_tillage.tillage_record.field='field1'"]['values'][0][
+            'incorporation_fraction'] == incorp_frac
+    assert pool["TillageApplication._record_tillage.tillage_record.field='field1'"]['values'][0]['mixing_fraction'] \
+           == mix_frac
     om.flush_pools()
 
 
