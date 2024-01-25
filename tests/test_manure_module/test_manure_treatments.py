@@ -2941,6 +2941,9 @@ def test_calc_anaerobic_digestion_daily_output(mocker: MockFixture) -> None:
     assert actual_anaerobic_digestion_daily_output.top_cover_volume == approx(
         expected_top_cover_volume
     )
+    assert actual_anaerobic_digestion_daily_output.methane_generation_volume == approx(
+        methane_generation_volume
+    )
 
 
 @pytest.mark.parametrize(
@@ -3180,6 +3183,11 @@ def test_anaerobic_digestion_and_lagoon_daily_update_helper(
         "_create_anaerobic_digestion_daily_output",
         return_value=mock_anaerobic_digestion_daily_output,
     )
+    patch_for_accumulate_daily_output = mocker.patch.object(
+        anaerobic_digestion_and_lagoon,
+        "_accumulate_daily_output",
+        return_value=None,
+    )
 
     if manure_separator_exists:
         mock_manure_separator = mocker.MagicMock()
@@ -3240,6 +3248,8 @@ def test_anaerobic_digestion_and_lagoon_daily_update_helper(
         )
 
     assert actual_anaerobic_lagoon_daily_output == mock_anaerobic_lagoon_daily_output
+    patch_for_accumulate_daily_output.assert_any_call(mock_anaerobic_digestion_daily_output)
+    patch_for_accumulate_daily_output.assert_any_call(mock_anaerobic_lagoon_daily_output)
 
 
 # Test CompostBeddedPackBarn specific methods

@@ -878,7 +878,7 @@ class GasEmissionsCalculator:
             num_animals: int,
             barn_area: float,
             manure_total_ammoniacal_nitrogen: float,
-            manure_mass: float,
+            manure_mass: float,  # TODO: Decide to use volume or mass
             temperature_celsius: float,
             housing_specific_constant=GasEmissionConstants.DEFAULT_HOUSING_SPECIFIC_CONSTANT,
     ) -> float:
