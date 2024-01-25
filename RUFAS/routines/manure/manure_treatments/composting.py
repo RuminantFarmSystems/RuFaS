@@ -60,7 +60,6 @@ class Composting(BaseManureTreatment):
         )
 
         self._accumulate_daily_output(daily_output)
-
         if self.time.is_last_day_of_year:
             self.annual_update()
         return daily_output
@@ -125,7 +124,7 @@ class Composting(BaseManureTreatment):
         float
             The methane conversion factor, unitless.
         """
-        if self.config.composting_type == CompostingType.STATIC_PILE:
+        if self.composting_type == CompostingType.STATIC_PILE:
             return 0.005
         else:
             current_day_mean_air_temperature = self._get_current_day_average_temperature_celsius()
