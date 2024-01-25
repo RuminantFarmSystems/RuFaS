@@ -288,6 +288,16 @@ def test_draw_graph_success_plot(graph_generator: GraphGenerator) -> None:
               {"error": "Can't plot Test_5 data set",
                "message": "No variables found in data provided.",
                "info_map": {"class": "GraphGenerator", "function": "_prepare_plot_data"}}]),
+        ),
+        (
+            {"variable1": {"values": [{"a": 1, "b": 2}, {"a": 3, "b": "ungraphable string"}]},
+             "variable2": {"values": [{"a": 5, "b": 6}, {"a": 7, "b": 8}]}},
+            {"variables": ["a", "b"], "title": "Test_6"},
+            ({'a': [1, 3, 5, 7],
+              'b': [2, 'ungraphable string', 6, 8]},
+             [{'error': "Can't plot Test_6 data set",
+               'message': "b key contains data that is non-numerical and can't be graphed.",
+               'info_map': {'class': 'GraphGenerator', 'function': '_prepare_plot_data'}}]),
         )
     ],
 )
