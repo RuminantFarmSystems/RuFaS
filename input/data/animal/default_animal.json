@@ -58,10 +58,10 @@
 					"estrus_conception_rate": 0.6,
 					"presynch_program": "Double OvSynch",
 					"presynch_program_start_day": 50,
-          "ovsynch_program": "OvSynch 56",
+          			"ovsynch_program": "OvSynch 56",
 					"ovsynch_program_start_day": 66,
 					"ovsynch_program_conception_rate": 0.7,
-          "resynch_program": "TAIafterPD"
+          			"resynch_program": "TAIafterPD"
 				}
 			},
 			"bodyweight": {
