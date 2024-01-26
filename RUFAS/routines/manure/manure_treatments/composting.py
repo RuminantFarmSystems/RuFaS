@@ -33,8 +33,8 @@ class Composting(BaseManureTreatment):
     Class for managing and simulating the composting process of manure treatment.
 
     This class simulates the composting process by considering various factors like weather,
-    manure characteristics, and composting configurations. It provides methods for daily and
-    annual updates of compost characteristics such as methane emissions, nitrogen content, and
+    manure characteristics, and composting configurations. It provides methods for daily
+    update of compost characteristics such as methane emissions, nitrogen content, and
     carbon decomposition. The calculations are based on standard composting models and
     environmental factors.
 
@@ -52,11 +52,7 @@ class Composting(BaseManureTreatment):
     Methods
     -------
     _daily_update_helper() -> ManureTreatmentDailyOutput:
-        Performs daily updates to the compost characteristics, computing methane_emission emission,
-        carbon decomposition and dry matter loss.
-
-    annual_update() -> None:
-        Updates and computes annual metrics: Nitrogen related calculations.
+        Performs daily updates to the compost characteristics.
 
     calc_methane_emission(*args, **kwargs) -> float:
         Calculates the methane emissions for the current day.

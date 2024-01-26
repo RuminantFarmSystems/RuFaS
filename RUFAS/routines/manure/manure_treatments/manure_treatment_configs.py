@@ -12,32 +12,64 @@ from RUFAS.routines.manure.manure_treatments.manure_treatment_types import (
 class ManureTreatmentConfig:
     """Class for storing manure treatment configuration data.
 
-    Attributes:
-        total_solids_removal_efficiency_for_treatment: Percent of total solids removed from manure during treatment.
-        volatile_solids_removal_efficiency_for_treatment: Percent of volatile solids removed from manure during
-        treatment.
-        nitrogen_removal_efficiency_for_treatment: Percent of nitrogen removed from manure during treatment.
-        total_ammoniacal_nitrogen_removal_efficiency_for_treatment: Percent of total ammoniacal nitrogen removed from
-        manure during treatment.
-        phosphorus_removal_efficiency_for_treatment: Percent of phosphorus removed from manure during treatment.
-        potassium_removal_efficiency_for_treatment: Percent of potassium removed from manure during treatment.
+    Attribute
+    ---------
+    total_solids_removal_efficiency_for_treatment:
+        Percent of total solids removed from manure during treatment.
 
-        hydraulic_retention_time: Time in days spent in the treatment system.
-        sludge_accumulation_period: Time in days/years that sludge accumulates in the treatment system.
-        sludge_accumulation_volume_fraction: Sludge Accumulation Volume (SAV) fraction based on the manure solids
-            entering the treatment system.
-        top_cover_volume_fraction: Fraction of the total volume of the treatment system
-            that is assumed to be the top cover volume.
-        biogas_generation_ratio: Amount of biogas generated from the treatment system.
-        methane_generation_ratio: Amount of methane generated from the treatment system
-            (calculated from the amount of biogas generated).
-        evaporation_fraction: Fraction of the liquid portion evaporated from the treatment system.
-        anaerobic_digestion_temperature_set_point: Temperature set point for the anaerobic digestion.
-        anaerobic_digestion_temperature_celsius: Temperature of the anaerobic digestion.
+    volatile_solids_removal_efficiency_for_treatment:
+        Percent of volatile solids removed from manure during treatment.
 
-        storage_time_period: Time in days that manure is stored in the treatment system.
-        freeboard_input: Empty storage space above the manure in the treatment system.
+    nitrogen_removal_efficiency_for_treatment:
+        Percent of nitrogen removed from manure during treatment.
 
+    total_ammoniacal_nitrogen_removal_efficiency_for_treatment:
+        Percent of total ammoniacal nitrogen removed from manure during treatment.
+
+    phosphorus_removal_efficiency_for_treatment:
+        Percent of phosphorus removed from manure during treatment.
+
+    potassium_removal_efficiency_for_treatment:
+        Percent of potassium removed from manure during treatment.
+
+    hydraulic_retention_time:
+        Time in days spent in the treatment system.
+
+    sludge_accumulation_period:
+        Time in days/years that sludge accumulates in the treatment system.
+
+    sludge_accumulation_volume_fraction:
+        Sludge Accumulation Volume (SAV) fraction based on the manure solids entering the treatment system.
+
+    top_cover_volume_fraction:
+        Fraction of the total volume of the treatment system that is assumed to be the top cover volume.
+
+    biogas_generation_ratio:
+        Amount of biogas generated from the treatment system.
+
+    methane_generation_ratio:
+        Amount of methane generated from the treatment system (calculated from the amount of biogas generated).
+
+    evaporation_fraction:
+        Fraction of the liquid portion evaporated from the treatment system.
+
+    anaerobic_digestion_temperature_set_point:
+        Temperature set point for the anaerobic digestion.
+
+    anaerobic_digestion_temperature_celsius:
+        Temperature of the anaerobic digestion.
+
+    storage_time_period:
+        Time in days that manure is stored in the treatment system.
+
+    freeboard_input:
+        Empty storage space above the manure in the treatment system.
+
+    composting_type: str
+        The type of composting.
+
+    last_compost_turning_or_addition:
+        Number of days since last compot turning or addition activity.
     """
 
     total_solids_removal_efficiency_for_treatment: float = 0.0
@@ -62,18 +94,7 @@ class ManureTreatmentConfig:
     freeboard_input: float = 0.0
 
     composting_type: str = "intensive windrow"
-    maximum_methane_producing_capacity: float = 0.24
-    effectiveness_of_microbial_decomposition_rate: float = 2.37e-3
-    decomposition_temperature: float = 60
-    first_order_decaying_coefficient: float = 0.1
     last_compost_turning_or_addition: int = 1
-    lag_time: int = 2
-    mole_fraction_of_oxygen: float = 0.15
-    half_saturation_constant: float = 0.02
-    ambient_air_mole_fraction_of_oxygen: float = 0.21
-    proportion_of_carbon_available_in_manure: float = 0.5
-    proportion_of_carbon_available_in_bedding: float = 0.35
-    effect_of_moisture_on_microbial_decomposition: float = 0.65
 
 
 class DefaultManureTreatmentConfigFactory:

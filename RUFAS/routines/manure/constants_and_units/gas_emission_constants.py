@@ -70,11 +70,34 @@ class GasEmissionConstants:
     """
 
     MCF_LOWER_BOUND_TEMPERATURE: float = 15.0
+    """
+    The lower bound temperature for determining MCF for windrow composting.
+    """
+
     MCF_UPPER_BOUND_TEMPERATURE: float = 25.0
+    """
+    The lower bound temperature for determining MCF for windrow composting.
+    """
+
     MCF_COMPOSTING_STATIC_PILE: float = 0.005
+    """
+    The MCF for static pile composting.
+    """
+
     MCF_COMPOSTING_WINDROW_LOW: float = 0.005
+    """
+    The MCF for windrow composting when the air temperature is below the lower bound temperature.
+    """
+
     MCF_COMPOSTING_WINDROW_MEDIUM: float = 0.01
+    """
+    The MCF for windrow composting when the air temperature is between the lower and upper bound temperature.
+    """
+
     MCF_COMPOSTING_WINDROW_HIGH: float = 0.015
+    """
+    The MCF for windrow composting when the air temperature is above the upper bound temperature.
+    """
 
     POTENTIAL_METHANE_YIELD_OF_MANURE: float = 0.48
     """
@@ -190,13 +213,31 @@ class GasEmissionConstants:
     """
 
     DEFAULT_EFFECTIVENESS_OF_MICROBIAL_DECOMPOSITION_RATE: float = 2.73e-3
+    """
+    The default effectiveness of microbial decomposition rate.
+    """
 
     DEFAULT_COMPOSTING_DECOMPOSITION_TEMPERATURE: float = 60.0
+    """
+    The default decomposition temperature for composting.
+    """
 
     DEFAULT_FIRST_ORDER_DECAYING_COEFFICIENT: float = 0.1
+    """
+    The default first order decaying coefficient.
+    """
 
     DEFAULT_MOLE_FRACTION_OF_OXYGEN: float = 0.15
+    """
+    The default mole fraction of Oxygen.
+    """
 
     DEFAULT_AMBIENT_AIR_MOLE_FRACTION_OF_OXYGEN: float = 0.21
+    """
+    The default ambient air mole fraction of Oxygen.
+    """
 
     DEFAULT_EFFECT_OF_MOISTURE_ON_MICROBIAL_DECOMPOSITION: float = 0.65
+    """
+    The default effect of moisture on microbial decomposition.
+    """
