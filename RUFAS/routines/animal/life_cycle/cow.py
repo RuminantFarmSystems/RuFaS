@@ -334,24 +334,6 @@ class Cow(HeiferIII):
             milk_history = [day.milk_production for day in self.milk_production_history[-305:]]
             self.latest_milk_production_305days = np.sum(milk_history)
 
-    def calculate_fat_percent(self, days_in_milk: int):
-        """
-        Calculates fat percent of milk.
-
-        Note that this equation produces 0.0 if days_in_milk is set to one,
-        so we've implemented a minimum days_in_milk value of 2.
-
-        Parameters
-        ----------
-        days_in_milk : int
-            Number of days in milk.
-        """
-        if days_in_milk == 1:
-            days_in_milk = 2
-        fat_percent = 12.86 * days_in_milk ** (-1.081) * math.exp(
-            0.0926 * (math.log(days_in_milk)) ** 2) * (math.log(days_in_milk) ** 1.107)
-        return fat_percent
-
     @staticmethod
     def determine_param_value(mean, std):
         """
