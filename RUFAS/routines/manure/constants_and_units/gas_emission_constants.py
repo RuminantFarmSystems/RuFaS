@@ -1,7 +1,7 @@
-from dataclasses import dataclass
+from typing import Dict
+from RUFAS.routines.manure.manure_treatments.composting_types import CompostingType
 
 
-@dataclass
 class GasEmissionConstants:
     """Constants used in gas emission calculations."""
 
@@ -241,3 +241,21 @@ class GasEmissionConstants:
     """
     The default effect of moisture on microbial decomposition.
     """
+
+    FRACTION_NITROGEN_LOST_TO_AMMONIA_EMISSION: Dict[CompostingType, float] = {
+        CompostingType.STATIC_PILE: 0.5,
+        CompostingType.PASSIVE_WINDROW: 0.45,
+        CompostingType.INTENSIVE_WINDROW: 0.5
+    }
+
+    FRACTION_NITROGEN_LOST_TO_LEACHING: Dict[CompostingType, float] = {
+        CompostingType.STATIC_PILE: 0.06,
+        CompostingType.PASSIVE_WINDROW: 0.04,
+        CompostingType.INTENSIVE_WINDROW: 0.06
+    }
+
+    FRACTION_NITROGEN_LOST_TO_DIRECT_N2O_EMISSION: Dict[CompostingType, float] = {
+        CompostingType.STATIC_PILE: 0.06,
+        CompostingType.PASSIVE_WINDROW: 0.04,
+        CompostingType.INTENSIVE_WINDROW: 0.06
+    }
