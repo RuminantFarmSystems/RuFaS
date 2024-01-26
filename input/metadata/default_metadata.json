@@ -3045,7 +3045,7 @@
           "bedding_type": {
             "type": "string",
             "description": "Bedding Type -- The material used for bedding pack.",
-            "pattern": "^(Sand|Straw|Sawdust|Manure_solids|CBPB sawdust)$"
+            "pattern": "^(Sand|Straw|Sawdust|Manure_solids|CBPB sawdust|None)$"
           },
           "manure_handler": {
             "type": "string",
@@ -3072,7 +3072,7 @@
             "bedding_type": {
               "type": "string",
               "description": "Bedding Type -- The material used for bedding pack.",
-              "pattern": "^(Sand|Straw|Sawdust|Manure_solids|CBPB sawdust)$"
+              "pattern": "^(Sand|Straw|Sawdust|Manure_solids|CBPB sawdust|None)$"
             },
             "bedding_mass_per_day": {
               "type": "number"
