@@ -9,6 +9,7 @@ from RUFAS.routines.field.crop.crop_data import CropData, DEFAULT_DRY_MATTER_DIG
 from RUFAS.routines.field.crop.crop_configurations.alfalfa import AlfalfaSilage
 from math import exp
 from RUFAS.routines.field.crop.harvest_operations import HarvestOperation
+from RUFAS.routines.field.soil.layer_data import LayerData
 from RUFAS.routines.field.soil.soil_data import SoilData
 from RUFAS.output_manager import OutputManager
 
@@ -396,3 +397,39 @@ def test_transfer_residue(root_biomass: float, residue: float, killed: bool,
     assert crop_data.yield_residue == 0.0
     assert crop_data.residue_nitrogen == 0.0
     assert crop_data.residue_phosphorus == 0.0
+
+
+@pytest.mark.parametrize("root_depth,n,p,expected_n,expected_p,", [
+    (100.0, 40.0, 20.0, [24.0, 6.0, 10.0], [12.0, 3.0, 5.0],),
+    (45.0, 40.0, 20.0, [28.888888, 11.111111, 0.0], [14.444444, 5.555555, 0.0],),
+    (50.0, 40.0, 20.0, [28.0, 12, 0.0], [14.0, 6.0, 0.0],),
+    (10.0, 50.0, 22.0, [50.0, 0.0, 0.0], [22.0, 0.0, 0.0],),
+])
+def test_distribute_residue_nutrients(
+        root_depth: float,
+        n: float,
+        p: float,
+        expected_n: list[float],
+        expected_p: list[float],
+) -> None:
+    """Tests that residue nutrients are correctly partitioned between the nutrient pools in a soil profile."""
+    crop_data = CropData(yield_residue=100.0, residue_nitrogen=n, residue_phosphorus=p, root_depth=root_depth)
+    crop_manager = CropManagement(crop_data)
+
+    field_size = 1.0
+    top_soil_layer = LayerData(top_depth=0.0, bottom_depth=20.0, field_size=field_size)
+    second_soil_layer = LayerData(top_depth=20.0, bottom_depth=50.0, field_size=field_size)
+    third_soil_layer = LayerData(top_depth=50.0, bottom_depth=100.0, field_size=field_size)
+    soil_data = SoilData(field_size=field_size, soil_layers=[top_soil_layer, second_soil_layer, third_soil_layer])
+    soil_data.set_vectorized_layer_attribute("top_depth", [0.0, 20.0, 50.0])
+    soil_data.set_vectorized_layer_attribute("bottom_depth", [20.0, 50.0, 100.0])
+    soil_data.set_vectorized_layer_attribute("fresh_organic_nitrogen_content", [0.0] * 3)
+    soil_data.set_vectorized_layer_attribute("active_organic_nitrogen_content", [0.0] * 3)
+    soil_data.set_vectorized_layer_attribute("labile_inorganic_phosphorus_content", [0.0] * 3)
+
+    crop_manager._distribute_residue_nutrients(soil_data, 50.0)
+
+    assert pytest.approx(soil_data.soil_layers[0].fresh_organic_nitrogen_content) == expected_n[0]
+    assert \
+        pytest.approx(soil_data.get_vectorized_layer_attribute("active_organic_nitrogen_content")[1:]) == expected_n[1:]
+    assert pytest.approx(soil_data.get_vectorized_layer_attribute("labile_inorganic_phosphorus_content")) == expected_p
