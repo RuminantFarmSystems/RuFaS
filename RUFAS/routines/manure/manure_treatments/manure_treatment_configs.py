@@ -69,7 +69,7 @@ class ManureTreatmentConfig:
     last_compost_turning_or_addition: int = 1
     lag_time: int = 2
     mole_fraction_of_oxygen: float = 0.15
-    half_saturation_constant: float = 0.002
+    half_saturation_constant: float = 0.02
     ambient_air_mole_fraction_of_oxygen: float = 0.21
     proportion_of_carbon_available_in_manure: float = 0.5
     proportion_of_carbon_available_in_bedding: float = 0.35

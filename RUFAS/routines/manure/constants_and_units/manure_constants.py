@@ -33,6 +33,9 @@ class ManureConstants:
     DEFAULT_CARBON_FRACTION_AVAILABLE_IN_MANURE = 0.5
     """Default proportion of carbon available in manure, (unitless, [0, 1]). Default is set to 0.5."""
 
+    DEFAULT_CARBON_FRACTION_AVAILABLE_IN_BEDDING = 0.35
+    """Default proportion of carbon available in bedding, (unitless, [0, 1]). Default is set to 0.35."""
+
     EFFECTIVE_MICROBIAL_DECOMP_RATE = 2.37e-3
     """The effectiveness of microbial decomposition rate (unitless)."""
 

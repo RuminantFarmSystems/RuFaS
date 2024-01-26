@@ -2,9 +2,10 @@ import math
 from typing import Dict
 
 from RUFAS.routines.manure.IO_helpers.manure_module_output_manager_helper import ManureModuleOutputManagerHelper
+from RUFAS.routines.manure.constants_and_units.gas_emission_constants import GasEmissionConstants
+from RUFAS.routines.manure.constants_and_units.manure_constants import ManureConstants
 from RUFAS.routines.manure.manure_treatments.base_manure_treatment import BaseManureTreatment
 from RUFAS.routines.manure.manure_treatments.composting_types import CompostingType
-from RUFAS.routines.manure.manure_treatments.manure_treatment_annual_output import ManureTreatmentAnnualOutput
 from RUFAS.routines.manure.manure_treatments.manure_treatment_configs import ManureTreatmentConfig
 from RUFAS.routines.manure.manure_treatments.manure_treatment_daily_output import ManureTreatmentDailyOutput
 
@@ -137,6 +138,11 @@ class Composting(BaseManureTreatment):
         remaining_manure_total_solids = manure_total_solids - daily_dry_matter_loss
         remaining_manure_mass = remaining_manure_total_solids / 0.12
 
+        total_Nitrogen_mass = self._calculate_total_Nitrogen_mass()
+        organic_Nitrogen_mass = self._calculate_organic_Nitrogen_mass()
+        inorganic_Nitrogen_mass = self._calculate_inorganic_Nitrogen_mass()
+        ammonia_mass = self._calculate_ammonium_mass()
+
         daily_output = ManureTreatmentDailyOutput(
             simulation_day=daily_input.simulation_day,
             pen_id=daily_input.pen_id,
@@ -146,35 +152,14 @@ class Composting(BaseManureTreatment):
             solid_manure_daily_mass=remaining_manure_mass,
             solid_manure_phosphorus=daily_input.liquid_manure_phosphorus,
             solid_manure_potassium=daily_input.liquid_manure_potassium,
-        )
-
-        self._accumulate_daily_output(daily_output)
-        if self.time.is_last_day_of_year:
-            self.annual_update()
-        return daily_output
-
-    def annual_update(self) -> None:
-        info_maps = {
-            "class": self.__class__.__name__,
-            "function": self.annual_update.__name__
-        }
-        daily_input = self._current_manure_treatment_daily_input
-
-        total_Nitrogen_mass = self._calculate_total_Nitrogen_mass()
-        organic_Nitrogen_mass = self._calculate_organic_Nitrogen_mass()
-        inorganic_Nitrogen_mass = self._calculate_inorganic_Nitrogen_mass()
-        ammonia_mass = self._calculate_ammonium_mass()
-
-        annual_output = ManureTreatmentAnnualOutput(
-            pen_id=daily_input.pen_id,
-            simulation_calendar_year=self.time.calendar_year,
             solid_manure_nitrogen=total_Nitrogen_mass,
             solid_manure_inorganic_nitrogen=inorganic_Nitrogen_mass,
             solid_manure_organic_nitrogen=organic_Nitrogen_mass,
             solid_manure_inorganic_nitrogen_ammonium=ammonia_mass
         )
-        ManureModuleOutputManagerHelper.add_dataclass_object(dataclass_object=annual_output,
-                                                             info_maps=info_maps)
+
+        self._accumulate_daily_output(daily_output)
+        return daily_output
 
     def calc_methane_emission(self, *args, **kwargs) -> float:
         """
@@ -186,7 +171,7 @@ class Composting(BaseManureTreatment):
             The solid manure methane emission of the current day, kg/day.
         """
         manure_volatile_solids = self._current_manure_treatment_daily_input.liquid_manure_total_volatile_solids
-        maximum_methane_producing_capacity = self.config.maximum_methane_producing_capacity
+        maximum_methane_producing_capacity = GasEmissionConstants.ACHIEVABLE_METHANE_EMISSION
         methane_conversion_factor = self._calculate_methane_conversion_factor()
         return (manure_volatile_solids * 365) * (maximum_methane_producing_capacity * 0.67 * methane_conversion_factor)
 
@@ -214,17 +199,18 @@ class Composting(BaseManureTreatment):
             The methane conversion factor, unitless.
         """
         if self.composting_type == CompostingType.STATIC_PILE:
-            return 0.005
+            return GasEmissionConstants.MCF_COMPOSTING_STATIC_PILE
         else:
             current_day_mean_air_temperature = self._get_current_day_average_temperature_celsius()
-            if current_day_mean_air_temperature < 15:
-                return 0.005
-            elif 15 <= current_day_mean_air_temperature <= 25:
-                return 0.01
+            if current_day_mean_air_temperature < GasEmissionConstants.MCF_LOWER_BOUND_TEMPERATURE:
+                return GasEmissionConstants.MCF_COMPOSTING_WINDROW_LOW
+            elif 15 <= current_day_mean_air_temperature <= GasEmissionConstants.MCF_UPPER_BOUND_TEMPERATURE:
+                return GasEmissionConstants.MCF_COMPOSTING_WINDROW_MEDIUM
             else:
-                return 0.015
+                return GasEmissionConstants.MCF_COMPOSTING_WINDROW_HIGH
 
-    def _calculate_max_microbial_decomposition_rate(self) -> float:
+    @staticmethod
+    def _calculate_max_microbial_decomposition_rate() -> float:
         """
         This function calculates the max microbial decomposition rate of the current day.
 
@@ -233,8 +219,9 @@ class Composting(BaseManureTreatment):
         float
             The max microbial decomposition rate of the current day, per day.
         """
-        effectiveness_of_microbial_decomposition_rate = self.config.effectiveness_of_microbial_decomposition_rate
-        decomposition_temperature = self.config.decomposition_temperature
+        effectiveness_of_microbial_decomposition_rate = GasEmissionConstants.\
+            DEFAULT_EFFECTIVENESS_OF_MICROBIAL_DECOMPOSITION_RATE
+        decomposition_temperature = GasEmissionConstants.DEFAULT_COMPOSTING_DECOMPOSITION_TEMPERATURE
 
         return effectiveness_of_microbial_decomposition_rate * (1.066 ** (decomposition_temperature - 10) - 1.21 **
                                                                 (decomposition_temperature - 50))
@@ -248,7 +235,8 @@ class Composting(BaseManureTreatment):
         float
             The slow microbial decomposition rate of the current day, per day.
         """
-        effectiveness_of_microbial_decomposition_rate = self.config.effectiveness_of_microbial_decomposition_rate
+        effectiveness_of_microbial_decomposition_rate = GasEmissionConstants.\
+            DEFAULT_EFFECTIVENESS_OF_MICROBIAL_DECOMPOSITION_RATE
         compost_pile_pack_temperature = self._get_current_day_average_temperature_celsius()
 
         return effectiveness_of_microbial_decomposition_rate * (1.066 ** (compost_pile_pack_temperature - 10) - 1.21 **
@@ -266,14 +254,15 @@ class Composting(BaseManureTreatment):
         max_microbial_decomposition_rate = self._calculate_max_microbial_decomposition_rate()
         slow_microbial_decomposition_rate = self._calculate_slow_microbial_decomposition_rate()
 
-        decay = self.config.first_order_decaying_coefficient
+        decay = GasEmissionConstants.DEFAULT_FIRST_ORDER_DECAYING_COEFFICIENT
         last_turning_or_addition = self.config.last_compost_turning_or_addition
-        lag = self.config.lag_time
+        lag = ManureConstants.DEFAULT_LAG_TIME
 
         return (max_microbial_decomposition_rate - slow_microbial_decomposition_rate) * \
                (math.e ** (decay * (last_turning_or_addition - lag))) * slow_microbial_decomposition_rate
 
-    def _calculate_anaerobic_coefficient(self) -> float:
+    @staticmethod
+    def _calculate_anaerobic_coefficient() -> float:
         """
         This function calculates the Anaerobic coefficient.
 
@@ -282,9 +271,9 @@ class Composting(BaseManureTreatment):
         float
             The Anaerobic coefficient, unitless.
         """
-        o2 = self.config.mole_fraction_of_oxygen
-        o2_half_saturation = self.config.half_saturation_constant
-        o2_ambient = self.config.ambient_air_mole_fraction_of_oxygen
+        o2 = GasEmissionConstants.DEFAULT_MOLE_FRACTION_OF_OXYGEN
+        o2_half_saturation = GasEmissionConstants.OXYGEN_HALF_SATURATION_CONSTANT
+        o2_ambient = GasEmissionConstants.DEFAULT_AMBIENT_AIR_MOLE_FRACTION_OF_OXYGEN
 
         return (o2 / (o2_half_saturation + o2)) * ((o2_half_saturation + o2_ambient) / o2_ambient)
 
@@ -297,9 +286,9 @@ class Composting(BaseManureTreatment):
         float
             The total carbon decomposition of the current day, kg/day.
         """
-        c_manure = self.config.proportion_of_carbon_available_in_manure
-        c_bedding = self.config.proportion_of_carbon_available_in_bedding
-        effect_moist = self.config.effect_of_moisture_on_microbial_decomposition
+        c_manure = ManureConstants.DEFAULT_CARBON_FRACTION_AVAILABLE_IN_MANURE
+        c_bedding = ManureConstants.DEFAULT_CARBON_FRACTION_AVAILABLE_IN_BEDDING
+        effect_moist = GasEmissionConstants.DEFAULT_EFFECT_OF_MOISTURE_ON_MICROBIAL_DECOMPOSITION
 
         q_bedding = self._manure_handler_daily_output.total_bedding_mass
 

@@ -111,13 +111,3 @@ class Time:
             return self.day == len(self.years[self.year - 1])
 
         return False
-
-    @property
-    def is_last_day_of_year(self):
-        """Checks whether the current day is the last day of the year.
-
-        Returns:
-            bool: True if the current day is the last day of the year, false otherwise
-
-        """
-        return self.day >= len(self.years[self.year - 1])
