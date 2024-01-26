@@ -1,4 +1,3 @@
-import pdb
 from math import exp
 from typing import Optional
 from RUFAS.routines.feed_storage.feed_manager import FeedManager
@@ -83,7 +82,7 @@ class CropManagement:
             annual plants.
         """
         self.data.is_alive = False
-        self.data.yield_residue = self.data.biomass
+        self.data.yield_residue += self.data.biomass
         self.data.residue_nitrogen = self.data.yield_residue * self.data.yield_nitrogen_fraction
         self.data.residue_phosphorus = self.data.yield_residue * self.data.yield_phosphorus_fraction
 
@@ -308,7 +307,8 @@ class CropManagement:
         Notes
         -----
         If a crop is harvested but not killed, then there is only residue added to the surface. If it is harvested and
-        killed, then both surface and root residue is added to the soil profile.
+        killed, then both surface and root residue is added to the soil profile. After transferring residue to the soil
+        profile, the residue pools are reset to zero.
 
         """
         soil_data.crop_yield_nitrogen = self.data.residue_nitrogen
@@ -325,6 +325,9 @@ class CropManagement:
             soil_data.crop_root_depth = 0
             soil_data.soil_layers[0].fresh_organic_nitrogen_content += self.data.residue_nitrogen
             soil_data.soil_layers[0].labile_inorganic_phosphorus_content += self.data.residue_phosphorus
+        self.data.yield_residue = 0.0
+        self.data.yield_nitrogen = 0.0
+        self.data.yield_phosphorus = 0.0
 
     def _distribute_residue_nutrients(
             self,

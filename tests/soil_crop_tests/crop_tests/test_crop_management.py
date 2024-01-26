@@ -217,7 +217,7 @@ def test_manage_harvest(mock_time: Time, mock_feed_manager: FeedManager, harvest
     (-1, 0.85, True, True),
     (0, 1.5, True, False)
 ])
-def test_cut_crop(efficiency: float, harvest: float, override: bool, should_fail: bool):
+def test_cut_crop(efficiency: float, harvest: float, override: bool, should_fail: bool) -> None:
     """Ensure that the crop cutting routines are properly executed and that errors are raised properly."""
     # setup
     data = CropData(harvest_index=harvest, biomass=100, leaf_area_index=2.3, accumulated_heat_units=1.1,
@@ -246,9 +246,9 @@ def test_cut_crop(efficiency: float, harvest: float, override: bool, should_fail
         assert data.biomass == 100 - cut_biomass
         assert data.leaf_area_index == 2.3 * (1 - (cut_biomass / 100))
         assert data.accumulated_heat_units == 1.1 * (1 - (cut_biomass / 100))
-        collected_fresh_yield = cut_biomass * efficiency
-        collected_dry_matter_yield = collected_fresh_yield * (crop.data.dry_matter_percentage / 100)
-        residue = cut_biomass * (1 - efficiency) * (crop.data.dry_matter_percentage / 100)
+        collected_fresh_yield = cut_biomass / (crop.data.dry_matter_percentage / 100) * efficiency
+        collected_dry_matter_yield = cut_biomass * efficiency
+        residue = cut_biomass * (1 - efficiency)
         crop._recalculate_biomass_distribution.assert_called_once()
         assert data.wet_yield_collected == collected_fresh_yield
         assert data.dry_matter_yield_collected == collected_dry_matter_yield
@@ -383,3 +383,6 @@ def test_transfer_residue(root_biomass: float, residue: float, nitrogen: float, 
     assert soil_data.plant_root_residue == expected_root_residue
     assert soil_data.crop_root_depth == expected_root_depth
     assert soil_data.soil_layers[0].fresh_organic_nitrogen_content == nitrogen
+    assert crop_data.yield_residue == 0.0
+    assert crop_data.residue_nitrogen == 0.0
+    assert crop_data.residue_phosphorus == 0.0
