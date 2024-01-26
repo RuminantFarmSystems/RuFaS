@@ -244,6 +244,11 @@ class GraphGenerator:
                                      "info_map": info_map})
                 data_dict = Utility.convert_list_of_dicts_to_dict_of_lists(values)
                 filtered_data = Utility.filter_pool(data_dict, selected_variables, filter_by_exclusion)
+                if not filtered_data:
+                    log_pool.append({"error": f"Can't plot {title} data set",
+                                     "message": "No variables found in data provided.",
+                                     "info_map": info_map})
+                    continue
                 non_int_float_keys = [
                     key for key, value in filtered_data.items()
                     if not (isinstance(value, (int, float)) or
@@ -252,10 +257,6 @@ class GraphGenerator:
                 for key in non_int_float_keys:
                     log_pool.append({"error": f"Can't plot {title} data set",
                                      "message": f"{key} key contains data that is non-numerical and can't be graphed.",
-                                     "info_map": info_map})
-                if not filtered_data:
-                    log_pool.append({"error": f"Can't plot {title} data set",
-                                     "message": "No variables found in data provided.",
                                      "info_map": info_map})
                 else:
                     for filtered_key, filtered_value in filtered_data.items():
