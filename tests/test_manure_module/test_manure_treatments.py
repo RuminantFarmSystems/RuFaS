@@ -3862,9 +3862,6 @@ def test_composting_daily_update_helper(mocker: MockFixture) -> None:
     mock_calculate_ammonium_mass = mocker.patch("RUFAS.routines.manure.manure_treatments.composting.Composting."
                                                 "_calculate_ammonium_mass", return_value=expected_ammonia_mass)
 
-    mock_add_dataclass_object = mocker.patch("RUFAS.routines.manure.IO_helpers.manure_module_output_manager_helper."
-                                             "ManureModuleOutputManagerHelper.add_dataclass_object", return_value=None)
-
     composting = Composting(weather_mock, time_mock, manure_treatment_config_mock)
     composting._current_manure_treatment_daily_input = daily_input_mock
     composting.time = time_mock
