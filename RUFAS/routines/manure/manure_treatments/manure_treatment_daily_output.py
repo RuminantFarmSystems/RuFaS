@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from dataclasses import astuple
 from dataclasses import dataclass
 
