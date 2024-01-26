@@ -310,6 +310,24 @@ def test_prepare_plot_data(graph_generator: GraphGenerator,
     assert result == expected_result
 
 
+@patch('your_module.Utility.convert_list_of_dicts_to_dict_of_lists')
+@patch('your_module.Utility.filter_pool')
+def test_prepare_plot_data_core_logic(mock_filter_pool, mock_convert_list) -> None:
+    filtered_pool = [{"a": 1, "b": 2}, {"a": 3, "c": 4}]
+    filter_list = ["a"]
+    mock_graph_generator = GraphGenerator()
+    # Set up mock return values
+    mock_convert_list.return_value = {"a": [1, 3], "b": [2], "c": [4]}
+    mock_filter_pool.return_value = {"a": [1, 3]}
+
+    # Call the function
+    prepared_pool, log_pool = mock_graph_generator._prepare_plot_data(data_pool)
+
+    # Assertions
+    assert ...  # Check that prepared_pool is as expected
+    assert ...  # Check that log_pool is as expected
+
+
 @pytest.mark.parametrize(
     "graph_details, expected_length, expected_message",
     [
