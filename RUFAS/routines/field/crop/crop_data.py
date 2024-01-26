@@ -409,9 +409,9 @@ class CropData:
     """nitrogen contained in the harvested yield (kg/ha)"""
     yield_phosphorus: Optional[float] = None
     """phosphorus contained in the harvested yield (kg/ha)"""
-    residue_nitrogen: Optional[float] = None
+    residue_nitrogen: float = 0.0
     """amount of nitrogen in the residue from this plant (kg/ha)"""
-    residue_phosphorus: Optional[float] = None
+    residue_phosphorus: float = 0.0
     """amount of phosphorus in the residue from this plant (kg/ha)"""
 
     # ---- dormancy

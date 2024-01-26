@@ -326,8 +326,8 @@ class CropManagement:
             soil_data.soil_layers[0].fresh_organic_nitrogen_content += self.data.residue_nitrogen
             soil_data.soil_layers[0].labile_inorganic_phosphorus_content += self.data.residue_phosphorus
         self.data.yield_residue = 0.0
-        self.data.yield_nitrogen = 0.0
-        self.data.yield_phosphorus = 0.0
+        self.data.residue_nitrogen = 0.0
+        self.data.residue_phosphorus = 0.0
 
     def _distribute_residue_nutrients(
             self,
@@ -354,19 +354,18 @@ class CropManagement:
 
         surface_layer = soil_data.soil_layers[0]
         surface_root_fraction = (surface_layer.bottom_depth - surface_layer.top_depth) / self.data.root_depth \
-                    if surface_layer.bottom_depth <= self.data.root_depth \
-                    else max(0.0, (self.data.root_depth - surface_layer.top_depth) / self.data.root_depth)
+            if surface_layer.bottom_depth <= self.data.root_depth \
+            else max(0.0, (self.data.root_depth - surface_layer.top_depth) / self.data.root_depth)
         surface_layer.fresh_organic_nitrogen_content += subsurface_nitrogen * surface_root_fraction
         surface_layer.labile_inorganic_phosphorus_content += subsurface_phosphorus * surface_root_fraction
 
         for layer in soil_data.soil_layers[1:]:
             layer_fraction = \
                 (layer.bottom_depth - layer.top_depth) / self.data.root_depth \
-                    if layer.bottom_depth <= self.data.root_depth \
-                    else max(0.0, (self.data.root_depth - layer.top_depth) / self.data.root_depth)
+                if layer.bottom_depth <= self.data.root_depth \
+                else max(0.0, (self.data.root_depth - layer.top_depth) / self.data.root_depth)
             layer.active_organic_nitrogen_content += subsurface_nitrogen * layer_fraction
             layer.labile_inorganic_phosphorus_content += subsurface_phosphorus * layer_fraction
-
 
     # ---- Harvest Scheduling ----
 

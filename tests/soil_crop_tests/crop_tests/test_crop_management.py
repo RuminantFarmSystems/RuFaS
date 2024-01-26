@@ -346,43 +346,53 @@ def test_record_yield(field_name: str, field_size: float, species: str, year: in
     crop_manager.data.yield_nitrogen = nitrogen
     crop_manager.data.yield_phosphorus = phosphorus
 
-    crop_manager._record_yield(field_name, field_size, year, day)
-
-    expected_info_map = {"suffix": f"field='{field_name}'", "field_size": field_size,
-                         "species": f"'{species}'"}
+    expected_info_map = {"class": crop_manager.__class__.__name__, "function": crop_manager._record_yield.__name__,
+                         "suffix": f"field='{field_name}'", "field_size": field_size, "species": f"'{species}'"}
     expected_value = {"crop": crop_manager.data.name, "wet_yield": mass, "dry_yield": dry_mass, "nitrogen": nitrogen,
                       "phosphorus": phosphorus, "planting_date": {"year": 1995, "day": 100},
+                      "yield_residue": crop_manager.data.yield_residue,
+                      "harvest_index": crop_manager.data.harvest_index,
                       "harvest_date": {"year": year, "day": day}}
 
-    actual = om.variables_pool[f"CropManagement._record_yield.harvest_yield.field='{field_name}'"]
-    assert actual['info_maps'].__contains__(expected_info_map)
-    assert actual['values'].__contains__(expected_value)
+    with patch.object(om, "add_variable") as add_variable:
+        crop_manager._record_yield(field_name, field_size, year, day)
+
+        add_variable.assert_called_once_with(
+            "harvest_yield",
+            expected_value,
+            expected_info_map,
+        )
 
 
 @pytest.mark.parametrize(
-    "root_biomass,residue,nitrogen,killed,expected_root_depth,expected_surface_residue,expected_root_residue", [
-        (150, 150, 22, True, 100, 0.0, 120.0),
-        (100, 150, 22, True, 100, 50, 80.0),
-        (100, 150, 22, False, 0, 150, 0)
+    "root_biomass,residue,killed,expected_root_depth,expected_surface_residue,expected_root_residue", [
+        (150, 150, True, 100, 0.0, 150.0),
+        (100, 150, True, 100, 50, 100.0),
+        (100, 150, False, 0, 150, 0)
     ])
-def test_transfer_residue(root_biomass: float, residue: float, nitrogen: float, killed: bool,
+def test_transfer_residue(root_biomass: float, residue: float, killed: bool,
                           expected_root_depth: float, expected_surface_residue: float,
                           expected_root_residue: float) -> None:
     """Tests that residue and associated nutrients from harvests and not collected are properly transferred to the
         soil."""
     soil_data = SoilData(field_size=1)
     soil_data.soil_layers[0].fresh_organic_nitrogen_content = 0
-    crop_data = CropData(yield_residue=residue, residue_nitrogen=nitrogen, dry_matter_percentage=80.0)
+    soil_data.soil_layers[0].labile_inorganic_phosphorus_content = 0
+    crop_data = CropData(yield_residue=residue, residue_nitrogen=22, residue_phosphorus=23)
     crop_data.root_depth = 100.0
     crop_data.root_biomass = root_biomass
     crop_manage = CropManagement(crop_data)
 
-    crop_manage._transfer_residue(soil_data, killed)
+    with patch.object(crop_manage, "_distribute_residue_nutrients") as distribute_nutrients:
+        crop_manage._transfer_residue(soil_data, killed)
+        distribute_nutrients.assert_called_once() if killed else distribute_nutrients.assert_not_called()
 
     assert soil_data.plant_surface_residue == expected_surface_residue
     assert soil_data.plant_root_residue == expected_root_residue
     assert soil_data.crop_root_depth == expected_root_depth
-    assert soil_data.soil_layers[0].fresh_organic_nitrogen_content == nitrogen
+    if not killed:
+        assert soil_data.soil_layers[0].fresh_organic_nitrogen_content == 22
+        assert soil_data.soil_layers[0].labile_inorganic_phosphorus_content == 23
     assert crop_data.yield_residue == 0.0
     assert crop_data.residue_nitrogen == 0.0
     assert crop_data.residue_phosphorus == 0.0
