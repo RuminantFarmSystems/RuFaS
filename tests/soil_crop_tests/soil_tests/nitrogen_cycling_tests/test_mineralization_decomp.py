@@ -82,10 +82,11 @@ def test_calculate_rate_constant(mineralization_rate: float, composition_factor:
 ])
 def test_mineralize_and_decompose_nitrogen(temp: float, fresh_nitrogen: float, decay_rate: float) -> None:
     """Tests that the main routine correctly calculates and updates all necessary values."""
-    top_layer = LayerData(top_depth=0, bottom_depth=20, field_size=1.5, temperature=temp, total_soil_carbon_amount=30,
+    top_layer = LayerData(top_depth=0, bottom_depth=20, field_size=1.5, temperature=temp,
                           fresh_organic_nitrogen_content=fresh_nitrogen, nitrate_content=60,
                           fresh_organic_phosphorus_content=5, labile_inorganic_phosphorus_content=33)
     data = SoilData(field_size=1.5, soil_layers=[top_layer])
+    data.soil_layers[0].total_soil_carbon_amount = 30.0
     incorp = MineralizationDecomposition(data)
 
     incorp._calculate_residue_nutrient_ratio = MagicMock(return_value=0.66)
