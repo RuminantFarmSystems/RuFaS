@@ -1,6 +1,7 @@
 # !/usr/bin/env python3
-
+import inspect
 from copy import deepcopy
+from enum import Enum
 from functools import reduce
 import json
 import re
@@ -12,6 +13,24 @@ from typing import Any, Dict, List, Union, Callable
 om = OutputManager()
 
 ADDRESS_TO_INPUTS = "files"
+
+
+class Modifiability(Enum):
+    """
+    This is an Enum class that represents different types of manure.
+
+    Attribute
+    ---------
+    REQUIRED_AND_LOCKED : str
+        Variable is required to have a value upon initialization, and it cannot be modified during runtime.
+    REQUIRED_AND_UNLOCKED : str
+        Variable is required to have a value upon initialization, and it can also be modified during runtime.
+    NOT_REQUIRED_AND_UNLOCKED: str
+        Variable is not required to have a value upon initialization, and it can be modified during runtime.
+    """
+    REQUIRED_AND_LOCKED: str = "required and locked"
+    REQUIRED_AND_UNLOCKED: str = "required and unlocked"
+    NOT_REQUIRED_AND_UNLOCKED: str = "not required and unlocked"
 
 
 class InputManager:
@@ -237,6 +256,64 @@ class InputManager:
 
         return filtered_input_data
 
+    @staticmethod
+    def _get_variable_modifiability(variable_properties: Dict[str, Any]) -> Modifiability:
+        if "modifiability" in variable_properties.keys() and variable_properties["modifiability"]:
+            return Modifiability.__getitem__('_'.join(variable_properties["modifiability"].strip().upper().split()))
+        else:
+            return Modifiability.__getitem__("NOT_REQUIRED_AND_UNLOCKED")
+
+    @staticmethod
+    def _get_caller_function():
+        """Returns the name of the function that called the current function."""
+        current_function = inspect.currentframe().f_back.f_back.f_code.co_name
+
+        call_stack = inspect.stack()
+        call_stack_functions = list(dict.fromkeys([call_stack[i].function for i in range(len(call_stack))]))
+
+        return call_stack_functions[call_stack_functions.index(current_function) + 1]
+
+    def _is_input_required_upon_initialization(self, variable_properties: Dict[str, Any]) -> bool:
+        variable_modifiability = self._get_variable_modifiability(variable_properties)
+        return variable_modifiability == Modifiability.REQUIRED_AND_LOCKED or variable_modifiability. \
+            REQUIRED_AND_UNLOCKED
+
+    def _is_modifiable_during_runtime(self, variable_properties: Dict[str, Any]) -> bool:
+        variable_modifiability = self._get_variable_modifiability(variable_properties)
+        return variable_modifiability == Modifiability.NOT_REQUIRED_AND_UNLOCKED or variable_modifiability. \
+            REQUIRED_AND_UNLOCKED
+
+    def _handle_missing_data(self, variable_properties: Dict[str, Any], var_name: str, info_map: Dict[str, str])\
+            -> None:
+        caller_function = self._get_caller_function()
+        print(caller_function)
+        is_initialization = caller_function == self._populate_pool.__name__
+
+        if is_initialization:
+            is_input_required_upon_initialization = self._is_input_required_upon_initialization(
+                variable_properties)
+            if is_input_required_upon_initialization:
+                om.add_error("Validation: key not found in input data -- input required upon initialization",
+                             f"Key {var_name} not found in input data. Input value is required for this "
+                             "variable upon program initialization.",
+                             info_map)
+                raise KeyError("Key {var_name} not found in input data. Input value is required for this "
+                               "variable upon program initialization.")
+            else:
+                om.add_warning(
+                    "Validation: key not found in input data -- input not required upon initialization",
+                    f"Key {var_name} not found in input data. Input value is not required for this "
+                    "variable upon program initialization, setting the variable value to None.",
+                    info_map)
+                return
+        else:
+            om.add_error(
+                "Validation: key not found in data -- value required to update variable during runtime",
+                f"Key {var_name} not found in data. A value is required for to update variable during runtime.",
+                info_map)
+            raise KeyError(f"Key {var_name} not found in data. A value is required for to update variable "
+                           "during runtime.")
+
     def _validate_input_type_dynamic(self, variable_properties: Dict[str, Any], var_name: str, input_data_value: Any,
                                      properties_blob_key: str) -> bool:
         """
@@ -338,9 +415,16 @@ class InputManager:
         info_map = {"class": self.__class__.__name__,
                     "function": self._validate_tabular_element.__name__,
                     }
-        variable = input_data[var_name]
+
         variable_properties = reduce(lambda d, key: d[key], [var_name],
                                      self.__metadata["properties"][properties_blob_key])
+        if var_name not in input_data.keys():
+            self._handle_missing_data(variable_properties=variable_properties,
+                                      var_name=var_name,
+                                      info_map=info_map)
+            variable = None
+        else:
+            variable = input_data[var_name]
 
         for element_num in range(len(variable)):
             element_counter_and_validity["total_elements"] += 1
@@ -413,7 +497,7 @@ class InputManager:
         if is_nested:
             children_status: Dict[str, bool] = {}
             false_counter = 0
-            variable_properties_to_ignore = ["type", "description"]
+            variable_properties_to_ignore = ["type", "description", "modifiability"]
             for nested_key in variable_properties.keys():
                 if nested_key not in variable_properties_to_ignore:
                     element_hierarchy.append(nested_key)
@@ -440,8 +524,9 @@ class InputManager:
             try:
                 input_data_value = reduce(lambda d, key: d[key], element_hierarchy, input_data)
             except KeyError:
-                om.add_error("Validation: key not found in input data", f"Key {var_name} not found in input data.",
-                             info_map)
+                self._handle_missing_data(variable_properties=variable_properties,
+                                          var_name=var_name,
+                                          info_map=info_map)
                 input_data_value = None
 
             is_valid = self._validate_input_type_dynamic(variable_properties, var_name, input_data_value,

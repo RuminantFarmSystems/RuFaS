@@ -148,7 +148,7 @@
         "description": "The year and Julian day on which the simulation will start.",
         "pattern": "[12][019][0-9]{2}:(?:[1-9]|[1-9][0-9]|[12][0-9]{2}|3[0-5][0-9]|36[0-6])$",
         "default": "2009:1",
-        "modifiability": ""
+        "modifiability": "required and unlocked"
       },
       "end_date": {
         "type": "string",
@@ -189,10 +189,12 @@
     },
     "animal_properties": {
       "herd_information": {
+        "modifiability": "required and unlocked",
         "type": "object",
         "description": "Herd Demographics",
         "calf_num": {
           "type": "number",
+          "modifiability": "required and unlocked",
           "description": "Number of Calves (head) -- The initial number of pre-weaned calves",
           "default": 8,
           "minimum": 0
@@ -263,6 +265,7 @@
           "type": "object",
           "description": "General Management",
           "breeding_start_day_h": {
+            "modifiability": "required and unlocked",
             "type": "number",
             "description": "Heifer Breeding Start Day (days) -- Days old when RuFaS initiates estrus protocol (first cycle to occur ~21 days later)",
             "default": 380,
