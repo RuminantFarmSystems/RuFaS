@@ -4384,43 +4384,6 @@ def test_composting_calculate_Nitrogen_loss_to_direct_Nitrous_Oxide_Emission(
     assert result == expected_result
 
 
-def test_composting_calculate_Nitrogen_loss_to_indirect_Nitrous_Oxide_Emission(mocker: MockFixture) -> None:
-    """
-    Unit test for _calculate_Nitrogen_loss_to_indirect_Nitrous_Oxide_Emission() in Composting class in composting.py
-    """
-    Nitrogen_loss_to_leaching = 0.5
-    Nitrogen_loss_to_ammonia_emission = 5.0
-    # Arrange
-    weather_mock = mocker.MagicMock()
-
-    time_mock = mocker.MagicMock()
-
-    manure_treatment_config_mock = mocker.MagicMock()
-
-    daily_input_mock = mocker.MagicMock()
-    daily_input_mock.liquid_manure_nitrogen = 10
-
-    mock_calculate_Nitrogen_loss_to_leaching = mocker.patch(
-        "RUFAS.routines.manure.manure_treatments.composting.Composting._calculate_Nitrogen_loss_to_leaching",
-        return_value=Nitrogen_loss_to_leaching)
-    mock_calc_ammonia_emission = mocker.patch(
-        "RUFAS.routines.manure.manure_treatments.composting.Composting.calc_ammonia_emission",
-        return_value=Nitrogen_loss_to_ammonia_emission)
-
-    composting = Composting(weather_mock, time_mock, manure_treatment_config_mock)
-    composting._current_manure_treatment_daily_input = daily_input_mock
-
-    expected_result = (Nitrogen_loss_to_leaching + Nitrogen_loss_to_ammonia_emission) * ManureConstants.\
-        COMPOSTING_N2O_INDIRECT_EMISSION_FACTOR * 44 / 28
-
-    result = composting._calculate_Nitrogen_loss_to_indirect_Nitrous_Oxide_Emission()
-
-    assert result == expected_result
-
-    mock_calculate_Nitrogen_loss_to_leaching.assert_called_once()
-    mock_calc_ammonia_emission.assert_called_once()
-
-
 def test_composting_calculate_total_Nitrogen_mass(mocker: MockFixture) -> None:
     """
     Unit test for _calculate_total_Nitrogen_mass() in Composting class in composting.py
@@ -4428,7 +4391,6 @@ def test_composting_calculate_total_Nitrogen_mass(mocker: MockFixture) -> None:
     Nitrogen_loss_to_leaching = 0.5
     Nitrogen_loss_to_ammonia_emission = 5.0
     Nitrogen_loss_to_direct_N2O_emission = 0.9428571428571428
-    Nitrogen_loss_to_indirect_N2O_emission = 0.08642857142857142
 
     # Arrange
     weather_mock = mocker.MagicMock()
@@ -4450,17 +4412,13 @@ def test_composting_calculate_total_Nitrogen_mass(mocker: MockFixture) -> None:
         "RUFAS.routines.manure.manure_treatments.composting.Composting."
         "_calculate_Nitrogen_loss_to_direct_Nitrous_Oxide_Emission",
         return_value=Nitrogen_loss_to_direct_N2O_emission)
-    mock_calculate_Nitrogen_loss_to_indirect_Nitrous_Oxide_Emission = mocker.patch(
-        "RUFAS.routines.manure.manure_treatments.composting.Composting."
-        "_calculate_Nitrogen_loss_to_indirect_Nitrous_Oxide_Emission",
-        return_value=Nitrogen_loss_to_indirect_N2O_emission)
 
     composting = Composting(weather_mock, time_mock, manure_treatment_config_mock)
     composting._current_manure_treatment_daily_input = daily_input_mock
 
     expected_result = \
         daily_input_mock.liquid_manure_nitrogen - Nitrogen_loss_to_ammonia_emission - Nitrogen_loss_to_leaching - \
-        Nitrogen_loss_to_direct_N2O_emission - Nitrogen_loss_to_indirect_N2O_emission
+        Nitrogen_loss_to_direct_N2O_emission
 
     result = composting._calculate_total_Nitrogen_mass()
 
@@ -4469,7 +4427,6 @@ def test_composting_calculate_total_Nitrogen_mass(mocker: MockFixture) -> None:
     mock_calculate_Nitrogen_loss_to_leaching.assert_called_once()
     mock_calc_ammonia_emission.assert_called_once()
     mock_calculate_Nitrogen_loss_to_direct_Nitrous_Oxide_Emission.assert_called_once()
-    mock_calculate_Nitrogen_loss_to_indirect_Nitrous_Oxide_Emission.assert_called_once()
 
 
 def test_composting_calculate_organic_Nitrogen_mass(mocker: MockFixture) -> None:

@@ -350,22 +350,6 @@ class Composting(BaseManureTreatment):
 
         return fraction_Nitrogen_lost_as_ammonia * N_prior_t * 44 / 28
 
-    def _calculate_Nitrogen_loss_to_indirect_Nitrous_Oxide_Emission(self) -> float:
-        """
-        This function calculates the amount of Nitrogen loss through indirect Nitrous Oxide Emission of the current
-        year.
-
-        Returns
-        -------
-        float
-            The total Nitrogen loss through indirect Nitrous Oxide Emission of the current year, kg.
-        """
-        Nitrogen_loss_to_leaching = self._calculate_Nitrogen_loss_to_leaching()
-        Nitrogen_loss_to_ammonia_emission = self.calc_ammonia_emission()
-
-        return (Nitrogen_loss_to_leaching +
-                Nitrogen_loss_to_ammonia_emission) * ManureConstants.COMPOSTING_N2O_INDIRECT_EMISSION_FACTOR * 44 / 28
-
     def _calculate_total_Nitrogen_mass(self) -> float:
         """
         This function calculates the total mass of Nitrogen in the manure-bedding mix of the current year.
@@ -379,11 +363,10 @@ class Composting(BaseManureTreatment):
         Nitrogen_loss_to_ammonia_emission = self.calc_ammonia_emission()
         Nitrogen_loss_to_leaching = self._calculate_Nitrogen_loss_to_leaching()
         Nitrogen_loss_to_direct_N2O_emission = self._calculate_Nitrogen_loss_to_direct_Nitrous_Oxide_Emission()
-        Nitrogen_loss_to_indirect_N2O_emission = self._calculate_Nitrogen_loss_to_indirect_Nitrous_Oxide_Emission()
 
         return \
             N_prior_t - Nitrogen_loss_to_ammonia_emission - Nitrogen_loss_to_leaching - \
-            Nitrogen_loss_to_direct_N2O_emission - Nitrogen_loss_to_indirect_N2O_emission
+            Nitrogen_loss_to_direct_N2O_emission
 
     def _calculate_organic_Nitrogen_mass(self) -> float:
         """

@@ -5,7 +5,7 @@ class CompostingType(DefaultEnum):
     """
     This is an Enum class that represents different types of composting.
 
-    Attributes
+    Attribute
     ----------
     INTENSIVE_WINDROW : str
         Intensive windrow.
