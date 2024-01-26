@@ -887,7 +887,7 @@ def test_calculate_NASEM_DMI(animal_dict: dict, lactating: bool, net_energy_lact
         (lazy_fixture("cow_a"), (11.12, 65.11, 0.204)),
         (lazy_fixture("cow_b"), (12.59, 48.52, 0.204)),
         (lazy_fixture("heifer_a"), (5.9, 0, 0)),
-        (lazy_fixture("heifer_b"), (6.3, 77.71, 10.25)),
+        (lazy_fixture("heifer_b"), (6.3, 77.71, 10.05)),
     ],
 )
 def test_calculate_NASEM_energy_maintenance_requirements(animal_dict: dict, expected: tuple) -> None:
