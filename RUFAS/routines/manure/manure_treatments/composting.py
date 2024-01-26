@@ -2,7 +2,6 @@ import math
 from typing import Dict
 
 from RUFAS.routines.manure.IO_helpers.manure_module_output_manager_helper import ManureModuleOutputManagerHelper
-from RUFAS.routines.manure.constants_and_units.manure_constants import ManureConstants
 from RUFAS.routines.manure.manure_treatments.base_manure_treatment import BaseManureTreatment
 from RUFAS.routines.manure.manure_treatments.composting_types import CompostingType
 from RUFAS.routines.manure.manure_treatments.manure_treatment_annual_output import ManureTreatmentAnnualOutput
