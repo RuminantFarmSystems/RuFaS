@@ -1,5 +1,5 @@
 import pytest
-from unittest.mock import MagicMock, call
+from unittest.mock import MagicMock, call, patch
 from typing import List
 
 from RUFAS.routines.field.field.field import Field
@@ -80,29 +80,25 @@ def test_mix_soil_layers(layers: List[LayerData], field_size: float, pool_values
 def test_record_tillage(till_depth: float, incorp_frac: float, mix_frac: float, year: int, day: int) -> None:
     field_data_1 = FieldData(name="field1", field_size=1.5)
     till_app = TillageApplication(field_data=field_data_1)
-    till_app.till_soil(till_depth, incorp_frac, mix_frac, year, day)
-    pool = om.variables_pool
-    assert len(pool["TillageApplication._record_tillage.tillage_record.field='field1'"]['info_maps']) == 1
-    assert pool["TillageApplication._record_tillage.tillage_record.field='field1'"]['info_maps'][0]["field_size"] \
-           == {1.5}
-    assert pool["TillageApplication._record_tillage.tillage_record.field='field1'"]['info_maps'][0]['suffix'] \
-           == "field='field1'"
-    assert pool["TillageApplication._record_tillage.tillage_record.field='field1'"]['info_maps'][0]['date']['year'] \
-           == year
-    assert pool["TillageApplication._record_tillage.tillage_record.field='field1'"]['info_maps'][0]['date']['day'] \
-           == day
-    if till_depth > till_app.soil_data.soil_layers[-1].bottom_depth:
-        assert pool["TillageApplication._record_tillage.tillage_record.field='field1'"]['values'][0]['tillage_depth'] \
-               == till_app.soil_data.soil_layers[-1].bottom_depth
-    else:
-        assert pool["TillageApplication._record_tillage.tillage_record.field='field1'"]['values'][0]['tillage_depth'] \
-               == till_depth
-    assert \
-        pool["TillageApplication._record_tillage.tillage_record.field='field1'"]['values'][0][
-            'incorporation_fraction'] == incorp_frac
-    assert pool["TillageApplication._record_tillage.tillage_record.field='field1'"]['values'][0]['mixing_fraction'] \
-           == mix_frac
-    om.flush_pools()
+
+    expected_info_map = {
+        "class": TillageApplication.__name__,
+        "function": TillageApplication._record_tillage.__name__,
+        "suffix": "field='field1'",
+        "field_size": 1.5,
+    }
+    expected_value = {
+        "tillage_depth": till_depth,
+        "incorporation_fraction": incorp_frac,
+        "mixing_fraction": mix_frac,
+        "year": year,
+        "day": day
+    }
+
+    with patch.object(om, "add_variable") as add_var:
+        till_app._record_tillage(till_depth, incorp_frac, mix_frac, year, day)
+
+        add_var.assert_called_once_with("tillage_record", expected_value, expected_info_map)
 
 
 @pytest.mark.parametrize("till_depth,incorp_frac,mix_frac, year, day", [
